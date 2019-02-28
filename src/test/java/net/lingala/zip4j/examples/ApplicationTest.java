@@ -9,6 +9,7 @@ import org.apache.commons.io.FileUtils;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -74,7 +75,7 @@ public class ApplicationTest {
 
         // Build the list of files to be added in the array list
         // Objects of type File have to be added to the ArrayList
-        ArrayList filesToAdd = new ArrayList();
+        List<File> filesToAdd = new ArrayList<>();
         filesToAdd.add(srcDir.resolve("mcdonnell-douglas-f-15-eagle-wallpapers-29085-4658857.jpg").toFile());
         filesToAdd.add(srcDir.resolve("saint-petersburg-wallpapers-28859-4730952.jpg").toFile());
         filesToAdd.add(srcDir.resolve("sig-sauer-pistol-wallpapers-29113-822891.jpg").toFile());
