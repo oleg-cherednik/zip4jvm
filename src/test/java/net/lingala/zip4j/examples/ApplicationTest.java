@@ -1,7 +1,11 @@
 package net.lingala.zip4j.examples;
 
+import lombok.NonNull;
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.util.Zip4jConstants;
 import org.apache.commons.io.FileUtils;
-import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -9,6 +13,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,7 +34,7 @@ public class ApplicationTest {
 
     @BeforeMethod
     public void createDirectory() throws IOException {
-        root = Files.createTempDirectory("zipper");
+        root = Paths.get("d:/zip4j");//Files.createTempDirectory("zip4j");
         srcDir = root.resolve("src");
         destDir = root.resolve("dest");
         resDir = destDir.resolve("res");
@@ -36,7 +44,7 @@ public class ApplicationTest {
         Files.createDirectories(resDir);
     }
 
-    @BeforeMethod(dependsOnMethods = "createDirectory")
+//    @BeforeMethod(dependsOnMethods = "createDirectory")
     public void copyTestData() throws IOException {
         Path dataDir = Paths.get("src/test/resources/data").toAbsolutePath();
 
@@ -52,9 +60,52 @@ public class ApplicationTest {
         });
     }
 
-    @AfterMethod
+//    @AfterMethod
     public void removeDirectory() throws IOException {
         FileUtils.deleteQuietly(root.toFile());
+    }
+
+    public void addFilesStoreCompNew() throws ZipException, IOException {
+        // Initiate ZipFile object with the path/name of the zip file
+        // Zip file may not necessarily exist. If zip file exists, then
+        // all these files are added to the zip file. If zip file does not
+        // exist, then a new zip file is created with the files mentioned
+        ZipFile zipFile = new ZipFile(destDir.resolve("src.zip").toString());
+
+        // Build the list of files to be added in the array list
+        // Objects of type File have to be added to the ArrayList
+        ArrayList filesToAdd = new ArrayList();
+        filesToAdd.add(srcDir.resolve("mcdonnell-douglas-f-15-eagle-wallpapers-29085-4658857.jpg").toFile());
+        filesToAdd.add(srcDir.resolve("saint-petersburg-wallpapers-28859-4730952.jpg").toFile());
+        filesToAdd.add(srcDir.resolve("sig-sauer-pistol-wallpapers-29113-822891.jpg").toFile());
+
+        // Initiate Zip Parameters which define various properties such
+        // as compression method, etc. More parameters are explained in other
+        // examples
+        ZipParameters parameters = new ZipParameters();
+        parameters.setCompressionMethod(Zip4jConstants.COMP_STORE); // set compression method to store compression
+
+        // Now add files to the zip file
+        // Note: To add a single file, the method addFile can be used
+        // Note: If the zip file already exists and if this zip file is a split file
+        // then this method throws an exception as Zip Format Specification does not
+        // allow updating split zip files
+        zipFile.addFiles(filesToAdd, parameters);
+
+        checkDestinationDir(1);
+//        checkResultDir();
+    }
+
+    @NonNull
+    private static List<String> getDirectoryEntries(@NonNull Path dir) {
+        try {
+            return Files.walk(dir)
+                        .filter(path -> Files.isRegularFile(path) || Files.isDirectory(path))
+                        .map(Path::toString)
+                        .collect(Collectors.toList());
+        } catch(IOException e) {
+            return Collections.emptyList();
+        }
     }
 
 //    public void shouldZipAndUnzipWithSinglePart() throws Exception {
@@ -81,7 +132,7 @@ public class ApplicationTest {
 
         assertThat(Files.exists(resDir)).isTrue();
         assertThat(getRegularFilesAmount(resDir)).isZero();
-        assertThat(getFoldersAmount(resDir)).isOne();
+//        assertThat(getFoldersAmount(resDir)).isOne();
     }
 
     private void checkResultDir() throws IOException {
