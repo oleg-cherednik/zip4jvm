@@ -1,44 +1,44 @@
 /*
-* Copyright 2010 Srikanth Reddy Lingala  
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
-* you may not use this file except in compliance with the License. 
-* You may obtain a copy of the License at 
-* 
-* http://www.apache.org/licenses/LICENSE-2.0 
-* 
-* Unless required by applicable law or agreed to in writing, 
-* software distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
-* limitations under the License. 
-*/
+ * Copyright 2010 Srikanth Reddy Lingala
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package net.lingala.zip4j.model;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class CentralDirectory {
-	
-	private ArrayList fileHeaders;
-	
-	private DigitalSignature digitalSignature;
 
-	public ArrayList getFileHeaders() {
-		return fileHeaders;
-	}
+    private List<FileHeader> fileHeaders;
 
-	public void setFileHeaders(ArrayList fileHeaders) {
-		this.fileHeaders = fileHeaders;
-	}
+    private DigitalSignature digitalSignature;
 
-	public DigitalSignature getDigitalSignature() {
-		return digitalSignature;
-	}
+    public List<FileHeader> getFileHeaders() {
+        return fileHeaders;
+    }
 
-	public void setDigitalSignature(DigitalSignature digitalSignature) {
-		this.digitalSignature = digitalSignature;
-	}
-	
-	
+    public void setFileHeaders(List<FileHeader> fileHeaders) {
+        this.fileHeaders = fileHeaders;
+    }
+
+    public DigitalSignature getDigitalSignature() {
+        return digitalSignature;
+    }
+
+    public void setDigitalSignature(DigitalSignature digitalSignature) {
+        this.digitalSignature = digitalSignature;
+    }
+
+
 }

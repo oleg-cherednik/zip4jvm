@@ -37,6 +37,7 @@ import net.lingala.zip4j.util.Zip4jUtil;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Helper class to read header information for the zip file
@@ -197,7 +198,7 @@ public class HeaderReader {
 
 		try {
 			CentralDirectory centralDirectory = new CentralDirectory();
-			ArrayList fileHeaderList = new ArrayList();
+			List<FileHeader> fileHeaderList = new ArrayList<>();
 
 			EndCentralDirRecord endCentralDirRecord = zipModel.getEndCentralDirRecord();
 			long offSetStartCentralDir = endCentralDirRecord.getOffsetOfStartOfCentralDir();
