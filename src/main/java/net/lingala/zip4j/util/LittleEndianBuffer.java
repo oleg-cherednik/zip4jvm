@@ -14,11 +14,42 @@ import java.util.List;
  */
 public final class LittleEndianBuffer implements Closeable {
     private final List<String> bytes = new ArrayList<>();
+    private final byte[] intByte = new byte[4];
+    private final byte[] shortByte = new byte[2];
+    private final byte[] longByte = new byte[8];
 
     public int flushInto(OutputStream out) throws IOException {
         byte[] lhBytes = byteArrayListToByteArray();
         out.write(lhBytes);
         return lhBytes.length;
+    }
+
+    public LittleEndianBuffer writeInt(int val) {
+        Raw.writeIntLittleEndian(intByte, 0, val);
+        copyByteArrayToArrayList(intByte);
+        return this;
+    }
+
+    public LittleEndianBuffer writeShort(short val) {
+        Raw.writeShortLittleEndian(shortByte, 0, val);
+        copyByteArrayToArrayList(shortByte);
+        return this;
+    }
+
+    public LittleEndianBuffer writeLong(long val) {
+        Raw.writeLongLittleEndian(longByte, 0, val);
+        return this;
+    }
+
+    public LittleEndianBuffer writeLongAsInt(long val) {
+        Raw.writeLongLittleEndian(longByte, 0, val);
+        System.arraycopy(longByte, 0, intByte, 0, 4);
+        return this;
+    }
+
+    public LittleEndianBuffer writeBytes(byte... buf) {
+        copyByteArrayToArrayList(buf);
+        return this;
     }
 
     public void copyByteArrayToArrayList(@NonNull byte[] buf) {
