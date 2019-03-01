@@ -16,12 +16,16 @@
 
 package net.lingala.zip4j.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import net.lingala.zip4j.util.Zip4jUtil;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
+@Getter
+@Setter
 public class ZipModel implements Cloneable {
 
     private List localFileHeaderList;
@@ -131,14 +135,6 @@ public class ZipModel implements Cloneable {
     public void setZip64EndCentralDirRecord(
             Zip64EndCentralDirRecord zip64EndCentralDirRecord) {
         this.zip64EndCentralDirRecord = zip64EndCentralDirRecord;
-    }
-
-    public boolean isZip64Format() {
-        return isZip64Format;
-    }
-
-    public void setZip64Format(boolean isZip64Format) {
-        this.isZip64Format = isZip64Format;
     }
 
     public boolean isNestedZipFile() {

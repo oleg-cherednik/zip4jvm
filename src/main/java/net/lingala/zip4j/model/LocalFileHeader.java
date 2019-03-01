@@ -25,30 +25,30 @@ import java.util.List;
 @Setter
 public class LocalFileHeader {
 
-    /* size:4 - local file header signature (0x04034b50) */
+    // size:4 - local file header signature (0x04034b50)
     private int signature;
-    /* size:2 - version needed to extract */
+    // size:2 - version needed to extract
     private int versionNeededToExtract;
-    /* size:2 - general purpose bit flag */
+    // size:2 - general purpose bit flag
     private byte[] generalPurposeFlag;
-    /* size:2 - compression method */
+    // size:2 - compression method
     private int compressionMethod;
-    /* size:2 - last mod file time */
-    /* size:2 - ast mod file date */
+    // size:2 - last mod file time
+    // size:2 - ast mod file date
     private int lastModFileTime;
-    /* size:4 - crc-32 */
+    // size:4 - crc-32
     private long crc32;
-    /* size:4 - compressed size */
+    // size:4 - compressed size
     private long compressedSize;
-    /* size:4 - uncompressed size */
+    // size:4 - uncompressed size
     private long uncompressedSize;
-    /* size:2 - file name length (n) */
+    // size:2 - file name length (n)
     private int fileNameLength;
-    /* size:2 - extra field length (m) */
+    // size:2 - extra field length (m)
     private int extraFieldLength;
-    /* size:n - File name */
+    // size:n - File name
     private String fileName;
-    /* size:m - extra field */
+    // size:m - extra field
     private byte[] extraField;
 
     // ----
@@ -64,5 +64,26 @@ public class LocalFileHeader {
     private boolean writeComprSizeInZip64ExtraRecord;
     private boolean fileNameUTF8Encoded;
     private byte[] crcBuff;
+
+    public short getExtraFileLength(ZipModel model) {
+        short extraFieldLength = 0;
+
+        if (model.isZip64Format())
+            extraFieldLength += 20;
+        if (aesExtraDataRecord != null)
+            extraFieldLength += 11;
+
+        return extraFieldLength;
+    }
+
+    @Getter
+    @Setter
+    public static final class GeneralPurposeFlag {
+
+        private boolean bit0;
+        private boolean bit1;
+        private boolean bit2;
+        private boolean bit3;
+    }
 
 }

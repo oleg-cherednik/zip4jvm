@@ -99,6 +99,15 @@ public interface InternalZipConstants {
 
     static final int MIN_SPLIT_LENGTH = 65536;
 
+    /*
+     * 4.3.9.2 When compressing files, compressed and uncompressed sizes
+     * SHOULD be stored in ZIP64 format (as 8 byte values) when a
+     * file's size exceeds 0xFFFFFFFF.   However ZIP64 format MAY be
+     * used regardless of the size of a file.  When extracting, if
+     * the zip64 extended information extra field is present for
+     * the file the compressed and uncompressed sizes will be 8
+     * byte values.
+     */
     static final long ZIP_64_LIMIT = 0xFFFF_FFFFL;
 
 	public static String OFFSET_CENTRAL_DIR = "offsetCentralDir";
