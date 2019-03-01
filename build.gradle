@@ -8,7 +8,7 @@ repositories {
     jcenter()
 }
 
-version = '1.4.0'
+version = '2.0'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 mainClassName = 'com.agoda.zipper.Application'
