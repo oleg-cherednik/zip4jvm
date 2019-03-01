@@ -33,6 +33,7 @@ import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.Raw;
 import net.lingala.zip4j.util.Zip4jConstants;
 import net.lingala.zip4j.util.Zip4jUtil;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -689,9 +690,8 @@ public class HeaderReader {
 			throw new ZipException("file header is null in reading Zip64 Extended Info");
 		}
 
-		if (localFileHeader.getExtraDataRecords() == null || localFileHeader.getExtraDataRecords().size() <= 0) {
+		if (CollectionUtils.isEmpty(localFileHeader.getExtraDataRecords()))
 			return;
-		}
 
 		Zip64ExtendedInfo zip64ExtendedInfo = readZip64ExtendedInfo(
 				localFileHeader.getExtraDataRecords(),
@@ -721,14 +721,14 @@ public class HeaderReader {
 	 * @throws ZipException
 	 */
 	private Zip64ExtendedInfo readZip64ExtendedInfo(
-			ArrayList extraDataRecords,
+			List<ExtraDataRecord> extraDataRecords,
 			long unCompressedSize,
 			long compressedSize,
 			long offsetLocalHeader,
 			int diskNumberStart) throws ZipException {
 
 		for (int i = 0; i < extraDataRecords.size(); i++) {
-			ExtraDataRecord extraDataRecord = (ExtraDataRecord)extraDataRecords.get(i);
+			ExtraDataRecord extraDataRecord = extraDataRecords.get(i);
 			if (extraDataRecord == null) {
 				continue;
 			}
@@ -1042,14 +1042,14 @@ public class HeaderReader {
 	 * @return {@link AESExtraDataRecord}
 	 * @throws ZipException
 	 */
-	private AESExtraDataRecord readAESExtraDataRecord(ArrayList extraDataRecords) throws ZipException {
+	private AESExtraDataRecord readAESExtraDataRecord(List<ExtraDataRecord> extraDataRecords) throws ZipException {
 
 		if (extraDataRecords == null) {
 			return null;
 		}
 
 		for (int i = 0; i < extraDataRecords.size(); i++) {
-			ExtraDataRecord extraDataRecord = (ExtraDataRecord)extraDataRecords.get(i);
+			ExtraDataRecord extraDataRecord = extraDataRecords.get(i);
 			if (extraDataRecord == null) {
 				continue;
 			}

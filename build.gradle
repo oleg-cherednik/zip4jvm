@@ -21,6 +21,7 @@ dependencies {
     compile 'javax.validation:validation-api:2.0.1.Final'
     compile 'commons-io:commons-io:2.6'
     compile 'commons-lang:commons-lang:2.6'
+    compile 'org.apache.commons:commons-collections4:4.3'
 
     compileOnly 'org.projectlombok:lombok:1.16.18'
 
