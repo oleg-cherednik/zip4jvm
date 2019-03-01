@@ -25,22 +25,37 @@ import java.util.List;
 @Setter
 public class LocalFileHeader {
 
+    /* size:4 - local file header signature (0x04034b50) */
     private int signature;
+    /* size:2 - version needed to extract */
     private int versionNeededToExtract;
+    /* size:2 - general purpose bit flag */
     private byte[] generalPurposeFlag;
+    /* size:2 - compression method */
     private int compressionMethod;
+    /* size:2 - last mod file time */
+    /* size:2 - ast mod file date */
     private int lastModFileTime;
+    /* size:4 - crc-32 */
     private long crc32;
-    private byte[] crcBuff;
+    /* size:4 - compressed size */
     private long compressedSize;
+    /* size:4 - uncompressed size */
     private long uncompressedSize;
+    /* size:2 - file name length (n) */
     private int fileNameLength;
+    /* size:2 - extra field length (m) */
     private int extraFieldLength;
+    /* size:n - File name */
     private String fileName;
+    /* size:m - extra field */
     private byte[] extraField;
+
+    // ----
+
     private long offsetStartOfData;
     private boolean isEncrypted;
-    private int encryptionMethod;
+    private int encryptionMethod = -1;
     private char[] password;
     private List<ExtraDataRecord> extraDataRecords;
     private Zip64ExtendedInfo zip64ExtendedInfo;
@@ -48,12 +63,6 @@ public class LocalFileHeader {
     private boolean dataDescriptorExists;
     private boolean writeComprSizeInZip64ExtraRecord;
     private boolean fileNameUTF8Encoded;
-
-    public LocalFileHeader() {
-        encryptionMethod = -1;
-        writeComprSizeInZip64ExtraRecord = false;
-        crc32 = 0;
-        uncompressedSize = 0;
-    }
+    private byte[] crcBuff;
 
 }

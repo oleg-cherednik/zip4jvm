@@ -37,6 +37,7 @@ import net.lingala.zip4j.util.Zip4jUtil;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.zip.CRC32;
 
@@ -333,7 +334,7 @@ public class CipherOutputStream extends BaseOutputStream {
             outputStream.close();
     }
 
-    private void createFileHeader() throws ZipException {
+    private void createFileHeader() throws ZipException, UnsupportedEncodingException {
         this.fileHeader = new FileHeader();
         fileHeader.setSignature((int)InternalZipConstants.CENSIG);
         fileHeader.setVersionMadeBy(20);

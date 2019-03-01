@@ -24,6 +24,25 @@ public final class LittleEndianBuffer implements Closeable {
         return lhBytes.length;
     }
 
+    // 2 bytes (16 bit)
+    public LittleEndianBuffer writeWord(short val) {
+        return writeShort(val);
+    }
+
+    // 4 bytes (32 bit)
+    public LittleEndianBuffer writeDword(int val) {
+        return writeInt(val);
+    }
+
+    public LittleEndianBuffer writeDword(long val) {
+        return writeLongAsInt(val);
+    }
+
+    // 8 bytes (64 bit)
+    public LittleEndianBuffer writeQword(long val) {
+        return writeLong(val);
+    }
+
     public LittleEndianBuffer writeInt(int val) {
         Raw.writeIntLittleEndian(intByte, 0, val);
         copyByteArrayToArrayList(intByte);
@@ -38,12 +57,14 @@ public final class LittleEndianBuffer implements Closeable {
 
     public LittleEndianBuffer writeLong(long val) {
         Raw.writeLongLittleEndian(longByte, 0, val);
+        copyByteArrayToArrayList(longByte);
         return this;
     }
 
     public LittleEndianBuffer writeLongAsInt(long val) {
         Raw.writeLongLittleEndian(longByte, 0, val);
         System.arraycopy(longByte, 0, intByte, 0, 4);
+        copyByteArrayToArrayList(intByte);
         return this;
     }
 
