@@ -446,14 +446,9 @@ public class HeaderWriter {
             bytes.copyByteArrayToArrayList(offsetLocalHeaderBytes);
             sizeOfFileHeader += 4;
 
-            if (Zip4jUtil.isStringNotNullAndNotEmpty(zipModel.getFileNameCharset())) {
-                byte[] fileNameBytes = fileHeader.getFileName().getBytes(zipModel.getFileNameCharset());
-                bytes.copyByteArrayToArrayList(fileNameBytes);
-                sizeOfFileHeader += fileNameBytes.length;
-            } else {
-                bytes.copyByteArrayToArrayList(Zip4jUtil.convertCharset(fileHeader.getFileName()));
-                sizeOfFileHeader += Zip4jUtil.getEncodedStringLength(fileHeader.getFileName());
-            }
+            byte[] fileNameBytes = fileHeader.getFileName().getBytes(zipModel.getCharset());
+            bytes.copyByteArrayToArrayList(fileNameBytes);
+            sizeOfFileHeader += fileNameBytes.length;
 
             if (writeZip64FileSize || writeZip64OffsetLocalHeader) {
                 zipModel.setZip64Format(true);

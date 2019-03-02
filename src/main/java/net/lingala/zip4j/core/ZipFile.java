@@ -16,7 +16,9 @@
 
 package net.lingala.zip4j.core;
 
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.FileHeader;
@@ -35,7 +37,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,6 +53,8 @@ import java.util.List;
  * </ul>
  */
 
+@Getter
+@Setter
 public class ZipFile {
 
     private String file;
@@ -59,7 +63,8 @@ public class ZipFile {
     private boolean isEncrypted;
     private final ProgressMonitor progressMonitor = new ProgressMonitor();
     private boolean runInThread;
-    private String fileNameCharset;
+    @NonNull
+    private Charset charset = Charset.defaultCharset();
 
     /**
      * Creates a new Zip File Object with the given zip file path.
@@ -421,7 +426,7 @@ public class ZipFile {
             if (zipModel == null) {
 
                 HeaderReader headerReader = new HeaderReader(raf);
-                zipModel = headerReader.readAllHeaders(this.fileNameCharset);
+                zipModel = headerReader.readAllHeaders(charset);
                 if (zipModel != null) {
                     zipModel.setZipFile(file);
                 }
@@ -899,49 +904,33 @@ public class ZipFile {
      * @throws ZipException
      */
     public String getComment() throws ZipException {
-        return getComment(null);
+        return getComment(Charset.defaultCharset());
     }
 
     /**
      * Returns the comment set for the Zip file in the input encoding
      *
-     * @param encoding
+     * @param charset
      * @return String
      * @throws ZipException
      */
-    public String getComment(String encoding) throws ZipException {
-        if (encoding == null) {
-            if (Zip4jUtil.isSupportedCharset(InternalZipConstants.CHARSET_COMMENTS_DEFAULT)) {
-                encoding = InternalZipConstants.CHARSET_COMMENTS_DEFAULT;
-            } else {
-                encoding = InternalZipConstants.CHARSET_DEFAULT;
-            }
-        }
-
-        if (Zip4jUtil.checkFileExists(file)) {
+    public String getComment(@NonNull Charset charset) throws ZipException {
+        if (Zip4jUtil.checkFileExists(file))
             checkZipModel();
-        } else {
+        else
             throw new ZipException("zip file does not exist, cannot read comment");
-        }
 
-        if (this.zipModel == null) {
+        if (zipModel == null)
             throw new ZipException("zip model is null, cannot read comment");
-        }
 
-        if (this.zipModel.getEndCentralDirRecord() == null) {
+        if (zipModel.getEndCentralDirRecord() == null)
             throw new ZipException("end of central directory record is null, cannot read comment");
-        }
 
-        if (this.zipModel.getEndCentralDirRecord().getCommentBytes() == null ||
-                this.zipModel.getEndCentralDirRecord().getCommentBytes().length <= 0) {
+        if (zipModel.getEndCentralDirRecord().getCommentBytes() == null ||
+                zipModel.getEndCentralDirRecord().getCommentBytes().length <= 0)
             return null;
-        }
 
-        try {
-            return new String(this.zipModel.getEndCentralDirRecord().getCommentBytes(), encoding);
-        } catch(UnsupportedEncodingException e) {
-            throw new ZipException(e);
-        }
+        return new String(zipModel.getEndCentralDirRecord().getCommentBytes(), charset);
     }
 
     /**
@@ -967,26 +956,7 @@ public class ZipFile {
     private void createNewZipModel() {
         zipModel = new ZipModel();
         zipModel.setZipFile(file);
-        zipModel.setFileNameCharset(fileNameCharset);
-    }
-
-    /**
-     * Zip4j will encode all the file names with the input charset. This method throws
-     * an exception if the Charset is not supported
-     *
-     * @param charsetName
-     * @throws ZipException
-     */
-    public void setFileNameCharset(String charsetName) throws ZipException {
-        if (!Zip4jUtil.isStringNotNullAndNotEmpty(charsetName)) {
-            throw new ZipException("null or empty charset name");
-        }
-
-        if (!Zip4jUtil.isSupportedCharset(charsetName)) {
-            throw new ZipException("unsupported charset: " + charsetName);
-        }
-
-        this.fileNameCharset = charsetName;
+        zipModel.setCharset(charset);
     }
 
     /**

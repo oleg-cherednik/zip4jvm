@@ -20,10 +20,13 @@ import lombok.NonNull;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipModel;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -438,16 +441,7 @@ public class Zip4jUtil {
     }
 
     public static byte[] convertCharset(String str) throws UnsupportedEncodingException {
-        byte[] converted = null;
-        String charSet = detectCharSet(str);
-        if (charSet.equals(InternalZipConstants.CHARSET_CP850)) {
-            converted = str.getBytes(InternalZipConstants.CHARSET_CP850);
-        } else if (charSet.equals(InternalZipConstants.CHARSET_UTF8)) {
-            converted = str.getBytes(InternalZipConstants.CHARSET_UTF8);
-        } else {
-            converted = str.getBytes();
-        }
-        return converted;
+        return str.getBytes(detectCharset(str));
     }
 
     /**
@@ -461,31 +455,7 @@ public class Zip4jUtil {
      * @return String
      */
     public static String decodeFileName(byte[] data, boolean isUTF8) {
-        if (isUTF8) {
-            try {
-                return new String(data, InternalZipConstants.CHARSET_UTF8);
-            } catch(UnsupportedEncodingException e) {
-                return new String(data);
-            }
-        } else {
-            return getCp850EncodedString(data);
-        }
-    }
-
-    /**
-     * Returns a string in Cp850 encoding from the input bytes.
-     * If this encoding is not supported, then String with the default encoding is returned.
-     *
-     * @param data
-     * @return String
-     */
-    public static String getCp850EncodedString(byte[] data) {
-        try {
-            String retString = new String(data, InternalZipConstants.CHARSET_CP850);
-            return retString;
-        } catch(UnsupportedEncodingException e) {
-            return new String(data);
-        }
+        return new String(data, isUTF8 ? StandardCharsets.UTF_8 : Charset.defaultCharset());
     }
 
     /**
@@ -511,22 +481,17 @@ public class Zip4jUtil {
      * @throws ZipException - if input string is null. In case of any other exception
      *                      this method returns default System charset
      */
-    public static String detectCharSet(@NonNull String str) throws UnsupportedEncodingException {
-        byte[] byteString = str.getBytes(InternalZipConstants.CHARSET_CP850);
-        String tempString = new String(byteString, InternalZipConstants.CHARSET_CP850);
+    @NonNull
+    public static Charset detectCharset(@NonNull String str) throws UnsupportedEncodingException {
+        if (checkCharset(str, Charset.forName("Cp850")))
+            return Charset.forName("Cp850");
+        if (checkCharset(str, StandardCharsets.UTF_8))
+            return StandardCharsets.UTF_8;
+        return Charset.defaultCharset();
+    }
 
-        if (str.equals(tempString)) {
-            return InternalZipConstants.CHARSET_CP850;
-        }
-
-        byteString = str.getBytes(InternalZipConstants.CHARSET_UTF8);
-        tempString = new String(byteString, InternalZipConstants.CHARSET_UTF8);
-
-        if (str.equals(tempString)) {
-            return InternalZipConstants.CHARSET_UTF8;
-        }
-
-        return InternalZipConstants.CHARSET_DEFAULT;
+    private static boolean checkCharset(@NonNull String str, @NonNull Charset charset) {
+        return str.equals(new String(str.getBytes(charset), charset));
     }
 
     /**
@@ -539,8 +504,7 @@ public class Zip4jUtil {
      * @throws ZipException
      */
     public static int getEncodedStringLength(@NonNull String str) throws ZipException, UnsupportedEncodingException {
-        String charset = detectCharSet(str);
-        return getEncodedStringLength(str, charset);
+        return getEncodedStringLength(str, detectCharset(str));
     }
 
     /**
@@ -549,34 +513,9 @@ public class Zip4jUtil {
      * @param str
      * @param charset
      * @return int
-     * @throws ZipException
      */
-    public static int getEncodedStringLength(String str, String charset) throws ZipException {
-        if (!isStringNotNullAndNotEmpty(str)) {
-            throw new ZipException("input string is null, cannot calculate encoded String length");
-        }
-
-        if (!isStringNotNullAndNotEmpty(charset)) {
-            throw new ZipException("encoding is not defined, cannot calculate string length");
-        }
-
-        ByteBuffer byteBuffer = null;
-
-        try {
-            if (charset.equals(InternalZipConstants.CHARSET_CP850)) {
-                byteBuffer = ByteBuffer.wrap(str.getBytes(InternalZipConstants.CHARSET_CP850));
-            } else if (charset.equals(InternalZipConstants.CHARSET_UTF8)) {
-                byteBuffer = ByteBuffer.wrap(str.getBytes(InternalZipConstants.CHARSET_UTF8));
-            } else {
-                byteBuffer = ByteBuffer.wrap(str.getBytes(charset));
-            }
-        } catch(UnsupportedEncodingException e) {
-            byteBuffer = ByteBuffer.wrap(str.getBytes());
-        } catch(Exception e) {
-            throw new ZipException(e);
-        }
-
-        return byteBuffer.limit();
+    public static int getEncodedStringLength(String str, @NonNull Charset charset) {
+        return StringUtils.isBlank(str) ? 0 : ByteBuffer.wrap(str.getBytes(charset)).limit();
     }
 
     /**

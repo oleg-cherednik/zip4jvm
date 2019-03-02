@@ -38,6 +38,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.zip.CRC32;
 
@@ -371,13 +372,7 @@ public class CipherOutputStream extends BaseOutputStream {
         }
 
         fileHeader.setFileName(fileName);
-
-        if (Zip4jUtil.isStringNotNullAndNotEmpty(zipModel.getFileNameCharset())) {
-            fileHeader.setFileNameLength(Zip4jUtil.getEncodedStringLength(fileName,
-                    zipModel.getFileNameCharset()));
-        } else {
-            fileHeader.setFileNameLength(Zip4jUtil.getEncodedStringLength(fileName));
-        }
+        fileHeader.setFileNameLength(Zip4jUtil.getEncodedStringLength(fileName, zipModel.getCharset()));
 
         if (outputStream instanceof SplitOutputStream) {
             fileHeader.setDiskNumberStart(((SplitOutputStream)outputStream).getCurrSplitFileCounter());
@@ -434,17 +429,11 @@ public class CipherOutputStream extends BaseOutputStream {
             fileHeader.setCrc32(zipParameters.getSourceFileCRC());
         }
         byte[] shortByte = new byte[2];
-        shortByte[0] = Raw.bitArrayToByte(generateGeneralPurposeBitArray(
-                fileHeader.isEncrypted(), zipParameters.getCompressionMethod()));
-        boolean isFileNameCharsetSet = Zip4jUtil.isStringNotNullAndNotEmpty(zipModel.getFileNameCharset());
-        if ((isFileNameCharsetSet &&
-                zipModel.getFileNameCharset().equalsIgnoreCase(InternalZipConstants.CHARSET_UTF8)) ||
-                (!isFileNameCharsetSet &&
-                        Zip4jUtil.detectCharSet(fileHeader.getFileName()).equals(InternalZipConstants.CHARSET_UTF8))) {
+        shortByte[0] = Raw.bitArrayToByte(generateGeneralPurposeBitArray(fileHeader.isEncrypted(), zipParameters.getCompressionMethod()));
+
+        if (zipModel.getCharset() == StandardCharsets.UTF_8 || Zip4jUtil.detectCharset(fileHeader.getFileName()) == StandardCharsets.UTF_8)
             shortByte[1] = 8;
-        } else {
-            shortByte[1] = 0;
-        }
+
         fileHeader.setGeneralPurposeFlag(shortByte);
     }
 

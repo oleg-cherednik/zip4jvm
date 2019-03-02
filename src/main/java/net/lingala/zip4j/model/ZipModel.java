@@ -17,11 +17,11 @@
 package net.lingala.zip4j.model;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
-import net.lingala.zip4j.util.Zip4jUtil;
-import org.apache.commons.lang.StringUtils;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.List;
 
 @Getter
@@ -56,7 +56,8 @@ public class ZipModel implements Cloneable {
 
     private long end;
 
-    private String fileNameCharset;
+    @NonNull
+    private Charset charset = Charset.defaultCharset();
 
     public ZipModel() {
         splitLength = -1;
@@ -173,18 +174,8 @@ public class ZipModel implements Cloneable {
         return super.clone();
     }
 
-    public String getFileNameCharset() {
-        return fileNameCharset;
-    }
-
-    public void setFileNameCharset(String fileNameCharset) {
-        this.fileNameCharset = fileNameCharset;
-    }
-
     public byte[] convertFileNameToByteArr(String fileName) throws UnsupportedEncodingException {
-        if (StringUtils.isNotBlank(fileNameCharset))
-            return fileName.getBytes(fileNameCharset);
-        return Zip4jUtil.convertCharset(fileName);
+        return fileName.getBytes(charset);
     }
 
 }
