@@ -1,30 +1,20 @@
 /*
-* Copyright 2010 Srikanth Reddy Lingala  
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
-* you may not use this file except in compliance with the License. 
-* You may obtain a copy of the License at 
-* 
-* http://www.apache.org/licenses/LICENSE-2.0 
-* 
-* Unless required by applicable law or agreed to in writing, 
-* software distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
-* limitations under the License. 
+* Copyright 2010 Srikanth Reddy Lingala
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
 */
 
 package net.lingala.zip4j.unzip;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.RandomAccessFile;
-import java.util.Arrays;
-import java.util.zip.CRC32;
 
 import net.lingala.zip4j.core.HeaderReader;
 import net.lingala.zip4j.crypto.AESDecrypter;
@@ -45,26 +35,36 @@ import net.lingala.zip4j.util.Raw;
 import net.lingala.zip4j.util.Zip4jConstants;
 import net.lingala.zip4j.util.Zip4jUtil;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.RandomAccessFile;
+import java.util.Arrays;
+import java.util.zip.CRC32;
+
 public class UnzipEngine {
-	
+
 	private ZipModel zipModel;
 	private FileHeader fileHeader;
 	private int currSplitFileCounter = 0;
 	private LocalFileHeader localFileHeader;
 	private IDecrypter decrypter;
 	private CRC32 crc;
-	
+
 	public UnzipEngine(ZipModel zipModel, FileHeader fileHeader) throws ZipException {
 		if (zipModel == null || fileHeader == null) {
 			throw new ZipException("Invalid parameters passed to StoreUnzip. One or more of the parameters were null");
 		}
-		
+
 		this.zipModel = zipModel;
 		this.fileHeader = fileHeader;
 		this.crc = new CRC32();
 	}
-	
-	public void unzipFile(ProgressMonitor progressMonitor, 
+
+	public void unzipFile(ProgressMonitor progressMonitor,
 			String outPath, String newFileName, UnzipParameters unzipParameters) throws ZipException {
 		if (zipModel == null || fileHeader == null || !Zip4jUtil.isStringNotNullAndNotEmpty(outPath)) {
 			throw new ZipException("Invalid parameters passed during unzipping file. One or more of the parameters were null");
@@ -74,10 +74,10 @@ public class UnzipEngine {
 		try {
 			byte[] buff = new byte[InternalZipConstants.BUFF_SIZE];
 			int readLength = -1;
-			
+
 			is = getInputStream();
 			os = getOutputStream(outPath, newFileName);
-			
+
 			while ((readLength = is.read(buff)) != -1) {
 				os.write(buff, 0, readLength);
 				progressMonitor.updateWorkCompleted(readLength);
@@ -87,11 +87,11 @@ public class UnzipEngine {
 					return;
 				}
 			}
-			
+
 			closeStreams(is, os);
-			
+
 			UnzipUtil.applyFileAttributes(fileHeader, new File(getOutputFileNameWithPath(outPath, newFileName)), unzipParameters);
-			
+
 		} catch (IOException e) {
 			throw new ZipException(e);
 		} catch (Exception e) {
@@ -100,32 +100,32 @@ public class UnzipEngine {
 			closeStreams(is, os);
 		}
 	}
-	
+
 	public ZipInputStream getInputStream() throws ZipException {
 		if (fileHeader == null) {
 			throw new ZipException("file header is null, cannot get inputstream");
 		}
-		
+
 		RandomAccessFile raf = null;
 		try {
 			raf = createFileHandler(InternalZipConstants.READ_MODE);
 			String errMsg = "local header and file header do not match";
 			//checkSplitFile();
-			
+
 			if (!checkLocalHeader())
 				throw new ZipException(errMsg);
-			
+
 			init(raf);
-			
+
 			long comprSize = localFileHeader.getCompressedSize();
 			long offsetStartOfData = localFileHeader.getOffsetStartOfData();
-			
+
 			if (localFileHeader.isEncrypted()) {
 				if (localFileHeader.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_AES) {
 					if (decrypter instanceof AESDecrypter) {
-						comprSize -= (((AESDecrypter)decrypter).getSaltLength() + 
+						comprSize -= (((AESDecrypter)decrypter).getSaltLength() +
 								((AESDecrypter)decrypter).getPasswordVerifierLength() + 10);
-						offsetStartOfData += (((AESDecrypter)decrypter).getSaltLength() + 
+						offsetStartOfData += (((AESDecrypter)decrypter).getSaltLength() +
 								((AESDecrypter)decrypter).getPasswordVerifierLength());
 					} else {
 						throw new ZipException("invalid decryptor when trying to calculate " +
@@ -136,7 +136,7 @@ public class UnzipEngine {
 					offsetStartOfData += InternalZipConstants.STD_DEC_HDR_SIZE;
 				}
 			}
-			
+
 			int compressionMethod = fileHeader.getCompressionMethod();
 			if (fileHeader.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_AES) {
 				if (fileHeader.getAesExtraDataRecord() != null) {
@@ -148,9 +148,9 @@ public class UnzipEngine {
 			raf.seek(offsetStartOfData);
 			switch (compressionMethod) {
 			case Zip4jConstants.COMP_STORE:
-				return new ZipInputStream(new PartInputStream(raf, offsetStartOfData, comprSize, this));
+				return new ZipInputStream(new PartInputStream(raf, offsetStartOfData, comprSize, this), this);
 			case Zip4jConstants.COMP_DEFLATE:
-				return new ZipInputStream(new InflaterInputStream(raf, offsetStartOfData, comprSize, this));
+				return new ZipInputStream(new InflaterInputStream(raf, offsetStartOfData, comprSize, this), this);
 			default:
 				throw new ZipException("compression type not supported");
 			}
@@ -172,15 +172,15 @@ public class UnzipEngine {
 			}
 			throw new ZipException(e);
 		}
-		
+
 	}
-	
+
 	private void init(RandomAccessFile raf) throws ZipException {
-		
+
 		if (localFileHeader == null) {
 			throw new ZipException("local file header is null, cannot initialize input stream");
 		}
-		
+
 		try {
 			initDecrypter(raf);
 		} catch (ZipException e) {
@@ -189,12 +189,12 @@ public class UnzipEngine {
 			throw new ZipException(e);
 		}
 	}
-	
+
 	private void initDecrypter(RandomAccessFile raf) throws ZipException {
 		if (localFileHeader == null) {
 			throw new ZipException("local file header is null, cannot init decrypter");
 		}
-		
+
 		if (localFileHeader.isEncrypted()) {
 			if (localFileHeader.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_STANDARD) {
 				decrypter = new StandardDecrypter(fileHeader, getStandardDecrypterHeaderBytes(raf));
@@ -205,7 +205,7 @@ public class UnzipEngine {
 			}
 		}
 	}
-	
+
 	private byte[] getStandardDecrypterHeaderBytes(RandomAccessFile raf) throws ZipException {
 		try {
 			byte[] headerBytes = new byte[InternalZipConstants.STD_DEC_HDR_SIZE];
@@ -218,14 +218,14 @@ public class UnzipEngine {
 			throw new ZipException(e);
 		}
 	}
-	
+
 	private byte[] getAESSalt(RandomAccessFile raf) throws ZipException {
 		if (localFileHeader.getAesExtraDataRecord() == null)
 			return null;
-		
+
 		try {
 			AESExtraDataRecord aesExtraDataRecord = localFileHeader.getAesExtraDataRecord();
-			byte[] saltBytes = new byte[calculateAESSaltLength(aesExtraDataRecord)]; 			
+			byte[] saltBytes = new byte[calculateAESSaltLength(aesExtraDataRecord)];
 			raf.seek(localFileHeader.getOffsetStartOfData());
 			raf.read(saltBytes);
 			return saltBytes;
@@ -233,7 +233,7 @@ public class UnzipEngine {
 			throw new ZipException(e);
 		}
 	}
-	
+
 	private byte[] getAESPasswordVerifier(RandomAccessFile raf) throws ZipException {
 		try {
 			byte[] pvBytes = new byte[2];
@@ -243,7 +243,7 @@ public class UnzipEngine {
 			throw new ZipException(e);
 		}
 	}
-	
+
 	private int calculateAESSaltLength(AESExtraDataRecord aesExtraDataRecord) throws ZipException {
 		if (aesExtraDataRecord == null) {
 			throw new ZipException("unable to determine salt length: AESExtraDataRecord is null");
@@ -259,21 +259,21 @@ public class UnzipEngine {
 			throw new ZipException("unable to determine salt length: invalid aes key strength");
 		}
 	}
-	
+
 	public void checkCRC() throws ZipException {
 		if (fileHeader != null) {
 			if (fileHeader.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_AES) {
 				if (decrypter != null && decrypter instanceof AESDecrypter) {
 					byte[] tmpMacBytes = ((AESDecrypter)decrypter).getCalculatedAuthenticationBytes();
 					byte[] storedMac = ((AESDecrypter)decrypter).getStoredMac();
-					byte[] calculatedMac = new byte[InternalZipConstants.AES_AUTH_LENGTH]; 
-					
+					byte[] calculatedMac = new byte[InternalZipConstants.AES_AUTH_LENGTH];
+
 					if (calculatedMac == null || storedMac == null) {
 						throw new ZipException("CRC (MAC) check failed for " + fileHeader.getFileName());
 					}
-					
+
 					System.arraycopy(tmpMacBytes, 0, calculatedMac, 0, InternalZipConstants.AES_AUTH_LENGTH);
-					
+
 					if (!Arrays.equals(calculatedMac, storedMac)) {
 						throw new ZipException("invalid CRC (MAC) for file: " + fileHeader.getFileName());
 					}
@@ -282,7 +282,7 @@ public class UnzipEngine {
 				long calculatedCRC = crc.getValue() & 0xffffffffL;
 				if (calculatedCRC != fileHeader.getCrc32()) {
 					String errMsg = "invalid CRC for file: " + fileHeader.getFileName();
-					if (localFileHeader.isEncrypted() && 
+					if (localFileHeader.isEncrypted() &&
 							localFileHeader.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_STANDARD) {
 						errMsg += " - Wrong Password?";
 					}
@@ -291,7 +291,7 @@ public class UnzipEngine {
 			}
 		}
 	}
-	
+
 //	private void checkCRC() throws ZipException {
 //		if (fileHeader != null) {
 //			if (fileHeader.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_AES) {
@@ -307,7 +307,7 @@ public class UnzipEngine {
 //						throw new ZipException("invalid CRC(mac) for file: " + fileHeader.getFileName());
 //					}
 //				} else {
-//					throw new ZipException("invalid decryptor...cannot calculate mac value for file: " 
+//					throw new ZipException("invalid decryptor...cannot calculate mac value for file: "
 //							+ fileHeader.getFileName());
 //				}
 //			} else if (unzipEngine != null) {
@@ -319,28 +319,28 @@ public class UnzipEngine {
 //			}
 //		}
 //	}
-	
+
 	private boolean checkLocalHeader() throws ZipException {
 		RandomAccessFile rafForLH = null;
 		try {
 			rafForLH = checkSplitFile();
-			
+
 			if (rafForLH == null) {
 				rafForLH = new RandomAccessFile(new File(this.zipModel.getZipFile()), InternalZipConstants.READ_MODE);
 			}
-			
+
 			HeaderReader headerReader = new HeaderReader(rafForLH);
 			this.localFileHeader = headerReader.readLocalFileHeader(fileHeader);
-			
+
 			if (localFileHeader == null) {
 				throw new ZipException("error reading local file header. Is this a valid zip file?");
 			}
-			
+
 			//TODO Add more comparision later
 			if (localFileHeader.getCompressionMethod() != fileHeader.getCompressionMethod()) {
 				return false;
 			}
-			
+
 			return true;
 		} catch (FileNotFoundException e) {
 			throw new ZipException(e);
@@ -356,7 +356,7 @@ public class UnzipEngine {
 			}
 		}
 	}
-	
+
 	private RandomAccessFile checkSplitFile() throws ZipException {
 		if (zipModel.isSplitArchive()) {
 			int diskNumberStartOfFile = fileHeader.getDiskNumberStart();
@@ -372,10 +372,10 @@ public class UnzipEngine {
 					partFile = curZipFile.substring(0, curZipFile.lastIndexOf(".")) + ".z0" + (diskNumberStartOfFile+ 1);
 				}
 			}
-			
+
 			try {
 				RandomAccessFile raf = new RandomAccessFile(partFile, InternalZipConstants.READ_MODE);
-				
+
 				if (currSplitFileCounter == 1) {
 					byte[] splitSig = new byte[4];
 					raf.read(splitSig);
@@ -392,12 +392,12 @@ public class UnzipEngine {
 		}
 		return null;
 	}
-	
+
 	private RandomAccessFile createFileHandler(String mode) throws ZipException {
 		if (this.zipModel == null || !Zip4jUtil.isStringNotNullAndNotEmpty(this.zipModel.getZipFile())) {
 			throw new ZipException("input parameter is null in getFilePointer");
 		}
-		
+
 		try {
 			RandomAccessFile raf = null;
 			if (zipModel.isSplitArchive()) {
@@ -412,30 +412,30 @@ public class UnzipEngine {
 			throw new ZipException(e);
 		}
 	}
-	
+
 	private FileOutputStream getOutputStream(String outPath, String newFileName) throws ZipException {
 		if (!Zip4jUtil.isStringNotNullAndNotEmpty(outPath)) {
 			throw new ZipException("invalid output path");
 		}
-		
+
 		try {
 			File file = new File(getOutputFileNameWithPath(outPath, newFileName));
-			
+
 			if (!file.getParentFile().exists()) {
 				file.getParentFile().mkdirs();
 			}
-			
+
 			if (file.exists()) {
 				file.delete();
 			}
-			
+
 			FileOutputStream fileOutputStream = new FileOutputStream(file);
 			return fileOutputStream;
 		} catch (FileNotFoundException e) {
 			throw new ZipException(e);
 		}
 	}
-	
+
 	private String getOutputFileNameWithPath(String outPath, String newFileName) throws ZipException {
 		String fileName = null;
 		if (Zip4jUtil.isStringNotNullAndNotEmpty(newFileName)) {
@@ -445,7 +445,7 @@ public class UnzipEngine {
 		}
 		return outPath + System.getProperty("file.separator") + fileName;
 	}
-	
+
 	public RandomAccessFile startNextSplitFile() throws IOException, FileNotFoundException {
 		String currZipFile = zipModel.getZipFile();
 		String partFile = null;
@@ -468,7 +468,7 @@ public class UnzipEngine {
 		}
 		return new RandomAccessFile(partFile, InternalZipConstants.READ_MODE);
 	}
-	
+
 	private void closeStreams(InputStream is, OutputStream os) throws ZipException {
 		try {
 			if (is != null) {
@@ -492,11 +492,11 @@ public class UnzipEngine {
 			}
 		}
 	}
-	
+
 	public void updateCRC(int b) {
 		crc.update(b);
 	}
-	
+
 	public void updateCRC(byte[] buff, int offset, int len) {
 		if (buff != null) {
 			crc.update(buff, offset, len);

@@ -98,9 +98,8 @@ public class ZipEngine {
             throw new ZipException("no files to add");
         }
 
-        if (zipModel.getEndCentralDirRecord() == null) {
-            zipModel.setEndCentralDirRecord(createEndOfCentralDirectoryRecord());
-        }
+        if (zipModel.getEndCentralDirRecord() == null)
+            zipModel.setEndCentralDirRecord(new EndCentralDirRecord());
 
         ZipOutputStream outputStream = null;
         InputStream inputStream = null;
@@ -122,7 +121,13 @@ public class ZipEngine {
             }
             byte[] readBuff = new byte[InternalZipConstants.BUFF_SIZE];
             int readLen = -1;
-            for (int i = 0; i < fileList.size(); i++) {
+
+            for (File file : fileList) {
+                String fileName = Zip4jUtil.getRelativeFileName(file.getAbsolutePath(),
+                        parameters.getRootFolderInZip(), parameters.getDefaultFolderPath());
+
+                if("/".equals(fileName) || "\\".equals(fileName))
+                    continue;
 
                 if (progressMonitor.isCancelAllTasks()) {
                     progressMonitor.setResult(ProgressMonitor.RESULT_CANCELLED);
@@ -132,12 +137,12 @@ public class ZipEngine {
 
                 ZipParameters fileParameters = (ZipParameters)parameters.clone();
 
-                progressMonitor.setFileName(((File)fileList.get(i)).getAbsolutePath());
+                progressMonitor.setFileName(file.getAbsolutePath());
 
-                if (!((File)fileList.get(i)).isDirectory()) {
+                if (!file.isDirectory()) {
                     if (fileParameters.isEncryptFiles() && fileParameters.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_STANDARD) {
                         progressMonitor.setCurrentOperation(ProgressMonitor.OPERATION_CALC_CRC);
-                        fileParameters.setSourceFileCRC((int)CRCUtil.computeFileCRC(((File)fileList.get(i)).getAbsolutePath(), progressMonitor));
+                        fileParameters.setSourceFileCRC((int)CRCUtil.computeFileCRC(file.getAbsolutePath(), progressMonitor));
                         progressMonitor.setCurrentOperation(ProgressMonitor.OPERATION_ADD);
 
                         if (progressMonitor.isCancelAllTasks()) {
@@ -147,18 +152,18 @@ public class ZipEngine {
                         }
                     }
 
-                    if (Zip4jUtil.getFileLengh((File)fileList.get(i)) == 0) {
+                    if (Zip4jUtil.getFileLengh(file) == 0) {
                         fileParameters.setCompressionMethod(Zip4jConstants.COMP_STORE);
                     }
                 }
 
-                outputStream.putNextEntry((File)fileList.get(i), fileParameters);
-                if (((File)fileList.get(i)).isDirectory()) {
+                outputStream.putNextEntry(file, fileParameters);
+                if (file.isDirectory()) {
                     outputStream.closeEntry();
                     continue;
                 }
 
-                inputStream = new FileInputStream((File)fileList.get(i));
+                inputStream = new FileInputStream(file);
 
                 while ((readLen = inputStream.read(readBuff)) != -1) {
                     if (progressMonitor.isCancelAllTasks()) {
@@ -339,8 +344,6 @@ public class ZipEngine {
      *
      * <b>Note:</b> Relative path has to be passed as the fileName
      *
-     * @param zipModel
-     * @param fileName
      * @throws ZipException
      */
     private void removeFilesIfExists(List<File> fileList, ZipParameters parameters, ProgressMonitor progressMonitor) throws ZipException {
@@ -438,16 +441,6 @@ public class ZipEngine {
         } catch(FileNotFoundException e) {
             throw new ZipException(e);
         }
-    }
-
-    private EndCentralDirRecord createEndOfCentralDirectoryRecord() {
-        EndCentralDirRecord endCentralDirRecord = new EndCentralDirRecord();
-        endCentralDirRecord.setSignature(InternalZipConstants.ENDSIG);
-        endCentralDirRecord.setNoOfThisDisk(0);
-        endCentralDirRecord.setTotNoOfEntriesInCentralDir(0);
-        endCentralDirRecord.setTotNoOfEntriesInCentralDirOnThisDisk(0);
-        endCentralDirRecord.setOffsetOfStartOfCentralDir(0);
-        return endCentralDirRecord;
     }
 
     private long calculateTotalWork(List<File> fileList, ZipParameters parameters) throws ZipException {

@@ -98,6 +98,7 @@ public class ApplicationTest {
         ZipParameters parameters = new ZipParameters();
         parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
         parameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
+        parameters.setDefaultFolderPath(srcDir.toString());
         zipFile.createZipFile(filesToAdd, parameters, true, 1024 * 1024);
 
         checkDestinationDir(10);

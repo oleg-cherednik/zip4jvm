@@ -20,6 +20,7 @@ import lombok.NonNull;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipModel;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
@@ -27,6 +28,9 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -587,57 +591,71 @@ public class Zip4jUtil {
     }
 
     public static String getRelativeFileName(String file, String rootFolderInZip, String rootFolderPath) throws ZipException {
-        if (!Zip4jUtil.isStringNotNullAndNotEmpty(file)) {
-            throw new ZipException("input file path/name is empty, cannot calculate relative file name");
-        }
+        Path entryPath = Paths.get(file).toAbsolutePath();
+        Path rootPath = rootFolderPath != null ? Paths.get(rootFolderPath).toAbsolutePath() : entryPath;
 
-        String fileName = null;
+        String path = rootPath.relativize(entryPath).toString();
 
-        if (Zip4jUtil.isStringNotNullAndNotEmpty(rootFolderPath)) {
+        if(Files.isDirectory(entryPath))
+            path += File.separator;
 
-            File rootFolderFile = new File(rootFolderPath);
+        if(rootFolderInZip != null)
+            path = FilenameUtils.concat(path, rootFolderInZip);
 
-            String rootFolderFileRef = rootFolderFile.getPath();
+        return path;
 
-            if (!rootFolderFileRef.endsWith(InternalZipConstants.FILE_SEPARATOR)) {
-                rootFolderFileRef += InternalZipConstants.FILE_SEPARATOR;
-            }
 
-            String tmpFileName = file.substring(rootFolderFileRef.length());
-            if (tmpFileName.startsWith(System.getProperty("file.separator"))) {
-                tmpFileName = tmpFileName.substring(1);
-            }
-
-            File tmpFile = new File(file);
-
-            if (tmpFile.isDirectory()) {
-                tmpFileName = tmpFileName.replaceAll("\\\\", "/");
-                tmpFileName += InternalZipConstants.ZIP_FILE_SEPARATOR;
-            } else {
-                String bkFileName = tmpFileName.substring(0, tmpFileName.lastIndexOf(tmpFile.getName()));
-                bkFileName = bkFileName.replaceAll("\\\\", "/");
-                tmpFileName = bkFileName + tmpFile.getName();
-            }
-
-            fileName = tmpFileName;
-        } else {
-            File relFile = new File(file);
-            if (relFile.isDirectory()) {
-                fileName = relFile.getName() + InternalZipConstants.ZIP_FILE_SEPARATOR;
-            } else {
-                fileName = Zip4jUtil.getFileNameFromFilePath(new File(file));
-            }
-        }
-
-        if (Zip4jUtil.isStringNotNullAndNotEmpty(rootFolderInZip)) {
-            fileName = rootFolderInZip + fileName;
-        }
-
-        if (!Zip4jUtil.isStringNotNullAndNotEmpty(fileName)) {
-            throw new ZipException("Error determining file name");
-        }
-
-        return fileName;
+//        if (!Zip4jUtil.isStringNotNullAndNotEmpty(file)) {
+//            throw new ZipException("input file path/name is empty, cannot calculate relative file name");
+//        }
+//
+//        String fileName = null;
+//
+//        if (Zip4jUtil.isStringNotNullAndNotEmpty(rootFolderPath)) {
+//
+//            File rootFolderFile = new File(rootFolderPath);
+//
+//            String rootFolderFileRef = rootFolderFile.getPath();
+//
+//            if (!rootFolderFileRef.endsWith(InternalZipConstants.FILE_SEPARATOR)) {
+//                rootFolderFileRef += InternalZipConstants.FILE_SEPARATOR;
+//            }
+//
+//            String tmpFileName = file.substring(rootFolderFileRef.length());
+//            if (tmpFileName.startsWith(System.getProperty("file.separator"))) {
+//                tmpFileName = tmpFileName.substring(1);
+//            }
+//
+//            File tmpFile = new File(file);
+//
+//            if (tmpFile.isDirectory()) {
+//                tmpFileName = tmpFileName.replaceAll("\\\\", "/");
+//                tmpFileName += InternalZipConstants.ZIP_FILE_SEPARATOR;
+//            } else {
+//                String bkFileName = tmpFileName.substring(0, tmpFileName.lastIndexOf(tmpFile.getName()));
+//                bkFileName = bkFileName.replaceAll("\\\\", "/");
+//                tmpFileName = bkFileName + tmpFile.getName();
+//            }
+//
+//            fileName = tmpFileName;
+//        } else {
+//            File relFile = new File(file);
+//            if (relFile.isDirectory()) {
+//                fileName = relFile.getName() + InternalZipConstants.ZIP_FILE_SEPARATOR;
+//            } else {
+//                fileName = Zip4jUtil.getFileNameFromFilePath(new File(file));
+//            }
+//        }
+//
+//        if (Zip4jUtil.isStringNotNullAndNotEmpty(rootFolderInZip)) {
+//            fileName = rootFolderInZip + fileName;
+//        }
+//
+//        if (!Zip4jUtil.isStringNotNullAndNotEmpty(fileName)) {
+//            throw new ZipException("Error determining file name");
+//        }
+//
+//        return fileName;
     }
 
     public static long[] getAllHeaderSignatures() {

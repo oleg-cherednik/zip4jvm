@@ -42,7 +42,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.zip.CRC32;
 
-public class CipherOutputStream extends BaseOutputStream {
+public class CipherOutputStream extends OutputStream {
 
     protected OutputStream outputStream;
     private File sourceFile;
