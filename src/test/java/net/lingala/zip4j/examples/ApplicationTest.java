@@ -1,14 +1,18 @@
 package net.lingala.zip4j.examples;
 
 import lombok.NonNull;
+import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.core.ZipFileNew;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.Context;
+import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Compression;
+import net.lingala.zip4j.util.Zip4jConstants;
 import org.apache.commons.io.FileUtils;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -88,12 +92,24 @@ public class ApplicationTest {
 //        checkResultDir();
     }
 
+    public void addFolderNew() throws ZipException, IOException {
+        ZipFile zipFile = new ZipFile(destDir.resolve("src.zip").toFile());
+        List<File> filesToAdd = getDirectoryEntries(srcDir);
+        ZipParameters parameters = new ZipParameters();
+        parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
+        parameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
+        zipFile.createZipFile(filesToAdd, parameters, true, 1024 * 1024);
+
+        checkDestinationDir(10);
+//        checkResultDir();
+    }
+
     @NonNull
-    private static List<String> getDirectoryEntries(@NonNull Path dir) {
+    private static List<File> getDirectoryEntries(@NonNull Path dir) {
         try {
             return Files.walk(dir)
                         .filter(path -> Files.isRegularFile(path) || Files.isDirectory(path))
-                        .map(Path::toString)
+                        .map(Path::toFile)
                         .collect(Collectors.toList());
         } catch(IOException e) {
             return Collections.emptyList();
