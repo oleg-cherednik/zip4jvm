@@ -18,6 +18,7 @@ package net.lingala.zip4j.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.lingala.zip4j.util.InternalZipConstants;
 
 import java.util.List;
 
@@ -25,8 +26,8 @@ import java.util.List;
 @Setter
 public class LocalFileHeader {
 
-    // size:4 - local file header signature (0x04034b50)
-    private int signature;
+    // size:4 - signature (0x04034b50)
+    private int signature = InternalZipConstants.LOCSIG;
     // size:2 - version needed to extract
     private int versionNeededToExtract;
     // size:2 - general purpose bit flag

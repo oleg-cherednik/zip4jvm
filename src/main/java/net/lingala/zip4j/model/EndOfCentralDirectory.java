@@ -22,17 +22,32 @@ import net.lingala.zip4j.util.InternalZipConstants;
 
 @Getter
 @Setter
-public class EndCentralDirRecord {
+public class EndOfCentralDirectory {
 
-    private long signature = InternalZipConstants.ENDSIG;
+    // size with comment length = 0
+    public static final int MIN_SIZE = 22;
+    // max length for comment is 2 bytes
+    public static final int MAX_COMMENT_LENGTH = 0xFFFF;
+
+    // size:4 - signature (0x06054b50)
+    private final int signature = InternalZipConstants.ENDSIG;
+    // size:2 - number of the disk
     private int noOfThisDisk;
+    // size:2 - number of the disk with the start of the central directory
     private int noOfThisDiskStartOfCentralDir;
+    // size:2 - total number of entries in the central directory on this disk
     private int totNoOfEntriesInCentralDirOnThisDisk;
+    // size:2 - total number of entries in the central directory
     private int totNoOfEntriesInCentralDir;
+    // size:4 - size of the central directory
     private int sizeOfCentralDir;
+    // size:4 - offset of start of central directory with respect to the starting disk number
     private long offsetOfStartOfCentralDir;
+    // size:2 - file comment length (n)
     private int commentLength;
+    // size:n - file comment
     private String comment;
+    @Deprecated
     private byte[] commentBytes;
 
 }

@@ -36,7 +36,7 @@ public class ZipModel implements Cloneable {
 
     private CentralDirectory centralDirectory;
 
-    private EndCentralDirRecord endCentralDirRecord;
+    private EndOfCentralDirectory endOfCentralDirectory;
 
     private Zip64EndCentralDirLocator zip64EndCentralDirLocator;
 
@@ -87,12 +87,12 @@ public class ZipModel implements Cloneable {
         this.centralDirectory = centralDirectory;
     }
 
-    public EndCentralDirRecord getEndCentralDirRecord() {
-        return endCentralDirRecord;
+    public EndOfCentralDirectory getEndOfCentralDirectory() {
+        return endOfCentralDirectory;
     }
 
-    public void setEndCentralDirRecord(EndCentralDirRecord endCentralDirRecord) {
-        this.endCentralDirRecord = endCentralDirRecord;
+    public void setEndOfCentralDirectory(EndOfCentralDirectory endOfCentralDirectory) {
+        this.endOfCentralDirectory = endOfCentralDirectory;
     }
 
     public ArchiveExtraDataRecord getArchiveExtraDataRecord() {

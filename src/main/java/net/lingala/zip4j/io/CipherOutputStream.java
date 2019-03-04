@@ -24,7 +24,7 @@ import net.lingala.zip4j.crypto.StandardEncrypter;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.CentralDirectory;
-import net.lingala.zip4j.model.EndCentralDirRecord;
+import net.lingala.zip4j.model.EndOfCentralDirectory;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.ZipModel;
@@ -188,8 +188,8 @@ public class CipherOutputStream extends OutputStream {
             this.zipModel = zipModel;
         }
 
-        if (this.zipModel.getEndCentralDirRecord() == null)
-            this.zipModel.setEndCentralDirRecord(new EndCentralDirRecord());
+        if (this.zipModel.getEndOfCentralDirectory() == null)
+            this.zipModel.setEndOfCentralDirectory(new EndOfCentralDirectory());
 
         if (this.zipModel.getCentralDirectory() == null)
             this.zipModel.setCentralDirectory(new CentralDirectory());
@@ -206,8 +206,6 @@ public class CipherOutputStream extends OutputStream {
                 this.zipModel.setSplitLength(((SplitOutputStream)outputStream).getSplitLength());
             }
         }
-
-        this.zipModel.getEndCentralDirRecord().setSignature(InternalZipConstants.ENDSIG);
     }
 
     public void write(int bval) throws IOException {
@@ -324,7 +322,7 @@ public class CipherOutputStream extends OutputStream {
     }
 
     public void finish() throws IOException, ZipException {
-        zipModel.getEndCentralDirRecord().setOffsetOfStartOfCentralDir(totalBytesWritten);
+        zipModel.getEndOfCentralDirectory().setOffsetOfStartOfCentralDir(totalBytesWritten);
 
         HeaderWriter headerWriter = new HeaderWriter();
         headerWriter.finalizeZipFile(zipModel, outputStream);
@@ -431,7 +429,7 @@ public class CipherOutputStream extends OutputStream {
         byte[] shortByte = new byte[2];
         shortByte[0] = Raw.bitArrayToByte(generateGeneralPurposeBitArray(fileHeader.isEncrypted(), zipParameters.getCompressionMethod()));
 
-        if (zipModel.getCharset() == StandardCharsets.UTF_8 || Zip4jUtil.detectCharset(fileHeader.getFileName()) == StandardCharsets.UTF_8)
+        if (zipModel.getCharset() == StandardCharsets.UTF_8 || Zip4jUtil.detectCharset(fileHeader.getFileName().getBytes()) == StandardCharsets.UTF_8)
             shortByte[1] = 8;
 
         fileHeader.setGeneralPurposeFlag(shortByte);

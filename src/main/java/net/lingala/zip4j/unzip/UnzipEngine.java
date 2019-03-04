@@ -363,7 +363,7 @@ public class UnzipEngine {
 			currSplitFileCounter = diskNumberStartOfFile + 1;
 			String curZipFile = zipModel.getZipFile();
 			String partFile = null;
-			if (diskNumberStartOfFile == zipModel.getEndCentralDirRecord().getNoOfThisDisk()) {
+			if (diskNumberStartOfFile == zipModel.getEndOfCentralDirectory().getNoOfThisDisk()) {
 				partFile = zipModel.getZipFile();
 			} else {
 				if (diskNumberStartOfFile >= 9) {
@@ -449,7 +449,7 @@ public class UnzipEngine {
 	public RandomAccessFile startNextSplitFile() throws IOException, FileNotFoundException {
 		String currZipFile = zipModel.getZipFile();
 		String partFile = null;
-		if (currSplitFileCounter == zipModel.getEndCentralDirRecord().getNoOfThisDisk()) {
+		if (currSplitFileCounter == zipModel.getEndOfCentralDirectory().getNoOfThisDisk()) {
 			partFile = zipModel.getZipFile();
 		} else {
 			if (currSplitFileCounter >= 9) {

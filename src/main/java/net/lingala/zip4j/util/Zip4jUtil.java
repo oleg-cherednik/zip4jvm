@@ -22,6 +22,7 @@ import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipModel;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import org.mozilla.universalchardet.UniversalDetector;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -444,9 +445,9 @@ public class Zip4jUtil {
         return tmpFileName;
     }
 
-    public static byte[] convertCharset(String str) throws UnsupportedEncodingException {
-        return str.getBytes(detectCharset(str));
-    }
+//    public static byte[] convertCharset(String str) throws UnsupportedEncodingException {
+//        return str.getBytes(detectCharset(str));
+//    }
 
     /**
      * Decodes file name based on encoding. If file name is UTF 8 encoded
@@ -480,23 +481,30 @@ public class Zip4jUtil {
     /**
      * Detects the encoding charset for the input string
      *
-     * @param str
      * @return String - charset for the String
      * @throws ZipException - if input string is null. In case of any other exception
      *                      this method returns default System charset
      */
     @NonNull
-    public static Charset detectCharset(@NonNull String str) throws UnsupportedEncodingException {
-        if (checkCharset(str, Charset.forName("Cp850")))
-            return Charset.forName("Cp850");
-        if (checkCharset(str, StandardCharsets.UTF_8))
-            return StandardCharsets.UTF_8;
-        return Charset.defaultCharset();
+    public static Charset detectCharset(@NonNull byte[] buf) throws UnsupportedEncodingException {
+        UniversalDetector detector = new UniversalDetector(null);
+        detector.handleData(buf, 0, buf.length);
+        detector.dataEnd();
+
+        String charsetName = detector.getDetectedCharset();
+        return charsetName != null ? Charset.forName(charsetName) : Charset.defaultCharset();
+//        if (checkCharset(str, Charset.forName("Cp850")))
+//            return Charset.forName("Cp850");
+//        if (checkCharset(str, Charset.forName("Windows-1251")))
+//            return Charset.forName("Windows-1251");
+//        if (checkCharset(str, StandardCharsets.UTF_8))
+//            return StandardCharsets.UTF_8;
+//        return Charset.defaultCharset();
     }
 
-    private static boolean checkCharset(@NonNull String str, @NonNull Charset charset) {
-        return str.equals(new String(str.getBytes(charset), charset));
-    }
+//    private static boolean checkCharset(@NonNull String str, @NonNull Charset charset) {
+//        return str.equals(new String(str.getBytes(charset), charset));
+//    }
 
     /**
      * returns the length of the string by wrapping it in a byte buffer with
@@ -507,9 +515,9 @@ public class Zip4jUtil {
      * @return length of the string
      * @throws ZipException
      */
-    public static int getEncodedStringLength(@NonNull String str) throws ZipException, UnsupportedEncodingException {
-        return getEncodedStringLength(str, detectCharset(str));
-    }
+//    public static int getEncodedStringLength(@NonNull String str) throws ZipException, UnsupportedEncodingException {
+//        return getEncodedStringLength(str, detectCharset(str));
+//    }
 
     /**
      * returns the length of the string in the input encoding
@@ -549,7 +557,7 @@ public class Zip4jUtil {
             throw new ZipException("cannot get split zip files: zipmodel is null");
         }
 
-        if (zipModel.getEndCentralDirRecord() == null) {
+        if (zipModel.getEndOfCentralDirectory() == null) {
             return null;
         }
 
@@ -567,7 +575,7 @@ public class Zip4jUtil {
             return retList;
         }
 
-        int numberOfThisDisk = zipModel.getEndCentralDirRecord().getNoOfThisDisk();
+        int numberOfThisDisk = zipModel.getEndOfCentralDirectory().getNoOfThisDisk();
 
         if (numberOfThisDisk == 0) {
             retList.add(new File(currZipFile));
@@ -592,14 +600,14 @@ public class Zip4jUtil {
 
     public static String getRelativeFileName(String file, String rootFolderInZip, String rootFolderPath) throws ZipException {
         Path entryPath = Paths.get(file).toAbsolutePath();
-        Path rootPath = rootFolderPath != null ? Paths.get(rootFolderPath).toAbsolutePath() : entryPath;
+        Path rootPath = rootFolderPath != null ? Paths.get(rootFolderPath).toAbsolutePath() : entryPath.getParent();
 
         String path = rootPath.relativize(entryPath).toString();
 
-        if(Files.isDirectory(entryPath))
+        if (Files.isDirectory(entryPath))
             path += File.separator;
 
-        if(rootFolderInZip != null)
+        if (rootFolderInZip != null)
             path = FilenameUtils.concat(path, rootFolderInZip);
 
         return path;

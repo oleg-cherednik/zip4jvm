@@ -33,8 +33,6 @@ import net.lingala.zip4j.util.Zip4jUtil;
 import net.lingala.zip4j.zip.ZipEngine;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
@@ -406,43 +404,21 @@ public class ZipFile {
      * @throws ZipException
      */
     private void readZipInfo() throws ZipException {
-
-        if (!Zip4jUtil.checkFileExists(file)) {
-            throw new ZipException("zip file does not exist");
-        }
-
-        if (!Zip4jUtil.checkFileReadAccess(this.file)) {
-            throw new ZipException("no read access for the input zip file");
-        }
-
-        if (this.mode != InternalZipConstants.MODE_UNZIP) {
+        if (this.mode != InternalZipConstants.MODE_UNZIP)
             throw new ZipException("Invalid mode");
-        }
+        if (zipModel != null)
+            return;
 
-        RandomAccessFile raf = null;
-        try {
-            raf = new RandomAccessFile(new File(file), InternalZipConstants.READ_MODE);
+        try (RandomAccessFile in = new RandomAccessFile(new File(file), InternalZipConstants.READ_MODE)) {
+            zipModel = new HeaderReader(in).readAllHeaders(charset);
 
-            if (zipModel == null) {
-
-                HeaderReader headerReader = new HeaderReader(raf);
-                zipModel = headerReader.readAllHeaders(charset);
-                if (zipModel != null) {
-                    zipModel.setZipFile(file);
-                }
-            }
-        } catch(FileNotFoundException e) {
+            if (zipModel != null)
+                zipModel.setZipFile(file);
+        } catch(Exception e) {
             throw new ZipException(e);
-        } finally {
-            if (raf != null) {
-                try {
-                    raf.close();
-                } catch(IOException e) {
-                    //ignore
-                }
-            }
         }
     }
+
 
     /**
      * Extracts all the files in the given zip file to the input destination path.
@@ -889,7 +865,7 @@ public class ZipFile {
             throw new ZipException("zipModel is null, cannot update zip file");
         }
 
-        if (zipModel.getEndCentralDirRecord() == null) {
+        if (zipModel.getEndOfCentralDirectory() == null) {
             throw new ZipException("end of central directory is null, cannot set comment");
         }
 
@@ -923,14 +899,14 @@ public class ZipFile {
         if (zipModel == null)
             throw new ZipException("zip model is null, cannot read comment");
 
-        if (zipModel.getEndCentralDirRecord() == null)
+        if (zipModel.getEndOfCentralDirectory() == null)
             throw new ZipException("end of central directory record is null, cannot read comment");
 
-        if (zipModel.getEndCentralDirRecord().getCommentBytes() == null ||
-                zipModel.getEndCentralDirRecord().getCommentBytes().length <= 0)
+        if (zipModel.getEndOfCentralDirectory().getCommentBytes() == null ||
+                zipModel.getEndOfCentralDirectory().getCommentBytes().length <= 0)
             return null;
 
-        return new String(zipModel.getEndCentralDirRecord().getCommentBytes(), charset);
+        return new String(zipModel.getEndOfCentralDirectory().getCommentBytes(), charset);
     }
 
     /**

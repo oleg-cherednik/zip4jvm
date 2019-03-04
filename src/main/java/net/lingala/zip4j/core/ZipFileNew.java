@@ -32,6 +32,7 @@ public class ZipFileNew {
 
         ZipParameters parameters = new ZipParameters();
         parameters.setCompressionMethod(context.getCompression().getVal());
+        parameters.setDefaultFolderPath(context.getRoot().toString());
 
         zipFile.addFiles(addFiles, parameters);
     }

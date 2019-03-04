@@ -78,8 +78,9 @@ public class ApplicationTest {
                 srcDir.resolve("sig-sauer-pistol-wallpapers-29113-822891.jpg"));
 
         Context context = Context.builder()
-                .compression(Compression.STORE)
-                .build();
+                                 .compression(Compression.STORE)
+                                 .root(srcDir)
+                                 .build();
 
         // Now add files to the zip file
         // Note: To add a single file, the method addFile can be used

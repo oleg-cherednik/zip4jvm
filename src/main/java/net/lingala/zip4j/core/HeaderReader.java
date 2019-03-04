@@ -17,12 +17,14 @@
 package net.lingala.zip4j.core;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.exception.ZipExceptionConstants;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.DigitalSignature;
-import net.lingala.zip4j.model.EndCentralDirRecord;
+import net.lingala.zip4j.model.EndOfCentralDirectory;
 import net.lingala.zip4j.model.ExtraDataRecord;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.LocalFileHeader;
@@ -31,6 +33,7 @@ import net.lingala.zip4j.model.Zip64EndCentralDirRecord;
 import net.lingala.zip4j.model.Zip64ExtendedInfo;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
+import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
 import net.lingala.zip4j.util.Raw;
 import net.lingala.zip4j.util.Zip4jConstants;
 import net.lingala.zip4j.util.Zip4jUtil;
@@ -43,33 +46,12 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Helper class to read header information for the zip file
- */
-public class HeaderReader {
+@Slf4j
+@RequiredArgsConstructor
+public final class HeaderReader {
 
-    private RandomAccessFile zip4jRaf = null;
+    private final RandomAccessFile zip4jRaf;
     private ZipModel zipModel;
-
-    /**
-     * Creates a new HeaderReader object with the given input stream
-     *
-     * @param zip4jRaf
-     */
-    public HeaderReader(RandomAccessFile zip4jRaf) {
-        this.zip4jRaf = zip4jRaf;
-    }
-
-    /**
-     * Reads all the header information for the zip file.
-     * <br><br><b>Note:</b> This method does not read local file header information
-     *
-     * @return {@link ZipModel}
-     * @throws ZipException
-     */
-    public ZipModel readAllHeaders() throws ZipException {
-        return readAllHeaders(null);
-    }
 
     /**
      * Reads all the header information for the zip file. File names are read with
@@ -79,10 +61,19 @@ public class HeaderReader {
      * @return {@link ZipModel}
      * @throws ZipException
      */
-    public ZipModel readAllHeaders(@NonNull Charset charset) throws ZipException {
-        zipModel = new ZipModel();
+    public ZipModel readAllHeaders(@NonNull Charset charset) throws ZipException, IOException {
+        EndOfCentralDirectory dir = new EndOfCentralDirectoryReader(new LittleEndianRandomAccessFile(zip4jRaf)).read();
+
+        ZipModel zipModel = new ZipModel();
         zipModel.setCharset(charset);
-        zipModel.setEndCentralDirRecord(readEndOfCentralDirectoryRecord());
+        zipModel.setEndOfCentralDirectory(dir);
+
+        int diskNumber = dir.getNoOfThisDisk();
+        if (diskNumber > 0) {
+            zipModel.setSplitArchive(true);
+        } else {
+            zipModel.setSplitArchive(false);
+        }
 
         // If file is Zip64 format, then Zip64 headers have to be read before
         // reading central directory
@@ -90,102 +81,15 @@ public class HeaderReader {
 
         if (zipModel.isZip64Format()) {
             zipModel.setZip64EndCentralDirRecord(readZip64EndCentralDirRec());
-            if (zipModel.getZip64EndCentralDirRecord() != null &&
-                    zipModel.getZip64EndCentralDirRecord().getNoOfThisDisk() > 0) {
+
+            if (zipModel.getZip64EndCentralDirRecord() != null && zipModel.getZip64EndCentralDirRecord().getNoOfThisDisk() > 0)
                 zipModel.setSplitArchive(true);
-            } else {
+            else
                 zipModel.setSplitArchive(false);
-            }
         }
 
         zipModel.setCentralDirectory(readCentralDirectory());
-        //zipModel.setLocalFileHeaderList(readLocalFileHeaders()); //Donot read local headers now.
         return zipModel;
-    }
-
-    /**
-     * Reads end of central directory record
-     *
-     * @return {@link EndCentralDirRecord}
-     * @throws ZipException
-     */
-    private EndCentralDirRecord readEndOfCentralDirectoryRecord() throws ZipException {
-
-        if (zip4jRaf == null) {
-            throw new ZipException("random access file was null", ZipExceptionConstants.randomAccessFileNull);
-        }
-
-        try {
-            byte[] ebs = new byte[4];
-            long pos = zip4jRaf.length() - InternalZipConstants.ENDHDR;
-
-            EndCentralDirRecord endCentralDirRecord = new EndCentralDirRecord();
-            int counter = 0;
-            do {
-                zip4jRaf.seek(pos--);
-                counter++;
-            } while ((Raw.readLeInt(zip4jRaf, ebs) != InternalZipConstants.ENDSIG) && counter <= 3000);
-
-            if ((Raw.readIntLittleEndian(ebs, 0) != InternalZipConstants.ENDSIG)) {
-                throw new ZipException("zip headers not found. probably not a zip file");
-            }
-            byte[] intBuff = new byte[4];
-            byte[] shortBuff = new byte[2];
-
-            //End of central record signature
-            endCentralDirRecord.setSignature(InternalZipConstants.ENDSIG);
-
-            //number of this disk
-            readIntoBuff(zip4jRaf, shortBuff);
-            endCentralDirRecord.setNoOfThisDisk(Raw.readShortLittleEndian(shortBuff, 0));
-
-            //number of the disk with the start of the central directory
-            readIntoBuff(zip4jRaf, shortBuff);
-            endCentralDirRecord.setNoOfThisDiskStartOfCentralDir(Raw.readShortLittleEndian(shortBuff, 0));
-
-            //total number of entries in the central directory on this disk
-            readIntoBuff(zip4jRaf, shortBuff);
-            endCentralDirRecord.setTotNoOfEntriesInCentralDirOnThisDisk(Raw.readShortLittleEndian(shortBuff, 0));
-
-            //total number of entries in the central directory
-            readIntoBuff(zip4jRaf, shortBuff);
-            endCentralDirRecord.setTotNoOfEntriesInCentralDir(Raw.readShortLittleEndian(shortBuff, 0));
-
-            //size of the central directory
-            readIntoBuff(zip4jRaf, intBuff);
-            endCentralDirRecord.setSizeOfCentralDir(Raw.readIntLittleEndian(intBuff, 0));
-
-            //offset of start of central directory with respect to the starting disk number
-            readIntoBuff(zip4jRaf, intBuff);
-            byte[] longBuff = getLongByteFromIntByte(intBuff);
-            endCentralDirRecord.setOffsetOfStartOfCentralDir(Raw.readLongLittleEndian(longBuff, 0));
-
-            //.ZIP file comment length
-            readIntoBuff(zip4jRaf, shortBuff);
-            int commentLength = Raw.readShortLittleEndian(shortBuff, 0);
-            endCentralDirRecord.setCommentLength(commentLength);
-
-            //.ZIP file comment
-            if (commentLength > 0) {
-                byte[] commentBuf = new byte[commentLength];
-                readIntoBuff(zip4jRaf, commentBuf);
-                endCentralDirRecord.setComment(new String(commentBuf));
-                endCentralDirRecord.setCommentBytes(commentBuf);
-            } else {
-                endCentralDirRecord.setComment(null);
-            }
-
-            int diskNumber = endCentralDirRecord.getNoOfThisDisk();
-            if (diskNumber > 0) {
-                zipModel.setSplitArchive(true);
-            } else {
-                zipModel.setSplitArchive(false);
-            }
-
-            return endCentralDirRecord;
-        } catch(IOException e) {
-            throw new ZipException("Probably not a zip file or a corrupted zip file", e, ZipExceptionConstants.notZipFile);
-        }
     }
 
     /**
@@ -200,7 +104,7 @@ public class HeaderReader {
             throw new ZipException("random access file was null", ZipExceptionConstants.randomAccessFileNull);
         }
 
-        if (zipModel.getEndCentralDirRecord() == null) {
+        if (zipModel.getEndOfCentralDirectory() == null) {
             throw new ZipException("EndCentralRecord was null, maybe a corrupt zip file");
         }
 
@@ -208,9 +112,9 @@ public class HeaderReader {
             CentralDirectory centralDirectory = new CentralDirectory();
             List<FileHeader> fileHeaderList = new ArrayList<>();
 
-            EndCentralDirRecord endCentralDirRecord = zipModel.getEndCentralDirRecord();
-            long offSetStartCentralDir = endCentralDirRecord.getOffsetOfStartOfCentralDir();
-            int centralDirEntryCount = endCentralDirRecord.getTotNoOfEntriesInCentralDir();
+            EndOfCentralDirectory endOfCentralDirectory = zipModel.getEndOfCentralDirectory();
+            long offSetStartCentralDir = endOfCentralDirectory.getOffsetOfStartOfCentralDir();
+            int centralDirEntryCount = endOfCentralDirectory.getTotNoOfEntriesInCentralDir();
 
             if (zipModel.isZip64Format()) {
                 offSetStartCentralDir = zipModel.getZip64EndCentralDirRecord().getOffsetStartCenDirWRTStartDiskNo();
@@ -806,7 +710,7 @@ public class HeaderReader {
     private void setFilePointerToReadZip64EndCentralDirLoc() throws ZipException {
         try {
             byte[] ebs = new byte[4];
-            long pos = zip4jRaf.length() - InternalZipConstants.ENDHDR;
+            long pos = zip4jRaf.length() - EndOfCentralDirectory.MIN_SIZE;
 
             do {
                 zip4jRaf.seek(pos--);
@@ -1101,7 +1005,7 @@ public class HeaderReader {
      * @return byte array
      * @throws ZipException
      */
-    private byte[] readIntoBuff(RandomAccessFile zip4jRaf, byte[] buf) throws ZipException {
+    static byte[] readIntoBuff(RandomAccessFile zip4jRaf, byte[] buf) throws ZipException {
         try {
             if (zip4jRaf.read(buf, 0, buf.length) != -1) {
                 return buf;
@@ -1113,6 +1017,10 @@ public class HeaderReader {
         }
     }
 
+    static byte[] readIntoBuff(LittleEndianRandomAccessFile zip4jRaf, byte[] buf) throws ZipException {
+        return readIntoBuff(zip4jRaf.getIn(), buf);
+    }
+
     /**
      * Returns a long byte from an int byte by appending last 4 bytes as 0's
      *
@@ -1120,7 +1028,7 @@ public class HeaderReader {
      * @return byte array
      * @throws ZipException
      */
-    private byte[] getLongByteFromIntByte(byte[] intByte) throws ZipException {
+    static byte[] getLongByteFromIntByte(byte[] intByte) throws ZipException {
         if (intByte == null) {
             throw new ZipException("input parameter is null, cannot expand to 8 bytes");
         }

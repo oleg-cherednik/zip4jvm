@@ -138,7 +138,7 @@ public class HeaderWriter {
         try {
             processHeaderData(zipModel, outputStream);
 
-            long offsetCentralDir = zipModel.getEndCentralDirRecord().getOffsetOfStartOfCentralDir();
+            long offsetCentralDir = zipModel.getEndOfCentralDirectory().getOffsetOfStartOfCentralDir();
 
             LittleEndianBuffer bytes = new LittleEndianBuffer();
 
@@ -196,7 +196,7 @@ public class HeaderWriter {
 
             LittleEndianBuffer bytes = new LittleEndianBuffer();
 
-            long offsetCentralDir = zipModel.getEndCentralDirRecord().getOffsetOfStartOfCentralDir();
+            long offsetCentralDir = zipModel.getEndOfCentralDirectory().getOffsetOfStartOfCentralDir();
 
             int sizeOfCentralDir = writeCentralDirectory(zipModel, outputStream, bytes);
 
@@ -261,7 +261,7 @@ public class HeaderWriter {
         try {
             int currSplitFileCounter = 0;
             if (outputStream instanceof SplitOutputStream) {
-                zipModel.getEndCentralDirRecord().setOffsetOfStartOfCentralDir(
+                zipModel.getEndOfCentralDirectory().setOffsetOfStartOfCentralDir(
                         ((SplitOutputStream)outputStream).getFilePointer());
                 currSplitFileCounter = ((SplitOutputStream)outputStream).getCurrSplitFileCounter();
 
@@ -278,8 +278,8 @@ public class HeaderWriter {
                 zipModel.getZip64EndCentralDirLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(currSplitFileCounter);
                 zipModel.getZip64EndCentralDirLocator().setTotNumberOfDiscs(currSplitFileCounter + 1);
             }
-            zipModel.getEndCentralDirRecord().setNoOfThisDisk(currSplitFileCounter);
-            zipModel.getEndCentralDirRecord().setNoOfThisDiskStartOfCentralDir(currSplitFileCounter);
+            zipModel.getEndOfCentralDirectory().setNoOfThisDisk(currSplitFileCounter);
+            zipModel.getEndOfCentralDirectory().setNoOfThisDiskStartOfCentralDir(currSplitFileCounter);
         } catch(IOException e) {
             throw new ZipException(e);
         }
@@ -561,11 +561,11 @@ public class HeaderWriter {
             }
 
             //number of this disk
-            Raw.writeIntLittleEndian(intByte, 0, zipModel.getEndCentralDirRecord().getNoOfThisDisk());
+            Raw.writeIntLittleEndian(intByte, 0, zipModel.getEndOfCentralDirectory().getNoOfThisDisk());
             bytes.copyByteArrayToArrayList(intByte);
 
             //number of the disk with start of central directory
-            Raw.writeIntLittleEndian(intByte, 0, zipModel.getEndCentralDirRecord().getNoOfThisDiskStartOfCentralDir());
+            Raw.writeIntLittleEndian(intByte, 0, zipModel.getEndOfCentralDirectory().getNoOfThisDiskStartOfCentralDir());
             bytes.copyByteArrayToArrayList(intByte);
 
             //total number of entries in the central directory on this disk
@@ -579,7 +579,7 @@ public class HeaderWriter {
                 numEntries = zipModel.getCentralDirectory().getFileHeaders().size();
                 if (zipModel.isSplitArchive()) {
                     countNumberOfFileHeaderEntriesOnDisk(zipModel.getCentralDirectory().getFileHeaders(),
-                            zipModel.getEndCentralDirRecord().getNoOfThisDisk());
+                            zipModel.getEndOfCentralDirectory().getNoOfThisDisk());
                 } else {
                     numEntriesOnThisDisk = numEntries;
                 }
@@ -653,15 +653,15 @@ public class HeaderWriter {
             byte[] longByte = new byte[8];
 
             //End of central directory signature
-            Raw.writeIntLittleEndian(intByte, 0, (int)zipModel.getEndCentralDirRecord().getSignature());
+            Raw.writeIntLittleEndian(intByte, 0, (int)zipModel.getEndOfCentralDirectory().getSignature());
             bytes.copyByteArrayToArrayList(intByte);
 
             //number of this disk
-            Raw.writeShortLittleEndian(shortByte, 0, (short)(zipModel.getEndCentralDirRecord().getNoOfThisDisk()));
+            Raw.writeShortLittleEndian(shortByte, 0, (short)(zipModel.getEndOfCentralDirectory().getNoOfThisDisk()));
             bytes.copyByteArrayToArrayList(shortByte);
 
             //number of the disk with start of central directory
-            Raw.writeShortLittleEndian(shortByte, 0, (short)(zipModel.getEndCentralDirRecord().getNoOfThisDiskStartOfCentralDir()));
+            Raw.writeShortLittleEndian(shortByte, 0, (short)(zipModel.getEndOfCentralDirectory().getNoOfThisDiskStartOfCentralDir()));
             bytes.copyByteArrayToArrayList(shortByte);
 
             //Total number of entries in central directory on this disk
@@ -675,7 +675,7 @@ public class HeaderWriter {
                 numEntries = zipModel.getCentralDirectory().getFileHeaders().size();
                 if (zipModel.isSplitArchive()) {
                     numEntriesOnThisDisk = countNumberOfFileHeaderEntriesOnDisk(zipModel.getCentralDirectory().getFileHeaders(),
-                            zipModel.getEndCentralDirRecord().getNoOfThisDisk());
+                            zipModel.getEndOfCentralDirectory().getNoOfThisDisk());
                 } else {
                     numEntriesOnThisDisk = numEntries;
                 }
@@ -705,15 +705,15 @@ public class HeaderWriter {
 
             //Zip File comment length
             int commentLength = 0;
-            if (zipModel.getEndCentralDirRecord().getComment() != null) {
-                commentLength = zipModel.getEndCentralDirRecord().getCommentLength();
+            if (zipModel.getEndOfCentralDirectory().getComment() != null) {
+                commentLength = zipModel.getEndOfCentralDirectory().getCommentLength();
             }
             Raw.writeShortLittleEndian(shortByte, 0, (short)commentLength);
             bytes.copyByteArrayToArrayList(shortByte);
 
             //Comment
             if (commentLength > 0) {
-                bytes.copyByteArrayToArrayList(zipModel.getEndCentralDirRecord().getCommentBytes());
+                bytes.copyByteArrayToArrayList(zipModel.getEndOfCentralDirectory().getCommentBytes());
             }
 
         } catch(Exception e) {
