@@ -22,8 +22,8 @@ import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.LocalFileHeader;
-import net.lingala.zip4j.model.Zip64EndCentralDirLocator;
-import net.lingala.zip4j.model.Zip64EndCentralDirRecord;
+import net.lingala.zip4j.model.Zip64EndCentralDirectoryLocator;
+import net.lingala.zip4j.model.Zip64EndOfCentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.LittleEndianBuffer;
@@ -33,6 +33,7 @@ import net.lingala.zip4j.util.Zip4jUtil;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.List;
 
 public class HeaderWriter {
@@ -138,28 +139,28 @@ public class HeaderWriter {
         try {
             processHeaderData(zipModel, outputStream);
 
-            long offsetCentralDir = zipModel.getEndOfCentralDirectory().getOffsetOfStartOfCentralDir();
+            long offsetCentralDir = zipModel.getEndCentralDirectory().getOffsetOfStartOfCentralDir();
 
             LittleEndianBuffer bytes = new LittleEndianBuffer();
 
             int sizeOfCentralDir = writeCentralDirectory(zipModel, outputStream, bytes);
 
             if (zipModel.isZip64Format()) {
-                if (zipModel.getZip64EndCentralDirRecord() == null) {
-                    zipModel.setZip64EndCentralDirRecord(new Zip64EndCentralDirRecord());
+                if (zipModel.getZip64EndOfCentralDirectory() == null) {
+                    zipModel.setZip64EndOfCentralDirectory(new Zip64EndOfCentralDirectory());
                 }
-                if (zipModel.getZip64EndCentralDirLocator() == null) {
-                    zipModel.setZip64EndCentralDirLocator(new Zip64EndCentralDirLocator());
+                if (zipModel.getZip64EndCentralDirectoryLocator() == null) {
+                    zipModel.setZip64EndCentralDirectoryLocator(new Zip64EndCentralDirectoryLocator());
                 }
 
-                zipModel.getZip64EndCentralDirLocator().setOffsetZip64EndOfCentralDirRec(offsetCentralDir + sizeOfCentralDir);
+                zipModel.getZip64EndCentralDirectoryLocator().setOffsetZip64EndOfCentralDirRec(offsetCentralDir + sizeOfCentralDir);
                 if (outputStream instanceof SplitOutputStream) {
-                    zipModel.getZip64EndCentralDirLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(
+                    zipModel.getZip64EndCentralDirectoryLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(
                             ((SplitOutputStream)outputStream).getCurrSplitFileCounter());
-                    zipModel.getZip64EndCentralDirLocator().setTotNumberOfDiscs(((SplitOutputStream)outputStream).getCurrSplitFileCounter() + 1);
+                    zipModel.getZip64EndCentralDirectoryLocator().setTotNumberOfDiscs(((SplitOutputStream)outputStream).getCurrSplitFileCounter() + 1);
                 } else {
-                    zipModel.getZip64EndCentralDirLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(0);
-                    zipModel.getZip64EndCentralDirLocator().setTotNumberOfDiscs(1);
+                    zipModel.getZip64EndCentralDirectoryLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(0);
+                    zipModel.getZip64EndCentralDirectoryLocator().setTotNumberOfDiscs(1);
                 }
 
                 writeZip64EndOfCentralDirectoryRecord(zipModel, outputStream, sizeOfCentralDir, offsetCentralDir, bytes);
@@ -196,19 +197,19 @@ public class HeaderWriter {
 
             LittleEndianBuffer bytes = new LittleEndianBuffer();
 
-            long offsetCentralDir = zipModel.getEndOfCentralDirectory().getOffsetOfStartOfCentralDir();
+            long offsetCentralDir = zipModel.getEndCentralDirectory().getOffsetOfStartOfCentralDir();
 
             int sizeOfCentralDir = writeCentralDirectory(zipModel, outputStream, bytes);
 
             if (zipModel.isZip64Format()) {
-                if (zipModel.getZip64EndCentralDirRecord() == null) {
-                    zipModel.setZip64EndCentralDirRecord(new Zip64EndCentralDirRecord());
+                if (zipModel.getZip64EndOfCentralDirectory() == null) {
+                    zipModel.setZip64EndOfCentralDirectory(new Zip64EndOfCentralDirectory());
                 }
-                if (zipModel.getZip64EndCentralDirLocator() == null) {
-                    zipModel.setZip64EndCentralDirLocator(new Zip64EndCentralDirLocator());
+                if (zipModel.getZip64EndCentralDirectoryLocator() == null) {
+                    zipModel.setZip64EndCentralDirectoryLocator(new Zip64EndCentralDirectoryLocator());
                 }
 
-                zipModel.getZip64EndCentralDirLocator().setOffsetZip64EndOfCentralDirRec(offsetCentralDir + sizeOfCentralDir);
+                zipModel.getZip64EndCentralDirectoryLocator().setOffsetZip64EndOfCentralDirRec(offsetCentralDir + sizeOfCentralDir);
 
                 writeZip64EndOfCentralDirectoryRecord(zipModel, outputStream, sizeOfCentralDir, offsetCentralDir, bytes);
                 writeZip64EndOfCentralDirectoryLocator(zipModel, outputStream, bytes);
@@ -261,25 +262,25 @@ public class HeaderWriter {
         try {
             int currSplitFileCounter = 0;
             if (outputStream instanceof SplitOutputStream) {
-                zipModel.getEndOfCentralDirectory().setOffsetOfStartOfCentralDir(
+                zipModel.getEndCentralDirectory().setOffsetOfStartOfCentralDir(
                         ((SplitOutputStream)outputStream).getFilePointer());
                 currSplitFileCounter = ((SplitOutputStream)outputStream).getCurrSplitFileCounter();
 
             }
 
             if (zipModel.isZip64Format()) {
-                if (zipModel.getZip64EndCentralDirRecord() == null) {
-                    zipModel.setZip64EndCentralDirRecord(new Zip64EndCentralDirRecord());
+                if (zipModel.getZip64EndOfCentralDirectory() == null) {
+                    zipModel.setZip64EndOfCentralDirectory(new Zip64EndOfCentralDirectory());
                 }
-                if (zipModel.getZip64EndCentralDirLocator() == null) {
-                    zipModel.setZip64EndCentralDirLocator(new Zip64EndCentralDirLocator());
+                if (zipModel.getZip64EndCentralDirectoryLocator() == null) {
+                    zipModel.setZip64EndCentralDirectoryLocator(new Zip64EndCentralDirectoryLocator());
                 }
 
-                zipModel.getZip64EndCentralDirLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(currSplitFileCounter);
-                zipModel.getZip64EndCentralDirLocator().setTotNumberOfDiscs(currSplitFileCounter + 1);
+                zipModel.getZip64EndCentralDirectoryLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(currSplitFileCounter);
+                zipModel.getZip64EndCentralDirectoryLocator().setTotNumberOfDiscs(currSplitFileCounter + 1);
             }
-            zipModel.getEndOfCentralDirectory().setNoOfThisDisk(currSplitFileCounter);
-            zipModel.getEndOfCentralDirectory().setNoOfThisDiskStartOfCentralDir(currSplitFileCounter);
+            zipModel.getEndCentralDirectory().setNoOfDisk(currSplitFileCounter);
+            zipModel.getEndCentralDirectory().setNoOfDiskStartCentralDir(currSplitFileCounter);
         } catch(IOException e) {
             throw new ZipException(e);
         }
@@ -536,7 +537,7 @@ public class HeaderWriter {
             byte[] longByte = new byte[8];
 
             //zip64 end of central dir signature
-            Raw.writeIntLittleEndian(intByte, 0, (int)InternalZipConstants.ZIP64ENDCENDIRREC);
+            Raw.writeIntLittleEndian(intByte, 0, (int)InternalZipConstants.ZIP64_ENDSIG);
             bytes.copyByteArrayToArrayList(intByte);
 
             //size of zip64 end of central directory record
@@ -561,11 +562,11 @@ public class HeaderWriter {
             }
 
             //number of this disk
-            Raw.writeIntLittleEndian(intByte, 0, zipModel.getEndOfCentralDirectory().getNoOfThisDisk());
+            Raw.writeIntLittleEndian(intByte, 0, zipModel.getEndCentralDirectory().getNoOfDisk());
             bytes.copyByteArrayToArrayList(intByte);
 
             //number of the disk with start of central directory
-            Raw.writeIntLittleEndian(intByte, 0, zipModel.getEndOfCentralDirectory().getNoOfThisDiskStartOfCentralDir());
+            Raw.writeIntLittleEndian(intByte, 0, zipModel.getEndCentralDirectory().getNoOfDiskStartCentralDir());
             bytes.copyByteArrayToArrayList(intByte);
 
             //total number of entries in the central directory on this disk
@@ -579,7 +580,7 @@ public class HeaderWriter {
                 numEntries = zipModel.getCentralDirectory().getFileHeaders().size();
                 if (zipModel.isSplitArchive()) {
                     countNumberOfFileHeaderEntriesOnDisk(zipModel.getCentralDirectory().getFileHeaders(),
-                            zipModel.getEndOfCentralDirectory().getNoOfThisDisk());
+                            zipModel.getEndCentralDirectory().getNoOfDisk());
                 } else {
                     numEntriesOnThisDisk = numEntries;
                 }
@@ -618,19 +619,19 @@ public class HeaderWriter {
             byte[] longByte = new byte[8];
 
             //zip64 end of central dir locator  signature
-            Raw.writeIntLittleEndian(intByte, 0, (int)InternalZipConstants.ZIP64ENDCENDIRLOC);
+            Raw.writeIntLittleEndian(intByte, 0, (int)InternalZipConstants.ZIP64_ENDSIG_LOC);
             bytes.copyByteArrayToArrayList(intByte);
 
             //number of the disk with the start of the zip64 end of central directory
-            Raw.writeIntLittleEndian(intByte, 0, zipModel.getZip64EndCentralDirLocator().getNoOfDiskStartOfZip64EndOfCentralDirRec());
+            Raw.writeIntLittleEndian(intByte, 0, zipModel.getZip64EndCentralDirectoryLocator().getNoOfDiskStartOfZip64EndOfCentralDirRec());
             bytes.copyByteArrayToArrayList(intByte);
 
             //relative offset of the zip64 end of central directory record
-            Raw.writeLongLittleEndian(longByte, 0, zipModel.getZip64EndCentralDirLocator().getOffsetZip64EndOfCentralDirRec());
+            Raw.writeLongLittleEndian(longByte, 0, zipModel.getZip64EndCentralDirectoryLocator().getOffsetZip64EndOfCentralDirRec());
             bytes.copyByteArrayToArrayList(longByte);
 
             //total number of disks
-            Raw.writeIntLittleEndian(intByte, 0, zipModel.getZip64EndCentralDirLocator().getTotNumberOfDiscs());
+            Raw.writeIntLittleEndian(intByte, 0, zipModel.getZip64EndCentralDirectoryLocator().getTotNumberOfDiscs());
             bytes.copyByteArrayToArrayList(intByte);
         } catch(Exception e) {
             throw new ZipException(e);
@@ -653,15 +654,15 @@ public class HeaderWriter {
             byte[] longByte = new byte[8];
 
             //End of central directory signature
-            Raw.writeIntLittleEndian(intByte, 0, (int)zipModel.getEndOfCentralDirectory().getSignature());
+            Raw.writeIntLittleEndian(intByte, 0, (int)zipModel.getEndCentralDirectory().getSignature());
             bytes.copyByteArrayToArrayList(intByte);
 
             //number of this disk
-            Raw.writeShortLittleEndian(shortByte, 0, (short)(zipModel.getEndOfCentralDirectory().getNoOfThisDisk()));
+            Raw.writeShortLittleEndian(shortByte, 0, (short)(zipModel.getEndCentralDirectory().getNoOfDisk()));
             bytes.copyByteArrayToArrayList(shortByte);
 
             //number of the disk with start of central directory
-            Raw.writeShortLittleEndian(shortByte, 0, (short)(zipModel.getEndOfCentralDirectory().getNoOfThisDiskStartOfCentralDir()));
+            Raw.writeShortLittleEndian(shortByte, 0, (short)(zipModel.getEndCentralDirectory().getNoOfDiskStartCentralDir()));
             bytes.copyByteArrayToArrayList(shortByte);
 
             //Total number of entries in central directory on this disk
@@ -675,7 +676,7 @@ public class HeaderWriter {
                 numEntries = zipModel.getCentralDirectory().getFileHeaders().size();
                 if (zipModel.isSplitArchive()) {
                     numEntriesOnThisDisk = countNumberOfFileHeaderEntriesOnDisk(zipModel.getCentralDirectory().getFileHeaders(),
-                            zipModel.getEndOfCentralDirectory().getNoOfThisDisk());
+                            zipModel.getEndCentralDirectory().getNoOfDisk());
                 } else {
                     numEntriesOnThisDisk = numEntries;
                 }
@@ -705,15 +706,16 @@ public class HeaderWriter {
 
             //Zip File comment length
             int commentLength = 0;
-            if (zipModel.getEndOfCentralDirectory().getComment() != null) {
-                commentLength = zipModel.getEndOfCentralDirectory().getCommentLength();
+            if (zipModel.getEndCentralDirectory().getComment() != null) {
+                commentLength = zipModel.getEndCentralDirectory().getCommentLength();
             }
             Raw.writeShortLittleEndian(shortByte, 0, (short)commentLength);
             bytes.copyByteArrayToArrayList(shortByte);
 
             //Comment
             if (commentLength > 0) {
-                bytes.copyByteArrayToArrayList(zipModel.getEndOfCentralDirectory().getCommentBytes());
+                Charset charset = Charset.forName(System.getProperty("sun.jnu.encoding", zipModel.getCharset().name()));
+                bytes.copyByteArrayToArrayList(zipModel.getEndCentralDirectory().getComment().getBytes(charset));
             }
 
         } catch(Exception e) {

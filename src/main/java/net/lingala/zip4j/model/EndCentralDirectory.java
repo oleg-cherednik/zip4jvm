@@ -19,24 +19,25 @@ package net.lingala.zip4j.model;
 import lombok.Getter;
 import lombok.Setter;
 import net.lingala.zip4j.util.InternalZipConstants;
+import org.apache.commons.lang.StringUtils;
 
 @Getter
 @Setter
-public class EndOfCentralDirectory {
+public class EndCentralDirectory {
 
-    // size with comment length = 0
-    public static final int MIN_SIZE = 22;
+    // size (22) with comment length = 0
+    public static final int MIN_SIZE = 4 + 2 + 2 + 2 + 2 + 4 + 4 + 2;
     // max length for comment is 2 bytes
     public static final int MAX_COMMENT_LENGTH = 0xFFFF;
 
     // size:4 - signature (0x06054b50)
     private final int signature = InternalZipConstants.ENDSIG;
     // size:2 - number of the disk
-    private int noOfThisDisk;
+    private int noOfDisk;
     // size:2 - number of the disk with the start of the central directory
-    private int noOfThisDiskStartOfCentralDir;
+    private int noOfDiskStartCentralDir;
     // size:2 - total number of entries in the central directory on this disk
-    private int totNoOfEntriesInCentralDirOnThisDisk;
+    private int totalNumberOfEntriesInCentralDirOnThisDisk;
     // size:2 - total number of entries in the central directory
     private int totNoOfEntriesInCentralDir;
     // size:4 - size of the central directory
@@ -47,7 +48,14 @@ public class EndOfCentralDirectory {
     private int commentLength;
     // size:n - file comment
     private String comment;
-    @Deprecated
-    private byte[] commentBytes;
+
+    public void setComment(String comment) {
+        this.comment = comment;
+        commentLength = StringUtils.length(comment);
+    }
+
+    public String getComment() {
+        return comment;
+    }
 
 }

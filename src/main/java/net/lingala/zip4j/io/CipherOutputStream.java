@@ -24,7 +24,7 @@ import net.lingala.zip4j.crypto.StandardEncrypter;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.CentralDirectory;
-import net.lingala.zip4j.model.EndOfCentralDirectory;
+import net.lingala.zip4j.model.EndCentralDirectory;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.ZipModel;
@@ -188,8 +188,8 @@ public class CipherOutputStream extends OutputStream {
             this.zipModel = zipModel;
         }
 
-        if (this.zipModel.getEndOfCentralDirectory() == null)
-            this.zipModel.setEndOfCentralDirectory(new EndOfCentralDirectory());
+        if (this.zipModel.getEndCentralDirectory() == null)
+            this.zipModel.setEndCentralDirectory(new EndCentralDirectory());
 
         if (this.zipModel.getCentralDirectory() == null)
             this.zipModel.setCentralDirectory(new CentralDirectory());
@@ -322,7 +322,7 @@ public class CipherOutputStream extends OutputStream {
     }
 
     public void finish() throws IOException, ZipException {
-        zipModel.getEndOfCentralDirectory().setOffsetOfStartOfCentralDir(totalBytesWritten);
+        zipModel.getEndCentralDirectory().setOffsetOfStartOfCentralDir(totalBytesWritten);
 
         HeaderWriter headerWriter = new HeaderWriter();
         headerWriter.finalizeZipFile(zipModel, outputStream);

@@ -19,7 +19,7 @@ public final class LittleEndianRandomAccessFile {
     @Getter
     private final RandomAccessFile in;
     @Getter
-    private int offs = 0;
+    private int offs;
 
     public void resetOffs() {
         offs = 0;
@@ -60,12 +60,21 @@ public final class LittleEndianRandomAccessFile {
         return convertInt(in.readInt());
     }
 
+    public long readLong() throws IOException {
+        offs += 8;
+        return convertLong(in.readLong());
+    }
+
     public long length() throws IOException {
         return in.length();
     }
 
     public void seek(long pos) throws IOException {
         in.seek(pos);
+    }
+
+    public long getFilePointer() throws IOException {
+        return in.getFilePointer();
     }
 
     private static short convertShort(short val) {
@@ -76,12 +85,13 @@ public final class LittleEndianRandomAccessFile {
         return getByte(val, 0) << 24 | getByte(val, 1) << 16 | getByte(val, 2) << 8 | getByte(val, 3);
     }
 
-    private static long getByte(long val, int i) {
-        return (val >> i * 8) & 0xFF;
+    private static long convertLong(long val) {
+        return getByte(val, 0) << 56 | getByte(val, 1) << 48 | getByte(val, 2) << 40 | getByte(val, 3) << 32 |
+                getByte(val, 4) << 24 | getByte(val, 5) << 16 | getByte(val, 6) << 8 | getByte(val, 7);
     }
 
-    public static int readInt(byte[] buf) {
-        return (buf[3] & 0xFF) << 24 | (buf[2] & 0xFF) << 16 | (buf[1] & 0xFF) << 8 | (buf[0] & 0xFF);
+    private static long getByte(long val, int i) {
+        return (val >> i * 8) & 0xFF;
     }
 
 }

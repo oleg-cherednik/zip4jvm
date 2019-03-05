@@ -557,7 +557,7 @@ public class Zip4jUtil {
             throw new ZipException("cannot get split zip files: zipmodel is null");
         }
 
-        if (zipModel.getEndOfCentralDirectory() == null) {
+        if (zipModel.getEndCentralDirectory() == null) {
             return null;
         }
 
@@ -575,7 +575,7 @@ public class Zip4jUtil {
             return retList;
         }
 
-        int numberOfThisDisk = zipModel.getEndOfCentralDirectory().getNoOfThisDisk();
+        int numberOfThisDisk = zipModel.getEndCentralDirectory().getNoOfDisk();
 
         if (numberOfThisDisk == 0) {
             retList.add(new File(currZipFile));
@@ -676,8 +676,8 @@ public class Zip4jUtil {
         allSigs[4] = InternalZipConstants.DIGSIG;
         allSigs[5] = InternalZipConstants.ARCEXTDATREC;
         allSigs[6] = InternalZipConstants.SPLITSIG;
-        allSigs[7] = InternalZipConstants.ZIP64ENDCENDIRLOC;
-        allSigs[8] = InternalZipConstants.ZIP64ENDCENDIRREC;
+        allSigs[7] = InternalZipConstants.ZIP64_ENDSIG_LOC;
+        allSigs[8] = InternalZipConstants.ZIP64_ENDSIG;
         allSigs[9] = InternalZipConstants.EXTRAFIELDZIP64LENGTH;
         allSigs[10] = InternalZipConstants.AESSIG;
 

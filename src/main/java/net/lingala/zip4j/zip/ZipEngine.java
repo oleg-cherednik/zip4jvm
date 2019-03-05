@@ -19,7 +19,7 @@ package net.lingala.zip4j.zip;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.io.ZipOutputStream;
-import net.lingala.zip4j.model.EndOfCentralDirectory;
+import net.lingala.zip4j.model.EndCentralDirectory;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
@@ -98,8 +98,8 @@ public class ZipEngine {
             throw new ZipException("no files to add");
         }
 
-        if (zipModel.getEndOfCentralDirectory() == null)
-            zipModel.setEndOfCentralDirectory(new EndOfCentralDirectory());
+        if (zipModel.getEndCentralDirectory() == null)
+            zipModel.setEndCentralDirectory(new EndCentralDirectory());
 
         ZipOutputStream outputStream = null;
         InputStream inputStream = null;
@@ -114,10 +114,10 @@ public class ZipEngine {
             outputStream = new ZipOutputStream(splitOutputStream, this.zipModel);
 
             if (isZipFileAlreadExists) {
-                if (zipModel.getEndOfCentralDirectory() == null) {
+                if (zipModel.getEndCentralDirectory() == null) {
                     throw new ZipException("invalid end of central directory record");
                 }
-                splitOutputStream.seek(zipModel.getEndOfCentralDirectory().getOffsetOfStartOfCentralDir());
+                splitOutputStream.seek(zipModel.getEndCentralDirectory().getOffsetOfStartOfCentralDir());
             }
             byte[] readBuff = new byte[InternalZipConstants.BUFF_SIZE];
             int readLen = -1;
@@ -224,10 +224,10 @@ public class ZipEngine {
             outputStream = new ZipOutputStream(splitOutputStream, this.zipModel);
 
             if (isZipFileAlreadExists) {
-                if (zipModel.getEndOfCentralDirectory() == null) {
+                if (zipModel.getEndCentralDirectory() == null) {
                     throw new ZipException("invalid end of central directory record");
                 }
-                splitOutputStream.seek(zipModel.getEndOfCentralDirectory().getOffsetOfStartOfCentralDir());
+                splitOutputStream.seek(zipModel.getEndCentralDirectory().getOffsetOfStartOfCentralDir());
             }
 
             byte[] readBuff = new byte[InternalZipConstants.BUFF_SIZE];

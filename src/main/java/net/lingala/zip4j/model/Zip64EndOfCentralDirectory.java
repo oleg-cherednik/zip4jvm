@@ -1,0 +1,54 @@
+/*
+ * Copyright 2010 Srikanth Reddy Lingala
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package net.lingala.zip4j.model;
+
+import lombok.Getter;
+import lombok.Setter;
+import net.lingala.zip4j.util.InternalZipConstants;
+
+/**
+ * @author Oleg Cherednik
+ * @since 04.03.2019
+ */
+@Getter
+@Setter
+public class Zip64EndOfCentralDirectory {
+
+    // size:4 - signature (0x06064b50)
+    private final int signature = InternalZipConstants.ZIP64_ENDSIG;
+    // size:8 - directory record
+    private long sizeOfZip64EndCentralDirRec;
+    // size:2 - version made by
+    private int versionMadeBy;
+    // size:2 - version needed to extract
+    private int versionNeededToExtract;
+    // size:4 - number of this disk
+    private int noOfThisDisk;
+    // sizeL4 - number of the disk with the start of the central directory
+    private int noOfThisDiskStartOfCentralDir;
+    // size:8 - total number of entries in the central directory on this disk
+    private long totNoOfEntriesInCentralDirOnThisDisk;
+    // size:8 - total number of entries in the central directory
+    private long totNoOfEntriesInCentralDir;
+    // size:8 - size of the central directory
+    private long sizeOfCentralDir;
+    // size:9 - directory with respect to the starting disk number
+    private long offsetStartCenDirWRTStartDiskNo;
+    // size:n - extensible data sector
+    private byte[] extensibleDataSector;
+
+}

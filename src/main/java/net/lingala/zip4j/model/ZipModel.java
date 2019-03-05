@@ -36,11 +36,11 @@ public class ZipModel implements Cloneable {
 
     private CentralDirectory centralDirectory;
 
-    private EndOfCentralDirectory endOfCentralDirectory;
+    private EndCentralDirectory endCentralDirectory;
 
-    private Zip64EndCentralDirLocator zip64EndCentralDirLocator;
+    private Zip64EndCentralDirectoryLocator zip64EndCentralDirectoryLocator;
 
-    private Zip64EndCentralDirRecord zip64EndCentralDirRecord;
+    private Zip64EndOfCentralDirectory zip64EndOfCentralDirectory;
 
     private boolean splitArchive;
 
@@ -87,12 +87,9 @@ public class ZipModel implements Cloneable {
         this.centralDirectory = centralDirectory;
     }
 
-    public EndOfCentralDirectory getEndOfCentralDirectory() {
-        return endOfCentralDirectory;
-    }
-
-    public void setEndOfCentralDirectory(EndOfCentralDirectory endOfCentralDirectory) {
-        this.endOfCentralDirectory = endOfCentralDirectory;
+    public void setEndCentralDirectory(EndCentralDirectory endCentralDirectory) {
+        this.endCentralDirectory = endCentralDirectory;
+        splitArchive = endCentralDirectory != null && endCentralDirectory.getNoOfDisk() > 0;
     }
 
     public ArchiveExtraDataRecord getArchiveExtraDataRecord() {
@@ -120,22 +117,13 @@ public class ZipModel implements Cloneable {
         this.zipFile = zipFile;
     }
 
-    public Zip64EndCentralDirLocator getZip64EndCentralDirLocator() {
-        return zip64EndCentralDirLocator;
+    public Zip64EndOfCentralDirectory getZip64EndOfCentralDirectory() {
+        return zip64EndOfCentralDirectory;
     }
 
-    public void setZip64EndCentralDirLocator(
-            Zip64EndCentralDirLocator zip64EndCentralDirLocator) {
-        this.zip64EndCentralDirLocator = zip64EndCentralDirLocator;
-    }
-
-    public Zip64EndCentralDirRecord getZip64EndCentralDirRecord() {
-        return zip64EndCentralDirRecord;
-    }
-
-    public void setZip64EndCentralDirRecord(
-            Zip64EndCentralDirRecord zip64EndCentralDirRecord) {
-        this.zip64EndCentralDirRecord = zip64EndCentralDirRecord;
+    public void setZip64EndOfCentralDirectory(
+            Zip64EndOfCentralDirectory zip64EndOfCentralDirectory) {
+        this.zip64EndOfCentralDirectory = zip64EndOfCentralDirectory;
     }
 
     public boolean isNestedZipFile() {
@@ -176,6 +164,10 @@ public class ZipModel implements Cloneable {
 
     public byte[] convertFileNameToByteArr(String fileName) throws UnsupportedEncodingException {
         return fileName.getBytes(charset);
+    }
+
+    public boolean isZip64Format() {
+        return zip64EndCentralDirectoryLocator != null;
     }
 
 }

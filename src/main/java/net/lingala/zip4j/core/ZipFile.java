@@ -865,7 +865,7 @@ public class ZipFile {
             throw new ZipException("zipModel is null, cannot update zip file");
         }
 
-        if (zipModel.getEndOfCentralDirectory() == null) {
+        if (zipModel.getEndCentralDirectory() == null) {
             throw new ZipException("end of central directory is null, cannot set comment");
         }
 
@@ -899,14 +899,13 @@ public class ZipFile {
         if (zipModel == null)
             throw new ZipException("zip model is null, cannot read comment");
 
-        if (zipModel.getEndOfCentralDirectory() == null)
+        if (zipModel.getEndCentralDirectory() == null)
             throw new ZipException("end of central directory record is null, cannot read comment");
 
-        if (zipModel.getEndOfCentralDirectory().getCommentBytes() == null ||
-                zipModel.getEndOfCentralDirectory().getCommentBytes().length <= 0)
+        if (zipModel.getEndCentralDirectory().getComment() == null)
             return null;
 
-        return new String(zipModel.getEndOfCentralDirectory().getCommentBytes(), charset);
+        return zipModel.getEndCentralDirectory().getComment();
     }
 
     /**

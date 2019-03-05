@@ -1,8 +1,8 @@
 package net.lingala.zip4j.core;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.model.EndOfCentralDirectory;
+import net.lingala.zip4j.model.EndCentralDirectory;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
 
@@ -13,17 +13,19 @@ import java.io.IOException;
  * @since 04.03.2019
  */
 @RequiredArgsConstructor
-public final class EndOfCentralDirectoryReader {
+public final class EndCentralDirectoryReader {
 
     private final LittleEndianRandomAccessFile in;
+    @Getter
+    private long offs = -1;
 
-    public EndOfCentralDirectory read() throws ZipException, IOException {
+    public EndCentralDirectory read() throws IOException {
         findHead();
 
-        EndOfCentralDirectory dir = new EndOfCentralDirectory();
-        dir.setNoOfThisDisk(in.readShort());
-        dir.setNoOfThisDiskStartOfCentralDir(in.readShort());
-        dir.setTotNoOfEntriesInCentralDirOnThisDisk(in.readShort());
+        EndCentralDirectory dir = new EndCentralDirectory();
+        dir.setNoOfDisk(in.readShort());
+        dir.setNoOfDiskStartCentralDir(in.readShort());
+        dir.setTotalNumberOfEntriesInCentralDirOnThisDisk(in.readShort());
         dir.setTotNoOfEntriesInCentralDir(in.readShort());
         dir.setSizeOfCentralDir(in.readInt());
         dir.setOffsetOfStartOfCentralDir(in.readIntAsLong());
@@ -35,19 +37,22 @@ public final class EndOfCentralDirectoryReader {
         return dir;
     }
 
-    private void findHead() throws ZipException, IOException {
-        int commentLength = EndOfCentralDirectory.MAX_COMMENT_LENGTH;
-        long offs = in.length() - EndOfCentralDirectory.MIN_SIZE;
+    public void findHead() throws IOException {
+        int commentLength = EndCentralDirectory.MAX_COMMENT_LENGTH;
+        long offs = in.length() - EndCentralDirectory.MIN_SIZE;
 
         do {
             in.seek(offs--);
             commentLength--;
+            this.offs = in.getFilePointer();
 
             if (in.readInt() == InternalZipConstants.ENDSIG)
                 return;
         } while (commentLength >= 0 && offs >= 0);
 
-        throw new ZipException("zip headers not found. probably not a zip file");
+        this.offs = -1;
+
+        throw new IOException("zip headers not found. probably not a zip file");
     }
 
 }
