@@ -40,7 +40,7 @@ public class ZipModel implements Cloneable {
 
     private Zip64EndCentralDirectoryLocator zip64EndCentralDirectoryLocator;
 
-    private Zip64EndOfCentralDirectory zip64EndOfCentralDirectory;
+    private Zip64EndCentralDirectory zip64EndCentralDirectory;
 
     private boolean splitArchive;
 
@@ -117,13 +117,13 @@ public class ZipModel implements Cloneable {
         this.zipFile = zipFile;
     }
 
-    public Zip64EndOfCentralDirectory getZip64EndOfCentralDirectory() {
-        return zip64EndOfCentralDirectory;
+    public Zip64EndCentralDirectory getZip64EndCentralDirectory() {
+        return zip64EndCentralDirectory;
     }
 
-    public void setZip64EndOfCentralDirectory(
-            Zip64EndOfCentralDirectory zip64EndOfCentralDirectory) {
-        this.zip64EndOfCentralDirectory = zip64EndOfCentralDirectory;
+    public void setZip64EndCentralDirectory(
+            Zip64EndCentralDirectory zip64EndCentralDirectory) {
+        this.zip64EndCentralDirectory = zip64EndCentralDirectory;
     }
 
     public boolean isNestedZipFile() {

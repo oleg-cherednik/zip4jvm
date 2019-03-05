@@ -23,7 +23,7 @@ import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.Zip64EndCentralDirectoryLocator;
-import net.lingala.zip4j.model.Zip64EndOfCentralDirectory;
+import net.lingala.zip4j.model.Zip64EndCentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.LittleEndianBuffer;
@@ -146,8 +146,8 @@ public class HeaderWriter {
             int sizeOfCentralDir = writeCentralDirectory(zipModel, outputStream, bytes);
 
             if (zipModel.isZip64Format()) {
-                if (zipModel.getZip64EndOfCentralDirectory() == null) {
-                    zipModel.setZip64EndOfCentralDirectory(new Zip64EndOfCentralDirectory());
+                if (zipModel.getZip64EndCentralDirectory() == null) {
+                    zipModel.setZip64EndCentralDirectory(new Zip64EndCentralDirectory());
                 }
                 if (zipModel.getZip64EndCentralDirectoryLocator() == null) {
                     zipModel.setZip64EndCentralDirectoryLocator(new Zip64EndCentralDirectoryLocator());
@@ -202,8 +202,8 @@ public class HeaderWriter {
             int sizeOfCentralDir = writeCentralDirectory(zipModel, outputStream, bytes);
 
             if (zipModel.isZip64Format()) {
-                if (zipModel.getZip64EndOfCentralDirectory() == null) {
-                    zipModel.setZip64EndOfCentralDirectory(new Zip64EndOfCentralDirectory());
+                if (zipModel.getZip64EndCentralDirectory() == null) {
+                    zipModel.setZip64EndCentralDirectory(new Zip64EndCentralDirectory());
                 }
                 if (zipModel.getZip64EndCentralDirectoryLocator() == null) {
                     zipModel.setZip64EndCentralDirectoryLocator(new Zip64EndCentralDirectoryLocator());
@@ -269,8 +269,8 @@ public class HeaderWriter {
             }
 
             if (zipModel.isZip64Format()) {
-                if (zipModel.getZip64EndOfCentralDirectory() == null) {
-                    zipModel.setZip64EndOfCentralDirectory(new Zip64EndOfCentralDirectory());
+                if (zipModel.getZip64EndCentralDirectory() == null) {
+                    zipModel.setZip64EndCentralDirectory(new Zip64EndCentralDirectory());
                 }
                 if (zipModel.getZip64EndCentralDirectoryLocator() == null) {
                     zipModel.setZip64EndCentralDirectoryLocator(new Zip64EndCentralDirectoryLocator());

@@ -23,7 +23,7 @@ import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.Zip64EndCentralDirectoryLocator;
-import net.lingala.zip4j.model.Zip64EndOfCentralDirectory;
+import net.lingala.zip4j.model.Zip64EndCentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.progress.ProgressMonitor;
 
@@ -129,8 +129,8 @@ public class ArchiveMaintainer {
 
 			long offsetStartCentralDir = zipModel.getEndCentralDirectory().getOffsetOfStartOfCentralDir();
 			if (zipModel.isZip64Format()) {
-				if (zipModel.getZip64EndOfCentralDirectory() != null) {
-					offsetStartCentralDir = zipModel.getZip64EndOfCentralDirectory().getOffsetStartCenDirWRTStartDiskNo();
+				if (zipModel.getZip64EndCentralDirectory() != null) {
+					offsetStartCentralDir = zipModel.getZip64EndCentralDirectory().getOffsetStartCenDirWRTStartDiskNo();
 				}
 			}
 
@@ -594,13 +594,13 @@ public class ArchiveMaintainer {
 			throw new ZipException("zip model is null, cannot update split Zip64 end of central directory record");
 		}
 
-		if (zipModel.getZip64EndOfCentralDirectory() == null) {
+		if (zipModel.getZip64EndCentralDirectory() == null) {
 			return;
 		}
 
-		zipModel.getZip64EndOfCentralDirectory().setNoOfThisDisk(0);
-		zipModel.getZip64EndOfCentralDirectory().setNoOfThisDiskStartOfCentralDir(0);
-		zipModel.getZip64EndOfCentralDirectory().setTotNoOfEntriesInCentralDirOnThisDisk(
+		zipModel.getZip64EndCentralDirectory().setNoOfThisDisk(0);
+		zipModel.getZip64EndCentralDirectory().setNoOfThisDiskStartOfCentralDir(0);
+		zipModel.getZip64EndCentralDirectory().setTotNoOfEntriesInCentralDirOnThisDisk(
 				zipModel.getEndCentralDirectory().getTotNoOfEntriesInCentralDir());
 
 		long offsetStartCenDirWRTStartDiskNo = 0;
@@ -609,8 +609,8 @@ public class ArchiveMaintainer {
 			offsetStartCenDirWRTStartDiskNo += ((Long)fileSizeList.get(i)).longValue();
 		}
 
-		zipModel.getZip64EndOfCentralDirectory().setOffsetStartCenDirWRTStartDiskNo(
-				((Zip64EndOfCentralDirectory)zipModel.getZip64EndOfCentralDirectory()).getOffsetStartCenDirWRTStartDiskNo() +
+		zipModel.getZip64EndCentralDirectory().setOffsetStartCenDirWRTStartDiskNo(
+				((Zip64EndCentralDirectory)zipModel.getZip64EndCentralDirectory()).getOffsetStartCenDirWRTStartDiskNo() +
 				offsetStartCenDirWRTStartDiskNo);
 	}
 
@@ -652,7 +652,7 @@ public class ArchiveMaintainer {
 			outputStream = new SplitOutputStream(zipModel.getZipFile());
 
 			if (zipModel.isZip64Format()) {
-				outputStream.seek(zipModel.getZip64EndOfCentralDirectory().getOffsetStartCenDirWRTStartDiskNo());
+				outputStream.seek(zipModel.getZip64EndCentralDirectory().getOffsetStartCenDirWRTStartDiskNo());
 			} else {
 				outputStream.seek(zipModel.getEndCentralDirectory().getOffsetOfStartOfCentralDir());
 			}

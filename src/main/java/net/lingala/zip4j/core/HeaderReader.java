@@ -29,7 +29,6 @@ import net.lingala.zip4j.model.ExtraDataRecord;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.Zip64EndCentralDirectoryLocator;
-import net.lingala.zip4j.model.Zip64EndOfCentralDirectory;
 import net.lingala.zip4j.model.Zip64ExtendedInfo;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
@@ -51,7 +50,6 @@ import java.util.List;
 public final class HeaderReader {
 
     private final RandomAccessFile zip4jRaf;
-    private ZipModel zipModel;
 
     /**
      * Reads all the header information for the zip file. File names are read with
@@ -71,19 +69,14 @@ public final class HeaderReader {
         ZipModel zipModel = new ZipModel();
         zipModel.setCharset(charset);
         zipModel.setEndCentralDirectory(dir);
-        zipModel.setZip64EndCentralDirectoryLocator(locator);
 
-        if (zipModel.isZip64Format()) {
-            zipModel.setZip64EndOfCentralDirectory(readZip64EndCentralDirRec());
-
-            // TODO this is already set when read EndCentralDirectory - why duplication?
-            if (zipModel.getZip64EndOfCentralDirectory() != null && zipModel.getZip64EndOfCentralDirectory().getNoOfThisDisk() > 0)
-                zipModel.setSplitArchive(true);
-            else
-                zipModel.setSplitArchive(false);
+        if (locator != null) {
+            zipModel.setZip64EndCentralDirectoryLocator(locator);
+            zipModel.setZip64EndCentralDirectory(new Zip64EndCentralDirectoryReader(in, locator.getOffsetZip64EndOfCentralDirRec()).read());
         }
 
         zipModel.setCentralDirectory(readCentralDirectory(zipModel));
+
         return zipModel;
     }
 
@@ -112,8 +105,8 @@ public final class HeaderReader {
             int centralDirEntryCount = endCentralDirectory.getTotNoOfEntriesInCentralDir();
 
             if (zipModel.isZip64Format()) {
-                offSetStartCentralDir = zipModel.getZip64EndOfCentralDirectory().getOffsetStartCenDirWRTStartDiskNo();
-                centralDirEntryCount = (int)zipModel.getZip64EndOfCentralDirectory().getTotNoOfEntriesInCentralDir();
+                offSetStartCentralDir = zipModel.getZip64EndCentralDirectory().getOffsetStartCenDirWRTStartDiskNo();
+                centralDirEntryCount = (int)zipModel.getZip64EndCentralDirectory().getTotNoOfEntriesInCentralDir();
             }
 
             zip4jRaf.seek(offSetStartCentralDir);
@@ -402,100 +395,6 @@ public final class HeaderReader {
         } catch(IOException e) {
             throw new ZipException(e);
         }
-    }
-
-    /**
-     * Reads Zip64 End of Central Directory Record
-     *
-     * @return {@link Zip64EndOfCentralDirectory}
-     * @throws ZipException
-     */
-    private Zip64EndOfCentralDirectory readZip64EndCentralDirRec() throws ZipException {
-
-        if (zipModel.getZip64EndCentralDirectoryLocator() == null) {
-            throw new ZipException("invalid zip64 end of central directory locator");
-        }
-
-        long offSetStartOfZip64CentralDir =
-                zipModel.getZip64EndCentralDirectoryLocator().getOffsetZip64EndOfCentralDirRec();
-
-        if (offSetStartOfZip64CentralDir < 0) {
-            throw new ZipException("invalid offset for start of end of central directory record");
-        }
-
-        try {
-            zip4jRaf.seek(offSetStartOfZip64CentralDir);
-
-            Zip64EndOfCentralDirectory zip64EndOfCentralDirectory = new Zip64EndOfCentralDirectory();
-
-            byte[] shortBuff = new byte[2];
-            byte[] intBuff = new byte[4];
-            byte[] longBuff = new byte[8];
-
-            //signature
-            readIntoBuff(zip4jRaf, intBuff);
-            int signature = Raw.readIntLittleEndian(intBuff, 0);
-            if (signature != InternalZipConstants.ZIP64_ENDSIG) {
-                throw new ZipException("invalid signature for zip64 end of central directory record");
-            }
-//            zip64EndOfCentralDirectory.setSignature(signature);
-
-            //size of zip64 end of central directory record
-            readIntoBuff(zip4jRaf, longBuff);
-            zip64EndOfCentralDirectory.setSizeOfZip64EndCentralDirRec(
-                    Raw.readLongLittleEndian(longBuff, 0));
-
-            //version made by
-            readIntoBuff(zip4jRaf, shortBuff);
-            zip64EndOfCentralDirectory.setVersionMadeBy(Raw.readShortLittleEndian(shortBuff, 0));
-
-            //version needed to extract
-            readIntoBuff(zip4jRaf, shortBuff);
-            zip64EndOfCentralDirectory.setVersionNeededToExtract(Raw.readShortLittleEndian(shortBuff, 0));
-
-            //number of this disk
-            readIntoBuff(zip4jRaf, intBuff);
-            zip64EndOfCentralDirectory.setNoOfThisDisk(Raw.readIntLittleEndian(intBuff, 0));
-
-            //number of the disk with the start of the central directory
-            readIntoBuff(zip4jRaf, intBuff);
-            zip64EndOfCentralDirectory.setNoOfThisDiskStartOfCentralDir(
-                    Raw.readIntLittleEndian(intBuff, 0));
-
-            //total number of entries in the central directory on this disk
-            readIntoBuff(zip4jRaf, longBuff);
-            zip64EndOfCentralDirectory.setTotNoOfEntriesInCentralDirOnThisDisk(
-                    Raw.readLongLittleEndian(longBuff, 0));
-
-            //total number of entries in the central directory
-            readIntoBuff(zip4jRaf, longBuff);
-            zip64EndOfCentralDirectory.setTotNoOfEntriesInCentralDir(
-                    Raw.readLongLittleEndian(longBuff, 0));
-
-            //size of the central directory
-            readIntoBuff(zip4jRaf, longBuff);
-            zip64EndOfCentralDirectory.setSizeOfCentralDir(Raw.readLongLittleEndian(longBuff, 0));
-
-            //offset of start of central directory with respect to the starting disk number
-            readIntoBuff(zip4jRaf, longBuff);
-            zip64EndOfCentralDirectory.setOffsetStartCenDirWRTStartDiskNo(
-                    Raw.readLongLittleEndian(longBuff, 0));
-
-            //zip64 extensible data sector
-            //44 is the size of fixed variables in this record
-            long extDataSecSize = zip64EndOfCentralDirectory.getSizeOfZip64EndCentralDirRec() - 44;
-            if (extDataSecSize > 0) {
-                byte[] extDataSecRecBuf = new byte[(int)extDataSecSize];
-                readIntoBuff(zip4jRaf, extDataSecRecBuf);
-                zip64EndOfCentralDirectory.setExtensibleDataSector(extDataSecRecBuf);
-            }
-
-            return zip64EndOfCentralDirectory;
-
-        } catch(IOException e) {
-            throw new ZipException(e);
-        }
-
     }
 
     /**

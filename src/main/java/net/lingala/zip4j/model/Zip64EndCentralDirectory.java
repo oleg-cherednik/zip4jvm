@@ -26,11 +26,14 @@ import net.lingala.zip4j.util.InternalZipConstants;
  */
 @Getter
 @Setter
-public class Zip64EndOfCentralDirectory {
+public class Zip64EndCentralDirectory {
+
+    // size (44) with extensibleDataSector length = 0
+    public static final int SIZE = 2 + 2 + 4 + 4 + 8 + 8 + 8 + 8;
 
     // size:4 - signature (0x06064b50)
     private final int signature = InternalZipConstants.ZIP64_ENDSIG;
-    // size:8 - directory record
+    // size:8 - directory record (n)
     private long sizeOfZip64EndCentralDirRec;
     // size:2 - version made by
     private int versionMadeBy;
@@ -38,7 +41,7 @@ public class Zip64EndOfCentralDirectory {
     private int versionNeededToExtract;
     // size:4 - number of this disk
     private int noOfThisDisk;
-    // sizeL4 - number of the disk with the start of the central directory
+    // size:4 - number of the disk with the start of the central directory
     private int noOfThisDiskStartOfCentralDir;
     // size:8 - total number of entries in the central directory on this disk
     private long totNoOfEntriesInCentralDirOnThisDisk;
@@ -46,9 +49,9 @@ public class Zip64EndOfCentralDirectory {
     private long totNoOfEntriesInCentralDir;
     // size:8 - size of the central directory
     private long sizeOfCentralDir;
-    // size:9 - directory with respect to the starting disk number
+    // size:8 - directory with respect to the starting disk number
     private long offsetStartCenDirWRTStartDiskNo;
-    // size:n - extensible data sector
+    // size:n-44 - extensible data sector
     private byte[] extensibleDataSector;
 
 }

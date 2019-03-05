@@ -65,6 +65,18 @@ public final class LittleEndianRandomAccessFile {
         return convertLong(in.readLong());
     }
 
+    public byte[] readBytes(int total) throws IOException {
+        if (total <= 0)
+            return null;
+
+        byte[] buf = new byte[total];
+
+        if (in.read(buf) != total)
+            throw new IOException("Not enough bytes to read");
+
+        return buf;
+    }
+
     public long length() throws IOException {
         return in.length();
     }
