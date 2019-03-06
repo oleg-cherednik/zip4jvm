@@ -19,7 +19,6 @@ package net.lingala.zip4j.unzip;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.CentralDirectory;
-import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.UnzipParameters;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.progress.ProgressMonitor;
@@ -52,7 +51,7 @@ public class Unzip {
 			throw new ZipException("invalid central directory in zipModel");
 		}
 
-		final List<FileHeader> fileHeaders = centralDirectory.getFileHeaders();
+		final List<CentralDirectory.FileHeader> fileHeaders = centralDirectory.getFileHeaders();
 
 		progressMonitor.setCurrentOperation(ProgressMonitor.OPERATION_EXTRACT);
 		progressMonitor.setTotalWork(calculateTotalWork(fileHeaders));
@@ -75,11 +74,11 @@ public class Unzip {
 
 	}
 
-	private void initExtractAll(List<FileHeader> fileHeaders, UnzipParameters unzipParameters,
+	private void initExtractAll(List<CentralDirectory.FileHeader> fileHeaders, UnzipParameters unzipParameters,
 			ProgressMonitor progressMonitor, String outPath) throws ZipException {
 
 		for (int i = 0; i < fileHeaders.size(); i++) {
-			FileHeader fileHeader = fileHeaders.get(i);
+			CentralDirectory.FileHeader fileHeader = fileHeaders.get(i);
 			initExtractFile(fileHeader, outPath, unzipParameters, null, progressMonitor);
 			if (progressMonitor.isCancelAllTasks()) {
 				progressMonitor.setResult(ProgressMonitor.RESULT_CANCELLED);
@@ -89,7 +88,7 @@ public class Unzip {
 		}
 	}
 
-	public void extractFile(final FileHeader fileHeader, final String outPath,
+	public void extractFile(final CentralDirectory.FileHeader fileHeader, final String outPath,
 			final UnzipParameters unzipParameters, final String newFileName,
 			final ProgressMonitor progressMonitor, boolean runInThread) throws ZipException {
 		if (fileHeader == null) {
@@ -120,7 +119,7 @@ public class Unzip {
 
 	}
 
-	private void initExtractFile(FileHeader fileHeader, String outPath,
+	private void initExtractFile(CentralDirectory.FileHeader fileHeader, String outPath,
 			UnzipParameters unzipParameters, String newFileName, ProgressMonitor progressMonitor) throws ZipException {
 
 		if (fileHeader == null) {
@@ -172,12 +171,12 @@ public class Unzip {
 		}
 	}
 
-	public ZipInputStream getInputStream(FileHeader fileHeader) throws ZipException {
+	public ZipInputStream getInputStream(CentralDirectory.FileHeader fileHeader) throws ZipException {
 		UnzipEngine unzipEngine = new UnzipEngine(zipModel, fileHeader);
 		return unzipEngine.getInputStream();
 	}
 
-	private void checkOutputDirectoryStructure(FileHeader fileHeader, String outPath, String newFileName) throws ZipException {
+	private void checkOutputDirectoryStructure(CentralDirectory.FileHeader fileHeader, String outPath, String newFileName) throws ZipException {
 		if (fileHeader == null || !Zip4jUtil.isStringNotNullAndNotEmpty(outPath)) {
 			throw new ZipException("Cannot check output directory structure...one of the parameters was null");
 		}
@@ -206,7 +205,7 @@ public class Unzip {
 		}
 	}
 
-	private long calculateTotalWork(List<FileHeader> fileHeaders) throws ZipException {
+	private long calculateTotalWork(List<CentralDirectory.FileHeader> fileHeaders) throws ZipException {
 
 		if (fileHeaders == null) {
 			throw new ZipException("fileHeaders is null, cannot calculate total work");
@@ -215,7 +214,7 @@ public class Unzip {
 		long totalWork = 0;
 
 		for (int i = 0; i < fileHeaders.size(); i++) {
-			FileHeader fileHeader = fileHeaders.get(i);
+			CentralDirectory.FileHeader fileHeader = fileHeaders.get(i);
 			if (fileHeader.getZip64ExtendedInfo() != null &&
 					fileHeader.getZip64ExtendedInfo().getUnCompressedSize() > 0) {
 				totalWork += fileHeader.getZip64ExtendedInfo().getCompressedSize();

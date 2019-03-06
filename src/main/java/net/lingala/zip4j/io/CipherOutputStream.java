@@ -25,7 +25,6 @@ import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.EndCentralDirectory;
-import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
@@ -47,7 +46,7 @@ public class CipherOutputStream extends OutputStream {
     protected OutputStream outputStream;
     private File sourceFile;
     @NonNull
-    protected FileHeader fileHeader;
+    protected CentralDirectory.FileHeader fileHeader;
     private LocalFileHeader localFileHeader;
     private IEncrypter encrypter;
     protected ZipParameters zipParameters;
@@ -334,7 +333,7 @@ public class CipherOutputStream extends OutputStream {
     }
 
     private void createFileHeader() throws ZipException, UnsupportedEncodingException {
-        this.fileHeader = new FileHeader();
+        this.fileHeader = new CentralDirectory.FileHeader();
 //        fileHeader.setSignature((int)InternalZipConstants.CENSIG);
         fileHeader.setVersionMadeBy(20);
         fileHeader.setVersionNeededToExtract(20);

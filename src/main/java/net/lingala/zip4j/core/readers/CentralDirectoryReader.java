@@ -1,4 +1,4 @@
-package net.lingala.zip4j.core;
+package net.lingala.zip4j.core.readers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +8,6 @@ import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.DigitalSignature;
 import net.lingala.zip4j.model.EndCentralDirectory;
 import net.lingala.zip4j.model.ExtraDataRecord;
-import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.Zip64EndCentralDirectory;
 import net.lingala.zip4j.model.Zip64ExtendedInfo;
 import net.lingala.zip4j.util.InternalZipConstants;
@@ -25,7 +24,7 @@ import java.util.List;
  * @since 05.03.2019
  */
 @RequiredArgsConstructor
-public final class CentralDirectoryReader {
+final class CentralDirectoryReader {
 
     private final LittleEndianRandomAccessFile in;
     private final EndCentralDirectory dir;
@@ -43,9 +42,9 @@ public final class CentralDirectoryReader {
     }
 
     @NonNull
-    private List<FileHeader> readFileHeaders() throws IOException {
+    private List<CentralDirectory.FileHeader> readFileHeaders() throws IOException {
         int total = zip64 ? (int)zip64Dir.getTotNoOfEntriesInCentralDir() : dir.getTotNoOfEntriesInCentralDir();
-        List<FileHeader> fileHeaders = new ArrayList<>(total);
+        List<CentralDirectory.FileHeader> fileHeaders = new ArrayList<>(total);
 
         for (int i = 0; i < total; i++)
             fileHeaders.add(readFileHeader());
@@ -54,8 +53,8 @@ public final class CentralDirectoryReader {
     }
 
     @NonNull
-    private FileHeader readFileHeader() throws IOException {
-        FileHeader fileHeader = new FileHeader();
+    private CentralDirectory.FileHeader readFileHeader() throws IOException {
+        CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
         int signature = in.readInt();
 
@@ -145,7 +144,7 @@ public final class CentralDirectoryReader {
         return null;
     }
 
-    private static Zip64ExtendedInfo readZip64ExtendedInfo(@NonNull FileHeader fileHeader) throws IOException {
+    private static Zip64ExtendedInfo readZip64ExtendedInfo(@NonNull CentralDirectory.FileHeader fileHeader) throws IOException {
         for (ExtraDataRecord record : fileHeader.getExtraDataRecords()) {
             if (record.getHeader() != ExtraDataRecord.HEADER_ZIP64)
                 continue;

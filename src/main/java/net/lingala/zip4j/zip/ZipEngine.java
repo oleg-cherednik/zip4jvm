@@ -19,8 +19,8 @@ package net.lingala.zip4j.zip;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.io.ZipOutputStream;
+import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.EndCentralDirectory;
-import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.progress.ProgressMonitor;
@@ -126,7 +126,7 @@ public class ZipEngine {
                 String fileName = Zip4jUtil.getRelativeFileName(file.getAbsolutePath(),
                         parameters.getRootFolderInZip(), parameters.getDefaultFolderPath());
 
-                if("/".equals(fileName) || "\\".equals(fileName))
+                if ("/".equals(fileName) || "\\".equals(fileName))
                     continue;
 
                 if (progressMonitor.isCancelAllTasks()) {
@@ -363,7 +363,7 @@ public class ZipEngine {
                 String fileName = Zip4jUtil.getRelativeFileName(file.getAbsolutePath(),
                         parameters.getRootFolderInZip(), parameters.getDefaultFolderPath());
 
-                FileHeader fileHeader = Zip4jUtil.getFileHeader(zipModel, fileName);
+                CentralDirectory.FileHeader fileHeader = Zip4jUtil.getFileHeader(zipModel, fileName);
                 if (fileHeader != null) {
 
                     if (outputStream != null) {
@@ -464,7 +464,7 @@ public class ZipEngine {
                         zipModel.getCentralDirectory().getFileHeaders().size() > 0) {
                     String relativeFileName = Zip4jUtil.getRelativeFileName(
                             ((File)fileList.get(i)).getAbsolutePath(), parameters.getRootFolderInZip(), parameters.getDefaultFolderPath());
-                    FileHeader fileHeader = Zip4jUtil.getFileHeader(zipModel, relativeFileName);
+                    CentralDirectory.FileHeader fileHeader = Zip4jUtil.getFileHeader(zipModel, relativeFileName);
                     if (fileHeader != null) {
                         totalWork += (Zip4jUtil.getFileLengh(new File(zipModel.getZipFile())) - fileHeader.getCompressedSize());
                     }

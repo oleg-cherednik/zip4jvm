@@ -1,4 +1,4 @@
-package net.lingala.zip4j.core;
+package net.lingala.zip4j.core.readers;
 
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.exception.ZipException;
@@ -13,7 +13,7 @@ import java.io.IOException;
  * @since 04.03.2019
  */
 @RequiredArgsConstructor
-public final class Zip64EndCentralDirectoryLocatorReader {
+final class Zip64EndCentralDirectoryLocatorReader {
 
     private final LittleEndianRandomAccessFile in;
     private final long offsEndCentralDirectory;

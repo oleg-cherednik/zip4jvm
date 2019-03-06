@@ -25,7 +25,7 @@ import net.lingala.zip4j.io.InflaterInputStream;
 import net.lingala.zip4j.io.PartInputStream;
 import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.AESExtraDataRecord;
-import net.lingala.zip4j.model.FileHeader;
+import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.UnzipParameters;
 import net.lingala.zip4j.model.ZipModel;
@@ -48,13 +48,13 @@ import java.util.zip.CRC32;
 public class UnzipEngine {
 
 	private ZipModel zipModel;
-	private FileHeader fileHeader;
+	private CentralDirectory.FileHeader fileHeader;
 	private int currSplitFileCounter = 0;
 	private LocalFileHeader localFileHeader;
 	private IDecrypter decrypter;
 	private CRC32 crc;
 
-	public UnzipEngine(ZipModel zipModel, FileHeader fileHeader) throws ZipException {
+	public UnzipEngine(ZipModel zipModel, CentralDirectory.FileHeader fileHeader) throws ZipException {
 		if (zipModel == null || fileHeader == null) {
 			throw new ZipException("Invalid parameters passed to StoreUnzip. One or more of the parameters were null");
 		}
@@ -503,7 +503,7 @@ public class UnzipEngine {
 		}
 	}
 
-	public FileHeader getFileHeader() {
+	public CentralDirectory.FileHeader getFileHeader() {
 		return fileHeader;
 	}
 

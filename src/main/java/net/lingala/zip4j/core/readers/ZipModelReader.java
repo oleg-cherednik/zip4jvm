@@ -1,4 +1,4 @@
-package net.lingala.zip4j.core;
+package net.lingala.zip4j.core.readers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

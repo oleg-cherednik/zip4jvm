@@ -20,9 +20,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.AESExtraDataRecord;
+import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.EndCentralDirectory;
 import net.lingala.zip4j.model.ExtraDataRecord;
-import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.Zip64ExtendedInfo;
 import net.lingala.zip4j.util.InternalZipConstants;
@@ -271,7 +271,7 @@ public final class HeaderReader {
      * @return {@link LocalFileHeader}
      * @throws ZipException
      */
-    public LocalFileHeader readLocalFileHeader(FileHeader fileHeader) throws ZipException {
+    public LocalFileHeader readLocalFileHeader(CentralDirectory.FileHeader fileHeader) throws ZipException {
         if (fileHeader == null || zip4jRaf == null) {
             throw new ZipException("invalid read parameters for local header");
         }

@@ -20,7 +20,7 @@ import net.lingala.zip4j.core.HeaderReader;
 import net.lingala.zip4j.core.HeaderWriter;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.SplitOutputStream;
-import net.lingala.zip4j.model.FileHeader;
+import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.Zip64EndCentralDirectoryLocator;
 import net.lingala.zip4j.model.Zip64EndCentralDirectory;
@@ -45,7 +45,7 @@ public class ArchiveMaintainer {
 	}
 
 	public Map<String, String> removeZipFile(final ZipModel zipModel,
-			final FileHeader fileHeader, final ProgressMonitor progressMonitor, boolean runInThread) throws ZipException {
+			final CentralDirectory.FileHeader fileHeader, final ProgressMonitor progressMonitor, boolean runInThread) throws ZipException {
 
 		if (runInThread) {
 			Thread thread = new Thread(InternalZipConstants.THREAD_NAME) {
@@ -68,7 +68,7 @@ public class ArchiveMaintainer {
 	}
 
 	public Map<String, String> initRemoveZipFile(ZipModel zipModel,
-			FileHeader fileHeader, ProgressMonitor progressMonitor) throws ZipException {
+			CentralDirectory.FileHeader fileHeader, ProgressMonitor progressMonitor) throws ZipException {
 
 		if (fileHeader == null || zipModel == null) {
 			throw new ZipException("input parameters is null in maintain zip file, cannot remove file from archive");
@@ -134,12 +134,12 @@ public class ArchiveMaintainer {
 				}
 			}
 
-			List<FileHeader> fileHeaderList = zipModel.getCentralDirectory().getFileHeaders();
+			List<CentralDirectory.FileHeader> fileHeaderList = zipModel.getCentralDirectory().getFileHeaders();
 
 			if (indexOfFileHeader == fileHeaderList.size() - 1) {
 				offsetEndOfCompressedFile = offsetStartCentralDir - 1;
 			} else {
-				FileHeader nextFileHeader = fileHeaderList.get(indexOfFileHeader + 1);
+				CentralDirectory.FileHeader nextFileHeader = fileHeaderList.get(indexOfFileHeader + 1);
 				if (nextFileHeader != null) {
 					offsetEndOfCompressedFile = nextFileHeader.getOffLocalHeaderRelative() - 1;
 					if (nextFileHeader.getZip64ExtendedInfo() != null &&
@@ -528,13 +528,13 @@ public class ArchiveMaintainer {
 			for (int i = 0; i < fileHeaderCount; i++) {
 				long offsetLHToAdd = 0;
 
-				for (int j = 0; j < ((FileHeader)zipModel.getCentralDirectory().getFileHeaders().get(i)).getDiskNumberStart(); j++) {
+				for (int j = 0; j < ((CentralDirectory.FileHeader)zipModel.getCentralDirectory().getFileHeaders().get(i)).getDiskNumberStart(); j++) {
 					offsetLHToAdd += ((Long)fileSizeList.get(j)).longValue();
 				}
-				((FileHeader)zipModel.getCentralDirectory().getFileHeaders().get(i)).setOffLocalHeaderRelative(
-						((FileHeader)zipModel.getCentralDirectory().getFileHeaders().get(i)).getOffLocalHeaderRelative() +
+				zipModel.getCentralDirectory().getFileHeaders().get(i).setOffLocalHeaderRelative(
+						zipModel.getCentralDirectory().getFileHeaders().get(i).getOffLocalHeaderRelative() +
 						offsetLHToAdd - splitSigOverhead);
-				((FileHeader)zipModel.getCentralDirectory().getFileHeaders().get(i)).setDiskNumberStart(0);
+				zipModel.getCentralDirectory().getFileHeaders().get(i).setDiskNumberStart(0);
 			}
 
 		} catch (ZipException e) {
@@ -674,7 +674,7 @@ public class ArchiveMaintainer {
 	}
 
 	public void initProgressMonitorForRemoveOp(ZipModel zipModel,
-			FileHeader fileHeader, ProgressMonitor progressMonitor) throws ZipException {
+			CentralDirectory.FileHeader fileHeader, ProgressMonitor progressMonitor) throws ZipException {
 		if (zipModel == null || fileHeader == null || progressMonitor == null) {
 			throw new ZipException("one of the input parameters is null, cannot calculate total work");
 		}
@@ -685,7 +685,7 @@ public class ArchiveMaintainer {
 		progressMonitor.setState(ProgressMonitor.STATE_BUSY);
 	}
 
-	private long calculateTotalWorkForRemoveOp(ZipModel zipModel, FileHeader fileHeader) throws ZipException {
+	private long calculateTotalWorkForRemoveOp(ZipModel zipModel, CentralDirectory.FileHeader fileHeader) throws ZipException {
 		return Zip4jUtil.getFileLengh(new File(zipModel.getZipFile())) - fileHeader.getCompressedSize();
 	}
 

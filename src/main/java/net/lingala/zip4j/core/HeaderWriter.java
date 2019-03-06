@@ -20,10 +20,10 @@ import lombok.NonNull;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.model.AESExtraDataRecord;
-import net.lingala.zip4j.model.FileHeader;
+import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.LocalFileHeader;
-import net.lingala.zip4j.model.Zip64EndCentralDirectoryLocator;
 import net.lingala.zip4j.model.Zip64EndCentralDirectory;
+import net.lingala.zip4j.model.Zip64EndCentralDirectoryLocator;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.LittleEndianBuffer;
@@ -309,14 +309,14 @@ public class HeaderWriter {
 
         int sizeOfCentralDir = 0;
         for (int i = 0; i < zipModel.getCentralDirectory().getFileHeaders().size(); i++) {
-            FileHeader fileHeader = zipModel.getCentralDirectory().getFileHeaders().get(i);
+            CentralDirectory.FileHeader fileHeader = zipModel.getCentralDirectory().getFileHeaders().get(i);
             int sizeOfFileHeader = writeFileHeader(zipModel, fileHeader, outputStream, bytes);
             sizeOfCentralDir += sizeOfFileHeader;
         }
         return sizeOfCentralDir;
     }
 
-    private int writeFileHeader(ZipModel zipModel, FileHeader fileHeader,
+    private int writeFileHeader(ZipModel zipModel, CentralDirectory.FileHeader fileHeader,
             OutputStream outputStream, LittleEndianBuffer bytes) throws ZipException {
 
         if (fileHeader == null || outputStream == null) {
@@ -550,11 +550,11 @@ public class HeaderWriter {
                     zipModel.getCentralDirectory().getFileHeaders() != null &&
                     zipModel.getCentralDirectory().getFileHeaders().size() > 0) {
                 Raw.writeShortLittleEndian(shortByte, 0,
-                        (short)((FileHeader)zipModel.getCentralDirectory().getFileHeaders().get(0)).getVersionMadeBy());
+                        (short)zipModel.getCentralDirectory().getFileHeaders().get(0).getVersionMadeBy());
                 bytes.copyByteArrayToArrayList(shortByte);
 
                 Raw.writeShortLittleEndian(shortByte, 0,
-                        (short)((FileHeader)zipModel.getCentralDirectory().getFileHeaders().get(0)).getVersionNeededToExtract());
+                        (short)zipModel.getCentralDirectory().getFileHeaders().get(0).getVersionNeededToExtract());
                 bytes.copyByteArrayToArrayList(shortByte);
             } else {
                 bytes.copyByteArrayToArrayList(emptyShortByte);
@@ -814,7 +814,7 @@ public class HeaderWriter {
 
     }
 
-    private int countNumberOfFileHeaderEntriesOnDisk(List<FileHeader> fileHeaders,
+    private int countNumberOfFileHeaderEntriesOnDisk(List<CentralDirectory.FileHeader> fileHeaders,
             int numOfDisk) throws ZipException {
         if (fileHeaders == null) {
             throw new ZipException("file headers are null, cannot calculate number of entries on this disk");
@@ -822,7 +822,7 @@ public class HeaderWriter {
 
         int noEntries = 0;
         for (int i = 0; i < fileHeaders.size(); i++) {
-            FileHeader fileHeader = fileHeaders.get(i);
+            CentralDirectory.FileHeader fileHeader = fileHeaders.get(i);
             if (fileHeader.getDiskNumberStart() == numOfDisk) {
                 noEntries++;
             }

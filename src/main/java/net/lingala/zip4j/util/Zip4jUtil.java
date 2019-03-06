@@ -18,7 +18,7 @@ package net.lingala.zip4j.util;
 
 import lombok.NonNull;
 import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.model.FileHeader;
+import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
@@ -301,7 +301,7 @@ public class Zip4jUtil {
         return cal.getTime().getTime();
     }
 
-    public static FileHeader getFileHeader(ZipModel zipModel, String fileName) throws ZipException {
+    public static CentralDirectory.FileHeader getFileHeader(ZipModel zipModel, String fileName) throws ZipException {
         if (zipModel == null) {
             throw new ZipException("zip model is null, cannot determine file header for fileName: " + fileName);
         }
@@ -310,7 +310,7 @@ public class Zip4jUtil {
             throw new ZipException("file name is null, cannot determine file header for fileName: " + fileName);
         }
 
-        FileHeader fileHeader = null;
+        CentralDirectory.FileHeader fileHeader = null;
         fileHeader = getFileHeaderWithExactMatch(zipModel, fileName);
 
         if (fileHeader == null) {
@@ -326,7 +326,7 @@ public class Zip4jUtil {
         return fileHeader;
     }
 
-    public static FileHeader getFileHeaderWithExactMatch(ZipModel zipModel, String fileName) throws ZipException {
+    public static CentralDirectory.FileHeader getFileHeaderWithExactMatch(ZipModel zipModel, String fileName) throws ZipException {
         if (zipModel == null) {
             throw new ZipException("zip model is null, cannot determine file header with exact match for fileName: " + fileName);
         }
@@ -346,9 +346,9 @@ public class Zip4jUtil {
         if (zipModel.getCentralDirectory().getFileHeaders().size() <= 0) {
             return null;
         }
-        List<FileHeader> fileHeaders = zipModel.getCentralDirectory().getFileHeaders();
+        List<CentralDirectory.FileHeader> fileHeaders = zipModel.getCentralDirectory().getFileHeaders();
         for (int i = 0; i < fileHeaders.size(); i++) {
-            FileHeader fileHeader = fileHeaders.get(i);
+            CentralDirectory.FileHeader fileHeader = fileHeaders.get(i);
             String fileNameForHdr = fileHeader.getFileName();
             if (!isStringNotNullAndNotEmpty(fileNameForHdr)) {
                 continue;
@@ -363,7 +363,7 @@ public class Zip4jUtil {
     }
 
     public static int getIndexOfFileHeader(ZipModel zipModel,
-            FileHeader fileHeader) throws ZipException {
+            CentralDirectory.FileHeader fileHeader) throws ZipException {
 
         if (zipModel == null || fileHeader == null) {
             throw new ZipException("input parameters is null, cannot determine index of file header");
@@ -386,9 +386,9 @@ public class Zip4jUtil {
             throw new ZipException("file name in file header is empty or null, cannot determine index of file header");
         }
 
-        List<FileHeader> fileHeaders = zipModel.getCentralDirectory().getFileHeaders();
+        List<CentralDirectory.FileHeader> fileHeaders = zipModel.getCentralDirectory().getFileHeaders();
         for (int i = 0; i < fileHeaders.size(); i++) {
-            FileHeader fileHeaderTmp = fileHeaders.get(i);
+            CentralDirectory.FileHeader fileHeaderTmp = fileHeaders.get(i);
             String fileNameForHdr = fileHeaderTmp.getFileName();
             if (!isStringNotNullAndNotEmpty(fileNameForHdr)) {
                 continue;

@@ -26,7 +26,7 @@ public class BitUtils {
      *
      * @param val  checked val
      * @param bits checked bit or bit set
-     * @return <code>true</code> if all selected bit(s) are set
+     * @return {@literal true} if all selected bit(s) are set
      */
     public boolean isBitSet(int val, int bits) {
         return (val & bits) == bits;
@@ -37,7 +37,7 @@ public class BitUtils {
      *
      * @param val  val
      * @param bits bit or bit set to set in the val
-     * @return <code>val</code> with set selected bits
+     * @return {@literal val} with set selected bits
      */
     public int setBits(int val, int bits) {
         return val | bits;
@@ -48,7 +48,7 @@ public class BitUtils {
      *
      * @param val  val
      * @param bits bit or bit set to clear in the val
-     * @return <code>val</code> with cleared selected bits
+     * @return {@literal val} with cleared selected bits
      */
     public static int clearBits(int val, int bits) {
         return val & ~bits;

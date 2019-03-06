@@ -19,9 +19,10 @@ package net.lingala.zip4j.core;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import net.lingala.zip4j.core.readers.ZipModelReader;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.ZipInputStream;
-import net.lingala.zip4j.model.FileHeader;
+import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.UnzipParameters;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
@@ -467,7 +468,7 @@ public class ZipFile {
      * @param destPath
      * @throws ZipException
      */
-    public void extractFile(FileHeader fileHeader, String destPath) throws ZipException {
+    public void extractFile(CentralDirectory.FileHeader fileHeader, String destPath) throws ZipException {
         extractFile(fileHeader, destPath, null);
     }
 
@@ -484,7 +485,7 @@ public class ZipFile {
      * @param unzipParameters
      * @throws ZipException
      */
-    public void extractFile(FileHeader fileHeader,
+    public void extractFile(CentralDirectory.FileHeader fileHeader,
             String destPath, UnzipParameters unzipParameters) throws ZipException {
         extractFile(fileHeader, destPath, unzipParameters, null);
     }
@@ -499,7 +500,7 @@ public class ZipFile {
      * @param newFileName
      * @throws ZipException
      */
-    public void extractFile(FileHeader fileHeader, String destPath,
+    public void extractFile(CentralDirectory.FileHeader fileHeader, String destPath,
             UnzipParameters unzipParameters, String newFileName) throws ZipException {
 
         if (fileHeader == null) {
@@ -597,7 +598,7 @@ public class ZipFile {
 
         zipModel = readZipModel();
 
-        FileHeader fileHeader = Zip4jUtil.getFileHeader(zipModel, fileName);
+        CentralDirectory.FileHeader fileHeader = Zip4jUtil.getFileHeader(zipModel, fileName);
 
         if (fileHeader == null) {
             throw new ZipException("file header not found for given file name, cannot extract file");
@@ -663,7 +664,7 @@ public class ZipFile {
      * @return list of file headers
      * @throws ZipException
      */
-    public List<FileHeader> getFileHeaders() throws ZipException {
+    public List<CentralDirectory.FileHeader> getFileHeaders() throws ZipException {
         zipModel = readZipModel();
         return zipModel.getCentralDirectory().getFileHeaders();
     }
@@ -676,7 +677,7 @@ public class ZipFile {
      * @return FileHeader
      * @throws ZipException
      */
-    public FileHeader getFileHeader(String fileName) throws ZipException {
+    public CentralDirectory.FileHeader getFileHeader(String fileName) throws ZipException {
         if (!Zip4jUtil.isStringNotNullAndNotEmpty(fileName)) {
             throw new ZipException("input file name is emtpy or null, cannot get FileHeader");
         }
@@ -699,9 +700,9 @@ public class ZipFile {
             throw new ZipException("invalid zip file");
         }
 
-        List<FileHeader> fileHeaderList = zipModel.getCentralDirectory().getFileHeaders();
+        List<CentralDirectory.FileHeader> fileHeaderList = zipModel.getCentralDirectory().getFileHeaders();
         for (int i = 0; i < fileHeaderList.size(); i++) {
-            FileHeader fileHeader = fileHeaderList.get(i);
+            CentralDirectory.FileHeader fileHeader = fileHeaderList.get(i);
             if (fileHeader != null) {
                 if (fileHeader.isEncrypted()) {
                     isEncrypted = true;
@@ -751,7 +752,7 @@ public class ZipFile {
             throw new ZipException("Zip file format does not allow updating split/spanned files");
         }
 
-        FileHeader fileHeader = Zip4jUtil.getFileHeader(zipModel, fileName);
+        CentralDirectory.FileHeader fileHeader = Zip4jUtil.getFileHeader(zipModel, fileName);
         if (fileHeader == null) {
             throw new ZipException("could not find file header for file: " + fileName);
         }
@@ -767,7 +768,7 @@ public class ZipFile {
      * @param fileHeader
      * @throws ZipException
      */
-    public void removeFile(FileHeader fileHeader) throws ZipException {
+    public void removeFile(CentralDirectory.FileHeader fileHeader) throws ZipException {
         if (fileHeader == null) {
             throw new ZipException("file header is null, cannot remove file");
         }
@@ -910,7 +911,7 @@ public class ZipFile {
      * @return ZipInputStream
      * @throws ZipException
      */
-    public ZipInputStream getInputStream(FileHeader fileHeader) throws ZipException {
+    public ZipInputStream getInputStream(CentralDirectory.FileHeader fileHeader) throws ZipException {
         if (fileHeader == null) {
             throw new ZipException("FileHeader is null, cannot get InputStream");
         }
