@@ -406,7 +406,7 @@ public class ZipFile {
     private ZipModel readZipModel() throws ZipException {
         if (mode != InternalZipConstants.MODE_UNZIP)
             throw new ZipException("Invalid mode");
-        return zipModel == null ? new ZipModelReader(Paths.get(file), charset).readZipModel() : zipModel;
+        return zipModel == null ? new ZipModelReader(Paths.get(file), charset).read() : zipModel;
     }
 
 
