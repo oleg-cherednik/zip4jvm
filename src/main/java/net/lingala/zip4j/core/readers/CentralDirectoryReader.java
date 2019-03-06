@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.CentralDirectory;
-import net.lingala.zip4j.model.DigitalSignature;
 import net.lingala.zip4j.model.EndCentralDirectory;
 import net.lingala.zip4j.model.ExtraDataRecord;
 import net.lingala.zip4j.model.Zip64EndCentralDirectory;
@@ -111,11 +110,11 @@ final class CentralDirectoryReader {
         return records.isEmpty() ? Collections.emptyList() : records;
     }
 
-    private DigitalSignature readDigitalSignature() throws IOException {
+    private CentralDirectory.DigitalSignature readDigitalSignature() throws IOException {
         if (in.readInt() != InternalZipConstants.DIGSIG)
             return null;
 
-        DigitalSignature digitalSignature = new DigitalSignature();
+        CentralDirectory.DigitalSignature digitalSignature = new CentralDirectory.DigitalSignature();
         digitalSignature.setSizeOfData(in.readShort());
         digitalSignature.setSignatureData(in.readBytes(digitalSignature.getSizeOfData()));
 

@@ -200,4 +200,17 @@ public class CentralDirectory {
         }
     }
 
+    @Getter
+    @Setter
+    public static class DigitalSignature {
+
+        // size:4 - header signature (0x06054b50)
+        private final int signature = InternalZipConstants.DIGSIG;
+        // size:2 - size of data (n)
+        private int sizeOfData;
+        // size:n - signature data
+        private byte[] signatureData;
+
+    }
+
 }
