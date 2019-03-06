@@ -27,6 +27,7 @@ import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.Zip4jConstants;
 import net.lingala.zip4j.util.Zip4jUtil;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,8 +42,14 @@ import static net.lingala.zip4j.util.BitUtils.BIT3;
 @Setter
 public class CentralDirectory {
 
-    private List<FileHeader> fileHeaders;
+    @NonNull
+    private List<FileHeader> fileHeaders = Collections.emptyList();
     private DigitalSignature digitalSignature;
+
+    public void addFileHeader(FileHeader fileHeader) {
+        fileHeaders = fileHeaders.isEmpty() ? new ArrayList<>() : fileHeaders;
+        fileHeaders.add(fileHeader);
+    }
 
     @Getter
     @Setter

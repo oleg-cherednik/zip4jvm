@@ -401,16 +401,16 @@ public class Zip4jUtil {
         return -1;
     }
 
-    public static ArrayList getFilesInDirectoryRec(File path,
+    public static List<File> getFilesInDirectoryRec(File path,
             boolean readHiddenFiles) throws ZipException {
 
         if (path == null) {
             throw new ZipException("input path is null, cannot read files in the directory");
         }
 
-        ArrayList result = new ArrayList();
+        List<File> result = new ArrayList<>();
         File[] filesAndDirs = path.listFiles();
-        List filesDirs = Arrays.asList(filesAndDirs);
+        List<File> filesDirs = Arrays.asList(filesAndDirs);
 
         if (!path.canRead()) {
             return result;
@@ -423,7 +423,7 @@ public class Zip4jUtil {
             }
             result.add(file);
             if (file.isDirectory()) {
-                List deeperList = getFilesInDirectoryRec(file, readHiddenFiles);
+                List<File> deeperList = getFilesInDirectoryRec(file, readHiddenFiles);
                 result.addAll(deeperList);
             }
         }

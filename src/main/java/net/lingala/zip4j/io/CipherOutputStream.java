@@ -308,8 +308,8 @@ public class CipherOutputStream extends OutputStream {
             localFileHeader.setCrc32(crc32);
         }
 
-        zipModel.getLocalFileHeaderList().add(localFileHeader);
-        zipModel.getCentralDirectory().getFileHeaders().add(fileHeader);
+        zipModel.addLocalFileHeader(localFileHeader);
+        zipModel.getCentralDirectory().addFileHeader(fileHeader);
 
         HeaderWriter headerWriter = new HeaderWriter();
         totalBytesWritten += headerWriter.writeExtendedLocalHeader(localFileHeader, outputStream);

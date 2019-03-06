@@ -22,6 +22,7 @@ import lombok.Setter;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -65,6 +66,11 @@ public class ZipModel implements Cloneable {
 
     public List getLocalFileHeaderList() {
         return localFileHeaderList;
+    }
+
+    public void addLocalFileHeader(LocalFileHeader localFileHeader) {
+        localFileHeaderList = localFileHeaderList.isEmpty() ? new ArrayList<>() : localFileHeaderList;
+        localFileHeaderList.add(localFileHeader);
     }
 
     public void setLocalFileHeaderList(List localFileHeaderList) {

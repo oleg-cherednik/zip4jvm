@@ -34,6 +34,7 @@ import net.lingala.zip4j.util.Zip4jUtil;
 import net.lingala.zip4j.zip.ZipEngine;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -80,7 +81,7 @@ public class ZipFile {
      * @param parameters - parameters to create the zip path
      * @throws ZipException
      */
-    public void createZipFile(File sourceFile, ZipParameters parameters) throws ZipException {
+    public void createZipFile(File sourceFile, ZipParameters parameters) throws ZipException, IOException {
         List<File> sourceFileList = new ArrayList<>();
         sourceFileList.add(sourceFile);
         createZipFile(sourceFileList, parameters, false, -1);
@@ -101,7 +102,7 @@ public class ZipFile {
      * @throws ZipException
      */
     public void createZipFile(File sourceFile, ZipParameters parameters,
-            boolean splitArchive, long splitLength) throws ZipException {
+            boolean splitArchive, long splitLength) throws ZipException, IOException {
 
         List<File> sourceFileList = new ArrayList<>();
         sourceFileList.add(sourceFile);
@@ -118,7 +119,7 @@ public class ZipFile {
      * @throws ZipException
      */
     public void createZipFile(List<File> sourceFileList,
-            ZipParameters parameters) throws ZipException {
+            ZipParameters parameters) throws ZipException, IOException {
         createZipFile(sourceFileList, parameters, false, -1);
     }
 
@@ -137,7 +138,7 @@ public class ZipFile {
      * @throws ZipException
      */
     public void createZipFile(List<File> sourceFileList, ZipParameters parameters,
-            boolean splitArchive, long splitLength) throws ZipException {
+            boolean splitArchive, long splitLength) throws ZipException, IOException {
         if (Files.exists(path))
             throw new ZipException("zip path: " + path + " already exists. To add files to existing zip path use addFile method");
 
@@ -167,7 +168,7 @@ public class ZipFile {
      * @throws ZipException
      */
     public void createZipFileFromFolder(String folderToAdd, ZipParameters parameters,
-            boolean splitArchive, long splitLength) throws ZipException {
+            boolean splitArchive, long splitLength) throws ZipException, IOException {
 
         if (!Zip4jUtil.isStringNotNullAndNotEmpty(folderToAdd)) {
             throw new ZipException("folderToAdd is empty or null, cannot create Zip File from folder");
@@ -192,7 +193,7 @@ public class ZipFile {
      * @throws ZipException
      */
     public void createZipFileFromFolder(File folderToAdd, ZipParameters parameters,
-            boolean splitArchive, long splitLength) throws ZipException {
+            boolean splitArchive, long splitLength) throws ZipException, IOException {
 
         if (folderToAdd == null)
             throw new ZipException("folderToAdd is null, cannot create zip path from folder");
@@ -218,7 +219,7 @@ public class ZipFile {
      * @param parameters - zip parameters for this path
      * @throws ZipException
      */
-    public void addFile(File sourceFile, ZipParameters parameters) throws ZipException {
+    public void addFile(File sourceFile, ZipParameters parameters) throws ZipException, IOException {
         addFiles(Collections.singletonList(sourceFile.toPath()), parameters);
     }
 
@@ -231,7 +232,7 @@ public class ZipFile {
      * @param parameters
      * @throws ZipException
      */
-    public void addFiles(Collection<Path> files, ZipParameters parameters) throws ZipException {
+    public void addFiles(Collection<Path> files, ZipParameters parameters) throws ZipException, IOException {
         Objects.requireNonNull(files);
         Objects.requireNonNull(parameters);
 
@@ -240,9 +241,7 @@ public class ZipFile {
         readOrCreateModel();
         checkAddFilesToSplitArchive();
 
-        new ZipEngine(zipModel).addFiles(files.stream()
-                                              .map(Path::toFile)
-                                              .collect(Collectors.toList()), parameters, progressMonitor, runInThread);
+        new ZipEngine(zipModel).addFiles(files, parameters, progressMonitor, runInThread);
     }
 
     private void checkProgressMonitorAvailable() throws ZipException {
@@ -265,7 +264,7 @@ public class ZipFile {
      * @param parameters
      * @throws ZipException
      */
-    public void addFolder(String path, ZipParameters parameters) throws ZipException {
+    public void addFolder(String path, ZipParameters parameters) throws ZipException, IOException {
         if (!Zip4jUtil.isStringNotNullAndNotEmpty(path)) {
             throw new ZipException("input path is null or empty, cannot add folder to zip path");
         }
@@ -283,7 +282,7 @@ public class ZipFile {
      * @param parameters
      * @throws ZipException
      */
-    public void addFolder(File path, ZipParameters parameters) throws ZipException {
+    public void addFolder(File path, ZipParameters parameters) throws ZipException, IOException {
         if (path == null) {
             throw new ZipException("input path is null, cannot add folder to zip path");
         }
@@ -304,7 +303,7 @@ public class ZipFile {
      * @throws ZipException
      */
     private void addFolder(File path, ZipParameters parameters,
-            boolean checkSplitArchive) throws ZipException {
+            boolean checkSplitArchive) throws ZipException, IOException {
 
         readOrCreateModel();
 
@@ -318,8 +317,7 @@ public class ZipFile {
             }
         }
 
-        ZipEngine zipEngine = new ZipEngine(zipModel);
-        zipEngine.addFolderToZip(path, parameters, progressMonitor, runInThread);
+        new ZipEngine(zipModel).addFolderToZip(path, parameters, progressMonitor, runInThread);
 
     }
 
@@ -355,8 +353,7 @@ public class ZipFile {
         if (Files.exists(path) && zipModel.isSplitArchive())
             throw new ZipException("Zip path already exists. Zip path format does not allow updating split/spanned files");
 
-        ZipEngine zipEngine = new ZipEngine(zipModel);
-        zipEngine.addStreamToZip(inputStream, parameters);
+        new ZipEngine(zipModel).addStreamToZip(inputStream, parameters);
     }
 
     /**

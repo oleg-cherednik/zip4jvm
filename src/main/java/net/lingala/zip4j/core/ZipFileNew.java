@@ -6,6 +6,7 @@ import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.Context;
 import net.lingala.zip4j.model.ZipParameters;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -17,11 +18,11 @@ import java.util.List;
 public class ZipFileNew {
     private final Path zipFile;
 
-    public void addFiles(@NonNull List<Path> files) throws ZipException {
+    public void addFiles(@NonNull List<Path> files) throws ZipException, IOException {
         addFiles(files, Context.builder().build());
     }
 
-    public void addFiles(@NonNull List<Path> files, @NonNull Context context) throws ZipException {
+    public void addFiles(@NonNull List<Path> files, @NonNull Context context) throws ZipException, IOException {
         ZipFile zipFile = new ZipFile(this.zipFile);
 
         ZipParameters parameters = new ZipParameters();
