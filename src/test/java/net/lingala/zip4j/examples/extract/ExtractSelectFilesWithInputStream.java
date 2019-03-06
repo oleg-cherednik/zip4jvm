@@ -8,6 +8,7 @@ import net.lingala.zip4j.unzip.UnzipUtil;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.nio.file.Paths;
 
 public class ExtractSelectFilesWithInputStream {
 
@@ -20,7 +21,7 @@ public class ExtractSelectFilesWithInputStream {
 
 		try {
 			// Initiate the ZipFile
-			ZipFile zipFile = new ZipFile("C:\\ZipTest\\ExtractAllFilesWithInputStreams.zip");
+			ZipFile zipFile = new ZipFile(Paths.get("C:\\ZipTest\\ExtractAllFilesWithInputStreams.zip"));
 			String destinationPath = "c:\\ZipTest";
 
 			// If zip file is password protected then set the password

@@ -17,14 +17,14 @@ import java.util.stream.Collectors;
  */
 @RequiredArgsConstructor
 public class ZipFileNew {
-    private final Path file;
+    private final Path zipFile;
 
     public void addFiles(@NonNull List<Path> files) throws ZipException {
         addFiles(files, Context.builder().build());
     }
 
     public void addFiles(@NonNull List<Path> files, @NonNull Context context) throws ZipException {
-        ZipFile zipFile = new ZipFile(file.toFile());
+        ZipFile zipFile = new ZipFile(this.zipFile);
 
         List<File> addFiles = files.stream()
                                    .map(Path::toFile)

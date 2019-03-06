@@ -20,6 +20,7 @@ import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CentralDirectory;
 
+import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -33,7 +34,7 @@ public class ListAllFilesInZipFile {
 
 		try {
 			// Initiate ZipFile object with the path/name of the zip file.
-			ZipFile zipFile = new ZipFile("c:\\ZipTest\\ListAllFilesInZipFile.zip");
+			ZipFile zipFile = new ZipFile(Paths.get("c:\\ZipTest\\ListAllFilesInZipFile.zip"));
 
 			// Get the list of file headers from the zip file
 			List fileHeaderList = zipFile.getFileHeaders();

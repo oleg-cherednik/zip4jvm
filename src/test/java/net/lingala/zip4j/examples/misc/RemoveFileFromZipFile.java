@@ -20,6 +20,8 @@ import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CentralDirectory;
 
+import java.nio.file.Paths;
+
 /**
  * Demonstrates how to remove a file from a zip file
  *
@@ -32,7 +34,7 @@ public class RemoveFileFromZipFile {
 
 		try {
 			// Initiate ZipFile object with the path/name of the zip file.
-			ZipFile zipFile = new ZipFile("c:\\ZipTest\\AddFilesWithAESZipEncryption.zip");
+			ZipFile zipFile = new ZipFile(Paths.get("c:\\ZipTest\\AddFilesWithAESZipEncryption.zip"));
 
 			// Note: If this zip file is a split file then this method throws an exception as
 			// Zip Format Specification does not allow updating split zip files

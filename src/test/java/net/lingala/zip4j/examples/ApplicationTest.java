@@ -94,7 +94,7 @@ public class ApplicationTest {
     }
 
     public void addFolderNew() throws ZipException, IOException {
-        ZipFile zipFile = new ZipFile(destDir.resolve("src.zip").toFile());
+        ZipFile zipFile = new ZipFile(destDir.resolve("src.zip"));
         List<File> filesToAdd = getDirectoryEntries(srcDir);
         ZipParameters parameters = new ZipParameters();
         parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);

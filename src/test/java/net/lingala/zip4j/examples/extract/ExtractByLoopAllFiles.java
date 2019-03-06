@@ -20,6 +20,7 @@ import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CentralDirectory;
 
+import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -36,7 +37,7 @@ public class ExtractByLoopAllFiles {
 
 		try {
 			// Initiate ZipFile object with the path/name of the zip file.
-			ZipFile zipFile = new ZipFile("c:\\ZipTest\\ExtractByLoopAllFiles.zip");
+			ZipFile zipFile = new ZipFile(Paths.get("c:\\ZipTest\\ExtractByLoopAllFiles.zip"));
 
 			// Check to see if the zip file is password protected
 			if (zipFile.isEncrypted()) {

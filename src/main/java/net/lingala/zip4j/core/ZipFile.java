@@ -2,7 +2,7 @@
  * Copyright 2010 Srikanth Reddy Lingala
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * you may not use this path except in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
@@ -18,6 +18,7 @@ package net.lingala.zip4j.core;
 
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.lingala.zip4j.core.readers.ZipModelReader;
 import net.lingala.zip4j.exception.ZipException;
@@ -29,14 +30,14 @@ import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.progress.ProgressMonitor;
 import net.lingala.zip4j.unzip.Unzip;
 import net.lingala.zip4j.util.ArchiveMaintainer;
-import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.Zip4jUtil;
 import net.lingala.zip4j.zip.ZipEngine;
 
 import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.nio.file.Paths;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,19 +46,20 @@ import java.util.List;
  * in this class are:<br>
  * <ul>
  * <li>Create Zip File</li>
- * <li>Add files to zip file</li>
- * <li>Add folder to zip file</li>
+ * <li>Add files to zip path</li>
+ * <li>Add folder to zip path</li>
  * <li>Extract files from zip files</li>
- * <li>Remove files from zip file</li>
+ * <li>Remove files from zip path</li>
  * </ul>
  */
 
 @Getter
 @Setter
+@RequiredArgsConstructor
 public class ZipFile {
 
-    private String file;
-    private int mode;
+    private final Path path;
+
     private ZipModel zipModel;
     private boolean isEncrypted;
     private final ProgressMonitor progressMonitor = new ProgressMonitor();
@@ -66,35 +68,12 @@ public class ZipFile {
     private Charset charset = Charset.defaultCharset();
 
     /**
-     * Creates a new Zip File Object with the given zip file path.
-     * If the zip file does not exist, it is not created at this point.
-     *
-     * @param zipFile
-     * @throws ZipException
-     */
-    public ZipFile(String zipFile) throws ZipException {
-        this(new File(zipFile));
-    }
-
-    /**
-     * Creates a new Zip File Object with the input file.
-     * If the zip file does not exist, it is not created at this point.
-     *
-     * @param zipFile
-     * @throws ZipException
-     */
-    public ZipFile(@NonNull File zipFile) throws ZipException {
-        file = zipFile.getPath();
-        mode = InternalZipConstants.MODE_UNZIP;
-    }
-
-    /**
-     * Creates a zip file and adds the source file to the zip file. If the zip file
+     * Creates a zip path and adds the source path to the zip path. If the zip path
      * exists then this method throws an exception. Parameters such as compression type, etc
      * can be set in the input parameters
      *
-     * @param sourceFile - File to be added to the zip file
-     * @param parameters - parameters to create the zip file
+     * @param sourceFile - File to be added to the zip path
+     * @param parameters - parameters to create the zip path
      * @throws ZipException
      */
     public void createZipFile(File sourceFile, ZipParameters parameters) throws ZipException {
@@ -104,15 +83,15 @@ public class ZipFile {
     }
 
     /**
-     * Creates a zip file and adds the source file to the zip file. If the zip file
+     * Creates a zip path and adds the source path to the zip path. If the zip path
      * exists then this method throws an exception. Parameters such as compression type, etc
      * can be set in the input parameters. While the method addFile/addFiles also creates the
-     * zip file if it does not exist, the main functionality of this method is to create a split
-     * zip file. To create a split zip file, set the splitArchive parameter to true with a valid
+     * zip path if it does not exist, the main functionality of this method is to create a split
+     * zip path. To create a split zip path, set the splitArchive parameter to true with a valid
      * splitLength. Split Length has to be more than 65536 bytes
      *
-     * @param sourceFile   - File to be added to the zip file
-     * @param parameters   - parameters to create the zip file
+     * @param sourceFile   - File to be added to the zip path
+     * @param parameters   - parameters to create the zip path
      * @param splitArchive - if archive has to be split or not
      * @param splitLength  - if archive has to be split, then length in bytes at which it has to be split
      * @throws ZipException
@@ -126,12 +105,12 @@ public class ZipFile {
     }
 
     /**
-     * Creates a zip file and adds the list of source file(s) to the zip file. If the zip file
+     * Creates a zip path and adds the list of source path(s) to the zip path. If the zip path
      * exists then this method throws an exception. Parameters such as compression type, etc
      * can be set in the input parameters
      *
-     * @param sourceFileList - File to be added to the zip file
-     * @param parameters     - parameters to create the zip file
+     * @param sourceFileList - File to be added to the zip path
+     * @param parameters     - parameters to create the zip path
      * @throws ZipException
      */
     public void createZipFile(List<File> sourceFileList,
@@ -140,33 +119,26 @@ public class ZipFile {
     }
 
     /**
-     * Creates a zip file and adds the list of source file(s) to the zip file. If the zip file
+     * Creates a zip path and adds the list of source path(s) to the zip path. If the zip path
      * exists then this method throws an exception. Parameters such as compression type, etc
      * can be set in the input parameters. While the method addFile/addFiles also creates the
-     * zip file if it does not exist, the main functionality of this method is to create a split
-     * zip file. To create a split zip file, set the splitArchive parameter to true with a valid
+     * zip path if it does not exist, the main functionality of this method is to create a split
+     * zip path. To create a split zip path, set the splitArchive parameter to true with a valid
      * splitLength. Split Length has to be more than 65536 bytes
      *
-     * @param sourceFileList - File to be added to the zip file
-     * @param parameters     - zip parameters for this file list
+     * @param sourceFileList - File to be added to the zip path
+     * @param parameters     - zip parameters for this path list
      * @param splitArchive   - if archive has to be split or not
      * @param splitLength    - if archive has to be split, then length in bytes at which it has to be split
      * @throws ZipException
      */
     public void createZipFile(List<File> sourceFileList, ZipParameters parameters,
             boolean splitArchive, long splitLength) throws ZipException {
+        if (Files.exists(path))
+            throw new ZipException("zip path: " + path + " already exists. To add files to existing zip path use addFile method");
 
-        if (!Zip4jUtil.isStringNotNullAndNotEmpty(file)) {
-            throw new ZipException("zip file path is empty");
-        }
-
-        if (Zip4jUtil.checkFileExists(file)) {
-            throw new ZipException("zip file: " + file + " already exists. To add files to existing zip file use addFile method");
-        }
-
-        if (sourceFileList == null) {
-            throw new ZipException("input file ArrayList is null, cannot create zip file");
-        }
+        if (sourceFileList == null)
+            throw new ZipException("input path ArrayList is null, cannot create zip path");
 
         zipModel = createZipModel();
         this.zipModel.setSplitArchive(splitArchive);
@@ -175,11 +147,11 @@ public class ZipFile {
     }
 
     /**
-     * Creates a zip file and adds the files/folders from the specified folder to the zip file.
+     * Creates a zip path and adds the files/folders from the specified folder to the zip path.
      * This method does the same functionality as in addFolder method except that this method
-     * can also create split zip files when adding a folder. To create a split zip file, set the
+     * can also create split zip files when adding a folder. To create a split zip path, set the
      * splitArchive parameter to true and specify the splitLength. Split length has to be more than
-     * or equal to 65536 bytes. Note that this method throws an exception if the zip file already
+     * or equal to 65536 bytes. Note that this method throws an exception if the zip path already
      * exists.
      *
      * @param folderToAdd
@@ -200,11 +172,11 @@ public class ZipFile {
     }
 
     /**
-     * Creates a zip file and adds the files/folders from the specified folder to the zip file.
+     * Creates a zip path and adds the files/folders from the specified folder to the zip path.
      * This method does the same functionality as in addFolder method except that this method
-     * can also create split zip files when adding a folder. To create a split zip file, set the
+     * can also create split zip files when adding a folder. To create a split zip path, set the
      * splitArchive parameter to true and specify the splitLength. Split length has to be more than
-     * or equal to 65536 bytes. Note that this method throws an exception if the zip file already
+     * or equal to 65536 bytes. Note that this method throws an exception if the zip path already
      * exists.
      *
      * @param folderToAdd
@@ -216,17 +188,12 @@ public class ZipFile {
     public void createZipFileFromFolder(File folderToAdd, ZipParameters parameters,
             boolean splitArchive, long splitLength) throws ZipException {
 
-        if (folderToAdd == null) {
-            throw new ZipException("folderToAdd is null, cannot create zip file from folder");
-        }
-
-        if (parameters == null) {
-            throw new ZipException("input parameters are null, cannot create zip file from folder");
-        }
-
-        if (Zip4jUtil.checkFileExists(file)) {
-            throw new ZipException("zip file: " + file + " already exists. To add files to existing zip file use addFolder method");
-        }
+        if (folderToAdd == null)
+            throw new ZipException("folderToAdd is null, cannot create zip path from folder");
+        if (parameters == null)
+            throw new ZipException("input parameters are null, cannot create zip path from folder");
+        if (Files.exists(path))
+            throw new ZipException("zip path: " + path + " already exists. To add files to existing zip path use addFolder method");
 
         zipModel = createZipModel();
         this.zipModel.setSplitArchive(splitArchive);
@@ -237,12 +204,12 @@ public class ZipFile {
     }
 
     /**
-     * Adds input source file to the zip file. If zip file does not exist, then
-     * this method creates a new zip file. Parameters such as compression type, etc
+     * Adds input source path to the zip path. If zip path does not exist, then
+     * this method creates a new zip path. Parameters such as compression type, etc
      * can be set in the input parameters.
      *
-     * @param sourceFile - File to tbe added to the zip file
-     * @param parameters - zip parameters for this file
+     * @param sourceFile - File to tbe added to the zip path
+     * @param parameters - zip parameters for this path
      * @throws ZipException
      */
     public void addFile(File sourceFile, ZipParameters parameters) throws ZipException {
@@ -252,8 +219,8 @@ public class ZipFile {
     }
 
     /**
-     * Adds the list of input files to the zip file. If zip file does not exist, then
-     * this method creates a new zip file. Parameters such as compression type, etc
+     * Adds the list of input files to the zip path. If zip path does not exist, then
+     * this method creates a new zip path. Parameters such as compression type, etc
      * can be set in the input parameters.
      *
      * @param sourceFileList
@@ -269,7 +236,7 @@ public class ZipFile {
         }
 
         if (sourceFileList == null) {
-            throw new ZipException("input file ArrayList is null, cannot add files");
+            throw new ZipException("input path ArrayList is null, cannot add files");
         }
 
         if (parameters == null) {
@@ -280,19 +247,16 @@ public class ZipFile {
             throw new ZipException("invalid operation - Zip4j is in busy state");
         }
 
-        if (Zip4jUtil.checkFileExists(file)) {
-            if (zipModel.isSplitArchive()) {
-                throw new ZipException("Zip file already exists. Zip file format does not allow updating split/spanned files");
-            }
-        }
+        if (Files.exists(path) && zipModel.isSplitArchive())
+            throw new ZipException("Zip path already exists. Zip path format does not allow updating split/spanned files");
 
         ZipEngine zipEngine = new ZipEngine(zipModel);
         zipEngine.addFiles(sourceFileList, parameters, progressMonitor, runInThread);
     }
 
     /**
-     * Adds the folder in the given path to the zip file. If zip file does not exist,
-     * then a new zip file is created. If input folder path is invalid then an exception
+     * Adds the folder in the given path to the zip path. If zip path does not exist,
+     * then a new zip path is created. If input folder path is invalid then an exception
      * is thrown. Zip parameters for the files in the folder to be added can be set in
      * the input parameters
      *
@@ -302,15 +266,15 @@ public class ZipFile {
      */
     public void addFolder(String path, ZipParameters parameters) throws ZipException {
         if (!Zip4jUtil.isStringNotNullAndNotEmpty(path)) {
-            throw new ZipException("input path is null or empty, cannot add folder to zip file");
+            throw new ZipException("input path is null or empty, cannot add folder to zip path");
         }
 
         addFolder(new File(path), parameters);
     }
 
     /**
-     * Adds the folder in the given file object to the zip file. If zip file does not exist,
-     * then a new zip file is created. If input folder is invalid then an exception
+     * Adds the folder in the given path object to the zip path. If zip path does not exist,
+     * then a new zip path is created. If input folder is invalid then an exception
      * is thrown. Zip parameters for the files in the folder to be added can be set in
      * the input parameters
      *
@@ -320,18 +284,18 @@ public class ZipFile {
      */
     public void addFolder(File path, ZipParameters parameters) throws ZipException {
         if (path == null) {
-            throw new ZipException("input path is null, cannot add folder to zip file");
+            throw new ZipException("input path is null, cannot add folder to zip path");
         }
 
         if (parameters == null) {
-            throw new ZipException("input parameters are null, cannot add folder to zip file");
+            throw new ZipException("input parameters are null, cannot add folder to zip path");
         }
 
         addFolder(path, parameters, true);
     }
 
     /**
-     * Internal method to add a folder to the zip file.
+     * Internal method to add a folder to the zip path.
      *
      * @param path
      * @param parameters
@@ -349,7 +313,7 @@ public class ZipFile {
 
         if (checkSplitArchive) {
             if (this.zipModel.isSplitArchive()) {
-                throw new ZipException("This is a split archive. Zip file format does not allow updating split/spanned files");
+                throw new ZipException("This is a split archive. Zip path format does not allow updating split/spanned files");
             }
         }
 
@@ -359,9 +323,9 @@ public class ZipFile {
     }
 
     /**
-     * Creates a new entry in the zip file and adds the content of the inputstream to the
-     * zip file. ZipParameters.isSourceExternalStream and ZipParameters.fileNameInZip have to be
-     * set before in the input parameters. If the file name ends with / or \, this method treats the
+     * Creates a new entry in the zip path and adds the content of the inputstream to the
+     * zip path. ZipParameters.isSourceExternalStream and ZipParameters.fileNameInZip have to be
+     * set before in the input parameters. If the path name ends with / or \, this method treats the
      * content as a directory. Setting the flag ProgressMonitor.setRunInThread to true will have
      * no effect for this method and hence this method cannot be used to add content to zip in
      * thread mode
@@ -372,7 +336,7 @@ public class ZipFile {
      */
     public void addStream(InputStream inputStream, ZipParameters parameters) throws ZipException {
         if (inputStream == null) {
-            throw new ZipException("inputstream is null, cannot add file to zip");
+            throw new ZipException("inputstream is null, cannot add path to zip");
         }
 
         if (parameters == null) {
@@ -387,33 +351,28 @@ public class ZipFile {
             throw new ZipException("internal error: zip model is null");
         }
 
-        if (Zip4jUtil.checkFileExists(file)) {
-            if (zipModel.isSplitArchive()) {
-                throw new ZipException("Zip file already exists. Zip file format does not allow updating split/spanned files");
-            }
-        }
+        if (Files.exists(path) && zipModel.isSplitArchive())
+            throw new ZipException("Zip path already exists. Zip path format does not allow updating split/spanned files");
 
         ZipEngine zipEngine = new ZipEngine(zipModel);
         zipEngine.addStreamToZip(inputStream, parameters);
     }
 
     /**
-     * Reads the zip header information for this zip file. If the zip file
+     * Reads the zip header information for this zip path. If the zip path
      * does not exist, then this method throws an exception.<br><br>
-     * <b>Note:</b> This method does not read local file header information
+     * <b>Note:</b> This method does not read local path header information
      *
      * @throws ZipException
      */
     private ZipModel readZipModel() throws ZipException {
-        if (mode != InternalZipConstants.MODE_UNZIP)
-            throw new ZipException("Invalid mode");
-        return zipModel == null ? new ZipModelReader(Paths.get(file), charset).read() : zipModel;
+        return zipModel == null ? new ZipModelReader(path, charset).read() : zipModel;
     }
 
 
     /**
-     * Extracts all the files in the given zip file to the input destination path.
-     * If zip file does not exist or destination path is invalid then an
+     * Extracts all the files in the given zip path to the input destination path.
+     * If zip path does not exist or destination path is invalid then an
      * exception is thrown.
      *
      * @param destPath
@@ -425,8 +384,8 @@ public class ZipFile {
     }
 
     /**
-     * Extracts all the files in the given zip file to the input destination path.
-     * If zip file does not exist or destination path is invalid then an
+     * Extracts all the files in the given zip path to the input destination path.
+     * If zip path does not exist or destination path is invalid then an
      * exception is thrown.
      *
      * @param destPath
@@ -448,7 +407,7 @@ public class ZipFile {
 
         // Throw an exception if zipModel is still null
         if (zipModel == null) {
-            throw new ZipException("Internal error occurred when extracting zip file");
+            throw new ZipException("Internal error occurred when extracting zip path");
         }
 
         if (progressMonitor.getState() == ProgressMonitor.STATE_BUSY) {
@@ -461,7 +420,7 @@ public class ZipFile {
     }
 
     /**
-     * Extracts a specific file from the zip file to the destination path.
+     * Extracts a specific path from the zip path to the destination path.
      * If destination path is invalid, then this method throws an exception.
      *
      * @param fileHeader
@@ -473,11 +432,11 @@ public class ZipFile {
     }
 
     /**
-     * Extracts a specific file from the zip file to the destination path.
+     * Extracts a specific path from the zip path to the destination path.
      * If destination path is invalid, then this method throws an exception.
      * <br><br>
-     * If newFileName is not null or empty, newly created file name will be replaced by
-     * the value in newFileName. If this value is null, then the file name will be the
+     * If newFileName is not null or empty, newly created path name will be replaced by
+     * the value in newFileName. If this value is null, then the path name will be the
      * value in FileHeader.getFileName
      *
      * @param fileHeader
@@ -491,7 +450,7 @@ public class ZipFile {
     }
 
     /**
-     * Extracts a specific file from the zip file to the destination path.
+     * Extracts a specific path from the zip path to the destination path.
      * If destination path is invalid, then this method throws an exception.
      *
      * @param fileHeader
@@ -504,11 +463,11 @@ public class ZipFile {
             UnzipParameters unzipParameters, String newFileName) throws ZipException {
 
         if (fileHeader == null) {
-            throw new ZipException("input file header is null, cannot extract file");
+            throw new ZipException("input path header is null, cannot extract path");
         }
 
         if (!Zip4jUtil.isStringNotNullAndNotEmpty(destPath)) {
-            throw new ZipException("destination path is empty or null, cannot extract file");
+            throw new ZipException("destination path is empty or null, cannot extract path");
         }
 
         zipModel = readZipModel();
@@ -522,15 +481,15 @@ public class ZipFile {
     }
 
     /**
-     * Extracts a specific file from the zip file to the destination path.
-     * This method first finds the necessary file header from the input file name.
+     * Extracts a specific path from the zip path to the destination path.
+     * This method first finds the necessary path header from the input path name.
      * <br><br>
-     * File name is relative file name in the zip file. For example if a zip file contains
-     * a file "a.txt", then to extract this file, input file name has to be "a.txt". Another
-     * example is if there is a file "b.txt" in a folder "abc" in the zip file, then the
-     * input file name has to be abc/b.txt
+     * File name is relative path name in the zip path. For example if a zip path contains
+     * a path "a.txt", then to extract this path, input path name has to be "a.txt". Another
+     * example is if there is a path "b.txt" in a folder "abc" in the zip path, then the
+     * input path name has to be abc/b.txt
      * <br><br>
-     * Throws an exception if file header could not be found for the given file name or if
+     * Throws an exception if path header could not be found for the given path name or if
      * the destination path is invalid
      *
      * @param fileName
@@ -542,15 +501,15 @@ public class ZipFile {
     }
 
     /**
-     * Extracts a specific file from the zip file to the destination path.
-     * This method first finds the necessary file header from the input file name.
+     * Extracts a specific path from the zip path to the destination path.
+     * This method first finds the necessary path header from the input path name.
      * <br><br>
-     * File name is relative file name in the zip file. For example if a zip file contains
-     * a file "a.txt", then to extract this file, input file name has to be "a.txt". Another
-     * example is if there is a file "b.txt" in a folder "abc" in the zip file, then the
-     * input file name has to be abc/b.txt
+     * File name is relative path name in the zip path. For example if a zip path contains
+     * a path "a.txt", then to extract this path, input path name has to be "a.txt". Another
+     * example is if there is a path "b.txt" in a folder "abc" in the zip path, then the
+     * input path name has to be abc/b.txt
      * <br><br>
-     * Throws an exception if file header could not be found for the given file name or if
+     * Throws an exception if path header could not be found for the given path name or if
      * the destination path is invalid
      *
      * @param fileName
@@ -564,19 +523,19 @@ public class ZipFile {
     }
 
     /**
-     * Extracts a specific file from the zip file to the destination path.
-     * This method first finds the necessary file header from the input file name.
+     * Extracts a specific path from the zip path to the destination path.
+     * This method first finds the necessary path header from the input path name.
      * <br><br>
-     * File name is relative file name in the zip file. For example if a zip file contains
-     * a file "a.txt", then to extract this file, input file name has to be "a.txt". Another
-     * example is if there is a file "b.txt" in a folder "abc" in the zip file, then the
-     * input file name has to be abc/b.txt
+     * File name is relative path name in the zip path. For example if a zip path contains
+     * a path "a.txt", then to extract this path, input path name has to be "a.txt". Another
+     * example is if there is a path "b.txt" in a folder "abc" in the zip path, then the
+     * input path name has to be abc/b.txt
      * <br><br>
-     * If newFileName is not null or empty, newly created file name will be replaced by
-     * the value in newFileName. If this value is null, then the file name will be the
+     * If newFileName is not null or empty, newly created path name will be replaced by
+     * the value in newFileName. If this value is null, then the path name will be the
      * value in FileHeader.getFileName
      * <br><br>
-     * Throws an exception if file header could not be found for the given file name or if
+     * Throws an exception if path header could not be found for the given path name or if
      * the destination path is invalid
      *
      * @param fileName
@@ -589,11 +548,11 @@ public class ZipFile {
             UnzipParameters unzipParameters, String newFileName) throws ZipException {
 
         if (!Zip4jUtil.isStringNotNullAndNotEmpty(fileName)) {
-            throw new ZipException("file to extract is null or empty, cannot extract file");
+            throw new ZipException("path to extract is null or empty, cannot extract path");
         }
 
         if (!Zip4jUtil.isStringNotNullAndNotEmpty(destPath)) {
-            throw new ZipException("destination string path is empty or null, cannot extract file");
+            throw new ZipException("destination string path is empty or null, cannot extract path");
         }
 
         zipModel = readZipModel();
@@ -601,7 +560,7 @@ public class ZipFile {
         CentralDirectory.FileHeader fileHeader = Zip4jUtil.getFileHeader(zipModel, fileName);
 
         if (fileHeader == null) {
-            throw new ZipException("file header not found for given file name, cannot extract file");
+            throw new ZipException("path header not found for given path name, cannot extract path");
         }
 
         if (progressMonitor.getState() == ProgressMonitor.STATE_BUSY) {
@@ -613,7 +572,7 @@ public class ZipFile {
     }
 
     /**
-     * Sets the password for the zip file.<br>
+     * Sets the password for the zip path.<br>
      * <b>Note</b>: For security reasons, usage of this method is discouraged. Use
      * setPassword(char[]) instead. As strings are immutable, they cannot be wiped
      * out from memory explicitly after usage. Therefore, usage of Strings to store
@@ -631,7 +590,7 @@ public class ZipFile {
     }
 
     /**
-     * Sets the password for the zip file
+     * Sets the password for the zip path
      *
      * @param password
      * @throws ZipException
@@ -645,7 +604,7 @@ public class ZipFile {
         }
 
         if (zipModel.getCentralDirectory() == null || zipModel.getCentralDirectory().getFileHeaders() == null) {
-            throw new ZipException("invalid zip file");
+            throw new ZipException("invalid zip path");
         }
 
         for (int i = 0; i < zipModel.getCentralDirectory().getFileHeaders().size(); i++) {
@@ -658,10 +617,10 @@ public class ZipFile {
     }
 
     /**
-     * Returns the list of file headers in the zip file. Throws an exception if the
-     * zip file does not exist
+     * Returns the list of path headers in the zip path. Throws an exception if the
+     * zip path does not exist
      *
-     * @return list of file headers
+     * @return list of path headers
      * @throws ZipException
      */
     public List<CentralDirectory.FileHeader> getFileHeaders() throws ZipException {
@@ -670,7 +629,7 @@ public class ZipFile {
     }
 
     /**
-     * Returns FileHeader if a file header with the given fileHeader
+     * Returns FileHeader if a path header with the given fileHeader
      * string exists in the zip model: If not returns null
      *
      * @param fileName
@@ -679,7 +638,7 @@ public class ZipFile {
      */
     public CentralDirectory.FileHeader getFileHeader(String fileName) throws ZipException {
         if (!Zip4jUtil.isStringNotNullAndNotEmpty(fileName)) {
-            throw new ZipException("input file name is emtpy or null, cannot get FileHeader");
+            throw new ZipException("input path name is emtpy or null, cannot get FileHeader");
         }
 
         zipModel = readZipModel();
@@ -688,7 +647,7 @@ public class ZipFile {
     }
 
     /**
-     * Checks to see if the zip file is encrypted
+     * Checks to see if the zip path is encrypted
      *
      * @return true if encrypted, false if not
      * @throws ZipException
@@ -697,7 +656,7 @@ public class ZipFile {
         zipModel = readZipModel();
 
         if (zipModel.getCentralDirectory() == null || zipModel.getCentralDirectory().getFileHeaders() == null) {
-            throw new ZipException("invalid zip file");
+            throw new ZipException("invalid zip path");
         }
 
         List<CentralDirectory.FileHeader> fileHeaderList = zipModel.getCentralDirectory().getFileHeaders();
@@ -715,7 +674,7 @@ public class ZipFile {
     }
 
     /**
-     * Checks if the zip file is a split archive
+     * Checks if the zip path is a split archive
      *
      * @return true if split archive, false if not
      * @throws ZipException
@@ -727,10 +686,10 @@ public class ZipFile {
     }
 
     /**
-     * Removes the file provided in the input paramters from the zip file.
-     * This method first finds the file header and then removes the file.
-     * If file does not exist, then this method throws an exception.
-     * If zip file is a split zip file, then this method throws an exception as
+     * Removes the path provided in the input paramters from the zip path.
+     * This method first finds the path header and then removes the path.
+     * If path does not exist, then this method throws an exception.
+     * If zip path is a split zip path, then this method throws an exception as
      * zip specification does not allow for updating split zip archives.
      *
      * @param fileName
@@ -739,30 +698,27 @@ public class ZipFile {
     public void removeFile(String fileName) throws ZipException {
 
         if (!Zip4jUtil.isStringNotNullAndNotEmpty(fileName)) {
-            throw new ZipException("file name is empty or null, cannot remove file");
+            throw new ZipException("path name is empty or null, cannot remove path");
         }
 
-        if (zipModel == null) {
-            if (Zip4jUtil.checkFileExists(file)) {
-                zipModel = readZipModel();
-            }
-        }
+        if (zipModel == null && Files.exists(path))
+            zipModel = readZipModel();
 
         if (zipModel.isSplitArchive()) {
-            throw new ZipException("Zip file format does not allow updating split/spanned files");
+            throw new ZipException("Zip path format does not allow updating split/spanned files");
         }
 
         CentralDirectory.FileHeader fileHeader = Zip4jUtil.getFileHeader(zipModel, fileName);
         if (fileHeader == null) {
-            throw new ZipException("could not find file header for file: " + fileName);
+            throw new ZipException("could not find path header for path: " + fileName);
         }
 
         removeFile(fileHeader);
     }
 
     /**
-     * Removes the file provided in the input file header from the zip file.
-     * If zip file is a split zip file, then this method throws an exception as
+     * Removes the path provided in the input path header from the zip path.
+     * If zip path is a split zip path, then this method throws an exception as
      * zip specification does not allow for updating split zip archives.
      *
      * @param fileHeader
@@ -770,17 +726,14 @@ public class ZipFile {
      */
     public void removeFile(CentralDirectory.FileHeader fileHeader) throws ZipException {
         if (fileHeader == null) {
-            throw new ZipException("file header is null, cannot remove file");
+            throw new ZipException("path header is null, cannot remove path");
         }
 
-        if (zipModel == null) {
-            if (Zip4jUtil.checkFileExists(file)) {
-                zipModel = readZipModel();
-            }
-        }
+        if (zipModel == null && Files.exists(path))
+            zipModel = readZipModel();
 
         if (zipModel.isSplitArchive()) {
-            throw new ZipException("Zip file format does not allow updating split/spanned files");
+            throw new ZipException("Zip path format does not allow updating split/spanned files");
         }
 
         ArchiveMaintainer archiveMaintainer = new ArchiveMaintainer();
@@ -789,7 +742,7 @@ public class ZipFile {
     }
 
     /**
-     * Merges split zip files into a single zip file without the need to extract the
+     * Merges split zip files into a single zip path without the need to extract the
      * files in the archive
      *
      * @param outputZipFile
@@ -807,7 +760,7 @@ public class ZipFile {
         checkZipModel();
 
         if (this.zipModel == null) {
-            throw new ZipException("zip model is null, corrupt zip file?");
+            throw new ZipException("zip model is null, corrupt zip path?");
         }
 
         ArchiveMaintainer archiveMaintainer = new ArchiveMaintainer();
@@ -816,24 +769,22 @@ public class ZipFile {
     }
 
     /**
-     * Sets comment for the Zip file
+     * Sets comment for the Zip path
      *
      * @param comment
      * @throws ZipException
      */
     public void setComment(String comment) throws ZipException {
-        if (comment == null) {
-            throw new ZipException("input comment is null, cannot update zip file");
-        }
+        if (comment == null)
+            throw new ZipException("input comment is null, cannot update zip path");
 
-        if (!Zip4jUtil.checkFileExists(file)) {
-            throw new ZipException("zip file does not exist, cannot set comment for zip file");
-        }
+        if (!Files.exists(path))
+            throw new ZipException("zip path does not exist, cannot set comment for zip path");
 
         zipModel = readZipModel();
 
         if (this.zipModel == null) {
-            throw new ZipException("zipModel is null, cannot update zip file");
+            throw new ZipException("zipModel is null, cannot update zip path");
         }
 
         if (zipModel.getEndCentralDirectory() == null) {
@@ -845,7 +796,7 @@ public class ZipFile {
     }
 
     /**
-     * Returns the comment set for the Zip file
+     * Returns the comment set for the Zip path
      *
      * @return String
      * @throws ZipException
@@ -855,17 +806,17 @@ public class ZipFile {
     }
 
     /**
-     * Returns the comment set for the Zip file in the input encoding
+     * Returns the comment set for the Zip path in the input encoding
      *
      * @param charset
      * @return String
      * @throws ZipException
      */
     public String getComment(@NonNull Charset charset) throws ZipException {
-        if (Zip4jUtil.checkFileExists(file))
+        if (Files.exists(path))
             checkZipModel();
         else
-            throw new ZipException("zip file does not exist, cannot read comment");
+            throw new ZipException("zip path does not exist, cannot read comment");
 
         if (zipModel == null)
             throw new ZipException("zip model is null, cannot read comment");
@@ -880,14 +831,14 @@ public class ZipFile {
     }
 
     /**
-     * Loads the zip model if zip model is null and if zip file exists.
+     * Loads the zip model if zip model is null and if zip path exists.
      *
      * @throws ZipException
      */
     private void checkZipModel() throws ZipException {
         if (zipModel != null)
             return;
-        zipModel = Zip4jUtil.checkFileExists(file) ? readZipModel() : createZipModel();
+        zipModel = Files.exists(path) ? readZipModel() : createZipModel();
     }
 
     /**
@@ -897,13 +848,13 @@ public class ZipFile {
      */
     private ZipModel createZipModel() {
         ZipModel zipModel = new ZipModel();
-        zipModel.setZipFile(file);
+        zipModel.setZipFile(path.toString());
         zipModel.setCharset(charset);
         return zipModel;
     }
 
     /**
-     * Returns an input stream for reading the contents of the Zip file corresponding
+     * Returns an input stream for reading the contents of the Zip path corresponding
      * to the input FileHeader. Throws an exception if the FileHeader does not exist
      * in the ZipFile
      *
@@ -927,7 +878,7 @@ public class ZipFile {
     }
 
     /**
-     * Checks to see if the input zip file is a valid zip file. This method
+     * Checks to see if the input zip path is a valid zip path. This method
      * will try to read zip headers. If headers are read successfully, this
      * method returns true else false
      *
@@ -944,10 +895,10 @@ public class ZipFile {
     }
 
     /**
-     * Returns the full file path+names of all split zip files
-     * in an ArrayList. For example: If a split zip file(abc.zip) has a 10 split parts
+     * Returns the full path path+names of all split zip files
+     * in an ArrayList. For example: If a split zip path(abc.zip) has a 10 split parts
      * this method returns an array list with path + "abc.z01", path + "abc.z02", etc.
-     * Returns null if the zip file does not exist
+     * Returns null if the zip path does not exist
      *
      * @return ArrayList of Strings
      * @throws ZipException
@@ -967,14 +918,5 @@ public class ZipFile {
 
     public void setRunInThread(boolean runInThread) {
         this.runInThread = runInThread;
-    }
-
-    /**
-     * Returns the File object of the zip file
-     *
-     * @return File
-     */
-    public File getFile() {
-        return new File(this.file);
     }
 }

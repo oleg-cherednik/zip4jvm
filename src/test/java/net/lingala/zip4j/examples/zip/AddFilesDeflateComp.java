@@ -22,6 +22,7 @@ import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 /**
@@ -38,7 +39,7 @@ public class AddFilesDeflateComp {
 			// Zip file may not necessarily exist. If zip file exists, then
 			// all these files are added to the zip file. If zip file does not
 			// exist, then a new zip file is created with the files mentioned
-			ZipFile zipFile = new ZipFile("c:\\ZipTest\\AddFilesDeflateComp.zip");
+			ZipFile zipFile = new ZipFile(Paths.get("c:\\ZipTest\\AddFilesDeflateComp.zip"));
 
 			// Build the list of files to be added in the array list
 			// Objects of type File have to be added to the ArrayList
