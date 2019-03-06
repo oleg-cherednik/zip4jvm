@@ -39,7 +39,11 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Base class to handle zip files. Some of the operations supported
@@ -143,7 +147,9 @@ public class ZipFile {
         zipModel = createZipModel();
         this.zipModel.setSplitArchive(splitArchive);
         this.zipModel.setSplitLength(splitLength);
-        addFiles(sourceFileList, parameters);
+        addFiles(sourceFileList.stream()
+                               .map(File::toPath)
+                               .collect(Collectors.toList()), parameters);
     }
 
     /**
@@ -213,9 +219,7 @@ public class ZipFile {
      * @throws ZipException
      */
     public void addFile(File sourceFile, ZipParameters parameters) throws ZipException {
-        List<File> sourceFileList = new ArrayList<>();
-        sourceFileList.add(sourceFile);
-        addFiles(sourceFileList, parameters);
+        addFiles(Collections.singletonList(sourceFile.toPath()), parameters);
     }
 
     /**
@@ -223,35 +227,32 @@ public class ZipFile {
      * this method creates a new zip path. Parameters such as compression type, etc
      * can be set in the input parameters.
      *
-     * @param sourceFileList
+     * @param files
      * @param parameters
      * @throws ZipException
      */
-    public void addFiles(List<File> sourceFileList, ZipParameters parameters) throws ZipException {
+    public void addFiles(Collection<Path> files, ZipParameters parameters) throws ZipException {
+        Objects.requireNonNull(files);
+        Objects.requireNonNull(parameters);
 
-        checkZipModel();
+        checkProgressMonitorAvailable();
 
-        if (this.zipModel == null) {
-            throw new ZipException("internal error: zip model is null");
-        }
+        readOrCreateModel();
+        checkAddFilesToSplitArchive();
 
-        if (sourceFileList == null) {
-            throw new ZipException("input path ArrayList is null, cannot add files");
-        }
+        new ZipEngine(zipModel).addFiles(files.stream()
+                                              .map(Path::toFile)
+                                              .collect(Collectors.toList()), parameters, progressMonitor, runInThread);
+    }
 
-        if (parameters == null) {
-            throw new ZipException("input parameters are null, cannot add files to zip");
-        }
-
-        if (progressMonitor.getState() == ProgressMonitor.STATE_BUSY) {
+    private void checkProgressMonitorAvailable() throws ZipException {
+        if (progressMonitor.getState() == ProgressMonitor.STATE_BUSY)
             throw new ZipException("invalid operation - Zip4j is in busy state");
-        }
+    }
 
+    private void checkAddFilesToSplitArchive() throws ZipException {
         if (Files.exists(path) && zipModel.isSplitArchive())
             throw new ZipException("Zip path already exists. Zip path format does not allow updating split/spanned files");
-
-        ZipEngine zipEngine = new ZipEngine(zipModel);
-        zipEngine.addFiles(sourceFileList, parameters, progressMonitor, runInThread);
     }
 
     /**
@@ -305,7 +306,7 @@ public class ZipFile {
     private void addFolder(File path, ZipParameters parameters,
             boolean checkSplitArchive) throws ZipException {
 
-        checkZipModel();
+        readOrCreateModel();
 
         if (this.zipModel == null) {
             throw new ZipException("internal error: zip model is null");
@@ -345,7 +346,7 @@ public class ZipFile {
 
         this.setRunInThread(false);
 
-        checkZipModel();
+        readOrCreateModel();
 
         if (this.zipModel == null) {
             throw new ZipException("internal error: zip model is null");
@@ -757,7 +758,7 @@ public class ZipFile {
             throw new ZipException("output Zip File already exists");
         }
 
-        checkZipModel();
+        readOrCreateModel();
 
         if (this.zipModel == null) {
             throw new ZipException("zip model is null, corrupt zip path?");
@@ -814,7 +815,7 @@ public class ZipFile {
      */
     public String getComment(@NonNull Charset charset) throws ZipException {
         if (Files.exists(path))
-            checkZipModel();
+            readOrCreateModel();
         else
             throw new ZipException("zip path does not exist, cannot read comment");
 
@@ -830,15 +831,9 @@ public class ZipFile {
         return zipModel.getEndCentralDirectory().getComment();
     }
 
-    /**
-     * Loads the zip model if zip model is null and if zip path exists.
-     *
-     * @throws ZipException
-     */
-    private void checkZipModel() throws ZipException {
-        if (zipModel != null)
-            return;
-        zipModel = Files.exists(path) ? readZipModel() : createZipModel();
+    private void readOrCreateModel() throws ZipException {
+        if (zipModel == null)
+            zipModel = Files.exists(path) ? readZipModel() : createZipModel();
     }
 
     /**
@@ -867,7 +862,7 @@ public class ZipFile {
             throw new ZipException("FileHeader is null, cannot get InputStream");
         }
 
-        checkZipModel();
+        readOrCreateModel();
 
         if (zipModel == null) {
             throw new ZipException("zip model is null, cannot get inputstream");
@@ -904,7 +899,7 @@ public class ZipFile {
      * @throws ZipException
      */
     public List<File> getSplitZipFiles() throws ZipException {
-        checkZipModel();
+        readOrCreateModel();
         return Zip4jUtil.getSplitZipFiles(zipModel);
     }
 

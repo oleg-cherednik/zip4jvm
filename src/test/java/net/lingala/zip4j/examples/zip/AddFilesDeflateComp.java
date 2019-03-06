@@ -21,66 +21,66 @@ import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Example showing addition of files to Zip File using deflate compression
  *
  * @author Srikanth Reddy Lingala
- *
  */
 public class AddFilesDeflateComp {
 
-	public AddFilesDeflateComp() {
-		try {
-			// Initiate ZipFile object with the path/name of the zip file.
-			// Zip file may not necessarily exist. If zip file exists, then
-			// all these files are added to the zip file. If zip file does not
-			// exist, then a new zip file is created with the files mentioned
-			ZipFile zipFile = new ZipFile(Paths.get("c:\\ZipTest\\AddFilesDeflateComp.zip"));
+    public AddFilesDeflateComp() {
+        try {
+            // Initiate ZipFile object with the path/name of the zip file.
+            // Zip file may not necessarily exist. If zip file exists, then
+            // all these files are added to the zip file. If zip file does not
+            // exist, then a new zip file is created with the files mentioned
+            ZipFile zipFile = new ZipFile(Paths.get("c:\\ZipTest\\AddFilesDeflateComp.zip"));
 
-			// Build the list of files to be added in the array list
-			// Objects of type File have to be added to the ArrayList
-			ArrayList filesToAdd = new ArrayList();
-			filesToAdd.add(new File("c:\\ZipTest\\sample.txt"));
-			filesToAdd.add(new File("c:\\ZipTest\\myvideo.avi"));
-			filesToAdd.add(new File("c:\\ZipTest\\mysong.mp3"));
+            // Build the list of files to be added in the array list
+            // Objects of type File have to be added to the ArrayList
+            List<Path> filesToAdd = Arrays.asList(
+                    Paths.get("c:/ZipTest/sample.txt"),
+                    Paths.get("c:/ZipTest/myvideo.avi"),
+                    Paths.get("c:/ZipTest/mysong.mp3"));
 
-			// Initiate Zip Parameters which define various properties such
-			// as compression method, etc. More parameters are explained in other
-			// examples
-			ZipParameters parameters = new ZipParameters();
-			parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE); // set compression method to deflate compression
+            // Initiate Zip Parameters which define various properties such
+            // as compression method, etc. More parameters are explained in other
+            // examples
+            ZipParameters parameters = new ZipParameters();
+            parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE); // set compression method to deflate compression
 
-			// Set the compression level. This value has to be in between 0 to 9
-			// Several predefined compression levels are available
-			// DEFLATE_LEVEL_FASTEST - Lowest compression level but higher speed of compression
-			// DEFLATE_LEVEL_FAST - Low compression level but higher speed of compression
-			// DEFLATE_LEVEL_NORMAL - Optimal balance between compression level/speed
-			// DEFLATE_LEVEL_MAXIMUM - High compression level with a compromise of speed
-			// DEFLATE_LEVEL_ULTRA - Highest compression level but low speed
-			parameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
+            // Set the compression level. This value has to be in between 0 to 9
+            // Several predefined compression levels are available
+            // DEFLATE_LEVEL_FASTEST - Lowest compression level but higher speed of compression
+            // DEFLATE_LEVEL_FAST - Low compression level but higher speed of compression
+            // DEFLATE_LEVEL_NORMAL - Optimal balance between compression level/speed
+            // DEFLATE_LEVEL_MAXIMUM - High compression level with a compromise of speed
+            // DEFLATE_LEVEL_ULTRA - Highest compression level but low speed
+            parameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
 
-			// Now add files to the zip file
-			// Note: To add a single file, the method addFile can be used
-			// Note: If the zip file already exists and if this zip file is a split file
-			// then this method throws an exception as Zip Format Specification does not
-			// allow updating split zip files
-			zipFile.addFiles(filesToAdd, parameters);
-		} catch (ZipException e) {
-			e.printStackTrace();
-		}
+            // Now add files to the zip file
+            // Note: To add a single file, the method addFile can be used
+            // Note: If the zip file already exists and if this zip file is a split file
+            // then this method throws an exception as Zip Format Specification does not
+            // allow updating split zip files
+            zipFile.addFiles(filesToAdd, parameters);
+        } catch(ZipException e) {
+            e.printStackTrace();
+        }
 
 
-	}
+    }
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		new AddFilesDeflateComp();
-	}
+    /**
+     * @param args
+     */
+    public static void main(String[] args) {
+        new AddFilesDeflateComp();
+    }
 
 }
