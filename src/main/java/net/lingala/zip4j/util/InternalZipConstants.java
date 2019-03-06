@@ -27,15 +27,15 @@ public interface InternalZipConstants {
     // in Zip4jUtil.getAllHeaderSignatures()
     int LOCSIG = 0x04034b50;    // "PK\003\004"
     static long EXTSIG = 0x08074b50L;    // "PK\007\008"
-    static long CENSIG = 0x02014b50L;    // "PK\001\002"
+    int CENSIG = 0x02014b50;    // "PK\001\002"
     int ENDSIG = 0x06054b50;    // "PK\005\006"
-    static long DIGSIG = 0x05054b50L;
+    int DIGSIG = 0x05054b50;
     static long ARCEXTDATREC = 0x08064b50L;
     static long SPLITSIG = 0x08074b50L;
     int ZIP64_ENDSIG_LOC = 0x07064b50;
     int ZIP64_ENDSIG = 0x06064b50;
     static int EXTRAFIELDZIP64LENGTH = 0x0001;
-    static int AESSIG = 0x9901;
+    short AESSIG = (short)0x9901;
 
     /*
      * Header sizes in bytes (including signatures)

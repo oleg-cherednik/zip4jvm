@@ -118,16 +118,16 @@ public class ArchiveMaintainer {
 				throw new ZipException("invalid local file header, cannot remove file from archive");
 			}
 
-			long offsetLocalFileHeader = fileHeader.getOffsetLocalHeader();
+			long offsetLocalFileHeader = fileHeader.getOffLocalHeaderRelative();
 
 			if (fileHeader.getZip64ExtendedInfo() != null &&
-					fileHeader.getZip64ExtendedInfo().getOffsetLocalHeader() != -1) {
-				offsetLocalFileHeader = fileHeader.getZip64ExtendedInfo().getOffsetLocalHeader();
+					fileHeader.getZip64ExtendedInfo().getOffsLocalHeaderRelative() != -1) {
+				offsetLocalFileHeader = fileHeader.getZip64ExtendedInfo().getOffsLocalHeaderRelative();
 			}
 
 			long offsetEndOfCompressedFile = -1;
 
-			long offsetStartCentralDir = zipModel.getEndCentralDirectory().getOffsetOfStartOfCentralDir();
+			long offsetStartCentralDir = zipModel.getEndCentralDirectory().getOffOfStartOfCentralDir();
 			if (zipModel.isZip64Format()) {
 				if (zipModel.getZip64EndCentralDirectory() != null) {
 					offsetStartCentralDir = zipModel.getZip64EndCentralDirectory().getOffsetStartCenDirWRTStartDiskNo();
@@ -141,10 +141,10 @@ public class ArchiveMaintainer {
 			} else {
 				FileHeader nextFileHeader = fileHeaderList.get(indexOfFileHeader + 1);
 				if (nextFileHeader != null) {
-					offsetEndOfCompressedFile = nextFileHeader.getOffsetLocalHeader() - 1;
+					offsetEndOfCompressedFile = nextFileHeader.getOffLocalHeaderRelative() - 1;
 					if (nextFileHeader.getZip64ExtendedInfo() != null &&
-							nextFileHeader.getZip64ExtendedInfo().getOffsetLocalHeader() != -1) {
-						offsetEndOfCompressedFile = nextFileHeader.getZip64ExtendedInfo().getOffsetLocalHeader() - 1;
+							nextFileHeader.getZip64ExtendedInfo().getOffsLocalHeaderRelative() != -1) {
+						offsetEndOfCompressedFile = nextFileHeader.getZip64ExtendedInfo().getOffsLocalHeaderRelative() - 1;
 					}
 				}
 			}
@@ -171,7 +171,7 @@ public class ArchiveMaintainer {
 				return null;
 			}
 
-			zipModel.getEndCentralDirectory().setOffsetOfStartOfCentralDir(((SplitOutputStream)outputStream).getFilePointer());
+			zipModel.getEndCentralDirectory().setOffOfStartOfCentralDir(((SplitOutputStream)outputStream).getFilePointer());
 			zipModel.getEndCentralDirectory().setTotNoOfEntriesInCentralDir(
 					zipModel.getEndCentralDirectory().getTotNoOfEntriesInCentralDir() - 1);
 			zipModel.getEndCentralDirectory().setTotalNumberOfEntriesInCentralDirOnThisDisk(
@@ -180,13 +180,13 @@ public class ArchiveMaintainer {
 			zipModel.getCentralDirectory().getFileHeaders().remove(indexOfFileHeader);
 
 			for (int i = indexOfFileHeader; i < zipModel.getCentralDirectory().getFileHeaders().size(); i++) {
-				long offsetLocalHdr = zipModel.getCentralDirectory().getFileHeaders().get(i).getOffsetLocalHeader();
+				long offsetLocalHdr = zipModel.getCentralDirectory().getFileHeaders().get(i).getOffLocalHeaderRelative();
 				if (zipModel.getCentralDirectory().getFileHeaders().get(i).getZip64ExtendedInfo() != null &&
-						zipModel.getCentralDirectory().getFileHeaders().get(i).getZip64ExtendedInfo().getOffsetLocalHeader() != -1) {
-					offsetLocalHdr = zipModel.getCentralDirectory().getFileHeaders().get(i).getZip64ExtendedInfo().getOffsetLocalHeader();
+						zipModel.getCentralDirectory().getFileHeaders().get(i).getZip64ExtendedInfo().getOffsLocalHeaderRelative() != -1) {
+					offsetLocalHdr = zipModel.getCentralDirectory().getFileHeaders().get(i).getZip64ExtendedInfo().getOffsLocalHeaderRelative();
 				}
 
-				zipModel.getCentralDirectory().getFileHeaders().get(i).setOffsetLocalHeader(
+				zipModel.getCentralDirectory().getFileHeaders().get(i).setOffLocalHeaderRelative(
 						offsetLocalHdr - (offsetEndOfCompressedFile - offsetLocalFileHeader) - 1);
 			}
 
@@ -196,7 +196,7 @@ public class ArchiveMaintainer {
 			successFlag = true;
 
 			retMap.put(InternalZipConstants.OFFSET_CENTRAL_DIR,
-					Long.toString(zipModel.getEndCentralDirectory().getOffsetOfStartOfCentralDir()));
+					Long.toString(zipModel.getEndCentralDirectory().getOffOfStartOfCentralDir()));
 
 		} catch (ZipException e) {
 			progressMonitor.endProgressMonitorError(e);
@@ -388,7 +388,7 @@ public class ArchiveMaintainer {
 				}
 
 				if (i == totNoOfSplitFiles) {
-					end = new Long(zipModel.getEndCentralDirectory().getOffsetOfStartOfCentralDir());
+					end = new Long(zipModel.getEndCentralDirectory().getOffOfStartOfCentralDir());
 				}
 
 				copyFile(inputStream, outputStream, start, end.longValue(), progressMonitor);
@@ -409,7 +409,7 @@ public class ArchiveMaintainer {
 			}
 
 			ZipModel newZipModel = (ZipModel)zipModel.clone();
-			newZipModel.getEndCentralDirectory().setOffsetOfStartOfCentralDir(totBytesWritten);
+			newZipModel.getEndCentralDirectory().setOffOfStartOfCentralDir(totBytesWritten);
 
 			updateSplitZipModel(newZipModel, fileSizeList, splitSigRemoved);
 
@@ -531,8 +531,8 @@ public class ArchiveMaintainer {
 				for (int j = 0; j < ((FileHeader)zipModel.getCentralDirectory().getFileHeaders().get(i)).getDiskNumberStart(); j++) {
 					offsetLHToAdd += ((Long)fileSizeList.get(j)).longValue();
 				}
-				((FileHeader)zipModel.getCentralDirectory().getFileHeaders().get(i)).setOffsetLocalHeader(
-						((FileHeader)zipModel.getCentralDirectory().getFileHeaders().get(i)).getOffsetLocalHeader() +
+				((FileHeader)zipModel.getCentralDirectory().getFileHeaders().get(i)).setOffLocalHeaderRelative(
+						((FileHeader)zipModel.getCentralDirectory().getFileHeaders().get(i)).getOffLocalHeaderRelative() +
 						offsetLHToAdd - splitSigOverhead);
 				((FileHeader)zipModel.getCentralDirectory().getFileHeaders().get(i)).setDiskNumberStart(0);
 			}
@@ -654,7 +654,7 @@ public class ArchiveMaintainer {
 			if (zipModel.isZip64Format()) {
 				outputStream.seek(zipModel.getZip64EndCentralDirectory().getOffsetStartCenDirWRTStartDiskNo());
 			} else {
-				outputStream.seek(zipModel.getEndCentralDirectory().getOffsetOfStartOfCentralDir());
+				outputStream.seek(zipModel.getEndCentralDirectory().getOffOfStartOfCentralDir());
 			}
 
 			headerWriter.finalizeZipFileWithoutValidations(zipModel, outputStream);

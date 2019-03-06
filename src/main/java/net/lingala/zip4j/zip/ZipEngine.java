@@ -117,7 +117,7 @@ public class ZipEngine {
                 if (zipModel.getEndCentralDirectory() == null) {
                     throw new ZipException("invalid end of central directory record");
                 }
-                splitOutputStream.seek(zipModel.getEndCentralDirectory().getOffsetOfStartOfCentralDir());
+                splitOutputStream.seek(zipModel.getEndCentralDirectory().getOffOfStartOfCentralDir());
             }
             byte[] readBuff = new byte[InternalZipConstants.BUFF_SIZE];
             int readLen = -1;
@@ -227,7 +227,7 @@ public class ZipEngine {
                 if (zipModel.getEndCentralDirectory() == null) {
                     throw new ZipException("invalid end of central directory record");
                 }
-                splitOutputStream.seek(zipModel.getEndCentralDirectory().getOffsetOfStartOfCentralDir());
+                splitOutputStream.seek(zipModel.getEndCentralDirectory().getOffOfStartOfCentralDir());
             }
 
             byte[] readBuff = new byte[InternalZipConstants.BUFF_SIZE];

@@ -28,16 +28,14 @@ public final class EndCentralDirectoryReader {
         dir.setTotalNumberOfEntriesInCentralDirOnThisDisk(in.readShort());
         dir.setTotNoOfEntriesInCentralDir(in.readShort());
         dir.setSizeOfCentralDir(in.readInt());
-        dir.setOffsetOfStartOfCentralDir(in.readIntAsLong());
+        dir.setOffOfStartOfCentralDir(in.readIntAsLong());
         dir.setCommentLength(in.readShort());
-
-        if (dir.getCommentLength() > 0)
-            dir.setComment(in.readString(dir.getCommentLength()));
+        dir.setComment(in.readString(dir.getCommentLength()));
 
         return dir;
     }
 
-    public void findHead() throws IOException {
+    private void findHead() throws IOException {
         int commentLength = EndCentralDirectory.MAX_COMMENT_LENGTH;
         long offs = in.length() - EndCentralDirectory.MIN_SIZE;
 

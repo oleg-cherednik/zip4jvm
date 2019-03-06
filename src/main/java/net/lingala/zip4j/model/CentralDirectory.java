@@ -16,29 +16,20 @@
 
 package net.lingala.zip4j.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.List;
 
+/**
+ * @author Oleg Cherednik
+ * @since 05.03.2019
+ */
+@Getter
+@Setter
 public class CentralDirectory {
 
     private List<FileHeader> fileHeaders;
-
     private DigitalSignature digitalSignature;
-
-    public List<FileHeader> getFileHeaders() {
-        return fileHeaders;
-    }
-
-    public void setFileHeaders(List<FileHeader> fileHeaders) {
-        this.fileHeaders = fileHeaders;
-    }
-
-    public DigitalSignature getDigitalSignature() {
-        return digitalSignature;
-    }
-
-    public void setDigitalSignature(DigitalSignature digitalSignature) {
-        this.digitalSignature = digitalSignature;
-    }
-
 
 }

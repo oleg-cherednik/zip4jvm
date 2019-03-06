@@ -139,7 +139,7 @@ public class HeaderWriter {
         try {
             processHeaderData(zipModel, outputStream);
 
-            long offsetCentralDir = zipModel.getEndCentralDirectory().getOffsetOfStartOfCentralDir();
+            long offsetCentralDir = zipModel.getEndCentralDirectory().getOffOfStartOfCentralDir();
 
             LittleEndianBuffer bytes = new LittleEndianBuffer();
 
@@ -197,7 +197,7 @@ public class HeaderWriter {
 
             LittleEndianBuffer bytes = new LittleEndianBuffer();
 
-            long offsetCentralDir = zipModel.getEndCentralDirectory().getOffsetOfStartOfCentralDir();
+            long offsetCentralDir = zipModel.getEndCentralDirectory().getOffOfStartOfCentralDir();
 
             int sizeOfCentralDir = writeCentralDirectory(zipModel, outputStream, bytes);
 
@@ -262,7 +262,7 @@ public class HeaderWriter {
         try {
             int currSplitFileCounter = 0;
             if (outputStream instanceof SplitOutputStream) {
-                zipModel.getEndCentralDirectory().setOffsetOfStartOfCentralDir(
+                zipModel.getEndCentralDirectory().setOffOfStartOfCentralDir(
                         ((SplitOutputStream)outputStream).getFilePointer());
                 currSplitFileCounter = ((SplitOutputStream)outputStream).getCurrSplitFileCounter();
 
@@ -396,12 +396,12 @@ public class HeaderWriter {
             //Compute offset bytes before extra field is written for Zip64 compatibility
             //NOTE: this data is not written now, but written at a later point
             byte[] offsetLocalHeaderBytes = new byte[4];
-            if (fileHeader.getOffsetLocalHeader() > InternalZipConstants.ZIP_64_LIMIT) {
+            if (fileHeader.getOffLocalHeaderRelative() > InternalZipConstants.ZIP_64_LIMIT) {
                 Raw.writeLongLittleEndian(longByte, 0, InternalZipConstants.ZIP_64_LIMIT);
                 System.arraycopy(longByte, 0, offsetLocalHeaderBytes, 0, 4);
                 writeZip64OffsetLocalHeader = true;
             } else {
-                Raw.writeLongLittleEndian(longByte, 0, fileHeader.getOffsetLocalHeader());
+                Raw.writeLongLittleEndian(longByte, 0, fileHeader.getOffLocalHeaderRelative());
                 System.arraycopy(longByte, 0, offsetLocalHeaderBytes, 0, 4);
             }
 
@@ -484,7 +484,7 @@ public class HeaderWriter {
                 }
 
                 if (writeZip64OffsetLocalHeader) {
-                    Raw.writeLongLittleEndian(longByte, 0, fileHeader.getOffsetLocalHeader());
+                    Raw.writeLongLittleEndian(longByte, 0, fileHeader.getOffLocalHeaderRelative());
                     bytes.copyByteArrayToArrayList(longByte);
                     sizeOfFileHeader += 8;
                 }

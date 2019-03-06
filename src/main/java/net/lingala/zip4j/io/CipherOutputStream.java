@@ -118,15 +118,15 @@ public class CipherOutputStream extends OutputStream {
 
             if (this.outputStream instanceof SplitOutputStream) {
                 if (totalBytesWritten == 4) {
-                    fileHeader.setOffsetLocalHeader(4);
+                    fileHeader.setOffLocalHeaderRelative(4);
                 } else {
-                    fileHeader.setOffsetLocalHeader(((SplitOutputStream)outputStream).getFilePointer());
+                    fileHeader.setOffLocalHeaderRelative(((SplitOutputStream)outputStream).getFilePointer());
                 }
             } else {
                 if (totalBytesWritten == 4) {
-                    fileHeader.setOffsetLocalHeader(4);
+                    fileHeader.setOffLocalHeaderRelative(4);
                 } else {
-                    fileHeader.setOffsetLocalHeader(totalBytesWritten);
+                    fileHeader.setOffLocalHeaderRelative(totalBytesWritten);
                 }
             }
 
@@ -322,7 +322,7 @@ public class CipherOutputStream extends OutputStream {
     }
 
     public void finish() throws IOException, ZipException {
-        zipModel.getEndCentralDirectory().setOffsetOfStartOfCentralDir(totalBytesWritten);
+        zipModel.getEndCentralDirectory().setOffOfStartOfCentralDir(totalBytesWritten);
 
         HeaderWriter headerWriter = new HeaderWriter();
         headerWriter.finalizeZipFile(zipModel, outputStream);
@@ -335,7 +335,7 @@ public class CipherOutputStream extends OutputStream {
 
     private void createFileHeader() throws ZipException, UnsupportedEncodingException {
         this.fileHeader = new FileHeader();
-        fileHeader.setSignature((int)InternalZipConstants.CENSIG);
+//        fileHeader.setSignature((int)InternalZipConstants.CENSIG);
         fileHeader.setVersionMadeBy(20);
         fileHeader.setVersionNeededToExtract(20);
         if (zipParameters.isEncryptFiles() &&
@@ -369,6 +369,11 @@ public class CipherOutputStream extends OutputStream {
             throw new ZipException("fileName is null or empty. unable to create file header");
         }
 
+        if(!zipParameters.isSourceExternalStream() && sourceFile.isDirectory()) {
+            if(!fileName.endsWith("/") && !fileName.endsWith("\\"))
+                fileName += "/";
+        }
+
         fileHeader.setFileName(fileName);
         fileHeader.setFileNameLength(Zip4jUtil.getEncodedStringLength(fileName, zipModel.getCharset()));
 
@@ -384,11 +389,6 @@ public class CipherOutputStream extends OutputStream {
         byte[] externalFileAttrs = { (byte)fileAttrs, 0, 0, 0 };
         fileHeader.setExternalFileAttr(externalFileAttrs);
 
-        if (zipParameters.isSourceExternalStream()) {
-            fileHeader.setDirectory(fileName.endsWith("/") || fileName.endsWith("\\"));
-        } else {
-            fileHeader.setDirectory(this.sourceFile.isDirectory());
-        }
         if (fileHeader.isDirectory()) {
             fileHeader.setCompressedSize(0);
             fileHeader.setUncompressedSize(0);
@@ -515,7 +515,6 @@ public class CipherOutputStream extends OutputStream {
         }
 
         AESExtraDataRecord aesDataRecord = new AESExtraDataRecord();
-        aesDataRecord.setSignature(InternalZipConstants.AESSIG);
         aesDataRecord.setDataSize(7);
         aesDataRecord.setVendorID("AE");
         // Always set the version number to 2 as we do not store CRC for any AES encrypted files

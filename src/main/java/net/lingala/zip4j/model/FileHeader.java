@@ -17,238 +17,78 @@
 package net.lingala.zip4j.model;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.progress.ProgressMonitor;
 import net.lingala.zip4j.unzip.Unzip;
+import net.lingala.zip4j.util.BitUtils;
+import net.lingala.zip4j.util.InternalZipConstants;
+import net.lingala.zip4j.util.Zip4jConstants;
 import net.lingala.zip4j.util.Zip4jUtil;
 
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static net.lingala.zip4j.util.BitUtils.BIT0;
+import static net.lingala.zip4j.util.BitUtils.BIT3;
 
 @Getter
 @Setter
 public class FileHeader {
 
-    private int signature;
-
+    // size:4 - signature (0x02014b50)
+    private final int signature = InternalZipConstants.CENSIG;
+    // size:2 - version made by
     private int versionMadeBy;
-
+    // size:2 - version needed to extract
     private int versionNeededToExtract;
-
+    // size:2 - general purpose bit flag
     private byte[] generalPurposeFlag;
-
+    // size:2 - compression method
     private int compressionMethod;
-
+    // size:2 - last mod file time
+    // size:2 - last mod file date
     private int lastModFileTime;
-
+    // size:4 - crc-32
     private long crc32;
-
+    @Deprecated
     private byte[] crcBuff;
-
+    // size:4 - compressed size
     private long compressedSize;
-
+    // size:4 - uncompressed size
     private long uncompressedSize;
-
+    // size:2 - file name length (n)
     private int fileNameLength;
-
+    // size:2 - extra field length (m)
     private int extraFieldLength;
-
+    // size:2 - file comment length
     private int fileCommentLength;
-
+    // size:2 - disk number start
     private int diskNumberStart;
-
+    // size:2 - internal file attributes
     private byte[] internalFileAttr;
-
+    // size:4 - external file attributes
     private byte[] externalFileAttr;
-
-    private long offsetLocalHeader;
-
+    // size:4 - relative offset of local header
+    private long offLocalHeaderRelative;
+    // size:n - file name
     private String fileName;
-
+    // size:m - extra field
+    @NonNull
+    private List<ExtraDataRecord> extraDataRecords = Collections.emptyList();
+    // size:k - extra field
     private String fileComment;
-
-    private boolean isDirectory;
-
-    private boolean isEncrypted;
-
-    private int encryptionMethod;
-
+    private int encryptionMethod = -1;
     private char[] password;
-
     private boolean dataDescriptorExists;
-
     private Zip64ExtendedInfo zip64ExtendedInfo;
-
     private AESExtraDataRecord aesExtraDataRecord;
-
-    private ArrayList extraDataRecords;
 
     // TODO should be true, when file name charset is UTF8
     private boolean fileNameUTF8Encoded;
 
-    public FileHeader() {
-        encryptionMethod = -1;
-        crc32 = 0;
-        uncompressedSize = 0;
-    }
-
-    public void setFileNameUTF8Encoded(boolean fileNameUTF8Encoded) {
-        this.fileNameUTF8Encoded = fileNameUTF8Encoded;
-    }
-
-    public int getSignature() {
-        return signature;
-    }
-
-    public void setSignature(int signature) {
-        this.signature = signature;
-    }
-
-    public int getVersionMadeBy() {
-        return versionMadeBy;
-    }
-
-    public void setVersionMadeBy(int versionMadeBy) {
-        this.versionMadeBy = versionMadeBy;
-    }
-
-    public int getVersionNeededToExtract() {
-        return versionNeededToExtract;
-    }
-
-    public void setVersionNeededToExtract(int versionNeededToExtract) {
-        this.versionNeededToExtract = versionNeededToExtract;
-    }
-
-    public byte[] getGeneralPurposeFlag() {
-        return generalPurposeFlag;
-    }
-
-    public void setGeneralPurposeFlag(byte[] generalPurposeFlag) {
-        this.generalPurposeFlag = generalPurposeFlag;
-    }
-
-    public int getCompressionMethod() {
-        return compressionMethod;
-    }
-
-    public void setCompressionMethod(int compressionMethod) {
-        this.compressionMethod = compressionMethod;
-    }
-
-    public int getLastModFileTime() {
-        return lastModFileTime;
-    }
-
-    public void setLastModFileTime(int lastModFileTime) {
-        this.lastModFileTime = lastModFileTime;
-    }
-
-    public long getCrc32() {
-        return crc32 & 0xffffffffL;
-    }
-
-    public void setCrc32(long crc32) {
-        this.crc32 = crc32;
-    }
-
-    public long getCompressedSize() {
-        return compressedSize;
-    }
-
-    public void setCompressedSize(long compressedSize) {
-        this.compressedSize = compressedSize;
-    }
-
-    public long getUncompressedSize() {
-        return uncompressedSize;
-    }
-
-    public void setUncompressedSize(long uncompressedSize) {
-        this.uncompressedSize = uncompressedSize;
-    }
-
-    public int getFileNameLength() {
-        return fileNameLength;
-    }
-
-    public void setFileNameLength(int fileNameLength) {
-        this.fileNameLength = fileNameLength;
-    }
-
-    public int getExtraFieldLength() {
-        return extraFieldLength;
-    }
-
-    public void setExtraFieldLength(int extraFieldLength) {
-        this.extraFieldLength = extraFieldLength;
-    }
-
-    public int getFileCommentLength() {
-        return fileCommentLength;
-    }
-
-    public void setFileCommentLength(int fileCommentLength) {
-        this.fileCommentLength = fileCommentLength;
-    }
-
-    public int getDiskNumberStart() {
-        return diskNumberStart;
-    }
-
-    public void setDiskNumberStart(int diskNumberStart) {
-        this.diskNumberStart = diskNumberStart;
-    }
-
-    public byte[] getInternalFileAttr() {
-        return internalFileAttr;
-    }
-
-    public void setInternalFileAttr(byte[] internalFileAttr) {
-        this.internalFileAttr = internalFileAttr;
-    }
-
-    public byte[] getExternalFileAttr() {
-        return externalFileAttr;
-    }
-
-    public void setExternalFileAttr(byte[] externalFileAttr) {
-        this.externalFileAttr = externalFileAttr;
-    }
-
-    public long getOffsetLocalHeader() {
-        return offsetLocalHeader;
-    }
-
-    public void setOffsetLocalHeader(long offsetLocalHeader) {
-        this.offsetLocalHeader = offsetLocalHeader;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-
-    // TODO when set file name, update charset
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public String getFileComment() {
-        return fileComment;
-    }
-
-    public void setFileComment(String fileComment) {
-        this.fileComment = fileComment;
-    }
-
-    public boolean isDirectory() {
-        return isDirectory;
-    }
-
-    public void setDirectory(boolean isDirectory) {
-        this.isDirectory = isDirectory;
-    }
+    // TODO this is data class, this logic should be moved out
 
     /**
      * Extracts file to the specified directory
@@ -306,69 +146,45 @@ public class FileHeader {
         unzip.extractFile(this, outPath, unzipParameters, newFileName, progressMonitor, runInThread);
     }
 
+
+    // -----------
+
+    public void setGeneralPurposeFlag(byte[] generalPurposeFlag) {
+        this.generalPurposeFlag = generalPurposeFlag;
+        fileNameUTF8Encoded = generalPurposeFlag != null && BitUtils.isBitSet(generalPurposeFlag[1], BIT3);
+        dataDescriptorExists = generalPurposeFlag != null && BitUtils.isBitSet(generalPurposeFlag[0], BIT3);
+    }
+
+    public boolean isDirectory() {
+        return fileName != null && (fileName.endsWith("/") || fileName.endsWith("\\"));
+    }
+
     public boolean isEncrypted() {
-        return isEncrypted;
+        return generalPurposeFlag != null && BitUtils.isBitSet(generalPurposeFlag[0], BIT0);
     }
 
-    public void setEncrypted(boolean isEncrypted) {
-        this.isEncrypted = isEncrypted;
+    public void setEncrypted(boolean val) {
+        generalPurposeFlag = generalPurposeFlag != null ? generalPurposeFlag : new byte[2];
+
+        if (val)
+            BitUtils.setBits(generalPurposeFlag[0], BIT0);
+        else
+            BitUtils.clearBits(generalPurposeFlag[0], BIT0);
     }
 
-    public int getEncryptionMethod() {
-        return encryptionMethod;
+    public void setZip64ExtendedInfo(Zip64ExtendedInfo info) {
+        zip64ExtendedInfo = info;
+
+        if (info != null) {
+            uncompressedSize = info.getUnCompressedSize() != -1 ? info.getUnCompressedSize() : uncompressedSize;
+            compressedSize = info.getCompressedSize() != -1 ? info.getCompressedSize() : uncompressedSize;
+            offLocalHeaderRelative = info.getOffsLocalHeaderRelative() != -1 ? info.getOffsLocalHeaderRelative() : offLocalHeaderRelative;
+            diskNumberStart = info.getDiskNumberStart() != -1 ? info.getDiskNumberStart() : diskNumberStart;
+        }
     }
 
-    public void setEncryptionMethod(int encryptionMethod) {
-        this.encryptionMethod = encryptionMethod;
+    public void setAesExtraDataRecord(AESExtraDataRecord record) {
+        aesExtraDataRecord = record;
+        encryptionMethod = record != null ? Zip4jConstants.ENC_METHOD_AES : -1;
     }
-
-    public char[] getPassword() {
-        return password;
-    }
-
-    public void setPassword(char[] password) {
-        this.password = password;
-    }
-
-    public byte[] getCrcBuff() {
-        return crcBuff;
-    }
-
-    public void setCrcBuff(byte[] crcBuff) {
-        this.crcBuff = crcBuff;
-    }
-
-    public ArrayList getExtraDataRecords() {
-        return extraDataRecords;
-    }
-
-    public void setExtraDataRecords(ArrayList extraDataRecords) {
-        this.extraDataRecords = extraDataRecords;
-    }
-
-    public boolean isDataDescriptorExists() {
-        return dataDescriptorExists;
-    }
-
-    public void setDataDescriptorExists(boolean dataDescriptorExists) {
-        this.dataDescriptorExists = dataDescriptorExists;
-    }
-
-    public Zip64ExtendedInfo getZip64ExtendedInfo() {
-        return zip64ExtendedInfo;
-    }
-
-    public void setZip64ExtendedInfo(Zip64ExtendedInfo zip64ExtendedInfo) {
-        this.zip64ExtendedInfo = zip64ExtendedInfo;
-    }
-
-    public AESExtraDataRecord getAesExtraDataRecord() {
-        return aesExtraDataRecord;
-    }
-
-    public void setAesExtraDataRecord(AESExtraDataRecord aesExtraDataRecord) {
-        this.aesExtraDataRecord = aesExtraDataRecord;
-    }
-
-
 }

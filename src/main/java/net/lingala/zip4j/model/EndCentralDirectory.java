@@ -43,7 +43,7 @@ public class EndCentralDirectory {
     // size:4 - size of the central directory
     private int sizeOfCentralDir;
     // size:4 - offset of start of central directory with respect to the starting disk number
-    private long offsetOfStartOfCentralDir;
+    private long offOfStartOfCentralDir;
     // size:2 - file comment length (n)
     private int commentLength;
     // size:n - file comment

@@ -36,7 +36,7 @@ public final class Zip64EndCentralDirectoryReader {
         return dir;
     }
 
-    public void findHead() throws IOException {
+    private void findHead() throws IOException {
         in.seek(offs);
 
         if (in.readInt() == InternalZipConstants.ZIP64_ENDSIG)

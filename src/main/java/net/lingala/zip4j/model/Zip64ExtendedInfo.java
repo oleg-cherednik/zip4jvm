@@ -23,11 +23,17 @@ import lombok.Setter;
 @Setter
 public class Zip64ExtendedInfo {
 
-    private int header;
+    // size:2 - tag for this "extra" block type (ZIP64 = 0x001)
+    private final int header = ExtraDataRecord.HEADER_ZIP64;
+    // size:2 - size of this "extra" block
     private int size;
-    private long compressedSize = -1;
+    // size:8 - original uncompressed file size
     private long unCompressedSize = -1;
-    private long offsetLocalHeader = -1;
+    // size:8 - size of compressed data
+    private long compressedSize = -1;
+    // size:8 - offset of local header record
+    private long offsLocalHeaderRelative = -1;
+    // size:4 - number of the disk on which  this file starts
     private int diskNumberStart = -1;
 
 }

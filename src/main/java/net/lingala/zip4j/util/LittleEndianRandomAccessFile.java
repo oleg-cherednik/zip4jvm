@@ -90,20 +90,16 @@ public final class LittleEndianRandomAccessFile {
     }
 
     private static short convertShort(short val) {
-        return (short)(getByte(val, 0) << 8 | getByte(val, 1));
+        return (short)(BitUtils.getByte(val, 0) << 8 | BitUtils.getByte(val, 1));
     }
 
     private static long convertInt(int val) {
-        return getByte(val, 0) << 24 | getByte(val, 1) << 16 | getByte(val, 2) << 8 | getByte(val, 3);
+        return BitUtils.getByte(val, 0) << 24 | BitUtils.getByte(val, 1) << 16 | BitUtils.getByte(val, 2) << 8 | BitUtils.getByte(val, 3);
     }
 
     private static long convertLong(long val) {
-        return getByte(val, 0) << 56 | getByte(val, 1) << 48 | getByte(val, 2) << 40 | getByte(val, 3) << 32 |
-                getByte(val, 4) << 24 | getByte(val, 5) << 16 | getByte(val, 6) << 8 | getByte(val, 7);
-    }
-
-    private static long getByte(long val, int i) {
-        return (val >> i * 8) & 0xFF;
+        return BitUtils.getByte(val, 0) << 56 | BitUtils.getByte(val, 1) << 48 | BitUtils.getByte(val, 2) << 40 | BitUtils.getByte(val, 3) << 32 |
+                BitUtils.getByte(val, 4) << 24 | BitUtils.getByte(val, 5) << 16 | BitUtils.getByte(val, 6) << 8 | BitUtils.getByte(val, 7);
     }
 
 }
