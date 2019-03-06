@@ -16,7 +16,6 @@
 
 package net.lingala.zip4j.core;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lingala.zip4j.exception.ZipException;
@@ -25,11 +24,8 @@ import net.lingala.zip4j.model.EndCentralDirectory;
 import net.lingala.zip4j.model.ExtraDataRecord;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.LocalFileHeader;
-import net.lingala.zip4j.model.Zip64EndCentralDirectoryLocator;
 import net.lingala.zip4j.model.Zip64ExtendedInfo;
-import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
-import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
 import net.lingala.zip4j.util.Raw;
 import net.lingala.zip4j.util.Zip4jConstants;
 import net.lingala.zip4j.util.Zip4jUtil;
@@ -37,7 +33,6 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,36 +41,6 @@ import java.util.List;
 public final class HeaderReader {
 
     private final RandomAccessFile zip4jRaf;
-
-    /**
-     * Reads all the header information for the zip file. File names are read with
-     * input charset name. If this parameter is null, default system charset is used.
-     * <br><br><b>Note:</b> This method does not read local file header information
-     *
-     * @return {@link ZipModel}
-     * @throws ZipException
-     */
-    public ZipModel readAllHeaders(@NonNull Charset charset) throws ZipException, IOException {
-        LittleEndianRandomAccessFile in = new LittleEndianRandomAccessFile(zip4jRaf);
-
-        EndCentralDirectoryReader endCentralDirectoryReader = new EndCentralDirectoryReader(in);
-        EndCentralDirectory dir = endCentralDirectoryReader.read();
-        Zip64EndCentralDirectoryLocator locator = new Zip64EndCentralDirectoryLocatorReader(in, endCentralDirectoryReader.getOffs()).read();
-
-        ZipModel zipModel = new ZipModel();
-        zipModel.setCharset(charset);
-        zipModel.setEndCentralDirectory(dir);
-
-        if (locator != null) {
-            zipModel.setZip64EndCentralDirectoryLocator(locator);
-            zipModel.setZip64EndCentralDirectory(new Zip64EndCentralDirectoryReader(in, locator.getOffsetZip64EndOfCentralDirRec()).read());
-        }
-
-        zipModel.setCentralDirectory(new CentralDirectoryReader(in,
-                dir, zipModel.getZip64EndCentralDirectory(), zipModel.isZip64Format()).read());
-
-        return zipModel;
-    }
 
     /**
      * Reads extra data record and saves it in the {@link LocalFileHeader}

@@ -13,7 +13,7 @@ import java.nio.charset.Charset;
  * @since 21.02.2019
  */
 @RequiredArgsConstructor
-public final class LittleEndianRandomAccessFile {
+public final class LittleEndianRandomAccessFile implements AutoCloseable {
 
     // TODO temporary, should be removed
     @Getter
@@ -83,6 +83,11 @@ public final class LittleEndianRandomAccessFile {
 
     public void seek(long pos) throws IOException {
         in.seek(pos);
+    }
+
+    @Override
+    public void close() throws Exception {
+        in.close();
     }
 
     public long getFilePointer() throws IOException {
