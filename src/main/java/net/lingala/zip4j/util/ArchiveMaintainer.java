@@ -25,7 +25,6 @@ import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.Zip64EndCentralDirectory;
 import net.lingala.zip4j.model.Zip64EndCentralDirectoryLocator;
 import net.lingala.zip4j.model.ZipModel;
-import net.lingala.zip4j.progress.ProgressMonitor;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -41,18 +40,14 @@ import java.util.Map;
 
 public class ArchiveMaintainer {
 
-    public ArchiveMaintainer() {
-    }
-
     public Map<String, String> removeZipFile(final ZipModel zipModel,
-            final CentralDirectory.FileHeader fileHeader, final ProgressMonitor progressMonitor, boolean runInThread) throws ZipException {
+            final CentralDirectory.FileHeader fileHeader, boolean runInThread) throws ZipException {
 
         if (runInThread) {
             Thread thread = new Thread(InternalZipConstants.THREAD_NAME) {
                 public void run() {
                     try {
-                        initRemoveZipFile(zipModel, fileHeader, progressMonitor);
-                        progressMonitor.endProgressMonitorSuccess();
+                        initRemoveZipFile(zipModel, fileHeader);
                     } catch(ZipException e) {
                     }
                 }
@@ -60,15 +55,14 @@ public class ArchiveMaintainer {
             thread.start();
             return null;
         } else {
-            Map<String, String> retMap = initRemoveZipFile(zipModel, fileHeader, progressMonitor);
-            progressMonitor.endProgressMonitorSuccess();
+            Map<String, String> retMap = initRemoveZipFile(zipModel, fileHeader);
             return retMap;
         }
 
     }
 
     public Map<String, String> initRemoveZipFile(ZipModel zipModel,
-            CentralDirectory.FileHeader fileHeader, ProgressMonitor progressMonitor) throws ZipException {
+            CentralDirectory.FileHeader fileHeader) throws ZipException {
 
         if (fileHeader == null || zipModel == null) {
             throw new ZipException("input parameters is null in maintain zip file, cannot remove file from archive");
@@ -156,19 +150,13 @@ public class ArchiveMaintainer {
             if (indexOfFileHeader == 0) {
                 if (zipModel.getCentralDirectory().getFileHeaders().size() > 1) {
                     // if this is the only file and it is deleted then no need to do this
-                    copyFile(inputStream, outputStream, offsetEndOfCompressedFile + 1, offsetStartCentralDir, progressMonitor);
+                    copyFile(inputStream, outputStream, offsetEndOfCompressedFile + 1, offsetStartCentralDir);
                 }
             } else if (indexOfFileHeader == fileHeaderList.size() - 1) {
-                copyFile(inputStream, outputStream, 0, offsetLocalFileHeader, progressMonitor);
+                copyFile(inputStream, outputStream, 0, offsetLocalFileHeader);
             } else {
-                copyFile(inputStream, outputStream, 0, offsetLocalFileHeader, progressMonitor);
-                copyFile(inputStream, outputStream, offsetEndOfCompressedFile + 1, offsetStartCentralDir, progressMonitor);
-            }
-
-            if (progressMonitor.isCancelAllTasks()) {
-                progressMonitor.setResult(ProgressMonitor.RESULT_CANCELLED);
-                progressMonitor.setState(ProgressMonitor.STATE_READY);
-                return null;
+                copyFile(inputStream, outputStream, 0, offsetLocalFileHeader);
+                copyFile(inputStream, outputStream, offsetEndOfCompressedFile + 1, offsetStartCentralDir);
             }
 
             zipModel.getEndCentralDirectory().setOffOfStartOfCentralDir(((SplitOutputStream)outputStream).getFilePointer());
@@ -199,10 +187,8 @@ public class ArchiveMaintainer {
                     Long.toString(zipModel.getEndCentralDirectory().getOffOfStartOfCentralDir()));
 
         } catch(ZipException e) {
-            progressMonitor.endProgressMonitorError(e);
             throw e;
         } catch(Exception e) {
-            progressMonitor.endProgressMonitorError(e);
             throw new ZipException(e);
         } finally {
             try {
@@ -236,8 +222,7 @@ public class ArchiveMaintainer {
         }
     }
 
-    private void copyFile(RandomAccessFile inputStream,
-            OutputStream outputStream, long start, long end, ProgressMonitor progressMonitor) throws ZipException {
+    private void copyFile(RandomAccessFile inputStream, OutputStream outputStream, long start, long end) throws ZipException {
 
         if (inputStream == null || outputStream == null) {
             throw new ZipException("input or output stream is null, cannot copy file");
@@ -259,12 +244,6 @@ public class ArchiveMaintainer {
             return;
         }
 
-        if (progressMonitor.isCancelAllTasks()) {
-            progressMonitor.setResult(ProgressMonitor.RESULT_CANCELLED);
-            progressMonitor.setState(ProgressMonitor.STATE_READY);
-            return;
-        }
-
         try {
             inputStream.seek(start);
 
@@ -281,12 +260,6 @@ public class ArchiveMaintainer {
 
             while ((readLen = inputStream.read(buff)) != -1) {
                 outputStream.write(buff, 0, readLen);
-
-                progressMonitor.updateWorkCompleted(readLen);
-                if (progressMonitor.isCancelAllTasks()) {
-                    progressMonitor.setResult(ProgressMonitor.RESULT_CANCELLED);
-                    return;
-                }
 
                 bytesRead += readLen;
 
@@ -321,34 +294,30 @@ public class ArchiveMaintainer {
      * @param zipModel
      * @throws ZipException
      */
-    public void mergeSplitZipFiles(final ZipModel zipModel, final File outputZipFile,
-            final ProgressMonitor progressMonitor, boolean runInThread) throws ZipException {
+    public void mergeSplitZipFiles(final ZipModel zipModel, final File outputZipFile, boolean runInThread) throws ZipException {
         if (runInThread) {
             Thread thread = new Thread(InternalZipConstants.THREAD_NAME) {
                 public void run() {
                     try {
-                        initMergeSplitZipFile(zipModel, outputZipFile, progressMonitor);
+                        initMergeSplitZipFile(zipModel, outputZipFile);
                     } catch(ZipException e) {
                     }
                 }
             };
             thread.start();
         } else {
-            initMergeSplitZipFile(zipModel, outputZipFile, progressMonitor);
+            initMergeSplitZipFile(zipModel, outputZipFile);
         }
     }
 
-    private void initMergeSplitZipFile(ZipModel zipModel, File outputZipFile,
-            ProgressMonitor progressMonitor) throws ZipException {
+    private void initMergeSplitZipFile(ZipModel zipModel, File outputZipFile) throws ZipException {
         if (zipModel == null) {
             ZipException e = new ZipException("one of the input parameters is null, cannot merge split zip file");
-            progressMonitor.endProgressMonitorError(e);
             throw e;
         }
 
         if (!zipModel.isSplitArchive()) {
             ZipException e = new ZipException("archive not a split zip file");
-            progressMonitor.endProgressMonitorError(e);
             throw e;
         }
 
@@ -390,13 +359,8 @@ public class ArchiveMaintainer {
                     end = new Long(zipModel.getEndCentralDirectory().getOffOfStartOfCentralDir());
                 }
 
-                copyFile(inputStream, outputStream, start, end.longValue(), progressMonitor);
+                copyFile(inputStream, outputStream, start, end.longValue());
                 totBytesWritten += (end.longValue() - start);
-                if (progressMonitor.isCancelAllTasks()) {
-                    progressMonitor.setResult(ProgressMonitor.RESULT_CANCELLED);
-                    progressMonitor.setState(ProgressMonitor.STATE_READY);
-                    return;
-                }
 
                 fileSizeList.add(end);
 
@@ -415,13 +379,7 @@ public class ArchiveMaintainer {
             HeaderWriter headerWriter = new HeaderWriter();
             headerWriter.finalizeZipFileWithoutValidations(newZipModel, outputStream);
 
-            progressMonitor.endProgressMonitorSuccess();
-
-        } catch(IOException e) {
-            progressMonitor.endProgressMonitorError(e);
-            throw new ZipException(e);
         } catch(Exception e) {
-            progressMonitor.endProgressMonitorError(e);
             throw new ZipException(e);
         } finally {
             if (outputStream != null) {
@@ -672,57 +630,5 @@ public class ArchiveMaintainer {
                 }
             }
         }
-    }
-
-    public void initProgressMonitorForRemoveOp(ZipModel zipModel,
-            CentralDirectory.FileHeader fileHeader, ProgressMonitor progressMonitor) throws ZipException {
-        if (zipModel == null || fileHeader == null || progressMonitor == null) {
-            throw new ZipException("one of the input parameters is null, cannot calculate total work");
-        }
-
-        progressMonitor.setCurrentOperation(ProgressMonitor.OPERATION_REMOVE);
-        progressMonitor.setFileName(fileHeader.getFileName());
-        progressMonitor.setTotalWork(calculateTotalWorkForRemoveOp(zipModel, fileHeader));
-        progressMonitor.setState(ProgressMonitor.STATE_BUSY);
-    }
-
-    private long calculateTotalWorkForRemoveOp(ZipModel zipModel, CentralDirectory.FileHeader fileHeader) throws ZipException {
-        return Zip4jUtil.getFileLengh(zipModel.getZipFile().toFile()) - fileHeader.getCompressedSize();
-    }
-
-    public void initProgressMonitorForMergeOp(ZipModel zipModel, ProgressMonitor progressMonitor) throws ZipException {
-        if (zipModel == null) {
-            throw new ZipException("zip model is null, cannot calculate total work for merge op");
-        }
-
-        progressMonitor.setCurrentOperation(ProgressMonitor.OPERATION_MERGE);
-        progressMonitor.setFileName(zipModel.getZipFile().toString());
-        progressMonitor.setTotalWork(calculateTotalWorkForMergeOp(zipModel));
-        progressMonitor.setState(ProgressMonitor.STATE_BUSY);
-    }
-
-    private long calculateTotalWorkForMergeOp(ZipModel zipModel) throws ZipException {
-        long totSize = 0;
-        if (zipModel.isSplitArchive()) {
-            int totNoOfSplitFiles = zipModel.getEndCentralDirectory().getNoOfDisk();
-            String partFile = null;
-            String curZipFile = zipModel.getZipFile().toString();
-            int partNumber = 0;
-            for (int i = 0; i <= totNoOfSplitFiles; i++) {
-                if (partNumber == zipModel.getEndCentralDirectory().getNoOfDisk()) {
-                    partFile = zipModel.getZipFile().toString();
-                } else {
-                    if (partNumber >= 9) {
-                        partFile = curZipFile.substring(0, curZipFile.lastIndexOf(".")) + ".z" + (partNumber + 1);
-                    } else {
-                        partFile = curZipFile.substring(0, curZipFile.lastIndexOf(".")) + ".z0" + (partNumber + 1);
-                    }
-                }
-
-                totSize += Zip4jUtil.getFileLengh(new File(partFile));
-            }
-
-        }
-        return totSize;
     }
 }

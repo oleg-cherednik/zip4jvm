@@ -20,7 +20,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.progress.ProgressMonitor;
 import net.lingala.zip4j.unzip.Unzip;
 import net.lingala.zip4j.util.BitUtils;
 import net.lingala.zip4j.util.InternalZipConstants;
@@ -115,9 +114,8 @@ public class CentralDirectory {
          * @param outPath
          * @throws ZipException
          */
-        public void extractFile(ZipModel zipModel, String outPath,
-                ProgressMonitor progressMonitor, boolean runInThread) throws ZipException {
-            extractFile(zipModel, outPath, null, progressMonitor, runInThread);
+        public void extractFile(ZipModel zipModel, String outPath, boolean runInThread) throws ZipException {
+            extractFile(zipModel, outPath, null, runInThread);
         }
 
         /**
@@ -130,8 +128,8 @@ public class CentralDirectory {
          * @throws ZipException
          */
         public void extractFile(ZipModel zipModel, String outPath,
-                UnzipParameters unzipParameters, ProgressMonitor progressMonitor, boolean runInThread) throws ZipException {
-            extractFile(zipModel, outPath, unzipParameters, null, progressMonitor, runInThread);
+                UnzipParameters unzipParameters, boolean runInThread) throws ZipException {
+            extractFile(zipModel, outPath, unzipParameters, null, runInThread);
         }
 
         /**
@@ -148,7 +146,7 @@ public class CentralDirectory {
          */
         public void extractFile(ZipModel zipModel, String outPath,
                 UnzipParameters unzipParameters, String newFileName,
-                ProgressMonitor progressMonitor, boolean runInThread) throws ZipException {
+                boolean runInThread) throws ZipException {
             if (zipModel == null) {
                 throw new ZipException("input zipModel is null");
             }
@@ -161,7 +159,7 @@ public class CentralDirectory {
                 throw new ZipException("invalid file header");
             }
             Unzip unzip = new Unzip(zipModel);
-            unzip.extractFile(this, outPath, unzipParameters, newFileName, progressMonitor, runInThread);
+            unzip.extractFile(this, outPath, unzipParameters, newFileName, runInThread);
         }
 
 

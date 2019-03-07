@@ -1,18 +1,18 @@
 /*
-* Copyright 2010 Srikanth Reddy Lingala
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2010 Srikanth Reddy Lingala
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package net.lingala.zip4j.unzip;
 
@@ -21,7 +21,6 @@ import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.UnzipParameters;
 import net.lingala.zip4j.model.ZipModel;
-import net.lingala.zip4j.progress.ProgressMonitor;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.Zip4jUtil;
 
@@ -30,201 +29,177 @@ import java.util.List;
 
 public class Unzip {
 
-	private ZipModel zipModel;
+    private ZipModel zipModel;
 
-	public Unzip(ZipModel zipModel) throws ZipException {
+    public Unzip(ZipModel zipModel) throws ZipException {
 
-		if (zipModel == null) {
-			throw new ZipException("ZipModel is null");
-		}
+        if (zipModel == null) {
+            throw new ZipException("ZipModel is null");
+        }
 
-		this.zipModel = zipModel;
-	}
+        this.zipModel = zipModel;
+    }
 
-	public void extractAll(final UnzipParameters unzipParameters, final String outPath,
-			final ProgressMonitor progressMonitor, boolean runInThread) throws ZipException {
+    public void extractAll(final UnzipParameters unzipParameters, final String outPath,
+            boolean runInThread) throws ZipException {
 
-		CentralDirectory centralDirectory = zipModel.getCentralDirectory();
+        CentralDirectory centralDirectory = zipModel.getCentralDirectory();
 
-		if (centralDirectory == null ||
-				centralDirectory.getFileHeaders() == null) {
-			throw new ZipException("invalid central directory in zipModel");
-		}
+        if (centralDirectory == null ||
+                centralDirectory.getFileHeaders() == null) {
+            throw new ZipException("invalid central directory in zipModel");
+        }
 
-		final List<CentralDirectory.FileHeader> fileHeaders = centralDirectory.getFileHeaders();
+        final List<CentralDirectory.FileHeader> fileHeaders = centralDirectory.getFileHeaders();
 
-		progressMonitor.setCurrentOperation(ProgressMonitor.OPERATION_EXTRACT);
-		progressMonitor.setTotalWork(calculateTotalWork(fileHeaders));
-		progressMonitor.setState(ProgressMonitor.STATE_BUSY);
+        if (runInThread) {
+            Thread thread = new Thread(InternalZipConstants.THREAD_NAME) {
+                public void run() {
+                    try {
+                        initExtractAll(fileHeaders, unzipParameters, outPath);
+                    } catch(ZipException e) {
+                    }
+                }
+            };
+            thread.start();
+        } else {
+            initExtractAll(fileHeaders, unzipParameters, outPath);
+        }
 
-		if (runInThread) {
-			Thread thread = new Thread(InternalZipConstants.THREAD_NAME) {
-				public void run() {
-					try {
-						initExtractAll(fileHeaders, unzipParameters, progressMonitor, outPath);
-						progressMonitor.endProgressMonitorSuccess();
-					} catch (ZipException e) {
-					}
-				}
-			};
-			thread.start();
-		} else {
-			initExtractAll(fileHeaders, unzipParameters, progressMonitor, outPath);
-		}
+    }
 
-	}
+    private void initExtractAll(List<CentralDirectory.FileHeader> fileHeaders, UnzipParameters unzipParameters,
+            String outPath) throws ZipException {
 
-	private void initExtractAll(List<CentralDirectory.FileHeader> fileHeaders, UnzipParameters unzipParameters,
-			ProgressMonitor progressMonitor, String outPath) throws ZipException {
+        for (int i = 0; i < fileHeaders.size(); i++) {
+            CentralDirectory.FileHeader fileHeader = fileHeaders.get(i);
+            initExtractFile(fileHeader, outPath, unzipParameters, null);
+        }
+    }
 
-		for (int i = 0; i < fileHeaders.size(); i++) {
-			CentralDirectory.FileHeader fileHeader = fileHeaders.get(i);
-			initExtractFile(fileHeader, outPath, unzipParameters, null, progressMonitor);
-			if (progressMonitor.isCancelAllTasks()) {
-				progressMonitor.setResult(ProgressMonitor.RESULT_CANCELLED);
-				progressMonitor.setState(ProgressMonitor.STATE_READY);
-				return;
-			}
-		}
-	}
+    public void extractFile(final CentralDirectory.FileHeader fileHeader, final String outPath,
+            final UnzipParameters unzipParameters, final String newFileName,
+            boolean runInThread) throws ZipException {
+        if (fileHeader == null) {
+            throw new ZipException("fileHeader is null");
+        }
 
-	public void extractFile(final CentralDirectory.FileHeader fileHeader, final String outPath,
-			final UnzipParameters unzipParameters, final String newFileName,
-			final ProgressMonitor progressMonitor, boolean runInThread) throws ZipException {
-		if (fileHeader == null) {
-			throw new ZipException("fileHeader is null");
-		}
+        if (runInThread) {
+            Thread thread = new Thread(InternalZipConstants.THREAD_NAME) {
+                public void run() {
+                    try {
+                        initExtractFile(fileHeader, outPath, unzipParameters, newFileName);
+                    } catch(ZipException e) {
+                    }
+                }
+            };
+            thread.start();
+        } else {
+            initExtractFile(fileHeader, outPath, unzipParameters, newFileName);
+        }
 
-		progressMonitor.setCurrentOperation(ProgressMonitor.OPERATION_EXTRACT);
-		progressMonitor.setTotalWork(fileHeader.getCompressedSize());
-		progressMonitor.setState(ProgressMonitor.STATE_BUSY);
-		progressMonitor.setPercentDone(0);
-		progressMonitor.setFileName(fileHeader.getFileName());
+    }
 
-		if (runInThread) {
-			Thread thread = new Thread(InternalZipConstants.THREAD_NAME) {
-				public void run() {
-					try {
-						initExtractFile(fileHeader, outPath, unzipParameters, newFileName, progressMonitor);
-						progressMonitor.endProgressMonitorSuccess();
-					} catch (ZipException e) {
-					}
-				}
-			};
-			thread.start();
-		} else {
-			initExtractFile(fileHeader, outPath, unzipParameters, newFileName, progressMonitor);
-			progressMonitor.endProgressMonitorSuccess();
-		}
+    private void initExtractFile(CentralDirectory.FileHeader fileHeader, String outPath,
+            UnzipParameters unzipParameters, String newFileName) throws ZipException {
 
-	}
+        if (fileHeader == null) {
+            throw new ZipException("fileHeader is null");
+        }
 
-	private void initExtractFile(CentralDirectory.FileHeader fileHeader, String outPath,
-			UnzipParameters unzipParameters, String newFileName, ProgressMonitor progressMonitor) throws ZipException {
+        try {
+            if (!outPath.endsWith(InternalZipConstants.FILE_SEPARATOR)) {
+                outPath += InternalZipConstants.FILE_SEPARATOR;
+            }
 
-		if (fileHeader == null) {
-			throw new ZipException("fileHeader is null");
-		}
+            // If file header is a directory, then check if the directory exists
+            // If not then create a directory and return
+            if (fileHeader.isDirectory()) {
+                try {
+                    String fileName = fileHeader.getFileName();
+                    if (!Zip4jUtil.isStringNotNullAndNotEmpty(fileName)) {
+                        return;
+                    }
+                    String completePath = outPath + fileName;
+                    File file = new File(completePath);
+                    if (!file.exists()) {
+                        file.mkdirs();
+                    }
+                } catch(Exception e) {
+                    throw new ZipException(e);
+                }
+            } else {
+                //Create Directories
+                checkOutputDirectoryStructure(fileHeader, outPath, newFileName);
 
-		try {
-			progressMonitor.setFileName(fileHeader.getFileName());
+                UnzipEngine unzipEngine = new UnzipEngine(zipModel, fileHeader);
+                try {
+                    unzipEngine.unzipFile(outPath, newFileName, unzipParameters);
+                } catch(Exception e) {
+                    throw new ZipException(e);
+                }
+            }
+        } catch(ZipException e) {
+            throw e;
+        } catch(Exception e) {
+            throw new ZipException(e);
+        }
+    }
 
-			if (!outPath.endsWith(InternalZipConstants.FILE_SEPARATOR)) {
-				outPath += InternalZipConstants.FILE_SEPARATOR;
-			}
+    public ZipInputStream getInputStream(CentralDirectory.FileHeader fileHeader) throws ZipException {
+        UnzipEngine unzipEngine = new UnzipEngine(zipModel, fileHeader);
+        return unzipEngine.getInputStream();
+    }
 
-			// If file header is a directory, then check if the directory exists
-			// If not then create a directory and return
-			if (fileHeader.isDirectory()) {
-				try {
-					String fileName = fileHeader.getFileName();
-					if (!Zip4jUtil.isStringNotNullAndNotEmpty(fileName)) {
-						return;
-					}
-					String completePath = outPath + fileName;
-					File file = new File(completePath);
-					if (!file.exists()) {
-						file.mkdirs();
-					}
-				} catch (Exception e) {
-					progressMonitor.endProgressMonitorError(e);
-					throw new ZipException(e);
-				}
-			} else {
-				//Create Directories
-				checkOutputDirectoryStructure(fileHeader, outPath, newFileName);
+    private void checkOutputDirectoryStructure(CentralDirectory.FileHeader fileHeader, String outPath, String newFileName) throws ZipException {
+        if (fileHeader == null || !Zip4jUtil.isStringNotNullAndNotEmpty(outPath)) {
+            throw new ZipException("Cannot check output directory structure...one of the parameters was null");
+        }
 
-				UnzipEngine unzipEngine = new UnzipEngine(zipModel, fileHeader);
-				try {
-					unzipEngine.unzipFile(progressMonitor, outPath, newFileName, unzipParameters);
-				} catch (Exception e) {
-					progressMonitor.endProgressMonitorError(e);
-					throw new ZipException(e);
-				}
-			}
-		} catch (ZipException e) {
-			progressMonitor.endProgressMonitorError(e);
-			throw e;
-		} catch (Exception e) {
-			progressMonitor.endProgressMonitorError(e);
-			throw new ZipException(e);
-		}
-	}
+        String fileName = fileHeader.getFileName();
 
-	public ZipInputStream getInputStream(CentralDirectory.FileHeader fileHeader) throws ZipException {
-		UnzipEngine unzipEngine = new UnzipEngine(zipModel, fileHeader);
-		return unzipEngine.getInputStream();
-	}
+        if (Zip4jUtil.isStringNotNullAndNotEmpty(newFileName)) {
+            fileName = newFileName;
+        }
 
-	private void checkOutputDirectoryStructure(CentralDirectory.FileHeader fileHeader, String outPath, String newFileName) throws ZipException {
-		if (fileHeader == null || !Zip4jUtil.isStringNotNullAndNotEmpty(outPath)) {
-			throw new ZipException("Cannot check output directory structure...one of the parameters was null");
-		}
+        if (!Zip4jUtil.isStringNotNullAndNotEmpty(fileName)) {
+            // Do nothing
+            return;
+        }
 
-		String fileName = fileHeader.getFileName();
+        String compOutPath = outPath + fileName;
+        try {
+            File file = new File(compOutPath);
+            String parentDir = file.getParent();
+            File parentDirFile = new File(parentDir);
+            if (!parentDirFile.exists()) {
+                parentDirFile.mkdirs();
+            }
+        } catch(Exception e) {
+            throw new ZipException(e);
+        }
+    }
 
-		if (Zip4jUtil.isStringNotNullAndNotEmpty(newFileName)) {
-			fileName = newFileName;
-		}
+    private long calculateTotalWork(List<CentralDirectory.FileHeader> fileHeaders) throws ZipException {
 
-		if (!Zip4jUtil.isStringNotNullAndNotEmpty(fileName)) {
-			// Do nothing
-			return;
-		}
+        if (fileHeaders == null) {
+            throw new ZipException("fileHeaders is null, cannot calculate total work");
+        }
 
-		String compOutPath = outPath + fileName;
-		try {
-			File file = new File(compOutPath);
-			String parentDir = file.getParent();
-			File parentDirFile = new File(parentDir);
-			if (!parentDirFile.exists()) {
-				parentDirFile.mkdirs();
-			}
-		} catch (Exception e) {
-			throw new ZipException(e);
-		}
-	}
+        long totalWork = 0;
 
-	private long calculateTotalWork(List<CentralDirectory.FileHeader> fileHeaders) throws ZipException {
+        for (int i = 0; i < fileHeaders.size(); i++) {
+            CentralDirectory.FileHeader fileHeader = fileHeaders.get(i);
+            if (fileHeader.getZip64ExtendedInfo() != null &&
+                    fileHeader.getZip64ExtendedInfo().getUnCompressedSize() > 0) {
+                totalWork += fileHeader.getZip64ExtendedInfo().getCompressedSize();
+            } else {
+                totalWork += fileHeader.getCompressedSize();
+            }
 
-		if (fileHeaders == null) {
-			throw new ZipException("fileHeaders is null, cannot calculate total work");
-		}
+        }
 
-		long totalWork = 0;
-
-		for (int i = 0; i < fileHeaders.size(); i++) {
-			CentralDirectory.FileHeader fileHeader = fileHeaders.get(i);
-			if (fileHeader.getZip64ExtendedInfo() != null &&
-					fileHeader.getZip64ExtendedInfo().getUnCompressedSize() > 0) {
-				totalWork += fileHeader.getZip64ExtendedInfo().getCompressedSize();
-			} else {
-				totalWork += fileHeader.getCompressedSize();
-			}
-
-		}
-
-		return totalWork;
-	}
+        return totalWork;
+    }
 
 }

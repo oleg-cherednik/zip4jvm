@@ -27,7 +27,6 @@ import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.UnzipParameters;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.progress.ProgressMonitor;
 import net.lingala.zip4j.unzip.Unzip;
 import net.lingala.zip4j.util.ArchiveMaintainer;
 import net.lingala.zip4j.util.Zip4jUtil;
@@ -67,7 +66,6 @@ public class ZipFile {
 
     private ZipModel zipModel;
     private boolean isEncrypted;
-    private final ProgressMonitor progressMonitor = new ProgressMonitor();
     private boolean runInThread;
     @NonNull
     private Charset charset = Charset.defaultCharset();
@@ -236,17 +234,10 @@ public class ZipFile {
         Objects.requireNonNull(files);
         Objects.requireNonNull(parameters);
 
-        checkProgressMonitorAvailable();
-
         readOrCreateModel();
         checkSplitArchiveModification();
 
-        new ZipEngine(zipModel, progressMonitor).addFiles(files, parameters, runInThread);
-    }
-
-    private void checkProgressMonitorAvailable() throws ZipException {
-        if (progressMonitor.getState() == ProgressMonitor.STATE_BUSY)
-            throw new ZipException("invalid operation - Zip4j is in busy state");
+        new ZipEngine(zipModel).addFiles(files, parameters, runInThread);
     }
 
     private void checkSplitArchiveModification() throws ZipException {
@@ -317,7 +308,7 @@ public class ZipFile {
             }
         }
 
-        new ZipEngine(zipModel, progressMonitor).addFolderToZip(path, parameters, runInThread);
+        new ZipEngine(zipModel).addFolderToZip(path, parameters, runInThread);
 
     }
 
@@ -353,7 +344,7 @@ public class ZipFile {
         if (Files.exists(path) && zipModel.isSplitArchive())
             throw new ZipException("Zip path already exists. Zip path format does not allow updating split/spanned files");
 
-        new ZipEngine(zipModel, progressMonitor).addStreamToZip(inputStream, parameters);
+        new ZipEngine(zipModel).addStreamToZip(inputStream, parameters);
     }
 
     /**
@@ -408,12 +399,8 @@ public class ZipFile {
             throw new ZipException("Internal error occurred when extracting zip path");
         }
 
-        if (progressMonitor.getState() == ProgressMonitor.STATE_BUSY) {
-            throw new ZipException("invalid operation - Zip4j is in busy state");
-        }
-
         Unzip unzip = new Unzip(zipModel);
-        unzip.extractAll(unzipParameters, destPath, progressMonitor, runInThread);
+        unzip.extractAll(unzipParameters, destPath, runInThread);
 
     }
 
@@ -469,12 +456,7 @@ public class ZipFile {
         }
 
         zipModel = readZipModel();
-
-        if (progressMonitor.getState() == ProgressMonitor.STATE_BUSY) {
-            throw new ZipException("invalid operation - Zip4j is in busy state");
-        }
-
-        fileHeader.extractFile(zipModel, destPath, unzipParameters, newFileName, progressMonitor, runInThread);
+        fileHeader.extractFile(zipModel, destPath, unzipParameters, newFileName, runInThread);
 
     }
 
@@ -561,11 +543,7 @@ public class ZipFile {
             throw new ZipException("path header not found for given path name, cannot extract path");
         }
 
-        if (progressMonitor.getState() == ProgressMonitor.STATE_BUSY) {
-            throw new ZipException("invalid operation - Zip4j is in busy state");
-        }
-
-        fileHeader.extractFile(zipModel, destPath, unzipParameters, newFileName, progressMonitor, runInThread);
+        fileHeader.extractFile(zipModel, destPath, unzipParameters, newFileName, runInThread);
 
     }
 
@@ -726,7 +704,7 @@ public class ZipFile {
         readOrCreateModel();
         checkSplitArchiveModification();
 
-        new ZipEngine(zipModel, progressMonitor).removeFile(fileHeader, runInThread);
+        new ZipEngine(zipModel).removeFile(fileHeader, runInThread);
     }
 
     /**
@@ -752,8 +730,7 @@ public class ZipFile {
         }
 
         ArchiveMaintainer archiveMaintainer = new ArchiveMaintainer();
-        archiveMaintainer.initProgressMonitorForMergeOp(zipModel, progressMonitor);
-        archiveMaintainer.mergeSplitZipFiles(zipModel, outputZipFile, progressMonitor, runInThread);
+        archiveMaintainer.mergeSplitZipFiles(zipModel, outputZipFile, runInThread);
     }
 
     /**
@@ -888,10 +865,6 @@ public class ZipFile {
     public List<File> getSplitZipFiles() throws ZipException {
         readOrCreateModel();
         return Zip4jUtil.getSplitZipFiles(zipModel);
-    }
-
-    public ProgressMonitor getProgressMonitor() {
-        return progressMonitor;
     }
 
     public boolean isRunInThread() {

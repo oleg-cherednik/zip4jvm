@@ -19,7 +19,6 @@ package net.lingala.zip4j.util;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.progress.ProgressMonitor;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -38,8 +37,6 @@ public final class ChecksumCalculator {
 
     @NonNull
     private final Path file;
-    @NonNull
-    private final ProgressMonitor progressMonitor;
 
     public long calculate() throws ZipException {
         try (InputStream inputStream = new FileInputStream(file.toFile())) {
@@ -49,19 +46,6 @@ public final class ChecksumCalculator {
 
             while ((readLen = inputStream.read(buf)) != -1) {
                 crc32.update(buf, 0, readLen);
-
-                if (progressMonitor == null)
-                    continue;
-
-                progressMonitor.updateWorkCompleted(readLen);
-
-                if (!progressMonitor.isCancelAllTasks())
-                    continue;
-
-                progressMonitor.setResult(ProgressMonitor.RESULT_CANCELLED);
-                progressMonitor.setState(ProgressMonitor.STATE_READY);
-
-                return 0;
             }
 
             return crc32.getValue();

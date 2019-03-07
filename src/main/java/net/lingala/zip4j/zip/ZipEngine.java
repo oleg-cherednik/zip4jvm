@@ -24,7 +24,6 @@ import net.lingala.zip4j.io.ZipOutputStream;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.progress.ProgressMonitor;
 import net.lingala.zip4j.util.ArchiveMaintainer;
 import net.lingala.zip4j.util.ChecksumCalculator;
 import net.lingala.zip4j.util.InternalZipConstants;
@@ -49,21 +48,12 @@ public class ZipEngine {
 
     @NonNull
     private final ZipModel zipModel;
-    @NonNull
-    private final ProgressMonitor progressMonitor;
 
     public void addFiles(@NonNull Collection<Path> files, @NonNull ZipParameters parameters, boolean runInThread) throws ZipException, IOException {
         if (files.isEmpty())
             return;
 
-        progressMonitor.setCurrentOperation(ProgressMonitor.OPERATION_ADD);
-        progressMonitor.setState(ProgressMonitor.STATE_BUSY);
-        progressMonitor.setResult(ProgressMonitor.RESULT_WORKING);
-
         if (runInThread) {
-            progressMonitor.setTotalWork(calculateTotalWork(files, parameters));
-            progressMonitor.setFileName(files.iterator().next().toAbsolutePath().toString());
-
             Thread thread = new Thread(InternalZipConstants.THREAD_NAME) {
                 @Override
                 public void run() {
@@ -110,28 +100,11 @@ public class ZipEngine {
                 if ("/".equals(fileName) || "\\".equals(fileName))
                     continue;
 
-                if (progressMonitor.isCancelAllTasks()) {
-                    progressMonitor.setResult(ProgressMonitor.RESULT_CANCELLED);
-                    progressMonitor.setState(ProgressMonitor.STATE_READY);
-                    return;
-                }
-
                 ZipParameters fileParameters = (ZipParameters)parameters.clone();
 
-                progressMonitor.setFileName(file.toAbsolutePath().toString());
-
                 if (Files.isRegularFile(file)) {
-                    if (fileParameters.isEncryptFiles() && fileParameters.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_STANDARD) {
-                        progressMonitor.setCurrentOperation(ProgressMonitor.OPERATION_CALC_CRC);
-                        fileParameters.setSourceFileCRC(new ChecksumCalculator(file, progressMonitor).calculate());
-                        progressMonitor.setCurrentOperation(ProgressMonitor.OPERATION_ADD);
-
-                        if (progressMonitor.isCancelAllTasks()) {
-                            progressMonitor.setResult(ProgressMonitor.RESULT_CANCELLED);
-                            progressMonitor.setState(ProgressMonitor.STATE_READY);
-                            return;
-                        }
-                    }
+                    if (fileParameters.isEncryptFiles() && fileParameters.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_STANDARD)
+                        fileParameters.setSourceFileCRC(new ChecksumCalculator(file).calculate());
 
                     if (Files.size(file) == 0)
                         fileParameters.setCompressionMethod(Zip4jConstants.COMP_STORE);
@@ -146,31 +119,15 @@ public class ZipEngine {
 
                 try (InputStream inputStream = new FileInputStream(file.toFile())) {
                     IOUtils.copyLarge(inputStream, outputStream);
-
-//                while ((readLen = inputStream.read(buf)) != -1) {
-//                    if (progressMonitor.isCancelAllTasks()) {
-//                        progressMonitor.setResult(ProgressMonitor.RESULT_CANCELLED);
-//                        progressMonitor.setState(ProgressMonitor.STATE_READY);
-//                        return;
-//                    }
-//
-//                    outputStream.write(buf, 0, readLen);
-//                    progressMonitor.updateWorkCompleted(readLen);
-//                }
-
-                    progressMonitor.updateWorkCompleted(readLen);
-
-                    outputStream.closeEntry();
                 }
+
+                outputStream.closeEntry();
             }
 
             outputStream.finish();
-            progressMonitor.endProgressMonitorSuccess();
         } catch(ZipException e) {
-            progressMonitor.endProgressMonitorError(e);
             throw e;
         } catch(Exception e) {
-            progressMonitor.endProgressMonitorError(e);
             throw new ZipException(e);
         } finally {
             if (outputStream != null) {
@@ -312,8 +269,7 @@ public class ZipEngine {
             return;
 
         ArchiveMaintainer archiveMaintainer = new ArchiveMaintainer();
-        archiveMaintainer.initProgressMonitorForRemoveOp(zipModel, fileHeader, progressMonitor);
-        archiveMaintainer.removeZipFile(zipModel, fileHeader, progressMonitor, runInThread);
+        archiveMaintainer.removeZipFile(zipModel, fileHeader, runInThread);
     }
 
 

@@ -29,7 +29,6 @@ import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.UnzipParameters;
 import net.lingala.zip4j.model.ZipModel;
-import net.lingala.zip4j.progress.ProgressMonitor;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.Raw;
 import net.lingala.zip4j.util.Zip4jConstants;
@@ -64,8 +63,7 @@ public class UnzipEngine {
         this.crc = new CRC32();
     }
 
-    public void unzipFile(ProgressMonitor progressMonitor,
-            String outPath, String newFileName, UnzipParameters unzipParameters) throws ZipException {
+    public void unzipFile(String outPath, String newFileName, UnzipParameters unzipParameters) throws ZipException {
         if (zipModel == null || fileHeader == null || !Zip4jUtil.isStringNotNullAndNotEmpty(outPath)) {
             throw new ZipException("Invalid parameters passed during unzipping file. One or more of the parameters were null");
         }
@@ -80,12 +78,6 @@ public class UnzipEngine {
 
             while ((readLength = is.read(buff)) != -1) {
                 os.write(buff, 0, readLength);
-                progressMonitor.updateWorkCompleted(readLength);
-                if (progressMonitor.isCancelAllTasks()) {
-                    progressMonitor.setResult(ProgressMonitor.RESULT_CANCELLED);
-                    progressMonitor.setState(ProgressMonitor.STATE_READY);
-                    return;
-                }
             }
 
             closeStreams(is, os);
