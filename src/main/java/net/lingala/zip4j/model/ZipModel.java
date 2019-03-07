@@ -24,6 +24,7 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +50,7 @@ public class ZipModel implements Cloneable {
 
     private long splitLength;
 
-    private String zipFile;
+    private Path zipFile;
 
     private boolean isZip64Format;
 
@@ -120,14 +121,6 @@ public class ZipModel implements Cloneable {
 
     public void setSplitArchive(boolean splitArchive) {
         this.splitArchive = splitArchive;
-    }
-
-    public String getZipFile() {
-        return zipFile;
-    }
-
-    public void setZipFile(String zipFile) {
-        this.zipFile = zipFile;
     }
 
     public Zip64EndCentralDirectory getZip64EndCentralDirectory() {

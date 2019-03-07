@@ -73,12 +73,12 @@ public class ApplicationTest {
         ZipFileNew zipFile = new ZipFileNew(destDir.resolve("src.zip"));
 
         List<Path> files = Arrays.asList(
-                srcDir.resolve("mcdonnell-douglas-f-15-eagle-wallpapers-29085-4658857.jpg"),
-                srcDir.resolve("saint-petersburg-wallpapers-28859-4730952.jpg"),
-                srcDir.resolve("sig-sauer-pistol-wallpapers-29113-822891.jpg"),
-                srcDir.resolve("Car/bentley-continental-wallpapers-31868-6183821.jpg"),
-                srcDir.resolve("Car/ferrari-458-italia-wallpapers-32092-3145146.jpg"),
-                srcDir.resolve("Car/wiesmann-gt-mf5-wallpapers-32660-5522756.jpg"));
+                srcDir.resolve("mcdonnell-douglas-f15-eagle.jpg"),
+                srcDir.resolve("saint-petersburg.jpg"),
+                srcDir.resolve("sig-sauer-pistol.jpg"),
+                srcDir.resolve("cars/bentley-continental.jpg"),
+                srcDir.resolve("cars/ferrari-458-italia.jpg"),
+                srcDir.resolve("cars/wiesmann-gt-mf5.jpg"));
 
         Context context = Context.builder()
                                  .compression(Compression.STORE)

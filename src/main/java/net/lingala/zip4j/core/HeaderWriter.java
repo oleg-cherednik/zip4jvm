@@ -28,12 +28,13 @@ import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.LittleEndianBuffer;
 import net.lingala.zip4j.util.Raw;
-import net.lingala.zip4j.util.Zip4jUtil;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.List;
 
 public class HeaderWriter {
@@ -734,9 +735,9 @@ public class HeaderWriter {
             SplitOutputStream currOutputStream = null;
 
             if (noOfDisk != outputStream.getCurrSplitFileCounter()) {
-                File zipFile = new File(zipModel.getZipFile());
-                String parentFile = zipFile.getParent();
-                String fileNameWithoutExt = Zip4jUtil.getZipFileNameWithoutExt(zipFile.getName());
+                Path zipFile = zipModel.getZipFile();
+                Path parentFile = zipFile.getParent();
+                String fileNameWithoutExt = FilenameUtils.getBaseName(zipFile.getFileName().toString());
                 String fileName = parentFile + System.getProperty("file.separator");
                 if (noOfDisk < 9) {
                     fileName += fileNameWithoutExt + ".z0" + (noOfDisk + 1);

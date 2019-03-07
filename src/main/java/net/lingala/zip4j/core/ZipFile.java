@@ -830,7 +830,7 @@ public class ZipFile {
      */
     private ZipModel createZipModel() {
         ZipModel zipModel = new ZipModel();
-        zipModel.setZipFile(path.toString());
+        zipModel.setZipFile(path);
         zipModel.setCharset(charset);
         return zipModel;
     }

@@ -502,7 +502,7 @@ public class Zip4jUtil {
         }
 
         List<File> retList = new ArrayList<>();
-        String currZipFile = zipModel.getZipFile();
+        String currZipFile = zipModel.getZipFile().toString();
         String zipFileName = new File(currZipFile).getName();
         String partFile = null;
 
@@ -511,19 +511,19 @@ public class Zip4jUtil {
         }
 
         if (!zipModel.isSplitArchive()) {
-            retList.add(new File(currZipFile));
+            retList.add(zipModel.getZipFile().toFile());
             return retList;
         }
 
         int numberOfThisDisk = zipModel.getEndCentralDirectory().getNoOfDisk();
 
         if (numberOfThisDisk == 0) {
-            retList.add(new File(currZipFile));
+            retList.add(zipModel.getZipFile().toFile());
             return retList;
         } else {
             for (int i = 0; i <= numberOfThisDisk; i++) {
                 if (i == numberOfThisDisk) {
-                    retList.add(new File(zipModel.getZipFile()));
+                    retList.add(zipModel.getZipFile().toFile());
                 } else {
                     String fileExt = ".z0";
                     if (i > 9) {

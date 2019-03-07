@@ -33,7 +33,6 @@ import net.lingala.zip4j.util.Zip4jUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
@@ -88,12 +87,10 @@ public class ZipEngine {
         InputStream inputStream = null;
         try {
             checkParameters(parameters);
-
             removeFilesIfExists(files, parameters);
 
-            boolean isZipFileAlreadExists = Zip4jUtil.checkFileExists(zipModel.getZipFile());
-
-            SplitOutputStream splitOutputStream = new SplitOutputStream(new File(zipModel.getZipFile()), zipModel.getSplitLength());
+            boolean isZipFileAlreadExists = Files.exists(zipModel.getZipFile());
+            SplitOutputStream splitOutputStream = new SplitOutputStream(zipModel.getZipFile().toFile(), zipModel.getSplitLength());
             outputStream = new ZipOutputStream(splitOutputStream, this.zipModel);
 
             if (isZipFileAlreadExists) {
@@ -200,9 +197,9 @@ public class ZipEngine {
         try {
             checkParameters(parameters);
 
-            boolean isZipFileAlreadExists = Zip4jUtil.checkFileExists(zipModel.getZipFile());
+            boolean isZipFileAlreadExists = Files.exists(zipModel.getZipFile());
 
-            SplitOutputStream splitOutputStream = new SplitOutputStream(new File(zipModel.getZipFile()), zipModel.getSplitLength());
+            SplitOutputStream splitOutputStream = new SplitOutputStream(zipModel.getZipFile().toFile(), zipModel.getSplitLength());
             outputStream = new ZipOutputStream(splitOutputStream, this.zipModel);
 
             if (isZipFileAlreadExists) {
@@ -343,18 +340,10 @@ public class ZipEngine {
     }
 
     private RandomAccessFile prepareFileOutputStream() throws ZipException {
-        String outPath = zipModel.getZipFile();
-        if (!Zip4jUtil.isStringNotNullAndNotEmpty(outPath)) {
-            throw new ZipException("invalid output path");
-        }
-
         try {
-            File outFile = new File(outPath);
-            if (!outFile.getParentFile().exists()) {
-                outFile.getParentFile().mkdirs();
-            }
-            return new RandomAccessFile(outFile, InternalZipConstants.WRITE_MODE);
-        } catch(FileNotFoundException e) {
+            Files.createDirectories(zipModel.getZipFile().getParent());
+            return new RandomAccessFile(zipModel.getZipFile().toFile(), InternalZipConstants.WRITE_MODE);
+        } catch(Exception e) {
             throw new ZipException(e);
         }
     }
@@ -376,7 +365,7 @@ public class ZipEngine {
                         file.toAbsolutePath().toString(), parameters.getRootFolderInZip(), parameters.getDefaultFolderPath());
                 CentralDirectory.FileHeader fileHeader = zipModel.getFileHeader(relativeFileName);
                 if (fileHeader != null) {
-                    totalWork += Zip4jUtil.getFileLengh(new File(zipModel.getZipFile())) - fileHeader.getCompressedSize();
+                    totalWork += Files.size(zipModel.getZipFile()) - fileHeader.getCompressedSize();
                 }
             }
         }
