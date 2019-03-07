@@ -70,9 +70,8 @@ public class CipherOutputStream extends OutputStream {
     }
 
     public void putNextEntry(File file, ZipParameters zipParameters) throws ZipException {
-        if (!zipParameters.isSourceExternalStream() && file == null) {
+        if (!zipParameters.isSourceExternalStream() && file == null)
             throw new ZipException("input file is null");
-        }
 
         if (!zipParameters.isSourceExternalStream() && !Zip4jUtil.checkFileExists(file)) {
             throw new ZipException("input file does not exist");

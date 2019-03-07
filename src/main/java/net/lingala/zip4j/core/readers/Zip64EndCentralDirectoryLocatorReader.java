@@ -34,7 +34,12 @@ final class Zip64EndCentralDirectoryLocatorReader {
         if (offsEndCentralDirectory < 0)
             throw new IOException("EndCentralDirectory offs is unknown");
 
-        in.seek(offsEndCentralDirectory - Zip64EndCentralDirectoryLocator.SIZE);
+        long offs = offsEndCentralDirectory - Zip64EndCentralDirectoryLocator.SIZE;
+
+        if (offs < 0)
+            return false;
+
+        in.seek(offs);
         return in.readInt() == InternalZipConstants.ZIP64_ENDSIG_LOC;
     }
 }

@@ -26,10 +26,11 @@ import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.progress.ProgressMonitor;
 import net.lingala.zip4j.util.ArchiveMaintainer;
-import net.lingala.zip4j.util.CRCUtil;
+import net.lingala.zip4j.util.ChecksumCalculator;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.Zip4jConstants;
 import net.lingala.zip4j.util.Zip4jUtil;
+import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -84,14 +85,14 @@ public class ZipEngine {
 
 
         ZipOutputStream outputStream = null;
-        InputStream inputStream = null;
+
         try {
             checkParameters(parameters);
             removeFilesIfExists(files, parameters);
 
             boolean isZipFileAlreadExists = Files.exists(zipModel.getZipFile());
             SplitOutputStream splitOutputStream = new SplitOutputStream(zipModel.getZipFile().toFile(), zipModel.getSplitLength());
-            outputStream = new ZipOutputStream(splitOutputStream, this.zipModel);
+            outputStream = new ZipOutputStream(splitOutputStream, zipModel);
 
             if (isZipFileAlreadExists) {
                 if (zipModel.getEndCentralDirectory() == null) {
@@ -99,12 +100,12 @@ public class ZipEngine {
                 }
                 splitOutputStream.seek(zipModel.getEndCentralDirectory().getOffOfStartOfCentralDir());
             }
-            byte[] readBuff = new byte[InternalZipConstants.BUFF_SIZE];
+
+            byte[] buf = new byte[InternalZipConstants.BUFF_SIZE];
             int readLen = -1;
 
             for (Path file : files) {
-                String fileName = Zip4jUtil.getRelativeFileName(file.toAbsolutePath().toString(),
-                        parameters.getRootFolderInZip(), parameters.getDefaultFolderPath());
+                String fileName = Zip4jUtil.getRelativeFileName(file, parameters);
 
                 if ("/".equals(fileName) || "\\".equals(fileName))
                     continue;
@@ -122,7 +123,7 @@ public class ZipEngine {
                 if (Files.isRegularFile(file)) {
                     if (fileParameters.isEncryptFiles() && fileParameters.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_STANDARD) {
                         progressMonitor.setCurrentOperation(ProgressMonitor.OPERATION_CALC_CRC);
-                        fileParameters.setSourceFileCRC((int)CRCUtil.computeFileCRC(file.toAbsolutePath().toString(), progressMonitor));
+                        fileParameters.setSourceFileCRC(new ChecksumCalculator(file, progressMonitor).calculate());
                         progressMonitor.setCurrentOperation(ProgressMonitor.OPERATION_ADD);
 
                         if (progressMonitor.isCancelAllTasks()) {
@@ -137,28 +138,29 @@ public class ZipEngine {
                 }
 
                 outputStream.putNextEntry(file.toFile(), fileParameters);
+
                 if (Files.isDirectory(file)) {
                     outputStream.closeEntry();
                     continue;
                 }
 
-                inputStream = new FileInputStream(file.toFile());
+                try (InputStream inputStream = new FileInputStream(file.toFile())) {
+                    IOUtils.copyLarge(inputStream, outputStream);
 
-                while ((readLen = inputStream.read(readBuff)) != -1) {
-                    if (progressMonitor.isCancelAllTasks()) {
-                        progressMonitor.setResult(ProgressMonitor.RESULT_CANCELLED);
-                        progressMonitor.setState(ProgressMonitor.STATE_READY);
-                        return;
-                    }
+//                while ((readLen = inputStream.read(buf)) != -1) {
+//                    if (progressMonitor.isCancelAllTasks()) {
+//                        progressMonitor.setResult(ProgressMonitor.RESULT_CANCELLED);
+//                        progressMonitor.setState(ProgressMonitor.STATE_READY);
+//                        return;
+//                    }
+//
+//                    outputStream.write(buf, 0, readLen);
+//                    progressMonitor.updateWorkCompleted(readLen);
+//                }
 
-                    outputStream.write(readBuff, 0, readLen);
                     progressMonitor.updateWorkCompleted(readLen);
-                }
 
-                outputStream.closeEntry();
-
-                if (inputStream != null) {
-                    inputStream.close();
+                    outputStream.closeEntry();
                 }
             }
 
@@ -171,13 +173,6 @@ public class ZipEngine {
             progressMonitor.endProgressMonitorError(e);
             throw new ZipException(e);
         } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch(IOException e) {
-                }
-            }
-
             if (outputStream != null) {
                 try {
                     outputStream.close();
