@@ -35,7 +35,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -59,7 +58,8 @@ public class ZipEngine {
                 public void run() {
                     try {
                         initAddFiles(files, parameters);
-                    } catch(ZipException e) {
+                    } catch(Exception e) {
+                        e.printStackTrace();
                     }
                 }
             };
@@ -70,19 +70,15 @@ public class ZipEngine {
         }
     }
 
-    private void initAddFiles(@NonNull Collection<Path> files, @NonNull ZipParameters parameters) throws ZipException {
+    private void initAddFiles(@NonNull Collection<Path> files, @NonNull ZipParameters parameters) throws ZipException, IOException {
         zipModel.createEndCentralDirectoryIfNotExist();
+        checkParameters(parameters);
+        removeFilesIfExists(files, parameters);
 
+        boolean isZipFileAlreadExists = Files.exists(zipModel.getZipFile());
 
-        ZipOutputStream outputStream = null;
-
-        try {
-            checkParameters(parameters);
-            removeFilesIfExists(files, parameters);
-
-            boolean isZipFileAlreadExists = Files.exists(zipModel.getZipFile());
-            SplitOutputStream splitOutputStream = new SplitOutputStream(zipModel.getZipFile().toFile(), zipModel.getSplitLength());
-            outputStream = new ZipOutputStream(splitOutputStream, zipModel);
+        try (SplitOutputStream splitOutputStream = new SplitOutputStream(zipModel.getZipFile().toFile(), zipModel.getSplitLength());
+             ZipOutputStream out = new ZipOutputStream(splitOutputStream, zipModel)) {
 
             if (isZipFileAlreadExists) {
                 if (zipModel.getEndCentralDirectory() == null) {
@@ -90,9 +86,6 @@ public class ZipEngine {
                 }
                 splitOutputStream.seek(zipModel.getEndCentralDirectory().getOffOfStartOfCentralDir());
             }
-
-            byte[] buf = new byte[InternalZipConstants.BUFF_SIZE];
-            int readLen = -1;
 
             for (Path file : files) {
                 String fileName = Zip4jUtil.getRelativeFileName(file, parameters);
@@ -110,32 +103,20 @@ public class ZipEngine {
                         fileParameters.setCompressionMethod(Zip4jConstants.COMP_STORE);
                 }
 
-                outputStream.putNextEntry(file.toFile(), fileParameters);
+                out.putNextEntry(file.toFile(), fileParameters);
 
-                if (Files.isDirectory(file)) {
-                    outputStream.closeEntry();
-                    continue;
+                if (Files.isRegularFile(file)) {
+                    try (InputStream in = new FileInputStream(file.toFile())) {
+                        IOUtils.copyLarge(in, out);
+                    }
                 }
 
-                try (InputStream inputStream = new FileInputStream(file.toFile())) {
-                    IOUtils.copyLarge(inputStream, outputStream);
-                }
-
-                outputStream.closeEntry();
+                out.closeEntry();
             }
 
-            outputStream.finish();
-        } catch(ZipException e) {
-            throw e;
-        } catch(Exception e) {
+            out.finish();
+        } catch(CloneNotSupportedException e) {
             throw new ZipException(e);
-        } finally {
-            if (outputStream != null) {
-                try {
-                    outputStream.close();
-                } catch(IOException e) {
-                }
-            }
         }
     }
 
@@ -290,37 +271,4 @@ public class ZipEngine {
             removeFile(zipModel.getFileHeader(Zip4jUtil.getRelativeFileName(file, parameters)), false);
     }
 
-    private RandomAccessFile prepareFileOutputStream() throws ZipException {
-        try {
-            Files.createDirectories(zipModel.getZipFile().getParent());
-            return new RandomAccessFile(zipModel.getZipFile().toFile(), InternalZipConstants.WRITE_MODE);
-        } catch(Exception e) {
-            throw new ZipException(e);
-        }
-    }
-
-    private long calculateTotalWork(@NonNull Collection<Path> files, ZipParameters parameters) throws ZipException, IOException {
-        long totalWork = 0;
-
-        for (Path file : files) {
-            if (!Files.exists(file))
-                continue;
-
-            if (parameters.isEncryptFiles() && parameters.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_STANDARD)
-                totalWork += Files.size(file) * 2;
-            else
-                totalWork += Files.size(file);
-
-            if (zipModel.getCentralDirectory() != null && !zipModel.getCentralDirectory().getFileHeaders().isEmpty()) {
-                String relativeFileName = Zip4jUtil.getRelativeFileName(
-                        file.toAbsolutePath().toString(), parameters.getRootFolderInZip(), parameters.getDefaultFolderPath());
-                CentralDirectory.FileHeader fileHeader = zipModel.getFileHeader(relativeFileName);
-                if (fileHeader != null) {
-                    totalWork += Files.size(zipModel.getZipFile()) - fileHeader.getCompressedSize();
-                }
-            }
-        }
-
-        return totalWork;
-    }
 }
