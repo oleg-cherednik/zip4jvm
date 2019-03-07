@@ -49,6 +49,7 @@ public final class ZipModelReader {
         Zip64EndCentralDirectoryLocator locator = new Zip64EndCentralDirectoryLocatorReader(in, endCentralDirectoryReader.getOffs()).read();
 
         ZipModel zipModel = new ZipModel();
+        zipModel.setZipFile(zipFile.toString());
         zipModel.setCharset(charset);
         zipModel.setEndCentralDirectory(dir);
 

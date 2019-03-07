@@ -20,6 +20,7 @@ import lombok.NonNull;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
+import net.lingala.zip4j.model.ZipParameters;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.mozilla.universalchardet.UniversalDetector;
@@ -301,67 +302,6 @@ public class Zip4jUtil {
         return cal.getTime().getTime();
     }
 
-    public static CentralDirectory.FileHeader getFileHeader(ZipModel zipModel, String fileName) throws ZipException {
-        if (zipModel == null) {
-            throw new ZipException("zip model is null, cannot determine file header for fileName: " + fileName);
-        }
-
-        if (!isStringNotNullAndNotEmpty(fileName)) {
-            throw new ZipException("file name is null, cannot determine file header for fileName: " + fileName);
-        }
-
-        CentralDirectory.FileHeader fileHeader = null;
-        fileHeader = getFileHeaderWithExactMatch(zipModel, fileName);
-
-        if (fileHeader == null) {
-            fileName = fileName.replaceAll("\\\\", "/");
-            fileHeader = getFileHeaderWithExactMatch(zipModel, fileName);
-
-            if (fileHeader == null) {
-                fileName = fileName.replaceAll("/", "\\\\");
-                fileHeader = getFileHeaderWithExactMatch(zipModel, fileName);
-            }
-        }
-
-        return fileHeader;
-    }
-
-    public static CentralDirectory.FileHeader getFileHeaderWithExactMatch(ZipModel zipModel, String fileName) throws ZipException {
-        if (zipModel == null) {
-            throw new ZipException("zip model is null, cannot determine file header with exact match for fileName: " + fileName);
-        }
-
-        if (!isStringNotNullAndNotEmpty(fileName)) {
-            throw new ZipException("file name is null, cannot determine file header with exact match for fileName: " + fileName);
-        }
-
-        if (zipModel.getCentralDirectory() == null) {
-            throw new ZipException("central directory is null, cannot determine file header with exact match for fileName: " + fileName);
-        }
-
-        if (zipModel.getCentralDirectory().getFileHeaders() == null) {
-            throw new ZipException("file Headers are null, cannot determine file header with exact match for fileName: " + fileName);
-        }
-
-        if (zipModel.getCentralDirectory().getFileHeaders().size() <= 0) {
-            return null;
-        }
-        List<CentralDirectory.FileHeader> fileHeaders = zipModel.getCentralDirectory().getFileHeaders();
-        for (int i = 0; i < fileHeaders.size(); i++) {
-            CentralDirectory.FileHeader fileHeader = fileHeaders.get(i);
-            String fileNameForHdr = fileHeader.getFileName();
-            if (!isStringNotNullAndNotEmpty(fileNameForHdr)) {
-                continue;
-            }
-
-            if (fileName.equalsIgnoreCase(fileNameForHdr)) {
-                return fileHeader;
-            }
-        }
-
-        return null;
-    }
-
     public static int getIndexOfFileHeader(ZipModel zipModel,
             CentralDirectory.FileHeader fileHeader) throws ZipException {
 
@@ -598,6 +538,10 @@ public class Zip4jUtil {
         return retList;
     }
 
+    public static String getRelativeFileName(Path file, ZipParameters parameters) throws ZipException {
+        return getRelativeFileName(file.toString(), parameters.getRootFolderInZip(), parameters.getDefaultFolderPath());
+    }
+
     public static String getRelativeFileName(String file, String rootFolderInZip, String rootFolderPath) throws ZipException {
         Path entryPath = Paths.get(file).toAbsolutePath();
         Path rootPath = rootFolderPath != null ? Paths.get(rootFolderPath).toAbsolutePath() : entryPath.getParent();
@@ -611,59 +555,6 @@ public class Zip4jUtil {
             path = FilenameUtils.concat(path, rootFolderInZip);
 
         return path;
-
-
-//        if (!Zip4jUtil.isStringNotNullAndNotEmpty(file)) {
-//            throw new ZipException("input file path/name is empty, cannot calculate relative file name");
-//        }
-//
-//        String fileName = null;
-//
-//        if (Zip4jUtil.isStringNotNullAndNotEmpty(rootFolderPath)) {
-//
-//            File rootFolderFile = new File(rootFolderPath);
-//
-//            String rootFolderFileRef = rootFolderFile.getPath();
-//
-//            if (!rootFolderFileRef.endsWith(InternalZipConstants.FILE_SEPARATOR)) {
-//                rootFolderFileRef += InternalZipConstants.FILE_SEPARATOR;
-//            }
-//
-//            String tmpFileName = file.substring(rootFolderFileRef.length());
-//            if (tmpFileName.startsWith(System.getProperty("file.separator"))) {
-//                tmpFileName = tmpFileName.substring(1);
-//            }
-//
-//            File tmpFile = new File(file);
-//
-//            if (tmpFile.isDirectory()) {
-//                tmpFileName = tmpFileName.replaceAll("\\\\", "/");
-//                tmpFileName += InternalZipConstants.ZIP_FILE_SEPARATOR;
-//            } else {
-//                String bkFileName = tmpFileName.substring(0, tmpFileName.lastIndexOf(tmpFile.getName()));
-//                bkFileName = bkFileName.replaceAll("\\\\", "/");
-//                tmpFileName = bkFileName + tmpFile.getName();
-//            }
-//
-//            fileName = tmpFileName;
-//        } else {
-//            File relFile = new File(file);
-//            if (relFile.isDirectory()) {
-//                fileName = relFile.getName() + InternalZipConstants.ZIP_FILE_SEPARATOR;
-//            } else {
-//                fileName = Zip4jUtil.getFileNameFromFilePath(new File(file));
-//            }
-//        }
-//
-//        if (Zip4jUtil.isStringNotNullAndNotEmpty(rootFolderInZip)) {
-//            fileName = rootFolderInZip + fileName;
-//        }
-//
-//        if (!Zip4jUtil.isStringNotNullAndNotEmpty(fileName)) {
-//            throw new ZipException("Error determining file name");
-//        }
-//
-//        return fileName;
     }
 
     public static long[] getAllHeaderSignatures() {

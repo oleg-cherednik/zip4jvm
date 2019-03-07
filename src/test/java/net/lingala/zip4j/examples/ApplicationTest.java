@@ -75,7 +75,10 @@ public class ApplicationTest {
         List<Path> files = Arrays.asList(
                 srcDir.resolve("mcdonnell-douglas-f-15-eagle-wallpapers-29085-4658857.jpg"),
                 srcDir.resolve("saint-petersburg-wallpapers-28859-4730952.jpg"),
-                srcDir.resolve("sig-sauer-pistol-wallpapers-29113-822891.jpg"));
+                srcDir.resolve("sig-sauer-pistol-wallpapers-29113-822891.jpg"),
+                srcDir.resolve("Car/bentley-continental-wallpapers-31868-6183821.jpg"),
+                srcDir.resolve("Car/ferrari-458-italia-wallpapers-32092-3145146.jpg"),
+                srcDir.resolve("Car/wiesmann-gt-mf5-wallpapers-32660-5522756.jpg"));
 
         Context context = Context.builder()
                                  .compression(Compression.STORE)

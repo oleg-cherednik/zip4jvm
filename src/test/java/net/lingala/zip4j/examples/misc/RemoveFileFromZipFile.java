@@ -18,7 +18,6 @@ package net.lingala.zip4j.examples.misc;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.model.CentralDirectory;
 
 import java.nio.file.Paths;
 
@@ -48,7 +47,7 @@ public class RemoveFileFromZipFile {
 
 			// 2. With the FileHeader
 			if (zipFile.getFileHeaders() != null && zipFile.getFileHeaders().size() > 0) {
-				zipFile.removeFile((CentralDirectory.FileHeader)zipFile.getFileHeaders().get(0));
+				zipFile.removeFile(zipFile.getFileHeaders().get(0));
 			} else {
 				System.out.println("This cannot be demonstrated as zip file does not have any files left");
 			}

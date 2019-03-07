@@ -22,7 +22,6 @@ import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.io.ZipOutputStream;
 import net.lingala.zip4j.model.CentralDirectory;
-import net.lingala.zip4j.model.EndCentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.progress.ProgressMonitor;
@@ -43,7 +42,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -51,9 +49,10 @@ public class ZipEngine {
 
     @NonNull
     private final ZipModel zipModel;
+    @NonNull
+    private final ProgressMonitor progressMonitor;
 
-    public void addFiles(@NonNull Collection<Path> files, @NonNull ZipParameters parameters,
-            final ProgressMonitor progressMonitor, boolean runInThread) throws ZipException, IOException {
+    public void addFiles(@NonNull Collection<Path> files, @NonNull ZipParameters parameters, boolean runInThread) throws ZipException, IOException {
         if (files.isEmpty())
             return;
 
@@ -69,7 +68,7 @@ public class ZipEngine {
                 @Override
                 public void run() {
                     try {
-                        initAddFiles(files, parameters, progressMonitor);
+                        initAddFiles(files, parameters);
                     } catch(ZipException e) {
                     }
                 }
@@ -77,26 +76,20 @@ public class ZipEngine {
             thread.start();
 
         } else {
-            initAddFiles(files, parameters, progressMonitor);
+            initAddFiles(files, parameters);
         }
     }
 
-    private void initAddFiles(@NonNull Collection<Path> files, @NonNull ZipParameters parameters,
-            @NonNull ProgressMonitor progressMonitor) throws ZipException {
+    private void initAddFiles(@NonNull Collection<Path> files, @NonNull ZipParameters parameters) throws ZipException {
+        zipModel.createEndCentralDirectoryIfNotExist();
 
-        if (files.size() <= 0) {
-            throw new ZipException("no files to add");
-        }
-
-        if (zipModel.getEndCentralDirectory() == null)
-            zipModel.setEndCentralDirectory(new EndCentralDirectory());
 
         ZipOutputStream outputStream = null;
         InputStream inputStream = null;
         try {
             checkParameters(parameters);
 
-            removeFilesIfExists(files, parameters, progressMonitor);
+            removeFilesIfExists(files, parameters);
 
             boolean isZipFileAlreadExists = Zip4jUtil.checkFileExists(zipModel.getZipFile());
 
@@ -249,8 +242,7 @@ public class ZipEngine {
         }
     }
 
-    public void addFolderToZip(File file, ZipParameters parameters,
-            ProgressMonitor progressMonitor, boolean runInThread) throws ZipException, IOException {
+    public void addFolderToZip(File file, ZipParameters parameters, boolean runInThread) throws ZipException, IOException {
         if (file == null || parameters == null) {
             throw new ZipException("one of the input parameters is null, cannot add folder to zip");
         }
@@ -281,8 +273,8 @@ public class ZipEngine {
         parameters.setDefaultFolderPath(rootFolderPath);
 
         List<Path> files = Zip4jUtil.getFilesInDirectoryRec(file, parameters.isReadHiddenFiles()).stream()
-                                       .map(File::toPath)
-                                       .collect(Collectors.toList());
+                                    .map(File::toPath)
+                                    .collect(Collectors.toList());
 
         if (parameters.isIncludeRootFolder()) {
             if (files == null) {
@@ -291,16 +283,11 @@ public class ZipEngine {
             files.add(file.toPath());
         }
 
-        addFiles(files, parameters, progressMonitor, runInThread);
+        addFiles(files, parameters, runInThread);
     }
 
 
     private void checkParameters(ZipParameters parameters) throws ZipException {
-
-        if (parameters == null) {
-            throw new ZipException("cannot validate zip parameters");
-        }
-
         if ((parameters.getCompressionMethod() != Zip4jConstants.COMP_STORE) &&
                 parameters.getCompressionMethod() != Zip4jConstants.COMP_DEFLATE) {
             throw new ZipException("unsupported compression type");
@@ -328,6 +315,16 @@ public class ZipEngine {
 
     }
 
+    public void removeFile(CentralDirectory.FileHeader fileHeader, boolean runInThread) throws ZipException {
+        if (fileHeader == null)
+            return;
+
+        ArchiveMaintainer archiveMaintainer = new ArchiveMaintainer();
+        archiveMaintainer.initProgressMonitorForRemoveOp(zipModel, fileHeader, progressMonitor);
+        archiveMaintainer.removeZipFile(zipModel, fileHeader, progressMonitor, runInThread);
+    }
+
+
     /**
      * Before adding a file to a zip file, we check if a file already exists in the zip file
      * with the same fileName (including path, if exists). If yes, then we remove this file
@@ -337,82 +334,12 @@ public class ZipEngine {
      *
      * @throws ZipException
      */
-    private void removeFilesIfExists(@NonNull Collection<Path> files, ZipParameters parameters, ProgressMonitor progressMonitor) throws ZipException {
-
-        if (zipModel == null || zipModel.getCentralDirectory() == null ||
-                zipModel.getCentralDirectory().getFileHeaders() == null ||
-                zipModel.getCentralDirectory().getFileHeaders().size() <= 0) {
-            //For a new zip file, this condition satisfies, so do nothing
+    private void removeFilesIfExists(@NonNull Collection<Path> files, ZipParameters parameters) throws ZipException {
+        if (zipModel == null || zipModel.isEmpty())
             return;
-        }
-        RandomAccessFile outputStream = null;
 
-        try {
-            for(Path file : files) {
-                String fileName = Zip4jUtil.getRelativeFileName(file.toAbsolutePath().toString(),
-                        parameters.getRootFolderInZip(), parameters.getDefaultFolderPath());
-
-                CentralDirectory.FileHeader fileHeader = Zip4jUtil.getFileHeader(zipModel, fileName);
-                if (fileHeader != null) {
-
-                    if (outputStream != null) {
-                        outputStream.close();
-                        outputStream = null;
-                    }
-
-                    ArchiveMaintainer archiveMaintainer = new ArchiveMaintainer();
-                    progressMonitor.setCurrentOperation(ProgressMonitor.OPERATION_REMOVE);
-                    Map<String, String> retMap = archiveMaintainer.initRemoveZipFile(zipModel,
-                            fileHeader, progressMonitor);
-
-                    if (progressMonitor.isCancelAllTasks()) {
-                        progressMonitor.setResult(ProgressMonitor.RESULT_CANCELLED);
-                        progressMonitor.setState(ProgressMonitor.STATE_READY);
-                        return;
-                    }
-
-                    progressMonitor
-                            .setCurrentOperation(ProgressMonitor.OPERATION_ADD);
-
-                    if (outputStream == null) {
-                        outputStream = prepareFileOutputStream();
-
-                        if (retMap != null) {
-                            if (retMap.get(InternalZipConstants.OFFSET_CENTRAL_DIR) != null) {
-                                long offsetCentralDir = -1;
-                                try {
-                                    offsetCentralDir = Long
-                                            .parseLong(retMap
-                                                    .get(InternalZipConstants.OFFSET_CENTRAL_DIR));
-                                } catch(NumberFormatException e) {
-                                    throw new ZipException(
-                                            "NumberFormatException while parsing offset central directory. " +
-                                                    "Cannot update already existing file header");
-                                } catch(Exception e) {
-                                    throw new ZipException(
-                                            "Error while parsing offset central directory. " +
-                                                    "Cannot update already existing file header");
-                                }
-
-                                if (offsetCentralDir >= 0) {
-                                    outputStream.seek(offsetCentralDir);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        } catch(IOException e) {
-            throw new ZipException(e);
-        } finally {
-            if (outputStream != null) {
-                try {
-                    outputStream.close();
-                } catch(IOException e) {
-                    //ignore
-                }
-            }
-        }
+        for (Path file : files)
+            removeFile(zipModel.getFileHeader(Zip4jUtil.getRelativeFileName(file, parameters)), false);
     }
 
     private RandomAccessFile prepareFileOutputStream() throws ZipException {
@@ -447,7 +374,7 @@ public class ZipEngine {
             if (zipModel.getCentralDirectory() != null && !zipModel.getCentralDirectory().getFileHeaders().isEmpty()) {
                 String relativeFileName = Zip4jUtil.getRelativeFileName(
                         file.toAbsolutePath().toString(), parameters.getRootFolderInZip(), parameters.getDefaultFolderPath());
-                CentralDirectory.FileHeader fileHeader = Zip4jUtil.getFileHeader(zipModel, relativeFileName);
+                CentralDirectory.FileHeader fileHeader = zipModel.getFileHeader(relativeFileName);
                 if (fileHeader != null) {
                     totalWork += Zip4jUtil.getFileLengh(new File(zipModel.getZipFile())) - fileHeader.getCompressedSize();
                 }

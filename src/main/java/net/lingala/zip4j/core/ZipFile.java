@@ -239,9 +239,9 @@ public class ZipFile {
         checkProgressMonitorAvailable();
 
         readOrCreateModel();
-        checkAddFilesToSplitArchive();
+        checkSplitArchiveModification();
 
-        new ZipEngine(zipModel).addFiles(files, parameters, progressMonitor, runInThread);
+        new ZipEngine(zipModel, progressMonitor).addFiles(files, parameters, runInThread);
     }
 
     private void checkProgressMonitorAvailable() throws ZipException {
@@ -249,9 +249,9 @@ public class ZipFile {
             throw new ZipException("invalid operation - Zip4j is in busy state");
     }
 
-    private void checkAddFilesToSplitArchive() throws ZipException {
+    private void checkSplitArchiveModification() throws ZipException {
         if (Files.exists(path) && zipModel.isSplitArchive())
-            throw new ZipException("Zip path already exists. Zip path format does not allow updating split/spanned files");
+            throw new ZipException("Zip file already exists. Zip file format does not allow updating split/spanned files");
     }
 
     /**
@@ -317,7 +317,7 @@ public class ZipFile {
             }
         }
 
-        new ZipEngine(zipModel).addFolderToZip(path, parameters, progressMonitor, runInThread);
+        new ZipEngine(zipModel, progressMonitor).addFolderToZip(path, parameters, runInThread);
 
     }
 
@@ -353,7 +353,7 @@ public class ZipFile {
         if (Files.exists(path) && zipModel.isSplitArchive())
             throw new ZipException("Zip path already exists. Zip path format does not allow updating split/spanned files");
 
-        new ZipEngine(zipModel).addStreamToZip(inputStream, parameters);
+        new ZipEngine(zipModel, progressMonitor).addStreamToZip(inputStream, parameters);
     }
 
     /**
@@ -555,7 +555,7 @@ public class ZipFile {
 
         zipModel = readZipModel();
 
-        CentralDirectory.FileHeader fileHeader = Zip4jUtil.getFileHeader(zipModel, fileName);
+        CentralDirectory.FileHeader fileHeader = zipModel.getFileHeader(fileName);
 
         if (fileHeader == null) {
             throw new ZipException("path header not found for given path name, cannot extract path");
@@ -641,7 +641,7 @@ public class ZipFile {
 
         zipModel = readZipModel();
 
-        return Zip4jUtil.getFileHeader(zipModel, fileName);
+        return zipModel.getFileHeader(fileName);
     }
 
     /**
@@ -706,7 +706,7 @@ public class ZipFile {
             throw new ZipException("Zip path format does not allow updating split/spanned files");
         }
 
-        CentralDirectory.FileHeader fileHeader = Zip4jUtil.getFileHeader(zipModel, fileName);
+        CentralDirectory.FileHeader fileHeader = zipModel.getFileHeader(fileName);
         if (fileHeader == null) {
             throw new ZipException("could not find path header for path: " + fileName);
         }
@@ -722,21 +722,11 @@ public class ZipFile {
      * @param fileHeader
      * @throws ZipException
      */
-    public void removeFile(CentralDirectory.FileHeader fileHeader) throws ZipException {
-        if (fileHeader == null) {
-            throw new ZipException("path header is null, cannot remove path");
-        }
+    public void removeFile(@NonNull CentralDirectory.FileHeader fileHeader) throws ZipException {
+        readOrCreateModel();
+        checkSplitArchiveModification();
 
-        if (zipModel == null && Files.exists(path))
-            zipModel = readZipModel();
-
-        if (zipModel.isSplitArchive()) {
-            throw new ZipException("Zip path format does not allow updating split/spanned files");
-        }
-
-        ArchiveMaintainer archiveMaintainer = new ArchiveMaintainer();
-        archiveMaintainer.initProgressMonitorForRemoveOp(zipModel, fileHeader, progressMonitor);
-        archiveMaintainer.removeZipFile(zipModel, fileHeader, progressMonitor, runInThread);
+        new ZipEngine(zipModel, progressMonitor).removeFile(fileHeader, runInThread);
     }
 
     /**

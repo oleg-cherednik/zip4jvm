@@ -19,6 +19,8 @@ package net.lingala.zip4j.model;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import net.lingala.zip4j.exception.ZipException;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
@@ -71,6 +73,11 @@ public class ZipModel implements Cloneable {
     public void addLocalFileHeader(LocalFileHeader localFileHeader) {
         localFileHeaderList = localFileHeaderList.isEmpty() ? new ArrayList<>() : localFileHeaderList;
         localFileHeaderList.add(localFileHeader);
+    }
+
+    public void createEndCentralDirectoryIfNotExist() {
+        if (endCentralDirectory == null)
+            endCentralDirectory = new EndCentralDirectory();
     }
 
     public void setLocalFileHeaderList(List localFileHeaderList) {
@@ -174,6 +181,19 @@ public class ZipModel implements Cloneable {
 
     public boolean isZip64Format() {
         return zip64EndCentralDirectoryLocator != null;
+    }
+
+    public boolean isEmpty() {
+        return centralDirectory == null || centralDirectory.getFileHeaders().isEmpty();
+    }
+
+    public CentralDirectory.FileHeader getFileHeader(@NonNull String fileName) throws ZipException {
+        if (isEmpty())
+            return null;
+
+        return centralDirectory.getFileHeaders().stream()
+                               .filter(fileHeader -> FilenameUtils.equalsNormalized(fileName, fileHeader.getFileName()))
+                               .findFirst().orElse(null);
     }
 
 }
