@@ -32,6 +32,7 @@ import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.Raw;
 import net.lingala.zip4j.util.Zip4jConstants;
 import net.lingala.zip4j.util.Zip4jUtil;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -89,7 +90,7 @@ public class CipherOutputStream extends OutputStream {
                     this.zipParameters.setCompressionMethod(Zip4jConstants.COMP_STORE);
                 }
             } else {
-                if (!Zip4jUtil.isStringNotNullAndNotEmpty(this.zipParameters.getFileNameInZip())) {
+                if (StringUtils.isBlank(this.zipParameters.getFileNameInZip())) {
                     throw new ZipException("file name is empty for external stream");
                 }
                 if (this.zipParameters.getFileNameInZip().endsWith("/") ||
@@ -350,7 +351,7 @@ public class CipherOutputStream extends OutputStream {
         String fileName = null;
         if (zipParameters.isSourceExternalStream()) {
             fileHeader.setLastModFileTime((int)Zip4jUtil.javaToDosTime(System.currentTimeMillis()));
-            if (!Zip4jUtil.isStringNotNullAndNotEmpty(zipParameters.getFileNameInZip())) {
+            if (StringUtils.isBlank(zipParameters.getFileNameInZip())) {
                 throw new ZipException("fileNameInZip is null or empty");
             }
             fileName = zipParameters.getFileNameInZip();
@@ -362,7 +363,7 @@ public class CipherOutputStream extends OutputStream {
 
         }
 
-        if (!Zip4jUtil.isStringNotNullAndNotEmpty(fileName)) {
+        if (StringUtils.isBlank(fileName)) {
             throw new ZipException("fileName is null or empty. unable to create file header");
         }
 
@@ -391,7 +392,7 @@ public class CipherOutputStream extends OutputStream {
             fileHeader.setUncompressedSize(0);
         } else {
             if (!zipParameters.isSourceExternalStream()) {
-                long fileSize = Zip4jUtil.getFileLengh(sourceFile);
+                long fileSize = sourceFile.length();
                 if (zipParameters.getCompressionMethod() == Zip4jConstants.COMP_STORE) {
                     if (zipParameters.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_STANDARD) {
                         fileHeader.setCompressedSize(fileSize

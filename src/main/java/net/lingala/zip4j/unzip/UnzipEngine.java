@@ -33,6 +33,7 @@ import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.Raw;
 import net.lingala.zip4j.util.Zip4jConstants;
 import net.lingala.zip4j.util.Zip4jUtil;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -64,7 +65,7 @@ public class UnzipEngine {
     }
 
     public void unzipFile(String outPath, String newFileName, UnzipParameters unzipParameters) throws ZipException {
-        if (zipModel == null || fileHeader == null || !Zip4jUtil.isStringNotNullAndNotEmpty(outPath)) {
+        if (zipModel == null || fileHeader == null || StringUtils.isBlank(outPath)) {
             throw new ZipException("Invalid parameters passed during unzipping file. One or more of the parameters were null");
         }
         InputStream is = null;
@@ -398,7 +399,7 @@ public class UnzipEngine {
     }
 
     private FileOutputStream getOutputStream(String outPath, String newFileName) throws ZipException {
-        if (!Zip4jUtil.isStringNotNullAndNotEmpty(outPath)) {
+        if (StringUtils.isBlank(outPath)) {
             throw new ZipException("invalid output path");
         }
 
@@ -422,7 +423,7 @@ public class UnzipEngine {
 
     private String getOutputFileNameWithPath(String outPath, String newFileName) throws ZipException {
         String fileName = null;
-        if (Zip4jUtil.isStringNotNullAndNotEmpty(newFileName)) {
+        if (StringUtils.isNotBlank(newFileName)) {
             fileName = newFileName;
         } else {
             fileName = fileHeader.getFileName();
@@ -460,7 +461,7 @@ public class UnzipEngine {
                 is = null;
             }
         } catch(IOException e) {
-            if (e != null && Zip4jUtil.isStringNotNullAndNotEmpty(e.getMessage())) {
+            if (e != null && StringUtils.isNotBlank(e.getMessage())) {
                 if (e.getMessage().indexOf(" - Wrong Password?") >= 0) {
                     throw new ZipException(e.getMessage());
                 }

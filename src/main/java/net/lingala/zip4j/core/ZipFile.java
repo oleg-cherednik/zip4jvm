@@ -31,6 +31,7 @@ import net.lingala.zip4j.unzip.Unzip;
 import net.lingala.zip4j.util.ArchiveMaintainer;
 import net.lingala.zip4j.util.Zip4jUtil;
 import net.lingala.zip4j.zip.ZipEngine;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -168,7 +169,7 @@ public class ZipFile {
     public void createZipFileFromFolder(String folderToAdd, ZipParameters parameters,
             boolean splitArchive, long splitLength) throws ZipException, IOException {
 
-        if (!Zip4jUtil.isStringNotNullAndNotEmpty(folderToAdd)) {
+        if (StringUtils.isBlank(folderToAdd)) {
             throw new ZipException("folderToAdd is empty or null, cannot create Zip File from folder");
         }
 
@@ -256,7 +257,7 @@ public class ZipFile {
      * @throws ZipException
      */
     public void addFolder(String path, ZipParameters parameters) throws ZipException, IOException {
-        if (!Zip4jUtil.isStringNotNullAndNotEmpty(path)) {
+        if (StringUtils.isBlank(path)) {
             throw new ZipException("input path is null or empty, cannot add folder to zip path");
         }
 
@@ -384,7 +385,7 @@ public class ZipFile {
     public void extractAll(String destPath,
             UnzipParameters unzipParameters) throws ZipException {
 
-        if (!Zip4jUtil.isStringNotNullAndNotEmpty(destPath)) {
+        if (StringUtils.isBlank(destPath)) {
             throw new ZipException("output path is null or invalid");
         }
 
@@ -451,7 +452,7 @@ public class ZipFile {
             throw new ZipException("input path header is null, cannot extract path");
         }
 
-        if (!Zip4jUtil.isStringNotNullAndNotEmpty(destPath)) {
+        if (StringUtils.isBlank(destPath)) {
             throw new ZipException("destination path is empty or null, cannot extract path");
         }
 
@@ -527,11 +528,11 @@ public class ZipFile {
     public void extractFile(String fileName, String destPath,
             UnzipParameters unzipParameters, String newFileName) throws ZipException {
 
-        if (!Zip4jUtil.isStringNotNullAndNotEmpty(fileName)) {
+        if (StringUtils.isBlank(fileName)) {
             throw new ZipException("path to extract is null or empty, cannot extract path");
         }
 
-        if (!Zip4jUtil.isStringNotNullAndNotEmpty(destPath)) {
+        if (StringUtils.isBlank(destPath)) {
             throw new ZipException("destination string path is empty or null, cannot extract path");
         }
 
@@ -559,7 +560,7 @@ public class ZipFile {
      * @throws ZipException
      */
     public void setPassword(String password) throws ZipException {
-        if (!Zip4jUtil.isStringNotNullAndNotEmpty(password)) {
+        if (StringUtils.isBlank(password)) {
             throw new NullPointerException();
         }
         setPassword(password.toCharArray());
@@ -613,7 +614,7 @@ public class ZipFile {
      * @throws ZipException
      */
     public CentralDirectory.FileHeader getFileHeader(String fileName) throws ZipException {
-        if (!Zip4jUtil.isStringNotNullAndNotEmpty(fileName)) {
+        if (StringUtils.isBlank(fileName)) {
             throw new ZipException("input path name is emtpy or null, cannot get FileHeader");
         }
 
@@ -673,7 +674,7 @@ public class ZipFile {
      */
     public void removeFile(String fileName) throws ZipException {
 
-        if (!Zip4jUtil.isStringNotNullAndNotEmpty(fileName)) {
+        if (StringUtils.isBlank(fileName)) {
             throw new ZipException("path name is empty or null, cannot remove path");
         }
 

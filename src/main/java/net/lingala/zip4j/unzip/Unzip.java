@@ -22,7 +22,7 @@ import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.UnzipParameters;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
-import net.lingala.zip4j.util.Zip4jUtil;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.util.List;
@@ -117,7 +117,7 @@ public class Unzip {
             if (fileHeader.isDirectory()) {
                 try {
                     String fileName = fileHeader.getFileName();
-                    if (!Zip4jUtil.isStringNotNullAndNotEmpty(fileName)) {
+                    if (StringUtils.isBlank(fileName)) {
                         return;
                     }
                     String completePath = outPath + fileName;
@@ -152,17 +152,17 @@ public class Unzip {
     }
 
     private void checkOutputDirectoryStructure(CentralDirectory.FileHeader fileHeader, String outPath, String newFileName) throws ZipException {
-        if (fileHeader == null || !Zip4jUtil.isStringNotNullAndNotEmpty(outPath)) {
+        if (fileHeader == null || StringUtils.isBlank(outPath)) {
             throw new ZipException("Cannot check output directory structure...one of the parameters was null");
         }
 
         String fileName = fileHeader.getFileName();
 
-        if (Zip4jUtil.isStringNotNullAndNotEmpty(newFileName)) {
+        if (StringUtils.isNotBlank(newFileName)) {
             fileName = newFileName;
         }
 
-        if (!Zip4jUtil.isStringNotNullAndNotEmpty(fileName)) {
+        if (StringUtils.isBlank(fileName)) {
             // Do nothing
             return;
         }

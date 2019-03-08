@@ -34,18 +34,11 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
 
+@SuppressWarnings("MethodCanBeVariableArityMethod")
 public class Zip4jUtil {
 
-    public static boolean isStringNotNullAndNotEmpty(String str) {
-        if (str == null || str.trim().length() <= 0) {
-            return false;
-        }
-
-        return true;
-    }
-
     public static boolean checkOutputFolder(String path) throws ZipException {
-        if (!isStringNotNullAndNotEmpty(path)) {
+        if (StringUtils.isBlank(path)) {
             throw new ZipException(new NullPointerException("output path is null"));
         }
 
@@ -87,7 +80,7 @@ public class Zip4jUtil {
     }
 
     public static boolean checkFileReadAccess(String path) throws ZipException {
-        if (!isStringNotNullAndNotEmpty(path)) {
+        if (StringUtils.isBlank(path)) {
             throw new ZipException("path is null");
         }
 
@@ -103,25 +96,8 @@ public class Zip4jUtil {
         }
     }
 
-    public static boolean checkFileWriteAccess(String path) throws ZipException {
-        if (!isStringNotNullAndNotEmpty(path)) {
-            throw new ZipException("path is null");
-        }
-
-        if (!checkFileExists(path)) {
-            throw new ZipException("file does not exist: " + path);
-        }
-
-        try {
-            File file = new File(path);
-            return file.canWrite();
-        } catch(Exception e) {
-            throw new ZipException("cannot read zip file");
-        }
-    }
-
     public static boolean checkFileExists(String path) throws ZipException {
-        if (!isStringNotNullAndNotEmpty(path)) {
+        if (StringUtils.isBlank(path)) {
             throw new ZipException("path is null");
         }
 
@@ -134,11 +110,6 @@ public class Zip4jUtil {
             throw new ZipException("cannot check if file exists: input file is null");
         }
         return file.exists();
-    }
-
-    public static boolean isWindows() {
-        String os = System.getProperty("os.name").toLowerCase();
-        return (os.indexOf("win") >= 0);
     }
 
     public static void setFileReadOnly(File file) throws ZipException {
@@ -225,38 +196,6 @@ public class Zip4jUtil {
         return file.lastModified();
     }
 
-    public static String getFileNameFromFilePath(File file) throws ZipException {
-        if (file == null) {
-            throw new ZipException("input file is null, cannot get file name");
-        }
-
-        if (file.isDirectory()) {
-            return null;
-        }
-
-        return file.getName();
-    }
-
-    public static long getFileLengh(String file) throws ZipException {
-        if (!isStringNotNullAndNotEmpty(file)) {
-            throw new ZipException("invalid file name");
-        }
-
-        return getFileLengh(new File(file));
-    }
-
-    public static long getFileLengh(File file) throws ZipException {
-        if (file == null) {
-            throw new ZipException("input file is null, cannot calculate file length");
-        }
-
-        if (file.isDirectory()) {
-            return -1;
-        }
-
-        return file.length();
-    }
-
     /**
      * Converts input time from Java to DOS format
      *
@@ -317,7 +256,7 @@ public class Zip4jUtil {
         }
         String fileName = fileHeader.getFileName();
 
-        if (!isStringNotNullAndNotEmpty(fileName)) {
+        if (StringUtils.isBlank(fileName)) {
             throw new ZipException("file name in file header is empty or null, cannot determine index of file header");
         }
 
@@ -325,7 +264,7 @@ public class Zip4jUtil {
         for (int i = 0; i < fileHeaders.size(); i++) {
             CentralDirectory.FileHeader fileHeaderTmp = fileHeaders.get(i);
             String fileNameForHdr = fileHeaderTmp.getFileName();
-            if (!isStringNotNullAndNotEmpty(fileNameForHdr)) {
+            if (StringUtils.isBlank(fileNameForHdr)) {
                 continue;
             }
 
@@ -366,7 +305,7 @@ public class Zip4jUtil {
     }
 
     public static String getZipFileNameWithoutExt(String zipFile) throws ZipException {
-        if (!isStringNotNullAndNotEmpty(zipFile)) {
+        if (StringUtils.isBlank(zipFile)) {
             throw new ZipException("zip file name is empty or null, cannot determine zip file name");
         }
         String tmpFileName = zipFile;
@@ -380,10 +319,6 @@ public class Zip4jUtil {
         return tmpFileName;
     }
 
-//    public static byte[] convertCharset(String str) throws UnsupportedEncodingException {
-//        return str.getBytes(detectCharset(str));
-//    }
-
     /**
      * Decodes file name based on encoding. If file name is UTF 8 encoded
      * returns an UTF8 encoded string, else return Cp850 encoded String. If
@@ -396,21 +331,6 @@ public class Zip4jUtil {
      */
     public static String decodeFileName(byte[] data, boolean isUTF8) {
         return new String(data, isUTF8 ? StandardCharsets.UTF_8 : Charset.defaultCharset());
-    }
-
-    /**
-     * Returns an absoulte path for the given file path
-     *
-     * @param filePath
-     * @return String
-     */
-    public static String getAbsoluteFilePath(String filePath) throws ZipException {
-        if (!isStringNotNullAndNotEmpty(filePath)) {
-            throw new ZipException("filePath is null or empty, cannot get absolute file path");
-        }
-
-        File file = new File(filePath);
-        return file.getAbsolutePath();
     }
 
     /**
@@ -428,31 +348,7 @@ public class Zip4jUtil {
 
         String charsetName = detector.getDetectedCharset();
         return charsetName != null ? Charset.forName(charsetName) : Charset.defaultCharset();
-//        if (checkCharset(str, Charset.forName("Cp850")))
-//            return Charset.forName("Cp850");
-//        if (checkCharset(str, Charset.forName("Windows-1251")))
-//            return Charset.forName("Windows-1251");
-//        if (checkCharset(str, StandardCharsets.UTF_8))
-//            return StandardCharsets.UTF_8;
-//        return Charset.defaultCharset();
     }
-
-//    private static boolean checkCharset(@NonNull String str, @NonNull Charset charset) {
-//        return str.equals(new String(str.getBytes(charset), charset));
-//    }
-
-    /**
-     * returns the length of the string by wrapping it in a byte buffer with
-     * the appropriate charset of the input string and returns the limit of the
-     * byte buffer
-     *
-     * @param str
-     * @return length of the string
-     * @throws ZipException
-     */
-//    public static int getEncodedStringLength(@NonNull String str) throws ZipException, UnsupportedEncodingException {
-//        return getEncodedStringLength(str, detectCharset(str));
-//    }
 
     /**
      * returns the length of the string in the input encoding
@@ -473,7 +369,7 @@ public class Zip4jUtil {
      * @throws ZipException
      */
     public static boolean isSupportedCharset(String charset) throws ZipException {
-        if (!isStringNotNullAndNotEmpty(charset)) {
+        if (StringUtils.isBlank(charset)) {
             throw new ZipException("charset is null or empty, cannot check if it is supported");
         }
 
@@ -501,7 +397,7 @@ public class Zip4jUtil {
         String zipFileName = new File(currZipFile).getName();
         String partFile = null;
 
-        if (!isStringNotNullAndNotEmpty(currZipFile)) {
+        if (StringUtils.isBlank(currZipFile)) {
             throw new ZipException("cannot get split zip files: zipfile is null");
         }
 
