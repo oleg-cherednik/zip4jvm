@@ -103,7 +103,7 @@ public class ZipEngine {
                         fileParameters.setCompressionMethod(Zip4jConstants.COMP_STORE);
                 }
 
-                out.putNextEntry(file.toFile(), fileParameters);
+                out.putNextEntry(file, fileParameters);
 
                 if (Files.isRegularFile(file)) {
                     try (InputStream in = new FileInputStream(file.toFile())) {

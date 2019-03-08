@@ -22,9 +22,9 @@ import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.Zip4jConstants;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Path;
 import java.util.zip.Deflater;
 
 public class DeflateOutputStream extends CipherOutputStream {
@@ -41,7 +41,7 @@ public class DeflateOutputStream extends CipherOutputStream {
     }
 
     @Override
-    public void putNextEntry(File file, ZipParameters zipParameters) throws ZipException {
+    public void putNextEntry(Path file, ZipParameters zipParameters) throws ZipException {
         super.putNextEntry(file, zipParameters);
         if (zipParameters.getCompressionMethod() == Zip4jConstants.COMP_DEFLATE) {
             deflater.reset();

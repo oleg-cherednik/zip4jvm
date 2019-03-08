@@ -34,18 +34,18 @@ import net.lingala.zip4j.util.Zip4jConstants;
 import net.lingala.zip4j.util.Zip4jUtil;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.zip.CRC32;
 
 public class CipherOutputStream extends OutputStream {
 
     protected OutputStream outputStream;
-    private File sourceFile;
+    private Path sourceFile;
     @NonNull
     protected CentralDirectory.FileHeader fileHeader;
     private LocalFileHeader localFileHeader;
@@ -70,13 +70,12 @@ public class CipherOutputStream extends OutputStream {
         this.totalBytesRead = 0;
     }
 
-    public void putNextEntry(File file, ZipParameters zipParameters) throws ZipException {
+    public void putNextEntry(Path file, ZipParameters zipParameters) throws ZipException {
         if (!zipParameters.isSourceExternalStream() && file == null)
             throw new ZipException("input file is null");
 
-        if (!zipParameters.isSourceExternalStream() && !file.exists()) {
+        if (!zipParameters.isSourceExternalStream() && !Files.exists(file))
             throw new ZipException("input file does not exist");
-        }
 
         try {
             sourceFile = file;
@@ -84,7 +83,7 @@ public class CipherOutputStream extends OutputStream {
             this.zipParameters = (ZipParameters)zipParameters.clone();
 
             if (!zipParameters.isSourceExternalStream()) {
-                if (sourceFile.isDirectory()) {
+                if (Files.isDirectory(sourceFile)) {
                     this.zipParameters.setEncryptFiles(false);
                     this.zipParameters.setEncryptionMethod(-1);
                     this.zipParameters.setCompressionMethod(Zip4jConstants.COMP_STORE);
@@ -330,7 +329,7 @@ public class CipherOutputStream extends OutputStream {
             outputStream.close();
     }
 
-    private void createFileHeader() throws ZipException, UnsupportedEncodingException {
+    private void createFileHeader() throws ZipException, IOException {
         this.fileHeader = new CentralDirectory.FileHeader();
 //        fileHeader.setSignature((int)InternalZipConstants.CENSIG);
         fileHeader.setVersionMadeBy(20);
@@ -354,9 +353,9 @@ public class CipherOutputStream extends OutputStream {
             }
             fileName = zipParameters.getFileNameInZip();
         } else {
-            fileHeader.setLastModFileTime((int)Zip4jUtil.javaToDosTime(sourceFile.lastModified()));
-            fileHeader.setUncompressedSize(sourceFile.length());
-            fileName = zipParameters.getRelativeFileName(sourceFile.toPath());
+            fileHeader.setLastModFileTime((int)Zip4jUtil.javaToDosTime(Files.getLastModifiedTime(sourceFile).toMillis()));
+            fileHeader.setUncompressedSize(Files.size(sourceFile));
+            fileName = zipParameters.getRelativeFileName(sourceFile);
 
         }
 
@@ -364,7 +363,7 @@ public class CipherOutputStream extends OutputStream {
             throw new ZipException("fileName is null or empty. unable to create file header");
         }
 
-        if (!zipParameters.isSourceExternalStream() && sourceFile.isDirectory()) {
+        if (!zipParameters.isSourceExternalStream() && Files.isDirectory(sourceFile)) {
             if (!fileName.endsWith("/") && !fileName.endsWith("\\"))
                 fileName += "/";
         }
@@ -389,7 +388,7 @@ public class CipherOutputStream extends OutputStream {
             fileHeader.setUncompressedSize(0);
         } else {
             if (!zipParameters.isSourceExternalStream()) {
-                long fileSize = sourceFile.length();
+                long fileSize = Files.size(sourceFile);
                 if (zipParameters.getCompressionMethod() == Zip4jConstants.COMP_STORE) {
                     if (zipParameters.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_STANDARD) {
                         fileHeader.setCompressedSize(fileSize
@@ -454,32 +453,17 @@ public class CipherOutputStream extends OutputStream {
      * @return
      * @throws ZipException
      */
-    private int getFileAttributes(File file) throws ZipException {
-        if (file == null) {
-            throw new ZipException("input file is null, cannot get file attributes");
-        }
-
-        if (!file.exists()) {
+    private static int getFileAttributes(@NonNull Path file) throws IOException {
+        if (!Files.exists(file))
             return 0;
-        }
 
-        if (file.isDirectory()) {
-            if (file.isHidden()) {
-                return InternalZipConstants.FOLDER_MODE_HIDDEN;
-            } else {
-                return InternalZipConstants.FOLDER_MODE_NONE;
-            }
-        } else {
-            if (!file.canWrite() && file.isHidden()) {
-                return InternalZipConstants.FILE_MODE_READ_ONLY_HIDDEN;
-            } else if (!file.canWrite()) {
-                return InternalZipConstants.FILE_MODE_READ_ONLY;
-            } else if (file.isHidden()) {
-                return InternalZipConstants.FILE_MODE_HIDDEN;
-            } else {
-                return InternalZipConstants.FILE_MODE_NONE;
-            }
-        }
+        if (Files.isDirectory(file))
+            return Files.isHidden(file) ? InternalZipConstants.FOLDER_MODE_HIDDEN : InternalZipConstants.FOLDER_MODE_NONE;
+        if (!Files.isWritable(file) && Files.isHidden(file))
+            return InternalZipConstants.FILE_MODE_READ_ONLY_HIDDEN;
+        if (!Files.isWritable(file))
+            return InternalZipConstants.FILE_MODE_READ_ONLY;
+        return Files.isHidden(file) ? InternalZipConstants.FILE_MODE_HIDDEN : InternalZipConstants.FILE_MODE_NONE;
     }
 
     private int[] generateGeneralPurposeBitArray(boolean isEncrpyted, int compressionMethod) {
@@ -540,13 +524,5 @@ public class CipherOutputStream extends OutputStream {
         if (toUpdate > 0) {
             totalBytesRead += toUpdate;
         }
-    }
-
-    public void setSourceFile(File sourceFile) {
-        this.sourceFile = sourceFile;
-    }
-
-    public File getSourceFile() {
-        return sourceFile;
     }
 }
