@@ -358,8 +358,7 @@ public class CipherOutputStream extends OutputStream {
             fileHeader.setLastModFileTime((int)Zip4jUtil.javaToDosTime((Zip4jUtil.getLastModifiedFileTime(
                     sourceFile, zipParameters.getTimeZone()))));
             fileHeader.setUncompressedSize(sourceFile.length());
-            fileName = Zip4jUtil.getRelativeFileName(
-                    sourceFile.getAbsolutePath(), zipParameters.getRootFolderInZip(), zipParameters.getDefaultFolderPath());
+            fileName = zipParameters.getRelativeFileName(sourceFile.toPath());
 
         }
 

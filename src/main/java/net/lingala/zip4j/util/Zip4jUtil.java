@@ -20,8 +20,6 @@ import lombok.NonNull;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
-import net.lingala.zip4j.model.ZipParameters;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.mozilla.universalchardet.UniversalDetector;
 
@@ -30,9 +28,6 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -536,25 +531,6 @@ public class Zip4jUtil {
             }
         }
         return retList;
-    }
-
-    public static String getRelativeFileName(Path file, ZipParameters parameters) throws ZipException {
-        return getRelativeFileName(file.toString(), parameters.getRootFolderInZip(), parameters.getDefaultFolderPath());
-    }
-
-    public static String getRelativeFileName(String file, String rootFolderInZip, String rootFolderPath) throws ZipException {
-        Path entryPath = Paths.get(file).toAbsolutePath();
-        Path rootPath = rootFolderPath != null ? Paths.get(rootFolderPath).toAbsolutePath() : entryPath.getParent();
-
-        String path = rootPath.relativize(entryPath).toString();
-
-        if (Files.isDirectory(entryPath))
-            path += File.separator;
-
-        if (rootFolderInZip != null)
-            path = FilenameUtils.concat(path, rootFolderInZip);
-
-        return path;
     }
 
     public static long[] getAllHeaderSignatures() {

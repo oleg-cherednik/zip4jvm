@@ -88,7 +88,7 @@ public class ZipEngine {
             }
 
             for (Path file : files) {
-                String fileName = Zip4jUtil.getRelativeFileName(file, parameters);
+                String fileName = parameters.getRelativeFileName(file);
 
                 if ("/".equals(fileName) || "\\".equals(fileName))
                     continue;
@@ -268,7 +268,7 @@ public class ZipEngine {
             return;
 
         for (Path file : files)
-            removeFile(zipModel.getFileHeader(Zip4jUtil.getRelativeFileName(file, parameters)), false);
+            removeFile(zipModel.getFileHeader(parameters.getRelativeFileName(file)), false);
     }
 
 }

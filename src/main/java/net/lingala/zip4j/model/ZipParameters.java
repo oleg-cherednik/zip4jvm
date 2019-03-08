@@ -18,10 +18,16 @@ package net.lingala.zip4j.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.Zip4jConstants;
-import net.lingala.zip4j.util.Zip4jUtil;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.TimeZone;
 
 @Getter
@@ -101,7 +107,7 @@ public class ZipParameters implements Cloneable {
     }
 
     public void setRootFolderInZip(String rootFolderInZip) {
-        if (Zip4jUtil.isStringNotNullAndNotEmpty(rootFolderInZip)) {
+        if (StringUtils.isNotBlank(rootFolderInZip)) {
 
             if (!rootFolderInZip.endsWith("\\") && !rootFolderInZip.endsWith("/")) {
                 rootFolderInZip = rootFolderInZip + InternalZipConstants.FILE_SEPARATOR;
@@ -148,6 +154,21 @@ public class ZipParameters implements Cloneable {
 
     public void setSourceExternalStream(boolean isSourceExternalStream) {
         this.isSourceExternalStream = isSourceExternalStream;
+    }
+
+    public String getRelativeFileName(Path file) throws ZipException {
+        Path entryPath = file.toAbsolutePath();
+        Path rootPath = defaultFolderPath != null ? Paths.get(defaultFolderPath).toAbsolutePath() : entryPath.getParent();
+
+        String path = rootPath.relativize(entryPath).toString();
+
+        if (Files.isDirectory(entryPath))
+            path += File.separator;
+
+        if (rootFolderInZip != null)
+            path = FilenameUtils.concat(path, rootFolderInZip);
+
+        return path;
     }
 
 }
