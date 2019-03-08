@@ -75,17 +75,9 @@ public class ZipEngine {
         checkParameters(parameters);
         removeFilesIfExists(files, parameters);
 
-        boolean isZipFileAlreadExists = Files.exists(zipModel.getZipFile());
-
         try (SplitOutputStream splitOutputStream = SplitOutputStream.create(zipModel);
              ZipOutputStream out = new ZipOutputStream(splitOutputStream, zipModel)) {
-
-            if (isZipFileAlreadExists) {
-                if (zipModel.getEndCentralDirectory() == null) {
-                    throw new ZipException("invalid end of central directory record");
-                }
-                splitOutputStream.seek(zipModel.getEndCentralDirectory().getOffOfStartOfCentralDir());
-            }
+            splitOutputStream.seek(zipModel.getOffOfStartOfCentralDir());
 
             for (Path file : files) {
                 String fileName = parameters.getRelativeFileName(file);
@@ -93,7 +85,7 @@ public class ZipEngine {
                 if ("/".equals(fileName) || "\\".equals(fileName))
                     continue;
 
-                ZipParameters fileParameters = (ZipParameters)parameters.clone();
+                ZipParameters fileParameters = parameters.toBuilder().build();
 
                 if (Files.isRegularFile(file)) {
                     if (fileParameters.isEncryptFiles() && fileParameters.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_STANDARD)
@@ -115,8 +107,6 @@ public class ZipEngine {
             }
 
             out.finish();
-        } catch(CloneNotSupportedException e) {
-            throw new ZipException(e);
         }
     }
 

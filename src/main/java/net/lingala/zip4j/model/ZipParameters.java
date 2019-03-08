@@ -16,6 +16,8 @@
 
 package net.lingala.zip4j.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import net.lingala.zip4j.exception.ZipException;
@@ -32,7 +34,9 @@ import java.util.TimeZone;
 
 @Getter
 @Setter
-public class ZipParameters implements Cloneable {
+@AllArgsConstructor
+@Builder(toBuilder = true)
+public class ZipParameters {
 
     private int compressionMethod;
     private int compressionLevel;
@@ -57,10 +61,6 @@ public class ZipParameters implements Cloneable {
         aesKeyStrength = -1;
         includeRootFolder = true;
         timeZone = TimeZone.getDefault();
-    }
-
-    public Object clone() throws CloneNotSupportedException {
-        return super.clone();
     }
 
     public char[] getPassword() {

@@ -42,7 +42,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.zip.CRC32;
 
-public class CipherOutputStream extends OutputStream {
+public abstract class CipherOutputStream extends OutputStream {
 
     protected OutputStream outputStream;
     private Path sourceFile;
@@ -59,7 +59,7 @@ public class CipherOutputStream extends OutputStream {
     private int pendingBufferLength;
     private long totalBytesRead;
 
-    public CipherOutputStream(OutputStream outputStream, ZipModel zipModel) {
+    protected CipherOutputStream(OutputStream outputStream, ZipModel zipModel) {
         this.outputStream = outputStream;
         initZipModel(zipModel);
         crc = new CRC32();
@@ -80,7 +80,7 @@ public class CipherOutputStream extends OutputStream {
         try {
             sourceFile = file;
 
-            this.zipParameters = (ZipParameters)zipParameters.clone();
+            this.zipParameters = zipParameters.toBuilder().build();
 
             if (!zipParameters.isSourceExternalStream()) {
                 if (Files.isDirectory(sourceFile)) {
@@ -149,8 +149,6 @@ public class CipherOutputStream extends OutputStream {
             }
 
             crc.reset();
-        } catch(CloneNotSupportedException e) {
-            throw new ZipException(e);
         } catch(ZipException e) {
             throw e;
         } catch(Exception e) {

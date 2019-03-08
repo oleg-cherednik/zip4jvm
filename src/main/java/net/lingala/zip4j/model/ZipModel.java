@@ -178,6 +178,10 @@ public class ZipModel implements Cloneable {
                                .findFirst().orElse(null);
     }
 
+    public long getOffOfStartOfCentralDir() {
+        return endCentralDirectory != null ? endCentralDirectory.getOffOfStartOfCentralDir() : 0;
+    }
+
     public static Path getSplitFilePath(Path zipFile, int count) {
         return zipFile.getParent().resolve(String.format("%s.z%02d", FilenameUtils.getBaseName(zipFile.toString()), count));
     }
