@@ -99,7 +99,8 @@ public interface InternalZipConstants {
     static final int AES_AUTH_LENGTH = 10;
     static final int AES_BLOCK_SIZE = 16;
 
-    static final int MIN_SPLIT_LENGTH = 65536;
+    // Minimum segment size = 64K
+    int MIN_SPLIT_LENGTH = 64 * 1024;
 
     /*
      * 4.3.9.2 When compressing files, compressed and uncompressed sizes

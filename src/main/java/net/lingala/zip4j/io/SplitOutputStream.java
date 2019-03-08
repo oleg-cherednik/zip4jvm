@@ -17,6 +17,7 @@
 package net.lingala.zip4j.io;
 
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.Raw;
 import net.lingala.zip4j.util.Zip4jUtil;
@@ -32,20 +33,16 @@ import java.nio.file.Path;
 public class SplitOutputStream extends OutputStream {
 
     private RandomAccessFile raf;
-    private long splitLength;
+    private final long splitLength;
     private Path zipFile;
     private Path outFile;
     private int currSplitFileCounter;
     private long bytesWrittenForThisPart;
 
-    public SplitOutputStream(Path file) throws FileNotFoundException, ZipException {
-        this(file, -1);
-    }
-
     public SplitOutputStream(Path file, long splitLength) throws FileNotFoundException, ZipException {
-        if (splitLength >= 0 && splitLength < InternalZipConstants.MIN_SPLIT_LENGTH) {
+        if (splitLength >= 0 && splitLength < InternalZipConstants.MIN_SPLIT_LENGTH)
             throw new ZipException("split length less than minimum allowed split length of " + InternalZipConstants.MIN_SPLIT_LENGTH + " Bytes");
-        }
+
         raf = new RandomAccessFile(file.toFile(), InternalZipConstants.WRITE_MODE);
         this.splitLength = splitLength;
         outFile = file;
@@ -67,12 +64,7 @@ public class SplitOutputStream extends OutputStream {
     public void write(byte[] b, int off, int len) throws IOException {
         if (len <= 0) return;
 
-        if (splitLength != -1) {
-
-            if (splitLength < InternalZipConstants.MIN_SPLIT_LENGTH) {
-                throw new IOException("split length less than minimum allowed split length of " + InternalZipConstants.MIN_SPLIT_LENGTH + " Bytes");
-            }
-
+        if (splitLength != ZipModel.NO_SPLIT) {
             if (bytesWrittenForThisPart >= splitLength) {
                 startNextSplitFile();
                 raf.write(b, off, len);
@@ -92,7 +84,6 @@ public class SplitOutputStream extends OutputStream {
                 raf.write(b, off, len);
                 bytesWrittenForThisPart += len;
             }
-
         } else {
             raf.write(b, off, len);
             bytesWrittenForThisPart += len;

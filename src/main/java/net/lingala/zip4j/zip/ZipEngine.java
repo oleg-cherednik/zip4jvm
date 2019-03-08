@@ -19,6 +19,7 @@ package net.lingala.zip4j.zip;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.io.NoSplitOutputStream;
 import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.io.ZipOutputStream;
 import net.lingala.zip4j.model.CentralDirectory;
@@ -77,7 +78,9 @@ public class ZipEngine {
 
         boolean isZipFileAlreadExists = Files.exists(zipModel.getZipFile());
 
-        try (SplitOutputStream splitOutputStream = new SplitOutputStream(zipModel.getZipFile(), zipModel.getSplitLength());
+        try (SplitOutputStream splitOutputStream = zipModel.isSplitArchive()
+                                                   ? new SplitOutputStream(zipModel.getZipFile(), zipModel.getSplitLength())
+                                                   : new NoSplitOutputStream(zipModel.getZipFile());
              ZipOutputStream out = new ZipOutputStream(splitOutputStream, zipModel)) {
 
             if (isZipFileAlreadExists) {
@@ -132,8 +135,11 @@ public class ZipEngine {
 
             boolean isZipFileAlreadExists = Files.exists(zipModel.getZipFile());
 
-            SplitOutputStream splitOutputStream = new SplitOutputStream(zipModel.getZipFile(), zipModel.getSplitLength());
-            outputStream = new ZipOutputStream(splitOutputStream, this.zipModel);
+            SplitOutputStream splitOutputStream = zipModel.isSplitArchive()
+                                                  ? new SplitOutputStream(zipModel.getZipFile(), zipModel.getSplitLength())
+                                                  : new NoSplitOutputStream(zipModel.getZipFile());
+
+            outputStream = new ZipOutputStream(splitOutputStream, zipModel);
 
             if (isZipFileAlreadExists) {
                 if (zipModel.getEndCentralDirectory() == null) {

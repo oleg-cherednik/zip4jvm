@@ -19,6 +19,7 @@ package net.lingala.zip4j.util;
 import net.lingala.zip4j.core.HeaderReader;
 import net.lingala.zip4j.core.HeaderWriter;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.io.NoSplitOutputStream;
 import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.LocalFileHeader;
@@ -33,6 +34,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -97,7 +99,7 @@ public class ArchiveMaintainer {
             }
 
             try {
-                outputStream = new SplitOutputStream(new File(tmpZipFileName).toPath());
+                outputStream = new NoSplitOutputStream(Paths.get(tmpZipFileName));
             } catch(FileNotFoundException e1) {
                 throw new ZipException(e1);
             }
@@ -604,31 +606,18 @@ public class ArchiveMaintainer {
 
         zipModel.getEndCentralDirectory().setComment(encodedComment);
 
-        SplitOutputStream outputStream = null;
-
-        try {
+        try (SplitOutputStream out = new NoSplitOutputStream(zipModel.getZipFile())) {
             HeaderWriter headerWriter = new HeaderWriter();
-            outputStream = new SplitOutputStream(zipModel.getZipFile());
 
             if (zipModel.isZip64Format()) {
-                outputStream.seek(zipModel.getZip64EndCentralDirectory().getOffsetStartCenDirWRTStartDiskNo());
+                out.seek(zipModel.getZip64EndCentralDirectory().getOffsetStartCenDirWRTStartDiskNo());
             } else {
-                outputStream.seek(zipModel.getEndCentralDirectory().getOffOfStartOfCentralDir());
+                out.seek(zipModel.getEndCentralDirectory().getOffOfStartOfCentralDir());
             }
 
-            headerWriter.finalizeZipFileWithoutValidations(zipModel, outputStream);
-        } catch(FileNotFoundException e) {
+            headerWriter.finalizeZipFileWithoutValidations(zipModel, out);
+        } catch(Exception e) {
             throw new ZipException(e);
-        } catch(IOException e) {
-            throw new ZipException(e);
-        } finally {
-            if (outputStream != null) {
-                try {
-                    outputStream.close();
-                } catch(IOException e) {
-                    //ignore
-                }
-            }
         }
     }
 }

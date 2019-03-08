@@ -32,6 +32,8 @@ import java.util.List;
 @Setter
 public class ZipModel implements Cloneable {
 
+    public static final int NO_SPLIT = -1;
+
     private List localFileHeaderList;
 
     private List dataDescriptorList;
@@ -47,8 +49,7 @@ public class ZipModel implements Cloneable {
     private Zip64EndCentralDirectory zip64EndCentralDirectory;
 
     private boolean splitArchive;
-
-    private long splitLength;
+    private long splitLength = NO_SPLIT;
 
     private Path zipFile;
 
@@ -62,10 +63,6 @@ public class ZipModel implements Cloneable {
 
     @NonNull
     private Charset charset = Charset.defaultCharset();
-
-    public ZipModel() {
-        splitLength = -1;
-    }
 
     public List getLocalFileHeaderList() {
         return localFileHeaderList;
@@ -154,14 +151,6 @@ public class ZipModel implements Cloneable {
 
     public void setEnd(long end) {
         this.end = end;
-    }
-
-    public long getSplitLength() {
-        return splitLength;
-    }
-
-    public void setSplitLength(long splitLength) {
-        this.splitLength = splitLength;
     }
 
     public Object clone() throws CloneNotSupportedException {

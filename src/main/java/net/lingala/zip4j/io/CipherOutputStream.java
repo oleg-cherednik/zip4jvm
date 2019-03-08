@@ -105,9 +105,7 @@ public class CipherOutputStream extends OutputStream {
             createLocalFileHeader();
 
             if (zipModel.isSplitArchive()) {
-                if (zipModel.getCentralDirectory() == null ||
-                        zipModel.getCentralDirectory().getFileHeaders() == null ||
-                        zipModel.getCentralDirectory().getFileHeaders().size() == 0) {
+                if (zipModel.getCentralDirectory() == null || zipModel.getCentralDirectory().getFileHeaders().isEmpty()) {
                     byte[] intByte = new byte[4];
                     Raw.writeIntLittleEndian(intByte, 0, (int)InternalZipConstants.SPLITSIG);
                     outputStream.write(intByte);
@@ -366,8 +364,8 @@ public class CipherOutputStream extends OutputStream {
             throw new ZipException("fileName is null or empty. unable to create file header");
         }
 
-        if(!zipParameters.isSourceExternalStream() && sourceFile.isDirectory()) {
-            if(!fileName.endsWith("/") && !fileName.endsWith("\\"))
+        if (!zipParameters.isSourceExternalStream() && sourceFile.isDirectory()) {
+            if (!fileName.endsWith("/") && !fileName.endsWith("\\"))
                 fileName += "/";
         }
 

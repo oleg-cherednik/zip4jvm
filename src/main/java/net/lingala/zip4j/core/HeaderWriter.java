@@ -18,6 +18,7 @@ package net.lingala.zip4j.core;
 
 import lombok.NonNull;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.io.NoSplitOutputStream;
 import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.CentralDirectory;
@@ -30,11 +31,11 @@ import net.lingala.zip4j.util.LittleEndianBuffer;
 import net.lingala.zip4j.util.Raw;
 import org.apache.commons.io.FilenameUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 public class HeaderWriter {
@@ -158,7 +159,8 @@ public class HeaderWriter {
                 if (outputStream instanceof SplitOutputStream) {
                     zipModel.getZip64EndCentralDirectoryLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(
                             ((SplitOutputStream)outputStream).getCurrSplitFileCounter());
-                    zipModel.getZip64EndCentralDirectoryLocator().setTotNumberOfDiscs(((SplitOutputStream)outputStream).getCurrSplitFileCounter() + 1);
+                    zipModel.getZip64EndCentralDirectoryLocator().setTotNumberOfDiscs(
+                            ((SplitOutputStream)outputStream).getCurrSplitFileCounter() + 1);
                 } else {
                     zipModel.getZip64EndCentralDirectoryLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(0);
                     zipModel.getZip64EndCentralDirectoryLocator().setTotNumberOfDiscs(1);
@@ -744,7 +746,7 @@ public class HeaderWriter {
                 } else {
                     fileName += fileNameWithoutExt + ".z" + (noOfDisk + 1);
                 }
-                currOutputStream = new SplitOutputStream(new File(fileName).toPath());
+                currOutputStream = new NoSplitOutputStream(Paths.get(fileName));
                 closeFlag = true;
             } else {
                 currOutputStream = outputStream;
