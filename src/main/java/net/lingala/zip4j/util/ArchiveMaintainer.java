@@ -97,7 +97,7 @@ public class ArchiveMaintainer {
             }
 
             try {
-                outputStream = new SplitOutputStream(new File(tmpZipFileName));
+                outputStream = new SplitOutputStream(new File(tmpZipFileName).toPath());
             } catch(FileNotFoundException e1) {
                 throw new ZipException(e1);
             }
@@ -608,7 +608,7 @@ public class ArchiveMaintainer {
 
         try {
             HeaderWriter headerWriter = new HeaderWriter();
-            outputStream = new SplitOutputStream(zipModel.getZipFile().toFile());
+            outputStream = new SplitOutputStream(zipModel.getZipFile());
 
             if (zipModel.isZip64Format()) {
                 outputStream.seek(zipModel.getZip64EndCentralDirectory().getOffsetStartCenDirWRTStartDiskNo());

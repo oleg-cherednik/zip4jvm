@@ -21,47 +21,37 @@ import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.Raw;
 import net.lingala.zip4j.util.Zip4jUtil;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.nio.file.Path;
 
 public class SplitOutputStream extends OutputStream {
 
     private RandomAccessFile raf;
     private long splitLength;
-    private File zipFile;
-    private File outFile;
+    private Path zipFile;
+    private Path outFile;
     private int currSplitFileCounter;
     private long bytesWrittenForThisPart;
 
-    public SplitOutputStream(String name) throws FileNotFoundException, ZipException {
-        this(StringUtils.isNotBlank(name) ?
-             new File(name) : null);
-    }
-
-    public SplitOutputStream(File file) throws FileNotFoundException, ZipException {
+    public SplitOutputStream(Path file) throws FileNotFoundException, ZipException {
         this(file, -1);
     }
 
-    public SplitOutputStream(String name, long splitLength) throws FileNotFoundException, ZipException {
-        this(StringUtils.isBlank(name) ?
-             new File(name) : null, splitLength);
-    }
-
-    public SplitOutputStream(File file, long splitLength) throws FileNotFoundException, ZipException {
+    public SplitOutputStream(Path file, long splitLength) throws FileNotFoundException, ZipException {
         if (splitLength >= 0 && splitLength < InternalZipConstants.MIN_SPLIT_LENGTH) {
             throw new ZipException("split length less than minimum allowed split length of " + InternalZipConstants.MIN_SPLIT_LENGTH + " Bytes");
         }
-        this.raf = new RandomAccessFile(file, InternalZipConstants.WRITE_MODE);
+        raf = new RandomAccessFile(file.toFile(), InternalZipConstants.WRITE_MODE);
         this.splitLength = splitLength;
-        this.outFile = file;
-        this.zipFile = file;
-        this.currSplitFileCounter = 0;
-        this.bytesWrittenForThisPart = 0;
+        outFile = file;
+        zipFile = file;
+        currSplitFileCounter = 0;
+        bytesWrittenForThisPart = 0;
     }
 
     public void write(int b) throws IOException {
@@ -111,9 +101,9 @@ public class SplitOutputStream extends OutputStream {
     }
 
     private void startNextSplitFile() throws IOException {
-        String zipFileWithoutExt = FilenameUtils.getBaseName(outFile.getName());
+        String zipFileWithoutExt = FilenameUtils.getBaseName(outFile.getFileName().toString());
         File currSplitFile = null;
-        String zipFileName = zipFile.getAbsolutePath();
+        String zipFileName = zipFile.toAbsolutePath().toString();
         String parentPath = (outFile.getParent() == null) ? "" : outFile.getParent() + System.getProperty("file.separator");
 
         if (currSplitFileCounter < 9) {
@@ -128,12 +118,12 @@ public class SplitOutputStream extends OutputStream {
             throw new IOException("split file: " + currSplitFile.getName() + " already exists in the current directory, cannot rename this file");
         }
 
-        if (!zipFile.renameTo(currSplitFile)) {
+        if (!zipFile.toFile().renameTo(currSplitFile)) {
             throw new IOException("cannot rename newly created split file");
         }
 
-        zipFile = new File(zipFileName);
-        raf = new RandomAccessFile(zipFile, InternalZipConstants.WRITE_MODE);
+        zipFile = new File(zipFileName).toPath();
+        raf = new RandomAccessFile(zipFile.toFile(), InternalZipConstants.WRITE_MODE);
         currSplitFileCounter++;
     }
 

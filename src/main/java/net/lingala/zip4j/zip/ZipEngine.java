@@ -77,7 +77,7 @@ public class ZipEngine {
 
         boolean isZipFileAlreadExists = Files.exists(zipModel.getZipFile());
 
-        try (SplitOutputStream splitOutputStream = new SplitOutputStream(zipModel.getZipFile().toFile(), zipModel.getSplitLength());
+        try (SplitOutputStream splitOutputStream = new SplitOutputStream(zipModel.getZipFile(), zipModel.getSplitLength());
              ZipOutputStream out = new ZipOutputStream(splitOutputStream, zipModel)) {
 
             if (isZipFileAlreadExists) {
@@ -132,7 +132,7 @@ public class ZipEngine {
 
             boolean isZipFileAlreadExists = Files.exists(zipModel.getZipFile());
 
-            SplitOutputStream splitOutputStream = new SplitOutputStream(zipModel.getZipFile().toFile(), zipModel.getSplitLength());
+            SplitOutputStream splitOutputStream = new SplitOutputStream(zipModel.getZipFile(), zipModel.getSplitLength());
             outputStream = new ZipOutputStream(splitOutputStream, this.zipModel);
 
             if (isZipFileAlreadExists) {

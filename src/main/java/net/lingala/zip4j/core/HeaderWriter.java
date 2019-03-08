@@ -744,7 +744,7 @@ public class HeaderWriter {
                 } else {
                     fileName += fileNameWithoutExt + ".z" + (noOfDisk + 1);
                 }
-                currOutputStream = new SplitOutputStream(new File(fileName));
+                currOutputStream = new SplitOutputStream(new File(fileName).toPath());
                 closeFlag = true;
             } else {
                 currOutputStream = outputStream;
