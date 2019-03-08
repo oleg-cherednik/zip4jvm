@@ -31,8 +31,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
-import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("MethodCanBeVariableArityMethod")
 public class Zip4jUtil {
@@ -84,7 +85,7 @@ public class Zip4jUtil {
             throw new ZipException("path is null");
         }
 
-        if (!checkFileExists(path)) {
+        if (!new File(path).exists()) {
             throw new ZipException("file does not exist: " + path);
         }
 
@@ -93,32 +94,6 @@ public class Zip4jUtil {
             return file.canRead();
         } catch(Exception e) {
             throw new ZipException("cannot read zip file");
-        }
-    }
-
-    public static boolean checkFileExists(String path) throws ZipException {
-        if (StringUtils.isBlank(path)) {
-            throw new ZipException("path is null");
-        }
-
-        File file = new File(path);
-        return checkFileExists(file);
-    }
-
-    public static boolean checkFileExists(File file) throws ZipException {
-        if (file == null) {
-            throw new ZipException("cannot check if file exists: input file is null");
-        }
-        return file.exists();
-    }
-
-    public static void setFileReadOnly(File file) throws ZipException {
-        if (file == null) {
-            throw new ZipException("input file is null. cannot set read only file attribute");
-        }
-
-        if (file.exists()) {
-            file.setReadOnly();
         }
     }
 
@@ -182,18 +157,6 @@ public class Zip4jUtil {
 //				// add log statements here when logging is done
 //			}
 //		}
-    }
-
-    public static long getLastModifiedFileTime(File file, TimeZone timeZone) throws ZipException {
-        if (file == null) {
-            throw new ZipException("input file is null, cannot read last modified file time");
-        }
-
-        if (!file.exists()) {
-            throw new ZipException("input file does not exist, cannot read last modified file time");
-        }
-
-        return file.lastModified();
     }
 
     /**
@@ -284,14 +247,14 @@ public class Zip4jUtil {
 
         List<File> result = new ArrayList<>();
         File[] filesAndDirs = path.listFiles();
-        List<File> filesDirs = Arrays.asList(filesAndDirs);
+        List<File> filesDirs = filesAndDirs == null ? Collections.emptyList() : Arrays.stream(filesAndDirs).collect(Collectors.toList());
 
         if (!path.canRead()) {
             return result;
         }
 
         for (int i = 0; i < filesDirs.size(); i++) {
-            File file = (File)filesDirs.get(i);
+            File file = filesDirs.get(i);
             if (file.isHidden() && !readHiddenFiles) {
                 return result;
             }
@@ -302,21 +265,6 @@ public class Zip4jUtil {
             }
         }
         return result;
-    }
-
-    public static String getZipFileNameWithoutExt(String zipFile) throws ZipException {
-        if (StringUtils.isBlank(zipFile)) {
-            throw new ZipException("zip file name is empty or null, cannot determine zip file name");
-        }
-        String tmpFileName = zipFile;
-        if (zipFile.indexOf(System.getProperty("file.separator")) >= 0) {
-            tmpFileName = zipFile.substring(zipFile.lastIndexOf(System.getProperty("file.separator")));
-        }
-
-        if (tmpFileName.indexOf(".") > 0) {
-            tmpFileName = tmpFileName.substring(0, tmpFileName.lastIndexOf("."));
-        }
-        return tmpFileName;
     }
 
     /**
@@ -420,7 +368,7 @@ public class Zip4jUtil {
                     if (i > 9) {
                         fileExt = ".z";
                     }
-                    partFile = (zipFileName.indexOf(".") >= 0) ? currZipFile.substring(0, currZipFile.lastIndexOf(".")) : currZipFile;
+                    partFile = (zipFileName.contains(".")) ? currZipFile.substring(0, currZipFile.lastIndexOf('.')) : currZipFile;
                     partFile = partFile + fileExt + (i + 1);
                     retList.add(new File(partFile));
                 }

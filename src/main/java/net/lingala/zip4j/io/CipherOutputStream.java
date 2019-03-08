@@ -74,7 +74,7 @@ public class CipherOutputStream extends OutputStream {
         if (!zipParameters.isSourceExternalStream() && file == null)
             throw new ZipException("input file is null");
 
-        if (!zipParameters.isSourceExternalStream() && !Zip4jUtil.checkFileExists(file)) {
+        if (!zipParameters.isSourceExternalStream() && !file.exists()) {
             throw new ZipException("input file does not exist");
         }
 
@@ -356,8 +356,7 @@ public class CipherOutputStream extends OutputStream {
             }
             fileName = zipParameters.getFileNameInZip();
         } else {
-            fileHeader.setLastModFileTime((int)Zip4jUtil.javaToDosTime((Zip4jUtil.getLastModifiedFileTime(
-                    sourceFile, zipParameters.getTimeZone()))));
+            fileHeader.setLastModFileTime((int)Zip4jUtil.javaToDosTime(sourceFile.lastModified()));
             fileHeader.setUncompressedSize(sourceFile.length());
             fileName = zipParameters.getRelativeFileName(sourceFile.toPath());
 

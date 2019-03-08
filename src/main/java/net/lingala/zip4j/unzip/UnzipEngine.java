@@ -32,7 +32,6 @@ import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.Raw;
 import net.lingala.zip4j.util.Zip4jConstants;
-import net.lingala.zip4j.util.Zip4jUtil;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
@@ -444,12 +443,8 @@ public class UnzipEngine {
             }
         }
         currSplitFileCounter++;
-        try {
-            if (!Zip4jUtil.checkFileExists(partFile)) {
-                throw new IOException("zip split file does not exist: " + partFile);
-            }
-        } catch(ZipException e) {
-            throw new IOException(e.getMessage());
+        if (!new File(partFile).exists()) {
+            throw new IOException("zip split file does not exist: " + partFile);
         }
         return new RandomAccessFile(partFile, InternalZipConstants.READ_MODE);
     }

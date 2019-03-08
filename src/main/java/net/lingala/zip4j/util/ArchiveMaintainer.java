@@ -430,7 +430,7 @@ public class ArchiveMaintainer {
             }
             File tmpFile = new File(partFile);
 
-            if (!Zip4jUtil.checkFileExists(tmpFile)) {
+            if (!tmpFile.exists()) {
                 throw new ZipException("split file does not exist: " + partFile);
             }
 

@@ -177,7 +177,7 @@ public class ZipEngine {
             throw new ZipException("one of the input parameters is null, cannot add folder to zip");
         }
 
-        if (!Zip4jUtil.checkFileExists(file.getAbsolutePath())) {
+        if (!new File(file.getAbsolutePath()).exists()) {
             throw new ZipException("input folder does not exist");
         }
 
