@@ -16,30 +16,37 @@
 
 package net.lingala.zip4j.io;
 
+import lombok.NonNull;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.Raw;
 import net.lingala.zip4j.util.Zip4jUtil;
-import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class SplitOutputStream extends OutputStream {
 
-    private RandomAccessFile raf;
+    protected RandomAccessFile raf;
     private final long splitLength;
     private Path zipFile;
-    private Path outFile;
+    private final Path outFile;
     private int currSplitFileCounter;
-    private long bytesWrittenForThisPart;
+    protected long bytesWrittenForThisPart;
 
-    public SplitOutputStream(Path file, long splitLength) throws FileNotFoundException, ZipException {
+    @NonNull
+    public static SplitOutputStream create(@NonNull ZipModel zipModel) throws FileNotFoundException, ZipException {
+        Path zipFile = zipModel.getZipFile();
+        return zipModel.isSplitArchive() ? new SplitOutputStream(zipFile, zipModel.getSplitLength()) : new NoSplitOutputStream(zipFile);
+    }
+
+    protected SplitOutputStream(Path file, long splitLength) throws FileNotFoundException, ZipException {
         if (splitLength >= 0 && splitLength < InternalZipConstants.MIN_SPLIT_LENGTH)
             throw new ZipException("split length less than minimum allowed split length of " + InternalZipConstants.MIN_SPLIT_LENGTH + " Bytes");
 
@@ -51,65 +58,55 @@ public class SplitOutputStream extends OutputStream {
         bytesWrittenForThisPart = 0;
     }
 
+    @Override
     public void write(int b) throws IOException {
         byte[] buff = new byte[1];
         buff[0] = (byte)b;
         write(buff, 0, 1);
     }
 
+    @Override
     public void write(byte[] b) throws IOException {
         write(b, 0, b.length);
     }
 
+    @Override
     public void write(byte[] b, int off, int len) throws IOException {
-        if (len <= 0) return;
+        if (len <= 0)
+            return;
 
-        if (splitLength != ZipModel.NO_SPLIT) {
-            if (bytesWrittenForThisPart >= splitLength) {
+        if (bytesWrittenForThisPart >= splitLength) {
+            startNextSplitFile();
+            raf.write(b, off, len);
+            bytesWrittenForThisPart = len;
+        } else if (bytesWrittenForThisPart + len > splitLength) {
+            if (isHeaderData(b)) {
                 startNextSplitFile();
                 raf.write(b, off, len);
                 bytesWrittenForThisPart = len;
-            } else if (bytesWrittenForThisPart + len > splitLength) {
-                if (isHeaderData(b)) {
-                    startNextSplitFile();
-                    raf.write(b, off, len);
-                    bytesWrittenForThisPart = len;
-                } else {
-                    raf.write(b, off, (int)(splitLength - bytesWrittenForThisPart));
-                    startNextSplitFile();
-                    raf.write(b, off + (int)(splitLength - bytesWrittenForThisPart), (int)(len - (splitLength - bytesWrittenForThisPart)));
-                    bytesWrittenForThisPart = len - (splitLength - bytesWrittenForThisPart);
-                }
             } else {
-                raf.write(b, off, len);
-                bytesWrittenForThisPart += len;
+                raf.write(b, off, (int)(splitLength - bytesWrittenForThisPart));
+                startNextSplitFile();
+                raf.write(b, off + (int)(splitLength - bytesWrittenForThisPart), (int)(len - (splitLength - bytesWrittenForThisPart)));
+                bytesWrittenForThisPart = len - (splitLength - bytesWrittenForThisPart);
             }
         } else {
             raf.write(b, off, len);
             bytesWrittenForThisPart += len;
         }
-
     }
 
     private void startNextSplitFile() throws IOException {
-        String zipFileWithoutExt = FilenameUtils.getBaseName(outFile.getFileName().toString());
-        File currSplitFile = null;
         String zipFileName = zipFile.toAbsolutePath().toString();
-        String parentPath = (outFile.getParent() == null) ? "" : outFile.getParent() + System.getProperty("file.separator");
-
-        if (currSplitFileCounter < 9) {
-            currSplitFile = new File(parentPath + zipFileWithoutExt + ".z0" + (currSplitFileCounter + 1));
-        } else {
-            currSplitFile = new File(parentPath + zipFileWithoutExt + ".z" + (currSplitFileCounter + 1));
-        }
+        Path currSplitFile = ZipModel.getSplitFilePath(zipFile, currSplitFileCounter + 1);
 
         raf.close();
 
-        if (currSplitFile.exists()) {
-            throw new IOException("split file: " + currSplitFile.getName() + " already exists in the current directory, cannot rename this file");
+        if (Files.exists(currSplitFile)) {
+            throw new IOException("split file: " + currSplitFile.getFileName() + " already exists in the current directory, cannot rename this file");
         }
 
-        if (!zipFile.toFile().renameTo(currSplitFile)) {
+        if (!zipFile.toFile().renameTo(currSplitFile.toFile())) {
             throw new IOException("cannot rename newly created split file");
         }
 
@@ -173,16 +170,10 @@ public class SplitOutputStream extends OutputStream {
      * @throws ZipException
      */
     public boolean isBuffSizeFitForCurrSplitFile(int bufferSize) throws ZipException {
-        if (bufferSize < 0) {
+        if (bufferSize < 0)
             throw new ZipException("negative buffersize for isBuffSizeFitForCurrSplitFile");
-        }
 
-        if (splitLength >= InternalZipConstants.MIN_SPLIT_LENGTH) {
-            return (bytesWrittenForThisPart + bufferSize <= splitLength);
-        } else {
-            //Non split zip -- return true
-            return true;
-        }
+        return bytesWrittenForThisPart + bufferSize <= splitLength;
     }
 
     public void seek(long pos) throws IOException {
@@ -202,7 +193,7 @@ public class SplitOutputStream extends OutputStream {
     }
 
     public boolean isSplitZipFile() {
-        return splitLength != -1;
+        return true;
     }
 
     public long getSplitLength() {

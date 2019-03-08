@@ -178,4 +178,8 @@ public class ZipModel implements Cloneable {
                                .findFirst().orElse(null);
     }
 
+    public static Path getSplitFilePath(Path zipFile, int count) {
+        return zipFile.getParent().resolve(String.format("%s.z%02d", FilenameUtils.getBaseName(zipFile.toString()), count));
+    }
+
 }

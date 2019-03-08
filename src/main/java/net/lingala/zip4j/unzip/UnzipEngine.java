@@ -352,17 +352,12 @@ public class UnzipEngine {
         if (zipModel.isSplitArchive()) {
             int diskNumberStartOfFile = fileHeader.getDiskNumberStart();
             currSplitFileCounter = diskNumberStartOfFile + 1;
-            String curZipFile = zipModel.getZipFile().toString();
-            String partFile = null;
-            if (diskNumberStartOfFile == zipModel.getEndCentralDirectory().getNoOfDisk()) {
+            String partFile;
+
+            if (diskNumberStartOfFile == zipModel.getEndCentralDirectory().getNoOfDisk())
                 partFile = zipModel.getZipFile().toString();
-            } else {
-                if (diskNumberStartOfFile >= 9) {
-                    partFile = curZipFile.substring(0, curZipFile.lastIndexOf(".")) + ".z" + (diskNumberStartOfFile + 1);
-                } else {
-                    partFile = curZipFile.substring(0, curZipFile.lastIndexOf(".")) + ".z0" + (diskNumberStartOfFile + 1);
-                }
-            }
+            else
+                partFile = ZipModel.getSplitFilePath(zipModel.getZipFile(), diskNumberStartOfFile + 1).toString();
 
             try {
                 RandomAccessFile raf = new RandomAccessFile(partFile, InternalZipConstants.READ_MODE);
@@ -431,17 +426,13 @@ public class UnzipEngine {
     }
 
     public RandomAccessFile startNextSplitFile() throws IOException {
-        String currZipFile = zipModel.getZipFile().toString();
         String partFile = null;
-        if (currSplitFileCounter == zipModel.getEndCentralDirectory().getNoOfDisk()) {
+
+        if (currSplitFileCounter == zipModel.getEndCentralDirectory().getNoOfDisk())
             partFile = zipModel.getZipFile().toString();
-        } else {
-            if (currSplitFileCounter >= 9) {
-                partFile = currZipFile.substring(0, currZipFile.lastIndexOf(".")) + ".z" + (currSplitFileCounter + 1);
-            } else {
-                partFile = currZipFile.substring(0, currZipFile.lastIndexOf(".")) + ".z0" + (currSplitFileCounter + 1);
-            }
-        }
+        else
+            partFile = ZipModel.getSplitFilePath(zipModel.getZipFile(), currSplitFileCounter + 1).toString();
+
         currSplitFileCounter++;
         if (!new File(partFile).exists()) {
             throw new IOException("zip split file does not exist: " + partFile);

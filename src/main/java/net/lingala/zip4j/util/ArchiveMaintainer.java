@@ -421,15 +421,12 @@ public class ArchiveMaintainer {
         try {
             String curZipFile = zipModel.getZipFile().toString();
             String partFile = null;
-            if (partNumber == zipModel.getEndCentralDirectory().getNoOfDisk()) {
+
+            if (partNumber == zipModel.getEndCentralDirectory().getNoOfDisk())
                 partFile = zipModel.getZipFile().toString();
-            } else {
-                if (partNumber >= 9) {
-                    partFile = curZipFile.substring(0, curZipFile.lastIndexOf(".")) + ".z" + (partNumber + 1);
-                } else {
-                    partFile = curZipFile.substring(0, curZipFile.lastIndexOf(".")) + ".z0" + (partNumber + 1);
-                }
-            }
+            else
+                partFile = ZipModel.getSplitFilePath(zipModel.getZipFile(), partNumber + 1).toString();
+
             File tmpFile = new File(partFile);
 
             if (!tmpFile.exists()) {

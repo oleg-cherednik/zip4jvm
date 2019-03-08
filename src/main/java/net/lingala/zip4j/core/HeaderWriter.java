@@ -29,13 +29,11 @@ import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.LittleEndianBuffer;
 import net.lingala.zip4j.util.Raw;
-import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 public class HeaderWriter {
@@ -738,15 +736,8 @@ public class HeaderWriter {
 
             if (noOfDisk != outputStream.getCurrSplitFileCounter()) {
                 Path zipFile = zipModel.getZipFile();
-                Path parentFile = zipFile.getParent();
-                String fileNameWithoutExt = FilenameUtils.getBaseName(zipFile.getFileName().toString());
-                String fileName = parentFile + System.getProperty("file.separator");
-                if (noOfDisk < 9) {
-                    fileName += fileNameWithoutExt + ".z0" + (noOfDisk + 1);
-                } else {
-                    fileName += fileNameWithoutExt + ".z" + (noOfDisk + 1);
-                }
-                currOutputStream = new NoSplitOutputStream(Paths.get(fileName));
+                Path fileName = ZipModel.getSplitFilePath(zipFile, noOfDisk + 1);
+                currOutputStream = new NoSplitOutputStream(fileName);
                 closeFlag = true;
             } else {
                 currOutputStream = outputStream;
