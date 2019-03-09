@@ -25,7 +25,7 @@ import net.lingala.zip4j.io.InflaterInputStream;
 import net.lingala.zip4j.io.PartInputStream;
 import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.AESExtraDataRecord;
-import net.lingala.zip4j.model.AesStrength;
+import net.lingala.zip4j.model.AESStrength;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.Encryption;
@@ -234,11 +234,11 @@ public class UnzipEngine {
         if (aesExtraDataRecord == null)
             throw new ZipException("unable to determine salt length: AESExtraDataRecord is null");
 
-        if (aesExtraDataRecord.getAesStrength() == AesStrength.STRENGTH_128)
+        if (aesExtraDataRecord.getAesStrength() == AESStrength.STRENGTH_128)
             return 8;
-        if (aesExtraDataRecord.getAesStrength() == AesStrength.STRENGTH_192)
+        if (aesExtraDataRecord.getAesStrength() == AESStrength.STRENGTH_192)
             return 12;
-        if (aesExtraDataRecord.getAesStrength() == AesStrength.STRENGTH_256)
+        if (aesExtraDataRecord.getAesStrength() == AESStrength.STRENGTH_256)
             return 16;
         throw new ZipException("unable to determine salt length: invalid aes key strength");
     }

@@ -4,7 +4,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.AESExtraDataRecord;
-import net.lingala.zip4j.model.AesStrength;
+import net.lingala.zip4j.model.AESStrength;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.EndCentralDirectory;
@@ -135,7 +135,7 @@ final class CentralDirectoryReader {
             res.setDataSize(record.getSizeOfData());
             res.setVersionNumber(in.readShort());
             res.setVendorID(in.readString(2));
-            res.setAesStrength(AesStrength.parseByte(in.readByte()));
+            res.setAesStrength(AESStrength.parseByte(in.readByte()));
             res.setCompressionMethod(CompressionMethod.parseValue(in.readShort()));
 
             return res;

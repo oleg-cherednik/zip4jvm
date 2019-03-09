@@ -14,25 +14,19 @@
  * limitations under the License.
  */
 
-package net.lingala.zip4j.model;
+package net.lingala.zip4j.crypto;
 
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import net.lingala.zip4j.util.InternalZipConstants;
+import net.lingala.zip4j.exception.ZipException;
 
-@Getter
-@Setter
-public class AESExtraDataRecord {
+@SuppressWarnings("MethodCanBeVariableArityMethod")
+public interface Encryptor {
 
-    // size:4 - signature (0x9901)
-    private final long signature = InternalZipConstants.AESSIG;
-    private int dataSize = -1;
-    private int versionNumber = -1;
-    private String vendorID;
-    @NonNull
-    private AESStrength aesStrength = AESStrength.NONE;
-    @NonNull
-    private CompressionMethod compressionMethod = CompressionMethod.STORE;
+    Encryptor NULL = (buf, offs, len) -> 0;
+
+    default int encrypt(byte[] buf) throws ZipException {
+        return encrypt(buf, 0, buf.length);
+    }
+
+    int encrypt(byte[] buf, int offs, int len) throws ZipException;
 
 }

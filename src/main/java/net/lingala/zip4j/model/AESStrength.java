@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public enum AesStrength {
+public enum AESStrength {
 
     NONE((byte)0),
     STRENGTH_128((byte)0x01),
@@ -19,11 +19,11 @@ public enum AesStrength {
 
     private final byte value;
 
-    public static AesStrength parseByte(byte value) {
-        for (AesStrength strength : values())
+    public static AESStrength parseByte(byte value) {
+        for (AESStrength strength : values())
             if (strength.value == value)
                 return strength;
-        throw new EnumConstantNotPresentException(AesStrength.class, "value=" + value);
+        throw new EnumConstantNotPresentException(AESStrength.class, "value=" + value);
     }
 
 }

@@ -23,7 +23,7 @@ import net.lingala.zip4j.crypto.engine.AESEngine;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.exception.ZipExceptionConstants;
 import net.lingala.zip4j.model.AESExtraDataRecord;
-import net.lingala.zip4j.model.AesStrength;
+import net.lingala.zip4j.model.AESStrength;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.Raw;
@@ -74,15 +74,15 @@ public class AESDecrypter implements IDecrypter {
         if (aesExtraDataRecord == null)
             throw new ZipException("invalid aes extra data record - in init method of AESDecryptor");
 
-        if (aesExtraDataRecord.getAesStrength() == AesStrength.STRENGTH_128) {
+        if (aesExtraDataRecord.getAesStrength() == AESStrength.STRENGTH_128) {
             KEY_LENGTH = 16;
             MAC_LENGTH = 16;
             SALT_LENGTH = 8;
-        } else if (aesExtraDataRecord.getAesStrength() == AesStrength.STRENGTH_192) {
+        } else if (aesExtraDataRecord.getAesStrength() == AESStrength.STRENGTH_192) {
             KEY_LENGTH = 24;
             MAC_LENGTH = 24;
             SALT_LENGTH = 12;
-        } else if (aesExtraDataRecord.getAesStrength() == AesStrength.STRENGTH_256) {
+        } else if (aesExtraDataRecord.getAesStrength() == AESStrength.STRENGTH_256) {
             KEY_LENGTH = 32;
             MAC_LENGTH = 32;
             SALT_LENGTH = 16;

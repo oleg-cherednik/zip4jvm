@@ -127,7 +127,7 @@ public class ExtractAllFilesWithInputStreams {
 		//If CRC check has to be skipped (for ex: to cancel the unzip operation, etc)
 		//use method is.close(boolean skipCRCCheck) and set the flag,
 		//skipCRCCheck to false
-		//NOTE: It is recommended to close outputStream first because Zip4j throws
+		//NOTE: It is recommended to close out first because Zip4j throws
 		//an exception if CRC check fails
 		if (is != null) {
 			is.close();

@@ -302,11 +302,8 @@ public class HeaderWriter {
             throw new ZipException("input parameters is null, cannot write central directory");
         }
 
-        if (zipModel.getCentralDirectory() == null ||
-                zipModel.getCentralDirectory().getFileHeaders() == null ||
-                zipModel.getCentralDirectory().getFileHeaders().size() <= 0) {
+        if (zipModel.isEmpty())
             return 0;
-        }
 
         int sizeOfCentralDir = 0;
         for (int i = 0; i < zipModel.getCentralDirectory().getFileHeaders().size(); i++) {
@@ -515,7 +512,7 @@ public class HeaderWriter {
                 sizeOfFileHeader += 11;
             }
 
-//			outputStream.write(byteArrayListToByteArray(headerBytesList));
+//			out.write(byteArrayListToByteArray(headerBytesList));
 
             return sizeOfFileHeader;
         } catch(Exception e) {

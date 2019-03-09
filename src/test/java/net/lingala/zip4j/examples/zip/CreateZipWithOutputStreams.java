@@ -17,7 +17,7 @@
 package net.lingala.zip4j.examples.zip;
 
 import net.lingala.zip4j.io.ZipOutputStream;
-import net.lingala.zip4j.model.AesStrength;
+import net.lingala.zip4j.model.AESStrength;
 import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.Encryption;
@@ -83,7 +83,7 @@ public class CreateZipWithOutputStreams {
                                                     .encryption(Encryption.AES)
 
                                                     //If AES encryption is used, this defines the key strength
-                                                    .aesKeyStrength(AesStrength.STRENGTH_256).build();
+                                                    .aesKeyStrength(AESStrength.STRENGTH_256).build();
 
             //self descriptive
             parameters.setPassword("YourPassword");
