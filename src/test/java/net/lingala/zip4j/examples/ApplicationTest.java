@@ -4,9 +4,8 @@ import lombok.NonNull;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CompressionLevel;
+import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.util.Compression;
-import net.lingala.zip4j.util.Zip4jConstants;
 import org.apache.commons.io.FileUtils;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -80,7 +79,7 @@ public class ApplicationTest {
                 srcDir.resolve("cars/wiesmann-gt-mf5.jpg"));
 
         ZipParameters parameters = new ZipParameters();
-        parameters.setCompressionMethod(Compression.STORE.getVal());
+        parameters.setCompressionMethod(CompressionMethod.STORE);
         parameters.setDefaultFolderPath(srcDir.toString());
 
         // Now add files to the zip file
@@ -98,7 +97,7 @@ public class ApplicationTest {
         ZipFile zipFile = new ZipFile(destDir.resolve("src.zip"));
         List<File> filesToAdd = getDirectoryEntries(srcDir);
         ZipParameters parameters = new ZipParameters();
-        parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
+        parameters.setCompressionMethod(CompressionMethod.DEFLATE);
         parameters.setCompressionLevel(CompressionLevel.NORMAL);
         parameters.setDefaultFolderPath(srcDir.toString());
         zipFile.createZipFile(filesToAdd, parameters, true, 1024 * 1024);

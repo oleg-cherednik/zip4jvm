@@ -12,13 +12,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum CompressionLevel {
     DEFAULT(-1),
-    STORE(0),
     FASTEST(1),
     FAST(3),
     NORMAL(5),
     MAXIMUM(7),
     ULTRA(9);
 
-    private final int level;
+    private final int value;
 
 }

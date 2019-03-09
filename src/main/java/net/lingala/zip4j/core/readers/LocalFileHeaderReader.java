@@ -4,6 +4,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CentralDirectory;
+import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.ExtraDataRecord;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.Zip64ExtendedInfo;
@@ -31,7 +32,7 @@ public final class LocalFileHeaderReader {
 
         localFileHeader.setVersionNeededToExtract(in.readShort());
         localFileHeader.setGeneralPurposeFlag(in.readBytes(2));
-        localFileHeader.setCompressionMethod(in.readShort());
+        localFileHeader.setCompressionMethod(CompressionMethod.parseValue(in.readShort()));
         localFileHeader.setLastModFileTime(in.readInt());
         localFileHeader.setCrc32(in.readInt());
         localFileHeader.setCompressedSize(in.readIntAsLong());

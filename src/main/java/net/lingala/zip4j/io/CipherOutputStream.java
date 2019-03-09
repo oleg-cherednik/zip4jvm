@@ -24,6 +24,7 @@ import net.lingala.zip4j.crypto.StandardEncrypter;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.CentralDirectory;
+import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.EndCentralDirectory;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.ZipModel;
@@ -86,7 +87,7 @@ public abstract class CipherOutputStream extends OutputStream {
                 if (Files.isDirectory(sourceFile)) {
                     this.zipParameters.setEncryptFiles(false);
                     this.zipParameters.setEncryptionMethod(-1);
-                    this.zipParameters.setCompressionMethod(Zip4jConstants.COMP_STORE);
+                    this.zipParameters.setCompressionMethod(CompressionMethod.STORE);
                 }
             } else {
                 if (StringUtils.isBlank(this.zipParameters.getFileNameInZip())) {
@@ -95,7 +96,7 @@ public abstract class CipherOutputStream extends OutputStream {
                 if (Zip4jUtil.isDirectory(zipParameters.getFileNameInZip())) {
                     this.zipParameters.setEncryptFiles(false);
                     this.zipParameters.setEncryptionMethod(-1);
-                    this.zipParameters.setCompressionMethod(Zip4jConstants.COMP_STORE);
+                    this.zipParameters.setCompressionMethod(CompressionMethod.STORE);
                 }
             }
 
@@ -333,7 +334,7 @@ public abstract class CipherOutputStream extends OutputStream {
         fileHeader.setVersionNeededToExtract(20);
         if (zipParameters.isEncryptFiles() &&
                 zipParameters.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_AES) {
-            fileHeader.setCompressionMethod(Zip4jConstants.ENC_METHOD_AES);
+            fileHeader.setEncryptionMethod(Zip4jConstants.ENC_METHOD_AES);
             fileHeader.setAesExtraDataRecord(generateAESExtraDataRecord(zipParameters));
         } else {
             fileHeader.setCompressionMethod(zipParameters.getCompressionMethod());
@@ -384,7 +385,7 @@ public abstract class CipherOutputStream extends OutputStream {
         } else {
             if (!zipParameters.isSourceExternalStream()) {
                 long fileSize = Files.size(sourceFile);
-                if (zipParameters.getCompressionMethod() == Zip4jConstants.COMP_STORE) {
+                if (zipParameters.getCompressionMethod() == CompressionMethod.STORE) {
                     if (zipParameters.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_STANDARD) {
                         fileHeader.setCompressedSize(fileSize
                                 + InternalZipConstants.STD_DEC_HDR_SIZE);
@@ -460,7 +461,7 @@ public abstract class CipherOutputStream extends OutputStream {
         return Files.isHidden(file) ? InternalZipConstants.FILE_MODE_HIDDEN : InternalZipConstants.FILE_MODE_NONE;
     }
 
-    private int[] generateGeneralPurposeBitArray(boolean isEncrpyted, int compressionMethod) {
+    private int[] generateGeneralPurposeBitArray(boolean isEncrpyted, CompressionMethod compressionMethod) {
 
         int[] generalPurposeBits = new int[8];
         if (isEncrpyted) {
@@ -469,7 +470,7 @@ public abstract class CipherOutputStream extends OutputStream {
             generalPurposeBits[0] = 0;
         }
 
-        if (compressionMethod == Zip4jConstants.COMP_DEFLATE) {
+        if (compressionMethod == CompressionMethod.DEFLATE) {
             // Have to set flags for deflate
         } else {
             generalPurposeBits[1] = 0;

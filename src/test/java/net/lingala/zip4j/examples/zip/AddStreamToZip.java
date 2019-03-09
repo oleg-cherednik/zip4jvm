@@ -17,8 +17,8 @@
 package net.lingala.zip4j.examples.zip;
 
 import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.util.Zip4jConstants;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -57,7 +57,7 @@ public class AddStreamToZip {
 			// as compression method, etc. More parameters are explained in other
 			// examples
 			ZipParameters parameters = new ZipParameters();
-			parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
+			parameters.setCompressionMethod(CompressionMethod.DEFLATE);
 
 			// below two parameters have to be set for adding content to a zip file
 			// directly from a stream

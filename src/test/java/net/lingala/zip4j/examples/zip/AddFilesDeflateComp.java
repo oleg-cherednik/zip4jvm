@@ -19,8 +19,8 @@ package net.lingala.zip4j.examples.zip;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CompressionLevel;
+import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.util.Zip4jConstants;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -53,7 +53,7 @@ public class AddFilesDeflateComp {
         // as compression method, etc. More parameters are explained in other
         // examples
         ZipParameters parameters = new ZipParameters();
-        parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE); // set compression method to deflate compression
+        parameters.setCompressionMethod(CompressionMethod.DEFLATE); // set compression method to deflate compression
 
         // Set the compression level. This value has to be in between 0 to 9
         // Several predefined compression levels are available

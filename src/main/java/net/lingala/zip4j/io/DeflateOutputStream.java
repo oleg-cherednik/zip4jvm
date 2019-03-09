@@ -17,10 +17,10 @@
 package net.lingala.zip4j.io;
 
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.InternalZipConstants;
-import net.lingala.zip4j.util.Zip4jConstants;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -42,11 +42,11 @@ public abstract class DeflateOutputStream extends CipherOutputStream {
     public void putNextEntry(Path file, ZipParameters zipParameters) throws ZipException {
         super.putNextEntry(file, zipParameters);
 
-        if (zipParameters.getCompressionMethod() != Zip4jConstants.COMP_DEFLATE)
+        if (zipParameters.getCompressionMethod() != CompressionMethod.DEFLATE)
             return;
 
         deflater.reset();
-        deflater.setLevel(zipParameters.getCompressionLevel().getLevel());
+        deflater.setLevel(zipParameters.getCompressionLevel().getValue());
     }
 
     @Override
@@ -82,7 +82,7 @@ public abstract class DeflateOutputStream extends CipherOutputStream {
     }
 
     public void write(byte[] buf, int off, int len) throws IOException {
-        if (zipParameters.getCompressionMethod() != Zip4jConstants.COMP_DEFLATE) {
+        if (zipParameters.getCompressionMethod() != CompressionMethod.DEFLATE) {
             super.write(buf, off, len);
         } else {
             deflater.setInput(buf, off, len);
@@ -93,7 +93,7 @@ public abstract class DeflateOutputStream extends CipherOutputStream {
     }
 
     public void closeEntry() throws IOException, ZipException {
-        if (zipParameters.getCompressionMethod() == Zip4jConstants.COMP_DEFLATE) {
+        if (zipParameters.getCompressionMethod() == CompressionMethod.DEFLATE) {
             if (!deflater.finished()) {
                 deflater.finish();
                 while (!deflater.finished()) {

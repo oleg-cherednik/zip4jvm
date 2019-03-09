@@ -18,6 +18,7 @@ package net.lingala.zip4j.examples.zip;
 
 import net.lingala.zip4j.io.ZipOutputStream;
 import net.lingala.zip4j.model.CompressionLevel;
+import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
 
@@ -54,7 +55,7 @@ public class CreateZipWithOutputStreamsStandardEnc {
             ZipParameters parameters = new ZipParameters();
 
             //Deflate compression or store(no compression) can be set below
-            parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
+            parameters.setCompressionMethod(CompressionMethod.DEFLATE);
 
             // Set the compression level. This value has to be in between 0 to 9
             // Several predefined compression levels are available

@@ -63,7 +63,8 @@ public class CentralDirectory {
         // size:2 - general purpose bit flag
         private byte[] generalPurposeFlag;
         // size:2 - compression method
-        private int compressionMethod;
+        @NonNull
+        private CompressionMethod compressionMethod = CompressionMethod.STORE;
         // size:2 - last mod file time
         // size:2 - last mod file date
         private int lastModFileTime;

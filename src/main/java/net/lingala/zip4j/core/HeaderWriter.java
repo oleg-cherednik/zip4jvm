@@ -47,7 +47,7 @@ public class HeaderWriter {
         bytes.writeWord((short)header.getVersionNeededToExtract());
         // TODO use LocalFileHeader.GeneralPurposeFlag
         bytes.copyByteArrayToArrayList(header.getGeneralPurposeFlag());
-        bytes.writeWord((short)header.getCompressionMethod());
+        bytes.writeWord(header.getCompressionMethod().getValue());
         bytes.writeDword(header.getLastModFileTime());
         bytes.writeDword((int)header.getCrc32());
 
@@ -82,7 +82,7 @@ public class HeaderWriter {
             bytes.writeWord((short)aesExtraDataRecord.getVersionNumber());
             bytes.writeBytes(aesExtraDataRecord.getVendorID().getBytes());
             bytes.writeBytes((byte)aesExtraDataRecord.getAesStrength());
-            bytes.writeWord((short)aesExtraDataRecord.getCompressionMethod());
+            bytes.writeWord(aesExtraDataRecord.getCompressionMethod().getValue());
         }
 
         return bytes.flushInto(out);
@@ -351,7 +351,7 @@ public class HeaderWriter {
             bytes.copyByteArrayToArrayList(fileHeader.getGeneralPurposeFlag());
             sizeOfFileHeader += 2;
 
-            Raw.writeShortLittleEndian(shortByte, 0, (short)fileHeader.getCompressionMethod());
+            Raw.writeShortLittleEndian(shortByte, 0, fileHeader.getCompressionMethod().getValue());
             bytes.copyByteArrayToArrayList(shortByte);
             sizeOfFileHeader += 2;
 
@@ -509,7 +509,7 @@ public class HeaderWriter {
                 aesStrengthBytes[0] = (byte)aesExtraDataRecord.getAesStrength();
                 bytes.copyByteArrayToArrayList(aesStrengthBytes);
 
-                Raw.writeShortLittleEndian(shortByte, 0, (short)aesExtraDataRecord.getCompressionMethod());
+                Raw.writeShortLittleEndian(shortByte, 0, aesExtraDataRecord.getCompressionMethod().getValue());
                 bytes.copyByteArrayToArrayList(shortByte);
 
                 sizeOfFileHeader += 11;

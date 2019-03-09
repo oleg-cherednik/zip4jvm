@@ -26,6 +26,7 @@ import net.lingala.zip4j.io.PartInputStream;
 import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.CentralDirectory;
+import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.UnzipParameters;
 import net.lingala.zip4j.model.ZipModel;
@@ -130,23 +131,20 @@ public class UnzipEngine {
                 }
             }
 
-            int compressionMethod = fileHeader.getCompressionMethod();
+            CompressionMethod compressionMethod = fileHeader.getCompressionMethod();
             if (fileHeader.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_AES) {
-                if (fileHeader.getAesExtraDataRecord() != null) {
+                if (fileHeader.getAesExtraDataRecord() != null)
                     compressionMethod = fileHeader.getAesExtraDataRecord().getCompressionMethod();
-                } else {
+                else
                     throw new ZipException("AESExtraDataRecord does not exist for AES encrypted file: " + fileHeader.getFileName());
-                }
             }
             raf.seek(offsetStartOfData);
-            switch (compressionMethod) {
-                case Zip4jConstants.COMP_STORE:
-                    return new ZipInputStream(new PartInputStream(raf, offsetStartOfData, comprSize, this), this);
-                case Zip4jConstants.COMP_DEFLATE:
-                    return new ZipInputStream(new InflaterInputStream(raf, offsetStartOfData, comprSize, this), this);
-                default:
-                    throw new ZipException("compression type not supported");
-            }
+
+            if (compressionMethod == CompressionMethod.STORE)
+                return new ZipInputStream(new PartInputStream(raf, offsetStartOfData, comprSize, this), this);
+            if (compressionMethod == CompressionMethod.DEFLATE)
+                return new ZipInputStream(new InflaterInputStream(raf, offsetStartOfData, comprSize, this), this);
+            throw new ZipException("compression type not supported");
         } catch(ZipException e) {
             if (raf != null) {
                 try {

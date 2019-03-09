@@ -19,8 +19,8 @@ package net.lingala.zip4j.examples.zip;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CompressionLevel;
+import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.util.Zip4jConstants;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -41,7 +41,7 @@ public class CreateSplitZipFileFromFolder {
         ZipParameters parameters = new ZipParameters();
 
         // set compression method to store compression
-        parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
+        parameters.setCompressionMethod(CompressionMethod.DEFLATE);
 
         // Set the compression level. This value has to be in between 0 to 9
         parameters.setCompressionLevel(CompressionLevel.NORMAL);

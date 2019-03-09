@@ -22,6 +22,7 @@ import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.io.ZipOutputStream;
 import net.lingala.zip4j.model.CentralDirectory;
+import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.ArchiveMaintainer;
@@ -92,7 +93,7 @@ public class ZipEngine {
                         fileParameters.setSourceFileCRC(new ChecksumCalculator(file).calculate());
 
                     if (Files.size(file) == 0)
-                        fileParameters.setCompressionMethod(Zip4jConstants.COMP_STORE);
+                        fileParameters.setCompressionMethod(CompressionMethod.STORE);
                 }
 
                 out.putNextEntry(file, fileParameters);
@@ -208,10 +209,8 @@ public class ZipEngine {
 
 
     private void checkParameters(ZipParameters parameters) throws ZipException {
-        if ((parameters.getCompressionMethod() != Zip4jConstants.COMP_STORE) &&
-                parameters.getCompressionMethod() != Zip4jConstants.COMP_DEFLATE) {
+        if ((parameters.getCompressionMethod() != CompressionMethod.STORE) && parameters.getCompressionMethod() != CompressionMethod.DEFLATE)
             throw new ZipException("unsupported compression type");
-        }
 
         if (parameters.isEncryptFiles()) {
             if (parameters.getEncryptionMethod() != Zip4jConstants.ENC_METHOD_STANDARD &&

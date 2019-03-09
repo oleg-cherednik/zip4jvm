@@ -17,6 +17,7 @@
 package net.lingala.zip4j.model;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import net.lingala.zip4j.util.InternalZipConstants;
 
@@ -30,6 +31,7 @@ public class AESExtraDataRecord {
     private int versionNumber = -1;
     private String vendorID;
     private int aesStrength = -1;
-    private int compressionMethod = -1;
+    @NonNull
+    private CompressionMethod compressionMethod = CompressionMethod.STORE;
 
 }

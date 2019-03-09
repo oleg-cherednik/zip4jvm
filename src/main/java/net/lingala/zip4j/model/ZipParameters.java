@@ -19,6 +19,7 @@ package net.lingala.zip4j.model;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.util.InternalZipConstants;
@@ -39,7 +40,9 @@ import java.util.TimeZone;
 @Builder(toBuilder = true)
 public class ZipParameters {
 
-    private int compressionMethod;
+    @NonNull
+    private CompressionMethod compressionMethod = CompressionMethod.DEFLATE;
+    @NonNull
     private CompressionLevel compressionLevel = CompressionLevel.DEFAULT;
     private boolean encryptFiles;
     private int encryptionMethod;
@@ -55,7 +58,6 @@ public class ZipParameters {
     private boolean isSourceExternalStream;
 
     public ZipParameters() {
-        compressionMethod = Zip4jConstants.COMP_DEFLATE;
         encryptFiles = false;
         readHiddenFiles = true;
         encryptionMethod = Zip4jConstants.ENC_NO_ENCRYPTION;

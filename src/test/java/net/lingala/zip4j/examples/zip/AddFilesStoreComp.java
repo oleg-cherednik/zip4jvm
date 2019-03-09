@@ -18,8 +18,8 @@ package net.lingala.zip4j.examples.zip;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.util.Zip4jConstants;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -54,7 +54,7 @@ public class AddFilesStoreComp {
         // as compression method, etc. More parameters are explained in other
         // examples
         ZipParameters parameters = new ZipParameters();
-        parameters.setCompressionMethod(Zip4jConstants.COMP_STORE); // set compression method to store compression
+        parameters.setCompressionMethod(CompressionMethod.STORE); // set compression method to store compression
 
         // Now add files to the zip file
         // Note: To add a single file, the method addFile can be used
