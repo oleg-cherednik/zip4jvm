@@ -47,21 +47,19 @@ public class AddFilesWithStandardZipEncryption {
 
         // Initiate Zip Parameters which define various properties such
         // as compression method, etc.
-        ZipParameters parameters = new ZipParameters();
-        parameters.setCompressionMethod(CompressionMethod.DEFLATE); // set compression method to store compression
+        ZipParameters parameters = ZipParameters.builder()
+        .compressionMethod(CompressionMethod.DEFLATE) // set compression method to store compression
 
         // Set the compression level
-        parameters.setCompressionLevel(CompressionLevel.NORMAL);
+        .compressionLevel(CompressionLevel.NORMAL)
 
         // Set the encryption flag to true
         // If this is set to false, then the rest of encryption properties are ignored
-        parameters.setEncryptFiles(true);
-
         // Set the encryption method to Standard Zip Encryption
-        parameters.setEncryption(Encryption.STANDARD);
+        .encryption(Encryption.STANDARD)
 
         // Set password
-        parameters.setPassword("test123!");
+        .password("test123!".toCharArray()).build();
 
         // Now add files to the zip file
         // Note: To add a single file, the method addFile can be used

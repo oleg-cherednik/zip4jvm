@@ -58,33 +58,32 @@ public class CreateZipWithOutputStreams {
             // Initiate Zip Parameters which define various properties such
             // as compression method, etc. More parameters are explained in other
             // examples
-            ZipParameters parameters = new ZipParameters();
+            ZipParameters parameters = ZipParameters.builder()
 
-            //Deflate compression or store(no compression) can be set below
-            parameters.setCompressionMethod(CompressionMethod.DEFLATE);
+                                                    //Deflate compression or store(no compression) can be set below
+                                                    .compressionMethod(CompressionMethod.DEFLATE)
 
-            // Set the compression level. This value has to be in between 0 to 9
-            // Several predefined compression levels are available
-            // DEFLATE_LEVEL_FASTEST - Lowest compression level but higher speed of compression
-            // DEFLATE_LEVEL_FAST - Low compression level but higher speed of compression
-            // DEFLATE_LEVEL_NORMAL - Optimal balance between compression level/speed
-            // DEFLATE_LEVEL_MAXIMUM - High compression level with a compromise of speed
-            // DEFLATE_LEVEL_ULTRA - Highest compression level but low speed
-            parameters.setCompressionLevel(CompressionLevel.NORMAL);
+                                                    // Set the compression level. This value has to be in between 0 to 9
+                                                    // Several predefined compression levels are available
+                                                    // DEFLATE_LEVEL_FASTEST - Lowest compression level but higher speed of compression
+                                                    // DEFLATE_LEVEL_FAST - Low compression level but higher speed of compression
+                                                    // DEFLATE_LEVEL_NORMAL - Optimal balance between compression level/speed
+                                                    // DEFLATE_LEVEL_MAXIMUM - High compression level with a compromise of speed
+                                                    // DEFLATE_LEVEL_ULTRA - Highest compression level but low speed
+                                                    .compressionLevel(CompressionLevel.NORMAL)
 
-            //This flag defines if the files have to be encrypted.
-            //If this flag is set to false, setEncryption, as described below,
-            //will be ignored and the files won't be encrypted
-            parameters.setEncryptFiles(true);
+                                                    //This flag defines if the files have to be encrypted.
+                                                    //If this flag is set to false, setEncryption, as described below,
+                                                    //will be ignored and the files won't be encrypted
 
-            //Zip4j supports AES or Standard Zip Encryption (also called ZipCrypto)
-            //If you choose to use Standard Zip Encryption, please have a look at example
-            //as some additional steps need to be done while using ZipOutputStreams with
-            //Standard Zip Encryption
-            parameters.setEncryption(Encryption.AES);
+                                                    //Zip4j supports AES or Standard Zip Encryption (also called ZipCrypto)
+                                                    //If you choose to use Standard Zip Encryption, please have a look at example
+                                                    //as some additional steps need to be done while using ZipOutputStreams with
+                                                    //Standard Zip Encryption
+                                                    .encryption(Encryption.AES)
 
-            //If AES encryption is used, this defines the key strength
-            parameters.setAesKeyStrength(Zip4jConstants.AES_STRENGTH_256);
+                                                    //If AES encryption is used, this defines the key strength
+                                                    .aesKeyStrength(Zip4jConstants.AES_STRENGTH_256).build();
 
             //self descriptive
             parameters.setPassword("YourPassword");

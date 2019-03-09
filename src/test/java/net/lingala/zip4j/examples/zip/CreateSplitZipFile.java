@@ -47,13 +47,13 @@ public class CreateSplitZipFile {
 
         // Initiate Zip Parameters which define various properties such
         // as compression method, etc.
-        ZipParameters parameters = new ZipParameters();
+        ZipParameters parameters = ZipParameters.builder()
 
-        // set compression method to store compression
-        parameters.setCompressionMethod(CompressionMethod.DEFLATE);
+                                                // set compression method to store compression
+                                                .compressionMethod(CompressionMethod.DEFLATE)
 
-        // Set the compression level. This value has to be in between 0 to 9
-        parameters.setCompressionLevel(CompressionLevel.NORMAL);
+                                                // Set the compression level. This value has to be in between 0 to 9
+                                                .compressionLevel(CompressionLevel.NORMAL).build();
 
         // Create a split file by setting splitArchive parameter to true
         // and specifying the splitLength. SplitLenth has to be greater than

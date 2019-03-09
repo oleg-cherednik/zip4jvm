@@ -115,21 +115,19 @@ public class UnzipEngine {
             long comprSize = localFileHeader.getCompressedSize();
             long offsetStartOfData = localFileHeader.getOffsetStartOfData();
 
-            if (localFileHeader.isEncrypted()) {
-                if (localFileHeader.getEncryption() == Encryption.AES) {
-                    if (decrypter instanceof AESDecrypter) {
-                        comprSize -= (((AESDecrypter)decrypter).getSaltLength() +
-                                ((AESDecrypter)decrypter).getPasswordVerifierLength() + 10);
-                        offsetStartOfData += (((AESDecrypter)decrypter).getSaltLength() +
-                                ((AESDecrypter)decrypter).getPasswordVerifierLength());
-                    } else {
-                        throw new ZipException("invalid decryptor when trying to calculate " +
-                                "compressed size for AES encrypted file: " + fileHeader.getFileName());
-                    }
-                } else if (localFileHeader.getEncryption() == Encryption.STANDARD) {
-                    comprSize -= InternalZipConstants.STD_DEC_HDR_SIZE;
-                    offsetStartOfData += InternalZipConstants.STD_DEC_HDR_SIZE;
+            if (localFileHeader.getEncryption() == Encryption.AES) {
+                if (decrypter instanceof AESDecrypter) {
+                    comprSize -= (((AESDecrypter)decrypter).getSaltLength() +
+                            ((AESDecrypter)decrypter).getPasswordVerifierLength() + 10);
+                    offsetStartOfData += (((AESDecrypter)decrypter).getSaltLength() +
+                            ((AESDecrypter)decrypter).getPasswordVerifierLength());
+                } else {
+                    throw new ZipException("invalid decryptor when trying to calculate " +
+                            "compressed size for AES encrypted file: " + fileHeader.getFileName());
                 }
+            } else if (localFileHeader.getEncryption() == Encryption.STANDARD) {
+                comprSize -= InternalZipConstants.STD_DEC_HDR_SIZE;
+                offsetStartOfData += InternalZipConstants.STD_DEC_HDR_SIZE;
             }
 
             CompressionMethod compressionMethod = fileHeader.getCompressionMethod();
@@ -183,19 +181,15 @@ public class UnzipEngine {
     }
 
     private void initDecrypter(RandomAccessFile raf) throws ZipException {
-        if (localFileHeader == null) {
+        if (localFileHeader == null)
             throw new ZipException("local file header is null, cannot init decrypter");
-        }
 
-        if (localFileHeader.isEncrypted()) {
-            if (localFileHeader.getEncryption() == Encryption.STANDARD) {
-                decrypter = new StandardDecrypter(fileHeader, getStandardDecrypterHeaderBytes(raf));
-            } else if (localFileHeader.getEncryption() == Encryption.AES) {
-                decrypter = new AESDecrypter(localFileHeader, getAESSalt(raf), getAESPasswordVerifier(raf));
-            } else {
-                throw new ZipException("unsupported encryption method");
-            }
-        }
+        if (localFileHeader.getEncryption() == Encryption.STANDARD)
+            decrypter = new StandardDecrypter(fileHeader, getStandardDecrypterHeaderBytes(raf));
+        else if (localFileHeader.getEncryption() == Encryption.AES)
+            decrypter = new AESDecrypter(localFileHeader, getAESSalt(raf), getAESPasswordVerifier(raf));
+        else if (localFileHeader.getEncryption() != Encryption.OFF)
+            throw new ZipException("unsupported encryption method");
     }
 
     private byte[] getStandardDecrypterHeaderBytes(RandomAccessFile raf) throws ZipException {
@@ -274,10 +268,8 @@ public class UnzipEngine {
                 long calculatedCRC = crc.getValue() & 0xffffffffL;
                 if (calculatedCRC != fileHeader.getCrc32()) {
                     String errMsg = "invalid CRC for file: " + fileHeader.getFileName();
-                    if (localFileHeader.isEncrypted() &&
-                            localFileHeader.getEncryption() == Encryption.STANDARD) {
+                    if (localFileHeader.getEncryption() == Encryption.STANDARD)
                         errMsg += " - Wrong Password?";
-                    }
                     throw new ZipException(errMsg);
                 }
             }

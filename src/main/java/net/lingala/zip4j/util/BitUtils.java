@@ -43,6 +43,13 @@ public class BitUtils {
         return val | bits;
     }
 
+    public void updateBits(int val, int bits, boolean value) {
+        if (value)
+            setBits(val, bits);
+        else
+            clearBits(val, bits);
+    }
+
     /**
      * Clear selected bit(s) in giving val
      *

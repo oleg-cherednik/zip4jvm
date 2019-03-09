@@ -176,19 +176,6 @@ public class CentralDirectory {
             return Zip4jUtil.isDirectory(fileName);
         }
 
-        public boolean isEncrypted() {
-            return generalPurposeFlag != null && BitUtils.isBitSet(generalPurposeFlag[0], BIT0);
-        }
-
-        public void setEncrypted(boolean val) {
-            generalPurposeFlag = generalPurposeFlag != null ? generalPurposeFlag : new byte[2];
-
-            if (val)
-                BitUtils.setBits(generalPurposeFlag[0], BIT0);
-            else
-                BitUtils.clearBits(generalPurposeFlag[0], BIT0);
-        }
-
         public void setZip64ExtendedInfo(Zip64ExtendedInfo info) {
             zip64ExtendedInfo = info;
 
@@ -203,6 +190,7 @@ public class CentralDirectory {
         public void setAesExtraDataRecord(AESExtraDataRecord record) {
             aesExtraDataRecord = record;
             encryption = record != null ? Encryption.AES : Encryption.OFF;
+            BitUtils.updateBits(generalPurposeFlag[0], BIT0, encryption != Encryption.OFF);
         }
     }
 

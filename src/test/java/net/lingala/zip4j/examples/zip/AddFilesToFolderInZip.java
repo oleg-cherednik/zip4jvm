@@ -45,17 +45,17 @@ public class AddFilesToFolderInZip {
                 Paths.get("c:/ZipTest/mysong.mp3"));
 
         // Initiate Zip Parameters
-        ZipParameters parameters = new ZipParameters();
-        parameters.setCompressionMethod(CompressionMethod.DEFLATE); // set compression method to deflate compression
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compressionMethod(CompressionMethod.DEFLATE) // set compression method to deflate compression
 
-        // Set the compression level.
-        parameters.setCompressionLevel(CompressionLevel.NORMAL);
+                                                // Set the compression level.
+                                                .compressionLevel(CompressionLevel.NORMAL)
 
-        // Sets the folder in the zip file to which these new files will be added.
-        // In this example, test2 is the folder to which these files will be added.
-        // Another example: if files were to be added to a directory test2/test3, then
-        // below statement should be parameters.setRootFolderInZip("test2/test3/");
-        parameters.setRootFolderInZip("test2/");
+                                                // Sets the folder in the zip file to which these new files will be added.
+                                                // In this example, test2 is the folder to which these files will be added.
+                                                // Another example: if files were to be added to a directory test2/test3, then
+                                                // below statement should be parameters.setRootFolderInZip("test2/test3/");
+                                                .rootFolderInZip("test2/").build();
 
         // Now add files to the zip file
         zipFile.addFiles(filesToAdd, parameters);

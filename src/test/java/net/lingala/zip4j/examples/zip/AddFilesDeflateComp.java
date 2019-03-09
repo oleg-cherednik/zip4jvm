@@ -52,17 +52,17 @@ public class AddFilesDeflateComp {
         // Initiate Zip Parameters which define various properties such
         // as compression method, etc. More parameters are explained in other
         // examples
-        ZipParameters parameters = new ZipParameters();
-        parameters.setCompressionMethod(CompressionMethod.DEFLATE); // set compression method to deflate compression
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compressionMethod(CompressionMethod.DEFLATE) // set compression method to deflate compression
 
-        // Set the compression level. This value has to be in between 0 to 9
-        // Several predefined compression levels are available
-        // DEFLATE_LEVEL_FASTEST - Lowest compression level but higher speed of compression
-        // DEFLATE_LEVEL_FAST - Low compression level but higher speed of compression
-        // DEFLATE_LEVEL_NORMAL - Optimal balance between compression level/speed
-        // DEFLATE_LEVEL_MAXIMUM - High compression level with a compromise of speed
-        // DEFLATE_LEVEL_ULTRA - Highest compression level but low speed
-        parameters.setCompressionLevel(CompressionLevel.NORMAL);
+                                                // Set the compression level. This value has to be in between 0 to 9
+                                                // Several predefined compression levels are available
+                                                // DEFLATE_LEVEL_FASTEST - Lowest compression level but higher speed of compression
+                                                // DEFLATE_LEVEL_FAST - Low compression level but higher speed of compression
+                                                // DEFLATE_LEVEL_NORMAL - Optimal balance between compression level/speed
+                                                // DEFLATE_LEVEL_MAXIMUM - High compression level with a compromise of speed
+                                                // DEFLATE_LEVEL_ULTRA - Highest compression level but low speed
+                                                .compressionLevel(CompressionLevel.NORMAL).build();
 
         // Now add files to the zip file
         // Note: To add a single file, the method addFile can be used

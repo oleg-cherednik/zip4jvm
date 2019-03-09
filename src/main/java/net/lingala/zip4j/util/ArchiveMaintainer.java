@@ -16,6 +16,7 @@
 
 package net.lingala.zip4j.util;
 
+import lombok.NonNull;
 import net.lingala.zip4j.core.HeaderWriter;
 import net.lingala.zip4j.core.readers.LocalFileHeaderReader;
 import net.lingala.zip4j.exception.ZipException;
@@ -36,14 +37,13 @@ import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ArchiveMaintainer {
 
-    public Map<String, String> removeZipFile(final ZipModel zipModel,
-            final CentralDirectory.FileHeader fileHeader, boolean runInThread) throws ZipException {
+    public void removeZipFile(ZipModel zipModel, CentralDirectory.FileHeader fileHeader, boolean runInThread) throws ZipException {
+        if (fileHeader == null)
+            return;
 
         if (runInThread) {
             Thread thread = new Thread(InternalZipConstants.THREAD_NAME) {
@@ -55,27 +55,16 @@ public class ArchiveMaintainer {
                 }
             };
             thread.start();
-            return null;
-        } else {
-            Map<String, String> retMap = initRemoveZipFile(zipModel, fileHeader);
-            return retMap;
-        }
-
+        } else
+            initRemoveZipFile(zipModel, fileHeader);
     }
 
-    public Map<String, String> initRemoveZipFile(ZipModel zipModel,
-            CentralDirectory.FileHeader fileHeader) throws ZipException {
-
-        if (fileHeader == null || zipModel == null) {
-            throw new ZipException("input parameters is null in maintain zip file, cannot remove file from archive");
-        }
-
+    private void initRemoveZipFile(@NonNull ZipModel zipModel, @NonNull CentralDirectory.FileHeader fileHeader) throws ZipException {
         OutputStream outputStream = null;
         File zipFile = null;
         RandomAccessFile inputStream = null;
         boolean successFlag = false;
         String tmpZipFileName = null;
-        Map<String, String> retMap = new HashMap<>();
 
         try {
             int indexOfFileHeader = Zip4jUtil.getIndexOfFileHeader(zipModel, fileHeader);
@@ -183,10 +172,6 @@ public class ArchiveMaintainer {
             headerWriter.finalizeZipFile(zipModel, outputStream);
 
             successFlag = true;
-
-            retMap.put(InternalZipConstants.OFFSET_CENTRAL_DIR,
-                    Long.toString(zipModel.getEndCentralDirectory().getOffOfStartOfCentralDir()));
-
         } catch(ZipException e) {
             throw e;
         } catch(Exception e) {
@@ -208,8 +193,6 @@ public class ArchiveMaintainer {
                 newZipFile.delete();
             }
         }
-
-        return retMap;
     }
 
     private void restoreFileName(File zipFile, String tmpZipFileName) throws ZipException {

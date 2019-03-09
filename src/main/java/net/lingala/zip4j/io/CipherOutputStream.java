@@ -86,7 +86,6 @@ public abstract class CipherOutputStream extends OutputStream {
 
             if (!zipParameters.isSourceExternalStream()) {
                 if (Files.isDirectory(sourceFile)) {
-                    this.zipParameters.setEncryptFiles(false);
                     this.zipParameters.setEncryption(Encryption.OFF);
                     this.zipParameters.setCompressionMethod(CompressionMethod.STORE);
                 }
@@ -95,7 +94,6 @@ public abstract class CipherOutputStream extends OutputStream {
                     throw new ZipException("file name is empty for external stream");
                 }
                 if (Zip4jUtil.isDirectory(zipParameters.getFileNameInZip())) {
-                    this.zipParameters.setEncryptFiles(false);
                     this.zipParameters.setEncryption(Encryption.OFF);
                     this.zipParameters.setCompressionMethod(CompressionMethod.STORE);
                 }
@@ -130,7 +128,7 @@ public abstract class CipherOutputStream extends OutputStream {
             HeaderWriter headerWriter = new HeaderWriter();
             totalBytesWritten += headerWriter.writeLocalFileHeader(zipModel, localFileHeader, outputStream);
 
-            if (this.zipParameters.isEncryptFiles()) {
+            if (this.zipParameters.getEncryption() != Encryption.OFF) {
                 initEncrypter();
                 if (encrypter != null) {
                     if (zipParameters.getEncryption() == Encryption.STANDARD) {
@@ -158,7 +156,7 @@ public abstract class CipherOutputStream extends OutputStream {
     }
 
     private void initEncrypter() throws ZipException {
-        if (!zipParameters.isEncryptFiles()) {
+        if (zipParameters.getEncryption() == Encryption.OFF) {
             encrypter = null;
             return;
         }
@@ -217,7 +215,7 @@ public abstract class CipherOutputStream extends OutputStream {
     public void write(byte[] b, int off, int len) throws IOException {
         if (len == 0) return;
 
-        if (zipParameters.isEncryptFiles() && zipParameters.getEncryption() == Encryption.AES) {
+        if (zipParameters.getEncryption() == Encryption.AES) {
             if (pendingBufferLength != 0) {
                 if (len >= (InternalZipConstants.AES_BLOCK_SIZE - pendingBufferLength)) {
                     System.arraycopy(b, off, pendingBuffer, pendingBufferLength,
@@ -263,8 +261,7 @@ public abstract class CipherOutputStream extends OutputStream {
             pendingBufferLength = 0;
         }
 
-        if (this.zipParameters.isEncryptFiles() &&
-                zipParameters.getEncryption() == Encryption.AES) {
+        if (zipParameters.getEncryption() == Encryption.AES) {
             if (encrypter instanceof AESEncrpyter) {
                 outputStream.write(((AESEncrpyter)encrypter).getFinalMac());
                 bytesWrittenForThisFile += 10;
@@ -283,14 +280,9 @@ public abstract class CipherOutputStream extends OutputStream {
             }
         }
 
-        long crc32 = crc.getValue();
-        if (fileHeader.isEncrypted()) {
-            if (fileHeader.getEncryption() == Encryption.AES) {
-                crc32 = 0;
-            }
-        }
+        long crc32 = fileHeader.getEncryption() == Encryption.AES ? 0 : crc.getValue();
 
-        if (zipParameters.isEncryptFiles() && zipParameters.getEncryption() == Encryption.AES) {
+        if (zipParameters.getEncryption() == Encryption.AES) {
             fileHeader.setCrc32(0);
             localFileHeader.setCrc32(0);
         } else {
@@ -327,16 +319,13 @@ public abstract class CipherOutputStream extends OutputStream {
 //        fileHeader.setSignature((int)InternalZipConstants.CENSIG);
         fileHeader.setVersionMadeBy(20);
         fileHeader.setVersionNeededToExtract(20);
-        if (zipParameters.isEncryptFiles() && zipParameters.getEncryption() == Encryption.AES) {
+        if (zipParameters.getEncryption() != Encryption.OFF && zipParameters.getEncryption() == Encryption.AES) {
             fileHeader.setEncryption(Encryption.AES);
             fileHeader.setAesExtraDataRecord(generateAESExtraDataRecord(zipParameters));
         } else {
             fileHeader.setCompressionMethod(zipParameters.getCompressionMethod());
         }
-        if (zipParameters.isEncryptFiles()) {
-            fileHeader.setEncrypted(true);
-            fileHeader.setEncryption(zipParameters.getEncryption());
-        }
+        fileHeader.setEncryption(zipParameters.getEncryption());
         String fileName = null;
         if (zipParameters.isSourceExternalStream()) {
             fileHeader.setLastModFileTime((int)Zip4jUtil.javaToDosTime(System.currentTimeMillis()));
@@ -406,12 +395,10 @@ public abstract class CipherOutputStream extends OutputStream {
                 fileHeader.setUncompressedSize(fileSize);
             }
         }
-        if (zipParameters.isEncryptFiles() &&
-                zipParameters.getEncryption() == Encryption.STANDARD) {
+        if (zipParameters.getEncryption() == Encryption.STANDARD)
             fileHeader.setCrc32(zipParameters.getSourceFileCRC());
-        }
         byte[] shortByte = new byte[2];
-        shortByte[0] = Raw.bitArrayToByte(generateGeneralPurposeBitArray(fileHeader.isEncrypted(), zipParameters.getCompressionMethod()));
+        shortByte[0] = Raw.bitArrayToByte(generateGeneralPurposeBitArray(fileHeader.getEncryption(), zipParameters.getCompressionMethod()));
 
         if (zipModel.getCharset() == StandardCharsets.UTF_8 || Zip4jUtil.detectCharset(fileHeader.getFileName().getBytes()) == StandardCharsets.UTF_8)
             shortByte[1] = 8;
@@ -455,14 +442,10 @@ public abstract class CipherOutputStream extends OutputStream {
         return Files.isHidden(file) ? InternalZipConstants.FILE_MODE_HIDDEN : InternalZipConstants.FILE_MODE_NONE;
     }
 
-    private int[] generateGeneralPurposeBitArray(boolean isEncrpyted, CompressionMethod compressionMethod) {
+    private int[] generateGeneralPurposeBitArray(Encryption encryption, CompressionMethod compressionMethod) {
 
         int[] generalPurposeBits = new int[8];
-        if (isEncrpyted) {
-            generalPurposeBits[0] = 1;
-        } else {
-            generalPurposeBits[0] = 0;
-        }
+        generalPurposeBits[0] = encryption != Encryption.OFF ? 1 : 0;
 
         if (compressionMethod == CompressionMethod.DEFLATE) {
             // Have to set flags for deflate

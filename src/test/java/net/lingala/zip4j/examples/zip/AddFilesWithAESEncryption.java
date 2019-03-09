@@ -52,35 +52,33 @@ public class AddFilesWithAESEncryption {
         // Initiate Zip Parameters which define various properties such
         // as compression method, etc. More parameters are explained in other
         // examples
-        ZipParameters parameters = new ZipParameters();
-        parameters.setCompressionMethod(CompressionMethod.DEFLATE); // set compression method to deflate compression
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compressionMethod(CompressionMethod.DEFLATE) // set compression method to deflate compression
 
-        // Set the compression level. This value has to be in between 0 to 9
-        // Several predefined compression levels are available
-        // DEFLATE_LEVEL_FASTEST - Lowest compression level but higher speed of compression
-        // DEFLATE_LEVEL_FAST - Low compression level but higher speed of compression
-        // DEFLATE_LEVEL_NORMAL - Optimal balance between compression level/speed
-        // DEFLATE_LEVEL_MAXIMUM - High compression level with a compromise of speed
-        // DEFLATE_LEVEL_ULTRA - Highest compression level but low speed
-        parameters.setCompressionLevel(CompressionLevel.NORMAL);
+                                                // Set the compression level. This value has to be in between 0 to 9
+                                                // Several predefined compression levels are available
+                                                // DEFLATE_LEVEL_FASTEST - Lowest compression level but higher speed of compression
+                                                // DEFLATE_LEVEL_FAST - Low compression level but higher speed of compression
+                                                // DEFLATE_LEVEL_NORMAL - Optimal balance between compression level/speed
+                                                // DEFLATE_LEVEL_MAXIMUM - High compression level with a compromise of speed
+                                                // DEFLATE_LEVEL_ULTRA - Highest compression level but low speed
+                                                .compressionLevel(CompressionLevel.NORMAL)
 
-        // Set the encryption flag to true
-        // If this is set to false, then the rest of encryption properties are ignored
-        parameters.setEncryptFiles(true);
+                                                // Set the encryption flag to true
+                                                // If this is set to false, then the rest of encryption properties are ignored
+                                                // Set the encryption method to AES Zip Encryption
+                                                .encryption(Encryption.AES)
 
-        // Set the encryption method to AES Zip Encryption
-        parameters.setEncryption(Encryption.AES);
+                                                // Set AES Key strength. Key strengths available for AES encryption are:
+                                                // AES_STRENGTH_128 - For both encryption and decryption
+                                                // AES_STRENGTH_192 - For decryption only
+                                                // AES_STRENGTH_256 - For both encryption and decryption
+                                                // Key strength 192 cannot be used for encryption. But if a zip file already has a
+                                                // file encrypted with key strength of 192, then Zip4j can decrypt this file
+                                                .aesKeyStrength(Zip4jConstants.AES_STRENGTH_256)
 
-        // Set AES Key strength. Key strengths available for AES encryption are:
-        // AES_STRENGTH_128 - For both encryption and decryption
-        // AES_STRENGTH_192 - For decryption only
-        // AES_STRENGTH_256 - For both encryption and decryption
-        // Key strength 192 cannot be used for encryption. But if a zip file already has a
-        // file encrypted with key strength of 192, then Zip4j can decrypt this file
-        parameters.setAesKeyStrength(Zip4jConstants.AES_STRENGTH_256);
-
-        // Set password
-        parameters.setPassword("test123!");
+                                                // Set password
+                                                .password("test123!".toCharArray()).build();
 
         // Now add files to the zip file
         // Note: To add a single file, the method addFile can be used

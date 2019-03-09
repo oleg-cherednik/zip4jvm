@@ -16,7 +16,6 @@
 
 package net.lingala.zip4j.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -35,35 +34,31 @@ import java.util.TimeZone;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @Builder(toBuilder = true)
 public class ZipParameters {
 
     @NonNull
+    @Builder.Default
     private CompressionMethod compressionMethod = CompressionMethod.DEFLATE;
     @NonNull
+    @Builder.Default
     private CompressionLevel compressionLevel = CompressionLevel.DEFAULT;
-    private boolean encryptFiles;
     @NonNull
+    @Builder.Default
     private Encryption encryption = Encryption.OFF;
     private boolean readHiddenFiles;
     private char[] password;
-    private int aesKeyStrength;
-    private boolean includeRootFolder;
+    @Builder.Default
+    private int aesKeyStrength = -1;
+    @Builder.Default
+    private boolean includeRootFolder = true;
     private String rootFolderInZip;
-    private TimeZone timeZone;
+    @Builder.Default
+    private TimeZone timeZone = TimeZone.getDefault();
     private long sourceFileCRC;
     private String defaultFolderPath;
     private String fileNameInZip;
     private boolean isSourceExternalStream;
-
-    public ZipParameters() {
-        encryptFiles = false;
-        readHiddenFiles = true;
-        aesKeyStrength = -1;
-        includeRootFolder = true;
-        timeZone = TimeZone.getDefault();
-    }
 
     public char[] getPassword() {
         return password;
@@ -88,25 +83,6 @@ public class ZipParameters {
         this.password = password;
     }
 
-    public int getAesKeyStrength() {
-        return aesKeyStrength;
-    }
-
-    public void setAesKeyStrength(int aesKeyStrength) {
-        this.aesKeyStrength = aesKeyStrength;
-    }
-
-    public boolean isIncludeRootFolder() {
-        return includeRootFolder;
-    }
-
-    public void setIncludeRootFolder(boolean includeRootFolder) {
-        this.includeRootFolder = includeRootFolder;
-    }
-
-    public String getRootFolderInZip() {
-        return rootFolderInZip;
-    }
 
     public void setRootFolderInZip(String rootFolderInZip) {
         if (StringUtils.isNotBlank(rootFolderInZip)) {
@@ -122,39 +98,6 @@ public class ZipParameters {
 //			}
         }
         this.rootFolderInZip = rootFolderInZip;
-    }
-
-    public TimeZone getTimeZone() {
-        return timeZone;
-    }
-
-    public void setTimeZone(TimeZone timeZone) {
-        this.timeZone = timeZone;
-    }
-
-
-    public String getDefaultFolderPath() {
-        return defaultFolderPath;
-    }
-
-    public void setDefaultFolderPath(String defaultFolderPath) {
-        this.defaultFolderPath = defaultFolderPath;
-    }
-
-    public String getFileNameInZip() {
-        return fileNameInZip;
-    }
-
-    public void setFileNameInZip(String fileNameInZip) {
-        this.fileNameInZip = fileNameInZip;
-    }
-
-    public boolean isSourceExternalStream() {
-        return isSourceExternalStream;
-    }
-
-    public void setSourceExternalStream(boolean isSourceExternalStream) {
-        this.isSourceExternalStream = isSourceExternalStream;
     }
 
     public String getRelativeFileName(Path file) throws ZipException {

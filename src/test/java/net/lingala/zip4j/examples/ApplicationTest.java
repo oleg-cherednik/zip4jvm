@@ -78,9 +78,9 @@ public class ApplicationTest {
                 srcDir.resolve("cars/ferrari-458-italia.jpg"),
                 srcDir.resolve("cars/wiesmann-gt-mf5.jpg"));
 
-        ZipParameters parameters = new ZipParameters();
-        parameters.setCompressionMethod(CompressionMethod.STORE);
-        parameters.setDefaultFolderPath(srcDir.toString());
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compressionMethod(CompressionMethod.DEFLATE)
+                                                .defaultFolderPath(srcDir.toString()).build();
 
         // Now add files to the zip file
         // Note: To add a single file, the method addFile can be used
@@ -96,10 +96,10 @@ public class ApplicationTest {
     public void addFolderNew() throws ZipException, IOException {
         ZipFile zipFile = new ZipFile(destDir.resolve("src.zip"));
         List<File> filesToAdd = getDirectoryEntries(srcDir);
-        ZipParameters parameters = new ZipParameters();
-        parameters.setCompressionMethod(CompressionMethod.DEFLATE);
-        parameters.setCompressionLevel(CompressionLevel.NORMAL);
-        parameters.setDefaultFolderPath(srcDir.toString());
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compressionMethod(CompressionMethod.DEFLATE)
+                                                .compressionLevel(CompressionLevel.NORMAL)
+                                                .defaultFolderPath(srcDir.toString()).build();
         zipFile.createZipFile(filesToAdd, parameters, true, 1024 * 1024);
 
         checkDestinationDir(10);

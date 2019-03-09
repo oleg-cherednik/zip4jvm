@@ -90,14 +90,6 @@ public class ZipModel implements Cloneable {
         this.dataDescriptorList = dataDescriptorList;
     }
 
-    public CentralDirectory getCentralDirectory() {
-        return centralDirectory;
-    }
-
-    public void setCentralDirectory(CentralDirectory centralDirectory) {
-        this.centralDirectory = centralDirectory;
-    }
-
     public void setEndCentralDirectory(EndCentralDirectory endCentralDirectory) {
         this.endCentralDirectory = endCentralDirectory;
         splitArchive = endCentralDirectory != null && endCentralDirectory.getNoOfDisk() > 0;

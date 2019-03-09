@@ -48,6 +48,7 @@ public class ZipEngine {
 
     @NonNull
     private final ZipModel zipModel;
+    private final ArchiveMaintainer archiveMaintainer = new ArchiveMaintainer();
 
     public void addFiles(@NonNull Collection<Path> files, @NonNull ZipParameters parameters, boolean runInThread) throws ZipException, IOException {
         if (files.isEmpty())
@@ -89,7 +90,7 @@ public class ZipEngine {
                 ZipParameters fileParameters = parameters.toBuilder().build();
 
                 if (Files.isRegularFile(file)) {
-                    if (fileParameters.isEncryptFiles() && fileParameters.getEncryption() == Encryption.STANDARD)
+                    if (fileParameters.getEncryption() == Encryption.STANDARD)
                         fileParameters.setSourceFileCRC(new ChecksumCalculator(file).calculate());
 
                     if (Files.size(file) == 0)
@@ -212,7 +213,7 @@ public class ZipEngine {
         if ((parameters.getCompressionMethod() != CompressionMethod.STORE) && parameters.getCompressionMethod() != CompressionMethod.DEFLATE)
             throw new ZipException("unsupported compression type");
 
-        if (parameters.isEncryptFiles()) {
+        if (parameters.getEncryption() != Encryption.OFF) {
             if (parameters.getEncryption() != Encryption.STANDARD &&
                     parameters.getEncryption() != Encryption.AES) {
                 throw new ZipException("unsupported encryption method");
@@ -229,10 +230,6 @@ public class ZipEngine {
     }
 
     public void removeFile(CentralDirectory.FileHeader fileHeader, boolean runInThread) throws ZipException {
-        if (fileHeader == null)
-            return;
-
-        ArchiveMaintainer archiveMaintainer = new ArchiveMaintainer();
         archiveMaintainer.removeZipFile(zipModel, fileHeader, runInThread);
     }
 
@@ -247,9 +244,6 @@ public class ZipEngine {
      * @throws ZipException
      */
     private void removeFilesIfExists(@NonNull Collection<Path> files, ZipParameters parameters) throws ZipException {
-        if (zipModel == null || zipModel.isEmpty())
-            return;
-
         for (Path file : files)
             removeFile(zipModel.getFileHeader(parameters.getRelativeFileName(file)), false);
     }

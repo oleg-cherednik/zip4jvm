@@ -53,9 +53,8 @@ public class AddFilesStoreComp {
         // Initiate Zip Parameters which define various properties such
         // as compression method, etc. More parameters are explained in other
         // examples
-        ZipParameters parameters = new ZipParameters();
-        parameters.setCompressionMethod(CompressionMethod.STORE); // set compression method to store compression
-
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compressionMethod(CompressionMethod.STORE).build(); // set compression method to store compression
         // Now add files to the zip file
         // Note: To add a single file, the method addFile can be used
         // Note: If the zip file already exists and if this zip file is a split file

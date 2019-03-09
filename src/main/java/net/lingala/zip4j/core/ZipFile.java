@@ -24,6 +24,7 @@ import net.lingala.zip4j.core.readers.ZipModelReader;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.CentralDirectory;
+import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.UnzipParameters;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
@@ -580,17 +581,12 @@ public class ZipFile {
             }
         }
 
-        if (zipModel.getCentralDirectory() == null || zipModel.getCentralDirectory().getFileHeaders() == null) {
+        if (zipModel.getCentralDirectory() == null || zipModel.getCentralDirectory().getFileHeaders() == null)
             throw new ZipException("invalid zip path");
-        }
 
-        for (int i = 0; i < zipModel.getCentralDirectory().getFileHeaders().size(); i++) {
-            if (zipModel.getCentralDirectory().getFileHeaders().get(i) != null) {
-                if (zipModel.getCentralDirectory().getFileHeaders().get(i).isEncrypted()) {
-                    zipModel.getCentralDirectory().getFileHeaders().get(i).setPassword(password);
-                }
-            }
-        }
+        zipModel.getCentralDirectory().getFileHeaders().stream()
+                .filter(fileHeader -> fileHeader.getEncryption() != Encryption.AES)
+                .forEach(fileHeader -> fileHeader.setPassword(password));
     }
 
     /**
@@ -632,20 +628,11 @@ public class ZipFile {
     public boolean isEncrypted() throws ZipException {
         zipModel = readZipModel();
 
-        if (zipModel.getCentralDirectory() == null || zipModel.getCentralDirectory().getFileHeaders() == null) {
+        if (zipModel.getCentralDirectory() == null || zipModel.getCentralDirectory().getFileHeaders() == null)
             throw new ZipException("invalid zip path");
-        }
 
-        List<CentralDirectory.FileHeader> fileHeaderList = zipModel.getCentralDirectory().getFileHeaders();
-        for (int i = 0; i < fileHeaderList.size(); i++) {
-            CentralDirectory.FileHeader fileHeader = fileHeaderList.get(i);
-            if (fileHeader != null) {
-                if (fileHeader.isEncrypted()) {
-                    isEncrypted = true;
-                    break;
-                }
-            }
-        }
+        isEncrypted = zipModel.getCentralDirectory().getFileHeaders().stream()
+                              .anyMatch(fileHeader -> fileHeader.getEncryption() != Encryption.OFF);
 
         return isEncrypted;
     }

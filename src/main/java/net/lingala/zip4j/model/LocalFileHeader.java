@@ -62,7 +62,6 @@ public class LocalFileHeader {
     // ----
 
     private long offsetStartOfData;
-    private boolean isEncrypted;
     @NonNull
     private Encryption encryption = Encryption.OFF;
     private char[] password;
@@ -83,10 +82,6 @@ public class LocalFileHeader {
         return extraFieldLength;
     }
 
-    public boolean isEncrypted() {
-        return generalPurposeFlag != null && BitUtils.isBitSet(generalPurposeFlag[0], BIT0);
-    }
-
     public void setZip64ExtendedInfo(Zip64ExtendedInfo info) {
         zip64ExtendedInfo = info;
 
@@ -99,6 +94,7 @@ public class LocalFileHeader {
     public void setAesExtraDataRecord(AESExtraDataRecord record) {
         aesExtraDataRecord = record;
         encryption = record != null ? Encryption.AES : Encryption.OFF;
+        BitUtils.updateBits(generalPurposeFlag[0], BIT0, encryption != Encryption.OFF);
     }
 
 

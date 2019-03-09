@@ -41,13 +41,13 @@ public class AddFolder {
 
         // Initiate Zip Parameters which define various properties such
         // as compression method, etc.
-        ZipParameters parameters = new ZipParameters();
+        ZipParameters parameters = ZipParameters.builder()
 
         // set compression method to store compression
-        parameters.setCompressionMethod(CompressionMethod.DEFLATE);
+        .compressionMethod(CompressionMethod.DEFLATE)
 
         // Set the compression level
-        parameters.setCompressionLevel(CompressionLevel.NORMAL);
+        .compressionLevel(CompressionLevel.NORMAL).build();
 
         // Add folder to the zip file
         zipFile.addFolder(folderToAdd, parameters);
