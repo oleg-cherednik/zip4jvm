@@ -25,6 +25,7 @@ import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.CompressionMethod;
+import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.EndCentralDirectory;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.ZipModel;
@@ -86,7 +87,7 @@ public abstract class CipherOutputStream extends OutputStream {
             if (!zipParameters.isSourceExternalStream()) {
                 if (Files.isDirectory(sourceFile)) {
                     this.zipParameters.setEncryptFiles(false);
-                    this.zipParameters.setEncryptionMethod(-1);
+                    this.zipParameters.setEncryption(Encryption.OFF);
                     this.zipParameters.setCompressionMethod(CompressionMethod.STORE);
                 }
             } else {
@@ -95,7 +96,7 @@ public abstract class CipherOutputStream extends OutputStream {
                 }
                 if (Zip4jUtil.isDirectory(zipParameters.getFileNameInZip())) {
                     this.zipParameters.setEncryptFiles(false);
-                    this.zipParameters.setEncryptionMethod(-1);
+                    this.zipParameters.setEncryption(Encryption.OFF);
                     this.zipParameters.setCompressionMethod(CompressionMethod.STORE);
                 }
             }
@@ -132,12 +133,12 @@ public abstract class CipherOutputStream extends OutputStream {
             if (this.zipParameters.isEncryptFiles()) {
                 initEncrypter();
                 if (encrypter != null) {
-                    if (zipParameters.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_STANDARD) {
+                    if (zipParameters.getEncryption() == Encryption.STANDARD) {
                         byte[] headerBytes = ((StandardEncrypter)encrypter).getHeaderBytes();
                         outputStream.write(headerBytes);
                         totalBytesWritten += headerBytes.length;
                         bytesWrittenForThisFile += headerBytes.length;
-                    } else if (zipParameters.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_AES) {
+                    } else if (zipParameters.getEncryption() == Encryption.AES) {
                         byte[] saltBytes = ((AESEncrpyter)encrypter).getSaltBytes();
                         byte[] passwordVerifier = ((AESEncrpyter)encrypter).getDerivedPasswordVerifier();
                         outputStream.write(saltBytes);
@@ -162,17 +163,13 @@ public abstract class CipherOutputStream extends OutputStream {
             return;
         }
 
-        switch (zipParameters.getEncryptionMethod()) {
-            case Zip4jConstants.ENC_METHOD_STANDARD:
-                // Since we do not know the crc here, we use the modification time for encrypting.
-                encrypter = new StandardEncrypter(zipParameters.getPassword(), (localFileHeader.getLastModFileTime() & 0x0000ffff) << 16);
-                break;
-            case Zip4jConstants.ENC_METHOD_AES:
-                encrypter = new AESEncrpyter(zipParameters.getPassword(), zipParameters.getAesKeyStrength());
-                break;
-            default:
-                throw new ZipException("invalid encprytion method");
-        }
+        if (zipParameters.getEncryption() == Encryption.STANDARD)
+            // Since we do not know the crc here, we use the modification time for encrypting.
+            encrypter = new StandardEncrypter(zipParameters.getPassword(), (localFileHeader.getLastModFileTime() & 0x0000ffff) << 16);
+        else if (zipParameters.getEncryption() == Encryption.AES)
+            encrypter = new AESEncrpyter(zipParameters.getPassword(), zipParameters.getAesKeyStrength());
+        else
+            throw new ZipException("invalid encprytion method");
     }
 
     private void initZipModel(ZipModel zipModel) {
@@ -220,15 +217,14 @@ public abstract class CipherOutputStream extends OutputStream {
     public void write(byte[] b, int off, int len) throws IOException {
         if (len == 0) return;
 
-        if (zipParameters.isEncryptFiles() &&
-                zipParameters.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_AES) {
+        if (zipParameters.isEncryptFiles() && zipParameters.getEncryption() == Encryption.AES) {
             if (pendingBufferLength != 0) {
                 if (len >= (InternalZipConstants.AES_BLOCK_SIZE - pendingBufferLength)) {
                     System.arraycopy(b, off, pendingBuffer, pendingBufferLength,
-                            (InternalZipConstants.AES_BLOCK_SIZE - pendingBufferLength));
+                            InternalZipConstants.AES_BLOCK_SIZE - pendingBufferLength);
                     encryptAndWrite(pendingBuffer, 0, pendingBuffer.length);
-                    off = (InternalZipConstants.AES_BLOCK_SIZE - pendingBufferLength);
-                    len = len - off;
+                    off = InternalZipConstants.AES_BLOCK_SIZE - pendingBufferLength;
+                    len -= off;
                     pendingBufferLength = 0;
                 } else {
                     System.arraycopy(b, off, pendingBuffer, pendingBufferLength,
@@ -268,7 +264,7 @@ public abstract class CipherOutputStream extends OutputStream {
         }
 
         if (this.zipParameters.isEncryptFiles() &&
-                this.zipParameters.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_AES) {
+                zipParameters.getEncryption() == Encryption.AES) {
             if (encrypter instanceof AESEncrpyter) {
                 outputStream.write(((AESEncrpyter)encrypter).getFinalMac());
                 bytesWrittenForThisFile += 10;
@@ -289,13 +285,12 @@ public abstract class CipherOutputStream extends OutputStream {
 
         long crc32 = crc.getValue();
         if (fileHeader.isEncrypted()) {
-            if (fileHeader.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_AES) {
+            if (fileHeader.getEncryption() == Encryption.AES) {
                 crc32 = 0;
             }
         }
 
-        if (zipParameters.isEncryptFiles() &&
-                zipParameters.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_AES) {
+        if (zipParameters.isEncryptFiles() && zipParameters.getEncryption() == Encryption.AES) {
             fileHeader.setCrc32(0);
             localFileHeader.setCrc32(0);
         } else {
@@ -332,16 +327,15 @@ public abstract class CipherOutputStream extends OutputStream {
 //        fileHeader.setSignature((int)InternalZipConstants.CENSIG);
         fileHeader.setVersionMadeBy(20);
         fileHeader.setVersionNeededToExtract(20);
-        if (zipParameters.isEncryptFiles() &&
-                zipParameters.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_AES) {
-            fileHeader.setEncryptionMethod(Zip4jConstants.ENC_METHOD_AES);
+        if (zipParameters.isEncryptFiles() && zipParameters.getEncryption() == Encryption.AES) {
+            fileHeader.setEncryption(Encryption.AES);
             fileHeader.setAesExtraDataRecord(generateAESExtraDataRecord(zipParameters));
         } else {
             fileHeader.setCompressionMethod(zipParameters.getCompressionMethod());
         }
         if (zipParameters.isEncryptFiles()) {
             fileHeader.setEncrypted(true);
-            fileHeader.setEncryptionMethod(zipParameters.getEncryptionMethod());
+            fileHeader.setEncryption(zipParameters.getEncryption());
         }
         String fileName = null;
         if (zipParameters.isSourceExternalStream()) {
@@ -386,10 +380,10 @@ public abstract class CipherOutputStream extends OutputStream {
             if (!zipParameters.isSourceExternalStream()) {
                 long fileSize = Files.size(sourceFile);
                 if (zipParameters.getCompressionMethod() == CompressionMethod.STORE) {
-                    if (zipParameters.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_STANDARD) {
+                    if (zipParameters.getEncryption() == Encryption.STANDARD) {
                         fileHeader.setCompressedSize(fileSize
                                 + InternalZipConstants.STD_DEC_HDR_SIZE);
-                    } else if (zipParameters.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_AES) {
+                    } else if (zipParameters.getEncryption() == Encryption.AES) {
                         int saltLength = 0;
                         switch (zipParameters.getAesKeyStrength()) {
                             case Zip4jConstants.AES_STRENGTH_128:
@@ -413,7 +407,7 @@ public abstract class CipherOutputStream extends OutputStream {
             }
         }
         if (zipParameters.isEncryptFiles() &&
-                zipParameters.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_STANDARD) {
+                zipParameters.getEncryption() == Encryption.STANDARD) {
             fileHeader.setCrc32(zipParameters.getSourceFileCRC());
         }
         byte[] shortByte = new byte[2];
@@ -434,7 +428,7 @@ public abstract class CipherOutputStream extends OutputStream {
         localFileHeader.setUncompressedSize(fileHeader.getUncompressedSize());
         localFileHeader.setFileNameLength(fileHeader.getFileNameLength());
         localFileHeader.setFileName(fileHeader.getFileName());
-        localFileHeader.setEncryptionMethod(fileHeader.getEncryptionMethod());
+        localFileHeader.setEncryption(fileHeader.getEncryption());
         localFileHeader.setAesExtraDataRecord(fileHeader.getAesExtraDataRecord());
         localFileHeader.setCrc32(fileHeader.getCrc32());
         localFileHeader.setCompressedSize(fileHeader.getCompressedSize());

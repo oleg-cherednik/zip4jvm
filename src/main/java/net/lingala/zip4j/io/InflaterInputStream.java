@@ -16,9 +16,9 @@
 
 package net.lingala.zip4j.io;
 
+import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.unzip.UnzipEngine;
 import net.lingala.zip4j.util.InternalZipConstants;
-import net.lingala.zip4j.util.Zip4jConstants;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -90,7 +90,7 @@ public class InflaterInputStream extends PartInputStream {
 		    }
 		    if (unzipEngine != null) {
 		    	if (unzipEngine.getLocalFileHeader().isEncrypted() &&
-		    			unzipEngine.getLocalFileHeader().getEncryptionMethod() == Zip4jConstants.ENC_METHOD_STANDARD) {
+		    			unzipEngine.getLocalFileHeader().getEncryption() == Encryption.STANDARD) {
 		    		s += " - Wrong Password?";
 		    	}
 		    }

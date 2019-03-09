@@ -20,8 +20,8 @@ import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
+import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.util.Zip4jConstants;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -58,7 +58,7 @@ public class AddFilesWithStandardZipEncryption {
         parameters.setEncryptFiles(true);
 
         // Set the encryption method to Standard Zip Encryption
-        parameters.setEncryptionMethod(Zip4jConstants.ENC_METHOD_STANDARD);
+        parameters.setEncryption(Encryption.STANDARD);
 
         // Set password
         parameters.setPassword("test123!");

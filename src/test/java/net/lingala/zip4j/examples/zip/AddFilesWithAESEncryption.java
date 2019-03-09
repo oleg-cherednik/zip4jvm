@@ -20,6 +20,7 @@ import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
+import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
 
@@ -68,7 +69,7 @@ public class AddFilesWithAESEncryption {
         parameters.setEncryptFiles(true);
 
         // Set the encryption method to AES Zip Encryption
-        parameters.setEncryptionMethod(Zip4jConstants.ENC_METHOD_AES);
+        parameters.setEncryption(Encryption.AES);
 
         // Set AES Key strength. Key strengths available for AES encryption are:
         // AES_STRENGTH_128 - For both encryption and decryption

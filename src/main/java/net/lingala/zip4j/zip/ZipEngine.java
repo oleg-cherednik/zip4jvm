@@ -23,12 +23,12 @@ import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.io.ZipOutputStream;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.CompressionMethod;
+import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.ArchiveMaintainer;
 import net.lingala.zip4j.util.ChecksumCalculator;
 import net.lingala.zip4j.util.InternalZipConstants;
-import net.lingala.zip4j.util.Zip4jConstants;
 import net.lingala.zip4j.util.Zip4jUtil;
 import org.apache.commons.io.IOUtils;
 
@@ -89,7 +89,7 @@ public class ZipEngine {
                 ZipParameters fileParameters = parameters.toBuilder().build();
 
                 if (Files.isRegularFile(file)) {
-                    if (fileParameters.isEncryptFiles() && fileParameters.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_STANDARD)
+                    if (fileParameters.isEncryptFiles() && fileParameters.getEncryption() == Encryption.STANDARD)
                         fileParameters.setSourceFileCRC(new ChecksumCalculator(file).calculate());
 
                     if (Files.size(file) == 0)
@@ -213,8 +213,8 @@ public class ZipEngine {
             throw new ZipException("unsupported compression type");
 
         if (parameters.isEncryptFiles()) {
-            if (parameters.getEncryptionMethod() != Zip4jConstants.ENC_METHOD_STANDARD &&
-                    parameters.getEncryptionMethod() != Zip4jConstants.ENC_METHOD_AES) {
+            if (parameters.getEncryption() != Encryption.STANDARD &&
+                    parameters.getEncryption() != Encryption.AES) {
                 throw new ZipException("unsupported encryption method");
             }
 
@@ -223,7 +223,7 @@ public class ZipEngine {
             }
         } else {
             parameters.setAesKeyStrength(-1);
-            parameters.setEncryptionMethod(-1);
+            parameters.setEncryption(Encryption.OFF);
         }
 
     }

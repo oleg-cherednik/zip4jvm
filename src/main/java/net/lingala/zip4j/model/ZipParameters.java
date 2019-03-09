@@ -23,7 +23,6 @@ import lombok.NonNull;
 import lombok.Setter;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.util.InternalZipConstants;
-import net.lingala.zip4j.util.Zip4jConstants;
 import net.lingala.zip4j.util.Zip4jUtil;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
@@ -45,7 +44,8 @@ public class ZipParameters {
     @NonNull
     private CompressionLevel compressionLevel = CompressionLevel.DEFAULT;
     private boolean encryptFiles;
-    private int encryptionMethod;
+    @NonNull
+    private Encryption encryption = Encryption.OFF;
     private boolean readHiddenFiles;
     private char[] password;
     private int aesKeyStrength;
@@ -60,7 +60,6 @@ public class ZipParameters {
     public ZipParameters() {
         encryptFiles = false;
         readHiddenFiles = true;
-        encryptionMethod = Zip4jConstants.ENC_NO_ENCRYPTION;
         aesKeyStrength = -1;
         includeRootFolder = true;
         timeZone = TimeZone.getDefault();

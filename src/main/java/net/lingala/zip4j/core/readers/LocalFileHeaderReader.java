@@ -5,13 +5,13 @@ import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.CompressionMethod;
+import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.ExtraDataRecord;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.Zip64ExtendedInfo;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.LittleEndianDecorator;
 import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
-import net.lingala.zip4j.util.Zip4jConstants;
 
 import java.io.IOException;
 
@@ -49,14 +49,14 @@ public final class LocalFileHeaderReader {
 
         if (localFileHeader.isEncrypted()) {
 
-            if (localFileHeader.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_AES) {
+            if (localFileHeader.getEncryption() == Encryption.AES) {
                 //Do nothing
             } else {
                 if ((localFileHeader.getGeneralPurposeFlag()[0] & 64) == 64) {
                     //hardcoded for now
-                    localFileHeader.setEncryptionMethod(1);
+                    localFileHeader.setEncryption(Encryption.STRONG);
                 } else {
-                    localFileHeader.setEncryptionMethod(Zip4jConstants.ENC_METHOD_STANDARD);
+                    localFileHeader.setEncryption(Encryption.STANDARD);
 //						localFileHeader.setCompressedSize(localFileHeader.getCompressedSize()
 //								- ZipConstants.STD_DEC_HDR_SIZE);
                 }

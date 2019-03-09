@@ -27,6 +27,7 @@ import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.CompressionMethod;
+import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.UnzipParameters;
 import net.lingala.zip4j.model.ZipModel;
@@ -115,7 +116,7 @@ public class UnzipEngine {
             long offsetStartOfData = localFileHeader.getOffsetStartOfData();
 
             if (localFileHeader.isEncrypted()) {
-                if (localFileHeader.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_AES) {
+                if (localFileHeader.getEncryption() == Encryption.AES) {
                     if (decrypter instanceof AESDecrypter) {
                         comprSize -= (((AESDecrypter)decrypter).getSaltLength() +
                                 ((AESDecrypter)decrypter).getPasswordVerifierLength() + 10);
@@ -125,14 +126,14 @@ public class UnzipEngine {
                         throw new ZipException("invalid decryptor when trying to calculate " +
                                 "compressed size for AES encrypted file: " + fileHeader.getFileName());
                     }
-                } else if (localFileHeader.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_STANDARD) {
+                } else if (localFileHeader.getEncryption() == Encryption.STANDARD) {
                     comprSize -= InternalZipConstants.STD_DEC_HDR_SIZE;
                     offsetStartOfData += InternalZipConstants.STD_DEC_HDR_SIZE;
                 }
             }
 
             CompressionMethod compressionMethod = fileHeader.getCompressionMethod();
-            if (fileHeader.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_AES) {
+            if (fileHeader.getEncryption() == Encryption.AES) {
                 if (fileHeader.getAesExtraDataRecord() != null)
                     compressionMethod = fileHeader.getAesExtraDataRecord().getCompressionMethod();
                 else
@@ -187,9 +188,9 @@ public class UnzipEngine {
         }
 
         if (localFileHeader.isEncrypted()) {
-            if (localFileHeader.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_STANDARD) {
+            if (localFileHeader.getEncryption() == Encryption.STANDARD) {
                 decrypter = new StandardDecrypter(fileHeader, getStandardDecrypterHeaderBytes(raf));
-            } else if (localFileHeader.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_AES) {
+            } else if (localFileHeader.getEncryption() == Encryption.AES) {
                 decrypter = new AESDecrypter(localFileHeader, getAESSalt(raf), getAESPasswordVerifier(raf));
             } else {
                 throw new ZipException("unsupported encryption method");
@@ -253,7 +254,7 @@ public class UnzipEngine {
 
     public void checkCRC() throws ZipException {
         if (fileHeader != null) {
-            if (fileHeader.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_AES) {
+            if (fileHeader.getEncryption() == Encryption.AES) {
                 if (decrypter != null && decrypter instanceof AESDecrypter) {
                     byte[] tmpMacBytes = ((AESDecrypter)decrypter).getCalculatedAuthenticationBytes();
                     byte[] storedMac = ((AESDecrypter)decrypter).getStoredMac();
@@ -274,7 +275,7 @@ public class UnzipEngine {
                 if (calculatedCRC != fileHeader.getCrc32()) {
                     String errMsg = "invalid CRC for file: " + fileHeader.getFileName();
                     if (localFileHeader.isEncrypted() &&
-                            localFileHeader.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_STANDARD) {
+                            localFileHeader.getEncryption() == Encryption.STANDARD) {
                         errMsg += " - Wrong Password?";
                     }
                     throw new ZipException(errMsg);
@@ -285,7 +286,7 @@ public class UnzipEngine {
 
 //	private void checkCRC() throws ZipException {
 //		if (fileHeader != null) {
-//			if (fileHeader.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_AES) {
+//			if (fileHeader.getEncryption() == Zip4jConstants.AES) {
 //				if (decrypter != null && decrypter instanceof AESDecrypter) {
 //					byte[] tmpMacBytes = ((AESDecrypter)decrypter).getCalculatedAuthenticationBytes();
 //					byte[] actualMacBytes = ((AESDecrypter)decrypter).getStoredMac();

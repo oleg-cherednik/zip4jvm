@@ -23,7 +23,6 @@ import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.unzip.Unzip;
 import net.lingala.zip4j.util.BitUtils;
 import net.lingala.zip4j.util.InternalZipConstants;
-import net.lingala.zip4j.util.Zip4jConstants;
 import net.lingala.zip4j.util.Zip4jUtil;
 
 import java.util.ArrayList;
@@ -97,7 +96,8 @@ public class CentralDirectory {
         private List<ExtraDataRecord> extraDataRecords = Collections.emptyList();
         // size:k - extra field
         private String fileComment;
-        private int encryptionMethod = -1;
+        @NonNull
+        private Encryption encryption = Encryption.OFF;
         private char[] password;
         private boolean dataDescriptorExists;
         private Zip64ExtendedInfo zip64ExtendedInfo;
@@ -202,7 +202,7 @@ public class CentralDirectory {
 
         public void setAesExtraDataRecord(AESExtraDataRecord record) {
             aesExtraDataRecord = record;
-            encryptionMethod = record != null ? Zip4jConstants.ENC_METHOD_AES : -1;
+            encryption = record != null ? Encryption.AES : Encryption.OFF;
         }
     }
 

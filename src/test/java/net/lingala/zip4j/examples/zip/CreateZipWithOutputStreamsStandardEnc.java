@@ -19,8 +19,8 @@ package net.lingala.zip4j.examples.zip;
 import net.lingala.zip4j.io.ZipOutputStream;
 import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
+import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.util.Zip4jConstants;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -67,12 +67,12 @@ public class CreateZipWithOutputStreamsStandardEnc {
             parameters.setCompressionLevel(CompressionLevel.NORMAL);
 
             //This flag defines if the files have to be encrypted.
-            //If this flag is set to false, setEncryptionMethod, as described below,
+            //If this flag is set to false, setEncryption, as described below,
             //will be ignored and the files won't be encrypted
             parameters.setEncryptFiles(true);
 
             //Set encryption method to Standard Encryption
-            parameters.setEncryptionMethod(Zip4jConstants.ENC_METHOD_STANDARD);
+            parameters.setEncryption(Encryption.STANDARD);
 
             //self descriptive
             parameters.setPassword("YourPassword");

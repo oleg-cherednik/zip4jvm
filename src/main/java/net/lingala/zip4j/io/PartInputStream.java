@@ -19,9 +19,9 @@ package net.lingala.zip4j.io;
 import net.lingala.zip4j.crypto.AESDecrypter;
 import net.lingala.zip4j.crypto.IDecrypter;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.unzip.UnzipEngine;
 import net.lingala.zip4j.util.InternalZipConstants;
-import net.lingala.zip4j.util.Zip4jConstants;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,7 +46,7 @@ public class PartInputStream extends InputStream
 	    this.bytesRead = 0;
 	    this.length = len;
 	    this.isAESEncryptedFile = unzipEngine.getFileHeader().isEncrypted() &&
-			unzipEngine.getFileHeader().getEncryptionMethod() == Zip4jConstants.ENC_METHOD_AES;
+			unzipEngine.getFileHeader().getEncryption() == Encryption.AES;
 	}
 
 	public int available() {

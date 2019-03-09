@@ -21,7 +21,6 @@ import lombok.NonNull;
 import lombok.Setter;
 import net.lingala.zip4j.util.BitUtils;
 import net.lingala.zip4j.util.InternalZipConstants;
-import net.lingala.zip4j.util.Zip4jConstants;
 
 import java.util.Collections;
 import java.util.List;
@@ -64,7 +63,8 @@ public class LocalFileHeader {
 
     private long offsetStartOfData;
     private boolean isEncrypted;
-    private int encryptionMethod = -1;
+    @NonNull
+    private Encryption encryption = Encryption.OFF;
     private char[] password;
     private Zip64ExtendedInfo zip64ExtendedInfo;
     private AESExtraDataRecord aesExtraDataRecord;
@@ -98,7 +98,7 @@ public class LocalFileHeader {
 
     public void setAesExtraDataRecord(AESExtraDataRecord record) {
         aesExtraDataRecord = record;
-        encryptionMethod = record != null ? Zip4jConstants.ENC_METHOD_AES : -1;
+        encryption = record != null ? Encryption.AES : Encryption.OFF;
     }
 
 
