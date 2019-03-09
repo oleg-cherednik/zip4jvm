@@ -18,11 +18,11 @@ package net.lingala.zip4j.examples.zip;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.AesStrength;
 import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.util.Zip4jConstants;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -70,12 +70,12 @@ public class AddFilesWithAESEncryption {
                                                 .encryption(Encryption.AES)
 
                                                 // Set AES Key strength. Key strengths available for AES encryption are:
-                                                // AES_STRENGTH_128 - For both encryption and decryption
-                                                // AES_STRENGTH_192 - For decryption only
-                                                // AES_STRENGTH_256 - For both encryption and decryption
+                                                // STRENGTH_128 - For both encryption and decryption
+                                                // STRENGTH_192 - For decryption only
+                                                // STRENGTH_256 - For both encryption and decryption
                                                 // Key strength 192 cannot be used for encryption. But if a zip file already has a
                                                 // file encrypted with key strength of 192, then Zip4j can decrypt this file
-                                                .aesKeyStrength(Zip4jConstants.AES_STRENGTH_256)
+                                                .aesKeyStrength(AesStrength.STRENGTH_256)
 
                                                 // Set password
                                                 .password("test123!".toCharArray()).build();

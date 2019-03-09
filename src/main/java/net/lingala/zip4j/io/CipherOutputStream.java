@@ -23,6 +23,7 @@ import net.lingala.zip4j.crypto.IEncrypter;
 import net.lingala.zip4j.crypto.StandardEncrypter;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.AESExtraDataRecord;
+import net.lingala.zip4j.model.AesStrength;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.Encryption;
@@ -32,7 +33,6 @@ import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.Raw;
-import net.lingala.zip4j.util.Zip4jConstants;
 import net.lingala.zip4j.util.Zip4jUtil;
 import org.apache.commons.lang.StringUtils;
 
@@ -373,17 +373,15 @@ public abstract class CipherOutputStream extends OutputStream {
                         fileHeader.setCompressedSize(fileSize
                                 + InternalZipConstants.STD_DEC_HDR_SIZE);
                     } else if (zipParameters.getEncryption() == Encryption.AES) {
-                        int saltLength = 0;
-                        switch (zipParameters.getAesKeyStrength()) {
-                            case Zip4jConstants.AES_STRENGTH_128:
-                                saltLength = 8;
-                                break;
-                            case Zip4jConstants.AES_STRENGTH_256:
-                                saltLength = 16;
-                                break;
-                            default:
-                                throw new ZipException("invalid aes key strength, cannot determine key sizes");
-                        }
+                        int saltLength;
+
+                        if (zipParameters.getAesKeyStrength() == AesStrength.STRENGTH_128)
+                            saltLength = 8;
+                        else if (zipParameters.getAesKeyStrength() == AesStrength.STRENGTH_256)
+                            saltLength = 16;
+                        else
+                            throw new ZipException("invalid aes key strength, cannot determine key sizes");
+
                         fileHeader.setCompressedSize(fileSize + saltLength
                                 + InternalZipConstants.AES_AUTH_LENGTH + 2); //2 is password verifier
                     } else {
@@ -472,13 +470,7 @@ public abstract class CipherOutputStream extends OutputStream {
         // only MAC is stored and as per the specification, if version number is 2, then MAC is read
         // and CRC is ignored
         aesDataRecord.setVersionNumber(2);
-        if (parameters.getAesKeyStrength() == Zip4jConstants.AES_STRENGTH_128) {
-            aesDataRecord.setAesStrength(Zip4jConstants.AES_STRENGTH_128);
-        } else if (parameters.getAesKeyStrength() == Zip4jConstants.AES_STRENGTH_256) {
-            aesDataRecord.setAesStrength(Zip4jConstants.AES_STRENGTH_256);
-        } else {
-            throw new ZipException("invalid AES key strength, cannot generate AES Extra data record");
-        }
+        aesDataRecord.setAesStrength(parameters.getAesKeyStrength());
         aesDataRecord.setCompressionMethod(parameters.getCompressionMethod());
 
         return aesDataRecord;

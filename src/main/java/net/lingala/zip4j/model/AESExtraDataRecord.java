@@ -30,7 +30,8 @@ public class AESExtraDataRecord {
     private int dataSize = -1;
     private int versionNumber = -1;
     private String vendorID;
-    private int aesStrength = -1;
+    @NonNull
+    private AesStrength aesStrength = AesStrength.NONE;
     @NonNull
     private CompressionMethod compressionMethod = CompressionMethod.STORE;
 

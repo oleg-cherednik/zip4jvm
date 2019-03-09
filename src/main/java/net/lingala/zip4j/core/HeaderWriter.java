@@ -81,7 +81,7 @@ public class HeaderWriter {
             bytes.writeWord((short)aesExtraDataRecord.getDataSize());
             bytes.writeWord((short)aesExtraDataRecord.getVersionNumber());
             bytes.writeBytes(aesExtraDataRecord.getVendorID().getBytes());
-            bytes.writeBytes((byte)aesExtraDataRecord.getAesStrength());
+            bytes.writeBytes(aesExtraDataRecord.getAesStrength().getValue());
             bytes.writeWord(aesExtraDataRecord.getCompressionMethod().getValue());
         }
 
@@ -506,7 +506,7 @@ public class HeaderWriter {
                 bytes.copyByteArrayToArrayList(aesExtraDataRecord.getVendorID().getBytes());
 
                 byte[] aesStrengthBytes = new byte[1];
-                aesStrengthBytes[0] = (byte)aesExtraDataRecord.getAesStrength();
+                aesStrengthBytes[0] = aesExtraDataRecord.getAesStrength().getValue();
                 bytes.copyByteArrayToArrayList(aesStrengthBytes);
 
                 Raw.writeShortLittleEndian(shortByte, 0, aesExtraDataRecord.getCompressionMethod().getValue());

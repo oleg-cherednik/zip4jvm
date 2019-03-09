@@ -25,6 +25,7 @@ import net.lingala.zip4j.io.InflaterInputStream;
 import net.lingala.zip4j.io.PartInputStream;
 import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.AESExtraDataRecord;
+import net.lingala.zip4j.model.AesStrength;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.Encryption;
@@ -34,7 +35,6 @@ import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
 import net.lingala.zip4j.util.Raw;
-import net.lingala.zip4j.util.Zip4jConstants;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
@@ -231,19 +231,16 @@ public class UnzipEngine {
     }
 
     private int calculateAESSaltLength(AESExtraDataRecord aesExtraDataRecord) throws ZipException {
-        if (aesExtraDataRecord == null) {
+        if (aesExtraDataRecord == null)
             throw new ZipException("unable to determine salt length: AESExtraDataRecord is null");
-        }
-        switch (aesExtraDataRecord.getAesStrength()) {
-            case Zip4jConstants.AES_STRENGTH_128:
-                return 8;
-            case Zip4jConstants.AES_STRENGTH_192:
-                return 12;
-            case Zip4jConstants.AES_STRENGTH_256:
-                return 16;
-            default:
-                throw new ZipException("unable to determine salt length: invalid aes key strength");
-        }
+
+        if (aesExtraDataRecord.getAesStrength() == AesStrength.STRENGTH_128)
+            return 8;
+        if (aesExtraDataRecord.getAesStrength() == AesStrength.STRENGTH_192)
+            return 12;
+        if (aesExtraDataRecord.getAesStrength() == AesStrength.STRENGTH_256)
+            return 16;
+        throw new ZipException("unable to determine salt length: invalid aes key strength");
     }
 
     public void checkCRC() throws ZipException {

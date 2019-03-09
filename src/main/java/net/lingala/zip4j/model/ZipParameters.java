@@ -49,7 +49,7 @@ public class ZipParameters {
     private boolean readHiddenFiles;
     private char[] password;
     @Builder.Default
-    private int aesKeyStrength = -1;
+    private AesStrength aesKeyStrength = AesStrength.NONE;
     @Builder.Default
     private boolean includeRootFolder = true;
     private String rootFolderInZip;
