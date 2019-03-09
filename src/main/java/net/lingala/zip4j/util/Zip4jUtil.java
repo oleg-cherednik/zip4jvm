@@ -27,7 +27,6 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -268,20 +267,6 @@ public class Zip4jUtil {
     }
 
     /**
-     * Decodes file name based on encoding. If file name is UTF 8 encoded
-     * returns an UTF8 encoded string, else return Cp850 encoded String. If
-     * appropriate charset is not supported, then returns a System default
-     * charset encoded String
-     *
-     * @param data
-     * @param isUTF8
-     * @return String
-     */
-    public static String decodeFileName(byte[] data, boolean isUTF8) {
-        return new String(data, isUTF8 ? StandardCharsets.UTF_8 : Charset.defaultCharset());
-    }
-
-    /**
      * Detects the encoding charset for the input string
      *
      * @return String - charset for the String
@@ -393,5 +378,9 @@ public class Zip4jUtil {
         allSigs[10] = InternalZipConstants.AESSIG;
 
         return allSigs;
+    }
+
+    public static boolean isDirectory(String fileName) {
+        return fileName != null && (fileName.endsWith("/") || fileName.endsWith("\\"));
     }
 }

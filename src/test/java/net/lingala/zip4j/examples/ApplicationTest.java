@@ -2,9 +2,7 @@ package net.lingala.zip4j.examples;
 
 import lombok.NonNull;
 import net.lingala.zip4j.core.ZipFile;
-import net.lingala.zip4j.core.ZipFileNew;
 import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.model.Context;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Compression;
 import net.lingala.zip4j.util.Zip4jConstants;
@@ -70,7 +68,7 @@ public class ApplicationTest {
     }
 
     public void addFilesStoreCompNew() throws ZipException, IOException {
-        ZipFileNew zipFile = new ZipFileNew(destDir.resolve("src.zip"));
+        ZipFile zipFile = new ZipFile(destDir.resolve("src.zip"));
 
         List<Path> files = Arrays.asList(
                 srcDir.resolve("mcdonnell-douglas-f15-eagle.jpg"),
@@ -80,17 +78,16 @@ public class ApplicationTest {
                 srcDir.resolve("cars/ferrari-458-italia.jpg"),
                 srcDir.resolve("cars/wiesmann-gt-mf5.jpg"));
 
-        Context context = Context.builder()
-                                 .compression(Compression.STORE)
-                                 .root(srcDir)
-                                 .build();
+        ZipParameters parameters = new ZipParameters();
+        parameters.setCompressionMethod(Compression.STORE.getVal());
+        parameters.setDefaultFolderPath(srcDir.toString());
 
         // Now add files to the zip file
         // Note: To add a single file, the method addFile can be used
         // Note: If the zip file already exists and if this zip file is a split file
         // then this method throws an exception as Zip Format Specification does not
         // allow updating split zip files
-        zipFile.addFiles(files, context);
+        zipFile.addFiles(files, parameters);
 
         checkDestinationDir(1);
 //        checkResultDir();

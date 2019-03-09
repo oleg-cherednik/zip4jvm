@@ -18,13 +18,12 @@ package net.lingala.zip4j.util;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.lingala.zip4j.exception.ZipException;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.zip.CRC32;
+import java.util.zip.CheckedInputStream;
 
 /**
  * @author Oleg Cherednik
@@ -33,24 +32,17 @@ import java.util.zip.CRC32;
 @RequiredArgsConstructor
 public final class ChecksumCalculator {
 
-    private static final int BUF_SIZE = 1 << 14; //16384
-
     @NonNull
     private final Path file;
 
-    public long calculate() throws ZipException {
-        try (InputStream inputStream = new FileInputStream(file.toFile())) {
-            byte[] buf = new byte[BUF_SIZE];
-            int readLen = -2;
-            CRC32 crc32 = new CRC32();
+    public long calculate() throws IOException {
+        try (CheckedInputStream in = new CheckedInputStream(new FileInputStream(file.toFile()), new CRC32())) {
+            byte[] buf = new byte[128];
 
-            while ((readLen = inputStream.read(buf)) != -1) {
-                crc32.update(buf, 0, readLen);
+            while (in.read(buf) >= 0) {
             }
 
-            return crc32.getValue();
-        } catch(IOException e) {
-            throw new ZipException(e);
+            return in.getChecksum().getValue();
         }
     }
 }

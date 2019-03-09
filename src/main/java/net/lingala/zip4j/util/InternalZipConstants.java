@@ -171,8 +171,7 @@ public interface InternalZipConstants {
     String CHARSET_COMMENTS_DEFAULT = "windows-1254";
     Charset CHARSET_DEFAULT = Charset.defaultCharset();
 
-    public static final String FILE_SEPARATOR = System.getProperty("file.separator");
-    public static final String ZIP_FILE_SEPARATOR = "/";
+    String FILE_SEPARATOR = System.getProperty("file.separator");
     public static final String THREAD_NAME = "Zip4j";
     public static final int MAX_ALLOWED_ZIP_COMMENT_LENGTH = 0xFFFF;
 }

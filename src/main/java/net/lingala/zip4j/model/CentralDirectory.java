@@ -172,7 +172,7 @@ public class CentralDirectory {
         }
 
         public boolean isDirectory() {
-            return fileName != null && (fileName.endsWith("/") || fileName.endsWith("\\"));
+            return Zip4jUtil.isDirectory(fileName);
         }
 
         public boolean isEncrypted() {

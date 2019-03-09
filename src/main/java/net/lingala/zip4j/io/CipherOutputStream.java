@@ -92,8 +92,7 @@ public abstract class CipherOutputStream extends OutputStream {
                 if (StringUtils.isBlank(this.zipParameters.getFileNameInZip())) {
                     throw new ZipException("file name is empty for external stream");
                 }
-                if (this.zipParameters.getFileNameInZip().endsWith("/") ||
-                        this.zipParameters.getFileNameInZip().endsWith("\\")) {
+                if (Zip4jUtil.isDirectory(zipParameters.getFileNameInZip())) {
                     this.zipParameters.setEncryptFiles(false);
                     this.zipParameters.setEncryptionMethod(-1);
                     this.zipParameters.setCompressionMethod(Zip4jConstants.COMP_STORE);
@@ -361,10 +360,8 @@ public abstract class CipherOutputStream extends OutputStream {
             throw new ZipException("fileName is null or empty. unable to create file header");
         }
 
-        if (!zipParameters.isSourceExternalStream() && Files.isDirectory(sourceFile)) {
-            if (!fileName.endsWith("/") && !fileName.endsWith("\\"))
-                fileName += "/";
-        }
+        if (!zipParameters.isSourceExternalStream() && Files.isDirectory(sourceFile) && !Zip4jUtil.isDirectory(fileName))
+            fileName += InternalZipConstants.FILE_SEPARATOR;
 
         fileHeader.setFileName(fileName);
         fileHeader.setFileNameLength(Zip4jUtil.getEncodedStringLength(fileName, zipModel.getCharset()));

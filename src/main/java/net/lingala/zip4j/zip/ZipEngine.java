@@ -82,7 +82,7 @@ public class ZipEngine {
             for (Path file : files) {
                 String fileName = parameters.getRelativeFileName(file);
 
-                if ("/".equals(fileName) || "\\".equals(fileName))
+                if (Zip4jUtil.isDirectory(fileName))
                     continue;
 
                 ZipParameters fileParameters = parameters.toBuilder().build();
@@ -138,8 +138,7 @@ public class ZipEngine {
 
             outputStream.putNextEntry(null, parameters);
 
-            if (!parameters.getFileNameInZip().endsWith("/") &&
-                    !parameters.getFileNameInZip().endsWith("\\")) {
+            if (!Zip4jUtil.isDirectory(parameters.getFileNameInZip())) {
                 while ((readLen = inputStream.read(readBuff)) != -1) {
                     outputStream.write(readBuff, 0, readLen);
                 }
