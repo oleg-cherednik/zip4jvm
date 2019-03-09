@@ -29,30 +29,24 @@ import java.util.zip.Deflater;
 
 public abstract class DeflateOutputStream extends CipherOutputStream {
 
-    private byte[] buff;
-    protected Deflater deflater;
+    private final byte[] buf = new byte[InternalZipConstants.BUFF_SIZE];
+    private final Deflater deflater = new Deflater();
+
     private boolean firstBytesRead;
 
-    protected DeflateOutputStream(OutputStream outputStream, ZipModel zipModel) {
-        super(outputStream, zipModel);
-        deflater = new Deflater();
-        buff = new byte[InternalZipConstants.BUFF_SIZE];
-        firstBytesRead = false;
+    protected DeflateOutputStream(OutputStream out, ZipModel zipModel) {
+        super(out, zipModel);
     }
 
     @Override
     public void putNextEntry(Path file, ZipParameters zipParameters) throws ZipException {
         super.putNextEntry(file, zipParameters);
-        if (zipParameters.getCompressionMethod() == Zip4jConstants.COMP_DEFLATE) {
-            deflater.reset();
-            if ((zipParameters.getCompressionLevel() < 0 || zipParameters
-                    .getCompressionLevel() > 9)
-                    && zipParameters.getCompressionLevel() != -1) {
-                throw new ZipException(
-                        "invalid compression level for deflater. compression level should be in the range of 0-9");
-            }
-            deflater.setLevel(zipParameters.getCompressionLevel());
-        }
+
+        if (zipParameters.getCompressionMethod() != Zip4jConstants.COMP_DEFLATE)
+            return;
+
+        deflater.reset();
+        deflater.setLevel(zipParameters.getCompressionLevel().getLevel());
     }
 
     @Override
@@ -61,7 +55,7 @@ public abstract class DeflateOutputStream extends CipherOutputStream {
     }
 
     private void deflate() throws IOException {
-        int len = deflater.deflate(buff, 0, buff.length);
+        int len = deflater.deflate(buf, 0, buf.length);
         if (len > 0) {
             if (deflater.finished()) {
                 if (len == 4) return;
@@ -72,10 +66,10 @@ public abstract class DeflateOutputStream extends CipherOutputStream {
                 len -= 4;
             }
             if (!firstBytesRead) {
-                super.write(buff, 2, len - 2);
+                super.write(buf, 2, len - 2);
                 firstBytesRead = true;
             } else {
-                super.write(buff, 0, len);
+                super.write(buf, 0, len);
             }
         }
     }

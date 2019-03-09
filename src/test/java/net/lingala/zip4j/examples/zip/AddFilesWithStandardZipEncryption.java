@@ -18,6 +18,7 @@ package net.lingala.zip4j.examples.zip;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
 
@@ -49,7 +50,7 @@ public class AddFilesWithStandardZipEncryption {
         parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE); // set compression method to store compression
 
         // Set the compression level
-        parameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
+        parameters.setCompressionLevel(CompressionLevel.NORMAL);
 
         // Set the encryption flag to true
         // If this is set to false, then the rest of encryption properties are ignored

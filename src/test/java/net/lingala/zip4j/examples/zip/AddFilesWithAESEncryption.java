@@ -18,6 +18,7 @@ package net.lingala.zip4j.examples.zip;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
 
@@ -59,7 +60,7 @@ public class AddFilesWithAESEncryption {
         // DEFLATE_LEVEL_NORMAL - Optimal balance between compression level/speed
         // DEFLATE_LEVEL_MAXIMUM - High compression level with a compromise of speed
         // DEFLATE_LEVEL_ULTRA - Highest compression level but low speed
-        parameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
+        parameters.setCompressionLevel(CompressionLevel.NORMAL);
 
         // Set the encryption flag to true
         // If this is set to false, then the rest of encryption properties are ignored

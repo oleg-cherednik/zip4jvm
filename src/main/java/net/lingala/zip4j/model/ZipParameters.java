@@ -40,7 +40,7 @@ import java.util.TimeZone;
 public class ZipParameters {
 
     private int compressionMethod;
-    private int compressionLevel;
+    private CompressionLevel compressionLevel = CompressionLevel.DEFAULT;
     private boolean encryptFiles;
     private int encryptionMethod;
     private boolean readHiddenFiles;

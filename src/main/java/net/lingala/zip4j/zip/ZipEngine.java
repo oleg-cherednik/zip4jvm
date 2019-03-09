@@ -213,12 +213,6 @@ public class ZipEngine {
             throw new ZipException("unsupported compression type");
         }
 
-        if (parameters.getCompressionMethod() == Zip4jConstants.COMP_DEFLATE) {
-            if (parameters.getCompressionLevel() < 0 && parameters.getCompressionLevel() > 9) {
-                throw new ZipException("invalid compression level. compression level dor deflate should be in the range of 0-9");
-            }
-        }
-
         if (parameters.isEncryptFiles()) {
             if (parameters.getEncryptionMethod() != Zip4jConstants.ENC_METHOD_STANDARD &&
                     parameters.getEncryptionMethod() != Zip4jConstants.ENC_METHOD_AES) {
