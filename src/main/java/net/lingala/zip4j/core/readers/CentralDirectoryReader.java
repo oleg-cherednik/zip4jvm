@@ -76,8 +76,7 @@ final class CentralDirectoryReader {
         fileHeader.setExternalFileAttr(in.readBytes(4));
         fileHeader.setOffLocalHeaderRelative(in.readIntAsLong());
         fileHeader.setFileName(in.readString(fileHeader.getFileNameLength()));
-
-        fileHeader.setExtraDataRecords(readExtraDataRecords(fileHeader.getExtraFieldLength()));
+        fileHeader.setExtraDataRecords(readExtraDataRecords(in, fileHeader.getExtraFieldLength()));
         fileHeader.setZip64ExtendedInfo(readZip64ExtendedInfo(fileHeader));
         fileHeader.setAesExtraDataRecord(readAESExtraDataRecord(fileHeader.getExtraDataRecords()));
         fileHeader.setFileComment(in.readString(fileHeader.getFileCommentLength()));
@@ -87,7 +86,7 @@ final class CentralDirectoryReader {
 
     // TODO same logic for extra field for FileHeader and LocalFileHeader
     @NonNull
-    private List<ExtraDataRecord> readExtraDataRecords(int length) throws IOException {
+    public static List<ExtraDataRecord> readExtraDataRecords(LittleEndianRandomAccessFile in, int length) throws IOException {
         if (length <= 0)
             return Collections.emptyList();
 
@@ -121,7 +120,7 @@ final class CentralDirectoryReader {
         return digitalSignature;
     }
 
-    private static AESExtraDataRecord readAESExtraDataRecord(@NonNull List<ExtraDataRecord> records) throws IOException {
+    public static AESExtraDataRecord readAESExtraDataRecord(@NonNull List<ExtraDataRecord> records) throws IOException {
         for (ExtraDataRecord record : records) {
             if (record.getHeader() != ExtraDataRecord.HEADER_AESSIG)
                 continue;
@@ -143,6 +142,7 @@ final class CentralDirectoryReader {
         return null;
     }
 
+    // TODO pretty similar to LocalFileHeader
     private static Zip64ExtendedInfo readZip64ExtendedInfo(@NonNull CentralDirectory.FileHeader fileHeader) throws IOException {
         for (ExtraDataRecord record : fileHeader.getExtraDataRecords()) {
             if (record.getHeader() != ExtraDataRecord.HEADER_ZIP64)

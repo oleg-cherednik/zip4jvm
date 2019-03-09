@@ -429,14 +429,13 @@ public abstract class CipherOutputStream extends OutputStream {
 
     private void createLocalFileHeader() throws ZipException {
         localFileHeader = new LocalFileHeader();
-        localFileHeader.setSignature((int)InternalZipConstants.LOCSIG);
         localFileHeader.setVersionNeededToExtract(fileHeader.getVersionNeededToExtract());
+        localFileHeader.setGeneralPurposeFlag(fileHeader.getGeneralPurposeFlag());
         localFileHeader.setCompressionMethod(fileHeader.getCompressionMethod());
         localFileHeader.setLastModFileTime(fileHeader.getLastModFileTime());
         localFileHeader.setUncompressedSize(fileHeader.getUncompressedSize());
         localFileHeader.setFileNameLength(fileHeader.getFileNameLength());
         localFileHeader.setFileName(fileHeader.getFileName());
-        localFileHeader.setEncrypted(fileHeader.isEncrypted());
         localFileHeader.setEncryptionMethod(fileHeader.getEncryptionMethod());
         localFileHeader.setAesExtraDataRecord(fileHeader.getAesExtraDataRecord());
         localFileHeader.setCrc32(fileHeader.getCrc32());

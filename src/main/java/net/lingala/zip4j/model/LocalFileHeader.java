@@ -17,17 +17,23 @@
 package net.lingala.zip4j.model;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
+import net.lingala.zip4j.util.BitUtils;
 import net.lingala.zip4j.util.InternalZipConstants;
+import net.lingala.zip4j.util.Zip4jConstants;
 
+import java.util.Collections;
 import java.util.List;
+
+import static net.lingala.zip4j.util.BitUtils.BIT0;
 
 @Getter
 @Setter
 public class LocalFileHeader {
 
     // size:4 - signature (0x04034b50)
-    private int signature = InternalZipConstants.LOCSIG;
+    private final int signature = InternalZipConstants.LOCSIG;
     // size:2 - version needed to extract
     private int versionNeededToExtract;
     // size:2 - general purpose bit flag
@@ -47,10 +53,11 @@ public class LocalFileHeader {
     private int fileNameLength;
     // size:2 - extra field length (m)
     private int extraFieldLength;
-    // size:n - File name
+    // size:n - file name
     private String fileName;
     // size:m - extra field
-    private byte[] extraField;
+    @NonNull
+    private List<ExtraDataRecord> extraDataRecords = Collections.emptyList();
 
     // ----
 
@@ -58,10 +65,8 @@ public class LocalFileHeader {
     private boolean isEncrypted;
     private int encryptionMethod = -1;
     private char[] password;
-    private List<ExtraDataRecord> extraDataRecords;
     private Zip64ExtendedInfo zip64ExtendedInfo;
     private AESExtraDataRecord aesExtraDataRecord;
-    private boolean dataDescriptorExists;
     private boolean writeComprSizeInZip64ExtraRecord;
     private boolean fileNameUTF8Encoded;
     private byte[] crcBuff;
@@ -76,6 +81,25 @@ public class LocalFileHeader {
 
         return extraFieldLength;
     }
+
+    public boolean isEncrypted() {
+        return generalPurposeFlag != null && BitUtils.isBitSet(generalPurposeFlag[0], BIT0);
+    }
+
+    public void setZip64ExtendedInfo(Zip64ExtendedInfo info) {
+        zip64ExtendedInfo = info;
+
+        if (info != null) {
+            uncompressedSize = info.getUnCompressedSize() != -1 ? info.getUnCompressedSize() : uncompressedSize;
+            compressedSize = info.getCompressedSize() != -1 ? info.getCompressedSize() : uncompressedSize;
+        }
+    }
+
+    public void setAesExtraDataRecord(AESExtraDataRecord record) {
+        aesExtraDataRecord = record;
+        encryptionMethod = record != null ? Zip4jConstants.ENC_METHOD_AES : -1;
+    }
+
 
     @Getter
     @Setter

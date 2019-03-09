@@ -16,8 +16,8 @@
 
 package net.lingala.zip4j.util;
 
-import net.lingala.zip4j.core.HeaderReader;
 import net.lingala.zip4j.core.HeaderWriter;
+import net.lingala.zip4j.core.readers.LocalFileHeaderReader;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.NoSplitOutputStream;
 import net.lingala.zip4j.io.SplitOutputStream;
@@ -108,8 +108,7 @@ public class ArchiveMaintainer {
 
             inputStream = createFileHandler(zipModel, InternalZipConstants.READ_MODE);
 
-            HeaderReader headerReader = new HeaderReader(inputStream);
-            LocalFileHeader localFileHeader = headerReader.readLocalFileHeader(fileHeader);
+            LocalFileHeader localFileHeader = new LocalFileHeaderReader(new LittleEndianRandomAccessFile(inputStream), fileHeader).read();
             if (localFileHeader == null) {
                 throw new ZipException("invalid local file header, cannot remove file from archive");
             }

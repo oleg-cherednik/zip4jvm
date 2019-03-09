@@ -16,7 +16,7 @@
 
 package net.lingala.zip4j.unzip;
 
-import net.lingala.zip4j.core.HeaderReader;
+import net.lingala.zip4j.core.readers.LocalFileHeaderReader;
 import net.lingala.zip4j.crypto.AESDecrypter;
 import net.lingala.zip4j.crypto.IDecrypter;
 import net.lingala.zip4j.crypto.StandardDecrypter;
@@ -30,6 +30,7 @@ import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.UnzipParameters;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
+import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
 import net.lingala.zip4j.util.Raw;
 import net.lingala.zip4j.util.Zip4jConstants;
 import org.apache.commons.lang.StringUtils;
@@ -320,8 +321,7 @@ public class UnzipEngine {
             if (rafForLH == null)
                 rafForLH = new RandomAccessFile(zipModel.getZipFile().toFile(), InternalZipConstants.READ_MODE);
 
-            HeaderReader headerReader = new HeaderReader(rafForLH);
-            this.localFileHeader = headerReader.readLocalFileHeader(fileHeader);
+            LocalFileHeader localFileHeader = new LocalFileHeaderReader(new LittleEndianRandomAccessFile(rafForLH), fileHeader).read();
 
             if (localFileHeader == null) {
                 throw new ZipException("error reading local file header. Is this a valid zip file?");
@@ -333,7 +333,7 @@ public class UnzipEngine {
             }
 
             return true;
-        } catch(FileNotFoundException e) {
+        } catch(Exception e) {
             throw new ZipException(e);
         } finally {
             if (rafForLH != null) {
