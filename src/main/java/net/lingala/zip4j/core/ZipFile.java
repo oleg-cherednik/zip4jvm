@@ -357,9 +357,12 @@ public class ZipFile {
      * @throws ZipException
      */
     private ZipModel readZipModel() throws ZipException {
-        return zipModel == null ? new ZipModelReader(path, charset).read() : zipModel;
+        try {
+            return zipModel == null ? new ZipModelReader(path, charset).read() : zipModel;
+        } catch(IOException e) {
+            throw new ZipException(e);
+        }
     }
-
 
     /**
      * Extracts all the files in the given zip path to the input destination path.

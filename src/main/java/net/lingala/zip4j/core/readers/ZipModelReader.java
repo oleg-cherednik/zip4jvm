@@ -21,16 +21,16 @@ import java.nio.file.Path;
 @RequiredArgsConstructor
 public final class ZipModelReader {
 
+    @NonNull
     private final Path zipFile;
+    @NonNull
     private final Charset charset;
 
     @NonNull
-    public ZipModel read() throws ZipException {
+    public ZipModel read() throws IOException {
         try (LittleEndianRandomAccessFile in = new LittleEndianRandomAccessFile(
                 new RandomAccessFile(zipFile.toFile(), InternalZipConstants.READ_MODE))) {
             return read(in);
-        } catch(Exception e) {
-            throw new ZipException(e);
         }
     }
 
@@ -43,7 +43,7 @@ public final class ZipModelReader {
      * @throws ZipException
      */
     @NonNull
-    private ZipModel read(@NonNull LittleEndianRandomAccessFile in) throws ZipException, IOException {
+    private ZipModel read(@NonNull LittleEndianRandomAccessFile in) throws IOException {
         EndCentralDirectoryReader endCentralDirectoryReader = new EndCentralDirectoryReader(in);
         EndCentralDirectory dir = endCentralDirectoryReader.read();
         Zip64EndCentralDirectoryLocator locator = new Zip64EndCentralDirectoryLocatorReader(in, endCentralDirectoryReader.getOffs()).read();

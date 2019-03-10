@@ -28,6 +28,7 @@ import net.lingala.zip4j.util.Zip4jUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static net.lingala.zip4j.util.BitUtils.BIT0;
 import static net.lingala.zip4j.util.BitUtils.BIT3;
@@ -93,7 +94,7 @@ public class CentralDirectory {
         private String fileName;
         // size:m - extra field
         @NonNull
-        private List<ExtraDataRecord> extraDataRecords = Collections.emptyList();
+        private Map<Short, ExtraDataRecord> extraDataRecords = Collections.emptyMap();
         // size:k - extra field
         private String fileComment;
         @NonNull
@@ -191,6 +192,10 @@ public class CentralDirectory {
             aesExtraDataRecord = record;
             encryption = record != null ? Encryption.AES : Encryption.OFF;
             BitUtils.updateBits(generalPurposeFlag[0], BIT0, encryption != Encryption.OFF);
+        }
+
+        public ExtraDataRecord getExtraDataRecordByHeader(short header) {
+            return extraDataRecords.get(header);
         }
     }
 

@@ -2,7 +2,6 @@ package net.lingala.zip4j.core.readers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.AESStrength;
 import net.lingala.zip4j.model.CentralDirectory;
@@ -18,7 +17,9 @@ import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Oleg Cherednik
@@ -32,7 +33,7 @@ final class CentralDirectoryReader {
     private final Zip64EndCentralDirectory zip64Dir;
     private final boolean zip64;
 
-    public CentralDirectory read() throws IOException, ZipException {
+    public CentralDirectory read() throws IOException {
         findHead();
 
         CentralDirectory centralDirectory = new CentralDirectory();
@@ -88,27 +89,29 @@ final class CentralDirectoryReader {
 
     // TODO same logic for extra field for FileHeader and LocalFileHeader
     @NonNull
-    public static List<ExtraDataRecord> readExtraDataRecords(LittleEndianRandomAccessFile in, int length) throws IOException {
+    public static Map<Short, ExtraDataRecord> readExtraDataRecords(LittleEndianRandomAccessFile in, int length) throws IOException {
         if (length <= 0)
-            return Collections.emptyList();
+            return Collections.emptyMap();
 
         final long offsMax = in.getFilePointer() + length;
-        List<ExtraDataRecord> records = new ArrayList<>();
+        Map<Short, ExtraDataRecord> map = new HashMap<>();
 
         while (in.getFilePointer() < offsMax) {
             ExtraDataRecord record = new ExtraDataRecord();
             record.setHeader(in.readShort());
             record.setSizeOfData(in.readShort());
 
+            if (record.getSizeOfData() == 0)
+                continue;
             if (in.getFilePointer() + record.getSizeOfData() > offsMax)
-                // extra data record is corrupt; skil reading any further extra data
+                // extra data record is corrupt; skip reading any further extra data
                 break;
 
             record.setData(in.readBytes(record.getSizeOfData()));
-            records.add(record);
+            map.put(record.getHeader(), record);
         }
 
-        return records.isEmpty() ? Collections.emptyList() : records;
+        return map.isEmpty() ? Collections.emptyMap() : map;
     }
 
     private CentralDirectory.DigitalSignature readDigitalSignature() throws IOException {
@@ -122,51 +125,42 @@ final class CentralDirectoryReader {
         return digitalSignature;
     }
 
-    public static AESExtraDataRecord readAESExtraDataRecord(@NonNull List<ExtraDataRecord> records) throws IOException {
-        for (ExtraDataRecord record : records) {
-            if (record.getHeader() != ExtraDataRecord.HEADER_AESSIG)
-                continue;
-            if (record.getSizeOfData() == 0)
-                return null;
+    public static AESExtraDataRecord readAESExtraDataRecord(@NonNull Map<Short, ExtraDataRecord> records) throws IOException {
+        ExtraDataRecord record = records.get(ExtraDataRecord.HEADER_AESSIG);
 
-            LittleEndianDecorator in = new LittleEndianDecorator(record.getData());
+        if (record == null)
+            return null;
 
-            AESExtraDataRecord res = new AESExtraDataRecord();
-            res.setDataSize(record.getSizeOfData());
-            res.setVersionNumber(in.readShort());
-            res.setVendorID(in.readString(2));
-            res.setAesStrength(AESStrength.parseByte(in.readByte()));
-            res.setCompressionMethod(CompressionMethod.parseValue(in.readShort()));
+        LittleEndianDecorator in = new LittleEndianDecorator(record.getData());
 
-            return res;
-        }
+        AESExtraDataRecord res = new AESExtraDataRecord();
+        res.setDataSize(record.getSizeOfData());
+        res.setVersionNumber(in.readShort());
+        res.setVendor(in.readString(2));
+        res.setAesStrength(AESStrength.parseByte(in.readByte()));
+        res.setCompressionMethod(CompressionMethod.parseValue(in.readShort()));
 
-        return null;
+        return res;
     }
 
     // TODO pretty similar to LocalFileHeader
     private static Zip64ExtendedInfo readZip64ExtendedInfo(@NonNull CentralDirectory.FileHeader fileHeader) throws IOException {
-        for (ExtraDataRecord record : fileHeader.getExtraDataRecords()) {
-            if (record.getHeader() != ExtraDataRecord.HEADER_ZIP64)
-                continue;
-            if (record.getSizeOfData() == 0)
-                return null;
+        ExtraDataRecord record = fileHeader.getExtraDataRecordByHeader(ExtraDataRecord.HEADER_ZIP64);
 
-            LittleEndianDecorator in = new LittleEndianDecorator(record.getData());
-
-            Zip64ExtendedInfo res = new Zip64ExtendedInfo();
-            res.setSize(record.getSizeOfData());
-            res.setUnCompressedSize((fileHeader.getUncompressedSize() & 0xFFFF) == 0xFFFF ? in.readLong() : -1);
-            res.setCompressedSize((fileHeader.getCompressedSize() & 0xFFFF) == 0xFFFF ? in.readLong() : -1);
-            res.setOffsLocalHeaderRelative((fileHeader.getOffLocalHeaderRelative() & 0xFFFF) == 0xFFFF ? in.readLong() : -1);
-            res.setDiskNumberStart((fileHeader.getDiskNumberStart() & 0xFFFF) == 0xFFFF ? in.readInt() : -1);
-
-            if (res.getUnCompressedSize() != -1 || res.getCompressedSize() != -1
-                    || res.getOffsLocalHeaderRelative() != -1 || res.getDiskNumberStart() != -1)
-                return res;
-
+        if (record == null)
             return null;
-        }
+        LittleEndianDecorator in = new LittleEndianDecorator(record.getData());
+
+        Zip64ExtendedInfo res = new Zip64ExtendedInfo();
+        res.setSize(record.getSizeOfData());
+        res.setUnCompressedSize((fileHeader.getUncompressedSize() & 0xFFFF) == 0xFFFF ? in.readLong() : -1);
+        res.setCompressedSize((fileHeader.getCompressedSize() & 0xFFFF) == 0xFFFF ? in.readLong() : -1);
+        res.setOffsLocalHeaderRelative((fileHeader.getOffLocalHeaderRelative() & 0xFFFF) == 0xFFFF ? in.readLong() : -1);
+        res.setDiskNumberStart((fileHeader.getDiskNumberStart() & 0xFFFF) == 0xFFFF ? in.readInt() : -1);
+
+        if (res.getUnCompressedSize() != -1 || res.getCompressedSize() != -1
+                || res.getOffsLocalHeaderRelative() != -1 || res.getDiskNumberStart() != -1)
+            return res;
 
         return null;
     }

@@ -83,27 +83,23 @@ public final class LocalFileHeaderReader {
 
     // TODO pretty similar to FileHeader
     private static Zip64ExtendedInfo readZip64ExtendedInfo(@NonNull LocalFileHeader localFileHeader) throws IOException {
-        for (ExtraDataRecord record : localFileHeader.getExtraDataRecords()) {
-            if (record.getHeader() != ExtraDataRecord.HEADER_ZIP64)
-                continue;
-            if (record.getSizeOfData() == 0)
-                return null;
+        ExtraDataRecord record = localFileHeader.getExtraDataRecordByHeader(ExtraDataRecord.HEADER_ZIP64);
 
-            LittleEndianDecorator in = new LittleEndianDecorator(record.getData());
-
-            Zip64ExtendedInfo res = new Zip64ExtendedInfo();
-            res.setSize(record.getSizeOfData());
-            res.setUnCompressedSize((localFileHeader.getUncompressedSize() & 0xFFFF) == 0xFFFF ? in.readLong() : -1);
-            res.setCompressedSize((localFileHeader.getCompressedSize() & 0xFFFF) == 0xFFFF ? in.readLong() : -1);
-            res.setOffsLocalHeaderRelative(in.readLong());
-            res.setDiskNumberStart(in.readInt());
-
-            if (res.getUnCompressedSize() != -1 || res.getCompressedSize() != -1
-                    || res.getOffsLocalHeaderRelative() != -1 || res.getDiskNumberStart() != -1)
-                return res;
-
+        if (record == null)
             return null;
-        }
+
+        LittleEndianDecorator in = new LittleEndianDecorator(record.getData());
+
+        Zip64ExtendedInfo res = new Zip64ExtendedInfo();
+        res.setSize(record.getSizeOfData());
+        res.setUnCompressedSize((localFileHeader.getUncompressedSize() & 0xFFFF) == 0xFFFF ? in.readLong() : -1);
+        res.setCompressedSize((localFileHeader.getCompressedSize() & 0xFFFF) == 0xFFFF ? in.readLong() : -1);
+        res.setOffsLocalHeaderRelative(in.readLong());
+        res.setDiskNumberStart(in.readInt());
+
+        if (res.getUnCompressedSize() != -1 || res.getCompressedSize() != -1
+                || res.getOffsLocalHeaderRelative() != -1 || res.getDiskNumberStart() != -1)
+            return res;
 
         return null;
     }

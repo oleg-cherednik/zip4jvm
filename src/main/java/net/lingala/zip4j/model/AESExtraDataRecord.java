@@ -23,13 +23,14 @@ import net.lingala.zip4j.util.InternalZipConstants;
 
 @Getter
 @Setter
+@SuppressWarnings("NewClassNamingConvention")
 public class AESExtraDataRecord {
 
     // size:4 - signature (0x9901)
-    private final long signature = InternalZipConstants.AESSIG;
+    private final int signature = InternalZipConstants.AESSIG;
     private int dataSize = -1;
     private int versionNumber = -1;
-    private String vendorID;
+    private String vendor;
     @NonNull
     private AESStrength aesStrength = AESStrength.NONE;
     @NonNull

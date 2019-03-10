@@ -60,7 +60,7 @@ public final class LocalFileHeaderWriter {
             bytes.writeWord((short)aesExtraDataRecord.getSignature());
             bytes.writeWord((short)aesExtraDataRecord.getDataSize());
             bytes.writeWord((short)aesExtraDataRecord.getVersionNumber());
-            bytes.writeBytes(aesExtraDataRecord.getVendorID().getBytes());
+            bytes.writeBytes(aesExtraDataRecord.getVendor().getBytes());
             bytes.writeBytes(aesExtraDataRecord.getAesStrength().getValue());
             bytes.writeWord(aesExtraDataRecord.getCompressionMethod().getValue());
         }

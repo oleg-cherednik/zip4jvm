@@ -198,7 +198,7 @@ public final class CentralDirectoryWriter {
                 Raw.writeShortLittleEndian(shortByte, 0, (short)aesExtraDataRecord.getVersionNumber());
                 bytes.copyByteArrayToArrayList(shortByte);
 
-                bytes.copyByteArrayToArrayList(aesExtraDataRecord.getVendorID().getBytes());
+                bytes.copyByteArrayToArrayList(aesExtraDataRecord.getVendor().getBytes());
 
                 byte[] aesStrengthBytes = new byte[1];
                 aesStrengthBytes[0] = aesExtraDataRecord.getAesStrength().getValue();

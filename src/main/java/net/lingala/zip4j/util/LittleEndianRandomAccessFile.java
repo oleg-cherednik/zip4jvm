@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
@@ -13,7 +14,7 @@ import java.nio.charset.Charset;
  * @since 21.02.2019
  */
 @RequiredArgsConstructor
-public final class LittleEndianRandomAccessFile implements AutoCloseable {
+public final class LittleEndianRandomAccessFile implements Closeable {
 
     @Getter
     private final RandomAccessFile raf;
@@ -85,7 +86,7 @@ public final class LittleEndianRandomAccessFile implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() throws IOException {
         raf.close();
     }
 
