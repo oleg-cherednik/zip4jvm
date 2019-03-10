@@ -16,8 +16,6 @@
 
 package net.lingala.zip4j.crypto;
 
-import lombok.Getter;
-import lombok.Setter;
 import net.lingala.zip4j.crypto.PBKDF2.MacBasedPRF;
 import net.lingala.zip4j.crypto.PBKDF2.PBKDF2Engine;
 import net.lingala.zip4j.crypto.PBKDF2.PBKDF2Parameters;
@@ -32,24 +30,18 @@ import java.util.Random;
 public class AESEncryptor implements Encryptor {
 
     private char[] password;
-    private final AESStrength keyStrength;
+    private AESStrength keyStrength;
     private AESEngine aesEngine;
     private MacBasedPRF mac;
 
     private int KEY_LENGTH;
     private int MAC_LENGTH;
-    @Getter
-    private int saltLength;
-    @Getter
-    private final int passwordVerifierLength = 2;
+    private int SALT_LENGTH;
+    private final int PASSWORD_VERIFIER_LENGTH = 2;
 
     private byte[] aesKey;
     private byte[] macKey;
-    @Getter
-    @Setter
     private byte[] derivedPasswordVerifier;
-    @Getter
-    @Setter
     private byte[] saltBytes;
 
     private boolean finished;
@@ -61,11 +53,6 @@ public class AESEncryptor implements Encryptor {
     private byte[] counterBlock;
 
     public AESEncryptor(char[] password, AESStrength keyStrength) throws ZipException {
-        if (password == null || password.length == 0)
-            throw new ZipException("input password is empty or null in AES encrypter constructor");
-        if (keyStrength != AESStrength.STRENGTH_128 && keyStrength != AESStrength.STRENGTH_256)
-            throw new ZipException("Invalid key strength in AES encrypter constructor");
-
         this.password = password;
         this.keyStrength = keyStrength;
         this.finished = false;
@@ -78,28 +65,28 @@ public class AESEncryptor implements Encryptor {
         if (keyStrength == AESStrength.STRENGTH_128) {
             KEY_LENGTH = 16;
             MAC_LENGTH = 16;
-            saltLength = 8;
+            SALT_LENGTH = 8;
         } else if (keyStrength == AESStrength.STRENGTH_256) {
             KEY_LENGTH = 32;
             MAC_LENGTH = 32;
-            saltLength = 16;
+            SALT_LENGTH = 16;
         } else
             throw new ZipException("invalid aes key strength, cannot determine key sizes");
 
-        saltBytes = generateSalt(saltLength);
+        saltBytes = generateSalt(SALT_LENGTH);
         byte[] keyBytes = deriveKey(saltBytes, password);
 
-        if (keyBytes == null || keyBytes.length != (KEY_LENGTH + MAC_LENGTH + passwordVerifierLength)) {
+        if (keyBytes == null || keyBytes.length != (KEY_LENGTH + MAC_LENGTH + PASSWORD_VERIFIER_LENGTH)) {
             throw new ZipException("invalid key generated, cannot decrypt file");
         }
 
         aesKey = new byte[KEY_LENGTH];
         macKey = new byte[MAC_LENGTH];
-        derivedPasswordVerifier = new byte[passwordVerifierLength];
+        derivedPasswordVerifier = new byte[PASSWORD_VERIFIER_LENGTH];
 
         System.arraycopy(keyBytes, 0, aesKey, 0, KEY_LENGTH);
         System.arraycopy(keyBytes, KEY_LENGTH, macKey, 0, MAC_LENGTH);
-        System.arraycopy(keyBytes, KEY_LENGTH + MAC_LENGTH, derivedPasswordVerifier, 0, passwordVerifierLength);
+        System.arraycopy(keyBytes, KEY_LENGTH + MAC_LENGTH, derivedPasswordVerifier, 0, PASSWORD_VERIFIER_LENGTH);
 
         aesEngine = new AESEngine(aesKey);
         mac = new MacBasedPRF("HmacSHA1");
@@ -111,7 +98,7 @@ public class AESEncryptor implements Encryptor {
             PBKDF2Parameters p = new PBKDF2Parameters("HmacSHA1", "ISO-8859-1",
                     salt, 1000);
             PBKDF2Engine e = new PBKDF2Engine(p);
-            byte[] derivedKey = e.deriveKey(password, KEY_LENGTH + MAC_LENGTH + passwordVerifierLength);
+            byte[] derivedKey = e.deriveKey(password, KEY_LENGTH + MAC_LENGTH + PASSWORD_VERIFIER_LENGTH);
             return derivedKey;
         } catch(Exception e) {
             throw new ZipException(e);
@@ -119,7 +106,7 @@ public class AESEncryptor implements Encryptor {
     }
 
     @Override
-    public int encrypt(byte[] buf, int offs, int len) throws ZipException {
+    public int encrypt(byte[] buff, int start, int len) throws ZipException {
 
         if (finished) {
             // A non 16 byte block has already been passed to encrypter
@@ -132,17 +119,18 @@ public class AESEncryptor implements Encryptor {
             this.finished = true;
         }
 
-        for (int j = offs; j < (offs + len); j += InternalZipConstants.AES_BLOCK_SIZE) {
-            loopCount = (j + InternalZipConstants.AES_BLOCK_SIZE <= (offs + len)) ?
-                        InternalZipConstants.AES_BLOCK_SIZE : ((offs + len) - j);
+        for (int j = start; j < (start + len); j += InternalZipConstants.AES_BLOCK_SIZE) {
+            loopCount = (j + InternalZipConstants.AES_BLOCK_SIZE <= (start + len)) ?
+                        InternalZipConstants.AES_BLOCK_SIZE : ((start + len) - j);
 
             Raw.prepareBuffAESIVBytes(iv, nonce, InternalZipConstants.AES_BLOCK_SIZE);
             aesEngine.processBlock(iv, counterBlock);
 
-            for (int k = 0; k < loopCount; k++)
-                buf[j + k] = (byte)(buf[j + k] ^ counterBlock[k]);
+            for (int k = 0; k < loopCount; k++) {
+                buff[j + k] = (byte)(buff[j + k] ^ counterBlock[k]);
+            }
 
-            mac.update(buf, j, loopCount);
+            mac.update(buff, j, loopCount);
             nonce++;
         }
 
@@ -180,5 +168,30 @@ public class AESEncryptor implements Encryptor {
         System.arraycopy(rawMacBytes, 0, macBytes, 0, 10);
         return macBytes;
     }
+
+    public byte[] getDerivedPasswordVerifier() {
+        return derivedPasswordVerifier;
+    }
+
+    public void setDerivedPasswordVerifier(byte[] derivedPasswordVerifier) {
+        this.derivedPasswordVerifier = derivedPasswordVerifier;
+    }
+
+    public byte[] getSaltBytes() {
+        return saltBytes;
+    }
+
+    public void setSaltBytes(byte[] saltBytes) {
+        this.saltBytes = saltBytes;
+    }
+
+    public int getSaltLength() {
+        return SALT_LENGTH;
+    }
+
+    public int getPasswordVeriifierLength() {
+        return PASSWORD_VERIFIER_LENGTH;
+    }
+
 
 }

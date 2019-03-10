@@ -39,7 +39,6 @@ import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -308,7 +307,7 @@ public abstract class CipherOutputStream extends OutputStream {
         fileHeader.setCompressionMethod(zipParameters.getCompressionMethod());
 
         if (zipParameters.getEncryption() == Encryption.AES) {
-            fileHeader.setEncryption(Encryption.AES);
+            fileHeader.setCompressionMethod(CompressionMethod.AES_ENC);
             fileHeader.setAesExtraDataRecord(generateAESExtraDataRecord(zipParameters));
         } else
             fileHeader.setCompressionMethod(zipParameters.getCompressionMethod());
@@ -385,8 +384,9 @@ public abstract class CipherOutputStream extends OutputStream {
         byte[] shortByte = new byte[2];
         shortByte[0] = Raw.bitArrayToByte(generateGeneralPurposeBitArray(fileHeader.getEncryption(), zipParameters.getCompressionMethod()));
 
-        if (zipModel.getCharset() == StandardCharsets.UTF_8 || Zip4jUtil.detectCharset(fileHeader.getFileName().getBytes()) == StandardCharsets.UTF_8)
-            shortByte[1] = 8;
+        // TODO check with original
+//        if (zipModel.getCharset() == StandardCharsets.UTF_8 || Zip4jUtil.detectCharset(fileHeader.getFileName().getBytes()) == StandardCharsets.UTF_8)
+//            shortByte[1] = 8;
 
         fileHeader.setGeneralPurposeFlag(shortByte);
 

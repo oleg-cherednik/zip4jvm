@@ -43,11 +43,8 @@ public class BitUtils {
         return val | bits;
     }
 
-    public void updateBits(int val, int bits, boolean value) {
-        if (value)
-            setBits(val, bits);
-        else
-            clearBits(val, bits);
+    public int updateBits(int val, int bits, boolean value) {
+        return value ? setBits(val, bits) : clearBits(val, bits);
     }
 
     /**

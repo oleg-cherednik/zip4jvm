@@ -60,10 +60,6 @@ public class ZipParameters {
     private String fileNameInZip;
     private boolean isSourceExternalStream;
 
-    public char[] getPassword() {
-        return password;
-    }
-
     /**
      * Sets the password for the zip file or the file being added<br>
      * <b>Note</b>: For security reasons, usage of this method is discouraged. Use

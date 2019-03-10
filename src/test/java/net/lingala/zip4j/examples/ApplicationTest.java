@@ -3,8 +3,10 @@ package net.lingala.zip4j.examples;
 import lombok.NonNull;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.AESStrength;
 import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
+import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.ZipParameters;
 import org.apache.commons.io.FileUtils;
 import org.testng.annotations.BeforeMethod;
@@ -80,6 +82,33 @@ public class ApplicationTest {
 
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
+                                                .encryption(Encryption.AES)
+                                                .aesKeyStrength(AESStrength.STRENGTH_256)
+                                                .password("test123!".toCharArray())
+                                                .defaultFolderPath(srcDir.toString()).build();
+
+        // Now add files to the zip file
+        // Note: To add a single file, the method addFile can be used
+        // Note: If the zip file already exists and if this zip file is a split file
+        // then this method throws an exception as Zip Format Specification does not
+        // allow updating split zip files
+        zipFile.addFiles(files, parameters);
+
+        checkDestinationDir(1);
+//        checkResultDir();
+    }
+
+    public void addFileEncryption() throws ZipException, IOException {
+        ZipFile zipFile = new ZipFile(destDir.resolve("src.zip"));
+
+        List<Path> files = Collections.singletonList(srcDir.resolve("mcdonnell-douglas-f15-eagle.jpg"));
+
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compressionMethod(CompressionMethod.DEFLATE)
+                                                .compressionLevel(CompressionLevel.NORMAL)
+                                                .encryption(Encryption.AES)
+                                                .aesKeyStrength(AESStrength.STRENGTH_256)
+                                                .password("1".toCharArray())
                                                 .defaultFolderPath(srcDir.toString()).build();
 
         // Now add files to the zip file

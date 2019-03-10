@@ -191,7 +191,8 @@ public class CentralDirectory {
         public void setAesExtraDataRecord(AESExtraDataRecord record) {
             aesExtraDataRecord = record;
             encryption = record != null ? Encryption.AES : Encryption.OFF;
-            BitUtils.updateBits(generalPurposeFlag[0], BIT0, encryption != Encryption.OFF);
+            generalPurposeFlag = generalPurposeFlag != null ? generalPurposeFlag : new byte[2];
+            generalPurposeFlag[0] = (byte)BitUtils.updateBits(generalPurposeFlag[0], BIT0, encryption != Encryption.OFF);
         }
 
         public ExtraDataRecord getExtraDataRecordByHeader(short header) {
