@@ -18,6 +18,7 @@ package net.lingala.zip4j.io;
 
 import lombok.NonNull;
 import net.lingala.zip4j.core.HeaderWriter;
+import net.lingala.zip4j.core.writers.LocalFileHeaderWriter;
 import net.lingala.zip4j.crypto.AESEncryptor;
 import net.lingala.zip4j.crypto.Encryptor;
 import net.lingala.zip4j.crypto.StandardEncryptor;
@@ -118,8 +119,7 @@ public abstract class CipherOutputStream extends OutputStream {
                     fileHeader.setOffLocalHeaderRelative(totalBytesWritten);
             }
 
-            HeaderWriter headerWriter = new HeaderWriter();
-            totalBytesWritten += headerWriter.writeLocalFileHeader(zipModel, localFileHeader, out);
+            totalBytesWritten += new LocalFileHeaderWriter().write(localFileHeader, zipModel, out);
 
             if (this.zipParameters.getEncryption() != Encryption.OFF) {
                 encryptor = createEncryptor();
@@ -284,7 +284,7 @@ public abstract class CipherOutputStream extends OutputStream {
         zipModel.getCentralDirectory().addFileHeader(fileHeader);
 
         HeaderWriter headerWriter = new HeaderWriter();
-        totalBytesWritten += headerWriter.writeExtendedLocalHeader(localFileHeader, out);
+        totalBytesWritten += new LocalFileHeaderWriter().writeExtended(localFileHeader, out);
 
         crc.reset();
         bytesWrittenForThisFile = 0;

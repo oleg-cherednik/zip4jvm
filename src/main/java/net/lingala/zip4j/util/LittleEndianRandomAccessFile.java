@@ -15,9 +15,8 @@ import java.nio.charset.Charset;
 @RequiredArgsConstructor
 public final class LittleEndianRandomAccessFile implements AutoCloseable {
 
-    // TODO temporary, should be removed
     @Getter
-    private final RandomAccessFile in;
+    private final RandomAccessFile raf;
     @Getter
     private int offs;
 
@@ -27,12 +26,12 @@ public final class LittleEndianRandomAccessFile implements AutoCloseable {
 
     public short readShort() throws IOException {
         offs += 2;
-        return convertShort(in.readShort());
+        return convertShort(raf.readShort());
     }
 
     public int readInt() throws IOException {
         offs += 4;
-        return (int)convertInt(in.readInt());
+        return (int)convertInt(raf.readInt());
     }
 
     public String readString(int length) throws IOException {
@@ -41,7 +40,7 @@ public final class LittleEndianRandomAccessFile implements AutoCloseable {
 
         offs += length;
         byte[] buf = new byte[length];
-        in.readFully(buf);
+        raf.readFully(buf);
         return new String(buf, Zip4jUtil.detectCharset(buf));
     }
 
@@ -51,18 +50,18 @@ public final class LittleEndianRandomAccessFile implements AutoCloseable {
 
         offs += length;
         byte[] buf = new byte[length];
-        in.readFully(buf);
+        raf.readFully(buf);
         return new String(buf, charset);
     }
 
     public long readIntAsLong() throws IOException {
         offs += 4;
-        return convertInt(in.readInt());
+        return convertInt(raf.readInt());
     }
 
     public long readLong() throws IOException {
         offs += 8;
-        return convertLong(in.readLong());
+        return convertLong(raf.readLong());
     }
 
     public byte[] readBytes(int total) throws IOException {
@@ -71,27 +70,27 @@ public final class LittleEndianRandomAccessFile implements AutoCloseable {
 
         byte[] buf = new byte[total];
 
-        if (in.read(buf) != total)
+        if (raf.read(buf) != total)
             throw new IOException("Not enough bytes to read");
 
         return buf;
     }
 
     public long length() throws IOException {
-        return in.length();
+        return raf.length();
     }
 
     public void seek(long pos) throws IOException {
-        in.seek(pos);
+        raf.seek(pos);
     }
 
     @Override
     public void close() throws Exception {
-        in.close();
+        raf.close();
     }
 
     public long getFilePointer() throws IOException {
-        return in.getFilePointer();
+        return raf.getFilePointer();
     }
 
     private static short convertShort(short val) {
