@@ -106,7 +106,7 @@ public class AESEncryptor implements Encryptor {
     }
 
     @Override
-    public int encrypt(byte[] buff, int start, int len) throws ZipException {
+    public void encrypt(byte[] buff, int start, int len) throws ZipException {
 
         if (finished) {
             // A non 16 byte block has already been passed to encrypter
@@ -133,8 +133,6 @@ public class AESEncryptor implements Encryptor {
             mac.update(buff, j, loopCount);
             nonce++;
         }
-
-        return len;
     }
 
     private static byte[] generateSalt(int size) throws ZipException {

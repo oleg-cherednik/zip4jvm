@@ -21,12 +21,13 @@ import net.lingala.zip4j.exception.ZipException;
 @SuppressWarnings("MethodCanBeVariableArityMethod")
 public interface Encryptor {
 
-    Encryptor NULL = (buf, offs, len) -> 0;
+    Encryptor NULL = (buf, offs, len) -> {
+    };
 
-    default int encrypt(byte[] buf) throws ZipException {
-        return encrypt(buf, 0, buf.length);
+    default void encrypt(byte[] buf) throws ZipException {
+        encrypt(buf, 0, buf.length);
     }
 
-    int encrypt(byte[] buf, int offs, int len) throws ZipException;
+    void encrypt(byte[] buf, int offs, int len) throws ZipException;
 
 }

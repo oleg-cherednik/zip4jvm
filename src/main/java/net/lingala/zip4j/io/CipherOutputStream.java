@@ -227,17 +227,14 @@ public abstract class CipherOutputStream extends OutputStream {
     }
 
     private void encryptAndWrite(byte[] b, int off, int len) throws IOException {
-        if (encryptor != null) {
-            try {
-                encryptor.encrypt(b, off, len);
-            } catch(ZipException e) {
-                throw new IOException(e.getMessage());
-            }
+        try {
+            encryptor.encrypt(b, off, len);
+            out.write(b, off, len);
+            totalBytesWritten += len;
+            bytesWrittenForThisFile += len;
+        } catch(ZipException e) {
+            throw new IOException(e);
         }
-
-        out.write(b, off, len);
-        totalBytesWritten += len;
-        bytesWrittenForThisFile += len;
     }
 
     public void closeEntry() throws IOException, ZipException {
