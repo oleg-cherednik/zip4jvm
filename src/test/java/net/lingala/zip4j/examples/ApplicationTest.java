@@ -129,7 +129,7 @@ public class ApplicationTest {
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .defaultFolderPath(srcDir.toString()).build();
-        zipFile.createZipFile(filesToAdd, parameters, true, 1024 * 1024);
+        zipFile.createZipFile(filesToAdd, parameters, 1024 * 1024);
 
         checkDestinationDir(10);
 //        checkResultDir();

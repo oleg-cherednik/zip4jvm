@@ -48,7 +48,6 @@ public class ZipModel implements Cloneable {
 
     private Zip64EndCentralDirectory zip64EndCentralDirectory;
 
-    private boolean splitArchive;
     private long splitLength = NO_SPLIT;
 
     private Path zipFile;
@@ -64,10 +63,6 @@ public class ZipModel implements Cloneable {
     @NonNull
     private Charset charset = Charset.defaultCharset();
 
-    public List getLocalFileHeaderList() {
-        return localFileHeaderList;
-    }
-
     public void addLocalFileHeader(LocalFileHeader localFileHeader) {
         localFileHeaderList = localFileHeaderList.isEmpty() ? new ArrayList<>() : localFileHeaderList;
         localFileHeaderList.add(localFileHeader);
@@ -78,71 +73,19 @@ public class ZipModel implements Cloneable {
             endCentralDirectory = new EndCentralDirectory();
     }
 
-    public void setLocalFileHeaderList(List localFileHeaderList) {
-        this.localFileHeaderList = localFileHeaderList;
-    }
-
-    public List getDataDescriptorList() {
-        return dataDescriptorList;
-    }
-
-    public void setDataDescriptorList(List dataDescriptorList) {
-        this.dataDescriptorList = dataDescriptorList;
-    }
-
     public void setEndCentralDirectory(EndCentralDirectory endCentralDirectory) {
         this.endCentralDirectory = endCentralDirectory;
-        splitArchive = endCentralDirectory != null && endCentralDirectory.getNoOfDisk() > 0;
+        // TODO check is it used, because 1 split length is invalid value, but it marks an archive as split
+        splitLength = endCentralDirectory != null && endCentralDirectory.getNoOfDisk() > 0 ? 1 : NO_SPLIT;
     }
 
-    public ArchiveExtraDataRecord getArchiveExtraDataRecord() {
-        return archiveExtraDataRecord;
-    }
-
-    public void setArchiveExtraDataRecord(
-            ArchiveExtraDataRecord archiveExtraDataRecord) {
-        this.archiveExtraDataRecord = archiveExtraDataRecord;
-    }
 
     public boolean isSplitArchive() {
-        return splitArchive;
+        return splitLength > 0;
     }
 
-    public void setSplitArchive(boolean splitArchive) {
-        this.splitArchive = splitArchive;
-    }
-
-    public Zip64EndCentralDirectory getZip64EndCentralDirectory() {
-        return zip64EndCentralDirectory;
-    }
-
-    public void setZip64EndCentralDirectory(
-            Zip64EndCentralDirectory zip64EndCentralDirectory) {
-        this.zip64EndCentralDirectory = zip64EndCentralDirectory;
-    }
-
-    public boolean isNestedZipFile() {
-        return isNestedZipFile;
-    }
-
-    public void setNestedZipFile(boolean isNestedZipFile) {
-        this.isNestedZipFile = isNestedZipFile;
-    }
-
-    public long getStart() {
-        return start;
-    }
-
-    public void setStart(long start) {
-        this.start = start;
-    }
-
-    public long getEnd() {
-        return end;
-    }
-
-    public void setEnd(long end) {
-        this.end = end;
+    public void setNoSplitArchive() {
+        splitLength = NO_SPLIT;
     }
 
     public Object clone() throws CloneNotSupportedException {

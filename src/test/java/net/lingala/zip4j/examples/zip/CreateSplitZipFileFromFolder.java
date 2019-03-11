@@ -51,7 +51,7 @@ public class CreateSplitZipFileFromFolder {
         // 65536 bytes
         // Please note: If the zip file already exists, then this method throws an
         // exception
-        zipFile.createZipFileFromFolder("C:\\ZipTest", parameters, true, 10485760);
+        zipFile.createZipFileFromFolder("C:\\ZipTest", parameters, 10485760);
     }
 
     /**

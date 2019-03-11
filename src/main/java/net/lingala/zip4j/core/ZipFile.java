@@ -84,7 +84,7 @@ public class ZipFile {
     public void createZipFile(File sourceFile, ZipParameters parameters) throws ZipException, IOException {
         List<File> sourceFileList = new ArrayList<>();
         sourceFileList.add(sourceFile);
-        createZipFile(sourceFileList, parameters, false, -1);
+        createZipFile(sourceFileList, parameters, ZipModel.NO_SPLIT);
     }
 
     /**
@@ -95,18 +95,14 @@ public class ZipFile {
      * zip path. To create a split zip path, set the splitArchive parameter to true with a valid
      * splitLength. Split Length has to be more than 65536 bytes
      *
-     * @param sourceFile   - File to be added to the zip path
-     * @param parameters   - parameters to create the zip path
-     * @param splitArchive - if archive has to be split or not
-     * @param splitLength  - if archive has to be split, then length in bytes at which it has to be split
+     * @param sourceFile  - File to be added to the zip path
+     * @param parameters  - parameters to create the zip path
+     * @param splitLength - if archive has to be split, then length in bytes at which it has to be split
      * @throws ZipException
      */
-    public void createZipFile(File sourceFile, ZipParameters parameters,
-            boolean splitArchive, long splitLength) throws ZipException, IOException {
+    public void createZipFile(File sourceFile, ZipParameters parameters, long splitLength) throws ZipException, IOException {
 
-        List<File> sourceFileList = new ArrayList<>();
-        sourceFileList.add(sourceFile);
-        createZipFile(sourceFileList, parameters, splitArchive, splitLength);
+        createZipFile(Collections.singletonList(sourceFile), parameters, splitLength);
     }
 
     /**
@@ -118,9 +114,8 @@ public class ZipFile {
      * @param parameters     - parameters to create the zip path
      * @throws ZipException
      */
-    public void createZipFile(List<File> sourceFileList,
-            ZipParameters parameters) throws ZipException, IOException {
-        createZipFile(sourceFileList, parameters, false, -1);
+    public void createZipFile(List<File> sourceFileList, ZipParameters parameters) throws ZipException, IOException {
+        createZipFile(sourceFileList, parameters, ZipModel.NO_SPLIT);
     }
 
     /**
@@ -133,12 +128,10 @@ public class ZipFile {
      *
      * @param sourceFileList - File to be added to the zip path
      * @param parameters     - zip parameters for this path list
-     * @param splitArchive   - if archive has to be split or not
      * @param splitLength    - if archive has to be split, then length in bytes at which it has to be split
      * @throws ZipException
      */
-    public void createZipFile(List<File> sourceFileList, ZipParameters parameters,
-            boolean splitArchive, long splitLength) throws ZipException, IOException {
+    public void createZipFile(List<File> sourceFileList, ZipParameters parameters, long splitLength) throws ZipException, IOException {
         if (Files.exists(path))
             throw new ZipException("zip path: " + path + " already exists. To add files to existing zip path use addFile method");
 
@@ -146,8 +139,7 @@ public class ZipFile {
             throw new ZipException("input path ArrayList is null, cannot create zip path");
 
         zipModel = createZipModel();
-        this.zipModel.setSplitArchive(splitArchive);
-        this.zipModel.setSplitLength(splitLength);
+        zipModel.setSplitLength(splitLength);
         addFiles(sourceFileList.stream()
                                .map(File::toPath)
                                .collect(Collectors.toList()), parameters);
@@ -163,18 +155,16 @@ public class ZipFile {
      *
      * @param folderToAdd
      * @param parameters
-     * @param splitArchive
      * @param splitLength
      * @throws ZipException
      */
-    public void createZipFileFromFolder(String folderToAdd, ZipParameters parameters,
-            boolean splitArchive, long splitLength) throws ZipException, IOException {
+    public void createZipFileFromFolder(String folderToAdd, ZipParameters parameters, long splitLength) throws ZipException, IOException {
 
         if (StringUtils.isBlank(folderToAdd)) {
             throw new ZipException("folderToAdd is empty or null, cannot create Zip File from folder");
         }
 
-        createZipFileFromFolder(new File(folderToAdd), parameters, splitArchive, splitLength);
+        createZipFileFromFolder(new File(folderToAdd), parameters, splitLength);
 
     }
 
@@ -188,12 +178,10 @@ public class ZipFile {
      *
      * @param folderToAdd
      * @param parameters
-     * @param splitArchive
      * @param splitLength
      * @throws ZipException
      */
-    public void createZipFileFromFolder(File folderToAdd, ZipParameters parameters,
-            boolean splitArchive, long splitLength) throws ZipException, IOException {
+    public void createZipFileFromFolder(File folderToAdd, ZipParameters parameters, long splitLength) throws ZipException, IOException {
 
         if (folderToAdd == null)
             throw new ZipException("folderToAdd is null, cannot create zip path from folder");
@@ -203,9 +191,7 @@ public class ZipFile {
             throw new ZipException("zip path: " + path + " already exists. To add files to existing zip path use addFolder method");
 
         zipModel = createZipModel();
-        this.zipModel.setSplitArchive(splitArchive);
-        if (splitArchive)
-            this.zipModel.setSplitLength(splitLength);
+        this.zipModel.setSplitLength(splitLength);
 
         addFolder(folderToAdd, parameters, false);
     }

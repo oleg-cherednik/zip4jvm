@@ -94,13 +94,11 @@ public abstract class CipherOutputStream extends OutputStream {
             fileHeader = createFileHeader();
             localFileHeader = createLocalFileHeader(fileHeader);
 
-            if (zipModel.isSplitArchive()) {
-                if (zipModel.isEmpty()) {
-                    byte[] intByte = new byte[4];
-                    Raw.writeIntLittleEndian(intByte, 0, (int)InternalZipConstants.SPLITSIG);
-                    out.write(intByte);
-                    totalBytesWritten += 4;
-                }
+            if (zipModel.isSplitArchive() && zipModel.isEmpty()) {
+                byte[] intByte = new byte[4];
+                Raw.writeIntLittleEndian(intByte, 0, (int)InternalZipConstants.SPLITSIG);
+                out.write(intByte);
+                totalBytesWritten += 4;
             }
 
             if (out instanceof SplitOutputStream) {
@@ -161,12 +159,8 @@ public abstract class CipherOutputStream extends OutputStream {
         if (this.zipModel.getLocalFileHeaderList() == null)
             this.zipModel.setLocalFileHeaderList(new ArrayList<>());
 
-        if (this.out instanceof SplitOutputStream) {
-            if (((SplitOutputStream)out).isSplitZipFile()) {
-                this.zipModel.setSplitArchive(true);
-                this.zipModel.setSplitLength(((SplitOutputStream)out).getSplitLength());
-            }
-        }
+        if (out instanceof SplitOutputStream && ((SplitOutputStream)out).isSplitZipFile())
+            this.zipModel.setSplitLength(((SplitOutputStream)out).getSplitLength());
     }
 
     public void write(int bval) throws IOException {

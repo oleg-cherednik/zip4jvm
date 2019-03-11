@@ -439,11 +439,10 @@ public class ArchiveMaintainer {
     }
 
     private void updateSplitZipModel(ZipModel zipModel, ArrayList fileSizeList, boolean splitSigRemoved) throws ZipException {
-        if (zipModel == null) {
+        if (zipModel == null)
             throw new ZipException("zip model is null, cannot update split zip model");
-        }
 
-        zipModel.setSplitArchive(false);
+        zipModel.setNoSplitArchive();
         updateSplitFileHeader(zipModel, fileSizeList, splitSigRemoved);
         updateSplitEndCentralDirectory(zipModel);
         if (zipModel.isZip64Format()) {
