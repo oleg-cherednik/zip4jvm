@@ -71,10 +71,10 @@ public class LocalFileHeader {
     private boolean fileNameUTF8Encoded;
     private byte[] crcBuff;
 
-    public short getExtraFileLength(ZipModel model) {
+    public short getExtraFileLength(ZipModel zipModel) {
         short extraFieldLength = 0;
 
-        if (model.isZip64Format())
+        if (zipModel.isZip64Format())
             extraFieldLength += 20;
         if (aesExtraDataRecord != null)
             extraFieldLength += 11;

@@ -18,10 +18,21 @@ package net.lingala.zip4j.crypto;
 
 import net.lingala.zip4j.exception.ZipException;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 @SuppressWarnings("MethodCanBeVariableArityMethod")
 public interface Encryptor {
 
-    Encryptor NULL = (buf, offs, len) -> {
+    Encryptor NULL = new Encryptor() {
+        @Override
+        public void encrypt(byte[] buf, int offs, int len) throws ZipException {
+        }
+
+        @Override
+        public int write(OutputStream out) throws IOException {
+            return 0;
+        }
     };
 
     default void encrypt(byte[] buf) throws ZipException {
@@ -29,5 +40,7 @@ public interface Encryptor {
     }
 
     void encrypt(byte[] buf, int offs, int len) throws ZipException;
+
+    int write(OutputStream out) throws IOException;
 
 }

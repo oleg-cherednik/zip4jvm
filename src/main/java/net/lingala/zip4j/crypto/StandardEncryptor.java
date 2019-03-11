@@ -20,6 +20,8 @@ import net.lingala.zip4j.crypto.engine.ZipCryptoEngine;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.util.InternalZipConstants;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Random;
 
 public class StandardEncryptor implements Encryptor {
@@ -70,6 +72,12 @@ public class StandardEncryptor implements Encryptor {
         } catch(Exception e) {
             throw new ZipException(e);
         }
+    }
+
+    @Override
+    public int write(OutputStream out) throws IOException {
+        out.write(headerBytes);
+        return headerBytes.length;
     }
 
     protected byte encryptByte(byte val) {

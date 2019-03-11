@@ -25,6 +25,8 @@ import net.lingala.zip4j.model.AESStrength;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.Raw;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Random;
 
 public class AESEncryptor implements Encryptor {
@@ -133,6 +135,13 @@ public class AESEncryptor implements Encryptor {
             mac.update(buff, j, loopCount);
             nonce++;
         }
+    }
+
+    @Override
+    public int write(OutputStream out) throws IOException {
+        out.write(saltBytes);
+        out.write(derivedPasswordVerifier);
+        return saltBytes.length + derivedPasswordVerifier.length;
     }
 
     private static byte[] generateSalt(int size) throws ZipException {

@@ -117,23 +117,10 @@ public abstract class CipherOutputStream extends OutputStream {
 
             totalBytesWritten += new LocalFileHeaderWriter().write(localFileHeader, zipModel, out);
 
-            if (zipParameters.getEncryption() != Encryption.OFF) {
-                encryptor = createEncryptor();
-
-                if (parameters.getEncryption() == Encryption.STANDARD) {
-                    byte[] headerBytes = ((StandardEncryptor)encryptor).getHeaderBytes();
-                    out.write(headerBytes);
-                    totalBytesWritten += headerBytes.length;
-                    bytesWrittenForThisFile += headerBytes.length;
-                } else if (parameters.getEncryption() == Encryption.AES) {
-                    byte[] saltBytes = ((AESEncryptor)encryptor).getSaltBytes();
-                    byte[] passwordVerifier = ((AESEncryptor)encryptor).getDerivedPasswordVerifier();
-                    out.write(saltBytes);
-                    out.write(passwordVerifier);
-                    totalBytesWritten += saltBytes.length + passwordVerifier.length;
-                    bytesWrittenForThisFile += saltBytes.length + passwordVerifier.length;
-                }
-            }
+            encryptor = createEncryptor();
+            int length = encryptor.write(out);
+            totalBytesWritten += length;
+            bytesWrittenForThisFile += length;
 
             crc.reset();
         } catch(ZipException e) {

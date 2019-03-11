@@ -81,6 +81,7 @@ public abstract class DeflateOutputStream extends CipherOutputStream {
         write(b, 0, 1);
     }
 
+    @Override
     public void write(byte[] buf, int off, int len) throws IOException {
         if (zipParameters.getCompressionMethod() != CompressionMethod.DEFLATE) {
             super.write(buf, off, len);
@@ -92,6 +93,7 @@ public abstract class DeflateOutputStream extends CipherOutputStream {
         }
     }
 
+    @Override
     public void closeEntry() throws IOException, ZipException {
         if (zipParameters.getCompressionMethod() == CompressionMethod.DEFLATE) {
             if (!deflater.finished()) {
