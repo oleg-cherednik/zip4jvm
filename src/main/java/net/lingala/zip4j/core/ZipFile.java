@@ -447,7 +447,7 @@ public class ZipFile {
         }
 
         zipModel = readZipModel();
-        fileHeader.extractFile(zipModel, destPath, unzipParameters, newFileName, runInThread);
+        extractFile(fileHeader, zipModel, destPath, unzipParameters, newFileName, runInThread);
 
     }
 
@@ -534,8 +534,37 @@ public class ZipFile {
             throw new ZipException("path header not found for given path name, cannot extract path");
         }
 
-        fileHeader.extractFile(zipModel, destPath, unzipParameters, newFileName, runInThread);
+        extractFile(fileHeader, zipModel, destPath, unzipParameters, newFileName, runInThread);
+    }
 
+    /**
+     * Extracts file to the specified directory using any
+     * user defined parameters in UnzipParameters. Output file name
+     * will be overwritten with the value in newFileName. If this
+     * parameter is null, then file name will be the same as in
+     * FileHeader.getFileName
+     *
+     * @param zipModel
+     * @param outPath
+     * @param unzipParameters
+     * @throws ZipException
+     */
+    private void extractFile(CentralDirectory.FileHeader fileHeader, ZipModel zipModel, String outPath,
+            UnzipParameters unzipParameters, String newFileName,
+            boolean runInThread) throws ZipException {
+        if (zipModel == null) {
+            throw new ZipException("input zipModel is null");
+        }
+
+        if (!Zip4jUtil.checkOutputFolder(outPath)) {
+            throw new ZipException("Invalid output path");
+        }
+
+        if (this == null) {
+            throw new ZipException("invalid file header");
+        }
+        Unzip unzip = new Unzip(zipModel);
+        unzip.extractFile(fileHeader, outPath, unzipParameters, newFileName, runInThread);
     }
 
     /**

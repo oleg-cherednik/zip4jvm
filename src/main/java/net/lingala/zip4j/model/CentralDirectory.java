@@ -19,8 +19,6 @@ package net.lingala.zip4j.model;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.unzip.Unzip;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.Zip4jUtil;
 
@@ -57,8 +55,7 @@ public class CentralDirectory {
         // size:2 - version needed to extract
         private int versionNeededToExtract;
         // size:2 - general purpose bit flag
-        @NonNull
-        private GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
+        private final GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         // size:2 - compression method
         @NonNull
         private CompressionMethod compressionMethod = CompressionMethod.STORE;
@@ -101,64 +98,6 @@ public class CentralDirectory {
         private Zip64ExtendedInfo zip64ExtendedInfo;
         private AESExtraDataRecord aesExtraDataRecord;
 
-        /**
-         * Extracts file to the specified directory
-         *
-         * @param zipModel
-         * @param outPath
-         * @throws ZipException
-         */
-        public void extractFile(ZipModel zipModel, String outPath, boolean runInThread) throws ZipException {
-            extractFile(zipModel, outPath, null, runInThread);
-        }
-
-        /**
-         * Extracts file to the specified directory using any
-         * user defined parameters in UnzipParameters
-         *
-         * @param zipModel
-         * @param outPath
-         * @param unzipParameters
-         * @throws ZipException
-         */
-        public void extractFile(ZipModel zipModel, String outPath,
-                UnzipParameters unzipParameters, boolean runInThread) throws ZipException {
-            extractFile(zipModel, outPath, unzipParameters, null, runInThread);
-        }
-
-        /**
-         * Extracts file to the specified directory using any
-         * user defined parameters in UnzipParameters. Output file name
-         * will be overwritten with the value in newFileName. If this
-         * parameter is null, then file name will be the same as in
-         * FileHeader.getFileName
-         *
-         * @param zipModel
-         * @param outPath
-         * @param unzipParameters
-         * @throws ZipException
-         */
-        public void extractFile(ZipModel zipModel, String outPath,
-                UnzipParameters unzipParameters, String newFileName,
-                boolean runInThread) throws ZipException {
-            if (zipModel == null) {
-                throw new ZipException("input zipModel is null");
-            }
-
-            if (!Zip4jUtil.checkOutputFolder(outPath)) {
-                throw new ZipException("Invalid output path");
-            }
-
-            if (this == null) {
-                throw new ZipException("invalid file header");
-            }
-            Unzip unzip = new Unzip(zipModel);
-            unzip.extractFile(this, outPath, unzipParameters, newFileName, runInThread);
-        }
-
-
-        // -----------
-
         public boolean isDirectory() {
             return Zip4jUtil.isDirectory(fileName);
         }
@@ -176,8 +115,7 @@ public class CentralDirectory {
 
         public void setAesExtraDataRecord(AESExtraDataRecord record) {
             aesExtraDataRecord = record;
-            encryption = record != null ? Encryption.AES : Encryption.OFF;
-            generalPurposeFlag.setEncrypted(encryption != Encryption.OFF);
+            updateEncryption();
         }
 
         public ExtraDataRecord getExtraDataRecordByHeader(short header) {
@@ -186,6 +124,20 @@ public class CentralDirectory {
 
         public void setGeneralPurposeFlag(short data) {
             generalPurposeFlag.setData(data);
+            updateEncryption();
+        }
+
+        private void updateEncryption() {
+            if (aesExtraDataRecord != null)
+                encryption = Encryption.AES;
+            else if (generalPurposeFlag.isStrongEncryption())
+                encryption = Encryption.STRONG;
+            else if (generalPurposeFlag.isEncrypted())
+                encryption = Encryption.STANDARD;
+            else
+                encryption = Encryption.OFF;
+
+            generalPurposeFlag.setEncrypted(encryption != Encryption.OFF);
         }
     }
 

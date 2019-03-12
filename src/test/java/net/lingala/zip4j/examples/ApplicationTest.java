@@ -84,7 +84,7 @@ public class ApplicationTest {
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .encryption(Encryption.AES)
                                                 .aesKeyStrength(AESStrength.STRENGTH_256)
-                                                .password("test123!".toCharArray())
+                                                .password("1".toCharArray())
                                                 .defaultFolderPath(srcDir.toString()).build();
 
         // Now add files to the zip file

@@ -24,6 +24,10 @@ import net.lingala.zip4j.util.InternalZipConstants;
 import java.util.Collections;
 import java.util.Map;
 
+/**
+ * @author Oleg Cherednik
+ * @since 12.03.2019
+ */
 @Getter
 @Setter
 public class LocalFileHeader {
@@ -33,8 +37,7 @@ public class LocalFileHeader {
     // size:2 - version needed to extract
     private int versionNeededToExtract;
     // size:2 - general purpose bit flag
-    @NonNull
-    private GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
+    private final GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
     // size:2 - compression method
     @NonNull
     private CompressionMethod compressionMethod = CompressionMethod.STORE;

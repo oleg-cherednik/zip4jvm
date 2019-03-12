@@ -69,7 +69,7 @@ public final class GeneralPurposeFlag {
     }
 
     public boolean isStrongEncryption() {
-        return BitUtils.isBitSet(data, BIT3);
+        return BitUtils.isBitSet(data, BIT6);
     }
 
     public void setStrongEncryption(boolean val) {
