@@ -2,11 +2,14 @@ package net.lingala.zip4j.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import net.lingala.zip4j.util.BitUtils;
 
 import static net.lingala.zip4j.util.BitUtils.BIT0;
+import static net.lingala.zip4j.util.BitUtils.BIT1;
 import static net.lingala.zip4j.util.BitUtils.BIT11;
+import static net.lingala.zip4j.util.BitUtils.BIT2;
 import static net.lingala.zip4j.util.BitUtils.BIT3;
 import static net.lingala.zip4j.util.BitUtils.BIT6;
 
@@ -21,6 +24,13 @@ public final class GeneralPurposeFlag {
 
     /*
      * Bit 0: If set, indicates that the file is encrypted.
+     *
+     * (For Methods 8 and 9 - Deflating)
+     * Bit 2  Bit 1
+     *   0      0    Normal (-en) compression option was used.
+     *   0      1    Maximum (-exx/-ex) compression option was used.
+     *   1      0    Fast (-ef) compression option was used.
+     *   1      1    Super Fast (-es) compression option was used.
      *
      * Bit 3: If this bit is set, the fields crc-32, compressed
      *        size and uncompressed size are set to zero in the
@@ -64,7 +74,7 @@ public final class GeneralPurposeFlag {
         return BitUtils.isBitSet(data, BIT3);
     }
 
-    public void setDataDescriptoExists(boolean val) {
+    public void setDataDescriptorExists(boolean val) {
         data = BitUtils.updateBits(data, BIT3, val);
     }
 
@@ -82,6 +92,17 @@ public final class GeneralPurposeFlag {
 
     public void setUtf8Enconding(boolean val) {
         data = BitUtils.updateBits(data, BIT11, val);
+    }
+
+    public void setCompressionLevel(@NonNull CompressionLevel compressionLevel) {
+        data = BitUtils.clearBits(data, BIT1 & BIT2);
+
+        if (compressionLevel == CompressionLevel.MAXIMUM)
+            data = BitUtils.setBits(data, BIT1);
+        else if(compressionLevel == CompressionLevel.FAST)
+            data = BitUtils.setBits(data, BIT2);
+        else if(compressionLevel == CompressionLevel.FASTEST)
+            data = BitUtils.setBits(data, BIT1 | BIT2);
     }
 
 }

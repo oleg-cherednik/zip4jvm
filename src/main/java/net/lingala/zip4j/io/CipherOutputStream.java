@@ -39,6 +39,7 @@ import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -304,9 +305,8 @@ public abstract class CipherOutputStream extends OutputStream {
 
         }
 
-        if (StringUtils.isBlank(fileName)) {
+        if (StringUtils.isBlank(fileName))
             throw new ZipException("fileName is null or empty. unable to create file header");
-        }
 
         if (!zipParameters.isSourceExternalStream() && Files.isDirectory(sourceFile) && !Zip4jUtil.isDirectory(fileName))
             fileName += InternalZipConstants.FILE_SEPARATOR;
@@ -324,49 +324,43 @@ public abstract class CipherOutputStream extends OutputStream {
         if (!zipParameters.isSourceExternalStream())
             fileAttrs = getFileAttributes(sourceFile);
         byte[] externalFileAttrs = { (byte)fileAttrs, 0, 0, 0 };
+
         fileHeader.setExternalFileAttr(externalFileAttrs);
 
         if (fileHeader.isDirectory()) {
             fileHeader.setCompressedSize(0);
             fileHeader.setUncompressedSize(0);
-        } else {
-            if (!zipParameters.isSourceExternalStream()) {
-                long fileSize = Files.size(sourceFile);
-                if (zipParameters.getCompressionMethod() == CompressionMethod.STORE) {
-                    if (zipParameters.getEncryption() == Encryption.STANDARD) {
-                        fileHeader.setCompressedSize(fileSize
-                                + InternalZipConstants.STD_DEC_HDR_SIZE);
-                    } else if (zipParameters.getEncryption() == Encryption.AES) {
-                        int saltLength;
+        } else if (!zipParameters.isSourceExternalStream()) {
+            long fileSize = Files.size(sourceFile);
 
-                        if (zipParameters.getAesKeyStrength() == AESStrength.STRENGTH_128)
-                            saltLength = 8;
-                        else if (zipParameters.getAesKeyStrength() == AESStrength.STRENGTH_256)
-                            saltLength = 16;
-                        else
-                            throw new ZipException("invalid aes key strength, cannot determine key sizes");
+            if (zipParameters.getCompressionMethod() == CompressionMethod.STORE) {
+                if (zipParameters.getEncryption() == Encryption.STANDARD)
+                    fileHeader.setCompressedSize(fileSize + InternalZipConstants.STD_DEC_HDR_SIZE);
+                else if (zipParameters.getEncryption() == Encryption.AES) {
+                    int saltLength;
 
-                        fileHeader.setCompressedSize(fileSize + saltLength
-                                + InternalZipConstants.AES_AUTH_LENGTH + 2); //2 is password verifier
-                    } else {
-                        fileHeader.setCompressedSize(0);
-                    }
-                } else {
+                    if (zipParameters.getAesKeyStrength() == AESStrength.STRENGTH_128)
+                        saltLength = 8;
+                    else if (zipParameters.getAesKeyStrength() == AESStrength.STRENGTH_256)
+                        saltLength = 16;
+                    else
+                        throw new ZipException("invalid aes key strength, cannot determine key sizes");
+
+                    fileHeader.setCompressedSize(fileSize + saltLength + InternalZipConstants.AES_AUTH_LENGTH + 2); //2 is password verifier
+                } else
                     fileHeader.setCompressedSize(0);
-                }
-                fileHeader.setUncompressedSize(fileSize);
-            }
+            } else
+                fileHeader.setCompressedSize(0);
+
+            fileHeader.setUncompressedSize(fileSize);
         }
+
         if (zipParameters.getEncryption() == Encryption.STANDARD)
             fileHeader.setCrc32(zipParameters.getSourceFileCRC());
-        byte[] shortByte = new byte[2];
-        shortByte[0] = Raw.bitArrayToByte(generateGeneralPurposeBitArray(fileHeader.getEncryption(), zipParameters.getCompressionMethod()));
 
-        // TODO check with original
-//        if (zipModel.getCharset() == StandardCharsets.UTF_8 || Zip4jUtil.detectCharset(fileHeader.getFileName().getBytes()) == StandardCharsets.UTF_8)
-//            shortByte[1] = 8;
-
-        fileHeader.setGeneralPurposeFlag((short)(shortByte[1] << 8 | shortByte[0]));
+        fileHeader.getGeneralPurposeFlag().setCompressionLevel(zipParameters.getCompressionLevel());
+        fileHeader.getGeneralPurposeFlag().setDataDescriptorExists(true);
+        fileHeader.getGeneralPurposeFlag().setUtf8Enconding(zipModel.getCharset() == StandardCharsets.UTF_8);
 
         return fileHeader;
     }
@@ -407,19 +401,12 @@ public abstract class CipherOutputStream extends OutputStream {
         return Files.isHidden(file) ? InternalZipConstants.FILE_MODE_HIDDEN : InternalZipConstants.FILE_MODE_NONE;
     }
 
-    private int[] generateGeneralPurposeBitArray(Encryption encryption, CompressionMethod compressionMethod) {
-
+    private int[] generateGeneralPurposeBitArray(CentralDirectory.FileHeader fileHeader) {
         int[] generalPurposeBits = new int[8];
-        generalPurposeBits[0] = encryption != Encryption.OFF ? 1 : 0;
+//        generalPurposeBits[0] = fileHeader.getEncryption() != Encryption.OFF ? 1 : 0;
 
-        if (compressionMethod == CompressionMethod.DEFLATE) {
-            // Have to set flags for deflate
-        } else {
-            generalPurposeBits[1] = 0;
-            generalPurposeBits[2] = 0;
-        }
-
-        generalPurposeBits[3] = 1;
+        fileHeader.getGeneralPurposeFlag().setCompressionLevel(zipParameters.getCompressionLevel());
+        fileHeader.getGeneralPurposeFlag().setDataDescriptorExists(true);
 
         return generalPurposeBits;
     }

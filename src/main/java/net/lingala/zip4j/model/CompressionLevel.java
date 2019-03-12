@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum CompressionLevel {
-    DEFAULT(-1),
     FASTEST(1),
     FAST(3),
     NORMAL(5),

@@ -52,6 +52,10 @@ public class BitUtils {
         return val | bits;
     }
 
+    public short setBits(short val, int bits) {
+        return (short)setBits((int)val, bits);
+    }
+
     /**
      * Clear selected bit(s) in giving val
      *
@@ -61,6 +65,10 @@ public class BitUtils {
      */
     public static int clearBits(int val, int bits) {
         return val & ~bits;
+    }
+
+    public static short clearBits(short val, int bits) {
+        return (short)clearBits((int)val, bits);
     }
 
     public int updateBits(int val, int bits, boolean value) {

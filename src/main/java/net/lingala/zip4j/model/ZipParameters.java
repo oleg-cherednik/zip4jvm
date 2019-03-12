@@ -42,7 +42,7 @@ public class ZipParameters {
     private CompressionMethod compressionMethod = CompressionMethod.DEFLATE;
     @NonNull
     @Builder.Default
-    private CompressionLevel compressionLevel = CompressionLevel.DEFAULT;
+    private CompressionLevel compressionLevel = CompressionLevel.NORMAL;
     @NonNull
     @Builder.Default
     private Encryption encryption = Encryption.OFF;

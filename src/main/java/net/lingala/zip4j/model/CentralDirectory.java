@@ -94,7 +94,6 @@ public class CentralDirectory {
         @NonNull
         private Encryption encryption = Encryption.OFF;
         private char[] password;
-        private boolean dataDescriptorExists;
         private Zip64ExtendedInfo zip64ExtendedInfo;
         private AESExtraDataRecord aesExtraDataRecord;
 
