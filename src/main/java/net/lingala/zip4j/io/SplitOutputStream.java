@@ -193,7 +193,7 @@ public class SplitOutputStream extends OutputStream {
     }
 
     public boolean isSplitZipFile() {
-        return true;
+        return splitLength > 0;
     }
 
     public long getSplitLength() {

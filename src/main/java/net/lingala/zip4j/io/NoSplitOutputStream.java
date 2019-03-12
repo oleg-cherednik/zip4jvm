@@ -30,8 +30,4 @@ public class NoSplitOutputStream extends SplitOutputStream {
         return true;
     }
 
-    @Override
-    public boolean isSplitZipFile() {
-        return false;
-    }
 }

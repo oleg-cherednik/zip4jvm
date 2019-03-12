@@ -28,7 +28,7 @@ import net.lingala.zip4j.model.AESStrength;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.Encryption;
-import net.lingala.zip4j.model.EndCentralDirectory;
+import net.lingala.zip4j.model.GeneralPurposeFlag;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
@@ -47,7 +47,7 @@ import java.util.zip.CRC32;
 
 public abstract class CipherOutputStream extends OutputStream {
 
-    protected final OutputStream out;
+    protected final OutputStreamDecorator out;
     private Path sourceFile;
     @NonNull
     protected CentralDirectory.FileHeader fileHeader;
@@ -56,7 +56,7 @@ public abstract class CipherOutputStream extends OutputStream {
     private Encryptor encryptor = Encryptor.NULL;
     protected ZipParameters zipParameters;
     protected ZipModel zipModel;
-    private long totalBytesWritten;
+
     protected final CRC32 crc = new CRC32();
     private long bytesWrittenForThisFile;
     private final byte[] pendingBuffer = new byte[InternalZipConstants.AES_BLOCK_SIZE];
@@ -64,7 +64,7 @@ public abstract class CipherOutputStream extends OutputStream {
     private long totalBytesRead;
 
     protected CipherOutputStream(OutputStream out, ZipModel zipModel) {
-        this.out = out;
+        this.out = new OutputStreamDecorator(out);
         initZipModel(zipModel);
     }
 
@@ -98,27 +98,16 @@ public abstract class CipherOutputStream extends OutputStream {
             if (zipModel.isSplitArchive() && zipModel.isEmpty()) {
                 byte[] intByte = new byte[4];
                 Raw.writeIntLittleEndian(intByte, 0, (int)InternalZipConstants.SPLITSIG);
-                out.write(intByte);
-                totalBytesWritten += 4;
+                out.getDelegate().write(intByte);
+                out.addTotalBytesWritten(4);
             }
 
-            if (out instanceof SplitOutputStream) {
-                if (totalBytesWritten == 4)
-                    fileHeader.setOffLocalHeaderRelative(4);
-                else
-                    fileHeader.setOffLocalHeaderRelative(((SplitOutputStream)out).getFilePointer());
-            } else {
-                if (totalBytesWritten == 4)
-                    fileHeader.setOffLocalHeaderRelative(4);
-                else
-                    fileHeader.setOffLocalHeaderRelative(totalBytesWritten);
-            }
-
-            totalBytesWritten += new LocalFileHeaderWriter().write(localFileHeader, zipModel, out);
+            fileHeader.setOffLocalHeaderRelative(out.getOffsLocalHeaderRelative());
+            out.addTotalBytesWritten(new LocalFileHeaderWriter().write(localFileHeader, zipModel, out.getDelegate()));
 
             encryptor = createEncryptor();
-            int length = encryptor.write(out);
-            totalBytesWritten += length;
+            int length = encryptor.write(out.getDelegate());
+            out.addTotalBytesWritten(length);
             bytesWrittenForThisFile += length;
 
             crc.reset();
@@ -142,14 +131,8 @@ public abstract class CipherOutputStream extends OutputStream {
     }
 
     private void initZipModel(ZipModel zipModel) {
-        if (zipModel == null) {
-            this.zipModel = new ZipModel();
-        } else {
-            this.zipModel = zipModel;
-        }
-
-        if (this.zipModel.getEndCentralDirectory() == null)
-            this.zipModel.setEndCentralDirectory(new EndCentralDirectory());
+        this.zipModel = zipModel == null ? new ZipModel() : zipModel;
+        this.zipModel.createEndCentralDirectoryIfNotExist();
 
         if (this.zipModel.getCentralDirectory() == null)
             this.zipModel.setCentralDirectory(new CentralDirectory());
@@ -160,8 +143,7 @@ public abstract class CipherOutputStream extends OutputStream {
         if (this.zipModel.getLocalFileHeaderList() == null)
             this.zipModel.setLocalFileHeaderList(new ArrayList<>());
 
-        if (out instanceof SplitOutputStream && ((SplitOutputStream)out).isSplitZipFile())
-            this.zipModel.setSplitLength(((SplitOutputStream)out).getSplitLength());
+        this.zipModel.setSplitLength(out.getSplitLength());
     }
 
     public void write(int bval) throws IOException {
@@ -201,7 +183,7 @@ public abstract class CipherOutputStream extends OutputStream {
             if (len != 0 && len % 16 != 0) {
                 System.arraycopy(b, (len + off) - (len % 16), pendingBuffer, 0, len % 16);
                 pendingBufferLength = len % 16;
-                len = len - pendingBufferLength;
+                len -= pendingBufferLength;
             }
         }
         if (len != 0)
@@ -211,8 +193,8 @@ public abstract class CipherOutputStream extends OutputStream {
     private void encryptAndWrite(byte[] b, int off, int len) throws IOException {
         try {
             encryptor.encrypt(b, off, len);
-            out.write(b, off, len);
-            totalBytesWritten += len;
+            out.getDelegate().write(b, off, len);
+            out.addTotalBytesWritten(len);
             bytesWrittenForThisFile += len;
         } catch(ZipException e) {
             throw new IOException(e);
@@ -228,9 +210,9 @@ public abstract class CipherOutputStream extends OutputStream {
 
         if (zipParameters.getEncryption() == Encryption.AES) {
             if (encryptor instanceof AESEncryptor) {
-                out.write(((AESEncryptor)encryptor).getFinalMac());
+                out.getDelegate().write(((AESEncryptor)encryptor).getFinalMac());
                 bytesWrittenForThisFile += 10;
-                totalBytesWritten += 10;
+                out.addTotalBytesWritten(10);
             } else {
                 throw new ZipException("invalid encryptor for AES encrypted file");
             }
@@ -258,8 +240,7 @@ public abstract class CipherOutputStream extends OutputStream {
         zipModel.addLocalFileHeader(localFileHeader);
         zipModel.getCentralDirectory().addFileHeader(fileHeader);
 
-        HeaderWriter headerWriter = new HeaderWriter();
-        totalBytesWritten += new LocalFileHeaderWriter().writeExtended(localFileHeader, out);
+        out.addTotalBytesWritten(new LocalFileHeaderWriter().writeExtended(localFileHeader, out.getDelegate()));
 
         crc.reset();
         bytesWrittenForThisFile = 0;
@@ -268,38 +249,36 @@ public abstract class CipherOutputStream extends OutputStream {
     }
 
     public void finish() throws IOException, ZipException {
-        zipModel.getEndCentralDirectory().setOffOfStartOfCentralDir(totalBytesWritten);
+        zipModel.getEndCentralDirectory().setOffOfStartOfCentralDir(out.getTotalBytesWritten());
 
         HeaderWriter headerWriter = new HeaderWriter();
-        headerWriter.finalizeZipFile(zipModel, out);
+        headerWriter.finalizeZipFile(zipModel, out.getDelegate());
     }
 
     public void close() throws IOException {
         if (out != null)
-            out.close();
+            out.getDelegate().close();
     }
 
     private CentralDirectory.FileHeader createFileHeader() throws ZipException, IOException {
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
+
         fileHeader.setVersionMadeBy(20);
         fileHeader.setVersionNeededToExtract(20);
-        fileHeader.setCompressionMethod(zipParameters.getCompressionMethod());
+        updateGeneralPurposeFlag(fileHeader.getGeneralPurposeFlag());
+        fileHeader.setCompressionMethod(getCompressionMethod());
+        fileHeader.setLastModFileTime(getLastModFileTime());
+        fileHeader.setCrc32(getCrc32());
 
-        if (zipParameters.getEncryption() == Encryption.AES) {
-            fileHeader.setCompressionMethod(CompressionMethod.AES_ENC);
-            fileHeader.setAesExtraDataRecord(generateAESExtraDataRecord(zipParameters));
-        } else
-            fileHeader.setCompressionMethod(zipParameters.getCompressionMethod());
+        fileHeader.setAesExtraDataRecord(getAesExtraDataRecord(zipParameters.getEncryption()));
 
-        fileHeader.setEncryption(zipParameters.getEncryption());
+
         String fileName = null;
         if (zipParameters.isSourceExternalStream()) {
-            fileHeader.setLastModFileTime((int)Zip4jUtil.javaToDosTime(System.currentTimeMillis()));
             if (StringUtils.isBlank(zipParameters.getFileNameInZip()))
                 throw new ZipException("fileNameInZip is null or empty");
             fileName = zipParameters.getFileNameInZip();
         } else {
-            fileHeader.setLastModFileTime((int)Zip4jUtil.javaToDosTime(Files.getLastModifiedTime(sourceFile).toMillis()));
             fileHeader.setUncompressedSize(Files.size(sourceFile));
             fileName = zipParameters.getRelativeFileName(sourceFile);
 
@@ -313,12 +292,7 @@ public abstract class CipherOutputStream extends OutputStream {
 
         fileHeader.setFileName(fileName);
         fileHeader.setFileNameLength(Zip4jUtil.getEncodedStringLength(fileName, zipModel.getCharset()));
-
-        if (out instanceof SplitOutputStream) {
-            fileHeader.setDiskNumberStart(((SplitOutputStream)out).getCurrSplitFileCounter());
-        } else {
-            fileHeader.setDiskNumberStart(0);
-        }
+        fileHeader.setDiskNumberStart(out.getCurrSplitFileCounter());
 
         int fileAttrs = 0;
         if (!zipParameters.isSourceExternalStream())
@@ -355,14 +329,44 @@ public abstract class CipherOutputStream extends OutputStream {
             fileHeader.setUncompressedSize(fileSize);
         }
 
-        if (zipParameters.getEncryption() == Encryption.STANDARD)
-            fileHeader.setCrc32(zipParameters.getSourceFileCRC());
-
-        fileHeader.getGeneralPurposeFlag().setCompressionLevel(zipParameters.getCompressionLevel());
-        fileHeader.getGeneralPurposeFlag().setDataDescriptorExists(true);
-        fileHeader.getGeneralPurposeFlag().setUtf8Enconding(zipModel.getCharset() == StandardCharsets.UTF_8);
 
         return fileHeader;
+    }
+
+    private void updateGeneralPurposeFlag(@NonNull GeneralPurposeFlag generalPurposeFlag) {
+        generalPurposeFlag.setCompressionLevel(zipParameters.getCompressionLevel());
+        generalPurposeFlag.setDataDescriptorExists(true);
+        generalPurposeFlag.setUtf8Enconding(zipModel.getCharset() == StandardCharsets.UTF_8);
+    }
+
+    private CompressionMethod getCompressionMethod() {
+        return zipParameters.getEncryption() == Encryption.AES ? CompressionMethod.AES_ENC : zipParameters.getCompressionMethod();
+    }
+
+    private int getLastModFileTime() throws IOException {
+        long time = zipParameters.isSourceExternalStream() ? System.currentTimeMillis() : Files.getLastModifiedTime(sourceFile).toMillis();
+        return (int)Zip4jUtil.javaToDosTime(time);
+    }
+
+    private long getCrc32() {
+        return zipParameters.getEncryption() == Encryption.STANDARD ? zipParameters.getSourceFileCRC() : 0;
+    }
+
+    private AESExtraDataRecord getAesExtraDataRecord(@NonNull Encryption encryption) {
+        if (encryption != Encryption.AES)
+            return null;
+
+        AESExtraDataRecord aesDataRecord = new AESExtraDataRecord();
+        aesDataRecord.setDataSize(7);
+        aesDataRecord.setVendor("AE");
+        // Always set the version number to 2 as we do not store CRC for any AES encrypted files
+        // only MAC is stored and as per the specification, if version number is 2, then MAC is read
+        // and CRC is ignored
+        aesDataRecord.setVersionNumber(2);
+        aesDataRecord.setAesStrength(zipParameters.getAesKeyStrength());
+        aesDataRecord.setCompressionMethod(zipParameters.getCompressionMethod());
+
+        return aesDataRecord;
     }
 
     private static LocalFileHeader createLocalFileHeader(@NonNull CentralDirectory.FileHeader fileHeader) throws ZipException {
@@ -409,25 +413,6 @@ public abstract class CipherOutputStream extends OutputStream {
         fileHeader.getGeneralPurposeFlag().setDataDescriptorExists(true);
 
         return generalPurposeBits;
-    }
-
-    private AESExtraDataRecord generateAESExtraDataRecord(ZipParameters parameters) throws ZipException {
-
-        if (parameters == null) {
-            throw new ZipException("zip parameters are null, cannot generate AES Extra Data record");
-        }
-
-        AESExtraDataRecord aesDataRecord = new AESExtraDataRecord();
-        aesDataRecord.setDataSize(7);
-        aesDataRecord.setVendor("AE");
-        // Always set the version number to 2 as we do not store CRC for any AES encrypted files
-        // only MAC is stored and as per the specification, if version number is 2, then MAC is read
-        // and CRC is ignored
-        aesDataRecord.setVersionNumber(2);
-        aesDataRecord.setAesStrength(parameters.getAesKeyStrength());
-        aesDataRecord.setCompressionMethod(parameters.getCompressionMethod());
-
-        return aesDataRecord;
     }
 
     public void decrementCompressedFileSize(int value) {
