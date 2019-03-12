@@ -18,6 +18,7 @@ package net.lingala.zip4j.examples.zip;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.model.CompressionMethod;
+import net.lingala.zip4j.model.InputStreamMeta;
 import net.lingala.zip4j.model.ZipParameters;
 
 import java.io.FileInputStream;
@@ -71,7 +72,7 @@ public class AddStreamToZip {
             is = new FileInputStream("filetoadd.txt");
 
             // Creates a new entry in the zip file and adds the content to the zip file
-            zipFile.addStream(is, "yourfilename.txt", parameters);
+            zipFile.addStream(new InputStreamMeta(is, "yourfilename.txt"), parameters);
 
         } catch(Exception e) {
             e.printStackTrace();

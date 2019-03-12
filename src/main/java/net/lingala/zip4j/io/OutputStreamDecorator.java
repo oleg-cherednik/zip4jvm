@@ -15,6 +15,7 @@ import java.io.OutputStream;
 @Setter
 @RequiredArgsConstructor
 final class OutputStreamDecorator {
+
     private final OutputStream delegate;
     private long totalBytesWritten;
 
@@ -38,4 +39,8 @@ final class OutputStreamDecorator {
         return delegate instanceof SplitOutputStream ? ((SplitOutputStream)delegate).getSplitLength() : 0;
     }
 
+    public void seek(long pos) throws IOException {
+        if (delegate instanceof SplitOutputStream)
+            ((SplitOutputStream)delegate).seek(pos);
+    }
 }

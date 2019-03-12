@@ -7,6 +7,7 @@ import net.lingala.zip4j.model.AESStrength;
 import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.Encryption;
+import net.lingala.zip4j.model.InputStreamMeta;
 import net.lingala.zip4j.model.ZipParameters;
 import org.apache.commons.io.FileUtils;
 import org.testng.annotations.BeforeMethod;
@@ -142,9 +143,10 @@ public class ApplicationTest {
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .isSourceExternalStream(true).build();
 
-        try (FileInputStream in = new FileInputStream(srcDir.resolve("saint-petersburg.jpg").toFile())) {
-            zipFile.addStream(in, "foo/yourfilename.jpg", parameters);
-        }
+        List<InputStreamMeta> files = Arrays.asList(
+                new InputStreamMeta(new FileInputStream(srcDir.resolve("saint-petersburg.jpg").toFile()), "one_one/one.jpg"),
+                new InputStreamMeta(new FileInputStream(srcDir.resolve("cars/bentley-continental.jpg").toFile()), "two_two/two.jpg"));
+        zipFile.addStream(files, parameters);
     }
 
     @NonNull

@@ -25,6 +25,7 @@ import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.Encryption;
+import net.lingala.zip4j.model.InputStreamMeta;
 import net.lingala.zip4j.model.UnzipParameters;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
@@ -36,7 +37,6 @@ import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -308,18 +308,22 @@ public class ZipFile {
      * no effect for this method and hence this method cannot be used to add content to zip in
      * thread mode
      *
-     * @param in
+     * @param meta
      * @param parameters
      * @throws ZipException
      */
-    public void addStream(@NonNull InputStream in, @NonNull String fileName, @NonNull ZipParameters parameters) throws ZipException {
+    public void addStream(@NonNull Collection<InputStreamMeta> files, @NonNull ZipParameters parameters) throws ZipException {
         runInThread = false;
         readOrCreateModel();
 
         if (Files.exists(path) && zipModel.isSplitArchive())
             throw new ZipException("Zip path already exists. Zip path format does not allow updating split/spanned files");
 
-        new ZipEngine(zipModel).addStreamToZip(in, fileName, parameters);
+        new ZipEngine(zipModel).addStreamToZip(files, parameters);
+    }
+
+    public void addStream(@NonNull InputStreamMeta file, @NonNull ZipParameters parameters) throws ZipException {
+        addStream(Collections.singletonList(file), parameters);
     }
 
     /**

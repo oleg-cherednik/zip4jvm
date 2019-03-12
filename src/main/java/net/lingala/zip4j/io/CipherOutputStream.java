@@ -64,6 +64,10 @@ public abstract class CipherOutputStream extends OutputStream {
         initZipModel(zipModel);
     }
 
+    public void putNextEntry(String fileNameStream, ZipParameters parameters) throws ZipException {
+        putNextEntry(null, fileNameStream, parameters);
+    }
+
     public void putNextEntry(Path file, String fileNameStream, ZipParameters parameters) throws ZipException {
         if (!parameters.isSourceExternalStream() && file == null)
             throw new ZipException("input file is null");
@@ -271,5 +275,9 @@ public abstract class CipherOutputStream extends OutputStream {
         if (toUpdate > 0) {
             totalBytesRead += toUpdate;
         }
+    }
+
+    public void seek(long pos) throws IOException {
+        out.seek(pos);
     }
 }

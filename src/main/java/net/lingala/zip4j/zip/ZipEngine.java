@@ -25,6 +25,7 @@ import net.lingala.zip4j.model.AESStrength;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.Encryption;
+import net.lingala.zip4j.model.InputStreamMeta;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.ArchiveMaintainer;
@@ -113,49 +114,28 @@ public class ZipEngine {
         }
     }
 
-    public void addStreamToZip(@NonNull InputStream in, @NonNull String fileName, @NonNull ZipParameters parameters) throws ZipException {
-        ZipOutputStream outputStream = null;
+    public void addStreamToZip(@NonNull Collection<InputStreamMeta> files, @NonNull ZipParameters parameters) throws ZipException {
+        checkParameters(parameters);
 
-        try {
-            checkParameters(parameters);
+        try (ZipOutputStream out = new ZipOutputStream(SplitOutputStream.create(zipModel), zipModel)) {
+            out.seek(zipModel.getEndCentralDirectory().getOffOfStartOfCentralDir());
 
-            boolean isZipFileAlreadExists = Files.exists(zipModel.getZipFile());
-            SplitOutputStream splitOutputStream = SplitOutputStream.create(zipModel);
-            outputStream = new ZipOutputStream(splitOutputStream, zipModel);
+            for (InputStreamMeta file : files) {
+                if (file == null)
+                    continue;
 
-            if (isZipFileAlreadExists) {
-                if (zipModel.getEndCentralDirectory() == null) {
-                    throw new ZipException("invalid end of central directory record");
-                }
-                splitOutputStream.seek(zipModel.getEndCentralDirectory().getOffOfStartOfCentralDir());
+                out.putNextEntry(file.getRelativePath(), parameters);
+
+                if (file.isRegularFile())
+                    IOUtils.copy(file.getIn(), out);
+
+                out.closeEntry();
+                out.finish();
             }
-
-            byte[] readBuff = new byte[InternalZipConstants.BUFF_SIZE];
-            int readLen = -1;
-
-            outputStream.putNextEntry(null, fileName, parameters);
-
-            if (!Zip4jUtil.isDirectory(fileName)) {
-                while ((readLen = in.read(readBuff)) != -1) {
-                    outputStream.write(readBuff, 0, readLen);
-                }
-            }
-
-            outputStream.closeEntry();
-            outputStream.finish();
-
         } catch(ZipException e) {
             throw e;
         } catch(Exception e) {
             throw new ZipException(e);
-        } finally {
-            if (outputStream != null) {
-                try {
-                    outputStream.close();
-                } catch(IOException e) {
-                    //ignore
-                }
-            }
         }
     }
 
