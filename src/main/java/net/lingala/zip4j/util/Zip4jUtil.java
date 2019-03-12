@@ -25,7 +25,6 @@ import org.mozilla.universalchardet.UniversalDetector;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -291,7 +290,7 @@ public class Zip4jUtil {
      * @return int
      */
     public static int getEncodedStringLength(String str, @NonNull Charset charset) {
-        return StringUtils.isBlank(str) ? 0 : ByteBuffer.wrap(str.getBytes(charset)).limit();
+        return StringUtils.isBlank(str) ? 0 : str.getBytes(charset).length;
     }
 
     /**

@@ -20,7 +20,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.Zip4jUtil;
 import org.apache.commons.io.FilenameUtils;
@@ -96,7 +95,11 @@ public class ZipParameters {
         this.rootFolderInZip = rootFolderInZip;
     }
 
-    public String getRelativeFileName(Path file) throws ZipException {
+    public String getFileName(Path file) {
+        return isSourceExternalStream ? fileNameInZip : getRelativeFileName(file);
+    }
+
+    public String getRelativeFileName(Path file) {
         Path entryPath = file.toAbsolutePath();
         Path rootPath = defaultFolderPath != null ? Paths.get(defaultFolderPath).toAbsolutePath() : entryPath.getParent();
 

@@ -114,7 +114,6 @@ public class CentralDirectory {
 
         public void setAesExtraDataRecord(AESExtraDataRecord record) {
             aesExtraDataRecord = record;
-            encryption = aesExtraDataRecord != null ? Encryption.AES : encryption;
             updateEncryption();
         }
 
