@@ -28,7 +28,6 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class CentralDirectoryBuilder {
 
-    @NonNull
     private final Path sourceFile;
     @NonNull
     private final ZipParameters zipParameters;

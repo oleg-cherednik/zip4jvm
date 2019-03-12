@@ -13,6 +13,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -100,7 +101,6 @@ public class ApplicationTest {
 
     public void addFileEncryption() throws ZipException, IOException {
         ZipFile zipFile = new ZipFile(destDir.resolve("src.zip"));
-
         List<Path> files = Collections.singletonList(srcDir.resolve("mcdonnell-douglas-f15-eagle.jpg"));
 
         ZipParameters parameters = ZipParameters.builder()
@@ -133,6 +133,19 @@ public class ApplicationTest {
 
         checkDestinationDir(10);
 //        checkResultDir();
+    }
+
+    public void addFilesWithStream() throws IOException, ZipException {
+        ZipFile zipFile = new ZipFile(destDir.resolve("src.zip"));
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compressionMethod(CompressionMethod.DEFLATE)
+                                                .compressionLevel(CompressionLevel.NORMAL)
+                                                .fileNameInZip("foo/yourfilename.jpg")
+                                                .isSourceExternalStream(true).build();
+
+        try (FileInputStream in = new FileInputStream(srcDir.resolve("saint-petersburg.jpg").toFile())) {
+            zipFile.addStream(in, parameters);
+        }
     }
 
     @NonNull
