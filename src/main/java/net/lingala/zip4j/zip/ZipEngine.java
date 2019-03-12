@@ -77,13 +77,13 @@ public class ZipEngine {
     private void initAddFiles(@NonNull Collection<Path> files, @NonNull ZipParameters parameters) throws ZipException, IOException {
         zipModel.createEndCentralDirectoryIfNotExist();
         checkParameters(parameters);
-        removeFilesIfExists(files, parameters);
 
-        try (SplitOutputStream splitOutputStream = SplitOutputStream.create(zipModel);
-             ZipOutputStream out = new ZipOutputStream(splitOutputStream, zipModel)) {
-            splitOutputStream.seek(zipModel.getOffOfStartOfCentralDir());
+        try (ZipOutputStream out = new ZipOutputStream(SplitOutputStream.create(zipModel), zipModel)) {
+            out.seek(zipModel.getOffOfStartOfCentralDir());
 
             for (Path file : files) {
+                removeFile(zipModel.getFileHeader(parameters.getRelativeFileName(file)), false);
+
                 String fileName = parameters.getRelativeFileName(file);
 
                 if (Zip4jUtil.isDirectory(fileName))
