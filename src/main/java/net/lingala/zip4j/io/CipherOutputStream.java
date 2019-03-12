@@ -24,7 +24,6 @@ import net.lingala.zip4j.crypto.Encryptor;
 import net.lingala.zip4j.crypto.StandardEncryptor;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.AESExtraDataRecord;
-import net.lingala.zip4j.model.AESStrength;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.Encryption;
@@ -269,6 +268,8 @@ public abstract class CipherOutputStream extends OutputStream {
         fileHeader.setCompressionMethod(getCompressionMethod());
         fileHeader.setLastModFileTime(getLastModFileTime());
         fileHeader.setCrc32(getCrc32());
+        fileHeader.setCompressedSize(getCompressedSize(fileHeader));
+        fileHeader.setUncompressedSize(getUncompressedSize(fileHeader));
 
         fileHeader.setAesExtraDataRecord(getAesExtraDataRecord(zipParameters.getEncryption()));
 
@@ -300,35 +301,6 @@ public abstract class CipherOutputStream extends OutputStream {
         byte[] externalFileAttrs = { (byte)fileAttrs, 0, 0, 0 };
 
         fileHeader.setExternalFileAttr(externalFileAttrs);
-
-        if (fileHeader.isDirectory()) {
-            fileHeader.setCompressedSize(0);
-            fileHeader.setUncompressedSize(0);
-        } else if (!zipParameters.isSourceExternalStream()) {
-            long fileSize = Files.size(sourceFile);
-
-            if (zipParameters.getCompressionMethod() == CompressionMethod.STORE) {
-                if (zipParameters.getEncryption() == Encryption.STANDARD)
-                    fileHeader.setCompressedSize(fileSize + InternalZipConstants.STD_DEC_HDR_SIZE);
-                else if (zipParameters.getEncryption() == Encryption.AES) {
-                    int saltLength;
-
-                    if (zipParameters.getAesKeyStrength() == AESStrength.STRENGTH_128)
-                        saltLength = 8;
-                    else if (zipParameters.getAesKeyStrength() == AESStrength.STRENGTH_256)
-                        saltLength = 16;
-                    else
-                        throw new ZipException("invalid aes key strength, cannot determine key sizes");
-
-                    fileHeader.setCompressedSize(fileSize + saltLength + InternalZipConstants.AES_AUTH_LENGTH + 2); //2 is password verifier
-                } else
-                    fileHeader.setCompressedSize(0);
-            } else
-                fileHeader.setCompressedSize(0);
-
-            fileHeader.setUncompressedSize(fileSize);
-        }
-
 
         return fileHeader;
     }
@@ -367,6 +339,32 @@ public abstract class CipherOutputStream extends OutputStream {
         aesDataRecord.setCompressionMethod(zipParameters.getCompressionMethod());
 
         return aesDataRecord;
+    }
+
+    private long getCompressedSize(CentralDirectory.FileHeader fileHeader) throws IOException {
+        if (fileHeader.isDirectory())
+            return 0;
+        if (zipParameters.isSourceExternalStream())
+            return 0;
+        if (zipParameters.getCompressionMethod() != CompressionMethod.STORE)
+            return 0;
+        if (zipParameters.getEncryption() != Encryption.AES)
+            return 0;
+
+        long fileSize = Files.size(sourceFile);
+
+        if (zipParameters.getEncryption() == Encryption.STANDARD)
+            return fileSize + InternalZipConstants.STD_DEC_HDR_SIZE;
+
+        return fileSize + zipParameters.getAesKeyStrength().getSaltLength() + InternalZipConstants.AES_AUTH_LENGTH + 2; //2 is password verifier
+    }
+
+    private long getUncompressedSize(CentralDirectory.FileHeader fileHeader) throws IOException, ZipException {
+        if (fileHeader.isDirectory())
+            return 0;
+        if (zipParameters.isSourceExternalStream())
+            return 0;
+        return Files.size(sourceFile);
     }
 
     private static LocalFileHeader createLocalFileHeader(@NonNull CentralDirectory.FileHeader fileHeader) throws ZipException {

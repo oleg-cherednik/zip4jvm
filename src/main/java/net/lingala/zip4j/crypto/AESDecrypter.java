@@ -16,6 +16,7 @@
 
 package net.lingala.zip4j.crypto;
 
+import lombok.NonNull;
 import net.lingala.zip4j.crypto.PBKDF2.MacBasedPRF;
 import net.lingala.zip4j.crypto.PBKDF2.PBKDF2Engine;
 import net.lingala.zip4j.crypto.PBKDF2.PBKDF2Parameters;
@@ -32,7 +33,8 @@ import java.util.Arrays;
 
 public class AESDecrypter implements IDecrypter {
 
-    private LocalFileHeader localFileHeader;
+    @NonNull
+    private final LocalFileHeader localFileHeader;
     private AESEngine aesEngine;
     private MacBasedPRF mac;
 
@@ -51,43 +53,35 @@ public class AESDecrypter implements IDecrypter {
     private byte[] counterBlock;
     private int loopCount = 0;
 
-    public AESDecrypter(LocalFileHeader localFileHeader,
-            byte[] salt, byte[] passwordVerifier) throws ZipException {
-
-        if (localFileHeader == null) {
-            throw new ZipException("one of the input parameters is null in AESDecryptor Constructor");
-        }
-
+    public AESDecrypter(@NonNull LocalFileHeader localFileHeader, byte[] salt, byte[] passwordVerifier) throws ZipException {
         this.localFileHeader = localFileHeader;
-        this.storedMac = null;
+        storedMac = null;
         iv = new byte[InternalZipConstants.AES_BLOCK_SIZE];
         counterBlock = new byte[InternalZipConstants.AES_BLOCK_SIZE];
         init(salt, passwordVerifier);
     }
 
     private void init(byte[] salt, byte[] passwordVerifier) throws ZipException {
-        if (localFileHeader == null) {
-            throw new ZipException("invalid file header in init method of AESDecryptor");
-        }
-
         AESExtraDataRecord aesExtraDataRecord = localFileHeader.getAesExtraDataRecord();
+
         if (aesExtraDataRecord == null)
             throw new ZipException("invalid aes extra data record - in init method of AESDecryptor");
+
+        SALT_LENGTH = aesExtraDataRecord.getAesStrength().getSaltLength();
+
+        if (aesExtraDataRecord.getAesStrength() == AESStrength.NONE)
+            throw new ZipException("invalid aes key strength for file: " + localFileHeader.getFileName());
 
         if (aesExtraDataRecord.getAesStrength() == AESStrength.STRENGTH_128) {
             KEY_LENGTH = 16;
             MAC_LENGTH = 16;
-            SALT_LENGTH = 8;
         } else if (aesExtraDataRecord.getAesStrength() == AESStrength.STRENGTH_192) {
             KEY_LENGTH = 24;
             MAC_LENGTH = 24;
-            SALT_LENGTH = 12;
         } else if (aesExtraDataRecord.getAesStrength() == AESStrength.STRENGTH_256) {
             KEY_LENGTH = 32;
             MAC_LENGTH = 32;
-            SALT_LENGTH = 16;
-        } else
-            throw new ZipException("invalid aes key strength for file: " + localFileHeader.getFileName());
+        }
 
         if (localFileHeader.getPassword() == null || localFileHeader.getPassword().length <= 0) {
             throw new ZipException("empty or null password provided for AES Decryptor");

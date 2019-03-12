@@ -12,12 +12,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum AESStrength {
 
-    NONE((byte)0),
-    STRENGTH_128((byte)0x01),
-    STRENGTH_192((byte)0x02),
-    STRENGTH_256((byte)0x03);
+    NONE((byte)0, 0),
+    STRENGTH_128((byte)0x01, 8),
+    STRENGTH_192((byte)0x02, 12),
+    STRENGTH_256((byte)0x03, 16);
 
     private final byte value;
+    private final int saltLength;
 
     public static AESStrength parseByte(byte value) {
         for (AESStrength strength : values())
