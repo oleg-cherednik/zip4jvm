@@ -56,7 +56,6 @@ public class ZipParameters {
     private TimeZone timeZone = TimeZone.getDefault();
     private long sourceFileCRC;
     private String defaultFolderPath;
-    private String fileNameInZip;
     private boolean isSourceExternalStream;
 
     /**
@@ -93,10 +92,6 @@ public class ZipParameters {
 //			}
         }
         this.rootFolderInZip = rootFolderInZip;
-    }
-
-    public String getFileName(Path file) {
-        return isSourceExternalStream ? fileNameInZip : getRelativeFileName(file);
     }
 
     public String getRelativeFileName(Path file) {

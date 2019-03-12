@@ -140,11 +140,10 @@ public class ApplicationTest {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
-                                                .fileNameInZip("foo/yourfilename.jpg")
                                                 .isSourceExternalStream(true).build();
 
         try (FileInputStream in = new FileInputStream(srcDir.resolve("saint-petersburg.jpg").toFile())) {
-            zipFile.addStream(in, parameters);
+            zipFile.addStream(in, "foo/yourfilename.jpg", parameters);
         }
     }
 

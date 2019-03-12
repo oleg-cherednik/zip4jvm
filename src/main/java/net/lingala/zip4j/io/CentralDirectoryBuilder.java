@@ -29,6 +29,7 @@ import java.util.Collections;
 public class CentralDirectoryBuilder {
 
     private final Path sourceFile;
+    private final String fileNameStream;
     @NonNull
     private final ZipParameters zipParameters;
     @NonNull
@@ -80,7 +81,10 @@ public class CentralDirectoryBuilder {
     }
 
     private String getFileName() throws IOException {
-        String fileName = zipParameters.getFileName(sourceFile);
+        String fileName = fileNameStream;
+
+        if (!zipParameters.isSourceExternalStream())
+            fileName = zipParameters.getRelativeFileName(sourceFile);
 
         if (StringUtils.isBlank(fileName))
             throw new IOException("fileName is null or empty. unable to create file header");

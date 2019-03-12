@@ -308,31 +308,18 @@ public class ZipFile {
      * no effect for this method and hence this method cannot be used to add content to zip in
      * thread mode
      *
-     * @param inputStream
+     * @param in
      * @param parameters
      * @throws ZipException
      */
-    public void addStream(InputStream inputStream, ZipParameters parameters) throws ZipException {
-        if (inputStream == null) {
-            throw new ZipException("inputstream is null, cannot add path to zip");
-        }
-
-        if (parameters == null) {
-            throw new ZipException("zip parameters are null");
-        }
-
-        this.setRunInThread(false);
-
+    public void addStream(@NonNull InputStream in, @NonNull String fileName, @NonNull ZipParameters parameters) throws ZipException {
+        runInThread = false;
         readOrCreateModel();
-
-        if (this.zipModel == null) {
-            throw new ZipException("internal error: zip model is null");
-        }
 
         if (Files.exists(path) && zipModel.isSplitArchive())
             throw new ZipException("Zip path already exists. Zip path format does not allow updating split/spanned files");
 
-        new ZipEngine(zipModel).addStreamToZip(inputStream, parameters);
+        new ZipEngine(zipModel).addStreamToZip(in, fileName, parameters);
     }
 
     /**

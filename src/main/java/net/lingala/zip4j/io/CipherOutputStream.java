@@ -64,7 +64,7 @@ public abstract class CipherOutputStream extends OutputStream {
         initZipModel(zipModel);
     }
 
-    public void putNextEntry(Path file, ZipParameters parameters) throws ZipException {
+    public void putNextEntry(Path file, String fileNameStream, ZipParameters parameters) throws ZipException {
         if (!parameters.isSourceExternalStream() && file == null)
             throw new ZipException("input file is null");
 
@@ -76,10 +76,10 @@ public abstract class CipherOutputStream extends OutputStream {
             zipParameters = parameters.toBuilder().build();
 
             if (parameters.isSourceExternalStream()) {
-                if (StringUtils.isBlank(zipParameters.getFileNameInZip()))
+                if (StringUtils.isBlank(fileNameStream))
                     throw new ZipException("file name is empty for external stream");
 
-                if (Zip4jUtil.isDirectory(parameters.getFileNameInZip())) {
+                if (Zip4jUtil.isDirectory(fileNameStream)) {
                     zipParameters.setEncryption(Encryption.OFF);
                     zipParameters.setCompressionMethod(CompressionMethod.STORE);
                 }
@@ -89,7 +89,8 @@ public abstract class CipherOutputStream extends OutputStream {
             }
 
             int currSplitFileCounter = out.getCurrSplitFileCounter();
-            CentralDirectoryBuilder centralDirectoryBuilder = new CentralDirectoryBuilder(sourceFile, zipParameters, zipModel, currSplitFileCounter);
+            CentralDirectoryBuilder centralDirectoryBuilder = new CentralDirectoryBuilder(sourceFile, fileNameStream, zipParameters, zipModel,
+                    currSplitFileCounter);
             fileHeader = centralDirectoryBuilder.createFileHeader();
             localFileHeader = centralDirectoryBuilder.createLocalFileHeader(fileHeader);
 

@@ -62,9 +62,6 @@ public class AddStreamToZip {
                                                     // below two parameters have to be set for adding content to a zip file
                                                     // directly from a stream
 
-                                                    // this would be the name of the file for this entry in the zip file
-                                                    .fileNameInZip("yourfilename.txt")
-
                                                     // we set this flag to true. If this flag is true, Zip4j identifies that
                                                     // the data will not be from a file but directly from a stream
                                                     .isSourceExternalStream(true).build();
@@ -74,7 +71,7 @@ public class AddStreamToZip {
             is = new FileInputStream("filetoadd.txt");
 
             // Creates a new entry in the zip file and adds the content to the zip file
-            zipFile.addStream(is, parameters);
+            zipFile.addStream(is, "yourfilename.txt", parameters);
 
         } catch(Exception e) {
             e.printStackTrace();

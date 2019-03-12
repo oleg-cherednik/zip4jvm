@@ -98,7 +98,7 @@ public class ZipEngine {
                         fileParameters.setCompressionMethod(CompressionMethod.STORE);
                 }
 
-                out.putNextEntry(file, fileParameters);
+                out.putNextEntry(file, null, fileParameters);
 
                 if (Files.isRegularFile(file)) {
                     try (InputStream in = new FileInputStream(file.toFile())) {
@@ -113,20 +113,14 @@ public class ZipEngine {
         }
     }
 
-    public void addStreamToZip(InputStream inputStream, ZipParameters parameters) throws ZipException {
-        if (inputStream == null || parameters == null) {
-            throw new ZipException("one of the input parameters is null, cannot add stream to zip");
-        }
-
+    public void addStreamToZip(@NonNull InputStream in, @NonNull String fileName, @NonNull ZipParameters parameters) throws ZipException {
         ZipOutputStream outputStream = null;
 
         try {
             checkParameters(parameters);
 
             boolean isZipFileAlreadExists = Files.exists(zipModel.getZipFile());
-
             SplitOutputStream splitOutputStream = SplitOutputStream.create(zipModel);
-
             outputStream = new ZipOutputStream(splitOutputStream, zipModel);
 
             if (isZipFileAlreadExists) {
@@ -139,10 +133,10 @@ public class ZipEngine {
             byte[] readBuff = new byte[InternalZipConstants.BUFF_SIZE];
             int readLen = -1;
 
-            outputStream.putNextEntry(null, parameters);
+            outputStream.putNextEntry(null, fileName, parameters);
 
-            if (!Zip4jUtil.isDirectory(parameters.getFileNameInZip())) {
-                while ((readLen = inputStream.read(readBuff)) != -1) {
+            if (!Zip4jUtil.isDirectory(fileName)) {
+                while ((readLen = in.read(readBuff)) != -1) {
                     outputStream.write(readBuff, 0, readLen);
                 }
             }
