@@ -65,7 +65,7 @@ final class CentralDirectoryReader {
 
         fileHeader.setVersionMadeBy(in.readShort());
         fileHeader.setVersionNeededToExtract(in.readShort());
-        fileHeader.setGeneralPurposeFlag(in.readBytes(2));
+        fileHeader.setGeneralPurposeFlag(in.readShort());
         fileHeader.setCompressionMethod(CompressionMethod.parseValue(in.readShort()));
         fileHeader.setLastModFileTime(in.readInt());
         fileHeader.setCrc32(in.readInt());

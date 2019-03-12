@@ -21,7 +21,6 @@ import lombok.NonNull;
 import lombok.Setter;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.unzip.Unzip;
-import net.lingala.zip4j.util.BitUtils;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.Zip4jUtil;
 
@@ -29,9 +28,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import static net.lingala.zip4j.util.BitUtils.BIT0;
-import static net.lingala.zip4j.util.BitUtils.BIT3;
 
 /**
  * @author Oleg Cherednik
@@ -61,7 +57,8 @@ public class CentralDirectory {
         // size:2 - version needed to extract
         private int versionNeededToExtract;
         // size:2 - general purpose bit flag
-        private byte[] generalPurposeFlag;
+        @NonNull
+        private GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         // size:2 - compression method
         @NonNull
         private CompressionMethod compressionMethod = CompressionMethod.STORE;
@@ -103,11 +100,6 @@ public class CentralDirectory {
         private boolean dataDescriptorExists;
         private Zip64ExtendedInfo zip64ExtendedInfo;
         private AESExtraDataRecord aesExtraDataRecord;
-
-        // TODO should be true, when file name charset is UTF8
-        private boolean fileNameUTF8Encoded;
-
-        // TODO this is data class, this logic should be moved out
 
         /**
          * Extracts file to the specified directory
@@ -167,12 +159,6 @@ public class CentralDirectory {
 
         // -----------
 
-        public void setGeneralPurposeFlag(byte[] generalPurposeFlag) {
-            this.generalPurposeFlag = generalPurposeFlag;
-            fileNameUTF8Encoded = generalPurposeFlag != null && BitUtils.isBitSet(generalPurposeFlag[1], BIT3);
-            dataDescriptorExists = generalPurposeFlag != null && BitUtils.isBitSet(generalPurposeFlag[0], BIT3);
-        }
-
         public boolean isDirectory() {
             return Zip4jUtil.isDirectory(fileName);
         }
@@ -191,12 +177,15 @@ public class CentralDirectory {
         public void setAesExtraDataRecord(AESExtraDataRecord record) {
             aesExtraDataRecord = record;
             encryption = record != null ? Encryption.AES : Encryption.OFF;
-            generalPurposeFlag = generalPurposeFlag != null ? generalPurposeFlag : new byte[2];
-            generalPurposeFlag[0] = (byte)BitUtils.updateBits(generalPurposeFlag[0], BIT0, encryption != Encryption.OFF);
+            generalPurposeFlag.setEncrypted(encryption != Encryption.OFF);
         }
 
         public ExtraDataRecord getExtraDataRecordByHeader(short header) {
             return extraDataRecords.get(header);
+        }
+
+        public void setGeneralPurposeFlag(short data) {
+            generalPurposeFlag.setData(data);
         }
     }
 

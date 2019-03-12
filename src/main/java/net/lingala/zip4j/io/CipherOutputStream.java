@@ -137,7 +137,7 @@ public abstract class CipherOutputStream extends OutputStream {
         if (zipParameters.getEncryption() == Encryption.AES)
             return new AESEncryptor(zipParameters.getPassword(), zipParameters.getAesKeyStrength());
 
-        throw new ZipException("invalid encprytion method");
+        throw new ZipException("invalid encryption method");
     }
 
     private void initZipModel(ZipModel zipModel) {
@@ -366,7 +366,7 @@ public abstract class CipherOutputStream extends OutputStream {
 //        if (zipModel.getCharset() == StandardCharsets.UTF_8 || Zip4jUtil.detectCharset(fileHeader.getFileName().getBytes()) == StandardCharsets.UTF_8)
 //            shortByte[1] = 8;
 
-        fileHeader.setGeneralPurposeFlag(shortByte);
+        fileHeader.setGeneralPurposeFlag((short)(shortByte[1] << 8 | shortByte[0]));
 
         return fileHeader;
     }
@@ -374,7 +374,7 @@ public abstract class CipherOutputStream extends OutputStream {
     private static LocalFileHeader createLocalFileHeader(@NonNull CentralDirectory.FileHeader fileHeader) throws ZipException {
         LocalFileHeader localFileHeader = new LocalFileHeader();
         localFileHeader.setVersionNeededToExtract(fileHeader.getVersionNeededToExtract());
-        localFileHeader.setGeneralPurposeFlag(fileHeader.getGeneralPurposeFlag());
+        localFileHeader.setGeneralPurposeFlag(fileHeader.getGeneralPurposeFlag().getData());
         localFileHeader.setCompressionMethod(fileHeader.getCompressionMethod());
         localFileHeader.setLastModFileTime(fileHeader.getLastModFileTime());
         localFileHeader.setUncompressedSize(fileHeader.getUncompressedSize());
@@ -384,7 +384,6 @@ public abstract class CipherOutputStream extends OutputStream {
         localFileHeader.setAesExtraDataRecord(fileHeader.getAesExtraDataRecord());
         localFileHeader.setCrc32(fileHeader.getCrc32());
         localFileHeader.setCompressedSize(fileHeader.getCompressedSize());
-        localFileHeader.setGeneralPurposeFlag(fileHeader.getGeneralPurposeFlag().clone());
         return localFileHeader;
     }
 

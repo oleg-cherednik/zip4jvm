@@ -43,7 +43,8 @@ public final class CentralDirectoryWriter {
             bytes.copyByteArrayToArrayList(shortByte);
             sizeOfFileHeader += 2;
 
-            bytes.copyByteArrayToArrayList(fileHeader.getGeneralPurposeFlag());
+            Raw.writeShortLittleEndian(shortByte, 0, (short)fileHeader.getGeneralPurposeFlag().getData());
+            bytes.copyByteArrayToArrayList(shortByte);
             sizeOfFileHeader += 2;
 
             Raw.writeShortLittleEndian(shortByte, 0, fileHeader.getCompressionMethod().getValue());

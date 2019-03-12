@@ -19,13 +19,10 @@ package net.lingala.zip4j.model;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import net.lingala.zip4j.util.BitUtils;
 import net.lingala.zip4j.util.InternalZipConstants;
 
 import java.util.Collections;
 import java.util.Map;
-
-import static net.lingala.zip4j.util.BitUtils.BIT0;
 
 @Getter
 @Setter
@@ -36,7 +33,8 @@ public class LocalFileHeader {
     // size:2 - version needed to extract
     private int versionNeededToExtract;
     // size:2 - general purpose bit flag
-    private byte[] generalPurposeFlag;
+    @NonNull
+    private GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
     // size:2 - compression method
     @NonNull
     private CompressionMethod compressionMethod = CompressionMethod.STORE;
@@ -68,7 +66,6 @@ public class LocalFileHeader {
     private Zip64ExtendedInfo zip64ExtendedInfo;
     private AESExtraDataRecord aesExtraDataRecord;
     private boolean writeComprSizeInZip64ExtraRecord;
-    private boolean fileNameUTF8Encoded;
     private byte[] crcBuff;
 
     public short getExtraFileLength(ZipModel zipModel) {
@@ -93,23 +90,29 @@ public class LocalFileHeader {
 
     public void setAesExtraDataRecord(AESExtraDataRecord record) {
         aesExtraDataRecord = record;
-        encryption = record != null ? Encryption.AES : Encryption.OFF;
-        generalPurposeFlag = generalPurposeFlag != null ? generalPurposeFlag : new byte[2];
-        generalPurposeFlag[0] = (byte)BitUtils.updateBits(generalPurposeFlag[0], BIT0, encryption != Encryption.OFF);
+        updateEncryption();
     }
 
     public ExtraDataRecord getExtraDataRecordByHeader(short header) {
         return extraDataRecords.get(header);
     }
 
-    @Getter
-    @Setter
-    public static final class GeneralPurposeFlag {
+    public void setGeneralPurposeFlag(short data) {
+        generalPurposeFlag.setData(data);
+        updateEncryption();
+    }
 
-        private boolean bit0;
-        private boolean bit1;
-        private boolean bit2;
-        private boolean bit3;
+    private void updateEncryption() {
+        if (aesExtraDataRecord != null)
+            encryption = Encryption.AES;
+        else if (generalPurposeFlag.isStrongEncryption())
+            encryption = Encryption.STRONG;
+        else if (generalPurposeFlag.isEncrypted())
+            encryption = Encryption.STANDARD;
+        else
+            encryption = Encryption.OFF;
+
+        generalPurposeFlag.setEncrypted(encryption != Encryption.OFF);
     }
 
 }

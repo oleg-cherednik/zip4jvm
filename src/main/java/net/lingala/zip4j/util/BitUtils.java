@@ -17,6 +17,15 @@ public class BitUtils {
     public static final int BIT6 = 0x40;
     public static final int BIT7 = 0x80;
 
+    public static final int BIT8 = 0x100;
+    public static final int BIT9 = 0x200;
+    public static final int BIT10 = 0x400;
+    public static final int BIT11 = 0x800;
+    public static final int BIT12 = 0x1000;
+    public static final int BIT13 = 0x2000;
+    public static final int BIT14 = 0x4000;
+    public static final int BIT15 = 0x8000;
+
     public long getByte(long val, int i) {
         return (val >> i * 8) & 0xFF;
     }
@@ -43,10 +52,6 @@ public class BitUtils {
         return val | bits;
     }
 
-    public int updateBits(int val, int bits, boolean value) {
-        return value ? setBits(val, bits) : clearBits(val, bits);
-    }
-
     /**
      * Clear selected bit(s) in giving val
      *
@@ -56,5 +61,13 @@ public class BitUtils {
      */
     public static int clearBits(int val, int bits) {
         return val & ~bits;
+    }
+
+    public int updateBits(int val, int bits, boolean value) {
+        return value ? setBits(val, bits) : clearBits(val, bits);
+    }
+
+    public short updateBits(short val, int bits, boolean value) {
+        return (short)updateBits((int)val, bits, value);
     }
 }

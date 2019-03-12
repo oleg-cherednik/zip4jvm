@@ -25,8 +25,7 @@ public final class LocalFileHeaderWriter {
 
         bytes.writeDword(localFileHeader.getSignature());
         bytes.writeWord((short)localFileHeader.getVersionNeededToExtract());
-        // TODO use LocalFileHeader.GeneralPurposeFlag
-        bytes.copyByteArrayToArrayList(localFileHeader.getGeneralPurposeFlag());
+        bytes.writeShort(localFileHeader.getGeneralPurposeFlag().getData());
         bytes.writeWord(localFileHeader.getCompressionMethod().getValue());
         bytes.writeDword(localFileHeader.getLastModFileTime());
         bytes.writeDword((int)localFileHeader.getCrc32());

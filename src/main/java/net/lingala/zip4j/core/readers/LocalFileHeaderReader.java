@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.CompressionMethod;
-import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.ExtraDataRecord;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.Zip64ExtendedInfo;
@@ -31,7 +30,7 @@ public final class LocalFileHeaderReader {
         LocalFileHeader localFileHeader = new LocalFileHeader();
 
         localFileHeader.setVersionNeededToExtract(in.readShort());
-        localFileHeader.setGeneralPurposeFlag(in.readBytes(2));
+        localFileHeader.setGeneralPurposeFlag(in.readShort());
         localFileHeader.setCompressionMethod(CompressionMethod.parseValue(in.readShort()));
         localFileHeader.setLastModFileTime(in.readInt());
         localFileHeader.setCrc32(in.readInt());
@@ -46,19 +45,6 @@ public final class LocalFileHeaderReader {
         localFileHeader.setPassword(fileHeader.getPassword());
         localFileHeader.setZip64ExtendedInfo(readZip64ExtendedInfo(localFileHeader));
         localFileHeader.setAesExtraDataRecord(CentralDirectoryReader.readAESExtraDataRecord(localFileHeader.getExtraDataRecords()));
-
-        if (localFileHeader.getEncryption() == Encryption.AES) {
-            //Do nothing
-        } else if (localFileHeader.getEncryption() != Encryption.OFF) {
-            if ((localFileHeader.getGeneralPurposeFlag()[0] & 64) == 64) {
-                //hardcoded for now
-                localFileHeader.setEncryption(Encryption.STRONG);
-            } else {
-                localFileHeader.setEncryption(Encryption.STANDARD);
-//						localFileHeader.setCompressedSize(localFileHeader.getCompressedSize()
-//								- ZipConstants.STD_DEC_HDR_SIZE);
-            }
-        }
 
         if (localFileHeader.getCrc32() <= 0)
             localFileHeader.setCrc32(fileHeader.getCrc32());
