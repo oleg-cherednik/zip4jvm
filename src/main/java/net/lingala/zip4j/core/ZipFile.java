@@ -68,7 +68,6 @@ public class ZipFile {
 
     private ZipModel zipModel;
     private boolean isEncrypted;
-    private boolean runInThread;
     @NonNull
     private Charset charset = Charset.defaultCharset();
 
@@ -225,7 +224,7 @@ public class ZipFile {
         readOrCreateModel();
         checkSplitArchiveModification();
 
-        new ZipEngine(zipModel).addFiles(files, parameters, runInThread);
+        new ZipEngine(zipModel).addFiles(files, parameters);
     }
 
     private void checkSplitArchiveModification() throws ZipException {
@@ -296,7 +295,7 @@ public class ZipFile {
             }
         }
 
-        new ZipEngine(zipModel).addFolderToZip(path, parameters, runInThread);
+        new ZipEngine(zipModel).addFolderToZip(path, parameters);
 
     }
 
@@ -308,12 +307,10 @@ public class ZipFile {
      * no effect for this method and hence this method cannot be used to add content to zip in
      * thread mode
      *
-     * @param meta
      * @param parameters
      * @throws ZipException
      */
     public void addStream(@NonNull Collection<InputStreamMeta> files, @NonNull ZipParameters parameters) throws ZipException {
-        runInThread = false;
         readOrCreateModel();
 
         if (Files.exists(path) && zipModel.isSplitArchive())
@@ -382,7 +379,7 @@ public class ZipFile {
         }
 
         Unzip unzip = new Unzip(zipModel);
-        unzip.extractAll(unzipParameters, destPath, runInThread);
+        unzip.extractAll(unzipParameters, destPath);
 
     }
 
@@ -438,7 +435,7 @@ public class ZipFile {
         }
 
         zipModel = readZipModel();
-        extractFile(fileHeader, zipModel, destPath, unzipParameters, newFileName, runInThread);
+        extractFile(fileHeader, zipModel, destPath, unzipParameters, newFileName);
 
     }
 
@@ -525,7 +522,7 @@ public class ZipFile {
             throw new ZipException("path header not found for given path name, cannot extract path");
         }
 
-        extractFile(fileHeader, zipModel, destPath, unzipParameters, newFileName, runInThread);
+        extractFile(fileHeader, zipModel, destPath, unzipParameters, newFileName);
     }
 
     /**
@@ -541,8 +538,7 @@ public class ZipFile {
      * @throws ZipException
      */
     private void extractFile(CentralDirectory.FileHeader fileHeader, ZipModel zipModel, String outPath,
-            UnzipParameters unzipParameters, String newFileName,
-            boolean runInThread) throws ZipException {
+            UnzipParameters unzipParameters, String newFileName) throws ZipException {
         if (zipModel == null) {
             throw new ZipException("input zipModel is null");
         }
@@ -555,7 +551,7 @@ public class ZipFile {
             throw new ZipException("invalid file header");
         }
         Unzip unzip = new Unzip(zipModel);
-        unzip.extractFile(fileHeader, outPath, unzipParameters, newFileName, runInThread);
+        unzip.extractFile(fileHeader, outPath, unzipParameters, newFileName);
     }
 
     /**
@@ -701,7 +697,7 @@ public class ZipFile {
         readOrCreateModel();
         checkSplitArchiveModification();
 
-        new ZipEngine(zipModel).removeFile(fileHeader, runInThread);
+        new ZipEngine(zipModel).removeFile(fileHeader);
     }
 
     /**
@@ -727,7 +723,7 @@ public class ZipFile {
         }
 
         ArchiveMaintainer archiveMaintainer = new ArchiveMaintainer();
-        archiveMaintainer.mergeSplitZipFiles(zipModel, outputZipFile, runInThread);
+        archiveMaintainer.mergeSplitZipFiles(zipModel, outputZipFile);
     }
 
     /**
@@ -862,13 +858,5 @@ public class ZipFile {
     public List<File> getSplitZipFiles() throws ZipException {
         readOrCreateModel();
         return Zip4jUtil.getSplitZipFiles(zipModel);
-    }
-
-    public boolean isRunInThread() {
-        return runInThread;
-    }
-
-    public void setRunInThread(boolean runInThread) {
-        this.runInThread = runInThread;
     }
 }

@@ -30,7 +30,6 @@ import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.ArchiveMaintainer;
 import net.lingala.zip4j.util.ChecksumCalculator;
-import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.Zip4jUtil;
 import org.apache.commons.io.IOUtils;
 
@@ -52,29 +51,10 @@ public class ZipEngine {
     private final ZipModel zipModel;
     private final ArchiveMaintainer archiveMaintainer = new ArchiveMaintainer();
 
-    public void addFiles(@NonNull Collection<Path> files, @NonNull ZipParameters parameters, boolean runInThread) throws ZipException, IOException {
+    public void addFiles(@NonNull Collection<Path> files, @NonNull ZipParameters parameters) throws ZipException, IOException {
         if (files.isEmpty())
             return;
 
-        if (runInThread) {
-            Thread thread = new Thread(InternalZipConstants.THREAD_NAME) {
-                @Override
-                public void run() {
-                    try {
-                        initAddFiles(files, parameters);
-                    } catch(Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            };
-            thread.start();
-
-        } else {
-            initAddFiles(files, parameters);
-        }
-    }
-
-    private void initAddFiles(@NonNull Collection<Path> files, @NonNull ZipParameters parameters) throws ZipException, IOException {
         zipModel.createEndCentralDirectoryIfNotExist();
         checkParameters(parameters);
 
@@ -145,7 +125,7 @@ public class ZipEngine {
         }
     }
 
-    public void addFolderToZip(File file, ZipParameters parameters, boolean runInThread) throws ZipException, IOException {
+    public void addFolderToZip(File file, ZipParameters parameters) throws ZipException, IOException {
         if (file == null || parameters == null) {
             throw new ZipException("one of the input parameters is null, cannot add folder to zip");
         }
@@ -186,7 +166,7 @@ public class ZipEngine {
             files.add(file.toPath());
         }
 
-        addFiles(files, parameters, runInThread);
+        addFiles(files, parameters);
     }
 
 
@@ -211,11 +191,11 @@ public class ZipEngine {
     }
 
     public void removeFile(String fileName) throws ZipException {
-        removeFile(zipModel.getFileHeader(fileName), false);
+        removeFile(zipModel.getFileHeader(fileName));
     }
 
-    public void removeFile(CentralDirectory.FileHeader fileHeader, boolean runInThread) throws ZipException {
-        archiveMaintainer.removeZipFile(zipModel, fileHeader, runInThread);
+    public void removeFile(CentralDirectory.FileHeader fileHeader) throws ZipException {
+        archiveMaintainer.removeZipFile(zipModel, fileHeader);
     }
 
     /**
@@ -229,7 +209,7 @@ public class ZipEngine {
      */
     private void removeFilesIfExists(@NonNull Collection<Path> files, ZipParameters parameters) throws ZipException {
         for (Path file : files)
-            removeFile(zipModel.getFileHeader(parameters.getRelativeFileName(file)), false);
+            removeFile(zipModel.getFileHeader(parameters.getRelativeFileName(file)));
     }
 
 }

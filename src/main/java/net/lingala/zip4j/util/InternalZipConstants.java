@@ -116,6 +116,5 @@ public interface InternalZipConstants {
     Charset CHARSET_DEFAULT = Charset.defaultCharset();
 
     String FILE_SEPARATOR = System.getProperty("file.separator");
-    public static final String THREAD_NAME = "Zip4j";
     public static final int MAX_ALLOWED_ZIP_COMMENT_LENGTH = 0xFFFF;
 }

@@ -41,22 +41,11 @@ import java.util.List;
 
 public class ArchiveMaintainer {
 
-    public void removeZipFile(ZipModel zipModel, CentralDirectory.FileHeader fileHeader, boolean runInThread) throws ZipException {
+    public void removeZipFile(ZipModel zipModel, CentralDirectory.FileHeader fileHeader) throws ZipException {
         if (fileHeader == null)
             return;
 
-        if (runInThread) {
-            Thread thread = new Thread(InternalZipConstants.THREAD_NAME) {
-                public void run() {
-                    try {
-                        initRemoveZipFile(zipModel, fileHeader);
-                    } catch(ZipException e) {
-                    }
-                }
-            };
-            thread.start();
-        } else
-            initRemoveZipFile(zipModel, fileHeader);
+        initRemoveZipFile(zipModel, fileHeader);
     }
 
     private void initRemoveZipFile(@NonNull ZipModel zipModel, @NonNull CentralDirectory.FileHeader fileHeader) throws ZipException {
@@ -278,20 +267,8 @@ public class ArchiveMaintainer {
      * @param zipModel
      * @throws ZipException
      */
-    public void mergeSplitZipFiles(final ZipModel zipModel, final File outputZipFile, boolean runInThread) throws ZipException {
-        if (runInThread) {
-            Thread thread = new Thread(InternalZipConstants.THREAD_NAME) {
-                public void run() {
-                    try {
-                        initMergeSplitZipFile(zipModel, outputZipFile);
-                    } catch(ZipException e) {
-                    }
-                }
-            };
-            thread.start();
-        } else {
-            initMergeSplitZipFile(zipModel, outputZipFile);
-        }
+    public void mergeSplitZipFiles(final ZipModel zipModel, final File outputZipFile) throws ZipException {
+        initMergeSplitZipFile(zipModel, outputZipFile);
     }
 
     private void initMergeSplitZipFile(ZipModel zipModel, File outputZipFile) throws ZipException {

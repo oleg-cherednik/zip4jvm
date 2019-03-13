@@ -40,8 +40,7 @@ public class Unzip {
         this.zipModel = zipModel;
     }
 
-    public void extractAll(final UnzipParameters unzipParameters, final String outPath,
-            boolean runInThread) throws ZipException {
+    public void extractAll(final UnzipParameters unzipParameters, final String outPath) throws ZipException {
 
         CentralDirectory centralDirectory = zipModel.getCentralDirectory();
 
@@ -52,20 +51,7 @@ public class Unzip {
 
         final List<CentralDirectory.FileHeader> fileHeaders = centralDirectory.getFileHeaders();
 
-        if (runInThread) {
-            Thread thread = new Thread(InternalZipConstants.THREAD_NAME) {
-                public void run() {
-                    try {
-                        initExtractAll(fileHeaders, unzipParameters, outPath);
-                    } catch(ZipException e) {
-                    }
-                }
-            };
-            thread.start();
-        } else {
-            initExtractAll(fileHeaders, unzipParameters, outPath);
-        }
-
+        initExtractAll(fileHeaders, unzipParameters, outPath);
     }
 
     private void initExtractAll(List<CentralDirectory.FileHeader> fileHeaders, UnzipParameters unzipParameters,
@@ -78,25 +64,12 @@ public class Unzip {
     }
 
     public void extractFile(final CentralDirectory.FileHeader fileHeader, final String outPath,
-            final UnzipParameters unzipParameters, final String newFileName,
-            boolean runInThread) throws ZipException {
+            final UnzipParameters unzipParameters, final String newFileName) throws ZipException {
         if (fileHeader == null) {
             throw new ZipException("fileHeader is null");
         }
 
-        if (runInThread) {
-            Thread thread = new Thread(InternalZipConstants.THREAD_NAME) {
-                public void run() {
-                    try {
-                        initExtractFile(fileHeader, outPath, unzipParameters, newFileName);
-                    } catch(ZipException e) {
-                    }
-                }
-            };
-            thread.start();
-        } else {
-            initExtractFile(fileHeader, outPath, unzipParameters, newFileName);
-        }
+        initExtractFile(fileHeader, outPath, unzipParameters, newFileName);
 
     }
 
