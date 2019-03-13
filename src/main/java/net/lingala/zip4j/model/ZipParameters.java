@@ -57,6 +57,8 @@ public class ZipParameters {
     private long sourceFileCRC;
     private String defaultFolderPath;
     private boolean isSourceExternalStream;
+    @Builder.Default
+    private long splitLength = ZipModel.NO_SPLIT;
 
     /**
      * Sets the password for the zip file or the file being added<br>

@@ -33,13 +33,13 @@ public final class ZipFileDir {
 
     private ZipModel zipModel;
 
-    public void addFolder(@NonNull Path dir, @NonNull ZipParameters parameters, long splitLength) throws ZipException, IOException {
+    public void addFolder(@NonNull Path dir, @NonNull ZipParameters parameters) throws ZipException, IOException {
         dir = Files.isRegularFile(dir) ? dir.getParent() : dir;
         parameters.setDefaultFolderPath(dir.toString());
 
         // TODO check cannot add new files to exited split archive
         zipModel = ZipFile.readOrCreateModel(zipModel, path, charset);
-        zipModel.setSplitLength(splitLength);
+        zipModel.setSplitLength(parameters.getSplitLength());
         new ZipEngine(zipModel).addFiles(getDirectoryEntries(dir), parameters);
     }
 

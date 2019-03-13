@@ -80,17 +80,13 @@ public class ZipFile {
      * @throws ZipException
      */
     public void addFiles(Collection<Path> files, ZipParameters parameters) throws ZipException, IOException {
-        addFiles(files, parameters, ZipModel.NO_SPLIT);
-    }
-
-    public void addFiles(Collection<Path> files, ZipParameters parameters, long splitLength) throws ZipException, IOException {
         Objects.requireNonNull(files);
         Objects.requireNonNull(parameters);
 
         zipModel = readOrCreateModel();
         checkSplitArchiveModification();
 
-        zipModel.setSplitLength(splitLength);
+        zipModel.setSplitLength(parameters.getSplitLength());
 
         new ZipEngine(zipModel).addFiles(files, parameters);
     }

@@ -125,8 +125,9 @@ public class ApplicationTest {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
-                                                .defaultFolderPath(srcDir.toString()).build();
-        new ZipFileDir(destDir.resolve("src.zip")).addFolder(srcDir, parameters, 1024 * 1024);
+                                                .defaultFolderPath(srcDir.toString())
+                                                .splitLength(1024 * 1024).build();
+        new ZipFileDir(destDir.resolve("src.zip")).addFolder(srcDir, parameters);
 
         checkDestinationDir(10);
 //        checkResultDir();

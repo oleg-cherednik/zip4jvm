@@ -22,10 +22,11 @@ import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.ZipParameters;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Demonstrated how to create a split zip file
@@ -40,10 +41,10 @@ public class CreateSplitZipFile {
 
         // Build the list of files to be added in the array list
         // Objects of type File have to be added to the ArrayList
-        ArrayList filesToAdd = new ArrayList();
-        filesToAdd.add(new File("c:\\ZipTest\\sample.txt"));
-        filesToAdd.add(new File("c:\\ZipTest\\myvideo.avi"));
-        filesToAdd.add(new File("c:\\ZipTest\\mysong.mp3"));
+        List<Path> filesToAdd = Arrays.asList(
+                Paths.get("c:\\ZipTest\\sample.txt"),
+                Paths.get("c:\\ZipTest\\myvideo.avi"),
+                Paths.get("c:\\ZipTest\\mysong.mp3"));
 
         // Initiate Zip Parameters which define various properties such
         // as compression method, etc.
@@ -53,14 +54,15 @@ public class CreateSplitZipFile {
                                                 .compressionMethod(CompressionMethod.DEFLATE)
 
                                                 // Set the compression level. This value has to be in between 0 to 9
-                                                .compressionLevel(CompressionLevel.NORMAL).build();
+                                                .compressionLevel(CompressionLevel.NORMAL)
+                                                .splitLength(10485760).build();
 
         // Create a split file by setting splitArchive parameter to true
         // and specifying the splitLength. SplitLenth has to be greater than
         // 65536 bytes
         // Please note: If the zip file already exists, then this method throws an
         // exception
-        zipFile.createZipFile(filesToAdd, parameters, 10485760);
+        zipFile.addFiles(filesToAdd, parameters);
     }
 
     /**

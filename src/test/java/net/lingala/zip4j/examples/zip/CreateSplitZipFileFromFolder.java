@@ -43,14 +43,16 @@ public class CreateSplitZipFileFromFolder {
                                                 .compressionMethod(CompressionMethod.DEFLATE)
 
                                                 // Set the compression level. This value has to be in between 0 to 9
-                                                .compressionLevel(CompressionLevel.NORMAL).build();
+                                                .compressionLevel(CompressionLevel.NORMAL)
+                                                .splitLength(10485760)
+                                                .build();
 
         // Create a split file by setting splitArchive parameter to true
         // and specifying the splitLength. SplitLenth has to be greater than
         // 65536 bytes
         // Please note: If the zip file already exists, then this method throws an
         // exception
-        new ZipFileDir(Paths.get("c:\\ZipTest\\CreateSplitZipFileFromFolder.zip")).addFolder(Paths.get("C:\\ZipTest"), parameters, 10485760);
+        new ZipFileDir(Paths.get("c:\\ZipTest\\CreateSplitZipFileFromFolder.zip")).addFolder(Paths.get("C:\\ZipTest"), parameters);
     }
 
     /**
