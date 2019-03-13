@@ -16,7 +16,7 @@
 
 package net.lingala.zip4j.examples.zip;
 
-import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.core.ZipFileDir;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
@@ -34,7 +34,6 @@ public class AddFolder {
 
     public AddFolder() throws ZipException, IOException {
         // Initiate ZipFile object with the path/name of the zip file.
-        ZipFile zipFile = new ZipFile(Paths.get("c:\\ZipTest\\AddFolder.zip"));
 
         // Folder to add
         String folderToAdd = "c:\\FolderToAdd";
@@ -50,7 +49,7 @@ public class AddFolder {
         .compressionLevel(CompressionLevel.NORMAL).build();
 
         // Add folder to the zip file
-        zipFile.addFolder(folderToAdd, parameters);
+        new ZipFileDir(Paths.get("c:\\ZipTest\\AddFolder.zip")).addFolder(folderToAdd, parameters);
     }
 
     public static void main(String[] args) throws ZipException, IOException {
