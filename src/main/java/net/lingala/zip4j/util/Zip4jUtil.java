@@ -27,11 +27,8 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @SuppressWarnings("MethodCanBeVariableArityMethod")
 public class Zip4jUtil {
@@ -234,35 +231,6 @@ public class Zip4jUtil {
             }
         }
         return -1;
-    }
-
-    public static List<File> getFilesInDirectoryRec(File path,
-            boolean readHiddenFiles) throws ZipException {
-
-        if (path == null) {
-            throw new ZipException("input path is null, cannot read files in the directory");
-        }
-
-        List<File> result = new ArrayList<>();
-        File[] filesAndDirs = path.listFiles();
-        List<File> filesDirs = filesAndDirs == null ? Collections.emptyList() : Arrays.stream(filesAndDirs).collect(Collectors.toList());
-
-        if (!path.canRead()) {
-            return result;
-        }
-
-        for (int i = 0; i < filesDirs.size(); i++) {
-            File file = filesDirs.get(i);
-            if (file.isHidden() && !readHiddenFiles) {
-                return result;
-            }
-            result.add(file);
-            if (file.isDirectory()) {
-                List<File> deeperList = getFilesInDirectoryRec(file, readHiddenFiles);
-                result.addAll(deeperList);
-            }
-        }
-        return result;
     }
 
     /**

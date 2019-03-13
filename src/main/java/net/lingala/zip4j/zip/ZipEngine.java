@@ -30,19 +30,14 @@ import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.ArchiveMaintainer;
 import net.lingala.zip4j.util.ChecksumCalculator;
-import net.lingala.zip4j.util.Zip4jUtil;
 import org.apache.commons.io.IOUtils;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class ZipEngine {
@@ -124,51 +119,6 @@ public class ZipEngine {
             throw new ZipException(e);
         }
     }
-
-    public void addFolderToZip(File file, ZipParameters parameters) throws ZipException, IOException {
-        if (file == null || parameters == null) {
-            throw new ZipException("one of the input parameters is null, cannot add folder to zip");
-        }
-
-        if (!new File(file.getAbsolutePath()).exists()) {
-            throw new ZipException("input folder does not exist");
-        }
-
-        if (!file.isDirectory()) {
-            throw new ZipException("input file is not a folder, user addFileToZip method to add files");
-        }
-
-        if (!Zip4jUtil.checkFileReadAccess(file.getAbsolutePath())) {
-            throw new ZipException("cannot read folder: " + file.getAbsolutePath());
-        }
-
-        String rootFolderPath = null;
-        if (parameters.isIncludeRootFolder()) {
-            if (file.getAbsolutePath() != null) {
-                rootFolderPath = file.getAbsoluteFile().getParentFile() != null ? file.getAbsoluteFile().getParentFile().getAbsolutePath() : "";
-            } else {
-                rootFolderPath = file.getParentFile() != null ? file.getParentFile().getAbsolutePath() : "";
-            }
-        } else {
-            rootFolderPath = file.getAbsolutePath();
-        }
-
-        parameters.setDefaultFolderPath(rootFolderPath);
-
-        List<Path> files = Zip4jUtil.getFilesInDirectoryRec(file, parameters.isReadHiddenFiles()).stream()
-                                    .map(File::toPath)
-                                    .collect(Collectors.toList());
-
-        if (parameters.isIncludeRootFolder()) {
-            if (files == null) {
-                files = new ArrayList();
-            }
-            files.add(file.toPath());
-        }
-
-        addFiles(files, parameters);
-    }
-
 
     private void checkParameters(ZipParameters parameters) throws ZipException {
         if ((parameters.getCompressionMethod() != CompressionMethod.STORE) && parameters.getCompressionMethod() != CompressionMethod.DEFLATE)

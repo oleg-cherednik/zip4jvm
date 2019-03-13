@@ -20,6 +20,7 @@ import net.lingala.zip4j.core.ZipFileDir;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
+import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
 
 import java.io.IOException;
@@ -49,7 +50,7 @@ public class AddFolder {
         .compressionLevel(CompressionLevel.NORMAL).build();
 
         // Add folder to the zip file
-        new ZipFileDir(Paths.get("c:\\ZipTest\\AddFolder.zip")).addFolder(folderToAdd, parameters);
+        new ZipFileDir(Paths.get("c:\\ZipTest\\AddFolder.zip")).addFolder(Paths.get(folderToAdd), parameters, ZipModel.NO_SPLIT);
     }
 
     public static void main(String[] args) throws ZipException, IOException {

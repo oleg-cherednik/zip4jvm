@@ -1,7 +1,7 @@
 package net.lingala.zip4j.examples;
 
-import lombok.NonNull;
 import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.core.ZipFileDir;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.AESStrength;
 import net.lingala.zip4j.model.CompressionLevel;
@@ -13,7 +13,6 @@ import org.apache.commons.io.FileUtils;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,7 +21,6 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -124,13 +122,11 @@ public class ApplicationTest {
     }
 
     public void addFolderNew() throws ZipException, IOException {
-        ZipFile zipFile = new ZipFile(destDir.resolve("src.zip"));
-        List<File> filesToAdd = getDirectoryEntries(srcDir);
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .defaultFolderPath(srcDir.toString()).build();
-        zipFile.createZipFile(filesToAdd, parameters, 1024 * 1024);
+        new ZipFileDir(destDir.resolve("src.zip")).addFolder(srcDir, parameters, 1024 * 1024);
 
         checkDestinationDir(10);
 //        checkResultDir();
@@ -147,18 +143,6 @@ public class ApplicationTest {
                 new InputStreamMeta(new FileInputStream(srcDir.resolve("saint-petersburg.jpg").toFile()), "one_one/one.jpg"),
                 new InputStreamMeta(new FileInputStream(srcDir.resolve("cars/bentley-continental.jpg").toFile()), "two_two/two.jpg"));
         zipFile.addStream(files, parameters);
-    }
-
-    @NonNull
-    private static List<File> getDirectoryEntries(@NonNull Path dir) {
-        try {
-            return Files.walk(dir)
-                        .filter(path -> Files.isRegularFile(path) || Files.isDirectory(path))
-                        .map(Path::toFile)
-                        .collect(Collectors.toList());
-        } catch(IOException e) {
-            return Collections.emptyList();
-        }
     }
 
 //    public void shouldZipAndUnzipWithSinglePart() throws Exception {
