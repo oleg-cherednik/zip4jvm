@@ -107,7 +107,7 @@ public class ApplicationTest {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
-                                                .encryption(Encryption.AES)
+                                                .encryption(Encryption.STANDARD)
                                                 .aesKeyStrength(AESStrength.STRENGTH_256)
                                                 .password("1".toCharArray())
                                                 .defaultFolderPath(srcDir.toString()).build();

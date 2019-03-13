@@ -82,24 +82,23 @@ public class ZipEngine {
             out.seek(zipModel.getOffOfStartOfCentralDir());
 
             for (Path file : files) {
-                removeFile(zipModel.getFileHeader(parameters.getRelativeFileName(file)), false);
-
-                String fileName = parameters.getRelativeFileName(file);
-
-                if (Zip4jUtil.isDirectory(fileName))
+                if (file == null)
                     continue;
 
-                ZipParameters fileParameters = parameters.toBuilder().build();
+                String fileName = parameters.getRelativeFileName(file);
+                removeFile(fileName);
+
+                ZipParameters params = parameters.toBuilder().build();
 
                 if (Files.isRegularFile(file)) {
-                    if (fileParameters.getEncryption() == Encryption.STANDARD)
-                        fileParameters.setSourceFileCRC(new ChecksumCalculator(file).calculate());
+                    if (params.getEncryption() == Encryption.STANDARD)
+                        params.setSourceFileCRC(new ChecksumCalculator(file).calculate());
 
                     if (Files.size(file) == 0)
-                        fileParameters.setCompressionMethod(CompressionMethod.STORE);
+                        params.setCompressionMethod(CompressionMethod.STORE);
                 }
 
-                out.putNextEntry(file, null, fileParameters);
+                out.putNextEntry(file, params);
 
                 if (Files.isRegularFile(file)) {
                     try (InputStream in = new FileInputStream(file.toFile())) {
@@ -114,7 +113,8 @@ public class ZipEngine {
         }
     }
 
-    public void addStreamToZip(@NonNull Collection<InputStreamMeta> files, @NonNull ZipParameters parameters) throws ZipException {
+    public void addStreamToZip(@NonNull Collection<InputStreamMeta> files, @NonNull final ZipParameters parameters) throws ZipException {
+        zipModel.createEndCentralDirectoryIfNotExist();
         checkParameters(parameters);
 
         try (ZipOutputStream out = new ZipOutputStream(SplitOutputStream.create(zipModel), zipModel)) {
@@ -124,7 +124,13 @@ public class ZipEngine {
                 if (file == null)
                     continue;
 
-                out.putNextEntry(file.getRelativePath(), parameters);
+                // TODO should be relative to the root zip path
+                String fileName = file.getRelativePath();
+                removeFile(fileName);
+
+                ZipParameters params = parameters.toBuilder().build();
+
+                out.putNextEntry(file.getRelativePath(), params);
 
                 if (file.isRegularFile())
                     IOUtils.copy(file.getIn(), out);
@@ -204,10 +210,13 @@ public class ZipEngine {
 
     }
 
+    public void removeFile(String fileName) throws ZipException {
+        removeFile(zipModel.getFileHeader(fileName), false);
+    }
+
     public void removeFile(CentralDirectory.FileHeader fileHeader, boolean runInThread) throws ZipException {
         archiveMaintainer.removeZipFile(zipModel, fileHeader, runInThread);
     }
-
 
     /**
      * Before adding a file to a zip file, we check if a file already exists in the zip file

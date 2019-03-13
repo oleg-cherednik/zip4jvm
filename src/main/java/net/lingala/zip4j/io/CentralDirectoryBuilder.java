@@ -40,6 +40,7 @@ public class CentralDirectoryBuilder {
         String fileName = getFileName();
 
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
+
         fileHeader.setVersionMadeBy(20);
         fileHeader.setVersionNeededToExtract(20);
         updateGeneralPurposeFlag(fileHeader.getGeneralPurposeFlag());
@@ -58,7 +59,7 @@ public class CentralDirectoryBuilder {
         fileHeader.setFileName(fileName);
         fileHeader.setExtraDataRecords(Collections.emptyMap());
         fileHeader.setZip64ExtendedInfo(null);
-        fileHeader.setAesExtraDataRecord(getAesExtraDataRecord(zipParameters.getEncryption()));
+        fileHeader.setAesExtraDataRecord(getAesExtraDataRecord(fileHeader.getEncryption()));
         fileHeader.setFileComment(null);
 
         return fileHeader;
@@ -99,6 +100,8 @@ public class CentralDirectoryBuilder {
         generalPurposeFlag.setCompressionLevel(zipParameters.getCompressionLevel());
         generalPurposeFlag.setDataDescriptorExists(true);
         generalPurposeFlag.setUtf8Enconding(zipModel.getCharset() == StandardCharsets.UTF_8);
+        generalPurposeFlag.setEncrypted(zipParameters.getEncryption() != Encryption.OFF);
+        generalPurposeFlag.setStrongEncryption(zipParameters.getEncryption() == Encryption.STRONG);
     }
 
     private CompressionMethod getCompressionMethod() {

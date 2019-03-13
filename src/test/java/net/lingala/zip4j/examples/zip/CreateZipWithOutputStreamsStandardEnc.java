@@ -84,7 +84,7 @@ public class CreateZipWithOutputStreamsStandardEnc {
 
                 //This will initiate ZipOutputStream to include the file
                 //with the input parameters
-                outputStream.putNextEntry(file.toPath(), null, parameters);
+                outputStream.putNextEntry(file.toPath(), parameters);
 
                 //If this file is a directory, then no further processing is required
                 //and we close the entry (Please note that we do not close the outputstream yet)

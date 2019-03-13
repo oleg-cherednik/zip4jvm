@@ -39,7 +39,7 @@ public abstract class DeflateOutputStream extends CipherOutputStream {
     }
 
     @Override
-    public void putNextEntry(Path file, String fileNameStream, ZipParameters parameters) throws ZipException {
+    protected void putNextEntry(Path file, String fileNameStream, ZipParameters parameters) throws ZipException {
         super.putNextEntry(file, fileNameStream, parameters);
 
         if (parameters.getCompressionMethod() != CompressionMethod.DEFLATE)
