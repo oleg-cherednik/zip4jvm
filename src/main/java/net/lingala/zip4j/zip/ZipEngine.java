@@ -120,7 +120,7 @@ public class ZipEngine {
         }
     }
 
-    private void checkParameters(ZipParameters parameters) throws ZipException {
+    private static void checkParameters(ZipParameters parameters) throws ZipException {
         if ((parameters.getCompressionMethod() != CompressionMethod.STORE) && parameters.getCompressionMethod() != CompressionMethod.DEFLATE)
             throw new ZipException("unsupported compression type");
 
@@ -140,26 +140,12 @@ public class ZipEngine {
 
     }
 
-    public void removeFile(String fileName) throws ZipException {
+    public void removeFile(@NonNull String fileName) throws ZipException {
         removeFile(zipModel.getFileHeader(fileName));
     }
 
     public void removeFile(CentralDirectory.FileHeader fileHeader) throws ZipException {
         archiveMaintainer.removeZipFile(zipModel, fileHeader);
-    }
-
-    /**
-     * Before adding a file to a zip file, we check if a file already exists in the zip file
-     * with the same fileName (including path, if exists). If yes, then we remove this file
-     * before adding the file<br><br>
-     *
-     * <b>Note:</b> Relative path has to be passed as the fileName
-     *
-     * @throws ZipException
-     */
-    private void removeFilesIfExists(@NonNull Collection<Path> files, ZipParameters parameters) throws ZipException {
-        for (Path file : files)
-            removeFile(zipModel.getFileHeader(parameters.getRelativeFileName(file)));
     }
 
 }
