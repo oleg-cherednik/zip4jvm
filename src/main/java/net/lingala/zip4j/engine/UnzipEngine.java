@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.lingala.zip4j.unzip;
+package net.lingala.zip4j.engine;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +50,10 @@ import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.zip.CRC32;
 
 /**
@@ -61,32 +65,55 @@ public class UnzipEngine {
 
     @NonNull
     private final ZipModel zipModel;
-    @NonNull
-    private final CentralDirectory.FileHeader fileHeader;
-    private final CRC32 crc = new CRC32();
+    private CRC32 crc = new CRC32();
+
+    private CentralDirectory.FileHeader fileHeader;
 
     private int currSplitFileCounter = 0;
     private LocalFileHeader localFileHeader;
     private IDecrypter decrypter;
 
-    void unzipFile(@NonNull Path destDir, UnzipParameters unzipParameters) throws ZipException {
-        try {
-            if (fileHeader.isDirectory())
-                Files.createDirectories(destDir.resolve(fileHeader.getFileName()));
-            else
-                copyLarge(destDir);
-        } catch(Exception e) {
-            throw new ZipException(e);
+    public void extractEntries(@NonNull Path destDir, @NonNull UnzipParameters parameters) throws ZipException, IOException {
+        extractEntries(destDir, zipModel.getEntryNames(), parameters);
+    }
+
+    public void extractEntries(@NonNull Path destDir, @NonNull Collection<String> entries, @NonNull UnzipParameters parameters)
+            throws ZipException, IOException {
+        for (CentralDirectory.FileHeader fileHeader : getFileHeaders(entries)) {
+            // TODO remporary
+            this.fileHeader = fileHeader;
+            crc = new CRC32();
+            extractEntry(destDir, fileHeader, parameters);
         }
     }
 
-    private long copyLarge(@NonNull Path destDir) throws IOException, ZipException {
-        try (InputStream in = getInputStream(); OutputStream out = getOutputStream(destDir)) {
-            return IOUtils.copyLarge(in, out);
+    private List<CentralDirectory.FileHeader> getFileHeaders(Collection<String> entries) throws ZipException {
+        List<CentralDirectory.FileHeader> fileHeaders = entries.stream()
+                                                               .map(entryName -> zipModel.getCentralDirectory().getFileHeaderByName(entryName))
+                                                               .filter(Objects::nonNull)
+                                                               .collect(Collectors.toList());
+
+        if (fileHeaders.size() == entries.size())
+            return fileHeaders;
+
+        throw new ZipException("Not all entries were found");
+    }
+
+    public void extractEntry(@NonNull Path destDir, @NonNull UnzipParameters param) throws ZipException, IOException {
+        extractEntry(destDir, fileHeader, param);
+    }
+
+    private void extractEntry(Path destDir, CentralDirectory.FileHeader fileHeader, UnzipParameters parameters) throws ZipException, IOException {
+        if (fileHeader.isDirectory())
+            Files.createDirectories(destDir.resolve(fileHeader.getFileName()));
+        else {
+            try (InputStream in = getInputStream(); OutputStream out = getOutputStream(destDir)) {
+                IOUtils.copyLarge(in, out);
+            }
         }
     }
 
-    ZipInputStream getInputStream() throws ZipException, IOException {
+    public ZipInputStream getInputStream() throws ZipException, IOException {
         RandomAccessFile raf = createFileHandler("r");
         String errMsg = "local header and file header do not match";
         //checkSplitFile();
@@ -425,4 +452,5 @@ public class UnzipEngine {
     public LocalFileHeader getLocalFileHeader() {
         return localFileHeader;
     }
+
 }

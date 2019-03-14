@@ -6,6 +6,7 @@ import net.lingala.zip4j.core.ZipFileUnzip;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.UnzipParameters;
 
+import java.io.IOException;
 import java.nio.file.Path;
 
 /**
@@ -18,7 +19,7 @@ public class UnzipIt {
     @NonNull
     private final Path zipFile;
 
-    public void extract(@NonNull Path destDir, @NonNull UnzipParameters parameters) throws ZipException {
+    public void extract(@NonNull Path destDir, @NonNull UnzipParameters parameters) throws ZipException, IOException {
         new ZipFileUnzip(zipFile).extract(destDir, parameters);
     }
 }

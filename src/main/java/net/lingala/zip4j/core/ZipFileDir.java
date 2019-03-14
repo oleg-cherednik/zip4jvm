@@ -7,7 +7,7 @@ import lombok.Setter;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.zip.ZipEngine;
+import net.lingala.zip4j.engine.ZipEngine;
 
 import java.io.IOException;
 import java.nio.charset.Charset;

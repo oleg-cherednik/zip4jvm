@@ -28,10 +28,10 @@ import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.InputStreamMeta;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.unzip.Unzip;
+import net.lingala.zip4j.engine.UnzipEngine;
 import net.lingala.zip4j.util.ArchiveMaintainer;
 import net.lingala.zip4j.util.Zip4jUtil;
-import net.lingala.zip4j.zip.ZipEngine;
+import net.lingala.zip4j.engine.ZipEngine;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
@@ -259,7 +259,7 @@ public class ZipFile {
     }
 
     /**
-     * Merges split zip files into a single zip path without the need to extract the
+     * Merges split zip files into a single zip path without the need to extractEntries the
      * files in the archive
      *
      * @param outputZipFile
@@ -355,7 +355,7 @@ public class ZipFile {
      * @return ZipInputStream
      * @throws ZipException
      */
-    public ZipInputStream getInputStream(CentralDirectory.FileHeader fileHeader) throws ZipException {
+    public ZipInputStream getInputStream(CentralDirectory.FileHeader fileHeader) throws ZipException, IOException {
         if (fileHeader == null) {
             throw new ZipException("FileHeader is null, cannot get InputStream");
         }
@@ -365,8 +365,7 @@ public class ZipFile {
         if (zipModel == null)
             throw new ZipException("zip model is null, cannot get inputstream");
 
-        Unzip unzip = new Unzip(zipModel);
-        return unzip.getInputStream(fileHeader);
+        return new UnzipEngine(zipModel).getInputStream();
     }
 
     /**

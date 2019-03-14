@@ -242,7 +242,7 @@ public class HeaderWriter {
             bytes.copyByteArrayToArrayList(longByte);
 
             //version made by
-            //version needed to extract
+            //version needed to extractEntries
             if (!zipModel.isEmpty()) {
                 Raw.writeShortLittleEndian(shortByte, 0,
                         (short)zipModel.getCentralDirectory().getFileHeaders().get(0).getVersionMadeBy());

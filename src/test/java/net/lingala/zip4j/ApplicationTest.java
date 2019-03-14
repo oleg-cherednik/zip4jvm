@@ -148,7 +148,7 @@ public class ApplicationTest {
 
 //    public void shouldZipAndUnzipWithSinglePart() throws Exception {
 //        Application.main("--add", srcDir.toString(), destDir.toString());
-//        Application.main("--extract", destDir.resolve("src.zip").toString(), destDir.resolve("res").toString());
+//        Application.main("--extractEntries", destDir.resolve("src.zip").toString(), destDir.resolve("res").toString());
 //
 //        checkDestinationDir(1);
 //        checkResultDir();
@@ -156,7 +156,7 @@ public class ApplicationTest {
 
 //    public void shouldZipAndUnzipWithMultipleParts() throws Exception {
 //        Application.main("--add", srcDir.toString(), destDir.toString(), "1MB");
-//        Application.main("--extract", destDir.resolve("src.zip").toString(), destDir.resolve("res").toString());
+//        Application.main("--extractEntries", destDir.resolve("src.zip").toString(), destDir.resolve("res").toString());
 //
 //        checkDestinationDir(10);
 //        checkResultDir();

@@ -6,7 +6,7 @@ import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.zip.ZipEngine;
+import net.lingala.zip4j.engine.ZipEngine;
 import org.apache.commons.lang.NotImplementedException;
 
 import java.io.IOException;

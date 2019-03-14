@@ -19,6 +19,7 @@ package net.lingala.zip4j.examples.extract;
 import net.lingala.zip4j.core.ZipFileUnzip;
 import net.lingala.zip4j.exception.ZipException;
 
+import java.io.IOException;
 import java.nio.file.Paths;
 
 /**
@@ -29,7 +30,7 @@ import java.nio.file.Paths;
 
 public class ExtractSingleFile {
 
-    public ExtractSingleFile() throws ZipException {
+    public ExtractSingleFile() throws ZipException, IOException {
 
         // Initiate ZipFile object with the path/name of the zip file.
         ZipFileUnzip zipFile = new ZipFileUnzip(Paths.get("c:\\ZipTest\\ExtractSingleFile.zip"));
@@ -53,7 +54,7 @@ public class ExtractSingleFile {
     /**
      * @param args
      */
-    public static void main(String[] args) throws ZipException {
+    public static void main(String[] args) throws ZipException, IOException {
         new ExtractSingleFile();
     }
 

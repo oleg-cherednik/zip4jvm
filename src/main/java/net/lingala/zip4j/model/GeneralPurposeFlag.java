@@ -42,9 +42,9 @@ public final class GeneralPurposeFlag {
      *        compression method.)
      *
      * Bit 6: Strong encryption.  If this bit is set, you MUST
-     *        set the version needed to extract value to at least
+     *        set the version needed to extractEntries value to at least
      *        50 and you MUST also set bit 0.  If AES encryption
-     *        is used, the version needed to extract value MUST
+     *        is used, the version needed to extractEntries value MUST
      *        be at least 51. See the section describing the Strong
      *        Encryption Specification for details.  Refer to the
      *        section in this document entitled "Incorporating PKWARE

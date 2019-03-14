@@ -20,7 +20,7 @@ import net.lingala.zip4j.crypto.AESDecrypter;
 import net.lingala.zip4j.crypto.IDecrypter;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.Encryption;
-import net.lingala.zip4j.unzip.UnzipEngine;
+import net.lingala.zip4j.engine.UnzipEngine;
 import net.lingala.zip4j.util.InternalZipConstants;
 
 import java.io.IOException;

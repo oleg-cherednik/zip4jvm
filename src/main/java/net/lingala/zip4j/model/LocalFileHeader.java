@@ -34,7 +34,7 @@ public class LocalFileHeader {
 
     // size:4 - signature (0x04034b50)
     private final int signature = InternalZipConstants.LOCSIG;
-    // size:2 - version needed to extract
+    // size:2 - version needed to extractEntries
     private int versionNeededToExtract;
     // size:2 - general purpose bit flag
     private final GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();

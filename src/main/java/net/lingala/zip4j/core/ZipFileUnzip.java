@@ -8,8 +8,9 @@ import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.UnzipParameters;
 import net.lingala.zip4j.model.ZipModel;
-import net.lingala.zip4j.unzip.Unzip;
+import net.lingala.zip4j.engine.UnzipEngine;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,29 +30,12 @@ public final class ZipFileUnzip {
     private Charset charset = Charset.defaultCharset();
     private ZipModel zipModel;
 
-    public void extract(@NonNull Path destDir, @NonNull UnzipParameters parameters) throws ZipException {
+    public void extract(@NonNull Path destDir, @NonNull UnzipParameters parameters) throws ZipException, IOException {
         checkZipFile();
         checkOutputFolder(destDir);
 
         zipModel = ZipFile.createZipModel(zipFile, charset);
-        new Unzip(zipModel).extract(destDir, parameters);
-    }
-
-    /**
-     * Extracts a specific path from the zip path to the destination path.
-     * If destination path is invalid, then this method throws an exception.
-     *
-     * @param fileHeader
-     * @param destDir
-     * @param unzipParameters
-     * @param newFileName
-     * @throws ZipException
-     */
-    public void extractFile(@NonNull CentralDirectory.FileHeader fileHeader, Path destDir,
-            UnzipParameters unzipParameters, String newFileName) throws ZipException {
-        zipModel = ZipFile.createZipModel(zipFile, charset);
-        internalExtractFile(fileHeader, destDir, unzipParameters);
-
+        new UnzipEngine(zipModel).extractEntries(destDir, parameters);
     }
 
     /**
@@ -59,7 +43,7 @@ public final class ZipFileUnzip {
      * This method first finds the necessary path header from the input path name.
      * <br><br>
      * File name is relative path name in the zip path. For example if a zip path contains
-     * a path "a.txt", then to extract this path, input path name has to be "a.txt". Another
+     * a path "a.txt", then to extractEntries this path, input path name has to be "a.txt". Another
      * example is if there is a path "b.txt" in a folder "abc" in the zip path, then the
      * input path name has to be abc/b.txt
      * <br><br>
@@ -69,7 +53,7 @@ public final class ZipFileUnzip {
      * @param fileName
      * @throws ZipException
      */
-    public void extractFile(String fileName, Path destDir) throws ZipException {
+    public void extractFile(String fileName, Path destDir) throws ZipException, IOException {
         extractFile(fileName, destDir, null);
     }
 
@@ -78,7 +62,7 @@ public final class ZipFileUnzip {
      * This method first finds the necessary path header from the input path name.
      * <br><br>
      * File name is relative path name in the zip path. For example if a zip path contains
-     * a path "a.txt", then to extract this path, input path name has to be "a.txt". Another
+     * a path "a.txt", then to extractEntries this path, input path name has to be "a.txt". Another
      * example is if there is a path "b.txt" in a folder "abc" in the zip path, then the
      * input path name has to be abc/b.txt
      * <br><br>
@@ -93,13 +77,13 @@ public final class ZipFileUnzip {
      * @param unzipParameters
      * @throws ZipException
      */
-    public void extractFile(@NonNull String entryName, Path destDir, UnzipParameters unzipParameters) throws ZipException {
+    public void extractFile(@NonNull String entryName, Path destDir, UnzipParameters unzipParameters) throws ZipException, IOException {
         zipModel = ZipFile.createZipModel(zipFile, charset);
 
         CentralDirectory.FileHeader fileHeader = zipModel.getFileHeader(entryName);
 
         if (fileHeader == null) {
-            throw new ZipException("path header not found for given path name, cannot extract path");
+            throw new ZipException("path header not found for given path name, cannot extractEntries path");
         }
 
         internalExtractFile(fileHeader, destDir, unzipParameters);
@@ -113,14 +97,13 @@ public final class ZipFileUnzip {
      * FileHeader.getFileName
      */
     private void internalExtractFile(CentralDirectory.FileHeader fileHeader, Path destDir,
-            UnzipParameters unzipParameters) throws ZipException {
+            UnzipParameters unzipParameters) throws ZipException, IOException {
         if (zipModel == null) {
             throw new ZipException("input zipModel is null");
         }
 
         checkOutputFolder(destDir);
-
-        new Unzip(zipModel).extractFile(fileHeader.getFileName(), destDir, unzipParameters);
+        new UnzipEngine(zipModel).extractEntry(destDir, unzipParameters);
     }
 
     private void checkZipFile() throws ZipException {

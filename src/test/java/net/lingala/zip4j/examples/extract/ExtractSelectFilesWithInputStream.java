@@ -3,7 +3,7 @@ package net.lingala.zip4j.examples.extract;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.CentralDirectory;
-import net.lingala.zip4j.unzip.UnzipUtil;
+import net.lingala.zip4j.util.UnzipUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -29,7 +29,7 @@ public class ExtractSelectFilesWithInputStream {
 				zipFile.setPassword("password");
 			}
 
-			//Get the FileHeader of the File you want to extract from the
+			//Get the FileHeader of the File you want to extractEntries from the
 			//zip file. Input for the below method is the name of the file
 			//For example: 123.txt or abc/123.txt if the file 123.txt
 			//is inside the directory abc

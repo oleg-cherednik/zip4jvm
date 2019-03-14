@@ -19,7 +19,7 @@ package net.lingala.zip4j.examples.extract;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.CentralDirectory;
-import net.lingala.zip4j.unzip.UnzipUtil;
+import net.lingala.zip4j.util.UnzipUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -30,7 +30,7 @@ import java.util.List;
 
 /**
  * Example demonstrating the use of InputStreams
- * to extract files from the ZipFile
+ * to extractEntries files from the ZipFile
  */
 public class ExtractAllFilesWithInputStreams {
 

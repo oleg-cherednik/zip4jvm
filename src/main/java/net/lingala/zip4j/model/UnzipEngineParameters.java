@@ -17,7 +17,7 @@
 package net.lingala.zip4j.model;
 
 import net.lingala.zip4j.crypto.IDecrypter;
-import net.lingala.zip4j.unzip.UnzipEngine;
+import net.lingala.zip4j.engine.UnzipEngine;
 
 import java.io.FileOutputStream;
 

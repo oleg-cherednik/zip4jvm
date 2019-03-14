@@ -18,7 +18,7 @@ package net.lingala.zip4j.io;
 
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.unzip.UnzipEngine;
+import net.lingala.zip4j.engine.UnzipEngine;
 
 import java.io.IOException;
 import java.io.InputStream;
