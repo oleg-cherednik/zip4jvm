@@ -7,8 +7,6 @@ import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.UnzipParameters;
 import net.lingala.zip4j.model.ZipParameters;
-import org.apache.commons.io.FileUtils;
-import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -42,26 +40,26 @@ public class ZipItDirectoryTest {
     }
 
     //    @BeforeMethod(dependsOnMethods = "createDirectory")
-    public void copyTestData() throws IOException {
-        Path dataDir = Paths.get("src/test/resources/data").toAbsolutePath();
+//    public void copyTestData() throws IOException {
+//        Path dataDir = Paths.get("src/test/resources/data").toAbsolutePath();
+//
+//        Files.walk(dataDir).forEach(path -> {
+//            try {
+//                if (Files.isDirectory(path))
+//                    Files.createDirectories(srcDir.resolve(dataDir.relativize(path)));
+//                else if (Files.isRegularFile(path))
+//                    Files.copy(path, srcDir.resolve(dataDir.relativize(path)));
+//            } catch(IOException e) {
+//                e.printStackTrace();
+//            }
+//        });
+//    }
 
-        Files.walk(dataDir).forEach(path -> {
-            try {
-                if (Files.isDirectory(path))
-                    Files.createDirectories(srcDir.resolve(dataDir.relativize(path)));
-                else if (Files.isRegularFile(path))
-                    Files.copy(path, srcDir.resolve(dataDir.relativize(path)));
-            } catch(IOException e) {
-                e.printStackTrace();
-            }
-        });
-    }
-
-    @AfterMethod
-    public void removeDirectory() throws IOException {
+//    @AfterMethod
+//    public void removeDirectory() throws IOException {
 //        FileUtils.deleteQuietly(root.toFile());
-        FileUtils.deleteQuietly(destDir.toFile());
-    }
+//        FileUtils.deleteQuietly(destDir.toFile());
+//    }
 
     public void shouldZipDirectoryWithSplitArchive() throws ZipException, IOException {
         Path zipFile = destDir.resolve("src.zip");
