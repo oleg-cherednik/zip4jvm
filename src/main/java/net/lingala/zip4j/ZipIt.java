@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
  */
 @Builder
 public final class ZipIt {
+
     @NonNull
     private final Path zipFile;
     @NonNull
@@ -37,7 +38,9 @@ public final class ZipIt {
         assert Files.isDirectory(dir);
 
         dir = Files.isRegularFile(dir) ? dir.getParent() : dir;
-        parameters.setDefaultFolderPath(dir.toString());
+
+        if (parameters.getDefaultFolderPath() == null)
+            parameters.setDefaultFolderPath(dir.toString());
 
         // TODO check cannot add new files to exited split archive
         ZipModel zipModel = ZipFile.createZipModel(zipFile, charset);

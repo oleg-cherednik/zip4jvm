@@ -37,14 +37,14 @@ public class TestUtils {
         checkTextFile(resDir.resolve("Oleg Cherednik.txt"), 41, "Oleg Cherednik\nОлег Чередник");
     }
 
-    private void checkCarsDirectory(Path path) throws IOException {
+    void checkCarsDirectory(Path path) throws IOException {
         checkDirectory(path, 0, 3);
         checkImage(path.resolve("bentley-continental.jpg"), 1_395_362);
         checkImage(path.resolve("ferrari-458-italia.jpg"), 320_894);
         checkImage(path.resolve("wiesmann-gt-mf5.jpg"), 729_633);
     }
 
-    private void checkStarWarsDirectory(Path path) throws IOException {
+    void checkStarWarsDirectory(Path path) throws IOException {
         checkDirectory(path, 0, 4);
         checkImage(path.resolve("0qQnv2v.jpg"), 2_204_448);
         checkImage(path.resolve("080fc325efa248454e59b84be24ea829.jpg"), 277_857);
@@ -52,7 +52,7 @@ public class TestUtils {
         checkImage(path.resolve("star-wars-wallpapers-29931-7188436.jpg"), 1_916_776);
     }
 
-    private void checkEmptyDirectory(Path path) throws IOException {
+    void checkEmptyDirectory(Path path) throws IOException {
         checkDirectory(path, 0, 0);
     }
 
