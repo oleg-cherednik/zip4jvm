@@ -16,7 +16,7 @@
 
 package net.lingala.zip4j.examples.extract;
 
-import net.lingala.zip4j.core.ZipFileUnzip;
+import net.lingala.zip4j.UnzipIt;
 import net.lingala.zip4j.exception.ZipException;
 
 import java.io.IOException;
@@ -34,7 +34,8 @@ public class ExtractAllFiles {
         // Initiate ZipFile object with the path/name of the zip file.
 
         // Extracts all files to the path specified
-        new ZipFileUnzip(Paths.get("c:\\ZipTest\\ExtractAllFiles.zip")).extract(Paths.get("c:\\ZipTest"));
+        UnzipIt unzip = UnzipIt.builder().zipFile(Paths.get("c:\\ZipTest\\ExtractAllFiles.zip")).build();
+        unzip.extract(Paths.get("c:\\ZipTest"));
     }
 
     /**

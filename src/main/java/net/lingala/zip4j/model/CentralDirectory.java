@@ -21,6 +21,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.Zip4jUtil;
+import org.apache.commons.io.FilenameUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,8 +46,10 @@ public class CentralDirectory {
     }
 
     public FileHeader getFileHeaderByName(@NonNull String entryName) {
+        String name = FilenameUtils.normalize(entryName, true);
+
         return fileHeaders.stream()
-                          .filter(fileHeader -> entryName.equalsIgnoreCase(fileHeader.getFileName()))
+                          .filter(fileHeader -> name.equalsIgnoreCase(FilenameUtils.normalize(fileHeader.getFileName(), true)))
                           .findFirst().orElse(null);
     }
 

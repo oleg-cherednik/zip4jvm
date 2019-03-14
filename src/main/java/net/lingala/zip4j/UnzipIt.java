@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 
 /**
  * @author Oleg Cherednik
@@ -30,7 +31,15 @@ public class UnzipIt {
         checkOutputFolder(destDir);
 
         ZipModel zipModel = ZipFile.createZipModel(zipFile, charset);
-        new UnzipEngine(zipModel).extractEntries(destDir);
+        new UnzipEngine(zipModel).extractEntries(destDir, zipModel.getEntryNames());
+    }
+
+    public void extract(@NonNull Path destDir, @NonNull Collection<String> entries) throws ZipException, IOException {
+        checkZipFile();
+        checkOutputFolder(destDir);
+
+        ZipModel zipModel = ZipFile.createZipModel(zipFile, charset);
+        new UnzipEngine(zipModel).extractEntries(destDir, entries);
     }
 
     private void checkZipFile() throws ZipException {

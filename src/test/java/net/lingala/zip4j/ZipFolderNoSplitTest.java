@@ -67,8 +67,7 @@ public class ZipFolderNoSplitTest {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
-                                                .defaultFolderPath(srcDir)
-                                                .build();
+                                                .defaultFolderPath(srcDir).build();
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         zip.add(carsDir, parameters);
 
@@ -94,8 +93,7 @@ public class ZipFolderNoSplitTest {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
-                                                .defaultFolderPath(srcDir)
-                                                .build();
+                                                .defaultFolderPath(srcDir).build();
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         zip.add(starWarsDir, parameters);
 
@@ -122,8 +120,7 @@ public class ZipFolderNoSplitTest {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
-                                                .defaultFolderPath(srcDir)
-                                                .build();
+                                                .defaultFolderPath(srcDir).build();
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         zip.add(emptyDir, parameters);
 

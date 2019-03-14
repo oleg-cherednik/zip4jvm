@@ -72,10 +72,6 @@ public class UnzipEngine {
     private LocalFileHeader localFileHeader;
     private IDecrypter decrypter;
 
-    public void extractEntries(@NonNull Path destDir) throws ZipException, IOException {
-        extractEntries(destDir, zipModel.getEntryNames());
-    }
-
     public void extractEntries(@NonNull Path destDir, @NonNull Collection<String> entries) throws ZipException, IOException {
         for (CentralDirectory.FileHeader fileHeader : getFileHeaders(entries)) {
             // TODO temporary
@@ -86,15 +82,10 @@ public class UnzipEngine {
     }
 
     private List<CentralDirectory.FileHeader> getFileHeaders(Collection<String> entries) throws ZipException {
-        List<CentralDirectory.FileHeader> fileHeaders = entries.stream()
-                                                               .map(entryName -> zipModel.getCentralDirectory().getFileHeaderByName(entryName))
-                                                               .filter(Objects::nonNull)
-                                                               .collect(Collectors.toList());
-
-        if (fileHeaders.size() == entries.size())
-            return fileHeaders;
-
-        throw new ZipException("Not all entries were found");
+        return entries.stream()
+                      .map(entryName -> zipModel.getCentralDirectory().getFileHeaderByName(entryName))
+                      .filter(Objects::nonNull)
+                      .collect(Collectors.toList());
     }
 
     public void extractEntry(@NonNull Path destDir) throws ZipException, IOException {

@@ -29,14 +29,6 @@ public final class ZipFileUnzip {
     private Charset charset = Charset.defaultCharset();
     private ZipModel zipModel;
 
-    public void extract(@NonNull Path destDir) throws ZipException, IOException {
-        checkZipFile();
-        checkOutputFolder(destDir);
-
-        zipModel = ZipFile.createZipModel(zipFile, charset);
-        new UnzipEngine(zipModel).extractEntries(destDir);
-    }
-
     /**
      * Extracts a specific path from the zip path to the destination path.
      * This method first finds the necessary path header from the input path name.

@@ -56,7 +56,7 @@ class TestUtils {
         checkDirectory(path, 0, 0);
     }
 
-    private void checkImage(Path path, long size) throws IOException {
+    void checkImage(Path path, long size) throws IOException {
         assertThat(Files.exists(path)).isTrue();
         assertThat(Files.isRegularFile(path)).isTrue();
         assertThat(Files.size(path)).isEqualTo(size);
