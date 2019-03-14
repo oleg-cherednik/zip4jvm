@@ -30,11 +30,13 @@ import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.ArchiveMaintainer;
 import net.lingala.zip4j.util.ChecksumCalculator;
+import net.lingala.zip4j.util.Zip4jUtil;
 import org.apache.commons.io.IOUtils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -46,8 +48,8 @@ public class ZipEngine {
     private final ZipModel zipModel;
     private final ArchiveMaintainer archiveMaintainer = new ArchiveMaintainer();
 
-    public void addFiles(@NonNull Collection<Path> files, @NonNull ZipParameters parameters) throws ZipException, IOException {
-        if (files.isEmpty())
+    public void addEntries(@NonNull Collection<Path> entries, @NonNull ZipParameters parameters) throws ZipException, IOException {
+        if (entries.isEmpty())
             return;
 
         zipModel.createEndCentralDirectoryIfNotExist();
@@ -56,35 +58,42 @@ public class ZipEngine {
         try (ZipOutputStream out = new ZipOutputStream(SplitOutputStream.create(zipModel), zipModel)) {
             out.seek(zipModel.getOffOfStartOfCentralDir());
 
-            for (Path file : files) {
-                if (file == null)
+            for (Path entry : entries) {
+                if (entry == null)
                     continue;
 
-                String fileName = parameters.getRelativeFileName(file);
+                String fileName = parameters.getRelativeEntryName(entry);
+
+                if(Zip4jUtil.isDirectory(fileName))
+                    continue;
+
                 removeFile(fileName);
 
                 ZipParameters params = parameters.toBuilder().build();
 
-                if (Files.isRegularFile(file)) {
+                if (Files.isRegularFile(entry)) {
                     if (params.getEncryption() == Encryption.STANDARD)
-                        params.setSourceFileCRC(new ChecksumCalculator(file).calculate());
+                        params.setSourceFileCRC(new ChecksumCalculator(entry).calculate());
 
-                    if (Files.size(file) == 0)
+                    if (Files.size(entry) == 0)
                         params.setCompressionMethod(CompressionMethod.STORE);
                 }
 
-                out.putNextEntry(file, params);
+                out.putNextEntry(entry, params);
 
-                if (Files.isRegularFile(file)) {
-                    try (InputStream in = new FileInputStream(file.toFile())) {
-                        IOUtils.copyLarge(in, out);
-                    }
-                }
+                if (Files.isRegularFile(entry))
+                    copyLarge(entry, out);
 
                 out.closeEntry();
             }
 
             out.finish();
+        }
+    }
+
+    private static long copyLarge(@NonNull Path entry, @NonNull OutputStream out) throws IOException {
+        try (InputStream in = new FileInputStream(entry.toFile())) {
+            return IOUtils.copyLarge(in, out);
         }
     }
 

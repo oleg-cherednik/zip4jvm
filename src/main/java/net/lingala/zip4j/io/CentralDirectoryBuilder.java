@@ -85,7 +85,7 @@ public class CentralDirectoryBuilder {
         String fileName = fileNameStream;
 
         if (!zipParameters.isSourceExternalStream())
-            fileName = zipParameters.getRelativeFileName(sourceFile);
+            fileName = zipParameters.getRelativeEntryName(sourceFile);
 
         if (StringUtils.isBlank(fileName))
             throw new IOException("fileName is null or empty. unable to create file header");

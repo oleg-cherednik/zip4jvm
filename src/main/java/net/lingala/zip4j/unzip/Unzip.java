@@ -16,6 +16,8 @@
 
 package net.lingala.zip4j.unzip;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.CentralDirectory;
@@ -27,20 +29,17 @@ import org.apache.commons.lang.StringUtils;
 import java.io.File;
 import java.util.List;
 
-public class Unzip {
+/**
+ * @author Oleg Cherednik
+ * @since 14.03.2019
+ */
+@RequiredArgsConstructor
+public final class Unzip {
 
-    private ZipModel zipModel;
+    @NonNull
+    private final ZipModel zipModel;
 
-    public Unzip(ZipModel zipModel) throws ZipException {
-
-        if (zipModel == null) {
-            throw new ZipException("ZipModel is null");
-        }
-
-        this.zipModel = zipModel;
-    }
-
-    public void extractAll(final UnzipParameters unzipParameters, final String outPath) throws ZipException {
+    public void extract(final UnzipParameters unzipParameters, final String outPath) throws ZipException {
 
         CentralDirectory centralDirectory = zipModel.getCentralDirectory();
 

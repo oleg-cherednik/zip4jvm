@@ -26,7 +26,6 @@ import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.InputStreamMeta;
-import net.lingala.zip4j.model.UnzipParameters;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.unzip.Unzip;
@@ -63,7 +62,7 @@ import java.util.Objects;
 public class ZipFile {
 
     @NonNull
-    private final Path path;
+    private final Path zipFile;
     @NonNull
     private Charset charset = Charset.defaultCharset();
 
@@ -84,15 +83,14 @@ public class ZipFile {
         Objects.requireNonNull(parameters);
 
         zipModel = readOrCreateModel();
+        zipModel.setSplitLength(parameters.getSplitLength());
         checkSplitArchiveModification();
 
-        zipModel.setSplitLength(parameters.getSplitLength());
-
-        new ZipEngine(zipModel).addFiles(files, parameters);
+        new ZipEngine(zipModel).addEntries(files, parameters);
     }
 
     private void checkSplitArchiveModification() throws ZipException {
-        if (Files.exists(path) && zipModel.isSplitArchive())
+        if (Files.exists(zipFile) && zipModel.isSplitArchive())
             throw new ZipException("Zip file already exists. Zip file format does not allow updating split/spanned files");
     }
 
@@ -110,7 +108,7 @@ public class ZipFile {
     public void addStream(@NonNull Collection<InputStreamMeta> files, @NonNull ZipParameters parameters) throws ZipException {
         readOrCreateModel();
 
-        if (Files.exists(path) && zipModel.isSplitArchive())
+        if (Files.exists(zipFile) && zipModel.isSplitArchive())
             throw new ZipException("Zip path already exists. Zip path format does not allow updating split/spanned files");
 
         new ZipEngine(zipModel).addStreamToZip(files, parameters);
@@ -118,241 +116,6 @@ public class ZipFile {
 
     public void addStream(@NonNull InputStreamMeta file, @NonNull ZipParameters parameters) throws ZipException {
         addStream(Collections.singletonList(file), parameters);
-    }
-
-    /**
-     * Reads the zip header information for this zip path. If the zip path
-     * does not exist, then this method throws an exception.<br><br>
-     * <b>Note:</b> This method does not read local path header information
-     *
-     * @throws ZipException
-     */
-    private ZipModel readZipModel() throws ZipException {
-        return readZipModel(zipModel, path, charset);
-    }
-
-    static ZipModel readZipModel(ZipModel zipModel, @NonNull Path path, @NonNull Charset charset) throws ZipException {
-        try {
-            return zipModel == null ? new ZipModelReader(path, charset).read() : zipModel;
-        } catch(IOException e) {
-            throw new ZipException(e);
-        }
-    }
-
-    /**
-     * Extracts all the files in the given zip path to the input destination path.
-     * If zip path does not exist or destination path is invalid then an
-     * exception is thrown.
-     *
-     * @param destPath
-     * @throws ZipException
-     */
-    public void extractAll(String destPath) throws ZipException {
-        extractAll(destPath, null);
-
-    }
-
-    /**
-     * Extracts all the files in the given zip path to the input destination path.
-     * If zip path does not exist or destination path is invalid then an
-     * exception is thrown.
-     *
-     * @param destPath
-     * @param unzipParameters
-     * @throws ZipException
-     */
-    public void extractAll(String destPath,
-            UnzipParameters unzipParameters) throws ZipException {
-
-        if (StringUtils.isBlank(destPath)) {
-            throw new ZipException("output path is null or invalid");
-        }
-
-        if (!Zip4jUtil.checkOutputFolder(destPath)) {
-            throw new ZipException("invalid output path");
-        }
-
-        zipModel = readZipModel();
-
-        // Throw an exception if zipModel is still null
-        if (zipModel == null) {
-            throw new ZipException("Internal error occurred when extracting zip path");
-        }
-
-        Unzip unzip = new Unzip(zipModel);
-        unzip.extractAll(unzipParameters, destPath);
-
-    }
-
-    /**
-     * Extracts a specific path from the zip path to the destination path.
-     * If destination path is invalid, then this method throws an exception.
-     *
-     * @param fileHeader
-     * @param destPath
-     * @throws ZipException
-     */
-    public void extractFile(CentralDirectory.FileHeader fileHeader, String destPath) throws ZipException {
-        extractFile(fileHeader, destPath, null);
-    }
-
-    /**
-     * Extracts a specific path from the zip path to the destination path.
-     * If destination path is invalid, then this method throws an exception.
-     * <br><br>
-     * If newFileName is not null or empty, newly created path name will be replaced by
-     * the value in newFileName. If this value is null, then the path name will be the
-     * value in FileHeader.getFileName
-     *
-     * @param fileHeader
-     * @param destPath
-     * @param unzipParameters
-     * @throws ZipException
-     */
-    public void extractFile(CentralDirectory.FileHeader fileHeader,
-            String destPath, UnzipParameters unzipParameters) throws ZipException {
-        extractFile(fileHeader, destPath, unzipParameters, null);
-    }
-
-    /**
-     * Extracts a specific path from the zip path to the destination path.
-     * If destination path is invalid, then this method throws an exception.
-     *
-     * @param fileHeader
-     * @param destPath
-     * @param unzipParameters
-     * @param newFileName
-     * @throws ZipException
-     */
-    public void extractFile(CentralDirectory.FileHeader fileHeader, String destPath,
-            UnzipParameters unzipParameters, String newFileName) throws ZipException {
-
-        if (fileHeader == null) {
-            throw new ZipException("input path header is null, cannot extract path");
-        }
-
-        if (StringUtils.isBlank(destPath)) {
-            throw new ZipException("destination path is empty or null, cannot extract path");
-        }
-
-        zipModel = readZipModel();
-        extractFile(fileHeader, zipModel, destPath, unzipParameters, newFileName);
-
-    }
-
-    /**
-     * Extracts a specific path from the zip path to the destination path.
-     * This method first finds the necessary path header from the input path name.
-     * <br><br>
-     * File name is relative path name in the zip path. For example if a zip path contains
-     * a path "a.txt", then to extract this path, input path name has to be "a.txt". Another
-     * example is if there is a path "b.txt" in a folder "abc" in the zip path, then the
-     * input path name has to be abc/b.txt
-     * <br><br>
-     * Throws an exception if path header could not be found for the given path name or if
-     * the destination path is invalid
-     *
-     * @param fileName
-     * @param destPath
-     * @throws ZipException
-     */
-    public void extractFile(String fileName, String destPath) throws ZipException {
-        extractFile(fileName, destPath, null);
-    }
-
-    /**
-     * Extracts a specific path from the zip path to the destination path.
-     * This method first finds the necessary path header from the input path name.
-     * <br><br>
-     * File name is relative path name in the zip path. For example if a zip path contains
-     * a path "a.txt", then to extract this path, input path name has to be "a.txt". Another
-     * example is if there is a path "b.txt" in a folder "abc" in the zip path, then the
-     * input path name has to be abc/b.txt
-     * <br><br>
-     * Throws an exception if path header could not be found for the given path name or if
-     * the destination path is invalid
-     *
-     * @param fileName
-     * @param destPath
-     * @param unzipParameters
-     * @throws ZipException
-     */
-    public void extractFile(String fileName,
-            String destPath, UnzipParameters unzipParameters) throws ZipException {
-        extractFile(fileName, destPath, unzipParameters, null);
-    }
-
-    /**
-     * Extracts a specific path from the zip path to the destination path.
-     * This method first finds the necessary path header from the input path name.
-     * <br><br>
-     * File name is relative path name in the zip path. For example if a zip path contains
-     * a path "a.txt", then to extract this path, input path name has to be "a.txt". Another
-     * example is if there is a path "b.txt" in a folder "abc" in the zip path, then the
-     * input path name has to be abc/b.txt
-     * <br><br>
-     * If newFileName is not null or empty, newly created path name will be replaced by
-     * the value in newFileName. If this value is null, then the path name will be the
-     * value in FileHeader.getFileName
-     * <br><br>
-     * Throws an exception if path header could not be found for the given path name or if
-     * the destination path is invalid
-     *
-     * @param fileName
-     * @param destPath
-     * @param unzipParameters
-     * @param newFileName
-     * @throws ZipException
-     */
-    public void extractFile(String fileName, String destPath,
-            UnzipParameters unzipParameters, String newFileName) throws ZipException {
-
-        if (StringUtils.isBlank(fileName)) {
-            throw new ZipException("path to extract is null or empty, cannot extract path");
-        }
-
-        if (StringUtils.isBlank(destPath)) {
-            throw new ZipException("destination string path is empty or null, cannot extract path");
-        }
-
-        zipModel = readZipModel();
-
-        CentralDirectory.FileHeader fileHeader = zipModel.getFileHeader(fileName);
-
-        if (fileHeader == null) {
-            throw new ZipException("path header not found for given path name, cannot extract path");
-        }
-
-        extractFile(fileHeader, zipModel, destPath, unzipParameters, newFileName);
-    }
-
-    /**
-     * Extracts file to the specified directory using any
-     * user defined parameters in UnzipParameters. Output file name
-     * will be overwritten with the value in newFileName. If this
-     * parameter is null, then file name will be the same as in
-     * FileHeader.getFileName
-     *
-     * @param zipModel
-     * @param outPath
-     * @param unzipParameters
-     * @throws ZipException
-     */
-    private void extractFile(CentralDirectory.FileHeader fileHeader, ZipModel zipModel, String outPath,
-            UnzipParameters unzipParameters, String newFileName) throws ZipException {
-        if (zipModel == null) {
-            throw new ZipException("input zipModel is null");
-        }
-
-        if (!Zip4jUtil.checkOutputFolder(outPath)) {
-            throw new ZipException("Invalid output path");
-        }
-
-        if (this == null) {
-            throw new ZipException("invalid file header");
-        }
-        Unzip unzip = new Unzip(zipModel);
-        unzip.extractFile(fileHeader, outPath, unzipParameters, newFileName);
     }
 
     /**
@@ -381,7 +144,7 @@ public class ZipFile {
      */
     public void setPassword(char[] password) throws ZipException {
         if (zipModel == null) {
-            zipModel = readZipModel();
+            zipModel = createZipModel();
             if (zipModel == null) {
                 throw new ZipException("Zip Model is null");
             }
@@ -403,7 +166,7 @@ public class ZipFile {
      * @throws ZipException
      */
     public List<CentralDirectory.FileHeader> getFileHeaders() throws ZipException {
-        zipModel = readZipModel();
+        zipModel = createZipModel();
         return zipModel.getCentralDirectory().getFileHeaders();
     }
 
@@ -420,7 +183,7 @@ public class ZipFile {
             throw new ZipException("input path name is emtpy or null, cannot get FileHeader");
         }
 
-        zipModel = readZipModel();
+        zipModel = createZipModel();
 
         return zipModel.getFileHeader(fileName);
     }
@@ -432,7 +195,7 @@ public class ZipFile {
      * @throws ZipException
      */
     public boolean isEncrypted() throws ZipException {
-        zipModel = readZipModel();
+        zipModel = createZipModel();
 
         if (zipModel.getCentralDirectory() == null || zipModel.getCentralDirectory().getFileHeaders() == null)
             throw new ZipException("invalid zip path");
@@ -450,7 +213,7 @@ public class ZipFile {
      * @throws ZipException
      */
     public boolean isSplitArchive() throws ZipException {
-        zipModel = readZipModel();
+        zipModel = createZipModel();
         return zipModel.isSplitArchive();
 
     }
@@ -471,8 +234,8 @@ public class ZipFile {
             throw new ZipException("path name is empty or null, cannot remove path");
         }
 
-        if (zipModel == null && Files.exists(path))
-            zipModel = readZipModel();
+        if (zipModel == null && Files.exists(zipFile))
+            zipModel = createZipModel();
 
         if (zipModel.isSplitArchive()) {
             throw new ZipException("Zip path format does not allow updating split/spanned files");
@@ -537,12 +300,12 @@ public class ZipFile {
         if (comment == null)
             throw new ZipException("input comment is null, cannot update zip path");
 
-        if (!Files.exists(path))
+        if (!Files.exists(zipFile))
             throw new ZipException("zip path does not exist, cannot set comment for zip path");
 
-        zipModel = readZipModel();
+        zipModel = createZipModel();
 
-        if (this.zipModel == null) {
+        if (zipModel == null) {
             throw new ZipException("zipModel is null, cannot update zip path");
         }
 
@@ -572,7 +335,7 @@ public class ZipFile {
      * @throws ZipException
      */
     public String getComment(@NonNull Charset charset) throws ZipException {
-        if (Files.exists(path))
+        if (Files.exists(zipFile))
             readOrCreateModel();
         else
             throw new ZipException("zip path does not exist, cannot read comment");
@@ -587,26 +350,6 @@ public class ZipFile {
             return null;
 
         return zipModel.getEndCentralDirectory().getComment();
-    }
-
-    private ZipModel readOrCreateModel() throws ZipException {
-        return readOrCreateModel(zipModel, path, charset);
-    }
-
-    static ZipModel readOrCreateModel(ZipModel zipModel, @NonNull Path path, @NonNull Charset charset) throws ZipException {
-        return Files.exists(path) ? readZipModel(zipModel, path, charset) : createZipModel(path, charset);
-    }
-
-    /**
-     * Creates a new instance of zip model
-     *
-     * @throws ZipException
-     */
-    static ZipModel createZipModel(@NonNull Path path, @NonNull Charset charset) {
-        ZipModel zipModel = new ZipModel();
-        zipModel.setZipFile(path);
-        zipModel.setCharset(charset);
-        return zipModel;
     }
 
     /**
@@ -625,9 +368,8 @@ public class ZipFile {
 
         readOrCreateModel();
 
-        if (zipModel == null) {
+        if (zipModel == null)
             throw new ZipException("zip model is null, cannot get inputstream");
-        }
 
         Unzip unzip = new Unzip(zipModel);
         return unzip.getInputStream(fileHeader);
@@ -643,7 +385,7 @@ public class ZipFile {
      */
     public boolean isValidZipFile() {
         try {
-            zipModel = readZipModel();
+            zipModel = createZipModel();
             return true;
         } catch(Exception e) {
             return false;
@@ -662,5 +404,35 @@ public class ZipFile {
     public List<File> getSplitZipFiles() throws ZipException {
         readOrCreateModel();
         return Zip4jUtil.getSplitZipFiles(zipModel);
+    }
+
+    /**
+     * Reads the zip header information for this zip path. If the zip path
+     * does not exist, then this method throws an exception.<br><br>
+     * <b>Note:</b> This method does not read local path header information
+     *
+     * @throws ZipException
+     */
+    private ZipModel createZipModel() throws ZipException {
+        return createZipModel(zipFile, charset);
+    }
+
+    @NonNull
+    static ZipModel createZipModel(@NonNull Path zipFile, @NonNull Charset charset) throws ZipException {
+        try {
+            if (Files.exists(zipFile))
+                return new ZipModelReader(zipFile, charset).read();
+
+            ZipModel zipModel = new ZipModel();
+            zipModel.setZipFile(zipFile);
+            zipModel.setCharset(charset);
+            return zipModel;
+        } catch(IOException e) {
+            throw new ZipException(e);
+        }
+    }
+
+    private ZipModel readOrCreateModel() throws ZipException {
+        return createZipModel(zipFile, charset);
     }
 }

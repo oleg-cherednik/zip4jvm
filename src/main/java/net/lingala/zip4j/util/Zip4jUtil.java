@@ -33,48 +33,6 @@ import java.util.List;
 @SuppressWarnings("MethodCanBeVariableArityMethod")
 public class Zip4jUtil {
 
-    public static boolean checkOutputFolder(String path) throws ZipException {
-        if (StringUtils.isBlank(path)) {
-            throw new ZipException(new NullPointerException("output path is null"));
-        }
-
-        File file = new File(path);
-
-        if (file.exists()) {
-
-            if (!file.isDirectory()) {
-                throw new ZipException("output folder is not valid");
-            }
-
-            if (!file.canWrite()) {
-                throw new ZipException("no write access to output folder");
-            }
-        } else {
-            try {
-                file.mkdirs();
-                if (!file.isDirectory()) {
-                    throw new ZipException("output folder is not valid");
-                }
-
-                if (!file.canWrite()) {
-                    throw new ZipException("no write access to destination folder");
-                }
-
-//				SecurityManager manager = new SecurityManager();
-//				try {
-//					manager.checkWrite(file.getAbsolutePath());
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//					throw new ZipException("no write access to destination folder");
-//				}
-            } catch(Exception e) {
-                throw new ZipException("Cannot create destination folder");
-            }
-        }
-
-        return true;
-    }
-
     public static boolean checkFileReadAccess(String path) throws ZipException {
         if (StringUtils.isBlank(path)) {
             throw new ZipException("path is null");

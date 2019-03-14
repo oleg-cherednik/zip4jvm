@@ -96,8 +96,9 @@ public class ZipParameters {
         this.rootFolderInZip = rootFolderInZip;
     }
 
-    public String getRelativeFileName(Path file) {
-        Path entryPath = file.toAbsolutePath();
+    @NonNull
+    public String getRelativeEntryName(Path entry) {
+        Path entryPath = entry.toAbsolutePath();
         Path rootPath = defaultFolderPath != null ? Paths.get(defaultFolderPath).toAbsolutePath() : entryPath.getParent();
 
         String path = rootPath.relativize(entryPath).toString();

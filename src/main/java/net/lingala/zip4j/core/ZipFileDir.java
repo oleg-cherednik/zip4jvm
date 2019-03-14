@@ -27,10 +27,9 @@ import java.util.stream.Collectors;
 public final class ZipFileDir {
 
     @NonNull
-    private final Path path;
+    private final Path zipFile;
     @NonNull
     private Charset charset = Charset.defaultCharset();
-
     private ZipModel zipModel;
 
     public void addFolder(@NonNull Path dir, @NonNull ZipParameters parameters) throws ZipException, IOException {
@@ -38,9 +37,9 @@ public final class ZipFileDir {
         parameters.setDefaultFolderPath(dir.toString());
 
         // TODO check cannot add new files to exited split archive
-        zipModel = ZipFile.readOrCreateModel(zipModel, path, charset);
+        zipModel = ZipFile.createZipModel(zipFile, charset);
         zipModel.setSplitLength(parameters.getSplitLength());
-        new ZipEngine(zipModel).addFiles(getDirectoryEntries(dir), parameters);
+        new ZipEngine(zipModel).addEntries(getDirectoryEntries(dir), parameters);
     }
 
     @NonNull

@@ -16,12 +16,10 @@
 
 package net.lingala.zip4j.examples.extract;
 
-import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.core.ZipFileUnzip;
 import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.model.CentralDirectory;
 
 import java.nio.file.Paths;
-import java.util.List;
 
 /**
  * Demonstrates extraction of files from a zip file by looping through
@@ -35,23 +33,23 @@ public class ExtractByLoopAllFiles {
     public ExtractByLoopAllFiles() throws ZipException {
 
         // Initiate ZipFile object with the path/name of the zip file.
-        ZipFile zipFile = new ZipFile(Paths.get("c:\\ZipTest\\ExtractByLoopAllFiles.zip"));
+        ZipFileUnzip zipFile = new ZipFileUnzip(Paths.get("c:\\ZipTest\\ExtractByLoopAllFiles.zip"));
 
         // Check to see if the zip file is password protected
-        if (zipFile.isEncrypted()) {
+//        if (zipFile.isEncrypted()) {
             // if yes, then set the password for the zip file
-            zipFile.setPassword("test123!");
-        }
+//            zipFile.setPassword("test123!");
+//        }
 
         // Get the list of file headers from the zip file
-        List fileHeaderList = zipFile.getFileHeaders();
+//        List fileHeaderList = zipFile.getFileHeaders();
 
         // Loop through the file headers
-        for (int i = 0; i < fileHeaderList.size(); i++) {
-            CentralDirectory.FileHeader fileHeader = (CentralDirectory.FileHeader)fileHeaderList.get(i);
-            // Extract the file to the specified destination
-            zipFile.extractFile(fileHeader, "c:\\ZipTest\\");
-        }
+//        for (int i = 0; i < fileHeaderList.size(); i++) {
+//            CentralDirectory.FileHeader fileHeader = (CentralDirectory.FileHeader)fileHeaderList.get(i);
+//            // Extract the file to the specified destination
+//            zipFile.intExtractFile(fileHeader, "c:\\ZipTest\\");
+//        }
 
     }
 
