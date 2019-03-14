@@ -44,6 +44,12 @@ public class CentralDirectory {
         fileHeaders.add(fileHeader);
     }
 
+    public FileHeader getFileHeaderByName(@NonNull String entryName) {
+        return fileHeaders.stream()
+                          .filter(fileHeader -> entryName.equalsIgnoreCase(fileHeader.getFileName()))
+                          .findFirst().orElse(null);
+    }
+
     @Getter
     @Setter
     public static class FileHeader {

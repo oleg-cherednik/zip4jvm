@@ -62,14 +62,14 @@ public class ZipEngine {
                 if (entry == null)
                     continue;
 
-                String fileName = parameters.getRelativeEntryName(entry);
+                String entryName = parameters.getRelativeEntryName(entry);
 
                 // TODO ignore root (it should be done prior)
                 // TODO here could be empty directory ignored (also prior)
-                if ("/".equals(fileName) || "\\".equals(fileName))
+                if ("/".equals(entryName) || "\\".equals(entryName))
                     continue;
 
-                removeFile(fileName);
+                removeFile(entryName);
 
                 ZipParameters params = parameters.toBuilder().build();
 

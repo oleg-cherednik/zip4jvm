@@ -27,6 +27,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -103,6 +104,12 @@ public class ZipModel implements Cloneable {
 
     public boolean isEmpty() {
         return centralDirectory.getFileHeaders().isEmpty();
+    }
+
+    public List<String> getEntryNames() {
+        return centralDirectory.getFileHeaders().stream()
+                               .map(CentralDirectory.FileHeader::getFileName)
+                               .collect(Collectors.toList());
     }
 
     public CentralDirectory.FileHeader getFileHeader(@NonNull String fileName) throws ZipException {
