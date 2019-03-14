@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Oleg Cherednik
@@ -45,12 +46,12 @@ public class CentralDirectory {
         fileHeaders.add(fileHeader);
     }
 
-    public FileHeader getFileHeaderByName(@NonNull String entryName) {
-        String name = FilenameUtils.normalize(entryName, true);
+    public List<FileHeader> getFileHeadersByPrefix(@NonNull String prefix) {
+        String name = FilenameUtils.normalize(prefix.toLowerCase(), true);
 
         return fileHeaders.stream()
-                          .filter(fileHeader -> name.equalsIgnoreCase(FilenameUtils.normalize(fileHeader.getFileName(), true)))
-                          .findFirst().orElse(null);
+                          .filter(fileHeader -> fileHeader.getFileName().toLowerCase().startsWith(name))
+                          .collect(Collectors.toList());
     }
 
     @Getter

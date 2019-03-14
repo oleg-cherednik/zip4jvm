@@ -13,6 +13,7 @@ import net.lingala.zip4j.model.Zip64ExtendedInfo;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.LittleEndianDecorator;
 import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -78,7 +79,7 @@ final class CentralDirectoryReader {
         fileHeader.setInternalFileAttr(in.readBytes(2));
         fileHeader.setExternalFileAttr(in.readBytes(4));
         fileHeader.setOffLocalHeaderRelative(in.readIntAsLong());
-        fileHeader.setFileName(in.readString(fileHeader.getFileNameLength()));
+        fileHeader.setFileName(FilenameUtils.normalize(in.readString(fileHeader.getFileNameLength()), true));
         fileHeader.setExtraDataRecords(readExtraDataRecords(in, fileHeader.getExtraFieldLength()));
         fileHeader.setZip64ExtendedInfo(readZip64ExtendedInfo(fileHeader));
         fileHeader.setAesExtraDataRecord(readAESExtraDataRecord(fileHeader.getExtraDataRecords()));

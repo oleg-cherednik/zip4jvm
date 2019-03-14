@@ -83,7 +83,8 @@ public class UnzipEngine {
 
     private List<CentralDirectory.FileHeader> getFileHeaders(Collection<String> entries) throws ZipException {
         return entries.stream()
-                      .map(entryName -> zipModel.getCentralDirectory().getFileHeaderByName(entryName))
+                      .map(entryName -> zipModel.getCentralDirectory().getFileHeadersByPrefix(entryName))
+                      .flatMap(List::stream)
                       .filter(Objects::nonNull)
                       .collect(Collectors.toList());
     }
