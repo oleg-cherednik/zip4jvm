@@ -32,7 +32,6 @@ import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.LocalFileHeader;
-import net.lingala.zip4j.model.UnzipParameters;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
@@ -73,17 +72,16 @@ public class UnzipEngine {
     private LocalFileHeader localFileHeader;
     private IDecrypter decrypter;
 
-    public void extractEntries(@NonNull Path destDir, @NonNull UnzipParameters parameters) throws ZipException, IOException {
-        extractEntries(destDir, zipModel.getEntryNames(), parameters);
+    public void extractEntries(@NonNull Path destDir) throws ZipException, IOException {
+        extractEntries(destDir, zipModel.getEntryNames());
     }
 
-    public void extractEntries(@NonNull Path destDir, @NonNull Collection<String> entries, @NonNull UnzipParameters parameters)
-            throws ZipException, IOException {
+    public void extractEntries(@NonNull Path destDir, @NonNull Collection<String> entries) throws ZipException, IOException {
         for (CentralDirectory.FileHeader fileHeader : getFileHeaders(entries)) {
             // TODO temporary
             this.fileHeader = fileHeader;
             crc = new CRC32();
-            extractEntry(destDir, fileHeader, parameters);
+            extractEntry(destDir, fileHeader);
         }
     }
 
@@ -99,11 +97,11 @@ public class UnzipEngine {
         throw new ZipException("Not all entries were found");
     }
 
-    public void extractEntry(@NonNull Path destDir, @NonNull UnzipParameters param) throws ZipException, IOException {
-        extractEntry(destDir, fileHeader, param);
+    public void extractEntry(@NonNull Path destDir) throws ZipException, IOException {
+        extractEntry(destDir, fileHeader);
     }
 
-    private void extractEntry(Path destDir, CentralDirectory.FileHeader fileHeader, UnzipParameters parameters) throws ZipException, IOException {
+    private void extractEntry(Path destDir, CentralDirectory.FileHeader fileHeader) throws ZipException, IOException {
         if (fileHeader.isDirectory())
             Files.createDirectories(destDir.resolve(fileHeader.getFileName()));
         else {

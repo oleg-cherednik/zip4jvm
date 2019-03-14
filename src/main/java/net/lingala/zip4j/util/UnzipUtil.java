@@ -2,18 +2,12 @@ package net.lingala.zip4j.util;
 
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CentralDirectory;
-import net.lingala.zip4j.model.UnzipParameters;
 
 import java.io.File;
 
 public class UnzipUtil {
 
     public static void applyFileAttributes(CentralDirectory.FileHeader fileHeader, File file) throws ZipException {
-        applyFileAttributes(fileHeader, file, null);
-    }
-
-    public static void applyFileAttributes(CentralDirectory.FileHeader fileHeader, File file,
-            UnzipParameters unzipParameters) throws ZipException {
 
         if (fileHeader == null) {
             throw new ZipException("cannot set file properties: file header is null");
@@ -27,22 +21,9 @@ public class UnzipUtil {
             throw new ZipException("cannot set file properties: file doesnot exist");
         }
 
-        if (unzipParameters == null || !unzipParameters.isIgnoreDateTimeAttributes()) {
-            setFileLastModifiedTime(fileHeader, file);
-        }
+        setFileLastModifiedTime(fileHeader, file);
 
-        if (unzipParameters == null) {
-            setFileAttributes(fileHeader, file, true, true, true, true);
-        } else {
-            if (unzipParameters.isIgnoreAllFileAttributes()) {
-                setFileAttributes(fileHeader, file, false, false, false, false);
-            } else {
-                setFileAttributes(fileHeader, file, !unzipParameters.isIgnoreReadOnlyFileAttribute(),
-                        !unzipParameters.isIgnoreHiddenFileAttribute(),
-                        !unzipParameters.isIgnoreArchiveFileAttribute(),
-                        !unzipParameters.isIgnoreSystemFileAttribute());
-            }
-        }
+        setFileAttributes(fileHeader, file, true, true, true, true);
     }
 
     private static void setFileAttributes(CentralDirectory.FileHeader fileHeader, File file, boolean setReadOnly,

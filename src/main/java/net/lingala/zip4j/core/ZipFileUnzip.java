@@ -4,11 +4,10 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import net.lingala.zip4j.engine.UnzipEngine;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CentralDirectory;
-import net.lingala.zip4j.model.UnzipParameters;
 import net.lingala.zip4j.model.ZipModel;
-import net.lingala.zip4j.engine.UnzipEngine;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -30,31 +29,12 @@ public final class ZipFileUnzip {
     private Charset charset = Charset.defaultCharset();
     private ZipModel zipModel;
 
-    public void extract(@NonNull Path destDir, @NonNull UnzipParameters parameters) throws ZipException, IOException {
+    public void extract(@NonNull Path destDir) throws ZipException, IOException {
         checkZipFile();
         checkOutputFolder(destDir);
 
         zipModel = ZipFile.createZipModel(zipFile, charset);
-        new UnzipEngine(zipModel).extractEntries(destDir, parameters);
-    }
-
-    /**
-     * Extracts a specific path from the zip path to the destination path.
-     * This method first finds the necessary path header from the input path name.
-     * <br><br>
-     * File name is relative path name in the zip path. For example if a zip path contains
-     * a path "a.txt", then to extractEntries this path, input path name has to be "a.txt". Another
-     * example is if there is a path "b.txt" in a folder "abc" in the zip path, then the
-     * input path name has to be abc/b.txt
-     * <br><br>
-     * Throws an exception if path header could not be found for the given path name or if
-     * the destination path is invalid
-     *
-     * @param fileName
-     * @throws ZipException
-     */
-    public void extractFile(String fileName, Path destDir) throws ZipException, IOException {
-        extractFile(fileName, destDir, null);
+        new UnzipEngine(zipModel).extractEntries(destDir);
     }
 
     /**
@@ -74,10 +54,9 @@ public final class ZipFileUnzip {
      * the destination path is invalid
      *
      * @param destDir
-     * @param unzipParameters
      * @throws ZipException
      */
-    public void extractFile(@NonNull String entryName, Path destDir, UnzipParameters unzipParameters) throws ZipException, IOException {
+    public void extractFile(@NonNull String entryName, Path destDir) throws ZipException, IOException {
         zipModel = ZipFile.createZipModel(zipFile, charset);
 
         CentralDirectory.FileHeader fileHeader = zipModel.getFileHeader(entryName);
@@ -86,7 +65,7 @@ public final class ZipFileUnzip {
             throw new ZipException("path header not found for given path name, cannot extractEntries path");
         }
 
-        internalExtractFile(fileHeader, destDir, unzipParameters);
+        internalExtractFile(fileHeader, destDir);
     }
 
     /**
@@ -96,14 +75,13 @@ public final class ZipFileUnzip {
      * parameter is null, then file name will be the same as in
      * FileHeader.getFileName
      */
-    private void internalExtractFile(CentralDirectory.FileHeader fileHeader, Path destDir,
-            UnzipParameters unzipParameters) throws ZipException, IOException {
+    private void internalExtractFile(CentralDirectory.FileHeader fileHeader, Path destDir) throws ZipException, IOException {
         if (zipModel == null) {
             throw new ZipException("input zipModel is null");
         }
 
         checkOutputFolder(destDir);
-        new UnzipEngine(zipModel).extractEntry(destDir, unzipParameters);
+        new UnzipEngine(zipModel).extractEntry(destDir);
     }
 
     private void checkZipFile() throws ZipException {

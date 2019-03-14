@@ -5,7 +5,6 @@ import lombok.NonNull;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.engine.UnzipEngine;
 import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.model.UnzipParameters;
 import net.lingala.zip4j.model.ZipModel;
 
 import java.io.IOException;
@@ -26,12 +25,12 @@ public class UnzipIt {
     @Builder.Default
     private final Charset charset = Charset.defaultCharset();
 
-    public void extract(@NonNull Path destDir, @NonNull UnzipParameters parameters) throws ZipException, IOException {
+    public void extract(@NonNull Path destDir) throws ZipException, IOException {
         checkZipFile();
         checkOutputFolder(destDir);
 
         ZipModel zipModel = ZipFile.createZipModel(zipFile, charset);
-        new UnzipEngine(zipModel).extractEntries(destDir, parameters);
+        new UnzipEngine(zipModel).extractEntries(destDir);
     }
 
     private void checkZipFile() throws ZipException {

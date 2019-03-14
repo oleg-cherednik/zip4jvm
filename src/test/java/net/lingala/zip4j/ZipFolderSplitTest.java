@@ -3,7 +3,6 @@ package net.lingala.zip4j;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
-import net.lingala.zip4j.model.UnzipParameters;
 import net.lingala.zip4j.model.ZipParameters;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -54,7 +53,7 @@ public class ZipFolderSplitTest {
         // ---
 
         UnzipIt unzip = UnzipIt.builder().zipFile(zipFile).build();
-        unzip.extract(resDir, new UnzipParameters());
+        unzip.extract(resDir);
 
         TestUtils.checkResultDir(resDir);
     }
