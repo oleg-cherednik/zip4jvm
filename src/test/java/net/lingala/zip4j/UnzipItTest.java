@@ -61,6 +61,10 @@ public class UnzipItTest {
         UnzipIt unzip = UnzipIt.builder().zipFile(zipFile).build();
         unzip.extract(resDir, entries);
 
+        Path carsDir = resDir.resolve("cars");
+
+        TestUtils.checkDirectory(resDir, 1, 1);
+        TestUtils.checkDirectory(carsDir, 0, 1);
         TestUtils.checkImage(resDir.resolve("saint-petersburg.jpg"), 1_074_836);
         TestUtils.checkImage(resDir.resolve("cars/bentley-continental.jpg"), 1_395_362);
     }

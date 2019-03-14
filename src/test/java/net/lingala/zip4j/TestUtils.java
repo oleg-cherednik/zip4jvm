@@ -86,7 +86,7 @@ class TestUtils {
         }
     }
 
-    private void checkDirectory(Path path, int foldersAmount, int regularFilesAmount) throws IOException {
+    void checkDirectory(Path path, int foldersAmount, int regularFilesAmount) throws IOException {
         assertThat(Files.exists(path)).isTrue();
         assertThat(Files.isDirectory(path)).isTrue();
         assertThat(getFoldersAmount(path)).isEqualTo(foldersAmount);
