@@ -7,6 +7,7 @@ import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.zip.ZipEngine;
+import org.apache.commons.lang.NotImplementedException;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -32,6 +33,10 @@ public final class ZipIt {
     public void add(@NonNull Path path, @NonNull ZipParameters parameters) throws ZipException, IOException {
         if (Files.isDirectory(path))
             addDirectory(path, parameters);
+        else if (Files.isRegularFile(path))
+            addRegularFile(path, parameters);
+        else
+            throw new ZipException("Cannot add neither directory nor regular file to zip: " + path);
     }
 
     private void addDirectory(Path dir, ZipParameters parameters) throws ZipException, IOException {
@@ -47,6 +52,12 @@ public final class ZipIt {
         zipModel.setSplitLength(parameters.getSplitLength());
 
         new ZipEngine(zipModel).addEntries(getDirectoryEntries(dir), parameters);
+    }
+
+    private void addRegularFile(Path file, ZipParameters parameters) {
+        assert Files.isRegularFile(file);
+
+        throw new NotImplementedException();
     }
 
     private void checkSplitArchiveModification(@NonNull ZipModel zipModel) throws ZipException {

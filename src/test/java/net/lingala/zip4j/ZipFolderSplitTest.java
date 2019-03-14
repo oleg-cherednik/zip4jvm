@@ -1,6 +1,5 @@
 package net.lingala.zip4j;
 
-import net.lingala.zip4j.core.ZipFileUnzip;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
@@ -54,7 +53,9 @@ public class ZipFolderSplitTest {
 
         // ---
 
-        new ZipFileUnzip(zipFile).extract(resDir, new UnzipParameters());
+        UnzipIt unzip = UnzipIt.builder().zipFile(zipFile).build();
+        unzip.extract(resDir, new UnzipParameters());
+
         TestUtils.checkResultDir(resDir);
     }
 
