@@ -138,6 +138,11 @@ public class CentralDirectory {
 
             generalPurposeFlag.setEncrypted(encryption != Encryption.OFF);
         }
+
+        @Override
+        public String toString() {
+            return fileName;
+        }
     }
 
     @Getter

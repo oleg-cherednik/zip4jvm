@@ -35,6 +35,7 @@ import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
 import net.lingala.zip4j.util.Raw;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
@@ -70,20 +71,15 @@ public class UnzipEngine {
         if (zipModel == null || fileHeader == null || StringUtils.isBlank(outPath)) {
             throw new ZipException("Invalid parameters passed during unzipping file. One or more of the parameters were null");
         }
-        InputStream is = null;
-        OutputStream os = null;
+        InputStream in = null;
+        OutputStream out = null;
         try {
-            byte[] buff = new byte[InternalZipConstants.BUFF_SIZE];
-            int readLength = -1;
+            in = getInputStream();
+            out = getOutputStream(outPath, newFileName);
 
-            is = getInputStream();
-            os = getOutputStream(outPath, newFileName);
-
-            while ((readLength = is.read(buff)) != -1) {
-                os.write(buff, 0, readLength);
-            }
-
-            closeStreams(is, os);
+            IOUtils.copyLarge(in, out);
+            // TODO file become ready only after close streams (why?)
+            closeStreams(in, out);
 
             UnzipUtil.applyFileAttributes(fileHeader, new File(getOutputFileNameWithPath(outPath, newFileName)), unzipParameters);
 
@@ -92,7 +88,7 @@ public class UnzipEngine {
         } catch(Exception e) {
             throw new ZipException(e);
         } finally {
-            closeStreams(is, os);
+            closeStreams(in, out);
         }
     }
 
@@ -309,7 +305,7 @@ public class UnzipEngine {
             if (rafForLH == null)
                 rafForLH = new RandomAccessFile(zipModel.getZipFile().toFile(), InternalZipConstants.READ_MODE);
 
-            LocalFileHeader localFileHeader = new LocalFileHeaderReader(new LittleEndianRandomAccessFile(rafForLH), fileHeader).read();
+            localFileHeader = new LocalFileHeaderReader(new LittleEndianRandomAccessFile(rafForLH), fileHeader).read();
 
             if (localFileHeader == null) {
                 throw new ZipException("error reading local file header. Is this a valid zip file?");

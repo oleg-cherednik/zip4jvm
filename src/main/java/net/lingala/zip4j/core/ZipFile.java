@@ -418,7 +418,7 @@ public class ZipFile {
     }
 
     @NonNull
-    static ZipModel createZipModel(@NonNull Path zipFile, @NonNull Charset charset) throws ZipException {
+    public static ZipModel createZipModel(@NonNull Path zipFile, @NonNull Charset charset) throws ZipException {
         try {
             if (Files.exists(zipFile))
                 return new ZipModelReader(zipFile, charset).read();

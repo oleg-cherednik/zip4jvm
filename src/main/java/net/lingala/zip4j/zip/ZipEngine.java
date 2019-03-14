@@ -30,7 +30,6 @@ import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.ArchiveMaintainer;
 import net.lingala.zip4j.util.ChecksumCalculator;
-import net.lingala.zip4j.util.Zip4jUtil;
 import org.apache.commons.io.IOUtils;
 
 import java.io.FileInputStream;
@@ -64,7 +63,9 @@ public class ZipEngine {
 
                 String fileName = parameters.getRelativeEntryName(entry);
 
-                if(Zip4jUtil.isDirectory(fileName))
+                // TODO ignore root (it should be done prior)
+                // TODO here could be empty directory ignored (also prior)
+                if ("/".equals(fileName) || "\\".equals(fileName))
                     continue;
 
                 removeFile(fileName);

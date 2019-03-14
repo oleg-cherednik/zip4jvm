@@ -207,5 +207,4 @@ public class ApplicationTest {
         return Files.list(dir).filter(path -> Files.isDirectory(path)).count();
     }
 
-
 }
