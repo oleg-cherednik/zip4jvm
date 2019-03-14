@@ -66,19 +66,18 @@ public class ZipItDirectoryTest {
     public void shouldZipDirectoryWithSplitArchive() throws ZipException, IOException {
         Path zipFile = destDir.resolve("src.zip");
 
-        zipIt(zipFile);
+        zipIt(zipFile, 1024 * 1024);
         TestUtils.checkDestinationDir(10, destDir);
 
         unzipId(zipFile);
         TestUtils.checkResultDir(resDir);
     }
 
-    private void zipIt(Path zipFile) throws ZipException, IOException {
+    private void zipIt(Path zipFile, long splitLength) throws ZipException, IOException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
-                                                .defaultFolderPath(srcDir.toString())
-                                                .splitLength(1024 * 1024).build();
+                                                .splitLength(splitLength).build();
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         zip.add(srcDir, parameters);
     }
