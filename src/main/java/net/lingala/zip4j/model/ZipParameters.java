@@ -28,7 +28,6 @@ import org.apache.commons.lang.StringUtils;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.TimeZone;
 
 @Getter
@@ -55,7 +54,7 @@ public class ZipParameters {
     @Builder.Default
     private TimeZone timeZone = TimeZone.getDefault();
     private long sourceFileCRC;
-    private String defaultFolderPath;
+    private Path defaultFolderPath;
     private boolean isSourceExternalStream;
     @Builder.Default
     private long splitLength = ZipModel.NO_SPLIT;
@@ -99,7 +98,7 @@ public class ZipParameters {
     @NonNull
     public String getRelativeEntryName(Path entry) {
         Path entryPath = entry.toAbsolutePath();
-        Path rootPath = defaultFolderPath != null ? Paths.get(defaultFolderPath).toAbsolutePath() : entryPath.getParent();
+        Path rootPath = defaultFolderPath != null ? defaultFolderPath : entryPath.getParent();
 
         String path = rootPath.relativize(entryPath).toString();
 

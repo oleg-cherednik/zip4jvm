@@ -69,7 +69,7 @@ public class ZipFolderNoSplitTest {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
-                                                .defaultFolderPath(srcDir.toString())
+                                                .defaultFolderPath(srcDir)
                                                 .build();
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         zip.add(carsDir, parameters);
@@ -83,7 +83,7 @@ public class ZipFolderNoSplitTest {
         TestUtils.checkCarsDirectory(resDir.resolve("cars"));
     }
 
-    @Test(dependsOnMethods = "shouldCreateNewZipWithDirectory")
+    @Test(dependsOnMethods = "shouldCreateNewZipWithFolder")
     public void shouldAddFolderToExistedZip() throws ZipException, IOException {
         Path zipFile = destDir.resolve("src.zip");
         Path starWarsDir = srcDir.resolve("Star Wars");
@@ -94,7 +94,7 @@ public class ZipFolderNoSplitTest {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
-                                                .defaultFolderPath(srcDir.toString())
+                                                .defaultFolderPath(srcDir)
                                                 .build();
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         zip.add(starWarsDir, parameters);
@@ -120,7 +120,7 @@ public class ZipFolderNoSplitTest {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
-                                                .defaultFolderPath(srcDir.toString())
+                                                .defaultFolderPath(srcDir)
                                                 .build();
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         zip.add(emptyDir, parameters);

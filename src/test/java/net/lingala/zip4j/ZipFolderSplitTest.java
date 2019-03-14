@@ -66,7 +66,7 @@ public class ZipFolderSplitTest {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
-                                                .defaultFolderPath(srcDir.toString())
+                                                .defaultFolderPath(srcDir)
                                                 .splitLength(1024 * 1024).build();
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         assertThatThrownBy(() -> zip.add(carsDir, parameters)).isExactlyInstanceOf(ZipException.class);

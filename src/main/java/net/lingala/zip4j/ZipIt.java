@@ -40,7 +40,7 @@ public final class ZipIt {
         dir = Files.isRegularFile(dir) ? dir.getParent() : dir;
 
         if (parameters.getDefaultFolderPath() == null)
-            parameters.setDefaultFolderPath(dir.toString());
+            parameters.setDefaultFolderPath(dir);
 
         ZipModel zipModel = ZipFile.createZipModel(zipFile, charset);
         checkSplitArchiveModification(zipModel);

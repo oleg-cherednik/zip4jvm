@@ -34,7 +34,7 @@ public final class ZipFileDir {
 
     public void addFolder(@NonNull Path dir, @NonNull ZipParameters parameters) throws ZipException, IOException {
         dir = Files.isRegularFile(dir) ? dir.getParent() : dir;
-        parameters.setDefaultFolderPath(dir.toString());
+        parameters.setDefaultFolderPath(dir);
 
         // TODO check cannot add new files to exited split archive
         zipModel = ZipFile.createZipModel(zipFile, charset);

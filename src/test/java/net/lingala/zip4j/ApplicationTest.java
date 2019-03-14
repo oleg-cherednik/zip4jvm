@@ -85,7 +85,7 @@ public class ApplicationTest {
                                                 .encryption(Encryption.AES)
                                                 .aesKeyStrength(AESStrength.STRENGTH_256)
                                                 .password("1".toCharArray())
-                                                .defaultFolderPath(srcDir.toString()).build();
+                                                .defaultFolderPath(srcDir).build();
 
         // Now add files to the zip file
         // Note: To add a single file, the method addFile can be used
@@ -108,7 +108,7 @@ public class ApplicationTest {
                                                 .encryption(Encryption.STANDARD)
                                                 .aesKeyStrength(AESStrength.STRENGTH_256)
                                                 .password("1".toCharArray())
-                                                .defaultFolderPath(srcDir.toString()).build();
+                                                .defaultFolderPath(srcDir).build();
 
         // Now add files to the zip file
         // Note: To add a single file, the method addFile can be used
@@ -125,7 +125,7 @@ public class ApplicationTest {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
-                                                .defaultFolderPath(srcDir.toString())
+                                                .defaultFolderPath(srcDir)
                                                 .splitLength(1024 * 1024).build();
         new ZipFileDir(destDir.resolve("src.zip")).addFolder(srcDir, parameters);
 
