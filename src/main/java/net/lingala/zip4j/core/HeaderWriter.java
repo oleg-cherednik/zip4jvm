@@ -243,9 +243,7 @@ public class HeaderWriter {
 
             //version made by
             //version needed to extract
-            if (zipModel.getCentralDirectory() != null &&
-                    zipModel.getCentralDirectory().getFileHeaders() != null &&
-                    zipModel.getCentralDirectory().getFileHeaders().size() > 0) {
+            if (!zipModel.isEmpty()) {
                 Raw.writeShortLittleEndian(shortByte, 0,
                         (short)zipModel.getCentralDirectory().getFileHeaders().get(0).getVersionMadeBy());
                 bytes.copyByteArrayToArrayList(shortByte);
@@ -269,19 +267,14 @@ public class HeaderWriter {
             //total number of entries in the central directory on this disk
             int numEntries = 0;
             int numEntriesOnThisDisk = 0;
-            if (zipModel.getCentralDirectory() == null ||
-                    zipModel.getCentralDirectory().getFileHeaders() == null) {
-                throw new ZipException("invalid central directory/file headers, " +
-                        "cannot write end of central directory record");
-            } else {
-                numEntries = zipModel.getCentralDirectory().getFileHeaders().size();
-                if (zipModel.isSplitArchive()) {
-                    countNumberOfFileHeaderEntriesOnDisk(zipModel.getCentralDirectory().getFileHeaders(),
-                            zipModel.getEndCentralDirectory().getNoOfDisk());
-                } else {
-                    numEntriesOnThisDisk = numEntries;
-                }
-            }
+            numEntries = zipModel.getCentralDirectory().getFileHeaders().size();
+
+            if (zipModel.isSplitArchive())
+                countNumberOfFileHeaderEntriesOnDisk(zipModel.getCentralDirectory().getFileHeaders(),
+                        zipModel.getEndCentralDirectory().getNoOfDisk());
+            else
+                numEntriesOnThisDisk = numEntries;
+
             Raw.writeLongLittleEndian(longByte, 0, numEntriesOnThisDisk);
             bytes.copyByteArrayToArrayList(longByte);
 
@@ -365,19 +358,14 @@ public class HeaderWriter {
             //Total number of entries in central directory on this disk
             int numEntries = 0;
             int numEntriesOnThisDisk = 0;
-            if (zipModel.getCentralDirectory() == null ||
-                    zipModel.getCentralDirectory().getFileHeaders() == null) {
-                throw new ZipException("invalid central directory/file headers, " +
-                        "cannot write end of central directory record");
-            } else {
-                numEntries = zipModel.getCentralDirectory().getFileHeaders().size();
-                if (zipModel.isSplitArchive()) {
-                    numEntriesOnThisDisk = countNumberOfFileHeaderEntriesOnDisk(zipModel.getCentralDirectory().getFileHeaders(),
-                            zipModel.getEndCentralDirectory().getNoOfDisk());
-                } else {
-                    numEntriesOnThisDisk = numEntries;
-                }
-            }
+
+            numEntries = zipModel.getCentralDirectory().getFileHeaders().size();
+            if (zipModel.isSplitArchive())
+                numEntriesOnThisDisk = countNumberOfFileHeaderEntriesOnDisk(zipModel.getCentralDirectory().getFileHeaders(),
+                        zipModel.getEndCentralDirectory().getNoOfDisk());
+            else
+                numEntriesOnThisDisk = numEntries;
+
             Raw.writeShortLittleEndian(shortByte, 0, (short)numEntriesOnThisDisk);
             bytes.copyByteArrayToArrayList(shortByte);
 

@@ -141,12 +141,6 @@ public abstract class CipherOutputStream extends OutputStream {
         this.zipModel = zipModel == null ? new ZipModel() : zipModel;
         this.zipModel.createEndCentralDirectoryIfNotExist();
 
-        if (this.zipModel.getCentralDirectory() == null)
-            this.zipModel.setCentralDirectory(new CentralDirectory());
-
-        if (this.zipModel.getCentralDirectory().getFileHeaders() == null)
-            this.zipModel.getCentralDirectory().setFileHeaders(new ArrayList<>());
-
         if (this.zipModel.getLocalFileHeaderList() == null)
             this.zipModel.setLocalFileHeaderList(new ArrayList<>());
 

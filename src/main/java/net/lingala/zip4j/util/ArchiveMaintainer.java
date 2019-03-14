@@ -303,9 +303,7 @@ public class ArchiveMaintainer {
                 Long end = new Long(inputStream.length());
 
                 if (i == 0) {
-                    if (zipModel.getCentralDirectory() != null &&
-                            zipModel.getCentralDirectory().getFileHeaders() != null &&
-                            zipModel.getCentralDirectory().getFileHeaders().size() > 0) {
+                    if (!zipModel.isEmpty()) {
                         byte[] buff = new byte[4];
                         inputStream.seek(0);
                         inputStream.read(buff);
@@ -430,11 +428,6 @@ public class ArchiveMaintainer {
 
     private void updateSplitFileHeader(ZipModel zipModel, ArrayList fileSizeList, boolean splitSigRemoved) throws ZipException {
         try {
-
-            if (zipModel.getCentralDirectory() == null) {
-                throw new ZipException("corrupt zip model - getCentralDirectory, cannot update split zip model");
-            }
-
             int fileHeaderCount = zipModel.getCentralDirectory().getFileHeaders().size();
             int splitSigOverhead = 0;
             if (splitSigRemoved)
@@ -443,8 +436,8 @@ public class ArchiveMaintainer {
             for (int i = 0; i < fileHeaderCount; i++) {
                 long offsetLHToAdd = 0;
 
-                for (int j = 0; j < ((CentralDirectory.FileHeader)zipModel.getCentralDirectory().getFileHeaders().get(i)).getDiskNumberStart(); j++) {
-                    offsetLHToAdd += ((Long)fileSizeList.get(j)).longValue();
+                for (int j = 0; j < zipModel.getCentralDirectory().getFileHeaders().get(i).getDiskNumberStart(); j++) {
+                    offsetLHToAdd += (Long)fileSizeList.get(j);
                 }
                 zipModel.getCentralDirectory().getFileHeaders().get(i).setOffLocalHeaderRelative(
                         zipModel.getCentralDirectory().getFileHeaders().get(i).getOffLocalHeaderRelative() +
@@ -452,8 +445,6 @@ public class ArchiveMaintainer {
                 zipModel.getCentralDirectory().getFileHeaders().get(i).setDiskNumberStart(0);
             }
 
-        } catch(ZipException e) {
-            throw e;
         } catch(Exception e) {
             throw new ZipException(e);
         }
@@ -461,13 +452,8 @@ public class ArchiveMaintainer {
 
     private void updateSplitEndCentralDirectory(ZipModel zipModel) throws ZipException {
         try {
-            if (zipModel == null) {
+            if (zipModel == null)
                 throw new ZipException("zip model is null - cannot update end of central directory for split zip model");
-            }
-
-            if (zipModel.getCentralDirectory() == null) {
-                throw new ZipException("corrupt zip model - getCentralDirectory, cannot update split zip model");
-            }
 
             zipModel.getEndCentralDirectory().setNoOfDisk(0);
             zipModel.getEndCentralDirectory().setNoOfDiskStartCentralDir(0);

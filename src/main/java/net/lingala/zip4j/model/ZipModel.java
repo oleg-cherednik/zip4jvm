@@ -40,7 +40,8 @@ public class ZipModel implements Cloneable {
 
     private ArchiveExtraDataRecord archiveExtraDataRecord;
 
-    private CentralDirectory centralDirectory;
+    @NonNull
+    private CentralDirectory centralDirectory = new CentralDirectory();
 
     private EndCentralDirectory endCentralDirectory;
 
@@ -101,7 +102,7 @@ public class ZipModel implements Cloneable {
     }
 
     public boolean isEmpty() {
-        return centralDirectory == null || centralDirectory.getFileHeaders().isEmpty();
+        return centralDirectory.getFileHeaders().isEmpty();
     }
 
     public CentralDirectory.FileHeader getFileHeader(@NonNull String fileName) throws ZipException {

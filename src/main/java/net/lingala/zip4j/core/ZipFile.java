@@ -150,9 +150,6 @@ public class ZipFile {
             }
         }
 
-        if (zipModel.getCentralDirectory() == null || zipModel.getCentralDirectory().getFileHeaders() == null)
-            throw new ZipException("invalid zip path");
-
         zipModel.getCentralDirectory().getFileHeaders().stream()
                 .filter(fileHeader -> fileHeader.getEncryption() != Encryption.AES)
                 .forEach(fileHeader -> fileHeader.setPassword(password));
@@ -196,9 +193,6 @@ public class ZipFile {
      */
     public boolean isEncrypted() throws ZipException {
         zipModel = createZipModel();
-
-        if (zipModel.getCentralDirectory() == null || zipModel.getCentralDirectory().getFileHeaders() == null)
-            throw new ZipException("invalid zip path");
 
         isEncrypted = zipModel.getCentralDirectory().getFileHeaders().stream()
                               .anyMatch(fileHeader -> fileHeader.getEncryption() != Encryption.OFF);

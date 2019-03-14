@@ -159,17 +159,9 @@ public class Zip4jUtil {
             throw new ZipException("input parameters is null, cannot determine index of file header");
         }
 
-        if (zipModel.getCentralDirectory() == null) {
-            throw new ZipException("central directory is null, ccannot determine index of file header");
-        }
-
-        if (zipModel.getCentralDirectory().getFileHeaders() == null) {
-            throw new ZipException("file Headers are null, cannot determine index of file header");
-        }
-
-        if (zipModel.getCentralDirectory().getFileHeaders().size() <= 0) {
+        if (zipModel.isEmpty())
             return -1;
-        }
+
         String fileName = fileHeader.getFileName();
 
         if (StringUtils.isBlank(fileName)) {
