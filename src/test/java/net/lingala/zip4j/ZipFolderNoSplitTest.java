@@ -1,6 +1,5 @@
-package net.lingala.zip4j.examples;
+package net.lingala.zip4j;
 
-import net.lingala.zip4j.ZipIt;
 import net.lingala.zip4j.core.ZipFileUnzip;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CompressionLevel;
@@ -21,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Oleg Cherednik
  * @since 14.03.2019
  */
-public class ZipItFolderNoSplitTest {
+public class ZipFolderNoSplitTest {
 
     private Path root;
     private Path srcDir;
@@ -63,7 +62,7 @@ public class ZipItFolderNoSplitTest {
 //    }
 
     @Test
-    public void shouldCreateNewZipWithDirectory() throws ZipException, IOException {
+    public void shouldCreateNewZipWithFolder() throws ZipException, IOException {
         Path zipFile = destDir.resolve("src.zip");
         Path carsDir = srcDir.resolve("cars");
 
@@ -136,30 +135,5 @@ public class ZipItFolderNoSplitTest {
         TestUtils.checkStarWarsDirectory(resDir.resolve("Star Wars"));
         TestUtils.checkEmptyDirectory(resDir.resolve("empty_dir"));
     }
-
-//    public void shouldZipDirectoryWithSplitArchive() throws ZipException, IOException {
-//        Path zipFile = destDir.resolve("src.zip");
-//
-//        zipIt(zipFile, 1024 * 1024);
-//        TestUtils.checkDestinationDir(10, destDir);
-//
-//        unzipId(zipFile);
-//        TestUtils.checkResultDir(resDir);
-//    }
-
-
-    private void zipIt(Path zipFile, long splitLength) throws ZipException, IOException {
-        ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(CompressionMethod.DEFLATE)
-                                                .compressionLevel(CompressionLevel.NORMAL)
-                                                .splitLength(splitLength).build();
-        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-        zip.add(srcDir, parameters);
-    }
-
-    private void unzipId(Path zipFile) throws ZipException {
-        new ZipFileUnzip(zipFile).extract(resDir, new UnzipParameters());
-    }
-
 
 }

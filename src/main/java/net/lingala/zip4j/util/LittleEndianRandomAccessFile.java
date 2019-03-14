@@ -5,9 +5,11 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.io.Closeable;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 
 /**
  * @author Oleg Cherednik
@@ -20,6 +22,10 @@ public final class LittleEndianRandomAccessFile implements Closeable {
     private final RandomAccessFile raf;
     @Getter
     private int offs;
+
+    public LittleEndianRandomAccessFile(@NonNull Path path) throws FileNotFoundException {
+        raf = new RandomAccessFile(path.toFile(), "r");
+    }
 
     public void resetOffs() {
         offs = 0;

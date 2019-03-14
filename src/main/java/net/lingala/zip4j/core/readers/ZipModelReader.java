@@ -6,12 +6,11 @@ import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.EndCentralDirectory;
 import net.lingala.zip4j.model.Zip64EndCentralDirectoryLocator;
 import net.lingala.zip4j.model.ZipModel;
-import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -28,9 +27,15 @@ public final class ZipModelReader {
 
     @NonNull
     public ZipModel read() throws IOException {
-        try (LittleEndianRandomAccessFile in = new LittleEndianRandomAccessFile(
-                new RandomAccessFile(zipFile.toFile(), InternalZipConstants.READ_MODE))) {
-            return read(in);
+        try (LittleEndianRandomAccessFile in = new LittleEndianRandomAccessFile(zipFile)) {
+            ZipModel zipModel = read(in);
+
+            if (zipModel.isSplitArchive()) {
+                Path path = ZipModel.getSplitFilePath(zipFile, 1);
+                zipModel.setSplitLength(Files.exists(path) ? Files.size(path) : zipModel.getSplitLength());
+            }
+
+            return zipModel;
         }
     }
 
@@ -58,8 +63,7 @@ public final class ZipModelReader {
             zipModel.setZip64EndCentralDirectory(new Zip64EndCentralDirectoryReader(in, locator.getOffsetZip64EndOfCentralDirRec()).read());
         }
 
-        zipModel.setCentralDirectory(new CentralDirectoryReader(in,
-                dir, zipModel.getZip64EndCentralDirectory(), zipModel.isZip64Format()).read());
+        zipModel.setCentralDirectory(new CentralDirectoryReader(in, dir, zipModel.getZip64EndCentralDirectory(), zipModel.isZip64Format()).read());
 
         return zipModel;
     }

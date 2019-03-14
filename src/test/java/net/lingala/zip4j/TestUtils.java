@@ -1,4 +1,4 @@
-package net.lingala.zip4j.examples;
+package net.lingala.zip4j;
 
 import lombok.experimental.UtilityClass;
 
@@ -17,13 +17,13 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 14.03.2019
  */
 @UtilityClass
-public class TestUtils {
-    public void checkDestinationDir(int totalParts, Path destDir) throws IOException {
-        // TODO should not be sub-folders
-        checkDirectory(destDir, 1, totalParts);
+class TestUtils {
+
+    void checkDestinationDir(int totalParts, Path destDir) throws IOException {
+        checkDirectory(destDir, 0, totalParts);
     }
 
-    public void checkResultDir(Path resDir) throws IOException {
+    void checkResultDir(Path resDir) throws IOException {
         checkDirectory(resDir, 3, 5);
 
         checkCarsDirectory(resDir.resolve("cars"));

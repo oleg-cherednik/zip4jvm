@@ -1,4 +1,4 @@
-package net.lingala.zip4j.examples;
+package net.lingala.zip4j;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.core.ZipFileDir;
