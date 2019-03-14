@@ -16,6 +16,7 @@
 
 package net.lingala.zip4j.unzip;
 
+import lombok.NonNull;
 import net.lingala.zip4j.core.readers.LocalFileHeaderReader;
 import net.lingala.zip4j.crypto.AESDecrypter;
 import net.lingala.zip4j.crypto.IDecrypter;
@@ -45,6 +46,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.zip.CRC32;
 
@@ -67,21 +69,21 @@ public class UnzipEngine {
         this.crc = new CRC32();
     }
 
-    public void unzipFile(String outPath, String newFileName, UnzipParameters unzipParameters) throws ZipException {
-        if (zipModel == null || fileHeader == null || StringUtils.isBlank(outPath)) {
+    public void unzipFile(@NonNull Path destDir, String newFileName, UnzipParameters unzipParameters) throws ZipException {
+        if (zipModel == null || fileHeader == null) {
             throw new ZipException("Invalid parameters passed during unzipping file. One or more of the parameters were null");
         }
         InputStream in = null;
         OutputStream out = null;
         try {
             in = getInputStream();
-            out = getOutputStream(outPath, newFileName);
+            out = getOutputStream(destDir, newFileName);
 
             IOUtils.copyLarge(in, out);
             // TODO file become ready only after close streams (why?)
             closeStreams(in, out);
 
-            UnzipUtil.applyFileAttributes(fileHeader, new File(getOutputFileNameWithPath(outPath, newFileName)), unzipParameters);
+            UnzipUtil.applyFileAttributes(fileHeader, getOutputFileNameWithPath(destDir, newFileName).toFile(), unzipParameters);
 
         } catch(IOException e) {
             throw new ZipException(e);
@@ -376,37 +378,26 @@ public class UnzipEngine {
         }
     }
 
-    private FileOutputStream getOutputStream(String outPath, String newFileName) throws ZipException {
-        if (StringUtils.isBlank(outPath)) {
-            throw new ZipException("invalid output path");
-        }
-
+    private FileOutputStream getOutputStream(@NonNull Path destDir, String newFileName) throws ZipException {
         try {
-            File file = new File(getOutputFileNameWithPath(outPath, newFileName));
+            File file = getOutputFileNameWithPath(destDir, newFileName).toFile();
 
-            if (!file.getParentFile().exists()) {
+            if (!file.getParentFile().exists())
                 file.getParentFile().mkdirs();
-            }
 
-            if (file.exists()) {
+            if (file.exists())
                 file.delete();
-            }
 
-            FileOutputStream fileOutputStream = new FileOutputStream(file);
-            return fileOutputStream;
+            return new FileOutputStream(file);
         } catch(FileNotFoundException e) {
             throw new ZipException(e);
         }
     }
 
-    private String getOutputFileNameWithPath(String outPath, String newFileName) throws ZipException {
-        String fileName = null;
-        if (StringUtils.isNotBlank(newFileName)) {
-            fileName = newFileName;
-        } else {
-            fileName = fileHeader.getFileName();
-        }
-        return outPath + System.getProperty("file.separator") + fileName;
+    @NonNull
+    private Path getOutputFileNameWithPath(@NonNull Path destDir, String newFileName) throws ZipException {
+        String fileName = StringUtils.isNotBlank(newFileName) ? newFileName : fileHeader.getFileName();
+        return destDir.resolve(fileName);
     }
 
     public RandomAccessFile startNextSplitFile() throws IOException {

@@ -23,11 +23,10 @@ import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.UnzipParameters;
 import net.lingala.zip4j.model.ZipModel;
-import net.lingala.zip4j.util.InternalZipConstants;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.File;
-import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * @author Oleg Cherednik
@@ -39,74 +38,53 @@ public final class Unzip {
     @NonNull
     private final ZipModel zipModel;
 
-    public void extract(final UnzipParameters unzipParameters, final String outPath) throws ZipException {
-
+    public void extract(@NonNull Path destDir, @NonNull UnzipParameters unzipParameters) throws ZipException {
         CentralDirectory centralDirectory = zipModel.getCentralDirectory();
 
-        if (centralDirectory == null ||
-                centralDirectory.getFileHeaders() == null) {
+        if (centralDirectory == null)
             throw new ZipException("invalid central directory in zipModel");
-        }
 
-        final List<CentralDirectory.FileHeader> fileHeaders = centralDirectory.getFileHeaders();
-
-        initExtractAll(fileHeaders, unzipParameters, outPath);
+        for (CentralDirectory.FileHeader fileHeader : centralDirectory.getFileHeaders())
+            initExtractFile(fileHeader, destDir, unzipParameters, null);
     }
 
-    private void initExtractAll(List<CentralDirectory.FileHeader> fileHeaders, UnzipParameters unzipParameters,
-            String outPath) throws ZipException {
-
-        for (int i = 0; i < fileHeaders.size(); i++) {
-            CentralDirectory.FileHeader fileHeader = fileHeaders.get(i);
-            initExtractFile(fileHeader, outPath, unzipParameters, null);
-        }
-    }
-
-    public void extractFile(final CentralDirectory.FileHeader fileHeader, final String outPath,
+    public void extractFile(final CentralDirectory.FileHeader fileHeader, final Path destDir,
             final UnzipParameters unzipParameters, final String newFileName) throws ZipException {
         if (fileHeader == null) {
             throw new ZipException("fileHeader is null");
         }
 
-        initExtractFile(fileHeader, outPath, unzipParameters, newFileName);
+        initExtractFile(fileHeader, destDir, unzipParameters, newFileName);
 
     }
 
-    private void initExtractFile(CentralDirectory.FileHeader fileHeader, String outPath,
-            UnzipParameters unzipParameters, String newFileName) throws ZipException {
-
-        if (fileHeader == null) {
-            throw new ZipException("fileHeader is null");
-        }
+    private void initExtractFile(@NonNull CentralDirectory.FileHeader fileHeader, @NonNull Path destDir, UnzipParameters unzipParameters,
+            String newFileName) throws ZipException {
 
         try {
-            if (!outPath.endsWith(InternalZipConstants.FILE_SEPARATOR)) {
-                outPath += InternalZipConstants.FILE_SEPARATOR;
-            }
-
             // If file header is a directory, then check if the directory exists
             // If not then create a directory and return
             if (fileHeader.isDirectory()) {
                 try {
                     String fileName = fileHeader.getFileName();
-                    if (StringUtils.isBlank(fileName)) {
+
+                    if (StringUtils.isBlank(fileName))
                         return;
-                    }
-                    String completePath = outPath + fileName;
-                    File file = new File(completePath);
-                    if (!file.exists()) {
-                        file.mkdirs();
-                    }
+
+                    Path completePath = destDir.resolve(fileName);
+
+                    if (!Files.exists(completePath))
+                        Files.createDirectories(completePath);
                 } catch(Exception e) {
                     throw new ZipException(e);
                 }
             } else {
                 //Create Directories
-                checkOutputDirectoryStructure(fileHeader, outPath, newFileName);
+                checkOutputDirectoryStructure(fileHeader, destDir, newFileName);
 
                 UnzipEngine unzipEngine = new UnzipEngine(zipModel, fileHeader);
                 try {
-                    unzipEngine.unzipFile(outPath, newFileName, unzipParameters);
+                    unzipEngine.unzipFile(destDir, newFileName, unzipParameters);
                 } catch(Exception e) {
                     throw new ZipException(e);
                 }
@@ -123,55 +101,27 @@ public final class Unzip {
         return unzipEngine.getInputStream();
     }
 
-    private void checkOutputDirectoryStructure(CentralDirectory.FileHeader fileHeader, String outPath, String newFileName) throws ZipException {
-        if (fileHeader == null || StringUtils.isBlank(outPath)) {
-            throw new ZipException("Cannot check output directory structure...one of the parameters was null");
-        }
-
+    private void checkOutputDirectoryStructure(@NonNull CentralDirectory.FileHeader fileHeader, @NonNull Path destDir, String newFileName)
+            throws ZipException {
         String fileName = fileHeader.getFileName();
 
-        if (StringUtils.isNotBlank(newFileName)) {
+        if (StringUtils.isNotBlank(newFileName))
             fileName = newFileName;
-        }
 
         if (StringUtils.isBlank(fileName)) {
             // Do nothing
             return;
         }
 
-        String compOutPath = outPath + fileName;
+        Path compOutPath = destDir.resolve(fileName);
         try {
-            File file = new File(compOutPath);
-            String parentDir = file.getParent();
-            File parentDirFile = new File(parentDir);
-            if (!parentDirFile.exists()) {
-                parentDirFile.mkdirs();
-            }
+            Path parentDir = compOutPath.getParent();
+
+            if (!Files.exists(parentDir))
+                Files.createDirectories(parentDir);
         } catch(Exception e) {
             throw new ZipException(e);
         }
-    }
-
-    private long calculateTotalWork(List<CentralDirectory.FileHeader> fileHeaders) throws ZipException {
-
-        if (fileHeaders == null) {
-            throw new ZipException("fileHeaders is null, cannot calculate total work");
-        }
-
-        long totalWork = 0;
-
-        for (int i = 0; i < fileHeaders.size(); i++) {
-            CentralDirectory.FileHeader fileHeader = fileHeaders.get(i);
-            if (fileHeader.getZip64ExtendedInfo() != null &&
-                    fileHeader.getZip64ExtendedInfo().getUnCompressedSize() > 0) {
-                totalWork += fileHeader.getZip64ExtendedInfo().getCompressedSize();
-            } else {
-                totalWork += fileHeader.getCompressedSize();
-            }
-
-        }
-
-        return totalWork;
     }
 
 }

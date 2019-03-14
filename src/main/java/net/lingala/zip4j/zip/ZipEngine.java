@@ -31,6 +31,7 @@ import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.ArchiveMaintainer;
 import net.lingala.zip4j.util.ChecksumCalculator;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -135,14 +136,10 @@ public class ZipEngine {
             throw new ZipException("unsupported compression type");
 
         if (parameters.getEncryption() != Encryption.OFF) {
-            if (parameters.getEncryption() != Encryption.STANDARD &&
-                    parameters.getEncryption() != Encryption.AES) {
+            if (parameters.getEncryption() != Encryption.STANDARD && parameters.getEncryption() != Encryption.AES)
                 throw new ZipException("unsupported encryption method");
-            }
-
-            if (parameters.getPassword() == null || parameters.getPassword().length <= 0) {
+            if (ArrayUtils.isEmpty(parameters.getPassword()))
                 throw new ZipException("input password is empty or null");
-            }
         } else {
             parameters.setAesKeyStrength(AESStrength.NONE);
             parameters.setEncryption(Encryption.OFF);

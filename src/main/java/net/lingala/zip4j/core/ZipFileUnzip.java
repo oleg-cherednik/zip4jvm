@@ -29,12 +29,12 @@ public final class ZipFileUnzip {
     private Charset charset = Charset.defaultCharset();
     private ZipModel zipModel;
 
-    public void extract(@NonNull Path dir, @NonNull UnzipParameters parameters) throws ZipException {
+    public void extract(@NonNull Path destDir, @NonNull UnzipParameters parameters) throws ZipException {
         checkZipFile();
-        checkOutputFolder(dir);
+        checkOutputFolder(destDir);
 
         zipModel = ZipFile.createZipModel(zipFile, charset);
-        new Unzip(zipModel).extract(parameters, dir.toString());
+        new Unzip(zipModel).extract(destDir, parameters);
     }
 
     /**
@@ -59,15 +59,15 @@ public final class ZipFileUnzip {
      * If destination path is invalid, then this method throws an exception.
      *
      * @param fileHeader
-     * @param destPath
+     * @param destDir
      * @param unzipParameters
      * @param newFileName
      * @throws ZipException
      */
-    public void extractFile(@NonNull CentralDirectory.FileHeader fileHeader, Path destPath,
+    public void extractFile(@NonNull CentralDirectory.FileHeader fileHeader, Path destDir,
             UnzipParameters unzipParameters, String newFileName) throws ZipException {
         zipModel = ZipFile.createZipModel(zipFile, charset);
-        internalExtractFile(fileHeader, destPath, unzipParameters, newFileName);
+        internalExtractFile(fileHeader, destDir, unzipParameters, newFileName);
 
     }
 
@@ -87,8 +87,8 @@ public final class ZipFileUnzip {
      * @param destPath
      * @throws ZipException
      */
-    public void extractFile(String fileName, Path destPath) throws ZipException {
-        extractFile(fileName, destPath, null);
+    public void extractFile(String fileName, Path destDir) throws ZipException {
+        extractFile(fileName, destDir, null);
     }
 
     /**
@@ -109,8 +109,8 @@ public final class ZipFileUnzip {
      * @throws ZipException
      */
     public void extractFile(String fileName,
-            Path destPath, UnzipParameters unzipParameters) throws ZipException {
-        extractFile(fileName, destPath, unzipParameters, null);
+            Path destDir, UnzipParameters unzipParameters) throws ZipException {
+        extractFile(fileName, destDir, unzipParameters, null);
     }
 
     /**
@@ -130,12 +130,12 @@ public final class ZipFileUnzip {
      * the destination path is invalid
      *
      * @param fileName
-     * @param destPath
+     * @param destDir
      * @param unzipParameters
      * @param newFileName
      * @throws ZipException
      */
-    public void extractFile(String fileName, Path destPath,
+    public void extractFile(String fileName, Path destDir,
             UnzipParameters unzipParameters, String newFileName) throws ZipException {
         zipModel = ZipFile.createZipModel(zipFile, charset);
 
@@ -145,7 +145,7 @@ public final class ZipFileUnzip {
             throw new ZipException("path header not found for given path name, cannot extract path");
         }
 
-        internalExtractFile(fileHeader, destPath, unzipParameters, newFileName);
+        internalExtractFile(fileHeader, destDir, unzipParameters, newFileName);
     }
 
     /**
@@ -155,15 +155,15 @@ public final class ZipFileUnzip {
      * parameter is null, then file name will be the same as in
      * FileHeader.getFileName
      */
-    private void internalExtractFile(CentralDirectory.FileHeader fileHeader, Path outPath,
+    private void internalExtractFile(CentralDirectory.FileHeader fileHeader, Path destDir,
             UnzipParameters unzipParameters, String newFileName) throws ZipException {
         if (zipModel == null) {
             throw new ZipException("input zipModel is null");
         }
 
-        checkOutputFolder(outPath);
+        checkOutputFolder(destDir);
 
-        new Unzip(zipModel).extractFile(fileHeader, outPath.toString(), unzipParameters, newFileName);
+        new Unzip(zipModel).extractFile(fileHeader, destDir, unzipParameters, newFileName);
     }
 
     private void checkZipFile() throws ZipException {
