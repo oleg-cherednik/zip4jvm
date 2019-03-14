@@ -80,7 +80,7 @@ public class UnzipEngine {
     public void extractEntries(@NonNull Path destDir, @NonNull Collection<String> entries, @NonNull UnzipParameters parameters)
             throws ZipException, IOException {
         for (CentralDirectory.FileHeader fileHeader : getFileHeaders(entries)) {
-            // TODO remporary
+            // TODO temporary
             this.fileHeader = fileHeader;
             crc = new CRC32();
             extractEntry(destDir, fileHeader, parameters);

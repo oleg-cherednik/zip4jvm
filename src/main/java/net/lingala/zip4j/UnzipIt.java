@@ -2,11 +2,15 @@ package net.lingala.zip4j;
 
 import lombok.Builder;
 import lombok.NonNull;
-import net.lingala.zip4j.core.ZipFileUnzip;
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.engine.UnzipEngine;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.UnzipParameters;
+import net.lingala.zip4j.model.ZipModel;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -18,8 +22,60 @@ public class UnzipIt {
 
     @NonNull
     private final Path zipFile;
+    @NonNull
+    @Builder.Default
+    private final Charset charset = Charset.defaultCharset();
 
     public void extract(@NonNull Path destDir, @NonNull UnzipParameters parameters) throws ZipException, IOException {
-        new ZipFileUnzip(zipFile).extract(destDir, parameters);
+        checkZipFile();
+        checkOutputFolder(destDir);
+
+        ZipModel zipModel = ZipFile.createZipModel(zipFile, charset);
+        new UnzipEngine(zipModel).extractEntries(destDir, parameters);
+    }
+
+    private void checkZipFile() throws ZipException {
+        if (!Files.isRegularFile(zipFile))
+            throw new ZipException("ZipFile is not a regular file: " + zipFile);
+        if (!Files.exists(zipFile))
+            throw new ZipException("ZipFile not exists: " + zipFile);
+    }
+
+    private static void checkOutputFolder(@NonNull Path dir) throws ZipException {
+
+//        if(!Files.isDirectory(dir))
+//            throw new ZipException("Destination path is not a directory: " + dir);
+//
+//        if (Files.exists(dir)) {
+//
+//            if (!file.isDirectory()) {
+//                throw new ZipException("output folder is not valid");
+//            }
+//
+//            if (!file.canWrite()) {
+//                throw new ZipException("no write access to output folder");
+//            }
+//        } else {
+//            try {
+//                file.mkdirs();
+//                if (!file.isDirectory()) {
+//                    throw new ZipException("output folder is not valid");
+//                }
+//
+//                if (!file.canWrite()) {
+//                    throw new ZipException("no write access to destination folder");
+//                }
+//
+////				SecurityManager manager = new SecurityManager();
+////				try {
+////					manager.checkWrite(file.getAbsolutePath());
+////				} catch (Exception e) {
+////					e.printStackTrace();
+////					throw new ZipException("no write access to destination folder");
+////				}
+//            } catch(Exception e) {
+//                throw new ZipException("Cannot create destination folder");
+//            }
+//        }
     }
 }
