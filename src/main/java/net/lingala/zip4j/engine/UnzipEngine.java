@@ -38,7 +38,6 @@ import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
 import net.lingala.zip4j.util.Raw;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -405,30 +404,6 @@ public class UnzipEngine {
             throw new IOException("zip split file does not exist: " + partFile);
         }
         return new RandomAccessFile(partFile, InternalZipConstants.READ_MODE);
-    }
-
-    private void closeStreams(InputStream is, OutputStream os) throws ZipException {
-        try {
-            if (is != null) {
-                is.close();
-                is = null;
-            }
-        } catch(IOException e) {
-            if (e != null && StringUtils.isNotBlank(e.getMessage())) {
-                if (e.getMessage().indexOf(" - Wrong Password?") >= 0) {
-                    throw new ZipException(e.getMessage());
-                }
-            }
-        } finally {
-            try {
-                if (os != null) {
-                    os.close();
-                    os = null;
-                }
-            } catch(IOException e) {
-                //do nothing
-            }
-        }
     }
 
     public void updateCRC(int b) {

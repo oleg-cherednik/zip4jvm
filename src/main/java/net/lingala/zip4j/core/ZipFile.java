@@ -264,68 +264,6 @@ public class ZipFile {
     }
 
     /**
-     * Sets comment for the Zip path
-     *
-     * @param comment
-     * @throws ZipException
-     */
-    public void setComment(String comment) throws ZipException {
-        if (comment == null)
-            throw new ZipException("input comment is null, cannot update zip path");
-
-        if (!Files.exists(zipFile))
-            throw new ZipException("zip path does not exist, cannot set comment for zip path");
-
-        zipModel = createZipModel();
-
-        if (zipModel == null) {
-            throw new ZipException("zipModel is null, cannot update zip path");
-        }
-
-        if (zipModel.getEndCentralDirectory() == null) {
-            throw new ZipException("end of central directory is null, cannot set comment");
-        }
-
-        ArchiveMaintainer archiveMaintainer = new ArchiveMaintainer();
-        archiveMaintainer.setComment(zipModel, comment);
-    }
-
-    /**
-     * Returns the comment set for the Zip path
-     *
-     * @return String
-     * @throws ZipException
-     */
-    public String getComment() throws ZipException {
-        return getComment(Charset.defaultCharset());
-    }
-
-    /**
-     * Returns the comment set for the Zip path in the input encoding
-     *
-     * @param charset
-     * @return String
-     * @throws ZipException
-     */
-    public String getComment(@NonNull Charset charset) throws ZipException {
-        if (Files.exists(zipFile))
-            readOrCreateModel();
-        else
-            throw new ZipException("zip path does not exist, cannot read comment");
-
-        if (zipModel == null)
-            throw new ZipException("zip model is null, cannot read comment");
-
-        if (zipModel.getEndCentralDirectory() == null)
-            throw new ZipException("end of central directory record is null, cannot read comment");
-
-        if (zipModel.getEndCentralDirectory().getComment() == null)
-            return null;
-
-        return zipModel.getEndCentralDirectory().getComment();
-    }
-
-    /**
      * Returns an input stream for reading the contents of the Zip path corresponding
      * to the input FileHeader. Throws an exception if the FileHeader does not exist
      * in the ZipFile

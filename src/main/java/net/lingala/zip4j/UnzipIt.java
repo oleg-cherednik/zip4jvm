@@ -29,7 +29,7 @@ public class UnzipIt {
     private final char[] password;
 
     public void extract(@NonNull Path destDir) throws ZipException, IOException {
-        checkZipFile();
+        checkZipFile(zipFile);
         checkOutputFolder(destDir);
 
         ZipModel zipModel = ZipFile.createZipModel(zipFile, charset);
@@ -41,14 +41,14 @@ public class UnzipIt {
     }
 
     public void extract(@NonNull Path destDir, @NonNull Collection<String> entries) throws ZipException, IOException {
-        checkZipFile();
+        checkZipFile(zipFile);
         checkOutputFolder(destDir);
 
         ZipModel zipModel = ZipFile.createZipModel(zipFile, charset);
         new UnzipEngine(zipModel, password).extractEntries(destDir, entries);
     }
 
-    private void checkZipFile() throws ZipException {
+    static void checkZipFile(Path zipFile) throws ZipException {
         if (!Files.isRegularFile(zipFile))
             throw new ZipException("ZipFile is not a regular file: " + zipFile);
         if (!Files.exists(zipFile))

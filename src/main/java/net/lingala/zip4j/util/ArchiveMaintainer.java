@@ -34,7 +34,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
-import java.io.UnsupportedEncodingException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -515,50 +514,4 @@ public class ArchiveMaintainer {
                         offsetStartCenDirWRTStartDiskNo);
     }
 
-    public void setComment(ZipModel zipModel, String comment) throws ZipException {
-        if (comment == null) {
-            throw new ZipException("comment is null, cannot update Zip file with comment");
-        }
-
-        if (zipModel == null) {
-            throw new ZipException("zipModel is null, cannot update Zip file with comment");
-        }
-
-        String encodedComment = comment;
-        byte[] commentBytes = comment.getBytes();
-        int commentLength = comment.length();
-
-        if (Zip4jUtil.isSupportedCharset(InternalZipConstants.CHARSET_COMMENTS_DEFAULT)) {
-            try {
-                encodedComment = new String(comment.getBytes(InternalZipConstants.CHARSET_COMMENTS_DEFAULT),
-                        InternalZipConstants.CHARSET_COMMENTS_DEFAULT);
-                commentBytes = encodedComment.getBytes(InternalZipConstants.CHARSET_COMMENTS_DEFAULT);
-                commentLength = encodedComment.length();
-            } catch(UnsupportedEncodingException e) {
-                encodedComment = comment;
-                commentBytes = comment.getBytes();
-                commentLength = comment.length();
-            }
-        }
-
-        if (commentLength > InternalZipConstants.MAX_ALLOWED_ZIP_COMMENT_LENGTH) {
-            throw new ZipException("comment length exceeds maximum length");
-        }
-
-        zipModel.getEndCentralDirectory().setComment(encodedComment);
-
-        try (SplitOutputStream out = new NoSplitOutputStream(zipModel.getZipFile())) {
-            HeaderWriter headerWriter = new HeaderWriter();
-
-            if (zipModel.isZip64Format()) {
-                out.seek(zipModel.getZip64EndCentralDirectory().getOffsetStartCenDirWRTStartDiskNo());
-            } else {
-                out.seek(zipModel.getEndCentralDirectory().getOffOfStartOfCentralDir());
-            }
-
-            headerWriter.finalizeZipFileWithoutValidations(zipModel, out);
-        } catch(Exception e) {
-            throw new ZipException(e);
-        }
-    }
 }
