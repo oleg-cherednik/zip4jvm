@@ -54,4 +54,8 @@ public class Zip64EndCentralDirectory {
     // size:n-44 - extensible data sector
     private byte[] extensibleDataSector;
 
+    public void updateOffsetStartCenDirWRTStartDiskNo(long delta) {
+        offsetStartCenDirWRTStartDiskNo += delta;
+    }
+
 }

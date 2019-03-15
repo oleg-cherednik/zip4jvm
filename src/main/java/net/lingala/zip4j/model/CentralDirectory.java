@@ -149,6 +149,10 @@ public class CentralDirectory {
             generalPurposeFlag.setEncrypted(encryption != Encryption.OFF);
         }
 
+        public void updateOffLocalHeaderRelative(long delta) {
+            offLocalHeaderRelative += delta;
+        }
+
         @Override
         public String toString() {
             return fileName;

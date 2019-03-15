@@ -36,4 +36,8 @@ public class Zip64EndCentralDirectoryLocator {
     // size:4 - total number of disks
     private int totNumberOfDiscs;
 
+    public void updateOffsetZip64EndOfCentralDirRec(long delta) {
+        offsetZip64EndOfCentralDirRec += delta;
+    }
+
 }

@@ -7,7 +7,11 @@ import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.NoSplitOutputStream;
 import net.lingala.zip4j.io.SplitOutputStream;
+import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.Encryption;
+import net.lingala.zip4j.model.EndCentralDirectory;
+import net.lingala.zip4j.model.Zip64EndCentralDirectory;
+import net.lingala.zip4j.model.Zip64EndCentralDirectoryLocator;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
 import org.apache.commons.io.IOUtils;
@@ -20,7 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -108,11 +112,11 @@ public final class ZipMisc {
             throw new ZipException("archive not a split zip file");
 
         try (OutputStream out = new FileOutputStream(destZipFile.toFile())) {
-            List<Long> fileSizeList = new ArrayList<>();
+            long[] fileSizeList = new long[zipModel.getEndCentralDirectory().getNoOfDisk() + 1];
             long totalBytesWritten = copyAllParts(out, zipModel, fileSizeList);
             // TODO what about big file? look at zipModel.getOffOfStartOfCentralDir()
             zipModel.getEndCentralDirectory().setOffOfStartOfCentralDir(totalBytesWritten);
-            updateSplitZipModel(zipModel, fileSizeList);
+            updateZipModel(zipModel, fileSizeList);
             new HeaderWriter().finalizeZipFileWithoutValidations(zipModel, out);
         } catch(ZipException e) {
             throw e;
@@ -121,7 +125,8 @@ public final class ZipMisc {
         }
     }
 
-    private static long copyAllParts(@NonNull OutputStream out, @NonNull ZipModel zipModel, @NonNull List<Long> fileSizeList) throws IOException {
+    @SuppressWarnings("MethodCanBeVariableArityMethod")
+    private static long copyAllParts(@NonNull OutputStream out, @NonNull ZipModel zipModel, @NonNull long[] fileSizeList) throws IOException {
         int noOfDisk = zipModel.getEndCentralDirectory().getNoOfDisk();
         long totalSize = 0;
 
@@ -129,111 +134,62 @@ public final class ZipMisc {
             try (InputStream in = new FileInputStream(zipModel.getPartFile(i).toFile())) {
                 long length = IOUtils.copyLarge(in, out, 0, i == noOfDisk ? zipModel.getOffOfStartOfCentralDir() : zipModel.getSplitLength());
                 totalSize += length;
-                fileSizeList.add(length);
+                fileSizeList[i] = length;
             }
         }
 
         return totalSize;
     }
 
-    public static void updateSplitZipModel(ZipModel zipModel, List<Long> fileSizeList) throws ZipException {
-        if (zipModel == null)
-            throw new ZipException("zip model is null, cannot update split zip model");
+    @SuppressWarnings("MethodCanBeVariableArityMethod")
+    private static void updateZipModel(ZipModel zipModel, long[] fileSizeList) throws ZipException {
+        long totalBytesWritten = Arrays.stream(fileSizeList).sum();
 
         zipModel.setNoSplitArchive();
-        updateSplitFileHeader(zipModel, fileSizeList);
-        updateSplitEndCentralDirectory(zipModel);
-        if (zipModel.isZip64Format()) {
-            updateSplitZip64EndCentralDirLocator(zipModel, fileSizeList);
-            updateSplitZip64EndCentralDirRec(zipModel, fileSizeList);
-        }
+        updateFileHeaders(zipModel, fileSizeList);
+        updateEndCentralDirectory(zipModel);
+        updateZip64EndCentralDirLocator(zipModel, totalBytesWritten);
+        updateZip64EndCentralDirRec(zipModel, totalBytesWritten);
     }
 
-    private static void updateSplitFileHeader(ZipModel zipModel, List<Long> fileSizeList) throws ZipException {
-        try {
-            int fileHeaderCount = zipModel.getCentralDirectory().getFileHeaders().size();
-            int splitSigOverhead = 0;
-
-            for (int i = 0; i < fileHeaderCount; i++) {
-                long offsetLHToAdd = 0;
-
-                for (int j = 0; j < zipModel.getCentralDirectory().getFileHeaders().get(i).getDiskNumberStart(); j++) {
-                    offsetLHToAdd += fileSizeList.get(j);
-                }
-                zipModel.getCentralDirectory().getFileHeaders().get(i).setOffLocalHeaderRelative(
-                        zipModel.getCentralDirectory().getFileHeaders().get(i).getOffLocalHeaderRelative() +
-                                offsetLHToAdd - splitSigOverhead);
-                zipModel.getCentralDirectory().getFileHeaders().get(i).setDiskNumberStart(0);
-            }
-
-        } catch(Exception e) {
-            throw new ZipException(e);
-        }
+    @SuppressWarnings("MethodCanBeVariableArityMethod")
+    private static void updateFileHeaders(ZipModel zipModel, long[] fileSizeList) {
+        zipModel.getCentralDirectory().getFileHeaders().forEach(fileHeader -> {
+            fileHeader.updateOffLocalHeaderRelative(Arrays.stream(fileSizeList, 0, fileHeader.getDiskNumberStart()).sum());
+            fileHeader.setDiskNumberStart(0);
+        });
     }
 
-    private static void updateSplitEndCentralDirectory(ZipModel zipModel) throws ZipException {
-        try {
-            if (zipModel == null)
-                throw new ZipException("zip model is null - cannot update end of central directory for split zip model");
+    private static void updateEndCentralDirectory(ZipModel zipModel) throws ZipException {
+        CentralDirectory centralDirectory = zipModel.getCentralDirectory();
+        EndCentralDirectory endCentralDirectory = zipModel.getEndCentralDirectory();
 
-            zipModel.getEndCentralDirectory().setNoOfDisk(0);
-            zipModel.getEndCentralDirectory().setNoOfDiskStartCentralDir(0);
-            zipModel.getEndCentralDirectory().setTotNoOfEntriesInCentralDir(
-                    zipModel.getCentralDirectory().getFileHeaders().size());
-            zipModel.getEndCentralDirectory().setTotalNumberOfEntriesInCentralDirOnThisDisk(
-                    zipModel.getCentralDirectory().getFileHeaders().size());
-
-        } catch(ZipException e) {
-            throw e;
-        } catch(Exception e) {
-            throw new ZipException(e);
-        }
+        endCentralDirectory.setNoOfDisk(0);
+        endCentralDirectory.setNoOfDiskStartCentralDir(0);
+        endCentralDirectory.setTotNoOfEntriesInCentralDir(centralDirectory.getFileHeaders().size());
+        endCentralDirectory.setTotalNumberOfEntriesInCentralDirOnThisDisk(centralDirectory.getFileHeaders().size());
     }
 
-    private static void updateSplitZip64EndCentralDirLocator(ZipModel zipModel, List<Long> fileSizeList) throws ZipException {
-        if (zipModel == null) {
-            throw new ZipException("zip model is null, cannot update split Zip64 end of central directory locator");
-        }
-
-        if (zipModel.getZip64EndCentralDirectoryLocator() == null) {
+    private static void updateZip64EndCentralDirLocator(ZipModel zipModel, long totalBytesWritten) throws ZipException {
+        if (!zipModel.isZip64Format())
             return;
-        }
 
-        zipModel.getZip64EndCentralDirectoryLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(0);
-        long offsetZip64EndCentralDirRec = 0;
+        Zip64EndCentralDirectoryLocator locator = zipModel.getZip64EndCentralDirectoryLocator();
 
-        for (int i = 0; i < fileSizeList.size(); i++) {
-            offsetZip64EndCentralDirRec += fileSizeList.get(i);
-        }
-        zipModel.getZip64EndCentralDirectoryLocator().setOffsetZip64EndOfCentralDirRec(
-                zipModel.getZip64EndCentralDirectoryLocator().getOffsetZip64EndOfCentralDirRec() +
-                        offsetZip64EndCentralDirRec);
-        zipModel.getZip64EndCentralDirectoryLocator().setTotNumberOfDiscs(1);
+        locator.setNoOfDiskStartOfZip64EndOfCentralDirRec(0);
+        locator.updateOffsetZip64EndOfCentralDirRec(totalBytesWritten);
+        locator.setTotNumberOfDiscs(1);
     }
 
-    private static void updateSplitZip64EndCentralDirRec(ZipModel zipModel, List<Long> fileSizeList) throws ZipException {
-        if (zipModel == null) {
-            throw new ZipException("zip model is null, cannot update split Zip64 end of central directory record");
-        }
-
-        if (zipModel.getZip64EndCentralDirectory() == null) {
+    private static void updateZip64EndCentralDirRec(ZipModel zipModel, long totalBytesWritten) throws ZipException {
+        if (!zipModel.isZip64Format())
             return;
-        }
 
-        zipModel.getZip64EndCentralDirectory().setNoOfThisDisk(0);
-        zipModel.getZip64EndCentralDirectory().setNoOfThisDiskStartOfCentralDir(0);
-        zipModel.getZip64EndCentralDirectory().setTotNoOfEntriesInCentralDirOnThisDisk(
-                zipModel.getEndCentralDirectory().getTotNoOfEntriesInCentralDir());
+        Zip64EndCentralDirectory dir = zipModel.getZip64EndCentralDirectory();
 
-        long offsetStartCenDirWRTStartDiskNo = 0;
-
-        for (int i = 0; i < fileSizeList.size(); i++)
-            offsetStartCenDirWRTStartDiskNo += fileSizeList.get(i);
-
-        zipModel.getZip64EndCentralDirectory().setOffsetStartCenDirWRTStartDiskNo(
-                zipModel.getZip64EndCentralDirectory().getOffsetStartCenDirWRTStartDiskNo() +
-                        offsetStartCenDirWRTStartDiskNo);
+        dir.setNoOfThisDisk(0);
+        dir.setNoOfThisDiskStartOfCentralDir(0);
+        dir.setTotNoOfEntriesInCentralDirOnThisDisk(zipModel.getEndCentralDirectory().getTotNoOfEntriesInCentralDir());
+        dir.updateOffsetStartCenDirWRTStartDiskNo(totalBytesWritten);
     }
-
-
 }
