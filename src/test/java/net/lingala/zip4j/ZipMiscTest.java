@@ -9,7 +9,6 @@ import net.lingala.zip4j.model.ZipParameters;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -83,10 +82,7 @@ public class ZipMiscTest {
         assertThat(Files.isRegularFile(zipFile)).isTrue();
 
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
-        List<File> files = misc.getFiles();
-        assertThat(files).hasSize(1);
-        int a = 0;
-        a++;
+        assertThat(misc.getFiles()).hasSize(1);
     }
 
     @Test(dependsOnMethods = "shouldRetrieveSingleFileWhenNoSplitZip")
@@ -103,8 +99,18 @@ public class ZipMiscTest {
         TestUtils.checkDestinationDir(10, destDir);
 
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
-        List<File> files = misc.getFiles();
+        List<Path> files = misc.getFiles();
 
         assertThat(files).hasSize(10);
+        assertThat(files.get(0).getFileName().toString()).isEqualTo("src.zip");
+        assertThat(files.get(1).getFileName().toString()).isEqualTo("src.z01");
+        assertThat(files.get(2).getFileName().toString()).isEqualTo("src.z02");
+        assertThat(files.get(3).getFileName().toString()).isEqualTo("src.z03");
+        assertThat(files.get(4).getFileName().toString()).isEqualTo("src.z04");
+        assertThat(files.get(5).getFileName().toString()).isEqualTo("src.z05");
+        assertThat(files.get(6).getFileName().toString()).isEqualTo("src.z06");
+        assertThat(files.get(7).getFileName().toString()).isEqualTo("src.z07");
+        assertThat(files.get(8).getFileName().toString()).isEqualTo("src.z08");
+        assertThat(files.get(9).getFileName().toString()).isEqualTo("src.z09");
     }
 }
