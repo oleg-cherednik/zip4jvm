@@ -3,16 +3,16 @@ package net.lingala.zip4j;
 import lombok.Builder;
 import lombok.NonNull;
 import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.engine.ZipEngine;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.engine.ZipEngine;
-import org.apache.commons.lang.NotImplementedException;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,6 +30,14 @@ public final class ZipIt {
     @Builder.Default
     private final Charset charset = Charset.defaultCharset();
 
+    public void add(@NonNull Collection<Path> paths, @NonNull ZipParameters parameters) throws ZipException, IOException {
+        if (paths.stream().anyMatch(path -> !Files.isDirectory(path) && !Files.isRegularFile(path)))
+            throw new ZipException("Cannot add neither directory nor regular file to zip");
+
+        for (Path path : paths)
+            add(path, parameters);
+    }
+
     public void add(@NonNull Path path, @NonNull ZipParameters parameters) throws ZipException, IOException {
         if (Files.isDirectory(path))
             addDirectory(path, parameters);
@@ -39,12 +47,11 @@ public final class ZipIt {
             throw new ZipException("Cannot add neither directory nor regular file to zip: " + path);
     }
 
+    // TODO addDirectory and addRegularFile are same
     private void addDirectory(Path dir, ZipParameters parameters) throws ZipException, IOException {
         assert Files.isDirectory(dir);
 
-        dir = Files.isRegularFile(dir) ? dir.getParent() : dir;
-
-        if (parameters.getDefaultFolderPath() == null)
+        if (Files.isDirectory(dir) && parameters.getDefaultFolderPath() == null)
             parameters.setDefaultFolderPath(dir);
 
         ZipModel zipModel = ZipFile.createZipModel(zipFile, charset);
@@ -54,10 +61,14 @@ public final class ZipIt {
         new ZipEngine(zipModel).addEntries(getDirectoryEntries(dir), parameters);
     }
 
-    private void addRegularFile(Path file, ZipParameters parameters) {
+    private void addRegularFile(Path file, ZipParameters parameters) throws ZipException, IOException {
         assert Files.isRegularFile(file);
 
-        throw new NotImplementedException();
+        ZipModel zipModel = ZipFile.createZipModel(zipFile, charset);
+        checkSplitArchiveModification(zipModel);
+        zipModel.setSplitLength(parameters.getSplitLength());
+
+        new ZipEngine(zipModel).addEntries(Collections.singletonList(file), parameters);
     }
 
     private void checkSplitArchiveModification(@NonNull ZipModel zipModel) throws ZipException {

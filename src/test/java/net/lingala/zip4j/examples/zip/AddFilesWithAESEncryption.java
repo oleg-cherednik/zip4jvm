@@ -16,7 +16,7 @@
 
 package net.lingala.zip4j.examples.zip;
 
-import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.ZipIt;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.AESStrength;
 import net.lingala.zip4j.model.CompressionLevel;
@@ -40,7 +40,7 @@ public class AddFilesWithAESEncryption {
     public AddFilesWithAESEncryption() throws ZipException, IOException {
 
         // Initiate ZipFile object with the path/name of the zip file.
-        ZipFile zipFile = new ZipFile(Paths.get("c:\\ZipTest\\AddFilesWithAESZipEncryption.zip"));
+        ZipIt zip = ZipIt.builder().zipFile(Paths.get("c:\\ZipTest\\AddFilesWithAESZipEncryption.zip")).build();
 
         // Build the list of files to be added in the array list
         // Objects of type File have to be added to the ArrayList
@@ -85,7 +85,7 @@ public class AddFilesWithAESEncryption {
         // Note: If the zip file already exists and if this zip file is a split file
         // then this method throws an exception as Zip Format Specification does not
         // allow updating split zip files
-        zipFile.addFiles(filesToAdd, parameters);
+        zip.add(filesToAdd, parameters);
     }
 
     public static void main(String[] args) throws ZipException, IOException {

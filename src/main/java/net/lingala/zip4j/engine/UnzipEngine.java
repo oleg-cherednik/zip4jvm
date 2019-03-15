@@ -393,7 +393,7 @@ public class UnzipEngine {
     }
 
     public RandomAccessFile startNextSplitFile() throws IOException {
-        String partFile = null;
+        String partFile;
 
         if (currSplitFileCounter == zipModel.getEndCentralDirectory().getNoOfDisk())
             partFile = zipModel.getZipFile().toString();

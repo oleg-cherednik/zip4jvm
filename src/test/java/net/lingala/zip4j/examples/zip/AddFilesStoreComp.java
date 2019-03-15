@@ -16,7 +16,7 @@
 
 package net.lingala.zip4j.examples.zip;
 
-import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.ZipIt;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.ZipParameters;
@@ -41,7 +41,7 @@ public class AddFilesStoreComp {
         // Zip file may not necessarily exist. If zip file exists, then
         // all these files are added to the zip file. If zip file does not
         // exist, then a new zip file is created with the files mentioned
-        ZipFile zipFile = new ZipFile(Paths.get("c:\\ZipTest\\AddFilesStoreComp.zip"));
+        ZipIt zip = ZipIt.builder().zipFile(Paths.get("c:\\ZipTest\\AddFilesStoreComp.zip")).build();
 
         // Build the list of files to be added in the array list
         // Objects of type File have to be added to the ArrayList
@@ -60,7 +60,7 @@ public class AddFilesStoreComp {
         // Note: If the zip file already exists and if this zip file is a split file
         // then this method throws an exception as Zip Format Specification does not
         // allow updating split zip files
-        zipFile.addFiles(filesToAdd, parameters);
+        zip.add(filesToAdd, parameters);
     }
 
     /**

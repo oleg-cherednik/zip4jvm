@@ -16,7 +16,7 @@
 
 package net.lingala.zip4j.examples.zip;
 
-import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.ZipIt;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
@@ -37,7 +37,7 @@ public class CreateSplitZipFile {
 
     public CreateSplitZipFile() throws ZipException, IOException {
         // Initiate ZipFile object with the path/name of the zip file.
-        ZipFile zipFile = new ZipFile(Paths.get("c:\\ZipTest\\CreateSplitZipFile.zip"));
+        ZipIt zip = ZipIt.builder().zipFile(Paths.get("c:\\ZipTest\\CreateSplitZipFile.zip")).build();
 
         // Build the list of files to be added in the array list
         // Objects of type File have to be added to the ArrayList
@@ -62,7 +62,7 @@ public class CreateSplitZipFile {
         // 65536 bytes
         // Please note: If the zip file already exists, then this method throws an
         // exception
-        zipFile.addFiles(filesToAdd, parameters);
+        zip.add(filesToAdd, parameters);
     }
 
     /**

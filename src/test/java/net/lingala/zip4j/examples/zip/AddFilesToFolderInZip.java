@@ -16,7 +16,7 @@
 
 package net.lingala.zip4j.examples.zip;
 
-import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.ZipIt;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
@@ -36,7 +36,7 @@ import java.util.List;
 public class AddFilesToFolderInZip {
 
     public AddFilesToFolderInZip() throws ZipException, IOException {
-        ZipFile zipFile = new ZipFile(Paths.get("c:\\ZipTest\\AddFilesDeflateComp.zip"));
+        ZipIt zip = ZipIt.builder().zipFile(Paths.get("c:\\ZipTest\\AddFilesDeflateComp.zip")).build();
 
         // Build the list of files to be added in the array list
         List<Path> filesToAdd = Arrays.asList(
@@ -58,7 +58,7 @@ public class AddFilesToFolderInZip {
                                                 .rootFolderInZip("test2/").build();
 
         // Now add files to the zip file
-        zipFile.addFiles(filesToAdd, parameters);
+        zip.add(filesToAdd, parameters);
     }
 
     /**

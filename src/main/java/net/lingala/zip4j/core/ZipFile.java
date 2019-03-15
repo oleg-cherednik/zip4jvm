@@ -21,6 +21,8 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.lingala.zip4j.core.readers.ZipModelReader;
+import net.lingala.zip4j.engine.UnzipEngine;
+import net.lingala.zip4j.engine.ZipEngine;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.CentralDirectory;
@@ -28,10 +30,8 @@ import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.InputStreamMeta;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.engine.UnzipEngine;
 import net.lingala.zip4j.util.ArchiveMaintainer;
 import net.lingala.zip4j.util.Zip4jUtil;
-import net.lingala.zip4j.engine.ZipEngine;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
@@ -42,7 +42,6 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Base class to handle zip files. Some of the operations supported
@@ -68,26 +67,6 @@ public class ZipFile {
 
     private ZipModel zipModel;
     private boolean isEncrypted;
-
-    /**
-     * Adds the list of input files to the zip path. If zip path does not exist, then
-     * this method creates a new zip path. Parameters such as compression type, etc
-     * can be set in the input parameters.
-     *
-     * @param files
-     * @param parameters
-     * @throws ZipException
-     */
-    public void addFiles(Collection<Path> files, ZipParameters parameters) throws ZipException, IOException {
-        Objects.requireNonNull(files);
-        Objects.requireNonNull(parameters);
-
-        zipModel = readOrCreateModel();
-        zipModel.setSplitLength(parameters.getSplitLength());
-        checkSplitArchiveModification();
-
-        new ZipEngine(zipModel).addEntries(files, parameters);
-    }
 
     private void checkSplitArchiveModification() throws ZipException {
         if (Files.exists(zipFile) && zipModel.isSplitArchive())

@@ -69,7 +69,7 @@ public class ApplicationTest {
     }
 
     public void addFilesStoreCompNew() throws ZipException, IOException {
-        ZipFile zipFile = new ZipFile(destDir.resolve("src.zip"));
+        ZipIt zip = ZipIt.builder().zipFile(destDir.resolve("src.zip")).build();
 
         List<Path> files = Arrays.asList(
                 srcDir.resolve("mcdonnell-douglas-f15-eagle.jpg"),
@@ -91,14 +91,14 @@ public class ApplicationTest {
         // Note: If the zip file already exists and if this zip file is a split file
         // then this method throws an exception as Zip Format Specification does not
         // allow updating split zip files
-        zipFile.addFiles(files, parameters);
+        zip.add(files, parameters);
 
         checkDestinationDir(1);
 //        checkResultDir();
     }
 
     public void addFileEncryption() throws ZipException, IOException {
-        ZipFile zipFile = new ZipFile(destDir.resolve("src.zip"));
+        ZipIt zip = ZipIt.builder().zipFile(destDir.resolve("src.zip")).build();
         List<Path> files = Collections.singletonList(srcDir.resolve("mcdonnell-douglas-f15-eagle.jpg"));
 
         ZipParameters parameters = ZipParameters.builder()
@@ -114,7 +114,7 @@ public class ApplicationTest {
         // Note: If the zip file already exists and if this zip file is a split file
         // then this method throws an exception as Zip Format Specification does not
         // allow updating split zip files
-        zipFile.addFiles(files, parameters);
+        zip.add(files, parameters);
 
         checkDestinationDir(1);
 //        checkResultDir();
