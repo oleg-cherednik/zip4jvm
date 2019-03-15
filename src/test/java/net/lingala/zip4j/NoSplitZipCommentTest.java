@@ -1,8 +1,10 @@
 package net.lingala.zip4j;
 
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.AESStrength;
 import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
+import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.ZipParameters;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -55,11 +57,11 @@ public class NoSplitZipCommentTest {
         // ---
 
         final String comment = "Oleg Cherednik - Олег Чередник";
-        ZipFileNew zipUtil = ZipFileNew.builder().zipFile(zipFile).build();
-        assertThat(zipUtil.getComment()).isNull();
+        ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
+        assertThat(misc.getComment()).isNull();
 
-        zipUtil.setComment(comment);
-        assertThat(zipUtil.getComment()).isEqualTo(comment);
+        misc.setComment(comment);
+        assertThat(misc.getComment()).isEqualTo(comment);
     }
 
     @Test(dependsOnMethods = "shouldAddCommentToExistedNoSplitZip")
@@ -68,11 +70,37 @@ public class NoSplitZipCommentTest {
         assertThat(Files.exists(zipFile)).isTrue();
         assertThat(Files.isRegularFile(zipFile)).isTrue();
 
-        ZipFileNew zipUtil = ZipFileNew.builder().zipFile(zipFile).build();
-        assertThat(zipUtil.getComment()).isNotBlank();
+        ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
+        assertThat(misc.getComment()).isNotBlank();
 
-        zipUtil.clearComment();
-        assertThat(zipUtil.getComment()).isNull();
+        misc.clearComment();
+        assertThat(misc.getComment()).isNull();
+    }
+
+    @Test(dependsOnMethods = "shouldClearCommentForExistedZip")
+    public void shouldAddCommentToEncryptedZip() throws ZipException, IOException {
+        Path zipFile = destDir.resolve("src.zip");
+        Files.deleteIfExists(zipFile);
+
+        Path carsDir = srcDir.resolve("cars");
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compressionMethod(CompressionMethod.DEFLATE)
+                                                .compressionLevel(CompressionLevel.NORMAL)
+                                                .encryption(Encryption.STANDARD)
+                                                .aesKeyStrength(AESStrength.STRENGTH_256)
+                                                .password("1".toCharArray())
+                                                .defaultFolderPath(srcDir).build();
+
+        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
+        zip.add(carsDir, parameters);
+
+        ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
+        assertThat(misc.isEncrypted()).isTrue();
+
+        final String comment = "Oleg Cherednik - Олег Чередник";
+
+        misc.setComment(comment);
+        assertThat(misc.getComment()).isEqualTo(comment);
     }
 
 }

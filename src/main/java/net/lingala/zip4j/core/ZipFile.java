@@ -26,7 +26,6 @@ import net.lingala.zip4j.engine.ZipEngine;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.CentralDirectory;
-import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.InputStreamMeta;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
@@ -98,43 +97,6 @@ public class ZipFile {
     }
 
     /**
-     * Sets the password for the zip path.<br>
-     * <b>Note</b>: For security reasons, usage of this method is discouraged. Use
-     * setPassword(char[]) instead. As strings are immutable, they cannot be wiped
-     * out from memory explicitly after usage. Therefore, usage of Strings to store
-     * passwords is discouraged. More info here:
-     * http://docs.oracle.com/javase/1.5.0/docs/guide/security/jce/JCERefGuide.html#PBEEx
-     *
-     * @param password
-     * @throws ZipException
-     */
-    public void setPassword(String password) throws ZipException {
-        if (StringUtils.isBlank(password)) {
-            throw new NullPointerException();
-        }
-        setPassword(password.toCharArray());
-    }
-
-    /**
-     * Sets the password for the zip path
-     *
-     * @param password
-     * @throws ZipException
-     */
-    public void setPassword(char[] password) throws ZipException {
-        if (zipModel == null) {
-            zipModel = createZipModel();
-            if (zipModel == null) {
-                throw new ZipException("Zip Model is null");
-            }
-        }
-
-        zipModel.getCentralDirectory().getFileHeaders().stream()
-                .filter(fileHeader -> fileHeader.getEncryption() != Encryption.AES)
-                .forEach(fileHeader -> fileHeader.setPassword(password));
-    }
-
-    /**
      * Returns the list of path headers in the zip path. Throws an exception if the
      * zip path does not exist
      *
@@ -162,21 +124,6 @@ public class ZipFile {
         zipModel = createZipModel();
 
         return zipModel.getFileHeader(fileName);
-    }
-
-    /**
-     * Checks to see if the zip path is encrypted
-     *
-     * @return true if encrypted, false if not
-     * @throws ZipException
-     */
-    public boolean isEncrypted() throws ZipException {
-        zipModel = createZipModel();
-
-        isEncrypted = zipModel.getCentralDirectory().getFileHeaders().stream()
-                              .anyMatch(fileHeader -> fileHeader.getEncryption() != Encryption.OFF);
-
-        return isEncrypted;
     }
 
     /**

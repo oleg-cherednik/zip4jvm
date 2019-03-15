@@ -7,6 +7,7 @@ import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.NoSplitOutputStream;
 import net.lingala.zip4j.io.SplitOutputStream;
+import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
 import org.apache.commons.lang.StringUtils;
@@ -19,7 +20,7 @@ import java.nio.file.Path;
  * @since 15.03.2019
  */
 @Builder
-public final class ZipFileNew {
+public final class ZipMisc {
 
     @NonNull
     private final Path zipFile;
@@ -63,22 +64,13 @@ public final class ZipFileNew {
         return ZipFile.createZipModel(zipFile, charset).getEndCentralDirectory().getComment();
     }
 
-//    /**
-//     * Sets the password for the zip path
-//     *
-//     * @param password
-//     * @throws ZipException
-//     */
-//    public void setPassword(char[] password) throws ZipException {
-//        if (zipModel == null) {
-//            zipModel = createZipModel();
-//            if (zipModel == null) {
-//                throw new ZipException("Zip Model is null");
-//            }
-//        }
-//
-//        zipModel.getCentralDirectory().getFileHeaders().stream()
-//                .filter(fileHeader -> fileHeader.getEncryption() != Encryption.AES)
-//                .forEach(fileHeader -> fileHeader.setPassword(password));
-//    }
+    public boolean isEncrypted() throws ZipException {
+        UnzipIt.checkZipFile(zipFile);
+
+        ZipModel zipModel = ZipFile.createZipModel(zipFile, charset);
+
+        return zipModel.getCentralDirectory().getFileHeaders().stream()
+                       .anyMatch(fileHeader -> fileHeader.getEncryption() != Encryption.OFF);
+    }
+
 }
