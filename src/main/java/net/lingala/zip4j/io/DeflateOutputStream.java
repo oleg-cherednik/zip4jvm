@@ -106,8 +106,4 @@ public abstract class DeflateOutputStream extends CipherOutputStream {
         }
         super.closeEntry();
     }
-
-    public void finish() throws IOException, ZipException {
-        super.finish();
-    }
 }

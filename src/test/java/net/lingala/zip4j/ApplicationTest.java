@@ -10,7 +10,6 @@ import net.lingala.zip4j.model.InputStreamMeta;
 import net.lingala.zip4j.model.ZipParameters;
 import org.apache.commons.io.FileUtils;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -27,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Oleg Cherednik
  * @since 28.02.2019
  */
-@Test
+//@Test
 public class ApplicationTest {
 
     private Path root;

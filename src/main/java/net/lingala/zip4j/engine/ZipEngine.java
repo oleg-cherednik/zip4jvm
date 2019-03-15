@@ -122,8 +122,9 @@ public class ZipEngine {
                     IOUtils.copy(file.getIn(), out);
 
                 out.closeEntry();
-                out.finish();
             }
+
+            out.finish();
         } catch(ZipException e) {
             throw e;
         } catch(Exception e) {
