@@ -9,6 +9,7 @@ import net.lingala.zip4j.io.NoSplitOutputStream;
 import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
+import org.apache.commons.lang.StringUtils;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
@@ -27,25 +28,25 @@ public final class ZipFileNew {
     private final Charset charset = Charset.defaultCharset();
     private final char[] password;
 
+    public void clearComment() throws ZipException {
+        setComment(null);
+    }
+
     public void setComment(String comment) throws ZipException {
+        comment = StringUtils.isEmpty(comment) ? null : comment.trim();
         UnzipIt.checkZipFile(zipFile);
 
         ZipModel zipModel = ZipFile.createZipModel(zipFile, charset);
+        ZipIt.checkSplitArchiveModification(zipModel);
 
-        if (comment.length() > InternalZipConstants.MAX_ALLOWED_ZIP_COMMENT_LENGTH)
+        if (StringUtils.length(comment) > InternalZipConstants.MAX_ALLOWED_ZIP_COMMENT_LENGTH)
             throw new ZipException("comment length exceeds maximum length");
 
         zipModel.getEndCentralDirectory().setComment(comment);
 
         try (SplitOutputStream out = new NoSplitOutputStream(zipModel.getZipFile())) {
-            HeaderWriter headerWriter = new HeaderWriter();
-
-            if (zipModel.isZip64Format())
-                out.seek(zipModel.getZip64EndCentralDirectory().getOffsetStartCenDirWRTStartDiskNo());
-            else
-                out.seek(zipModel.getEndCentralDirectory().getOffOfStartOfCentralDir());
-
-            headerWriter.finalizeZipFileWithoutValidations(zipModel, out);
+            out.seek(zipModel.getOffOfStartOfCentralDir());
+            new HeaderWriter().finalizeZipFileWithoutValidations(zipModel, out);
         } catch(Exception e) {
             throw new ZipException(e);
         }
@@ -61,4 +62,23 @@ public final class ZipFileNew {
         UnzipIt.checkZipFile(zipFile);
         return ZipFile.createZipModel(zipFile, charset).getEndCentralDirectory().getComment();
     }
+
+//    /**
+//     * Sets the password for the zip path
+//     *
+//     * @param password
+//     * @throws ZipException
+//     */
+//    public void setPassword(char[] password) throws ZipException {
+//        if (zipModel == null) {
+//            zipModel = createZipModel();
+//            if (zipModel == null) {
+//                throw new ZipException("Zip Model is null");
+//            }
+//        }
+//
+//        zipModel.getCentralDirectory().getFileHeaders().stream()
+//                .filter(fileHeader -> fileHeader.getEncryption() != Encryption.AES)
+//                .forEach(fileHeader -> fileHeader.setPassword(password));
+//    }
 }

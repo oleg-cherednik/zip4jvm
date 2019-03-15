@@ -71,8 +71,8 @@ public final class ZipIt {
         new ZipEngine(zipModel).addEntries(Collections.singletonList(file), parameters);
     }
 
-    private void checkSplitArchiveModification(@NonNull ZipModel zipModel) throws ZipException {
-        if (Files.exists(zipFile) && zipModel.isSplitArchive())
+    static void checkSplitArchiveModification(@NonNull ZipModel zipModel) throws ZipException {
+        if (Files.exists(zipModel.getZipFile()) && zipModel.isSplitArchive())
             throw new ZipException("Zip file already exists. Zip file format does not allow updating split/spanned files");
     }
 

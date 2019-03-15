@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Oleg Cherednik
  * @since 15.03.2019
  */
-public class ZipCommentTest {
+public class NoSplitZipCommentTest {
 
     private Path root;
     private Path srcDir;
@@ -54,11 +54,25 @@ public class ZipCommentTest {
 
         // ---
 
+        final String comment = "Oleg Cherednik - Олег Чередник";
         ZipFileNew zipUtil = ZipFileNew.builder().zipFile(zipFile).build();
         assertThat(zipUtil.getComment()).isNull();
 
-        zipUtil.setComment("Oleg Cherednik - Олег Чередник");
-        assertThat(zipUtil.getComment()).isEqualTo("Oleg Cherednik - Олег Чередник");
+        zipUtil.setComment(comment);
+        assertThat(zipUtil.getComment()).isEqualTo(comment);
+    }
+
+    @Test(dependsOnMethods = "shouldAddCommentToExistedNoSplitZip")
+    public void shouldClearCommentForExistedZip() throws ZipException {
+        Path zipFile = destDir.resolve("src.zip");
+        assertThat(Files.exists(zipFile)).isTrue();
+        assertThat(Files.isRegularFile(zipFile)).isTrue();
+
+        ZipFileNew zipUtil = ZipFileNew.builder().zipFile(zipFile).build();
+        assertThat(zipUtil.getComment()).isNotBlank();
+
+        zipUtil.clearComment();
+        assertThat(zipUtil.getComment()).isNull();
     }
 
 }

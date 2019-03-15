@@ -122,7 +122,11 @@ public class ZipModel implements Cloneable {
     }
 
     public long getOffOfStartOfCentralDir() {
-        return endCentralDirectory != null ? endCentralDirectory.getOffOfStartOfCentralDir() : 0;
+        if (isZip64Format())
+            return zip64EndCentralDirectory.getOffsetStartCenDirWRTStartDiskNo();
+        if (endCentralDirectory != null)
+            return endCentralDirectory.getOffOfStartOfCentralDir();
+        return 0;
     }
 
     public static Path getSplitFilePath(Path zipFile, int count) {
