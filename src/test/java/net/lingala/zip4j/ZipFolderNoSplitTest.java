@@ -73,6 +73,7 @@ public class ZipFolderNoSplitTest {
 
         assertThat(Files.exists(zipFile)).isTrue();
         assertThat(Files.isRegularFile(zipFile)).isTrue();
+        TestUtils.checkDestinationDir(1, destDir);
 
         // ---
 

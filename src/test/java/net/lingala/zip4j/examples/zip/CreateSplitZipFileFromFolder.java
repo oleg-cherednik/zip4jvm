@@ -16,13 +16,14 @@
 
 package net.lingala.zip4j.examples.zip;
 
-import net.lingala.zip4j.core.ZipFileDir;
+import net.lingala.zip4j.ZipIt;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.ZipParameters;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
@@ -52,7 +53,9 @@ public class CreateSplitZipFileFromFolder {
         // 65536 bytes
         // Please note: If the zip file already exists, then this method throws an
         // exception
-        new ZipFileDir(Paths.get("c:\\ZipTest\\CreateSplitZipFileFromFolder.zip")).addFolder(Paths.get("C:\\ZipTest"), parameters);
+        Path zipFile = Paths.get("c:\\ZipTest\\CreateSplitZipFileFromFolder.zip");
+        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
+        zip.add(Paths.get("C:\\ZipTest"), parameters);
     }
 
     /**

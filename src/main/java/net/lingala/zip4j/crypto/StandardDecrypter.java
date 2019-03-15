@@ -21,6 +21,7 @@ import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.exception.ZipExceptionConstants;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.util.InternalZipConstants;
+import org.apache.commons.lang.ArrayUtils;
 
 public class StandardDecrypter implements IDecrypter {
 
@@ -61,18 +62,20 @@ public class StandardDecrypter implements IDecrypter {
     }
 
     public void init(byte[] headerBytes) throws ZipException {
-        byte[] crcBuff = fileHeader.getCrcBuff();
-        crc[3] = (byte)(crcBuff[3] & 0xFF);
-        crc[2] = (byte)((crcBuff[3] >> 8) & 0xFF);
-        crc[1] = (byte)((crcBuff[3] >> 16) & 0xFF);
-        crc[0] = (byte)((crcBuff[3] >> 24) & 0xFF);
+        long crc32 = fileHeader.getCrc32();
 
-        if (crc[2] > 0 || crc[1] > 0 || crc[0] > 0)
-            throw new IllegalStateException("Invalid CRC in File Header");
+        // TODO check it, temporary commented
+        byte[] crcBuff = new byte[4];
+//        crc[3] = (byte)(crcBuff[3] & 0xFF);
+//        crc[2] = (byte)((crcBuff[3] >> 8) & 0xFF);
+//        crc[1] = (byte)((crcBuff[3] >> 16) & 0xFF);
+//        crc[0] = (byte)((crcBuff[3] >> 24) & 0xFF);
 
-        if (fileHeader.getPassword() == null || fileHeader.getPassword().length <= 0) {
+//        if (crc[2] > 0 || crc[1] > 0 || crc[0] > 0)
+//            throw new IllegalStateException("Invalid CRC in File Header");
+
+        if (ArrayUtils.isEmpty(fileHeader.getPassword()))
             throw new ZipException("Wrong password!", ZipExceptionConstants.WRONG_PASSWORD);
-        }
 
         zipCryptoEngine.initKeys(fileHeader.getPassword());
 

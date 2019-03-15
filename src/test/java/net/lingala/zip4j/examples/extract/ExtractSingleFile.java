@@ -16,7 +16,7 @@
 
 package net.lingala.zip4j.examples.extract;
 
-import net.lingala.zip4j.core.ZipFileUnzip;
+import net.lingala.zip4j.UnzipIt;
 import net.lingala.zip4j.exception.ZipException;
 
 import java.io.IOException;
@@ -33,22 +33,22 @@ public class ExtractSingleFile {
     public ExtractSingleFile() throws ZipException, IOException {
 
         // Initiate ZipFile object with the path/name of the zip file.
-        ZipFileUnzip zipFile = new ZipFileUnzip(Paths.get("c:\\ZipTest\\ExtractSingleFile.zip"));
+        UnzipIt unzip = UnzipIt.builder().zipFile(Paths.get("c:\\ZipTest\\ExtractSingleFile.zip")).build();
 
         // Check to see if the zip file is password protected
 //        if (zipFile.isEncrypted()) {
-            // if yes, then set the password for the zip file
+        // if yes, then set the password for the zip file
 //            zipFile.setPassword("test123!");
 //        }
 
         // Specify the file name which has to be extracted and the path to which
         // this file has to be extracted
-        zipFile.extractFile("Ronan_Keating_-_In_This_Life.mp3", Paths.get("c:\\ZipTest\\"));
+        unzip.extract(Paths.get("c:\\ZipTest\\"), "Ronan_Keating_-_In_This_Life.mp3");
 
         // Note that the file name is the relative file name in the zip file.
         // For example if the zip file contains a file "mysong.mp3" in a folder
         // "FolderToAdd", then extraction of this file can be done as below:
-        zipFile.extractFile("FolderToAdd\\myvideo.avi", Paths.get("c:\\ZipTest\\"));
+        unzip.extract(Paths.get("c:\\ZipTest\\"), "FolderToAdd\\myvideo.avi");
     }
 
     /**

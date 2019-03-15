@@ -16,10 +16,7 @@
 
 package net.lingala.zip4j.examples.extract;
 
-import net.lingala.zip4j.core.ZipFileUnzip;
 import net.lingala.zip4j.exception.ZipException;
-
-import java.nio.file.Paths;
 
 /**
  * Demonstrates extraction of files from a zip file by looping through
@@ -33,11 +30,11 @@ public class ExtractByLoopAllFiles {
     public ExtractByLoopAllFiles() throws ZipException {
 
         // Initiate ZipFile object with the path/name of the zip file.
-        ZipFileUnzip zipFile = new ZipFileUnzip(Paths.get("c:\\ZipTest\\ExtractByLoopAllFiles.zip"));
+//        ZipFileUnzip zipFile = new ZipFileUnzip(Paths.get("c:\\ZipTest\\ExtractByLoopAllFiles.zip"));
 
         // Check to see if the zip file is password protected
 //        if (zipFile.isEncrypted()) {
-            // if yes, then set the password for the zip file
+        // if yes, then set the password for the zip file
 //            zipFile.setPassword("test123!");
 //        }
 

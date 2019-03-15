@@ -37,6 +37,7 @@ import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
 import net.lingala.zip4j.util.Raw;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
@@ -64,6 +65,8 @@ public class UnzipEngine {
 
     @NonNull
     private final ZipModel zipModel;
+
+    private char[] password;
     private CRC32 crc = new CRC32();
 
     private CentralDirectory.FileHeader fileHeader;
@@ -71,6 +74,11 @@ public class UnzipEngine {
     private int currSplitFileCounter = 0;
     private LocalFileHeader localFileHeader;
     private IDecrypter decrypter;
+
+    public UnzipEngine(ZipModel zipModel, char[] password) {
+        this.zipModel = zipModel;
+        this.password = ArrayUtils.clone(password);
+    }
 
     public void extractEntries(@NonNull Path destDir, @NonNull Collection<String> entries) throws ZipException, IOException {
         for (CentralDirectory.FileHeader fileHeader : getFileHeaders(entries)) {
@@ -82,11 +90,17 @@ public class UnzipEngine {
     }
 
     private List<CentralDirectory.FileHeader> getFileHeaders(Collection<String> entries) throws ZipException {
-        return entries.stream()
-                      .map(entryName -> zipModel.getCentralDirectory().getFileHeadersByPrefix(entryName))
-                      .flatMap(List::stream)
-                      .filter(Objects::nonNull)
-                      .collect(Collectors.toList());
+        List<CentralDirectory.FileHeader> fileHeaders = entries.stream()
+                                                               .map(entryName -> zipModel.getCentralDirectory().getFileHeadersByPrefix(entryName))
+                                                               .flatMap(List::stream)
+                                                               .filter(Objects::nonNull)
+                                                               .collect(Collectors.toList());
+
+        fileHeaders.stream()
+                   .filter(fileHeader -> fileHeader.getEncryption() != Encryption.OFF)
+                   .forEach(fileHeader -> fileHeader.setPassword(password));
+
+        return fileHeaders;
     }
 
     public void extractEntry(@NonNull Path destDir) throws ZipException, IOException {

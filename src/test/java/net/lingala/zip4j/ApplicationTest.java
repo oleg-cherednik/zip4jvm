@@ -1,7 +1,6 @@
 package net.lingala.zip4j;
 
 import net.lingala.zip4j.core.ZipFile;
-import net.lingala.zip4j.core.ZipFileDir;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.AESStrength;
 import net.lingala.zip4j.model.CompressionLevel;
@@ -127,7 +126,10 @@ public class ApplicationTest {
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .defaultFolderPath(srcDir)
                                                 .splitLength(1024 * 1024).build();
-        new ZipFileDir(destDir.resolve("src.zip")).addFolder(srcDir, parameters);
+
+        Path zipFile = destDir.resolve("src.zip");
+        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
+        zip.add(srcDir, parameters);
 
         checkDestinationDir(10);
 //        checkResultDir();

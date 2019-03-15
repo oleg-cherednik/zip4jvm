@@ -26,13 +26,14 @@ public class UnzipIt {
     @NonNull
     @Builder.Default
     private final Charset charset = Charset.defaultCharset();
+    private final char[] password;
 
     public void extract(@NonNull Path destDir) throws ZipException, IOException {
         checkZipFile();
         checkOutputFolder(destDir);
 
         ZipModel zipModel = ZipFile.createZipModel(zipFile, charset);
-        new UnzipEngine(zipModel).extractEntries(destDir, zipModel.getEntryNames());
+        new UnzipEngine(zipModel, password).extractEntries(destDir, zipModel.getEntryNames());
     }
 
     public void extract(@NonNull Path destDir, @NonNull String entryName) throws ZipException, IOException {
@@ -44,7 +45,7 @@ public class UnzipIt {
         checkOutputFolder(destDir);
 
         ZipModel zipModel = ZipFile.createZipModel(zipFile, charset);
-        new UnzipEngine(zipModel).extractEntries(destDir, entries);
+        new UnzipEngine(zipModel, password).extractEntries(destDir, entries);
     }
 
     private void checkZipFile() throws ZipException {
