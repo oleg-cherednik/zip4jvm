@@ -1,8 +1,10 @@
 package net.lingala.zip4j;
 
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.AESStrength;
 import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
+import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.ZipParameters;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -48,6 +50,27 @@ public class ZipMiscTest {
         zip.add(srcDir, parameters);
 
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
+        assertThat(misc.getEntryNames()).hasSize(15);
+    }
+
+    @Test(dependsOnMethods = "shouldRetrieveAllEntryNamesForExistedZip")
+    public void shouldRetrieveAllEntryNamesForExistedEncryptedZip() throws ZipException, IOException {
+        Path zipFile = destDir.resolve("src.zip");
+        Files.deleteIfExists(zipFile);
+
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compressionMethod(CompressionMethod.DEFLATE)
+                                                .compressionLevel(CompressionLevel.NORMAL)
+                                                .encryption(Encryption.STANDARD)
+                                                .aesKeyStrength(AESStrength.STRENGTH_256)
+                                                .password("1".toCharArray())
+                                                .defaultFolderPath(srcDir).build();
+
+        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
+        zip.add(srcDir, parameters);
+
+        ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
+        assertThat(misc.isEncrypted()).isTrue();
         assertThat(misc.getEntryNames()).hasSize(15);
     }
 }
