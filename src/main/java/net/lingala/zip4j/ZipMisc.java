@@ -14,6 +14,7 @@ import org.apache.commons.lang.StringUtils;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.List;
 
 /**
  * @author Oleg Cherednik
@@ -71,6 +72,11 @@ public final class ZipMisc {
 
         return zipModel.getCentralDirectory().getFileHeaders().stream()
                        .anyMatch(fileHeader -> fileHeader.getEncryption() != Encryption.OFF);
+    }
+
+    public List<String> getEntryNames() throws ZipException {
+        UnzipIt.checkZipFile(zipFile);
+        return ZipFile.createZipModel(zipFile, charset).getEntryNames();
     }
 
 }
