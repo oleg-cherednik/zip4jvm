@@ -337,8 +337,8 @@ public class UnzipEngine {
             currSplitFileCounter = diskNumberStartOfFile + 1;
 
             try {
-                String partFile = zipModel.getPartFile(diskNumberStartOfFile);
-                RandomAccessFile raf = new RandomAccessFile(partFile, InternalZipConstants.READ_MODE);
+                Path partFile = zipModel.getPartFile(diskNumberStartOfFile);
+                RandomAccessFile raf = new RandomAccessFile(partFile.toFile(), InternalZipConstants.READ_MODE);
 
                 if (currSplitFileCounter == 1) {
                     byte[] splitSig = new byte[4];

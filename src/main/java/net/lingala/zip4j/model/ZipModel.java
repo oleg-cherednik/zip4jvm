@@ -133,10 +133,10 @@ public class ZipModel implements Cloneable {
         return zipFile.getParent().resolve(String.format("%s.z%02d", FilenameUtils.getBaseName(zipFile.toString()), count));
     }
 
-    public String getPartFile(int diskNumberStartOfFile) {
+    public Path getPartFile(int diskNumberStartOfFile) {
         if (diskNumberStartOfFile == endCentralDirectory.getNoOfDisk())
-            return zipFile.toString();
-        return getSplitFilePath(zipFile, diskNumberStartOfFile + 1).toString();
+            return zipFile;
+        return getSplitFilePath(zipFile, diskNumberStartOfFile + 1);
     }
 
 }

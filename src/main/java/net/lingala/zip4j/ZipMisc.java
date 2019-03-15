@@ -14,13 +14,10 @@ import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -108,41 +105,35 @@ public final class ZipMisc {
         if (!zipModel.isSplitArchive())
             throw new ZipException("archive not a split zip file");
 
-        LittleEndianRandomAccessFile in = null;
         List<Long> fileSizeList = new ArrayList<>();
         long totBytesWritten = 0;
         boolean splitSigRemoved = false;
 
-        try (OutputStream outputStream = new FileOutputStream(destZipFile.toFile())) {
+        try (OutputStream out = new FileOutputStream(destZipFile.toFile())) {
             int noOfDisk = zipModel.getEndCentralDirectory().getNoOfDisk();
 
             for (int i = 0; i <= noOfDisk; i++) {
-                in = createSplitZipFileHandler(zipModel, i);
+                try (LittleEndianRandomAccessFile in = new LittleEndianRandomAccessFile(zipModel.getPartFile(i))) {
 
-                int start = 0;
-                long end = in.length();
+                    int start = 0;
+                    long end = in.length();
 
-                if (i == 0 && !zipModel.isEmpty()) {
-                    in.seek(0);
+                    if (i == 0 && !zipModel.isEmpty()) {
+                        in.seek(0);
 
-                    if (in.readInt() == InternalZipConstants.SPLITSIG) {
-                        start = 4;
-                        splitSigRemoved = true;
+                        if (in.readInt() == InternalZipConstants.SPLITSIG) {
+                            start = 4;
+                            splitSigRemoved = true;
+                        }
                     }
-                }
 
-                if (i == noOfDisk)
-                    end = zipModel.getEndCentralDirectory().getOffOfStartOfCentralDir();
+                    if (i == noOfDisk)
+                        end = zipModel.getEndCentralDirectory().getOffOfStartOfCentralDir();
 
-                ArchiveMaintainer.copyFile(in.getRaf(), outputStream, start, end);
-                totBytesWritten += end - start;
+                    ArchiveMaintainer.copyFile(in.getRaf(), out, start, end);
+                    totBytesWritten += end - start;
 
-                fileSizeList.add(end);
-
-                try {
-                    in.close();
-                } catch(IOException e) {
-                    //ignore
+                    fileSizeList.add(end);
                 }
             }
 
@@ -152,27 +143,13 @@ public final class ZipMisc {
             updateSplitZipModel(newZipModel, fileSizeList, splitSigRemoved);
 
             HeaderWriter headerWriter = new HeaderWriter();
-            headerWriter.finalizeZipFileWithoutValidations(newZipModel, outputStream);
+            headerWriter.finalizeZipFileWithoutValidations(newZipModel, out);
 
+        } catch(ZipException e) {
+            throw e;
         } catch(Exception e) {
             throw new ZipException(e);
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch(IOException e) {
-                    // ignore
-                }
-            }
         }
-    }
-
-    private static LittleEndianRandomAccessFile createSplitZipFileHandler(@NonNull ZipModel zipModel, int diskNumberStartOfFile)
-            throws ZipException, FileNotFoundException {
-        assert diskNumberStartOfFile >= 0;
-
-        String partFile = zipModel.getPartFile(diskNumberStartOfFile);
-        return new LittleEndianRandomAccessFile(Paths.get(partFile));
     }
 
     public static void updateSplitZipModel(ZipModel zipModel, List<Long> fileSizeList, boolean splitSigRemoved) throws ZipException {
