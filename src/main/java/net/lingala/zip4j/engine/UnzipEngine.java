@@ -335,14 +335,9 @@ public class UnzipEngine {
         if (zipModel.isSplitArchive()) {
             int diskNumberStartOfFile = fileHeader.getDiskNumberStart();
             currSplitFileCounter = diskNumberStartOfFile + 1;
-            String partFile;
-
-            if (diskNumberStartOfFile == zipModel.getEndCentralDirectory().getNoOfDisk())
-                partFile = zipModel.getZipFile().toString();
-            else
-                partFile = ZipModel.getSplitFilePath(zipModel.getZipFile(), diskNumberStartOfFile + 1).toString();
 
             try {
+                String partFile = zipModel.getPartFile(diskNumberStartOfFile);
                 RandomAccessFile raf = new RandomAccessFile(partFile, InternalZipConstants.READ_MODE);
 
                 if (currSplitFileCounter == 1) {

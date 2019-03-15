@@ -8,22 +8,19 @@ import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.NoSplitOutputStream;
 import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.model.Encryption;
-import net.lingala.zip4j.model.Zip64EndCentralDirectory;
-import net.lingala.zip4j.model.Zip64EndCentralDirectoryLocator;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.ArchiveMaintainer;
 import net.lingala.zip4j.util.InternalZipConstants;
-import net.lingala.zip4j.util.Raw;
+import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -108,59 +105,42 @@ public final class ZipMisc {
     public void merge(@NonNull Path destZipFile) throws ZipException {
         ZipModel zipModel = ZipFile.createZipModel(zipFile, charset);
 
-        if (zipModel == null) {
-            ZipException e = new ZipException("one of the input parameters is null, cannot merge split zip file");
-            throw e;
-        }
+        if (!zipModel.isSplitArchive())
+            throw new ZipException("archive not a split zip file");
 
-        if (!zipModel.isSplitArchive()) {
-            ZipException e = new ZipException("archive not a split zip file");
-            throw e;
-        }
-
-        OutputStream outputStream = null;
-        RandomAccessFile inputStream = null;
-        ArrayList fileSizeList = new ArrayList();
+        LittleEndianRandomAccessFile in = null;
+        List<Long> fileSizeList = new ArrayList<>();
         long totBytesWritten = 0;
         boolean splitSigRemoved = false;
-        try {
 
-            int totNoOfSplitFiles = zipModel.getEndCentralDirectory().getNoOfDisk();
+        try (OutputStream outputStream = new FileOutputStream(destZipFile.toFile())) {
+            int noOfDisk = zipModel.getEndCentralDirectory().getNoOfDisk();
 
-            if (totNoOfSplitFiles <= 0) {
-                throw new ZipException("corrupt zip model, archive not a split zip file");
-            }
-
-            outputStream = prepareOutputStreamForMerge(destZipFile.toFile());
-            for (int i = 0; i <= totNoOfSplitFiles; i++) {
-                inputStream = createSplitZipFileHandler(zipModel, i);
+            for (int i = 0; i <= noOfDisk; i++) {
+                in = createSplitZipFileHandler(zipModel, i);
 
                 int start = 0;
-                Long end = new Long(inputStream.length());
+                long end = in.length();
 
-                if (i == 0) {
-                    if (!zipModel.isEmpty()) {
-                        byte[] buff = new byte[4];
-                        inputStream.seek(0);
-                        inputStream.read(buff);
-                        if (Raw.readIntLittleEndian(buff, 0) == InternalZipConstants.SPLITSIG) {
-                            start = 4;
-                            splitSigRemoved = true;
-                        }
+                if (i == 0 && !zipModel.isEmpty()) {
+                    in.seek(0);
+
+                    if (in.readInt() == InternalZipConstants.SPLITSIG) {
+                        start = 4;
+                        splitSigRemoved = true;
                     }
                 }
 
-                if (i == totNoOfSplitFiles) {
-                    end = new Long(zipModel.getEndCentralDirectory().getOffOfStartOfCentralDir());
-                }
+                if (i == noOfDisk)
+                    end = zipModel.getEndCentralDirectory().getOffOfStartOfCentralDir();
 
-                ArchiveMaintainer.copyFile(inputStream, outputStream, start, end.longValue());
-                totBytesWritten += (end.longValue() - start);
+                ArchiveMaintainer.copyFile(in.getRaf(), outputStream, start, end);
+                totBytesWritten += end - start;
 
                 fileSizeList.add(end);
 
                 try {
-                    inputStream.close();
+                    in.close();
                 } catch(IOException e) {
                     //ignore
                 }
@@ -177,17 +157,9 @@ public final class ZipMisc {
         } catch(Exception e) {
             throw new ZipException(e);
         } finally {
-            if (outputStream != null) {
+            if (in != null) {
                 try {
-                    outputStream.close();
-                } catch(IOException e) {
-                    //ignore
-                }
-            }
-
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
+                    in.close();
                 } catch(IOException e) {
                     // ignore
                 }
@@ -195,54 +167,15 @@ public final class ZipMisc {
         }
     }
 
-    private OutputStream prepareOutputStreamForMerge(File outFile) throws ZipException {
-        if (outFile == null) {
-            throw new ZipException("outFile is null, cannot create outputstream");
-        }
+    private static LittleEndianRandomAccessFile createSplitZipFileHandler(@NonNull ZipModel zipModel, int diskNumberStartOfFile)
+            throws ZipException, FileNotFoundException {
+        assert diskNumberStartOfFile >= 0;
 
-        try {
-            return new FileOutputStream(outFile);
-        } catch(FileNotFoundException e) {
-            throw new ZipException(e);
-        } catch(Exception e) {
-            throw new ZipException(e);
-        }
+        String partFile = zipModel.getPartFile(diskNumberStartOfFile);
+        return new LittleEndianRandomAccessFile(Paths.get(partFile));
     }
 
-    private RandomAccessFile createSplitZipFileHandler(ZipModel zipModel, int partNumber) throws ZipException {
-        if (zipModel == null) {
-            throw new ZipException("zip model is null, cannot create split file handler");
-        }
-
-        if (partNumber < 0) {
-            throw new ZipException("invlaid part number, cannot create split file handler");
-        }
-
-        try {
-            String curZipFile = zipModel.getZipFile().toString();
-            String partFile = null;
-
-            if (partNumber == zipModel.getEndCentralDirectory().getNoOfDisk())
-                partFile = zipModel.getZipFile().toString();
-            else
-                partFile = ZipModel.getSplitFilePath(zipModel.getZipFile(), partNumber + 1).toString();
-
-            File tmpFile = new File(partFile);
-
-            if (!tmpFile.exists()) {
-                throw new ZipException("split file does not exist: " + partFile);
-            }
-
-            return new RandomAccessFile(tmpFile, InternalZipConstants.READ_MODE);
-        } catch(FileNotFoundException e) {
-            throw new ZipException(e);
-        } catch(Exception e) {
-            throw new ZipException(e);
-        }
-
-    }
-
-    public static void updateSplitZipModel(ZipModel zipModel, ArrayList fileSizeList, boolean splitSigRemoved) throws ZipException {
+    public static void updateSplitZipModel(ZipModel zipModel, List<Long> fileSizeList, boolean splitSigRemoved) throws ZipException {
         if (zipModel == null)
             throw new ZipException("zip model is null, cannot update split zip model");
 
@@ -255,7 +188,7 @@ public final class ZipMisc {
         }
     }
 
-    private static void updateSplitFileHeader(ZipModel zipModel, ArrayList fileSizeList, boolean splitSigRemoved) throws ZipException {
+    private static void updateSplitFileHeader(ZipModel zipModel, List<Long> fileSizeList, boolean splitSigRemoved) throws ZipException {
         try {
             int fileHeaderCount = zipModel.getCentralDirectory().getFileHeaders().size();
             int splitSigOverhead = 0;
@@ -266,7 +199,7 @@ public final class ZipMisc {
                 long offsetLHToAdd = 0;
 
                 for (int j = 0; j < zipModel.getCentralDirectory().getFileHeaders().get(i).getDiskNumberStart(); j++) {
-                    offsetLHToAdd += (Long)fileSizeList.get(j);
+                    offsetLHToAdd += fileSizeList.get(j);
                 }
                 zipModel.getCentralDirectory().getFileHeaders().get(i).setOffLocalHeaderRelative(
                         zipModel.getCentralDirectory().getFileHeaders().get(i).getOffLocalHeaderRelative() +
@@ -298,7 +231,7 @@ public final class ZipMisc {
         }
     }
 
-    private static void updateSplitZip64EndCentralDirLocator(ZipModel zipModel, ArrayList fileSizeList) throws ZipException {
+    private static void updateSplitZip64EndCentralDirLocator(ZipModel zipModel, List<Long> fileSizeList) throws ZipException {
         if (zipModel == null) {
             throw new ZipException("zip model is null, cannot update split Zip64 end of central directory locator");
         }
@@ -311,15 +244,15 @@ public final class ZipMisc {
         long offsetZip64EndCentralDirRec = 0;
 
         for (int i = 0; i < fileSizeList.size(); i++) {
-            offsetZip64EndCentralDirRec += ((Long)fileSizeList.get(i)).longValue();
+            offsetZip64EndCentralDirRec += fileSizeList.get(i);
         }
         zipModel.getZip64EndCentralDirectoryLocator().setOffsetZip64EndOfCentralDirRec(
-                ((Zip64EndCentralDirectoryLocator)zipModel.getZip64EndCentralDirectoryLocator()).getOffsetZip64EndOfCentralDirRec() +
+                zipModel.getZip64EndCentralDirectoryLocator().getOffsetZip64EndOfCentralDirRec() +
                         offsetZip64EndCentralDirRec);
         zipModel.getZip64EndCentralDirectoryLocator().setTotNumberOfDiscs(1);
     }
 
-    private static void updateSplitZip64EndCentralDirRec(ZipModel zipModel, ArrayList fileSizeList) throws ZipException {
+    private static void updateSplitZip64EndCentralDirRec(ZipModel zipModel, List<Long> fileSizeList) throws ZipException {
         if (zipModel == null) {
             throw new ZipException("zip model is null, cannot update split Zip64 end of central directory record");
         }
@@ -335,12 +268,11 @@ public final class ZipMisc {
 
         long offsetStartCenDirWRTStartDiskNo = 0;
 
-        for (int i = 0; i < fileSizeList.size(); i++) {
-            offsetStartCenDirWRTStartDiskNo += ((Long)fileSizeList.get(i)).longValue();
-        }
+        for (int i = 0; i < fileSizeList.size(); i++)
+            offsetStartCenDirWRTStartDiskNo += fileSizeList.get(i);
 
         zipModel.getZip64EndCentralDirectory().setOffsetStartCenDirWRTStartDiskNo(
-                ((Zip64EndCentralDirectory)zipModel.getZip64EndCentralDirectory()).getOffsetStartCenDirWRTStartDiskNo() +
+                zipModel.getZip64EndCentralDirectory().getOffsetStartCenDirWRTStartDiskNo() +
                         offsetStartCenDirWRTStartDiskNo);
     }
 
