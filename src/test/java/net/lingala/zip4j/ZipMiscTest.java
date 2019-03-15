@@ -9,10 +9,12 @@ import net.lingala.zip4j.model.ZipParameters;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -72,5 +74,37 @@ public class ZipMiscTest {
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
         assertThat(misc.isEncrypted()).isTrue();
         assertThat(misc.getEntryNames()).hasSize(15);
+    }
+
+    @Test(dependsOnMethods = "shouldRetrieveAllEntryNamesForExistedEncryptedZip")
+    public void shouldRetrieveSingleFileWhenNoSplitZip() throws ZipException {
+        Path zipFile = destDir.resolve("src.zip");
+        assertThat(Files.exists(zipFile)).isTrue();
+        assertThat(Files.isRegularFile(zipFile)).isTrue();
+
+        ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
+        List<File> files = misc.getFiles();
+        assertThat(files).hasSize(1);
+        int a = 0;
+        a++;
+    }
+
+    @Test(dependsOnMethods = "shouldRetrieveSingleFileWhenNoSplitZip")
+    public void shouldRetrieveMultipleFilesWhenSplitZip() throws IOException, ZipException {
+        Path zipFile = destDir.resolve("src.zip");
+        Files.deleteIfExists(zipFile);
+
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compressionMethod(CompressionMethod.DEFLATE)
+                                                .compressionLevel(CompressionLevel.NORMAL)
+                                                .splitLength(1024 * 1024).build();
+        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
+        zip.add(srcDir, parameters);
+        TestUtils.checkDestinationDir(10, destDir);
+
+        ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
+        List<File> files = misc.getFiles();
+
+        assertThat(files).hasSize(10);
     }
 }

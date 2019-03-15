@@ -5,6 +5,7 @@ import lombok.NonNull;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.engine.ZipEngine;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.InputStreamMeta;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
 
@@ -45,6 +46,20 @@ public final class ZipIt {
             addRegularFile(path, parameters);
         else
             throw new ZipException("Cannot add neither directory nor regular file to zip: " + path);
+    }
+
+    public void add(@NonNull InputStreamMeta file, @NonNull ZipParameters parameters) throws ZipException {
+        addStream(Collections.singletonList(file), parameters);
+    }
+
+    public void addStream(@NonNull Collection<InputStreamMeta> files, @NonNull ZipParameters parameters) throws ZipException {
+        ZipModel zipModel = ZipFile.createZipModel(zipFile, charset);
+        checkSplitArchiveModification(zipModel);
+        zipModel.setSplitLength(parameters.getSplitLength());
+
+        parameters.setSourceExternalStream(true);
+
+        new ZipEngine(zipModel).addStreamToZip(files, parameters);
     }
 
     // TODO addDirectory and addRegularFile are same

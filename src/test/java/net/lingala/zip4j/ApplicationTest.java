@@ -1,17 +1,14 @@
 package net.lingala.zip4j;
 
-import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.AESStrength;
 import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.Encryption;
-import net.lingala.zip4j.model.InputStreamMeta;
 import net.lingala.zip4j.model.ZipParameters;
 import org.apache.commons.io.FileUtils;
 import org.testng.annotations.BeforeMethod;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -135,16 +132,16 @@ public class ApplicationTest {
     }
 
     public void addFilesWithStream() throws IOException, ZipException {
-        ZipFile zipFile = new ZipFile(destDir.resolve("src.zip"));
-        ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(CompressionMethod.DEFLATE)
-                                                .compressionLevel(CompressionLevel.NORMAL)
-                                                .isSourceExternalStream(true).build();
-
-        List<InputStreamMeta> files = Arrays.asList(
-                new InputStreamMeta(new FileInputStream(srcDir.resolve("saint-petersburg.jpg").toFile()), "one_one/one.jpg"),
-                new InputStreamMeta(new FileInputStream(srcDir.resolve("cars/bentley-continental.jpg").toFile()), "two_two/two.jpg"));
-        zipFile.addStream(files, parameters);
+//        ZipFile zipFile = new ZipFile(destDir.resolve("src.zip"));
+//        ZipParameters parameters = ZipParameters.builder()
+//                                                .compressionMethod(CompressionMethod.DEFLATE)
+//                                                .compressionLevel(CompressionLevel.NORMAL)
+//                                                .isSourceExternalStream(true).build();
+//
+//        List<InputStreamMeta> files = Arrays.asList(
+//                new InputStreamMeta(new FileInputStream(srcDir.resolve("saint-petersburg.jpg").toFile()), "one_one/one.jpg"),
+//                new InputStreamMeta(new FileInputStream(srcDir.resolve("cars/bentley-continental.jpg").toFile()), "two_two/two.jpg"));
+//        zipFile.addStream(files, parameters);
     }
 
 //    public void shouldZipAndUnzipWithSinglePart() throws Exception {

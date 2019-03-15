@@ -26,11 +26,8 @@ import net.lingala.zip4j.engine.ZipEngine;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.CentralDirectory;
-import net.lingala.zip4j.model.InputStreamMeta;
 import net.lingala.zip4j.model.ZipModel;
-import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.ArchiveMaintainer;
-import net.lingala.zip4j.util.Zip4jUtil;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
@@ -38,9 +35,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Base class to handle zip files. Some of the operations supported
@@ -70,60 +64,6 @@ public class ZipFile {
     private void checkSplitArchiveModification() throws ZipException {
         if (Files.exists(zipFile) && zipModel.isSplitArchive())
             throw new ZipException("Zip file already exists. Zip file format does not allow updating split/spanned files");
-    }
-
-    /**
-     * Creates a new entry in the zip path and adds the content of the inputstream to the
-     * zip path. ZipParameters.isSourceExternalStream and ZipParameters.fileNameInZip have to be
-     * set before in the input parameters. If the path name ends with / or \, this method treats the
-     * content as a directory. Setting the flag ProgressMonitor.setRunInThread to true will have
-     * no effect for this method and hence this method cannot be used to add content to zip in
-     * thread mode
-     *
-     * @param parameters
-     * @throws ZipException
-     */
-    public void addStream(@NonNull Collection<InputStreamMeta> files, @NonNull ZipParameters parameters) throws ZipException {
-        readOrCreateModel();
-
-        if (Files.exists(zipFile) && zipModel.isSplitArchive())
-            throw new ZipException("Zip path already exists. Zip path format does not allow updating split/spanned files");
-
-        new ZipEngine(zipModel).addStreamToZip(files, parameters);
-    }
-
-    public void addStream(@NonNull InputStreamMeta file, @NonNull ZipParameters parameters) throws ZipException {
-        addStream(Collections.singletonList(file), parameters);
-    }
-
-    /**
-     * Returns the list of path headers in the zip path. Throws an exception if the
-     * zip path does not exist
-     *
-     * @return list of path headers
-     * @throws ZipException
-     */
-    public List<CentralDirectory.FileHeader> getFileHeaders() throws ZipException {
-        zipModel = createZipModel();
-        return zipModel.getCentralDirectory().getFileHeaders();
-    }
-
-    /**
-     * Returns FileHeader if a path header with the given fileHeader
-     * string exists in the zip model: If not returns null
-     *
-     * @param fileName
-     * @return FileHeader
-     * @throws ZipException
-     */
-    public CentralDirectory.FileHeader getFileHeader(String fileName) throws ZipException {
-        if (StringUtils.isBlank(fileName)) {
-            throw new ZipException("input path name is emtpy or null, cannot get FileHeader");
-        }
-
-        zipModel = createZipModel();
-
-        return zipModel.getFileHeader(fileName);
     }
 
     /**
@@ -178,7 +118,7 @@ public class ZipFile {
      * @throws ZipException
      */
     public void removeFile(@NonNull CentralDirectory.FileHeader fileHeader) throws ZipException {
-        readOrCreateModel();
+        zipModel = createZipModel(zipFile, charset);
         checkSplitArchiveModification();
 
         new ZipEngine(zipModel).removeFile(fileHeader);
@@ -200,7 +140,7 @@ public class ZipFile {
             throw new ZipException("output Zip File already exists");
         }
 
-        readOrCreateModel();
+        zipModel = createZipModel(zipFile, charset);
 
         if (this.zipModel == null) {
             throw new ZipException("zip model is null, corrupt zip path?");
@@ -224,43 +164,12 @@ public class ZipFile {
             throw new ZipException("FileHeader is null, cannot get InputStream");
         }
 
-        readOrCreateModel();
+        zipModel = createZipModel(zipFile, charset);
 
         if (zipModel == null)
             throw new ZipException("zip model is null, cannot get inputstream");
 
         return new UnzipEngine(zipModel).getInputStream();
-    }
-
-    /**
-     * Checks to see if the input zip path is a valid zip path. This method
-     * will try to read zip headers. If headers are read successfully, this
-     * method returns true else false
-     *
-     * @return boolean
-     * @since 1.2.3
-     */
-    public boolean isValidZipFile() {
-        try {
-            zipModel = createZipModel();
-            return true;
-        } catch(Exception e) {
-            return false;
-        }
-    }
-
-    /**
-     * Returns the full path path+names of all split zip files
-     * in an ArrayList. For example: If a split zip path(abc.zip) has a 10 split parts
-     * this method returns an array list with path + "abc.z01", path + "abc.z02", etc.
-     * Returns null if the zip path does not exist
-     *
-     * @return ArrayList of Strings
-     * @throws ZipException
-     */
-    public List<File> getSplitZipFiles() throws ZipException {
-        readOrCreateModel();
-        return Zip4jUtil.getSplitZipFiles(zipModel);
     }
 
     /**
@@ -289,7 +198,4 @@ public class ZipFile {
         }
     }
 
-    private ZipModel readOrCreateModel() throws ZipException {
-        return createZipModel(zipFile, charset);
-    }
 }

@@ -12,8 +12,10 @@ import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
 import org.apache.commons.lang.StringUtils;
 
+import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -67,7 +69,6 @@ public final class ZipMisc {
 
     public boolean isEncrypted() throws ZipException {
         UnzipIt.checkZipFile(zipFile);
-
         ZipModel zipModel = ZipFile.createZipModel(zipFile, charset);
 
         return zipModel.getCentralDirectory().getFileHeaders().stream()
@@ -77,6 +78,47 @@ public final class ZipMisc {
     public List<String> getEntryNames() throws ZipException {
         UnzipIt.checkZipFile(zipFile);
         return ZipFile.createZipModel(zipFile, charset).getEntryNames();
+    }
+
+    public List<File> getFiles() throws ZipException {
+        UnzipIt.checkZipFile(zipFile);
+        ZipModel zipModel = ZipFile.createZipModel(zipFile, charset);
+
+        List<File> retList = new ArrayList<>();
+        String currZipFile = zipModel.getZipFile().toString();
+        String zipFileName = new File(currZipFile).getName();
+        String partFile = null;
+
+        if (StringUtils.isBlank(currZipFile)) {
+            throw new ZipException("cannot get split zip files: zipfile is null");
+        }
+
+        if (!zipModel.isSplitArchive()) {
+            retList.add(zipModel.getZipFile().toFile());
+            return retList;
+        }
+
+        int numberOfThisDisk = zipModel.getEndCentralDirectory().getNoOfDisk();
+
+        if (numberOfThisDisk == 0) {
+            retList.add(zipModel.getZipFile().toFile());
+            return retList;
+        } else {
+            for (int i = 0; i <= numberOfThisDisk; i++) {
+                if (i == numberOfThisDisk) {
+                    retList.add(zipModel.getZipFile().toFile());
+                } else {
+                    String fileExt = ".z0";
+                    if (i > 9) {
+                        fileExt = ".z";
+                    }
+                    partFile = (zipFileName.contains(".")) ? currZipFile.substring(0, currZipFile.lastIndexOf('.')) : currZipFile;
+                    partFile = partFile + fileExt + (i + 1);
+                    retList.add(new File(partFile));
+                }
+            }
+        }
+        return retList;
     }
 
 }
