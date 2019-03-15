@@ -9,6 +9,7 @@ import net.lingala.zip4j.io.NoSplitOutputStream;
 import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.ZipModel;
+import net.lingala.zip4j.util.ArchiveMaintainer;
 import net.lingala.zip4j.util.InternalZipConstants;
 import org.apache.commons.lang.StringUtils;
 
@@ -87,6 +88,18 @@ public final class ZipMisc {
         return IntStream.rangeClosed(0, zipModel.getEndCentralDirectory().getNoOfDisk())
                         .mapToObj(i -> i == 0 ? zipModel.getZipFile() : ZipModel.getSplitFilePath(zipFile, i))
                         .collect(Collectors.toList());
+    }
+
+    public boolean isSplit() throws ZipException {
+        UnzipIt.checkZipFile(zipFile);
+        return ZipFile.createZipModel(zipFile, charset).isSplitArchive();
+    }
+
+    public void merge(@NonNull Path destZipFile) throws ZipException {
+        ZipModel zipModel = ZipFile.createZipModel(zipFile, charset);
+
+        ArchiveMaintainer archiveMaintainer = new ArchiveMaintainer();
+        archiveMaintainer.mergeSplitZipFiles(zipModel, destZipFile.toFile());
     }
 
 }

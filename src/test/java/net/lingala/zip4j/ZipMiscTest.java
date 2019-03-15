@@ -113,4 +113,31 @@ public class ZipMiscTest {
         assertThat(files.get(8).getFileName().toString()).isEqualTo("src.z08");
         assertThat(files.get(9).getFileName().toString()).isEqualTo("src.z09");
     }
+
+    @Test(dependsOnMethods = "shouldRetrieveMultipleFilesWhenSplitZip")
+    public void shouldMergeSplitZip() throws ZipException, IOException {
+        Path zipFile = destDir.resolve("src.zip");
+        assertThat(Files.exists(zipFile)).isTrue();
+        assertThat(Files.isRegularFile(zipFile)).isTrue();
+
+        ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
+        assertThat(misc.isSplit()).isTrue();
+
+        Path mergeDir = destDir.resolve("merge");
+        Path mergeZipFle = mergeDir.resolve("src.zip");
+        // TODO temporary
+        Files.createDirectories(mergeDir);
+        misc.merge(mergeZipFle);
+
+        assertThat(Files.exists(zipFile)).isTrue();
+        assertThat(Files.isRegularFile(zipFile)).isTrue();
+        TestUtils.checkDirectory(mergeDir, 0, 1);
+
+        //---
+
+        Path mergeResDir = mergeDir.resolve("res");
+        UnzipIt unzip = UnzipIt.builder().zipFile(zipFile).build();
+        unzip.extract(mergeResDir);
+        TestUtils.checkResultDir(mergeResDir);
+    }
 }

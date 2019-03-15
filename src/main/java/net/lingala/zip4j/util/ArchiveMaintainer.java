@@ -412,7 +412,7 @@ public class ArchiveMaintainer {
         }
     }
 
-    private void updateSplitZipModel(ZipModel zipModel, ArrayList fileSizeList, boolean splitSigRemoved) throws ZipException {
+    public static void updateSplitZipModel(ZipModel zipModel, ArrayList fileSizeList, boolean splitSigRemoved) throws ZipException {
         if (zipModel == null)
             throw new ZipException("zip model is null, cannot update split zip model");
 
@@ -425,7 +425,7 @@ public class ArchiveMaintainer {
         }
     }
 
-    private void updateSplitFileHeader(ZipModel zipModel, ArrayList fileSizeList, boolean splitSigRemoved) throws ZipException {
+    private static void updateSplitFileHeader(ZipModel zipModel, ArrayList fileSizeList, boolean splitSigRemoved) throws ZipException {
         try {
             int fileHeaderCount = zipModel.getCentralDirectory().getFileHeaders().size();
             int splitSigOverhead = 0;
@@ -449,7 +449,7 @@ public class ArchiveMaintainer {
         }
     }
 
-    private void updateSplitEndCentralDirectory(ZipModel zipModel) throws ZipException {
+    private static void updateSplitEndCentralDirectory(ZipModel zipModel) throws ZipException {
         try {
             if (zipModel == null)
                 throw new ZipException("zip model is null - cannot update end of central directory for split zip model");
@@ -468,7 +468,7 @@ public class ArchiveMaintainer {
         }
     }
 
-    private void updateSplitZip64EndCentralDirLocator(ZipModel zipModel, ArrayList fileSizeList) throws ZipException {
+    private static void updateSplitZip64EndCentralDirLocator(ZipModel zipModel, ArrayList fileSizeList) throws ZipException {
         if (zipModel == null) {
             throw new ZipException("zip model is null, cannot update split Zip64 end of central directory locator");
         }
@@ -489,7 +489,7 @@ public class ArchiveMaintainer {
         zipModel.getZip64EndCentralDirectoryLocator().setTotNumberOfDiscs(1);
     }
 
-    private void updateSplitZip64EndCentralDirRec(ZipModel zipModel, ArrayList fileSizeList) throws ZipException {
+    private static void updateSplitZip64EndCentralDirRec(ZipModel zipModel, ArrayList fileSizeList) throws ZipException {
         if (zipModel == null) {
             throw new ZipException("zip model is null, cannot update split Zip64 end of central directory record");
         }

@@ -27,10 +27,8 @@ import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
-import net.lingala.zip4j.util.ArchiveMaintainer;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -122,32 +120,6 @@ public class ZipFile {
         checkSplitArchiveModification();
 
         new ZipEngine(zipModel).removeFile(fileHeader);
-    }
-
-    /**
-     * Merges split zip files into a single zip path without the need to extractEntries the
-     * files in the archive
-     *
-     * @param outputZipFile
-     * @throws ZipException
-     */
-    public void mergeSplitFiles(File outputZipFile) throws ZipException {
-        if (outputZipFile == null) {
-            throw new ZipException("outputZipFile is null, cannot merge split files");
-        }
-
-        if (outputZipFile.exists()) {
-            throw new ZipException("output Zip File already exists");
-        }
-
-        zipModel = createZipModel(zipFile, charset);
-
-        if (this.zipModel == null) {
-            throw new ZipException("zip model is null, corrupt zip path?");
-        }
-
-        ArchiveMaintainer archiveMaintainer = new ArchiveMaintainer();
-        archiveMaintainer.mergeSplitZipFiles(zipModel, outputZipFile);
     }
 
     /**

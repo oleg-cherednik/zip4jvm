@@ -55,7 +55,7 @@ public class UnzipIt {
             throw new ZipException("ZipFile not exists: " + zipFile);
     }
 
-    private static void checkOutputFolder(@NonNull Path dir) throws ZipException {
+    static void checkOutputFolder(@NonNull Path dir) throws ZipException {
 
 //        if(!Files.isDirectory(dir))
 //            throw new ZipException("Destination path is not a directory: " + dir);
