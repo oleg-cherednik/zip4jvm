@@ -26,6 +26,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -137,6 +138,50 @@ public class ZipModel implements Cloneable {
         if (diskNumberStartOfFile == endCentralDirectory.getNoOfDisk())
             return zipFile;
         return getSplitFilePath(zipFile, diskNumberStartOfFile + 1);
+    }
+
+    @SuppressWarnings("MethodCanBeVariableArityMethod")
+    public void convertToSolid(long[] fileSizeList) {
+        long totalBytesWritten = Arrays.stream(fileSizeList).sum();
+
+        setNoSplitArchive();
+        updateFileHeaders(fileSizeList);
+        updateEndCentralDirectory(totalBytesWritten);
+        updateZip64EndCentralDirLocator(totalBytesWritten);
+        updateZip64EndCentralDirRec(totalBytesWritten);
+    }
+
+    @SuppressWarnings("MethodCanBeVariableArityMethod")
+    private void updateFileHeaders(long[] fileSizeList) {
+        getCentralDirectory().getFileHeaders().forEach(fileHeader -> {
+            fileHeader.updateOffLocalHeaderRelative(Arrays.stream(fileSizeList, 0, fileHeader.getDiskNumberStart()).sum());
+            fileHeader.setDiskNumberStart(0);
+        });
+    }
+
+    private void updateEndCentralDirectory(long totalBytesWritten) throws ZipException {
+        endCentralDirectory.setNoOfDisk(0);
+        endCentralDirectory.setNoOfDiskStartCentralDir(0);
+        endCentralDirectory.setTotNoOfEntriesInCentralDir(centralDirectory.getFileHeaders().size());
+        endCentralDirectory.setTotalNumberOfEntriesInCentralDirOnThisDisk(centralDirectory.getFileHeaders().size());
+        endCentralDirectory.setOffOfStartOfCentralDir(totalBytesWritten);
+    }
+
+    private void updateZip64EndCentralDirLocator(long totalBytesWritten) throws ZipException {
+        if (isZip64Format()) {
+            zip64EndCentralDirectoryLocator.setNoOfDiskStartOfZip64EndOfCentralDirRec(0);
+            zip64EndCentralDirectoryLocator.updateOffsetZip64EndOfCentralDirRec(totalBytesWritten);
+            zip64EndCentralDirectoryLocator.setTotNumberOfDiscs(1);
+        }
+    }
+
+    private void updateZip64EndCentralDirRec(long totalBytesWritten) throws ZipException {
+        if (isZip64Format()) {
+            zip64EndCentralDirectory.setNoOfThisDisk(0);
+            zip64EndCentralDirectory.setNoOfThisDiskStartOfCentralDir(0);
+            zip64EndCentralDirectory.setTotNoOfEntriesInCentralDirOnThisDisk(endCentralDirectory.getTotNoOfEntriesInCentralDir());
+            zip64EndCentralDirectory.updateOffsetStartCenDirWRTStartDiskNo(totalBytesWritten);
+        }
     }
 
 }
