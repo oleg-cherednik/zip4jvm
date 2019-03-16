@@ -22,12 +22,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.lingala.zip4j.core.readers.ZipModelReader;
 import net.lingala.zip4j.engine.UnzipEngine;
-import net.lingala.zip4j.engine.ZipEngine;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
-import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -62,64 +60,6 @@ public class ZipFile {
     private void checkSplitArchiveModification() throws ZipException {
         if (Files.exists(zipFile) && zipModel.isSplitArchive())
             throw new ZipException("Zip file already exists. Zip file format does not allow updating split/spanned files");
-    }
-
-    /**
-     * Checks if the zip path is a split archive
-     *
-     * @return true if split archive, false if not
-     * @throws ZipException
-     */
-    public boolean isSplitArchive() throws ZipException {
-        zipModel = createZipModel();
-        return zipModel.isSplitArchive();
-
-    }
-
-    /**
-     * Removes the path provided in the input paramters from the zip path.
-     * This method first finds the path header and then removes the path.
-     * If path does not exist, then this method throws an exception.
-     * If zip path is a split zip path, then this method throws an exception as
-     * zip specification does not allow for updating split zip archives.
-     *
-     * @param fileName
-     * @throws ZipException
-     */
-    public void removeFile(String fileName) throws ZipException {
-
-        if (StringUtils.isBlank(fileName)) {
-            throw new ZipException("path name is empty or null, cannot remove path");
-        }
-
-        if (zipModel == null && Files.exists(zipFile))
-            zipModel = createZipModel();
-
-        if (zipModel.isSplitArchive()) {
-            throw new ZipException("Zip path format does not allow updating split/spanned files");
-        }
-
-        CentralDirectory.FileHeader fileHeader = zipModel.getFileHeader(fileName);
-        if (fileHeader == null) {
-            throw new ZipException("could not find path header for path: " + fileName);
-        }
-
-        removeFile(fileHeader);
-    }
-
-    /**
-     * Removes the path provided in the input path header from the zip path.
-     * If zip path is a split zip path, then this method throws an exception as
-     * zip specification does not allow for updating split zip archives.
-     *
-     * @param fileHeader
-     * @throws ZipException
-     */
-    public void removeFile(@NonNull CentralDirectory.FileHeader fileHeader) throws ZipException {
-        zipModel = createZipModel(zipFile, charset);
-        checkSplitArchiveModification();
-
-        new ZipEngine(zipModel).removeFile(fileHeader);
     }
 
     /**

@@ -7,8 +7,10 @@ import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.NoSplitOutputStream;
 import net.lingala.zip4j.io.SplitOutputStream;
+import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.ZipModel;
+import net.lingala.zip4j.util.ArchiveMaintainer;
 import net.lingala.zip4j.util.InternalZipConstants;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -20,7 +22,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -97,6 +102,7 @@ public final class ZipMisc {
     public void merge(@NonNull Path destZipFile) {
         ZipModel zipModel = ZipFile.createZipModel(zipFile, charset);
 
+        // TODO probably if not split archive, just copy single zip file
         if (!zipModel.isSplitArchive())
             throw new ZipException("archive not a split zip file");
 
@@ -122,6 +128,31 @@ public final class ZipMisc {
         }
 
         return fileSizeList;
+    }
+
+    public void removeEntry(@NonNull String entryName) {
+        removeEntries(Collections.singletonList(entryName));
+    }
+
+    public void removeEntries(@NonNull Collection<String> entries) {
+        UnzipIt.checkZipFile(zipFile);
+
+        ZipModel zipModel = ZipFile.createZipModel(zipFile, charset);
+        ZipIt.checkSplitArchiveModification(zipModel);
+
+        ArchiveMaintainer maintainer = new ArchiveMaintainer();
+
+        for (CentralDirectory.FileHeader fileHeader : getFileHeaders(entries, zipModel))
+            maintainer.removeZipFile(zipModel, fileHeader);
+
+    }
+
+    private static List<CentralDirectory.FileHeader> getFileHeaders(Collection<String> entries, ZipModel zipModel) {
+        return entries.stream()
+                      .map(entryName -> zipModel.getCentralDirectory().getFileHeadersByPrefix(entryName))
+                      .flatMap(List::stream)
+                      .filter(Objects::nonNull)
+                      .collect(Collectors.toList());
     }
 
 }
