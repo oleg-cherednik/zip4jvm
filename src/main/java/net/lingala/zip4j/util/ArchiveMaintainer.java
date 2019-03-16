@@ -16,14 +16,13 @@
 
 package net.lingala.zip4j.util;
 
+import lombok.NonNull;
 import net.lingala.zip4j.core.HeaderWriter;
-import net.lingala.zip4j.core.readers.LocalFileHeaderReader;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.NoSplitOutputStream;
 import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.EndCentralDirectory;
-import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.ZipModel;
 
 import java.io.FileNotFoundException;
@@ -59,11 +58,6 @@ public class ArchiveMaintainer {
 
             in = createFileHandler(zipModel, InternalZipConstants.READ_MODE);
 
-            LocalFileHeader localFileHeader = new LocalFileHeaderReader(new LittleEndianRandomAccessFile(in), fileHeader).read();
-            if (localFileHeader == null) {
-                throw new ZipException("invalid local file header, cannot remove file from archive");
-            }
-
             long offsetLocalFileHeader = fileHeader.getOffLocalHeaderRelative();
 
             if (fileHeader.getZip64ExtendedInfo() != null &&
@@ -71,44 +65,22 @@ public class ArchiveMaintainer {
                 offsetLocalFileHeader = fileHeader.getZip64ExtendedInfo().getOffsLocalHeaderRelative();
             }
 
-            long offsetEndOfCompressedFile = -1;
-
-            long offsetStartCentralDir = zipModel.getEndCentralDirectory().getOffOfStartOfCentralDir();
-            if (zipModel.isZip64Format()) {
-                if (zipModel.getZip64EndCentralDirectory() != null) {
-                    offsetStartCentralDir = zipModel.getZip64EndCentralDirectory().getOffsetStartCenDirWRTStartDiskNo();
-                }
-            }
-
             List<CentralDirectory.FileHeader> fileHeaders = zipModel.getFileHeaders();
+            long offsetEndOfCompressedFile = getOffs(zipModel, fileHeader);
 
-            if (indexOfFileHeader == fileHeaders.size() - 1) {
-                offsetEndOfCompressedFile = offsetStartCentralDir - 1;
-            } else {
-                CentralDirectory.FileHeader nextFileHeader = fileHeaders.get(indexOfFileHeader + 1);
-                if (nextFileHeader != null) {
-                    offsetEndOfCompressedFile = nextFileHeader.getOffLocalHeaderRelative() - 1;
-                    if (nextFileHeader.getZip64ExtendedInfo() != null &&
-                            nextFileHeader.getZip64ExtendedInfo().getOffsLocalHeaderRelative() != -1) {
-                        offsetEndOfCompressedFile = nextFileHeader.getZip64ExtendedInfo().getOffsLocalHeaderRelative() - 1;
-                    }
-                }
-            }
-
-            if (offsetLocalFileHeader < 0 || offsetEndOfCompressedFile < 0) {
+            if (offsetLocalFileHeader < 0 || offsetEndOfCompressedFile < 0)
                 throw new ZipException("invalid offset for start and end of local file, cannot remove file");
-            }
 
             if (indexOfFileHeader == 0) {
                 if (zipModel.getFileHeaders().size() > 1) {
                     // if this is the only file and it is deleted then no need to do this
-                    copyFile(in, out, offsetEndOfCompressedFile + 1, offsetStartCentralDir);
+                    copyFile(in, out, offsetEndOfCompressedFile + 1, zipModel.getOffOfStartOfCentralDir());
                 }
             } else if (indexOfFileHeader == fileHeaders.size() - 1) {
                 copyFile(in, out, 0, offsetLocalFileHeader);
             } else {
                 copyFile(in, out, 0, offsetLocalFileHeader);
-                copyFile(in, out, offsetEndOfCompressedFile + 1, offsetStartCentralDir);
+                copyFile(in, out, offsetEndOfCompressedFile + 1, zipModel.getOffOfStartOfCentralDir());
             }
 
             EndCentralDirectory endCentralDirectory = zipModel.getEndCentralDirectory();
@@ -158,6 +130,28 @@ public class ArchiveMaintainer {
                 }
             }
         }
+    }
+
+    private long getOffs(@NonNull ZipModel zipModel, CentralDirectory.FileHeader fileHeader) {
+        int indexOfFileHeader = Zip4jUtil.getIndexOfFileHeader(zipModel, fileHeader);
+        long offsetEndOfCompressedFile = -1;
+        List<CentralDirectory.FileHeader> fileHeaders = zipModel.getFileHeaders();
+
+        if (indexOfFileHeader == fileHeaders.size() - 1)
+            offsetEndOfCompressedFile = zipModel.getOffOfStartOfCentralDir() - 1;
+        else {
+            CentralDirectory.FileHeader nextFileHeader = fileHeaders.get(indexOfFileHeader + 1);
+
+            if (nextFileHeader != null) {
+                offsetEndOfCompressedFile = nextFileHeader.getOffLocalHeaderRelative() - 1;
+                if (nextFileHeader.getZip64ExtendedInfo() != null &&
+                        nextFileHeader.getZip64ExtendedInfo().getOffsLocalHeaderRelative() != -1) {
+                    offsetEndOfCompressedFile = nextFileHeader.getZip64ExtendedInfo().getOffsLocalHeaderRelative() - 1;
+                }
+            }
+        }
+
+        return offsetEndOfCompressedFile;
     }
 
     private static void restoreFileName(Path zipFile, Path tmpZipFileName) {
