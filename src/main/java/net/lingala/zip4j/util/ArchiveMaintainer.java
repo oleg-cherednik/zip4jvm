@@ -23,6 +23,7 @@ import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.NoSplitOutputStream;
 import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.model.CentralDirectory;
+import net.lingala.zip4j.model.EndCentralDirectory;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.ZipModel;
 
@@ -44,7 +45,7 @@ public class ArchiveMaintainer {
     }
 
     private void initRemoveZipFile(@NonNull ZipModel zipModel, @NonNull CentralDirectory.FileHeader fileHeader) throws ZipException {
-        OutputStream outputStream = null;
+        SplitOutputStream out = null;
         File zipFile = null;
         RandomAccessFile inputStream = null;
         boolean successFlag = false;
@@ -72,7 +73,7 @@ public class ArchiveMaintainer {
             }
 
             try {
-                outputStream = new NoSplitOutputStream(Paths.get(tmpZipFileName));
+                out = new NoSplitOutputStream(Paths.get(tmpZipFileName));
             } catch(FileNotFoundException e1) {
                 throw new ZipException(e1);
             }
@@ -102,12 +103,12 @@ public class ArchiveMaintainer {
                 }
             }
 
-            List<CentralDirectory.FileHeader> fileHeaderList = zipModel.getCentralDirectory().getFileHeaders();
+            List<CentralDirectory.FileHeader> fileHeaders = zipModel.getFileHeaders();
 
-            if (indexOfFileHeader == fileHeaderList.size() - 1) {
+            if (indexOfFileHeader == fileHeaders.size() - 1) {
                 offsetEndOfCompressedFile = offsetStartCentralDir - 1;
             } else {
-                CentralDirectory.FileHeader nextFileHeader = fileHeaderList.get(indexOfFileHeader + 1);
+                CentralDirectory.FileHeader nextFileHeader = fileHeaders.get(indexOfFileHeader + 1);
                 if (nextFileHeader != null) {
                     offsetEndOfCompressedFile = nextFileHeader.getOffLocalHeaderRelative() - 1;
                     if (nextFileHeader.getZip64ExtendedInfo() != null &&
@@ -122,38 +123,38 @@ public class ArchiveMaintainer {
             }
 
             if (indexOfFileHeader == 0) {
-                if (zipModel.getCentralDirectory().getFileHeaders().size() > 1) {
+                if (zipModel.getFileHeaders().size() > 1) {
                     // if this is the only file and it is deleted then no need to do this
-                    copyFile(inputStream, outputStream, offsetEndOfCompressedFile + 1, offsetStartCentralDir);
+                    copyFile(inputStream, out, offsetEndOfCompressedFile + 1, offsetStartCentralDir);
                 }
-            } else if (indexOfFileHeader == fileHeaderList.size() - 1) {
-                copyFile(inputStream, outputStream, 0, offsetLocalFileHeader);
+            } else if (indexOfFileHeader == fileHeaders.size() - 1) {
+                copyFile(inputStream, out, 0, offsetLocalFileHeader);
             } else {
-                copyFile(inputStream, outputStream, 0, offsetLocalFileHeader);
-                copyFile(inputStream, outputStream, offsetEndOfCompressedFile + 1, offsetStartCentralDir);
+                copyFile(inputStream, out, 0, offsetLocalFileHeader);
+                copyFile(inputStream, out, offsetEndOfCompressedFile + 1, offsetStartCentralDir);
             }
 
-            zipModel.getEndCentralDirectory().setOffOfStartOfCentralDir(((SplitOutputStream)outputStream).getFilePointer());
-            zipModel.getEndCentralDirectory().setTotNoOfEntriesInCentralDir(
-                    zipModel.getEndCentralDirectory().getTotNoOfEntriesInCentralDir() - 1);
-            zipModel.getEndCentralDirectory().setTotalNumberOfEntriesInCentralDirOnThisDisk(
-                    zipModel.getEndCentralDirectory().getTotalNumberOfEntriesInCentralDirOnThisDisk() - 1);
+            EndCentralDirectory endCentralDirectory = zipModel.getEndCentralDirectory();
+            endCentralDirectory.setOffOfStartOfCentralDir(out.getFilePointer());
+            endCentralDirectory.setTotNoOfEntriesInCentralDir(endCentralDirectory.getTotNoOfEntriesInCentralDir() - 1);
+            endCentralDirectory.setTotalNumberOfEntriesInCentralDirOnThisDisk(
+                    endCentralDirectory.getTotalNumberOfEntriesInCentralDirOnThisDisk() - 1);
 
-            zipModel.getCentralDirectory().getFileHeaders().remove(indexOfFileHeader);
+            zipModel.getFileHeaders().remove(indexOfFileHeader);
 
-            for (int i = indexOfFileHeader; i < zipModel.getCentralDirectory().getFileHeaders().size(); i++) {
-                long offsetLocalHdr = zipModel.getCentralDirectory().getFileHeaders().get(i).getOffLocalHeaderRelative();
-                if (zipModel.getCentralDirectory().getFileHeaders().get(i).getZip64ExtendedInfo() != null &&
-                        zipModel.getCentralDirectory().getFileHeaders().get(i).getZip64ExtendedInfo().getOffsLocalHeaderRelative() != -1) {
-                    offsetLocalHdr = zipModel.getCentralDirectory().getFileHeaders().get(i).getZip64ExtendedInfo().getOffsLocalHeaderRelative();
+            for (int i = indexOfFileHeader; i < zipModel.getFileHeaders().size(); i++) {
+                long offsetLocalHdr = zipModel.getFileHeaders().get(i).getOffLocalHeaderRelative();
+                if (zipModel.getFileHeaders().get(i).getZip64ExtendedInfo() != null &&
+                        zipModel.getFileHeaders().get(i).getZip64ExtendedInfo().getOffsLocalHeaderRelative() != -1) {
+                    offsetLocalHdr = zipModel.getFileHeaders().get(i).getZip64ExtendedInfo().getOffsLocalHeaderRelative();
                 }
 
-                zipModel.getCentralDirectory().getFileHeaders().get(i).setOffLocalHeaderRelative(
+                zipModel.getFileHeaders().get(i).setOffLocalHeaderRelative(
                         offsetLocalHdr - (offsetEndOfCompressedFile - offsetLocalFileHeader) - 1);
             }
 
             HeaderWriter headerWriter = new HeaderWriter();
-            headerWriter.finalizeZipFile(zipModel, outputStream);
+            headerWriter.finalizeZipFile(zipModel, out);
 
             successFlag = true;
         } catch(ZipException e) {
@@ -164,8 +165,8 @@ public class ArchiveMaintainer {
             try {
                 if (inputStream != null)
                     inputStream.close();
-                if (outputStream != null)
-                    outputStream.close();
+                if (out != null)
+                    out.close();
             } catch(IOException e) {
                 throw new ZipException("cannot close input stream or output stream when trying to delete a file from zip file");
             }

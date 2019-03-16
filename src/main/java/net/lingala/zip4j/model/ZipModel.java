@@ -104,11 +104,11 @@ public class ZipModel implements Cloneable {
     }
 
     public boolean isEmpty() {
-        return centralDirectory.getFileHeaders().isEmpty();
+        return getFileHeaders().isEmpty();
     }
 
     public List<String> getEntryNames() {
-        return centralDirectory.getFileHeaders().stream()
+        return getFileHeaders().stream()
                                .map(CentralDirectory.FileHeader::getFileName)
                                .collect(Collectors.toList());
     }
@@ -117,7 +117,7 @@ public class ZipModel implements Cloneable {
         if (isEmpty())
             return null;
 
-        return centralDirectory.getFileHeaders().stream()
+        return getFileHeaders().stream()
                                .filter(fileHeader -> FilenameUtils.equalsNormalized(fileName, fileHeader.getFileName()))
                                .findFirst().orElse(null);
     }
@@ -153,7 +153,7 @@ public class ZipModel implements Cloneable {
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")
     private void updateFileHeaders(long[] fileSizeList) {
-        getCentralDirectory().getFileHeaders().forEach(fileHeader -> {
+        getFileHeaders().forEach(fileHeader -> {
             fileHeader.updateOffLocalHeaderRelative(Arrays.stream(fileSizeList, 0, fileHeader.getDiskNumberStart()).sum());
             fileHeader.setDiskNumberStart(0);
         });
@@ -162,8 +162,8 @@ public class ZipModel implements Cloneable {
     private void updateEndCentralDirectory(long totalBytesWritten) throws ZipException {
         endCentralDirectory.setNoOfDisk(0);
         endCentralDirectory.setNoOfDiskStartCentralDir(0);
-        endCentralDirectory.setTotNoOfEntriesInCentralDir(centralDirectory.getFileHeaders().size());
-        endCentralDirectory.setTotalNumberOfEntriesInCentralDirOnThisDisk(centralDirectory.getFileHeaders().size());
+        endCentralDirectory.setTotNoOfEntriesInCentralDir(getFileHeaders().size());
+        endCentralDirectory.setTotalNumberOfEntriesInCentralDirOnThisDisk(getFileHeaders().size());
         endCentralDirectory.setOffOfStartOfCentralDir(totalBytesWritten);
     }
 
@@ -182,6 +182,14 @@ public class ZipModel implements Cloneable {
             zip64EndCentralDirectory.setTotNoOfEntriesInCentralDirOnThisDisk(endCentralDirectory.getTotNoOfEntriesInCentralDir());
             zip64EndCentralDirectory.updateOffsetStartCenDirWRTStartDiskNo(totalBytesWritten);
         }
+    }
+
+    public List<CentralDirectory.FileHeader> getFileHeaders() {
+        return centralDirectory.getFileHeaders();
+    }
+
+    public void addFileHeader(CentralDirectory.FileHeader fileHeader) {
+        centralDirectory.addFileHeader(fileHeader);
     }
 
 }

@@ -168,7 +168,7 @@ public class Zip4jUtil {
             throw new ZipException("file name in file header is empty or null, cannot determine index of file header");
         }
 
-        List<CentralDirectory.FileHeader> fileHeaders = zipModel.getCentralDirectory().getFileHeaders();
+        List<CentralDirectory.FileHeader> fileHeaders = zipModel.getFileHeaders();
         for (int i = 0; i < fileHeaders.size(); i++) {
             CentralDirectory.FileHeader fileHeaderTmp = fileHeaders.get(i);
             String fileNameForHdr = fileHeaderTmp.getFileName();

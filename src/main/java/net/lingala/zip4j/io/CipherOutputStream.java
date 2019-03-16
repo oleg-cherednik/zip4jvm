@@ -239,7 +239,7 @@ public abstract class CipherOutputStream extends OutputStream {
         }
 
         zipModel.addLocalFileHeader(localFileHeader);
-        zipModel.getCentralDirectory().addFileHeader(fileHeader);
+        zipModel.addFileHeader(fileHeader);
 
         out.addTotalBytesWritten(new LocalFileHeaderWriter().writeExtended(localFileHeader, out.getDelegate()));
 

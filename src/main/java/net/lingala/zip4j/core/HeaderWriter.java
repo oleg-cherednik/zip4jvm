@@ -213,7 +213,7 @@ public class HeaderWriter {
 
         int sizeOfCentralDir = 0;
 
-        for (CentralDirectory.FileHeader fileHeader : zipModel.getCentralDirectory().getFileHeaders())
+        for (CentralDirectory.FileHeader fileHeader : zipModel.getFileHeaders())
             sizeOfCentralDir += writer.write(zipModel, fileHeader, outputStream, bytes);
 
         return sizeOfCentralDir;
@@ -244,12 +244,10 @@ public class HeaderWriter {
             //version made by
             //version needed to extractEntries
             if (!zipModel.isEmpty()) {
-                Raw.writeShortLittleEndian(shortByte, 0,
-                        (short)zipModel.getCentralDirectory().getFileHeaders().get(0).getVersionMadeBy());
+                Raw.writeShortLittleEndian(shortByte, 0, (short)zipModel.getFileHeaders().get(0).getVersionMadeBy());
                 bytes.copyByteArrayToArrayList(shortByte);
 
-                Raw.writeShortLittleEndian(shortByte, 0,
-                        (short)zipModel.getCentralDirectory().getFileHeaders().get(0).getVersionNeededToExtract());
+                Raw.writeShortLittleEndian(shortByte, 0, (short)zipModel.getFileHeaders().get(0).getVersionNeededToExtract());
                 bytes.copyByteArrayToArrayList(shortByte);
             } else {
                 bytes.copyByteArrayToArrayList(emptyShortByte);
@@ -267,11 +265,10 @@ public class HeaderWriter {
             //total number of entries in the central directory on this disk
             int numEntries = 0;
             int numEntriesOnThisDisk = 0;
-            numEntries = zipModel.getCentralDirectory().getFileHeaders().size();
+            numEntries = zipModel.getFileHeaders().size();
 
             if (zipModel.isSplitArchive())
-                countNumberOfFileHeaderEntriesOnDisk(zipModel.getCentralDirectory().getFileHeaders(),
-                        zipModel.getEndCentralDirectory().getNoOfDisk());
+                countNumberOfFileHeaderEntriesOnDisk(zipModel.getFileHeaders(), zipModel.getEndCentralDirectory().getNoOfDisk());
             else
                 numEntriesOnThisDisk = numEntries;
 
@@ -359,9 +356,9 @@ public class HeaderWriter {
             int numEntries = 0;
             int numEntriesOnThisDisk = 0;
 
-            numEntries = zipModel.getCentralDirectory().getFileHeaders().size();
+            numEntries = zipModel.getFileHeaders().size();
             if (zipModel.isSplitArchive())
-                numEntriesOnThisDisk = countNumberOfFileHeaderEntriesOnDisk(zipModel.getCentralDirectory().getFileHeaders(),
+                numEntriesOnThisDisk = countNumberOfFileHeaderEntriesOnDisk(zipModel.getFileHeaders(),
                         zipModel.getEndCentralDirectory().getNoOfDisk());
             else
                 numEntriesOnThisDisk = numEntries;

@@ -76,7 +76,7 @@ public final class ZipMisc {
         UnzipIt.checkZipFile(zipFile);
         ZipModel zipModel = ZipFile.createZipModel(zipFile, charset);
 
-        return zipModel.getCentralDirectory().getFileHeaders().stream()
+        return zipModel.getFileHeaders().stream()
                        .anyMatch(fileHeader -> fileHeader.getEncryption() != Encryption.OFF);
     }
 
