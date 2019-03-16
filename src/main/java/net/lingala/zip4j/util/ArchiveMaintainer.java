@@ -16,7 +16,6 @@
 
 package net.lingala.zip4j.util;
 
-import lombok.NonNull;
 import net.lingala.zip4j.core.HeaderWriter;
 import net.lingala.zip4j.core.readers.LocalFileHeaderReader;
 import net.lingala.zip4j.exception.ZipException;
@@ -27,12 +26,12 @@ import net.lingala.zip4j.model.EndCentralDirectory;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.ZipModel;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
-import java.nio.file.Paths;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 public class ArchiveMaintainer {
@@ -41,48 +40,26 @@ public class ArchiveMaintainer {
         if (fileHeader == null)
             return;
 
-        initRemoveZipFile(zipModel, fileHeader);
-    }
-
-    private void initRemoveZipFile(@NonNull ZipModel zipModel, @NonNull CentralDirectory.FileHeader fileHeader) throws ZipException {
         SplitOutputStream out = null;
-        File zipFile = null;
-        RandomAccessFile inputStream = null;
+        Path zipFile = zipModel.getZipFile();
+        RandomAccessFile in = null;
         boolean successFlag = false;
-        String tmpZipFileName = null;
+        Path tmp = null;
 
         try {
             int indexOfFileHeader = Zip4jUtil.getIndexOfFileHeader(zipModel, fileHeader);
 
-            if (indexOfFileHeader < 0) {
-                throw new ZipException("file header not found in zip model, cannot remove file");
-            }
+//            if (indexOfFileHeader < 0)
+//                throw new ZipException("file header not found in zip model, cannot remove file");
+//            if (zipModel.isSplitArchive())
+//                throw new ZipException("This is a split archive. Zip file format does not allow updating split/spanned files");
 
-            if (zipModel.isSplitArchive()) {
-                throw new ZipException("This is a split archive. Zip file format does not allow updating split/spanned files");
-            }
+            tmp = Files.createTempFile(zipModel.getZipFile().getParent(), null, null);
+            out = new NoSplitOutputStream(tmp);
 
-            long currTime = System.currentTimeMillis();
-            tmpZipFileName = zipModel.getZipFile().toString() + currTime % 1000;
-            File tmpFile = new File(tmpZipFileName);
+            in = createFileHandler(zipModel, InternalZipConstants.READ_MODE);
 
-            while (tmpFile.exists()) {
-                currTime = System.currentTimeMillis();
-                tmpZipFileName = zipModel.getZipFile().toString() + currTime % 1000;
-                tmpFile = new File(tmpZipFileName);
-            }
-
-            try {
-                out = new NoSplitOutputStream(Paths.get(tmpZipFileName));
-            } catch(FileNotFoundException e1) {
-                throw new ZipException(e1);
-            }
-
-            zipFile = zipModel.getZipFile().toFile();
-
-            inputStream = createFileHandler(zipModel, InternalZipConstants.READ_MODE);
-
-            LocalFileHeader localFileHeader = new LocalFileHeaderReader(new LittleEndianRandomAccessFile(inputStream), fileHeader).read();
+            LocalFileHeader localFileHeader = new LocalFileHeaderReader(new LittleEndianRandomAccessFile(in), fileHeader).read();
             if (localFileHeader == null) {
                 throw new ZipException("invalid local file header, cannot remove file from archive");
             }
@@ -125,13 +102,13 @@ public class ArchiveMaintainer {
             if (indexOfFileHeader == 0) {
                 if (zipModel.getFileHeaders().size() > 1) {
                     // if this is the only file and it is deleted then no need to do this
-                    copyFile(inputStream, out, offsetEndOfCompressedFile + 1, offsetStartCentralDir);
+                    copyFile(in, out, offsetEndOfCompressedFile + 1, offsetStartCentralDir);
                 }
             } else if (indexOfFileHeader == fileHeaders.size() - 1) {
-                copyFile(inputStream, out, 0, offsetLocalFileHeader);
+                copyFile(in, out, 0, offsetLocalFileHeader);
             } else {
-                copyFile(inputStream, out, 0, offsetLocalFileHeader);
-                copyFile(inputStream, out, offsetEndOfCompressedFile + 1, offsetStartCentralDir);
+                copyFile(in, out, 0, offsetLocalFileHeader);
+                copyFile(in, out, offsetEndOfCompressedFile + 1, offsetStartCentralDir);
             }
 
             EndCentralDirectory endCentralDirectory = zipModel.getEndCentralDirectory();
@@ -140,21 +117,21 @@ public class ArchiveMaintainer {
             endCentralDirectory.setTotalNumberOfEntriesInCentralDirOnThisDisk(
                     endCentralDirectory.getTotalNumberOfEntriesInCentralDirOnThisDisk() - 1);
 
-            zipModel.getFileHeaders().remove(indexOfFileHeader);
+            fileHeaders.remove(indexOfFileHeader);
 
-            for (int i = indexOfFileHeader; i < zipModel.getFileHeaders().size(); i++) {
-                long offsetLocalHdr = zipModel.getFileHeaders().get(i).getOffLocalHeaderRelative();
-                if (zipModel.getFileHeaders().get(i).getZip64ExtendedInfo() != null &&
-                        zipModel.getFileHeaders().get(i).getZip64ExtendedInfo().getOffsLocalHeaderRelative() != -1) {
-                    offsetLocalHdr = zipModel.getFileHeaders().get(i).getZip64ExtendedInfo().getOffsLocalHeaderRelative();
+            for (int i = indexOfFileHeader; i < fileHeaders.size(); i++) {
+                fileHeader = fileHeaders.get(i);
+
+                long offsetLocalHdr = fileHeader.getOffLocalHeaderRelative();
+                if (fileHeader.getZip64ExtendedInfo() != null &&
+                        fileHeader.getZip64ExtendedInfo().getOffsLocalHeaderRelative() != -1) {
+                    offsetLocalHdr = fileHeader.getZip64ExtendedInfo().getOffsLocalHeaderRelative();
                 }
 
-                zipModel.getFileHeaders().get(i).setOffLocalHeaderRelative(
-                        offsetLocalHdr - (offsetEndOfCompressedFile - offsetLocalFileHeader) - 1);
+                fileHeader.setOffLocalHeaderRelative(offsetLocalHdr - (offsetEndOfCompressedFile - offsetLocalFileHeader) - 1);
             }
 
-            HeaderWriter headerWriter = new HeaderWriter();
-            headerWriter.finalizeZipFile(zipModel, out);
+            new HeaderWriter().finalizeZipFile(zipModel, out);
 
             successFlag = true;
         } catch(ZipException e) {
@@ -163,31 +140,36 @@ public class ArchiveMaintainer {
             throw new ZipException(e);
         } finally {
             try {
-                if (inputStream != null)
-                    inputStream.close();
+                if (in != null)
+                    in.close();
                 if (out != null)
                     out.close();
             } catch(IOException e) {
                 throw new ZipException("cannot close input stream or output stream when trying to delete a file from zip file");
             }
 
-            if (successFlag) {
-                restoreFileName(zipFile, tmpZipFileName);
-            } else {
-                File newZipFile = new File(tmpZipFileName);
-                newZipFile.delete();
+            if (successFlag)
+                restoreFileName(zipFile, tmp);
+            else if (tmp != null) {
+                try {
+                    Files.deleteIfExists(tmp);
+                } catch(IOException e) {
+                    throw new ZipException(e);
+                }
             }
         }
     }
 
-    private void restoreFileName(File zipFile, String tmpZipFileName) throws ZipException {
-        if (zipFile.delete()) {
-            File newZipFile = new File(tmpZipFileName);
-            if (!newZipFile.renameTo(zipFile)) {
-                throw new ZipException("cannot rename modified zip file");
-            }
-        } else {
-            throw new ZipException("cannot delete old zip file");
+    private static void restoreFileName(Path zipFile, Path tmpZipFileName) {
+        try {
+            if (tmpZipFileName == null)
+                return;
+            if (Files.deleteIfExists(zipFile))
+                Files.move(tmpZipFileName, zipFile);
+            else
+                throw new ZipException("cannot delete old zip file");
+        } catch(IOException e) {
+            throw new ZipException(e);
         }
     }
 
