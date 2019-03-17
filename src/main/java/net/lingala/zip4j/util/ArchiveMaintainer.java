@@ -19,13 +19,14 @@ package net.lingala.zip4j.util;
 import lombok.NonNull;
 import net.lingala.zip4j.core.HeaderWriter;
 import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.io.NoSplitOutputStream;
-import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
+import org.apache.commons.io.IOUtils;
 
-import java.io.FileNotFoundException;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
@@ -36,9 +37,9 @@ import java.util.List;
 public class ArchiveMaintainer {
 
     public void removeZipFile(ZipModel zipModel, @NonNull String entryName) throws ZipException {
-        SplitOutputStream out = null;
+        OutputStream out = null;
         Path zipFile = zipModel.getZipFile();
-        RandomAccessFile in = null;
+        InputStream in = null;
         boolean successFlag = false;
         Path tmp = null;
 
@@ -56,22 +57,29 @@ public class ArchiveMaintainer {
 //                throw new ZipException("This is a split archive. Zip file format does not allow updating split/spanned files");
 
             tmp = Files.createTempFile(zipModel.getZipFile().getParent(), null, null);
-            out = new NoSplitOutputStream(tmp);
 
-            in = createFileHandler(zipModel, InternalZipConstants.READ_MODE);
+            in = new FileInputStream(zipModel.getZipFile().toFile());
+            out = new FileOutputStream(tmp.toFile());
 
             List<CentralDirectory.FileHeader> newHeaders = new ArrayList<>();
             CentralDirectory.FileHeader prvHeader = null;
 
-            long offs = 0;
+            long offsIn = 0;
+            long offsOut = 0;
+            long skip = 0;
 
             for (CentralDirectory.FileHeader header : zipModel.getFileHeaders()) {
                 if (prvHeader != null) {
-                    long curOffs = offs;
-                    copyFile(in, out, prvHeader.getOffsLocalFileHeader(), header.getOffsLocalFileHeader() - 1);
-                    offs += header.getOffsLocalFileHeader() - 1 - prvHeader.getOffsLocalFileHeader();
+                    long curOffs = offsOut;
+                    long length = header.getOffsLocalFileHeader() - prvHeader.getOffsLocalFileHeader();
+                    System.out.println((skip + offsIn) + " - " + (skip + offsIn + length));
+                    offsIn += skip + IOUtils.copyLarge(in, out, skip, length);
+                    offsOut += length;
+//                    copyFile(in, out, prvHeader.getOffsLocalFileHeader(), header.getOffsLocalFileHeader() - 1);
+//                    offs += header.getOffsLocalFileHeader() - 1 - prvHeader.getOffsLocalFileHeader();
                     newHeaders.add(prvHeader);
                     prvHeader.setOffsLocalFileHeader(curOffs);
+                    skip = 0;
 
                     // TODO fix offs for zip64
 
@@ -86,19 +94,29 @@ public class ArchiveMaintainer {
 
                 }
 
-                prvHeader = entryName.equals(header.getFileName()) ? null : header;
+                if (entryName.equals(header.getFileName())) {
+                    prvHeader = null;
+                    skip += header.getOffsLocalFileHeader() - offsIn;
+                } else {
+                    prvHeader = header;
+                    skip += header.getOffsLocalFileHeader() - offsIn;
+                }
             }
 
             if (prvHeader != null) {
-                long curOffs = offs;
-                copyFile(in, out, prvHeader.getOffsLocalFileHeader(), zipModel.getOffsCentralDirectory() - 1);
-                offs += zipModel.getOffsCentralDirectory() - 1 - prvHeader.getOffsLocalFileHeader();
+                long curOffs = offsOut;
+                long length = zipModel.getOffsCentralDirectory() - prvHeader.getOffsLocalFileHeader();
+                System.out.println((skip + offsIn) + " - " + (skip + offsIn + length));
+                IOUtils.copyLarge(in, out, skip, length);
+                offsOut += length;
+//                copyFile(in, out, prvHeader.getOffsLocalFileHeader() - skip, zipModel.getOffsCentralDirectory() - 1);
+//                offs += zipModel.getOffsCentralDirectory() - 1 - prvHeader.getOffsLocalFileHeader();
                 newHeaders.add(prvHeader);
                 prvHeader.setOffsLocalFileHeader(curOffs);
             }
 
             zipModel.setFileHeaders(newHeaders);
-            zipModel.getEndCentralDirectory().setOffsCentralDirectory(offs);
+            zipModel.getEndCentralDirectory().setOffsCentralDirectory(offsOut);
 
             new HeaderWriter().finalizeZipFile(zipModel, out);
 
@@ -197,15 +215,5 @@ public class ArchiveMaintainer {
         }
     }
 
-    private static RandomAccessFile createFileHandler(ZipModel zipModel, String mode) throws ZipException {
-        if (zipModel == null || zipModel.getZipFile() == null)
-            throw new ZipException("input parameter is null in getFilePointer, cannot create file handler to remove file");
-
-        try {
-            return new RandomAccessFile(zipModel.getZipFile().toFile(), mode);
-        } catch(FileNotFoundException e) {
-            throw new ZipException(e);
-        }
-    }
 
 }
