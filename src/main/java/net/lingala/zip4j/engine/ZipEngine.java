@@ -54,7 +54,6 @@ public class ZipEngine {
         if (entries.isEmpty())
             return;
 
-        zipModel.createEndCentralDirectoryIfNotExist();
         checkParameters(parameters);
 
         try (ZipOutputStream out = new ZipOutputStream(SplitOutputStream.create(zipModel), zipModel)) {
@@ -100,7 +99,6 @@ public class ZipEngine {
     }
 
     public void addStreamToZip(@NonNull Collection<InputStreamMeta> files, @NonNull final ZipParameters parameters) throws ZipException {
-        zipModel.createEndCentralDirectoryIfNotExist();
         checkParameters(parameters);
 
         try (ZipOutputStream out = new ZipOutputStream(SplitOutputStream.create(zipModel), zipModel)) {

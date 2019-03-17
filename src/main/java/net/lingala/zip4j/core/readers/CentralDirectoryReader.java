@@ -46,7 +46,7 @@ final class CentralDirectoryReader {
 
     @NonNull
     private List<CentralDirectory.FileHeader> readFileHeaders() throws IOException {
-        int total = zip64 ? (int)zip64Dir.getGetTotalEntries() : dir.getTotalEntries();
+        int total = zip64 ? (int)zip64Dir.getTotalEntries() : dir.getTotalEntries();
         List<CentralDirectory.FileHeader> fileHeaders = new ArrayList<>(total);
 
         for (int i = 0; i < total; i++)

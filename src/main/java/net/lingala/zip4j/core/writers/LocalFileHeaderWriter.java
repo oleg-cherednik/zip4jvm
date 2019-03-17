@@ -5,6 +5,7 @@ import net.lingala.zip4j.core.HeaderWriter;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.LocalFileHeader;
+import net.lingala.zip4j.model.Zip64EndCentralDirectoryLocator;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.LittleEndianBuffer;
@@ -34,7 +35,7 @@ public final class LocalFileHeaderWriter {
         if (localFileHeader.getUncompressedSize() + HeaderWriter.ZIP64_EXTRA_BUF >= InternalZipConstants.ZIP_64_LIMIT) {
             bytes.writeDword((int)InternalZipConstants.ZIP_64_LIMIT);
             bytes.writeDword(0);
-            zipModel.setZip64Format(true);
+            zipModel.setZip64EndCentralDirectoryLocator(new Zip64EndCentralDirectoryLocator());
             localFileHeader.setWriteComprSizeInZip64ExtraRecord(true);
         } else {
             bytes.writeDword(localFileHeader.getCompressedSize());
@@ -44,7 +45,7 @@ public final class LocalFileHeaderWriter {
 
         bytes.writeWord((short)localFileHeader.getFileNameLength());
         bytes.writeWord(localFileHeader.getExtraFileLength(zipModel));
-        bytes.writeBytes(zipModel.convertFileNameToByteArr(localFileHeader.getFileName()));
+        bytes.writeBytes(localFileHeader.getFileName().getBytes(zipModel.getCharset()));
 
         if (zipModel.isZip64Format()) {
             bytes.writeWord((short)InternalZipConstants.EXTRAFIELDZIP64LENGTH);

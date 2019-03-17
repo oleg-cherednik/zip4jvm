@@ -38,7 +38,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.zip.CRC32;
 
 public abstract class CipherOutputStream extends OutputStream {
@@ -139,11 +138,6 @@ public abstract class CipherOutputStream extends OutputStream {
 
     private void initZipModel(ZipModel zipModel) {
         this.zipModel = zipModel == null ? new ZipModel() : zipModel;
-        this.zipModel.createEndCentralDirectoryIfNotExist();
-
-        if (this.zipModel.getLocalFileHeaderList() == null)
-            this.zipModel.setLocalFileHeaderList(new ArrayList<>());
-
         this.zipModel.setSplitLength(out.getSplitLength());
     }
 
@@ -214,18 +208,18 @@ public abstract class CipherOutputStream extends OutputStream {
                 out.getDelegate().write(((AESEncryptor)encryptor).getFinalMac());
                 bytesWrittenForThisFile += 10;
                 out.addTotalBytesWritten(10);
-            } else {
+            } else
                 throw new ZipException("invalid encryptor for AES encrypted file");
-            }
         }
+
         fileHeader.setCompressedSize(bytesWrittenForThisFile);
         localFileHeader.setCompressedSize(bytesWrittenForThisFile);
 
         if (zipParameters.isSourceExternalStream()) {
             fileHeader.setUncompressedSize(totalBytesRead);
-            if (localFileHeader.getUncompressedSize() != totalBytesRead) {
+
+            if (localFileHeader.getUncompressedSize() != totalBytesRead)
                 localFileHeader.setUncompressedSize(totalBytesRead);
-            }
         }
 
         long crc32 = fileHeader.getEncryption() == Encryption.AES ? 0 : crc.getValue();

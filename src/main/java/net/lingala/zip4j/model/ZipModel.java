@@ -22,7 +22,6 @@ import lombok.Setter;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.FilenameUtils;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -32,48 +31,24 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
-public class ZipModel implements Cloneable {
+public class ZipModel {
 
     public static final int NO_SPLIT = -1;
 
-    private List localFileHeaderList;
-
-    private List dataDescriptorList;
-
+    private final List<LocalFileHeader> localFileHeaders = new ArrayList<>();
     private ArchiveExtraDataRecord archiveExtraDataRecord;
-
     @NonNull
     private CentralDirectory centralDirectory = new CentralDirectory();
-
-    private EndCentralDirectory endCentralDirectory;
-
+    private EndCentralDirectory endCentralDirectory = new EndCentralDirectory();
     private Zip64EndCentralDirectoryLocator zip64EndCentralDirectoryLocator;
-
     private Zip64EndCentralDirectory zip64EndCentralDirectory;
-
     private long splitLength = NO_SPLIT;
-
     private Path zipFile;
-
-    private boolean isZip64Format;
-
-    private boolean isNestedZipFile;
-
-    private long start;
-
-    private long end;
-
     @NonNull
     private Charset charset = Charset.defaultCharset();
 
-    public void addLocalFileHeader(LocalFileHeader localFileHeader) {
-        localFileHeaderList = localFileHeaderList.isEmpty() ? new ArrayList<>() : localFileHeaderList;
-        localFileHeaderList.add(localFileHeader);
-    }
-
-    public void createEndCentralDirectoryIfNotExist() {
-        if (endCentralDirectory == null)
-            endCentralDirectory = new EndCentralDirectory();
+    public void addLocalFileHeader(@NonNull LocalFileHeader localFileHeader) {
+        localFileHeaders.add(localFileHeader);
     }
 
     public void setEndCentralDirectory(EndCentralDirectory endCentralDirectory) {
@@ -82,21 +57,12 @@ public class ZipModel implements Cloneable {
         splitLength = endCentralDirectory != null && endCentralDirectory.getDiskNumber() > 0 ? 1 : NO_SPLIT;
     }
 
-
     public boolean isSplitArchive() {
         return splitLength > 0;
     }
 
     public void setNoSplitArchive() {
         splitLength = NO_SPLIT;
-    }
-
-    public Object clone() throws CloneNotSupportedException {
-        return super.clone();
-    }
-
-    public byte[] convertFileNameToByteArr(String fileName) throws UnsupportedEncodingException {
-        return fileName.getBytes(charset);
     }
 
     public boolean isZip64Format() {
@@ -111,15 +77,6 @@ public class ZipModel implements Cloneable {
         return getFileHeaders().stream()
                                .map(CentralDirectory.FileHeader::getFileName)
                                .collect(Collectors.toList());
-    }
-
-    public CentralDirectory.FileHeader getFileHeader(@NonNull String fileName) throws ZipException {
-        if (isEmpty())
-            return null;
-
-        return getFileHeaders().stream()
-                               .filter(fileHeader -> FilenameUtils.equalsNormalized(fileName, fileHeader.getFileName()))
-                               .findFirst().orElse(null);
     }
 
     public long getOffsCentralDirectory() {
@@ -190,7 +147,6 @@ public class ZipModel implements Cloneable {
 
     public void addFileHeader(CentralDirectory.FileHeader fileHeader) {
         centralDirectory.addFileHeader(fileHeader);
-        // TODO should be union with setFileHeaders
     }
 
     public void setFileHeaders(List<CentralDirectory.FileHeader> fileHeaders) {
