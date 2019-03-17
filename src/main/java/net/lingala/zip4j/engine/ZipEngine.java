@@ -147,7 +147,7 @@ public class ZipEngine {
 
     }
 
-    public void removeFile(@NonNull String fileName) throws ZipException {
+    public void removeFile(@NonNull String fileName) {
         archiveMaintainer.removeZipFile(zipModel, fileName);
     }
 
