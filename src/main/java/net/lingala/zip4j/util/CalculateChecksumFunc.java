@@ -16,12 +16,13 @@
 
 package net.lingala.zip4j.util;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import net.lingala.zip4j.exception.ZipException;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.function.ToLongFunction;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
 
@@ -30,12 +31,10 @@ import java.util.zip.CheckedInputStream;
  * @since 07.03.2019
  */
 @RequiredArgsConstructor
-public final class ChecksumCalculator {
+public final class CalculateChecksumFunc implements ToLongFunction<Path> {
 
-    @NonNull
-    private final Path file;
-
-    public long calculate() throws IOException {
+    @Override
+    public long applyAsLong(Path file) {
         try (CheckedInputStream in = new CheckedInputStream(new FileInputStream(file.toFile()), new CRC32())) {
             byte[] buf = new byte[128];
 
@@ -43,6 +42,8 @@ public final class ChecksumCalculator {
             }
 
             return in.getChecksum().getValue();
+        } catch(IOException e) {
+            throw new ZipException(e);
         }
     }
 }

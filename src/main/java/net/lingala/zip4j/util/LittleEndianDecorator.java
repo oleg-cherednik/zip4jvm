@@ -49,7 +49,7 @@ public final class LittleEndianDecorator {
         System.arraycopy(this.buf, offs, buf, 0, length);
 
         offs += length;
-        return new String(buf, Zip4jUtil.detectCharset(buf));
+        return new CreateStringFunc().apply(buf);
     }
 
     @Override

@@ -46,14 +46,15 @@ public final class ZipMisc {
     }
 
     public void setComment(String comment) throws ZipException {
-        comment = StringUtils.isEmpty(comment) ? null : comment.trim();
+        comment = StringUtils.trimToNull(comment);
+
+        if (StringUtils.length(comment) > InternalZipConstants.MAX_ALLOWED_ZIP_COMMENT_LENGTH)
+            throw new ZipException("comment length exceeds maximum length");
+
         UnzipIt.checkZipFile(zipFile);
 
         ZipModel zipModel = ZipFile.createZipModel(zipFile, charset);
         ZipIt.checkSplitArchiveModification(zipModel);
-
-        if (StringUtils.length(comment) > InternalZipConstants.MAX_ALLOWED_ZIP_COMMENT_LENGTH)
-            throw new ZipException("comment length exceeds maximum length");
 
         zipModel.getEndCentralDirectory().setComment(comment);
 
@@ -114,7 +115,6 @@ public final class ZipMisc {
         }
     }
 
-    // TODO ArchiveMaintainer.copy() is duplication
     private static long[] copyAllParts(@NonNull OutputStream out, @NonNull ZipModel zipModel) throws IOException {
         int noOfDisk = zipModel.getEndCentralDirectory().getDiskNumber();
         long[] fileSizeList = new long[noOfDisk + 1];

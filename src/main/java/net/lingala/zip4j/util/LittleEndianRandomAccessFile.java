@@ -48,7 +48,7 @@ public final class LittleEndianRandomAccessFile implements Closeable {
         offs += length;
         byte[] buf = new byte[length];
         raf.readFully(buf);
-        return new String(buf, Zip4jUtil.detectCharset(buf));
+        return new CreateStringFunc().apply(buf);
     }
 
     public String readString(int length, @NonNull Charset charset) throws IOException {
