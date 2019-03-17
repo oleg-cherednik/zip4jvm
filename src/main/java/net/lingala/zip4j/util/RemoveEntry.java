@@ -17,6 +17,7 @@
 package net.lingala.zip4j.util;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.core.HeaderWriter;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CentralDirectory;
@@ -33,9 +34,12 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArchiveMaintainer {
+@RequiredArgsConstructor
+public final class RemoveEntry {
+    @NonNull
+    private final ZipModel zipModel;
 
-    public void removeZipFile(ZipModel zipModel, @NonNull String entryName) {
+    public void removeZipFile(@NonNull String entryName) {
         CentralDirectory.FileHeader fileHeader = zipModel.getFileHeader(entryName);
 
         if (fileHeader == null)
@@ -48,19 +52,19 @@ public class ArchiveMaintainer {
 //            if (zipModel.isSplitArchive())
 //                throw new ZipException("This is a split archive. Zip file format does not allow updating split/spanned files");
 
-        Path tmpZipFile = createTempFile(zipModel);
+        Path tmpZipFile = createTempFile();
 
         try (OutputStream out = new FileOutputStream(tmpZipFile.toFile())) {
-            writeFileHeaders(zipModel, entryName, out);
+            writeFileHeaders(entryName, out);
             new HeaderWriter().finalizeZipFile(zipModel, out);
         } catch(IOException e) {
             throw new ZipException(e);
         }
 
-        restoreFileName(zipModel.getZipFile(), tmpZipFile);
+        restoreFileName(tmpZipFile);
     }
 
-    private static Path createTempFile(ZipModel zipModel) {
+    private Path createTempFile() {
         try {
             return Files.createTempFile(zipModel.getZipFile().getParent(), null, ".zip");
         } catch(IOException e) {
@@ -68,7 +72,7 @@ public class ArchiveMaintainer {
         }
     }
 
-    private static void writeFileHeaders(ZipModel zipModel, String entryName, OutputStream out) throws IOException {
+    private void writeFileHeaders(String entryName, OutputStream out) throws IOException {
         List<CentralDirectory.FileHeader> fileHeaders = new ArrayList<>();
         CentralDirectory.FileHeader prv = null;
 
@@ -116,12 +120,12 @@ public class ArchiveMaintainer {
         zipModel.getEndCentralDirectory().setOffsCentralDirectory(offsOut);
     }
 
-    private static void restoreFileName(Path zipFile, Path tmpZipFileName) {
+    private void restoreFileName(Path tmpZipFileName) {
         try {
             if (tmpZipFileName == null)
                 return;
-            if (Files.deleteIfExists(zipFile))
-                Files.move(tmpZipFileName, zipFile);
+            if (Files.deleteIfExists(zipModel.getZipFile()))
+                Files.move(tmpZipFileName, zipModel.getZipFile());
             else
                 throw new ZipException("cannot delete old zip file");
         } catch(IOException e) {

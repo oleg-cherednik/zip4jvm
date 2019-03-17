@@ -7,11 +7,10 @@ import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.NoSplitOutputStream;
 import net.lingala.zip4j.io.SplitOutputStream;
-import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.ZipModel;
-import net.lingala.zip4j.util.ArchiveMaintainer;
 import net.lingala.zip4j.util.InternalZipConstants;
+import net.lingala.zip4j.util.RemoveEntry;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -25,7 +24,6 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -140,16 +138,8 @@ public final class ZipMisc {
         ZipModel zipModel = ZipFile.createZipModel(zipFile, charset);
         ZipIt.checkSplitArchiveModification(zipModel);
 
-        ArchiveMaintainer maintainer = new ArchiveMaintainer();
-        entries.forEach(entryName -> maintainer.removeZipFile(zipModel, entryName));
-    }
-
-    private static List<CentralDirectory.FileHeader> getFileHeaders(Collection<String> entries, ZipModel zipModel) {
-        return entries.stream()
-                      .map(entryName -> zipModel.getCentralDirectory().getFileHeadersByPrefix(entryName))
-                      .flatMap(List::stream)
-                      .filter(Objects::nonNull)
-                      .collect(Collectors.toList());
+        RemoveEntry maintainer = new RemoveEntry(zipModel);
+        entries.forEach(maintainer::removeZipFile);
     }
 
 }

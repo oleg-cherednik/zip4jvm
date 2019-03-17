@@ -27,8 +27,8 @@ import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.InputStreamMeta;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.util.ArchiveMaintainer;
 import net.lingala.zip4j.util.ChecksumCalculator;
+import net.lingala.zip4j.util.RemoveEntry;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 
@@ -40,12 +40,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 
+/**
+ * @author Oleg Cherednik
+ * @since 17.03.2019
+ */
 @RequiredArgsConstructor
 public class ZipEngine {
 
     @NonNull
     private final ZipModel zipModel;
-    private final ArchiveMaintainer archiveMaintainer = new ArchiveMaintainer();
 
     public void addEntries(@NonNull Collection<Path> entries, @NonNull ZipParameters parameters) throws ZipException, IOException {
         if (entries.isEmpty())
@@ -68,8 +71,7 @@ public class ZipEngine {
                 if ("/".equals(entryName) || "\\".equals(entryName))
                     continue;
 
-                removeFile(entryName);
-
+                new RemoveEntry(zipModel).removeZipFile(entryName);
                 ZipParameters params = parameters.toBuilder().build();
 
                 if (Files.isRegularFile(entry)) {
@@ -110,8 +112,7 @@ public class ZipEngine {
                     continue;
 
                 // TODO should be relative to the root zip path
-                String fileName = file.getRelativePath();
-                removeFile(fileName);
+                new RemoveEntry(zipModel).removeZipFile(file.getRelativePath());
 
                 ZipParameters params = parameters.toBuilder().build();
 
@@ -148,7 +149,7 @@ public class ZipEngine {
     }
 
     public void removeFile(@NonNull String fileName) {
-        archiveMaintainer.removeZipFile(zipModel, fileName);
+        new RemoveEntry(zipModel).removeZipFile(fileName);
     }
 
 }

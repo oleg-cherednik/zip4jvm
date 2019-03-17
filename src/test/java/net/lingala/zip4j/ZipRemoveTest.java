@@ -60,8 +60,8 @@ public class ZipRemoveTest {
 //        assertThat(misc.getEntryNames()).hasSize(1);
 
         Collection<String> entries = Arrays.asList(
-                "cars/bentley-continental.jpg"
-//                "cars/ferrari-458-italia.jpg",
+                "cars/bentley-continental.jpg",
+                "cars/ferrari-458-italia.jpg"
 //                "cars/wiesmann-gt-mf5.jpg"
         );
         misc.removeEntries(entries);
