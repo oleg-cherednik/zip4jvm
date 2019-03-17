@@ -10,7 +10,7 @@ import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
-import net.lingala.zip4j.util.RemoveEntry;
+import net.lingala.zip4j.util.RemoveEntryFunc;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -138,8 +138,7 @@ public final class ZipMisc {
         ZipModel zipModel = ZipFile.createZipModel(zipFile, charset);
         ZipIt.checkSplitArchiveModification(zipModel);
 
-        RemoveEntry maintainer = new RemoveEntry(zipModel);
-        entries.forEach(maintainer::removeZipFile);
+        new RemoveEntryFunc(zipModel).accept(entries);
     }
 
 }

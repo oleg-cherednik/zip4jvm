@@ -28,7 +28,7 @@ import net.lingala.zip4j.model.InputStreamMeta;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.ChecksumCalculator;
-import net.lingala.zip4j.util.RemoveEntry;
+import net.lingala.zip4j.util.RemoveEntryFunc;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 
@@ -71,7 +71,7 @@ public class ZipEngine {
                 if ("/".equals(entryName) || "\\".equals(entryName))
                     continue;
 
-                new RemoveEntry(zipModel).removeZipFile(entryName);
+                new RemoveEntryFunc(zipModel).accept(entryName);
                 ZipParameters params = parameters.toBuilder().build();
 
                 if (Files.isRegularFile(entry)) {
@@ -112,7 +112,7 @@ public class ZipEngine {
                     continue;
 
                 // TODO should be relative to the root zip path
-                new RemoveEntry(zipModel).removeZipFile(file.getRelativePath());
+                new RemoveEntryFunc(zipModel).accept(file.getRelativePath());
 
                 ZipParameters params = parameters.toBuilder().build();
 
@@ -146,10 +146,6 @@ public class ZipEngine {
             parameters.setEncryption(Encryption.OFF);
         }
 
-    }
-
-    public void removeFile(@NonNull String fileName) {
-        new RemoveEntry(zipModel).removeZipFile(fileName);
     }
 
 }

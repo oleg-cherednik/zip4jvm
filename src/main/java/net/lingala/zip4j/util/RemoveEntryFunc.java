@@ -22,6 +22,7 @@ import net.lingala.zip4j.core.HeaderWriter;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.FileInputStream;
@@ -32,30 +33,35 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-public final class RemoveEntry {
+public final class RemoveEntryFunc implements Consumer<Collection<String>> {
     @NonNull
     private final ZipModel zipModel;
+    private final Function<Collection<String>, Set<String>> normalize = entries -> entries.stream()
+                                                                                          .map(entryName -> FilenameUtils.normalize(entryName, true))
+                                                                                          .collect(Collectors.toSet());
 
-    public void removeZipFile(@NonNull String entryName) {
-        CentralDirectory.FileHeader fileHeader = zipModel.getFileHeader(entryName);
+    public void accept(@NonNull String entryName) {
+        accept(Collections.singleton(entryName));
+    }
 
-        if (fileHeader == null)
+    @Override
+    public void accept(@NonNull Collection<String> removeEntries) {
+        if (removeEntries.isEmpty())
             return;
-
-        entryName = fileHeader.getFileName();
-
-//            if (indexOfFileHeader < 0)
-//                throw new ZipException("file header not found in zip model, cannot remove file");
-//            if (zipModel.isSplitArchive())
-//                throw new ZipException("This is a split archive. Zip file format does not allow updating split/spanned files");
 
         Path tmpZipFile = createTempFile();
 
         try (OutputStream out = new FileOutputStream(tmpZipFile.toFile())) {
-            writeFileHeaders(entryName, out);
+            writeFileHeaders(out, normalize.apply(removeEntries));
             new HeaderWriter().finalizeZipFile(zipModel, out);
         } catch(IOException e) {
             throw new ZipException(e);
@@ -72,7 +78,7 @@ public final class RemoveEntry {
         }
     }
 
-    private void writeFileHeaders(String entryName, OutputStream out) throws IOException {
+    private void writeFileHeaders(OutputStream out, Collection<String> removeEntries) throws IOException {
         List<CentralDirectory.FileHeader> fileHeaders = new ArrayList<>();
         CentralDirectory.FileHeader prv = null;
 
@@ -102,15 +108,14 @@ public final class RemoveEntry {
 //                fileHeader.setOffsLocalFileHeader(offsetLocalHdr - (offs - offsetLocalFileHeader) - 1);
                 }
 
-                prv = entryName.equalsIgnoreCase(header.getFileName()) ? null : header;
-                skip += header.getOffsLocalFileHeader() - offsIn;
+                prv = removeEntries.contains(header.getFileName()) ? null : header;
+                skip = header.getOffsLocalFileHeader() - offsIn;
             }
 
             if (prv != null) {
                 long curOffs = offsOut;
                 long length = zipModel.getOffsCentralDirectory() - prv.getOffsLocalFileHeader();
-                IOUtils.copyLarge(in, out, skip, length);
-                offsOut += length;
+                offsOut += IOUtils.copyLarge(in, out, skip, length);
                 fileHeaders.add(prv);
                 prv.setOffsLocalFileHeader(curOffs);
             }
@@ -132,5 +137,4 @@ public final class RemoveEntry {
             throw new ZipException(e);
         }
     }
-
 }
