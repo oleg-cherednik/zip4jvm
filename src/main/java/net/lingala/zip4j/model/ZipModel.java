@@ -190,6 +190,13 @@ public class ZipModel implements Cloneable {
 
     public void addFileHeader(CentralDirectory.FileHeader fileHeader) {
         centralDirectory.addFileHeader(fileHeader);
+        // TODO should be union with setFileHeaders
+    }
+
+    public void setFileHeaders(List<CentralDirectory.FileHeader> fileHeaders) {
+        centralDirectory.setFileHeaders(fileHeaders);
+        endCentralDirectory.setTotalEntries(fileHeaders.size());
+        endCentralDirectory.setDiskEntries(fileHeaders.size());
     }
 
 }

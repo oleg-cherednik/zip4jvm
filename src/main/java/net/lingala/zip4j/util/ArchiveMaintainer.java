@@ -22,7 +22,6 @@ import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.NoSplitOutputStream;
 import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.model.CentralDirectory;
-import net.lingala.zip4j.model.EndCentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
 
 import java.io.FileNotFoundException;
@@ -45,6 +44,10 @@ public class ArchiveMaintainer {
 
         try {
             CentralDirectory.FileHeader fileHeader = zipModel.getFileHeader(entryName);
+
+            if (fileHeader == null)
+                return;
+
             entryName = fileHeader.getFileName();
 
 //            if (indexOfFileHeader < 0)
@@ -59,12 +62,13 @@ public class ArchiveMaintainer {
 
             List<CentralDirectory.FileHeader> newHeaders = new ArrayList<>();
             CentralDirectory.FileHeader prvHeader = null;
-            long prv = -1;
 
             for (CentralDirectory.FileHeader header : zipModel.getFileHeaders()) {
-                if (prv >= 0) {
+                if (prvHeader != null) {
+                    long offs = out.getFilePointer();
+                    copyFile(in, out, prvHeader.getOffsLocalFileHeader(), header.getOffsLocalFileHeader() - 1);
                     newHeaders.add(prvHeader);
-                    prvHeader.setOffsLocalFileHeader(out.getFilePointer());
+                    prvHeader.setOffsLocalFileHeader(offs);
 
                     // TODO fix offs for zip64
 
@@ -76,30 +80,20 @@ public class ArchiveMaintainer {
 //
 //                fileHeader.setOffsLocalFileHeader(offsetLocalHdr - (offs - offsetLocalFileHeader) - 1);
 
-                    copyFile(in, out, prv, header.getOffsLocalFileHeader() - 1);
+
                 }
 
-                if (entryName.equals(header.getFileName())) {
-                    prv = -1;
-                    prvHeader = null;
-                } else {
-                    prv = header.getOffsLocalFileHeader();
-                    prvHeader = header;
-                }
+                prvHeader = entryName.equals(header.getFileName()) ? null : header;
             }
 
-            if (prv >= 0) {
+            if (prvHeader != null) {
+                long offs = out.getFilePointer();
+                copyFile(in, out, prvHeader.getOffsLocalFileHeader(), zipModel.getOffsCentralDirectory() - 1);
                 newHeaders.add(prvHeader);
-                prvHeader.setOffsLocalFileHeader(out.getFilePointer());
-                copyFile(in, out, prv, zipModel.getOffsCentralDirectory() - 1);
+                prvHeader.setOffsLocalFileHeader(offs);
             }
 
-            zipModel.getCentralDirectory().setFileHeaders(newHeaders);
-
-            EndCentralDirectory endCentralDirectory = zipModel.getEndCentralDirectory();
-            endCentralDirectory.setOffsCentralDirectory(out.getFilePointer());
-            endCentralDirectory.setTotalEntries(newHeaders.size());
-            endCentralDirectory.setDiskEntries(newHeaders.size());
+            zipModel.setFileHeaders(newHeaders);
 
             new HeaderWriter().finalizeZipFile(zipModel, out);
 
@@ -128,41 +122,6 @@ public class ArchiveMaintainer {
                 }
             }
         }
-    }
-
-    private static long[] getOffs(ZipModel zipModel) {
-        int totalEntries = zipModel.getEndCentralDirectory().getTotalEntries();
-        long[] offs = new long[totalEntries + 1];
-        int i = 0;
-
-        for (CentralDirectory.FileHeader fileHeader : zipModel.getFileHeaders())
-            offs[i++] = fileHeader.getOffsLocalFileHeader();
-
-        offs[i++] = zipModel.getOffsCentralDirectory();
-
-        return offs;
-    }
-
-    private static long getOffs(@NonNull ZipModel zipModel, CentralDirectory.FileHeader fileHeader) {
-        int indexOfFileHeader = Zip4jUtil.getIndexOfFileHeader(zipModel, fileHeader);
-        long offsetEndOfCompressedFile = -1;
-        List<CentralDirectory.FileHeader> fileHeaders = zipModel.getFileHeaders();
-
-        if (indexOfFileHeader == fileHeaders.size() - 1)
-            offsetEndOfCompressedFile = zipModel.getOffsCentralDirectory() - 1;
-        else {
-            CentralDirectory.FileHeader nextFileHeader = fileHeaders.get(indexOfFileHeader + 1);
-
-            if (nextFileHeader != null) {
-                offsetEndOfCompressedFile = nextFileHeader.getOffsLocalFileHeader() - 1;
-                if (nextFileHeader.getZip64ExtendedInfo() != null &&
-                        nextFileHeader.getZip64ExtendedInfo().getOffsLocalHeaderRelative() != -1) {
-                    offsetEndOfCompressedFile = nextFileHeader.getZip64ExtendedInfo().getOffsLocalHeaderRelative() - 1;
-                }
-            }
-        }
-
-        return offsetEndOfCompressedFile + 1;
     }
 
     private static void restoreFileName(Path zipFile, Path tmpZipFileName) {
