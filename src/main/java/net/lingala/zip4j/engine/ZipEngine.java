@@ -71,7 +71,6 @@ public class ZipEngine {
                 if ("/".equals(entryName) || "\\".equals(entryName))
                     continue;
 
-                new RemoveEntryFunc(zipModel).accept(entryName);
                 ZipParameters params = parameters.toBuilder().build();
 
                 if (Files.isRegularFile(entry)) {
@@ -145,7 +144,6 @@ public class ZipEngine {
             parameters.setAesKeyStrength(AESStrength.NONE);
             parameters.setEncryption(Encryption.OFF);
         }
-
     }
 
 }
