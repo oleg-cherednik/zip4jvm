@@ -63,12 +63,15 @@ public class ArchiveMaintainer {
             List<CentralDirectory.FileHeader> newHeaders = new ArrayList<>();
             CentralDirectory.FileHeader prvHeader = null;
 
+            long offs = 0;
+
             for (CentralDirectory.FileHeader header : zipModel.getFileHeaders()) {
                 if (prvHeader != null) {
-                    long offs = out.getFilePointer();
+                    long curOffs = offs;
                     copyFile(in, out, prvHeader.getOffsLocalFileHeader(), header.getOffsLocalFileHeader() - 1);
+                    offs += header.getOffsLocalFileHeader() - 1 - prvHeader.getOffsLocalFileHeader();
                     newHeaders.add(prvHeader);
-                    prvHeader.setOffsLocalFileHeader(offs);
+                    prvHeader.setOffsLocalFileHeader(curOffs);
 
                     // TODO fix offs for zip64
 
@@ -87,13 +90,15 @@ public class ArchiveMaintainer {
             }
 
             if (prvHeader != null) {
-                long offs = out.getFilePointer();
+                long curOffs = offs;
                 copyFile(in, out, prvHeader.getOffsLocalFileHeader(), zipModel.getOffsCentralDirectory() - 1);
+                offs += zipModel.getOffsCentralDirectory() - 1 - prvHeader.getOffsLocalFileHeader();
                 newHeaders.add(prvHeader);
-                prvHeader.setOffsLocalFileHeader(offs);
+                prvHeader.setOffsLocalFileHeader(curOffs);
             }
 
             zipModel.setFileHeaders(newHeaders);
+            zipModel.getEndCentralDirectory().setOffsCentralDirectory(offs);
 
             new HeaderWriter().finalizeZipFile(zipModel, out);
 
