@@ -33,17 +33,17 @@ public class EndCentralDirectory {
     // size:4 - signature (0x06054b50)
     private final int signature = InternalZipConstants.ENDSIG;
     // size:2 - number of the disk
-    private int noOfDisk;
+    private int diskNumber;
     // size:2 - number of the disk with the start of the central directory
-    private int noOfDiskStartCentralDir;
+    private int startDiskNumber;
     // size:2 - total number of entries in the central directory on this disk
-    private int totalNumberOfEntriesInCentralDirOnThisDisk;
+    private int diskEntries;
     // size:2 - total number of entries in the central directory
-    private int totNoOfEntriesInCentralDir;
+    private int totalEntries;
     // size:4 - size of the central directory
-    private int sizeOfCentralDir;
+    private int sizeCentralDirectory;
     // size:4 - offset of start of central directory with respect to the starting disk number
-    private long offOfStartOfCentralDir;
+    private long offsCentralDirectory;
     // size:2 - file comment length (n)
     private int commentLength;
     // size:n - file comment

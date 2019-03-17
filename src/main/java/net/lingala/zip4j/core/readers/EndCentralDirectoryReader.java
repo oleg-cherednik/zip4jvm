@@ -23,12 +23,12 @@ final class EndCentralDirectoryReader {
         findHead();
 
         EndCentralDirectory dir = new EndCentralDirectory();
-        dir.setNoOfDisk(in.readShort());
-        dir.setNoOfDiskStartCentralDir(in.readShort());
-        dir.setTotalNumberOfEntriesInCentralDirOnThisDisk(in.readShort());
-        dir.setTotNoOfEntriesInCentralDir(in.readShort());
-        dir.setSizeOfCentralDir(in.readInt());
-        dir.setOffOfStartOfCentralDir(in.readIntAsLong());
+        dir.setDiskNumber(in.readShort());
+        dir.setStartDiskNumber(in.readShort());
+        dir.setDiskEntries(in.readShort());
+        dir.setTotalEntries(in.readShort());
+        dir.setSizeCentralDirectory(in.readInt());
+        dir.setOffsCentralDirectory(in.readIntAsLong());
         dir.setCommentLength(in.readShort());
         dir.setComment(in.readString(dir.getCommentLength()));
 

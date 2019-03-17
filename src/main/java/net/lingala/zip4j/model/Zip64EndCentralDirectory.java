@@ -46,7 +46,7 @@ public class Zip64EndCentralDirectory {
     // size:8 - total number of entries in the central directory on this disk
     private long totNoOfEntriesInCentralDirOnThisDisk;
     // size:8 - total number of entries in the central directory
-    private long totNoOfEntriesInCentralDir;
+    private long getTotalEntries;
     // size:8 - size of the central directory
     private long sizeOfCentralDir;
     // size:8 - directory with respect to the starting disk number

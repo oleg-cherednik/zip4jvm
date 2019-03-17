@@ -256,7 +256,7 @@ public class Zip4jUtil {
             return retList;
         }
 
-        int numberOfThisDisk = zipModel.getEndCentralDirectory().getNoOfDisk();
+        int numberOfThisDisk = zipModel.getEndCentralDirectory().getDiskNumber();
 
         if (numberOfThisDisk == 0) {
             retList.add(zipModel.getZipFile().toFile());

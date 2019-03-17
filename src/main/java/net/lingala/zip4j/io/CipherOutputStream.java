@@ -109,7 +109,7 @@ public abstract class CipherOutputStream extends OutputStream {
                 out.addTotalBytesWritten(4);
             }
 
-            fileHeader.setOffLocalHeaderRelative(out.getOffsLocalHeaderRelative());
+            fileHeader.setOffsLocalFileHeader(out.getOffsLocalHeaderRelative());
             out.addTotalBytesWritten(new LocalFileHeaderWriter().write(localFileHeader, zipModel, out.getDelegate()));
 
             encryptor = createEncryptor();
@@ -130,7 +130,7 @@ public abstract class CipherOutputStream extends OutputStream {
             return Encryptor.NULL;
         if (zipParameters.getEncryption() == Encryption.STANDARD)
             // Since we do not know the crc here, we use the modification time for encrypting.
-            return new StandardEncryptor(zipParameters.getPassword(), (localFileHeader.getLastModFileTime() & 0x0000ffff) << 16);
+            return new StandardEncryptor(zipParameters.getPassword(), (localFileHeader.getLastModifiedTime() & 0x0000ffff) << 16);
         if (zipParameters.getEncryption() == Encryption.AES)
             return new AESEncryptor(zipParameters.getPassword(), zipParameters.getAesKeyStrength());
 
@@ -250,7 +250,7 @@ public abstract class CipherOutputStream extends OutputStream {
     }
 
     public void finish() throws IOException, ZipException {
-        zipModel.getEndCentralDirectory().setOffOfStartOfCentralDir(out.getTotalBytesWritten());
+        zipModel.getEndCentralDirectory().setOffsCentralDirectory(out.getTotalBytesWritten());
         new HeaderWriter().finalizeZipFile(zipModel, out.getDelegate());
     }
 

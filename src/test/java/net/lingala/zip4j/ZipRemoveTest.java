@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -44,18 +45,26 @@ public class ZipRemoveTest {
 
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
-                                                .compressionLevel(CompressionLevel.NORMAL).build();
-        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-        zip.add(srcDir, parameters);
+                                                .compressionLevel(CompressionLevel.NORMAL)
+                                                .defaultFolderPath(srcDir).build();
+        List<Path> files = Arrays.asList(
+                srcDir.resolve("cars/bentley-continental.jpg"),
+                srcDir.resolve("cars/ferrari-458-italia.jpg"),
+                srcDir.resolve("cars/wiesmann-gt-mf5.jpg")
+        );
+
+//        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
+//        zip.add(files, parameters);
 
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
-        assertThat(misc.getEntryNames()).hasSize(15);
+//        assertThat(misc.getEntryNames()).hasSize(1);
 
         Collection<String> entries = Arrays.asList(
-                "cars/bentley-continental.jpg",
-                "cars/ferrari-458-italia.jpg",
-                "cars/wiesmann-gt-mf5.jpg");
+                "cars/bentley-continental.jpg"
+//                "cars/ferrari-458-italia.jpg"
+//                "cars/wiesmann-gt-mf5.jpg"
+        );
         misc.removeEntries(entries);
-        assertThat(misc.getEntryNames()).hasSize(12);
+        assertThat(misc.getEntryNames()).hasSize(2);
     }
 }

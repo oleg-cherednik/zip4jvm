@@ -79,7 +79,7 @@ public class ZipModel implements Cloneable {
     public void setEndCentralDirectory(EndCentralDirectory endCentralDirectory) {
         this.endCentralDirectory = endCentralDirectory;
         // TODO check is it used, because 1 split length is invalid value, but it marks an archive as split
-        splitLength = endCentralDirectory != null && endCentralDirectory.getNoOfDisk() > 0 ? 1 : NO_SPLIT;
+        splitLength = endCentralDirectory != null && endCentralDirectory.getDiskNumber() > 0 ? 1 : NO_SPLIT;
     }
 
 
@@ -122,11 +122,11 @@ public class ZipModel implements Cloneable {
                                .findFirst().orElse(null);
     }
 
-    public long getOffOfStartOfCentralDir() {
+    public long getOffsCentralDirectory() {
         if (isZip64Format())
             return zip64EndCentralDirectory.getOffsetStartCenDirWRTStartDiskNo();
         if (endCentralDirectory != null)
-            return endCentralDirectory.getOffOfStartOfCentralDir();
+            return endCentralDirectory.getOffsCentralDirectory();
         return 0;
     }
 
@@ -135,7 +135,7 @@ public class ZipModel implements Cloneable {
     }
 
     public Path getPartFile(int diskNumberStartOfFile) {
-        if (diskNumberStartOfFile == endCentralDirectory.getNoOfDisk())
+        if (diskNumberStartOfFile == endCentralDirectory.getDiskNumber())
             return zipFile;
         return getSplitFilePath(zipFile, diskNumberStartOfFile + 1);
     }
@@ -154,17 +154,17 @@ public class ZipModel implements Cloneable {
     @SuppressWarnings("MethodCanBeVariableArityMethod")
     private void updateFileHeaders(long[] fileSizeList) {
         getFileHeaders().forEach(fileHeader -> {
-            fileHeader.updateOffLocalHeaderRelative(Arrays.stream(fileSizeList, 0, fileHeader.getDiskNumberStart()).sum());
-            fileHeader.setDiskNumberStart(0);
+            fileHeader.updateOffLocalHeaderRelative(Arrays.stream(fileSizeList, 0, fileHeader.getDiskNumber()).sum());
+            fileHeader.setDiskNumber(0);
         });
     }
 
     private void updateEndCentralDirectory(long totalBytesWritten) throws ZipException {
-        endCentralDirectory.setNoOfDisk(0);
-        endCentralDirectory.setNoOfDiskStartCentralDir(0);
-        endCentralDirectory.setTotNoOfEntriesInCentralDir(getFileHeaders().size());
-        endCentralDirectory.setTotalNumberOfEntriesInCentralDirOnThisDisk(getFileHeaders().size());
-        endCentralDirectory.setOffOfStartOfCentralDir(totalBytesWritten);
+        endCentralDirectory.setDiskNumber(0);
+        endCentralDirectory.setStartDiskNumber(0);
+        endCentralDirectory.setTotalEntries(getFileHeaders().size());
+        endCentralDirectory.setDiskEntries(getFileHeaders().size());
+        endCentralDirectory.setOffsCentralDirectory(totalBytesWritten);
     }
 
     private void updateZip64EndCentralDirLocator(long totalBytesWritten) throws ZipException {
@@ -179,7 +179,7 @@ public class ZipModel implements Cloneable {
         if (isZip64Format()) {
             zip64EndCentralDirectory.setNoOfThisDisk(0);
             zip64EndCentralDirectory.setNoOfThisDiskStartOfCentralDir(0);
-            zip64EndCentralDirectory.setTotNoOfEntriesInCentralDirOnThisDisk(endCentralDirectory.getTotNoOfEntriesInCentralDir());
+            zip64EndCentralDirectory.setTotNoOfEntriesInCentralDirOnThisDisk(endCentralDirectory.getTotalEntries());
             zip64EndCentralDirectory.updateOffsetStartCenDirWRTStartDiskNo(totalBytesWritten);
         }
     }

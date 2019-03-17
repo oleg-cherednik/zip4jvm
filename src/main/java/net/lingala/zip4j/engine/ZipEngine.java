@@ -22,7 +22,6 @@ import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.io.ZipOutputStream;
 import net.lingala.zip4j.model.AESStrength;
-import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.InputStreamMeta;
@@ -56,7 +55,7 @@ public class ZipEngine {
         checkParameters(parameters);
 
         try (ZipOutputStream out = new ZipOutputStream(SplitOutputStream.create(zipModel), zipModel)) {
-            out.seek(zipModel.getOffOfStartOfCentralDir());
+            out.seek(zipModel.getOffsCentralDirectory());
 
             for (Path entry : entries) {
                 if (entry == null)
@@ -104,7 +103,7 @@ public class ZipEngine {
         checkParameters(parameters);
 
         try (ZipOutputStream out = new ZipOutputStream(SplitOutputStream.create(zipModel), zipModel)) {
-            out.seek(zipModel.getEndCentralDirectory().getOffOfStartOfCentralDir());
+            out.seek(zipModel.getEndCentralDirectory().getOffsCentralDirectory());
 
             for (InputStreamMeta file : files) {
                 if (file == null)
@@ -149,11 +148,7 @@ public class ZipEngine {
     }
 
     public void removeFile(@NonNull String fileName) throws ZipException {
-        removeFile(zipModel.getFileHeader(fileName));
-    }
-
-    public void removeFile(CentralDirectory.FileHeader fileHeader) throws ZipException {
-        archiveMaintainer.removeZipFile(zipModel, fileHeader);
+        archiveMaintainer.removeZipFile(zipModel, fileName);
     }
 
 }

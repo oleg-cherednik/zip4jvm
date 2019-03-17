@@ -35,7 +35,7 @@ public class LocalFileHeader {
     // size:4 - signature (0x04034b50)
     private final int signature = InternalZipConstants.LOCSIG;
     // size:2 - version needed to extractEntries
-    private int versionNeededToExtract;
+    private int versionToExtract;
     // size:2 - general purpose bit flag
     private final GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
     // size:2 - compression method
@@ -43,7 +43,7 @@ public class LocalFileHeader {
     private CompressionMethod compressionMethod = CompressionMethod.STORE;
     // size:2 - last mod file time
     // size:2 - ast mod file date
-    private int lastModFileTime;
+    private int lastModifiedTime;
     // size:4 - crc-32
     private long crc32;
     // size:4 - compressed size

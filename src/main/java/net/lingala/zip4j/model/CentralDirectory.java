@@ -63,7 +63,7 @@ public class CentralDirectory {
         // size:2 - version made by
         private int versionMadeBy;
         // size:2 - version needed to extractEntries
-        private int versionNeededToExtract;
+        private int versionToExtract;
         // size:2 - general purpose bit flag
         private final GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         // size:2 - compression method
@@ -71,7 +71,7 @@ public class CentralDirectory {
         private CompressionMethod compressionMethod = CompressionMethod.STORE;
         // size:2 - last mod file time
         // size:2 - last mod file date
-        private int lastModFileTime;
+        private int lastModifiedTime;
         // size:4 - crc-32
         private long crc32;
         @Deprecated
@@ -87,13 +87,13 @@ public class CentralDirectory {
         // size:2 - file comment length
         private int fileCommentLength;
         // size:2 - disk number start
-        private int diskNumberStart;
+        private int diskNumber;
         // size:2 - internal file attributes
-        private byte[] internalFileAttr;
+        private byte[] internalFileAttributes;
         // size:4 - external file attributes
-        private byte[] externalFileAttr;
+        private byte[] externalFileAttributes;
         // size:4 - relative offset of local header
-        private long offLocalHeaderRelative;
+        private long offsLocalFileHeader;
         // size:n - file name
         private String fileName;
         // size:m - extra field
@@ -117,8 +117,8 @@ public class CentralDirectory {
             if (info != null) {
                 uncompressedSize = info.getUnCompressedSize() != -1 ? info.getUnCompressedSize() : uncompressedSize;
                 compressedSize = info.getCompressedSize() != -1 ? info.getCompressedSize() : uncompressedSize;
-                offLocalHeaderRelative = info.getOffsLocalHeaderRelative() != -1 ? info.getOffsLocalHeaderRelative() : offLocalHeaderRelative;
-                diskNumberStart = info.getDiskNumberStart() != -1 ? info.getDiskNumberStart() : diskNumberStart;
+                offsLocalFileHeader = info.getOffsLocalHeaderRelative() != -1 ? info.getOffsLocalHeaderRelative() : offsLocalFileHeader;
+                diskNumber = info.getDiskNumberStart() != -1 ? info.getDiskNumberStart() : diskNumber;
             }
         }
 
@@ -150,7 +150,7 @@ public class CentralDirectory {
         }
 
         public void updateOffLocalHeaderRelative(long delta) {
-            offLocalHeaderRelative += delta;
+            offsLocalFileHeader += delta;
         }
 
         @Override

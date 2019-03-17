@@ -42,20 +42,20 @@ public class CentralDirectoryBuilder {
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
         fileHeader.setVersionMadeBy(20);
-        fileHeader.setVersionNeededToExtract(20);
+        fileHeader.setVersionToExtract(20);
         updateGeneralPurposeFlag(fileHeader.getGeneralPurposeFlag());
         fileHeader.setCompressionMethod(getCompressionMethod());
-        fileHeader.setLastModFileTime(getLastModFileTime());
+        fileHeader.setLastModifiedTime(getLastModFileTime());
         fileHeader.setCrc32(getCrc32());
         fileHeader.setCompressedSize(getCompressedSize(fileHeader));
         fileHeader.setUncompressedSize(getUncompressedSize(fileHeader));
         fileHeader.setFileNameLength(Zip4jUtil.getEncodedStringLength(fileName, zipModel.getCharset()));
         fileHeader.setExtraFieldLength(0);
         fileHeader.setFileCommentLength(0);
-        fileHeader.setDiskNumberStart(currSplitFileCounter);
-        fileHeader.setInternalFileAttr(null);
-        fileHeader.setExternalFileAttr(getExternalFileAttr());
-        fileHeader.setOffLocalHeaderRelative(0);
+        fileHeader.setDiskNumber(currSplitFileCounter);
+        fileHeader.setInternalFileAttributes(null);
+        fileHeader.setExternalFileAttributes(getExternalFileAttr());
+        fileHeader.setOffsLocalFileHeader(0);
         fileHeader.setFileName(fileName);
         fileHeader.setExtraDataRecords(Collections.emptyMap());
         fileHeader.setZip64ExtendedInfo(null);
@@ -67,10 +67,10 @@ public class CentralDirectoryBuilder {
 
     public LocalFileHeader createLocalFileHeader(@NonNull CentralDirectory.FileHeader fileHeader) throws ZipException {
         LocalFileHeader localFileHeader = new LocalFileHeader();
-        localFileHeader.setVersionNeededToExtract(fileHeader.getVersionNeededToExtract());
+        localFileHeader.setVersionToExtract(fileHeader.getVersionToExtract());
         localFileHeader.setGeneralPurposeFlag(fileHeader.getGeneralPurposeFlag().getData());
         localFileHeader.setCompressionMethod(fileHeader.getCompressionMethod());
-        localFileHeader.setLastModFileTime(fileHeader.getLastModFileTime());
+        localFileHeader.setLastModifiedTime(fileHeader.getLastModifiedTime());
         localFileHeader.setUncompressedSize(fileHeader.getUncompressedSize());
         localFileHeader.setFileNameLength(fileHeader.getFileNameLength());
         localFileHeader.setFileName(fileHeader.getFileName());

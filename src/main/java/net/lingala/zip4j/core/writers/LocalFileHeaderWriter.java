@@ -24,10 +24,10 @@ public final class LocalFileHeaderWriter {
         LittleEndianBuffer bytes = new LittleEndianBuffer();
 
         bytes.writeDword(localFileHeader.getSignature());
-        bytes.writeWord((short)localFileHeader.getVersionNeededToExtract());
+        bytes.writeWord((short)localFileHeader.getVersionToExtract());
         bytes.writeShort(localFileHeader.getGeneralPurposeFlag().getData());
         bytes.writeWord(localFileHeader.getCompressionMethod().getValue());
-        bytes.writeDword(localFileHeader.getLastModFileTime());
+        bytes.writeDword(localFileHeader.getLastModifiedTime());
         bytes.writeDword((int)localFileHeader.getCrc32());
 
         //compressed & uncompressed size

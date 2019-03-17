@@ -32,7 +32,7 @@ public class UnzipUtil {
             throw new ZipException("invalid file header. cannot set file attributes");
         }
 
-        byte[] externalAttrbs = fileHeader.getExternalFileAttr();
+        byte[] externalAttrbs = fileHeader.getExternalFileAttributes();
         if (externalAttrbs == null) {
             return;
         }
@@ -85,12 +85,12 @@ public class UnzipUtil {
     }
 
     private static void setFileLastModifiedTime(CentralDirectory.FileHeader fileHeader, File file) throws ZipException {
-        if (fileHeader.getLastModFileTime() <= 0) {
+        if (fileHeader.getLastModifiedTime() <= 0) {
             return;
         }
 
         if (file.exists()) {
-            file.setLastModified(Zip4jUtil.dosToJavaTme(fileHeader.getLastModFileTime()));
+            file.setLastModified(Zip4jUtil.dosToJavaTme(fileHeader.getLastModifiedTime()));
         }
     }
 

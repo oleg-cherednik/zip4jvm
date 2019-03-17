@@ -60,7 +60,7 @@ public final class ZipMisc {
         zipModel.getEndCentralDirectory().setComment(comment);
 
         try (SplitOutputStream out = new NoSplitOutputStream(zipModel.getZipFile())) {
-            out.seek(zipModel.getOffOfStartOfCentralDir());
+            out.seek(zipModel.getOffsCentralDirectory());
             new HeaderWriter().finalizeZipFileWithoutValidations(zipModel, out);
         } catch(Exception e) {
             throw new ZipException(e);
@@ -89,7 +89,7 @@ public final class ZipMisc {
         UnzipIt.checkZipFile(zipFile);
         ZipModel zipModel = ZipFile.createZipModel(zipFile, charset);
 
-        return IntStream.rangeClosed(0, zipModel.getEndCentralDirectory().getNoOfDisk())
+        return IntStream.rangeClosed(0, zipModel.getEndCentralDirectory().getDiskNumber())
                         .mapToObj(i -> i == 0 ? zipModel.getZipFile() : ZipModel.getSplitFilePath(zipFile, i))
                         .collect(Collectors.toList());
     }
@@ -118,12 +118,12 @@ public final class ZipMisc {
 
     // TODO ArchiveMaintainer.copy() is duplication
     private static long[] copyAllParts(@NonNull OutputStream out, @NonNull ZipModel zipModel) throws IOException {
-        int noOfDisk = zipModel.getEndCentralDirectory().getNoOfDisk();
+        int noOfDisk = zipModel.getEndCentralDirectory().getDiskNumber();
         long[] fileSizeList = new long[noOfDisk + 1];
 
         for (int i = 0; i <= noOfDisk; i++) {
             try (InputStream in = new FileInputStream(zipModel.getPartFile(i).toFile())) {
-                fileSizeList[i] = IOUtils.copyLarge(in, out, 0, i == noOfDisk ? zipModel.getOffOfStartOfCentralDir() : zipModel.getSplitLength());
+                fileSizeList[i] = IOUtils.copyLarge(in, out, 0, i == noOfDisk ? zipModel.getOffsCentralDirectory() : zipModel.getSplitLength());
             }
         }
 
@@ -141,10 +141,7 @@ public final class ZipMisc {
         ZipIt.checkSplitArchiveModification(zipModel);
 
         ArchiveMaintainer maintainer = new ArchiveMaintainer();
-
-        for (CentralDirectory.FileHeader fileHeader : getFileHeaders(entries, zipModel))
-            maintainer.removeZipFile(zipModel, fileHeader);
-
+        entries.forEach(entryName -> maintainer.removeZipFile(zipModel, entryName));
     }
 
     private static List<CentralDirectory.FileHeader> getFileHeaders(Collection<String> entries, ZipModel zipModel) {

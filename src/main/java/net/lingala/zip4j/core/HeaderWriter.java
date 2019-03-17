@@ -56,7 +56,7 @@ public class HeaderWriter {
         try {
             processHeaderData(zipModel, outputStream);
 
-            long offsetCentralDir = zipModel.getEndCentralDirectory().getOffOfStartOfCentralDir();
+            long offsetCentralDir = zipModel.getEndCentralDirectory().getOffsCentralDirectory();
 
             LittleEndianBuffer bytes = new LittleEndianBuffer();
 
@@ -115,7 +115,7 @@ public class HeaderWriter {
 
             LittleEndianBuffer bytes = new LittleEndianBuffer();
 
-            long offsetCentralDir = zipModel.getEndCentralDirectory().getOffOfStartOfCentralDir();
+            long offsetCentralDir = zipModel.getEndCentralDirectory().getOffsCentralDirectory();
 
             int sizeOfCentralDir = writeCentralDirectory(zipModel, outputStream, bytes);
 
@@ -180,7 +180,7 @@ public class HeaderWriter {
         try {
             int currSplitFileCounter = 0;
             if (outputStream instanceof SplitOutputStream) {
-                zipModel.getEndCentralDirectory().setOffOfStartOfCentralDir(
+                zipModel.getEndCentralDirectory().setOffsCentralDirectory(
                         ((SplitOutputStream)outputStream).getFilePointer());
                 currSplitFileCounter = ((SplitOutputStream)outputStream).getCurrSplitFileCounter();
 
@@ -197,8 +197,8 @@ public class HeaderWriter {
                 zipModel.getZip64EndCentralDirectoryLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(currSplitFileCounter);
                 zipModel.getZip64EndCentralDirectoryLocator().setTotNumberOfDiscs(currSplitFileCounter + 1);
             }
-            zipModel.getEndCentralDirectory().setNoOfDisk(currSplitFileCounter);
-            zipModel.getEndCentralDirectory().setNoOfDiskStartCentralDir(currSplitFileCounter);
+            zipModel.getEndCentralDirectory().setDiskNumber(currSplitFileCounter);
+            zipModel.getEndCentralDirectory().setStartDiskNumber(currSplitFileCounter);
         } catch(IOException e) {
             throw new ZipException(e);
         }
@@ -247,7 +247,7 @@ public class HeaderWriter {
                 Raw.writeShortLittleEndian(shortByte, 0, (short)zipModel.getFileHeaders().get(0).getVersionMadeBy());
                 bytes.copyByteArrayToArrayList(shortByte);
 
-                Raw.writeShortLittleEndian(shortByte, 0, (short)zipModel.getFileHeaders().get(0).getVersionNeededToExtract());
+                Raw.writeShortLittleEndian(shortByte, 0, (short)zipModel.getFileHeaders().get(0).getVersionToExtract());
                 bytes.copyByteArrayToArrayList(shortByte);
             } else {
                 bytes.copyByteArrayToArrayList(emptyShortByte);
@@ -255,11 +255,11 @@ public class HeaderWriter {
             }
 
             //number of this disk
-            Raw.writeIntLittleEndian(intByte, 0, zipModel.getEndCentralDirectory().getNoOfDisk());
+            Raw.writeIntLittleEndian(intByte, 0, zipModel.getEndCentralDirectory().getDiskNumber());
             bytes.copyByteArrayToArrayList(intByte);
 
             //number of the disk with start of central directory
-            Raw.writeIntLittleEndian(intByte, 0, zipModel.getEndCentralDirectory().getNoOfDiskStartCentralDir());
+            Raw.writeIntLittleEndian(intByte, 0, zipModel.getEndCentralDirectory().getStartDiskNumber());
             bytes.copyByteArrayToArrayList(intByte);
 
             //total number of entries in the central directory on this disk
@@ -268,7 +268,7 @@ public class HeaderWriter {
             numEntries = zipModel.getFileHeaders().size();
 
             if (zipModel.isSplitArchive())
-                countNumberOfFileHeaderEntriesOnDisk(zipModel.getFileHeaders(), zipModel.getEndCentralDirectory().getNoOfDisk());
+                countNumberOfFileHeaderEntriesOnDisk(zipModel.getFileHeaders(), zipModel.getEndCentralDirectory().getDiskNumber());
             else
                 numEntriesOnThisDisk = numEntries;
 
@@ -345,11 +345,11 @@ public class HeaderWriter {
             bytes.copyByteArrayToArrayList(intByte);
 
             //number of this disk
-            Raw.writeShortLittleEndian(shortByte, 0, (short)(zipModel.getEndCentralDirectory().getNoOfDisk()));
+            Raw.writeShortLittleEndian(shortByte, 0, (short)(zipModel.getEndCentralDirectory().getDiskNumber()));
             bytes.copyByteArrayToArrayList(shortByte);
 
             //number of the disk with start of central directory
-            Raw.writeShortLittleEndian(shortByte, 0, (short)(zipModel.getEndCentralDirectory().getNoOfDiskStartCentralDir()));
+            Raw.writeShortLittleEndian(shortByte, 0, (short)(zipModel.getEndCentralDirectory().getStartDiskNumber()));
             bytes.copyByteArrayToArrayList(shortByte);
 
             //Total number of entries in central directory on this disk
@@ -359,7 +359,7 @@ public class HeaderWriter {
             numEntries = zipModel.getFileHeaders().size();
             if (zipModel.isSplitArchive())
                 numEntriesOnThisDisk = countNumberOfFileHeaderEntriesOnDisk(zipModel.getFileHeaders(),
-                        zipModel.getEndCentralDirectory().getNoOfDisk());
+                        zipModel.getEndCentralDirectory().getDiskNumber());
             else
                 numEntriesOnThisDisk = numEntries;
 
@@ -498,7 +498,7 @@ public class HeaderWriter {
         int noEntries = 0;
         for (int i = 0; i < fileHeaders.size(); i++) {
             CentralDirectory.FileHeader fileHeader = fileHeaders.get(i);
-            if (fileHeader.getDiskNumberStart() == numOfDisk) {
+            if (fileHeader.getDiskNumber() == numOfDisk) {
                 noEntries++;
             }
         }

@@ -46,7 +46,7 @@ final class CentralDirectoryReader {
 
     @NonNull
     private List<CentralDirectory.FileHeader> readFileHeaders() throws IOException {
-        int total = zip64 ? (int)zip64Dir.getTotNoOfEntriesInCentralDir() : dir.getTotNoOfEntriesInCentralDir();
+        int total = zip64 ? (int)zip64Dir.getGetTotalEntries() : dir.getTotalEntries();
         List<CentralDirectory.FileHeader> fileHeaders = new ArrayList<>(total);
 
         for (int i = 0; i < total; i++)
@@ -65,20 +65,20 @@ final class CentralDirectoryReader {
             throw new IOException("Expected central directory entry not found (offs:" + in.getFilePointer() + ')');
 
         fileHeader.setVersionMadeBy(in.readShort());
-        fileHeader.setVersionNeededToExtract(in.readShort());
+        fileHeader.setVersionToExtract(in.readShort());
         fileHeader.setGeneralPurposeFlag(in.readShort());
         fileHeader.setCompressionMethod(CompressionMethod.parseValue(in.readShort()));
-        fileHeader.setLastModFileTime(in.readInt());
+        fileHeader.setLastModifiedTime(in.readInt());
         fileHeader.setCrc32(in.readInt());
         fileHeader.setCompressedSize(in.readIntAsLong());
         fileHeader.setUncompressedSize(in.readIntAsLong());
         fileHeader.setFileNameLength(in.readShort());
         fileHeader.setExtraFieldLength(in.readShort());
         fileHeader.setFileCommentLength(in.readShort());
-        fileHeader.setDiskNumberStart(in.readShort());
-        fileHeader.setInternalFileAttr(in.readBytes(2));
-        fileHeader.setExternalFileAttr(in.readBytes(4));
-        fileHeader.setOffLocalHeaderRelative(in.readIntAsLong());
+        fileHeader.setDiskNumber(in.readShort());
+        fileHeader.setInternalFileAttributes(in.readBytes(2));
+        fileHeader.setExternalFileAttributes(in.readBytes(4));
+        fileHeader.setOffsLocalFileHeader(in.readIntAsLong());
         fileHeader.setFileName(FilenameUtils.normalize(in.readString(fileHeader.getFileNameLength()), true));
         fileHeader.setExtraDataRecords(readExtraDataRecords(in, fileHeader.getExtraFieldLength()));
         fileHeader.setZip64ExtendedInfo(readZip64ExtendedInfo(fileHeader));
@@ -156,8 +156,8 @@ final class CentralDirectoryReader {
         res.setSize(record.getSizeOfData());
         res.setUnCompressedSize((fileHeader.getUncompressedSize() & 0xFFFF) == 0xFFFF ? in.readLong() : -1);
         res.setCompressedSize((fileHeader.getCompressedSize() & 0xFFFF) == 0xFFFF ? in.readLong() : -1);
-        res.setOffsLocalHeaderRelative((fileHeader.getOffLocalHeaderRelative() & 0xFFFF) == 0xFFFF ? in.readLong() : -1);
-        res.setDiskNumberStart((fileHeader.getDiskNumberStart() & 0xFFFF) == 0xFFFF ? in.readInt() : -1);
+        res.setOffsLocalHeaderRelative((fileHeader.getOffsLocalFileHeader() & 0xFFFF) == 0xFFFF ? in.readLong() : -1);
+        res.setDiskNumberStart((fileHeader.getDiskNumber() & 0xFFFF) == 0xFFFF ? in.readInt() : -1);
 
         if (res.getUnCompressedSize() != -1 || res.getCompressedSize() != -1
                 || res.getOffsLocalHeaderRelative() != -1 || res.getDiskNumberStart() != -1)
@@ -167,6 +167,6 @@ final class CentralDirectoryReader {
     }
 
     private void findHead() throws IOException {
-        in.seek(zip64 ? zip64Dir.getOffsetStartCenDirWRTStartDiskNo() : dir.getOffOfStartOfCentralDir());
+        in.seek(zip64 ? zip64Dir.getOffsetStartCenDirWRTStartDiskNo() : dir.getOffsCentralDirectory());
     }
 }

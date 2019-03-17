@@ -192,10 +192,6 @@ public class SplitOutputStream extends OutputStream {
         return raf.getFilePointer();
     }
 
-    public boolean isSplitZipFile() {
-        return splitLength > 0;
-    }
-
     public long getSplitLength() {
         return splitLength;
     }

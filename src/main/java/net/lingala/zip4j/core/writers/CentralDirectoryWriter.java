@@ -39,7 +39,7 @@ public final class CentralDirectoryWriter {
             bytes.copyByteArrayToArrayList(shortByte);
             sizeOfFileHeader += 2;
 
-            Raw.writeShortLittleEndian(shortByte, 0, (short)fileHeader.getVersionNeededToExtract());
+            Raw.writeShortLittleEndian(shortByte, 0, (short)fileHeader.getVersionToExtract());
             bytes.copyByteArrayToArrayList(shortByte);
             sizeOfFileHeader += 2;
 
@@ -51,7 +51,7 @@ public final class CentralDirectoryWriter {
             bytes.copyByteArrayToArrayList(shortByte);
             sizeOfFileHeader += 2;
 
-            int dateTime = fileHeader.getLastModFileTime();
+            int dateTime = fileHeader.getLastModifiedTime();
             Raw.writeIntLittleEndian(intByte, 0, dateTime);
             bytes.copyByteArrayToArrayList(intByte);
             sizeOfFileHeader += 4;
@@ -93,12 +93,12 @@ public final class CentralDirectoryWriter {
             //Compute offset bytes before extra field is written for Zip64 compatibility
             //NOTE: this data is not written now, but written at a later point
             byte[] offsetLocalHeaderBytes = new byte[4];
-            if (fileHeader.getOffLocalHeaderRelative() > InternalZipConstants.ZIP_64_LIMIT) {
+            if (fileHeader.getOffsLocalFileHeader() > InternalZipConstants.ZIP_64_LIMIT) {
                 Raw.writeLongLittleEndian(longByte, 0, InternalZipConstants.ZIP_64_LIMIT);
                 System.arraycopy(longByte, 0, offsetLocalHeaderBytes, 0, 4);
                 writeZip64OffsetLocalHeader = true;
             } else {
-                Raw.writeLongLittleEndian(longByte, 0, fileHeader.getOffLocalHeaderRelative());
+                Raw.writeLongLittleEndian(longByte, 0, fileHeader.getOffsLocalFileHeader());
                 System.arraycopy(longByte, 0, offsetLocalHeaderBytes, 0, 4);
             }
 
@@ -123,7 +123,7 @@ public final class CentralDirectoryWriter {
             sizeOfFileHeader += 2;
 
             //Skip disk number start for now
-            Raw.writeShortLittleEndian(shortByte, 0, (short)(fileHeader.getDiskNumberStart()));
+            Raw.writeShortLittleEndian(shortByte, 0, (short)(fileHeader.getDiskNumber()));
             bytes.copyByteArrayToArrayList(shortByte);
             sizeOfFileHeader += 2;
 
@@ -132,8 +132,8 @@ public final class CentralDirectoryWriter {
             sizeOfFileHeader += 2;
 
             //External file attributes
-            if (fileHeader.getExternalFileAttr() != null) {
-                bytes.copyByteArrayToArrayList(fileHeader.getExternalFileAttr());
+            if (fileHeader.getExternalFileAttributes() != null) {
+                bytes.copyByteArrayToArrayList(fileHeader.getExternalFileAttributes());
             } else {
                 bytes.copyByteArrayToArrayList(emptyIntByte);
             }
@@ -181,7 +181,7 @@ public final class CentralDirectoryWriter {
                 }
 
                 if (writeZip64OffsetLocalHeader) {
-                    Raw.writeLongLittleEndian(longByte, 0, fileHeader.getOffLocalHeaderRelative());
+                    Raw.writeLongLittleEndian(longByte, 0, fileHeader.getOffsLocalFileHeader());
                     bytes.copyByteArrayToArrayList(longByte);
                     sizeOfFileHeader += 8;
                 }

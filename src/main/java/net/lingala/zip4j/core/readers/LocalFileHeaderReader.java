@@ -29,10 +29,10 @@ public final class LocalFileHeaderReader {
 
         LocalFileHeader localFileHeader = new LocalFileHeader();
 
-        localFileHeader.setVersionNeededToExtract(in.readShort());
+        localFileHeader.setVersionToExtract(in.readShort());
         localFileHeader.setGeneralPurposeFlag(in.readShort());
         localFileHeader.setCompressionMethod(CompressionMethod.parseValue(in.readShort()));
-        localFileHeader.setLastModFileTime(in.readInt());
+        localFileHeader.setLastModifiedTime(in.readInt());
         localFileHeader.setCrc32(in.readInt());
         localFileHeader.setCompressedSize(in.readIntAsLong());
         localFileHeader.setUncompressedSize(in.readIntAsLong());
@@ -59,7 +59,7 @@ public final class LocalFileHeaderReader {
     }
 
     private void findHead() throws IOException {
-        in.seek(fileHeader.getOffLocalHeaderRelative());
+        in.seek(fileHeader.getOffsLocalFileHeader());
 
         if (in.readInt() == InternalZipConstants.LOCSIG)
             return;
