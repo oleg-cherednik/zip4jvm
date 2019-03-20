@@ -48,7 +48,7 @@ public class UnzipIt {
         new UnzipEngine(zipModel, password).extractEntries(destDir, entries);
     }
 
-    static void checkZipFile(Path zipFile) throws ZipException {
+    static void checkZipFile(Path zipFile) {
         if (!Files.isRegularFile(zipFile))
             throw new ZipException("ZipFile is not a regular file: " + zipFile);
         if (!Files.exists(zipFile))

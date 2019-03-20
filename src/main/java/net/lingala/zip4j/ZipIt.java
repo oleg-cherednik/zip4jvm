@@ -53,10 +53,7 @@ public final class ZipIt {
     }
 
     public void addStream(@NonNull Collection<InputStreamMeta> files, @NonNull ZipParameters parameters) throws ZipException {
-        ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get();
-        checkSplitArchiveModification(zipModel);
-        zipModel.setSplitLength(parameters.getSplitLength());
-
+        ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get().noSplitOnly();
         parameters.setSourceExternalStream(true);
 
         new ZipEngine(zipModel).addStreamToZip(files, parameters);
@@ -69,8 +66,7 @@ public final class ZipIt {
         if (Files.isDirectory(dir) && parameters.getDefaultFolderPath() == null)
             parameters.setDefaultFolderPath(dir);
 
-        ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get();
-        checkSplitArchiveModification(zipModel);
+        ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get().noSplitOnly();
         zipModel.setSplitLength(parameters.getSplitLength());
 
         new ZipEngine(zipModel).addEntries(getDirectoryEntries(dir), parameters);
@@ -79,8 +75,7 @@ public final class ZipIt {
     private void addRegularFile(Path file, ZipParameters parameters) throws ZipException, IOException {
         assert Files.isRegularFile(file);
 
-        ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get();
-        checkSplitArchiveModification(zipModel);
+        ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get().noSplitOnly();
         zipModel.setSplitLength(parameters.getSplitLength());
 
         new ZipEngine(zipModel).addEntries(Collections.singletonList(file), parameters);

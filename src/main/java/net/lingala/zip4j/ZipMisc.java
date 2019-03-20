@@ -53,9 +53,7 @@ public final class ZipMisc {
 
         UnzipIt.checkZipFile(zipFile);
 
-        ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get();
-        ZipIt.checkSplitArchiveModification(zipModel);
-
+        ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get().noSplitOnly();
         zipModel.getEndCentralDirectory().setComment(comment);
 
         try (SplitOutputStream out = new NoSplitOutputStream(zipModel.getZipFile())) {
@@ -135,9 +133,7 @@ public final class ZipMisc {
     public void removeEntries(@NonNull Collection<String> entries) {
         UnzipIt.checkZipFile(zipFile);
 
-        ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get();
-        ZipIt.checkSplitArchiveModification(zipModel);
-
+        ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get().noSplitOnly();
         new RemoveEntryFunc(zipModel).accept(entries);
     }
 

@@ -23,6 +23,7 @@ import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.FilenameUtils;
 
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -153,6 +154,14 @@ public class ZipModel {
         centralDirectory.setFileHeaders(fileHeaders);
         endCentralDirectory.setTotalEntries(fileHeaders.size());
         endCentralDirectory.setDiskEntries(fileHeaders.size());
+    }
+
+    @NonNull
+    public ZipModel noSplitOnly() {
+        if (Files.exists(zipFile) && isSplitArchive())
+            throw new ZipException("Zip file already exists. Zip file format does not allow updating split/spanned files");
+
+        return this;
     }
 
 }
