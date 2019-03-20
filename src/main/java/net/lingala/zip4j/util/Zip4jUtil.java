@@ -17,12 +17,23 @@
 package net.lingala.zip4j.util;
 
 import lombok.NonNull;
+import lombok.experimental.UtilityClass;
+import net.lingala.zip4j.core.readers.ZipModelReader;
+import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.ZipModel;
 import org.apache.commons.lang.StringUtils;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Calendar;
 
-@SuppressWarnings("MethodCanBeVariableArityMethod")
+/**
+ * @author Oleg CHerednik
+ * @since 20.03.2019
+ */
+@UtilityClass
 public class Zip4jUtil {
 
     /**
@@ -31,7 +42,7 @@ public class Zip4jUtil {
      * @param time
      * @return time in DOS format
      */
-    public static long javaToDosTime(long time) {
+    public long javaToDosTime(long time) {
 
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(time);
@@ -96,5 +107,20 @@ public class Zip4jUtil {
 
     public static boolean isDirectory(String fileName) {
         return fileName != null && (fileName.endsWith("/") || fileName.endsWith("\\"));
+    }
+
+    @NonNull
+    public static ZipModel createZipModel(@NonNull Path zipFile, @NonNull Charset charset) {
+        try {
+            if (Files.exists(zipFile))
+                return new ZipModelReader(zipFile, charset).read();
+
+            ZipModel zipModel = new ZipModel();
+            zipModel.setZipFile(zipFile);
+            zipModel.setCharset(charset);
+            return zipModel;
+        } catch(IOException e) {
+            throw new ZipException(e);
+        }
     }
 }
