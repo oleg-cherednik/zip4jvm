@@ -8,9 +8,9 @@ import net.lingala.zip4j.io.NoSplitOutputStream;
 import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.ZipModel;
+import net.lingala.zip4j.util.CreateZipModelSup;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.RemoveEntryFunc;
-import net.lingala.zip4j.util.ZipUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -53,7 +53,7 @@ public final class ZipMisc {
 
         UnzipIt.checkZipFile(zipFile);
 
-        ZipModel zipModel = ZipUtils.createZipModel(zipFile, charset);
+        ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get();
         ZipIt.checkSplitArchiveModification(zipModel);
 
         zipModel.getEndCentralDirectory().setComment(comment);
@@ -68,12 +68,12 @@ public final class ZipMisc {
 
     public String getComment() throws ZipException {
         UnzipIt.checkZipFile(zipFile);
-        return ZipUtils.createZipModel(zipFile, charset).getEndCentralDirectory().getComment();
+        return new CreateZipModelSup(zipFile, charset).get().getEndCentralDirectory().getComment();
     }
 
     public boolean isEncrypted() throws ZipException {
         UnzipIt.checkZipFile(zipFile);
-        ZipModel zipModel = ZipUtils.createZipModel(zipFile, charset);
+        ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get();
 
         return zipModel.getFileHeaders().stream()
                        .anyMatch(fileHeader -> fileHeader.getEncryption() != Encryption.OFF);
@@ -81,12 +81,12 @@ public final class ZipMisc {
 
     public List<String> getEntryNames() throws ZipException {
         UnzipIt.checkZipFile(zipFile);
-        return ZipUtils.createZipModel(zipFile, charset).getEntryNames();
+        return new CreateZipModelSup(zipFile, charset).get().getEntryNames();
     }
 
     public List<Path> getFiles() throws ZipException {
         UnzipIt.checkZipFile(zipFile);
-        ZipModel zipModel = ZipUtils.createZipModel(zipFile, charset);
+        ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get();
 
         return IntStream.rangeClosed(0, zipModel.getEndCentralDirectory().getDiskNumber())
                         .mapToObj(i -> i == 0 ? zipModel.getZipFile() : ZipModel.getSplitFilePath(zipFile, i))
@@ -95,11 +95,11 @@ public final class ZipMisc {
 
     public boolean isSplit() throws ZipException {
         UnzipIt.checkZipFile(zipFile);
-        return ZipUtils.createZipModel(zipFile, charset).isSplitArchive();
+        return new CreateZipModelSup(zipFile, charset).get().isSplitArchive();
     }
 
     public void merge(@NonNull Path destZipFile) {
-        ZipModel zipModel = ZipUtils.createZipModel(zipFile, charset);
+        ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get();
 
         // TODO probably if not split archive, just copy single zip file
         if (!zipModel.isSplitArchive())
@@ -135,7 +135,7 @@ public final class ZipMisc {
     public void removeEntries(@NonNull Collection<String> entries) {
         UnzipIt.checkZipFile(zipFile);
 
-        ZipModel zipModel = ZipUtils.createZipModel(zipFile, charset);
+        ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get();
         ZipIt.checkSplitArchiveModification(zipModel);
 
         new RemoveEntryFunc(zipModel).accept(entries);
