@@ -25,7 +25,7 @@ import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
-import net.lingala.zip4j.util.Zip4jUtil;
+import net.lingala.zip4j.util.ZipUtils;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -70,7 +70,7 @@ public class ZipFile {
             throw new ZipException("FileHeader is null, cannot get InputStream");
         }
 
-        zipModel = Zip4jUtil.createZipModel(zipFile, charset);
+        zipModel = ZipUtils.createZipModel(zipFile, charset);
 
         if (zipModel == null)
             throw new ZipException("zip model is null, cannot get inputstream");

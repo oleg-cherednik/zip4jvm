@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import net.lingala.zip4j.util.Zip4jUtil;
+import net.lingala.zip4j.util.ZipUtils;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -25,7 +25,7 @@ public final class InputStreamMeta implements Closeable {
     private final String relativePath;
 
     public boolean isRegularFile() {
-        return !Zip4jUtil.isDirectory(relativePath);
+        return !ZipUtils.isDirectory(relativePath);
     }
 
     @Override

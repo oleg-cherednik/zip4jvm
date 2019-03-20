@@ -7,7 +7,7 @@ import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.InputStreamMeta;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.util.Zip4jUtil;
+import net.lingala.zip4j.util.ZipUtils;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -53,7 +53,7 @@ public final class ZipIt {
     }
 
     public void addStream(@NonNull Collection<InputStreamMeta> files, @NonNull ZipParameters parameters) throws ZipException {
-        ZipModel zipModel = Zip4jUtil.createZipModel(zipFile, charset);
+        ZipModel zipModel = ZipUtils.createZipModel(zipFile, charset);
         checkSplitArchiveModification(zipModel);
         zipModel.setSplitLength(parameters.getSplitLength());
 
@@ -69,7 +69,7 @@ public final class ZipIt {
         if (Files.isDirectory(dir) && parameters.getDefaultFolderPath() == null)
             parameters.setDefaultFolderPath(dir);
 
-        ZipModel zipModel = Zip4jUtil.createZipModel(zipFile, charset);
+        ZipModel zipModel = ZipUtils.createZipModel(zipFile, charset);
         checkSplitArchiveModification(zipModel);
         zipModel.setSplitLength(parameters.getSplitLength());
 
@@ -79,7 +79,7 @@ public final class ZipIt {
     private void addRegularFile(Path file, ZipParameters parameters) throws ZipException, IOException {
         assert Files.isRegularFile(file);
 
-        ZipModel zipModel = Zip4jUtil.createZipModel(zipFile, charset);
+        ZipModel zipModel = ZipUtils.createZipModel(zipFile, charset);
         checkSplitArchiveModification(zipModel);
         zipModel.setSplitLength(parameters.getSplitLength());
 

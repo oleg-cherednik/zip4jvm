@@ -31,7 +31,7 @@ import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.Raw;
-import net.lingala.zip4j.util.Zip4jUtil;
+import net.lingala.zip4j.util.ZipUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
@@ -86,7 +86,7 @@ public abstract class CipherOutputStream extends OutputStream {
                 if (StringUtils.isBlank(fileNameStream))
                     throw new ZipException("file name is empty for external stream");
 
-                if (Zip4jUtil.isDirectory(fileNameStream)) {
+                if (ZipUtils.isDirectory(fileNameStream)) {
                     zipParameters.setEncryption(Encryption.OFF);
                     zipParameters.setCompressionMethod(CompressionMethod.STORE);
                 }

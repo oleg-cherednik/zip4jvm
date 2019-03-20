@@ -5,7 +5,7 @@ import lombok.NonNull;
 import net.lingala.zip4j.engine.UnzipEngine;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipModel;
-import net.lingala.zip4j.util.Zip4jUtil;
+import net.lingala.zip4j.util.ZipUtils;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -32,7 +32,7 @@ public class UnzipIt {
         checkZipFile(zipFile);
         checkOutputFolder(destDir);
 
-        ZipModel zipModel = Zip4jUtil.createZipModel(zipFile, charset);
+        ZipModel zipModel = ZipUtils.createZipModel(zipFile, charset);
         new UnzipEngine(zipModel, password).extractEntries(destDir, zipModel.getEntryNames());
     }
 
@@ -44,7 +44,7 @@ public class UnzipIt {
         checkZipFile(zipFile);
         checkOutputFolder(destDir);
 
-        ZipModel zipModel = Zip4jUtil.createZipModel(zipFile, charset);
+        ZipModel zipModel = ZipUtils.createZipModel(zipFile, charset);
         new UnzipEngine(zipModel, password).extractEntries(destDir, entries);
     }
 

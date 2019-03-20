@@ -21,7 +21,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import net.lingala.zip4j.util.InternalZipConstants;
-import net.lingala.zip4j.util.Zip4jUtil;
+import net.lingala.zip4j.util.ZipUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -82,7 +82,7 @@ public class ZipParameters {
     public void setRootFolderInZip(String rootFolderInZip) {
         if (StringUtils.isNotBlank(rootFolderInZip)) {
 
-            if (!Zip4jUtil.isDirectory(rootFolderInZip))
+            if (!ZipUtils.isDirectory(rootFolderInZip))
                 rootFolderInZip += InternalZipConstants.FILE_SEPARATOR;
 
             rootFolderInZip = rootFolderInZip.replaceAll("\\\\", "/");

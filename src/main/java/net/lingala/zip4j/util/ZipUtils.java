@@ -34,7 +34,7 @@ import java.util.Calendar;
  * @since 20.03.2019
  */
 @UtilityClass
-public class Zip4jUtil {
+public class ZipUtils {
 
     /**
      * Converts input time from Java to DOS format

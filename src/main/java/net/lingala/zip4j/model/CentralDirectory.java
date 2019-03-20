@@ -20,7 +20,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import net.lingala.zip4j.util.InternalZipConstants;
-import net.lingala.zip4j.util.Zip4jUtil;
+import net.lingala.zip4j.util.ZipUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.util.ArrayList;
@@ -108,7 +108,7 @@ public class CentralDirectory {
         private AESExtraDataRecord aesExtraDataRecord;
 
         public boolean isDirectory() {
-            return Zip4jUtil.isDirectory(fileName);
+            return ZipUtils.isDirectory(fileName);
         }
 
         public void setZip64ExtendedInfo(Zip64ExtendedInfo info) {

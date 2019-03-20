@@ -12,7 +12,7 @@ import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.InternalZipConstants;
-import net.lingala.zip4j.util.Zip4jUtil;
+import net.lingala.zip4j.util.ZipUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
@@ -49,7 +49,7 @@ public class CentralDirectoryBuilder {
         fileHeader.setCrc32(getCrc32());
         fileHeader.setCompressedSize(getCompressedSize(fileHeader));
         fileHeader.setUncompressedSize(getUncompressedSize(fileHeader));
-        fileHeader.setFileNameLength(Zip4jUtil.getEncodedStringLength(fileName, zipModel.getCharset()));
+        fileHeader.setFileNameLength(ZipUtils.getEncodedStringLength(fileName, zipModel.getCharset()));
         fileHeader.setExtraFieldLength(0);
         fileHeader.setFileCommentLength(0);
         fileHeader.setDiskNumber(currSplitFileCounter);
@@ -90,7 +90,7 @@ public class CentralDirectoryBuilder {
         if (StringUtils.isBlank(fileName))
             throw new IOException("fileName is null or empty. unable to create file header");
 
-        if (!zipParameters.isSourceExternalStream() && Files.isDirectory(sourceFile) && !Zip4jUtil.isDirectory(fileName))
+        if (!zipParameters.isSourceExternalStream() && Files.isDirectory(sourceFile) && !ZipUtils.isDirectory(fileName))
             fileName += InternalZipConstants.FILE_SEPARATOR;
 
         return fileName;
@@ -110,7 +110,7 @@ public class CentralDirectoryBuilder {
 
     private int getLastModFileTime() throws IOException {
         long time = zipParameters.isSourceExternalStream() ? System.currentTimeMillis() : Files.getLastModifiedTime(sourceFile).toMillis();
-        return (int)Zip4jUtil.javaToDosTime(time);
+        return (int)ZipUtils.javaToDosTime(time);
     }
 
     private long getCrc32() {
