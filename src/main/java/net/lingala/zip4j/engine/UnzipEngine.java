@@ -46,6 +46,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.CRC32;
 
@@ -69,22 +70,27 @@ public class UnzipEngine {
     private int currSplitFileCounter;
     private Decrypter decrypter;
 
+    private final Function<CentralDirectory.FileHeader, CentralDirectory.FileHeader> setPassword =
+            new Function<CentralDirectory.FileHeader, CentralDirectory.FileHeader>() {
+                @Override
+                public CentralDirectory.FileHeader apply(CentralDirectory.FileHeader fileHeader) {
+                    if (fileHeader.isEncrypted())
+                        fileHeader.setPassword(password);
+                    return fileHeader;
+                }
+            };
+
     public void extractEntries(@NonNull Path destDir, @NonNull Collection<String> entries) {
         getFileHeaders(entries).forEach(fileHeader -> extractEntry(destDir, fileHeader));
     }
 
     private List<CentralDirectory.FileHeader> getFileHeaders(Collection<String> entries) {
-        List<CentralDirectory.FileHeader> fileHeaders = entries.stream()
-                                                               .map(entryName -> zipModel.getCentralDirectory().getFileHeadersByPrefix(entryName))
-                                                               .flatMap(List::stream)
-                                                               .filter(Objects::nonNull)
-                                                               .collect(Collectors.toList());
-
-        fileHeaders.stream()
-                   .filter(CentralDirectory.FileHeader::isEncrypted)
-                   .forEach(fileHeader -> fileHeader.setPassword(password));
-
-        return fileHeaders;
+        return entries.stream()
+                      .map(entryName -> zipModel.getCentralDirectory().getFileHeadersByPrefix(entryName))
+                      .flatMap(List::stream)
+                      .filter(Objects::nonNull)
+                      .map(setPassword)
+                      .collect(Collectors.toList());
     }
 
     private void extractEntry(Path destDir, @NonNull CentralDirectory.FileHeader fileHeader) {
