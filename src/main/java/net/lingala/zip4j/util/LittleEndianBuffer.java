@@ -1,10 +1,10 @@
 package net.lingala.zip4j.util;
 
 import lombok.NonNull;
+import net.lingala.zip4j.io.OutputStreamDecorator;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,9 +18,9 @@ public final class LittleEndianBuffer implements Closeable {
     private final byte[] shortByte = new byte[2];
     private final byte[] longByte = new byte[8];
 
-    public int flushInto(OutputStream out) throws IOException {
+    public int flushInto(OutputStreamDecorator out) throws IOException {
         byte[] lhBytes = byteArrayListToByteArray();
-        out.write(lhBytes);
+        out.getDelegate().write(lhBytes);
         return lhBytes.length;
     }
 

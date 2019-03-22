@@ -3,6 +3,7 @@ package net.lingala.zip4j.io;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import net.lingala.zip4j.util.Raw;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -14,7 +15,9 @@ import java.io.OutputStream;
 @Getter
 @Setter
 @RequiredArgsConstructor
-final class OutputStreamDecorator {
+public final class OutputStreamDecorator {
+
+    private final byte[] intByte = new byte[4];
 
     private final OutputStream delegate;
     private long totalBytesWritten;
@@ -42,5 +45,11 @@ final class OutputStreamDecorator {
     public void seek(long pos) throws IOException {
         if (delegate instanceof SplitOutputStream)
             ((SplitOutputStream)delegate).seek(pos);
+    }
+
+    public void writeInt(int val) throws IOException {
+        Raw.writeIntLittleEndian(intByte, 0, val);
+        delegate.write(intByte);
+        totalBytesWritten += 4;
     }
 }

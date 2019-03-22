@@ -31,7 +31,7 @@ public interface InternalZipConstants {
     int ENDSIG = 0x06054b50;    // "PK\005\006"
     int DIGSIG = 0x05054b50;
     static long ARCEXTDATREC = 0x08064b50L;
-    static long SPLITSIG = 0x08074b50L;
+    static int SPLITSIG = 0x08074b50;
     int ZIP64_ENDSIG_LOC = 0x07064b50;
     int ZIP64_ENDSIG = 0x06064b50;
     static int EXTRAFIELDZIP64LENGTH = 0x0001;

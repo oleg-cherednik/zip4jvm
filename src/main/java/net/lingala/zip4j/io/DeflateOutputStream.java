@@ -39,7 +39,7 @@ public abstract class DeflateOutputStream extends CipherOutputStream {
     }
 
     @Override
-    protected void putNextEntry(Path file, String fileNameStream, ZipParameters parameters) throws ZipException {
+    protected void putNextEntry(Path file, String fileNameStream, ZipParameters parameters) {
         super.putNextEntry(file, fileNameStream, parameters);
 
         if (parameters.getCompressionMethod() != CompressionMethod.DEFLATE)
@@ -83,7 +83,7 @@ public abstract class DeflateOutputStream extends CipherOutputStream {
 
     @Override
     public void write(byte[] buf, int off, int len) throws IOException {
-        if (zipParameters.getCompressionMethod() != CompressionMethod.DEFLATE) {
+        if (parameters.getCompressionMethod() != CompressionMethod.DEFLATE) {
             super.write(buf, off, len);
         } else {
             deflater.setInput(buf, off, len);
@@ -95,7 +95,7 @@ public abstract class DeflateOutputStream extends CipherOutputStream {
 
     @Override
     public void closeEntry() throws IOException, ZipException {
-        if (zipParameters.getCompressionMethod() == CompressionMethod.DEFLATE) {
+        if (parameters.getCompressionMethod() == CompressionMethod.DEFLATE) {
             if (!deflater.finished()) {
                 deflater.finish();
                 while (!deflater.finished()) {
