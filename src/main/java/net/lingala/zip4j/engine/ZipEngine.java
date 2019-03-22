@@ -50,7 +50,7 @@ public class ZipEngine {
     @NonNull
     private final ZipModel zipModel;
 
-    public void addEntries(@NonNull Collection<Path> entries, @NonNull ZipParameters parameters) throws ZipException, IOException {
+    public void addEntries(@NonNull Collection<Path> entries, @NonNull ZipParameters parameters) {
         if (entries.isEmpty())
             return;
 
@@ -89,6 +89,8 @@ public class ZipEngine {
             }
 
             out.finish();
+        } catch(IOException e) {
+            throw new ZipException(e);
         }
     }
 
@@ -98,7 +100,7 @@ public class ZipEngine {
         }
     }
 
-    public void addStreamToZip(@NonNull Collection<InputStreamMeta> files, @NonNull final ZipParameters parameters) throws ZipException {
+    public void addStreamToZip(@NonNull Collection<InputStreamMeta> files, @NonNull final ZipParameters parameters) {
         checkParameters(parameters);
 
         try (ZipOutputStream out = new ZipOutputStream(SplitOutputStream.create(zipModel), zipModel)) {
@@ -129,7 +131,7 @@ public class ZipEngine {
         }
     }
 
-    private static void checkParameters(ZipParameters parameters) throws ZipException {
+    private static void checkParameters(ZipParameters parameters) {
         if ((parameters.getCompressionMethod() != CompressionMethod.STORE) && parameters.getCompressionMethod() != CompressionMethod.DEFLATE)
             throw new ZipException("unsupported compression type");
 
