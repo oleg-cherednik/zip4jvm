@@ -36,7 +36,6 @@ public class SplitOutputStream extends OutputStream {
     protected RandomAccessFile raf;
     private final long splitLength;
     private Path zipFile;
-    private final Path outFile;
     private int currSplitFileCounter;
     protected long bytesWrittenForThisPart;
 
@@ -52,46 +51,38 @@ public class SplitOutputStream extends OutputStream {
 
         raf = new RandomAccessFile(file.toFile(), InternalZipConstants.WRITE_MODE);
         this.splitLength = splitLength;
-        outFile = file;
         zipFile = file;
         currSplitFileCounter = 0;
         bytesWrittenForThisPart = 0;
     }
 
     @Override
-    public void write(int b) throws IOException {
-        byte[] buff = new byte[1];
-        buff[0] = (byte)b;
-        write(buff, 0, 1);
+    public void write(int val) throws IOException {
+        write(new byte[] { (byte)val }, 0, 1);
     }
 
     @Override
-    public void write(byte[] b) throws IOException {
-        write(b, 0, b.length);
-    }
-
-    @Override
-    public void write(byte[] b, int off, int len) throws IOException {
+    public void write(byte[] buf, int offs, int len) throws IOException {
         if (len <= 0)
             return;
 
         if (bytesWrittenForThisPart >= splitLength) {
             startNextSplitFile();
-            raf.write(b, off, len);
+            raf.write(buf, offs, len);
             bytesWrittenForThisPart = len;
         } else if (bytesWrittenForThisPart + len > splitLength) {
-            if (isHeaderData(b)) {
+            if (isHeaderData(buf)) {
                 startNextSplitFile();
-                raf.write(b, off, len);
+                raf.write(buf, offs, len);
                 bytesWrittenForThisPart = len;
             } else {
-                raf.write(b, off, (int)(splitLength - bytesWrittenForThisPart));
+                raf.write(buf, offs, (int)(splitLength - bytesWrittenForThisPart));
                 startNextSplitFile();
-                raf.write(b, off + (int)(splitLength - bytesWrittenForThisPart), (int)(len - (splitLength - bytesWrittenForThisPart)));
+                raf.write(buf, offs + (int)(splitLength - bytesWrittenForThisPart), (int)(len - (splitLength - bytesWrittenForThisPart)));
                 bytesWrittenForThisPart = len - (splitLength - bytesWrittenForThisPart);
             }
         } else {
-            raf.write(b, off, len);
+            raf.write(buf, offs, len);
             bytesWrittenForThisPart += len;
         }
     }
@@ -179,12 +170,10 @@ public class SplitOutputStream extends OutputStream {
         raf.seek(pos);
     }
 
+    @Override
     public void close() throws IOException {
         if (raf != null)
             raf.close();
-    }
-
-    public void flush() throws IOException {
     }
 
     public long getFilePointer() throws IOException {

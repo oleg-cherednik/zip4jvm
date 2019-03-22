@@ -1,8 +1,8 @@
 package net.lingala.zip4j.core.writers;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.core.HeaderWriter;
-import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.OutputStreamDecorator;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.LocalFileHeader;
@@ -18,10 +18,13 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 10.03.2019
  */
+@RequiredArgsConstructor
 public final class LocalFileHeaderWriter {
 
-    public void write(@NonNull LocalFileHeader localFileHeader, @NonNull ZipModel zipModel, @NonNull OutputStreamDecorator out)
-            throws ZipException, IOException {
+    @NonNull
+    private final LocalFileHeader localFileHeader;
+
+    public void write(@NonNull ZipModel zipModel, @NonNull OutputStreamDecorator out) throws IOException {
         LittleEndianBuffer bytes = new LittleEndianBuffer();
 
         bytes.writeDword(localFileHeader.getSignature());
@@ -68,7 +71,7 @@ public final class LocalFileHeaderWriter {
         bytes.flushInto(out);
     }
 
-    public void writeExtended(@NonNull LocalFileHeader localFileHeader, @NonNull OutputStreamDecorator out) throws ZipException, IOException {
+    public void writeExtended(@NonNull OutputStreamDecorator out) throws IOException {
         LittleEndianBuffer bytes = new LittleEndianBuffer();
         byte[] intByte = new byte[4];
 

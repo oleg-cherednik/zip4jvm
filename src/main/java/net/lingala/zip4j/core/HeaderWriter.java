@@ -44,51 +44,41 @@ public class HeaderWriter {
      * Processes zip header data and writes this data to the zip file
      *
      * @param zipModel
-     * @param outputStream
+     * @param out
      * @throws ZipException
      */
-    public void finalizeZipFile(ZipModel zipModel,
-            OutputStream outputStream) throws ZipException {
-        if (zipModel == null || outputStream == null) {
-            throw new ZipException("input parameters is null, cannot finalize zip file");
-        }
-
+    public void finalizeZipFile(@NonNull ZipModel zipModel, @NonNull OutputStream out) throws ZipException {
         try {
-            processHeaderData(zipModel, outputStream);
+            processHeaderData(zipModel, out);
 
             long offsetCentralDir = zipModel.getEndCentralDirectory().getOffsCentralDirectory();
-
             LittleEndianBuffer bytes = new LittleEndianBuffer();
-
-            int sizeOfCentralDir = writeCentralDirectory(zipModel, outputStream, bytes);
+            int sizeOfCentralDir = writeCentralDirectory(zipModel, out, bytes);
 
             if (zipModel.isZip64Format()) {
-                if (zipModel.getZip64EndCentralDirectory() == null) {
+                if (zipModel.getZip64EndCentralDirectory() == null)
                     zipModel.setZip64EndCentralDirectory(new Zip64EndCentralDirectory());
-                }
-                if (zipModel.getZip64EndCentralDirectoryLocator() == null) {
+                if (zipModel.getZip64EndCentralDirectoryLocator() == null)
                     zipModel.setZip64EndCentralDirectoryLocator(new Zip64EndCentralDirectoryLocator());
-                }
 
                 zipModel.getZip64EndCentralDirectoryLocator().setOffsetZip64EndOfCentralDirRec(offsetCentralDir + sizeOfCentralDir);
-                if (outputStream instanceof SplitOutputStream) {
+                if (out instanceof SplitOutputStream) {
                     zipModel.getZip64EndCentralDirectoryLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(
-                            ((SplitOutputStream)outputStream).getCurrSplitFileCounter());
+                            ((SplitOutputStream)out).getCurrSplitFileCounter());
                     zipModel.getZip64EndCentralDirectoryLocator().setTotNumberOfDiscs(
-                            ((SplitOutputStream)outputStream).getCurrSplitFileCounter() + 1);
+                            ((SplitOutputStream)out).getCurrSplitFileCounter() + 1);
                 } else {
                     zipModel.getZip64EndCentralDirectoryLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(0);
                     zipModel.getZip64EndCentralDirectoryLocator().setTotNumberOfDiscs(1);
                 }
 
-                writeZip64EndOfCentralDirectoryRecord(zipModel, outputStream, sizeOfCentralDir, offsetCentralDir, bytes);
+                writeZip64EndOfCentralDirectoryRecord(zipModel, out, sizeOfCentralDir, offsetCentralDir, bytes);
 
-                writeZip64EndOfCentralDirectoryLocator(zipModel, outputStream, bytes);
+                writeZip64EndOfCentralDirectoryLocator(zipModel, out, bytes);
             }
 
-            writeEndOfCentralDirectoryRecord(zipModel, outputStream, sizeOfCentralDir, offsetCentralDir, bytes);
-
-            writeZipHeaderBytes(zipModel, outputStream, bytes.byteArrayListToByteArray());
+            writeEndOfCentralDirectoryRecord(zipModel, out, sizeOfCentralDir, offsetCentralDir, bytes);
+            writeZipHeaderBytes(zipModel, out, bytes.byteArrayListToByteArray());
         } catch(ZipException e) {
             throw e;
         } catch(Exception e) {
@@ -134,7 +124,6 @@ public class HeaderWriter {
             }
 
             writeEndOfCentralDirectoryRecord(zipModel, outputStream, sizeOfCentralDir, offsetCentralDir, bytes);
-
             writeZipHeaderBytes(zipModel, outputStream, bytes.byteArrayListToByteArray());
         } catch(ZipException e) {
             throw e;
@@ -146,27 +135,19 @@ public class HeaderWriter {
     /**
      * Writes the zip header data to the zip file
      *
-     * @param outputStream
-     * @param buff
+     * @param out
+     * @param buf
      * @throws ZipException
      */
-    private void writeZipHeaderBytes(ZipModel zipModel, OutputStream outputStream, byte[] buff) throws ZipException {
-        if (buff == null) {
-            throw new ZipException("invalid buff to write as zip headers");
-        }
-
-        try {
-            if (outputStream instanceof SplitOutputStream) {
-                if (((SplitOutputStream)outputStream).checkBuffSizeAndStartNextSplitFile(buff.length)) {
-                    finalizeZipFile(zipModel, outputStream);
-                    return;
-                }
+    private void writeZipHeaderBytes(ZipModel zipModel, OutputStream out, @NonNull byte[] buf) throws IOException {
+        if (out instanceof SplitOutputStream) {
+            if (((SplitOutputStream)out).checkBuffSizeAndStartNextSplitFile(buf.length)) {
+                finalizeZipFile(zipModel, out);
+                return;
             }
-
-            outputStream.write(buff);
-        } catch(IOException e) {
-            throw new ZipException(e);
         }
+
+        out.write(buf);
     }
 
     /**
@@ -176,32 +157,25 @@ public class HeaderWriter {
      * @param outputStream
      * @throws ZipException
      */
-    private void processHeaderData(ZipModel zipModel, OutputStream outputStream) throws ZipException {
-        try {
-            int currSplitFileCounter = 0;
-            if (outputStream instanceof SplitOutputStream) {
-                zipModel.getEndCentralDirectory().setOffsCentralDirectory(
-                        ((SplitOutputStream)outputStream).getFilePointer());
-                currSplitFileCounter = ((SplitOutputStream)outputStream).getCurrSplitFileCounter();
+    private void processHeaderData(ZipModel zipModel, OutputStream outputStream) throws IOException {
+        int currSplitFileCounter = 0;
+        if (outputStream instanceof SplitOutputStream) {
+            zipModel.getEndCentralDirectory().setOffsCentralDirectory(((SplitOutputStream)outputStream).getFilePointer());
+            currSplitFileCounter = ((SplitOutputStream)outputStream).getCurrSplitFileCounter();
 
-            }
-
-            if (zipModel.isZip64Format()) {
-                if (zipModel.getZip64EndCentralDirectory() == null) {
-                    zipModel.setZip64EndCentralDirectory(new Zip64EndCentralDirectory());
-                }
-                if (zipModel.getZip64EndCentralDirectoryLocator() == null) {
-                    zipModel.setZip64EndCentralDirectoryLocator(new Zip64EndCentralDirectoryLocator());
-                }
-
-                zipModel.getZip64EndCentralDirectoryLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(currSplitFileCounter);
-                zipModel.getZip64EndCentralDirectoryLocator().setTotNumberOfDiscs(currSplitFileCounter + 1);
-            }
-            zipModel.getEndCentralDirectory().setDiskNumber(currSplitFileCounter);
-            zipModel.getEndCentralDirectory().setStartDiskNumber(currSplitFileCounter);
-        } catch(IOException e) {
-            throw new ZipException(e);
         }
+
+        if (zipModel.isZip64Format()) {
+            if (zipModel.getZip64EndCentralDirectory() == null)
+                zipModel.setZip64EndCentralDirectory(new Zip64EndCentralDirectory());
+            if (zipModel.getZip64EndCentralDirectoryLocator() == null)
+                zipModel.setZip64EndCentralDirectoryLocator(new Zip64EndCentralDirectoryLocator());
+
+            zipModel.getZip64EndCentralDirectoryLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(currSplitFileCounter);
+            zipModel.getZip64EndCentralDirectoryLocator().setTotNumberOfDiscs(currSplitFileCounter + 1);
+        }
+        zipModel.getEndCentralDirectory().setDiskNumber(currSplitFileCounter);
+        zipModel.getEndCentralDirectory().setStartDiskNumber(currSplitFileCounter);
     }
 
     private int writeCentralDirectory(@NonNull ZipModel zipModel, @NonNull OutputStream outputStream, @NonNull LittleEndianBuffer bytes)

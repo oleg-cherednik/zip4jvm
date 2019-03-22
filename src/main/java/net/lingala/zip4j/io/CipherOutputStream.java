@@ -96,19 +96,17 @@ public abstract class CipherOutputStream extends OutputStream {
             }
 
             int currSplitFileCounter = out.getCurrSplitFileCounter();
-            CentralDirectoryBuilder centralDirectoryBuilder = new CentralDirectoryBuilder(file, fileNameStream, parameters, zipModel,
-                    currSplitFileCounter);
-            fileHeader = centralDirectoryBuilder.createFileHeader();
-            localFileHeader = centralDirectoryBuilder.createLocalFileHeader(fileHeader);
+            CentralDirectoryBuilder builder = new CentralDirectoryBuilder(file, fileNameStream, parameters, zipModel, currSplitFileCounter);
+            fileHeader = builder.createFileHeader();
+            localFileHeader = builder.createLocalFileHeader(fileHeader);
 
             if (zipModel.isSplitArchive() && zipModel.isEmpty())
                 out.writeInt(InternalZipConstants.SPLITSIG);
 
             fileHeader.setOffsLocalFileHeader(out.getOffsLocalHeaderRelative());
-            new LocalFileHeaderWriter().write(localFileHeader, zipModel, out);
+            new LocalFileHeaderWriter(localFileHeader).write(zipModel, out);
 
-            encryptor = parameters.getEncryption().createEncryptor(parameters, localFileHeader);
-            encryptor.write(out);
+            (encryptor = parameters.getEncryption().createEncryptor(parameters, localFileHeader)).write(out);
             out.mark();
             crc.reset();
         } catch(ZipException e) {
@@ -192,7 +190,7 @@ public abstract class CipherOutputStream extends OutputStream {
         zipModel.addLocalFileHeader(localFileHeader);
         zipModel.addFileHeader(fileHeader);
 
-        new LocalFileHeaderWriter().writeExtended(localFileHeader, out);
+        new LocalFileHeaderWriter(localFileHeader).writeExtended(out);
 
         crc.reset();
         encryptor = Encryptor.NULL;

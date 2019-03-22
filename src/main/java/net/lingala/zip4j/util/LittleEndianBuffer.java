@@ -77,12 +77,12 @@ public final class LittleEndianBuffer implements Closeable {
     }
 
     public byte[] byteArrayListToByteArray() {
-        byte[] retBytes = new byte[bytes.size()];
+        byte[] buf = new byte[bytes.size()];
 
         for (int i = 0; i < bytes.size(); i++)
-            retBytes[i] = Byte.parseByte(bytes.get(i));
+            buf[i] = Byte.parseByte(bytes.get(i));
 
-        return retBytes;
+        return buf;
     }
 
     // ---------- Closeable ----------
