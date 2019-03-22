@@ -113,7 +113,9 @@ public class UnzipEngine {
 
     @NonNull
     public InputStream extractEntry(@NonNull String entryName) {
-        fileHeader = zipModel.getCentralDirectory().getFileHeaderByEntryName(entryName);
+        CentralDirectory.FileHeader fileHeader = zipModel.getCentralDirectory().getFileHeaderByEntryName(entryName);
+        // TODO temporary
+        this.fileHeader = fileHeader;
 
         if (fileHeader.isEncrypted())
             fileHeader.setPassword(password);
@@ -124,14 +126,14 @@ public class UnzipEngine {
     @NonNull
     private InputStream extractEntryAsStream(CentralDirectory.FileHeader fileHeader) {
         try {
-            RandomAccessFile raf = zipModel.isSplitArchive() ? checkSplitFile() : new RandomAccessFile(zipModel.getZipFile().toFile(), "r");
+            RandomAccessFile raf = zipModel.isSplitArchive() ? checkSplitFile(fileHeader) : new RandomAccessFile(zipModel.getZipFile().toFile(), "r");
             String errMsg = "local header and file header do not match";
             //checkSplitFile();
 
-            if (!checkLocalHeader())
+            if (!checkLocalHeader(fileHeader))
                 throw new ZipException(errMsg);
 
-            init(raf);
+            init(raf, fileHeader);
 
             long comprSize = localFileHeader.getCompressedSize();
             long offsetStartOfData = localFileHeader.getOffsetStartOfData();
@@ -172,14 +174,14 @@ public class UnzipEngine {
         }
     }
 
-    private void init(RandomAccessFile raf) throws ZipException {
+    private void init(RandomAccessFile raf, CentralDirectory.FileHeader fileHeader) throws ZipException {
 
         if (localFileHeader == null) {
             throw new ZipException("local file header is null, cannot initialize input stream");
         }
 
         try {
-            initDecrypter(raf);
+            initDecrypter(raf, fileHeader);
         } catch(ZipException e) {
             throw e;
         } catch(Exception e) {
@@ -187,7 +189,7 @@ public class UnzipEngine {
         }
     }
 
-    private void initDecrypter(RandomAccessFile raf) throws ZipException {
+    private void initDecrypter(RandomAccessFile raf, CentralDirectory.FileHeader fileHeader) throws ZipException {
         if (localFileHeader == null)
             throw new ZipException("local file header is null, cannot init decrypter");
 
@@ -308,13 +310,13 @@ public class UnzipEngine {
 //		}
 //	}
 
-    private boolean checkLocalHeader() throws ZipException {
+    private boolean checkLocalHeader(CentralDirectory.FileHeader fileHeader) throws ZipException {
         RandomAccessFile rafForLH = null;
         try {
-            rafForLH = checkSplitFile();
+            rafForLH = checkSplitFile(fileHeader);
 
             if (rafForLH == null)
-                rafForLH = new RandomAccessFile(zipModel.getZipFile().toFile(), InternalZipConstants.READ_MODE);
+                rafForLH = new RandomAccessFile(zipModel.getZipFile().toFile(), "r");
 
             localFileHeader = new LocalFileHeaderReader(new LittleEndianRandomAccessFile(rafForLH), fileHeader).read();
 
@@ -343,7 +345,7 @@ public class UnzipEngine {
         }
     }
 
-    private RandomAccessFile checkSplitFile() throws ZipException {
+    private RandomAccessFile checkSplitFile(CentralDirectory.FileHeader fileHeader) throws ZipException {
         if (!zipModel.isSplitArchive())
             return null;
 
@@ -352,7 +354,7 @@ public class UnzipEngine {
 
         try {
             Path partFile = zipModel.getPartFile(diskNumberStartOfFile);
-            RandomAccessFile raf = new RandomAccessFile(partFile.toFile(), InternalZipConstants.READ_MODE);
+            RandomAccessFile raf = new RandomAccessFile(partFile.toFile(), "r");
 
             if (currSplitFileCounter == 1) {
                 byte[] splitSig = new byte[4];
