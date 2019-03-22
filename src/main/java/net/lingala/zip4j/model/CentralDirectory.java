@@ -19,6 +19,7 @@ package net.lingala.zip4j.model;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.ZipUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -46,12 +47,29 @@ public class CentralDirectory {
         fileHeaders.add(fileHeader);
     }
 
+    @NonNull
     public List<FileHeader> getFileHeadersByPrefix(@NonNull String prefix) {
         String name = FilenameUtils.normalize(prefix.toLowerCase(), true);
 
         return fileHeaders.stream()
                           .filter(fileHeader -> fileHeader.getFileName().toLowerCase().startsWith(name))
                           .collect(Collectors.toList());
+    }
+
+    @NonNull
+    public FileHeader getFileHeaderByEntryName(@NonNull String entryName) {
+        String name = FilenameUtils.normalize(entryName.toLowerCase(), true);
+
+        List<FileHeader> fileHeaders = this.fileHeaders.stream()
+                                                       .filter(fileHeader -> fileHeader.getFileName().toLowerCase().equals(name))
+                                                       .collect(Collectors.toList());
+
+        if (fileHeaders.size() > 1)
+            throw new ZipException("Multiple file headers found for entry name '" + entryName + '\'');
+        if (fileHeaders.isEmpty())
+            throw new ZipException("File header with entry name '" + entryName + "' was not found");
+
+        return fileHeaders.get(0);
     }
 
     @Getter
@@ -146,11 +164,15 @@ public class CentralDirectory {
             else
                 encryption = Encryption.OFF;
 
-            generalPurposeFlag.setEncrypted(encryption != Encryption.OFF);
+            generalPurposeFlag.setEncrypted(isEncrypted());
         }
 
         public void updateOffLocalHeaderRelative(long delta) {
             offsLocalFileHeader += delta;
+        }
+
+        public boolean isEncrypted() {
+            return encryption != Encryption.OFF;
         }
 
         @Override

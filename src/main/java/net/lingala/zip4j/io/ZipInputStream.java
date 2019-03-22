@@ -78,10 +78,12 @@ public class ZipInputStream extends InputStream {
         }
     }
 
+    @Override
     public int available() throws IOException {
         return in.available();
     }
 
+    @Override
     public long skip(long n) throws IOException {
         return in.skip(n);
     }

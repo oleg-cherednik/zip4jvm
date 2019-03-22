@@ -6,7 +6,7 @@ import net.lingala.zip4j.core.HeaderWriter;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.NoSplitOutputStream;
 import net.lingala.zip4j.io.SplitOutputStream;
-import net.lingala.zip4j.model.Encryption;
+import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.CreateZipModelSup;
 import net.lingala.zip4j.util.InternalZipConstants;
@@ -69,12 +69,12 @@ public final class ZipMisc {
         return new CreateZipModelSup(zipFile, charset).get().getEndCentralDirectory().getComment();
     }
 
-    public boolean isEncrypted() throws ZipException {
+    public boolean isEncrypted() {
         UnzipIt.checkZipFile(zipFile);
         ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get();
 
         return zipModel.getFileHeaders().stream()
-                       .anyMatch(fileHeader -> fileHeader.getEncryption() != Encryption.OFF);
+                       .anyMatch(CentralDirectory.FileHeader::isEncrypted);
     }
 
     public List<String> getEntryNames() throws ZipException {

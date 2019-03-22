@@ -16,7 +16,6 @@
 
 package net.lingala.zip4j.io;
 
-import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.engine.UnzipEngine;
 import net.lingala.zip4j.util.InternalZipConstants;
 
@@ -88,9 +87,10 @@ public class InflaterInputStream extends PartInputStream {
             if (e.getMessage() != null) {
                 s = e.getMessage();
             }
-            if (unzipEngine != null)
-                if (unzipEngine.getLocalFileHeader().getEncryption() == Encryption.STANDARD)
-                    s += " - Wrong Password?";
+            // TODO fix it, localFileHeader is not belong to UnzipEngine
+//            if (unzipEngine != null)
+//                if (unzipEngine.getLocalFileHeader().getEncryption() == Encryption.STANDARD)
+//                    s += " - Wrong Password?";
             throw new IOException(s);
         }
     }

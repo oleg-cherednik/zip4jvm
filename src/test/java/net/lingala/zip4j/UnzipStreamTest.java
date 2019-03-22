@@ -1,7 +1,6 @@
 package net.lingala.zip4j;
 
 import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.ZipParameters;
@@ -11,6 +10,7 @@ import org.testng.annotations.Test;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -56,10 +56,14 @@ public class UnzipStreamTest {
 
         // ---
 
-        Path imgFile = destDir.resolve("stream/src.zip");
+        Path imgFile = resDir.resolve("bentley-continental.jpg");
+
+        if (!Files.exists(imgFile.getParent()))
+            Files.createDirectories(imgFile.getParent());
+
         UnzipIt unzip = UnzipIt.builder().zipFile(zipFile).build();
 
-        try (ZipInputStream in = unzip.extract("cars/bentley-continental.jpg");
+        try (InputStream in = unzip.extract("cars/bentley-continental.jpg");
              OutputStream out = new FileOutputStream(imgFile.toFile())) {
             IOUtils.copyLarge(in, out);
         }
