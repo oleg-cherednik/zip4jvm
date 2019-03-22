@@ -226,6 +226,7 @@ public class UnzipEngine {
 //		}
 //	}
 
+    @NonNull
     private LocalFileHeader checkLocalHeader(@NonNull CentralDirectory.FileHeader fileHeader) throws IOException {
         try (LittleEndianRandomAccessFile in = openFile(fileHeader)) {
             LocalFileHeader localFileHeader = new LocalFileHeaderReader(in, fileHeader).read();

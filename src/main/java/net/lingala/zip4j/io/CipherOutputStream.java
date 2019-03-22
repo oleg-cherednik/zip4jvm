@@ -41,6 +41,8 @@ import java.util.zip.CRC32;
 public abstract class CipherOutputStream extends OutputStream {
 
     protected final OutputStreamDecorator out;
+    protected final ZipModel zipModel;
+
     private Path sourceFile;
     @NonNull
     protected CentralDirectory.FileHeader fileHeader;
@@ -48,7 +50,7 @@ public abstract class CipherOutputStream extends OutputStream {
     @NonNull
     private Encryptor encryptor = Encryptor.NULL;
     protected ZipParameters parameters;
-    protected ZipModel zipModel;
+
 
     protected final CRC32 crc = new CRC32();
     private long bytesWrittenForThisFile;
@@ -58,7 +60,7 @@ public abstract class CipherOutputStream extends OutputStream {
 
     protected CipherOutputStream(@NonNull OutputStream out, ZipModel zipModel) {
         this.out = new OutputStreamDecorator(out);
-        initZipModel(zipModel);
+        this.zipModel = initZipModel(zipModel, this.out);
     }
 
     public final void putNextEntry(String fileNameStream, ZipParameters parameters) {
@@ -117,9 +119,10 @@ public abstract class CipherOutputStream extends OutputStream {
         }
     }
 
-    private void initZipModel(ZipModel zipModel) {
-        this.zipModel = zipModel == null ? new ZipModel() : zipModel;
-        this.zipModel.setSplitLength(out.getSplitLength());
+    private static ZipModel initZipModel(ZipModel zipModel, @NonNull OutputStreamDecorator out) {
+        zipModel = zipModel == null ? new ZipModel() : zipModel;
+        zipModel.setSplitLength(out.getSplitLength());
+        return zipModel;
     }
 
     public void write(int bval) throws IOException {
@@ -229,8 +232,10 @@ public abstract class CipherOutputStream extends OutputStream {
         new HeaderWriter().finalizeZipFile(zipModel, out.getDelegate());
     }
 
+    @Override
     public void close() throws IOException {
-        out.getDelegate().close();
+        finish();
+        out.close();
     }
 
     public void decrementCompressedFileSize(int value) {

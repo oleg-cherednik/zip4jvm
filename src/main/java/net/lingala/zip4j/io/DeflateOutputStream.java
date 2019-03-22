@@ -28,14 +28,18 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.zip.Deflater;
 
-public abstract class DeflateOutputStream extends CipherOutputStream {
+/**
+ * @author Oleg Cherednik
+ * @since 22.03.2019
+ */
+public class DeflateOutputStream extends CipherOutputStream {
 
     private final byte[] buf = new byte[InternalZipConstants.BUFF_SIZE];
     private final Deflater deflater = new Deflater();
 
     private boolean firstBytesRead;
 
-    protected DeflateOutputStream(@NonNull OutputStream out, ZipModel zipModel) {
+    public DeflateOutputStream(@NonNull OutputStream out, ZipModel zipModel) {
         super(out, zipModel);
     }
 
@@ -84,9 +88,12 @@ public abstract class DeflateOutputStream extends CipherOutputStream {
 
     @Override
     public void write(byte[] buf, int off, int len) throws IOException {
-        if (parameters.getCompressionMethod() != CompressionMethod.DEFLATE) {
+        crc.update(buf, off, len);
+        updateTotalBytesRead(len);
+
+        if (parameters.getCompressionMethod() != CompressionMethod.DEFLATE)
             super.write(buf, off, len);
-        } else {
+        else {
             deflater.setInput(buf, off, len);
             while (!deflater.needsInput()) {
                 deflate();
@@ -107,4 +114,5 @@ public abstract class DeflateOutputStream extends CipherOutputStream {
         }
         super.closeEntry();
     }
+
 }

@@ -19,8 +19,8 @@ package net.lingala.zip4j.engine;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.io.DeflateOutputStream;
 import net.lingala.zip4j.io.SplitOutputStream;
-import net.lingala.zip4j.io.ZipOutputStream;
 import net.lingala.zip4j.model.AESStrength;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.Encryption;
@@ -56,7 +56,7 @@ public class ZipEngine {
 
         checkParameters(parameters);
 
-        try (ZipOutputStream out = new ZipOutputStream(SplitOutputStream.create(zipModel), zipModel)) {
+        try (DeflateOutputStream out = new DeflateOutputStream(SplitOutputStream.create(zipModel), zipModel)) {
             out.seek(zipModel.getOffsCentralDirectory());
 
             for (Path entry : entries) {
@@ -103,7 +103,7 @@ public class ZipEngine {
     public void addStreamToZip(@NonNull Collection<InputStreamMeta> files, @NonNull final ZipParameters parameters) {
         checkParameters(parameters);
 
-        try (ZipOutputStream out = new ZipOutputStream(SplitOutputStream.create(zipModel), zipModel)) {
+        try (DeflateOutputStream out = new DeflateOutputStream(SplitOutputStream.create(zipModel), zipModel)) {
             out.seek(zipModel.getEndCentralDirectory().getOffsCentralDirectory());
 
             for (InputStreamMeta file : files) {
@@ -122,8 +122,6 @@ public class ZipEngine {
 
                 out.closeEntry();
             }
-
-            out.finish();
         } catch(ZipException e) {
             throw e;
         } catch(Exception e) {

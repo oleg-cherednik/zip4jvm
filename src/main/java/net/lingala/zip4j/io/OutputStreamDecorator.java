@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.lingala.zip4j.util.Raw;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -15,7 +16,7 @@ import java.io.OutputStream;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public final class OutputStreamDecorator {
+public final class OutputStreamDecorator implements Closeable {
 
     private final byte[] intByte = new byte[4];
 
@@ -51,5 +52,10 @@ public final class OutputStreamDecorator {
         Raw.writeIntLittleEndian(intByte, 0, val);
         delegate.write(intByte);
         totalBytesWritten += 4;
+    }
+
+    @Override
+    public void close() throws IOException {
+        delegate.close();
     }
 }
