@@ -110,14 +110,14 @@ public class UnzipEngine {
         if (fileHeader.isDirectory())
             Files.createDirectories(destDir.resolve(fileHeader.getFileName()));
         else {
-            try (InputStream in = getInputStream(); OutputStream out = getOutputStream(destDir)) {
+            try (InputStream in = extractEntryAsStream(); OutputStream out = getOutputStream(destDir)) {
                 IOUtils.copyLarge(in, out);
             }
         }
     }
 
-    public ZipInputStream getInputStream() throws ZipException, IOException {
-        RandomAccessFile raf = createFileHandler("r");
+    public ZipInputStream extractEntryAsStream() throws ZipException, IOException {
+        RandomAccessFile raf = zipModel.isSplitArchive() ? checkSplitFile() : new RandomAccessFile(zipModel.getZipFile().toFile(), "r");
         String errMsg = "local header and file header do not match";
         //checkSplitFile();
 
@@ -332,40 +332,27 @@ public class UnzipEngine {
     }
 
     private RandomAccessFile checkSplitFile() throws ZipException {
-        if (zipModel.isSplitArchive()) {
-            int diskNumberStartOfFile = fileHeader.getDiskNumber();
-            currSplitFileCounter = diskNumberStartOfFile + 1;
+        if (!zipModel.isSplitArchive())
+            return null;
 
-            try {
-                Path partFile = zipModel.getPartFile(diskNumberStartOfFile);
-                RandomAccessFile raf = new RandomAccessFile(partFile.toFile(), InternalZipConstants.READ_MODE);
-
-                if (currSplitFileCounter == 1) {
-                    byte[] splitSig = new byte[4];
-                    raf.read(splitSig);
-                    if (Raw.readIntLittleEndian(splitSig, 0) != InternalZipConstants.SPLITSIG) {
-                        throw new ZipException("invalid first part split file signature");
-                    }
-                }
-                return raf;
-            } catch(FileNotFoundException e) {
-                throw new ZipException(e);
-            } catch(IOException e) {
-                throw new ZipException(e);
-            }
-        }
-        return null;
-    }
-
-    private RandomAccessFile createFileHandler(String mode) throws ZipException {
-        if (zipModel == null || zipModel.getZipFile() == null)
-            throw new ZipException("input parameter is null in getFilePointer");
+        int diskNumberStartOfFile = fileHeader.getDiskNumber();
+        currSplitFileCounter = diskNumberStartOfFile + 1;
 
         try {
-            return zipModel.isSplitArchive() ? checkSplitFile() : new RandomAccessFile(zipModel.getZipFile().toFile(), mode);
+            Path partFile = zipModel.getPartFile(diskNumberStartOfFile);
+            RandomAccessFile raf = new RandomAccessFile(partFile.toFile(), InternalZipConstants.READ_MODE);
+
+            if (currSplitFileCounter == 1) {
+                byte[] splitSig = new byte[4];
+                raf.read(splitSig);
+                if (Raw.readIntLittleEndian(splitSig, 0) != InternalZipConstants.SPLITSIG) {
+                    throw new ZipException("invalid first part split file signature");
+                }
+            }
+            return raf;
         } catch(FileNotFoundException e) {
             throw new ZipException(e);
-        } catch(Exception e) {
+        } catch(IOException e) {
             throw new ZipException(e);
         }
     }
@@ -398,7 +385,7 @@ public class UnzipEngine {
         if (!new File(partFile).exists()) {
             throw new IOException("zip split file does not exist: " + partFile);
         }
-        return new RandomAccessFile(partFile, InternalZipConstants.READ_MODE);
+        return new RandomAccessFile(partFile, "r");
     }
 
     public void updateCRC(int b) {

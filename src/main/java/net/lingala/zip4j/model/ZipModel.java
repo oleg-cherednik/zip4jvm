@@ -44,6 +44,7 @@ public class ZipModel {
     private Zip64EndCentralDirectoryLocator zip64EndCentralDirectoryLocator;
     private Zip64EndCentralDirectory zip64EndCentralDirectory;
     private long splitLength = NO_SPLIT;
+    @NonNull
     private Path zipFile;
     @NonNull
     private Charset charset = Charset.defaultCharset();
