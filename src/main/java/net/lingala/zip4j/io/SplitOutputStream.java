@@ -125,8 +125,7 @@ public class SplitOutputStream extends OutputStream {
         if (allHeaderSignatures != null && allHeaderSignatures.length > 0) {
             for (int i = 0; i < allHeaderSignatures.length; i++) {
                 //Ignore split signature
-                if (allHeaderSignatures[i] != InternalZipConstants.SPLITSIG &&
-                        allHeaderSignatures[i] == signature) {
+                if (allHeaderSignatures[i] != InternalZipConstants.SPLITSIG && allHeaderSignatures[i] == signature) {
                     return true;
                 }
             }

@@ -93,10 +93,8 @@ public class ZipModel {
         return zipFile.getParent().resolve(String.format("%s.z%02d", FilenameUtils.getBaseName(zipFile.toString()), count));
     }
 
-    public Path getPartFile(int diskNumberStartOfFile) {
-        if (diskNumberStartOfFile == endCentralDirectory.getDiskNumber())
-            return zipFile;
-        return getSplitFilePath(zipFile, diskNumberStartOfFile + 1);
+    public Path getPartFile(int diskNumber) {
+        return diskNumber == endCentralDirectory.getDiskNumber() ? zipFile : getSplitFilePath(zipFile, diskNumber + 1);
     }
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")

@@ -62,7 +62,7 @@ final class CentralDirectoryReader {
         int signature = in.readInt();
 
         if (signature != InternalZipConstants.CENSIG)
-            throw new IOException("Expected central directory entry not found (offs:" + in.getFilePointer() + ')');
+            throw new IOException("Expected central directory entry not found (offs:" + (in.getFilePointer() - 4) + ')');
 
         fileHeader.setVersionMadeBy(in.readShort());
         fileHeader.setVersionToExtract(in.readShort());

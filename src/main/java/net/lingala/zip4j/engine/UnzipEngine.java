@@ -35,11 +35,9 @@ import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
-import net.lingala.zip4j.util.Raw;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -126,7 +124,7 @@ public class UnzipEngine {
     @NonNull
     private InputStream extractEntryAsStream(@NonNull CentralDirectory.FileHeader fileHeader) {
         try {
-            RandomAccessFile raf = zipModel.isSplitArchive() ? checkSplitFile(fileHeader) : new RandomAccessFile(zipModel.getZipFile().toFile(), "r");
+            RandomAccessFile raf = openFile(fileHeader);
             String errMsg = "local header and file header do not match";
             //checkSplitFile();
 
@@ -176,9 +174,8 @@ public class UnzipEngine {
 
     private void init(RandomAccessFile raf, CentralDirectory.FileHeader fileHeader) throws ZipException {
 
-        if (localFileHeader == null) {
+        if (localFileHeader == null)
             throw new ZipException("local file header is null, cannot initialize input stream");
-        }
 
         try {
             initDecrypter(raf, fileHeader);
@@ -310,15 +307,15 @@ public class UnzipEngine {
 //		}
 //	}
 
-    private boolean checkLocalHeader(CentralDirectory.FileHeader fileHeader) throws ZipException {
-        RandomAccessFile rafForLH = null;
+    private boolean checkLocalHeader(CentralDirectory.FileHeader fileHeader) {
+        RandomAccessFile raf = null;
         try {
-            rafForLH = checkSplitFile(fileHeader);
+            raf = openFile(fileHeader);
 
-            if (rafForLH == null)
-                rafForLH = new RandomAccessFile(zipModel.getZipFile().toFile(), "r");
+            if (raf == null)
+                raf = new RandomAccessFile(zipModel.getZipFile().toFile(), "r");
 
-            localFileHeader = new LocalFileHeaderReader(new LittleEndianRandomAccessFile(rafForLH), fileHeader).read();
+            localFileHeader = new LocalFileHeaderReader(new LittleEndianRandomAccessFile(raf), fileHeader).read();
 
             if (localFileHeader == null) {
                 throw new ZipException("error reading local file header. Is this a valid zip file?");
@@ -333,9 +330,9 @@ public class UnzipEngine {
         } catch(Exception e) {
             throw new ZipException(e);
         } finally {
-            if (rafForLH != null) {
+            if (raf != null) {
                 try {
-                    rafForLH.close();
+                    raf.close();
                 } catch(IOException e) {
                     // Ignore this
                 } catch(Exception e) {
@@ -345,27 +342,24 @@ public class UnzipEngine {
         }
     }
 
-    private RandomAccessFile checkSplitFile(@NonNull CentralDirectory.FileHeader fileHeader) throws ZipException {
-        if (!zipModel.isSplitArchive())
-            return null;
-
-        int diskNumber = fileHeader.getDiskNumber();
-        currSplitFileCounter = diskNumber + 1;
-
+    private RandomAccessFile openFile(@NonNull CentralDirectory.FileHeader fileHeader) {
         try {
-            Path partFile = zipModel.getPartFile(diskNumber);
-            RandomAccessFile raf = new RandomAccessFile(partFile.toFile(), "r");
+            if (!zipModel.isSplitArchive())
+                return new RandomAccessFile(zipModel.getZipFile().toFile(), "r");
+
+            int diskNumber = fileHeader.getDiskNumber();
+            currSplitFileCounter = diskNumber + 1;
+
+            LittleEndianRandomAccessFile in = new LittleEndianRandomAccessFile(zipModel.getPartFile(diskNumber));
 
             if (currSplitFileCounter == 1) {
-                byte[] splitSig = new byte[4];
-                raf.read(splitSig);
-                if (Raw.readIntLittleEndian(splitSig, 0) != InternalZipConstants.SPLITSIG) {
-                    throw new ZipException("invalid first part split file signature");
-                }
+                int signature = in.readInt();
+
+                if (signature != InternalZipConstants.SPLITSIG)
+                    throw new IOException("Expected first part of split file signature (offs:" + in.getFilePointer() + ')');
             }
-            return raf;
-        } catch(FileNotFoundException e) {
-            throw new ZipException(e);
+
+            return in.getRaf();
         } catch(IOException e) {
             throw new ZipException(e);
         }
