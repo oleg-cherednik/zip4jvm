@@ -15,6 +15,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -78,9 +79,10 @@ public class UnzipStreamTest {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
-                                                .splitLength(1024 * 1024).build();
+                                                .splitLength(1024 * 512).build();
+
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-        zip.add(srcDir, parameters);
+        zip.add(Collections.singletonList(srcDir.resolve("cars/bentley-continental.jpg")), parameters);
 
         assertThat(Files.exists(zipFile)).isTrue();
         assertThat(Files.isRegularFile(zipFile)).isTrue();
@@ -94,7 +96,7 @@ public class UnzipStreamTest {
 
         UnzipIt unzip = UnzipIt.builder().zipFile(zipFile).build();
 
-        try (InputStream in = unzip.extract("cars/bentley-continental.jpg");
+        try (InputStream in = unzip.extract("bentley-continental.jpg");
              OutputStream out = new FileOutputStream(imgFile.toFile())) {
             IOUtils.copyLarge(in, out);
         }

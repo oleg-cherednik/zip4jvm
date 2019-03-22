@@ -345,15 +345,15 @@ public class UnzipEngine {
         }
     }
 
-    private RandomAccessFile checkSplitFile(CentralDirectory.FileHeader fileHeader) throws ZipException {
+    private RandomAccessFile checkSplitFile(@NonNull CentralDirectory.FileHeader fileHeader) throws ZipException {
         if (!zipModel.isSplitArchive())
             return null;
 
-        int diskNumberStartOfFile = fileHeader.getDiskNumber();
-        currSplitFileCounter = diskNumberStartOfFile + 1;
+        int diskNumber = fileHeader.getDiskNumber();
+        currSplitFileCounter = diskNumber + 1;
 
         try {
-            Path partFile = zipModel.getPartFile(diskNumberStartOfFile);
+            Path partFile = zipModel.getPartFile(diskNumber);
             RandomAccessFile raf = new RandomAccessFile(partFile.toFile(), "r");
 
             if (currSplitFileCounter == 1) {
@@ -422,10 +422,6 @@ public class UnzipEngine {
 
     public ZipModel getZipModel() {
         return zipModel;
-    }
-
-    public LocalFileHeader getLocalFileHeader() {
-        return localFileHeader;
     }
 
 }
