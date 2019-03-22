@@ -18,10 +18,10 @@ package net.lingala.zip4j.io;
 
 import net.lingala.zip4j.engine.UnzipEngine;
 import net.lingala.zip4j.util.InternalZipConstants;
+import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
@@ -34,8 +34,8 @@ public class InflaterInputStream extends PartInputStream {
     private long bytesWritten;
     private long uncompressedSize;
 
-    public InflaterInputStream(RandomAccessFile raf, long len, UnzipEngine unzipEngine) {
-        super(raf, len, unzipEngine);
+    public InflaterInputStream(LittleEndianRandomAccessFile in, long len, UnzipEngine unzipEngine) {
+        super(in, len, unzipEngine);
         this.buff = new byte[InternalZipConstants.BUFF_SIZE];
         this.unzipEngine = unzipEngine;
         bytesWritten = 0;

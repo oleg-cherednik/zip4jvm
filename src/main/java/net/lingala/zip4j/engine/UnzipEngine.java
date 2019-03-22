@@ -160,9 +160,9 @@ public class UnzipEngine {
             in.seek(offs);
 
             if (compressionMethod == CompressionMethod.STORE)
-                return new ZipInputStream(new PartInputStream(in.getRaf(), comprSize, this), this);
+                return new ZipInputStream(new PartInputStream(in, comprSize, this), this);
             if (compressionMethod == CompressionMethod.DEFLATE)
-                return new ZipInputStream(new InflaterInputStream(in.getRaf(), comprSize, this), this);
+                return new ZipInputStream(new InflaterInputStream(in, comprSize, this), this);
 
             throw new ZipException("compression type not supported");
         } catch(ZipException e) {

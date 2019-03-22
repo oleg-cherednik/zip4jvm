@@ -21,6 +21,7 @@ import net.lingala.zip4j.engine.UnzipEngine;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.util.InternalZipConstants;
+import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,8 +39,8 @@ public class PartInputStream extends InputStream {
     private int aesBytesReturned = 0;
     private int count = -1;
 
-    public PartInputStream(RandomAccessFile raf, long length, UnzipEngine unzipEngine) {
-        this.raf = raf;
+    public PartInputStream(LittleEndianRandomAccessFile in, long length, UnzipEngine unzipEngine) {
+        raf = in.getRaf();
         this.unzipEngine = unzipEngine;
         this.length = length;
     }
