@@ -16,6 +16,7 @@
 
 package net.lingala.zip4j.io;
 
+import lombok.NonNull;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.ZipModel;
@@ -34,7 +35,7 @@ public abstract class DeflateOutputStream extends CipherOutputStream {
 
     private boolean firstBytesRead;
 
-    protected DeflateOutputStream(OutputStream out, ZipModel zipModel) {
+    protected DeflateOutputStream(@NonNull OutputStream out, ZipModel zipModel) {
         super(out, zipModel);
     }
 

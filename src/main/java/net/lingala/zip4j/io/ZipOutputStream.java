@@ -1,5 +1,6 @@
 package net.lingala.zip4j.io;
 
+import lombok.NonNull;
 import net.lingala.zip4j.model.ZipModel;
 
 import java.io.IOException;
@@ -7,12 +8,12 @@ import java.io.OutputStream;
 
 public class ZipOutputStream extends DeflateOutputStream {
 
-    public ZipOutputStream(OutputStream outputStream) {
-        this(outputStream, null);
+    public ZipOutputStream(OutputStream out) {
+        this(out, null);
     }
 
-    public ZipOutputStream(OutputStream outputStream, ZipModel zipModel) {
-        super(outputStream, zipModel);
+    public ZipOutputStream(@NonNull OutputStream out, ZipModel zipModel) {
+        super(out, zipModel);
     }
 
     @Override
