@@ -95,7 +95,6 @@ public class UnzipEngine {
 
     private void extractEntry(Path destDir, @NonNull CentralDirectory.FileHeader fileHeader) {
         crc.reset();
-        this.fileHeader = fileHeader;
 
         if (fileHeader.isDirectory())
             try {
@@ -114,19 +113,18 @@ public class UnzipEngine {
 
     @NonNull
     public InputStream extractEntry(@NonNull String entryName) {
-        CentralDirectory.FileHeader fileHeader = zipModel.getCentralDirectory().getFileHeaderByEntryName(entryName);
-        // TODO temporary
-        this.fileHeader = fileHeader;
-
-        if (fileHeader.isEncrypted())
-            fileHeader.setPassword(password);
-
-        return extractEntryAsStream(fileHeader);
+        return extractEntryAsStream(zipModel.getCentralDirectory().getFileHeaderByEntryName(entryName));
     }
 
     @NonNull
     private InputStream extractEntryAsStream(@NonNull CentralDirectory.FileHeader fileHeader) {
         try {
+            if (fileHeader.isEncrypted())
+                fileHeader.setPassword(password);
+
+            // TODO temporary
+            this.fileHeader = fileHeader;
+
             LittleEndianRandomAccessFile in = openFile(fileHeader);
             LocalFileHeader localFileHeader = checkLocalHeader(fileHeader);
             this.localFileHeader = localFileHeader;
