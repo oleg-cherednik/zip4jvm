@@ -20,7 +20,7 @@ import java.io.IOException;
  */
 public final class LocalFileHeaderWriter {
 
-    public int write(@NonNull LocalFileHeader localFileHeader, @NonNull ZipModel zipModel, @NonNull OutputStreamDecorator out)
+    public void write(@NonNull LocalFileHeader localFileHeader, @NonNull ZipModel zipModel, @NonNull OutputStreamDecorator out)
             throws ZipException, IOException {
         LittleEndianBuffer bytes = new LittleEndianBuffer();
 
@@ -65,10 +65,10 @@ public final class LocalFileHeaderWriter {
             bytes.writeWord(aesExtraDataRecord.getCompressionMethod().getValue());
         }
 
-        return bytes.flushInto(out);
+        bytes.flushInto(out);
     }
 
-    public int writeExtended(@NonNull LocalFileHeader localFileHeader, @NonNull OutputStreamDecorator out) throws ZipException, IOException {
+    public void writeExtended(@NonNull LocalFileHeader localFileHeader, @NonNull OutputStreamDecorator out) throws ZipException, IOException {
         LittleEndianBuffer bytes = new LittleEndianBuffer();
         byte[] intByte = new byte[4];
 
@@ -96,7 +96,7 @@ public final class LocalFileHeaderWriter {
         Raw.writeIntLittleEndian(intByte, 0, (int)uncompressedSize);
         bytes.copyByteArrayToArrayList(intByte);
 
-        return bytes.flushInto(out);
+        bytes.flushInto(out);
     }
 
 }

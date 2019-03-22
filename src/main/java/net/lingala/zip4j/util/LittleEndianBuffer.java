@@ -18,10 +18,8 @@ public final class LittleEndianBuffer implements Closeable {
     private final byte[] shortByte = new byte[2];
     private final byte[] longByte = new byte[8];
 
-    public int flushInto(OutputStreamDecorator out) throws IOException {
-        byte[] lhBytes = byteArrayListToByteArray();
-        out.getDelegate().write(lhBytes);
-        return lhBytes.length;
+    public void flushInto(OutputStreamDecorator out) throws IOException {
+        out.writeBytes(byteArrayListToByteArray());
     }
 
     // 2 bytes (16 bit)

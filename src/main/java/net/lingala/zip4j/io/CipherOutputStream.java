@@ -53,10 +53,9 @@ public abstract class CipherOutputStream extends OutputStream {
 
 
     protected final CRC32 crc = new CRC32();
-    private long mark;
     private final byte[] pendingBuffer = new byte[InternalZipConstants.AES_BLOCK_SIZE];
     private int pendingBufferLength;
-    private long totalBytesRead;
+    protected long totalBytesRead;
 
     protected CipherOutputStream(@NonNull OutputStream out, ZipModel zipModel) {
         this.out = new OutputStreamDecorator(out);
@@ -104,13 +103,11 @@ public abstract class CipherOutputStream extends OutputStream {
                 out.writeInt(InternalZipConstants.SPLITSIG);
 
             fileHeader.setOffsLocalFileHeader(out.getOffsLocalHeaderRelative());
-            out.addTotalBytesWritten(new LocalFileHeaderWriter().write(localFileHeader, zipModel, out));
+            new LocalFileHeaderWriter().write(localFileHeader, zipModel, out);
 
             encryptor = parameters.getEncryption().createEncryptor(parameters, localFileHeader);
-            int length = encryptor.write(out.getDelegate());
-            out.addTotalBytesWritten(length);
-            mark = out.getOffs();
-
+            encryptor.write(out);
+            out.mark();
             crc.reset();
         } catch(ZipException e) {
             throw e;
@@ -169,33 +166,27 @@ public abstract class CipherOutputStream extends OutputStream {
             encryptAndWrite(b, off, len);
     }
 
-    private void encryptAndWrite(byte[] b, int off, int len) throws IOException {
-        try {
-            encryptor.encrypt(b, off, len);
-            out.getDelegate().write(b, off, len);
-            out.addTotalBytesWritten(len);
-        } catch(ZipException e) {
-            throw new IOException(e);
-        }
+    private void encryptAndWrite(byte[] buf, int offs, int len) throws IOException {
+        encryptor.encrypt(buf, offs, len);
+        out.writeBytes(buf, offs, len);
     }
 
     public void closeEntry() throws IOException, ZipException {
 
-        if (this.pendingBufferLength != 0) {
+        if (pendingBufferLength != 0) {
             encryptAndWrite(pendingBuffer, 0, pendingBufferLength);
             pendingBufferLength = 0;
         }
 
         if (parameters.getEncryption() == Encryption.AES) {
-            if (encryptor instanceof AESEncryptor) {
-                out.getDelegate().write(((AESEncryptor)encryptor).getFinalMac());
-                out.addTotalBytesWritten(10);
-            } else
+            if (encryptor instanceof AESEncryptor)
+                out.writeBytes(((AESEncryptor)encryptor).getFinalMac());
+            else
                 throw new ZipException("invalid encryptor for AES encrypted file");
         }
 
-        fileHeader.setCompressedSize(out.getOffs() - mark);
-        localFileHeader.setCompressedSize(out.getOffs() - mark);
+        fileHeader.setCompressedSize(out.getWrittenBytes());
+        localFileHeader.setCompressedSize(out.getWrittenBytes());
 
         if (parameters.isSourceExternalStream()) {
             fileHeader.setUncompressedSize(totalBytesRead);
@@ -217,7 +208,7 @@ public abstract class CipherOutputStream extends OutputStream {
         zipModel.addLocalFileHeader(localFileHeader);
         zipModel.addFileHeader(fileHeader);
 
-        out.addTotalBytesWritten(new LocalFileHeaderWriter().writeExtended(localFileHeader, out));
+        new LocalFileHeaderWriter().writeExtended(localFileHeader, out);
 
         crc.reset();
         encryptor = Encryptor.NULL;
@@ -233,20 +224,6 @@ public abstract class CipherOutputStream extends OutputStream {
     public void close() throws IOException {
         finish();
         out.close();
-    }
-
-    public void decrementCompressedFileSize(int value) {
-        if (value <= 0) return;
-
-        if (value <= out.getOffs() - mark) {
-            out.offs -= value;
-        }
-    }
-
-    protected void updateTotalBytesRead(int toUpdate) {
-        if (toUpdate > 0) {
-            totalBytesRead += toUpdate;
-        }
     }
 
     public void seek(long pos) throws IOException {

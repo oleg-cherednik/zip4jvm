@@ -18,10 +18,10 @@ package net.lingala.zip4j.crypto;
 
 import net.lingala.zip4j.crypto.engine.ZipCryptoEngine;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.io.OutputStreamDecorator;
 import net.lingala.zip4j.util.InternalZipConstants;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Random;
 
 public class StandardEncryptor implements Encryptor {
@@ -75,9 +75,8 @@ public class StandardEncryptor implements Encryptor {
     }
 
     @Override
-    public int write(OutputStream out) throws IOException {
-        out.write(headerBytes);
-        return headerBytes.length;
+    public void write(OutputStreamDecorator out) throws IOException {
+        out.writeBytes(headerBytes);
     }
 
     protected byte encryptByte(byte val) {

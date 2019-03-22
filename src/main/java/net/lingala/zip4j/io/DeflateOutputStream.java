@@ -79,6 +79,14 @@ public class DeflateOutputStream extends CipherOutputStream {
         }
     }
 
+    private void decrementCompressedFileSize(int value) {
+        if (value <= 0)
+            return;
+
+        if (value <= out.getWrittenBytes())
+            out.offs -= value;
+    }
+
     @Override
     public void write(int bval) throws IOException {
         byte[] b = new byte[1];
@@ -87,14 +95,14 @@ public class DeflateOutputStream extends CipherOutputStream {
     }
 
     @Override
-    public void write(byte[] buf, int off, int len) throws IOException {
-        crc.update(buf, off, len);
-        updateTotalBytesRead(len);
+    public void write(byte[] buf, int offs, int len) throws IOException {
+        crc.update(buf, offs, len);
+        totalBytesRead += len;
 
         if (parameters.getCompressionMethod() != CompressionMethod.DEFLATE)
-            super.write(buf, off, len);
+            super.write(buf, offs, len);
         else {
-            deflater.setInput(buf, off, len);
+            deflater.setInput(buf, offs, len);
             while (!deflater.needsInput()) {
                 deflate();
             }

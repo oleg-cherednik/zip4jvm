@@ -1,5 +1,6 @@
 package net.lingala.zip4j.io;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -21,15 +22,22 @@ public final class OutputStreamDecorator implements Closeable {
     private final byte[] intByte = new byte[4];
 
     private final OutputStream delegate;
-    // TODO temporary
+    // TODO temporary public
     public long offs;
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    private long mark;
+
+    public void mark() {
+        mark = offs;
+    }
+
+    public long getWrittenBytes() {
+        return offs - mark;
+    }
 
     public OutputStream getDelegate() {
         return delegate;
-    }
-
-    public void addTotalBytesWritten(int delta) {
-        offs += delta;
     }
 
     public int getCurrSplitFileCounter() {
@@ -57,6 +65,16 @@ public final class OutputStreamDecorator implements Closeable {
         Raw.writeIntLittleEndian(intByte, 0, val);
         delegate.write(intByte);
         offs += 4;
+    }
+
+    public void writeBytes(byte... buf) throws IOException {
+        delegate.write(buf);
+        offs += buf.length;
+    }
+
+    public void writeBytes(byte[] buf, int offs, int len) throws IOException {
+        delegate.write(buf, offs, len);
+        this.offs += len;
     }
 
     @Override
