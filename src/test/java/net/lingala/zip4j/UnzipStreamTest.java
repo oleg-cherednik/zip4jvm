@@ -70,4 +70,35 @@ public class UnzipStreamTest {
 
         TestUtils.checkImage(imgFile, 1_395_362);
     }
+
+    @Test
+    public void shouldUnzipEntryToStreamWhenSplit() throws ZipException, IOException {
+        Path zipFile = destDir.resolve("src.zip");
+
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compressionMethod(CompressionMethod.DEFLATE)
+                                                .compressionLevel(CompressionLevel.NORMAL)
+                                                .splitLength(1024 * 1024).build();
+        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
+        zip.add(srcDir, parameters);
+
+        assertThat(Files.exists(zipFile)).isTrue();
+        assertThat(Files.isRegularFile(zipFile)).isTrue();
+
+        // ---
+
+        Path imgFile = resDir.resolve("bentley-continental.jpg");
+
+        if (!Files.exists(imgFile.getParent()))
+            Files.createDirectories(imgFile.getParent());
+
+        UnzipIt unzip = UnzipIt.builder().zipFile(zipFile).build();
+
+        try (InputStream in = unzip.extract("cars/bentley-continental.jpg");
+             OutputStream out = new FileOutputStream(imgFile.toFile())) {
+            IOUtils.copyLarge(in, out);
+        }
+
+        TestUtils.checkImage(imgFile, 1_395_362);
+    }
 }

@@ -124,7 +124,7 @@ public class UnzipEngine {
     }
 
     @NonNull
-    private InputStream extractEntryAsStream(CentralDirectory.FileHeader fileHeader) {
+    private InputStream extractEntryAsStream(@NonNull CentralDirectory.FileHeader fileHeader) {
         try {
             RandomAccessFile raf = zipModel.isSplitArchive() ? checkSplitFile(fileHeader) : new RandomAccessFile(zipModel.getZipFile().toFile(), "r");
             String errMsg = "local header and file header do not match";
