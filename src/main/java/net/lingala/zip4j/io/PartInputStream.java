@@ -17,10 +17,9 @@
 package net.lingala.zip4j.io;
 
 import net.lingala.zip4j.crypto.AESDecrypter;
-import net.lingala.zip4j.crypto.Decrypter;
+import net.lingala.zip4j.engine.UnzipEngine;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.Encryption;
-import net.lingala.zip4j.engine.UnzipEngine;
 import net.lingala.zip4j.util.InternalZipConstants;
 
 import java.io.IOException;
@@ -28,51 +27,48 @@ import java.io.InputStream;
 import java.io.RandomAccessFile;
 
 public class PartInputStream extends InputStream {
+
     private RandomAccessFile raf;
-    private long bytesRead, length;
-    private UnzipEngine unzipEngine;
-    private Decrypter decrypter;
+    private final long length;
+    private final UnzipEngine unzipEngine;
+
+    private long bytesRead;
     private byte[] oneByteBuff = new byte[1];
     private byte[] aesBlockByte = new byte[16];
     private int aesBytesReturned = 0;
-    private boolean isAESEncryptedFile = false;
     private int count = -1;
 
-    public PartInputStream(RandomAccessFile raf, long offs, long len, UnzipEngine unzipEngine) {
+    public PartInputStream(RandomAccessFile raf, long length, UnzipEngine unzipEngine) {
         this.raf = raf;
         this.unzipEngine = unzipEngine;
-        this.decrypter = unzipEngine.getDecrypter();
-        this.bytesRead = 0;
-        this.length = len;
-        this.isAESEncryptedFile = unzipEngine.getFileHeader().getEncryption() == Encryption.AES;
+        this.length = length;
     }
 
+    private boolean isAes() {
+        return unzipEngine.getFileHeader().getEncryption() == Encryption.AES;
+    }
+
+    @Override
     public int available() {
-        long amount = length - bytesRead;
-        if (amount > Integer.MAX_VALUE)
-            return Integer.MAX_VALUE;
-        return (int)amount;
+        return (int)Math.min(length - bytesRead, Integer.MAX_VALUE);
     }
 
+    @Override
     public int read() throws IOException {
         if (bytesRead >= length)
             return -1;
 
-        if (isAESEncryptedFile) {
-            if (aesBytesReturned == 0 || aesBytesReturned == 16) {
-                if (read(aesBlockByte) == -1) {
-                    return -1;
-                }
-                aesBytesReturned = 0;
-            }
-            return aesBlockByte[aesBytesReturned++] & 0xff;
-        } else {
-            return read(oneByteBuff, 0, 1) == -1 ? -1 : oneByteBuff[0] & 0xff;
-        }
-    }
+        if (!isAes())
+            return read(oneByteBuff, 0, 1) == -1 ? -1 : oneByteBuff[0] & 0xFF;
 
-    public int read(byte[] b) throws IOException {
-        return this.read(b, 0, b.length);
+        if (aesBytesReturned == 0 || aesBytesReturned == 16) {
+            if (read(aesBlockByte) == -1)
+                return -1;
+
+            aesBytesReturned = 0;
+        }
+
+        return aesBlockByte[aesBytesReturned++] & 0xff;
     }
 
     public int read(byte[] b, int off, int len) throws IOException {
@@ -105,9 +101,9 @@ public class PartInputStream extends InputStream {
         }
 
         if (count > 0) {
-            if (decrypter != null) {
+            if (unzipEngine.getDecrypter() != null) {
                 try {
-                    decrypter.decryptData(b, off, count);
+                    unzipEngine.getDecrypter().decryptData(b, off, count);
                 } catch(ZipException e) {
                     throw new IOException(e.getMessage());
                 }
@@ -115,54 +111,52 @@ public class PartInputStream extends InputStream {
             bytesRead += count;
         }
 
-        if (bytesRead >= length) {
+        if (bytesRead >= length)
             checkAndReadAESMacBytes();
-        }
 
         return count;
     }
 
     protected void checkAndReadAESMacBytes() throws IOException {
-        if (isAESEncryptedFile) {
-            if (decrypter != null && decrypter instanceof AESDecrypter) {
-                if (((AESDecrypter)decrypter).getStoredMac() != null) {
-                    //Stored mac already set
-                    return;
-                }
-                byte[] macBytes = new byte[InternalZipConstants.AES_AUTH_LENGTH];
-                int readLen = -1;
-                readLen = raf.read(macBytes);
-                if (readLen != InternalZipConstants.AES_AUTH_LENGTH) {
-                    if (unzipEngine.getZipModel().isSplitArchive()) {
-                        raf.close();
-                        raf = unzipEngine.startNextSplitFile();
-                        int newlyRead = raf.read(macBytes, readLen, InternalZipConstants.AES_AUTH_LENGTH - readLen);
-                        readLen += newlyRead;
-                    } else {
-                        throw new IOException("Error occured while reading stored AES authentication bytes");
-                    }
-                }
+        if (!isAes())
+            return;
+        if (unzipEngine.getDecrypter() == null || !(unzipEngine.getDecrypter() instanceof AESDecrypter))
+            return;
 
-                ((AESDecrypter)unzipEngine.getDecrypter()).setStoredMac(macBytes);
+        if (((AESDecrypter)unzipEngine.getDecrypter()).getStoredMac() != null) {
+            //Stored mac already set
+            return;
+        }
+        byte[] macBytes = new byte[InternalZipConstants.AES_AUTH_LENGTH];
+        int readLen = -1;
+        readLen = raf.read(macBytes);
+        if (readLen != InternalZipConstants.AES_AUTH_LENGTH) {
+            if (unzipEngine.getZipModel().isSplitArchive()) {
+                raf.close();
+                raf = unzipEngine.startNextSplitFile();
+                int newlyRead = raf.read(macBytes, readLen, InternalZipConstants.AES_AUTH_LENGTH - readLen);
+                readLen += newlyRead;
+            } else {
+                throw new IOException("Error occured while reading stored AES authentication bytes");
             }
         }
+
+        ((AESDecrypter)unzipEngine.getDecrypter()).setStoredMac(macBytes);
     }
 
-    public long skip(long amount) throws IOException {
-        if (amount < 0)
+    @Override
+    public long skip(long n) throws IOException {
+        if (n < 0)
             throw new IllegalArgumentException();
-        if (amount > length - bytesRead)
-            amount = length - bytesRead;
-        bytesRead += amount;
-        return amount;
+        if (n > length - bytesRead)
+            n = length - bytesRead;
+        bytesRead += n;
+        return n;
     }
 
+    @Override
     public void close() throws IOException {
         raf.close();
-    }
-
-    public void seek(long pos) throws IOException {
-        raf.seek(pos);
     }
 
 }

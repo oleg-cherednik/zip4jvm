@@ -40,6 +40,7 @@ public class CentralDirectoryBuilder {
         String fileName = getFileName();
 
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
+        fileHeader.setEncryption(zipParameters.getEncryption());
 
         fileHeader.setVersionMadeBy(20);
         fileHeader.setVersionToExtract(20);

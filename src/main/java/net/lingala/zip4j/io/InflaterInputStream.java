@@ -27,32 +27,24 @@ import java.util.zip.Inflater;
 
 public class InflaterInputStream extends PartInputStream {
 
-    private Inflater inflater;
+    private final Inflater inflater = new Inflater(true);
     private byte[] buff;
     private byte[] oneByteBuff = new byte[1];
     private UnzipEngine unzipEngine;
     private long bytesWritten;
     private long uncompressedSize;
 
-    public InflaterInputStream(RandomAccessFile raf, long offs, long len, UnzipEngine unzipEngine) {
-        super(raf, offs, len, unzipEngine);
-        this.inflater = new Inflater(true);
+    public InflaterInputStream(RandomAccessFile raf, long len, UnzipEngine unzipEngine) {
+        super(raf, len, unzipEngine);
         this.buff = new byte[InternalZipConstants.BUFF_SIZE];
         this.unzipEngine = unzipEngine;
         bytesWritten = 0;
         uncompressedSize = unzipEngine.getFileHeader().getUncompressedSize();
     }
 
+    @Override
     public int read() throws IOException {
         return read(oneByteBuff, 0, 1) == -1 ? -1 : oneByteBuff[0] & 0xff;
-    }
-
-    public int read(byte[] b) throws IOException {
-        if (b == null) {
-            throw new NullPointerException("input buffer is null");
-        }
-
-        return read(b, 0, b.length);
     }
 
     public int read(byte[] b, int off, int len) throws IOException {
@@ -121,6 +113,7 @@ public class InflaterInputStream extends PartInputStream {
      * @throws IOException              if an I/O error has occurred
      * @throws IllegalArgumentException if n < 0
      */
+    @Override
     public long skip(long n) throws IOException {
         if (n < 0) {
             throw new IllegalArgumentException("negative skip length");
@@ -142,11 +135,6 @@ public class InflaterInputStream extends PartInputStream {
         return total;
     }
 
-
-    public void seek(long pos) throws IOException {
-        super.seek(pos);
-    }
-
     /**
      * Returns 0 after EOF has been reached, otherwise always return 1.
      * <p>
@@ -156,13 +144,15 @@ public class InflaterInputStream extends PartInputStream {
      * @return 1 before EOF and 0 after EOF.
      * @throws IOException if an I/O error occurs.
      */
+    @Override
     public int available() {
         return inflater.finished() ? 0 : 1;
     }
 
+    @Override
     public void close() throws IOException {
-        inflater.end();
         super.close();
+        inflater.end();
     }
 
 }

@@ -48,7 +48,7 @@ public class ZipEncryptedFilesTest {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
-                                                .encryption(Encryption.STANDARD)
+                                                .encryption(Encryption.AES)
                                                 .aesKeyStrength(AESStrength.STRENGTH_256)
                                                 .password(password)
                                                 .defaultFolderPath(srcDir).build();
