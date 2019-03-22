@@ -54,11 +54,6 @@ public class DeflateOutputStream extends CipherOutputStream {
         deflater.setLevel(parameters.getCompressionLevel().getValue());
     }
 
-    @Override
-    public void write(byte[] b) throws IOException {
-        write(b, 0, b.length);
-    }
-
     private void deflate() throws IOException {
         int len = deflater.deflate(buf, 0, buf.length);
         if (len > 0) {
@@ -88,13 +83,6 @@ public class DeflateOutputStream extends CipherOutputStream {
     }
 
     @Override
-    public void write(int bval) throws IOException {
-        byte[] b = new byte[1];
-        b[0] = (byte)bval;
-        write(b, 0, 1);
-    }
-
-    @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
         crc.update(buf, offs, len);
         totalBytesRead += len;
@@ -114,10 +102,12 @@ public class DeflateOutputStream extends CipherOutputStream {
         if (parameters.getCompressionMethod() == CompressionMethod.DEFLATE) {
             if (!deflater.finished()) {
                 deflater.finish();
+
                 while (!deflater.finished()) {
                     deflate();
                 }
             }
+
             firstBytesRead = false;
         }
         super.closeEntry();
