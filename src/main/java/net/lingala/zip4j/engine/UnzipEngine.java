@@ -202,34 +202,6 @@ public class UnzipEngine {
         }
     }
 
-//	private void checkCRC() throws ZipException {
-//		if (fileHeader != null) {
-//			if (fileHeader.getEncryption() == Zip4jConstants.AES) {
-//				if (decrypter != null && decrypter instanceof AESDecrypter) {
-//					byte[] tmpMacBytes = ((AESDecrypter)decrypter).getCalculatedAuthenticationBytes();
-//					byte[] actualMacBytes = ((AESDecrypter)decrypter).getStoredMac();
-//					if (tmpMacBytes == null || actualMacBytes == null) {
-//						throw new ZipException("null mac value for AES encrypted file: " + fileHeader.getFileName());
-//					}
-//					byte[] calcMacBytes = new byte[10];
-//					System.arraycopy(tmpMacBytes, 0, calcMacBytes, 0, 10);
-//					if (!Arrays.equals(calcMacBytes, actualMacBytes)) {
-//						throw new ZipException("invalid CRC(mac) for file: " + fileHeader.getFileName());
-//					}
-//				} else {
-//					throw new ZipException("invalid decryptor...cannot calculate mac value for file: "
-//							+ fileHeader.getFileName());
-//				}
-//			} else if (unzipEngine != null) {
-//				long calculatedCRC = unzipEngine.getCRC();
-//				long actualCRC = fileHeader.getCrc32();
-//				if (calculatedCRC != actualCRC) {
-//					throw new ZipException("invalid CRC for file: " + fileHeader.getFileName());
-//				}
-//			}
-//		}
-//	}
-
     @NonNull
     private LocalFileHeader checkLocalHeader(@NonNull CentralDirectory.FileHeader fileHeader) throws IOException {
         try (LittleEndianRandomAccessFile in = openFile(fileHeader)) {

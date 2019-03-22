@@ -9,10 +9,9 @@ import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.CreateZipModelSup;
-import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.RemoveEntryFunc;
+import net.lingala.zip4j.util.ZipUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -46,11 +45,7 @@ public final class ZipMisc {
     }
 
     public void setComment(String comment) throws ZipException {
-        comment = StringUtils.trimToNull(comment);
-
-        if (StringUtils.length(comment) > InternalZipConstants.MAX_ALLOWED_ZIP_COMMENT_LENGTH)
-            throw new ZipException("comment length exceeds maximum length");
-
+        comment = ZipUtils.normalizeComment(comment);
         UnzipIt.checkZipFile(zipFile);
 
         ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get().noSplitOnly();

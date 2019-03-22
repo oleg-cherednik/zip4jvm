@@ -8,6 +8,7 @@ import net.lingala.zip4j.model.InputStreamMeta;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.CreateZipModelSup;
+import net.lingala.zip4j.util.ZipUtils;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -39,7 +40,7 @@ public final class ZipIt {
             add(path, parameters);
     }
 
-    public void add(@NonNull Path path, @NonNull ZipParameters parameters) throws ZipException, IOException {
+    public void add(@NonNull Path path, @NonNull ZipParameters parameters) {
         if (Files.isDirectory(path))
             addDirectory(path, parameters);
         else if (Files.isRegularFile(path))
@@ -60,7 +61,7 @@ public final class ZipIt {
     }
 
     // TODO addDirectory and addRegularFile are same
-    private void addDirectory(Path dir, ZipParameters parameters) throws ZipException, IOException {
+    private void addDirectory(Path dir, ZipParameters parameters) {
         assert Files.isDirectory(dir);
 
         if (Files.isDirectory(dir) && parameters.getDefaultFolderPath() == null)
@@ -68,11 +69,12 @@ public final class ZipIt {
 
         ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get().noSplitOnly();
         zipModel.setSplitLength(parameters.getSplitLength());
+        zipModel.getEndCentralDirectory().setComment(ZipUtils.normalizeComment(parameters.getComment()));
 
         new ZipEngine(zipModel).addEntries(getDirectoryEntries(dir), parameters);
     }
 
-    private void addRegularFile(Path file, ZipParameters parameters) throws ZipException, IOException {
+    private void addRegularFile(Path file, ZipParameters parameters) {
         assert Files.isRegularFile(file);
 
         ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get().noSplitOnly();

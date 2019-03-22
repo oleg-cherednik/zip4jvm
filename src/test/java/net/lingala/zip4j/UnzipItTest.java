@@ -5,7 +5,6 @@ import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.ZipParameters;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -38,7 +37,7 @@ public class UnzipItTest {
 //        Files.createDirectories(resDir);
     }
 
-    @Test
+//    @Test
     public void shouldUnzipRequiredFiles() throws ZipException, IOException {
         Path zipFile = destDir.resolve("src.zip");
 
@@ -63,7 +62,7 @@ public class UnzipItTest {
         TestUtils.checkImage(resDir.resolve("cars/bentley-continental.jpg"), 1_395_362);
     }
 
-    @Test(dependsOnMethods = "shouldUnzipRequiredFiles")
+//    @Test(dependsOnMethods = "shouldUnzipRequiredFiles")
     public void shouldUnzipOneFile() throws ZipException, IOException {
         Path zipFile = destDir.resolve("src.zip");
 
@@ -80,7 +79,7 @@ public class UnzipItTest {
         TestUtils.checkImage(resDir.resolve("cars/ferrari-458-italia.jpg"), 320_894);
     }
 
-    @Test(dependsOnMethods = "shouldUnzipOneFile")
+//    @Test(dependsOnMethods = "shouldUnzipOneFile")
     public void shouldUnzipFolder() throws ZipException, IOException {
         Path zipFile = destDir.resolve("src.zip");
 

@@ -4,7 +4,6 @@ import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.ZipParameters;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -39,7 +38,7 @@ public class ZipRemoveTest {
 //        Files.createDirectories(resDir);
     }
 
-    @Test
+    //    @Test
     public void shouldRemoveGivenFilesFromExistedZip() throws IOException {
         Path zipFile = destDir.resolve("src.zip");
 

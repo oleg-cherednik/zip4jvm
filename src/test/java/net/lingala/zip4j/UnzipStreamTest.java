@@ -6,7 +6,6 @@ import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.ZipParameters;
 import org.apache.commons.io.IOUtils;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -42,7 +41,7 @@ public class UnzipStreamTest {
 //        Files.createDirectories(resDir);
     }
 
-    @Test
+//    @Test
     public void shouldUnzipEntryToStreamWhenNoSplit() throws ZipException, IOException {
         Path zipFile = destDir.resolve("src.zip");
 
@@ -72,7 +71,7 @@ public class UnzipStreamTest {
         TestUtils.checkImage(imgFile, 1_395_362);
     }
 
-    @Test
+//    @Test
     public void shouldUnzipEntryToStreamWhenSplit() throws ZipException, IOException {
         Path zipFile = destDir.resolve("src.zip");
 

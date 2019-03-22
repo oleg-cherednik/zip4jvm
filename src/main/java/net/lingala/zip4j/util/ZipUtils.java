@@ -18,6 +18,7 @@ package net.lingala.zip4j.util;
 
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
+import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.lang.StringUtils;
 
 import java.nio.charset.Charset;
@@ -101,5 +102,17 @@ public class ZipUtils {
 
     public static boolean isDirectory(String fileName) {
         return fileName != null && (fileName.endsWith("/") || fileName.endsWith("\\"));
+    }
+
+    public static String normalizeComment(String comment) {
+        if (StringUtils.isBlank(comment))
+            return null;
+
+        comment = StringUtils.trimToNull(comment);
+
+        if (StringUtils.length(comment) > InternalZipConstants.MAX_ALLOWED_ZIP_COMMENT_LENGTH)
+            throw new ZipException("comment length exceeds maximum length");
+
+        return comment;
     }
 }

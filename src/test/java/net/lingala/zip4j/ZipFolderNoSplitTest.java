@@ -5,7 +5,6 @@ import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.ZipParameters;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -59,7 +58,7 @@ public class ZipFolderNoSplitTest {
 //        FileUtils.deleteQuietly(destDir.toFile());
 //    }
 
-    @Test
+//    @Test(groups = "zip4j")
     public void shouldCreateNewZipWithFolder() throws ZipException, IOException {
         Path zipFile = destDir.resolve("src.zip");
         Path carsDir = srcDir.resolve("cars");
@@ -83,7 +82,7 @@ public class ZipFolderNoSplitTest {
         TestUtils.checkCarsDirectory(resDir.resolve("cars"));
     }
 
-    @Test(dependsOnMethods = "shouldCreateNewZipWithFolder")
+//    @Test(dependsOnMethods = "shouldCreateNewZipWithFolder")
     public void shouldAddFolderToExistedZip() throws ZipException, IOException {
         Path zipFile = destDir.resolve("src.zip");
         Path starWarsDir = srcDir.resolve("Star Wars");
@@ -110,7 +109,7 @@ public class ZipFolderNoSplitTest {
         TestUtils.checkStarWarsDirectory(resDir.resolve("Star Wars"));
     }
 
-    @Test(dependsOnMethods = "shouldAddFolderToExistedZip")
+//    @Test(dependsOnMethods = "shouldAddFolderToExistedZip")
     public void shouldAddEmptyDirectoryToExistedZip() throws ZipException, IOException {
         Path zipFile = destDir.resolve("src.zip");
         Path emptyDir = srcDir.resolve("empty_dir");

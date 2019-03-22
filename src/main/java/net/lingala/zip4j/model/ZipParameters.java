@@ -58,6 +58,7 @@ public class ZipParameters {
     private boolean isSourceExternalStream;
     @Builder.Default
     private long splitLength = ZipModel.NO_SPLIT;
+    private String comment;
 
     /**
      * Sets the password for the zip file or the file being added<br>

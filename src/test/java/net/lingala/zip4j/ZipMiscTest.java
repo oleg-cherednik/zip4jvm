@@ -7,7 +7,6 @@ import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.ZipParameters;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -40,7 +39,7 @@ public class ZipMiscTest {
 //        Files.createDirectories(resDir);
     }
 
-    @Test
+    //    @Test
     public void shouldRetrieveAllEntryNamesForExistedZip() throws ZipException, IOException {
         Path zipFile = destDir.resolve("src.zip");
 
@@ -54,7 +53,7 @@ public class ZipMiscTest {
         assertThat(misc.getEntryNames()).hasSize(15);
     }
 
-    @Test(dependsOnMethods = "shouldRetrieveAllEntryNamesForExistedZip")
+    //    @Test(dependsOnMethods = "shouldRetrieveAllEntryNamesForExistedZip")
     public void shouldRetrieveAllEntryNamesForExistedEncryptedZip() throws ZipException, IOException {
         Path zipFile = destDir.resolve("src.zip");
         Files.deleteIfExists(zipFile);
@@ -75,7 +74,7 @@ public class ZipMiscTest {
         assertThat(misc.getEntryNames()).hasSize(15);
     }
 
-    @Test(dependsOnMethods = "shouldRetrieveAllEntryNamesForExistedEncryptedZip")
+    //    @Test(dependsOnMethods = "shouldRetrieveAllEntryNamesForExistedEncryptedZip")
     public void shouldRetrieveSingleFileWhenNoSplitZip() throws ZipException {
         Path zipFile = destDir.resolve("src.zip");
         assertThat(Files.exists(zipFile)).isTrue();
@@ -85,7 +84,7 @@ public class ZipMiscTest {
         assertThat(misc.getFiles()).hasSize(1);
     }
 
-    @Test(dependsOnMethods = "shouldRetrieveSingleFileWhenNoSplitZip")
+    //    @Test(dependsOnMethods = "shouldRetrieveSingleFileWhenNoSplitZip")
     public void shouldRetrieveMultipleFilesWhenSplitZip() throws IOException, ZipException {
         Path zipFile = destDir.resolve("src.zip");
         Files.deleteIfExists(zipFile);
@@ -114,7 +113,7 @@ public class ZipMiscTest {
         assertThat(files.get(9).getFileName().toString()).isEqualTo("src.z09");
     }
 
-    @Test(dependsOnMethods = "shouldRetrieveMultipleFilesWhenSplitZip")
+    //    @Test(dependsOnMethods = "shouldRetrieveMultipleFilesWhenSplitZip")
     public void shouldMergeSplitZip() throws ZipException, IOException {
         Path zipFile = destDir.resolve("src.zip");
         assertThat(Files.exists(zipFile)).isTrue();

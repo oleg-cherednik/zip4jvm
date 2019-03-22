@@ -6,7 +6,6 @@ import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.InputStreamMeta;
 import net.lingala.zip4j.model.ZipParameters;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -41,7 +40,7 @@ public class ZipStreamNoSplitTest {
 //        Files.createDirectories(resDir);
     }
 
-    @Test
+    //    @Test
     public void shouldCreateNewZipFromGivenStream() throws ZipException, IOException {
         Path zipFile = destDir.resolve("src.zip");
 
@@ -75,7 +74,7 @@ public class ZipStreamNoSplitTest {
         TestUtils.checkCarsDirectory(resDir.resolve("cars"));
     }
 
-    @Test(dependsOnMethods = "shouldCreateNewZipFromGivenStream")
+    //    @Test(dependsOnMethods = "shouldCreateNewZipFromGivenStream")
     public void shouldAddNewFilesFromStreamToExistedZip() throws IOException, ZipException {
         Path zipFile = destDir.resolve("src.zip");
         assertThat(Files.exists(zipFile)).isTrue();

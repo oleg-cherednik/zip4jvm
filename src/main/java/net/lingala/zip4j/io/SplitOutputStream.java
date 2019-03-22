@@ -40,8 +40,13 @@ public class SplitOutputStream extends OutputStream {
     protected long bytesWrittenForThisPart;
 
     @NonNull
-    public static SplitOutputStream create(@NonNull ZipModel zipModel) throws FileNotFoundException, ZipException {
+    public static SplitOutputStream create(@NonNull ZipModel zipModel) throws IOException, ZipException {
         Path zipFile = zipModel.getZipFile();
+        Path parent = zipFile.getParent();
+
+        if (parent != null)
+            Files.createDirectories(parent);
+
         return zipModel.isSplitArchive() ? new SplitOutputStream(zipFile, zipModel.getSplitLength()) : new NoSplitOutputStream(zipFile);
     }
 

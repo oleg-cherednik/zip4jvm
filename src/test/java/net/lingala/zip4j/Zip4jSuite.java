@@ -1,0 +1,99 @@
+package net.lingala.zip4j;
+
+import net.lingala.zip4j.model.AESStrength;
+import net.lingala.zip4j.model.CompressionLevel;
+import net.lingala.zip4j.model.CompressionMethod;
+import net.lingala.zip4j.model.Encryption;
+import net.lingala.zip4j.model.ZipParameters;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeSuite;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Comparator;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+/**
+ * @author Oleg Cherednik
+ * @since 23.03.2019
+ */
+@SuppressWarnings("FieldNamingConvention")
+public class Zip4jSuite {
+
+    public static final Path root = Paths.get("d:/zip4j/foo");//Files.createTempDirectory("zip4j");
+    public static final Path srcDir = root.resolve("src");
+    public static final Path noSplitZip = root.resolve("no_split/src.zip");
+    public static final Path noSplitAesZip = root.resolve("no_split_aes/src.zip");
+
+    public static final char[] password = "1".toCharArray();
+
+    @BeforeSuite
+    public void beforeSuite() throws IOException {
+        System.out.println("@BeforeSuite");
+
+        Files.createDirectories(srcDir);
+        Files.createDirectories(srcDir.resolve("empty_dir"));
+        copyTestData();
+        createNoSplitZip();
+        createEncryptedNoSplitZip();
+    }
+
+    @AfterSuite
+    public void afterSuite() {
+        System.out.println("@AfterSuite");
+    }
+
+    private static void copyTestData() throws IOException {
+        Path dataDir = Paths.get("src/test/resources/data").toAbsolutePath();
+
+        Files.walk(dataDir).forEach(path -> {
+            try {
+                if (Files.isDirectory(path))
+                    Files.createDirectories(srcDir.resolve(dataDir.relativize(path)));
+                else if (Files.isRegularFile(path))
+                    Files.copy(path, srcDir.resolve(dataDir.relativize(path)));
+            } catch(IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private static void createNoSplitZip() throws IOException {
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compressionMethod(CompressionMethod.DEFLATE)
+                                                .compressionLevel(CompressionLevel.NORMAL).build();
+        ZipIt zip = ZipIt.builder().zipFile(noSplitZip).build();
+        zip.add(srcDir, parameters);
+
+        assertThat(Files.exists(noSplitZip)).isTrue();
+        assertThat(Files.isRegularFile(noSplitZip)).isTrue();
+        TestUtils.checkDestinationDir(1, noSplitZip.getParent());
+    }
+
+    private static void createEncryptedNoSplitZip() throws IOException {
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compressionMethod(CompressionMethod.DEFLATE)
+                                                .compressionLevel(CompressionLevel.NORMAL)
+                                                .encryption(Encryption.STANDARD)
+                                                .aesKeyStrength(AESStrength.STRENGTH_256)
+                                                .password(password).build();
+        ZipIt zip = ZipIt.builder().zipFile(noSplitAesZip).build();
+        zip.add(srcDir, parameters);
+
+        assertThat(Files.exists(noSplitZip)).isTrue();
+        assertThat(Files.isRegularFile(noSplitZip)).isTrue();
+        TestUtils.checkDestinationDir(1, noSplitZip.getParent());
+    }
+
+    public static void removeDir(Path path) throws IOException {
+        Files.walk(path)
+             .sorted(Comparator.reverseOrder())
+             .map(Path::toFile)
+             .forEach(File::delete);
+    }
+
+}
