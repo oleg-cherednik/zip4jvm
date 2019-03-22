@@ -21,10 +21,15 @@ public final class OutputStreamDecorator implements Closeable {
     private final byte[] intByte = new byte[4];
 
     private final OutputStream delegate;
-    private long totalBytesWritten;
+    // TODO temporary
+    public long offs;
+
+    public OutputStream getDelegate() {
+        return delegate;
+    }
 
     public void addTotalBytesWritten(int delta) {
-        totalBytesWritten += delta;
+        offs += delta;
     }
 
     public int getCurrSplitFileCounter() {
@@ -32,11 +37,11 @@ public final class OutputStreamDecorator implements Closeable {
     }
 
     public long getOffsLocalHeaderRelative() throws IOException {
-        if (totalBytesWritten == 4)
+        if (offs == 4)
             return 4;
         if (delegate instanceof SplitOutputStream)
             return ((SplitOutputStream)delegate).getFilePointer();
-        return totalBytesWritten;
+        return offs;
     }
 
     public long getSplitLength() {
@@ -51,7 +56,7 @@ public final class OutputStreamDecorator implements Closeable {
     public void writeInt(int val) throws IOException {
         Raw.writeIntLittleEndian(intByte, 0, val);
         delegate.write(intByte);
-        totalBytesWritten += 4;
+        offs += 4;
     }
 
     @Override
