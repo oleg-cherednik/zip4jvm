@@ -119,4 +119,8 @@ public class LocalFileHeader {
         generalPurposeFlag.setEncrypted(encryption != Encryption.OFF);
     }
 
+    public boolean isEncrypted() {
+        return encryption != Encryption.OFF;
+    }
+
 }

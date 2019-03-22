@@ -23,7 +23,7 @@ import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.util.InternalZipConstants;
 import org.apache.commons.lang.ArrayUtils;
 
-public class StandardDecrypter implements IDecrypter {
+public class StandardDecrypter implements Decrypter {
 
     private CentralDirectory.FileHeader fileHeader;
     private byte[] crc = new byte[4];

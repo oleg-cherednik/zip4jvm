@@ -16,7 +16,7 @@
 
 package net.lingala.zip4j.model;
 
-import net.lingala.zip4j.crypto.IDecrypter;
+import net.lingala.zip4j.crypto.Decrypter;
 import net.lingala.zip4j.engine.UnzipEngine;
 
 import java.io.FileOutputStream;
@@ -29,7 +29,7 @@ public class UnzipEngineParameters {
 
     private LocalFileHeader localFileHeader;
 
-    private IDecrypter iDecryptor;
+    private Decrypter iDecryptor;
 
     private FileOutputStream outputStream;
 
@@ -59,11 +59,11 @@ public class UnzipEngineParameters {
         this.localFileHeader = localFileHeader;
     }
 
-    public IDecrypter getIDecryptor() {
+    public Decrypter getIDecryptor() {
         return iDecryptor;
     }
 
-    public void setIDecryptor(IDecrypter decrypter) {
+    public void setIDecryptor(Decrypter decrypter) {
         iDecryptor = decrypter;
     }
 

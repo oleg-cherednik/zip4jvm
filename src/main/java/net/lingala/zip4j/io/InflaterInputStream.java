@@ -34,8 +34,8 @@ public class InflaterInputStream extends PartInputStream {
     private long bytesWritten;
     private long uncompressedSize;
 
-    public InflaterInputStream(RandomAccessFile raf, long start, long len, UnzipEngine unzipEngine) {
-        super(raf, start, len, unzipEngine);
+    public InflaterInputStream(RandomAccessFile raf, long offs, long len, UnzipEngine unzipEngine) {
+        super(raf, offs, len, unzipEngine);
         this.inflater = new Inflater(true);
         this.buff = new byte[InternalZipConstants.BUFF_SIZE];
         this.unzipEngine = unzipEngine;

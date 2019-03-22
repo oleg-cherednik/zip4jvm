@@ -31,7 +31,7 @@ import net.lingala.zip4j.util.Raw;
 
 import java.util.Arrays;
 
-public class AESDecrypter implements IDecrypter {
+public class AESDecrypter implements Decrypter {
 
     @NonNull
     private final LocalFileHeader localFileHeader;

@@ -17,7 +17,7 @@
 package net.lingala.zip4j.io;
 
 import net.lingala.zip4j.crypto.AESDecrypter;
-import net.lingala.zip4j.crypto.IDecrypter;
+import net.lingala.zip4j.crypto.Decrypter;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.engine.UnzipEngine;
@@ -31,14 +31,14 @@ public class PartInputStream extends InputStream {
     private RandomAccessFile raf;
     private long bytesRead, length;
     private UnzipEngine unzipEngine;
-    private IDecrypter decrypter;
+    private Decrypter decrypter;
     private byte[] oneByteBuff = new byte[1];
     private byte[] aesBlockByte = new byte[16];
     private int aesBytesReturned = 0;
     private boolean isAESEncryptedFile = false;
     private int count = -1;
 
-    public PartInputStream(RandomAccessFile raf, long start, long len, UnzipEngine unzipEngine) {
+    public PartInputStream(RandomAccessFile raf, long offs, long len, UnzipEngine unzipEngine) {
         this.raf = raf;
         this.unzipEngine = unzipEngine;
         this.decrypter = unzipEngine.getDecrypter();

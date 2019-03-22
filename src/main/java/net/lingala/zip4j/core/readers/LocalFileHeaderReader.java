@@ -24,6 +24,7 @@ public final class LocalFileHeaderReader {
     private final LittleEndianRandomAccessFile in;
     private final CentralDirectory.FileHeader fileHeader;
 
+    @NonNull
     public LocalFileHeader read() throws IOException, ZipException {
         findHead();
 
