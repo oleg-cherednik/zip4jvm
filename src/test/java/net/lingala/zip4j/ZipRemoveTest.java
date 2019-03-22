@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * @author Oleg Cherednik
  * @since 15.03.2019
@@ -51,11 +53,11 @@ public class ZipRemoveTest {
                 srcDir.resolve("cars/wiesmann-gt-mf5.jpg")
         );
 
-//        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-//        zip.add(files, parameters);
+        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
+        zip.add(files, parameters);
 
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
-//        assertThat(misc.getEntryNames()).hasSize(1);
+        assertThat(misc.getEntryNames()).hasSize(3);
 
         Collection<String> entries = Arrays.asList(
                 "cars/bentley-continental.jpg",
@@ -63,6 +65,6 @@ public class ZipRemoveTest {
 //                "cars/wiesmann-gt-mf5.jpg"
         );
         misc.removeEntries(entries);
-//        assertThat(misc.getEntryNames()).hasSize(2);
+        assertThat(misc.getEntryNames()).hasSize(1);
     }
 }

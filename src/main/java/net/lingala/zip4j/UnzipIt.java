@@ -55,10 +55,10 @@ public class UnzipIt {
     }
 
     static void checkZipFile(Path zipFile) {
-        if (!Files.isRegularFile(zipFile))
-            throw new ZipException("ZipFile is not a regular file: " + zipFile);
         if (!Files.exists(zipFile))
             throw new ZipException("ZipFile not exists: " + zipFile);
+        if (!Files.isRegularFile(zipFile))
+            throw new ZipException("ZipFile is not a regular file: " + zipFile);
     }
 
     static void checkOutputFolder(@NonNull Path dir) throws ZipException {

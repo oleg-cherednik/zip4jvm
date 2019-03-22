@@ -58,6 +58,15 @@ public class CentralDirectory {
 
     @NonNull
     public FileHeader getFileHeaderByEntryName(@NonNull String entryName) {
+        FileHeader fileHeader = getNullableFileHeaderByEntryName(entryName);
+
+        if (fileHeaders.isEmpty())
+            throw new ZipException("File header with entry name '" + entryName + "' was not found");
+
+        return fileHeader;
+    }
+
+    public FileHeader getNullableFileHeaderByEntryName(@NonNull String entryName) {
         String name = FilenameUtils.normalize(entryName.toLowerCase(), true);
 
         List<FileHeader> fileHeaders = this.fileHeaders.stream()
@@ -66,10 +75,8 @@ public class CentralDirectory {
 
         if (fileHeaders.size() > 1)
             throw new ZipException("Multiple file headers found for entry name '" + entryName + '\'');
-        if (fileHeaders.isEmpty())
-            throw new ZipException("File header with entry name '" + entryName + "' was not found");
 
-        return fileHeaders.get(0);
+        return fileHeaders.isEmpty() ? null : fileHeaders.get(0);
     }
 
     @Getter

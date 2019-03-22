@@ -22,7 +22,6 @@ import net.lingala.zip4j.core.HeaderWriter;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.FileInputStream;
@@ -36,38 +35,47 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public final class RemoveEntryFunc implements Consumer<Collection<String>> {
+
     @NonNull
     private final ZipModel zipModel;
-    private final Function<Collection<String>, Set<String>> normalize = entries -> entries.stream()
-                                                                                          .map(entryName -> FilenameUtils.normalize(entryName, true))
-                                                                                          .collect(Collectors.toSet());
 
     public void accept(@NonNull String entryName) {
         accept(Collections.singleton(entryName));
     }
 
     @Override
-    public void accept(@NonNull Collection<String> removeEntries) {
-        if (removeEntries.isEmpty())
+    public void accept(@NonNull Collection<String> entries) {
+        entries = getExistedEntries(entries);
+
+        if (entries.isEmpty())
             return;
 
         Path tmpZipFile = createTempFile();
 
         try (OutputStream out = new FileOutputStream(tmpZipFile.toFile())) {
-            writeFileHeaders(out, normalize.apply(removeEntries));
+            writeFileHeaders(out, entries);
             new HeaderWriter().finalizeZipFile(zipModel, out);
         } catch(IOException e) {
             throw new ZipException(e);
         }
 
         restoreFileName(tmpZipFile);
+    }
+
+    private Set<String> getExistedEntries(Collection<String> entries) {
+        return entries.stream()
+                      .filter(Objects::nonNull)
+                      .map(entryName -> zipModel.getCentralDirectory().getNullableFileHeaderByEntryName(entryName))
+                      .filter(Objects::nonNull)
+                      .map(CentralDirectory.FileHeader::getFileName)
+                      .collect(Collectors.toSet());
     }
 
     private Path createTempFile() {
@@ -78,7 +86,7 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
         }
     }
 
-    private void writeFileHeaders(OutputStream out, Collection<String> removeEntries) throws IOException {
+    private void writeFileHeaders(OutputStream out, Collection<String> entries) throws IOException {
         List<CentralDirectory.FileHeader> fileHeaders = new ArrayList<>();
         CentralDirectory.FileHeader prv = null;
 
@@ -108,7 +116,7 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
 //                fileHeader.setOffsLocalFileHeader(offsetLocalHdr - (offs - offsetLocalFileHeader) - 1);
                 }
 
-                prv = removeEntries.contains(header.getFileName()) ? null : header;
+                prv = entries.contains(header.getFileName()) ? null : header;
                 skip = header.getOffsLocalFileHeader() - offsIn;
             }
 
