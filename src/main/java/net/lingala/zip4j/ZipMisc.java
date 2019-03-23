@@ -5,7 +5,7 @@ import lombok.NonNull;
 import net.lingala.zip4j.core.HeaderWriter;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.NoSplitOutputStream;
-import net.lingala.zip4j.io.SplitOutputStream;
+import net.lingala.zip4j.io.OutputStreamDecorator;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.CreateZipModelSup;
@@ -51,7 +51,7 @@ public final class ZipMisc {
         ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get().noSplitOnly();
         zipModel.getEndCentralDirectory().setComment(comment);
 
-        try (SplitOutputStream out = new NoSplitOutputStream(zipModel.getZipFile())) {
+        try (OutputStreamDecorator out = new OutputStreamDecorator(new NoSplitOutputStream(zipModel.getZipFile()))) {
             out.seek(zipModel.getOffsCentralDirectory());
             new HeaderWriter().finalizeZipFileWithoutValidations(zipModel, out);
         } catch(Exception e) {
@@ -98,8 +98,8 @@ public final class ZipMisc {
         if (!zipModel.isSplitArchive())
             throw new ZipException("archive not a split zip file");
 
-        try (OutputStream out = new FileOutputStream(destZipFile.toFile())) {
-            zipModel.convertToSolid(copyAllParts(out, zipModel));
+        try (OutputStreamDecorator out = new OutputStreamDecorator(new FileOutputStream(destZipFile.toFile()))) {
+            zipModel.convertToSolid(copyAllParts(out.getDelegate(), zipModel));
             new HeaderWriter().finalizeZipFileWithoutValidations(zipModel, out);
         } catch(ZipException e) {
             throw e;

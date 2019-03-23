@@ -20,6 +20,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.core.HeaderWriter;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.io.OutputStreamDecorator;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
 import org.apache.commons.io.IOUtils;
@@ -28,7 +29,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -59,7 +59,7 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
 
         Path tmpZipFile = createTempFile();
 
-        try (OutputStream out = new FileOutputStream(tmpZipFile.toFile())) {
+        try (OutputStreamDecorator out = new OutputStreamDecorator(new FileOutputStream(tmpZipFile.toFile()))) {
             writeFileHeaders(out, entries);
             new HeaderWriter().finalizeZipFile(zipModel, out);
         } catch(IOException e) {
@@ -86,7 +86,7 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
         }
     }
 
-    private void writeFileHeaders(OutputStream out, Collection<String> entries) throws IOException {
+    private void writeFileHeaders(OutputStreamDecorator out, Collection<String> entries) throws IOException {
         List<CentralDirectory.FileHeader> fileHeaders = new ArrayList<>();
         CentralDirectory.FileHeader prv = null;
 
@@ -99,7 +99,7 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
                 if (prv != null) {
                     long curOffs = offsOut;
                     long length = header.getOffsLocalFileHeader() - prv.getOffsLocalFileHeader();
-                    offsIn += skip + IOUtils.copyLarge(in, out, skip, length);
+                    offsIn += skip + IOUtils.copyLarge(in, out.getDelegate(), skip, length);
                     offsOut += length;
                     fileHeaders.add(prv);
                     prv.setOffsLocalFileHeader(curOffs);
@@ -123,7 +123,7 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
             if (prv != null) {
                 long curOffs = offsOut;
                 long length = zipModel.getOffsCentralDirectory() - prv.getOffsLocalFileHeader();
-                offsOut += IOUtils.copyLarge(in, out, skip, length);
+                offsOut += IOUtils.copyLarge(in, out.getDelegate(), skip, length);
                 fileHeaders.add(prv);
                 prv.setOffsLocalFileHeader(curOffs);
             }

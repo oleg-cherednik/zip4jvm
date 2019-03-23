@@ -5,7 +5,6 @@ import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.ZipParameters;
-import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 
 import java.io.File;
@@ -45,9 +44,9 @@ public class Zip4jSuite {
         createEncryptedNoSplitZip();
     }
 
-    @AfterSuite(enabled = clear)
-    public void afterSuite() {
-        System.out.println("@AfterSuite");
+    //    @AfterSuite(enabled = clear)
+    public void afterSuite() throws IOException {
+        removeDir(root);
     }
 
     private static void copyTestData() throws IOException {
@@ -93,6 +92,9 @@ public class Zip4jSuite {
     }
 
     public static void removeDir(Path path) throws IOException {
+        if (!Files.exists(path))
+            return;
+
         Files.walk(path)
              .sorted(Comparator.reverseOrder())
              .map(Path::toFile)
