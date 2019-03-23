@@ -5,14 +5,14 @@ import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.ZipParameters;
+import org.apache.commons.io.FileUtils;
+import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Comparator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,7 +31,7 @@ public class Zip4jSuite {
     /** Password for encrypted zip */
     public static final char[] password = "1".toCharArray();
     /** Clear resources */
-    public static final boolean clear = false;
+    public static final boolean clear = true;
 
     @BeforeSuite
     public void beforeSuite() throws IOException {
@@ -44,7 +44,7 @@ public class Zip4jSuite {
         createEncryptedNoSplitZip();
     }
 
-    //    @AfterSuite(enabled = clear)
+    @AfterSuite(enabled = clear)
     public void afterSuite() throws IOException {
         removeDir(root);
     }
@@ -92,13 +92,8 @@ public class Zip4jSuite {
     }
 
     public static void removeDir(Path path) throws IOException {
-        if (!Files.exists(path))
-            return;
-
-        Files.walk(path)
-             .sorted(Comparator.reverseOrder())
-             .map(Path::toFile)
-             .forEach(File::delete);
+        if (Files.exists(path))
+            FileUtils.deleteQuietly(path.toFile());
     }
 
 }
