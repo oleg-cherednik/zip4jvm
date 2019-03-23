@@ -29,11 +29,14 @@ public class Zip4jSuite {
     public static final Path noSplitZip = root.resolve("no_split/src.zip");
     public static final Path noSplitAesZip = root.resolve("no_split_aes/src.zip");
 
+    /** Password for encrypted zip */
     public static final char[] password = "1".toCharArray();
+    /** Clear resources */
+    public static final boolean clear = false;
 
     @BeforeSuite
     public void beforeSuite() throws IOException {
-        System.out.println("@BeforeSuite");
+        removeDir(root);
 
         Files.createDirectories(srcDir);
         Files.createDirectories(srcDir.resolve("empty_dir"));
@@ -42,7 +45,7 @@ public class Zip4jSuite {
         createEncryptedNoSplitZip();
     }
 
-    @AfterSuite
+    @AfterSuite(enabled = clear)
     public void afterSuite() {
         System.out.println("@AfterSuite");
     }

@@ -57,7 +57,6 @@ public abstract class CipherOutputStream extends OutputStream {
 
 
     protected final CRC32 crc = new CRC32();
-    private long bytesWrittenForThisFile;
     private final byte[] pendingBuffer = new byte[InternalZipConstants.AES_BLOCK_SIZE];
     private int pendingBufferLength;
     protected long totalBytesRead;
@@ -108,17 +107,12 @@ public abstract class CipherOutputStream extends OutputStream {
                 out.writeInt(InternalZipConstants.SPLITSIG);
 
             fileHeader.setOffsLocalFileHeader(out.getOffsLocalHeaderRelative());
-            out.addTotalBytesWritten(new LocalFileHeaderWriter(localFileHeader).write(zipModel, out.getDelegate()));
+            new LocalFileHeaderWriter(localFileHeader).write(zipModel, out);
 
             encryptor = parameters.getEncryption().createEncryptor(parameters, localFileHeader);
             out.mark();
 
-            long length = encryptor.write(out.getDelegate());
-            out.addTotalBytesWritten(length);
-
-
-            bytesWrittenForThisFile += length;
-
+            encryptor.write(out);
             crc.reset();
         } catch(ZipException e) {
             throw e;
@@ -177,37 +171,27 @@ public abstract class CipherOutputStream extends OutputStream {
             encryptAndWrite(b, off, len);
     }
 
-    private void encryptAndWrite(byte[] b, int off, int len) throws IOException {
-        try {
-            encryptor.encrypt(b, off, len);
-            out.getDelegate().write(b, off, len);
-            out.addTotalBytesWritten(len);
-            bytesWrittenForThisFile += len;
-        } catch(ZipException e) {
-            throw new IOException(e);
-        }
+    private void encryptAndWrite(byte[] buf, int offs, int len) throws IOException {
+        encryptor.encrypt(buf, offs, len);
+        out.writeBytes(buf, offs, len);
     }
 
     public void closeEntry() throws IOException, ZipException {
 
-        if (this.pendingBufferLength != 0) {
+        if (pendingBufferLength != 0) {
             encryptAndWrite(pendingBuffer, 0, pendingBufferLength);
             pendingBufferLength = 0;
         }
 
         if (parameters.getEncryption() == Encryption.AES) {
             if (encryptor instanceof AESEncryptor) {
-                out.getDelegate().write(((AESEncryptor)encryptor).getFinalMac());
-                bytesWrittenForThisFile += 10;
-                out.addTotalBytesWritten(10);
+                out.writeBytes(((AESEncryptor)encryptor).getFinalMac());
             } else
                 throw new ZipException("invalid encryptor for AES encrypted file");
         }
 
-//        long offs = out.getWrittenBytesAmount();
-//        boolean eq = offs == bytesWrittenForThisFile;
-        fileHeader.setCompressedSize(bytesWrittenForThisFile);
-        localFileHeader.setCompressedSize(bytesWrittenForThisFile);
+        fileHeader.setCompressedSize(out.getWrittenBytesAmount());
+        localFileHeader.setCompressedSize(out.getWrittenBytesAmount());
 
         if (parameters.isSourceExternalStream()) {
             fileHeader.setUncompressedSize(totalBytesRead);
@@ -229,11 +213,10 @@ public abstract class CipherOutputStream extends OutputStream {
         zipModel.addLocalFileHeader(localFileHeader);
         zipModel.addFileHeader(fileHeader);
 
-        out.addTotalBytesWritten(new LocalFileHeaderWriter(localFileHeader).writeExtended(out.getDelegate()));
+        new LocalFileHeaderWriter(localFileHeader).writeExtended(out);
 
         crc.reset();
         out.mark();
-        bytesWrittenForThisFile = 0;
         encryptor = Encryptor.NULL;
         totalBytesRead = 0;
     }
@@ -247,21 +230,6 @@ public abstract class CipherOutputStream extends OutputStream {
     public void close() throws IOException {
         finish();
         out.close();
-    }
-
-    public void decrementCompressedFileSize(int value) {
-        if (value <= 0) return;
-
-        if (value <= this.bytesWrittenForThisFile) {
-            this.bytesWrittenForThisFile -= value;
-            out.offs -= value;
-        }
-    }
-
-    protected void updateTotalBytesRead(int toUpdate) {
-        if (toUpdate > 0) {
-            totalBytesRead += toUpdate;
-        }
     }
 
     public void seek(long pos) throws IOException {

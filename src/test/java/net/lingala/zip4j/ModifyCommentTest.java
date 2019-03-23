@@ -30,9 +30,9 @@ public class ModifyCommentTest {
         Files.createDirectories(root);
     }
 
-    @AfterClass
+    @AfterClass(enabled = Zip4jSuite.clear)
     public static void removeDir() throws IOException {
-//        Zip4jSuite.removeDir(root);
+        Zip4jSuite.removeDir(root);
     }
 
     @Test

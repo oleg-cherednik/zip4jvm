@@ -58,11 +58,10 @@ public class DeflateOutputStream extends CipherOutputStream {
         int len = deflater.deflate(buf, 0, buf.length);
         if (len > 0) {
             if (deflater.finished()) {
-                if (len == 4) return;
-                if (len < 4) {
-                    decrementCompressedFileSize(4 - len);
+                if (len == 4)
                     return;
-                }
+                if (len < 4)
+                    return;
                 len -= 4;
             }
             if (!firstBytesRead) {

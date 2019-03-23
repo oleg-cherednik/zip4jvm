@@ -22,21 +22,16 @@ public final class OutputStreamDecorator implements Closeable {
     private final byte[] intByte = new byte[4];
 
     private final OutputStream delegate;
-    // TODO temporary public
-    public long offs;
+    private long offs;
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     private long mark;
-
-    public void addTotalBytesWritten(long total) {
-        offs += total;
-    }
 
     public void mark() {
         mark = offs;
     }
 
-    public long getWrittenBytes() {
+    public long getWrittenBytesAmount() {
         return offs - mark;
     }
 
@@ -73,12 +68,12 @@ public final class OutputStreamDecorator implements Closeable {
 
     public void writeBytes(byte... buf) throws IOException {
         delegate.write(buf);
-//        offs += buf.length;
+        offs += buf.length;
     }
 
     public void writeBytes(byte[] buf, int offs, int len) throws IOException {
         delegate.write(buf, offs, len);
-//        this.offs += len;
+        this.offs += len;
     }
 
     @Override

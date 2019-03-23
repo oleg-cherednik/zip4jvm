@@ -21,12 +21,12 @@ import net.lingala.zip4j.crypto.PBKDF2.PBKDF2Engine;
 import net.lingala.zip4j.crypto.PBKDF2.PBKDF2Parameters;
 import net.lingala.zip4j.crypto.engine.AESEngine;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.io.OutputStreamDecorator;
 import net.lingala.zip4j.model.AESStrength;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.Raw;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Random;
 
 public class AESEncryptor implements Encryptor {
@@ -138,10 +138,9 @@ public class AESEncryptor implements Encryptor {
     }
 
     @Override
-    public long write(OutputStream out) throws IOException {
-        out.write(saltBytes);
-        out.write(derivedPasswordVerifier);
-        return saltBytes.length + derivedPasswordVerifier.length;
+    public void write(OutputStreamDecorator out) throws IOException {
+        out.writeBytes(saltBytes);
+        out.writeBytes(derivedPasswordVerifier);
     }
 
     private static byte[] generateSalt(int size) throws ZipException {
