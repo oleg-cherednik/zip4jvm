@@ -74,14 +74,6 @@ public class DeflateOutputStream extends CipherOutputStream {
         }
     }
 
-    private void decrementCompressedFileSize(int value) {
-        if (value <= 0)
-            return;
-
-        if (value <= out.getWrittenBytes())
-            out.offs -= value;
-    }
-
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
         crc.update(buf, offs, len);

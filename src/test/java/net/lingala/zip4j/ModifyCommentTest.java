@@ -32,7 +32,7 @@ public class ModifyCommentTest {
 
     @AfterClass
     public static void removeDir() throws IOException {
-        Zip4jSuite.removeDir(root);
+//        Zip4jSuite.removeDir(root);
     }
 
     @Test

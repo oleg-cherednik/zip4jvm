@@ -28,6 +28,10 @@ public final class OutputStreamDecorator implements Closeable {
     @Setter(AccessLevel.NONE)
     private long mark;
 
+    public void addTotalBytesWritten(long total) {
+        offs += total;
+    }
+
     public void mark() {
         mark = offs;
     }
@@ -69,12 +73,12 @@ public final class OutputStreamDecorator implements Closeable {
 
     public void writeBytes(byte... buf) throws IOException {
         delegate.write(buf);
-        offs += buf.length;
+//        offs += buf.length;
     }
 
     public void writeBytes(byte[] buf, int offs, int len) throws IOException {
         delegate.write(buf, offs, len);
-        this.offs += len;
+//        this.offs += len;
     }
 
     @Override
