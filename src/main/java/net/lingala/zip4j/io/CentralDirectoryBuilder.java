@@ -13,6 +13,7 @@ import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.ZipUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
@@ -82,6 +83,7 @@ public class CentralDirectoryBuilder {
         return localFileHeader;
     }
 
+    @NonNull
     private String getFileName() throws IOException {
         String fileName = fileNameStream;
 
@@ -92,9 +94,9 @@ public class CentralDirectoryBuilder {
             throw new IOException("fileName is null or empty. unable to create file header");
 
         if (!parameters.isSourceExternalStream() && Files.isDirectory(sourceFile) && !ZipUtils.isDirectory(fileName))
-            fileName += InternalZipConstants.FILE_SEPARATOR;
+            fileName += "/";
 
-        return fileName;
+        return FilenameUtils.normalize(fileName, true);
     }
 
     private void updateGeneralPurposeFlag(@NonNull GeneralPurposeFlag generalPurposeFlag) {

@@ -74,7 +74,7 @@ public class ZipEngine {
 
                 if (Files.isRegularFile(entry)) {
                     if (params.getEncryption() == Encryption.STANDARD)
-                        params.setSourceFileCRC(new CalculateChecksumFunc().applyAsLong(entry));
+                        params.setSourceFileCRC(new CalculateChecksumFunc(entry).getAsLong());
 
                     if (Files.size(entry) == 0)
                         params.setCompressionMethod(CompressionMethod.STORE);

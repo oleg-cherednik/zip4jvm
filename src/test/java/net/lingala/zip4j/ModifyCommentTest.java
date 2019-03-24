@@ -21,18 +21,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SuppressWarnings("FieldNamingConvention")
 public class ModifyCommentTest {
 
-    private static final Path root = Zip4jSuite.root.resolve(ModifyCommentTest.class.getSimpleName());
-
-    private final Path zipFile = root.resolve("src.zip");
+    private static final Path rootDir = Zip4jSuite.rootDir.resolve(ModifyCommentTest.class.getSimpleName());
+    private static final Path zipFile = rootDir.resolve("src.zip");
 
     @BeforeClass
     public static void createDir() throws IOException {
-        Files.createDirectories(root);
+        Files.createDirectories(rootDir);
     }
 
     @AfterClass(enabled = Zip4jSuite.clear)
     public static void removeDir() throws IOException {
-        Zip4jSuite.removeDir(root);
+        Zip4jSuite.removeDir(rootDir);
     }
 
     @Test
@@ -43,13 +42,13 @@ public class ModifyCommentTest {
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .comment("Oleg Cherednik - Олег Чередник").build();
-        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-        zip.add(Zip4jSuite.srcDir.resolve("cars"), parameters);
+        ZipIt zipIt = ZipIt.builder().zipFile(zipFile).build();
+        zipIt.add(Zip4jSuite.srcDir.resolve("cars"), parameters);
 
         assertThat(Files.exists(zipFile)).isTrue();
         assertThat(Files.isRegularFile(zipFile)).isTrue();
         assertThat(misc.getComment()).isEqualTo("Oleg Cherednik - Олег Чередник");
-        TestUtils.checkDirectory(root, 0, 1);
+        TestUtils.checkDirectory(rootDir, 0, 1);
     }
 
     @Test(dependsOnMethods = "shouldCreateNewZipWithComment")

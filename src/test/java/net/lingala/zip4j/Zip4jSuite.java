@@ -23,19 +23,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SuppressWarnings("FieldNamingConvention")
 public class Zip4jSuite {
 
-    public static final Path root = Paths.get("d:/zip4j/foo");//Files.createTempDirectory("zip4j");
-    public static final Path srcDir = root.resolve("src");
-    public static final Path noSplitZip = root.resolve("no_split/src.zip");
-    public static final Path noSplitAesZip = root.resolve("no_split_aes/src.zip");
+    public static final Path rootDir = Paths.get("d:/zip4j/foo");//Files.createTempDirectory("zip4j");
+    public static final Path srcDir = rootDir.resolve("src");
+    public static final Path carsDir = srcDir.resolve("cars");
+    public static final Path noSplitZip = rootDir.resolve("no_split/src.zip");
+    public static final Path noSplitAesZip = rootDir.resolve("no_split_aes/src.zip");
 
     /** Password for encrypted zip */
     public static final char[] password = "1".toCharArray();
     /** Clear resources */
-    public static final boolean clear = true;
+    public static final boolean clear = false;
 
     @BeforeSuite
     public void beforeSuite() throws IOException {
-        removeDir(root);
+        removeDir(rootDir);
 
         Files.createDirectories(srcDir);
         Files.createDirectories(srcDir.resolve("empty_dir"));
@@ -46,7 +47,7 @@ public class Zip4jSuite {
 
     @AfterSuite(enabled = clear)
     public void afterSuite() throws IOException {
-        removeDir(root);
+        removeDir(rootDir);
     }
 
     private static void copyTestData() throws IOException {

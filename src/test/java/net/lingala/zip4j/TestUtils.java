@@ -1,14 +1,24 @@
 package net.lingala.zip4j;
 
 import lombok.experimental.UtilityClass;
+import org.apache.commons.io.FilenameUtils;
 
 import javax.imageio.ImageIO;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -100,4 +110,124 @@ class TestUtils {
     private long getFoldersAmount(Path dir) throws IOException {
         return Files.list(dir).filter(path -> Files.isDirectory(path)).count();
     }
+
+    // -------
+
+    void checkCarsDirectory(ZipFile zip, String dir) {
+        checkDirectory(zip, dir, 0, 3);
+        checkImage(zip, dir + "bentley-continental.jpg", 1_395_362);
+        checkImage(zip, dir + "ferrari-458-italia.jpg", 320_894);
+        checkImage(zip, dir + "wiesmann-gt-mf5.jpg", 729_633);
+    }
+
+//    void checkDirectory(ZipFile zip, String dir, int foldersAmount, int regularFilesAmount) {
+//        assertThat(getFoldersAmount(zip, dir)).isEqualTo(foldersAmount);
+//        assertThat(getRegularFilesAmount(zip, dir)).isEqualTo(regularFilesAmount);
+//    }
+
+    void checkDirectory(ZipFile zipFile, String dir, int foldersAmount, int regularFilesAmount) {
+        if (!"/".equals(dir)) {
+            ZipEntry entry = zipFile.getEntry(dir);
+
+            assertThat(entry).isNotNull();
+            assertThat(entry.isDirectory()).isTrue();
+        }
+
+        assertThat(getFoldersAmount(zipFile, dir)).isEqualTo(foldersAmount);
+        assertThat(getRegularFilesAmount(zipFile, dir)).isEqualTo(regularFilesAmount);
+    }
+
+    private long getRegularFilesAmount(ZipFile zip, String dir) {
+        Map<String, Set<String>> map = walk(zip);
+        long count = 0;
+
+        for (String entryName : map.getOrDefault(dir, Collections.emptySet()))
+            if (!isDirectory(entryName))
+                count++;
+
+        return count;
+    }
+
+    private long getFoldersAmount(ZipFile zip, String dir) {
+        Map<String, Set<String>> map = walk(zip);
+        long count = 0;
+
+        for (String entryName : map.getOrDefault(dir, Collections.emptySet()))
+            if (isDirectory(entryName))
+                count++;
+
+        return count;
+    }
+
+    private static Map<String, Set<String>> walk(ZipFile zip) {
+        Map<String, Set<String>> map = new HashMap<>();
+
+        Enumeration<? extends ZipEntry> entries = zip.entries();
+
+        while (entries.hasMoreElements())
+            add(entries.nextElement().getName(), map);
+
+        return map;
+    }
+
+    public static void main(String... args) {
+        Map<String, Set<String>> map = new HashMap<>();
+
+        add("aaa/bbbb/ccccc/foo.txt", map);
+        add("aaa/bbbb/ccccc/bar.txt", map);
+        add("aaa/bbbb/ccccc1/foo.txt", map);
+        add("aaa/bbbb1/ccccc/bar.txt", map);
+
+
+        int a = 0;
+        a++;
+    }
+
+    private static void add(String entryName, Map<String, Set<String>> map) {
+        int offs = 0;
+        String parent = "/";
+
+        while (parent != null) {
+            map.computeIfAbsent(parent, val -> new HashSet<>());
+
+            int pos = entryName.indexOf('/', offs);
+
+            if (pos >= 0) {
+                String part = entryName.substring(offs, pos + 1);
+                String path = entryName.substring(0, pos + 1);
+
+                map.computeIfAbsent(path, val -> new HashSet<>());
+                map.get(parent).add(part);
+
+                offs = pos + 1;
+                parent = path;
+            } else {
+                if (offs < entryName.length())
+                    map.get(parent).add(entryName.substring(offs));
+                parent = null;
+            }
+        }
+    }
+
+    private boolean isDirectory(String entryName) {
+        return FilenameUtils.getExtension(entryName).isEmpty();
+    }
+
+    void checkImage(ZipFile zip, String entryName, long size) {
+        ZipEntry entry = zip.getEntry(entryName);
+
+        assertThat(entry).isNotNull();
+        assertThat(entry.isDirectory()).isFalse();
+        assertThat(entry.getSize()).isEqualTo(size);
+        assertThat(isImage(zip, entry)).isTrue();
+    }
+
+    private boolean isImage(ZipFile zipFile, ZipEntry entry) {
+        try (InputStream in = zipFile.getInputStream(entry)) {
+            return ImageIO.read(in) != null;
+        } catch(Exception e) {
+            return false;
+        }
+    }
+
 }
