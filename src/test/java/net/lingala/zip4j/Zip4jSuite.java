@@ -25,7 +25,11 @@ public class Zip4jSuite {
 
     public static final Path rootDir = Paths.get("d:/zip4j/foo");//Files.createTempDirectory("zip4j");
     public static final Path srcDir = rootDir.resolve("src");
+
     public static final Path carsDir = srcDir.resolve("cars");
+    public static final Path starWarsDir = srcDir.resolve("Star Wars");
+    public static final Path emptyDir = srcDir.resolve("empty_dir");
+
     public static final Path noSplitZip = rootDir.resolve("no_split/src.zip");
     public static final Path noSplitAesZip = rootDir.resolve("no_split_aes/src.zip");
 

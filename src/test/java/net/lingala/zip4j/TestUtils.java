@@ -106,11 +106,21 @@ class TestUtils {
 
     // -------
 
-    final Consumer<AbstractZipEntryDirectoryAssert<?>> carsDirectoryAssert = dir -> {
+    final Consumer<AbstractZipEntryDirectoryAssert<?>> carsDirAssert = dir -> {
         dir.exists().hasSubDirectories(0).hasFiles(3);
         dir.file("bentley-continental.jpg").exists().isImage().hasSize(1_395_362);
         dir.file("ferrari-458-italia.jpg").exists().isImage().hasSize(320_894);
         dir.file("wiesmann-gt-mf5.jpg").exists().isImage().hasSize(729_633);
     };
+
+    final Consumer<AbstractZipEntryDirectoryAssert<?>> starWarsDirAssert = dir -> {
+        dir.exists().hasSubDirectories(0).hasFiles(4);
+        dir.file("0qQnv2v.jpg").exists().isImage().hasSize(2_204_448);
+        dir.file("080fc325efa248454e59b84be24ea829.jpg").exists().isImage().hasSize(277_857);
+        dir.file("pE9Hkw6.jpg").exists().isImage().hasSize(1_601_879);
+        dir.file("star-wars-wallpapers-29931-7188436.jpg").exists().isImage().hasSize(1_916_776);
+    };
+
+    final Consumer<AbstractZipEntryDirectoryAssert<?>> emptyDirAssert = dir -> dir.exists().hasSubDirectories(0).hasFiles(0);
 
 }
