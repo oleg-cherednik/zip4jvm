@@ -170,19 +170,6 @@ class TestUtils {
         return map;
     }
 
-    public static void main(String... args) {
-        Map<String, Set<String>> map = new HashMap<>();
-
-        add("aaa/bbbb/ccccc/foo.txt", map);
-        add("aaa/bbbb/ccccc/bar.txt", map);
-        add("aaa/bbbb/ccccc1/foo.txt", map);
-        add("aaa/bbbb1/ccccc/bar.txt", map);
-
-
-        int a = 0;
-        a++;
-    }
-
     private static void add(String entryName, Map<String, Set<String>> map) {
         int offs = 0;
         String parent = "/";

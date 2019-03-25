@@ -13,7 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.zip.ZipFile;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThat;
 
 /**
  * @author Oleg Cherednik
@@ -50,7 +50,7 @@ public class ZipFolderNoSplitTest {
 
         ZipFile zip = new ZipFile(zipFile.toFile());
         TestUtils.checkDestinationDir(1, zipFile.getParent());
-        TestUtils.checkDirectory(zip, "/", 1, 0);
+        assertThat(zip).hasDirectory("/").withTotalDirectories(1).withTotalFiles(0);
         TestUtils.checkCarsDirectory(zip, "cars/");
     }
 
