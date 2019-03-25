@@ -19,6 +19,6 @@ public class Zip4jAssertionsForClassTypes extends AssertionsForClassTypes {
     }
 
     public static AbstractZipEntryAssert<?> assertThat(ZipEntry actual, ZipFile zipFile) {
-        return new ZipEntryAssert(actual, zipFile);
+        return actual.isDirectory() ? new ZipEntryFileAssert(actual, zipFile) : new ZipEntryDirectoryAssert(actual, zipFile);
     }
 }

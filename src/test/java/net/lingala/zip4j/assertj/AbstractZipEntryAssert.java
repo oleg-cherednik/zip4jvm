@@ -1,9 +1,7 @@
 package net.lingala.zip4j.assertj;
 
-import org.apache.commons.io.FilenameUtils;
 import org.assertj.core.api.AbstractAssert;
 
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,49 +17,33 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 25.03.2019
  */
 @SuppressWarnings("NewClassNamingConvention")
-public class AbstractZipEntryAssert<SELF extends AbstractZipEntryAssert<SELF>> extends AbstractAssert<SELF, ZipEntry> {
+public abstract class AbstractZipEntryAssert<SELF extends AbstractZipEntryAssert<SELF>> extends AbstractAssert<SELF, ZipEntry> {
+
     protected final ZipFile zipFile;
 
-    public AbstractZipEntryAssert(ZipEntry actual, Class<?> selfType, ZipFile zipFile) {
+    protected AbstractZipEntryAssert(ZipEntry actual, Class<?> selfType, ZipFile zipFile) {
         super(actual, selfType);
         this.zipFile = zipFile;
     }
 
-    public SELF withTotalDirectories(int expected) {
-        assertThat(getFoldersAmount()).isEqualTo(expected);
+    public SELF exists() {
+        isNotNull();
+        assertThat(entries()).contains(actual.getName());
         return myself;
     }
 
-    public SELF withTotalFiles(int expected) {
-        assertThat(getRegularFilesAmount()).isEqualTo(expected);
-        return myself;
+    protected Set<String> entries() {
+        Set<String> res = new HashSet<>();
+        Enumeration<? extends ZipEntry> entries = zipFile.entries();
+
+        while (entries.hasMoreElements())
+            res.add(entries.nextElement().getName());
+
+        return res;
     }
 
-    private int getFoldersAmount() {
-        Map<String, Set<String>> map = walk();
-        int count = 0;
-
-        for (String entryName : map.getOrDefault(actual.getName(), Collections.emptySet()))
-            if (isDirectory(entryName))
-                count++;
-
-        return count;
-    }
-
-    private long getRegularFilesAmount() {
-        Map<String, Set<String>> map = walk();
-        long count = 0;
-
-        for (String entryName : map.getOrDefault(actual.getName(), Collections.emptySet()))
-            if (!isDirectory(entryName))
-                count++;
-
-        return count;
-    }
-
-    private Map<String, Set<String>> walk() {
+    protected Map<String, Set<String>> walk() {
         Map<String, Set<String>> map = new HashMap<>();
-
         Enumeration<? extends ZipEntry> entries = zipFile.entries();
 
         while (entries.hasMoreElements())
@@ -70,7 +52,7 @@ public class AbstractZipEntryAssert<SELF extends AbstractZipEntryAssert<SELF>> e
         return map;
     }
 
-    private static void add(String entryName, Map<String, Set<String>> map) {
+    protected static void add(String entryName, Map<String, Set<String>> map) {
         int offs = 0;
         String parent = "/";
 
@@ -95,9 +77,4 @@ public class AbstractZipEntryAssert<SELF extends AbstractZipEntryAssert<SELF>> e
             }
         }
     }
-
-    private static boolean isDirectory(String entryName) {
-        return FilenameUtils.getExtension(entryName).isEmpty();
-    }
-
 }

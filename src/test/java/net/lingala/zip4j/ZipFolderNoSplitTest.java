@@ -50,7 +50,8 @@ public class ZipFolderNoSplitTest {
 
         ZipFile zip = new ZipFile(zipFile.toFile());
         TestUtils.checkDestinationDir(1, zipFile.getParent());
-        assertThat(zip).hasDirectory("/").withTotalDirectories(1).withTotalFiles(0);
+
+        assertThat(zip).rootEntry().hasSubDirectories(1).hasFiles(0);
         TestUtils.checkCarsDirectory(zip, "cars/");
     }
 

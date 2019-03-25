@@ -11,11 +11,28 @@ import java.util.zip.ZipFile;
  */
 @SuppressWarnings("NewClassNamingConvention")
 public class AbstractZipFileAssert<SELF extends AbstractZipFileAssert<SELF>> extends AbstractAssert<SELF, ZipFile> {
+
     public AbstractZipFileAssert(ZipFile actual, Class<?> selfType) {
         super(actual, selfType);
     }
 
-    public AbstractZipEntryAssert<?> hasDirectory(String name) {
+    public AbstractZipEntryDirectoryAssert<?> rootEntry() {
+        return directory("/");
+    }
+
+    public AbstractZipEntryDirectoryAssert<?> directory(String name) {
+        ZipEntry entry = new ZipEntry(name);
+        Zip4jAssertions.assertThat(entry.isDirectory()).isTrue();
+        return new ZipEntryDirectoryAssert(entry, actual);
+    }
+
+    public AbstractZipEntryFileAssert<?> file(String name) {
+        ZipEntry entry = new ZipEntry(name);
+        Zip4jAssertions.assertThat(entry.isDirectory()).isFalse();
+        return new ZipEntryFileAssert(entry, actual);
+    }
+
+    public AbstractZipEntryAssert<?> containsDirectory(String name) {
         if (!"/".equals(name)) {
             ZipEntry entry = actual.getEntry(name);
 
@@ -25,4 +42,5 @@ public class AbstractZipFileAssert<SELF extends AbstractZipFileAssert<SELF>> ext
 
         return Zip4jAssertionsForClassTypes.assertThat(new ZipEntry(name), actual);
     }
+
 }
