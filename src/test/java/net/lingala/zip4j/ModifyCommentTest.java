@@ -42,8 +42,9 @@ public class ModifyCommentTest {
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .comment("Oleg Cherednik - Олег Чередник").build();
+
         ZipIt zipIt = ZipIt.builder().zipFile(zipFile).build();
-        zipIt.add(Zip4jSuite.srcDir.resolve("cars"), parameters);
+        zipIt.add(Zip4jSuite.carsDir, parameters);
 
         assertThat(Files.exists(zipFile)).isTrue();
         assertThat(Files.isRegularFile(zipFile)).isTrue();

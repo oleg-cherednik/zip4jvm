@@ -12,7 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThat;
-import static net.lingala.zip4j.assertj.Zip4jAssertions.assertZipFileThat;
+import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThatZipFile;
 
 /**
  * @author Oleg Cherednik
@@ -48,8 +48,8 @@ public class ZipFolderNoSplitTest {
         assertThat(Files.isRegularFile(zipFile)).isTrue();
 
         TestUtils.checkDestinationDir(1, zipFile.getParent());
-        assertZipFileThat(zipFile).rootEntry().hasSubDirectories(1).hasFiles(0);
-        assertZipFileThat(zipFile).directory("cars/").matches(TestUtils.carsDirAssert);
+        assertThatZipFile(zipFile).rootEntry().hasSubDirectories(1).hasFiles(0);
+        assertThatZipFile(zipFile).directory("cars/").matches(TestUtils.carsDirAssert);
     }
 
     @Test(dependsOnMethods = "shouldCreateNewZipWithFolder")
@@ -69,9 +69,9 @@ public class ZipFolderNoSplitTest {
         assertThat(Files.isRegularFile(zipFile)).isTrue();
 
         TestUtils.checkDestinationDir(1, zipFile.getParent());
-        assertZipFileThat(zipFile).rootEntry().hasSubDirectories(2).hasFiles(0);
-        assertZipFileThat(zipFile).directory("cars/").matches(TestUtils.carsDirAssert);
-        assertZipFileThat(zipFile).directory("Star Wars/").matches(TestUtils.starWarsDirAssert);
+        assertThatZipFile(zipFile).rootEntry().hasSubDirectories(2).hasFiles(0);
+        assertThatZipFile(zipFile).directory("cars/").matches(TestUtils.carsDirAssert);
+        assertThatZipFile(zipFile).directory("Star Wars/").matches(TestUtils.starWarsDirAssert);
     }
 
     @Test(dependsOnMethods = "shouldAddFolderToExistedZip")
@@ -91,10 +91,10 @@ public class ZipFolderNoSplitTest {
         assertThat(Files.isRegularFile(zipFile)).isTrue();
 
         TestUtils.checkDestinationDir(1, zipFile.getParent());
-        assertZipFileThat(zipFile).rootEntry().hasSubDirectories(3).hasFiles(0);
-        assertZipFileThat(zipFile).directory("cars/").matches(TestUtils.carsDirAssert);
-        assertZipFileThat(zipFile).directory("Star Wars/").matches(TestUtils.starWarsDirAssert);
-        assertZipFileThat(zipFile).directory("empty_dir/").matches(TestUtils.emptyDirAssert);
+        assertThatZipFile(zipFile).rootEntry().hasSubDirectories(3).hasFiles(0);
+        assertThatZipFile(zipFile).directory("cars/").matches(TestUtils.carsDirAssert);
+        assertThatZipFile(zipFile).directory("Star Wars/").matches(TestUtils.starWarsDirAssert);
+        assertThatZipFile(zipFile).directory("empty_dir/").matches(TestUtils.emptyDirAssert);
     }
 
 }
