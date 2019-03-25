@@ -1,15 +1,16 @@
 package net.lingala.zip4j;
 
 import lombok.experimental.UtilityClass;
+import net.lingala.zip4j.assertj.AbstractZipEntryDirectoryAssert;
 
 import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.zip.ZipFile;
 
 import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThat;
 
@@ -18,6 +19,7 @@ import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThat;
  * @since 14.03.2019
  */
 @UtilityClass
+@SuppressWarnings("FieldNamingConvention")
 class TestUtils {
 
     void checkDestinationDir(int totalParts, Path destDir) throws IOException {
@@ -104,11 +106,11 @@ class TestUtils {
 
     // -------
 
-    void checkCarsDirectory(ZipFile zip, String dir) {
-        assertThat(zip).directory(dir).exists().hasSubDirectories(0).hasFiles(3);
-        assertThat(zip).directory(dir).file("bentley-continental.jpg").exists().isImage().hasSize(1_395_362);
-        assertThat(zip).directory(dir).file("ferrari-458-italia.jpg").exists().isImage().hasSize(320_894);
-        assertThat(zip).directory(dir).file("wiesmann-gt-mf5.jpg").exists().isImage().hasSize(729_633);
-    }
+    final Consumer<AbstractZipEntryDirectoryAssert<?>> carsDirectoryAssert = dir -> {
+        dir.exists().hasSubDirectories(0).hasFiles(3);
+        dir.file("bentley-continental.jpg").exists().isImage().hasSize(1_395_362);
+        dir.file("ferrari-458-italia.jpg").exists().isImage().hasSize(320_894);
+        dir.file("wiesmann-gt-mf5.jpg").exists().isImage().hasSize(729_633);
+    };
 
 }

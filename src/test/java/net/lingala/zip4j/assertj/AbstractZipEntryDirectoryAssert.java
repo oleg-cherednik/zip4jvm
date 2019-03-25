@@ -5,6 +5,7 @@ import org.apache.commons.io.FilenameUtils;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -33,6 +34,11 @@ public class AbstractZipEntryDirectoryAssert<SELF extends AbstractZipEntryDirect
 
     public AbstractZipEntryFileAssert<?> file(String name) {
         return new ZipEntryFileAssert(new ZipEntry(actual.getName() + name), zipFile);
+    }
+
+    public SELF matches(Consumer<AbstractZipEntryDirectoryAssert<?>> consumer) {
+        consumer.accept(this);
+        return myself;
     }
 
     private int getFoldersAmount() {

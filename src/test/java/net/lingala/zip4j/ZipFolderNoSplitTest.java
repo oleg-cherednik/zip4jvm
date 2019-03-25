@@ -11,9 +11,9 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.zip.ZipFile;
 
 import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThat;
+import static net.lingala.zip4j.assertj.Zip4jAssertions.assertZipFileThat;
 
 /**
  * @author Oleg Cherednik
@@ -48,11 +48,9 @@ public class ZipFolderNoSplitTest {
         assertThat(Files.exists(zipFile)).isTrue();
         assertThat(Files.isRegularFile(zipFile)).isTrue();
 
-        ZipFile zip = new ZipFile(zipFile.toFile());
         TestUtils.checkDestinationDir(1, zipFile.getParent());
-
-        assertThat(zip).rootEntry().hasSubDirectories(1).hasFiles(0);
-        TestUtils.checkCarsDirectory(zip, "cars/");
+        assertZipFileThat(zipFile).rootEntry().hasSubDirectories(1).hasFiles(0);
+        assertZipFileThat(zipFile).directory("cars/").matches(TestUtils.carsDirectoryAssert);
     }
 
     //    @Test(dependsOnMethods = "shouldCreateNewZipWithFolder")

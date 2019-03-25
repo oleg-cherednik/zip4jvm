@@ -32,15 +32,4 @@ public class AbstractZipFileAssert<SELF extends AbstractZipFileAssert<SELF>> ext
         return new ZipEntryFileAssert(entry, actual);
     }
 
-    public AbstractZipEntryAssert<?> containsDirectory(String name) {
-        if (!"/".equals(name)) {
-            ZipEntry entry = actual.getEntry(name);
-
-            Zip4jAssertions.assertThat(entry).isNotNull();
-            Zip4jAssertions.assertThat(entry.isDirectory()).isTrue();
-        }
-
-        return Zip4jAssertionsForClassTypes.assertThat(new ZipEntry(name), actual);
-    }
-
 }
