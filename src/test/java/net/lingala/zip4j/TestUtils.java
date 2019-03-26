@@ -106,6 +106,21 @@ class TestUtils {
 
     // -------
 
+    final Consumer<AbstractZipEntryDirectoryAssert<?>> rootDirAssert = dir -> {
+        dir.exists().hasSubDirectories(3).hasFiles(5);
+
+        TestUtils.carsDirAssert.accept(dir);
+        TestUtils.starWarsDirAssert.accept(dir);
+        TestUtils.emptyDirAssert.accept(dir);
+
+        dir.file("mcdonnell-douglas-f15-eagle.jpg").exists().isImage().hasSize(624_746);
+        dir.file("saint-petersburg.jpg").exists().isImage().hasSize(1_074_836);
+        dir.file("sig-sauer-pistol.jpg").exists().isImage().hasSize(431_478);
+
+//        checkTextFile(resDir.resolve("empty_file.txt"), 0, null);
+//        checkTextFile(resDir.resolve("Oleg Cherednik.txt"), 41, "Oleg Cherednik\nОлег Чередник");
+    };
+
     final Consumer<AbstractZipEntryDirectoryAssert<?>> carsDirAssert = dir -> {
         dir.exists().hasSubDirectories(0).hasFiles(3);
         dir.file("bentley-continental.jpg").exists().isImage().hasSize(1_395_362);

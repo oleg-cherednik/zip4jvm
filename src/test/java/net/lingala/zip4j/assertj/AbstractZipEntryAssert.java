@@ -2,11 +2,11 @@ package net.lingala.zip4j.assertj;
 
 import org.assertj.core.api.AbstractAssert;
 
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -33,32 +33,28 @@ public abstract class AbstractZipEntryAssert<SELF extends AbstractZipEntryAssert
     }
 
     protected Set<String> entries() {
-        Set<String> res = new HashSet<>();
-        Enumeration<? extends ZipEntry> entries = zipFile.entries();
-
-        while (entries.hasMoreElements())
-            res.add(entries.nextElement().getName());
-
-        return res;
+        return zipFile.stream()
+                      .map(ZipEntry::getName)
+                      .collect(Collectors.toSet());
     }
 
     protected Map<String, Set<String>> walk() {
         Map<String, Set<String>> map = new HashMap<>();
-        Enumeration<? extends ZipEntry> entries = zipFile.entries();
-
-        while (entries.hasMoreElements())
-            add(entries.nextElement().getName(), map);
-
+        entries().forEach(entryName -> add(entryName, map));
         return map;
     }
 
     protected static void add(String entryName, Map<String, Set<String>> map) {
+        if ("/".equals(entryName))
+            return;
+        if (entryName.charAt(0) == '/')
+            entryName = entryName.substring(1);
+
         int offs = 0;
         String parent = "/";
 
         while (parent != null) {
             map.computeIfAbsent(parent, val -> new HashSet<>());
-
             int pos = entryName.indexOf('/', offs);
 
             if (pos >= 0) {
