@@ -4,7 +4,7 @@ import javax.imageio.ImageIO;
 import java.io.InputStream;
 import java.util.zip.ZipEntry;
 
-import static net.lingala.zip4j.assertj.Zip4jAssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 /**

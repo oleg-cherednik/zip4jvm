@@ -16,11 +16,11 @@ import java.nio.file.Path;
 public final class Zip4jAssertions extends Assertions {
 
     public static AbstractZipFileAssert<?> assertThatZipFile(Path path) throws IOException {
-        return assertThat(new ZipFileDecorator(path));
+        return Zip4jAssertionsForClassTypes.assertThat(new ZipFileDecorator(path));
     }
 
-    public static AbstractZipFileAssert<?> assertThat(ZipFileDecorator actual) {
-        return Zip4jAssertionsForClassTypes.assertThat(actual);
+    public static AbstractDirectoryAssert<?> assertThatDirectory(Path path) {
+        return Zip4jAssertionsForClassTypes.assertThatDirectory(path);
     }
 
 }

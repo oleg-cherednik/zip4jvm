@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -95,7 +96,7 @@ public class ZipMiscTest {
                                                 .splitLength(1024 * 1024).build();
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         zip.add(srcDir, parameters);
-        TestUtils.checkDestinationDir(10, destDir);
+        assertThatDirectory(destDir).exists().hasSubDirectories(0).hasFiles(10);
 
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
         List<Path> files = misc.getFiles();

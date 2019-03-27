@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -78,7 +79,7 @@ public class Zip4jSuite {
 
         assertThat(Files.exists(noSplitZip)).isTrue();
         assertThat(Files.isRegularFile(noSplitZip)).isTrue();
-        TestUtils.checkDestinationDir(1, noSplitZip.getParent());
+        assertThatDirectory(noSplitZip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
     }
 
     private static void createEncryptedNoSplitZip() throws IOException {
@@ -93,7 +94,7 @@ public class Zip4jSuite {
 
         assertThat(Files.exists(noSplitZip)).isTrue();
         assertThat(Files.isRegularFile(noSplitZip)).isTrue();
-        TestUtils.checkDestinationDir(1, noSplitZip.getParent());
+        assertThatDirectory(noSplitZip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
     }
 
     public static void removeDir(Path path) throws IOException {

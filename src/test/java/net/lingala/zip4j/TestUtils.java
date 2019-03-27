@@ -22,10 +22,6 @@ import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThat;
 @SuppressWarnings("FieldNamingConvention")
 class TestUtils {
 
-    void checkDestinationDir(int totalParts, Path destDir) throws IOException {
-        checkDirectory(destDir, 0, totalParts);
-    }
-
     void checkResultDir(Path resDir) throws IOException {
         checkDirectory(resDir, 3, 5);
 

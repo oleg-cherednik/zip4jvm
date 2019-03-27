@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -45,10 +46,9 @@ public class ZipFolderSplitTest {
         ZipIt zipIt = ZipIt.builder().zipFile(zipFile).build();
         zipIt.add(Zip4jSuite.srcDir, parameters);
 
+        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(10);
         assertThat(Files.exists(zipFile)).isTrue();
         assertThat(Files.isRegularFile(zipFile)).isTrue();
-
-        TestUtils.checkDestinationDir(10, zipFile.getParent());
 //        assertThatZipFile(zipFile).directory("/").matches(TestUtils.rootDirAssert);
     }
 

@@ -1,8 +1,8 @@
 package net.lingala.zip4j.assertj;
 
 import lombok.experimental.UtilityClass;
-import org.assertj.core.api.AssertionsForClassTypes;
 
+import java.nio.file.Path;
 import java.util.zip.ZipEntry;
 
 /**
@@ -10,8 +10,7 @@ import java.util.zip.ZipEntry;
  * @since 25.03.2019
  */
 @UtilityClass
-@SuppressWarnings("ExtendsUtilityClass")
-public class Zip4jAssertionsForClassTypes extends AssertionsForClassTypes {
+public class Zip4jAssertionsForClassTypes {
 
     public static AbstractZipFileAssert<?> assertThat(ZipFileDecorator actual) {
         return new ZipFileAssert(actual);
@@ -19,5 +18,9 @@ public class Zip4jAssertionsForClassTypes extends AssertionsForClassTypes {
 
     public static AbstractZipEntryAssert<?> assertThat(ZipEntry actual, ZipFileDecorator zipFile) {
         return actual.isDirectory() ? new ZipEntryFileAssert(actual, zipFile) : new ZipEntryDirectoryAssert(actual, zipFile);
+    }
+
+    public static AbstractDirectoryAssert<?> assertThatDirectory(Path path) {
+        return new DirectoryAssert(path);
     }
 }

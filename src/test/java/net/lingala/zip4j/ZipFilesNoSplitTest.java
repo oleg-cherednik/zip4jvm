@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
+import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -58,7 +59,7 @@ public class ZipFilesNoSplitTest {
 
         assertThat(Files.exists(zipFile)).isTrue();
         assertThat(Files.isRegularFile(zipFile)).isTrue();
-        TestUtils.checkDestinationDir(1, destDir);
+        assertThatDirectory(destDir).exists().hasSubDirectories(0).hasFiles(1);
 
         // ---
 

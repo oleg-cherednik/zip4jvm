@@ -16,7 +16,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
-import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThat;
+import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
 import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThatZipFile;
 
 /**
@@ -58,16 +58,14 @@ public class ZipStreamNoSplitTest {
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         zip.addStream(files, parameters);
 
-        TestUtils.checkDestinationDir(1, zipFile.getParent());
+        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
         assertThatZipFile(zipFile).exists().rootEntry().hasSubDirectories(1).hasFiles(0);
         assertThatZipFile(zipFile).directory("cars/").matches(TestUtils.carsDirAssert);
     }
 
     @Test(dependsOnMethods = "shouldCreateNewZipFromGivenStream")
     public void shouldAddNewFilesFromStreamToExistedZip() throws IOException, ZipException {
-//        assertThatZipFile(zipFile).exists();
-        assertThat(Files.exists(zipFile)).isTrue();
-        assertThat(Files.isRegularFile(zipFile)).isTrue();
+        assertThatZipFile(zipFile).exists();
 
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
@@ -88,7 +86,7 @@ public class ZipStreamNoSplitTest {
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         zip.addStream(files, parameters);
 
-        TestUtils.checkDestinationDir(1, zipFile.getParent());
+        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
         assertThatZipFile(zipFile).exists().rootEntry().hasSubDirectories(2).hasFiles(0);
         assertThatZipFile(zipFile).directory("cars/").matches(TestUtils.carsDirAssert);
         assertThatZipFile(zipFile).directory("Star Wars/").matches(TestUtils.starWarsDirAssert);
