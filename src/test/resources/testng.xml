@@ -1,15 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<suite name="zip4j" parallel="false">
-    <!--<test name="pkg">-->
-        <!--<packages>-->
-            <!--<package name="net.lingala.zip4j.*"/>-->
-        <!--</packages>-->
-    <!--</test>-->
-
-    <!--<test name="cls">-->
-        <!--<classes>-->
-            <!--<class name="net.lingala.zip4j.ZipFolderNoSplitTest"/>-->
-            <!--<class name="com.mkyong.testng.examples.suite.TestOrder"/>-->
-        <!--</classes>-->
-    <!--</test>-->
+<suite name="zip4j" parallel="classes" thread-count="4">
+    <test name="pkg">
+        <packages>
+            <package name="net.lingala.zip4j.*"/>
+        </packages>
+    </test>
 </suite>

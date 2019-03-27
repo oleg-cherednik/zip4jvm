@@ -19,7 +19,7 @@ import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThatZipFile;
  * @author Oleg Cherednik
  * @since 14.03.2019
  */
-@SuppressWarnings("FieldNamingConvention")
+@SuppressWarnings({ "FieldNamingConvention", "DefaultAnnotationParam" })
 public class ZipFolderNoSplitTest {
 
     private static final Path rootDir = Zip4jSuite.rootDir.resolve(ZipFolderNoSplitTest.class.getSimpleName());
