@@ -3,14 +3,15 @@ package net.lingala.zip4j;
 import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.ZipParameters;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,38 +20,34 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Oleg Cherednik
  * @since 15.03.2019
  */
+@SuppressWarnings("FieldNamingConvention")
 public class ZipRemoveTest {
 
-    private Path root;
-    private Path srcDir;
-    private Path destDir;
-    private Path resDir;
+    private static final Path rootDir = Zip4jSuite.rootDir.resolve(ZipRemoveTest.class.getSimpleName());
+    private static final Path zipFile = rootDir.resolve("src.zip");
 
-    @BeforeMethod
-    public void createDirectory() throws IOException {
-        root = Paths.get("d:/zip4j");//Files.createTempDirectory("zip4j");
-        srcDir = root.resolve("src");
-        destDir = root.resolve("dest");
-        resDir = destDir.resolve("res");
-
-        Files.createDirectories(srcDir);
-        Files.createDirectories(destDir);
-//        Files.createDirectories(resDir);
+    @BeforeClass
+    public static void createDir() throws IOException {
+        Files.createDirectories(rootDir);
     }
 
-    //    @Test
-    public void shouldRemoveGivenFilesFromExistedZip() throws IOException {
-        Path zipFile = destDir.resolve("src.zip");
+    @AfterClass(enabled = Zip4jSuite.clear)
+    public static void removeDir() throws IOException {
+        Zip4jSuite.removeDir(rootDir);
+    }
 
+    @Test
+    public void shouldRemoveGivenFilesFromExistedZip() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
-                                                .defaultFolderPath(srcDir).build();
-        List<Path> files = Arrays.asList(
-                srcDir.resolve("cars/bentley-continental.jpg"),
-                srcDir.resolve("cars/ferrari-458-italia.jpg"),
-                srcDir.resolve("cars/wiesmann-gt-mf5.jpg")
-        );
+                                                .defaultFolderPath(Zip4jSuite.srcDir).build();
+
+        Path bentley = Zip4jSuite.carsDir.resolve("bentley-continental.jpg");
+        Path ferrari = Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg");
+        Path wiesmann = Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg");
+
+        List<Path> files = Arrays.asList(bentley, ferrari, wiesmann);
 
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         zip.add(files, parameters);
@@ -58,12 +55,10 @@ public class ZipRemoveTest {
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
         assertThat(misc.getEntryNames()).hasSize(3);
 
-        Collection<String> entries = Arrays.asList(
-                "cars/bentley-continental.jpg",
-                "cars/ferrari-458-italia.jpg"
-//                "cars/wiesmann-gt-mf5.jpg"
-        );
-        misc.removeEntries(entries);
-        assertThat(misc.getEntryNames()).hasSize(1);
+        misc.removeEntries(Collections.singleton(Zip4jSuite.srcDir.relativize(ferrari).toString()));
+        assertThat(misc.getEntryNames()).hasSize(2);
+
+        misc.removeEntries(Arrays.asList(Zip4jSuite.srcDir.relativize(bentley).toString(), Zip4jSuite.srcDir.relativize(wiesmann).toString()));
+        assertThat(misc.getEntryNames()).isEmpty();
     }
 }

@@ -23,7 +23,7 @@ import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThatZipFile;
  * @author Oleg Cherednik
  * @since 15.03.2019
  */
-@SuppressWarnings({ "FieldNamingConvention", "DefaultAnnotationParam" })
+@SuppressWarnings("FieldNamingConvention")
 public class ZipStreamNoSplitTest {
 
     private static final Path rootDir = Zip4jSuite.rootDir.resolve(ZipStreamNoSplitTest.class.getSimpleName());
