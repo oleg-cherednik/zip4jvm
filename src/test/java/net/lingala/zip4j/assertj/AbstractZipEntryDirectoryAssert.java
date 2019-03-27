@@ -3,8 +3,6 @@ package net.lingala.zip4j.assertj;
 import org.apache.commons.io.FilenameUtils;
 
 import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -36,31 +34,28 @@ public class AbstractZipEntryDirectoryAssert<SELF extends AbstractZipEntryDirect
         return new ZipEntryFileAssert(new ZipEntry(actual.getName() + name), zipFile);
     }
 
+    @Override
+    public SELF exists() {
+        isNotNull();
+        assertThat(map).containsKey(actual.getName());
+        return myself;
+    }
+
     public SELF matches(Consumer<AbstractZipEntryDirectoryAssert<?>> consumer) {
         consumer.accept(this);
         return myself;
     }
 
     private int getFoldersAmount() {
-        Map<String, Set<String>> map = walk();
-        int count = 0;
-
-        for (String entryName : map.getOrDefault(actual.getName(), Collections.emptySet()))
-            if (isDirectory(entryName))
-                count++;
-
-        return count;
+        return (int)map.getOrDefault(actual.getName(), Collections.emptySet()).stream()
+                       .filter(AbstractZipEntryDirectoryAssert::isDirectory)
+                       .count();
     }
 
     private long getRegularFilesAmount() {
-        Map<String, Set<String>> map = walk();
-        long count = 0;
-
-        for (String entryName : map.getOrDefault(actual.getName(), Collections.emptySet()))
-            if (!isDirectory(entryName))
-                count++;
-
-        return count;
+        return (int)map.getOrDefault(actual.getName(), Collections.emptySet()).stream()
+                       .filter(entryName -> !isDirectory(entryName))
+                       .count();
     }
 
     private static boolean isDirectory(String entryName) {

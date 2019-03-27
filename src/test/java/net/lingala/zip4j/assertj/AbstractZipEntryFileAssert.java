@@ -1,5 +1,7 @@
 package net.lingala.zip4j.assertj;
 
+import org.assertj.core.api.Assertions;
+
 import javax.imageio.ImageIO;
 import java.io.InputStream;
 import java.util.zip.ZipEntry;
@@ -26,8 +28,16 @@ public abstract class AbstractZipEntryFileAssert<SELF extends AbstractZipEntryFi
         return myself;
     }
 
+    @Override
+    public SELF exists() {
+        isNotNull();
+        Assertions.assertThat(entries).contains(actual.getName());
+        return myself;
+    }
+
     public SELF isImage() {
         try (InputStream in = zipFile.getInputStream(actual)) {
+            actual.setSize(in.available());
             assertThat(ImageIO.read(in)).isNotNull();
         } catch(Exception e) {
             assertThatThrownBy(() -> {

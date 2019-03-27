@@ -2,8 +2,13 @@ package net.lingala.zip4j.assertj;
 
 import org.assertj.core.api.AbstractAssert;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Oleg Cherednik
@@ -28,8 +33,18 @@ public class AbstractZipFileAssert<SELF extends AbstractZipFileAssert<SELF>> ext
 
     public AbstractZipEntryFileAssert<?> file(String name) {
         ZipEntry entry = new ZipEntry(name);
-        Zip4jAssertions.assertThat(entry.isDirectory()).isFalse();
+        assertThat(entry.isDirectory()).isFalse();
         return new ZipEntryFileAssert(entry, actual);
+    }
+
+    public SELF exists() {
+        isNotNull();
+
+        Path path = Paths.get(actual.getName());
+        assertThat(Files.exists(path)).isTrue();
+        assertThat(Files.isRegularFile(path)).isTrue();
+
+        return myself;
     }
 
 }

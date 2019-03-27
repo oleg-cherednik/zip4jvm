@@ -44,11 +44,8 @@ public class ZipFolderNoSplitTest {
         ZipIt zipIt = ZipIt.builder().zipFile(zipFile).build();
         zipIt.add(Zip4jSuite.carsDir, parameters);
 
-        assertThat(Files.exists(zipFile)).isTrue();
-        assertThat(Files.isRegularFile(zipFile)).isTrue();
-
         TestUtils.checkDestinationDir(1, zipFile.getParent());
-        assertThatZipFile(zipFile).rootEntry().hasSubDirectories(1).hasFiles(0);
+        assertThatZipFile(zipFile).exists().rootEntry().hasSubDirectories(1).hasFiles(0);
         assertThatZipFile(zipFile).directory("cars/").matches(TestUtils.carsDirAssert);
     }
 
@@ -65,11 +62,8 @@ public class ZipFolderNoSplitTest {
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         zip.add(Zip4jSuite.starWarsDir, parameters);
 
-        assertThat(Files.exists(zipFile)).isTrue();
-        assertThat(Files.isRegularFile(zipFile)).isTrue();
-
         TestUtils.checkDestinationDir(1, zipFile.getParent());
-        assertThatZipFile(zipFile).rootEntry().hasSubDirectories(2).hasFiles(0);
+        assertThatZipFile(zipFile).exists().rootEntry().hasSubDirectories(2).hasFiles(0);
         assertThatZipFile(zipFile).directory("cars/").matches(TestUtils.carsDirAssert);
         assertThatZipFile(zipFile).directory("Star Wars/").matches(TestUtils.starWarsDirAssert);
     }
@@ -87,11 +81,8 @@ public class ZipFolderNoSplitTest {
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         zip.add(Zip4jSuite.emptyDir, parameters);
 
-        assertThat(Files.exists(zipFile)).isTrue();
-        assertThat(Files.isRegularFile(zipFile)).isTrue();
-
         TestUtils.checkDestinationDir(1, zipFile.getParent());
-        assertThatZipFile(zipFile).rootEntry().hasSubDirectories(3).hasFiles(0);
+        assertThatZipFile(zipFile).exists().rootEntry().hasSubDirectories(3).hasFiles(0);
         assertThatZipFile(zipFile).directory("cars/").matches(TestUtils.carsDirAssert);
         assertThatZipFile(zipFile).directory("Star Wars/").matches(TestUtils.starWarsDirAssert);
         assertThatZipFile(zipFile).directory("empty_dir/").matches(TestUtils.emptyDirAssert);

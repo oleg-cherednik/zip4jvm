@@ -10,8 +10,6 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  * @author Oleg Cherednik
  * @since 25.03.2019
@@ -20,31 +18,36 @@ import static org.assertj.core.api.Assertions.assertThat;
 public abstract class AbstractZipEntryAssert<SELF extends AbstractZipEntryAssert<SELF>> extends AbstractAssert<SELF, ZipEntry> {
 
     protected final ZipFile zipFile;
+    protected final Set<String> entries;
+    protected final Map<String, Set<String>> map;
 
     protected AbstractZipEntryAssert(ZipEntry actual, Class<?> selfType, ZipFile zipFile) {
         super(actual, selfType);
         this.zipFile = zipFile;
+        entries = entries(zipFile);
+        map = walk(entries);
     }
 
-    public SELF exists() {
-        isNotNull();
-        assertThat(entries()).contains(actual.getName());
-        return myself;
+    public abstract SELF exists();
+
+    @Override
+    public String toString() {
+        return actual.getName();
     }
 
-    protected Set<String> entries() {
+    private static Set<String> entries(ZipFile zipFile) {
         return zipFile.stream()
                       .map(ZipEntry::getName)
                       .collect(Collectors.toSet());
     }
 
-    protected Map<String, Set<String>> walk() {
+    private static Map<String, Set<String>> walk(Set<String> entries) {
         Map<String, Set<String>> map = new HashMap<>();
-        entries().forEach(entryName -> add(entryName, map));
+        entries.forEach(entryName -> add(entryName, map));
         return map;
     }
 
-    protected static void add(String entryName, Map<String, Set<String>> map) {
+    private static void add(String entryName, Map<String, Set<String>> map) {
         if ("/".equals(entryName))
             return;
         if (entryName.charAt(0) == '/')

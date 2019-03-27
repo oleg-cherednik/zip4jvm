@@ -46,9 +46,10 @@ public class ModifyCommentTest {
         ZipIt zipIt = ZipIt.builder().zipFile(zipFile).build();
         zipIt.add(Zip4jSuite.carsDir, parameters);
 
-        assertThat(Files.exists(zipFile)).isTrue();
         assertThat(Files.isRegularFile(zipFile)).isTrue();
         assertThat(misc.getComment()).isEqualTo("Oleg Cherednik - Олег Чередник");
+        // TODO ZipFile block remove; should be lazy
+//        assertThatZipFile(zipFile).exists();
         TestUtils.checkDirectory(rootDir, 0, 1);
     }
 
