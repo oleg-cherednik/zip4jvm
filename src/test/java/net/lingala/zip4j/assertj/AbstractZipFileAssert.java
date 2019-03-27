@@ -3,10 +3,7 @@ package net.lingala.zip4j.assertj;
 import org.assertj.core.api.AbstractAssert;
 
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -15,9 +12,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 25.03.2019
  */
 @SuppressWarnings("NewClassNamingConvention")
-public class AbstractZipFileAssert<SELF extends AbstractZipFileAssert<SELF>> extends AbstractAssert<SELF, ZipFile> {
+public class AbstractZipFileAssert<SELF extends AbstractZipFileAssert<SELF>> extends AbstractAssert<SELF, ZipFileDecorator> {
 
-    public AbstractZipFileAssert(ZipFile actual, Class<?> selfType) {
+    public AbstractZipFileAssert(ZipFileDecorator actual, Class<?> selfType) {
         super(actual, selfType);
     }
 
@@ -27,7 +24,7 @@ public class AbstractZipFileAssert<SELF extends AbstractZipFileAssert<SELF>> ext
 
     public AbstractZipEntryDirectoryAssert<?> directory(String name) {
         ZipEntry entry = new ZipEntry(name);
-        Zip4jAssertions.assertThat(entry.isDirectory()).isTrue();
+        assertThat(entry.isDirectory()).isTrue();
         return new ZipEntryDirectoryAssert(entry, actual);
     }
 
@@ -39,10 +36,8 @@ public class AbstractZipFileAssert<SELF extends AbstractZipFileAssert<SELF>> ext
 
     public SELF exists() {
         isNotNull();
-
-        Path path = Paths.get(actual.getName());
-        assertThat(Files.exists(path)).isTrue();
-        assertThat(Files.isRegularFile(path)).isTrue();
+        assertThat(Files.exists(actual.getPath())).isTrue();
+        assertThat(Files.isRegularFile(actual.getPath())).isTrue();
 
         return myself;
     }

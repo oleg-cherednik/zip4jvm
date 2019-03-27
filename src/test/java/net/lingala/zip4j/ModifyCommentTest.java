@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThatZipFile;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -46,10 +47,8 @@ public class ModifyCommentTest {
         ZipIt zipIt = ZipIt.builder().zipFile(zipFile).build();
         zipIt.add(Zip4jSuite.carsDir, parameters);
 
-        assertThat(Files.isRegularFile(zipFile)).isTrue();
         assertThat(misc.getComment()).isEqualTo("Oleg Cherednik - Олег Чередник");
-        // TODO ZipFile block remove; should be lazy
-//        assertThatZipFile(zipFile).exists();
+        assertThatZipFile(zipFile).exists();
         TestUtils.checkDirectory(rootDir, 0, 1);
     }
 

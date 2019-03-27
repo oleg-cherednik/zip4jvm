@@ -4,7 +4,6 @@ import lombok.experimental.UtilityClass;
 import org.assertj.core.api.AssertionsForClassTypes;
 
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 /**
  * @author Oleg Cherednik
@@ -14,11 +13,11 @@ import java.util.zip.ZipFile;
 @SuppressWarnings("ExtendsUtilityClass")
 public class Zip4jAssertionsForClassTypes extends AssertionsForClassTypes {
 
-    public static AbstractZipFileAssert<?> assertThat(ZipFile actual) {
+    public static AbstractZipFileAssert<?> assertThat(ZipFileDecorator actual) {
         return new ZipFileAssert(actual);
     }
 
-    public static AbstractZipEntryAssert<?> assertThat(ZipEntry actual, ZipFile zipFile) {
+    public static AbstractZipEntryAssert<?> assertThat(ZipEntry actual, ZipFileDecorator zipFile) {
         return actual.isDirectory() ? new ZipEntryFileAssert(actual, zipFile) : new ZipEntryDirectoryAssert(actual, zipFile);
     }
 }

@@ -1,7 +1,6 @@
 package net.lingala.zip4j.assertj;
 
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 /**
  * @author Oleg Cherednik
@@ -9,7 +8,7 @@ import java.util.zip.ZipFile;
  */
 public class ZipEntryFileAssert extends AbstractZipEntryFileAssert<ZipEntryFileAssert> {
 
-    public ZipEntryFileAssert(ZipEntry actual, ZipFile zipFile) {
+    public ZipEntryFileAssert(ZipEntry actual, ZipFileDecorator zipFile) {
         super(actual, ZipEntryFileAssert.class, zipFile);
     }
 }

@@ -6,7 +6,6 @@ import org.assertj.core.api.Assertions;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.zip.ZipFile;
 
 /**
  * @author Oleg Cherednik
@@ -17,10 +16,10 @@ import java.util.zip.ZipFile;
 public final class Zip4jAssertions extends Assertions {
 
     public static AbstractZipFileAssert<?> assertThatZipFile(Path path) throws IOException {
-        return assertThat(new ZipFile(path.toFile()));
+        return assertThat(new ZipFileDecorator(path));
     }
 
-    public static AbstractZipFileAssert<?> assertThat(ZipFile actual) {
+    public static AbstractZipFileAssert<?> assertThat(ZipFileDecorator actual) {
         return Zip4jAssertionsForClassTypes.assertThat(actual);
     }
 
