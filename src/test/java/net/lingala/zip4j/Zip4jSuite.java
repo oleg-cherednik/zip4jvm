@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Oleg Cherednik
  * @since 23.03.2019
  */
-@SuppressWarnings({ "FieldNamingConvention", "DefaultAnnotationParam" })
+@SuppressWarnings("FieldNamingConvention")
 public class Zip4jSuite {
 
     public static final Path rootDir = Paths.get("d:/zip4j/foo");//Files.createTempDirectory("zip4j");

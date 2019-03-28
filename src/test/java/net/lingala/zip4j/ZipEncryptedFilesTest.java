@@ -6,68 +6,50 @@ import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.ZipParameters;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
-import static org.assertj.core.api.Assertions.assertThat;
+import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThatZipFile;
 
 /**
  * @author Oleg Cherednik
  * @since 15.03.2019
  */
+@SuppressWarnings("FieldNamingConvention")
 public class ZipEncryptedFilesTest {
 
-    private Path root;
-    private Path srcDir;
-    private Path destDir;
-    private Path resDir;
+    private static final Path rootDir = Zip4jSuite.rootDir.resolve(ZipEncryptedFilesTest.class.getSimpleName());
+    private static final Path zipFile = rootDir.resolve("src.zip");
 
-    @BeforeMethod
-    public void createDirectory() throws IOException {
-        root = Paths.get("d:/zip4j");//Files.createTempDirectory("zip4j");
-        srcDir = root.resolve("src");
-        destDir = root.resolve("dest");
-        resDir = destDir.resolve("res");
-
-        Files.createDirectories(srcDir);
-        Files.createDirectories(destDir);
-//        Files.createDirectories(resDir);
+    @BeforeClass
+    public static void createDir() throws IOException {
+        Files.createDirectories(rootDir);
     }
 
-//    @Test
-    public void shouldCreateEncryptedZip() throws ZipException, IOException {
-        final char[] password = "1".toCharArray();
-        Path zipFile = destDir.resolve("src.zip");
-        Path carsDir = srcDir.resolve("cars");
+    @AfterClass(enabled = Zip4jSuite.clear)
+    public static void removeDir() throws IOException {
+        Zip4jSuite.removeDir(rootDir);
+    }
 
+    //    @Test
+    public void shouldCreateEncryptedZip() throws ZipException, IOException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
-                                                .encryption(Encryption.AES)
+                                                .encryption(Encryption.STANDARD)
                                                 .aesKeyStrength(AESStrength.STRENGTH_256)
-                                                .password(password)
-                                                .defaultFolderPath(srcDir).build();
+                                                .password(Zip4jSuite.password).build();
 
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-        zip.add(carsDir, parameters);
+        zip.add(Zip4jSuite.srcDir, parameters);
 
-        assertThat(Files.exists(zipFile)).isTrue();
-        assertThat(Files.isRegularFile(zipFile)).isTrue();
-        assertThatDirectory(destDir).exists().hasSubDirectories(0).hasFiles(1);
-
-        // ---
-
-        UnzipIt unzip = UnzipIt.builder()
-                               .zipFile(zipFile)
-                               .password(password).build();
-        unzip.extract(resDir);
-
-        TestUtils.checkDirectory(resDir, 1, 0);
-        TestUtils.checkCarsDirectory(resDir.resolve("cars"));
+        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatZipFile(zipFile).exists().rootEntry().hasSubDirectories(1).hasFiles(0);
+        assertThatZipFile(zipFile).directory("/").matches(TestUtils.rootDirAssert);
     }
 }
