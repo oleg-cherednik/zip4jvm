@@ -1,100 +1,78 @@
 package net.lingala.zip4j;
 
 import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.model.CompressionLevel;
-import net.lingala.zip4j.model.CompressionMethod;
-import net.lingala.zip4j.model.ZipParameters;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
+import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThatFile;
 
 /**
  * @author Oleg Cherednik
  * @since 14.03.2019
  */
+@SuppressWarnings("FieldNamingConvention")
 public class UnzipItTest {
-    private Path root;
-    private Path srcDir;
-    private Path destDir;
-    private Path resDir;
 
-    @BeforeMethod
-    public void createDirectory() throws IOException {
-        root = Paths.get("d:/zip4j");//Files.createTempDirectory("zip4j");
-        srcDir = root.resolve("src");
-        destDir = root.resolve("dest");
-        resDir = destDir.resolve("res");
+    private static final Path rootDir = Zip4jSuite.rootDir.resolve(UnzipItTest.class.getSimpleName());
 
-        Files.createDirectories(srcDir);
-        Files.createDirectories(destDir);
-//        Files.createDirectories(resDir);
+    @BeforeClass
+    public static void createDir() throws IOException {
+        Files.createDirectories(rootDir);
     }
 
-//    @Test
+    @AfterClass(enabled = Zip4jSuite.clear)
+    public static void removeDir() throws IOException {
+        Zip4jSuite.removeDir(rootDir);
+    }
+
+    @Test
     public void shouldUnzipRequiredFiles() throws ZipException, IOException {
-        Path zipFile = destDir.resolve("src.zip");
-
-        ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(CompressionMethod.DEFLATE)
-                                                .compressionLevel(CompressionLevel.NORMAL).build();
-        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-        zip.add(srcDir, parameters);
-
-        assertThat(Files.exists(zipFile)).isTrue();
-        assertThat(Files.isRegularFile(zipFile)).isTrue();
-
-        // ---
-
         List<String> entries = Arrays.asList("saint-petersburg.jpg", "cars/bentley-continental.jpg");
-        UnzipIt unzip = UnzipIt.builder().zipFile(zipFile).build();
-        unzip.extract(resDir, entries);
+        UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.noSplitZip).build();
+        unzip.extract(rootDir, entries);
 
-        TestUtils.checkDirectory(resDir, 1, 1);
-        TestUtils.checkDirectory(resDir.resolve("cars"), 0, 1);
-        TestUtils.checkImage(resDir.resolve("saint-petersburg.jpg"), 1_074_836);
-        TestUtils.checkImage(resDir.resolve("cars/bentley-continental.jpg"), 1_395_362);
+        assertThatDirectory(rootDir).exists().hasSubDirectories(1).hasFiles(1);
+        assertThatDirectory(rootDir.resolve("cars/")).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatFile(rootDir.resolve("saint-petersburg.jpg")).exists().isImage().hasSize(1_074_836);
+        assertThatFile(rootDir.resolve("cars/bentley-continental.jpg")).exists().isImage().hasSize(1_395_362);
     }
 
-//    @Test(dependsOnMethods = "shouldUnzipRequiredFiles")
+    @Test(dependsOnMethods = "shouldUnzipRequiredFiles")
     public void shouldUnzipOneFile() throws ZipException, IOException {
-        Path zipFile = destDir.resolve("src.zip");
+        UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.noSplitZip).build();
+        unzip.extract(rootDir, "cars/ferrari-458-italia.jpg");
 
-        assertThat(Files.exists(zipFile)).isTrue();
-        assertThat(Files.isRegularFile(zipFile)).isTrue();
-
-        UnzipIt unzip = UnzipIt.builder().zipFile(zipFile).build();
-        unzip.extract(resDir, "cars/ferrari-458-italia.jpg");
-
-        TestUtils.checkDirectory(resDir, 1, 1);
-        TestUtils.checkDirectory(resDir.resolve("cars"), 0, 2);
-        TestUtils.checkImage(resDir.resolve("saint-petersburg.jpg"), 1_074_836);
-        TestUtils.checkImage(resDir.resolve("cars/bentley-continental.jpg"), 1_395_362);
-        TestUtils.checkImage(resDir.resolve("cars/ferrari-458-italia.jpg"), 320_894);
+        assertThatDirectory(rootDir).exists().hasSubDirectories(1).hasFiles(1);
+        assertThatDirectory(rootDir.resolve("cars/")).exists().hasSubDirectories(0).hasFiles(2);
+        assertThatFile(rootDir.resolve("saint-petersburg.jpg")).exists().isImage().hasSize(1_074_836);
+        assertThatFile(rootDir.resolve("cars/bentley-continental.jpg")).exists().isImage().hasSize(1_395_362);
+        assertThatFile(rootDir.resolve("cars/ferrari-458-italia.jpg")).exists().isImage().hasSize(320_894);
     }
 
-//    @Test(dependsOnMethods = "shouldUnzipOneFile")
+    @Test(dependsOnMethods = "shouldUnzipOneFile")
     public void shouldUnzipFolder() throws ZipException, IOException {
-        Path zipFile = destDir.resolve("src.zip");
+        UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.noSplitZip).build();
+        unzip.extract(rootDir, "Star Wars");
 
-        assertThat(Files.exists(zipFile)).isTrue();
-        assertThat(Files.isRegularFile(zipFile)).isTrue();
+        assertThatDirectory(rootDir).exists().hasSubDirectories(2).hasFiles(1);
+        assertThatDirectory(rootDir.resolve("cars/")).exists().hasSubDirectories(0).hasFiles(2);
+        assertThatFile(rootDir.resolve("saint-petersburg.jpg")).exists().isImage().hasSize(1_074_836);
+        assertThatFile(rootDir.resolve("cars/bentley-continental.jpg")).exists().isImage().hasSize(1_395_362);
+        assertThatFile(rootDir.resolve("cars/ferrari-458-italia.jpg")).exists().isImage().hasSize(320_894);
 
-        UnzipIt unzip = UnzipIt.builder().zipFile(zipFile).build();
-        unzip.extract(resDir, "Star Wars");
-
-        TestUtils.checkDirectory(resDir, 2, 1);
-        TestUtils.checkDirectory(resDir.resolve("cars"), 0, 2);
-        TestUtils.checkStarWarsDirectory(resDir.resolve("Star Wars"));
-
-        TestUtils.checkImage(resDir.resolve("saint-petersburg.jpg"), 1_074_836);
-        TestUtils.checkImage(resDir.resolve("cars/bentley-continental.jpg"), 1_395_362);
-        TestUtils.checkImage(resDir.resolve("cars/ferrari-458-italia.jpg"), 320_894);
+        Path starWarsDir = rootDir.resolve("Star Wars/");
+        assertThatDirectory(starWarsDir).exists().hasSubDirectories(0).hasFiles(4);
+        assertThatFile(starWarsDir.resolve("0qQnv2v.jpg")).isImage().hasSize(2_204_448);
+        assertThatFile(starWarsDir.resolve("080fc325efa248454e59b84be24ea829.jpg")).isImage().hasSize(277_857);
+        assertThatFile(starWarsDir.resolve("pE9Hkw6.jpg")).isImage().hasSize(1_601_879);
+        assertThatFile(starWarsDir.resolve("star-wars-wallpapers-29931-7188436.jpg")).isImage().hasSize(1_916_776);
     }
 }
