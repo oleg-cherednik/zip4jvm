@@ -1,11 +1,10 @@
 package net.lingala.zip4j;
 
 import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.model.CompressionLevel;
-import net.lingala.zip4j.model.CompressionMethod;
-import net.lingala.zip4j.model.ZipParameters;
 import org.apache.commons.io.IOUtils;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -13,93 +12,51 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collections;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThatFile;
 
 /**
  * @author Oleg Cherednik
  * @since 22.03.2019
  */
+@SuppressWarnings("FieldNamingConvention")
 public class UnzipStreamTest {
 
-    private Path root;
-    private Path srcDir;
-    private Path destDir;
-    private Path resDir;
+    private static final Path rootDir = Zip4jSuite.rootDir.resolve(UnzipStreamTest.class.getSimpleName());
 
-    @BeforeMethod
-    public void createDirectory() throws IOException {
-        root = Paths.get("d:/zip4j");//Files.createTempDirectory("zip4j");
-        srcDir = root.resolve("src");
-        destDir = root.resolve("dest");
-        resDir = destDir.resolve("res");
-
-        Files.createDirectories(srcDir);
-        Files.createDirectories(destDir);
-//        Files.createDirectories(resDir);
+    @BeforeClass
+    public static void createDir() throws IOException {
+        Files.createDirectories(rootDir);
     }
 
-//    @Test
+    @AfterClass(enabled = Zip4jSuite.clear)
+    public static void removeDir() throws IOException {
+        Zip4jSuite.removeDir(rootDir);
+    }
+
+    @Test
     public void shouldUnzipEntryToStreamWhenNoSplit() throws ZipException, IOException {
-        Path zipFile = destDir.resolve("src.zip");
-
-        ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(CompressionMethod.DEFLATE)
-                                                .compressionLevel(CompressionLevel.NORMAL).build();
-        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-        zip.add(srcDir, parameters);
-
-        assertThat(Files.exists(zipFile)).isTrue();
-        assertThat(Files.isRegularFile(zipFile)).isTrue();
-
-        // ---
-
-        Path imgFile = resDir.resolve("bentley-continental.jpg");
-
-        if (!Files.exists(imgFile.getParent()))
-            Files.createDirectories(imgFile.getParent());
-
-        UnzipIt unzip = UnzipIt.builder().zipFile(zipFile).build();
+        Path imgFile = rootDir.resolve("bentley-continental.jpg");
+        UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.noSplitZip).build();
 
         try (InputStream in = unzip.extract("cars/bentley-continental.jpg");
              OutputStream out = new FileOutputStream(imgFile.toFile())) {
             IOUtils.copyLarge(in, out);
         }
 
-        TestUtils.checkImage(imgFile, 1_395_362);
+        assertThatFile(imgFile).exists().isImage().hasSize(1_395_362);
     }
 
-//    @Test
+    @Test
     public void shouldUnzipEntryToStreamWhenSplit() throws ZipException, IOException {
-        Path zipFile = destDir.resolve("src.zip");
+        Path imgFile = rootDir.resolve("ferrari-458-italia.jpg");
+        UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.splitZip).build();
 
-        ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(CompressionMethod.DEFLATE)
-                                                .compressionLevel(CompressionLevel.NORMAL)
-                                                .splitLength(1024 * 512).build();
-
-        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-        zip.add(Collections.singletonList(srcDir.resolve("cars/bentley-continental.jpg")), parameters);
-
-        assertThat(Files.exists(zipFile)).isTrue();
-        assertThat(Files.isRegularFile(zipFile)).isTrue();
-
-        // ---
-
-        Path imgFile = resDir.resolve("bentley-continental.jpg");
-
-        if (!Files.exists(imgFile.getParent()))
-            Files.createDirectories(imgFile.getParent());
-
-        UnzipIt unzip = UnzipIt.builder().zipFile(zipFile).build();
-
-        try (InputStream in = unzip.extract("bentley-continental.jpg");
+        try (InputStream in = unzip.extract("cars/ferrari-458-italia.jpg");
              OutputStream out = new FileOutputStream(imgFile.toFile())) {
             IOUtils.copyLarge(in, out);
         }
 
-        TestUtils.checkImage(imgFile, 1_395_362);
+        assertThatFile(imgFile).exists().isImage().hasSize(320_894);
     }
 }

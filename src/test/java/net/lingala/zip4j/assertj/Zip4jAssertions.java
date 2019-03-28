@@ -23,4 +23,8 @@ public final class Zip4jAssertions extends Assertions {
         return Zip4jAssertionsForClassTypes.assertThatDirectory(path);
     }
 
+    public static AbstractFileAssert<?> assertThatFile(Path path) {
+        return Zip4jAssertionsForClassTypes.assertThatFile(path);
+    }
+
 }

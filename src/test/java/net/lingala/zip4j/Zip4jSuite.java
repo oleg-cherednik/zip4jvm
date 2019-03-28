@@ -33,6 +33,7 @@ public class Zip4jSuite {
 
     public static final Path noSplitZip = rootDir.resolve("no_split/src.zip");
     public static final Path noSplitAesZip = rootDir.resolve("no_split_aes/src.zip");
+    public static final Path splitZip = rootDir.resolve("split/src.zip");
 
     /** Password for encrypted zip */
     public static final char[] password = "1".toCharArray();
@@ -48,6 +49,7 @@ public class Zip4jSuite {
         copyTestData();
         createNoSplitZip();
         createEncryptedNoSplitZip();
+        createSplitZip();
     }
 
     @AfterSuite(enabled = clear)
@@ -80,6 +82,19 @@ public class Zip4jSuite {
         assertThat(Files.exists(noSplitZip)).isTrue();
         assertThat(Files.isRegularFile(noSplitZip)).isTrue();
         assertThatDirectory(noSplitZip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+    }
+
+    private static void createSplitZip() throws IOException {
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compressionMethod(CompressionMethod.DEFLATE)
+                                                .compressionLevel(CompressionLevel.NORMAL)
+                                                .splitLength(1024 * 1024).build();
+        ZipIt zip = ZipIt.builder().zipFile(splitZip).build();
+        zip.add(srcDir, parameters);
+
+        assertThat(Files.exists(splitZip)).isTrue();
+        assertThat(Files.isRegularFile(splitZip)).isTrue();
+        assertThatDirectory(splitZip.getParent()).exists().hasSubDirectories(0).hasFiles(10);
     }
 
     private static void createEncryptedNoSplitZip() throws IOException {
