@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @author Oleg Cherednik
  * @since 14.03.2019
  */
-@SuppressWarnings({ "FieldNamingConvention", "DefaultAnnotationParam" })
+@SuppressWarnings("FieldNamingConvention")
 public class ZipFolderSplitTest {
 
     private static final Path rootDir = Zip4jSuite.rootDir.resolve(ZipFolderSplitTest.class.getSimpleName());

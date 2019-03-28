@@ -105,9 +105,9 @@ class TestUtils {
     final Consumer<AbstractZipEntryDirectoryAssert<?>> rootDirAssert = dir -> {
         dir.exists().hasSubDirectories(3).hasFiles(5);
 
-        TestUtils.carsDirAssert.accept(dir);
-        TestUtils.starWarsDirAssert.accept(dir);
-        TestUtils.emptyDirAssert.accept(dir);
+        TestUtils.carsDirAssert.accept(dir.directory("cars/"));
+        TestUtils.starWarsDirAssert.accept(dir.directory("Star Wars/"));
+        TestUtils.emptyDirAssert.accept(dir.directory("empty_dir/"));
 
         dir.file("mcdonnell-douglas-f15-eagle.jpg").exists().isImage().hasSize(624_746);
         dir.file("saint-petersburg.jpg").exists().isImage().hasSize(1_074_836);

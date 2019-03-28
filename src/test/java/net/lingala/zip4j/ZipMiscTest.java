@@ -1,62 +1,58 @@
 package net.lingala.zip4j;
 
-import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.AESStrength;
 import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.ZipParameters;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
+import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThatZipFile;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Oleg Cherednik
  * @since 15.03.2019
  */
+@SuppressWarnings("FieldNamingConvention")
 public class ZipMiscTest {
 
-    private Path root;
-    private Path srcDir;
-    private Path destDir;
-    private Path resDir;
+    private static final Path rootDir = Zip4jSuite.rootDir.resolve(ZipMiscTest.class.getSimpleName());
+    private static final Path zipFile = rootDir.resolve("src.zip");
 
-    @BeforeMethod
-    public void createDirectory() throws IOException {
-        root = Paths.get("d:/zip4j");//Files.createTempDirectory("zip4j");
-        srcDir = root.resolve("src");
-        destDir = root.resolve("dest");
-        resDir = destDir.resolve("res");
-
-        Files.createDirectories(srcDir);
-        Files.createDirectories(destDir);
-//        Files.createDirectories(resDir);
+    @BeforeClass
+    public static void createDir() throws IOException {
+        Files.createDirectories(rootDir);
     }
 
-    //    @Test
-    public void shouldRetrieveAllEntryNamesForExistedZip() throws ZipException, IOException {
-        Path zipFile = destDir.resolve("src.zip");
+    @AfterClass(enabled = Zip4jSuite.clear)
+    public static void removeDir() throws IOException {
+        Zip4jSuite.removeDir(rootDir);
+    }
 
+    @Test
+    public void shouldRetrieveAllEntryNamesForExistedZip() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL).build();
+
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-        zip.add(srcDir, parameters);
+        zip.add(Zip4jSuite.srcDir, parameters);
 
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
         assertThat(misc.getEntryNames()).hasSize(15);
     }
 
-    //    @Test(dependsOnMethods = "shouldRetrieveAllEntryNamesForExistedZip")
-    public void shouldRetrieveAllEntryNamesForExistedEncryptedZip() throws ZipException, IOException {
-        Path zipFile = destDir.resolve("src.zip");
+    @Test(dependsOnMethods = "shouldRetrieveAllEntryNamesForExistedZip")
+    public void shouldRetrieveAllEntryNamesForExistedEncryptedZip() throws IOException {
         Files.deleteIfExists(zipFile);
 
         ZipParameters parameters = ZipParameters.builder()
@@ -65,38 +61,36 @@ public class ZipMiscTest {
                                                 .encryption(Encryption.STANDARD)
                                                 .aesKeyStrength(AESStrength.STRENGTH_256)
                                                 .password("1".toCharArray())
-                                                .defaultFolderPath(srcDir).build();
+                                                .defaultFolderPath(Zip4jSuite.srcDir).build();
 
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-        zip.add(srcDir, parameters);
+        zip.add(Zip4jSuite.srcDir, parameters);
 
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
         assertThat(misc.isEncrypted()).isTrue();
         assertThat(misc.getEntryNames()).hasSize(15);
     }
 
-    //    @Test(dependsOnMethods = "shouldRetrieveAllEntryNamesForExistedEncryptedZip")
-    public void shouldRetrieveSingleFileWhenNoSplitZip() throws ZipException {
-        Path zipFile = destDir.resolve("src.zip");
-        assertThat(Files.exists(zipFile)).isTrue();
-        assertThat(Files.isRegularFile(zipFile)).isTrue();
+    @Test(dependsOnMethods = "shouldRetrieveAllEntryNamesForExistedEncryptedZip")
+    public void shouldRetrieveSingleFileWhenNoSplitZip() throws IOException {
+        assertThatZipFile(zipFile).exists();
 
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
         assertThat(misc.getFiles()).hasSize(1);
     }
 
-    //    @Test(dependsOnMethods = "shouldRetrieveSingleFileWhenNoSplitZip")
-    public void shouldRetrieveMultipleFilesWhenSplitZip() throws IOException, ZipException {
-        Path zipFile = destDir.resolve("src.zip");
+    @Test(dependsOnMethods = "shouldRetrieveSingleFileWhenNoSplitZip")
+    public void shouldRetrieveMultipleFilesWhenSplitZip() throws IOException {
         Files.deleteIfExists(zipFile);
 
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .splitLength(1024 * 1024).build();
+
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-        zip.add(srcDir, parameters);
-        assertThatDirectory(destDir).exists().hasSubDirectories(0).hasFiles(10);
+        zip.add(Zip4jSuite.srcDir, parameters);
+        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(10);
 
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
         List<Path> files = misc.getFiles();
@@ -114,30 +108,20 @@ public class ZipMiscTest {
         assertThat(files.get(9).getFileName().toString()).isEqualTo("src.z09");
     }
 
-    //    @Test(dependsOnMethods = "shouldRetrieveMultipleFilesWhenSplitZip")
-    public void shouldMergeSplitZip() throws ZipException, IOException {
-        Path zipFile = destDir.resolve("src.zip");
-        assertThat(Files.exists(zipFile)).isTrue();
-        assertThat(Files.isRegularFile(zipFile)).isTrue();
+    @Test(dependsOnMethods = "shouldRetrieveMultipleFilesWhenSplitZip")
+    public void shouldMergeSplitZip() throws IOException {
+        assertThatZipFile(zipFile).exists();
 
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
         assertThat(misc.isSplit()).isTrue();
 
-        Path mergeDir = destDir.resolve("merge");
+        Path mergeDir = rootDir.resolve("merge");
         Path mergeZipFle = mergeDir.resolve("src.zip");
-        // TODO temporary
+        // TODO temporary, should be created automatically
         Files.createDirectories(mergeDir);
         misc.merge(mergeZipFle);
 
-        assertThat(Files.exists(zipFile)).isTrue();
-        assertThat(Files.isRegularFile(zipFile)).isTrue();
-        TestUtils.checkDirectory(mergeDir, 0, 1);
-
-        //---
-
-        Path mergeResDir = mergeDir.resolve("res");
-        UnzipIt unzip = UnzipIt.builder().zipFile(zipFile).build();
-        unzip.extract(mergeResDir);
-        TestUtils.checkResultDir(mergeResDir);
+        assertThatDirectory(mergeDir).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatZipFile(mergeZipFle).exists().directory("/").matches(TestUtils.rootDirAssert);
     }
 }

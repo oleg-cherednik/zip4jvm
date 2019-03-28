@@ -29,7 +29,16 @@ public class AbstractZipEntryDirectoryAssert<SELF extends AbstractZipEntryDirect
     }
 
     public AbstractZipEntryFileAssert<?> file(String name) {
-        return new ZipEntryFileAssert(new ZipEntry(actual.getName() + name), zipFile);
+        return new ZipEntryFileAssert(getZipEntry(name), zipFile);
+    }
+
+    public AbstractZipEntryDirectoryAssert<?> directory(String name) {
+        return new ZipEntryDirectoryAssert(new ZipEntry(name), zipFile);
+    }
+
+    private ZipEntry getZipEntry(String name) {
+        name = "/".equals(actual.getName()) ? name : actual.getName() + name;
+        return new ZipEntry(name);
     }
 
     public SELF matches(Consumer<AbstractZipEntryDirectoryAssert<?>> consumer) {

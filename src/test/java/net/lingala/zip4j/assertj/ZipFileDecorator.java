@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 /**
@@ -60,6 +61,8 @@ final class ZipFileDecorator {
                 }
             });
             return map;
+        } catch(ZipException e) {
+            return Collections.emptyMap();
         } catch(Exception e) {
             throw new RuntimeException(e);
         }
