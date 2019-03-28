@@ -49,6 +49,7 @@ public class ZipFolderSplitTest {
         assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(10);
         assertThat(Files.exists(zipFile)).isTrue();
         assertThat(Files.isRegularFile(zipFile)).isTrue();
+        // TODO ZipFile does not read split archive
 //        assertThatZipFile(zipFile).directory("/").matches(TestUtils.rootDirAssert);
     }
 

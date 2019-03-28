@@ -46,7 +46,6 @@ public class ZipRemoveTest {
         Path bentley = Zip4jSuite.carsDir.resolve("bentley-continental.jpg");
         Path ferrari = Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg");
         Path wiesmann = Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg");
-
         List<Path> files = Arrays.asList(bentley, ferrari, wiesmann);
 
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();

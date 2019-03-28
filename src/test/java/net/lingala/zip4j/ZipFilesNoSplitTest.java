@@ -4,69 +4,56 @@ import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.ZipParameters;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
 import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
-import static org.assertj.core.api.Assertions.assertThat;
+import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThatZipFile;
 
 /**
  * @author Oleg Cherednik
  * @since 15.03.2019
  */
+@SuppressWarnings("FieldNamingConvention")
 public class ZipFilesNoSplitTest {
 
-    private Path root;
-    private Path srcDir;
-    private Path destDir;
-    private Path resDir;
+    private static final Path rootDir = Zip4jSuite.rootDir.resolve(ZipFilesNoSplitTest.class.getSimpleName());
+    private static final Path zipFile = rootDir.resolve("src.zip");
 
-    @BeforeMethod
-    public void createDirectory() throws IOException {
-        root = Paths.get("d:/zip4j");//Files.createTempDirectory("zip4j");
-        srcDir = root.resolve("src");
-        destDir = root.resolve("dest");
-        resDir = destDir.resolve("res");
-
-        Files.createDirectories(srcDir);
-        Files.createDirectories(destDir);
-//        Files.createDirectories(resDir);
+    @BeforeClass
+    public static void createDir() throws IOException {
+        Files.createDirectories(rootDir);
     }
 
-//    @Test
-    public void shouldCreateNewZipWithFiles() throws IOException, ZipException {
-        Path zipFile = destDir.resolve("src.zip");
+    @AfterClass(enabled = Zip4jSuite.clear)
+    public static void removeDir() throws IOException {
+        Zip4jSuite.removeDir(rootDir);
+    }
 
+    @Test
+    public void shouldCreateNewZipWithFiles() throws IOException, ZipException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
-                                                .defaultFolderPath(srcDir).build();
+                                                .defaultFolderPath(Zip4jSuite.srcDir).build();
 
-        List<Path> files = Arrays.asList(
-                srcDir.resolve("cars/bentley-continental.jpg"),
-                srcDir.resolve("cars/ferrari-458-italia.jpg"),
-                srcDir.resolve("cars/wiesmann-gt-mf5.jpg"));
-
+        Path bentley = Zip4jSuite.carsDir.resolve("bentley-continental.jpg");
+        Path ferrari = Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg");
+        Path wiesmann = Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg");
+        List<Path> files = Arrays.asList(bentley, ferrari, wiesmann);
 
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         zip.add(files, parameters);
 
-        assertThat(Files.exists(zipFile)).isTrue();
-        assertThat(Files.isRegularFile(zipFile)).isTrue();
-        assertThatDirectory(destDir).exists().hasSubDirectories(0).hasFiles(1);
-
-        // ---
-
-        UnzipIt unzip = UnzipIt.builder().zipFile(zipFile).build();
-        unzip.extract(resDir);
-
-        TestUtils.checkDirectory(resDir, 1, 0);
-        TestUtils.checkCarsDirectory(resDir.resolve("cars"));
+        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatZipFile(zipFile).exists().rootEntry().hasSubDirectories(1).hasFiles(0);
+        assertThatZipFile(zipFile).directory("cars/").matches(TestUtils.carsDirAssert);
     }
 }
