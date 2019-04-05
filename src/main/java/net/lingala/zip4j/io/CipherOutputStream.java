@@ -212,6 +212,7 @@ public abstract class CipherOutputStream extends OutputStream {
         zipModel.addLocalFileHeader(localFileHeader);
         zipModel.addFileHeader(fileHeader);
 
+        // TODO should we do all above?
         if (parameters.getCompressionMethod() == CompressionMethod.DEFLATE)
             new LocalFileHeaderWriter(localFileHeader).writeExtended(out);
 
