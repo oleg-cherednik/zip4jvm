@@ -58,6 +58,7 @@ public class CompatibilityTest {
                 if (entry.isDirectory())
                     Files.createDirectories(path);
                 else {
+                    //noinspection NestedTryStatement
                     try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(path.toFile()))) {
                         int len;
 

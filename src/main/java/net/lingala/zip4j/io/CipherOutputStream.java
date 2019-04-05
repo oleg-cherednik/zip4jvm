@@ -177,7 +177,6 @@ public abstract class CipherOutputStream extends OutputStream {
     }
 
     public void closeEntry() throws IOException, ZipException {
-
         if (pendingBufferLength != 0) {
             encryptAndWrite(pendingBuffer, 0, pendingBufferLength);
             pendingBufferLength = 0;
@@ -213,7 +212,8 @@ public abstract class CipherOutputStream extends OutputStream {
         zipModel.addLocalFileHeader(localFileHeader);
         zipModel.addFileHeader(fileHeader);
 
-        new LocalFileHeaderWriter(localFileHeader).writeExtended(out);
+        if (parameters.getCompressionMethod() == CompressionMethod.DEFLATE)
+            new LocalFileHeaderWriter(localFileHeader).writeExtended(out);
 
         crc.reset();
         out.mark();
