@@ -50,7 +50,7 @@ public class ZipFolderSplitTest {
         assertThat(Files.exists(zipFile)).isTrue();
         assertThat(Files.isRegularFile(zipFile)).isTrue();
         // TODO ZipFile does not read split archive
-//        assertThatZipFile(zipFile).directory("/").matches(TestUtils.rootDirAssert);
+//        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
     }
 
     @Test(dependsOnMethods = "shouldCreateNewZipWithFolder")

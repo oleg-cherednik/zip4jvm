@@ -50,6 +50,6 @@ public class ZipEncryptedFilesTest {
 
         assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
         assertThatZipFile(zipFile).exists().rootEntry().hasSubDirectories(1).hasFiles(0);
-        assertThatZipFile(zipFile).directory("/").matches(TestUtils.rootDirAssert);
+        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
     }
 }

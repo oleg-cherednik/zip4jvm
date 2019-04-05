@@ -60,7 +60,7 @@ public class ZipStreamNoSplitTest {
 
         assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
         assertThatZipFile(zipFile).exists().rootEntry().hasSubDirectories(1).hasFiles(0);
-        assertThatZipFile(zipFile).directory("cars/").matches(TestUtils.carsDirAssert);
+        assertThatZipFile(zipFile).directory("cars/").matches(TestUtils.zipCarsDirAssert);
     }
 
     @Test(dependsOnMethods = "shouldCreateNewZipFromGivenStream")
@@ -88,7 +88,7 @@ public class ZipStreamNoSplitTest {
 
         assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
         assertThatZipFile(zipFile).exists().rootEntry().hasSubDirectories(2).hasFiles(0);
-        assertThatZipFile(zipFile).directory("cars/").matches(TestUtils.carsDirAssert);
-        assertThatZipFile(zipFile).directory("Star Wars/").matches(TestUtils.starWarsDirAssert);
+        assertThatZipFile(zipFile).directory("cars/").matches(TestUtils.zipCarsDirAssert);
+        assertThatZipFile(zipFile).directory("Star Wars/").matches(TestUtils.zipStarWarsDirAssert);
     }
 }

@@ -1,15 +1,11 @@
 package net.lingala.zip4j;
 
 import net.lingala.zip4j.exception.ZipException;
-import org.apache.commons.io.IOUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -38,12 +34,7 @@ public class UnzipStreamTest {
     public void shouldUnzipEntryToStreamWhenNoSplit() throws ZipException, IOException {
         Path imgFile = rootDir.resolve("bentley-continental.jpg");
         UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.noSplitZip).build();
-
-        try (InputStream in = unzip.extract("cars/bentley-continental.jpg");
-             OutputStream out = new FileOutputStream(imgFile.toFile())) {
-            IOUtils.copyLarge(in, out);
-        }
-
+        TestUtils.copyLarge(unzip.extract("cars/bentley-continental.jpg"), imgFile);
         assertThatFile(imgFile).exists().isImage().hasSize(1_395_362);
     }
 
@@ -51,12 +42,7 @@ public class UnzipStreamTest {
     public void shouldUnzipEntryToStreamWhenSplit() throws ZipException, IOException {
         Path imgFile = rootDir.resolve("ferrari-458-italia.jpg");
         UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.splitZip).build();
-
-        try (InputStream in = unzip.extract("cars/ferrari-458-italia.jpg");
-             OutputStream out = new FileOutputStream(imgFile.toFile())) {
-            IOUtils.copyLarge(in, out);
-        }
-
+        TestUtils.copyLarge(unzip.extract("cars/ferrari-458-italia.jpg"), imgFile);
         assertThatFile(imgFile).exists().isImage().hasSize(320_894);
     }
 }

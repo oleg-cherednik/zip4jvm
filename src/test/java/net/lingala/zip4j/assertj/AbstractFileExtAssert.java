@@ -1,11 +1,10 @@
 package net.lingala.zip4j.assertj;
 
-import org.assertj.core.api.AbstractAssert;
+import org.assertj.core.api.AbstractFileAssert;
 
 import javax.imageio.ImageIO;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,14 +15,14 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
  * @since 28.03.2019
  */
 @SuppressWarnings("NewClassNamingConvention")
-public class AbstractFileAssert<SELF extends AbstractFileAssert<SELF>> extends AbstractAssert<SELF, Path> {
+public class AbstractFileExtAssert<SELF extends AbstractFileExtAssert<SELF>> extends AbstractFileAssert<SELF> {
 
-    public AbstractFileAssert(Path actual, Class<?> selfType) {
-        super(actual, selfType);
+    public AbstractFileExtAssert(Path actual, Class<?> selfType) {
+        super(actual.toFile(), selfType);
     }
 
     public SELF isImage() {
-        try (InputStream in = new FileInputStream(actual.toFile())) {
+        try (InputStream in = new FileInputStream(actual)) {
             assertThat(ImageIO.read(in)).isNotNull();
         } catch(Exception e) {
             assertThatThrownBy(() -> {
@@ -36,7 +35,7 @@ public class AbstractFileAssert<SELF extends AbstractFileAssert<SELF>> extends A
 
     public SELF hasSize(long size) {
         try {
-            assertThat(Files.size(actual)).isEqualTo(size);
+            assertThat(actual.length()).isEqualTo(size);
         } catch(Exception e) {
             assertThatThrownBy(() -> {
                 throw e;
@@ -46,10 +45,14 @@ public class AbstractFileAssert<SELF extends AbstractFileAssert<SELF>> extends A
         return myself;
     }
 
+    public SELF hasEmptyContent() {
+        return hasContent("");
+    }
+
+    @Override
     public SELF exists() {
-        isNotNull();
-        assertThat(Files.exists(actual)).isTrue();
-        assertThat(Files.isRegularFile(actual)).isTrue();
+        super.exists();
+        isFile();
         return myself;
     }
 

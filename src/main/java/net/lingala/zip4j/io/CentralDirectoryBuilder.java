@@ -101,8 +101,8 @@ public class CentralDirectoryBuilder {
 
     private void updateGeneralPurposeFlag(@NonNull GeneralPurposeFlag generalPurposeFlag) {
         generalPurposeFlag.setCompressionLevel(parameters.getCompressionLevel());
-        generalPurposeFlag.setDataDescriptorExists(true);
-        generalPurposeFlag.setUtf8Enconding(zipModel.getCharset() == StandardCharsets.UTF_8);
+        generalPurposeFlag.setDataDescriptorExists(parameters.getCompressionMethod() == CompressionMethod.DEFLATE);
+        generalPurposeFlag.setUtf8Encoding(zipModel.getCharset() == StandardCharsets.UTF_8);
         generalPurposeFlag.setEncrypted(parameters.getEncryption() != Encryption.OFF);
         generalPurposeFlag.setStrongEncryption(parameters.getEncryption() == Encryption.STRONG);
     }

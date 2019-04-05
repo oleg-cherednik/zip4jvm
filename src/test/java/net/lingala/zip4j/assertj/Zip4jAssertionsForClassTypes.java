@@ -24,7 +24,7 @@ public class Zip4jAssertionsForClassTypes {
         return new DirectoryAssert(path);
     }
 
-    public static AbstractFileAssert<?> assertThatFile(Path path) {
+    public static AbstractFileExtAssert<?> assertThatFile(Path path) {
         return new FileAssert(path);
     }
 }

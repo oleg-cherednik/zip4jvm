@@ -70,6 +70,8 @@ public class Zip4jSuite {
                 e.printStackTrace();
             }
         });
+
+        assertThatDirectory(srcDir).matches(TestUtils.dirAssert);
     }
 
     private static void createNoSplitZip() throws IOException {

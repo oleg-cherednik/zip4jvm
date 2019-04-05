@@ -87,10 +87,10 @@ public final class GeneralPurposeFlag {
     }
 
     public boolean isUtf8Encoding() {
-        return BitUtils.isBitSet(data, BIT3);
+        return BitUtils.isBitSet(data, BIT1);
     }
 
-    public void setUtf8Enconding(boolean val) {
+    public void setUtf8Encoding(boolean val) {
         data = BitUtils.updateBits(data, BIT11, val);
     }
 

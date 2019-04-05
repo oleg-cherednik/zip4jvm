@@ -122,6 +122,6 @@ public class ZipMiscTest {
         misc.merge(mergeZipFle);
 
         assertThatDirectory(mergeDir).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(mergeZipFle).exists().directory("/").matches(TestUtils.rootDirAssert);
+        assertThatZipFile(mergeZipFle).exists().directory("/").matches(TestUtils.zipRootDirAssert);
     }
 }
