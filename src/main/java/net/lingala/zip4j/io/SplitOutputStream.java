@@ -111,21 +111,19 @@ public class SplitOutputStream extends OutputStream {
         currSplitFileCounter++;
     }
 
-    private boolean isHeaderData(byte[] buff) {
-        if (buff == null || buff.length < 4) {
+    @SuppressWarnings("MethodCanBeVariableArityMethod")
+    private static boolean isHeaderData(byte[] buf) {
+        if (buf == null || buf.length < 4)
             return false;
-        }
 
-        int signature = Raw.readIntLittleEndian(buff, 0);
+        int signature = Raw.readIntLittleEndian(buf, 0);
         long[] allHeaderSignatures = ZipUtils.getAllHeaderSignatures();
-        if (allHeaderSignatures != null && allHeaderSignatures.length > 0) {
-            for (int i = 0; i < allHeaderSignatures.length; i++) {
+
+        if (allHeaderSignatures != null && allHeaderSignatures.length > 0)
+            for (int i = 0; i < allHeaderSignatures.length; i++)
                 //Ignore split signature
-                if (allHeaderSignatures[i] != InternalZipConstants.SPLITSIG && allHeaderSignatures[i] == signature) {
+                if (allHeaderSignatures[i] != InternalZipConstants.SPLITSIG && allHeaderSignatures[i] == signature)
                     return true;
-                }
-            }
-        }
 
         return false;
     }
@@ -139,9 +137,8 @@ public class SplitOutputStream extends OutputStream {
      * @throws ZipException
      */
     public boolean checkBuffSizeAndStartNextSplitFile(int bufferSize) throws ZipException {
-        if (bufferSize < 0) {
+        if (bufferSize < 0)
             throw new ZipException("negative buffersize for checkBuffSizeAndStartNextSplitFile");
-        }
 
         if (!isBuffSizeFitForCurrSplitFile(bufferSize)) {
             try {

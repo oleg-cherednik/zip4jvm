@@ -24,7 +24,6 @@ import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.InternalZipConstants;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.zip.Deflater;
 
@@ -39,7 +38,7 @@ public class DeflateOutputStream extends CipherOutputStream {
 
     private boolean firstBytesRead;
 
-    public DeflateOutputStream(@NonNull OutputStream out, ZipModel zipModel) {
+    public DeflateOutputStream(@NonNull SplitOutputStream out, ZipModel zipModel) {
         super(out, zipModel);
     }
 

@@ -8,7 +8,6 @@ import net.lingala.zip4j.util.Raw;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.OutputStream;
 
 /**
  * @author Oleg Cherednik
@@ -23,7 +22,7 @@ public final class OutputStreamDecorator implements Closeable {
     private final byte[] shortByte = new byte[2];
     private final byte[] longByte = new byte[8];
 
-    private final OutputStream delegate;
+    private final SplitOutputStream delegate;
     private long offs;
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
@@ -37,33 +36,26 @@ public final class OutputStreamDecorator implements Closeable {
         return offs - mark;
     }
 
-    public OutputStream getDelegate() {
-        return delegate;
-    }
-
     public int getCurrSplitFileCounter() {
-        return delegate instanceof SplitOutputStream ? ((SplitOutputStream)delegate).getCurrSplitFileCounter() : 0;
+        return delegate.getCurrSplitFileCounter();
     }
 
     public long getFilePointer() throws IOException {
-        return delegate instanceof SplitOutputStream ? ((SplitOutputStream)delegate).getFilePointer() : offs;
+        return delegate.getFilePointer();
     }
 
     public long getOffsLocalHeaderRelative() throws IOException {
         if (offs == 4)
             return 4;
-        if (delegate instanceof SplitOutputStream)
-            return ((SplitOutputStream)delegate).getFilePointer();
-        return offs;
+        return delegate.getFilePointer();
     }
 
     public long getSplitLength() {
-        return delegate instanceof SplitOutputStream ? ((SplitOutputStream)delegate).getSplitLength() : 0;
+        return delegate.getSplitLength();
     }
 
     public void seek(long pos) throws IOException {
-        if (delegate instanceof SplitOutputStream)
-            ((SplitOutputStream)delegate).seek(pos);
+        delegate.seek(pos);
     }
 
     // 2 bytes (16 bit)

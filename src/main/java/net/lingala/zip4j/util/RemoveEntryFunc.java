@@ -20,13 +20,13 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.core.writers.HeaderWriter;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.io.NoSplitOutputStream;
 import net.lingala.zip4j.io.OutputStreamDecorator;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
 import org.apache.commons.io.IOUtils;
 
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -59,7 +59,7 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
 
         Path tmpZipFile = createTempFile();
 
-        try (OutputStreamDecorator out = new OutputStreamDecorator(new FileOutputStream(tmpZipFile.toFile()))) {
+        try (OutputStreamDecorator out = new OutputStreamDecorator(new NoSplitOutputStream(tmpZipFile))) {
             writeFileHeaders(out, entries);
             new HeaderWriter(zipModel).finalizeZipFile(out);
         } catch(IOException e) {

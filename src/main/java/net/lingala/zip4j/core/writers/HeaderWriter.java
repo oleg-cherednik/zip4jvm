@@ -20,7 +20,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.OutputStreamDecorator;
-import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
@@ -90,28 +89,24 @@ public final class HeaderWriter {
      * @throws ZipException
      */
     private void writeZipHeaderBytes(OutputStreamDecorator out, byte[] buf) throws IOException {
-        if (out.getDelegate() instanceof SplitOutputStream) {
-            if (((SplitOutputStream)out.getDelegate()).checkBuffSizeAndStartNextSplitFile(buf.length)) {
-                finalizeZipFile(out);
-                return;
-            }
+        if (out.getDelegate().checkBuffSizeAndStartNextSplitFile(buf.length)) {
+            finalizeZipFile(out);
+            return;
         }
 
         out.writeBytes(buf);
     }
 
     private void processHeaderData(OutputStreamDecorator out) throws IOException {
-        int currSplitFileCounter = out.getCurrSplitFileCounter();
-
-        if (out.getDelegate() instanceof SplitOutputStream)
-            zipModel.getEndCentralDirectory().setOffs(out.getFilePointer());
+        zipModel.getEndCentralDirectory().setOffs(out.getFilePointer());
 
         if (zipModel.isZip64()) {
-            zipModel.getZip64().getEndCentralDirectoryLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(currSplitFileCounter);
-            zipModel.getZip64().getEndCentralDirectoryLocator().setTotNumberOfDiscs(currSplitFileCounter + 1);
+            zipModel.getZip64().getEndCentralDirectoryLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(out.getCurrSplitFileCounter());
+            zipModel.getZip64().getEndCentralDirectoryLocator().setTotNumberOfDiscs(out.getCurrSplitFileCounter() + 1);
         }
-        zipModel.getEndCentralDirectory().setDiskNumber(currSplitFileCounter);
-        zipModel.getEndCentralDirectory().setStartDiskNumber(currSplitFileCounter);
+
+        zipModel.getEndCentralDirectory().setDiskNumber(out.getCurrSplitFileCounter());
+        zipModel.getEndCentralDirectory().setStartDiskNumber(out.getCurrSplitFileCounter());
     }
 
     private int writeCentralDirectory(LittleEndianBuffer bytes) {

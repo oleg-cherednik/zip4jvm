@@ -14,7 +14,6 @@ import net.lingala.zip4j.util.ZipUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -98,7 +97,7 @@ public final class ZipMisc {
         if (!zipModel.isSplitArchive())
             throw new ZipException("archive not a split zip file");
 
-        try (OutputStreamDecorator out = new OutputStreamDecorator(new FileOutputStream(destZipFile.toFile()))) {
+        try (OutputStreamDecorator out = new OutputStreamDecorator(new NoSplitOutputStream(destZipFile))) {
             zipModel.convertToSolid(copyAllParts(out.getDelegate(), zipModel));
             new HeaderWriter(zipModel).finalizeZipFileWithoutValidations(out);
         } catch(ZipException e) {

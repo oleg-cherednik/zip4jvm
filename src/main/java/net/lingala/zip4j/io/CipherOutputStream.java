@@ -61,7 +61,7 @@ public abstract class CipherOutputStream extends OutputStream {
     private int pendingBufferLength;
     protected long totalBytesRead;
 
-    protected CipherOutputStream(@NonNull OutputStream out, ZipModel zipModel) {
+    protected CipherOutputStream(@NonNull SplitOutputStream out, ZipModel zipModel) {
         this.out = new OutputStreamDecorator(out);
         this.zipModel = initZipModel(zipModel, this.out);
     }
