@@ -74,7 +74,7 @@ public class LocalFileHeader {
     public short getExtraFileLength(ZipModel zipModel) {
         short extraFieldLength = 0;
 
-        if (zipModel.isZip64Format())
+        if (zipModel.isZip64())
             extraFieldLength += 20;
         if (aesExtraDataRecord != null)
             extraFieldLength += 11;

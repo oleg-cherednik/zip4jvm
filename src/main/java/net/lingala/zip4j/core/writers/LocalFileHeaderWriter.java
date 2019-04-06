@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.io.OutputStreamDecorator;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.LocalFileHeader;
-import net.lingala.zip4j.model.Zip64EndCentralDirectoryLocator;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
 
@@ -33,7 +32,7 @@ public final class LocalFileHeaderWriter {
         if (localFileHeader.getUncompressedSize() + HeaderWriter.ZIP64_EXTRA_BUF >= InternalZipConstants.ZIP_64_LIMIT) {
             out.writeDword((int)InternalZipConstants.ZIP_64_LIMIT);
             out.writeDword(0);
-            zipModel.setZip64EndCentralDirectoryLocator(new Zip64EndCentralDirectoryLocator());
+            zipModel.zip64();
             localFileHeader.setWriteComprSizeInZip64ExtraRecord(true);
         } else {
             out.writeDword(localFileHeader.getCompressedSize());
@@ -45,7 +44,7 @@ public final class LocalFileHeaderWriter {
         out.writeWord(localFileHeader.getExtraFileLength(zipModel));
         out.writeBytes(localFileHeader.getFileName().getBytes(zipModel.getCharset()));
 
-        if (zipModel.isZip64Format()) {
+        if (zipModel.isZip64()) {
             out.writeWord((short)InternalZipConstants.EXTRAFIELDZIP64LENGTH);
             out.writeWord((short)16);
             out.writeLong(localFileHeader.getUncompressedSize());

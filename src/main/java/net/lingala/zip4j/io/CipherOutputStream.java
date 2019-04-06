@@ -186,7 +186,7 @@ public abstract class CipherOutputStream extends OutputStream {
             if (encryptor instanceof AESEncryptor) {
                 out.writeBytes(((AESEncryptor)encryptor).getFinalMac());
             } else
-                throw new ZipException("invalid encryptor for AES encrypted file");
+                throw new ZipException("invalid encryption for AES encrypted file");
         }
 
         fileHeader.setCompressedSize(out.getWrittenBytesAmount());

@@ -32,7 +32,10 @@ final class CentralDirectoryReader {
     private final LittleEndianRandomAccessFile in;
     private final EndCentralDirectory dir;
     private final Zip64EndCentralDirectory zip64Dir;
-    private final boolean zip64;
+
+    private boolean isZip64() {
+        return zip64Dir != null;
+    }
 
     public CentralDirectory read() throws IOException {
         findHead();
@@ -46,7 +49,7 @@ final class CentralDirectoryReader {
 
     @NonNull
     private List<CentralDirectory.FileHeader> readFileHeaders() throws IOException {
-        int total = zip64 ? (int)zip64Dir.getTotalEntries() : dir.getTotalEntries();
+        int total = isZip64() ? (int)zip64Dir.getTotalEntries() : dir.getTotalEntries();
         List<CentralDirectory.FileHeader> fileHeaders = new ArrayList<>(total);
 
         for (int i = 0; i < total; i++)
@@ -167,6 +170,6 @@ final class CentralDirectoryReader {
     }
 
     private void findHead() throws IOException {
-        in.seek(zip64 ? zip64Dir.getOffsetStartCenDirWRTStartDiskNo() : dir.getOffsCentralDirectory());
+        in.seek(isZip64() ? zip64Dir.getOffsetStartCenDirWRTStartDiskNo() : dir.getOffsCentralDirectory());
     }
 }

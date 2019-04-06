@@ -18,6 +18,7 @@ package net.lingala.zip4j.model;
 
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.FilenameUtils;
@@ -41,8 +42,7 @@ public class ZipModel {
     @NonNull
     private CentralDirectory centralDirectory = new CentralDirectory();
     private EndCentralDirectory endCentralDirectory = new EndCentralDirectory();
-    private Zip64EndCentralDirectoryLocator zip64EndCentralDirectoryLocator;
-    private Zip64EndCentralDirectory zip64EndCentralDirectory;
+    private Zip64 zip64;
     private long splitLength = NO_SPLIT;
     @NonNull
     private Path zipFile;
@@ -67,8 +67,17 @@ public class ZipModel {
         splitLength = NO_SPLIT;
     }
 
-    public boolean isZip64Format() {
-        return zip64EndCentralDirectoryLocator != null;
+    public boolean isZip64() {
+        return zip64 != null;
+    }
+
+    public void zip64() {
+        if (zip64 == null)
+            zip64 = new Zip64(new Zip64EndCentralDirectoryLocator(), new Zip64EndCentralDirectory());
+    }
+
+    public void zip64(Zip64EndCentralDirectoryLocator zip64EndCentralDirectoryLocator, Zip64EndCentralDirectory zip64EndCentralDirectory) {
+        zip64 = new Zip64(zip64EndCentralDirectoryLocator, zip64EndCentralDirectory);
     }
 
     public boolean isEmpty() {
@@ -82,8 +91,8 @@ public class ZipModel {
     }
 
     public long getOffsCentralDirectory() {
-        if (isZip64Format())
-            return zip64EndCentralDirectory.getOffsetStartCenDirWRTStartDiskNo();
+        if (isZip64())
+            return zip64.getEndCentralDirectory().getOffsetStartCenDirWRTStartDiskNo();
         if (endCentralDirectory != null)
             return endCentralDirectory.getOffsCentralDirectory();
         return 0;
@@ -125,19 +134,19 @@ public class ZipModel {
     }
 
     private void updateZip64EndCentralDirLocator(long totalBytesWritten) throws ZipException {
-        if (isZip64Format()) {
-            zip64EndCentralDirectoryLocator.setNoOfDiskStartOfZip64EndOfCentralDirRec(0);
-            zip64EndCentralDirectoryLocator.updateOffsetZip64EndOfCentralDirRec(totalBytesWritten);
-            zip64EndCentralDirectoryLocator.setTotNumberOfDiscs(1);
+        if (isZip64()) {
+            zip64.getEndCentralDirectoryLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(0);
+            zip64.getEndCentralDirectoryLocator().updateOffsetZip64EndOfCentralDirRec(totalBytesWritten);
+            zip64.getEndCentralDirectoryLocator().setTotNumberOfDiscs(1);
         }
     }
 
     private void updateZip64EndCentralDirRec(long totalBytesWritten) throws ZipException {
-        if (isZip64Format()) {
-            zip64EndCentralDirectory.setNoOfThisDisk(0);
-            zip64EndCentralDirectory.setNoOfThisDiskStartOfCentralDir(0);
-            zip64EndCentralDirectory.setTotNoOfEntriesInCentralDirOnThisDisk(endCentralDirectory.getTotalEntries());
-            zip64EndCentralDirectory.updateOffsetStartCenDirWRTStartDiskNo(totalBytesWritten);
+        if (isZip64()) {
+            zip64.getEndCentralDirectory().setNoOfThisDisk(0);
+            zip64.getEndCentralDirectory().setNoOfThisDiskStartOfCentralDir(0);
+            zip64.getEndCentralDirectory().setTotNoOfEntriesInCentralDirOnThisDisk(endCentralDirectory.getTotalEntries());
+            zip64.getEndCentralDirectory().updateOffsetStartCenDirWRTStartDiskNo(totalBytesWritten);
         }
     }
 
@@ -161,6 +170,13 @@ public class ZipModel {
             throw new ZipException("Zip file already exists. Zip file format does not allow updating split/spanned files");
 
         return this;
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static final class Zip64 {
+        private final Zip64EndCentralDirectoryLocator endCentralDirectoryLocator;
+        private final Zip64EndCentralDirectory endCentralDirectory;
     }
 
 }

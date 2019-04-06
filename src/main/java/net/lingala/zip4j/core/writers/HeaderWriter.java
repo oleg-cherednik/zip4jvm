@@ -23,15 +23,12 @@ import net.lingala.zip4j.io.OutputStreamDecorator;
 import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.LocalFileHeader;
-import net.lingala.zip4j.model.Zip64EndCentralDirectory;
-import net.lingala.zip4j.model.Zip64EndCentralDirectoryLocator;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.LittleEndianBuffer;
 import net.lingala.zip4j.util.Raw;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
@@ -49,27 +46,23 @@ public class HeaderWriter {
      */
     public void finalizeZipFile(@NonNull ZipModel zipModel, @NonNull OutputStreamDecorator out) {
         try {
-            processHeaderData(zipModel, out.getDelegate());
+            processHeaderData(zipModel, out);
 
             long offsetCentralDir = zipModel.getEndCentralDirectory().getOffsCentralDirectory();
             LittleEndianBuffer bytes = new LittleEndianBuffer();
             int sizeOfCentralDir = writeCentralDirectory(zipModel, out, bytes);
 
-            if (zipModel.isZip64Format()) {
-                if (zipModel.getZip64EndCentralDirectory() == null)
-                    zipModel.setZip64EndCentralDirectory(new Zip64EndCentralDirectory());
-                if (zipModel.getZip64EndCentralDirectoryLocator() == null)
-                    zipModel.setZip64EndCentralDirectoryLocator(new Zip64EndCentralDirectoryLocator());
+            if (zipModel.isZip64()) {
+                zipModel.getZip64().getEndCentralDirectoryLocator().setOffsetZip64EndOfCentralDirRec(offsetCentralDir + sizeOfCentralDir);
 
-                zipModel.getZip64EndCentralDirectoryLocator().setOffsetZip64EndOfCentralDirRec(offsetCentralDir + sizeOfCentralDir);
                 if (out.getDelegate() instanceof SplitOutputStream) {
-                    zipModel.getZip64EndCentralDirectoryLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(
+                    zipModel.getZip64().getEndCentralDirectoryLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(
                             ((SplitOutputStream)out.getDelegate()).getCurrSplitFileCounter());
-                    zipModel.getZip64EndCentralDirectoryLocator().setTotNumberOfDiscs(
+                    zipModel.getZip64().getEndCentralDirectoryLocator().setTotNumberOfDiscs(
                             ((SplitOutputStream)out.getDelegate()).getCurrSplitFileCounter() + 1);
                 } else {
-                    zipModel.getZip64EndCentralDirectoryLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(0);
-                    zipModel.getZip64EndCentralDirectoryLocator().setTotNumberOfDiscs(1);
+                    zipModel.getZip64().getEndCentralDirectoryLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(0);
+                    zipModel.getZip64().getEndCentralDirectoryLocator().setTotNumberOfDiscs(1);
                 }
 
                 writeZip64EndOfCentralDirectoryRecord(zipModel, sizeOfCentralDir, offsetCentralDir, bytes);
@@ -101,15 +94,8 @@ public class HeaderWriter {
             long offsetCentralDir = zipModel.getEndCentralDirectory().getOffsCentralDirectory();
             int sizeOfCentralDir = writeCentralDirectory(zipModel, out, bytes);
 
-            if (zipModel.isZip64Format()) {
-                if (zipModel.getZip64EndCentralDirectory() == null) {
-                    zipModel.setZip64EndCentralDirectory(new Zip64EndCentralDirectory());
-                }
-                if (zipModel.getZip64EndCentralDirectoryLocator() == null) {
-                    zipModel.setZip64EndCentralDirectoryLocator(new Zip64EndCentralDirectoryLocator());
-                }
-
-                zipModel.getZip64EndCentralDirectoryLocator().setOffsetZip64EndOfCentralDirRec(offsetCentralDir + sizeOfCentralDir);
+            if (zipModel.isZip64()) {
+                zipModel.getZip64().getEndCentralDirectoryLocator().setOffsetZip64EndOfCentralDirRec(offsetCentralDir + sizeOfCentralDir);
                 writeZip64EndOfCentralDirectoryRecord(zipModel, sizeOfCentralDir, offsetCentralDir, bytes);
                 writeZip64EndOfCentralDirectoryLocator(zipModel, bytes);
             }
@@ -141,29 +127,15 @@ public class HeaderWriter {
         out.writeBytes(buf);
     }
 
-    /**
-     * Fills the header data in the zip model
-     *
-     * @param zipModel
-     * @param outputStream
-     * @throws ZipException
-     */
-    private void processHeaderData(ZipModel zipModel, OutputStream outputStream) throws IOException {
-        int currSplitFileCounter = 0;
-        if (outputStream instanceof SplitOutputStream) {
-            zipModel.getEndCentralDirectory().setOffsCentralDirectory(((SplitOutputStream)outputStream).getFilePointer());
-            currSplitFileCounter = ((SplitOutputStream)outputStream).getCurrSplitFileCounter();
+    private static void processHeaderData(ZipModel zipModel, OutputStreamDecorator out) throws IOException {
+        int currSplitFileCounter = out.getCurrSplitFileCounter();
 
-        }
+        if (out.getDelegate() instanceof SplitOutputStream)
+            zipModel.getEndCentralDirectory().setOffsCentralDirectory(out.getFilePointer());
 
-        if (zipModel.isZip64Format()) {
-            if (zipModel.getZip64EndCentralDirectory() == null)
-                zipModel.setZip64EndCentralDirectory(new Zip64EndCentralDirectory());
-            if (zipModel.getZip64EndCentralDirectoryLocator() == null)
-                zipModel.setZip64EndCentralDirectoryLocator(new Zip64EndCentralDirectoryLocator());
-
-            zipModel.getZip64EndCentralDirectoryLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(currSplitFileCounter);
-            zipModel.getZip64EndCentralDirectoryLocator().setTotNumberOfDiscs(currSplitFileCounter + 1);
+        if (zipModel.isZip64()) {
+            zipModel.getZip64().getEndCentralDirectoryLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(currSplitFileCounter);
+            zipModel.getZip64().getEndCentralDirectoryLocator().setTotNumberOfDiscs(currSplitFileCounter + 1);
         }
         zipModel.getEndCentralDirectory().setDiskNumber(currSplitFileCounter);
         zipModel.getEndCentralDirectory().setStartDiskNumber(currSplitFileCounter);
@@ -263,15 +235,15 @@ public class HeaderWriter {
             bytes.copyByteArrayToArrayList(intByte);
 
             //number of the disk with the start of the zip64 end of central directory
-            Raw.writeIntLittleEndian(intByte, 0, zipModel.getZip64EndCentralDirectoryLocator().getNoOfDiskStartOfZip64EndOfCentralDirRec());
+            Raw.writeIntLittleEndian(intByte, 0, zipModel.getZip64().getEndCentralDirectoryLocator().getNoOfDiskStartOfZip64EndOfCentralDirRec());
             bytes.copyByteArrayToArrayList(intByte);
 
             //relative offset of the zip64 end of central directory record
-            Raw.writeLongLittleEndian(longByte, 0, zipModel.getZip64EndCentralDirectoryLocator().getOffsetZip64EndOfCentralDirRec());
+            Raw.writeLongLittleEndian(longByte, 0, zipModel.getZip64().getEndCentralDirectoryLocator().getOffsetZip64EndOfCentralDirRec());
             bytes.copyByteArrayToArrayList(longByte);
 
             //total number of disks
-            Raw.writeIntLittleEndian(intByte, 0, zipModel.getZip64EndCentralDirectoryLocator().getTotNumberOfDiscs());
+            Raw.writeIntLittleEndian(intByte, 0, zipModel.getZip64().getEndCentralDirectoryLocator().getTotNumberOfDiscs());
             bytes.copyByteArrayToArrayList(intByte);
         } catch(Exception e) {
             throw new ZipException(e);
@@ -382,7 +354,7 @@ public class HeaderWriter {
                 case InternalZipConstants.UPDATE_LFH_COMP_SIZE:
                 case InternalZipConstants.UPDATE_LFH_UNCOMP_SIZE:
                     updateCompressedSizeInLocalFileHeader(currOutputStream, localFileHeader,
-                            offset, toUpdate, bytesToWrite, zipModel.isZip64Format());
+                            offset, toUpdate, bytesToWrite, zipModel.isZip64());
                     break;
                 default:
                     break;

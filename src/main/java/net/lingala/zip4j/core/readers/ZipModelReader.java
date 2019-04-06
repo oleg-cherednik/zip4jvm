@@ -4,6 +4,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.EndCentralDirectory;
+import net.lingala.zip4j.model.Zip64EndCentralDirectory;
 import net.lingala.zip4j.model.Zip64EndCentralDirectoryLocator;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
@@ -58,12 +59,11 @@ public final class ZipModelReader {
         zipModel.setCharset(charset);
         zipModel.setEndCentralDirectory(dir);
 
-        if (locator != null) {
-            zipModel.setZip64EndCentralDirectoryLocator(locator);
-            zipModel.setZip64EndCentralDirectory(new Zip64EndCentralDirectoryReader(in, locator.getOffsetZip64EndOfCentralDirRec()).read());
-        }
+        if (locator != null)
+            zipModel.zip64(locator, new Zip64EndCentralDirectoryReader(in, locator.getOffsetZip64EndOfCentralDirRec()).read());
 
-        zipModel.setCentralDirectory(new CentralDirectoryReader(in, dir, zipModel.getZip64EndCentralDirectory(), zipModel.isZip64Format()).read());
+        Zip64EndCentralDirectory zip64EndCentralDirectory = zipModel.isZip64() ? zipModel.getZip64().getEndCentralDirectory() : null;
+        zipModel.setCentralDirectory(new CentralDirectoryReader(in, dir, zip64EndCentralDirectory).read());
 
         return zipModel;
     }

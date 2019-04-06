@@ -57,5 +57,4 @@ public class EndCentralDirectory {
     public String getComment() {
         return comment;
     }
-
 }

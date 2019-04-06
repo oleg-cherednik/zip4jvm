@@ -45,6 +45,10 @@ public final class OutputStreamDecorator implements Closeable {
         return delegate instanceof SplitOutputStream ? ((SplitOutputStream)delegate).getCurrSplitFileCounter() : 0;
     }
 
+    public long getFilePointer() throws IOException {
+        return delegate instanceof SplitOutputStream ? ((SplitOutputStream)delegate).getFilePointer() : offs;
+    }
+
     public long getOffsLocalHeaderRelative() throws IOException {
         if (offs == 4)
             return 4;
@@ -79,12 +83,13 @@ public final class OutputStreamDecorator implements Closeable {
     public void writeInt(int val) throws IOException {
         Raw.writeIntLittleEndian(intByte, 0, val);
         delegate.write(intByte);
-        offs += 4;
+        offs += intByte.length;
     }
 
     public void writeShort(short val) throws IOException {
         Raw.writeShortLittleEndian(shortByte, 0, val);
         delegate.write(shortByte);
+        offs += shortByte.length;
     }
 
     public void writeBytes(byte... buf) throws IOException {
@@ -100,12 +105,14 @@ public final class OutputStreamDecorator implements Closeable {
     public void writeLong(long val) throws IOException {
         Raw.writeLongLittleEndian(longByte, 0, val);
         delegate.write(longByte);
+        offs += longByte.length;
     }
 
     public void writeLongAsInt(long val) throws IOException {
         Raw.writeLongLittleEndian(longByte, 0, val);
         System.arraycopy(longByte, 0, intByte, 0, 4);
         delegate.write(intByte);
+        offs += intByte.length;
     }
 
     @Override

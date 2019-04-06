@@ -3,7 +3,6 @@ package net.lingala.zip4j.core.writers;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.CentralDirectory;
-import net.lingala.zip4j.model.Zip64EndCentralDirectoryLocator;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.LittleEndianBuffer;
@@ -149,7 +148,7 @@ public final class CentralDirectoryWriter {
             sizeOfFileHeader += fileNameBytes.length;
 
             if (writeZip64FileSize || writeZip64OffsetLocalHeader) {
-                zipModel.setZip64EndCentralDirectoryLocator(new Zip64EndCentralDirectoryLocator());
+                zipModel.zip64();
 
                 //Zip64 header
                 Raw.writeShortLittleEndian(shortByte, 0, (short)InternalZipConstants.EXTRAFIELDZIP64LENGTH);
