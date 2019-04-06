@@ -25,50 +25,46 @@ public final class LocalFileHeaderWriter {
     private final LocalFileHeader localFileHeader;
 
     public void write(@NonNull ZipModel zipModel, @NonNull OutputStreamDecorator out) throws IOException {
-        LittleEndianBuffer bytes = new LittleEndianBuffer();
-
-        bytes.writeDword(localFileHeader.getSignature());
-        bytes.writeWord((short)localFileHeader.getVersionToExtract());
-        bytes.writeShort(localFileHeader.getGeneralPurposeFlag().getData());
-        bytes.writeWord(localFileHeader.getCompressionMethod().getValue());
-        bytes.writeDword(localFileHeader.getLastModifiedTime());
-        bytes.writeDword((int)localFileHeader.getCrc32());
+        out.writeDword(localFileHeader.getSignature());
+        out.writeWord((short)localFileHeader.getVersionToExtract());
+        out.writeShort(localFileHeader.getGeneralPurposeFlag().getData());
+        out.writeWord(localFileHeader.getCompressionMethod().getValue());
+        out.writeDword(localFileHeader.getLastModifiedTime());
+        out.writeDword((int)localFileHeader.getCrc32());
 
         //compressed & uncompressed size
         if (localFileHeader.getUncompressedSize() + HeaderWriter.ZIP64_EXTRA_BUF >= InternalZipConstants.ZIP_64_LIMIT) {
-            bytes.writeDword((int)InternalZipConstants.ZIP_64_LIMIT);
-            bytes.writeDword(0);
+            out.writeDword((int)InternalZipConstants.ZIP_64_LIMIT);
+            out.writeDword(0);
             zipModel.setZip64EndCentralDirectoryLocator(new Zip64EndCentralDirectoryLocator());
             localFileHeader.setWriteComprSizeInZip64ExtraRecord(true);
         } else {
-            bytes.writeDword(localFileHeader.getCompressedSize());
-            bytes.writeDword(localFileHeader.getUncompressedSize());
+            out.writeDword(localFileHeader.getCompressedSize());
+            out.writeDword(localFileHeader.getUncompressedSize());
             localFileHeader.setWriteComprSizeInZip64ExtraRecord(false);
         }
 
-        bytes.writeWord((short)localFileHeader.getFileNameLength());
-        bytes.writeWord(localFileHeader.getExtraFileLength(zipModel));
-        bytes.writeBytes(localFileHeader.getFileName().getBytes(zipModel.getCharset()));
+        out.writeWord((short)localFileHeader.getFileNameLength());
+        out.writeWord(localFileHeader.getExtraFileLength(zipModel));
+        out.writeBytes(localFileHeader.getFileName().getBytes(zipModel.getCharset()));
 
         if (zipModel.isZip64Format()) {
-            bytes.writeWord((short)InternalZipConstants.EXTRAFIELDZIP64LENGTH);
-            bytes.writeWord((short)16);
-            bytes.writeLong(localFileHeader.getUncompressedSize());
-            bytes.writeBytes(new byte[8]);
+            out.writeWord((short)InternalZipConstants.EXTRAFIELDZIP64LENGTH);
+            out.writeWord((short)16);
+            out.writeLong(localFileHeader.getUncompressedSize());
+            out.writeBytes(new byte[8]);
         }
 
         if (localFileHeader.getAesExtraDataRecord() != null) {
             AESExtraDataRecord aesExtraDataRecord = localFileHeader.getAesExtraDataRecord();
 
-            bytes.writeWord((short)aesExtraDataRecord.getSignature());
-            bytes.writeWord((short)aesExtraDataRecord.getDataSize());
-            bytes.writeWord((short)aesExtraDataRecord.getVersionNumber());
-            bytes.writeBytes(aesExtraDataRecord.getVendor().getBytes());
-            bytes.writeBytes(aesExtraDataRecord.getAesStrength().getValue());
-            bytes.writeWord(aesExtraDataRecord.getCompressionMethod().getValue());
+            out.writeWord((short)aesExtraDataRecord.getSignature());
+            out.writeWord((short)aesExtraDataRecord.getDataSize());
+            out.writeWord((short)aesExtraDataRecord.getVersionNumber());
+            out.writeBytes(aesExtraDataRecord.getVendor().getBytes());
+            out.writeBytes(aesExtraDataRecord.getAesStrength().getValue());
+            out.writeWord(aesExtraDataRecord.getCompressionMethod().getValue());
         }
-
-        bytes.flushInto(out);
     }
 
     public void writeExtended(@NonNull OutputStreamDecorator out) throws IOException {

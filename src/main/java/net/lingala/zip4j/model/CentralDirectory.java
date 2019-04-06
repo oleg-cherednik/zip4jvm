@@ -17,6 +17,7 @@
 package net.lingala.zip4j.model;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 import net.lingala.zip4j.exception.ZipException;
@@ -81,6 +82,7 @@ public class CentralDirectory {
 
     @Getter
     @Setter
+    @NoArgsConstructor
     public static class FileHeader {
 
         // size:4 - signature (0x02014b50)
@@ -131,6 +133,11 @@ public class CentralDirectory {
         private char[] password;
         private Zip64ExtendedInfo zip64ExtendedInfo;
         private AESExtraDataRecord aesExtraDataRecord;
+
+        public FileHeader(String fileName, Encryption encryption) {
+            this.fileName = fileName;
+            this.encryption = encryption;
+        }
 
         public boolean isDirectory() {
             return ZipUtils.isDirectory(fileName);

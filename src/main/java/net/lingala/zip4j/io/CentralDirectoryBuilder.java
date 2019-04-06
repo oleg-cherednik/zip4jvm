@@ -38,11 +38,7 @@ public class CentralDirectoryBuilder {
     private final int currSplitFileCounter;
 
     public CentralDirectory.FileHeader createFileHeader() throws IOException {
-        String fileName = getFileName();
-
-        CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
-        fileHeader.setEncryption(parameters.getEncryption());
-        fileHeader.setFileName(fileName);
+        CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader(getFileName(), parameters.getEncryption());
 
         fileHeader.setVersionMadeBy(20);
         fileHeader.setVersionToExtract(20);
@@ -52,7 +48,7 @@ public class CentralDirectoryBuilder {
         fileHeader.setCrc32(getCrc32());
         fileHeader.setCompressedSize(getCompressedSize(fileHeader));
         fileHeader.setUncompressedSize(getUncompressedSize(fileHeader));
-        fileHeader.setFileNameLength(ZipUtils.getEncodedStringLength(fileName, zipModel.getCharset()));
+        fileHeader.setFileNameLength(ZipUtils.getEncodedStringLength(fileHeader.getFileName(), zipModel.getCharset()));
         fileHeader.setExtraFieldLength(0);
         fileHeader.setFileCommentLength(0);
         fileHeader.setDiskNumber(currSplitFileCounter);

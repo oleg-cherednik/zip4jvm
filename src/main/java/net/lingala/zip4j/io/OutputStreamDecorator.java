@@ -20,6 +20,8 @@ import java.io.OutputStream;
 public final class OutputStreamDecorator implements Closeable {
 
     private final byte[] intByte = new byte[4];
+    private final byte[] shortByte = new byte[2];
+    private final byte[] longByte = new byte[8];
 
     private final OutputStream delegate;
     private long offs;
@@ -60,10 +62,29 @@ public final class OutputStreamDecorator implements Closeable {
             ((SplitOutputStream)delegate).seek(pos);
     }
 
+    // 2 bytes (16 bit)
+    public void writeWord(short val) throws IOException {
+        writeShort(val);
+    }
+
+    // 4 bytes (32 bit)
+    public void writeDword(int val) throws IOException {
+        writeInt(val);
+    }
+
+    public void writeDword(long val) throws IOException {
+        writeLongAsInt(val);
+    }
+
     public void writeInt(int val) throws IOException {
         Raw.writeIntLittleEndian(intByte, 0, val);
         delegate.write(intByte);
         offs += 4;
+    }
+
+    public void writeShort(short val) throws IOException {
+        Raw.writeShortLittleEndian(shortByte, 0, val);
+        delegate.write(shortByte);
     }
 
     public void writeBytes(byte... buf) throws IOException {
@@ -74,6 +95,17 @@ public final class OutputStreamDecorator implements Closeable {
     public void writeBytes(byte[] buf, int offs, int len) throws IOException {
         delegate.write(buf, offs, len);
         this.offs += len;
+    }
+
+    public void writeLong(long val) throws IOException {
+        Raw.writeLongLittleEndian(longByte, 0, val);
+        delegate.write(longByte);
+    }
+
+    public void writeLongAsInt(long val) throws IOException {
+        Raw.writeLongLittleEndian(longByte, 0, val);
+        System.arraycopy(longByte, 0, intByte, 0, 4);
+        delegate.write(intByte);
     }
 
     @Override
