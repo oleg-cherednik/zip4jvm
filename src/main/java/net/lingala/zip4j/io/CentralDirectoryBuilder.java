@@ -42,6 +42,7 @@ public class CentralDirectoryBuilder {
 
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
         fileHeader.setEncryption(parameters.getEncryption());
+        fileHeader.setFileName(fileName);
 
         fileHeader.setVersionMadeBy(20);
         fileHeader.setVersionToExtract(20);
@@ -58,7 +59,6 @@ public class CentralDirectoryBuilder {
         fileHeader.setInternalFileAttributes(null);
         fileHeader.setExternalFileAttributes(getExternalFileAttr());
         fileHeader.setOffsLocalFileHeader(0);
-        fileHeader.setFileName(fileName);
         fileHeader.setExtraDataRecords(Collections.emptyMap());
         fileHeader.setZip64ExtendedInfo(null);
         fileHeader.setAesExtraDataRecord(getAesExtraDataRecord(fileHeader.getEncryption()));
