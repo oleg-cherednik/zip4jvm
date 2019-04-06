@@ -89,10 +89,10 @@ public final class HeaderWriter {
      * @throws ZipException
      */
     private void writeZipHeaderBytes(OutputStreamDecorator out, byte[] buf) throws IOException {
-        if (out.getDelegate().checkBuffSizeAndStartNextSplitFile(buf.length)) {
-            finalizeZipFile(out);
-            return;
-        }
+//        if (out.getDelegate().checkBuffSizeAndStartNextSplitFile(buf.length)) {
+//            finalizeZipFile(out);
+//            return;
+//        }
 
         out.writeBytes(buf);
     }
