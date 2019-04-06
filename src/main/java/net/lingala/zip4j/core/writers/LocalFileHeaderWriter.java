@@ -2,7 +2,6 @@ package net.lingala.zip4j.core.writers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.lingala.zip4j.core.HeaderWriter;
 import net.lingala.zip4j.io.OutputStreamDecorator;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.LocalFileHeader;

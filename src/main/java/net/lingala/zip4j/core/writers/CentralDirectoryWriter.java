@@ -1,6 +1,5 @@
 package net.lingala.zip4j.core.writers;
 
-import net.lingala.zip4j.core.HeaderWriter;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.CentralDirectory;

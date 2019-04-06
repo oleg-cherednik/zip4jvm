@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package net.lingala.zip4j.core;
+package net.lingala.zip4j.core.writers;
 
 import lombok.NonNull;
-import net.lingala.zip4j.core.writers.CentralDirectoryWriter;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.NoSplitOutputStream;
 import net.lingala.zip4j.io.OutputStreamDecorator;

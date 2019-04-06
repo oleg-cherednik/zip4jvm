@@ -2,7 +2,7 @@ package net.lingala.zip4j;
 
 import lombok.Builder;
 import lombok.NonNull;
-import net.lingala.zip4j.core.HeaderWriter;
+import net.lingala.zip4j.core.writers.HeaderWriter;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.NoSplitOutputStream;
 import net.lingala.zip4j.io.OutputStreamDecorator;
