@@ -53,7 +53,7 @@ public final class ZipMisc {
 
         try (OutputStreamDecorator out = new OutputStreamDecorator(new NoSplitOutputStream(zipModel.getZipFile()))) {
             out.seek(zipModel.getOffsCentralDirectory());
-            new HeaderWriter().finalizeZipFileWithoutValidations(zipModel, out);
+            new HeaderWriter(zipModel).finalizeZipFileWithoutValidations(out);
         } catch(Exception e) {
             throw new ZipException(e);
         }
@@ -100,7 +100,7 @@ public final class ZipMisc {
 
         try (OutputStreamDecorator out = new OutputStreamDecorator(new FileOutputStream(destZipFile.toFile()))) {
             zipModel.convertToSolid(copyAllParts(out.getDelegate(), zipModel));
-            new HeaderWriter().finalizeZipFileWithoutValidations(zipModel, out);
+            new HeaderWriter(zipModel).finalizeZipFileWithoutValidations(out);
         } catch(ZipException e) {
             throw e;
         } catch(Exception e) {

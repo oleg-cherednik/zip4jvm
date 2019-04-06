@@ -224,7 +224,7 @@ public abstract class CipherOutputStream extends OutputStream {
 
     public void finish() throws IOException, ZipException {
         zipModel.getEndCentralDirectory().setOffs(out.getOffs());
-        new HeaderWriter().finalizeZipFile(zipModel, out);
+        new HeaderWriter(zipModel).finalizeZipFile(out);
     }
 
     @Override
