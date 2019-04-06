@@ -94,7 +94,7 @@ public class ZipModel {
         if (isZip64())
             return zip64.getEndCentralDirectory().getOffsetStartCenDirWRTStartDiskNo();
         if (endCentralDirectory != null)
-            return endCentralDirectory.getOffsCentralDirectory();
+            return endCentralDirectory.getOffs();
         return 0;
     }
 
@@ -130,7 +130,7 @@ public class ZipModel {
         endCentralDirectory.setStartDiskNumber(0);
         endCentralDirectory.setTotalEntries(getFileHeaders().size());
         endCentralDirectory.setDiskEntries(getFileHeaders().size());
-        endCentralDirectory.setOffsCentralDirectory(totalBytesWritten);
+        endCentralDirectory.setOffs(totalBytesWritten);
     }
 
     private void updateZip64EndCentralDirLocator(long totalBytesWritten) throws ZipException {

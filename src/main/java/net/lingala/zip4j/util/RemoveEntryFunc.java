@@ -130,7 +130,7 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
         }
 
         zipModel.setFileHeaders(fileHeaders);
-        zipModel.getEndCentralDirectory().setOffsCentralDirectory(offsOut);
+        zipModel.getEndCentralDirectory().setOffs(offsOut);
     }
 
     private void restoreFileName(Path tmpZipFileName) {

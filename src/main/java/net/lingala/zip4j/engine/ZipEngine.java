@@ -104,7 +104,7 @@ public class ZipEngine {
         checkParameters(parameters);
 
         try (DeflateOutputStream out = new DeflateOutputStream(SplitOutputStream.create(zipModel), zipModel)) {
-            out.seek(zipModel.getEndCentralDirectory().getOffsCentralDirectory());
+            out.seek(zipModel.getEndCentralDirectory().getOffs());
 
             for (InputStreamMeta file : files) {
                 if (file == null)

@@ -170,6 +170,6 @@ final class CentralDirectoryReader {
     }
 
     private void findHead() throws IOException {
-        in.seek(isZip64() ? zip64Dir.getOffsetStartCenDirWRTStartDiskNo() : dir.getOffsCentralDirectory());
+        in.seek(isZip64() ? zip64Dir.getOffsetStartCenDirWRTStartDiskNo() : dir.getOffs());
     }
 }
