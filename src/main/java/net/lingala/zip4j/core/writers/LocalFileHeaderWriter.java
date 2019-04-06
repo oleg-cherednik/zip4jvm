@@ -9,8 +9,6 @@ import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.Zip64EndCentralDirectoryLocator;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
-import net.lingala.zip4j.util.LittleEndianBuffer;
-import net.lingala.zip4j.util.Raw;
 
 import java.io.IOException;
 
@@ -68,34 +66,25 @@ public final class LocalFileHeaderWriter {
     }
 
     public void writeExtended(@NonNull OutputStreamDecorator out) throws IOException {
-        LittleEndianBuffer bytes = new LittleEndianBuffer();
-        byte[] intByte = new byte[4];
-
         //Extended local file header signature
-        Raw.writeIntLittleEndian(intByte, 0, (int)InternalZipConstants.EXTSIG);
-        bytes.copyByteArrayToArrayList(intByte);
+        out.writeDword((int)InternalZipConstants.EXTSIG);
 
         //CRC
-        Raw.writeIntLittleEndian(intByte, 0, (int)localFileHeader.getCrc32());
-        bytes.copyByteArrayToArrayList(intByte);
+        out.writeDword((int)localFileHeader.getCrc32());
 
         //compressed size
         long compressedSize = localFileHeader.getCompressedSize();
         if (compressedSize >= Integer.MAX_VALUE) {
             compressedSize = Integer.MAX_VALUE;
         }
-        Raw.writeIntLittleEndian(intByte, 0, (int)compressedSize);
-        bytes.copyByteArrayToArrayList(intByte);
+        out.writeDword((int)compressedSize);
 
         //uncompressed size
         long uncompressedSize = localFileHeader.getUncompressedSize();
         if (uncompressedSize >= Integer.MAX_VALUE) {
             uncompressedSize = Integer.MAX_VALUE;
         }
-        Raw.writeIntLittleEndian(intByte, 0, (int)uncompressedSize);
-        bytes.copyByteArrayToArrayList(intByte);
-
-        bytes.flushInto(out);
+        out.writeDword((int)uncompressedSize);
     }
 
 }
