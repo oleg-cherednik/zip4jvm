@@ -177,6 +177,18 @@ public class ZipModel {
     public static final class Zip64 {
         private final Zip64EndCentralDirectoryLocator endCentralDirectoryLocator;
         private final Zip64EndCentralDirectory endCentralDirectory;
+
+        public void setNoOfDiskStartOfZip64EndOfCentralDirRec(int noOfDiskStartOfZip64EndOfCentralDirRec) {
+            endCentralDirectoryLocator.setNoOfDiskStartOfZip64EndOfCentralDirRec(noOfDiskStartOfZip64EndOfCentralDirRec);
+        }
+
+        public void setOffsetZip64EndOfCentralDirRec(long offsetZip64EndOfCentralDirRec) {
+            endCentralDirectoryLocator.setOffsetZip64EndOfCentralDirRec(offsetZip64EndOfCentralDirRec);
+        }
+
+        public void setTotNumberOfDiscs(int totNumberOfDiscs) {
+            endCentralDirectoryLocator.setTotNumberOfDiscs(totNumberOfDiscs);
+        }
     }
 
 }

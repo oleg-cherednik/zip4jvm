@@ -33,49 +33,34 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
 
-public class HeaderWriter {
+public final class HeaderWriter {
 
     public static final int ZIP64_EXTRA_BUF = 50;
 
-    /**
-     * Processes zip header data and writes this data to the zip file
-     *
-     * @param zipModel
-     * @param out
-     * @throws ZipException
-     */
-    public void finalizeZipFile(@NonNull ZipModel zipModel, @NonNull OutputStreamDecorator out) {
-        try {
-            processHeaderData(zipModel, out);
+    public void finalizeZipFile(@NonNull ZipModel zipModel, @NonNull OutputStreamDecorator out) throws IOException {
+        processHeaderData(zipModel, out);
 
-            long offsetCentralDir = zipModel.getEndCentralDirectory().getOffsCentralDirectory();
-            LittleEndianBuffer bytes = new LittleEndianBuffer();
-            int sizeOfCentralDir = writeCentralDirectory(zipModel, out, bytes);
+        long offsetCentralDir = zipModel.getEndCentralDirectory().getOffsCentralDirectory();
+        LittleEndianBuffer bytes = new LittleEndianBuffer();
+        int sizeOfCentralDir = writeCentralDirectory(zipModel, out, bytes);
 
-            if (zipModel.isZip64()) {
-                zipModel.getZip64().getEndCentralDirectoryLocator().setOffsetZip64EndOfCentralDirRec(offsetCentralDir + sizeOfCentralDir);
+        if (zipModel.isZip64()) {
+            zipModel.getZip64().setOffsetZip64EndOfCentralDirRec(offsetCentralDir + sizeOfCentralDir);
 
-                if (out.getDelegate() instanceof SplitOutputStream) {
-                    zipModel.getZip64().getEndCentralDirectoryLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(
-                            ((SplitOutputStream)out.getDelegate()).getCurrSplitFileCounter());
-                    zipModel.getZip64().getEndCentralDirectoryLocator().setTotNumberOfDiscs(
-                            ((SplitOutputStream)out.getDelegate()).getCurrSplitFileCounter() + 1);
-                } else {
-                    zipModel.getZip64().getEndCentralDirectoryLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(0);
-                    zipModel.getZip64().getEndCentralDirectoryLocator().setTotNumberOfDiscs(1);
-                }
-
-                writeZip64EndOfCentralDirectoryRecord(zipModel, sizeOfCentralDir, offsetCentralDir, bytes);
-                writeZip64EndOfCentralDirectoryLocator(zipModel, bytes);
+            if (out.getDelegate() instanceof SplitOutputStream) {
+                zipModel.getZip64().setNoOfDiskStartOfZip64EndOfCentralDirRec(out.getCurrSplitFileCounter());
+                zipModel.getZip64().setTotNumberOfDiscs(out.getCurrSplitFileCounter() + 1);
+            } else {
+                zipModel.getZip64().setNoOfDiskStartOfZip64EndOfCentralDirRec(0);
+                zipModel.getZip64().setTotNumberOfDiscs(1);
             }
 
-            writeEndOfCentralDirectoryRecord(zipModel, sizeOfCentralDir, offsetCentralDir, bytes);
-            writeZipHeaderBytes(zipModel, out, bytes.byteArrayListToByteArray());
-        } catch(ZipException e) {
-            throw e;
-        } catch(Exception e) {
-            throw new ZipException(e);
+            writeZip64EndOfCentralDirectoryRecord(zipModel, sizeOfCentralDir, offsetCentralDir, bytes);
+            writeZip64EndOfCentralDirectoryLocator(zipModel, bytes);
         }
+
+        writeEndOfCentralDirectoryRecord(zipModel, sizeOfCentralDir, offsetCentralDir, bytes);
+        writeZipHeaderBytes(zipModel, out, bytes.byteArrayListToByteArray());
     }
 
     /**
