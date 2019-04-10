@@ -1,6 +1,5 @@
 package net.lingala.zip4j;
 
-import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.AESStrength;
 import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
@@ -37,7 +36,7 @@ public class ZipEncryptedFilesTest {
     }
 
     //    @Test
-    public void shouldCreateEncryptedZip() throws ZipException, IOException {
+    public void shouldCreateEncryptedZip() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)

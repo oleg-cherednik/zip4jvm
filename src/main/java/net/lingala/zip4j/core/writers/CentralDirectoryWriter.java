@@ -142,9 +142,10 @@ public final class CentralDirectoryWriter {
         bytes.copyByteArrayToArrayList(fileNameBytes);
         sizeOfFileHeader += fileNameBytes.length;
 
-        if (writeZip64FileSize || writeZip64OffsetLocalHeader) {
+        if (writeZip64FileSize || writeZip64OffsetLocalHeader)
             zipModel.zip64();
 
+        if (zipModel.isZip64()) {
             //Zip64 header
             Raw.writeShortLittleEndian(shortByte, 0, (short)InternalZipConstants.EXTRAFIELDZIP64LENGTH);
             bytes.copyByteArrayToArrayList(shortByte);

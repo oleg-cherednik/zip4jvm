@@ -81,8 +81,9 @@ public final class LocalFileHeaderReader {
         res.setSize(record.getSizeOfData());
         res.setUnCompressedSize((localFileHeader.getUncompressedSize() & 0xFFFF) == 0xFFFF ? in.readLong() : -1);
         res.setCompressedSize((localFileHeader.getCompressedSize() & 0xFFFF) == 0xFFFF ? in.readLong() : -1);
-        res.setOffsLocalHeaderRelative(in.readLong());
-        res.setDiskNumberStart(in.readInt());
+        // TODO why it throws exception
+//        res.setOffsLocalHeaderRelative(in.readLong());
+//        res.setDiskNumberStart(in.readInt());
 
         if (res.getUnCompressedSize() != -1 || res.getCompressedSize() != -1
                 || res.getOffsLocalHeaderRelative() != -1 || res.getDiskNumberStart() != -1)

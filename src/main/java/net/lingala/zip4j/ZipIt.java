@@ -71,6 +71,9 @@ public final class ZipIt {
         zipModel.setSplitLength(parameters.getSplitLength());
         zipModel.getEndCentralDirectory().setComment(ZipUtils.normalizeComment(parameters.getComment()));
 
+        if(parameters.isZip64())
+            zipModel.zip64();
+
         new ZipEngine(zipModel).addEntries(getDirectoryEntries(dir), parameters);
     }
 
@@ -81,11 +84,6 @@ public final class ZipIt {
         zipModel.setSplitLength(parameters.getSplitLength());
 
         new ZipEngine(zipModel).addEntries(Collections.singletonList(file), parameters);
-    }
-
-    static void checkSplitArchiveModification(@NonNull ZipModel zipModel) throws ZipException {
-        if (Files.exists(zipModel.getZipFile()) && zipModel.isSplitArchive())
-            throw new ZipException("Zip file already exists. Zip file format does not allow updating split/spanned files");
     }
 
     @NonNull

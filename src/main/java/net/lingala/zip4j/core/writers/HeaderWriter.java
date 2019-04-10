@@ -18,7 +18,6 @@ package net.lingala.zip4j.core.writers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.OutputStreamDecorator;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
@@ -37,79 +36,45 @@ public final class HeaderWriter {
     @NonNull
     private final ZipModel zipModel;
 
-    public void finalizeZipFile(@NonNull OutputStreamDecorator out) throws IOException {
-        processHeaderData(out);
+    // TODO do we really need validate flag?
+    public void finalizeZipFile(@NonNull OutputStreamDecorator out, boolean validate) throws IOException {
+        if (validate)
+            processHeaderData(out);
 
         LittleEndianBuffer bytes = new LittleEndianBuffer();
-        long offsetCentralDir = zipModel.getEndCentralDirectory().getOffs();
-        int sizeOfCentralDir = writeCentralDirectory(bytes);
+        long offs = zipModel.getEndCentralDirectory().getOffs();
+        int size = writeCentralDirectory(out, bytes);
 
         if (zipModel.isZip64()) {
-            zipModel.getZip64().setNoOfDiskStartOfZip64EndOfCentralDirRec(out.getCurrSplitFileCounter());
-            zipModel.getZip64().setOffsetZip64EndOfCentralDirRec(offsetCentralDir + sizeOfCentralDir);
-            zipModel.getZip64().setTotNumberOfDiscs(out.getCurrSplitFileCounter() + 1);
+            if (validate)
+                zipModel.getZip64().setNoOfDiskStartOfZip64EndOfCentralDirRec(out.getCurrSplitFileCounter());
 
-            writeZip64EndOfCentralDirectoryRecord(sizeOfCentralDir, offsetCentralDir, bytes);
+            zipModel.getZip64().setOffsetZip64EndOfCentralDirRec(offs + size);
+
+            if (validate)
+                zipModel.getZip64().setTotNumberOfDiscs(out.getCurrSplitFileCounter() + 1);
+
+            writeZip64EndOfCentralDirectoryRecord(size, offs, bytes);
             writeZip64EndOfCentralDirectoryLocator(bytes);
         }
 
-        writeEndOfCentralDirectoryRecord(sizeOfCentralDir, offsetCentralDir, bytes);
-        writeZipHeaderBytes(out, bytes.byteArrayListToByteArray());
-    }
-
-    /**
-     * Processes zip header data and writes this data to the zip file without any validations.
-     * This process is not intended to use for normal operations (adding, deleting, etc) of a zip file.
-     * This method is used when certain validations need to be skipped (ex: Merging split zip files,
-     * adding comment to a zip file, etc)
-     *
-     * @param out
-     * @throws ZipException
-     */
-    public void finalizeZipFileWithoutValidations(@NonNull OutputStreamDecorator out) throws IOException {
-        LittleEndianBuffer bytes = new LittleEndianBuffer();
-        long offsetCentralDir = zipModel.getEndCentralDirectory().getOffs();
-        int sizeOfCentralDir = writeCentralDirectory(bytes);
-
-        if (zipModel.isZip64()) {
-            zipModel.getZip64().setOffsetZip64EndOfCentralDirRec(offsetCentralDir + sizeOfCentralDir);
-            writeZip64EndOfCentralDirectoryRecord(sizeOfCentralDir, offsetCentralDir, bytes);
-            writeZip64EndOfCentralDirectoryLocator(bytes);
-        }
-
-        writeEndOfCentralDirectoryRecord(sizeOfCentralDir, offsetCentralDir, bytes);
-        writeZipHeaderBytes(out, bytes.byteArrayListToByteArray());
-    }
-
-    /**
-     * Writes the zip header data to the zip file
-     *
-     * @param out
-     * @param buf
-     * @throws ZipException
-     */
-    private void writeZipHeaderBytes(OutputStreamDecorator out, byte[] buf) throws IOException {
-//        if (out.getDelegate().checkBuffSizeAndStartNextSplitFile(buf.length)) {
-//            finalizeZipFile(out);
-//            return;
-//        }
-
-        out.writeBytes(buf);
+        writeEndOfCentralDirectoryRecord(size, offs, bytes);
+        out.writeBytes(bytes.byteArrayListToByteArray());
     }
 
     private void processHeaderData(OutputStreamDecorator out) throws IOException {
         zipModel.getEndCentralDirectory().setOffs(out.getFilePointer());
 
         if (zipModel.isZip64()) {
-            zipModel.getZip64().getEndCentralDirectoryLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(out.getCurrSplitFileCounter());
-            zipModel.getZip64().getEndCentralDirectoryLocator().setTotNumberOfDiscs(out.getCurrSplitFileCounter() + 1);
+            zipModel.getZip64().setNoOfDiskStartOfZip64EndOfCentralDirRec(out.getCurrSplitFileCounter());
+            zipModel.getZip64().setTotNumberOfDiscs(out.getCurrSplitFileCounter() + 1);
         }
 
         zipModel.getEndCentralDirectory().setDiskNumber(out.getCurrSplitFileCounter());
         zipModel.getEndCentralDirectory().setStartDiskNumber(out.getCurrSplitFileCounter());
     }
 
-    private int writeCentralDirectory(LittleEndianBuffer bytes) {
+    private int writeCentralDirectory(@NonNull OutputStreamDecorator out, LittleEndianBuffer bytes) {
         if (zipModel.isEmpty())
             return 0;
 
@@ -123,58 +88,23 @@ public final class HeaderWriter {
     }
 
     private void writeZip64EndOfCentralDirectoryRecord(int sizeOfCentralDir, long offsetCentralDir, LittleEndianBuffer bytes) {
-        byte[] shortByte = new byte[2];
-        byte[] emptyShortByte = { 0, 0 };
-        byte[] intByte = new byte[4];
-        byte[] longByte = new byte[8];
+        bytes.writeInt(InternalZipConstants.ZIP64_ENDSIG);
+        bytes.writeLong(44L);   // size of zip64 end of central directory record
 
-        //zip64 end of central dir signature
-        Raw.writeIntLittleEndian(intByte, 0, (int)InternalZipConstants.ZIP64_ENDSIG);
-        bytes.copyByteArrayToArrayList(intByte);
-
-        //size of zip64 end of central directory record
-        Raw.writeLongLittleEndian(longByte, 0, 44L);
-        bytes.copyByteArrayToArrayList(longByte);
-
-        //version made by
-        //version needed to extractEntries
         if (zipModel.isEmpty()) {
-            bytes.copyByteArrayToArrayList(emptyShortByte);
-            bytes.copyByteArrayToArrayList(emptyShortByte);
+            bytes.writeShort((short)0);
+            bytes.writeShort((short)0);
         } else {
-            Raw.writeShortLittleEndian(shortByte, 0, (short)zipModel.getFileHeaders().get(0).getVersionMadeBy());
-            bytes.copyByteArrayToArrayList(shortByte);
-
-            Raw.writeShortLittleEndian(shortByte, 0, (short)zipModel.getFileHeaders().get(0).getVersionToExtract());
-            bytes.copyByteArrayToArrayList(shortByte);
+            bytes.writeShort((short)zipModel.getFileHeaders().get(0).getVersionMadeBy());
+            bytes.writeShort((short)zipModel.getFileHeaders().get(0).getVersionToExtract());
         }
 
-        //number of this disk
-        Raw.writeIntLittleEndian(intByte, 0, zipModel.getEndCentralDirectory().getDiskNumber());
-        bytes.copyByteArrayToArrayList(intByte);
-
-        //number of the disk with start of central directory
-        Raw.writeIntLittleEndian(intByte, 0, zipModel.getEndCentralDirectory().getStartDiskNumber());
-        bytes.copyByteArrayToArrayList(intByte);
-
-        //total number of entries in the central directory on this disk
-        int numEntries = zipModel.getFileHeaders().size();
-        int numEntriesOnThisDisk = countNumberOfFileHeaderEntriesOnDisk();
-
-        Raw.writeLongLittleEndian(longByte, 0, numEntriesOnThisDisk);
-        bytes.copyByteArrayToArrayList(longByte);
-
-        //Total number of entries in central directory
-        Raw.writeLongLittleEndian(longByte, 0, numEntries);
-        bytes.copyByteArrayToArrayList(longByte);
-
-        //Size of central directory
-        Raw.writeLongLittleEndian(longByte, 0, sizeOfCentralDir);
-        bytes.copyByteArrayToArrayList(longByte);
-
-        //offset of start of central directory with respect to the starting disk number
-        Raw.writeLongLittleEndian(longByte, 0, offsetCentralDir);
-        bytes.copyByteArrayToArrayList(longByte);
+        bytes.writeInt(zipModel.getEndCentralDirectory().getDiskNumber());
+        bytes.writeInt(zipModel.getEndCentralDirectory().getStartDiskNumber());
+        bytes.writeLong(countNumberOfFileHeaderEntriesOnDisk());
+        bytes.writeLong(zipModel.getFileHeaders().size());
+        bytes.writeLong(sizeOfCentralDir);
+        bytes.writeLong(offsetCentralDir);
     }
 
     private void writeZip64EndOfCentralDirectoryLocator(LittleEndianBuffer bytes) {

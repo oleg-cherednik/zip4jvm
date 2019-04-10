@@ -58,6 +58,7 @@ public class ZipParameters {
     @Builder.Default
     private long splitLength = ZipModel.NO_SPLIT;
     private String comment;
+    public boolean zip64;
 
     /**
      * Sets the password for the zip file or the file being added<br>

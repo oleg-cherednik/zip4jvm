@@ -61,7 +61,7 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
 
         try (OutputStreamDecorator out = new OutputStreamDecorator(new NoSplitOutputStream(tmpZipFile))) {
             writeFileHeaders(out, entries);
-            new HeaderWriter(zipModel).finalizeZipFile(out);
+            new HeaderWriter(zipModel).finalizeZipFile(out, true);
         } catch(IOException e) {
             throw new ZipException(e);
         }
