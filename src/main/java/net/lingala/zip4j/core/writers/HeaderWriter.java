@@ -47,6 +47,10 @@ public final class HeaderWriter {
         new CentralDirectoryWriter(zipModel, out, bytes).write();
         int size = bytes.size() + (int)(out.getOffs() - off);
 
+        out.writeBytes(bytes.byteArrayListToByteArray());
+        bytes = new LittleEndianBuffer();
+
+
         if (zipModel.isZip64()) {
             if (validate)
                 zipModel.getZip64().setNoOfDiskStartOfZip64EndOfCentralDirRec(out.getCurrSplitFileCounter());
