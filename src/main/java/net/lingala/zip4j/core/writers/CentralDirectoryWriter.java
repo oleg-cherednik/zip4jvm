@@ -156,21 +156,23 @@ public final class CentralDirectoryWriter {
             bytes.copyByteArrayToArrayList(shortByte);
         }
 
-        if (i == -1)
-            out.writeShort((short)0);
+        if (i == 0)
+            out.writeBytes(emptyShortByte);
         else {
             //Skip internal file attributes for now
             bytes.copyByteArrayToArrayList(emptyShortByte);
         }
 
-        if (i == -1)
-            out.writeBytes(fileHeader.getExternalFileAttributes());
+        if (i == 0)
+            if (fileHeader.getExternalFileAttributes() != null)
+                out.writeBytes(fileHeader.getExternalFileAttributes());
+            else
+                out.writeBytes(emptyIntByte);
         else {
-            if (fileHeader.getExternalFileAttributes() != null) {
+            if (fileHeader.getExternalFileAttributes() != null)
                 bytes.copyByteArrayToArrayList(fileHeader.getExternalFileAttributes());
-            } else {
+            else
                 bytes.copyByteArrayToArrayList(emptyIntByte);
-            }
         }
 
         //Compute offset bytes before extra field is written for Zip64 compatibility
