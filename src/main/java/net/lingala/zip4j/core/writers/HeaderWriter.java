@@ -42,8 +42,10 @@ public final class HeaderWriter {
 
         LittleEndianBuffer bytes = new LittleEndianBuffer();
         long offs = zipModel.getEndCentralDirectory().getOffs();
+
+        long off = out.getOffs();
         new CentralDirectoryWriter(zipModel, out, bytes).write();
-        int size = bytes.size();
+        int size = bytes.size() + (int)(out.getOffs() - off);
 
         if (zipModel.isZip64()) {
             if (validate)

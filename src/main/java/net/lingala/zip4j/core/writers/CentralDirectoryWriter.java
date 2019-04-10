@@ -31,9 +31,10 @@ public final class CentralDirectoryWriter {
             return;
 
         long offs = out.getOffs();
+        int i = 0;
 
         for (CentralDirectory.FileHeader fileHeader : zipModel.getFileHeaders())
-            write(fileHeader);
+            write(fileHeader, i++);
 
         int delta = (int)(out.getOffs() - offs);
         int expected = bytes.size();
@@ -41,7 +42,7 @@ public final class CentralDirectoryWriter {
         a++;
     }
 
-    private void write(CentralDirectory.FileHeader fileHeader) throws IOException {
+    private void write(CentralDirectory.FileHeader fileHeader, int i) throws IOException {
         byte[] shortByte = new byte[2];
         byte[] intByte = new byte[4];
         byte[] longByte = new byte[8];
@@ -52,29 +53,56 @@ public final class CentralDirectoryWriter {
         boolean writeZip64FileSize = false;
         boolean writeZip64OffsetLocalHeader = false;
 
-//        out.writeDword(fileHeader.getSignature());
+        if (i == 0)
+            out.writeDword(fileHeader.getSignature());
+        else {
+            Raw.writeIntLittleEndian(intByte, 0, fileHeader.getSignature());
+            bytes.copyByteArrayToArrayList(intByte);
+        }
 
-        Raw.writeIntLittleEndian(intByte, 0, fileHeader.getSignature());
-        bytes.copyByteArrayToArrayList(intByte);
+        if (i == 0)
+            out.writeWord((short)fileHeader.getVersionMadeBy());
+        else {
+            Raw.writeShortLittleEndian(shortByte, 0, (short)fileHeader.getVersionMadeBy());
+            bytes.copyByteArrayToArrayList(shortByte);
+        }
 
-        Raw.writeShortLittleEndian(shortByte, 0, (short)fileHeader.getVersionMadeBy());
-        bytes.copyByteArrayToArrayList(shortByte);
+        if (i == 0)
+            out.writeWord((short)fileHeader.getVersionToExtract());
+        else {
+            Raw.writeShortLittleEndian(shortByte, 0, (short)fileHeader.getVersionToExtract());
+            bytes.copyByteArrayToArrayList(shortByte);
+        }
 
-        Raw.writeShortLittleEndian(shortByte, 0, (short)fileHeader.getVersionToExtract());
-        bytes.copyByteArrayToArrayList(shortByte);
+        if (i == 0)
+            out.writeWord(fileHeader.getGeneralPurposeFlag().getData());
+        else {
+            Raw.writeShortLittleEndian(shortByte, 0, fileHeader.getGeneralPurposeFlag().getData());
+            bytes.copyByteArrayToArrayList(shortByte);
+        }
 
-        Raw.writeShortLittleEndian(shortByte, 0, (short)fileHeader.getGeneralPurposeFlag().getData());
-        bytes.copyByteArrayToArrayList(shortByte);
+        if (i == 0)
+            out.writeShort(fileHeader.getCompressionMethod().getValue());
+        else {
+            Raw.writeShortLittleEndian(shortByte, 0, fileHeader.getCompressionMethod().getValue());
+            bytes.copyByteArrayToArrayList(shortByte);
+        }
 
-        Raw.writeShortLittleEndian(shortByte, 0, fileHeader.getCompressionMethod().getValue());
-        bytes.copyByteArrayToArrayList(shortByte);
+        if (i == 0)
+            out.writeDword(fileHeader.getLastModifiedTime());
+        else {
+            int dateTime = fileHeader.getLastModifiedTime();
+            Raw.writeIntLittleEndian(intByte, 0, dateTime);
+            bytes.copyByteArrayToArrayList(intByte);
+        }
 
-        int dateTime = fileHeader.getLastModifiedTime();
-        Raw.writeIntLittleEndian(intByte, 0, dateTime);
-        bytes.copyByteArrayToArrayList(intByte);
+        if (i == 0)
+            out.writeDword((int)fileHeader.getCrc32());
+        else {
+            Raw.writeIntLittleEndian(intByte, 0, (int)fileHeader.getCrc32());
+            bytes.copyByteArrayToArrayList(intByte);
+        }
 
-        Raw.writeIntLittleEndian(intByte, 0, (int)(fileHeader.getCrc32()));
-        bytes.copyByteArrayToArrayList(intByte);
 
         if (fileHeader.getCompressedSize() >= InternalZipConstants.ZIP_64_LIMIT ||
                 fileHeader.getUncompressedSize() + HeaderWriter.ZIP64_EXTRA_BUF >= InternalZipConstants.ZIP_64_LIMIT) {
@@ -209,6 +237,5 @@ public final class CentralDirectoryWriter {
             bytes.copyByteArrayToArrayList(shortByte);
         }
     }
-
 
 }
