@@ -17,6 +17,10 @@ public final class LittleEndianBuffer implements Closeable {
     private final byte[] shortByte = new byte[2];
     private final byte[] longByte = new byte[8];
 
+    public int size() {
+        return bytes.size();
+    }
+
     public LittleEndianBuffer writeInt(int val) {
         Raw.writeIntLittleEndian(intByte, 0, val);
         copyByteArrayToArrayList(intByte);

@@ -19,7 +19,6 @@ package net.lingala.zip4j.core.writers;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.io.OutputStreamDecorator;
-import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.LittleEndianBuffer;
@@ -43,7 +42,8 @@ public final class HeaderWriter {
 
         LittleEndianBuffer bytes = new LittleEndianBuffer();
         long offs = zipModel.getEndCentralDirectory().getOffs();
-        int size = writeCentralDirectory(out, bytes);
+        new CentralDirectoryWriter(zipModel, out, bytes).write();
+        int size = bytes.size();
 
         if (zipModel.isZip64()) {
             if (validate)
@@ -72,19 +72,6 @@ public final class HeaderWriter {
 
         zipModel.getEndCentralDirectory().setDiskNumber(out.getCurrSplitFileCounter());
         zipModel.getEndCentralDirectory().setStartDiskNumber(out.getCurrSplitFileCounter());
-    }
-
-    private int writeCentralDirectory(@NonNull OutputStreamDecorator out, LittleEndianBuffer bytes) {
-        if (zipModel.isEmpty())
-            return 0;
-
-        CentralDirectoryWriter writer = new CentralDirectoryWriter();
-        int sizeOfCentralDir = 0;
-
-        for (CentralDirectory.FileHeader fileHeader : zipModel.getFileHeaders())
-            sizeOfCentralDir += writer.write(zipModel, fileHeader, bytes);
-
-        return sizeOfCentralDir;
     }
 
     private void writeZip64EndOfCentralDirectoryRecord(int sizeOfCentralDir, long offsetCentralDir, LittleEndianBuffer bytes) {

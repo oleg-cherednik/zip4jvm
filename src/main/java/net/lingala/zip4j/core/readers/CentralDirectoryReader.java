@@ -33,10 +33,6 @@ final class CentralDirectoryReader {
     private final EndCentralDirectory dir;
     private final Zip64EndCentralDirectory zip64Dir;
 
-    private boolean isZip64() {
-        return zip64Dir != null;
-    }
-
     public CentralDirectory read() throws IOException {
         findHead();
 
@@ -171,5 +167,9 @@ final class CentralDirectoryReader {
 
     private void findHead() throws IOException {
         in.seek(isZip64() ? zip64Dir.getOffsetStartCenDirWRTStartDiskNo() : dir.getOffs());
+    }
+
+    private boolean isZip64() {
+        return zip64Dir != null;
     }
 }
