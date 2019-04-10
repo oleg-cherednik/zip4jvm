@@ -80,6 +80,7 @@ final class CentralDirectoryReader {
         fileHeader.setOffsLocalFileHeader(in.readIntAsLong());
         fileHeader.setFileName(FilenameUtils.normalize(in.readString(fileHeader.getFileNameLength()), true));
         fileHeader.setExtraDataRecords(readExtraDataRecords(in, fileHeader.getExtraFieldLength()));
+
         fileHeader.setZip64ExtendedInfo(readZip64ExtendedInfo(fileHeader));
         fileHeader.setAesExtraDataRecord(readAESExtraDataRecord(fileHeader.getExtraDataRecords()));
         fileHeader.setFileComment(in.readString(fileHeader.getFileCommentLength()));
@@ -149,6 +150,7 @@ final class CentralDirectoryReader {
 
         if (record == null)
             return null;
+
         LittleEndianDecorator in = new LittleEndianDecorator(record.getData());
 
         Zip64ExtendedInfo res = new Zip64ExtendedInfo();
