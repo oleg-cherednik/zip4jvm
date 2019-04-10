@@ -50,9 +50,9 @@ public final class CentralDirectoryWriter {
         final byte[] emptyIntByte = { 0, 0, 0, 0 };
 
 
-        boolean writeZip64FileSize = fileHeader.getCompressedSize() >= InternalZipConstants.ZIP_64_LIMIT ||
+        final boolean writeZip64FileSize = fileHeader.getCompressedSize() >= InternalZipConstants.ZIP_64_LIMIT ||
                 fileHeader.getUncompressedSize() + HeaderWriter.ZIP64_EXTRA_BUF >= InternalZipConstants.ZIP_64_LIMIT;
-        boolean writeZip64OffsetLocalHeader = false;
+        final boolean writeZip64OffsetLocalHeader = fileHeader.getOffsLocalFileHeader() > InternalZipConstants.ZIP_64_LIMIT;
 
         if (i == 0)
             out.writeDword(fileHeader.getSignature());
@@ -128,52 +128,60 @@ public final class CentralDirectoryWriter {
             }
         }
 
+        if (i == 0)
+            out.writeShort((short)fileHeader.getFileNameLength());
+        else {
+            Raw.writeShortLittleEndian(shortByte, 0, (short)fileHeader.getFileNameLength());
+            bytes.copyByteArrayToArrayList(shortByte);
+        }
 
-        Raw.writeShortLittleEndian(shortByte, 0, (short)fileHeader.getFileNameLength());
-        bytes.copyByteArrayToArrayList(shortByte);
+        if (i == 0)
+            out.writeWord(getExtraFieldLength(fileHeader, writeZip64FileSize, writeZip64OffsetLocalHeader));
+        else {
+            Raw.writeShortLittleEndian(shortByte, 0, getExtraFieldLength(fileHeader, writeZip64FileSize, writeZip64OffsetLocalHeader));
+            bytes.copyByteArrayToArrayList(shortByte);
+        }
+
+        //Skip file comment length for now
+        if (i == 0)
+            out.writeShort((short)0);
+        else
+            bytes.copyByteArrayToArrayList(emptyShortByte);
+
+        if (i == 0)
+            out.writeShort((short)fileHeader.getDiskNumber());
+        else {
+            //Skip disk number start for now
+            Raw.writeShortLittleEndian(shortByte, 0, (short)fileHeader.getDiskNumber());
+            bytes.copyByteArrayToArrayList(shortByte);
+        }
+
+        if (i == -1)
+            out.writeShort((short)0);
+        else {
+            //Skip internal file attributes for now
+            bytes.copyByteArrayToArrayList(emptyShortByte);
+        }
+
+        if (i == -1)
+            out.writeBytes(fileHeader.getExternalFileAttributes());
+        else {
+            if (fileHeader.getExternalFileAttributes() != null) {
+                bytes.copyByteArrayToArrayList(fileHeader.getExternalFileAttributes());
+            } else {
+                bytes.copyByteArrayToArrayList(emptyIntByte);
+            }
+        }
 
         //Compute offset bytes before extra field is written for Zip64 compatibility
         //NOTE: this data is not written now, but written at a later point
         byte[] offsetLocalHeaderBytes = new byte[4];
-        if (fileHeader.getOffsLocalFileHeader() > InternalZipConstants.ZIP_64_LIMIT) {
+        if (writeZip64OffsetLocalHeader) {
             Raw.writeLongLittleEndian(longByte, 0, InternalZipConstants.ZIP_64_LIMIT);
             System.arraycopy(longByte, 0, offsetLocalHeaderBytes, 0, 4);
-            writeZip64OffsetLocalHeader = true;
         } else {
             Raw.writeLongLittleEndian(longByte, 0, fileHeader.getOffsLocalFileHeader());
             System.arraycopy(longByte, 0, offsetLocalHeaderBytes, 0, 4);
-        }
-
-        // extra field length
-        int extraFieldLength = 0;
-        if (writeZip64FileSize || writeZip64OffsetLocalHeader) {
-            extraFieldLength += 4;
-            if (writeZip64FileSize)
-                extraFieldLength += 16;
-            if (writeZip64OffsetLocalHeader)
-                extraFieldLength += 8;
-        }
-        if (fileHeader.getAesExtraDataRecord() != null) {
-            extraFieldLength += 11;
-        }
-        Raw.writeShortLittleEndian(shortByte, 0, (short)(extraFieldLength));
-        bytes.copyByteArrayToArrayList(shortByte);
-
-        //Skip file comment length for now
-        bytes.copyByteArrayToArrayList(emptyShortByte);
-
-        //Skip disk number start for now
-        Raw.writeShortLittleEndian(shortByte, 0, (short)(fileHeader.getDiskNumber()));
-        bytes.copyByteArrayToArrayList(shortByte);
-
-        //Skip internal file attributes for now
-        bytes.copyByteArrayToArrayList(emptyShortByte);
-
-        //External file attributes
-        if (fileHeader.getExternalFileAttributes() != null) {
-            bytes.copyByteArrayToArrayList(fileHeader.getExternalFileAttributes());
-        } else {
-            bytes.copyByteArrayToArrayList(emptyIntByte);
         }
 
         //offset local header
@@ -251,6 +259,21 @@ public final class CentralDirectoryWriter {
         if (writeZip64FileSize)
             return InternalZipConstants.ZIP_64_LIMIT;
         return fileHeader.getUncompressedSize();
+    }
+
+    private static short getExtraFieldLength(CentralDirectory.FileHeader fileHeader, boolean writeZip64FileSize,
+            boolean writeZip64OffsetLocalHeader) {
+        int extraFieldLength = 0;
+        if (writeZip64FileSize || writeZip64OffsetLocalHeader) {
+            extraFieldLength += 4;
+            if (writeZip64FileSize)
+                extraFieldLength += 16;
+            if (writeZip64OffsetLocalHeader)
+                extraFieldLength += 8;
+        }
+        if (fileHeader.getAesExtraDataRecord() != null)
+            extraFieldLength += 11;
+        return (short)extraFieldLength;
     }
 
 }
