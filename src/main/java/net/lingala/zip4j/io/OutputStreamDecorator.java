@@ -87,8 +87,10 @@ public final class OutputStreamDecorator implements Closeable {
     }
 
     public void writeBytes(byte... buf) throws IOException {
-        delegate.write(buf);
-        offs += buf.length;
+        if (buf != null) {
+            delegate.write(buf);
+            offs += buf.length;
+        }
     }
 
     public void writeBytes(byte[] buf, int offs, int len) throws IOException {
@@ -97,7 +99,7 @@ public final class OutputStreamDecorator implements Closeable {
     }
 
     public void writeString(String str, @NonNull Charset charset) throws IOException {
-        if(str != null)
+        if (str != null)
             writeBytes(str.getBytes(charset));
     }
 

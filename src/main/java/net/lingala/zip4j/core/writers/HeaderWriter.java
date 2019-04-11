@@ -19,12 +19,10 @@ package net.lingala.zip4j.core.writers;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.io.OutputStreamDecorator;
-import net.lingala.zip4j.model.EndCentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.LittleEndianBuffer;
 import net.lingala.zip4j.util.Raw;
-import org.apache.commons.lang.ArrayUtils;
 
 import java.io.IOException;
 
@@ -66,8 +64,9 @@ public final class HeaderWriter {
             writeZip64EndOfCentralDirectoryLocator(bytes);
         }
 
-        writeEndOfCentralDirectoryRecord(bytes);
         out.writeBytes(bytes.byteArrayListToByteArray());
+        new EndCentralDirectoryWriter(out, zipModel.getCharset()).write(zipModel.getEndCentralDirectory());
+
     }
 
     private void processHeaderData(OutputStreamDecorator out) throws IOException {
@@ -121,55 +120,6 @@ public final class HeaderWriter {
         //total number of disks
         Raw.writeIntLittleEndian(intByte, 0, zipModel.getZip64().getEndCentralDirectoryLocator().getTotNumberOfDiscs());
         bytes.copyByteArrayToArrayList(intByte);
-    }
-
-    private void writeEndOfCentralDirectoryRecord(LittleEndianBuffer bytes) {
-        byte[] shortByte = new byte[2];
-        byte[] intByte = new byte[4];
-        byte[] longByte = new byte[8];
-
-        EndCentralDirectory dir = zipModel.getEndCentralDirectory();
-
-        //End of central directory signature
-        Raw.writeIntLittleEndian(intByte, 0, (int)dir.getSignature());
-        bytes.copyByteArrayToArrayList(intByte);
-
-        //number of this disk
-        Raw.writeShortLittleEndian(shortByte, 0, (short)dir.getDiskNumber());
-        bytes.copyByteArrayToArrayList(shortByte);
-
-        //number of the disk with start of central directory
-        Raw.writeShortLittleEndian(shortByte, 0, (short)dir.getStartDiskNumber());
-        bytes.copyByteArrayToArrayList(shortByte);
-
-        //Total number of entries in central directory on this disk
-        int numEntriesOnThisDisk = countNumberOfFileHeaderEntriesOnDisk();
-
-        Raw.writeShortLittleEndian(shortByte, 0, (short)numEntriesOnThisDisk);
-        bytes.copyByteArrayToArrayList(shortByte);
-
-        //Total number of entries in central directory
-        Raw.writeShortLittleEndian(shortByte, 0, (short)dir.getTotalEntries());
-        bytes.copyByteArrayToArrayList(shortByte);
-
-        //Size of central directory
-        Raw.writeIntLittleEndian(intByte, 0, dir.getSize());
-        bytes.copyByteArrayToArrayList(intByte);
-
-        //Offset central directory
-        Raw.writeLongLittleEndian(longByte, 0, Math.min(dir.getOffs(), InternalZipConstants.ZIP_64_LIMIT));
-        System.arraycopy(longByte, 0, intByte, 0, 4);
-        bytes.copyByteArrayToArrayList(intByte);
-
-        byte[] comment = dir.getComment(zipModel.getCharset());
-
-        //Zip File comment length
-        Raw.writeShortLittleEndian(shortByte, 0, (short)ArrayUtils.getLength(comment));
-        bytes.copyByteArrayToArrayList(shortByte);
-
-        //Comment
-        if (ArrayUtils.isNotEmpty(comment))
-            bytes.copyByteArrayToArrayList(comment);
     }
 
     private int countNumberOfFileHeaderEntriesOnDisk() {
