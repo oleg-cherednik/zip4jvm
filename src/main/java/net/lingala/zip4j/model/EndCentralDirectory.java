@@ -21,8 +21,6 @@ import lombok.Setter;
 import net.lingala.zip4j.util.InternalZipConstants;
 import org.apache.commons.lang.StringUtils;
 
-import java.nio.charset.Charset;
-
 @Getter
 @Setter
 public class EndCentralDirectory {
@@ -50,16 +48,13 @@ public class EndCentralDirectory {
     private int commentLength;
     // size:n - file comment
     private String comment;
-    private byte[] bufComment;
 
-    public void setComment(String comment, Charset charset) {
+    public void setComment(String comment) {
         this.comment = comment;
-
-
         commentLength = StringUtils.length(comment);
     }
 
-    public void incTotalEntries() {  g
+    public void incTotalEntries() {
         totalEntries++;
     }
 

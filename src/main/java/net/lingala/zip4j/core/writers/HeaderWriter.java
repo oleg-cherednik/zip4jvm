@@ -161,9 +161,6 @@ public final class HeaderWriter {
         bytes.copyByteArrayToArrayList(intByte);
 
         //Zip File comment length
-        byte[] comment = dir.getComment()dir.getComment().getBytes(zipModel.getCharset())
-
-
         Raw.writeShortLittleEndian(shortByte, 0, (short)dir.getCommentLength());
         bytes.copyByteArrayToArrayList(shortByte);
 

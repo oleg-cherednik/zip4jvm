@@ -29,6 +29,10 @@ final class EndCentralDirectoryWriter {
         out.writeWord((short)dir.getDiskEntries());
         out.writeDword(dir.getSize());
         out.writeDword(Math.min(offs, InternalZipConstants.ZIP_64_LIMIT));
+
+
+
+
         out.writeWord((short)dir.getCommentLength());
         out.writeString(dir.getComment(), zipModel.getCharset());
 
