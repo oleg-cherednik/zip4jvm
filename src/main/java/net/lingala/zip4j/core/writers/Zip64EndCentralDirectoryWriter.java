@@ -23,6 +23,7 @@ final class Zip64EndCentralDirectoryWriter {
             return;
 
         out.writeDword(InternalZipConstants.ZIP64_ENDSIG);
+        // TODO should be read from dir (including size of ExtensibleDataSector)
         out.writeLong(Zip64EndCentralDirectory.SIZE);
         out.writeWord(dir.getVersionMadeBy());
         out.writeWord(dir.getVersionNeededToExtract());
