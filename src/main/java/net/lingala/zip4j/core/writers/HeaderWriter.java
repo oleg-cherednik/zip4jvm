@@ -50,19 +50,17 @@ public final class HeaderWriter {
         out.writeBytes(bytes.byteArrayListToByteArray());
         bytes = new LittleEndianBuffer();
 
+        if (zipModel.isZip64() && validate)
+            zipModel.getZip64().setNoOfDiskStartOfZip64EndOfCentralDirRec(out.getCurrSplitFileCounter());
 
-        if (zipModel.isZip64()) {
-            if (validate)
-                zipModel.getZip64().setNoOfDiskStartOfZip64EndOfCentralDirRec(out.getCurrSplitFileCounter());
-
+        if (zipModel.isZip64())
             zipModel.getZip64().setOffsetZip64EndOfCentralDirRec(offs + size);
 
-            if (validate)
-                zipModel.getZip64().setTotNumberOfDiscs(out.getCurrSplitFileCounter() + 1);
+        if (zipModel.isZip64() && validate)
+            zipModel.getZip64().setTotNumberOfDiscs(out.getCurrSplitFileCounter() + 1);
 
-            writeZip64EndOfCentralDirectoryRecord(size, offs, bytes);
-            writeZip64EndOfCentralDirectoryLocator(bytes);
-        }
+        writeZip64EndOfCentralDirectoryRecord(size, offs, bytes);
+        writeZip64EndOfCentralDirectoryLocator(bytes);
 
         out.writeBytes(bytes.byteArrayListToByteArray());
         new EndCentralDirectoryWriter(out, zipModel.getCharset()).write(zipModel.getEndCentralDirectory());
@@ -82,6 +80,9 @@ public final class HeaderWriter {
     }
 
     private void writeZip64EndOfCentralDirectoryRecord(int sizeOfCentralDir, long offsetCentralDir, LittleEndianBuffer bytes) {
+        if (!zipModel.isZip64())
+            return;
+
         bytes.writeInt(InternalZipConstants.ZIP64_ENDSIG);
         bytes.writeLong(44L);   // size of zip64 end of central directory record
 
@@ -102,6 +103,9 @@ public final class HeaderWriter {
     }
 
     private void writeZip64EndOfCentralDirectoryLocator(LittleEndianBuffer bytes) {
+        if (!zipModel.isZip64())
+            return;
+
         byte[] intByte = new byte[4];
         byte[] longByte = new byte[8];
 
