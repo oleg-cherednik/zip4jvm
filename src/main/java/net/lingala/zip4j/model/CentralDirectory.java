@@ -88,9 +88,9 @@ public class CentralDirectory {
         // size:4 - signature (0x02014b50)
         private final int signature = InternalZipConstants.CENSIG;
         // size:2 - version made by
-        private int versionMadeBy;
+        private short versionMadeBy;
         // size:2 - version needed to extractEntries
-        private int versionToExtract;
+        private short versionToExtract;
         // size:2 - general purpose bit flag
         private final GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         // size:2 - compression method

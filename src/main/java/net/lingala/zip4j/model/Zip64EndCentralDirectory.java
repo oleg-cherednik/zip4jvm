@@ -36,9 +36,9 @@ public class Zip64EndCentralDirectory {
     // size:8 - directory record (n)
     private long sizeOfZip64EndCentralDirRec;
     // size:2 - version made by
-    private int versionMadeBy;
+    private short versionMadeBy;
     // size:2 - version needed to extractEntries
-    private int versionNeededToExtract;
+    private short versionNeededToExtract;
     // size:4 - number of this disk
     private int noOfThisDisk;
     // size:4 - number of the disk with the start of the central directory

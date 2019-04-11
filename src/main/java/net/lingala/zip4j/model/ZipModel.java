@@ -166,6 +166,14 @@ public class ZipModel {
         endCentralDirectory.setDiskEntries(fileHeaders.size());
     }
 
+    public short getVersionMadeBy() {
+        return isEmpty() ? 0 : getFileHeaders().get(0).getVersionMadeBy();
+    }
+
+    public short getVersionToExtract() {
+        return isEmpty() ? 0 : getFileHeaders().get(0).getVersionToExtract();
+    }
+
     @NonNull
     public ZipModel noSplitOnly() {
         if (Files.exists(zipFile) && isSplitArchive())
@@ -177,6 +185,7 @@ public class ZipModel {
     @Getter
     @RequiredArgsConstructor
     public static final class Zip64 {
+
         private final Zip64EndCentralDirectoryLocator endCentralDirectoryLocator;
         private final Zip64EndCentralDirectory endCentralDirectory;
 

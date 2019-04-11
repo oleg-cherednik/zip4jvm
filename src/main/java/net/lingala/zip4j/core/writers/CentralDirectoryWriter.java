@@ -62,16 +62,16 @@ public final class CentralDirectoryWriter {
         }
 
         if (i == 0)
-            out.writeWord((short)fileHeader.getVersionMadeBy());
+            out.writeWord(fileHeader.getVersionMadeBy());
         else {
-            Raw.writeShortLittleEndian(shortByte, 0, (short)fileHeader.getVersionMadeBy());
+            Raw.writeShortLittleEndian(shortByte, 0, fileHeader.getVersionMadeBy());
             bytes.copyByteArrayToArrayList(shortByte);
         }
 
         if (i == 0)
-            out.writeWord((short)fileHeader.getVersionToExtract());
+            out.writeWord(fileHeader.getVersionToExtract());
         else {
-            Raw.writeShortLittleEndian(shortByte, 0, (short)fileHeader.getVersionToExtract());
+            Raw.writeShortLittleEndian(shortByte, 0, fileHeader.getVersionToExtract());
             bytes.copyByteArrayToArrayList(shortByte);
         }
 
