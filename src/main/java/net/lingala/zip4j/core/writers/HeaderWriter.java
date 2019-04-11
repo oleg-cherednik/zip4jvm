@@ -22,7 +22,6 @@ import net.lingala.zip4j.io.OutputStreamDecorator;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.LittleEndianBuffer;
-import net.lingala.zip4j.util.Raw;
 
 import java.io.IOException;
 
@@ -60,11 +59,10 @@ public final class HeaderWriter {
             zipModel.getZip64().setTotNumberOfDiscs(out.getCurrSplitFileCounter() + 1);
 
         writeZip64EndOfCentralDirectoryRecord(size, offs, bytes);
-        writeZip64EndOfCentralDirectoryLocator(bytes);
-
         out.writeBytes(bytes.byteArrayListToByteArray());
-        new EndCentralDirectoryWriter(out, zipModel.getCharset()).write(zipModel.getEndCentralDirectory());
 
+        new Zip64EndCentralDirectoryLocatorWriter(out).write(zipModel.isZip64() ? zipModel.getZip64().getEndCentralDirectoryLocator() : null);
+        new EndCentralDirectoryWriter(out, zipModel.getCharset()).write(zipModel.getEndCentralDirectory());
     }
 
     private void processHeaderData(OutputStreamDecorator out) throws IOException {
@@ -100,30 +98,6 @@ public final class HeaderWriter {
         bytes.writeLong(zipModel.getFileHeaders().size());
         bytes.writeLong(sizeOfCentralDir);
         bytes.writeLong(offsetCentralDir);
-    }
-
-    private void writeZip64EndOfCentralDirectoryLocator(LittleEndianBuffer bytes) {
-        if (!zipModel.isZip64())
-            return;
-
-        byte[] intByte = new byte[4];
-        byte[] longByte = new byte[8];
-
-        //zip64 end of central dir locator  signature
-        Raw.writeIntLittleEndian(intByte, 0, (int)InternalZipConstants.ZIP64_ENDSIG_LOC);
-        bytes.copyByteArrayToArrayList(intByte);
-
-        //number of the disk with the start of the zip64 end of central directory
-        Raw.writeIntLittleEndian(intByte, 0, zipModel.getZip64().getEndCentralDirectoryLocator().getNoOfDiskStartOfZip64EndOfCentralDirRec());
-        bytes.copyByteArrayToArrayList(intByte);
-
-        //relative offset of the zip64 end of central directory record
-        Raw.writeLongLittleEndian(longByte, 0, zipModel.getZip64().getEndCentralDirectoryLocator().getOffsetZip64EndOfCentralDirRec());
-        bytes.copyByteArrayToArrayList(longByte);
-
-        //total number of disks
-        Raw.writeIntLittleEndian(intByte, 0, zipModel.getZip64().getEndCentralDirectoryLocator().getTotNumberOfDiscs());
-        bytes.copyByteArrayToArrayList(intByte);
     }
 
     private int countNumberOfFileHeaderEntriesOnDisk() {
