@@ -21,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.io.OutputStreamDecorator;
 import net.lingala.zip4j.model.Zip64EndCentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
-import net.lingala.zip4j.util.LittleEndianBuffer;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.io.IOException;
@@ -39,12 +38,10 @@ public final class HeaderWriter {
         if (validate)
             processHeaderData(out);
 
-        LittleEndianBuffer bytes = new LittleEndianBuffer();
         final long offs = zipModel.getEndCentralDirectory().getOffs();
-
         long off = out.getOffs();
-        new CentralDirectoryWriter(zipModel, out, bytes).write();
-        final int size = bytes.size() + (int)(out.getOffs() - off);
+        new CentralDirectoryWriter(out, zipModel).write();
+        final int size = (int)(out.getOffs() - off);
         zipModel.getEndCentralDirectory().setSize(size);
 
         if (zipModel.isZip64()) {
@@ -59,8 +56,6 @@ public final class HeaderWriter {
             dir.setSizeOfCentralDir(size);
             dir.setOffsetStartCenDirWRTStartDiskNo(offs);
         }
-
-        out.writeBytes(bytes.byteArrayListToByteArray());
 
         if (zipModel.isZip64() && validate)
             zipModel.getZip64().setNoOfDiskStartOfZip64EndOfCentralDirRec(out.getCurrSplitFileCounter());

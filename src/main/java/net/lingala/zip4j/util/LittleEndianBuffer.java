@@ -11,6 +11,7 @@ import java.util.List;
  * @author Oleg Cherednik
  * @since 01.03.2019
  */
+@Deprecated
 public final class LittleEndianBuffer implements Closeable {
     private final List<String> bytes = new ArrayList<>();
     private final byte[] intByte = new byte[4];
