@@ -156,6 +156,8 @@ public class ZipModel {
 
     public void addFileHeader(CentralDirectory.FileHeader fileHeader) {
         centralDirectory.addFileHeader(fileHeader);
+        endCentralDirectory.incTotalEntries();
+        endCentralDirectory.incDiskEntries();
     }
 
     public void setFileHeaders(List<CentralDirectory.FileHeader> fileHeaders) {

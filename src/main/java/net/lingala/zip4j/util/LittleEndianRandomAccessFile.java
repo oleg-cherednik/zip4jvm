@@ -8,7 +8,6 @@ import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 
 /**
@@ -27,8 +26,16 @@ public final class LittleEndianRandomAccessFile implements Closeable {
         raf = new RandomAccessFile(path.toFile(), "r");
     }
 
-    public void resetOffs() {
-        offs = 0;
+    public short readWord() throws IOException {
+        return readShort();
+    }
+
+    public int readDword() throws IOException {
+        return readInt();
+    }
+
+    public long readDwordLong() throws IOException {
+        return readIntAsLong();
     }
 
     public short readShort() throws IOException {
@@ -49,16 +56,6 @@ public final class LittleEndianRandomAccessFile implements Closeable {
         byte[] buf = new byte[length];
         raf.readFully(buf);
         return new CreateStringFunc().apply(buf);
-    }
-
-    public String readString(int length, @NonNull Charset charset) throws IOException {
-        if (length <= 0)
-            return null;
-
-        offs += length;
-        byte[] buf = new byte[length];
-        raf.readFully(buf);
-        return new String(buf, charset);
     }
 
     public long readIntAsLong() throws IOException {

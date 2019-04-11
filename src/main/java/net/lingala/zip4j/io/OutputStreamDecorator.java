@@ -2,12 +2,14 @@ package net.lingala.zip4j.io;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.lingala.zip4j.util.Raw;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  * @author Oleg Cherednik
@@ -92,6 +94,11 @@ public final class OutputStreamDecorator implements Closeable {
     public void writeBytes(byte[] buf, int offs, int len) throws IOException {
         delegate.write(buf, offs, len);
         this.offs += len;
+    }
+
+    public void writeString(String str, @NonNull Charset charset) throws IOException {
+        if(str != null)
+            writeBytes(str.getBytes(charset));
     }
 
     public void writeLong(long val) throws IOException {

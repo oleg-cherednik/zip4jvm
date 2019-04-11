@@ -21,6 +21,8 @@ import lombok.Setter;
 import net.lingala.zip4j.util.InternalZipConstants;
 import org.apache.commons.lang.StringUtils;
 
+import java.nio.charset.Charset;
+
 @Getter
 @Setter
 public class EndCentralDirectory {
@@ -41,20 +43,27 @@ public class EndCentralDirectory {
     // size:2 - total number of entries in the central directory
     private int totalEntries;
     // size:4 - size of the central directory
-    private int sizeCentralDirectory;
+    private int size;
     // size:4 - offset of start of central directory with respect to the starting disk number
     private long offs;
     // size:2 - file comment length (n)
     private int commentLength;
     // size:n - file comment
     private String comment;
+    private byte[] bufComment;
 
-    public void setComment(String comment) {
+    public void setComment(String comment, Charset charset) {
         this.comment = comment;
+
+
         commentLength = StringUtils.length(comment);
     }
 
-    public String getComment() {
-        return comment;
+    public void incTotalEntries() {  g
+        totalEntries++;
+    }
+
+    public void incDiskEntries() {
+        diskEntries++;
     }
 }
