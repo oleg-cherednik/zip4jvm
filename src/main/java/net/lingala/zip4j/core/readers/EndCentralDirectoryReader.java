@@ -29,8 +29,9 @@ final class EndCentralDirectoryReader {
         dir.setTotalEntries(in.readWord());
         dir.setSize(in.readDword());
         dir.setOffs(in.readDwordLong());
-        dir.setCommentLength(in.readWord());
-        dir.setComment(in.readString(dir.getCommentLength()));
+
+        short commentLength = in.readWord();
+        dir.setComment(in.readString(commentLength));
 
         return dir;
     }

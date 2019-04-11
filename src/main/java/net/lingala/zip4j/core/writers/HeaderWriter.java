@@ -24,6 +24,7 @@ import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.LittleEndianBuffer;
 import net.lingala.zip4j.util.Raw;
+import org.apache.commons.lang.ArrayUtils;
 
 import java.io.IOException;
 
@@ -160,13 +161,15 @@ public final class HeaderWriter {
         System.arraycopy(longByte, 0, intByte, 0, 4);
         bytes.copyByteArrayToArrayList(intByte);
 
+        byte[] comment = dir.getComment(zipModel.getCharset());
+
         //Zip File comment length
-        Raw.writeShortLittleEndian(shortByte, 0, (short)dir.getCommentLength());
+        Raw.writeShortLittleEndian(shortByte, 0, (short)ArrayUtils.getLength(comment));
         bytes.copyByteArrayToArrayList(shortByte);
 
         //Comment
-        if (dir.getCommentLength() > 0)
-            bytes.copyByteArrayToArrayList(dir.getComment().getBytes(zipModel.getCharset()));
+        if (ArrayUtils.isNotEmpty(comment))
+            bytes.copyByteArrayToArrayList(comment);
     }
 
     private int countNumberOfFileHeaderEntriesOnDisk() {

@@ -17,9 +17,11 @@
 package net.lingala.zip4j.model;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import net.lingala.zip4j.util.InternalZipConstants;
-import org.apache.commons.lang.StringUtils;
+
+import java.nio.charset.Charset;
 
 @Getter
 @Setter
@@ -45,13 +47,16 @@ public class EndCentralDirectory {
     // size:4 - offset of start of central directory with respect to the starting disk number
     private long offs;
     // size:2 - file comment length (n)
-    private int commentLength;
+//    private int commentLength;
     // size:n - file comment
     private String comment;
 
     public void setComment(String comment) {
         this.comment = comment;
-        commentLength = StringUtils.length(comment);
+    }
+
+    public byte[] getComment(@NonNull Charset charset) {
+        return comment != null ? comment.getBytes(charset) : null;
     }
 
     public void incTotalEntries() {

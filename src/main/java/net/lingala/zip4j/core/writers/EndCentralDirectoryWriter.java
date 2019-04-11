@@ -6,6 +6,7 @@ import net.lingala.zip4j.io.OutputStreamDecorator;
 import net.lingala.zip4j.model.EndCentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
+import org.apache.commons.lang.ArrayUtils;
 
 import java.io.IOException;
 
@@ -30,11 +31,9 @@ final class EndCentralDirectoryWriter {
         out.writeDword(dir.getSize());
         out.writeDword(Math.min(offs, InternalZipConstants.ZIP_64_LIMIT));
 
-
-
-
-        out.writeWord((short)dir.getCommentLength());
-        out.writeString(dir.getComment(), zipModel.getCharset());
+        byte[] comment = dir.getComment(zipModel.getCharset());
+        out.writeWord((short)ArrayUtils.getLength(comment));
+        out.writeBytes(comment);
 
         /*
                 dir.setDiskNumber(in.readWord());
