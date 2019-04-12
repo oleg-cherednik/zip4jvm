@@ -19,11 +19,13 @@ package net.lingala.zip4j.core.writers;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.io.OutputStreamDecorator;
+import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.Zip64EndCentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.io.IOException;
+import java.util.zip.ZipException;
 
 @RequiredArgsConstructor
 public final class HeaderWriter {
@@ -35,6 +37,18 @@ public final class HeaderWriter {
 
     // TODO do we really need validate flag?
     public void finalizeZipFile(@NonNull OutputStreamDecorator out, boolean validate) throws IOException {
+        long s = 0;
+
+        for (CentralDirectory.FileHeader fileHeader : zipModel.getFileHeaders())
+            s += fileHeader.getFileName().getBytes(zipModel.getCharset()).length + fileHeader.getExtraFieldLength();
+
+        s += zipModel.getEndCentralDirectory().getComment(zipModel.getCharset()).length;
+
+        if(s > 65_535)
+            throw new ZipException("----------------");
+
+
+
         if (validate)
             processHeaderData(out);
 

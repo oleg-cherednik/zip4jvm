@@ -36,14 +36,13 @@ final class CentralDirectoryReader {
     public CentralDirectory read() throws IOException {
         findHead();
 
-        CentralDirectory centralDirectory = new CentralDirectory();
-        centralDirectory.setFileHeaders(readFileHeaders());
-        centralDirectory.setDigitalSignature(readDigitalSignature());
+        CentralDirectory dir = new CentralDirectory();
+        dir.setFileHeaders(readFileHeaders());
+        dir.setDigitalSignature(readDigitalSignature());
 
-        return centralDirectory;
+        return dir;
     }
 
-    @NonNull
     private List<CentralDirectory.FileHeader> readFileHeaders() throws IOException {
         int total = isZip64() ? (int)zip64Dir.getTotalEntries() : dir.getTotalEntries();
         List<CentralDirectory.FileHeader> fileHeaders = new ArrayList<>(total);
@@ -54,7 +53,6 @@ final class CentralDirectoryReader {
         return fileHeaders;
     }
 
-    @NonNull
     private CentralDirectory.FileHeader readFileHeader() throws IOException {
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 

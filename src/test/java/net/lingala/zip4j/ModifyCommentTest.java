@@ -3,7 +3,9 @@ package net.lingala.zip4j;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
+import net.lingala.zip4j.model.EndCentralDirectory;
 import net.lingala.zip4j.model.ZipParameters;
+import org.apache.commons.lang.StringUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -71,7 +73,19 @@ public class ModifyCommentTest {
         assertThat(misc.getComment()).isNull();
     }
 
-    @Test(dependsOnMethods = "shouldClearCommentForExistedZip")
+    @Test
+    public void shouldSetCommentWithMaxLength() throws IOException {
+        Path zipFile = rootDir.resolve("src_" + System.currentTimeMillis() + ".zip");
+        Files.copy(Zip4jSuite.noSplitZip, zipFile);
+
+        ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
+        assertThat(misc.getComment()).isNull();
+
+        misc.setComment(StringUtils.repeat("_", 25191));
+        assertThat(misc.getComment()).hasSize(EndCentralDirectory.MAX_COMMENT_LENGTH);
+    }
+
+    @Test(dependsOnMethods = "shouldAddCommentWithMaxLength")
     public void shouldAddCommentToEncryptedZip() throws ZipException, IOException {
         Files.deleteIfExists(zipFile);
         Files.copy(Zip4jSuite.noSplitAesZip, zipFile);
