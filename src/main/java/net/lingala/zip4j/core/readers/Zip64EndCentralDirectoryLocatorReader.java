@@ -1,5 +1,6 @@
 package net.lingala.zip4j.core.readers;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.model.Zip64EndCentralDirectoryLocator;
 import net.lingala.zip4j.util.InternalZipConstants;
@@ -14,11 +15,11 @@ import java.io.IOException;
 @RequiredArgsConstructor
 final class Zip64EndCentralDirectoryLocatorReader {
 
-    private final LittleEndianRandomAccessFile in;
-    private final long offsEndCentralDirectory;
+    private final long offs;
 
-    public Zip64EndCentralDirectoryLocator read() throws IOException {
-        if (!findHead())
+    @NonNull
+    public Zip64EndCentralDirectoryLocator read(@NonNull LittleEndianRandomAccessFile in) throws IOException {
+        if (!findHead(in))
             return null;
 
         Zip64EndCentralDirectoryLocator locator = new Zip64EndCentralDirectoryLocator();
@@ -29,11 +30,11 @@ final class Zip64EndCentralDirectoryLocatorReader {
         return locator;
     }
 
-    private boolean findHead() throws IOException {
-        if (offsEndCentralDirectory < 0)
+    private boolean findHead(LittleEndianRandomAccessFile in) throws IOException {
+        if (offs < 0)
             throw new IOException("EndCentralDirectory offs is unknown");
 
-        long offs = offsEndCentralDirectory - Zip64EndCentralDirectoryLocator.SIZE;
+        long offs = this.offs - Zip64EndCentralDirectoryLocator.SIZE;
 
         if (offs < 0)
             return false;

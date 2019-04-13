@@ -18,16 +18,20 @@ import java.io.IOException;
 public final class CentralDirectoryWriter {
 
     @NonNull
-    private final OutputStreamDecorator out;
+    private final CentralDirectory dir;
     @NonNull
     private final ZipModel zipModel;
 
-    public void write() throws IOException {
-        for (CentralDirectory.FileHeader fileHeader : zipModel.getFileHeaders())
-            write(fileHeader);
+    public void write(@NonNull OutputStreamDecorator out) throws IOException {
+        writeFileHeaders(out);
     }
 
-    private void write(CentralDirectory.FileHeader fileHeader) throws IOException {
+    private void writeFileHeaders(OutputStreamDecorator out) throws IOException {
+        for (CentralDirectory.FileHeader fileHeader : dir.getFileHeaders())
+            writeFileHeader(fileHeader, out);
+    }
+
+    private void writeFileHeader(CentralDirectory.FileHeader fileHeader, OutputStreamDecorator out) throws IOException {
         final byte[] emptyShortByte = { 0, 0 };
         final byte[] emptyIntByte = { 0, 0, 0, 0 };
 
@@ -84,11 +88,11 @@ public final class CentralDirectoryWriter {
         if (writeZip64FileSize || writeZip64OffsetLocalHeader)
             zipModel.zip64();
 
-        writeZip64ExtendedInfo(fileHeader, writeZip64FileSize, writeZip64OffsetLocalHeader);
-        writeAesExtraDataRecord(fileHeader.getAesExtraDataRecord());
+        writeZip64ExtendedInfo(out, fileHeader, writeZip64FileSize, writeZip64OffsetLocalHeader);
+        writeAesExtraDataRecord(out, fileHeader.getAesExtraDataRecord());
     }
 
-    private void writeZip64ExtendedInfo(CentralDirectory.FileHeader fileHeader, boolean writeZip64FileSize,
+    private void writeZip64ExtendedInfo(OutputStreamDecorator out, CentralDirectory.FileHeader fileHeader, boolean writeZip64FileSize,
             boolean writeZip64OffsetLocalHeader) throws IOException {
         if (!zipModel.isZip64())
             return;
@@ -117,7 +121,7 @@ public final class CentralDirectoryWriter {
             out.writeDword(fileHeader.getOffsLocalFileHeader());
     }
 
-    private void writeAesExtraDataRecord(AESExtraDataRecord record) throws IOException {
+    private void writeAesExtraDataRecord(OutputStreamDecorator out, AESExtraDataRecord record) throws IOException {
         if (record == null)
             return;
 

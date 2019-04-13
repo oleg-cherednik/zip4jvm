@@ -10,6 +10,8 @@ import net.lingala.zip4j.util.Raw;
 import java.io.Closeable;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Oleg Cherednik
@@ -28,14 +30,14 @@ public final class OutputStreamDecorator implements Closeable {
     private long offs;
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
-    private long mark;
+    private final Map<String, Long> mark = new HashMap<>();
 
-    public void mark() {
-        mark = offs;
+    public void mark(String id) {
+        mark.put(id, offs);
     }
 
-    public long getWrittenBytesAmount() {
-        return offs - mark;
+    public long getWrittenBytesAmount(String id) {
+        return offs - mark.getOrDefault(id, 0L);
     }
 
     public int getCurrSplitFileCounter() {

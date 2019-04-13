@@ -18,11 +18,11 @@ import java.nio.charset.Charset;
 final class EndCentralDirectoryWriter {
 
     @NonNull
-    private final OutputStreamDecorator out;
+    private final EndCentralDirectory dir;
     @NonNull
     private final Charset charset;
 
-    public void write(@NonNull EndCentralDirectory dir) throws IOException {
+    public void write(@NonNull OutputStreamDecorator out) throws IOException {
         out.writeDword(dir.getSignature());
         out.writeWord((short)dir.getDiskNumber());
         out.writeWord((short)dir.getStartDiskNumber());

@@ -1,5 +1,6 @@
 package net.lingala.zip4j.core.readers;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.model.Zip64EndCentralDirectory;
 import net.lingala.zip4j.util.InternalZipConstants;
@@ -14,11 +15,11 @@ import java.io.IOException;
 @RequiredArgsConstructor
 final class Zip64EndCentralDirectoryReader {
 
-    private final LittleEndianRandomAccessFile in;
     private final long offs;
 
-    public Zip64EndCentralDirectory read() throws IOException {
-        findHead();
+    @NonNull
+    public Zip64EndCentralDirectory read(@NonNull LittleEndianRandomAccessFile in) throws IOException {
+        findHead(in);
 
         Zip64EndCentralDirectory dir = new Zip64EndCentralDirectory();
         dir.setSizeOfZip64EndCentralDirRec(in.readLong());
@@ -35,7 +36,7 @@ final class Zip64EndCentralDirectoryReader {
         return dir;
     }
 
-    private void findHead() throws IOException {
+    private void findHead(LittleEndianRandomAccessFile in) throws IOException {
         in.seek(offs);
 
         if (in.readInt() == InternalZipConstants.ZIP64_ENDSIG)

@@ -19,6 +19,7 @@ package net.lingala.zip4j.core.writers;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.io.OutputStreamDecorator;
+import net.lingala.zip4j.model.EndCentralDirectory;
 import net.lingala.zip4j.model.Zip64EndCentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
 import org.apache.commons.lang.ArrayUtils;
@@ -29,6 +30,7 @@ import java.io.IOException;
 public final class HeaderWriter {
 
     public static final int ZIP64_EXTRA_BUF = 50;
+    private static final String MARK = "header";
 
     @NonNull
     private final ZipModel zipModel;
@@ -38,49 +40,51 @@ public final class HeaderWriter {
         if (validate)
             processHeaderData(out);
 
-        final long offs = zipModel.getEndCentralDirectory().getOffs();
-        long off = out.getOffs();
-        new CentralDirectoryWriter(out, zipModel).write();
-        final int size = (int)(out.getOffs() - off);
-        zipModel.getEndCentralDirectory().setSize(size);
+        EndCentralDirectory endCentralDirectory = zipModel.getEndCentralDirectory();
+        out.mark(MARK);
+        new CentralDirectoryWriter(zipModel.getCentralDirectory(), zipModel).write(out);
+        endCentralDirectory.setSize((int)out.getWrittenBytesAmount(MARK));
 
         if (zipModel.isZip64()) {
-            Zip64EndCentralDirectory dir = zipModel.getZip64().getEndCentralDirectory();
+            Zip64EndCentralDirectory dir = zipModel.getZip64EndCentralDirectory();
             dir.setSizeOfCentralDir(Zip64EndCentralDirectory.SIZE + ArrayUtils.getLength(dir.getExtensibleDataSector()));
             dir.setVersionMadeBy(zipModel.getVersionMadeBy());
             dir.setVersionNeededToExtract(zipModel.getVersionToExtract());
-            dir.setNoOfThisDisk(zipModel.getEndCentralDirectory().getDiskNumber());
-            dir.setNoOfThisDiskStartOfCentralDir(zipModel.getEndCentralDirectory().getStartDiskNumber());
+            dir.setNoOfThisDisk(endCentralDirectory.getDiskNumber());
+            dir.setNoOfThisDiskStartOfCentralDir(endCentralDirectory.getStartDiskNumber());
             dir.setTotNoOfEntriesInCentralDirOnThisDisk(countNumberOfFileHeaderEntriesOnDisk());
             dir.setTotalEntries(zipModel.getFileHeaders().size());
-            dir.setSizeOfCentralDir(size);
-            dir.setOffsetStartCenDirWRTStartDiskNo(offs);
+            dir.setSizeOfCentralDir(endCentralDirectory.getSize());
+            dir.setOffsetStartCenDirWRTStartDiskNo(endCentralDirectory.getOffs());
         }
 
         if (zipModel.isZip64() && validate)
-            zipModel.getZip64().setNoOfDiskStartOfZip64EndOfCentralDirRec(out.getCurrSplitFileCounter());
+            zipModel.getZip64EndCentralDirectoryLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(out.getCurrSplitFileCounter());
 
         if (zipModel.isZip64())
-            zipModel.getZip64().setOffsetZip64EndOfCentralDirRec(offs + size);
+            zipModel.getZip64EndCentralDirectoryLocator()
+                    .setOffsetZip64EndOfCentralDirRec(endCentralDirectory.getOffs() + endCentralDirectory.getSize());
 
         if (zipModel.isZip64() && validate)
-            zipModel.getZip64().setTotNumberOfDiscs(out.getCurrSplitFileCounter() + 1);
+            zipModel.getZip64EndCentralDirectoryLocator().setTotNumberOfDiscs(out.getCurrSplitFileCounter() + 1);
 
-        new Zip64EndCentralDirectoryWriter(out).write(zipModel.isZip64() ? zipModel.getZip64().getEndCentralDirectory() : null);
-        new Zip64EndCentralDirectoryLocatorWriter(out).write(zipModel.isZip64() ? zipModel.getZip64().getEndCentralDirectoryLocator() : null);
-        new EndCentralDirectoryWriter(out, zipModel.getCharset()).write(zipModel.getEndCentralDirectory());
+        new Zip64EndCentralDirectoryWriter(zipModel.getZip64EndCentralDirectory()).write(out);
+        new Zip64EndCentralDirectoryLocatorWriter(zipModel.getZip64EndCentralDirectoryLocator()).write(out);
+        new EndCentralDirectoryWriter(endCentralDirectory, zipModel.getCharset()).write(out);
     }
 
     private void processHeaderData(OutputStreamDecorator out) throws IOException {
-        zipModel.getEndCentralDirectory().setOffs(out.getFilePointer());
+        EndCentralDirectory endCentralDirectory = zipModel.getEndCentralDirectory();
+
+        endCentralDirectory.setOffs(out.getFilePointer());
 
         if (zipModel.isZip64()) {
-            zipModel.getZip64().setNoOfDiskStartOfZip64EndOfCentralDirRec(out.getCurrSplitFileCounter());
-            zipModel.getZip64().setTotNumberOfDiscs(out.getCurrSplitFileCounter() + 1);
+            zipModel.getZip64EndCentralDirectoryLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(out.getCurrSplitFileCounter());
+            zipModel.getZip64EndCentralDirectoryLocator().setTotNumberOfDiscs(out.getCurrSplitFileCounter() + 1);
         }
 
-        zipModel.getEndCentralDirectory().setDiskNumber(out.getCurrSplitFileCounter());
-        zipModel.getEndCentralDirectory().setStartDiskNumber(out.getCurrSplitFileCounter());
+        endCentralDirectory.setDiskNumber(out.getCurrSplitFileCounter());
+        endCentralDirectory.setStartDiskNumber(out.getCurrSplitFileCounter());
     }
 
     private int countNumberOfFileHeaderEntriesOnDisk() {

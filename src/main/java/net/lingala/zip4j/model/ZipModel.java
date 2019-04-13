@@ -59,6 +59,14 @@ public class ZipModel {
         splitLength = endCentralDirectory != null && endCentralDirectory.getDiskNumber() > 0 ? 1 : NO_SPLIT;
     }
 
+    public Zip64EndCentralDirectoryLocator getZip64EndCentralDirectoryLocator() {
+        return isZip64() ? zip64.getEndCentralDirectoryLocator() : null;
+    }
+
+    public Zip64EndCentralDirectory getZip64EndCentralDirectory() {
+        return isZip64() ? zip64.getEndCentralDirectory() : null;
+    }
+
     public boolean isSplitArchive() {
         return splitLength > 0;
     }
@@ -189,17 +197,6 @@ public class ZipModel {
         private final Zip64EndCentralDirectoryLocator endCentralDirectoryLocator;
         private final Zip64EndCentralDirectory endCentralDirectory;
 
-        public void setNoOfDiskStartOfZip64EndOfCentralDirRec(int noOfDiskStartOfZip64EndOfCentralDirRec) {
-            endCentralDirectoryLocator.setNoOfDiskStartOfZip64EndOfCentralDirRec(noOfDiskStartOfZip64EndOfCentralDirRec);
-        }
-
-        public void setOffsetZip64EndOfCentralDirRec(long offsetZip64EndOfCentralDirRec) {
-            endCentralDirectoryLocator.setOffsetZip64EndOfCentralDirRec(offsetZip64EndOfCentralDirRec);
-        }
-
-        public void setTotNumberOfDiscs(int totNumberOfDiscs) {
-            endCentralDirectoryLocator.setTotNumberOfDiscs(totNumberOfDiscs);
-        }
     }
 
 }

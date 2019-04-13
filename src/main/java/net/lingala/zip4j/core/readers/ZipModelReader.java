@@ -48,11 +48,10 @@ public final class ZipModelReader {
      * @return {@link ZipModel}
      * @throws ZipException
      */
-    @NonNull
     private ZipModel read(@NonNull LittleEndianRandomAccessFile in) throws IOException {
-        EndCentralDirectoryReader endCentralDirectoryReader = new EndCentralDirectoryReader(in);
-        EndCentralDirectory dir = endCentralDirectoryReader.read();
-        Zip64EndCentralDirectoryLocator locator = new Zip64EndCentralDirectoryLocatorReader(in, endCentralDirectoryReader.getOffs()).read();
+        EndCentralDirectoryReader endCentralDirectoryReader = new EndCentralDirectoryReader();
+        EndCentralDirectory dir = endCentralDirectoryReader.read(in);
+        Zip64EndCentralDirectoryLocator locator = new Zip64EndCentralDirectoryLocatorReader(endCentralDirectoryReader.getOffs()).read(in);
 
         ZipModel zipModel = new ZipModel();
         zipModel.setZipFile(zipFile);
@@ -60,10 +59,10 @@ public final class ZipModelReader {
         zipModel.setEndCentralDirectory(dir);
 
         if (locator != null)
-            zipModel.zip64(locator, new Zip64EndCentralDirectoryReader(in, locator.getOffsetZip64EndOfCentralDirRec()).read());
+            zipModel.zip64(locator, new Zip64EndCentralDirectoryReader(locator.getOffsetZip64EndOfCentralDirRec()).read(in));
 
         Zip64EndCentralDirectory zip64EndCentralDirectory = zipModel.isZip64() ? zipModel.getZip64().getEndCentralDirectory() : null;
-        zipModel.setCentralDirectory(new CentralDirectoryReader(in, dir, zip64EndCentralDirectory).read());
+        zipModel.setCentralDirectory(new CentralDirectoryReader(dir, zip64EndCentralDirectory).read(in));
 
         return zipModel;
     }

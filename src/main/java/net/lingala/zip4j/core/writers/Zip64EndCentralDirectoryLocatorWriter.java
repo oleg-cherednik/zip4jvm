@@ -15,10 +15,9 @@ import java.io.IOException;
 @RequiredArgsConstructor
 final class Zip64EndCentralDirectoryLocatorWriter {
 
-    @NonNull
-    private final OutputStreamDecorator out;
+    private final Zip64EndCentralDirectoryLocator locator;
 
-    public void write(Zip64EndCentralDirectoryLocator locator) throws IOException {
+    public void write(@NonNull OutputStreamDecorator out) throws IOException {
         if (locator == null)
             return;
 

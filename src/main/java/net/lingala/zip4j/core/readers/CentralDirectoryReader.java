@@ -29,31 +29,31 @@ import java.util.Map;
 @RequiredArgsConstructor
 final class CentralDirectoryReader {
 
-    private final LittleEndianRandomAccessFile in;
     private final EndCentralDirectory dir;
     private final Zip64EndCentralDirectory zip64Dir;
 
-    public CentralDirectory read() throws IOException {
-        findHead();
+    @NonNull
+    public CentralDirectory read(@NonNull LittleEndianRandomAccessFile in) throws IOException {
+        findHead(in);
 
         CentralDirectory dir = new CentralDirectory();
-        dir.setFileHeaders(readFileHeaders());
-        dir.setDigitalSignature(readDigitalSignature());
+        dir.setFileHeaders(readFileHeaders(in));
+        dir.setDigitalSignature(readDigitalSignature(in));
 
         return dir;
     }
 
-    private List<CentralDirectory.FileHeader> readFileHeaders() throws IOException {
+    private List<CentralDirectory.FileHeader> readFileHeaders(LittleEndianRandomAccessFile in) throws IOException {
         int total = isZip64() ? (int)zip64Dir.getTotalEntries() : dir.getTotalEntries();
         List<CentralDirectory.FileHeader> fileHeaders = new ArrayList<>(total);
 
         for (int i = 0; i < total; i++)
-            fileHeaders.add(readFileHeader());
+            fileHeaders.add(readFileHeader(in));
 
         return fileHeaders;
     }
 
-    private CentralDirectory.FileHeader readFileHeader() throws IOException {
+    private CentralDirectory.FileHeader readFileHeader(LittleEndianRandomAccessFile in) throws IOException {
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
         int signature = in.readInt();
@@ -113,7 +113,7 @@ final class CentralDirectoryReader {
         return map.isEmpty() ? Collections.emptyMap() : map;
     }
 
-    private CentralDirectory.DigitalSignature readDigitalSignature() throws IOException {
+    private CentralDirectory.DigitalSignature readDigitalSignature(LittleEndianRandomAccessFile in) throws IOException {
         if (in.readInt() != InternalZipConstants.DIGSIG)
             return null;
 
@@ -165,7 +165,7 @@ final class CentralDirectoryReader {
         return null;
     }
 
-    private void findHead() throws IOException {
+    private void findHead(LittleEndianRandomAccessFile in) throws IOException {
         in.seek(isZip64() ? zip64Dir.getOffsetStartCenDirWRTStartDiskNo() : dir.getOffs());
     }
 

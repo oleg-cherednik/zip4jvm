@@ -21,12 +21,11 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public final class LocalFileHeaderReader {
 
-    private final LittleEndianRandomAccessFile in;
     private final CentralDirectory.FileHeader fileHeader;
 
     @NonNull
-    public LocalFileHeader read() throws IOException, ZipException {
-        findHead();
+    public LocalFileHeader read(@NonNull LittleEndianRandomAccessFile in) throws IOException, ZipException {
+        findHead(in);
 
         LocalFileHeader localFileHeader = new LocalFileHeader();
 
@@ -59,7 +58,7 @@ public final class LocalFileHeaderReader {
         return localFileHeader;
     }
 
-    private void findHead() throws IOException {
+    private void findHead(LittleEndianRandomAccessFile in) throws IOException {
         in.seek(fileHeader.getOffsLocalFileHeader());
 
         if (in.readInt() == InternalZipConstants.LOCSIG)

@@ -44,6 +44,8 @@ import java.util.zip.CRC32;
  */
 public abstract class CipherOutputStream extends OutputStream {
 
+    private static final String MARK = "entry";
+
     protected final OutputStreamDecorator out;
     protected final ZipModel zipModel;
 
@@ -107,10 +109,10 @@ public abstract class CipherOutputStream extends OutputStream {
                 out.writeInt(InternalZipConstants.SPLITSIG);
 
             fileHeader.setOffsLocalFileHeader(out.getOffsLocalHeaderRelative());
-            new LocalFileHeaderWriter(localFileHeader).write(zipModel, out);
+            new LocalFileHeaderWriter(localFileHeader, zipModel).write(out);
 
             encryptor = parameters.getEncryption().createEncryptor(parameters, localFileHeader);
-            out.mark();
+            out.mark(MARK);
 
             encryptor.write(out);
             crc.reset();
@@ -189,8 +191,8 @@ public abstract class CipherOutputStream extends OutputStream {
                 throw new ZipException("invalid encryption for AES encrypted file");
         }
 
-        fileHeader.setCompressedSize(out.getWrittenBytesAmount());
-        localFileHeader.setCompressedSize(out.getWrittenBytesAmount());
+        fileHeader.setCompressedSize(out.getWrittenBytesAmount(MARK));
+        localFileHeader.setCompressedSize(out.getWrittenBytesAmount(MARK));
 
         if (parameters.isSourceExternalStream()) {
             fileHeader.setUncompressedSize(totalBytesRead);
@@ -214,10 +216,10 @@ public abstract class CipherOutputStream extends OutputStream {
 
         // TODO should we do all above?
         if (parameters.getCompressionMethod() == CompressionMethod.DEFLATE)
-            new LocalFileHeaderWriter(localFileHeader).writeExtended(out);
+            new LocalFileHeaderWriter(localFileHeader, zipModel).writeExtended(out);
 
         crc.reset();
-        out.mark();
+        out.mark(MARK);
         encryptor = Encryptor.NULL;
         totalBytesRead = 0;
     }

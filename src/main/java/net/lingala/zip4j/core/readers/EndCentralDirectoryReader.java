@@ -1,6 +1,7 @@
 package net.lingala.zip4j.core.readers;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.model.EndCentralDirectory;
 import net.lingala.zip4j.util.InternalZipConstants;
@@ -15,12 +16,13 @@ import java.io.IOException;
 @RequiredArgsConstructor
 final class EndCentralDirectoryReader {
 
-    private final LittleEndianRandomAccessFile in;
     @Getter
     private long offs = -1;
 
-    public EndCentralDirectory read() throws IOException {
-        findHead();
+    @NonNull
+    public EndCentralDirectory read(@NonNull LittleEndianRandomAccessFile in) throws IOException {
+        offs = -1;
+        findHead(in);
 
         EndCentralDirectory dir = new EndCentralDirectory();
         dir.setDiskNumber(in.readWord());
@@ -36,7 +38,7 @@ final class EndCentralDirectoryReader {
         return dir;
     }
 
-    private void findHead() throws IOException {
+    private void findHead(LittleEndianRandomAccessFile in) throws IOException {
         int commentLength = EndCentralDirectory.MAX_COMMENT_LENGTH;
         long offs = in.length() - EndCentralDirectory.MIN_SIZE;
 

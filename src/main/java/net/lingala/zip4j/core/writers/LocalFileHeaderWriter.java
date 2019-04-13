@@ -19,8 +19,10 @@ public final class LocalFileHeaderWriter {
 
     @NonNull
     private final LocalFileHeader localFileHeader;
+    @NonNull
+    private final ZipModel zipModel;
 
-    public void write(@NonNull ZipModel zipModel, @NonNull OutputStreamDecorator out) throws IOException {
+    public void write(@NonNull OutputStreamDecorator out) throws IOException {
         out.writeDword(localFileHeader.getSignature());
         out.writeWord((short)localFileHeader.getVersionToExtract());
         out.writeShort(localFileHeader.getGeneralPurposeFlag().getData());
