@@ -24,13 +24,13 @@ import java.util.zip.ZipFile;
 final class ZipFileDecorator {
 
     @Getter
-    private final Path path;
+    private final Path zipFile;
     private final Map<String, ZipEntry> entries;
     private final Map<String, Set<String>> map;
 
-    public ZipFileDecorator(Path path) {
-        this.path = path;
-        entries = entries(path);
+    public ZipFileDecorator(Path zipFile) {
+        this.zipFile = zipFile;
+        entries = entries(zipFile);
         map = walk(entries.keySet());
     }
 
@@ -44,7 +44,15 @@ final class ZipFileDecorator {
 
     public InputStream getInputStream(@NonNull ZipEntry entry) {
         try {
-            return new ZipFile(path.toFile()).getInputStream(entry);
+            return new ZipFile(zipFile.toFile()).getInputStream(entry);
+        } catch(Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String getComment() {
+        try (ZipFile zipFile = new ZipFile(this.zipFile.toFile())) {
+            return zipFile.getComment();
         } catch(Exception e) {
             throw new RuntimeException(e);
         }

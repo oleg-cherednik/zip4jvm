@@ -19,7 +19,9 @@ package net.lingala.zip4j.model;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.util.InternalZipConstants;
+import org.apache.commons.lang.StringUtils;
 
 import java.nio.charset.Charset;
 
@@ -30,7 +32,7 @@ public class EndCentralDirectory {
     // size (22) with comment length = 0
     public static final int MIN_SIZE = 4 + 2 + 2 + 2 + 2 + 4 + 4 + 2;
     // max length for comment is 2 bytes
-    public static final int MAX_COMMENT_LENGTH = 0xFFFF;
+    public static final int MAX_COMMENT_LENGTH = 33_000;
 
     // size:4 - signature (0x06054b50)
     private final int signature = InternalZipConstants.ENDSIG;
@@ -52,6 +54,9 @@ public class EndCentralDirectory {
     private String comment;
 
     public void setComment(String comment) {
+        if (StringUtils.length(comment) > MAX_COMMENT_LENGTH)
+            throw new ZipException("File comment should be " + MAX_COMMENT_LENGTH + " characters maximum");
+
         this.comment = comment;
     }
 

@@ -2,7 +2,6 @@ package net.lingala.zip4j.core.writers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.OutputStreamDecorator;
 import net.lingala.zip4j.model.EndCentralDirectory;
 import net.lingala.zip4j.util.InternalZipConstants;
@@ -35,15 +34,6 @@ final class EndCentralDirectoryWriter {
         byte[] comment = dir.getComment(charset);
         out.writeWord((short)ArrayUtils.getLength(comment));
         out.writeBytes(comment);
-    }
-
-    private byte[] getComment(EndCentralDirectory dir) {
-        byte[] comment = dir.getComment(charset);
-
-        if (out.getOffs() + 2 + comment.length > 65_535)
-            throw new ZipException("Comment is too long. File length is greater that 65535 bytes (see 4.4.12)");
-
-        return comment;
     }
 
 }

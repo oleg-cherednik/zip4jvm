@@ -15,8 +15,8 @@ import java.nio.file.Path;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Zip4jAssertions extends Assertions {
 
-    public static AbstractZipFileAssert<?> assertThatZipFile(Path path) throws IOException {
-        return Zip4jAssertionsForClassTypes.assertThat(new ZipFileDecorator(path));
+    public static AbstractZipFileAssert<?> assertThatZipFile(Path zipFile) throws IOException {
+        return Zip4jAssertionsForClassTypes.assertThat(new ZipFileDecorator(zipFile));
     }
 
     public static AbstractDirectoryAssert<?> assertThatDirectory(Path path) {

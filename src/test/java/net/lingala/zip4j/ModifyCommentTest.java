@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
 import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThatZipFile;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author Oleg Cherednik
@@ -73,19 +74,7 @@ public class ModifyCommentTest {
         assertThat(misc.getComment()).isNull();
     }
 
-    @Test
-    public void shouldSetCommentWithMaxLength() throws IOException {
-        Path zipFile = rootDir.resolve("src_" + System.currentTimeMillis() + ".zip");
-        Files.copy(Zip4jSuite.noSplitZip, zipFile);
-
-        ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
-        assertThat(misc.getComment()).isNull();
-
-        misc.setComment(StringUtils.repeat("_", 25191));
-        assertThat(misc.getComment()).hasSize(EndCentralDirectory.MAX_COMMENT_LENGTH);
-    }
-
-    @Test(dependsOnMethods = "shouldAddCommentWithMaxLength")
+    @Test(dependsOnMethods = "shouldClearCommentForExistedZip")
     public void shouldAddCommentToEncryptedZip() throws ZipException, IOException {
         Files.deleteIfExists(zipFile);
         Files.copy(Zip4jSuite.noSplitAesZip, zipFile);
@@ -96,6 +85,30 @@ public class ModifyCommentTest {
 
         misc.setComment("Oleg Cherednik - Олег Чередник");
         assertThat(misc.getComment()).isEqualTo("Oleg Cherednik - Олег Чередник");
+    }
+
+    @Test
+    public void shouldSetCommentWithMaxLength() throws IOException {
+        Path zipFile = rootDir.resolve("src_" + System.currentTimeMillis() + ".zip");
+        Files.copy(Zip4jSuite.noSplitZip, zipFile);
+
+        ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
+        assertThat(misc.getComment()).isNull();
+
+        misc.setComment(StringUtils.repeat("_", EndCentralDirectory.MAX_COMMENT_LENGTH));
+        assertThatZipFile(zipFile).hasCommentSize(EndCentralDirectory.MAX_COMMENT_LENGTH);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenCommentIsOverMaxLength() throws IOException {
+        Path zipFile = rootDir.resolve("src_" + System.currentTimeMillis() + ".zip");
+        Files.copy(Zip4jSuite.noSplitZip, zipFile);
+
+        ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
+        assertThat(misc.getComment()).isNull();
+
+        assertThatThrownBy(() -> misc.setComment(StringUtils.repeat("_", EndCentralDirectory.MAX_COMMENT_LENGTH + 1)))
+                .isInstanceOf(ZipException.class);
     }
 
 }
