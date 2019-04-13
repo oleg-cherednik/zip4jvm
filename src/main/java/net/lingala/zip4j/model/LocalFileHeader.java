@@ -20,7 +20,9 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import net.lingala.zip4j.util.InternalZipConstants;
+import org.apache.commons.lang.ArrayUtils;
 
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Map;
 
@@ -51,7 +53,7 @@ public class LocalFileHeader {
     // size:4 - uncompressed size
     private long uncompressedSize;
     // size:2 - file name length (n)
-    private int fileNameLength;
+//    private int fileNameLength;
     // size:2 - extra field length (m)
     private int extraFieldLength;
     // size:n - file name
@@ -70,6 +72,11 @@ public class LocalFileHeader {
     private AESExtraDataRecord aesExtraDataRecord;
     private boolean writeComprSizeInZip64ExtraRecord;
     private byte[] crcBuff;
+
+    @NonNull
+    public byte[] getFileName(@NonNull Charset charset) {
+        return fileName != null ? fileName.getBytes(charset) : ArrayUtils.EMPTY_BYTE_ARRAY;
+    }
 
     public short getExtraFileLength(ZipModel zipModel) {
         short extraFieldLength = 0;

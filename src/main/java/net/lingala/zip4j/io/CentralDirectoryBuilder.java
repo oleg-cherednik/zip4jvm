@@ -70,7 +70,6 @@ public class CentralDirectoryBuilder {
         localFileHeader.setCompressionMethod(fileHeader.getCompressionMethod());
         localFileHeader.setLastModifiedTime(fileHeader.getLastModifiedTime());
         localFileHeader.setUncompressedSize(fileHeader.getUncompressedSize());
-        localFileHeader.setFileNameLength(fileHeader.getFileNameLength());
         localFileHeader.setFileName(fileHeader.getFileName());
         localFileHeader.setEncryption(fileHeader.getEncryption());
         localFileHeader.setAesExtraDataRecord(fileHeader.getAesExtraDataRecord());

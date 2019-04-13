@@ -11,6 +11,7 @@ import net.lingala.zip4j.model.Zip64ExtendedInfo;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.LittleEndianDecorator;
 import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
 
@@ -36,9 +37,11 @@ public final class LocalFileHeaderReader {
         localFileHeader.setCrc32(in.readInt());
         localFileHeader.setCompressedSize(in.readIntAsLong());
         localFileHeader.setUncompressedSize(in.readIntAsLong());
-        localFileHeader.setFileNameLength(in.readShort());
+
+        short fileNameLength = in.readShort();
+
         localFileHeader.setExtraFieldLength(in.readShort());
-        localFileHeader.setFileName(in.readString(localFileHeader.getFileNameLength()));
+        localFileHeader.setFileName(FilenameUtils.normalize(in.readString(fileNameLength)));
         localFileHeader.setExtraDataRecords(CentralDirectoryReader.readExtraDataRecords(in, localFileHeader.getExtraFieldLength()));
 
         localFileHeader.setOffsetStartOfData(in.getFilePointer());

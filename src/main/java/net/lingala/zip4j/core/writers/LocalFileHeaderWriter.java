@@ -42,9 +42,12 @@ public final class LocalFileHeaderWriter {
             localFileHeader.setWriteComprSizeInZip64ExtraRecord(false);
         }
 
-        out.writeWord((short)localFileHeader.getFileNameLength());
+
+        byte[] fileName = localFileHeader.getFileName(zipModel.getCharset());
+
+        out.writeWord((short)fileName.length);
         out.writeWord(localFileHeader.getExtraFileLength(zipModel));
-        out.writeBytes(localFileHeader.getFileName().getBytes(zipModel.getCharset()));
+        out.writeBytes(fileName);
 
         if (zipModel.isZip64()) {
             out.writeWord((short)InternalZipConstants.EXTRAFIELDZIP64LENGTH);
