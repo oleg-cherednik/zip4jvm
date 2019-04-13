@@ -32,60 +32,33 @@ public final class CentralDirectoryWriter {
     }
 
     private void writeFileHeader(CentralDirectory.FileHeader fileHeader, OutputStreamDecorator out) throws IOException {
-        final byte[] emptyShortByte = { 0, 0 };
-        final byte[] emptyIntByte = { 0, 0, 0, 0 };
-
-
         final boolean writeZip64FileSize = fileHeader.getCompressedSize() >= InternalZipConstants.ZIP_64_LIMIT ||
                 fileHeader.getUncompressedSize() + HeaderWriter.ZIP64_EXTRA_BUF >= InternalZipConstants.ZIP_64_LIMIT;
         final boolean writeZip64OffsetLocalHeader = fileHeader.getOffsLocalFileHeader() > InternalZipConstants.ZIP_64_LIMIT;
         byte[] fileName = fileHeader.getFileName(zipModel.getCharset());
 
         out.writeDword(fileHeader.getSignature());
-
         out.writeWord(fileHeader.getVersionMadeBy());
-
         out.writeWord(fileHeader.getVersionToExtract());
-
         out.writeWord(fileHeader.getGeneralPurposeFlag().getData());
-
         out.writeShort(fileHeader.getCompressionMethod().getValue());
-
         out.writeDword(fileHeader.getLastModifiedTime());
-
         out.writeDword((int)fileHeader.getCrc32());
-
         out.writeDword(getCompressedSize(fileHeader, writeZip64FileSize));
         out.writeDword(getUncompressedSize(fileHeader, writeZip64FileSize));
-
         out.writeShort((short)fileName.length);
-
         out.writeWord(getExtraFieldLength(fileHeader, writeZip64FileSize, writeZip64OffsetLocalHeader));
-
-        //Skip file comment length for now
-        out.writeShort((short)0);
-
+        out.writeShort((short)0);   // file comment length
         out.writeShort((short)fileHeader.getDiskNumber());
-
-        out.writeBytes(emptyShortByte);
-
-        if (fileHeader.getExternalFileAttributes() != null)
-            out.writeBytes(fileHeader.getExternalFileAttributes());
-        else
-            out.writeBytes(emptyIntByte);
-
-        //Compute offset bytes before extra field is written for Zip64 compatibility
-        //NOTE: this data is not written now, but written at a later point
-
-
-        //offset local header
-        //this data is computed above
-
-
+        out.writeBytes(fileHeader.getInternalFileAttributes() != null ? fileHeader.getInternalFileAttributes() : new byte[2]);
+        out.writeBytes(fileHeader.getExternalFileAttributes() != null ? fileHeader.getExternalFileAttributes() : new byte[4]);
         out.writeLongAsInt(getOffsLocalFileHeader(fileHeader, writeZip64OffsetLocalHeader));
-
         out.writeBytes(fileName);
+        writeExtraDataRecord(out, fileHeader, writeZip64FileSize, writeZip64OffsetLocalHeader);
+    }
 
+    private void writeExtraDataRecord(OutputStreamDecorator out, CentralDirectory.FileHeader fileHeader, boolean writeZip64FileSize,
+            boolean writeZip64OffsetLocalHeader) throws IOException {
         if (writeZip64FileSize || writeZip64OffsetLocalHeader)
             zipModel.zip64();
 
