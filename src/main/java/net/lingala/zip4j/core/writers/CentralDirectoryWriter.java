@@ -39,6 +39,7 @@ public final class CentralDirectoryWriter {
         final boolean writeZip64FileSize = fileHeader.getCompressedSize() >= InternalZipConstants.ZIP_64_LIMIT ||
                 fileHeader.getUncompressedSize() + HeaderWriter.ZIP64_EXTRA_BUF >= InternalZipConstants.ZIP_64_LIMIT;
         final boolean writeZip64OffsetLocalHeader = fileHeader.getOffsLocalFileHeader() > InternalZipConstants.ZIP_64_LIMIT;
+        byte[] fileName = fileHeader.getFileName(zipModel.getCharset());
 
         out.writeDword(fileHeader.getSignature());
 
@@ -57,7 +58,7 @@ public final class CentralDirectoryWriter {
         out.writeDword(getCompressedSize(fileHeader, writeZip64FileSize));
         out.writeDword(getUncompressedSize(fileHeader, writeZip64FileSize));
 
-        out.writeShort((short)fileHeader.getFileNameLength());
+        out.writeShort((short)fileName.length);
 
         out.writeWord(getExtraFieldLength(fileHeader, writeZip64FileSize, writeZip64OffsetLocalHeader));
 
@@ -83,7 +84,7 @@ public final class CentralDirectoryWriter {
 
         out.writeLongAsInt(getOffsLocalFileHeader(fileHeader, writeZip64OffsetLocalHeader));
 
-        out.writeBytes(fileHeader.getFileName().getBytes(zipModel.getCharset()));
+        out.writeBytes(fileName);
 
         if (writeZip64FileSize || writeZip64OffsetLocalHeader)
             zipModel.zip64();

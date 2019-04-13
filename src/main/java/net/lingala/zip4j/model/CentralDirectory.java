@@ -24,7 +24,9 @@ import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.ZipUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.ArrayUtils;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -108,7 +110,7 @@ public class CentralDirectory {
         // size:4 - uncompressed size
         private long uncompressedSize;
         // size:2 - file name length (n)
-        private int fileNameLength;
+//        private int fileNameLength;
         // size:2 - extra field length (m)
         private int extraFieldLength;
         // size:2 - file comment length
@@ -137,6 +139,11 @@ public class CentralDirectory {
         public FileHeader(String fileName, Encryption encryption) {
             this.fileName = fileName;
             this.encryption = encryption;
+        }
+
+        @NonNull
+        public byte[] getFileName(@NonNull Charset charset) {
+            return fileName != null ? fileName.getBytes(charset) : ArrayUtils.EMPTY_BYTE_ARRAY;
         }
 
         public boolean isDirectory() {

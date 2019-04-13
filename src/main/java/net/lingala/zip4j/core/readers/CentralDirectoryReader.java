@@ -69,14 +69,16 @@ final class CentralDirectoryReader {
         fileHeader.setCrc32(in.readInt());
         fileHeader.setCompressedSize(in.readIntAsLong());
         fileHeader.setUncompressedSize(in.readIntAsLong());
-        fileHeader.setFileNameLength(in.readShort());
+
+        short fileNameLength = in.readShort();
+
         fileHeader.setExtraFieldLength(in.readShort());
         fileHeader.setFileCommentLength(in.readShort());
         fileHeader.setDiskNumber(in.readShort());
         fileHeader.setInternalFileAttributes(in.readBytes(2));
         fileHeader.setExternalFileAttributes(in.readBytes(4));
         fileHeader.setOffsLocalFileHeader(in.readIntAsLong());
-        fileHeader.setFileName(FilenameUtils.normalize(in.readString(fileHeader.getFileNameLength()), true));
+        fileHeader.setFileName(FilenameUtils.normalize(in.readString(fileNameLength), true));
         fileHeader.setExtraDataRecords(readExtraDataRecords(in, fileHeader.getExtraFieldLength()));
 
         fileHeader.setZip64ExtendedInfo(readZip64ExtendedInfo(fileHeader));
