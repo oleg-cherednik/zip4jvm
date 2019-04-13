@@ -10,7 +10,6 @@ import net.lingala.zip4j.model.EndCentralDirectory;
 import net.lingala.zip4j.model.ExtraDataRecord;
 import net.lingala.zip4j.model.Zip64EndCentralDirectory;
 import net.lingala.zip4j.model.Zip64ExtendedInfo;
-import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.LittleEndianDecorator;
 import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
 import org.apache.commons.io.FilenameUtils;
@@ -58,7 +57,7 @@ final class CentralDirectoryReader {
 
         int signature = in.readInt();
 
-        if (signature != InternalZipConstants.CENSIG)
+        if (signature != CentralDirectory.FileHeader.SIGNATURE)
             throw new IOException("Expected central directory entry not found (offs:" + (in.getFilePointer() - 4) + ')');
 
         fileHeader.setVersionMadeBy(in.readShort());
@@ -69,23 +68,24 @@ final class CentralDirectoryReader {
         fileHeader.setCrc32(in.readInt());
         fileHeader.setCompressedSize(in.readIntAsLong());
         fileHeader.setUncompressedSize(in.readIntAsLong());
-
         short fileNameLength = in.readShort();
-
         fileHeader.setExtraFieldLength(in.readShort());
-        fileHeader.setFileCommentLength(in.readShort());
+        short fileCommentLength = in.readShort();
         fileHeader.setDiskNumber(in.readShort());
         fileHeader.setInternalFileAttributes(in.readBytes(2));
         fileHeader.setExternalFileAttributes(in.readBytes(4));
         fileHeader.setOffsLocalFileHeader(in.readIntAsLong());
         fileHeader.setFileName(FilenameUtils.normalize(in.readString(fileNameLength), true));
-        fileHeader.setExtraDataRecords(readExtraDataRecords(in, fileHeader.getExtraFieldLength()));
-
-        fileHeader.setZip64ExtendedInfo(readZip64ExtendedInfo(fileHeader));
-        fileHeader.setAesExtraDataRecord(readAESExtraDataRecord(fileHeader.getExtraDataRecords()));
-        fileHeader.setFileComment(in.readString(fileHeader.getFileCommentLength()));
+        readExtraField(fileHeader, in);
+        fileHeader.setFileComment(in.readString(fileCommentLength));
 
         return fileHeader;
+    }
+
+    private static void readExtraField(CentralDirectory.FileHeader fileHeader, LittleEndianRandomAccessFile in) throws IOException {
+        fileHeader.setExtraDataRecords(readExtraDataRecords(in, fileHeader.getExtraFieldLength()));
+        fileHeader.setZip64ExtendedInfo(readZip64ExtendedInfo(fileHeader));
+        fileHeader.setAesExtraDataRecord(readAESExtraDataRecord(fileHeader.getExtraDataRecords()));
     }
 
     // TODO same logic for extra field for FileHeader and LocalFileHeader

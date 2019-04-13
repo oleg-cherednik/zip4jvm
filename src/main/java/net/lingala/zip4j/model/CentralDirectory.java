@@ -87,8 +87,10 @@ public class CentralDirectory {
     @NoArgsConstructor
     public static class FileHeader {
 
+        public static final int SIGNATURE = 0x02014b50;
+
         // size:4 - signature (0x02014b50)
-        private final int signature = InternalZipConstants.CENSIG;
+        private final int signature = SIGNATURE;
         // size:2 - version made by
         private short versionMadeBy;
         // size:2 - version needed to extractEntries
@@ -144,6 +146,11 @@ public class CentralDirectory {
         @NonNull
         public byte[] getFileName(@NonNull Charset charset) {
             return fileName != null ? fileName.getBytes(charset) : ArrayUtils.EMPTY_BYTE_ARRAY;
+        }
+
+        @NonNull
+        public byte[] getFileComment(@NonNull Charset charset) {
+            return fileComment != null ? fileComment.getBytes(charset) : ArrayUtils.EMPTY_BYTE_ARRAY;
         }
 
         public boolean isDirectory() {

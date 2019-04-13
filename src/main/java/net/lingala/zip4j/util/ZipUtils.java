@@ -19,6 +19,7 @@ package net.lingala.zip4j.util;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.CentralDirectory;
 import org.apache.commons.lang.StringUtils;
 
 import java.nio.charset.Charset;
@@ -87,7 +88,7 @@ public class ZipUtils {
 
         allSigs[0] = InternalZipConstants.LOCSIG;
         allSigs[1] = InternalZipConstants.EXTSIG;
-        allSigs[2] = InternalZipConstants.CENSIG;
+        allSigs[2] = CentralDirectory.FileHeader.SIGNATURE;
         allSigs[3] = InternalZipConstants.ENDSIG;
         allSigs[4] = InternalZipConstants.DIGSIG;
         allSigs[5] = InternalZipConstants.ARCEXTDATREC;
