@@ -209,7 +209,7 @@ public class CentralDirectory {
         // size:4 - header signature (0x06054b50)
         private final int signature = InternalZipConstants.DIGSIG;
         // size:2 - size of data (n)
-        private int sizeOfData;
+//        private int sizeOfData;
         // size:n - signature data
         private byte[] signatureData;
 

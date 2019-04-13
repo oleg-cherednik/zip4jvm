@@ -6,6 +6,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.lingala.zip4j.util.Raw;
+import org.apache.commons.lang.ArrayUtils;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -89,7 +90,7 @@ public final class OutputStreamDecorator implements Closeable {
     }
 
     public void writeBytes(byte... buf) throws IOException {
-        if (buf != null) {
+        if (ArrayUtils.isNotEmpty(buf)) {
             delegate.write(buf);
             offs += buf.length;
         }

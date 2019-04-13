@@ -38,7 +38,7 @@ final class CentralDirectoryReader {
 
         CentralDirectory dir = new CentralDirectory();
         dir.setFileHeaders(readFileHeaders(in));
-        dir.setDigitalSignature(readDigitalSignature(in));
+        dir.setDigitalSignature(new DigitalSignatureReader().read(in));
 
         return dir;
     }
@@ -53,7 +53,7 @@ final class CentralDirectoryReader {
         return fileHeaders;
     }
 
-    private CentralDirectory.FileHeader readFileHeader(LittleEndianRandomAccessFile in) throws IOException {
+    private static CentralDirectory.FileHeader readFileHeader(LittleEndianRandomAccessFile in) throws IOException {
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
         int signature = in.readInt();
@@ -113,17 +113,6 @@ final class CentralDirectoryReader {
         }
 
         return map.isEmpty() ? Collections.emptyMap() : map;
-    }
-
-    private CentralDirectory.DigitalSignature readDigitalSignature(LittleEndianRandomAccessFile in) throws IOException {
-        if (in.readInt() != InternalZipConstants.DIGSIG)
-            return null;
-
-        CentralDirectory.DigitalSignature digitalSignature = new CentralDirectory.DigitalSignature();
-        digitalSignature.setSizeOfData(in.readShort());
-        digitalSignature.setSignatureData(in.readBytes(digitalSignature.getSizeOfData()));
-
-        return digitalSignature;
     }
 
     public static AESExtraDataRecord readAESExtraDataRecord(@NonNull Map<Short, ExtraDataRecord> records) throws IOException {

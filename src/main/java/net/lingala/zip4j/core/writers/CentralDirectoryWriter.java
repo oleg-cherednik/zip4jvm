@@ -24,6 +24,7 @@ public final class CentralDirectoryWriter {
 
     public void write(@NonNull OutputStreamDecorator out) throws IOException {
         writeFileHeaders(out);
+        new DigitalSignatureWriter(dir.getDigitalSignature()).write(out);
     }
 
     private void writeFileHeaders(OutputStreamDecorator out) throws IOException {
