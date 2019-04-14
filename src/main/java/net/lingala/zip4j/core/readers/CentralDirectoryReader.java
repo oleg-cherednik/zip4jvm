@@ -16,8 +16,6 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -83,36 +81,9 @@ final class CentralDirectoryReader {
     }
 
     private static void readExtraField(CentralDirectory.FileHeader fileHeader, LittleEndianRandomAccessFile in) throws IOException {
-        fileHeader.setExtraDataRecords(readExtraDataRecords(in, fileHeader.getExtraFieldLength()));
+        fileHeader.setExtraDataRecords(new ExtraDataRecordReader(fileHeader.getExtraFieldLength()).read(in));
         fileHeader.setZip64ExtendedInfo(readZip64ExtendedInfo(fileHeader));
         fileHeader.setAesExtraDataRecord(readAESExtraDataRecord(fileHeader.getExtraDataRecords()));
-    }
-
-    // TODO same logic for extra field for FileHeader and LocalFileHeader
-    @NonNull
-    public static Map<Short, ExtraDataRecord> readExtraDataRecords(LittleEndianRandomAccessFile in, int length) throws IOException {
-        if (length <= 0)
-            return Collections.emptyMap();
-
-        final long offsMax = in.getFilePointer() + length;
-        Map<Short, ExtraDataRecord> map = new HashMap<>();
-
-        while (in.getFilePointer() < offsMax) {
-            ExtraDataRecord record = new ExtraDataRecord();
-            record.setHeader(in.readShort());
-            record.setSizeOfData(in.readShort());
-
-            if (record.getSizeOfData() == 0)
-                continue;
-            if (in.getFilePointer() + record.getSizeOfData() > offsMax)
-                // extra data record is corrupt; skip reading any further extra data
-                break;
-
-            record.setData(in.readBytes(record.getSizeOfData()));
-            map.put(record.getHeader(), record);
-        }
-
-        return map.isEmpty() ? Collections.emptyMap() : map;
     }
 
     public static AESExtraDataRecord readAESExtraDataRecord(@NonNull Map<Short, ExtraDataRecord> records) throws IOException {

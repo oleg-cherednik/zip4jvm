@@ -8,6 +8,7 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -74,5 +75,21 @@ public class UnzipItTest {
         assertThatFile(starWarsDir.resolve("080fc325efa248454e59b84be24ea829.jpg")).isImage().hasSize(277_857);
         assertThatFile(starWarsDir.resolve("pE9Hkw6.jpg")).isImage().hasSize(1_601_879);
         assertThatFile(starWarsDir.resolve("star-wars-wallpapers-29931-7188436.jpg")).isImage().hasSize(1_916_776);
+    }
+
+    @Test
+    public void shouldUnzipOneFileFromEncryptedNoSplitZip() throws IOException {
+        Path rootDir = Zip4jSuite.generateSubDirName(UnzipItTest.rootDir, "shouldUnzipOneFileFromEncryptedNoSplitZip");
+
+        UnzipIt unzip = UnzipIt.builder()
+//                               .zipFile(Zip4jSuite.noSplitZip)
+                               .zipFile(Paths.get("d:/zip4j/srca.zip"))
+                               .password("2".toCharArray()).build();
+
+        unzip.extract(rootDir, "cars/ferrari-458-italia.jpg");
+        assertThatDirectory(rootDir).exists().hasSubDirectories(1).hasFiles(0);
+
+        assertThatDirectory(rootDir.resolve("cars")).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatFile(rootDir.resolve("cars/ferrari-458-italia.jpg")).exists().isImage().hasSize(320_894);
     }
 }

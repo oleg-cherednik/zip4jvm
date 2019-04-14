@@ -29,7 +29,7 @@ public class UnzipIt {
     private final Charset charset = Charset.defaultCharset();
     private final char[] password;
 
-    public void extract(@NonNull Path destDir) throws ZipException, IOException {
+    public void extract(@NonNull Path destDir) throws IOException {
         checkZipFile(zipFile);
         checkOutputFolder(destDir);
 
@@ -37,11 +37,11 @@ public class UnzipIt {
         new UnzipEngine(zipModel, password).extractEntries(destDir, zipModel.getEntryNames());
     }
 
-    public void extract(@NonNull Path destDir, @NonNull String entryName) throws ZipException, IOException {
+    public void extract(@NonNull Path destDir, @NonNull String entryName) throws IOException {
         extract(destDir, Collections.singleton(entryName));
     }
 
-    public void extract(@NonNull Path destDir, @NonNull Collection<String> entries) throws ZipException, IOException {
+    public void extract(@NonNull Path destDir, @NonNull Collection<String> entries) throws IOException {
         checkZipFile(zipFile);
         checkOutputFolder(destDir);
 
@@ -49,7 +49,7 @@ public class UnzipIt {
         new UnzipEngine(zipModel, password).extractEntries(destDir, entries);
     }
 
-    public InputStream extract(@NonNull String entryName) throws ZipException, IOException {
+    public InputStream extract(@NonNull String entryName) throws IOException {
         ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get();
         return new UnzipEngine(zipModel, password).extractEntry(entryName);
     }
@@ -61,7 +61,7 @@ public class UnzipIt {
             throw new ZipException("ZipFile is not a regular file: " + zipFile);
     }
 
-    static void checkOutputFolder(@NonNull Path dir) throws ZipException {
+    static void checkOutputFolder(@NonNull Path dir) {
 
 //        if(!Files.isDirectory(dir))
 //            throw new ZipException("Destination path is not a directory: " + dir);
