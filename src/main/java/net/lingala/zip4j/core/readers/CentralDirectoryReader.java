@@ -9,7 +9,6 @@ import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.EndCentralDirectory;
 import net.lingala.zip4j.model.ExtraDataRecord;
 import net.lingala.zip4j.model.Zip64EndCentralDirectory;
-import net.lingala.zip4j.model.Zip64ExtendedInfo;
 import net.lingala.zip4j.util.LittleEndianDecorator;
 import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
 import org.apache.commons.io.FilenameUtils;
@@ -74,16 +73,10 @@ final class CentralDirectoryReader {
         fileHeader.setExternalFileAttributes(in.readBytes(4));
         fileHeader.setOffsLocalFileHeader(in.readIntAsLong());
         fileHeader.setFileName(FilenameUtils.normalize(in.readString(fileNameLength), true));
-        readExtraField(fileHeader, in);
+        new ExtraDataFieldReader(fileHeader.getExtraFieldLength()).read(in, fileHeader);
         fileHeader.setFileComment(in.readString(fileCommentLength));
 
         return fileHeader;
-    }
-
-    private static void readExtraField(CentralDirectory.FileHeader fileHeader, LittleEndianRandomAccessFile in) throws IOException {
-        fileHeader.setExtraDataRecords(new ExtraDataRecordReader(fileHeader.getExtraFieldLength()).read(in));
-        fileHeader.setZip64ExtendedInfo(readZip64ExtendedInfo(fileHeader));
-        fileHeader.setAesExtraDataRecord(readAESExtraDataRecord(fileHeader.getExtraDataRecords()));
     }
 
     public static AESExtraDataRecord readAESExtraDataRecord(@NonNull Map<Short, ExtraDataRecord> records) throws IOException {
@@ -102,29 +95,6 @@ final class CentralDirectoryReader {
         res.setCompressionMethod(CompressionMethod.parseValue(in.readShort()));
 
         return res;
-    }
-
-    // TODO pretty similar to LocalFileHeader
-    private static Zip64ExtendedInfo readZip64ExtendedInfo(@NonNull CentralDirectory.FileHeader fileHeader) throws IOException {
-        ExtraDataRecord record = fileHeader.getExtraDataRecordByHeader(ExtraDataRecord.HEADER_ZIP64);
-
-        if (record == null)
-            return null;
-
-        LittleEndianDecorator in = new LittleEndianDecorator(record.getData());
-
-        Zip64ExtendedInfo res = new Zip64ExtendedInfo();
-        res.setSize(record.getSizeOfData());
-        res.setUnCompressedSize((fileHeader.getUncompressedSize() & 0xFFFF) == 0xFFFF ? in.readLong() : -1);
-        res.setCompressedSize((fileHeader.getCompressedSize() & 0xFFFF) == 0xFFFF ? in.readLong() : -1);
-        res.setOffsLocalHeaderRelative((fileHeader.getOffsLocalFileHeader() & 0xFFFF) == 0xFFFF ? in.readLong() : -1);
-        res.setDiskNumberStart((fileHeader.getDiskNumber() & 0xFFFF) == 0xFFFF ? in.readInt() : -1);
-
-        if (res.getUnCompressedSize() != -1 || res.getCompressedSize() != -1
-                || res.getOffsLocalHeaderRelative() != -1 || res.getDiskNumberStart() != -1)
-            return res;
-
-        return null;
     }
 
     private void findHead(LittleEndianRandomAccessFile in) throws IOException {

@@ -36,40 +36,37 @@ public class UnzipItTest {
 
     @Test
     public void shouldUnzipRequiredFiles() throws ZipException, IOException {
+        Path destDir = Zip4jSuite.generateSubDirName(rootDir, "shouldUnzipRequiredFiles");
         List<String> entries = Arrays.asList("saint-petersburg.jpg", "cars/bentley-continental.jpg");
         UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.noSplitZip).build();
-        unzip.extract(rootDir, entries);
+        unzip.extract(destDir, entries);
 
-        assertThatDirectory(rootDir).exists().hasSubDirectories(1).hasFiles(1);
-        assertThatDirectory(rootDir.resolve("cars/")).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatFile(rootDir.resolve("saint-petersburg.jpg")).exists().isImage().hasSize(1_074_836);
-        assertThatFile(rootDir.resolve("cars/bentley-continental.jpg")).exists().isImage().hasSize(1_395_362);
+        assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(1);
+        assertThatDirectory(destDir.resolve("cars/")).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatFile(destDir.resolve("saint-petersburg.jpg")).exists().isImage().hasSize(1_074_836);
+        assertThatFile(destDir.resolve("cars/bentley-continental.jpg")).exists().isImage().hasSize(1_395_362);
     }
 
-    @Test(dependsOnMethods = "shouldUnzipRequiredFiles")
+    @Test
     public void shouldUnzipOneFile() throws ZipException, IOException {
+        Path destDir = Zip4jSuite.generateSubDirName(rootDir, "shouldUnzipRequiredFiles");
         UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.noSplitZip).build();
-        unzip.extract(rootDir, "cars/ferrari-458-italia.jpg");
+        unzip.extract(destDir, "cars/ferrari-458-italia.jpg");
 
-        assertThatDirectory(rootDir).exists().hasSubDirectories(1).hasFiles(1);
-        assertThatDirectory(rootDir.resolve("cars/")).exists().hasSubDirectories(0).hasFiles(2);
-        assertThatFile(rootDir.resolve("saint-petersburg.jpg")).exists().isImage().hasSize(1_074_836);
-        assertThatFile(rootDir.resolve("cars/bentley-continental.jpg")).exists().isImage().hasSize(1_395_362);
-        assertThatFile(rootDir.resolve("cars/ferrari-458-italia.jpg")).exists().isImage().hasSize(320_894);
+        assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);
+        assertThatDirectory(destDir.resolve("cars/")).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatFile(destDir.resolve("cars/ferrari-458-italia.jpg")).exists().isImage().hasSize(320_894);
     }
 
-    @Test(dependsOnMethods = "shouldUnzipOneFile")
+    @Test
     public void shouldUnzipFolder() throws ZipException, IOException {
+        Path destDir = Zip4jSuite.generateSubDirName(rootDir, "shouldUnzipRequiredFiles");
         UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.noSplitZip).build();
-        unzip.extract(rootDir, "Star Wars");
+        unzip.extract(destDir, "Star Wars");
 
-        assertThatDirectory(rootDir).exists().hasSubDirectories(2).hasFiles(1);
-        assertThatDirectory(rootDir.resolve("cars/")).exists().hasSubDirectories(0).hasFiles(2);
-        assertThatFile(rootDir.resolve("saint-petersburg.jpg")).exists().isImage().hasSize(1_074_836);
-        assertThatFile(rootDir.resolve("cars/bentley-continental.jpg")).exists().isImage().hasSize(1_395_362);
-        assertThatFile(rootDir.resolve("cars/ferrari-458-italia.jpg")).exists().isImage().hasSize(320_894);
+        assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);
 
-        Path starWarsDir = rootDir.resolve("Star Wars/");
+        Path starWarsDir = destDir.resolve("Star Wars/");
         assertThatDirectory(starWarsDir).exists().hasSubDirectories(0).hasFiles(4);
         assertThatFile(starWarsDir.resolve("0qQnv2v.jpg")).isImage().hasSize(2_204_448);
         assertThatFile(starWarsDir.resolve("080fc325efa248454e59b84be24ea829.jpg")).isImage().hasSize(277_857);
@@ -79,17 +76,17 @@ public class UnzipItTest {
 
     @Test
     public void shouldUnzipOneFileFromEncryptedNoSplitZip() throws IOException {
-        Path rootDir = Zip4jSuite.generateSubDirName(UnzipItTest.rootDir, "shouldUnzipOneFileFromEncryptedNoSplitZip");
+        Path destDir = Zip4jSuite.generateSubDirName(rootDir, "shouldUnzipOneFileFromEncryptedNoSplitZip");
 
         UnzipIt unzip = UnzipIt.builder()
 //                               .zipFile(Zip4jSuite.noSplitZip)
                                .zipFile(Paths.get("d:/zip4j/srca.zip"))
                                .password("2".toCharArray()).build();
 
-        unzip.extract(rootDir, "cars/ferrari-458-italia.jpg");
-        assertThatDirectory(rootDir).exists().hasSubDirectories(1).hasFiles(0);
+        unzip.extract(destDir, "cars/ferrari-458-italia.jpg");
+        assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);
 
-        assertThatDirectory(rootDir.resolve("cars")).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatFile(rootDir.resolve("cars/ferrari-458-italia.jpg")).exists().isImage().hasSize(320_894);
+        assertThatDirectory(destDir.resolve("cars")).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatFile(destDir.resolve("cars/ferrari-458-italia.jpg")).exists().isImage().hasSize(320_894);
     }
 }

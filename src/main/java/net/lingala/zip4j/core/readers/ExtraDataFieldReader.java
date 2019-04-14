@@ -2,7 +2,10 @@ package net.lingala.zip4j.core.readers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import net.lingala.zip4j.model.AESExtraDataRecord;
+import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.ExtraDataRecord;
+import net.lingala.zip4j.model.Zip64ExtendedInfo;
 import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
 
 import java.io.IOException;
@@ -15,7 +18,7 @@ import java.util.Map;
  * @since 14.04.2019
  */
 @RequiredArgsConstructor
-final class ExtraDataRecordReader {
+final class ExtraDataFieldReader {
 
     private final int size;
 
@@ -42,6 +45,29 @@ final class ExtraDataRecordReader {
         }
 
         return map.isEmpty() ? Collections.emptyMap() : map;
+    }
+
+    public void read(@NonNull LittleEndianRandomAccessFile in, @NonNull CentralDirectory.FileHeader fileHeader) throws IOException {
+        if (size <= 0)
+            return;
+
+        final long offsMax = in.getFilePointer() + size;
+
+        while (in.getFilePointer() < offsMax) {
+            short header = in.readWord();
+            short size = in.readWord();
+
+            Zip64ExtendedInfo zip64;
+            AESExtraDataRecord aes;
+
+            if ((zip64 = new Zip64ExtendedInfoReader(header, size, fileHeader).read(in)) != null)
+                fileHeader.setZip64ExtendedInfo(zip64);
+            else if ((aes = new AESExtraDataRecordReader(header, size).read(in)) != null)
+                fileHeader.setAesExtraDataRecord(aes);
+            else
+                // TODO do add skip instead
+                in.readBytes(size);
+        }
     }
 
 }

@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 
 /**
  * @author Oleg Cherednik
@@ -54,7 +53,6 @@ public class CentralDirectoryBuilder {
         fileHeader.setInternalFileAttributes(null);
         fileHeader.setExternalFileAttributes(getExternalFileAttr());
         fileHeader.setOffsLocalFileHeader(0);
-        fileHeader.setExtraDataRecords(Collections.emptyMap());
         fileHeader.setZip64ExtendedInfo(null);
         fileHeader.setAesExtraDataRecord(getAesExtraDataRecord(fileHeader.getEncryption()));
         fileHeader.setFileComment(null);

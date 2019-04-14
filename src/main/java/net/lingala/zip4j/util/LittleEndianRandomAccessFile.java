@@ -68,10 +68,16 @@ public final class LittleEndianRandomAccessFile implements Closeable {
         return convertLong(raf.readLong());
     }
 
+    public byte readByte() throws IOException {
+        offs++;
+        return raf.readByte();
+    }
+
     public byte[] readBytes(int total) throws IOException {
         if (total <= 0)
             return null;
 
+        offs += total;
         byte[] buf = new byte[total];
 
         if (raf.read(buf) != total)

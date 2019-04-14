@@ -30,7 +30,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -128,15 +127,13 @@ public class CentralDirectory {
         // size:n - file name
         private String fileName;
         // size:m - extra field
-        @NonNull
-        private Map<Short, ExtraDataRecord> extraDataRecords = Collections.emptyMap();
+        private Zip64ExtendedInfo zip64ExtendedInfo;
+        private AESExtraDataRecord aesExtraDataRecord;
         // size:k - extra field
         private String fileComment;
         @NonNull
         private Encryption encryption = Encryption.OFF;
         private char[] password;
-        private Zip64ExtendedInfo zip64ExtendedInfo;
-        private AESExtraDataRecord aesExtraDataRecord;
 
         public FileHeader(String fileName, Encryption encryption) {
             this.fileName = fileName;
@@ -171,10 +168,6 @@ public class CentralDirectory {
         public void setAesExtraDataRecord(AESExtraDataRecord record) {
             aesExtraDataRecord = record;
             updateEncryption();
-        }
-
-        public ExtraDataRecord getExtraDataRecordByHeader(short header) {
-            return extraDataRecords.get(header);
         }
 
         public void setGeneralPurposeFlag(short data) {

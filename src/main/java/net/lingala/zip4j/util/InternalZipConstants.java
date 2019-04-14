@@ -33,8 +33,8 @@ public interface InternalZipConstants {
     static int SPLITSIG = 0x08074b50;
     int ZIP64_ENDSIG_LOC = 0x07064b50;
     int ZIP64_ENDSIG = 0x06064b50;
-    static int EXTRAFIELDZIP64LENGTH = 0x0001;
-    int AESSIG = 0x9901;
+    short EXTRAFIELDZIP64LENGTH = 0x0001;
+    short AESSIG = (short)0x9901;
 
     static final int STD_DEC_HDR_SIZE = 12;
 
