@@ -127,8 +127,7 @@ public class CentralDirectory {
         // size:n - file name
         private String fileName;
         // size:m - extra field
-        private Zip64ExtendedInfo zip64ExtendedInfo;
-        private AESExtraDataRecord aesExtraDataRecord;
+        private ExtraField extraField;
         // size:k - extra field
         private String fileComment;
         @NonNull
@@ -138,6 +137,11 @@ public class CentralDirectory {
         public FileHeader(String fileName, Encryption encryption) {
             this.fileName = fileName;
             this.encryption = encryption;
+        }
+
+        @Deprecated
+        public AESExtraDataRecord getAesExtraDataRecord() {
+            return extraField != null ? extraField.getAesExtraDataRecord() : null;
         }
 
         @NonNull
@@ -155,7 +159,10 @@ public class CentralDirectory {
         }
 
         public void setZip64ExtendedInfo(Zip64ExtendedInfo info) {
-            zip64ExtendedInfo = info;
+            if (extraField == null)
+                extraField = new ExtraField();
+
+            extraField.setZip64ExtendedInfo(info);
 
             if (info != null) {
                 uncompressedSize = info.getUnCompressedSize() != -1 ? info.getUnCompressedSize() : uncompressedSize;
@@ -166,7 +173,9 @@ public class CentralDirectory {
         }
 
         public void setAesExtraDataRecord(AESExtraDataRecord record) {
-            aesExtraDataRecord = record;
+            if (extraField == null)
+                extraField = new ExtraField();
+            extraField.setAesExtraDataRecord(record);
             updateEncryption();
         }
 
@@ -176,7 +185,7 @@ public class CentralDirectory {
         }
 
         private void updateEncryption() {
-            if (aesExtraDataRecord != null)
+            if (extraField != null && extraField.getAesExtraDataRecord() != null)
                 encryption = Encryption.AES;
             else if (generalPurposeFlag.isStrongEncryption())
                 encryption = Encryption.STRONG;
@@ -200,6 +209,7 @@ public class CentralDirectory {
         public String toString() {
             return fileName;
         }
+
     }
 
     @Getter
