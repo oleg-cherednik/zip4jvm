@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
@@ -96,6 +97,12 @@ public final class ZipMisc {
         // TODO probably if not split archive, just copy single zip file
         if (!zipModel.isSplitArchive())
             throw new ZipException("archive not a split zip file");
+
+        try {
+            Files.createDirectories(destZipFile.getParent());
+        } catch(IOException e) {
+            throw new ZipException(e);
+        }
 
         try (OutputStreamDecorator out = new OutputStreamDecorator(new NoSplitOutputStream(destZipFile))) {
             zipModel.convertToSolid(copyAllParts(out.getDelegate(), zipModel));

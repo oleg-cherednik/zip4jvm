@@ -35,7 +35,7 @@ public class ZipEncryptedFilesTest {
         Zip4jSuite.removeDir(rootDir);
     }
 
-    //    @Test
+//    @Test
     public void shouldCreateEncryptedZip() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)

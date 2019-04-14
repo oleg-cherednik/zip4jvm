@@ -16,13 +16,11 @@
 
 package net.lingala.zip4j.util;
 
-import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CentralDirectory;
 import org.apache.commons.lang.StringUtils;
 
-import java.nio.charset.Charset;
 import java.util.Calendar;
 
 /**
@@ -70,17 +68,6 @@ public class ZipUtils {
         cal.set(year, mon, day, hrs, min, sec);
         cal.set(Calendar.MILLISECOND, 0);
         return cal.getTime().getTime();
-    }
-
-    /**
-     * returns the length of the string in the input encoding
-     *
-     * @param str
-     * @param charset
-     * @return int
-     */
-    public static int getEncodedStringLength(String str, @NonNull Charset charset) {
-        return StringUtils.isBlank(str) ? 0 : str.getBytes(charset).length;
     }
 
     public static long[] getAllHeaderSignatures() {

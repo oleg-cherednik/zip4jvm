@@ -119,4 +119,18 @@ public class Zip4jSuite {
             FileUtils.deleteQuietly(path.toFile());
     }
 
+    public static Path copy(Path rootDir, Path srcFile) throws IOException {
+        Path zipFile = generateZipFileName(rootDir);
+        Files.copy(srcFile, zipFile);
+        return zipFile;
+    }
+
+    public static Path generateZipFileName(Path rootDir) {
+        return rootDir.resolve("src_" + System.currentTimeMillis() + ".zip");
+    }
+
+    public static Path generateSubDirName(Path rootDir, String methodName) {
+        return rootDir.resolve(methodName + '_' + System.currentTimeMillis());
+    }
+
 }

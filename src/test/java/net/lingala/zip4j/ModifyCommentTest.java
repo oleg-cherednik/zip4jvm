@@ -101,8 +101,7 @@ public class ModifyCommentTest {
 
     @Test
     public void shouldThrowExceptionWhenCommentIsOverMaxLength() throws IOException {
-        Path zipFile = rootDir.resolve("src_" + System.currentTimeMillis() + ".zip");
-        Files.copy(Zip4jSuite.noSplitZip, zipFile);
+        Path zipFile = Zip4jSuite.copy(rootDir, Zip4jSuite.noSplitZip);
 
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
         assertThat(misc.getComment()).isNull();
