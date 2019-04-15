@@ -18,7 +18,7 @@ import java.util.Map;
  * @since 14.04.2019
  */
 @RequiredArgsConstructor
-final class ExtraDataFieldReader {
+final class ExtraFieldReader {
 
     private final int size;
 

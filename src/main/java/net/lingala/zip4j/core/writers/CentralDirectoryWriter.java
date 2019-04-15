@@ -46,30 +46,18 @@ public final class CentralDirectoryWriter {
         out.writeShort(fileHeader.getCompressionMethod().getValue());
         out.writeDword(fileHeader.getLastModifiedTime());
         out.writeDword((int)fileHeader.getCrc32());
-        out.writeDword(getCompressedSize(fileHeader, writeZip64FileSize));
-        out.writeDword(getUncompressedSize(fileHeader, writeZip64FileSize));
+        out.writeDword(writeZip64FileSize ? InternalZipConstants.ZIP_64_LIMIT : fileHeader.getCompressedSize());
+        out.writeDword(writeZip64FileSize ? InternalZipConstants.ZIP_64_LIMIT : fileHeader.getUncompressedSize());
         out.writeShort((short)fileName.length);
         out.writeWord(getExtraFieldLength(fileHeader, writeZip64FileSize, writeZip64OffsetLocalHeader));
         out.writeShort((short)fileComment.length);
         out.writeShort((short)fileHeader.getDiskNumber());
         out.writeBytes(fileHeader.getInternalFileAttributes() != null ? fileHeader.getInternalFileAttributes() : new byte[2]);
         out.writeBytes(fileHeader.getExternalFileAttributes() != null ? fileHeader.getExternalFileAttributes() : new byte[4]);
-        out.writeLongAsInt(getOffsLocalFileHeader(fileHeader, writeZip64OffsetLocalHeader));
+        out.writeLongAsInt(writeZip64OffsetLocalHeader ? InternalZipConstants.ZIP_64_LIMIT : fileHeader.getOffsLocalFileHeader());
         out.writeBytes(fileName);
-        new ExtraFieldWriter(fileHeader, zipModel, writeZip64FileSize, writeZip64OffsetLocalHeader).write(out);
+        new ExtraFieldWriter(zipModel, fileHeader, writeZip64FileSize, writeZip64OffsetLocalHeader).write(out);
         out.writeBytes(fileComment);
-    }
-
-    private static long getCompressedSize(CentralDirectory.FileHeader fileHeader, boolean writeZip64FileSize) {
-        if (writeZip64FileSize)
-            return InternalZipConstants.ZIP_64_LIMIT;
-        return fileHeader.getCompressedSize();
-    }
-
-    private static long getUncompressedSize(CentralDirectory.FileHeader fileHeader, boolean writeZip64FileSize) {
-        if (writeZip64FileSize)
-            return InternalZipConstants.ZIP_64_LIMIT;
-        return fileHeader.getUncompressedSize();
     }
 
     private static short getExtraFieldLength(CentralDirectory.FileHeader fileHeader, boolean writeZip64FileSize,
@@ -85,12 +73,6 @@ public final class CentralDirectoryWriter {
         if (fileHeader.getAesExtraDataRecord() != null)
             extraFieldLength += 11;
         return (short)extraFieldLength;
-    }
-
-    private long getOffsLocalFileHeader(CentralDirectory.FileHeader fileHeader, boolean writeZip64OffsetLocalHeader) {
-        if (writeZip64OffsetLocalHeader)
-            return InternalZipConstants.ZIP_64_LIMIT;
-        return fileHeader.getOffsLocalFileHeader();
     }
 
 }

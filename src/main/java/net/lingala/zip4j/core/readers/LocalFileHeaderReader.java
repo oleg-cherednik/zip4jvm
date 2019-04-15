@@ -42,7 +42,7 @@ public final class LocalFileHeaderReader {
 
         localFileHeader.setExtraFieldLength(in.readShort());
         localFileHeader.setFileName(FilenameUtils.normalize(in.readString(fileNameLength)));
-        localFileHeader.setExtraDataRecords(new ExtraDataFieldReader(localFileHeader.getExtraFieldLength()).read(in));
+        localFileHeader.setExtraDataRecords(new ExtraFieldReader(localFileHeader.getExtraFieldLength()).read(in));
 
         localFileHeader.setOffsetStartOfData(in.getFilePointer());
         localFileHeader.setPassword(fileHeader.getPassword());

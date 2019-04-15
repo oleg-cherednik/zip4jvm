@@ -73,7 +73,7 @@ final class CentralDirectoryReader {
         fileHeader.setExternalFileAttributes(in.readBytes(4));
         fileHeader.setOffsLocalFileHeader(in.readIntAsLong());
         fileHeader.setFileName(FilenameUtils.normalize(in.readString(fileNameLength), true));
-        new ExtraDataFieldReader(fileHeader.getExtraFieldLength()).read(in, fileHeader);
+        new ExtraFieldReader(fileHeader.getExtraFieldLength()).read(in, fileHeader);
         fileHeader.setFileComment(in.readString(fileCommentLength));
 
         return fileHeader;
