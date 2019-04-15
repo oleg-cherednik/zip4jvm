@@ -20,6 +20,7 @@ import lombok.experimental.UtilityClass;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.CentralDirectory;
+import net.lingala.zip4j.model.Zip64ExtendedInfo;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Calendar;
@@ -83,7 +84,7 @@ public class ZipUtils {
         allSigs[6] = InternalZipConstants.SPLITSIG;
         allSigs[7] = InternalZipConstants.ZIP64_ENDSIG_LOC;
         allSigs[8] = InternalZipConstants.ZIP64_ENDSIG;
-        allSigs[9] = InternalZipConstants.EXTRAFIELDZIP64LENGTH;
+        allSigs[9] = Zip64ExtendedInfo.SIGNATURE;
         allSigs[10] = AESExtraDataRecord.SIGNATURE;
 
         return allSigs;

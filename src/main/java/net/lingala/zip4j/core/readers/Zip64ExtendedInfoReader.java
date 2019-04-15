@@ -4,7 +4,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.Zip64ExtendedInfo;
-import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
 
 import java.io.IOException;
@@ -21,7 +20,7 @@ final class Zip64ExtendedInfoReader {
     private final CentralDirectory.FileHeader fileHeader;
 
     public Zip64ExtendedInfo read(@NonNull LittleEndianRandomAccessFile in) throws IOException {
-        if (header != InternalZipConstants.EXTRAFIELDZIP64LENGTH)
+        if (header != Zip64ExtendedInfo.SIGNATURE)
             return null;
 
         Zip64ExtendedInfo res = new Zip64ExtendedInfo();

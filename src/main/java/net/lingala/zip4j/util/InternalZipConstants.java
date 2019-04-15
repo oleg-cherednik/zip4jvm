@@ -16,8 +16,6 @@
 
 package net.lingala.zip4j.util;
 
-import java.nio.charset.Charset;
-
 public interface InternalZipConstants {
 
     /*
@@ -33,8 +31,6 @@ public interface InternalZipConstants {
     static int SPLITSIG = 0x08074b50;
     int ZIP64_ENDSIG_LOC = 0x07064b50;
     int ZIP64_ENDSIG = 0x06064b50;
-    short EXTRAFIELDZIP64LENGTH = 0x0001;
-    short AESSIG = (short)0x9901;
 
     static final int STD_DEC_HDR_SIZE = 12;
 
@@ -111,9 +107,5 @@ public interface InternalZipConstants {
 
     public static final int UFT8_NAMES_FLAG = 1 << 11;
 
-    String CHARSET_COMMENTS_DEFAULT = "windows-1254";
-    Charset CHARSET_DEFAULT = Charset.defaultCharset();
-
-    String FILE_SEPARATOR = System.getProperty("file.separator");
     public static final int MAX_ALLOWED_ZIP_COMMENT_LENGTH = 0xFFFF;
 }

@@ -18,13 +18,10 @@ package net.lingala.zip4j.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.lingala.zip4j.util.InternalZipConstants;
 
 @Getter
 @Setter
 public class ExtraDataRecord {
-
-    public static final short HEADER_ZIP64 = (short)InternalZipConstants.EXTRAFIELDZIP64LENGTH;
 
     // size:4 - size of the central directory
     private short header;

@@ -23,8 +23,10 @@ import lombok.Setter;
 @Setter
 public class Zip64ExtendedInfo {
 
+    public static final short SIGNATURE = 0x0001;
+
     // size:2 - tag for this "extra" block type (ZIP64 = 0x001)
-    private final int header = ExtraDataRecord.HEADER_ZIP64;
+    private final short header = SIGNATURE;
     // size:2 - size of this "extra" block
     private int size;
     // size:8 - original uncompressed file size

@@ -72,7 +72,7 @@ public final class LocalFileHeaderReader {
 
     // TODO pretty similar to FileHeader
     private static Zip64ExtendedInfo readZip64ExtendedInfo(@NonNull LocalFileHeader localFileHeader) throws IOException {
-        ExtraDataRecord record = localFileHeader.getExtraDataRecordByHeader(ExtraDataRecord.HEADER_ZIP64);
+        ExtraDataRecord record = localFileHeader.getExtraDataRecordByHeader(Zip64ExtendedInfo.SIGNATURE);
 
         if (record == null)
             return null;

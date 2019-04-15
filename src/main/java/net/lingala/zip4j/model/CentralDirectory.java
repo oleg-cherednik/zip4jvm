@@ -140,6 +140,11 @@ public class CentralDirectory {
         }
 
         @Deprecated
+        public Zip64ExtendedInfo getZip64ExtendedInfo() {
+            return extraField != null ? extraField.getZip64ExtendedInfo() : null;
+        }
+
+        @Deprecated
         public AESExtraDataRecord getAesExtraDataRecord() {
             return extraField != null ? extraField.getAesExtraDataRecord() : null;
         }

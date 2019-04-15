@@ -4,6 +4,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.io.OutputStreamDecorator;
 import net.lingala.zip4j.model.CentralDirectory;
+import net.lingala.zip4j.model.Zip64ExtendedInfo;
 import net.lingala.zip4j.model.ZipModel;
 
 import java.io.IOException;
@@ -26,8 +27,26 @@ final class ExtraFieldWriter {
         if (writeZip64FileSize || writeZip64OffsetLocalHeader)
             zipModel.zip64();
 
-        new Zip64ExtendedInfoWriter(zipModel, fileHeader, writeZip64FileSize, writeZip64OffsetLocalHeader);
+        // TODO move it before
+        Zip64ExtendedInfo info = fileHeader.getZip64ExtendedInfo();
+        info.setSize(getSize());
+        info.setUnCompressedSize(writeZip64FileSize ? fileHeader.getUncompressedSize() : -1);
+        info.setCompressedSize(writeZip64FileSize ? fileHeader.getCompressedSize() : -1);
+        info.setOffsLocalHeaderRelative(writeZip64OffsetLocalHeader ? fileHeader.getOffsLocalFileHeader() : -1);
+
+        new Zip64ExtendedInfoWriter(fileHeader.getZip64ExtendedInfo()).write(out);
         new AESExtraDataRecordWriter(fileHeader.getAesExtraDataRecord(), zipModel.getCharset()).write(out);
+    }
+
+    private int getSize() {
+        short dataSize = 0;
+
+        if (writeZip64FileSize)
+            dataSize += 16;
+        if (writeZip64OffsetLocalHeader)
+            dataSize += 8;
+
+        return dataSize;
     }
 
 }
