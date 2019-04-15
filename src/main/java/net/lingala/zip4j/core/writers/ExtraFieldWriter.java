@@ -27,7 +27,7 @@ final class ExtraFieldWriter {
             zipModel.zip64();
 
         new Zip64ExtendedInfoWriter(zipModel, fileHeader, writeZip64FileSize, writeZip64OffsetLocalHeader);
-        new AESExtraDataRecordWriter(fileHeader.getAesExtraDataRecord(), zipModel).write(out);
+        new AESExtraDataRecordWriter(fileHeader.getAesExtraDataRecord(), zipModel.getCharset()).write(out);
     }
 
 }

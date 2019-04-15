@@ -25,7 +25,6 @@ import net.lingala.zip4j.util.InternalZipConstants;
 public class ExtraDataRecord {
 
     public static final short HEADER_ZIP64 = (short)InternalZipConstants.EXTRAFIELDZIP64LENGTH;
-    public static final short HEADER_AESSIG = (short)InternalZipConstants.AESSIG;
 
     // size:4 - size of the central directory
     private short header;

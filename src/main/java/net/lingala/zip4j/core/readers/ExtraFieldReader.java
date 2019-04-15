@@ -51,22 +51,20 @@ final class ExtraFieldReader {
         if (size <= 0)
             return;
 
+        Zip64ExtendedInfo zip64;
+        AESExtraDataRecord aes;
         final long offsMax = in.getFilePointer() + size;
 
         while (in.getFilePointer() < offsMax) {
-            short header = in.readWord();
-            short size = in.readWord();
+            short signature = in.readWord();
 
-            Zip64ExtendedInfo zip64;
-            AESExtraDataRecord aes;
-
-            if ((zip64 = new Zip64ExtendedInfoReader(header, size, fileHeader).read(in)) != null)
+            if ((zip64 = new Zip64ExtendedInfoReader(signature, fileHeader).read(in)) != null)
                 fileHeader.setZip64ExtendedInfo(zip64);
-            else if ((aes = new AESExtraDataRecordReader(header, size).read(in)) != null)
+            else if ((aes = new AESExtraDataRecordReader(signature).read(in)) != null)
                 fileHeader.setAesExtraDataRecord(aes);
             else
                 // TODO do add skip instead
-                in.readBytes(size);
+                in.readBytes(in.readWord());
         }
     }
 

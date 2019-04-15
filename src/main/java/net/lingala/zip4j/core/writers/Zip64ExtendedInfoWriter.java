@@ -20,6 +20,7 @@ final class Zip64ExtendedInfoWriter {
     private final ZipModel zipModel;
     @NonNull
     private final CentralDirectory.FileHeader fileHeader;
+//    private final Zip64ExtendedInfo info;
     private final boolean writeZip64FileSize;
     private final boolean writeZip64OffsetLocalHeader;
 

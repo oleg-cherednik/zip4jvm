@@ -17,7 +17,6 @@ import java.io.IOException;
 final class Zip64ExtendedInfoReader {
 
     private final short header;
-    private final short size;
     @NonNull
     private final CentralDirectory.FileHeader fileHeader;
 
@@ -26,7 +25,7 @@ final class Zip64ExtendedInfoReader {
             return null;
 
         Zip64ExtendedInfo res = new Zip64ExtendedInfo();
-        res.setSize(size);
+        res.setSize(in.readWord());
         res.setUnCompressedSize((fileHeader.getUncompressedSize() & 0xFFFF) == 0xFFFF ? in.readLong() : -1);
         res.setCompressedSize((fileHeader.getCompressedSize() & 0xFFFF) == 0xFFFF ? in.readLong() : -1);
         res.setOffsLocalHeaderRelative((fileHeader.getOffsLocalFileHeader() & 0xFFFF) == 0xFFFF ? in.readLong() : -1);

@@ -80,7 +80,7 @@ final class CentralDirectoryReader {
     }
 
     public static AESExtraDataRecord readAESExtraDataRecord(@NonNull Map<Short, ExtraDataRecord> records) throws IOException {
-        ExtraDataRecord record = records.get(ExtraDataRecord.HEADER_AESSIG);
+        ExtraDataRecord record = records.get(AESExtraDataRecord.SIGNATURE);
 
         if (record == null)
             return null;
