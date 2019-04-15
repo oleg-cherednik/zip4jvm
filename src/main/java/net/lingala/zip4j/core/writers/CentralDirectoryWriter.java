@@ -4,6 +4,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.io.OutputStreamDecorator;
 import net.lingala.zip4j.model.CentralDirectory;
+import net.lingala.zip4j.model.Zip64ExtendedInfo;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
 
@@ -36,6 +37,8 @@ public final class CentralDirectoryWriter {
                 fileHeader.getUncompressedSize() + HeaderWriter.ZIP64_EXTRA_BUF >= InternalZipConstants.ZIP_64_LIMIT;
         final boolean writeZip64OffsetLocalHeader = fileHeader.getOffsLocalFileHeader() > InternalZipConstants.ZIP_64_LIMIT;
 
+        updateZip64(fileHeader, writeZip64FileSize, writeZip64OffsetLocalHeader);
+
         byte[] fileName = fileHeader.getFileName(zipModel.getCharset());
         byte[] fileComment = fileHeader.getFileComment(zipModel.getCharset());
 
@@ -56,7 +59,7 @@ public final class CentralDirectoryWriter {
         out.writeBytes(fileHeader.getExternalFileAttributes() != null ? fileHeader.getExternalFileAttributes() : new byte[4]);
         out.writeLongAsInt(writeZip64OffsetLocalHeader ? InternalZipConstants.ZIP_64_LIMIT : fileHeader.getOffsLocalFileHeader());
         out.writeBytes(fileName);
-        new ExtraFieldWriter(zipModel, fileHeader, writeZip64FileSize, writeZip64OffsetLocalHeader).write(out);
+        new ExtraFieldWriter(fileHeader.getExtraField(), zipModel.getCharset()).write(out);
         out.writeBytes(fileComment);
     }
 
@@ -73,6 +76,36 @@ public final class CentralDirectoryWriter {
         if (fileHeader.getAesExtraDataRecord() != null)
             extraFieldLength += 11;
         return (short)extraFieldLength;
+    }
+
+    // TODO should be updated on the fly
+    @Deprecated
+    private void updateZip64(CentralDirectory.FileHeader fileHeader, boolean writeZip64FileSize,
+            boolean writeZip64OffsetLocalHeader) {
+        if (writeZip64FileSize || writeZip64OffsetLocalHeader)
+            zipModel.zip64();
+
+//        if (fileHeader.getExtraField() == null)
+//            fileHeader.setExtraField(new ExtraField());
+//        if (fileHeader.getExtraField().getZip64ExtendedInfo() == null)
+//            fileHeader.getExtraField().setZip64ExtendedInfo(new Zip64ExtendedInfo());
+
+        // TODO move it before
+        Zip64ExtendedInfo info = fileHeader.getZip64ExtendedInfo();
+
+        if (info != null) {
+            short dataSize = 0;
+
+            if (writeZip64FileSize)
+                dataSize += 16;
+            if (writeZip64OffsetLocalHeader)
+                dataSize += 8;
+
+            info.setSize(dataSize);
+            info.setUnCompressedSize(writeZip64FileSize ? fileHeader.getUncompressedSize() : -1);
+            info.setCompressedSize(writeZip64FileSize ? fileHeader.getCompressedSize() : -1);
+            info.setOffsLocalHeaderRelative(writeZip64OffsetLocalHeader ? fileHeader.getOffsLocalFileHeader() : -1);
+        }
     }
 
 }
