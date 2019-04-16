@@ -4,7 +4,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.io.OutputStreamDecorator;
 import net.lingala.zip4j.model.Zip64EndCentralDirectoryLocator;
-import net.lingala.zip4j.util.InternalZipConstants;
 
 import java.io.IOException;
 
@@ -21,7 +20,7 @@ final class Zip64EndCentralDirectoryLocatorWriter {
         if (locator == null)
             return;
 
-        out.writeDword(InternalZipConstants.ZIP64_ENDSIG_LOC);
+        out.writeDword(Zip64EndCentralDirectoryLocator.SIGNATURE);
         out.writeDword(locator.getNoOfDiskStartOfZip64EndOfCentralDirRec());
         out.writeLong(locator.getOffsetZip64EndOfCentralDirRec());
         out.writeDword(locator.getTotNumberOfDiscs());

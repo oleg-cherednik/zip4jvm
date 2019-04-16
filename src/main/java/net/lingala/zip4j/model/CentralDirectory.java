@@ -86,7 +86,7 @@ public class CentralDirectory {
     @NoArgsConstructor
     public static class FileHeader {
 
-        public static final int SIGNATURE = 0x02014b50;
+        public static final int SIGNATURE = 0x02014B50;
 
         // size:4 - signature (0x02014b50)
         private final int signature = SIGNATURE;

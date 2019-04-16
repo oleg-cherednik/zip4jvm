@@ -20,6 +20,7 @@ import lombok.experimental.UtilityClass;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.CentralDirectory;
+import net.lingala.zip4j.model.Zip64EndCentralDirectoryLocator;
 import net.lingala.zip4j.model.Zip64ExtendedInfo;
 import org.apache.commons.lang.StringUtils;
 
@@ -82,7 +83,7 @@ public class ZipUtils {
         allSigs[4] = InternalZipConstants.DIGSIG;
         allSigs[5] = InternalZipConstants.ARCEXTDATREC;
         allSigs[6] = InternalZipConstants.SPLITSIG;
-        allSigs[7] = InternalZipConstants.ZIP64_ENDSIG_LOC;
+        allSigs[7] = Zip64EndCentralDirectoryLocator.SIGNATURE;
         allSigs[8] = InternalZipConstants.ZIP64_ENDSIG;
         allSigs[9] = Zip64ExtendedInfo.SIGNATURE;
         allSigs[10] = AESExtraDataRecord.SIGNATURE;

@@ -19,6 +19,7 @@ package net.lingala.zip4j.model;
 import lombok.Getter;
 import lombok.Setter;
 import net.lingala.zip4j.util.InternalZipConstants;
+import org.apache.commons.lang.ArrayUtils;
 
 /**
  * @author Oleg Cherednik
@@ -53,6 +54,11 @@ public class Zip64EndCentralDirectory {
     private long offsetStartCenDirWRTStartDiskNo;
     // size:n-44 - extensible data sector
     private byte[] extensibleDataSector;
+
+    public void setExtensibleDataSector(byte[] extensibleDataSector) {
+        this.extensibleDataSector = extensibleDataSector;
+        sizeOfZip64EndCentralDirRec = SIZE + ArrayUtils.getLength(extensibleDataSector);
+    }
 
     public void updateOffsetStartCenDirWRTStartDiskNo(long delta) {
         offsetStartCenDirWRTStartDiskNo += delta;

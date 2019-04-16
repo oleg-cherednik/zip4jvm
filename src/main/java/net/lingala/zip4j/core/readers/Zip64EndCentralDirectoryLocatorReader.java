@@ -3,7 +3,6 @@ package net.lingala.zip4j.core.readers;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.model.Zip64EndCentralDirectoryLocator;
-import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
 
 import java.io.IOException;
@@ -40,6 +39,6 @@ final class Zip64EndCentralDirectoryLocatorReader {
             return false;
 
         in.seek(offs);
-        return in.readInt() == InternalZipConstants.ZIP64_ENDSIG_LOC;
+        return in.readInt() == Zip64EndCentralDirectoryLocator.SIGNATURE;
     }
 }

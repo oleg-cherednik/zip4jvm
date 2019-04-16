@@ -18,17 +18,18 @@ package net.lingala.zip4j.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.lingala.zip4j.util.InternalZipConstants;
 
 @Getter
 @Setter
 public class Zip64EndCentralDirectoryLocator {
 
+    public static final int SIGNATURE = 0x07064B50;
+
     // size (20) with comment length = 0
     public static final int SIZE = 4 + 4 + 8 + 4;
 
     // size:4 - signature (0x06054b50)
-    private final int signature = InternalZipConstants.ZIP64_ENDSIG_LOC;
+    private final int signature = SIGNATURE;
     // size:4 - number of the disk with the start of the zip64 end of central directory
     private int noOfDiskStartOfZip64EndOfCentralDirRec;
     // size:8 - relative offset of the zip64 end of central directory record

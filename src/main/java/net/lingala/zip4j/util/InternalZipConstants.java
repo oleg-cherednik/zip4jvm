@@ -29,7 +29,6 @@ public interface InternalZipConstants {
     int DIGSIG = 0x05054b50;
     static long ARCEXTDATREC = 0x08064b50L;
     static int SPLITSIG = 0x08074b50;
-    int ZIP64_ENDSIG_LOC = 0x07064b50;
     int ZIP64_ENDSIG = 0x06064b50;
 
     static final int STD_DEC_HDR_SIZE = 12;
