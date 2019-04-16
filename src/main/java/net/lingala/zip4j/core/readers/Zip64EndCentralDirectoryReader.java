@@ -25,11 +25,11 @@ final class Zip64EndCentralDirectoryReader {
         dir.setSizeOfZip64EndCentralDirRec(in.readLong());
         dir.setVersionMadeBy(in.readShort());
         dir.setVersionNeededToExtract(in.readShort());
-        dir.setNoOfThisDisk(in.readInt());
-        dir.setNoOfThisDiskStartOfCentralDir(in.readInt());
-        dir.setTotNoOfEntriesInCentralDirOnThisDisk(in.readLong());
+        dir.setDiskNumber(in.readInt());
+        dir.setStartDiskNumber(in.readInt());
+        dir.setDiskEntries(in.readLong());
         dir.setTotalEntries(in.readLong());
-        dir.setSizeOfCentralDir(in.readLong());
+        dir.setSize(in.readLong());
         dir.setOffs(in.readLong());
         dir.setExtensibleDataSector(in.readBytes((int)(dir.getSizeOfZip64EndCentralDirRec() - Zip64EndCentralDirectory.SIZE)));
 

@@ -19,7 +19,6 @@ package net.lingala.zip4j.model;
 import lombok.Getter;
 import lombok.Setter;
 import net.lingala.zip4j.util.InternalZipConstants;
-import org.apache.commons.lang.ArrayUtils;
 
 /**
  * see 4.3.14  Zip64 end of central directory record
@@ -43,24 +42,19 @@ public class Zip64EndCentralDirectory {
     // size:2 - version needed to extractEntries
     private short versionNeededToExtract;
     // size:4 - number of this disk
-    private int noOfThisDisk;
+    private int diskNumber;
     // size:4 - number of the disk with the start of the central directory
-    private int noOfThisDiskStartOfCentralDir;
+    private int startDiskNumber;
     // size:8 - total number of entries in the central directory on this disk
-    private long totNoOfEntriesInCentralDirOnThisDisk;
+    private long diskEntries;
     // size:8 - total number of entries in the central directory
     private long totalEntries;
     // size:8 - size of the central directory
-    private long sizeOfCentralDir;
+    private long size;
     // size:8 - directory with respect to the starting disk number
     private long offs;
     // size:n-44 - extensible data sector
     private byte[] extensibleDataSector;
-
-    public void setExtensibleDataSector(byte[] extensibleDataSector) {
-        this.extensibleDataSector = extensibleDataSector;
-        sizeOfZip64EndCentralDirRec = SIZE + ArrayUtils.getLength(extensibleDataSector);
-    }
 
     public void updateOffsetStartCenDirWRTStartDiskNo(long delta) {
         offs += delta;

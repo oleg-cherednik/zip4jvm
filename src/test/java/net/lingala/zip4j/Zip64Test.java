@@ -33,7 +33,7 @@ public class Zip64Test {
         Zip4jSuite.removeDir(rootDir);
     }
 
-    //    @Test
+//    @Test
     public void shouldCreateNewZipWithZip64() throws IOException, ZipException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
@@ -52,7 +52,7 @@ public class Zip64Test {
 //        assertThatZipFile(zipFile).directory("cars/").matches(TestUtils.zipCarsDirAssert);
     }
 
-//    @Test
+    //    @Test
     public void shouldReadZip64() throws IOException {
         Path zipFile = Paths.get("d:/zip4j/ferdinand.zip");
         UnzipIt unzip = UnzipIt.builder().zipFile(zipFile).build();
