@@ -6,15 +6,13 @@ import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.AESStrength;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.CompressionMethod;
-import net.lingala.zip4j.model.EndCentralDirectory;
 import net.lingala.zip4j.model.ExtraDataRecord;
-import net.lingala.zip4j.model.Zip64EndCentralDirectory;
 import net.lingala.zip4j.util.LittleEndianDecorator;
 import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -25,8 +23,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 final class CentralDirectoryReader {
 
-    private final EndCentralDirectory dir;
-    private final Zip64EndCentralDirectory zip64Dir;
+    private final long offs;
+    private final long totalEntries;
 
     @NonNull
     public CentralDirectory read(@NonNull LittleEndianRandomAccessFile in) throws IOException {
@@ -40,10 +38,9 @@ final class CentralDirectoryReader {
     }
 
     private List<CentralDirectory.FileHeader> readFileHeaders(LittleEndianRandomAccessFile in) throws IOException {
-        int total = isZip64() ? (int)zip64Dir.getTotalEntries() : dir.getTotalEntries();
-        List<CentralDirectory.FileHeader> fileHeaders = new ArrayList<>(total);
+        List<CentralDirectory.FileHeader> fileHeaders = new LinkedList<>();
 
-        for (int i = 0; i < total; i++)
+        for (int i = 0; i < totalEntries; i++)
             fileHeaders.add(readFileHeader(in));
 
         return fileHeaders;
@@ -98,10 +95,6 @@ final class CentralDirectoryReader {
     }
 
     private void findHead(LittleEndianRandomAccessFile in) throws IOException {
-        in.seek(isZip64() ? zip64Dir.getOffsetStartCenDirWRTStartDiskNo() : dir.getOffs());
-    }
-
-    private boolean isZip64() {
-        return zip64Dir != null;
+        in.seek(offs);
     }
 }

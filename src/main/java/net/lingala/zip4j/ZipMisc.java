@@ -2,7 +2,7 @@ package net.lingala.zip4j;
 
 import lombok.Builder;
 import lombok.NonNull;
-import net.lingala.zip4j.core.writers.HeaderWriter;
+import net.lingala.zip4j.core.writers.ZipModelWriter;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.NoSplitOutputStream;
 import net.lingala.zip4j.io.OutputStreamDecorator;
@@ -53,7 +53,7 @@ public final class ZipMisc {
 
         try (OutputStreamDecorator out = new OutputStreamDecorator(new NoSplitOutputStream(zipModel.getZipFile()))) {
             out.seek(zipModel.getOffsCentralDirectory());
-            new HeaderWriter(zipModel).finalizeZipFile(out, false);
+            new ZipModelWriter(zipModel).finalizeZipFile(out, false);
         } catch(Exception e) {
             throw new ZipException(e);
         }
@@ -106,7 +106,7 @@ public final class ZipMisc {
 
         try (OutputStreamDecorator out = new OutputStreamDecorator(new NoSplitOutputStream(destZipFile))) {
             zipModel.convertToSolid(copyAllParts(out.getDelegate(), zipModel));
-            new HeaderWriter(zipModel).finalizeZipFile(out, false);
+            new ZipModelWriter(zipModel).finalizeZipFile(out, false);
         } catch(ZipException e) {
             throw e;
         } catch(Exception e) {

@@ -98,9 +98,13 @@ public class ZipModel {
                                .collect(Collectors.toList());
     }
 
+    public long getTotalEntries() {
+        return isZip64() ? zip64.getEndCentralDirectory().getTotalEntries() : endCentralDirectory.getTotalEntries();
+    }
+
     public long getOffsCentralDirectory() {
         if (isZip64())
-            return zip64.getEndCentralDirectory().getOffsetStartCenDirWRTStartDiskNo();
+            return zip64.getEndCentralDirectory().getOffs();
         if (endCentralDirectory != null)
             return endCentralDirectory.getOffs();
         return 0;
@@ -180,6 +184,10 @@ public class ZipModel {
 
     public short getVersionToExtract() {
         return isEmpty() ? 0 : getFileHeaders().get(0).getVersionToExtract();
+    }
+
+    public long getEndCentralDirectoryOffs() {
+        return isZip64() ? zip64.getEndCentralDirectory().getOffs() : endCentralDirectory.getOffs();
     }
 
     @NonNull

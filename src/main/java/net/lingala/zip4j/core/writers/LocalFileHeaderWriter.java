@@ -32,7 +32,7 @@ public final class LocalFileHeaderWriter {
         out.writeDword((int)localFileHeader.getCrc32());
 
         //compressed & uncompressed size
-        if (localFileHeader.getUncompressedSize() + HeaderWriter.ZIP64_EXTRA_BUF >= InternalZipConstants.ZIP_64_LIMIT) {
+        if (localFileHeader.getUncompressedSize() + ZipModelWriter.ZIP64_EXTRA_BUF >= InternalZipConstants.ZIP_64_LIMIT) {
             out.writeDword((int)InternalZipConstants.ZIP_64_LIMIT);
             out.writeDword(0);
             zipModel.zip64();

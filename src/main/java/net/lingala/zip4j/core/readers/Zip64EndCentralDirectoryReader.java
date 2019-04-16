@@ -30,7 +30,7 @@ final class Zip64EndCentralDirectoryReader {
         dir.setTotNoOfEntriesInCentralDirOnThisDisk(in.readLong());
         dir.setTotalEntries(in.readLong());
         dir.setSizeOfCentralDir(in.readLong());
-        dir.setOffsetStartCenDirWRTStartDiskNo(in.readLong());
+        dir.setOffs(in.readLong());
         dir.setExtensibleDataSector(in.readBytes((int)(dir.getSizeOfZip64EndCentralDirRec() - Zip64EndCentralDirectory.SIZE)));
 
         return dir;

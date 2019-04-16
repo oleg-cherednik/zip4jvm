@@ -27,7 +27,7 @@ import org.apache.commons.lang.ArrayUtils;
 import java.io.IOException;
 
 @RequiredArgsConstructor
-public final class HeaderWriter {
+public final class ZipModelWriter {
 
     public static final int ZIP64_EXTRA_BUF = 50;
     private static final String MARK = "header";
@@ -55,7 +55,7 @@ public final class HeaderWriter {
             dir.setTotNoOfEntriesInCentralDirOnThisDisk(countNumberOfFileHeaderEntriesOnDisk());
             dir.setTotalEntries(zipModel.getFileHeaders().size());
             dir.setSizeOfCentralDir(endCentralDirectory.getSize());
-            dir.setOffsetStartCenDirWRTStartDiskNo(endCentralDirectory.getOffs());
+            dir.setOffs(endCentralDirectory.getOffs());
         }
 
         if (zipModel.isZip64() && validate)

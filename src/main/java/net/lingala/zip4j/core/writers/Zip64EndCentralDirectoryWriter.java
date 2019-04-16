@@ -30,7 +30,7 @@ final class Zip64EndCentralDirectoryWriter {
         out.writeLong(dir.getTotNoOfEntriesInCentralDirOnThisDisk());
         out.writeLong(dir.getTotalEntries());
         out.writeLong(dir.getSizeOfCentralDir());
-        out.writeLong(dir.getOffsetStartCenDirWRTStartDiskNo());
+        out.writeLong(dir.getOffs());
         out.writeBytes(dir.getExtensibleDataSector());
     }
 }

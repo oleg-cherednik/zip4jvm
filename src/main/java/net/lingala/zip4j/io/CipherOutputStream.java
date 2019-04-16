@@ -17,7 +17,7 @@
 package net.lingala.zip4j.io;
 
 import lombok.NonNull;
-import net.lingala.zip4j.core.writers.HeaderWriter;
+import net.lingala.zip4j.core.writers.ZipModelWriter;
 import net.lingala.zip4j.core.writers.LocalFileHeaderWriter;
 import net.lingala.zip4j.crypto.AESEncryptor;
 import net.lingala.zip4j.crypto.Encryptor;
@@ -226,7 +226,7 @@ public abstract class CipherOutputStream extends OutputStream {
 
     public void finish() throws IOException, ZipException {
         zipModel.getEndCentralDirectory().setOffs(out.getOffs());
-        new HeaderWriter(zipModel).finalizeZipFile(out, true);
+        new ZipModelWriter(zipModel).finalizeZipFile(out, true);
     }
 
     @Override

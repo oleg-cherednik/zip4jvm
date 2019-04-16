@@ -22,6 +22,8 @@ import net.lingala.zip4j.util.InternalZipConstants;
 import org.apache.commons.lang.ArrayUtils;
 
 /**
+ * see 4.3.14  Zip64 end of central directory record
+ *
  * @author Oleg Cherednik
  * @since 04.03.2019
  */
@@ -51,7 +53,7 @@ public class Zip64EndCentralDirectory {
     // size:8 - size of the central directory
     private long sizeOfCentralDir;
     // size:8 - directory with respect to the starting disk number
-    private long offsetStartCenDirWRTStartDiskNo;
+    private long offs;
     // size:n-44 - extensible data sector
     private byte[] extensibleDataSector;
 
@@ -61,7 +63,7 @@ public class Zip64EndCentralDirectory {
     }
 
     public void updateOffsetStartCenDirWRTStartDiskNo(long delta) {
-        offsetStartCenDirWRTStartDiskNo += delta;
+        offs += delta;
     }
 
 }
