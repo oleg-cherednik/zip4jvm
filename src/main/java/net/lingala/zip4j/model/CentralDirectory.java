@@ -114,7 +114,7 @@ public class CentralDirectory {
         // size:2 - file name length (n)
 //        private int fileNameLength;
         // size:2 - extra field length (m)
-        private int extraFieldLength;
+//        private int extraFieldLength;
         // size:2 - file comment length
         private int fileCommentLength;
         // size:2 - disk number start

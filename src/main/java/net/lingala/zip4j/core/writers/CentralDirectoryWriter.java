@@ -3,6 +3,7 @@ package net.lingala.zip4j.core.writers;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.io.OutputStreamDecorator;
+import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.Zip64ExtendedInfo;
 import net.lingala.zip4j.model.ZipModel;
@@ -66,6 +67,7 @@ public final class CentralDirectoryWriter {
     private static short getExtraFieldLength(CentralDirectory.FileHeader fileHeader, boolean writeZip64FileSize,
             boolean writeZip64OffsetLocalHeader) {
         int extraFieldLength = 0;
+
         if (writeZip64FileSize || writeZip64OffsetLocalHeader) {
             extraFieldLength += 4;
             if (writeZip64FileSize)
@@ -73,8 +75,9 @@ public final class CentralDirectoryWriter {
             if (writeZip64OffsetLocalHeader)
                 extraFieldLength += 8;
         }
-        if (fileHeader.getAesExtraDataRecord() != null)
-            extraFieldLength += 11;
+
+        extraFieldLength += fileHeader.getAesExtraDataRecord() != null ? AESExtraDataRecord.SIZE : 0;
+
         return (short)extraFieldLength;
     }
 

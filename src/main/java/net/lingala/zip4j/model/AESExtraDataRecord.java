@@ -30,6 +30,7 @@ import java.nio.charset.Charset;
 public class AESExtraDataRecord {
 
     public static final short SIGNATURE = (short)0x9901;
+    public static final int SIZE = 2 + 2 + 2 + 2 + 1 + 2;   // size:11
 
     // size:2 - signature (0x9901)
     private final short signature = SIGNATURE;

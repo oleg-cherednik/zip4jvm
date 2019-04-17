@@ -33,12 +33,12 @@ public class Zip64EndCentralDirectoryLocator {
     // size:4 - number of the disk with the start of the zip64 end of central directory
     private int noOfDiskStartOfZip64EndOfCentralDirRec;
     // size:8 - relative offset of the zip64 end of central directory record
-    private long offsetZip64EndOfCentralDirRec;
+    private long offs;
     // size:4 - total number of disks
     private int totNumberOfDiscs;
 
     public void updateOffsetZip64EndOfCentralDirRec(long delta) {
-        offsetZip64EndOfCentralDirRec += delta;
+        offs += delta;
     }
 
 }

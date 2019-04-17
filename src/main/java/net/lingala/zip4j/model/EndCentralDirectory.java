@@ -31,7 +31,7 @@ public class EndCentralDirectory {
 
     // size (22) with comment length = 0
     public static final int MIN_SIZE = 4 + 2 + 2 + 2 + 2 + 4 + 4 + 2;
-    // max length for comment is 2 bytes
+    // comment length depend on size of other structures; it is definitely possible to write 33k bytes
     public static final int MAX_COMMENT_LENGTH = 33_000;
 
     // size:4 - signature (0x06054b50)
@@ -44,9 +44,9 @@ public class EndCentralDirectory {
     private int diskEntries;
     // size:2 - total number of entries in the central directory
     private int totalEntries;
-    // size:4 - size of the central directory
+    // size:4 - CentralDirectory size
     private int size;
-    // size:4 - offset of start of central directory with respect to the starting disk number
+    // size:4 - CentralDirectory offs
     private long offs;
     // size:2 - file comment length (n)
 //    private int commentLength;

@@ -23,7 +23,7 @@ final class Zip64EndCentralDirectoryLocatorReader {
 
         Zip64EndCentralDirectoryLocator locator = new Zip64EndCentralDirectoryLocator();
         locator.setNoOfDiskStartOfZip64EndOfCentralDirRec(in.readInt());
-        locator.setOffsetZip64EndOfCentralDirRec(in.readLong());
+        locator.setOffs(in.readLong());
         locator.setTotNumberOfDiscs(in.readInt());
 
         return locator;

@@ -47,7 +47,6 @@ public class CentralDirectoryBuilder {
         fileHeader.setCrc32(getCrc32());
         fileHeader.setCompressedSize(getCompressedSize(fileHeader));
         fileHeader.setUncompressedSize(getUncompressedSize(fileHeader));
-        fileHeader.setExtraFieldLength(0);
         fileHeader.setFileCommentLength(0);
         fileHeader.setDiskNumber(currSplitFileCounter);
         fileHeader.setInternalFileAttributes(null);

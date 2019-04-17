@@ -84,8 +84,8 @@ public class ZipModel {
         zip64(new Zip64EndCentralDirectoryLocator(), new Zip64EndCentralDirectory());
     }
 
-    public void zip64(Zip64EndCentralDirectoryLocator zip64EndCentralDirectoryLocator, Zip64EndCentralDirectory zip64EndCentralDirectory) {
-        zip64 = new Zip64(zip64EndCentralDirectoryLocator, zip64EndCentralDirectory);
+    public void zip64(Zip64EndCentralDirectoryLocator locator, Zip64EndCentralDirectory dir) {
+        zip64 = new Zip64(locator, dir);
     }
 
     public void updateZip64() {
@@ -104,7 +104,7 @@ public class ZipModel {
         dir.setOffs(endCentralDirectory.getOffs());
 
         Zip64EndCentralDirectoryLocator locator = zip64.getEndCentralDirectoryLocator();
-        locator.setOffsetZip64EndOfCentralDirRec(endCentralDirectory.getOffs() + endCentralDirectory.getSize());
+        locator.setOffs(endCentralDirectory.getOffs() + endCentralDirectory.getSize());
     }
 
     private int countNumberOfFileHeaderEntriesOnDisk() {
@@ -117,17 +117,17 @@ public class ZipModel {
     }
 
     public boolean isEmpty() {
-        return getFileHeaders().isEmpty();
+        return getTotalEntries() == 0;
+    }
+
+    public long getTotalEntries() {
+        return isZip64() ? zip64.getEndCentralDirectory().getTotalEntries() : endCentralDirectory.getTotalEntries();
     }
 
     public List<String> getEntryNames() {
         return getFileHeaders().stream()
                                .map(CentralDirectory.FileHeader::getFileName)
                                .collect(Collectors.toList());
-    }
-
-    public long getTotalEntries() {
-        return isZip64() ? zip64.getEndCentralDirectory().getTotalEntries() : endCentralDirectory.getTotalEntries();
     }
 
     public long getOffsCentralDirectory() {
