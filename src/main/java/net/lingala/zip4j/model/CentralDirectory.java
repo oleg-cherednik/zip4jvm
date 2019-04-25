@@ -178,6 +178,11 @@ public class CentralDirectory {
             }
         }
 
+        public void setExtraField(ExtraField extraField) {
+            this.extraField = extraField;
+            updateEncryption();
+        }
+
         public void setAesExtraDataRecord(AESExtraDataRecord record) {
             if (extraField == null)
                 extraField = new ExtraField();
