@@ -126,7 +126,7 @@ public class UnzipEngine {
             this.fileHeader = fileHeader;
 
             LittleEndianRandomAccessFile in = openFile(fileHeader);
-            LocalFileHeader localFileHeader = checkLocalHeader(fileHeader);
+            LocalFileHeader localFileHeader = readLocalFileHeader(fileHeader);
             this.localFileHeader = localFileHeader;
             decrypter = localFileHeader.getEncryption().createDecrypter(in, fileHeader, localFileHeader);
 
@@ -149,19 +149,11 @@ public class UnzipEngine {
                 offs += InternalZipConstants.STD_DEC_HDR_SIZE;
             }
 
-            CompressionMethod compressionMethod = fileHeader.getCompressionMethod();
-            if (fileHeader.getEncryption() == Encryption.AES) {
-                if (fileHeader.getAesExtraDataRecord() != null)
-                    compressionMethod = fileHeader.getAesExtraDataRecord().getCompressionMethod();
-                else
-                    throw new ZipException("AESExtraDataRecord does not exist for AES encrypted file: " + fileHeader.getFileName());
-            }
-
             in.seek(offs);
 
-            if (compressionMethod == CompressionMethod.STORE)
+            if (fileHeader.getActualCompressionMethod() == CompressionMethod.STORE)
                 return new ZipInputStream(new PartInputStream(in, comprSize, this), this);
-            if (compressionMethod == CompressionMethod.DEFLATE)
+            if (fileHeader.getActualCompressionMethod() == CompressionMethod.DEFLATE)
                 return new ZipInputStream(new InflaterInputStream(in, comprSize, this), this);
 
             throw new ZipException("compression type not supported");
@@ -203,39 +195,29 @@ public class UnzipEngine {
     }
 
     @NonNull
-    private LocalFileHeader checkLocalHeader(@NonNull CentralDirectory.FileHeader fileHeader) throws IOException {
+    private LocalFileHeader readLocalFileHeader(@NonNull CentralDirectory.FileHeader fileHeader) throws IOException {
         try (LittleEndianRandomAccessFile in = openFile(fileHeader)) {
-            LocalFileHeader localFileHeader = new LocalFileHeaderReader(fileHeader).read(in);
-
-            //TODO Add more comparision later
-            if (localFileHeader.getCompressionMethod() != fileHeader.getCompressionMethod())
-                throw new ZipException("local header and file header do not match");
-
-            return localFileHeader;
+            return new LocalFileHeaderReader(fileHeader).read(in);
         }
     }
 
-    private LittleEndianRandomAccessFile openFile(@NonNull CentralDirectory.FileHeader fileHeader) {
-        try {
-            if (!zipModel.isSplitArchive())
-                return new LittleEndianRandomAccessFile(zipModel.getZipFile());
+    private LittleEndianRandomAccessFile openFile(@NonNull CentralDirectory.FileHeader fileHeader) throws IOException {
+        if (!zipModel.isSplitArchive())
+            return new LittleEndianRandomAccessFile(zipModel.getZipFile());
 
-            int diskNumber = fileHeader.getDiskNumber();
-            currSplitFileCounter = diskNumber + 1;
+        int diskNumber = fileHeader.getDiskNumber();
+        currSplitFileCounter = diskNumber + 1;
 
-            LittleEndianRandomAccessFile in = new LittleEndianRandomAccessFile(zipModel.getPartFile(diskNumber));
+        LittleEndianRandomAccessFile in = new LittleEndianRandomAccessFile(zipModel.getPartFile(diskNumber));
 
-            if (currSplitFileCounter == 1) {
-                int signature = in.readInt();
+        if (currSplitFileCounter == 1) {
+            int signature = in.readInt();
 
-                if (signature != InternalZipConstants.SPLITSIG)
-                    throw new IOException("Expected first part of split file signature (offs:" + in.getFilePointer() + ')');
-            }
-
-            return in;
-        } catch(IOException e) {
-            throw new ZipException(e);
+            if (signature != InternalZipConstants.SPLITSIG)
+                throw new IOException("Expected first part of split file signature (offs:" + in.getFilePointer() + ')');
         }
+
+        return in;
     }
 
     private static FileOutputStream getOutputStream(@NonNull Path destDir, @NonNull CentralDirectory.FileHeader fileHeader) {

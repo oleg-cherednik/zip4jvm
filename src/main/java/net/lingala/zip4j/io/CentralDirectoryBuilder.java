@@ -42,7 +42,7 @@ public class CentralDirectoryBuilder {
         fileHeader.setVersionMadeBy(CentralDirectory.FileHeader.DEF_VERSION);
         fileHeader.setVersionToExtract(CentralDirectory.FileHeader.DEF_VERSION);
         updateGeneralPurposeFlag(fileHeader.getGeneralPurposeFlag());
-        fileHeader.setCompressionMethod(getCompressionMethod());
+        fileHeader.setCompressionMethod(parameters.getActualCompressionMethod());
         fileHeader.setLastModifiedTime(getLastModFileTime());
         fileHeader.setCrc32(getCrc32());
         fileHeader.setCompressedSize(getCompressedSize(fileHeader));
@@ -95,10 +95,6 @@ public class CentralDirectoryBuilder {
         generalPurposeFlag.setUtf8Encoding(zipModel.getCharset() == StandardCharsets.UTF_8);
         generalPurposeFlag.setEncrypted(parameters.getEncryption() != Encryption.OFF);
         generalPurposeFlag.setStrongEncryption(parameters.getEncryption() == Encryption.STRONG);
-    }
-
-    private CompressionMethod getCompressionMethod() {
-        return parameters.getEncryption() == Encryption.AES ? CompressionMethod.AES_ENC : parameters.getCompressionMethod();
     }
 
     private int getLastModFileTime() throws IOException {

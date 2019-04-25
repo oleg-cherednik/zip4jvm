@@ -16,6 +16,7 @@
 
 package net.lingala.zip4j.model;
 
+import com.sun.istack.internal.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -59,6 +60,11 @@ public class ZipParameters {
     private long splitLength = ZipModel.NO_SPLIT;
     private String comment;
     public boolean zip64;
+
+    @NotNull
+    public CompressionMethod getActualCompressionMethod() {
+        return encryption == Encryption.AES ? CompressionMethod.AES_ENC : compressionMethod;
+    }
 
     /**
      * Sets the password for the zip file or the file being added<br>

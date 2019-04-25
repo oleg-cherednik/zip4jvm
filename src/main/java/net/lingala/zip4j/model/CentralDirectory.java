@@ -16,10 +16,12 @@
 
 package net.lingala.zip4j.model;
 
+import com.sun.istack.internal.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
+import net.lingala.zip4j.core.writers.ZipModelWriter;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.ZipUtils;
@@ -157,6 +159,11 @@ public class CentralDirectory {
             return fileComment != null ? fileComment.getBytes(charset) : ArrayUtils.EMPTY_BYTE_ARRAY;
         }
 
+        @NotNull
+        public CompressionMethod getActualCompressionMethod() {
+            return compressionMethod == CompressionMethod.AES_ENC ? extraField.getAesExtraDataRecord().getCompressionMethod() : compressionMethod;
+        }
+
         public boolean isDirectory() {
             return ZipUtils.isDirectory(fileName);
         }
@@ -206,6 +213,15 @@ public class CentralDirectory {
             if (generalPurposeFlag.isStrongEncryption())
                 return Encryption.STRONG;
             return generalPurposeFlag.isEncrypted() ? Encryption.STANDARD : Encryption.OFF;
+        }
+
+        public boolean isWriteZip64FileSize() {
+            return compressedSize >= InternalZipConstants.ZIP_64_LIMIT ||
+                    uncompressedSize + ZipModelWriter.ZIP64_EXTRA_BUF >= InternalZipConstants.ZIP_64_LIMIT;
+        }
+
+        public boolean isWriteZip64OffsetLocalHeader() {
+            return offsLocalFileHeader > InternalZipConstants.ZIP_64_LIMIT;
         }
 
         @Override

@@ -34,11 +34,7 @@ public final class CentralDirectoryWriter {
     }
 
     private void writeFileHeader(CentralDirectory.FileHeader fileHeader, OutputStreamDecorator out) throws IOException {
-        final boolean writeZip64FileSize = fileHeader.getCompressedSize() >= InternalZipConstants.ZIP_64_LIMIT ||
-                fileHeader.getUncompressedSize() + ZipModelWriter.ZIP64_EXTRA_BUF >= InternalZipConstants.ZIP_64_LIMIT;
-        final boolean writeZip64OffsetLocalHeader = fileHeader.getOffsLocalFileHeader() > InternalZipConstants.ZIP_64_LIMIT;
-
-        updateZip64(fileHeader, writeZip64FileSize, writeZip64OffsetLocalHeader);
+        updateZip64(fileHeader);
 
         byte[] fileName = fileHeader.getFileName(zipModel.getCharset());
         byte[] fileComment = fileHeader.getFileComment(zipModel.getCharset());
@@ -50,31 +46,30 @@ public final class CentralDirectoryWriter {
         out.writeShort(fileHeader.getCompressionMethod().getValue());
         out.writeDword(fileHeader.getLastModifiedTime());
         out.writeDword((int)fileHeader.getCrc32());
-        out.writeDword(writeZip64FileSize ? InternalZipConstants.ZIP_64_LIMIT : fileHeader.getCompressedSize());
-        out.writeDword(writeZip64FileSize ? InternalZipConstants.ZIP_64_LIMIT : fileHeader.getUncompressedSize());
+        out.writeDword(fileHeader.isWriteZip64FileSize() ? InternalZipConstants.ZIP_64_LIMIT : fileHeader.getCompressedSize());
+        out.writeDword(fileHeader.isWriteZip64FileSize() ? InternalZipConstants.ZIP_64_LIMIT : fileHeader.getUncompressedSize());
         out.writeShort((short)fileName.length);
-        out.writeWord(getExtraFieldLength(fileHeader, writeZip64FileSize, writeZip64OffsetLocalHeader));
+        out.writeWord(getExtraFieldLength(fileHeader));
         out.writeShort((short)fileComment.length);
         out.writeShort((short)fileHeader.getDiskNumber());
         out.writeBytes(fileHeader.getInternalFileAttributes() != null ? fileHeader.getInternalFileAttributes() : new byte[2]);
         out.writeBytes(fileHeader.getExternalFileAttributes() != null ? fileHeader.getExternalFileAttributes() : new byte[4]);
-        out.writeLongAsInt(writeZip64OffsetLocalHeader ? InternalZipConstants.ZIP_64_LIMIT : fileHeader.getOffsLocalFileHeader());
+        out.writeLongAsInt(fileHeader.isWriteZip64OffsetLocalHeader() ? InternalZipConstants.ZIP_64_LIMIT : fileHeader.getOffsLocalFileHeader());
         out.writeBytes(fileName);
         new ExtraFieldWriter(fileHeader.getExtraField(), zipModel.getCharset()).write(out);
         out.writeBytes(fileComment);
     }
 
-    private static short getExtraFieldLength(CentralDirectory.FileHeader fileHeader, boolean writeZip64FileSize,
-            boolean writeZip64OffsetLocalHeader) {
+    private static short getExtraFieldLength(CentralDirectory.FileHeader fileHeader) {
         int extraFieldLength = 0;
 
-        if (writeZip64FileSize || writeZip64OffsetLocalHeader) {
+        if (fileHeader.isWriteZip64FileSize())
+            extraFieldLength += 16;
+        if (fileHeader.isWriteZip64OffsetLocalHeader())
+            extraFieldLength += 8;
+
+        if (extraFieldLength != 0)
             extraFieldLength += 4;
-            if (writeZip64FileSize)
-                extraFieldLength += 16;
-            if (writeZip64OffsetLocalHeader)
-                extraFieldLength += 8;
-        }
 
         extraFieldLength += fileHeader.getAesExtraDataRecord() != null ? AESExtraDataRecord.SIZE : 0;
 
@@ -83,9 +78,8 @@ public final class CentralDirectoryWriter {
 
     // TODO should be updated on the fly
     @Deprecated
-    private void updateZip64(CentralDirectory.FileHeader fileHeader, boolean writeZip64FileSize,
-            boolean writeZip64OffsetLocalHeader) {
-        if (writeZip64FileSize || writeZip64OffsetLocalHeader)
+    private void updateZip64(CentralDirectory.FileHeader fileHeader) {
+        if (fileHeader.isWriteZip64FileSize() || fileHeader.isWriteZip64OffsetLocalHeader())
             zipModel.zip64();
 
 //        if (fileHeader.getExtraField() == null)
@@ -99,15 +93,15 @@ public final class CentralDirectoryWriter {
         if (info != null) {
             short dataSize = 0;
 
-            if (writeZip64FileSize)
+            if (fileHeader.isWriteZip64FileSize())
                 dataSize += 16;
-            if (writeZip64OffsetLocalHeader)
+            if (fileHeader.isWriteZip64OffsetLocalHeader())
                 dataSize += 8;
 
             info.setSize(dataSize);
-            info.setUncompressedSize(writeZip64FileSize ? fileHeader.getUncompressedSize() : -1);
-            info.setCompressedSize(writeZip64FileSize ? fileHeader.getCompressedSize() : -1);
-            info.setOffsLocalHeaderRelative(writeZip64OffsetLocalHeader ? fileHeader.getOffsLocalFileHeader() : -1);
+            info.setUncompressedSize(fileHeader.isWriteZip64FileSize() ? fileHeader.getUncompressedSize() : -1);
+            info.setCompressedSize(fileHeader.isWriteZip64FileSize() ? fileHeader.getCompressedSize() : -1);
+            info.setOffsLocalHeaderRelative(fileHeader.isWriteZip64OffsetLocalHeader() ? fileHeader.getOffsLocalFileHeader() : -1);
         }
     }
 
