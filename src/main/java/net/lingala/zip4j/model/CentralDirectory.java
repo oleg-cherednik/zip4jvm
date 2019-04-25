@@ -171,10 +171,10 @@ public class CentralDirectory {
             extraField.setZip64ExtendedInfo(info);
 
             if (info != null) {
-                uncompressedSize = info.getUnCompressedSize() != -1 ? info.getUnCompressedSize() : uncompressedSize;
+                uncompressedSize = info.getUncompressedSize() != -1 ? info.getUncompressedSize() : uncompressedSize;
                 compressedSize = info.getCompressedSize() != -1 ? info.getCompressedSize() : uncompressedSize;
                 offsLocalFileHeader = info.getOffsLocalHeaderRelative() != -1 ? info.getOffsLocalHeaderRelative() : offsLocalFileHeader;
-                diskNumber = info.getDiskNumberStart() != -1 ? info.getDiskNumberStart() : diskNumber;
+                diskNumber = info.getDiskNumber() != -1 ? info.getDiskNumber() : diskNumber;
             }
         }
 

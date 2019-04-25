@@ -22,10 +22,10 @@ final class Zip64ExtendedInfoWriter {
 
         out.writeWord(Zip64ExtendedInfo.SIGNATURE);
         out.writeWord((short)info.getSize());
-        out.writeLong(info.getUnCompressedSize());
+        out.writeLong(info.getUncompressedSize());
         out.writeLong(info.getCompressedSize());
         out.writeLong(info.getOffsLocalHeaderRelative());
-        out.writeDword(info.getDiskNumberStart());
+        out.writeDword(info.getDiskNumber());
     }
 
 }

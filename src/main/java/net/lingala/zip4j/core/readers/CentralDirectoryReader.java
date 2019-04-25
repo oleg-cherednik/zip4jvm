@@ -49,9 +49,7 @@ final class CentralDirectoryReader {
     private static CentralDirectory.FileHeader readFileHeader(LittleEndianRandomAccessFile in) throws IOException {
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
-        int signature = in.readInt();
-
-        if (signature != CentralDirectory.FileHeader.SIGNATURE)
+        if (in.readInt() != CentralDirectory.FileHeader.SIGNATURE)
             throw new IOException("Expected central directory entry not found (offs:" + (in.getFilePointer() - 4) + ')');
 
         fileHeader.setVersionMadeBy(in.readShort());
@@ -70,7 +68,12 @@ final class CentralDirectoryReader {
         fileHeader.setExternalFileAttributes(in.readBytes(4));
         fileHeader.setOffsLocalFileHeader(in.readIntAsLong());
         fileHeader.setFileName(FilenameUtils.normalize(in.readString(fileNameLength), true));
-        new ExtraFieldReader(extraFieldLength).read(in, fileHeader);
+
+        boolean uncompressedSize = (fileHeader.getUncompressedSize() & 0xFFFF) == 0xFFFF;
+        boolean compressedSize = (fileHeader.getCompressedSize() & 0xFFFF) == 0xFFFF;
+        boolean offs = (fileHeader.getOffsLocalFileHeader() & 0xFFFF) == 0xFFFF;
+        boolean diskNumber = (fileHeader.getDiskNumber() & 0xFFFF) == 0xFFFF;
+        fileHeader.setExtraField(new ExtraFieldReader(extraFieldLength, uncompressedSize, compressedSize, offs, diskNumber).read(in, null));
         fileHeader.setFileComment(in.readString(fileCommentLength));
 
         return fileHeader;

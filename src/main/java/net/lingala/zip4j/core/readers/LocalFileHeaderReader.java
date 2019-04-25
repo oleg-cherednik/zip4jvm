@@ -42,7 +42,7 @@ public final class LocalFileHeaderReader {
 
         localFileHeader.setExtraFieldLength(in.readShort());
         localFileHeader.setFileName(FilenameUtils.normalize(in.readString(fileNameLength)));
-        localFileHeader.setExtraDataRecords(new ExtraFieldReader(localFileHeader.getExtraFieldLength()).read(in));
+        localFileHeader.setExtraDataRecords(new ExtraFieldReader(localFileHeader.getExtraFieldLength(), false, false, false, false).read(in));
 
         localFileHeader.setOffsetStartOfData(in.getFilePointer());
         localFileHeader.setPassword(fileHeader.getPassword());
@@ -81,14 +81,14 @@ public final class LocalFileHeaderReader {
 
         Zip64ExtendedInfo res = new Zip64ExtendedInfo();
         res.setSize(record.getSizeOfData());
-        res.setUnCompressedSize((localFileHeader.getUncompressedSize() & 0xFFFF) == 0xFFFF ? in.readLong() : -1);
+        res.setUncompressedSize((localFileHeader.getUncompressedSize() & 0xFFFF) == 0xFFFF ? in.readLong() : -1);
         res.setCompressedSize((localFileHeader.getCompressedSize() & 0xFFFF) == 0xFFFF ? in.readLong() : -1);
         // TODO why it throws exception
 //        res.setOffsLocalHeaderRelative(in.readLong());
 //        res.setDiskNumberStart(in.readInt());
 
-        if (res.getUnCompressedSize() != -1 || res.getCompressedSize() != -1
-                || res.getOffsLocalHeaderRelative() != -1 || res.getDiskNumberStart() != -1)
+        if (res.getUncompressedSize() != -1 || res.getCompressedSize() != -1
+                || res.getOffsLocalHeaderRelative() != -1 || res.getDiskNumber() != -1)
             return res;
 
         return null;

@@ -206,7 +206,7 @@ public class ZipModel {
         endCentralDirectory.setDiskEntries(fileHeaders.size());
     }
 
-    public long getEndCentralDirectoryOffs() {
+    public long getCentralDirectoryOffs() {
         return isZip64() ? zip64.getEndCentralDirectory().getOffs() : endCentralDirectory.getOffs();
     }
 

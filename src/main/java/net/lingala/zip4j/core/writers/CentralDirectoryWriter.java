@@ -105,7 +105,7 @@ public final class CentralDirectoryWriter {
                 dataSize += 8;
 
             info.setSize(dataSize);
-            info.setUnCompressedSize(writeZip64FileSize ? fileHeader.getUncompressedSize() : -1);
+            info.setUncompressedSize(writeZip64FileSize ? fileHeader.getUncompressedSize() : -1);
             info.setCompressedSize(writeZip64FileSize ? fileHeader.getCompressedSize() : -1);
             info.setOffsLocalHeaderRelative(writeZip64OffsetLocalHeader ? fileHeader.getOffsLocalFileHeader() : -1);
         }

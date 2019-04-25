@@ -93,7 +93,7 @@ public class LocalFileHeader {
         zip64ExtendedInfo = info;
 
         if (info != null) {
-            uncompressedSize = info.getUnCompressedSize() != -1 ? info.getUnCompressedSize() : uncompressedSize;
+            uncompressedSize = info.getUncompressedSize() != -1 ? info.getUncompressedSize() : uncompressedSize;
             compressedSize = info.getCompressedSize() != -1 ? info.getCompressedSize() : uncompressedSize;
         }
     }

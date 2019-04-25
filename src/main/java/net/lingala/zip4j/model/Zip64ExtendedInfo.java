@@ -24,18 +24,19 @@ import lombok.Setter;
 public class Zip64ExtendedInfo {
 
     public static final short SIGNATURE = 0x0001;
+    public static final int NO_DATA = -1;
 
     // size:2 - tag for this "extra" block type (ZIP64 = 0x001)
     private final short header = SIGNATURE;
     // size:2 - size of this "extra" block
     private int size;
     // size:8 - original uncompressed file size
-    private long unCompressedSize = -1;
+    private long uncompressedSize = NO_DATA;
     // size:8 - size of compressed data
-    private long compressedSize = -1;
+    private long compressedSize = NO_DATA;
     // size:8 - offset of local header record
-    private long offsLocalHeaderRelative = -1;
+    private long offsLocalHeaderRelative = NO_DATA;
     // size:4 - number of the disk on which  this file starts
-    private int diskNumberStart = -1;
+    private int diskNumber = NO_DATA;
 
 }

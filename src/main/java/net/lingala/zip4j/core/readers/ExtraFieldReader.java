@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.ExtraDataRecord;
+import net.lingala.zip4j.model.ExtraField;
 import net.lingala.zip4j.model.Zip64ExtendedInfo;
 import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
 
@@ -21,6 +22,10 @@ import java.util.Map;
 final class ExtraFieldReader {
 
     private final int size;
+    private final boolean uncompressedSize;
+    private final boolean compressedSize;
+    private final boolean offs;
+    private final boolean diskNumber;
 
     public Map<Short, ExtraDataRecord> read(@NonNull LittleEndianRandomAccessFile in) throws IOException {
         if (size <= 0)
@@ -47,25 +52,29 @@ final class ExtraFieldReader {
         return map.isEmpty() ? Collections.emptyMap() : map;
     }
 
-    public void read(@NonNull LittleEndianRandomAccessFile in, @NonNull CentralDirectory.FileHeader fileHeader) throws IOException {
+    public ExtraField read(@NonNull LittleEndianRandomAccessFile in, CentralDirectory.FileHeader tmp) throws IOException {
         if (size <= 0)
-            return;
+            return null;
 
-        Zip64ExtendedInfo zip64;
-        AESExtraDataRecord aes;
+        ExtraField extraField = new ExtraField();
         final long offsMax = in.getFilePointer() + size;
 
         while (in.getFilePointer() < offsMax) {
             short signature = in.readWord();
 
-            if ((zip64 = new Zip64ExtendedInfoReader(signature, fileHeader).read(in)) != null)
-                fileHeader.setZip64ExtendedInfo(zip64);
-            else if ((aes = new AESExtraDataRecordReader(signature).read(in)) != null)
-                fileHeader.setAesExtraDataRecord(aes);
+            Zip64ExtendedInfo zip64 = new Zip64ExtendedInfoReader(signature, uncompressedSize, compressedSize, offs, diskNumber).read(in);
+            AESExtraDataRecord aes = new AESExtraDataRecordReader(signature).read(in);
+
+            if (zip64 != null)
+                extraField.setZip64ExtendedInfo(zip64);
+            else if (aes != null)
+                extraField.setAesExtraDataRecord(aes);
             else
                 // TODO do add skip instead
                 in.readBytes(in.readWord());
         }
+
+        return extraField.isEmpty() ? null : extraField;
     }
 
 }

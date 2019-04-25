@@ -14,4 +14,8 @@ public class ExtraField {
     private Zip64ExtendedInfo zip64ExtendedInfo;
     private AESExtraDataRecord aesExtraDataRecord;
 
+    public boolean isEmpty() {
+        return zip64ExtendedInfo == null && aesExtraDataRecord == null;
+    }
+
 }
