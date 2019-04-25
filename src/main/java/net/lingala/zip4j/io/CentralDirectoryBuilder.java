@@ -37,7 +37,7 @@ public class CentralDirectoryBuilder {
     private final int currSplitFileCounter;
 
     public CentralDirectory.FileHeader createFileHeader() throws IOException {
-        CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader(getFileName(), parameters.getEncryption());
+        CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader(getFileName());
 
         fileHeader.setVersionMadeBy(CentralDirectory.FileHeader.DEF_VERSION);
         fileHeader.setVersionToExtract(CentralDirectory.FileHeader.DEF_VERSION);
@@ -53,7 +53,7 @@ public class CentralDirectoryBuilder {
         fileHeader.setExternalFileAttributes(getExternalFileAttr());
         fileHeader.setOffsLocalFileHeader(0);
         fileHeader.setZip64ExtendedInfo(null);
-        fileHeader.setAesExtraDataRecord(getAesExtraDataRecord(fileHeader.getEncryption()));
+        fileHeader.setAesExtraDataRecord(getAesExtraDataRecord(parameters.getEncryption()));
         fileHeader.setFileComment(null);
 
         return fileHeader;
@@ -67,7 +67,6 @@ public class CentralDirectoryBuilder {
         localFileHeader.setLastModifiedTime(fileHeader.getLastModifiedTime());
         localFileHeader.setUncompressedSize(fileHeader.getUncompressedSize());
         localFileHeader.setFileName(fileHeader.getFileName());
-        localFileHeader.setEncryption(fileHeader.getEncryption());
         localFileHeader.setAesExtraDataRecord(fileHeader.getAesExtraDataRecord());
         localFileHeader.setCrc32(fileHeader.getCrc32());
         localFileHeader.setCompressedSize(fileHeader.getCompressedSize());

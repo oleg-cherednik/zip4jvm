@@ -65,8 +65,6 @@ public class LocalFileHeader {
     // ----
 
     private long offsetStartOfData;
-    @NonNull
-    private Encryption encryption = Encryption.OFF;
     private char[] password;
     private Zip64ExtendedInfo zip64ExtendedInfo;
     private AESExtraDataRecord aesExtraDataRecord;
@@ -100,8 +98,7 @@ public class LocalFileHeader {
 
     public void setAesExtraDataRecord(AESExtraDataRecord record) {
         aesExtraDataRecord = record;
-        encryption = aesExtraDataRecord != null ? Encryption.AES : encryption;
-        updateEncryption();
+        generalPurposeFlag.setEncrypted(getEncryption() != Encryption.OFF);
     }
 
     public ExtraDataRecord getExtraDataRecordByHeader(short header) {
@@ -110,24 +107,15 @@ public class LocalFileHeader {
 
     public void setGeneralPurposeFlag(short data) {
         generalPurposeFlag.setData(data);
-        updateEncryption();
+        generalPurposeFlag.setEncrypted(getEncryption() != Encryption.OFF);
     }
 
-    private void updateEncryption() {
+    public Encryption getEncryption() {
         if (aesExtraDataRecord != null)
-            encryption = Encryption.AES;
-        else if (generalPurposeFlag.isStrongEncryption())
-            encryption = Encryption.STRONG;
-        else if (generalPurposeFlag.isEncrypted())
-            encryption = Encryption.STANDARD;
-        else
-            encryption = Encryption.OFF;
-
-        generalPurposeFlag.setEncrypted(encryption != Encryption.OFF);
-    }
-
-    public boolean isEncrypted() {
-        return encryption != Encryption.OFF;
+            return Encryption.AES;
+        if (generalPurposeFlag.isStrongEncryption())
+            return Encryption.STRONG;
+        return generalPurposeFlag.isEncrypted() ? Encryption.STANDARD : Encryption.OFF;
     }
 
 }

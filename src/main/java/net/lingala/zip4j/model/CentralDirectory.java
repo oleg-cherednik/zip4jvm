@@ -131,13 +131,10 @@ public class CentralDirectory {
         private ExtraField extraField;
         // size:k - extra field
         private String fileComment;
-        @NonNull
-        private Encryption encryption = Encryption.OFF;
         private char[] password;
 
-        public FileHeader(String fileName, Encryption encryption) {
+        public FileHeader(String fileName) {
             this.fileName = fileName;
-            this.encryption = encryption;
         }
 
         @Deprecated
@@ -180,31 +177,18 @@ public class CentralDirectory {
 
         public void setExtraField(ExtraField extraField) {
             this.extraField = extraField;
-            updateEncryption();
+            generalPurposeFlag.setEncrypted(isEncrypted());
         }
 
         public void setAesExtraDataRecord(AESExtraDataRecord record) {
             if (extraField == null)
                 extraField = new ExtraField();
             extraField.setAesExtraDataRecord(record);
-            updateEncryption();
+            generalPurposeFlag.setEncrypted(isEncrypted());
         }
 
         public void setGeneralPurposeFlag(short data) {
             generalPurposeFlag.setData(data);
-            updateEncryption();
-        }
-
-        private void updateEncryption() {
-            if (extraField != null && extraField.getAesExtraDataRecord() != null)
-                encryption = Encryption.AES;
-            else if (generalPurposeFlag.isStrongEncryption())
-                encryption = Encryption.STRONG;
-            else if (generalPurposeFlag.isEncrypted())
-                encryption = Encryption.STANDARD;
-            else
-                encryption = Encryption.OFF;
-
             generalPurposeFlag.setEncrypted(isEncrypted());
         }
 
@@ -213,7 +197,15 @@ public class CentralDirectory {
         }
 
         public boolean isEncrypted() {
-            return encryption != Encryption.OFF;
+            return getEncryption() != Encryption.OFF;
+        }
+
+        public Encryption getEncryption() {
+            if (extraField != null && extraField.getAesExtraDataRecord() != null)
+                return Encryption.AES;
+            if (generalPurposeFlag.isStrongEncryption())
+                return Encryption.STRONG;
+            return generalPurposeFlag.isEncrypted() ? Encryption.STANDARD : Encryption.OFF;
         }
 
         @Override
