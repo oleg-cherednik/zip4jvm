@@ -24,12 +24,12 @@ import net.lingala.zip4j.util.InternalZipConstants;
 import java.io.IOException;
 import java.util.Random;
 
-public class StandardEncryptor implements Encryptor {
+public class StandardEncoder implements Encoder {
 
     private ZipCryptoEngine zipCryptoEngine;
     private byte[] headerBytes;
 
-    public StandardEncryptor(char[] password, int crc) throws ZipException {
+    public StandardEncoder(char[] password, int crc) throws ZipException {
         if (password == null || password.length <= 0) {
             throw new ZipException("input password is null or empty in standard encrpyter constructor");
         }
@@ -56,11 +56,11 @@ public class StandardEncryptor implements Encryptor {
             throw new ZipException("invalid header bytes generated, cannot perform standard encryption");
         }
 
-        encrypt(headerBytes);
+        encode(headerBytes);
     }
 
     @Override
-    public void encrypt(byte[] buf, int offs, int len) throws ZipException {
+    public void encode(byte[] buf, int offs, int len) throws ZipException {
 
         if (len < 0) {
             throw new ZipException("invalid length specified to decrpyt data");

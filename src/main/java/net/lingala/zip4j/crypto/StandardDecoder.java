@@ -16,6 +16,7 @@
 
 package net.lingala.zip4j.crypto;
 
+import lombok.NonNull;
 import net.lingala.zip4j.crypto.engine.ZipCryptoEngine;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.exception.ZipExceptionConstants;
@@ -23,37 +24,28 @@ import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.util.InternalZipConstants;
 import org.apache.commons.lang.ArrayUtils;
 
-public class StandardDecrypter implements Decrypter {
+public class StandardDecoder implements Decoder {
 
-    private CentralDirectory.FileHeader fileHeader;
-    private byte[] crc = new byte[4];
-    private ZipCryptoEngine zipCryptoEngine;
+    @NonNull
+    private final CentralDirectory.FileHeader fileHeader;
+    private final ZipCryptoEngine zipCryptoEngine = new ZipCryptoEngine();
 
-    public StandardDecrypter(CentralDirectory.FileHeader fileHeader, byte[] headerBytes) throws ZipException {
-        if (fileHeader == null) {
-            throw new ZipException("one of more of the input parameters were null in StandardDecryptor");
-        }
-
+    public StandardDecoder(@NonNull CentralDirectory.FileHeader fileHeader, byte[] headerBytes) throws ZipException {
         this.fileHeader = fileHeader;
-        this.zipCryptoEngine = new ZipCryptoEngine();
         init(headerBytes);
     }
 
-    public int decryptData(byte[] buff) throws ZipException {
-        return decryptData(buff, 0, buff.length);
-    }
-
-    public int decryptData(byte[] buff, int start, int len) throws ZipException {
-        if (start < 0 || len < 0) {
+    @Override
+    public int decode(byte[] buf, int start, int len) {
+        if (start < 0 || len < 0)
             throw new ZipException("one of the input parameters were null in standard decrpyt data");
-        }
 
         try {
             for (int i = start; i < start + len; i++) {
-                int val = buff[i] & 0xff;
+                int val = buf[i] & 0xff;
                 val = (val ^ zipCryptoEngine.decryptByte()) & 0xff;
                 zipCryptoEngine.updateKeys((byte)val);
-                buff[i] = (byte)val;
+                buf[i] = (byte)val;
             }
             return len;
         } catch(Exception e) {
@@ -61,7 +53,7 @@ public class StandardDecrypter implements Decrypter {
         }
     }
 
-    public void init(byte[] headerBytes) throws ZipException {
+    public void init(byte[] headerBytes) {
         long crc32 = fileHeader.getCrc32();
 
         // TODO check it, temporary commented

@@ -28,13 +28,15 @@ import net.lingala.zip4j.model.AESStrength;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.Raw;
+import org.apache.commons.lang.ArrayUtils;
 
 import java.util.Arrays;
 
-public class AESDecrypter implements Decrypter {
+public class AESDecoder implements Decoder {
 
     @NonNull
     private final LocalFileHeader localFileHeader;
+    private final char[] password;
     private AESEngine aesEngine;
     private MacBasedPRF mac;
 
@@ -53,8 +55,9 @@ public class AESDecrypter implements Decrypter {
     private byte[] counterBlock;
     private int loopCount = 0;
 
-    public AESDecrypter(@NonNull LocalFileHeader localFileHeader, byte[] salt, byte[] passwordVerifier) throws ZipException {
+    public AESDecoder(@NonNull LocalFileHeader localFileHeader, char[] password, byte[] salt, byte[] passwordVerifier) throws ZipException {
         this.localFileHeader = localFileHeader;
+        this.password = password;
         storedMac = null;
         iv = new byte[InternalZipConstants.AES_BLOCK_SIZE];
         counterBlock = new byte[InternalZipConstants.AES_BLOCK_SIZE];
@@ -83,11 +86,10 @@ public class AESDecrypter implements Decrypter {
             MAC_LENGTH = 32;
         }
 
-        if (localFileHeader.getPassword() == null || localFileHeader.getPassword().length <= 0) {
+        if (ArrayUtils.isEmpty(password))
             throw new ZipException("empty or null password provided for AES Decryptor");
-        }
 
-        byte[] derivedKey = deriveKey(salt, localFileHeader.getPassword());
+        byte[] derivedKey = deriveKey(salt, password);
         if (derivedKey == null ||
                 derivedKey.length != (KEY_LENGTH + MAC_LENGTH + PASSWORD_VERIFIER_LENGTH)) {
             throw new ZipException("invalid derived key");
@@ -114,7 +116,7 @@ public class AESDecrypter implements Decrypter {
         mac.init(macKey);
     }
 
-    public int decryptData(byte[] buff, int start, int len) throws ZipException {
+    public int decode(byte[] buf, int start, int len) throws ZipException {
 
         if (aesEngine == null) {
             throw new ZipException("AES not initialized properly");
@@ -126,12 +128,12 @@ public class AESDecrypter implements Decrypter {
                 loopCount = (j + InternalZipConstants.AES_BLOCK_SIZE <= (start + len)) ?
                             InternalZipConstants.AES_BLOCK_SIZE : ((start + len) - j);
 
-                mac.update(buff, j, loopCount);
+                mac.update(buf, j, loopCount);
                 Raw.prepareBuffAESIVBytes(iv, nonce, InternalZipConstants.AES_BLOCK_SIZE);
                 aesEngine.processBlock(iv, counterBlock);
 
                 for (int k = 0; k < loopCount; k++) {
-                    buff[j + k] = (byte)(buff[j + k] ^ counterBlock[k]);
+                    buf[j + k] = (byte)(buf[j + k] ^ counterBlock[k]);
                 }
 
                 nonce++;
@@ -146,8 +148,8 @@ public class AESDecrypter implements Decrypter {
         }
     }
 
-    public int decryptData(byte[] buff) throws ZipException {
-        return decryptData(buff, 0, buff.length);
+    public int decode(byte[] buf) throws ZipException {
+        return decode(buf, 0, buf.length);
     }
 
     private byte[] deriveKey(byte[] salt, char[] password) throws ZipException {

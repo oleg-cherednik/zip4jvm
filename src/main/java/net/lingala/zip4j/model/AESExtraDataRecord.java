@@ -41,16 +41,20 @@ public class AESExtraDataRecord {
     // size:2 - signature (0x9901)
     private final short signature = SIGNATURE;
     // size:2
+    @Builder.Default
     private int dataSize = ExtraField.NO_DATA;
     // size:2
+    @Builder.Default
     private int versionNumber = ExtraField.NO_DATA;
     // size:2
     private String vendor;
     // size:1
     @NonNull
+    @Builder.Default
     private AESStrength aesStrength = AESStrength.NONE;
     // size:2
     @NonNull
+    @Builder.Default
     private CompressionMethod compressionMethod = CompressionMethod.STORE;
 
     // TODO should be checked on set

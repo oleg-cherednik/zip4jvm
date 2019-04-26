@@ -29,7 +29,7 @@ import net.lingala.zip4j.util.Raw;
 import java.io.IOException;
 import java.util.Random;
 
-public class AESEncryptor implements Encryptor {
+public class AESEncoder implements Encoder {
 
     private char[] password;
     private AESStrength keyStrength;
@@ -54,7 +54,7 @@ public class AESEncryptor implements Encryptor {
     private byte[] iv;
     private byte[] counterBlock;
 
-    public AESEncryptor(char[] password, AESStrength keyStrength) throws ZipException {
+    public AESEncoder(char[] password, AESStrength keyStrength) throws ZipException {
         this.password = password;
         this.keyStrength = keyStrength;
         this.finished = false;
@@ -108,7 +108,7 @@ public class AESEncryptor implements Encryptor {
     }
 
     @Override
-    public void encrypt(byte[] buff, int start, int len) throws ZipException {
+    public void encode(byte[] buff, int start, int len) throws ZipException {
 
         if (finished) {
             // A non 16 byte block has already been passed to encrypter

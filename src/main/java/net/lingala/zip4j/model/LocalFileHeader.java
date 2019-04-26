@@ -63,12 +63,7 @@ public class LocalFileHeader {
     @NonNull
     private ExtraField extraField = ExtraField.NULL;
 
-    // ----
-
     private long offs;
-    private char[] password;
-    private boolean writeComprSizeInZip64ExtraRecord;
-    private byte[] crcBuff;
 
     @NonNull
     public byte[] getFileName(@NonNull Charset charset) {

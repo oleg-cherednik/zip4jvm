@@ -16,7 +16,7 @@
 
 package net.lingala.zip4j.io;
 
-import net.lingala.zip4j.crypto.AESDecrypter;
+import net.lingala.zip4j.crypto.AESDecoder;
 import net.lingala.zip4j.engine.UnzipEngine;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.Encryption;
@@ -81,7 +81,7 @@ public class PartInputStream extends InputStream {
             }
         }
 
-        if (unzipEngine.getDecrypter() instanceof AESDecrypter) {
+        if (unzipEngine.getDecoder() instanceof AESDecoder) {
             if (bytesRead + len < length) {
                 if (len % 16 != 0) {
                     len = len - (len % 16);
@@ -102,9 +102,9 @@ public class PartInputStream extends InputStream {
         }
 
         if (count > 0) {
-            if (unzipEngine.getDecrypter() != null) {
+            if (unzipEngine.getDecoder() != null) {
                 try {
-                    unzipEngine.getDecrypter().decryptData(b, off, count);
+                    unzipEngine.getDecoder().decode(b, off, count);
                 } catch(ZipException e) {
                     throw new IOException(e.getMessage());
                 }
@@ -121,10 +121,10 @@ public class PartInputStream extends InputStream {
     protected void checkAndReadAESMacBytes() throws IOException {
         if (!isAes())
             return;
-        if (unzipEngine.getDecrypter() == null || !(unzipEngine.getDecrypter() instanceof AESDecrypter))
+        if (unzipEngine.getDecoder() == null || !(unzipEngine.getDecoder() instanceof AESDecoder))
             return;
 
-        if (((AESDecrypter)unzipEngine.getDecrypter()).getStoredMac() != null) {
+        if (((AESDecoder)unzipEngine.getDecoder()).getStoredMac() != null) {
             //Stored mac already set
             return;
         }
@@ -142,7 +142,7 @@ public class PartInputStream extends InputStream {
             }
         }
 
-        ((AESDecrypter)unzipEngine.getDecrypter()).setStoredMac(macBytes);
+        ((AESDecoder)unzipEngine.getDecoder()).setStoredMac(macBytes);
     }
 
     @Override

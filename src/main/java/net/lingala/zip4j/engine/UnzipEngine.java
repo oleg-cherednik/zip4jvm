@@ -19,8 +19,8 @@ package net.lingala.zip4j.engine;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.core.readers.LocalFileHeaderReader;
-import net.lingala.zip4j.crypto.AESDecrypter;
-import net.lingala.zip4j.crypto.Decrypter;
+import net.lingala.zip4j.crypto.AESDecoder;
+import net.lingala.zip4j.crypto.Decoder;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.InflaterInputStream;
 import net.lingala.zip4j.io.PartInputStream;
@@ -68,7 +68,7 @@ public class UnzipEngine {
     private LocalFileHeader localFileHeader;
 
     private int currSplitFileCounter;
-    private Decrypter decrypter;
+    private Decoder decoder;
 
     private final Function<CentralDirectory.FileHeader, CentralDirectory.FileHeader> setPassword =
             new Function<CentralDirectory.FileHeader, CentralDirectory.FileHeader>() {
@@ -128,21 +128,20 @@ public class UnzipEngine {
             LittleEndianRandomAccessFile in = openFile(fileHeader);
             LocalFileHeader localFileHeader = readLocalFileHeader(fileHeader);
             this.localFileHeader = localFileHeader;
-            decrypter = localFileHeader.getEncryption().createDecrypter(in, fileHeader, localFileHeader);
+            decoder = localFileHeader.getEncryption().createDecrypter(in, fileHeader, localFileHeader);
 
             long comprSize = localFileHeader.getCompressedSize();
             long offs = localFileHeader.getOffs();
 
             if (localFileHeader.getEncryption() == Encryption.AES) {
-                if (decrypter instanceof AESDecrypter) {
-                    comprSize -= ((AESDecrypter)decrypter).getSaltLength() +
-                            ((AESDecrypter)decrypter).getPasswordVerifierLength() + 10;
-                    offs += ((AESDecrypter)decrypter).getSaltLength() +
-                            ((AESDecrypter)decrypter).getPasswordVerifierLength();
-                } else {
+                if (decoder instanceof AESDecoder) {
+                    comprSize -= ((AESDecoder)decoder).getSaltLength() +
+                            ((AESDecoder)decoder).getPasswordVerifierLength() + 10;
+                    offs += ((AESDecoder)decoder).getSaltLength() +
+                            ((AESDecoder)decoder).getPasswordVerifierLength();
+                } else
                     throw new ZipException("invalid decryptor when trying to calculate " +
                             "compressed size for AES encrypted file: " + fileHeader.getFileName());
-                }
             } else if (localFileHeader.getEncryption() == Encryption.STANDARD) {
                 // TODO decrypter throws unsupported exception
                 comprSize -= InternalZipConstants.STD_DEC_HDR_SIZE;
@@ -167,9 +166,9 @@ public class UnzipEngine {
     public void checkCRC() throws ZipException {
         if (fileHeader != null) {
             if (fileHeader.getEncryption() == Encryption.AES) {
-                if (decrypter != null && decrypter instanceof AESDecrypter) {
-                    byte[] tmpMacBytes = ((AESDecrypter)decrypter).getCalculatedAuthenticationBytes();
-                    byte[] storedMac = ((AESDecrypter)decrypter).getStoredMac();
+                if (decoder != null && decoder instanceof AESDecoder) {
+                    byte[] tmpMacBytes = ((AESDecoder)decoder).getCalculatedAuthenticationBytes();
+                    byte[] storedMac = ((AESDecoder)decoder).getStoredMac();
                     byte[] calculatedMac = new byte[InternalZipConstants.AES_AUTH_LENGTH];
 
                     if (calculatedMac == null || storedMac == null) {
@@ -265,8 +264,8 @@ public class UnzipEngine {
         return fileHeader;
     }
 
-    public Decrypter getDecrypter() {
-        return decrypter;
+    public Decoder getDecoder() {
+        return decoder;
     }
 
     public ZipModel getZipModel() {

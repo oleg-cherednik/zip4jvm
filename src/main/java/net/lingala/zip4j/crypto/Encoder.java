@@ -22,11 +22,12 @@ import net.lingala.zip4j.io.OutputStreamDecorator;
 import java.io.IOException;
 
 @SuppressWarnings("MethodCanBeVariableArityMethod")
-public interface Encryptor {
+public interface Encoder {
 
-    Encryptor NULL = new Encryptor() {
+    // TODO should nobe here
+    Encoder NULL = new Encoder() {
         @Override
-        public void encrypt(byte[] buf, int offs, int len) throws ZipException {
+        public void encode(byte[] buf, int offs, int len) {
         }
 
         @Override
@@ -34,11 +35,11 @@ public interface Encryptor {
         }
     };
 
-    default void encrypt(byte[] buf) throws ZipException {
-        encrypt(buf, 0, buf.length);
+    default void encode(byte[] buf) throws ZipException {
+        encode(buf, 0, buf.length);
     }
 
-    void encrypt(byte[] buf, int offs, int len) throws ZipException;
+    void encode(byte[] buf, int offs, int len);
 
     void write(OutputStreamDecorator out) throws IOException;
 

@@ -37,12 +37,16 @@ public class Zip64ExtendedInfo {
     // size:2 - size of this "extra" block
     private int size;
     // size:8 - original uncompressed file size
+    @Builder.Default
     private long uncompressedSize = ExtraField.NO_DATA;
     // size:8 - size of compressed data
+    @Builder.Default
     private long compressedSize = ExtraField.NO_DATA;
     // size:8 - offset of local header record
+    @Builder.Default
     private long offsLocalHeaderRelative = ExtraField.NO_DATA;
     // size:4 - number of the disk on which  this file starts
+    @Builder.Default
     private int diskNumber = ExtraField.NO_DATA;
 
     public int getLength() {

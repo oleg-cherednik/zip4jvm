@@ -16,16 +16,16 @@
 
 package net.lingala.zip4j.crypto;
 
-import net.lingala.zip4j.exception.ZipException;
-
 /**
  * @author Oleg Cherednik
  * @since 22.03.2019
  */
-public interface Decrypter {
+public interface Decoder {
 
-    int decryptData(byte[] buff, int start, int len) throws ZipException;
+    default int decode(byte[] buf) {
+        return decode(buf, 0, buf.length);
+    }
 
-    int decryptData(byte[] buff) throws ZipException;
+    int decode(byte[] buf, int start, int len);
 
 }

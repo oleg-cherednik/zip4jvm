@@ -19,8 +19,8 @@ package net.lingala.zip4j.io;
 import lombok.NonNull;
 import net.lingala.zip4j.core.writers.ZipModelWriter;
 import net.lingala.zip4j.core.writers.LocalFileHeaderWriter;
-import net.lingala.zip4j.crypto.AESEncryptor;
-import net.lingala.zip4j.crypto.Encryptor;
+import net.lingala.zip4j.crypto.AESEncoder;
+import net.lingala.zip4j.crypto.Encoder;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.CompressionMethod;
@@ -54,7 +54,7 @@ public abstract class CipherOutputStream extends OutputStream {
     protected CentralDirectory.FileHeader fileHeader;
     private LocalFileHeader localFileHeader;
     @NonNull
-    private Encryptor encryptor = Encryptor.NULL;
+    private Encoder encoder = Encoder.NULL;
     protected ZipParameters parameters;
 
 
@@ -111,10 +111,10 @@ public abstract class CipherOutputStream extends OutputStream {
             fileHeader.setOffsLocalFileHeader(out.getOffsLocalHeaderRelative());
             new LocalFileHeaderWriter(localFileHeader, zipModel).write(out);
 
-            encryptor = parameters.getEncryption().createEncryptor(parameters, localFileHeader);
+            encoder = parameters.getEncryption().createEncryptor(parameters, localFileHeader);
             out.mark(MARK);
 
-            encryptor.write(out);
+            encoder.write(out);
             crc.reset();
         } catch(ZipException e) {
             throw e;
@@ -174,7 +174,7 @@ public abstract class CipherOutputStream extends OutputStream {
     }
 
     private void encryptAndWrite(byte[] buf, int offs, int len) throws IOException {
-        encryptor.encrypt(buf, offs, len);
+        encoder.encode(buf, offs, len);
         out.writeBytes(buf, offs, len);
     }
 
@@ -185,8 +185,8 @@ public abstract class CipherOutputStream extends OutputStream {
         }
 
         if (parameters.getEncryption() == Encryption.AES) {
-            if (encryptor instanceof AESEncryptor) {
-                out.writeBytes(((AESEncryptor)encryptor).getFinalMac());
+            if (encoder instanceof AESEncoder) {
+                out.writeBytes(((AESEncoder)encoder).getFinalMac());
             } else
                 throw new ZipException("invalid encryption for AES encrypted file");
         }
@@ -220,7 +220,7 @@ public abstract class CipherOutputStream extends OutputStream {
 
         crc.reset();
         out.mark(MARK);
-        encryptor = Encryptor.NULL;
+        encoder = Encoder.NULL;
         totalBytesRead = 0;
     }
 
