@@ -39,7 +39,7 @@ public enum Encryption {
         @Override
         public Decrypter createDecrypter(LittleEndianRandomAccessFile in, CentralDirectory.FileHeader fileHeader, LocalFileHeader localFileHeader)
                 throws IOException {
-            in.seek(localFileHeader.getOffsetStartOfData());
+            in.seek(localFileHeader.getOffs());
             return new StandardDecrypter(fileHeader, in.readBytes(InternalZipConstants.STD_DEC_HDR_SIZE));
         }
 
@@ -60,11 +60,11 @@ public enum Encryption {
         }
 
         private byte[] getSalt(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader) throws IOException {
-            if (localFileHeader.getAesExtraDataRecord() == AESExtraDataRecord.NULL)
+            if (localFileHeader.getExtraField().getAesExtraDataRecord() == AESExtraDataRecord.NULL)
                 return null;
 
-            in.seek(localFileHeader.getOffsetStartOfData());
-            return in.readBytes(localFileHeader.getAesExtraDataRecord().getAesStrength().getSaltLength());
+            in.seek(localFileHeader.getOffs());
+            return in.readBytes(localFileHeader.getExtraField().getAesExtraDataRecord().getAesStrength().getSaltLength());
         }
 
         @Override

@@ -16,7 +16,10 @@
 
 package net.lingala.zip4j.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 import net.lingala.zip4j.exception.ZipException;
@@ -26,11 +29,14 @@ import java.nio.charset.Charset;
 
 @Getter
 @Setter
-@SuppressWarnings("NewClassNamingConvention")
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder(toBuilder = true)
 public class AESExtraDataRecord {
 
     public static final short SIGNATURE = (short)0x9901;
     public static final int SIZE = 2 + 2 + 2 + 2 + 1 + 2;   // size:11
+    public static final int SIZE_FIELD = 2 + 2; // 4 bytes: signature + size
 
     // size:2 - signature (0x9901)
     private final short signature = SIGNATURE;

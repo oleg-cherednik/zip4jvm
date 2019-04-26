@@ -20,6 +20,7 @@ import lombok.experimental.UtilityClass;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.CentralDirectory;
+import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.Zip64EndCentralDirectoryLocator;
 import net.lingala.zip4j.model.Zip64ExtendedInfo;
 import org.apache.commons.lang.StringUtils;
@@ -76,7 +77,7 @@ public class ZipUtils {
     public static long[] getAllHeaderSignatures() {
         long[] allSigs = new long[11];
 
-        allSigs[0] = InternalZipConstants.LOCSIG;
+        allSigs[0] = LocalFileHeader.SIGNATURE;
         allSigs[1] = InternalZipConstants.EXTSIG;
         allSigs[2] = CentralDirectory.FileHeader.SIGNATURE;
         allSigs[3] = InternalZipConstants.ENDSIG;

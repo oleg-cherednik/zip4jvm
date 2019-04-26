@@ -19,14 +19,13 @@ package net.lingala.zip4j.model;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import net.lingala.zip4j.util.InternalZipConstants;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.nio.charset.Charset;
-import java.util.Collections;
-import java.util.Map;
 
 /**
+ * see 4.3.7
+ *
  * @author Oleg Cherednik
  * @since 12.03.2019
  */
@@ -34,8 +33,10 @@ import java.util.Map;
 @Setter
 public class LocalFileHeader {
 
+    public static final int SIGNATURE = 0x04034B50;
+
     // size:4 - signature (0x04034b50)
-    private final int signature = InternalZipConstants.LOCSIG;
+    private final int signature = SIGNATURE;
     // size:2 - version needed to extractEntries
     private int versionToExtract;
     // size:2 - general purpose bit flag
@@ -55,21 +56,17 @@ public class LocalFileHeader {
     // size:2 - file name length (n)
 //    private int fileNameLength;
     // size:2 - extra field length (m)
-    private int extraFieldLength;
+//    private int extraFieldLength;
     // size:n - file name
     private String fileName;
     // size:m - extra field
     @NonNull
-    private Map<Short, ExtraDataRecord> extraDataRecords = Collections.emptyMap();
+    private ExtraField extraField = ExtraField.NULL;
 
     // ----
 
-    private long offsetStartOfData;
+    private long offs;
     private char[] password;
-    @NonNull
-    private Zip64ExtendedInfo zip64ExtendedInfo = Zip64ExtendedInfo.NULL;
-    @NonNull
-    private AESExtraDataRecord aesExtraDataRecord = AESExtraDataRecord.NULL;
     private boolean writeComprSizeInZip64ExtraRecord;
     private byte[] crcBuff;
 
@@ -78,33 +75,9 @@ public class LocalFileHeader {
         return fileName != null ? fileName.getBytes(charset) : ArrayUtils.EMPTY_BYTE_ARRAY;
     }
 
-    public short getExtraFileLength(ZipModel zipModel) {
-        short extraFieldLength = 0;
-
-        if (zipModel.isZip64())
-            extraFieldLength += 20;
-        if (aesExtraDataRecord != AESExtraDataRecord.NULL)
-            extraFieldLength += 11;
-
-        return extraFieldLength;
-    }
-
-    public void setZip64ExtendedInfo(@NonNull Zip64ExtendedInfo info) {
-        zip64ExtendedInfo = info;
-
-        if (info != Zip64ExtendedInfo.NULL) {
-            uncompressedSize = info.getUncompressedSize() != ExtraField.NO_DATA ? info.getUncompressedSize() : uncompressedSize;
-            compressedSize = info.getCompressedSize() != ExtraField.NO_DATA ? info.getCompressedSize() : uncompressedSize;
-        }
-    }
-
-    public void setAesExtraDataRecord(@NonNull AESExtraDataRecord record) {
-        aesExtraDataRecord = record;
-        generalPurposeFlag.setEncrypted(getEncryption() != Encryption.OFF);
-    }
-
-    public ExtraDataRecord getExtraDataRecordByHeader(short header) {
-        return extraDataRecords.get(header);
+    public void setExtraField(@NonNull ExtraField extraField) {
+        this.extraField = extraField;
+        generalPurposeFlag.setEncrypted(isEncrypted());
     }
 
     public void setGeneralPurposeFlag(short data) {
@@ -112,8 +85,12 @@ public class LocalFileHeader {
         generalPurposeFlag.setEncrypted(getEncryption() != Encryption.OFF);
     }
 
+    public boolean isEncrypted() {
+        return getEncryption() != Encryption.OFF;
+    }
+
     public Encryption getEncryption() {
-        if (aesExtraDataRecord != AESExtraDataRecord.NULL)
+        if (extraField.getAesExtraDataRecord() != AESExtraDataRecord.NULL)
             return Encryption.AES;
         if (generalPurposeFlag.isStrongEncryption())
             return Encryption.STRONG;

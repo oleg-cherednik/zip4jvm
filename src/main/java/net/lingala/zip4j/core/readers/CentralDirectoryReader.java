@@ -68,7 +68,7 @@ final class CentralDirectoryReader {
         boolean compressedSize = (fileHeader.getCompressedSize() & 0xFFFF) == 0xFFFF;
         boolean offs = (fileHeader.getOffsLocalFileHeader() & 0xFFFF) == 0xFFFF;
         boolean diskNumber = (fileHeader.getDiskNumber() & 0xFFFF) == 0xFFFF;
-        fileHeader.setExtraField(new ExtraFieldReader(extraFieldLength, uncompressedSize, compressedSize, offs, diskNumber).read(in, null));
+        fileHeader.setExtraField(new ExtraFieldReader(extraFieldLength, uncompressedSize, compressedSize, offs, diskNumber).read(in));
         fileHeader.setFileComment(in.readString(fileCommentLength));
 
         return fileHeader;

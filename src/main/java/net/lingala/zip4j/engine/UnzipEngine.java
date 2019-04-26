@@ -131,7 +131,7 @@ public class UnzipEngine {
             decrypter = localFileHeader.getEncryption().createDecrypter(in, fileHeader, localFileHeader);
 
             long comprSize = localFileHeader.getCompressedSize();
-            long offs = localFileHeader.getOffsetStartOfData();
+            long offs = localFileHeader.getOffs();
 
             if (localFileHeader.getEncryption() == Encryption.AES) {
                 if (decrypter instanceof AESDecrypter) {

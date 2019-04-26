@@ -16,11 +16,17 @@
 
 package net.lingala.zip4j.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder(toBuilder = true)
 public class Zip64ExtendedInfo {
 
     public static final short SIGNATURE = 0x0001;

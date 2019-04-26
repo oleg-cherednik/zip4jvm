@@ -130,6 +130,7 @@ public class CentralDirectory {
         // size:n - file name
         private String fileName;
         // size:m - extra field
+        @NonNull
         private ExtraField extraField = ExtraField.NULL;
         // size:k - extra field
         private String fileComment;

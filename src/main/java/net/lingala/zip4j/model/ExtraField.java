@@ -27,6 +27,18 @@ public class ExtraField {
         return zip64ExtendedInfo.getLength() + aesExtraDataRecord.getLength();
     }
 
+    @NonNull
+    public ExtraField deepCopy() {
+        ExtraField res = new ExtraField();
+
+        if (zip64ExtendedInfo != Zip64ExtendedInfo.NULL)
+            res.setZip64ExtendedInfo(zip64ExtendedInfo.toBuilder().build());
+        if (aesExtraDataRecord != AESExtraDataRecord.NULL)
+            res.setAesExtraDataRecord(aesExtraDataRecord.toBuilder().build());
+
+        return res;
+    }
+
     public static final ExtraField NULL = new ExtraField() {
         @Override
         public void setZip64ExtendedInfo(@NonNull Zip64ExtendedInfo zip64ExtendedInfo) {
@@ -37,7 +49,11 @@ public class ExtraField {
         public void setAesExtraDataRecord(@NonNull AESExtraDataRecord aesExtraDataRecord) {
             throw new NullPointerException("Null object modification: " + getClass().getSimpleName());
         }
-    };
 
+        @Override
+        public ExtraField deepCopy() {
+            return NULL;
+        }
+    };
 
 }

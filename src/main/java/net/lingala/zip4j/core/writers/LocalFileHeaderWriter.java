@@ -45,7 +45,7 @@ public final class LocalFileHeaderWriter {
         byte[] fileName = localFileHeader.getFileName(zipModel.getCharset());
 
         out.writeWord((short)fileName.length);
-        out.writeWord(localFileHeader.getExtraFileLength(zipModel));
+        out.writeWord((short)localFileHeader.getExtraField().getLength());
         out.writeBytes(fileName);
 
         if (zipModel.isZip64()) {
@@ -55,7 +55,7 @@ public final class LocalFileHeaderWriter {
             out.writeBytes(new byte[8]);
         }
 
-        new AESExtraDataRecordWriter(localFileHeader.getAesExtraDataRecord(), zipModel.getCharset()).write(out);
+        new ExtraFieldWriter(localFileHeader.getExtraField(), zipModel.getCharset()).write(out);
     }
 
     public void writeExtended(@NonNull OutputStreamDecorator out) throws IOException {
