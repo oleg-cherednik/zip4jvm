@@ -23,6 +23,8 @@ final class EndCentralDirectoryWriter {
     private final Charset charset;
 
     public void write(@NonNull OutputStreamDecorator out) throws IOException {
+        byte[] comment = dir.getComment(charset);
+
         out.writeDword(dir.getSignature());
         out.writeWord((short)dir.getDiskNumber());
         out.writeWord((short)dir.getStartDiskNumber());
@@ -30,8 +32,6 @@ final class EndCentralDirectoryWriter {
         out.writeWord((short)dir.getDiskEntries());
         out.writeDword(dir.getSize());
         out.writeDword(Math.min(dir.getOffs(), InternalZipConstants.ZIP_64_LIMIT));
-
-        byte[] comment = dir.getComment(charset);
         out.writeWord((short)ArrayUtils.getLength(comment));
         out.writeBytes(comment);
     }

@@ -4,12 +4,10 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.io.OutputStreamDecorator;
 import net.lingala.zip4j.model.CentralDirectory;
-import net.lingala.zip4j.model.ExtraField;
-import net.lingala.zip4j.model.Zip64ExtendedInfo;
-import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  * @author Oleg Cherednik
@@ -21,7 +19,7 @@ public final class CentralDirectoryWriter {
     @NonNull
     private final CentralDirectory dir;
     @NonNull
-    private final ZipModel zipModel;
+    private final Charset charset;
 
     public void write(@NonNull OutputStreamDecorator out) throws IOException {
         writeFileHeaders(out);
@@ -34,10 +32,8 @@ public final class CentralDirectoryWriter {
     }
 
     private void writeFileHeader(CentralDirectory.FileHeader fileHeader, OutputStreamDecorator out) throws IOException {
-        updateZip64(fileHeader);
-
-        byte[] fileName = fileHeader.getFileName(zipModel.getCharset());
-        byte[] fileComment = fileHeader.getFileComment(zipModel.getCharset());
+        byte[] fileName = fileHeader.getFileName(charset);
+        byte[] fileComment = fileHeader.getFileComment(charset);
 
         out.writeDword(fileHeader.getSignature());
         out.writeWord(fileHeader.getVersionMadeBy());
@@ -56,30 +52,8 @@ public final class CentralDirectoryWriter {
         out.writeBytes(fileHeader.getExternalFileAttributes() != null ? fileHeader.getExternalFileAttributes() : new byte[4]);
         out.writeLongAsInt(fileHeader.isWriteZip64OffsetLocalHeader() ? InternalZipConstants.ZIP_64_LIMIT : fileHeader.getOffsLocalFileHeader());
         out.writeBytes(fileName);
-        new ExtraFieldWriter(fileHeader.getExtraField(), zipModel.getCharset()).write(out);
+        new ExtraFieldWriter(fileHeader.getExtraField(), charset).write(out);
         out.writeBytes(fileComment);
-    }
-
-    // TODO should be updated on the fly
-    @Deprecated
-    private void updateZip64(CentralDirectory.FileHeader fileHeader) {
-        if (fileHeader.isWriteZip64FileSize() || fileHeader.isWriteZip64OffsetLocalHeader())
-            zipModel.zip64();
-
-//        if (fileHeader.getExtraField() == ExtraField.NULL)
-//            fileHeader.setExtraField(new ExtraField());
-//        if (fileHeader.getExtraField().getZip64ExtendedInfo() == )
-//            fileHeader.getExtraField().setZip64ExtendedInfo(new Zip64ExtendedInfo());
-
-        // TODO move it before
-        Zip64ExtendedInfo info = fileHeader.getExtraField().getZip64ExtendedInfo();
-
-        if (info != Zip64ExtendedInfo.NULL) {
-            info.setSize(info.getLength() - Zip64ExtendedInfo.SIZE_FIELD);
-            info.setUncompressedSize(fileHeader.isWriteZip64FileSize() ? fileHeader.getUncompressedSize() : ExtraField.NO_DATA);
-            info.setCompressedSize(fileHeader.isWriteZip64FileSize() ? fileHeader.getCompressedSize() : ExtraField.NO_DATA);
-            info.setOffsLocalHeaderRelative(fileHeader.isWriteZip64OffsetLocalHeader() ? fileHeader.getOffsLocalFileHeader() : ExtraField.NO_DATA);
-        }
     }
 
 }
