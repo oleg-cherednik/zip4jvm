@@ -23,20 +23,8 @@ public class ExtraField {
         return zip64ExtendedInfo == null && aesExtraDataRecord == null;
     }
 
-    public static short getExtraFieldLength(CentralDirectory.FileHeader fileHeader) {
-        int extraFieldLength = 0;
-
-        if (fileHeader.isWriteZip64FileSize())
-            extraFieldLength += 16;
-        if (fileHeader.isWriteZip64OffsetLocalHeader())
-            extraFieldLength += 8;
-
-        if (extraFieldLength != 0)
-            extraFieldLength += 4;
-
-        extraFieldLength += fileHeader.getExtraField().getAesExtraDataRecord() != AESExtraDataRecord.NULL ? AESExtraDataRecord.SIZE : 0;
-
-        return (short)extraFieldLength;
+    public int getLength() {
+        return zip64ExtendedInfo.getLength() + aesExtraDataRecord.getLength();
     }
 
     public static final ExtraField NULL = new ExtraField() {

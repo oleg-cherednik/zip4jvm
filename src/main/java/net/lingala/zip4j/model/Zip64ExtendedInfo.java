@@ -24,6 +24,7 @@ import lombok.Setter;
 public class Zip64ExtendedInfo {
 
     public static final short SIGNATURE = 0x0001;
+    public static final int SIZE_FIELD = 2 + 2; // 4 bytes: signature + size
 
     // size:2 - tag for this "extra" block type (ZIP64 = 0x001)
     private final short signature = SIGNATURE;
@@ -37,6 +38,16 @@ public class Zip64ExtendedInfo {
     private long offsLocalHeaderRelative = ExtraField.NO_DATA;
     // size:4 - number of the disk on which  this file starts
     private int diskNumber = ExtraField.NO_DATA;
+
+    public int getLength() {
+        int length = 0;
+
+        length += uncompressedSize != ExtraField.NO_DATA ? 8 : 0;
+        length += compressedSize != ExtraField.NO_DATA ? 8 : 0;
+        length += offsLocalHeaderRelative != ExtraField.NO_DATA ? 8 : 0;
+
+        return length != 0 ? length + SIZE_FIELD : 0;
+    }
 
     public static final Zip64ExtendedInfo NULL = new Zip64ExtendedInfo() {
 
@@ -63,6 +74,11 @@ public class Zip64ExtendedInfo {
         @Override
         public void setDiskNumber(int diskNumber) {
             throw new NullPointerException("Null object modification: " + getClass().getSimpleName());
+        }
+
+        @Override
+        public int getLength() {
+            return 0;
         }
     };
 }

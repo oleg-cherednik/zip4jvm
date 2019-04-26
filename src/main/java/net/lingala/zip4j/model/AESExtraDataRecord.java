@@ -57,6 +57,10 @@ public class AESExtraDataRecord {
         return buf;
     }
 
+    public int getLength() {
+        return SIZE;
+    }
+
     public static final AESExtraDataRecord NULL = new AESExtraDataRecord() {
         @Override
         public void setDataSize(int dataSize) {
@@ -81,6 +85,11 @@ public class AESExtraDataRecord {
         @Override
         public void setCompressionMethod(CompressionMethod compressionMethod) {
             throw new NullPointerException("Null object modification: " + getClass().getSimpleName());
+        }
+
+        @Override
+        public int getLength() {
+            return 0;
         }
     };
 

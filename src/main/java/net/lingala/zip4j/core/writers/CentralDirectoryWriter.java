@@ -49,7 +49,7 @@ public final class CentralDirectoryWriter {
         out.writeDword(fileHeader.isWriteZip64FileSize() ? InternalZipConstants.ZIP_64_LIMIT : fileHeader.getCompressedSize());
         out.writeDword(fileHeader.isWriteZip64FileSize() ? InternalZipConstants.ZIP_64_LIMIT : fileHeader.getUncompressedSize());
         out.writeShort((short)fileName.length);
-        out.writeWord(ExtraField.getExtraFieldLength(fileHeader));
+        out.writeWord((short)fileHeader.getExtraField().getLength());
         out.writeShort((short)fileComment.length);
         out.writeShort((short)fileHeader.getDiskNumber());
         out.writeBytes(fileHeader.getInternalFileAttributes() != null ? fileHeader.getInternalFileAttributes() : new byte[2]);
@@ -66,26 +66,19 @@ public final class CentralDirectoryWriter {
         if (fileHeader.isWriteZip64FileSize() || fileHeader.isWriteZip64OffsetLocalHeader())
             zipModel.zip64();
 
-//        if (fileHeader.getExtraField() == null)
+//        if (fileHeader.getExtraField() == ExtraField.NULL)
 //            fileHeader.setExtraField(new ExtraField());
-//        if (fileHeader.getExtraField().getZip64ExtendedInfo() == null)
+//        if (fileHeader.getExtraField().getZip64ExtendedInfo() == )
 //            fileHeader.getExtraField().setZip64ExtendedInfo(new Zip64ExtendedInfo());
 
         // TODO move it before
         Zip64ExtendedInfo info = fileHeader.getExtraField().getZip64ExtendedInfo();
 
         if (info != Zip64ExtendedInfo.NULL) {
-            short dataSize = 0;
-
-            if (fileHeader.isWriteZip64FileSize())
-                dataSize += 16;
-            if (fileHeader.isWriteZip64OffsetLocalHeader())
-                dataSize += 8;
-
-            info.setSize(dataSize);
-            info.setUncompressedSize(fileHeader.isWriteZip64FileSize() ? fileHeader.getUncompressedSize() : -1);
-            info.setCompressedSize(fileHeader.isWriteZip64FileSize() ? fileHeader.getCompressedSize() : -1);
-            info.setOffsLocalHeaderRelative(fileHeader.isWriteZip64OffsetLocalHeader() ? fileHeader.getOffsLocalFileHeader() : -1);
+            info.setSize(info.getLength() - Zip64ExtendedInfo.SIZE_FIELD);
+            info.setUncompressedSize(fileHeader.isWriteZip64FileSize() ? fileHeader.getUncompressedSize() : ExtraField.NO_DATA);
+            info.setCompressedSize(fileHeader.isWriteZip64FileSize() ? fileHeader.getCompressedSize() : ExtraField.NO_DATA);
+            info.setOffsLocalHeaderRelative(fileHeader.isWriteZip64OffsetLocalHeader() ? fileHeader.getOffsLocalFileHeader() : ExtraField.NO_DATA);
         }
     }
 
