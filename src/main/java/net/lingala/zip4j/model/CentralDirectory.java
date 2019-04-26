@@ -35,6 +35,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
+ * see 4.3.12
+ *
  * @author Oleg Cherednik
  * @since 05.03.2019
  */
