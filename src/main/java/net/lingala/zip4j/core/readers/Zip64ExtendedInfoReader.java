@@ -16,14 +16,14 @@ import java.io.IOException;
 @RequiredArgsConstructor
 final class Zip64ExtendedInfoReader {
 
-    private final short header;
+    private final short signature;
     private final boolean uncompressedSize;
     private final boolean compressedSize;
     private final boolean offs;
     private final boolean diskNumber;
 
     public Zip64ExtendedInfo read(@NonNull LittleEndianRandomAccessFile in) throws IOException {
-        if (header != Zip64ExtendedInfo.SIGNATURE)
+        if (signature != Zip64ExtendedInfo.SIGNATURE)
             return null;
 
         Zip64ExtendedInfo res = new Zip64ExtendedInfo();

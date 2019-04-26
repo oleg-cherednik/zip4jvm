@@ -61,6 +61,7 @@ public class CentralDirectoryBuilder {
 
     public LocalFileHeader createLocalFileHeader(@NonNull CentralDirectory.FileHeader fileHeader) throws ZipException {
         LocalFileHeader localFileHeader = new LocalFileHeader();
+
         localFileHeader.setVersionToExtract(fileHeader.getVersionToExtract());
         localFileHeader.setGeneralPurposeFlag(fileHeader.getGeneralPurposeFlag().getData());
         localFileHeader.setCompressionMethod(fileHeader.getCompressionMethod());
@@ -70,6 +71,7 @@ public class CentralDirectoryBuilder {
         localFileHeader.setAesExtraDataRecord(fileHeader.getAesExtraDataRecord());
         localFileHeader.setCrc32(fileHeader.getCrc32());
         localFileHeader.setCompressedSize(fileHeader.getCompressedSize());
+
         return localFileHeader;
     }
 

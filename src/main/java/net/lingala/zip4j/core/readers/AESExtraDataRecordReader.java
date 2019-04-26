@@ -16,10 +16,10 @@ import java.io.IOException;
 @RequiredArgsConstructor
 final class AESExtraDataRecordReader {
 
-    private final short header;
+    private final short signature;
 
     public AESExtraDataRecord read(@NonNull LittleEndianRandomAccessFile in) throws IOException {
-        if (header != AESExtraDataRecord.SIGNATURE)
+        if (signature != AESExtraDataRecord.SIGNATURE)
             return null;
 
         AESExtraDataRecord record = new AESExtraDataRecord();

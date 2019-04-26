@@ -27,7 +27,7 @@ public class Zip64ExtendedInfo {
     public static final int NO_DATA = -1;
 
     // size:2 - tag for this "extra" block type (ZIP64 = 0x001)
-    private final short header = SIGNATURE;
+    private final short signature = SIGNATURE;
     // size:2 - size of this "extra" block
     private int size;
     // size:8 - original uncompressed file size

@@ -3,8 +3,8 @@ package net.lingala.zip4j.core.writers;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.io.OutputStreamDecorator;
-import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.CentralDirectory;
+import net.lingala.zip4j.model.ExtraField;
 import net.lingala.zip4j.model.Zip64ExtendedInfo;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
@@ -49,7 +49,7 @@ public final class CentralDirectoryWriter {
         out.writeDword(fileHeader.isWriteZip64FileSize() ? InternalZipConstants.ZIP_64_LIMIT : fileHeader.getCompressedSize());
         out.writeDword(fileHeader.isWriteZip64FileSize() ? InternalZipConstants.ZIP_64_LIMIT : fileHeader.getUncompressedSize());
         out.writeShort((short)fileName.length);
-        out.writeWord(getExtraFieldLength(fileHeader));
+        out.writeWord(ExtraField.getExtraFieldLength(fileHeader));
         out.writeShort((short)fileComment.length);
         out.writeShort((short)fileHeader.getDiskNumber());
         out.writeBytes(fileHeader.getInternalFileAttributes() != null ? fileHeader.getInternalFileAttributes() : new byte[2]);
@@ -58,22 +58,6 @@ public final class CentralDirectoryWriter {
         out.writeBytes(fileName);
         new ExtraFieldWriter(fileHeader.getExtraField(), zipModel.getCharset()).write(out);
         out.writeBytes(fileComment);
-    }
-
-    private static short getExtraFieldLength(CentralDirectory.FileHeader fileHeader) {
-        int extraFieldLength = 0;
-
-        if (fileHeader.isWriteZip64FileSize())
-            extraFieldLength += 16;
-        if (fileHeader.isWriteZip64OffsetLocalHeader())
-            extraFieldLength += 8;
-
-        if (extraFieldLength != 0)
-            extraFieldLength += 4;
-
-        extraFieldLength += fileHeader.getAesExtraDataRecord() != null ? AESExtraDataRecord.SIZE : 0;
-
-        return (short)extraFieldLength;
     }
 
     // TODO should be updated on the fly
