@@ -52,9 +52,10 @@ final class ExtraFieldReader {
         return map.isEmpty() ? Collections.emptyMap() : map;
     }
 
+    @NonNull
     public ExtraField read(@NonNull LittleEndianRandomAccessFile in, CentralDirectory.FileHeader tmp) throws IOException {
         if (size <= 0)
-            return null;
+            return ExtraField.NULL;
 
         ExtraField extraField = new ExtraField();
         final long offsMax = in.getFilePointer() + size;
@@ -65,16 +66,16 @@ final class ExtraFieldReader {
             Zip64ExtendedInfo zip64 = new Zip64ExtendedInfoReader(signature, uncompressedSize, compressedSize, offs, diskNumber).read(in);
             AESExtraDataRecord aes = new AESExtraDataRecordReader(signature).read(in);
 
-            if (zip64 != null)
+            if (zip64 != Zip64ExtendedInfo.NULL)
                 extraField.setZip64ExtendedInfo(zip64);
-            else if (aes != null)
+            else if (aes != AESExtraDataRecord.NULL)
                 extraField.setAesExtraDataRecord(aes);
             else
                 // TODO do add skip instead
                 in.readBytes(in.readWord());
         }
 
-        return extraField.isEmpty() ? null : extraField;
+        return extraField.isEmpty() ? ExtraField.NULL : extraField;
     }
 
 }

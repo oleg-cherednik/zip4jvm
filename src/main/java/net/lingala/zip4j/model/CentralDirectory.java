@@ -130,23 +130,13 @@ public class CentralDirectory {
         // size:n - file name
         private String fileName;
         // size:m - extra field
-        private ExtraField extraField;
+        private ExtraField extraField = ExtraField.NULL;
         // size:k - extra field
         private String fileComment;
         private char[] password;
 
         public FileHeader(String fileName) {
             this.fileName = fileName;
-        }
-
-        @Deprecated
-        public Zip64ExtendedInfo getZip64ExtendedInfo() {
-            return extraField != null ? extraField.getZip64ExtendedInfo() : null;
-        }
-
-        @Deprecated
-        public AESExtraDataRecord getAesExtraDataRecord() {
-            return extraField != null ? extraField.getAesExtraDataRecord() : null;
         }
 
         @NonNull
@@ -168,28 +158,28 @@ public class CentralDirectory {
             return ZipUtils.isDirectory(fileName);
         }
 
-        public void setZip64ExtendedInfo(Zip64ExtendedInfo info) {
-            if (extraField == null)
+        public void setZip64ExtendedInfo(@NonNull Zip64ExtendedInfo info) {
+            if (extraField == ExtraField.NULL)
                 extraField = new ExtraField();
 
             extraField.setZip64ExtendedInfo(info);
 
-            if (info != null) {
-                uncompressedSize = info.getUncompressedSize() != Zip64ExtendedInfo.NO_DATA ? info.getUncompressedSize() : uncompressedSize;
-                compressedSize = info.getCompressedSize() != Zip64ExtendedInfo.NO_DATA ? info.getCompressedSize() : uncompressedSize;
-                offsLocalFileHeader = info.getOffsLocalHeaderRelative() != Zip64ExtendedInfo.NO_DATA ? info.getOffsLocalHeaderRelative()
-                                                                                                     : offsLocalFileHeader;
+            if (info != Zip64ExtendedInfo.NULL) {
+                uncompressedSize = info.getUncompressedSize() != ExtraField.NO_DATA ? info.getUncompressedSize() : uncompressedSize;
+                compressedSize = info.getCompressedSize() != ExtraField.NO_DATA ? info.getCompressedSize() : uncompressedSize;
+                offsLocalFileHeader = info.getOffsLocalHeaderRelative() != ExtraField.NO_DATA ? info.getOffsLocalHeaderRelative()
+                                                                                              : offsLocalFileHeader;
                 diskNumber = info.getDiskNumber() != -1 ? info.getDiskNumber() : diskNumber;
             }
         }
 
-        public void setExtraField(ExtraField extraField) {
+        public void setExtraField(@NonNull ExtraField extraField) {
             this.extraField = extraField;
             generalPurposeFlag.setEncrypted(isEncrypted());
         }
 
-        public void setAesExtraDataRecord(AESExtraDataRecord record) {
-            if (extraField == null)
+        public void setAesExtraDataRecord(@NonNull AESExtraDataRecord record) {
+            if (extraField == ExtraField.NULL)
                 extraField = new ExtraField();
             extraField.setAesExtraDataRecord(record);
             generalPurposeFlag.setEncrypted(isEncrypted());
@@ -209,7 +199,7 @@ public class CentralDirectory {
         }
 
         public Encryption getEncryption() {
-            if (extraField != null && extraField.getAesExtraDataRecord() != null)
+            if (extraField.getAesExtraDataRecord() != AESExtraDataRecord.NULL)
                 return Encryption.AES;
             if (generalPurposeFlag.isStrongEncryption())
                 return Encryption.STRONG;

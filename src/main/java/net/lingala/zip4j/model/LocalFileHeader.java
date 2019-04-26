@@ -66,8 +66,10 @@ public class LocalFileHeader {
 
     private long offsetStartOfData;
     private char[] password;
-    private Zip64ExtendedInfo zip64ExtendedInfo;
-    private AESExtraDataRecord aesExtraDataRecord;
+    @NonNull
+    private Zip64ExtendedInfo zip64ExtendedInfo = Zip64ExtendedInfo.NULL;
+    @NonNull
+    private AESExtraDataRecord aesExtraDataRecord = AESExtraDataRecord.NULL;
     private boolean writeComprSizeInZip64ExtraRecord;
     private byte[] crcBuff;
 
@@ -81,22 +83,22 @@ public class LocalFileHeader {
 
         if (zipModel.isZip64())
             extraFieldLength += 20;
-        if (aesExtraDataRecord != null)
+        if (aesExtraDataRecord != AESExtraDataRecord.NULL)
             extraFieldLength += 11;
 
         return extraFieldLength;
     }
 
-    public void setZip64ExtendedInfo(Zip64ExtendedInfo info) {
+    public void setZip64ExtendedInfo(@NonNull Zip64ExtendedInfo info) {
         zip64ExtendedInfo = info;
 
-        if (info != null) {
-            uncompressedSize = info.getUncompressedSize() != -1 ? info.getUncompressedSize() : uncompressedSize;
-            compressedSize = info.getCompressedSize() != -1 ? info.getCompressedSize() : uncompressedSize;
+        if (info != Zip64ExtendedInfo.NULL) {
+            uncompressedSize = info.getUncompressedSize() != ExtraField.NO_DATA ? info.getUncompressedSize() : uncompressedSize;
+            compressedSize = info.getCompressedSize() != ExtraField.NO_DATA ? info.getCompressedSize() : uncompressedSize;
         }
     }
 
-    public void setAesExtraDataRecord(AESExtraDataRecord record) {
+    public void setAesExtraDataRecord(@NonNull AESExtraDataRecord record) {
         aesExtraDataRecord = record;
         generalPurposeFlag.setEncrypted(getEncryption() != Encryption.OFF);
     }
@@ -111,7 +113,7 @@ public class LocalFileHeader {
     }
 
     public Encryption getEncryption() {
-        if (aesExtraDataRecord != null)
+        if (aesExtraDataRecord != AESExtraDataRecord.NULL)
             return Encryption.AES;
         if (generalPurposeFlag.isStrongEncryption())
             return Encryption.STRONG;

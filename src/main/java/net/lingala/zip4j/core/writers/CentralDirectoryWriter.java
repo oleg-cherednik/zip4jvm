@@ -72,9 +72,9 @@ public final class CentralDirectoryWriter {
 //            fileHeader.getExtraField().setZip64ExtendedInfo(new Zip64ExtendedInfo());
 
         // TODO move it before
-        Zip64ExtendedInfo info = fileHeader.getZip64ExtendedInfo();
+        Zip64ExtendedInfo info = fileHeader.getExtraField().getZip64ExtendedInfo();
 
-        if (info != null) {
+        if (info != Zip64ExtendedInfo.NULL) {
             short dataSize = 0;
 
             if (fileHeader.isWriteZip64FileSize())

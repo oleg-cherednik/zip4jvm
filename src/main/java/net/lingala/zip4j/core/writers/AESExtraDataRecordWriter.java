@@ -15,12 +15,13 @@ import java.nio.charset.Charset;
 @RequiredArgsConstructor
 final class AESExtraDataRecordWriter {
 
+    @NonNull
     private final AESExtraDataRecord record;
     @NonNull
     private final Charset charset;
 
     public void write(@NonNull OutputStreamDecorator out) throws IOException {
-        if (record == null)
+        if (record == AESExtraDataRecord.NULL)
             return;
 
         out.writeWord(record.getSignature());

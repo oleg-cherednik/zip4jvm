@@ -9,6 +9,7 @@ import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.GeneralPurposeFlag;
 import net.lingala.zip4j.model.LocalFileHeader;
+import net.lingala.zip4j.model.Zip64ExtendedInfo;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.InternalZipConstants;
@@ -52,7 +53,7 @@ public class CentralDirectoryBuilder {
         fileHeader.setInternalFileAttributes(null);
         fileHeader.setExternalFileAttributes(getExternalFileAttr());
         fileHeader.setOffsLocalFileHeader(0);
-        fileHeader.setZip64ExtendedInfo(null);
+        fileHeader.setZip64ExtendedInfo(Zip64ExtendedInfo.NULL);
         fileHeader.setAesExtraDataRecord(getAesExtraDataRecord(parameters.getEncryption()));
         fileHeader.setFileComment(null);
 
@@ -68,7 +69,7 @@ public class CentralDirectoryBuilder {
         localFileHeader.setLastModifiedTime(fileHeader.getLastModifiedTime());
         localFileHeader.setUncompressedSize(fileHeader.getUncompressedSize());
         localFileHeader.setFileName(fileHeader.getFileName());
-        localFileHeader.setAesExtraDataRecord(fileHeader.getAesExtraDataRecord());
+        localFileHeader.setAesExtraDataRecord(fileHeader.getExtraField().getAesExtraDataRecord());
         localFileHeader.setCrc32(fileHeader.getCrc32());
         localFileHeader.setCompressedSize(fileHeader.getCompressedSize());
 
@@ -152,9 +153,10 @@ public class CentralDirectoryBuilder {
         return new byte[] { (byte)attr, 0, 0, 0 };
     }
 
+    @NonNull
     private AESExtraDataRecord getAesExtraDataRecord(@NonNull Encryption encryption) {
         if (encryption != Encryption.AES)
-            return null;
+            return AESExtraDataRecord.NULL;
 
         AESExtraDataRecord aesDataRecord = new AESExtraDataRecord();
         aesDataRecord.setDataSize(7);

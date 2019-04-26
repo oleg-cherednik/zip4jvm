@@ -3,7 +3,6 @@ package net.lingala.zip4j.core.writers;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.io.OutputStreamDecorator;
-import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.Zip64ExtendedInfo;
 import net.lingala.zip4j.model.ZipModel;
@@ -43,7 +42,6 @@ public final class LocalFileHeaderWriter {
             localFileHeader.setWriteComprSizeInZip64ExtraRecord(false);
         }
 
-
         byte[] fileName = localFileHeader.getFileName(zipModel.getCharset());
 
         out.writeWord((short)fileName.length);
@@ -57,16 +55,7 @@ public final class LocalFileHeaderWriter {
             out.writeBytes(new byte[8]);
         }
 
-        if (localFileHeader.getAesExtraDataRecord() != null) {
-            AESExtraDataRecord aesExtraDataRecord = localFileHeader.getAesExtraDataRecord();
-
-            out.writeWord((short)aesExtraDataRecord.getSignature());
-            out.writeWord((short)aesExtraDataRecord.getDataSize());
-            out.writeWord((short)aesExtraDataRecord.getVersionNumber());
-            out.writeBytes(aesExtraDataRecord.getVendor().getBytes());
-            out.writeBytes(aesExtraDataRecord.getAesStrength().getValue());
-            out.writeWord(aesExtraDataRecord.getCompressionMethod().getValue());
-        }
+        new AESExtraDataRecordWriter(localFileHeader.getAesExtraDataRecord(), zipModel.getCharset()).write(out);
     }
 
     public void writeExtended(@NonNull OutputStreamDecorator out) throws IOException {

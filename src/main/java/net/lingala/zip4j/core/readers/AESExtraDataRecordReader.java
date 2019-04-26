@@ -18,9 +18,10 @@ final class AESExtraDataRecordReader {
 
     private final short signature;
 
+    @NonNull
     public AESExtraDataRecord read(@NonNull LittleEndianRandomAccessFile in) throws IOException {
         if (signature != AESExtraDataRecord.SIGNATURE)
-            return null;
+            return AESExtraDataRecord.NULL;
 
         AESExtraDataRecord record = new AESExtraDataRecord();
         record.setDataSize(in.readWord());

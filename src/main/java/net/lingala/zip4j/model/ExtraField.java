@@ -1,6 +1,7 @@
 package net.lingala.zip4j.model;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 
 /**
@@ -11,8 +12,12 @@ import lombok.Setter;
 @Setter
 public class ExtraField {
 
-    private Zip64ExtendedInfo zip64ExtendedInfo;
-    private AESExtraDataRecord aesExtraDataRecord;
+    public static final int NO_DATA = -1;
+
+    @NonNull
+    private Zip64ExtendedInfo zip64ExtendedInfo = Zip64ExtendedInfo.NULL;
+    @NonNull
+    private AESExtraDataRecord aesExtraDataRecord = AESExtraDataRecord.NULL;
 
     public boolean isEmpty() {
         return zip64ExtendedInfo == null && aesExtraDataRecord == null;
@@ -29,9 +34,22 @@ public class ExtraField {
         if (extraFieldLength != 0)
             extraFieldLength += 4;
 
-        extraFieldLength += fileHeader.getAesExtraDataRecord() != null ? AESExtraDataRecord.SIZE : 0;
+        extraFieldLength += fileHeader.getExtraField().getAesExtraDataRecord() != AESExtraDataRecord.NULL ? AESExtraDataRecord.SIZE : 0;
 
         return (short)extraFieldLength;
     }
+
+    public static final ExtraField NULL = new ExtraField() {
+        @Override
+        public void setZip64ExtendedInfo(@NonNull Zip64ExtendedInfo zip64ExtendedInfo) {
+            throw new NullPointerException("Null object modification: " + getClass().getSimpleName());
+        }
+
+        @Override
+        public void setAesExtraDataRecord(@NonNull AESExtraDataRecord aesExtraDataRecord) {
+            throw new NullPointerException("Null object modification: " + getClass().getSimpleName());
+        }
+    };
+
 
 }

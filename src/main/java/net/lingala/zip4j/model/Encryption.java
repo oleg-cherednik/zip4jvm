@@ -60,7 +60,7 @@ public enum Encryption {
         }
 
         private byte[] getSalt(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader) throws IOException {
-            if (localFileHeader.getAesExtraDataRecord() == null)
+            if (localFileHeader.getAesExtraDataRecord() == AESExtraDataRecord.NULL)
                 return null;
 
             in.seek(localFileHeader.getOffsetStartOfData());

@@ -2,19 +2,14 @@ package net.lingala.zip4j.core.readers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.lingala.zip4j.model.AESExtraDataRecord;
-import net.lingala.zip4j.model.AESStrength;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.CompressionMethod;
-import net.lingala.zip4j.model.ExtraDataRecord;
-import net.lingala.zip4j.util.LittleEndianDecorator;
 import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Oleg Cherednik
@@ -77,24 +72,6 @@ final class CentralDirectoryReader {
         fileHeader.setFileComment(in.readString(fileCommentLength));
 
         return fileHeader;
-    }
-
-    public static AESExtraDataRecord readAESExtraDataRecord(@NonNull Map<Short, ExtraDataRecord> records) throws IOException {
-        ExtraDataRecord record = records.get(AESExtraDataRecord.SIGNATURE);
-
-        if (record == null)
-            return null;
-
-        LittleEndianDecorator in = new LittleEndianDecorator(record.getData());
-
-        AESExtraDataRecord res = new AESExtraDataRecord();
-        res.setDataSize(record.getSizeOfData());
-        res.setVersionNumber(in.readShort());
-        res.setVendor(in.readString(2));
-        res.setAesStrength(AESStrength.parseByte(in.readByte()));
-        res.setCompressionMethod(CompressionMethod.parseValue(in.readShort()));
-
-        return res;
     }
 
     private void findHead(LittleEndianRandomAccessFile in) throws IOException {

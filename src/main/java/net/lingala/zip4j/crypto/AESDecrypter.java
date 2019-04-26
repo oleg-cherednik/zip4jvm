@@ -64,7 +64,7 @@ public class AESDecrypter implements Decrypter {
     private void init(byte[] salt, byte[] passwordVerifier) throws ZipException {
         AESExtraDataRecord aesExtraDataRecord = localFileHeader.getAesExtraDataRecord();
 
-        if (aesExtraDataRecord == null)
+        if (aesExtraDataRecord == AESExtraDataRecord.NULL)
             throw new ZipException("invalid aes extra data record - in init method of AESDecryptor");
 
         SALT_LENGTH = aesExtraDataRecord.getAesStrength().getSaltLength();

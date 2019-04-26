@@ -35,9 +35,9 @@ public class AESExtraDataRecord {
     // size:2 - signature (0x9901)
     private final short signature = SIGNATURE;
     // size:2
-    private int dataSize = -1;
+    private int dataSize = ExtraField.NO_DATA;
     // size:2
-    private int versionNumber = -1;
+    private int versionNumber = ExtraField.NO_DATA;
     // size:2
     private String vendor;
     // size:1
@@ -56,5 +56,32 @@ public class AESExtraDataRecord {
 
         return buf;
     }
+
+    public static final AESExtraDataRecord NULL = new AESExtraDataRecord() {
+        @Override
+        public void setDataSize(int dataSize) {
+            throw new NullPointerException("Null object modification: " + getClass().getSimpleName());
+        }
+
+        @Override
+        public void setVersionNumber(int versionNumber) {
+            throw new NullPointerException("Null object modification: " + getClass().getSimpleName());
+        }
+
+        @Override
+        public void setVendor(String vendor) {
+            throw new NullPointerException("Null object modification: " + getClass().getSimpleName());
+        }
+
+        @Override
+        public void setAesStrength(AESStrength aesStrength) {
+            throw new NullPointerException("Null object modification: " + getClass().getSimpleName());
+        }
+
+        @Override
+        public void setCompressionMethod(CompressionMethod compressionMethod) {
+            throw new NullPointerException("Null object modification: " + getClass().getSimpleName());
+        }
+    };
 
 }
