@@ -25,7 +25,7 @@ public final class LocalFileHeaderWriter {
     public void write(@NonNull OutputStreamDecorator out) throws IOException {
         out.writeDword(localFileHeader.getSignature());
         out.writeWord((short)localFileHeader.getVersionToExtract());
-        out.writeShort(localFileHeader.getGeneralPurposeFlag().getData());
+        out.writeWord(localFileHeader.getGeneralPurposeFlag().getData());
         out.writeWord(localFileHeader.getCompressionMethod().getValue());
         out.writeDword(localFileHeader.getLastModifiedTime());
         out.writeDword((int)localFileHeader.getCrc32());

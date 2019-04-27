@@ -65,7 +65,9 @@ public final class OutputStreamDecorator implements Closeable {
 
     // 2 bytes (16 bit)
     public void writeWord(short val) throws IOException {
-        writeShort(val);
+        Raw.writeShortLittleEndian(shortByte, 0, val);
+        delegate.write(shortByte);
+        offs += shortByte.length;
     }
 
     // 4 bytes (32 bit)
@@ -81,12 +83,6 @@ public final class OutputStreamDecorator implements Closeable {
         Raw.writeIntLittleEndian(intByte, 0, val);
         delegate.write(intByte);
         offs += intByte.length;
-    }
-
-    public void writeShort(short val) throws IOException {
-        Raw.writeShortLittleEndian(shortByte, 0, val);
-        delegate.write(shortByte);
-        offs += shortByte.length;
     }
 
     public void writeBytes(byte... buf) throws IOException {

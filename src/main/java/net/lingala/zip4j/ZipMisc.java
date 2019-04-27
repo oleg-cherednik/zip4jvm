@@ -6,6 +6,7 @@ import net.lingala.zip4j.core.writers.ZipModelWriter;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.NoSplitOutputStream;
 import net.lingala.zip4j.io.OutputStreamDecorator;
+import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.utils.CreateZipModelSup;
@@ -16,7 +17,6 @@ import org.apache.commons.io.IOUtils;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -114,7 +114,7 @@ public final class ZipMisc {
         }
     }
 
-    private static long[] copyAllParts(@NonNull OutputStream out, @NonNull ZipModel zipModel) throws IOException {
+    private static long[] copyAllParts(@NonNull SplitOutputStream out, @NonNull ZipModel zipModel) throws IOException {
         int noOfDisk = zipModel.getEndCentralDirectory().getDiskNumber();
         long[] fileSizeList = new long[noOfDisk + 1];
 

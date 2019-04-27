@@ -54,7 +54,7 @@ public class SplitOutputStream extends OutputStream {
         if (splitLength >= 0 && splitLength < InternalZipConstants.MIN_SPLIT_LENGTH)
             throw new ZipException("split length less than minimum allowed split length of " + InternalZipConstants.MIN_SPLIT_LENGTH + " Bytes");
 
-        raf = new RandomAccessFile(file.toFile(), InternalZipConstants.WRITE_MODE);
+        raf = new RandomAccessFile(file.toFile(), "rw");
         this.splitLength = splitLength;
         zipFile = file;
         currSplitFileCounter = 0;
@@ -75,20 +75,18 @@ public class SplitOutputStream extends OutputStream {
             startNextSplitFile();
             raf.write(buf, offs, len);
             bytesWrittenForThisPart = len;
-        } else if (bytesWrittenForThisPart + len > splitLength) {
-            if (isHeaderData(buf)) {
-                startNextSplitFile();
-                raf.write(buf, offs, len);
-                bytesWrittenForThisPart = len;
-            } else {
-                raf.write(buf, offs, (int)(splitLength - bytesWrittenForThisPart));
-                startNextSplitFile();
-                raf.write(buf, offs + (int)(splitLength - bytesWrittenForThisPart), (int)(len - (splitLength - bytesWrittenForThisPart)));
-                bytesWrittenForThisPart = len - (splitLength - bytesWrittenForThisPart);
-            }
-        } else {
+        } else if (bytesWrittenForThisPart + len <= splitLength) {
             raf.write(buf, offs, len);
             bytesWrittenForThisPart += len;
+        } else if (isHeaderData(buf)) {
+            startNextSplitFile();
+            raf.write(buf, offs, len);
+            bytesWrittenForThisPart = len;
+        } else {
+            raf.write(buf, offs, (int)(splitLength - bytesWrittenForThisPart));
+            startNextSplitFile();
+            raf.write(buf, offs + (int)(splitLength - bytesWrittenForThisPart), (int)(len - (splitLength - bytesWrittenForThisPart)));
+            bytesWrittenForThisPart = len - (splitLength - bytesWrittenForThisPart);
         }
     }
 
@@ -107,7 +105,7 @@ public class SplitOutputStream extends OutputStream {
         }
 
         zipFile = new File(zipFileName).toPath();
-        raf = new RandomAccessFile(zipFile.toFile(), InternalZipConstants.WRITE_MODE);
+        raf = new RandomAccessFile(zipFile.toFile(), "rw");
         currSplitFileCounter++;
     }
 
