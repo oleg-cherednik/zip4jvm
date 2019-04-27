@@ -55,8 +55,8 @@ public final class ZipModelWriter {
             locator.setTotNumberOfDiscs(out.getCurrSplitFileCounter() + 1);
         }
 
-        new Zip64EndCentralDirectoryWriter(zipModel.getZip64EndCentralDirectory()).write(out);
-        new Zip64EndCentralDirectoryLocatorWriter(zipModel.getZip64EndCentralDirectoryLocator()).write(out);
+        new Zip64EndCentralDirectoryWriter(zipModel.getZip64().getEndCentralDirectory()).write(out);
+        new Zip64EndCentralDirectoryLocatorWriter(zipModel.getZip64().getEndCentralDirectoryLocator()).write(out);
         new EndCentralDirectoryWriter(endCentralDirectory, zipModel.getCharset()).write(out);
     }
 
@@ -66,8 +66,9 @@ public final class ZipModelWriter {
         endCentralDirectory.setOffs(out.getFilePointer());
 
         if (zipModel.isZip64()) {
-            zipModel.getZip64EndCentralDirectoryLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(out.getCurrSplitFileCounter());
-            zipModel.getZip64EndCentralDirectoryLocator().setTotNumberOfDiscs(out.getCurrSplitFileCounter() + 1);
+            Zip64.EndCentralDirectoryLocator locator = zipModel.getZip64().getEndCentralDirectoryLocator();
+            locator.setNoOfDiskStartOfZip64EndOfCentralDirRec(out.getCurrSplitFileCounter());
+            locator.setTotNumberOfDiscs(out.getCurrSplitFileCounter() + 1);
         }
 
         endCentralDirectory.setSplitParts(out.getCurrSplitFileCounter());

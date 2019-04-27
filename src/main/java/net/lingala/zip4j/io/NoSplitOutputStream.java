@@ -1,6 +1,5 @@
 package net.lingala.zip4j.io;
 
-import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipModel;
 
 import java.io.FileNotFoundException;
@@ -12,7 +11,8 @@ import java.nio.file.Path;
  * @since 08.03.2019
  */
 public class NoSplitOutputStream extends SplitOutputStream {
-    public NoSplitOutputStream(Path file) throws FileNotFoundException, ZipException {
+
+    public NoSplitOutputStream(Path file) throws FileNotFoundException {
         super(file, ZipModel.NO_SPLIT);
     }
 
@@ -26,7 +26,7 @@ public class NoSplitOutputStream extends SplitOutputStream {
     }
 
     @Override
-    public boolean isBuffSizeFitForCurrSplitFile(int bufferSize) throws ZipException {
+    public boolean isBuffSizeFitForCurrSplitFile(int bufferSize) {
         return true;
     }
 

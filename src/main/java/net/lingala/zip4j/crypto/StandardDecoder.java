@@ -30,7 +30,7 @@ public class StandardDecoder implements Decoder {
     private final CentralDirectory.FileHeader fileHeader;
     private final ZipCryptoEngine zipCryptoEngine = new ZipCryptoEngine();
 
-    public StandardDecoder(@NonNull CentralDirectory.FileHeader fileHeader, byte[] headerBytes) throws ZipException {
+    public StandardDecoder(@NonNull CentralDirectory.FileHeader fileHeader, byte[] headerBytes) {
         this.fileHeader = fileHeader;
         init(headerBytes);
     }

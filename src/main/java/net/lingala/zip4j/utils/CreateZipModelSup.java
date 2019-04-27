@@ -30,10 +30,7 @@ public final class CreateZipModelSup implements Supplier<ZipModel> {
             if (Files.exists(zipFile))
                 return new ZipModelReader(zipFile, charset).read();
 
-            ZipModel zipModel = new ZipModel();
-            zipModel.setZipFile(zipFile);
-            zipModel.setCharset(charset);
-            return zipModel;
+            return new ZipModel(zipFile, charset);
         } catch(IOException e) {
             throw new ZipException(e);
         }

@@ -11,8 +11,8 @@ import net.lingala.zip4j.crypto.Encoder;
 import net.lingala.zip4j.crypto.StandardDecoder;
 import net.lingala.zip4j.crypto.StandardEncoder;
 import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.utils.InternalZipConstants;
 import net.lingala.zip4j.io.LittleEndianRandomAccessFile;
+import net.lingala.zip4j.utils.InternalZipConstants;
 
 import java.io.IOException;
 
@@ -25,26 +25,26 @@ import java.io.IOException;
 public enum Encryption {
     OFF(-1) {
         @Override
-        public Decoder createDecrypter(LittleEndianRandomAccessFile in, CentralDirectory.FileHeader fileHeader, LocalFileHeader localFileHeader)
+        public Decoder decoder(LittleEndianRandomAccessFile in, CentralDirectory.FileHeader fileHeader, LocalFileHeader localFileHeader)
                 throws IOException {
             return null;
         }
 
         @Override
-        public Encoder createEncryptor(ZipParameters parameters, LocalFileHeader localFileHeader) {
+        public Encoder encoder(ZipParameters parameters, LocalFileHeader localFileHeader) {
             return Encoder.NULL;
         }
     },
     STANDARD(0) {
         @Override
-        public Decoder createDecrypter(LittleEndianRandomAccessFile in, CentralDirectory.FileHeader fileHeader, LocalFileHeader localFileHeader)
+        public Decoder decoder(LittleEndianRandomAccessFile in, CentralDirectory.FileHeader fileHeader, LocalFileHeader localFileHeader)
                 throws IOException {
             in.seek(localFileHeader.getOffs());
             return new StandardDecoder(fileHeader, in.readBytes(InternalZipConstants.STD_DEC_HDR_SIZE));
         }
 
         @Override
-        public Encoder createEncryptor(ZipParameters parameters, LocalFileHeader localFileHeader) {
+        public Encoder encoder(ZipParameters parameters, LocalFileHeader localFileHeader) {
             // Since we do not know the crc here, we use the modification time for encrypting.
             return new StandardEncoder(parameters.getPassword(), (localFileHeader.getLastModifiedTime() & 0xFFFF) << 16);
         }
@@ -52,7 +52,7 @@ public enum Encryption {
     STRONG(1),
     AES(99) {
         @Override
-        public Decoder createDecrypter(LittleEndianRandomAccessFile in, CentralDirectory.FileHeader fileHeader, LocalFileHeader localFileHeader)
+        public Decoder decoder(LittleEndianRandomAccessFile in, CentralDirectory.FileHeader fileHeader, LocalFileHeader localFileHeader)
                 throws IOException {
             byte[] salt = getSalt(in, localFileHeader);
             byte[] passwordVerifier = in.readBytes(2);
@@ -68,19 +68,19 @@ public enum Encryption {
         }
 
         @Override
-        public Encoder createEncryptor(ZipParameters parameters, LocalFileHeader localFileHeader) {
+        public Encoder encoder(ZipParameters parameters, LocalFileHeader localFileHeader) {
             return new AESEncoder(parameters.getPassword(), parameters.getAesKeyStrength());
         }
     };
 
     private final int value;
 
-    public Decoder createDecrypter(LittleEndianRandomAccessFile in, CentralDirectory.FileHeader fileHeader, LocalFileHeader localFileHeader)
+    public Decoder decoder(LittleEndianRandomAccessFile in, CentralDirectory.FileHeader fileHeader, LocalFileHeader localFileHeader)
             throws IOException {
         throw new ZipException("unsupported encryption method");
     }
 
-    public Encoder createEncryptor(ZipParameters parameters, LocalFileHeader localFileHeader) {
+    public Encoder encoder(ZipParameters parameters, LocalFileHeader localFileHeader) {
         throw new ZipException("invalid encryption method");
     }
 }

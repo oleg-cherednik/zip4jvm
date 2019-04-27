@@ -111,7 +111,7 @@ public abstract class CipherOutputStream extends OutputStream {
             fileHeader.setOffsLocalFileHeader(out.getOffsLocalHeaderRelative());
             new LocalFileHeaderWriter(localFileHeader, zipModel).write(out);
 
-            encoder = parameters.getEncryption().createEncryptor(parameters, localFileHeader);
+            encoder = parameters.getEncryption().encoder(parameters, localFileHeader);
             out.mark(MARK);
 
             encoder.write(out);

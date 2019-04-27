@@ -16,10 +16,11 @@ import net.lingala.zip4j.utils.InternalZipConstants;
 @RequiredArgsConstructor
 public class Zip64 {
 
+    public static final Zip64 NULL = new Zip64(null, null);
+
     private final EndCentralDirectoryLocator endCentralDirectoryLocator;
     private final EndCentralDirectory endCentralDirectory;
 
-    /** see 4.3.15 */
     @Getter
     @Setter
     public static class EndCentralDirectoryLocator {
