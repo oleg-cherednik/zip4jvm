@@ -12,7 +12,7 @@ import net.lingala.zip4j.crypto.StandardDecoder;
 import net.lingala.zip4j.crypto.StandardEncoder;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.utils.InternalZipConstants;
-import net.lingala.zip4j.utils.LittleEndianRandomAccessFile;
+import net.lingala.zip4j.io.LittleEndianRandomAccessFile;
 
 import java.io.IOException;
 

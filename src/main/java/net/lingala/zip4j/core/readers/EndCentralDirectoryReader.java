@@ -5,7 +5,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.EndCentralDirectory;
-import net.lingala.zip4j.utils.LittleEndianRandomAccessFile;
+import net.lingala.zip4j.io.LittleEndianRandomAccessFile;
 
 import java.io.IOException;
 

@@ -3,7 +3,7 @@ package net.lingala.zip4j.core.readers;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.CompressionMethod;
-import net.lingala.zip4j.utils.LittleEndianRandomAccessFile;
+import net.lingala.zip4j.io.LittleEndianRandomAccessFile;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
@@ -34,18 +34,18 @@ final class FileHeaderReader {
         if (in.readInt() != CentralDirectory.FileHeader.SIGNATURE)
             throw new IOException("Expected central directory entry not found (offs:" + (in.getFilePointer() - 4) + ')');
 
-        fileHeader.setVersionMadeBy(in.readShort());
-        fileHeader.setVersionToExtract(in.readShort());
-        fileHeader.setGeneralPurposeFlag(in.readShort());
-        fileHeader.setCompressionMethod(CompressionMethod.parseValue(in.readShort()));
+        fileHeader.setVersionMadeBy(in.readWord());
+        fileHeader.setVersionToExtract(in.readWord());
+        fileHeader.setGeneralPurposeFlag(in.readWord());
+        fileHeader.setCompressionMethod(CompressionMethod.parseValue(in.readWord()));
         fileHeader.setLastModifiedTime(in.readInt());
         fileHeader.setCrc32(in.readInt());
         fileHeader.setCompressedSize(in.readIntAsLong());
         fileHeader.setUncompressedSize(in.readIntAsLong());
-        short fileNameLength = in.readShort();
-        short extraFieldLength = in.readShort();
-        short fileCommentLength = in.readShort();
-        fileHeader.setDiskNumber(in.readShort());
+        short fileNameLength = in.readWord();
+        short extraFieldLength = in.readWord();
+        short fileCommentLength = in.readWord();
+        fileHeader.setDiskNumber(in.readWord());
         fileHeader.setInternalFileAttributes(in.readBytes(2));
         fileHeader.setExternalFileAttributes(in.readBytes(4));
         fileHeader.setOffsLocalFileHeader(in.readIntAsLong());

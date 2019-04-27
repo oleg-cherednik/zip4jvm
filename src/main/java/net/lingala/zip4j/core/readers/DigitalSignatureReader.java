@@ -4,7 +4,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.utils.InternalZipConstants;
-import net.lingala.zip4j.utils.LittleEndianRandomAccessFile;
+import net.lingala.zip4j.io.LittleEndianRandomAccessFile;
 
 import java.io.IOException;
 
@@ -22,7 +22,7 @@ final class DigitalSignatureReader {
 
         CentralDirectory.DigitalSignature digitalSignature = new CentralDirectory.DigitalSignature();
 
-        short size = in.readShort();
+        short size = in.readWord();
         digitalSignature.setSignatureData(in.readBytes(size));
 
         return digitalSignature;

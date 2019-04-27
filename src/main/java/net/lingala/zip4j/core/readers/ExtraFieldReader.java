@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.ExtraField;
 import net.lingala.zip4j.model.Zip64;
-import net.lingala.zip4j.utils.LittleEndianRandomAccessFile;
+import net.lingala.zip4j.io.LittleEndianRandomAccessFile;
 
 import java.io.IOException;
 

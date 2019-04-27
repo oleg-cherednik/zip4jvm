@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.LocalFileHeader;
-import net.lingala.zip4j.utils.LittleEndianRandomAccessFile;
+import net.lingala.zip4j.io.LittleEndianRandomAccessFile;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
@@ -25,15 +25,15 @@ public final class LocalFileHeaderReader {
 
         LocalFileHeader localFileHeader = new LocalFileHeader();
 
-        localFileHeader.setVersionToExtract(in.readShort());
-        localFileHeader.setGeneralPurposeFlag(in.readShort());
-        localFileHeader.setCompressionMethod(CompressionMethod.parseValue(in.readShort()));
+        localFileHeader.setVersionToExtract(in.readWord());
+        localFileHeader.setGeneralPurposeFlag(in.readWord());
+        localFileHeader.setCompressionMethod(CompressionMethod.parseValue(in.readWord()));
         localFileHeader.setLastModifiedTime(in.readInt());
         localFileHeader.setCrc32(in.readInt());
         localFileHeader.setCompressedSize(in.readIntAsLong());
         localFileHeader.setUncompressedSize(in.readIntAsLong());
-        short fileNameLength = in.readShort();
-        short extraFieldLength = in.readShort();
+        short fileNameLength = in.readWord();
+        short extraFieldLength = in.readWord();
         localFileHeader.setFileName(FilenameUtils.normalize(in.readString(fileNameLength)));
         localFileHeader.setExtraField(new ExtraFieldReader(extraFieldLength).read(in));
 

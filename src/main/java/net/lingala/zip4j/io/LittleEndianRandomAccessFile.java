@@ -1,8 +1,10 @@
-package net.lingala.zip4j.utils;
+package net.lingala.zip4j.io;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import net.lingala.zip4j.utils.BitUtils;
+import net.lingala.zip4j.utils.CreateStringFunc;
 
 import java.io.Closeable;
 import java.io.FileNotFoundException;
@@ -27,7 +29,10 @@ public final class LittleEndianRandomAccessFile implements Closeable {
     }
 
     public short readWord() throws IOException {
-        return readShort();
+        offs += 2;
+        int ch1 = raf.read();
+        int ch2 = raf.read();
+        return (short)((ch2 << 8) + ch1);
     }
 
     public int readDword() throws IOException {
@@ -36,11 +41,6 @@ public final class LittleEndianRandomAccessFile implements Closeable {
 
     public long readDwordLong() throws IOException {
         return readIntAsLong();
-    }
-
-    public short readShort() throws IOException {
-        offs += 2;
-        return convertShort(raf.readShort());
     }
 
     public int readInt() throws IOException {

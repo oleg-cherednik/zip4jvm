@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.AESStrength;
 import net.lingala.zip4j.model.CompressionMethod;
-import net.lingala.zip4j.utils.LittleEndianRandomAccessFile;
+import net.lingala.zip4j.io.LittleEndianRandomAccessFile;
 
 import java.io.IOException;
 
@@ -25,10 +25,10 @@ final class AESExtraDataRecordReader {
 
         AESExtraDataRecord record = new AESExtraDataRecord();
         record.setDataSize(in.readWord());
-        record.setVersionNumber(in.readShort());
+        record.setVersionNumber(in.readWord());
         record.setVendor(in.readString(2));
         record.setAesStrength(AESStrength.parseByte(in.readByte()));
-        record.setCompressionMethod(CompressionMethod.parseValue(in.readShort()));
+        record.setCompressionMethod(CompressionMethod.parseValue(in.readWord()));
         return record;
     }
 }
