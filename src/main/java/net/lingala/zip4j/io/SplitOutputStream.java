@@ -96,13 +96,11 @@ public class SplitOutputStream extends OutputStream {
 
         raf.close();
 
-        if (Files.exists(currSplitFile)) {
+        if (Files.exists(currSplitFile))
             throw new IOException("split file: " + currSplitFile.getFileName() + " already exists in the current directory, cannot rename this file");
-        }
 
-        if (!zipFile.toFile().renameTo(currSplitFile.toFile())) {
+        if (!zipFile.toFile().renameTo(currSplitFile.toFile()))
             throw new IOException("cannot rename newly created split file");
-        }
 
         zipFile = new File(zipFileName).toPath();
         raf = new RandomAccessFile(zipFile.toFile(), "rw");

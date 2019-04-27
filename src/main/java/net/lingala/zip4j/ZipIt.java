@@ -32,19 +32,19 @@ public final class ZipIt {
     @Builder.Default
     private final Charset charset = Charset.defaultCharset();
 
-    public void add(@NonNull Collection<Path> paths, @NonNull ZipParameters parameters) throws ZipException, IOException {
+    public void add(@NonNull Collection<Path> paths, @NonNull ZipParameters parameters) throws IOException {
         if (paths.stream().anyMatch(path -> !Files.isDirectory(path) && !Files.isRegularFile(path)))
             throw new ZipException("Cannot add neither directory nor regular file to zip");
 
-        for (Path path : paths)
-            add(path, parameters);
+        paths = getRegularFilesAndDirectoryEntries(paths);
+        addRegularFiles(paths, parameters);
     }
 
     public void add(@NonNull Path path, @NonNull ZipParameters parameters) {
         if (Files.isDirectory(path))
             addDirectory(path, parameters);
         else if (Files.isRegularFile(path))
-            addRegularFile(path, parameters);
+            addRegularFiles(Collections.singleton(path), parameters);
         else
             throw new ZipException("Cannot add neither directory nor regular file to zip: " + path);
     }
@@ -71,19 +71,28 @@ public final class ZipIt {
         zipModel.setSplitLength(parameters.getSplitLength());
         zipModel.getEndCentralDirectory().setComment(ZipUtils.normalizeComment(parameters.getComment()));
 
-        if(parameters.isZip64())
+        if (parameters.isZip64())
             zipModel.zip64();
 
         new ZipEngine(zipModel).addEntries(getDirectoryEntries(dir), parameters);
     }
 
-    private void addRegularFile(Path file, ZipParameters parameters) {
-        assert Files.isRegularFile(file);
+    private void addRegularFiles(@NonNull Collection<Path> files, @NonNull ZipParameters parameters) {
+        assert files.stream().allMatch(file -> Files.isRegularFile(file));
 
         ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get().noSplitOnly();
         zipModel.setSplitLength(parameters.getSplitLength());
 
-        new ZipEngine(zipModel).addEntries(Collections.singletonList(file), parameters);
+        new ZipEngine(zipModel).addEntries(files, parameters);
+    }
+
+    @NonNull
+    private static List<Path> getRegularFilesAndDirectoryEntries(@NonNull Collection<Path> paths) {
+        return paths.stream()
+                    .filter(path -> Files.isRegularFile(path) || Files.isDirectory(path))
+                    .map(path -> Files.isDirectory(path) ? getDirectoryEntries(path) : Collections.singleton(path))
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toList());
     }
 
     @NonNull
