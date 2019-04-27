@@ -3,7 +3,7 @@ package net.lingala.zip4j.core.writers;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.io.OutputStreamDecorator;
-import net.lingala.zip4j.model.Zip64EndCentralDirectory;
+import net.lingala.zip4j.model.Zip64;
 import net.lingala.zip4j.util.InternalZipConstants;
 
 import java.io.IOException;
@@ -15,7 +15,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 final class Zip64EndCentralDirectoryWriter {
 
-    private final Zip64EndCentralDirectory dir;
+    private final Zip64.EndCentralDirectory dir;
 
     public void write(@NonNull OutputStreamDecorator out) throws IOException {
         if (dir == null)

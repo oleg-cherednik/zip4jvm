@@ -4,7 +4,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.ExtraField;
-import net.lingala.zip4j.model.Zip64ExtendedInfo;
+import net.lingala.zip4j.model.Zip64;
 import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
 
 import java.io.IOException;
@@ -37,11 +37,11 @@ final class ExtraFieldReader {
         while (in.getFilePointer() < offsMax) {
             short signature = in.readWord();
 
-            Zip64ExtendedInfo zip64 = new Zip64ExtendedInfoReader(signature, uncompressedSize, compressedSize, offs, diskNumber).read(in);
+            Zip64.ExtendedInfo zip64 = new Zip64ExtendedInfoReader(signature, uncompressedSize, compressedSize, offs, diskNumber).read(in);
             AESExtraDataRecord aes = new AESExtraDataRecordReader(signature).read(in);
 
-            if (zip64 != Zip64ExtendedInfo.NULL)
-                extraField.setZip64ExtendedInfo(zip64);
+            if (zip64 != Zip64.ExtendedInfo.NULL)
+                extraField.setExtendedInfo(zip64);
             else if (aes != AESExtraDataRecord.NULL)
                 extraField.setAesExtraDataRecord(aes);
             else

@@ -3,7 +3,7 @@ package net.lingala.zip4j.core.readers;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.model.ExtraField;
-import net.lingala.zip4j.model.Zip64ExtendedInfo;
+import net.lingala.zip4j.model.Zip64;
 import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
 
 import java.io.IOException;
@@ -24,11 +24,11 @@ final class Zip64ExtendedInfoReader {
     private final boolean diskNumber;
 
     @NonNull
-    public Zip64ExtendedInfo read(@NonNull LittleEndianRandomAccessFile in) throws IOException {
-        if (signature != Zip64ExtendedInfo.SIGNATURE)
-            return Zip64ExtendedInfo.NULL;
+    public Zip64.ExtendedInfo read(@NonNull LittleEndianRandomAccessFile in) throws IOException {
+        if (signature != Zip64.ExtendedInfo.SIGNATURE)
+            return Zip64.ExtendedInfo.NULL;
 
-        Zip64ExtendedInfo res = new Zip64ExtendedInfo();
+        Zip64.ExtendedInfo res = new Zip64.ExtendedInfo();
         res.setSize(in.readWord());
         res.setUncompressedSize(uncompressedSize ? in.readLong() : ExtraField.NO_DATA);
         res.setCompressedSize(compressedSize ? in.readLong() : ExtraField.NO_DATA);

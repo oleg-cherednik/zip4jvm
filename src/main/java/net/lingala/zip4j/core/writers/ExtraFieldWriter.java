@@ -21,7 +21,7 @@ final class ExtraFieldWriter {
     private final Charset charset;
 
     public void write(@NonNull OutputStreamDecorator out) throws IOException {
-        new Zip64ExtendedInfoWriter(extraField.getZip64ExtendedInfo()).write(out);
+        new Zip64ExtendedInfoWriter(extraField.getExtendedInfo()).write(out);
         new AESExtraDataRecordWriter(extraField.getAesExtraDataRecord(), charset).write(out);
     }
 

@@ -22,8 +22,7 @@ import net.lingala.zip4j.io.OutputStreamDecorator;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.EndCentralDirectory;
 import net.lingala.zip4j.model.ExtraField;
-import net.lingala.zip4j.model.Zip64EndCentralDirectoryLocator;
-import net.lingala.zip4j.model.Zip64ExtendedInfo;
+import net.lingala.zip4j.model.Zip64;
 import net.lingala.zip4j.model.ZipModel;
 
 import java.io.IOException;
@@ -51,7 +50,7 @@ public final class ZipModelWriter {
         zipModel.updateZip64();
 
         if (zipModel.isZip64() && validate) {
-            Zip64EndCentralDirectoryLocator locator = zipModel.getZip64().getEndCentralDirectoryLocator();
+            Zip64.EndCentralDirectoryLocator locator = zipModel.getZip64().getEndCentralDirectoryLocator();
             locator.setNoOfDiskStartOfZip64EndOfCentralDirRec(out.getCurrSplitFileCounter());
             locator.setTotNumberOfDiscs(out.getCurrSplitFileCounter() + 1);
         }
@@ -92,10 +91,10 @@ public final class ZipModelWriter {
 //            fileHeader.getExtraField().setZip64ExtendedInfo(new Zip64ExtendedInfo());
 
         // TODO move it before
-        Zip64ExtendedInfo info = fileHeader.getExtraField().getZip64ExtendedInfo();
+        Zip64.ExtendedInfo info = fileHeader.getExtraField().getExtendedInfo();
 
-        if (info != Zip64ExtendedInfo.NULL) {
-            info.setSize(info.getLength() - Zip64ExtendedInfo.SIZE_FIELD);
+        if (info != Zip64.ExtendedInfo.NULL) {
+            info.setSize(info.getLength() - Zip64.ExtendedInfo.SIZE_FIELD);
             info.setUncompressedSize(fileHeader.isWriteZip64FileSize() ? fileHeader.getUncompressedSize() : ExtraField.NO_DATA);
             info.setCompressedSize(fileHeader.isWriteZip64FileSize() ? fileHeader.getCompressedSize() : ExtraField.NO_DATA);
             info.setOffsLocalHeaderRelative(fileHeader.isWriteZip64OffsetLocalHeader() ? fileHeader.getOffsLocalFileHeader() : ExtraField.NO_DATA);

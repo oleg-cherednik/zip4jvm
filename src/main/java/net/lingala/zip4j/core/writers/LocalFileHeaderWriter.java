@@ -4,7 +4,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.io.OutputStreamDecorator;
 import net.lingala.zip4j.model.LocalFileHeader;
-import net.lingala.zip4j.model.Zip64ExtendedInfo;
+import net.lingala.zip4j.model.Zip64;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.InternalZipConstants;
 
@@ -47,7 +47,7 @@ public final class LocalFileHeaderWriter {
         out.writeBytes(fileName);
 
         if (zipModel.isZip64()) {
-            out.writeWord(Zip64ExtendedInfo.SIGNATURE);
+            out.writeWord(Zip64.ExtendedInfo.SIGNATURE);
             out.writeWord((short)16);
             out.writeLong(localFileHeader.getUncompressedSize());
             out.writeBytes(new byte[8]);

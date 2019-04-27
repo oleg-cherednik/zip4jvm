@@ -20,9 +20,9 @@ import lombok.experimental.UtilityClass;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.CentralDirectory;
+import net.lingala.zip4j.model.EndCentralDirectory;
 import net.lingala.zip4j.model.LocalFileHeader;
-import net.lingala.zip4j.model.Zip64EndCentralDirectoryLocator;
-import net.lingala.zip4j.model.Zip64ExtendedInfo;
+import net.lingala.zip4j.model.Zip64;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Calendar;
@@ -80,13 +80,13 @@ public class ZipUtils {
         allSigs[0] = LocalFileHeader.SIGNATURE;
         allSigs[1] = InternalZipConstants.EXTSIG;
         allSigs[2] = CentralDirectory.FileHeader.SIGNATURE;
-        allSigs[3] = InternalZipConstants.ENDSIG;
+        allSigs[3] = EndCentralDirectory.SIGNATURE;
         allSigs[4] = InternalZipConstants.DIGSIG;
         allSigs[5] = InternalZipConstants.ARCEXTDATREC;
         allSigs[6] = InternalZipConstants.SPLITSIG;
-        allSigs[7] = Zip64EndCentralDirectoryLocator.SIGNATURE;
+        allSigs[7] = Zip64.EndCentralDirectoryLocator.SIGNATURE;
         allSigs[8] = InternalZipConstants.ZIP64_ENDSIG;
-        allSigs[9] = Zip64ExtendedInfo.SIGNATURE;
+        allSigs[9] = Zip64.ExtendedInfo.SIGNATURE;
         allSigs[10] = AESExtraDataRecord.SIGNATURE;
 
         return allSigs;

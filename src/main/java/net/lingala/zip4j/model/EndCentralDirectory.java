@@ -20,14 +20,21 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.util.InternalZipConstants;
 import org.apache.commons.lang.StringUtils;
 
 import java.nio.charset.Charset;
 
+/**
+ * see 4.3.16
+ *
+ * @author Oleg Cherednik
+ * @since 26.04.2019
+ */
 @Getter
 @Setter
 public class EndCentralDirectory {
+
+    public static final int SIGNATURE = 0x06054B50;
 
     // size (22) with comment length = 0
     public static final int MIN_SIZE = 4 + 2 + 2 + 2 + 2 + 4 + 4 + 2;
@@ -35,7 +42,7 @@ public class EndCentralDirectory {
     public static final int MAX_COMMENT_LENGTH = 33_000;
 
     // size:4 - signature (0x06054b50)
-    private final int signature = InternalZipConstants.ENDSIG;
+    private final int signature = SIGNATURE;
     // size:2 - number of the disk
     private int diskNumber;
     // size:2 - number of the disk with the start of the central directory

@@ -24,7 +24,6 @@ public interface InternalZipConstants {
     // Whenever a new Signature is added here, make sure to add it
     // in Zip4jUtil.getAllHeaderSignatures()
     static long EXTSIG = 0x08074b50L;    // "PK\007\008"
-    int ENDSIG = 0x06054b50;    // "PK\005\006"
     int DIGSIG = 0x05054b50;
     static long ARCEXTDATREC = 0x08064b50L;
     static int SPLITSIG = 0x08074b50;

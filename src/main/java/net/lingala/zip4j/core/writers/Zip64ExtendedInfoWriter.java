@@ -4,7 +4,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.io.OutputStreamDecorator;
 import net.lingala.zip4j.model.ExtraField;
-import net.lingala.zip4j.model.Zip64ExtendedInfo;
+import net.lingala.zip4j.model.Zip64;
 
 import java.io.IOException;
 
@@ -16,13 +16,13 @@ import java.io.IOException;
 final class Zip64ExtendedInfoWriter {
 
     @NonNull
-    private final Zip64ExtendedInfo info;
+    private final Zip64.ExtendedInfo info;
 
     public void write(@NonNull OutputStreamDecorator out) throws IOException {
-        if (info == Zip64ExtendedInfo.NULL)
+        if (info == Zip64.ExtendedInfo.NULL)
             return;
 
-        out.writeWord(Zip64ExtendedInfo.SIGNATURE);
+        out.writeWord(Zip64.ExtendedInfo.SIGNATURE);
         out.writeWord((short)info.getSize());
 
         if (info.getUncompressedSize() != ExtraField.NO_DATA)

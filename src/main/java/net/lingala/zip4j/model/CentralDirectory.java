@@ -161,13 +161,13 @@ public class CentralDirectory {
             return ZipUtils.isDirectory(fileName);
         }
 
-        public void setZip64ExtendedInfo(@NonNull Zip64ExtendedInfo info) {
+        public void setZip64ExtendedInfo(@NonNull Zip64.ExtendedInfo info) {
             if (extraField == ExtraField.NULL)
                 extraField = new ExtraField();
 
-            extraField.setZip64ExtendedInfo(info);
+            extraField.setExtendedInfo(info);
 
-            if (info != Zip64ExtendedInfo.NULL) {
+            if (info != Zip64.ExtendedInfo.NULL) {
                 uncompressedSize = info.getUncompressedSize() != ExtraField.NO_DATA ? info.getUncompressedSize() : uncompressedSize;
                 compressedSize = info.getCompressedSize() != ExtraField.NO_DATA ? info.getCompressedSize() : uncompressedSize;
                 offsLocalFileHeader = info.getOffsLocalHeaderRelative() != ExtraField.NO_DATA ? info.getOffsLocalHeaderRelative()

@@ -3,8 +3,8 @@ package net.lingala.zip4j.core.readers;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.EndCentralDirectory;
-import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
 
 import java.io.IOException;
@@ -21,7 +21,6 @@ final class EndCentralDirectoryReader {
 
     @NonNull
     public EndCentralDirectory read(@NonNull LittleEndianRandomAccessFile in) throws IOException {
-        offs = -1;
         findHead(in);
 
         EndCentralDirectory dir = new EndCentralDirectory();
@@ -37,6 +36,8 @@ final class EndCentralDirectoryReader {
     }
 
     private void findHead(LittleEndianRandomAccessFile in) throws IOException {
+        offs = -1;
+
         int commentLength = EndCentralDirectory.MAX_COMMENT_LENGTH;
         long offs = in.length() - EndCentralDirectory.MIN_SIZE;
 
@@ -45,13 +46,13 @@ final class EndCentralDirectoryReader {
             commentLength--;
             this.offs = in.getFilePointer();
 
-            if (in.readInt() == InternalZipConstants.ENDSIG)
+            if (in.readInt() == EndCentralDirectory.SIGNATURE)
                 return;
         } while (commentLength >= 0 && offs >= 0);
 
         this.offs = -1;
 
-        throw new IOException("zip headers not found. probably not a zip file");
+        throw new ZipException("zip headers not found. probably not a zip file");
     }
 
 }

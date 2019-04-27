@@ -18,7 +18,6 @@ package net.lingala.zip4j.model;
 
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.FilenameUtils;
@@ -60,11 +59,11 @@ public class ZipModel {
         splitLength = endCentralDirectory != null && endCentralDirectory.getDiskNumber() > 0 ? 1 : NO_SPLIT;
     }
 
-    public Zip64EndCentralDirectoryLocator getZip64EndCentralDirectoryLocator() {
+    public Zip64.EndCentralDirectoryLocator getZip64EndCentralDirectoryLocator() {
         return isZip64() ? zip64.getEndCentralDirectoryLocator() : null;
     }
 
-    public Zip64EndCentralDirectory getZip64EndCentralDirectory() {
+    public Zip64.EndCentralDirectory getZip64EndCentralDirectory() {
         return isZip64() ? zip64.getEndCentralDirectory() : null;
     }
 
@@ -81,10 +80,10 @@ public class ZipModel {
     }
 
     public void zip64() {
-        zip64(new Zip64EndCentralDirectoryLocator(), new Zip64EndCentralDirectory());
+        zip64(new Zip64.EndCentralDirectoryLocator(), new Zip64.EndCentralDirectory());
     }
 
-    public void zip64(Zip64EndCentralDirectoryLocator locator, Zip64EndCentralDirectory dir) {
+    public void zip64(Zip64.EndCentralDirectoryLocator locator, Zip64.EndCentralDirectory dir) {
         zip64 = new Zip64(locator, dir);
     }
 
@@ -92,8 +91,8 @@ public class ZipModel {
         if (!isZip64())
             return;
 
-        Zip64EndCentralDirectory dir = zip64.getEndCentralDirectory();
-        dir.setSize(Zip64EndCentralDirectory.SIZE + ArrayUtils.getLength(dir.getExtensibleDataSector()));
+        Zip64.EndCentralDirectory dir = zip64.getEndCentralDirectory();
+        dir.setSize(Zip64.EndCentralDirectory.SIZE + ArrayUtils.getLength(dir.getExtensibleDataSector()));
         dir.setVersionMadeBy(isEmpty() ? CentralDirectory.FileHeader.DEF_VERSION : getFileHeaders().get(0).getVersionMadeBy());
         dir.setVersionNeededToExtract(isEmpty() ? CentralDirectory.FileHeader.DEF_VERSION : getFileHeaders().get(0).getVersionToExtract());
         dir.setDiskNumber(endCentralDirectory.getDiskNumber());
@@ -103,7 +102,7 @@ public class ZipModel {
         dir.setSize(endCentralDirectory.getSize());
         dir.setOffs(endCentralDirectory.getOffs());
 
-        Zip64EndCentralDirectoryLocator locator = zip64.getEndCentralDirectoryLocator();
+        Zip64.EndCentralDirectoryLocator locator = zip64.getEndCentralDirectoryLocator();
         locator.setOffs(endCentralDirectory.getOffs() + endCentralDirectory.getSize());
     }
 
@@ -216,15 +215,6 @@ public class ZipModel {
             throw new ZipException("Zip file already exists. Zip file format does not allow updating split/spanned files");
 
         return this;
-    }
-
-    @Getter
-    @RequiredArgsConstructor
-    public static final class Zip64 {
-
-        private final Zip64EndCentralDirectoryLocator endCentralDirectoryLocator;
-        private final Zip64EndCentralDirectory endCentralDirectory;
-
     }
 
 }

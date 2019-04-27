@@ -2,7 +2,7 @@ package net.lingala.zip4j.core.readers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.lingala.zip4j.model.Zip64EndCentralDirectoryLocator;
+import net.lingala.zip4j.model.Zip64;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
 
@@ -55,7 +55,7 @@ public final class ZipModelReader {
         zipModel.setCharset(charset);
         zipModel.setEndCentralDirectory(reader.read(in));
 
-        Zip64EndCentralDirectoryLocator locator = new Zip64EndCentralDirectoryLocatorReader(reader.getOffs()).read(in);
+        Zip64.EndCentralDirectoryLocator locator = new Zip64EndCentralDirectoryLocatorReader(reader.getOffs()).read(in);
 
         if (locator != null)
             zipModel.zip64(locator, new Zip64EndCentralDirectoryReader(locator.getOffs()).read(in));
