@@ -41,6 +41,7 @@ public class ZipModel {
     private ArchiveExtraDataRecord archiveExtraDataRecord;
     @NonNull
     private CentralDirectory centralDirectory = new CentralDirectory();
+    @NonNull
     private EndCentralDirectory endCentralDirectory = new EndCentralDirectory();
     private Zip64 zip64;
     private long splitLength = NO_SPLIT;
@@ -53,10 +54,8 @@ public class ZipModel {
         localFileHeaders.add(localFileHeader);
     }
 
-    public void setEndCentralDirectory(EndCentralDirectory endCentralDirectory) {
+    public void setEndCentralDirectory(@NonNull EndCentralDirectory endCentralDirectory) {
         this.endCentralDirectory = endCentralDirectory;
-        // TODO check is it used, because 1 split length is invalid value, but it marks an archive as split
-        splitLength = endCentralDirectory != null && endCentralDirectory.getDiskNumber() > 0 ? 1 : NO_SPLIT;
     }
 
     public Zip64.EndCentralDirectoryLocator getZip64EndCentralDirectoryLocator() {
@@ -68,11 +67,12 @@ public class ZipModel {
     }
 
     public boolean isSplitArchive() {
-        return splitLength > 0;
+        return splitLength > 0 || endCentralDirectory.isSplitArchive();
     }
 
     public void setNoSplitArchive() {
         splitLength = NO_SPLIT;
+        endCentralDirectory.setNoSplitArchive();
     }
 
     public boolean isZip64() {
@@ -95,7 +95,7 @@ public class ZipModel {
         dir.setSize(Zip64.EndCentralDirectory.SIZE + ArrayUtils.getLength(dir.getExtensibleDataSector()));
         dir.setVersionMadeBy(isEmpty() ? CentralDirectory.FileHeader.DEF_VERSION : getFileHeaders().get(0).getVersionMadeBy());
         dir.setVersionNeededToExtract(isEmpty() ? CentralDirectory.FileHeader.DEF_VERSION : getFileHeaders().get(0).getVersionToExtract());
-        dir.setDiskNumber(endCentralDirectory.getDiskNumber());
+        dir.setDiskNumber(endCentralDirectory.getSplitParts());
         dir.setStartDiskNumber(endCentralDirectory.getStartDiskNumber());
         dir.setDiskEntries(countNumberOfFileHeaderEntriesOnDisk());
         dir.setTotalEntries(getFileHeaders().size());
@@ -111,7 +111,7 @@ public class ZipModel {
             return getFileHeaders().size();
 
         return (int)getFileHeaders().stream()
-                                    .filter(fileHeader -> fileHeader.getDiskNumber() == endCentralDirectory.getDiskNumber())
+                                    .filter(fileHeader -> fileHeader.getDiskNumber() == endCentralDirectory.getSplitParts())
                                     .count();
     }
 
@@ -142,7 +142,7 @@ public class ZipModel {
     }
 
     public Path getPartFile(int diskNumber) {
-        return diskNumber == endCentralDirectory.getDiskNumber() ? zipFile : getSplitFilePath(zipFile, diskNumber + 1);
+        return diskNumber == endCentralDirectory.getSplitParts() ? zipFile : getSplitFilePath(zipFile, diskNumber + 1);
     }
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")
@@ -165,7 +165,7 @@ public class ZipModel {
     }
 
     private void updateEndCentralDirectory(long totalBytesWritten) throws ZipException {
-        endCentralDirectory.setDiskNumber(0);
+        endCentralDirectory.setSplitParts(0);
         endCentralDirectory.setStartDiskNumber(0);
         endCentralDirectory.setTotalEntries(getFileHeaders().size());
         endCentralDirectory.setDiskEntries(getFileHeaders().size());

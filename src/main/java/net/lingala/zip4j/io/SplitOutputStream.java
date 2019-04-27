@@ -178,10 +178,6 @@ public class SplitOutputStream extends OutputStream {
         return raf.getFilePointer();
     }
 
-    public long getSplitLength() {
-        return splitLength;
-    }
-
     public int getCurrSplitFileCounter() {
         return currSplitFileCounter;
     }

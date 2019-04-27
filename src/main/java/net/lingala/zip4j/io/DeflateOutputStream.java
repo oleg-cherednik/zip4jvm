@@ -38,7 +38,7 @@ public class DeflateOutputStream extends CipherOutputStream {
 
     private boolean firstBytesRead;
 
-    public DeflateOutputStream(@NonNull SplitOutputStream out, ZipModel zipModel) {
+    public DeflateOutputStream(@NonNull SplitOutputStream out, @NonNull ZipModel zipModel) {
         super(out, zipModel);
     }
 

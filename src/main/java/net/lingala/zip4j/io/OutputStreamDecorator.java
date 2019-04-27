@@ -55,10 +55,6 @@ public final class OutputStreamDecorator implements Closeable {
         return delegate.getFilePointer();
     }
 
-    public long getSplitLength() {
-        return delegate.getSplitLength();
-    }
-
     public void seek(long pos) throws IOException {
         delegate.seek(pos);
     }

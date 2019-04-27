@@ -19,6 +19,7 @@ public class Zip64 {
     private final EndCentralDirectoryLocator endCentralDirectoryLocator;
     private final EndCentralDirectory endCentralDirectory;
 
+    /** see 4.3.15 */
     @Getter
     @Setter
     public static class EndCentralDirectoryLocator {

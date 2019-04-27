@@ -44,7 +44,7 @@ public class EndCentralDirectory {
     // size:4 - signature (0x06054b50)
     private final int signature = SIGNATURE;
     // size:2 - number of the disk
-    private int diskNumber;
+    private int splitParts;
     // size:2 - number of the disk with the start of the central directory
     private int startDiskNumber;
     // size:2 - total number of entries in the central directory on this disk
@@ -77,5 +77,13 @@ public class EndCentralDirectory {
 
     public void incDiskEntries() {
         diskEntries++;
+    }
+
+    public boolean isSplitArchive() {
+        return splitParts > 0;
+    }
+
+    public void setNoSplitArchive() {
+        splitParts = 0;
     }
 }

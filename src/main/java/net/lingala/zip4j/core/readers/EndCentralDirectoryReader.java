@@ -24,7 +24,7 @@ final class EndCentralDirectoryReader {
         findHead(in);
 
         EndCentralDirectory dir = new EndCentralDirectory();
-        dir.setDiskNumber(in.readWord());
+        dir.setSplitParts(in.readWord());
         dir.setStartDiskNumber(in.readWord());
         dir.setDiskEntries(in.readWord());
         dir.setTotalEntries(in.readWord());

@@ -81,7 +81,7 @@ public final class ZipMisc {
         UnzipIt.checkZipFile(zipFile);
         ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get();
 
-        return IntStream.rangeClosed(0, zipModel.getEndCentralDirectory().getDiskNumber())
+        return IntStream.rangeClosed(0, zipModel.getEndCentralDirectory().getSplitParts())
                         .mapToObj(i -> i == 0 ? zipModel.getZipFile() : ZipModel.getSplitFilePath(zipFile, i))
                         .collect(Collectors.toList());
     }
@@ -115,7 +115,7 @@ public final class ZipMisc {
     }
 
     private static long[] copyAllParts(@NonNull SplitOutputStream out, @NonNull ZipModel zipModel) throws IOException {
-        int noOfDisk = zipModel.getEndCentralDirectory().getDiskNumber();
+        int noOfDisk = zipModel.getEndCentralDirectory().getSplitParts();
         long[] fileSizeList = new long[noOfDisk + 1];
 
         for (int i = 0; i <= noOfDisk; i++) {

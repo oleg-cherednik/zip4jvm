@@ -70,7 +70,7 @@ public final class ZipModelWriter {
             zipModel.getZip64EndCentralDirectoryLocator().setTotNumberOfDiscs(out.getCurrSplitFileCounter() + 1);
         }
 
-        endCentralDirectory.setDiskNumber(out.getCurrSplitFileCounter());
+        endCentralDirectory.setSplitParts(out.getCurrSplitFileCounter());
         endCentralDirectory.setStartDiskNumber(out.getCurrSplitFileCounter());
     }
 

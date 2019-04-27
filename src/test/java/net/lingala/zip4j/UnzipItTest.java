@@ -48,6 +48,19 @@ public class UnzipItTest {
     }
 
     @Test
+    public void shouldUnzipRequiredFilesWhenSplit() throws ZipException, IOException {
+        Path destDir = Zip4jSuite.generateSubDirName(rootDir, "shouldUnzipRequiredFiles");
+        List<String> entries = Arrays.asList("saint-petersburg.jpg", "cars/bentley-continental.jpg");
+        UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.splitZip).build();
+        unzip.extract(destDir, entries);
+
+        assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(1);
+        assertThatDirectory(destDir.resolve("cars/")).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatFile(destDir.resolve("saint-petersburg.jpg")).exists().isImage().hasSize(1_074_836);
+        assertThatFile(destDir.resolve("cars/bentley-continental.jpg")).exists().isImage().hasSize(1_395_362);
+    }
+
+    @Test
     public void shouldUnzipOneFile() throws ZipException, IOException {
         Path destDir = Zip4jSuite.generateSubDirName(rootDir, "shouldUnzipRequiredFiles");
         UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.noSplitZip).build();
@@ -75,6 +88,7 @@ public class UnzipItTest {
     }
 
     @Test
+    // TODO update this test
     public void shouldUnzipOneFileFromEncryptedNoSplitZip() throws IOException {
         Path destDir = Zip4jSuite.generateSubDirName(rootDir, "shouldUnzipOneFileFromEncryptedNoSplitZip");
 

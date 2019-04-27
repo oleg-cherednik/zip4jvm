@@ -63,9 +63,9 @@ public abstract class CipherOutputStream extends OutputStream {
     private int pendingBufferLength;
     protected long totalBytesRead;
 
-    protected CipherOutputStream(@NonNull SplitOutputStream out, ZipModel zipModel) {
+    protected CipherOutputStream(@NonNull SplitOutputStream out, @NonNull ZipModel zipModel) {
         this.out = new OutputStreamDecorator(out);
-        this.zipModel = initZipModel(zipModel, this.out);
+        this.zipModel = zipModel;
     }
 
     public final void putNextEntry(String fileNameStream, ZipParameters parameters) {
@@ -121,12 +121,6 @@ public abstract class CipherOutputStream extends OutputStream {
         } catch(Exception e) {
             throw new ZipException(e);
         }
-    }
-
-    private static ZipModel initZipModel(ZipModel zipModel, @NonNull OutputStreamDecorator out) {
-        zipModel = zipModel == null ? new ZipModel() : zipModel;
-        zipModel.setSplitLength(out.getSplitLength());
-        return zipModel;
     }
 
     public void write(int bval) throws IOException {
