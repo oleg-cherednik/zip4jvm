@@ -28,8 +28,8 @@ import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.util.InternalZipConstants;
-import net.lingala.zip4j.util.ZipUtils;
+import net.lingala.zip4j.utils.InternalZipConstants;
+import net.lingala.zip4j.utils.ZipUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;

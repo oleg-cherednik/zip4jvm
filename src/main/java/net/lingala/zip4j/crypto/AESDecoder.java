@@ -26,8 +26,8 @@ import net.lingala.zip4j.exception.ZipExceptionConstants;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.AESStrength;
 import net.lingala.zip4j.model.LocalFileHeader;
-import net.lingala.zip4j.util.InternalZipConstants;
-import net.lingala.zip4j.util.Raw;
+import net.lingala.zip4j.utils.InternalZipConstants;
+import net.lingala.zip4j.utils.Raw;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.util.Arrays;

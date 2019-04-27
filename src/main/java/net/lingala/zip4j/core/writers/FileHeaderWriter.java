@@ -4,7 +4,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.io.OutputStreamDecorator;
 import net.lingala.zip4j.model.CentralDirectory;
-import net.lingala.zip4j.util.InternalZipConstants;
+import net.lingala.zip4j.utils.InternalZipConstants;
 
 import java.io.IOException;
 import java.nio.charset.Charset;

@@ -20,8 +20,8 @@ import net.lingala.zip4j.crypto.AESDecoder;
 import net.lingala.zip4j.engine.UnzipEngine;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.Encryption;
-import net.lingala.zip4j.util.InternalZipConstants;
-import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
+import net.lingala.zip4j.utils.InternalZipConstants;
+import net.lingala.zip4j.utils.LittleEndianRandomAccessFile;
 
 import java.io.IOException;
 import java.io.InputStream;

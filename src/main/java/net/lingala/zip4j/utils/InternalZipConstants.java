@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.lingala.zip4j.util;
+package net.lingala.zip4j.utils;
 
 public interface InternalZipConstants {
 

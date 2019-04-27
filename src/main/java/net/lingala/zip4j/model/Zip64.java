@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import net.lingala.zip4j.util.InternalZipConstants;
+import net.lingala.zip4j.utils.InternalZipConstants;
 
 /**
  * @author Oleg Cherednik

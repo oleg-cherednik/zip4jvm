@@ -17,8 +17,8 @@
 package net.lingala.zip4j.io;
 
 import net.lingala.zip4j.engine.UnzipEngine;
-import net.lingala.zip4j.util.InternalZipConstants;
-import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
+import net.lingala.zip4j.utils.InternalZipConstants;
+import net.lingala.zip4j.utils.LittleEndianRandomAccessFile;
 
 import java.io.EOFException;
 import java.io.IOException;

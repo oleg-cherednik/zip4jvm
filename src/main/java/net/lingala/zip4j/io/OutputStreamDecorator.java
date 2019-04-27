@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import net.lingala.zip4j.util.Raw;
+import net.lingala.zip4j.utils.Raw;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.io.Closeable;

@@ -19,9 +19,9 @@ package net.lingala.zip4j.io;
 import lombok.NonNull;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipModel;
-import net.lingala.zip4j.util.InternalZipConstants;
-import net.lingala.zip4j.util.Raw;
-import net.lingala.zip4j.util.ZipUtils;
+import net.lingala.zip4j.utils.InternalZipConstants;
+import net.lingala.zip4j.utils.Raw;
+import net.lingala.zip4j.utils.ZipUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -40,7 +40,7 @@ public class SplitOutputStream extends OutputStream {
     protected long bytesWrittenForThisPart;
 
     @NonNull
-    public static SplitOutputStream create(@NonNull ZipModel zipModel) throws IOException, ZipException {
+    public static SplitOutputStream create(@NonNull ZipModel zipModel) throws IOException {
         Path zipFile = zipModel.getZipFile();
         Path parent = zipFile.getParent();
 
@@ -50,7 +50,7 @@ public class SplitOutputStream extends OutputStream {
         return zipModel.isSplitArchive() ? new SplitOutputStream(zipFile, zipModel.getSplitLength()) : new NoSplitOutputStream(zipFile);
     }
 
-    protected SplitOutputStream(Path file, long splitLength) throws FileNotFoundException, ZipException {
+    protected SplitOutputStream(Path file, long splitLength) throws FileNotFoundException {
         if (splitLength >= 0 && splitLength < InternalZipConstants.MIN_SPLIT_LENGTH)
             throw new ZipException("split length less than minimum allowed split length of " + InternalZipConstants.MIN_SPLIT_LENGTH + " Bytes");
 
@@ -136,7 +136,7 @@ public class SplitOutputStream extends OutputStream {
      * @return true if a new split file was started else false
      * @throws ZipException
      */
-    public boolean checkBuffSizeAndStartNextSplitFile(int bufferSize) throws ZipException {
+    public boolean checkBuffSizeAndStartNextSplitFile(int bufferSize) {
         if (bufferSize < 0)
             throw new ZipException("negative buffersize for checkBuffSizeAndStartNextSplitFile");
 
@@ -161,7 +161,7 @@ public class SplitOutputStream extends OutputStream {
      * @return true if the buffer size is fit in the current split file or else false.
      * @throws ZipException
      */
-    public boolean isBuffSizeFitForCurrSplitFile(int bufferSize) throws ZipException {
+    public boolean isBuffSizeFitForCurrSplitFile(int bufferSize) {
         if (bufferSize < 0)
             throw new ZipException("negative buffersize for isBuffSizeFitForCurrSplitFile");
 

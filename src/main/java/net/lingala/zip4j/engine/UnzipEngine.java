@@ -30,8 +30,8 @@ import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.ZipModel;
-import net.lingala.zip4j.util.InternalZipConstants;
-import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
+import net.lingala.zip4j.utils.InternalZipConstants;
+import net.lingala.zip4j.utils.LittleEndianRandomAccessFile;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;

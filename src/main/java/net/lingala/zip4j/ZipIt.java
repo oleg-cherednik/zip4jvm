@@ -7,8 +7,8 @@ import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.InputStreamMeta;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.util.CreateZipModelSup;
-import net.lingala.zip4j.util.ZipUtils;
+import net.lingala.zip4j.utils.CreateZipModelSup;
+import net.lingala.zip4j.utils.ZipUtils;
 
 import java.io.IOException;
 import java.nio.charset.Charset;

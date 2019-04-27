@@ -4,14 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import net.lingala.zip4j.util.BitUtils;
+import net.lingala.zip4j.utils.BitUtils;
 
-import static net.lingala.zip4j.util.BitUtils.BIT0;
-import static net.lingala.zip4j.util.BitUtils.BIT1;
-import static net.lingala.zip4j.util.BitUtils.BIT11;
-import static net.lingala.zip4j.util.BitUtils.BIT2;
-import static net.lingala.zip4j.util.BitUtils.BIT3;
-import static net.lingala.zip4j.util.BitUtils.BIT6;
+import static net.lingala.zip4j.utils.BitUtils.BIT0;
+import static net.lingala.zip4j.utils.BitUtils.BIT1;
+import static net.lingala.zip4j.utils.BitUtils.BIT11;
+import static net.lingala.zip4j.utils.BitUtils.BIT2;
+import static net.lingala.zip4j.utils.BitUtils.BIT3;
+import static net.lingala.zip4j.utils.BitUtils.BIT6;
 
 /**
  * @author Oleg Cherednik

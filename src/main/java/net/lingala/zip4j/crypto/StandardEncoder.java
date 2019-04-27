@@ -19,7 +19,7 @@ package net.lingala.zip4j.crypto;
 import net.lingala.zip4j.crypto.engine.ZipCryptoEngine;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.OutputStreamDecorator;
-import net.lingala.zip4j.util.InternalZipConstants;
+import net.lingala.zip4j.utils.InternalZipConstants;
 
 import java.io.IOException;
 import java.util.Random;

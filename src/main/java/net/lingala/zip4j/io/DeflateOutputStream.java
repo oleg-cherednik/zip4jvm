@@ -21,7 +21,7 @@ import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.util.InternalZipConstants;
+import net.lingala.zip4j.utils.InternalZipConstants;
 
 import java.io.IOException;
 import java.nio.file.Path;

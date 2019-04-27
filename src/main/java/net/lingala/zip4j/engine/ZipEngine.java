@@ -27,8 +27,8 @@ import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.InputStreamMeta;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.util.CalculateChecksumFunc;
-import net.lingala.zip4j.util.RemoveEntryFunc;
+import net.lingala.zip4j.utils.CalculateChecksumFunc;
+import net.lingala.zip4j.utils.RemoveEntryFunc;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 

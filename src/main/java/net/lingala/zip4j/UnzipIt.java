@@ -5,7 +5,7 @@ import lombok.NonNull;
 import net.lingala.zip4j.engine.UnzipEngine;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipModel;
-import net.lingala.zip4j.util.CreateZipModelSup;
+import net.lingala.zip4j.utils.CreateZipModelSup;
 
 import java.io.IOException;
 import java.io.InputStream;

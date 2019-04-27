@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.lingala.zip4j.util;
+package net.lingala.zip4j.utils;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

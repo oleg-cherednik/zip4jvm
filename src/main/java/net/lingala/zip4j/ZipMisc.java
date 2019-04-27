@@ -8,9 +8,9 @@ import net.lingala.zip4j.io.NoSplitOutputStream;
 import net.lingala.zip4j.io.OutputStreamDecorator;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
-import net.lingala.zip4j.util.CreateZipModelSup;
-import net.lingala.zip4j.util.RemoveEntryFunc;
-import net.lingala.zip4j.util.ZipUtils;
+import net.lingala.zip4j.utils.CreateZipModelSup;
+import net.lingala.zip4j.utils.RemoveEntryFunc;
+import net.lingala.zip4j.utils.ZipUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.FileInputStream;

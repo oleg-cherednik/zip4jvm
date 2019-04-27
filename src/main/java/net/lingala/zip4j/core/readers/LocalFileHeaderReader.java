@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.LocalFileHeader;
-import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
+import net.lingala.zip4j.utils.LittleEndianRandomAccessFile;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;

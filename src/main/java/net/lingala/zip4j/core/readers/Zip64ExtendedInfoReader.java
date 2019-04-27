@@ -4,7 +4,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.model.ExtraField;
 import net.lingala.zip4j.model.Zip64;
-import net.lingala.zip4j.util.LittleEndianRandomAccessFile;
+import net.lingala.zip4j.utils.LittleEndianRandomAccessFile;
 
 import java.io.IOException;
 
