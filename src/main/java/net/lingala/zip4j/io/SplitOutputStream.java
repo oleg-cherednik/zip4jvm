@@ -48,6 +48,7 @@ import java.util.function.Predicate;
  * @author Oleg Cherednik
  * @since 08.03.2019
  */
+@SuppressWarnings("SpellCheckingInspection")
 public class SplitOutputStream extends OutputStream {
 
     private final long splitLength;
@@ -140,7 +141,8 @@ public class SplitOutputStream extends OutputStream {
         return currSplitFileCounter;
     }
 
-    private final byte[] intByte = new byte[4];
+    private final byte[] word = new byte[2];
+    private final byte[] dword = new byte[4];
     private final byte[] longByte = new byte[8];
 
     @Getter
@@ -149,31 +151,29 @@ public class SplitOutputStream extends OutputStream {
     private final Map<String, Long> mark = new HashMap<>();
 
     public void writeSignature(int val) throws IOException {
-        Raw.writeIntLittleEndian(intByte, 0, val);
-        write(intByte);
-        offs += intByte.length;
+        Raw.writeIntLittleEndian(dword, 0, val);
+        write(dword);
+        offs += dword.length;
     }
 
-    private final byte[] arrShort = new byte[2];
-
     public void writeWord(int val) throws IOException {
-        arrShort[0] = (byte)(val & 0xFF);
-        arrShort[1] = (byte)(val >>> 8);
-        write(arrShort);
-        offs += arrShort.length;
+        word[0] = (byte)(val & 0xFF);
+        word[1] = (byte)(val >>> 8);
+        write(word);
+        offs += word.length;
     }
 
     public void writeDword(int val) throws IOException {
-        Raw.writeIntLittleEndian(intByte, 0, val);
-        write(intByte);
-        offs += intByte.length;
+        writeDword((long)val);
     }
 
     public void writeDword(long val) throws IOException {
-        Raw.writeLongLittleEndian(longByte, 0, val);
-        System.arraycopy(longByte, 0, intByte, 0, 4);
-        write(intByte);
-        offs += intByte.length;
+        dword[0] = (byte)(val & 0xFF);
+        dword[1] = (byte)(val >>> 8);
+        dword[2] = (byte)(val >>> 16);
+        dword[3] = (byte)(val >>> 24);
+        write(dword);
+        offs += dword.length;
     }
 
     public void writeQword(long val) throws IOException {

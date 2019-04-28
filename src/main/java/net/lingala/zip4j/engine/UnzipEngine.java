@@ -210,7 +210,7 @@ public class UnzipEngine {
         LittleEndianRandomAccessFile in = new LittleEndianRandomAccessFile(zipModel.getPartFile(diskNumber));
 
         if (currSplitFileCounter == 1) {
-            int signature = in.readInt();
+            int signature = in.readDword();
 
             if (signature != InternalZipConstants.SPLITSIG)
                 throw new ZipException("Expected first part of split file signature (offs:" + in.getFilePointer() + ')');

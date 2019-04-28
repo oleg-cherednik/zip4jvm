@@ -33,7 +33,7 @@ final class Zip64ExtendedInfoReader {
         res.setUncompressedSize(uncompressedSize ? in.readLong() : ExtraField.NO_DATA);
         res.setCompressedSize(compressedSize ? in.readLong() : ExtraField.NO_DATA);
         res.setOffsLocalHeaderRelative(offs ? in.readLong() : ExtraField.NO_DATA);
-        res.setDiskNumber(diskNumber ? in.readInt() : ExtraField.NO_DATA);
+        res.setDiskNumber(diskNumber ? in.readDword() : ExtraField.NO_DATA);
 
         return res;
     }

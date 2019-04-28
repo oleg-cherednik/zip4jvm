@@ -17,35 +17,42 @@ import java.nio.file.Path;
  * @since 21.02.2019
  */
 @RequiredArgsConstructor
+@SuppressWarnings("SpellCheckingInspection")
 public final class LittleEndianRandomAccessFile implements Closeable {
 
     @Getter
-    private final RandomAccessFile raf;
+    @NonNull
+    private final RandomAccessFile in;
     @Getter
     private int offs;
 
     public LittleEndianRandomAccessFile(@NonNull Path path) throws FileNotFoundException {
-        raf = new RandomAccessFile(path.toFile(), "r");
+        in = new RandomAccessFile(path.toFile(), "r");
     }
 
     public int readWord() throws IOException {
         offs += 2;
-        int ch1 = raf.read();
-        int ch2 = raf.read();
-        return (ch2 << 8) + ch1;
+        int ch0 = in.read();
+        int ch1 = in.read();
+        return (ch1 << 8) + ch0;
     }
 
     public int readDword() throws IOException {
-        return readInt();
+        return (int)readDwordLong();
     }
 
     public long readDwordLong() throws IOException {
-        return readIntAsLong();
+        offs += 4;
+        int ch0 = in.read();
+        int ch1 = in.read();
+        int ch2 = in.read();
+        int ch3 = in.read();
+        return ch3 << 24 | ch2 << 16 | ch1 << 8 | ch0;
     }
 
-    public int readInt() throws IOException {
-        offs += 4;
-        return (int)convertInt(raf.readInt());
+    public long readLong() throws IOException {
+        offs += 8;
+        return convertLong(in.readLong());
     }
 
     public String readString(int length) throws IOException {
@@ -54,23 +61,15 @@ public final class LittleEndianRandomAccessFile implements Closeable {
 
         offs += length;
         byte[] buf = new byte[length];
-        raf.readFully(buf);
+        in.readFully(buf);
         return new CreateStringFunc().apply(buf);
     }
 
-    public long readIntAsLong() throws IOException {
-        offs += 4;
-        return convertInt(raf.readInt());
-    }
 
-    public long readLong() throws IOException {
-        offs += 8;
-        return convertLong(raf.readLong());
-    }
 
     public byte readByte() throws IOException {
         offs++;
-        return raf.readByte();
+        return in.readByte();
     }
 
     public byte[] readBytes(int total) throws IOException {
@@ -80,35 +79,27 @@ public final class LittleEndianRandomAccessFile implements Closeable {
         offs += total;
         byte[] buf = new byte[total];
 
-        if (raf.read(buf) != total)
+        if (in.read(buf) != total)
             throw new IOException("Not enough bytes to read");
 
         return buf;
     }
 
     public long length() throws IOException {
-        return raf.length();
+        return in.length();
     }
 
     public void seek(long pos) throws IOException {
-        raf.seek(pos);
+        in.seek(pos);
     }
 
     @Override
     public void close() throws IOException {
-        raf.close();
+        in.close();
     }
 
     public long getFilePointer() throws IOException {
-        return raf.getFilePointer();
-    }
-
-    private static short convertShort(short val) {
-        return (short)(BitUtils.getByte(val, 0) << 8 | BitUtils.getByte(val, 1));
-    }
-
-    private static long convertInt(int val) {
-        return BitUtils.getByte(val, 0) << 24 | BitUtils.getByte(val, 1) << 16 | BitUtils.getByte(val, 2) << 8 | BitUtils.getByte(val, 3);
+        return in.getFilePointer();
     }
 
     private static long convertLong(long val) {

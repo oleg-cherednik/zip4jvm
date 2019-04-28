@@ -16,7 +16,7 @@ final class DigitalSignatureReader {
 
     @NonNull
     public CentralDirectory.DigitalSignature read(@NonNull LittleEndianRandomAccessFile in) throws IOException {
-        if (in.readInt() != CentralDirectory.DigitalSignature.SIGNATURE)
+        if (in.readDword() != CentralDirectory.DigitalSignature.SIGNATURE)
             return null;
 
         CentralDirectory.DigitalSignature digitalSignature = new CentralDirectory.DigitalSignature();

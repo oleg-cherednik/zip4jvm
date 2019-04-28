@@ -45,7 +45,7 @@ public final class ZipModelWriter {
         out.mark(MARK);
         updateFileHeaders();
         new CentralDirectoryWriter(zipModel.getCentralDirectory(), zipModel.getCharset()).write(out);
-        endCentralDirectory.setSize((int)out.getWrittenBytesAmount(MARK));
+        endCentralDirectory.setSize(out.getWrittenBytesAmount(MARK));
 
         zipModel.updateZip64();
 

@@ -28,7 +28,7 @@ final class EndCentralDirectoryReader {
         dir.setStartDiskNumber(in.readWord());
         dir.setDiskEntries(in.readWord());
         dir.setTotalEntries(in.readWord());
-        dir.setSize(in.readDword());
+        dir.setSize(in.readDwordLong());
         dir.setOffs(in.readDwordLong());
         dir.setComment(in.readString(in.readWord() & 0xFFFF));
 
@@ -46,7 +46,7 @@ final class EndCentralDirectoryReader {
             commentLength--;
             this.offs = in.getFilePointer();
 
-            if (in.readInt() == EndCentralDirectory.SIGNATURE)
+            if (in.readDword() == EndCentralDirectory.SIGNATURE)
                 return;
         } while (commentLength >= 0 && offs >= 0);
 

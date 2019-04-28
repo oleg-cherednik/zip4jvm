@@ -39,7 +39,7 @@ public class PartInputStream extends InputStream {
     private int count = -1;
 
     public PartInputStream(LittleEndianRandomAccessFile in, long length, UnzipEngine unzipEngine) {
-        raf = in.getRaf();
+        raf = in.getIn();
         this.unzipEngine = unzipEngine;
         this.length = length;
     }

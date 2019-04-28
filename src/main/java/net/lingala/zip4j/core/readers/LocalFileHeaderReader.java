@@ -29,10 +29,10 @@ public final class LocalFileHeaderReader {
         localFileHeader.setVersionToExtract(in.readWord());
         localFileHeader.setGeneralPurposeFlag(in.readWord());
         localFileHeader.setCompressionMethod(CompressionMethod.parseValue(in.readWord()));
-        localFileHeader.setLastModifiedTime(in.readInt());
-        localFileHeader.setCrc32(in.readInt());
-        localFileHeader.setCompressedSize(in.readIntAsLong());
-        localFileHeader.setUncompressedSize(in.readIntAsLong());
+        localFileHeader.setLastModifiedTime(in.readDword());
+        localFileHeader.setCrc32(in.readDword());
+        localFileHeader.setCompressedSize(in.readDwordLong());
+        localFileHeader.setUncompressedSize(in.readDwordLong());
         int fileNameLength = in.readWord();
         int extraFieldLength = in.readWord();
         localFileHeader.setFileName(FilenameUtils.normalize(in.readString(fileNameLength)));
@@ -53,7 +53,7 @@ public final class LocalFileHeaderReader {
     private void findHead(LittleEndianRandomAccessFile in) throws IOException {
         in.seek(fileHeader.getOffsLocalFileHeader());
 
-        if (in.readInt() == LocalFileHeader.SIGNATURE)
+        if (in.readDword() == LocalFileHeader.SIGNATURE)
             return;
 
         throw new ZipException("invalid local file header signature");

@@ -32,24 +32,24 @@ final class FileHeaderReader {
     private static CentralDirectory.FileHeader readFileHeader(LittleEndianRandomAccessFile in) throws IOException {
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
-        if (in.readInt() != CentralDirectory.FileHeader.SIGNATURE)
+        if (in.readDword() != CentralDirectory.FileHeader.SIGNATURE)
             throw new ZipException("Expected central directory entry not found (offs:" + (in.getFilePointer() - 4) + ')');
 
         fileHeader.setVersionMadeBy(in.readWord());
         fileHeader.setVersionToExtract(in.readWord());
         fileHeader.setGeneralPurposeFlag(in.readWord());
         fileHeader.setCompressionMethod(CompressionMethod.parseValue(in.readWord()));
-        fileHeader.setLastModifiedTime(in.readInt());
-        fileHeader.setCrc32(in.readInt());
-        fileHeader.setCompressedSize(in.readIntAsLong());
-        fileHeader.setUncompressedSize(in.readIntAsLong());
+        fileHeader.setLastModifiedTime(in.readDword());
+        fileHeader.setCrc32(in.readDword());
+        fileHeader.setCompressedSize(in.readDwordLong());
+        fileHeader.setUncompressedSize(in.readDwordLong());
         int fileNameLength = in.readWord();
         int extraFieldLength = in.readWord();
         int fileCommentLength = in.readWord();
         fileHeader.setDiskNumber(in.readWord());
         fileHeader.setInternalFileAttributes(in.readBytes(2));
         fileHeader.setExternalFileAttributes(in.readBytes(4));
-        fileHeader.setOffsLocalFileHeader(in.readIntAsLong());
+        fileHeader.setOffsLocalFileHeader(in.readDwordLong());
         fileHeader.setFileName(FilenameUtils.normalize(in.readString(fileNameLength), true));
 
         boolean uncompressedSize = (fileHeader.getUncompressedSize() & 0xFFFF) == 0xFFFF;

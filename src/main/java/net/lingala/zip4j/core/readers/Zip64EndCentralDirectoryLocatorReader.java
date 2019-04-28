@@ -23,9 +23,9 @@ final class Zip64EndCentralDirectoryLocatorReader {
             return null;
 
         Zip64.EndCentralDirectoryLocator locator = new Zip64.EndCentralDirectoryLocator();
-        locator.setNoOfDiskStartOfZip64EndOfCentralDirRec(in.readInt());
+        locator.setNoOfDiskStartOfZip64EndOfCentralDirRec(in.readDword());
         locator.setOffs(in.readLong());
-        locator.setTotNumberOfDiscs(in.readInt());
+        locator.setTotNumberOfDiscs(in.readDword());
 
         return locator;
     }
@@ -40,6 +40,6 @@ final class Zip64EndCentralDirectoryLocatorReader {
             return false;
 
         in.seek(offs);
-        return in.readInt() == Zip64.EndCentralDirectoryLocator.SIGNATURE;
+        return in.readDword() == Zip64.EndCentralDirectoryLocator.SIGNATURE;
     }
 }

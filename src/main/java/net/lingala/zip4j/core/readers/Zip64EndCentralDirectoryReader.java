@@ -25,8 +25,8 @@ final class Zip64EndCentralDirectoryReader {
         dir.setSizeOfZip64EndCentralDirRec(in.readLong());
         dir.setVersionMadeBy(in.readWord());
         dir.setVersionNeededToExtract(in.readWord());
-        dir.setDiskNumber(in.readInt());
-        dir.setStartDiskNumber(in.readInt());
+        dir.setDiskNumber(in.readDword());
+        dir.setStartDiskNumber(in.readDword());
         dir.setDiskEntries(in.readLong());
         dir.setTotalEntries(in.readLong());
         dir.setSize(in.readLong());
@@ -39,7 +39,7 @@ final class Zip64EndCentralDirectoryReader {
     private void findHead(LittleEndianRandomAccessFile in) throws IOException {
         in.seek(offs);
 
-        if (in.readInt() == Zip64.EndCentralDirectory.SIGNATURE)
+        if (in.readDword() == Zip64.EndCentralDirectory.SIGNATURE)
             return;
 
         throw new ZipException("invalid zip64 end of central directory");
