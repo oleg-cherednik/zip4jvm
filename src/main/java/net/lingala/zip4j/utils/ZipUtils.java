@@ -16,6 +16,7 @@
 
 package net.lingala.zip4j.utils;
 
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.AESExtraDataRecord;
@@ -74,6 +75,7 @@ public class ZipUtils {
         return cal.getTime().getTime();
     }
 
+    @NonNull
     public static long[] getAllHeaderSignatures() {
         long[] allSigs = new long[11];
 

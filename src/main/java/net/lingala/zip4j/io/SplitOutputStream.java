@@ -24,6 +24,7 @@ import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.utils.InternalZipConstants;
 import net.lingala.zip4j.utils.Raw;
 import net.lingala.zip4j.utils.ZipUtils;
+import org.apache.commons.lang.ArrayUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -43,26 +44,13 @@ public class SplitOutputStream extends OutputStream {
     private int currSplitFileCounter;
     protected long bytesWrittenForThisPart;
 
-    @NonNull
-    public static SplitOutputStream create(@NonNull ZipModel zipModel) throws IOException {
-        Path zipFile = zipModel.getZipFile();
-        Path parent = zipFile.getParent();
-
-        if (parent != null)
-            Files.createDirectories(parent);
-
-        return zipModel.isSplitArchive() ? new SplitOutputStream(zipFile, zipModel.getSplitLength()) : new NoSplitOutputStream(zipFile);
-    }
-
-    protected SplitOutputStream(Path file, long splitLength) throws FileNotFoundException {
+    protected SplitOutputStream(Path zipFile, long splitLength) throws FileNotFoundException {
         if (splitLength >= 0 && splitLength < InternalZipConstants.MIN_SPLIT_LENGTH)
             throw new ZipException("split length less than minimum allowed split length of " + InternalZipConstants.MIN_SPLIT_LENGTH + " Bytes");
 
-        raf = new RandomAccessFile(file.toFile(), "rw");
         this.splitLength = splitLength;
-        zipFile = file;
-        currSplitFileCounter = 0;
-        bytesWrittenForThisPart = 0;
+        raf = new RandomAccessFile(zipFile.toFile(), "rw");
+        this.zipFile = zipFile;
     }
 
     @Override
@@ -109,63 +97,6 @@ public class SplitOutputStream extends OutputStream {
         zipFile = new File(zipFileName).toPath();
         raf = new RandomAccessFile(zipFile.toFile(), "rw");
         currSplitFileCounter++;
-    }
-
-    @SuppressWarnings("MethodCanBeVariableArityMethod")
-    private static boolean isHeaderData(byte[] buf) {
-        if (buf == null || buf.length < 4)
-            return false;
-
-        int signature = Raw.readIntLittleEndian(buf, 0);
-        long[] allHeaderSignatures = ZipUtils.getAllHeaderSignatures();
-
-        if (allHeaderSignatures != null && allHeaderSignatures.length > 0)
-            for (int i = 0; i < allHeaderSignatures.length; i++)
-                //Ignore split signature
-                if (allHeaderSignatures[i] != InternalZipConstants.SPLITSIG && allHeaderSignatures[i] == signature)
-                    return true;
-
-        return false;
-    }
-
-    /**
-     * Checks if the buffer size is sufficient for the current split file. If not
-     * a new split file will be started.
-     *
-     * @param bufferSize
-     * @return true if a new split file was started else false
-     * @throws ZipException
-     */
-    public boolean checkBuffSizeAndStartNextSplitFile(int bufferSize) {
-        if (bufferSize < 0)
-            throw new ZipException("negative buffersize for checkBuffSizeAndStartNextSplitFile");
-
-        if (!isBuffSizeFitForCurrSplitFile(bufferSize)) {
-            try {
-                startNextSplitFile();
-                bytesWrittenForThisPart = 0;
-                return true;
-            } catch(IOException e) {
-                throw new ZipException(e);
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Checks if the given buffer size will be fit in the current split file.
-     * If this output stream is a non-split file, then this method always returns true
-     *
-     * @param bufferSize
-     * @return true if the buffer size is fit in the current split file or else false.
-     * @throws ZipException
-     */
-    public boolean isBuffSizeFitForCurrSplitFile(int bufferSize) {
-        if (bufferSize < 0)
-            throw new ZipException("negative buffersize for isBuffSizeFitForCurrSplitFile");
-
-        return bytesWrittenForThisPart + bufferSize <= splitLength;
     }
 
     public void seek(long pos) throws IOException {
@@ -241,4 +172,30 @@ public class SplitOutputStream extends OutputStream {
     public long getWrittenBytesAmount(String id) {
         return offs - mark.getOrDefault(id, 0L);
     }
+
+    @NonNull
+    public static SplitOutputStream create(@NonNull ZipModel zipModel) throws IOException {
+        Path zipFile = zipModel.getZipFile();
+        Path parent = zipFile.getParent();
+
+        if (parent != null)
+            Files.createDirectories(parent);
+
+        return zipModel.isSplitArchive() ? new SplitOutputStream(zipFile, zipModel.getSplitLength()) : new NoSplitOutputStream(zipFile);
+    }
+
+    @SuppressWarnings("MethodCanBeVariableArityMethod")
+    private static boolean isHeaderData(byte[] buf) {
+        if (ArrayUtils.getLength(buf) < 4)
+            return false;
+
+        int signature = Raw.readIntLittleEndian(buf, 0);
+
+        for (long headerSignature : ZipUtils.getAllHeaderSignatures())
+            if (headerSignature != InternalZipConstants.SPLITSIG && headerSignature == signature)
+                return true;
+
+        return false;
+    }
+
 }
