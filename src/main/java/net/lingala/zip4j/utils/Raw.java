@@ -67,22 +67,4 @@ public class Raw {
         buff[14] = 0;
         buff[15] = 0;
     }
-
-    /**
-     * Converts a char array to byte array
-     *
-     * @param charArray
-     * @return byte array representation of the input char array
-     */
-    public static byte[] convertCharArrayToByteArray(char[] charArray) {
-        if (charArray == null) {
-            throw new NullPointerException();
-        }
-
-        byte[] bytes = new byte[charArray.length];
-        for (int i = 0; i < charArray.length; i++) {
-            bytes[i] = (byte)charArray[i];
-        }
-        return bytes;
-    }
 }
