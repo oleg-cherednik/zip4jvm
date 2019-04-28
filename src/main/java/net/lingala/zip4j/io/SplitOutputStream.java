@@ -38,10 +38,11 @@ import java.util.Map;
 
 public class SplitOutputStream extends OutputStream {
 
-    protected RandomAccessFile raf;
     private final long splitLength;
-    private Path zipFile;
     private int currSplitFileCounter;
+
+    protected Path zipFile;
+    protected RandomAccessFile raf;
     protected long bytesWrittenForThisPart;
 
     protected SplitOutputStream(Path zipFile, long splitLength) throws FileNotFoundException {
@@ -125,6 +126,14 @@ public class SplitOutputStream extends OutputStream {
     @Setter
     private long offs;
     private final Map<String, Long> mark = new HashMap<>();
+
+
+    public void writeSignature(int val) throws IOException {
+        Raw.writeIntLittleEndian(intByte, 0, val);
+        write(intByte);
+        offs += intByte.length;
+    }
+
 
     public void writeWord(short val) throws IOException {
         Raw.writeShortLittleEndian(shortByte, 0, val);

@@ -22,7 +22,7 @@ final class DigitalSignatureWriter {
         if (digitalSignature == null)
             return;
 
-        out.writeDword(InternalZipConstants.DIGSIG);
+        out.writeSignature(InternalZipConstants.DIGSIG);
         out.writeWord((short)ArrayUtils.getLength(digitalSignature.getSignatureData()));
         out.writeBytes(digitalSignature.getSignatureData());
     }
