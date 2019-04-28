@@ -74,24 +74,18 @@ public class SplitOutputStream extends OutputStream {
 
         int canWrite = (int)(splitLength - bytesWrittenForThisPart);
 
-        if (canWrite <= 0) {
+        if (canWrite <= 0)
             startNextSplitFile();
-            bytesWrittenForThisPart = 0;
-        }
 
-        if (canWrite > 0 && len > canWrite && isSignatureData.test(buf)) {
+        if (canWrite > 0 && len > canWrite && isSignatureData.test(buf))
             startNextSplitFile();
-            bytesWrittenForThisPart = 0;
-        }
 
         if (canWrite > 0 && len > canWrite && !isSignatureData.test(buf)) {
             out.write(buf, offs, canWrite);
-
-            startNextSplitFile();
-            bytesWrittenForThisPart = 0;
-
             offs += canWrite;
             len -= canWrite;
+
+            startNextSplitFile();
         }
 
         out.write(buf, offs, len);
