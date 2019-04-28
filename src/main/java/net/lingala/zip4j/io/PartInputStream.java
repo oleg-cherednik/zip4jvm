@@ -16,7 +16,7 @@
 
 package net.lingala.zip4j.io;
 
-import net.lingala.zip4j.crypto.AESDecoder;
+import net.lingala.zip4j.crypto.AesDecoder;
 import net.lingala.zip4j.engine.UnzipEngine;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.Encryption;
@@ -80,7 +80,7 @@ public class PartInputStream extends InputStream {
             }
         }
 
-        if (unzipEngine.getDecoder() instanceof AESDecoder) {
+        if (unzipEngine.getDecoder() instanceof AesDecoder) {
             if (bytesRead + len < length) {
                 if (len % 16 != 0) {
                     len = len - (len % 16);
@@ -120,10 +120,10 @@ public class PartInputStream extends InputStream {
     protected void checkAndReadAESMacBytes() throws IOException {
         if (!isAes())
             return;
-        if (unzipEngine.getDecoder() == null || !(unzipEngine.getDecoder() instanceof AESDecoder))
+        if (unzipEngine.getDecoder() == null || !(unzipEngine.getDecoder() instanceof AesDecoder))
             return;
 
-        if (((AESDecoder)unzipEngine.getDecoder()).getStoredMac() != null) {
+        if (((AesDecoder)unzipEngine.getDecoder()).getStoredMac() != null) {
             //Stored mac already set
             return;
         }
@@ -141,7 +141,7 @@ public class PartInputStream extends InputStream {
             }
         }
 
-        ((AESDecoder)unzipEngine.getDecoder()).setStoredMac(macBytes);
+        ((AesDecoder)unzipEngine.getDecoder()).setStoredMac(macBytes);
     }
 
     @Override

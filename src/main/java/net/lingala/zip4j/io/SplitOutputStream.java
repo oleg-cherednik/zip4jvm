@@ -20,7 +20,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.model.AESExtraDataRecord;
+import net.lingala.zip4j.model.AesExtraDataRecord;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.EndCentralDirectory;
 import net.lingala.zip4j.model.LocalFileHeader;
@@ -228,7 +228,7 @@ public class SplitOutputStream extends OutputStream {
                 Zip64.EndCentralDirectoryLocator.SIGNATURE,
                 Zip64.EndCentralDirectory.SIGNATURE,
                 Zip64.ExtendedInfo.SIGNATURE,
-                AESExtraDataRecord.SIGNATURE));
+                AesExtraDataRecord.SIGNATURE));
 
         @Override
         public boolean test(byte[] buf) {

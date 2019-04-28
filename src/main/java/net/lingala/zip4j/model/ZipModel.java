@@ -48,7 +48,6 @@ public class ZipModel {
     private final Path zipFile;
     @NonNull
     private final Charset charset;
-
     private final List<LocalFileHeader> localFileHeaders = new ArrayList<>();
     @NonNull
     private CentralDirectory centralDirectory = new CentralDirectory();

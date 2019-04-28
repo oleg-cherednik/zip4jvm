@@ -55,7 +55,6 @@ public final class GeneralPurposeFlag {
      *         the filename and comment fields for this file
      *         MUST be encoded using UTF-8.
      */
-
     private int data;
 
     public GeneralPurposeFlag() {
@@ -99,9 +98,9 @@ public final class GeneralPurposeFlag {
 
         if (compressionLevel == CompressionLevel.MAXIMUM)
             data = BitUtils.setBits(data, BIT1);
-        else if(compressionLevel == CompressionLevel.FAST)
+        else if (compressionLevel == CompressionLevel.FAST)
             data = BitUtils.setBits(data, BIT2);
-        else if(compressionLevel == CompressionLevel.FASTEST)
+        else if (compressionLevel == CompressionLevel.FASTEST)
             data = BitUtils.setBits(data, BIT1 | BIT2);
     }
 

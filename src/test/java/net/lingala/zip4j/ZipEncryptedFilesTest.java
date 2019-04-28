@@ -1,6 +1,6 @@
 package net.lingala.zip4j;
 
-import net.lingala.zip4j.model.AESStrength;
+import net.lingala.zip4j.model.AesStrength;
 import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.Encryption;
@@ -41,7 +41,7 @@ public class ZipEncryptedFilesTest {
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .encryption(Encryption.STANDARD)
-                                                .aesKeyStrength(AESStrength.STRENGTH_256)
+                                                .aesKeyStrength(AesStrength.STRENGTH_256)
                                                 .password(Zip4jSuite.password).build();
 
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();

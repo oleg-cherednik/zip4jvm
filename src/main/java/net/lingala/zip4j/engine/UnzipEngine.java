@@ -19,7 +19,7 @@ package net.lingala.zip4j.engine;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.core.readers.LocalFileHeaderReader;
-import net.lingala.zip4j.crypto.AESDecoder;
+import net.lingala.zip4j.crypto.AesDecoder;
 import net.lingala.zip4j.crypto.Decoder;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.InflaterInputStream;
@@ -134,11 +134,11 @@ public class UnzipEngine {
             long offs = localFileHeader.getOffs();
 
             if (localFileHeader.getEncryption() == Encryption.AES) {
-                if (decoder instanceof AESDecoder) {
-                    comprSize -= ((AESDecoder)decoder).getSaltLength() +
-                            ((AESDecoder)decoder).getPasswordVerifierLength() + 10;
-                    offs += ((AESDecoder)decoder).getSaltLength() +
-                            ((AESDecoder)decoder).getPasswordVerifierLength();
+                if (decoder instanceof AesDecoder) {
+                    comprSize -= ((AesDecoder)decoder).getSaltLength() +
+                            ((AesDecoder)decoder).getPasswordVerifierLength() + 10;
+                    offs += ((AesDecoder)decoder).getSaltLength() +
+                            ((AesDecoder)decoder).getPasswordVerifierLength();
                 } else
                     throw new ZipException("invalid decryptor when trying to calculate " +
                             "compressed size for AES encrypted file: " + fileHeader.getFileName());
@@ -166,9 +166,9 @@ public class UnzipEngine {
     public void checkCRC() throws ZipException {
         if (fileHeader != null) {
             if (fileHeader.getEncryption() == Encryption.AES) {
-                if (decoder != null && decoder instanceof AESDecoder) {
-                    byte[] tmpMacBytes = ((AESDecoder)decoder).getCalculatedAuthenticationBytes();
-                    byte[] storedMac = ((AESDecoder)decoder).getStoredMac();
+                if (decoder != null && decoder instanceof AesDecoder) {
+                    byte[] tmpMacBytes = ((AesDecoder)decoder).getCalculatedAuthenticationBytes();
+                    byte[] storedMac = ((AesDecoder)decoder).getStoredMac();
                     byte[] calculatedMac = new byte[InternalZipConstants.AES_AUTH_LENGTH];
 
                     if (calculatedMac == null || storedMac == null) {

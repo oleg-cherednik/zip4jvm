@@ -3,7 +3,7 @@ package net.lingala.zip4j.io;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.model.AESExtraDataRecord;
+import net.lingala.zip4j.model.AesExtraDataRecord;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.Encryption;
@@ -154,11 +154,11 @@ public class CentralDirectoryBuilder {
     }
 
     @NonNull
-    private AESExtraDataRecord getAesExtraDataRecord(@NonNull Encryption encryption) {
+    private AesExtraDataRecord getAesExtraDataRecord(@NonNull Encryption encryption) {
         if (encryption != Encryption.AES)
-            return AESExtraDataRecord.NULL;
+            return AesExtraDataRecord.NULL;
 
-        AESExtraDataRecord aesDataRecord = new AESExtraDataRecord();
+        AesExtraDataRecord aesDataRecord = new AesExtraDataRecord();
         aesDataRecord.setDataSize(7);
         aesDataRecord.setVendor("AE");
         // Always set the version number to 2 as we do not store CRC for any AES encrypted files

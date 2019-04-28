@@ -4,8 +4,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.lingala.zip4j.crypto.AESDecoder;
-import net.lingala.zip4j.crypto.AESEncoder;
+import net.lingala.zip4j.crypto.AesDecoder;
+import net.lingala.zip4j.crypto.AesEncoder;
 import net.lingala.zip4j.crypto.Decoder;
 import net.lingala.zip4j.crypto.Encoder;
 import net.lingala.zip4j.crypto.StandardDecoder;
@@ -56,11 +56,11 @@ public enum Encryption {
                 throws IOException {
             byte[] salt = getSalt(in, localFileHeader);
             byte[] passwordVerifier = in.readBytes(2);
-            return new AESDecoder(localFileHeader, fileHeader.getPassword(), salt, passwordVerifier);
+            return new AesDecoder(localFileHeader, fileHeader.getPassword(), salt, passwordVerifier);
         }
 
         private byte[] getSalt(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader) throws IOException {
-            if (localFileHeader.getExtraField().getAesExtraDataRecord() == AESExtraDataRecord.NULL)
+            if (localFileHeader.getExtraField().getAesExtraDataRecord() == AesExtraDataRecord.NULL)
                 return null;
 
             in.seek(localFileHeader.getOffs());
@@ -69,7 +69,7 @@ public enum Encryption {
 
         @Override
         public Encoder encoder(ZipParameters parameters, LocalFileHeader localFileHeader) {
-            return new AESEncoder(parameters.getPassword(), parameters.getAesKeyStrength());
+            return new AesEncoder(parameters.getPassword(), parameters.getAesKeyStrength());
         }
     };
 
@@ -83,4 +83,13 @@ public enum Encryption {
     public Encoder encoder(ZipParameters parameters, LocalFileHeader localFileHeader) {
         throw new ZipException("invalid encryption method");
     }
+
+    public static Encryption get(@NonNull ExtraField extraField, @NonNull GeneralPurposeFlag generalPurposeFlag) {
+        if (extraField.getAesExtraDataRecord() != AesExtraDataRecord.NULL)
+            return AES;
+        if (generalPurposeFlag.isStrongEncryption())
+            return STRONG;
+        return generalPurposeFlag.isEncrypted() ? STANDARD : OFF;
+    }
+
 }

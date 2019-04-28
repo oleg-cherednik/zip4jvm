@@ -36,10 +36,10 @@ public class LocalFileHeader {
     public static final int SIGNATURE = 0x04034B50;
 
     // size:4 - signature (0x04034b50)
-//    private final int signature = SIGNATURE;
     // size:2 - version needed to extractEntries
     private int versionToExtract;
     // size:2 - general purpose bit flag
+    @NonNull
     private final GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
     // size:2 - compression method
     @NonNull
@@ -54,9 +54,7 @@ public class LocalFileHeader {
     // size:4 - uncompressed size
     private long uncompressedSize;
     // size:2 - file name length (n)
-//    private int fileNameLength;
     // size:2 - extra field length (m)
-//    private int extraFieldLength;
     // size:n - file name
     private String fileName;
     // size:m - extra field
@@ -85,11 +83,7 @@ public class LocalFileHeader {
     }
 
     public Encryption getEncryption() {
-        if (extraField.getAesExtraDataRecord() != AESExtraDataRecord.NULL)
-            return Encryption.AES;
-        if (generalPurposeFlag.isStrongEncryption())
-            return Encryption.STRONG;
-        return generalPurposeFlag.isEncrypted() ? Encryption.STANDARD : Encryption.OFF;
+        return Encryption.get(extraField, generalPurposeFlag);
     }
 
 }

@@ -22,7 +22,7 @@ final class ExtraFieldWriter {
 
     public void write(@NonNull SplitOutputStream out) throws IOException {
         new Zip64ExtendedInfoWriter(extraField.getExtendedInfo()).write(out);
-        new AESExtraDataRecordWriter(extraField.getAesExtraDataRecord(), charset).write(out);
+        new AesExtraDataRecordWriter(extraField.getAesExtraDataRecord(), charset).write(out);
     }
 
 }

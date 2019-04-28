@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.lingala.zip4j.model;
 
 import lombok.AllArgsConstructor;
@@ -32,14 +31,13 @@ import java.nio.charset.Charset;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
-public class AESExtraDataRecord {
+public class AesExtraDataRecord {
 
     public static final int SIGNATURE = 0x9901;
     public static final int SIZE = 2 + 2 + 2 + 2 + 1 + 2;   // size:11
     public static final int SIZE_FIELD = 2 + 2; // 4 bytes: signature + size
 
     // size:2 - signature (0x9901)
-//    private final short signature = SIGNATURE;
     // size:2
     @Builder.Default
     private int dataSize = ExtraField.NO_DATA;
@@ -51,7 +49,7 @@ public class AESExtraDataRecord {
     // size:1
     @NonNull
     @Builder.Default
-    private AESStrength aesStrength = AESStrength.NONE;
+    private AesStrength aesStrength = AesStrength.NONE;
     // size:2
     @NonNull
     @Builder.Default
@@ -71,7 +69,7 @@ public class AESExtraDataRecord {
         return SIZE;
     }
 
-    public static final AESExtraDataRecord NULL = new AESExtraDataRecord() {
+    public static final AesExtraDataRecord NULL = new AesExtraDataRecord() {
 
         private final NullPointerException exception = new NullPointerException("Null object modification: " + getClass().getSimpleName());
 
@@ -92,7 +90,7 @@ public class AESExtraDataRecord {
         }
 
         @Override
-        public void setAesStrength(AESStrength aesStrength) {
+        public void setAesStrength(AesStrength aesStrength) {
             throw exception;
         }
 

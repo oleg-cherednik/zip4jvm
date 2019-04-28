@@ -13,28 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.lingala.zip4j.crypto;
 
 import lombok.NonNull;
 import net.lingala.zip4j.crypto.PBKDF2.MacBasedPRF;
 import net.lingala.zip4j.crypto.PBKDF2.PBKDF2Engine;
 import net.lingala.zip4j.crypto.PBKDF2.PBKDF2Parameters;
-import net.lingala.zip4j.crypto.engine.AESEngine;
+import net.lingala.zip4j.crypto.engine.AesEngine;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.SplitOutputStream;
-import net.lingala.zip4j.model.AESStrength;
+import net.lingala.zip4j.model.AesStrength;
 import net.lingala.zip4j.utils.InternalZipConstants;
 import net.lingala.zip4j.utils.ZipUtils;
 
 import java.io.IOException;
 import java.util.Random;
 
-public class AESEncoder implements Encoder {
+public class AesEncoder implements Encoder {
 
     private char[] password;
-    private AESStrength keyStrength;
-    private AESEngine aesEngine;
+    private AesStrength keyStrength;
+    private AesEngine aesEngine;
     private MacBasedPRF mac;
 
     private int KEY_LENGTH;
@@ -55,7 +54,7 @@ public class AESEncoder implements Encoder {
     private byte[] iv;
     private byte[] counterBlock;
 
-    public AESEncoder(char[] password, AESStrength keyStrength) throws ZipException {
+    public AesEncoder(char[] password, AesStrength keyStrength) throws ZipException {
         this.password = password;
         this.keyStrength = keyStrength;
         this.finished = false;
@@ -65,11 +64,11 @@ public class AESEncoder implements Encoder {
     }
 
     private void init() throws ZipException {
-        if (keyStrength == AESStrength.STRENGTH_128) {
+        if (keyStrength == AesStrength.STRENGTH_128) {
             KEY_LENGTH = 16;
             MAC_LENGTH = 16;
             SALT_LENGTH = 8;
-        } else if (keyStrength == AESStrength.STRENGTH_256) {
+        } else if (keyStrength == AesStrength.STRENGTH_256) {
             KEY_LENGTH = 32;
             MAC_LENGTH = 32;
             SALT_LENGTH = 16;
@@ -91,7 +90,7 @@ public class AESEncoder implements Encoder {
         System.arraycopy(keyBytes, KEY_LENGTH, macKey, 0, MAC_LENGTH);
         System.arraycopy(keyBytes, KEY_LENGTH + MAC_LENGTH, derivedPasswordVerifier, 0, PASSWORD_VERIFIER_LENGTH);
 
-        aesEngine = new AESEngine(aesKey);
+        aesEngine = new AesEngine(aesKey);
         mac = new MacBasedPRF("HmacSHA1");
         mac.init(macKey);
     }

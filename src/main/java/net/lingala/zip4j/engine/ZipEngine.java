@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.DeflateOutputStream;
 import net.lingala.zip4j.io.SplitOutputStream;
-import net.lingala.zip4j.model.AESStrength;
+import net.lingala.zip4j.model.AesStrength;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.InputStreamMeta;
@@ -138,7 +138,7 @@ public class ZipEngine {
             if (ArrayUtils.isEmpty(parameters.getPassword()))
                 throw new ZipException("input password is empty or null");
         } else {
-            parameters.setAesKeyStrength(AESStrength.NONE);
+            parameters.setAesKeyStrength(AesStrength.NONE);
             parameters.setEncryption(Encryption.OFF);
         }
     }

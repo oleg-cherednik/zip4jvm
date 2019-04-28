@@ -20,11 +20,11 @@ import lombok.NonNull;
 import net.lingala.zip4j.crypto.PBKDF2.MacBasedPRF;
 import net.lingala.zip4j.crypto.PBKDF2.PBKDF2Engine;
 import net.lingala.zip4j.crypto.PBKDF2.PBKDF2Parameters;
-import net.lingala.zip4j.crypto.engine.AESEngine;
+import net.lingala.zip4j.crypto.engine.AesEngine;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.exception.ZipExceptionConstants;
-import net.lingala.zip4j.model.AESExtraDataRecord;
-import net.lingala.zip4j.model.AESStrength;
+import net.lingala.zip4j.model.AesExtraDataRecord;
+import net.lingala.zip4j.model.AesStrength;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.utils.InternalZipConstants;
 import net.lingala.zip4j.utils.ZipUtils;
@@ -32,12 +32,12 @@ import org.apache.commons.lang.ArrayUtils;
 
 import java.util.Arrays;
 
-public class AESDecoder implements Decoder {
+public class AesDecoder implements Decoder {
 
     @NonNull
     private final LocalFileHeader localFileHeader;
     private final char[] password;
-    private AESEngine aesEngine;
+    private AesEngine aesEngine;
     private MacBasedPRF mac;
 
     private final int PASSWORD_VERIFIER_LENGTH = 2;
@@ -55,7 +55,7 @@ public class AESDecoder implements Decoder {
     private byte[] counterBlock;
     private int loopCount = 0;
 
-    public AESDecoder(@NonNull LocalFileHeader localFileHeader, char[] password, byte[] salt, byte[] passwordVerifier) throws ZipException {
+    public AesDecoder(@NonNull LocalFileHeader localFileHeader, char[] password, byte[] salt, byte[] passwordVerifier) throws ZipException {
         this.localFileHeader = localFileHeader;
         this.password = password;
         storedMac = null;
@@ -65,23 +65,23 @@ public class AESDecoder implements Decoder {
     }
 
     private void init(byte[] salt, byte[] passwordVerifier) throws ZipException {
-        AESExtraDataRecord aesExtraDataRecord = localFileHeader.getExtraField().getAesExtraDataRecord();
+        AesExtraDataRecord aesExtraDataRecord = localFileHeader.getExtraField().getAesExtraDataRecord();
 
-        if (aesExtraDataRecord == AESExtraDataRecord.NULL)
+        if (aesExtraDataRecord == AesExtraDataRecord.NULL)
             throw new ZipException("invalid aes extra data record - in init method of AESDecryptor");
 
         SALT_LENGTH = aesExtraDataRecord.getAesStrength().getSaltLength();
 
-        if (aesExtraDataRecord.getAesStrength() == AESStrength.NONE)
+        if (aesExtraDataRecord.getAesStrength() == AesStrength.NONE)
             throw new ZipException("invalid aes key strength for file: " + localFileHeader.getFileName());
 
-        if (aesExtraDataRecord.getAesStrength() == AESStrength.STRENGTH_128) {
+        if (aesExtraDataRecord.getAesStrength() == AesStrength.STRENGTH_128) {
             KEY_LENGTH = 16;
             MAC_LENGTH = 16;
-        } else if (aesExtraDataRecord.getAesStrength() == AESStrength.STRENGTH_192) {
+        } else if (aesExtraDataRecord.getAesStrength() == AesStrength.STRENGTH_192) {
             KEY_LENGTH = 24;
             MAC_LENGTH = 24;
-        } else if (aesExtraDataRecord.getAesStrength() == AESStrength.STRENGTH_256) {
+        } else if (aesExtraDataRecord.getAesStrength() == AesStrength.STRENGTH_256) {
             KEY_LENGTH = 32;
             MAC_LENGTH = 32;
         }
@@ -111,7 +111,7 @@ public class AESDecoder implements Decoder {
             throw new ZipException("Wrong Password for file: " + localFileHeader.getFileName(), ZipExceptionConstants.WRONG_PASSWORD);
         }
 
-        aesEngine = new AESEngine(aesKey);
+        aesEngine = new AesEngine(aesKey);
         mac = new MacBasedPRF("HmacSHA1");
         mac.init(macKey);
     }

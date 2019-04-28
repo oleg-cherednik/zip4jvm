@@ -24,13 +24,13 @@ import net.lingala.zip4j.utils.InternalZipConstants;
  * @author Srikanth Reddy Lingala
  *
  */
-public class AESEngine {
+public class AesEngine {
 
 	private int rounds;
     private int[][] workingKey = null;
     private int C0, C1, C2, C3;
 
-    public AESEngine(byte[] key) throws ZipException {
+    public AesEngine(byte[] key) throws ZipException {
 		init(key);
 	}
 

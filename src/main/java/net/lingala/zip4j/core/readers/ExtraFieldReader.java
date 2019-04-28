@@ -2,7 +2,7 @@ package net.lingala.zip4j.core.readers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.lingala.zip4j.model.AESExtraDataRecord;
+import net.lingala.zip4j.model.AesExtraDataRecord;
 import net.lingala.zip4j.model.ExtraField;
 import net.lingala.zip4j.model.Zip64;
 import net.lingala.zip4j.io.LittleEndianRandomAccessFile;
@@ -38,11 +38,11 @@ final class ExtraFieldReader {
             int signature = in.readWord();
 
             Zip64.ExtendedInfo zip64 = new Zip64ExtendedInfoReader(signature, uncompressedSize, compressedSize, offs, diskNumber).read(in);
-            AESExtraDataRecord aes = new AESExtraDataRecordReader(signature).read(in);
+            AesExtraDataRecord aes = new AesExtraDataRecordReader(signature).read(in);
 
             if (zip64 != Zip64.ExtendedInfo.NULL)
                 extraField.setExtendedInfo(zip64);
-            else if (aes != AESExtraDataRecord.NULL)
+            else if (aes != AesExtraDataRecord.NULL)
                 extraField.setAesExtraDataRecord(aes);
             else
                 // TODO do add skip instead

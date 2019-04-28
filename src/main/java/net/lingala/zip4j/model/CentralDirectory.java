@@ -94,12 +94,12 @@ public class CentralDirectory {
         public static final int DEF_VERSION = 20;
 
         // size:4 - signature (0x02014b50)
-//        private final int signature = SIGNATURE;
         // size:2 - version made by
         private int versionMadeBy = DEF_VERSION;
         // size:2 - version needed to extractEntries
         private int versionToExtract = DEF_VERSION;
         // size:2 - general purpose bit flag
+        @NonNull
         private final GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         // size:2 - compression method
         @NonNull
@@ -116,9 +116,7 @@ public class CentralDirectory {
         // size:4 - uncompressed size
         private long uncompressedSize;
         // size:2 - file name length (n)
-//        private int fileNameLength;
         // size:2 - extra field length (m)
-//        private int extraFieldLength;
         // size:2 - file comment length
         private int fileCommentLength;
         // size:2 - disk number start
@@ -181,7 +179,7 @@ public class CentralDirectory {
             generalPurposeFlag.setEncrypted(isEncrypted());
         }
 
-        public void setAesExtraDataRecord(@NonNull AESExtraDataRecord record) {
+        public void setAesExtraDataRecord(@NonNull AesExtraDataRecord record) {
             if (extraField == ExtraField.NULL)
                 extraField = new ExtraField();
             extraField.setAesExtraDataRecord(record);
@@ -202,11 +200,7 @@ public class CentralDirectory {
         }
 
         public Encryption getEncryption() {
-            if (extraField.getAesExtraDataRecord() != AESExtraDataRecord.NULL)
-                return Encryption.AES;
-            if (generalPurposeFlag.isStrongEncryption())
-                return Encryption.STRONG;
-            return generalPurposeFlag.isEncrypted() ? Encryption.STANDARD : Encryption.OFF;
+            return Encryption.get(extraField, generalPurposeFlag);
         }
 
         public boolean isWriteZip64FileSize() {
@@ -232,9 +226,7 @@ public class CentralDirectory {
         public static final int SIGNATURE = 0x05054B50;
 
         // size:4 - header signature (0x06054b50)
-//        private final int signature = SIGNATURE;
         // size:2 - size of data (n)
-//        private int sizeOfData;
         // size:n - signature data
         private byte[] signatureData;
 

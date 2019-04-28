@@ -30,7 +30,6 @@ public class Zip64 {
         public static final int SIZE = 4 + 4 + 8 + 4;
 
         // size:4 - signature (0x06054b50)
-//        private final int signature = SIGNATURE;
         // size:4 - number of the disk with the start of the zip64 end of central directory
         private int noOfDiskStartOfZip64EndOfCentralDirRec;
         // size:8 - relative offset of the zip64 end of central directory record
@@ -53,7 +52,6 @@ public class Zip64 {
         public static final int SIZE = 2 + 2 + 4 + 4 + 8 + 8 + 8 + 8;
 
         // size:4 - signature (0x06064b50)
-//        private final int signature = SIGNATURE;
         // size:8 - directory record (n)
         private long sizeOfZip64EndCentralDirRec;
         // size:2 - version made by
@@ -92,7 +90,6 @@ public class Zip64 {
         public static final int SIZE_FIELD = 2 + 2; // 4 bytes: signature + size
 
         // size:2 - tag for this "extra" block type (ZIP64 = 0x001)
-//        private final short signature = SIGNATURE;
         // size:2 - size of this "extra" block
         private int size;
         // size:8 - original uncompressed file size

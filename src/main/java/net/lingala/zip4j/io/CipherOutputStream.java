@@ -21,7 +21,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.core.writers.LocalFileHeaderWriter;
 import net.lingala.zip4j.core.writers.ZipModelWriter;
-import net.lingala.zip4j.crypto.AESEncoder;
+import net.lingala.zip4j.crypto.AesEncoder;
 import net.lingala.zip4j.crypto.Encoder;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CentralDirectory;
@@ -178,8 +178,8 @@ public abstract class CipherOutputStream extends OutputStream {
         }
 
         if (parameters.getEncryption() == Encryption.AES) {
-            if (encoder instanceof AESEncoder) {
-                out.writeBytes(((AESEncoder)encoder).getFinalMac());
+            if (encoder instanceof AesEncoder) {
+                out.writeBytes(((AesEncoder)encoder).getFinalMac());
             } else
                 throw new ZipException("invalid encryption for AES encrypted file");
         }

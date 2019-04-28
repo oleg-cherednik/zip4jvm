@@ -42,7 +42,6 @@ public class EndCentralDirectory {
     public static final int MAX_COMMENT_LENGTH = 33_000;
 
     // size:4 - signature (0x06054b50)
-//    private final int signature = SIGNATURE;
     // size:2 - number of the disk
     private int splitParts;
     // size:2 - number of the disk with the start of the central directory
@@ -56,7 +55,6 @@ public class EndCentralDirectory {
     // size:4 - CentralDirectory offs
     private long offs;
     // size:2 - file comment length (n)
-//    private int commentLength;
     // size:n - file comment
     private String comment;
 

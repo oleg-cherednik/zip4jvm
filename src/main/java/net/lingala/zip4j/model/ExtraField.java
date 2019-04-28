@@ -17,7 +17,7 @@ public class ExtraField {
     @NonNull
     private Zip64.ExtendedInfo extendedInfo = Zip64.ExtendedInfo.NULL;
     @NonNull
-    private AESExtraDataRecord aesExtraDataRecord = AESExtraDataRecord.NULL;
+    private AesExtraDataRecord aesExtraDataRecord = AesExtraDataRecord.NULL;
 
     public boolean isEmpty() {
         return extendedInfo == null && aesExtraDataRecord == null;
@@ -33,7 +33,7 @@ public class ExtraField {
 
         if (extendedInfo != Zip64.ExtendedInfo.NULL)
             res.setExtendedInfo(extendedInfo.toBuilder().build());
-        if (aesExtraDataRecord != AESExtraDataRecord.NULL)
+        if (aesExtraDataRecord != AesExtraDataRecord.NULL)
             res.setAesExtraDataRecord(aesExtraDataRecord.toBuilder().build());
 
         return res;
@@ -46,7 +46,7 @@ public class ExtraField {
         }
 
         @Override
-        public void setAesExtraDataRecord(@NonNull AESExtraDataRecord aesExtraDataRecord) {
+        public void setAesExtraDataRecord(@NonNull AesExtraDataRecord aesExtraDataRecord) {
             throw new NullPointerException("Null object modification: " + getClass().getSimpleName());
         }
 
