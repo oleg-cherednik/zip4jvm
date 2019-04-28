@@ -20,7 +20,7 @@ final class Zip64EndCentralDirectoryWriter {
         if (dir == null)
             return;
 
-        out.writeSignature(Zip64.EndCentralDirectory.SIGNATURE);
+        out.writeDword(Zip64.EndCentralDirectory.SIGNATURE);
         out.writeQword(dir.getSizeOfZip64EndCentralDirRec());
         out.writeWord(dir.getVersionMadeBy());
         out.writeWord(dir.getVersionNeededToExtract());

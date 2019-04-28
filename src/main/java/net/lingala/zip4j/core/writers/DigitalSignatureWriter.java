@@ -21,7 +21,7 @@ final class DigitalSignatureWriter {
         if (digitalSignature == null)
             return;
 
-        out.writeSignature(CentralDirectory.DigitalSignature.SIGNATURE);
+        out.writeDword(CentralDirectory.DigitalSignature.SIGNATURE);
         out.writeWord(ArrayUtils.getLength(digitalSignature.getSignatureData()));
         out.writeBytes(digitalSignature.getSignatureData());
     }

@@ -3,7 +3,6 @@ package net.lingala.zip4j.io;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.lingala.zip4j.utils.BitUtils;
 import net.lingala.zip4j.utils.CreateStringFunc;
 
 import java.io.Closeable;
@@ -43,16 +42,24 @@ public final class LittleEndianRandomAccessFile implements Closeable {
 
     public long readDwordLong() throws IOException {
         offs += 4;
-        int ch0 = in.read();
-        int ch1 = in.read();
-        int ch2 = in.read();
-        int ch3 = in.read();
+        long ch0 = in.read();
+        long ch1 = in.read();
+        long ch2 = in.read();
+        long ch3 = in.read();
         return ch3 << 24 | ch2 << 16 | ch1 << 8 | ch0;
     }
 
-    public long readLong() throws IOException {
+    public long readQword() throws IOException {
         offs += 8;
-        return convertLong(in.readLong());
+        long ch0 = in.read();
+        long ch1 = in.read();
+        long ch2 = in.read();
+        long ch3 = in.read();
+        long ch4 = in.read();
+        long ch5 = in.read();
+        long ch6 = in.read();
+        long ch7 = in.read();
+        return ch7 << 56 | ch6 << 48 | ch5 << 40 | ch4 << 32 | ch3 << 24 | ch2 << 16 | ch1 << 8 | ch0;
     }
 
     public String readString(int length) throws IOException {
@@ -64,7 +71,6 @@ public final class LittleEndianRandomAccessFile implements Closeable {
         in.readFully(buf);
         return new CreateStringFunc().apply(buf);
     }
-
 
 
     public byte readByte() throws IOException {
@@ -100,11 +106,6 @@ public final class LittleEndianRandomAccessFile implements Closeable {
 
     public long getFilePointer() throws IOException {
         return in.getFilePointer();
-    }
-
-    private static long convertLong(long val) {
-        return BitUtils.getByte(val, 0) << 56 | BitUtils.getByte(val, 1) << 48 | BitUtils.getByte(val, 2) << 40 | BitUtils.getByte(val, 3) << 32 |
-                BitUtils.getByte(val, 4) << 24 | BitUtils.getByte(val, 5) << 16 | BitUtils.getByte(val, 6) << 8 | BitUtils.getByte(val, 7);
     }
 
 }

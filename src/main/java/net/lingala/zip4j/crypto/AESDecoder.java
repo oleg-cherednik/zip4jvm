@@ -27,7 +27,7 @@ import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.AESStrength;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.utils.InternalZipConstants;
-import net.lingala.zip4j.utils.Raw;
+import net.lingala.zip4j.utils.ZipUtils;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.util.Arrays;
@@ -129,7 +129,7 @@ public class AESDecoder implements Decoder {
                             InternalZipConstants.AES_BLOCK_SIZE : ((start + len) - j);
 
                 mac.update(buf, j, loopCount);
-                Raw.prepareBuffAESIVBytes(iv, nonce, InternalZipConstants.AES_BLOCK_SIZE);
+                ZipUtils.prepareBuffAESIVBytes(iv, nonce, InternalZipConstants.AES_BLOCK_SIZE);
                 aesEngine.processBlock(iv, counterBlock);
 
                 for (int k = 0; k < loopCount; k++) {

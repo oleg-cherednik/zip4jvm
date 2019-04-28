@@ -22,15 +22,15 @@ final class Zip64EndCentralDirectoryReader {
         findHead(in);
 
         Zip64.EndCentralDirectory dir = new Zip64.EndCentralDirectory();
-        dir.setSizeOfZip64EndCentralDirRec(in.readLong());
+        dir.setSizeOfZip64EndCentralDirRec(in.readQword());
         dir.setVersionMadeBy(in.readWord());
         dir.setVersionNeededToExtract(in.readWord());
         dir.setDiskNumber(in.readDword());
         dir.setStartDiskNumber(in.readDword());
-        dir.setDiskEntries(in.readLong());
-        dir.setTotalEntries(in.readLong());
-        dir.setSize(in.readLong());
-        dir.setOffs(in.readLong());
+        dir.setDiskEntries(in.readQword());
+        dir.setTotalEntries(in.readQword());
+        dir.setSize(in.readQword());
+        dir.setOffs(in.readQword());
         dir.setExtensibleDataSector(in.readBytes((int)(dir.getSizeOfZip64EndCentralDirRec() - Zip64.EndCentralDirectory.SIZE)));
 
         return dir;

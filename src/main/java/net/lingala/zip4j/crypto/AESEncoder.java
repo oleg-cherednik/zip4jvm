@@ -25,7 +25,7 @@ import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.model.AESStrength;
 import net.lingala.zip4j.utils.InternalZipConstants;
-import net.lingala.zip4j.utils.Raw;
+import net.lingala.zip4j.utils.ZipUtils;
 
 import java.io.IOException;
 import java.util.Random;
@@ -126,7 +126,7 @@ public class AESEncoder implements Encoder {
             loopCount = (j + InternalZipConstants.AES_BLOCK_SIZE <= (start + len)) ?
                         InternalZipConstants.AES_BLOCK_SIZE : ((start + len) - j);
 
-            Raw.prepareBuffAESIVBytes(iv, nonce, InternalZipConstants.AES_BLOCK_SIZE);
+            ZipUtils.prepareBuffAESIVBytes(iv, nonce, InternalZipConstants.AES_BLOCK_SIZE);
             aesEngine.processBlock(iv, counterBlock);
 
             for (int k = 0; k < loopCount; k++) {

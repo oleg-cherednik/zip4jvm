@@ -105,7 +105,7 @@ public abstract class CipherOutputStream extends OutputStream {
             localFileHeader = centralDirectoryBuilder.createLocalFileHeader(fileHeader);
 
             if (zipModel.isSplitArchive() && zipModel.isEmpty())
-                out.writeSignature(InternalZipConstants.SPLITSIG);
+                out.writeDword(InternalZipConstants.SPLITSIG);
 
             fileHeader.setOffsLocalFileHeader(out.getFilePointer());
             new LocalFileHeaderWriter(localFileHeader, zipModel).write(out);

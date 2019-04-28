@@ -27,7 +27,6 @@ import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.Zip64;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.utils.InternalZipConstants;
-import net.lingala.zip4j.utils.Raw;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.io.File;
@@ -143,18 +142,12 @@ public class SplitOutputStream extends OutputStream {
 
     private final byte[] word = new byte[2];
     private final byte[] dword = new byte[4];
-    private final byte[] longByte = new byte[8];
+    private final byte[] qword = new byte[8];
 
     @Getter
     @Setter
     private long offs;
     private final Map<String, Long> mark = new HashMap<>();
-
-    public void writeSignature(int val) throws IOException {
-        Raw.writeIntLittleEndian(dword, 0, val);
-        write(dword);
-        offs += dword.length;
-    }
 
     public void writeWord(int val) throws IOException {
         word[0] = (byte)(val & 0xFF);
@@ -177,9 +170,16 @@ public class SplitOutputStream extends OutputStream {
     }
 
     public void writeQword(long val) throws IOException {
-        Raw.writeLongLittleEndian(longByte, 0, val);
-        write(longByte);
-        offs += longByte.length;
+        qword[0] = (byte)(val & 0xFF);
+        qword[1] = (byte)(val >>> 8);
+        qword[2] = (byte)(val >>> 16);
+        qword[3] = (byte)(val >>> 24);
+        qword[4] = (byte)(val >>> 32);
+        qword[5] = (byte)(val >>> 40);
+        qword[6] = (byte)(val >>> 48);
+        qword[7] = (byte)(val >>> 56);
+        write(qword);
+        offs += qword.length;
     }
 
     public void writeBytes(byte... buf) throws IOException {
@@ -227,12 +227,12 @@ public class SplitOutputStream extends OutputStream {
                 InternalZipConstants.SPLITSIG,
                 Zip64.EndCentralDirectoryLocator.SIGNATURE,
                 Zip64.EndCentralDirectory.SIGNATURE,
-                (int)Zip64.ExtendedInfo.SIGNATURE,
-                (int)AESExtraDataRecord.SIGNATURE));
+                Zip64.ExtendedInfo.SIGNATURE,
+                AESExtraDataRecord.SIGNATURE));
 
         @Override
         public boolean test(byte[] buf) {
-            return ArrayUtils.getLength(buf) >= 4 && signature.contains(Raw.readIntLittleEndian(buf, 0));
+            return ArrayUtils.getLength(buf) >= 4 && signature.contains(buf[3] << 24 | buf[2] << 16 | buf[1] << 8 | buf[0]);
         }
     };
 
