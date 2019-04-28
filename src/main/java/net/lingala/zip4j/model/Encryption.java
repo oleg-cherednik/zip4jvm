@@ -21,12 +21,12 @@ import java.io.IOException;
  * @since 09.03.2019
  */
 @Getter
+@SuppressWarnings("MethodCanBeVariableArityMethod")
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum Encryption {
     OFF(-1) {
         @Override
-        public Decoder decoder(LittleEndianRandomAccessFile in, CentralDirectory.FileHeader fileHeader, LocalFileHeader localFileHeader)
-                throws IOException {
+        public Decoder decoder(LittleEndianRandomAccessFile in, LocalFileHeader localFileHeader, char[] password) throws IOException {
             return null;
         }
 
@@ -37,10 +37,9 @@ public enum Encryption {
     },
     STANDARD(0) {
         @Override
-        public Decoder decoder(LittleEndianRandomAccessFile in, CentralDirectory.FileHeader fileHeader, LocalFileHeader localFileHeader)
-                throws IOException {
+        public Decoder decoder(LittleEndianRandomAccessFile in, LocalFileHeader localFileHeader, char[] password) throws IOException {
             in.seek(localFileHeader.getOffs());
-            return new StandardDecoder(fileHeader, in.readBytes(InternalZipConstants.STD_DEC_HDR_SIZE));
+            return new StandardDecoder(localFileHeader, password, in.readBytes(InternalZipConstants.STD_DEC_HDR_SIZE));
         }
 
         @Override
@@ -52,11 +51,10 @@ public enum Encryption {
     STRONG(1),
     AES(99) {
         @Override
-        public Decoder decoder(LittleEndianRandomAccessFile in, CentralDirectory.FileHeader fileHeader, LocalFileHeader localFileHeader)
-                throws IOException {
+        public Decoder decoder(LittleEndianRandomAccessFile in, LocalFileHeader localFileHeader, char[] password) throws IOException {
             byte[] salt = getSalt(in, localFileHeader);
             byte[] passwordVerifier = in.readBytes(2);
-            return new AesDecoder(localFileHeader, fileHeader.getPassword(), salt, passwordVerifier);
+            return new AesDecoder(localFileHeader, password, salt, passwordVerifier);
         }
 
         private byte[] getSalt(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader) throws IOException {
@@ -75,8 +73,7 @@ public enum Encryption {
 
     private final int value;
 
-    public Decoder decoder(LittleEndianRandomAccessFile in, CentralDirectory.FileHeader fileHeader, LocalFileHeader localFileHeader)
-            throws IOException {
+    public Decoder decoder(LittleEndianRandomAccessFile in, LocalFileHeader localFileHeader, char[] password) throws IOException {
         throw new ZipException("unsupported encryption method");
     }
 
@@ -93,3 +90,5 @@ public enum Encryption {
     }
 
 }
+
+

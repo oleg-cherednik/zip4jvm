@@ -128,7 +128,7 @@ public class UnzipEngine {
             LittleEndianRandomAccessFile in = openFile(fileHeader);
             LocalFileHeader localFileHeader = readLocalFileHeader(fileHeader);
             this.localFileHeader = localFileHeader;
-            decoder = localFileHeader.getEncryption().decoder(in, fileHeader, localFileHeader);
+            decoder = localFileHeader.getEncryption().decoder(in, localFileHeader, fileHeader.getPassword());
 
             long comprSize = localFileHeader.getCompressedSize();
             long offs = localFileHeader.getOffs();
