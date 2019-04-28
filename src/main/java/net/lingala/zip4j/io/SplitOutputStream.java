@@ -47,19 +47,19 @@ import java.util.function.Predicate;
 public class SplitOutputStream extends OutputStream {
 
     private final long splitLength;
-    private int currSplitFileCounter;
 
     protected Path zipFile;
-    protected RandomAccessFile raf;
+    protected RandomAccessFile out;
     protected long bytesWrittenForThisPart;
+    private int currSplitFileCounter = -1;
 
     protected SplitOutputStream(Path zipFile, long splitLength) throws FileNotFoundException {
         if (splitLength >= 0 && splitLength < InternalZipConstants.MIN_SPLIT_LENGTH)
             throw new ZipException("split length less than minimum allowed split length of " + InternalZipConstants.MIN_SPLIT_LENGTH + " Bytes");
 
         this.splitLength = splitLength;
-        raf = new RandomAccessFile(zipFile.toFile(), "rw");
         this.zipFile = zipFile;
+        openRandomAccessFile();
     }
 
     @Override
@@ -72,31 +72,57 @@ public class SplitOutputStream extends OutputStream {
         if (len <= 0)
             return;
 
-        if (bytesWrittenForThisPart >= splitLength) {
-            startNextSplitFile();
-            bytesWrittenForThisPart = 0;
-        } else if (bytesWrittenForThisPart + len <= splitLength) {
-        } else if (isSignatureData.test(buf)) {
-            startNextSplitFile();
-            bytesWrittenForThisPart = 0;
-        } else {
-            raf.write(buf, offs, (int)(splitLength - bytesWrittenForThisPart));
-            startNextSplitFile();
+        int canWrite = (int)(splitLength - bytesWrittenForThisPart);
 
-            offs += (int)(splitLength - bytesWrittenForThisPart);
-            len -= (int)(splitLength - bytesWrittenForThisPart);
+        if (canWrite <= 0) {
+            startNextSplitFile();
             bytesWrittenForThisPart = 0;
         }
 
-        raf.write(buf, offs, len);
+        if (canWrite > 0 && len > canWrite && isSignatureData.test(buf)) {
+            startNextSplitFile();
+            bytesWrittenForThisPart = 0;
+        }
+
+        if (canWrite > 0 && len > canWrite && !isSignatureData.test(buf)) {
+            out.write(buf, offs, canWrite);
+
+            startNextSplitFile();
+            bytesWrittenForThisPart = 0;
+
+            offs += canWrite;
+            len -= canWrite;
+        }
+
+        out.write(buf, offs, len);
         bytesWrittenForThisPart += len;
+
+
+//        if (bytesWrittenForThisPart >= splitLength) {
+//            startNextSplitFile();
+//            bytesWrittenForThisPart = 0;
+//        } else if (bytesWrittenForThisPart + len <= splitLength) {
+//        } else if (isSignatureData.test(buf)) {
+//            startNextSplitFile();
+//            bytesWrittenForThisPart = 0;
+//        } else {
+//            out.write(buf, offs, (int)(splitLength - bytesWrittenForThisPart));
+//            startNextSplitFile();
+//
+//            offs += (int)(splitLength - bytesWrittenForThisPart);
+//            len -= (int)(splitLength - bytesWrittenForThisPart);
+//            bytesWrittenForThisPart = 0;
+//        }
+//
+//        out.write(buf, offs, len);
+//        bytesWrittenForThisPart += len;
     }
 
     private void startNextSplitFile() throws IOException {
         String zipFileName = zipFile.toAbsolutePath().toString();
         Path currSplitFile = ZipModel.getSplitFilePath(zipFile, currSplitFileCounter + 1);
 
-        raf.close();
+        out.close();
 
         if (Files.exists(currSplitFile))
             throw new IOException("split file: " + currSplitFile.getFileName() + " already exists in the current directory, cannot rename this file");
@@ -105,22 +131,27 @@ public class SplitOutputStream extends OutputStream {
             throw new IOException("cannot rename newly created split file");
 
         zipFile = new File(zipFileName).toPath();
-        raf = new RandomAccessFile(zipFile.toFile(), "rw");
+        openRandomAccessFile();
+    }
+
+    private void openRandomAccessFile() throws FileNotFoundException {
+        out = new RandomAccessFile(zipFile.toFile(), "rw");
         currSplitFileCounter++;
+        bytesWrittenForThisPart = 0;
     }
 
     public void seek(long pos) throws IOException {
-        raf.seek(pos);
+        out.seek(pos);
     }
 
     @Override
     public void close() throws IOException {
-        if (raf != null)
-            raf.close();
+        if (out != null)
+            out.close();
     }
 
     public long getFilePointer() throws IOException {
-        return raf.getFilePointer();
+        return out.getFilePointer();
     }
 
     public int getCurrSplitFileCounter() {

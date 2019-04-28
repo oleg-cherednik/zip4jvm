@@ -19,7 +19,7 @@ public class NoSplitOutputStream extends SplitOutputStream {
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
         if (len > 0) {
-            raf.write(buf, offs, len);
+            out.write(buf, offs, len);
             bytesWrittenForThisPart += len;
         }
     }
