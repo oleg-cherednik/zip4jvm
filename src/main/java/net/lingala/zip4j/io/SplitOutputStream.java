@@ -75,7 +75,11 @@ public class SplitOutputStream extends OutputStream {
 
     @Override
     public void write(int val) throws IOException {
-        write(new byte[] { (byte)val }, 0, 1);
+        if ((splitLength == ZipModel.NO_SPLIT ? Integer.MAX_VALUE : (int)(splitLength - bytesWrittenForThisPart)) <= 0)
+            startNextSplitFile();
+
+        out.write(val);
+        bytesWrittenForThisPart++;
     }
 
     @Override
