@@ -213,7 +213,7 @@ public class UnzipEngine {
             int signature = in.readInt();
 
             if (signature != InternalZipConstants.SPLITSIG)
-                throw new IOException("Expected first part of split file signature (offs:" + in.getFilePointer() + ')');
+                throw new ZipException("Expected first part of split file signature (offs:" + in.getFilePointer() + ')');
         }
 
         return in;

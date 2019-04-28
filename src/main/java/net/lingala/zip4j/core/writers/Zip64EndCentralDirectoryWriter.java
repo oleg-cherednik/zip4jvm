@@ -4,7 +4,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.model.Zip64;
-import net.lingala.zip4j.utils.InternalZipConstants;
 
 import java.io.IOException;
 
@@ -21,7 +20,7 @@ final class Zip64EndCentralDirectoryWriter {
         if (dir == null)
             return;
 
-        out.writeSignature(InternalZipConstants.ZIP64_ENDSIG);
+        out.writeSignature(Zip64.EndCentralDirectory.SIGNATURE);
         out.writeQword(dir.getSizeOfZip64EndCentralDirRec());
         out.writeWord(dir.getVersionMadeBy());
         out.writeWord(dir.getVersionNeededToExtract());

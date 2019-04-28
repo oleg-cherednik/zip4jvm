@@ -1,9 +1,10 @@
 package net.lingala.zip4j.core.readers;
 
 import lombok.RequiredArgsConstructor;
+import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.io.LittleEndianRandomAccessFile;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.CompressionMethod;
-import net.lingala.zip4j.io.LittleEndianRandomAccessFile;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
@@ -32,7 +33,7 @@ final class FileHeaderReader {
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
         if (in.readInt() != CentralDirectory.FileHeader.SIGNATURE)
-            throw new IOException("Expected central directory entry not found (offs:" + (in.getFilePointer() - 4) + ')');
+            throw new ZipException("Expected central directory entry not found (offs:" + (in.getFilePointer() - 4) + ')');
 
         fileHeader.setVersionMadeBy(in.readWord());
         fileHeader.setVersionToExtract(in.readWord());

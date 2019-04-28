@@ -4,7 +4,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.model.CentralDirectory;
-import net.lingala.zip4j.utils.InternalZipConstants;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.io.IOException;
@@ -22,7 +21,7 @@ final class DigitalSignatureWriter {
         if (digitalSignature == null)
             return;
 
-        out.writeSignature(InternalZipConstants.DIGSIG);
+        out.writeSignature(CentralDirectory.DigitalSignature.SIGNATURE);
         out.writeWord((short)ArrayUtils.getLength(digitalSignature.getSignatureData()));
         out.writeBytes(digitalSignature.getSignatureData());
     }

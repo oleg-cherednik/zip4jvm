@@ -94,7 +94,7 @@ public class CentralDirectory {
         public static final short DEF_VERSION = 20;
 
         // size:4 - signature (0x02014b50)
-        private final int signature = SIGNATURE;
+//        private final int signature = SIGNATURE;
         // size:2 - version made by
         private short versionMadeBy = DEF_VERSION;
         // size:2 - version needed to extractEntries
@@ -229,8 +229,10 @@ public class CentralDirectory {
     @Setter
     public static class DigitalSignature {
 
+        public static final int SIGNATURE = 0x05054B50;
+
         // size:4 - header signature (0x06054b50)
-        private final int signature = InternalZipConstants.DIGSIG;
+//        private final int signature = SIGNATURE;
         // size:2 - size of data (n)
 //        private int sizeOfData;
         // size:n - signature data

@@ -20,10 +20,14 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.AESExtraDataRecord;
+import net.lingala.zip4j.model.CentralDirectory;
+import net.lingala.zip4j.model.EndCentralDirectory;
+import net.lingala.zip4j.model.LocalFileHeader;
+import net.lingala.zip4j.model.Zip64;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.utils.InternalZipConstants;
 import net.lingala.zip4j.utils.Raw;
-import net.lingala.zip4j.utils.ZipUtils;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.io.File;
@@ -33,8 +37,12 @@ import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Predicate;
 
 public class SplitOutputStream extends OutputStream {
 
@@ -71,7 +79,7 @@ public class SplitOutputStream extends OutputStream {
         } else if (bytesWrittenForThisPart + len <= splitLength) {
             raf.write(buf, offs, len);
             bytesWrittenForThisPart += len;
-        } else if (isHeaderData(buf)) {
+        } else if (isSignatureData.test(buf)) {
             startNextSplitFile();
             raf.write(buf, offs, len);
             bytesWrittenForThisPart = len;
@@ -193,18 +201,25 @@ public class SplitOutputStream extends OutputStream {
         return zipModel.isSplitArchive() ? new SplitOutputStream(zipFile, zipModel.getSplitLength()) : new NoSplitOutputStream(zipFile);
     }
 
-    @SuppressWarnings("MethodCanBeVariableArityMethod")
-    private static boolean isHeaderData(byte[] buf) {
-        if (ArrayUtils.getLength(buf) < 4)
-            return false;
+    @SuppressWarnings("FieldNamingConvention")
+    public static final Predicate<byte[]> isSignatureData = new Predicate<byte[]>() {
+        private final Set<Integer> signature = new HashSet<>(Arrays.asList(
+                LocalFileHeader.SIGNATURE,
+                InternalZipConstants.EXTSIG,
+                CentralDirectory.FileHeader.SIGNATURE,
+                EndCentralDirectory.SIGNATURE,
+                CentralDirectory.DigitalSignature.SIGNATURE,
+                InternalZipConstants.ARCEXTDATREC,
+                InternalZipConstants.SPLITSIG,
+                Zip64.EndCentralDirectoryLocator.SIGNATURE,
+                Zip64.EndCentralDirectory.SIGNATURE,
+                (int)Zip64.ExtendedInfo.SIGNATURE,
+                (int)AESExtraDataRecord.SIGNATURE));
 
-        int signature = Raw.readIntLittleEndian(buf, 0);
-
-        for (long headerSignature : ZipUtils.getAllHeaderSignatures())
-            if (headerSignature != InternalZipConstants.SPLITSIG && headerSignature == signature)
-                return true;
-
-        return false;
-    }
+        @Override
+        public boolean test(byte[] buf) {
+            return ArrayUtils.getLength(buf) >= 4 && signature.contains(Raw.readIntLittleEndian(buf, 0));
+        }
+    };
 
 }

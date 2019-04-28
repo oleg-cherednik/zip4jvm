@@ -25,7 +25,7 @@ final class EndCentralDirectoryWriter {
     public void write(@NonNull SplitOutputStream out) throws IOException {
         byte[] comment = dir.getComment(charset);
 
-        out.writeSignature(dir.getSignature());
+        out.writeSignature(EndCentralDirectory.SIGNATURE);
         out.writeWord((short)dir.getSplitParts());
         out.writeWord((short)dir.getStartDiskNumber());
         out.writeWord((short)dir.getTotalEntries());

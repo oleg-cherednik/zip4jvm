@@ -39,7 +39,7 @@ public class AESExtraDataRecord {
     public static final int SIZE_FIELD = 2 + 2; // 4 bytes: signature + size
 
     // size:2 - signature (0x9901)
-    private final short signature = SIGNATURE;
+//    private final short signature = SIGNATURE;
     // size:2
     @Builder.Default
     private int dataSize = ExtraField.NO_DATA;

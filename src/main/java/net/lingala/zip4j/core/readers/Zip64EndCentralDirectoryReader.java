@@ -2,9 +2,9 @@ package net.lingala.zip4j.core.readers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.lingala.zip4j.model.Zip64;
-import net.lingala.zip4j.utils.InternalZipConstants;
+import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.LittleEndianRandomAccessFile;
+import net.lingala.zip4j.model.Zip64;
 
 import java.io.IOException;
 
@@ -39,9 +39,9 @@ final class Zip64EndCentralDirectoryReader {
     private void findHead(LittleEndianRandomAccessFile in) throws IOException {
         in.seek(offs);
 
-        if (in.readInt() == InternalZipConstants.ZIP64_ENDSIG)
+        if (in.readInt() == Zip64.EndCentralDirectory.SIGNATURE)
             return;
 
-        throw new IOException("invalid zip64 end of central directory");
+        throw new ZipException("invalid zip64 end of central directory");
     }
 }

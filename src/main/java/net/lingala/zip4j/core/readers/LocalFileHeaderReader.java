@@ -2,10 +2,11 @@ package net.lingala.zip4j.core.readers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.io.LittleEndianRandomAccessFile;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.LocalFileHeader;
-import net.lingala.zip4j.io.LittleEndianRandomAccessFile;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
@@ -55,7 +56,7 @@ public final class LocalFileHeaderReader {
         if (in.readInt() == LocalFileHeader.SIGNATURE)
             return;
 
-        throw new IOException("invalid local file header signature");
+        throw new ZipException("invalid local file header signature");
     }
 
 }

@@ -36,7 +36,7 @@ public class LocalFileHeader {
     public static final int SIGNATURE = 0x04034B50;
 
     // size:4 - signature (0x04034b50)
-    private final int signature = SIGNATURE;
+//    private final int signature = SIGNATURE;
     // size:2 - version needed to extractEntries
     private int versionToExtract;
     // size:2 - general purpose bit flag

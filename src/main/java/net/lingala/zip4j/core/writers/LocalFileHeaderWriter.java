@@ -23,7 +23,7 @@ public final class LocalFileHeaderWriter {
     private final ZipModel zipModel;
 
     public void write(@NonNull SplitOutputStream out) throws IOException {
-        out.writeSignature(localFileHeader.getSignature());
+        out.writeSignature(LocalFileHeader.SIGNATURE);
         out.writeWord((short)localFileHeader.getVersionToExtract());
         out.writeWord(localFileHeader.getGeneralPurposeFlag().getData());
         out.writeWord(localFileHeader.getCompressionMethod().getValue());
@@ -58,7 +58,7 @@ public final class LocalFileHeaderWriter {
 
     public void writeExtended(@NonNull SplitOutputStream out) throws IOException {
         //Extended local file header signature
-        out.writeSignature((int)InternalZipConstants.EXTSIG);
+        out.writeSignature(InternalZipConstants.EXTSIG);
 
         //CRC
         out.writeDword((int)localFileHeader.getCrc32());

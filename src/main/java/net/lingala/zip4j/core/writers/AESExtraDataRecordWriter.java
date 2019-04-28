@@ -24,7 +24,7 @@ final class AESExtraDataRecordWriter {
         if (record == AESExtraDataRecord.NULL)
             return;
 
-        out.writeWord(record.getSignature());
+        out.writeWord(AESExtraDataRecord.SIGNATURE);
         out.writeWord((short)record.getDataSize());
         out.writeWord((short)record.getVersionNumber());
         out.writeBytes(record.getVendor(charset));
