@@ -69,47 +69,27 @@ public class SplitOutputStream extends OutputStream {
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
-        if (len <= 0)
-            return;
+        final int offsInit = offs;
 
-        int canWrite = (int)(splitLength - bytesWrittenForThisPart);
+        while (len > 0) {
+            int canWrite = (int)(splitLength - bytesWrittenForThisPart);
+            int writeCurrPart = Math.min(len, canWrite);
 
-        if (canWrite <= 0)
-            startNextSplitFile();
+            if (canWrite <= 0 || len > canWrite && offsInit != offs && isSignatureData.test(buf))
+                startNextSplitFile();
 
-        if (canWrite > 0 && len > canWrite && isSignatureData.test(buf))
-            startNextSplitFile();
-
-        if (canWrite > 0 && len > canWrite && !isSignatureData.test(buf)) {
-            out.write(buf, offs, canWrite);
-            offs += canWrite;
-            len -= canWrite;
-
-            startNextSplitFile();
+            _write(buf, offs, writeCurrPart);
+            offs += writeCurrPart;
+            len -= writeCurrPart;
         }
+    }
 
-        out.write(buf, offs, len);
-        bytesWrittenForThisPart += len;
-
-
-//        if (bytesWrittenForThisPart >= splitLength) {
-//            startNextSplitFile();
-//            bytesWrittenForThisPart = 0;
-//        } else if (bytesWrittenForThisPart + len <= splitLength) {
-//        } else if (isSignatureData.test(buf)) {
-//            startNextSplitFile();
-//            bytesWrittenForThisPart = 0;
-//        } else {
-//            out.write(buf, offs, (int)(splitLength - bytesWrittenForThisPart));
-//            startNextSplitFile();
-//
-//            offs += (int)(splitLength - bytesWrittenForThisPart);
-//            len -= (int)(splitLength - bytesWrittenForThisPart);
-//            bytesWrittenForThisPart = 0;
-//        }
-//
-//        out.write(buf, offs, len);
-//        bytesWrittenForThisPart += len;
+    @SuppressWarnings("NewMethodNamingConvention")
+    protected final void _write(byte[] buf, int offs, int len) throws IOException {
+        if (len > 0) {
+            out.write(buf, offs, len);
+            bytesWrittenForThisPart += len;
+        }
     }
 
     private void startNextSplitFile() throws IOException {
