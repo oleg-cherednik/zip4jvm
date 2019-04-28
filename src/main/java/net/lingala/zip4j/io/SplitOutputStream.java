@@ -72,7 +72,7 @@ public class SplitOutputStream extends OutputStream {
         final int offsInit = offs;
 
         while (len > 0) {
-            int canWrite = (int)(splitLength - bytesWrittenForThisPart);
+            int canWrite = splitLength == ZipModel.NO_SPLIT ? Integer.MAX_VALUE : (int)(splitLength - bytesWrittenForThisPart);
             int writeCurrPart = Math.min(len, canWrite);
 
             if (canWrite <= 0 || len > canWrite && offsInit != offs && isSignatureData.test(buf))

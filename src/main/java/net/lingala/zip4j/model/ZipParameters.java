@@ -77,14 +77,13 @@ public class ZipParameters {
      * @param password
      */
     public void setPassword(String password) {
-        if (password == null) return;
-        setPassword(password.toCharArray());
+        if (password != null)
+            setPassword(password.toCharArray());
     }
 
     public void setPassword(char[] password) {
         this.password = password;
     }
-
 
     public void setRootFolderInZip(String rootFolderInZip) {
         if (StringUtils.isNotBlank(rootFolderInZip)) {
