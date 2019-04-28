@@ -74,21 +74,22 @@ public class SplitOutputStream extends OutputStream {
 
         if (bytesWrittenForThisPart >= splitLength) {
             startNextSplitFile();
-            raf.write(buf, offs, len);
-            bytesWrittenForThisPart = len;
+            bytesWrittenForThisPart = 0;
         } else if (bytesWrittenForThisPart + len <= splitLength) {
-            raf.write(buf, offs, len);
-            bytesWrittenForThisPart += len;
         } else if (isSignatureData.test(buf)) {
             startNextSplitFile();
-            raf.write(buf, offs, len);
-            bytesWrittenForThisPart = len;
+            bytesWrittenForThisPart = 0;
         } else {
             raf.write(buf, offs, (int)(splitLength - bytesWrittenForThisPart));
             startNextSplitFile();
-            raf.write(buf, offs + (int)(splitLength - bytesWrittenForThisPart), (int)(len - (splitLength - bytesWrittenForThisPart)));
-            bytesWrittenForThisPart = len - (splitLength - bytesWrittenForThisPart);
+
+            offs += (int)(splitLength - bytesWrittenForThisPart);
+            len -= (int)(splitLength - bytesWrittenForThisPart);
+            bytesWrittenForThisPart = 0;
         }
+
+        raf.write(buf, offs, len);
+        bytesWrittenForThisPart += len;
     }
 
     private void startNextSplitFile() throws IOException {
