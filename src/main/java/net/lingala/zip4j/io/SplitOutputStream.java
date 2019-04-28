@@ -16,7 +16,9 @@
 
 package net.lingala.zip4j.io;
 
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.utils.InternalZipConstants;
@@ -30,6 +32,8 @@ import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SplitOutputStream extends OutputStream {
 
@@ -180,5 +184,61 @@ public class SplitOutputStream extends OutputStream {
 
     public int getCurrSplitFileCounter() {
         return currSplitFileCounter;
+    }
+
+    private final byte[] intByte = new byte[4];
+    private final byte[] shortByte = new byte[2];
+    private final byte[] longByte = new byte[8];
+
+    @Getter
+    @Setter
+    private long offs;
+    private final Map<String, Long> mark = new HashMap<>();
+
+    public void writeWord(short val) throws IOException {
+        Raw.writeShortLittleEndian(shortByte, 0, val);
+        write(shortByte);
+        offs += shortByte.length;
+    }
+
+    public void writeDword(int val) throws IOException {
+        Raw.writeIntLittleEndian(intByte, 0, val);
+        write(intByte);
+        offs += intByte.length;
+    }
+
+    public void writeDword(long val) throws IOException {
+        Raw.writeLongLittleEndian(longByte, 0, val);
+        System.arraycopy(longByte, 0, intByte, 0, 4);
+        write(intByte);
+        offs += intByte.length;
+    }
+
+    public void writeQword(long val) throws IOException {
+        Raw.writeLongLittleEndian(longByte, 0, val);
+        write(longByte);
+        offs += longByte.length;
+    }
+
+    public void writeBytes(byte... buf) throws IOException {
+        if (buf == null)
+            return;
+        write(buf);
+        offs += buf.length;
+    }
+
+    public void writeBytes(byte[] buf, int offs, int len) throws IOException {
+        if (buf == null)
+            return;
+        write(buf, offs, len);
+        this.offs += len;
+    }
+
+    public void mark(String id) {
+        mark.put(id, offs);
+    }
+
+    public long getWrittenBytesAmount(String id) {
+        return offs - mark.getOrDefault(id, 0L);
     }
 }

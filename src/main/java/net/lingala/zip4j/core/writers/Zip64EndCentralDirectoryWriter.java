@@ -2,7 +2,7 @@ package net.lingala.zip4j.core.writers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.lingala.zip4j.io.OutputStreamDecorator;
+import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.model.Zip64;
 import net.lingala.zip4j.utils.InternalZipConstants;
 
@@ -17,20 +17,20 @@ final class Zip64EndCentralDirectoryWriter {
 
     private final Zip64.EndCentralDirectory dir;
 
-    public void write(@NonNull OutputStreamDecorator out) throws IOException {
+    public void write(@NonNull SplitOutputStream out) throws IOException {
         if (dir == null)
             return;
 
         out.writeDword(InternalZipConstants.ZIP64_ENDSIG);
-        out.writeLong(dir.getSizeOfZip64EndCentralDirRec());
+        out.writeQword(dir.getSizeOfZip64EndCentralDirRec());
         out.writeWord(dir.getVersionMadeBy());
         out.writeWord(dir.getVersionNeededToExtract());
         out.writeDword(dir.getDiskNumber());
         out.writeDword(dir.getStartDiskNumber());
-        out.writeLong(dir.getDiskEntries());
-        out.writeLong(dir.getTotalEntries());
-        out.writeLong(dir.getSize());
-        out.writeLong(dir.getOffs());
+        out.writeQword(dir.getDiskEntries());
+        out.writeQword(dir.getTotalEntries());
+        out.writeQword(dir.getSize());
+        out.writeQword(dir.getOffs());
         out.writeBytes(dir.getExtensibleDataSector());
     }
 }

@@ -2,7 +2,7 @@ package net.lingala.zip4j.core.writers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.lingala.zip4j.io.OutputStreamDecorator;
+import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.Zip64;
 import net.lingala.zip4j.model.ZipModel;
@@ -22,7 +22,7 @@ public final class LocalFileHeaderWriter {
     @NonNull
     private final ZipModel zipModel;
 
-    public void write(@NonNull OutputStreamDecorator out) throws IOException {
+    public void write(@NonNull SplitOutputStream out) throws IOException {
         out.writeDword(localFileHeader.getSignature());
         out.writeWord((short)localFileHeader.getVersionToExtract());
         out.writeWord(localFileHeader.getGeneralPurposeFlag().getData());
@@ -49,14 +49,14 @@ public final class LocalFileHeaderWriter {
         if (zipModel.isZip64()) {
             out.writeWord(Zip64.ExtendedInfo.SIGNATURE);
             out.writeWord((short)16);
-            out.writeLong(localFileHeader.getUncompressedSize());
+            out.writeQword(localFileHeader.getUncompressedSize());
             out.writeBytes(new byte[8]);
         }
 
         new ExtraFieldWriter(localFileHeader.getExtraField(), zipModel.getCharset()).write(out);
     }
 
-    public void writeExtended(@NonNull OutputStreamDecorator out) throws IOException {
+    public void writeExtended(@NonNull SplitOutputStream out) throws IOException {
         //Extended local file header signature
         out.writeDword((int)InternalZipConstants.EXTSIG);
 
@@ -64,18 +64,8 @@ public final class LocalFileHeaderWriter {
         out.writeDword((int)localFileHeader.getCrc32());
 
         //compressed size
-        long compressedSize = localFileHeader.getCompressedSize();
-        if (compressedSize >= Integer.MAX_VALUE) {
-            compressedSize = Integer.MAX_VALUE;
-        }
-        out.writeDword((int)compressedSize);
-
-        //uncompressed size
-        long uncompressedSize = localFileHeader.getUncompressedSize();
-        if (uncompressedSize >= Integer.MAX_VALUE) {
-            uncompressedSize = Integer.MAX_VALUE;
-        }
-        out.writeDword((int)uncompressedSize);
+        out.writeDword((int)Math.min(localFileHeader.getCompressedSize(), Integer.MAX_VALUE));
+        out.writeDword((int)Math.min(localFileHeader.getUncompressedSize(), Integer.MAX_VALUE));
     }
 
 }

@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.core.writers.ZipModelWriter;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.NoSplitOutputStream;
-import net.lingala.zip4j.io.OutputStreamDecorator;
+import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.ZipModel;
 import org.apache.commons.io.IOUtils;
@@ -59,7 +59,7 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
 
         Path tmpZipFile = createTempFile();
 
-        try (OutputStreamDecorator out = new OutputStreamDecorator(new NoSplitOutputStream(tmpZipFile))) {
+        try (SplitOutputStream out = new NoSplitOutputStream(tmpZipFile)) {
             writeFileHeaders(out, entries);
             new ZipModelWriter(zipModel).finalizeZipFile(out, true);
         } catch(IOException e) {
@@ -86,7 +86,7 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
         }
     }
 
-    private void writeFileHeaders(OutputStreamDecorator out, Collection<String> entries) throws IOException {
+    private void writeFileHeaders(SplitOutputStream out, Collection<String> entries) throws IOException {
         List<CentralDirectory.FileHeader> fileHeaders = new ArrayList<>();
         CentralDirectory.FileHeader prv = null;
 
@@ -99,7 +99,7 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
                 if (prv != null) {
                     long curOffs = offsOut;
                     long length = header.getOffsLocalFileHeader() - prv.getOffsLocalFileHeader();
-                    offsIn += skip + IOUtils.copyLarge(in, out.getDelegate(), skip, length);
+                    offsIn += skip + IOUtils.copyLarge(in, out, skip, length);
                     offsOut += length;
                     fileHeaders.add(prv);
                     prv.setOffsLocalFileHeader(curOffs);
@@ -123,7 +123,7 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
             if (prv != null) {
                 long curOffs = offsOut;
                 long length = zipModel.getOffsCentralDirectory() - prv.getOffsLocalFileHeader();
-                offsOut += IOUtils.copyLarge(in, out.getDelegate(), skip, length);
+                offsOut += IOUtils.copyLarge(in, out, skip, length);
                 fileHeaders.add(prv);
                 prv.setOffsLocalFileHeader(curOffs);
             }

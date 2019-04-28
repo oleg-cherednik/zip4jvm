@@ -16,12 +16,13 @@
 
 package net.lingala.zip4j.crypto;
 
+import lombok.NonNull;
 import net.lingala.zip4j.crypto.PBKDF2.MacBasedPRF;
 import net.lingala.zip4j.crypto.PBKDF2.PBKDF2Engine;
 import net.lingala.zip4j.crypto.PBKDF2.PBKDF2Parameters;
 import net.lingala.zip4j.crypto.engine.AESEngine;
 import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.io.OutputStreamDecorator;
+import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.model.AESStrength;
 import net.lingala.zip4j.utils.InternalZipConstants;
 import net.lingala.zip4j.utils.Raw;
@@ -138,7 +139,7 @@ public class AESEncoder implements Encoder {
     }
 
     @Override
-    public void write(OutputStreamDecorator out) throws IOException {
+    public void write(@NonNull SplitOutputStream out) throws IOException {
         out.writeBytes(saltBytes);
         out.writeBytes(derivedPasswordVerifier);
     }

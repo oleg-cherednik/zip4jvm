@@ -16,9 +16,11 @@
 
 package net.lingala.zip4j.io;
 
+import lombok.AccessLevel;
 import lombok.NonNull;
-import net.lingala.zip4j.core.writers.ZipModelWriter;
+import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.core.writers.LocalFileHeaderWriter;
+import net.lingala.zip4j.core.writers.ZipModelWriter;
 import net.lingala.zip4j.crypto.AESEncoder;
 import net.lingala.zip4j.crypto.Encoder;
 import net.lingala.zip4j.exception.ZipException;
@@ -42,15 +44,17 @@ import java.util.zip.CRC32;
  * @author Oleg Cherednik
  * @since 22.03.2019
  */
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class CipherOutputStream extends OutputStream {
 
     private static final String MARK = "entry";
 
-    protected final OutputStreamDecorator out;
+    @NonNull
+    protected final SplitOutputStream out;
+    @NonNull
     protected final ZipModel zipModel;
 
     private Path sourceFile;
-    @NonNull
     protected CentralDirectory.FileHeader fileHeader;
     private LocalFileHeader localFileHeader;
     @NonNull
@@ -62,11 +66,6 @@ public abstract class CipherOutputStream extends OutputStream {
     private final byte[] pendingBuffer = new byte[InternalZipConstants.AES_BLOCK_SIZE];
     private int pendingBufferLength;
     protected long totalBytesRead;
-
-    protected CipherOutputStream(@NonNull SplitOutputStream out, @NonNull ZipModel zipModel) {
-        this.out = new OutputStreamDecorator(out);
-        this.zipModel = zipModel;
-    }
 
     public final void putNextEntry(String fileNameStream, ZipParameters parameters) {
         putNextEntry(null, fileNameStream, parameters);
@@ -106,9 +105,9 @@ public abstract class CipherOutputStream extends OutputStream {
             localFileHeader = centralDirectoryBuilder.createLocalFileHeader(fileHeader);
 
             if (zipModel.isSplitArchive() && zipModel.isEmpty())
-                out.writeInt(InternalZipConstants.SPLITSIG);
+                out.writeDword(InternalZipConstants.SPLITSIG);
 
-            fileHeader.setOffsLocalFileHeader(out.getOffsLocalHeaderRelative());
+            fileHeader.setOffsLocalFileHeader(out.getFilePointer());
             new LocalFileHeaderWriter(localFileHeader, zipModel).write(out);
 
             encoder = parameters.getEncryption().encoder(parameters, localFileHeader);
@@ -172,7 +171,7 @@ public abstract class CipherOutputStream extends OutputStream {
         out.writeBytes(buf, offs, len);
     }
 
-    public void closeEntry() throws IOException, ZipException {
+    public void closeEntry() throws IOException {
         if (pendingBufferLength != 0) {
             encryptAndWrite(pendingBuffer, 0, pendingBufferLength);
             pendingBufferLength = 0;
@@ -218,7 +217,7 @@ public abstract class CipherOutputStream extends OutputStream {
         totalBytesRead = 0;
     }
 
-    public void finish() throws IOException, ZipException {
+    public void finish() throws IOException {
         zipModel.getEndCentralDirectory().setOffs(out.getOffs());
         new ZipModelWriter(zipModel).finalizeZipFile(out, true);
     }

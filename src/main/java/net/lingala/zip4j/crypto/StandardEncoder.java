@@ -16,9 +16,10 @@
 
 package net.lingala.zip4j.crypto;
 
+import lombok.NonNull;
 import net.lingala.zip4j.crypto.engine.ZipCryptoEngine;
 import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.io.OutputStreamDecorator;
+import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.utils.InternalZipConstants;
 
 import java.io.IOException;
@@ -75,7 +76,7 @@ public class StandardEncoder implements Encoder {
     }
 
     @Override
-    public void write(OutputStreamDecorator out) throws IOException {
+    public void write(@NonNull SplitOutputStream out) throws IOException {
         out.writeBytes(headerBytes);
     }
 

@@ -2,7 +2,7 @@ package net.lingala.zip4j.core.writers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.lingala.zip4j.io.OutputStreamDecorator;
+import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.utils.InternalZipConstants;
 import org.apache.commons.lang.ArrayUtils;
@@ -18,7 +18,7 @@ final class DigitalSignatureWriter {
 
     private final CentralDirectory.DigitalSignature digitalSignature;
 
-    public void write(@NonNull OutputStreamDecorator out) throws IOException {
+    public void write(@NonNull SplitOutputStream out) throws IOException {
         if (digitalSignature == null)
             return;
 

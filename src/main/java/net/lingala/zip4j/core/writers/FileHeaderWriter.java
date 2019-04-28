@@ -2,7 +2,7 @@ package net.lingala.zip4j.core.writers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.lingala.zip4j.io.OutputStreamDecorator;
+import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.utils.InternalZipConstants;
 
@@ -22,12 +22,12 @@ final class FileHeaderWriter {
     @NonNull
     private final Charset charset;
 
-    public void write(OutputStreamDecorator out) throws IOException {
+    public void write(SplitOutputStream out) throws IOException {
         for (CentralDirectory.FileHeader fileHeader : fileHeaders)
             writeFileHeader(fileHeader, out);
     }
 
-    private void writeFileHeader(CentralDirectory.FileHeader fileHeader, OutputStreamDecorator out) throws IOException {
+    private void writeFileHeader(CentralDirectory.FileHeader fileHeader, SplitOutputStream out) throws IOException {
         byte[] fileName = fileHeader.getFileName(charset);
         byte[] fileComment = fileHeader.getFileComment(charset);
 
@@ -46,7 +46,7 @@ final class FileHeaderWriter {
         out.writeWord((short)fileHeader.getDiskNumber());
         out.writeBytes(fileHeader.getInternalFileAttributes() != null ? fileHeader.getInternalFileAttributes() : new byte[2]);
         out.writeBytes(fileHeader.getExternalFileAttributes() != null ? fileHeader.getExternalFileAttributes() : new byte[4]);
-        out.writeLongAsInt(fileHeader.isWriteZip64OffsetLocalHeader() ? InternalZipConstants.ZIP_64_LIMIT : fileHeader.getOffsLocalFileHeader());
+        out.writeDword(fileHeader.isWriteZip64OffsetLocalHeader() ? InternalZipConstants.ZIP_64_LIMIT : fileHeader.getOffsLocalFileHeader());
         out.writeBytes(fileName);
         new ExtraFieldWriter(fileHeader.getExtraField(), charset).write(out);
         out.writeBytes(fileComment);

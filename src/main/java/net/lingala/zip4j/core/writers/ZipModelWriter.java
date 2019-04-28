@@ -18,7 +18,7 @@ package net.lingala.zip4j.core.writers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.lingala.zip4j.io.OutputStreamDecorator;
+import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.EndCentralDirectory;
 import net.lingala.zip4j.model.ExtraField;
@@ -37,7 +37,7 @@ public final class ZipModelWriter {
     private final ZipModel zipModel;
 
     // TODO do we really need validate flag?
-    public void finalizeZipFile(@NonNull OutputStreamDecorator out, boolean validate) throws IOException {
+    public void finalizeZipFile(@NonNull SplitOutputStream out, boolean validate) throws IOException {
         if (validate)
             processHeaderData(out);
 
@@ -60,7 +60,7 @@ public final class ZipModelWriter {
         new EndCentralDirectoryWriter(endCentralDirectory, zipModel.getCharset()).write(out);
     }
 
-    private void processHeaderData(OutputStreamDecorator out) throws IOException {
+    private void processHeaderData(SplitOutputStream out) throws IOException {
         EndCentralDirectory endCentralDirectory = zipModel.getEndCentralDirectory();
 
         endCentralDirectory.setOffs(out.getFilePointer());
