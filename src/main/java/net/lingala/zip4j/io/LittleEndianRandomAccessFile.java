@@ -91,6 +91,13 @@ public final class LittleEndianRandomAccessFile implements Closeable {
         return buf;
     }
 
+    public void skip(int bytes) throws IOException {
+        if (bytes > 0) {
+            in.skipBytes(bytes);
+            offs += bytes;
+        }
+    }
+
     public long length() throws IOException {
         return in.length();
     }

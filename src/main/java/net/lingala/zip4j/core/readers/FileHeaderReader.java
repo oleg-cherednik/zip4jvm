@@ -52,10 +52,10 @@ final class FileHeaderReader {
         fileHeader.setOffsLocalFileHeader(in.readDwordLong());
         fileHeader.setFileName(FilenameUtils.normalize(in.readString(fileNameLength), true));
 
-        boolean uncompressedSize = (fileHeader.getUncompressedSize() & 0xFFFF) == 0xFFFF;
-        boolean compressedSize = (fileHeader.getCompressedSize() & 0xFFFF) == 0xFFFF;
-        boolean offs = (fileHeader.getOffsLocalFileHeader() & 0xFFFF) == 0xFFFF;
-        boolean diskNumber = (fileHeader.getDiskNumber() & 0xFFFF) == 0xFFFF;
+        boolean uncompressedSize = fileHeader.getUncompressedSize() == 0xFFFF;
+        boolean compressedSize = fileHeader.getCompressedSize() == 0xFFFF;
+        boolean offs = fileHeader.getOffsLocalFileHeader() == 0xFFFF;
+        boolean diskNumber = fileHeader.getDiskNumber() == 0xFFFF;
         fileHeader.setExtraField(new ExtraFieldReader(extraFieldLength, uncompressedSize, compressedSize, offs, diskNumber).read(in));
         fileHeader.setFileComment(in.readString(fileCommentLength));
 

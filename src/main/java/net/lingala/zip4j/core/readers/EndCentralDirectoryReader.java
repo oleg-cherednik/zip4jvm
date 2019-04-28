@@ -4,8 +4,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.model.EndCentralDirectory;
 import net.lingala.zip4j.io.LittleEndianRandomAccessFile;
+import net.lingala.zip4j.model.EndCentralDirectory;
 
 import java.io.IOException;
 
@@ -30,7 +30,7 @@ final class EndCentralDirectoryReader {
         dir.setTotalEntries(in.readWord());
         dir.setSize(in.readDwordLong());
         dir.setOffs(in.readDwordLong());
-        dir.setComment(in.readString(in.readWord() & 0xFFFF));
+        dir.setComment(in.readString(in.readWord()));
 
         return dir;
     }
