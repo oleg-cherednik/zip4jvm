@@ -23,13 +23,6 @@ public class Raw {
                 | ((b[off + 2] & 0xff) | (b[off + 3] & 0xff) << 8) << 16;
     }
 
-    public static final void writeShortLittleEndian(byte[] array, int pos,
-            short value) {
-        array[pos + 1] = (byte)(value >>> 8);
-        array[pos] = (byte)(value & 0xFF);
-
-    }
-
     public static final void writeIntLittleEndian(byte[] array, int pos, int value) {
         array[pos + 3] = (byte)(value >>> 24);
         array[pos + 2] = (byte)(value >>> 16);

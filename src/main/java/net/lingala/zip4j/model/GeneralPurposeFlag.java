@@ -56,7 +56,7 @@ public final class GeneralPurposeFlag {
      *         MUST be encoded using UTF-8.
      */
 
-    private short data;
+    private int data;
 
     public GeneralPurposeFlag() {
         this((short)0);

@@ -28,11 +28,11 @@ public final class LittleEndianRandomAccessFile implements Closeable {
         raf = new RandomAccessFile(path.toFile(), "r");
     }
 
-    public short readWord() throws IOException {
+    public int readWord() throws IOException {
         offs += 2;
         int ch1 = raf.read();
         int ch2 = raf.read();
-        return (short)((ch2 << 8) + ch1);
+        return (ch2 << 8) + ch1;
     }
 
     public int readDword() throws IOException {

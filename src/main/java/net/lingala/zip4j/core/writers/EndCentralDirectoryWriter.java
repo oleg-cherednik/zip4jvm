@@ -26,13 +26,13 @@ final class EndCentralDirectoryWriter {
         byte[] comment = dir.getComment(charset);
 
         out.writeSignature(EndCentralDirectory.SIGNATURE);
-        out.writeWord((short)dir.getSplitParts());
-        out.writeWord((short)dir.getStartDiskNumber());
-        out.writeWord((short)dir.getTotalEntries());
-        out.writeWord((short)dir.getDiskEntries());
+        out.writeWord(dir.getSplitParts());
+        out.writeWord(dir.getStartDiskNumber());
+        out.writeWord(dir.getTotalEntries());
+        out.writeWord(dir.getDiskEntries());
         out.writeDword(dir.getSize());
         out.writeDword(Math.min(dir.getOffs(), InternalZipConstants.ZIP_64_LIMIT));
-        out.writeWord((short)ArrayUtils.getLength(comment));
+        out.writeWord(ArrayUtils.getLength(comment));
         out.writeBytes(comment);
     }
 

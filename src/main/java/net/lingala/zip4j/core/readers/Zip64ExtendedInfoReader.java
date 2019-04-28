@@ -2,9 +2,9 @@ package net.lingala.zip4j.core.readers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import net.lingala.zip4j.io.LittleEndianRandomAccessFile;
 import net.lingala.zip4j.model.ExtraField;
 import net.lingala.zip4j.model.Zip64;
-import net.lingala.zip4j.io.LittleEndianRandomAccessFile;
 
 import java.io.IOException;
 
@@ -17,7 +17,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 final class Zip64ExtendedInfoReader {
 
-    private final short signature;
+    private final int signature;
     private final boolean uncompressedSize;
     private final boolean compressedSize;
     private final boolean offs;

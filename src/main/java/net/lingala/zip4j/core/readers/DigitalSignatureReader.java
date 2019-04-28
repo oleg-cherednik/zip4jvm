@@ -20,10 +20,7 @@ final class DigitalSignatureReader {
             return null;
 
         CentralDirectory.DigitalSignature digitalSignature = new CentralDirectory.DigitalSignature();
-
-        short size = in.readWord();
-        digitalSignature.setSignatureData(in.readBytes(size));
-
+        digitalSignature.setSignatureData(in.readBytes(in.readWord()));
         return digitalSignature;
     }
 }

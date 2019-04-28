@@ -24,7 +24,7 @@ public final class LocalFileHeaderWriter {
 
     public void write(@NonNull SplitOutputStream out) throws IOException {
         out.writeSignature(LocalFileHeader.SIGNATURE);
-        out.writeWord((short)localFileHeader.getVersionToExtract());
+        out.writeWord(localFileHeader.getVersionToExtract());
         out.writeWord(localFileHeader.getGeneralPurposeFlag().getData());
         out.writeWord(localFileHeader.getCompressionMethod().getValue());
         out.writeDword(localFileHeader.getLastModifiedTime());
@@ -42,13 +42,13 @@ public final class LocalFileHeaderWriter {
 
         byte[] fileName = localFileHeader.getFileName(zipModel.getCharset());
 
-        out.writeWord((short)fileName.length);
-        out.writeWord((short)localFileHeader.getExtraField().getLength());
+        out.writeWord(fileName.length);
+        out.writeWord(localFileHeader.getExtraField().getLength());
         out.writeBytes(fileName);
 
         if (zipModel.isZip64()) {
             out.writeWord(Zip64.ExtendedInfo.SIGNATURE);
-            out.writeWord((short)16);
+            out.writeWord(16);
             out.writeQword(localFileHeader.getUncompressedSize());
             out.writeBytes(new byte[8]);
         }

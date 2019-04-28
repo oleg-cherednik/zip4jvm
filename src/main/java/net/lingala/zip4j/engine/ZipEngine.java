@@ -100,7 +100,7 @@ public class ZipEngine {
         }
     }
 
-    public void addStreamToZip(@NonNull Collection<InputStreamMeta> files, @NonNull final ZipParameters parameters) {
+    public void addStreamToZip(@NonNull Collection<InputStreamMeta> files, @NonNull ZipParameters parameters) {
         checkParameters(parameters);
 
         try (DeflateOutputStream out = new DeflateOutputStream(SplitOutputStream.create(zipModel), zipModel)) {
@@ -112,7 +112,6 @@ public class ZipEngine {
 
                 // TODO should be relative to the root zip path
                 new RemoveEntryFunc(zipModel).accept(file.getRelativePath());
-
                 ZipParameters params = parameters.toBuilder().build();
 
                 out.putNextEntry(file.getRelativePath(), params);

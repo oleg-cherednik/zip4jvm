@@ -20,7 +20,7 @@ public enum AESStrength {
     private final byte value;
     private final int saltLength;
 
-    public static AESStrength parseByte(byte value) {
+    public static AESStrength parseValue(byte value) {
         for (AESStrength strength : values())
             if (strength.value == value)
                 return strength;

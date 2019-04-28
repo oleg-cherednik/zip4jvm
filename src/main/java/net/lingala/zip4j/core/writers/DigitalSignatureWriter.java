@@ -22,7 +22,7 @@ final class DigitalSignatureWriter {
             return;
 
         out.writeSignature(CentralDirectory.DigitalSignature.SIGNATURE);
-        out.writeWord((short)ArrayUtils.getLength(digitalSignature.getSignatureData()));
+        out.writeWord(ArrayUtils.getLength(digitalSignature.getSignatureData()));
         out.writeBytes(digitalSignature.getSignatureData());
     }
 

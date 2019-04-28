@@ -35,7 +35,7 @@ final class ExtraFieldReader {
         final long offsMax = in.getFilePointer() + size;
 
         while (in.getFilePointer() < offsMax) {
-            short signature = in.readWord();
+            int signature = in.readWord();
 
             Zip64.ExtendedInfo zip64 = new Zip64ExtendedInfoReader(signature, uncompressedSize, compressedSize, offs, diskNumber).read(in);
             AESExtraDataRecord aes = new AESExtraDataRecordReader(signature).read(in);

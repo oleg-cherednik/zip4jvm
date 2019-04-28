@@ -25,8 +25,8 @@ final class AESExtraDataRecordWriter {
             return;
 
         out.writeWord(AESExtraDataRecord.SIGNATURE);
-        out.writeWord((short)record.getDataSize());
-        out.writeWord((short)record.getVersionNumber());
+        out.writeWord(record.getDataSize());
+        out.writeWord(record.getVersionNumber());
         out.writeBytes(record.getVendor(charset));
         out.writeBytes(record.getAesStrength().getValue(), (byte)0);
         out.writeWord(record.getCompressionMethod().getValue());

@@ -1,12 +1,15 @@
 package net.lingala.zip4j.model;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * @author Oleg Cherednik
  * @since 09.03.2019
  */
 @Getter
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum CompressionMethod {
     STORE(0),
     FILE_SHRUNK(1),
@@ -26,13 +29,9 @@ public enum CompressionMethod {
     PPMD(98),
     AES_ENC(99);
 
-    private final short value;
+    private final int value;
 
-    CompressionMethod(int value) {
-        this.value = (short)value;
-    }
-
-    public static CompressionMethod parseValue(short value) {
+    public static CompressionMethod parseValue(int value) {
         for (CompressionMethod method : values())
             if (method.value == value)
                 return method;

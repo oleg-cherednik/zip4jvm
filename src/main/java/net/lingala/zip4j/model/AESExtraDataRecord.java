@@ -34,7 +34,7 @@ import java.nio.charset.Charset;
 @Builder(toBuilder = true)
 public class AESExtraDataRecord {
 
-    public static final short SIGNATURE = (short)0x9901;
+    public static final int SIGNATURE = 0x9901;
     public static final int SIZE = 2 + 2 + 2 + 2 + 1 + 2;   // size:11
     public static final int SIZE_FIELD = 2 + 2; // 4 bytes: signature + size
 

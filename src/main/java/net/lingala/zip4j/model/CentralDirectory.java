@@ -91,14 +91,14 @@ public class CentralDirectory {
     public static class FileHeader {
 
         public static final int SIGNATURE = 0x02014B50;
-        public static final short DEF_VERSION = 20;
+        public static final int DEF_VERSION = 20;
 
         // size:4 - signature (0x02014b50)
 //        private final int signature = SIGNATURE;
         // size:2 - version made by
-        private short versionMadeBy = DEF_VERSION;
+        private int versionMadeBy = DEF_VERSION;
         // size:2 - version needed to extractEntries
-        private short versionToExtract = DEF_VERSION;
+        private int versionToExtract = DEF_VERSION;
         // size:2 - general purpose bit flag
         private final GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         // size:2 - compression method
@@ -188,7 +188,7 @@ public class CentralDirectory {
             generalPurposeFlag.setEncrypted(isEncrypted());
         }
 
-        public void setGeneralPurposeFlag(short data) {
+        public void setGeneralPurposeFlag(int data) {
             generalPurposeFlag.setData(data);
             generalPurposeFlag.setEncrypted(isEncrypted());
         }

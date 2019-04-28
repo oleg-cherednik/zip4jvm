@@ -75,7 +75,7 @@ public class SplitOutputStream extends OutputStream {
 
     @Override
     public void write(int val) throws IOException {
-        if ((splitLength == ZipModel.NO_SPLIT ? Integer.MAX_VALUE : (int)(splitLength - bytesWrittenForThisPart)) <= 0)
+        if (splitLength != ZipModel.NO_SPLIT && (int)(splitLength - bytesWrittenForThisPart) <= 0)
             startNextSplitFile();
 
         out.write(val);
@@ -141,7 +141,6 @@ public class SplitOutputStream extends OutputStream {
     }
 
     private final byte[] intByte = new byte[4];
-    private final byte[] shortByte = new byte[2];
     private final byte[] longByte = new byte[8];
 
     @Getter
@@ -149,18 +148,19 @@ public class SplitOutputStream extends OutputStream {
     private long offs;
     private final Map<String, Long> mark = new HashMap<>();
 
-
     public void writeSignature(int val) throws IOException {
         Raw.writeIntLittleEndian(intByte, 0, val);
         write(intByte);
         offs += intByte.length;
     }
 
+    private final byte[] arrShort = new byte[2];
 
-    public void writeWord(short val) throws IOException {
-        Raw.writeShortLittleEndian(shortByte, 0, val);
-        write(shortByte);
-        offs += shortByte.length;
+    public void writeWord(int val) throws IOException {
+        arrShort[0] = (byte)(val & 0xFF);
+        arrShort[1] = (byte)(val >>> 8);
+        write(arrShort);
+        offs += arrShort.length;
     }
 
     public void writeDword(int val) throws IOException {

@@ -164,7 +164,7 @@ public class CentralDirectoryBuilder {
         // Always set the version number to 2 as we do not store CRC for any AES encrypted files
         // only MAC is stored and as per the specification, if version number is 2, then MAC is read
         // and CRC is ignored
-        aesDataRecord.setVersionNumber(2);
+        aesDataRecord.setVersionNumber((short)2);
         aesDataRecord.setAesStrength(parameters.getAesKeyStrength());
         aesDataRecord.setCompressionMethod(parameters.getCompressionMethod());
 

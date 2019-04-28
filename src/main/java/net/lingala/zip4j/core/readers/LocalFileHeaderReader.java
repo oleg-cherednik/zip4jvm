@@ -33,8 +33,8 @@ public final class LocalFileHeaderReader {
         localFileHeader.setCrc32(in.readInt());
         localFileHeader.setCompressedSize(in.readIntAsLong());
         localFileHeader.setUncompressedSize(in.readIntAsLong());
-        short fileNameLength = in.readWord();
-        short extraFieldLength = in.readWord();
+        int fileNameLength = in.readWord();
+        int extraFieldLength = in.readWord();
         localFileHeader.setFileName(FilenameUtils.normalize(in.readString(fileNameLength)));
         localFileHeader.setExtraField(new ExtraFieldReader(extraFieldLength).read(in));
 

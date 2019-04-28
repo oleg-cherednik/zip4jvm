@@ -57,9 +57,9 @@ public class Zip64 {
         // size:8 - directory record (n)
         private long sizeOfZip64EndCentralDirRec;
         // size:2 - version made by
-        private short versionMadeBy;
+        private int versionMadeBy;
         // size:2 - version needed to extractEntries
-        private short versionNeededToExtract;
+        private int versionNeededToExtract;
         // size:4 - number of this disk
         private int diskNumber;
         // size:4 - number of the disk with the start of the central directory
@@ -88,7 +88,7 @@ public class Zip64 {
     @Builder(toBuilder = true)
     public static class ExtendedInfo {
 
-        public static final short SIGNATURE = 0x0001;
+        public static final int SIGNATURE = 0x1;
         public static final int SIZE_FIELD = 2 + 2; // 4 bytes: signature + size
 
         // size:2 - tag for this "extra" block type (ZIP64 = 0x001)

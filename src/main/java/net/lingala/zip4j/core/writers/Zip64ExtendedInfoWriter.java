@@ -23,7 +23,7 @@ final class Zip64ExtendedInfoWriter {
             return;
 
         out.writeWord(Zip64.ExtendedInfo.SIGNATURE);
-        out.writeWord((short)info.getSize());
+        out.writeWord(info.getSize());
 
         if (info.getUncompressedSize() != ExtraField.NO_DATA)
             out.writeQword(info.getUncompressedSize());

@@ -2,10 +2,10 @@ package net.lingala.zip4j.core.readers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import net.lingala.zip4j.io.LittleEndianRandomAccessFile;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.AESStrength;
 import net.lingala.zip4j.model.CompressionMethod;
-import net.lingala.zip4j.io.LittleEndianRandomAccessFile;
 
 import java.io.IOException;
 
@@ -16,7 +16,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 final class AESExtraDataRecordReader {
 
-    private final short signature;
+    private final int signature;
 
     @NonNull
     public AESExtraDataRecord read(@NonNull LittleEndianRandomAccessFile in) throws IOException {
@@ -27,7 +27,7 @@ final class AESExtraDataRecordReader {
         record.setDataSize(in.readWord());
         record.setVersionNumber(in.readWord());
         record.setVendor(in.readString(2));
-        record.setAesStrength(AESStrength.parseByte(in.readByte()));
+        record.setAesStrength(AESStrength.parseValue(in.readByte()));
         record.setCompressionMethod(CompressionMethod.parseValue(in.readWord()));
         return record;
     }

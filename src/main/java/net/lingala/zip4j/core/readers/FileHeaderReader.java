@@ -43,9 +43,9 @@ final class FileHeaderReader {
         fileHeader.setCrc32(in.readInt());
         fileHeader.setCompressedSize(in.readIntAsLong());
         fileHeader.setUncompressedSize(in.readIntAsLong());
-        short fileNameLength = in.readWord();
-        short extraFieldLength = in.readWord();
-        short fileCommentLength = in.readWord();
+        int fileNameLength = in.readWord();
+        int extraFieldLength = in.readWord();
+        int fileCommentLength = in.readWord();
         fileHeader.setDiskNumber(in.readWord());
         fileHeader.setInternalFileAttributes(in.readBytes(2));
         fileHeader.setExternalFileAttributes(in.readBytes(4));
