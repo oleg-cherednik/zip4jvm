@@ -21,6 +21,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.utils.InternalZipConstants;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.ArrayUtils;
 
@@ -63,6 +64,10 @@ public class ZipModel {
 
     public void setEndCentralDirectory(@NonNull EndCentralDirectory endCentralDirectory) {
         this.endCentralDirectory = endCentralDirectory;
+    }
+
+    public void setSplitLength(long splitLength) {
+        this.splitLength = splitLength < InternalZipConstants.MIN_SPLIT_LENGTH ? NO_SPLIT : splitLength;
     }
 
     public boolean isSplitArchive() {

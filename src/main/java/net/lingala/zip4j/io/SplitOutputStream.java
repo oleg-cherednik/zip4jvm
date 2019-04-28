@@ -44,16 +44,27 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
+/**
+ * @author Oleg Cherednik
+ * @since 08.03.2019
+ */
 public class SplitOutputStream extends OutputStream {
 
     private final long splitLength;
 
-    protected Path zipFile;
-    protected RandomAccessFile out;
-    protected long bytesWrittenForThisPart;
+    @NonNull
+    private Path zipFile;
+    @NonNull
+    private RandomAccessFile out;
+    private long bytesWrittenForThisPart;
     private int currSplitFileCounter = -1;
 
-    protected SplitOutputStream(Path zipFile, long splitLength) throws FileNotFoundException {
+    public SplitOutputStream(@NonNull Path zipFile) throws FileNotFoundException {
+        this(zipFile, ZipModel.NO_SPLIT);
+    }
+
+    public SplitOutputStream(@NonNull Path zipFile, long splitLength) throws FileNotFoundException {
+        // TODO move to ZipParameters
         if (splitLength >= 0 && splitLength < InternalZipConstants.MIN_SPLIT_LENGTH)
             throw new ZipException("split length less than minimum allowed split length of " + InternalZipConstants.MIN_SPLIT_LENGTH + " Bytes");
 
@@ -73,22 +84,16 @@ public class SplitOutputStream extends OutputStream {
 
         while (len > 0) {
             int canWrite = splitLength == ZipModel.NO_SPLIT ? Integer.MAX_VALUE : (int)(splitLength - bytesWrittenForThisPart);
-            int writeCurrPart = Math.min(len, canWrite);
+            int writeBytes = Math.min(len, canWrite);
 
             if (canWrite <= 0 || len > canWrite && offsInit != offs && isSignatureData.test(buf))
                 startNextSplitFile();
 
-            _write(buf, offs, writeCurrPart);
-            offs += writeCurrPart;
-            len -= writeCurrPart;
-        }
-    }
+            out.write(buf, offs, writeBytes);
+            bytesWrittenForThisPart += writeBytes;
 
-    @SuppressWarnings("NewMethodNamingConvention")
-    protected final void _write(byte[] buf, int offs, int len) throws IOException {
-        if (len > 0) {
-            out.write(buf, offs, len);
-            bytesWrittenForThisPart += len;
+            offs += writeBytes;
+            len -= writeBytes;
         }
     }
 
@@ -120,8 +125,7 @@ public class SplitOutputStream extends OutputStream {
 
     @Override
     public void close() throws IOException {
-        if (out != null)
-            out.close();
+        out.close();
     }
 
     public long getFilePointer() throws IOException {
@@ -204,7 +208,7 @@ public class SplitOutputStream extends OutputStream {
         if (parent != null)
             Files.createDirectories(parent);
 
-        return zipModel.isSplitArchive() ? new SplitOutputStream(zipFile, zipModel.getSplitLength()) : new NoSplitOutputStream(zipFile);
+        return new SplitOutputStream(zipFile, zipModel.getSplitLength());
     }
 
     @SuppressWarnings("FieldNamingConvention")
