@@ -25,7 +25,6 @@ import net.lingala.zip4j.core.writers.ZipModelWriter;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.utils.InternalZipConstants;
 import net.lingala.zip4j.utils.ZipUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.nio.charset.Charset;
@@ -55,7 +54,7 @@ public class CentralDirectory {
 
     @NonNull
     public List<FileHeader> getFileHeadersByPrefix(@NonNull String prefix) {
-        String name = FilenameUtils.normalize(prefix.toLowerCase(), true);
+        String name = ZipUtils.normalizeFileName.apply(prefix.toLowerCase());
 
         return fileHeaders.stream()
                           .filter(fileHeader -> fileHeader.getFileName().toLowerCase().startsWith(name))
@@ -64,25 +63,23 @@ public class CentralDirectory {
 
     @NonNull
     public FileHeader getFileHeaderByEntryName(@NonNull String entryName) {
-        FileHeader fileHeader = getNullableFileHeaderByEntryName(entryName);
-
-        if (fileHeaders.isEmpty())
-            throw new ZipException("File header with entry name '" + entryName + "' was not found");
-
-        return fileHeader;
-    }
-
-    public FileHeader getNullableFileHeaderByEntryName(@NonNull String entryName) {
-        String name = FilenameUtils.normalize(entryName.toLowerCase(), true);
-
-        List<FileHeader> fileHeaders = this.fileHeaders.stream()
-                                                       .filter(fileHeader -> fileHeader.getFileName().toLowerCase().equals(name))
-                                                       .collect(Collectors.toList());
+        List<FileHeader> fileHeaders = getFileHeadersByEntryName(entryName);
 
         if (fileHeaders.size() > 1)
             throw new ZipException("Multiple file headers found for entry name '" + entryName + '\'');
+        if (fileHeaders.isEmpty())
+            throw new ZipException("File header with entry name '" + entryName + "' was not found");
 
-        return fileHeaders.isEmpty() ? null : fileHeaders.get(0);
+        return fileHeaders.iterator().next();
+    }
+
+    @NonNull
+    public List<FileHeader> getFileHeadersByEntryName(@NonNull String entryName) {
+        String name = ZipUtils.normalizeFileName.apply(entryName.toLowerCase());
+
+        return fileHeaders.stream()
+                          .filter(fileHeader -> fileHeader.getFileName().toLowerCase().equals(name))
+                          .collect(Collectors.toList());
     }
 
     @Getter
@@ -134,7 +131,6 @@ public class CentralDirectory {
         private ExtraField extraField = ExtraField.NULL;
         // size:k - extra field
         private String fileComment;
-        private char[] password;
 
         public FileHeader(String fileName) {
             this.fileName = fileName;

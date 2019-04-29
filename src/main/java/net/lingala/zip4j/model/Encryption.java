@@ -26,24 +26,26 @@ import java.io.IOException;
 public enum Encryption {
     OFF(-1) {
         @Override
-        public Decoder decoder(LittleEndianRandomAccessFile in, LocalFileHeader localFileHeader, char[] password) throws IOException {
+        public Decoder decoder(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, char[] password)
+                throws IOException {
             return null;
         }
 
         @Override
-        public Encoder encoder(ZipParameters parameters, LocalFileHeader localFileHeader) {
+        public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull ZipParameters parameters) {
             return Encoder.NULL;
         }
     },
     STANDARD(0) {
         @Override
-        public Decoder decoder(LittleEndianRandomAccessFile in, LocalFileHeader localFileHeader, char[] password) throws IOException {
+        public Decoder decoder(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, char[] password)
+                throws IOException {
             in.seek(localFileHeader.getOffs());
             return new StandardDecoder(localFileHeader, password, in.readBytes(InternalZipConstants.STD_DEC_HDR_SIZE));
         }
 
         @Override
-        public Encoder encoder(ZipParameters parameters, LocalFileHeader localFileHeader) {
+        public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull ZipParameters parameters) {
             // Since we do not know the crc here, we use the modification time for encrypting.
             return new StandardEncoder(parameters.getPassword(), (localFileHeader.getLastModifiedTime() & 0xFFFF) << 16);
         }
@@ -51,33 +53,35 @@ public enum Encryption {
     STRONG(1),
     AES(99) {
         @Override
-        public Decoder decoder(LittleEndianRandomAccessFile in, LocalFileHeader localFileHeader, char[] password) throws IOException {
+        public Decoder decoder(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, char[] password)
+                throws IOException {
             byte[] salt = getSalt(in, localFileHeader);
             byte[] passwordVerifier = in.readBytes(2);
             return new AesDecoder(localFileHeader, password, salt, passwordVerifier);
         }
 
         private byte[] getSalt(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader) throws IOException {
-            if (localFileHeader.getExtraField().getAesExtraDataRecord() == AesExtraDataRecord.NULL)
+            if (localFileHeader.getEncryption() != AES)
                 return null;
 
             in.seek(localFileHeader.getOffs());
-            return in.readBytes(localFileHeader.getExtraField().getAesExtraDataRecord().getAesStrength().getSaltLength());
+            AesStrength aesStrength = localFileHeader.getExtraField().getAesExtraDataRecord().getAesStrength();
+            return in.readBytes(aesStrength.getSaltLength());
         }
 
         @Override
-        public Encoder encoder(ZipParameters parameters, LocalFileHeader localFileHeader) {
-            return new AesEncoder(parameters.getPassword(), parameters.getAesKeyStrength());
+        public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull ZipParameters parameters) {
+            return new AesEncoder(parameters.getPassword(), parameters.getAesStrength());
         }
     };
 
     private final int value;
 
-    public Decoder decoder(LittleEndianRandomAccessFile in, LocalFileHeader localFileHeader, char[] password) throws IOException {
+    public Decoder decoder(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, char[] password) throws IOException {
         throw new ZipException("unsupported encryption method");
     }
 
-    public Encoder encoder(ZipParameters parameters, LocalFileHeader localFileHeader) {
+    public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull ZipParameters parameters) {
         throw new ZipException("invalid encryption method");
     }
 

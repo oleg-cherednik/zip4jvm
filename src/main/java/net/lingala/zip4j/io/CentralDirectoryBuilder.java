@@ -14,7 +14,6 @@ import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.utils.InternalZipConstants;
 import net.lingala.zip4j.utils.ZipUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
@@ -89,7 +88,7 @@ public class CentralDirectoryBuilder {
         if (!parameters.isSourceExternalStream() && Files.isDirectory(sourceFile) && !ZipUtils.isDirectory(fileName))
             fileName += "/";
 
-        return FilenameUtils.normalize(fileName, true);
+        return ZipUtils.normalizeFileName.apply(fileName);
     }
 
     private void updateGeneralPurposeFlag(@NonNull GeneralPurposeFlag generalPurposeFlag) {
@@ -124,7 +123,7 @@ public class CentralDirectoryBuilder {
         if (parameters.getEncryption() == Encryption.STANDARD)
             return fileSize + InternalZipConstants.STD_DEC_HDR_SIZE;
 
-        return fileSize + parameters.getAesKeyStrength().getSaltLength() + InternalZipConstants.AES_AUTH_LENGTH + 2; //2 is password verifier
+        return fileSize + parameters.getAesStrength().getSaltLength() + InternalZipConstants.AES_AUTH_LENGTH + 2; //2 is password verifier
     }
 
     private long getUncompressedSize(CentralDirectory.FileHeader fileHeader) throws IOException {
@@ -165,7 +164,7 @@ public class CentralDirectoryBuilder {
         // only MAC is stored and as per the specification, if version number is 2, then MAC is read
         // and CRC is ignored
         aesDataRecord.setVersionNumber((short)2);
-        aesDataRecord.setAesStrength(parameters.getAesKeyStrength());
+        aesDataRecord.setAesStrength(parameters.getAesStrength());
         aesDataRecord.setCompressionMethod(parameters.getCompressionMethod());
 
         return aesDataRecord;

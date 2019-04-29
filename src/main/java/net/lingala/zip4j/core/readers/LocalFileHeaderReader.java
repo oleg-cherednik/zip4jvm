@@ -7,7 +7,7 @@ import net.lingala.zip4j.io.LittleEndianRandomAccessFile;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.LocalFileHeader;
-import org.apache.commons.io.FilenameUtils;
+import net.lingala.zip4j.utils.ZipUtils;
 
 import java.io.IOException;
 
@@ -35,7 +35,7 @@ public final class LocalFileHeaderReader {
         localFileHeader.setUncompressedSize(in.readDwordLong());
         int fileNameLength = in.readWord();
         int extraFieldLength = in.readWord();
-        localFileHeader.setFileName(FilenameUtils.normalize(in.readString(fileNameLength)));
+        localFileHeader.setFileName(ZipUtils.normalizeFileName.apply(in.readString(fileNameLength)));
         localFileHeader.setExtraField(new ExtraFieldReader(extraFieldLength).read(in));
 
         localFileHeader.setOffs(in.getFilePointer());

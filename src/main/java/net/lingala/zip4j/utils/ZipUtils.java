@@ -18,9 +18,11 @@ package net.lingala.zip4j.utils;
 
 import lombok.experimental.UtilityClass;
 import net.lingala.zip4j.exception.ZipException;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Calendar;
+import java.util.function.Function;
 
 /**
  * @author Oleg CHerednik
@@ -73,7 +75,8 @@ public class ZipUtils {
         return fileName != null && (fileName.endsWith("/") || fileName.endsWith("\\"));
     }
 
-    public static String normalizeComment(String comment) {
+    @SuppressWarnings("FieldNamingConvention")
+    public static final Function<String, String> normalizeComment = comment -> {
         if (StringUtils.isBlank(comment))
             return null;
 
@@ -83,7 +86,10 @@ public class ZipUtils {
             throw new ZipException("comment length exceeds maximum length");
 
         return comment;
-    }
+    };
+
+    @SuppressWarnings("FieldNamingConvention")
+    public static final Function<String, String> normalizeFileName = fileName -> FilenameUtils.normalize(fileName, true);
 
     public static void prepareBuffAESIVBytes(byte[] buff, int nonce, int length) {
         buff[0] = (byte)nonce;
@@ -103,4 +109,5 @@ public class ZipUtils {
         buff[14] = 0;
         buff[15] = 0;
     }
+
 }

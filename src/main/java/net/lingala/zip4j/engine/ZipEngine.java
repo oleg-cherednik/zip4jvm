@@ -138,7 +138,7 @@ public class ZipEngine {
             if (ArrayUtils.isEmpty(parameters.getPassword()))
                 throw new ZipException("input password is empty or null");
         } else {
-            parameters.setAesKeyStrength(AesStrength.NONE);
+            parameters.setAesStrength(AesStrength.NONE);
             parameters.setEncryption(Encryption.OFF);
         }
     }

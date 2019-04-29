@@ -43,7 +43,7 @@ public final class ZipMisc {
     }
 
     public void setComment(String comment) throws ZipException {
-        comment = ZipUtils.normalizeComment(comment);
+        comment = ZipUtils.normalizeComment.apply(comment);
         UnzipIt.checkZipFile(zipFile);
 
         ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get().noSplitOnly();

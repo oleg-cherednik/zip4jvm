@@ -72,7 +72,6 @@ public final class LittleEndianRandomAccessFile implements Closeable {
         return new CreateStringFunc().apply(buf);
     }
 
-
     public byte readByte() throws IOException {
         offs++;
         return in.readByte();

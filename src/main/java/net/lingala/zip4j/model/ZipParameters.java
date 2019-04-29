@@ -47,7 +47,7 @@ public class ZipParameters {
     private boolean readHiddenFiles;
     private char[] password;
     @Builder.Default
-    private AesStrength aesKeyStrength = AesStrength.NONE;
+    private AesStrength aesStrength = AesStrength.NONE;
     @Builder.Default
     private boolean includeRootFolder = true;
     private String rootFolderInZip;

@@ -23,6 +23,7 @@ import net.lingala.zip4j.crypto.AesDecoder;
 import net.lingala.zip4j.crypto.Decoder;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.InflaterInputStream;
+import net.lingala.zip4j.io.LittleEndianRandomAccessFile;
 import net.lingala.zip4j.io.PartInputStream;
 import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.CentralDirectory;
@@ -31,7 +32,6 @@ import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.utils.InternalZipConstants;
-import net.lingala.zip4j.io.LittleEndianRandomAccessFile;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
@@ -46,7 +46,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.CRC32;
 
@@ -70,26 +69,15 @@ public class UnzipEngine {
     private int currSplitFileCounter;
     private Decoder decoder;
 
-    private final Function<CentralDirectory.FileHeader, CentralDirectory.FileHeader> setPassword =
-            new Function<CentralDirectory.FileHeader, CentralDirectory.FileHeader>() {
-                @Override
-                public CentralDirectory.FileHeader apply(CentralDirectory.FileHeader fileHeader) {
-                    if (fileHeader.isEncrypted())
-                        fileHeader.setPassword(password);
-                    return fileHeader;
-                }
-            };
-
     public void extractEntries(@NonNull Path destDir, @NonNull Collection<String> entries) {
         getFileHeaders(entries).forEach(fileHeader -> extractEntry(destDir, fileHeader));
     }
 
-    private List<CentralDirectory.FileHeader> getFileHeaders(Collection<String> entries) {
+    private List<CentralDirectory.FileHeader> getFileHeaders(@NonNull Collection<String> entries) {
         return entries.stream()
                       .map(entryName -> zipModel.getCentralDirectory().getFileHeadersByPrefix(entryName))
                       .flatMap(List::stream)
                       .filter(Objects::nonNull)
-                      .map(setPassword)
                       .collect(Collectors.toList());
     }
 
@@ -119,16 +107,13 @@ public class UnzipEngine {
     @NonNull
     private InputStream extractEntryAsStream(@NonNull CentralDirectory.FileHeader fileHeader) {
         try {
-            if (fileHeader.isEncrypted())
-                fileHeader.setPassword(password);
-
             // TODO temporary
             this.fileHeader = fileHeader;
 
             LittleEndianRandomAccessFile in = openFile(fileHeader);
             LocalFileHeader localFileHeader = readLocalFileHeader(fileHeader);
             this.localFileHeader = localFileHeader;
-            decoder = localFileHeader.getEncryption().decoder(in, localFileHeader, fileHeader.getPassword());
+            decoder = localFileHeader.getEncryption().decoder(in, localFileHeader, password);
 
             long comprSize = localFileHeader.getCompressedSize();
             long offs = localFileHeader.getOffs();

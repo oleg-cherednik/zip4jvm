@@ -5,7 +5,7 @@ import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.LittleEndianRandomAccessFile;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.CompressionMethod;
-import org.apache.commons.io.FilenameUtils;
+import net.lingala.zip4j.utils.ZipUtils;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -50,7 +50,7 @@ final class FileHeaderReader {
         fileHeader.setInternalFileAttributes(in.readBytes(2));
         fileHeader.setExternalFileAttributes(in.readBytes(4));
         fileHeader.setOffsLocalFileHeader(in.readDwordLong());
-        fileHeader.setFileName(FilenameUtils.normalize(in.readString(fileNameLength), true));
+        fileHeader.setFileName(ZipUtils.normalizeFileName.apply(in.readString(fileNameLength)));
 
         boolean uncompressedSize = fileHeader.getUncompressedSize() == 0xFFFF;
         boolean compressedSize = fileHeader.getCompressedSize() == 0xFFFF;
@@ -61,4 +61,5 @@ final class FileHeaderReader {
 
         return fileHeader;
     }
+
 }

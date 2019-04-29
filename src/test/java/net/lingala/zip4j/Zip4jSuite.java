@@ -104,7 +104,7 @@ public class Zip4jSuite {
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .encryption(Encryption.STANDARD)
-                                                .aesKeyStrength(AesStrength.STRENGTH_256)
+                                                .aesStrength(AesStrength.STRENGTH_256)
                                                 .password(password).build();
         ZipIt zip = ZipIt.builder().zipFile(noSplitAesZip).build();
         zip.add(srcDir, parameters);

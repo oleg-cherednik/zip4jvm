@@ -41,7 +41,7 @@ public class ZipEncryptedFilesTest {
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .encryption(Encryption.STANDARD)
-                                                .aesKeyStrength(AesStrength.STRENGTH_256)
+                                                .aesStrength(AesStrength.STRENGTH_256)
                                                 .password(Zip4jSuite.password).build();
 
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();

@@ -71,8 +71,8 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
     private Set<String> getExistedEntries(Collection<String> entries) {
         return entries.stream()
                       .filter(Objects::nonNull)
-                      .map(entryName -> zipModel.getCentralDirectory().getNullableFileHeaderByEntryName(entryName))
-                      .filter(Objects::nonNull)
+                      .map(entryName -> zipModel.getCentralDirectory().getFileHeadersByEntryName(entryName))
+                      .flatMap(List::stream)
                       .map(CentralDirectory.FileHeader::getFileName)
                       .collect(Collectors.toSet());
     }
