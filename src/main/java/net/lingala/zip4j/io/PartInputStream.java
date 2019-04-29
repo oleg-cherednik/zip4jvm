@@ -28,7 +28,7 @@ import java.io.RandomAccessFile;
 
 public class PartInputStream extends InputStream {
 
-    private RandomAccessFile raf;
+    private RandomAccessFile in;
     private final long length;
     private final UnzipEngine unzipEngine;
 
@@ -39,7 +39,7 @@ public class PartInputStream extends InputStream {
     private int count = -1;
 
     public PartInputStream(LittleEndianRandomAccessFile in, long length, UnzipEngine unzipEngine) {
-        raf = in.getIn();
+        this.in = in.getIn();
         this.unzipEngine = unzipEngine;
         this.length = length;
     }
@@ -88,13 +88,13 @@ public class PartInputStream extends InputStream {
             }
         }
 
-        synchronized (raf) {
-            count = raf.read(b, off, len);
+        synchronized (in) {
+            count = in.read(b, off, len);
             if ((count < len) && unzipEngine.getZipModel().isSplitArchive()) {
-                raf.close();
-                raf = unzipEngine.startNextSplitFile();
+                in.close();
+                in = unzipEngine.startNextSplitFile();
                 if (count < 0) count = 0;
-                int newlyRead = raf.read(b, count, len - count);
+                int newlyRead = in.read(b, count, len - count);
                 if (newlyRead > 0)
                     count += newlyRead;
             }
@@ -129,12 +129,12 @@ public class PartInputStream extends InputStream {
         }
         byte[] macBytes = new byte[InternalZipConstants.AES_AUTH_LENGTH];
         int readLen = -1;
-        readLen = raf.read(macBytes);
+        readLen = in.read(macBytes);
         if (readLen != InternalZipConstants.AES_AUTH_LENGTH) {
             if (unzipEngine.getZipModel().isSplitArchive()) {
-                raf.close();
-                raf = unzipEngine.startNextSplitFile();
-                int newlyRead = raf.read(macBytes, readLen, InternalZipConstants.AES_AUTH_LENGTH - readLen);
+                in.close();
+                in = unzipEngine.startNextSplitFile();
+                int newlyRead = in.read(macBytes, readLen, InternalZipConstants.AES_AUTH_LENGTH - readLen);
                 readLen += newlyRead;
             } else {
                 throw new IOException("Error occured while reading stored AES authentication bytes");
@@ -156,7 +156,7 @@ public class PartInputStream extends InputStream {
 
     @Override
     public void close() throws IOException {
-        raf.close();
+        in.close();
     }
 
 }

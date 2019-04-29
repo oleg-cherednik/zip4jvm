@@ -34,7 +34,6 @@ import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.utils.InternalZipConstants;
 import org.apache.commons.io.IOUtils;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -221,18 +220,16 @@ public class UnzipEngine {
     }
 
     public RandomAccessFile startNextSplitFile() throws IOException {
-        String partFile;
+        Path currSplitFile = zipModel.getZipFile();
 
-        if (currSplitFileCounter == zipModel.getEndCentralDirectory().getSplitParts())
-            partFile = zipModel.getZipFile().toString();
-        else
-            partFile = ZipModel.getSplitFilePath(zipModel.getZipFile(), currSplitFileCounter + 1).toString();
+        if (currSplitFileCounter != zipModel.getEndCentralDirectory().getSplitParts())
+            currSplitFile = ZipModel.getSplitFilePath(currSplitFile, currSplitFileCounter + 1);
+
+        if (!Files.exists(currSplitFile))
+            throw new ZipException("split file: " + currSplitFile.getFileName() + " does not exists");
 
         currSplitFileCounter++;
-        if (!new File(partFile).exists()) {
-            throw new IOException("zip split file does not exist: " + partFile);
-        }
-        return new RandomAccessFile(partFile, "r");
+        return new RandomAccessFile(currSplitFile.toFile(), "r");
     }
 
     public void updateCRC(int b) {
