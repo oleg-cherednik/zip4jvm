@@ -7,13 +7,14 @@ import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.model.ZipParameters;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
-import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThatZipFile;
+import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThatEncryptedZipFile;
 
 /**
  * @author Oleg Cherednik
@@ -23,7 +24,6 @@ import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThatZipFile;
 public class ZipEncryptedFilesTest {
 
     private static final Path rootDir = Zip4jSuite.rootDir.resolve(ZipEncryptedFilesTest.class.getSimpleName());
-    private static final Path zipFile = rootDir.resolve("src.zip");
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -35,8 +35,8 @@ public class ZipEncryptedFilesTest {
         Zip4jSuite.removeDir(rootDir);
     }
 
-//    @Test
-    public void shouldCreateEncryptedZip() throws IOException {
+    @Test
+    public void shouldCreateNewEncryptedZipWithFolder() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
@@ -44,11 +44,12 @@ public class ZipEncryptedFilesTest {
                                                 .aesStrength(AesStrength.STRENGTH_256)
                                                 .password(Zip4jSuite.password).build();
 
+        Path destDir = Zip4jSuite.generateSubDirName(rootDir, "shouldCreateNewEncryptedZipWithFolder");
+        Path zipFile = destDir.resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         zip.add(Zip4jSuite.srcDir, parameters);
 
-        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(zipFile).exists().rootEntry().hasSubDirectories(1).hasFiles(0);
-        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
+        assertThatDirectory(destDir).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatEncryptedZipFile(zipFile, Zip4jSuite.password).exists().rootEntry().matches(TestUtils.zipRootDirAssert);
     }
 }

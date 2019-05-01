@@ -72,12 +72,12 @@ public class StandardDecoder implements Decoder {
     }
 
     @Override
-    public int decode(byte[] buf, int start, int len) {
-        if (start < 0 || len < 0)
+    public int decode(byte[] buf, int offs, int len) {
+        if (offs < 0 || len < 0)
             throw new ZipException("one of the input parameters were null in standard decrpyt data");
 
         try {
-            for (int i = start; i < start + len; i++) {
+            for (int i = offs; i < offs + len; i++) {
                 int val = buf[i] & 0xff;
                 val = (val ^ zipCryptoEngine.decryptByte()) & 0xff;
                 zipCryptoEngine.updateKeys((byte)val);

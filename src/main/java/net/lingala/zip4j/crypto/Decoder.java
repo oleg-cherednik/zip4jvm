@@ -21,10 +21,6 @@ package net.lingala.zip4j.crypto;
  */
 public interface Decoder {
 
-    default int decode(byte[] buf) {
-        return decode(buf, 0, buf.length);
-    }
-
-    int decode(byte[] buf, int start, int len);
+    int decode(byte[] buf, int offs, int len);
 
 }

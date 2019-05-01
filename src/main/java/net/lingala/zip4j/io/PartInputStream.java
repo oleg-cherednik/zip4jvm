@@ -18,7 +18,6 @@ package net.lingala.zip4j.io;
 
 import net.lingala.zip4j.crypto.AesDecoder;
 import net.lingala.zip4j.engine.UnzipEngine;
-import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.utils.InternalZipConstants;
 
@@ -101,13 +100,8 @@ public class PartInputStream extends InputStream {
         }
 
         if (count > 0) {
-            if (unzipEngine.getDecoder() != null) {
-                try {
-                    unzipEngine.getDecoder().decode(b, off, count);
-                } catch(ZipException e) {
-                    throw new IOException(e.getMessage());
-                }
-            }
+            if (unzipEngine.getDecoder() != null)
+                unzipEngine.getDecoder().decode(b, off, count);
             bytesRead += count;
         }
 

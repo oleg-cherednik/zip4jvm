@@ -51,16 +51,13 @@ public class AesDecoder implements Decoder {
     private byte[] storedMac;
 
     private int nonce = 1;
-    private byte[] iv;
-    private byte[] counterBlock;
+    private final byte[] iv = new byte[InternalZipConstants.AES_BLOCK_SIZE];
+    private final byte[] counterBlock = new byte[InternalZipConstants.AES_BLOCK_SIZE];
     private int loopCount = 0;
 
-    public AesDecoder(@NonNull LocalFileHeader localFileHeader, char[] password, byte[] salt, byte[] passwordVerifier) throws ZipException {
+    public AesDecoder(@NonNull LocalFileHeader localFileHeader, @NonNull char[] password, byte[] salt, byte[] passwordVerifier) throws ZipException {
         this.localFileHeader = localFileHeader;
         this.password = password;
-        storedMac = null;
-        iv = new byte[InternalZipConstants.AES_BLOCK_SIZE];
-        counterBlock = new byte[InternalZipConstants.AES_BLOCK_SIZE];
         init(salt, passwordVerifier);
     }
 
@@ -116,17 +113,16 @@ public class AesDecoder implements Decoder {
         mac.init(macKey);
     }
 
-    public int decode(byte[] buf, int start, int len) throws ZipException {
-
-        if (aesEngine == null) {
+    @Override
+    public int decode(byte[] buf, int offs, int len) throws ZipException {
+        if (aesEngine == null)
             throw new ZipException("AES not initialized properly");
-        }
 
         try {
 
-            for (int j = start; j < (start + len); j += InternalZipConstants.AES_BLOCK_SIZE) {
-                loopCount = (j + InternalZipConstants.AES_BLOCK_SIZE <= (start + len)) ?
-                            InternalZipConstants.AES_BLOCK_SIZE : ((start + len) - j);
+            for (int j = offs; j < (offs + len); j += InternalZipConstants.AES_BLOCK_SIZE) {
+                loopCount = (j + InternalZipConstants.AES_BLOCK_SIZE <= (offs + len)) ?
+                            InternalZipConstants.AES_BLOCK_SIZE : ((offs + len) - j);
 
                 mac.update(buf, j, loopCount);
                 ZipUtils.prepareBuffAESIVBytes(iv, nonce, InternalZipConstants.AES_BLOCK_SIZE);
@@ -146,10 +142,6 @@ public class AesDecoder implements Decoder {
         } catch(Exception e) {
             throw new ZipException(e);
         }
-    }
-
-    public int decode(byte[] buf) throws ZipException {
-        return decode(buf, 0, buf.length);
     }
 
     private byte[] deriveKey(byte[] salt, char[] password) throws ZipException {
