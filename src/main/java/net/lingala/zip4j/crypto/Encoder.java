@@ -22,6 +22,10 @@ import net.lingala.zip4j.io.SplitOutputStream;
 
 import java.io.IOException;
 
+/**
+ * @author Oleg Cherednik
+ * @since 22.03.2019
+ */
 @SuppressWarnings("MethodCanBeVariableArityMethod")
 public interface Encoder {
 

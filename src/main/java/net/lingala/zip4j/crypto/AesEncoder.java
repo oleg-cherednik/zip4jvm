@@ -31,8 +31,12 @@ import java.util.Random;
 
 public class AesEncoder implements Encoder {
 
-    private char[] password;
-    private AesStrength keyStrength;
+    private final char[] password;
+    private final AesStrength keyStrength;
+
+    private final byte[] counterBlock = new byte[InternalZipConstants.AES_BLOCK_SIZE];
+    private final byte[] iv = new byte[InternalZipConstants.AES_BLOCK_SIZE];
+
     private AesEngine aesEngine;
     private MacBasedPRF mac;
 
@@ -51,15 +55,9 @@ public class AesEncoder implements Encoder {
     private int nonce = 1;
     private int loopCount = 0;
 
-    private byte[] iv;
-    private byte[] counterBlock;
-
     public AesEncoder(char[] password, AesStrength keyStrength) throws ZipException {
         this.password = password;
         this.keyStrength = keyStrength;
-        this.finished = false;
-        counterBlock = new byte[InternalZipConstants.AES_BLOCK_SIZE];
-        iv = new byte[InternalZipConstants.AES_BLOCK_SIZE];
         init();
     }
 

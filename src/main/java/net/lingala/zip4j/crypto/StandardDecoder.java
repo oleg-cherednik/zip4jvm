@@ -17,7 +17,7 @@
 package net.lingala.zip4j.crypto;
 
 import lombok.NonNull;
-import net.lingala.zip4j.crypto.engine.ZipCryptoEngine;
+import net.lingala.zip4j.crypto.engine.StandardEngine;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.exception.ZipExceptionConstants;
 import net.lingala.zip4j.model.LocalFileHeader;
@@ -28,7 +28,7 @@ public class StandardDecoder implements Decoder {
 
     private final LocalFileHeader localFileHeader;
     private final char[] password;
-    private final ZipCryptoEngine zipCryptoEngine = new ZipCryptoEngine();
+    private final StandardEngine standardEngine = new StandardEngine();
 
     public StandardDecoder(@NonNull LocalFileHeader localFileHeader, @NonNull char[] password, byte[] headerBytes) {
         this.localFileHeader = localFileHeader;
@@ -51,7 +51,7 @@ public class StandardDecoder implements Decoder {
         if (ArrayUtils.isEmpty(password))
             throw new ZipException("Wrong password!", ZipExceptionConstants.WRONG_PASSWORD);
 
-        zipCryptoEngine.initKeys(password);
+        standardEngine.initKeys(password);
 
         try {
             int result = headerBytes[0];
@@ -62,7 +62,7 @@ public class StandardDecoder implements Decoder {
 //				if(i+1 == InternalZipConstants.STD_DEC_HDR_SIZE && ((byte)(result ^ zipCryptoEngine.decryptByte()) != crc[3]) && !isSplit)
 //					throw new ZipException("Wrong password!", ZipExceptionConstants.WRONG_PASSWORD);
 
-                zipCryptoEngine.updateKeys((byte)(result ^ zipCryptoEngine.decryptByte()));
+                standardEngine.updateKeys((byte)(result ^ standardEngine.decryptByte()));
                 if (i + 1 != InternalZipConstants.STD_DEC_HDR_SIZE)
                     result = headerBytes[i + 1];
             }
@@ -79,8 +79,8 @@ public class StandardDecoder implements Decoder {
         try {
             for (int i = offs; i < offs + len; i++) {
                 int val = buf[i] & 0xff;
-                val = (val ^ zipCryptoEngine.decryptByte()) & 0xff;
-                zipCryptoEngine.updateKeys((byte)val);
+                val = (val ^ standardEngine.decryptByte()) & 0xff;
+                standardEngine.updateKeys((byte)val);
                 buf[i] = (byte)val;
             }
             return len;
