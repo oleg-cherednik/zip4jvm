@@ -36,12 +36,13 @@ public class ZipEncryptedFilesTest {
     }
 
     @Test
-    public void shouldCreateNewEncryptedZipWithFolder() throws IOException {
+    public void shouldCreateNewZipWithFolderAndStandardEncryption() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .encryption(Encryption.STANDARD)
                                                 .aesStrength(AesStrength.STRENGTH_256)
+                                                .comment("password: " + new String(Zip4jSuite.password))
                                                 .password(Zip4jSuite.password).build();
 
         Path destDir = Zip4jSuite.generateSubDirName(rootDir, "shouldCreateNewEncryptedZipWithFolder");

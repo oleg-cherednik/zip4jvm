@@ -27,15 +27,10 @@ public class StandardEngine {
     private final int[] keys = new int[3];
 
     static {
-        for (int i = 0; i < 256; i++) {
-            int r = i;
-            for (int j = 0; j < 8; j++) {
-                if ((r & 1) == 1) {
-                    r = (r >>> 1) ^ 0xedb88320;
-                } else {
-                    r >>>= 1;
-                }
-            }
+        for (int i = 0, r = i; i < 256; i++, r = i) {
+            for (int j = 0; j < 8; j++)
+                r = (r & 1) == 1 ? (r >>> 1) ^ 0xedb88320 : (r >>> 1);
+
             CRC_TABLE[i] = r;
         }
     }
@@ -61,7 +56,7 @@ public class StandardEngine {
     }
 
     public byte decryptByte() {
-        int temp = keys[2] | 2;
-        return (byte)((temp * (temp ^ 1)) >>> 8);
+        int tmp = keys[2] | 2;
+        return (byte)((tmp * (tmp ^ 1)) >>> 8);
     }
 }
