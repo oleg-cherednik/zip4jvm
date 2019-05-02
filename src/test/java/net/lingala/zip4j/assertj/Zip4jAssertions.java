@@ -20,7 +20,7 @@ public final class Zip4jAssertions extends Assertions {
     }
 
     public static AbstractZipFileAssert<?> assertThatEncryptedZipFile(Path zipFile, char[] password) throws IOException {
-        return Zip4jAssertionsForClassTypes.assertThat(new ZipFileDecorator(zipFile, password));
+        return Zip4jAssertionsForClassTypes.assertThat(new ZipFileEncryptedDecoder(zipFile, password));
     }
 
     public static AbstractDirectoryAssert<?> assertThatDirectory(Path path) {
