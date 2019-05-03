@@ -1,6 +1,5 @@
 package net.lingala.zip4j;
 
-import net.lingala.zip4j.model.AesStrength;
 import net.lingala.zip4j.model.CompressionLevel;
 import net.lingala.zip4j.model.CompressionMethod;
 import net.lingala.zip4j.model.Encryption;
@@ -32,7 +31,7 @@ public class Zip4jSuite {
     public static final Path emptyDir = srcDir.resolve("empty_dir");
 
     public static final Path noSplitZip = rootDir.resolve("no_split/src.zip");
-    public static final Path noSplitAesZip = rootDir.resolve("no_split_aes/src.zip");
+    public static final Path noSplitPkwareZip = rootDir.resolve("no_split_pkware/src.zip");
     public static final Path splitZip = rootDir.resolve("split/src.zip");
 
     /** Password for encrypted zip */
@@ -104,9 +103,8 @@ public class Zip4jSuite {
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .encryption(Encryption.STANDARD)
-                                                .aesStrength(AesStrength.STRENGTH_256)
                                                 .password(password).build();
-        ZipIt zip = ZipIt.builder().zipFile(noSplitAesZip).build();
+        ZipIt zip = ZipIt.builder().zipFile(noSplitPkwareZip).build();
         zip.add(srcDir, parameters);
 
         assertThat(Files.exists(noSplitZip)).isTrue();

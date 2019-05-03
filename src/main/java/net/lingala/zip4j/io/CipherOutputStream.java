@@ -21,7 +21,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.core.writers.LocalFileHeaderWriter;
 import net.lingala.zip4j.core.writers.ZipModelWriter;
-import net.lingala.zip4j.crypto.AesEncoder;
+import net.lingala.zip4j.crypto.aes.AesEncoder;
 import net.lingala.zip4j.crypto.Encoder;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.CentralDirectory;

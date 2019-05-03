@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.lingala.zip4j.crypto.engine;
+package net.lingala.zip4j.crypto.pkware;
 
 /**
  * @author Oleg Cherednik

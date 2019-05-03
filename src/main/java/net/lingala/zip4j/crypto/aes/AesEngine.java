@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-package net.lingala.zip4j.crypto.engine;
+package net.lingala.zip4j.crypto.aes;
 
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.utils.InternalZipConstants;

@@ -19,7 +19,7 @@ package net.lingala.zip4j.engine;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.core.readers.LocalFileHeaderReader;
-import net.lingala.zip4j.crypto.AesDecoder;
+import net.lingala.zip4j.crypto.aes.AesDecoder;
 import net.lingala.zip4j.crypto.Decoder;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.InflaterInputStream;

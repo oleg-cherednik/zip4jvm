@@ -77,7 +77,7 @@ public class ModifyCommentTest {
     @Test(dependsOnMethods = "shouldClearCommentForExistedZip")
     public void shouldAddCommentToEncryptedZip() throws ZipException, IOException {
         Files.deleteIfExists(zipFile);
-        Files.copy(Zip4jSuite.noSplitAesZip, zipFile);
+        Files.copy(Zip4jSuite.noSplitPkwareZip, zipFile);
 
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
         assertThat(misc.isEncrypted()).isTrue();

@@ -42,7 +42,7 @@ public class ZipMiscTest {
     }
 
     public void shouldRetrieveAllEntryNamesForExistedEncryptedZip() throws IOException {
-        Path zipFile = Zip4jSuite.copy(rootDir, Zip4jSuite.noSplitAesZip);
+        Path zipFile = Zip4jSuite.copy(rootDir, Zip4jSuite.noSplitPkwareZip);
 
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
         assertThat(misc.isEncrypted()).isTrue();

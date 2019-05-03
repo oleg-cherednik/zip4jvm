@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.lingala.zip4j.crypto;
+package net.lingala.zip4j.crypto.aes;
 
 import lombok.NonNull;
-import net.lingala.zip4j.crypto.PBKDF2.MacBasedPRF;
-import net.lingala.zip4j.crypto.PBKDF2.PBKDF2Engine;
-import net.lingala.zip4j.crypto.PBKDF2.PBKDF2Parameters;
-import net.lingala.zip4j.crypto.engine.AesEngine;
+import net.lingala.zip4j.crypto.Encoder;
+import net.lingala.zip4j.crypto.aes.pbkdf2.MacBasedPRF;
+import net.lingala.zip4j.crypto.aes.pbkdf2.PBKDF2Engine;
+import net.lingala.zip4j.crypto.aes.pbkdf2.PBKDF2Parameters;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.model.AesStrength;

@@ -1,30 +1,30 @@
 /*
-* Copyright 2010 Srikanth Reddy Lingala  
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
-* you may not use this file except in compliance with the License. 
-* You may obtain a copy of the License at 
-* 
-* http://www.apache.org/licenses/LICENSE-2.0 
-* 
-* Unless required by applicable law or agreed to in writing, 
-* software distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
-* limitations under the License. 
+* Copyright 2010 Srikanth Reddy Lingala
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
 */
 
-package net.lingala.zip4j.crypto.PBKDF2;
+package net.lingala.zip4j.crypto.aes.pbkdf2;
 
 /*
- * Source referred from Matthias Gartner's PKCS#5 implementation - 
- * see http://rtner.de/software/PBKDF2.html 
+ * Source referred from Matthias Gartner's PKCS#5 implementation -
+ * see http://rtner.de/software/PBKDF2.html
  */
 
 class BinTools
 {
     public static final String hex = "0123456789ABCDEF";
-    
+
     public static String bin2hex(final byte[] b)
     {
         if (b == null)
@@ -40,7 +40,7 @@ class BinTools
         }
         return sb.toString();
     }
-    
+
     public static byte[] hex2bin(final String s)
     {
         String m = s;
@@ -63,7 +63,7 @@ class BinTools
         }
         return r;
     }
-    
+
     public static int hex2bin(char c)
     {
         if (c >= '0' && c <= '9')

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package net.lingala.zip4j.crypto;
+package net.lingala.zip4j.crypto.pkware;
 
 import lombok.NonNull;
-import net.lingala.zip4j.crypto.engine.StandardEngine;
+import net.lingala.zip4j.crypto.Encoder;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.utils.InternalZipConstants;

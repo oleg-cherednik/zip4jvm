@@ -16,7 +16,7 @@
 
 package net.lingala.zip4j.io;
 
-import net.lingala.zip4j.crypto.AesDecoder;
+import net.lingala.zip4j.crypto.aes.AesDecoder;
 import net.lingala.zip4j.engine.UnzipEngine;
 import net.lingala.zip4j.model.Encryption;
 import net.lingala.zip4j.utils.InternalZipConstants;

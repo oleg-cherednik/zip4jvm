@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.lingala.zip4j.crypto.PBKDF2;
+package net.lingala.zip4j.crypto.aes.pbkdf2;
 
 import lombok.NonNull;
 
