@@ -24,6 +24,7 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Oleg Cherednik
@@ -85,8 +86,8 @@ public class CompatibilityTest {
         assertThatDirectory(destDir).matches(TestUtils.dirAssert);
     }
 
-    public void zip4jPkwareEncryptionShouldBeReadableForAnotherTool() throws IOException {
-        Path destDir = Zip4jSuite.generateSubDirName(rootDir, "zip4jPkwareEncryptionShouldBeReadableForAnotherTool");
+    public void zip4jPkwareEncryptionShouldBeReadableForSevenZipTool() throws IOException {
+        Path destDir = Zip4jSuite.generateSubDirName(rootDir, "zip4jPkwareEncryptionShouldBeReadableForSevenZipTool");
 
         try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(Zip4jSuite.noSplitPkwareZip.toFile(), "r"));
              IInArchive zip = SevenZip.openInArchive(ArchiveFormat.ZIP, in)) {
@@ -117,6 +118,21 @@ public class CompatibilityTest {
                 }
             }
         }
+
+        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
+    }
+
+    public void winRarPkwareEncryptionZipShouldBeReadableForZip4j() throws IOException {
+        Path destDir = Zip4jSuite.generateSubDirName(rootDir, "sevenZipPkwareEncryptionShouldBeReadableForZip4j");
+        Files.createDirectories(destDir);
+
+        assertThat(Files.exists(Zip4jSuite.winRarPkwareZip)).isTrue();
+
+        UnzipIt unzip = UnzipIt.builder()
+                               .zipFile(Zip4jSuite.winRarPkwareZip)
+                               .password(Zip4jSuite.password).build();
+
+        unzip.extract(destDir);
 
         assertThatDirectory(destDir).matches(TestUtils.dirAssert);
     }

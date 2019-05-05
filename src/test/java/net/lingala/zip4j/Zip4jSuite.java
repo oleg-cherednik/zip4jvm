@@ -34,6 +34,9 @@ public class Zip4jSuite {
     public static final Path noSplitPkwareZip = rootDir.resolve("no_split_pkware/src.zip");
     public static final Path splitZip = rootDir.resolve("split/src.zip");
 
+    public static final Path winRarPkwareZip = Paths.get("src/test/resources/pkware.zip").toAbsolutePath();
+    public static final Path winRarAesZip = Paths.get("src/test/resources/aes.zip").toAbsolutePath();
+
     /** Password for encrypted zip */
     public static final char[] password = "1".toCharArray();
     /** Clear resources */

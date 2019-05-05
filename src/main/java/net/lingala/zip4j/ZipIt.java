@@ -96,7 +96,9 @@ public final class ZipIt {
     }
 
     @NonNull
-    private static List<Path> getDirectoryEntries(@NonNull Path dir) {
+    public static List<Path> getDirectoryEntries(@NonNull Path dir) {
+        assert Files.isDirectory(dir);
+
         try {
             return Files.walk(dir)
                         .filter(path -> Files.isRegularFile(path) || Files.isDirectory(path))
