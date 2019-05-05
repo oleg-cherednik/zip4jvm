@@ -74,5 +74,11 @@ public class StandardEngine {
         int tmp = keys[2] | 3;
         return (byte)((tmp * (tmp ^ 1)) >>> 8);
     }
-    
+
+    public byte encrypt(byte plain) {
+        byte cipher = (byte)(stream() ^ plain & 0xFF);
+        updateKeys(plain);
+        return cipher;
+    }
+
 }

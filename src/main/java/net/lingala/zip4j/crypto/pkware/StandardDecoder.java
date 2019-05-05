@@ -21,17 +21,18 @@ import net.lingala.zip4j.crypto.Decoder;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.utils.InternalZipConstants;
-import org.apache.commons.lang.ArrayUtils;
 
+/**
+ * @author Oleg Cherednik
+ * @since 22.03.2019
+ */
 public class StandardDecoder implements Decoder {
 
     private final LocalFileHeader localFileHeader;
-    private final char[] password;
     private final StandardEngine standardEngine;
 
     public StandardDecoder(@NonNull LocalFileHeader localFileHeader, @NonNull char[] password, byte[] headerBytes) {
         this.localFileHeader = localFileHeader;
-        this.password = ArrayUtils.clone(password);
         standardEngine = new StandardEngine(password);
         init(headerBytes);
     }
