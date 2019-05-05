@@ -51,15 +51,14 @@ public class StandardEngine {
         return keys;
     }
 
-    private static void updateKeys(int[] keys, byte charAt) {
-        keys[0] = crc32(keys[0], charAt);
-        keys[1] += keys[0] & 0xff;
-        keys[1] = keys[1] * 0x8088405 + 1;
+    private static void updateKeys(int[] keys, byte val) {
+        keys[0] = crc32(keys[0], val);
+        keys[1] = (keys[1] + (keys[0] & 0xFF)) * 0x8088405 + 1;
         keys[2] = crc32(keys[2], (byte)(keys[1] >> 24));
     }
 
-    private static int crc32(int crc, byte ch) {
-        return (crc >>> 8) ^ CRC_TABLE[(crc ^ ch) & 0xFF];
+    private static int crc32(int crc, byte val) {
+        return (crc >>> 8) ^ CRC_TABLE[(crc ^ val) & 0xFF];
     }
 
     public void updateKeys(byte charAt) {
@@ -70,4 +69,10 @@ public class StandardEngine {
         int tmp = keys[2] | 2;
         return (byte)((tmp * (tmp ^ 1)) >>> 8);
     }
+
+    private byte stream() {
+        int tmp = keys[2] | 3;
+        return (byte)((tmp * (tmp ^ 1)) >>> 8);
+    }
+    
 }
