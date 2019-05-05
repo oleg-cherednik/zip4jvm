@@ -18,11 +18,9 @@ package net.lingala.zip4j.crypto.pkware;
 
 import lombok.NonNull;
 import net.lingala.zip4j.crypto.Encoder;
-import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.utils.InternalZipConstants;
 import net.lingala.zip4j.utils.ZipUtils;
-import org.apache.commons.lang.ArrayUtils;
 
 import java.io.IOException;
 
@@ -30,15 +28,12 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 22.03.2019
  */
-public class StandardEncoder implements Encoder {
+public final class StandardEncoder implements Encoder {
 
     private final StandardEngine standardEngine;
     private final byte[] headerBytes = new byte[InternalZipConstants.STD_DEC_HDR_SIZE];
 
-    public StandardEncoder(char[] password, int crc) {
-        if (ArrayUtils.isEmpty(password))
-            throw new ZipException("input password is null or empty in StandardEncoder constructor");
-
+    public StandardEncoder(@NonNull char[] password, int crc) {
         standardEngine = new StandardEngine(password);
         init(crc);
     }
@@ -55,7 +50,7 @@ public class StandardEncoder implements Encoder {
         ZipUtils.checkEquealOrGreaterZero(len);
 
         for (int i = offs; i < offs + len; i++)
-            buf[i] = standardEngine.encrypt(buf[i]);
+            buf[i] = standardEngine.encode(buf[i]);
     }
 
     @Override

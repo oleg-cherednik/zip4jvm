@@ -75,7 +75,7 @@ public class StandardEngine {
         return (byte)((tmp * (tmp ^ 1)) >>> 8);
     }
 
-    public byte encrypt(byte plain) {
+    public byte encode(byte plain) {
         byte cipher = (byte)(stream() ^ plain & 0xFF);
         updateKeys(plain);
         return cipher;
