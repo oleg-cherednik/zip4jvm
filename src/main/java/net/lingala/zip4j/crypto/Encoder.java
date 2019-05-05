@@ -44,7 +44,7 @@ public interface Encoder {
         encode(buf, 0, buf.length);
     }
 
-    void encode(byte[] buf, int offs, int len);
+    void encode(@NonNull byte[] buf, int offs, int len);
 
     void write(@NonNull SplitOutputStream out) throws IOException;
 

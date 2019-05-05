@@ -110,4 +110,9 @@ public class ZipUtils {
         buff[15] = 0;
     }
 
+    public static void checkEquealOrGreaterZero(int val) {
+        if (val < 0)
+            throw new ZipException("invalid length specified to decrpyt data");
+    }
+
 }

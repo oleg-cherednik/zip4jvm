@@ -21,6 +21,7 @@ import net.lingala.zip4j.crypto.Encoder;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.utils.InternalZipConstants;
+import net.lingala.zip4j.utils.ZipUtils;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.io.IOException;
@@ -43,24 +44,18 @@ public class StandardEncoder implements Encoder {
     }
 
     private void init(int crc) {
-        headerBytes[InternalZipConstants.STD_DEC_HDR_SIZE - 1] = (byte)((crc >>> 24));
-        headerBytes[InternalZipConstants.STD_DEC_HDR_SIZE - 2] = (byte)((crc >>> 16));
+        headerBytes[InternalZipConstants.STD_DEC_HDR_SIZE - 1] = (byte)(crc >>> 24);
+        headerBytes[InternalZipConstants.STD_DEC_HDR_SIZE - 2] = (byte)(crc >>> 16);
         encode(headerBytes);
     }
 
     @Override
-    public void encode(byte[] buf, int offs, int len) throws ZipException {
+    public void encode(@NonNull byte[] buf, int offs, int len) {
+        ZipUtils.checkEquealOrGreaterZero(offs);
+        ZipUtils.checkEquealOrGreaterZero(len);
 
-        if (len < 0) {
-            throw new ZipException("invalid length specified to decrpyt data");
-        }
-
-        try {
-            for (int i = offs; i < offs + len; i++)
-                buf[i] = standardEngine.encrypt(buf[i]);
-        } catch(Exception e) {
-            throw new ZipException(e);
-        }
+        for (int i = offs; i < offs + len; i++)
+            buf[i] = standardEngine.encrypt(buf[i]);
     }
 
     @Override
