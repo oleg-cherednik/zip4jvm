@@ -4,15 +4,14 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.lingala.zip4j.crypto.aes.AesDecoder;
-import net.lingala.zip4j.crypto.aes.AesEncoder;
 import net.lingala.zip4j.crypto.Decoder;
 import net.lingala.zip4j.crypto.Encoder;
+import net.lingala.zip4j.crypto.aes.AesDecoder;
+import net.lingala.zip4j.crypto.aes.AesEncoder;
 import net.lingala.zip4j.crypto.pkware.StandardDecoder;
 import net.lingala.zip4j.crypto.pkware.StandardEncoder;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.LittleEndianRandomAccessFile;
-import net.lingala.zip4j.utils.InternalZipConstants;
 
 import java.io.IOException;
 
@@ -41,13 +40,12 @@ public enum Encryption {
         public Decoder decoder(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, char[] password)
                 throws IOException {
             in.seek(localFileHeader.getOffs());
-            return new StandardDecoder(localFileHeader, password, in.readBytes(InternalZipConstants.STD_DEC_HDR_SIZE));
+            return new StandardDecoder(localFileHeader, password, in.readBytes(StandardEncoder.SIZE_RND_HEADER));
         }
 
         @Override
         public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull ZipParameters parameters) {
-            // Since we do not know the crc here, we use the modification time for encrypting.
-            return new StandardEncoder(parameters.getPassword(), (localFileHeader.getLastModifiedTime() & 0xFFFF) << 16);
+            return new StandardEncoder(parameters.getPassword());
         }
     },
     STRONG(1),

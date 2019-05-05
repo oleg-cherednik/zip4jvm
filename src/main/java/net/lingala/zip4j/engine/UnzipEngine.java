@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import net.lingala.zip4j.core.readers.LocalFileHeaderReader;
 import net.lingala.zip4j.crypto.aes.AesDecoder;
 import net.lingala.zip4j.crypto.Decoder;
+import net.lingala.zip4j.crypto.pkware.StandardEncoder;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.InflaterInputStream;
 import net.lingala.zip4j.io.LittleEndianRandomAccessFile;
@@ -128,8 +129,8 @@ public class UnzipEngine {
                             "compressed size for AES encrypted file: " + fileHeader.getFileName());
             } else if (localFileHeader.getEncryption() == Encryption.STANDARD) {
                 // TODO decrypter throws unsupported exception
-                comprSize -= InternalZipConstants.STD_DEC_HDR_SIZE;
-                offs += InternalZipConstants.STD_DEC_HDR_SIZE;
+                comprSize -= StandardEncoder.SIZE_RND_HEADER;
+                offs += StandardEncoder.SIZE_RND_HEADER;
             }
 
             in.seek(offs);

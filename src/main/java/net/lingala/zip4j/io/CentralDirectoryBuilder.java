@@ -2,6 +2,7 @@ package net.lingala.zip4j.io;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import net.lingala.zip4j.crypto.pkware.StandardEncoder;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.AesExtraDataRecord;
 import net.lingala.zip4j.model.CentralDirectory;
@@ -121,7 +122,7 @@ public class CentralDirectoryBuilder {
         long fileSize = Files.size(sourceFile);
 
         if (parameters.getEncryption() == Encryption.STANDARD)
-            return fileSize + InternalZipConstants.STD_DEC_HDR_SIZE;
+            return fileSize + StandardEncoder.SIZE_RND_HEADER;
 
         return fileSize + parameters.getAesStrength().getSaltLength() + InternalZipConstants.AES_AUTH_LENGTH + 2; //2 is password verifier
     }

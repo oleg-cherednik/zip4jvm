@@ -19,10 +19,10 @@ package net.lingala.zip4j.crypto.pkware;
 import lombok.NonNull;
 import net.lingala.zip4j.crypto.Encoder;
 import net.lingala.zip4j.io.SplitOutputStream;
-import net.lingala.zip4j.utils.InternalZipConstants;
 import net.lingala.zip4j.utils.ZipUtils;
 
 import java.io.IOException;
+import java.util.Random;
 
 /**
  * @author Oleg Cherednik
@@ -30,19 +30,32 @@ import java.io.IOException;
  */
 public final class StandardEncoder implements Encoder {
 
+    public static final int SIZE_RND_HEADER = 12;
+
     private final StandardEngine standardEngine;
-    private final byte[] headerBytes = new byte[InternalZipConstants.STD_DEC_HDR_SIZE];
+    private final byte[] header;
 
-    public StandardEncoder(@NonNull char[] password, int crc) {
+    @SuppressWarnings("MethodCanBeVariableArityMethod")
+    public StandardEncoder(@NonNull char[] password) {
         standardEngine = new StandardEngine(password);
-        init(crc);
+        header = createRandomHeader();
     }
 
-    private void init(int crc) {
-        headerBytes[InternalZipConstants.STD_DEC_HDR_SIZE - 1] = (byte)(crc >>> 24);
-        headerBytes[InternalZipConstants.STD_DEC_HDR_SIZE - 2] = (byte)(crc >>> 16);
-        encode(headerBytes);
+    private byte[] createRandomHeader() {
+        byte[] header = new byte[SIZE_RND_HEADER];
+        new Random().nextBytes(header);
+
+        for (int i = 0; i < header.length; i++)
+            header[i] = standardEngine.encode(header[i]);
+
+        return header;
     }
+
+//    private void init(int crc) {
+//        header[SIZE_RND_HEADER - 1] = (byte)(crc >>> 24);
+//        header[SIZE_RND_HEADER - 2] = (byte)(crc >>> 16);
+//        encode(header);
+//    }
 
     @Override
     public void encode(@NonNull byte[] buf, int offs, int len) {
@@ -55,7 +68,7 @@ public final class StandardEncoder implements Encoder {
 
     @Override
     public void write(@NonNull SplitOutputStream out) throws IOException {
-        out.writeBytes(headerBytes);
+        out.writeBytes(header);
     }
 
 }
