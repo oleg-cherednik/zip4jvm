@@ -19,7 +19,6 @@ package net.lingala.zip4j.crypto.pkware;
 import lombok.NonNull;
 import net.lingala.zip4j.crypto.Decoder;
 import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.exception.ZipExceptionConstants;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.utils.InternalZipConstants;
 import org.apache.commons.lang.ArrayUtils;
@@ -28,11 +27,12 @@ public class StandardDecoder implements Decoder {
 
     private final LocalFileHeader localFileHeader;
     private final char[] password;
-    private final StandardEngine standardEngine = new StandardEngine();
+    private final StandardEngine standardEngine;
 
     public StandardDecoder(@NonNull LocalFileHeader localFileHeader, @NonNull char[] password, byte[] headerBytes) {
         this.localFileHeader = localFileHeader;
         this.password = ArrayUtils.clone(password);
+        standardEngine = new StandardEngine(password);
         init(headerBytes);
     }
 
@@ -47,11 +47,6 @@ public class StandardDecoder implements Decoder {
 
 //        if (crc[2] > 0 || crc[1] > 0 || crc[0] > 0)
 //            throw new IllegalStateException("Invalid CRC in File Header");
-
-        if (ArrayUtils.isEmpty(password))
-            throw new ZipException("Wrong password!", ZipExceptionConstants.WRONG_PASSWORD);
-
-        standardEngine.initKeys(password);
 
         try {
             int result = headerBytes[0];
