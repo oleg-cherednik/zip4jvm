@@ -20,6 +20,11 @@ public class Zip64 {
     private final EndCentralDirectoryLocator endCentralDirectoryLocator;
     private final EndCentralDirectory endCentralDirectory;
 
+    @Override
+    public String toString() {
+        return this == NULL ? "<null>" : super.toString();
+    }
+
     @Getter
     @Setter
     public static class EndCentralDirectoryLocator {

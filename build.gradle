@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'application'
     id 'io.franzbecker.gradle-lombok' version '1.14'
+    id 'jacoco'
 }
 
 repositories {
@@ -42,6 +43,11 @@ jar {
     from {
         configurations.compile.collect {it.isDirectory() ? it : zipTree(it)}
     }
+}
+
+jacoco {
+    toolVersion = "0.8.4"
+    reportsDir = file("$buildDir/customJacocoReportDir")
 }
 
 task fatJar(type: Jar) {

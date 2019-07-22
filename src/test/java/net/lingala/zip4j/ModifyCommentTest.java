@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SuppressWarnings("FieldNamingConvention")
 public class ModifyCommentTest {
 
-    private static final Path rootDir = Zip4jSuite.rootDir.resolve(ModifyCommentTest.class.getSimpleName());
+    private static final Path rootDir = Zip4jSuite.generateSubDirNameTwice(ModifyCommentTest.class);
     private static final Path zipFile = rootDir.resolve("src.zip");
 
     @BeforeClass

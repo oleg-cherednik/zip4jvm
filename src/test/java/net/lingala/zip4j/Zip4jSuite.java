@@ -42,6 +42,8 @@ public class Zip4jSuite {
     /** Clear resources */
     public static final boolean clear = false;
 
+    private static final long time = System.currentTimeMillis();
+
     @BeforeSuite
     public void beforeSuite() throws IOException {
         removeDir(rootDir);
@@ -130,8 +132,16 @@ public class Zip4jSuite {
         return rootDir.resolve("src_" + System.currentTimeMillis() + ".zip");
     }
 
+    public static Path generateSubDirName(Class<?> cls) {
+        return rootDir.resolve(cls.getSimpleName());
+    }
+
+    public static Path generateSubDirNameTwice(Class<?> cls) {
+        return rootDir.resolve(cls.getSimpleName()).resolve(Paths.get(String.valueOf(time)));
+    }
+
     public static Path generateSubDirName(Path rootDir, String methodName) {
-        return rootDir.resolve(methodName + '_' + System.currentTimeMillis());
+        return rootDir.resolve(methodName).resolve(Paths.get(String.valueOf(time)));
     }
 
 }

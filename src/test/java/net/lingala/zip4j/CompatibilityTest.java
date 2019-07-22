@@ -34,7 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SuppressWarnings("FieldNamingConvention")
 public class CompatibilityTest {
 
-    private static final Path rootDir = Zip4jSuite.rootDir.resolve(CompatibilityTest.class.getSimpleName());
+    private static final Path rootDir = Zip4jSuite.generateSubDirName(CompatibilityTest.class);
 
     public void zip4jShouldBeReadableForZipFile() throws IOException {
         Path destDir = Zip4jSuite.generateSubDirName(rootDir, "zip4jShouldBeReadableForZipFile");

@@ -16,7 +16,6 @@
 
 package net.lingala.zip4j.model;
 
-import com.sun.istack.internal.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -61,7 +60,7 @@ public class ZipParameters {
     private String comment;
     public boolean zip64;
 
-    @NotNull
+    @NonNull
     public CompressionMethod getActualCompressionMethod() {
         return encryption == Encryption.AES ? CompressionMethod.AES_ENC : compressionMethod;
     }
