@@ -73,7 +73,6 @@ public class AesExtraDataRecord {
 
         private final NullPointerException exception = new NullPointerException("Null object modification: " + getClass().getSimpleName());
 
-
         @Override
         public void setDataSize(int dataSize) {
             throw exception;

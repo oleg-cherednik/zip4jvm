@@ -136,7 +136,7 @@ public class Zip4jSuite {
         return rootDir.resolve(cls.getSimpleName());
     }
 
-    public static Path generateSubDirNameTwice(Class<?> cls) {
+    public static Path generateSubDirNameWithTime(Class<?> cls) {
         return rootDir.resolve(cls.getSimpleName()).resolve(Paths.get(String.valueOf(time)));
     }
 
