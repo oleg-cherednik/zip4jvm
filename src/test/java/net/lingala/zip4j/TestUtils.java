@@ -90,4 +90,15 @@ class TestUtils {
         }
     }
 
+    String getMethodName() {
+        for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
+            String className = element.getClassName();
+
+            if (className.startsWith(ZipIt.class.getPackage().getName()) && className.endsWith("Test"))
+                return element.getMethodName();
+        }
+
+        return null;
+    }
+
 }
