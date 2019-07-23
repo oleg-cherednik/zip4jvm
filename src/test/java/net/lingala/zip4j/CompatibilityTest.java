@@ -34,10 +34,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SuppressWarnings("FieldNamingConvention")
 public class CompatibilityTest {
 
-    private static final Path rootDir = Zip4jSuite.rootDir.resolve(CompatibilityTest.class.getSimpleName());
+    private static final Path rootDir = Zip4jSuite.generateSubDirName(CompatibilityTest.class);
 
     public void zip4jShouldBeReadableForZipFile() throws IOException {
-        Path destDir = Zip4jSuite.generateSubDirName(rootDir, "zip4jShouldBeReadableForZipFile");
+        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
 
         try (ZipFile zipFile = new ZipFile(Zip4jSuite.noSplitZip.toFile())) {
             Enumeration<? extends ZipEntry> entries = zipFile.entries();
@@ -57,7 +57,7 @@ public class CompatibilityTest {
     }
 
     public void zip4jShouldBeReadableForZipInputStream() throws IOException {
-        Path destDir = Zip4jSuite.generateSubDirName(rootDir, "zip4jShouldBeReadableForZipInputStream");
+        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         byte[] buf = new byte[1024];
 
         try (ZipInputStream in = new ZipInputStream(new FileInputStream(Zip4jSuite.noSplitZip.toFile()))) {
@@ -87,7 +87,7 @@ public class CompatibilityTest {
     }
 
     public void zip4jPkwareEncryptionShouldBeReadableForSevenZipTool() throws IOException {
-        Path destDir = Zip4jSuite.generateSubDirName(rootDir, "zip4jPkwareEncryptionShouldBeReadableForSevenZipTool");
+        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
 
         try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(Zip4jSuite.noSplitPkwareZip.toFile(), "r"));
              IInArchive zip = SevenZip.openInArchive(ArchiveFormat.ZIP, in)) {
@@ -123,7 +123,7 @@ public class CompatibilityTest {
     }
 
     public void winRarPkwareEncryptionZipShouldBeReadableForZip4j() throws IOException {
-        Path destDir = Zip4jSuite.generateSubDirName(rootDir, "sevenZipPkwareEncryptionShouldBeReadableForZip4j");
+        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         Files.createDirectories(destDir);
 
         assertThat(Files.exists(Zip4jSuite.winRarPkwareZip)).isTrue();

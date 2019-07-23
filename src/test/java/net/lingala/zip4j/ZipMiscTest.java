@@ -55,7 +55,7 @@ public class ZipMiscTest {
     }
 
     public void shouldRetrieveMultipleFilesWhenSplitZip() throws IOException {
-        Path rootDir = Zip4jSuite.generateSubDirName(ZipMiscTest.rootDir, "shouldRetrieveMultipleFilesWhenSplitZip");
+        Path rootDir = Zip4jSuite.subDirNameAsMethodName(ZipMiscTest.rootDir);
 
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
@@ -87,7 +87,7 @@ public class ZipMiscTest {
         ZipMisc misc = ZipMisc.builder().zipFile(Zip4jSuite.splitZip).build();
         assertThat(misc.isSplit()).isTrue();
 
-        Path mergeDir = Zip4jSuite.generateSubDirName(rootDir, "shouldMergeSplitZip");
+        Path mergeDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         Path mergeZipFle = mergeDir.resolve("src.zip");
         misc.merge(mergeZipFle);
 

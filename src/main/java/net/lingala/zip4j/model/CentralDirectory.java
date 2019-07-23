@@ -16,7 +16,6 @@
 
 package net.lingala.zip4j.model;
 
-import com.sun.istack.internal.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -146,7 +145,7 @@ public class CentralDirectory {
             return fileComment != null ? fileComment.getBytes(charset) : ArrayUtils.EMPTY_BYTE_ARRAY;
         }
 
-        @NotNull
+        @NonNull
         public CompressionMethod getActualCompressionMethod() {
             return compressionMethod == CompressionMethod.AES_ENC ? extraField.getAesExtraDataRecord().getCompressionMethod() : compressionMethod;
         }

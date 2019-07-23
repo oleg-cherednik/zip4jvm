@@ -2,13 +2,16 @@ plugins {
     id 'java'
     id 'application'
     id 'io.franzbecker.gradle-lombok' version '1.14'
+    id 'jacoco'
 }
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
+group 'net.lingala'
 version = '2.0'
+
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 mainClassName = 'com.agoda.zipper.Application'
@@ -40,6 +43,11 @@ jar {
     from {
         configurations.compile.collect {it.isDirectory() ? it : zipTree(it)}
     }
+}
+
+jacoco {
+    toolVersion = "0.8.4"
+    reportsDir = file("$buildDir/customJacocoReportDir")
 }
 
 task fatJar(type: Jar) {

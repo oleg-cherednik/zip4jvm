@@ -18,9 +18,9 @@ import java.util.function.Consumer;
  */
 @UtilityClass
 @SuppressWarnings("FieldNamingConvention")
-class TestUtils {
+public class TestUtils {
 
-    final Consumer<AbstractDirectoryAssert<?>> dirAssert = dir -> {
+    public final Consumer<AbstractDirectoryAssert<?>> dirAssert = dir -> {
         dir.exists().hasSubDirectories(3).hasFiles(5);
 
         TestUtils.carsDirAssert.accept(dir.directory("cars/"));
@@ -34,14 +34,14 @@ class TestUtils {
         dir.file("Oleg Cherednik.txt").exists().hasContent("Oleg Cherednik\nОлег Чередник").hasSize(41);
     };
 
-    final Consumer<AbstractDirectoryAssert<?>> carsDirAssert = dir -> {
+    public final Consumer<AbstractDirectoryAssert<?>> carsDirAssert = dir -> {
         dir.exists().hasSubDirectories(0).hasFiles(3);
         dir.file("bentley-continental.jpg").exists().isImage().hasSize(1_395_362);
         dir.file("ferrari-458-italia.jpg").exists().isImage().hasSize(320_894);
         dir.file("wiesmann-gt-mf5.jpg").exists().isImage().hasSize(729_633);
     };
 
-    final Consumer<AbstractDirectoryAssert<?>> starWarsDirAssert = dir -> {
+    public final Consumer<AbstractDirectoryAssert<?>> starWarsDirAssert = dir -> {
         dir.exists().hasSubDirectories(0).hasFiles(4);
         dir.file("0qQnv2v.jpg").exists().isImage().hasSize(2_204_448);
         dir.file("080fc325efa248454e59b84be24ea829.jpg").exists().isImage().hasSize(277_857);
@@ -49,9 +49,9 @@ class TestUtils {
         dir.file("star-wars-wallpapers-29931-7188436.jpg").exists().isImage().hasSize(1_916_776);
     };
 
-    final Consumer<AbstractDirectoryAssert<?>> emptyDirAssert = dir -> dir.exists().hasSubDirectories(0).hasFiles(0);
+    public final Consumer<AbstractDirectoryAssert<?>> emptyDirAssert = dir -> dir.exists().hasSubDirectories(0).hasFiles(0);
 
-    final Consumer<AbstractZipEntryDirectoryAssert<?>> zipRootDirAssert = dir -> {
+    public final Consumer<AbstractZipEntryDirectoryAssert<?>> zipRootDirAssert = dir -> {
         dir.exists().hasSubDirectories(3).hasFiles(5);
 
         TestUtils.zipCarsDirAssert.accept(dir.directory("cars/"));
@@ -65,14 +65,14 @@ class TestUtils {
         dir.file("Oleg Cherednik.txt").exists().hasContent("Oleg Cherednik\nОлег Чередник").hasSize(41);
     };
 
-    final Consumer<AbstractZipEntryDirectoryAssert<?>> zipCarsDirAssert = dir -> {
+    public final Consumer<AbstractZipEntryDirectoryAssert<?>> zipCarsDirAssert = dir -> {
         dir.exists().hasSubDirectories(0).hasFiles(3);
         dir.file("bentley-continental.jpg").exists().isImage().hasSize(1_395_362);
         dir.file("ferrari-458-italia.jpg").exists().isImage().hasSize(320_894);
         dir.file("wiesmann-gt-mf5.jpg").exists().isImage().hasSize(729_633);
     };
 
-    final Consumer<AbstractZipEntryDirectoryAssert<?>> zipStarWarsDirAssert = dir -> {
+    public final Consumer<AbstractZipEntryDirectoryAssert<?>> zipStarWarsDirAssert = dir -> {
         dir.exists().hasSubDirectories(0).hasFiles(4);
         dir.file("0qQnv2v.jpg").exists().isImage().hasSize(2_204_448);
         dir.file("080fc325efa248454e59b84be24ea829.jpg").exists().isImage().hasSize(277_857);
@@ -80,14 +80,25 @@ class TestUtils {
         dir.file("star-wars-wallpapers-29931-7188436.jpg").exists().isImage().hasSize(1_916_776);
     };
 
-    final Consumer<AbstractZipEntryDirectoryAssert<?>> zipEmptyDirAssert = dir -> dir.exists().hasSubDirectories(0).hasFiles(0);
+    public final Consumer<AbstractZipEntryDirectoryAssert<?>> zipEmptyDirAssert = dir -> dir.exists().hasSubDirectories(0).hasFiles(0);
 
-    void copyLarge(InputStream in, Path dest) throws IOException {
+    public void copyLarge(InputStream in, Path dest) throws IOException {
         try (OutputStream out = new FileOutputStream(dest.toFile())) {
             IOUtils.copyLarge(in, out);
         } finally {
             in.close();
         }
+    }
+
+    public String getMethodName() {
+        for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
+            String className = element.getClassName();
+
+            if (className.startsWith(ZipIt.class.getPackage().getName()) && className.endsWith("Test"))
+                return element.getMethodName();
+        }
+
+        throw new RuntimeException("Cannot detect ");
     }
 
 }

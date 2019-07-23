@@ -106,7 +106,7 @@ public class CentralDirectoryBuilder {
     }
 
     private long getCrc32() {
-        return parameters.getEncryption() == Encryption.STANDARD ? parameters.getSourceFileCRC() : 0;
+        return parameters.getCrc32();
     }
 
     private long getCompressedSize(CentralDirectory.FileHeader fileHeader) throws IOException {
