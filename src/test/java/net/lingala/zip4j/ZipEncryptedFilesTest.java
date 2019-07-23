@@ -47,7 +47,7 @@ public class ZipEncryptedFilesTest {
                                                 .comment("password: " + new String(Zip4jSuite.password))
                                                 .password(Zip4jSuite.password).build();
 
-        Path destDir = Zip4jSuite.generateSubDirName(rootDir, "shouldCreateNewEncryptedZipWithFolder");
+        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         Path zipFile = destDir.resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         zip.add(Zip4jSuite.srcDir, parameters);
@@ -65,7 +65,7 @@ public class ZipEncryptedFilesTest {
                                                 .comment("password: " + new String(Zip4jSuite.password))
                                                 .password(Zip4jSuite.password).build();
 
-        Path destDir = Zip4jSuite.generateSubDirName(rootDir, "shouldCreateNewZipWithSelectedFilesAndStandardEncryption");
+        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         Path zipFile = destDir.resolve("src.zip");
 
         Path bentley = Zip4jSuite.carsDir.resolve("bentley-continental.jpg");

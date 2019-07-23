@@ -140,8 +140,8 @@ public class Zip4jSuite {
         return rootDir.resolve(cls.getSimpleName()).resolve(Paths.get(String.valueOf(time)));
     }
 
-    public static Path generateSubDirName(Path rootDir, String methodName) {
-        return rootDir.resolve(methodName).resolve(Paths.get(String.valueOf(time)));
+    public static Path subDirNameAsMethodName(Path rootDir) {
+        return rootDir.resolve(TestUtils.getMethodName()).resolve(Paths.get(String.valueOf(time)));
     }
 
 }

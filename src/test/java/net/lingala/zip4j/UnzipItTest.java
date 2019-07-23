@@ -36,7 +36,7 @@ public class UnzipItTest {
 
     @Test
     public void shouldUnzipRequiredFiles() throws ZipException, IOException {
-        Path destDir = Zip4jSuite.generateSubDirName(rootDir, "shouldUnzipRequiredFiles");
+        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         List<String> entries = Arrays.asList("saint-petersburg.jpg", "cars/bentley-continental.jpg");
         UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.noSplitZip).build();
         unzip.extract(destDir, entries);
@@ -49,7 +49,7 @@ public class UnzipItTest {
 
     @Test
     public void shouldUnzipRequiredFilesWhenSplit() throws ZipException, IOException {
-        Path destDir = Zip4jSuite.generateSubDirName(rootDir, "shouldUnzipRequiredFilesWhenSplit");
+        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         List<String> entries = Arrays.asList("saint-petersburg.jpg", "cars/bentley-continental.jpg");
         UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.splitZip).build();
         unzip.extract(destDir, entries);
@@ -62,7 +62,7 @@ public class UnzipItTest {
 
     @Test
     public void shouldUnzipOneFile() throws ZipException, IOException {
-        Path destDir = Zip4jSuite.generateSubDirName(rootDir, "shouldUnzipOneFile");
+        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.noSplitZip).build();
         unzip.extract(destDir, "cars/ferrari-458-italia.jpg");
 
@@ -73,7 +73,7 @@ public class UnzipItTest {
 
     @Test
     public void shouldUnzipFolder() throws ZipException, IOException {
-        Path destDir = Zip4jSuite.generateSubDirName(rootDir, "shouldUnzipFolder");
+        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.noSplitZip).build();
         unzip.extract(destDir, "Star Wars");
 
@@ -90,7 +90,7 @@ public class UnzipItTest {
     @Test
     // TODO update this test
     public void shouldUnzipOneFileFromEncryptedNoSplitZip() throws IOException {
-        Path destDir = Zip4jSuite.generateSubDirName(rootDir, "shouldUnzipOneFileFromEncryptedNoSplitZip");
+        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
 
         UnzipIt unzip = UnzipIt.builder()
 //                               .zipFile(Zip4jSuite.noSplitZip)
