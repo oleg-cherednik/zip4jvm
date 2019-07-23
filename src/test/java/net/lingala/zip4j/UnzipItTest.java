@@ -22,7 +22,7 @@ import static net.lingala.zip4j.assertj.Zip4jAssertions.assertThatFile;
 @SuppressWarnings("FieldNamingConvention")
 public class UnzipItTest {
 
-    private static final Path rootDir = Zip4jSuite.rootDir.resolve(UnzipItTest.class.getSimpleName());
+    private static final Path rootDir = Zip4jSuite.generateSubDirName(UnzipItTest.class);
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -49,7 +49,7 @@ public class UnzipItTest {
 
     @Test
     public void shouldUnzipRequiredFilesWhenSplit() throws ZipException, IOException {
-        Path destDir = Zip4jSuite.generateSubDirName(rootDir, "shouldUnzipRequiredFiles");
+        Path destDir = Zip4jSuite.generateSubDirName(rootDir, "shouldUnzipRequiredFilesWhenSplit");
         List<String> entries = Arrays.asList("saint-petersburg.jpg", "cars/bentley-continental.jpg");
         UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.splitZip).build();
         unzip.extract(destDir, entries);
@@ -62,7 +62,7 @@ public class UnzipItTest {
 
     @Test
     public void shouldUnzipOneFile() throws ZipException, IOException {
-        Path destDir = Zip4jSuite.generateSubDirName(rootDir, "shouldUnzipRequiredFiles");
+        Path destDir = Zip4jSuite.generateSubDirName(rootDir, "shouldUnzipOneFile");
         UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.noSplitZip).build();
         unzip.extract(destDir, "cars/ferrari-458-italia.jpg");
 
@@ -73,7 +73,7 @@ public class UnzipItTest {
 
     @Test
     public void shouldUnzipFolder() throws ZipException, IOException {
-        Path destDir = Zip4jSuite.generateSubDirName(rootDir, "shouldUnzipRequiredFiles");
+        Path destDir = Zip4jSuite.generateSubDirName(rootDir, "shouldUnzipFolder");
         UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.noSplitZip).build();
         unzip.extract(destDir, "Star Wars");
 
