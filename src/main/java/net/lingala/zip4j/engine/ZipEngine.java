@@ -73,11 +73,8 @@ public class ZipEngine {
                 ZipParameters params = parameters.toBuilder().build();
 
                 if (Files.isRegularFile(entry)) {
-                    if (params.getEncryption() == Encryption.STANDARD)
-                        params.setSourceFileCRC(new CalculateChecksumFunc(entry).getAsLong());
-
-                    if (Files.size(entry) == 0)
-                        params.setCompressionMethod(CompressionMethod.STORE);
+                    params.setCrc32(new CalculateChecksumFunc(entry).getAsLong());
+                    params.setCompressionMethod(Files.size(entry) == 0 ? CompressionMethod.STORE : params.getCompressionMethod());
                 }
 
                 out.putNextEntry(entry, params);

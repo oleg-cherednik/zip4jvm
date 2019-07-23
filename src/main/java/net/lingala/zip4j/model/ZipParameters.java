@@ -52,7 +52,7 @@ public class ZipParameters {
     private String rootFolderInZip;
     @Builder.Default
     private TimeZone timeZone = TimeZone.getDefault();
-    private long sourceFileCRC;
+    private long crc32;
     private Path defaultFolderPath;
     private boolean isSourceExternalStream;
     @Builder.Default
