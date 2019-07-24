@@ -9,7 +9,7 @@ import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.InputStreamMeta;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.ZipParameters;
-import com.cop.zip4j.utils.CalculateChecksumFunc;
+import com.cop.zip4j.utils.CalculateChecksum;
 import com.cop.zip4j.utils.RemoveEntryFunc;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -57,7 +57,7 @@ public class ZipEngine {
                 ZipParameters params = parameters.toBuilder().build();
 
                 if (Files.isRegularFile(entry)) {
-                    params.setCrc32(new CalculateChecksumFunc(entry).getAsLong());
+                    params.setCrc32(new CalculateChecksum(entry).getAsLong());
                     params.setCompressionMethod(Files.size(entry) == 0 ? CompressionMethod.STORE : params.getCompressionMethod());
                 }
 

@@ -1,7 +1,5 @@
 package com.cop.zip4j.io;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import com.cop.zip4j.crypto.pkware.StandardEncoder;
 import com.cop.zip4j.exception.ZipException;
 import com.cop.zip4j.model.AesExtraDataRecord;
@@ -15,6 +13,8 @@ import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.ZipParameters;
 import com.cop.zip4j.utils.InternalZipConstants;
 import com.cop.zip4j.utils.ZipUtils;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
@@ -94,7 +94,7 @@ public class CentralDirectoryBuilder {
 
     private void updateGeneralPurposeFlag(@NonNull GeneralPurposeFlag generalPurposeFlag) {
         generalPurposeFlag.setCompressionLevel(parameters.getCompressionLevel());
-        generalPurposeFlag.setDataDescriptorExists(parameters.getCompressionMethod() == CompressionMethod.DEFLATE);
+        generalPurposeFlag.setDataDescriptorExists(true);
         generalPurposeFlag.setUtf8Encoding(zipModel.getCharset() == StandardCharsets.UTF_8);
         generalPurposeFlag.setEncrypted(parameters.getEncryption() != Encryption.OFF);
         generalPurposeFlag.setStrongEncryption(parameters.getEncryption() == Encryption.STRONG);

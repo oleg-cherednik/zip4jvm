@@ -16,7 +16,7 @@ import java.util.zip.CheckedInputStream;
  * @since 07.03.2019
  */
 @RequiredArgsConstructor
-public final class CalculateChecksumFunc implements LongSupplier {
+public final class CalculateChecksum implements LongSupplier {
 
     @NonNull
     private final Path file;
