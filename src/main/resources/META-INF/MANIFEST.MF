@@ -5,13 +5,7 @@ Bundle-SymbolicName: net.lingala.zip4j
 Bundle-Version: 1.3.2
 Bundle-Vendor: Zip4j
 Bundle-RequiredExecutionEnvironment: J2SE-1.4
-Export-Package: net.lingala.zip4j.core,
- net.lingala.zip4j.crypto,
- net.lingala.zip4j.crypto.engine,
- net.lingala.zip4j.crypto.PBKDF2,
- net.lingala.zip4j.exception,
- net.lingala.zip4j.io,
- net.lingala.zip4j.model,
+Export-Package: com.cop.zip4j.core,com.cop.zip4j.crypto,com.cop.zip4j.crypto.engine,com.cop.zip4j.crypto.PBKDF2,com.cop.zip4j.exception,com.cop.zip4j.io,com.cop.zip4j.model,
  net.lingala.zip4j.progress,
  net.lingala.zip4j.unzip,
  net.lingala.zip4j.util,

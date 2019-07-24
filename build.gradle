@@ -9,12 +9,12 @@ repositories {
     mavenCentral()
 }
 
-group 'net.lingala'
+group 'com.cop.zip4j'
 version = '2.0'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
-mainClassName = 'com.agoda.zipper.Application'
+mainClassName = 'com.cop.zip4j.Application'
 
 dependencies {
     compile 'org.slf4j:slf4j-api:1.7.25'
