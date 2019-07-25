@@ -1,6 +1,5 @@
 package com.cop.zip4j.crypto.aes;
 
-import lombok.NonNull;
 import com.cop.zip4j.crypto.Encoder;
 import com.cop.zip4j.crypto.aes.pbkdf2.MacBasedPRF;
 import com.cop.zip4j.crypto.aes.pbkdf2.PBKDF2Engine;
@@ -10,6 +9,7 @@ import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.model.AesStrength;
 import com.cop.zip4j.utils.InternalZipConstants;
 import com.cop.zip4j.utils.ZipUtils;
+import lombok.NonNull;
 
 import java.io.IOException;
 import java.util.Random;
@@ -19,8 +19,8 @@ public class AesEncoder implements Encoder {
     private final char[] password;
     private final AesStrength keyStrength;
 
-    private final byte[] counterBlock = new byte[InternalZipConstants.AES_BLOCK_SIZE];
-    private final byte[] iv = new byte[InternalZipConstants.AES_BLOCK_SIZE];
+    private final byte[] counterBlock = new byte[AesEngine.AES_BLOCK_SIZE];
+    private final byte[] iv = new byte[AesEngine.AES_BLOCK_SIZE];
 
     private AesEngine aesEngine;
     private MacBasedPRF mac;
@@ -104,11 +104,11 @@ public class AesEncoder implements Encoder {
             this.finished = true;
         }
 
-        for (int j = start; j < (start + len); j += InternalZipConstants.AES_BLOCK_SIZE) {
-            loopCount = (j + InternalZipConstants.AES_BLOCK_SIZE <= (start + len)) ?
-                        InternalZipConstants.AES_BLOCK_SIZE : ((start + len) - j);
+        for (int j = start; j < (start + len); j += AesEngine.AES_BLOCK_SIZE) {
+            loopCount = (j + AesEngine.AES_BLOCK_SIZE <= (start + len)) ?
+                        AesEngine.AES_BLOCK_SIZE : ((start + len) - j);
 
-            ZipUtils.prepareBuffAESIVBytes(iv, nonce, InternalZipConstants.AES_BLOCK_SIZE);
+            ZipUtils.prepareBuffAESIVBytes(iv, nonce, AesEngine.AES_BLOCK_SIZE);
             aesEngine.processBlock(iv, counterBlock);
 
             for (int k = 0; k < loopCount; k++) {

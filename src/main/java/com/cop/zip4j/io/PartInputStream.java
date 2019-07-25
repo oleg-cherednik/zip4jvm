@@ -1,9 +1,9 @@
 package com.cop.zip4j.io;
 
 import com.cop.zip4j.crypto.aes.AesDecoder;
+import com.cop.zip4j.crypto.aes.AesEngine;
 import com.cop.zip4j.engine.UnzipEngine;
 import com.cop.zip4j.model.Encryption;
-import com.cop.zip4j.utils.InternalZipConstants;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -105,14 +105,14 @@ public class PartInputStream extends InputStream {
             //Stored mac already set
             return;
         }
-        byte[] macBytes = new byte[InternalZipConstants.AES_AUTH_LENGTH];
+        byte[] macBytes = new byte[AesEngine.AES_AUTH_LENGTH];
         int readLen = -1;
         readLen = in.read(macBytes);
-        if (readLen != InternalZipConstants.AES_AUTH_LENGTH) {
+        if (readLen != AesEngine.AES_AUTH_LENGTH) {
             if (unzipEngine.getZipModel().isSplitArchive()) {
                 in.close();
                 in = unzipEngine.startNextSplitFile();
-                int newlyRead = in.read(macBytes, readLen, InternalZipConstants.AES_AUTH_LENGTH - readLen);
+                int newlyRead = in.read(macBytes, readLen, AesEngine.AES_AUTH_LENGTH - readLen);
                 readLen += newlyRead;
             } else {
                 throw new IOException("Error occured while reading stored AES authentication bytes");

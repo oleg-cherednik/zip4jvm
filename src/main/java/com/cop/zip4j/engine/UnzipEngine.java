@@ -3,6 +3,7 @@ package com.cop.zip4j.engine;
 import com.cop.zip4j.core.readers.LocalFileHeaderReader;
 import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.crypto.aes.AesDecoder;
+import com.cop.zip4j.crypto.aes.AesEngine;
 import com.cop.zip4j.crypto.pkware.StandardEncoder;
 import com.cop.zip4j.exception.ZipException;
 import com.cop.zip4j.io.InflaterInputStream;
@@ -138,13 +139,13 @@ public class UnzipEngine {
                 if (decoder != null && decoder instanceof AesDecoder) {
                     byte[] tmpMacBytes = ((AesDecoder)decoder).getCalculatedAuthenticationBytes();
                     byte[] storedMac = ((AesDecoder)decoder).getStoredMac();
-                    byte[] calculatedMac = new byte[InternalZipConstants.AES_AUTH_LENGTH];
+                    byte[] calculatedMac = new byte[AesEngine.AES_AUTH_LENGTH];
 
                     if (calculatedMac == null || storedMac == null) {
                         throw new ZipException("CRC (MAC) check failed for " + fileHeader.getFileName());
                     }
 
-                    System.arraycopy(tmpMacBytes, 0, calculatedMac, 0, InternalZipConstants.AES_AUTH_LENGTH);
+                    System.arraycopy(tmpMacBytes, 0, calculatedMac, 0, AesEngine.AES_AUTH_LENGTH);
 
                     if (!Arrays.equals(calculatedMac, storedMac)) {
                         throw new ZipException("invalid CRC (MAC) for file: " + fileHeader.getFileName());

@@ -11,10 +11,6 @@ public interface InternalZipConstants {
     int ARCEXTDATREC = 0x08064B50;
     int SPLITSIG = 0x08074b50;
 
-    //AES Constants
-    static final int AES_AUTH_LENGTH = 10;
-    static final int AES_BLOCK_SIZE = 16;
-
     // Minimum segment size = 64K
     int MIN_SPLIT_LENGTH = 64 * 1024;
 

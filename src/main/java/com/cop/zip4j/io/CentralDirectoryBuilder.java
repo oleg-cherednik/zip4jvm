@@ -1,5 +1,6 @@
 package com.cop.zip4j.io;
 
+import com.cop.zip4j.crypto.aes.AesEngine;
 import com.cop.zip4j.crypto.pkware.StandardEncoder;
 import com.cop.zip4j.exception.ZipException;
 import com.cop.zip4j.model.AesExtraDataRecord;
@@ -119,7 +120,7 @@ public class CentralDirectoryBuilder {
         if (parameters.getEncryption() == Encryption.STANDARD)
             return fileSize + StandardEncoder.SIZE_RND_HEADER;
 
-        return fileSize + parameters.getAesStrength().getSaltLength() + InternalZipConstants.AES_AUTH_LENGTH + 2; //2 is password verifier
+        return fileSize + parameters.getAesStrength().getSaltLength() + AesEngine.AES_AUTH_LENGTH + 2; //2 is password verifier
     }
 
     private long getUncompressedSize(CentralDirectory.FileHeader fileHeader) throws IOException {

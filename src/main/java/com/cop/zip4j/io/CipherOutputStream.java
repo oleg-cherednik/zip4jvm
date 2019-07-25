@@ -5,6 +5,7 @@ import com.cop.zip4j.core.writers.LocalFileHeaderWriter;
 import com.cop.zip4j.core.writers.ZipModelWriter;
 import com.cop.zip4j.crypto.Encoder;
 import com.cop.zip4j.crypto.aes.AesEncoder;
+import com.cop.zip4j.crypto.aes.AesEngine;
 import com.cop.zip4j.exception.ZipException;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.CompressionMethod;
@@ -17,6 +18,7 @@ import com.cop.zip4j.utils.InternalZipConstants;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang.ArrayUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -38,7 +40,6 @@ public abstract class CipherOutputStream extends OutputStream {
     @NonNull
     protected final ZipModel zipModel;
 
-    private Path sourceFile;
     protected CentralDirectory.FileHeader fileHeader;
     private LocalFileHeader localFileHeader;
     @NonNull
@@ -46,27 +47,21 @@ public abstract class CipherOutputStream extends OutputStream {
     protected ZipParameters parameters;
 
     protected final CRC32 crc = new CRC32();
-    private final byte[] pendingBuffer = new byte[InternalZipConstants.AES_BLOCK_SIZE];
+    private final byte[] pendingBuffer = new byte[AesEngine.AES_BLOCK_SIZE];
     private int pendingBufferLength;
     protected long totalBytesRead;
 
-    public void putNextEntry(Path file, ZipParameters parameters) {
-        if (file == null)
-            throw new ZipException("input file is null");
-        if (!Files.exists(file))
-            throw new ZipException("input file does not exist");
-
+    public void putNextEntry(@NonNull Path file, @NonNull ZipParameters parameters) {
         try {
-            sourceFile = file;
             this.parameters = parameters = parameters.toBuilder().build();
 
-            if (Files.isDirectory(sourceFile)) {
+            if (Files.isDirectory(file)) {
                 parameters.setEncryption(Encryption.OFF);
                 parameters.setCompressionMethod(CompressionMethod.STORE);
             }
 
             int currSplitFileCounter = out.getCurrSplitFileCounter();
-            CentralDirectoryBuilder centralDirectoryBuilder = new CentralDirectoryBuilder(sourceFile, parameters, zipModel, currSplitFileCounter);
+            CentralDirectoryBuilder centralDirectoryBuilder = new CentralDirectoryBuilder(file, parameters, zipModel, currSplitFileCounter);
             fileHeader = centralDirectoryBuilder.createFileHeader();
             localFileHeader = centralDirectoryBuilder.createLocalFileHeader(fileHeader);
 
@@ -88,31 +83,31 @@ public abstract class CipherOutputStream extends OutputStream {
         }
     }
 
+    @Override
     public void write(int bval) throws IOException {
         byte[] b = new byte[1];
         b[0] = (byte)bval;
         write(b, 0, 1);
     }
 
+    @Override
     public void write(byte[] b) throws IOException {
-        if (b == null)
-            throw new NullPointerException();
-
-        if (b.length == 0) return;
-
-        write(b, 0, b.length);
+        if (ArrayUtils.isNotEmpty(b))
+            write(b, 0, b.length);
     }
 
+    @Override
     public void write(byte[] b, int off, int len) throws IOException {
-        if (len == 0) return;
+        if (len == 0)
+            return;
 
         if (parameters.getEncryption() == Encryption.AES) {
             if (pendingBufferLength != 0) {
-                if (len >= (InternalZipConstants.AES_BLOCK_SIZE - pendingBufferLength)) {
+                if (len >= (AesEngine.AES_BLOCK_SIZE - pendingBufferLength)) {
                     System.arraycopy(b, off, pendingBuffer, pendingBufferLength,
-                            InternalZipConstants.AES_BLOCK_SIZE - pendingBufferLength);
+                            AesEngine.AES_BLOCK_SIZE - pendingBufferLength);
                     encryptAndWrite(pendingBuffer, 0, pendingBuffer.length);
-                    off = InternalZipConstants.AES_BLOCK_SIZE - pendingBufferLength;
+                    off = AesEngine.AES_BLOCK_SIZE - pendingBufferLength;
                     len -= off;
                     pendingBufferLength = 0;
                 } else {
@@ -128,6 +123,7 @@ public abstract class CipherOutputStream extends OutputStream {
                 len -= pendingBufferLength;
             }
         }
+
         if (len != 0)
             encryptAndWrite(b, off, len);
     }

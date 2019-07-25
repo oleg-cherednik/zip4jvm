@@ -5,6 +5,10 @@ import com.cop.zip4j.utils.InternalZipConstants;
 
 public class AesEngine {
 
+    public static final int AES_AUTH_LENGTH = 10;
+    public static final int AES_BLOCK_SIZE = 16;
+
+
     private int rounds;
     private int[][] workingKey = null;
     private int C0, C1, C2, C3;
@@ -71,7 +75,7 @@ public class AesEngine {
         encryptBlock(workingKey);
         stateOut(out, outOff);
 
-        return InternalZipConstants.AES_BLOCK_SIZE;
+        return AesEngine.AES_BLOCK_SIZE;
     }
 
     private final void stateIn(byte[] bytes, int off) {

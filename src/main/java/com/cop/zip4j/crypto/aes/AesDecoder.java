@@ -1,6 +1,5 @@
 package com.cop.zip4j.crypto.aes;
 
-import lombok.NonNull;
 import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.crypto.aes.pbkdf2.MacBasedPRF;
 import com.cop.zip4j.crypto.aes.pbkdf2.PBKDF2Engine;
@@ -10,8 +9,8 @@ import com.cop.zip4j.exception.ZipExceptionConstants;
 import com.cop.zip4j.model.AesExtraDataRecord;
 import com.cop.zip4j.model.AesStrength;
 import com.cop.zip4j.model.LocalFileHeader;
-import com.cop.zip4j.utils.InternalZipConstants;
 import com.cop.zip4j.utils.ZipUtils;
+import lombok.NonNull;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.util.Arrays;
@@ -35,8 +34,8 @@ public class AesDecoder implements Decoder {
     private byte[] storedMac;
 
     private int nonce = 1;
-    private final byte[] iv = new byte[InternalZipConstants.AES_BLOCK_SIZE];
-    private final byte[] counterBlock = new byte[InternalZipConstants.AES_BLOCK_SIZE];
+    private final byte[] iv = new byte[AesEngine.AES_BLOCK_SIZE];
+    private final byte[] counterBlock = new byte[AesEngine.AES_BLOCK_SIZE];
     private int loopCount = 0;
 
     public AesDecoder(@NonNull LocalFileHeader localFileHeader, @NonNull char[] password, byte[] salt, byte[] passwordVerifier) throws ZipException {
@@ -104,12 +103,12 @@ public class AesDecoder implements Decoder {
 
         try {
 
-            for (int j = offs; j < (offs + len); j += InternalZipConstants.AES_BLOCK_SIZE) {
-                loopCount = (j + InternalZipConstants.AES_BLOCK_SIZE <= (offs + len)) ?
-                            InternalZipConstants.AES_BLOCK_SIZE : ((offs + len) - j);
+            for (int j = offs; j < (offs + len); j += AesEngine.AES_BLOCK_SIZE) {
+                loopCount = (j + AesEngine.AES_BLOCK_SIZE <= (offs + len)) ?
+                            AesEngine.AES_BLOCK_SIZE : ((offs + len) - j);
 
                 mac.update(buf, j, loopCount);
-                ZipUtils.prepareBuffAESIVBytes(iv, nonce, InternalZipConstants.AES_BLOCK_SIZE);
+                ZipUtils.prepareBuffAESIVBytes(iv, nonce, AesEngine.AES_BLOCK_SIZE);
                 aesEngine.processBlock(iv, counterBlock);
 
                 for (int k = 0; k < loopCount; k++) {
