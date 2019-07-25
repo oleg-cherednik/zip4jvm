@@ -104,7 +104,9 @@ public class CentralDirectoryBuilder {
     }
 
     private long getCrc32() {
-        return parameters.getCrc32();
+        return parameters.getEncryption() == Encryption.STANDARD ? parameters.getCrc32() : 0;
+        // TODO this fix breaks encryption - password incorrect
+//        return parameters.getCrc32();
     }
 
     private long getCompressedSize(CentralDirectory.FileHeader fileHeader) throws IOException {
