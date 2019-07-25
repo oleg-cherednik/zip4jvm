@@ -38,7 +38,6 @@ public class ZipParameters {
     private TimeZone timeZone = TimeZone.getDefault();
     private long crc32;
     private Path defaultFolderPath;
-    private boolean isSourceExternalStream;
     @Builder.Default
     private long splitLength = ZipModel.NO_SPLIT;
     private String comment;

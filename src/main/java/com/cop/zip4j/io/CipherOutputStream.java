@@ -12,11 +12,9 @@ import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.ZipParameters;
 import com.cop.zip4j.utils.InternalZipConstants;
-import com.cop.zip4j.utils.ZipUtils;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -45,46 +43,28 @@ public abstract class CipherOutputStream extends OutputStream {
     private Encoder encoder = Encoder.NULL;
     protected ZipParameters parameters;
 
-
     protected final CRC32 crc = new CRC32();
     private final byte[] pendingBuffer = new byte[InternalZipConstants.AES_BLOCK_SIZE];
     private int pendingBufferLength;
     protected long totalBytesRead;
 
-    public final void putNextEntry(String fileNameStream, ZipParameters parameters) {
-        putNextEntry(null, fileNameStream, parameters);
-    }
-
-    public final void putNextEntry(Path file, ZipParameters parameters) {
-        putNextEntry(file, null, parameters);
-    }
-
-    protected void putNextEntry(Path file, String fileNameStream, ZipParameters parameters) {
-        if (!parameters.isSourceExternalStream() && file == null)
+    public void putNextEntry(Path file, ZipParameters parameters) {
+        if (file == null)
             throw new ZipException("input file is null");
-        if (!parameters.isSourceExternalStream() && !Files.exists(file))
+        if (!Files.exists(file))
             throw new ZipException("input file does not exist");
 
         try {
             sourceFile = file;
             this.parameters = parameters = parameters.toBuilder().build();
 
-            if (parameters.isSourceExternalStream()) {
-                if (StringUtils.isBlank(fileNameStream))
-                    throw new ZipException("file name is empty for external stream");
-
-                if (ZipUtils.isDirectory(fileNameStream)) {
-                    parameters.setEncryption(Encryption.OFF);
-                    parameters.setCompressionMethod(CompressionMethod.STORE);
-                }
-            } else if (Files.isDirectory(sourceFile)) {
+            if (Files.isDirectory(sourceFile)) {
                 parameters.setEncryption(Encryption.OFF);
                 parameters.setCompressionMethod(CompressionMethod.STORE);
             }
 
             int currSplitFileCounter = out.getCurrSplitFileCounter();
-            CentralDirectoryBuilder centralDirectoryBuilder = new CentralDirectoryBuilder(sourceFile, fileNameStream, parameters, zipModel,
-                    currSplitFileCounter);
+            CentralDirectoryBuilder centralDirectoryBuilder = new CentralDirectoryBuilder(sourceFile, parameters, zipModel, currSplitFileCounter);
             fileHeader = centralDirectoryBuilder.createFileHeader();
             localFileHeader = centralDirectoryBuilder.createLocalFileHeader(fileHeader);
 
@@ -170,13 +150,6 @@ public abstract class CipherOutputStream extends OutputStream {
 
         fileHeader.setCompressedSize(out.getWrittenBytesAmount(MARK));
         localFileHeader.setCompressedSize(out.getWrittenBytesAmount(MARK));
-
-        if (parameters.isSourceExternalStream()) {
-            fileHeader.setUncompressedSize(totalBytesRead);
-
-            if (localFileHeader.getUncompressedSize() != totalBytesRead)
-                localFileHeader.setUncompressedSize(totalBytesRead);
-        }
 
         long crc32 = fileHeader.getEncryption() == Encryption.AES ? 0 : crc.getValue();
 

@@ -6,11 +6,9 @@ import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.model.AesStrength;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.Encryption;
-import com.cop.zip4j.model.InputStreamMeta;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.ZipParameters;
 import com.cop.zip4j.utils.CalculateChecksum;
-import com.cop.zip4j.utils.RemoveEntryFunc;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
@@ -78,34 +76,6 @@ public class ZipEngine {
     private static long copyLarge(@NonNull Path entry, @NonNull OutputStream out) throws IOException {
         try (InputStream in = new FileInputStream(entry.toFile())) {
             return IOUtils.copyLarge(in, out);
-        }
-    }
-
-    public void addStreamToZip(@NonNull Collection<InputStreamMeta> files, @NonNull ZipParameters parameters) {
-        checkParameters(parameters);
-
-        try (DeflateOutputStream out = new DeflateOutputStream(SplitOutputStream.create(zipModel), zipModel)) {
-            out.seek(zipModel.getEndCentralDirectory().getOffs());
-
-            for (InputStreamMeta file : files) {
-                if (file == null)
-                    continue;
-
-                // TODO should be relative to the root zip path
-                new RemoveEntryFunc(zipModel).accept(file.getRelativePath());
-                ZipParameters params = parameters.toBuilder().build();
-
-                out.putNextEntry(file.getRelativePath(), params);
-
-                if (file.isRegularFile())
-                    IOUtils.copy(file.getIn(), out);
-
-                out.closeEntry();
-            }
-        } catch(ZipException e) {
-            throw e;
-        } catch(Exception e) {
-            throw new ZipException(e);
         }
     }
 

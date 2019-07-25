@@ -10,9 +10,6 @@ import net.sf.sevenzipjbinding.simple.ISimpleInArchiveItem;
 import org.apache.commons.lang.ArrayUtils;
 import org.testng.annotations.Test;
 
-import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
@@ -21,7 +18,6 @@ import java.nio.file.StandardOpenOption;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 
 import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -56,35 +52,35 @@ public class CompatibilityTest {
         assertThatDirectory(destDir).matches(TestUtils.dirAssert);
     }
 
-    public void zip4jShouldBeReadableForZipInputStream() throws IOException {
-        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        byte[] buf = new byte[1024];
-
-        try (ZipInputStream in = new ZipInputStream(new FileInputStream(Zip4jSuite.noSplitZip.toFile()))) {
-            ZipEntry entry;
-
-            while ((entry = in.getNextEntry()) != null) {
-                Path path = destDir.resolve(entry.getName());
-
-                if (entry.isDirectory())
-                    Files.createDirectories(path);
-                else {
-                    //noinspection NestedTryStatement
-                    try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(path.toFile()))) {
-                        int len;
-
-                        while ((len = in.read(buf)) > 0) {
-                            out.write(buf, 0, len);
-                        }
-                    }
-                }
-
-                in.closeEntry();
-            }
-        }
-
-        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
-    }
+//    public void zip4jShouldBeReadableForZipInputStream() throws IOException {
+//        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+//        byte[] buf = new byte[1024];
+//
+//        try (ZipInputStream in = new ZipInputStream(new FileInputStream(Zip4jSuite.noSplitZip.toFile()))) {
+//            ZipEntry entry;
+//
+//            while ((entry = in.getNextEntry()) != null) {
+//                Path path = destDir.resolve(entry.getName());
+//
+//                if (entry.isDirectory())
+//                    Files.createDirectories(path);
+//                else {
+//                    //noinspection NestedTryStatement
+//                    try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(path.toFile()))) {
+//                        int len;
+//
+//                        while ((len = in.read(buf)) > 0) {
+//                            out.write(buf, 0, len);
+//                        }
+//                    }
+//                }
+//
+//                in.closeEntry();
+//            }
+//        }
+//
+//        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
+//    }
 
     public void zip4jPkwareEncryptionShouldBeReadableForSevenZipTool() throws IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);

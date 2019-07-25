@@ -30,7 +30,6 @@ import java.nio.file.Path;
 public class CentralDirectoryBuilder {
 
     private final Path sourceFile;
-    private final String fileNameStream;
     @NonNull
     private final ZipParameters parameters;
     @NonNull
@@ -78,15 +77,12 @@ public class CentralDirectoryBuilder {
 
     @NonNull
     private String getFileName() throws IOException {
-        String fileName = fileNameStream;
-
-        if (!parameters.isSourceExternalStream())
-            fileName = parameters.getRelativeEntryName(sourceFile);
+        String fileName = parameters.getRelativeEntryName(sourceFile);
 
         if (StringUtils.isBlank(fileName))
             throw new IOException("fileName is null or empty. unable to create file header");
 
-        if (!parameters.isSourceExternalStream() && Files.isDirectory(sourceFile) && !ZipUtils.isDirectory(fileName))
+        if (Files.isDirectory(sourceFile) && !ZipUtils.isDirectory(fileName))
             fileName += "/";
 
         return ZipUtils.normalizeFileName.apply(fileName);
@@ -101,7 +97,7 @@ public class CentralDirectoryBuilder {
     }
 
     private int getLastModFileTime() throws IOException {
-        long time = parameters.isSourceExternalStream() ? System.currentTimeMillis() : Files.getLastModifiedTime(sourceFile).toMillis();
+        long time = Files.getLastModifiedTime(sourceFile).toMillis();
         return (int)ZipUtils.javaToDosTime(time);
     }
 
@@ -111,8 +107,6 @@ public class CentralDirectoryBuilder {
 
     private long getCompressedSize(CentralDirectory.FileHeader fileHeader) throws IOException {
         if (fileHeader.isDirectory())
-            return 0;
-        if (parameters.isSourceExternalStream())
             return 0;
         if (parameters.getCompressionMethod() != CompressionMethod.STORE)
             return 0;
@@ -130,14 +124,10 @@ public class CentralDirectoryBuilder {
     private long getUncompressedSize(CentralDirectory.FileHeader fileHeader) throws IOException {
         if (fileHeader.isDirectory())
             return 0;
-        if (parameters.isSourceExternalStream())
-            return 0;
         return Files.size(sourceFile);
     }
 
     private byte[] getExternalFileAttr() throws IOException {
-        if (parameters.isSourceExternalStream())
-            return null;
         if (!Files.exists(sourceFile))
             return null;
 

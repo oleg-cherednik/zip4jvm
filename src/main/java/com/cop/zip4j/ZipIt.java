@@ -17,7 +17,6 @@ package com.cop.zip4j;
 
 import com.cop.zip4j.engine.ZipEngine;
 import com.cop.zip4j.exception.ZipException;
-import com.cop.zip4j.model.InputStreamMeta;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.ZipParameters;
 import com.cop.zip4j.utils.CreateZipModelSup;
@@ -62,17 +61,6 @@ public final class ZipIt {
             addRegularFiles(Collections.singleton(path), parameters);
         else
             throw new ZipException("Cannot add neither directory nor regular file to zip: " + path);
-    }
-
-    public void add(@NonNull InputStreamMeta file, @NonNull ZipParameters parameters) throws ZipException {
-        addStream(Collections.singletonList(file), parameters);
-    }
-
-    public void addStream(@NonNull Collection<InputStreamMeta> files, @NonNull ZipParameters parameters) throws ZipException {
-        ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get().noSplitOnly();
-        parameters.setSourceExternalStream(true);
-
-        new ZipEngine(zipModel).addStreamToZip(files, parameters);
     }
 
     // TODO addDirectory and addRegularFile are same
