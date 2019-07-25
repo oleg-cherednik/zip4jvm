@@ -8,9 +8,9 @@ import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.ZipParameters;
-import com.cop.zip4j.utils.CalculateChecksum;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 
@@ -55,7 +55,7 @@ public class ZipEngine {
                 ZipParameters params = parameters.toBuilder().build();
 
                 if (Files.isRegularFile(entry)) {
-                    params.setCrc32(new CalculateChecksum(entry).getAsLong());
+                    params.setCrc32(FileUtils.checksumCRC32(entry.toFile()));
                     params.setCompressionMethod(Files.size(entry) == 0 ? CompressionMethod.STORE : params.getCompressionMethod());
                 }
 
