@@ -1,5 +1,6 @@
 package com.cop.zip4j.io;
 
+import com.cop.zip4j.core.writers.DataDescriptorWriter;
 import com.cop.zip4j.core.writers.LocalFileHeaderWriter;
 import com.cop.zip4j.core.writers.ZipModelWriter;
 import com.cop.zip4j.crypto.Encoder;
@@ -7,6 +8,7 @@ import com.cop.zip4j.crypto.aes.AesEncoder;
 import com.cop.zip4j.exception.ZipException;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.CompressionMethod;
+import com.cop.zip4j.model.DataDescriptor;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.ZipModel;
@@ -148,30 +150,30 @@ public abstract class CipherOutputStream extends OutputStream {
                 throw new ZipException("invalid encryption for AES encrypted file");
         }
 
+        fileHeader.setCrc32(fileHeader.getEncryption() == Encryption.AES ? 0 : crc.getValue());
         fileHeader.setCompressedSize(out.getWrittenBytesAmount(MARK));
-        localFileHeader.setCompressedSize(out.getWrittenBytesAmount(MARK));
-
-        long crc32 = fileHeader.getEncryption() == Encryption.AES ? 0 : crc.getValue();
-
-        if (parameters.getEncryption() == Encryption.AES) {
-            fileHeader.setCrc32(0);
-            localFileHeader.setCrc32(0);
-        } else {
-            fileHeader.setCrc32(crc32);
-            localFileHeader.setCrc32(crc32);
-        }
-
-        zipModel.addLocalFileHeader(localFileHeader);
+        fileHeader.setUncompressedSize(totalBytesRead);
         zipModel.addFileHeader(fileHeader);
 
-        // TODO should we do all above?
-        if (parameters.getCompressionMethod() == CompressionMethod.DEFLATE)
-            new LocalFileHeaderWriter(localFileHeader, zipModel).writeExtended(out);
+        writeDataDescriptor();
 
         crc.reset();
         out.mark(MARK);
         encoder = Encoder.NULL;
         totalBytesRead = 0;
+    }
+
+    private void writeDataDescriptor() throws IOException {
+        // TODO should be isDataDescriptorExists == true only when parameters.getCompressionMethod() == CompressionMethod.DEFLATE
+        if (!localFileHeader.getGeneralPurposeFlag().isDataDescriptorExists())
+            return;
+
+        DataDescriptor dataDescriptor = new DataDescriptor();
+        dataDescriptor.setCrc32(fileHeader.getCrc32());
+        dataDescriptor.setCompressedSize(fileHeader.getCompressedSize());
+        dataDescriptor.setUncompressedSize(fileHeader.getUncompressedSize());
+
+        new DataDescriptorWriter(dataDescriptor).write(out);
     }
 
     public void finish() throws IOException {
