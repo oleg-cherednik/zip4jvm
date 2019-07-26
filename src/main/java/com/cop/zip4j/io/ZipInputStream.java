@@ -13,23 +13,28 @@ public class ZipInputStream extends InputStream {
     private final InputStream in;
     private final UnzipEngine unzipEngine;
 
+    @Override
     public int read() throws IOException {
         int readByte = in.read();
-        if (readByte != -1) {
+
+        if (readByte != -1)
             unzipEngine.updateCRC(readByte);
-        }
+
         return readByte;
     }
 
+    @Override
     public int read(byte[] b) throws IOException {
         return read(b, 0, b.length);
     }
 
+    @Override
     public int read(byte[] b, int off, int len) throws IOException {
         int readLen = in.read(b, off, len);
-        if (readLen > 0 && unzipEngine != null) {
+
+        if (readLen > 0 && unzipEngine != null)
             unzipEngine.updateCRC(b, off, readLen);
-        }
+
         return readLen;
     }
 
@@ -40,6 +45,7 @@ public class ZipInputStream extends InputStream {
      *
      * @throws IOException
      */
+    @Override
     public void close() throws IOException {
         close(false);
     }

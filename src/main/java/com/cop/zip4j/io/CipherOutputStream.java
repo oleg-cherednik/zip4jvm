@@ -1,23 +1,20 @@
 package com.cop.zip4j.io;
 
-import com.cop.zip4j.core.writers.DataDescriptorWriter;
-import com.cop.zip4j.core.writers.LocalFileHeaderWriter;
 import com.cop.zip4j.core.writers.ZipModelWriter;
 import com.cop.zip4j.crypto.Encoder;
 import com.cop.zip4j.crypto.aes.AesEngine;
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.io.delegate.OutputDelegate;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.CompressionMethod;
-import com.cop.zip4j.model.DataDescriptor;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.ZipParameters;
 import com.cop.zip4j.model.entry.PathZipEntry;
-import com.cop.zip4j.utils.InternalZipConstants;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.io.IOException;
@@ -31,53 +28,32 @@ import java.util.zip.CRC32;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class CipherOutputStream extends OutputStream {
 
-    private static final String MARK = "entry";
+    public static final String MARK = "entry";
 
     @NonNull
-    protected final SplitOutputStream out;
+    public final SplitOutputStream out;
     @NonNull
-    protected final ZipModel zipModel;
+    public final ZipModel zipModel;
 
-    protected CentralDirectory.FileHeader fileHeader;
-    private LocalFileHeader localFileHeader;
+    public CentralDirectory.FileHeader fileHeader;
+    public LocalFileHeader localFileHeader;
     @NonNull
-    private Encoder encoder = Encoder.NULL;
+    public Encoder encoder = Encoder.NULL;
     @NonNull
-    private Encryption encryption = Encryption.OFF;
+    public Encryption encryption = Encryption.OFF;
     @NonNull
-    protected CompressionMethod compressionMethod = CompressionMethod.DEFLATE;
+    public CompressionMethod compressionMethod = CompressionMethod.DEFLATE;
 
-    protected final CRC32 crc = new CRC32();
-    private final byte[] pendingBuffer = new byte[AesEngine.AES_BLOCK_SIZE];
-    private int pendingBufferLength;
-    protected long totalBytesRead;
+    public final CRC32 crc = new CRC32();
+    public final byte[] pendingBuffer = new byte[AesEngine.AES_BLOCK_SIZE];
+    public int pendingBufferLength;
+    public long totalBytesRead;
+
+    @Setter
+    protected OutputDelegate delegate;
 
     public void putNextEntry(@NonNull PathZipEntry entry, @NonNull ZipParameters parameters) {
-        try {
-            int currSplitFileCounter = out.getCurrSplitFileCounter();
-            CentralDirectoryBuilder centralDirectoryBuilder = new CentralDirectoryBuilder(entry, parameters, zipModel, currSplitFileCounter);
-            fileHeader = centralDirectoryBuilder.createFileHeader();
-            localFileHeader = centralDirectoryBuilder.createLocalFileHeader(fileHeader);
-
-            if (zipModel.isSplitArchive() && zipModel.isEmpty())
-                out.writeDword(InternalZipConstants.SPLITSIG);
-
-            fileHeader.setOffsLocalFileHeader(out.getFilePointer());
-            new LocalFileHeaderWriter(localFileHeader, zipModel).write(out);
-
-            encoder = parameters.getEncryption().encoder(localFileHeader, parameters);
-            encryption = parameters.getEncryption();
-            compressionMethod = parameters.getCompressionMethod();
-
-            out.mark(MARK);
-
-            encoder.write(out);
-            crc.reset();
-        } catch(ZipException e) {
-            throw e;
-        } catch(Exception e) {
-            throw new ZipException(e);
-        }
+        delegate.putNextEntry(entry, parameters);
     }
 
     @Override
@@ -94,75 +70,12 @@ public abstract class CipherOutputStream extends OutputStream {
     }
 
     @Override
-    public void write(byte[] b, int off, int len) throws IOException {
-        if (len == 0)
-            return;
-
-        if (encryption == Encryption.AES) {
-            if (pendingBufferLength != 0) {
-                if (len >= (AesEngine.AES_BLOCK_SIZE - pendingBufferLength)) {
-                    System.arraycopy(b, off, pendingBuffer, pendingBufferLength,
-                            AesEngine.AES_BLOCK_SIZE - pendingBufferLength);
-                    encryptAndWrite(pendingBuffer, 0, pendingBuffer.length);
-                    off = AesEngine.AES_BLOCK_SIZE - pendingBufferLength;
-                    len -= off;
-                    pendingBufferLength = 0;
-                } else {
-                    System.arraycopy(b, off, pendingBuffer, pendingBufferLength,
-                            len);
-                    pendingBufferLength += len;
-                    return;
-                }
-            }
-
-            if (len % 16 != 0) {
-                System.arraycopy(b, (len + off) - (len % 16), pendingBuffer, 0, len % 16);
-                pendingBufferLength = len % 16;
-                len -= pendingBufferLength;
-            }
-        }
-
-        if (len != 0)
-            encryptAndWrite(b, off, len);
-    }
-
-    private void encryptAndWrite(byte[] buf, int offs, int len) throws IOException {
-        encoder.encode(buf, offs, len);
-        out.writeBytes(buf, offs, len);
+    public void write(byte[] buf, int offs, int len) throws IOException {
+        delegate.write(buf, offs, len);
     }
 
     public void closeEntry() throws IOException {
-        if (pendingBufferLength != 0) {
-            encryptAndWrite(pendingBuffer, 0, pendingBufferLength);
-            pendingBufferLength = 0;
-        }
-
-        encoder.closeEntry(out);
-
-        fileHeader.setCrc32(fileHeader.getEncryption() == Encryption.AES ? 0 : crc.getValue());
-        fileHeader.setCompressedSize(out.getWrittenBytesAmount(MARK));
-        fileHeader.setUncompressedSize(totalBytesRead);
-        zipModel.addFileHeader(fileHeader);
-
-        writeDataDescriptor();
-
-        crc.reset();
-        out.mark(MARK);
-        encoder = Encoder.NULL;
-        totalBytesRead = 0;
-    }
-
-    private void writeDataDescriptor() throws IOException {
-        // TODO should be isDataDescriptorExists == true only when parameters.getCompressionMethod() == CompressionMethod.DEFLATE
-        if (!localFileHeader.getGeneralPurposeFlag().isDataDescriptorExists())
-            return;
-
-        DataDescriptor dataDescriptor = new DataDescriptor();
-        dataDescriptor.setCrc32(fileHeader.getCrc32());
-        dataDescriptor.setCompressedSize(fileHeader.getCompressedSize());
-        dataDescriptor.setUncompressedSize(fileHeader.getUncompressedSize());
-
-        new DataDescriptorWriter(dataDescriptor).write(out);
+        delegate.closeEntry();
     }
 
     @Override
