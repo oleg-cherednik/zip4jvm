@@ -43,7 +43,6 @@ public class CommonOutputDelegate implements OutputDelegate {
 
             cipherOutputStream.encoder = parameters.getEncryption().encoder(cipherOutputStream.localFileHeader, parameters);
             cipherOutputStream.encryption = parameters.getEncryption();
-            cipherOutputStream.compressionMethod = parameters.getCompressionMethod();
 
             cipherOutputStream.out.mark(CipherOutputStream.MARK);
 

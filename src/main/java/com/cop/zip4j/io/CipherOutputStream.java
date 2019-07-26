@@ -5,13 +5,11 @@ import com.cop.zip4j.crypto.Encoder;
 import com.cop.zip4j.crypto.aes.AesEngine;
 import com.cop.zip4j.io.delegate.OutputDelegate;
 import com.cop.zip4j.model.CentralDirectory;
-import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.ZipParameters;
 import com.cop.zip4j.model.entry.PathZipEntry;
-import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -25,8 +23,8 @@ import java.util.zip.CRC32;
  * @author Oleg Cherednik
  * @since 22.03.2019
  */
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class CipherOutputStream extends OutputStream {
+@RequiredArgsConstructor
+public class CipherOutputStream extends OutputStream {
 
     public static final String MARK = "entry";
 
@@ -41,8 +39,6 @@ public abstract class CipherOutputStream extends OutputStream {
     public Encoder encoder = Encoder.NULL;
     @NonNull
     public Encryption encryption = Encryption.OFF;
-    @NonNull
-    public CompressionMethod compressionMethod = CompressionMethod.DEFLATE;
 
     public final CRC32 crc = new CRC32();
     public final byte[] pendingBuffer = new byte[AesEngine.AES_BLOCK_SIZE];
@@ -64,9 +60,9 @@ public abstract class CipherOutputStream extends OutputStream {
     }
 
     @Override
-    public void write(byte[] b) throws IOException {
-        if (ArrayUtils.isNotEmpty(b))
-            write(b, 0, b.length);
+    public void write(byte[] buf) throws IOException {
+        if (ArrayUtils.isNotEmpty(buf))
+            write(buf, 0, buf.length);
     }
 
     @Override
