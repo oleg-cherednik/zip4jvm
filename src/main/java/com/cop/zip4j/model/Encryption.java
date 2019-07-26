@@ -1,5 +1,6 @@
 package com.cop.zip4j.model;
 
+import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -31,7 +32,7 @@ public enum Encryption {
         }
 
         @Override
-        public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull ZipParameters parameters) {
+        public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull PathZipEntry entry) {
             return Encoder.NULL;
         }
     },
@@ -44,8 +45,8 @@ public enum Encryption {
         }
 
         @Override
-        public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull ZipParameters parameters) {
-            return new StandardEncoder(parameters.getPassword());
+        public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull PathZipEntry entry) {
+            return new StandardEncoder(entry.getPassword());
         }
     },
     STRONG(1),
@@ -68,8 +69,8 @@ public enum Encryption {
         }
 
         @Override
-        public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull ZipParameters parameters) {
-            return new AesEncoder(parameters.getPassword(), parameters.getAesStrength());
+        public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull PathZipEntry entry) {
+            return new AesEncoder(entry.getPassword(), entry.getAesStrength());
         }
     };
 
@@ -79,7 +80,7 @@ public enum Encryption {
         throw new ZipException("unsupported encryption method");
     }
 
-    public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull ZipParameters parameters) {
+    public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull PathZipEntry entry) {
         throw new ZipException("invalid encryption method");
     }
 

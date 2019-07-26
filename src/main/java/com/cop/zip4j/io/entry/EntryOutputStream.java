@@ -12,7 +12,6 @@ import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.DataDescriptor;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.LocalFileHeader;
-import com.cop.zip4j.model.ZipParameters;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import com.cop.zip4j.utils.InternalZipConstants;
 import lombok.NonNull;
@@ -46,7 +45,7 @@ public class EntryOutputStream extends OutputStream {
     @NonNull
     private Encryption encryption = Encryption.OFF;
 
-    public static EntryOutputStream create(@NonNull PathZipEntry entry, @NonNull ZipParameters parameters, @NonNull SplitOutputStream out) {
+    public static EntryOutputStream create(@NonNull PathZipEntry entry, @NonNull SplitOutputStream out) {
         EntryOutputStream stream;
 
         if (entry.getCompressionMethod() == CompressionMethod.DEFLATE)
@@ -54,12 +53,12 @@ public class EntryOutputStream extends OutputStream {
         else
             stream = new EntryOutputStream(out);
 
-        stream.putNextEntry(entry, parameters);
+        stream.putNextEntry(entry);
 
         return stream;
     }
 
-    private void putNextEntry(@NonNull PathZipEntry entry, @NonNull ZipParameters parameters) {
+    private void putNextEntry(@NonNull PathZipEntry entry) {
         try {
             CentralDirectoryBuilder centralDirectoryBuilder = new CentralDirectoryBuilder(entry, out.zipModel, out.getCurrSplitFileCounter());
 
@@ -72,7 +71,7 @@ public class EntryOutputStream extends OutputStream {
             fileHeader.setOffsLocalFileHeader(out.getFilePointer());
             new LocalFileHeaderWriter(localFileHeader).write(out);
 
-            encoder = entry.getEncryption().encoder(localFileHeader, parameters);
+            encoder = entry.getEncryption().encoder(localFileHeader, entry);
             encryption = entry.getEncryption();
 
             out.mark(MARK);

@@ -28,6 +28,8 @@ public abstract class PathZipEntry extends ZipEntry {
     protected CompressionMethod compressionMethod = CompressionMethod.STORE;
     protected CompressionLevel compressionLevel = CompressionLevel.NORMAL;
     protected Encryption encryption = Encryption.OFF;
+    @Setter
+    protected char[] password;
 
     @Override
     public boolean isRegularFile() {

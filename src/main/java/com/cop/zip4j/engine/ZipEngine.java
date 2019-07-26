@@ -37,6 +37,7 @@ public class ZipEngine {
                 entry.setName(parameters.getRelativeEntryName(entry.getPath()));
                 entry.setCompressionMethod(parameters.getCompressionMethod());
                 entry.setEncryption(parameters.getEncryption());
+                entry.setPassword(parameters.getPassword());
             } catch(IOException e) {
                 throw new ZipException(e);
             }
@@ -45,29 +46,22 @@ public class ZipEngine {
         try (SplitOutputStream out = SplitOutputStream.create(zipModel)) {
             entries.stream()
                    .filter(entry -> !entry.isRoot())
-                   .forEach(entry -> addEntry(entry, parameters.toBuilder().build(), out));
+                   .forEach(entry -> {
+                       try {
+                           entry.setCompressionMethod(parameters.getCompressionMethod());
+                           entry.setEncryption(parameters.getEncryption());
+                           writeEntry(entry, out);
+                       } catch(IOException e) {
+                           throw new ZipException(e);
+                       }
+                   });
         } catch(IOException e) {
             throw new ZipException(e);
         }
     }
 
-    private static void addEntry(@NonNull PathZipEntry entry, @NonNull ZipParameters parameters, @NonNull SplitOutputStream out) {
-        try {
-            parameters.setCrc32(entry.crc32());
-            entry.setCompressionMethod(parameters.getCompressionMethod());
-            entry.setEncryption(parameters.getEncryption());
-
-            writeEntry(entry, parameters, out);
-        } catch(ZipException e) {
-            throw e;
-        } catch(Exception e) {
-            throw new ZipException(e);
-        }
-    }
-
-    private static void writeEntry(@NonNull PathZipEntry entry, @NonNull ZipParameters parameters, @NonNull SplitOutputStream out)
-            throws IOException {
-        try (EntryOutputStream delegate = EntryOutputStream.create(entry, parameters, out)) {
+    private static void writeEntry(@NonNull PathZipEntry entry, @NonNull SplitOutputStream out) throws IOException {
+        try (EntryOutputStream delegate = EntryOutputStream.create(entry, out)) {
             entry.write(delegate);
         }
     }
