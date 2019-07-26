@@ -6,7 +6,7 @@ import com.cop.zip4j.crypto.Encoder;
 import com.cop.zip4j.crypto.aes.AesEngine;
 import com.cop.zip4j.exception.ZipException;
 import com.cop.zip4j.io.CentralDirectoryBuilder;
-import com.cop.zip4j.io.ZipOutputStream;
+import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.DataDescriptor;
 import com.cop.zip4j.model.Encryption;
@@ -30,7 +30,7 @@ public class CommonEntryOutputDelegate extends OutputStream {
 
     private static final String MARK = "entry";
 
-    protected final ZipOutputStream zipOutputStream;
+    protected final SplitOutputStream out;
     protected final CRC32 crc32 = new CRC32();
 
     private CentralDirectory.FileHeader fileHeader;
@@ -47,24 +47,24 @@ public class CommonEntryOutputDelegate extends OutputStream {
 
     public void putNextEntry(@NonNull PathZipEntry entry, @NonNull ZipParameters parameters) {
         try {
-            int currSplitFileCounter = zipOutputStream.out.getCurrSplitFileCounter();
-            CentralDirectoryBuilder centralDirectoryBuilder = new CentralDirectoryBuilder(entry, parameters, zipOutputStream.zipModel,
+            int currSplitFileCounter = out.getCurrSplitFileCounter();
+            CentralDirectoryBuilder centralDirectoryBuilder = new CentralDirectoryBuilder(entry, parameters, out.zipModel,
                     currSplitFileCounter);
             fileHeader = centralDirectoryBuilder.createFileHeader();
             localFileHeader = centralDirectoryBuilder.createLocalFileHeader(fileHeader);
 
-            if (zipOutputStream.zipModel.isSplitArchive() && zipOutputStream.zipModel.isEmpty())
-                zipOutputStream.out.writeDword(InternalZipConstants.SPLITSIG);
+            if (out.zipModel.isSplitArchive() && out.zipModel.isEmpty())
+                out.writeDword(InternalZipConstants.SPLITSIG);
 
-            fileHeader.setOffsLocalFileHeader(zipOutputStream.out.getFilePointer());
-            new LocalFileHeaderWriter(localFileHeader, zipOutputStream.zipModel).write(zipOutputStream.out);
+            fileHeader.setOffsLocalFileHeader(out.getFilePointer());
+            new LocalFileHeaderWriter(localFileHeader, out.zipModel).write(out);
 
             encoder = parameters.getEncryption().encoder(localFileHeader, parameters);
             encryption = parameters.getEncryption();
 
-            zipOutputStream.out.mark(MARK);
+            out.mark(MARK);
 
-            encoder.write(zipOutputStream.out);
+            encoder.write(out);
         } catch(ZipException e) {
             throw e;
         } catch(Exception e) {
@@ -116,7 +116,7 @@ public class CommonEntryOutputDelegate extends OutputStream {
 
     private void encryptAndWrite(byte[] buf, int offs, int len) throws IOException {
         encoder.encode(buf, offs, len);
-        zipOutputStream.out.writeBytes(buf, offs, len);
+        out.writeBytes(buf, offs, len);
     }
 
     @Override
@@ -126,16 +126,16 @@ public class CommonEntryOutputDelegate extends OutputStream {
             pendingBufferLength = 0;
         }
 
-        encoder.close(zipOutputStream.out);
+        encoder.close(out);
 
         fileHeader.setCrc32(fileHeader.getEncryption() == Encryption.AES ? 0 : crc32.getValue());
-        fileHeader.setCompressedSize(zipOutputStream.out.getWrittenBytesAmount(MARK));
+        fileHeader.setCompressedSize(out.getWrittenBytesAmount(MARK));
         fileHeader.setUncompressedSize(totalBytesRead);
-        zipOutputStream.zipModel.addFileHeader(fileHeader);
+        out.zipModel.addFileHeader(fileHeader);
 
         writeDataDescriptor();
 
-        zipOutputStream.out.mark(MARK);
+        out.mark(MARK);
         totalBytesRead = 0;
     }
 
@@ -149,7 +149,7 @@ public class CommonEntryOutputDelegate extends OutputStream {
         dataDescriptor.setCompressedSize(fileHeader.getCompressedSize());
         dataDescriptor.setUncompressedSize(fileHeader.getUncompressedSize());
 
-        new DataDescriptorWriter(dataDescriptor).write(zipOutputStream.out);
+        new DataDescriptorWriter(dataDescriptor).write(out);
     }
 
 }

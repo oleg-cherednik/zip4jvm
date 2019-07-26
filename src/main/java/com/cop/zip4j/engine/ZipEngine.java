@@ -2,7 +2,6 @@ package com.cop.zip4j.engine;
 
 import com.cop.zip4j.exception.ZipException;
 import com.cop.zip4j.io.SplitOutputStream;
-import com.cop.zip4j.io.ZipOutputStream;
 import com.cop.zip4j.io.entry.CommonEntryOutputDelegate;
 import com.cop.zip4j.io.entry.DeflateEntryOutputDelegate;
 import com.cop.zip4j.model.AesStrength;
@@ -40,7 +39,7 @@ public class ZipEngine {
             return !"/".equals(entryName) && !"\\".equals(entryName);
         };
 
-        try (ZipOutputStream out = new ZipOutputStream(SplitOutputStream.create(zipModel), zipModel)) {
+        try (SplitOutputStream out = SplitOutputStream.create(zipModel)) {
             out.seek(zipModel.getOffsCentralDirectory());
             entries.stream()
                    .filter(ignoreRoot)
@@ -50,7 +49,7 @@ public class ZipEngine {
         }
     }
 
-    private static void addEntry(@NonNull PathZipEntry entry, @NonNull ZipParameters parameters, @NonNull ZipOutputStream out) {
+    private static void addEntry(@NonNull PathZipEntry entry, @NonNull ZipParameters parameters, @NonNull SplitOutputStream out) {
         try {
             parameters.setCrc32(entry.crc32());
 
@@ -72,7 +71,7 @@ public class ZipEngine {
         }
     }
 
-    private static CommonEntryOutputDelegate createOutputDelegate(@NonNull ZipParameters parameters, @NonNull ZipOutputStream out) {
+    private static CommonEntryOutputDelegate createOutputDelegate(@NonNull ZipParameters parameters, @NonNull SplitOutputStream out) {
         if (parameters.getCompressionMethod() == CompressionMethod.DEFLATE)
             return new DeflateEntryOutputDelegate(out, parameters.getCompressionLevel());
         return new CommonEntryOutputDelegate(out);
