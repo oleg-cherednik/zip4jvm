@@ -1,8 +1,7 @@
 package com.cop.zip4j.io.delegate;
 
-import com.cop.zip4j.io.CipherOutputStream;
-import com.cop.zip4j.model.ZipParameters;
-import com.cop.zip4j.model.entry.PathZipEntry;
+import com.cop.zip4j.io.ZipOutputStream;
+import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.utils.InternalZipConstants;
 import lombok.NonNull;
 
@@ -13,28 +12,22 @@ import java.util.zip.Deflater;
  * @author Oleg Cherednik
  * @since 26.07.2019
  */
-public class DeflateOutputDelegate extends CommonOutputDelegate {
+public class DeflateEntryOutputDelegate extends CommonEntryOutputDelegate {
 
-    public final byte[] buf = new byte[InternalZipConstants.BUFF_SIZE];
-    public final Deflater deflater = new Deflater();
+    private final byte[] buf = new byte[InternalZipConstants.BUFF_SIZE];
+    private final Deflater deflater = new Deflater();
 
     public boolean firstBytesRead;
 
-    public DeflateOutputDelegate(CipherOutputStream cipherOutputStream) {
-        super(cipherOutputStream);
-    }
-
-    @Override
-    public void putNextEntry(@NonNull PathZipEntry entry, @NonNull ZipParameters parameters) {
-        super.putNextEntry(entry, parameters);
-        deflater.reset();
-        deflater.setLevel(parameters.getCompressionLevel().getValue());
+    public DeflateEntryOutputDelegate(@NonNull ZipOutputStream zipOutputStream, @NonNull CompressionLevel compressionLevel) {
+        super(zipOutputStream);
+        deflater.setLevel(compressionLevel.getValue());
     }
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
-        cipherOutputStream.crc.update(buf, offs, len);
-        cipherOutputStream.totalBytesRead += len;
+        zipOutputStream.crc.update(buf, offs, len);
+        zipOutputStream.totalBytesRead += len;
 
         deflater.setInput(buf, offs, len);
 
@@ -66,7 +59,7 @@ public class DeflateOutputDelegate extends CommonOutputDelegate {
     }
 
     @Override
-    public void closeEntry() throws IOException {
+    public void close() throws IOException {
         if (!deflater.finished()) {
             deflater.finish();
 
@@ -76,6 +69,6 @@ public class DeflateOutputDelegate extends CommonOutputDelegate {
         }
 
         firstBytesRead = false;
-        super.closeEntry();
+        super.close();
     }
 }

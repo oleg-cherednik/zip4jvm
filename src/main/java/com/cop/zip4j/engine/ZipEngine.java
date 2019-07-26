@@ -1,11 +1,11 @@
 package com.cop.zip4j.engine;
 
 import com.cop.zip4j.exception.ZipException;
-import com.cop.zip4j.io.CipherOutputStream;
 import com.cop.zip4j.io.SplitOutputStream;
-import com.cop.zip4j.io.delegate.CommonOutputDelegate;
-import com.cop.zip4j.io.delegate.DeflateOutputDelegate;
-import com.cop.zip4j.io.delegate.OutputDelegate;
+import com.cop.zip4j.io.ZipOutputStream;
+import com.cop.zip4j.io.delegate.CommonEntryOutputDelegate;
+import com.cop.zip4j.io.delegate.DeflateEntryOutputDelegate;
+import com.cop.zip4j.io.delegate.EntryOutputDelegate;
 import com.cop.zip4j.model.AesStrength;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.Encryption;
@@ -41,9 +41,7 @@ public class ZipEngine {
             return !"/".equals(entryName) && !"\\".equals(entryName);
         };
 
-        try (CipherOutputStream out = new CipherOutputStream(SplitOutputStream.create(zipModel), zipModel)) {
-            out.seek(zipModel.getOffsCentralDirectory());
-
+        try (ZipOutputStream out = new ZipOutputStream(SplitOutputStream.create(zipModel), zipModel)) {
             entries.stream()
                    .filter(ignoreRoot)
                    .forEach(entry -> addEntry(entry, parameters.toBuilder().build(), out));
@@ -52,7 +50,7 @@ public class ZipEngine {
         }
     }
 
-    private static void addEntry(@NonNull PathZipEntry entry, @NonNull ZipParameters parameters, @NonNull CipherOutputStream out) {
+    private static void addEntry(@NonNull PathZipEntry entry, @NonNull ZipParameters parameters, @NonNull ZipOutputStream out) {
         try {
             parameters.setCrc32(entry.crc32());
 
@@ -63,12 +61,10 @@ public class ZipEngine {
                 parameters.setCompressionMethod(CompressionMethod.STORE);
             }
 
-            OutputDelegate delegate = createOutputDelegate(parameters, out);
-            out.setDelegate(delegate);
-
-            out.putNextEntry(entry, parameters);
-            entry.write(out);
-            out.closeEntry();
+            try (EntryOutputDelegate delegate = createOutputDelegate(parameters, out)) {
+                delegate.putNextEntry(entry, parameters);
+                entry.write(delegate);
+            }
         } catch(ZipException e) {
             throw e;
         } catch(Exception e) {
@@ -76,10 +72,10 @@ public class ZipEngine {
         }
     }
 
-    private static OutputDelegate createOutputDelegate(@NonNull ZipParameters parameters, @NonNull CipherOutputStream out) {
+    private static EntryOutputDelegate createOutputDelegate(@NonNull ZipParameters parameters, @NonNull ZipOutputStream out) {
         if (parameters.getCompressionMethod() == CompressionMethod.DEFLATE)
-            return new DeflateOutputDelegate(out);
-        return new CommonOutputDelegate(out);
+            return new DeflateEntryOutputDelegate(out, parameters.getCompressionLevel());
+        return new CommonEntryOutputDelegate(out);
     }
 
     private static void checkParameters(ZipParameters parameters) {
