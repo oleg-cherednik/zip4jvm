@@ -12,6 +12,7 @@ import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.ZipParameters;
+import com.cop.zip4j.model.entry.PathZipEntry;
 import com.cop.zip4j.utils.InternalZipConstants;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.NonNull;
@@ -21,7 +22,6 @@ import org.apache.commons.lang.StringUtils;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 
 /**
  * @author Oleg Cherednik
@@ -30,7 +30,7 @@ import java.nio.file.Path;
 @RequiredArgsConstructor
 public class CentralDirectoryBuilder {
 
-    private final Path sourceFile;
+    private final PathZipEntry entry;
     @NonNull
     private final ZipParameters parameters;
     @NonNull
@@ -46,8 +46,8 @@ public class CentralDirectoryBuilder {
         fileHeader.setCompressionMethod(parameters.getActualCompressionMethod());
         fileHeader.setLastModifiedTime(getLastModFileTime());
         fileHeader.setCrc32(getCrc32());
-        fileHeader.setCompressedSize(getCompressedSize(fileHeader));
-        fileHeader.setUncompressedSize(getUncompressedSize(fileHeader));
+        fileHeader.setCompressedSize(getCompressedSize());
+        fileHeader.setUncompressedSize(getUncompressedSize());
         fileHeader.setFileCommentLength(0);
         fileHeader.setDiskNumber(currSplitFileCounter);
         fileHeader.setInternalFileAttributes(null);
@@ -78,12 +78,12 @@ public class CentralDirectoryBuilder {
 
     @NonNull
     private String getFileName() throws IOException {
-        String fileName = parameters.getRelativeEntryName(sourceFile);
+        String fileName = parameters.getRelativeEntryName(entry.getPath());
 
         if (StringUtils.isBlank(fileName))
             throw new IOException("fileName is null or empty. unable to create file header");
 
-        if (Files.isDirectory(sourceFile) && !ZipUtils.isDirectory(fileName))
+        if (entry.isDirectory() && !ZipUtils.isDirectory(fileName))
             fileName += "/";
 
         return ZipUtils.normalizeFileName.apply(fileName);
@@ -99,7 +99,7 @@ public class CentralDirectoryBuilder {
     }
 
     private int getLastModFileTime() throws IOException {
-        long time = Files.getLastModifiedTime(sourceFile).toMillis();
+        long time = Files.getLastModifiedTime(entry.getPath()).toMillis();
         return (int)ZipUtils.javaToDosTime(time);
     }
 
@@ -109,15 +109,15 @@ public class CentralDirectoryBuilder {
 //        return parameters.getCrc32();
     }
 
-    private long getCompressedSize(CentralDirectory.FileHeader fileHeader) throws IOException {
-        if (fileHeader.isDirectory())
+    private long getCompressedSize() throws IOException {
+        if (entry.isDirectory())
             return 0;
         if (parameters.getCompressionMethod() != CompressionMethod.STORE)
             return 0;
         if (parameters.getEncryption() != Encryption.AES)
             return 0;
 
-        long fileSize = Files.size(sourceFile);
+        long fileSize = entry.size();
 
         if (parameters.getEncryption() == Encryption.STANDARD)
             return fileSize + StandardEncoder.SIZE_RND_HEADER;
@@ -125,24 +125,19 @@ public class CentralDirectoryBuilder {
         return fileSize + parameters.getAesStrength().getSaltLength() + AesEngine.AES_AUTH_LENGTH + 2; //2 is password verifier
     }
 
-    private long getUncompressedSize(CentralDirectory.FileHeader fileHeader) throws IOException {
-        if (fileHeader.isDirectory())
-            return 0;
-        return Files.size(sourceFile);
+    private long getUncompressedSize() throws IOException {
+        return entry.size();
     }
 
     private byte[] getExternalFileAttr() throws IOException {
-        if (!Files.exists(sourceFile))
-            return null;
-
         int attr = InternalZipConstants.FILE_MODE_READ_ONLY;
 
-        if (Files.isDirectory(sourceFile))
-            attr = Files.isHidden(sourceFile) ? InternalZipConstants.FOLDER_MODE_HIDDEN : InternalZipConstants.FOLDER_MODE_NONE;
-        if (!Files.isWritable(sourceFile) && Files.isHidden(sourceFile))
+        if (entry.isDirectory())
+            attr = Files.isHidden(entry.getPath()) ? InternalZipConstants.FOLDER_MODE_HIDDEN : InternalZipConstants.FOLDER_MODE_NONE;
+        if (!Files.isWritable(entry.getPath()) && Files.isHidden(entry.getPath()))
             attr = InternalZipConstants.FILE_MODE_READ_ONLY_HIDDEN;
-        if (Files.isWritable(sourceFile))
-            attr = Files.isHidden(sourceFile) ? InternalZipConstants.FILE_MODE_HIDDEN : InternalZipConstants.FILE_MODE_NONE;
+        if (Files.isWritable(entry.getPath()))
+            attr = Files.isHidden(entry.getPath()) ? InternalZipConstants.FILE_MODE_HIDDEN : InternalZipConstants.FILE_MODE_NONE;
 
         return new byte[] { (byte)attr, 0, 0, 0 };
     }

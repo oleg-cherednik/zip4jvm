@@ -22,7 +22,7 @@ import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatZipFile;
 @SuppressWarnings("FieldNamingConvention")
 public class ZipFolderNoSplitTest {
 
-    private static final Path rootDir = Zip4jSuite.rootDir.resolve(ZipFolderNoSplitTest.class.getSimpleName());
+    private static final Path rootDir = Zip4jSuite.generateSubDirNameWithTime(ZipFolderNoSplitTest.class);
     private static final Path zipFile = rootDir.resolve("src.zip");
 
     @BeforeClass

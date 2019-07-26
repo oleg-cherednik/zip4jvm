@@ -22,6 +22,11 @@ public abstract class PathZipEntry extends ZipEntry {
     }
 
     @Override
+    public boolean isDirectory() {
+        return Files.isDirectory(path);
+    }
+
+    @Override
     public String getAbsolutePath() {
         return path.toAbsolutePath().toString();
     }

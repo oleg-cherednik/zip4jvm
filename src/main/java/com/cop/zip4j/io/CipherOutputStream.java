@@ -13,6 +13,7 @@ import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.ZipParameters;
+import com.cop.zip4j.model.entry.PathZipEntry;
 import com.cop.zip4j.utils.InternalZipConstants;
 import lombok.AccessLevel;
 import lombok.NonNull;
@@ -21,8 +22,6 @@ import org.apache.commons.lang.ArrayUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.zip.CRC32;
 
 /**
@@ -43,24 +42,20 @@ public abstract class CipherOutputStream extends OutputStream {
     private LocalFileHeader localFileHeader;
     @NonNull
     private Encoder encoder = Encoder.NULL;
-    protected ZipParameters parameters;
+    @NonNull
+    private Encryption encryption = Encryption.OFF;
+    @NonNull
+    protected CompressionMethod compressionMethod = CompressionMethod.DEFLATE;
 
     protected final CRC32 crc = new CRC32();
     private final byte[] pendingBuffer = new byte[AesEngine.AES_BLOCK_SIZE];
     private int pendingBufferLength;
     protected long totalBytesRead;
 
-    public void putNextEntry(@NonNull Path file, @NonNull ZipParameters parameters) {
+    public void putNextEntry(@NonNull PathZipEntry entry, @NonNull ZipParameters parameters) {
         try {
-            this.parameters = parameters = parameters.toBuilder().build();
-
-            if (Files.isDirectory(file)) {
-                parameters.setEncryption(Encryption.OFF);
-                parameters.setCompressionMethod(CompressionMethod.STORE);
-            }
-
             int currSplitFileCounter = out.getCurrSplitFileCounter();
-            CentralDirectoryBuilder centralDirectoryBuilder = new CentralDirectoryBuilder(file, parameters, zipModel, currSplitFileCounter);
+            CentralDirectoryBuilder centralDirectoryBuilder = new CentralDirectoryBuilder(entry, parameters, zipModel, currSplitFileCounter);
             fileHeader = centralDirectoryBuilder.createFileHeader();
             localFileHeader = centralDirectoryBuilder.createLocalFileHeader(fileHeader);
 
@@ -71,6 +66,9 @@ public abstract class CipherOutputStream extends OutputStream {
             new LocalFileHeaderWriter(localFileHeader, zipModel).write(out);
 
             encoder = parameters.getEncryption().encoder(localFileHeader, parameters);
+            encryption = parameters.getEncryption();
+            compressionMethod = parameters.getCompressionMethod();
+
             out.mark(MARK);
 
             encoder.write(out);
@@ -100,7 +98,7 @@ public abstract class CipherOutputStream extends OutputStream {
         if (len == 0)
             return;
 
-        if (parameters.getEncryption() == Encryption.AES) {
+        if (encryption == Encryption.AES) {
             if (pendingBufferLength != 0) {
                 if (len >= (AesEngine.AES_BLOCK_SIZE - pendingBufferLength)) {
                     System.arraycopy(b, off, pendingBuffer, pendingBufferLength,

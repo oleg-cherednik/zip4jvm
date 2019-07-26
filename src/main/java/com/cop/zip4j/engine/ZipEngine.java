@@ -11,14 +11,9 @@ import com.cop.zip4j.model.ZipParameters;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.function.Predicate;
 
@@ -48,7 +43,7 @@ public class ZipEngine {
 
             entries.stream()
                    .filter(ignoreRoot)
-                   .forEach(entry -> addEntry(entry, parameters, out));
+                   .forEach(entry -> addEntry(entry, parameters.toBuilder().build(), out));
         } catch(IOException e) {
             throw new ZipException(e);
         }
@@ -56,29 +51,22 @@ public class ZipEngine {
 
     private static void addEntry(@NonNull PathZipEntry entry, @NonNull ZipParameters parameters, @NonNull DeflateOutputStream out) {
         try {
-            ZipParameters params = parameters.toBuilder().build();
+            parameters.setCrc32(entry.crc32());
 
             if (entry.isRegularFile()) {
-                params.setCrc32(entry.crc32());
-                params.setCompressionMethod(entry.size() == 0 ? CompressionMethod.STORE : params.getCompressionMethod());
+                parameters.setCompressionMethod(entry.size() == 0 ? CompressionMethod.STORE : parameters.getCompressionMethod());
+            } else if (entry.isDirectory()) {
+                parameters.setEncryption(Encryption.OFF);
+                parameters.setCompressionMethod(CompressionMethod.STORE);
             }
 
-            out.putNextEntry(entry.getPath(), params);
-
-            if (entry.isRegularFile())
-                copyLarge(entry.getPath(), out);
-
+            out.putNextEntry(entry, parameters);
+            entry.write(out);
             out.closeEntry();
         } catch(ZipException e) {
             throw e;
         } catch(Exception e) {
             throw new ZipException(e);
-        }
-    }
-
-    private static long copyLarge(@NonNull Path entry, @NonNull OutputStream out) throws IOException {
-        try (InputStream in = new FileInputStream(entry.toFile())) {
-            return IOUtils.copyLarge(in, out);
         }
     }
 

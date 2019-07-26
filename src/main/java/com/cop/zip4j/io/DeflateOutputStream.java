@@ -4,11 +4,11 @@ import com.cop.zip4j.exception.ZipException;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.ZipParameters;
+import com.cop.zip4j.model.entry.PathZipEntry;
 import com.cop.zip4j.utils.InternalZipConstants;
 import lombok.NonNull;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.zip.Deflater;
 
 /**
@@ -27,8 +27,8 @@ public class DeflateOutputStream extends CipherOutputStream {
     }
 
     @Override
-    public void putNextEntry(Path file, ZipParameters parameters) {
-        super.putNextEntry(file, parameters);
+    public void putNextEntry(PathZipEntry entry, ZipParameters parameters) {
+        super.putNextEntry(entry, parameters);
 
         if (parameters.getCompressionMethod() != CompressionMethod.DEFLATE)
             return;
@@ -64,7 +64,7 @@ public class DeflateOutputStream extends CipherOutputStream {
         crc.update(buf, offs, len);
         totalBytesRead += len;
 
-        if (parameters.getCompressionMethod() != CompressionMethod.DEFLATE)
+        if (compressionMethod != CompressionMethod.DEFLATE)
             super.write(buf, offs, len);
         else {
             deflater.setInput(buf, offs, len);
@@ -76,7 +76,7 @@ public class DeflateOutputStream extends CipherOutputStream {
 
     @Override
     public void closeEntry() throws IOException, ZipException {
-        if (parameters.getCompressionMethod() == CompressionMethod.DEFLATE) {
+        if (compressionMethod == CompressionMethod.DEFLATE) {
             if (!deflater.finished()) {
                 deflater.finish();
 
