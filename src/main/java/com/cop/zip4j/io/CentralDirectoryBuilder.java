@@ -11,7 +11,6 @@ import com.cop.zip4j.model.GeneralPurposeFlag;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
-import com.cop.zip4j.model.ZipParameters;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import com.cop.zip4j.utils.InternalZipConstants;
 import com.cop.zip4j.utils.ZipUtils;
@@ -32,8 +31,6 @@ public class CentralDirectoryBuilder {
 
     private final PathZipEntry entry;
     @NonNull
-    private final ZipParameters parameters;
-    @NonNull
     private final ZipModel zipModel;
     private final int currSplitFileCounter;
 
@@ -43,9 +40,9 @@ public class CentralDirectoryBuilder {
         fileHeader.setVersionMadeBy(CentralDirectory.FileHeader.DEF_VERSION);
         fileHeader.setVersionToExtract(CentralDirectory.FileHeader.DEF_VERSION);
         updateGeneralPurposeFlag(fileHeader.getGeneralPurposeFlag());
-        fileHeader.setCompressionMethod(parameters.getActualCompressionMethod());
+        fileHeader.setCompressionMethod(entry.getCompressionMethod());
         fileHeader.setLastModifiedTime(getLastModFileTime());
-        fileHeader.setCrc32(getCrc32());
+        fileHeader.setCrc32(entry.crc32());
         fileHeader.setCompressedSize(getCompressedSize());
         fileHeader.setUncompressedSize(getUncompressedSize());
         fileHeader.setFileCommentLength(0);
@@ -54,7 +51,7 @@ public class CentralDirectoryBuilder {
         fileHeader.setExternalFileAttributes(getExternalFileAttr());
         fileHeader.setOffsLocalFileHeader(0);
         fileHeader.setZip64ExtendedInfo(Zip64.ExtendedInfo.NULL);
-        fileHeader.setAesExtraDataRecord(getAesExtraDataRecord(parameters.getEncryption()));
+        fileHeader.setAesExtraDataRecord(getAesExtraDataRecord(entry.getEncryption()));
         fileHeader.setFileComment(null);
 
         return fileHeader;
@@ -78,7 +75,7 @@ public class CentralDirectoryBuilder {
 
     @NonNull
     private String getFileName() throws IOException {
-        String fileName = parameters.getRelativeEntryName(entry.getPath());
+        String fileName = entry.getName();
 
         if (StringUtils.isBlank(fileName))
             throw new IOException("fileName is null or empty. unable to create file header");
@@ -90,12 +87,12 @@ public class CentralDirectoryBuilder {
     }
 
     private void updateGeneralPurposeFlag(@NonNull GeneralPurposeFlag generalPurposeFlag) {
-        generalPurposeFlag.setCompressionLevel(parameters.getCompressionLevel());
-//        generalPurposeFlag.setDataDescriptorExists(parameters.getCompressionMethod() == CompressionMethod.DEFLATE);
+        generalPurposeFlag.setCompressionLevel(entry.getCompressionLevel());
+//        generalPurposeFlag.setDataDescriptorExists(entry.getCompressionMethod() == CompressionMethod.DEFLATE);
         generalPurposeFlag.setDataDescriptorExists(true);
         generalPurposeFlag.setUtf8Encoding(zipModel.getCharset() == StandardCharsets.UTF_8);
-        generalPurposeFlag.setEncrypted(parameters.getEncryption() != Encryption.OFF);
-        generalPurposeFlag.setStrongEncryption(parameters.getEncryption() == Encryption.STRONG);
+        generalPurposeFlag.setEncrypted(entry.getEncryption() != Encryption.OFF);
+        generalPurposeFlag.setStrongEncryption(entry.getEncryption() == Encryption.STRONG);
     }
 
     private int getLastModFileTime() throws IOException {
@@ -103,26 +100,20 @@ public class CentralDirectoryBuilder {
         return (int)ZipUtils.javaToDosTime(time);
     }
 
-    private long getCrc32() {
-        return parameters.getEncryption() == Encryption.STANDARD ? parameters.getCrc32() : 0;
-        // TODO this fix breaks encryption - password incorrect
-//        return parameters.getCrc32();
-    }
-
     private long getCompressedSize() throws IOException {
         if (entry.isDirectory())
             return 0;
-        if (parameters.getCompressionMethod() != CompressionMethod.STORE)
+        if (entry.getCompressionMethod() != CompressionMethod.STORE)
             return 0;
-        if (parameters.getEncryption() != Encryption.AES)
+        if (entry.getEncryption() != Encryption.AES)
             return 0;
 
         long fileSize = entry.size();
 
-        if (parameters.getEncryption() == Encryption.STANDARD)
+        if (entry.getEncryption() == Encryption.STANDARD)
             return fileSize + StandardEncoder.SIZE_RND_HEADER;
 
-        return fileSize + parameters.getAesStrength().getSaltLength() + AesEngine.AES_AUTH_LENGTH + 2; //2 is password verifier
+        return fileSize + entry.getAesStrength().getSaltLength() + AesEngine.AES_AUTH_LENGTH + 2; //2 is password verifier
     }
 
     private long getUncompressedSize() throws IOException {
@@ -154,8 +145,8 @@ public class CentralDirectoryBuilder {
         // only MAC is stored and as per the specification, if version number is 2, then MAC is read
         // and CRC is ignored
         aesDataRecord.setVersionNumber((short)2);
-        aesDataRecord.setAesStrength(parameters.getAesStrength());
-        aesDataRecord.setCompressionMethod(parameters.getCompressionMethod());
+        aesDataRecord.setAesStrength(entry.getAesStrength());
+        aesDataRecord.setCompressionMethod(entry.getCompressionMethod());
 
         return aesDataRecord;
     }

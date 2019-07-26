@@ -1,12 +1,11 @@
 package com.cop.zip4j.model;
 
-import com.cop.zip4j.utils.ZipUtils;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.ArrayUtils;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -48,39 +47,9 @@ public class ZipParameters {
         return encryption == Encryption.AES ? CompressionMethod.AES_ENC : compressionMethod;
     }
 
-    /**
-     * Sets the password for the zip file or the file being added<br>
-     * <b>Note</b>: For security reasons, usage of this method is discouraged. Use
-     * setPassword(char[]) instead. As strings are immutable, they cannot be wiped
-     * out from memory explicitly after usage. Therefore, usage of Strings to store
-     * passwords is discouraged. More info here:
-     * http://docs.oracle.com/javase/1.5.0/docs/guide/security/jce/JCERefGuide.html#PBEEx
-     *
-     * @param password
-     */
-    public void setPassword(String password) {
-        if (password != null)
-            setPassword(password.toCharArray());
-    }
-
+    @SuppressWarnings("MethodCanBeVariableArityMethod")
     public void setPassword(char[] password) {
-        this.password = password;
-    }
-
-    public void setRootFolderInZip(String rootFolderInZip) {
-        if (StringUtils.isNotBlank(rootFolderInZip)) {
-
-            if (!ZipUtils.isDirectory(rootFolderInZip))
-                rootFolderInZip += "/";
-
-            rootFolderInZip = rootFolderInZip.replaceAll("\\\\", "/");
-
-//			if (rootFolderInZip.endsWith("/")) {
-//				rootFolderInZip = rootFolderInZip.substring(0, rootFolderInZip.length() - 1);
-//				rootFolderInZip = rootFolderInZip + "\\";
-//			}
-        }
-        this.rootFolderInZip = rootFolderInZip;
+        this.password = ArrayUtils.clone(password);
     }
 
     @NonNull

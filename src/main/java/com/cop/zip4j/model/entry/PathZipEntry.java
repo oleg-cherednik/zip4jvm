@@ -1,5 +1,6 @@
 package com.cop.zip4j.model.entry;
 
+import com.cop.zip4j.model.AesStrength;
 import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.Encryption;
@@ -49,10 +50,18 @@ public abstract class PathZipEntry extends ZipEntry {
 
     public abstract void setCompressionMethod(@NonNull CompressionMethod compressionMethod) throws IOException;
 
+    public CompressionMethod getCompressionMethod() {
+        return encryption == Encryption.AES ? CompressionMethod.AES_ENC : compressionMethod;
+    }
+
     public void setCompressionLevel(@NonNull CompressionLevel compressionLevel) throws IOException {
         this.compressionLevel = CompressionLevel.NORMAL;
     }
 
     public abstract void setEncryption(@NonNull Encryption encryption);
+
+    public AesStrength getAesStrength() {
+        return AesStrength.NONE;
+    }
 
 }

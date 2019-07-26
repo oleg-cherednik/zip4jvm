@@ -61,8 +61,7 @@ public class EntryOutputStream extends OutputStream {
 
     private void putNextEntry(@NonNull PathZipEntry entry, @NonNull ZipParameters parameters) {
         try {
-            CentralDirectoryBuilder centralDirectoryBuilder =
-                    new CentralDirectoryBuilder(entry, parameters, out.zipModel, out.getCurrSplitFileCounter());
+            CentralDirectoryBuilder centralDirectoryBuilder = new CentralDirectoryBuilder(entry, out.zipModel, out.getCurrSplitFileCounter());
 
             fileHeader = centralDirectoryBuilder.createFileHeader();
             localFileHeader = centralDirectoryBuilder.createLocalFileHeader(fileHeader);
@@ -73,8 +72,8 @@ public class EntryOutputStream extends OutputStream {
             fileHeader.setOffsLocalFileHeader(out.getFilePointer());
             new LocalFileHeaderWriter(localFileHeader).write(out);
 
-            encoder = parameters.getEncryption().encoder(localFileHeader, parameters);
-            encryption = parameters.getEncryption();
+            encoder = entry.getEncryption().encoder(localFileHeader, parameters);
+            encryption = entry.getEncryption();
 
             out.mark(MARK);
             encoder.write(out);

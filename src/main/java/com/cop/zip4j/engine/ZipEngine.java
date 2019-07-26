@@ -45,9 +45,7 @@ public class ZipEngine {
         try (SplitOutputStream out = SplitOutputStream.create(zipModel)) {
             entries.stream()
                    .filter(entry -> !entry.isRoot())
-                   .forEach(entry -> {
-                       addEntry(entry, parameters.toBuilder().build(), out);
-                   });
+                   .forEach(entry -> addEntry(entry, parameters.toBuilder().build(), out));
         } catch(IOException e) {
             throw new ZipException(e);
         }
