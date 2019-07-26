@@ -41,6 +41,7 @@ public class ZipEngine {
         };
 
         try (ZipOutputStream out = new ZipOutputStream(SplitOutputStream.create(zipModel), zipModel)) {
+            out.seek(zipModel.getOffsCentralDirectory());
             entries.stream()
                    .filter(ignoreRoot)
                    .forEach(entry -> addEntry(entry, parameters.toBuilder().build(), out));

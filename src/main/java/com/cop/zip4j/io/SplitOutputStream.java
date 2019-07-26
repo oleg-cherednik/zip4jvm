@@ -1,5 +1,6 @@
 package com.cop.zip4j.io;
 
+import com.cop.zip4j.core.writers.ZipModelWriter;
 import com.cop.zip4j.exception.ZipException;
 import com.cop.zip4j.model.AesExtraDataRecord;
 import com.cop.zip4j.model.CentralDirectory;
@@ -34,6 +35,8 @@ import java.util.function.Predicate;
 @SuppressWarnings("SpellCheckingInspection")
 public class SplitOutputStream extends OutputStream {
 
+    @NonNull
+    public final ZipModel zipModel;
     private final long splitLength;
 
     @NonNull
@@ -43,15 +46,16 @@ public class SplitOutputStream extends OutputStream {
     private long bytesWrittenForThisPart;
     private int currSplitFileCounter = -1;
 
-    public SplitOutputStream(@NonNull Path zipFile) throws FileNotFoundException {
-        this(zipFile, ZipModel.NO_SPLIT);
+    public SplitOutputStream(@NonNull Path zipFile, @NonNull ZipModel zipModel) throws FileNotFoundException {
+        this(zipFile, zipModel, ZipModel.NO_SPLIT);
     }
 
-    public SplitOutputStream(@NonNull Path zipFile, long splitLength) throws FileNotFoundException {
+    public SplitOutputStream(@NonNull Path zipFile, @NonNull ZipModel zipModel, long splitLength) throws FileNotFoundException {
         // TODO move to ZipParameters
         if (splitLength >= 0 && splitLength < InternalZipConstants.MIN_SPLIT_LENGTH)
             throw new ZipException("split length less than minimum allowed split length of " + InternalZipConstants.MIN_SPLIT_LENGTH + " Bytes");
 
+        this.zipModel = zipModel;
         this.splitLength = splitLength;
         this.zipFile = zipFile;
         openRandomAccessFile();
@@ -113,6 +117,8 @@ public class SplitOutputStream extends OutputStream {
 
     @Override
     public void close() throws IOException {
+        zipModel.getEndCentralDirectory().setOffs(offs);
+        new ZipModelWriter(zipModel).finalizeZipFile(this, true);
         out.close();
     }
 
@@ -196,7 +202,7 @@ public class SplitOutputStream extends OutputStream {
         if (parent != null)
             Files.createDirectories(parent);
 
-        return new SplitOutputStream(zipFile, zipModel.getSplitLength());
+        return new SplitOutputStream(zipFile, zipModel, zipModel.getSplitLength());
     }
 
     @SuppressWarnings("FieldNamingConvention")

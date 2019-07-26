@@ -49,7 +49,7 @@ public final class ZipMisc {
         ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get().noSplitOnly();
         zipModel.getEndCentralDirectory().setComment(comment);
 
-        try (SplitOutputStream out = new SplitOutputStream(zipModel.getZipFile())) {
+        try (SplitOutputStream out = new SplitOutputStream(zipModel.getZipFile(), zipModel)) {
             out.seek(zipModel.getOffsCentralDirectory());
             new ZipModelWriter(zipModel).finalizeZipFile(out, false);
         } catch(Exception e) {
@@ -102,7 +102,7 @@ public final class ZipMisc {
             throw new ZipException(e);
         }
 
-        try (SplitOutputStream out = new SplitOutputStream(destZipFile)) {
+        try (SplitOutputStream out = new SplitOutputStream(destZipFile, zipModel)) {
             zipModel.convertToSolid(copyAllParts(out, zipModel));
             new ZipModelWriter(zipModel).finalizeZipFile(out, false);
         } catch(ZipException e) {
