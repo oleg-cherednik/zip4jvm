@@ -49,8 +49,8 @@ public class EntryOutputStream extends OutputStream {
     public static EntryOutputStream create(@NonNull PathZipEntry entry, @NonNull ZipParameters parameters, @NonNull SplitOutputStream out) {
         EntryOutputStream stream;
 
-        if (parameters.getCompressionMethod() == CompressionMethod.DEFLATE)
-            stream = new DeflateEntryOutputStream(out, parameters.getCompressionLevel());
+        if (entry.getCompressionMethod() == CompressionMethod.DEFLATE)
+            stream = new DeflateEntryOutputStream(out, entry.getCompressionLevel());
         else
             stream = new EntryOutputStream(out);
 

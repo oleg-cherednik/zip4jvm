@@ -1,9 +1,14 @@
 package com.cop.zip4j.model.entry;
 
+import com.cop.zip4j.model.CompressionLevel;
+import com.cop.zip4j.model.CompressionMethod;
+import com.cop.zip4j.model.Encryption;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -18,6 +23,10 @@ public abstract class PathZipEntry extends ZipEntry {
     protected final Path path;
     @Setter
     protected String name;
+
+    protected CompressionMethod compressionMethod = CompressionMethod.STORE;
+    protected CompressionLevel compressionLevel = CompressionLevel.NORMAL;
+    protected Encryption encryption = Encryption.OFF;
 
     @Override
     public boolean isRegularFile() {
@@ -37,5 +46,13 @@ public abstract class PathZipEntry extends ZipEntry {
     public boolean isRoot() {
         return "/".equals(name) || "\\".equals(name);
     }
+
+    public abstract void setCompressionMethod(@NonNull CompressionMethod compressionMethod) throws IOException;
+
+    public void setCompressionLevel(@NonNull CompressionLevel compressionLevel) throws IOException {
+        this.compressionLevel = CompressionLevel.NORMAL;
+    }
+
+    public abstract void setEncryption(@NonNull Encryption encryption);
 
 }

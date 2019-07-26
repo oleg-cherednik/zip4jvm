@@ -32,12 +32,22 @@ public class ZipEngine {
         if (entries.isEmpty())
             return;
 
-        entries.forEach(entry -> entry.setName(parameters.getRelativeEntryName(entry.getPath())));
+        entries.forEach(entry -> {
+            try {
+                entry.setName(parameters.getRelativeEntryName(entry.getPath()));
+                entry.setCompressionMethod(parameters.getCompressionMethod());
+                entry.setEncryption(parameters.getEncryption());
+            } catch(IOException e) {
+                throw new ZipException(e);
+            }
+        });
 
         try (SplitOutputStream out = SplitOutputStream.create(zipModel)) {
             entries.stream()
                    .filter(entry -> !entry.isRoot())
-                   .forEach(entry -> addEntry(entry, parameters.toBuilder().build(), out));
+                   .forEach(entry -> {
+                       addEntry(entry, parameters.toBuilder().build(), out);
+                   });
         } catch(IOException e) {
             throw new ZipException(e);
         }
@@ -46,13 +56,8 @@ public class ZipEngine {
     private static void addEntry(@NonNull PathZipEntry entry, @NonNull ZipParameters parameters, @NonNull SplitOutputStream out) {
         try {
             parameters.setCrc32(entry.crc32());
-
-            if (entry.isRegularFile()) {
-                parameters.setCompressionMethod(entry.size() == 0 ? CompressionMethod.STORE : parameters.getCompressionMethod());
-            } else if (entry.isDirectory()) {
-                parameters.setEncryption(Encryption.OFF);
-                parameters.setCompressionMethod(CompressionMethod.STORE);
-            }
+            entry.setCompressionMethod(parameters.getCompressionMethod());
+            entry.setEncryption(parameters.getEncryption());
 
             writeEntry(entry, parameters, out);
         } catch(ZipException e) {

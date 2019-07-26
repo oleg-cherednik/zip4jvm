@@ -1,5 +1,7 @@
 package com.cop.zip4j.model.entry;
 
+import com.cop.zip4j.model.CompressionMethod;
+import com.cop.zip4j.model.Encryption;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.io.FileUtils;
@@ -38,6 +40,16 @@ public class RegularFileZipEntry extends PathZipEntry {
         try (InputStream in = new FileInputStream(path.toFile())) {
             return IOUtils.copyLarge(in, out);
         }
+    }
+
+    @Override
+    public void setCompressionMethod(@NonNull CompressionMethod compressionMethod) throws IOException {
+        this.compressionMethod = size() == 0 ? CompressionMethod.STORE : compressionMethod;
+    }
+
+    @Override
+    public void setEncryption(@NonNull Encryption encryption) {
+        this.encryption = encryption;
     }
 
 }
