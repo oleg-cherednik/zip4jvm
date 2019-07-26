@@ -28,6 +28,9 @@ public abstract class PathZipEntry extends ZipEntry {
     protected CompressionMethod compressionMethod = CompressionMethod.STORE;
     protected CompressionLevel compressionLevel = CompressionLevel.NORMAL;
     protected Encryption encryption = Encryption.OFF;
+
+    @Setter
+    protected AesStrength aesStrength = AesStrength.NONE;
     @Setter
     protected char[] password;
 
@@ -63,7 +66,7 @@ public abstract class PathZipEntry extends ZipEntry {
     public abstract void setEncryption(@NonNull Encryption encryption);
 
     public AesStrength getAesStrength() {
-        return AesStrength.NONE;
+        return encryption == Encryption.AES ? aesStrength : AesStrength.NONE;
     }
 
 }

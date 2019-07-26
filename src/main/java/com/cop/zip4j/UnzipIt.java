@@ -5,7 +5,7 @@ import lombok.NonNull;
 import com.cop.zip4j.engine.UnzipEngine;
 import com.cop.zip4j.exception.ZipException;
 import com.cop.zip4j.model.ZipModel;
-import com.cop.zip4j.utils.CreateZipModelSup;
+import com.cop.zip4j.utils.CreateZipModel;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,7 +33,7 @@ public class UnzipIt {
         checkZipFile(zipFile);
         checkOutputFolder(destDir);
 
-        ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get();
+        ZipModel zipModel = new CreateZipModel(zipFile, charset).get();
         new UnzipEngine(zipModel, password).extractEntries(destDir, zipModel.getEntryNames());
     }
 
@@ -45,12 +45,12 @@ public class UnzipIt {
         checkZipFile(zipFile);
         checkOutputFolder(destDir);
 
-        ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get();
+        ZipModel zipModel = new CreateZipModel(zipFile, charset).get();
         new UnzipEngine(zipModel, password).extractEntries(destDir, entries);
     }
 
     public InputStream extract(@NonNull String entryName) throws IOException {
-        ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get();
+        ZipModel zipModel = new CreateZipModel(zipFile, charset).get();
         return new UnzipEngine(zipModel, password).extractEntry(entryName);
     }
 

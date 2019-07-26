@@ -19,8 +19,9 @@ import com.cop.zip4j.engine.ZipEngine;
 import com.cop.zip4j.exception.ZipException;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.ZipParameters;
+import com.cop.zip4j.model.entry.PathZipEntry;
 import com.cop.zip4j.model.entry.ZipEntry;
-import com.cop.zip4j.utils.CreateZipModelSup;
+import com.cop.zip4j.utils.CreateZipModel;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.Builder;
 import lombok.NonNull;
@@ -47,65 +48,55 @@ public final class ZipIt {
     @Builder.Default
     private final Charset charset = Charset.defaultCharset();
 
+    public void add(@NonNull Path path, @NonNull ZipParameters parameters) throws IOException {
+        add(Collections.singleton(path), parameters);
+    }
+
     public void add(@NonNull Collection<Path> paths, @NonNull ZipParameters parameters) throws IOException {
-        if (paths.stream().anyMatch(path -> !Files.isDirectory(path) && !Files.isRegularFile(path)))
-            throw new ZipException("Cannot add neither directory nor regular file to zip");
+        if (paths.size() == 1) {
+            Path path = paths.iterator().next();
 
-        paths = getRegularFilesAndDirectoryEntries(paths);
-        addRegularFiles(paths, parameters);
-    }
+            if (Files.isDirectory(path) && parameters.getDefaultFolderPath() == null)
+                parameters.setDefaultFolderPath(path);
 
-    public void add(@NonNull Path path, @NonNull ZipParameters parameters) {
-        if (Files.isDirectory(path))
-            addDirectory(path, parameters);
-        else if (Files.isRegularFile(path))
-            addRegularFiles(Collections.singleton(path), parameters);
-        else
-            throw new ZipException("Cannot add neither directory nor regular file to zip: " + path);
-    }
+        }
 
-    // TODO addDirectory and addRegularFile are same
-    private void addDirectory(Path dir, ZipParameters parameters) {
-        assert Files.isDirectory(dir);
-
-        if (Files.isDirectory(dir) && parameters.getDefaultFolderPath() == null)
-            parameters.setDefaultFolderPath(dir);
-
-        ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get().noSplitOnly();
+        ZipModel zipModel = new CreateZipModel(zipFile, charset).get().noSplitOnly();
         zipModel.setSplitLength(parameters.getSplitLength());
         zipModel.getEndCentralDirectory().setComment(ZipUtils.normalizeComment.apply(parameters.getComment()));
 
         if (parameters.isZip64())
             zipModel.zip64();
 
-        new ZipEngine(zipModel).addEntries(getDirectoryEntries(dir).stream()
-                                                                   .map(ZipEntry::of)
-                                                                   .collect(Collectors.toList()), parameters);
-    }
+        List<PathZipEntry> entries = createEntries(paths);
 
-    private void addRegularFiles(@NonNull Collection<Path> files, @NonNull ZipParameters parameters) {
-        assert files.stream().allMatch(file -> Files.isRegularFile(file));
+        entries.forEach(entry -> {
+            try {
+                entry.setName(parameters.getRelativeEntryName(entry.getPath()));
+                entry.setCompressionMethod(parameters.getCompressionMethod());
+                entry.setEncryption(parameters.getEncryption());
+                entry.setAesStrength(parameters.getAesStrength());
+                entry.setPassword(parameters.getPassword());
+            } catch(IOException e) {
+                throw new ZipException(e);
+            }
+        });
 
-        ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get().noSplitOnly();
-        zipModel.setSplitLength(parameters.getSplitLength());
-        zipModel.getEndCentralDirectory().setComment(ZipUtils.normalizeComment.apply(parameters.getComment()));
-
-        new ZipEngine(zipModel).addEntries(files.stream()
-                                                .map(ZipEntry::of)
-                                                .collect(Collectors.toList()), parameters);
+        new ZipEngine(zipModel).addEntries(entries);
     }
 
     @NonNull
-    private static List<Path> getRegularFilesAndDirectoryEntries(@NonNull Collection<Path> paths) {
+    private static List<PathZipEntry> createEntries(@NonNull Collection<Path> paths) {
         return paths.stream()
                     .filter(path -> Files.isRegularFile(path) || Files.isDirectory(path))
                     .map(path -> Files.isDirectory(path) ? getDirectoryEntries(path) : Collections.singleton(path))
                     .flatMap(Collection::stream)
+                    .map(ZipEntry::of)
                     .collect(Collectors.toList());
     }
 
     @NonNull
-    public static List<Path> getDirectoryEntries(@NonNull Path dir) {
+    private static List<Path> getDirectoryEntries(@NonNull Path dir) {
         assert Files.isDirectory(dir);
 
         try {

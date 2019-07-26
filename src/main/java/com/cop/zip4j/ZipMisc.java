@@ -7,7 +7,7 @@ import com.cop.zip4j.exception.ZipException;
 import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.ZipModel;
-import com.cop.zip4j.utils.CreateZipModelSup;
+import com.cop.zip4j.utils.CreateZipModel;
 import com.cop.zip4j.utils.RemoveEntryFunc;
 import com.cop.zip4j.utils.ZipUtils;
 import org.apache.commons.io.IOUtils;
@@ -46,7 +46,7 @@ public final class ZipMisc {
         comment = ZipUtils.normalizeComment.apply(comment);
         UnzipIt.checkZipFile(zipFile);
 
-        ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get().noSplitOnly();
+        ZipModel zipModel = new CreateZipModel(zipFile, charset).get().noSplitOnly();
         zipModel.getEndCentralDirectory().setComment(comment);
 
         try (SplitOutputStream out = new SplitOutputStream(zipModel.getZipFile(), zipModel)) {
@@ -59,12 +59,12 @@ public final class ZipMisc {
 
     public String getComment() throws ZipException {
         UnzipIt.checkZipFile(zipFile);
-        return new CreateZipModelSup(zipFile, charset).get().getEndCentralDirectory().getComment();
+        return new CreateZipModel(zipFile, charset).get().getEndCentralDirectory().getComment();
     }
 
     public boolean isEncrypted() {
         UnzipIt.checkZipFile(zipFile);
-        ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get();
+        ZipModel zipModel = new CreateZipModel(zipFile, charset).get();
 
         return zipModel.getFileHeaders().stream()
                        .anyMatch(CentralDirectory.FileHeader::isEncrypted);
@@ -72,12 +72,12 @@ public final class ZipMisc {
 
     public List<String> getEntryNames() throws ZipException {
         UnzipIt.checkZipFile(zipFile);
-        return new CreateZipModelSup(zipFile, charset).get().getEntryNames();
+        return new CreateZipModel(zipFile, charset).get().getEntryNames();
     }
 
     public List<Path> getFiles() throws ZipException {
         UnzipIt.checkZipFile(zipFile);
-        ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get();
+        ZipModel zipModel = new CreateZipModel(zipFile, charset).get();
 
         return IntStream.rangeClosed(0, zipModel.getEndCentralDirectory().getSplitParts())
                         .mapToObj(i -> i == 0 ? zipModel.getZipFile() : ZipModel.getSplitFilePath(zipFile, i))
@@ -86,11 +86,11 @@ public final class ZipMisc {
 
     public boolean isSplit() throws ZipException {
         UnzipIt.checkZipFile(zipFile);
-        return new CreateZipModelSup(zipFile, charset).get().isSplitArchive();
+        return new CreateZipModel(zipFile, charset).get().isSplitArchive();
     }
 
     public void merge(@NonNull Path destZipFile) {
-        ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get();
+        ZipModel zipModel = new CreateZipModel(zipFile, charset).get();
 
         // TODO probably if not split archive, just copy single zip file
         if (!zipModel.isSplitArchive())
@@ -132,7 +132,7 @@ public final class ZipMisc {
     public void removeEntries(@NonNull Collection<String> entries) {
         UnzipIt.checkZipFile(zipFile);
 
-        ZipModel zipModel = new CreateZipModelSup(zipFile, charset).get().noSplitOnly();
+        ZipModel zipModel = new CreateZipModel(zipFile, charset).get().noSplitOnly();
         new RemoveEntryFunc(zipModel).accept(entries);
     }
 

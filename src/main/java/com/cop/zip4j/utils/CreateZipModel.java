@@ -1,10 +1,10 @@
 package com.cop.zip4j.utils;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import com.cop.zip4j.core.readers.ZipModelReader;
 import com.cop.zip4j.exception.ZipException;
 import com.cop.zip4j.model.ZipModel;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -17,7 +17,8 @@ import java.util.function.Supplier;
  * @since 20.03.2019
  */
 @RequiredArgsConstructor
-public final class CreateZipModelSup implements Supplier<ZipModel> {
+public final class CreateZipModel implements Supplier<ZipModel> {
+
     @NonNull
     private final Path zipFile;
     @NonNull
@@ -27,10 +28,7 @@ public final class CreateZipModelSup implements Supplier<ZipModel> {
     @Override
     public ZipModel get() {
         try {
-            if (Files.exists(zipFile))
-                return new ZipModelReader(zipFile, charset).read();
-
-            return new ZipModel(zipFile, charset);
+            return Files.exists(zipFile) ? new ZipModelReader(zipFile, charset).read() : new ZipModel(zipFile, charset);
         } catch(IOException e) {
             throw new ZipException(e);
         }
