@@ -39,20 +39,23 @@ public class DeflateOutputStream extends CipherOutputStream {
 
     private void deflate() throws IOException {
         int len = deflater.deflate(buf, 0, buf.length);
-        if (len > 0) {
-            if (deflater.finished()) {
-                if (len == 4)
-                    return;
-                if (len < 4)
-                    return;
-                len -= 4;
-            }
-            if (!firstBytesRead) {
-                super.write(buf, 2, len - 2);
-                firstBytesRead = true;
-            } else {
-                super.write(buf, 0, len);
-            }
+
+        if (len <= 0)
+            return;
+
+        if (deflater.finished()) {
+            if (len == 4)
+                return;
+            if (len < 4)
+                return;
+            len -= 4;
+        }
+
+        if (firstBytesRead)
+            super.write(buf, 0, len);
+        else {
+            super.write(buf, 2, len - 2);
+            firstBytesRead = true;
         }
     }
 

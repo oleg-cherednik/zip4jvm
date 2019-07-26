@@ -12,7 +12,6 @@ import org.apache.commons.lang.ArrayUtils;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,7 +31,6 @@ public class ZipModel {
     private final Path zipFile;
     @NonNull
     private final Charset charset;
-    private final List<LocalFileHeader> localFileHeaders = new ArrayList<>();
     @NonNull
     private CentralDirectory centralDirectory = new CentralDirectory();
     @NonNull
@@ -40,10 +38,6 @@ public class ZipModel {
     @NonNull
     private Zip64 zip64 = Zip64.NULL;
     private long splitLength = NO_SPLIT;
-
-    public void addLocalFileHeader(@NonNull LocalFileHeader localFileHeader) {
-        localFileHeaders.add(localFileHeader);
-    }
 
     public void setEndCentralDirectory(@NonNull EndCentralDirectory endCentralDirectory) {
         this.endCentralDirectory = endCentralDirectory;
@@ -118,11 +112,7 @@ public class ZipModel {
     }
 
     public long getOffsCentralDirectory() {
-        if (isZip64())
-            return zip64.getEndCentralDirectory().getOffs();
-        if (endCentralDirectory != null)
-            return endCentralDirectory.getOffs();
-        return 0;
+        return isZip64() ? zip64.getEndCentralDirectory().getOffs() : endCentralDirectory.getOffs();
     }
 
     public static Path getSplitFilePath(Path zipFile, int count) {

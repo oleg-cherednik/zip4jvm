@@ -8,9 +8,9 @@ import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.ZipParameters;
+import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 
@@ -18,9 +18,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.function.Predicate;
 
 /**
  * @author Oleg Cherednik
@@ -32,43 +32,46 @@ public class ZipEngine {
     @NonNull
     private final ZipModel zipModel;
 
-    public void addEntries(@NonNull Collection<Path> entries, @NonNull ZipParameters parameters) {
+    public void addEntries(@NonNull Collection<PathZipEntry> entries, @NonNull ZipParameters parameters) {
+        checkParameters(parameters);
+
         if (entries.isEmpty())
             return;
 
-        checkParameters(parameters);
+        Predicate<PathZipEntry> ignoreRoot = entry -> {
+            String entryName = parameters.getRelativeEntryName(entry.getPath());
+            return !"/".equals(entryName) && !"\\".equals(entryName);
+        };
 
         try (DeflateOutputStream out = new DeflateOutputStream(SplitOutputStream.create(zipModel), zipModel)) {
             out.seek(zipModel.getOffsCentralDirectory());
 
-            for (Path entry : entries) {
-                if (entry == null)
-                    continue;
+            entries.stream()
+                   .filter(ignoreRoot)
+                   .forEach(entry -> addEntry(entry, parameters, out));
+        } catch(IOException e) {
+            throw new ZipException(e);
+        }
+    }
 
-                String entryName = parameters.getRelativeEntryName(entry);
+    private static void addEntry(@NonNull PathZipEntry entry, @NonNull ZipParameters parameters, @NonNull DeflateOutputStream out) {
+        try {
+            ZipParameters params = parameters.toBuilder().build();
 
-                // TODO ignore root (it should be done prior)
-                // TODO here could be empty directory ignored (also prior)
-                if ("/".equals(entryName) || "\\".equals(entryName))
-                    continue;
-
-                ZipParameters params = parameters.toBuilder().build();
-
-                if (Files.isRegularFile(entry)) {
-                    params.setCrc32(FileUtils.checksumCRC32(entry.toFile()));
-                    params.setCompressionMethod(Files.size(entry) == 0 ? CompressionMethod.STORE : params.getCompressionMethod());
-                }
-
-                out.putNextEntry(entry, params);
-
-                if (Files.isRegularFile(entry))
-                    copyLarge(entry, out);
-
-                out.closeEntry();
+            if (entry.isRegularFile()) {
+                params.setCrc32(entry.crc32());
+                params.setCompressionMethod(entry.size() == 0 ? CompressionMethod.STORE : params.getCompressionMethod());
             }
 
-            out.finish();
-        } catch(IOException e) {
+            out.putNextEntry(entry.getPath(), params);
+
+            if (entry.isRegularFile())
+                copyLarge(entry.getPath(), out);
+
+            out.closeEntry();
+        } catch(ZipException e) {
+            throw e;
+        } catch(Exception e) {
             throw new ZipException(e);
         }
     }

@@ -8,7 +8,6 @@ import com.cop.zip4j.model.ZipParameters;
 import org.apache.commons.lang.StringUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -41,7 +40,7 @@ public class ModifyCommentTest {
     }
 
     @Test
-    @Ignore("it's not working under gradle build")
+//    @Ignore("it's not working under gradle build")
     public void shouldCreateNewZipWithComment() throws IOException {
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
 
@@ -59,7 +58,7 @@ public class ModifyCommentTest {
     }
 
     @Test(dependsOnMethods = "shouldCreateNewZipWithComment")
-    @Ignore("it's not working under gradle build")
+//    @Ignore("it's not working under gradle build")
     public void shouldAddCommentToExistedNoSplitZip() {
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
         assertThat(misc.getComment()).isEqualTo("Oleg Cherednik - Олег Чередник");
@@ -69,7 +68,7 @@ public class ModifyCommentTest {
     }
 
     @Test(dependsOnMethods = "shouldAddCommentToExistedNoSplitZip")
-    @Ignore("it's not working under gradle build")
+//    @Ignore("it's not working under gradle build")
     public void shouldClearCommentForExistedZip() {
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
         assertThat(misc.getComment()).isNotBlank();
@@ -79,7 +78,7 @@ public class ModifyCommentTest {
     }
 
     @Test(dependsOnMethods = "shouldClearCommentForExistedZip")
-    @Ignore("it's not working under gradle build")
+//    @Ignore("it's not working under gradle build")
     public void shouldAddCommentToEncryptedZip() throws ZipException, IOException {
         Files.deleteIfExists(zipFile);
         Files.copy(Zip4jSuite.noSplitPkwareZip, zipFile);
@@ -93,7 +92,7 @@ public class ModifyCommentTest {
     }
 
     @Test
-    @Ignore("it's not working under gradle build")
+//    @Ignore("it's not working under gradle build")
     public void shouldSetCommentWithMaxLength() throws IOException {
         Path zipFile = rootDir.resolve("src_" + System.currentTimeMillis() + ".zip");
         Files.copy(Zip4jSuite.noSplitZip, zipFile);
@@ -106,7 +105,7 @@ public class ModifyCommentTest {
     }
 
     @Test
-    @Ignore("it's not working under gradle build")
+//    @Ignore("it's not working under gradle build")
     public void shouldThrowExceptionWhenCommentIsOverMaxLength() throws IOException {
         Path zipFile = Zip4jSuite.copy(rootDir, Zip4jSuite.noSplitZip);
 

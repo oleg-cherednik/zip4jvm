@@ -19,6 +19,7 @@ import com.cop.zip4j.engine.ZipEngine;
 import com.cop.zip4j.exception.ZipException;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.ZipParameters;
+import com.cop.zip4j.model.entry.ZipEntry;
 import com.cop.zip4j.utils.CreateZipModelSup;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.Builder;
@@ -77,7 +78,9 @@ public final class ZipIt {
         if (parameters.isZip64())
             zipModel.zip64();
 
-        new ZipEngine(zipModel).addEntries(getDirectoryEntries(dir), parameters);
+        new ZipEngine(zipModel).addEntries(getDirectoryEntries(dir).stream()
+                                                                   .map(ZipEntry::of)
+                                                                   .collect(Collectors.toList()), parameters);
     }
 
     private void addRegularFiles(@NonNull Collection<Path> files, @NonNull ZipParameters parameters) {
@@ -87,7 +90,9 @@ public final class ZipIt {
         zipModel.setSplitLength(parameters.getSplitLength());
         zipModel.getEndCentralDirectory().setComment(ZipUtils.normalizeComment.apply(parameters.getComment()));
 
-        new ZipEngine(zipModel).addEntries(files, parameters);
+        new ZipEngine(zipModel).addEntries(files.stream()
+                                                .map(ZipEntry::of)
+                                                .collect(Collectors.toList()), parameters);
     }
 
     @NonNull

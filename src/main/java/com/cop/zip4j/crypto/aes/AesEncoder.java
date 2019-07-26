@@ -7,7 +7,6 @@ import com.cop.zip4j.crypto.aes.pbkdf2.PBKDF2Parameters;
 import com.cop.zip4j.exception.ZipException;
 import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.model.AesStrength;
-import com.cop.zip4j.utils.InternalZipConstants;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.NonNull;
 
@@ -126,7 +125,7 @@ public class AesEncoder implements Encoder {
         out.writeBytes(derivedPasswordVerifier);
     }
 
-    private static byte[] generateSalt(int size) throws ZipException {
+    private static byte[] generateSalt(int size) {
 
         if (size != 8 && size != 16) {
             throw new ZipException("invalid salt size, cannot generate salt");
@@ -180,6 +179,11 @@ public class AesEncoder implements Encoder {
 
     public int getPasswordVeriifierLength() {
         return PASSWORD_VERIFIER_LENGTH;
+    }
+
+    @Override
+    public void closeEntry(SplitOutputStream out) throws IOException {
+        out.writeBytes(getFinalMac());
     }
 
 

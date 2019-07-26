@@ -1,6 +1,5 @@
 package com.cop.zip4j.crypto;
 
-import com.cop.zip4j.exception.ZipException;
 import com.cop.zip4j.io.SplitOutputStream;
 import lombok.NonNull;
 
@@ -10,7 +9,6 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 22.03.2019
  */
-@SuppressWarnings("MethodCanBeVariableArityMethod")
 public interface Encoder {
 
     // TODO should nobe here
@@ -22,14 +20,18 @@ public interface Encoder {
         @Override
         public void write(@NonNull SplitOutputStream out) throws IOException {
         }
-    };
 
-    default void encode(byte[] buf) throws ZipException {
-        encode(buf, 0, buf.length);
-    }
+        @Override
+        public String toString() {
+            return "<null>";
+        }
+    };
 
     void encode(@NonNull byte[] buf, int offs, int len);
 
     void write(@NonNull SplitOutputStream out) throws IOException;
+
+    default void closeEntry(SplitOutputStream out) throws IOException {
+    }
 
 }

@@ -4,7 +4,6 @@ import com.cop.zip4j.core.writers.DataDescriptorWriter;
 import com.cop.zip4j.core.writers.LocalFileHeaderWriter;
 import com.cop.zip4j.core.writers.ZipModelWriter;
 import com.cop.zip4j.crypto.Encoder;
-import com.cop.zip4j.crypto.aes.AesEncoder;
 import com.cop.zip4j.crypto.aes.AesEngine;
 import com.cop.zip4j.exception.ZipException;
 import com.cop.zip4j.model.CentralDirectory;
@@ -117,7 +116,8 @@ public abstract class CipherOutputStream extends OutputStream {
                     return;
                 }
             }
-            if (len != 0 && len % 16 != 0) {
+
+            if (len % 16 != 0) {
                 System.arraycopy(b, (len + off) - (len % 16), pendingBuffer, 0, len % 16);
                 pendingBufferLength = len % 16;
                 len -= pendingBufferLength;
@@ -139,12 +139,7 @@ public abstract class CipherOutputStream extends OutputStream {
             pendingBufferLength = 0;
         }
 
-        if (parameters.getEncryption() == Encryption.AES) {
-            if (encoder instanceof AesEncoder) {
-                out.writeBytes(((AesEncoder)encoder).getFinalMac());
-            } else
-                throw new ZipException("invalid encryption for AES encrypted file");
-        }
+        encoder.closeEntry(out);
 
         fileHeader.setCrc32(fileHeader.getEncryption() == Encryption.AES ? 0 : crc.getValue());
         fileHeader.setCompressedSize(out.getWrittenBytesAmount(MARK));
@@ -172,14 +167,10 @@ public abstract class CipherOutputStream extends OutputStream {
         new DataDescriptorWriter(dataDescriptor).write(out);
     }
 
-    public void finish() throws IOException {
-        zipModel.getEndCentralDirectory().setOffs(out.getOffs());
-        new ZipModelWriter(zipModel).finalizeZipFile(out, true);
-    }
-
     @Override
     public void close() throws IOException {
-        finish();
+        zipModel.getEndCentralDirectory().setOffs(out.getOffs());
+        new ZipModelWriter(zipModel).finalizeZipFile(out, true);
         out.close();
     }
 
