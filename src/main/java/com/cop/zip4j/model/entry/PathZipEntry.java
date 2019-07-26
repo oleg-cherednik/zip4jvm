@@ -2,6 +2,7 @@ package com.cop.zip4j.model.entry;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,6 +16,8 @@ import java.nio.file.Path;
 public abstract class PathZipEntry extends ZipEntry {
 
     protected final Path path;
+    @Setter
+    protected String name;
 
     @Override
     public boolean isRegularFile() {
@@ -29,6 +32,10 @@ public abstract class PathZipEntry extends ZipEntry {
     @Override
     public String getAbsolutePath() {
         return path.toAbsolutePath().toString();
+    }
+
+    public boolean isRoot() {
+        return "/".equals(name) || "\\".equals(name);
     }
 
 }

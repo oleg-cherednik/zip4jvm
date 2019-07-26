@@ -202,7 +202,9 @@ public class SplitOutputStream extends OutputStream {
         if (parent != null)
             Files.createDirectories(parent);
 
-        return new SplitOutputStream(zipFile, zipModel, zipModel.getSplitLength());
+        SplitOutputStream out = new SplitOutputStream(zipFile, zipModel, zipModel.getSplitLength());
+        out.seek(zipModel.getOffsCentralDirectory());
+        return out;
     }
 
     @SuppressWarnings("FieldNamingConvention")

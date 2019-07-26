@@ -15,7 +15,6 @@ import org.apache.commons.lang.ArrayUtils;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.function.Predicate;
 
 /**
  * @author Oleg Cherednik
@@ -33,15 +32,11 @@ public class ZipEngine {
         if (entries.isEmpty())
             return;
 
-        Predicate<PathZipEntry> ignoreRoot = entry -> {
-            String entryName = parameters.getRelativeEntryName(entry.getPath());
-            return !"/".equals(entryName) && !"\\".equals(entryName);
-        };
+        entries.forEach(entry -> entry.setName(parameters.getRelativeEntryName(entry.getPath())));
 
         try (SplitOutputStream out = SplitOutputStream.create(zipModel)) {
-            out.seek(zipModel.getOffsCentralDirectory());
             entries.stream()
-                   .filter(ignoreRoot)
+                   .filter(entry -> !entry.isRoot())
                    .forEach(entry -> addEntry(entry, parameters.toBuilder().build(), out));
         } catch(IOException e) {
             throw new ZipException(e);
@@ -59,13 +54,18 @@ public class ZipEngine {
                 parameters.setCompressionMethod(CompressionMethod.STORE);
             }
 
-            try (EntryOutputStream delegate = EntryOutputStream.create(entry, parameters, out)) {
-                entry.write(delegate);
-            }
+            writeEntry(entry, parameters, out);
         } catch(ZipException e) {
             throw e;
         } catch(Exception e) {
             throw new ZipException(e);
+        }
+    }
+
+    private static void writeEntry(@NonNull PathZipEntry entry, @NonNull ZipParameters parameters, @NonNull SplitOutputStream out)
+            throws IOException {
+        try (EntryOutputStream delegate = EntryOutputStream.create(entry, parameters, out)) {
+            entry.write(delegate);
         }
     }
 
