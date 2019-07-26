@@ -182,7 +182,7 @@ public class AesEncoder implements Encoder {
     }
 
     @Override
-    public void closeEntry(SplitOutputStream out) throws IOException {
+    public void close(SplitOutputStream out) throws IOException {
         out.writeBytes(getFinalMac());
     }
 

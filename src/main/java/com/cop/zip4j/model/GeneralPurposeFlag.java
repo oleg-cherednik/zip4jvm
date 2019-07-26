@@ -32,7 +32,7 @@ public final class GeneralPurposeFlag {
      *   1      0    Fast (-ef) compression option was used.
      *   1      1    Super Fast (-es) compression option was used.
      *
-     * Bit 3: If this bit is set, the fields crc-32, compressed
+     * Bit 3: If this bit is set, the fields crc32-32, compressed
      *        size and uncompressed size are set to zero in the
      *        local header.  The correct values are put in the
      *        data descriptor immediately following the compressed

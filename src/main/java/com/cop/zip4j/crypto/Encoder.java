@@ -31,7 +31,7 @@ public interface Encoder {
 
     void write(@NonNull SplitOutputStream out) throws IOException;
 
-    default void closeEntry(SplitOutputStream out) throws IOException {
+    default void close(SplitOutputStream out) throws IOException {
     }
 
 }

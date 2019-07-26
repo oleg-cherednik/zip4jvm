@@ -35,9 +35,9 @@ public final class StandardEncoder implements Encoder {
         return header;
     }
 
-//    private void init(int crc) {
-//        header[SIZE_RND_HEADER - 1] = (byte)(crc >>> 24);
-//        header[SIZE_RND_HEADER - 2] = (byte)(crc >>> 16);
+//    private void init(int crc32) {
+//        header[SIZE_RND_HEADER - 1] = (byte)(crc32 >>> 24);
+//        header[SIZE_RND_HEADER - 2] = (byte)(crc32 >>> 16);
 //        encode(header);
 //    }
 

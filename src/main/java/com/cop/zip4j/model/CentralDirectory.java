@@ -87,7 +87,7 @@ public class CentralDirectory {
         // size:2 - last mod file time
         // size:2 - last mod file date
         private int lastModifiedTime;
-        // size:4 - crc-32
+        // size:4 - crc32-32
         private long crc32;
         @Deprecated
         private byte[] crcBuff;

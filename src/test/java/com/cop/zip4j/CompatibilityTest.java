@@ -75,7 +75,7 @@ public class CompatibilityTest {
 //                    }
 //                }
 //
-//                in.closeEntry();
+//                in.close();
 //            }
 //        }
 //

@@ -3,9 +3,8 @@ package com.cop.zip4j.engine;
 import com.cop.zip4j.exception.ZipException;
 import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.io.ZipOutputStream;
-import com.cop.zip4j.io.delegate.CommonEntryOutputDelegate;
-import com.cop.zip4j.io.delegate.DeflateEntryOutputDelegate;
-import com.cop.zip4j.io.delegate.EntryOutputDelegate;
+import com.cop.zip4j.io.entry.CommonEntryOutputDelegate;
+import com.cop.zip4j.io.entry.DeflateEntryOutputDelegate;
 import com.cop.zip4j.model.AesStrength;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.Encryption;
@@ -61,7 +60,7 @@ public class ZipEngine {
                 parameters.setCompressionMethod(CompressionMethod.STORE);
             }
 
-            try (EntryOutputDelegate delegate = createOutputDelegate(parameters, out)) {
+            try (CommonEntryOutputDelegate delegate = createOutputDelegate(parameters, out)) {
                 delegate.putNextEntry(entry, parameters);
                 entry.write(delegate);
             }
@@ -72,7 +71,7 @@ public class ZipEngine {
         }
     }
 
-    private static EntryOutputDelegate createOutputDelegate(@NonNull ZipParameters parameters, @NonNull ZipOutputStream out) {
+    private static CommonEntryOutputDelegate createOutputDelegate(@NonNull ZipParameters parameters, @NonNull ZipOutputStream out) {
         if (parameters.getCompressionMethod() == CompressionMethod.DEFLATE)
             return new DeflateEntryOutputDelegate(out, parameters.getCompressionLevel());
         return new CommonEntryOutputDelegate(out);

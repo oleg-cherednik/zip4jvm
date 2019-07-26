@@ -24,12 +24,12 @@ public class StandardDecoder implements Decoder {
         long crc32 = localFileHeader.getCrc32();
         // TODO check it, temporary commented
         byte[] crcBuff = new byte[4];
-//        crc[3] = (byte)(crcBuff[3] & 0xFF);
-//        crc[2] = (byte)((crcBuff[3] >> 8) & 0xFF);
-//        crc[1] = (byte)((crcBuff[3] >> 16) & 0xFF);
-//        crc[0] = (byte)((crcBuff[3] >> 24) & 0xFF);
+//        crc32[3] = (byte)(crcBuff[3] & 0xFF);
+//        crc32[2] = (byte)((crcBuff[3] >> 8) & 0xFF);
+//        crc32[1] = (byte)((crcBuff[3] >> 16) & 0xFF);
+//        crc32[0] = (byte)((crcBuff[3] >> 24) & 0xFF);
 
-//        if (crc[2] > 0 || crc[1] > 0 || crc[0] > 0)
+//        if (crc32[2] > 0 || crc32[1] > 0 || crc32[0] > 0)
 //            throw new IllegalStateException("Invalid CRC in File Header");
 
         try {
@@ -38,7 +38,7 @@ public class StandardDecoder implements Decoder {
 //				Commented this as this check cannot always be trusted
 //				New functionality: If there is an error in extracting a password protected file,
 //				"Wrong Password?" text is appended to the exception message
-//				if(i+1 == InternalZipConstants.STD_DEC_HDR_SIZE && ((byte)(result ^ zipCryptoEngine.decryptByte()) != crc[3]) && !isSplit)
+//				if(i+1 == InternalZipConstants.STD_DEC_HDR_SIZE && ((byte)(result ^ zipCryptoEngine.decryptByte()) != crc32[3]) && !isSplit)
 //					throw new ZipException("Wrong password!", ZipExceptionConstants.WRONG_PASSWORD);
 
                 standardEngine.updateKeys((byte)(result ^ standardEngine.decryptByte()));

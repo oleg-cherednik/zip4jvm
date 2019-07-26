@@ -1,4 +1,4 @@
-package com.cop.zip4j.io.delegate;
+package com.cop.zip4j.io.entry;
 
 import com.cop.zip4j.io.ZipOutputStream;
 import com.cop.zip4j.model.CompressionLevel;
@@ -26,8 +26,8 @@ public class DeflateEntryOutputDelegate extends CommonEntryOutputDelegate {
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
-        zipOutputStream.crc.update(buf, offs, len);
-        zipOutputStream.totalBytesRead += len;
+        crc32.update(buf, offs, len);
+        totalBytesRead += len;
 
         deflater.setInput(buf, offs, len);
 
