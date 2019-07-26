@@ -12,14 +12,14 @@ import java.util.zip.Deflater;
  * @author Oleg Cherednik
  * @since 26.07.2019
  */
-public class DeflateEntryOutputDelegate extends CommonEntryOutputDelegate {
+final class DeflateEntryOutputStream extends EntryOutputStream {
 
     private final byte[] buf = new byte[InternalZipConstants.BUFF_SIZE];
     private final Deflater deflater = new Deflater();
 
     public boolean firstBytesRead;
 
-    public DeflateEntryOutputDelegate(@NonNull SplitOutputStream out, @NonNull CompressionLevel compressionLevel) {
+    public DeflateEntryOutputStream(@NonNull SplitOutputStream out, @NonNull CompressionLevel compressionLevel) {
         super(out);
         deflater.setLevel(compressionLevel.getValue());
     }

@@ -8,6 +8,7 @@ import com.cop.zip4j.exception.ZipException;
 import com.cop.zip4j.io.CentralDirectoryBuilder;
 import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.model.CentralDirectory;
+import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.DataDescriptor;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.LocalFileHeader;
@@ -26,7 +27,7 @@ import java.util.zip.CRC32;
  * @since 26.07.2019
  */
 @RequiredArgsConstructor
-public class CommonEntryOutputDelegate extends OutputStream {
+public class EntryOutputStream extends OutputStream {
 
     private static final String MARK = "entry";
 
@@ -45,11 +46,23 @@ public class CommonEntryOutputDelegate extends OutputStream {
     @NonNull
     private Encryption encryption = Encryption.OFF;
 
-    public void putNextEntry(@NonNull PathZipEntry entry, @NonNull ZipParameters parameters) {
+    public static EntryOutputStream create(@NonNull PathZipEntry entry, @NonNull ZipParameters parameters, @NonNull SplitOutputStream out) {
+        EntryOutputStream stream;
+
+        if (parameters.getCompressionMethod() == CompressionMethod.DEFLATE)
+            stream = new DeflateEntryOutputStream(out, parameters.getCompressionLevel());
+        else
+            stream = new EntryOutputStream(out);
+
+        stream.putNextEntry(entry, parameters);
+
+        return stream;
+    }
+
+    private void putNextEntry(@NonNull PathZipEntry entry, @NonNull ZipParameters parameters) {
         try {
             int currSplitFileCounter = out.getCurrSplitFileCounter();
-            CentralDirectoryBuilder centralDirectoryBuilder = new CentralDirectoryBuilder(entry, parameters, out.zipModel,
-                    currSplitFileCounter);
+            CentralDirectoryBuilder centralDirectoryBuilder = new CentralDirectoryBuilder(entry, parameters, out.zipModel, currSplitFileCounter);
             fileHeader = centralDirectoryBuilder.createFileHeader();
             localFileHeader = centralDirectoryBuilder.createLocalFileHeader(fileHeader);
 
@@ -63,7 +76,6 @@ public class CommonEntryOutputDelegate extends OutputStream {
             encryption = parameters.getEncryption();
 
             out.mark(MARK);
-
             encoder.write(out);
         } catch(ZipException e) {
             throw e;
