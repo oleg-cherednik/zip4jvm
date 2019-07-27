@@ -6,7 +6,6 @@ import com.cop.zip4j.utils.ZipUtils;
 import lombok.NonNull;
 
 import java.io.IOException;
-import java.util.Random;
 
 /**
  * @author Oleg Cherednik
@@ -17,29 +16,22 @@ public final class StandardEncoder implements Encoder {
     public static final int SIZE_RND_HEADER = 12;
 
     private final StandardEngine standardEngine;
-    private final byte[] header;
+    private final byte[] headerBytes = new byte[SIZE_RND_HEADER];
 
-    @SuppressWarnings("MethodCanBeVariableArityMethod")
-    public StandardEncoder(char[] password) {
+    public StandardEncoder(@NonNull char[] password, int crc) {
         standardEngine = new StandardEngine(password);
-        header = createRandomHeader();
+        init(crc);
     }
 
-    private byte[] createRandomHeader() {
-        byte[] header = new byte[SIZE_RND_HEADER];
-        new Random().nextBytes(header);
-
-        for (int i = 0; i < header.length; i++)
-            header[i] = standardEngine.encode(header[i]);
-
-        return header;
+    private void init(int crc) {
+        headerBytes[SIZE_RND_HEADER - 1] = (byte)(crc >>> 24);
+        headerBytes[SIZE_RND_HEADER - 2] = (byte)(crc >>> 16);
+        encode(headerBytes);
     }
 
-//    private void init(int crc32) {
-//        header[SIZE_RND_HEADER - 1] = (byte)(crc32 >>> 24);
-//        header[SIZE_RND_HEADER - 2] = (byte)(crc32 >>> 16);
-//        encode(header);
-//    }
+    void encode(byte[] buf) {
+        encode(buf, 0, buf.length);
+    }
 
     @Override
     public void encode(@NonNull byte[] buf, int offs, int len) {
@@ -52,7 +44,7 @@ public final class StandardEncoder implements Encoder {
 
     @Override
     public void write(@NonNull SplitOutputStream out) throws IOException {
-        out.writeBytes(header);
+        out.writeBytes(headerBytes);
     }
 
 }

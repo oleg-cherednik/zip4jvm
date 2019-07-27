@@ -147,7 +147,6 @@ public class EntryOutputStream extends OutputStream {
         writeDataDescriptor();
 
         out.mark(MARK);
-        totalBytesRead = 0;
     }
 
     private void writeDataDescriptor() throws IOException {

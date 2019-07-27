@@ -10,6 +10,7 @@ import com.cop.zip4j.utils.CreateZipModel;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -26,7 +27,7 @@ public class UnzipIt {
     private final Path zipFile;
     @NonNull
     @Builder.Default
-    private final Charset charset = Charset.defaultCharset();
+    private final Charset charset = StandardCharsets.UTF_8;
     private final char[] password;
 
     public void extract(@NonNull Path destDir) throws IOException {

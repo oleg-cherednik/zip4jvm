@@ -1,7 +1,5 @@
 package com.cop.zip4j;
 
-import lombok.Builder;
-import lombok.NonNull;
 import com.cop.zip4j.core.writers.ZipModelWriter;
 import com.cop.zip4j.exception.ZipException;
 import com.cop.zip4j.io.SplitOutputStream;
@@ -10,12 +8,15 @@ import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.utils.CreateZipModel;
 import com.cop.zip4j.utils.RemoveEntryFunc;
 import com.cop.zip4j.utils.ZipUtils;
+import lombok.Builder;
+import lombok.NonNull;
 import org.apache.commons.io.IOUtils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -35,7 +36,7 @@ public final class ZipMisc {
     private final Path zipFile;
     @NonNull
     @Builder.Default
-    private final Charset charset = Charset.defaultCharset();
+    private final Charset charset = StandardCharsets.UTF_8;
     private final char[] password;
 
     public void clearComment() throws ZipException {

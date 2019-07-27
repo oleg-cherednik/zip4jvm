@@ -28,6 +28,7 @@ import lombok.NonNull;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -46,7 +47,7 @@ public final class ZipIt {
     private final Path zipFile;
     @NonNull
     @Builder.Default
-    private final Charset charset = Charset.defaultCharset();
+    private final Charset charset = StandardCharsets.UTF_8;
 
     public void add(@NonNull Path path, @NonNull ZipParameters parameters) throws IOException {
         add(Collections.singleton(path), parameters);

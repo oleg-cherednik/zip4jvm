@@ -46,7 +46,8 @@ public enum Encryption {
 
         @Override
         public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull PathZipEntry entry) {
-            return new StandardEncoder(entry.getPassword());
+            // Since we do not know the crc here, we use the modification time for encrypting.
+            return new StandardEncoder(entry.getPassword(), (localFileHeader.getLastModifiedTime() & 0xFFFF) << 16);
         }
     },
     STRONG(1),

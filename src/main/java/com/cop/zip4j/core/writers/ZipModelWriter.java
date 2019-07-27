@@ -46,7 +46,7 @@ public final class ZipModelWriter {
 
     private void processHeaderData(SplitOutputStream out) throws IOException {
         EndCentralDirectory endCentralDirectory = zipModel.getEndCentralDirectory();
-
+        // TODO duplication set; see previous step
         endCentralDirectory.setOffs(out.getFilePointer());
 
         if (zipModel.isZip64()) {

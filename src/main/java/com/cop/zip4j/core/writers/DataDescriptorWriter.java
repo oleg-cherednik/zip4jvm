@@ -18,6 +18,7 @@ public final class DataDescriptorWriter {
     private final DataDescriptor dataDescriptor;
 
     public void write(@NonNull SplitOutputStream out) throws IOException {
+        out.writeDword(DataDescriptor.SIGNATURE);
         out.writeDword((int)dataDescriptor.getCrc32());
         out.writeDword(dataDescriptor.getCompressedSize());
         out.writeDword(dataDescriptor.getUncompressedSize());
