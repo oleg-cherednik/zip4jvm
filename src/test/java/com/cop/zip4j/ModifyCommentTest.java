@@ -85,7 +85,7 @@ public class ModifyCommentTest {
 
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
         assertThat(misc.isEncrypted()).isTrue();
-        assertThat(misc.getComment()).isNull();
+        assertThat(misc.getComment()).isEqualTo("password: " + new String(Zip4jSuite.password));
 
         misc.setComment("Oleg Cherednik - Олег Чередник");
         assertThat(misc.getComment()).isEqualTo("Oleg Cherednik - Олег Чередник");
