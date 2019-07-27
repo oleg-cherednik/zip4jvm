@@ -103,10 +103,7 @@ public class UnzipItTest {
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         Path zipFile = destDir.resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-//        zip.add(Zip4jSuite.srcDir, parameters);
-
-        Path bentley = Zip4jSuite.carsDir.resolve("bentley-continental.jpg");
-        zip.add(bentley, parameters);
+        zip.add(Zip4jSuite.srcDir, parameters);
 
         destDir = destDir.resolve("unzip");
 
@@ -114,8 +111,8 @@ public class UnzipItTest {
                                .zipFile(zipFile)
                                .password(Zip4jSuite.password)
                                .build();
-        unzip.extract(destDir);
 
-//        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
+        unzip.extract(destDir);
+        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
     }
 }
