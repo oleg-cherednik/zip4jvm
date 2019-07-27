@@ -1,10 +1,5 @@
 package com.cop.zip4j.model;
 
-import com.cop.zip4j.model.entry.PathZipEntry;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.crypto.Encoder;
 import com.cop.zip4j.crypto.aes.AesDecoder;
@@ -13,6 +8,11 @@ import com.cop.zip4j.crypto.pkware.StandardDecoder;
 import com.cop.zip4j.crypto.pkware.StandardEncoder;
 import com.cop.zip4j.exception.ZipException;
 import com.cop.zip4j.io.LittleEndianRandomAccessFile;
+import com.cop.zip4j.model.entry.PathZipEntry;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 

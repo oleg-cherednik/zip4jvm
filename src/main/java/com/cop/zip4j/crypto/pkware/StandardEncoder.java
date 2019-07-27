@@ -20,7 +20,7 @@ public final class StandardEncoder implements Encoder {
     private final byte[] header;
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")
-    public StandardEncoder(@NonNull char[] password) {
+    public StandardEncoder(char[] password) {
         standardEngine = new StandardEngine(password);
         header = createRandomHeader();
     }

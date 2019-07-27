@@ -1,6 +1,11 @@
 package com.cop.zip4j;
 
 import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.model.CompressionLevel;
+import com.cop.zip4j.model.CompressionMethod;
+import com.cop.zip4j.model.Encryption;
+import com.cop.zip4j.model.ZipParameters;
+import org.apache.commons.lang.ArrayUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -8,7 +13,6 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -88,19 +92,30 @@ public class UnzipItTest {
     }
 
     @Test
-    // TODO update this test
-    public void shouldUnzipOneFileFromEncryptedNoSplitZip() throws IOException {
+    public void shouldUnzipEncryptedZip() throws IOException {
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compressionMethod(CompressionMethod.DEFLATE)
+                                                .compressionLevel(CompressionLevel.NORMAL)
+                                                .encryption(Encryption.STANDARD)
+                                                .comment("password: " + ArrayUtils.toString(Zip4jSuite.password))
+                                                .password(Zip4jSuite.password).build();
+
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path zipFile = destDir.resolve("src.zip");
+        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
+//        zip.add(Zip4jSuite.srcDir, parameters);
+
+        Path bentley = Zip4jSuite.carsDir.resolve("bentley-continental.jpg");
+        zip.add(bentley, parameters);
+
+        destDir = destDir.resolve("unzip");
 
         UnzipIt unzip = UnzipIt.builder()
-//                               .zipFile(Zip4jSuite.noSplitZip)
-                               .zipFile(Paths.get("d:/zip4j/srca.zip"))
-                               .password("2".toCharArray()).build();
+                               .zipFile(zipFile)
+                               .password(Zip4jSuite.password)
+                               .build();
+        unzip.extract(destDir);
 
-        unzip.extract(destDir, "cars/ferrari-458-italia.jpg");
-        assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);
-
-        assertThatDirectory(destDir.resolve("cars")).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatFile(destDir.resolve("cars/ferrari-458-italia.jpg")).exists().isImage().hasSize(320_894);
+//        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
     }
 }

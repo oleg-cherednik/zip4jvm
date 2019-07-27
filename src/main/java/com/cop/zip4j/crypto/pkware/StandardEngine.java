@@ -1,6 +1,6 @@
 package com.cop.zip4j.crypto.pkware;
 
-import lombok.NonNull;
+import org.apache.commons.lang.ArrayUtils;
 
 /**
  * @author Oleg Cherednik
@@ -22,14 +22,14 @@ public class StandardEngine {
         }
     }
 
-    public StandardEngine(@NonNull char[] password) {
+    public StandardEngine(char[] password) {
         keys = createKeys(password);
     }
 
     private static int[] createKeys(char[] password) {
         int[] keys = { 0x12345678, 0x23456789, 0x34567890 };
 
-        for (int i = 0; i < password.length; i++)
+        for (int i = 0; i < ArrayUtils.getLength(password); i++)
             updateKeys(keys, (byte)(password[i] & 0xFF));
 
         return keys;

@@ -63,7 +63,7 @@ public final class ZipIt {
 
         ZipModel zipModel = new CreateZipModel(zipFile, charset).get().noSplitOnly();
         zipModel.setSplitLength(parameters.getSplitLength());
-        zipModel.getEndCentralDirectory().setComment(ZipUtils.normalizeComment.apply(parameters.getComment()));
+        zipModel.setComment(ZipUtils.normalizeComment.apply(parameters.getComment()));
 
         if (parameters.isZip64())
             zipModel.zip64();

@@ -14,7 +14,7 @@ public class StandardDecoder implements Decoder {
     private final LocalFileHeader localFileHeader;
     private final StandardEngine standardEngine;
 
-    public StandardDecoder(@NonNull LocalFileHeader localFileHeader, @NonNull char[] password, byte[] headerBytes) {
+    public StandardDecoder(@NonNull LocalFileHeader localFileHeader, char[] password, byte[] headerBytes) {
         this.localFileHeader = localFileHeader;
         standardEngine = new StandardEngine(password);
         init(headerBytes);

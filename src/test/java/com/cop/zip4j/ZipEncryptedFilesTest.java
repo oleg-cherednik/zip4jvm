@@ -5,6 +5,7 @@ import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ZipParameters;
+import org.apache.commons.lang.ArrayUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -44,7 +45,7 @@ public class ZipEncryptedFilesTest {
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .encryption(Encryption.STANDARD)
                                                 .aesStrength(AesStrength.STRENGTH_256)
-                                                .comment("password: " + new String(Zip4jSuite.password))
+                                                .comment("password: " + ArrayUtils.toString(Zip4jSuite.password))
                                                 .password(Zip4jSuite.password).build();
 
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
@@ -53,8 +54,7 @@ public class ZipEncryptedFilesTest {
         zip.add(Zip4jSuite.srcDir, parameters);
 
         assertThatDirectory(destDir).exists().hasSubDirectories(0).hasFiles(1);
-        // TODO it's not working under gradle build
-//        assertThatEncryptedZipFile(zipFile, Zip4jSuite.password).exists().rootEntry().matches(TestUtils.zipRootDirAssert);
+        assertThatEncryptedZipFile(zipFile, Zip4jSuite.password).exists().rootEntry().matches(TestUtils.zipRootDirAssert);
     }
 
     @Test
@@ -63,7 +63,7 @@ public class ZipEncryptedFilesTest {
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .encryption(Encryption.STANDARD)
-                                                .comment("password: " + new String(Zip4jSuite.password))
+                                                .comment("password: " + ArrayUtils.toString(Zip4jSuite.password))
                                                 .password(Zip4jSuite.password).build();
 
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
@@ -81,4 +81,5 @@ public class ZipEncryptedFilesTest {
         assertThatEncryptedZipFile(zipFile, Zip4jSuite.password).exists().rootEntry().hasSubDirectories(0).hasFiles(3);
         assertThatEncryptedZipFile(zipFile, Zip4jSuite.password).directory("/").matches(TestUtils.zipCarsDirAssert);
     }
+
 }

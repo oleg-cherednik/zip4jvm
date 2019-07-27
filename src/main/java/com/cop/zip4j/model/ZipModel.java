@@ -69,6 +69,10 @@ public class ZipModel {
         zip64 = new Zip64(locator, dir);
     }
 
+    public void setComment(String comment) {
+        endCentralDirectory.setComment(comment);
+    }
+
     public void updateZip64() {
         if (!isZip64())
             return;
