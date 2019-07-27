@@ -34,7 +34,7 @@ public class StandardDecoder implements Decoder {
 
         try {
             int result = headerBytes[0];
-            for (int i = 0; i < StandardEncoder.SIZE_RND_HEADER; i++) {
+            for (int i = 0; i < StandardEncoder.SIZE_HEADER; i++) {
 //				Commented this as this check cannot always be trusted
 //				New functionality: If there is an error in extracting a password protected file,
 //				"Wrong Password?" text is appended to the exception message
@@ -42,7 +42,7 @@ public class StandardDecoder implements Decoder {
 //					throw new ZipException("Wrong password!", ZipExceptionConstants.WRONG_PASSWORD);
 
                 standardEngine.updateKeys((byte)(result ^ standardEngine.decryptByte()));
-                if (i + 1 != StandardEncoder.SIZE_RND_HEADER)
+                if (i + 1 != StandardEncoder.SIZE_HEADER)
                     result = headerBytes[i + 1];
             }
         } catch(Exception e) {
