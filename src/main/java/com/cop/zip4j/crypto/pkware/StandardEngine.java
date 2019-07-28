@@ -14,7 +14,7 @@ public class StandardEngine {
     private final int[] keys;
 
     static {
-        for (int i = 0, r = i; i < 256; i++, r = i) {
+        for (int i = 0, r = i; i < CRC_TABLE.length; i++, r = i) {
             for (int j = 0; j < 8; j++)
                 r = (r & 1) == 1 ? (r >>> 1) ^ 0xedb88320 : (r >>> 1);
 
@@ -26,6 +26,7 @@ public class StandardEngine {
         keys = createKeys(password);
     }
 
+    /** see 6.1.5 */
     private static int[] createKeys(char[] password) {
         int[] keys = { 0x12345678, 0x23456789, 0x34567890 };
 
@@ -59,9 +60,9 @@ public class StandardEngine {
         return (byte)((tmp * (tmp ^ 1)) >>> 8);
     }
 
-    public byte encode(byte plain) {
-        byte cipher = (byte)(stream() ^ plain & 0xFF);
-        updateKeys(plain);
+    public byte encode(byte b) {
+        byte cipher = (byte)(stream() ^ b & 0xFF);
+        updateKeys(b);
         return cipher;
     }
 

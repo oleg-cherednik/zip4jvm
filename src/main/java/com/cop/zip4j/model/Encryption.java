@@ -13,6 +13,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang.ArrayUtils;
 
 import java.io.IOException;
 
@@ -46,6 +47,8 @@ public enum Encryption {
 
         @Override
         public Encoder encoder(@NonNull PathZipEntry entry) {
+            if(ArrayUtils.isEmpty(entry.getPassword()))
+                throw new ZipException("Passwords should not be empty for '" + name() + "' encryption");
             return new StandardEncoder(entry.getPassword());
         }
     },
