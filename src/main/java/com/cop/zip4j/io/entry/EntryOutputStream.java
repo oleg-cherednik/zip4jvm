@@ -77,9 +77,7 @@ public class EntryOutputStream extends OutputStream {
 
             out.mark(MARK);
             encoder.writeHeader(out);
-        } catch(Zip4jException e) {
-            throw e;
-        } catch(Exception e) {
+        } catch(IOException e) {
             throw new Zip4jException(e);
         }
     }
