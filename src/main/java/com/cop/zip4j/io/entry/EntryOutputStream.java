@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
 /**
  * @author Oleg Cherednik
@@ -31,7 +32,7 @@ public class EntryOutputStream extends OutputStream {
     private static final String MARK = "entry";
 
     protected final SplitOutputStream out;
-    protected final CRC32 crc32 = new CRC32();
+    protected final Checksum crc32 = new CRC32();
 
     private CentralDirectory.FileHeader fileHeader;
     private LocalFileHeader localFileHeader;

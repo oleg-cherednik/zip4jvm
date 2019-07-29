@@ -35,8 +35,7 @@ public class RegularFileZipEntry extends PathZipEntry {
 
     @Override
     public long crc32() {
-        // TODO why only for PKWARE?
-        return encryption == Encryption.PKWARE ? crc32 : 0;
+        return crc32;
     }
 
     @Override
