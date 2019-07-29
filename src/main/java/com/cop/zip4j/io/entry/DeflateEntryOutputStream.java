@@ -27,7 +27,7 @@ final class DeflateEntryOutputStream extends EntryOutputStream {
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
         crc32.update(buf, offs, len);
-        totalBytesRead += len;
+        total += len;
 
         deflater.setInput(buf, offs, len);
 

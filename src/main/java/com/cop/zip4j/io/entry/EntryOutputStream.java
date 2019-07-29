@@ -39,7 +39,7 @@ public class EntryOutputStream extends OutputStream {
 
     private final byte[] pendingBuffer = new byte[AesEngine.AES_BLOCK_SIZE];
     private int pendingBufferLength;
-    protected long totalBytesRead;
+    protected long total;
 
     @NonNull
     private Encoder encoder = Encoder.NULL;
@@ -90,7 +90,7 @@ public class EntryOutputStream extends OutputStream {
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
         crc32.update(buf, offs, len);
-        totalBytesRead += len;
+        total += len;
         _write(buf, offs, len);
     }
 
@@ -140,7 +140,7 @@ public class EntryOutputStream extends OutputStream {
 
         fileHeader.setCrc32(fileHeader.getEncryption() == Encryption.AES ? 0 : crc32.getValue());
         fileHeader.setCompressedSize(out.getWrittenBytesAmount(MARK));
-        fileHeader.setUncompressedSize(totalBytesRead);
+        fileHeader.setUncompressedSize(total);
         out.zipModel.addFileHeader(fileHeader);
 
         writeDataDescriptor();
