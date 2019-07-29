@@ -1,5 +1,9 @@
-package com.cop.zip4j;
+package com.cop.zip4j.encryption;
 
+import com.cop.zip4j.TestUtils;
+import com.cop.zip4j.Zip4jSuite;
+import com.cop.zip4j.ZipIt;
+import com.cop.zip4j.exception.ZipException;
 import com.cop.zip4j.model.AesStrength;
 import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.CompressionMethod;
@@ -17,15 +21,16 @@ import java.util.List;
 
 import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
 import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatEncryptedZipFile;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author Oleg Cherednik
- * @since 15.03.2019
+ * @since 28.07.2019
  */
 @SuppressWarnings("FieldNamingConvention")
-public class ZipEncryptedFilesTest {
+public class EncryptionPkwareTest {
 
-    private static final Path rootDir = Zip4jSuite.rootDir.resolve(ZipEncryptedFilesTest.class.getSimpleName());
+    private static final Path rootDir = Zip4jSuite.generateSubDirName(EncryptionPkwareTest.class);
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -79,6 +84,36 @@ public class ZipEncryptedFilesTest {
         assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
         assertThatEncryptedZipFile(zipFile, Zip4jSuite.password).exists().rootEntry().hasSubDirectories(0).hasFiles(3);
         assertThatEncryptedZipFile(zipFile, Zip4jSuite.password).directory("/").matches(TestUtils.zipCarsDirAssert);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenStandardEncryptionAndNullPassword() throws IOException {
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compressionMethod(CompressionMethod.DEFLATE)
+                                                .compressionLevel(CompressionLevel.NORMAL)
+                                                .encryption(Encryption.STANDARD)
+                                                .password(null).build();
+
+        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path zipFile = destDir.resolve("src.zip");
+        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
+
+        assertThatThrownBy(() -> zip.add(Zip4jSuite.srcDir, parameters)).isExactlyInstanceOf(ZipException.class);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenStandardEncryptionAndEmptyPassword() throws IOException {
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compressionMethod(CompressionMethod.DEFLATE)
+                                                .compressionLevel(CompressionLevel.NORMAL)
+                                                .encryption(Encryption.STANDARD)
+                                                .password("".toCharArray()).build();
+
+        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path zipFile = destDir.resolve("src.zip");
+        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
+
+        assertThatThrownBy(() -> zip.add(Zip4jSuite.srcDir, parameters)).isExactlyInstanceOf(ZipException.class);
     }
 
 }
