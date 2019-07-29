@@ -1,6 +1,7 @@
 package com.cop.zip4j.encryption;
 
 import com.cop.zip4j.TestUtils;
+import com.cop.zip4j.UnzipIt;
 import com.cop.zip4j.Zip4jSuite;
 import com.cop.zip4j.ZipIt;
 import com.cop.zip4j.exception.ZipException;
@@ -114,6 +115,29 @@ public class EncryptionPkwareTest {
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
 
         assertThatThrownBy(() -> zip.add(Zip4jSuite.srcDir, parameters)).isExactlyInstanceOf(ZipException.class);
+    }
+
+    @Test
+    public void shouldDecodeZipFileWhenStandardEncryption() throws IOException {
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compressionMethod(CompressionMethod.DEFLATE)
+                                                .compressionLevel(CompressionLevel.NORMAL)
+                                                .encryption(Encryption.PKWARE)
+                                                .comment("password: " + new String(Zip4jSuite.password))
+                                                .password(Zip4jSuite.password).build();
+
+        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path zipFile = destDir.resolve("src.zip");
+        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
+        zip.add(Zip4jSuite.srcDir, parameters);
+
+        destDir = destDir.resolve("unzip");
+        UnzipIt unzip = UnzipIt.builder()
+                               .zipFile(zipFile)
+                               .password(Zip4jSuite.password).build();
+        unzip.extract(destDir);
+
+        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
     }
 
 }
