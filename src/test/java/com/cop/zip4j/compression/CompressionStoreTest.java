@@ -3,6 +3,7 @@ package com.cop.zip4j.compression;
 import com.cop.zip4j.TestUtils;
 import com.cop.zip4j.Zip4jSuite;
 import com.cop.zip4j.ZipIt;
+import com.cop.zip4j.exception.ZipException;
 import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.ZipParameters;
@@ -40,7 +41,7 @@ public class CompressionStoreTest {
     }
 
     @Test
-    public void shouldCreateNewZipWithFilesWhenStoreCompression() throws IOException {
+    public void shouldCreateNewZipWithFilesWhenStoreCompression() throws IOException, ZipException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.STORE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
@@ -58,5 +59,4 @@ public class CompressionStoreTest {
         assertThatZipFile(zipFile).exists().rootEntry().hasSubDirectories(1).hasFiles(0);
         assertThatZipFile(zipFile).directory("cars/").matches(TestUtils.zipCarsDirAssert);
     }
-
 }
