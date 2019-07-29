@@ -1,6 +1,5 @@
 package com.cop.zip4j.model.entry;
 
-import com.cop.zip4j.crypto.Encoder;
 import com.cop.zip4j.model.AesStrength;
 import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.CompressionMethod;
@@ -68,10 +67,6 @@ public abstract class PathZipEntry extends ZipEntry {
 
     public AesStrength getAesStrength() {
         return encryption == Encryption.AES ? aesStrength : AesStrength.NONE;
-    }
-
-    public Encoder creatEncoder() {
-        return encryption.encoder(this);
     }
 
 }

@@ -114,8 +114,8 @@ public class UnzipEngine {
                             "compressed size for AES encrypted file: " + fileHeader.getFileName());
             } else if (localFileHeader.getEncryption() == Encryption.STANDARD) {
                 // TODO decrypter throws unsupported exception
-                comprSize -= StandardEncoder.SIZE_HEADER;
-                offs += StandardEncoder.SIZE_HEADER;
+                comprSize -= StandardEncoder.SIZE_RND_HEADER;
+                offs += StandardEncoder.SIZE_RND_HEADER;
             }
 
             in.seek(offs);

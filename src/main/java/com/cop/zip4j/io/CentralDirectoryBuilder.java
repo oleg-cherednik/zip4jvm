@@ -111,7 +111,7 @@ public class CentralDirectoryBuilder {
         long fileSize = entry.size();
 
         if (entry.getEncryption() == Encryption.STANDARD)
-            return fileSize + StandardEncoder.SIZE_HEADER;
+            return fileSize + StandardEncoder.SIZE_RND_HEADER;
 
         return fileSize + entry.getAesStrength().getSaltLength() + AesEngine.AES_AUTH_LENGTH + 2; //2 is password verifier
     }

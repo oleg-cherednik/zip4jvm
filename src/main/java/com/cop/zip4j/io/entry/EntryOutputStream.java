@@ -71,7 +71,7 @@ public class EntryOutputStream extends OutputStream {
             fileHeader.setOffsLocalFileHeader(out.getFilePointer());
             new LocalFileHeaderWriter(localFileHeader).write(out);
 
-            encoder = entry.creatEncoder();
+            encoder = entry.getEncryption().encoder(localFileHeader, entry);
             encryption = entry.getEncryption();
 
             out.mark(MARK);

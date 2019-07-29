@@ -32,7 +32,7 @@ public enum Encryption {
         }
 
         @Override
-        public Encoder encoder(@NonNull PathZipEntry entry) {
+        public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull PathZipEntry entry) {
             return Encoder.NULL;
         }
     },
@@ -41,12 +41,13 @@ public enum Encryption {
         public Decoder decoder(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, char[] password)
                 throws IOException {
             in.seek(localFileHeader.getOffs());
-            return new StandardDecoder(localFileHeader, password, in.readBytes(StandardEncoder.SIZE_HEADER));
+            return new StandardDecoder(localFileHeader, password, in.readBytes(StandardEncoder.SIZE_RND_HEADER));
         }
 
         @Override
-        public Encoder encoder(@NonNull PathZipEntry entry) {
-            return new StandardEncoder(entry.getPassword());
+        public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull PathZipEntry entry) {
+            // Since we do not know the crc here, we use the modification time for encrypting.
+            return new StandardEncoder(entry.getPassword(), (localFileHeader.getLastModifiedTime() & 0xFFFF) << 16);
         }
     },
     STRONG(1),
@@ -69,7 +70,7 @@ public enum Encryption {
         }
 
         @Override
-        public Encoder encoder(@NonNull PathZipEntry entry) {
+        public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull PathZipEntry entry) {
             return new AesEncoder(entry.getPassword(), entry.getAesStrength());
         }
     };
@@ -80,7 +81,7 @@ public enum Encryption {
         throw new ZipException("unsupported encryption method");
     }
 
-    public Encoder encoder(@NonNull PathZipEntry entry) {
+    public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull PathZipEntry entry) {
         throw new ZipException("invalid encryption method");
     }
 
