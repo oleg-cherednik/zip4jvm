@@ -118,7 +118,7 @@ public class EncryptionPkwareTest {
     }
 
     @Test
-    public void shouldDecodeZipFileWhenStandardEncryption() throws IOException {
+    public void shouldUnzipWhenStandardEncryption() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)

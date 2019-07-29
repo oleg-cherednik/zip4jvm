@@ -100,7 +100,7 @@ public class CentralDirectoryBuilder {
         return (int)ZipUtils.javaToDosTime(time);
     }
 
-    private long getCompressedSize() throws IOException {
+    private long getCompressedSize() {
         if (entry.isDirectory())
             return 0;
         if (entry.getCompressionMethod() != CompressionMethod.STORE)
@@ -116,7 +116,7 @@ public class CentralDirectoryBuilder {
         return fileSize + entry.getAesStrength().getSaltLength() + AesEngine.AES_AUTH_LENGTH + 2; //2 is password verifier
     }
 
-    private long getUncompressedSize() throws IOException {
+    private long getUncompressedSize() {
         return entry.size();
     }
 
