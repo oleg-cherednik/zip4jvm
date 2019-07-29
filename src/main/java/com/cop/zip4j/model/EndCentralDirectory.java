@@ -4,6 +4,7 @@ import com.cop.zip4j.exception.ZipException;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.nio.charset.Charset;
@@ -49,8 +50,9 @@ public class EndCentralDirectory {
         this.comment = comment;
     }
 
+    @NonNull
     public byte[] getComment(@NonNull Charset charset) {
-        return comment != null ? comment.getBytes(charset) : null;
+        return comment != null ? comment.getBytes(charset) : ArrayUtils.EMPTY_BYTE_ARRAY;
     }
 
     public void incTotalEntries() {

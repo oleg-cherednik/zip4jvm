@@ -40,9 +40,6 @@ public enum Encryption {
         @Override
         public Decoder decoder(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, char[] password)
                 throws IOException {
-//            in.seek(localFileHeader.getOffs());
-//            byte[] header = in.readBytes(PkwareEncoder.SIZE_HEADER);
-//            return new PkwareDecoder(localFileHeader, password, header);
             return PkwareDecoder.create(in, localFileHeader, password);
         }
     },

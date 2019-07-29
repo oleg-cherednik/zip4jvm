@@ -122,6 +122,11 @@ public class SplitOutputStream extends OutputStream {
         out.close();
     }
 
+    @Override
+    public String toString() {
+        return "offs: " + offs;
+    }
+
     public long getFilePointer() throws IOException {
         return out.getFilePointer();
     }

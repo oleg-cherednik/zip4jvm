@@ -17,7 +17,7 @@ public class DataDescriptor {
 
     // TODO 4.3.9.1 - size of compressed and uncompressed is 8 bytes
 
-    // size:4 - crc32-32
+    // size:4 - crc-32
     private long crc32;
     // size:4 - compressed size
     private long compressedSize;

@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
 import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatEncryptedZipFile;
@@ -28,6 +29,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @author Oleg Cherednik
  * @since 28.07.2019
  */
+@Test
 @SuppressWarnings("FieldNamingConvention")
 public class EncryptionPkwareTest {
 
@@ -43,7 +45,6 @@ public class EncryptionPkwareTest {
         Zip4jSuite.removeDir(rootDir);
     }
 
-    @Test
     public void shouldCreateNewZipWithFolderAndStandardEncryption() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
@@ -62,7 +63,6 @@ public class EncryptionPkwareTest {
         assertThatEncryptedZipFile(zipFile, Zip4jSuite.password).exists().rootEntry().matches(TestUtils.zipRootDirAssert);
     }
 
-    @Test
     public void shouldCreateNewZipWithSelectedFilesAndStandardEncryption() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
@@ -87,7 +87,6 @@ public class EncryptionPkwareTest {
         assertThatEncryptedZipFile(zipFile, Zip4jSuite.password).directory("/").matches(TestUtils.zipCarsDirAssert);
     }
 
-    @Test
     public void shouldThrowExceptionWhenStandardEncryptionAndNullPassword() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
@@ -102,7 +101,6 @@ public class EncryptionPkwareTest {
         assertThatThrownBy(() -> zip.add(Zip4jSuite.srcDir, parameters)).isExactlyInstanceOf(ZipException.class);
     }
 
-    @Test
     public void shouldThrowExceptionWhenStandardEncryptionAndEmptyPassword() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
@@ -117,7 +115,6 @@ public class EncryptionPkwareTest {
         assertThatThrownBy(() -> zip.add(Zip4jSuite.srcDir, parameters)).isExactlyInstanceOf(ZipException.class);
     }
 
-    @Test
     public void shouldUnzipWhenStandardEncryption() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
@@ -138,6 +135,27 @@ public class EncryptionPkwareTest {
         unzip.extract(destDir);
 
         assertThatDirectory(destDir).matches(TestUtils.dirAssert);
+    }
+
+    public void shouldThrowExceptionWhenUnzipStandardEncryptedZipWithIncorrectPassword() throws IOException {
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compressionMethod(CompressionMethod.DEFLATE)
+                                                .compressionLevel(CompressionLevel.NORMAL)
+                                                .encryption(Encryption.PKWARE)
+                                                .comment("password: " + new String(Zip4jSuite.password))
+                                                .password(Zip4jSuite.password).build();
+
+        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path zipFile = destDir.resolve("src.zip");
+        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
+        zip.add(Zip4jSuite.srcDir, parameters);
+
+        Path destDir1 = destDir.resolve("unzip");
+        UnzipIt unzip = UnzipIt.builder()
+                               .zipFile(zipFile)
+                               .password(UUID.randomUUID().toString().toCharArray()).build();
+
+        assertThatThrownBy(() -> unzip.extract(destDir1)).isExactlyInstanceOf(ZipException.class);
     }
 
 }

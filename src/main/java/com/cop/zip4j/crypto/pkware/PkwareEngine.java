@@ -21,10 +21,20 @@ class PkwareEngine {
         updateKeys(keys, b);
     }
 
+    public void encrypt(byte[] buf, int offs, int len) {
+        for (int i = offs; i < offs + len; i++)
+            buf[i] = encrypt(buf[i]);
+    }
+
     public byte encrypt(byte b) {
         byte cipher = (byte)(stream() ^ b & 0xFF);
         updateKeys(b);
         return cipher;
+    }
+
+    public void decrypt(byte[] buf, int offs, int len) {
+        for (int i = offs; i < offs + len; i++)
+            buf[i] = decrypt(buf[i]);
     }
 
     public byte decrypt(byte b) {

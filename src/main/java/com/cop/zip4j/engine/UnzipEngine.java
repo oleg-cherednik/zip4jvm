@@ -4,7 +4,7 @@ import com.cop.zip4j.core.readers.LocalFileHeaderReader;
 import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.crypto.aes.AesDecoder;
 import com.cop.zip4j.crypto.aes.AesEngine;
-import com.cop.zip4j.crypto.pkware.PkwareEncoder;
+import com.cop.zip4j.crypto.pkware.PkwareHeader;
 import com.cop.zip4j.exception.ZipException;
 import com.cop.zip4j.io.InflaterInputStream;
 import com.cop.zip4j.io.LittleEndianRandomAccessFile;
@@ -114,8 +114,8 @@ public class UnzipEngine {
                             "compressed size for AES encrypted file: " + fileHeader.getFileName());
             } else if (localFileHeader.getEncryption() == Encryption.PKWARE) {
                 // TODO decrypter throws unsupported exception
-                comprSize -= PkwareEncoder.SIZE_HEADER;
-                offs += PkwareEncoder.SIZE_HEADER;
+                comprSize -= PkwareHeader.SIZE;
+                offs += PkwareHeader.SIZE;
             }
 
             in.seek(offs);

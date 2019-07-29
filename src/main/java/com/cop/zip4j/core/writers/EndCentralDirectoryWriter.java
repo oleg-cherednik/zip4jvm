@@ -1,11 +1,10 @@
 package com.cop.zip4j.core.writers;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.model.EndCentralDirectory;
 import com.cop.zip4j.utils.InternalZipConstants;
-import org.apache.commons.lang.ArrayUtils;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -32,7 +31,7 @@ final class EndCentralDirectoryWriter {
         out.writeWord(dir.getDiskEntries());
         out.writeDword(dir.getSize());
         out.writeDword(Math.min(dir.getOffs(), InternalZipConstants.ZIP_64_LIMIT));
-        out.writeWord(ArrayUtils.getLength(comment));
+        out.writeWord(comment.length);
         out.writeBytes(comment);
     }
 

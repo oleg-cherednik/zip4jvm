@@ -1,7 +1,7 @@
 package com.cop.zip4j.io;
 
 import com.cop.zip4j.crypto.aes.AesEngine;
-import com.cop.zip4j.crypto.pkware.PkwareEncoder;
+import com.cop.zip4j.crypto.pkware.PkwareHeader;
 import com.cop.zip4j.exception.ZipException;
 import com.cop.zip4j.model.AesExtraDataRecord;
 import com.cop.zip4j.model.CentralDirectory;
@@ -111,7 +111,7 @@ public class CentralDirectoryBuilder {
         long fileSize = entry.size();
 
         if (entry.getEncryption() == Encryption.PKWARE)
-            return fileSize + PkwareEncoder.SIZE_HEADER;
+            return fileSize + PkwareHeader.SIZE;
 
         return fileSize + entry.getAesStrength().getSaltLength() + AesEngine.AES_AUTH_LENGTH + 2; //2 is password verifier
     }
