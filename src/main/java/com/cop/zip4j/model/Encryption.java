@@ -55,7 +55,7 @@ public enum Encryption {
                 throws IOException {
             byte[] salt = getSalt(in, localFileHeader);
             byte[] passwordVerifier = in.readBytes(2);
-            return new AesDecoder(localFileHeader, password, salt, passwordVerifier);
+            return new AesDecoder(localFileHeader.getExtraField().getAesExtraDataRecord(), password, salt, passwordVerifier);
         }
 
         private byte[] getSalt(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader) throws IOException {

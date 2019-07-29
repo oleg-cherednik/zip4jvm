@@ -44,7 +44,7 @@ public class EncryptionAesTest {
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .encryption(Encryption.AES)
-                                                .aesStrength(AesStrength.STRENGTH_256)
+                                                .aesStrength(AesStrength.KEY_STRENGTH_256)
                                                 .comment("password: " + new String(Zip4jSuite.password))
                                                 .password(Zip4jSuite.password).build();
 

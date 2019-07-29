@@ -7,122 +7,92 @@ import com.cop.zip4j.crypto.aes.pbkdf2.PBKDF2Parameters;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.model.AesStrength;
-import com.cop.zip4j.utils.ZipUtils;
-import lombok.NonNull;
 
 import java.io.IOException;
 import java.util.Random;
 
+import static com.cop.zip4j.crypto.aes.AesCipherUtil.prepareBuffAESIVBytes;
+import static com.cop.zip4j.crypto.aes.AesEngine.AES_BLOCK_SIZE;
+
 public class AesEncoder implements Encoder {
 
-    private final char[] password;
-    private final AesStrength keyStrength;
+    private static final int PASSWORD_VERIFIER_LENGTH = 2;
 
-    private final byte[] counterBlock = new byte[AesEngine.AES_BLOCK_SIZE];
-    private final byte[] iv = new byte[AesEngine.AES_BLOCK_SIZE];
-
+    private char[] password;
+    private AesStrength aesKeyStrength;
     private AesEngine aesEngine;
     private MacBasedPRF mac;
-
-    private int KEY_LENGTH;
-    private int MAC_LENGTH;
-    private int SALT_LENGTH;
-    private final int PASSWORD_VERIFIER_LENGTH = 2;
-
-    private byte[] aesKey;
-    private byte[] macKey;
-    private byte[] derivedPasswordVerifier;
-    private byte[] saltBytes;
 
     private boolean finished;
 
     private int nonce = 1;
     private int loopCount = 0;
 
-    public AesEncoder(char[] password, AesStrength keyStrength) throws Zip4jException {
+    private byte[] iv;
+    private byte[] counterBlock;
+    private byte[] derivedPasswordVerifier;
+    private byte[] saltBytes;
+
+    public AesEncoder(char[] password, AesStrength aesKeyStrength) {
+        if (password == null || password.length == 0) {
+            throw new Zip4jException("input password is empty or null");
+        }
+        if (aesKeyStrength != AesStrength.KEY_STRENGTH_128 &&
+                aesKeyStrength != AesStrength.KEY_STRENGTH_256) {
+            throw new Zip4jException("Invalid AES key strength");
+        }
+
         this.password = password;
-        this.keyStrength = keyStrength;
+        this.aesKeyStrength = aesKeyStrength;
+        this.finished = false;
+        counterBlock = new byte[AES_BLOCK_SIZE];
+        iv = new byte[AES_BLOCK_SIZE];
         init();
     }
 
-    private void init() throws Zip4jException {
-        if (keyStrength == AesStrength.STRENGTH_128) {
-            KEY_LENGTH = 16;
-            MAC_LENGTH = 16;
-            SALT_LENGTH = 8;
-        } else if (keyStrength == AesStrength.STRENGTH_256) {
-            KEY_LENGTH = 32;
-            MAC_LENGTH = 32;
-            SALT_LENGTH = 16;
-        } else
-            throw new Zip4jException("invalid aes key strength, cannot determine key sizes");
+    private void init() {
+        int keyLength = aesKeyStrength.getKeyLength();
+        int macLength = aesKeyStrength.getMacLength();
+        int saltLength = aesKeyStrength.getSaltLength();
 
-        saltBytes = generateSalt(SALT_LENGTH);
-        byte[] keyBytes = deriveKey(saltBytes, password);
+        saltBytes = generateSalt(saltLength);
+        byte[] keyBytes = deriveKey(saltBytes, password, keyLength, macLength);
 
-        if (keyBytes == null || keyBytes.length != (KEY_LENGTH + MAC_LENGTH + PASSWORD_VERIFIER_LENGTH)) {
+        if (keyBytes == null || keyBytes.length != (keyLength + macLength + PASSWORD_VERIFIER_LENGTH)) {
             throw new Zip4jException("invalid key generated, cannot decrypt file");
         }
 
-        aesKey = new byte[KEY_LENGTH];
-        macKey = new byte[MAC_LENGTH];
+        byte[] aesKey = new byte[keyLength];
+        byte[] macKey = new byte[macLength];
         derivedPasswordVerifier = new byte[PASSWORD_VERIFIER_LENGTH];
 
-        System.arraycopy(keyBytes, 0, aesKey, 0, KEY_LENGTH);
-        System.arraycopy(keyBytes, KEY_LENGTH, macKey, 0, MAC_LENGTH);
-        System.arraycopy(keyBytes, KEY_LENGTH + MAC_LENGTH, derivedPasswordVerifier, 0, PASSWORD_VERIFIER_LENGTH);
+        System.arraycopy(keyBytes, 0, aesKey, 0, keyLength);
+        System.arraycopy(keyBytes, keyLength, macKey, 0, macLength);
+        System.arraycopy(keyBytes, keyLength + macLength, derivedPasswordVerifier, 0, PASSWORD_VERIFIER_LENGTH);
 
         aesEngine = new AesEngine(aesKey);
         mac = new MacBasedPRF("HmacSHA1");
         mac.init(macKey);
     }
 
-    private byte[] deriveKey(byte[] salt, char[] password) throws Zip4jException {
+    private byte[] deriveKey(byte[] salt, char[] password, int keyLength, int macLength) {
         try {
             PBKDF2Parameters p = new PBKDF2Parameters("HmacSHA1", "ISO-8859-1",
                     salt, 1000);
             PBKDF2Engine e = new PBKDF2Engine(p);
-            byte[] derivedKey = e.deriveKey(password, KEY_LENGTH + MAC_LENGTH + PASSWORD_VERIFIER_LENGTH);
+            byte[] derivedKey = e.deriveKey(password, keyLength + macLength + PASSWORD_VERIFIER_LENGTH);
             return derivedKey;
         } catch(Exception e) {
             throw new Zip4jException(e);
         }
     }
 
-    @Override
-    public void encrypt(byte[] buff, int start, int len) throws Zip4jException {
+    public void encryptData(byte[] buff) {
 
-        if (finished) {
-            // A non 16 byte block has already been passed to encrypter
-            // non 16 byte block should be the last block of compressed data in AES encryption
-            // any more encryption will lead to corruption of data
-            throw new Zip4jException("AES Encrypter is in finished state (A non 16 byte block has already been passed to encrypter)");
+        if (buff == null) {
+            throw new Zip4jException("input bytes are null, cannot perform AES encrpytion");
         }
-
-        if (len % 16 != 0) {
-            this.finished = true;
-        }
-
-        for (int j = start; j < (start + len); j += AesEngine.AES_BLOCK_SIZE) {
-            loopCount = (j + AesEngine.AES_BLOCK_SIZE <= (start + len)) ?
-                        AesEngine.AES_BLOCK_SIZE : ((start + len) - j);
-
-            ZipUtils.prepareBuffAESIVBytes(iv, nonce, AesEngine.AES_BLOCK_SIZE);
-            aesEngine.processBlock(iv, counterBlock);
-
-            for (int k = 0; k < loopCount; k++) {
-                buff[j + k] = (byte)(buff[j + k] ^ counterBlock[k]);
-            }
-
-            mac.update(buff, j, loopCount);
-            nonce++;
-        }
-    }
-
-    @Override
-    public void writeHeader(@NonNull SplitOutputStream out) throws IOException {
-        out.writeBytes(saltBytes);
-        out.writeBytes(derivedPasswordVerifier);
+        encrypt(buff, 0, buff.length);
     }
 
     private static byte[] generateSalt(int size) {
@@ -161,30 +131,43 @@ public class AesEncoder implements Encoder {
         return derivedPasswordVerifier;
     }
 
-    public void setDerivedPasswordVerifier(byte[] derivedPasswordVerifier) {
-        this.derivedPasswordVerifier = derivedPasswordVerifier;
-    }
-
     public byte[] getSaltBytes() {
         return saltBytes;
     }
 
-    public void setSaltBytes(byte[] saltBytes) {
-        this.saltBytes = saltBytes;
-    }
 
-    public int getSaltLength() {
-        return SALT_LENGTH;
-    }
+    @Override
+    public void encrypt(byte[] buf, int offs, int len) {
+        if (finished) {
+            // A non 16 byte block has already been passed to encrypter
+            // non 16 byte block should be the last block of compressed data in AES encryption
+            // any more encryption will lead to corruption of data
+            throw new Zip4jException("AES Encrypter is in finished state (A non 16 byte block has already been passed to encrypter)");
+        }
 
-    public int getPasswordVeriifierLength() {
-        return PASSWORD_VERIFIER_LENGTH;
+        if (len % 16 != 0) {
+            this.finished = true;
+        }
+
+        for (int j = offs; j < (offs + len); j += AES_BLOCK_SIZE) {
+            loopCount = (j + AES_BLOCK_SIZE <= (offs + len)) ?
+                        AES_BLOCK_SIZE : ((offs + len) - j);
+
+            prepareBuffAESIVBytes(iv, nonce);
+            aesEngine.processBlock(iv, counterBlock);
+
+            for (int k = 0; k < loopCount; k++) {
+                buf[j + k] = (byte)(buf[j + k] ^ counterBlock[k]);
+            }
+
+            mac.update(buf, j, loopCount);
+            nonce++;
+        }
     }
 
     @Override
-    public void close(SplitOutputStream out) throws IOException {
-        out.writeBytes(getFinalMac());
+    public void writeHeader(SplitOutputStream out) throws IOException {
+        out.writeBytes(saltBytes);
+        out.writeBytes(derivedPasswordVerifier);
     }
-
-
 }

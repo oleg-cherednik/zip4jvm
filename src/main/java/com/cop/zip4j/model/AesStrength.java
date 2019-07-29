@@ -11,20 +11,24 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum AesStrength {
-    NONE((byte)0, 0),
-    STRENGTH_128((byte)0x01, 8),
-    STRENGTH_192((byte)0x02, 12),
-    STRENGTH_256((byte)0x03, 16);
+    NONE(0, 0, 0, 0),
+    KEY_STRENGTH_128(1, 8, 16, 16),
+    KEY_STRENGTH_192(2, 12, 24, 24),
+    KEY_STRENGTH_256(3, 16, 32, 32);
 
-    private final byte value;
+    private final int rawCode;
     private final int saltLength;
+    private final int macLength;
+    private final int keyLength;
 
-    public static AesStrength parseValue(byte value) {
-        for (AesStrength strength : values())
-            if (strength.value == value)
-                return strength;
+    public static AesStrength parseValue(int code) {
+        for (AesStrength aesKeyStrength : values()) {
+            if (aesKeyStrength.getRawCode() == code) {
+                return aesKeyStrength;
+            }
+        }
 
-        throw new EnumConstantNotPresentException(AesStrength.class, "value=" + value);
+        throw new EnumConstantNotPresentException(AesStrength.class, "value=" + code);
     }
 
 }

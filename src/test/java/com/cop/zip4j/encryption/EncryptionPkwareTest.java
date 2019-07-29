@@ -5,7 +5,6 @@ import com.cop.zip4j.UnzipIt;
 import com.cop.zip4j.Zip4jSuite;
 import com.cop.zip4j.ZipIt;
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.model.AesStrength;
 import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.Encryption;
@@ -50,7 +49,6 @@ public class EncryptionPkwareTest {
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .encryption(Encryption.PKWARE)
-                                                .aesStrength(AesStrength.STRENGTH_256)
                                                 .comment("password: " + new String(Zip4jSuite.password))
                                                 .password(Zip4jSuite.password).build();
 

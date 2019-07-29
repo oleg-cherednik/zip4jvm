@@ -7,20 +7,19 @@ public class AesEngine {
     public static final int AES_AUTH_LENGTH = 10;
     public static final int AES_BLOCK_SIZE = 16;
 
-
     private int rounds;
     private int[][] workingKey = null;
     private int C0, C1, C2, C3;
 
-    public AesEngine(byte[] key) throws Zip4jException {
+    public AesEngine(byte[] key) {
         init(key);
     }
 
-    public void init(byte[] key) throws Zip4jException {
+    private void init(byte[] key) {
         workingKey = generateWorkingKey(key);
     }
 
-    private int[][] generateWorkingKey(byte[] key) throws Zip4jException {
+    private int[][] generateWorkingKey(byte[] key) {
         int kc = key.length / 4;
         int t;
 
@@ -34,7 +33,8 @@ public class AesEngine {
         t = 0;
         int i = 0;
         while (i < key.length) {
-            W[t >> 2][t & 3] = (key[i] & 0xff) | ((key[i + 1] & 0xff) << 8) | ((key[i + 2] & 0xff) << 16) | (key[i + 3] << 24);
+            W[t >> 2][t & 3] = (key[i] & 0xff) | ((key[i + 1] & 0xff) << 8) | ((key[i + 2] & 0xff) << 16)
+                    | (key[i + 3] << 24);
             i += 4;
             t++;
         }
@@ -53,11 +53,11 @@ public class AesEngine {
         return W;
     }
 
-    public int processBlock(byte[] in, byte[] out) throws Zip4jException {
+    public int processBlock(byte[] in, byte[] out) {
         return processBlock(in, 0, out, 0);
     }
 
-    public int processBlock(byte[] in, int inOff, byte[] out, int outOff) throws Zip4jException {
+    public int processBlock(byte[] in, int inOff, byte[] out, int outOff) {
         if (workingKey == null) {
             throw new Zip4jException("AES engine not initialised");
         }
@@ -74,10 +74,10 @@ public class AesEngine {
         encryptBlock(workingKey);
         stateOut(out, outOff);
 
-        return AesEngine.AES_BLOCK_SIZE;
+        return AES_BLOCK_SIZE;
     }
 
-    private final void stateIn(byte[] bytes, int off) {
+    private void stateIn(byte[] bytes, int off) {
         int index = off;
 
         C0 = (bytes[index++] & 0xff);
@@ -101,7 +101,7 @@ public class AesEngine {
         C3 |= bytes[index++] << 24;
     }
 
-    private final void stateOut(byte[] bytes, int off) {
+    private void stateOut(byte[] bytes, int off) {
         int index = off;
 
         bytes[index++] = (byte)C0;
@@ -125,7 +125,7 @@ public class AesEngine {
         bytes[index++] = (byte)(C3 >> 24);
     }
 
-    private final void encryptBlock(int[][] KW) {
+    private void encryptBlock(int[][] KW) {
         int r, r0, r1, r2, r3;
 
         C0 ^= KW[0][0];
