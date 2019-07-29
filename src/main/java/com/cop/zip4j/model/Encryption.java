@@ -4,6 +4,7 @@ import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.crypto.Encoder;
 import com.cop.zip4j.crypto.aes.AesDecoder;
 import com.cop.zip4j.crypto.aes.AesEncoder;
+import com.cop.zip4j.crypto.aesnew.AesNewDecoder;
 import com.cop.zip4j.crypto.aesnew.AesNewEncoder;
 import com.cop.zip4j.crypto.pkware.PkwareDecoder;
 import com.cop.zip4j.crypto.pkware.PkwareEncoder;
@@ -60,7 +61,7 @@ public enum Encryption {
         }
 
         private byte[] getSalt(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader) throws IOException {
-            if (localFileHeader.getEncryption() != AES)
+            if (localFileHeader.getEncryption() != this)
                 return null;
 
             in.seek(localFileHeader.getOffs());
@@ -79,11 +80,11 @@ public enum Encryption {
                 throws IOException {
             byte[] salt = getSalt(in, localFileHeader);
             byte[] passwordVerifier = in.readBytes(2);
-            return new AesDecoder(localFileHeader.getExtraField().getAesExtraDataRecord(), password, salt, passwordVerifier);
+            return new AesNewDecoder(localFileHeader.getExtraField().getAesExtraDataRecord(), password, salt, passwordVerifier);
         }
 
         private byte[] getSalt(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader) throws IOException {
-            if (localFileHeader.getEncryption() != AES)
+            if (localFileHeader.getEncryption() != this)
                 return null;
 
             in.seek(localFileHeader.getOffs());
@@ -104,7 +105,7 @@ public enum Encryption {
         if (!generalPurposeFlag.isEncrypted())
             return OFF;
         if (extraField.getAesExtraDataRecord() != AesExtraDataRecord.NULL)
-            return AES;
+            return AES_NEW;
         return generalPurposeFlag.isStrongEncryption() ? STRONG : PKWARE;
     }
 

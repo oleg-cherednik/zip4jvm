@@ -2,6 +2,7 @@ package com.cop.zip4j.io;
 
 import com.cop.zip4j.crypto.aes.AesDecoder;
 import com.cop.zip4j.crypto.aes.AesEngine;
+import com.cop.zip4j.crypto.aesnew.AesNewDecoder;
 import com.cop.zip4j.engine.UnzipEngine;
 import com.cop.zip4j.model.Encryption;
 
@@ -31,6 +32,11 @@ public class PartInputStream extends InputStream {
         return unzipEngine.getFileHeader().getEncryption() == Encryption.AES;
     }
 
+    private boolean isAesNew() {
+        return unzipEngine.getFileHeader().getEncryption() == Encryption.AES_NEW;
+    }
+
+
     @Override
     public int available() {
         return (int)Math.min(length - bytesRead, Integer.MAX_VALUE);
@@ -41,7 +47,7 @@ public class PartInputStream extends InputStream {
         if (bytesRead >= length)
             return -1;
 
-        if (!isAes())
+        if (!(isAes() || isAesNew()))
             return read(oneByteBuff, 0, 1) == -1 ? -1 : oneByteBuff[0] & 0xFF;
 
         if (aesBytesReturned == 0 || aesBytesReturned == 16) {
@@ -63,7 +69,7 @@ public class PartInputStream extends InputStream {
             }
         }
 
-        if (unzipEngine.getDecoder() instanceof AesDecoder) {
+        if (unzipEngine.getDecoder() instanceof AesDecoder || unzipEngine.getDecoder() instanceof AesNewDecoder) {
             if (bytesRead + len < length) {
                 if (len % 16 != 0) {
                     len = len - (len % 16);
@@ -120,6 +126,33 @@ public class PartInputStream extends InputStream {
         }
 
         ((AesDecoder)unzipEngine.getDecoder()).setStoredMac(macBytes);
+    }
+
+    protected void checkAndReadAESNewMacBytes() throws IOException {
+        if (!isAesNew())
+            return;
+        if (unzipEngine.getDecoder() == null || !(unzipEngine.getDecoder() instanceof AesNewDecoder))
+            return;
+
+        if (((AesNewDecoder)unzipEngine.getDecoder()).getStoredMac() != null) {
+            //Stored mac already set
+            return;
+        }
+        byte[] macBytes = new byte[AesEngine.AES_AUTH_LENGTH];
+        int readLen = -1;
+        readLen = in.read(macBytes);
+        if (readLen != AesEngine.AES_AUTH_LENGTH) {
+            if (unzipEngine.getZipModel().isSplitArchive()) {
+                in.close();
+                in = unzipEngine.startNextSplitFile();
+                int newlyRead = in.read(macBytes, readLen, AesEngine.AES_AUTH_LENGTH - readLen);
+                readLen += newlyRead;
+            } else {
+                throw new IOException("Error occured while reading stored AES authentication bytes");
+            }
+        }
+
+        ((AesNewDecoder)unzipEngine.getDecoder()).setStoredMac(macBytes);
     }
 
     @Override

@@ -78,6 +78,7 @@ public class InflaterInputStream extends PartInputStream {
             //read all data
         }
         checkAndReadAESMacBytes();
+        checkAndReadAESNewMacBytes();
     }
 
     private void fill() throws IOException {

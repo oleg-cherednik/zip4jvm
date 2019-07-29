@@ -4,6 +4,7 @@ import com.cop.zip4j.core.readers.LocalFileHeaderReader;
 import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.crypto.aes.AesDecoder;
 import com.cop.zip4j.crypto.aes.AesEngine;
+import com.cop.zip4j.crypto.aesnew.AesNewDecoder;
 import com.cop.zip4j.crypto.pkware.PkwareHeader;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.InflaterInputStream;
@@ -111,6 +112,15 @@ public class UnzipEngine {
                 } else
                     throw new Zip4jException("invalid decryptor when trying to calculate " +
                             "compressed size for AES encrypted file: " + fileHeader.getFileName());
+            } else if (localFileHeader.getEncryption() == Encryption.AES_NEW) {
+                if (decoder instanceof AesNewDecoder) {
+                    comprSize -= ((AesNewDecoder)decoder).getSaltLength() +
+                            ((AesNewDecoder)decoder).getPasswordVerifierLength() + 10;
+                    offs += ((AesNewDecoder)decoder).getSaltLength() +
+                            ((AesNewDecoder)decoder).getPasswordVerifierLength();
+                } else
+                    throw new Zip4jException("invalid decryptor when trying to calculate " +
+                            "compressed size for AES encrypted file: " + fileHeader.getFileName());
             } else if (localFileHeader.getEncryption() == Encryption.PKWARE) {
                 // TODO decrypter throws unsupported exception
                 comprSize -= PkwareHeader.SIZE;
@@ -138,6 +148,20 @@ public class UnzipEngine {
                 if (decoder != null && decoder instanceof AesDecoder) {
                     byte[] tmpMacBytes = ((AesDecoder)decoder).getCalculatedAuthenticationBytes();
                     byte[] storedMac = ((AesDecoder)decoder).getStoredMac();
+                    byte[] calculatedMac = new byte[AesEngine.AES_AUTH_LENGTH];
+
+                    if (calculatedMac == null || storedMac == null) {
+                        throw new Zip4jException("CRC (MAC) check failed for " + fileHeader.getFileName());
+                    }
+
+                    System.arraycopy(tmpMacBytes, 0, calculatedMac, 0, AesEngine.AES_AUTH_LENGTH);
+// TODO temporary
+//                    if (!Arrays.equals(calculatedMac, storedMac)) {
+//                        throw new Zip4jException("invalid CRC (MAC) for file: " + fileHeader.getFileName());
+//                    }
+                } else if (decoder != null && decoder instanceof AesNewDecoder) {
+                    byte[] tmpMacBytes = ((AesNewDecoder)decoder).getCalculatedAuthenticationBytes();
+                    byte[] storedMac = ((AesNewDecoder)decoder).getStoredMac();
                     byte[] calculatedMac = new byte[AesEngine.AES_AUTH_LENGTH];
 
                     if (calculatedMac == null || storedMac == null) {
