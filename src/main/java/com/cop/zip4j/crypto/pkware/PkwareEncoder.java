@@ -12,7 +12,7 @@ import java.io.IOException;
  */
 public class PkwareEncoder implements Encoder {
 
-    public static final int SIZE_RND_HEADER = 12;
+    public static final int SIZE_HEADER = 12;
 
     private final PkwareEngine engine;
     private final byte[] header;
@@ -33,7 +33,7 @@ public class PkwareEncoder implements Encoder {
     }
 
     private static byte[] createHeader(int crc32, PkwareEngine engine) {
-        byte[] header = new byte[SIZE_RND_HEADER];
+        byte[] header = new byte[SIZE_HEADER];
         header[header.length - 1] = (byte)(crc32 >>> 24);
         header[header.length - 2] = (byte)(crc32 >>> 16);
         encode(header, 0, header.length, engine);

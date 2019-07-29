@@ -1,6 +1,6 @@
 package com.cop.zip4j.crypto.pkware;
 
-import org.apache.commons.lang.ArrayUtils;
+import lombok.NonNull;
 
 /**
  * @author Oleg Cherednik
@@ -13,7 +13,7 @@ class PkwareEngine {
 
     private final int[] keys;
 
-    public PkwareEngine(char[] password) {
+    public PkwareEngine(@NonNull char[] password) {
         keys = createKeys(password);
     }
 
@@ -55,8 +55,8 @@ class PkwareEngine {
     private static int[] createKeys(char[] password) {
         int[] keys = { 0x12345678, 0x23456789, 0x34567890 };
 
-        for (int i = 0; i < ArrayUtils.getLength(password); i++)
-            updateKeys(keys, (byte)(password[i] & 0xFF));
+        for (int i = 0; i < password.length; i++)
+            updateKeys(keys, (byte)password[i]);
 
         return keys;
     }

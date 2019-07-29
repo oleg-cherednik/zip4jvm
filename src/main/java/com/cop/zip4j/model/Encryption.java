@@ -9,10 +9,7 @@ import com.cop.zip4j.crypto.pkware.PkwareEncoder;
 import com.cop.zip4j.exception.ZipException;
 import com.cop.zip4j.io.LittleEndianRandomAccessFile;
 import com.cop.zip4j.model.entry.PathZipEntry;
-import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.io.IOException;
@@ -21,40 +18,43 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 09.03.2019
  */
-@Getter
 @SuppressWarnings("MethodCanBeVariableArityMethod")
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum Encryption {
-    OFF(-1) {
+    OFF {
+        @Override
+        public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull PathZipEntry entry) {
+            return Encoder.NULL;
+        }
+
         @Override
         public Decoder decoder(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, char[] password)
                 throws IOException {
             return null;
         }
-
-        @Override
-        public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull PathZipEntry entry) {
-            return Encoder.NULL;
-        }
     },
-    PKWARE(0) {
-        @Override
-        public Decoder decoder(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, char[] password)
-                throws IOException {
-            in.seek(localFileHeader.getOffs());
-            return new PkwareDecoder(localFileHeader, password, in.readBytes(PkwareEncoder.SIZE_RND_HEADER));
-        }
-
+    PKWARE {
         @Override
         public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull PathZipEntry entry) {
-            if(ArrayUtils.isEmpty(entry.getPassword()))
+            if (ArrayUtils.isEmpty(entry.getPassword()))
                 throw new ZipException("Passwords should not be empty for '" + name() + "' encryption");
             // Since we do not know the crc here, we use the modification time for encrypting.
             return new PkwareEncoder(entry.getPassword(), (localFileHeader.getLastModifiedTime() & 0xFFFF) << 16);
         }
+
+        @Override
+        public Decoder decoder(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, char[] password)
+                throws IOException {
+            in.seek(localFileHeader.getOffs());
+            return new PkwareDecoder(localFileHeader, password, in.readBytes(PkwareEncoder.SIZE_HEADER));
+        }
     },
-    STRONG(1),
-    AES(99) {
+    STRONG,
+    AES {
+        @Override
+        public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull PathZipEntry entry) {
+            return new AesEncoder(entry.getPassword(), entry.getAesStrength());
+        }
+
         @Override
         public Decoder decoder(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, char[] password)
                 throws IOException {
@@ -71,21 +71,14 @@ public enum Encryption {
             AesStrength aesStrength = localFileHeader.getExtraField().getAesExtraDataRecord().getAesStrength();
             return in.readBytes(aesStrength.getSaltLength());
         }
-
-        @Override
-        public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull PathZipEntry entry) {
-            return new AesEncoder(entry.getPassword(), entry.getAesStrength());
-        }
     };
-
-    private final int value;
-
-    public Decoder decoder(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, char[] password) throws IOException {
-        throw new ZipException("unsupported encryption method");
-    }
 
     public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull PathZipEntry entry) {
         throw new ZipException("invalid encryption method");
+    }
+
+    public Decoder decoder(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, char[] password) throws IOException {
+        throw new ZipException("unsupported encryption method");
     }
 
     public static Encryption get(@NonNull ExtraField extraField, @NonNull GeneralPurposeFlag generalPurposeFlag) {
