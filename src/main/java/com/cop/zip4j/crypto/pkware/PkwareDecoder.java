@@ -27,13 +27,7 @@ public class PkwareDecoder implements Decoder {
 
     @Override
     public int decrypt(byte[] buf, int offs, int len) {
-        for (int i = offs; i < offs + len; i++) {
-            int val = buf[i] & 0xFF;
-            val = (val ^ engine.decrypt()) & 0xFF;
-            engine.updateKeys((byte)val);
-            buf[i] = (byte)val;
-        }
-
+        engine.decrypt(buf, offs, len);
         return len;
     }
 
