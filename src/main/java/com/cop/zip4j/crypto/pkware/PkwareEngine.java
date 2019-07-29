@@ -27,23 +27,19 @@ class PkwareEngine {
     }
 
     public void decrypt(byte[] buf, int offs, int len) {
-        for (int i = offs; i < offs + len; i++)
-            buf[i] = decrypt(buf[i]);
+        for (int i = offs; i < offs + len; i++) {
+            buf[i] ^= decrypt();
+            updateKeys(keys, buf[i]);
+        }
     }
 
-    public byte encrypt(byte b) {
+    private byte encrypt(byte b) {
         byte cipher = (byte)(stream() ^ b);
         updateKeys(b);
         return cipher;
     }
 
-    public byte decrypt(byte b) {
-        byte tmp = (byte)(b ^ decrypt());
-        updateKeys(keys, tmp);
-        return tmp;
-    }
-
-    public byte decrypt() {
+    private byte decrypt() {
         int tmp = keys[2] | 2;
         return (byte)((tmp * (tmp ^ 1)) >>> 8);
     }
