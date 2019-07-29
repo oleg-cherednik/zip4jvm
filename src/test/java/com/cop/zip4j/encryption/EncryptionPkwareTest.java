@@ -4,7 +4,7 @@ import com.cop.zip4j.TestUtils;
 import com.cop.zip4j.UnzipIt;
 import com.cop.zip4j.Zip4jSuite;
 import com.cop.zip4j.ZipIt;
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.AesStrength;
 import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.CompressionMethod;
@@ -98,7 +98,7 @@ public class EncryptionPkwareTest {
         Path zipFile = destDir.resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
 
-        assertThatThrownBy(() -> zip.add(Zip4jSuite.srcDir, parameters)).isExactlyInstanceOf(ZipException.class);
+        assertThatThrownBy(() -> zip.add(Zip4jSuite.srcDir, parameters)).isExactlyInstanceOf(Zip4jException.class);
     }
 
     public void shouldThrowExceptionWhenStandardEncryptionAndEmptyPassword() throws IOException {
@@ -112,7 +112,7 @@ public class EncryptionPkwareTest {
         Path zipFile = destDir.resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
 
-        assertThatThrownBy(() -> zip.add(Zip4jSuite.srcDir, parameters)).isExactlyInstanceOf(ZipException.class);
+        assertThatThrownBy(() -> zip.add(Zip4jSuite.srcDir, parameters)).isExactlyInstanceOf(Zip4jException.class);
     }
 
     public void shouldUnzipWhenStandardEncryption() throws IOException {
@@ -155,7 +155,7 @@ public class EncryptionPkwareTest {
                                .zipFile(zipFile)
                                .password(UUID.randomUUID().toString().toCharArray()).build();
 
-        assertThatThrownBy(() -> unzip.extract(destDir1)).isExactlyInstanceOf(ZipException.class);
+        assertThatThrownBy(() -> unzip.extract(destDir1)).isExactlyInstanceOf(Zip4jException.class);
     }
 
 }

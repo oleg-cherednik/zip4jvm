@@ -1,6 +1,6 @@
 package com.cop.zip4j.utils;
 
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
@@ -67,7 +67,7 @@ public class ZipUtils {
         comment = StringUtils.trimToNull(comment);
 
         if (StringUtils.length(comment) > InternalZipConstants.MAX_ALLOWED_ZIP_COMMENT_LENGTH)
-            throw new ZipException("comment length exceeds maximum length");
+            throw new Zip4jException("comment length exceeds maximum length");
 
         return comment;
     };
@@ -96,7 +96,7 @@ public class ZipUtils {
 
     public static void checkEquealOrGreaterZero(int val) {
         if (val < 0)
-            throw new ZipException("invalid length specified to decrpyt data");
+            throw new Zip4jException("invalid length specified to decrpyt data");
     }
 
 }

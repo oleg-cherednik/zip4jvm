@@ -1,6 +1,6 @@
 package com.cop.zip4j.model;
 
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -45,7 +45,7 @@ public class EndCentralDirectory {
 
     public void setComment(String comment) {
         if (StringUtils.length(comment) > MAX_COMMENT_LENGTH)
-            throw new ZipException("File comment should be " + MAX_COMMENT_LENGTH + " characters maximum");
+            throw new Zip4jException("File comment should be " + MAX_COMMENT_LENGTH + " characters maximum");
 
         this.comment = comment;
     }

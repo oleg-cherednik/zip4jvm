@@ -1,6 +1,6 @@
 package com.cop.zip4j;
 
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.ZipParameters;
@@ -35,7 +35,7 @@ public class ZipFilesSplitTest {
     }
 
     @Test
-    public void shouldCreateNewSplitZipWithFiles() throws IOException, ZipException {
+    public void shouldCreateNewSplitZipWithFiles() throws IOException, Zip4jException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)

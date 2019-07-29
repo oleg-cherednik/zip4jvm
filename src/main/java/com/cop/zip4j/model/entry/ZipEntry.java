@@ -1,6 +1,6 @@
 package com.cop.zip4j.model.entry;
 
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import lombok.NonNull;
 import org.apache.commons.io.FileUtils;
 
@@ -25,10 +25,10 @@ public abstract class ZipEntry {
                 long crc32 = FileUtils.checksumCRC32(path.toFile());
                 return new RegularFileZipEntry(path, size, crc32);
             } catch(IOException e) {
-                throw new ZipException(e);
+                throw new Zip4jException(e);
             }
         }
-        throw new ZipException("Cannot add neither directory nor regular file to zip");
+        throw new Zip4jException("Cannot add neither directory nor regular file to zip");
     }
 
     public abstract String getAbsolutePath();

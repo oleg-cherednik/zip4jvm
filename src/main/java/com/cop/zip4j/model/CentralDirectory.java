@@ -1,7 +1,7 @@
 package com.cop.zip4j.model;
 
 import com.cop.zip4j.core.writers.ZipModelWriter;
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.utils.InternalZipConstants;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.Getter;
@@ -49,9 +49,9 @@ public class CentralDirectory {
         List<FileHeader> fileHeaders = getFileHeadersByEntryName(entryName);
 
         if (fileHeaders.size() > 1)
-            throw new ZipException("Multiple file headers found for entry name '" + entryName + '\'');
+            throw new Zip4jException("Multiple file headers found for entry name '" + entryName + '\'');
         if (fileHeaders.isEmpty())
-            throw new ZipException("File header with entry name '" + entryName + "' was not found");
+            throw new Zip4jException("File header with entry name '" + entryName + "' was not found");
 
         return fileHeaders.iterator().next();
     }

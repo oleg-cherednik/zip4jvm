@@ -1,7 +1,7 @@
 package com.cop.zip4j.io;
 
 import com.cop.zip4j.core.writers.ZipModelWriter;
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.AesExtraDataRecord;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.EndCentralDirectory;
@@ -53,7 +53,7 @@ public class SplitOutputStream extends OutputStream {
     public SplitOutputStream(@NonNull Path zipFile, @NonNull ZipModel zipModel, long splitLength) throws FileNotFoundException {
         // TODO move to ZipParameters
         if (splitLength >= 0 && splitLength < InternalZipConstants.MIN_SPLIT_LENGTH)
-            throw new ZipException("split length less than minimum allowed split length of " + InternalZipConstants.MIN_SPLIT_LENGTH + " Bytes");
+            throw new Zip4jException("split length less than minimum allowed split length of " + InternalZipConstants.MIN_SPLIT_LENGTH + " Bytes");
 
         this.zipModel = zipModel;
         this.splitLength = splitLength;

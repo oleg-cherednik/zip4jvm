@@ -1,7 +1,7 @@
 package com.cop.zip4j.core.readers;
 
 import lombok.RequiredArgsConstructor;
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.LittleEndianRandomAccessFile;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.CompressionMethod;
@@ -33,7 +33,7 @@ final class FileHeaderReader {
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
         if (in.readDword() != CentralDirectory.FileHeader.SIGNATURE)
-            throw new ZipException("Expected central directory entry not found (offs:" + (in.getFilePointer() - 4) + ')');
+            throw new Zip4jException("Expected central directory entry not found (offs:" + (in.getFilePointer() - 4) + ')');
 
         fileHeader.setVersionMadeBy(in.readWord());
         fileHeader.setVersionToExtract(in.readWord());

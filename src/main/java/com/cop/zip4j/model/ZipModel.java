@@ -1,6 +1,6 @@
 package com.cop.zip4j.model;
 
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.utils.InternalZipConstants;
 import lombok.Getter;
 import lombok.NonNull;
@@ -146,7 +146,7 @@ public class ZipModel {
         });
     }
 
-    private void updateEndCentralDirectory(long totalBytesWritten) throws ZipException {
+    private void updateEndCentralDirectory(long totalBytesWritten) throws Zip4jException {
         endCentralDirectory.setSplitParts(0);
         endCentralDirectory.setStartDiskNumber(0);
         endCentralDirectory.setTotalEntries(getFileHeaders().size());
@@ -154,7 +154,7 @@ public class ZipModel {
         endCentralDirectory.setOffs(totalBytesWritten);
     }
 
-    private void updateZip64EndCentralDirLocator(long totalBytesWritten) throws ZipException {
+    private void updateZip64EndCentralDirLocator(long totalBytesWritten) throws Zip4jException {
         if (isZip64()) {
             Zip64.EndCentralDirectoryLocator locator = zip64.getEndCentralDirectoryLocator();
             locator.setNoOfDiskStartOfZip64EndOfCentralDirRec(0);
@@ -163,7 +163,7 @@ public class ZipModel {
         }
     }
 
-    private void updateZip64EndCentralDirRec(long totalBytesWritten) throws ZipException {
+    private void updateZip64EndCentralDirRec(long totalBytesWritten) throws Zip4jException {
         if (isZip64()) {
             Zip64.EndCentralDirectory dir = zip64.getEndCentralDirectory();
             dir.setDiskNumber(0);
@@ -196,7 +196,7 @@ public class ZipModel {
     @NonNull
     public ZipModel noSplitOnly() {
         if (Files.exists(zipFile) && isSplitArchive())
-            throw new ZipException("Zip file already exists. Zip file format does not allow updating split/spanned files");
+            throw new Zip4jException("Zip file already exists. Zip file format does not allow updating split/spanned files");
 
         return this;
     }

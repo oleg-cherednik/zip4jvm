@@ -4,7 +4,7 @@ import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.crypto.aes.pbkdf2.MacBasedPRF;
 import com.cop.zip4j.crypto.aes.pbkdf2.PBKDF2Engine;
 import com.cop.zip4j.crypto.aes.pbkdf2.PBKDF2Parameters;
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.exception.ZipExceptionConstants;
 import com.cop.zip4j.model.AesExtraDataRecord;
 import com.cop.zip4j.model.AesStrength;
@@ -38,22 +38,23 @@ public class AesDecoder implements Decoder {
     private final byte[] counterBlock = new byte[AesEngine.AES_BLOCK_SIZE];
     private int loopCount = 0;
 
-    public AesDecoder(@NonNull LocalFileHeader localFileHeader, @NonNull char[] password, byte[] salt, byte[] passwordVerifier) throws ZipException {
+    public AesDecoder(@NonNull LocalFileHeader localFileHeader, @NonNull char[] password, byte[] salt, byte[] passwordVerifier) throws
+            Zip4jException {
         this.localFileHeader = localFileHeader;
         this.password = password;
         init(salt, passwordVerifier);
     }
 
-    private void init(byte[] salt, byte[] passwordVerifier) throws ZipException {
+    private void init(byte[] salt, byte[] passwordVerifier) throws Zip4jException {
         AesExtraDataRecord aesExtraDataRecord = localFileHeader.getExtraField().getAesExtraDataRecord();
 
         if (aesExtraDataRecord == AesExtraDataRecord.NULL)
-            throw new ZipException("invalid aes extra data record - in init method of AESDecryptor");
+            throw new Zip4jException("invalid aes extra data record - in init method of AESDecryptor");
 
         SALT_LENGTH = aesExtraDataRecord.getAesStrength().getSaltLength();
 
         if (aesExtraDataRecord.getAesStrength() == AesStrength.NONE)
-            throw new ZipException("invalid aes key strength for file: " + localFileHeader.getFileName());
+            throw new Zip4jException("invalid aes key strength for file: " + localFileHeader.getFileName());
 
         if (aesExtraDataRecord.getAesStrength() == AesStrength.STRENGTH_128) {
             KEY_LENGTH = 16;
@@ -67,12 +68,12 @@ public class AesDecoder implements Decoder {
         }
 
         if (ArrayUtils.isEmpty(password))
-            throw new ZipException("empty or null password provided for AES Decryptor");
+            throw new Zip4jException("empty or null password provided for AES Decryptor");
 
         byte[] derivedKey = deriveKey(salt, password);
         if (derivedKey == null ||
                 derivedKey.length != (KEY_LENGTH + MAC_LENGTH + PASSWORD_VERIFIER_LENGTH)) {
-            throw new ZipException("invalid derived key");
+            throw new Zip4jException("invalid derived key");
         }
 
         aesKey = new byte[KEY_LENGTH];
@@ -84,11 +85,11 @@ public class AesDecoder implements Decoder {
         System.arraycopy(derivedKey, KEY_LENGTH + MAC_LENGTH, derivedPasswordVerifier, 0, PASSWORD_VERIFIER_LENGTH);
 
         if (derivedPasswordVerifier == null) {
-            throw new ZipException("invalid derived password verifier for AES");
+            throw new Zip4jException("invalid derived password verifier for AES");
         }
 
         if (!Arrays.equals(passwordVerifier, derivedPasswordVerifier)) {
-            throw new ZipException("Wrong Password for file: " + localFileHeader.getFileName(), ZipExceptionConstants.WRONG_PASSWORD);
+            throw new Zip4jException("Wrong Password for file: " + localFileHeader.getFileName(), ZipExceptionConstants.WRONG_PASSWORD);
         }
 
         aesEngine = new AesEngine(aesKey);
@@ -97,9 +98,9 @@ public class AesDecoder implements Decoder {
     }
 
     @Override
-    public int decrypt(byte[] buf, int offs, int len) throws ZipException {
+    public int decrypt(byte[] buf, int offs, int len) throws Zip4jException {
         if (aesEngine == null)
-            throw new ZipException("AES not initialized properly");
+            throw new Zip4jException("AES not initialized properly");
 
         try {
 
@@ -120,14 +121,14 @@ public class AesDecoder implements Decoder {
 
             return len;
 
-        } catch(ZipException e) {
+        } catch(Zip4jException e) {
             throw e;
         } catch(Exception e) {
-            throw new ZipException(e);
+            throw new Zip4jException(e);
         }
     }
 
-    private byte[] deriveKey(byte[] salt, char[] password) throws ZipException {
+    private byte[] deriveKey(byte[] salt, char[] password) throws Zip4jException {
         try {
             PBKDF2Parameters p = new PBKDF2Parameters("HmacSHA1", "ISO-8859-1",
                     salt, 1000);
@@ -135,7 +136,7 @@ public class AesDecoder implements Decoder {
             byte[] derivedKey = e.deriveKey(password, KEY_LENGTH + MAC_LENGTH + PASSWORD_VERIFIER_LENGTH);
             return derivedKey;
         } catch(Exception e) {
-            throw new ZipException(e);
+            throw new Zip4jException(e);
         }
     }
 

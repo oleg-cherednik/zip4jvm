@@ -3,7 +3,7 @@ package com.cop.zip4j;
 import lombok.Builder;
 import lombok.NonNull;
 import com.cop.zip4j.engine.UnzipEngine;
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.utils.CreateZipModel;
 
@@ -57,9 +57,9 @@ public class UnzipIt {
 
     static void checkZipFile(Path zipFile) {
         if (!Files.exists(zipFile))
-            throw new ZipException("ZipFile not exists: " + zipFile);
+            throw new Zip4jException("ZipFile not exists: " + zipFile);
         if (!Files.isRegularFile(zipFile))
-            throw new ZipException("ZipFile is not a regular file: " + zipFile);
+            throw new Zip4jException("ZipFile is not a regular file: " + zipFile);
     }
 
     static void checkOutputFolder(@NonNull Path dir) {

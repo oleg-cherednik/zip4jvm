@@ -1,6 +1,6 @@
 package com.cop.zip4j.crypto.pkware;
 
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.LittleEndianRandomAccessFile;
 import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.model.LocalFileHeader;
@@ -45,7 +45,7 @@ public class PkwareHeader {
         int crc = getCrc(localFileHeader);
 
         if (buf[buf.length - 1] != low(crc) || buf[buf.length - 2] != high(crc))
-            throw new ZipException("The specified password is incorrect");
+            throw new Zip4jException("The specified password is incorrect");
     }
 
     private static byte[] create(PkwareEngine engine, int crc) {

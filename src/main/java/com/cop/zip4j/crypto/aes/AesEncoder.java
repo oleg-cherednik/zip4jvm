@@ -4,7 +4,7 @@ import com.cop.zip4j.crypto.Encoder;
 import com.cop.zip4j.crypto.aes.pbkdf2.MacBasedPRF;
 import com.cop.zip4j.crypto.aes.pbkdf2.PBKDF2Engine;
 import com.cop.zip4j.crypto.aes.pbkdf2.PBKDF2Parameters;
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.model.AesStrength;
 import com.cop.zip4j.utils.ZipUtils;
@@ -39,13 +39,13 @@ public class AesEncoder implements Encoder {
     private int nonce = 1;
     private int loopCount = 0;
 
-    public AesEncoder(char[] password, AesStrength keyStrength) throws ZipException {
+    public AesEncoder(char[] password, AesStrength keyStrength) throws Zip4jException {
         this.password = password;
         this.keyStrength = keyStrength;
         init();
     }
 
-    private void init() throws ZipException {
+    private void init() throws Zip4jException {
         if (keyStrength == AesStrength.STRENGTH_128) {
             KEY_LENGTH = 16;
             MAC_LENGTH = 16;
@@ -55,13 +55,13 @@ public class AesEncoder implements Encoder {
             MAC_LENGTH = 32;
             SALT_LENGTH = 16;
         } else
-            throw new ZipException("invalid aes key strength, cannot determine key sizes");
+            throw new Zip4jException("invalid aes key strength, cannot determine key sizes");
 
         saltBytes = generateSalt(SALT_LENGTH);
         byte[] keyBytes = deriveKey(saltBytes, password);
 
         if (keyBytes == null || keyBytes.length != (KEY_LENGTH + MAC_LENGTH + PASSWORD_VERIFIER_LENGTH)) {
-            throw new ZipException("invalid key generated, cannot decrypt file");
+            throw new Zip4jException("invalid key generated, cannot decrypt file");
         }
 
         aesKey = new byte[KEY_LENGTH];
@@ -77,7 +77,7 @@ public class AesEncoder implements Encoder {
         mac.init(macKey);
     }
 
-    private byte[] deriveKey(byte[] salt, char[] password) throws ZipException {
+    private byte[] deriveKey(byte[] salt, char[] password) throws Zip4jException {
         try {
             PBKDF2Parameters p = new PBKDF2Parameters("HmacSHA1", "ISO-8859-1",
                     salt, 1000);
@@ -85,18 +85,18 @@ public class AesEncoder implements Encoder {
             byte[] derivedKey = e.deriveKey(password, KEY_LENGTH + MAC_LENGTH + PASSWORD_VERIFIER_LENGTH);
             return derivedKey;
         } catch(Exception e) {
-            throw new ZipException(e);
+            throw new Zip4jException(e);
         }
     }
 
     @Override
-    public void encrypt(byte[] buff, int start, int len) throws ZipException {
+    public void encrypt(byte[] buff, int start, int len) throws Zip4jException {
 
         if (finished) {
             // A non 16 byte block has already been passed to encrypter
             // non 16 byte block should be the last block of compressed data in AES encryption
             // any more encryption will lead to corruption of data
-            throw new ZipException("AES Encrypter is in finished state (A non 16 byte block has already been passed to encrypter)");
+            throw new Zip4jException("AES Encrypter is in finished state (A non 16 byte block has already been passed to encrypter)");
         }
 
         if (len % 16 != 0) {
@@ -128,7 +128,7 @@ public class AesEncoder implements Encoder {
     private static byte[] generateSalt(int size) {
 
         if (size != 8 && size != 16) {
-            throw new ZipException("invalid salt size, cannot generate salt");
+            throw new Zip4jException("invalid salt size, cannot generate salt");
         }
 
         int rounds = 0;

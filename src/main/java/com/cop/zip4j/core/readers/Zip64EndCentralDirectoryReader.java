@@ -2,7 +2,7 @@ package com.cop.zip4j.core.readers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.LittleEndianRandomAccessFile;
 import com.cop.zip4j.model.Zip64;
 
@@ -42,6 +42,6 @@ final class Zip64EndCentralDirectoryReader {
         if (in.readDword() == Zip64.EndCentralDirectory.SIGNATURE)
             return;
 
-        throw new ZipException("invalid zip64 end of central directory");
+        throw new Zip4jException("invalid zip64 end of central directory");
     }
 }

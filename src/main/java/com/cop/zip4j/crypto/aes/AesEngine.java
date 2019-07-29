@@ -1,7 +1,6 @@
 package com.cop.zip4j.crypto.aes;
 
-import com.cop.zip4j.exception.ZipException;
-import com.cop.zip4j.utils.InternalZipConstants;
+import com.cop.zip4j.exception.Zip4jException;
 
 public class AesEngine {
 
@@ -13,20 +12,20 @@ public class AesEngine {
     private int[][] workingKey = null;
     private int C0, C1, C2, C3;
 
-    public AesEngine(byte[] key) throws ZipException {
+    public AesEngine(byte[] key) throws Zip4jException {
         init(key);
     }
 
-    public void init(byte[] key) throws ZipException {
+    public void init(byte[] key) throws Zip4jException {
         workingKey = generateWorkingKey(key);
     }
 
-    private int[][] generateWorkingKey(byte[] key) throws ZipException {
+    private int[][] generateWorkingKey(byte[] key) throws Zip4jException {
         int kc = key.length / 4;
         int t;
 
         if (((kc != 4) && (kc != 6) && (kc != 8)) || ((kc * 4) != key.length)) {
-            throw new ZipException("invalid key length (not 128/192/256)");
+            throw new Zip4jException("invalid key length (not 128/192/256)");
         }
 
         rounds = kc + 6;
@@ -54,21 +53,21 @@ public class AesEngine {
         return W;
     }
 
-    public int processBlock(byte[] in, byte[] out) throws ZipException {
+    public int processBlock(byte[] in, byte[] out) throws Zip4jException {
         return processBlock(in, 0, out, 0);
     }
 
-    public int processBlock(byte[] in, int inOff, byte[] out, int outOff) throws ZipException {
+    public int processBlock(byte[] in, int inOff, byte[] out, int outOff) throws Zip4jException {
         if (workingKey == null) {
-            throw new ZipException("AES engine not initialised");
+            throw new Zip4jException("AES engine not initialised");
         }
 
         if ((inOff + (32 / 2)) > in.length) {
-            throw new ZipException("input buffer too short");
+            throw new Zip4jException("input buffer too short");
         }
 
         if ((outOff + (32 / 2)) > out.length) {
-            throw new ZipException("output buffer too short");
+            throw new Zip4jException("output buffer too short");
         }
 
         stateIn(in, inOff);

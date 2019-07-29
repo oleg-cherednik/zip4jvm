@@ -5,7 +5,7 @@ import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.crypto.aes.AesDecoder;
 import com.cop.zip4j.crypto.aes.AesEngine;
 import com.cop.zip4j.crypto.pkware.PkwareHeader;
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.InflaterInputStream;
 import com.cop.zip4j.io.LittleEndianRandomAccessFile;
 import com.cop.zip4j.io.PartInputStream;
@@ -73,13 +73,13 @@ public class UnzipEngine {
             try {
                 Files.createDirectories(destDir.resolve(fileHeader.getFileName()));
             } catch(IOException e) {
-                throw new ZipException(e);
+                throw new Zip4jException(e);
             }
         else {
             try (InputStream in = extractEntryAsStream(fileHeader); OutputStream out = getOutputStream(destDir, fileHeader)) {
                 IOUtils.copyLarge(in, out);
             } catch(IOException e) {
-                throw new ZipException(e);
+                throw new Zip4jException(e);
             }
         }
     }
@@ -110,7 +110,7 @@ public class UnzipEngine {
                     offs += ((AesDecoder)decoder).getSaltLength() +
                             ((AesDecoder)decoder).getPasswordVerifierLength();
                 } else
-                    throw new ZipException("invalid decryptor when trying to calculate " +
+                    throw new Zip4jException("invalid decryptor when trying to calculate " +
                             "compressed size for AES encrypted file: " + fileHeader.getFileName());
             } else if (localFileHeader.getEncryption() == Encryption.PKWARE) {
                 // TODO decrypter throws unsupported exception
@@ -125,15 +125,15 @@ public class UnzipEngine {
             if (fileHeader.getActualCompressionMethod() == CompressionMethod.DEFLATE)
                 return new ZipInputStream(new InflaterInputStream(in, comprSize, this), this);
 
-            throw new ZipException("compression type not supported");
-        } catch(ZipException e) {
+            throw new Zip4jException("compression type not supported");
+        } catch(Zip4jException e) {
             throw e;
         } catch(Exception e) {
-            throw new ZipException(e);
+            throw new Zip4jException(e);
         }
     }
 
-    public void checkCRC() throws ZipException {
+    public void checkCRC() throws Zip4jException {
         if (fileHeader != null) {
             if (fileHeader.getEncryption() == Encryption.AES) {
                 if (decoder != null && decoder instanceof AesDecoder) {
@@ -142,13 +142,13 @@ public class UnzipEngine {
                     byte[] calculatedMac = new byte[AesEngine.AES_AUTH_LENGTH];
 
                     if (calculatedMac == null || storedMac == null) {
-                        throw new ZipException("CRC (MAC) check failed for " + fileHeader.getFileName());
+                        throw new Zip4jException("CRC (MAC) check failed for " + fileHeader.getFileName());
                     }
 
                     System.arraycopy(tmpMacBytes, 0, calculatedMac, 0, AesEngine.AES_AUTH_LENGTH);
 
                     if (!Arrays.equals(calculatedMac, storedMac)) {
-                        throw new ZipException("invalid CRC (MAC) for file: " + fileHeader.getFileName());
+                        throw new Zip4jException("invalid CRC (MAC) for file: " + fileHeader.getFileName());
                     }
                 }
             } else {
@@ -157,7 +157,7 @@ public class UnzipEngine {
                     String errMsg = "invalid CRC for file: " + fileHeader.getFileName();
                     if (localFileHeader.getEncryption() == Encryption.PKWARE)
                         errMsg += " - Wrong Password?";
-                    throw new ZipException(errMsg);
+                    throw new Zip4jException(errMsg);
                 }
             }
         }
@@ -183,7 +183,7 @@ public class UnzipEngine {
             int signature = in.readDword();
 
             if (signature != InternalZipConstants.SPLITSIG)
-                throw new ZipException("Expected first part of split file signature (offs:" + in.getFilePointer() + ')');
+                throw new Zip4jException("Expected first part of split file signature (offs:" + in.getFilePointer() + ')');
         }
 
         return in;
@@ -201,7 +201,7 @@ public class UnzipEngine {
 
             return new FileOutputStream(file.toFile());
         } catch(IOException e) {
-            throw new ZipException(e);
+            throw new Zip4jException(e);
         }
     }
 
@@ -212,7 +212,7 @@ public class UnzipEngine {
             currSplitFile = ZipModel.getSplitFilePath(currSplitFile, currSplitFileCounter + 1);
 
         if (!Files.exists(currSplitFile))
-            throw new ZipException("split file: " + currSplitFile.getFileName() + " does not exists");
+            throw new Zip4jException("split file: " + currSplitFile.getFileName() + " does not exists");
 
         currSplitFileCounter++;
         return new RandomAccessFile(currSplitFile.toFile(), "r");

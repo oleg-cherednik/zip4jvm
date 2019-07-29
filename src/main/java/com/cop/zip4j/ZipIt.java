@@ -16,7 +16,7 @@
 package com.cop.zip4j;
 
 import com.cop.zip4j.engine.ZipEngine;
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.ZipParameters;
 import com.cop.zip4j.model.entry.PathZipEntry;
@@ -79,7 +79,7 @@ public final class ZipIt {
                 entry.setAesStrength(parameters.getAesStrength());
                 entry.setPassword(parameters.getPassword());
             } catch(IOException e) {
-                throw new ZipException(e);
+                throw new Zip4jException(e);
             }
         });
 

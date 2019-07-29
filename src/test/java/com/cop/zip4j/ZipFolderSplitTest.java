@@ -1,6 +1,6 @@
 package com.cop.zip4j;
 
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.ZipParameters;
@@ -61,6 +61,6 @@ public class ZipFolderSplitTest {
                                                 .defaultFolderPath(Zip4jSuite.srcDir)
                                                 .splitLength(1024 * 1024).build();
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-        assertThatThrownBy(() -> zip.add(Zip4jSuite.carsDir, parameters)).isExactlyInstanceOf(ZipException.class);
+        assertThatThrownBy(() -> zip.add(Zip4jSuite.carsDir, parameters)).isExactlyInstanceOf(Zip4jException.class);
     }
 }

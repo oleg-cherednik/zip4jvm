@@ -4,7 +4,7 @@ import com.cop.zip4j.core.writers.DataDescriptorWriter;
 import com.cop.zip4j.core.writers.LocalFileHeaderWriter;
 import com.cop.zip4j.crypto.Encoder;
 import com.cop.zip4j.crypto.aes.AesEngine;
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.CentralDirectoryBuilder;
 import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.model.CentralDirectory;
@@ -77,10 +77,10 @@ public class EntryOutputStream extends OutputStream {
 
             out.mark(MARK);
             encoder.writeHeader(out);
-        } catch(ZipException e) {
+        } catch(Zip4jException e) {
             throw e;
         } catch(Exception e) {
-            throw new ZipException(e);
+            throw new Zip4jException(e);
         }
     }
 

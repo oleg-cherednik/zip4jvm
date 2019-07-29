@@ -3,7 +3,7 @@ package com.cop.zip4j.core.readers;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.LittleEndianRandomAccessFile;
 import com.cop.zip4j.model.EndCentralDirectory;
 
@@ -52,7 +52,7 @@ final class EndCentralDirectoryReader {
 
         this.offs = -1;
 
-        throw new ZipException("zip headers not found. probably not a zip file");
+        throw new Zip4jException("zip headers not found. probably not a zip file");
     }
 
 }

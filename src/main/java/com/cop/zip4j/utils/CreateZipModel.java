@@ -1,7 +1,7 @@
 package com.cop.zip4j.utils;
 
 import com.cop.zip4j.core.readers.ZipModelReader;
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.ZipModel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ public final class CreateZipModel implements Supplier<ZipModel> {
         try {
             return Files.exists(zipFile) ? new ZipModelReader(zipFile, charset).read() : new ZipModel(zipFile, charset);
         } catch(IOException e) {
-            throw new ZipException(e);
+            throw new Zip4jException(e);
         }
     }
 }

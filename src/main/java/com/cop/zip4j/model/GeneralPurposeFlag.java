@@ -1,10 +1,10 @@
 package com.cop.zip4j.model;
 
+import com.cop.zip4j.utils.BitUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import com.cop.zip4j.utils.BitUtils;
 
 import static com.cop.zip4j.utils.BitUtils.BIT0;
 import static com.cop.zip4j.utils.BitUtils.BIT1;
@@ -14,6 +14,8 @@ import static com.cop.zip4j.utils.BitUtils.BIT3;
 import static com.cop.zip4j.utils.BitUtils.BIT6;
 
 /**
+ * see 4.4.4
+ *
  * @author Oleg Cherednik
  * @since 12.03.2019
  */

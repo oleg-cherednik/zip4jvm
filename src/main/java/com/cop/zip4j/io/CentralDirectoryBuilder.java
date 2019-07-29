@@ -2,7 +2,7 @@ package com.cop.zip4j.io;
 
 import com.cop.zip4j.crypto.aes.AesEngine;
 import com.cop.zip4j.crypto.pkware.PkwareHeader;
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.AesExtraDataRecord;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.CompressionMethod;
@@ -57,7 +57,7 @@ public class CentralDirectoryBuilder {
         return fileHeader;
     }
 
-    public LocalFileHeader createLocalFileHeader(@NonNull CentralDirectory.FileHeader fileHeader) throws ZipException {
+    public LocalFileHeader createLocalFileHeader(@NonNull CentralDirectory.FileHeader fileHeader) throws Zip4jException {
         LocalFileHeader localFileHeader = new LocalFileHeader();
 
         localFileHeader.setVersionToExtract(fileHeader.getVersionToExtract());

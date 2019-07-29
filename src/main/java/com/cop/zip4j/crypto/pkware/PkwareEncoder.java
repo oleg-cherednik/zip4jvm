@@ -1,7 +1,7 @@
 package com.cop.zip4j.crypto.pkware;
 
 import com.cop.zip4j.crypto.Encoder;
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.LocalFileHeader;
@@ -24,7 +24,7 @@ public class PkwareEncoder implements Encoder {
 
     public static PkwareEncoder create(@NonNull LocalFileHeader localFileHeader, @NonNull PathZipEntry entry) {
         if (ArrayUtils.isEmpty(entry.getPassword()))
-            throw new ZipException("Passwords should not be empty for '" + Encryption.PKWARE.name() + "' encryption");
+            throw new Zip4jException("Passwords should not be empty for '" + Encryption.PKWARE.name() + "' encryption");
 
         PkwareEngine engine = new PkwareEngine(entry.getPassword());
         PkwareHeader header = PkwareHeader.create(localFileHeader, engine);

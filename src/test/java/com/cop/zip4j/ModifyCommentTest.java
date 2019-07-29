@@ -1,6 +1,6 @@
 package com.cop.zip4j;
 
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.EndCentralDirectory;
@@ -79,7 +79,7 @@ public class ModifyCommentTest {
 
     @Test(dependsOnMethods = "shouldClearCommentForExistedZip")
 //    @Ignore("it's not working under gradle build")
-    public void shouldAddCommentToEncryptedZip() throws ZipException, IOException {
+    public void shouldAddCommentToEncryptedZip() throws Zip4jException, IOException {
         Files.deleteIfExists(zipFile);
         Files.copy(Zip4jSuite.noSplitPkwareZip, zipFile);
 
@@ -113,7 +113,7 @@ public class ModifyCommentTest {
         assertThat(misc.getComment()).isNull();
 
         assertThatThrownBy(() -> misc.setComment(StringUtils.repeat("_", EndCentralDirectory.MAX_COMMENT_LENGTH + 1)))
-                .isInstanceOf(ZipException.class);
+                .isInstanceOf(Zip4jException.class);
     }
 
 }

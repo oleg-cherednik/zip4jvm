@@ -1,7 +1,7 @@
 package com.cop.zip4j.utils;
 
 import com.cop.zip4j.core.writers.ZipModelWriter;
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.ZipModel;
@@ -46,7 +46,7 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
             writeFileHeaders(out, entries);
             new ZipModelWriter(zipModel).finalizeZipFile(out, true);
         } catch(IOException e) {
-            throw new ZipException(e);
+            throw new Zip4jException(e);
         }
 
         restoreFileName(tmpZipFile);
@@ -65,7 +65,7 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
         try {
             return Files.createTempFile(zipModel.getZipFile().getParent(), null, ".zip");
         } catch(IOException e) {
-            throw new ZipException(e);
+            throw new Zip4jException(e);
         }
     }
 
@@ -123,9 +123,9 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
             if (Files.deleteIfExists(zipModel.getZipFile()))
                 Files.move(tmpZipFileName, zipModel.getZipFile());
             else
-                throw new ZipException("cannot delete old zip file");
+                throw new Zip4jException("cannot delete old zip file");
         } catch(IOException e) {
-            throw new ZipException(e);
+            throw new Zip4jException(e);
         }
     }
 }

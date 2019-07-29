@@ -1,6 +1,6 @@
 package com.cop.zip4j.model;
 
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -45,7 +45,7 @@ public class AesExtraDataRecord {
         byte[] buf = vendor != null ? vendor.getBytes(charset) : null;
 
         if (ArrayUtils.getLength(buf) > 2)
-            throw new ZipException("AESExtraDataRecord.vendor should be maximum 2 characters");
+            throw new Zip4jException("AESExtraDataRecord.vendor should be maximum 2 characters");
 
         return buf;
     }

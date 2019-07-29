@@ -1,6 +1,6 @@
 package com.cop.zip4j;
 
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -31,7 +31,7 @@ public class UnzipStreamTest {
     }
 
     @Test
-    public void shouldUnzipEntryToStreamWhenNoSplit() throws ZipException, IOException {
+    public void shouldUnzipEntryToStreamWhenNoSplit() throws Zip4jException, IOException {
         Path imgFile = rootDir.resolve("bentley-continental.jpg");
         UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.noSplitZip).build();
         TestUtils.copyLarge(unzip.extract("cars/bentley-continental.jpg"), imgFile);
@@ -39,7 +39,7 @@ public class UnzipStreamTest {
     }
 
     @Test
-    public void shouldUnzipEntryToStreamWhenSplit() throws ZipException, IOException {
+    public void shouldUnzipEntryToStreamWhenSplit() throws Zip4jException, IOException {
         Path imgFile = rootDir.resolve("ferrari-458-italia.jpg");
         UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.splitZip).build();
         TestUtils.copyLarge(unzip.extract("cars/ferrari-458-italia.jpg"), imgFile);

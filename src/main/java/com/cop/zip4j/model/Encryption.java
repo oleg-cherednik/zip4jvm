@@ -6,7 +6,7 @@ import com.cop.zip4j.crypto.aes.AesDecoder;
 import com.cop.zip4j.crypto.aes.AesEncoder;
 import com.cop.zip4j.crypto.pkware.PkwareDecoder;
 import com.cop.zip4j.crypto.pkware.PkwareEncoder;
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.LittleEndianRandomAccessFile;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.NonNull;
@@ -69,11 +69,11 @@ public enum Encryption {
     };
 
     public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull PathZipEntry entry) {
-        throw new ZipException("invalid encryption method");
+        throw new Zip4jException("invalid encryption method");
     }
 
     public Decoder decoder(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, char[] password) throws IOException {
-        throw new ZipException("unsupported encryption method");
+        throw new Zip4jException("unsupported encryption method");
     }
 
     public static Encryption get(@NonNull ExtraField extraField, @NonNull GeneralPurposeFlag generalPurposeFlag) {

@@ -1,7 +1,7 @@
 package com.cop.zip4j;
 
 import com.cop.zip4j.core.writers.ZipModelWriter;
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.ZipModel;
@@ -39,11 +39,11 @@ public final class ZipMisc {
     private final Charset charset = StandardCharsets.UTF_8;
     private final char[] password;
 
-    public void clearComment() throws ZipException {
+    public void clearComment() throws Zip4jException {
         setComment(null);
     }
 
-    public void setComment(String comment) throws ZipException {
+    public void setComment(String comment) throws Zip4jException {
         comment = ZipUtils.normalizeComment.apply(comment);
         UnzipIt.checkZipFile(zipFile);
 
@@ -54,11 +54,11 @@ public final class ZipMisc {
             out.seek(zipModel.getOffsCentralDirectory());
             new ZipModelWriter(zipModel).finalizeZipFile(out, false);
         } catch(Exception e) {
-            throw new ZipException(e);
+            throw new Zip4jException(e);
         }
     }
 
-    public String getComment() throws ZipException {
+    public String getComment() throws Zip4jException {
         UnzipIt.checkZipFile(zipFile);
         return new CreateZipModel(zipFile, charset).get().getEndCentralDirectory().getComment();
     }
@@ -71,12 +71,12 @@ public final class ZipMisc {
                        .anyMatch(CentralDirectory.FileHeader::isEncrypted);
     }
 
-    public List<String> getEntryNames() throws ZipException {
+    public List<String> getEntryNames() throws Zip4jException {
         UnzipIt.checkZipFile(zipFile);
         return new CreateZipModel(zipFile, charset).get().getEntryNames();
     }
 
-    public List<Path> getFiles() throws ZipException {
+    public List<Path> getFiles() throws Zip4jException {
         UnzipIt.checkZipFile(zipFile);
         ZipModel zipModel = new CreateZipModel(zipFile, charset).get();
 
@@ -85,7 +85,7 @@ public final class ZipMisc {
                         .collect(Collectors.toList());
     }
 
-    public boolean isSplit() throws ZipException {
+    public boolean isSplit() throws Zip4jException {
         UnzipIt.checkZipFile(zipFile);
         return new CreateZipModel(zipFile, charset).get().isSplitArchive();
     }
@@ -95,21 +95,21 @@ public final class ZipMisc {
 
         // TODO probably if not split archive, just copy single zip file
         if (!zipModel.isSplitArchive())
-            throw new ZipException("archive not a split zip file");
+            throw new Zip4jException("archive not a split zip file");
 
         try {
             Files.createDirectories(destZipFile.getParent());
         } catch(IOException e) {
-            throw new ZipException(e);
+            throw new Zip4jException(e);
         }
 
         try (SplitOutputStream out = new SplitOutputStream(destZipFile, zipModel)) {
             zipModel.convertToSolid(copyAllParts(out, zipModel));
             new ZipModelWriter(zipModel).finalizeZipFile(out, false);
-        } catch(ZipException e) {
+        } catch(Zip4jException e) {
             throw e;
         } catch(Exception e) {
-            throw new ZipException(e);
+            throw new Zip4jException(e);
         }
     }
 

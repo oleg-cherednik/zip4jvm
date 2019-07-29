@@ -1,6 +1,6 @@
 package com.cop.zip4j;
 
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.Encryption;
@@ -38,7 +38,7 @@ public class UnzipItTest {
     }
 
     @Test
-    public void shouldUnzipRequiredFiles() throws ZipException, IOException {
+    public void shouldUnzipRequiredFiles() throws Zip4jException, IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         List<String> entries = Arrays.asList("saint-petersburg.jpg", "cars/bentley-continental.jpg");
         UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.noSplitZip).build();
@@ -51,7 +51,7 @@ public class UnzipItTest {
     }
 
     @Test
-    public void shouldUnzipRequiredFilesWhenSplit() throws ZipException, IOException {
+    public void shouldUnzipRequiredFilesWhenSplit() throws Zip4jException, IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         List<String> entries = Arrays.asList("saint-petersburg.jpg", "cars/bentley-continental.jpg");
         UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.splitZip).build();
@@ -64,7 +64,7 @@ public class UnzipItTest {
     }
 
     @Test
-    public void shouldUnzipOneFile() throws ZipException, IOException {
+    public void shouldUnzipOneFile() throws Zip4jException, IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.noSplitZip).build();
         unzip.extract(destDir, "cars/ferrari-458-italia.jpg");
@@ -75,7 +75,7 @@ public class UnzipItTest {
     }
 
     @Test
-    public void shouldUnzipFolder() throws ZipException, IOException {
+    public void shouldUnzipFolder() throws Zip4jException, IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.noSplitZip).build();
         unzip.extract(destDir, "Star Wars");

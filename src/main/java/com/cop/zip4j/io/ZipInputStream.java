@@ -1,7 +1,7 @@
 package com.cop.zip4j.io;
 
 import com.cop.zip4j.engine.UnzipEngine;
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
@@ -63,7 +63,7 @@ public class ZipInputStream extends InputStream {
             if (!skipCRCCheck && unzipEngine != null) {
                 unzipEngine.checkCRC();
             }
-        } catch(ZipException e) {
+        } catch(Zip4jException e) {
             throw new IOException(e.getMessage());
         }
     }

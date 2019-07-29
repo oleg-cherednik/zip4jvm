@@ -2,7 +2,7 @@ package com.cop.zip4j.core.readers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.LittleEndianRandomAccessFile;
 import com.cop.zip4j.model.Zip64;
 
@@ -32,7 +32,7 @@ final class Zip64EndCentralDirectoryLocatorReader {
 
     private boolean findHead(LittleEndianRandomAccessFile in) throws IOException {
         if (offs < 0)
-            throw new ZipException("EndCentralDirectory offs is unknown");
+            throw new Zip4jException("EndCentralDirectory offs is unknown");
 
         long offs = this.offs - Zip64.EndCentralDirectoryLocator.SIZE;
 
