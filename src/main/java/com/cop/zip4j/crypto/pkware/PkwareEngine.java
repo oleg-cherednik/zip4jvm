@@ -17,13 +17,13 @@ class PkwareEngine {
         keys = createKeys(password);
     }
 
-    public void updateKeys(byte charAt) {
-        updateKeys(keys, charAt);
+    public void updateKeys(byte b) {
+        updateKeys(keys, b);
     }
 
-    public byte encrypt(byte plain) {
-        byte cipher = (byte)(stream() ^ plain & 0xFF);
-        updateKeys(plain);
+    public byte encrypt(byte b) {
+        byte cipher = (byte)(stream() ^ b & 0xFF);
+        updateKeys(b);
         return cipher;
     }
 
@@ -61,14 +61,14 @@ class PkwareEngine {
         return keys;
     }
 
-    private static void updateKeys(int[] keys, byte val) {
-        keys[0] = crc32(keys[0], val);
+    private static void updateKeys(int[] keys, byte b) {
+        keys[0] = crc32(keys[0], b);
         keys[1] = (keys[1] + (keys[0] & 0xFF)) * 0x8088405 + 1;
         keys[2] = crc32(keys[2], (byte)(keys[1] >> 24));
     }
 
-    private static int crc32(int crc, byte val) {
-        return (crc >>> 8) ^ CRC_TABLE[(crc ^ val) & 0xFF];
+    private static int crc32(int crc, byte b) {
+        return (crc >>> 8) ^ CRC_TABLE[(crc ^ b) & 0xFF];
     }
 
 }

@@ -9,6 +9,7 @@ import lombok.NonNull;
  * @author Oleg Cherednik
  * @since 22.03.2019
  */
+@SuppressWarnings("MethodCanBeVariableArityMethod")
 public class PkwareDecoder implements Decoder {
 
     private final LocalFileHeader localFileHeader;
@@ -51,7 +52,7 @@ public class PkwareDecoder implements Decoder {
     }
 
     @Override
-    public int decode(byte[] buf, int offs, int len) {
+    public int decrypt(byte[] buf, int offs, int len) {
         if (offs < 0 || len < 0)
             throw new ZipException("one of the input parameters were null in standard decrpyt data");
 

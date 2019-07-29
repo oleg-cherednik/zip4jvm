@@ -90,7 +90,7 @@ public class AesEncoder implements Encoder {
     }
 
     @Override
-    public void encode(byte[] buff, int start, int len) throws ZipException {
+    public void encrypt(byte[] buff, int start, int len) throws ZipException {
 
         if (finished) {
             // A non 16 byte block has already been passed to encrypter

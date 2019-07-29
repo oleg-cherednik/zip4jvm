@@ -14,7 +14,7 @@ public interface Encoder {
     // TODO should nobe here
     Encoder NULL = new Encoder() {
         @Override
-        public void encode(byte[] buf, int offs, int len) {
+        public void encrypt(byte[] buf, int offs, int len) {
         }
 
         @Override
@@ -27,7 +27,7 @@ public interface Encoder {
         }
     };
 
-    void encode(@NonNull byte[] buf, int offs, int len);
+    void encrypt(@NonNull byte[] buf, int offs, int len);
 
     void write(@NonNull SplitOutputStream out) throws IOException;
 

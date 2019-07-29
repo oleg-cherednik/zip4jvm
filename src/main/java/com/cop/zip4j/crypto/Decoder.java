@@ -6,6 +6,6 @@ package com.cop.zip4j.crypto;
  */
 public interface Decoder {
 
-    int decode(byte[] buf, int offs, int len);
+    int decrypt(byte[] buf, int offs, int len);
 
 }

@@ -85,7 +85,7 @@ public class PartInputStream extends InputStream {
 
         if (count > 0) {
             if (unzipEngine.getDecoder() != null)
-                unzipEngine.getDecoder().decode(b, off, count);
+                unzipEngine.getDecoder().decrypt(b, off, count);
             bytesRead += count;
         }
 

@@ -2,7 +2,6 @@ package com.cop.zip4j.crypto.pkware;
 
 import com.cop.zip4j.crypto.Encoder;
 import com.cop.zip4j.io.SplitOutputStream;
-import com.cop.zip4j.utils.ZipUtils;
 import lombok.NonNull;
 
 import java.io.IOException;
@@ -11,40 +10,39 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 22.03.2019
  */
-public final class PkwareEncoder implements Encoder {
+public class PkwareEncoder implements Encoder {
 
     public static final int SIZE_RND_HEADER = 12;
 
     private final PkwareEngine engine;
-    private final byte[] headerBytes = new byte[SIZE_RND_HEADER];
+    private final byte[] header;
 
-    public PkwareEncoder(@NonNull char[] password, int crc) {
+    public PkwareEncoder(@NonNull char[] password, int crc32) {
         engine = new PkwareEngine(password);
-        init(crc);
-    }
-
-    private void init(int crc) {
-        headerBytes[SIZE_RND_HEADER - 1] = (byte)(crc >>> 24);
-        headerBytes[SIZE_RND_HEADER - 2] = (byte)(crc >>> 16);
-        encode(headerBytes);
-    }
-
-    void encode(byte[] buf) {
-        encode(buf, 0, buf.length);
+        header = createHeader(crc32, engine);
     }
 
     @Override
-    public void encode(@NonNull byte[] buf, int offs, int len) {
-        ZipUtils.checkEquealOrGreaterZero(offs);
-        ZipUtils.checkEquealOrGreaterZero(len);
-
-        for (int i = offs; i < offs + len; i++)
-            buf[i] = engine.encrypt(buf[i]);
+    public void encrypt(@NonNull byte[] buf, int offs, int len) {
+        encode(buf, offs, len, engine);
     }
 
     @Override
     public void write(@NonNull SplitOutputStream out) throws IOException {
-        out.writeBytes(headerBytes);
+        out.writeBytes(header);
+    }
+
+    private static byte[] createHeader(int crc32, PkwareEngine engine) {
+        byte[] header = new byte[SIZE_RND_HEADER];
+        header[header.length - 1] = (byte)(crc32 >>> 24);
+        header[header.length - 2] = (byte)(crc32 >>> 16);
+        encode(header, 0, header.length, engine);
+        return header;
+    }
+
+    private static void encode(byte[] buf, int offs, int len, PkwareEngine engine) {
+        for (int i = offs; i < offs + len; i++)
+            buf[i] = engine.encrypt(buf[i]);
     }
 
 }

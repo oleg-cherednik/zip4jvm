@@ -97,7 +97,7 @@ public class AesDecoder implements Decoder {
     }
 
     @Override
-    public int decode(byte[] buf, int offs, int len) throws ZipException {
+    public int decrypt(byte[] buf, int offs, int len) throws ZipException {
         if (aesEngine == null)
             throw new ZipException("AES not initialized properly");
 
