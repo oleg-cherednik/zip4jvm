@@ -27,6 +27,12 @@ class PkwareEngine {
         return cipher;
     }
 
+    public byte decrypt(byte b) {
+        byte tmp = (byte)(b ^ decrypt());
+        updateKeys(keys, tmp);
+        return tmp;
+    }
+
     public byte decrypt() {
         int tmp = keys[2] | 2;
         return (byte)((tmp * (tmp ^ 1)) >>> 8);
@@ -40,7 +46,7 @@ class PkwareEngine {
     private static int[] createCrcTable() {
         int[] buf = new int[256];
 
-        for (int i = 0; i < 256; i++) {
+        for (int i = 0; i < buf.length; i++) {
             int r = i;
 
             for (int j = 0; j < 8; j++)
@@ -52,6 +58,7 @@ class PkwareEngine {
         return buf;
     }
 
+    /** see 6.1.5 */
     private static int[] createKeys(char[] password) {
         int[] keys = { 0x12345678, 0x23456789, 0x34567890 };
 

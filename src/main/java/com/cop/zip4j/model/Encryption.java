@@ -10,7 +10,6 @@ import com.cop.zip4j.exception.ZipException;
 import com.cop.zip4j.io.LittleEndianRandomAccessFile;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.NonNull;
-import org.apache.commons.lang.ArrayUtils;
 
 import java.io.IOException;
 
@@ -35,17 +34,16 @@ public enum Encryption {
     PKWARE {
         @Override
         public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull PathZipEntry entry) {
-            if (ArrayUtils.isEmpty(entry.getPassword()))
-                throw new ZipException("Passwords should not be empty for '" + name() + "' encryption");
-            // Since we do not know the crc here, we use the modification time for encrypting.
-            return new PkwareEncoder(entry.getPassword(), (localFileHeader.getLastModifiedTime() & 0xFFFF) << 16);
+            return PkwareEncoder.create(localFileHeader, entry);
         }
 
         @Override
         public Decoder decoder(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, char[] password)
                 throws IOException {
-            in.seek(localFileHeader.getOffs());
-            return new PkwareDecoder(localFileHeader, password, in.readBytes(PkwareEncoder.SIZE_HEADER));
+//            in.seek(localFileHeader.getOffs());
+//            byte[] header = in.readBytes(PkwareEncoder.SIZE_HEADER);
+//            return new PkwareDecoder(localFileHeader, password, header);
+            return PkwareDecoder.create(in, localFileHeader, password);
         }
     },
     STRONG,

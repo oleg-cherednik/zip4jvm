@@ -2,8 +2,12 @@ package com.cop.zip4j.crypto.pkware;
 
 import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.exception.ZipException;
+import com.cop.zip4j.io.LittleEndianRandomAccessFile;
 import com.cop.zip4j.model.LocalFileHeader;
 import lombok.NonNull;
+
+import java.io.IOException;
+import java.util.Objects;
 
 /**
  * @author Oleg Cherednik
@@ -14,6 +18,28 @@ public class PkwareDecoder implements Decoder {
 
     private final LocalFileHeader localFileHeader;
     private final PkwareEngine engine;
+
+    public static PkwareDecoder create(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, char[] password)
+            throws IOException {
+        PkwareEngine engine = new PkwareEngine(password);
+        in.seek(localFileHeader.getOffs());
+        byte[] header = in.readBytes(PkwareEncoder.SIZE_HEADER);
+
+        Objects.requireNonNull(header);
+        decrypt(header, 0, header.length, engine);
+
+        return new PkwareDecoder(localFileHeader, engine);
+    }
+
+    private static void decrypt(byte[] buf, int offs, int len, PkwareEngine engine) {
+        for (int i = offs; i < offs + len; i++)
+            buf[i] = engine.decrypt(buf[i]);
+    }
+
+    public PkwareDecoder(@NonNull LocalFileHeader localFileHeader, PkwareEngine engine) {
+        this.localFileHeader = localFileHeader;
+        this.engine = engine;
+    }
 
     public PkwareDecoder(@NonNull LocalFileHeader localFileHeader, char[] password, byte[] header) {
         this.localFileHeader = localFileHeader;
@@ -43,7 +69,8 @@ public class PkwareDecoder implements Decoder {
 //					throw new ZipException("Wrong password!", ZipExceptionConstants.WRONG_PASSWORD);
 
                 engine.updateKeys((byte)(result ^ engine.decrypt()));
-                if (i + 1 != PkwareEncoder.SIZE_HEADER)
+
+                if (i + 1 != header.length)
                     result = header[i + 1];
             }
         } catch(Exception e) {
