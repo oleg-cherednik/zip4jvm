@@ -32,7 +32,7 @@ public class RegularFileZipEntry extends PathZipEntry {
 
     @Override
     public long crc32() throws IOException {
-        return encryption == Encryption.STANDARD ? FileUtils.checksumCRC32(path.toFile()) : 0;
+        return encryption == Encryption.PKWARE ? FileUtils.checksumCRC32(path.toFile()) : 0;
     }
 
     @Override

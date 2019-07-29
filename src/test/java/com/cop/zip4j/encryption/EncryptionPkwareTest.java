@@ -47,7 +47,7 @@ public class EncryptionPkwareTest {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
-                                                .encryption(Encryption.STANDARD)
+                                                .encryption(Encryption.PKWARE)
                                                 .aesStrength(AesStrength.STRENGTH_256)
                                                 .comment("password: " + new String(Zip4jSuite.password))
                                                 .password(Zip4jSuite.password).build();
@@ -66,7 +66,7 @@ public class EncryptionPkwareTest {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
-                                                .encryption(Encryption.STANDARD)
+                                                .encryption(Encryption.PKWARE)
                                                 .comment("password: " + new String(Zip4jSuite.password))
                                                 .password(Zip4jSuite.password).build();
 
@@ -91,7 +91,7 @@ public class EncryptionPkwareTest {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
-                                                .encryption(Encryption.STANDARD)
+                                                .encryption(Encryption.PKWARE)
                                                 .password(null).build();
 
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
@@ -106,7 +106,7 @@ public class EncryptionPkwareTest {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
-                                                .encryption(Encryption.STANDARD)
+                                                .encryption(Encryption.PKWARE)
                                                 .password("".toCharArray()).build();
 
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);

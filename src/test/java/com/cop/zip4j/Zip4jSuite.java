@@ -107,7 +107,7 @@ public class Zip4jSuite {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
-                                                .encryption(Encryption.STANDARD)
+                                                .encryption(Encryption.PKWARE)
                                                 .comment("password: " + new String(password))
                                                 .password(password).build();
         ZipIt zip = ZipIt.builder().zipFile(noSplitPkwareZip).build();

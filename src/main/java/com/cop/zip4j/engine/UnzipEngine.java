@@ -4,7 +4,7 @@ import com.cop.zip4j.core.readers.LocalFileHeaderReader;
 import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.crypto.aes.AesDecoder;
 import com.cop.zip4j.crypto.aes.AesEngine;
-import com.cop.zip4j.crypto.pkware.StandardEncoder;
+import com.cop.zip4j.crypto.pkware.PkwareEncoder;
 import com.cop.zip4j.exception.ZipException;
 import com.cop.zip4j.io.InflaterInputStream;
 import com.cop.zip4j.io.LittleEndianRandomAccessFile;
@@ -112,10 +112,10 @@ public class UnzipEngine {
                 } else
                     throw new ZipException("invalid decryptor when trying to calculate " +
                             "compressed size for AES encrypted file: " + fileHeader.getFileName());
-            } else if (localFileHeader.getEncryption() == Encryption.STANDARD) {
+            } else if (localFileHeader.getEncryption() == Encryption.PKWARE) {
                 // TODO decrypter throws unsupported exception
-                comprSize -= StandardEncoder.SIZE_RND_HEADER;
-                offs += StandardEncoder.SIZE_RND_HEADER;
+                comprSize -= PkwareEncoder.SIZE_RND_HEADER;
+                offs += PkwareEncoder.SIZE_RND_HEADER;
             }
 
             in.seek(offs);
@@ -155,7 +155,7 @@ public class UnzipEngine {
                 long calculatedCRC = crc.getValue() & 0xFFFFFFFFL;
                 if (calculatedCRC != (fileHeader.getCrc32() & 0xFFFFFFFFL)) {
                     String errMsg = "invalid CRC for file: " + fileHeader.getFileName();
-                    if (localFileHeader.getEncryption() == Encryption.STANDARD)
+                    if (localFileHeader.getEncryption() == Encryption.PKWARE)
                         errMsg += " - Wrong Password?";
                     throw new ZipException(errMsg);
                 }

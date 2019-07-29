@@ -9,14 +9,14 @@ import lombok.NonNull;
  * @author Oleg Cherednik
  * @since 22.03.2019
  */
-public class StandardDecoder implements Decoder {
+public class PkwareDecoder implements Decoder {
 
     private final LocalFileHeader localFileHeader;
-    private final StandardEngine standardEngine;
+    private final PkwareEngine engine;
 
-    public StandardDecoder(@NonNull LocalFileHeader localFileHeader, char[] password, byte[] headerBytes) {
+    public PkwareDecoder(@NonNull LocalFileHeader localFileHeader, char[] password, byte[] headerBytes) {
         this.localFileHeader = localFileHeader;
-        standardEngine = new StandardEngine(password);
+        engine = new PkwareEngine(password);
         init(headerBytes);
     }
 
@@ -34,15 +34,15 @@ public class StandardDecoder implements Decoder {
 
         try {
             int result = headerBytes[0];
-            for (int i = 0; i < StandardEncoder.SIZE_RND_HEADER; i++) {
+            for (int i = 0; i < PkwareEncoder.SIZE_RND_HEADER; i++) {
 //				Commented this as this check cannot always be trusted
 //				New functionality: If there is an error in extracting a password protected file,
 //				"Wrong Password?" text is appended to the exception message
 //				if(i+1 == InternalZipConstants.STD_DEC_HDR_SIZE && ((byte)(result ^ zipCryptoEngine.decryptByte()) != crc32[3]) && !isSplit)
 //					throw new ZipException("Wrong password!", ZipExceptionConstants.WRONG_PASSWORD);
 
-                standardEngine.updateKeys((byte)(result ^ standardEngine.decryptByte()));
-                if (i + 1 != StandardEncoder.SIZE_RND_HEADER)
+                engine.updateKeys((byte)(result ^ engine.decrypt()));
+                if (i + 1 != PkwareEncoder.SIZE_RND_HEADER)
                     result = headerBytes[i + 1];
             }
         } catch(Exception e) {
@@ -58,8 +58,8 @@ public class StandardDecoder implements Decoder {
         try {
             for (int i = offs; i < offs + len; i++) {
                 int val = buf[i] & 0xff;
-                val = (val ^ standardEngine.decryptByte()) & 0xff;
-                standardEngine.updateKeys((byte)val);
+                val = (val ^ engine.decrypt()) & 0xff;
+                engine.updateKeys((byte)val);
                 buf[i] = (byte)val;
             }
             return len;

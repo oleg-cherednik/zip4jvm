@@ -7,23 +7,49 @@ import org.apache.commons.lang.ArrayUtils;
  * @since 22.03.2019
  */
 @SuppressWarnings({ "MethodCanBeVariableArityMethod", "NewMethodNamingConvention" })
-public class StandardEngine {
+class PkwareEngine {
 
-    private static final int[] CRC_TABLE = new int[256];
+    private static final int[] CRC_TABLE = createCrcTable();
 
     private final int[] keys;
 
-    static {
-        for (int i = 0, r = i; i < 256; i++, r = i) {
-            for (int j = 0; j < 8; j++)
-                r = (r & 1) == 1 ? (r >>> 1) ^ 0xedb88320 : (r >>> 1);
-
-            CRC_TABLE[i] = r;
-        }
+    public PkwareEngine(char[] password) {
+        keys = createKeys(password);
     }
 
-    public StandardEngine(char[] password) {
-        keys = createKeys(password);
+    public void updateKeys(byte charAt) {
+        updateKeys(keys, charAt);
+    }
+
+    public byte encrypt(byte plain) {
+        byte cipher = (byte)(stream() ^ plain & 0xFF);
+        updateKeys(plain);
+        return cipher;
+    }
+
+    public byte decrypt() {
+        int tmp = keys[2] | 2;
+        return (byte)((tmp * (tmp ^ 1)) >>> 8);
+    }
+
+    private byte stream() {
+        int tmp = keys[2] | 3;
+        return (byte)((tmp * (tmp ^ 1)) >>> 8);
+    }
+
+    private static int[] createCrcTable() {
+        int[] buf = new int[256];
+
+        for (int i = 0; i < 256; i++) {
+            int r = i;
+
+            for (int j = 0; j < 8; j++)
+                r = (r & 1) == 1 ? (r >>> 1) ^ 0xEDB88320 : (r >>> 1);
+
+            buf[i] = r;
+        }
+
+        return buf;
     }
 
     private static int[] createKeys(char[] password) {
@@ -43,26 +69,6 @@ public class StandardEngine {
 
     private static int crc32(int crc, byte val) {
         return (crc >>> 8) ^ CRC_TABLE[(crc ^ val) & 0xFF];
-    }
-
-    public void updateKeys(byte charAt) {
-        updateKeys(keys, charAt);
-    }
-
-    public byte decryptByte() {
-        int tmp = keys[2] | 2;
-        return (byte)((tmp * (tmp ^ 1)) >>> 8);
-    }
-
-    private byte stream() {
-        int tmp = keys[2] | 3;
-        return (byte)((tmp * (tmp ^ 1)) >>> 8);
-    }
-
-    public byte encode(byte plain) {
-        byte cipher = (byte)(stream() ^ plain & 0xFF);
-        updateKeys(plain);
-        return cipher;
     }
 
 }

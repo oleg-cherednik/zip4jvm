@@ -4,8 +4,8 @@ import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.crypto.Encoder;
 import com.cop.zip4j.crypto.aes.AesDecoder;
 import com.cop.zip4j.crypto.aes.AesEncoder;
-import com.cop.zip4j.crypto.pkware.StandardDecoder;
-import com.cop.zip4j.crypto.pkware.StandardEncoder;
+import com.cop.zip4j.crypto.pkware.PkwareDecoder;
+import com.cop.zip4j.crypto.pkware.PkwareEncoder;
 import com.cop.zip4j.exception.ZipException;
 import com.cop.zip4j.io.LittleEndianRandomAccessFile;
 import com.cop.zip4j.model.entry.PathZipEntry;
@@ -37,12 +37,12 @@ public enum Encryption {
             return Encoder.NULL;
         }
     },
-    STANDARD(0) {
+    PKWARE(0) {
         @Override
         public Decoder decoder(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, char[] password)
                 throws IOException {
             in.seek(localFileHeader.getOffs());
-            return new StandardDecoder(localFileHeader, password, in.readBytes(StandardEncoder.SIZE_RND_HEADER));
+            return new PkwareDecoder(localFileHeader, password, in.readBytes(PkwareEncoder.SIZE_RND_HEADER));
         }
 
         @Override
@@ -50,7 +50,7 @@ public enum Encryption {
             if(ArrayUtils.isEmpty(entry.getPassword()))
                 throw new ZipException("Passwords should not be empty for '" + name() + "' encryption");
             // Since we do not know the crc here, we use the modification time for encrypting.
-            return new StandardEncoder(entry.getPassword(), (localFileHeader.getLastModifiedTime() & 0xFFFF) << 16);
+            return new PkwareEncoder(entry.getPassword(), (localFileHeader.getLastModifiedTime() & 0xFFFF) << 16);
         }
     },
     STRONG(1),
@@ -93,7 +93,7 @@ public enum Encryption {
             return AES;
         if (generalPurposeFlag.isStrongEncryption())
             return STRONG;
-        return generalPurposeFlag.isEncrypted() ? STANDARD : OFF;
+        return generalPurposeFlag.isEncrypted() ? PKWARE : OFF;
     }
 
 }

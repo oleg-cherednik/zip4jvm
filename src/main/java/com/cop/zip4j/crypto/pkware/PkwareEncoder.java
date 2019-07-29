@@ -11,15 +11,15 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 22.03.2019
  */
-public final class StandardEncoder implements Encoder {
+public final class PkwareEncoder implements Encoder {
 
     public static final int SIZE_RND_HEADER = 12;
 
-    private final StandardEngine standardEngine;
+    private final PkwareEngine engine;
     private final byte[] headerBytes = new byte[SIZE_RND_HEADER];
 
-    public StandardEncoder(@NonNull char[] password, int crc) {
-        standardEngine = new StandardEngine(password);
+    public PkwareEncoder(@NonNull char[] password, int crc) {
+        engine = new PkwareEngine(password);
         init(crc);
     }
 
@@ -39,7 +39,7 @@ public final class StandardEncoder implements Encoder {
         ZipUtils.checkEquealOrGreaterZero(len);
 
         for (int i = offs; i < offs + len; i++)
-            buf[i] = standardEngine.encode(buf[i]);
+            buf[i] = engine.encrypt(buf[i]);
     }
 
     @Override
