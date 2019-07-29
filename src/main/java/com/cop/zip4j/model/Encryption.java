@@ -4,6 +4,7 @@ import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.crypto.Encoder;
 import com.cop.zip4j.crypto.aes.AesDecoder;
 import com.cop.zip4j.crypto.aes.AesEncoder;
+import com.cop.zip4j.crypto.aesnew.AesNewEncoder;
 import com.cop.zip4j.crypto.pkware.PkwareDecoder;
 import com.cop.zip4j.crypto.pkware.PkwareEncoder;
 import com.cop.zip4j.exception.Zip4jException;
@@ -48,6 +49,29 @@ public enum Encryption {
         @Override
         public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull PathZipEntry entry) {
             return new AesEncoder(entry.getPassword(), entry.getAesStrength());
+        }
+
+        @Override
+        public Decoder decoder(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, char[] password)
+                throws IOException {
+            byte[] salt = getSalt(in, localFileHeader);
+            byte[] passwordVerifier = in.readBytes(2);
+            return new AesDecoder(localFileHeader.getExtraField().getAesExtraDataRecord(), password, salt, passwordVerifier);
+        }
+
+        private byte[] getSalt(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader) throws IOException {
+            if (localFileHeader.getEncryption() != AES)
+                return null;
+
+            in.seek(localFileHeader.getOffs());
+            AesStrength aesStrength = localFileHeader.getExtraField().getAesExtraDataRecord().getAesStrength();
+            return in.readBytes(aesStrength.getSaltLength());
+        }
+    },
+    AES_NEW {
+        @Override
+        public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull PathZipEntry entry) {
+            return new AesNewEncoder(entry.getPassword(), entry.getAesStrength());
         }
 
         @Override
