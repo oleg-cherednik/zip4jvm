@@ -48,8 +48,6 @@ public class Zip4jSuite {
     public void beforeSuite() throws IOException {
         removeDir(rootDir);
 
-        Files.createDirectories(srcDir);
-        Files.createDirectories(srcDir.resolve("empty_dir"));
         copyTestData();
         createNoSplitZip();
         createEncryptedNoSplitZip();
@@ -62,6 +60,8 @@ public class Zip4jSuite {
     }
 
     private static void copyTestData() throws IOException {
+        Files.createDirectories(srcDir.resolve("empty_dir"));
+
         Path dataDir = Paths.get("src/test/resources/data").toAbsolutePath();
 
         Files.walk(dataDir).forEach(path -> {
