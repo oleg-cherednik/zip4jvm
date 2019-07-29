@@ -18,7 +18,7 @@ public interface Encoder {
         }
 
         @Override
-        public void write(@NonNull SplitOutputStream out) throws IOException {
+        public void writeHeader(@NonNull SplitOutputStream out) throws IOException {
         }
 
         @Override
@@ -29,7 +29,7 @@ public interface Encoder {
 
     void encrypt(@NonNull byte[] buf, int offs, int len);
 
-    void write(@NonNull SplitOutputStream out) throws IOException;
+    void writeHeader(@NonNull SplitOutputStream out) throws IOException;
 
     default void close(SplitOutputStream out) throws IOException {
     }

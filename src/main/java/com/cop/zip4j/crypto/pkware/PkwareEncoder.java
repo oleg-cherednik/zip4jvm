@@ -37,7 +37,7 @@ public class PkwareEncoder implements Encoder {
     }
 
     @Override
-    public void write(@NonNull SplitOutputStream out) throws IOException {
+    public void writeHeader(@NonNull SplitOutputStream out) throws IOException {
         header.write(out);
     }
 

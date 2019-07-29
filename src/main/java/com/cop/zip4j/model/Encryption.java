@@ -77,11 +77,11 @@ public enum Encryption {
     }
 
     public static Encryption get(@NonNull ExtraField extraField, @NonNull GeneralPurposeFlag generalPurposeFlag) {
+        if (!generalPurposeFlag.isEncrypted())
+            return OFF;
         if (extraField.getAesExtraDataRecord() != AesExtraDataRecord.NULL)
             return AES;
-        if (generalPurposeFlag.isStrongEncryption())
-            return STRONG;
-        return generalPurposeFlag.isEncrypted() ? PKWARE : OFF;
+        return generalPurposeFlag.isStrongEncryption() ? STRONG : PKWARE;
     }
 
 }

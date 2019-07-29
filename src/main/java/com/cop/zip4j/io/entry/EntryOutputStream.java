@@ -76,7 +76,7 @@ public class EntryOutputStream extends OutputStream {
             encryption = entry.getEncryption();
 
             out.mark(MARK);
-            encoder.write(out);
+            encoder.writeHeader(out);
         } catch(ZipException e) {
             throw e;
         } catch(Exception e) {

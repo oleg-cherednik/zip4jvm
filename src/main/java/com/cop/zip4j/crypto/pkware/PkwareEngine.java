@@ -17,10 +17,6 @@ class PkwareEngine {
         keys = createKeys(password);
     }
 
-    public void updateKeys(byte b) {
-        updateKeys(keys, b);
-    }
-
     public void encrypt(byte[] buf, int offs, int len) {
         for (int i = offs; i < offs + len; i++)
             buf[i] = encrypt(buf[i]);
@@ -35,7 +31,7 @@ class PkwareEngine {
 
     private byte encrypt(byte b) {
         byte cipher = (byte)(stream() ^ b);
-        updateKeys(b);
+        updateKeys(keys, b);
         return cipher;
     }
 
