@@ -145,7 +145,7 @@ public class EncryptionAesTest {
 
     public void shouldUnzipWhenAesEncryption() throws IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        Path zipFile = destDir.resolve("d:/zip4j/src_aes.zip");
+        Path zipFile = destDir.resolve("d:/zip4j/aes.zip");
 //        Path zipFile = destDir.resolve("d:/zip4j/src_aes_big.zip");
         UnzipIt unzip = UnzipIt.builder()
                                .zipFile(zipFile)
