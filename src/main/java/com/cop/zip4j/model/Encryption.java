@@ -79,7 +79,7 @@ public enum Encryption {
         public Decoder decoder(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, char[] password)
                 throws IOException {
             byte[] salt = getSalt(in, localFileHeader);
-            byte[] passwordVerifier = in.readBytes(2);
+            byte[] passwordVerifier = in.readBytes(AesNewEncoder.PASSWORD_VERIFIER_LENGTH);
             return new AesNewDecoder(localFileHeader.getExtraField().getAesExtraDataRecord(), password, salt, passwordVerifier);
         }
 

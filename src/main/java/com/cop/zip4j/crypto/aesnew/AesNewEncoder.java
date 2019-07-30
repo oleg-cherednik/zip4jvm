@@ -16,7 +16,7 @@ import static com.cop.zip4j.crypto.aesnew.AesNewEngine.AES_BLOCK_SIZE;
 
 public class AesNewEncoder implements Encoder {
 
-    private static final int PASSWORD_VERIFIER_LENGTH = 2;
+    public static final int PASSWORD_VERIFIER_LENGTH = 2;
 
     private char[] password;
     private AesStrength aesKeyStrength;

@@ -1,9 +1,9 @@
 package com.cop.zip4j.io;
 
+import com.cop.zip4j.utils.CreateStringFunc;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import com.cop.zip4j.utils.CreateStringFunc;
 
 import java.io.Closeable;
 import java.io.FileNotFoundException;
@@ -23,7 +23,7 @@ public final class LittleEndianRandomAccessFile implements Closeable {
     @NonNull
     private final RandomAccessFile in;
     @Getter
-    private int offs;
+    private long offs;
 
     public LittleEndianRandomAccessFile(@NonNull Path path) throws FileNotFoundException {
         in = new RandomAccessFile(path.toFile(), "r");
@@ -103,11 +103,17 @@ public final class LittleEndianRandomAccessFile implements Closeable {
 
     public void seek(long pos) throws IOException {
         in.seek(pos);
+        offs = pos;
     }
 
     @Override
     public void close() throws IOException {
         in.close();
+    }
+
+    @Override
+    public String toString() {
+        return "offs: " + offs;
     }
 
     public long getFilePointer() throws IOException {

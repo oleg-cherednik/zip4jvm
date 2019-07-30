@@ -8,6 +8,15 @@ import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.AesExtraDataRecord;
 import com.cop.zip4j.model.AesStrength;
 
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
 import java.util.Arrays;
 import java.util.zip.ZipException;
 
@@ -46,21 +55,43 @@ public class AesNewDecoder implements Decoder {
         return PASSWORD_VERIFIER_LENGTH;
     }
 
+    private Cipher cipher;
+
     public AesNewDecoder(AesExtraDataRecord aesExtraDataRecord, char[] password, byte[] salt, byte[] passwordVerifier) throws ZipException {
         this.aesExtraDataRecord = aesExtraDataRecord;
         this.password = password;
         this.saltLength = salt.length;
-        iv = new byte[AES_BLOCK_SIZE];
-        counterBlock = new byte[AES_BLOCK_SIZE];
-        init(salt, passwordVerifier);
+        try {
+            iv = new byte[AES_BLOCK_SIZE];
+            IvParameterSpec ivspec = new IvParameterSpec(iv);
+
+            KeySpec spec = new PBEKeySpec(password, salt, 1000, 256);
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+
+            SecretKey tmp = factory.generateSecret(spec);
+            SecretKeySpec secretKey = new SecretKeySpec(tmp.getEncoded(), "AES");
+
+            //AES/CBC/PKCS5Padding
+            cipher = Cipher.getInstance("AES/CTR/NoPadding");
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, ivspec);
+
+
+//            counterBlock = new byte[AES_BLOCK_SIZE];
+
+
+//            init(salt, passwordVerifier);
+        } catch(Exception e) {
+            throw new Zip4jException(e);
+        }
     }
 
-    private void init(byte[] salt, byte[] passwordVerifier) {
+    private void init(byte[] salt, byte[] passwordVerifier) throws NoSuchAlgorithmException, InvalidKeySpecException {
         AesStrength aesKeyStrength = aesExtraDataRecord.getAesStrength();
 
         if (password == null || password.length <= 0) {
             throw new Zip4jException("empty or null password provided for AES Decryptor");
         }
+
 
         byte[] derivedKey = deriveKey(salt, password, aesKeyStrength.getKeyLength(), aesKeyStrength.getMacLength());
         if (derivedKey == null || derivedKey.length != (aesKeyStrength.getKeyLength() + aesKeyStrength.getMacLength()
@@ -88,19 +119,28 @@ public class AesNewDecoder implements Decoder {
 
     @Override
     public int decrypt(byte[] buf, int offs, int len) {
-        for (int j = offs; j < (offs + len); j += AES_BLOCK_SIZE) {
-            int loopCount = (j + AES_BLOCK_SIZE <= (offs + len)) ?
-                            AES_BLOCK_SIZE : ((offs + len) - j);
+        try {
+            int loop = len / AES_BLOCK_SIZE * AES_BLOCK_SIZE + (len % AES_BLOCK_SIZE == 0 ? 0 : AES_BLOCK_SIZE);
+            byte[] res = cipher.doFinal(buf, offs, len);
+            int a = 0;
+            a++;
 
-            mac.update(buf, j, loopCount);
-            prepareBuffAESIVBytes(iv, nonce);
-            aesEngine.processBlock(iv, counterBlock);
+            for (int j = offs; j < (offs + len); j += AES_BLOCK_SIZE) {
+                int loopCount = (j + AES_BLOCK_SIZE <= (offs + len)) ? AES_BLOCK_SIZE : ((offs + len) - j);
 
-            for (int k = 0; k < loopCount; k++) {
-                buf[j + k] = (byte)(buf[j + k] ^ counterBlock[k]);
+                mac.update(buf, j, loopCount);
+                prepareBuffAESIVBytes(iv, nonce);
+                aesEngine.processBlock(iv, counterBlock);
+
+                for (int k = 0; k < loopCount; k++) {
+                    buf[j + k] = (byte)(buf[j + k] ^ counterBlock[k]);
+                }
+
+                nonce++;
             }
 
-            nonce++;
+        } catch(Exception e) {
+            throw new Zip4jException(e);
         }
 
         return len;

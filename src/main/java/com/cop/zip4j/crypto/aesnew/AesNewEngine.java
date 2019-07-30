@@ -2,6 +2,16 @@ package com.cop.zip4j.crypto.aesnew;
 
 import com.cop.zip4j.exception.Zip4jException;
 
+/**
+ * byte[] iv = new byte[128/8];
+ * new SecureRandom().nextBytes(iv);
+ * IvParameterSpec ivspec = new IvParameterSpec(iv);
+ *
+ * KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 128);
+ * SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+ *
+ * Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
+ */
 public class AesNewEngine {
 
     public static final int AES_AUTH_LENGTH = 10;
