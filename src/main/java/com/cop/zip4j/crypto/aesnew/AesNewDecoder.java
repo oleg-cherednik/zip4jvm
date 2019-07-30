@@ -6,7 +6,6 @@ import com.cop.zip4j.crypto.aesnew.pbkdf2.PBKDF2Engine;
 import com.cop.zip4j.crypto.aesnew.pbkdf2.PBKDF2Parameters;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.AesExtraDataRecord;
-import com.cop.zip4j.model.AesStrength;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -14,14 +13,9 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
 import java.util.zip.ZipException;
-
-import static com.cop.zip4j.crypto.aesnew.AesNewCipherUtil.prepareBuffAESIVBytes;
-import static com.cop.zip4j.crypto.aesnew.AesNewEngine.AES_BLOCK_SIZE;
 
 public class AesNewDecoder implements Decoder {
 
@@ -57,23 +51,30 @@ public class AesNewDecoder implements Decoder {
 
     private Cipher cipher;
 
+    private static final String aes = "AES/CTR/PKCS5Padding";
+    private static final String pbk = "PBKDF2WithHmacSHA1";
+
     public AesNewDecoder(AesExtraDataRecord aesExtraDataRecord, char[] password, byte[] salt, byte[] passwordVerifier) throws ZipException {
         this.aesExtraDataRecord = aesExtraDataRecord;
         this.password = password;
         this.saltLength = salt.length;
+
         try {
-            iv = new byte[AES_BLOCK_SIZE];
+            byte[] iv = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
             IvParameterSpec ivspec = new IvParameterSpec(iv);
 
+            SecretKeyFactory factory = SecretKeyFactory.getInstance(pbk);
             KeySpec spec = new PBEKeySpec(password, salt, 1000, 256);
-            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-
             SecretKey tmp = factory.generateSecret(spec);
             SecretKeySpec secretKey = new SecretKeySpec(tmp.getEncoded(), "AES");
 
-            //AES/CBC/PKCS5Padding
-            cipher = Cipher.getInstance("AES/CTR/NoPadding");
+            cipher = Cipher.getInstance(aes);
             cipher.init(Cipher.DECRYPT_MODE, secretKey, ivspec);
+
+            //AES/CBC/PKCS5Padding
+            //AES/CTR/NoPadding
+//            cipher = Cipher.getInstance("AES/CTR/NoPadding");
+//            cipher.init(Cipher.DECRYPT_MODE, secretKey, ivspec);
 
 
 //            counterBlock = new byte[AES_BLOCK_SIZE];
@@ -85,59 +86,13 @@ public class AesNewDecoder implements Decoder {
         }
     }
 
-    private void init(byte[] salt, byte[] passwordVerifier) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        AesStrength aesKeyStrength = aesExtraDataRecord.getAesStrength();
-
-        if (password == null || password.length <= 0) {
-            throw new Zip4jException("empty or null password provided for AES Decryptor");
-        }
-
-
-        byte[] derivedKey = deriveKey(salt, password, aesKeyStrength.getKeyLength(), aesKeyStrength.getMacLength());
-        if (derivedKey == null || derivedKey.length != (aesKeyStrength.getKeyLength() + aesKeyStrength.getMacLength()
-                + PASSWORD_VERIFIER_LENGTH)) {
-            throw new Zip4jException("invalid derived key");
-        }
-
-        byte[] aesKey = new byte[aesKeyStrength.getKeyLength()];
-        macKey = new byte[aesKeyStrength.getMacLength()];
-        byte[] derivedPasswordVerifier = new byte[PASSWORD_VERIFIER_LENGTH];
-
-        System.arraycopy(derivedKey, 0, aesKey, 0, aesKeyStrength.getKeyLength());
-        System.arraycopy(derivedKey, aesKeyStrength.getKeyLength(), macKey, 0, aesKeyStrength.getMacLength());
-        System.arraycopy(derivedKey, aesKeyStrength.getKeyLength() + aesKeyStrength.getMacLength(), derivedPasswordVerifier,
-                0, PASSWORD_VERIFIER_LENGTH);
-
-        if (!Arrays.equals(passwordVerifier, derivedPasswordVerifier)) {
-            throw new Zip4jException("Wrong Password");
-        }
-
-        aesEngine = new AesNewEngine(aesKey);
-        mac = new MacBasedPRF("HmacSHA1");
-        mac.init(macKey);
-    }
-
     @Override
     public int decrypt(byte[] buf, int offs, int len) {
         try {
-            int loop = len / AES_BLOCK_SIZE * AES_BLOCK_SIZE + (len % AES_BLOCK_SIZE == 0 ? 0 : AES_BLOCK_SIZE);
-            byte[] res = cipher.doFinal(buf, offs, len);
+            byte[] tmp = Arrays.copyOfRange(buf, 0, len);
+            byte[] res = cipher.doFinal(tmp);
             int a = 0;
             a++;
-
-            for (int j = offs; j < (offs + len); j += AES_BLOCK_SIZE) {
-                int loopCount = (j + AES_BLOCK_SIZE <= (offs + len)) ? AES_BLOCK_SIZE : ((offs + len) - j);
-
-                mac.update(buf, j, loopCount);
-                prepareBuffAESIVBytes(iv, nonce);
-                aesEngine.processBlock(iv, counterBlock);
-
-                for (int k = 0; k < loopCount; k++) {
-                    buf[j + k] = (byte)(buf[j + k] ^ counterBlock[k]);
-                }
-
-                nonce++;
-            }
 
         } catch(Exception e) {
             throw new Zip4jException(e);
