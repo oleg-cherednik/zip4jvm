@@ -36,7 +36,7 @@ public class AES {
             (byte)92, (byte)-5, (byte)48, (byte)57, (byte)-49, (byte)-88 };
     private static final byte[] passwordVerifier = { (byte)0xC2, (byte)0x65 };
 
-    //    private static final String aes = "AES/CTR/NoPadding";
+    //    private static final String aes = "AES/CTR/PKCS5Padding";
     private static final String aes = "AES/CTR/NoPadding";
     private static final String pbk = "PBKDF2WithHmacSHA1";
 
@@ -87,11 +87,10 @@ public class AES {
         System.out.println(Arrays.toString(aesKey));
         System.out.println("-------------");
 
-        IvParameterSpec ivspec = new IvParameterSpec(new byte[16]);
         Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
-        cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(aesKey, "AES"), ivspec);
+        cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(aesKey, "AES"), new IvParameterSpec(new byte[16]));
 
-        byte[] res = cipher.update(buf);
+        byte[] res = cipher.doFinal(buf);
 
 
         AesDecoder decoder = new AesDecoder(AesStrength.KEY_STRENGTH_256, password.toCharArray(), salt, passwordVerifier);
