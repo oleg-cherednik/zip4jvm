@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
-import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatEncryptedZipFile;
+import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatZipFile;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
@@ -58,7 +58,7 @@ public class EncryptionPkwareTest {
         zip.add(Zip4jSuite.srcDir, parameters);
 
         assertThatDirectory(destDir).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatEncryptedZipFile(zipFile, Zip4jSuite.password).exists().rootEntry().matches(TestUtils.zipRootDirAssert);
+        assertThatZipFile(zipFile, Zip4jSuite.password).exists().rootEntry().matches(TestUtils.zipRootDirAssert);
     }
 
     public void shouldCreateNewZipWithSelectedFilesAndStandardEncryption() throws IOException {
@@ -81,8 +81,8 @@ public class EncryptionPkwareTest {
         zip.add(files, parameters);
 
         assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatEncryptedZipFile(zipFile, Zip4jSuite.password).exists().rootEntry().hasSubDirectories(0).hasFiles(3);
-        assertThatEncryptedZipFile(zipFile, Zip4jSuite.password).directory("/").matches(TestUtils.zipCarsDirAssert);
+        assertThatZipFile(zipFile, Zip4jSuite.password).exists().rootEntry().hasSubDirectories(0).hasFiles(3);
+        assertThatZipFile(zipFile, Zip4jSuite.password).directory("/").matches(TestUtils.zipCarsDirAssert);
     }
 
     public void shouldThrowExceptionWhenStandardEncryptionAndNullPassword() throws IOException {

@@ -1,7 +1,6 @@
 package com.cop.zip4j.crypto.aesnew;
 
 import com.cop.zip4j.crypto.Encoder;
-import com.cop.zip4j.crypto.aes.pbkdf2.MacBasedPRF;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.model.aes.AesStrength;
@@ -33,7 +32,6 @@ public class AesNewEncoder implements Encoder {
 
     private final Cipher cipher;
     private final Mac mac;
-    private final MacBasedPRF mac1;
     private final byte[] salt;
     private final byte[] derivedPasswordVerifier;
 
@@ -63,14 +61,8 @@ public class AesNewEncoder implements Encoder {
             cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(secretKey.getEncoded(), "AES"), new IvParameterSpec(iv));
 
             Mac mac = Mac.getInstance("HmacSHA1");
-            mac.init(secretKey);
-
-            // TODO temporary
-
-            MacBasedPRF mac1 = new MacBasedPRF("HmacSHA1");
-            mac1.init(macKey);
-
-            return new AesNewEncoder(cipher, mac, mac1, salt, derivedPasswordVerifier);
+            mac.init(new SecretKeySpec(macKey, "HmacSHA1"));
+            return new AesNewEncoder(cipher, mac, salt, derivedPasswordVerifier);
         } catch(Exception e) {
             throw new Zip4jException(e);
         }
@@ -93,7 +85,6 @@ public class AesNewEncoder implements Encoder {
             byte[] tmp = cipher.doFinal(buf, offs, len);
             System.arraycopy(tmp, 0, buf, offs, tmp.length);
             mac.update(buf, offs, len);
-            mac1.update(buf, offs, len);
         } catch(Exception e) {
             throw new Zip4jException(e);
         }
@@ -108,14 +99,9 @@ public class AesNewEncoder implements Encoder {
     @Override
     public void close(SplitOutputStream out) throws IOException {
         byte[] buf = mac.doFinal();
-//        out.writeBytes(macBytes);
-        out.writeBytes(getFinalMac());
+        byte[] macBytes = new byte[10];
+        System.arraycopy(buf, 0, macBytes, 0, 10);
+        out.writeBytes(macBytes);
     }
 
-    public byte[] getFinalMac() {
-        byte[] rawMacBytes = mac1.doFinal();
-        byte[] macBytes = new byte[10];
-        System.arraycopy(rawMacBytes, 0, macBytes, 0, 10);
-        return macBytes;
-    }
 }
