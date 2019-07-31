@@ -1,7 +1,6 @@
 package com.cop.zip4j.foo;
 
 import com.cop.zip4j.crypto.aes.AesEngine;
-import com.cop.zip4j.crypto.aes.pbkdf2.MacBasedPRF;
 import com.cop.zip4j.crypto.aes.pbkdf2.PBKDF2Engine;
 import com.cop.zip4j.crypto.aes.pbkdf2.PBKDF2Parameters;
 import com.cop.zip4j.exception.Zip4jException;
@@ -16,6 +15,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
@@ -107,14 +107,14 @@ class AesDecoder {
     private final AesStrength strength;
     private final char[] password;
     private AesEngine aesEngine;
-    private MacBasedPRF mac;
+    private Mac mac;
 
     private int nonce = 1;
     private final byte[] iv = new byte[AES_BLOCK_SIZE];
     private final byte[] counterBlock = new byte[AES_BLOCK_SIZE];
 
     public AesDecoder(AesStrength strength, char[] password, byte[] salt, byte[] passwordVerifier)
-            throws NoSuchAlgorithmException, InvalidKeySpecException {
+            throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException {
         this.strength = strength;
         this.password = ArrayUtils.clone(password);
 
@@ -122,7 +122,7 @@ class AesDecoder {
         init(salt, passwordVerifier);
     }
 
-    private void init(byte[] salt, byte[] passwordVerifier) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    private void init(byte[] salt, byte[] passwordVerifier) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException {
         SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
         KeySpec spec = new PBEKeySpec(password, salt, 1000, 256);
         SecretKey secretKey = factory.generateSecret(spec);
@@ -145,8 +145,9 @@ class AesDecoder {
         }
 
         aesEngine = new AesEngine(aesKey);
-        mac = new MacBasedPRF("HmacSHA1");
-        mac.init(macKey);
+
+        mac = Mac.getInstance("HmacSHA1");
+        mac.init(secretKey);
     }
 
     public int decrypt(byte[] buf, int offs, int len) {
