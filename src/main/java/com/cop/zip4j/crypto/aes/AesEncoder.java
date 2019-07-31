@@ -9,6 +9,7 @@ import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.model.aes.AesStrength;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import static com.cop.zip4j.crypto.aes.AesCipherUtil.prepareBuffAESIVBytes;
 import static com.cop.zip4j.crypto.aes.AesEngine.AES_BLOCK_SIZE;
@@ -69,6 +70,8 @@ public class AesEncoder implements Encoder {
         System.arraycopy(keyBytes, keyLength, macKey, 0, macLength);
         System.arraycopy(keyBytes, keyLength + macLength, derivedPasswordVerifier, 0, PASSWORD_VERIFIER_LENGTH);
 
+        System.out.println(Arrays.toString(macKey));
+
         aesEngine = new AesEngine(aesKey);
         mac = new MacBasedPRF("HmacSHA1");
         mac.init(macKey);
@@ -127,6 +130,7 @@ public class AesEncoder implements Encoder {
         byte[] rawMacBytes = mac.doFinal();
         byte[] macBytes = new byte[10];
         System.arraycopy(rawMacBytes, 0, macBytes, 0, 10);
+        System.out.println(Arrays.toString(macBytes));
         return macBytes;
     }
 

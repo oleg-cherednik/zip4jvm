@@ -60,7 +60,7 @@ public class EncryptionAesTest {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(CompressionMethod.STORE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
-                                                .encryption(Encryption.AES)
+                                                .encryption(Encryption.AES_NEW)
                                                 .strength(AesStrength.KEY_STRENGTH_256)
 //                                                .comment("password: " + new String(Zip4jSuite.password))
                                                 .password(Zip4jSuite.password).build();

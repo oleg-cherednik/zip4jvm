@@ -17,6 +17,7 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.security.spec.KeySpec;
+import java.util.Arrays;
 
 /**
  * byte[] iv = new byte[128/8];
@@ -46,7 +47,15 @@ public class AesNewEncoder implements Encoder {
             SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
             KeySpec spec = new PBEKeySpec(password, salt, 1000, length * 8);
             byte[] tmp = secretKeyFactory.generateSecret(spec).getEncoded();
-            byte[] derivedPasswordVerifier = { tmp[tmp.length - 2], tmp[tmp.length - 1] };
+
+            byte[] macKey = new byte[strength.getMacLength()];
+            byte[] derivedPasswordVerifier = new byte[AesNewDecoder.PASSWORD_VERIFIER_LENGTH];
+
+            System.arraycopy(tmp, strength.getKeyLength(), macKey, 0, macKey.length);
+            System.arraycopy(tmp, strength.getKeyLength() + macKey.length, derivedPasswordVerifier, 0, AesNewDecoder.PASSWORD_VERIFIER_LENGTH);
+
+            System.out.println(Arrays.toString(macKey));
+
             // --
 
             spec = new PBEKeySpec(password, salt, 1000, strength.getSize());
@@ -60,8 +69,7 @@ public class AesNewEncoder implements Encoder {
             mac.init(secretKey);
 
             // TODO temporary
-            byte[] macKey = new byte[strength.getMacLength()];
-            System.arraycopy(tmp, strength.getKeyLength(), macKey, 0, macKey.length);
+
             MacBasedPRF mac1 = new MacBasedPRF("HmacSHA1");
             mac1.init(macKey);
 
@@ -87,6 +95,8 @@ public class AesNewEncoder implements Encoder {
         try {
             byte[] tmp = cipher.doFinal(buf, offs, len);
             System.arraycopy(tmp, 0, buf, offs, tmp.length);
+            mac.update(buf, offs, len);
+            mac1.update(buf, offs, len);
         } catch(Exception e) {
             throw new Zip4jException(e);
         }
@@ -100,12 +110,16 @@ public class AesNewEncoder implements Encoder {
 
     @Override
     public void close(SplitOutputStream out) throws IOException {
+        byte[] buf = mac.doFinal();
+//        out.writeBytes(macBytes);
+        out.writeBytes(getFinalMac());
+    }
+
+    public byte[] getFinalMac() {
         byte[] rawMacBytes = mac1.doFinal();
         byte[] macBytes = new byte[10];
         System.arraycopy(rawMacBytes, 0, macBytes, 0, 10);
-
-
-//        byte[] buf = mac.doFinal();
-        out.writeBytes(macBytes);
+        System.out.println(Arrays.toString(macBytes));
+        return macBytes;
     }
 }
