@@ -17,7 +17,6 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.security.spec.KeySpec;
-import java.util.Arrays;
 
 /**
  * byte[] iv = new byte[128/8];
@@ -53,8 +52,6 @@ public class AesNewEncoder implements Encoder {
 
             System.arraycopy(tmp, strength.getKeyLength(), macKey, 0, macKey.length);
             System.arraycopy(tmp, strength.getKeyLength() + macKey.length, derivedPasswordVerifier, 0, AesNewDecoder.PASSWORD_VERIFIER_LENGTH);
-
-            System.out.println(Arrays.toString(macKey));
 
             // --
 
@@ -119,7 +116,6 @@ public class AesNewEncoder implements Encoder {
         byte[] rawMacBytes = mac1.doFinal();
         byte[] macBytes = new byte[10];
         System.arraycopy(rawMacBytes, 0, macBytes, 0, 10);
-        System.out.println(Arrays.toString(macBytes));
         return macBytes;
     }
 }
