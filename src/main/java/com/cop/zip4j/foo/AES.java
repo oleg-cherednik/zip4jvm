@@ -87,11 +87,11 @@ public class AES {
         System.out.println(Arrays.toString(aesKey));
         System.out.println("-------------");
 
-//        IvParameterSpec ivspec = new IvParameterSpec(new byte[16]);
-//        Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
-//        cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(aesKey, "AES"), ivspec);
-//
-//        byte[] res = cipher.doFinal(buf);
+        IvParameterSpec ivspec = new IvParameterSpec(new byte[16]);
+        Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
+        cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(aesKey, "AES"), ivspec);
+
+        byte[] res = cipher.update(buf);
 
 
         AesDecoder decoder = new AesDecoder(AesStrength.KEY_STRENGTH_256, password.toCharArray(), salt, passwordVerifier);
