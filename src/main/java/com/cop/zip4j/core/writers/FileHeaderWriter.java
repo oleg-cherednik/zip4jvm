@@ -1,5 +1,6 @@
 package com.cop.zip4j.core.writers;
 
+import com.cop.zip4j.model.CompressionMethod;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import com.cop.zip4j.io.SplitOutputStream;
@@ -37,7 +38,7 @@ final class FileHeaderWriter {
         out.writeWord(fileHeader.getGeneralPurposeFlag().getData());
         out.writeWord(fileHeader.getCompressionMethod().getValue());
         out.writeDword(fileHeader.getLastModifiedTime());
-        out.writeDword(fileHeader.getCrc32());
+        out.writeDword(fileHeader.getCompressionMethod() == CompressionMethod.AES_ENC ? 0 : fileHeader.getCrc32());
         out.writeDword(fileHeader.isWriteZip64FileSize() ? InternalZipConstants.ZIP_64_LIMIT : fileHeader.getCompressedSize());
         out.writeDword(fileHeader.isWriteZip64FileSize() ? InternalZipConstants.ZIP_64_LIMIT : fileHeader.getUncompressedSize());
         out.writeWord(fileName.length);

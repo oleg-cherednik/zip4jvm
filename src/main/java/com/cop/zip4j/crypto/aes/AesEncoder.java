@@ -9,7 +9,6 @@ import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.model.aes.AesStrength;
 
 import java.io.IOException;
-import java.util.Random;
 
 import static com.cop.zip4j.crypto.aes.AesCipherUtil.prepareBuffAESIVBytes;
 import static com.cop.zip4j.crypto.aes.AesEngine.AES_BLOCK_SIZE;
@@ -96,28 +95,32 @@ public class AesEncoder implements Encoder {
     }
 
     private static byte[] generateSalt(int size) {
+        return new byte[] {
+                (byte)0x3, (byte)0x58, (byte)0xC6, (byte)0x44, (byte)0x26,
+                (byte)0x6, (byte)0x30, (byte)0xD2, (byte)0xEF, (byte)0x2B,
+                (byte)0x2D, (byte)0x83, (byte)0x7B, (byte)0x5F, (byte)0xAC, (byte)0xCB };
 
-        if (size != 8 && size != 16) {
-            throw new Zip4jException("invalid salt size, cannot generate salt");
-        }
-
-        int rounds = 0;
-
-        if (size == 8)
-            rounds = 2;
-        if (size == 16)
-            rounds = 4;
-
-        byte[] salt = new byte[size];
-        for (int j = 0; j < rounds; j++) {
-            Random rand = new Random();
-            int i = rand.nextInt();
-            salt[0 + j * 4] = (byte)(i >> 24);
-            salt[1 + j * 4] = (byte)(i >> 16);
-            salt[2 + j * 4] = (byte)(i >> 8);
-            salt[3 + j * 4] = (byte)i;
-        }
-        return salt;
+//        if (size != 8 && size != 16) {
+//            throw new Zip4jException("invalid salt size, cannot generate salt");
+//        }
+//
+//        int rounds = 0;
+//
+//        if (size == 8)
+//            rounds = 2;
+//        if (size == 16)
+//            rounds = 4;
+//
+//        byte[] salt = new byte[size];
+//        for (int j = 0; j < rounds; j++) {
+//            Random rand = new Random();
+//            int i = rand.nextInt();
+//            salt[0 + j * 4] = (byte)(i >> 24);
+//            salt[1 + j * 4] = (byte)(i >> 16);
+//            salt[2 + j * 4] = (byte)(i >> 8);
+//            salt[3 + j * 4] = (byte)i;
+//        }
+//        return salt;
     }
 
     public byte[] getFinalMac() {
@@ -169,5 +172,10 @@ public class AesEncoder implements Encoder {
     public void writeHeader(SplitOutputStream out) throws IOException {
         out.writeBytes(saltBytes);
         out.writeBytes(derivedPasswordVerifier);
+    }
+
+    @Override
+    public void close(SplitOutputStream out) throws IOException {
+        out.writeBytes(getFinalMac());
     }
 }

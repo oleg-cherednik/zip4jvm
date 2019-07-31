@@ -96,7 +96,7 @@ public enum Encryption {
         if (!generalPurposeFlag.isEncrypted())
             return OFF;
         if (extraField.getAesExtraDataRecord() != AesExtraDataRecord.NULL)
-            return AES;
+            return AES_NEW;
         return generalPurposeFlag.isStrongEncryption() ? STRONG : PKWARE;
     }
 

@@ -4,7 +4,6 @@ import com.cop.zip4j.crypto.aes.AesEngine;
 import com.cop.zip4j.crypto.aesnew.AesNewDecoder;
 import com.cop.zip4j.crypto.pkware.PkwareHeader;
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.Encryption;
@@ -12,6 +11,7 @@ import com.cop.zip4j.model.GeneralPurposeFlag;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
+import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import com.cop.zip4j.utils.InternalZipConstants;
 import com.cop.zip4j.utils.ZipUtils;
@@ -41,7 +41,7 @@ public class CentralDirectoryBuilder {
         fileHeader.setVersionMadeBy(CentralDirectory.FileHeader.DEF_VERSION);
         fileHeader.setVersionToExtract(CentralDirectory.FileHeader.DEF_VERSION);
         updateGeneralPurposeFlag(fileHeader.getGeneralPurposeFlag());
-        fileHeader.setCompressionMethod(entry.getCompressionMethod());
+        fileHeader.setCompressionMethod(entry.getEncryption() == Encryption.AES || entry.getEncryption() == Encryption.AES_NEW ? CompressionMethod.AES_ENC : entry.getCompressionMethod());
         fileHeader.setLastModifiedTime(getLastModFileTime());
         fileHeader.setCrc32(entry.crc32());
         fileHeader.setCompressedSize(getCompressedSize());
@@ -63,15 +63,27 @@ public class CentralDirectoryBuilder {
 
         localFileHeader.setVersionToExtract(fileHeader.getVersionToExtract());
         localFileHeader.setGeneralPurposeFlag(fileHeader.getGeneralPurposeFlag().getData());
-        localFileHeader.setCompressionMethod(fileHeader.getCompressionMethod());
+        localFileHeader.setCompressionMethod(getCompressionMethod(fileHeader));
         localFileHeader.setLastModifiedTime(fileHeader.getLastModifiedTime());
         localFileHeader.setUncompressedSize(fileHeader.getUncompressedSize());
         localFileHeader.setFileName(fileHeader.getFileName());
         localFileHeader.setExtraField(fileHeader.getExtraField().deepCopy());
-        localFileHeader.setCrc32(fileHeader.getCrc32());
+        localFileHeader.setCrc32(getCrc32(fileHeader));
         localFileHeader.setCompressedSize(fileHeader.getCompressedSize());
 
         return localFileHeader;
+    }
+
+    private static CompressionMethod getCompressionMethod(CentralDirectory.FileHeader fileHeader) {
+        if (fileHeader.getEncryption() == Encryption.AES || fileHeader.getEncryption() == Encryption.AES_NEW)
+            return CompressionMethod.AES_ENC;
+        return fileHeader.getCompressionMethod();
+    }
+
+    private static long getCrc32(CentralDirectory.FileHeader fileHeader) {
+        if (fileHeader.getEncryption() == Encryption.AES || fileHeader.getEncryption() == Encryption.AES_NEW)
+            return 0;
+        return fileHeader.getCrc32();
     }
 
     @NonNull

@@ -1,6 +1,7 @@
 package com.cop.zip4j.crypto.aesnew;
 
 import com.cop.zip4j.crypto.Encoder;
+import com.cop.zip4j.crypto.aes.pbkdf2.MacBasedPRF;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.model.aes.AesStrength;
@@ -32,6 +33,7 @@ public class AesNewEncoder implements Encoder {
 
     private final Cipher cipher;
     private final Mac mac;
+    private final MacBasedPRF mac1;
     private final byte[] salt;
     private final byte[] derivedPasswordVerifier;
 
@@ -57,16 +59,23 @@ public class AesNewEncoder implements Encoder {
             Mac mac = Mac.getInstance("HmacSHA1");
             mac.init(secretKey);
 
-            return new AesNewEncoder(cipher, mac, salt, derivedPasswordVerifier);
+            // TODO temporary
+            byte[] macKey = new byte[strength.getMacLength()];
+            System.arraycopy(tmp, strength.getKeyLength(), macKey, 0, macKey.length);
+            MacBasedPRF mac1 = new MacBasedPRF("HmacSHA1");
+            mac1.init(macKey);
+
+            return new AesNewEncoder(cipher, mac, mac1, salt, derivedPasswordVerifier);
         } catch(Exception e) {
             throw new Zip4jException(e);
         }
     }
 
     private static byte[] generateSalt(AesStrength strength) {
-        return new byte[] { (byte)-5, (byte)76, (byte)-57, (byte)-47, (byte)-20,
-                (byte)-120, (byte)54, (byte)69, (byte)102, (byte)-87,
-                (byte)92, (byte)-5, (byte)48, (byte)57, (byte)-49, (byte)-88 };
+        return new byte[] {
+                (byte)0x3, (byte)0x58, (byte)0xC6, (byte)0x44, (byte)0x26,
+                (byte)0x6, (byte)0x30, (byte)0xD2, (byte)0xEF, (byte)0x2B,
+                (byte)0x2D, (byte)0x83, (byte)0x7B, (byte)0x5F, (byte)0xAC, (byte)0xCB };
 //        SecureRandom random = new SecureRandom();
 //        byte[] buf = new byte[strength.getSaltLength()];
 //        random.nextBytes(buf);
@@ -87,5 +96,16 @@ public class AesNewEncoder implements Encoder {
     public void writeHeader(SplitOutputStream out) throws IOException {
         out.writeBytes(salt);
         out.writeBytes(derivedPasswordVerifier);
+    }
+
+    @Override
+    public void close(SplitOutputStream out) throws IOException {
+        byte[] rawMacBytes = mac1.doFinal();
+        byte[] macBytes = new byte[10];
+        System.arraycopy(rawMacBytes, 0, macBytes, 0, 10);
+
+
+//        byte[] buf = mac.doFinal();
+        out.writeBytes(macBytes);
     }
 }

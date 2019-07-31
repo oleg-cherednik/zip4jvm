@@ -27,8 +27,8 @@ final class EndCentralDirectoryWriter {
         out.writeDword(EndCentralDirectory.SIGNATURE);
         out.writeWord(dir.getSplitParts());
         out.writeWord(dir.getStartDiskNumber());
-        out.writeWord(dir.getTotalEntries());
         out.writeWord(dir.getDiskEntries());
+        out.writeWord(dir.getTotalEntries());
         out.writeDword(dir.getSize());
         out.writeDword(Math.min(dir.getOffs(), InternalZipConstants.ZIP_64_LIMIT));
         out.writeWord(comment.length);

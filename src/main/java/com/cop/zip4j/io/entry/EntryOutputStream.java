@@ -154,7 +154,7 @@ public class EntryOutputStream extends OutputStream {
             return;
 
         DataDescriptor dataDescriptor = new DataDescriptor();
-        dataDescriptor.setCrc32(fileHeader.getCrc32());
+        dataDescriptor.setCrc32(fileHeader.getCompressionMethod() == CompressionMethod.AES_ENC ? 0 : fileHeader.getCrc32());
         dataDescriptor.setCompressedSize(fileHeader.getCompressedSize());
         dataDescriptor.setUncompressedSize(fileHeader.getUncompressedSize());
 

@@ -55,9 +55,9 @@ public abstract class PathZipEntry extends ZipEntry {
 
     public abstract void setCompressionMethod(@NonNull CompressionMethod compressionMethod) throws IOException;
 
-    public CompressionMethod getCompressionMethod() {
-        return encryption == Encryption.AES ? CompressionMethod.AES_ENC : compressionMethod;
-    }
+//    public CompressionMethod getCompressionMethod() {
+//        return encryption == Encryption.AES ? CompressionMethod.AES_ENC : compressionMethod;
+//    }
 
     public void setCompressionLevel(@NonNull CompressionLevel compressionLevel) throws IOException {
         this.compressionLevel = CompressionLevel.NORMAL;
