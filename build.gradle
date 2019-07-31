@@ -26,6 +26,8 @@ dependencies {
     compile 'org.apache.commons:commons-collections4:4.3'
     compile 'com.googlecode.juniversalchardet:juniversalchardet:1.0.3'
 
+    compile 'org.bouncycastle:bcprov-jdk16:1.46'
+
     compileOnly 'org.projectlombok:lombok:1.16.18'
 
     testCompile 'org.testng:testng:6.14.3'

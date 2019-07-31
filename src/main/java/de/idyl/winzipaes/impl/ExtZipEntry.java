@@ -27,6 +27,8 @@ public class ExtZipEntry extends ZipEntry {
 		setComment(entry.getComment());
 		setTime(entry.getTime());
 		setMethod(entry.getMethod());
+		setCrc(entry.getCrc());
+		setOffset(entry.getOffset());
 	}
 
 	public ExtZipEntry(String name, CentralDirectoryEntry centralDirectoryEntry) {

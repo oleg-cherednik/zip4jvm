@@ -95,8 +95,10 @@ public class PartInputStream extends InputStream {
             bytesRead += count;
         }
 
-        if (bytesRead >= length)
+        if (bytesRead >= length) {
             checkAndReadAESMacBytes();
+            checkAndReadAESNewMacBytes();
+        }
 
         return count;
     }

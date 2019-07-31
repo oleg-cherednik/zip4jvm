@@ -4,6 +4,10 @@ import com.cop.zip4j.crypto.aes.AesEngine;
 import com.cop.zip4j.crypto.aes.pbkdf2.PBKDF2Engine;
 import com.cop.zip4j.crypto.aes.pbkdf2.PBKDF2Parameters;
 import com.cop.zip4j.model.AesStrength;
+import de.idyl.winzipaes.AesZipFileDecrypter;
+import de.idyl.winzipaes.impl.AESDecrypter;
+import de.idyl.winzipaes.impl.AESDecrypterBC;
+import de.idyl.winzipaes.impl.ExtZipEntry;
 import org.apache.commons.lang.ArrayUtils;
 
 import javax.crypto.Cipher;
@@ -13,6 +17,8 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -96,6 +102,16 @@ public class AES {
         AesDecoder decoder = new AesDecoder(AesStrength.KEY_STRENGTH_256, password.toCharArray(), salt, passwordVerifier);
         int len = decoder.decrypt(buf, 0, buf.length);
         return new String(buf, StandardCharsets.UTF_8);
+    }
+
+    public static String decryptNew(String password) throws Exception {
+        AESDecrypter decrypter = new AESDecrypterBC();
+        AesZipFileDecrypter aesDecryptor = new AesZipFileDecrypter(new File("d:/zip4j/aes.zip"), decrypter);
+        ExtZipEntry entry = aesDecryptor.getEntry("foo.txt");
+        entry.setCrc(0x3981703a);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        aesDecryptor.extractEntry(entry, out, password);
+        return out.toString();
     }
 }
 
