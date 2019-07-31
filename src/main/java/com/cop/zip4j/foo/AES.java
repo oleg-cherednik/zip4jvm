@@ -9,15 +9,17 @@ import com.cop.zip4j.model.AesStrength;
 import org.apache.commons.lang.ArrayUtils;
 
 import javax.crypto.Cipher;
+import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
-import java.util.zip.ZipException;
 
 import static com.cop.zip4j.crypto.aes.AesCipherUtil.prepareBuffAESIVBytes;
 import static com.cop.zip4j.crypto.aes.AesEngine.AES_BLOCK_SIZE;
@@ -75,8 +77,23 @@ public class AES {
         return null;
     }
 
-    public static String decryptOld(byte[] buf, String secret) throws Exception {
-        AesDecoder decoder = new AesDecoder(AesStrength.KEY_STRENGTH_256, secret.toCharArray(), salt, passwordVerifier);
+    public static String decryptOld(byte[] buf, String password) throws Exception {
+        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+        KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 1000, 256);
+        SecretKey secretKey = factory.generateSecret(spec);
+        byte[] aesKey = secretKey.getEncoded();
+        System.out.println(Arrays.toString(aesKey));
+        System.out.println("-------------");
+
+        Mac mac = Mac.getInstance("HmacSHA1");
+        mac.init(secretKey);
+
+
+//        Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
+//        cipher.init(Cipher.DECRYPT_MODE, skey, ivspec);
+
+
+        AesDecoder decoder = new AesDecoder(AesStrength.KEY_STRENGTH_256, password.toCharArray(), salt, passwordVerifier);
         int len = decoder.decrypt(buf, 0, buf.length);
         return new String(buf, StandardCharsets.UTF_8);
     }
@@ -95,24 +112,33 @@ class AesDecoder {
     private int nonce = 1;
     private final byte[] iv = new byte[AES_BLOCK_SIZE];
     private final byte[] counterBlock = new byte[AES_BLOCK_SIZE];
-    private final byte[] macKey;
 
-    public AesDecoder(AesStrength strength, char[] password, byte[] salt, byte[] passwordVerifier) throws ZipException {
+    public AesDecoder(AesStrength strength, char[] password, byte[] salt, byte[] passwordVerifier)
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
         this.strength = strength;
         this.password = ArrayUtils.clone(password);
-        macKey = new byte[strength.getMacLength()];
+
 
         init(salt, passwordVerifier);
     }
 
-    private void init(byte[] salt, byte[] passwordVerifier) {
+    private void init(byte[] salt, byte[] passwordVerifier) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+        KeySpec spec = new PBEKeySpec(password, salt, 1000, 256);
+        SecretKey secretKey = factory.generateSecret(spec);
+        byte[] aesKey = secretKey.getEncoded();
+
         byte[] derivedKey = deriveKey(salt);
-        byte[] aesKey = new byte[strength.getKeyLength()];
+        byte[] macKey = new byte[strength.getMacLength()];
         byte[] derivedPasswordVerifier = new byte[PASSWORD_VERIFIER_LENGTH];
 
-        System.arraycopy(derivedKey, 0, aesKey, 0, strength.getKeyLength());
         System.arraycopy(derivedKey, strength.getKeyLength(), macKey, 0, strength.getMacLength());
         System.arraycopy(derivedKey, strength.getKeyLength() + strength.getMacLength(), derivedPasswordVerifier, 0, PASSWORD_VERIFIER_LENGTH);
+
+//        System.out.println(Arrays.toString(derivedKey));
+        System.out.println(Arrays.toString(aesKey));
+        System.out.println(Arrays.toString(macKey));
+        System.out.println(Arrays.toString(derivedPasswordVerifier));
 
         if (!Arrays.equals(passwordVerifier, derivedPasswordVerifier)) {
             throw new Zip4jException("Wrong Password");
