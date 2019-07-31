@@ -62,7 +62,7 @@ public class EncryptionAesTest {
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .encryption(Encryption.AES_NEW)
                                                 .strength(AesStrength.KEY_STRENGTH_256)
-                                                .comment("password: " + new String(Zip4jSuite.password))
+//                                                .comment("password: " + new String(Zip4jSuite.password))
                                                 .password(Zip4jSuite.password).build();
 
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
@@ -173,7 +173,8 @@ public class EncryptionAesTest {
 
     public void shouldUnzipWhenAesEncryption() throws IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        Path zipFile = destDir.resolve("d:/zip4j/aes.zip");
+//        Path zipFile = destDir.resolve("d:/zip4j/aes.zip");
+        Path zipFile = destDir.resolve("d:/zip4j/src.zip");
         UnzipIt unzip = UnzipIt.builder()
                                .zipFile(zipFile)
                                .password(Zip4jSuite.password).build();

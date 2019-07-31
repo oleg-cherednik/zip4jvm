@@ -65,6 +65,7 @@ public class PartInputStream extends InputStream {
             len = (int)(length - bytesRead);
             if (len == 0) {
                 checkAndReadAESMacBytes();
+                checkAndReadAESNewMacBytes();
                 return -1;
             }
         }

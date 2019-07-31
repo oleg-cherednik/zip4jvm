@@ -90,8 +90,6 @@ public class CentralDirectory {
         private int lastModifiedTime;
         // size:4 - crc-32
         private long crc32;
-        @Deprecated
-        private byte[] crcBuff;
         // size:4 - compressed size
         private long compressedSize;
         // size:4 - uncompressed size

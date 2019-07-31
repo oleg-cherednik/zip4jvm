@@ -1,6 +1,7 @@
 package com.cop.zip4j.io;
 
 import com.cop.zip4j.crypto.aes.AesEngine;
+import com.cop.zip4j.crypto.aesnew.AesNewDecoder;
 import com.cop.zip4j.crypto.pkware.PkwareHeader;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.aes.AesExtraDataRecord;
@@ -105,7 +106,7 @@ public class CentralDirectoryBuilder {
             return 0;
         if (entry.getCompressionMethod() != CompressionMethod.STORE)
             return 0;
-        if (entry.getEncryption() != Encryption.AES)
+        if (entry.getEncryption() != Encryption.AES && entry.getEncryption() != Encryption.AES_NEW)
             return 0;
 
         long fileSize = entry.size();
@@ -113,7 +114,7 @@ public class CentralDirectoryBuilder {
         if (entry.getEncryption() == Encryption.PKWARE)
             return fileSize + PkwareHeader.SIZE;
 
-        return fileSize + entry.getStrength().getSaltLength() + AesEngine.AES_AUTH_LENGTH + 2; //2 is password verifier
+        return fileSize + entry.getStrength().getSaltLength() + AesEngine.AES_AUTH_LENGTH + AesNewDecoder.PASSWORD_VERIFIER_LENGTH;
     }
 
     private long getUncompressedSize() {
@@ -135,7 +136,7 @@ public class CentralDirectoryBuilder {
 
     @NonNull
     private AesExtraDataRecord getAesExtraDataRecord(@NonNull Encryption encryption) {
-        if (encryption != Encryption.AES)
+        if (encryption != Encryption.AES && encryption != Encryption.AES_NEW)
             return AesExtraDataRecord.NULL;
 
         AesExtraDataRecord aesDataRecord = new AesExtraDataRecord();

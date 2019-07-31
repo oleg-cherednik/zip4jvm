@@ -58,36 +58,39 @@ public class AesExtraDataRecord {
 
     public static final AesExtraDataRecord NULL = new AesExtraDataRecord() {
 
-        private final NullPointerException exception = new NullPointerException("Null object modification: " + getClass().getSimpleName());
-
         @Override
         public void setDataSize(int dataSize) {
-            throw exception;
+            throw new NullPointerException("Null object modification: " + getClass().getSimpleName());
         }
 
         @Override
         public void setVersionNumber(int versionNumber) {
-            throw exception;
+            throw new NullPointerException("Null object modification: " + getClass().getSimpleName());
         }
 
         @Override
         public void setVendor(String vendor) {
-            throw exception;
+            throw new NullPointerException("Null object modification: " + getClass().getSimpleName());
         }
 
         @Override
         public void setStrength(AesStrength strength) {
-            throw exception;
+            throw new NullPointerException("Null object modification: " + getClass().getSimpleName());
         }
 
         @Override
         public void setCompressionMethod(CompressionMethod compressionMethod) {
-            throw exception;
+            throw new NullPointerException("Null object modification: " + getClass().getSimpleName());
         }
 
         @Override
         public int getLength() {
             return 0;
+        }
+
+        @Override
+        public String toString() {
+            return "<null>";
         }
     };
 

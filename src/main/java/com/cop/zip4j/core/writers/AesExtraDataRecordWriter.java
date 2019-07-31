@@ -1,9 +1,9 @@
 package com.cop.zip4j.core.writers;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.model.aes.AesExtraDataRecord;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -28,7 +28,7 @@ final class AesExtraDataRecordWriter {
         out.writeWord(record.getDataSize());
         out.writeWord(record.getVersionNumber());
         out.writeBytes(record.getVendor(charset));
-        out.writeBytes((byte)record.getStrength().getRawCode(), (byte)0);
+        out.writeBytes((byte)record.getStrength().getRawCode());
         out.writeWord(record.getCompressionMethod().getValue());
     }
 
