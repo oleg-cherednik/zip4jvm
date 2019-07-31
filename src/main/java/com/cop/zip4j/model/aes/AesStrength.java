@@ -1,4 +1,4 @@
-package com.cop.zip4j.model;
+package com.cop.zip4j.model.aes;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -11,12 +11,13 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum AesStrength {
-    NONE(0, 0, 0, 0),
-    KEY_STRENGTH_128(1, 8, 16, 16),
-    KEY_STRENGTH_192(2, 12, 24, 24),
-    KEY_STRENGTH_256(3, 16, 32, 32);
+    NONE(0, 0, 0, 0, 0),
+    KEY_STRENGTH_128(1, 128, 8, 16, 16),
+    KEY_STRENGTH_192(2, 192, 12, 24, 24),
+    KEY_STRENGTH_256(3, 256, 16, 32, 32);
 
     private final int rawCode;
+    private final int size;
     private final int saltLength;
     private final int macLength;
     private final int keyLength;

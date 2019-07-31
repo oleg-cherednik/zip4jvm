@@ -10,6 +10,8 @@ import com.cop.zip4j.crypto.pkware.PkwareDecoder;
 import com.cop.zip4j.crypto.pkware.PkwareEncoder;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.LittleEndianRandomAccessFile;
+import com.cop.zip4j.model.aes.AesExtraDataRecord;
+import com.cop.zip4j.model.aes.AesStrength;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.NonNull;
 
@@ -65,7 +67,7 @@ public enum Encryption {
                 return null;
 
             in.seek(localFileHeader.getOffs());
-            AesStrength aesStrength = localFileHeader.getExtraField().getAesExtraDataRecord().getAesStrength();
+            AesStrength aesStrength = localFileHeader.getExtraField().getAesExtraDataRecord().getStrength();
             return in.readBytes(aesStrength.getSaltLength());
         }
     },
@@ -78,18 +80,7 @@ public enum Encryption {
         @Override
         public Decoder decoder(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, char[] password)
                 throws IOException {
-            byte[] salt = getSalt(in, localFileHeader);
-            byte[] passwordVerifier = in.readBytes(AesNewEncoder.PASSWORD_VERIFIER_LENGTH);
-            return new AesNewDecoder(localFileHeader.getExtraField().getAesExtraDataRecord(), password, salt, passwordVerifier);
-        }
-
-        private byte[] getSalt(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader) throws IOException {
-            if (localFileHeader.getEncryption() != this)
-                return null;
-
-            in.seek(localFileHeader.getOffs());
-            AesStrength aesStrength = localFileHeader.getExtraField().getAesExtraDataRecord().getAesStrength();
-            return in.readBytes(aesStrength.getSaltLength());
+            return AesNewDecoder.create(in, localFileHeader, password);
         }
     };
 

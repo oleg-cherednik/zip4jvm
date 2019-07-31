@@ -1,6 +1,6 @@
 package com.cop.zip4j.model.entry;
 
-import com.cop.zip4j.model.AesStrength;
+import com.cop.zip4j.model.aes.AesStrength;
 import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.Encryption;

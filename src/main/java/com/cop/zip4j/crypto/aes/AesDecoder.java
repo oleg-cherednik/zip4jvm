@@ -5,8 +5,8 @@ import com.cop.zip4j.crypto.aes.pbkdf2.MacBasedPRF;
 import com.cop.zip4j.crypto.aes.pbkdf2.PBKDF2Engine;
 import com.cop.zip4j.crypto.aes.pbkdf2.PBKDF2Parameters;
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.model.AesExtraDataRecord;
-import com.cop.zip4j.model.AesStrength;
+import com.cop.zip4j.model.aes.AesExtraDataRecord;
+import com.cop.zip4j.model.aes.AesStrength;
 
 import java.util.Arrays;
 import java.util.zip.ZipException;
@@ -56,7 +56,7 @@ public class AesDecoder implements Decoder {
     }
 
     private void init(byte[] salt, byte[] passwordVerifier) {
-        AesStrength aesKeyStrength = aesExtraDataRecord.getAesStrength();
+        AesStrength aesKeyStrength = aesExtraDataRecord.getStrength();
 
         if (password == null || password.length <= 0) {
             throw new Zip4jException("empty or null password provided for AES Decryptor");

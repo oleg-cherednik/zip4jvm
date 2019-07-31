@@ -3,7 +3,7 @@ package com.cop.zip4j.foo;
 import com.cop.zip4j.crypto.aes.AesEngine;
 import com.cop.zip4j.crypto.aes.pbkdf2.PBKDF2Engine;
 import com.cop.zip4j.crypto.aes.pbkdf2.PBKDF2Parameters;
-import com.cop.zip4j.model.AesStrength;
+import com.cop.zip4j.model.aes.AesStrength;
 import de.idyl.winzipaes.AesZipFileDecrypter;
 import de.idyl.winzipaes.impl.AESDecrypter;
 import de.idyl.winzipaes.impl.AESDecrypterBC;
@@ -94,7 +94,8 @@ public class AES {
         System.out.println("-------------");
 
         Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
-        cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(aesKey, "AES"), new IvParameterSpec(new byte[16]));
+        cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(aesKey, "AES"),
+                new IvParameterSpec(new byte[] { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }));
 
         byte[] res = cipher.doFinal(buf);
 
@@ -108,7 +109,6 @@ public class AES {
         AESDecrypter decrypter = new AESDecrypterBC();
         AesZipFileDecrypter aesDecryptor = new AesZipFileDecrypter(new File("d:/zip4j/aes.zip"), decrypter);
         ExtZipEntry entry = aesDecryptor.getEntry("foo.txt");
-        entry.setCrc(0x3981703a);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         aesDecryptor.extractEntry(entry, out, password);
         return out.toString();

@@ -2,7 +2,7 @@ package com.cop.zip4j.io;
 
 import com.cop.zip4j.core.writers.ZipModelWriter;
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.model.AesExtraDataRecord;
+import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.EndCentralDirectory;
 import com.cop.zip4j.model.LocalFileHeader;

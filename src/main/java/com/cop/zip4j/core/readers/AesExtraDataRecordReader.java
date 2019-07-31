@@ -3,8 +3,8 @@ package com.cop.zip4j.core.readers;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import com.cop.zip4j.io.LittleEndianRandomAccessFile;
-import com.cop.zip4j.model.AesExtraDataRecord;
-import com.cop.zip4j.model.AesStrength;
+import com.cop.zip4j.model.aes.AesExtraDataRecord;
+import com.cop.zip4j.model.aes.AesStrength;
 import com.cop.zip4j.model.CompressionMethod;
 
 import java.io.IOException;
@@ -27,7 +27,7 @@ final class AesExtraDataRecordReader {
         record.setDataSize(in.readWord());
         record.setVersionNumber(in.readWord());
         record.setVendor(in.readString(2));
-        record.setAesStrength(AesStrength.parseValue(in.readByte()));
+        record.setStrength(AesStrength.parseValue(in.readByte()));
         record.setCompressionMethod(CompressionMethod.parseValue(in.readWord()));
         return record;
     }

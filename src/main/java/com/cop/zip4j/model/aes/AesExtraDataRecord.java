@@ -1,6 +1,8 @@
-package com.cop.zip4j.model;
+package com.cop.zip4j.model.aes;
 
 import com.cop.zip4j.exception.Zip4jException;
+import com.cop.zip4j.model.CompressionMethod;
+import com.cop.zip4j.model.ExtraField;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,7 +36,7 @@ public class AesExtraDataRecord {
     // size:1
     @NonNull
     @Builder.Default
-    private AesStrength aesStrength = AesStrength.NONE;
+    private AesStrength strength = AesStrength.NONE;
     // size:2
     @NonNull
     @Builder.Default
@@ -74,7 +76,7 @@ public class AesExtraDataRecord {
         }
 
         @Override
-        public void setAesStrength(AesStrength aesStrength) {
+        public void setStrength(AesStrength strength) {
             throw exception;
         }
 

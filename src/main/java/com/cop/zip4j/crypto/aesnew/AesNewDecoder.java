@@ -1,37 +1,36 @@
 package com.cop.zip4j.crypto.aesnew;
 
 import com.cop.zip4j.crypto.Decoder;
-import com.cop.zip4j.crypto.aesnew.pbkdf2.MacBasedPRF;
-import com.cop.zip4j.crypto.aesnew.pbkdf2.PBKDF2Engine;
-import com.cop.zip4j.crypto.aesnew.pbkdf2.PBKDF2Parameters;
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.model.AesExtraDataRecord;
+import com.cop.zip4j.io.LittleEndianRandomAccessFile;
+import com.cop.zip4j.model.LocalFileHeader;
+import com.cop.zip4j.model.aes.AesExtraDataRecord;
+import com.cop.zip4j.model.aes.AesStrength;
+import lombok.AccessLevel;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import javax.crypto.Cipher;
+import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.IOException;
 import java.security.spec.KeySpec;
-import java.util.Arrays;
-import java.util.zip.ZipException;
 
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class AesNewDecoder implements Decoder {
 
     public static final int PASSWORD_VERIFIER_LENGTH = 2;
 
-    private AesExtraDataRecord aesExtraDataRecord;
-    private char[] password;
-    private AesNewEngine aesEngine;
-    private MacBasedPRF mac;
-
-    private int nonce = 1;
-    private byte[] iv;
-    private byte[] counterBlock;
+    private final Cipher cipher;
+    private final Mac mac;
+    private final int saltLength;
 
     private byte[] macKey;
-    private int saltLength;
+
 
     public byte[] getStoredMac() {
         return macKey;
@@ -49,38 +48,30 @@ public class AesNewDecoder implements Decoder {
         return PASSWORD_VERIFIER_LENGTH;
     }
 
-    private Cipher cipher;
+    public byte[] getCalculatedAuthenticationBytes() {
+        return mac.doFinal();
+    }
 
-    private static final String aes = "AES/CTR/PKCS5Padding";
-    private static final String pbk = "PBKDF2WithHmacSHA1";
-
-    public AesNewDecoder(AesExtraDataRecord aesExtraDataRecord, char[] password, byte[] salt, byte[] passwordVerifier) throws ZipException {
-        this.aesExtraDataRecord = aesExtraDataRecord;
-        this.password = password;
-        this.saltLength = salt.length;
-
+    @SuppressWarnings("MethodCanBeVariableArityMethod")
+    public static AesNewDecoder create(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, char[] password) {
         try {
-            byte[] iv = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-            IvParameterSpec ivspec = new IvParameterSpec(iv);
+            AesExtraDataRecord aesExtraDataRecord = localFileHeader.getExtraField().getAesExtraDataRecord();
+            AesStrength strength = aesExtraDataRecord.getStrength();
 
-            SecretKeyFactory factory = SecretKeyFactory.getInstance(pbk);
-            KeySpec spec = new PBEKeySpec(password, salt, 1000, 256);
-            SecretKey tmp = factory.generateSecret(spec);
-            SecretKeySpec secretKey = new SecretKeySpec(tmp.getEncoded(), "AES");
+            byte[] salt = getSalt(in, localFileHeader.getOffs(), strength);
+            byte[] passwordVerifier = getPasswordVerifier(in);
 
-            cipher = Cipher.getInstance(aes);
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, ivspec);
+            KeySpec spec = new PBEKeySpec(password, salt, 1000, strength.getSize());
+            SecretKey secretKey = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(spec);
+            byte[] iv = { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-            //AES/CBC/PKCS5Padding
-            //AES/CTR/NoPadding
-//            cipher = Cipher.getInstance("AES/CTR/NoPadding");
-//            cipher.init(Cipher.DECRYPT_MODE, secretKey, ivspec);
+            Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
+            cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(secretKey.getEncoded(), "AES"), new IvParameterSpec(iv));
 
+            Mac mac = Mac.getInstance("HmacSHA1");
+            mac.init(secretKey);
 
-//            counterBlock = new byte[AES_BLOCK_SIZE];
-
-
-//            init(salt, passwordVerifier);
+            return new AesNewDecoder(cipher, mac, salt.length);
         } catch(Exception e) {
             throw new Zip4jException(e);
         }
@@ -89,27 +80,21 @@ public class AesNewDecoder implements Decoder {
     @Override
     public int decrypt(byte[] buf, int offs, int len) {
         try {
-            byte[] tmp = Arrays.copyOfRange(buf, 0, len);
-            byte[] res = cipher.doFinal(tmp);
-            int a = 0;
-            a++;
-
+            byte[] tmp = cipher.doFinal(buf, offs, len);
+            System.arraycopy(tmp, 0, buf, 0, len);
+            return len;
         } catch(Exception e) {
             throw new Zip4jException(e);
         }
-
-        return len;
     }
 
-    private byte[] deriveKey(byte[] salt, char[] password, int keyLength, int macLength) {
-        PBKDF2Parameters p = new PBKDF2Parameters("HmacSHA1", "ISO-8859-1", salt, 1000);
-        PBKDF2Engine e = new PBKDF2Engine(p);
-        return e.deriveKey(password, keyLength + macLength + PASSWORD_VERIFIER_LENGTH);
+    private static byte[] getSalt(LittleEndianRandomAccessFile in, long offs, AesStrength strength) throws IOException {
+        in.seek(offs);
+        return in.readBytes(strength.getSaltLength());
     }
 
-    public byte[] getCalculatedAuthenticationBytes() {
-        return mac.doFinal();
+    private static byte[] getPasswordVerifier(LittleEndianRandomAccessFile in) throws IOException {
+        return in.readBytes(2);
     }
-
 
 }

@@ -3,7 +3,7 @@ package com.cop.zip4j.io;
 import com.cop.zip4j.crypto.aes.AesEngine;
 import com.cop.zip4j.crypto.pkware.PkwareHeader;
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.model.AesExtraDataRecord;
+import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.Encryption;
@@ -145,7 +145,7 @@ public class CentralDirectoryBuilder {
         // only MAC is stored and as per the specification, if version number is 2, then MAC is read
         // and CRC is ignored
         aesDataRecord.setVersionNumber((short)2);
-        aesDataRecord.setAesStrength(entry.getAesStrength());
+        aesDataRecord.setStrength(entry.getAesStrength());
         aesDataRecord.setCompressionMethod(entry.getCompressionMethod());
 
         return aesDataRecord;

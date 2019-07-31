@@ -3,7 +3,7 @@ package com.cop.zip4j.core.readers;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import com.cop.zip4j.io.LittleEndianRandomAccessFile;
-import com.cop.zip4j.model.AesExtraDataRecord;
+import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import com.cop.zip4j.model.ExtraField;
 import com.cop.zip4j.model.Zip64;
 

@@ -1,5 +1,6 @@
 package com.cop.zip4j.model;
 
+import com.cop.zip4j.model.aes.AesStrength;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;

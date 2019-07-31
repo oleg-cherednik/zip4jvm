@@ -6,7 +6,7 @@ import com.cop.zip4j.crypto.aes.pbkdf2.PBKDF2Engine;
 import com.cop.zip4j.crypto.aes.pbkdf2.PBKDF2Parameters;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.SplitOutputStream;
-import com.cop.zip4j.model.AesStrength;
+import com.cop.zip4j.model.aes.AesStrength;
 
 import java.io.IOException;
 import java.util.Random;
