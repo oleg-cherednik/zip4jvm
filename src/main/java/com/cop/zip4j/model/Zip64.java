@@ -122,36 +122,39 @@ public class Zip64 {
 
         public static final ExtendedInfo NULL = new ExtendedInfo() {
 
-            private final NullPointerException exception = new NullPointerException("Null object modification: " + getClass().getSimpleName());
-
             @Override
             public void setSize(int size) {
-                throw exception;
+                throw new NullPointerException("Null object modification: " + getClass().getSimpleName());
             }
 
             @Override
             public void setUncompressedSize(long uncompressedSize) {
-                throw exception;
+                throw new NullPointerException("Null object modification: " + getClass().getSimpleName());
             }
 
             @Override
             public void setCompressedSize(long compressedSize) {
-                throw exception;
+                throw new NullPointerException("Null object modification: " + getClass().getSimpleName());
             }
 
             @Override
             public void setOffsLocalHeaderRelative(long offsLocalHeaderRelative) {
-                throw exception;
+                throw new NullPointerException("Null object modification: " + getClass().getSimpleName());
             }
 
             @Override
             public void setDiskNumber(int diskNumber) {
-                throw exception;
+                throw new NullPointerException("Null object modification: " + getClass().getSimpleName());
             }
 
             @Override
             public int getLength() {
                 return 0;
+            }
+
+            @Override
+            public String toString() {
+                return "<null>";
             }
         };
     }
