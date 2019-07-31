@@ -30,7 +30,7 @@ public abstract class PathZipEntry extends ZipEntry {
     protected Encryption encryption = Encryption.OFF;
 
     @Setter
-    protected AesStrength aesStrength = AesStrength.NONE;
+    protected AesStrength strength = AesStrength.NONE;
     @Setter
     protected char[] password;
 
@@ -65,8 +65,8 @@ public abstract class PathZipEntry extends ZipEntry {
 
     public abstract void setEncryption(@NonNull Encryption encryption);
 
-    public AesStrength getAesStrength() {
-        return encryption == Encryption.AES ? aesStrength : AesStrength.NONE;
+    public AesStrength getStrength() {
+        return encryption == Encryption.AES || encryption == Encryption.AES_NEW ? strength : AesStrength.NONE;
     }
 
 }

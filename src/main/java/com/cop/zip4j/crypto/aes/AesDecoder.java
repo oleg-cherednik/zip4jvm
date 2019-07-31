@@ -87,7 +87,7 @@ public class AesDecoder implements Decoder {
     }
 
     @Override
-    public int decrypt(byte[] buf, int offs, int len) {
+    public void decrypt(byte[] buf, int offs, int len) {
         for (int j = offs; j < (offs + len); j += AES_BLOCK_SIZE) {
             int loopCount = (j + AES_BLOCK_SIZE <= (offs + len)) ?
                             AES_BLOCK_SIZE : ((offs + len) - j);
@@ -102,8 +102,6 @@ public class AesDecoder implements Decoder {
 
             nonce++;
         }
-
-        return len;
     }
 
     private byte[] deriveKey(byte[] salt, char[] password, int keyLength, int macLength) {

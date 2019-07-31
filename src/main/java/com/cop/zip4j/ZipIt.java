@@ -76,7 +76,7 @@ public final class ZipIt {
                 entry.setName(parameters.getRelativeEntryName(entry.getPath()));
                 entry.setCompressionMethod(parameters.getCompressionMethod());
                 entry.setEncryption(parameters.getEncryption());
-                entry.setAesStrength(parameters.getAesStrength());
+                entry.setStrength(parameters.getStrength());
                 entry.setPassword(parameters.getPassword());
             } catch(IOException e) {
                 throw new Zip4jException(e);

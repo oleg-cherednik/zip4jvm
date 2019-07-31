@@ -27,7 +27,7 @@ public class ZipParameters {
     private Encryption encryption = Encryption.OFF;
     private char[] password;
     @Builder.Default
-    private AesStrength aesStrength = AesStrength.NONE;
+    private AesStrength strength = AesStrength.NONE;
     private String rootFolderInZip;
     private Path defaultFolderPath;
     @Builder.Default

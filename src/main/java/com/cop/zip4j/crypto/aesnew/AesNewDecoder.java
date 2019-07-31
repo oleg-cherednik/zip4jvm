@@ -33,7 +33,7 @@ public class AesNewDecoder implements Decoder {
     private byte[] macKey;
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")
-    public static AesNewDecoder create(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, char[] password) {
+    public static AesNewDecoder create(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, @NonNull char[] password) {
         try {
             AesExtraDataRecord aesExtraDataRecord = localFileHeader.getExtraField().getAesExtraDataRecord();
             AesStrength strength = aesExtraDataRecord.getStrength();
@@ -58,11 +58,10 @@ public class AesNewDecoder implements Decoder {
     }
 
     @Override
-    public int decrypt(byte[] buf, int offs, int len) {
+    public void decrypt(byte[] buf, int offs, int len) {
         try {
             byte[] tmp = cipher.doFinal(buf, offs, len);
             System.arraycopy(tmp, 0, buf, offs, tmp.length);
-            return len;
         } catch(Exception e) {
             throw new Zip4jException(e);
         }

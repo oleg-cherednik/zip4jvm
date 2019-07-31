@@ -51,7 +51,7 @@ public enum Encryption {
     AES {
         @Override
         public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull PathZipEntry entry) {
-            return new AesEncoder(entry.getPassword(), entry.getAesStrength());
+            return new AesEncoder(entry.getPassword(), entry.getStrength());
         }
 
         @Override
@@ -74,7 +74,7 @@ public enum Encryption {
     AES_NEW {
         @Override
         public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull PathZipEntry entry) {
-            return new AesNewEncoder(entry.getPassword(), entry.getAesStrength());
+            return AesNewEncoder.create(entry.getStrength(), entry.getPassword());
         }
 
         @Override

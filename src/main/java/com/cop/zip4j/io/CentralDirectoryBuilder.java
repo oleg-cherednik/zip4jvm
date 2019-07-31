@@ -113,7 +113,7 @@ public class CentralDirectoryBuilder {
         if (entry.getEncryption() == Encryption.PKWARE)
             return fileSize + PkwareHeader.SIZE;
 
-        return fileSize + entry.getAesStrength().getSaltLength() + AesEngine.AES_AUTH_LENGTH + 2; //2 is password verifier
+        return fileSize + entry.getStrength().getSaltLength() + AesEngine.AES_AUTH_LENGTH + 2; //2 is password verifier
     }
 
     private long getUncompressedSize() {
@@ -145,7 +145,7 @@ public class CentralDirectoryBuilder {
         // only MAC is stored and as per the specification, if version number is 2, then MAC is read
         // and CRC is ignored
         aesDataRecord.setVersionNumber((short)2);
-        aesDataRecord.setStrength(entry.getAesStrength());
+        aesDataRecord.setStrength(entry.getStrength());
         aesDataRecord.setCompressionMethod(entry.getCompressionMethod());
 
         return aesDataRecord;
