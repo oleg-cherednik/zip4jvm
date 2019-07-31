@@ -7,6 +7,7 @@ import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import com.cop.zip4j.model.aes.AesStrength;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -20,6 +21,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.security.spec.KeySpec;
 
+@Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class AesNewDecoder implements Decoder {
 
@@ -28,29 +30,7 @@ public class AesNewDecoder implements Decoder {
     private final Cipher cipher;
     private final Mac mac;
     private final int saltLength;
-
     private byte[] macKey;
-
-
-    public byte[] getStoredMac() {
-        return macKey;
-    }
-
-    public void setStoredMac(byte[] storedMac) {
-        this.macKey = storedMac;
-    }
-
-    public int getSaltLength() {
-        return saltLength;
-    }
-
-    public int getPasswordVerifierLength() {
-        return PASSWORD_VERIFIER_LENGTH;
-    }
-
-    public byte[] getCalculatedAuthenticationBytes() {
-        return mac.doFinal();
-    }
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")
     public static AesNewDecoder create(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, char[] password) {
@@ -88,13 +68,21 @@ public class AesNewDecoder implements Decoder {
         }
     }
 
+    public void setStoredMac(byte[] macKey) {
+        this.macKey = macKey;
+    }
+
+    public byte[] getCalculatedAuthenticationBytes() {
+        return mac.doFinal();
+    }
+
     private static byte[] getSalt(LittleEndianRandomAccessFile in, long offs, AesStrength strength) throws IOException {
         in.seek(offs);
         return in.readBytes(strength.getSaltLength());
     }
 
     private static byte[] getPasswordVerifier(LittleEndianRandomAccessFile in) throws IOException {
-        return in.readBytes(2);
+        return in.readBytes(PASSWORD_VERIFIER_LENGTH);
     }
 
 }

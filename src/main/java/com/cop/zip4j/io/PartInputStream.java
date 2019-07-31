@@ -136,7 +136,7 @@ public class PartInputStream extends InputStream {
         if (unzipEngine.getDecoder() == null || !(unzipEngine.getDecoder() instanceof AesNewDecoder))
             return;
 
-        if (((AesNewDecoder)unzipEngine.getDecoder()).getStoredMac() != null) {
+        if (((AesNewDecoder)unzipEngine.getDecoder()).getMacKey() != null) {
             //Stored mac already set
             return;
         }

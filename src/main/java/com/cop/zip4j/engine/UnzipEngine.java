@@ -115,9 +115,9 @@ public class UnzipEngine {
             } else if (localFileHeader.getEncryption() == Encryption.AES_NEW) {
                 if (decoder instanceof AesNewDecoder) {
                     comprSize -= ((AesNewDecoder)decoder).getSaltLength() +
-                            ((AesNewDecoder)decoder).getPasswordVerifierLength() + 10;
+                            AesNewDecoder.PASSWORD_VERIFIER_LENGTH + 10;
                     offs += ((AesNewDecoder)decoder).getSaltLength() +
-                            ((AesNewDecoder)decoder).getPasswordVerifierLength();
+                            AesNewDecoder.PASSWORD_VERIFIER_LENGTH;
                 } else
                     throw new Zip4jException("invalid decryptor when trying to calculate " +
                             "compressed size for AES encrypted file: " + fileHeader.getFileName());
@@ -161,7 +161,7 @@ public class UnzipEngine {
 //                    }
                 } else if (decoder != null && decoder instanceof AesNewDecoder) {
                     byte[] tmpMacBytes = ((AesNewDecoder)decoder).getCalculatedAuthenticationBytes();
-                    byte[] storedMac = ((AesNewDecoder)decoder).getStoredMac();
+                    byte[] storedMac = ((AesNewDecoder)decoder).getMacKey();
                     byte[] calculatedMac = new byte[AesEngine.AES_AUTH_LENGTH];
 
                     if (calculatedMac == null || storedMac == null) {
