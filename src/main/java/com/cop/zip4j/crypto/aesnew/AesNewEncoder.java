@@ -30,28 +30,25 @@ import java.security.spec.KeySpec;
 @RequiredArgsConstructor
 public class AesNewEncoder implements Encoder {
 
-    private char[] password;
-    private AesStrength aesKeyStrength;
-
-    private boolean finished;
-
-    private int nonce = 1;
-    private int loopCount = 0;
-
-    private byte[] iv;
-    private byte[] counterBlock;
-    private byte[] derivedPasswordVerifier = { (byte)0xC2, (byte)0x65 };
-
     private final Cipher cipher;
     private final Mac mac;
     private final byte[] salt;
+    private final byte[] derivedPasswordVerifier;
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")
     public static AesNewEncoder create(@NonNull AesStrength strength, char[] password) {
         try {
             byte[] salt = generateSalt(strength);
-            KeySpec spec = new PBEKeySpec(password, salt, 1000, strength.getSize());
-            SecretKey secretKey = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(spec);
+            // TODO temporary
+            int length = strength.getKeyLength() + strength.getMacLength() + AesNewDecoder.PASSWORD_VERIFIER_LENGTH;
+            SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+            KeySpec spec = new PBEKeySpec(password, salt, 1000, length * 8);
+            byte[] tmp = secretKeyFactory.generateSecret(spec).getEncoded();
+            byte[] derivedPasswordVerifier = { tmp[tmp.length - 2], tmp[tmp.length - 1] };
+            // --
+
+            spec = new PBEKeySpec(password, salt, 1000, strength.getSize());
+            SecretKey secretKey = secretKeyFactory.generateSecret(spec);
             byte[] iv = { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
             Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
@@ -60,7 +57,7 @@ public class AesNewEncoder implements Encoder {
             Mac mac = Mac.getInstance("HmacSHA1");
             mac.init(secretKey);
 
-            return new AesNewEncoder(cipher, mac, salt);
+            return new AesNewEncoder(cipher, mac, salt, derivedPasswordVerifier);
         } catch(Exception e) {
             throw new Zip4jException(e);
         }

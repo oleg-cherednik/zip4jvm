@@ -87,7 +87,7 @@ public class AES {
         AesStrength strength = AesStrength.KEY_STRENGTH_256;
         int length = strength.getKeyLength() + strength.getMacLength() + PASSWORD_VERIFIER_LENGTH;
         SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-        KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 1000, 256);//length * 8);
+        KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 1000, length * 8);
         SecretKey secretKey = factory.generateSecret(spec);
         byte[] aesKey = secretKey.getEncoded();
         System.out.println(Arrays.toString(aesKey));

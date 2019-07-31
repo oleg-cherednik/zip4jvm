@@ -17,8 +17,8 @@ public class Foo {
                 (byte)0x76, (byte)0x93, (byte)0x30, (byte)0x2C, (byte)0x34 };
 
         //AES.encrypt(expected, secret) ;
-        String actual = AES.decryptOld(buf, password);
-//        String actual = AES.decryptNew(password);
+//        String actual = AES.decryptOld(buf, password);
+        String actual = AES.decryptNew(password);
 
         System.out.println(expected);
         System.out.println(Arrays.toString(buf));
