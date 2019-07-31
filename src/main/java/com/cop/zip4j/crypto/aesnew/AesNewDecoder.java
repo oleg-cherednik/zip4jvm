@@ -81,7 +81,7 @@ public class AesNewDecoder implements Decoder {
     public int decrypt(byte[] buf, int offs, int len) {
         try {
             byte[] tmp = cipher.doFinal(buf, offs, len);
-            System.arraycopy(tmp, 0, buf, 0, len);
+            System.arraycopy(tmp, 0, buf, offs, tmp.length);
             return len;
         } catch(Exception e) {
             throw new Zip4jException(e);
