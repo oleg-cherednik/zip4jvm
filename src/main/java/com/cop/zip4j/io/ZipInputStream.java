@@ -25,27 +25,15 @@ public class ZipInputStream extends InputStream {
     }
 
     @Override
-    public int read(byte[] b) throws IOException {
-        return read(b, 0, b.length);
-    }
-
-    @Override
-    public int read(byte[] b, int off, int len) throws IOException {
-        int readLen = in.read(b, off, len);
+    public int read(byte[] buf, int offs, int len) throws IOException {
+        int readLen = in.read(buf, offs, len);
 
         if (readLen > 0 && engine != null)
-            engine.updateCRC(b, off, readLen);
+            engine.updateCRC(buf, offs, readLen);
 
         return readLen;
     }
 
-    /**
-     * Closes the input stream and releases any resources.
-     * This method also checks for the CRC of the extracted file.
-     * If CRC check has to be skipped use close(boolean skipCRCCheck) method
-     *
-     * @throws IOException
-     */
     @Override
     public void close() throws IOException {
         in.close();
