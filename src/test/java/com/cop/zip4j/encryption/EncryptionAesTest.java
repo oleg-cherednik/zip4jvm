@@ -1,5 +1,6 @@
 package com.cop.zip4j.encryption;
 
+import com.cop.zip4j.UnzipIt;
 import com.cop.zip4j.Zip4jSuite;
 import com.cop.zip4j.ZipIt;
 import com.cop.zip4j.model.CompressionLevel;
@@ -14,6 +15,7 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -70,11 +72,19 @@ public class EncryptionAesTest {
 //        Path bentley = Zip4jSuite.carsDir.resolve("bentley-continental.jpg");
 //        Path ferrari = Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg");
 //        Path wiesmann = Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg");
-        Path txt = Zip4jSuite.srcDir.resolve("Oleg Cherednik.txt");
+//        Path txt = Zip4jSuite.srcDir.resolve("Oleg Cherednik.txt");
+        Path txt = Paths.get("d:/zip4j/tmp/foo.txt");
         List<Path> files = Arrays.asList(txt);
 
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         zip.add(files, parameters);
+
+        destDir = destDir.resolve("unzip");
+        UnzipIt unzip = UnzipIt.builder()
+                               .zipFile(zipFile)
+                               .password(Zip4jSuite.password).build();
+        unzip.extract(destDir);
+
 
 //        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
 //        assertThatZipFile(zipFile, Zip4jSuite.password).exists().rootEntry().hasSubDirectories(0).hasFiles(3);
@@ -130,6 +140,8 @@ public class EncryptionAesTest {
 //
 //        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
 //    }
+
+
 //
 //    public void shouldThrowExceptionWhenUnzipStandardEncryptedZipWithIncorrectPassword() throws IOException {
 //        ZipParameters parameters = ZipParameters.builder()

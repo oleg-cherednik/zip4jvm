@@ -28,6 +28,7 @@ import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -143,45 +144,47 @@ public class UnzipEngine {
     }
 
     public void checkCRC() throws Zip4jException {
-        if (fileHeader != null) {
-            if (fileHeader.getEncryption() == Encryption.AES) {
-                if (decoder != null && decoder instanceof AesDecoder) {
-                    byte[] tmpMacBytes = ((AesDecoder)decoder).getCalculatedAuthenticationBytes();
-                    byte[] storedMac = ((AesDecoder)decoder).getStoredMac();
-                    byte[] calculatedMac = new byte[AesEngine.AES_AUTH_LENGTH];
+        if (fileHeader == null)
+            return;
 
-                    if (calculatedMac == null || storedMac == null) {
-                        throw new Zip4jException("CRC (MAC) check failed for " + fileHeader.getFileName());
-                    }
+        if (fileHeader.getEncryption() == Encryption.AES) {
+            if (decoder != null && decoder instanceof AesDecoder) {
+                byte[] tmpMacBytes = ((AesDecoder)decoder).getCalculatedAuthenticationBytes();
+                byte[] storedMac = ((AesDecoder)decoder).getStoredMac();
+                byte[] calculatedMac = new byte[AesEngine.AES_AUTH_LENGTH];
 
-                    System.arraycopy(tmpMacBytes, 0, calculatedMac, 0, AesEngine.AES_AUTH_LENGTH);
+                if (calculatedMac == null || storedMac == null) {
+                    throw new Zip4jException("CRC (MAC) check failed for " + fileHeader.getFileName());
+                }
+
+                System.arraycopy(tmpMacBytes, 0, calculatedMac, 0, AesEngine.AES_AUTH_LENGTH);
 // TODO temporary
 //                    if (!Arrays.equals(calculatedMac, storedMac)) {
 //                        throw new Zip4jException("invalid CRC (MAC) for file: " + fileHeader.getFileName());
 //                    }
-                } else if (decoder != null && decoder instanceof AesNewDecoder) {
-                    byte[] tmpMacBytes = ((AesNewDecoder)decoder).getCalculatedAuthenticationBytes();
-                    byte[] storedMac = ((AesNewDecoder)decoder).getMacKey();
-                    byte[] calculatedMac = new byte[AesEngine.AES_AUTH_LENGTH];
+            }
+        } else if (fileHeader.getEncryption() == Encryption.AES_NEW) {
+            if (decoder != null && decoder instanceof AesNewDecoder) {
+                byte[] tmpMacBytes = ((AesNewDecoder)decoder).getCalculatedAuthenticationBytes();
+                byte[] storedMac = ((AesNewDecoder)decoder).getMacKey();
+                byte[] calculatedMac = new byte[AesEngine.AES_AUTH_LENGTH];
 
-                    if (calculatedMac == null || storedMac == null) {
-                        throw new Zip4jException("CRC (MAC) check failed for " + fileHeader.getFileName());
-                    }
+                if (calculatedMac == null || storedMac == null) {
+                    throw new Zip4jException("CRC (MAC) check failed for " + fileHeader.getFileName());
+                }
 
-                    System.arraycopy(tmpMacBytes, 0, calculatedMac, 0, AesEngine.AES_AUTH_LENGTH);
+                System.arraycopy(tmpMacBytes, 0, calculatedMac, 0, AesEngine.AES_AUTH_LENGTH);
 // TODO temporary
-//                    if (!Arrays.equals(calculatedMac, storedMac)) {
-//                        throw new Zip4jException("invalid CRC (MAC) for file: " + fileHeader.getFileName());
-//                    }
-                }
-            } else {
-                long calculatedCRC = crc.getValue() & 0xFFFFFFFFL;
-                if (calculatedCRC != (fileHeader.getCrc32() & 0xFFFFFFFFL)) {
-                    String errMsg = "invalid CRC for file: " + fileHeader.getFileName();
-                    if (localFileHeader.getEncryption() == Encryption.PKWARE)
-                        errMsg += " - Wrong Password?";
-                    throw new Zip4jException(errMsg);
-                }
+                if (!Arrays.equals(calculatedMac, storedMac))
+                    throw new Zip4jException("invalid CRC (MAC) for file: " + fileHeader.getFileName());
+            }
+        } else {
+            long calculatedCRC = crc.getValue() & 0xFFFFFFFFL;
+            if (calculatedCRC != (fileHeader.getCrc32() & 0xFFFFFFFFL)) {
+                String errMsg = "invalid CRC for file: " + fileHeader.getFileName();
+                if (localFileHeader.getEncryption() == Encryption.PKWARE)
+                    errMsg += " - Wrong Password?";
+                throw new Zip4jException(errMsg);
             }
         }
     }

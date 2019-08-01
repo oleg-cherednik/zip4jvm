@@ -39,6 +39,7 @@ public class AesNewEncoder implements Encoder {
     public static AesNewEncoder create(@NonNull AesStrength strength, char[] password) {
         try {
             byte[] salt = generateSalt(strength);
+
             // TODO temporary
             int length = strength.getKeyLength() + strength.getMacLength() + AesNewDecoder.PASSWORD_VERIFIER_LENGTH;
             SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");

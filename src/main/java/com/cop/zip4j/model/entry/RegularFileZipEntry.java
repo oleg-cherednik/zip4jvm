@@ -8,11 +8,8 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 /**
@@ -43,10 +40,8 @@ public class RegularFileZipEntry extends PathZipEntry {
 
     @Override
     public long write(@NonNull OutputStream out) throws IOException {
-        try (Reader in = new InputStreamReader(new FileInputStream(path.toFile()), StandardCharsets.UTF_8)) {
-            return IOUtils.copyLarge(in, new OutputStreamWriter(out));
-        } finally {
-            out.flush();
+        try (InputStream in = new FileInputStream(path.toFile())) {
+            return IOUtils.copyLarge(in, out);
         }
     }
 

@@ -39,17 +39,30 @@ public class AesNewDecoder implements Decoder {
             AesStrength strength = aesExtraDataRecord.getStrength();
 
             byte[] salt = getSalt(in, localFileHeader.getOffs(), strength);
-            byte[] passwordVerifier = getPasswordVerifier(in);
 
-            KeySpec spec = new PBEKeySpec(password, salt, 1000, strength.getSize());
-            SecretKey secretKey = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(spec);
+            // TODO temporary
+            int length = strength.getKeyLength() + strength.getMacLength() + AesNewDecoder.PASSWORD_VERIFIER_LENGTH;
+            SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+            KeySpec spec = new PBEKeySpec(password, salt, 1000, length * 8);
+            byte[] tmp = secretKeyFactory.generateSecret(spec).getEncoded();
+
+            byte[] macKey = new byte[strength.getMacLength()];
+            byte[] derivedPasswordVerifier = new byte[AesNewDecoder.PASSWORD_VERIFIER_LENGTH];
+
+            System.arraycopy(tmp, strength.getKeyLength(), macKey, 0, macKey.length);
+            System.arraycopy(tmp, strength.getKeyLength() + macKey.length, derivedPasswordVerifier, 0, AesNewDecoder.PASSWORD_VERIFIER_LENGTH);
+
+            // --
+
+            spec = new PBEKeySpec(password, salt, 1000, strength.getSize());
+            SecretKey secretKey = secretKeyFactory.generateSecret(spec);
             byte[] iv = { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
             Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
             cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(secretKey.getEncoded(), "AES"), new IvParameterSpec(iv));
 
             Mac mac = Mac.getInstance("HmacSHA1");
-            mac.init(secretKey);
+            mac.init(new SecretKeySpec(macKey, "HmacSHA1"));
 
             return new AesNewDecoder(cipher, mac, salt.length);
         } catch(Exception e) {
@@ -60,6 +73,7 @@ public class AesNewDecoder implements Decoder {
     @Override
     public void decrypt(byte[] buf, int offs, int len) {
         try {
+            mac.update(buf, offs, len);
             byte[] tmp = cipher.doFinal(buf, offs, len);
             System.arraycopy(tmp, 0, buf, offs, tmp.length);
         } catch(Exception e) {
