@@ -7,6 +7,7 @@ import com.cop.zip4j.crypto.aes.pbkdf2.PBKDF2Parameters;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import com.cop.zip4j.model.aes.AesStrength;
+import lombok.Setter;
 
 import java.util.Arrays;
 import java.util.zip.ZipException;
@@ -27,16 +28,9 @@ public class AesDecoder implements Decoder {
     private byte[] iv;
     private byte[] counterBlock;
 
+    @Setter
     private byte[] macKey;
     private int saltLength;
-
-    public byte[] getStoredMac() {
-        return macKey;
-    }
-
-    public void setStoredMac(byte[] storedMac) {
-        this.macKey = storedMac;
-    }
 
     public int getSaltLength() {
         return saltLength;
@@ -102,6 +96,20 @@ public class AesDecoder implements Decoder {
 
             nonce++;
         }
+    }
+
+    @Override
+    public int getLen(long bytesRead, int len, long length) {
+        return bytesRead + len < length && len % 16 != 0 ? len - len % 16 : len;
+    }
+
+    @Override
+    public void checkCRC() {
+        byte[] actual = new byte[AesEngine.AES_AUTH_LENGTH];
+        System.arraycopy(mac.doFinal(), 0, actual, 0, actual.length);
+
+        if (!Arrays.equals(actual, macKey))
+            throw new Zip4jException("invalid CRC (MAC) for file");
     }
 
     private byte[] deriveKey(byte[] salt, char[] password, int keyLength, int macLength) {

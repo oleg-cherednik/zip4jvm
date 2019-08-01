@@ -1,6 +1,7 @@
 package com.cop.zip4j.crypto.aesnew;
 
 import com.cop.zip4j.crypto.Decoder;
+import com.cop.zip4j.crypto.aes.AesEngine;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.LittleEndianRandomAccessFile;
 import com.cop.zip4j.model.LocalFileHeader;
@@ -10,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
@@ -20,6 +22,7 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.security.spec.KeySpec;
+import java.util.Arrays;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -30,6 +33,8 @@ public class AesNewDecoder implements Decoder {
     private final Cipher cipher;
     private final Mac mac;
     private final int saltLength;
+
+    @Setter
     private byte[] macKey;
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")
@@ -41,13 +46,13 @@ public class AesNewDecoder implements Decoder {
             byte[] salt = getSalt(in, localFileHeader.getOffs(), strength);
 
             // TODO temporary
-            int length = strength.getKeyLength() + strength.getMacLength() + AesNewDecoder.PASSWORD_VERIFIER_LENGTH;
+            int length = strength.getKeyLength() + strength.getMacLength() + PASSWORD_VERIFIER_LENGTH;
             SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
             KeySpec spec = new PBEKeySpec(password, salt, 1000, length * 8);
             byte[] tmp = secretKeyFactory.generateSecret(spec).getEncoded();
 
             byte[] macKey = new byte[strength.getMacLength()];
-            byte[] derivedPasswordVerifier = new byte[AesNewDecoder.PASSWORD_VERIFIER_LENGTH];
+            byte[] derivedPasswordVerifier = new byte[PASSWORD_VERIFIER_LENGTH];
 
             System.arraycopy(tmp, strength.getKeyLength(), macKey, 0, macKey.length);
             System.arraycopy(tmp, strength.getKeyLength() + macKey.length, derivedPasswordVerifier, 0, AesNewDecoder.PASSWORD_VERIFIER_LENGTH);
@@ -81,21 +86,23 @@ public class AesNewDecoder implements Decoder {
         }
     }
 
-    public void setStoredMac(byte[] macKey) {
-        this.macKey = macKey;
+    @Override
+    public int getLen(long bytesRead, int len, long length) {
+        return bytesRead + len < length && len % 16 != 0 ? len - len % 16 : len;
     }
 
-    public byte[] getCalculatedAuthenticationBytes() {
-        return mac.doFinal();
+    @Override
+    public void checkCRC() {
+        byte[] actual = new byte[AesEngine.AES_AUTH_LENGTH];
+        System.arraycopy(mac.doFinal(), 0, actual, 0, actual.length);
+
+        if (!Arrays.equals(actual, macKey))
+            throw new Zip4jException("invalid CRC (MAC) for file");
     }
 
     private static byte[] getSalt(LittleEndianRandomAccessFile in, long offs, AesStrength strength) throws IOException {
         in.seek(offs);
         return in.readBytes(strength.getSaltLength());
-    }
-
-    private static byte[] getPasswordVerifier(LittleEndianRandomAccessFile in) throws IOException {
-        return in.readBytes(PASSWORD_VERIFIER_LENGTH);
     }
 
 }

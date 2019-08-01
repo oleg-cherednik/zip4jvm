@@ -30,11 +30,11 @@ public class InflaterInputStream extends PartInputStream {
         return read(oneByteBuff, 0, 1) == -1 ? -1 : oneByteBuff[0] & 0xff;
     }
 
-    public int read(byte[] b, int off, int len) throws IOException {
+    public int read(byte[] buf, int offs, int len) throws IOException {
 
-        if (b == null) {
+        if (buf == null) {
             throw new NullPointerException("input buffer is null");
-        } else if (off < 0 || len < 0 || len > b.length - off) {
+        } else if (offs < 0 || len < 0 || len > buf.length - offs) {
             throw new IndexOutOfBoundsException();
         } else if (len == 0) {
             return 0;
@@ -46,7 +46,7 @@ public class InflaterInputStream extends PartInputStream {
                 finishInflating();
                 return -1;
             }
-            while ((n = inflater.inflate(b, off, len)) == 0) {
+            while ((n = inflater.inflate(buf, offs, len)) == 0) {
                 if (inflater.finished() || inflater.needsDictionary()) {
                     finishInflating();
                     return -1;
@@ -78,7 +78,6 @@ public class InflaterInputStream extends PartInputStream {
             //read all data
         }
         checkAndReadAESMacBytes();
-        checkAndReadAESNewMacBytes();
     }
 
     private void fill() throws IOException {

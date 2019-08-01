@@ -1,7 +1,7 @@
 package com.cop.zip4j.io;
 
 import com.cop.zip4j.engine.UnzipEngine;
-import com.cop.zip4j.exception.Zip4jException;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
@@ -11,14 +11,15 @@ import java.io.InputStream;
 public class ZipInputStream extends InputStream {
 
     private final InputStream in;
-    private final UnzipEngine unzipEngine;
+    @NonNull
+    private final UnzipEngine engine;
 
     @Override
     public int read() throws IOException {
         int readByte = in.read();
 
         if (readByte != -1)
-            unzipEngine.updateCRC(readByte);
+            engine.updateCRC(readByte);
 
         return readByte;
     }
@@ -32,8 +33,8 @@ public class ZipInputStream extends InputStream {
     public int read(byte[] b, int off, int len) throws IOException {
         int readLen = in.read(b, off, len);
 
-        if (readLen > 0 && unzipEngine != null)
-            unzipEngine.updateCRC(b, off, readLen);
+        if (readLen > 0 && engine != null)
+            engine.updateCRC(b, off, readLen);
 
         return readLen;
     }
@@ -47,25 +48,8 @@ public class ZipInputStream extends InputStream {
      */
     @Override
     public void close() throws IOException {
-        close(false);
-    }
-
-    /**
-     * Closes the input stream and releases any resources.
-     * If skipCRCCheck flag in set to true, this method skips CRC Check
-     * of the extracted file
-     *
-     * @throws IOException
-     */
-    public void close(boolean skipCRCCheck) throws IOException {
-        try {
-            in.close();
-            if (!skipCRCCheck && unzipEngine != null) {
-                unzipEngine.checkCRC();
-            }
-        } catch(Zip4jException e) {
-            throw new IOException(e.getMessage());
-        }
+        in.close();
+        engine.checkCRC();
     }
 
     @Override
