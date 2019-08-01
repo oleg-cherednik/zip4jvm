@@ -215,14 +215,7 @@ public class UnzipEngine {
     }
 
     public void updateCRC(int b) {
-        if (b != -1)
-            crc.update(b);
-    }
-
-    public void updateCRC(byte[] buff, int offset, int len) {
-        if (buff != null) {
-            crc.update(buff, offset, len);
-        }
+        crc.update(b);
     }
 
     public CentralDirectory.FileHeader getFileHeader() {

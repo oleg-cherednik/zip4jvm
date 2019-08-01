@@ -7,6 +7,9 @@ import lombok.RequiredArgsConstructor;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * It's created for separate ZipEntry. Therefore CRC calculation could be incapsulated in this file instead of UnzipEngine
+ */
 @RequiredArgsConstructor
 public class ZipInputStream extends InputStream {
 
@@ -16,22 +19,12 @@ public class ZipInputStream extends InputStream {
 
     @Override
     public int read() throws IOException {
-        int readByte = in.read();
+        int b = in.read();
 
-        if (readByte != -1)
-            engine.updateCRC(readByte);
+        if (b != -1)
+            engine.updateCRC(b);
 
-        return readByte;
-    }
-
-    @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
-        int readLen = in.read(buf, offs, len);
-
-        if (readLen > 0 && engine != null)
-            engine.updateCRC(buf, offs, readLen);
-
-        return readLen;
+        return b;
     }
 
     @Override
