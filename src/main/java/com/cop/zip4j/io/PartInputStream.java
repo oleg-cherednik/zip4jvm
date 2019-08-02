@@ -71,6 +71,8 @@ public class PartInputStream extends InputStream {
         }
 
         len = engine.getDecoder().getLen(bytesRead, len, length);
+
+
         int count = in.read(buf, offs, len);
 
         if ((count < len) && engine.getZipModel().isSplitArchive()) {

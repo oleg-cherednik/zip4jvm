@@ -32,7 +32,7 @@ public enum Encryption {
         @Override
         public Decoder decoder(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, char[] password)
                 throws IOException {
-            return null;
+            return Decoder.NULL;
         }
     },
     PKWARE {

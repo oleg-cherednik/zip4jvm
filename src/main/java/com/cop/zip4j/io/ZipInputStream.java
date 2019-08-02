@@ -28,6 +28,11 @@ public class ZipInputStream extends InputStream {
     }
 
     @Override
+    public int read(byte b[], int off, int len) throws IOException {
+        return super.read(b, off, len);
+    }
+
+    @Override
     public void close() throws IOException {
         in.close();
         engine.checkCRC();

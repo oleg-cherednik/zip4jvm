@@ -16,6 +16,7 @@ import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.utils.InternalZipConstants;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
@@ -40,18 +41,22 @@ import java.util.zip.CRC32;
 @RequiredArgsConstructor
 public class UnzipEngine {
 
+    @Getter
     @NonNull
     private final ZipModel zipModel;
     private final char[] password;
     private final CRC32 crc = new CRC32();
 
+    @Getter
     @Deprecated
     private CentralDirectory.FileHeader fileHeader;
     @Deprecated
     private LocalFileHeader localFileHeader;
 
     private int currSplitFileCounter;
-    private Decoder decoder;
+    @Getter
+    @NonNull
+    private Decoder decoder = Decoder.NULL;
 
     public void extractEntries(@NonNull Path destDir, @NonNull Collection<String> entries) {
         getFileHeaders(entries).forEach(fileHeader -> extractEntry(destDir, fileHeader));
@@ -65,21 +70,28 @@ public class UnzipEngine {
                       .collect(Collectors.toList());
     }
 
-    private void extractEntry(Path destDir, @NonNull CentralDirectory.FileHeader fileHeader) {
+    private void extractEntry(Path destDir, CentralDirectory.FileHeader fileHeader) {
         crc.reset();
 
         if (fileHeader.isDirectory())
-            try {
-                Files.createDirectories(destDir.resolve(fileHeader.getFileName()));
-            } catch(IOException e) {
-                throw new Zip4jException(e);
-            }
-        else {
-            try (InputStream in = extractEntryAsStream(fileHeader); OutputStream out = getOutputStream(destDir, fileHeader)) {
-                IOUtils.copyLarge(in, out);
-            } catch(IOException e) {
-                throw new Zip4jException(e);
-            }
+            extractDirectory(destDir, fileHeader);
+        else
+            extractFile(destDir, fileHeader);
+    }
+
+    private static void extractDirectory(Path destDir, CentralDirectory.FileHeader fileHeader) {
+        try {
+            Files.createDirectories(destDir.resolve(fileHeader.getFileName()));
+        } catch(IOException e) {
+            throw new Zip4jException(e);
+        }
+    }
+
+    private void extractFile(Path destDir, CentralDirectory.FileHeader fileHeader) {
+        try (InputStream in = extractEntryAsStream(fileHeader); OutputStream out = getOutputStream(destDir, fileHeader)) {
+            IOUtils.copyLarge(in, out);
+        } catch(IOException e) {
+            throw new Zip4jException(e);
         }
     }
 
@@ -132,7 +144,7 @@ public class UnzipEngine {
     }
 
     public void checkCRC() {
-        if (fileHeader == null || decoder == null)
+        if (fileHeader == null)
             return;
 
         if (decoder instanceof AesDecoder || decoder instanceof AesNewDecoder) {
@@ -206,18 +218,6 @@ public class UnzipEngine {
 
     public void updateCRC(int b) {
         crc.update(b);
-    }
-
-    public CentralDirectory.FileHeader getFileHeader() {
-        return fileHeader;
-    }
-
-    public Decoder getDecoder() {
-        return decoder;
-    }
-
-    public ZipModel getZipModel() {
-        return zipModel;
     }
 
 }

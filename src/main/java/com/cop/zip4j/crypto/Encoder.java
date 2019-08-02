@@ -11,7 +11,6 @@ import java.io.IOException;
  */
 public interface Encoder {
 
-    // TODO should nobe here
     Encoder NULL = new Encoder() {
         @Override
         public void encrypt(byte[] buf, int offs, int len) {
