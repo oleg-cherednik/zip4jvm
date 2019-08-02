@@ -30,9 +30,9 @@ public final class LittleEndianRandomAccessFile implements AutoCloseable {
 
     public int readWord() throws IOException {
         offs += 2;
-        int ch0 = in.read();
-        int ch1 = in.read();
-        return (ch1 << 8) + ch0;
+        int b0 = in.read();
+        int b1 = in.read();
+        return (b1 << 8) + b0;
     }
 
     public int readDword() throws IOException {
@@ -41,24 +41,24 @@ public final class LittleEndianRandomAccessFile implements AutoCloseable {
 
     public long readDwordLong() throws IOException {
         offs += 4;
-        long ch0 = in.read();
-        long ch1 = in.read();
-        long ch2 = in.read();
-        long ch3 = in.read();
-        return ch3 << 24 | ch2 << 16 | ch1 << 8 | ch0;
+        long b0 = in.read();
+        long b1 = in.read();
+        long b2 = in.read();
+        long b3 = in.read();
+        return b3 << 24 | b2 << 16 | b1 << 8 | b0;
     }
 
     public long readQword() throws IOException {
         offs += 8;
-        long ch0 = in.read();
-        long ch1 = in.read();
-        long ch2 = in.read();
-        long ch3 = in.read();
-        long ch4 = in.read();
-        long ch5 = in.read();
-        long ch6 = in.read();
-        long ch7 = in.read();
-        return ch7 << 56 | ch6 << 48 | ch5 << 40 | ch4 << 32 | ch3 << 24 | ch2 << 16 | ch1 << 8 | ch0;
+        long b0 = in.read();
+        long b1 = in.read();
+        long b2 = in.read();
+        long b3 = in.read();
+        long b4 = in.read();
+        long b5 = in.read();
+        long b6 = in.read();
+        long b7 = in.read();
+        return b7 << 56 | b6 << 48 | b5 << 40 | b4 << 32 | b3 << 24 | b2 << 16 | b1 << 8 | b0;
     }
 
     public String readString(int length) throws IOException {

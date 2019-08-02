@@ -7,6 +7,7 @@ import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ZipParameters;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -51,6 +52,7 @@ public class UnzipItTest {
     }
 
     @Test
+    @Ignore
     public void shouldUnzipRequiredFilesWhenSplit() throws Zip4jException, IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         List<String> entries = Arrays.asList("saint-petersburg.jpg", "cars/bentley-continental.jpg");

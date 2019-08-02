@@ -82,7 +82,7 @@ public class SplitOutputStream extends OutputStream {
         if (splitLength != ZipModel.NO_SPLIT && (int)(splitLength - bytesWrittenForThisPart) <= 0)
             startNextSplitFile();
 
-        out.write(val);
+        out.writeBytes((byte)val);
         bytesWrittenForThisPart++;
     }
 
@@ -145,57 +145,30 @@ public class SplitOutputStream extends OutputStream {
         return currSplitFileCounter;
     }
 
-    private final byte[] word = new byte[2];
-    private final byte[] dword = new byte[4];
-    private final byte[] qword = new byte[8];
-
     private final Map<String, Long> mark = new HashMap<>();
 
     public void writeWord(int val) throws IOException {
-        word[0] = (byte)(val & 0xFF);
-        word[1] = (byte)(val >>> 8);
-        write(word);
-        out.incOffs(word.length);
+        out.writeWord(val);
     }
 
     public void writeDword(int val) throws IOException {
-        writeDword((long)val);
+        out.writeDword(val);
     }
 
     public void writeDword(long val) throws IOException {
-        dword[0] = (byte)(val & 0xFF);
-        dword[1] = (byte)(val >>> 8);
-        dword[2] = (byte)(val >>> 16);
-        dword[3] = (byte)(val >>> 24);
-        write(dword);
-        out.incOffs(dword.length);
+        out.writeDword(val);
     }
 
     public void writeQword(long val) throws IOException {
-        qword[0] = (byte)(val & 0xFF);
-        qword[1] = (byte)(val >>> 8);
-        qword[2] = (byte)(val >>> 16);
-        qword[3] = (byte)(val >>> 24);
-        qword[4] = (byte)(val >>> 32);
-        qword[5] = (byte)(val >>> 40);
-        qword[6] = (byte)(val >>> 48);
-        qword[7] = (byte)(val >>> 56);
-        write(qword);
-        out.incOffs(qword.length);
+        out.writeQword(val);
     }
 
     public void writeBytes(byte... buf) throws IOException {
-        if (buf == null)
-            return;
-        write(buf);
-        out.incOffs(buf.length);
+        out.writeBytes(buf);
     }
 
     public void writeBytes(byte[] buf, int offs, int len) throws IOException {
-        if (buf == null)
-            return;
         write(buf, offs, len);
-        out.incOffs(len);
     }
 
     public void mark(String id) {
