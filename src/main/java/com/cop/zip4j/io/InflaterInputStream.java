@@ -1,6 +1,8 @@
 package com.cop.zip4j.io;
 
+import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.engine.UnzipEngine;
+import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.utils.InternalZipConstants;
 
 import java.io.EOFException;
@@ -13,16 +15,14 @@ public class InflaterInputStream extends PartInputStream {
     private final Inflater inflater = new Inflater(true);
     private byte[] buff;
     private byte[] oneByteBuff = new byte[1];
-    private UnzipEngine unzipEngine;
     private long bytesWritten;
     private long uncompressedSize;
 
-    public InflaterInputStream(LittleEndianRandomAccessFile in, long len, UnzipEngine unzipEngine) {
-        super(in, len, unzipEngine);
+    public InflaterInputStream(LittleEndianRandomAccessFile in, long len, Decoder decoder, UnzipEngine engine, CentralDirectory.FileHeader fileHeader) {
+        super(in, len, decoder, engine);
         this.buff = new byte[InternalZipConstants.BUFF_SIZE];
-        this.unzipEngine = unzipEngine;
         bytesWritten = 0;
-        uncompressedSize = unzipEngine.getFileHeader().getUncompressedSize();
+        uncompressedSize = fileHeader.getUncompressedSize();
     }
 
     @Override

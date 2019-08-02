@@ -32,7 +32,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.zip.CRC32;
 
 /**
  * @author Oleg Cherednik
@@ -45,18 +44,8 @@ public class UnzipEngine {
     @NonNull
     private final ZipModel zipModel;
     private final char[] password;
-    private final CRC32 crc = new CRC32();
-
-    @Getter
-    @Deprecated
-    private CentralDirectory.FileHeader fileHeader;
-    @Deprecated
-    private LocalFileHeader localFileHeader;
 
     private int currSplitFileCounter;
-    @Getter
-    @NonNull
-    private Decoder decoder = Decoder.NULL;
 
     public void extractEntries(@NonNull Path destDir, @NonNull Collection<String> entries) {
         getFileHeaders(entries).forEach(fileHeader -> extractEntry(destDir, fileHeader));
@@ -71,8 +60,6 @@ public class UnzipEngine {
     }
 
     private void extractEntry(Path destDir, CentralDirectory.FileHeader fileHeader) {
-        crc.reset();
-
         if (fileHeader.isDirectory())
             extractDirectory(destDir, fileHeader);
         else
@@ -103,13 +90,9 @@ public class UnzipEngine {
     @NonNull
     private InputStream extractEntryAsStream(@NonNull CentralDirectory.FileHeader fileHeader) {
         try {
-            // TODO temporary
-            this.fileHeader = fileHeader;
-
             LittleEndianRandomAccessFile in = openFile(fileHeader);
             LocalFileHeader localFileHeader = readLocalFileHeader(fileHeader);
-            this.localFileHeader = localFileHeader;
-            decoder = localFileHeader.getEncryption().decoder(in, localFileHeader, password);
+            Decoder decoder = localFileHeader.getEncryption().decoder(in, localFileHeader, password);
 
             long comprSize = localFileHeader.getCompressedSize();
             long offs = localFileHeader.getOffs();
@@ -131,33 +114,15 @@ public class UnzipEngine {
             in.seek(offs);
 
             if (fileHeader.getActualCompressionMethod() == CompressionMethod.STORE)
-                return new ZipInputStream(new PartInputStream(in, comprSize, this), this);
+                return new ZipInputStream(new PartInputStream(in, comprSize, decoder, this), fileHeader, decoder);
             if (fileHeader.getActualCompressionMethod() == CompressionMethod.DEFLATE)
-                return new ZipInputStream(new InflaterInputStream(in, comprSize, this), this);
+                return new ZipInputStream(new InflaterInputStream(in, comprSize, decoder, this, fileHeader), fileHeader, decoder);
 
             throw new Zip4jException("compression type not supported");
         } catch(Zip4jException e) {
             throw e;
         } catch(Exception e) {
             throw new Zip4jException(e);
-        }
-    }
-
-    public void checkCRC() {
-        if (fileHeader == null)
-            return;
-
-        if (decoder instanceof AesDecoder || decoder instanceof AesNewDecoder) {
-            decoder.checkCRC();
-        } else {
-            // TODO should be moved to decoder
-            long calculatedCRC = crc.getValue() & 0xFFFFFFFFL;
-            if (calculatedCRC != (fileHeader.getCrc32() & 0xFFFFFFFFL)) {
-                String errMsg = "invalid CRC for file: " + fileHeader.getFileName();
-                if (localFileHeader.getEncryption() == Encryption.PKWARE)
-                    errMsg += " - Wrong Password?";
-                throw new Zip4jException(errMsg);
-            }
         }
     }
 
@@ -214,10 +179,6 @@ public class UnzipEngine {
 
         currSplitFileCounter++;
         return new RandomAccessFile(currSplitFile.toFile(), "r");
-    }
-
-    public void updateCRC(int b) {
-        crc.update(b);
     }
 
 }

@@ -4,6 +4,7 @@ import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.crypto.aes.AesEngine;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.LittleEndianRandomAccessFile;
+import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import com.cop.zip4j.model.aes.AesStrength;
@@ -92,12 +93,12 @@ public class AesNewDecoder implements Decoder {
     }
 
     @Override
-    public void checkCRC() {
+    public void checkChecksum(@NonNull CentralDirectory.FileHeader fileHeader, long crc32) {
         byte[] actual = new byte[AesEngine.AES_AUTH_LENGTH];
         System.arraycopy(mac.doFinal(), 0, actual, 0, actual.length);
 
         if (!Arrays.equals(actual, macKey))
-            throw new Zip4jException("invalid CRC (MAC) for file");
+            throw new Zip4jException("invalid CRC (MAC) for file '" + fileHeader.getFileName() + '\'');
     }
 
     private static byte[] getSalt(LittleEndianRandomAccessFile in, long offs, AesStrength strength) throws IOException {

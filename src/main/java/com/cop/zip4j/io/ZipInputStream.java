@@ -1,41 +1,41 @@
 package com.cop.zip4j.io;
 
-import com.cop.zip4j.engine.UnzipEngine;
+import com.cop.zip4j.crypto.Decoder;
+import com.cop.zip4j.model.CentralDirectory;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
-/**
- * It's created for separate ZipEntry. Therefore CRC calculation could be incapsulated in this file instead of UnzipEngine
- */
 @RequiredArgsConstructor
 public class ZipInputStream extends InputStream {
 
+    @NonNull
     private final InputStream in;
     @NonNull
-    private final UnzipEngine engine;
+    private final CentralDirectory.FileHeader fileHeader;
+    @NonNull
+    private final Decoder decoder;
+
+    private final Checksum crc32 = new CRC32();
 
     @Override
     public int read() throws IOException {
         int b = in.read();
 
         if (b != -1)
-            engine.updateCRC(b);
+            crc32.update(b);
 
         return b;
     }
 
     @Override
-    public int read(byte b[], int off, int len) throws IOException {
-        return super.read(b, off, len);
-    }
-
-    @Override
     public void close() throws IOException {
         in.close();
-        engine.checkCRC();
+        decoder.checkChecksum(fileHeader, crc32.getValue());
     }
 
     @Override

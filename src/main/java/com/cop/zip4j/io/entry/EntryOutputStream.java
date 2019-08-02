@@ -88,9 +88,13 @@ public class EntryOutputStream extends OutputStream {
     }
 
     @Override
-    public void write(byte[] buf, int offs, int len) throws IOException {
+    public final void write(byte[] buf, int offs, int len) throws IOException {
         crc32.update(buf, offs, len);
         total += len;
+        writeImpl(buf, offs, len);
+    }
+
+    protected void writeImpl(byte[] buf, int offs, int len) throws IOException {
         _write(buf, offs, len);
     }
 

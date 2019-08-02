@@ -1,9 +1,10 @@
 package com.cop.zip4j.io;
 
+import com.cop.zip4j.crypto.Decoder;
+import com.cop.zip4j.crypto.aes.AesDecoder;
 import com.cop.zip4j.crypto.aes.AesEngine;
 import com.cop.zip4j.crypto.aesnew.AesNewDecoder;
 import com.cop.zip4j.engine.UnzipEngine;
-import com.cop.zip4j.model.Encryption;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,26 +15,20 @@ public class PartInputStream extends InputStream {
     private RandomAccessFile in;
     private final long length;
     private final UnzipEngine engine;
+    private final Decoder decoder;
+
 
     private long bytesRead;
     private byte[] oneByteBuff = new byte[1];
     private byte[] aesBlockByte = new byte[16];
     private int aesBytesReturned = 0;
 
-    public PartInputStream(LittleEndianRandomAccessFile in, long length, UnzipEngine engine) {
+    public PartInputStream(LittleEndianRandomAccessFile in, long length, Decoder decoder, UnzipEngine engine) {
         this.in = in.getIn();
         this.engine = engine;
         this.length = length;
+        this.decoder = decoder;
     }
-
-    private boolean isAes() {
-        return engine.getFileHeader().getEncryption() == Encryption.AES;
-    }
-
-    private boolean isAesNew() {
-        return engine.getFileHeader().getEncryption() == Encryption.AES_NEW;
-    }
-
 
     @Override
     public int available() {
@@ -45,7 +40,7 @@ public class PartInputStream extends InputStream {
         if (bytesRead >= length)
             return -1;
 
-        if (!(isAes() || isAesNew()))
+        if (!(decoder instanceof AesDecoder || decoder instanceof AesNewDecoder))
             return read(oneByteBuff, 0, 1) == -1 ? -1 : oneByteBuff[0] & 0xFF;
 
         if (aesBytesReturned == 0 || aesBytesReturned == 16) {
@@ -70,7 +65,7 @@ public class PartInputStream extends InputStream {
             }
         }
 
-        len = engine.getDecoder().getLen(bytesRead, len, length);
+        len = decoder.getLen(bytesRead, len, length);
 
 
         int count = in.read(buf, offs, len);
@@ -90,7 +85,7 @@ public class PartInputStream extends InputStream {
         }
 
         if (count > 0) {
-            engine.getDecoder().decrypt(buf, offs, count);
+            decoder.decrypt(buf, offs, count);
             bytesRead += count;
         }
 
@@ -103,23 +98,23 @@ public class PartInputStream extends InputStream {
     }
 
     protected void checkAndReadAESMacBytes() throws IOException {
-        if (engine.getDecoder() == null || !(engine.getDecoder() instanceof AesNewDecoder))
+        if (!(decoder instanceof AesNewDecoder))
             return;
 
-        AesNewDecoder decoder = (AesNewDecoder)engine.getDecoder();
+        AesNewDecoder dec = (AesNewDecoder)decoder;
 
-        if (decoder.getMacKey() == null)
-            decoder.setMacKey(readMac());
+        if (dec.getMacKey() == null)
+            dec.setMacKey(readMac());
     }
 
     protected void checkAndReadAESNewMacBytes() throws IOException {
-        if (engine.getDecoder() == null || !(engine.getDecoder() instanceof AesNewDecoder))
+        if (!(decoder instanceof AesNewDecoder))
             return;
 
-        AesNewDecoder decoder = (AesNewDecoder)engine.getDecoder();
+        AesNewDecoder dec = (AesNewDecoder)decoder;
 
-        if (decoder.getMacKey() == null)
-            decoder.setMacKey(readMac());
+        if (dec.getMacKey() == null)
+            dec.setMacKey(readMac());
     }
 
     private byte[] readMac() throws IOException {

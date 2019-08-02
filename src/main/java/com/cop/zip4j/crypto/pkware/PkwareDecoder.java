@@ -1,7 +1,9 @@
 package com.cop.zip4j.crypto.pkware;
 
 import com.cop.zip4j.crypto.Decoder;
+import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.LittleEndianRandomAccessFile;
+import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.LocalFileHeader;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,14 @@ public class PkwareDecoder implements Decoder {
     @Override
     public void decrypt(byte[] buf, int offs, int len) {
         engine.decrypt(buf, offs, len);
+    }
+
+    @Override
+    public void checkChecksum(@NonNull CentralDirectory.FileHeader fileHeader, long crc32) {
+        long calculatedCRC = crc32 & 0xFFFFFFFFL;
+
+        if (calculatedCRC != (fileHeader.getCrc32() & 0xFFFFFFFFL))
+            throw new Zip4jException("invalid CRC for file: " + fileHeader.getFileName() + " (Wrong Password?)");
     }
 
 }
