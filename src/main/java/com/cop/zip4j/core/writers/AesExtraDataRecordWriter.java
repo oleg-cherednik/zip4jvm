@@ -13,13 +13,14 @@ import java.nio.charset.Charset;
  * @since 15.04.2019
  */
 @RequiredArgsConstructor
-final class AesExtraDataRecordWriter {
+final class AesExtraDataRecordWriter implements DataOutput {
 
     @NonNull
     private final AesExtraDataRecord record;
     @NonNull
     private final Charset charset;
 
+    @Override
     public void write(@NonNull DataOutputStream out) throws IOException {
         if (record == AesExtraDataRecord.NULL)
             return;

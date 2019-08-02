@@ -1,9 +1,9 @@
 package com.cop.zip4j.core.writers;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.model.CentralDirectory;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.nio.charset.Charset;

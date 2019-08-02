@@ -1,12 +1,13 @@
 package com.cop.zip4j.io;
 
+import java.io.Closeable;
 import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
  * @since 02.08.2019
  */
-public interface DataOutputStream {
+public interface DataOutputStream extends Closeable {
 
     void mark(String id);
 

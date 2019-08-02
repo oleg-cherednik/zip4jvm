@@ -164,6 +164,7 @@ public class SplitOutputStream extends OutputStream implements DataOutputStream 
         out.writeDword(val);
     }
 
+    @Override
     public void writeQword(long val) throws IOException {
         out.writeQword(val);
     }

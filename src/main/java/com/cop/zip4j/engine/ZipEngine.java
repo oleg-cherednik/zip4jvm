@@ -1,6 +1,7 @@
 package com.cop.zip4j.engine;
 
 import com.cop.zip4j.exception.Zip4jException;
+import com.cop.zip4j.io.DataOutputStream;
 import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.io.entry.EntryOutputStream;
 import com.cop.zip4j.model.ZipModel;
@@ -26,7 +27,7 @@ public class ZipEngine {
         if (entries.isEmpty())
             return;
 
-        try (SplitOutputStream out = SplitOutputStream.create(zipModel)) {
+        try (DataOutputStream out = SplitOutputStream.create(zipModel)) {
             entries.stream()
                    .filter(entry -> !entry.isRoot())
                    .forEach(entry -> writeEntry(entry, out));
@@ -35,7 +36,7 @@ public class ZipEngine {
         }
     }
 
-    private void writeEntry(@NonNull PathZipEntry entry, @NonNull SplitOutputStream out) {
+    private void writeEntry(@NonNull PathZipEntry entry, @NonNull DataOutputStream out) {
         try (OutputStream delegate = EntryOutputStream.create(entry, zipModel, out)) {
             entry.write(delegate);
         } catch(IOException e) {

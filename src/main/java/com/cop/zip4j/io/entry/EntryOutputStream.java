@@ -7,7 +7,6 @@ import com.cop.zip4j.crypto.aes.AesEngine;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.CentralDirectoryBuilder;
 import com.cop.zip4j.io.DataOutputStream;
-import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.DataDescriptor;
@@ -50,7 +49,7 @@ public class EntryOutputStream extends OutputStream {
     @NonNull
     private Encryption encryption = Encryption.OFF;
 
-    public static EntryOutputStream create(@NonNull PathZipEntry entry, @NonNull ZipModel zipModel, @NonNull SplitOutputStream out) {
+    public static EntryOutputStream create(@NonNull PathZipEntry entry, @NonNull ZipModel zipModel, @NonNull DataOutputStream out) {
         EntryOutputStream stream;
 
         if (entry.getCompressionMethod() == CompressionMethod.DEFLATE)
