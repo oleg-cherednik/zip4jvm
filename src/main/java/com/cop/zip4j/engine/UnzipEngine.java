@@ -103,23 +103,13 @@ public class UnzipEngine {
             long offs = localFileHeader.getOffs();
 
             if (localFileHeader.getEncryption() == Encryption.AES) {
-                if (decoder instanceof AesDecoder) {
-                    comprSize -= ((AesDecoder)decoder).getSaltLength() +
-                            ((AesDecoder)decoder).getPasswordVerifierLength() + 10;
-                    offs += ((AesDecoder)decoder).getSaltLength() +
-                            ((AesDecoder)decoder).getPasswordVerifierLength();
-                } else
-                    throw new Zip4jException("invalid decryptor when trying to calculate " +
-                            "compressed size for AES encrypted file: " + fileHeader.getFileName());
+                AesDecoder dec = (AesDecoder)decoder;
+                comprSize -= dec.getSaltLength() + dec.getPasswordVerifierLength() + 10;
+                offs += dec.getSaltLength() + dec.getPasswordVerifierLength();
             } else if (localFileHeader.getEncryption() == Encryption.AES_NEW) {
-                if (decoder instanceof AesNewDecoder) {
-                    comprSize -= ((AesNewDecoder)decoder).getSaltLength() +
-                            AesNewDecoder.PASSWORD_VERIFIER_LENGTH + 10;
-                    offs += ((AesNewDecoder)decoder).getSaltLength() +
-                            AesNewDecoder.PASSWORD_VERIFIER_LENGTH;
-                } else
-                    throw new Zip4jException("invalid decryptor when trying to calculate " +
-                            "compressed size for AES encrypted file: " + fileHeader.getFileName());
+                AesNewDecoder dec = (AesNewDecoder)decoder;
+                comprSize -= dec.getSaltLength() + AesNewDecoder.PASSWORD_VERIFIER_LENGTH + 10;
+                offs += dec.getSaltLength() + AesNewDecoder.PASSWORD_VERIFIER_LENGTH;
             } else if (localFileHeader.getEncryption() == Encryption.PKWARE) {
                 // TODO decrypter throws unsupported exception
                 comprSize -= PkwareHeader.SIZE;
