@@ -3,7 +3,6 @@ package com.cop.zip4j.core.writers;
 import com.cop.zip4j.io.DataOutputStream;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.model.ExtraField;
 
 import java.io.IOException;

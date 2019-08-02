@@ -2,7 +2,7 @@ package com.cop.zip4j.engine;
 
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.DataOutputStream;
-import com.cop.zip4j.io.SingleZipFileDataOutputStream;
+import com.cop.zip4j.io.SingleZipFileOutputStream;
 import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.io.entry.EntryOutputStream;
 import com.cop.zip4j.model.ZipModel;
@@ -40,7 +40,7 @@ public class ZipEngine {
     private DataOutputStream createOutputStream() throws IOException {
         if (zipModel.isSplitArchive())
             return SplitOutputStream.create(zipModel);
-        return SingleZipFileDataOutputStream.create(zipModel);
+        return SingleZipFileOutputStream.create(zipModel);
     }
 
     private void writeEntry(@NonNull PathZipEntry entry, @NonNull DataOutputStream out) {

@@ -2,7 +2,7 @@ package com.cop.zip4j.utils;
 
 import com.cop.zip4j.core.writers.ZipModelWriter;
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.io.SplitOutputStream;
+import com.cop.zip4j.io.SingleZipFileOutputStream;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.ZipModel;
 import lombok.NonNull;
@@ -42,7 +42,7 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
 
         Path tmpZipFile = createTempFile();
 
-        try (SplitOutputStream out = new SplitOutputStream(tmpZipFile, zipModel)) {
+        try (SingleZipFileOutputStream out = new SingleZipFileOutputStream(tmpZipFile, zipModel)) {
             writeFileHeaders(out, entries);
             new ZipModelWriter(zipModel).finalizeZipFile(out, true);
         } catch(IOException e) {
@@ -69,7 +69,7 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
         }
     }
 
-    private void writeFileHeaders(SplitOutputStream out, Collection<String> entries) throws IOException {
+    private void writeFileHeaders(SingleZipFileOutputStream out, Collection<String> entries) throws IOException {
         List<CentralDirectory.FileHeader> fileHeaders = new ArrayList<>();
         CentralDirectory.FileHeader prv = null;
 

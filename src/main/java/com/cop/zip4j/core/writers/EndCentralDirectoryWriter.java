@@ -1,7 +1,6 @@
 package com.cop.zip4j.core.writers;
 
 import com.cop.zip4j.io.DataOutputStream;
-import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.model.EndCentralDirectory;
 import com.cop.zip4j.utils.InternalZipConstants;
 import lombok.NonNull;

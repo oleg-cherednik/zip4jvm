@@ -2,7 +2,7 @@ package com.cop.zip4j;
 
 import com.cop.zip4j.core.writers.ZipModelWriter;
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.io.SplitOutputStream;
+import com.cop.zip4j.io.SingleZipFileOutputStream;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.utils.CreateZipModel;
@@ -50,7 +50,7 @@ public final class ZipMisc {
         ZipModel zipModel = new CreateZipModel(zipFile, charset).get().noSplitOnly();
         zipModel.getEndCentralDirectory().setComment(comment);
 
-        try (SplitOutputStream out = new SplitOutputStream(zipModel.getZipFile(), zipModel)) {
+        try (SingleZipFileOutputStream out = new SingleZipFileOutputStream(zipModel.getZipFile(), zipModel)) {
             out.seek(zipModel.getOffsCentralDirectory());
             new ZipModelWriter(zipModel).finalizeZipFile(out, false);
         } catch(Exception e) {
@@ -103,7 +103,7 @@ public final class ZipMisc {
             throw new Zip4jException(e);
         }
 
-        try (SplitOutputStream out = new SplitOutputStream(destZipFile, zipModel)) {
+        try (SingleZipFileOutputStream out = new SingleZipFileOutputStream(destZipFile, zipModel)) {
             zipModel.convertToSolid(copyAllParts(out, zipModel));
             new ZipModelWriter(zipModel).finalizeZipFile(out, false);
         } catch(Zip4jException e) {
@@ -113,7 +113,7 @@ public final class ZipMisc {
         }
     }
 
-    private static long[] copyAllParts(@NonNull SplitOutputStream out, @NonNull ZipModel zipModel) throws IOException {
+    private static long[] copyAllParts(@NonNull SingleZipFileOutputStream out, @NonNull ZipModel zipModel) throws IOException {
         int noOfDisk = zipModel.getEndCentralDirectory().getSplitParts();
         long[] fileSizeList = new long[noOfDisk + 1];
 
