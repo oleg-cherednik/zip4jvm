@@ -9,9 +9,7 @@ import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import com.cop.zip4j.utils.InternalZipConstants;
-import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.io.File;
@@ -44,6 +42,19 @@ public class SplitOutputStream extends OutputStream {
     private LittleEndianWriteFile out;
     private long bytesWrittenForThisPart;
     private int currSplitFileCounter = -1;
+
+    @NonNull
+    public static SplitOutputStream create(@NonNull ZipModel zipModel) throws IOException {
+        Path zipFile = zipModel.getZipFile();
+        Path parent = zipFile.getParent();
+
+        if (parent != null)
+            Files.createDirectories(parent);
+
+        SplitOutputStream out = new SplitOutputStream(zipFile, zipModel, zipModel.getSplitLength());
+        out.seek(zipModel.getOffsCentralDirectory());
+        return out;
+    }
 
     public SplitOutputStream(@NonNull Path zipFile, @NonNull ZipModel zipModel) throws FileNotFoundException {
         this(zipFile, zipModel, ZipModel.NO_SPLIT);
@@ -116,14 +127,14 @@ public class SplitOutputStream extends OutputStream {
 
     @Override
     public void close() throws IOException {
-        zipModel.getEndCentralDirectory().setOffs(offs);
+        zipModel.getEndCentralDirectory().setOffs(out.getOffs());
         new ZipModelWriter(zipModel).finalizeZipFile(this, true);
         out.close();
     }
 
     @Override
     public String toString() {
-        return "offs: " + offs;
+        return "offs: " + out.getOffs();
     }
 
     public long getFilePointer() throws IOException {
@@ -138,16 +149,13 @@ public class SplitOutputStream extends OutputStream {
     private final byte[] dword = new byte[4];
     private final byte[] qword = new byte[8];
 
-    @Getter
-    @Setter
-    private long offs;
     private final Map<String, Long> mark = new HashMap<>();
 
     public void writeWord(int val) throws IOException {
         word[0] = (byte)(val & 0xFF);
         word[1] = (byte)(val >>> 8);
         write(word);
-        offs += word.length;
+        out.incOffs(word.length);
     }
 
     public void writeDword(int val) throws IOException {
@@ -160,7 +168,7 @@ public class SplitOutputStream extends OutputStream {
         dword[2] = (byte)(val >>> 16);
         dword[3] = (byte)(val >>> 24);
         write(dword);
-        offs += dword.length;
+        out.incOffs(dword.length);
     }
 
     public void writeQword(long val) throws IOException {
@@ -173,42 +181,29 @@ public class SplitOutputStream extends OutputStream {
         qword[6] = (byte)(val >>> 48);
         qword[7] = (byte)(val >>> 56);
         write(qword);
-        offs += qword.length;
+        out.incOffs(qword.length);
     }
 
     public void writeBytes(byte... buf) throws IOException {
         if (buf == null)
             return;
         write(buf);
-        offs += buf.length;
+        out.incOffs(buf.length);
     }
 
     public void writeBytes(byte[] buf, int offs, int len) throws IOException {
         if (buf == null)
             return;
         write(buf, offs, len);
-        this.offs += len;
+        out.incOffs(len);
     }
 
     public void mark(String id) {
-        mark.put(id, offs);
+        mark.put(id, out.getOffs());
     }
 
     public long getWrittenBytesAmount(String id) {
-        return offs - mark.getOrDefault(id, 0L);
-    }
-
-    @NonNull
-    public static SplitOutputStream create(@NonNull ZipModel zipModel) throws IOException {
-        Path zipFile = zipModel.getZipFile();
-        Path parent = zipFile.getParent();
-
-        if (parent != null)
-            Files.createDirectories(parent);
-
-        SplitOutputStream out = new SplitOutputStream(zipFile, zipModel, zipModel.getSplitLength());
-        out.seek(zipModel.getOffsCentralDirectory());
-        return out;
+        return out.getOffs() - mark.getOrDefault(id, 0L);
     }
 
     @SuppressWarnings("FieldNamingConvention")

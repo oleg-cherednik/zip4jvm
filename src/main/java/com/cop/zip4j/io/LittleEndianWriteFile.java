@@ -1,5 +1,6 @@
 package com.cop.zip4j.io;
 
+import lombok.Getter;
 import lombok.NonNull;
 
 import java.io.Closeable;
@@ -15,6 +16,8 @@ import java.nio.file.Path;
 public class LittleEndianWriteFile implements Closeable {
 
     private final RandomAccessFile out;
+    @Getter
+    private long offs;
 
     public LittleEndianWriteFile(@NonNull Path path) throws FileNotFoundException {
         out = new RandomAccessFile(path.toFile(), "rw");
@@ -36,14 +39,6 @@ public class LittleEndianWriteFile implements Closeable {
         return out.getFilePointer();
     }
 
-    public long getOffs() {
-        try {
-            return out.getFilePointer();
-        } catch(IOException e) {
-            return -1;
-        }
-    }
-
     @Override
     public void close() throws IOException {
         out.close();
@@ -51,6 +46,10 @@ public class LittleEndianWriteFile implements Closeable {
 
     @Override
     public String toString() {
-        return "offs: " + getOffs();
+        return "offs: " + offs;
+    }
+
+    public void incOffs(long inc) {
+        offs += inc;
     }
 }

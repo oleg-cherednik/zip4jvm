@@ -2,7 +2,7 @@
 <suite name="zip4j" parallel="classes" thread-count="4">
     <test name="pkg">
         <packages>
-            <package name="net.lingala.zip4j.*"/>
+            <package name="com.cop.zip4j.*"/>
         </packages>
     </test>
 </suite>
