@@ -2,12 +2,12 @@ package com.cop.zip4j.io;
 
 import com.cop.zip4j.core.writers.ZipModelWriter;
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.EndCentralDirectory;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
+import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import com.cop.zip4j.utils.InternalZipConstants;
 import lombok.Getter;
 import lombok.NonNull;
@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -42,7 +41,7 @@ public class SplitOutputStream extends OutputStream {
     @NonNull
     private Path zipFile;
     @NonNull
-    private RandomAccessFile out;
+    private LittleEndianWriteFile out;
     private long bytesWrittenForThisPart;
     private int currSplitFileCounter = -1;
 
@@ -59,6 +58,12 @@ public class SplitOutputStream extends OutputStream {
         this.splitLength = splitLength;
         this.zipFile = zipFile;
         openRandomAccessFile();
+    }
+
+    private void openRandomAccessFile() throws FileNotFoundException {
+        out = new LittleEndianWriteFile(zipFile);
+        currSplitFileCounter++;
+        bytesWrittenForThisPart = 0;
     }
 
     @Override
@@ -103,12 +108,6 @@ public class SplitOutputStream extends OutputStream {
 
         zipFile = new File(zipFileName).toPath();
         openRandomAccessFile();
-    }
-
-    private void openRandomAccessFile() throws FileNotFoundException {
-        out = new RandomAccessFile(zipFile.toFile(), "rw");
-        currSplitFileCounter++;
-        bytesWrittenForThisPart = 0;
     }
 
     public void seek(long pos) throws IOException {

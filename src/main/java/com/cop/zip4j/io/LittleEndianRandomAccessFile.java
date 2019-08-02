@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -17,7 +16,7 @@ import java.nio.file.Path;
  */
 @RequiredArgsConstructor
 @SuppressWarnings("SpellCheckingInspection")
-public final class LittleEndianRandomAccessFile implements Closeable {
+public final class LittleEndianRandomAccessFile implements AutoCloseable {
 
     @Getter
     @NonNull
