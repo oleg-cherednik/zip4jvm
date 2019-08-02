@@ -1,6 +1,6 @@
 package com.cop.zip4j.core.writers;
 
-import com.cop.zip4j.io.SplitOutputStream;
+import com.cop.zip4j.io.DataOutputStream;
 import com.cop.zip4j.model.CentralDirectory;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ public final class CentralDirectoryWriter {
     @NonNull
     private final Charset charset;
 
-    public void write(@NonNull SplitOutputStream out) throws IOException {
+    public void write(@NonNull DataOutputStream out) throws IOException {
         new FileHeaderWriter(dir.getFileHeaders(), charset).write(out);
         new DigitalSignatureWriter(dir.getDigitalSignature()).write(out);
     }

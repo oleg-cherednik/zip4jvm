@@ -1,5 +1,6 @@
 package com.cop.zip4j.core.writers;
 
+import com.cop.zip4j.io.DataOutputStream;
 import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.model.EndCentralDirectory;
 import com.cop.zip4j.utils.InternalZipConstants;
@@ -21,7 +22,7 @@ final class EndCentralDirectoryWriter {
     @NonNull
     private final Charset charset;
 
-    public void write(@NonNull SplitOutputStream out) throws IOException {
+    public void write(@NonNull DataOutputStream out) throws IOException {
         byte[] comment = dir.getComment(charset);
 
         out.writeDword(EndCentralDirectory.SIGNATURE);

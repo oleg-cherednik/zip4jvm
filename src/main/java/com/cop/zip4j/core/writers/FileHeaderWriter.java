@@ -1,11 +1,11 @@
 package com.cop.zip4j.core.writers;
 
+import com.cop.zip4j.io.DataOutputStream;
+import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.CompressionMethod;
+import com.cop.zip4j.utils.InternalZipConstants;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import com.cop.zip4j.io.SplitOutputStream;
-import com.cop.zip4j.model.CentralDirectory;
-import com.cop.zip4j.utils.InternalZipConstants;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -23,12 +23,12 @@ final class FileHeaderWriter {
     @NonNull
     private final Charset charset;
 
-    public void write(SplitOutputStream out) throws IOException {
+    public void write(DataOutputStream out) throws IOException {
         for (CentralDirectory.FileHeader fileHeader : fileHeaders)
             writeFileHeader(fileHeader, out);
     }
 
-    private void writeFileHeader(CentralDirectory.FileHeader fileHeader, SplitOutputStream out) throws IOException {
+    private void writeFileHeader(CentralDirectory.FileHeader fileHeader, DataOutputStream out) throws IOException {
         byte[] fileName = fileHeader.getFileName(charset);
         byte[] fileComment = fileHeader.getFileComment(charset);
 
