@@ -1,6 +1,6 @@
 package com.cop.zip4j.core.writers;
 
-import com.cop.zip4j.io.SplitOutputStream;
+import com.cop.zip4j.io.DataOutputStream;
 import com.cop.zip4j.model.DataDescriptor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ public final class DataDescriptorWriter {
     @NonNull
     private final DataDescriptor dataDescriptor;
 
-    public void write(@NonNull SplitOutputStream out) throws IOException {
+    public void write(@NonNull DataOutputStream out) throws IOException {
         out.writeDword(DataDescriptor.SIGNATURE);
         out.writeDword(dataDescriptor.getCrc32());
         out.writeDword(dataDescriptor.getCompressedSize());

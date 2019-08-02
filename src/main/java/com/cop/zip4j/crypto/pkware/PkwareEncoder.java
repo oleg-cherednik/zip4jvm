@@ -2,7 +2,7 @@ package com.cop.zip4j.crypto.pkware;
 
 import com.cop.zip4j.crypto.Encoder;
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.io.SplitOutputStream;
+import com.cop.zip4j.io.DataOutputStream;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.entry.PathZipEntry;
@@ -37,7 +37,7 @@ public class PkwareEncoder implements Encoder {
     }
 
     @Override
-    public void writeHeader(@NonNull SplitOutputStream out) throws IOException {
+    public void writeHeader(@NonNull DataOutputStream out) throws IOException {
         header.write(out);
     }
 

@@ -5,8 +5,10 @@ import com.cop.zip4j.crypto.aes.pbkdf2.MacBasedPRF;
 import com.cop.zip4j.crypto.aes.pbkdf2.PBKDF2Engine;
 import com.cop.zip4j.crypto.aes.pbkdf2.PBKDF2Parameters;
 import com.cop.zip4j.exception.Zip4jException;
+import com.cop.zip4j.io.DataOutputStream;
 import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.model.aes.AesStrength;
+import lombok.NonNull;
 
 import java.io.IOException;
 
@@ -169,13 +171,13 @@ public class AesEncoder implements Encoder {
     }
 
     @Override
-    public void writeHeader(SplitOutputStream out) throws IOException {
+    public void writeHeader(@NonNull DataOutputStream out) throws IOException {
         out.writeBytes(saltBytes);
         out.writeBytes(derivedPasswordVerifier);
     }
 
     @Override
-    public void close(SplitOutputStream out) throws IOException {
+    public void close(DataOutputStream out) throws IOException {
         out.writeBytes(getFinalMac());
     }
 }

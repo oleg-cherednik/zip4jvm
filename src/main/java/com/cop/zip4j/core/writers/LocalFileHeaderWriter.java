@@ -1,5 +1,6 @@
 package com.cop.zip4j.core.writers;
 
+import com.cop.zip4j.io.DataOutputStream;
 import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.Zip64;
@@ -22,7 +23,7 @@ public final class LocalFileHeaderWriter {
     @NonNull
     private final LocalFileHeader localFileHeader;
 
-    public void write(@NonNull SplitOutputStream out) throws IOException {
+    public void write(@NonNull DataOutputStream out) throws IOException {
         out.writeDword(LocalFileHeader.SIGNATURE);
         out.writeWord(localFileHeader.getVersionToExtract());
         out.writeWord(localFileHeader.getGeneralPurposeFlag().getData());

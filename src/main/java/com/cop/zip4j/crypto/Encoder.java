@@ -1,6 +1,6 @@
 package com.cop.zip4j.crypto;
 
-import com.cop.zip4j.io.SplitOutputStream;
+import com.cop.zip4j.io.DataOutputStream;
 import lombok.NonNull;
 
 import java.io.IOException;
@@ -17,7 +17,7 @@ public interface Encoder {
         }
 
         @Override
-        public void writeHeader(@NonNull SplitOutputStream out) throws IOException {
+        public void writeHeader(@NonNull DataOutputStream out) throws IOException {
         }
 
         @Override
@@ -28,9 +28,9 @@ public interface Encoder {
 
     void encrypt(@NonNull byte[] buf, int offs, int len);
 
-    void writeHeader(@NonNull SplitOutputStream out) throws IOException;
+    void writeHeader(@NonNull DataOutputStream out) throws IOException;
 
-    default void close(SplitOutputStream out) throws IOException {
+    default void close(DataOutputStream out) throws IOException {
     }
 
 }

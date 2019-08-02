@@ -6,6 +6,7 @@ import com.cop.zip4j.crypto.Encoder;
 import com.cop.zip4j.crypto.aes.AesEngine;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.CentralDirectoryBuilder;
+import com.cop.zip4j.io.DataOutputStream;
 import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.CompressionMethod;
@@ -34,7 +35,7 @@ public class EntryOutputStream extends OutputStream {
 
     @NonNull
     private final ZipModel zipModel;
-    protected final SplitOutputStream out;
+    protected final DataOutputStream out;
     protected final Checksum crc32 = new CRC32();
 
     private CentralDirectory.FileHeader fileHeader;

@@ -2,6 +2,7 @@ package com.cop.zip4j.crypto.aesnew;
 
 import com.cop.zip4j.crypto.Encoder;
 import com.cop.zip4j.exception.Zip4jException;
+import com.cop.zip4j.io.DataOutputStream;
 import com.cop.zip4j.io.SplitOutputStream;
 import com.cop.zip4j.model.aes.AesStrength;
 import lombok.NonNull;
@@ -92,13 +93,13 @@ public class AesNewEncoder implements Encoder {
     }
 
     @Override
-    public void writeHeader(SplitOutputStream out) throws IOException {
+    public void writeHeader(DataOutputStream out) throws IOException {
         out.writeBytes(salt);
         out.writeBytes(derivedPasswordVerifier);
     }
 
     @Override
-    public void close(SplitOutputStream out) throws IOException {
+    public void close(DataOutputStream out) throws IOException {
         byte[] buf = mac.doFinal();
         byte[] macBytes = new byte[10];
         System.arraycopy(buf, 0, macBytes, 0, 10);

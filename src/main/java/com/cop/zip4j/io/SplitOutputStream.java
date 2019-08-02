@@ -30,7 +30,7 @@ import java.util.function.Predicate;
  * @since 08.03.2019
  */
 @SuppressWarnings("SpellCheckingInspection")
-public class SplitOutputStream extends OutputStream {
+public class SplitOutputStream extends OutputStream implements DataOutputStream {
 
     @NonNull
     private final ZipModel zipModel;
@@ -137,24 +137,29 @@ public class SplitOutputStream extends OutputStream {
         return "offs: " + out.getOffs();
     }
 
+    @Override
     public long getFilePointer() throws IOException {
         return out.getFilePointer();
     }
 
+    @Override
     public int getCurrSplitFileCounter() {
         return currSplitFileCounter;
     }
 
     private final Map<String, Long> mark = new HashMap<>();
 
+    @Override
     public void writeWord(int val) throws IOException {
         out.writeWord(val);
     }
 
+    @Override
     public void writeDword(int val) throws IOException {
         out.writeDword(val);
     }
 
+    @Override
     public void writeDword(long val) throws IOException {
         out.writeDword(val);
     }
@@ -163,18 +168,22 @@ public class SplitOutputStream extends OutputStream {
         out.writeQword(val);
     }
 
+    @Override
     public void writeBytes(byte... buf) throws IOException {
         out.writeBytes(buf);
     }
 
+    @Override
     public void writeBytes(byte[] buf, int offs, int len) throws IOException {
         write(buf, offs, len);
     }
 
+    @Override
     public void mark(String id) {
         mark.put(id, out.getOffs());
     }
 
+    @Override
     public long getWrittenBytesAmount(String id) {
         return out.getOffs() - mark.getOrDefault(id, 0L);
     }
