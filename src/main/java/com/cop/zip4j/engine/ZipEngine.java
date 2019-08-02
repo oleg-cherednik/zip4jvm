@@ -35,8 +35,8 @@ public class ZipEngine {
         }
     }
 
-    private static void writeEntry(@NonNull PathZipEntry entry, @NonNull SplitOutputStream out) {
-        try (OutputStream delegate = EntryOutputStream.create(entry, out)) {
+    private void writeEntry(@NonNull PathZipEntry entry, @NonNull SplitOutputStream out) {
+        try (OutputStream delegate = EntryOutputStream.create(entry, zipModel, out)) {
             entry.write(delegate);
         } catch(IOException e) {
             throw new Zip4jException(e);

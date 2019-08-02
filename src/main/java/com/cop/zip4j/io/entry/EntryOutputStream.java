@@ -12,6 +12,7 @@ import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.DataDescriptor;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.LocalFileHeader;
+import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import com.cop.zip4j.utils.InternalZipConstants;
 import lombok.NonNull;
@@ -31,6 +32,8 @@ public class EntryOutputStream extends OutputStream {
 
     private static final String MARK = "entry";
 
+    @NonNull
+    private final ZipModel zipModel;
     protected final SplitOutputStream out;
     protected final Checksum crc32 = new CRC32();
 
@@ -46,13 +49,13 @@ public class EntryOutputStream extends OutputStream {
     @NonNull
     private Encryption encryption = Encryption.OFF;
 
-    public static EntryOutputStream create(@NonNull PathZipEntry entry, @NonNull SplitOutputStream out) {
+    public static EntryOutputStream create(@NonNull PathZipEntry entry, @NonNull ZipModel zipModel, @NonNull SplitOutputStream out) {
         EntryOutputStream stream;
 
         if (entry.getCompressionMethod() == CompressionMethod.DEFLATE)
-            stream = new DeflateEntryOutputStream(out, entry.getCompressionLevel());
+            stream = new DeflateEntryOutputStream(zipModel, out, entry.getCompressionLevel());
         else
-            stream = new EntryOutputStream(out);
+            stream = new EntryOutputStream(zipModel, out);
 
         stream.putNextEntry(entry);
 
@@ -61,16 +64,16 @@ public class EntryOutputStream extends OutputStream {
 
     private void putNextEntry(@NonNull PathZipEntry entry) {
         try {
-            CentralDirectoryBuilder centralDirectoryBuilder = new CentralDirectoryBuilder(entry, out.zipModel, out.getCurrSplitFileCounter());
+            CentralDirectoryBuilder centralDirectoryBuilder = new CentralDirectoryBuilder(entry, zipModel, out.getCurrSplitFileCounter());
 
             fileHeader = centralDirectoryBuilder.createFileHeader();
             localFileHeader = centralDirectoryBuilder.createLocalFileHeader(fileHeader);
 
-            if (out.zipModel.isSplitArchive() && out.zipModel.isEmpty())
+            if (zipModel.isSplitArchive() && zipModel.isEmpty())
                 out.writeDword(InternalZipConstants.SPLITSIG);
 
             fileHeader.setOffsLocalFileHeader(out.getFilePointer());
-            new LocalFileHeaderWriter(localFileHeader).write(out);
+            new LocalFileHeaderWriter(zipModel, localFileHeader).write(out);
 
             encoder = entry.getEncryption().encoder(localFileHeader, entry);
             encryption = entry.getEncryption();
@@ -145,7 +148,7 @@ public class EntryOutputStream extends OutputStream {
         fileHeader.setCrc32(fileHeader.getEncryption() == Encryption.AES ? 0 : crc32.getValue());
         fileHeader.setCompressedSize(out.getWrittenBytesAmount(MARK));
         fileHeader.setUncompressedSize(total);
-        out.zipModel.addFileHeader(fileHeader);
+        zipModel.addFileHeader(fileHeader);
 
         writeDataDescriptor();
 

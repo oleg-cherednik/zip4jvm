@@ -33,7 +33,7 @@ import java.util.function.Predicate;
 public class SplitOutputStream extends OutputStream {
 
     @NonNull
-    public final ZipModel zipModel;
+    private final ZipModel zipModel;
     private final long splitLength;
 
     @NonNull
@@ -60,7 +60,7 @@ public class SplitOutputStream extends OutputStream {
         this(zipFile, zipModel, ZipModel.NO_SPLIT);
     }
 
-    public SplitOutputStream(@NonNull Path zipFile, @NonNull ZipModel zipModel, long splitLength) throws FileNotFoundException {
+    private SplitOutputStream(@NonNull Path zipFile, @NonNull ZipModel zipModel, long splitLength) throws FileNotFoundException {
         // TODO move to ZipParameters
         if (splitLength >= 0 && splitLength < InternalZipConstants.MIN_SPLIT_LENGTH)
             throw new Zip4jException("split length less than minimum allowed split length of " + InternalZipConstants.MIN_SPLIT_LENGTH + " Bytes");
