@@ -1,6 +1,6 @@
 package com.cop.zip4j.core.writers;
 
-import com.cop.zip4j.io.DataOutputStream;
+import com.cop.zip4j.io.DataOutput;
 import com.cop.zip4j.model.ExtraField;
 import com.cop.zip4j.model.Zip64;
 import lombok.NonNull;
@@ -18,7 +18,7 @@ final class Zip64ExtendedInfoWriter {
     @NonNull
     private final Zip64.ExtendedInfo info;
 
-    public void write(@NonNull DataOutputStream out) throws IOException {
+    public void write(@NonNull DataOutput out) throws IOException {
         if (info == Zip64.ExtendedInfo.NULL)
             return;
 

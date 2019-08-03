@@ -1,6 +1,6 @@
 package com.cop.zip4j.core.writers;
 
-import com.cop.zip4j.io.DataOutputStream;
+import com.cop.zip4j.io.DataOutput;
 import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -13,15 +13,14 @@ import java.nio.charset.Charset;
  * @since 15.04.2019
  */
 @RequiredArgsConstructor
-final class AesExtraDataRecordWriter implements DataOutput {
+final class AesExtraDataRecordWriter {
 
     @NonNull
     private final AesExtraDataRecord record;
     @NonNull
     private final Charset charset;
 
-    @Override
-    public void write(@NonNull DataOutputStream out) throws IOException {
+    public void write(@NonNull DataOutput out) throws IOException {
         if (record == AesExtraDataRecord.NULL)
             return;
 

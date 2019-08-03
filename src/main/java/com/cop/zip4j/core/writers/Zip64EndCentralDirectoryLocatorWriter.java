@@ -1,9 +1,9 @@
 package com.cop.zip4j.core.writers;
 
-import com.cop.zip4j.io.DataOutputStream;
+import com.cop.zip4j.io.DataOutput;
+import com.cop.zip4j.model.Zip64;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import com.cop.zip4j.model.Zip64;
 
 import java.io.IOException;
 
@@ -16,7 +16,7 @@ final class Zip64EndCentralDirectoryLocatorWriter {
 
     private final Zip64.EndCentralDirectoryLocator locator;
 
-    public void write(@NonNull DataOutputStream out) throws IOException {
+    public void write(@NonNull DataOutput out) throws IOException {
         if (locator == null)
             return;
 

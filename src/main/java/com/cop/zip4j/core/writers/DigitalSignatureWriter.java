@@ -1,9 +1,9 @@
 package com.cop.zip4j.core.writers;
 
-import com.cop.zip4j.io.DataOutputStream;
+import com.cop.zip4j.io.DataOutput;
+import com.cop.zip4j.model.CentralDirectory;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import com.cop.zip4j.model.CentralDirectory;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.io.IOException;
@@ -17,7 +17,7 @@ final class DigitalSignatureWriter {
 
     private final CentralDirectory.DigitalSignature digitalSignature;
 
-    public void write(@NonNull DataOutputStream out) throws IOException {
+    public void write(@NonNull DataOutput out) throws IOException {
         if (digitalSignature == null)
             return;
 

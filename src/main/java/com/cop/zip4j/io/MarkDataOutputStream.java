@@ -9,7 +9,7 @@ import java.util.Map;
  * @author Oleg Cherednik
  * @since 03.08.2019
  */
-public abstract class MarkDataOutputStream extends DataOutputStreamAdapter {
+public abstract class MarkDataOutputStream extends DataOutputAdapter implements MarkDataOutput {
 
     private final Map<String, Long> map = new HashMap<>();
 

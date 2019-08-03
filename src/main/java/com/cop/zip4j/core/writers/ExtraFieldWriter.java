@@ -1,9 +1,9 @@
 package com.cop.zip4j.core.writers;
 
-import com.cop.zip4j.io.DataOutputStream;
+import com.cop.zip4j.io.DataOutput;
+import com.cop.zip4j.model.ExtraField;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import com.cop.zip4j.model.ExtraField;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -20,7 +20,7 @@ final class ExtraFieldWriter {
     @NonNull
     private final Charset charset;
 
-    public void write(@NonNull DataOutputStream out) throws IOException {
+    public void write(@NonNull DataOutput out) throws IOException {
         new Zip64ExtendedInfoWriter(extraField.getExtendedInfo()).write(out);
         new AesExtraDataRecordWriter(extraField.getAesExtraDataRecord(), charset).write(out);
     }

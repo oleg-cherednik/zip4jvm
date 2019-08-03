@@ -1,6 +1,6 @@
 package com.cop.zip4j.core.writers;
 
-import com.cop.zip4j.io.DataOutputStream;
+import com.cop.zip4j.io.DataOutput;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.utils.InternalZipConstants;
@@ -23,12 +23,12 @@ final class FileHeaderWriter {
     @NonNull
     private final Charset charset;
 
-    public void write(DataOutputStream out) throws IOException {
+    public void write(@NonNull DataOutput out) throws IOException {
         for (CentralDirectory.FileHeader fileHeader : fileHeaders)
             writeFileHeader(fileHeader, out);
     }
 
-    private void writeFileHeader(CentralDirectory.FileHeader fileHeader, DataOutputStream out) throws IOException {
+    private void writeFileHeader(CentralDirectory.FileHeader fileHeader, DataOutput out) throws IOException {
         byte[] fileName = fileHeader.getFileName(charset);
         byte[] fileComment = fileHeader.getFileComment(charset);
 

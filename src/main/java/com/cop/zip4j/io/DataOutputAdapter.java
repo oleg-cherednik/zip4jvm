@@ -5,13 +5,14 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * @author Oleg Cherednik
  * @since 03.08.2019
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class DataOutputStreamAdapter extends DataOutputStream {
+public class DataOutputAdapter extends OutputStream implements DataOutput {
 
     @NonNull
     protected DataOutput out;
@@ -49,6 +50,11 @@ public abstract class DataOutputStreamAdapter extends DataOutputStream {
     @Override
     public void writeBytes(byte... buf) throws IOException {
         out.writeBytes(buf);
+    }
+
+    @Override
+    public final void write(int b) throws IOException {
+        write(new byte[] { (byte)b }, 0, 1);
     }
 
     @Override

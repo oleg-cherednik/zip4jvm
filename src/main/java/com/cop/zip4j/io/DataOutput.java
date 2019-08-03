@@ -1,5 +1,7 @@
 package com.cop.zip4j.io;
 
+import org.apache.commons.lang.ArrayUtils;
+
 import java.io.Closeable;
 import java.io.IOException;
 
@@ -29,13 +31,13 @@ public interface DataOutput extends Closeable {
 
     void writeQword(long val) throws IOException;
 
-    void writeBytes(byte... buf) throws IOException;
+    default void writeBytes(byte... buf) throws IOException {
+        if (ArrayUtils.isNotEmpty(buf))
+            write(buf, 0, buf.length);
+    }
 
     void write(byte[] buf, int offs, int len) throws IOException;
 
     int getCounter();
 
-    default void write(int b) throws IOException {
-        write(new byte[] { (byte)b }, 0, 1);
-    }
 }

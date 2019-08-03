@@ -1,7 +1,7 @@
 package com.cop.zip4j.crypto.pkware;
 
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.io.DataOutputStream;
+import com.cop.zip4j.io.DataOutput;
 import com.cop.zip4j.io.LittleEndianRandomAccessFile;
 import com.cop.zip4j.model.LocalFileHeader;
 import lombok.AccessLevel;
@@ -36,7 +36,7 @@ public class PkwareHeader {
         return header;
     }
 
-    public void write(@NonNull DataOutputStream out) throws IOException {
+    public void write(@NonNull DataOutput out) throws IOException {
         out.writeBytes(buf);
     }
 
