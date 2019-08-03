@@ -17,16 +17,6 @@ public abstract class DataOutputStreamAdapter extends DataOutputStream {
     protected DataOutputStream out;
 
     @Override
-    public void mark(String id) {
-        out.mark(id);
-    }
-
-    @Override
-    public long getWrittenBytesAmount(String id) {
-        return out.getWrittenBytesAmount(id);
-    }
-
-    @Override
     public void seek(long bytes) throws IOException {
         out.seek(bytes);
     }

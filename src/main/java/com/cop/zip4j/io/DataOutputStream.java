@@ -13,10 +13,6 @@ import java.io.OutputStream;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class DataOutputStream extends OutputStream {
 
-    public abstract void mark(String id);
-
-    public abstract long getWrittenBytesAmount(String id);
-
     public abstract void seek(long pos) throws IOException;
 
     public abstract long getFilePointer() throws IOException;

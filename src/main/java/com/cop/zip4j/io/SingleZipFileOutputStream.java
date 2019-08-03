@@ -7,14 +7,12 @@ import lombok.NonNull;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Oleg Cherednik
  * @since 08.03.2019
  */
-public class SingleZipFileOutputStream extends DataOutputStreamAdapter {
+public class SingleZipFileOutputStream extends MarkDataOutputStream {
 
     @NonNull
     private final ZipModel zipModel;
@@ -45,20 +43,5 @@ public class SingleZipFileOutputStream extends DataOutputStreamAdapter {
     public int getCurrSplitFileCounter() {
         return 0;
     }
-
-    // -------------------
-
-    private final Map<String, Long> mark = new HashMap<>();
-
-    @Override
-    public void mark(String id) {
-        mark.put(id, getOffs());
-    }
-
-    @Override
-    public long getWrittenBytesAmount(String id) {
-        return getOffs() - mark.getOrDefault(id, 0L);
-    }
-
 
 }

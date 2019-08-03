@@ -1,6 +1,7 @@
 package com.cop.zip4j.core.writers;
 
 import com.cop.zip4j.io.DataOutputStream;
+import com.cop.zip4j.io.MarkDataOutputStream;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.EndCentralDirectory;
 import com.cop.zip4j.model.ExtraField;
@@ -21,7 +22,7 @@ public final class ZipModelWriter {
     private final ZipModel zipModel;
 
     // TODO do we really need validate flag?
-    public void finalizeZipFile(@NonNull DataOutputStream out, boolean validate) throws IOException {
+    public void finalizeZipFile(@NonNull MarkDataOutputStream out, boolean validate) throws IOException {
         if (validate)
             processHeaderData(out);
 

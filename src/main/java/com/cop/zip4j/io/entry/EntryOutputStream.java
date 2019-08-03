@@ -6,7 +6,7 @@ import com.cop.zip4j.crypto.Encoder;
 import com.cop.zip4j.crypto.aes.AesEngine;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.CentralDirectoryBuilder;
-import com.cop.zip4j.io.DataOutputStream;
+import com.cop.zip4j.io.MarkDataOutputStream;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.DataDescriptor;
@@ -34,7 +34,7 @@ public class EntryOutputStream extends OutputStream {
 
     @NonNull
     private final ZipModel zipModel;
-    protected final DataOutputStream out;
+    protected final MarkDataOutputStream out;
     protected final Checksum crc32 = new CRC32();
 
     private CentralDirectory.FileHeader fileHeader;
@@ -49,7 +49,7 @@ public class EntryOutputStream extends OutputStream {
     @NonNull
     private Encryption encryption = Encryption.OFF;
 
-    public static EntryOutputStream create(@NonNull PathZipEntry entry, @NonNull ZipModel zipModel, @NonNull DataOutputStream out) {
+    public static EntryOutputStream create(@NonNull PathZipEntry entry, @NonNull ZipModel zipModel, @NonNull MarkDataOutputStream out) {
         EntryOutputStream stream;
 
         if (entry.getCompressionMethod() == CompressionMethod.DEFLATE)

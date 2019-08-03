@@ -18,9 +18,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -28,7 +26,7 @@ import java.util.function.Predicate;
  * @author Oleg Cherednik
  * @since 08.03.2019
  */
-public class SplitOutputStream extends DataOutputStreamAdapter {
+public class SplitOutputStream extends MarkDataOutputStream {
 
     @NonNull
     private final ZipModel zipModel;
@@ -117,18 +115,6 @@ public class SplitOutputStream extends DataOutputStreamAdapter {
     @Override
     public int getCurrSplitFileCounter() {
         return currSplitFileCounter;
-    }
-
-    private final Map<String, Long> mark = new HashMap<>();
-
-    @Override
-    public void mark(String id) {
-        mark.put(id, out.getOffs());
-    }
-
-    @Override
-    public long getWrittenBytesAmount(String id) {
-        return out.getOffs() - mark.getOrDefault(id, 0L);
     }
 
     @SuppressWarnings("FieldNamingConvention")
