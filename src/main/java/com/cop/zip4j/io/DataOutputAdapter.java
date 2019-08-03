@@ -48,11 +48,6 @@ public class DataOutputAdapter extends OutputStream implements DataOutput {
     }
 
     @Override
-    public void writeBytes(byte... buf) throws IOException {
-        out.writeBytes(buf);
-    }
-
-    @Override
     public final void write(int b) throws IOException {
         write(new byte[] { (byte)b }, 0, 1);
     }

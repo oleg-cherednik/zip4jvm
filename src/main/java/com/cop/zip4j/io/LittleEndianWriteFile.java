@@ -1,7 +1,6 @@
 package com.cop.zip4j.io;
 
 import lombok.NonNull;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.NotImplementedException;
 
 import java.io.FileNotFoundException;
@@ -50,12 +49,6 @@ public class LittleEndianWriteFile implements DataOutput {
         out.writeByte((byte)(val >> 40));
         out.writeByte((byte)(val >> 48));
         out.writeByte((byte)(val >> 56));
-    }
-
-    @Override
-    public void writeBytes(byte... buf) throws IOException {
-        if (ArrayUtils.isNotEmpty(buf))
-            out.write(buf);
     }
 
     @Override
