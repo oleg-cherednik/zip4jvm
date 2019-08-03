@@ -67,11 +67,6 @@ public class LittleEndianWriteFile extends DataOutputStream {
     }
 
     @Override
-    public void writeBytes(byte[] buf, int offs, int len) throws IOException {
-        out.write(buf, offs, len);
-    }
-
-    @Override
     public int getCurrSplitFileCounter() {
         throw new NotImplementedException();
     }

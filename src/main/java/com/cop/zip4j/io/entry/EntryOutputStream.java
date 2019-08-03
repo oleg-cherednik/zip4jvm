@@ -133,7 +133,7 @@ public class EntryOutputStream extends OutputStream {
 
     private void encryptAndWrite(byte[] buf, int offs, int len) throws IOException {
         encoder.encrypt(buf, offs, len);
-        out.writeBytes(buf, offs, len);
+        out.write(buf, offs, len);
     }
 
     @Override

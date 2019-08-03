@@ -39,7 +39,7 @@ public abstract class DataOutputStream extends OutputStream {
 
     public abstract void writeBytes(byte... buf) throws IOException;
 
-    public abstract void writeBytes(byte[] buf, int offs, int len) throws IOException;
+    public abstract void write(byte[] buf, int offs, int len) throws IOException;
 
     public abstract int getCurrSplitFileCounter();
 

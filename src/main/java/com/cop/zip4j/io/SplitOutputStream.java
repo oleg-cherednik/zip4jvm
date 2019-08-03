@@ -28,7 +28,6 @@ import java.util.function.Predicate;
  * @author Oleg Cherednik
  * @since 08.03.2019
  */
-@SuppressWarnings("SpellCheckingInspection")
 public class SplitOutputStream extends DataOutputStreamAdapter {
 
     @NonNull
@@ -121,16 +120,6 @@ public class SplitOutputStream extends DataOutputStreamAdapter {
     }
 
     private final Map<String, Long> mark = new HashMap<>();
-
-    @Override
-    public void writeBytes(byte... buf) throws IOException {
-        out.writeBytes(buf);
-    }
-
-    @Override
-    public void writeBytes(byte[] buf, int offs, int len) throws IOException {
-        write(buf, offs, len);
-    }
 
     @Override
     public void mark(String id) {

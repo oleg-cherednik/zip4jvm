@@ -62,8 +62,8 @@ public abstract class DataOutputStreamAdapter extends DataOutputStream {
     }
 
     @Override
-    public void writeBytes(byte[] buf, int offs, int len) throws IOException {
-        out.writeBytes(buf, offs, len);
+    public void write(byte[] buf, int offs, int len) throws IOException {
+        out.write(buf, offs, len);
     }
 
     @Override
