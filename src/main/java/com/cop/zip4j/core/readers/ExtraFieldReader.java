@@ -2,7 +2,7 @@ package com.cop.zip4j.core.readers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import com.cop.zip4j.io.LittleEndianRandomAccessFile;
+import com.cop.zip4j.io.in.LittleEndianReadFile;
 import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import com.cop.zip4j.model.ExtraField;
 import com.cop.zip4j.model.Zip64;
@@ -27,7 +27,7 @@ final class ExtraFieldReader {
     }
 
     @NonNull
-    public ExtraField read(@NonNull LittleEndianRandomAccessFile in) throws IOException {
+    public ExtraField read(@NonNull LittleEndianReadFile in) throws IOException {
         if (size <= 0)
             return ExtraField.NULL;
 

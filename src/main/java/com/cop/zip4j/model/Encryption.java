@@ -9,7 +9,7 @@ import com.cop.zip4j.crypto.aesnew.AesNewEncoder;
 import com.cop.zip4j.crypto.pkware.PkwareDecoder;
 import com.cop.zip4j.crypto.pkware.PkwareEncoder;
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.io.LittleEndianRandomAccessFile;
+import com.cop.zip4j.io.in.LittleEndianReadFile;
 import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import com.cop.zip4j.model.aes.AesStrength;
 import com.cop.zip4j.model.entry.PathZipEntry;
@@ -30,7 +30,7 @@ public enum Encryption {
         }
 
         @Override
-        public Decoder decoder(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, char[] password)
+        public Decoder decoder(@NonNull LittleEndianReadFile in, @NonNull LocalFileHeader localFileHeader, char[] password)
                 throws IOException {
             return Decoder.NULL;
         }
@@ -42,7 +42,7 @@ public enum Encryption {
         }
 
         @Override
-        public Decoder decoder(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, char[] password)
+        public Decoder decoder(@NonNull LittleEndianReadFile in, @NonNull LocalFileHeader localFileHeader, char[] password)
                 throws IOException {
             return PkwareDecoder.create(in, localFileHeader, password);
         }
@@ -55,14 +55,14 @@ public enum Encryption {
         }
 
         @Override
-        public Decoder decoder(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, char[] password)
+        public Decoder decoder(@NonNull LittleEndianReadFile in, @NonNull LocalFileHeader localFileHeader, char[] password)
                 throws IOException {
             byte[] salt = getSalt(in, localFileHeader);
             byte[] passwordVerifier = in.readBytes(2);
             return new AesDecoder(localFileHeader.getExtraField().getAesExtraDataRecord(), password, salt, passwordVerifier);
         }
 
-        private byte[] getSalt(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader) throws IOException {
+        private byte[] getSalt(@NonNull LittleEndianReadFile in, @NonNull LocalFileHeader localFileHeader) throws IOException {
             if (localFileHeader.getEncryption() != this)
                 return null;
 
@@ -78,7 +78,7 @@ public enum Encryption {
         }
 
         @Override
-        public Decoder decoder(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, char[] password)
+        public Decoder decoder(@NonNull LittleEndianReadFile in, @NonNull LocalFileHeader localFileHeader, char[] password)
                 throws IOException {
             return AesNewDecoder.create(in, localFileHeader, password);
         }
@@ -88,7 +88,7 @@ public enum Encryption {
         throw new Zip4jException("invalid encryption method");
     }
 
-    public Decoder decoder(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, char[] password) throws IOException {
+    public Decoder decoder(@NonNull LittleEndianReadFile in, @NonNull LocalFileHeader localFileHeader, char[] password) throws IOException {
         throw new Zip4jException("unsupported encryption method");
     }
 

@@ -4,7 +4,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
-import com.cop.zip4j.io.LittleEndianRandomAccessFile;
+import com.cop.zip4j.io.in.LittleEndianReadFile;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -35,7 +35,7 @@ public final class ZipModelReader {
 
     @NonNull
     public ZipModel read() throws IOException {
-        try (LittleEndianRandomAccessFile in = new LittleEndianRandomAccessFile(zipFile)) {
+        try (LittleEndianReadFile in = new LittleEndianReadFile(zipFile)) {
             ZipModel zipModel = read(in);
 
             if (zipModel.isSplitArchive()) {
@@ -47,7 +47,7 @@ public final class ZipModelReader {
         }
     }
 
-    private ZipModel read(@NonNull LittleEndianRandomAccessFile in) throws IOException {
+    private ZipModel read(@NonNull LittleEndianReadFile in) throws IOException {
         EndCentralDirectoryReader reader = new EndCentralDirectoryReader();
 
         ZipModel zipModel = new ZipModel(zipFile, charset);

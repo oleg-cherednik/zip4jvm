@@ -47,7 +47,7 @@ public final class ZipModelWriter {
     private void processHeaderData(MarkDataOutput out) throws IOException {
         EndCentralDirectory endCentralDirectory = zipModel.getEndCentralDirectory();
         // TODO duplication set; see previous step
-        endCentralDirectory.setOffs(out.getFilePointer());
+        endCentralDirectory.setOffs(out.getOffs());
 
         if (zipModel.isZip64()) {
             Zip64.EndCentralDirectoryLocator locator = zipModel.getZip64().getEndCentralDirectoryLocator();

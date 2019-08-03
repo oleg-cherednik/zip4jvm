@@ -2,6 +2,7 @@ package com.cop.zip4j.io;
 
 import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.engine.UnzipEngine;
+import com.cop.zip4j.io.in.LittleEndianReadFile;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.utils.InternalZipConstants;
 
@@ -18,7 +19,7 @@ public class InflaterInputStream extends PartInputStream {
     private long bytesWritten;
     private long uncompressedSize;
 
-    public InflaterInputStream(LittleEndianRandomAccessFile in, long len, Decoder decoder, UnzipEngine engine, CentralDirectory.FileHeader fileHeader) {
+    public InflaterInputStream(LittleEndianReadFile in, long len, Decoder decoder, UnzipEngine engine, CentralDirectory.FileHeader fileHeader) {
         super(in, len, decoder, engine);
         this.buff = new byte[InternalZipConstants.BUFF_SIZE];
         bytesWritten = 0;

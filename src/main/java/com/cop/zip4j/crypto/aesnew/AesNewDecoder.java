@@ -3,7 +3,7 @@ package com.cop.zip4j.crypto.aesnew;
 import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.crypto.aes.AesEngine;
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.io.LittleEndianRandomAccessFile;
+import com.cop.zip4j.io.in.LittleEndianReadFile;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.aes.AesExtraDataRecord;
@@ -39,7 +39,7 @@ public class AesNewDecoder implements Decoder {
     private byte[] macKey;
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")
-    public static AesNewDecoder create(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, @NonNull char[] password) {
+    public static AesNewDecoder create(@NonNull LittleEndianReadFile in, @NonNull LocalFileHeader localFileHeader, @NonNull char[] password) {
         try {
             AesExtraDataRecord aesExtraDataRecord = localFileHeader.getExtraField().getAesExtraDataRecord();
             AesStrength strength = aesExtraDataRecord.getStrength();
@@ -101,7 +101,7 @@ public class AesNewDecoder implements Decoder {
             throw new Zip4jException("invalid CRC (MAC) for file '" + fileHeader.getFileName() + '\'');
     }
 
-    private static byte[] getSalt(LittleEndianRandomAccessFile in, long offs, AesStrength strength) throws IOException {
+    private static byte[] getSalt(LittleEndianReadFile in, long offs, AesStrength strength) throws IOException {
         in.seek(offs);
         return in.readBytes(strength.getSaltLength());
     }

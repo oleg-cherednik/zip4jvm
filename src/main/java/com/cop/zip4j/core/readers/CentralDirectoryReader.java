@@ -3,7 +3,7 @@ package com.cop.zip4j.core.readers;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import com.cop.zip4j.model.CentralDirectory;
-import com.cop.zip4j.io.LittleEndianRandomAccessFile;
+import com.cop.zip4j.io.in.LittleEndianReadFile;
 
 import java.io.IOException;
 
@@ -18,7 +18,7 @@ final class CentralDirectoryReader {
     private final long totalEntries;
 
     @NonNull
-    public CentralDirectory read(@NonNull LittleEndianRandomAccessFile in) throws IOException {
+    public CentralDirectory read(@NonNull LittleEndianReadFile in) throws IOException {
         findHead(in);
 
         CentralDirectory dir = new CentralDirectory();
@@ -28,7 +28,7 @@ final class CentralDirectoryReader {
         return dir;
     }
 
-    private void findHead(LittleEndianRandomAccessFile in) throws IOException {
+    private void findHead(LittleEndianReadFile in) throws IOException {
         in.seek(offs);
     }
 }

@@ -3,7 +3,7 @@ package com.cop.zip4j.core.readers;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.io.LittleEndianRandomAccessFile;
+import com.cop.zip4j.io.in.LittleEndianReadFile;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.LocalFileHeader;
@@ -21,7 +21,7 @@ public final class LocalFileHeaderReader {
     private final CentralDirectory.FileHeader fileHeader;
 
     @NonNull
-    public LocalFileHeader read(@NonNull LittleEndianRandomAccessFile in) throws IOException {
+    public LocalFileHeader read(@NonNull LittleEndianReadFile in) throws IOException {
         findHead(in);
 
         LocalFileHeader localFileHeader = new LocalFileHeader();
@@ -50,7 +50,7 @@ public final class LocalFileHeaderReader {
         return localFileHeader;
     }
 
-    private void findHead(LittleEndianRandomAccessFile in) throws IOException {
+    private void findHead(LittleEndianReadFile in) throws IOException {
         in.seek(fileHeader.getOffsLocalFileHeader());
 
         if (in.readDword() == LocalFileHeader.SIGNATURE)

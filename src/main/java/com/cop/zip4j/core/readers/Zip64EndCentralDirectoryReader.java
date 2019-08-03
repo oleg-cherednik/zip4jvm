@@ -3,7 +3,7 @@ package com.cop.zip4j.core.readers;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.io.LittleEndianRandomAccessFile;
+import com.cop.zip4j.io.in.LittleEndianReadFile;
 import com.cop.zip4j.model.Zip64;
 
 import java.io.IOException;
@@ -18,7 +18,7 @@ final class Zip64EndCentralDirectoryReader {
     private final long offs;
 
     @NonNull
-    public Zip64.EndCentralDirectory read(@NonNull LittleEndianRandomAccessFile in) throws IOException {
+    public Zip64.EndCentralDirectory read(@NonNull LittleEndianReadFile in) throws IOException {
         findHead(in);
 
         Zip64.EndCentralDirectory dir = new Zip64.EndCentralDirectory();
@@ -36,7 +36,7 @@ final class Zip64EndCentralDirectoryReader {
         return dir;
     }
 
-    private void findHead(LittleEndianRandomAccessFile in) throws IOException {
+    private void findHead(LittleEndianReadFile in) throws IOException {
         in.seek(offs);
 
         if (in.readDword() == Zip64.EndCentralDirectory.SIGNATURE)

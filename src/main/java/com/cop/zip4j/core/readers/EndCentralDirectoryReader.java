@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.io.LittleEndianRandomAccessFile;
+import com.cop.zip4j.io.in.LittleEndianReadFile;
 import com.cop.zip4j.model.EndCentralDirectory;
 
 import java.io.IOException;
@@ -20,7 +20,7 @@ final class EndCentralDirectoryReader {
     private long offs = -1;
 
     @NonNull
-    public EndCentralDirectory read(@NonNull LittleEndianRandomAccessFile in) throws IOException {
+    public EndCentralDirectory read(@NonNull LittleEndianReadFile in) throws IOException {
         findHead(in);
 
         EndCentralDirectory dir = new EndCentralDirectory();
@@ -35,7 +35,7 @@ final class EndCentralDirectoryReader {
         return dir;
     }
 
-    private void findHead(LittleEndianRandomAccessFile in) throws IOException {
+    private void findHead(LittleEndianReadFile in) throws IOException {
         offs = -1;
 
         int commentLength = EndCentralDirectory.MAX_COMMENT_LENGTH;

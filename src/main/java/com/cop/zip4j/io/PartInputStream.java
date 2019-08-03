@@ -5,6 +5,7 @@ import com.cop.zip4j.crypto.aes.AesDecoder;
 import com.cop.zip4j.crypto.aes.AesEngine;
 import com.cop.zip4j.crypto.aesnew.AesNewDecoder;
 import com.cop.zip4j.engine.UnzipEngine;
+import com.cop.zip4j.io.in.LittleEndianReadFile;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +24,7 @@ public class PartInputStream extends InputStream {
     private byte[] aesBlockByte = new byte[16];
     private int aesBytesReturned = 0;
 
-    public PartInputStream(LittleEndianRandomAccessFile in, long length, Decoder decoder, UnzipEngine engine) {
+    public PartInputStream(LittleEndianReadFile in, long length, Decoder decoder, UnzipEngine engine) {
         this.in = in.getIn();
         this.engine = engine;
         this.length = length;

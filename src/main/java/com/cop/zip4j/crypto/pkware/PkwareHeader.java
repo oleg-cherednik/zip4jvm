@@ -2,7 +2,7 @@ package com.cop.zip4j.crypto.pkware;
 
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.out.DataOutput;
-import com.cop.zip4j.io.LittleEndianRandomAccessFile;
+import com.cop.zip4j.io.in.LittleEndianReadFile;
 import com.cop.zip4j.model.LocalFileHeader;
 import lombok.AccessLevel;
 import lombok.NonNull;
@@ -28,7 +28,7 @@ public class PkwareHeader {
         return new PkwareHeader(create(engine, crc));
     }
 
-    public static PkwareHeader read(@NonNull LittleEndianRandomAccessFile in, @NonNull LocalFileHeader localFileHeader, @NonNull PkwareEngine engine)
+    public static PkwareHeader read(@NonNull LittleEndianReadFile in, @NonNull LocalFileHeader localFileHeader, @NonNull PkwareEngine engine)
             throws IOException {
         in.seek(localFileHeader.getOffs());
         PkwareHeader header = new PkwareHeader(in.readBytes(SIZE));

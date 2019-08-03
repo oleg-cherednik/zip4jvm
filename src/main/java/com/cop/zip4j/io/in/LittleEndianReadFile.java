@@ -1,4 +1,4 @@
-package com.cop.zip4j.io;
+package com.cop.zip4j.io.in;
 
 import com.cop.zip4j.utils.CreateStringFunc;
 import lombok.Getter;
@@ -16,7 +16,7 @@ import java.nio.file.Path;
  */
 @RequiredArgsConstructor
 @SuppressWarnings("SpellCheckingInspection")
-public final class LittleEndianRandomAccessFile implements AutoCloseable {
+public class LittleEndianReadFile implements DataInput {
 
     @Getter
     @NonNull
@@ -24,7 +24,7 @@ public final class LittleEndianRandomAccessFile implements AutoCloseable {
     @Getter
     private long offs;
 
-    public LittleEndianRandomAccessFile(@NonNull Path path) throws FileNotFoundException {
+    public LittleEndianReadFile(@NonNull Path path) throws FileNotFoundException {
         in = new RandomAccessFile(path.toFile(), "r");
     }
 

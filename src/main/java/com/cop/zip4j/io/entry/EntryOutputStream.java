@@ -72,7 +72,7 @@ public class EntryOutputStream extends OutputStream {
             if (zipModel.isSplitArchive() && zipModel.isEmpty())
                 out.writeDword(InternalZipConstants.SPLITSIG);
 
-            fileHeader.setOffsLocalFileHeader(out.getFilePointer());
+            fileHeader.setOffsLocalFileHeader(out.getOffs());
             new LocalFileHeaderWriter(zipModel, localFileHeader).write(out);
 
             encoder = entry.getEncryption().encoder(localFileHeader, entry);

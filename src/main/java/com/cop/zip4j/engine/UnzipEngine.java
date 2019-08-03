@@ -7,7 +7,7 @@ import com.cop.zip4j.crypto.aesnew.AesNewDecoder;
 import com.cop.zip4j.crypto.pkware.PkwareHeader;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.InflaterInputStream;
-import com.cop.zip4j.io.LittleEndianRandomAccessFile;
+import com.cop.zip4j.io.in.LittleEndianReadFile;
 import com.cop.zip4j.io.PartInputStream;
 import com.cop.zip4j.io.ZipInputStream;
 import com.cop.zip4j.model.CentralDirectory;
@@ -90,7 +90,7 @@ public class UnzipEngine {
     @NonNull
     private InputStream extractEntryAsStream(@NonNull CentralDirectory.FileHeader fileHeader) {
         try {
-            LittleEndianRandomAccessFile in = openFile(fileHeader);
+            LittleEndianReadFile in = openFile(fileHeader);
             LocalFileHeader localFileHeader = readLocalFileHeader(fileHeader);
             Decoder decoder = localFileHeader.getEncryption().decoder(in, localFileHeader, password);
 
@@ -128,19 +128,19 @@ public class UnzipEngine {
 
     @NonNull
     private LocalFileHeader readLocalFileHeader(@NonNull CentralDirectory.FileHeader fileHeader) throws IOException {
-        try (LittleEndianRandomAccessFile in = openFile(fileHeader)) {
+        try (LittleEndianReadFile in = openFile(fileHeader)) {
             return new LocalFileHeaderReader(fileHeader).read(in);
         }
     }
 
-    private LittleEndianRandomAccessFile openFile(@NonNull CentralDirectory.FileHeader fileHeader) throws IOException {
+    private LittleEndianReadFile openFile(@NonNull CentralDirectory.FileHeader fileHeader) throws IOException {
         if (!zipModel.isSplitArchive())
-            return new LittleEndianRandomAccessFile(zipModel.getZipFile());
+            return new LittleEndianReadFile(zipModel.getZipFile());
 
         int diskNumber = fileHeader.getDiskNumber();
         currSplitFileCounter = diskNumber + 1;
 
-        LittleEndianRandomAccessFile in = new LittleEndianRandomAccessFile(zipModel.getPartFile(diskNumber));
+        LittleEndianReadFile in = new LittleEndianReadFile(zipModel.getPartFile(diskNumber));
 
         if (currSplitFileCounter == 1) {
             int signature = in.readDword();

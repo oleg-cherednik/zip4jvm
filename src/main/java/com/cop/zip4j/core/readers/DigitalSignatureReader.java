@@ -2,7 +2,7 @@ package com.cop.zip4j.core.readers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import com.cop.zip4j.io.LittleEndianRandomAccessFile;
+import com.cop.zip4j.io.in.LittleEndianReadFile;
 import com.cop.zip4j.model.CentralDirectory;
 
 import java.io.IOException;
@@ -15,7 +15,7 @@ import java.io.IOException;
 final class DigitalSignatureReader {
 
     @NonNull
-    public CentralDirectory.DigitalSignature read(@NonNull LittleEndianRandomAccessFile in) throws IOException {
+    public CentralDirectory.DigitalSignature read(@NonNull LittleEndianReadFile in) throws IOException {
         if (in.readDword() != CentralDirectory.DigitalSignature.SIGNATURE)
             return null;
 

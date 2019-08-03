@@ -2,7 +2,7 @@ package com.cop.zip4j.core.readers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import com.cop.zip4j.io.LittleEndianRandomAccessFile;
+import com.cop.zip4j.io.in.LittleEndianReadFile;
 import com.cop.zip4j.model.ExtraField;
 import com.cop.zip4j.model.Zip64;
 
@@ -24,7 +24,7 @@ final class Zip64ExtendedInfoReader {
     private final boolean diskNumber;
 
     @NonNull
-    public Zip64.ExtendedInfo read(@NonNull LittleEndianRandomAccessFile in) throws IOException {
+    public Zip64.ExtendedInfo read(@NonNull LittleEndianReadFile in) throws IOException {
         if (signature != Zip64.ExtendedInfo.SIGNATURE)
             return Zip64.ExtendedInfo.NULL;
 

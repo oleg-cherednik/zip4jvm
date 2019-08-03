@@ -2,7 +2,7 @@ package com.cop.zip4j.core.readers;
 
 import lombok.RequiredArgsConstructor;
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.io.LittleEndianRandomAccessFile;
+import com.cop.zip4j.io.in.LittleEndianReadFile;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.utils.ZipUtils;
@@ -20,7 +20,7 @@ final class FileHeaderReader {
 
     private final long totalEntries;
 
-    public List<CentralDirectory.FileHeader> read(LittleEndianRandomAccessFile in) throws IOException {
+    public List<CentralDirectory.FileHeader> read(LittleEndianReadFile in) throws IOException {
         List<CentralDirectory.FileHeader> fileHeaders = new LinkedList<>();
 
         for (int i = 0; i < totalEntries; i++)
@@ -29,7 +29,7 @@ final class FileHeaderReader {
         return fileHeaders;
     }
 
-    private static CentralDirectory.FileHeader readFileHeader(LittleEndianRandomAccessFile in) throws IOException {
+    private static CentralDirectory.FileHeader readFileHeader(LittleEndianReadFile in) throws IOException {
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
         if (in.readDword() != CentralDirectory.FileHeader.SIGNATURE)
