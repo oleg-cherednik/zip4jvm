@@ -15,7 +15,6 @@ import org.apache.commons.lang.ArrayUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -30,7 +29,7 @@ import java.util.function.Predicate;
  * @since 08.03.2019
  */
 @SuppressWarnings("SpellCheckingInspection")
-public class SplitOutputStream extends OutputStream implements DataOutputStream {
+public class SplitOutputStream extends DataOutputStream {
 
     @NonNull
     private final ZipModel zipModel;

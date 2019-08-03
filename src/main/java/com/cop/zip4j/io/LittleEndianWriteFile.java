@@ -3,8 +3,8 @@ package com.cop.zip4j.io;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.NotImplementedException;
 
-import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -14,7 +14,7 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 02.08.2019
  */
-public class LittleEndianWriteFile implements Closeable {
+public class LittleEndianWriteFile extends DataOutputStream {
 
     private final RandomAccessFile out;
     @Getter
@@ -24,16 +24,19 @@ public class LittleEndianWriteFile implements Closeable {
         out = new RandomAccessFile(path.toFile(), "rw");
     }
 
+    @Override
     public void writeWord(int val) throws IOException {
         out.writeByte((byte)val);
         out.writeByte((byte)(val >> 8));
         offs += 2;
     }
 
+    @Override
     public void writeDword(int val) throws IOException {
         writeDword((long)val);
     }
 
+    @Override
     public void writeDword(long val) throws IOException {
         out.writeByte((byte)val);
         out.writeByte((byte)(val >> 8));
@@ -42,6 +45,7 @@ public class LittleEndianWriteFile implements Closeable {
         offs += 4;
     }
 
+    @Override
     public void writeQword(long val) throws IOException {
         out.writeByte((byte)val);
         out.writeByte((byte)(val >> 8));
@@ -54,6 +58,7 @@ public class LittleEndianWriteFile implements Closeable {
         offs += 8;
     }
 
+    @Override
     public void writeBytes(byte... buf) throws IOException {
         if (ArrayUtils.isEmpty(buf))
             return;
@@ -61,15 +66,38 @@ public class LittleEndianWriteFile implements Closeable {
         offs += buf.length;
     }
 
+    @Override
+    public void writeBytes(byte[] buf, int offs, int len) throws IOException {
+        out.write(buf, offs, len);
+    }
+
+    @Override
+    public int getCurrSplitFileCounter() {
+        throw new NotImplementedException();
+    }
+
+    @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
         out.write(buf, offs, len);
         this.offs += len;
     }
 
+    @Override
     public void seek(long pos) throws IOException {
         out.seek(pos);
     }
 
+    @Override
+    public void mark(String id) {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public long getWrittenBytesAmount(String id) {
+        return 0;
+    }
+
+    @Override
     public long getFilePointer() throws IOException {
         return out.getFilePointer();
     }
@@ -84,7 +112,4 @@ public class LittleEndianWriteFile implements Closeable {
         return "offs: " + offs;
     }
 
-    public void incOffs(long inc) {
-        offs += inc;
-    }
 }

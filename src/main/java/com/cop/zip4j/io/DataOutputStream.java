@@ -1,32 +1,55 @@
 package com.cop.zip4j.io;
 
-import java.io.Closeable;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+
 import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * @author Oleg Cherednik
  * @since 02.08.2019
  */
-public interface DataOutputStream extends Closeable {
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+public abstract class DataOutputStream extends OutputStream {
 
-    void mark(String id);
+    public abstract void mark(String id);
 
-    long getWrittenBytesAmount(String id);
+    public abstract long getWrittenBytesAmount(String id);
 
-    long getFilePointer() throws IOException;
+    public abstract void seek(long pos) throws IOException;
 
-    void writeDword(int val) throws IOException;
+    public abstract long getFilePointer() throws IOException;
 
-    void writeDword(long val) throws IOException;
+    public long getOffs() {
+        try {
+            return getFilePointer();
+        } catch(IOException e) {
+            return -1;
+        }
+    }
 
-    void writeWord(int val) throws IOException;
+    public abstract void writeDword(int val) throws IOException;
 
-    void writeQword(long val) throws IOException;
+    public abstract void writeDword(long val) throws IOException;
 
-    void writeBytes(byte... buf) throws IOException;
+    public abstract void writeWord(int val) throws IOException;
 
-    void writeBytes(byte[] buf, int offs, int len) throws IOException;
+    public abstract void writeQword(long val) throws IOException;
 
-    int getCurrSplitFileCounter();
+    public abstract void writeBytes(byte... buf) throws IOException;
 
+    public abstract void writeBytes(byte[] buf, int offs, int len) throws IOException;
+
+    public abstract int getCurrSplitFileCounter();
+
+    @Override
+    public String toString() {
+        return "offs: " + getOffs();
+    }
+
+    @Override
+    public void write(int b) throws IOException {
+        writeBytes((byte)b);
+    }
 }
