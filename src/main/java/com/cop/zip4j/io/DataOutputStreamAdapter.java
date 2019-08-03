@@ -1,6 +1,7 @@
 package com.cop.zip4j.io;
 
 import lombok.AccessLevel;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
@@ -12,7 +13,8 @@ import java.io.IOException;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class DataOutputStreamAdapter extends DataOutputStream {
 
-    protected final DataOutputStream out;
+    @NonNull
+    protected DataOutputStream out;
 
     @Override
     public void mark(String id) {

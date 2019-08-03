@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
 
 /**
@@ -29,6 +31,7 @@ public class ZipEngine {
             return;
 
         try (DataOutputStream out = createOutputStream()) {
+            out.seek(zipModel.getOffsCentralDirectory());
             entries.stream()
                    .filter(entry -> !entry.isRoot())
                    .forEach(entry -> writeEntry(entry, out));
@@ -38,6 +41,12 @@ public class ZipEngine {
     }
 
     private DataOutputStream createOutputStream() throws IOException {
+        Path zipFile = zipModel.getZipFile();
+        Path parent = zipFile.getParent();
+
+        if (parent != null)
+            Files.createDirectories(parent);
+
         if (zipModel.isSplitArchive())
             return SplitOutputStream.create(zipModel);
         return SingleZipFileOutputStream.create(zipModel);

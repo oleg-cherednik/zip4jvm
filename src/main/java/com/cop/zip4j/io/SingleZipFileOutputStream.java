@@ -6,7 +6,6 @@ import lombok.NonNull;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,16 +20,13 @@ public class SingleZipFileOutputStream extends DataOutputStreamAdapter {
     private final ZipModel zipModel;
 
     @NonNull
-    public static SingleZipFileOutputStream create(@NonNull ZipModel zipModel) throws IOException {
-        Path zipFile = zipModel.getZipFile();
-        Path parent = zipFile.getParent();
+    public static SingleZipFileOutputStream create(@NonNull ZipModel zipModel) throws FileNotFoundException {
+        return new SingleZipFileOutputStream(zipModel.getZipFile(), zipModel);
+    }
 
-        if (parent != null)
-            Files.createDirectories(parent);
-
-        SingleZipFileOutputStream out = new SingleZipFileOutputStream(zipFile, zipModel);
-        out.seek(zipModel.getOffsCentralDirectory());
-        return out;
+    @NonNull
+    public static SingleZipFileOutputStream create(@NonNull Path zipFile, @NonNull ZipModel zipModel) throws FileNotFoundException {
+        return new SingleZipFileOutputStream(zipFile, zipModel);
     }
 
     public SingleZipFileOutputStream(@NonNull Path zipFile, @NonNull ZipModel zipModel) throws FileNotFoundException {
@@ -41,7 +37,7 @@ public class SingleZipFileOutputStream extends DataOutputStreamAdapter {
     @Override
     public void close() throws IOException {
         zipModel.getEndCentralDirectory().setOffs(getOffs());
-        new ZipModelWriter(zipModel).finalizeZipFile(out, true);
+        new ZipModelWriter(zipModel).finalizeZipFile(this, true);
         super.close();
     }
 

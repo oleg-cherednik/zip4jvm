@@ -42,7 +42,7 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
 
         Path tmpZipFile = createTempFile();
 
-        try (SingleZipFileOutputStream out = new SingleZipFileOutputStream(tmpZipFile, zipModel)) {
+        try (SingleZipFileOutputStream out = SingleZipFileOutputStream.create(tmpZipFile, zipModel)) {
             writeFileHeaders(out, entries);
             new ZipModelWriter(zipModel).finalizeZipFile(out, true);
         } catch(IOException e) {

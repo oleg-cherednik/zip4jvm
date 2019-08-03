@@ -29,56 +29,44 @@ import java.util.function.Predicate;
  * @since 08.03.2019
  */
 @SuppressWarnings("SpellCheckingInspection")
-public class SplitOutputStream extends DataOutputStream {
+public class SplitOutputStream extends DataOutputStreamAdapter {
 
     @NonNull
     private final ZipModel zipModel;
-    private final long splitLength;
 
     @NonNull
-    private Path zipFile;
-    @NonNull
-    private LittleEndianWriteFile out;
+    private Path zipFilePart;
     private long bytesWrittenForThisPart;
-    private int currSplitFileCounter = -1;
+    private int currSplitFileCounter;
 
     @NonNull
-    public static SplitOutputStream create(@NonNull ZipModel zipModel) throws IOException {
-        Path zipFile = zipModel.getZipFile();
-        Path parent = zipFile.getParent();
-
-        if (parent != null)
-            Files.createDirectories(parent);
-
-        SplitOutputStream out = new SplitOutputStream(zipFile, zipModel, zipModel.getSplitLength());
-        out.seek(zipModel.getOffsCentralDirectory());
-        return out;
+    public static SplitOutputStream create(@NonNull ZipModel zipModel) throws FileNotFoundException {
+        return new SplitOutputStream(zipModel);
     }
 
-    public SplitOutputStream(@NonNull Path zipFile, @NonNull ZipModel zipModel) throws FileNotFoundException {
-        this(zipFile, zipModel, ZipModel.NO_SPLIT);
-    }
-
-    private SplitOutputStream(@NonNull Path zipFile, @NonNull ZipModel zipModel, long splitLength) throws FileNotFoundException {
+    private SplitOutputStream(@NonNull ZipModel zipModel) throws FileNotFoundException {
+        super(openFile(zipModel.getZipFile()));
         // TODO move to ZipParameters
-        if (splitLength >= 0 && splitLength < InternalZipConstants.MIN_SPLIT_LENGTH)
+        if (zipModel.getSplitLength() >= 0 && zipModel.getSplitLength() < InternalZipConstants.MIN_SPLIT_LENGTH)
             throw new Zip4jException("split length less than minimum allowed split length of " + InternalZipConstants.MIN_SPLIT_LENGTH + " Bytes");
 
         this.zipModel = zipModel;
-        this.splitLength = splitLength;
-        this.zipFile = zipFile;
-        openRandomAccessFile();
+        zipFilePart = zipModel.getZipFile();
+    }
+
+    private static DataOutputStream openFile(Path zipFile) throws FileNotFoundException {
+        return new LittleEndianWriteFile(zipFile);
     }
 
     private void openRandomAccessFile() throws FileNotFoundException {
-        out = new LittleEndianWriteFile(zipFile);
+        out = openFile(zipFilePart);
         currSplitFileCounter++;
         bytesWrittenForThisPart = 0;
     }
 
     @Override
     public void write(int val) throws IOException {
-        if (splitLength != ZipModel.NO_SPLIT && (int)(splitLength - bytesWrittenForThisPart) <= 0)
+        if (zipModel.getSplitLength() != ZipModel.NO_SPLIT && (int)(zipModel.getSplitLength() - bytesWrittenForThisPart) <= 0)
             startNextSplitFile();
 
         out.writeBytes((byte)val);
@@ -90,7 +78,8 @@ public class SplitOutputStream extends DataOutputStream {
         final int offsInit = offs;
 
         while (len > 0) {
-            int canWrite = splitLength == ZipModel.NO_SPLIT ? Integer.MAX_VALUE : (int)(splitLength - bytesWrittenForThisPart);
+            int canWrite =
+                    zipModel.getSplitLength() == ZipModel.NO_SPLIT ? Integer.MAX_VALUE : (int)(zipModel.getSplitLength() - bytesWrittenForThisPart);
             int writeBytes = Math.min(len, canWrite);
 
             if (canWrite <= 0 || len > canWrite && offsInit != offs && isSignatureData.test(buf))
@@ -105,18 +94,18 @@ public class SplitOutputStream extends DataOutputStream {
     }
 
     private void startNextSplitFile() throws IOException {
-        String zipFileName = zipFile.toAbsolutePath().toString();
-        Path currSplitFile = ZipModel.getSplitFilePath(zipFile, currSplitFileCounter + 1);
+        String zipFileName = zipFilePart.toAbsolutePath().toString();
+        Path currSplitFile = ZipModel.getSplitFilePath(zipFilePart, currSplitFileCounter + 1);
 
         out.close();
 
         if (Files.exists(currSplitFile))
             throw new IOException("split file: " + currSplitFile.getFileName() + " already exists in the current directory, cannot rename this file");
 
-        if (!zipFile.toFile().renameTo(currSplitFile.toFile()))
+        if (!zipFilePart.toFile().renameTo(currSplitFile.toFile()))
             throw new IOException("cannot rename newly created split file");
 
-        zipFile = new File(zipFileName).toPath();
+        zipFilePart = new File(zipFileName).toPath();
         openRandomAccessFile();
     }
 
