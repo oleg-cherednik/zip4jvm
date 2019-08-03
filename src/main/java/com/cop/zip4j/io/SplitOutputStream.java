@@ -14,6 +14,7 @@ import lombok.NonNull;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -26,11 +27,13 @@ import java.util.Set;
  * @author Oleg Cherednik
  * @since 08.03.2019
  */
-public class SplitOutputStream extends MarkDataOutputStream {
+public final class SplitOutputStream extends OutputStream implements MarkDataOutput {
 
     @NonNull
     private final ZipModel zipModel;
 
+    @NonNull
+    private MarkDataOutput delegate;
     @NonNull
     private Path zipFilePart;
     private int counter;
@@ -45,9 +48,9 @@ public class SplitOutputStream extends MarkDataOutputStream {
     }
 
     private SplitOutputStream(@NonNull ZipModel zipModel) throws FileNotFoundException {
-        super(openFile(zipModel.getZipFile()));
         this.zipModel = zipModel;
         zipFilePart = zipModel.getZipFile();
+        delegate = createFilePart(zipFilePart);
     }
 
     @Override
@@ -61,7 +64,7 @@ public class SplitOutputStream extends MarkDataOutputStream {
             if (canWrite <= 0 || len > canWrite && offsInit != offs && isSignature(buf, offs, len))
                 startNextSplitFile();
 
-            out.write(buf, offs, writeBytes);
+            delegate.write(buf, offs, writeBytes);
 
             offs += writeBytes;
             len -= writeBytes;
@@ -72,7 +75,7 @@ public class SplitOutputStream extends MarkDataOutputStream {
         String zipFileName = zipFilePart.toAbsolutePath().toString();
         Path currSplitFile = ZipModel.getSplitFilePath(zipFilePart, ++counter);
 
-        out.close();
+        delegate.close();
 
         if (Files.exists(currSplitFile))
             throw new IOException("split file: " + currSplitFile.getFileName() + " already exists in the current directory, cannot rename this file");
@@ -80,7 +83,7 @@ public class SplitOutputStream extends MarkDataOutputStream {
         if (!zipFilePart.toFile().renameTo(currSplitFile.toFile()))
             throw new IOException("cannot rename newly created split file");
 
-        out = openFile(zipFilePart = new File(zipFileName).toPath());
+        delegate = createFilePart(zipFilePart = new File(zipFileName).toPath());
     }
 
     @Override
@@ -95,8 +98,8 @@ public class SplitOutputStream extends MarkDataOutputStream {
         return counter;
     }
 
-    private static DataOutput openFile(Path zipFile) throws FileNotFoundException {
-        return new LittleEndianWriteFile(zipFile);
+    private static MarkDataOutput createFilePart(Path zipFile) throws FileNotFoundException {
+        return new MarkDataOutputDecorator(new LittleEndianWriteFile(zipFile));
     }
 
     private static final Set<Integer> SIGNATURES = getAllSignatures();
@@ -120,6 +123,54 @@ public class SplitOutputStream extends MarkDataOutputStream {
 
     private static boolean isSignature(byte[] buf, int offs, int len) {
         return len >= 4 && offs + 4 < buf.length && SIGNATURES.contains(buf[offs + 3] << 24 | buf[offs + 2] << 16 | buf[offs + 1] << 8 | buf[offs]);
+    }
+
+    // ----------------------
+
+
+    @Override
+    public void seek(long pos) throws IOException {
+        delegate.seek(pos);
+    }
+
+    @Override
+    public long getFilePointer() throws IOException {
+        return delegate.getFilePointer();
+    }
+
+    @Override
+    public void writeDword(int val) throws IOException {
+        delegate.writeDword(val);
+    }
+
+    @Override
+    public void writeDword(long val) throws IOException {
+        delegate.writeDword(val);
+    }
+
+    @Override
+    public void writeWord(int val) throws IOException {
+        delegate.writeWord(val);
+    }
+
+    @Override
+    public void writeQword(long val) throws IOException {
+        delegate.writeQword(val);
+    }
+
+    @Override
+    public void write(int b) throws IOException {
+        write(new byte[] { (byte)b }, 0, 1);
+    }
+
+    @Override
+    public void mark(String id) {
+        delegate.mark(id);
+    }
+
+    @Override
+    public long getWrittenBytesAmount(String id) {
+        return delegate.getWrittenBytesAmount(id);
     }
 
 }
