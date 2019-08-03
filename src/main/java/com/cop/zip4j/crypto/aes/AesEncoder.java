@@ -175,8 +175,47 @@ public class AesEncoder implements Encoder {
         out.writeBytes(derivedPasswordVerifier);
     }
 
+    private int aesOffs;
+    private final byte[] aesBuf = new byte[AesEngine.AES_BLOCK_SIZE];
+
+    @Override
+    public int writeDraft(byte[] buf, int offs, int len, DataOutput out) throws IOException {
+        if (aesOffs != 0) {
+            if (len >= (AesEngine.AES_BLOCK_SIZE - aesOffs)) {
+                System.arraycopy(buf, offs, aesBuf, aesOffs, AesEngine.AES_BLOCK_SIZE - aesOffs);
+                encryptAndWrite(aesBuf, 0, aesBuf.length, out);
+                offs = AesEngine.AES_BLOCK_SIZE - aesOffs;
+                len -= offs;
+                aesOffs = 0;
+            } else {
+                System.arraycopy(buf, offs, aesBuf, aesOffs, len);
+                aesOffs += len;
+                return 0;
+            }
+        }
+
+        if (len % 16 != 0) {
+            System.arraycopy(buf, (len + offs) - (len % 16), aesBuf, 0, len % 16);
+            aesOffs = len % 16;
+            len -= aesOffs;
+        }
+
+        return len;
+    }
+
     @Override
     public void close(DataOutput out) throws IOException {
+        if (aesOffs != 0) {
+            encryptAndWrite(aesBuf, 0, aesOffs, out);
+            aesOffs = 0;
+        }
+
         out.writeBytes(getFinalMac());
+    }
+
+    @Deprecated
+    private void encryptAndWrite(byte[] buf, int offs, int len, DataOutput out) throws IOException {
+        encrypt(buf, offs, len);
+        out.write(buf, offs, len);
     }
 }
