@@ -13,7 +13,7 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 02.08.2019
  */
-public class LittleEndianWriteFile extends DataOutputStream {
+public class LittleEndianWriteFile implements DataOutput {
 
     private final RandomAccessFile out;
 

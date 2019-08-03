@@ -13,7 +13,7 @@ public abstract class MarkDataOutputStream extends DataOutputStreamAdapter {
 
     private final Map<String, Long> map = new HashMap<>();
 
-    protected MarkDataOutputStream(@NonNull DataOutputStream out) {
+    protected MarkDataOutputStream(@NonNull DataOutput out) {
         super(out);
     }
 

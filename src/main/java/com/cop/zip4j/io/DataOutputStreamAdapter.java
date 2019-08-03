@@ -14,7 +14,7 @@ import java.io.IOException;
 public abstract class DataOutputStreamAdapter extends DataOutputStream {
 
     @NonNull
-    protected DataOutputStream out;
+    protected DataOutput out;
 
     @Override
     public void seek(long bytes) throws IOException {

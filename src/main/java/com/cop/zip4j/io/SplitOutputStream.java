@@ -95,7 +95,7 @@ public class SplitOutputStream extends MarkDataOutputStream {
         return counter;
     }
 
-    private static DataOutputStream openFile(Path zipFile) throws FileNotFoundException {
+    private static DataOutput openFile(Path zipFile) throws FileNotFoundException {
         return new LittleEndianWriteFile(zipFile);
     }
 

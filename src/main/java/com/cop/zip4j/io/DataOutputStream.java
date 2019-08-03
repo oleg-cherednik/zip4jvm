@@ -11,7 +11,7 @@ import java.io.OutputStream;
  * @since 02.08.2019
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class DataOutputStream extends OutputStream {
+public abstract class DataOutputStream extends OutputStream implements DataOutput {
 
     public abstract void seek(long pos) throws IOException;
 
