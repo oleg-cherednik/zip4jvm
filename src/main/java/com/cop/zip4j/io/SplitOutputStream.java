@@ -66,7 +66,7 @@ public class SplitOutputStream extends MarkDataOutputStream {
         if (zipModel.getSplitLength() <= bytesWrittenForThisPart)
             startNextSplitFile();
 
-        out.writeBytes((byte)val);
+        out.write(val);
         bytesWrittenForThisPart++;
     }
 
