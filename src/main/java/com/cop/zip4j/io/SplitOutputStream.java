@@ -41,15 +41,15 @@ public class SplitOutputStream extends DataOutputStreamAdapter {
 
     @NonNull
     public static SplitOutputStream create(@NonNull ZipModel zipModel) throws FileNotFoundException {
+        // TODO move to ZipParameters
+        if (zipModel.getSplitLength() >= 0 && zipModel.getSplitLength() < InternalZipConstants.MIN_SPLIT_LENGTH)
+            throw new Zip4jException("split length less than minimum allowed split length of " + InternalZipConstants.MIN_SPLIT_LENGTH + " Bytes");
+
         return new SplitOutputStream(zipModel);
     }
 
     private SplitOutputStream(@NonNull ZipModel zipModel) throws FileNotFoundException {
         super(openFile(zipModel.getZipFile()));
-        // TODO move to ZipParameters
-        if (zipModel.getSplitLength() >= 0 && zipModel.getSplitLength() < InternalZipConstants.MIN_SPLIT_LENGTH)
-            throw new Zip4jException("split length less than minimum allowed split length of " + InternalZipConstants.MIN_SPLIT_LENGTH + " Bytes");
-
         this.zipModel = zipModel;
         zipFilePart = zipModel.getZipFile();
     }
@@ -66,7 +66,7 @@ public class SplitOutputStream extends DataOutputStreamAdapter {
 
     @Override
     public void write(int val) throws IOException {
-        if (zipModel.getSplitLength() != ZipModel.NO_SPLIT && (int)(zipModel.getSplitLength() - bytesWrittenForThisPart) <= 0)
+        if (zipModel.getSplitLength() <= bytesWrittenForThisPart)
             startNextSplitFile();
 
         out.writeBytes((byte)val);
@@ -78,9 +78,8 @@ public class SplitOutputStream extends DataOutputStreamAdapter {
         final int offsInit = offs;
 
         while (len > 0) {
-            int canWrite =
-                    zipModel.getSplitLength() == ZipModel.NO_SPLIT ? Integer.MAX_VALUE : (int)(zipModel.getSplitLength() - bytesWrittenForThisPart);
-            int writeBytes = Math.min(len, canWrite);
+            long canWrite = zipModel.getSplitLength() - bytesWrittenForThisPart;
+            int writeBytes = Math.min(len, (int)canWrite);
 
             if (canWrite <= 0 || len > canWrite && offsInit != offs && isSignatureData.test(buf))
                 startNextSplitFile();
@@ -109,25 +108,11 @@ public class SplitOutputStream extends DataOutputStreamAdapter {
         openRandomAccessFile();
     }
 
-    public void seek(long pos) throws IOException {
-        out.seek(pos);
-    }
-
     @Override
     public void close() throws IOException {
-        zipModel.getEndCentralDirectory().setOffs(out.getOffs());
+        zipModel.getEndCentralDirectory().setOffs(getOffs());
         new ZipModelWriter(zipModel).finalizeZipFile(this, true);
-        out.close();
-    }
-
-    @Override
-    public String toString() {
-        return "offs: " + out.getOffs();
-    }
-
-    @Override
-    public long getFilePointer() throws IOException {
-        return out.getFilePointer();
+        super.close();
     }
 
     @Override
@@ -136,26 +121,6 @@ public class SplitOutputStream extends DataOutputStreamAdapter {
     }
 
     private final Map<String, Long> mark = new HashMap<>();
-
-    @Override
-    public void writeWord(int val) throws IOException {
-        out.writeWord(val);
-    }
-
-    @Override
-    public void writeDword(int val) throws IOException {
-        out.writeDword(val);
-    }
-
-    @Override
-    public void writeDword(long val) throws IOException {
-        out.writeDword(val);
-    }
-
-    @Override
-    public void writeQword(long val) throws IOException {
-        out.writeQword(val);
-    }
 
     @Override
     public void writeBytes(byte... buf) throws IOException {

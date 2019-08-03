@@ -29,7 +29,7 @@ public class SingleZipFileOutputStream extends DataOutputStreamAdapter {
         return new SingleZipFileOutputStream(zipFile, zipModel);
     }
 
-    public SingleZipFileOutputStream(@NonNull Path zipFile, @NonNull ZipModel zipModel) throws FileNotFoundException {
+    private SingleZipFileOutputStream(@NonNull Path zipFile, @NonNull ZipModel zipModel) throws FileNotFoundException {
         super(new LittleEndianWriteFile(zipFile));
         this.zipModel = zipModel;
     }
