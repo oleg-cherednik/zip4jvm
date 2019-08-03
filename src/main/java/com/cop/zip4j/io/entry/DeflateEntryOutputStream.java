@@ -1,6 +1,6 @@
 package com.cop.zip4j.io.entry;
 
-import com.cop.zip4j.io.MarkDataOutput;
+import com.cop.zip4j.io.out.MarkDataOutput;
 import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.utils.InternalZipConstants;

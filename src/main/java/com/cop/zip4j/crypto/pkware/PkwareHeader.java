@@ -1,7 +1,7 @@
 package com.cop.zip4j.crypto.pkware;
 
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.io.DataOutput;
+import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.io.LittleEndianRandomAccessFile;
 import com.cop.zip4j.model.LocalFileHeader;
 import lombok.AccessLevel;

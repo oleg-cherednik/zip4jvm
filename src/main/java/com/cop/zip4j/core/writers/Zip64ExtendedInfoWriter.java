@@ -1,6 +1,6 @@
 package com.cop.zip4j.core.writers;
 
-import com.cop.zip4j.io.DataOutput;
+import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.model.ExtraField;
 import com.cop.zip4j.model.Zip64;
 import lombok.NonNull;

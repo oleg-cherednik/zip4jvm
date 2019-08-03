@@ -2,7 +2,7 @@ package com.cop.zip4j.crypto.aesnew;
 
 import com.cop.zip4j.crypto.Encoder;
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.io.DataOutput;
+import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.model.aes.AesStrength;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

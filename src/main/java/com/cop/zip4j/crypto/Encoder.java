@@ -1,6 +1,6 @@
 package com.cop.zip4j.crypto;
 
-import com.cop.zip4j.io.DataOutput;
+import com.cop.zip4j.io.out.DataOutput;
 import lombok.NonNull;
 
 import java.io.IOException;

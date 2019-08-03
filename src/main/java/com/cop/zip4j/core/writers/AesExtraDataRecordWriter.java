@@ -1,6 +1,6 @@
 package com.cop.zip4j.core.writers;
 
-import com.cop.zip4j.io.DataOutput;
+import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

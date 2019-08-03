@@ -2,9 +2,9 @@ package com.cop.zip4j.utils;
 
 import com.cop.zip4j.core.writers.ZipModelWriter;
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.io.DataOutputStreamDecorator;
-import com.cop.zip4j.io.MarkDataOutput;
-import com.cop.zip4j.io.SingleZipFileOutputStream;
+import com.cop.zip4j.io.out.DataOutputStreamDecorator;
+import com.cop.zip4j.io.out.MarkDataOutput;
+import com.cop.zip4j.io.out.SingleZipFileOutputStream;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.ZipModel;
 import lombok.NonNull;
