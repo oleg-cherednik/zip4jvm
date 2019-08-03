@@ -5,8 +5,8 @@ import com.cop.zip4j.UnzipIt;
 import com.cop.zip4j.Zip4jSuite;
 import com.cop.zip4j.ZipIt;
 import com.cop.zip4j.exception.Zip4jException;
+import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.CompressionLevel;
-import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ZipParameters;
 import org.testng.annotations.AfterClass;
@@ -46,7 +46,7 @@ public class EncryptionPkwareTest {
 
     public void shouldCreateNewZipWithFolderAndStandardEncryption() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(CompressionMethod.DEFLATE)
+                                                .compressionMethod(Compression.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .encryption(Encryption.PKWARE)
                                                 .comment("password: " + new String(Zip4jSuite.password))
@@ -63,7 +63,7 @@ public class EncryptionPkwareTest {
 
     public void shouldCreateNewZipWithSelectedFilesAndStandardEncryption() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(CompressionMethod.DEFLATE)
+                                                .compressionMethod(Compression.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .encryption(Encryption.PKWARE)
                                                 .comment("password: " + new String(Zip4jSuite.password))
@@ -87,7 +87,7 @@ public class EncryptionPkwareTest {
 
     public void shouldThrowExceptionWhenStandardEncryptionAndNullPassword() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(CompressionMethod.DEFLATE)
+                                                .compressionMethod(Compression.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .encryption(Encryption.PKWARE)
                                                 .password(null).build();
@@ -101,7 +101,7 @@ public class EncryptionPkwareTest {
 
     public void shouldThrowExceptionWhenStandardEncryptionAndEmptyPassword() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(CompressionMethod.DEFLATE)
+                                                .compressionMethod(Compression.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .encryption(Encryption.PKWARE)
                                                 .password("".toCharArray()).build();
@@ -115,7 +115,7 @@ public class EncryptionPkwareTest {
 
     public void shouldUnzipWhenStandardEncryption() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(CompressionMethod.DEFLATE)
+                                                .compressionMethod(Compression.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .encryption(Encryption.PKWARE)
                                                 .comment("password: " + new String(Zip4jSuite.password))
@@ -137,7 +137,7 @@ public class EncryptionPkwareTest {
 
     public void shouldThrowExceptionWhenUnzipStandardEncryptedZipWithIncorrectPassword() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(CompressionMethod.DEFLATE)
+                                                .compressionMethod(Compression.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .encryption(Encryption.PKWARE)
                                                 .comment("password: " + new String(Zip4jSuite.password))

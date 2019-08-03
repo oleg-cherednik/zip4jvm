@@ -1,8 +1,8 @@
 package com.cop.zip4j;
 
 import com.cop.zip4j.exception.Zip4jException;
+import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.CompressionLevel;
-import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.ZipParameters;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -37,7 +37,7 @@ public class ZipFilesSplitTest {
     @Test
     public void shouldCreateNewSplitZipWithFiles() throws IOException, Zip4jException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(CompressionMethod.DEFLATE)
+                                                .compressionMethod(Compression.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .defaultFolderPath(Zip4jSuite.carsDir)
                                                 .splitLength(1024 * 1024).build();

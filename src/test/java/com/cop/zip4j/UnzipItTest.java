@@ -1,8 +1,8 @@
 package com.cop.zip4j;
 
 import com.cop.zip4j.exception.Zip4jException;
+import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.CompressionLevel;
-import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ZipParameters;
 import org.testng.annotations.AfterClass;
@@ -95,7 +95,7 @@ public class UnzipItTest {
     @Test
     public void shouldUnzipEncryptedZip() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(CompressionMethod.DEFLATE)
+                                                .compressionMethod(Compression.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .encryption(Encryption.PKWARE)
                                                 .comment("password: " + new String(Zip4jSuite.password))

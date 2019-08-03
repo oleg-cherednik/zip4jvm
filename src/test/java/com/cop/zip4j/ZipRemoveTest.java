@@ -1,7 +1,7 @@
 package com.cop.zip4j;
 
+import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.CompressionLevel;
-import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.ZipParameters;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -39,7 +39,7 @@ public class ZipRemoveTest {
     @Test
     public void shouldRemoveGivenFilesFromExistedZip() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(CompressionMethod.DEFLATE)
+                                                .compressionMethod(Compression.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .defaultFolderPath(Zip4jSuite.srcDir).build();
 

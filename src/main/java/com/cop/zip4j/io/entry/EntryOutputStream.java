@@ -8,7 +8,7 @@ import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.CentralDirectoryBuilder;
 import com.cop.zip4j.io.out.MarkDataOutput;
 import com.cop.zip4j.model.CentralDirectory;
-import com.cop.zip4j.model.CompressionMethod;
+import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.DataDescriptor;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.LocalFileHeader;
@@ -35,13 +35,13 @@ public class EntryOutputStream extends OutputStream {
     @NonNull
     private final ZipModel zipModel;
     protected final MarkDataOutput out;
-    protected final Checksum crc32 = new CRC32();
+    protected final Checksum checksum = new CRC32();
 
     private CentralDirectory.FileHeader fileHeader;
     private LocalFileHeader localFileHeader;
 
-    private final byte[] pendingBuffer = new byte[AesEngine.AES_BLOCK_SIZE];
-    private int pendingBufferLength;
+    private final byte[] aesBuf = new byte[AesEngine.AES_BLOCK_SIZE];
+    private int aesOffs;
     protected long total;
 
     @NonNull
@@ -50,16 +50,19 @@ public class EntryOutputStream extends OutputStream {
     private Encryption encryption = Encryption.OFF;
 
     public static EntryOutputStream create(@NonNull PathZipEntry entry, @NonNull ZipModel zipModel, @NonNull MarkDataOutput out) {
-        EntryOutputStream stream;
+        Compression compression = entry.getCompression();
 
-        if (entry.getCompressionMethod() == CompressionMethod.DEFLATE)
-            stream = new DeflateEntryOutputStream(zipModel, out, entry.getCompressionLevel());
-        else
-            stream = new EntryOutputStream(zipModel, out);
+        if (compression == Compression.DEFLATE)
+            return putNextEntry(new DeflateEntryOutputStream(zipModel, out, entry.getCompressionLevel()), entry);
+        if (compression == Compression.STORE)
+            return putNextEntry(new EntryOutputStream(zipModel, out), entry);
 
-        stream.putNextEntry(entry);
+        throw new Zip4jException("Compression is not supported: " + compression);
+    }
 
-        return stream;
+    private static EntryOutputStream putNextEntry(EntryOutputStream out, PathZipEntry entry) {
+        out.putNextEntry(entry);
+        return out;
     }
 
     private void putNextEntry(@NonNull PathZipEntry entry) {
@@ -92,7 +95,7 @@ public class EntryOutputStream extends OutputStream {
 
     @Override
     public final void write(byte[] buf, int offs, int len) throws IOException {
-        crc32.update(buf, offs, len);
+        checksum.update(buf, offs, len);
         total += len;
         writeImpl(buf, offs, len);
     }
@@ -105,25 +108,25 @@ public class EntryOutputStream extends OutputStream {
         if (len == 0)
             return;
 
-        if (encryption == Encryption.AES) {
-            if (pendingBufferLength != 0) {
-                if (len >= (AesEngine.AES_BLOCK_SIZE - pendingBufferLength)) {
-                    System.arraycopy(buf, offs, pendingBuffer, pendingBufferLength, AesEngine.AES_BLOCK_SIZE - pendingBufferLength);
-                    encryptAndWrite(pendingBuffer, 0, pendingBuffer.length);
-                    offs = AesEngine.AES_BLOCK_SIZE - pendingBufferLength;
+        if (encryption == Encryption.AES || encryption == Encryption.AES_NEW) {
+            if (aesOffs != 0) {
+                if (len >= (AesEngine.AES_BLOCK_SIZE - aesOffs)) {
+                    System.arraycopy(buf, offs, aesBuf, aesOffs, AesEngine.AES_BLOCK_SIZE - aesOffs);
+                    encryptAndWrite(aesBuf, 0, aesBuf.length);
+                    offs = AesEngine.AES_BLOCK_SIZE - aesOffs;
                     len -= offs;
-                    pendingBufferLength = 0;
+                    aesOffs = 0;
                 } else {
-                    System.arraycopy(buf, offs, pendingBuffer, pendingBufferLength, len);
-                    pendingBufferLength += len;
+                    System.arraycopy(buf, offs, aesBuf, aesOffs, len);
+                    aesOffs += len;
                     return;
                 }
             }
 
             if (len % 16 != 0) {
-                System.arraycopy(buf, (len + offs) - (len % 16), pendingBuffer, 0, len % 16);
-                pendingBufferLength = len % 16;
-                len -= pendingBufferLength;
+                System.arraycopy(buf, (len + offs) - (len % 16), aesBuf, 0, len % 16);
+                aesOffs = len % 16;
+                len -= aesOffs;
             }
         }
 
@@ -138,14 +141,14 @@ public class EntryOutputStream extends OutputStream {
 
     @Override
     public void close() throws IOException {
-        if (pendingBufferLength != 0) {
-            encryptAndWrite(pendingBuffer, 0, pendingBufferLength);
-            pendingBufferLength = 0;
+        if (aesOffs != 0) {
+            encryptAndWrite(aesBuf, 0, aesOffs);
+            aesOffs = 0;
         }
 
         encoder.close(out);
 
-        fileHeader.setCrc32(fileHeader.getEncryption() == Encryption.AES ? 0 : crc32.getValue());
+        fileHeader.setCrc32(fileHeader.getEncryption() == Encryption.AES ? 0 : checksum.getValue());
         fileHeader.setCompressedSize(out.getWrittenBytesAmount(MARK));
         fileHeader.setUncompressedSize(total);
         zipModel.addFileHeader(fileHeader);
@@ -161,7 +164,7 @@ public class EntryOutputStream extends OutputStream {
             return;
 
         DataDescriptor dataDescriptor = new DataDescriptor();
-        dataDescriptor.setCrc32(fileHeader.getCompressionMethod() == CompressionMethod.AES_ENC ? 0 : fileHeader.getCrc32());
+        dataDescriptor.setCrc32(fileHeader.getCrc32());
         dataDescriptor.setCompressedSize(fileHeader.getCompressedSize());
         dataDescriptor.setUncompressedSize(fileHeader.getUncompressedSize());
 

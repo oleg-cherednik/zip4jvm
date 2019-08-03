@@ -56,17 +56,20 @@ final class DeflateEntryOutputStream extends EntryOutputStream {
         }
     }
 
+    private void finish() throws IOException {
+        if (deflater.finished())
+            return;
+
+        deflater.finish();
+
+        while (!deflater.finished()) {
+            deflate();
+        }
+    }
+
     @Override
     public void close() throws IOException {
-        if (!deflater.finished()) {
-            deflater.finish();
-
-            while (!deflater.finished()) {
-                deflate();
-            }
-        }
-
-        firstBytesRead = false;
+        finish();
         super.close();
     }
 }

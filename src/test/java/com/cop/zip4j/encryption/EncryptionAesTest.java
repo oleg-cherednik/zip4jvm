@@ -3,13 +3,14 @@ package com.cop.zip4j.encryption;
 import com.cop.zip4j.UnzipIt;
 import com.cop.zip4j.Zip4jSuite;
 import com.cop.zip4j.ZipIt;
+import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.CompressionLevel;
-import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ZipParameters;
 import com.cop.zip4j.model.aes.AesStrength;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,7 +23,7 @@ import java.util.List;
  * @author Oleg Cherednik
  * @since 29.07.2019
  */
-//@Test
+@Test
 //@Ignore
 @SuppressWarnings("FieldNamingConvention")
 public class EncryptionAesTest {
@@ -59,7 +60,7 @@ public class EncryptionAesTest {
 
     public void shouldCreateNewZipWithSelectedFilesAndAesEncryption() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(CompressionMethod.STORE)
+                                                .compressionMethod(Compression.STORE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .encryption(Encryption.AES_NEW)
                                                 .strength(AesStrength.KEY_STRENGTH_256)

@@ -5,6 +5,7 @@ import com.cop.zip4j.crypto.aesnew.AesNewDecoder;
 import com.cop.zip4j.crypto.pkware.PkwareHeader;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.CentralDirectory;
+import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.GeneralPurposeFlag;
@@ -41,7 +42,7 @@ public class CentralDirectoryBuilder {
         fileHeader.setVersionMadeBy(CentralDirectory.FileHeader.DEF_VERSION);
         fileHeader.setVersionToExtract(CentralDirectory.FileHeader.DEF_VERSION);
         updateGeneralPurposeFlag(fileHeader.getGeneralPurposeFlag());
-        fileHeader.setCompressionMethod(entry.getEncryption() == Encryption.AES || entry.getEncryption() == Encryption.AES_NEW ? CompressionMethod.AES_ENC : entry.getCompressionMethod());
+        fileHeader.setCompressionMethod(getCompressionMethod(entry));
         fileHeader.setLastModifiedTime(getLastModFileTime());
         fileHeader.setCrc32(entry.crc32());
         fileHeader.setCompressedSize(getCompressedSize());
@@ -72,12 +73,6 @@ public class CentralDirectoryBuilder {
         localFileHeader.setCompressedSize(fileHeader.getCompressedSize());
 
         return localFileHeader;
-    }
-
-    private static CompressionMethod getCompressionMethod(CentralDirectory.FileHeader fileHeader) {
-        if (fileHeader.getEncryption() == Encryption.AES || fileHeader.getEncryption() == Encryption.AES_NEW)
-            return CompressionMethod.AES_ENC;
-        return fileHeader.getCompressionMethod();
     }
 
     private static long getCrc32(CentralDirectory.FileHeader fileHeader) {
@@ -116,7 +111,7 @@ public class CentralDirectoryBuilder {
     private long getCompressedSize() {
         if (entry.isDirectory())
             return 0;
-        if (entry.getCompressionMethod() != CompressionMethod.STORE)
+        if (entry.getCompression() != Compression.STORE)
             return 0;
         if (entry.getEncryption() != Encryption.AES && entry.getEncryption() != Encryption.AES_NEW)
             return 0;
@@ -147,6 +142,20 @@ public class CentralDirectoryBuilder {
     }
 
     @NonNull
+    private static CompressionMethod getCompressionMethod(CentralDirectory.FileHeader fileHeader) {
+        if (fileHeader.getEncryption() == Encryption.AES || fileHeader.getEncryption() == Encryption.AES_NEW)
+            return CompressionMethod.AES_ENC;
+        return fileHeader.getCompressionMethod();
+    }
+
+    @NonNull
+    private static CompressionMethod getCompressionMethod(PathZipEntry entry) {
+        if (entry.getEncryption() == Encryption.AES || entry.getEncryption() == Encryption.AES_NEW)
+            return CompressionMethod.AES_ENC;
+        return entry.getCompression().getMethod();
+    }
+
+    @NonNull
     private AesExtraDataRecord getAesExtraDataRecord(@NonNull Encryption encryption) {
         if (encryption != Encryption.AES && encryption != Encryption.AES_NEW)
             return AesExtraDataRecord.NULL;
@@ -159,7 +168,7 @@ public class CentralDirectoryBuilder {
         // and CRC is ignored
         aesDataRecord.setVersionNumber((short)2);
         aesDataRecord.setStrength(entry.getStrength());
-        aesDataRecord.setCompressionMethod(entry.getCompressionMethod());
+        aesDataRecord.setCompressionMethod(entry.getCompression().getMethod());
 
         return aesDataRecord;
     }

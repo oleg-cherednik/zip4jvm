@@ -1,9 +1,9 @@
 package com.cop.zip4j.model.entry;
 
-import com.cop.zip4j.model.aes.AesStrength;
+import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.CompressionLevel;
-import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.Encryption;
+import com.cop.zip4j.model.aes.AesStrength;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public abstract class PathZipEntry extends ZipEntry {
     @Setter
     protected String name;
 
-    protected CompressionMethod compressionMethod = CompressionMethod.STORE;
+    protected Compression compression = Compression.STORE;
     protected CompressionLevel compressionLevel = CompressionLevel.NORMAL;
     protected Encryption encryption = Encryption.OFF;
 
@@ -53,7 +53,7 @@ public abstract class PathZipEntry extends ZipEntry {
         return "/".equals(name) || "\\".equals(name);
     }
 
-    public abstract void setCompressionMethod(@NonNull CompressionMethod compressionMethod) throws IOException;
+    public abstract void setCompression(@NonNull Compression compression) throws IOException;
 
 //    public CompressionMethod getCompressionMethod() {
 //        return encryption == Encryption.AES ? CompressionMethod.AES_ENC : compressionMethod;

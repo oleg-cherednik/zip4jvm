@@ -4,8 +4,8 @@ import com.cop.zip4j.TestUtils;
 import com.cop.zip4j.Zip4jSuite;
 import com.cop.zip4j.ZipIt;
 import com.cop.zip4j.exception.Zip4jException;
+import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.CompressionLevel;
-import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.ZipParameters;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -43,7 +43,7 @@ public class CompressionStoreTest {
     @Test
     public void shouldCreateNewZipWithFilesWhenStoreCompression() throws IOException, Zip4jException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(CompressionMethod.STORE)
+                                                .compressionMethod(Compression.STORE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .defaultFolderPath(Zip4jSuite.srcDir).build();
 

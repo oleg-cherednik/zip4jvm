@@ -1,6 +1,6 @@
 package com.cop.zip4j.model.entry;
 
-import com.cop.zip4j.model.CompressionMethod;
+import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.Encryption;
 import lombok.NonNull;
 
@@ -17,8 +17,8 @@ public class DirectoryZipEntry extends PathZipEntry {
     }
 
     @Override
-    public void setCompressionMethod(@NonNull CompressionMethod compressionMethod) {
-        this.compressionMethod = CompressionMethod.STORE;
+    public void setCompression(@NonNull Compression compression) {
+        this.compression = Compression.STORE;
     }
 
     @Override

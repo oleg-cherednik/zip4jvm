@@ -1,7 +1,7 @@
 package com.cop.zip4j;
 
+import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.CompressionLevel;
-import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ZipParameters;
 import org.apache.commons.io.FileUtils;
@@ -80,7 +80,7 @@ public class Zip4jSuite {
 
     private static void createNoSplitZip() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(CompressionMethod.DEFLATE)
+                                                .compressionMethod(Compression.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL).build();
         ZipIt zip = ZipIt.builder().zipFile(noSplitZip).build();
         zip.add(srcDir, parameters);
@@ -92,7 +92,7 @@ public class Zip4jSuite {
 
     private static void createSplitZip() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(CompressionMethod.DEFLATE)
+                                                .compressionMethod(Compression.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .splitLength(1024 * 1024).build();
         ZipIt zip = ZipIt.builder().zipFile(splitZip).build();
@@ -105,7 +105,7 @@ public class Zip4jSuite {
 
     private static void createEncryptedNoSplitZip() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(CompressionMethod.DEFLATE)
+                                                .compressionMethod(Compression.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .encryption(Encryption.PKWARE)
                                                 .comment("password: " + new String(password))

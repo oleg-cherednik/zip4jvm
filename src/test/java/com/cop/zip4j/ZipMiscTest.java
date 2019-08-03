@@ -1,7 +1,7 @@
 package com.cop.zip4j;
 
+import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.CompressionLevel;
-import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.ZipParameters;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -57,7 +57,7 @@ public class ZipMiscTest {
         Path rootDir = Zip4jSuite.subDirNameAsMethodName(ZipMiscTest.rootDir);
 
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(CompressionMethod.DEFLATE)
+                                                .compressionMethod(Compression.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .splitLength(1024 * 1024).build();
 

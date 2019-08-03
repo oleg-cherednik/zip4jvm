@@ -1,8 +1,8 @@
 package com.cop.zip4j;
 
 import com.cop.zip4j.exception.Zip4jException;
+import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.CompressionLevel;
-import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.EndCentralDirectory;
 import com.cop.zip4j.model.ZipParameters;
 import org.apache.commons.lang.StringUtils;
@@ -45,7 +45,7 @@ public class ModifyCommentTest {
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
 
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(CompressionMethod.DEFLATE)
+                                                .compressionMethod(Compression.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .comment("Oleg Cherednik - Олег Чередник").build();
 
