@@ -5,31 +5,26 @@ import com.cop.zip4j.crypto.aes.AesDecoder;
 import com.cop.zip4j.crypto.aes.AesEngine;
 import com.cop.zip4j.crypto.aesnew.AesNewDecoder;
 import com.cop.zip4j.engine.UnzipEngine;
-import com.cop.zip4j.io.in.LittleEndianReadFile;
+import com.cop.zip4j.io.in.DataInput;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile;
 
+@RequiredArgsConstructor
 public class PartInputStream extends InputStream {
 
-    private RandomAccessFile in;
+    @NonNull
+    private DataInput in;
     private final long length;
-    private final UnzipEngine engine;
     private final Decoder decoder;
-
+    private final UnzipEngine engine;
 
     private long bytesRead;
     private byte[] oneByteBuff = new byte[1];
     private byte[] aesBlockByte = new byte[16];
     private int aesBytesReturned = 0;
-
-    public PartInputStream(LittleEndianReadFile in, long length, Decoder decoder, UnzipEngine engine) {
-        this.in = in.getIn();
-        this.engine = engine;
-        this.length = length;
-        this.decoder = decoder;
-    }
 
     @Override
     public int available() {
@@ -119,17 +114,16 @@ public class PartInputStream extends InputStream {
     }
 
     private byte[] readMac() throws IOException {
-        byte[] mac = new byte[AesEngine.AES_AUTH_LENGTH];
-        int readLen = in.read(mac);
+        byte[] mac = in.readBytes(AesEngine.AES_AUTH_LENGTH);
 
-        if (readLen != AesEngine.AES_AUTH_LENGTH) {
+        if (mac.length != AesEngine.AES_AUTH_LENGTH) {
             if (engine.getZipModel().isSplitArchive())
                 throw new IOException("Error occured while reading stored AES authentication bytes");
 
             in.close();
             // TODO what if more than one file
             in = engine.startNextSplitFile();
-            in.read(mac, readLen, AesEngine.AES_AUTH_LENGTH - readLen);
+            in.read(mac, mac.length, AesEngine.AES_AUTH_LENGTH - mac.length);
         }
 
         return mac;

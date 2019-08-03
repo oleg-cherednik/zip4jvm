@@ -14,14 +14,14 @@ import java.util.zip.Inflater;
 public class InflaterInputStream extends PartInputStream {
 
     private final Inflater inflater = new Inflater(true);
-    private byte[] buff;
+    private final byte[] buf = new byte[InternalZipConstants.BUF_SIZE];
+
     private byte[] oneByteBuff = new byte[1];
     private long bytesWritten;
     private long uncompressedSize;
 
     public InflaterInputStream(LittleEndianReadFile in, long len, Decoder decoder, UnzipEngine engine, CentralDirectory.FileHeader fileHeader) {
         super(in, len, decoder, engine);
-        this.buff = new byte[InternalZipConstants.BUFF_SIZE];
         bytesWritten = 0;
         uncompressedSize = fileHeader.getUncompressedSize();
     }
@@ -31,6 +31,7 @@ public class InflaterInputStream extends PartInputStream {
         return read(oneByteBuff, 0, 1) == -1 ? -1 : oneByteBuff[0] & 0xff;
     }
 
+    @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
 
         if (buf == null) {
@@ -82,11 +83,11 @@ public class InflaterInputStream extends PartInputStream {
     }
 
     private void fill() throws IOException {
-        int len = super.read(buff, 0, buff.length);
+        int len = super.read(buf, 0, buf.length);
         if (len == -1) {
             throw new EOFException("Unexpected end of ZLIB input stream");
         }
-        inflater.setInput(buff, 0, len);
+        inflater.setInput(buf, 0, len);
     }
 
     /**

@@ -15,7 +15,7 @@ import java.util.zip.Deflater;
  */
 final class DeflateEntryOutputStream extends EntryOutputStream {
 
-    private final byte[] buf = new byte[InternalZipConstants.BUFF_SIZE];
+    private final byte[] buf = new byte[InternalZipConstants.BUF_SIZE];
     private final Deflater deflater = new Deflater();
 
     public boolean firstBytesRead;

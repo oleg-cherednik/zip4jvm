@@ -33,4 +33,6 @@ public interface DataInput extends Closeable {
 
     void seek(long pos) throws IOException;
 
+    int read(byte[] buf, int offs, int len) throws IOException;
+
 }

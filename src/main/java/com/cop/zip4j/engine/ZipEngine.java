@@ -3,8 +3,8 @@ package com.cop.zip4j.engine;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.entry.EntryOutputStream;
 import com.cop.zip4j.io.out.MarkDataOutput;
-import com.cop.zip4j.io.out.SingleZipFileOutputStream;
-import com.cop.zip4j.io.out.SplitZipFileOutputStream;
+import com.cop.zip4j.io.out.SingleZipOutputStream;
+import com.cop.zip4j.io.out.SplitZipOutputStream;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.NonNull;
@@ -47,7 +47,7 @@ public class ZipEngine {
         if (parent != null)
             Files.createDirectories(parent);
 
-        return zipModel.isSplitArchive() ? SplitZipFileOutputStream.create(zipModel) : SingleZipFileOutputStream.create(zipModel);
+        return zipModel.isSplitArchive() ? SplitZipOutputStream.create(zipModel) : SingleZipOutputStream.create(zipModel);
     }
 
     private void writeEntry(@NonNull PathZipEntry entry, @NonNull MarkDataOutput out) {

@@ -9,6 +9,7 @@ import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.InflaterInputStream;
 import com.cop.zip4j.io.PartInputStream;
 import com.cop.zip4j.io.ZipInputStream;
+import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.io.in.LittleEndianReadFile;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.CompressionMethod;
@@ -25,7 +26,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -168,7 +168,7 @@ public class UnzipEngine {
         }
     }
 
-    public RandomAccessFile startNextSplitFile() throws IOException {
+    public DataInput startNextSplitFile() throws IOException {
         Path currSplitFile = zipModel.getZipFile();
 
         if (currSplitFileCounter != zipModel.getEndCentralDirectory().getSplitParts())
@@ -178,7 +178,7 @@ public class UnzipEngine {
             throw new Zip4jException("split file: " + currSplitFile.getFileName() + " does not exists");
 
         currSplitFileCounter++;
-        return new RandomAccessFile(currSplitFile.toFile(), "r");
+        return new LittleEndianReadFile(currSplitFile);
     }
 
 }

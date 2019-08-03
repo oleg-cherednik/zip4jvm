@@ -4,7 +4,7 @@ import com.cop.zip4j.core.writers.ZipModelWriter;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.out.DataOutputStreamDecorator;
 import com.cop.zip4j.io.out.MarkDataOutput;
-import com.cop.zip4j.io.out.SingleZipFileOutputStream;
+import com.cop.zip4j.io.out.SingleZipOutputStream;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.utils.CreateZipModel;
@@ -53,7 +53,7 @@ public final class ZipMisc {
         ZipModel zipModel = new CreateZipModel(zipFile, charset).get().noSplitOnly();
         zipModel.getEndCentralDirectory().setComment(comment);
 
-        try (SingleZipFileOutputStream out = SingleZipFileOutputStream.create(zipModel)) {
+        try (SingleZipOutputStream out = SingleZipOutputStream.create(zipModel)) {
             out.seek(zipModel.getOffsCentralDirectory());
             new ZipModelWriter(zipModel).finalizeZipFile(out, false);
         } catch(Exception e) {
@@ -106,7 +106,7 @@ public final class ZipMisc {
             throw new Zip4jException(e);
         }
 
-        try (MarkDataOutput out = SingleZipFileOutputStream.create(destZipFile, zipModel)) {
+        try (MarkDataOutput out = SingleZipOutputStream.create(destZipFile, zipModel)) {
             zipModel.convertToSolid(copyAllParts(new DataOutputStreamDecorator(out), zipModel));
             new ZipModelWriter(zipModel).finalizeZipFile(out, false);
         } catch(Zip4jException e) {

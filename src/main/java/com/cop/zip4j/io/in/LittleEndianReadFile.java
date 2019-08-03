@@ -100,6 +100,11 @@ public class LittleEndianReadFile implements DataInput {
     }
 
     @Override
+    public int read(byte[] buf, int offs, int len) throws IOException {
+        return in.read(buf, offs, len);
+    }
+
+    @Override
     public long getOffs() {
         try {
             return in.getFilePointer();

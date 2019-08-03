@@ -1,7 +1,7 @@
 package com.cop.zip4j.core.writers;
 
 import com.cop.zip4j.io.out.DataOutput;
-import com.cop.zip4j.io.out.SingleZipFileOutputStream;
+import com.cop.zip4j.io.out.SingleZipOutputStream;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
@@ -58,7 +58,7 @@ public final class LocalFileHeaderWriter {
     }
 
     // TODO this is DataDescriptor
-    public void writeExtended(@NonNull SingleZipFileOutputStream out) throws IOException {
+    public void writeExtended(@NonNull SingleZipOutputStream out) throws IOException {
         //Extended local file header signature
         out.writeDword(InternalZipConstants.EXTSIG);
 
