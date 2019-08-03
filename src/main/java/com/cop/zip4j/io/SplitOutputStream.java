@@ -14,7 +14,6 @@ import lombok.NonNull;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -27,7 +26,7 @@ import java.util.Set;
  * @author Oleg Cherednik
  * @since 08.03.2019
  */
-public final class SplitOutputStream extends OutputStream implements MarkDataOutput {
+public final class SplitOutputStream implements MarkDataOutput {
 
     @NonNull
     private final ZipModel zipModel;
@@ -90,7 +89,7 @@ public final class SplitOutputStream extends OutputStream implements MarkDataOut
     public void close() throws IOException {
         zipModel.getEndCentralDirectory().setOffs(getOffs());
         new ZipModelWriter(zipModel).finalizeZipFile(this, true);
-        super.close();
+        delegate.close();
     }
 
     @Override
@@ -158,10 +157,10 @@ public final class SplitOutputStream extends OutputStream implements MarkDataOut
         delegate.writeQword(val);
     }
 
-    @Override
-    public void write(int b) throws IOException {
-        write(new byte[] { (byte)b }, 0, 1);
-    }
+//    @Override
+//    public void write(int b) throws IOException {
+//        write(new byte[] { (byte)b }, 0, 1);
+//    }
 
     @Override
     public void mark(String id) {
