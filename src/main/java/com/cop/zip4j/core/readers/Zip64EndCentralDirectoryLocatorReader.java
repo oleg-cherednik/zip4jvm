@@ -1,10 +1,10 @@
 package com.cop.zip4j.core.readers;
 
+import com.cop.zip4j.exception.Zip4jException;
+import com.cop.zip4j.io.in.DataInput;
+import com.cop.zip4j.model.Zip64;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.io.in.LittleEndianReadFile;
-import com.cop.zip4j.model.Zip64;
 
 import java.io.IOException;
 
@@ -18,7 +18,7 @@ final class Zip64EndCentralDirectoryLocatorReader {
     private final long offs;
 
     @NonNull
-    public Zip64.EndCentralDirectoryLocator read(@NonNull LittleEndianReadFile in) throws IOException {
+    public Zip64.EndCentralDirectoryLocator read(@NonNull DataInput in) throws IOException {
         if (!findHead(in))
             return null;
 
@@ -30,7 +30,7 @@ final class Zip64EndCentralDirectoryLocatorReader {
         return locator;
     }
 
-    private boolean findHead(LittleEndianReadFile in) throws IOException {
+    private boolean findHead(DataInput in) throws IOException {
         if (offs < 0)
             throw new Zip4jException("EndCentralDirectory offs is unknown");
 

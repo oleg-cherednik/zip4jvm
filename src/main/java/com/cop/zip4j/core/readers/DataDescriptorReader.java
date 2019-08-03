@@ -1,6 +1,6 @@
 package com.cop.zip4j.core.readers;
 
-import com.cop.zip4j.io.in.LittleEndianReadFile;
+import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.DataDescriptor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ public final class DataDescriptorReader {
 
     // TODO should be used to check data after reading LocalFileHeader
     @NonNull
-    public DataDescriptor read(@NonNull LittleEndianReadFile in) throws IOException {
+    public DataDescriptor read(@NonNull DataInput in) throws IOException {
         DataDescriptor dataDescriptor = new DataDescriptor();
 
         dataDescriptor.setCrc32(in.readDword());

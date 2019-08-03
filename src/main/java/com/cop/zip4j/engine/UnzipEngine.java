@@ -7,9 +7,9 @@ import com.cop.zip4j.crypto.aesnew.AesNewDecoder;
 import com.cop.zip4j.crypto.pkware.PkwareHeader;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.InflaterInputStream;
-import com.cop.zip4j.io.in.LittleEndianReadFile;
 import com.cop.zip4j.io.PartInputStream;
 import com.cop.zip4j.io.ZipInputStream;
+import com.cop.zip4j.io.in.LittleEndianReadFile;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.Encryption;
@@ -146,7 +146,7 @@ public class UnzipEngine {
             int signature = in.readDword();
 
             if (signature != InternalZipConstants.SPLITSIG)
-                throw new Zip4jException("Expected first part of split file signature (offs:" + in.getFilePointer() + ')');
+                throw new Zip4jException("Expected first part of split file signature (offs:" + in.getOffs() + ')');
         }
 
         return in;

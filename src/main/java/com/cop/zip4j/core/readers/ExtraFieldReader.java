@@ -1,11 +1,11 @@
 package com.cop.zip4j.core.readers;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import com.cop.zip4j.io.in.LittleEndianReadFile;
-import com.cop.zip4j.model.aes.AesExtraDataRecord;
+import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.ExtraField;
 import com.cop.zip4j.model.Zip64;
+import com.cop.zip4j.model.aes.AesExtraDataRecord;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 
@@ -27,14 +27,14 @@ final class ExtraFieldReader {
     }
 
     @NonNull
-    public ExtraField read(@NonNull LittleEndianReadFile in) throws IOException {
+    public ExtraField read(@NonNull DataInput in) throws IOException {
         if (size <= 0)
             return ExtraField.NULL;
 
         ExtraField extraField = new ExtraField();
-        final long offsMax = in.getFilePointer() + size;
+        final long offsMax = in.getOffs() + size;
 
-        while (in.getFilePointer() < offsMax) {
+        while (in.getOffs() < offsMax) {
             int signature = in.readWord();
 
             Zip64.ExtendedInfo zip64 = new Zip64ExtendedInfoReader(signature, uncompressedSize, compressedSize, offs, diskNumber).read(in);

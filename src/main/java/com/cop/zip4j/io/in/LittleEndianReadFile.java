@@ -4,6 +4,7 @@ import com.cop.zip4j.utils.CreateStringFunc;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang.ArrayUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -21,26 +22,20 @@ public class LittleEndianReadFile implements DataInput {
     @Getter
     @NonNull
     private final RandomAccessFile in;
-    @Getter
-    private long offs;
 
     public LittleEndianReadFile(@NonNull Path path) throws FileNotFoundException {
         in = new RandomAccessFile(path.toFile(), "r");
     }
 
+    @Override
     public int readWord() throws IOException {
-        offs += 2;
         int b0 = in.read();
         int b1 = in.read();
         return (b1 << 8) + b0;
     }
 
-    public int readDword() throws IOException {
-        return (int)readDwordLong();
-    }
-
+    @Override
     public long readDwordLong() throws IOException {
-        offs += 4;
         long b0 = in.read();
         long b1 = in.read();
         long b2 = in.read();
@@ -48,8 +43,8 @@ public class LittleEndianReadFile implements DataInput {
         return b3 << 24 | b2 << 16 | b1 << 8 | b0;
     }
 
+    @Override
     public long readQword() throws IOException {
-        offs += 8;
         long b0 = in.read();
         long b1 = in.read();
         long b2 = in.read();
@@ -61,48 +56,56 @@ public class LittleEndianReadFile implements DataInput {
         return b7 << 56 | b6 << 48 | b5 << 40 | b4 << 32 | b3 << 24 | b2 << 16 | b1 << 8 | b0;
     }
 
+    @Override
     public String readString(int length) throws IOException {
         if (length <= 0)
             return null;
 
-        offs += length;
         byte[] buf = new byte[length];
         in.readFully(buf);
         return new CreateStringFunc().apply(buf);
     }
 
+    @Override
     public byte readByte() throws IOException {
-        offs++;
         return in.readByte();
     }
 
+    @Override
     public byte[] readBytes(int total) throws IOException {
         if (total <= 0)
             return null;
 
-        offs += total;
         byte[] buf = new byte[total];
+        total = in.read(buf);
 
-        if (in.read(buf) != total)
-            throw new IOException("Not enough bytes to read");
-
-        return buf;
+        return total == buf.length ? buf : ArrayUtils.subarray(buf, 0, total);
     }
 
+    @Override
     public void skip(int bytes) throws IOException {
         if (bytes > 0) {
             in.skipBytes(bytes);
-            offs += bytes;
         }
     }
 
+    @Override
     public long length() throws IOException {
         return in.length();
     }
 
+    @Override
     public void seek(long pos) throws IOException {
         in.seek(pos);
-        offs = pos;
+    }
+
+    @Override
+    public long getOffs() {
+        try {
+            return in.getFilePointer();
+        } catch(IOException e) {
+            return -1;
+        }
     }
 
     @Override
@@ -112,11 +115,7 @@ public class LittleEndianReadFile implements DataInput {
 
     @Override
     public String toString() {
-        return "offs: " + offs;
-    }
-
-    public long getFilePointer() throws IOException {
-        return in.getFilePointer();
+        return "offs: " + getOffs();
     }
 
 }

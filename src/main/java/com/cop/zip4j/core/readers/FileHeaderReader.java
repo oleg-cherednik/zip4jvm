@@ -1,11 +1,11 @@
 package com.cop.zip4j.core.readers;
 
-import lombok.RequiredArgsConstructor;
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.io.in.LittleEndianReadFile;
+import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.utils.ZipUtils;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -20,7 +20,7 @@ final class FileHeaderReader {
 
     private final long totalEntries;
 
-    public List<CentralDirectory.FileHeader> read(LittleEndianReadFile in) throws IOException {
+    public List<CentralDirectory.FileHeader> read(DataInput in) throws IOException {
         List<CentralDirectory.FileHeader> fileHeaders = new LinkedList<>();
 
         for (int i = 0; i < totalEntries; i++)
@@ -29,11 +29,11 @@ final class FileHeaderReader {
         return fileHeaders;
     }
 
-    private static CentralDirectory.FileHeader readFileHeader(LittleEndianReadFile in) throws IOException {
+    private static CentralDirectory.FileHeader readFileHeader(DataInput in) throws IOException {
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
         if (in.readDword() != CentralDirectory.FileHeader.SIGNATURE)
-            throw new Zip4jException("Expected central directory entry not found (offs:" + (in.getFilePointer() - 4) + ')');
+            throw new Zip4jException("Expected central directory entry not found (offs:" + (in.getOffs() - 4) + ')');
 
         fileHeader.setVersionMadeBy(in.readWord());
         fileHeader.setVersionToExtract(in.readWord());
