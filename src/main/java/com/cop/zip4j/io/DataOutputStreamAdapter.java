@@ -57,8 +57,8 @@ public abstract class DataOutputStreamAdapter extends DataOutputStream {
     }
 
     @Override
-    public int getCurrSplitFileCounter() {
-        return out.getCurrSplitFileCounter();
+    public int getCounter() {
+        return out.getCounter();
     }
 
     @Override

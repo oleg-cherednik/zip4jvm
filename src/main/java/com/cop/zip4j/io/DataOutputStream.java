@@ -37,7 +37,7 @@ public abstract class DataOutputStream extends OutputStream {
 
     public abstract void write(byte[] buf, int offs, int len) throws IOException;
 
-    public abstract int getCurrSplitFileCounter();
+    public abstract int getCounter();
 
     @Override
     public String toString() {
@@ -45,7 +45,7 @@ public abstract class DataOutputStream extends OutputStream {
     }
 
     @Override
-    public void write(int b) throws IOException {
-        writeBytes((byte)b);
+    public final void write(int b) throws IOException {
+        write(new byte[] { (byte)b }, 0, 1);
     }
 }

@@ -59,7 +59,7 @@ public class LittleEndianWriteFile extends DataOutputStream {
     }
 
     @Override
-    public int getCurrSplitFileCounter() {
+    public int getCounter() {
         throw new NotImplementedException();
     }
 

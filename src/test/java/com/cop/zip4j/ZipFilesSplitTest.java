@@ -21,7 +21,7 @@ import java.util.List;
 @SuppressWarnings("FieldNamingConvention")
 public class ZipFilesSplitTest {
 
-    private static final Path rootDir = Zip4jSuite.rootDir.resolve(ZipFilesSplitTest.class.getSimpleName());
+    private static final Path rootDir = Zip4jSuite.generateSubDirNameWithTime(ZipFilesSplitTest.class);
     private static final Path zipFile = rootDir.resolve("src.zip");
 
     @BeforeClass

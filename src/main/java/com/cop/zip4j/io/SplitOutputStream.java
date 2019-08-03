@@ -10,7 +10,6 @@ import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import com.cop.zip4j.utils.InternalZipConstants;
 import lombok.NonNull;
-import org.apache.commons.lang.ArrayUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -18,9 +17,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.function.Predicate;
 
 /**
  * @author Oleg Cherednik
@@ -33,8 +33,7 @@ public class SplitOutputStream extends MarkDataOutputStream {
 
     @NonNull
     private Path zipFilePart;
-    private long bytesWrittenForThisPart;
-    private int currSplitFileCounter;
+    private int counter;
 
     @NonNull
     public static SplitOutputStream create(@NonNull ZipModel zipModel) throws FileNotFoundException {
@@ -51,38 +50,18 @@ public class SplitOutputStream extends MarkDataOutputStream {
         zipFilePart = zipModel.getZipFile();
     }
 
-    private static DataOutputStream openFile(Path zipFile) throws FileNotFoundException {
-        return new LittleEndianWriteFile(zipFile);
-    }
-
-    private void openRandomAccessFile() throws FileNotFoundException {
-        out = openFile(zipFilePart);
-        currSplitFileCounter++;
-        bytesWrittenForThisPart = 0;
-    }
-
-    @Override
-    public void write(int val) throws IOException {
-        if (zipModel.getSplitLength() <= bytesWrittenForThisPart)
-            startNextSplitFile();
-
-        out.write(val);
-        bytesWrittenForThisPart++;
-    }
-
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
         final int offsInit = offs;
 
         while (len > 0) {
-            long canWrite = zipModel.getSplitLength() - bytesWrittenForThisPart;
+            long canWrite = zipModel.getSplitLength() - getOffs();
             int writeBytes = Math.min(len, (int)canWrite);
 
-            if (canWrite <= 0 || len > canWrite && offsInit != offs && isSignatureData.test(buf))
+            if (canWrite <= 0 || len > canWrite && offsInit != offs && isSignature(buf, offs, len))
                 startNextSplitFile();
 
             out.write(buf, offs, writeBytes);
-            bytesWrittenForThisPart += writeBytes;
 
             offs += writeBytes;
             len -= writeBytes;
@@ -91,7 +70,7 @@ public class SplitOutputStream extends MarkDataOutputStream {
 
     private void startNextSplitFile() throws IOException {
         String zipFileName = zipFilePart.toAbsolutePath().toString();
-        Path currSplitFile = ZipModel.getSplitFilePath(zipFilePart, currSplitFileCounter + 1);
+        Path currSplitFile = ZipModel.getSplitFilePath(zipFilePart, ++counter);
 
         out.close();
 
@@ -101,8 +80,7 @@ public class SplitOutputStream extends MarkDataOutputStream {
         if (!zipFilePart.toFile().renameTo(currSplitFile.toFile()))
             throw new IOException("cannot rename newly created split file");
 
-        zipFilePart = new File(zipFileName).toPath();
-        openRandomAccessFile();
+        out = openFile(zipFilePart = new File(zipFileName).toPath());
     }
 
     @Override
@@ -113,13 +91,18 @@ public class SplitOutputStream extends MarkDataOutputStream {
     }
 
     @Override
-    public int getCurrSplitFileCounter() {
-        return currSplitFileCounter;
+    public int getCounter() {
+        return counter;
     }
 
-    @SuppressWarnings("FieldNamingConvention")
-    public static final Predicate<byte[]> isSignatureData = new Predicate<byte[]>() {
-        private final Set<Integer> signature = new HashSet<>(Arrays.asList(
+    private static DataOutputStream openFile(Path zipFile) throws FileNotFoundException {
+        return new LittleEndianWriteFile(zipFile);
+    }
+
+    private static final Set<Integer> SIGNATURES = getAllSignatures();
+
+    private static Set<Integer> getAllSignatures() {
+        List<Integer> signatures = Arrays.asList(
                 LocalFileHeader.SIGNATURE,
                 InternalZipConstants.EXTSIG,
                 CentralDirectory.FileHeader.SIGNATURE,
@@ -130,12 +113,13 @@ public class SplitOutputStream extends MarkDataOutputStream {
                 Zip64.EndCentralDirectoryLocator.SIGNATURE,
                 Zip64.EndCentralDirectory.SIGNATURE,
                 Zip64.ExtendedInfo.SIGNATURE,
-                AesExtraDataRecord.SIGNATURE));
+                AesExtraDataRecord.SIGNATURE);
 
-        @Override
-        public boolean test(byte[] buf) {
-            return ArrayUtils.getLength(buf) >= 4 && signature.contains(buf[3] << 24 | buf[2] << 16 | buf[1] << 8 | buf[0]);
-        }
-    };
+        return Collections.unmodifiableSet(new HashSet<>(signatures));
+    }
+
+    private static boolean isSignature(byte[] buf, int offs, int len) {
+        return len >= 4 && offs + 4 < buf.length && SIGNATURES.contains(buf[offs + 3] << 24 | buf[offs + 2] << 16 | buf[offs + 1] << 8 | buf[offs]);
+    }
 
 }

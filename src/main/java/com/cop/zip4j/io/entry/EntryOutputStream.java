@@ -64,7 +64,7 @@ public class EntryOutputStream extends OutputStream {
 
     private void putNextEntry(@NonNull PathZipEntry entry) {
         try {
-            CentralDirectoryBuilder centralDirectoryBuilder = new CentralDirectoryBuilder(entry, zipModel, out.getCurrSplitFileCounter());
+            CentralDirectoryBuilder centralDirectoryBuilder = new CentralDirectoryBuilder(entry, zipModel, out.getCounter());
 
             fileHeader = centralDirectoryBuilder.createFileHeader();
             localFileHeader = centralDirectoryBuilder.createLocalFileHeader(fileHeader);
