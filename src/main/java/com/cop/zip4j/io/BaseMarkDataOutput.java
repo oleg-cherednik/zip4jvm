@@ -1,29 +1,29 @@
 package com.cop.zip4j.io;
 
-import lombok.RequiredArgsConstructor;
+import lombok.NonNull;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.nio.file.Path;
 
 /**
  * @author Oleg Cherednik
  * @since 03.08.2019
  */
-@RequiredArgsConstructor
-public final class MarkDataOutputDecorator implements MarkDataOutput {
+public abstract class BaseMarkDataOutput implements MarkDataOutput {
 
-    private final DataOutput delegate;
-    private final Map<String, Long> map = new HashMap<>();
+    @NonNull
+    protected MarkDataOutput delegate;
+    @NonNull
+    protected Path zipFile;
 
-    @Override
-    public void mark(String id) {
-        map.put(id, getOffs());
+    protected BaseMarkDataOutput(@NonNull Path zipFile) throws FileNotFoundException {
+        createDelegate(zipFile);
     }
 
-    @Override
-    public long getWrittenBytesAmount(String id) {
-        return getOffs() - map.getOrDefault(id, 0L);
+    protected final void createDelegate(Path zipFile) throws FileNotFoundException {
+        this.zipFile = zipFile;
+        delegate = new MarkDataOutputDecorator(new LittleEndianWriteFile(zipFile));
     }
 
     @Override
@@ -63,7 +63,17 @@ public final class MarkDataOutputDecorator implements MarkDataOutput {
 
     @Override
     public int getCounter() {
-        return 0;
+        return delegate.getCounter();
+    }
+
+    @Override
+    public void mark(String id) {
+        delegate.mark(id);
+    }
+
+    @Override
+    public long getWrittenBytesAmount(String id) {
+        return delegate.getWrittenBytesAmount(id);
     }
 
     @Override

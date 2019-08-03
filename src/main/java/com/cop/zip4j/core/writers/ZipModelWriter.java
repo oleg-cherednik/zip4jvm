@@ -1,6 +1,5 @@
 package com.cop.zip4j.core.writers;
 
-import com.cop.zip4j.io.DataOutput;
 import com.cop.zip4j.io.MarkDataOutput;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.EndCentralDirectory;
@@ -45,7 +44,7 @@ public final class ZipModelWriter {
         new EndCentralDirectoryWriter(endCentralDirectory, zipModel.getCharset()).write(out);
     }
 
-    private void processHeaderData(DataOutput out) throws IOException {
+    private void processHeaderData(MarkDataOutput out) throws IOException {
         EndCentralDirectory endCentralDirectory = zipModel.getEndCentralDirectory();
         // TODO duplication set; see previous step
         endCentralDirectory.setOffs(out.getFilePointer());

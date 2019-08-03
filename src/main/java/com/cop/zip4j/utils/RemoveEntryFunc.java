@@ -2,6 +2,8 @@ package com.cop.zip4j.utils;
 
 import com.cop.zip4j.core.writers.ZipModelWriter;
 import com.cop.zip4j.exception.Zip4jException;
+import com.cop.zip4j.io.DataOutputStreamDecorator;
+import com.cop.zip4j.io.MarkDataOutput;
 import com.cop.zip4j.io.SingleZipFileOutputStream;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.ZipModel;
@@ -12,6 +14,7 @@ import org.apache.commons.io.IOUtils;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -42,8 +45,8 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
 
         Path tmpZipFile = createTempFile();
 
-        try (SingleZipFileOutputStream out = SingleZipFileOutputStream.create(tmpZipFile, zipModel)) {
-            writeFileHeaders(out, entries);
+        try (MarkDataOutput out = SingleZipFileOutputStream.create(tmpZipFile, zipModel)) {
+            writeFileHeaders(new DataOutputStreamDecorator(out), entries);
             new ZipModelWriter(zipModel).finalizeZipFile(out, true);
         } catch(IOException e) {
             throw new Zip4jException(e);
@@ -69,7 +72,7 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
         }
     }
 
-    private void writeFileHeaders(SingleZipFileOutputStream out, Collection<String> entries) throws IOException {
+    private void writeFileHeaders(OutputStream out, Collection<String> entries) throws IOException {
         List<CentralDirectory.FileHeader> fileHeaders = new ArrayList<>();
         CentralDirectory.FileHeader prv = null;
 

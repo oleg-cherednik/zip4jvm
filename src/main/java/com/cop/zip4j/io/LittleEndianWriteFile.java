@@ -1,7 +1,6 @@
 package com.cop.zip4j.io;
 
 import lombok.NonNull;
-import org.apache.commons.lang.NotImplementedException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -52,11 +51,6 @@ public class LittleEndianWriteFile implements DataOutput {
     }
 
     @Override
-    public int getCounter() {
-        throw new NotImplementedException();
-    }
-
-    @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
         out.write(buf, offs, len);
     }
@@ -74,6 +68,11 @@ public class LittleEndianWriteFile implements DataOutput {
     @Override
     public void close() throws IOException {
         out.close();
+    }
+
+    @Override
+    public String toString() {
+        return "offs: " + getOffs();
     }
 
 }

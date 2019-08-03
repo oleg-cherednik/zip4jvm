@@ -10,4 +10,6 @@ public interface MarkDataOutput extends DataOutput {
 
     long getWrittenBytesAmount(String id);
 
+    int getCounter();
+
 }

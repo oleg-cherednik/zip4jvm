@@ -38,6 +38,4 @@ public interface DataOutput extends Closeable {
 
     void write(byte[] buf, int offs, int len) throws IOException;
 
-    int getCounter();
-
 }
