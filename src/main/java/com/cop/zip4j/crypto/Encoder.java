@@ -21,11 +21,6 @@ public interface Encoder {
         }
 
         @Override
-        public int writeDraft(byte[] buf, int offs, int len, DataOutput out) {
-            return len;
-        }
-
-        @Override
         public String toString() {
             return "<null>";
         }
@@ -34,11 +29,6 @@ public interface Encoder {
     void encrypt(@NonNull byte[] buf, int offs, int len);
 
     void writeHeader(@NonNull DataOutput out) throws IOException;
-
-    @Deprecated
-    default int writeDraft(byte[] buf, int offs, int len, DataOutput out) throws IOException {
-        return len;
-    }
 
     default void close(DataOutput out) throws IOException {
     }
