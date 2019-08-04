@@ -3,7 +3,6 @@ package com.cop.zip4j.io.entry;
 import com.cop.zip4j.core.writers.DataDescriptorWriter;
 import com.cop.zip4j.core.writers.LocalFileHeaderWriter;
 import com.cop.zip4j.crypto.Encoder;
-import com.cop.zip4j.crypto.aes.AesEngine;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.CentralDirectoryBuilder;
 import com.cop.zip4j.io.out.MarkDataOutput;
@@ -40,14 +39,8 @@ public class EntryOutputStream extends OutputStream {
     private CentralDirectory.FileHeader fileHeader;
     private LocalFileHeader localFileHeader;
 
-    private final byte[] aesBuf = new byte[AesEngine.AES_BLOCK_SIZE];
-    private int aesOffs;
-    protected long total;
-
     @NonNull
     private Encoder encoder = Encoder.NULL;
-    @NonNull
-    private Encryption encryption = Encryption.OFF;
 
     public static EntryOutputStream create(@NonNull PathZipEntry entry, @NonNull ZipModel zipModel, @NonNull MarkDataOutput out) {
         Compression compression = entry.getCompression();
@@ -79,7 +72,6 @@ public class EntryOutputStream extends OutputStream {
             new LocalFileHeaderWriter(zipModel, localFileHeader).write(out);
 
             encoder = entry.getEncryption().encoder(localFileHeader, entry);
-            encryption = entry.getEncryption();
 
             out.mark(MARK);
             encoder.writeHeader(out);
@@ -96,7 +88,6 @@ public class EntryOutputStream extends OutputStream {
     @Override
     public final void write(byte[] buf, int offs, int len) throws IOException {
         checksum.update(buf, offs, len);
-        total += len;
         writeImpl(buf, offs, len);
     }
 
@@ -105,52 +96,16 @@ public class EntryOutputStream extends OutputStream {
     }
 
     protected final void _write(byte[] buf, int offs, int len) throws IOException {
-        len = writeDraft(buf, offs, len);
-        encryptAndWrite(buf, offs, len);
-    }
-
-    private int writeDraft(byte[] buf, int offs, int len) throws IOException {
-        if (encryption == Encryption.AES || encryption == Encryption.AES_NEW) {
-            if (aesOffs != 0) {
-                if (len >= (AesEngine.AES_BLOCK_SIZE - aesOffs)) {
-                    System.arraycopy(buf, offs, aesBuf, aesOffs, aesBuf.length - aesOffs);
-                    encryptAndWrite(aesBuf, 0, aesBuf.length);
-                    offs = AesEngine.AES_BLOCK_SIZE - aesOffs;
-                    len -= offs;
-                    aesOffs = 0;
-                } else {
-                    System.arraycopy(buf, offs, aesBuf, aesOffs, len);
-                    aesOffs += len;
-                    return 0;
-                }
-            }
-
-            if (len % 16 != 0) {
-                System.arraycopy(buf, (len + offs) - (len % 16), aesBuf, 0, len % 16);
-                aesOffs = len % 16;
-                len -= aesOffs;
-            }
-        }
-
-        return len;
-    }
-
-    private void encryptAndWrite(byte[] buf, int offs, int len) throws IOException {
+        len = encoder.writeDraft(buf, offs, len, out);
         encoder.encrypt(buf, offs, len, out);
     }
 
     @Override
     public void close() throws IOException {
-        if (aesOffs != 0) {
-            encryptAndWrite(aesBuf, 0, aesOffs);
-            aesOffs = 0;
-        }
-
         encoder.close(out);
 
         fileHeader.setCrc32(fileHeader.getEncryption() == Encryption.AES ? 0 : checksum.getValue());
         fileHeader.setCompressedSize(out.getWrittenBytesAmount(MARK));
-        fileHeader.setUncompressedSize(total);
         zipModel.addFileHeader(fileHeader);
 
         writeDataDescriptor();

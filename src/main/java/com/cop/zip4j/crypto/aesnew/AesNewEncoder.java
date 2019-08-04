@@ -1,6 +1,7 @@
 package com.cop.zip4j.crypto.aesnew;
 
 import com.cop.zip4j.crypto.Encoder;
+import com.cop.zip4j.crypto.aes.AesEngine;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.model.aes.AesStrength;
@@ -91,6 +92,34 @@ public class AesNewEncoder implements Encoder {
         }
     }
 
+    private final byte[] aesBuf = new byte[AesEngine.AES_BLOCK_SIZE];
+    private int aesOffs;
+
+    @Override
+    public int writeDraft(byte[] buf, int offs, int len, DataOutput out) throws IOException {
+        if (aesOffs != 0) {
+            if (len >= (AesEngine.AES_BLOCK_SIZE - aesOffs)) {
+                System.arraycopy(buf, offs, aesBuf, aesOffs, aesBuf.length - aesOffs);
+                encrypt(aesBuf, 0, aesBuf.length, out);
+                offs = AesEngine.AES_BLOCK_SIZE - aesOffs;
+                len -= offs;
+                aesOffs = 0;
+            } else {
+                System.arraycopy(buf, offs, aesBuf, aesOffs, len);
+                aesOffs += len;
+                return 0;
+            }
+        }
+
+        if (len % 16 != 0) {
+            System.arraycopy(buf, (len + offs) - (len % 16), aesBuf, 0, len % 16);
+            aesOffs = len % 16;
+            len -= aesOffs;
+        }
+
+        return len;
+    }
+
     @Override
     public void writeHeader(DataOutput out) throws IOException {
         out.writeBytes(salt);
@@ -99,6 +128,12 @@ public class AesNewEncoder implements Encoder {
 
     @Override
     public void close(DataOutput out) throws IOException {
+        if (aesOffs != 0) {
+            encrypt(aesBuf, 0, aesOffs, out);
+            aesOffs = 0;
+        }
+
+
         byte[] buf = mac.doFinal();
         byte[] macBytes = new byte[10];
         System.arraycopy(buf, 0, macBytes, 0, 10);
