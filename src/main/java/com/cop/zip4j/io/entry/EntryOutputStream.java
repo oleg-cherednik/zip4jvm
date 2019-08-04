@@ -43,34 +43,38 @@ public abstract class EntryOutputStream extends OutputStream {
     protected Encoder encoder = Encoder.NULL;
 
     public static EntryOutputStream create(@NonNull PathZipEntry entry, @NonNull ZipModel zipModel, @NonNull MarkDataOutput out) throws IOException {
+        EntryOutputStream res = createOutputStream(entry, zipModel, out);
+        res.putNextEntry(entry);
+        return res;
+    }
+
+    private static EntryOutputStream createOutputStream(@NonNull PathZipEntry entry, @NonNull ZipModel zipModel, @NonNull MarkDataOutput out) {
         Compression compression = entry.getCompression();
 
         if (compression == Compression.DEFLATE)
-            return putNextEntry(new DeflateEntryOutputStream(zipModel, out, entry.getCompressionLevel()), entry);
+            return new DeflateEntryOutputStream(zipModel, out, entry.getCompressionLevel());
         if (compression == Compression.STORE)
-            return putNextEntry(new StoreEntryOutputStream(zipModel, out), entry);
+            return new StoreEntryOutputStream(zipModel, out);
 
         throw new Zip4jException("Compression is not supported: " + compression);
     }
 
-    private static EntryOutputStream putNextEntry(EntryOutputStream out, PathZipEntry entry) throws IOException {
-        CentralDirectoryBuilder centralDirectoryBuilder = new CentralDirectoryBuilder(entry, out.zipModel, out.out.getCounter());
+    private void putNextEntry(PathZipEntry entry) throws IOException {
+        CentralDirectoryBuilder centralDirectoryBuilder = new CentralDirectoryBuilder(entry, zipModel, out.getCounter());
 
-        out.fileHeader = centralDirectoryBuilder.createFileHeader();
-        out.localFileHeader = centralDirectoryBuilder.createLocalFileHeader(out.fileHeader);
+        fileHeader = centralDirectoryBuilder.createFileHeader();
+        localFileHeader = centralDirectoryBuilder.createLocalFileHeader(fileHeader);
 
-        if (out.zipModel.isSplitArchive() && out.zipModel.isEmpty())
-            out.out.writeDword(InternalZipConstants.SPLITSIG);
+        if (zipModel.isSplitArchive() && zipModel.isEmpty())
+            out.writeDword(InternalZipConstants.SPLITSIG);
 
-        out.fileHeader.setOffsLocalFileHeader(out.out.getOffs());
-        new LocalFileHeaderWriter(out.zipModel, out.localFileHeader).write(out.out);
+        fileHeader.setOffsLocalFileHeader(out.getOffs());
+        new LocalFileHeaderWriter(zipModel, localFileHeader).write(out);
 
-        out.encoder = entry.getEncryption().encoder(out.localFileHeader, entry);
+        encoder = entry.getEncryption().encoder(localFileHeader, entry);
 
-        out.out.mark(MARK);
-        out.encoder.writeHeader(out.out);
-
-        return out;
+        out.mark(MARK);
+        encoder.writeHeader(out);
     }
 
     @Override

@@ -32,7 +32,6 @@ public abstract class ZipEntry {
                 long size = Files.size(path);
                 long checksum = FileUtils.checksumCRC32(path.toFile());
                 int lastModifiedTime = ZipUtils.javaToDosTime(Files.getLastModifiedTime(path).toMillis());
-
                 return new RegularFileZipEntry(path, size, checksum, lastModifiedTime);
             } catch(IOException e) {
                 throw new Zip4jException(e);
