@@ -96,8 +96,7 @@ public class EntryOutputStream extends OutputStream {
     }
 
     protected final void _write(byte[] buf, int offs, int len) throws IOException {
-        len = encoder.writeDraft(buf, offs, len, out);
-        encoder.encrypt(buf, offs, len, out);
+        encoder._write(buf, offs, len, out);
     }
 
     @Override

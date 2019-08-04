@@ -96,18 +96,18 @@ public class AesNewEncoder implements Encoder {
     private int aesOffs;
 
     @Override
-    public int writeDraft(byte[] buf, int offs, int len, DataOutput out) throws IOException {
+    public void _write(byte[] buf, int offs, int len, DataOutput out) throws IOException {
         if (aesOffs != 0) {
             if (len >= (AesEngine.AES_BLOCK_SIZE - aesOffs)) {
                 System.arraycopy(buf, offs, aesBuf, aesOffs, aesBuf.length - aesOffs);
-                encrypt(aesBuf, 0, aesBuf.length, out);
+                encryptAndWrite(aesBuf, 0, aesBuf.length, out);
                 offs = AesEngine.AES_BLOCK_SIZE - aesOffs;
                 len -= offs;
                 aesOffs = 0;
             } else {
                 System.arraycopy(buf, offs, aesBuf, aesOffs, len);
                 aesOffs += len;
-                return 0;
+                len = 0;
             }
         }
 
@@ -117,7 +117,7 @@ public class AesNewEncoder implements Encoder {
             len -= aesOffs;
         }
 
-        return len;
+        encryptAndWrite(buf, offs, len, out);
     }
 
     @Override
@@ -129,7 +129,7 @@ public class AesNewEncoder implements Encoder {
     @Override
     public void close(DataOutput out) throws IOException {
         if (aesOffs != 0) {
-            encrypt(aesBuf, 0, aesOffs, out);
+            encryptAndWrite(aesBuf, 0, aesOffs, out);
             aesOffs = 0;
         }
 

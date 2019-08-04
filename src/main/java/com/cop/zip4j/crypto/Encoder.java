@@ -29,15 +29,15 @@ public interface Encoder {
     void encrypt(@NonNull byte[] buf, int offs, int len);
 
     @Deprecated
-    default void encrypt(@NonNull byte[] buf, int offs, int len, @NonNull DataOutput out) throws  IOException {
+    default void encryptAndWrite(@NonNull byte[] buf, int offs, int len, @NonNull DataOutput out) throws  IOException {
         if (len == 0)
             return;
         encrypt(buf, offs, len);
         out.write(buf, offs, len);
     }
 
-    default int writeDraft(byte[] buf, int offs, int len, DataOutput out) throws IOException {
-        return len;
+    default void _write(byte[] buf, int offs, int len, DataOutput out) throws IOException {
+        encryptAndWrite(buf, offs, len, out);
     }
 
     void writeHeader(@NonNull DataOutput out) throws IOException;
