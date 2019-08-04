@@ -21,8 +21,7 @@ public class ZipUtils {
      * @param time
      * @return time in DOS format
      */
-    public long javaToDosTime(long time) {
-
+    public int javaToDosTime(long time) {
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(time);
 

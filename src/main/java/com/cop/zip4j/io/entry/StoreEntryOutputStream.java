@@ -16,7 +16,8 @@ final class StoreEntryOutputStream extends EntryOutputStream {
     }
 
     @Override
-    protected void writeImpl(byte[] buf, int offs, int len) throws IOException {
+    public void write(byte[] buf, int offs, int len) throws IOException {
+        super.write(buf, offs, len);
         encoder._write(buf, offs, len, out);
     }
 }

@@ -24,6 +24,7 @@ public abstract class PathZipEntry extends ZipEntry {
     protected final Path path;
     @Setter
     protected String name;
+    private final int lastModifiedTime;
 
     protected Compression compression = Compression.STORE;
     protected CompressionLevel compressionLevel = CompressionLevel.NORMAL;
@@ -54,10 +55,6 @@ public abstract class PathZipEntry extends ZipEntry {
     }
 
     public abstract void setCompression(@NonNull Compression compression) throws IOException;
-
-//    public CompressionMethod getCompressionMethod() {
-//        return encryption == Encryption.AES ? CompressionMethod.AES_ENC : compressionMethod;
-//    }
 
     public void setCompressionLevel(@NonNull CompressionLevel compressionLevel) throws IOException {
         this.compressionLevel = CompressionLevel.NORMAL;

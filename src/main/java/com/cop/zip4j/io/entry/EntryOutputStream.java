@@ -79,12 +79,9 @@ public abstract class EntryOutputStream extends OutputStream {
     }
 
     @Override
-    public final void write(byte[] buf, int offs, int len) throws IOException {
+    public void write(byte[] buf, int offs, int len) throws IOException {
         checksum.update(buf, offs, len);
-        writeImpl(buf, offs, len);
     }
-
-    protected abstract void writeImpl(byte[] buf, int offs, int len) throws IOException;
 
     @Override
     public void close() throws IOException {

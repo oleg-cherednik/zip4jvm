@@ -12,8 +12,8 @@ import java.nio.file.Path;
  */
 public class DirectoryZipEntry extends PathZipEntry {
 
-    public DirectoryZipEntry(Path dir) {
-        super(dir);
+    public DirectoryZipEntry(Path dir, int lastModifiedTime) {
+        super(dir, lastModifiedTime);
     }
 
     @Override

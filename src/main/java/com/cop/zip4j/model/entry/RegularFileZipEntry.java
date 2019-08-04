@@ -20,12 +20,12 @@ import java.nio.file.Path;
 public class RegularFileZipEntry extends PathZipEntry {
 
     private final long size;
-    private final long crc32;
+    private final long checksum;
 
-    public RegularFileZipEntry(Path file, long size, long crc32) {
-        super(file);
+    public RegularFileZipEntry(Path file, long size, long checksum, int lastModifiedTime) {
+        super(file, lastModifiedTime);
         this.size = size;
-        this.crc32 = crc32;
+        this.checksum = checksum;
     }
 
     @Override
@@ -34,8 +34,8 @@ public class RegularFileZipEntry extends PathZipEntry {
     }
 
     @Override
-    public long crc32() {
-        return crc32;
+    public long checksum() {
+        return checksum;
     }
 
     @Override

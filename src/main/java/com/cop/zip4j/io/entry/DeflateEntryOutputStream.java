@@ -26,7 +26,8 @@ final class DeflateEntryOutputStream extends EntryOutputStream {
     }
 
     @Override
-    protected void writeImpl(byte[] buf, int offs, int len) throws IOException {
+    public void write(byte[] buf, int offs, int len) throws IOException {
+        super.write(buf, offs, len);
         deflater.setInput(buf, offs, len);
 
         while (!deflater.needsInput()) {
