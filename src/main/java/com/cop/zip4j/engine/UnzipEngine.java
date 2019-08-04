@@ -8,6 +8,7 @@ import com.cop.zip4j.crypto.pkware.PkwareHeader;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.InflaterInputStream;
 import com.cop.zip4j.io.PartInputStream;
+import com.cop.zip4j.io.SingleZipInputStream;
 import com.cop.zip4j.io.ZipInputStream;
 import com.cop.zip4j.io.entry.EntryOutputStream;
 import com.cop.zip4j.io.in.DataInput;
@@ -90,7 +91,7 @@ public class UnzipEngine {
     @NonNull
     private InputStream extractEntryAsStream(@NonNull CentralDirectory.FileHeader fileHeader) {
         try {
-            LittleEndianReadFile in = openFile(fileHeader);
+            DataInput in = openFile(fileHeader);
             LocalFileHeader localFileHeader = readLocalFileHeader(fileHeader);
             Decoder decoder = localFileHeader.getEncryption().decoder(in, localFileHeader, password);
 
@@ -128,14 +129,14 @@ public class UnzipEngine {
 
     @NonNull
     private LocalFileHeader readLocalFileHeader(@NonNull CentralDirectory.FileHeader fileHeader) throws IOException {
-        try (LittleEndianReadFile in = openFile(fileHeader)) {
+        try (DataInput in = openFile(fileHeader)) {
             return new LocalFileHeaderReader(fileHeader).read(in);
         }
     }
 
-    private LittleEndianReadFile openFile(@NonNull CentralDirectory.FileHeader fileHeader) throws IOException {
+    private DataInput openFile(@NonNull CentralDirectory.FileHeader fileHeader) throws IOException {
         if (!zipModel.isSplitArchive())
-            return new LittleEndianReadFile(zipModel.getZipFile());
+            return SingleZipInputStream.create(zipModel);
 
         int diskNumber = fileHeader.getDiskNumber();
         currSplitFileCounter = diskNumber + 1;

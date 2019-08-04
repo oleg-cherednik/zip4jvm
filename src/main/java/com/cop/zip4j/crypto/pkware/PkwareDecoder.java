@@ -2,7 +2,7 @@ package com.cop.zip4j.crypto.pkware;
 
 import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.io.in.LittleEndianReadFile;
+import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.LocalFileHeader;
 import lombok.NonNull;
@@ -20,7 +20,7 @@ public class PkwareDecoder implements Decoder {
 
     private final PkwareEngine engine;
 
-    public static PkwareDecoder create(@NonNull LittleEndianReadFile in, @NonNull LocalFileHeader localFileHeader, char[] password)
+    public static PkwareDecoder create(@NonNull DataInput in, @NonNull LocalFileHeader localFileHeader, char[] password)
             throws IOException {
         PkwareEngine engine = new PkwareEngine(password);
         PkwareHeader.read(in, localFileHeader, engine);

@@ -1,11 +1,11 @@
 package com.cop.zip4j.io.entry;
 
+import com.cop.zip4j.core.builders.CentralDirectoryBuilder;
 import com.cop.zip4j.core.builders.LocalFileHeaderBuilder;
 import com.cop.zip4j.core.writers.DataDescriptorWriter;
 import com.cop.zip4j.core.writers.LocalFileHeaderWriter;
 import com.cop.zip4j.crypto.Encoder;
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.core.builders.CentralDirectoryBuilder;
 import com.cop.zip4j.io.out.MarkDataOutput;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Compression;
@@ -37,7 +37,8 @@ public abstract class EntryOutputStream extends OutputStream {
     private final CentralDirectory.FileHeader fileHeader;
     protected final Encoder encoder;
     protected final MarkDataOutput out;
-    protected final Checksum checksum = new CRC32();
+
+    private final Checksum checksum = new CRC32();
 
     public static EntryOutputStream create(@NonNull PathZipEntry entry, @NonNull ZipModel zipModel, @NonNull MarkDataOutput out) throws IOException {
         EntryOutputStream res = createOutputStream(entry, zipModel, out);
