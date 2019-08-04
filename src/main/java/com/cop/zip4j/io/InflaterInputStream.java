@@ -33,30 +33,31 @@ public class InflaterInputStream extends PartInputStream {
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-
-        if (buf == null) {
+        if (buf == null)
             throw new NullPointerException("input buffer is null");
-        } else if (offs < 0 || len < 0 || len > buf.length - offs) {
+        if (offs < 0 || len < 0 || len > buf.length - offs)
             throw new IndexOutOfBoundsException();
-        } else if (len == 0) {
+        if (len == 0)
             return 0;
-        }
 
         try {
-            int n;
             if (bytesWritten >= uncompressedSize) {
                 finishInflating();
                 return -1;
             }
+
+            int n;
+
             while ((n = inflater.inflate(buf, offs, len)) == 0) {
                 if (inflater.finished() || inflater.needsDictionary()) {
                     finishInflating();
                     return -1;
                 }
-                if (inflater.needsInput()) {
+
+                if (inflater.needsInput())
                     fill();
-                }
             }
+
             bytesWritten += n;
             return n;
         } catch(DataFormatException e) {
@@ -84,9 +85,10 @@ public class InflaterInputStream extends PartInputStream {
 
     private void fill() throws IOException {
         int len = super.read(buf, 0, buf.length);
-        if (len == -1) {
+
+        if (len == -1)
             throw new EOFException("Unexpected end of ZLIB input stream");
-        }
+
         inflater.setInput(buf, 0, len);
     }
 
@@ -100,21 +102,24 @@ public class InflaterInputStream extends PartInputStream {
      */
     @Override
     public long skip(long n) throws IOException {
-        if (n < 0) {
+        if (n < 0)
             throw new IllegalArgumentException("negative skip length");
-        }
+
         int max = (int)Math.min(n, Integer.MAX_VALUE);
         int total = 0;
         byte[] b = new byte[512];
+
         while (total < max) {
             int len = max - total;
-            if (len > b.length) {
+
+            if (len > b.length)
                 len = b.length;
-            }
+
             len = read(b, 0, len);
-            if (len == -1) {
+
+            if (len == -1)
                 break;
-            }
+
             total += len;
         }
         return total;

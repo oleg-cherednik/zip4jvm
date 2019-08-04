@@ -115,7 +115,7 @@ public class AesDecoder implements Decoder {
             throw new Zip4jException("invalid CRC (MAC) for file '" + fileHeader.getFileName() + '\'');
     }
 
-    private byte[] deriveKey(byte[] salt, char[] password, int keyLength, int macLength) {
+    private static byte[] deriveKey(byte[] salt, char[] password, int keyLength, int macLength) {
         PBKDF2Parameters p = new PBKDF2Parameters("HmacSHA1", "ISO-8859-1", salt, 1000);
         PBKDF2Engine e = new PBKDF2Engine(p);
         return e.deriveKey(password, keyLength + macLength + PASSWORD_VERIFIER_LENGTH);
@@ -131,6 +131,5 @@ public class AesDecoder implements Decoder {
         // TODO why don;t have MAC SIZE
         return localFileHeader.getOffs() + getSaltLength() + getPasswordVerifierLength(); // + MAC SIZE
     }
-
 
 }

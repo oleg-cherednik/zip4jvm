@@ -40,17 +40,18 @@ public class PartInputStream extends InputStream {
         if (bytesRead >= length)
             return -1;
 
-        if (!(decoder instanceof AesDecoder || decoder instanceof AesNewDecoder))
-            return read(oneByteBuff, 0, 1) == -1 ? -1 : oneByteBuff[0] & 0xFF;
+        if (decoder instanceof AesDecoder || decoder instanceof AesNewDecoder) {
+            if (aesBytesReturned == 0 || aesBytesReturned == 16) {
+                if (read(aesBlockByte) == -1)
+                    return -1;
 
-        if (aesBytesReturned == 0 || aesBytesReturned == 16) {
-            if (read(aesBlockByte) == -1)
-                return -1;
+                aesBytesReturned = 0;
+            }
 
-            aesBytesReturned = 0;
+            return aesBlockByte[aesBytesReturned++] & 0xff;
         }
 
-        return aesBlockByte[aesBytesReturned++] & 0xff;
+        return read(oneByteBuff, 0, 1) == -1 ? -1 : oneByteBuff[0] & 0xFF;
     }
 
     @Override
