@@ -36,11 +36,11 @@ public abstract class EntryOutputStream extends OutputStream {
     private final ZipModel zipModel;
     @NonNull
     private final CentralDirectory.FileHeader fileHeader;
+    @NonNull
+    protected final Encoder encoder;
+
     protected final MarkDataOutput out;
     protected final Checksum checksum = new CRC32();
-
-    @NonNull
-    protected Encoder encoder = Encoder.NULL;
 
     public static EntryOutputStream create(@NonNull PathZipEntry entry, @NonNull ZipModel zipModel, @NonNull MarkDataOutput out) throws IOException {
         EntryOutputStream res = createOutputStream(entry, zipModel, out);
@@ -51,12 +51,13 @@ public abstract class EntryOutputStream extends OutputStream {
     private static EntryOutputStream createOutputStream(@NonNull PathZipEntry entry, @NonNull ZipModel zipModel, @NonNull MarkDataOutput out)
             throws IOException {
         Compression compression = entry.getCompression();
+        Encoder encoder = entry.getEncryption().encoder(entry);
         CentralDirectory.FileHeader fileHeader = new CentralDirectoryBuilder(entry, zipModel, out.getCounter()).createFileHeader();
 
         if (compression == Compression.DEFLATE)
-            return new DeflateEntryOutputStream(zipModel, fileHeader, out, entry.getCompressionLevel());
+            return new DeflateEntryOutputStream(zipModel, fileHeader, encoder, out, entry.getCompressionLevel());
         if (compression == Compression.STORE)
-            return new StoreEntryOutputStream(zipModel, fileHeader, out);
+            return new StoreEntryOutputStream(zipModel, fileHeader, encoder, out);
 
         throw new Zip4jException("Compression is not supported: " + compression);
     }
@@ -68,8 +69,6 @@ public abstract class EntryOutputStream extends OutputStream {
         fileHeader.setOffsLocalFileHeader(out.getOffs());
 
         writeLocalFileHeader();
-
-        encoder = entry.getEncryption().encoder(entry);
 
         out.mark(MARK);
         encoder.writeHeader(out);
