@@ -25,7 +25,7 @@ import java.io.IOException;
 public enum Encryption {
     OFF {
         @Override
-        public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull PathZipEntry entry) {
+        public Encoder encoder(@NonNull PathZipEntry entry) {
             return Encoder.NULL;
         }
 
@@ -37,8 +37,8 @@ public enum Encryption {
     },
     PKWARE {
         @Override
-        public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull PathZipEntry entry) {
-            return PkwareEncoder.create(localFileHeader, entry);
+        public Encoder encoder(@NonNull PathZipEntry entry) {
+            return PkwareEncoder.create(entry);
         }
 
         @Override
@@ -50,7 +50,7 @@ public enum Encryption {
     STRONG,
     AES {
         @Override
-        public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull PathZipEntry entry) {
+        public Encoder encoder(@NonNull PathZipEntry entry) {
             return new AesEncoder(entry.getPassword(), entry.getStrength());
         }
 
@@ -73,7 +73,7 @@ public enum Encryption {
     },
     AES_NEW {
         @Override
-        public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull PathZipEntry entry) {
+        public Encoder encoder(@NonNull PathZipEntry entry) {
             return AesNewEncoder.create(entry.getStrength(), entry.getPassword());
         }
 
@@ -84,7 +84,7 @@ public enum Encryption {
         }
     };
 
-    public Encoder encoder(@NonNull LocalFileHeader localFileHeader, @NonNull PathZipEntry entry) {
+    public Encoder encoder(@NonNull PathZipEntry entry) {
         throw new Zip4jException("invalid encryption method");
     }
 

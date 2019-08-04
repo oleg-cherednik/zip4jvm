@@ -1,10 +1,10 @@
 package com.cop.zip4j.io.entry;
 
 import com.cop.zip4j.io.out.MarkDataOutput;
+import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.utils.InternalZipConstants;
-import lombok.NonNull;
 
 import java.io.IOException;
 import java.util.zip.Deflater;
@@ -20,8 +20,8 @@ final class DeflateEntryOutputStream extends EntryOutputStream {
 
     public boolean firstBytesRead;
 
-    public DeflateEntryOutputStream(@NonNull ZipModel zipModel, @NonNull MarkDataOutput out, @NonNull CompressionLevel compressionLevel) {
-        super(zipModel, out);
+    public DeflateEntryOutputStream(ZipModel zipModel, CentralDirectory.FileHeader fileHeader, MarkDataOutput out, CompressionLevel compressionLevel) {
+        super(zipModel, fileHeader, out);
         deflater.setLevel(compressionLevel.getValue());
     }
 

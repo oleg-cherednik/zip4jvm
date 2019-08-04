@@ -1,6 +1,7 @@
 package com.cop.zip4j.io.entry;
 
 import com.cop.zip4j.io.out.MarkDataOutput;
+import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.ZipModel;
 
 import java.io.IOException;
@@ -11,8 +12,8 @@ import java.io.IOException;
  */
 final class StoreEntryOutputStream extends EntryOutputStream {
 
-    public StoreEntryOutputStream(ZipModel zipModel, MarkDataOutput out) {
-        super(zipModel, out);
+    public StoreEntryOutputStream(ZipModel zipModel, CentralDirectory.FileHeader fileHeader, MarkDataOutput out) {
+        super(zipModel, fileHeader, out);
     }
 
     @Override

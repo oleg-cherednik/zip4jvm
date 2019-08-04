@@ -1,5 +1,6 @@
 package com.cop.zip4j.io.entry;
 
+import com.cop.zip4j.core.builders.LocalFileHeaderBuilder;
 import com.cop.zip4j.core.writers.DataDescriptorWriter;
 import com.cop.zip4j.core.writers.LocalFileHeaderWriter;
 import com.cop.zip4j.crypto.Encoder;
@@ -33,11 +34,10 @@ public abstract class EntryOutputStream extends OutputStream {
 
     @NonNull
     private final ZipModel zipModel;
+    @NonNull
+    private final CentralDirectory.FileHeader fileHeader;
     protected final MarkDataOutput out;
     protected final Checksum checksum = new CRC32();
-
-    private CentralDirectory.FileHeader fileHeader;
-    private LocalFileHeader localFileHeader;
 
     @NonNull
     protected Encoder encoder = Encoder.NULL;
@@ -48,30 +48,28 @@ public abstract class EntryOutputStream extends OutputStream {
         return res;
     }
 
-    private static EntryOutputStream createOutputStream(@NonNull PathZipEntry entry, @NonNull ZipModel zipModel, @NonNull MarkDataOutput out) {
+    private static EntryOutputStream createOutputStream(@NonNull PathZipEntry entry, @NonNull ZipModel zipModel, @NonNull MarkDataOutput out)
+            throws IOException {
         Compression compression = entry.getCompression();
+        CentralDirectory.FileHeader fileHeader = new CentralDirectoryBuilder(entry, zipModel, out.getCounter()).createFileHeader();
 
         if (compression == Compression.DEFLATE)
-            return new DeflateEntryOutputStream(zipModel, out, entry.getCompressionLevel());
+            return new DeflateEntryOutputStream(zipModel, fileHeader, out, entry.getCompressionLevel());
         if (compression == Compression.STORE)
-            return new StoreEntryOutputStream(zipModel, out);
+            return new StoreEntryOutputStream(zipModel, fileHeader, out);
 
         throw new Zip4jException("Compression is not supported: " + compression);
     }
 
     private void putNextEntry(PathZipEntry entry) throws IOException {
-        CentralDirectoryBuilder centralDirectoryBuilder = new CentralDirectoryBuilder(entry, zipModel, out.getCounter());
-
-        fileHeader = centralDirectoryBuilder.createFileHeader();
-        localFileHeader = centralDirectoryBuilder.createLocalFileHeader(fileHeader);
-
         if (zipModel.isSplitArchive() && zipModel.isEmpty())
             out.writeDword(InternalZipConstants.SPLITSIG);
 
         fileHeader.setOffsLocalFileHeader(out.getOffs());
-        new LocalFileHeaderWriter(zipModel, localFileHeader).write(out);
 
-        encoder = entry.getEncryption().encoder(localFileHeader, entry);
+        writeLocalFileHeader();
+
+        encoder = entry.getEncryption().encoder(entry);
 
         out.mark(MARK);
         encoder.writeHeader(out);
@@ -100,9 +98,14 @@ public abstract class EntryOutputStream extends OutputStream {
         out.mark(MARK);
     }
 
+    private void writeLocalFileHeader() throws IOException {
+        LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(fileHeader).create();
+        new LocalFileHeaderWriter(zipModel, localFileHeader).write(out);
+    }
+
     private void writeDataDescriptor() throws IOException {
         // TODO should be isDataDescriptorExists == true only when parameters.getCompressionMethod() == CompressionMethod.DEFLATE
-        if (!localFileHeader.getGeneralPurposeFlag().isDataDescriptorExists())
+        if (!fileHeader.getGeneralPurposeFlag().isDataDescriptorExists())
             return;
 
         DataDescriptor dataDescriptor = new DataDescriptor();

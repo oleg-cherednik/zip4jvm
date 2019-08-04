@@ -1,8 +1,8 @@
 package com.cop.zip4j.crypto.pkware;
 
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.io.in.LittleEndianReadFile;
+import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.model.LocalFileHeader;
 import lombok.AccessLevel;
 import lombok.NonNull;
@@ -22,10 +22,20 @@ public class PkwareHeader {
 
     private final byte[] buf;
 
-    public static PkwareHeader create(@NonNull LocalFileHeader localFileHeader, @NonNull PkwareEngine engine) {
+    public static PkwareHeader create(@NonNull PkwareEngine engine, int checksum) {
         // TODO Instead of CRC32, time should be used along with {@link GeneralPurposeFlag} bit 3 should be true
-        int crc = getCrc(localFileHeader);
-        return new PkwareHeader(create(engine, crc));
+        return new PkwareHeader(createBuf(engine, checksum));
+    }
+
+    private static byte[] createBuf(PkwareEngine engine, int checksum) {
+        byte[] buf = new byte[SIZE];
+
+        new Random().nextBytes(buf);
+        buf[buf.length - 1] = low(checksum);
+        buf[buf.length - 2] = high(checksum);
+        engine.encrypt(buf, 0, buf.length);
+
+        return buf;
     }
 
     public static PkwareHeader read(@NonNull LittleEndianReadFile in, @NonNull LocalFileHeader localFileHeader, @NonNull PkwareEngine engine)
@@ -46,17 +56,6 @@ public class PkwareHeader {
 
         if (buf[buf.length - 1] != low(crc) || buf[buf.length - 2] != high(crc))
             throw new Zip4jException("The specified password is incorrect");
-    }
-
-    private static byte[] create(PkwareEngine engine, int crc) {
-        byte[] buf = new byte[SIZE];
-
-        new Random().nextBytes(buf);
-        buf[buf.length - 1] = low(crc);
-        buf[buf.length - 2] = high(crc);
-        engine.encrypt(buf, 0, buf.length);
-
-        return buf;
     }
 
     private static int getCrc(LocalFileHeader localFileHeader) {
