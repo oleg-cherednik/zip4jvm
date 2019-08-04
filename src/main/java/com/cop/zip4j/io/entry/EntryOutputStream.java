@@ -105,13 +105,15 @@ public class EntryOutputStream extends OutputStream {
     }
 
     protected final void _write(byte[] buf, int offs, int len) throws IOException {
-        if (len == 0)
-            return;
+        len = writeDraft(buf, offs, len);
+        encryptAndWrite(buf, offs, len);
+    }
 
+    private int writeDraft(byte[] buf, int offs, int len) throws IOException {
         if (encryption == Encryption.AES || encryption == Encryption.AES_NEW) {
             if (aesOffs != 0) {
                 if (len >= (AesEngine.AES_BLOCK_SIZE - aesOffs)) {
-                    System.arraycopy(buf, offs, aesBuf, aesOffs, AesEngine.AES_BLOCK_SIZE - aesOffs);
+                    System.arraycopy(buf, offs, aesBuf, aesOffs, aesBuf.length - aesOffs);
                     encryptAndWrite(aesBuf, 0, aesBuf.length);
                     offs = AesEngine.AES_BLOCK_SIZE - aesOffs;
                     len -= offs;
@@ -119,7 +121,7 @@ public class EntryOutputStream extends OutputStream {
                 } else {
                     System.arraycopy(buf, offs, aesBuf, aesOffs, len);
                     aesOffs += len;
-                    return;
+                    return 0;
                 }
             }
 
@@ -130,13 +132,11 @@ public class EntryOutputStream extends OutputStream {
             }
         }
 
-        if (len != 0)
-            encryptAndWrite(buf, offs, len);
+        return len;
     }
 
     private void encryptAndWrite(byte[] buf, int offs, int len) throws IOException {
-        encoder.encrypt(buf, offs, len);
-        out.write(buf, offs, len);
+        encoder.encrypt(buf, offs, len, out);
     }
 
     @Override
