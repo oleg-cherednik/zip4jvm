@@ -4,13 +4,17 @@ import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.crypto.aes.AesDecoder;
 import com.cop.zip4j.crypto.aes.AesEngine;
 import com.cop.zip4j.crypto.aesnew.AesNewDecoder;
-import com.cop.zip4j.engine.UnzipEngine;
+import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.in.DataInput;
+import com.cop.zip4j.io.in.LittleEndianReadFile;
+import com.cop.zip4j.model.ZipModel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 @RequiredArgsConstructor
 public class PartInputStream extends InputStream {
@@ -19,7 +23,7 @@ public class PartInputStream extends InputStream {
     private DataInput in;
     private final long length;
     private final Decoder decoder;
-    private final UnzipEngine engine;
+    private final ZipModel zipModel;
 
     private long bytesRead;
     private byte[] oneByteBuff = new byte[1];
@@ -66,9 +70,9 @@ public class PartInputStream extends InputStream {
 
         int count = in.read(buf, offs, len);
 
-        if ((count < len) && engine.getZipModel().isSplitArchive()) {
+        if ((count < len) && zipModel.isSplitArchive()) {
             in.close();
-            in = engine.startNextSplitFile();
+            in = startNextSplitFile();
 
             if (count < 0)
                 count = 0;
@@ -91,6 +95,21 @@ public class PartInputStream extends InputStream {
         }
 
         return count;
+    }
+
+    private int currSplitFileCounter;
+
+    private DataInput startNextSplitFile() throws IOException {
+        Path currSplitFile = zipModel.getZipFile();
+
+        if (currSplitFileCounter != zipModel.getEndCentralDirectory().getSplitParts())
+            currSplitFile = ZipModel.getSplitFilePath(currSplitFile, currSplitFileCounter + 1);
+
+        if (!Files.exists(currSplitFile))
+            throw new Zip4jException("split file: " + currSplitFile.getFileName() + " does not exists");
+
+        currSplitFileCounter++;
+        return new LittleEndianReadFile(currSplitFile);
     }
 
     protected void checkAndReadAESMacBytes() throws IOException {
@@ -117,12 +136,12 @@ public class PartInputStream extends InputStream {
         byte[] mac = in.readBytes(AesEngine.AES_AUTH_LENGTH);
 
         if (mac.length != AesEngine.AES_AUTH_LENGTH) {
-            if (engine.getZipModel().isSplitArchive())
+            if (zipModel.isSplitArchive())
                 throw new IOException("Error occured while reading stored AES authentication bytes");
 
             in.close();
             // TODO what if more than one file
-            in = engine.startNextSplitFile();
+            in = startNextSplitFile();
             in.read(mac, mac.length, AesEngine.AES_AUTH_LENGTH - mac.length);
         }
 

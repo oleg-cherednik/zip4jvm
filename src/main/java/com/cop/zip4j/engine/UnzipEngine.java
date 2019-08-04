@@ -2,7 +2,6 @@ package com.cop.zip4j.engine;
 
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.in.DataInput;
-import com.cop.zip4j.io.in.LittleEndianReadFile;
 import com.cop.zip4j.io.in.SingleZipInputStream;
 import com.cop.zip4j.io.in.SplitZipInputStream;
 import com.cop.zip4j.io.in.entry.EntryInputStream;
@@ -35,8 +34,6 @@ public class UnzipEngine {
     @NonNull
     private final ZipModel zipModel;
     private final char[] password;
-
-    private int currSplitFileCounter;
 
     public void extractEntries(@NonNull Path destDir, @NonNull Collection<String> entries) {
         getFileHeaders(entries).forEach(fileHeader -> extractEntry(destDir, fileHeader));
@@ -82,7 +79,7 @@ public class UnzipEngine {
     private InputStream extractEntryAsStream(@NonNull CentralDirectory.FileHeader fileHeader) {
         try {
             DataInput in = createInputStream(fileHeader);
-            return EntryInputStream.create(fileHeader, password, in, this);
+            return EntryInputStream.create(fileHeader, password, in, zipModel);
         } catch(IOException e) {
             throw new Zip4jException(e);
         }
@@ -106,19 +103,6 @@ public class UnzipEngine {
         } catch(IOException e) {
             throw new Zip4jException(e);
         }
-    }
-
-    public DataInput startNextSplitFile() throws IOException {
-        Path currSplitFile = zipModel.getZipFile();
-
-        if (currSplitFileCounter != zipModel.getEndCentralDirectory().getSplitParts())
-            currSplitFile = ZipModel.getSplitFilePath(currSplitFile, currSplitFileCounter + 1);
-
-        if (!Files.exists(currSplitFile))
-            throw new Zip4jException("split file: " + currSplitFile.getFileName() + " does not exists");
-
-        currSplitFileCounter++;
-        return new LittleEndianReadFile(currSplitFile);
     }
 
 }

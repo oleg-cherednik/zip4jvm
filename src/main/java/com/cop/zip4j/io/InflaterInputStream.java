@@ -1,9 +1,9 @@
 package com.cop.zip4j.io;
 
 import com.cop.zip4j.crypto.Decoder;
-import com.cop.zip4j.engine.UnzipEngine;
 import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.CentralDirectory;
+import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.utils.InternalZipConstants;
 
 import java.io.EOFException;
@@ -20,8 +20,8 @@ public class InflaterInputStream extends PartInputStream {
     private long bytesWritten;
     private long uncompressedSize;
 
-    public InflaterInputStream(DataInput in, long len, Decoder decoder, UnzipEngine engine, CentralDirectory.FileHeader fileHeader) {
-        super(in, len, decoder, engine);
+    public InflaterInputStream(DataInput in, long len, Decoder decoder, ZipModel zipModel, CentralDirectory.FileHeader fileHeader) {
+        super(in, len, decoder, zipModel);
         bytesWritten = 0;
         uncompressedSize = fileHeader.getUncompressedSize();
     }
