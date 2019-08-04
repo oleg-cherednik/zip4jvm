@@ -40,7 +40,7 @@ public class EntryOutputStream extends OutputStream {
     private LocalFileHeader localFileHeader;
 
     @NonNull
-    private Encoder encoder = Encoder.NULL;
+    protected Encoder encoder = Encoder.NULL;
 
     public static EntryOutputStream create(@NonNull PathZipEntry entry, @NonNull ZipModel zipModel, @NonNull MarkDataOutput out) {
         Compression compression = entry.getCompression();
@@ -81,7 +81,7 @@ public class EntryOutputStream extends OutputStream {
     }
 
     @Override
-    public void write(int b) throws IOException {
+    public final void write(int b) throws IOException {
         write(new byte[] { (byte)b }, 0, 1);
     }
 
@@ -92,10 +92,6 @@ public class EntryOutputStream extends OutputStream {
     }
 
     protected void writeImpl(byte[] buf, int offs, int len) throws IOException {
-        _write(buf, offs, len);
-    }
-
-    protected final void _write(byte[] buf, int offs, int len) throws IOException {
         encoder._write(buf, offs, len, out);
     }
 

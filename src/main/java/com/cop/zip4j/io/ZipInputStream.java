@@ -20,14 +20,14 @@ public class ZipInputStream extends InputStream {
     @NonNull
     private final Decoder decoder;
 
-    private final Checksum crc32 = new CRC32();
+    private final Checksum checksum = new CRC32();
 
     @Override
     public int read() throws IOException {
         int b = in.read();
 
         if (b != -1)
-            crc32.update(b);
+            checksum.update(b);
 
         return b;
     }
@@ -35,7 +35,7 @@ public class ZipInputStream extends InputStream {
     @Override
     public void close() throws IOException {
         in.close();
-        decoder.checkChecksum(fileHeader, crc32.getValue());
+        decoder.checkChecksum(fileHeader, checksum.getValue());
     }
 
     @Override
