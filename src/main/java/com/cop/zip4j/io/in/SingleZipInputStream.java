@@ -9,7 +9,7 @@ import java.io.FileNotFoundException;
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
-public class SingleZipInputStream extends BaseDataInput {
+public class SingleZipInputStream extends BaseMarkDataInput {
 
     @NonNull
     public static SingleZipInputStream create(@NonNull ZipModel zipModel) throws FileNotFoundException {

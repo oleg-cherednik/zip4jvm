@@ -11,7 +11,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
-public class SplitZipInputStream extends BaseDataInput {
+public class SplitZipInputStream extends BaseMarkDataInput {
 
     @NonNull
     public static SplitZipInputStream create(@NonNull ZipModel zipModel, int diskNumber) throws IOException {

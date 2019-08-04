@@ -5,13 +5,17 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-abstract class BaseDataInput implements DataInput {
+abstract class BaseMarkDataInput implements MarkDataInput {
+
+    private final Map<String, Long> map = new HashMap<>();
 
     @NonNull
     protected final DataInput delegate;
@@ -64,6 +68,21 @@ abstract class BaseDataInput implements DataInput {
     @Override
     public void seek(long pos) throws IOException {
         delegate.seek(pos);
+    }
+
+    @Override
+    public int getCounter() {
+        return 0;
+    }
+
+    @Override
+    public void mark(String id) {
+        map.put(id, getOffs());
+    }
+
+    @Override
+    public long getWrittenBytesAmount(String id) {
+        return getOffs() - map.getOrDefault(id, 0L);
     }
 
     @Override
