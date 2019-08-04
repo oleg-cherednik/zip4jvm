@@ -8,11 +8,11 @@ import com.cop.zip4j.crypto.pkware.PkwareHeader;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.InflaterInputStream;
 import com.cop.zip4j.io.PartInputStream;
-import com.cop.zip4j.io.SingleZipInputStream;
 import com.cop.zip4j.io.ZipInputStream;
-import com.cop.zip4j.io.entry.EntryOutputStream;
 import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.io.in.LittleEndianReadFile;
+import com.cop.zip4j.io.in.SingleZipInputStream;
+import com.cop.zip4j.io.in.SplitZipInputStream;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.Encryption;
@@ -91,7 +91,7 @@ public class UnzipEngine {
     @NonNull
     private InputStream extractEntryAsStream(@NonNull CentralDirectory.FileHeader fileHeader) {
         try {
-            DataInput in = openFile(fileHeader);
+            DataInput in = createInputStream(fileHeader);
             LocalFileHeader localFileHeader = readLocalFileHeader(fileHeader);
             Decoder decoder = localFileHeader.getEncryption().decoder(in, localFileHeader, password);
 
@@ -129,28 +129,13 @@ public class UnzipEngine {
 
     @NonNull
     private LocalFileHeader readLocalFileHeader(@NonNull CentralDirectory.FileHeader fileHeader) throws IOException {
-        try (DataInput in = openFile(fileHeader)) {
+        try (DataInput in = createInputStream(fileHeader)) {
             return new LocalFileHeaderReader(fileHeader).read(in);
         }
     }
 
-    private DataInput openFile(@NonNull CentralDirectory.FileHeader fileHeader) throws IOException {
-        if (!zipModel.isSplitArchive())
-            return SingleZipInputStream.create(zipModel);
-
-        int diskNumber = fileHeader.getDiskNumber();
-        currSplitFileCounter = diskNumber + 1;
-
-        LittleEndianReadFile in = new LittleEndianReadFile(zipModel.getPartFile(diskNumber));
-
-        if (currSplitFileCounter == 1) {
-            int signature = in.readDword();
-
-            if (signature != EntryOutputStream.SPLIT_SIGNATURE)
-                throw new Zip4jException("Expected first part of split file signature (offs:" + in.getOffs() + ')');
-        }
-
-        return in;
+    private DataInput createInputStream(@NonNull CentralDirectory.FileHeader fileHeader) throws IOException {
+        return zipModel.isSplitArchive() ? SplitZipInputStream.create(zipModel, fileHeader.getDiskNumber()) : SingleZipInputStream.create(zipModel);
     }
 
     private static FileOutputStream getOutputStream(@NonNull Path destDir, @NonNull CentralDirectory.FileHeader fileHeader) {

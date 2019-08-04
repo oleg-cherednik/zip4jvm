@@ -1,7 +1,5 @@
-package com.cop.zip4j.io;
+package com.cop.zip4j.io.in;
 
-import com.cop.zip4j.io.in.DataInput;
-import com.cop.zip4j.io.in.LittleEndianReadFile;
 import com.cop.zip4j.model.ZipModel;
 import lombok.AccessLevel;
 import lombok.NonNull;
