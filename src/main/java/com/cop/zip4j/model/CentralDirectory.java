@@ -129,8 +129,10 @@ public class CentralDirectory {
         }
 
         @NonNull
-        public CompressionMethod getActualCompressionMethod() {
-            return compressionMethod == CompressionMethod.AES_ENC ? extraField.getAesExtraDataRecord().getCompressionMethod() : compressionMethod;
+        public Compression getCompression() {
+            if (compressionMethod == CompressionMethod.AES_ENC)
+                return Compression.parseCompressionMethod(extraField.getAesExtraDataRecord().getCompressionMethod());
+            return Compression.parseCompressionMethod(compressionMethod);
         }
 
         public boolean isDirectory() {

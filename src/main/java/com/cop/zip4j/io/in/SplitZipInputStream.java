@@ -1,7 +1,7 @@
 package com.cop.zip4j.io.in;
 
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.io.entry.EntryOutputStream;
+import com.cop.zip4j.io.out.entry.EntryOutputStream;
 import com.cop.zip4j.model.ZipModel;
 import lombok.NonNull;
 

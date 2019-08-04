@@ -1,22 +1,12 @@
 package com.cop.zip4j.engine;
 
-import com.cop.zip4j.core.readers.LocalFileHeaderReader;
-import com.cop.zip4j.crypto.Decoder;
-import com.cop.zip4j.crypto.aes.AesDecoder;
-import com.cop.zip4j.crypto.aesnew.AesNewDecoder;
-import com.cop.zip4j.crypto.pkware.PkwareHeader;
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.io.InflaterInputStream;
-import com.cop.zip4j.io.PartInputStream;
-import com.cop.zip4j.io.ZipInputStream;
 import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.io.in.LittleEndianReadFile;
 import com.cop.zip4j.io.in.SingleZipInputStream;
 import com.cop.zip4j.io.in.SplitZipInputStream;
+import com.cop.zip4j.io.in.entry.EntryInputStream;
 import com.cop.zip4j.model.CentralDirectory;
-import com.cop.zip4j.model.CompressionMethod;
-import com.cop.zip4j.model.Encryption;
-import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.ZipModel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -92,51 +82,9 @@ public class UnzipEngine {
     private InputStream extractEntryAsStream(@NonNull CentralDirectory.FileHeader fileHeader) {
         try {
             DataInput in = createInputStream(fileHeader);
-            LocalFileHeader localFileHeader = readLocalFileHeader(fileHeader);
-            Decoder decoder = localFileHeader.getEncryption().decoder(in, localFileHeader, password);
-
-            long comprSize = localFileHeader.getCompressedSize();
-            long offs = localFileHeader.getOffs();
-
-            if (localFileHeader.getEncryption() == Encryption.AES) {
-                AesDecoder dec = (AesDecoder)decoder;
-                comprSize -= dec.getSaltLength() + dec.getPasswordVerifierLength() + 10;
-                offs += dec.getSaltLength() + dec.getPasswordVerifierLength();
-            } else if (localFileHeader.getEncryption() == Encryption.AES_NEW) {
-                AesNewDecoder dec = (AesNewDecoder)decoder;
-                comprSize -= dec.getSaltLength() + AesNewDecoder.PASSWORD_VERIFIER_LENGTH + 10;
-                offs += dec.getSaltLength() + AesNewDecoder.PASSWORD_VERIFIER_LENGTH;
-            } else if (localFileHeader.getEncryption() == Encryption.PKWARE) {
-                // TODO decrypter throws unsupported exception
-                comprSize -= PkwareHeader.SIZE;
-                offs += PkwareHeader.SIZE;
-            }
-
-            long _comprSize = decoder.getCompressedSize(localFileHeader);
-            long _offs = decoder.getOffs(localFileHeader);
-
-            if (_comprSize != comprSize || _offs != offs)
-                throw new Zip4jException("aaaaaaaaaaaaaaaaaa");
-
-            in.seek(offs);
-
-            if (fileHeader.getActualCompressionMethod() == CompressionMethod.STORE)
-                return new ZipInputStream(new PartInputStream(in, comprSize, decoder, this), fileHeader, decoder);
-            if (fileHeader.getActualCompressionMethod() == CompressionMethod.DEFLATE)
-                return new ZipInputStream(new InflaterInputStream(in, comprSize, decoder, this, fileHeader), fileHeader, decoder);
-
-            throw new Zip4jException("compression type not supported");
-        } catch(Zip4jException e) {
-            throw e;
-        } catch(Exception e) {
+            return EntryInputStream.create(fileHeader, password, in, this);
+        } catch(IOException e) {
             throw new Zip4jException(e);
-        }
-    }
-
-    @NonNull
-    private LocalFileHeader readLocalFileHeader(@NonNull CentralDirectory.FileHeader fileHeader) throws IOException {
-        try (DataInput in = createInputStream(fileHeader)) {
-            return new LocalFileHeaderReader(fileHeader).read(in);
         }
     }
 

@@ -14,4 +14,12 @@ public enum Compression {
     DEFLATE(CompressionMethod.DEFLATE);
 
     private final CompressionMethod method;
+
+    public static Compression parseCompressionMethod(CompressionMethod method) {
+        for (Compression compression : values())
+            if (compression.method == method)
+                return compression;
+        throw new EnumConstantNotPresentException(Compression.class, "method=" + method);
+    }
+
 }
