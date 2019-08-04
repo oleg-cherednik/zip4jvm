@@ -6,6 +6,7 @@ import com.cop.zip4j.crypto.aes.pbkdf2.PBKDF2Engine;
 import com.cop.zip4j.crypto.aes.pbkdf2.PBKDF2Parameters;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.CentralDirectory;
+import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import com.cop.zip4j.model.aes.AesStrength;
 import lombok.NonNull;
@@ -120,8 +121,15 @@ public class AesDecoder implements Decoder {
         return e.deriveKey(password, keyLength + macLength + PASSWORD_VERIFIER_LENGTH);
     }
 
-    public byte[] getCalculatedAuthenticationBytes() {
-        return mac.doFinal();
+    @Override
+    public long getCompressedSize(@NonNull LocalFileHeader localFileHeader) {
+        return localFileHeader.getCompressedSize() - getSaltLength() - getPasswordVerifierLength() - 10;
+    }
+
+    @Override
+    public long getOffs(@NonNull LocalFileHeader localFileHeader) {
+        // TODO why don;t have MAC SIZE
+        return localFileHeader.getOffs() + getSaltLength() + getPasswordVerifierLength(); // + MAC SIZE
     }
 
 

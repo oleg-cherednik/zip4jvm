@@ -1,6 +1,7 @@
 package com.cop.zip4j.crypto;
 
 import com.cop.zip4j.model.CentralDirectory;
+import com.cop.zip4j.model.LocalFileHeader;
 import lombok.NonNull;
 
 /**
@@ -27,6 +28,14 @@ public interface Decoder {
 
     default int getLen(long bytesRead, int len, long length) {
         return len;
+    }
+
+    default long getCompressedSize(@NonNull LocalFileHeader localFileHeader) {
+        return localFileHeader.getCompressedSize();
+    }
+
+    default long getOffs(@NonNull LocalFileHeader localFileHeader) {
+        return localFileHeader.getOffs();
     }
 
 }

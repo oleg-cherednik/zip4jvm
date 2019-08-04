@@ -112,6 +112,12 @@ public class UnzipEngine {
                 offs += PkwareHeader.SIZE;
             }
 
+            long _comprSize = decoder.getCompressedSize(localFileHeader);
+            long _offs = decoder.getOffs(localFileHeader);
+
+            if (_comprSize != comprSize || _offs != offs)
+                throw new Zip4jException("aaaaaaaaaaaaaaaaaa");
+
             in.seek(offs);
 
             if (fileHeader.getActualCompressionMethod() == CompressionMethod.STORE)

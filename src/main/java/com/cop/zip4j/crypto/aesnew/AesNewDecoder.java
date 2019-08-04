@@ -101,6 +101,17 @@ public class AesNewDecoder implements Decoder {
             throw new Zip4jException("invalid CRC (MAC) for file '" + fileHeader.getFileName() + '\'');
     }
 
+    @Override
+    public long getCompressedSize(@NonNull LocalFileHeader localFileHeader) {
+        return localFileHeader.getCompressedSize() - getSaltLength() - PASSWORD_VERIFIER_LENGTH - 10;
+    }
+
+    @Override
+    public long getOffs(@NonNull LocalFileHeader localFileHeader) {
+        // TODO why don;t have MAC SIZE
+        return localFileHeader.getOffs() + getSaltLength() + PASSWORD_VERIFIER_LENGTH; // + MAC SIZE
+    }
+
     private static byte[] getSalt(DataInput in, long offs, AesStrength strength) throws IOException {
         in.seek(offs);
         return in.readBytes(strength.getSaltLength());

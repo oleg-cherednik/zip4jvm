@@ -40,4 +40,14 @@ public class PkwareDecoder implements Decoder {
             throw new Zip4jException("invalid CRC for file: " + fileHeader.getFileName() + " (Wrong Password?)");
     }
 
+    @Override
+    public long getCompressedSize(@NonNull LocalFileHeader localFileHeader) {
+        return localFileHeader.getCompressedSize() - PkwareHeader.SIZE;
+    }
+
+    @Override
+    public long getOffs(@NonNull LocalFileHeader localFileHeader) {
+        return localFileHeader.getOffs() + PkwareHeader.SIZE;
+    }
+
 }
