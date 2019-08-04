@@ -27,7 +27,7 @@ import java.util.zip.Checksum;
  * @since 26.07.2019
  */
 @RequiredArgsConstructor
-public class EntryOutputStream extends OutputStream {
+public abstract class EntryOutputStream extends OutputStream {
 
     private static final String MARK = "entry";
 
@@ -42,42 +42,35 @@ public class EntryOutputStream extends OutputStream {
     @NonNull
     protected Encoder encoder = Encoder.NULL;
 
-    public static EntryOutputStream create(@NonNull PathZipEntry entry, @NonNull ZipModel zipModel, @NonNull MarkDataOutput out) {
+    public static EntryOutputStream create(@NonNull PathZipEntry entry, @NonNull ZipModel zipModel, @NonNull MarkDataOutput out) throws IOException {
         Compression compression = entry.getCompression();
 
         if (compression == Compression.DEFLATE)
             return putNextEntry(new DeflateEntryOutputStream(zipModel, out, entry.getCompressionLevel()), entry);
         if (compression == Compression.STORE)
-            return putNextEntry(new EntryOutputStream(zipModel, out), entry);
+            return putNextEntry(new StoreEntryOutputStream(zipModel, out), entry);
 
         throw new Zip4jException("Compression is not supported: " + compression);
     }
 
-    private static EntryOutputStream putNextEntry(EntryOutputStream out, PathZipEntry entry) {
-        out.putNextEntry(entry);
+    private static EntryOutputStream putNextEntry(EntryOutputStream out, PathZipEntry entry) throws IOException {
+        CentralDirectoryBuilder centralDirectoryBuilder = new CentralDirectoryBuilder(entry, out.zipModel, out.out.getCounter());
+
+        out.fileHeader = centralDirectoryBuilder.createFileHeader();
+        out.localFileHeader = centralDirectoryBuilder.createLocalFileHeader(out.fileHeader);
+
+        if (out.zipModel.isSplitArchive() && out.zipModel.isEmpty())
+            out.out.writeDword(InternalZipConstants.SPLITSIG);
+
+        out.fileHeader.setOffsLocalFileHeader(out.out.getOffs());
+        new LocalFileHeaderWriter(out.zipModel, out.localFileHeader).write(out.out);
+
+        out.encoder = entry.getEncryption().encoder(out.localFileHeader, entry);
+
+        out.out.mark(MARK);
+        out.encoder.writeHeader(out.out);
+
         return out;
-    }
-
-    private void putNextEntry(@NonNull PathZipEntry entry) {
-        try {
-            CentralDirectoryBuilder centralDirectoryBuilder = new CentralDirectoryBuilder(entry, zipModel, out.getCounter());
-
-            fileHeader = centralDirectoryBuilder.createFileHeader();
-            localFileHeader = centralDirectoryBuilder.createLocalFileHeader(fileHeader);
-
-            if (zipModel.isSplitArchive() && zipModel.isEmpty())
-                out.writeDword(InternalZipConstants.SPLITSIG);
-
-            fileHeader.setOffsLocalFileHeader(out.getOffs());
-            new LocalFileHeaderWriter(zipModel, localFileHeader).write(out);
-
-            encoder = entry.getEncryption().encoder(localFileHeader, entry);
-
-            out.mark(MARK);
-            encoder.writeHeader(out);
-        } catch(IOException e) {
-            throw new Zip4jException(e);
-        }
     }
 
     @Override
@@ -91,9 +84,7 @@ public class EntryOutputStream extends OutputStream {
         writeImpl(buf, offs, len);
     }
 
-    protected void writeImpl(byte[] buf, int offs, int len) throws IOException {
-        encoder._write(buf, offs, len, out);
-    }
+    protected abstract void writeImpl(byte[] buf, int offs, int len) throws IOException;
 
     @Override
     public void close() throws IOException {
