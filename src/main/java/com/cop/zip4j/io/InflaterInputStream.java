@@ -1,17 +1,15 @@
 package com.cop.zip4j.io;
 
-import com.cop.zip4j.crypto.Decoder;
-import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.CentralDirectory;
-import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.utils.InternalZipConstants;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
-public class InflaterInputStream extends PartInputStream {
+public class InflaterInputStream extends InputStream {
 
     private final Inflater inflater = new Inflater(true);
     private final byte[] buf = new byte[InternalZipConstants.BUF_SIZE];
@@ -20,8 +18,10 @@ public class InflaterInputStream extends PartInputStream {
     private long bytesWritten;
     private long uncompressedSize;
 
-    public InflaterInputStream(DataInput in, long len, Decoder decoder, ZipModel zipModel, CentralDirectory.FileHeader fileHeader) {
-        super(in, len, decoder, zipModel);
+    private final PartInputStream delegate;
+
+    public InflaterInputStream(PartInputStream delegate, CentralDirectory.FileHeader fileHeader) {
+        this.delegate = delegate;
         bytesWritten = 0;
         uncompressedSize = fileHeader.getUncompressedSize();
     }
@@ -77,14 +77,14 @@ public class InflaterInputStream extends PartInputStream {
         //In some cases, compelte data is not read even though inflater is complete
         //make sure to read complete data before returning -1
         byte[] b = new byte[1024];
-        while (super.read(b, 0, 1024) != -1) {
+        while (delegate.read(b, 0, 1024) != -1) {
             //read all data
         }
-        checkAndReadAESMacBytes();
+        delegate.checkAndReadAESMacBytes();
     }
 
     private void fill() throws IOException {
-        int len = super.read(buf, 0, buf.length);
+        int len = delegate.read(buf, 0, buf.length);
 
         if (len == -1)
             throw new EOFException("Unexpected end of ZLIB input stream");
@@ -141,8 +141,8 @@ public class InflaterInputStream extends PartInputStream {
 
     @Override
     public void close() throws IOException {
-        super.close();
         inflater.end();
+        delegate.close();
     }
 
 }

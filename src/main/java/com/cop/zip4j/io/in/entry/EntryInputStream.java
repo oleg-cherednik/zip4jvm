@@ -40,8 +40,10 @@ public abstract class EntryInputStream extends InputStream {
 
         if (compression == Compression.STORE)
             return new ZipInputStream(new PartInputStream(in, comprSize, decoder, zipModel), fileHeader, decoder);
-        if (compression == Compression.DEFLATE)
-            return new ZipInputStream(new InflaterInputStream(in, comprSize, decoder, zipModel, fileHeader), fileHeader, decoder);
+        if (compression == Compression.DEFLATE) {
+            PartInputStream pis = new PartInputStream(in, comprSize, decoder, zipModel);
+            return new ZipInputStream(new InflaterInputStream(pis, fileHeader), fileHeader, decoder);
+        }
 
         throw new Zip4jException("Compression is not supported: " + compression);
     }
