@@ -50,7 +50,7 @@ public class ZipEngine {
         return zipModel.isSplitArchive() ? SplitZipOutputStream.create(zipModel) : SingleZipOutputStream.create(zipModel);
     }
 
-    private void writeEntry(@NonNull PathZipEntry entry, @NonNull MarkDataOutput out) {
+    private void writeEntry(PathZipEntry entry, MarkDataOutput out) {
         try (OutputStream delegate = EntryOutputStream.create(entry, zipModel, out)) {
             entry.write(delegate);
         } catch(IOException e) {

@@ -1,15 +1,13 @@
-package com.cop.zip4j.io;
+package com.cop.zip4j.core.builders;
 
 import com.cop.zip4j.crypto.aes.AesEngine;
 import com.cop.zip4j.crypto.aesnew.AesNewDecoder;
 import com.cop.zip4j.crypto.pkware.PkwareHeader;
-import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.GeneralPurposeFlag;
-import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.aes.AesExtraDataRecord;
@@ -36,7 +34,8 @@ public class CentralDirectoryBuilder {
     private final ZipModel zipModel;
     private final int currSplitFileCounter;
 
-    public CentralDirectory.FileHeader createFileHeader() throws IOException {
+    @NonNull
+    public CentralDirectory.FileHeader create() throws IOException {
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader(getFileName());
 
         fileHeader.setVersionMadeBy(CentralDirectory.FileHeader.DEF_VERSION);
@@ -57,28 +56,6 @@ public class CentralDirectoryBuilder {
         fileHeader.setFileComment(null);
 
         return fileHeader;
-    }
-
-    public LocalFileHeader createLocalFileHeader(@NonNull CentralDirectory.FileHeader fileHeader) throws Zip4jException {
-        LocalFileHeader localFileHeader = new LocalFileHeader();
-
-        localFileHeader.setVersionToExtract(fileHeader.getVersionToExtract());
-        localFileHeader.setGeneralPurposeFlag(fileHeader.getGeneralPurposeFlag().getData());
-        localFileHeader.setCompressionMethod(getCompressionMethod(fileHeader));
-        localFileHeader.setLastModifiedTime(fileHeader.getLastModifiedTime());
-        localFileHeader.setUncompressedSize(fileHeader.getUncompressedSize());
-        localFileHeader.setFileName(fileHeader.getFileName());
-        localFileHeader.setExtraField(fileHeader.getExtraField().deepCopy());
-        localFileHeader.setCrc32(getCrc32(fileHeader));
-        localFileHeader.setCompressedSize(fileHeader.getCompressedSize());
-
-        return localFileHeader;
-    }
-
-    private static long getCrc32(CentralDirectory.FileHeader fileHeader) {
-        if (fileHeader.getEncryption() == Encryption.AES || fileHeader.getEncryption() == Encryption.AES_NEW)
-            return 0;
-        return fileHeader.getCrc32();
     }
 
     @NonNull
@@ -134,13 +111,6 @@ public class CentralDirectoryBuilder {
             attr = Files.isHidden(entry.getPath()) ? InternalZipConstants.FILE_MODE_HIDDEN : InternalZipConstants.FILE_MODE_NONE;
 
         return new byte[] { (byte)attr, 0, 0, 0 };
-    }
-
-    @NonNull
-    private static CompressionMethod getCompressionMethod(CentralDirectory.FileHeader fileHeader) {
-        if (fileHeader.getEncryption() == Encryption.AES || fileHeader.getEncryption() == Encryption.AES_NEW)
-            return CompressionMethod.AES_ENC;
-        return fileHeader.getCompressionMethod();
     }
 
     @NonNull

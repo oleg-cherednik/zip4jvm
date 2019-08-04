@@ -5,7 +5,7 @@ import com.cop.zip4j.core.writers.DataDescriptorWriter;
 import com.cop.zip4j.core.writers.LocalFileHeaderWriter;
 import com.cop.zip4j.crypto.Encoder;
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.io.CentralDirectoryBuilder;
+import com.cop.zip4j.core.builders.CentralDirectoryBuilder;
 import com.cop.zip4j.io.out.MarkDataOutput;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Compression;
@@ -14,7 +14,6 @@ import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.entry.PathZipEntry;
-import com.cop.zip4j.utils.InternalZipConstants;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -30,21 +29,19 @@ import java.util.zip.Checksum;
 @RequiredArgsConstructor
 public abstract class EntryOutputStream extends OutputStream {
 
-    private static final String MARK = "entry";
+    public static final int SPLIT_SIGNATURE = 0x08074b50;
 
-    @NonNull
+    private static final String MARK = EntryOutputStream.class.getSimpleName();
+
     private final ZipModel zipModel;
-    @NonNull
     private final CentralDirectory.FileHeader fileHeader;
-    @NonNull
     protected final Encoder encoder;
-
     protected final MarkDataOutput out;
     protected final Checksum checksum = new CRC32();
 
     public static EntryOutputStream create(@NonNull PathZipEntry entry, @NonNull ZipModel zipModel, @NonNull MarkDataOutput out) throws IOException {
         EntryOutputStream res = createOutputStream(entry, zipModel, out);
-        res.putNextEntry(entry);
+        res.writeHeader();
         return res;
     }
 
@@ -52,7 +49,7 @@ public abstract class EntryOutputStream extends OutputStream {
             throws IOException {
         Compression compression = entry.getCompression();
         Encoder encoder = entry.getEncryption().encoder(entry);
-        CentralDirectory.FileHeader fileHeader = new CentralDirectoryBuilder(entry, zipModel, out.getCounter()).createFileHeader();
+        CentralDirectory.FileHeader fileHeader = new CentralDirectoryBuilder(entry, zipModel, out.getCounter()).create();
 
         if (compression == Compression.DEFLATE)
             return new DeflateEntryOutputStream(zipModel, fileHeader, encoder, out, entry.getCompressionLevel());
@@ -62,16 +59,24 @@ public abstract class EntryOutputStream extends OutputStream {
         throw new Zip4jException("Compression is not supported: " + compression);
     }
 
-    private void putNextEntry(PathZipEntry entry) throws IOException {
+    private void writeHeader() throws IOException {
+        // only at the beginning of the split file
         if (zipModel.isSplitArchive() && zipModel.isEmpty())
-            out.writeDword(InternalZipConstants.SPLITSIG);
+            out.writeDword(SPLIT_SIGNATURE);
 
-        fileHeader.setOffsLocalFileHeader(out.getOffs());
+        zipModel.addFileHeader(fileHeader);
 
         writeLocalFileHeader();
+        encoder.writeHeader(out);
+    }
+
+    private void writeLocalFileHeader() throws IOException {
+        fileHeader.setOffsLocalFileHeader(out.getOffs());
+
+        LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(fileHeader).create();
+        new LocalFileHeaderWriter(zipModel, localFileHeader).write(out);
 
         out.mark(MARK);
-        encoder.writeHeader(out);
     }
 
     @Override
@@ -87,19 +92,13 @@ public abstract class EntryOutputStream extends OutputStream {
     @Override
     public void close() throws IOException {
         encoder.close(out);
-
-        fileHeader.setCrc32(fileHeader.getEncryption() == Encryption.AES ? 0 : checksum.getValue());
-        fileHeader.setCompressedSize(out.getWrittenBytesAmount(MARK));
-        zipModel.addFileHeader(fileHeader);
-
+        updateFileHeader();
         writeDataDescriptor();
-
-        out.mark(MARK);
     }
 
-    private void writeLocalFileHeader() throws IOException {
-        LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(fileHeader).create();
-        new LocalFileHeaderWriter(zipModel, localFileHeader).write(out);
+    private void updateFileHeader() {
+        fileHeader.setCrc32(fileHeader.getEncryption() == Encryption.AES ? 0 : checksum.getValue());
+        fileHeader.setCompressedSize(out.getWrittenBytesAmount(MARK));
     }
 
     private void writeDataDescriptor() throws IOException {

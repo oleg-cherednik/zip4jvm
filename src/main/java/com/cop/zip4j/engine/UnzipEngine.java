@@ -9,6 +9,7 @@ import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.InflaterInputStream;
 import com.cop.zip4j.io.PartInputStream;
 import com.cop.zip4j.io.ZipInputStream;
+import com.cop.zip4j.io.entry.EntryOutputStream;
 import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.io.in.LittleEndianReadFile;
 import com.cop.zip4j.model.CentralDirectory;
@@ -16,7 +17,6 @@ import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.ZipModel;
-import com.cop.zip4j.utils.InternalZipConstants;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -145,7 +145,7 @@ public class UnzipEngine {
         if (currSplitFileCounter == 1) {
             int signature = in.readDword();
 
-            if (signature != InternalZipConstants.SPLITSIG)
+            if (signature != EntryOutputStream.SPLIT_SIGNATURE)
                 throw new Zip4jException("Expected first part of split file signature (offs:" + in.getOffs() + ')');
         }
 

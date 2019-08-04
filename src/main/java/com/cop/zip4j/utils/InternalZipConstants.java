@@ -9,7 +9,7 @@ public interface InternalZipConstants {
     // in Zip4jUtil.getAllHeaderSignatures()
     int EXTSIG = 0x08074b50;
     int ARCEXTDATREC = 0x08064B50;
-    int SPLITSIG = 0x08074b50;
+
 
     // Minimum segment size = 64K
     int MIN_SPLIT_LENGTH = 64 * 1024;
