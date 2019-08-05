@@ -46,7 +46,7 @@ abstract class BaseMarkDataInput implements MarkDataInput {
     }
 
     @Override
-    public byte readByte() throws IOException {
+    public int readByte() throws IOException {
         return delegate.readByte();
     }
 
@@ -97,6 +97,6 @@ abstract class BaseMarkDataInput implements MarkDataInput {
 
     @Override
     public String toString() {
-        return "offs: " + getOffs();
+        return "offs: " + getOffs() + " (0x" + Long.toHexString(getOffs()) + ')';
     }
 }

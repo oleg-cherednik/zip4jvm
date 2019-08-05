@@ -30,7 +30,7 @@ public final class LocalFileHeaderReader {
         localFileHeader.setGeneralPurposeFlag(in.readWord());
         localFileHeader.setCompressionMethod(CompressionMethod.parseValue(in.readWord()));
         localFileHeader.setLastModifiedTime(in.readDword());
-        localFileHeader.setCrc32(in.readDword());
+        localFileHeader.setCrc32(in.readDwordLong());
         localFileHeader.setCompressedSize(in.readDwordLong());
         localFileHeader.setUncompressedSize(in.readDwordLong());
         int fileNameLength = in.readWord();

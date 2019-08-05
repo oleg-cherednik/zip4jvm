@@ -67,8 +67,8 @@ public class LittleEndianReadFile implements DataInput {
     }
 
     @Override
-    public byte readByte() throws IOException {
-        return in.readByte();
+    public int readByte() throws IOException {
+        return in.read();
     }
 
     @Override
@@ -120,7 +120,7 @@ public class LittleEndianReadFile implements DataInput {
 
     @Override
     public String toString() {
-        return "offs: " + getOffs();
+        return "offs: " + getOffs() + " (0x" + Long.toHexString(getOffs()) + ')';
     }
 
 }

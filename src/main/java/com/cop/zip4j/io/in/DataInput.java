@@ -23,7 +23,7 @@ public interface DataInput extends Closeable {
 
     String readString(int length) throws IOException;
 
-    byte readByte() throws IOException;
+    int readByte() throws IOException;
 
     byte[] readBytes(int total) throws IOException;
 

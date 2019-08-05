@@ -3,7 +3,6 @@ package com.cop.zip4j.io.in.entry;
 import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.in.MarkDataInput;
-import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.ZipModel;
 import org.apache.commons.io.IOUtils;
@@ -22,7 +21,6 @@ final class StoreEntryInputStream extends InputStream {
     private static final String MARK = StoreEntryInputStream.class.getSimpleName();
 
     private final ZipModel zipModel;
-    private final CentralDirectory.FileHeader fileHeader;
     private final LocalFileHeader localFileHeader;
     private final Decoder decoder;
     private final long compressedSize;
@@ -30,11 +28,9 @@ final class StoreEntryInputStream extends InputStream {
 
     private final Checksum checksum = new CRC32();
 
-    public StoreEntryInputStream(ZipModel zipModel, CentralDirectory.FileHeader fileHeader, LocalFileHeader localFileHeader, Decoder decoder,
-            MarkDataInput in) {
+    public StoreEntryInputStream(ZipModel zipModel, LocalFileHeader localFileHeader, Decoder decoder, MarkDataInput in) {
         this.zipModel = zipModel;
         this.decoder = decoder;
-        this.fileHeader = fileHeader;
         this.localFileHeader = localFileHeader;
         compressedSize = decoder.getCompressedSize(localFileHeader);
         this.in = in;
@@ -49,18 +45,22 @@ final class StoreEntryInputStream extends InputStream {
 
     @Override
     public int read() throws IOException {
-        if (available() == 0)
-            return IOUtils.EOF;
+        int b = available() == 0 ? IOUtils.EOF : in.readByte();
 
-        byte b = in.readByte();
-        checksum.update(b);
+        if (b != IOUtils.EOF)
+            checksum.update(b);
+
         return b;
+    }
+
+    private void checkChecksum() {
+        if (checksum.getValue() != localFileHeader.getCrc32())
+            throw new Zip4jException("Checksum is not match for entry: " + localFileHeader.getFileName());
     }
 
     @Override
     public void close() throws IOException {
-        if (checksum.getValue() != localFileHeader.getCrc32())
-            throw new Zip4jException("Checksum is not match for entry: " + localFileHeader.getFileName());
+        checkChecksum();
     }
 
 }

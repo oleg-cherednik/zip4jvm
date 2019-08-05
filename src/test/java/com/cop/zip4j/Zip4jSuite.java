@@ -38,6 +38,7 @@ public class Zip4jSuite {
     public static final Path winRarPkwareZip = Paths.get("src/test/resources/pkware.zip").toAbsolutePath();
     public static final Path winRarAesZip = Paths.get("src/test/resources/aes.zip").toAbsolutePath();
     public static final Path storeAesZip = Paths.get("src/test/resources/storeAes.zip").toAbsolutePath();
+    public static final Path wirRarStoreZip = Paths.get("src/test/resources/store.zip").toAbsolutePath();
 
     /** Password for encrypted zip */
     public static final char[] password = "1".toCharArray();

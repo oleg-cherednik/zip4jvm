@@ -27,9 +27,7 @@ public abstract class EntryInputStream extends InputStream {
 
     public static InputStream create(@NonNull CentralDirectory.FileHeader fileHeader, char[] password, MarkDataInput in, ZipModel zipModel)
             throws IOException {
-        long pos = in.getOffs();
         LocalFileHeader localFileHeader = new LocalFileHeaderReader(fileHeader).read(in);
-        in.seek(pos);
         Decoder decoder = localFileHeader.getEncryption().decoder(in, localFileHeader, password);
 
         in.seek(decoder.getOffs(localFileHeader));
@@ -37,8 +35,7 @@ public abstract class EntryInputStream extends InputStream {
         Compression compression = fileHeader.getCompression();
 
         if (compression == Compression.STORE)
-            return new StoreEntryInputStream(zipModel, fileHeader, localFileHeader, decoder, in);
-
+            return new StoreEntryInputStream(zipModel, localFileHeader, decoder, in);
         if (compression == Compression.DEFLATE) {
             PartInputStream pis = new PartInputStream(in, decoder.getCompressedSize(localFileHeader), decoder, zipModel);
             return new ZipInputStream(new InflaterInputStream(pis, fileHeader), fileHeader, decoder);
