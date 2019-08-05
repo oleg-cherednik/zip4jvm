@@ -71,18 +71,14 @@ public class UnzipEngine {
     }
 
     @NonNull
-    public InputStream extractEntry(@NonNull String entryName) {
+    public InputStream extractEntry(@NonNull String entryName) throws IOException {
         return extractEntryAsStream(zipModel.getCentralDirectory().getFileHeaderByEntryName(entryName));
     }
 
     @NonNull
-    private InputStream extractEntryAsStream(@NonNull CentralDirectory.FileHeader fileHeader) {
-        try {
-            MarkDataInput in = createInputStream(fileHeader);
-            return EntryInputStream.create(fileHeader, password, in, zipModel);
-        } catch(IOException e) {
-            throw new Zip4jException(e);
-        }
+    private InputStream extractEntryAsStream(@NonNull CentralDirectory.FileHeader fileHeader) throws IOException {
+        MarkDataInput in = createInputStream(fileHeader);
+        return EntryInputStream.create(fileHeader, password, in, zipModel);
     }
 
     private MarkDataInput createInputStream(@NonNull CentralDirectory.FileHeader fileHeader) throws IOException {

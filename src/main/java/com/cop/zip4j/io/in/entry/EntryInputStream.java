@@ -32,17 +32,15 @@ public abstract class EntryInputStream extends InputStream {
         in.seek(pos);
         Decoder decoder = localFileHeader.getEncryption().decoder(in, localFileHeader, password);
 
-        long comprSize = decoder.getCompressedSize(localFileHeader);
-
         in.seek(decoder.getOffs(localFileHeader));
 
         Compression compression = fileHeader.getCompression();
 
         if (compression == Compression.STORE)
-            return new StoreEntryInputStream(zipModel, decoder, comprSize, in);
+            return new StoreEntryInputStream(zipModel, fileHeader, localFileHeader, decoder, in);
 
         if (compression == Compression.DEFLATE) {
-            PartInputStream pis = new PartInputStream(in, comprSize, decoder, zipModel);
+            PartInputStream pis = new PartInputStream(in, decoder.getCompressedSize(localFileHeader), decoder, zipModel);
             return new ZipInputStream(new InflaterInputStream(pis, fileHeader), fileHeader, decoder);
         }
 
