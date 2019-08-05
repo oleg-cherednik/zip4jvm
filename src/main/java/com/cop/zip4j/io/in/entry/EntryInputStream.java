@@ -41,8 +41,8 @@ public abstract class EntryInputStream extends InputStream {
 
         if (compression == Compression.STORE) {
             InputStream pis = zipModel.isSplitArchive()
-                              ? new SingleInputStream(in, comprSize, decoder, zipModel)
-                              : new PartInputStream(in, comprSize, decoder, zipModel);
+                              ? new PartInputStream(in, comprSize, decoder, zipModel)
+                              : new SingleInputStream(in, comprSize, decoder, zipModel);
             return new ZipInputStream(pis, fileHeader, decoder);
         }
 
