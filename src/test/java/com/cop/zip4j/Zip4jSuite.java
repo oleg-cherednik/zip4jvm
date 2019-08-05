@@ -31,6 +31,7 @@ public class Zip4jSuite {
     public static final Path emptyDir = srcDir.resolve("empty_dir");
 
     public static final Path noSplitZip = rootDir.resolve("no_split/src.zip");
+    public static final Path storeZip = rootDir.resolve("store/src.zip");
     public static final Path noSplitPkwareZip = rootDir.resolve("no_split_pkware/src.zip");
     public static final Path splitZip = rootDir.resolve("split/src.zip");
 
@@ -49,9 +50,10 @@ public class Zip4jSuite {
         removeDir(rootDir);
 
         copyTestData();
-        createNoSplitZip();
-        createEncryptedNoSplitZip();
-        createSplitZip();
+        createStoreZip();
+        createDeflateZip();
+        createDeflatePkwareZip();
+        createDeflateNormalSplitZip();
     }
 
     @AfterSuite(enabled = clear)
@@ -78,7 +80,19 @@ public class Zip4jSuite {
         assertThatDirectory(srcDir).matches(TestUtils.dirAssert);
     }
 
-    private static void createNoSplitZip() throws IOException {
+    private static void createStoreZip() throws IOException {
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compressionMethod(Compression.STORE)
+                                                .build();
+        ZipIt zip = ZipIt.builder().zipFile(storeZip).build();
+        zip.add(srcDir, parameters);
+
+        assertThat(Files.exists(storeZip)).isTrue();
+        assertThat(Files.isRegularFile(storeZip)).isTrue();
+        assertThatDirectory(storeZip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+    }
+
+    private static void createDeflateZip() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(Compression.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL).build();
@@ -90,7 +104,7 @@ public class Zip4jSuite {
         assertThatDirectory(noSplitZip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
     }
 
-    private static void createSplitZip() throws IOException {
+    private static void createDeflateNormalSplitZip() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(Compression.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
@@ -103,7 +117,7 @@ public class Zip4jSuite {
         assertThatDirectory(splitZip.getParent()).exists().hasSubDirectories(0).hasFiles(10);
     }
 
-    private static void createEncryptedNoSplitZip() throws IOException {
+    private static void createDeflatePkwareZip() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(Compression.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
@@ -141,8 +155,12 @@ public class Zip4jSuite {
         return rootDir.resolve(cls.getSimpleName()).resolve(Paths.get(String.valueOf(time)));
     }
 
-    public static Path subDirNameAsMethodName(Path rootDir) {
+    public static Path subDirNameAsMethodNameWithTme(Path rootDir) {
         return rootDir.resolve(TestUtils.getMethodName()).resolve(Paths.get(String.valueOf(time)));
+    }
+
+    public static Path subDirNameAsMethodName(Path rootDir) {
+        return rootDir.resolve(TestUtils.getMethodName());
     }
 
 }

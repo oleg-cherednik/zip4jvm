@@ -33,7 +33,7 @@ public class CompatibilityTest {
     private static final Path rootDir = Zip4jSuite.generateSubDirName(CompatibilityTest.class);
 
     public void zip4jShouldBeReadableForZipFile() throws IOException {
-        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
 
         try (ZipFile zipFile = new ZipFile(Zip4jSuite.noSplitZip.toFile())) {
             Enumeration<? extends ZipEntry> entries = zipFile.entries();
@@ -83,7 +83,7 @@ public class CompatibilityTest {
 //    }
 
     public void zip4jPkwareEncryptionShouldBeReadableForSevenZipTool() throws IOException {
-        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
 
         try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(Zip4jSuite.noSplitPkwareZip.toFile(), "r"));
              IInArchive zip = SevenZip.openInArchive(ArchiveFormat.ZIP, in)) {
@@ -119,7 +119,7 @@ public class CompatibilityTest {
     }
 
     public void winRarPkwareEncryptionZipShouldBeReadableForZip4j() throws IOException {
-        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
         Files.createDirectories(destDir);
 
         assertThat(Files.exists(Zip4jSuite.winRarPkwareZip)).isTrue();

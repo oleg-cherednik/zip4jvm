@@ -67,7 +67,7 @@ public class EncryptionAesTest {
                                                 .comment("password: " + new String(Zip4jSuite.password))
                                                 .password(Zip4jSuite.password).build();
 
-        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
         Path zipFile = destDir.resolve("src.zip");
 
 //        Path bentley = Zip4jSuite.carsDir.resolve("bentley-continental.jpg");

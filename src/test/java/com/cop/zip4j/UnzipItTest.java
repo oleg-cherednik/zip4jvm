@@ -40,7 +40,7 @@ public class UnzipItTest {
 
     @Test
     public void shouldUnzipRequiredFiles() throws Zip4jException, IOException {
-        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
         List<String> entries = Arrays.asList("saint-petersburg.jpg", "cars/bentley-continental.jpg");
         UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.noSplitZip).build();
         unzip.extract(destDir, entries);
@@ -54,7 +54,7 @@ public class UnzipItTest {
     @Test
     @Ignore
     public void shouldUnzipRequiredFilesWhenSplit() throws Zip4jException, IOException {
-        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
         List<String> entries = Arrays.asList("saint-petersburg.jpg", "cars/bentley-continental.jpg");
         UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.splitZip).build();
         unzip.extract(destDir, entries);
@@ -67,7 +67,7 @@ public class UnzipItTest {
 
     @Test
     public void shouldUnzipOneFile() throws Zip4jException, IOException {
-        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
         UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.noSplitZip).build();
         unzip.extract(destDir, "cars/ferrari-458-italia.jpg");
 
@@ -78,7 +78,7 @@ public class UnzipItTest {
 
     @Test
     public void shouldUnzipFolder() throws Zip4jException, IOException {
-        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
         UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.noSplitZip).build();
         unzip.extract(destDir, "Star Wars");
 
@@ -101,7 +101,7 @@ public class UnzipItTest {
                                                 .comment("password: " + new String(Zip4jSuite.password))
                                                 .password(Zip4jSuite.password).build();
 
-        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
         Path zipFile = destDir.resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         zip.add(Zip4jSuite.srcDir, parameters);

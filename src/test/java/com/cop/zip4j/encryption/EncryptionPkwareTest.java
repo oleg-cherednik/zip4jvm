@@ -52,7 +52,7 @@ public class EncryptionPkwareTest {
                                                 .comment("password: " + new String(Zip4jSuite.password))
                                                 .password(Zip4jSuite.password).build();
 
-        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
         Path zipFile = destDir.resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         zip.add(Zip4jSuite.srcDir, parameters);
@@ -69,7 +69,7 @@ public class EncryptionPkwareTest {
                                                 .comment("password: " + new String(Zip4jSuite.password))
                                                 .password(Zip4jSuite.password).build();
 
-        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
         Path zipFile = destDir.resolve("src.zip");
 
         Path bentley = Zip4jSuite.carsDir.resolve("bentley-continental.jpg");
@@ -92,7 +92,7 @@ public class EncryptionPkwareTest {
                                                 .encryption(Encryption.PKWARE)
                                                 .password(null).build();
 
-        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
         Path zipFile = destDir.resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
 
@@ -106,7 +106,7 @@ public class EncryptionPkwareTest {
                                                 .encryption(Encryption.PKWARE)
                                                 .password("".toCharArray()).build();
 
-        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
         Path zipFile = destDir.resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
 
@@ -121,7 +121,7 @@ public class EncryptionPkwareTest {
                                                 .comment("password: " + new String(Zip4jSuite.password))
                                                 .password(Zip4jSuite.password).build();
 
-        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
         Path zipFile = destDir.resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         zip.add(Zip4jSuite.srcDir, parameters);
@@ -143,7 +143,7 @@ public class EncryptionPkwareTest {
                                                 .comment("password: " + new String(Zip4jSuite.password))
                                                 .password(Zip4jSuite.password).build();
 
-        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
         Path zipFile = destDir.resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         zip.add(Zip4jSuite.srcDir, parameters);

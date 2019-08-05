@@ -1,6 +1,7 @@
 package com.cop.zip4j.compression;
 
 import com.cop.zip4j.TestUtils;
+import com.cop.zip4j.UnzipIt;
 import com.cop.zip4j.Zip4jSuite;
 import com.cop.zip4j.ZipIt;
 import com.cop.zip4j.exception.Zip4jException;
@@ -24,11 +25,11 @@ import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatZipFile;
  * @author Oleg Cherednik
  * @since 15.03.2019
  */
+@Test
 @SuppressWarnings("FieldNamingConvention")
 public class CompressionStoreTest {
 
     private static final Path rootDir = Zip4jSuite.generateSubDirNameWithTime(CompressionStoreTest.class);
-    private static final Path zipFile = rootDir.resolve("src.zip");
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -40,8 +41,10 @@ public class CompressionStoreTest {
         Zip4jSuite.removeDir(rootDir);
     }
 
-    @Test
     public void shouldCreateNewZipWithFilesWhenStoreCompression() throws IOException, Zip4jException {
+        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path zipFile = destDir.resolve("src.zip");
+
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(Compression.STORE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
@@ -59,4 +62,15 @@ public class CompressionStoreTest {
         assertThatZipFile(zipFile).exists().rootEntry().hasSubDirectories(1).hasFiles(0);
         assertThatZipFile(zipFile).directory("cars/").matches(TestUtils.zipCarsDirAssert);
     }
+
+    public void shouldUnzipWhenStoreCompression() throws IOException {
+        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        UnzipIt unzip = UnzipIt.builder()
+                               .zipFile(Zip4jSuite.storeZip)
+                               .build();
+        unzip.extract(destDir);
+        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
+    }
+
+
 }
