@@ -72,5 +72,14 @@ public class CompressionStoreTest {
         assertThatDirectory(destDir).matches(TestUtils.dirAssert);
     }
 
+    public void shouldUnzipWhenStoreCompressionAesEncryption() throws IOException {
+        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        UnzipIt unzip = UnzipIt.builder()
+                               .zipFile(Zip4jSuite.storeAesZip)
+                               .password(Zip4jSuite.password)
+                               .build();
+        unzip.extract(destDir);
+        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
+    }
 
 }
