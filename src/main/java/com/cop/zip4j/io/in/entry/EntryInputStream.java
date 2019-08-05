@@ -5,9 +5,8 @@ import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.InflaterInputStream;
 import com.cop.zip4j.io.PartInputStream;
-import com.cop.zip4j.io.SingleInputStream;
 import com.cop.zip4j.io.ZipInputStream;
-import com.cop.zip4j.io.in.DataInput;
+import com.cop.zip4j.io.in.MarkDataInput;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.LocalFileHeader;
@@ -26,7 +25,7 @@ import java.io.InputStream;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class EntryInputStream extends InputStream {
 
-    public static InputStream create(@NonNull CentralDirectory.FileHeader fileHeader, char[] password, DataInput in, ZipModel zipModel)
+    public static InputStream create(@NonNull CentralDirectory.FileHeader fileHeader, char[] password, MarkDataInput in, ZipModel zipModel)
             throws IOException {
         long pos = in.getOffs();
         LocalFileHeader localFileHeader = new LocalFileHeaderReader(fileHeader).read(in);
@@ -39,12 +38,8 @@ public abstract class EntryInputStream extends InputStream {
 
         Compression compression = fileHeader.getCompression();
 
-        if (compression == Compression.STORE) {
-            InputStream pis = zipModel.isSplitArchive()
-                              ? new PartInputStream(in, comprSize, decoder, zipModel)
-                              : new SingleInputStream(in, comprSize, decoder, zipModel);
-            return new ZipInputStream(pis, fileHeader, decoder);
-        }
+        if (compression == Compression.STORE)
+            return new StoreEntryInputStream(zipModel, decoder, comprSize, in);
 
         if (compression == Compression.DEFLATE) {
             PartInputStream pis = new PartInputStream(in, comprSize, decoder, zipModel);

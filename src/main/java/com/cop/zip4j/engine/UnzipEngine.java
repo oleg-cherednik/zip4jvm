@@ -1,7 +1,7 @@
 package com.cop.zip4j.engine;
 
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.io.in.DataInput;
+import com.cop.zip4j.io.in.MarkDataInput;
 import com.cop.zip4j.io.in.SingleZipInputStream;
 import com.cop.zip4j.io.in.SplitZipInputStream;
 import com.cop.zip4j.io.in.entry.EntryInputStream;
@@ -78,14 +78,14 @@ public class UnzipEngine {
     @NonNull
     private InputStream extractEntryAsStream(@NonNull CentralDirectory.FileHeader fileHeader) {
         try {
-            DataInput in = createInputStream(fileHeader);
+            MarkDataInput in = createInputStream(fileHeader);
             return EntryInputStream.create(fileHeader, password, in, zipModel);
         } catch(IOException e) {
             throw new Zip4jException(e);
         }
     }
 
-    private DataInput createInputStream(@NonNull CentralDirectory.FileHeader fileHeader) throws IOException {
+    private MarkDataInput createInputStream(@NonNull CentralDirectory.FileHeader fileHeader) throws IOException {
         return zipModel.isSplitArchive() ? SplitZipInputStream.create(zipModel, fileHeader.getDiskNumber()) : SingleZipInputStream.create(zipModel);
     }
 

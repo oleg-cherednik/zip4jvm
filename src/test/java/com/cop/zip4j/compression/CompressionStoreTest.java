@@ -66,20 +66,21 @@ public class CompressionStoreTest {
     public void shouldUnzipWhenStoreCompression() throws IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         UnzipIt unzip = UnzipIt.builder()
+                               //Paths.get("d:/zip4j/tmp/store.zip")
                                .zipFile(Zip4jSuite.storeZip)
                                .build();
         unzip.extract(destDir);
         assertThatDirectory(destDir).matches(TestUtils.dirAssert);
     }
 
-    public void shouldUnzipWhenStoreCompressionAesEncryption() throws IOException {
-        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt unzip = UnzipIt.builder()
-                               .zipFile(Zip4jSuite.storeAesZip)
-                               .password(Zip4jSuite.password)
-                               .build();
-        unzip.extract(destDir);
-        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
-    }
+//    public void shouldUnzipWhenStoreCompressionAesEncryption() throws IOException {
+//        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+//        UnzipIt unzip = UnzipIt.builder()
+//                               .zipFile(Zip4jSuite.storeAesZip)
+//                               .password(Zip4jSuite.password)
+//                               .build();
+//        unzip.extract(destDir);
+//        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
+//    }
 
 }
