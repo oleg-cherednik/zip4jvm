@@ -7,7 +7,6 @@ import lombok.NonNull;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -16,7 +15,7 @@ import java.nio.file.Path;
  */
 public class SplitZipInputStream extends BaseMarkDataInput {
 
-    private int counter;
+    private int diskNumber;
 
     @NonNull
     public static SplitZipInputStream create(@NonNull ZipModel zipModel, int diskNumber) throws IOException {
@@ -25,13 +24,13 @@ public class SplitZipInputStream extends BaseMarkDataInput {
 
     private SplitZipInputStream(@NonNull ZipModel zipModel, int diskNumber) throws IOException {
         super(zipModel);
-        counter = diskNumber + 1;
+        this.diskNumber = diskNumber;
         delegate = new LittleEndianReadFile(zipModel.getPartFile(diskNumber));
         checkSignature();
     }
 
     private void checkSignature() throws IOException {
-        if (counter != 1)
+        if (diskNumber != 0)
             return;
 
         int signature = delegate.readDword();
@@ -42,18 +41,6 @@ public class SplitZipInputStream extends BaseMarkDataInput {
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-//        if (len > length - bytesRead) {
-//            len = (int)(length - bytesRead);
-//
-//            if (len == 0) {
-//                checkAndReadAESMacBytes();
-//                checkAndReadAESNewMacBytes();
-//                return -1;
-//            }
-//        }
-//
-//        len = decoder.getLen(bytesRead, len, length);
-
         int res = 0;
 
         while (res < len) {
@@ -74,27 +61,9 @@ public class SplitZipInputStream extends BaseMarkDataInput {
     }
 
     private void openNextSplit() throws IOException {
-        Path splitFile = zipModel.getPartFile(counter++);
+        Path splitFile = zipModel.getPartFile(++diskNumber);
         delegate.close();
         delegate = new LittleEndianReadFile(splitFile);
-    }
-
-    private DataInput openNextSplitOld() throws IOException {
-        Path currSplitFile = zipModel.getZipFile();
-
-        if (counter != zipModel.getEndCentralDirectory().getSplitParts())
-            currSplitFile = ZipModel.getSplitFilePath(currSplitFile, counter + 1);
-
-        if (!Files.exists(currSplitFile))
-            throw new Zip4jException("split file: " + currSplitFile.getFileName() + " does not exists");
-
-        counter++;
-        return new LittleEndianReadFile(currSplitFile);
-    }
-
-    @Override
-    public int getCounter() {
-        return 0;
     }
 
     @Override

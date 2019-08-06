@@ -10,6 +10,4 @@ public interface MarkDataInput extends DataInput {
 
     long getWrittenBytesAmount(String id);
 
-    int getCounter();
-
 }

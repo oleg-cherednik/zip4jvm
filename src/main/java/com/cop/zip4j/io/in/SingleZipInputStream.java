@@ -29,11 +29,6 @@ public class SingleZipInputStream extends BaseMarkDataInput {
     }
 
     @Override
-    public int getCounter() {
-        return 0;
-    }
-
-    @Override
     public void close() throws IOException {
         delegate.close();
     }
