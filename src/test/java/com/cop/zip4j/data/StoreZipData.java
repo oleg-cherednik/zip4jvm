@@ -8,6 +8,9 @@ import lombok.experimental.UtilityClass;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,8 +23,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class StoreZipData {
 
     public static void createStoreZip() throws IOException {
-        createStoreSplitZip();
         createStoreSolidZip();
+        createStoreSplitZip();
         createDeflateSolidZip();
     }
 
@@ -41,10 +44,17 @@ public class StoreZipData {
     private static void createStoreSplitZip() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(Compression.STORE)
+                                                .defaultFolderPath(Zip4jSuite.srcDir)
                                                 .splitLength(1024 * 1024)
                                                 .build();
+
+        Path bentley = Zip4jSuite.carsDir.resolve("bentley-continental.jpg");
+        Path ferrari = Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg");
+        Path wiesmann = Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg");
+        List<Path> files = Arrays.asList(bentley, ferrari, wiesmann);
+
         ZipIt zip = ZipIt.builder().zipFile(Zip4jSuite.storeSplitZip).build();
-        zip.add(Zip4jSuite.srcDir, parameters);
+        zip.add(files, parameters);
 
         assertThat(Files.exists(Zip4jSuite.storeSplitZip)).isTrue();
         assertThat(Files.isRegularFile(Zip4jSuite.storeSplitZip)).isTrue();
