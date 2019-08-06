@@ -6,7 +6,6 @@ import com.cop.zip4j.Zip4jSuite;
 import com.cop.zip4j.ZipIt;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.Compression;
-import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.ZipParameters;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -42,13 +41,9 @@ public class CompressionStoreTest {
         Zip4jSuite.removeDir(rootDir);
     }
 
-    public void shouldCreateZipWithFilesWhenStoreCompression() throws IOException, Zip4jException {
-        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        Path zipFile = destDir.resolve("src.zip");
-
+    public void shouldCreateSingleZipWithFilesWhenStoreCompression() throws IOException, Zip4jException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(Compression.STORE)
-                                                .compressionLevel(CompressionLevel.NORMAL)
                                                 .defaultFolderPath(Zip4jSuite.srcDir).build();
 
         Path bentley = Zip4jSuite.carsDir.resolve("bentley-continental.jpg");
@@ -56,8 +51,23 @@ public class CompressionStoreTest {
         Path wiesmann = Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg");
         List<Path> files = Arrays.asList(bentley, ferrari, wiesmann);
 
+        Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         zip.add(files, parameters);
+
+        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatZipFile(zipFile).exists().rootEntry().hasSubDirectories(1).hasFiles(0);
+        assertThatZipFile(zipFile).directory("cars/").matches(TestUtils.zipCarsDirAssert);
+    }
+
+    public void shouldCreateSingleZipWithEntireFolderWhenStoreCompression() throws IOException, Zip4jException {
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compressionMethod(Compression.STORE)
+                                                .defaultFolderPath(Zip4jSuite.srcDir).build();
+
+        Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        ZipIt zipIt = ZipIt.builder().zipFile(zipFile).build();
+        zipIt.add(Zip4jSuite.carsDir, parameters);
 
         assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
         assertThatZipFile(zipFile).exists().rootEntry().hasSubDirectories(1).hasFiles(0);
@@ -67,7 +77,7 @@ public class CompressionStoreTest {
     public void shouldUnzipWhenStoreCompression() throws IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         UnzipIt unzip = UnzipIt.builder()
-                               .zipFile(Zip4jSuite.storeZip)
+                               .zipFile(Zip4jSuite.storeSolidZip)
                                .build();
         unzip.extract(destDir);
         assertThatDirectory(destDir).matches(TestUtils.dirAssert);

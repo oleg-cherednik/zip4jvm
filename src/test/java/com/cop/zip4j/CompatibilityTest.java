@@ -35,7 +35,7 @@ public class CompatibilityTest {
     public void zip4jShouldBeReadableForZipFile() throws IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
 
-        try (ZipFile zipFile = new ZipFile(Zip4jSuite.noSplitZip.toFile())) {
+        try (ZipFile zipFile = new ZipFile(Zip4jSuite.deflateSolidZip.toFile())) {
             Enumeration<? extends ZipEntry> entries = zipFile.entries();
 
             while (entries.hasMoreElements()) {
@@ -85,7 +85,7 @@ public class CompatibilityTest {
     public void zip4jPkwareEncryptionShouldBeReadableForSevenZipTool() throws IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
 
-        try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(Zip4jSuite.noSplitPkwareZip.toFile(), "r"));
+        try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(Zip4jSuite.deflateSolidPkwareZip.toFile(), "r"));
              IInArchive zip = SevenZip.openInArchive(ArchiveFormat.ZIP, in)) {
 
             for (ISimpleInArchiveItem item : zip.getSimpleInterface().getArchiveItems()) {

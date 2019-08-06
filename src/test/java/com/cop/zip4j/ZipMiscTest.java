@@ -36,12 +36,12 @@ public class ZipMiscTest {
     }
 
     public void shouldRetrieveAllEntryNamesForExistedZip() throws IOException {
-        ZipMisc misc = ZipMisc.builder().zipFile(Zip4jSuite.noSplitZip).build();
+        ZipMisc misc = ZipMisc.builder().zipFile(Zip4jSuite.deflateSolidZip).build();
         assertThat(misc.getEntryNames()).hasSize(15);
     }
 
     public void shouldRetrieveAllEntryNamesForExistedEncryptedZip() throws IOException {
-        Path zipFile = Zip4jSuite.copy(rootDir, Zip4jSuite.noSplitPkwareZip);
+        Path zipFile = Zip4jSuite.copy(rootDir, Zip4jSuite.deflateSolidPkwareZip);
 
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
         assertThat(misc.isEncrypted()).isTrue();
@@ -49,7 +49,7 @@ public class ZipMiscTest {
     }
 
     public void shouldRetrieveSingleFileWhenNoSplitZip() throws IOException {
-        ZipMisc misc = ZipMisc.builder().zipFile(Zip4jSuite.noSplitZip).build();
+        ZipMisc misc = ZipMisc.builder().zipFile(Zip4jSuite.deflateSolidZip).build();
         assertThat(misc.getFiles()).hasSize(1);
     }
 
@@ -83,7 +83,7 @@ public class ZipMiscTest {
     }
 
     public void shouldMergeSplitZip() throws IOException {
-        ZipMisc misc = ZipMisc.builder().zipFile(Zip4jSuite.splitZip).build();
+        ZipMisc misc = ZipMisc.builder().zipFile(Zip4jSuite.deflateSplitZip).build();
         assertThat(misc.isSplit()).isTrue();
 
         Path mergeDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);

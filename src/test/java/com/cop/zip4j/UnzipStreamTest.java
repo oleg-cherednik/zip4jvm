@@ -33,7 +33,7 @@ public class UnzipStreamTest {
     @Test
     public void shouldUnzipEntryToStreamWhenNoSplit() throws Zip4jException, IOException {
         Path imgFile = rootDir.resolve("bentley-continental.jpg");
-        UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.noSplitZip).build();
+        UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.deflateSolidZip).build();
         TestUtils.copyLarge(unzip.extract("cars/bentley-continental.jpg"), imgFile);
         assertThatFile(imgFile).exists().isImage().hasSize(1_395_362);
     }
@@ -41,7 +41,7 @@ public class UnzipStreamTest {
     @Test
     public void shouldUnzipEntryToStreamWhenSplit() throws Zip4jException, IOException {
         Path imgFile = rootDir.resolve("ferrari-458-italia.jpg");
-        UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.splitZip).build();
+        UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.deflateSplitZip).build();
         TestUtils.copyLarge(unzip.extract("cars/ferrari-458-italia.jpg"), imgFile);
         assertThatFile(imgFile).exists().isImage().hasSize(320_894);
     }

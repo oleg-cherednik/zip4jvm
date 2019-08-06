@@ -42,7 +42,7 @@ public class UnzipItTest {
     public void shouldUnzipRequiredFiles() throws Zip4jException, IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
         List<String> entries = Arrays.asList("saint-petersburg.jpg", "cars/bentley-continental.jpg");
-        UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.noSplitZip).build();
+        UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.deflateSolidZip).build();
         unzip.extract(destDir, entries);
 
         assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(1);
@@ -56,7 +56,7 @@ public class UnzipItTest {
     public void shouldUnzipRequiredFilesWhenSplit() throws Zip4jException, IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
         List<String> entries = Arrays.asList("saint-petersburg.jpg", "cars/bentley-continental.jpg");
-        UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.splitZip).build();
+        UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.deflateSplitZip).build();
         unzip.extract(destDir, entries);
 
         assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(1);
@@ -68,7 +68,7 @@ public class UnzipItTest {
     @Test
     public void shouldUnzipOneFile() throws Zip4jException, IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
-        UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.noSplitZip).build();
+        UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.deflateSolidZip).build();
         unzip.extract(destDir, "cars/ferrari-458-italia.jpg");
 
         assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);
@@ -79,7 +79,7 @@ public class UnzipItTest {
     @Test
     public void shouldUnzipFolder() throws Zip4jException, IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
-        UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.noSplitZip).build();
+        UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.deflateSolidZip).build();
         unzip.extract(destDir, "Star Wars");
 
         assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);

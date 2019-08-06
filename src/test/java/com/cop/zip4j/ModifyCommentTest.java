@@ -81,7 +81,7 @@ public class ModifyCommentTest {
 //    @Ignore("it's not working under gradle build")
     public void shouldAddCommentToEncryptedZip() throws Zip4jException, IOException {
         Files.deleteIfExists(zipFile);
-        Files.copy(Zip4jSuite.noSplitPkwareZip, zipFile);
+        Files.copy(Zip4jSuite.deflateSolidPkwareZip, zipFile);
 
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
         assertThat(misc.isEncrypted()).isTrue();
@@ -95,7 +95,7 @@ public class ModifyCommentTest {
 //    @Ignore("it's not working under gradle build")
     public void shouldSetCommentWithMaxLength() throws IOException {
         Path zipFile = rootDir.resolve("src_" + System.currentTimeMillis() + ".zip");
-        Files.copy(Zip4jSuite.noSplitZip, zipFile);
+        Files.copy(Zip4jSuite.deflateSolidZip, zipFile);
 
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
         assertThat(misc.getComment()).isNull();
@@ -107,7 +107,7 @@ public class ModifyCommentTest {
     @Test
 //    @Ignore("it's not working under gradle build")
     public void shouldThrowExceptionWhenCommentIsOverMaxLength() throws IOException {
-        Path zipFile = Zip4jSuite.copy(rootDir, Zip4jSuite.noSplitZip);
+        Path zipFile = Zip4jSuite.copy(rootDir, Zip4jSuite.deflateSolidZip);
 
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
         assertThat(misc.getComment()).isNull();
