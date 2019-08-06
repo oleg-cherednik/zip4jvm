@@ -31,7 +31,8 @@ public class Zip4jSuite {
     public static final Path emptyDir = srcDir.resolve("empty_dir");
 
     public static final Path noSplitZip = rootDir.resolve("no_split/src.zip");
-    public static final Path storeZip = rootDir.resolve("store/src.zip");
+    public static final Path storeZip = rootDir.resolve("store/solid/src.zip");
+    public static final Path storeSplitZip = rootDir.resolve("store/split/src.zip");
     public static final Path noSplitPkwareZip = rootDir.resolve("no_split_pkware/src.zip");
     public static final Path splitZip = rootDir.resolve("split/src.zip");
 
@@ -53,6 +54,7 @@ public class Zip4jSuite {
 
         copyTestData();
         createStoreZip();
+        createStoreSplitZip();
         createDeflateZip();
         createDeflatePkwareZip();
         createDeflateNormalSplitZip();
@@ -92,6 +94,19 @@ public class Zip4jSuite {
         assertThat(Files.exists(storeZip)).isTrue();
         assertThat(Files.isRegularFile(storeZip)).isTrue();
         assertThatDirectory(storeZip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+    }
+
+    private static void createStoreSplitZip() throws IOException {
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compressionMethod(Compression.STORE)
+                                                .splitLength(1024 * 1024)
+                                                .build();
+        ZipIt zip = ZipIt.builder().zipFile(storeSplitZip).build();
+        zip.add(srcDir, parameters);
+
+        assertThat(Files.exists(storeSplitZip)).isTrue();
+        assertThat(Files.isRegularFile(storeSplitZip)).isTrue();
+        assertThatDirectory(storeSplitZip.getParent()).exists().hasSubDirectories(0).hasFiles(11);
     }
 
     private static void createDeflateZip() throws IOException {

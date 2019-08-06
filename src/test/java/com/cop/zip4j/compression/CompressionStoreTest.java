@@ -41,7 +41,7 @@ public class CompressionStoreTest {
         Zip4jSuite.removeDir(rootDir);
     }
 
-    public void shouldCreateNewZipWithFilesWhenStoreCompression() throws IOException, Zip4jException {
+    public void shouldCreateZipWithFilesWhenStoreCompression() throws IOException, Zip4jException {
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         Path zipFile = destDir.resolve("src.zip");
 
@@ -69,7 +69,7 @@ public class CompressionStoreTest {
                                .zipFile(Zip4jSuite.storeZip)
                                .build();
         unzip.extract(destDir);
-//        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
+        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
     }
 
 //    public void shouldUnzipWhenStoreCompressionAesEncryption() throws IOException {
