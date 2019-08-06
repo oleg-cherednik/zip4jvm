@@ -6,7 +6,7 @@ import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.InflaterInputStream;
 import com.cop.zip4j.io.PartInputStream;
 import com.cop.zip4j.io.ZipInputStream;
-import com.cop.zip4j.io.in.MarkDataInput;
+import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.LocalFileHeader;
@@ -25,7 +25,7 @@ import java.io.InputStream;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class EntryInputStream extends InputStream {
 
-    public static InputStream create(@NonNull CentralDirectory.FileHeader fileHeader, char[] password, MarkDataInput in, ZipModel zipModel)
+    public static InputStream create(@NonNull CentralDirectory.FileHeader fileHeader, char[] password, DataInput in, ZipModel zipModel)
             throws IOException {
         LocalFileHeader localFileHeader = new LocalFileHeaderReader(fileHeader).read(in);
         Decoder decoder = localFileHeader.getEncryption().decoder(in, localFileHeader, password);

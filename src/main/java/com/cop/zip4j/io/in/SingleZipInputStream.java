@@ -11,7 +11,7 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
-public class SingleZipInputStream extends BaseMarkDataInput {
+public class SingleZipInputStream extends BaseDataInput {
 
     @NonNull
     public static SingleZipInputStream create(@NonNull ZipModel zipModel) throws FileNotFoundException {

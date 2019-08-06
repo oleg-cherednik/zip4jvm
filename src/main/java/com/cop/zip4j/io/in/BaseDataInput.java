@@ -5,23 +5,19 @@ import lombok.NonNull;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
-abstract class BaseMarkDataInput implements MarkDataInput {
-
-    private final Map<String, Long> map = new HashMap<>();
+abstract class BaseDataInput implements DataInput {
 
     @NonNull
     protected final ZipModel zipModel;
     @NonNull
     protected DataInput delegate;
 
-    protected BaseMarkDataInput(@NonNull ZipModel zipModel) throws FileNotFoundException {
+    protected BaseDataInput(@NonNull ZipModel zipModel) throws FileNotFoundException {
         this.zipModel = zipModel;
     }
 
@@ -73,16 +69,6 @@ abstract class BaseMarkDataInput implements MarkDataInput {
     @Override
     public void seek(long pos) throws IOException {
         delegate.seek(pos);
-    }
-
-    @Override
-    public void mark(String id) {
-        map.put(id, getOffs());
-    }
-
-    @Override
-    public long getWrittenBytesAmount(String id) {
-        return getOffs() - map.getOrDefault(id, 0L);
     }
 
     @Override

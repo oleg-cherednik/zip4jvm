@@ -10,8 +10,6 @@ import com.cop.zip4j.model.ZipParameters;
 import com.cop.zip4j.model.aes.AesStrength;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Ignore;
-import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -24,8 +22,8 @@ import java.util.List;
  * @author Oleg Cherednik
  * @since 29.07.2019
  */
-@Test
-@Ignore
+//@Test
+//@Ignore
 @SuppressWarnings("FieldNamingConvention")
 public class EncryptionAesTest {
 

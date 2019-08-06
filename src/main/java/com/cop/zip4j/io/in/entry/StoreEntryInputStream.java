@@ -2,7 +2,7 @@ package com.cop.zip4j.io.in.entry;
 
 import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.io.in.MarkDataInput;
+import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.ZipModel;
 import org.apache.commons.io.IOUtils;
@@ -22,13 +22,13 @@ final class StoreEntryInputStream extends InputStream {
     private final LocalFileHeader localFileHeader;
     private final Decoder decoder;
     private final long compressedSize;
-    private final MarkDataInput in;
+    private final DataInput in;
 
     private final Checksum checksum = new CRC32();
 
     private int readBytes;
 
-    public StoreEntryInputStream(ZipModel zipModel, LocalFileHeader localFileHeader, Decoder decoder, MarkDataInput in) {
+    public StoreEntryInputStream(ZipModel zipModel, LocalFileHeader localFileHeader, Decoder decoder, DataInput in) {
         this.zipModel = zipModel;
         this.decoder = decoder;
         this.localFileHeader = localFileHeader;
@@ -72,14 +72,14 @@ final class StoreEntryInputStream extends InputStream {
         return len;
     }
 
-    private void checkChecksum() {
-        if (checksum.getValue() != localFileHeader.getCrc32())
-            throw new Zip4jException("Checksum is not match for entry: " + localFileHeader.getFileName());
-    }
-
     @Override
     public void close() throws IOException {
         checkChecksum();
+    }
+
+    private void checkChecksum() {
+        if (checksum.getValue() != localFileHeader.getCrc32())
+            throw new Zip4jException("Checksum is not match for entry: " + localFileHeader.getFileName());
     }
 
 }

@@ -13,7 +13,7 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
-public class SplitZipInputStream extends BaseMarkDataInput {
+public class SplitZipInputStream extends BaseDataInput {
 
     private int diskNumber;
 
