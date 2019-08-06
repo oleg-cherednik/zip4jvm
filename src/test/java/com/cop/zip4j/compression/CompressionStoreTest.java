@@ -15,7 +15,6 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -67,8 +66,7 @@ public class CompressionStoreTest {
     public void shouldUnzipWhenStoreCompression() throws IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         UnzipIt unzip = UnzipIt.builder()
-                               .zipFile(Paths.get("d:/zip4j/tmp/a.zip"))
-//                               .zipFile(Zip4jSuite.wirRarStoreZip)
+                               .zipFile(Zip4jSuite.storeZip)
                                .build();
         unzip.extract(destDir);
 //        assertThatDirectory(destDir).matches(TestUtils.dirAssert);

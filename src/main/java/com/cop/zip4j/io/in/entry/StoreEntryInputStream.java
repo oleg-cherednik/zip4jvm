@@ -61,7 +61,7 @@ final class StoreEntryInputStream extends InputStream {
     public int read(byte[] buf, int offs, int len) throws IOException {
         len = Math.min(len, available());
 
-        if (available() == 0)
+        if (len == 0)
             return IOUtils.EOF;
 
         len = in.read(buf, offs, len);
