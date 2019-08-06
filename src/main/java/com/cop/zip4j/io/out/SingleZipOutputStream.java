@@ -17,9 +17,6 @@ import java.nio.file.Path;
 public class SingleZipOutputStream extends BaseMarkDataOutput {
 
     @NonNull
-    private final ZipModel zipModel;
-
-    @NonNull
     public static SingleZipOutputStream create(@NonNull ZipModel zipModel) throws FileNotFoundException {
         return new SingleZipOutputStream(zipModel.getZipFile(), zipModel);
     }
@@ -29,9 +26,9 @@ public class SingleZipOutputStream extends BaseMarkDataOutput {
         return new SingleZipOutputStream(zipFile, zipModel);
     }
 
-    private SingleZipOutputStream(@NonNull Path zipFile, @NonNull ZipModel zipModel) throws FileNotFoundException {
-        super(zipFile);
-        this.zipModel = zipModel;
+    private SingleZipOutputStream(Path zipFile, ZipModel zipModel) throws FileNotFoundException {
+        super(zipModel);
+        delegate = new LittleEndianWriteFile(zipFile);
     }
 
     @Override

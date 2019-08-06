@@ -121,7 +121,7 @@ public final class ZipMisc {
         long[] fileSizeList = new long[noOfDisk + 1];
 
         for (int i = 0; i <= noOfDisk; i++) {
-            try (InputStream in = new FileInputStream(zipModel.getPartFile(i).toFile())) {
+            try (InputStream in = new FileInputStream(zipModel.getPartFile(i + 1).toFile())) {
                 fileSizeList[i] = IOUtils.copyLarge(in, out, 0, i == noOfDisk ? zipModel.getOffsCentralDirectory() : zipModel.getSplitLength());
             }
         }

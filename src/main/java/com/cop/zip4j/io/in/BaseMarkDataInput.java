@@ -1,9 +1,9 @@
 package com.cop.zip4j.io.in;
 
-import lombok.AccessLevel;
+import com.cop.zip4j.model.ZipModel;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,13 +12,18 @@ import java.util.Map;
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 abstract class BaseMarkDataInput implements MarkDataInput {
 
     private final Map<String, Long> map = new HashMap<>();
 
     @NonNull
-    protected final DataInput delegate;
+    protected final ZipModel zipModel;
+    @NonNull
+    protected DataInput delegate;
+
+    protected BaseMarkDataInput(@NonNull ZipModel zipModel) throws FileNotFoundException {
+        this.zipModel = zipModel;
+    }
 
     @Override
     public long getOffs() {
@@ -71,11 +76,6 @@ abstract class BaseMarkDataInput implements MarkDataInput {
     }
 
     @Override
-    public int getCounter() {
-        return 0;
-    }
-
-    @Override
     public void mark(String id) {
         map.put(id, getOffs());
     }
@@ -83,16 +83,6 @@ abstract class BaseMarkDataInput implements MarkDataInput {
     @Override
     public long getWrittenBytesAmount(String id) {
         return getOffs() - map.getOrDefault(id, 0L);
-    }
-
-    @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
-        return delegate.read(buf, offs, len);
-    }
-
-    @Override
-    public void close() throws IOException {
-        delegate.close();
     }
 
     @Override

@@ -28,9 +28,6 @@ import java.util.Set;
  */
 public class SplitZipOutputStream extends BaseMarkDataOutput {
 
-    @NonNull
-    private final ZipModel zipModel;
-
     private int counter;
 
     @NonNull
@@ -43,8 +40,8 @@ public class SplitZipOutputStream extends BaseMarkDataOutput {
     }
 
     private SplitZipOutputStream(@NonNull ZipModel zipModel) throws FileNotFoundException {
-        super(zipModel.getZipFile());
-        this.zipModel = zipModel;
+        super(zipModel);
+        delegate = new LittleEndianWriteFile(zipModel.getZipFile());
     }
 
     @Override
@@ -56,7 +53,7 @@ public class SplitZipOutputStream extends BaseMarkDataOutput {
             int writeBytes = Math.min(len, (int)canWrite);
 
             if (canWrite <= 0 || len > canWrite && offsInit != offs && isSignature(buf, offs, len))
-                startNextSplitFile();
+                openNextSplit();
 
             delegate.write(buf, offs, writeBytes);
 
@@ -65,18 +62,18 @@ public class SplitZipOutputStream extends BaseMarkDataOutput {
         }
     }
 
-    private void startNextSplitFile() throws IOException {
-        Path currSplitFile = ZipModel.getSplitFilePath(zipFile, ++counter);
+    private void openNextSplit() throws IOException {
+        Path splitFile = ZipModel.getSplitFilePath(zipModel.getZipFile(), ++counter);
 
         delegate.close();
 
-        if (Files.exists(currSplitFile))
-            throw new IOException("split file: " + currSplitFile.getFileName() + " already exists in the current directory, cannot rename this file");
+        if (Files.exists(splitFile))
+            throw new IOException("split file: " + splitFile.getFileName() + " already exists in the current directory, cannot rename this file");
 
-        if (!zipFile.toFile().renameTo(currSplitFile.toFile()))
+        if (!zipModel.getZipFile().toFile().renameTo(splitFile.toFile()))
             throw new IOException("cannot rename newly created split file");
 
-        createDelegate(zipModel.getZipFile());
+        delegate = new LittleEndianWriteFile(zipModel.getZipFile());
     }
 
     @Override

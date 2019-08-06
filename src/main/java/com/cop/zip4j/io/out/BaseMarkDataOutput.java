@@ -1,10 +1,10 @@
 package com.cop.zip4j.io.out;
 
+import com.cop.zip4j.model.ZipModel;
 import lombok.NonNull;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,17 +17,12 @@ abstract class BaseMarkDataOutput implements MarkDataOutput {
     private final Map<String, Long> map = new HashMap<>();
 
     @NonNull
-    protected Path zipFile;
+    protected final ZipModel zipModel;
     @NonNull
     protected DataOutput delegate;
 
-    protected BaseMarkDataOutput(@NonNull Path zipFile) throws FileNotFoundException {
-        createDelegate(zipFile);
-    }
-
-    protected final void createDelegate(Path zipFile) throws FileNotFoundException {
-        this.zipFile = zipFile;
-        delegate = new LittleEndianWriteFile(zipFile);
+    protected BaseMarkDataOutput(@NonNull ZipModel zipModel) throws FileNotFoundException {
+        this.zipModel = zipModel;
     }
 
     @Override

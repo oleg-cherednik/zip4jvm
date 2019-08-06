@@ -18,8 +18,6 @@ import java.util.zip.Checksum;
  */
 final class StoreEntryInputStream extends InputStream {
 
-    private static final String MARK = StoreEntryInputStream.class.getSimpleName();
-
     private final ZipModel zipModel;
     private final LocalFileHeader localFileHeader;
     private final Decoder decoder;
@@ -28,19 +26,19 @@ final class StoreEntryInputStream extends InputStream {
 
     private final Checksum checksum = new CRC32();
 
+    private int readBytes;
+
     public StoreEntryInputStream(ZipModel zipModel, LocalFileHeader localFileHeader, Decoder decoder, MarkDataInput in) {
         this.zipModel = zipModel;
         this.decoder = decoder;
         this.localFileHeader = localFileHeader;
-        compressedSize = decoder.getCompressedSize(localFileHeader);
         this.in = in;
-
-        in.mark(MARK);
+        compressedSize = decoder.getCompressedSize(localFileHeader);
     }
 
     @Override
     public int available() {
-        return (int)Math.max(0, compressedSize - in.getWrittenBytesAmount(MARK));
+        return (int)Math.max(0, compressedSize - readBytes);
     }
 
     @Override
@@ -66,8 +64,10 @@ final class StoreEntryInputStream extends InputStream {
 
         len = in.read(buf, offs, len);
 
-        if (len != IOUtils.EOF)
+        if (len != IOUtils.EOF) {
+            readBytes += len;
             checksum.update(buf, offs, len);
+        }
 
         return len;
     }
