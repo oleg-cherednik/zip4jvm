@@ -61,16 +61,6 @@ abstract class BaseMarkDataOutput implements MarkDataOutput {
     }
 
     @Override
-    public void write(byte[] buf, int offs, int len) throws IOException {
-        delegate.write(buf, offs, len);
-    }
-
-    @Override
-    public int getCounter() {
-        return 0;
-    }
-
-    @Override
     public void mark(String id) {
         map.put(id, getOffs());
     }
@@ -78,11 +68,6 @@ abstract class BaseMarkDataOutput implements MarkDataOutput {
     @Override
     public long getWrittenBytesAmount(String id) {
         return getOffs() - map.getOrDefault(id, 0L);
-    }
-
-    @Override
-    public void close() throws IOException {
-        delegate.close();
     }
 
     @Override

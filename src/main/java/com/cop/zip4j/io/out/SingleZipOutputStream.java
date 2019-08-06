@@ -35,10 +35,20 @@ public class SingleZipOutputStream extends BaseMarkDataOutput {
     }
 
     @Override
+    public void write(byte[] buf, int offs, int len) throws IOException {
+        delegate.write(buf, offs, len);
+    }
+
+    @Override
+    public int getCounter() {
+        return 0;
+    }
+
+    @Override
     public void close() throws IOException {
         zipModel.getEndCentralDirectory().setOffs(getOffs());
         new ZipModelWriter(zipModel).finalizeZipFile(this, true);
-        super.close();
+        delegate.close();
     }
 
 }

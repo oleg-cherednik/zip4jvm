@@ -80,15 +80,15 @@ public class SplitZipOutputStream extends BaseMarkDataOutput {
     }
 
     @Override
+    public int getCounter() {
+        return counter;
+    }
+
+    @Override
     public void close() throws IOException {
         zipModel.getEndCentralDirectory().setOffs(getOffs());
         new ZipModelWriter(zipModel).finalizeZipFile(this, true);
         delegate.close();
-    }
-
-    @Override
-    public int getCounter() {
-        return counter;
     }
 
     private static final Set<Integer> SIGNATURES = getAllSignatures();
