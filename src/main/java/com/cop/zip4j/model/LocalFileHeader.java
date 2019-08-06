@@ -70,4 +70,9 @@ public class LocalFileHeader {
         return Encryption.get(extraField, generalPurposeFlag);
     }
 
+    @Override
+    public String toString() {
+        return fileName;
+    }
+
 }

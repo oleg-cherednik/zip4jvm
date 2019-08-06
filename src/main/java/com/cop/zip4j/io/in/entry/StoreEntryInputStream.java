@@ -45,12 +45,31 @@ final class StoreEntryInputStream extends InputStream {
 
     @Override
     public int read() throws IOException {
-        int b = available() == 0 ? IOUtils.EOF : in.readByte();
+        if (available() == 0)
+            return IOUtils.EOF;
 
-        if (b != IOUtils.EOF)
-            checksum.update(b);
+        byte[] buf = new byte[1];
+        int len = read(buf, 0, 1);
 
-        return b;
+        if (len == IOUtils.EOF)
+            return IOUtils.EOF;
+
+        return buf[0] & 0xFF;
+    }
+
+    @Override
+    public int read(byte[] buf, int offs, int len) throws IOException {
+        len = Math.min(len, available());
+
+        if (available() == 0)
+            return IOUtils.EOF;
+
+        len = in.read(buf, offs, len);
+
+        if (len != IOUtils.EOF)
+            checksum.update(buf, offs, len);
+
+        return len;
     }
 
     private void checkChecksum() {
