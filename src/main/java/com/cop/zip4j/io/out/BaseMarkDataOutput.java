@@ -5,6 +5,7 @@ import lombok.NonNull;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,58 +17,86 @@ abstract class BaseMarkDataOutput implements MarkDataOutput {
 
     private final Map<String, Long> map = new HashMap<>();
 
+    private long tic;
+
     @NonNull
     protected final ZipModel zipModel;
     @NonNull
-    protected DataOutput delegate;
+    private DataOutput delegate;
 
     protected BaseMarkDataOutput(@NonNull ZipModel zipModel) throws FileNotFoundException {
         this.zipModel = zipModel;
     }
 
+    protected void createNewFile(Path zipFile) throws FileNotFoundException {
+        delegate = new LittleEndianWriteFile(zipFile);
+    }
+
     @Override
-    public void seek(long pos) throws IOException {
+    public final void seek(long pos) throws IOException {
         delegate.seek(pos);
     }
 
     @Override
-    public long getOffs() {
+    public final long getOffs() {
         return delegate.getOffs();
     }
 
     @Override
-    public void writeDword(int val) throws IOException {
-        delegate.writeDword(val);
+    public final void writeWord(int val) throws IOException {
+        doWithTic(() -> delegate.writeWord(val));
     }
 
     @Override
-    public void writeDword(long val) throws IOException {
-        delegate.writeDword(val);
+    public final void writeDword(int val) throws IOException {
+        doWithTic(() -> delegate.writeDword(val));
     }
 
     @Override
-    public void writeWord(int val) throws IOException {
-        delegate.writeWord(val);
+    public final void writeDword(long val) throws IOException {
+        doWithTic(() -> delegate.writeDword(val));
     }
 
     @Override
     public void writeQword(long val) throws IOException {
-        delegate.writeQword(val);
+        doWithTic(() -> delegate.writeQword(val));
     }
 
     @Override
-    public void mark(String id) {
-        map.put(id, getOffs());
+    public void write(byte[] buf, int offs, int len) throws IOException {
+        doWithTic(() -> delegate.write(buf, offs, len));
+    }
+
+    private void doWithTic(Task task) throws IOException {
+        long offs = getOffs();
+        task.apply();
+        tic += getOffs() - offs;
     }
 
     @Override
-    public long getWrittenBytesAmount(String id) {
-        return getOffs() - map.getOrDefault(id, 0L);
+    public final void mark(String id) {
+        map.put(id, tic);
+    }
+
+    @Override
+    public final long getWrittenBytesAmount(String id) {
+        return tic - map.getOrDefault(id, 0L);
+    }
+
+    @Override
+    public void close() throws IOException {
+        delegate.close();
     }
 
     @Override
     public String toString() {
         return "offs: " + getOffs();
+    }
+
+    @FunctionalInterface
+    private interface Task {
+
+        void apply() throws IOException;
     }
 
 }

@@ -31,7 +31,6 @@ public class ZipEngine {
             return;
 
         try (MarkDataOutput out = createOutputStream()) {
-            out.seek(zipModel.getOffsCentralDirectory());
             entries.stream()
                    .filter(entry -> !entry.isRoot())
                    .forEach(entry -> writeEntry(entry, out));

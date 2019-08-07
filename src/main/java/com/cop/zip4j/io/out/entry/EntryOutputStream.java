@@ -41,6 +41,8 @@ public abstract class EntryOutputStream extends OutputStream {
 
     private final Checksum checksum = new CRC32();
 
+    private int size;
+
     public static EntryOutputStream create(@NonNull PathZipEntry entry, @NonNull ZipModel zipModel, @NonNull MarkDataOutput out) throws IOException {
         EntryOutputStream res = createOutputStream(entry, zipModel, out);
         res.writeHeader();
@@ -73,7 +75,6 @@ public abstract class EntryOutputStream extends OutputStream {
 
     private void writeLocalFileHeader() throws IOException {
         fileHeader.setOffsLocalFileHeader(out.getOffs());
-
         LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(fileHeader).create();
         new LocalFileHeaderWriter(zipModel, localFileHeader).write(out);
 

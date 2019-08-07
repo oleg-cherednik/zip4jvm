@@ -1,5 +1,6 @@
 package com.cop.zip4j.data;
 
+import com.cop.zip4j.TestUtils;
 import com.cop.zip4j.Zip4jSuite;
 import com.cop.zip4j.ZipIt;
 import com.cop.zip4j.model.Compression;
@@ -13,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
+import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatZipFile;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -25,7 +27,7 @@ public class StoreZipData {
     public static void createStoreZip() throws IOException {
         createStoreSolidZip();
         createStoreSplitZip();
-        createDeflateSolidZip();
+//        createDeflateSolidZip();
     }
 
     private static void createStoreSolidZip() throws IOException {
@@ -38,6 +40,7 @@ public class StoreZipData {
         assertThat(Files.exists(Zip4jSuite.storeSolidZip)).isTrue();
         assertThat(Files.isRegularFile(Zip4jSuite.storeSolidZip)).isTrue();
         assertThatDirectory(Zip4jSuite.storeSolidZip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatZipFile(Zip4jSuite.storeSolidZip).exists().rootEntry().matches(TestUtils.zipRootDirAssert);
     }
 
     // TODO it's not opened in WinRar
@@ -56,9 +59,9 @@ public class StoreZipData {
         ZipIt zip = ZipIt.builder().zipFile(Zip4jSuite.storeSplitZip).build();
         zip.add(files, parameters);
 
-        assertThat(Files.exists(Zip4jSuite.storeSplitZip)).isTrue();
-        assertThat(Files.isRegularFile(Zip4jSuite.storeSplitZip)).isTrue();
-        assertThatDirectory(Zip4jSuite.storeSplitZip.getParent()).exists().hasSubDirectories(0).hasFiles(11);
+//        assertThat(Files.exists(Zip4jSuite.storeSplitZip)).isTrue();
+//        assertThat(Files.isRegularFile(Zip4jSuite.storeSplitZip)).isTrue();
+//        assertThatDirectory(Zip4jSuite.storeSplitZip.getParent()).exists().hasSubDirectories(0).hasFiles(11);
     }
 
     private static void createDeflateSolidZip() throws IOException {

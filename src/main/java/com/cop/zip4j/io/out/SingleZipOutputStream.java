@@ -28,12 +28,7 @@ public class SingleZipOutputStream extends BaseMarkDataOutput {
 
     private SingleZipOutputStream(Path zipFile, ZipModel zipModel) throws FileNotFoundException {
         super(zipModel);
-        delegate = new LittleEndianWriteFile(zipFile);
-    }
-
-    @Override
-    public void write(byte[] buf, int offs, int len) throws IOException {
-        delegate.write(buf, offs, len);
+        createNewFile(zipFile);
     }
 
     @Override
@@ -45,7 +40,7 @@ public class SingleZipOutputStream extends BaseMarkDataOutput {
     public void close() throws IOException {
         zipModel.getEndCentralDirectory().setOffs(getOffs());
         new ZipModelWriter(zipModel).finalizeZipFile(this, true);
-        delegate.close();
+        super.close();
     }
 
 }

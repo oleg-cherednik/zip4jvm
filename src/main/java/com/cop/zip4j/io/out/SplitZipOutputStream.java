@@ -41,7 +41,7 @@ public class SplitZipOutputStream extends BaseMarkDataOutput {
 
     private SplitZipOutputStream(@NonNull ZipModel zipModel) throws FileNotFoundException {
         super(zipModel);
-        delegate = new LittleEndianWriteFile(zipModel.getZipFile());
+        createNewFile(zipModel.getZipFile());
     }
 
     @Override
@@ -55,7 +55,7 @@ public class SplitZipOutputStream extends BaseMarkDataOutput {
             if (canWrite <= 0 || len > canWrite && offsInit != offs && isSignature(buf, offs, len))
                 openNextSplit();
 
-            delegate.write(buf, offs, writeBytes);
+            super.write(buf, offs, writeBytes);
 
             offs += writeBytes;
             len -= writeBytes;
@@ -65,7 +65,7 @@ public class SplitZipOutputStream extends BaseMarkDataOutput {
     private void openNextSplit() throws IOException {
         Path splitFile = ZipModel.getSplitFilePath(zipModel.getZipFile(), ++counter);
 
-        delegate.close();
+        super.close();
 
         if (Files.exists(splitFile))
             throw new IOException("split file: " + splitFile.getFileName() + " already exists in the current directory, cannot rename this file");
@@ -73,7 +73,7 @@ public class SplitZipOutputStream extends BaseMarkDataOutput {
         if (!zipModel.getZipFile().toFile().renameTo(splitFile.toFile()))
             throw new IOException("cannot rename newly created split file");
 
-        delegate = new LittleEndianWriteFile(zipModel.getZipFile());
+        createNewFile(zipModel.getZipFile());
     }
 
     @Override
@@ -85,7 +85,7 @@ public class SplitZipOutputStream extends BaseMarkDataOutput {
     public void close() throws IOException {
         zipModel.getEndCentralDirectory().setOffs(getOffs());
         new ZipModelWriter(zipModel).finalizeZipFile(this, true);
-        delegate.close();
+        super.close();
     }
 
     private static final Set<Integer> SIGNATURES = getAllSignatures();
