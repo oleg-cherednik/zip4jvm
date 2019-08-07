@@ -32,7 +32,7 @@ final class FileHeaderWriter {
         byte[] fileName = fileHeader.getFileName(charset);
         byte[] fileComment = fileHeader.getFileComment(charset);
 
-        out.writeDword(CentralDirectory.FileHeader.SIGNATURE);
+        out.writeDwordSignature(CentralDirectory.FileHeader.SIGNATURE);
         out.writeWord(fileHeader.getVersionMadeBy());
         out.writeWord(fileHeader.getVersionToExtract());
         out.writeWord(fileHeader.getGeneralPurposeFlag().getData());

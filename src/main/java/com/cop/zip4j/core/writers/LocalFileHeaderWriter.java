@@ -24,7 +24,7 @@ public final class LocalFileHeaderWriter {
     private final LocalFileHeader localFileHeader;
 
     public void write(@NonNull DataOutput out) throws IOException {
-        out.writeDword(LocalFileHeader.SIGNATURE);
+        out.writeDwordSignature(LocalFileHeader.SIGNATURE);
         out.writeWord(localFileHeader.getVersionToExtract());
         out.writeWord(localFileHeader.getGeneralPurposeFlag().getData());
         out.writeWord(localFileHeader.getCompressionMethod().getValue());
@@ -48,7 +48,7 @@ public final class LocalFileHeaderWriter {
         out.writeBytes(fileName);
 
         if (zipModel.isZip64()) {
-            out.writeWord(Zip64.ExtendedInfo.SIGNATURE);
+            out.writeDwordSignature(Zip64.ExtendedInfo.SIGNATURE);
             out.writeWord(16);
             out.writeQword(localFileHeader.getUncompressedSize());
             out.writeBytes(new byte[8]);
@@ -60,7 +60,7 @@ public final class LocalFileHeaderWriter {
     // TODO this is DataDescriptor
     public void writeExtended(@NonNull SingleZipOutputStream out) throws IOException {
         //Extended local file header signature
-        out.writeDword(InternalZipConstants.EXTSIG);
+        out.writeDwordSignature(InternalZipConstants.EXTSIG);
 
         //CRC
         out.writeDword((int)localFileHeader.getCrc32());

@@ -19,6 +19,10 @@ public interface DataOutput extends Closeable {
 
     void writeDword(int val) throws IOException;
 
+    default void writeDwordSignature(int sig) throws IOException {
+        writeDword(sig);
+    }
+
     void writeDword(long val) throws IOException;
 
     void writeQword(long val) throws IOException;

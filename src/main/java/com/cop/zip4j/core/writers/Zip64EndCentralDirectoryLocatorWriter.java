@@ -20,7 +20,7 @@ final class Zip64EndCentralDirectoryLocatorWriter {
         if (locator == null)
             return;
 
-        out.writeDword(Zip64.EndCentralDirectoryLocator.SIGNATURE);
+        out.writeDwordSignature(Zip64.EndCentralDirectoryLocator.SIGNATURE);
         out.writeDword(locator.getNoOfDiskStartOfZip64EndOfCentralDirRec());
         out.writeQword(locator.getOffs());
         out.writeDword(locator.getTotNumberOfDiscs());

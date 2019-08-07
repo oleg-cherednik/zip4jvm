@@ -28,7 +28,7 @@ abstract class BaseMarkDataOutput implements MarkDataOutput {
         this.zipModel = zipModel;
     }
 
-    protected void createNewFile(Path zipFile) throws FileNotFoundException {
+    protected void createFile(Path zipFile) throws FileNotFoundException {
         delegate = new LittleEndianWriteFile(zipFile);
     }
 

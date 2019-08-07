@@ -50,24 +50,24 @@ public class ZipFolderNoSplitTest {
         assertThatZipFile(zipFile).directory("cars/").matches(TestUtils.zipCarsDirAssert);
     }
 
-//    @Test(dependsOnMethods = "shouldCreateNewZipWithFolder")
-//    public void shouldAddFolderToExistedZip() throws IOException {
-//        assertThat(Files.exists(zipFile)).isTrue();
-//        assertThat(Files.isRegularFile(zipFile)).isTrue();
-//
-//        ZipParameters parameters = ZipParameters.builder()
-//                                                .compressionMethod(Compression.DEFLATE)
-//                                                .compressionLevel(CompressionLevel.NORMAL)
-//                                                .defaultFolderPath(Zip4jSuite.srcDir).build();
-//
-//        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-//        zip.add(Zip4jSuite.starWarsDir, parameters);
-//
-//        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-//        assertThatZipFile(zipFile).exists().rootEntry().hasSubDirectories(2).hasFiles(0);
-//        assertThatZipFile(zipFile).directory("cars/").matches(TestUtils.zipCarsDirAssert);
-//        assertThatZipFile(zipFile).directory("Star Wars/").matches(TestUtils.zipStarWarsDirAssert);
-//    }
+    @Test(dependsOnMethods = "shouldCreateNewZipWithFolder")
+    public void shouldAddFolderToExistedZip() throws IOException {
+        assertThat(Files.exists(zipFile)).isTrue();
+        assertThat(Files.isRegularFile(zipFile)).isTrue();
+
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compressionMethod(Compression.DEFLATE)
+                                                .compressionLevel(CompressionLevel.NORMAL)
+                                                .defaultFolderPath(Zip4jSuite.srcDir).build();
+
+        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
+        zip.add(Zip4jSuite.starWarsDir, parameters);
+
+        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatZipFile(zipFile).exists().rootEntry().hasSubDirectories(2).hasFiles(0);
+        assertThatZipFile(zipFile).directory("cars/").matches(TestUtils.zipCarsDirAssert);
+        assertThatZipFile(zipFile).directory("Star Wars/").matches(TestUtils.zipStarWarsDirAssert);
+    }
 
     @Test(dependsOnMethods = "shouldAddFolderToExistedZip")
     public void shouldAddEmptyDirectoryToExistedZip() throws IOException {

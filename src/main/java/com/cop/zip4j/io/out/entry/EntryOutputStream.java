@@ -65,7 +65,7 @@ public abstract class EntryOutputStream extends OutputStream {
     private void writeHeader() throws IOException {
         // only at the beginning of the split file
         if (zipModel.isSplitArchive() && zipModel.isEmpty())
-            out.writeDword(SPLIT_SIGNATURE);
+            out.writeDwordSignature(SPLIT_SIGNATURE);
 
         zipModel.addFileHeader(fileHeader);
 

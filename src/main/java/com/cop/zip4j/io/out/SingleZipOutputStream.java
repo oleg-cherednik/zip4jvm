@@ -28,7 +28,7 @@ public class SingleZipOutputStream extends BaseMarkDataOutput {
 
     private SingleZipOutputStream(Path zipFile, ZipModel zipModel) throws FileNotFoundException {
         super(zipModel);
-        createNewFile(zipFile);
+        createFile(zipFile);
     }
 
     @Override
