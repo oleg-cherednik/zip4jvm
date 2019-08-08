@@ -13,8 +13,6 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.List;
 
 import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
 import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatZipFile;
@@ -44,14 +42,9 @@ public class CompressionStoreTest {
                                                 .compressionMethod(Compression.STORE)
                                                 .defaultFolderPath(Zip4jSuite.srcDir).build();
 
-        Path bentley = Zip4jSuite.carsDir.resolve("bentley-continental.jpg");
-        Path ferrari = Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg");
-        Path wiesmann = Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg");
-        List<Path> files = Arrays.asList(bentley, ferrari, wiesmann);
-
         Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-        zip.add(files, parameters);
+        zip.add(Zip4jSuite.filesCarsDir, parameters);
 
         assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
         assertThatZipFile(zipFile).exists().rootEntry().hasSubDirectories(1).hasFiles(0);
@@ -65,14 +58,9 @@ public class CompressionStoreTest {
                                                 .splitLength(1024 * 1024)
                                                 .build();
 
-        Path bentley = Zip4jSuite.carsDir.resolve("bentley-continental.jpg");
-        Path ferrari = Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg");
-        Path wiesmann = Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg");
-        List<Path> files = Arrays.asList(bentley, ferrari, wiesmann);
-
         Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-        zip.add(files, parameters);
+        zip.add(Zip4jSuite.filesCarsDir, parameters);
 
         assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(3);
         // TODO check split zip file

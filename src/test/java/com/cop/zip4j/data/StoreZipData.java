@@ -52,7 +52,6 @@ public class StoreZipData {
         assertThat(Files.exists(Zip4jSuite.storeSplitZip)).isTrue();
         assertThat(Files.isRegularFile(Zip4jSuite.storeSplitZip)).isTrue();
         assertThatDirectory(Zip4jSuite.storeSplitZip.getParent()).exists().hasSubDirectories(0).hasFiles(11);
-//        assertThatZipFile(Zip4jSuite.storeSplitZip).exists().rootEntry().matches(TestUtils.zipRootDirAssert);
     }
 
 }

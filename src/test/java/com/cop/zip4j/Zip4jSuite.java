@@ -10,6 +10,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
 
@@ -27,14 +31,25 @@ public class Zip4jSuite {
     public static final Path starWarsDir = srcDir.resolve("Star Wars");
     public static final Path emptyDir = srcDir.resolve("empty_dir");
 
+    public static final List<Path> filesCarsDir =
+            collect(carsDir, "bentley-continental.jpg", "ferrari-458-italia.jpg", "three.jpg", "wiesmann-gt-mf5.jpg");
+    public static final List<Path> filesStarWarsDir = collect(starWarsDir, "one.jpg", "two.jpg", "three.jpg", "four.jpg");
+
+    private static List<Path> collect(Path dir, String... fileNames) {
+        List<Path> paths = Stream.of(fileNames)
+                                 .map(dir::resolve)
+                                 .collect(Collectors.toList());
+        return Collections.unmodifiableList(paths);
+    }
+
     // store
-    public static final Path storeSolidZip = rootDir.resolve("store/solid/src.zip");
-    public static final Path storeSplitZip = rootDir.resolve("store/split/src.zip");
+    public static final Path storeSolidZip = rootDir.resolve("store/solid/off/src.zip");
+    public static final Path storeSplitZip = rootDir.resolve("store/split/off/src.zip");
 
     // deflate
     public static final Path deflateSolidZip = rootDir.resolve("deflate/solid/off/src.zip");
+    public static final Path deflateSplitZip = rootDir.resolve("deflate/split/off/src.zip");
     public static final Path deflateSolidPkwareZip = rootDir.resolve("deflate/solid/pkware/src.zip");
-    public static final Path deflateSplitZip = rootDir.resolve("deflate/split/щаа.src.zip");
 
     public static final Path winRarPkwareZip = Paths.get("src/test/resources/pkware.zip").toAbsolutePath();
     public static final Path winRarAesZip = Paths.get("src/test/resources/aes.zip").toAbsolutePath();
