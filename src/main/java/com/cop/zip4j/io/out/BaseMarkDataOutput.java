@@ -44,17 +44,35 @@ abstract class BaseMarkDataOutput implements MarkDataOutput {
 
     @Override
     public final void writeWord(int val) throws IOException {
-        doWithTic(() -> delegate.writeWord(val));
+        doWithTic(new Task() {
+            @Override
+            public void apply() throws IOException {
+                byte[] buf = delegate.convertWord(val);
+                delegate.write(buf, 0, buf.length);
+            }
+        });
     }
 
     @Override
     public final void writeDword(long val) throws IOException {
-        doWithTic(() -> delegate.writeDword(val));
+        doWithTic(new Task() {
+            @Override
+            public void apply() throws IOException {
+                byte[] buf = delegate.convertDword(val);
+                delegate.write(buf, 0, buf.length);
+            }
+        });
     }
 
     @Override
     public void writeQword(long val) throws IOException {
-        doWithTic(() -> delegate.writeQword(val));
+        doWithTic(new Task() {
+            @Override
+            public void apply() throws IOException {
+                byte[] buf = delegate.convertQword(val);
+                delegate.write(buf, 0, buf.length);
+            }
+        });
     }
 
     @Override

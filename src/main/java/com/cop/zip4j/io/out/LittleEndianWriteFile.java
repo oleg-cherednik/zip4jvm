@@ -1,6 +1,7 @@
 package com.cop.zip4j.io.out;
 
 import lombok.NonNull;
+import org.apache.commons.lang.NotImplementedException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -50,20 +51,23 @@ public class LittleEndianWriteFile implements DataOutput {
 
     @Override
     public void writeWord(int val) throws IOException {
-        byte[] buf = convertWord(val);
-        write(buf, 0, buf.length);
+        throw new NotImplementedException();
+//        byte[] buf = convertWord(val);
+//        write(buf, 0, buf.length);
     }
 
     @Override
     public void writeDword(long val) throws IOException {
-        byte[] buf = convertDword(val);
-        write(buf, 0, buf.length);
+        throw new NotImplementedException();
+//        byte[] buf = convertDword(val);
+//        write(buf, 0, buf.length);
     }
 
     @Override
     public void writeQword(long val) throws IOException {
-        byte[] buf = convertQword(val);
-        write(buf, 0, buf.length);
+        throw new NotImplementedException();
+//        byte[] buf = convertQword(val);
+//        write(buf, 0, buf.length);
     }
 
     @Override
