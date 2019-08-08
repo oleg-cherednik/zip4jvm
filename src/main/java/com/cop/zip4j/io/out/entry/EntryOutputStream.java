@@ -10,7 +10,6 @@ import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.DataDescriptor;
-import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.entry.PathZipEntry;
@@ -75,7 +74,6 @@ public abstract class EntryOutputStream extends OutputStream {
         fileHeader.setOffsLocalFileHeader(out.getOffs());
         LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(fileHeader).create();
         new LocalFileHeaderWriter(zipModel, localFileHeader).write(out);
-
         out.mark(MARK);
     }
 
@@ -97,21 +95,19 @@ public abstract class EntryOutputStream extends OutputStream {
     }
 
     private void updateFileHeader() {
-        fileHeader.setCrc32(fileHeader.getEncryption() == Encryption.AES ? 0 : checksum.getValue());
+        fileHeader.setCrc32(fileHeader.getEncryption().getChecksum(checksum.getValue()));
         fileHeader.setCompressedSize(out.getWrittenBytesAmount(MARK));
     }
 
     private void writeDataDescriptor() throws IOException {
-        // TODO should be isDataDescriptorExists == true only when parameters.getCompressionMethod() == CompressionMethod.DEFLATE
-        if (!fileHeader.getGeneralPurposeFlag().isDataDescriptorExists())
-            return;
+        if (fileHeader.getGeneralPurposeFlag().isDataDescriptorExists()) {
+            DataDescriptor dataDescriptor = new DataDescriptor();
+            dataDescriptor.setCrc32(fileHeader.getCrc32());
+            dataDescriptor.setCompressedSize(fileHeader.getCompressedSize());
+            dataDescriptor.setUncompressedSize(fileHeader.getUncompressedSize());
 
-        DataDescriptor dataDescriptor = new DataDescriptor();
-        dataDescriptor.setCrc32(fileHeader.getCrc32());
-        dataDescriptor.setCompressedSize(fileHeader.getCompressedSize());
-        dataDescriptor.setUncompressedSize(fileHeader.getUncompressedSize());
-
-        new DataDescriptorWriter(dataDescriptor).write(out);
+            new DataDescriptorWriter(dataDescriptor).write(out);
+        }
     }
 
 }

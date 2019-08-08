@@ -179,13 +179,13 @@ public class CentralDirectory {
             return getEncryption() != Encryption.OFF;
         }
 
-        public Encryption getEncryption() {
-            return Encryption.get(extraField, generalPurposeFlag);
-        }
-
         public boolean isWriteZip64FileSize() {
             return compressedSize >= InternalZipConstants.ZIP_64_LIMIT ||
                     uncompressedSize + ZipModelWriter.ZIP64_EXTRA_BUF >= InternalZipConstants.ZIP_64_LIMIT;
+        }
+
+        public Encryption getEncryption() {
+            return Encryption.get(extraField, generalPurposeFlag);
         }
 
         public boolean isWriteZip64OffsetLocalHeader() {

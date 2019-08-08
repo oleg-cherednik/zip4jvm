@@ -10,7 +10,6 @@ import com.cop.zip4j.crypto.pkware.PkwareDecoder;
 import com.cop.zip4j.crypto.pkware.PkwareEncoder;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.in.DataInput;
-import com.cop.zip4j.io.in.LittleEndianReadFile;
 import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import com.cop.zip4j.model.aes.AesStrength;
 import com.cop.zip4j.model.entry.PathZipEntry;
@@ -63,6 +62,11 @@ public enum Encryption {
             return new AesDecoder(localFileHeader.getExtraField().getAesExtraDataRecord(), password, salt, passwordVerifier);
         }
 
+        @Override
+        public long getChecksum(long checksum) {
+            return 0;
+        }
+
         private byte[] getSalt(@NonNull DataInput in, @NonNull LocalFileHeader localFileHeader) throws IOException {
             if (localFileHeader.getEncryption() != this)
                 return null;
@@ -83,6 +87,11 @@ public enum Encryption {
                 throws IOException {
             return AesNewDecoder.create(in, localFileHeader, password);
         }
+
+        @Override
+        public long getChecksum(long checksum) {
+            return 0;
+        }
     };
 
     public Encoder encoder(@NonNull PathZipEntry entry) {
@@ -91,6 +100,10 @@ public enum Encryption {
 
     public Decoder decoder(@NonNull DataInput in, @NonNull LocalFileHeader localFileHeader, char[] password) throws IOException {
         throw new Zip4jException("unsupported encryption method");
+    }
+
+    public long getChecksum(long checksum) {
+        return checksum;
     }
 
     public static Encryption get(@NonNull ExtraField extraField, @NonNull GeneralPurposeFlag generalPurposeFlag) {
