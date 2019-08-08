@@ -14,6 +14,7 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -126,15 +127,14 @@ public class CompressionStoreTest {
         assertThatDirectory(destDir).matches(TestUtils.dirAssert);
     }
 
-//    public void shouldUnzipWhenStoreCompressionAndSplit() throws IOException {
-//        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-//        UnzipIt unzip = UnzipIt.builder()
-//                               .zipFile(Paths.get("d:/zip4j/tmp/b/b.zip"))
-////                               .zipFile(Zip4jSuite.storeSplitZip)
-//                               .build();
-//        unzip.extract(destDir);
-//        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
-//    }
+    public void shouldUnzipWhen() throws IOException {
+        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        UnzipIt unzip = UnzipIt.builder()
+                               .zipFile(Paths.get("D:/zip4j/tmp/cant_find_ecd/b.zip"))
+                               .build();
+        unzip.extract(destDir);
+        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
+    }
 
 //    public void shouldUnzipWhenStoreCompressionAesEncryption() throws IOException {
 //        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);

@@ -1,7 +1,6 @@
 package com.cop.zip4j.core.writers;
 
 import com.cop.zip4j.io.out.DataOutput;
-import com.cop.zip4j.io.out.SingleZipOutputStream;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
@@ -29,7 +28,7 @@ public final class LocalFileHeaderWriter {
         out.writeWord(localFileHeader.getGeneralPurposeFlag().getData());
         out.writeWord(localFileHeader.getCompressionMethod().getValue());
         out.writeDword(localFileHeader.getLastModifiedTime());
-        out.writeDword((int)localFileHeader.getCrc32());
+        out.writeDword(localFileHeader.getCrc32());
 
         //compressed & uncompressed size
         if (localFileHeader.getUncompressedSize() + ZipModelWriter.ZIP64_EXTRA_BUF >= InternalZipConstants.ZIP_64_LIMIT) {
@@ -55,19 +54,6 @@ public final class LocalFileHeaderWriter {
         }
 
         new ExtraFieldWriter(localFileHeader.getExtraField(), zipModel.getCharset()).write(out);
-    }
-
-    // TODO this is DataDescriptor
-    public void writeExtended(@NonNull SingleZipOutputStream out) throws IOException {
-        //Extended local file header signature
-        out.writeDwordSignature(InternalZipConstants.EXTSIG);
-
-        //CRC
-        out.writeDword((int)localFileHeader.getCrc32());
-
-        //compressed size
-        out.writeDword((int)Math.min(localFileHeader.getCompressedSize(), Integer.MAX_VALUE));
-        out.writeDword((int)Math.min(localFileHeader.getUncompressedSize(), Integer.MAX_VALUE));
     }
 
 }
