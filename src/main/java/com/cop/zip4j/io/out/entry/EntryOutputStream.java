@@ -90,8 +90,28 @@ public abstract class EntryOutputStream extends OutputStream {
     @Override
     public void close() throws IOException {
         encoder.close(out);
+
+        checkChecksum();
+        checkCompressedSize();
+
         updateFileHeader();
         writeDataDescriptor();
+    }
+
+    private void checkChecksum() {
+        long expected = fileHeader.getCrc32();
+        long actual = checksum.getValue();
+
+        if (expected != 0 && expected != actual)
+            throw new Zip4jException("Checksum is not matched: " + fileHeader.getFileName());
+    }
+
+    private void checkCompressedSize() {
+        long expected = fileHeader.getCompressedSize();
+        long actual = out.getWrittenBytesAmount(MARK);
+
+        if (expected != 0 && expected != actual)
+            throw new Zip4jException("CompressedSize is not matched: " + fileHeader.getFileName());
     }
 
     private void updateFileHeader() {
