@@ -41,8 +41,6 @@ public abstract class EntryOutputStream extends OutputStream {
 
     private final Checksum checksum = new CRC32();
 
-    private int size;
-
     public static EntryOutputStream create(@NonNull PathZipEntry entry, @NonNull ZipModel zipModel, @NonNull DataOutput out) throws IOException {
         EntryOutputStream res = createOutputStream(entry, zipModel, out);
         res.writeHeader();
