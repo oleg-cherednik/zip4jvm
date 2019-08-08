@@ -19,35 +19,51 @@ public class LittleEndianWriteFile implements DataOutput {
         out = new RandomAccessFile(path.toFile(), "rw");
     }
 
-    @Override
-    public void writeWord(int val) throws IOException {
-        out.writeByte((byte)val);
-        out.writeByte((byte)(val >> 8));
+    public byte[] convertWord(int val) {
+        byte[] buf = new byte[2];
+        buf[0] = (byte)val;
+        buf[1] = (byte)(val >> 8);
+        return buf;
+    }
+
+    public byte[] convertDword(long val) {
+        byte[] buf = new byte[4];
+        buf[0] = (byte)val;
+        buf[1] = (byte)(val >> 8);
+        buf[2] = (byte)(val >> 16);
+        buf[3] = (byte)(val >> 24);
+        return buf;
+    }
+
+    public byte[] convertQword(long val) {
+        byte[] buf = new byte[8];
+        buf[0] = (byte)val;
+        buf[1] = (byte)(val >> 8);
+        buf[2] = (byte)(val >> 16);
+        buf[3] = (byte)(val >> 24);
+        buf[4] = (byte)(val >> 32);
+        buf[5] = (byte)(val >> 40);
+        buf[6] = (byte)(val >> 48);
+        buf[7] = (byte)(val >> 56);
+        return buf;
     }
 
     @Override
-    public void writeDword(int val) throws IOException {
-        writeDword((long)val);
+    public void writeWord(int val) throws IOException {
+        byte[] buf = convertWord(val);
+        write(buf, 0, buf.length);
     }
 
     @Override
     public void writeDword(long val) throws IOException {
-        out.writeByte((byte)val);
-        out.writeByte((byte)(val >> 8));
-        out.writeByte((byte)(val >> 16));
-        out.writeByte((byte)(val >> 24));
+        byte[] buf = convertDword(val);
+        write(buf, 0, buf.length);
     }
 
     @Override
     public void writeQword(long val) throws IOException {
-        out.writeByte((byte)val);
-        out.writeByte((byte)(val >> 8));
-        out.writeByte((byte)(val >> 16));
-        out.writeByte((byte)(val >> 24));
-        out.writeByte((byte)(val >> 32));
-        out.writeByte((byte)(val >> 40));
-        out.writeByte((byte)(val >> 48));
-        out.writeByte((byte)(val >> 56));
+        byte[] buf = convertQword(val);
+        write(buf, 0, buf.length);
     }
 
     @Override

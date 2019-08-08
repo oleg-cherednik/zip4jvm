@@ -17,8 +17,6 @@ public interface DataOutput extends Closeable {
 
     void writeWord(int val) throws IOException;
 
-    void writeDword(int val) throws IOException;
-
     default void writeDwordSignature(int sig) throws IOException {
         writeDword(sig);
     }
@@ -33,5 +31,18 @@ public interface DataOutput extends Closeable {
     }
 
     void write(byte[] buf, int offs, int len) throws IOException;
+
+
+    default byte[] convertWord(int val) {
+        return null;
+    }
+
+    default byte[] convertDword(long val) {
+        return null;
+    }
+
+    default byte[] convertQword(long val) {
+        return null;
+    }
 
 }

@@ -48,11 +48,6 @@ abstract class BaseMarkDataOutput implements MarkDataOutput {
     }
 
     @Override
-    public final void writeDword(int val) throws IOException {
-        doWithTic(() -> delegate.writeDword(val));
-    }
-
-    @Override
     public final void writeDword(long val) throws IOException {
         doWithTic(() -> delegate.writeDword(val));
     }

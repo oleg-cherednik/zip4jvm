@@ -18,7 +18,7 @@ public final class DataDescriptorWriter {
     private final DataDescriptor dataDescriptor;
 
     public void write(@NonNull DataOutput out) throws IOException {
-        out.writeDword(DataDescriptor.SIGNATURE);
+        out.writeDwordSignature(DataDescriptor.SIGNATURE);
         out.writeDword(dataDescriptor.getCrc32());
         out.writeDword(dataDescriptor.getCompressedSize());
         out.writeDword(dataDescriptor.getUncompressedSize());
