@@ -86,10 +86,10 @@ public class UnzipItTest {
 
         Path starWarsDir = destDir.resolve("Star Wars/");
         assertThatDirectory(starWarsDir).exists().hasSubDirectories(0).hasFiles(4);
-        assertThatFile(starWarsDir.resolve("0qQnv2v.jpg")).isImage().hasSize(2_204_448);
-        assertThatFile(starWarsDir.resolve("080fc325efa248454e59b84be24ea829.jpg")).isImage().hasSize(277_857);
-        assertThatFile(starWarsDir.resolve("pE9Hkw6.jpg")).isImage().hasSize(1_601_879);
-        assertThatFile(starWarsDir.resolve("star-wars-wallpapers-29931-7188436.jpg")).isImage().hasSize(1_916_776);
+        assertThatFile(starWarsDir.resolve("one.jpg")).isImage().hasSize(2_204_448);
+        assertThatFile(starWarsDir.resolve("two.jpg")).isImage().hasSize(277_857);
+        assertThatFile(starWarsDir.resolve("three.jpg")).isImage().hasSize(1_601_879);
+        assertThatFile(starWarsDir.resolve("four.jpg")).isImage().hasSize(1_916_776);
     }
 
     @Test

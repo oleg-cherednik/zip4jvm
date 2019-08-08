@@ -43,10 +43,10 @@ public class TestUtils {
 
     public final Consumer<AbstractDirectoryAssert<?>> starWarsDirAssert = dir -> {
         dir.exists().hasSubDirectories(0).hasFiles(4);
-        dir.file("0qQnv2v.jpg").exists().isImage().hasSize(2_204_448);
-        dir.file("080fc325efa248454e59b84be24ea829.jpg").exists().isImage().hasSize(277_857);
-        dir.file("pE9Hkw6.jpg").exists().isImage().hasSize(1_601_879);
-        dir.file("star-wars-wallpapers-29931-7188436.jpg").exists().isImage().hasSize(1_916_776);
+        dir.file("one.jpg").exists().isImage().hasSize(2_204_448);
+        dir.file("two.jpg").exists().isImage().hasSize(277_857);
+        dir.file("three.jpg").exists().isImage().hasSize(1_601_879);
+        dir.file("four.jpg").exists().isImage().hasSize(1_916_776);
     };
 
     public final Consumer<AbstractDirectoryAssert<?>> emptyDirAssert = dir -> dir.exists().hasSubDirectories(0).hasFiles(0);
@@ -74,10 +74,10 @@ public class TestUtils {
 
     public final Consumer<AbstractZipEntryDirectoryAssert<?>> zipStarWarsDirAssert = dir -> {
         dir.exists().hasSubDirectories(0).hasFiles(4);
-        dir.file("0qQnv2v.jpg").exists().isImage().hasSize(2_204_448);
-        dir.file("080fc325efa248454e59b84be24ea829.jpg").exists().isImage().hasSize(277_857);
-        dir.file("pE9Hkw6.jpg").exists().isImage().hasSize(1_601_879);
-        dir.file("star-wars-wallpapers-29931-7188436.jpg").exists().isImage().hasSize(1_916_776);
+        dir.file("one.jpg").exists().isImage().hasSize(2_204_448);
+        dir.file("two.jpg").exists().isImage().hasSize(277_857);
+        dir.file("three.jpg").exists().isImage().hasSize(1_601_879);
+        dir.file("four.jpg").exists().isImage().hasSize(1_916_776);
     };
 
     public final Consumer<AbstractZipEntryDirectoryAssert<?>> zipEmptyDirAssert = dir -> dir.exists().hasSubDirectories(0).hasFiles(0);

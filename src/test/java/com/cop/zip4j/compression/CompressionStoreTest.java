@@ -4,7 +4,6 @@ import com.cop.zip4j.TestUtils;
 import com.cop.zip4j.UnzipIt;
 import com.cop.zip4j.Zip4jSuite;
 import com.cop.zip4j.ZipIt;
-import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.ZipParameters;
 import org.testng.annotations.AfterClass;
@@ -14,7 +13,6 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -41,7 +39,7 @@ public class CompressionStoreTest {
         Zip4jSuite.removeDir(rootDir);
     }
 
-    public void shouldCreateSingleZipWithFilesWhenStoreCompression() throws IOException, Zip4jException {
+    public void shouldCreateSingleZipWithFilesWhenStoreCompression() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(Compression.STORE)
                                                 .defaultFolderPath(Zip4jSuite.srcDir).build();
@@ -60,7 +58,7 @@ public class CompressionStoreTest {
         assertThatZipFile(zipFile).directory("cars/").matches(TestUtils.zipCarsDirAssert);
     }
 
-    public void shouldCreateSplitZipWithFilesWhenStoreCompression() throws IOException, Zip4jException {
+    public void shouldCreateSplitZipWithFilesWhenStoreCompression() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(Compression.STORE)
                                                 .defaultFolderPath(Zip4jSuite.srcDir)
@@ -80,7 +78,7 @@ public class CompressionStoreTest {
         // TODO check split zip file
     }
 
-    public void shouldCreateSingleZipWithEntireFolderWhenStoreCompression() throws IOException, Zip4jException {
+    public void shouldCreateSingleZipWithEntireFolderWhenStoreCompression() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(Compression.STORE)
                                                 .defaultFolderPath(Zip4jSuite.srcDir).build();
@@ -94,7 +92,7 @@ public class CompressionStoreTest {
         assertThatZipFile(zipFile).directory("cars/").matches(TestUtils.zipCarsDirAssert);
     }
 
-    public void shouldCreateSplitZipWithEntireFolderWhenStoreCompression() throws IOException, Zip4jException {
+    public void shouldCreateSplitZipWithEntireFolderWhenStoreCompression() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(Compression.STORE)
                                                 .defaultFolderPath(Zip4jSuite.srcDir)
@@ -126,24 +124,5 @@ public class CompressionStoreTest {
         unzip.extract(destDir);
         assertThatDirectory(destDir).matches(TestUtils.dirAssert);
     }
-
-    public void shouldUnzipWhen() throws IOException {
-        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt unzip = UnzipIt.builder()
-                               .zipFile(Paths.get("D:/zip4j/tmp/cant_find_ecd/b.zip"))
-                               .build();
-        unzip.extract(destDir);
-        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
-    }
-
-//    public void shouldUnzipWhenStoreCompressionAesEncryption() throws IOException {
-//        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-//        UnzipIt unzip = UnzipIt.builder()
-//                               .zipFile(Zip4jSuite.storeAesZip)
-//                               .password(Zip4jSuite.password)
-//                               .build();
-//        unzip.extract(destDir);
-//        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
-//    }
 
 }
