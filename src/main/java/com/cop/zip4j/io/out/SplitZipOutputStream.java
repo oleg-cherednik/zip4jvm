@@ -15,7 +15,7 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 08.03.2019
  */
-public class SplitZipOutputStream extends BaseMarkDataOutput {
+public class SplitZipOutputStream extends BaseDataOutput {
 
     private int counter;
 

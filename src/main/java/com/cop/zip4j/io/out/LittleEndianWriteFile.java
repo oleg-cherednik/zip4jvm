@@ -1,7 +1,6 @@
 package com.cop.zip4j.io.out;
 
 import lombok.NonNull;
-import org.apache.commons.lang.NotImplementedException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -12,7 +11,7 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 02.08.2019
  */
-public class LittleEndianWriteFile implements DataOutput {
+public class LittleEndianWriteFile implements DataOutputFile {
 
     private final RandomAccessFile out;
 
@@ -20,6 +19,7 @@ public class LittleEndianWriteFile implements DataOutput {
         out = new RandomAccessFile(path.toFile(), "rw");
     }
 
+    @Override
     public byte[] convertWord(int val) {
         byte[] buf = new byte[2];
         buf[0] = (byte)val;
@@ -27,6 +27,7 @@ public class LittleEndianWriteFile implements DataOutput {
         return buf;
     }
 
+    @Override
     public byte[] convertDword(long val) {
         byte[] buf = new byte[4];
         buf[0] = (byte)val;
@@ -36,6 +37,7 @@ public class LittleEndianWriteFile implements DataOutput {
         return buf;
     }
 
+    @Override
     public byte[] convertQword(long val) {
         byte[] buf = new byte[8];
         buf[0] = (byte)val;
@@ -49,26 +51,6 @@ public class LittleEndianWriteFile implements DataOutput {
         return buf;
     }
 
-    @Override
-    public void writeWord(int val) throws IOException {
-        throw new NotImplementedException();
-//        byte[] buf = convertWord(val);
-//        write(buf, 0, buf.length);
-    }
-
-    @Override
-    public void writeDword(long val) throws IOException {
-        throw new NotImplementedException();
-//        byte[] buf = convertDword(val);
-//        write(buf, 0, buf.length);
-    }
-
-    @Override
-    public void writeQword(long val) throws IOException {
-        throw new NotImplementedException();
-//        byte[] buf = convertQword(val);
-//        write(buf, 0, buf.length);
-    }
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {

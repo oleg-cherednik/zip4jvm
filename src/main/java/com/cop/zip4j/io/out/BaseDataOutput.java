@@ -13,7 +13,7 @@ import java.util.Map;
  * @author Oleg Cherednik
  * @since 03.08.2019
  */
-abstract class BaseMarkDataOutput implements MarkDataOutput {
+abstract class BaseDataOutput implements DataOutput {
 
     private final Map<String, Long> map = new HashMap<>();
 
@@ -22,9 +22,9 @@ abstract class BaseMarkDataOutput implements MarkDataOutput {
     @NonNull
     protected final ZipModel zipModel;
     @NonNull
-    private DataOutput delegate;
+    private DataOutputFile delegate;
 
-    protected BaseMarkDataOutput(@NonNull ZipModel zipModel) throws FileNotFoundException {
+    protected BaseDataOutput(@NonNull ZipModel zipModel) throws FileNotFoundException {
         this.zipModel = zipModel;
     }
 
@@ -44,34 +44,25 @@ abstract class BaseMarkDataOutput implements MarkDataOutput {
 
     @Override
     public final void writeWord(int val) throws IOException {
-        doWithTic(new Task() {
-            @Override
-            public void apply() throws IOException {
-                byte[] buf = delegate.convertWord(val);
-                delegate.write(buf, 0, buf.length);
-            }
+        doWithTic(() -> {
+            byte[] buf = delegate.convertWord(val);
+            delegate.write(buf, 0, buf.length);
         });
     }
 
     @Override
     public final void writeDword(long val) throws IOException {
-        doWithTic(new Task() {
-            @Override
-            public void apply() throws IOException {
-                byte[] buf = delegate.convertDword(val);
-                delegate.write(buf, 0, buf.length);
-            }
+        doWithTic(() -> {
+            byte[] buf = delegate.convertDword(val);
+            delegate.write(buf, 0, buf.length);
         });
     }
 
     @Override
     public void writeQword(long val) throws IOException {
-        doWithTic(new Task() {
-            @Override
-            public void apply() throws IOException {
-                byte[] buf = delegate.convertQword(val);
-                delegate.write(buf, 0, buf.length);
-            }
+        doWithTic(() -> {
+            byte[] buf = delegate.convertQword(val);
+            delegate.write(buf, 0, buf.length);
         });
     }
 

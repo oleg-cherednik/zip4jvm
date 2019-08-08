@@ -32,17 +32,10 @@ public interface DataOutput extends Closeable {
 
     void write(byte[] buf, int offs, int len) throws IOException;
 
+    void mark(String id);
 
-    default byte[] convertWord(int val) {
-        return null;
-    }
+    long getWrittenBytesAmount(String id);
 
-    default byte[] convertDword(long val) {
-        return null;
-    }
-
-    default byte[] convertQword(long val) {
-        return null;
-    }
+    int getCounter();
 
 }

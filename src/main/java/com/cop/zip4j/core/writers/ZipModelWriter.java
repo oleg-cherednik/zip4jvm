@@ -1,6 +1,6 @@
 package com.cop.zip4j.core.writers;
 
-import com.cop.zip4j.io.out.MarkDataOutput;
+import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.EndCentralDirectory;
 import com.cop.zip4j.model.ExtraField;
@@ -21,7 +21,7 @@ public final class ZipModelWriter {
     private final ZipModel zipModel;
 
     // TODO do we really need validate flag?
-    public void finalizeZipFile(@NonNull MarkDataOutput out, boolean validate) throws IOException {
+    public void finalizeZipFile(@NonNull DataOutput out, boolean validate) throws IOException {
         if (validate)
             processHeaderData(out);
 
@@ -44,7 +44,7 @@ public final class ZipModelWriter {
         new EndCentralDirectoryWriter(endCentralDirectory, zipModel.getCharset()).write(out);
     }
 
-    private void processHeaderData(MarkDataOutput out) throws IOException {
+    private void processHeaderData(DataOutput out) throws IOException {
         EndCentralDirectory endCentralDirectory = zipModel.getEndCentralDirectory();
         // TODO duplication set; see previous step
         endCentralDirectory.setOffs(out.getOffs());

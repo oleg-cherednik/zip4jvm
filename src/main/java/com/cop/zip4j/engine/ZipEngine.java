@@ -1,10 +1,10 @@
 package com.cop.zip4j.engine;
 
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.io.out.entry.EntryOutputStream;
-import com.cop.zip4j.io.out.MarkDataOutput;
+import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.io.out.SingleZipOutputStream;
 import com.cop.zip4j.io.out.SplitZipOutputStream;
+import com.cop.zip4j.io.out.entry.EntryOutputStream;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.NonNull;
@@ -30,7 +30,7 @@ public class ZipEngine {
         if (entries.isEmpty())
             return;
 
-        try (MarkDataOutput out = createOutputStream()) {
+        try (DataOutput out = createOutputStream()) {
             entries.stream()
                    .filter(entry -> !entry.isRoot())
                    .forEach(entry -> writeEntry(entry, out));
@@ -39,7 +39,7 @@ public class ZipEngine {
         }
     }
 
-    private MarkDataOutput createOutputStream() throws IOException {
+    private DataOutput createOutputStream() throws IOException {
         Path zipFile = zipModel.getZipFile();
         Path parent = zipFile.getParent();
 
@@ -49,7 +49,7 @@ public class ZipEngine {
         return zipModel.isSplitArchive() ? SplitZipOutputStream.create(zipModel) : SingleZipOutputStream.create(zipModel);
     }
 
-    private void writeEntry(PathZipEntry entry, MarkDataOutput out) {
+    private void writeEntry(PathZipEntry entry, DataOutput out) {
         try (OutputStream os = EntryOutputStream.create(entry, zipModel, out)) {
             entry.write(os);
         } catch(IOException e) {

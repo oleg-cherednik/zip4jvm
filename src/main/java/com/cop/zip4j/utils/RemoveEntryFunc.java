@@ -2,8 +2,8 @@ package com.cop.zip4j.utils;
 
 import com.cop.zip4j.core.writers.ZipModelWriter;
 import com.cop.zip4j.exception.Zip4jException;
+import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.io.out.DataOutputStreamDecorator;
-import com.cop.zip4j.io.out.MarkDataOutput;
 import com.cop.zip4j.io.out.SingleZipOutputStream;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.ZipModel;
@@ -45,7 +45,7 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
 
         Path tmpZipFile = createTempFile();
 
-        try (MarkDataOutput out = SingleZipOutputStream.create(tmpZipFile, zipModel)) {
+        try (DataOutput out = SingleZipOutputStream.create(tmpZipFile, zipModel)) {
             writeFileHeaders(new DataOutputStreamDecorator(out), entries);
             new ZipModelWriter(zipModel).finalizeZipFile(out, true);
         } catch(IOException e) {

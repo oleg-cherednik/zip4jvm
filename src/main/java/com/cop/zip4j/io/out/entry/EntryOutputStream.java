@@ -6,7 +6,7 @@ import com.cop.zip4j.core.writers.DataDescriptorWriter;
 import com.cop.zip4j.core.writers.LocalFileHeaderWriter;
 import com.cop.zip4j.crypto.Encoder;
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.io.out.MarkDataOutput;
+import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.DataDescriptor;
@@ -37,19 +37,19 @@ public abstract class EntryOutputStream extends OutputStream {
     private final ZipModel zipModel;
     private final CentralDirectory.FileHeader fileHeader;
     protected final Encoder encoder;
-    protected final MarkDataOutput out;
+    protected final DataOutput out;
 
     private final Checksum checksum = new CRC32();
 
     private int size;
 
-    public static EntryOutputStream create(@NonNull PathZipEntry entry, @NonNull ZipModel zipModel, @NonNull MarkDataOutput out) throws IOException {
+    public static EntryOutputStream create(@NonNull PathZipEntry entry, @NonNull ZipModel zipModel, @NonNull DataOutput out) throws IOException {
         EntryOutputStream res = createOutputStream(entry, zipModel, out);
         res.writeHeader();
         return res;
     }
 
-    private static EntryOutputStream createOutputStream(PathZipEntry entry, ZipModel zipModel, MarkDataOutput out) throws IOException {
+    private static EntryOutputStream createOutputStream(PathZipEntry entry, ZipModel zipModel, DataOutput out) throws IOException {
         Compression compression = entry.getCompression();
         Encoder encoder = entry.getEncryption().encoder(entry);
         CentralDirectory.FileHeader fileHeader = new CentralDirectoryBuilder(entry, zipModel, out.getCounter()).create();

@@ -2,8 +2,8 @@ package com.cop.zip4j;
 
 import com.cop.zip4j.core.writers.ZipModelWriter;
 import com.cop.zip4j.exception.Zip4jException;
+import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.io.out.DataOutputStreamDecorator;
-import com.cop.zip4j.io.out.MarkDataOutput;
 import com.cop.zip4j.io.out.SingleZipOutputStream;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.ZipModel;
@@ -106,7 +106,7 @@ public final class ZipMisc {
             throw new Zip4jException(e);
         }
 
-        try (MarkDataOutput out = SingleZipOutputStream.create(destZipFile, zipModel)) {
+        try (DataOutput out = SingleZipOutputStream.create(destZipFile, zipModel)) {
             zipModel.convertToSolid(copyAllParts(new DataOutputStreamDecorator(out), zipModel));
             new ZipModelWriter(zipModel).finalizeZipFile(out, false);
         } catch(Zip4jException e) {
