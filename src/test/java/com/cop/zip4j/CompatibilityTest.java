@@ -118,19 +118,20 @@ public class CompatibilityTest {
         assertThatDirectory(destDir).matches(TestUtils.dirAssert);
     }
 
-    public void winRarPkwareEncryptionZipShouldBeReadableForZip4j() throws IOException {
+    public void winRarPkwareDeflateZipShouldBeReadableForZip4j() throws IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
         Files.createDirectories(destDir);
 
-        assertThat(Files.exists(Zip4jSuite.winRarPkwareZip)).isTrue();
+        assertThat(Files.exists(Zip4jSuite.winRarPkwareDeflateZip)).isTrue();
 
         UnzipIt unzip = UnzipIt.builder()
-                               .zipFile(Zip4jSuite.winRarPkwareZip)
+                               .zipFile(Zip4jSuite.winRarPkwareDeflateZip)
                                .password(Zip4jSuite.password).build();
 
         unzip.extract(destDir);
 
-        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
+        assertThatDirectory(destDir).matches(TestUtils.starWarsDirAssert);
     }
+
 
 }

@@ -65,7 +65,6 @@ public abstract class EntryOutputStream extends OutputStream {
             out.writeDwordSignature(SPLIT_SIGNATURE);
 
         zipModel.addFileHeader(fileHeader);
-
         writeLocalFileHeader();
         encoder.writeHeader(out);
     }

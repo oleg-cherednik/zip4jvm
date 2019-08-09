@@ -11,25 +11,14 @@ import java.io.IOException;
  */
 public interface Encoder {
 
-    Encoder NULL = new Encoder() {
-        @Override
-        public void encrypt(byte[] buf, int offs, int len) {
-        }
+    Encoder NULL = new NullEncoder();
 
-        @Override
-        public void writeHeader(@NonNull DataOutput out) throws IOException {
-        }
-
-        @Override
-        public String toString() {
-            return "<null>";
-        }
-    };
+    void writeHeader(@NonNull DataOutput out) throws IOException;
 
     void encrypt(@NonNull byte[] buf, int offs, int len);
 
     @Deprecated
-    default void encryptAndWrite(@NonNull byte[] buf, int offs, int len, @NonNull DataOutput out) throws  IOException {
+    default void encryptAndWrite(@NonNull byte[] buf, int offs, int len, @NonNull DataOutput out) throws IOException {
         if (len == 0)
             return;
         encrypt(buf, offs, len);
@@ -40,7 +29,6 @@ public interface Encoder {
         encryptAndWrite(buf, offs, len, out);
     }
 
-    void writeHeader(@NonNull DataOutput out) throws IOException;
 
     default void close(DataOutput out) throws IOException {
     }

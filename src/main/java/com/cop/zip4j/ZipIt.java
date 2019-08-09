@@ -17,6 +17,7 @@ package com.cop.zip4j;
 
 import com.cop.zip4j.engine.ZipEngine;
 import com.cop.zip4j.exception.Zip4jException;
+import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.ZipParameters;
 import com.cop.zip4j.model.entry.PathZipEntry;
@@ -25,6 +26,7 @@ import com.cop.zip4j.utils.CreateZipModel;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.Builder;
 import lombok.NonNull;
+import org.apache.commons.lang.ArrayUtils;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -54,12 +56,13 @@ public final class ZipIt {
     }
 
     public void add(@NonNull Collection<Path> paths, @NonNull ZipParameters parameters) throws IOException {
+        checkParameters(parameters);
+
         if (paths.size() == 1) {
             Path path = paths.iterator().next();
 
             if (Files.isDirectory(path) && parameters.getDefaultFolderPath() == null)
                 parameters.setDefaultFolderPath(path);
-
         }
 
         ZipModel zipModel = new CreateZipModel(zipFile, charset).get().noSplitOnly();
@@ -107,6 +110,14 @@ public final class ZipIt {
         } catch(IOException e) {
             return Collections.emptyList();
         }
+    }
+
+    private static void checkParameters(ZipParameters parameters) {
+        Encryption encryption = parameters.getEncryption();
+        boolean passwordEmpty = ArrayUtils.isEmpty(parameters.getPassword());
+
+        if (encryption != Encryption.OFF && passwordEmpty)
+            throw new Zip4jException("Passwords should not be empty for '" + encryption.name() + "' encryption");
     }
 
 }

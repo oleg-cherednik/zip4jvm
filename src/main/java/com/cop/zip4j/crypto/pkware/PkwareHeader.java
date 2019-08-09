@@ -42,7 +42,7 @@ public class PkwareHeader {
             throws IOException {
         in.seek(localFileHeader.getOffs());
         PkwareHeader header = new PkwareHeader(in.readBytes(SIZE));
-        header.requireMatchCrc(localFileHeader, engine);
+        header.requireMatchChecksum(localFileHeader, engine);
         return header;
     }
 
@@ -50,24 +50,24 @@ public class PkwareHeader {
         out.writeBytes(buf);
     }
 
-    private void requireMatchCrc(LocalFileHeader localFileHeader, PkwareEngine engine) {
+    private void requireMatchChecksum(LocalFileHeader localFileHeader, PkwareEngine engine) {
         engine.decrypt(buf, 0, buf.length);
-        int crc = getCrc(localFileHeader);
+        int crc = getChecksum(localFileHeader);
 
         if (buf[buf.length - 1] != low(crc) || buf[buf.length - 2] != high(crc))
             throw new Zip4jException("The specified password is incorrect");
     }
 
-    private static int getCrc(LocalFileHeader localFileHeader) {
+    private static int getChecksum(LocalFileHeader localFileHeader) {
         return localFileHeader.getLastModifiedTime();
     }
 
-    private static byte low(int crc) {
-        return (byte)(crc >> 8);
+    private static byte low(int checksum) {
+        return (byte)(checksum >> 8);
     }
 
-    private static byte high(int crc) {
-        return (byte)crc;
+    private static byte high(int checksum) {
+        return (byte)checksum;
     }
 
 }
