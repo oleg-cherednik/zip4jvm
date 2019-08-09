@@ -17,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
 /**
  * @author Oleg Cherednik
@@ -24,6 +26,9 @@ import java.io.InputStream;
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class EntryInputStream extends InputStream {
+
+    private final LocalFileHeader localFileHeader;
+    private final Checksum checksum = new CRC32();
 
     public static InputStream create(@NonNull CentralDirectory.FileHeader fileHeader, char[] password, DataInput in, ZipModel zipModel)
             throws IOException {
@@ -42,6 +47,20 @@ public abstract class EntryInputStream extends InputStream {
         }
 
         throw new Zip4jException("Compression is not supported: " + compression);
+    }
+
+    protected final void updateChecksum(byte[] buf, int offs, int len) {
+        checksum.update(buf, offs, len);
+    }
+
+    private void checkChecksum() {
+        if (checksum.getValue() != localFileHeader.getCrc32())
+            throw new Zip4jException("Checksum is not match for entry: " + localFileHeader.getFileName());
+    }
+
+    @Override
+    public void close() throws IOException {
+        checkChecksum();
     }
 
 }
