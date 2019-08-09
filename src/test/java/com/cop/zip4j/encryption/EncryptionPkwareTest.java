@@ -31,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SuppressWarnings("FieldNamingConvention")
 public class EncryptionPkwareTest {
 
-    private static final Path rootDir = Zip4jSuite.generateSubDirName(EncryptionPkwareTest.class);
+    private static final Path rootDir = Zip4jSuite.generateSubDirNameWithTime(EncryptionPkwareTest.class);
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -51,7 +51,7 @@ public class EncryptionPkwareTest {
                                                 .comment("password: " + new String(Zip4jSuite.password))
                                                 .password(Zip4jSuite.password).build();
 
-        Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
+        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         Path zipFile = destDir.resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         zip.add(Zip4jSuite.srcDir, parameters);
@@ -68,7 +68,7 @@ public class EncryptionPkwareTest {
                                                 .comment("password: " + new String(Zip4jSuite.password))
                                                 .password(Zip4jSuite.password).build();
 
-        Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
+        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         Path zipFile = destDir.resolve("src.zip");
 
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
@@ -87,7 +87,7 @@ public class EncryptionPkwareTest {
                                                     .encryption(Encryption.PKWARE)
                                                     .password(password).build();
 
-            Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
+            Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
             Path zipFile = destDir.resolve("src.zip");
             ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
 
@@ -103,7 +103,7 @@ public class EncryptionPkwareTest {
                                                 .comment("password: " + new String(Zip4jSuite.password))
                                                 .password(Zip4jSuite.password).build();
 
-        Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
+        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         Path zipFile = destDir.resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         zip.add(Zip4jSuite.srcDir, parameters);
@@ -125,7 +125,7 @@ public class EncryptionPkwareTest {
                                                 .comment("password: " + new String(Zip4jSuite.password))
                                                 .password(Zip4jSuite.password).build();
 
-        Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
+        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         Path zipFile = destDir.resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         zip.add(Zip4jSuite.srcDir, parameters);
