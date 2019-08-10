@@ -3,7 +3,6 @@ package com.cop.zip4j.io.in.entry;
 import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.LocalFileHeader;
-import com.cop.zip4j.model.ZipModel;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -14,17 +13,13 @@ import java.io.IOException;
  */
 final class StoreEntryInputStream extends EntryInputStream {
 
-    private final ZipModel zipModel;
-    private final Decoder decoder;
-    private final long compressedSize;
     private final DataInput in;
+    private final long compressedSize;
 
     private int readBytes;
 
-    public StoreEntryInputStream(ZipModel zipModel, LocalFileHeader localFileHeader, Decoder decoder, DataInput in) {
+    public StoreEntryInputStream(LocalFileHeader localFileHeader, Decoder decoder, DataInput in) {
         super(localFileHeader);
-        this.zipModel = zipModel;
-        this.decoder = decoder;
         this.in = in;
         compressedSize = decoder.getCompressedSize(localFileHeader);
     }

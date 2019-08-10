@@ -17,14 +17,14 @@ import java.util.zip.Deflater;
 final class DeflateEntryOutputStream extends EntryOutputStream {
 
     private final byte[] buf = new byte[InternalZipConstants.BUF_SIZE];
-    private final Deflater deflater = new Deflater();
+    private final Deflater deflater;
 
     public boolean firstBytesRead;
 
     public DeflateEntryOutputStream(ZipModel zipModel, CentralDirectory.FileHeader fileHeader, Encoder encoder, DataOutput out,
             CompressionLevel compressionLevel) {
         super(zipModel, fileHeader, encoder, out);
-        deflater.setLevel(compressionLevel.getValue());
+        deflater = new Deflater(compressionLevel.getValue(), true);
     }
 
     @Override

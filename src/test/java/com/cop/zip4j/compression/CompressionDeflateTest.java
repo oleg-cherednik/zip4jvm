@@ -100,7 +100,7 @@ public class CompressionDeflateTest {
         UnzipIt unzip = UnzipIt.builder()
                                .zipFile(Zip4jSuite.deflateSolidZip)
                                .build();
-        unzip.extract(destDir);
+        unzip.extract(destDir);//, "Oleg Cherednik.txt");
         assertThatDirectory(destDir).matches(TestUtils.dirAssert);
     }
 
