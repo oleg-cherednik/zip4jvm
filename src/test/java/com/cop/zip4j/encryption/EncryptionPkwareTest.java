@@ -5,6 +5,7 @@ import com.cop.zip4j.UnzipIt;
 import com.cop.zip4j.Zip4jSuite;
 import com.cop.zip4j.ZipIt;
 import com.cop.zip4j.exception.Zip4jException;
+import com.cop.zip4j.exception.Zip4jIncorrectPasswordException;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.Encryption;
@@ -135,7 +136,7 @@ public class EncryptionPkwareTest {
                                .zipFile(zipFile)
                                .password(UUID.randomUUID().toString().toCharArray()).build();
 
-        assertThatThrownBy(() -> unzip.extract(destDir1)).isExactlyInstanceOf(Zip4jException.class);
+        assertThatThrownBy(() -> unzip.extract(destDir1)).isExactlyInstanceOf(Zip4jIncorrectPasswordException.class);
     }
 
 }

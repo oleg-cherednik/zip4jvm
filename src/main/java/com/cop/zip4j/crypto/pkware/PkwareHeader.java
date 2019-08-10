@@ -1,6 +1,6 @@
 package com.cop.zip4j.crypto.pkware;
 
-import com.cop.zip4j.exception.Zip4jException;
+import com.cop.zip4j.exception.Zip4jIncorrectPasswordException;
 import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.model.LocalFileHeader;
@@ -52,10 +52,10 @@ public class PkwareHeader {
 
     private void requireMatchChecksum(LocalFileHeader localFileHeader, PkwareEngine engine) {
         engine.decrypt(buf, 0, buf.length);
-        int crc = getChecksum(localFileHeader);
+        int checksum = getChecksum(localFileHeader);
 
-        if (buf[buf.length - 1] != low(crc) || buf[buf.length - 2] != high(crc))
-            throw new Zip4jException("The specified password is incorrect");
+        if (buf[buf.length - 1] != low(checksum) || buf[buf.length - 2] != high(checksum))
+            throw new Zip4jIncorrectPasswordException(localFileHeader.getFileName());
     }
 
     private static int getChecksum(LocalFileHeader localFileHeader) {

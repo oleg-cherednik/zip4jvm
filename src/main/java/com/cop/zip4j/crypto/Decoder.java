@@ -23,7 +23,7 @@ public interface Decoder {
 
     void decrypt(byte[] buf, int offs, int len);
 
-    default void checkChecksum(@NonNull CentralDirectory.FileHeader fileHeader, long crc32) {
+    default void checkChecksum(@NonNull CentralDirectory.FileHeader fileHeader, long checksum) {
     }
 
     default int getLen(long bytesRead, int len, long length) {

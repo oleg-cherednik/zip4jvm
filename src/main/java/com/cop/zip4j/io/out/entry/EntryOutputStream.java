@@ -35,10 +35,10 @@ public abstract class EntryOutputStream extends OutputStream {
 
     private final ZipModel zipModel;
     private final CentralDirectory.FileHeader fileHeader;
+    private final Checksum checksum = new CRC32();
+
     protected final Encoder encoder;
     protected final DataOutput out;
-
-    private final Checksum checksum = new CRC32();
 
     public static EntryOutputStream create(@NonNull PathZipEntry entry, @NonNull ZipModel zipModel, @NonNull DataOutput out) throws IOException {
         EntryOutputStream res = createOutputStream(entry, zipModel, out);

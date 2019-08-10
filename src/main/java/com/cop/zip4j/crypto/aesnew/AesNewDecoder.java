@@ -93,7 +93,7 @@ public class AesNewDecoder implements Decoder {
     }
 
     @Override
-    public void checkChecksum(@NonNull CentralDirectory.FileHeader fileHeader, long crc32) {
+    public void checkChecksum(@NonNull CentralDirectory.FileHeader fileHeader, long checksum) {
         byte[] actual = new byte[AesEngine.AES_AUTH_LENGTH];
         System.arraycopy(mac.doFinal(), 0, actual, 0, actual.length);
 

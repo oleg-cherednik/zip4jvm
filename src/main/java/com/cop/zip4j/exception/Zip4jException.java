@@ -1,10 +1,13 @@
 package com.cop.zip4j.exception;
 
+import lombok.Getter;
+
+@Getter
 public class Zip4jException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
-    private int code = -1;
+    private ErrorCode code = ErrorCode.UNKNOWN;
 
     public Zip4jException() {
     }
@@ -17,12 +20,12 @@ public class Zip4jException extends RuntimeException {
         super(message, cause);
     }
 
-    public Zip4jException(String msg, int code) {
+    public Zip4jException(String msg, ErrorCode code) {
         super(msg);
         this.code = code;
     }
 
-    public Zip4jException(String message, Throwable cause, int code) {
+    public Zip4jException(String message, Throwable cause, ErrorCode code) {
         super(message, cause);
         this.code = code;
     }
@@ -31,13 +34,9 @@ public class Zip4jException extends RuntimeException {
         super(cause);
     }
 
-    public Zip4jException(Throwable cause, int code) {
+    public Zip4jException(Throwable cause, ErrorCode code) {
         super(cause);
         this.code = code;
-    }
-
-    public int getCode() {
-        return code;
     }
 
 }

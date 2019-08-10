@@ -33,11 +33,9 @@ public class PkwareDecoder implements Decoder {
     }
 
     @Override
-    public void checkChecksum(@NonNull CentralDirectory.FileHeader fileHeader, long crc32) {
-        long calculatedCRC = crc32 & 0xFFFFFFFFL;
-
-        if (calculatedCRC != (fileHeader.getCrc32() & 0xFFFFFFFFL))
-            throw new Zip4jException("invalid CRC for file: " + fileHeader.getFileName() + " (Wrong Password?)");
+    public void checkChecksum(@NonNull CentralDirectory.FileHeader fileHeader, long checksum) {
+        if (checksum != fileHeader.getCrc32())
+            throw new Zip4jException("Incorrect checksum filename '" + fileHeader.getFileName() + '\'');
     }
 
     @Override
