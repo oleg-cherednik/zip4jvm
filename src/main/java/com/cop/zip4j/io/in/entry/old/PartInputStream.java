@@ -1,7 +1,6 @@
 package com.cop.zip4j.io.in.entry.old;
 
 import com.cop.zip4j.crypto.Decoder;
-import com.cop.zip4j.crypto.aes.AesDecoder;
 import com.cop.zip4j.crypto.aes.AesEngine;
 import com.cop.zip4j.crypto.aesnew.AesNewDecoder;
 import com.cop.zip4j.exception.Zip4jException;
@@ -27,8 +26,6 @@ public class PartInputStream extends InputStream {
 
     private long bytesRead;
     private byte[] oneByteBuff = new byte[1];
-    private byte[] aesBlockByte = new byte[16];
-    private int aesBytesReturned = 0;
 
     @Override
     public int available() {
@@ -39,17 +36,6 @@ public class PartInputStream extends InputStream {
     public int read() throws IOException {
         if (bytesRead >= length)
             return -1;
-
-        if (decoder instanceof AesDecoder || decoder instanceof AesNewDecoder) {
-            if (aesBytesReturned == 0 || aesBytesReturned == 16) {
-                if (read(aesBlockByte) == -1)
-                    return -1;
-
-                aesBytesReturned = 0;
-            }
-
-            return aesBlockByte[aesBytesReturned++] & 0xff;
-        }
 
         return read(oneByteBuff, 0, 1) == -1 ? -1 : oneByteBuff[0] & 0xFF;
     }
