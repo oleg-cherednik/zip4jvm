@@ -1,8 +1,6 @@
 package com.cop.zip4j.io.in.entry.old;
 
 import com.cop.zip4j.crypto.Decoder;
-import com.cop.zip4j.crypto.aes.AesEngine;
-import com.cop.zip4j.crypto.aesnew.AesNewDecoder;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.io.in.LittleEndianReadFile;
@@ -46,8 +44,6 @@ public class PartInputStream extends InputStream {
             len = (int)(length - bytesRead);
 
             if (len == 0) {
-                checkAndReadAESMacBytes();
-                checkAndReadAESNewMacBytes();
                 return -1;
             }
         }
@@ -76,11 +72,6 @@ public class PartInputStream extends InputStream {
             bytesRead += count;
         }
 
-        if (bytesRead >= length) {
-            checkAndReadAESMacBytes();
-            checkAndReadAESNewMacBytes();
-        }
-
         return count;
     }
 
@@ -97,42 +88,6 @@ public class PartInputStream extends InputStream {
 
         currSplitFileCounter++;
         return new LittleEndianReadFile(currSplitFile);
-    }
-
-    protected void checkAndReadAESMacBytes() throws IOException {
-        if (!(decoder instanceof AesNewDecoder))
-            return;
-
-        AesNewDecoder dec = (AesNewDecoder)decoder;
-
-        if (dec.getMacKey() == null)
-            dec.setMacKey(readMac());
-    }
-
-    protected void checkAndReadAESNewMacBytes() throws IOException {
-        if (!(decoder instanceof AesNewDecoder))
-            return;
-
-        AesNewDecoder dec = (AesNewDecoder)decoder;
-
-        if (dec.getMacKey() == null)
-            dec.setMacKey(readMac());
-    }
-
-    private byte[] readMac() throws IOException {
-        byte[] mac = in.readBytes(AesEngine.AES_AUTH_LENGTH);
-
-        if (mac.length != AesEngine.AES_AUTH_LENGTH) {
-            if (zipModel.isSplitArchive())
-                throw new IOException("Error occured while reading stored AES authentication bytes");
-
-            in.close();
-            // TODO what if more than one file
-            in = startNextSplitFile();
-            in.read(mac, mac.length, AesEngine.AES_AUTH_LENGTH - mac.length);
-        }
-
-        return mac;
     }
 
     @Override

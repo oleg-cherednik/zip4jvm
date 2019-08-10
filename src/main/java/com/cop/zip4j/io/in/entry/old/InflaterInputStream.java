@@ -80,7 +80,6 @@ public class InflaterInputStream extends InputStream {
         while (delegate.read(b, 0, 1024) != -1) {
             //read all data
         }
-        delegate.checkAndReadAESMacBytes();
     }
 
     private void fill() throws IOException {
