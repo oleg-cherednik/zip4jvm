@@ -64,6 +64,11 @@ public abstract class EntryInputStream extends InputStream {
     }
 
     @Override
+    public final long skip(long n) throws IOException {
+        return super.skip(n);
+    }
+
+    @Override
     public void close() throws IOException {
         checkChecksum();
         checkUncompressedSize();

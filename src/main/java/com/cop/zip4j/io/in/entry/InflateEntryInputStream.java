@@ -110,31 +110,6 @@ final class InflateEntryInputStream extends EntryInputStream {
      */
 
     @Override
-    public long skip(long n) throws IOException {
-        if (n < 0)
-            throw new IllegalArgumentException("negative skip length");
-
-        int max = (int)Math.min(n, Integer.MAX_VALUE);
-        int total = 0;
-        byte[] b = new byte[512];
-
-        while (total < max) {
-            int len = max - total;
-
-            if (len > b.length)
-                len = b.length;
-
-            len = read(b, 0, len);
-
-            if (len == -1)
-                break;
-
-            total += len;
-        }
-        return total;
-    }
-
-    @Override
     public void close() throws IOException {
         inflater.end();
         in.close();
