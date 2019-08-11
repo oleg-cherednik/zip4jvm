@@ -60,6 +60,8 @@ public abstract class EntryInputStream extends InputStream {
     }
 
     protected long getAvailableCompressedBytes() {
+        int a = 0;
+        a++;
         return Math.max(0, compressedSize - readCompressedBytes);
     }
 

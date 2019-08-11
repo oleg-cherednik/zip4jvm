@@ -1,8 +1,11 @@
 package com.cop.zip4j.crypto;
 
+import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.LocalFileHeader;
 import lombok.NonNull;
+
+import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
@@ -10,16 +13,7 @@ import lombok.NonNull;
  */
 public interface Decoder {
 
-    Decoder NULL = new Decoder() {
-        @Override
-        public void decrypt(byte[] buf, int offs, int len) {
-        }
-
-        @Override
-        public String toString() {
-            return "<null>";
-        }
-    };
+    Decoder NULL = new NullDecoder();
 
     void decrypt(byte[] buf, int offs, int len);
 
@@ -38,7 +32,19 @@ public interface Decoder {
         return localFileHeader.getOffs();
     }
 
+    // ---
+    default int _read(byte[] buf, int offs, int len, DataInput in) throws IOException {
+        return decryptAndRead(buf, offs, len, in);
+    }
 
+    @Deprecated
+    default int decryptAndRead(@NonNull byte[] buf, int offs, int len, @NonNull DataInput in) throws IOException {
+        if (len == 0)
+            return 0;
+        int bytes = in.read(buf, offs, len);
+        decrypt(buf, offs, bytes);
+        return bytes;
+    }
 
 
 }
