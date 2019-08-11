@@ -81,6 +81,11 @@ public abstract class EntryInputStream extends InputStream {
     }
 
     @Override
+    public int available() {
+        return (int)Math.max(0, uncompressedSize - writtenUncompressedBytes);
+    }
+
+    @Override
     public final int read() throws IOException {
         if (available() == 0)
             return IOUtils.EOF;

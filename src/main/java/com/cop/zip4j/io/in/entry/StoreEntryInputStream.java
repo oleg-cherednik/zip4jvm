@@ -18,11 +18,6 @@ final class StoreEntryInputStream extends EntryInputStream {
     }
 
     @Override
-    public int available() {
-        return (int)Math.max(0, compressedSize - readCompressedBytes);
-    }
-
-    @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
         int bytes = _read(buf, offs, len);
 

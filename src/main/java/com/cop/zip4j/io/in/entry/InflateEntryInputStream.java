@@ -26,7 +26,7 @@ final class InflateEntryInputStream extends EntryInputStream {
 
     @Override
     public int available() {
-        int bytes = (int)Math.max(0, uncompressedSize - writtenUncompressedBytes);
+        int bytes = super.available();
 
         if (bytes == 0)
             return inflater.finished() ? 0 : 1;
@@ -37,9 +37,6 @@ final class InflateEntryInputStream extends EntryInputStream {
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
         try {
-            if (writtenUncompressedBytes >= uncompressedSize)
-                return IOUtils.EOF;
-
             int bytes;
 
             while ((bytes = inflater.inflate(buf, offs, len)) == 0) {
