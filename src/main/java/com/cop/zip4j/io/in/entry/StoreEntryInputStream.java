@@ -3,7 +3,6 @@ package com.cop.zip4j.io.in.entry;
 import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.LocalFileHeader;
-import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 
@@ -27,20 +26,7 @@ final class StoreEntryInputStream extends EntryInputStream {
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        len = Math.min(len, available());
-
-        if (len == 0)
-            return IOUtils.EOF;
-
-        len = in.read(buf, offs, len);
-
-        if (len != IOUtils.EOF) {
-            decoder.decrypt(buf, offs, len);
-            updateChecksum(buf, offs, len);
-            readCompressedBytes += len;
-        }
-
-        return len;
+        return _read(buf, offs, len);
     }
 
 }
