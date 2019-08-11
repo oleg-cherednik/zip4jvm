@@ -5,6 +5,7 @@ import com.cop.zip4j.UnzipIt;
 import com.cop.zip4j.Zip4jSuite;
 import com.cop.zip4j.ZipIt;
 import com.cop.zip4j.model.Compression;
+import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ZipParameters;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -13,6 +14,8 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collections;
 
 import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
 import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatZipFile;
@@ -104,13 +107,33 @@ public class CompressionDeflateTest {
         assertThatDirectory(dstDir).matches(TestUtils.dirAssert);
     }
 
-//    public void shouldUnzipWhenSplitAndDeflateCompression() throws IOException {
-//        Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-//        UnzipIt unzip = UnzipIt.builder()
-//                               .zipFile(Zip4jSuite.deflateSplitZip)
-//                               .build();
-//        unzip.extract(dstDir);
-//        assertThatDirectory(dstDir).matches(TestUtils.dirAssert);
-//    }
+    public void shouldUnzipWhenWhenStoreCompressionAndPkwareEncryption() throws IOException {
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compressionMethod(Compression.DEFLATE)
+                                                .encryption(Encryption.PKWARE)
+                                                .defaultFolderPath(Zip4jSuite.srcDir)
+                                                .comment("password: " + new String(Zip4jSuite.password))
+                                                .password(Zip4jSuite.password).build();
+
+        Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
+//        zip.add(Zip4jSuite.filesCarsDir, parameters);
+        zip.add(Collections.singleton(Paths.get("c:/zip4j/foo/src/Oleg Cherednik.txt")), parameters);
+
+
+//        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+//        assertThatZipFile(zipFile, Zip4jSuite.password).exists().rootEntry().hasSubDirectories(1).hasFiles(0);
+//        assertThatZipFile(zipFile, Zip4jSuite.password).directory("cars/").matches(TestUtils.zipCarsDirAssert);
+
+        Path dirUnzip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("unzip");
+        UnzipIt unzip = UnzipIt.builder()
+                               .zipFile(zipFile)
+                               .password(Zip4jSuite.password)
+                               .build();
+        unzip.extract(dirUnzip);
+
+//        assertThatDirectory(dirUnzip).exists().hasSubDirectories(1).hasFiles(0);
+//        assertThatDirectory(dirUnzip).directory("cars/").matches(TestUtils.carsDirAssert);
+    }
 
 }

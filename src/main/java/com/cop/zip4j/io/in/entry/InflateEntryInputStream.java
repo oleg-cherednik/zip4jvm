@@ -35,6 +35,16 @@ final class InflateEntryInputStream extends EntryInputStream {
     }
 
     @Override
+    public int available() {
+        int bytes = (int)Math.max(0, compressedSize - readBytes);
+
+        if (bytes == 0)
+            return inflater.finished() ? 0 : 1;
+
+        return bytes;
+    }
+
+    @Override
     public int read() throws IOException {
         return read(oneByteBuff, 0, 1) == -1 ? -1 : oneByteBuff[0] & 0xff;
     }
@@ -126,20 +136,6 @@ final class InflateEntryInputStream extends EntryInputStream {
             total += len;
         }
         return total;
-    }
-
-    /**
-     * Returns 0 after EOF has been reached, otherwise always return 1.
-     * <p>
-     * Programs should not count on this method to return the actual number
-     * of bytes that could be read without blocking.
-     *
-     * @return 1 before EOF and 0 after EOF.
-     * @throws IOException if an I/O error occurs.
-     */
-    @Override
-    public int available() {
-        return inflater.finished() ? 0 : 1;
     }
 
     @Override
