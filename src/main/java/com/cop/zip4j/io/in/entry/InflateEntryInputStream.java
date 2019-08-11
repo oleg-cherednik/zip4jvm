@@ -20,8 +20,6 @@ final class InflateEntryInputStream extends EntryInputStream {
     private final byte[] buf = new byte[InternalZipConstants.BUF_SIZE];
     private final Inflater inflater = new Inflater(true);
 
-    private long writtenUncompressedBytes;
-
     public InflateEntryInputStream(DataInput in, LocalFileHeader localFileHeader, Decoder decoder) {
         super(in, localFileHeader, decoder);
     }
@@ -42,9 +40,9 @@ final class InflateEntryInputStream extends EntryInputStream {
             if (writtenUncompressedBytes >= uncompressedSize)
                 return IOUtils.EOF;
 
-            int n;
+            int bytes;
 
-            while ((n = inflater.inflate(buf, offs, len)) == 0) {
+            while ((bytes = inflater.inflate(buf, offs, len)) == 0) {
                 if (inflater.finished() || inflater.needsDictionary())
                     return IOUtils.EOF;
 
@@ -52,8 +50,8 @@ final class InflateEntryInputStream extends EntryInputStream {
                     fill();
             }
 
-            writtenUncompressedBytes += n;
-            return n;
+            writtenUncompressedBytes += bytes;
+            return bytes;
         } catch(DataFormatException e) {
             throw new IOException(e);
         }
@@ -67,23 +65,6 @@ final class InflateEntryInputStream extends EntryInputStream {
 
         inflater.setInput(buf, 0, len);
     }
-
-    /*
-            len = Math.min(len, available());
-
-        if (len == 0)
-            return IOUtils.EOF;
-
-        len = in.read(buf, offs, len);
-
-        if (len != IOUtils.EOF) {
-            decoder.decrypt(buf, offs, len);
-            updateChecksum(buf, offs, len);
-            readBytes += len;
-        }
-
-        return len;
-     */
 
     @Override
     public void close() throws IOException {

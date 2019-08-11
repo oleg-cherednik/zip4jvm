@@ -32,6 +32,7 @@ public abstract class EntryInputStream extends InputStream {
     private final byte[] buf = new byte[1];
 
     protected int readCompressedBytes;
+    protected long writtenUncompressedBytes;
 
     public static InputStream create(@NonNull CentralDirectory.FileHeader fileHeader, char[] password, DataInput in) throws IOException {
         LocalFileHeader localFileHeader = new LocalFileHeaderReader(fileHeader).read(in);
