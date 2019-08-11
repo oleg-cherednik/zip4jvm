@@ -112,7 +112,7 @@ public abstract class EntryInputStream extends InputStream {
         long expected = localFileHeader.getCrc32();
         long actual = checksum.getValue();
 
-        if (expected != 0 && expected != actual)
+        if (expected != actual)
             throw new Zip4jException("Checksum is not matched: " + localFileHeader.getFileName());
     }
 
