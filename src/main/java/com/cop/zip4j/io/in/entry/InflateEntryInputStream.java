@@ -47,6 +47,7 @@ final class InflateEntryInputStream extends EntryInputStream {
                     fill();
             }
 
+            updateChecksum(buf, offs, bytes);
             writtenUncompressedBytes += bytes;
             return bytes;
         } catch(DataFormatException e) {
@@ -66,7 +67,7 @@ final class InflateEntryInputStream extends EntryInputStream {
     @Override
     public void close() throws IOException {
         inflater.end();
-        in.close();
+        super.close();
     }
 
 }

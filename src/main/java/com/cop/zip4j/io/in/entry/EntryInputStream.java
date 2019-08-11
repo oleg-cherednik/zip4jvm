@@ -73,7 +73,6 @@ public abstract class EntryInputStream extends InputStream {
 
         if (len != IOUtils.EOF) {
             decoder.decrypt(buf, offs, len);
-            updateChecksum(buf, offs, len);
             readCompressedBytes += len;
         }
 
@@ -119,9 +118,9 @@ public abstract class EntryInputStream extends InputStream {
 
     private void checkUncompressedSize() {
         long expected = localFileHeader.getUncompressedSize();
-        long actual = readCompressedBytes;
+        long actual = writtenUncompressedBytes;
 
-        if (expected != 0 && expected != actual)
+        if (expected != actual)
             throw new Zip4jException("UncompressedSize is not matched: " + localFileHeader.getFileName());
     }
 

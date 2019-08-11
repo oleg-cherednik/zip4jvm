@@ -21,8 +21,10 @@ final class StoreEntryInputStream extends EntryInputStream {
     public int read(byte[] buf, int offs, int len) throws IOException {
         int bytes = _read(buf, offs, len);
 
-        if (bytes != IOUtils.EOF)
+        if (bytes != IOUtils.EOF) {
             writtenUncompressedBytes += bytes;
+            updateChecksum(buf, offs, bytes);
+        }
 
         return bytes;
     }
