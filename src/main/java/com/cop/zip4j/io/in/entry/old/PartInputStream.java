@@ -5,6 +5,7 @@ import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.ZipModel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,7 +20,6 @@ public class PartInputStream extends InputStream {
     private final ZipModel zipModel;
 
     private long bytesRead;
-    private byte[] oneByteBuff = new byte[1];
 
     @Override
     public int available() {
@@ -29,9 +29,15 @@ public class PartInputStream extends InputStream {
     @Override
     public int read() throws IOException {
         if (bytesRead >= length)
-            return -1;
+            return IOUtils.EOF;
 
-        return read(oneByteBuff, 0, 1) == -1 ? -1 : oneByteBuff[0] & 0xFF;
+        byte[] buf = new byte[1];
+        int len = read(buf, 0, 1);
+
+        if (len == IOUtils.EOF)
+            return IOUtils.EOF;
+
+        return buf[0] & 0xFF;
     }
 
     @Override
