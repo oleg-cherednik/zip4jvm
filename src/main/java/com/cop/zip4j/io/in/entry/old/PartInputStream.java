@@ -39,9 +39,8 @@ public class PartInputStream extends InputStream {
         if (len > length - bytesRead) {
             len = (int)(length - bytesRead);
 
-            if (len == 0) {
+            if (len == 0)
                 return -1;
-            }
         }
 
         len = decoder.getLen(bytesRead, len, length);
@@ -55,16 +54,6 @@ public class PartInputStream extends InputStream {
         }
 
         return count;
-    }
-
-    @Override
-    public long skip(long n) throws IOException {
-        if (n < 0)
-            throw new IllegalArgumentException();
-        if (n > length - bytesRead)
-            n = length - bytesRead;
-        bytesRead += n;
-        return n;
     }
 
     @Override

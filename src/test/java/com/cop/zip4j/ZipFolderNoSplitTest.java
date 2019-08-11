@@ -5,6 +5,7 @@ import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.ZipParameters;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -51,6 +52,7 @@ public class ZipFolderNoSplitTest {
     }
 
     @Test(dependsOnMethods = "shouldCreateNewZipWithFolder")
+    @Ignore
     public void shouldAddFolderToExistedZip() throws IOException {
         assertThat(Files.exists(zipFile)).isTrue();
         assertThat(Files.isRegularFile(zipFile)).isTrue();
@@ -70,6 +72,7 @@ public class ZipFolderNoSplitTest {
     }
 
     @Test(dependsOnMethods = "shouldAddFolderToExistedZip")
+    @Ignore
     public void shouldAddEmptyDirectoryToExistedZip() throws IOException {
         assertThat(Files.exists(zipFile)).isTrue();
         assertThat(Files.isRegularFile(zipFile)).isTrue();
