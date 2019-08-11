@@ -14,16 +14,7 @@ import java.io.IOException;
  */
 public interface Decoder {
 
-    Decoder NULL = new Decoder() {
-        @Override
-        public void decrypt(byte[] buf, int offs, int len) {
-        }
-
-        @Override
-        public String toString() {
-            return "<null>";
-        }
-    };
+    Decoder NULL = new NullDecoder();
 
     void decrypt(byte[] buf, int offs, int len);
 
