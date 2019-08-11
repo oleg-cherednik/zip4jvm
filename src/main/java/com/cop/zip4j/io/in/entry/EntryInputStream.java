@@ -69,12 +69,11 @@ public abstract class EntryInputStream extends InputStream {
         if (len == 0)
             return IOUtils.EOF;
 
-        len = in.read(buf, offs, decoder.getLen(readCompressedBytes, len, compressedSize));
+        len = decoder.getLen(readCompressedBytes, len, compressedSize);
+        len = in.read(buf, offs, len);
 
-        if (len != IOUtils.EOF) {
+        if (len != IOUtils.EOF)
             decoder.decrypt(buf, offs, len);
-            readCompressedBytes += len;
-        }
 
         return len;
     }

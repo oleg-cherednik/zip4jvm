@@ -22,6 +22,7 @@ final class StoreEntryInputStream extends EntryInputStream {
         int bytes = _read(buf, offs, len);
 
         if (bytes != IOUtils.EOF) {
+            readCompressedBytes += bytes;
             writtenUncompressedBytes += bytes;
             updateChecksum(buf, offs, bytes);
         }

@@ -61,6 +61,7 @@ final class InflateEntryInputStream extends EntryInputStream {
         if (len == IOUtils.EOF)
             throw new EOFException("Unexpected end of ZLIB input stream");
 
+        readCompressedBytes += len;
         inflater.setInput(buf, 0, len);
     }
 
