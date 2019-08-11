@@ -4,6 +4,7 @@ import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.utils.InternalZipConstants;
+import org.apache.commons.io.IOUtils;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -41,16 +42,13 @@ final class InflateEntryInputStream extends EntryInputStream {
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
         try {
-            if (bytesWritten >= localFileHeader.getUncompressedSize()) {
-                finishInflating();
-                return -1;
-            }
+            if (bytesWritten >= localFileHeader.getUncompressedSize())
+                return IOUtils.EOF;
 
             int n;
 
             while ((n = inflater.inflate(buf, offs, len)) == 0) {
                 if (inflater.finished() || inflater.needsDictionary()) {
-                    finishInflating();
                     return -1;
                 }
 
@@ -65,22 +63,36 @@ final class InflateEntryInputStream extends EntryInputStream {
         }
     }
 
-    private void finishInflating() throws IOException {
-        //In some cases, compelte data is not read even though inflater is complete
-        //make sure to read complete data before returning -1
-        byte[] b = new byte[1024];
-        while (_read(b, 0, 1024) != -1) {
-            //read all data
-        }
-    }
-
     private void fill() throws IOException {
         int len = _read(buf, 0, buf.length);
 
-        if (len == -1)
+        if (len == IOUtils.EOF)
             throw new EOFException("Unexpected end of ZLIB input stream");
 
         inflater.setInput(buf, 0, len);
+    }
+
+    private long bytesRead;
+
+    private int _read(byte[] buf, int offs, int len) throws IOException {
+        if (len > compressedSize - bytesRead) {
+            len = (int)(compressedSize - bytesRead);
+
+            if (len == 0)
+                return IOUtils.EOF;
+        }
+
+        len = decoder.getLen(bytesRead, len, compressedSize);
+
+
+        int count = in.read(buf, offs, len);
+
+        if (count > 0) {
+            decoder.decrypt(buf, offs, count);
+            bytesRead += count;
+        }
+
+        return count;
     }
 
     /**
@@ -136,29 +148,4 @@ final class InflateEntryInputStream extends EntryInputStream {
         in.close();
     }
 
-
-    // -------------------
-
-    private long bytesRead;
-
-    private int _read(byte[] buf, int offs, int len) throws IOException {
-        if (len > compressedSize - bytesRead) {
-            len = (int)(compressedSize - bytesRead);
-
-            if (len == 0)
-                return -1;
-        }
-
-        len = decoder.getLen(bytesRead, len, compressedSize);
-
-
-        int count = in.read(buf, offs, len);
-
-        if (count > 0) {
-            decoder.decrypt(buf, offs, count);
-            bytesRead += count;
-        }
-
-        return count;
-    }
 }
