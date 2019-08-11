@@ -31,7 +31,7 @@ public abstract class EntryInputStream extends InputStream {
     private final Checksum checksum = new CRC32();
     private final byte[] buf = new byte[1];
 
-    protected int readBytes;
+    protected int readCompressedBytes;
 
     public static InputStream create(@NonNull CentralDirectory.FileHeader fileHeader, char[] password, DataInput in) throws IOException {
         LocalFileHeader localFileHeader = new LocalFileHeaderReader(fileHeader).read(in);
@@ -59,7 +59,24 @@ public abstract class EntryInputStream extends InputStream {
     }
 
     protected long getAvailableCompressedBytes() {
-        return Math.max(0, compressedSize - readBytes);
+        return Math.max(0, compressedSize - readCompressedBytes);
+    }
+
+    protected final int _read(byte[] buf, int offs, int len) throws IOException {
+        len = (int)Math.min(len, getAvailableCompressedBytes());
+
+        if (len == 0)
+            return IOUtils.EOF;
+
+        len = in.read(buf, offs, decoder.getLen(readCompressedBytes, len, compressedSize));
+
+        if (len != IOUtils.EOF) {
+            decoder.decrypt(buf, offs, len);
+            updateChecksum(buf, offs, len);
+            readCompressedBytes += len;
+        }
+
+        return len;
     }
 
     @Override
@@ -96,7 +113,7 @@ public abstract class EntryInputStream extends InputStream {
 
     private void checkUncompressedSize() {
         long expected = localFileHeader.getUncompressedSize();
-        long actual = readBytes;
+        long actual = readCompressedBytes;
 
         if (expected != 0 && expected != actual)
             throw new Zip4jException("UncompressedSize is not matched: " + localFileHeader.getFileName());

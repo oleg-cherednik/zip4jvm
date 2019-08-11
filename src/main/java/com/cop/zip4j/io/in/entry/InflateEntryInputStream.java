@@ -68,23 +68,6 @@ final class InflateEntryInputStream extends EntryInputStream {
         inflater.setInput(buf, 0, len);
     }
 
-    private int _read(byte[] buf, int offs, int len) throws IOException {
-        len = (int)Math.min(len, getAvailableCompressedBytes());
-
-        if (len == 0)
-            return IOUtils.EOF;
-
-        len = in.read(buf, offs, decoder.getLen(readBytes, len, compressedSize));
-
-        if (len != IOUtils.EOF) {
-            decoder.decrypt(buf, offs, len);
-            updateChecksum(buf, offs, len);
-            readBytes += len;
-        }
-
-        return len;
-    }
-
     /*
             len = Math.min(len, available());
 
