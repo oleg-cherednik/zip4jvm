@@ -29,7 +29,7 @@ final class DeflateEntryOutputStream extends EntryOutputStream {
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
-        super.write(buf, offs, len);
+        updateChecksum(buf, offs, len);
         deflater.setInput(buf, offs, len);
 
         while (!deflater.needsInput()) {

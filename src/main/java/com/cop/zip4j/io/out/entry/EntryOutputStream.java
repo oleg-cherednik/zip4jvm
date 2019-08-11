@@ -76,14 +76,13 @@ public abstract class EntryOutputStream extends OutputStream {
         out.mark(MARK);
     }
 
-    @Override
-    public final void write(int b) throws IOException {
-        write(new byte[] { (byte)b }, 0, 1);
+    protected final void updateChecksum(byte[] buf, int offs, int len) {
+        checksum.update(buf, offs, len);
     }
 
     @Override
-    public void write(byte[] buf, int offs, int len) throws IOException {
-        checksum.update(buf, offs, len);
+    public final void write(int b) throws IOException {
+        write(new byte[] { (byte)b }, 0, 1);
     }
 
     @Override

@@ -19,8 +19,6 @@ final class StoreEntryInputStream extends EntryInputStream {
     private final long compressedSize;
     private final DataInput in;
 
-    private int readBytes;
-
     public StoreEntryInputStream(ZipModel zipModel, LocalFileHeader localFileHeader, Decoder decoder, DataInput in) {
         super(localFileHeader);
         this.zipModel = zipModel;
@@ -31,7 +29,7 @@ final class StoreEntryInputStream extends EntryInputStream {
 
     @Override
     public int available() {
-        return (int)Math.max(0, compressedSize - readBytes);
+        return (int)Math.max(0, compressedSize - uncompressedSize);
     }
 
     @Override
@@ -59,8 +57,8 @@ final class StoreEntryInputStream extends EntryInputStream {
 
         if (len != IOUtils.EOF) {
             decoder.decrypt(buf, offs, len);
-            readBytes += len;
             updateChecksum(buf, offs, len);
+            uncompressedSize += len;
         }
 
         return len;
