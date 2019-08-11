@@ -63,18 +63,6 @@ public abstract class EntryInputStream extends InputStream {
         return Math.max(0, compressedSize - readCompressedBytes);
     }
 
-    protected final int _read(byte[] buf, int offs, int len) throws IOException {
-        if (len == 0)
-            return IOUtils.EOF;
-
-        len = in.read(buf, offs, len);
-
-        if (len != IOUtils.EOF)
-            decoder.decrypt(buf, offs, len);
-
-        return len;
-    }
-
     @Override
     public int available() {
         return (int)Math.max(0, uncompressedSize - writtenUncompressedBytes);
