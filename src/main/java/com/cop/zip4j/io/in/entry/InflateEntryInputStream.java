@@ -24,7 +24,6 @@ final class InflateEntryInputStream extends EntryInputStream {
     private final Decoder decoder;
     private final long compressedSize;
 
-    private byte[] oneByteBuff = new byte[1];
     private long bytesWritten;
 
     public InflateEntryInputStream(DataInput in, LocalFileHeader localFileHeader, Decoder decoder) {
@@ -42,11 +41,6 @@ final class InflateEntryInputStream extends EntryInputStream {
             return inflater.finished() ? 0 : 1;
 
         return bytes;
-    }
-
-    @Override
-    public int read() throws IOException {
-        return read(oneByteBuff, 0, 1) == -1 ? -1 : oneByteBuff[0] & 0xff;
     }
 
     @Override

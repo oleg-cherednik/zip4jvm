@@ -11,6 +11,7 @@ import com.cop.zip4j.model.ZipModel;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +27,7 @@ public abstract class EntryInputStream extends InputStream {
 
     protected final LocalFileHeader localFileHeader;
     private final Checksum checksum = new CRC32();
+    private final byte[] buf = new byte[1];
 
     protected int readBytes;
 
@@ -48,6 +50,19 @@ public abstract class EntryInputStream extends InputStream {
 
     protected final void updateChecksum(byte[] buf, int offs, int len) {
         checksum.update(buf, offs, len);
+    }
+
+    @Override
+    public final int read() throws IOException {
+        if (available() == 0)
+            return IOUtils.EOF;
+
+        int len = read(buf, 0, 1);
+
+        if (len == IOUtils.EOF)
+            return IOUtils.EOF;
+
+        return buf[0] & 0xFF;
     }
 
     @Override

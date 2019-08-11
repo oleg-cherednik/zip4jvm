@@ -30,20 +30,6 @@ final class StoreEntryInputStream extends EntryInputStream {
     }
 
     @Override
-    public int read() throws IOException {
-        if (available() == 0)
-            return IOUtils.EOF;
-
-        byte[] buf = new byte[1];
-        int len = read(buf, 0, 1);
-
-        if (len == IOUtils.EOF)
-            return IOUtils.EOF;
-
-        return buf[0] & 0xFF;
-    }
-
-    @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
         len = Math.min(len, available());
 
