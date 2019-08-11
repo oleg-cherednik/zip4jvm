@@ -24,7 +24,10 @@ import java.util.zip.Checksum;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class EntryInputStream extends InputStream {
 
+    protected final DataInput in;
     protected final LocalFileHeader localFileHeader;
+    protected final Decoder decoder;
+
     private final Checksum checksum = new CRC32();
     private final byte[] buf = new byte[1];
 

@@ -13,14 +13,10 @@ import java.io.IOException;
  */
 final class StoreEntryInputStream extends EntryInputStream {
 
-    private final DataInput in;
-    private final Decoder decoder;
     private final long compressedSize;
 
     public StoreEntryInputStream(DataInput in, LocalFileHeader localFileHeader, Decoder decoder) {
-        super(localFileHeader);
-        this.in = in;
-        this.decoder = decoder;
+        super(in, localFileHeader, decoder);
         compressedSize = decoder.getCompressedSize(localFileHeader);
     }
 
