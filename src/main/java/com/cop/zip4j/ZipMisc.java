@@ -93,7 +93,7 @@ public final class ZipMisc {
         return new CreateZipModel(zipFile, charset).get().isSplitArchive();
     }
 
-    public void merge(@NonNull Path destZipFile) {
+    public void merge(@NonNull Path dstZipFile) {
         ZipModel zipModel = new CreateZipModel(zipFile, charset).get();
 
         // TODO probably if not split archive, just copy single zip file
@@ -101,12 +101,12 @@ public final class ZipMisc {
             throw new Zip4jException("archive not a split zip file");
 
         try {
-            Files.createDirectories(destZipFile.getParent());
+            Files.createDirectories(dstZipFile.getParent());
         } catch(IOException e) {
             throw new Zip4jException(e);
         }
 
-        try (DataOutput out = SingleZipOutputStream.create(destZipFile, zipModel)) {
+        try (DataOutput out = SingleZipOutputStream.create(dstZipFile, zipModel)) {
             zipModel.convertToSolid(copyAllParts(new DataOutputStreamDecorator(out), zipModel));
             new ZipModelWriter(zipModel).finalizeZipFile(out, false);
         } catch(Zip4jException e) {

@@ -109,7 +109,7 @@ public class PBKDF2Engine {
         return a / b + m;
     }
 
-    protected void _F(byte[] dest, int offset, PRF prf, byte[] S, int c,
+    protected void _F(byte[] dst, int offset, PRF prf, byte[] S, int c,
             int blockIndex) {
         int hLen = prf.getHLen();
         byte U_r[] = new byte[hLen];
@@ -123,20 +123,20 @@ public class PBKDF2Engine {
             U_i = prf.doFinal(U_i);
             xor(U_r, U_i);
         }
-        System.arraycopy(U_r, 0, dest, offset, hLen);
+        System.arraycopy(U_r, 0, dst, offset, hLen);
     }
 
-    protected void xor(byte[] dest, byte[] src) {
-        for (int i = 0; i < dest.length; i++) {
-            dest[i] ^= src[i];
+    protected void xor(byte[] dst, byte[] src) {
+        for (int i = 0; i < dst.length; i++) {
+            dst[i] ^= src[i];
         }
     }
 
-    protected void INT(byte[] dest, int offset, int i) {
-        dest[offset + 0] = (byte)(i / (256 * 256 * 256));
-        dest[offset + 1] = (byte)(i / (256 * 256));
-        dest[offset + 2] = (byte)(i / (256));
-        dest[offset + 3] = (byte)(i);
+    protected void INT(byte[] dst, int offset, int i) {
+        dst[offset + 0] = (byte)(i / (256 * 256 * 256));
+        dst[offset + 1] = (byte)(i / (256 * 256));
+        dst[offset + 2] = (byte)(i / (256));
+        dst[offset + 3] = (byte)(i);
     }
 
     public PBKDF2Parameters getParameters() {

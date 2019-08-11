@@ -30,24 +30,24 @@ public class UnzipIt {
     private final Charset charset = StandardCharsets.UTF_8;
     private final char[] password;
 
-    public void extract(@NonNull Path destDir) throws IOException {
+    public void extract(@NonNull Path dstDir) throws IOException {
         checkZipFile(zipFile);
-        checkOutputFolder(destDir);
+        checkOutputFolder(dstDir);
 
         ZipModel zipModel = new CreateZipModel(zipFile, charset).get();
-        new UnzipEngine(zipModel, password).extractEntries(destDir, zipModel.getEntryNames());
+        new UnzipEngine(zipModel, password).extractEntries(dstDir, zipModel.getEntryNames());
     }
 
-    public void extract(@NonNull Path destDir, @NonNull String entryName) throws IOException {
-        extract(destDir, Collections.singleton(entryName));
+    public void extract(@NonNull Path dstDir, @NonNull String entryName) throws IOException {
+        extract(dstDir, Collections.singleton(entryName));
     }
 
-    public void extract(@NonNull Path destDir, @NonNull Collection<String> entries) throws IOException {
+    public void extract(@NonNull Path dstDir, @NonNull Collection<String> entries) throws IOException {
         checkZipFile(zipFile);
-        checkOutputFolder(destDir);
+        checkOutputFolder(dstDir);
 
         ZipModel zipModel = new CreateZipModel(zipFile, charset).get();
-        new UnzipEngine(zipModel, password).extractEntries(destDir, entries);
+        new UnzipEngine(zipModel, password).extractEntries(dstDir, entries);
     }
 
     public InputStream extract(@NonNull String entryName) throws IOException {
@@ -65,7 +65,7 @@ public class UnzipIt {
     static void checkOutputFolder(@NonNull Path dir) {
 
 //        if(!Files.isDirectory(dir))
-//            throw new ZipException("Destination path is not a directory: " + dir);
+//            throw new ZipException("dstination path is not a directory: " + dir);
 //
 //        if (Files.exists(dir)) {
 //
@@ -84,7 +84,7 @@ public class UnzipIt {
 //                }
 //
 //                if (!file.canWrite()) {
-//                    throw new ZipException("no write access to destination folder");
+//                    throw new ZipException("no write access to dstination folder");
 //                }
 //
 ////				SecurityManager manager = new SecurityManager();
@@ -92,10 +92,10 @@ public class UnzipIt {
 ////					manager.checkWrite(file.getAbsolutePath());
 ////				} catch (Exception e) {
 ////					e.printStackTrace();
-////					throw new ZipException("no write access to destination folder");
+////					throw new ZipException("no write access to dstination folder");
 ////				}
 //            } catch(Exception e) {
-//                throw new ZipException("Cannot create destination folder");
+//                throw new ZipException("Cannot create dstination folder");
 //            }
 //        }
     }

@@ -33,14 +33,14 @@ public class CompatibilityTest {
     private static final Path rootDir = Zip4jSuite.generateSubDirName(CompatibilityTest.class);
 
     public void zip4jShouldBeReadableForZipFile() throws IOException {
-        Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
+        Path dstDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
 
         try (ZipFile zipFile = new ZipFile(Zip4jSuite.deflateSolidZip.toFile())) {
             Enumeration<? extends ZipEntry> entries = zipFile.entries();
 
             while (entries.hasMoreElements()) {
                 ZipEntry entry = entries.nextElement();
-                Path path = destDir.resolve(entry.getName());
+                Path path = dstDir.resolve(entry.getName());
 
                 if (entry.isDirectory())
                     Files.createDirectories(path);
@@ -49,18 +49,18 @@ public class CompatibilityTest {
             }
         }
 
-        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
+        assertThatDirectory(dstDir).matches(TestUtils.dirAssert);
     }
 
 //    public void zip4jShouldBeReadableForZipInputStream() throws IOException {
-//        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+//        Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
 //        byte[] buf = new byte[1024];
 //
 //        try (ZipInputStream in = new ZipInputStream(new FileInputStream(Zip4jSuite.noSplitZip.toFile()))) {
 //            ZipEntry entry;
 //
 //            while ((entry = in.getNextEntry()) != null) {
-//                Path path = destDir.resolve(entry.getName());
+//                Path path = dstDir.resolve(entry.getName());
 //
 //                if (entry.isDirectory())
 //                    Files.createDirectories(path);
@@ -79,17 +79,17 @@ public class CompatibilityTest {
 //            }
 //        }
 //
-//        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
+//        assertThatDirectory(dstDir).matches(TestUtils.dirAssert);
 //    }
 
     public void zip4jPkwareEncryptionShouldBeReadableForSevenZipTool() throws IOException {
-        Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
+        Path dstDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
 
         try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(Zip4jSuite.deflateSolidPkwareZip.toFile(), "r"));
              IInArchive zip = SevenZip.openInArchive(ArchiveFormat.ZIP, in)) {
 
             for (ISimpleInArchiveItem item : zip.getSimpleInterface().getArchiveItems()) {
-                Path path = destDir.resolve(item.getPath());
+                Path path = dstDir.resolve(item.getPath());
 
                 if (item.isFolder())
                     Files.createDirectories(path);
@@ -115,12 +115,12 @@ public class CompatibilityTest {
             }
         }
 
-        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
+        assertThatDirectory(dstDir).matches(TestUtils.dirAssert);
     }
 
     public void winRarPkwareDeflateZipShouldBeReadableForZip4j() throws IOException {
-        Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
-        Files.createDirectories(destDir);
+        Path dstDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
+        Files.createDirectories(dstDir);
 
         assertThat(Files.exists(Zip4jSuite.winRarPkwareDeflateZip)).isTrue();
 
@@ -128,9 +128,9 @@ public class CompatibilityTest {
                                .zipFile(Zip4jSuite.winRarPkwareDeflateZip)
                                .password(Zip4jSuite.password).build();
 
-        unzip.extract(destDir);
+        unzip.extract(dstDir);
 
-        assertThatDirectory(destDir).matches(TestUtils.starWarsDirAssert);
+        assertThatDirectory(dstDir).matches(TestUtils.starWarsDirAssert);
     }
 
 

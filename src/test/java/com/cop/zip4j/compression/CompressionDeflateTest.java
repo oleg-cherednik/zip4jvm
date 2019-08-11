@@ -96,21 +96,21 @@ public class CompressionDeflateTest {
     }
 
     public void shouldUnzipWhenDeflateCompression() throws IOException {
-        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         UnzipIt unzip = UnzipIt.builder()
                                .zipFile(Zip4jSuite.deflateSolidZip)
                                .build();
-        unzip.extract(destDir);
-        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
+        unzip.extract(dstDir);
+        assertThatDirectory(dstDir).matches(TestUtils.dirAssert);
     }
 
 //    public void shouldUnzipWhenSplitAndDeflateCompression() throws IOException {
-//        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+//        Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
 //        UnzipIt unzip = UnzipIt.builder()
 //                               .zipFile(Zip4jSuite.deflateSplitZip)
 //                               .build();
-//        unzip.extract(destDir);
-//        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
+//        unzip.extract(dstDir);
+//        assertThatDirectory(dstDir).matches(TestUtils.dirAssert);
 //    }
 
 }

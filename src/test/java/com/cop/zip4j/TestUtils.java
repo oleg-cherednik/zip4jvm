@@ -82,8 +82,8 @@ public class TestUtils {
 
     public final Consumer<AbstractZipEntryDirectoryAssert<?>> zipEmptyDirAssert = dir -> dir.exists().hasSubDirectories(0).hasFiles(0);
 
-    public void copyLarge(InputStream in, Path dest) throws IOException {
-        try (OutputStream out = new FileOutputStream(dest.toFile())) {
+    public void copyLarge(InputStream in, Path dst) throws IOException {
+        try (OutputStream out = new FileOutputStream(dst.toFile())) {
             IOUtils.copyLarge(in, out);
         } finally {
             in.close();

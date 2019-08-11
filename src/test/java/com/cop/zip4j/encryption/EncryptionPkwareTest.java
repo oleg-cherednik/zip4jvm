@@ -52,12 +52,12 @@ public class EncryptionPkwareTest {
                                                 .comment("password: " + new String(Zip4jSuite.password))
                                                 .password(Zip4jSuite.password).build();
 
-        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        Path zipFile = destDir.resolve("src.zip");
+        Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path zipFile = dstDir.resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         zip.add(Zip4jSuite.srcDir, parameters);
 
-        assertThatDirectory(destDir).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatDirectory(dstDir).exists().hasSubDirectories(0).hasFiles(1);
         assertThatZipFile(zipFile, Zip4jSuite.password).exists().rootEntry().matches(TestUtils.zipRootDirAssert);
     }
 
@@ -69,8 +69,8 @@ public class EncryptionPkwareTest {
                                                 .comment("password: " + new String(Zip4jSuite.password))
                                                 .password(Zip4jSuite.password).build();
 
-        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        Path zipFile = destDir.resolve("src.zip");
+        Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path zipFile = dstDir.resolve("src.zip");
 
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         zip.add(Zip4jSuite.filesCarsDir, parameters);
@@ -88,8 +88,8 @@ public class EncryptionPkwareTest {
                                                     .encryption(Encryption.PKWARE)
                                                     .password(password).build();
 
-            Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-            Path zipFile = destDir.resolve("src.zip");
+            Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+            Path zipFile = dstDir.resolve("src.zip");
             ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
 
             assertThatThrownBy(() -> zip.add(Zip4jSuite.srcDir, parameters)).isExactlyInstanceOf(Zip4jException.class);
@@ -104,18 +104,18 @@ public class EncryptionPkwareTest {
                                                 .comment("password: " + new String(Zip4jSuite.password))
                                                 .password(Zip4jSuite.password).build();
 
-        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        Path zipFile = destDir.resolve("src.zip");
+        Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path zipFile = dstDir.resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         zip.add(Zip4jSuite.srcDir, parameters);
 
-        destDir = destDir.resolve("unzip");
+        dstDir = dstDir.resolve("unzip");
         UnzipIt unzip = UnzipIt.builder()
                                .zipFile(zipFile)
                                .password(Zip4jSuite.password).build();
-        unzip.extract(destDir);
+        unzip.extract(dstDir);
 
-        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
+        assertThatDirectory(dstDir).matches(TestUtils.dirAssert);
     }
 
     public void shouldThrowExceptionWhenUnzipStandardEncryptedZipWithIncorrectPassword() throws IOException {
@@ -126,17 +126,17 @@ public class EncryptionPkwareTest {
                                                 .comment("password: " + new String(Zip4jSuite.password))
                                                 .password(Zip4jSuite.password).build();
 
-        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        Path zipFile = destDir.resolve("src.zip");
+        Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path zipFile = dstDir.resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         zip.add(Zip4jSuite.srcDir, parameters);
 
-        Path destDir1 = destDir.resolve("unzip");
+        Path dstDir1 = dstDir.resolve("unzip");
         UnzipIt unzip = UnzipIt.builder()
                                .zipFile(zipFile)
                                .password(UUID.randomUUID().toString().toCharArray()).build();
 
-        assertThatThrownBy(() -> unzip.extract(destDir1)).isExactlyInstanceOf(Zip4jIncorrectPasswordException.class);
+        assertThatThrownBy(() -> unzip.extract(dstDir1)).isExactlyInstanceOf(Zip4jIncorrectPasswordException.class);
     }
 
 }

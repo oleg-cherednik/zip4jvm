@@ -48,12 +48,12 @@ public class EncryptionAesTest {
 //                                                .comment("password: " + new String(Zip4jSuite.password))
 //                                                .password(Zip4jSuite.password).build();
 //
-//        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-//        Path zipFile = destDir.resolve("src.zip");
+//        Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+//        Path zipFile = dstDir.resolve("src.zip");
 //        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
 //        zip.add(Zip4jSuite.srcDir, parameters);
 //
-////        assertThatDirectory(destDir).exists().hasSubDirectories(0).hasFiles(1);
+////        assertThatDirectory(dstDir).exists().hasSubDirectories(0).hasFiles(1);
 ////        assertThatEncryptedZipFile(zipFile, Zip4jSuite.password).exists().rootEntry().matches(TestUtils.zipRootDirAssert);
 //    }
 
@@ -66,8 +66,8 @@ public class EncryptionAesTest {
                                                 .comment("password: " + new String(Zip4jSuite.password))
                                                 .password(Zip4jSuite.password).build();
 
-        Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
-        Path zipFile = destDir.resolve("src.zip");
+        Path dstDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
+        Path zipFile = dstDir.resolve("src.zip");
 
 //        Path bentley = Zip4jSuite.carsDir.resolve("bentley-continental.jpg");
 //        Path ferrari = Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg");
@@ -79,11 +79,11 @@ public class EncryptionAesTest {
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
         zip.add(files, parameters);
 
-        destDir = destDir.resolve("unzip");
+        dstDir = dstDir.resolve("unzip");
         UnzipIt unzip = UnzipIt.builder()
                                .zipFile(zipFile)
                                .password(Zip4jSuite.password).build();
-        unzip.extract(destDir);
+        unzip.extract(dstDir);
 
 
 //        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -98,8 +98,8 @@ public class EncryptionAesTest {
 //                                                .encryption(Encryption.PKWARE)
 //                                                .password(null).build();
 //
-//        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-//        Path zipFile = destDir.resolve("src.zip");
+//        Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+//        Path zipFile = dstDir.resolve("src.zip");
 //        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
 //
 //        assertThatThrownBy(() -> zip.add(Zip4jSuite.srcDir, parameters)).isExactlyInstanceOf(Zip4jException.class);
@@ -112,8 +112,8 @@ public class EncryptionAesTest {
 //                                                .encryption(Encryption.PKWARE)
 //                                                .password("".toCharArray()).build();
 //
-//        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-//        Path zipFile = destDir.resolve("src.zip");
+//        Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+//        Path zipFile = dstDir.resolve("src.zip");
 //        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
 //
 //        assertThatThrownBy(() -> zip.add(Zip4jSuite.srcDir, parameters)).isExactlyInstanceOf(Zip4jException.class);
@@ -127,18 +127,18 @@ public class EncryptionAesTest {
 //                                                .comment("password: " + new String(Zip4jSuite.password))
 //                                                .password(Zip4jSuite.password).build();
 //
-//        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-//        Path zipFile = destDir.resolve("src.zip");
+//        Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+//        Path zipFile = dstDir.resolve("src.zip");
 //        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
 //        zip.add(Zip4jSuite.srcDir, parameters);
 //
-//        destDir = destDir.resolve("unzip");
+//        dstDir = dstDir.resolve("unzip");
 //        UnzipIt unzip = UnzipIt.builder()
 //                               .zipFile(zipFile)
 //                               .password(Zip4jSuite.password).build();
-//        unzip.extract(destDir);
+//        unzip.extract(dstDir);
 //
-//        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
+//        assertThatDirectory(dstDir).matches(TestUtils.dirAssert);
 //    }
 
 
@@ -151,27 +151,27 @@ public class EncryptionAesTest {
 //                                                .comment("password: " + new String(Zip4jSuite.password))
 //                                                .password(Zip4jSuite.password).build();
 //
-//        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-//        Path zipFile = destDir.resolve("src.zip");
+//        Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+//        Path zipFile = dstDir.resolve("src.zip");
 //        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
 //        zip.add(Zip4jSuite.srcDir, parameters);
 //
-//        Path destDir1 = destDir.resolve("unzip");
+//        Path dstDir1 = dstDir.resolve("unzip");
 //        UnzipIt unzip = UnzipIt.builder()
 //                               .zipFile(zipFile)
 //                               .password(UUID.randomUUID().toString().toCharArray()).build();
 //
-//        assertThatThrownBy(() -> unzip.extract(destDir1)).isExactlyInstanceOf(Zip4jException.class);
+//        assertThatThrownBy(() -> unzip.extract(dstDir1)).isExactlyInstanceOf(Zip4jException.class);
 //    }
 
 //    public void shouldUnzipWhenAesEncryption() throws IOException {
-//        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-////        Path zipFile = destDir.resolve("d:/zip4j/aes.zip");
-//        Path zipFile = destDir.resolve("d:/zip4j/tmp/aes.zip");
+//        Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+////        Path zipFile = dstDir.resolve("d:/zip4j/aes.zip");
+//        Path zipFile = dstDir.resolve("d:/zip4j/tmp/aes.zip");
 //        UnzipIt unzip = UnzipIt.builder()
 //                               .zipFile(zipFile)
 //                               .password(Zip4jSuite.password).build();
-//        unzip.extract(destDir);
+//        unzip.extract(dstDir);
 //    }
 
 }

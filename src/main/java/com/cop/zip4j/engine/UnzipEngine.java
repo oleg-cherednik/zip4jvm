@@ -35,8 +35,8 @@ public class UnzipEngine {
     private final ZipModel zipModel;
     private final char[] password;
 
-    public void extractEntries(@NonNull Path destDir, @NonNull Collection<String> entries) {
-        getFileHeaders(entries).forEach(fileHeader -> extractEntry(destDir, fileHeader));
+    public void extractEntries(@NonNull Path dstDir, @NonNull Collection<String> entries) {
+        getFileHeaders(entries).forEach(fileHeader -> extractEntry(dstDir, fileHeader));
     }
 
     private List<CentralDirectory.FileHeader> getFileHeaders(@NonNull Collection<String> entries) {
@@ -47,23 +47,23 @@ public class UnzipEngine {
                       .collect(Collectors.toList());
     }
 
-    private void extractEntry(Path destDir, CentralDirectory.FileHeader fileHeader) {
+    private void extractEntry(Path dstDir, CentralDirectory.FileHeader fileHeader) {
         if (fileHeader.isDirectory())
-            extractDirectory(destDir, fileHeader);
+            extractDirectory(dstDir, fileHeader);
         else
-            extractFile(destDir, fileHeader);
+            extractFile(dstDir, fileHeader);
     }
 
-    private static void extractDirectory(Path destDir, CentralDirectory.FileHeader fileHeader) {
+    private static void extractDirectory(Path dstDir, CentralDirectory.FileHeader fileHeader) {
         try {
-            Files.createDirectories(destDir.resolve(fileHeader.getFileName()));
+            Files.createDirectories(dstDir.resolve(fileHeader.getFileName()));
         } catch(IOException e) {
             throw new Zip4jException(e);
         }
     }
 
-    private void extractFile(Path destDir, CentralDirectory.FileHeader fileHeader) {
-        try (InputStream in = extractEntryAsStream(fileHeader); OutputStream out = getOutputStream(destDir, fileHeader)) {
+    private void extractFile(Path dstDir, CentralDirectory.FileHeader fileHeader) {
+        try (InputStream in = extractEntryAsStream(fileHeader); OutputStream out = getOutputStream(dstDir, fileHeader)) {
             IOUtils.copyLarge(in, out);
         } catch(IOException e) {
             throw new Zip4jException(e);
@@ -85,9 +85,9 @@ public class UnzipEngine {
         return zipModel.isSplitArchive() ? SplitZipInputStream.create(zipModel, fileHeader.getDiskNumber()) : SingleZipInputStream.create(zipModel);
     }
 
-    private static FileOutputStream getOutputStream(@NonNull Path destDir, @NonNull CentralDirectory.FileHeader fileHeader) {
+    private static FileOutputStream getOutputStream(@NonNull Path dstDir, @NonNull CentralDirectory.FileHeader fileHeader) {
         try {
-            Path file = destDir.resolve(fileHeader.getFileName());
+            Path file = dstDir.resolve(fileHeader.getFileName());
             Path parent = file.getParent();
 
             if (!Files.exists(file))

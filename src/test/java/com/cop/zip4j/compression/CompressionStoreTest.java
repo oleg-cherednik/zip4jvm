@@ -96,21 +96,21 @@ public class CompressionStoreTest {
     }
 
     public void shouldUnzipWhenStoreCompression() throws IOException {
-        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         UnzipIt unzip = UnzipIt.builder()
                                .zipFile(Zip4jSuite.storeSolidZip)
                                .build();
-        unzip.extract(destDir);
-        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
+        unzip.extract(dstDir);
+        assertThatDirectory(dstDir).matches(TestUtils.dirAssert);
     }
 
     public void shouldUnzipWhenSplitAndStoreCompression() throws IOException {
-        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         UnzipIt unzip = UnzipIt.builder()
                                .zipFile(Zip4jSuite.storeSplitZip)
                                .build();
-        unzip.extract(destDir);
-        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
+        unzip.extract(dstDir);
+        assertThatDirectory(dstDir).matches(TestUtils.dirAssert);
     }
 
 }
