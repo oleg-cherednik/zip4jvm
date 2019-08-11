@@ -24,7 +24,7 @@ import java.util.zip.Checksum;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class EntryInputStream extends InputStream {
 
-    private final LocalFileHeader localFileHeader;
+    protected final LocalFileHeader localFileHeader;
     private final Checksum checksum = new CRC32();
 
     protected int readBytes;
@@ -39,9 +39,9 @@ public abstract class EntryInputStream extends InputStream {
         Compression compression = fileHeader.getCompression();
 
         if (compression == Compression.STORE)
-            return new StoreEntryInputStream(zipModel, localFileHeader, decoder, in);
+            return new StoreEntryInputStream(in, localFileHeader, decoder);
         if (compression == Compression.DEFLATE)
-            return new InflateEntryInputStream(in, fileHeader, decoder, localFileHeader);
+            return new InflateEntryInputStream(in, localFileHeader, decoder);
 
         throw new Zip4jException("Compression is not supported: " + compression);
     }

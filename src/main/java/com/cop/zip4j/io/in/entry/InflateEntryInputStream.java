@@ -2,13 +2,11 @@ package com.cop.zip4j.io.in.entry;
 
 import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.io.in.DataInput;
-import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.utils.InternalZipConstants;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
@@ -16,30 +14,23 @@ import java.util.zip.Inflater;
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
-final class InflateEntryInputStream extends InputStream {
-    private final Inflater inflater = new Inflater(true);
+final class InflateEntryInputStream extends EntryInputStream {
+
     private final byte[] buf = new byte[InternalZipConstants.BUF_SIZE];
+    private final Inflater inflater = new Inflater(true);
+
+    private final DataInput in;
+    private final Decoder decoder;
+    private final long compressedSize;
 
     private byte[] oneByteBuff = new byte[1];
     private long bytesWritten;
-    private long uncompressedSize;
 
-    private final DataInput delegate;
-
-    // -----------
-
-    private final Decoder decoder;
-    private final long length;
-
-    public InflateEntryInputStream(DataInput delegate, CentralDirectory.FileHeader fileHeader, Decoder decoder, LocalFileHeader localFileHeader) {
-        this.delegate = delegate;
-        bytesWritten = 0;
-        uncompressedSize = fileHeader.getUncompressedSize();
-
-        // --------------
-
+    public InflateEntryInputStream(DataInput in, LocalFileHeader localFileHeader, Decoder decoder) {
+        super(localFileHeader);
+        this.in = in;
         this.decoder = decoder;
-        length = decoder.getCompressedSize(localFileHeader);
+        compressedSize = decoder.getCompressedSize(localFileHeader);
     }
 
     @Override
@@ -49,15 +40,8 @@ final class InflateEntryInputStream extends InputStream {
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        if (buf == null)
-            throw new NullPointerException("input buffer is null");
-        if (offs < 0 || len < 0 || len > buf.length - offs)
-            throw new IndexOutOfBoundsException();
-        if (len == 0)
-            return 0;
-
         try {
-            if (bytesWritten >= uncompressedSize) {
+            if (bytesWritten >= localFileHeader.getUncompressedSize()) {
                 finishInflating();
                 return -1;
             }
@@ -77,15 +61,7 @@ final class InflateEntryInputStream extends InputStream {
             bytesWritten += n;
             return n;
         } catch(DataFormatException e) {
-            String s = "Invalid ZLIB data format";
-            if (e.getMessage() != null) {
-                s = e.getMessage();
-            }
-            // TODO fix it, localFileHeader is not belong to UnzipEngine
-//            if (unzipEngine != null)
-//                if (unzipEngine.getLocalFileHeader().getEncryption() == Encryption.STANDARD)
-//                    s += " - Wrong Password?";
-            throw new IOException(s);
+            throw new IOException(e);
         }
     }
 
@@ -157,7 +133,7 @@ final class InflateEntryInputStream extends InputStream {
     @Override
     public void close() throws IOException {
         inflater.end();
-        delegate.close();
+        in.close();
     }
 
 
@@ -165,18 +141,18 @@ final class InflateEntryInputStream extends InputStream {
 
     private long bytesRead;
 
-    private final int _read(byte[] buf, int offs, int len) throws IOException {
-        if (len > length - bytesRead) {
-            len = (int)(length - bytesRead);
+    private int _read(byte[] buf, int offs, int len) throws IOException {
+        if (len > compressedSize - bytesRead) {
+            len = (int)(compressedSize - bytesRead);
 
             if (len == 0)
                 return -1;
         }
 
-        len = decoder.getLen(bytesRead, len, length);
+        len = decoder.getLen(bytesRead, len, compressedSize);
 
 
-        int count = delegate.read(buf, offs, len);
+        int count = in.read(buf, offs, len);
 
         if (count > 0) {
             decoder.decrypt(buf, offs, count);
