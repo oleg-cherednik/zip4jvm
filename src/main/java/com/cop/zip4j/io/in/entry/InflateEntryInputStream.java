@@ -21,17 +21,19 @@ final class InflateEntryInputStream extends EntryInputStream {
     private final Inflater inflater = new Inflater(true);
 
     private final long compressedSize;
+    private final long uncompressedSize;
 
-    private long bytesWritten;
+    private long writtenUncompressedBytes;
 
     public InflateEntryInputStream(DataInput in, LocalFileHeader localFileHeader, Decoder decoder) {
         super(in, localFileHeader, decoder);
         compressedSize = decoder.getCompressedSize(localFileHeader);
+        uncompressedSize = localFileHeader.getUncompressedSize();
     }
 
     @Override
     public int available() {
-        int bytes = (int)Math.max(0, localFileHeader.getUncompressedSize() - bytesWritten);
+        int bytes = (int)Math.max(0, uncompressedSize - writtenUncompressedBytes);
 
         if (bytes == 0)
             return inflater.finished() ? 0 : 1;
@@ -42,7 +44,7 @@ final class InflateEntryInputStream extends EntryInputStream {
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
         try {
-            if (bytesWritten >= localFileHeader.getUncompressedSize())
+            if (writtenUncompressedBytes >= uncompressedSize)
                 return IOUtils.EOF;
 
             int n;
@@ -55,7 +57,7 @@ final class InflateEntryInputStream extends EntryInputStream {
                     fill();
             }
 
-            bytesWritten += n;
+            writtenUncompressedBytes += n;
             return n;
         } catch(DataFormatException e) {
             throw new IOException(e);
@@ -71,37 +73,42 @@ final class InflateEntryInputStream extends EntryInputStream {
         inflater.setInput(buf, 0, len);
     }
 
-    private long bytesRead;
-
     private int _read(byte[] buf, int offs, int len) throws IOException {
-        if (len > compressedSize - bytesRead) {
-            len = (int)(compressedSize - bytesRead);
+        if (len > compressedSize - readBytes) {
+            len = (int)(compressedSize - readBytes);
 
             if (len == 0)
                 return IOUtils.EOF;
         }
 
-        len = decoder.getLen(bytesRead, len, compressedSize);
-
-
+        len = decoder.getLen(readBytes, len, compressedSize);
         int count = in.read(buf, offs, len);
 
         if (count > 0) {
             decoder.decrypt(buf, offs, count);
-            bytesRead += count;
+            readBytes += count;
         }
 
         return count;
     }
 
-    /**
-     * Skips specified number of bytes of uncompressed data.
-     *
-     * @param n the number of bytes to skip
-     * @return the actual number of bytes skipped.
-     * @throws IOException              if an I/O error has occurred
-     * @throws IllegalArgumentException if n < 0
+    /*
+            len = Math.min(len, available());
+
+        if (len == 0)
+            return IOUtils.EOF;
+
+        len = in.read(buf, offs, len);
+
+        if (len != IOUtils.EOF) {
+            decoder.decrypt(buf, offs, len);
+            updateChecksum(buf, offs, len);
+            readBytes += len;
+        }
+
+        return len;
      */
+
     @Override
     public long skip(long n) throws IOException {
         if (n < 0)
