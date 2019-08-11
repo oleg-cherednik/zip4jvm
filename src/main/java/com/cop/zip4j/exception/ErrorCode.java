@@ -12,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum ErrorCode {
     UNKNOWN(-1),
-    ILLEGAL_PASSWORD(1);
+    INCORRECT_PASSWORD(1),
+    EMPTY_PASSWORD(2),
+    PATH_NOT_EXISTS(3);
 
     private final int code;
 

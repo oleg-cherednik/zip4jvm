@@ -1,5 +1,6 @@
 package com.cop.zip4j;
 
+import com.cop.zip4j.exception.Zip4jPathNotExistsException;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.ZipParameters;
@@ -10,10 +11,13 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author Oleg Cherednik
@@ -23,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SuppressWarnings("FieldNamingConvention")
 public class ZipMiscTest {
 
-    private static final Path rootDir = Zip4jSuite.rootDir.resolve(ZipMiscTest.class.getSimpleName());
+    private static final Path rootDir = Zip4jSuite.generateSubDirNameWithTime(ZipMiscTest.class);
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -80,6 +84,23 @@ public class ZipMiscTest {
         assertThat(files.get(7).getFileName().toString()).isEqualTo("src.z07");
         assertThat(files.get(8).getFileName().toString()).isEqualTo("src.z08");
         assertThat(files.get(9).getFileName().toString()).isEqualTo("src.z09");
+    }
+
+    public void shouldThrowExceptionWhenAddedFileNotExists() throws IOException {
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compressionMethod(Compression.STORE)
+                                                .build();
+
+        Path bentley = Zip4jSuite.carsDir.resolve("bentley-continental.jpg");
+        Path ferrari = Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg");
+        Path wiesmann = Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg");
+        Path notExisted = Zip4jSuite.carsDir.resolve(UUID.randomUUID().toString());
+        List<Path> files = Arrays.asList(bentley, ferrari, wiesmann, notExisted);
+
+        Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
+
+        assertThatThrownBy(() -> zip.add(files, parameters)).isExactlyInstanceOf(Zip4jPathNotExistsException.class);
     }
 
 //    public void shouldMergeSplitZip() throws IOException {

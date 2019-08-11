@@ -16,7 +16,9 @@
 package com.cop.zip4j;
 
 import com.cop.zip4j.engine.ZipEngine;
+import com.cop.zip4j.exception.Zip4jEmptyPasswordException;
 import com.cop.zip4j.exception.Zip4jException;
+import com.cop.zip4j.exception.Zip4jPathNotExistsException;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.ZipParameters;
@@ -72,7 +74,7 @@ public final class ZipIt {
         if (parameters.isZip64())
             zipModel.zip64();
 
-        List<PathZipEntry> entries = createEntries(paths);
+        List<PathZipEntry> entries = createEntries(withExistedEntries(paths));
 
         entries.forEach(entry -> {
             try {
@@ -87,6 +89,14 @@ public final class ZipIt {
         });
 
         new ZipEngine(zipModel).addEntries(entries);
+    }
+
+    private static Collection<Path> withExistedEntries(Collection<Path> paths) {
+        for (Path path : paths)
+            if (!Files.exists(path))
+                throw new Zip4jPathNotExistsException(path);
+
+        return paths;
     }
 
     @NonNull
@@ -117,7 +127,7 @@ public final class ZipIt {
         boolean passwordEmpty = ArrayUtils.isEmpty(parameters.getPassword());
 
         if (encryption != Encryption.OFF && passwordEmpty)
-            throw new Zip4jException("Passwords should not be empty for '" + encryption.name() + "' encryption");
+            throw new Zip4jEmptyPasswordException();
     }
 
 }

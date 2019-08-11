@@ -4,7 +4,7 @@ import com.cop.zip4j.TestUtils;
 import com.cop.zip4j.UnzipIt;
 import com.cop.zip4j.Zip4jSuite;
 import com.cop.zip4j.ZipIt;
-import com.cop.zip4j.exception.Zip4jException;
+import com.cop.zip4j.exception.Zip4jEmptyPasswordException;
 import com.cop.zip4j.exception.Zip4jIncorrectPasswordException;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.CompressionLevel;
@@ -92,7 +92,7 @@ public class EncryptionPkwareTest {
             Path zipFile = dstDir.resolve("src.zip");
             ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
 
-            assertThatThrownBy(() -> zip.add(Zip4jSuite.srcDir, parameters)).isExactlyInstanceOf(Zip4jException.class);
+            assertThatThrownBy(() -> zip.add(Zip4jSuite.srcDir, parameters)).isExactlyInstanceOf(Zip4jEmptyPasswordException.class);
         }
     }
 
