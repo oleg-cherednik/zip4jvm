@@ -1,6 +1,9 @@
 package com.cop.zip4j.io.in.entry.old;
 
+import com.cop.zip4j.crypto.Decoder;
+import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.CentralDirectory;
+import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.utils.InternalZipConstants;
 
 import java.io.EOFException;
@@ -18,12 +21,22 @@ public class InflaterInputStream extends InputStream {
     private long bytesWritten;
     private long uncompressedSize;
 
-    private final PartInputStream delegate;
+    private final DataInput delegate;
 
-    public InflaterInputStream(PartInputStream delegate, CentralDirectory.FileHeader fileHeader) {
+    // -----------
+
+    private final Decoder decoder;
+    private final long length;
+
+    public InflaterInputStream(DataInput delegate, CentralDirectory.FileHeader fileHeader, Decoder decoder, LocalFileHeader localFileHeader) {
         this.delegate = delegate;
         bytesWritten = 0;
         uncompressedSize = fileHeader.getUncompressedSize();
+
+        // --------------
+
+        this.decoder = decoder;
+        length = decoder.getCompressedSize(localFileHeader);
     }
 
     @Override
@@ -77,13 +90,13 @@ public class InflaterInputStream extends InputStream {
         //In some cases, compelte data is not read even though inflater is complete
         //make sure to read complete data before returning -1
         byte[] b = new byte[1024];
-        while (delegate.read(b, 0, 1024) != -1) {
+        while (_read(b, 0, 1024) != -1) {
             //read all data
         }
     }
 
     private void fill() throws IOException {
-        int len = delegate.read(buf, 0, buf.length);
+        int len = _read(buf, 0, buf.length);
 
         if (len == -1)
             throw new EOFException("Unexpected end of ZLIB input stream");
@@ -142,6 +155,32 @@ public class InflaterInputStream extends InputStream {
     public void close() throws IOException {
         inflater.end();
         delegate.close();
+    }
+
+
+    // -------------------
+
+    private long bytesRead;
+
+    private final int _read(byte[] buf, int offs, int len) throws IOException {
+        if (len > length - bytesRead) {
+            len = (int)(length - bytesRead);
+
+            if (len == 0)
+                return -1;
+        }
+
+        len = decoder.getLen(bytesRead, len, length);
+
+
+        int count = delegate.read(buf, offs, len);
+
+        if (count > 0) {
+            decoder.decrypt(buf, offs, count);
+            bytesRead += count;
+        }
+
+        return count;
     }
 
 }

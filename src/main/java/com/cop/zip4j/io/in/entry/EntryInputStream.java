@@ -5,7 +5,6 @@ import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.io.in.entry.old.InflaterInputStream;
-import com.cop.zip4j.io.in.entry.old.PartInputStream;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.LocalFileHeader;
@@ -43,8 +42,7 @@ public abstract class EntryInputStream extends InputStream {
         if (compression == Compression.STORE)
             return new StoreEntryInputStream(zipModel, localFileHeader, decoder, in);
         if (compression == Compression.DEFLATE) {
-            PartInputStream pis = new PartInputStream(in, decoder.getCompressedSize(localFileHeader), decoder, zipModel);
-            return new InflaterInputStream(pis, fileHeader);
+            return new InflaterInputStream(in, fileHeader, decoder, localFileHeader);
         }
 
         throw new Zip4jException("Compression is not supported: " + compression);
