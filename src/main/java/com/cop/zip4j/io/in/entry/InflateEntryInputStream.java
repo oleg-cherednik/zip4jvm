@@ -1,4 +1,4 @@
-package com.cop.zip4j.io.in.entry.old;
+package com.cop.zip4j.io.in.entry;
 
 import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.io.in.DataInput;
@@ -12,8 +12,11 @@ import java.io.InputStream;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
-public class InflaterInputStream extends InputStream {
-
+/**
+ * @author Oleg Cherednik
+ * @since 04.08.2019
+ */
+final class InflateEntryInputStream extends InputStream {
     private final Inflater inflater = new Inflater(true);
     private final byte[] buf = new byte[InternalZipConstants.BUF_SIZE];
 
@@ -28,7 +31,7 @@ public class InflaterInputStream extends InputStream {
     private final Decoder decoder;
     private final long length;
 
-    public InflaterInputStream(DataInput delegate, CentralDirectory.FileHeader fileHeader, Decoder decoder, LocalFileHeader localFileHeader) {
+    public InflateEntryInputStream(DataInput delegate, CentralDirectory.FileHeader fileHeader, Decoder decoder, LocalFileHeader localFileHeader) {
         this.delegate = delegate;
         bytesWritten = 0;
         uncompressedSize = fileHeader.getUncompressedSize();
@@ -182,5 +185,4 @@ public class InflaterInputStream extends InputStream {
 
         return count;
     }
-
 }
