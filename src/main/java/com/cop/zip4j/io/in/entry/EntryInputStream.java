@@ -29,7 +29,7 @@ public abstract class EntryInputStream extends InputStream {
     private final LocalFileHeader localFileHeader;
     private final Checksum checksum = new CRC32();
 
-    protected int uncompressedSize;
+    protected int readBytes;
 
     public static InputStream create(@NonNull CentralDirectory.FileHeader fileHeader, char[] password, DataInput in, ZipModel zipModel)
             throws IOException {
@@ -70,7 +70,7 @@ public abstract class EntryInputStream extends InputStream {
 
     private void checkUncompressedSize() {
         long expected = localFileHeader.getUncompressedSize();
-        long actual = uncompressedSize;
+        long actual = readBytes;
 
         if (expected != 0 && expected != actual)
             throw new Zip4jException("UncompressedSize is not matched: " + localFileHeader.getFileName());

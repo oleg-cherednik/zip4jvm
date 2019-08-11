@@ -29,7 +29,7 @@ final class StoreEntryInputStream extends EntryInputStream {
 
     @Override
     public int available() {
-        return (int)Math.max(0, compressedSize - uncompressedSize);
+        return (int)Math.max(0, compressedSize - readBytes);
     }
 
     @Override
@@ -58,7 +58,7 @@ final class StoreEntryInputStream extends EntryInputStream {
         if (len != IOUtils.EOF) {
             decoder.decrypt(buf, offs, len);
             updateChecksum(buf, offs, len);
-            uncompressedSize += len;
+            readBytes += len;
         }
 
         return len;
