@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
+@Deprecated
 public class InflaterInputStream extends InputStream {
 
     private final Inflater inflater = new Inflater(true);

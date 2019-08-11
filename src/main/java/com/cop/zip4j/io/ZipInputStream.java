@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
+@Deprecated
 @RequiredArgsConstructor
 public class ZipInputStream extends InputStream {
 
