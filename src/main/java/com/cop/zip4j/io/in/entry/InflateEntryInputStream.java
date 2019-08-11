@@ -81,15 +81,15 @@ final class InflateEntryInputStream extends EntryInputStream {
                 return IOUtils.EOF;
         }
 
-        len = decoder.getLen(readBytes, len, compressedSize);
-        int count = in.read(buf, offs, len);
+        len = in.read(buf, offs, decoder.getLen(readBytes, len, compressedSize));
 
-        if (count > 0) {
-            decoder.decrypt(buf, offs, count);
-            readBytes += count;
+        if (len != IOUtils.EOF) {
+            decoder.decrypt(buf, offs, len);
+            updateChecksum(buf, offs, len);
+            readBytes += len;
         }
 
-        return count;
+        return len;
     }
 
     /*
