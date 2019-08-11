@@ -64,12 +64,9 @@ public abstract class EntryInputStream extends InputStream {
     }
 
     protected final int _read(byte[] buf, int offs, int len) throws IOException {
-        len = (int)Math.min(len, getAvailableCompressedBytes());
-
         if (len == 0)
             return IOUtils.EOF;
 
-        len = decoder.getLen(readCompressedBytes, len, compressedSize);
         len = in.read(buf, offs, len);
 
         if (len != IOUtils.EOF)

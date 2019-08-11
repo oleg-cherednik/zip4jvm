@@ -19,6 +19,8 @@ final class StoreEntryInputStream extends EntryInputStream {
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
+        len = (int)Math.min(len, getAvailableCompressedBytes());
+        len = decoder.getLen(readCompressedBytes, len, compressedSize);
         int bytes = _read(buf, offs, len);
 
         if (bytes != IOUtils.EOF) {

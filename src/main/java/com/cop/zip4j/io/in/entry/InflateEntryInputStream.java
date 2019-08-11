@@ -56,7 +56,9 @@ final class InflateEntryInputStream extends EntryInputStream {
     }
 
     private void fill() throws IOException {
-        int len = _read(buf, 0, buf.length);
+        int len = (int)Math.min(buf.length, getAvailableCompressedBytes());
+        len = decoder.getLen(readCompressedBytes, len, compressedSize);
+        len = _read(buf, 0, len);
 
         if (len == IOUtils.EOF)
             throw new EOFException("Unexpected end of ZLIB input stream");
