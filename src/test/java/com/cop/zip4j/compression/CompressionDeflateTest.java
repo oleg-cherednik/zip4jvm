@@ -14,8 +14,6 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collections;
 
 import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
 import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatZipFile;
@@ -117,13 +115,12 @@ public class CompressionDeflateTest {
 
         Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-//        zip.add(Zip4jSuite.filesCarsDir, parameters);
-        zip.add(Collections.singleton(Paths.get("c:/zip4j/foo/src/Oleg Cherednik.txt")), parameters);
+        zip.add(Zip4jSuite.filesCarsDir, parameters);
+//        zip.add(Collections.singleton(Paths.get("c:/zip4j/foo/src/Oleg Cherednik.txt")), parameters);
 
-
-//        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-//        assertThatZipFile(zipFile, Zip4jSuite.password).exists().rootEntry().hasSubDirectories(1).hasFiles(0);
-//        assertThatZipFile(zipFile, Zip4jSuite.password).directory("cars/").matches(TestUtils.zipCarsDirAssert);
+        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatZipFile(zipFile, Zip4jSuite.password).exists().rootEntry().hasSubDirectories(1).hasFiles(0);
+        assertThatZipFile(zipFile, Zip4jSuite.password).directory("cars/").matches(TestUtils.zipCarsDirAssert);
 
         Path dirUnzip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("unzip");
         UnzipIt unzip = UnzipIt.builder()
@@ -132,8 +129,8 @@ public class CompressionDeflateTest {
                                .build();
         unzip.extract(dirUnzip);
 
-//        assertThatDirectory(dirUnzip).exists().hasSubDirectories(1).hasFiles(0);
-//        assertThatDirectory(dirUnzip).directory("cars/").matches(TestUtils.carsDirAssert);
+        assertThatDirectory(dirUnzip).exists().hasSubDirectories(1).hasFiles(0);
+        assertThatDirectory(dirUnzip).directory("cars/").matches(TestUtils.carsDirAssert);
     }
 
 }
