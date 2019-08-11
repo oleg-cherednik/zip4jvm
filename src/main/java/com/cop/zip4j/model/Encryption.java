@@ -30,8 +30,7 @@ public enum Encryption {
         }
 
         @Override
-        public Decoder decoder(@NonNull DataInput in, @NonNull LocalFileHeader localFileHeader, char[] password)
-                throws IOException {
+        public Decoder decoder(@NonNull DataInput in, @NonNull LocalFileHeader localFileHeader, char[] password) throws IOException {
             return Decoder.NULL;
         }
     },
@@ -42,8 +41,7 @@ public enum Encryption {
         }
 
         @Override
-        public Decoder decoder(@NonNull DataInput in, @NonNull LocalFileHeader localFileHeader, char[] password)
-                throws IOException {
+        public Decoder decoder(@NonNull DataInput in, @NonNull LocalFileHeader localFileHeader, char[] password) throws IOException {
             return PkwareDecoder.create(in, localFileHeader, password);
         }
     },
@@ -55,8 +53,7 @@ public enum Encryption {
         }
 
         @Override
-        public Decoder decoder(@NonNull DataInput in, @NonNull LocalFileHeader localFileHeader, char[] password)
-                throws IOException {
+        public Decoder decoder(@NonNull DataInput in, @NonNull LocalFileHeader localFileHeader, char[] password) throws IOException {
             byte[] salt = getSalt(in, localFileHeader);
             byte[] passwordVerifier = in.readBytes(2);
             return new AesDecoder(localFileHeader.getExtraField().getAesExtraDataRecord(), password, salt, passwordVerifier);

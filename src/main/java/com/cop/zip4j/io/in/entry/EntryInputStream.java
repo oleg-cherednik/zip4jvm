@@ -70,15 +70,8 @@ public abstract class EntryInputStream extends InputStream {
 
     @Override
     public final int read() throws IOException {
-        if (available() == 0)
-            return IOUtils.EOF;
-
         int len = read(buf, 0, 1);
-
-        if (len == IOUtils.EOF)
-            return IOUtils.EOF;
-
-        return buf[0] & 0xFF;
+        return len == IOUtils.EOF ? IOUtils.EOF : buf[0] & 0xFF;
     }
 
     @Override
