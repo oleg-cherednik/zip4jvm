@@ -58,6 +58,7 @@ final class StoreEntryInputStream extends EntryInputStream {
         len = in.read(buf, offs, len);
 
         if (len != IOUtils.EOF) {
+            decoder.decrypt(buf, offs, len);
             readBytes += len;
             updateChecksum(buf, offs, len);
         }

@@ -1,16 +1,19 @@
 package com.cop.zip4j.engine;
 
 import com.cop.zip4j.exception.Zip4jException;
+import com.cop.zip4j.exception.Zip4jIncorrectPasswordException;
 import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.io.in.SingleZipInputStream;
 import com.cop.zip4j.io.in.SplitZipInputStream;
 import com.cop.zip4j.io.in.entry.EntryInputStream;
 import com.cop.zip4j.model.CentralDirectory;
+import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ZipModel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -48,10 +51,20 @@ public class UnzipEngine {
     }
 
     private void extractEntry(Path dstDir, CentralDirectory.FileHeader fileHeader) {
+        checkPassword(fileHeader);
+
         if (fileHeader.isDirectory())
             extractDirectory(dstDir, fileHeader);
         else
             extractFile(dstDir, fileHeader);
+    }
+
+    private void checkPassword(CentralDirectory.FileHeader fileHeader) {
+        Encryption encryption = fileHeader.getEncryption();
+        boolean passwordEmpty = ArrayUtils.isEmpty(password);
+
+        if (encryption != Encryption.OFF && passwordEmpty)
+            throw new Zip4jIncorrectPasswordException(fileHeader.getFileName());
     }
 
     private static void extractDirectory(Path dstDir, CentralDirectory.FileHeader fileHeader) {

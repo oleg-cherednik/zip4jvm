@@ -114,7 +114,7 @@ public class CompressionStoreTest {
         assertThatDirectory(dstDir).matches(TestUtils.dirAssert);
     }
 
-    public void shouldCreateSingleZipWithFilesWhenStoreCompressionAndPkware() throws IOException {
+    public void shouldUnzipWhenWhenStoreCompressionAndPkwareEncryption() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(Compression.STORE)
                                                 .encryption(Encryption.PKWARE)
@@ -129,6 +129,16 @@ public class CompressionStoreTest {
         assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
         assertThatZipFile(zipFile, Zip4jSuite.password).exists().rootEntry().hasSubDirectories(1).hasFiles(0);
         assertThatZipFile(zipFile, Zip4jSuite.password).directory("cars/").matches(TestUtils.zipCarsDirAssert);
+
+        Path dirUnzip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("unzip");
+        UnzipIt unzip = UnzipIt.builder()
+                               .zipFile(zipFile)
+                               .password(Zip4jSuite.password)
+                               .build();
+        unzip.extract(dirUnzip);
+
+        assertThatDirectory(dirUnzip).exists().hasSubDirectories(1).hasFiles(0);
+        assertThatDirectory(dirUnzip).directory("cars/").matches(TestUtils.carsDirAssert);
     }
 
 }
