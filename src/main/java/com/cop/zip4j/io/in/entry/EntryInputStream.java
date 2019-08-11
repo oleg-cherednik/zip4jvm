@@ -58,6 +58,10 @@ public abstract class EntryInputStream extends InputStream {
         checksum.update(buf, offs, len);
     }
 
+    protected long getAvailableCompressedBytes() {
+        return Math.max(0, compressedSize - readBytes);
+    }
+
     @Override
     public final int read() throws IOException {
         if (available() == 0)

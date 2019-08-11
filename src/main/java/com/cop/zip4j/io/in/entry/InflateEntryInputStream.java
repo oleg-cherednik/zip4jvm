@@ -68,10 +68,6 @@ final class InflateEntryInputStream extends EntryInputStream {
         inflater.setInput(buf, 0, len);
     }
 
-    private long getAvailableCompressedBytes() {
-        return Math.max(0, compressedSize - readBytes);
-    }
-
     private int _read(byte[] buf, int offs, int len) throws IOException {
         len = (int)Math.min(len, getAvailableCompressedBytes());
 
