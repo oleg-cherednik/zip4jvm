@@ -7,7 +7,6 @@ import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.LocalFileHeader;
-import com.cop.zip4j.model.ZipModel;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -31,13 +30,9 @@ public abstract class EntryInputStream extends InputStream {
 
     protected int readBytes;
 
-    public static InputStream create(@NonNull CentralDirectory.FileHeader fileHeader, char[] password, DataInput in, ZipModel zipModel)
-            throws IOException {
+    public static InputStream create(@NonNull CentralDirectory.FileHeader fileHeader, char[] password, DataInput in) throws IOException {
         LocalFileHeader localFileHeader = new LocalFileHeaderReader(fileHeader).read(in);
         Decoder decoder = localFileHeader.getEncryption().decoder(in, localFileHeader, password);
-
-        in.seek(decoder.getOffs(localFileHeader));
-
         Compression compression = fileHeader.getCompression();
 
         if (compression == Compression.STORE)

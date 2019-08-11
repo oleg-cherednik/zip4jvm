@@ -91,7 +91,7 @@ public class UnzipEngine {
     @NonNull
     private InputStream extractEntryAsStream(@NonNull CentralDirectory.FileHeader fileHeader) throws IOException {
         DataInput in = createInputStream(fileHeader);
-        return EntryInputStream.create(fileHeader, password, in, zipModel);
+        return EntryInputStream.create(fileHeader, password, in);
     }
 
     private DataInput createInputStream(@NonNull CentralDirectory.FileHeader fileHeader) throws IOException {
