@@ -20,15 +20,10 @@ final class InflateEntryInputStream extends EntryInputStream {
     private final byte[] buf = new byte[InternalZipConstants.BUF_SIZE];
     private final Inflater inflater = new Inflater(true);
 
-    private final long compressedSize;
-    private final long uncompressedSize;
-
     private long writtenUncompressedBytes;
 
     public InflateEntryInputStream(DataInput in, LocalFileHeader localFileHeader, Decoder decoder) {
         super(in, localFileHeader, decoder);
-        compressedSize = decoder.getCompressedSize(localFileHeader);
-        uncompressedSize = localFileHeader.getUncompressedSize();
     }
 
     @Override

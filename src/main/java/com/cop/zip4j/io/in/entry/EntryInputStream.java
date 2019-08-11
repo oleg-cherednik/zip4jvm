@@ -7,9 +7,7 @@ import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.LocalFileHeader;
-import lombok.AccessLevel;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -21,12 +19,14 @@ import java.util.zip.Checksum;
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class EntryInputStream extends InputStream {
 
     protected final DataInput in;
     protected final LocalFileHeader localFileHeader;
     protected final Decoder decoder;
+
+    protected final long compressedSize;
+    protected final long uncompressedSize;
 
     private final Checksum checksum = new CRC32();
     private final byte[] buf = new byte[1];
@@ -44,6 +44,14 @@ public abstract class EntryInputStream extends InputStream {
             return new InflateEntryInputStream(in, localFileHeader, decoder);
 
         throw new Zip4jException("Compression is not supported: " + compression);
+    }
+
+    protected EntryInputStream(DataInput in, LocalFileHeader localFileHeader, Decoder decoder) {
+        this.in = in;
+        this.localFileHeader = localFileHeader;
+        this.decoder = decoder;
+        compressedSize = decoder.getCompressedSize(localFileHeader);
+        uncompressedSize = localFileHeader.getUncompressedSize();
     }
 
     protected final void updateChecksum(byte[] buf, int offs, int len) {
