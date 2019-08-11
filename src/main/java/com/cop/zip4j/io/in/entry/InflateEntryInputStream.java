@@ -35,7 +35,7 @@ final class InflateEntryInputStream extends EntryInputStream {
 
     @Override
     public int available() {
-        int bytes = (int)Math.max(0, compressedSize - readBytes);
+        int bytes = (int)Math.max(0, localFileHeader.getUncompressedSize() - bytesWritten);
 
         if (bytes == 0)
             return inflater.finished() ? 0 : 1;
@@ -52,9 +52,8 @@ final class InflateEntryInputStream extends EntryInputStream {
             int n;
 
             while ((n = inflater.inflate(buf, offs, len)) == 0) {
-                if (inflater.finished() || inflater.needsDictionary()) {
-                    return -1;
-                }
+                if (inflater.finished() || inflater.needsDictionary())
+                    return IOUtils.EOF;
 
                 if (inflater.needsInput())
                     fill();
