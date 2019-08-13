@@ -21,19 +21,16 @@ final class StoreEntryInputStream extends EntryInputStream {
     public int read(byte[] buf, int offs, int len) throws IOException {
         len = (int)Math.min(len, getAvailableCompressedBytes());
         len = decoder.getLen(readCompressedBytes, len, compressedSize);
+        len = in.read(buf, offs, len);
 
-        if (len == 0)
+        if (len == 0 || len == IOUtils.EOF)
             return IOUtils.EOF;
 
-        int bytes = decoder._read(buf, offs, len, in);
-
-        if (bytes != IOUtils.EOF) {
-            readCompressedBytes += bytes;
-            writtenUncompressedBytes += bytes;
-            updateChecksum(buf, offs, bytes);
-        }
-
-        return bytes;
+        decoder.decrypt(buf, offs, len);
+        readCompressedBytes += len;
+        writtenUncompressedBytes += len;
+        updateChecksum(buf, offs, len);
+        return len;
     }
 
 }
