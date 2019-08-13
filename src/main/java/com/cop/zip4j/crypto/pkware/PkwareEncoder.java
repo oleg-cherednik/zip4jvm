@@ -13,7 +13,7 @@ import java.io.IOException;
  * @since 22.03.2019
  */
 @RequiredArgsConstructor
-public class PkwareEncoder implements Encoder {
+public final class PkwareEncoder implements Encoder {
 
     private final PkwareEngine engine;
     private final PkwareHeader header;

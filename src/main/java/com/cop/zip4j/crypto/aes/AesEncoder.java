@@ -17,6 +17,9 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.security.spec.KeySpec;
 
+import static com.cop.zip4j.crypto.aes.AesEngine.AES_BLOCK_SIZE;
+import static com.cop.zip4j.crypto.aes.AesEngine.PASSWORD_VERIFIER_LENGTH;
+
 /**
  * byte[] iv = new byte[128/8];
  * new SecureRandom().nextBytes(iv);
@@ -28,7 +31,7 @@ import java.security.spec.KeySpec;
  * Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
  */
 @RequiredArgsConstructor
-public class AesEncoder implements Encoder {
+public final class AesEncoder implements Encoder {
 
     private final Cipher cipher;
     private final Mac mac;
@@ -41,16 +44,16 @@ public class AesEncoder implements Encoder {
             byte[] salt = generateSalt(strength);
 
             // TODO temporary
-            int length = strength.getKeyLength() + strength.getMacLength() + AesDecoder.PASSWORD_VERIFIER_LENGTH;
+            int length = strength.getKeyLength() + strength.getMacLength() + PASSWORD_VERIFIER_LENGTH;
             SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
             KeySpec spec = new PBEKeySpec(password, salt, 1000, length * 8);
             byte[] tmp = secretKeyFactory.generateSecret(spec).getEncoded();
 
             byte[] macKey = new byte[strength.getMacLength()];
-            byte[] derivedPasswordVerifier = new byte[AesDecoder.PASSWORD_VERIFIER_LENGTH];
+            byte[] derivedPasswordVerifier = new byte[PASSWORD_VERIFIER_LENGTH];
 
             System.arraycopy(tmp, strength.getKeyLength(), macKey, 0, macKey.length);
-            System.arraycopy(tmp, strength.getKeyLength() + macKey.length, derivedPasswordVerifier, 0, AesDecoder.PASSWORD_VERIFIER_LENGTH);
+            System.arraycopy(tmp, strength.getKeyLength() + macKey.length, derivedPasswordVerifier, 0, PASSWORD_VERIFIER_LENGTH);
 
             // --
 
@@ -91,16 +94,16 @@ public class AesEncoder implements Encoder {
         }
     }
 
-    private final byte[] aesBuf = new byte[AesDecoder.AES_BLOCK_SIZE];
+    private final byte[] aesBuf = new byte[AES_BLOCK_SIZE];
     private int aesOffs;
 
     @Override
     public void _write(byte[] buf, int offs, int len, DataOutput out) throws IOException {
         if (aesOffs != 0) {
-            if (len >= (AesDecoder.AES_BLOCK_SIZE - aesOffs)) {
+            if (len >= (AES_BLOCK_SIZE - aesOffs)) {
                 System.arraycopy(buf, offs, aesBuf, aesOffs, aesBuf.length - aesOffs);
                 encryptAndWrite(aesBuf, 0, aesBuf.length, out);
-                offs = AesDecoder.AES_BLOCK_SIZE - aesOffs;
+                offs = AES_BLOCK_SIZE - aesOffs;
                 len -= offs;
                 aesOffs = 0;
             } else {
