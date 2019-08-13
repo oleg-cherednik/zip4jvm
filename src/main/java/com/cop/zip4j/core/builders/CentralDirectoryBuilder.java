@@ -75,7 +75,8 @@ public class CentralDirectoryBuilder {
         generalPurposeFlag.setDataDescriptorExists(true);
         generalPurposeFlag.setUtf8Encoding(zipModel.getCharset() == StandardCharsets.UTF_8);
         generalPurposeFlag.setEncrypted(entry.getEncryption() != Encryption.OFF);
-        generalPurposeFlag.setStrongEncryption(entry.getEncryption() == Encryption.STRONG);
+//        generalPurposeFlag.setStrongEncryption(entry.getEncryption() == Encryption.STRONG);
+        generalPurposeFlag.setStrongEncryption(false);
     }
 
     private long getCompressedSize() {

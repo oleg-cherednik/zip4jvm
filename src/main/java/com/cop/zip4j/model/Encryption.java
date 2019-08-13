@@ -10,45 +10,33 @@ import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import com.cop.zip4j.model.entry.PathZipEntry;
+import lombok.AccessLevel;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
+import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
  * @since 09.03.2019
  */
 @SuppressWarnings("MethodCanBeVariableArityMethod")
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum Encryption {
-    OFF {
-        @Override
-        public Encoder encoder(@NonNull PathZipEntry entry) {
-            return Encoder.NULL;
-        }
-
+    OFF(pathZipEntry -> Encoder.NULL) {
         @Override
         public Decoder decoder(@NonNull DataInput in, @NonNull LocalFileHeader localFileHeader, char[] password) throws IOException {
             return Decoder.NULL;
         }
     },
-    PKWARE {
-        @Override
-        public Encoder encoder(@NonNull PathZipEntry entry) {
-            return PkwareEncoder.create(entry);
-        }
-
+    PKWARE(PkwareEncoder::create) {
         @Override
         public Decoder decoder(@NonNull DataInput in, @NonNull LocalFileHeader localFileHeader, char[] password) throws IOException {
             return PkwareDecoder.create(in, localFileHeader, password);
         }
     },
-    STRONG,
-    AES {
-        @Override
-        public Encoder encoder(@NonNull PathZipEntry entry) {
-            return AesEncoder.create(entry.getStrength(), entry.getPassword());
-        }
-
+    AES(AesEncoder::create) {
         @Override
         public Decoder decoder(DataInput in, @NonNull LocalFileHeader localFileHeader, char[] password) throws IOException {
             return AesDecoder.create(in, localFileHeader, password);
@@ -60,8 +48,10 @@ public enum Encryption {
         }
     };
 
-    public Encoder encoder(@NonNull PathZipEntry entry) {
-        throw new Zip4jException("invalid encryption method");
+    private final Function<PathZipEntry, Encoder> createEncoder;
+
+    public final Encoder encoder(@NonNull PathZipEntry entry) {
+        return createEncoder.apply(entry);
     }
 
     public Decoder decoder(@NonNull DataInput in, @NonNull LocalFileHeader localFileHeader, char[] password) throws IOException {
@@ -73,11 +63,14 @@ public enum Encryption {
     }
 
     public static Encryption get(@NonNull ExtraField extraField, @NonNull GeneralPurposeFlag generalPurposeFlag) {
+        if (generalPurposeFlag.isStrongEncryption())
+            throw new Zip4jException("Strong encryption is not supported");
         if (!generalPurposeFlag.isEncrypted())
             return OFF;
         if (extraField.getAesExtraDataRecord() != AesExtraDataRecord.NULL)
             return AES;
-        return generalPurposeFlag.isStrongEncryption() ? STRONG : PKWARE;
+//        return generalPurposeFlag.isStrongEncryption() ? STRONG : PKWARE;
+        return PKWARE;
     }
 
 }

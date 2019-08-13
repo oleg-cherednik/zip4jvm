@@ -4,6 +4,7 @@ import com.cop.zip4j.crypto.Encoder;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.model.aes.AesStrength;
+import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -20,7 +21,6 @@ import static com.cop.zip4j.crypto.aes.AesEngine.AES_BLOCK_SIZE;
  * @author Oleg Cherednik
  * @since 13.08.2019
  */
-@SuppressWarnings("MethodCanBeVariableArityMethod")
 @RequiredArgsConstructor
 public final class AesEncoder implements Encoder {
 
@@ -29,10 +29,11 @@ public final class AesEncoder implements Encoder {
     private final byte[] salt;
     private final byte[] passwordChecksum;
 
-    public static AesEncoder create(@NonNull AesStrength strength, @NonNull char[] password) {
+    public static AesEncoder create(@NonNull PathZipEntry entry) {
         try {
+            AesStrength strength = entry.getStrength();
             byte[] salt = generateSalt(strength);
-            byte[] key = AesEngine.createKey(password, salt, strength);
+            byte[] key = AesEngine.createKey(entry.getPassword(), salt, strength);
 
             Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
             Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
