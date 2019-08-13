@@ -40,40 +40,6 @@ public final class AesEncoder implements Encoder {
         }
     }
 
-    private final byte[] iv = new byte[AES_BLOCK_SIZE];
-    private final byte[] counter = new byte[AES_BLOCK_SIZE];
-    private int nonce = AES_BLOCK_SIZE;
-
-    /**
-     * Custom implementation of 'AES/CTR/NoPadding' is not compatible with WinZip specification. Have to implement custom one.
-     *
-     * @see com.sun.crypto.provider.CounterMode
-     */
-    private void cryptUpdate(byte[] buf, int offs, int len) {
-        try {
-            for (int i = 0; i < len; i++) {
-                if (nonce == iv.length) {
-                    ivUpdate();
-                    cipher.update(iv, 0, iv.length, counter);
-                    nonce = 0;
-                }
-
-                buf[offs + i] ^= counter[nonce++];
-            }
-        } catch(ShortBufferException e) {
-            throw new Zip4jException(e);
-        }
-    }
-
-    private void ivUpdate() {
-        for (int i = 0; i < iv.length; i++)
-            if (++iv[i] != 0)
-                break;
-    }
-
-    private final byte[] aesBuf = new byte[AES_BLOCK_SIZE];
-    private int aesOffs;
-
     @Override
     public void writeHeader(DataOutput out) throws IOException {
         out.writeBytes(salt);
@@ -82,8 +48,38 @@ public final class AesEncoder implements Encoder {
 
     @Override
     public void encrypt(byte[] buf, int offs, int len) {
-        cryptUpdate(buf, offs, len);
-        mac.update(buf, offs, len);
+        try {
+            cypherUpdate(buf, offs, len);
+            mac.update(buf, offs, len);
+        } catch(Exception e) {
+            throw new Zip4jException(e);
+        }
+    }
+
+    private final byte[] iv = new byte[AES_BLOCK_SIZE];
+    private final byte[] counter = new byte[AES_BLOCK_SIZE];
+    private int nonce = AES_BLOCK_SIZE;
+
+    /**
+     * Custom implementation (com.sun.crypto.provider.CounterMode) of 'AES/CTR/NoPadding' is not compatible with WinZip specification.
+     * Have to implement custom one.
+     */
+    private void cypherUpdate(byte[] buf, int offs, int len) throws ShortBufferException {
+        for (int i = 0; i < len; i++) {
+            if (nonce == iv.length) {
+                ivUpdate();
+                cipher.update(iv, 0, iv.length, counter);
+                nonce = 0;
+            }
+
+            buf[offs + i] ^= counter[nonce++];
+        }
+    }
+
+    private void ivUpdate() {
+        for (int i = 0; i < iv.length; i++)
+            if (++iv[i] != 0)
+                break;
     }
 
     @Override
