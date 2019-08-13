@@ -52,11 +52,13 @@ final class DeflateEntryOutputStream extends EntryOutputStream {
         }
 
         if (firstBytesRead)
-            encoder._write(buf, 0, len, out);
+            encoder.encrypt(buf, 0, len);
         else {
-            encoder._write(buf, 2, len - 2, out);
+            encoder.encrypt(buf, 2, len - 2);
             firstBytesRead = true;
         }
+
+        out.write(buf, 0, len);
     }
 
     private void finish() throws IOException {

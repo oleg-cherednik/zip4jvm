@@ -57,8 +57,8 @@ public final class AesEncoder implements Encoder {
     }
 
     private final byte[] iv = new byte[AES_BLOCK_SIZE];
-    private final byte[] counter = new byte[AES_BLOCK_SIZE];
-    private int nonce = AES_BLOCK_SIZE;
+    private final byte[] counter = new byte[iv.length];
+    private int nonce = iv.length;
 
     /**
      * Custom implementation (com.sun.crypto.provider.CounterMode) of 'AES/CTR/NoPadding' is not compatible with WinZip specification.
