@@ -1,4 +1,4 @@
-package com.cop.zip4j.crypto.aes.pbkdf2;
+package com.cop.zip4j.foo.pbkdf2;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;

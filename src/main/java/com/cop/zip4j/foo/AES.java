@@ -1,8 +1,7 @@
 package com.cop.zip4j.foo;
 
-import com.cop.zip4j.crypto.aes.AesEngine;
-import com.cop.zip4j.crypto.aes.pbkdf2.PBKDF2Engine;
-import com.cop.zip4j.crypto.aes.pbkdf2.PBKDF2Parameters;
+import com.cop.zip4j.foo.pbkdf2.PBKDF2Engine;
+import com.cop.zip4j.foo.pbkdf2.PBKDF2Parameters;
 import com.cop.zip4j.model.aes.AesStrength;
 import de.idyl.winzipaes.AesZipFileDecrypter;
 import de.idyl.winzipaes.impl.AESDecrypter;
@@ -26,8 +25,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
 
-import static com.cop.zip4j.crypto.aes.AesCipherUtil.prepareBuffAESIVBytes;
-import static com.cop.zip4j.crypto.aes.AesEngine.AES_BLOCK_SIZE;
+import static com.cop.zip4j.foo.AesEngine.AES_BLOCK_SIZE;
 import static com.cop.zip4j.foo.AesDecoder.PASSWORD_VERIFIER_LENGTH;
 
 /**
@@ -187,6 +185,17 @@ class AesDecoder {
     private byte[] deriveKey(byte[] salt) {
         PBKDF2Engine e = new PBKDF2Engine(new PBKDF2Parameters("HmacSHA1", "ISO-8859-1", salt, 1000));
         return e.deriveKey(password, strength.getKeyLength() + strength.getMacLength() + PASSWORD_VERIFIER_LENGTH);
+    }
+
+    public static void prepareBuffAESIVBytes(byte[] buff, int nonce) {
+        buff[0] = (byte) nonce;
+        buff[1] = (byte) (nonce >> 8);
+        buff[2] = (byte) (nonce >> 16);
+        buff[3] = (byte) (nonce >> 24);
+
+        for (int i = 4; i <= 15; i++) {
+            buff[i] = 0;
+        }
     }
 
 }

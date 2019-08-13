@@ -63,7 +63,7 @@ public abstract class PathZipEntry extends ZipEntry {
     public abstract void setEncryption(@NonNull Encryption encryption);
 
     public AesStrength getStrength() {
-        return encryption == Encryption.AES || encryption == Encryption.AES_NEW ? strength : AesStrength.NONE;
+        return encryption == Encryption.AES ? strength : AesStrength.NONE;
     }
 
 }

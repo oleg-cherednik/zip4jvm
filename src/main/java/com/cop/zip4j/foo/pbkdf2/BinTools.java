@@ -1,4 +1,4 @@
-package com.cop.zip4j.crypto.aes.pbkdf2;
+package com.cop.zip4j.foo.pbkdf2;
 
 /*
  * Source referred from Matthias Gartner's PKCS#5 implementation -

@@ -1,182 +1,136 @@
 package com.cop.zip4j.crypto.aes;
 
 import com.cop.zip4j.crypto.Encoder;
-import com.cop.zip4j.crypto.aes.pbkdf2.MacBasedPRF;
-import com.cop.zip4j.crypto.aes.pbkdf2.PBKDF2Engine;
-import com.cop.zip4j.crypto.aes.pbkdf2.PBKDF2Parameters;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.model.aes.AesStrength;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
+import javax.crypto.Cipher;
+import javax.crypto.Mac;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
+import java.security.spec.KeySpec;
 
-import static com.cop.zip4j.crypto.aes.AesCipherUtil.prepareBuffAESIVBytes;
-import static com.cop.zip4j.crypto.aes.AesEngine.AES_BLOCK_SIZE;
-
+/**
+ * byte[] iv = new byte[128/8];
+ * new SecureRandom().nextBytes(iv);
+ * IvParameterSpec ivspec = new IvParameterSpec(iv);
+ * <p>
+ * KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 128);
+ * SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+ * <p>
+ * Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
+ */
+@RequiredArgsConstructor
 public class AesEncoder implements Encoder {
 
-    private static final int PASSWORD_VERIFIER_LENGTH = 2;
+    private final Cipher cipher;
+    private final Mac mac;
+    private final byte[] salt;
+    private final byte[] derivedPasswordVerifier;
 
-    private char[] password;
-    private AesStrength aesKeyStrength;
-    private AesEngine aesEngine;
-    private MacBasedPRF mac;
-
-    private boolean finished;
-
-    private int nonce = 1;
-    private int loopCount = 0;
-
-    private byte[] iv;
-    private byte[] counterBlock;
-    private byte[] derivedPasswordVerifier;
-    private byte[] saltBytes;
-
-    public AesEncoder(char[] password, AesStrength aesKeyStrength) {
-        if (password == null || password.length == 0) {
-            throw new Zip4jException("input password is empty or null");
-        }
-        if (aesKeyStrength != AesStrength.KEY_STRENGTH_128 &&
-                aesKeyStrength != AesStrength.KEY_STRENGTH_256) {
-            throw new Zip4jException("Invalid AES key strength");
-        }
-
-        this.password = password;
-        this.aesKeyStrength = aesKeyStrength;
-        this.finished = false;
-        counterBlock = new byte[AES_BLOCK_SIZE];
-        iv = new byte[AES_BLOCK_SIZE];
-        init();
-    }
-
-    private void init() {
-        int keyLength = aesKeyStrength.getKeyLength();
-        int macLength = aesKeyStrength.getMacLength();
-        int saltLength = aesKeyStrength.getSaltLength();
-
-        saltBytes = generateSalt(saltLength);
-        byte[] keyBytes = deriveKey(saltBytes, password, keyLength, macLength);
-
-        if (keyBytes == null || keyBytes.length != (keyLength + macLength + PASSWORD_VERIFIER_LENGTH)) {
-            throw new Zip4jException("invalid key generated, cannot decrypt file");
-        }
-
-        byte[] aesKey = new byte[keyLength];
-        byte[] macKey = new byte[macLength];
-        derivedPasswordVerifier = new byte[PASSWORD_VERIFIER_LENGTH];
-
-        System.arraycopy(keyBytes, 0, aesKey, 0, keyLength);
-        System.arraycopy(keyBytes, keyLength, macKey, 0, macLength);
-        System.arraycopy(keyBytes, keyLength + macLength, derivedPasswordVerifier, 0, PASSWORD_VERIFIER_LENGTH);
-
-        aesEngine = new AesEngine(aesKey);
-        mac = new MacBasedPRF("HmacSHA1");
-        mac.init(macKey);
-    }
-
-    private byte[] deriveKey(byte[] salt, char[] password, int keyLength, int macLength) {
+    @SuppressWarnings("MethodCanBeVariableArityMethod")
+    public static AesEncoder create(@NonNull AesStrength strength, char[] password) {
         try {
-            PBKDF2Parameters p = new PBKDF2Parameters("HmacSHA1", "ISO-8859-1",
-                    salt, 1000);
-            PBKDF2Engine e = new PBKDF2Engine(p);
-            byte[] derivedKey = e.deriveKey(password, keyLength + macLength + PASSWORD_VERIFIER_LENGTH);
-            return derivedKey;
+            byte[] salt = generateSalt(strength);
+
+            // TODO temporary
+            int length = strength.getKeyLength() + strength.getMacLength() + AesDecoder.PASSWORD_VERIFIER_LENGTH;
+            SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+            KeySpec spec = new PBEKeySpec(password, salt, 1000, length * 8);
+            byte[] tmp = secretKeyFactory.generateSecret(spec).getEncoded();
+
+            byte[] macKey = new byte[strength.getMacLength()];
+            byte[] derivedPasswordVerifier = new byte[AesDecoder.PASSWORD_VERIFIER_LENGTH];
+
+            System.arraycopy(tmp, strength.getKeyLength(), macKey, 0, macKey.length);
+            System.arraycopy(tmp, strength.getKeyLength() + macKey.length, derivedPasswordVerifier, 0, AesDecoder.PASSWORD_VERIFIER_LENGTH);
+
+            // --
+
+            spec = new PBEKeySpec(password, salt, 1000, strength.getSize());
+            SecretKey secretKey = secretKeyFactory.generateSecret(spec);
+            byte[] iv = { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+            Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
+            cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(secretKey.getEncoded(), "AES"), new IvParameterSpec(iv));
+
+            Mac mac = Mac.getInstance("HmacSHA1");
+            mac.init(new SecretKeySpec(macKey, "HmacSHA1"));
+            return new AesEncoder(cipher, mac, salt, derivedPasswordVerifier);
         } catch(Exception e) {
             throw new Zip4jException(e);
         }
     }
 
-    public void encryptData(byte[] buff) {
-
-        if (buff == null) {
-            throw new Zip4jException("input bytes are null, cannot perform AES encrpytion");
-        }
-        encrypt(buff, 0, buff.length);
-    }
-
-    private static byte[] generateSalt(int size) {
+    private static byte[] generateSalt(AesStrength strength) {
         return new byte[] {
                 (byte)0x3, (byte)0x58, (byte)0xC6, (byte)0x44, (byte)0x26,
                 (byte)0x6, (byte)0x30, (byte)0xD2, (byte)0xEF, (byte)0x2B,
                 (byte)0x2D, (byte)0x83, (byte)0x7B, (byte)0x5F, (byte)0xAC, (byte)0xCB };
-
-//        if (size != 8 && size != 16) {
-//            throw new Zip4jException("invalid salt size, cannot generate salt");
-//        }
-//
-//        int rounds = 0;
-//
-//        if (size == 8)
-//            rounds = 2;
-//        if (size == 16)
-//            rounds = 4;
-//
-//        byte[] salt = new byte[size];
-//        for (int j = 0; j < rounds; j++) {
-//            Random rand = new Random();
-//            int i = rand.nextInt();
-//            salt[0 + j * 4] = (byte)(i >> 24);
-//            salt[1 + j * 4] = (byte)(i >> 16);
-//            salt[2 + j * 4] = (byte)(i >> 8);
-//            salt[3 + j * 4] = (byte)i;
-//        }
-//        return salt;
+//        SecureRandom random = new SecureRandom();
+//        byte[] buf = new byte[strength.getSaltLength()];
+//        random.nextBytes(buf);
+//        return buf;
     }
-
-    public byte[] getFinalMac() {
-        byte[] rawMacBytes = mac.doFinal();
-        byte[] macBytes = new byte[10];
-        System.arraycopy(rawMacBytes, 0, macBytes, 0, 10);
-        return macBytes;
-    }
-
-    public byte[] getDerivedPasswordVerifier() {
-        return derivedPasswordVerifier;
-    }
-
-    public byte[] getSaltBytes() {
-        return saltBytes;
-    }
-
 
     @Override
     public void encrypt(byte[] buf, int offs, int len) {
-        if (finished) {
-            // A non 16 byte block has already been passed to encrypter
-            // non 16 byte block should be the last block of compressed data in AES encryption
-            // any more encryption will lead to corruption of data
-            throw new Zip4jException("AES Encrypter is in finished state (A non 16 byte block has already been passed to encrypter)");
-        }
-
-        if (len % 16 != 0) {
-            this.finished = true;
-        }
-
-        for (int j = offs; j < (offs + len); j += AES_BLOCK_SIZE) {
-            loopCount = (j + AES_BLOCK_SIZE <= (offs + len)) ?
-                        AES_BLOCK_SIZE : ((offs + len) - j);
-
-            prepareBuffAESIVBytes(iv, nonce);
-            aesEngine.processBlock(iv, counterBlock);
-
-            for (int k = 0; k < loopCount; k++) {
-                buf[j + k] = (byte)(buf[j + k] ^ counterBlock[k]);
-            }
-
-            mac.update(buf, j, loopCount);
-            nonce++;
+        try {
+            byte[] tmp = cipher.doFinal(buf, offs, len);
+            System.arraycopy(tmp, 0, buf, offs, tmp.length);
+            mac.update(buf, offs, len);
+        } catch(Exception e) {
+            throw new Zip4jException(e);
         }
     }
 
+    private final byte[] aesBuf = new byte[AesDecoder.AES_BLOCK_SIZE];
+    private int aesOffs;
+
     @Override
-    public void writeHeader(@NonNull DataOutput out) throws IOException {
-        out.writeBytes(saltBytes);
+    public void _write(byte[] buf, int offs, int len, DataOutput out) throws IOException {
+        if (aesOffs != 0) {
+            if (len >= (AesDecoder.AES_BLOCK_SIZE - aesOffs)) {
+                System.arraycopy(buf, offs, aesBuf, aesOffs, aesBuf.length - aesOffs);
+                encryptAndWrite(aesBuf, 0, aesBuf.length, out);
+                offs = AesDecoder.AES_BLOCK_SIZE - aesOffs;
+                len -= offs;
+                aesOffs = 0;
+            } else {
+                System.arraycopy(buf, offs, aesBuf, aesOffs, len);
+                aesOffs += len;
+                len = 0;
+            }
+        }
+
+        if (len % 16 != 0) {
+            System.arraycopy(buf, (len + offs) - (len % 16), aesBuf, 0, len % 16);
+            aesOffs = len % 16;
+            len -= aesOffs;
+        }
+
+        encryptAndWrite(buf, offs, len, out);
+    }
+
+    @Override
+    public void writeHeader(DataOutput out) throws IOException {
+        out.writeBytes(salt);
         out.writeBytes(derivedPasswordVerifier);
     }
 
     @Override
     public void close(DataOutput out) throws IOException {
-        out.writeBytes(getFinalMac());
+        if (aesOffs != 0)
+            encryptAndWrite(aesBuf, 0, aesOffs, out);
+
+        out.write(mac.doFinal(), 0, 10);
     }
+
 }

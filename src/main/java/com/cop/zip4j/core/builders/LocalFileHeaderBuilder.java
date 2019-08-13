@@ -34,13 +34,13 @@ public final class LocalFileHeaderBuilder {
 
     @NonNull
     private static CompressionMethod getCompressionMethod(CentralDirectory.FileHeader fileHeader) {
-        if (fileHeader.getEncryption() == Encryption.AES || fileHeader.getEncryption() == Encryption.AES_NEW)
+        if (fileHeader.getEncryption() == Encryption.AES)
             return CompressionMethod.AES_ENC;
         return fileHeader.getCompressionMethod();
     }
 
     private static long getChecksum(CentralDirectory.FileHeader fileHeader) {
-        if (fileHeader.getEncryption() == Encryption.AES || fileHeader.getEncryption() == Encryption.AES_NEW)
+        if (fileHeader.getEncryption() == Encryption.AES)
             return 0;
         return fileHeader.getCrc32();
     }

@@ -1,4 +1,4 @@
-package com.cop.zip4j.crypto.aes;
+package com.cop.zip4j.foo;
 
 import com.cop.zip4j.exception.Zip4jException;
 
