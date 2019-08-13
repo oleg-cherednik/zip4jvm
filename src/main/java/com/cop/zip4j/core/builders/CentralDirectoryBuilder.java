@@ -1,6 +1,6 @@
 package com.cop.zip4j.core.builders;
 
-import com.cop.zip4j.crypto.aes.AesDecoder;
+import com.cop.zip4j.crypto.aes.AesEngine;
 import com.cop.zip4j.crypto.pkware.PkwareHeader;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Compression;
@@ -91,7 +91,7 @@ public class CentralDirectoryBuilder {
         if (entry.getEncryption() == Encryption.PKWARE)
             return fileSize + PkwareHeader.SIZE;
 
-        return fileSize + entry.getStrength().getSaltLength() + AesDecoder.AES_AUTH_LENGTH + AesDecoder.PASSWORD_VERIFIER_LENGTH;
+        return fileSize + entry.getStrength().getSaltLength() + AesEngine.AES_AUTH_LENGTH + AesEngine.PASSWORD_VERIFIER_LENGTH;
     }
 
     private long getUncompressedSize() {

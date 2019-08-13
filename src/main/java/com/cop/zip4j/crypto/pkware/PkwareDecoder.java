@@ -16,7 +16,7 @@ import java.io.IOException;
  */
 @RequiredArgsConstructor
 @SuppressWarnings("MethodCanBeVariableArityMethod")
-public class PkwareDecoder implements Decoder {
+public final class PkwareDecoder implements Decoder {
 
     private final PkwareEngine engine;
 

@@ -24,13 +24,12 @@ import java.io.IOException;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
 
+import static com.cop.zip4j.crypto.aes.AesEngine.AES_AUTH_LENGTH;
+import static com.cop.zip4j.crypto.aes.AesEngine.PASSWORD_VERIFIER_LENGTH;
+
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class AesDecoder implements Decoder {
-
-    public static final int AES_AUTH_LENGTH = 10;
-    public static final int AES_BLOCK_SIZE = 16;
-    public static final int PASSWORD_VERIFIER_LENGTH = 2;
+public final class AesDecoder implements Decoder {
 
     private final Cipher cipher;
     private final Mac mac;
@@ -57,7 +56,7 @@ public class AesDecoder implements Decoder {
             byte[] derivedPasswordVerifier = new byte[PASSWORD_VERIFIER_LENGTH];
 
             System.arraycopy(tmp, strength.getKeyLength(), macKey, 0, macKey.length);
-            System.arraycopy(tmp, strength.getKeyLength() + macKey.length, derivedPasswordVerifier, 0, AesDecoder.PASSWORD_VERIFIER_LENGTH);
+            System.arraycopy(tmp, strength.getKeyLength() + macKey.length, derivedPasswordVerifier, 0, PASSWORD_VERIFIER_LENGTH);
 
             // --
 
