@@ -56,7 +56,7 @@ public abstract class AesEngine {
                 break;
     }
 
-    public static byte[] createKey(char[] password, byte[] salt, AesStrength strength)
+    protected static byte[] createKey(char[] password, byte[] salt, AesStrength strength)
             throws NoSuchAlgorithmException, InvalidKeySpecException {
         final int iterationCount = 1000;
         final int keyLength = strength.getSize() * 2 + 16;
@@ -64,14 +64,14 @@ public abstract class AesEngine {
         return SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(keySpec).getEncoded();
     }
 
-    public static Cipher createCipher(SecretKeySpec secretKeySpec) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+    protected static Cipher createCipher(SecretKeySpec secretKeySpec) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
         Cipher cipher = Cipher.getInstance("AES");
         // use custom AES implementation, so no worry for DECRYPT_MODE
         cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
         return cipher;
     }
 
-    public static Mac createMac(SecretKeySpec secretKeySpec) throws NoSuchAlgorithmException, InvalidKeyException {
+    protected static Mac createMac(SecretKeySpec secretKeySpec) throws NoSuchAlgorithmException, InvalidKeyException {
         Mac mac = Mac.getInstance("HmacSHA1");
         mac.init(secretKeySpec);
         return mac;
