@@ -15,6 +15,8 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collections;
 
 import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
 import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatZipFile;
@@ -154,8 +156,8 @@ public class CompressionStoreTest {
 
         Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-        zip.add(Zip4jSuite.filesCarsDir, parameters);
-//        zip.add(Collections.singleton(Paths.get("d:/zip4j/tmp/tmp.txt")), parameters);
+//        zip.add(Zip4jSuite.filesCarsDir, parameters);
+        zip.add(Collections.singleton(Paths.get("d:/zip4j/tmp/tmp.txt")), parameters);
 
 //        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
 //        assertThatZipFile(zipFile, Zip4jSuite.password).exists().rootEntry().hasSubDirectories(1).hasFiles(0);
