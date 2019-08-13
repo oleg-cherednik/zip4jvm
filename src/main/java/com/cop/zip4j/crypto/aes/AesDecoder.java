@@ -6,7 +6,6 @@ import com.cop.zip4j.exception.Zip4jIncorrectPasswordException;
 import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.aes.AesStrength;
-import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang.ArrayUtils;
 
@@ -18,7 +17,6 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 13.08.2019
  */
-@Getter
 public final class AesDecoder extends AesEngine implements Decoder {
 
     private final int saltLength;
