@@ -150,14 +150,14 @@ public class CompressionStoreTest {
                                                 .compressionMethod(Compression.STORE)
                                                 .encryption(Encryption.AES_NEW)
                                                 .strength(AesStrength.KEY_STRENGTH_256)
-                                                .defaultFolderPath(Zip4jSuite.srcDir)
-                                                .comment("password: " + new String(Zip4jSuite.password))
+//                                                .defaultFolderPath(Zip4jSuite.srcDir)
+//                                                .comment("password: " + new String(Zip4jSuite.password))
                                                 .password(Zip4jSuite.password).build();
 
         Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
 //        zip.add(Zip4jSuite.filesCarsDir, parameters);
-        zip.add(Collections.singleton(Paths.get("c:/zip4j/foo/src/Oleg Cherednik.txt")), parameters);
+        zip.add(Collections.singleton(Paths.get("d:/zip4j/tmp/foo.txt")), parameters);
 
 //        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
 //        assertThatZipFile(zipFile, Zip4jSuite.password).exists().rootEntry().hasSubDirectories(1).hasFiles(0);

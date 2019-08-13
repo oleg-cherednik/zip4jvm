@@ -34,13 +34,22 @@ public class SplitZipOutputStream extends BaseDataOutput {
     }
 
     @Override
+    public void writeWordSignature(int sig) throws IOException {
+        doNotSplitSignature(2);
+        super.writeDwordSignature(sig);
+    }
+
+    @Override
     public void writeDwordSignature(int sig) throws IOException {
+        doNotSplitSignature(4);
+        super.writeDwordSignature(sig);
+    }
+
+    private void doNotSplitSignature(int len) throws IOException {
         long available = zipModel.getSplitLength() - getOffs();
 
-        if (available <= 2)
+        if (available <= len)
             openNextSplit();
-
-        writeDword(sig);
     }
 
     @Override

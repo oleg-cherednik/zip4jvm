@@ -78,7 +78,7 @@ public class LittleEndianWriteFile implements DataOutputFile {
 
     @Override
     public String toString() {
-        return "offs: " + getOffs();
+        return "offs: " + getOffs() + " (0x" + Long.toHexString(getOffs()) + ')';
     }
 
 }

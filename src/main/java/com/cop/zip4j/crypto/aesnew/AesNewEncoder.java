@@ -128,16 +128,10 @@ public class AesNewEncoder implements Encoder {
 
     @Override
     public void close(DataOutput out) throws IOException {
-        if (aesOffs != 0) {
+        if (aesOffs != 0)
             encryptAndWrite(aesBuf, 0, aesOffs, out);
-            aesOffs = 0;
-        }
 
-
-        byte[] buf = mac.doFinal();
-        byte[] macBytes = new byte[10];
-        System.arraycopy(buf, 0, macBytes, 0, 10);
-        out.writeBytes(macBytes);
+        out.write(mac.doFinal(), 0, 10);
     }
 
 }

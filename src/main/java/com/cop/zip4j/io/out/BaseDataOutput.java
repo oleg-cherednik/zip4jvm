@@ -94,7 +94,7 @@ abstract class BaseDataOutput implements DataOutput {
 
     @Override
     public String toString() {
-        return "offs: " + getOffs();
+        return "offs: " + getOffs() + " (0x" + Long.toHexString(getOffs()) + ')';
     }
 
     @FunctionalInterface
