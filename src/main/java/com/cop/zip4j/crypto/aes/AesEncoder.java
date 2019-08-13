@@ -9,10 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
 import javax.crypto.ShortBufferException;
-import javax.crypto.spec.PBEKeySpec;
 import java.io.IOException;
 import java.security.SecureRandom;
 
@@ -29,11 +26,10 @@ import static com.cop.zip4j.crypto.aes.AesEngine.AES_BLOCK_SIZE;
  * <p>
  * Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
  */
+@SuppressWarnings("MethodCanBeVariableArityMethod")
 @RequiredArgsConstructor
 public final class AesEncoder implements Encoder {
 
-    private static final int ITERATION_COUNT = 1000;
-    private static final int KEY_OFFS = 0;
     public static final int BLOCK_SIZE = 16;
 
     private final Cipher cipher;
@@ -49,15 +45,12 @@ public final class AesEncoder implements Encoder {
 
     public static AesEncoder create(@NonNull AesStrength strength, char[] password) {
         try {
-            int keySize = strength.getSize();
             byte[] salt = generateSalt(strength);
-            PBEKeySpec keySpec = new PBEKeySpec(password, salt, ITERATION_COUNT, keySize * 2 + 16);
-            SecretKey secretKey = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(keySpec);
-            byte[] key = secretKey.getEncoded();
+            byte[] key = AesEngine.createKey(password, salt, strength);
 
-            Cipher cipher = AesEngine.createCipher(key, strength);
-            Mac mac = AesEngine.createMac(key, strength);
-            byte[] passwordChecksum = AesEngine.getPasswordChecksum(key, strength);
+            Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
+            Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
+            byte[] passwordChecksum = strength.createPasswordChecksum(key);
 
             return new AesEncoder(cipher, mac, salt, passwordChecksum);
         } catch(Exception e) {
