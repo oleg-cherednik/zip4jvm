@@ -30,10 +30,11 @@ final class FileHeaderReader {
     }
 
     private static CentralDirectory.FileHeader readFileHeader(DataInput in) throws IOException {
+        long offs = in.getOffs();
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
         if (in.readDword() != CentralDirectory.FileHeader.SIGNATURE)
-            throw new Zip4jException("Expected central directory entry not found (offs:" + (in.getOffs() - 4) + ')');
+            throw new Zip4jException("Expected central directory entry not found offs=" + offs);
 
         fileHeader.setVersionMadeBy(in.readWord());
         fileHeader.setVersionToExtract(in.readWord());
@@ -54,9 +55,9 @@ final class FileHeaderReader {
 
         boolean uncompressedSize = fileHeader.getUncompressedSize() == 0xFFFF;
         boolean compressedSize = fileHeader.getCompressedSize() == 0xFFFF;
-        boolean offs = fileHeader.getOffsLocalFileHeader() == 0xFFFF;
+        boolean offsHeader = fileHeader.getOffsLocalFileHeader() == 0xFFFF;
         boolean diskNumber = fileHeader.getDiskNumber() == 0xFFFF;
-        fileHeader.setExtraField(new ExtraFieldReader(extraFieldLength, uncompressedSize, compressedSize, offs, diskNumber).read(in));
+        fileHeader.setExtraField(new ExtraFieldReader(extraFieldLength, uncompressedSize, compressedSize, offsHeader, diskNumber).read(in));
         fileHeader.setFileComment(in.readString(fileCommentLength));
 
         return fileHeader;
