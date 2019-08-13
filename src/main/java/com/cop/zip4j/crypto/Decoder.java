@@ -1,7 +1,6 @@
 package com.cop.zip4j.crypto;
 
 import com.cop.zip4j.io.in.DataInput;
-import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.LocalFileHeader;
 import lombok.NonNull;
 import org.apache.commons.io.IOUtils;
@@ -17,9 +16,6 @@ public interface Decoder {
     Decoder NULL = new NullDecoder();
 
     void decrypt(byte[] buf, int offs, int len);
-
-    default void checkChecksum(@NonNull CentralDirectory.FileHeader fileHeader, long checksum) {
-    }
 
     default int getLen(long bytesRead, int len, long length) {
         return len;
@@ -50,5 +46,7 @@ public interface Decoder {
         return decryptAndRead(buf, offs, len, in);
     }
 
+    default void close(DataInput in) throws IOException {
+    }
 
 }

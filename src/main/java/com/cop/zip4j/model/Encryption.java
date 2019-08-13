@@ -50,8 +50,7 @@ public enum Encryption {
         }
 
         @Override
-        public Decoder decoder(@NonNull DataInput in, @NonNull LocalFileHeader localFileHeader, char[] password)
-                throws IOException {
+        public Decoder decoder(DataInput in, @NonNull LocalFileHeader localFileHeader, char[] password) throws IOException {
             return AesDecoder.create(in, localFileHeader, password);
         }
 

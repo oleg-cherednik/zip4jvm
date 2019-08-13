@@ -2,8 +2,8 @@ package com.cop.zip4j.crypto.aes;
 
 import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.exception.Zip4jException;
+import com.cop.zip4j.exception.Zip4jIncorrectPasswordException;
 import com.cop.zip4j.io.in.DataInput;
-import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import com.cop.zip4j.model.aes.AesStrength;
@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang.ArrayUtils;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
@@ -22,7 +23,6 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.security.spec.KeySpec;
-import java.util.Arrays;
 
 import static com.cop.zip4j.crypto.aes.AesEngine.AES_AUTH_LENGTH;
 import static com.cop.zip4j.crypto.aes.AesEngine.PASSWORD_VERIFIER_LENGTH;
@@ -44,7 +44,7 @@ public final class AesDecoder implements Decoder {
             AesExtraDataRecord aesExtraDataRecord = localFileHeader.getExtraField().getAesExtraDataRecord();
             AesStrength strength = aesExtraDataRecord.getStrength();
 
-            byte[] salt = getSalt(in, localFileHeader.getOffs(), strength);
+            byte[] salt = getSalt(in, localFileHeader);
 
             // TODO temporary
             int length = strength.getKeyLength() + strength.getMacLength() + PASSWORD_VERIFIER_LENGTH;
@@ -57,6 +57,10 @@ public final class AesDecoder implements Decoder {
 
             System.arraycopy(tmp, strength.getKeyLength(), macKey, 0, macKey.length);
             System.arraycopy(tmp, strength.getKeyLength() + macKey.length, derivedPasswordVerifier, 0, PASSWORD_VERIFIER_LENGTH);
+
+            checkPasswordChecksum(derivedPasswordVerifier, in, localFileHeader);
+
+            in.seek(localFileHeader.getOffs() + strength.getSaltLength() + PASSWORD_VERIFIER_LENGTH);
 
             // --
 
@@ -93,15 +97,6 @@ public final class AesDecoder implements Decoder {
     }
 
     @Override
-    public void checkChecksum(@NonNull CentralDirectory.FileHeader fileHeader, long checksum) {
-        byte[] actual = new byte[AES_AUTH_LENGTH];
-        System.arraycopy(mac.doFinal(), 0, actual, 0, actual.length);
-
-        if (!Arrays.equals(actual, macKey))
-            throw new Zip4jException("invalid CRC (MAC) for file '" + fileHeader.getFileName() + '\'');
-    }
-
-    @Override
     public long getCompressedSize(@NonNull LocalFileHeader localFileHeader) {
         return localFileHeader.getCompressedSize() - getSaltLength() - PASSWORD_VERIFIER_LENGTH - 10;
     }
@@ -112,9 +107,32 @@ public final class AesDecoder implements Decoder {
         return localFileHeader.getOffs() + getSaltLength() + PASSWORD_VERIFIER_LENGTH; // + MAC SIZE
     }
 
-    private static byte[] getSalt(DataInput in, long offs, AesStrength strength) throws IOException {
-        in.seek(offs);
-        return in.readBytes(strength.getSaltLength());
+    @Override
+    public void close(DataInput in) throws IOException {
+        checkMessageAuthenticationCode(in);
+    }
+
+    private static byte[] getSalt(DataInput in, LocalFileHeader localFileHeader) throws IOException {
+        int saltLength = localFileHeader.getExtraField().getAesExtraDataRecord().getStrength().getSaltLength();
+        in.seek(localFileHeader.getOffs());
+        return in.readBytes(saltLength);
+    }
+
+    private static void checkPasswordChecksum(byte[] actual, DataInput in, LocalFileHeader localFileHeader) throws IOException {
+        int saltLength = localFileHeader.getExtraField().getAesExtraDataRecord().getStrength().getSaltLength();
+        in.seek(localFileHeader.getOffs() + saltLength);
+        byte[] expected = in.readBytes(PASSWORD_VERIFIER_LENGTH);
+
+        if (!ArrayUtils.isEquals(expected, actual))
+            throw new Zip4jIncorrectPasswordException(localFileHeader.getFileName());
+    }
+
+    private void checkMessageAuthenticationCode(DataInput in) throws IOException {
+        byte[] expected = in.readBytes(AES_AUTH_LENGTH);
+        byte[] actual = ArrayUtils.subarray(mac.doFinal(), 0, AES_AUTH_LENGTH);
+
+        if (!ArrayUtils.isEquals(expected, actual))
+            throw new Zip4jException("Message Authentication Code (MAC) is incorrect");
     }
 
 }

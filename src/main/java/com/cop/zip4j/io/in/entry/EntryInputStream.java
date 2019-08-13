@@ -1,11 +1,13 @@
 package com.cop.zip4j.io.in.entry;
 
+import com.cop.zip4j.core.readers.DataDescriptorReader;
 import com.cop.zip4j.core.readers.LocalFileHeaderReader;
 import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Compression;
+import com.cop.zip4j.model.DataDescriptor;
 import com.cop.zip4j.model.LocalFileHeader;
 import lombok.NonNull;
 import org.apache.commons.io.IOUtils;
@@ -81,6 +83,8 @@ public abstract class EntryInputStream extends InputStream {
 
     @Override
     public void close() throws IOException {
+        decoder.close(in);
+        readDataDescriptor();
         checkChecksum();
         checkUncompressedSize();
     }
@@ -99,6 +103,16 @@ public abstract class EntryInputStream extends InputStream {
 
         if (expected != actual)
             throw new Zip4jException("UncompressedSize is not matched: " + localFileHeader.getFileName());
+    }
+
+    private void readDataDescriptor() throws IOException {
+        if (localFileHeader.getGeneralPurposeFlag().isDataDescriptorExists()) {
+            DataDescriptor dataDescriptor = new DataDescriptorReader().read(in);
+
+            localFileHeader.setCrc32(dataDescriptor.getCrc32());
+            localFileHeader.setCompressedSize(dataDescriptor.getCompressedSize());
+            localFileHeader.setUncompressedSize(dataDescriptor.getUncompressedSize());
+        }
     }
 
 }

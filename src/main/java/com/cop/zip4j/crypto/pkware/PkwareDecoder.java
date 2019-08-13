@@ -1,9 +1,7 @@
 package com.cop.zip4j.crypto.pkware;
 
 import com.cop.zip4j.crypto.Decoder;
-import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.in.DataInput;
-import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.LocalFileHeader;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -30,12 +28,6 @@ public final class PkwareDecoder implements Decoder {
     @Override
     public void decrypt(byte[] buf, int offs, int len) {
         engine.decrypt(buf, offs, len);
-    }
-
-    @Override
-    public void checkChecksum(@NonNull CentralDirectory.FileHeader fileHeader, long checksum) {
-        if (checksum != fileHeader.getCrc32())
-            throw new Zip4jException("Incorrect checksum filename '" + fileHeader.getFileName() + '\'');
     }
 
     @Override

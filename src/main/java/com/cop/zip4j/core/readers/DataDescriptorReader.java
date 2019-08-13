@@ -14,7 +14,6 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public final class DataDescriptorReader {
 
-    // TODO should be used to check data after reading LocalFileHeader
     @NonNull
     public DataDescriptor read(@NonNull DataInput in) throws IOException {
         DataDescriptor dataDescriptor = new DataDescriptor();

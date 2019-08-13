@@ -113,14 +113,14 @@ public abstract class EntryOutputStream extends OutputStream {
     }
 
     private void updateFileHeader() {
-        fileHeader.setCrc32(fileHeader.getEncryption().getChecksum(checksum.getValue()));
+        fileHeader.setCrc32(fileHeader.getEncryption().getChecksum(fileHeader.getCrc32()));
         fileHeader.setCompressedSize(out.getWrittenBytesAmount(MARK));
     }
 
     private void writeDataDescriptor() throws IOException {
         if (fileHeader.getGeneralPurposeFlag().isDataDescriptorExists()) {
             DataDescriptor dataDescriptor = new DataDescriptor();
-            dataDescriptor.setCrc32(fileHeader.getCrc32());
+            dataDescriptor.setCrc32(checksum.getValue());
             dataDescriptor.setCompressedSize(fileHeader.getCompressedSize());
             dataDescriptor.setUncompressedSize(fileHeader.getUncompressedSize());
 
