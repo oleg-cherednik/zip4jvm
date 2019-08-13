@@ -18,7 +18,6 @@ import java.security.SecureRandom;
  */
 public final class AesEncoder extends AesEngine implements Encoder {
 
-    private final Mac mac;
     private final byte[] salt;
     private final byte[] passwordChecksum;
 
@@ -38,9 +37,9 @@ public final class AesEncoder extends AesEngine implements Encoder {
         }
     }
 
+    @SuppressWarnings({ "AssignmentOrReturnOfFieldWithMutableType", "MethodCanBeVariableArityMethod" })
     private AesEncoder(Cipher cipher, Mac mac, byte[] salt, byte[] passwordChecksum) {
-        super(cipher);
-        this.mac = mac;
+        super(cipher, mac);
         this.salt = salt;
         this.passwordChecksum = passwordChecksum;
     }

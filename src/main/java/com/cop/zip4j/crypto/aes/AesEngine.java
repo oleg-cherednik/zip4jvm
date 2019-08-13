@@ -28,6 +28,7 @@ public abstract class AesEngine {
     public static final int AES_PASSWORD_VERIFIER_LENGTH = 2;
 
     protected final Cipher cipher;
+    protected final Mac mac;
 
     private final byte[] iv = new byte[AES_BLOCK_SIZE];
     private final byte[] counter = new byte[iv.length];

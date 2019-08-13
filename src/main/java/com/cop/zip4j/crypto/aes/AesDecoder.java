@@ -8,7 +8,6 @@ import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.aes.AesStrength;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
 import org.apache.commons.lang.ArrayUtils;
 
 import javax.crypto.Cipher;
@@ -22,25 +21,21 @@ import java.io.IOException;
 @Getter
 public final class AesDecoder extends AesEngine implements Decoder {
 
-    private final Mac mac;
     private final int saltLength;
-
-    @Setter
-    private byte[] macKey;
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")
     public static AesDecoder create(@NonNull DataInput in, @NonNull LocalFileHeader localFileHeader, @NonNull char[] password) {
         try {
             AesStrength strength = localFileHeader.getExtraField().getAesExtraDataRecord().getStrength();
             byte[] salt = getSalt(in, localFileHeader);
-            byte[] key = AesEngine.createKey(password, salt, strength);
+            byte[] key = createKey(password, salt, strength);
 
-            Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
-            Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
+            Cipher cipher = createCipher(strength.createSecretKeyForCipher(key));
+            Mac mac = createMac(strength.createSecretKeyForMac(key));
             byte[] passwordChecksum = strength.createPasswordChecksum(key);
 
             checkPasswordChecksum(passwordChecksum, in, localFileHeader);
-            in.seek(localFileHeader.getOffs() + strength.getSaltLength() + AES_PASSWORD_VERIFIER_LENGTH);
+            in.seek(localFileHeader.getOffs() + strength.getSaltLength() + passwordChecksum.length);
 
             return new AesDecoder(cipher, mac, salt.length);
         } catch(Exception e) {
@@ -49,8 +44,7 @@ public final class AesDecoder extends AesEngine implements Decoder {
     }
 
     private AesDecoder(Cipher cipher, Mac mac, int saltLength) {
-        super(cipher);
-        this.mac = mac;
+        super(cipher, mac);
         this.saltLength = saltLength;
     }
 
@@ -71,13 +65,13 @@ public final class AesDecoder extends AesEngine implements Decoder {
 
     @Override
     public long getCompressedSize(@NonNull LocalFileHeader localFileHeader) {
-        return localFileHeader.getCompressedSize() - getSaltLength() - AES_PASSWORD_VERIFIER_LENGTH - 10;
+        return localFileHeader.getCompressedSize() - saltLength - AES_PASSWORD_VERIFIER_LENGTH - 10;
     }
 
     @Override
     public long getOffs(@NonNull LocalFileHeader localFileHeader) {
         // TODO why don;t have MAC SIZE
-        return localFileHeader.getOffs() + getSaltLength() + AES_PASSWORD_VERIFIER_LENGTH; // + MAC SIZE
+        return localFileHeader.getOffs() + saltLength + AES_PASSWORD_VERIFIER_LENGTH; // + MAC SIZE
     }
 
     @Override
