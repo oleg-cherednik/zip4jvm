@@ -18,7 +18,7 @@ import java.security.spec.KeySpec;
 
 import static com.cop.zip4j.crypto.aes.AesEngine.AES_AUTH_LENGTH;
 import static com.cop.zip4j.crypto.aes.AesEngine.AES_BLOCK_SIZE;
-import static com.cop.zip4j.crypto.aes.AesEngine.PASSWORD_VERIFIER_LENGTH;
+import static com.cop.zip4j.crypto.aes.AesEngine.AES_PASSWORD_VERIFIER_LENGTH;
 
 /**
  * byte[] iv = new byte[128/8];
@@ -44,16 +44,16 @@ public final class AesEncoderOld implements Encoder {
             byte[] salt = generateSalt(strength);
 
             // TODO temporary
-            int length = strength.getKeyLength() + strength.getMacLength() + PASSWORD_VERIFIER_LENGTH;
+            int length = strength.getKeyLength() + strength.getMacLength() + AES_PASSWORD_VERIFIER_LENGTH;
             SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
             KeySpec spec = new PBEKeySpec(password, salt, 1000, length * 8);
             byte[] tmp = secretKeyFactory.generateSecret(spec).getEncoded();
 
             byte[] macKey = new byte[strength.getMacLength()];
-            byte[] derivedPasswordVerifier = new byte[PASSWORD_VERIFIER_LENGTH];
+            byte[] derivedPasswordVerifier = new byte[AES_PASSWORD_VERIFIER_LENGTH];
 
             System.arraycopy(tmp, strength.getKeyLength(), macKey, 0, macKey.length);
-            System.arraycopy(tmp, strength.getKeyLength() + macKey.length, derivedPasswordVerifier, 0, PASSWORD_VERIFIER_LENGTH);
+            System.arraycopy(tmp, strength.getKeyLength() + macKey.length, derivedPasswordVerifier, 0, AES_PASSWORD_VERIFIER_LENGTH);
 
             // ----
 

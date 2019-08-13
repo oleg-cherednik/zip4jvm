@@ -91,7 +91,7 @@ public class CentralDirectoryBuilder {
         if (entry.getEncryption() == Encryption.PKWARE)
             return fileSize + PkwareHeader.SIZE;
 
-        return fileSize + entry.getStrength().getSaltLength() + AesEngine.AES_AUTH_LENGTH + AesEngine.PASSWORD_VERIFIER_LENGTH;
+        return fileSize + entry.getStrength().getSaltLength() + AesEngine.AES_AUTH_LENGTH + AesEngine.AES_PASSWORD_VERIFIER_LENGTH;
     }
 
     private long getUncompressedSize() {

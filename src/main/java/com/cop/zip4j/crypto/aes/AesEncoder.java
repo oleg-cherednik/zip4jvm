@@ -16,32 +16,14 @@ import java.security.SecureRandom;
 import static com.cop.zip4j.crypto.aes.AesEngine.AES_AUTH_LENGTH;
 import static com.cop.zip4j.crypto.aes.AesEngine.AES_BLOCK_SIZE;
 
-/**
- * byte[] iv = new byte[128/8];
- * new SecureRandom().nextBytes(iv);
- * IvParameterSpec ivspec = new IvParameterSpec(iv);
- * <p>
- * KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 128);
- * SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
- * <p>
- * Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
- */
 @SuppressWarnings("MethodCanBeVariableArityMethod")
 @RequiredArgsConstructor
 public final class AesEncoder implements Encoder {
-
-    public static final int BLOCK_SIZE = 16;
 
     private final Cipher cipher;
     private final Mac mac;
     private final byte[] salt;
     private final byte[] passwordVerifier;
-
-
-    /* State for implementing AES-CTR. */
-    private final byte[] iv = new byte[BLOCK_SIZE];
-    private final byte[] keystream = new byte[BLOCK_SIZE];
-    private int next = BLOCK_SIZE;
 
     public static AesEncoder create(@NonNull AesStrength strength, char[] password) {
         try {
@@ -58,60 +40,33 @@ public final class AesEncoder implements Encoder {
         }
     }
 
-    private static byte[] generateSalt(AesStrength strength) {
-//        return new byte[] {
-//                (byte)0x3, (byte)0x58, (byte)0xC6, (byte)0x44, (byte)0x26,
-//                (byte)0x6, (byte)0x30, (byte)0xD2, (byte)0xEF, (byte)0x2B,
-//                (byte)0x2D, (byte)0x83, (byte)0x7B, (byte)0x5F, (byte)0xAC, (byte)0xCB };
-        SecureRandom random = new SecureRandom();
-        byte[] buf = new byte[strength.getSaltLength()];
-        random.nextBytes(buf);
-        return buf;
-    }
+    private final byte[] iv = new byte[AES_BLOCK_SIZE];
+    private final byte[] counter = new byte[AES_BLOCK_SIZE];
+    private int next = AES_BLOCK_SIZE;
 
-    public void cryptUpdate(byte[] in, int length) {
+    /**
+     * Custom implementation of 'AES/CTR/NoPadding' is not compatible with WinZip specification. Have to implement custom one.
+     *
+     * @see com.sun.crypto.provider.CounterMode
+     */
+    private void cryptUpdate(byte[] buf, int offs, int len) {
         try {
-            /*
-             * We must implement CTR mode by hand, because WinZip's AES encryption
-             * scheme is incompatible with Java's AES/CTR/NoPadding.
-             */
-            for (int i = 0; i < length; ++i) {
-                /*
-                 * If we've exhausted the current keystream block, we need to
-                 * increment the iv and generate another one.
-                 */
-                if (next == BLOCK_SIZE) {
-                    for (int j = 0; j < BLOCK_SIZE; ++j)
+            for (int i = 0; i < len; i++) {
+                if (next == AES_BLOCK_SIZE) {
+                    for (int j = 0; j < AES_BLOCK_SIZE; j++)
                         if (++iv[j] != 0)
                             break;
-                    cipher.update(iv, 0, BLOCK_SIZE, keystream);
+
+                    cipher.update(iv, 0, AES_BLOCK_SIZE, counter);
                     next = 0;
                 }
 
-                in[i] ^= keystream[next++];
+                buf[i] ^= counter[next++];
             }
         } catch(ShortBufferException e) {
-            /* Shouldn't happen: our output buffer is always appropriately sized. */
-            throw new Error();
+            throw new Zip4jException(e);
         }
     }
-
-    public void authUpdate(byte[] in, int length) {
-        mac.update(in, 0, length);
-    }
-
-    public byte[] getFinalAuthentifier() {
-        byte[] auth = new byte[10];
-        System.arraycopy(mac.doFinal(), 0, auth, 0, 10);
-        return auth;
-    }
-
-    public byte[] getPasswordVerifier() {
-        return passwordVerifier;
-    }
-
-
-    // ------------------------
 
     private final byte[] aesBuf = new byte[AES_BLOCK_SIZE];
     private int aesOffs;
@@ -151,8 +106,8 @@ public final class AesEncoder implements Encoder {
 
     @Override
     public void encrypt(byte[] buf, int offs, int len) {
-        cryptUpdate(buf, len);
-        authUpdate(buf, len);
+        cryptUpdate(buf, offs, len);
+        mac.update(buf, offs, len);
     }
 
     @Override
@@ -161,5 +116,16 @@ public final class AesEncoder implements Encoder {
             encryptAndWrite(aesBuf, 0, aesOffs, out);
 
         out.write(mac.doFinal(), 0, AES_AUTH_LENGTH);
+    }
+
+    private static byte[] generateSalt(AesStrength strength) {
+//        return new byte[] {
+//                (byte)0x3, (byte)0x58, (byte)0xC6, (byte)0x44, (byte)0x26,
+//                (byte)0x6, (byte)0x30, (byte)0xD2, (byte)0xEF, (byte)0x2B,
+//                (byte)0x2D, (byte)0x83, (byte)0x7B, (byte)0x5F, (byte)0xAC, (byte)0xCB };
+        SecureRandom random = new SecureRandom();
+        byte[] buf = new byte[strength.getSaltLength()];
+        random.nextBytes(buf);
+        return buf;
     }
 }

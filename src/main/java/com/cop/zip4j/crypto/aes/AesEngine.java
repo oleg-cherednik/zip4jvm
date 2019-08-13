@@ -24,7 +24,7 @@ public class AesEngine {
 
     public static final int AES_AUTH_LENGTH = 10;
     public static final int AES_BLOCK_SIZE = 16;
-    public static final int PASSWORD_VERIFIER_LENGTH = 2;
+    public static final int AES_PASSWORD_VERIFIER_LENGTH = 2;
 
     public static byte[] createKey(char[] password, byte[] salt, AesStrength strength)
             throws NoSuchAlgorithmException, InvalidKeySpecException {

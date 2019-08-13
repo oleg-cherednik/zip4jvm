@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.security.spec.KeySpec;
 
 import static com.cop.zip4j.crypto.aes.AesEngine.AES_AUTH_LENGTH;
-import static com.cop.zip4j.crypto.aes.AesEngine.PASSWORD_VERIFIER_LENGTH;
+import static com.cop.zip4j.crypto.aes.AesEngine.AES_PASSWORD_VERIFIER_LENGTH;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -47,20 +47,20 @@ public final class AesDecoder implements Decoder {
             byte[] salt = getSalt(in, localFileHeader);
 
             // TODO temporary
-            int length = strength.getKeyLength() + strength.getMacLength() + PASSWORD_VERIFIER_LENGTH;
+            int length = strength.getKeyLength() + strength.getMacLength() + AES_PASSWORD_VERIFIER_LENGTH;
             SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
             KeySpec spec = new PBEKeySpec(password, salt, 1000, length * 8);
             byte[] tmp = secretKeyFactory.generateSecret(spec).getEncoded();
 
             byte[] macKey = new byte[strength.getMacLength()];
-            byte[] derivedPasswordVerifier = new byte[PASSWORD_VERIFIER_LENGTH];
+            byte[] derivedPasswordVerifier = new byte[AES_PASSWORD_VERIFIER_LENGTH];
 
             System.arraycopy(tmp, strength.getKeyLength(), macKey, 0, macKey.length);
-            System.arraycopy(tmp, strength.getKeyLength() + macKey.length, derivedPasswordVerifier, 0, PASSWORD_VERIFIER_LENGTH);
+            System.arraycopy(tmp, strength.getKeyLength() + macKey.length, derivedPasswordVerifier, 0, AES_PASSWORD_VERIFIER_LENGTH);
 
             checkPasswordChecksum(derivedPasswordVerifier, in, localFileHeader);
 
-            in.seek(localFileHeader.getOffs() + strength.getSaltLength() + PASSWORD_VERIFIER_LENGTH);
+            in.seek(localFileHeader.getOffs() + strength.getSaltLength() + AES_PASSWORD_VERIFIER_LENGTH);
 
             // --
 
@@ -98,13 +98,13 @@ public final class AesDecoder implements Decoder {
 
     @Override
     public long getCompressedSize(@NonNull LocalFileHeader localFileHeader) {
-        return localFileHeader.getCompressedSize() - getSaltLength() - PASSWORD_VERIFIER_LENGTH - 10;
+        return localFileHeader.getCompressedSize() - getSaltLength() - AES_PASSWORD_VERIFIER_LENGTH - 10;
     }
 
     @Override
     public long getOffs(@NonNull LocalFileHeader localFileHeader) {
         // TODO why don;t have MAC SIZE
-        return localFileHeader.getOffs() + getSaltLength() + PASSWORD_VERIFIER_LENGTH; // + MAC SIZE
+        return localFileHeader.getOffs() + getSaltLength() + AES_PASSWORD_VERIFIER_LENGTH; // + MAC SIZE
     }
 
     @Override
@@ -121,7 +121,7 @@ public final class AesDecoder implements Decoder {
     private static void checkPasswordChecksum(byte[] actual, DataInput in, LocalFileHeader localFileHeader) throws IOException {
         int saltLength = localFileHeader.getExtraField().getAesExtraDataRecord().getStrength().getSaltLength();
         in.seek(localFileHeader.getOffs() + saltLength);
-        byte[] expected = in.readBytes(PASSWORD_VERIFIER_LENGTH);
+        byte[] expected = in.readBytes(AES_PASSWORD_VERIFIER_LENGTH);
 
         if (!ArrayUtils.isEquals(expected, actual))
             throw new Zip4jIncorrectPasswordException(localFileHeader.getFileName());
