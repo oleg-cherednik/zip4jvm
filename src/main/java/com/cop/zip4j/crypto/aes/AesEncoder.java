@@ -1,6 +1,7 @@
 package com.cop.zip4j.crypto.aes;
 
 import com.cop.zip4j.crypto.Encoder;
+import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.model.aes.AesStrength;
 import lombok.NonNull;
@@ -8,18 +9,13 @@ import lombok.RequiredArgsConstructor;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.ShortBufferException;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Random;
 
 import static com.cop.zip4j.crypto.aes.AesEngine.AES_AUTH_LENGTH;
 import static com.cop.zip4j.crypto.aes.AesEngine.AES_BLOCK_SIZE;
@@ -42,8 +38,9 @@ public final class AesEncoder implements Encoder {
 
     private final Cipher cipher;
     private final Mac mac;
-    private final byte[] passwordVerifier;
     private final byte[] salt;
+    private final byte[] passwordVerifier;
+
 
     /* State for implementing AES-CTR. */
     private final byte[] iv = new byte[BLOCK_SIZE];
@@ -51,29 +48,15 @@ public final class AesEncoder implements Encoder {
     private int next = BLOCK_SIZE;
 
     public static AesEncoder create(@NonNull AesStrength strength, char[] password) {
-        return new AesEncoder(password, strength.getSize(), createSalt(strength.getSaltLength()));
-    }
-
-    private static final Random RANDOM = new SecureRandom();
-
-    private static byte[] createSalt(int size) {
-        byte[] salt = new byte[size];
-        RANDOM.nextBytes(salt);
-        return salt;
-    }
-
-    public AesEncoder(char[] passwordChars, int keySize, byte[] salt) {
-        if (keySize != 128 && keySize != 192 && keySize != 256)
-            throw new IllegalArgumentException("Illegal keysize: " + keySize);
-
         try {
-            this.salt = salt;
+            int keySize = strength.getSize();
+            byte[] salt = generateSalt(strength);
             SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-            PBEKeySpec keySpec = new PBEKeySpec(passwordChars, salt, ITERATION_COUNT, keySize * 2 + 16);
+            PBEKeySpec keySpec = new PBEKeySpec(password, salt, ITERATION_COUNT, keySize * 2 + 16);
             SecretKey sk = skf.generateSecret(keySpec);
             byte[] keyBytes = sk.getEncoded();
 
-            cipher = Cipher.getInstance("AES");
+            Cipher cipher = Cipher.getInstance("AES");
             SecretKeySpec secretKeySpec = new SecretKeySpec(keyBytes, 0, keySize / 8, "AES");
 
             //int maxKeyLen = Cipher.getMaxAllowedKeyLength("AES");
@@ -81,28 +64,27 @@ public final class AesEncoder implements Encoder {
 
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
 
-            mac = Mac.getInstance("HmacSHA1");
+            Mac mac = Mac.getInstance("HmacSHA1");
             mac.init(new SecretKeySpec(keyBytes, keySize / 8, keySize / 8, "HmacSHA1"));
 
-            passwordVerifier = new byte[2];
+            byte[] passwordVerifier = new byte[2];
             System.arraycopy(keyBytes, 2 * (keySize / 8), passwordVerifier, 0, 2);
-        } catch(NoSuchAlgorithmException e) {
-            /*
-             * XXX(mdempsky): Could happen if the user's JRE doesn't support PBKDF2,
-             * AES, and/or HMAC-SHA1.  Throw a better exception?
-             */
-            throw new Error();
-        } catch(InvalidKeyException e) {
-            e.printStackTrace();
-            /* Shouldn't happen: our key specs match our algorithms. */
-            throw new Error();
-        } catch(InvalidKeySpecException e) {
-            /* Shouldn't happen: our key specs match our algorithms. */
-            throw new Error();
-        } catch(NoSuchPaddingException e) {
-            /* Shouldn't happen: we don't specify any padding schemes. */
-            throw new Error();
+
+            return new AesEncoder(cipher, mac, salt, passwordVerifier);
+        } catch(Exception e) {
+            throw new Zip4jException(e);
         }
+    }
+
+    private static byte[] generateSalt(AesStrength strength) {
+//        return new byte[] {
+//                (byte)0x3, (byte)0x58, (byte)0xC6, (byte)0x44, (byte)0x26,
+//                (byte)0x6, (byte)0x30, (byte)0xD2, (byte)0xEF, (byte)0x2B,
+//                (byte)0x2D, (byte)0x83, (byte)0x7B, (byte)0x5F, (byte)0xAC, (byte)0xCB };
+        SecureRandom random = new SecureRandom();
+        byte[] buf = new byte[strength.getSaltLength()];
+        random.nextBytes(buf);
+        return buf;
     }
 
     public void cryptUpdate(byte[] in, int length) {
