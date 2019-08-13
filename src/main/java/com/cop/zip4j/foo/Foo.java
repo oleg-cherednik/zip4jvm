@@ -1,7 +1,10 @@
 package com.cop.zip4j.foo;
 
+import de.idyl.winzipaes.AesZipFileDecrypter;
 import de.idyl.winzipaes.AesZipFileEncrypter;
+import de.idyl.winzipaes.impl.AESDecrypterJCA;
 import de.idyl.winzipaes.impl.AESEncrypterJCA;
+import de.idyl.winzipaes.impl.ExtZipEntry;
 
 import java.io.File;
 
@@ -20,11 +23,16 @@ public class Foo {
                 (byte)0x76, (byte)0x93, (byte)0x30, (byte)0x2C, (byte)0x34 };
 
 
-        File out = new File("d:/zip4j/tmp/aes/aes.zip");
-        AesZipFileEncrypter encrypter = new AesZipFileEncrypter(out, new AESEncrypterJCA());
+        File zipFile = new File("d:/zip4j/tmp/aes/aes.zip");
+        AesZipFileEncrypter encrypter = new AesZipFileEncrypter(zipFile, new AESEncrypterJCA());
 
         encrypter.add(new File("d:/zip4j/tmp/tmp.txt"), "tmp.txt", "1");
         encrypter.close();
+
+        AesZipFileDecrypter decrypter = new AesZipFileDecrypter(zipFile, new AESDecrypterJCA());
+
+        for (ExtZipEntry zipEntry : decrypter.getEntryList())
+            decrypter.extractEntry(zipEntry, new File(zipFile.getParentFile(), zipEntry.getName()), "1");
 
         //AES.encrypt(expected, secret) ;
 //        String actual = AES.decryptOld(buf, password);

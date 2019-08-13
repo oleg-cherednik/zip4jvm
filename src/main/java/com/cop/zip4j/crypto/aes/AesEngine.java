@@ -36,6 +36,7 @@ public class AesEngine {
 
     public static Cipher createCipher(SecretKeySpec secretKeySpec) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
         Cipher cipher = Cipher.getInstance("AES");
+        // use custom AES implementation, so no worry for DECRYPT_MODE
         cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
         return cipher;
     }
