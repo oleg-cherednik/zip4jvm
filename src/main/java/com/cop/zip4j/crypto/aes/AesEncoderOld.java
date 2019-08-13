@@ -114,27 +114,27 @@ public final class AesEncoderOld implements Encoder {
 
     @Override
     public void _write(byte[] buf, int offs, int len, DataOutput out) throws IOException {
-//        if (aesOffs != 0) {
-//            if (len >= (AES_BLOCK_SIZE - aesOffs)) {
-//                System.arraycopy(buf, offs, aesBuf, aesOffs, aesBuf.length - aesOffs);
-//                encryptAndWrite(aesBuf, 0, aesBuf.length, out);
-//                offs = AES_BLOCK_SIZE - aesOffs;
-//                len -= offs;
-//                aesOffs = 0;
-//            } else {
-//                System.arraycopy(buf, offs, aesBuf, aesOffs, len);
-//                aesOffs += len;
-//                len = 0;
-//            }
-//        }
-//
-//        int tail = len % aesBuf.length;
-//
-//        if (tail != 0) {
-//            System.arraycopy(buf, len + offs - tail, aesBuf, 0, tail);
-//            aesOffs = tail;
-//            len -= aesOffs;
-//        }
+        if (aesOffs != 0) {
+            if (len >= (AES_BLOCK_SIZE - aesOffs)) {
+                System.arraycopy(buf, offs, aesBuf, aesOffs, aesBuf.length - aesOffs);
+                encryptAndWrite(aesBuf, 0, aesBuf.length, out);
+                offs = AES_BLOCK_SIZE - aesOffs;
+                len -= offs;
+                aesOffs = 0;
+            } else {
+                System.arraycopy(buf, offs, aesBuf, aesOffs, len);
+                aesOffs += len;
+                len = 0;
+            }
+        }
+
+        int tail = len % aesBuf.length;
+
+        if (tail != 0) {
+            System.arraycopy(buf, len + offs - tail, aesBuf, 0, tail);
+            aesOffs = tail;
+            len -= aesOffs;
+        }
 
         encryptAndWrite(buf, offs, len, out);
     }
