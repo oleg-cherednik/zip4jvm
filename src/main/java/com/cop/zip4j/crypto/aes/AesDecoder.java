@@ -6,31 +6,22 @@ import com.cop.zip4j.exception.Zip4jIncorrectPasswordException;
 import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.aes.AesStrength;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang.ArrayUtils;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
-import javax.crypto.ShortBufferException;
 import java.io.IOException;
-
-import static com.cop.zip4j.crypto.aes.AesEngine.AES_AUTH_LENGTH;
-import static com.cop.zip4j.crypto.aes.AesEngine.AES_BLOCK_SIZE;
-import static com.cop.zip4j.crypto.aes.AesEngine.AES_PASSWORD_VERIFIER_LENGTH;
 
 /**
  * @author Oleg Cherednik
  * @since 13.08.2019
  */
 @Getter
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class AesDecoder implements Decoder {
+public final class AesDecoder extends AesEngine implements Decoder {
 
-    private final Cipher cipher;
     private final Mac mac;
     private final int saltLength;
 
@@ -57,6 +48,12 @@ public final class AesDecoder implements Decoder {
         }
     }
 
+    private AesDecoder(Cipher cipher, Mac mac, int saltLength) {
+        super(cipher);
+        this.mac = mac;
+        this.saltLength = saltLength;
+    }
+
     @Override
     public void decrypt(byte[] buf, int offs, int len) {
         try {
@@ -65,32 +62,6 @@ public final class AesDecoder implements Decoder {
         } catch(Exception e) {
             throw new Zip4jException(e);
         }
-    }
-
-    private final byte[] iv = new byte[AES_BLOCK_SIZE];
-    private final byte[] counter = new byte[iv.length];
-    private int nonce = iv.length;
-
-    /**
-     * Custom implementation (com.sun.crypto.provider.CounterMode) of 'AES/CTR/NoPadding' is not compatible with WinZip specification.
-     * Have to implement custom one.
-     */
-    private void cypherUpdate(byte[] buf, int offs, int len) throws ShortBufferException {
-        for (int i = 0; i < len; i++) {
-            if (nonce == iv.length) {
-                ivUpdate();
-                cipher.update(iv, 0, iv.length, counter);
-                nonce = 0;
-            }
-
-            buf[offs + i] ^= counter[nonce++];
-        }
-    }
-
-    private void ivUpdate() {
-        for (int i = 0; i < iv.length; i++)
-            if (++iv[i] != 0)
-                break;
     }
 
     @Override
