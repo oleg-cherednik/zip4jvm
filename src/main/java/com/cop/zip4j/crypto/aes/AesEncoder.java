@@ -17,6 +17,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.security.spec.KeySpec;
 
+import static com.cop.zip4j.crypto.aes.AesEngine.AES_AUTH_LENGTH;
 import static com.cop.zip4j.crypto.aes.AesEngine.AES_BLOCK_SIZE;
 import static com.cop.zip4j.crypto.aes.AesEngine.PASSWORD_VERIFIER_LENGTH;
 
@@ -88,7 +89,7 @@ public final class AesEncoder implements Encoder {
         try {
             byte[] tmp = cipher.doFinal(buf, offs, len);
             System.arraycopy(tmp, 0, buf, offs, tmp.length);
-            mac.update(buf, offs, len);
+            mac.update(buf, offs, tmp.length);
         } catch(Exception e) {
             throw new Zip4jException(e);
         }
@@ -99,25 +100,27 @@ public final class AesEncoder implements Encoder {
 
     @Override
     public void _write(byte[] buf, int offs, int len, DataOutput out) throws IOException {
-        if (aesOffs != 0) {
-            if (len >= (AES_BLOCK_SIZE - aesOffs)) {
-                System.arraycopy(buf, offs, aesBuf, aesOffs, aesBuf.length - aesOffs);
-                encryptAndWrite(aesBuf, 0, aesBuf.length, out);
-                offs = AES_BLOCK_SIZE - aesOffs;
-                len -= offs;
-                aesOffs = 0;
-            } else {
-                System.arraycopy(buf, offs, aesBuf, aesOffs, len);
-                aesOffs += len;
-                len = 0;
-            }
-        }
-
-        if (len % 16 != 0) {
-            System.arraycopy(buf, (len + offs) - (len % 16), aesBuf, 0, len % 16);
-            aesOffs = len % 16;
-            len -= aesOffs;
-        }
+//        if (aesOffs != 0) {
+//            if (len >= (AES_BLOCK_SIZE - aesOffs)) {
+//                System.arraycopy(buf, offs, aesBuf, aesOffs, aesBuf.length - aesOffs);
+//                encryptAndWrite(aesBuf, 0, aesBuf.length, out);
+//                offs = AES_BLOCK_SIZE - aesOffs;
+//                len -= offs;
+//                aesOffs = 0;
+//            } else {
+//                System.arraycopy(buf, offs, aesBuf, aesOffs, len);
+//                aesOffs += len;
+//                len = 0;
+//            }
+//        }
+//
+//        int tail = len % aesBuf.length;
+//
+//        if (tail != 0) {
+//            System.arraycopy(buf, len + offs - tail, aesBuf, 0, tail);
+//            aesOffs = tail;
+//            len -= aesOffs;
+//        }
 
         encryptAndWrite(buf, offs, len, out);
     }
@@ -130,10 +133,10 @@ public final class AesEncoder implements Encoder {
 
     @Override
     public void close(DataOutput out) throws IOException {
-        if (aesOffs != 0)
-            encryptAndWrite(aesBuf, 0, aesOffs, out);
+//        if (aesOffs != 0)
+//            encryptAndWrite(aesBuf, 0, aesOffs, out);
 
-        out.write(mac.doFinal(), 0, 10);
+        out.write(mac.doFinal(), 0, AES_AUTH_LENGTH);
     }
 
 }
