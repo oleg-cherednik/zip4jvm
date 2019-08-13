@@ -13,23 +13,27 @@ import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import java.io.IOException;
 
+import static com.cop.zip4j.crypto.aes.AesEngine.AES_AUTH_LENGTH;
+import static com.cop.zip4j.crypto.aes.AesEngine.AES_PASSWORD_VERIFIER_LENGTH;
+
 /**
  * @author Oleg Cherednik
  * @since 13.08.2019
  */
-public final class AesDecoder extends AesEngine implements Decoder {
+public final class AesDecoder implements Decoder {
 
     private final int saltLength;
+    private final AesEngine engine;
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")
     public static AesDecoder create(@NonNull DataInput in, @NonNull LocalFileHeader localFileHeader, @NonNull char[] password) {
         try {
             AesStrength strength = localFileHeader.getExtraField().getAesExtraDataRecord().getStrength();
             byte[] salt = getSalt(in, localFileHeader);
-            byte[] key = createKey(password, salt, strength);
+            byte[] key = AesEngine.createKey(password, salt, strength);
 
-            Cipher cipher = createCipher(strength.createSecretKeyForCipher(key));
-            Mac mac = createMac(strength.createSecretKeyForMac(key));
+            Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
+            Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
             byte[] passwordChecksum = strength.createPasswordChecksum(key);
 
             checkPasswordChecksum(passwordChecksum, in, localFileHeader);
@@ -42,15 +46,15 @@ public final class AesDecoder extends AesEngine implements Decoder {
     }
 
     private AesDecoder(Cipher cipher, Mac mac, int saltLength) {
-        super(cipher, mac);
         this.saltLength = saltLength;
+        engine = new AesEngine(cipher, mac);
     }
 
     @Override
     public void decrypt(byte[] buf, int offs, int len) {
         try {
-            mac.update(buf, offs, len);
-            cypherUpdate(buf, offs, len);
+            engine.updateMac(buf, offs, len);
+            engine.cypherUpdate(buf, offs, len);
         } catch(Exception e) {
             throw new Zip4jException(e);
         }
@@ -94,7 +98,7 @@ public final class AesDecoder extends AesEngine implements Decoder {
 
     private void checkMessageAuthenticationCode(DataInput in) throws IOException {
         byte[] expected = in.readBytes(AES_AUTH_LENGTH);
-        byte[] actual = ArrayUtils.subarray(mac.doFinal(), 0, AES_AUTH_LENGTH);
+        byte[] actual = ArrayUtils.subarray(engine.getMac(), 0, AES_AUTH_LENGTH);
 
         if (!ArrayUtils.isEquals(expected, actual))
             throw new Zip4jException("Message Authentication Code (MAC) is incorrect");

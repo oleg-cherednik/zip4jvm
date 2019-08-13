@@ -12,14 +12,17 @@ import javax.crypto.Mac;
 import java.io.IOException;
 import java.security.SecureRandom;
 
+import static com.cop.zip4j.crypto.aes.AesEngine.AES_AUTH_LENGTH;
+
 /**
  * @author Oleg Cherednik
  * @since 13.08.2019
  */
-public final class AesEncoder extends AesEngine implements Encoder {
+public final class AesEncoder implements Encoder {
 
     private final byte[] salt;
     private final byte[] passwordChecksum;
+    private final AesEngine engine;
 
     public static AesEncoder create(@NonNull PathZipEntry entry) {
         try {
@@ -39,9 +42,9 @@ public final class AesEncoder extends AesEngine implements Encoder {
 
     @SuppressWarnings({ "AssignmentOrReturnOfFieldWithMutableType", "MethodCanBeVariableArityMethod" })
     private AesEncoder(Cipher cipher, Mac mac, byte[] salt, byte[] passwordChecksum) {
-        super(cipher, mac);
         this.salt = salt;
         this.passwordChecksum = passwordChecksum;
+        engine = new AesEngine(cipher, mac);
     }
 
     @Override
@@ -53,8 +56,8 @@ public final class AesEncoder extends AesEngine implements Encoder {
     @Override
     public void encrypt(byte[] buf, int offs, int len) {
         try {
-            cypherUpdate(buf, offs, len);
-            mac.update(buf, offs, len);
+            engine.cypherUpdate(buf, offs, len);
+            engine.updateMac(buf, offs, len);
         } catch(Exception e) {
             throw new Zip4jException(e);
         }
@@ -62,7 +65,7 @@ public final class AesEncoder extends AesEngine implements Encoder {
 
     @Override
     public void close(DataOutput out) throws IOException {
-        out.write(mac.doFinal(), 0, AES_AUTH_LENGTH);
+        out.write(engine.getMac(), 0, AES_AUTH_LENGTH);
     }
 
     private static byte[] generateSalt(AesStrength strength) {

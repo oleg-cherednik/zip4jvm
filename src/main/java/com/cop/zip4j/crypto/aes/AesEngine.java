@@ -20,8 +20,8 @@ import java.security.spec.InvalidKeySpecException;
  * @since 13.08.2019
  */
 // TODO should be package
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class AesEngine {
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+public class AesEngine {
 
     public static final int AES_AUTH_LENGTH = 10;
     public static final int AES_BLOCK_SIZE = 16;
@@ -38,7 +38,7 @@ public abstract class AesEngine {
      * Custom implementation (com.sun.crypto.provider.CounterMode) of 'AES/CTR/NoPadding' is not compatible with WinZip specification.
      * Have to implement custom one.
      */
-    protected final void cypherUpdate(byte[] buf, int offs, int len) throws ShortBufferException {
+    public final void cypherUpdate(byte[] buf, int offs, int len) throws ShortBufferException {
         for (int i = 0; i < len; i++) {
             if (nonce == iv.length) {
                 ivUpdate();
@@ -56,7 +56,15 @@ public abstract class AesEngine {
                 break;
     }
 
-    protected static byte[] createKey(char[] password, byte[] salt, AesStrength strength)
+    public void updateMac(byte[] buf, int offs, int len) {
+        mac.update(buf, offs, len);
+    }
+
+    public byte[] getMac() {
+        return mac.doFinal();
+    }
+
+    static byte[] createKey(char[] password, byte[] salt, AesStrength strength)
             throws NoSuchAlgorithmException, InvalidKeySpecException {
         final int iterationCount = 1000;
         final int keyLength = strength.getSize() * 2 + 16;
@@ -64,14 +72,14 @@ public abstract class AesEngine {
         return SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(keySpec).getEncoded();
     }
 
-    protected static Cipher createCipher(SecretKeySpec secretKeySpec) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+    static Cipher createCipher(SecretKeySpec secretKeySpec) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
         Cipher cipher = Cipher.getInstance("AES");
         // use custom AES implementation, so no worry for DECRYPT_MODE
         cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
         return cipher;
     }
 
-    protected static Mac createMac(SecretKeySpec secretKeySpec) throws NoSuchAlgorithmException, InvalidKeyException {
+    static Mac createMac(SecretKeySpec secretKeySpec) throws NoSuchAlgorithmException, InvalidKeyException {
         Mac mac = Mac.getInstance("HmacSHA1");
         mac.init(secretKeySpec);
         return mac;
