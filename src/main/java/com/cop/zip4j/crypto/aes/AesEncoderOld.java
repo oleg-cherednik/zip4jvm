@@ -31,7 +31,7 @@ import static com.cop.zip4j.crypto.aes.AesEngine.PASSWORD_VERIFIER_LENGTH;
  * Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
  */
 @RequiredArgsConstructor
-public final class AesEncoder implements Encoder {
+public final class AesEncoderOld implements Encoder {
 
     private final Cipher cipher;
     private final Mac mac;
@@ -39,7 +39,7 @@ public final class AesEncoder implements Encoder {
     private final byte[] derivedPasswordVerifier;
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")
-    public static AesEncoder create(@NonNull AesStrength strength, char[] password) {
+    public static AesEncoderOld create(@NonNull AesStrength strength, char[] password) {
         try {
             byte[] salt = generateSalt(strength);
 
@@ -70,7 +70,7 @@ public final class AesEncoder implements Encoder {
 
             Mac mac = Mac.getInstance("HmacSHA1");
             mac.init(new SecretKeySpec(macKey, "HmacSHA1"));
-            return new AesEncoder(cipher, mac, salt, derivedPasswordVerifier);
+            return new AesEncoderOld(cipher, mac, salt, derivedPasswordVerifier);
 
 
 //            KeySpec keySpec = new PBEKeySpec(password, salt, 1000, strength.getSize());
