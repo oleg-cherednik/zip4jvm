@@ -16,6 +16,10 @@ import java.security.SecureRandom;
 import static com.cop.zip4j.crypto.aes.AesEngine.AES_AUTH_LENGTH;
 import static com.cop.zip4j.crypto.aes.AesEngine.AES_BLOCK_SIZE;
 
+/**
+ * @author Oleg Cherednik
+ * @since 13.08.2019
+ */
 @SuppressWarnings("MethodCanBeVariableArityMethod")
 @RequiredArgsConstructor
 public final class AesEncoder implements Encoder {

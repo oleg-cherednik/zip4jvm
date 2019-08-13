@@ -27,6 +27,10 @@ import java.security.spec.KeySpec;
 import static com.cop.zip4j.crypto.aes.AesEngine.AES_AUTH_LENGTH;
 import static com.cop.zip4j.crypto.aes.AesEngine.AES_PASSWORD_VERIFIER_LENGTH;
 
+/**
+ * @author Oleg Cherednik
+ * @since 13.08.2019
+ */
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AesDecoder implements Decoder {
