@@ -13,7 +13,6 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.ShortBufferException;
 import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.security.SecureRandom;
 
@@ -33,7 +32,8 @@ import static com.cop.zip4j.crypto.aes.AesEngine.AES_BLOCK_SIZE;
 @RequiredArgsConstructor
 public final class AesEncoder implements Encoder {
 
-    public static final int ITERATION_COUNT = 1000;
+    private static final int ITERATION_COUNT = 1000;
+    private static final int KEY_OFFS = 0;
     public static final int BLOCK_SIZE = 16;
 
     private final Cipher cipher;
@@ -51,26 +51,15 @@ public final class AesEncoder implements Encoder {
         try {
             int keySize = strength.getSize();
             byte[] salt = generateSalt(strength);
-            SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
             PBEKeySpec keySpec = new PBEKeySpec(password, salt, ITERATION_COUNT, keySize * 2 + 16);
-            SecretKey sk = skf.generateSecret(keySpec);
-            byte[] keyBytes = sk.getEncoded();
+            SecretKey secretKey = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(keySpec);
+            byte[] key = secretKey.getEncoded();
 
-            Cipher cipher = Cipher.getInstance("AES");
-            SecretKeySpec secretKeySpec = new SecretKeySpec(keyBytes, 0, keySize / 8, "AES");
+            Cipher cipher = AesEngine.createCipher(key, strength);
+            Mac mac = AesEngine.createMac(key, strength);
+            byte[] passwordChecksum = AesEngine.getPasswordChecksum(key, strength);
 
-            //int maxKeyLen = Cipher.getMaxAllowedKeyLength("AES");
-            //System.out.println( "maxKeyLen=" + maxKeyLen );
-
-            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
-
-            Mac mac = Mac.getInstance("HmacSHA1");
-            mac.init(new SecretKeySpec(keyBytes, keySize / 8, keySize / 8, "HmacSHA1"));
-
-            byte[] passwordVerifier = new byte[2];
-            System.arraycopy(keyBytes, 2 * (keySize / 8), passwordVerifier, 0, 2);
-
-            return new AesEncoder(cipher, mac, salt, passwordVerifier);
+            return new AesEncoder(cipher, mac, salt, passwordChecksum);
         } catch(Exception e) {
             throw new Zip4jException(e);
         }
