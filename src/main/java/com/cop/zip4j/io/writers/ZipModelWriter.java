@@ -39,8 +39,7 @@ public final class ZipModelWriter {
             locator.setTotNumberOfDiscs(out.getCounter() + 1);
         }
 
-        new Zip64EndCentralDirectoryWriter(zipModel.getZip64().getEndCentralDirectory()).write(out);
-        new Zip64EndCentralDirectoryLocatorWriter(zipModel.getZip64().getEndCentralDirectoryLocator()).write(out);
+        new Zip64Writer(zipModel.getZip64()).write(out);
         new EndCentralDirectoryWriter(endCentralDirectory, zipModel.getCharset()).write(out);
     }
 

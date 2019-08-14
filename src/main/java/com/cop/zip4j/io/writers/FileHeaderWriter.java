@@ -36,7 +36,7 @@ final class FileHeaderWriter {
         out.writeWord(fileHeader.getVersionMadeBy());
         out.writeWord(fileHeader.getVersionToExtract());
         out.writeWord(fileHeader.getGeneralPurposeFlag().getData());
-        out.writeWord(fileHeader.getCompressionMethod().getValue());
+        out.writeWord(fileHeader.getCompressionMethod().getCode());
         out.writeDword(fileHeader.getLastModifiedTime());
         out.writeDword(fileHeader.getCompressionMethod() == CompressionMethod.AES_ENC ? 0 : fileHeader.getCrc32());
         out.writeDword(fileHeader.isWriteZip64FileSize() ? InternalZipConstants.ZIP_64_LIMIT : fileHeader.getCompressedSize());

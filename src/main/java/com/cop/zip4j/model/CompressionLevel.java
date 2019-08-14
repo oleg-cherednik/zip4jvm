@@ -17,6 +17,6 @@ public enum CompressionLevel {
     MAXIMUM(7),
     ULTRA(9);
 
-    private final int value;
+    private final int code;
 
 }

@@ -29,11 +29,11 @@ public enum CompressionMethod {
 //    PPMD(98),
     AES_ENC(99);
 
-    private final int value;
+    private final int code;
 
     public static CompressionMethod parseValue(int value) {
         for (CompressionMethod method : values())
-            if (method.value == value)
+            if (method.code == value)
                 return method;
         throw new EnumConstantNotPresentException(CompressionMethod.class, "value=" + value);
     }

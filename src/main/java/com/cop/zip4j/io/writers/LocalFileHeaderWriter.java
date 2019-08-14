@@ -26,7 +26,7 @@ public final class LocalFileHeaderWriter {
         out.writeDwordSignature(LocalFileHeader.SIGNATURE);
         out.writeWord(localFileHeader.getVersionToExtract());
         out.writeWord(localFileHeader.getGeneralPurposeFlag().getData());
-        out.writeWord(localFileHeader.getCompressionMethod().getValue());
+        out.writeWord(localFileHeader.getCompressionMethod().getCode());
         out.writeDword(localFileHeader.getLastModifiedTime());
         out.writeDword(localFileHeader.getCrc32());
 

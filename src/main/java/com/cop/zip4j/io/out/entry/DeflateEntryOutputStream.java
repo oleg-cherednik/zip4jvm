@@ -23,7 +23,7 @@ final class DeflateEntryOutputStream extends EntryOutputStream {
     public DeflateEntryOutputStream(ZipModel zipModel, CentralDirectory.FileHeader fileHeader, Encoder encoder, DataOutput out,
             CompressionLevel compressionLevel) {
         super(zipModel, fileHeader, encoder, out);
-        deflater.setLevel(compressionLevel.getValue());
+        deflater.setLevel(compressionLevel.getCode());
     }
 
     @Override
