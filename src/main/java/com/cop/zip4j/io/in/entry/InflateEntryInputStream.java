@@ -3,7 +3,6 @@ package com.cop.zip4j.io.in.entry;
 import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.LocalFileHeader;
-import com.cop.zip4j.utils.InternalZipConstants;
 import org.apache.commons.io.IOUtils;
 
 import java.io.EOFException;
@@ -17,7 +16,7 @@ import java.util.zip.Inflater;
  */
 final class InflateEntryInputStream extends EntryInputStream {
 
-    private final byte[] buf = new byte[InternalZipConstants.BUF_SIZE];
+    private final byte[] buf = new byte[1024 * 4];
     private final Inflater inflater = new Inflater(true);
 
     public InflateEntryInputStream(DataInput in, LocalFileHeader localFileHeader, Decoder decoder) {
@@ -57,7 +56,6 @@ final class InflateEntryInputStream extends EntryInputStream {
 
     private void fill() throws IOException {
         int len = (int)Math.min(buf.length, getAvailableCompressedBytes());
-        len = decoder.getLen(readCompressedBytes, len, compressedSize);
         len = in.read(buf, 0, len);
 
         if (len == IOUtils.EOF)

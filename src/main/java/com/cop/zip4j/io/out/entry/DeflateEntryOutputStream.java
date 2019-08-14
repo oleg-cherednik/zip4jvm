@@ -5,7 +5,6 @@ import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.ZipModel;
-import com.cop.zip4j.utils.InternalZipConstants;
 
 import java.io.IOException;
 import java.util.zip.Deflater;
@@ -16,7 +15,7 @@ import java.util.zip.Deflater;
  */
 final class DeflateEntryOutputStream extends EntryOutputStream {
 
-    private final byte[] buf = new byte[InternalZipConstants.BUF_SIZE];
+    private final byte[] buf = new byte[1024 * 4];
     private final Deflater deflater = new Deflater();
 
     public boolean firstBytesRead;

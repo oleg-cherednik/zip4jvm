@@ -65,7 +65,7 @@ public class ZipUtils {
 
         comment = StringUtils.trimToNull(comment);
 
-        if (StringUtils.length(comment) > InternalZipConstants.MAX_ALLOWED_ZIP_COMMENT_LENGTH)
+        if (StringUtils.length(comment) > 0xFFFF)
             throw new Zip4jException("comment length exceeds maximum length");
 
         return comment;
@@ -73,29 +73,5 @@ public class ZipUtils {
 
     @SuppressWarnings("FieldNamingConvention")
     public static final Function<String, String> normalizeFileName = fileName -> FilenameUtils.normalize(fileName, true);
-
-    public static void prepareBuffAESIVBytes(byte[] buff, int nonce, int length) {
-        buff[0] = (byte)nonce;
-        buff[1] = (byte)(nonce >> 8);
-        buff[2] = (byte)(nonce >> 16);
-        buff[3] = (byte)(nonce >> 24);
-        buff[4] = 0;
-        buff[5] = 0;
-        buff[6] = 0;
-        buff[7] = 0;
-        buff[8] = 0;
-        buff[9] = 0;
-        buff[10] = 0;
-        buff[11] = 0;
-        buff[12] = 0;
-        buff[13] = 0;
-        buff[14] = 0;
-        buff[15] = 0;
-    }
-
-    public static void checkEquealOrGreaterZero(int val) {
-        if (val < 0)
-            throw new Zip4jException("invalid length specified to decrpyt data");
-    }
 
 }

@@ -61,19 +61,8 @@ public final class AesDecoder implements Decoder {
     }
 
     @Override
-    public int getLen(long bytesRead, int len, long length) {
-        return bytesRead + len < length && len % 16 != 0 ? len - len % 16 : len;
-    }
-
-    @Override
     public long getCompressedSize(@NonNull LocalFileHeader localFileHeader) {
-        return localFileHeader.getCompressedSize() - saltLength - AES_PASSWORD_VERIFIER_LENGTH - 10;
-    }
-
-    @Override
-    public long getOffs(@NonNull LocalFileHeader localFileHeader) {
-        // TODO why don;t have MAC SIZE
-        return localFileHeader.getOffs() + saltLength + AES_PASSWORD_VERIFIER_LENGTH; // + MAC SIZE
+        return localFileHeader.getCompressedSize() - saltLength - AES_PASSWORD_VERIFIER_LENGTH - AES_AUTH_LENGTH;
     }
 
     @Override

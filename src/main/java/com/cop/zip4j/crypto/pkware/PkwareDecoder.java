@@ -35,9 +35,4 @@ public final class PkwareDecoder implements Decoder {
         return localFileHeader.getCompressedSize() - PkwareHeader.SIZE;
     }
 
-    @Override
-    public long getOffs(@NonNull LocalFileHeader localFileHeader) {
-        return localFileHeader.getOffs() + PkwareHeader.SIZE;
-    }
-
 }

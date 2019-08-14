@@ -3,7 +3,6 @@ package com.cop.zip4j.io.out;
 import com.cop.zip4j.core.writers.ZipModelWriter;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.ZipModel;
-import com.cop.zip4j.utils.InternalZipConstants;
 import lombok.NonNull;
 
 import java.io.FileNotFoundException;
@@ -22,8 +21,8 @@ public class SplitZipOutputStream extends BaseDataOutput {
     @NonNull
     public static SplitZipOutputStream create(@NonNull ZipModel zipModel) throws FileNotFoundException {
         // TODO move to ZipParameters
-        if (zipModel.getSplitLength() >= 0 && zipModel.getSplitLength() < InternalZipConstants.MIN_SPLIT_LENGTH)
-            throw new Zip4jException("split length less than minimum allowed split length of " + InternalZipConstants.MIN_SPLIT_LENGTH + " Bytes");
+        if (zipModel.getSplitLength() >= 0 && zipModel.getSplitLength() < ZipModel.MIN_SPLIT_LENGTH)
+            throw new Zip4jException("split length less than minimum allowed split length of " + ZipModel.MIN_SPLIT_LENGTH + " Bytes");
 
         return new SplitZipOutputStream(zipModel);
     }

@@ -1,5 +1,6 @@
 package com.cop.zip4j.utils;
 
+@Deprecated
 public interface InternalZipConstants {
 
     // Minimum segment size = 64K

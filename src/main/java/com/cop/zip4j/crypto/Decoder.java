@@ -16,17 +16,7 @@ public interface Decoder {
 
     void decrypt(@NonNull byte[] buf, int offs, int len);
 
-    default int getLen(long bytesRead, int len, long length) {
-        return len;
-    }
-
-    default long getCompressedSize(@NonNull LocalFileHeader localFileHeader) {
-        return localFileHeader.getCompressedSize();
-    }
-
-    default long getOffs(@NonNull LocalFileHeader localFileHeader) {
-        return localFileHeader.getOffs();
-    }
+    long getCompressedSize(@NonNull LocalFileHeader localFileHeader);
 
     default void close(@NonNull DataInput in) throws IOException {
     }

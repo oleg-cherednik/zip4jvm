@@ -1,7 +1,6 @@
 package com.cop.zip4j.model;
 
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.utils.InternalZipConstants;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +25,8 @@ import java.util.stream.Collectors;
 public class ZipModel {
 
     public static final int NO_SPLIT = -1;
+    // MIN_SPLIT_LENGTH = 64K bytes
+    public static final int MIN_SPLIT_LENGTH = 64 * 1024;
 
     @NonNull
     private final Path zipFile;
@@ -44,7 +45,7 @@ public class ZipModel {
     }
 
     public void setSplitLength(long splitLength) {
-        this.splitLength = splitLength < InternalZipConstants.MIN_SPLIT_LENGTH ? NO_SPLIT : splitLength;
+        this.splitLength = splitLength < MIN_SPLIT_LENGTH ? NO_SPLIT : splitLength;
     }
 
     public boolean isSplitArchive() {
