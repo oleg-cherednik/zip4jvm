@@ -50,10 +50,13 @@ public class Zip4jSuite {
     public static final Path deflateSplitZip = rootDir.resolve("deflate/split/off/src.zip");
     public static final Path deflateSolidPkwareZip = rootDir.resolve("deflate/solid/pkware/src.zip");
 
-    public static final Path winRarPkwareDeflateZip = Paths.get("src/test/resources/winrar/pkware_deflate.zip").toAbsolutePath();
-    public static final Path winRarAesZip = Paths.get("src/test/resources/aes.zip").toAbsolutePath();
-    public static final Path storeAesZip = Paths.get("src/test/resources/storeAes.zip").toAbsolutePath();
-    public static final Path wirRarStoreZip = Paths.get("src/test/resources/store.zip").toAbsolutePath();
+    // winrar
+    public static final Path winRarStoreSolidZip = Paths.get("src/test/resources/winrar/store_solid_off.zip").toAbsolutePath();
+    public static final Path winRarStoreSolidPkwareZip = Paths.get("src/test/resources/winrar/store_solid_pkware.zip").toAbsolutePath();
+    public static final Path winRarStoreSolidAesZip = Paths.get("src/test/resources/winrar/store_solid_aes.zip").toAbsolutePath();
+    public static final Path winRarDeflateSolidZip = Paths.get("src/test/resources/winrar/deflate_solid_off.zip").toAbsolutePath();
+    public static final Path winRarDeflateSolidPkwareZip = Paths.get("src/test/resources/winrar/deflate_solid_pkware.zip").toAbsolutePath();
+    public static final Path winRarDeflateSolidAesZip = Paths.get("src/test/resources/winrar/deflate_solid_aes.zip").toAbsolutePath();
 
     /** Password for encrypted zip */
     public static final char[] password = "1".toCharArray();
@@ -115,7 +118,9 @@ public class Zip4jSuite {
     }
 
     public static Path generateSubDirNameWithTime(Class<?> cls) {
-        return rootDir.resolve(cls.getSimpleName()).resolve(Paths.get(String.valueOf(time)));
+        String baseDir = Zip4jSuite.class.getPackage().getName();
+        String relativePath = cls.getName().substring(baseDir.length() + 1).replaceAll("\\.", "/");
+        return rootDir.resolve(relativePath).resolve(Paths.get(String.valueOf(time)));
     }
 
     public static Path subDirNameAsMethodNameWithTme(Path rootDir) {
@@ -124,6 +129,19 @@ public class Zip4jSuite {
 
     public static Path subDirNameAsMethodName(Path rootDir) {
         return rootDir.resolve(TestUtils.getMethodName());
+    }
+
+    public static Path subDirNameAsRelativePathToRoot(Path rootDir, Path zipFile) {
+        Path path;
+
+        if (zipFile.toAbsolutePath().toString().contains("resources"))
+            path = Paths.get("src/test/resources/winrar").toAbsolutePath().relativize(zipFile);
+        else
+            path = Zip4jSuite.rootDir.relativize(zipFile);
+
+        String dirName = path.toString().replaceAll("\\\\", "_");
+
+        return rootDir.resolve(dirName);
     }
 
 }
