@@ -1,6 +1,7 @@
 package com.cop.zip4j.crypto;
 
 import com.cop.zip4j.io.out.DataOutput;
+import lombok.NonNull;
 
 import java.io.IOException;
 
@@ -11,11 +12,11 @@ import java.io.IOException;
 final class NullEncoder implements Encoder {
 
     @Override
-    public void writeHeader(DataOutput out) throws IOException {
+    public void writeHeader(@NonNull DataOutput out) throws IOException {
     }
 
     @Override
-    public void encrypt(byte[] buf, int offs, int len) {
+    public void encrypt(@NonNull byte[] buf, int offs, int len) {
     }
 
     @Override

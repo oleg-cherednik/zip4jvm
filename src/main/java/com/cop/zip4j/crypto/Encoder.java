@@ -17,20 +17,7 @@ public interface Encoder {
 
     void encrypt(@NonNull byte[] buf, int offs, int len);
 
-    default void close(DataOutput out) throws IOException {
-    }
-
-    @Deprecated
-    default void encryptAndWrite(@NonNull byte[] buf, int offs, int len, @NonNull DataOutput out) throws IOException {
-        if (len == 0)
-            return;
-        encrypt(buf, offs, len);
-        out.write(buf, offs, len);
-    }
-
-    @Deprecated
-    default void _write(byte[] buf, int offs, int len, DataOutput out) throws IOException {
-        encryptAndWrite(buf, offs, len, out);
+    default void close(@NonNull DataOutput out) throws IOException {
     }
 
 }

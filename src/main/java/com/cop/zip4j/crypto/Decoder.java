@@ -14,7 +14,7 @@ public interface Decoder {
 
     Decoder NULL = new NullDecoder();
 
-    void decrypt(byte[] buf, int offs, int len);
+    void decrypt(@NonNull byte[] buf, int offs, int len);
 
     default int getLen(long bytesRead, int len, long length) {
         return len;
@@ -28,7 +28,7 @@ public interface Decoder {
         return localFileHeader.getOffs();
     }
 
-    default void close(DataInput in) throws IOException {
+    default void close(@NonNull DataInput in) throws IOException {
     }
 
 }

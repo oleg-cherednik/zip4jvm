@@ -37,7 +37,7 @@ public final class AesDecoder implements Decoder {
             byte[] passwordChecksum = strength.createPasswordChecksum(key);
 
             checkPasswordChecksum(passwordChecksum, in, localFileHeader);
-            in.seek(localFileHeader.getOffs() + strength.getSaltLength() + passwordChecksum.length);
+            in.seek(localFileHeader.getOffs() + strength.saltLength() + passwordChecksum.length);
 
             return new AesDecoder(cipher, mac, salt.length);
         } catch(Exception e) {
@@ -51,7 +51,7 @@ public final class AesDecoder implements Decoder {
     }
 
     @Override
-    public void decrypt(byte[] buf, int offs, int len) {
+    public void decrypt(@NonNull byte[] buf, int offs, int len) {
         try {
             engine.updateMac(buf, offs, len);
             engine.cypherUpdate(buf, offs, len);
@@ -77,18 +77,18 @@ public final class AesDecoder implements Decoder {
     }
 
     @Override
-    public void close(DataInput in) throws IOException {
+    public void close(@NonNull DataInput in) throws IOException {
         checkMessageAuthenticationCode(in);
     }
 
     private static byte[] getSalt(DataInput in, LocalFileHeader localFileHeader) throws IOException {
-        int saltLength = localFileHeader.getExtraField().getAesExtraDataRecord().getStrength().getSaltLength();
+        int saltLength = localFileHeader.getExtraField().getAesExtraDataRecord().getStrength().saltLength();
         in.seek(localFileHeader.getOffs());
         return in.readBytes(saltLength);
     }
 
     private static void checkPasswordChecksum(byte[] actual, DataInput in, LocalFileHeader localFileHeader) throws IOException {
-        int saltLength = localFileHeader.getExtraField().getAesExtraDataRecord().getStrength().getSaltLength();
+        int saltLength = localFileHeader.getExtraField().getAesExtraDataRecord().getStrength().saltLength();
         in.seek(localFileHeader.getOffs() + saltLength);
         byte[] expected = in.readBytes(AES_PASSWORD_VERIFIER_LENGTH);
 
