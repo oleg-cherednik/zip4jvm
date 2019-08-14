@@ -15,8 +15,8 @@ import java.util.Random;
  * @author Oleg Cherednik
  * @since 29.07.2019
  */
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public class PkwareHeader {
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class PkwareHeader {
 
     public static final int SIZE = 12;
 

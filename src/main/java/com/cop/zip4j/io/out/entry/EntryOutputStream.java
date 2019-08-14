@@ -48,7 +48,7 @@ public abstract class EntryOutputStream extends OutputStream {
 
     private static EntryOutputStream createOutputStream(PathZipEntry entry, ZipModel zipModel, DataOutput out) throws IOException {
         Compression compression = entry.getCompression();
-        Encoder encoder = entry.getEncryption().encoder(entry);
+        Encoder encoder = entry.getEncryption().getCreateEncoder().apply(entry);
         CentralDirectory.FileHeader fileHeader = new CentralDirectoryBuilder(entry, zipModel, out.getCounter()).create();
 
         if (compression == Compression.STORE)
@@ -113,7 +113,7 @@ public abstract class EntryOutputStream extends OutputStream {
     }
 
     private void updateFileHeader() {
-        fileHeader.setCrc32(fileHeader.getEncryption().getChecksum(fileHeader.getCrc32()));
+        fileHeader.setCrc32(fileHeader.getEncryption().getChecksum().apply(fileHeader));
         fileHeader.setCompressedSize(out.getWrittenBytesAmount(MARK));
     }
 

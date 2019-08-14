@@ -13,8 +13,8 @@ import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import java.io.IOException;
 
-import static com.cop.zip4j.crypto.aes.AesEngine.AES_AUTH_LENGTH;
-import static com.cop.zip4j.crypto.aes.AesEngine.AES_PASSWORD_VERIFIER_LENGTH;
+import static com.cop.zip4j.crypto.aes.AesEngine.MAX_SIZE;
+import static com.cop.zip4j.crypto.aes.AesEngine.PASSWORD_CHECKSUM_SIZE;
 
 /**
  * @author Oleg Cherednik
@@ -62,7 +62,7 @@ public final class AesDecoder implements Decoder {
 
     @Override
     public long getCompressedSize(@NonNull LocalFileHeader localFileHeader) {
-        return localFileHeader.getCompressedSize() - saltLength - AES_PASSWORD_VERIFIER_LENGTH - AES_AUTH_LENGTH;
+        return localFileHeader.getCompressedSize() - saltLength - PASSWORD_CHECKSUM_SIZE - MAX_SIZE;
     }
 
     @Override
@@ -79,15 +79,15 @@ public final class AesDecoder implements Decoder {
     private static void checkPasswordChecksum(byte[] actual, DataInput in, LocalFileHeader localFileHeader) throws IOException {
         int saltLength = localFileHeader.getExtraField().getAesExtraDataRecord().getStrength().saltLength();
         in.seek(localFileHeader.getOffs() + saltLength);
-        byte[] expected = in.readBytes(AES_PASSWORD_VERIFIER_LENGTH);
+        byte[] expected = in.readBytes(PASSWORD_CHECKSUM_SIZE);
 
         if (!ArrayUtils.isEquals(expected, actual))
             throw new Zip4jIncorrectPasswordException(localFileHeader.getFileName());
     }
 
     private void checkMessageAuthenticationCode(DataInput in) throws IOException {
-        byte[] expected = in.readBytes(AES_AUTH_LENGTH);
-        byte[] actual = ArrayUtils.subarray(engine.getMac(), 0, AES_AUTH_LENGTH);
+        byte[] expected = in.readBytes(MAX_SIZE);
+        byte[] actual = ArrayUtils.subarray(engine.getMac(), 0, MAX_SIZE);
 
         if (!ArrayUtils.isEquals(expected, actual))
             throw new Zip4jException("Message Authentication Code (MAC) is incorrect");

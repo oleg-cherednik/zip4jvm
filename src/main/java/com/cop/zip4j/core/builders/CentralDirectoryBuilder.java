@@ -1,9 +1,6 @@
 package com.cop.zip4j.core.builders;
 
-import com.cop.zip4j.crypto.aes.AesEngine;
-import com.cop.zip4j.crypto.pkware.PkwareHeader;
 import com.cop.zip4j.model.CentralDirectory;
-import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.GeneralPurposeFlag;
@@ -43,8 +40,8 @@ public class CentralDirectoryBuilder {
         fileHeader.setCompressionMethod(getCompressionMethod(entry));
         fileHeader.setLastModifiedTime(entry.getLastModifiedTime());
         fileHeader.setCrc32(entry.checksum());
-        fileHeader.setCompressedSize(getCompressedSize());
-        fileHeader.setUncompressedSize(getUncompressedSize());
+        fileHeader.setCompressedSize(entry.getCompressedSize());
+        fileHeader.setUncompressedSize(entry.size());
         fileHeader.setFileCommentLength(0);
         fileHeader.setDiskNumber(currSplitFileCounter);
         fileHeader.setInternalFileAttributes(null);
@@ -77,26 +74,6 @@ public class CentralDirectoryBuilder {
         generalPurposeFlag.setEncrypted(entry.getEncryption() != Encryption.OFF);
 //        generalPurposeFlag.setStrongEncryption(entry.getEncryption() == Encryption.STRONG);
         generalPurposeFlag.setStrongEncryption(false);
-    }
-
-    private long getCompressedSize() {
-        if (entry.isDirectory())
-            return 0;
-        if (entry.getCompression() != Compression.STORE)
-            return 0;
-        if (entry.getEncryption() != Encryption.AES)
-            return 0;
-
-        long fileSize = entry.size();
-
-        if (entry.getEncryption() == Encryption.PKWARE)
-            return fileSize + PkwareHeader.SIZE;
-
-        return fileSize + entry.getStrength().saltLength() + AesEngine.AES_AUTH_LENGTH + AesEngine.AES_PASSWORD_VERIFIER_LENGTH;
-    }
-
-    private long getUncompressedSize() {
-        return entry.size();
     }
 
     private byte[] getExternalFileAttr() throws IOException {

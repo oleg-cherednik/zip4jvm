@@ -11,7 +11,7 @@ import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import java.io.IOException;
 
-import static com.cop.zip4j.crypto.aes.AesEngine.AES_AUTH_LENGTH;
+import static com.cop.zip4j.crypto.aes.AesEngine.MAX_SIZE;
 
 /**
  * @author Oleg Cherednik
@@ -64,7 +64,7 @@ public final class AesEncoder implements Encoder {
 
     @Override
     public void close(@NonNull DataOutput out) throws IOException {
-        out.write(engine.getMac(), 0, AES_AUTH_LENGTH);
+        out.write(engine.getMac(), 0, MAX_SIZE);
     }
 
 }

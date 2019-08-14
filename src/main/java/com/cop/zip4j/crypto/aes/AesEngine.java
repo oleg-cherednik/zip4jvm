@@ -19,26 +19,25 @@ import java.security.spec.InvalidKeySpecException;
  * @author Oleg Cherednik
  * @since 13.08.2019
  */
-// TODO should be package
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public class AesEngine {
+public final class AesEngine {
 
-    public static final int AES_AUTH_LENGTH = 10;
-    public static final int AES_BLOCK_SIZE = 16;
-    public static final int AES_PASSWORD_VERIFIER_LENGTH = 2;
+    private static final int BLOCK_SIZE = 16;
+    public static final int MAX_SIZE = 10;
+    public static final int PASSWORD_CHECKSUM_SIZE = 2;
 
-    protected final Cipher cipher;
-    protected final Mac mac;
+    private final Cipher cipher;
+    private final Mac mac;
 
-    private final byte[] iv = new byte[AES_BLOCK_SIZE];
-    private final byte[] counter = new byte[iv.length];
-    private int nonce = iv.length;
+    private final byte[] iv = new byte[BLOCK_SIZE];
+    private final byte[] counter = new byte[BLOCK_SIZE];
+    private int nonce = BLOCK_SIZE;
 
     /**
      * Custom implementation (com.sun.crypto.provider.CounterMode) of 'AES/CTR/NoPadding' is not compatible with WinZip specification.
      * Have to implement custom one.
      */
-    public final void cypherUpdate(byte[] buf, int offs, int len) throws ShortBufferException {
+    public void cypherUpdate(byte[] buf, int offs, int len) throws ShortBufferException {
         for (int i = 0; i < len; i++) {
             if (nonce == iv.length) {
                 ivUpdate();

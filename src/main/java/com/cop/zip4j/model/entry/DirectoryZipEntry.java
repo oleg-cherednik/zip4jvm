@@ -26,4 +26,9 @@ public class DirectoryZipEntry extends PathZipEntry {
         this.encryption = Encryption.OFF;
     }
 
+    @Override
+    public long getCompressedSize() {
+        return 0;
+    }
+
 }

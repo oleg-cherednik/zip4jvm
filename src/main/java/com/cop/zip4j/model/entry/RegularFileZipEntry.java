@@ -55,4 +55,9 @@ public class RegularFileZipEntry extends PathZipEntry {
         this.encryption = encryption;
     }
 
+    @Override
+    public long getCompressedSize() {
+        return compression == Compression.STORE ? encryption.getCompressedSize().apply(this) : 0;
+    }
+
 }

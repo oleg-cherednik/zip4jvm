@@ -50,6 +50,8 @@ public abstract class PathZipEntry extends ZipEntry {
         return path.toAbsolutePath().toString();
     }
 
+    public abstract long getCompressedSize();
+
     public boolean isRoot() {
         return "/".equals(name) || "\\".equals(name);
     }
