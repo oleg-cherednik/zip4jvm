@@ -1,6 +1,6 @@
 package com.cop.zip4j.utils;
 
-import com.cop.zip4j.core.readers.ZipModelReader;
+import com.cop.zip4j.io.readers.ZipModelReader;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.ZipModel;
 import lombok.NonNull;

@@ -1,9 +1,9 @@
 package com.cop.zip4j.io.out.entry;
 
-import com.cop.zip4j.core.builders.CentralDirectoryBuilder;
-import com.cop.zip4j.core.builders.LocalFileHeaderBuilder;
-import com.cop.zip4j.core.writers.DataDescriptorWriter;
-import com.cop.zip4j.core.writers.LocalFileHeaderWriter;
+import com.cop.zip4j.model.builders.CentralDirectoryBuilder;
+import com.cop.zip4j.model.builders.LocalFileHeaderBuilder;
+import com.cop.zip4j.io.writers.DataDescriptorWriter;
+import com.cop.zip4j.io.writers.LocalFileHeaderWriter;
 import com.cop.zip4j.crypto.Encoder;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.out.DataOutput;

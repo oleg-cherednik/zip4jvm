@@ -1,4 +1,4 @@
-package com.cop.zip4j.core.readers;
+package com.cop.zip4j.io.readers;
 
 import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.CentralDirectory;

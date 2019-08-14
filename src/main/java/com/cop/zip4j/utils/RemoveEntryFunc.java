@@ -1,6 +1,6 @@
 package com.cop.zip4j.utils;
 
-import com.cop.zip4j.core.writers.ZipModelWriter;
+import com.cop.zip4j.io.writers.ZipModelWriter;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.io.out.DataOutputStreamDecorator;

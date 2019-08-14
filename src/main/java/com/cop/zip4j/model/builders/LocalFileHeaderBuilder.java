@@ -1,4 +1,4 @@
-package com.cop.zip4j.core.builders;
+package com.cop.zip4j.model.builders;
 
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.CompressionMethod;

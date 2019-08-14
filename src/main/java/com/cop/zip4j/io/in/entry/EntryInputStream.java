@@ -1,7 +1,7 @@
 package com.cop.zip4j.io.in.entry;
 
-import com.cop.zip4j.core.readers.DataDescriptorReader;
-import com.cop.zip4j.core.readers.LocalFileHeaderReader;
+import com.cop.zip4j.io.readers.DataDescriptorReader;
+import com.cop.zip4j.io.readers.LocalFileHeaderReader;
 import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.in.DataInput;

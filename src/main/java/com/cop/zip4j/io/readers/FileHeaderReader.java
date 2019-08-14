@@ -1,4 +1,4 @@
-package com.cop.zip4j.core.readers;
+package com.cop.zip4j.io.readers;
 
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.in.DataInput;

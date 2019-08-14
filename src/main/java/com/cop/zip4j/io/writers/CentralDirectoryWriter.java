@@ -1,7 +1,7 @@
-package com.cop.zip4j.core.writers;
+package com.cop.zip4j.io.writers;
 
 import com.cop.zip4j.io.out.DataOutput;
-import com.cop.zip4j.model.ExtraField;
+import com.cop.zip4j.model.CentralDirectory;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -10,19 +10,19 @@ import java.nio.charset.Charset;
 
 /**
  * @author Oleg Cherednik
- * @since 14.04.2019
+ * @since 10.03.2019
  */
 @RequiredArgsConstructor
-final class ExtraFieldWriter {
+public final class CentralDirectoryWriter {
 
     @NonNull
-    private final ExtraField extraField;
+    private final CentralDirectory dir;
     @NonNull
     private final Charset charset;
 
     public void write(@NonNull DataOutput out) throws IOException {
-        new Zip64ExtendedInfoWriter(extraField.getExtendedInfo()).write(out);
-        new AesExtraDataRecordWriter(extraField.getAesExtraDataRecord(), charset).write(out);
+        new FileHeaderWriter(dir.getFileHeaders(), charset).write(out);
+        new DigitalSignatureWriter(dir.getDigitalSignature()).write(out);
     }
 
 }

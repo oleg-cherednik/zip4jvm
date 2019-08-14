@@ -1,4 +1,4 @@
-package com.cop.zip4j.core.writers;
+package com.cop.zip4j.io.writers;
 
 import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.model.CentralDirectory;
