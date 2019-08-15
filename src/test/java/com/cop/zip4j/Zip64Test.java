@@ -2,29 +2,30 @@ package com.cop.zip4j;
 
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.Compression;
-import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.ZipParameters;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+
+import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
+import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatZipFile;
 
 /**
  * @author Oleg Cherednik
  * @since 06.04.2019
  */
+@Test
 @SuppressWarnings({ "FieldNamingConvention", "NewClassNamingConvention" })
 public class Zip64Test {
 
-    private static final Path rootDir = Zip4jSuite.rootDir.resolve(Zip64Test.class.getSimpleName());
-    private static final Path zipFile = rootDir.resolve("src.zip");
+    private static final Path rootDir = Zip4jSuite.generateSubDirNameWithTime(Zip64Test.class);
 
     @BeforeClass
     public static void createDir() throws IOException {
-        Zip4jSuite.removeDir(rootDir);
         Files.createDirectories(rootDir);
     }
 
@@ -33,43 +34,17 @@ public class Zip64Test {
         Zip4jSuite.removeDir(rootDir);
     }
 
-//    @Test
     public void shouldCreateNewZipWithZip64() throws IOException, Zip4jException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(Compression.DEFLATE)
-                                                .compressionLevel(CompressionLevel.NORMAL)
-//                                                .defaultFolderPath(Zip4jSuite.srcDir)
-                                                .zip64(false).build();
+                                                .compressionMethod(Compression.STORE)
+                                                .defaultFolderPath(Zip4jSuite.srcDir).build();
 
+        Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-        zip.add(Paths.get("d:/zip4j/ferdinand.mkv"), parameters);
+        zip.add(Zip4jSuite.srcDir, parameters);
 
-        int a = 0;
-        a++;
-
-//        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-//        assertThatZipFile(zipFile).exists().rootEntry().hasSubDirectories(1).hasFiles(0);
-//        assertThatZipFile(zipFile).directory("cars/").matches(TestUtils.zipCarsDirAssert);
+        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
     }
 
-    //    @Test
-    public void shouldReadZip64() throws IOException {
-        Path zipFile = Paths.get("d:/zip4j/ferdinand.zip");
-        UnzipIt unzip = UnzipIt.builder().zipFile(zipFile).build();
-        unzip.extract(rootDir.resolve("unzip"));
-    }
-
-    //    @Test
-    public void shouldReadZip64Split() throws IOException {
-        Path zipFile = Paths.get("d:/zip4j/zip64split/ferdinand.zip");
-        UnzipIt unzip = UnzipIt.builder().zipFile(zipFile).build();
-        unzip.extract(rootDir.resolve("unzip"));
-    }
-
-    //    @Test
-    public void shouldReadZip64SplitMulti() throws IOException {
-        Path zipFile = Paths.get("d:/zip4j/zip64split_multi/ferdinand.zip");
-        UnzipIt unzip = UnzipIt.builder().zipFile(zipFile).build();
-        unzip.extract(rootDir.resolve("unzip"));
-    }
 }
