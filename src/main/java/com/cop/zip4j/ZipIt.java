@@ -16,12 +16,14 @@
 package com.cop.zip4j;
 
 import com.cop.zip4j.engine.ZipEngine;
+import com.cop.zip4j.exception.Zip4jAesStrengthNotSetException;
 import com.cop.zip4j.exception.Zip4jEmptyPasswordException;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.exception.Zip4jPathNotExistsException;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.ZipParameters;
+import com.cop.zip4j.model.aes.AesStrength;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import com.cop.zip4j.model.entry.ZipEntry;
 import com.cop.zip4j.utils.CreateZipModel;
@@ -124,10 +126,13 @@ public final class ZipIt {
 
     private static void checkParameters(ZipParameters parameters) {
         Encryption encryption = parameters.getEncryption();
+        AesStrength strength = parameters.getStrength();
         boolean passwordEmpty = ArrayUtils.isEmpty(parameters.getPassword());
 
         if (encryption != Encryption.OFF && passwordEmpty)
             throw new Zip4jEmptyPasswordException();
+        if(encryption == Encryption.AES && strength == AesStrength.NONE)
+            throw new Zip4jAesStrengthNotSetException();
     }
 
 }

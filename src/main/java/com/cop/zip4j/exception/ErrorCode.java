@@ -14,7 +14,8 @@ public enum ErrorCode {
     UNKNOWN(-1),
     INCORRECT_PASSWORD(1),
     EMPTY_PASSWORD(2),
-    PATH_NOT_EXISTS(3);
+    PATH_NOT_EXISTS(3),
+    AES_STRENGTH_NOT_SET(4);
 
     private final int code;
 

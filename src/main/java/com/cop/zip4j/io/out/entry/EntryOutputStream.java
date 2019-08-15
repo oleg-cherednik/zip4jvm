@@ -124,7 +124,7 @@ public abstract class EntryOutputStream extends OutputStream {
             dataDescriptor.setCompressedSize(fileHeader.getCompressedSize());
             dataDescriptor.setUncompressedSize(fileHeader.getUncompressedSize());
 
-            new DataDescriptorWriter(dataDescriptor).write(out);
+            new DataDescriptorWriter(dataDescriptor, zipModel.isZip64()).write(out);
         }
     }
 

@@ -35,6 +35,8 @@ dependencies {
     testCompile 'org.projectlombok:lombok:1.16.18'
     testCompile 'net.sf.sevenzipjbinding:sevenzipjbinding:9.20-2.00beta'
     testCompile 'net.sf.sevenzipjbinding:sevenzipjbinding-all-platforms:9.20-2.00beta'
+    testCompile 'de.idyl:winzipaes:1.0.1'
+
 }
 
 jar {

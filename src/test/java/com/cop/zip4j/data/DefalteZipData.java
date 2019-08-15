@@ -6,6 +6,7 @@ import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ZipParameters;
+import com.cop.zip4j.model.aes.AesStrength;
 import lombok.experimental.UtilityClass;
 
 import java.io.IOException;
@@ -25,6 +26,7 @@ public class DefalteZipData {
         createDeflateSolidZip();
         createDeflateSplitZip();
         createDeflateSolidPkwareZip();
+        createDeflateSolidAesZip();
     }
 
     private static void createDeflateSolidZip() throws IOException {
@@ -62,9 +64,25 @@ public class DefalteZipData {
         ZipIt zip = ZipIt.builder().zipFile(Zip4jSuite.deflateSolidPkwareZip).build();
         zip.add(Zip4jSuite.srcDir, parameters);
 
-        assertThat(Files.exists(Zip4jSuite.deflateSolidZip)).isTrue();
-        assertThat(Files.isRegularFile(Zip4jSuite.deflateSolidZip)).isTrue();
-        assertThatDirectory(Zip4jSuite.deflateSolidZip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThat(Files.exists(Zip4jSuite.deflateSolidPkwareZip)).isTrue();
+        assertThat(Files.isRegularFile(Zip4jSuite.deflateSolidPkwareZip)).isTrue();
+        assertThatDirectory(Zip4jSuite.deflateSolidPkwareZip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+    }
+
+    private static void createDeflateSolidAesZip() throws IOException {
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compressionMethod(Compression.DEFLATE)
+                                                .compressionLevel(CompressionLevel.NORMAL)
+                                                .encryption(Encryption.AES)
+                                                .strength(AesStrength.KEY_STRENGTH_256)
+                                                .comment("password: " + new String(Zip4jSuite.password))
+                                                .password(Zip4jSuite.password).build();
+        ZipIt zip = ZipIt.builder().zipFile(Zip4jSuite.deflateSolidAesZip).build();
+        zip.add(Zip4jSuite.srcDir, parameters);
+
+        assertThat(Files.exists(Zip4jSuite.deflateSolidAesZip)).isTrue();
+        assertThat(Files.isRegularFile(Zip4jSuite.deflateSolidAesZip)).isTrue();
+        assertThatDirectory(Zip4jSuite.deflateSolidAesZip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
     }
 
 }

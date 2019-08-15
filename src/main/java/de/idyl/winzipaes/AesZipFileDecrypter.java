@@ -309,7 +309,7 @@ public class AesZipFileDecrypter implements ZipConstants {
             int cryptoHeaderOffset = zipEntry.getOffset() - cde.getCryptoHeaderLength();
             byte[] salt = raFile.readByteArray(cryptoHeaderOffset, 16);
             byte[] pwVerification = raFile.readByteArray(cryptoHeaderOffset + 16, 2);
-            if (LOG.isLoggable(Level.FINEST)) {
+//            if (LOG.isLoggable(Level.FINEST)) {
                 LOG.finest("\n" + cde.toString());
                 LOG.finest("offset    = " + zipEntry.getOffset());
                 LOG.finest("cryptoOff = " + cryptoHeaderOffset);
@@ -317,7 +317,7 @@ public class AesZipFileDecrypter implements ZipConstants {
                 LOG.finest("salt      = " + ByteArrayHelper.toString(salt) + " - " + salt.length);
                 LOG.finest("pwVerif   = " + ByteArrayHelper.toString(pwVerification) + " - "
                         + pwVerification.length);
-            }
+//            }
             // encrypter throws ZipException for wrong password
             decrypter.init(password, 256, salt, pwVerification);
 

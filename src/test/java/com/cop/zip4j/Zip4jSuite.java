@@ -49,6 +49,7 @@ public class Zip4jSuite {
     public static final Path deflateSolidZip = rootDir.resolve("deflate/solid/off/src.zip");
     public static final Path deflateSplitZip = rootDir.resolve("deflate/split/off/src.zip");
     public static final Path deflateSolidPkwareZip = rootDir.resolve("deflate/solid/pkware/src.zip");
+    public static final Path deflateSolidAesZip = rootDir.resolve("deflate/solid/aes/src.zip");
 
     // winrar
     public static final Path winRarStoreSolidZip = Paths.get("src/test/resources/winrar/store_solid_off.zip").toAbsolutePath();
