@@ -1,10 +1,10 @@
 package com.cop.zip4j.io.in.entry;
 
-import com.cop.zip4j.io.readers.DataDescriptorReader;
-import com.cop.zip4j.io.readers.LocalFileHeaderReader;
 import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.in.DataInput;
+import com.cop.zip4j.io.readers.DataDescriptorReader;
+import com.cop.zip4j.io.readers.LocalFileHeaderReader;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.DataDescriptor;
@@ -93,7 +93,7 @@ public abstract class EntryInputStream extends InputStream {
         long expected = localFileHeader.getCrc32();
         long actual = checksum.getValue();
 
-        if (expected != actual)
+        if (expected > 0 && expected != actual)
             throw new Zip4jException("Checksum is not matched: " + localFileHeader.getFileName());
     }
 

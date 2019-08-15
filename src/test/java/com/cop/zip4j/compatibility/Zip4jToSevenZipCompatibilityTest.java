@@ -35,6 +35,7 @@ public class Zip4jToSevenZipCompatibilityTest {
     private static final Path rootDir = Zip4jSuite.generateSubDirNameWithTime(Zip4jToSevenZipCompatibilityTest.class);
 
     public void checkCompatibilityWithSevenZip() throws IOException {
+        String password = new String(Zip4jSuite.password);
         Path parentDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
 
         for (Path zip4jFile : Arrays.asList(storeSolidZip, deflateSolidZip, deflateSolidPkwareZip)) {
@@ -62,7 +63,7 @@ public class Zip4jToSevenZipCompatibilityTest {
                                 e.printStackTrace();
                                 return 0;
                             }
-                        }, new String(Zip4jSuite.password));
+                        }, password);
 
                         if (res != ExtractOperationResult.OK)
                             throw new RuntimeException("Cannot extract zip entry");

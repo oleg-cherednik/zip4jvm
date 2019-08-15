@@ -25,6 +25,7 @@ public class Zip4jToWinZipAesCompatibilityTest {
     private static final Path rootDir = Zip4jSuite.generateSubDirNameWithTime(Zip4jToWinZipAesCompatibilityTest.class);
 
     public void checkCompatibilityWithWinZipAes() throws IOException, DataFormatException {
+        String password = new String(Zip4jSuite.password);
         Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         AesZipFileDecrypter decrypter = new AesZipFileDecrypter(Zip4jSuite.deflateSolidAesZip.toFile(), new AESDecrypterJCA());
 
@@ -39,10 +40,11 @@ public class Zip4jToWinZipAesCompatibilityTest {
                 if (!Files.exists(path))
                     Files.createFile(path);
 
-                decrypter.extractEntry(zipEntry, path.toFile(), new String(Zip4jSuite.password));
+                decrypter.extractEntry(zipEntry, path.toFile(), password);
             }
         }
 
         assertThatDirectory(dstDir).matches(TestUtils.dirAssert);
     }
+
 }

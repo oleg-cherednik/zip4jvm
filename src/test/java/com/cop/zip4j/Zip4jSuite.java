@@ -81,7 +81,7 @@ public class Zip4jSuite {
     }
 
     private static void copyTestData() throws IOException {
-        Files.createDirectories(srcDir.resolve("empty_dir"));
+        Files.createDirectories(emptyDir);
 
         Path dataDir = Paths.get("src/test/resources/data").toAbsolutePath();
 
