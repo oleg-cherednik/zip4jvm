@@ -107,7 +107,7 @@ public abstract class EntryInputStream extends InputStream {
 
     private void readDataDescriptor() throws IOException {
         if (localFileHeader.getGeneralPurposeFlag().isDataDescriptorExists()) {
-            DataDescriptor dataDescriptor = new DataDescriptorReader().read(in);
+            DataDescriptor dataDescriptor = new DataDescriptorReader(false).read(in);
 
             localFileHeader.setCrc32(dataDescriptor.getCrc32());
             localFileHeader.setCompressedSize(dataDescriptor.getCompressedSize());
