@@ -27,6 +27,14 @@ public class WinZipAesToZip4jCompatibilityTest {
     private static final Path rootDir = Zip4jSuite.generateSubDirNameWithTime(WinZipAesToZip4jCompatibilityTest.class);
 
     public void winZipAesShouldBeReadableForZip4j() throws IOException {
+        Path zipFile = zipItWithWinZipAes();
+        Path dir = unzipItWithZip4j(zipFile);
+
+        Files.createDirectories(dir.resolve("empty_dir"));
+        assertThatDirectory(dir).matches(TestUtils.dirAssert);
+    }
+
+    private static Path zipItWithWinZipAes() throws IOException {
         String password = new String(Zip4jSuite.password);
         Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         Files.createDirectories(zipFile.getParent());
@@ -44,15 +52,22 @@ public class WinZipAesToZip4jCompatibilityTest {
 
         encrypter.close();
 
-        Path dirUnzip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("unzip");
+        return zipFile;
+    }
+
+    @SuppressWarnings("NewMethodNamingConvention")
+    private static Path unzipItWithZip4j(Path zipFile) throws IOException {
+        Path dir = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("unzip");
         UnzipIt unzip = UnzipIt.builder()
                                .zipFile(zipFile)
                                .password(Zip4jSuite.password)
                                .build();
-        unzip.extract(dirUnzip);
+        unzip.extract(dir);
 
-        Files.createDirectories(dirUnzip.resolve("empty_dir"));
-        assertThatDirectory(dirUnzip).matches(TestUtils.dirAssert);
+        // WinZipAes does not support empty folders in zip
+        Files.createDirectories(dir.resolve("empty_dir"));
+
+        return dir;
     }
 
     private static List<Path> getDirectoryEntries(Path dir) {
