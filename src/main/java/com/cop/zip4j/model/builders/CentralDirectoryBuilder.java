@@ -34,8 +34,8 @@ public class CentralDirectoryBuilder {
     public CentralDirectory.FileHeader create() throws IOException {
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader(getFileName());
 
-        fileHeader.setVersionMadeBy(CentralDirectory.FileHeader.DEF_VERSION);
-        fileHeader.setVersionToExtract(CentralDirectory.FileHeader.DEF_VERSION);
+        fileHeader.setVersionMadeBy(CentralDirectory.FileHeader.VERSION);
+        fileHeader.setVersionToExtract(CentralDirectory.FileHeader.VERSION);
         updateGeneralPurposeFlag(fileHeader.getGeneralPurposeFlag());
         fileHeader.setCompressionMethod(getCompressionMethod(entry));
         fileHeader.setLastModifiedTime(entry.getLastModifiedTime());

@@ -80,8 +80,8 @@ public class ZipModel {
 
         Zip64.EndCentralDirectory dir = zip64.getEndCentralDirectory();
         dir.setSize(Zip64.EndCentralDirectory.SIZE + ArrayUtils.getLength(dir.getExtensibleDataSector()));
-        dir.setVersionMadeBy(isEmpty() ? CentralDirectory.FileHeader.DEF_VERSION : getFileHeaders().get(0).getVersionMadeBy());
-        dir.setVersionNeededToExtract(isEmpty() ? CentralDirectory.FileHeader.DEF_VERSION : getFileHeaders().get(0).getVersionToExtract());
+        dir.setVersionMadeBy(isEmpty() ? CentralDirectory.FileHeader.VERSION : getFileHeaders().get(0).getVersionMadeBy());
+        dir.setVersionNeededToExtract(isEmpty() ? CentralDirectory.FileHeader.VERSION : getFileHeaders().get(0).getVersionToExtract());
         dir.setDiskNumber(endCentralDirectory.getSplitParts());
         dir.setStartDiskNumber(endCentralDirectory.getStartDiskNumber());
         dir.setDiskEntries(countNumberOfFileHeaderEntriesOnDisk());

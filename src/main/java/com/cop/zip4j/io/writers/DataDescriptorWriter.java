@@ -20,13 +20,12 @@ public final class DataDescriptorWriter {
 
     public void write(@NonNull DataOutput out) throws IOException {
         out.writeDwordSignature(DataDescriptor.SIGNATURE);
+        out.writeDword(dataDescriptor.getCrc32());
 
         if (zip64) {
-            out.writeQword(dataDescriptor.getCrc32());
             out.writeQword(dataDescriptor.getCompressedSize());
             out.writeQword(dataDescriptor.getUncompressedSize());
         } else {
-            out.writeDword(dataDescriptor.getCrc32());
             out.writeDword(dataDescriptor.getCompressedSize());
             out.writeDword(dataDescriptor.getUncompressedSize());
         }

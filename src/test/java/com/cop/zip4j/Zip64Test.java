@@ -5,7 +5,6 @@ import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.ZipParameters;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,7 +17,7 @@ import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatZipFile;
  * @author Oleg Cherednik
  * @since 06.04.2019
  */
-@Test
+//@Test
 @SuppressWarnings({ "FieldNamingConvention", "NewClassNamingConvention" })
 public class Zip64Test {
 
@@ -37,6 +36,7 @@ public class Zip64Test {
     public void shouldCreateNewZipWithZip64() throws IOException, Zip4jException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(Compression.STORE)
+                                                .zip64(true)
                                                 .defaultFolderPath(Zip4jSuite.srcDir).build();
 
         Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
