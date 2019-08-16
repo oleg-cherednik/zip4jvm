@@ -53,23 +53,46 @@ public enum Encryption {
         }
 
         @Override
+        public long getChecksum(CentralDirectory.FileHeader fileHeader) {
+            return 0;
+        }
+
+        @Override
         public CompressionMethod getCompressionMethod(PathZipEntry entry) {
             return CompressionMethod.AES_ENC;
         }
+
+        @Override
+        public CompressionMethod getCompressionMethod(CentralDirectory.FileHeader fileHeader) {
+            return CompressionMethod.AES_ENC;
+        }
+
     };
 
     private final Function<PathZipEntry, Encoder> createEncoder;
     private final Function<PathZipEntry, Long> compressedSize;
     private final Function<CentralDirectory.FileHeader, Long> checksum;
 
+    @NonNull
     public Decoder decoder(@NonNull DataInput in, @NonNull LocalFileHeader localFileHeader, char[] password) throws IOException {
         throw new Zip4jException("unsupported encryption method");
     }
 
+    public long getChecksum(CentralDirectory.FileHeader fileHeader) {
+        return fileHeader.getCrc32();
+    }
+
+    @NonNull
     public CompressionMethod getCompressionMethod(PathZipEntry entry) {
         return entry.getCompression().getMethod();
     }
 
+    @NonNull
+    public CompressionMethod getCompressionMethod(CentralDirectory.FileHeader fileHeader) {
+        return fileHeader.getCompressionMethod();
+    }
+
+    @NonNull
     public static Encryption get(@NonNull ExtraField extraField, @NonNull GeneralPurposeFlag generalPurposeFlag) {
         if (generalPurposeFlag.isStrongEncryption())
             throw new Zip4jException("Strong encryption is not supported");

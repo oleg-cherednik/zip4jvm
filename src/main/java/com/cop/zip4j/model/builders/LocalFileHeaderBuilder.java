@@ -1,10 +1,8 @@
 package com.cop.zip4j.model.builders;
 
 import com.cop.zip4j.model.CentralDirectory;
-import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.LocalFileHeader;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -17,32 +15,20 @@ public final class LocalFileHeaderBuilder {
     private final CentralDirectory.FileHeader fileHeader;
 
     public LocalFileHeader create() {
+        Encryption encryption = fileHeader.getEncryption();
         LocalFileHeader localFileHeader = new LocalFileHeader();
 
         localFileHeader.setVersionToExtract(fileHeader.getVersionToExtract());
         localFileHeader.setGeneralPurposeFlag(fileHeader.getGeneralPurposeFlag().getData());
-        localFileHeader.setCompressionMethod(getCompressionMethod(fileHeader));
+        localFileHeader.setCompressionMethod(encryption.getCompressionMethod(fileHeader));
         localFileHeader.setLastModifiedTime(fileHeader.getLastModifiedTime());
         localFileHeader.setUncompressedSize(fileHeader.getUncompressedSize());
         localFileHeader.setFileName(fileHeader.getFileName());
         localFileHeader.setExtraField(fileHeader.getExtraField().deepCopy());
         localFileHeader.setCompressedSize(fileHeader.getCompressedSize());
-        localFileHeader.setCrc32(getChecksum(fileHeader));
+        localFileHeader.setCrc32(encryption.getChecksum(fileHeader));
 
         return localFileHeader;
-    }
-
-    @NonNull
-    private static CompressionMethod getCompressionMethod(CentralDirectory.FileHeader fileHeader) {
-        if (fileHeader.getEncryption() == Encryption.AES)
-            return CompressionMethod.AES_ENC;
-        return fileHeader.getCompressionMethod();
-    }
-
-    private static long getChecksum(CentralDirectory.FileHeader fileHeader) {
-        if (fileHeader.getEncryption() == Encryption.AES)
-            return 0;
-        return fileHeader.getCrc32();
     }
 
 }
