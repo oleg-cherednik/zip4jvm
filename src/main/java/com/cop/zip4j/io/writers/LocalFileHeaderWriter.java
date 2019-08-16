@@ -4,7 +4,6 @@ import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
-import com.cop.zip4j.utils.InternalZipConstants;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -31,8 +30,8 @@ public final class LocalFileHeaderWriter {
         out.writeDword(localFileHeader.getCrc32());
 
         //compressed & uncompressed size
-        if (localFileHeader.getUncompressedSize() + ZipModelWriter.ZIP64_EXTRA_BUF >= InternalZipConstants.ZIP_64_LIMIT) {
-            out.writeDword((int)InternalZipConstants.ZIP_64_LIMIT);
+        if (localFileHeader.getUncompressedSize() + ZipModelWriter.ZIP64_EXTRA_BUF >= ZipModel.ZIP_64_LIMIT) {
+            out.writeDword((int)ZipModel.ZIP_64_LIMIT);
             out.writeDword(0);
             zipModel.zip64();
         } else {

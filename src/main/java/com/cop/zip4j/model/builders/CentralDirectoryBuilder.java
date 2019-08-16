@@ -8,7 +8,7 @@ import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import com.cop.zip4j.model.entry.PathZipEntry;
-import com.cop.zip4j.utils.InternalZipConstants;
+import com.cop.zip4j.utils.OS;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,6 @@ import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 
 /**
  * @author Oleg Cherednik
@@ -45,7 +44,7 @@ public class CentralDirectoryBuilder {
         fileHeader.setFileCommentLength(0);
         fileHeader.setDiskNumber(currSplitFileCounter);
         fileHeader.setInternalFileAttributes(null);
-        fileHeader.setExternalFileAttributes(getExternalFileAttr());
+        fileHeader.setExternalFileAttributes(OS.current().getAttributes(entry.getPath()));
         fileHeader.setOffsLocalFileHeader(0);
         fileHeader.setZip64ExtendedInfo(Zip64.ExtendedInfo.NULL);
         fileHeader.setAesExtraDataRecord(getAesExtraDataRecord(entry.getEncryption()));
@@ -74,19 +73,6 @@ public class CentralDirectoryBuilder {
         generalPurposeFlag.setEncrypted(entry.getEncryption() != Encryption.OFF);
 //        generalPurposeFlag.setStrongEncryption(entry.getEncryption() == Encryption.STRONG);
         generalPurposeFlag.setStrongEncryption(false);
-    }
-
-    private byte[] getExternalFileAttr() throws IOException {
-        int attr = InternalZipConstants.FILE_MODE_READ_ONLY;
-
-        if (entry.isDirectory())
-            attr = Files.isHidden(entry.getPath()) ? InternalZipConstants.FOLDER_MODE_HIDDEN : InternalZipConstants.FOLDER_MODE_NONE;
-        if (!Files.isWritable(entry.getPath()) && Files.isHidden(entry.getPath()))
-            attr = InternalZipConstants.FILE_MODE_READ_ONLY_HIDDEN;
-        if (Files.isWritable(entry.getPath()))
-            attr = Files.isHidden(entry.getPath()) ? InternalZipConstants.FILE_MODE_HIDDEN : InternalZipConstants.FILE_MODE_NONE;
-
-        return new byte[] { (byte)attr, 0, 0, 0 };
     }
 
     @NonNull

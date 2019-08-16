@@ -9,6 +9,8 @@ import com.cop.zip4j.io.in.entry.EntryInputStream;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ZipModel;
+import com.cop.zip4j.utils.OS;
+import com.cop.zip4j.utils.ZipUtils;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -55,8 +58,12 @@ public class UnzipEngine {
 
         if (fileHeader.isDirectory())
             extractDirectory(dstDir, fileHeader);
-        else
-            extractFile(dstDir, fileHeader);
+        else {
+            Path file = dstDir.resolve(fileHeader.getFileName());
+            extractFile(file, fileHeader);
+            setFileAttributes(file, fileHeader);
+            setFileLastModifiedTime(file, fileHeader);
+        }
     }
 
     private void checkPassword(CentralDirectory.FileHeader fileHeader) {
@@ -75,11 +82,28 @@ public class UnzipEngine {
         }
     }
 
-    private void extractFile(Path dstDir, CentralDirectory.FileHeader fileHeader) {
-        try (InputStream in = extractEntryAsStream(fileHeader); OutputStream out = getOutputStream(dstDir, fileHeader)) {
+    private void extractFile(Path file, CentralDirectory.FileHeader fileHeader) {
+        try (InputStream in = extractEntryAsStream(fileHeader); OutputStream out = getOutputStream(file)) {
             IOUtils.copyLarge(in, out);
         } catch(IOException e) {
             throw new Zip4jException(e);
+        }
+    }
+
+    private static void setFileAttributes(Path file, CentralDirectory.FileHeader fileHeader) {
+        try {
+            OS.current().applyAttribute(file, fileHeader.getExternalFileAttributes());
+        } catch(IOException ignored) {
+        }
+    }
+
+    private static void setFileLastModifiedTime(Path file, CentralDirectory.FileHeader fileHeader) {
+        try {
+            int lastModifiedTime = fileHeader.getLastModifiedTime();
+
+            if (lastModifiedTime > 0 && Files.exists(file))
+                Files.setLastModifiedTime(file, FileTime.fromMillis(ZipUtils.dosToJavaTme(lastModifiedTime)));
+        } catch(IOException ignored) {
         }
     }
 
@@ -98,9 +122,8 @@ public class UnzipEngine {
         return zipModel.isSplitArchive() ? SplitZipInputStream.create(zipModel, fileHeader.getDiskNumber()) : SingleZipInputStream.create(zipModel);
     }
 
-    private static FileOutputStream getOutputStream(@NonNull Path dstDir, @NonNull CentralDirectory.FileHeader fileHeader) {
+    private static FileOutputStream getOutputStream(Path file) {
         try {
-            Path file = dstDir.resolve(fileHeader.getFileName());
             Path parent = file.getParent();
 
             if (!Files.exists(file))

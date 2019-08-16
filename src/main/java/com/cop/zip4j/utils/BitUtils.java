@@ -8,23 +8,24 @@ import lombok.experimental.UtilityClass;
  */
 @UtilityClass
 public class BitUtils {
-    public static final int BIT0 = 0x1;
-    public static final int BIT1 = 0x2;
-    public static final int BIT2 = 0x4;
-    public static final int BIT3 = 0x8;
-    public static final int BIT4 = 0x10;
-    public static final int BIT5 = 0x20;
-    public static final int BIT6 = 0x40;
-    public static final int BIT7 = 0x80;
 
-    public static final int BIT8 = 0x100;
-    public static final int BIT9 = 0x200;
-    public static final int BIT10 = 0x400;
-    public static final int BIT11 = 0x800;
-    public static final int BIT12 = 0x1000;
-    public static final int BIT13 = 0x2000;
-    public static final int BIT14 = 0x4000;
-    public static final int BIT15 = 0x8000;
+    public static final int BIT0 = 0b00000000_00000001;
+    public static final int BIT1 = 0b00000000_00000010;
+    public static final int BIT2 = 0b00000000_00000100;
+    public static final int BIT3 = 0b00000000_00001000;
+    public static final int BIT4 = 0b00000000_00010000;
+    public static final int BIT5 = 0b00000000_00100000;
+    public static final int BIT6 = 0b00000000_01000000;
+    public static final int BIT7 = 0b00000000_10000000;
+
+    public static final int BIT8 = 0b00000001_00000000;
+    public static final int BIT9 = 0b00000010_00000000;
+    public static final int BIT10 = 0b00000100_00000000;
+    public static final int BIT11 = 0b00001000_00000000;
+    public static final int BIT12 = 0b00010000_00000000;
+    public static final int BIT13 = 0b00100000_00000000;
+    public static final int BIT14 = 0b01000000_00000000;
+    public static final int BIT15 = 0b10000000_00000000;
 
     public long getByte(long val, int i) {
         return (val >> i * 8) & 0xFF;

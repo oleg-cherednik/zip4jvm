@@ -1,9 +1,8 @@
 package com.cop.zip4j.model;
 
-import com.cop.zip4j.io.writers.ZipModelWriter;
 import com.cop.zip4j.exception.Zip4jException;
+import com.cop.zip4j.io.writers.ZipModelWriter;
 import com.cop.zip4j.model.aes.AesExtraDataRecord;
-import com.cop.zip4j.utils.InternalZipConstants;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -180,8 +179,8 @@ public class CentralDirectory {
         }
 
         public boolean isWriteZip64FileSize() {
-            return compressedSize >= InternalZipConstants.ZIP_64_LIMIT ||
-                    uncompressedSize + ZipModelWriter.ZIP64_EXTRA_BUF >= InternalZipConstants.ZIP_64_LIMIT;
+            return compressedSize >= ZipModel.ZIP_64_LIMIT ||
+                    uncompressedSize + ZipModelWriter.ZIP64_EXTRA_BUF >= ZipModel.ZIP_64_LIMIT;
         }
 
         public Encryption getEncryption() {
@@ -189,7 +188,7 @@ public class CentralDirectory {
         }
 
         public boolean isWriteZip64OffsetLocalHeader() {
-            return offsLocalFileHeader > InternalZipConstants.ZIP_64_LIMIT;
+            return offsLocalFileHeader > ZipModel.ZIP_64_LIMIT;
         }
 
         @Override
