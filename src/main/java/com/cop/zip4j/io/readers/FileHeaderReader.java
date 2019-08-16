@@ -50,7 +50,7 @@ final class FileHeaderReader {
         int fileCommentLength = in.readWord();
         fileHeader.setDiskNumber(in.readWord());
         fileHeader.setInternalFileAttributes(in.readBytes(2));
-        fileHeader.setExternalFileAttributes(ExternalFileAttributes.readFromData(in.readBytes(4)));
+        fileHeader.setExternalFileAttributes(ExternalFileAttributes.of(in.readBytes(4)));
         fileHeader.setOffsLocalFileHeader(in.readDwordLong());
         fileHeader.setFileName(ZipUtils.normalizeFileName.apply(in.readString(fileNameLength)));
 

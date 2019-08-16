@@ -2,8 +2,8 @@ package com.cop.zip4j.model;
 
 import com.cop.zip4j.utils.BitUtils;
 import lombok.AccessLevel;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
+import org.apache.commons.lang.ArrayUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,7 +15,6 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static com.cop.zip4j.utils.BitUtils.BIT0;
@@ -40,202 +39,232 @@ import static java.nio.file.attribute.PosixFilePermission.OWNER_WRITE;
  * @author Oleg Cherednik
  * @since 16.08.2019
  */
-public class ExternalFileAttributes implements Supplier<byte[]>, Consumer<Path> {
+@SuppressWarnings("MethodCanBeVariableArityMethod")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consumer<Path> {
 
-    private final OS os;
-
-    // windows
-    private boolean readOnly;
-    private boolean hidden;
-    private boolean system;
-    private boolean archive;
-
-    // posix
-    private boolean othersExecute;
-    private boolean othersWrite;
-    private boolean othersRead;
-    private boolean groupExecute;
-    private boolean groupWrite;
-    private boolean groupRead;
-    private boolean ownerExecute;
-    private boolean ownerWrite;
-    private boolean ownerRead;
-    private boolean directory;
-    private boolean regularFile;
-
-    public static ExternalFileAttributes readFromFile(Path path) {
-        return new ExternalFileAttributes(path);
+    public static ExternalFileAttributes of(Path path) throws IOException {
+        ExternalFileAttributes delegate = createDelegate(null).get();
+        delegate.readFrom(path);
+        return delegate;
     }
 
-    public static ExternalFileAttributes readFromData(byte[] data) {
-        return new ExternalFileAttributes(data);
+    public static ExternalFileAttributes of(byte[] data) throws IOException {
+        ExternalFileAttributes delegate = createDelegate(data).get();
+        delegate.readFrom(data);
+        return delegate;
     }
 
-    private ExternalFileAttributes(Path path) {
-        os = OS.current();
+    private static Supplier<ExternalFileAttributes> createDelegate(byte[] data) {
+        int length = ArrayUtils.getLength(data);
 
-        try {
-            os.read(path, this);
-        } catch(IOException ignored) {
-        }
-    }
+        if (length != 0 && length != 4)
+            return () -> UnknownFileAttribute.INSTANCE;
 
-    public ExternalFileAttributes(byte[] data) {
-        os = OS.current();
-        os.read(data, this);
+        String os = System.getProperty("os.name").toLowerCase();
+
+        if (os.contains("win"))
+            return () -> WindowsFileAttribute.create(data);
+        if (os.contains("mac") || os.contains("nux"))
+            return () -> PosixFileAttribute.create(data);
+        return () -> UnknownFileAttribute.INSTANCE;
     }
 
     @Override
     public byte[] get() {
-        return os.apply(new byte[4], this);
+        byte[] data = new byte[4];
+        saveToRowData(data);
+        return data;
     }
 
     @Override
     public void accept(Path path) {
         try {
-            os.apply(path, this);
+            applyToPath(path);
         } catch(IOException ignored) {
         }
     }
 
-    @SuppressWarnings("NewClassNamingConvention")
-    @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-    private enum OS {
-        UNKNOWN(os -> false),
-        WINDOWS(os -> os.contains("win")) {
-            @Override
-            public void read(Path path, ExternalFileAttributes attr) throws IOException {
-                DosFileAttributes dos = Files.getFileAttributeView(path, DosFileAttributeView.class).readAttributes();
-                attr.readOnly = dos.isReadOnly();
-                attr.hidden = dos.isHidden();
-                attr.system = dos.isSystem();
-                attr.archive = dos.isArchive();
-            }
+    protected abstract void readFrom(Path path) throws IOException;
 
-            @Override
-            public void read(byte[] data, ExternalFileAttributes attr) {
-                attr.readOnly = BitUtils.isBitSet(data[0], BIT0);
-                attr.hidden = BitUtils.isBitSet(data[0], BIT1);
-                attr.system = BitUtils.isBitSet(data[0], BIT2);
-                attr.archive = BitUtils.isBitSet(data[0], BIT5);
-            }
+    protected abstract void readFrom(byte[] data);
 
-            @Override
-            public byte[] apply(byte[] data, ExternalFileAttributes attr) {
-                data[0] = BitUtils.updateBits(data[0], BIT0, attr.readOnly);
-                data[0] = BitUtils.updateBits(data[0], BIT1, attr.hidden);
-                data[0] = BitUtils.updateBits(data[0], BIT2, attr.system);
-                data[0] = BitUtils.updateBits(data[0], BIT5, attr.archive);
-                return data;
-            }
+    protected abstract void saveToRowData(byte[] data);
 
-            @Override
-            public void apply(@NonNull Path path, ExternalFileAttributes attr) throws IOException {
-                DosFileAttributeView dos = Files.getFileAttributeView(path, DosFileAttributeView.class);
-                dos.setReadOnly(attr.readOnly);
-                dos.setHidden(attr.hidden);
-                dos.setSystem(attr.system);
-                dos.setArchive(attr.archive);
-            }
-        },
-        POSIX(os -> os.contains("mac") || os.contains("nux")) {
-            @Override
-            public void read(Path path, ExternalFileAttributes attr) throws IOException {
-                Set<PosixFilePermission> permissions = Files.getFileAttributeView(path, PosixFileAttributeView.class).readAttributes().permissions();
+    protected abstract void applyToPath(Path path) throws IOException;
 
-                attr.othersExecute = permissions.contains(OTHERS_EXECUTE);
-                attr.othersWrite = permissions.contains(OTHERS_WRITE);
-                attr.othersRead = permissions.contains(OTHERS_READ);
-                attr.groupExecute = permissions.contains(GROUP_EXECUTE);
-                attr.groupWrite = permissions.contains(GROUP_WRITE);
-                attr.groupRead = permissions.contains(GROUP_READ);
-                attr.ownerExecute = permissions.contains(OWNER_EXECUTE);
-                attr.ownerWrite = permissions.contains(OWNER_WRITE);
-                attr.ownerRead = permissions.contains(OWNER_READ);
-                attr.directory = Files.isDirectory(path);
-                attr.regularFile = Files.isRegularFile(path);
-            }
+    private static class UnknownFileAttribute extends ExternalFileAttributes {
 
-            @Override
-            public void read(byte[] data, ExternalFileAttributes attr) {
-                attr.othersExecute = BitUtils.isBitSet(data[2], BIT0);
-                attr.othersWrite = BitUtils.isBitSet(data[2], BIT1);
-                attr.othersRead = BitUtils.isBitSet(data[2], BIT2);
-                attr.groupExecute = BitUtils.isBitSet(data[2], BIT3);
-                attr.groupWrite = BitUtils.isBitSet(data[2], BIT4);
-                attr.groupRead = BitUtils.isBitSet(data[2], BIT5);
-                attr.ownerExecute = BitUtils.isBitSet(data[2], BIT6);
-                attr.ownerWrite = BitUtils.isBitSet(data[2], BIT7);
-                attr.ownerRead = BitUtils.isBitSet(data[3], BIT0);
-                attr.directory = BitUtils.isBitSet(data[3], BIT6);
-                attr.regularFile = BitUtils.isBitSet(data[3], BIT7);
-            }
+        private static final UnknownFileAttribute INSTANCE = new UnknownFileAttribute();
 
-            @Override
-            public byte[] apply(byte[] data, ExternalFileAttributes attr) {
-                data[2] = BitUtils.updateBits(data[0], BIT0, attr.othersExecute);
-                data[2] = BitUtils.updateBits(data[0], BIT1, attr.othersWrite);
-                data[2] = BitUtils.updateBits(data[0], BIT2, attr.othersRead);
-                data[2] = BitUtils.updateBits(data[0], BIT3, attr.groupExecute);
-                data[2] = BitUtils.updateBits(data[0], BIT4, attr.groupWrite);
-                data[2] = BitUtils.updateBits(data[0], BIT4, attr.groupRead);
-                data[2] = BitUtils.updateBits(data[0], BIT5, attr.ownerExecute);
-                data[2] = BitUtils.updateBits(data[0], BIT7, attr.ownerWrite);
-                data[3] = BitUtils.updateBits(data[0], BIT0, attr.ownerRead);
-                data[3] = BitUtils.updateBits(data[0], BIT6, attr.directory);
-                data[3] = BitUtils.updateBits(data[0], BIT7, attr.regularFile);
-                return data;
-            }
-
-            @Override
-            public void apply(@NonNull Path path, ExternalFileAttributes attr) throws IOException {
-                Set<PosixFilePermission> permissions = EnumSet.noneOf(PosixFilePermission.class);
-                add(attr.othersExecute, permissions, OTHERS_EXECUTE);
-                add(attr.othersWrite, permissions, OTHERS_WRITE);
-                add(attr.othersRead, permissions, OTHERS_READ);
-                add(attr.groupExecute, permissions, GROUP_EXECUTE);
-                add(attr.groupWrite, permissions, GROUP_WRITE);
-                add(attr.groupRead, permissions, GROUP_READ);
-                add(attr.ownerExecute, permissions, OWNER_EXECUTE);
-                add(attr.ownerWrite, permissions, OWNER_WRITE);
-                add(attr.ownerRead, permissions, OWNER_READ);
-
-                if (!permissions.isEmpty())
-                    Files.setPosixFilePermissions(path, permissions);
-            }
-
-            private void add(boolean exists, Set<PosixFilePermission> permissions, PosixFilePermission permission) {
-                if (exists)
-                    permissions.add(permission);
-            }
-        };
-
-        private final Predicate<String> is;
-
-        public void read(Path path, ExternalFileAttributes attr) throws IOException {
+        @Override
+        protected void readFrom(Path path) throws IOException {
         }
 
-        public void read(byte[] data, ExternalFileAttributes attr) {
+        @Override
+        protected void readFrom(byte[] data) {
         }
 
-        public byte[] apply(byte[] data, ExternalFileAttributes attr) {
-            return data;
+        @Override
+        protected void saveToRowData(byte[] data) {
         }
 
-        public void apply(@NonNull Path path, ExternalFileAttributes attr) throws IOException {
+        @Override
+        protected void applyToPath(Path path) throws IOException {
         }
 
-        public static OS current() {
-            String os = System.getProperty("os.name").toLowerCase();
-
-            for (OS system : values())
-                if (system.is.test(os))
-                    return system;
-
-            return UNKNOWN;
+        @Override
+        public String toString() {
+            return "<null>";
         }
 
     }
 
+    private static class WindowsFileAttribute extends ExternalFileAttributes {
+
+        private boolean readOnly;
+        private boolean hidden;
+        private boolean system;
+        private boolean archive;
+
+        public static ExternalFileAttributes create(byte[] data) {
+            if (data == null || data[0] != 0)
+                return new WindowsFileAttribute();
+            return UnknownFileAttribute.INSTANCE;
+        }
+
+        @Override
+        protected void readFrom(Path path) throws IOException {
+            DosFileAttributes dos = Files.getFileAttributeView(path, DosFileAttributeView.class).readAttributes();
+            readOnly = dos.isReadOnly();
+            hidden = dos.isHidden();
+            system = dos.isSystem();
+            archive = dos.isArchive();
+        }
+
+        @Override
+        protected void readFrom(byte[] data) {
+            readOnly = BitUtils.isBitSet(data[0], BIT0);
+            hidden = BitUtils.isBitSet(data[0], BIT1);
+            system = BitUtils.isBitSet(data[0], BIT2);
+            archive = BitUtils.isBitSet(data[0], BIT5);
+        }
+
+        @Override
+        protected void saveToRowData(byte[] data) {
+            data[0] = BitUtils.updateBits(data[0], BIT0, readOnly);
+            data[0] = BitUtils.updateBits(data[0], BIT1, hidden);
+            data[0] = BitUtils.updateBits(data[0], BIT2, system);
+            data[0] = BitUtils.updateBits(data[0], BIT5, archive);
+        }
+
+        @Override
+        protected void applyToPath(Path path) throws IOException {
+        }
+
+        @Override
+        public String toString() {
+            return "win";
+        }
+    }
+
+    private static class PosixFileAttribute extends ExternalFileAttributes {
+
+        private boolean othersExecute;
+        private boolean othersWrite;
+        private boolean othersRead;
+        private boolean groupExecute;
+        private boolean groupWrite;
+        private boolean groupRead;
+        private boolean ownerExecute;
+        private boolean ownerWrite;
+        private boolean ownerRead;
+        private boolean directory;
+        private boolean regularFile;
+
+        public static ExternalFileAttributes create() {
+            return new PosixFileAttribute();
+        }
+
+        public static ExternalFileAttributes create(byte[] data) {
+            if (data == null || data[2] != 0 || data[3] != 0)
+                return new PosixFileAttribute();
+            return UnknownFileAttribute.INSTANCE;
+        }
+
+        @Override
+        protected void readFrom(Path path) throws IOException {
+            Set<PosixFilePermission> permissions = Files.getFileAttributeView(path, PosixFileAttributeView.class).readAttributes().permissions();
+
+            othersExecute = permissions.contains(OTHERS_EXECUTE);
+            othersWrite = permissions.contains(OTHERS_WRITE);
+            othersRead = permissions.contains(OTHERS_READ);
+            groupExecute = permissions.contains(GROUP_EXECUTE);
+            groupWrite = permissions.contains(GROUP_WRITE);
+            groupRead = permissions.contains(GROUP_READ);
+            ownerExecute = permissions.contains(OWNER_EXECUTE);
+            ownerWrite = permissions.contains(OWNER_WRITE);
+            ownerRead = permissions.contains(OWNER_READ);
+            directory = Files.isDirectory(path);
+            regularFile = Files.isRegularFile(path);
+        }
+
+        @Override
+        protected void readFrom(byte[] data) {
+            othersExecute = BitUtils.isBitSet(data[2], BIT0);
+            othersWrite = BitUtils.isBitSet(data[2], BIT1);
+            othersRead = BitUtils.isBitSet(data[2], BIT2);
+            groupExecute = BitUtils.isBitSet(data[2], BIT3);
+            groupWrite = BitUtils.isBitSet(data[2], BIT4);
+            groupRead = BitUtils.isBitSet(data[2], BIT5);
+            ownerExecute = BitUtils.isBitSet(data[2], BIT6);
+            ownerWrite = BitUtils.isBitSet(data[2], BIT7);
+            ownerRead = BitUtils.isBitSet(data[3], BIT0);
+            directory = BitUtils.isBitSet(data[3], BIT6);
+            regularFile = BitUtils.isBitSet(data[3], BIT7);
+        }
+
+        @Override
+        protected void saveToRowData(byte[] data) {
+            data[2] = BitUtils.updateBits(data[0], BIT0, othersExecute);
+            data[2] = BitUtils.updateBits(data[0], BIT1, othersWrite);
+            data[2] = BitUtils.updateBits(data[0], BIT2, othersRead);
+            data[2] = BitUtils.updateBits(data[0], BIT3, groupExecute);
+            data[2] = BitUtils.updateBits(data[0], BIT4, groupWrite);
+            data[2] = BitUtils.updateBits(data[0], BIT4, groupRead);
+            data[2] = BitUtils.updateBits(data[0], BIT5, ownerExecute);
+            data[2] = BitUtils.updateBits(data[0], BIT7, ownerWrite);
+            data[3] = BitUtils.updateBits(data[0], BIT0, ownerRead);
+            data[3] = BitUtils.updateBits(data[0], BIT6, directory);
+            data[3] = BitUtils.updateBits(data[0], BIT7, regularFile);
+        }
+
+        @Override
+        protected void applyToPath(Path path) throws IOException {
+            Set<PosixFilePermission> permissions = EnumSet.noneOf(PosixFilePermission.class);
+            addIfSet(othersExecute, permissions, OTHERS_EXECUTE);
+            addIfSet(othersWrite, permissions, OTHERS_WRITE);
+            addIfSet(othersRead, permissions, OTHERS_READ);
+            addIfSet(groupExecute, permissions, GROUP_EXECUTE);
+            addIfSet(groupWrite, permissions, GROUP_WRITE);
+            addIfSet(groupRead, permissions, GROUP_READ);
+            addIfSet(ownerExecute, permissions, OWNER_EXECUTE);
+            addIfSet(ownerWrite, permissions, OWNER_WRITE);
+            addIfSet(ownerRead, permissions, OWNER_READ);
+
+            if (!permissions.isEmpty())
+                Files.setPosixFilePermissions(path, permissions);
+        }
+
+        private static void addIfSet(boolean exists, Set<PosixFilePermission> permissions, PosixFilePermission permission) {
+            if (exists)
+                permissions.add(permission);
+        }
+
+        @Override
+        public String toString() {
+            return "posix";
+        }
+    }
 
 }
