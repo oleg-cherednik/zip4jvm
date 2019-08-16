@@ -51,6 +51,11 @@ public enum Encryption {
         public Decoder decoder(DataInput in, @NonNull LocalFileHeader localFileHeader, char[] password) throws IOException {
             return AesDecoder.create(in, localFileHeader, password);
         }
+
+        @Override
+        public CompressionMethod getCompressionMethod(PathZipEntry entry) {
+            return CompressionMethod.AES_ENC;
+        }
     };
 
     private final Function<PathZipEntry, Encoder> createEncoder;
@@ -59,6 +64,10 @@ public enum Encryption {
 
     public Decoder decoder(@NonNull DataInput in, @NonNull LocalFileHeader localFileHeader, char[] password) throws IOException {
         throw new Zip4jException("unsupported encryption method");
+    }
+
+    public CompressionMethod getCompressionMethod(PathZipEntry entry) {
+        return entry.getCompression().getMethod();
     }
 
     public static Encryption get(@NonNull ExtraField extraField, @NonNull GeneralPurposeFlag generalPurposeFlag) {

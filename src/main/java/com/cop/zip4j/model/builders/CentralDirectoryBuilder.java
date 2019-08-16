@@ -1,7 +1,6 @@
 package com.cop.zip4j.model.builders;
 
 import com.cop.zip4j.model.CentralDirectory;
-import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.GeneralPurposeFlag;
 import com.cop.zip4j.model.Zip64;
@@ -36,7 +35,7 @@ public class CentralDirectoryBuilder {
         fileHeader.setVersionMadeBy(CentralDirectory.FileHeader.VERSION);
         fileHeader.setVersionToExtract(CentralDirectory.FileHeader.VERSION);
         updateGeneralPurposeFlag(fileHeader.getGeneralPurposeFlag());
-        fileHeader.setCompressionMethod(getCompressionMethod(entry));
+        fileHeader.setCompressionMethod(entry.getEncryption().getCompressionMethod(entry));
         fileHeader.setLastModifiedTime(entry.getLastModifiedTime());
         fileHeader.setCrc32(entry.checksum());
         fileHeader.setCompressedSize(entry.getCompressedSize());
@@ -73,13 +72,6 @@ public class CentralDirectoryBuilder {
         generalPurposeFlag.setEncrypted(entry.getEncryption() != Encryption.OFF);
 //        generalPurposeFlag.setStrongEncryption(entry.getEncryption() == Encryption.STRONG);
         generalPurposeFlag.setStrongEncryption(false);
-    }
-
-    @NonNull
-    private static CompressionMethod getCompressionMethod(PathZipEntry entry) {
-        if (entry.getEncryption() == Encryption.AES)
-            return CompressionMethod.AES_ENC;
-        return entry.getCompression().getMethod();
     }
 
     @NonNull
