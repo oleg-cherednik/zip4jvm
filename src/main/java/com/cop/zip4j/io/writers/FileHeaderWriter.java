@@ -35,7 +35,7 @@ final class FileHeaderWriter {
         out.writeDwordSignature(CentralDirectory.FileHeader.SIGNATURE);
         out.writeWord(fileHeader.getVersionMadeBy());
         out.writeWord(fileHeader.getVersionToExtract());
-        out.writeWord(fileHeader.getGeneralPurposeFlag().getData());
+        out.writeWord(fileHeader.getGeneralPurposeFlag().getAsInt());
         out.writeWord(fileHeader.getCompressionMethod().getCode());
         out.writeDword(fileHeader.getLastModifiedTime());
         out.writeDword(fileHeader.getCompressionMethod() == CompressionMethod.AES_ENC ? 0 : fileHeader.getCrc32());

@@ -45,6 +45,8 @@ import static java.nio.file.attribute.PosixFilePermission.OWNER_WRITE;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consumer<Path> {
 
+    public static final ExternalFileAttributes NULL = new UnknownFileAttribute();
+
     private static final int SIZE = 4;
 
     public static ExternalFileAttributes of(@NonNull Path path) throws IOException {
@@ -64,7 +66,7 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consum
         int length = ArrayUtils.getLength(data);
 
         if (length != 0 && length != SIZE)
-            return () -> UnknownFileAttribute.INSTANCE;
+            return () -> NULL;
 
         String os = System.getProperty("os.name").toLowerCase();
 
@@ -72,7 +74,7 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consum
             return () -> WindowsFileAttribute.create(data);
         if (os.contains("mac") || os.contains("nux"))
             return () -> PosixFileAttribute.create(data);
-        return () -> UnknownFileAttribute.INSTANCE;
+        return () -> NULL;
     }
 
     @Override
@@ -99,8 +101,6 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consum
     protected abstract void applyToPath(Path path) throws IOException;
 
     private static class UnknownFileAttribute extends ExternalFileAttributes {
-
-        private static final UnknownFileAttribute INSTANCE = new UnknownFileAttribute();
 
         @Override
         protected void readFrom(Path path) throws IOException {
@@ -135,7 +135,7 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consum
         public static ExternalFileAttributes create(byte[] data) {
             if (data == null || data[0] != 0)
                 return new WindowsFileAttribute();
-            return UnknownFileAttribute.INSTANCE;
+            return NULL;
         }
 
         @Override
@@ -194,7 +194,7 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consum
         public static ExternalFileAttributes create(byte[] data) {
             if (data == null || data[2] != 0 || data[3] != 0)
                 return new PosixFileAttribute();
-            return UnknownFileAttribute.INSTANCE;
+            return NULL;
         }
 
         @Override

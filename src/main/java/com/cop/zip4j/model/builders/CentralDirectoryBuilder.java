@@ -69,7 +69,7 @@ public class CentralDirectoryBuilder {
     private void updateGeneralPurposeFlag(@NonNull GeneralPurposeFlag generalPurposeFlag) {
         generalPurposeFlag.setCompressionLevel(entry.getCompressionLevel());
         generalPurposeFlag.setDataDescriptorExists(true);
-        generalPurposeFlag.setUtf8Encoding(zipModel.getCharset() == StandardCharsets.UTF_8);
+        generalPurposeFlag.setUtf8(zipModel.getCharset() == StandardCharsets.UTF_8);
         generalPurposeFlag.setEncrypted(entry.getEncryption() != Encryption.OFF);
 //        generalPurposeFlag.setStrongEncryption(entry.getEncryption() == Encryption.STRONG);
         generalPurposeFlag.setStrongEncryption(false);

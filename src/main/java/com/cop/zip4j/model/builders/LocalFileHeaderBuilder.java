@@ -19,7 +19,7 @@ public final class LocalFileHeaderBuilder {
         LocalFileHeader localFileHeader = new LocalFileHeader();
 
         localFileHeader.setVersionToExtract(fileHeader.getVersionToExtract());
-        localFileHeader.setGeneralPurposeFlag(fileHeader.getGeneralPurposeFlag().getData());
+        localFileHeader.setGeneralPurposeFlag(fileHeader.getGeneralPurposeFlag().getAsInt());
         localFileHeader.setCompressionMethod(encryption.getCompressionMethod(fileHeader));
         localFileHeader.setLastModifiedTime(fileHeader.getLastModifiedTime());
         localFileHeader.setUncompressedSize(fileHeader.getUncompressedSize());

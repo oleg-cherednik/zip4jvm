@@ -100,9 +100,11 @@ public class CentralDirectory {
         // size:2 - disk number start
         private int diskNumber;
         // size:2 - internal file attributes
-        private InternalFileAttributes internalFileAttributes;
+        @NonNull
+        private InternalFileAttributes internalFileAttributes = InternalFileAttributes.NULL;
         // size:4 - external file attributes
-        private ExternalFileAttributes externalFileAttributes;
+        @NonNull
+        private ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.NULL;
         // size:4 - relative offset of local header
         private long offsLocalFileHeader;
         // size:n - file name
@@ -166,7 +168,7 @@ public class CentralDirectory {
         }
 
         public void setGeneralPurposeFlag(int data) {
-            generalPurposeFlag.setData(data);
+            generalPurposeFlag.read(data);
             generalPurposeFlag.setEncrypted(isEncrypted());
         }
 

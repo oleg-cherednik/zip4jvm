@@ -58,8 +58,8 @@ public class LocalFileHeader {
     }
 
     public void setGeneralPurposeFlag(int data) {
-        generalPurposeFlag.setData(data);
-        generalPurposeFlag.setEncrypted(getEncryption() != Encryption.OFF);
+        generalPurposeFlag.read(data);
+        generalPurposeFlag.setEncrypted(isEncrypted());
     }
 
     public boolean isEncrypted() {

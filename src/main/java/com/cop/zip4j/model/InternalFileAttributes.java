@@ -18,6 +18,7 @@ import java.util.function.Supplier;
 public class InternalFileAttributes implements Supplier<byte[]>, Consumer<Path> {
 
     private static final int SIZE = 2;
+    public static final InternalFileAttributes NULL = new InternalFileAttributes(new byte[SIZE]);
 
     private final byte[] data;
 
