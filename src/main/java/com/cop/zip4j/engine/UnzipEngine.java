@@ -9,7 +9,6 @@ import com.cop.zip4j.io.in.entry.EntryInputStream;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ZipModel;
-import com.cop.zip4j.utils.OS;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.Getter;
 import lombok.NonNull;
@@ -91,10 +90,7 @@ public class UnzipEngine {
     }
 
     private static void setFileAttributes(Path file, CentralDirectory.FileHeader fileHeader) {
-        try {
-            OS.current().applyAttribute(file, fileHeader.getExternalFileAttributes());
-        } catch(IOException ignored) {
-        }
+        fileHeader.getExternalFileAttributes().accept(file);
     }
 
     private static void setFileLastModifiedTime(Path file, CentralDirectory.FileHeader fileHeader) {

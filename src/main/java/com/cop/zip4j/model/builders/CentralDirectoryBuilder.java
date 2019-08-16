@@ -2,12 +2,12 @@ package com.cop.zip4j.model.builders;
 
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Encryption;
+import com.cop.zip4j.model.ExternalFileAttributes;
 import com.cop.zip4j.model.GeneralPurposeFlag;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import com.cop.zip4j.model.entry.PathZipEntry;
-import com.cop.zip4j.utils.OS;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +43,7 @@ public class CentralDirectoryBuilder {
         fileHeader.setFileCommentLength(0);
         fileHeader.setDiskNumber(currSplitFileCounter);
         fileHeader.setInternalFileAttributes(null);
-        fileHeader.setExternalFileAttributes(OS.current().getAttributes(entry.getPath()));
+        fileHeader.setExternalFileAttributes(ExternalFileAttributes.readFromFile(entry.getPath()));
         fileHeader.setOffsLocalFileHeader(0);
         fileHeader.setZip64ExtendedInfo(Zip64.ExtendedInfo.NULL);
         fileHeader.setAesExtraDataRecord(getAesExtraDataRecord(entry.getEncryption()));

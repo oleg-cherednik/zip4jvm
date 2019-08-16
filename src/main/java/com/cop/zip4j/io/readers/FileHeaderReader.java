@@ -4,6 +4,7 @@ import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.CompressionMethod;
+import com.cop.zip4j.model.ExternalFileAttributes;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.RequiredArgsConstructor;
 
@@ -49,7 +50,7 @@ final class FileHeaderReader {
         int fileCommentLength = in.readWord();
         fileHeader.setDiskNumber(in.readWord());
         fileHeader.setInternalFileAttributes(in.readBytes(2));
-        fileHeader.setExternalFileAttributes(in.readBytes(4));
+        fileHeader.setExternalFileAttributes(ExternalFileAttributes.readFromData(in.readBytes(4)));
         fileHeader.setOffsLocalFileHeader(in.readDwordLong());
         fileHeader.setFileName(ZipUtils.normalizeFileName.apply(in.readString(fileNameLength)));
 

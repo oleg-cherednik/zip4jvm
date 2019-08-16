@@ -102,7 +102,7 @@ public class CentralDirectory {
         // size:2 - internal file attributes
         private byte[] internalFileAttributes;
         // size:4 - external file attributes
-        private byte[] externalFileAttributes;
+        private ExternalFileAttributes externalFileAttributes;
         // size:4 - relative offset of local header
         private long offsLocalFileHeader;
         // size:n - file name

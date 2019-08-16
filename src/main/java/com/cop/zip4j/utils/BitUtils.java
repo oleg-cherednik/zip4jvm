@@ -79,4 +79,8 @@ public class BitUtils {
     public short updateBits(short val, int bits, boolean value) {
         return (short)updateBits((int)val, bits, value);
     }
+
+    public byte updateBits(byte val, int bits, boolean value) {
+        return (byte)updateBits((int)val, bits, value);
+    }
 }
