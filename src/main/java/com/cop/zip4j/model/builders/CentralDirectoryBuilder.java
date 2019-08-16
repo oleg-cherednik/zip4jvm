@@ -4,6 +4,7 @@ import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ExternalFileAttributes;
 import com.cop.zip4j.model.GeneralPurposeFlag;
+import com.cop.zip4j.model.InternalFileAttributes;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.aes.AesExtraDataRecord;
@@ -42,7 +43,7 @@ public class CentralDirectoryBuilder {
         fileHeader.setUncompressedSize(entry.size());
         fileHeader.setFileCommentLength(0);
         fileHeader.setDiskNumber(currSplitFileCounter);
-        fileHeader.setInternalFileAttributes(null);
+        fileHeader.setInternalFileAttributes(InternalFileAttributes.of(entry.getPath()));
         fileHeader.setExternalFileAttributes(ExternalFileAttributes.of(entry.getPath()));
         fileHeader.setOffsLocalFileHeader(0);
         fileHeader.setZip64ExtendedInfo(Zip64.ExtendedInfo.NULL);

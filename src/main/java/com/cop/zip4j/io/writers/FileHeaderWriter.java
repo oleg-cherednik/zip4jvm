@@ -45,7 +45,7 @@ final class FileHeaderWriter {
         out.writeWord(fileHeader.getExtraField().getLength());
         out.writeWord(fileComment.length);
         out.writeWord(fileHeader.getDiskNumber());
-        out.writeBytes(fileHeader.getInternalFileAttributes() != null ? fileHeader.getInternalFileAttributes() : new byte[2]);
+        out.writeBytes(fileHeader.getInternalFileAttributes().get());
         out.writeBytes(fileHeader.getExternalFileAttributes().get());
         out.writeDword(fileHeader.isWriteZip64OffsetLocalHeader() ? ZipModel.ZIP_64_LIMIT : fileHeader.getOffsLocalFileHeader());
         out.writeBytes(fileName);

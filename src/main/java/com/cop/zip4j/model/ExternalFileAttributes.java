@@ -1,8 +1,10 @@
 package com.cop.zip4j.model;
 
+import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.utils.BitUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.io.IOException;
@@ -43,13 +45,16 @@ import static java.nio.file.attribute.PosixFilePermission.OWNER_WRITE;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consumer<Path> {
 
-    public static ExternalFileAttributes of(Path path) throws IOException {
+    private static final int SIZE = 4;
+
+    public static ExternalFileAttributes of(@NonNull Path path) throws IOException {
         ExternalFileAttributes delegate = createDelegate(null).get();
         delegate.readFrom(path);
         return delegate;
     }
 
-    public static ExternalFileAttributes of(byte[] data) throws IOException {
+    public static ExternalFileAttributes read(@NonNull DataInput in) throws IOException {
+        byte[] data = in.readBytes(SIZE);
         ExternalFileAttributes delegate = createDelegate(data).get();
         delegate.readFrom(data);
         return delegate;
@@ -58,7 +63,7 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consum
     private static Supplier<ExternalFileAttributes> createDelegate(byte[] data) {
         int length = ArrayUtils.getLength(data);
 
-        if (length != 0 && length != 4)
+        if (length != 0 && length != SIZE)
             return () -> UnknownFileAttribute.INSTANCE;
 
         String os = System.getProperty("os.name").toLowerCase();
@@ -72,7 +77,7 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consum
 
     @Override
     public byte[] get() {
-        byte[] data = new byte[4];
+        byte[] data = new byte[SIZE];
         saveToRowData(data);
         return data;
     }

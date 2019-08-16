@@ -100,7 +100,7 @@ public class CentralDirectory {
         // size:2 - disk number start
         private int diskNumber;
         // size:2 - internal file attributes
-        private byte[] internalFileAttributes;
+        private InternalFileAttributes internalFileAttributes;
         // size:4 - external file attributes
         private ExternalFileAttributes externalFileAttributes;
         // size:4 - relative offset of local header
