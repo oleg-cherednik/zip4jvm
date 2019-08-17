@@ -2,19 +2,20 @@ plugins {
     id 'java'
     id 'application'
     id 'io.franzbecker.gradle-lombok' version '1.14'
-    id 'jacoco'
+//    id 'jacoco'
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
 group 'com.cop.zip4j'
-version = '2.0'
+version '2.0'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
-//mainClassName = 'com.cop.zip4j.Application'
+mainClassName = 'com.cop.zip4j.Application'
 
 dependencies {
     compile 'org.slf4j:slf4j-api:1.7.25'
@@ -37,24 +38,24 @@ dependencies {
 }
 
 jar {
-//    manifest {
-//        attributes 'Main-Class': mainClassName
-//    }
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
 
     from {
         configurations.compile.collect {it.isDirectory() ? it : zipTree(it)}
     }
 }
 
-jacoco {
-    toolVersion = "0.8.4"
-    reportsDir = file("$buildDir/customJacocoReportDir")
-}
+//jacoco {
+//    toolVersion = "0.8.4"
+//    reportsDir = file("$buildDir/customJacocoReportDir")
+//}
 
 task fatJar(type: Jar) {
-//    manifest {
-//        attributes 'Main-Class': mainClassName
-//    }
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
 
     baseName = project.name
     from {configurations.compile.collect {it.isDirectory() ? it : zipTree(it)}}

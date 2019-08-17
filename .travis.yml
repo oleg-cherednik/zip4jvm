@@ -1,0 +1,4 @@
+language: java
+
+script:
+  - travis_wait 30 gradle clean build
