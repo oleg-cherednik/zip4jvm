@@ -65,6 +65,9 @@ public class CentralDirectory {
                           .collect(Collectors.toList());
     }
 
+    /**
+     * see 4.3.12
+     */
     @Getter
     @Setter
     @NoArgsConstructor

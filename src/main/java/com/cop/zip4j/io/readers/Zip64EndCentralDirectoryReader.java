@@ -39,9 +39,7 @@ final class Zip64EndCentralDirectoryReader {
     private void findHead(DataInput in) throws IOException {
         in.seek(offs);
 
-        if (in.readDword() == Zip64.EndCentralDirectory.SIGNATURE)
-            return;
-
-        throw new Zip4jException("invalid zip64 end of central directory");
+        if (in.readSignature() != Zip64.EndCentralDirectory.SIGNATURE)
+            throw new Zip4jException("invalid zip64 end of central directory");
     }
 }

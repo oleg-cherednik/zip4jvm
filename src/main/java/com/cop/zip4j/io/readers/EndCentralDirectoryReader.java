@@ -46,7 +46,7 @@ final class EndCentralDirectoryReader {
             commentLength--;
             this.offs = in.getOffs();
 
-            if (in.readDword() == EndCentralDirectory.SIGNATURE)
+            if (in.readSignature() == EndCentralDirectory.SIGNATURE)
                 return;
         } while (commentLength >= 0 && offs >= 0);
 

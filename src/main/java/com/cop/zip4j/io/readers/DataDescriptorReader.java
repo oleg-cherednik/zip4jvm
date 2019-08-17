@@ -21,7 +21,7 @@ public final class DataDescriptorReader {
     public DataDescriptor read(@NonNull DataInput in) throws IOException {
         long offs = in.getOffs();
 
-        if (in.readDword() != DataDescriptor.SIGNATURE)
+        if (in.readSignature() != DataDescriptor.SIGNATURE)
             throw new Zip4jException("DataDescriptor signature expected at offs=" + offs);
 
         DataDescriptor dataDescriptor = new DataDescriptor();

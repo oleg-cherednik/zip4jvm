@@ -32,10 +32,7 @@ public class SplitZipInputStream extends BaseDataInput {
     private void checkSignature() throws IOException {
         if (diskNumber != 0)
             return;
-
-        int signature = delegate.readDword();
-
-        if (signature != EntryOutputStream.SPLIT_SIGNATURE)
+        if (delegate.readSignature() != EntryOutputStream.SPLIT_SIGNATURE)
             throw new Zip4jException("Incorrect split file signature: " + zipModel.getZipFile().getFileName());
     }
 

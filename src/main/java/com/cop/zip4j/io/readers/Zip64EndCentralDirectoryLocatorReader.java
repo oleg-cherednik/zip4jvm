@@ -40,6 +40,6 @@ final class Zip64EndCentralDirectoryLocatorReader {
             return false;
 
         in.seek(offs);
-        return in.readDword() == Zip64.EndCentralDirectoryLocator.SIGNATURE;
+        return in.readSignature() == Zip64.EndCentralDirectoryLocator.SIGNATURE;
     }
 }

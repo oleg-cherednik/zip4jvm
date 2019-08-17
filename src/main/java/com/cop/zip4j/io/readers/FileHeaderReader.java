@@ -35,7 +35,7 @@ final class FileHeaderReader {
         long offs = in.getOffs();
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
-        if (in.readDword() != CentralDirectory.FileHeader.SIGNATURE)
+        if (in.readSignature() != CentralDirectory.FileHeader.SIGNATURE)
             throw new Zip4jException("Expected central directory entry not found offs=" + offs);
 
         fileHeader.setVersionMadeBy(in.readWord());
