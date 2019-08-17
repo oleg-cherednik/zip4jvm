@@ -5,19 +5,17 @@ import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.ZipParameters;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
-import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatZipFile;
-
 /**
  * @author Oleg Cherednik
  * @since 06.04.2019
  */
-//@Test
+@Test
 @SuppressWarnings({ "FieldNamingConvention", "NewClassNamingConvention" })
 public class Zip64Test {
 
@@ -41,10 +39,10 @@ public class Zip64Test {
 
         Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-        zip.add(Zip4jSuite.srcDir, parameters);
+        zip.add(Zip4jSuite.srcDir.resolve("Oleg Cherednik.txt"), parameters);
 
-        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
+//        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+//        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
     }
 
 }

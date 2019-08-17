@@ -29,15 +29,11 @@ public final class LocalFileHeaderWriter {
         out.writeDword(localFileHeader.getLastModifiedTime());
         out.writeDword(localFileHeader.getCrc32());
 
-        //compressed & uncompressed size
-        if (localFileHeader.getUncompressedSize() + ZipModelWriter.ZIP64_EXTRA_BUF >= ZipModel.ZIP_64_LIMIT) {
-            out.writeDword((int)ZipModel.ZIP_64_LIMIT);
-            out.writeDword(0);
+        if(localFileHeader.getUncompressedSize() + ZipModelWriter.ZIP64_EXTRA_BUF >= ZipModel.ZIP_64_LIMIT)
             zipModel.zip64();
-        } else {
-            out.writeDword(localFileHeader.getCompressedSize());
-            out.writeDword(localFileHeader.getUncompressedSize());
-        }
+
+        out.writeDword(zipModel.isZip64() ? -1 : localFileHeader.getCompressedSize());
+        out.writeDword(zipModel.isZip64() ? -1 : localFileHeader.getUncompressedSize());
 
         byte[] fileName = localFileHeader.getFileName(zipModel.getCharset());
 
@@ -46,6 +42,7 @@ public final class LocalFileHeaderWriter {
         out.writeBytes(fileName);
 
         if (zipModel.isZip64()) {
+            // TODO duplication of ExtendedINfo
             out.writeDwordSignature(Zip64.ExtendedInfo.SIGNATURE);
             out.writeWord(16);
             out.writeQword(localFileHeader.getUncompressedSize());
