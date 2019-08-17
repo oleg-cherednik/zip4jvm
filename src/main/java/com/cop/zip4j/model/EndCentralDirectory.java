@@ -24,6 +24,7 @@ public class EndCentralDirectory {
     // size (22) with comment length = 0
     public static final int MIN_SIZE = 4 + 2 + 2 + 2 + 2 + 4 + 4 + 2;
     // comment length depend on size of other structures; it is definitely possible to write 33k bytes
+    // TODO I have test it with WinRar. But according to specification, 0xFFFF is max size
     public static final int MAX_COMMENT_LENGTH = 33_000;
 
     // size:4 - signature (0x06054b50)

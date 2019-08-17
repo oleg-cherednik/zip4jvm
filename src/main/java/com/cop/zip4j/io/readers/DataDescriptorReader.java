@@ -26,8 +26,8 @@ public final class DataDescriptorReader {
 
         DataDescriptor dataDescriptor = new DataDescriptor();
         dataDescriptor.setCrc32(in.readDwordLong());
-        dataDescriptor.setCompressedSize(zip64 ? in.readQword() : in.readDwordLong());
-        dataDescriptor.setUncompressedSize(zip64 ? in.readQword() : in.readDwordLong());
+        dataDescriptor.setCompressedSize(/*zip64 ? in.readQword() :*/ in.readDwordLong());
+        dataDescriptor.setUncompressedSize(/*zip64 ? in.readQword() :*/ in.readDwordLong());
 
         return dataDescriptor;
     }

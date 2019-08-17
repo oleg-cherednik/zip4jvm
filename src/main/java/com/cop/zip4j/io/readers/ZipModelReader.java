@@ -41,6 +41,7 @@ public final class ZipModelReader {
 
             if (zipModel.isSplitArchive()) {
                 Path path = ZipModel.getSplitFilePath(zipFile, 1);
+                // TODO have to check all parts and get the max size
                 zipModel.setSplitLength(Files.exists(path) ? Files.size(path) : zipModel.getSplitLength());
             }
 

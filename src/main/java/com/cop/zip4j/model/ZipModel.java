@@ -16,6 +16,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
+ * zip64:
+ * 1. Size of archive is over 4Gb (2^32)
+ * 2. Total entries is over 65535 (2^16 - 1)
+ * http://www.artpol-software.com/ZipArchive/KB/0610051629.aspx#limits
+ *
  * @author Oleg Cherednik
  * @since 10.03.2019
  */
