@@ -3,6 +3,7 @@ package com.cop.zip4j.io.readers;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.Zip64;
+import com.cop.zip4j.utils.ZipUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -22,7 +23,7 @@ final class Zip64EndCentralDirectoryReader {
         findHead(in);
 
         Zip64.EndCentralDirectory dir = new Zip64.EndCentralDirectory();
-        dir.setSizeOfZip64EndCentralDirRec(in.readQword());
+        dir.setSizeEndCentralDirectory(in.readQword());
         dir.setVersionMadeBy(in.readWord());
         dir.setVersionNeededToExtract(in.readWord());
         dir.setDiskNumber(in.readDword());
@@ -31,7 +32,10 @@ final class Zip64EndCentralDirectoryReader {
         dir.setTotalEntries(in.readQword());
         dir.setSize(in.readQword());
         dir.setOffs(in.readQword());
-        dir.setExtensibleDataSector(in.readBytes((int)(dir.getSizeOfZip64EndCentralDirRec() - Zip64.EndCentralDirectory.SIZE)));
+        dir.setExtensibleDataSector(in.readBytes((int)(dir.getSizeEndCentralDirectory() - Zip64.EndCentralDirectory.SIZE)));
+
+        ZipUtils.requirePositive(dir.getOffs(), "offsCentralDirectory");
+        ZipUtils.requirePositive(dir.getTotalEntries(), "totalEntries");
 
         return dir;
     }

@@ -25,6 +25,9 @@ public class Zip64 {
         return this == NULL ? "<null>" : super.toString();
     }
 
+    /**
+     * see 4.3.15
+     */
     @Getter
     @Setter
     public static class EndCentralDirectoryLocator {
@@ -36,11 +39,11 @@ public class Zip64 {
 
         // size:4 - signature (0x06054b50)
         // size:4 - number of the disk with the start of the zip64 end of central directory
-        private int noOfDiskStartOfZip64EndOfCentralDirRec;
-        // size:8 - relative offset of the zip64 end of central directory record
+        private int startDiskNumber;
+        // size:8 - relative offset of the Zip64.EndCentralDirectory
         private long offs;
         // size:4 - total number of disks
-        private int totNumberOfDiscs;
+        private int totalDisks;
 
         public void updateOffsetZip64EndOfCentralDirRec(long delta) {
             offs += delta;
@@ -48,6 +51,9 @@ public class Zip64 {
 
     }
 
+    /**
+     * see 4.3.14
+     */
     @Getter
     @Setter
     public static class EndCentralDirectory {
@@ -58,7 +64,7 @@ public class Zip64 {
 
         // size:4 - signature (0x06064b50)
         // size:8 - directory record (n)
-        private long sizeOfZip64EndCentralDirRec;
+        private long sizeEndCentralDirectory;
         // size:2 - version made by
         private int versionMadeBy;
         // size:2 - version needed to extractEntries
@@ -73,7 +79,7 @@ public class Zip64 {
         private long totalEntries;
         // size:8 - size of the central directory
         private long size;
-        // size:8 - directory with respect to the starting disk number
+        // size:8 - offs of CentralDirectory in startDiskNumber
         private long offs;
         // size:n-44 - extensible data sector
         private byte[] extensibleDataSector;

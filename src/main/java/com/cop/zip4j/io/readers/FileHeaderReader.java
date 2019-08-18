@@ -42,7 +42,7 @@ final class FileHeaderReader {
         fileHeader.setVersionToExtract(in.readWord());
         fileHeader.setGeneralPurposeFlag(in.readWord());
         fileHeader.setCompressionMethod(CompressionMethod.parseValue(in.readWord()));
-        fileHeader.setLastModifiedTime(in.readDword());
+        fileHeader.setLastModifiedTime((int)in.readDwordLong());
         fileHeader.setCrc32(in.readDwordLong());
         fileHeader.setCompressedSize(in.readDwordLong());
         fileHeader.setUncompressedSize(in.readDwordLong());

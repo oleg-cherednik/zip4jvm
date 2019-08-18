@@ -108,7 +108,7 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
 
             if (prv != null) {
                 long curOffs = offsOut;
-                long length = zipModel.getOffsCentralDirectory() - prv.getOffsLocalFileHeader();
+                long length = zipModel.getCentralDirectoryOffs() - prv.getOffsLocalFileHeader();
                 offsOut += IOUtils.copyLarge(in, out, skip, length);
                 fileHeaders.add(prv);
                 prv.setOffsLocalFileHeader(curOffs);

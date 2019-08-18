@@ -54,7 +54,7 @@ public final class ZipMisc {
         zipModel.getEndCentralDirectory().setComment(comment);
 
         try (SingleZipOutputStream out = SingleZipOutputStream.create(zipModel)) {
-            out.seek(zipModel.getOffsCentralDirectory());
+            out.seek(zipModel.getCentralDirectoryOffs());
             new ZipModelWriter(zipModel).finalizeZipFile(out, false);
         } catch(Exception e) {
             throw new Zip4jException(e);
@@ -122,7 +122,7 @@ public final class ZipMisc {
 
         for (int i = 0; i <= noOfDisk; i++) {
             try (InputStream in = new FileInputStream(zipModel.getPartFile(i + 1).toFile())) {
-                fileSizeList[i] = IOUtils.copyLarge(in, out, 0, i == noOfDisk ? zipModel.getOffsCentralDirectory() : zipModel.getSplitLength());
+                fileSizeList[i] = IOUtils.copyLarge(in, out, 0, i == noOfDisk ? zipModel.getCentralDirectoryOffs() : zipModel.getSplitLength());
             }
         }
 

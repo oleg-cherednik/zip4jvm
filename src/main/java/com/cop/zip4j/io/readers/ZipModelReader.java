@@ -56,9 +56,8 @@ public final class ZipModelReader {
         zipModel.setEndCentralDirectory(reader.read(in));
 
         Zip64.EndCentralDirectoryLocator locator = new Zip64EndCentralDirectoryLocatorReader(reader.getOffs()).read(in);
-
-        if (locator != null)
-            zipModel.zip64(locator, new Zip64EndCentralDirectoryReader(locator.getOffs()).read(in));
+        Zip64.EndCentralDirectory dir = locator == null ? null : new Zip64EndCentralDirectoryReader(locator.getOffs()).read(in);
+        zipModel.zip64(locator, dir);
 
         long offs = zipModel.getCentralDirectoryOffs();
         long totalEntries = zipModel.getTotalEntries();

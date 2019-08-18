@@ -3,6 +3,7 @@ package com.cop.zip4j.io.readers;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.Zip64;
+import com.cop.zip4j.utils.ZipUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -23,9 +24,11 @@ final class Zip64EndCentralDirectoryLocatorReader {
             return null;
 
         Zip64.EndCentralDirectoryLocator locator = new Zip64.EndCentralDirectoryLocator();
-        locator.setNoOfDiskStartOfZip64EndOfCentralDirRec(in.readDword());
+        locator.setStartDiskNumber(in.readDword());
         locator.setOffs(in.readQword());
-        locator.setTotNumberOfDiscs(in.readDword());
+        locator.setTotalDisks(in.readDword());
+
+        ZipUtils.requirePositive(locator.getOffs(), "Zip64.EndCentralDirectory");
 
         return locator;
     }

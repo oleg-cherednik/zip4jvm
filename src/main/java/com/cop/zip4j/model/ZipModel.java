@@ -72,8 +72,8 @@ public class ZipModel {
             zip64(new Zip64.EndCentralDirectoryLocator(), new Zip64.EndCentralDirectory());
     }
 
-    public void zip64(@NonNull Zip64.EndCentralDirectoryLocator locator, @NonNull Zip64.EndCentralDirectory dir) {
-        zip64 = new Zip64(locator, dir);
+    public void zip64(Zip64.EndCentralDirectoryLocator locator, Zip64.EndCentralDirectory dir) {
+        zip64 = locator == null || dir == null ? Zip64.NULL : new Zip64(locator, dir);
     }
 
     public void setComment(String comment) {
@@ -122,7 +122,7 @@ public class ZipModel {
                                .collect(Collectors.toList());
     }
 
-    public long getOffsCentralDirectory() {
+    public long getCentralDirectoryOffs() {
         return isZip64() ? zip64.getEndCentralDirectory().getOffs() : endCentralDirectory.getOffs();
     }
 
@@ -164,9 +164,9 @@ public class ZipModel {
     private void updateZip64EndCentralDirLocator(long totalBytesWritten) throws Zip4jException {
         if (isZip64()) {
             Zip64.EndCentralDirectoryLocator locator = zip64.getEndCentralDirectoryLocator();
-            locator.setNoOfDiskStartOfZip64EndOfCentralDirRec(0);
+            locator.setStartDiskNumber(0);
             locator.updateOffsetZip64EndOfCentralDirRec(totalBytesWritten);
-            locator.setTotNumberOfDiscs(1);
+            locator.setTotalDisks(1);
         }
     }
 
@@ -194,10 +194,6 @@ public class ZipModel {
         centralDirectory.setFileHeaders(fileHeaders);
         endCentralDirectory.setTotalEntries(fileHeaders.size());
         endCentralDirectory.setDiskEntries(fileHeaders.size());
-    }
-
-    public long getCentralDirectoryOffs() {
-        return isZip64() ? zip64.getEndCentralDirectory().getOffs() : endCentralDirectory.getOffs();
     }
 
     @NonNull

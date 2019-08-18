@@ -1,6 +1,7 @@
 package com.cop.zip4j.utils;
 
 import com.cop.zip4j.exception.Zip4jException;
+import com.cop.zip4j.exception.Zip4jRealBigZip64NotSupportedException;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
@@ -52,6 +53,11 @@ public class ZipUtils {
         cal.set(year, mon, day, hrs, min, sec);
         cal.set(Calendar.MILLISECOND, 0);
         return cal.getTime().getTime();
+    }
+
+    public static void requirePositive(long value, String type) {
+        if (value < 0)
+            throw new Zip4jRealBigZip64NotSupportedException(value, type);
     }
 
     public static boolean isDirectory(String fileName) {
