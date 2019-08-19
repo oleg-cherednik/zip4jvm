@@ -15,7 +15,7 @@ version '2.0'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
-mainClassName = 'com.cop.zip4j.Application'
+mainClassName = 'unknown'
 
 dependencies {
     compile 'org.slf4j:slf4j-api:1.7.25'
