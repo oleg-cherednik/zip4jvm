@@ -49,7 +49,7 @@ public abstract class EntryOutputStream extends OutputStream {
     private static EntryOutputStream createOutputStream(PathZipEntry entry, ZipModel zipModel, DataOutput out) throws IOException {
         Compression compression = entry.getCompression();
         Encoder encoder = entry.getEncryption().getCreateEncoder().apply(entry);
-        CentralDirectory.FileHeader fileHeader = new CentralDirectoryBuilder(entry, zipModel.getCharset(), out.getCounter()).create();
+        CentralDirectory.FileHeader fileHeader = new CentralDirectoryBuilder(entry, zipModel, out.getCounter()).create();
 
         if (compression == Compression.STORE)
             return new StoreEntryOutputStream(zipModel, fileHeader, encoder, out);
@@ -71,7 +71,7 @@ public abstract class EntryOutputStream extends OutputStream {
 
     private void writeLocalFileHeader() throws IOException {
         fileHeader.setOffsLocalFileHeader(out.getOffs());
-        LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(fileHeader).create();
+        LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(zipModel, fileHeader).create();
         new LocalFileHeaderWriter(zipModel, localFileHeader).write(out);
         out.mark(MARK);
     }
@@ -105,7 +105,7 @@ public abstract class EntryOutputStream extends OutputStream {
     }
 
     private void checkCompressedSize() {
-        long expected = fileHeader.getCompressedSize();
+        long expected = zipModel.isZip64() ? fileHeader.getExtraField().getExtendedInfo().getCompressedSize() : fileHeader.getCompressedSize();
         long actual = out.getWrittenBytesAmount(MARK);
 
         if (expected != 0 && expected != actual)

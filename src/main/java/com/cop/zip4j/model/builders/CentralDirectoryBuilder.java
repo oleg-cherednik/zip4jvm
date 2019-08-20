@@ -6,6 +6,7 @@ import com.cop.zip4j.model.ExternalFileAttributes;
 import com.cop.zip4j.model.GeneralPurposeFlag;
 import com.cop.zip4j.model.InternalFileAttributes;
 import com.cop.zip4j.model.Zip64;
+import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import com.cop.zip4j.utils.ZipUtils;
@@ -14,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -27,7 +27,7 @@ public class CentralDirectoryBuilder {
     @NonNull
     private final PathZipEntry entry;
     @NonNull
-    private final Charset charset;
+    private final ZipModel zipModel;
     private final int currSplitFileCounter;
 
     @NonNull
@@ -47,11 +47,23 @@ public class CentralDirectoryBuilder {
         fileHeader.setInternalFileAttributes(InternalFileAttributes.of(entry.getPath()));
         fileHeader.setExternalFileAttributes(ExternalFileAttributes.of(entry.getPath()));
         fileHeader.setOffsLocalFileHeader(0);
-        fileHeader.setZip64ExtendedInfo(Zip64.ExtendedInfo.NULL);
+        fileHeader.setZip64ExtendedInfo(getExtendedInfo());
         fileHeader.setAesExtraDataRecord(getAesExtraDataRecord(entry.getEncryption()));
         fileHeader.setFileComment(null);
 
         return fileHeader;
+    }
+
+    private Zip64.ExtendedInfo getExtendedInfo() {
+        if (!zipModel.isZip64())
+            return Zip64.ExtendedInfo.NULL;
+
+        return Zip64.ExtendedInfo.builder()
+                                 .size(8 + 8)
+                                 .compressedSize(entry.getCompressedSize())
+                                 .uncompressedSize(entry.size())
+                                 .build();
+
     }
 
     @NonNull
@@ -70,7 +82,7 @@ public class CentralDirectoryBuilder {
     private void updateGeneralPurposeFlag(@NonNull GeneralPurposeFlag generalPurposeFlag) {
         generalPurposeFlag.setCompressionLevel(entry.getCompressionLevel());
         generalPurposeFlag.setDataDescriptorExists(true);
-        generalPurposeFlag.setUtf8(charset == StandardCharsets.UTF_8);
+        generalPurposeFlag.setUtf8(zipModel.getCharset() == StandardCharsets.UTF_8);
         generalPurposeFlag.setEncrypted(entry.getEncryption() != Encryption.OFF);
 //        generalPurposeFlag.setStrongEncryption(entry.getEncryption() == Encryption.STRONG);
         generalPurposeFlag.setStrongEncryption(false);

@@ -99,13 +99,17 @@ public class Zip64 {
         // size:2 - size of this "extra" block
         private final int size;
         // size:8 - original uncompressed file size
-        private final long uncompressedSize;
+        @Builder.Default
+        private final long uncompressedSize = ExtraField.NO_DATA;
         // size:8 - size of compressed data
-        private final long compressedSize;
+        @Builder.Default
+        private final long compressedSize = ExtraField.NO_DATA;
         // size:8 - offset of local header record
-        private final long offsLocalHeaderRelative;
+        @Builder.Default
+        private final long offsLocalHeaderRelative = ExtraField.NO_DATA;
         // size:4 - number of the disk on which  this file starts
-        private final long diskNumber;
+        @Builder.Default
+        private final long diskNumber = ExtraField.NO_DATA;
 
         public int getLength() {
             int length = 0;
