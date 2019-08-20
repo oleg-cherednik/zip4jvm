@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 
+import static com.cop.zip4j.model.ZipModel.ZIP_64_LIMIT;
+
 /**
  * @author Oleg Cherednik
  * @since 08.03.2019
@@ -29,23 +31,19 @@ public final class LocalFileHeaderReader {
         localFileHeader.setVersionToExtract(in.readWord());
         localFileHeader.setGeneralPurposeFlag(in.readWord());
         localFileHeader.setCompressionMethod(CompressionMethod.parseValue(in.readWord()));
-        localFileHeader.setLastModifiedTime((int)in.readDwordLong());
-        localFileHeader.setCrc32(in.readDwordLong());
-        localFileHeader.setCompressedSize(in.readDwordLong());
-        localFileHeader.setUncompressedSize(in.readDwordLong());
+        localFileHeader.setLastModifiedTime((int)in.readDword());
+        localFileHeader.setCrc32(in.readDword());
+        localFileHeader.setCompressedSize(in.readDword());
+        localFileHeader.setUncompressedSize(in.readDword());
         int fileNameLength = in.readWord();
         int extraFieldLength = in.readWord();
         localFileHeader.setFileName(ZipUtils.normalizeFileName.apply(in.readString(fileNameLength)));
-        localFileHeader.setExtraField(new ExtraFieldReader(extraFieldLength).read(in));
+
+        boolean uncompressedSize = localFileHeader.getUncompressedSize() == ZIP_64_LIMIT;
+        boolean compressedSize = localFileHeader.getCompressedSize() == ZIP_64_LIMIT;
+        localFileHeader.setExtraField(new ExtraFieldReader(extraFieldLength, uncompressedSize, compressedSize, false, false).read(in));
 
         localFileHeader.setOffs(in.getOffs());
-
-        if (localFileHeader.getCrc32() <= 0)
-            localFileHeader.setCrc32(fileHeader.getCrc32());
-        if (localFileHeader.getCompressedSize() <= 0)
-            localFileHeader.setCompressedSize(fileHeader.getCompressedSize());
-        if (localFileHeader.getUncompressedSize() <= 0)
-            localFileHeader.setUncompressedSize(fileHeader.getUncompressedSize());
 
         return localFileHeader;
     }

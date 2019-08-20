@@ -55,6 +55,11 @@ public class ExtraField {
         public ExtraField deepCopy() {
             return NULL;
         }
+
+        @Override
+        public String toString() {
+            return "<null>";
+        }
     };
 
 }

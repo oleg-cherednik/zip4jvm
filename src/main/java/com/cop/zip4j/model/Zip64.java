@@ -1,9 +1,7 @@
 package com.cop.zip4j.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
@@ -39,11 +37,11 @@ public class Zip64 {
 
         // size:4 - signature (0x06054b50)
         // size:4 - number of the disk with the start of the zip64 end of central directory
-        private int startDiskNumber;
+        private long startDisk;
         // size:8 - relative offset of the Zip64.EndCentralDirectory
         private long offs;
         // size:4 - total number of disks
-        private int totalDisks;
+        private long totalDisks;
 
         public void updateOffsetZip64EndOfCentralDirRec(long delta) {
             offs += delta;
@@ -70,9 +68,9 @@ public class Zip64 {
         // size:2 - version needed to extractEntries
         private int versionNeededToExtract;
         // size:4 - number of this disk
-        private int diskNumber;
+        private long disk;
         // size:4 - number of the disk with the start of the central directory
-        private int startDiskNumber;
+        private long startDisk;
         // size:8 - total number of entries in the central directory on this disk
         private long diskEntries;
         // size:8 - total number of entries in the central directory
@@ -91,9 +89,6 @@ public class Zip64 {
     }
 
     @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
     @Builder(toBuilder = true)
     public static class ExtendedInfo {
 
@@ -102,19 +97,15 @@ public class Zip64 {
 
         // size:2 - tag for this "extra" block type (ZIP64 = 0x001)
         // size:2 - size of this "extra" block
-        private int size;
+        private final int size;
         // size:8 - original uncompressed file size
-        @Builder.Default
-        private long uncompressedSize = ExtraField.NO_DATA;
+        private final long uncompressedSize;
         // size:8 - size of compressed data
-        @Builder.Default
-        private long compressedSize = ExtraField.NO_DATA;
+        private final long compressedSize;
         // size:8 - offset of local header record
-        @Builder.Default
-        private long offsLocalHeaderRelative = ExtraField.NO_DATA;
+        private final long offsLocalHeaderRelative;
         // size:4 - number of the disk on which  this file starts
-        @Builder.Default
-        private int diskNumber = ExtraField.NO_DATA;
+        private final long diskNumber;
 
         public int getLength() {
             int length = 0;
@@ -126,37 +117,7 @@ public class Zip64 {
             return length != 0 ? length + SIZE_FIELD : 0;
         }
 
-        public static final ExtendedInfo NULL = new ExtendedInfo() {
-
-            @Override
-            public void setSize(int size) {
-                throw new NullPointerException("Null object modification: " + getClass().getSimpleName());
-            }
-
-            @Override
-            public void setUncompressedSize(long uncompressedSize) {
-                throw new NullPointerException("Null object modification: " + getClass().getSimpleName());
-            }
-
-            @Override
-            public void setCompressedSize(long compressedSize) {
-                throw new NullPointerException("Null object modification: " + getClass().getSimpleName());
-            }
-
-            @Override
-            public void setOffsLocalHeaderRelative(long offsLocalHeaderRelative) {
-                throw new NullPointerException("Null object modification: " + getClass().getSimpleName());
-            }
-
-            @Override
-            public void setDiskNumber(int diskNumber) {
-                throw new NullPointerException("Null object modification: " + getClass().getSimpleName());
-            }
-
-            @Override
-            public int getLength() {
-                return 0;
-            }
+        public static final ExtendedInfo NULL = new ExtendedInfo(0, ExtraField.NO_DATA, ExtraField.NO_DATA, ExtraField.NO_DATA, ExtraField.NO_DATA) {
 
             @Override
             public String toString() {

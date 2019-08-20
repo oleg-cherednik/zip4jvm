@@ -22,10 +22,6 @@ final class ExtraFieldReader {
     private final boolean offs;
     private final boolean diskNumber;
 
-    public ExtraFieldReader(int size) {
-        this(size, false, false, false, false);
-    }
-
     @NonNull
     public ExtraField read(@NonNull DataInput in) throws IOException {
         if (size <= 0)

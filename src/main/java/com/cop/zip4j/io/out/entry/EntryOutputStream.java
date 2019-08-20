@@ -49,7 +49,7 @@ public abstract class EntryOutputStream extends OutputStream {
     private static EntryOutputStream createOutputStream(PathZipEntry entry, ZipModel zipModel, DataOutput out) throws IOException {
         Compression compression = entry.getCompression();
         Encoder encoder = entry.getEncryption().getCreateEncoder().apply(entry);
-        CentralDirectory.FileHeader fileHeader = new CentralDirectoryBuilder(entry, zipModel, out.getCounter()).create();
+        CentralDirectory.FileHeader fileHeader = new CentralDirectoryBuilder(entry, zipModel.getCharset(), out.getCounter()).create();
 
         if (compression == Compression.STORE)
             return new StoreEntryOutputStream(zipModel, fileHeader, encoder, out);

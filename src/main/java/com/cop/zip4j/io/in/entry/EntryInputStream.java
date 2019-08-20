@@ -98,10 +98,7 @@ public abstract class EntryInputStream extends InputStream {
     }
 
     private void checkUncompressedSize() {
-        long expected = localFileHeader.getUncompressedSize();
-        long actual = writtenUncompressedBytes;
-
-        if (expected != actual)
+        if (uncompressedSize != writtenUncompressedBytes)
             throw new Zip4jException("UncompressedSize is not matched: " + localFileHeader.getFileName());
     }
 

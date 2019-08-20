@@ -1,5 +1,7 @@
 package com.cop.zip4j;
 
+import com.cop.zip4j.model.Compression;
+import com.cop.zip4j.model.ZipParameters;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -29,24 +31,26 @@ public class Zip64Test {
         Zip4jSuite.removeDir(rootDir);
     }
 
-//    public void shouldCreateNewZipWithZip64() throws IOException {
-//        ZipParameters parameters = ZipParameters.builder()
-//                                                .compressionMethod(Compression.STORE)
-//                                                .zip64(true)
-//                                                .defaultFolderPath(Zip4jSuite.srcDir).build();
-//
-//        Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-//        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-//        zip.add(Zip4jSuite.srcDir.resolve("Oleg Cherednik.txt"), parameters);
-//
-////        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-////        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
-//    }
+    public void shouldCreateNewZipWithZip64() throws IOException {
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compressionMethod(Compression.STORE)
+                                                .zip64(true)
+//                                                .defaultFolderPath(Zip4jSuite.srcDir)
+                                                .build();
+
+        Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
+        zip.add(Zip4jSuite.srcDir.resolve("Oleg Cherednik.txt"), parameters);
+
+//        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+//        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
+    }
 
     public void shouldUnzipReadZipWithZip64() throws IOException {
         Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         UnzipIt unzip = UnzipIt.builder()
-                               .zipFile(Paths.get("d:/zip4j/ferdinand.zip"))
+//                               .zipFile(Paths.get("d:/zip4j/ferdinand_store.zip"))
+                               .zipFile(Paths.get("d:/zip4j/ferdinand_deflate.zip"))
                                .build();
         unzip.extract(dstDir);
 

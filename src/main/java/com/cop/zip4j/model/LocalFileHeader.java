@@ -57,6 +57,14 @@ public class LocalFileHeader {
         generalPurposeFlag.setEncrypted(isEncrypted());
     }
 
+    public long getCompressedSize() {
+        return extraField.getExtendedInfo() == Zip64.ExtendedInfo.NULL ? compressedSize : extraField.getExtendedInfo().getCompressedSize();
+    }
+
+    public long getUncompressedSize() {
+        return extraField.getExtendedInfo() == Zip64.ExtendedInfo.NULL ? uncompressedSize : extraField.getExtendedInfo().getUncompressedSize();
+    }
+
     public void setGeneralPurposeFlag(int data) {
         generalPurposeFlag.read(data);
         generalPurposeFlag.setEncrypted(isEncrypted());

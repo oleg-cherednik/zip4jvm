@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.cop.zip4j.model.ZipModel.ZIP_64_LIMIT;
+
 /**
  * @author Oleg Cherednik
  * @since 26.04.2019
@@ -42,22 +44,22 @@ final class FileHeaderReader {
         fileHeader.setVersionToExtract(in.readWord());
         fileHeader.setGeneralPurposeFlag(in.readWord());
         fileHeader.setCompressionMethod(CompressionMethod.parseValue(in.readWord()));
-        fileHeader.setLastModifiedTime((int)in.readDwordLong());
-        fileHeader.setCrc32(in.readDwordLong());
-        fileHeader.setCompressedSize(in.readDwordLong());
-        fileHeader.setUncompressedSize(in.readDwordLong());
+        fileHeader.setLastModifiedTime((int)in.readDword());
+        fileHeader.setCrc32(in.readDword());
+        fileHeader.setCompressedSize(in.readDword());
+        fileHeader.setUncompressedSize(in.readDword());
         int fileNameLength = in.readWord();
         int extraFieldLength = in.readWord();
         int fileCommentLength = in.readWord();
         fileHeader.setDiskNumber(in.readWord());
         fileHeader.setInternalFileAttributes(InternalFileAttributes.read(in));
         fileHeader.setExternalFileAttributes(ExternalFileAttributes.read(in));
-        fileHeader.setOffsLocalFileHeader(in.readDwordLong());
+        fileHeader.setOffsLocalFileHeader(in.readDword());
         fileHeader.setFileName(ZipUtils.normalizeFileName.apply(in.readString(fileNameLength)));
 
-        boolean uncompressedSize = fileHeader.getUncompressedSize() == 0xFFFF;
-        boolean compressedSize = fileHeader.getCompressedSize() == 0xFFFF;
-        boolean offsHeader = fileHeader.getOffsLocalFileHeader() == 0xFFFF;
+        boolean uncompressedSize = fileHeader.getUncompressedSize() == ZIP_64_LIMIT;
+        boolean compressedSize = fileHeader.getCompressedSize() == ZIP_64_LIMIT;
+        boolean offsHeader = fileHeader.getOffsLocalFileHeader() == ZIP_64_LIMIT;
         boolean diskNumber = fileHeader.getDiskNumber() == 0xFFFF;
         fileHeader.setExtraField(new ExtraFieldReader(extraFieldLength, uncompressedSize, compressedSize, offsHeader, diskNumber).read(in));
         fileHeader.setFileComment(in.readString(fileCommentLength));

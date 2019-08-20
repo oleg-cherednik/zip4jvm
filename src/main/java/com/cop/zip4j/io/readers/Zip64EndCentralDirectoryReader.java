@@ -26,8 +26,8 @@ final class Zip64EndCentralDirectoryReader {
         dir.setSizeEndCentralDirectory(in.readQword());
         dir.setVersionMadeBy(in.readWord());
         dir.setVersionNeededToExtract(in.readWord());
-        dir.setDiskNumber(in.readDword());
-        dir.setStartDiskNumber(in.readDword());
+        dir.setDisk(in.readDword());
+        dir.setStartDisk(in.readDword());
         dir.setDiskEntries(in.readQword());
         dir.setTotalEntries(in.readQword());
         dir.setSize(in.readQword());

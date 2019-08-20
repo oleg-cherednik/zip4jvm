@@ -25,9 +25,9 @@ public final class DataDescriptorReader {
             throw new Zip4jException("DataDescriptor signature expected at offs=" + offs);
 
         DataDescriptor dataDescriptor = new DataDescriptor();
-        dataDescriptor.setCrc32(in.readDwordLong());
-        dataDescriptor.setCompressedSize(/*zip64 ? in.readQword() :*/ in.readDwordLong());
-        dataDescriptor.setUncompressedSize(/*zip64 ? in.readQword() :*/ in.readDwordLong());
+        dataDescriptor.setCrc32(in.readDword());
+        dataDescriptor.setCompressedSize(/*zip64 ? in.readQword() :*/ in.readDword());
+        dataDescriptor.setUncompressedSize(/*zip64 ? in.readQword() :*/ in.readDword());
 
         return dataDescriptor;
     }

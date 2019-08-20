@@ -35,7 +35,7 @@ public final class ZipModelWriter {
 
         if (zipModel.isZip64() && validate) {
             Zip64.EndCentralDirectoryLocator locator = zipModel.getZip64().getEndCentralDirectoryLocator();
-            locator.setStartDiskNumber(out.getCounter());
+            locator.setStartDisk(out.getCounter());
             locator.setTotalDisks(out.getCounter() + 1);
         }
 
@@ -50,7 +50,7 @@ public final class ZipModelWriter {
 
         if (zipModel.isZip64()) {
             Zip64.EndCentralDirectoryLocator locator = zipModel.getZip64().getEndCentralDirectoryLocator();
-            locator.setStartDiskNumber(out.getCounter());
+            locator.setStartDisk(out.getCounter());
             locator.setTotalDisks(out.getCounter() + 1);
         }
 
@@ -78,10 +78,16 @@ public final class ZipModelWriter {
         Zip64.ExtendedInfo info = fileHeader.getExtraField().getExtendedInfo();
 
         if (info != Zip64.ExtendedInfo.NULL) {
-            info.setSize(info.getLength() - Zip64.ExtendedInfo.SIZE_FIELD);
-            info.setUncompressedSize(fileHeader.isWriteZip64FileSize() ? fileHeader.getUncompressedSize() : ExtraField.NO_DATA);
-            info.setCompressedSize(fileHeader.isWriteZip64FileSize() ? fileHeader.getCompressedSize() : ExtraField.NO_DATA);
-            info.setOffsLocalHeaderRelative(fileHeader.isWriteZip64OffsetLocalHeader() ? fileHeader.getOffsLocalFileHeader() : ExtraField.NO_DATA);
+            int size = info.getLength() - Zip64.ExtendedInfo.SIZE_FIELD;
+            info = Zip64.ExtendedInfo.builder()
+                                     .size(size)
+                                     .uncompressedSize(fileHeader.isWriteZip64FileSize() ? fileHeader.getUncompressedSize() : ExtraField.NO_DATA)
+                                     .compressedSize(fileHeader.isWriteZip64FileSize() ? fileHeader.getCompressedSize() : ExtraField.NO_DATA)
+                                     .offsLocalHeaderRelative(
+                                             fileHeader.isWriteZip64OffsetLocalHeader() ? fileHeader.getOffsLocalFileHeader() : ExtraField.NO_DATA)
+                                     .build();
+
+            fileHeader.getExtraField().setExtendedInfo(info);
         }
     }
 

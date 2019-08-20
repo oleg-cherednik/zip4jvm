@@ -149,13 +149,13 @@ public class CentralDirectory {
 
             extraField.setExtendedInfo(info);
 
-            if (info != Zip64.ExtendedInfo.NULL) {
-                uncompressedSize = info.getUncompressedSize() != ExtraField.NO_DATA ? info.getUncompressedSize() : uncompressedSize;
-                compressedSize = info.getCompressedSize() != ExtraField.NO_DATA ? info.getCompressedSize() : uncompressedSize;
-                offsLocalFileHeader = info.getOffsLocalHeaderRelative() != ExtraField.NO_DATA ? info.getOffsLocalHeaderRelative()
-                                                                                              : offsLocalFileHeader;
-                diskNumber = info.getDiskNumber() != -1 ? info.getDiskNumber() : diskNumber;
-            }
+//            if (info != Zip64.ExtendedInfo.NULL) {
+//                uncompressedSize = info.getUncompressedSize() != ExtraField.NO_DATA ? info.getUncompressedSize() : uncompressedSize;
+//                compressedSize = info.getCompressedSize() != ExtraField.NO_DATA ? info.getCompressedSize() : uncompressedSize;
+//                offsLocalFileHeader = info.getOffsLocalHeaderRelative() != ExtraField.NO_DATA ? info.getOffsLocalHeaderRelative()
+//                                                                                              : offsLocalFileHeader;
+//                diskNumber = info.getDiskNumber() != ExtraField.NO_DATA ? info.getDiskNumber() : diskNumber;
+//            }
         }
 
         public void setExtraField(@NonNull ExtraField extraField) {

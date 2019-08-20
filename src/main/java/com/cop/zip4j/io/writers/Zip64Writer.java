@@ -36,8 +36,8 @@ final class Zip64Writer {
             out.writeQword(dir.getSizeEndCentralDirectory());
             out.writeWord(dir.getVersionMadeBy());
             out.writeWord(dir.getVersionNeededToExtract());
-            out.writeDword(dir.getDiskNumber());
-            out.writeDword(dir.getStartDiskNumber());
+            out.writeDword(dir.getDisk());
+            out.writeDword(dir.getStartDisk());
             out.writeQword(dir.getDiskEntries());
             out.writeQword(dir.getTotalEntries());
             out.writeQword(dir.getSize());
@@ -56,7 +56,7 @@ final class Zip64Writer {
                 return;
 
             out.writeDwordSignature(Zip64.EndCentralDirectoryLocator.SIGNATURE);
-            out.writeDword(locator.getStartDiskNumber());
+            out.writeDword(locator.getStartDisk());
             out.writeQword(locator.getOffs());
             out.writeDword(locator.getTotalDisks());
         }

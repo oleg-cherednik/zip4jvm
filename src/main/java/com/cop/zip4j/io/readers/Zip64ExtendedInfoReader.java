@@ -28,14 +28,13 @@ final class Zip64ExtendedInfoReader {
         if (signature != Zip64.ExtendedInfo.SIGNATURE)
             return Zip64.ExtendedInfo.NULL;
 
-        Zip64.ExtendedInfo res = new Zip64.ExtendedInfo();
-        res.setSize(in.readWord());
-        res.setUncompressedSize(uncompressedSize ? in.readQword() : ExtraField.NO_DATA);
-        res.setCompressedSize(compressedSize ? in.readQword() : ExtraField.NO_DATA);
-        res.setOffsLocalHeaderRelative(offs ? in.readQword() : ExtraField.NO_DATA);
-        res.setDiskNumber(diskNumber ? in.readDword() : ExtraField.NO_DATA);
-
-        return res;
+        return Zip64.ExtendedInfo.builder()
+                                 .size(in.readWord())
+                                 .uncompressedSize(uncompressedSize ? in.readQword() : ExtraField.NO_DATA)
+                                 .compressedSize(compressedSize ? in.readQword() : ExtraField.NO_DATA)
+                                 .offsLocalHeaderRelative(offs ? in.readQword() : ExtraField.NO_DATA)
+                                 .diskNumber(diskNumber ? in.readDword() : ExtraField.NO_DATA)
+                                 .build();
     }
 
 }
