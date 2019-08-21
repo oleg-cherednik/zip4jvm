@@ -14,6 +14,8 @@ import lombok.Setter;
 public class ExtraField {
 
     public static final int NO_DATA = -1;
+    @SuppressWarnings("StaticInitializerReferencesSubClass")
+    public static final ExtraField NULL = new NullExtraField();
 
     @NonNull
     private Zip64.ExtendedInfo extendedInfo = Zip64.ExtendedInfo.NULL;
@@ -39,27 +41,5 @@ public class ExtraField {
 
         return res;
     }
-
-    public static final ExtraField NULL = new ExtraField() {
-        @Override
-        public void setExtendedInfo(@NonNull Zip64.ExtendedInfo extendedInfo) {
-            throw new NullPointerException("Null object modification: " + getClass().getSimpleName());
-        }
-
-        @Override
-        public void setAesExtraDataRecord(@NonNull AesExtraDataRecord aesExtraDataRecord) {
-            throw new NullPointerException("Null object modification: " + getClass().getSimpleName());
-        }
-
-        @Override
-        public ExtraField deepCopy() {
-            return NULL;
-        }
-
-        @Override
-        public String toString() {
-            return "<null>";
-        }
-    };
 
 }

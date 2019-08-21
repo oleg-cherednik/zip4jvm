@@ -72,7 +72,7 @@ public abstract class EntryOutputStream extends OutputStream {
     private void writeLocalFileHeader() throws IOException {
         fileHeader.setOffsLocalFileHeader(out.getOffs());
         LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(zipModel, fileHeader).create();
-        new LocalFileHeaderWriter(zipModel, localFileHeader).write(out);
+        new LocalFileHeaderWriter(localFileHeader, zipModel.getCharset()).write(out);
         out.mark(MARK);
     }
 

@@ -2,6 +2,7 @@ package com.cop.zip4j.model.builders;
 
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Encryption;
+import com.cop.zip4j.model.ExtraField;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
@@ -14,6 +15,9 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 public final class LocalFileHeaderBuilder {
+
+    private static final long LOOK_IN_DATA_DESCRIPTOR = 0;
+    private static final long LOOK_IN_EXTRA_FIELD = ZipModel.ZIP_64_LIMIT;
 
     @NonNull
     private final ZipModel zipModel;
@@ -28,23 +32,38 @@ public final class LocalFileHeaderBuilder {
         localFileHeader.setGeneralPurposeFlag(fileHeader.getGeneralPurposeFlag().getAsInt());
         localFileHeader.setCompressionMethod(encryption.getCompressionMethod(fileHeader));
         localFileHeader.setLastModifiedTime(fileHeader.getLastModifiedTime());
-
-        if(fileHeader.getGeneralPurposeFlag().isDataDescriptorExists()) {
-            localFileHeader.setCompressedSize(0);
-            localFileHeader.setUncompressedSize(0);
-        } else {
-            localFileHeader.setCompressedSize(zipModel.isZip64() ? ZipModel.ZIP_64_LIMIT : fileHeader.getCompressedSize());
-            localFileHeader.setUncompressedSize(zipModel.isZip64() ? ZipModel.ZIP_64_LIMIT : fileHeader.getUncompressedSize());
-        }
-
+        localFileHeader.setCompressedSize(getCompressedSize());
+        localFileHeader.setUncompressedSize(getUncompressedSize());
         localFileHeader.setFileName(fileHeader.getFileName());
-        localFileHeader.setExtraField(fileHeader.getExtraField().deepCopy());
+        localFileHeader.setExtraField(getExtraField());
         localFileHeader.setCrc32(encryption.getChecksum(fileHeader));
 
-        if(fileHeader.getGeneralPurposeFlag().isDataDescriptorExists())
-            localFileHeader.getExtraField().setExtendedInfo(Zip64.ExtendedInfo.NULL);
-
         return localFileHeader;
+    }
+
+    private long getCompressedSize() {
+        if (fileHeader.getGeneralPurposeFlag().isDataDescriptorExists())
+            return LOOK_IN_DATA_DESCRIPTOR;
+        if (zipModel.isZip64())
+            return LOOK_IN_EXTRA_FIELD;
+        return fileHeader.getCompressedSize();
+    }
+
+    private long getUncompressedSize() {
+        if (fileHeader.getGeneralPurposeFlag().isDataDescriptorExists())
+            return LOOK_IN_DATA_DESCRIPTOR;
+        if (zipModel.isZip64())
+            return LOOK_IN_EXTRA_FIELD;
+        return fileHeader.getUncompressedSize();
+    }
+
+    private ExtraField getExtraField() {
+        ExtraField extraField = fileHeader.getExtraField().deepCopy();
+
+        if (fileHeader.getGeneralPurposeFlag().isDataDescriptorExists())
+            extraField.setExtendedInfo(Zip64.ExtendedInfo.NULL);
+
+        return extraField;
     }
 
 }

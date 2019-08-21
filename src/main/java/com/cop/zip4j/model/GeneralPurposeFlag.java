@@ -27,6 +27,7 @@ public class GeneralPurposeFlag implements IntSupplier {
 
     private boolean encrypted;
     private CompressionLevel compressionLevel;
+    /** {@link DataDescriptor} */
     private boolean dataDescriptorExists;
     private boolean strongEncryption;
     private boolean utf8;

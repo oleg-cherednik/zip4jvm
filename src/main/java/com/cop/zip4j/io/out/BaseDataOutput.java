@@ -44,26 +44,17 @@ abstract class BaseDataOutput implements DataOutput {
 
     @Override
     public final void writeWord(int val) throws IOException {
-        doWithTic(() -> {
-            byte[] buf = delegate.convertWord(val);
-            delegate.write(buf, 0, buf.length);
-        });
+        doWithTic(() -> delegate.write(delegate.convertWord(val)));
     }
 
     @Override
     public final void writeDword(long val) throws IOException {
-        doWithTic(() -> {
-            byte[] buf = delegate.convertDword(val);
-            delegate.write(buf, 0, buf.length);
-        });
+        doWithTic(() -> delegate.write(delegate.convertDword(val)));
     }
 
     @Override
     public void writeQword(long val) throws IOException {
-        doWithTic(() -> {
-            byte[] buf = delegate.convertQword(val);
-            delegate.write(buf, 0, buf.length);
-        });
+        doWithTic(() -> delegate.write(delegate.convertQword(val)));
     }
 
     @Override
