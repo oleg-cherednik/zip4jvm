@@ -9,10 +9,8 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
-import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatZipFile;
 
 /**
  * @author Oleg Cherednik
@@ -46,27 +44,29 @@ public class Zip64Test {
 //        zip.add(Zip4jSuite.srcDir.resolve("Oleg Cherednik.txt"), parameters);
         zip.add(Zip4jSuite.srcDir, parameters);
 
-        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
+        // TODO it seems it could be checked with commons-compress
+//        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+//        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
 
         Path dstDir = zipFile.getParent().resolve("unzip");
         UnzipIt unzip = UnzipIt.builder()
                                .zipFile(zipFile)
                                .build();
         unzip.extract(dstDir);
+        assertThatDirectory(dstDir).matches(TestUtils.dirAssert);
     }
 
-    public void shouldUnzipReadZipWithZip64() throws IOException {
-        Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt unzip = UnzipIt.builder()
-//                               .zipFile(Paths.get("d:/zip4j/ferdinand_store.zip"))
-//                               .zipFile(Paths.get("d:/zip4j/ferdinand_deflate.zip"))
-                               .zipFile(Paths.get("d:/zip4j/zip64_winzip.zip"))
-                               .build();
-        unzip.extract(dstDir);
-
-        int a = 0;
-        a++;
-    }
+//    public void shouldUnzipReadZipWithZip64() throws IOException {
+//        Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+//        UnzipIt unzip = UnzipIt.builder()
+////                               .zipFile(Paths.get("d:/zip4j/ferdinand_store.zip"))
+////                               .zipFile(Paths.get("d:/zip4j/ferdinand_deflate.zip"))
+//                               .zipFile(Paths.get("d:/zip4j/zip64_winzip.zip"))
+//                               .build();
+//        unzip.extract(dstDir);
+//
+//        int a = 0;
+//        a++;
+//    }
 
 }
