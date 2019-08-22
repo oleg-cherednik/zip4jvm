@@ -1,7 +1,6 @@
 package com.cop.zip4j.model;
 
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.io.writers.ZipModelWriter;
 import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.Getter;
@@ -179,11 +178,6 @@ public class CentralDirectory {
 
         public boolean isEncrypted() {
             return getEncryption() != Encryption.OFF;
-        }
-
-        public boolean isWriteZip64FileSize() {
-            return compressedSize >= ZipModel.ZIP_64_LIMIT ||
-                    uncompressedSize + ZipModelWriter.ZIP64_EXTRA_BUF >= ZipModel.ZIP_64_LIMIT;
         }
 
         public Encryption getEncryption() {
