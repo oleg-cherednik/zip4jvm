@@ -17,7 +17,6 @@ import static com.cop.zip4j.model.builders.LocalFileHeaderBuilder.LOOK_IN_EXTRA_
 @RequiredArgsConstructor
 public final class ZipModelWriter {
 
-    public static final int ZIP64_EXTRA_BUF = 50;
     private static final String MARK = "header";
 
     @NonNull
