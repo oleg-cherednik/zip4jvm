@@ -8,6 +8,8 @@ import com.cop.zip4j.model.ZipModel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import java.util.function.LongSupplier;
+
 /**
  * @author Oleg Cherednik
  * @since 04.08.2019
@@ -30,35 +32,21 @@ public final class LocalFileHeaderBuilder {
         localFileHeader.setGeneralPurposeFlag(fileHeader.getGeneralPurposeFlag().getAsInt());
         localFileHeader.setCompressionMethod(fileHeader.getEncryption().getCompressionMethod(fileHeader));
         localFileHeader.setLastModifiedTime(fileHeader.getLastModifiedTime());
-        localFileHeader.setCrc32(getCrc32());
-        localFileHeader.setCompressedSize(getCompressedSize());
-        localFileHeader.setUncompressedSize(getUncompressedSize());
+        localFileHeader.setCrc32(getValue(fileHeader::getCrc32));
+        localFileHeader.setCompressedSize(getValue(fileHeader::getCompressedSize));
+        localFileHeader.setUncompressedSize(getValue(fileHeader::getCompressedSize));
         localFileHeader.setFileName(fileHeader.getFileName());
         localFileHeader.setExtraField(getExtraField());
 
         return localFileHeader;
     }
 
-    private long getCrc32() {
-        if (fileHeader.getGeneralPurposeFlag().isDataDescriptorExists())
-            return LOOK_IN_DATA_DESCRIPTOR;
-        return fileHeader.getEncryption().getChecksum(fileHeader);
-    }
-
-    private long getCompressedSize() {
-        if (fileHeader.getGeneralPurposeFlag().isDataDescriptorExists())
-            return LOOK_IN_DATA_DESCRIPTOR;
+    private long getValue(LongSupplier supplier) {
         if (zipModel.isZip64())
             return LOOK_IN_EXTRA_FIELD;
-        return fileHeader.getCompressedSize();
-    }
-
-    private long getUncompressedSize() {
         if (fileHeader.getGeneralPurposeFlag().isDataDescriptorExists())
             return LOOK_IN_DATA_DESCRIPTOR;
-        if (zipModel.isZip64())
-            return LOOK_IN_EXTRA_FIELD;
-        return fileHeader.getUncompressedSize();
+        return supplier.getAsLong();
     }
 
     private ExtraField getExtraField() {

@@ -93,6 +93,7 @@ public final class Zip64 {
 
     }
 
+    /** see 4.5.3 */
     @Getter
     @Builder(toBuilder = true)
     public static class ExtendedInfo {

@@ -14,21 +14,15 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 22.08.2019
  */
-@RequiredArgsConstructor
 final class Zip64Reader {
 
-    private final long offs;
-
     public Zip64 read(@NonNull DataInput in) throws IOException {
-        Zip64.EndCentralDirectoryLocator locator = new Zip64Reader.EndCentralDirectoryLocator(offs).read(in);
+        Zip64.EndCentralDirectoryLocator locator = new Zip64Reader.EndCentralDirectoryLocator().read(in);
         Zip64.EndCentralDirectory dir = locator == null ? null : new Zip64Reader.EndCentralDirectory(locator.getOffs()).read(in);
         return Zip64.of(locator, dir);
     }
 
-    @RequiredArgsConstructor
     private static final class EndCentralDirectoryLocator {
-
-        private final long offs;
 
         @NonNull
         public Zip64.EndCentralDirectoryLocator read(@NonNull DataInput in) throws IOException {
@@ -45,11 +39,8 @@ final class Zip64Reader {
             return locator;
         }
 
-        private boolean findHead(DataInput in) throws IOException {
-            if (offs < 0)
-                throw new Zip4jException("EndCentralDirectory offs is unknown");
-
-            long offs = this.offs - Zip64.EndCentralDirectoryLocator.SIZE;
+        private static boolean findHead(DataInput in) throws IOException {
+            long offs = in.getOffs() - Zip64.EndCentralDirectoryLocator.SIZE;
 
             if (offs < 0)
                 return false;

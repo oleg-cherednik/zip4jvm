@@ -9,6 +9,7 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * @author Oleg Cherednik
@@ -44,18 +45,25 @@ public class Zip64Test {
 
 //        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
 //        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
-    }
 
-//    public void shouldUnzipReadZipWithZip64() throws IOException {
-//        Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+//        Path dstDir = zipFile.getParent().resolve("unzip");
 //        UnzipIt unzip = UnzipIt.builder()
-////                               .zipFile(Paths.get("d:/zip4j/ferdinand_store.zip"))
-//                               .zipFile(Paths.get("d:/zip4j/ferdinand_deflate.zip"))
+//                               .zipFile(zipFile)
 //                               .build();
 //        unzip.extract(dstDir);
-//
-//        int a = 0;
-//        a++;
-//    }
+    }
+
+    public void shouldUnzipReadZipWithZip64() throws IOException {
+        Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        UnzipIt unzip = UnzipIt.builder()
+//                               .zipFile(Paths.get("d:/zip4j/ferdinand_store.zip"))
+//                               .zipFile(Paths.get("d:/zip4j/ferdinand_deflate.zip"))
+                               .zipFile(Paths.get("d:/zip4j/zip64_winzip.zip"))
+                               .build();
+        unzip.extract(dstDir);
+
+        int a = 0;
+        a++;
+    }
 
 }

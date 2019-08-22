@@ -65,16 +65,14 @@ public class CentralDirectory {
                           .collect(Collectors.toList());
     }
 
-    /**
-     * see 4.3.12
-     */
+    /** see 4.3.12 */
     @Getter
     @Setter
     @NoArgsConstructor
     public static class FileHeader {
 
         public static final int SIGNATURE = 0x02014B50;
-        public static final int VERSION = 20;
+        public static final int VERSION = 45;
 
         // size:4 - signature (0x02014b50)
         // size:2 - version made by

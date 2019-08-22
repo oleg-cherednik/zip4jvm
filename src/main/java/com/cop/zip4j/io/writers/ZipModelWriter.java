@@ -3,7 +3,6 @@ package com.cop.zip4j.io.writers;
 import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.EndCentralDirectory;
-import com.cop.zip4j.model.ExtraField;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
 import lombok.NonNull;
@@ -64,32 +63,35 @@ public final class ZipModelWriter {
         zipModel.getCentralDirectory().getFileHeaders().forEach(this::updateZip64);
     }
 
-    // TODO should be updated on the fly
-    @Deprecated
     private void updateZip64(CentralDirectory.FileHeader fileHeader) {
-        if (fileHeader.isWriteZip64FileSize() || fileHeader.isWriteZip64OffsetLocalHeader())
-            zipModel.zip64();
-
-//        if (fileHeader.getExtraField() == ExtraField.NULL)
+//        if (fileHeader.isWriteZip64FileSize() || fileHeader.isWriteZip64OffsetLocalHeader())
+//            zipModel.zip64();
+//
+//        if (zipModel.isZip64()) {
 //            fileHeader.setExtraField(new ExtraField());
-//        if (fileHeader.getExtraField().getZip64ExtendedInfo() == )
-//            fileHeader.getExtraField().setZip64ExtendedInfo(new Zip64ExtendedInfo());
+//            fileHeader.getExtraField().setExtendedInfo(Zip64.ExtendedInfo.builder()
+//                                                                         .size(8)
+//                                                                         .compressedSize(fileHeader.getCompressedSize())
+////                                                                         .uncompressedSize(fileHeader.getUncompressedSize())
+////                                                                         .offsLocalHeaderRelative(fileHeader.getOffsLocalFileHeader())
+//                                                                         .build());
+//            fileHeader.setCompressedSize(LOOK_IN_EXTRA_FIELD);
+//        }
 
-        // TODO move it before
-        Zip64.ExtendedInfo info = fileHeader.getExtraField().getExtendedInfo();
-
-        if (info != Zip64.ExtendedInfo.NULL) {
-            int size = info.getLength() - Zip64.ExtendedInfo.SIZE_FIELD;
-            info = Zip64.ExtendedInfo.builder()
-                                     .size(size)
-                                     .uncompressedSize(fileHeader.isWriteZip64FileSize() ? fileHeader.getUncompressedSize() : ExtraField.NO_DATA)
-                                     .compressedSize(fileHeader.isWriteZip64FileSize() ? fileHeader.getCompressedSize() : ExtraField.NO_DATA)
-                                     .offsLocalHeaderRelative(
-                                             fileHeader.isWriteZip64OffsetLocalHeader() ? fileHeader.getOffsLocalFileHeader() : ExtraField.NO_DATA)
-                                     .build();
-
-            fileHeader.getExtraField().setExtendedInfo(info);
-        }
+//        Zip64.ExtendedInfo info = fileHeader.getExtraField().getExtendedInfo();
+//
+//        if (info != Zip64.ExtendedInfo.NULL) {
+//            int size = info.getLength() - Zip64.ExtendedInfo.SIZE_FIELD;
+//            info = Zip64.ExtendedInfo.builder()
+//                                     .size(size)
+//                                     .uncompressedSize(fileHeader.isWriteZip64FileSize() ? fileHeader.getUncompressedSize() : ExtraField.NO_DATA)
+//                                     .compressedSize(fileHeader.isWriteZip64FileSize() ? fileHeader.getCompressedSize() : ExtraField.NO_DATA)
+//                                     .offsLocalHeaderRelative(
+//                                             fileHeader.isWriteZip64OffsetLocalHeader() ? fileHeader.getOffsLocalFileHeader() : ExtraField.NO_DATA)
+//                                     .build();
+//
+//            fileHeader.getExtraField().setExtendedInfo(info);
+//        }
     }
 
 }

@@ -49,11 +49,9 @@ public final class ZipModelReader {
     }
 
     private ZipModel read(@NonNull DataInput in) throws IOException {
-        EndCentralDirectoryReader reader = new EndCentralDirectoryReader();
-
         ZipModel zipModel = new ZipModel(zipFile, charset);
-        zipModel.setEndCentralDirectory(reader.read(in));
-        zipModel.setZip64(new Zip64Reader(reader.getOffs()).read(in));
+        zipModel.setEndCentralDirectory(new EndCentralDirectoryReader().read(in));
+        zipModel.setZip64(new Zip64Reader().read(in));
 
         long offs = zipModel.getCentralDirectoryOffs();
         long totalEntries = zipModel.getTotalEntries();
