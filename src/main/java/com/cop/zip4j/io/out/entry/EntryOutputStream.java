@@ -105,7 +105,7 @@ public abstract class EntryOutputStream extends OutputStream {
     }
 
     private void checkCompressedSize() {
-        long expected = zipModel.isZip64() ? fileHeader.getExtraField().getExtendedInfo().getCompressedSize() : fileHeader.getCompressedSize();
+        long expected = fileHeader.getCompressedSize();
         long actual = out.getWrittenBytesAmount(MARK);
 
         if (expected != 0 && expected != actual)

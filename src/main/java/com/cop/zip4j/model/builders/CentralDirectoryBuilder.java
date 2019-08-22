@@ -47,23 +47,11 @@ public class CentralDirectoryBuilder {
         fileHeader.setInternalFileAttributes(InternalFileAttributes.of(entry.getPath()));
         fileHeader.setExternalFileAttributes(ExternalFileAttributes.of(entry.getPath()));
         fileHeader.setOffsLocalFileHeader(0);
-        fileHeader.setZip64ExtendedInfo(getExtendedInfo());
+        fileHeader.setZip64ExtendedInfo(Zip64.ExtendedInfo.NULL);
         fileHeader.setAesExtraDataRecord(getAesExtraDataRecord(entry.getEncryption()));
         fileHeader.setFileComment(null);
 
         return fileHeader;
-    }
-
-    private Zip64.ExtendedInfo getExtendedInfo() {
-        if (!zipModel.isZip64())
-            return Zip64.ExtendedInfo.NULL;
-
-        return Zip64.ExtendedInfo.builder()
-                                 .size(8 + 8)
-                                 .compressedSize(entry.getCompressedSize())
-                                 .uncompressedSize(entry.size())
-                                 .build();
-
     }
 
     @NonNull
