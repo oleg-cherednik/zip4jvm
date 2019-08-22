@@ -36,7 +36,7 @@ public class Zip64Test {
 
     public void shouldZipWhenZip64() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(Compression.STORE)
+                                                .compression(Compression.STORE)
                                                 .zip64(true)
                                                 .build();
 
@@ -58,5 +58,34 @@ public class Zip64Test {
         unzip.extract(dstDir);
         assertThatDirectory(dstDir).matches(TestUtils.dirAssert);
     }
+
+//    public void shouldZipWhenZip64AndAesEncryption() throws IOException {
+//        ZipParameters parameters = ZipParameters.builder()
+//                                                .compressionMethod(Compression.STORE)
+//                                                .encryption(Encryption.AES)
+//                                                .strength(AesStrength.KEY_STRENGTH_256)
+//                                                .zip64(true)
+//                                                .build();
+//
+//        zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+//        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
+//        zip.add(Zip4jSuite.srcDir, parameters);
+//
+//        // TODO it seems it could be checked with commons-compress
+////        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+////        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
+//    }
+//
+//    @Test(dependsOnMethods = "shouldZipWhenZip64AndAesEncryption")
+//    public void shouldUnzipWhenZip64AndAesEncryption() throws IOException {
+//        Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+//        UnzipIt unzip = UnzipIt.builder()
+//                               .zipFile(zipFile)
+//                               .build();
+//        unzip.extract(dstDir);
+//        assertThatDirectory(dstDir).matches(TestUtils.dirAssert);
+//    }
+
+
 
 }

@@ -37,7 +37,7 @@ public class ZipFilesSplitTest {
     @Test
     public void shouldCreateNewSplitZipWithFiles() throws IOException, Zip4jException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(Compression.DEFLATE)
+                                                .compression(Compression.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .defaultFolderPath(Zip4jSuite.carsDir)
                                                 .splitLength(1024 * 1024).build();

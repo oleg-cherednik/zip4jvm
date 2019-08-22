@@ -81,7 +81,7 @@ public final class ZipIt {
         entries.forEach(entry -> {
             try {
                 entry.setName(parameters.getRelativeEntryName(entry.getPath()));
-                entry.setCompression(parameters.getCompressionMethod());
+                entry.setCompression(parameters.getCompression());
                 entry.setEncryption(parameters.getEncryption());
                 entry.setStrength(parameters.getStrength());
                 entry.setPassword(parameters.getPassword());

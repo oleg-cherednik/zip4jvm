@@ -94,7 +94,7 @@ public class UnzipItTest {
     @Test
     public void shouldUnzipEncryptedZip() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(Compression.DEFLATE)
+                                                .compression(Compression.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .encryption(Encryption.PKWARE)
                                                 .comment("password: " + new String(Zip4jSuite.password))

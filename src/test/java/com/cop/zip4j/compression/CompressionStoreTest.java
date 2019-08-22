@@ -41,7 +41,7 @@ public class CompressionStoreTest {
 
     public void shouldCreateSingleZipWithFilesWhenStoreCompression() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(Compression.STORE)
+                                                .compression(Compression.STORE)
                                                 .defaultFolderPath(Zip4jSuite.srcDir).build();
 
         Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
@@ -55,7 +55,7 @@ public class CompressionStoreTest {
 
     public void shouldCreateSplitZipWithFilesWhenStoreCompression() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(Compression.STORE)
+                                                .compression(Compression.STORE)
                                                 .defaultFolderPath(Zip4jSuite.srcDir)
                                                 .splitLength(1024 * 1024)
                                                 .build();
@@ -70,7 +70,7 @@ public class CompressionStoreTest {
 
     public void shouldCreateSingleZipWithEntireFolderWhenStoreCompression() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(Compression.STORE)
+                                                .compression(Compression.STORE)
                                                 .defaultFolderPath(Zip4jSuite.srcDir).build();
 
         Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
@@ -84,7 +84,7 @@ public class CompressionStoreTest {
 
     public void shouldCreateSplitZipWithEntireFolderWhenStoreCompression() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(Compression.STORE)
+                                                .compression(Compression.STORE)
                                                 .defaultFolderPath(Zip4jSuite.srcDir)
                                                 .splitLength(1024 * 1024)
                                                 .build();
@@ -117,7 +117,7 @@ public class CompressionStoreTest {
 
     public void shouldUnzipWhenWhenStoreCompressionAndPkwareEncryption() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(Compression.STORE)
+                                                .compression(Compression.STORE)
                                                 .encryption(Encryption.PKWARE)
                                                 .defaultFolderPath(Zip4jSuite.srcDir)
                                                 .comment("password: " + new String(Zip4jSuite.password))
@@ -144,7 +144,7 @@ public class CompressionStoreTest {
 
     public void shouldUnzipWhenWhenStoreCompressionAndAesEncryption() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(Compression.STORE)
+                                                .compression(Compression.STORE)
                                                 .encryption(Encryption.AES)
                                                 .strength(AesStrength.KEY_STRENGTH_256)
                                                 .comment("password: " + new String(Zip4jSuite.password))

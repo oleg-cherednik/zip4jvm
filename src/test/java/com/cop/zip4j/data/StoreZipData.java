@@ -28,7 +28,7 @@ public class StoreZipData {
 
     private static void createStoreSolidZip() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(Compression.STORE)
+                                                .compression(Compression.STORE)
                                                 .build();
         ZipIt zip = ZipIt.builder().zipFile(Zip4jSuite.storeSolidZip).build();
         zip.add(Zip4jSuite.srcDir, parameters);
@@ -41,7 +41,7 @@ public class StoreZipData {
 
     private static void createStoreSplitZip() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(Compression.STORE)
+                                                .compression(Compression.STORE)
                                                 .defaultFolderPath(Zip4jSuite.srcDir)
                                                 .splitLength(1024 * 1024)
                                                 .build();

@@ -61,7 +61,7 @@ public class ZipMiscTest {
         Path rootDir = Zip4jSuite.subDirNameAsMethodNameWithTme(ZipMiscTest.rootDir);
 
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(Compression.DEFLATE)
+                                                .compression(Compression.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .splitLength(1024 * 1024).build();
 
@@ -88,7 +88,7 @@ public class ZipMiscTest {
 
     public void shouldThrowExceptionWhenAddedFileNotExists() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(Compression.STORE)
+                                                .compression(Compression.STORE)
                                                 .build();
 
         Path bentley = Zip4jSuite.carsDir.resolve("bentley-continental.jpg");
