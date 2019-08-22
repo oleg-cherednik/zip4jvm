@@ -21,6 +21,7 @@ public final class CentralDirectoryWriter {
     private final Charset charset;
 
     public void write(@NonNull DataOutput out) throws IOException {
+        // TODO check that exactly required byte were written
         new FileHeaderWriter(dir.getFileHeaders(), charset).write(out);
         new DigitalSignatureWriter(dir.getDigitalSignature()).write(out);
     }

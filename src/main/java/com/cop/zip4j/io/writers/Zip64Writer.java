@@ -72,7 +72,7 @@ final class Zip64Writer {
             if (info == Zip64.ExtendedInfo.NULL)
                 return;
 
-            out.writeDwordSignature(Zip64.ExtendedInfo.SIGNATURE);
+            out.writeWordSignature(Zip64.ExtendedInfo.SIGNATURE);
             out.writeWord(info.getSize());
 
             if (info.getUncompressedSize() != ExtraField.NO_DATA)

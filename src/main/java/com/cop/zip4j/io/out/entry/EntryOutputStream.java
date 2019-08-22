@@ -118,6 +118,7 @@ public abstract class EntryOutputStream extends OutputStream {
     }
 
     private void writeDataDescriptor() throws IOException {
+        // TODO avoid add it for folders
         if (fileHeader.getGeneralPurposeFlag().isDataDescriptorExists()) {
             DataDescriptor dataDescriptor = new DataDescriptor();
             dataDescriptor.setCrc32(checksum.getValue());

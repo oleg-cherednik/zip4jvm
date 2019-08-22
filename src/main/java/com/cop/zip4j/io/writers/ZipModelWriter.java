@@ -3,12 +3,16 @@ package com.cop.zip4j.io.writers;
 import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.EndCentralDirectory;
+import com.cop.zip4j.model.ExtraField;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
+import com.cop.zip4j.utils.ZipUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
+
+import static com.cop.zip4j.model.builders.LocalFileHeaderBuilder.LOOK_IN_EXTRA_FIELD;
 
 @RequiredArgsConstructor
 public final class ZipModelWriter {
@@ -64,6 +68,29 @@ public final class ZipModelWriter {
     }
 
     private void updateZip64(CentralDirectory.FileHeader fileHeader) {
+        if (ZipUtils.isDirectory(fileHeader.getFileName()) || !zipModel.isZip64()) {
+            if (fileHeader.getExtraField().getExtendedInfo() != Zip64.ExtendedInfo.NULL)
+                fileHeader.getExtraField().setExtendedInfo(Zip64.ExtendedInfo.NULL);
+        } else {
+            if (fileHeader.getExtraField() == ExtraField.NULL)
+                fileHeader.setExtraField(new ExtraField());
+
+            fileHeader.getExtraField().setExtendedInfo(Zip64.ExtendedInfo.builder()
+                                                                         .size(8)
+                                                                         .compressedSize(fileHeader.getCompressedSize())
+                                                                         .uncompressedSize(fileHeader.getUncompressedSize())
+//                                                                         .offsLocalHeaderRelative(fileHeader.getOffsLocalFileHeader())
+                                                                         .build());
+
+            fileHeader.setCompressedSize(LOOK_IN_EXTRA_FIELD);
+            fileHeader.setUncompressedSize(LOOK_IN_EXTRA_FIELD);
+
+            int a = 0;
+            a++;
+        }
+
+        int a = 0;
+        a++;
 //        if (fileHeader.isWriteZip64FileSize() || fileHeader.isWriteZip64OffsetLocalHeader())
 //            zipModel.zip64();
 //
