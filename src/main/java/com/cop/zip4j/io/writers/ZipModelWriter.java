@@ -19,9 +19,10 @@ public final class ZipModelWriter {
 
     @NonNull
     private final ZipModel zipModel;
+    private final boolean validate;
 
     // TODO do we really need validate flag?
-    public void finalizeZipFile(@NonNull DataOutput out, boolean validate) throws IOException {
+    public void finalizeZipFile(@NonNull DataOutput out) throws IOException {
         if (validate)
             processHeaderData(out);
 

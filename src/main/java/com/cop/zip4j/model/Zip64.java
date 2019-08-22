@@ -1,5 +1,6 @@
 package com.cop.zip4j.model;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -10,13 +11,17 @@ import lombok.Setter;
  * @since 26.04.2019
  */
 @Getter
-@RequiredArgsConstructor
-public class Zip64 {
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class Zip64 {
 
     public static final Zip64 NULL = new Zip64(null, null);
 
     private final EndCentralDirectoryLocator endCentralDirectoryLocator;
     private final EndCentralDirectory endCentralDirectory;
+
+    public static Zip64 of(EndCentralDirectoryLocator locator, EndCentralDirectory dir) {
+        return locator == null || dir == null ? NULL : new Zip64(locator, dir);
+    }
 
     @Override
     public String toString() {

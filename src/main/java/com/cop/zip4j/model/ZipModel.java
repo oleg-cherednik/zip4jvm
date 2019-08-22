@@ -69,11 +69,7 @@ public class ZipModel {
 
     public void zip64() {
         if (!isZip64())
-            zip64(new Zip64.EndCentralDirectoryLocator(), new Zip64.EndCentralDirectory());
-    }
-
-    public void zip64(Zip64.EndCentralDirectoryLocator locator, Zip64.EndCentralDirectory dir) {
-        zip64 = locator == null || dir == null ? Zip64.NULL : new Zip64(locator, dir);
+            setZip64(Zip64.of(new Zip64.EndCentralDirectoryLocator(), new Zip64.EndCentralDirectory()));
     }
 
     public void setComment(String comment) {

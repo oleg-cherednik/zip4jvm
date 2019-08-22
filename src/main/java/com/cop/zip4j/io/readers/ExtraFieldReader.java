@@ -33,7 +33,7 @@ final class ExtraFieldReader {
         while (in.getOffs() < offsMax) {
             int signature = in.readWord();
 
-            Zip64.ExtendedInfo zip64 = new Zip64ExtendedInfoReader(signature, uncompressedSize, compressedSize, offs, diskNumber).read(in);
+            Zip64.ExtendedInfo zip64 = new Zip64Reader.ExtendedInfo(signature, uncompressedSize, compressedSize, offs, diskNumber).read(in);
             AesExtraDataRecord aes = new AesExtraDataRecordReader(signature).read(in);
 
             if (zip64 != Zip64.ExtendedInfo.NULL)

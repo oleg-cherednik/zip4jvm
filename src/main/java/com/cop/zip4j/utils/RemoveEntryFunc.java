@@ -47,7 +47,7 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
 
         try (DataOutput out = SingleZipOutputStream.create(tmpZipFile, zipModel)) {
             writeFileHeaders(new DataOutputStreamDecorator(out), entries);
-            new ZipModelWriter(zipModel).finalizeZipFile(out, true);
+            new ZipModelWriter(zipModel, true).finalizeZipFile(out);
         } catch(IOException e) {
             throw new Zip4jException(e);
         }

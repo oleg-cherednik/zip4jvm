@@ -17,9 +17,9 @@ public class DataDescriptor {
 
     // size:4 - crc-32
     private long crc32;
-    // size:4 - compressed size
+    // size:4 (zip64:8) - compressed size
     private long compressedSize;
-    // size:4 - uncompressed size
+    // size:4(zip64:8) - uncompressed size
     private long uncompressedSize;
 
 }

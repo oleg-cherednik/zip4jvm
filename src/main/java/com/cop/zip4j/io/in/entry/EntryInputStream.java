@@ -53,8 +53,8 @@ public abstract class EntryInputStream extends InputStream {
         this.in = in;
         this.localFileHeader = localFileHeader;
         this.decoder = decoder;
-        compressedSize = decoder.getCompressedSize(localFileHeader);
-        uncompressedSize = localFileHeader.getUncompressedSize();
+        compressedSize = Math.max(0, decoder.getCompressedSize(localFileHeader));
+        uncompressedSize = Math.max(0, localFileHeader.getUncompressedSize());
     }
 
     protected final void updateChecksum(byte[] buf, int offs, int len) {
@@ -84,7 +84,7 @@ public abstract class EntryInputStream extends InputStream {
     @Override
     public void close() throws IOException {
         decoder.close(in);
-//        readDataDescriptor();
+        readDataDescriptor();
         checkChecksum();
         checkUncompressedSize();
     }
@@ -102,14 +102,10 @@ public abstract class EntryInputStream extends InputStream {
             throw new Zip4jException("UncompressedSize is not matched: " + localFileHeader.getFileName());
     }
 
+    /** Just read {@link DataDescriptor} and ignore it's value. We got it from {@link CentralDirectory.FileHeader} */
     private void readDataDescriptor() throws IOException {
-        if (localFileHeader.getGeneralPurposeFlag().isDataDescriptorExists()) {
-            DataDescriptor dataDescriptor = new DataDescriptorReader(false).read(in);
-
-            localFileHeader.setCrc32(dataDescriptor.getCrc32());
-            localFileHeader.setCompressedSize(dataDescriptor.getCompressedSize());
-            localFileHeader.setUncompressedSize(dataDescriptor.getUncompressedSize());
-        }
+        if (localFileHeader.getGeneralPurposeFlag().isDataDescriptorExists())
+            new DataDescriptorReader(false).read(in);
     }
 
 }
