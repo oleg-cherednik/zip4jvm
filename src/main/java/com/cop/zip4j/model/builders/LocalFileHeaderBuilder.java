@@ -5,6 +5,7 @@ import com.cop.zip4j.model.ExtraField;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
+import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -32,7 +33,7 @@ public final class LocalFileHeaderBuilder {
         localFileHeader.setGeneralPurposeFlag(fileHeader.getGeneralPurposeFlag().getAsInt());
         localFileHeader.setCompressionMethod(fileHeader.getEncryption().getCompressionMethod(fileHeader));
         localFileHeader.setLastModifiedTime(fileHeader.getLastModifiedTime());
-        localFileHeader.setCrc32(getValue(fileHeader::getCrc32));
+        localFileHeader.setCrc32(getValue(() -> fileHeader.getEncryption().getChecksum(fileHeader)));
         localFileHeader.setCompressedSize(getValue(fileHeader::getCompressedSize));
         localFileHeader.setUncompressedSize(getValue(fileHeader::getCompressedSize));
         localFileHeader.setFileName(fileHeader.getFileName());
@@ -42,20 +43,36 @@ public final class LocalFileHeaderBuilder {
     }
 
     private long getValue(LongSupplier supplier) {
-        if (zipModel.isZip64())
-            return LOOK_IN_EXTRA_FIELD;
         if (fileHeader.getGeneralPurposeFlag().isDataDescriptorExists())
             return LOOK_IN_DATA_DESCRIPTOR;
+        if (zipModel.isZip64())
+            return LOOK_IN_EXTRA_FIELD;
         return supplier.getAsLong();
     }
 
     private ExtraField getExtraField() {
-        ExtraField extraField = fileHeader.getExtraField().deepCopy();
+        Zip64.ExtendedInfo extendedInfo = getExtendedInfo();
+        // TODO should be created
+        AesExtraDataRecord aesExtraDataRecord = AesExtraDataRecord.NULL;
 
-        if (fileHeader.getGeneralPurposeFlag().isDataDescriptorExists())
-            extraField.setExtendedInfo(Zip64.ExtendedInfo.NULL);
+        if (extendedInfo == Zip64.ExtendedInfo.NULL && aesExtraDataRecord == AesExtraDataRecord.NULL)
+            return ExtraField.NULL;
 
+        ExtraField extraField = new ExtraField();
+        extraField.setExtendedInfo(extendedInfo);
+        extraField.setAesExtraDataRecord(aesExtraDataRecord);
         return extraField;
+    }
+
+    private Zip64.ExtendedInfo getExtendedInfo() {
+        if (fileHeader.getGeneralPurposeFlag().isDataDescriptorExists() || !zipModel.isZip64())
+            return Zip64.ExtendedInfo.NULL;
+
+        return Zip64.ExtendedInfo.builder()
+                                 .size(8)
+                                 .compressedSize(fileHeader.getCompressedSize())
+                                 .uncompressedSize(fileHeader.getUncompressedSize())
+                                 .build();
     }
 
 }

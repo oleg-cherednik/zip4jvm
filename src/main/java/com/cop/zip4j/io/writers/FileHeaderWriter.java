@@ -39,7 +39,7 @@ final class FileHeaderWriter {
         out.writeWord(fileHeader.getCompressionMethod().getCode());
         out.writeDword(fileHeader.getLastModifiedTime());
         out.writeDword(fileHeader.getCompressionMethod() == CompressionMethod.AES_ENC ? 0 : fileHeader.getCrc32());
-        out.writeDword(fileHeader.isWriteZip64FileSize() ? ZipModel.ZIP_64_LIMIT : fileHeader.getCompressedSize());
+        out.writeDword(fileHeader.getCompressedSize());
         out.writeDword(fileHeader.isWriteZip64FileSize() ? ZipModel.ZIP_64_LIMIT : fileHeader.getUncompressedSize());
         out.writeWord(fileName.length);
         out.writeWord(fileHeader.getExtraField().getLength());

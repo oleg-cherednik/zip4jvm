@@ -22,13 +22,13 @@ public final class DataDescriptorWriter {
         out.writeDwordSignature(DataDescriptor.SIGNATURE);
         out.writeDword(dataDescriptor.getCrc32());
 
-//        if (zip64) {
-//            out.writeQword(dataDescriptor.getCompressedSize());
-//            out.writeQword(dataDescriptor.getUncompressedSize());
-//        } else {
+        if (zip64) {
+            out.writeQword(dataDescriptor.getCompressedSize());
+            out.writeQword(dataDescriptor.getUncompressedSize());
+        } else {
             out.writeDword(dataDescriptor.getCompressedSize());
             out.writeDword(dataDescriptor.getUncompressedSize());
-//        }
+        }
     }
 
 }
