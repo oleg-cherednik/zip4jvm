@@ -11,6 +11,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
+import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatZipFile;
+
 /**
  * @author Oleg Cherednik
  * @since 06.04.2019
@@ -40,11 +43,11 @@ public class Zip64Test {
 
         Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-        zip.add(Zip4jSuite.srcDir.resolve("Oleg Cherednik.txt"), parameters);
-//        zip.add(Zip4jSuite.filesCarsDir, parameters);
+//        zip.add(Zip4jSuite.srcDir.resolve("Oleg Cherednik.txt"), parameters);
+        zip.add(Zip4jSuite.srcDir, parameters);
 
-//        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-//        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
+        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
 
         Path dstDir = zipFile.getParent().resolve("unzip");
         UnzipIt unzip = UnzipIt.builder()
