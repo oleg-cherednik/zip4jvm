@@ -19,12 +19,12 @@ final class Zip64Writer {
     private final Zip64 zip64;
 
     public void write(@NonNull DataOutput out) throws IOException {
-        new EndCentralDirectoryWriter(zip64.getEndCentralDirectory()).write(out);
-        new EndCentralDirectoryLocatorWriter(zip64.getEndCentralDirectoryLocator()).write(out);
+        new EndCentralDirectory(zip64.getEndCentralDirectory()).write(out);
+        new EndCentralDirectoryLocator(zip64.getEndCentralDirectoryLocator()).write(out);
     }
 
     @RequiredArgsConstructor
-    private static final class EndCentralDirectoryWriter {
+    private static final class EndCentralDirectory {
 
         private final Zip64.EndCentralDirectory dir;
 
@@ -47,7 +47,7 @@ final class Zip64Writer {
     }
 
     @RequiredArgsConstructor
-    private static final class EndCentralDirectoryLocatorWriter {
+    private static final class EndCentralDirectoryLocator {
 
         private final Zip64.EndCentralDirectoryLocator locator;
 
@@ -63,7 +63,7 @@ final class Zip64Writer {
     }
 
     @RequiredArgsConstructor
-    static final class ExtendedInfoWriter {
+    static final class ExtendedInfo {
 
         @NonNull
         private final Zip64.ExtendedInfo info;

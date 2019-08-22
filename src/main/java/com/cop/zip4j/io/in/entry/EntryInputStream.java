@@ -84,7 +84,7 @@ public abstract class EntryInputStream extends InputStream {
     @Override
     public void close() throws IOException {
         decoder.close(in);
-        readDataDescriptor();
+//        readDataDescriptor();
         checkChecksum();
         checkUncompressedSize();
     }

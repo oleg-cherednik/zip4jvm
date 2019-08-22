@@ -12,6 +12,7 @@ import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ZipParameters;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -96,6 +97,7 @@ public class EncryptionPkwareTest {
         }
     }
 
+    @Ignore
     public void shouldUnzipWhenStandardEncryption() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compressionMethod(Compression.DEFLATE)

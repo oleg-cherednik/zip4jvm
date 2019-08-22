@@ -16,8 +16,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public final class LocalFileHeaderBuilder {
 
-    private static final long LOOK_IN_DATA_DESCRIPTOR = 0;
-    private static final long LOOK_IN_EXTRA_FIELD = ZipModel.ZIP_64_LIMIT;
+    public static final long LOOK_IN_DATA_DESCRIPTOR = 0;
+    public static final long LOOK_IN_EXTRA_FIELD = ZipModel.ZIP_64_LIMIT;
 
     @NonNull
     private final ZipModel zipModel;
@@ -32,11 +32,11 @@ public final class LocalFileHeaderBuilder {
         localFileHeader.setGeneralPurposeFlag(fileHeader.getGeneralPurposeFlag().getAsInt());
         localFileHeader.setCompressionMethod(encryption.getCompressionMethod(fileHeader));
         localFileHeader.setLastModifiedTime(fileHeader.getLastModifiedTime());
+        localFileHeader.setCrc32(encryption.getChecksum(fileHeader));
         localFileHeader.setCompressedSize(getCompressedSize());
         localFileHeader.setUncompressedSize(getUncompressedSize());
         localFileHeader.setFileName(fileHeader.getFileName());
         localFileHeader.setExtraField(getExtraField());
-        localFileHeader.setCrc32(encryption.getChecksum(fileHeader));
 
         return localFileHeader;
     }

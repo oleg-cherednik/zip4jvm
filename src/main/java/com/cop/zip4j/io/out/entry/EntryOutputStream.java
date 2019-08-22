@@ -1,17 +1,17 @@
 package com.cop.zip4j.io.out.entry;
 
-import com.cop.zip4j.model.builders.CentralDirectoryBuilder;
-import com.cop.zip4j.model.builders.LocalFileHeaderBuilder;
-import com.cop.zip4j.io.writers.DataDescriptorWriter;
-import com.cop.zip4j.io.writers.LocalFileHeaderWriter;
 import com.cop.zip4j.crypto.Encoder;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.out.DataOutput;
+import com.cop.zip4j.io.writers.DataDescriptorWriter;
+import com.cop.zip4j.io.writers.LocalFileHeaderWriter;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.DataDescriptor;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.ZipModel;
+import com.cop.zip4j.model.builders.CentralDirectoryBuilder;
+import com.cop.zip4j.model.builders.LocalFileHeaderBuilder;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.AccessLevel;
 import lombok.NonNull;
@@ -41,9 +41,7 @@ public abstract class EntryOutputStream extends OutputStream {
     protected final DataOutput out;
 
     public static EntryOutputStream create(@NonNull PathZipEntry entry, @NonNull ZipModel zipModel, @NonNull DataOutput out) throws IOException {
-        EntryOutputStream res = createOutputStream(entry, zipModel, out);
-        res.writeHeader();
-        return res;
+        return createOutputStream(entry, zipModel, out).writeHeader();
     }
 
     private static EntryOutputStream createOutputStream(PathZipEntry entry, ZipModel zipModel, DataOutput out) throws IOException {
@@ -59,7 +57,7 @@ public abstract class EntryOutputStream extends OutputStream {
         throw new Zip4jException("Compression is not supported: " + compression);
     }
 
-    private void writeHeader() throws IOException {
+    private EntryOutputStream writeHeader() throws IOException {
         // only at the beginning of the split file
         if (zipModel.isSplitArchive() && zipModel.isEmpty())
             out.writeDwordSignature(SPLIT_SIGNATURE);
@@ -67,6 +65,8 @@ public abstract class EntryOutputStream extends OutputStream {
         zipModel.addFileHeader(fileHeader);
         writeLocalFileHeader();
         encoder.writeHeader(out);
+
+        return this;
     }
 
     private void writeLocalFileHeader() throws IOException {

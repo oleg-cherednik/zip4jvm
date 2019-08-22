@@ -1,6 +1,5 @@
 package com.cop.zip4j;
 
-import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.Encryption;
@@ -39,7 +38,7 @@ public class UnzipItTest {
     }
 
     @Test
-    public void shouldUnzipRequiredFiles() throws Zip4jException, IOException {
+    public void shouldUnzipRequiredFiles() throws IOException {
         Path dstDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
         List<String> entries = Arrays.asList("saint-petersburg.jpg", "cars/bentley-continental.jpg");
         UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.deflateSolidZip).build();
@@ -53,7 +52,7 @@ public class UnzipItTest {
 
     @Test
     @Ignore
-    public void shouldUnzipRequiredFilesWhenSplit() throws Zip4jException, IOException {
+    public void shouldUnzipRequiredFilesWhenSplit() throws IOException {
         Path dstDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
         List<String> entries = Arrays.asList("saint-petersburg.jpg", "cars/bentley-continental.jpg");
         UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.deflateSplitZip).build();
@@ -66,7 +65,7 @@ public class UnzipItTest {
     }
 
     @Test
-    public void shouldUnzipOneFile() throws Zip4jException, IOException {
+    public void shouldUnzipOneFile() throws IOException {
         Path dstDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
         UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.deflateSolidZip).build();
         unzip.extract(dstDir, "cars/ferrari-458-italia.jpg");
@@ -77,7 +76,7 @@ public class UnzipItTest {
     }
 
     @Test
-    public void shouldUnzipFolder() throws Zip4jException, IOException {
+    public void shouldUnzipFolder() throws IOException {
         Path dstDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
         UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.deflateSolidZip).build();
         unzip.extract(dstDir, "Star Wars");
