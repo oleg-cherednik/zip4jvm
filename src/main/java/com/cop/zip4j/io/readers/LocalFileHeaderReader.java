@@ -56,8 +56,8 @@ public final class LocalFileHeaderReader {
      * We do not use it while reading, because we could get this size from {@link CentralDirectory.FileHeader}.
      */
     private static long getFromFileHeader(DataInput in, LongSupplier supplier) throws IOException {
-        long size = in.readDword();
-        return size == LOOK_IN_DATA_DESCRIPTOR ? supplier.getAsLong() : size;
+        long value = in.readDword();
+        return value == LOOK_IN_DATA_DESCRIPTOR ? supplier.getAsLong() : value;
     }
 
     private void findHead(DataInput in) throws IOException {

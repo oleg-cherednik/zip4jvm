@@ -1,7 +1,6 @@
 package com.cop.zip4j.model.builders;
 
 import com.cop.zip4j.model.CentralDirectory;
-import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ExtraField;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.Zip64;
@@ -25,20 +24,25 @@ public final class LocalFileHeaderBuilder {
     private final CentralDirectory.FileHeader fileHeader;
 
     public LocalFileHeader create() {
-        Encryption encryption = fileHeader.getEncryption();
         LocalFileHeader localFileHeader = new LocalFileHeader();
 
         localFileHeader.setVersionToExtract(fileHeader.getVersionToExtract());
         localFileHeader.setGeneralPurposeFlag(fileHeader.getGeneralPurposeFlag().getAsInt());
-        localFileHeader.setCompressionMethod(encryption.getCompressionMethod(fileHeader));
+        localFileHeader.setCompressionMethod(fileHeader.getEncryption().getCompressionMethod(fileHeader));
         localFileHeader.setLastModifiedTime(fileHeader.getLastModifiedTime());
-        localFileHeader.setCrc32(encryption.getChecksum(fileHeader));
+        localFileHeader.setCrc32(getCrc32());
         localFileHeader.setCompressedSize(getCompressedSize());
         localFileHeader.setUncompressedSize(getUncompressedSize());
         localFileHeader.setFileName(fileHeader.getFileName());
         localFileHeader.setExtraField(getExtraField());
 
         return localFileHeader;
+    }
+
+    private long getCrc32() {
+        if (fileHeader.getGeneralPurposeFlag().isDataDescriptorExists())
+            return LOOK_IN_DATA_DESCRIPTOR;
+        return fileHeader.getEncryption().getChecksum(fileHeader);
     }
 
     private long getCompressedSize() {
