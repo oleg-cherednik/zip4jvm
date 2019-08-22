@@ -15,6 +15,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.cop.zip4j.model.builders.LocalFileHeaderBuilder.LOOK_IN_EXTRA_FIELD;
+
 /**
  * see 4.3.12
  *
@@ -186,6 +188,14 @@ public class CentralDirectory {
 
         public boolean isWriteZip64OffsetLocalHeader() {
             return offsLocalFileHeader > ZipModel.ZIP_64_LIMIT;
+        }
+
+        public long getActualCompressedSize() {
+            return compressedSize == LOOK_IN_EXTRA_FIELD ? extraField.getExtendedInfo().getCompressedSize() : compressedSize;
+        }
+
+        public long getActualUncompressedSize() {
+            return uncompressedSize == LOOK_IN_EXTRA_FIELD ? extraField.getExtendedInfo().getUncompressedSize() : uncompressedSize;
         }
 
         @Override

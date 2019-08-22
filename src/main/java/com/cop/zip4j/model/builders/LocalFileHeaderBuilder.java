@@ -52,8 +52,7 @@ public final class LocalFileHeaderBuilder {
 
     private ExtraField getExtraField() {
         Zip64.ExtendedInfo extendedInfo = getExtendedInfo();
-        // TODO should be created
-        AesExtraDataRecord aesExtraDataRecord = AesExtraDataRecord.NULL;
+        AesExtraDataRecord aesExtraDataRecord = fileHeader.getExtraField().getAesExtraDataRecord();
 
         if (extendedInfo == Zip64.ExtendedInfo.NULL && aesExtraDataRecord == AesExtraDataRecord.NULL)
             return ExtraField.NULL;
