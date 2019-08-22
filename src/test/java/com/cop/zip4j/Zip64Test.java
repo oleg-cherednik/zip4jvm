@@ -46,11 +46,11 @@ public class Zip64Test {
 //        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
 //        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
 
-//        Path dstDir = zipFile.getParent().resolve("unzip");
-//        UnzipIt unzip = UnzipIt.builder()
-//                               .zipFile(zipFile)
-//                               .build();
-//        unzip.extract(dstDir);
+        Path dstDir = zipFile.getParent().resolve("unzip");
+        UnzipIt unzip = UnzipIt.builder()
+                               .zipFile(zipFile)
+                               .build();
+        unzip.extract(dstDir);
     }
 
     public void shouldUnzipReadZipWithZip64() throws IOException {
