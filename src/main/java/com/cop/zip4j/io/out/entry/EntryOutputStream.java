@@ -126,10 +126,10 @@ public abstract class EntryOutputStream extends OutputStream {
         if (fileHeader.getGeneralPurposeFlag().isDataDescriptorExists()) {
             DataDescriptor dataDescriptor = new DataDescriptor();
             dataDescriptor.setCrc32(checksum.getValue());
-            dataDescriptor.setCompressedSize(fileHeader.getCompressedSize());
-            dataDescriptor.setUncompressedSize(fileHeader.getUncompressedSize());
+            dataDescriptor.setCompressedSize(fileHeader.getOriginalCompressedSize());
+            dataDescriptor.setUncompressedSize(fileHeader.getOriginalUncompressedSize());
 
-            new DataDescriptorWriter(dataDescriptor, zipModel.isZip64()).write(out);
+            new DataDescriptorWriter(dataDescriptor, zipModel.getActivity()).write(out);
         }
     }
 

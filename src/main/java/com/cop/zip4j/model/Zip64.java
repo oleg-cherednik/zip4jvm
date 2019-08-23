@@ -28,9 +28,7 @@ public final class Zip64 {
         return this == NULL ? "<null>" : super.toString();
     }
 
-    /**
-     * see 4.3.15
-     */
+    /** see 4.3.15 */
     @Getter
     @Setter
     public static class EndCentralDirectoryLocator {
@@ -54,9 +52,7 @@ public final class Zip64 {
 
     }
 
-    /**
-     * see 4.3.14
-     */
+    /** see 4.3.14 */
     @Getter
     @Setter
     public static class EndCentralDirectory {

@@ -1,6 +1,9 @@
 package com.cop.zip4j.model;
 
 import com.cop.zip4j.exception.Zip4jException;
+import com.cop.zip4j.model.activity.Activity;
+import com.cop.zip4j.model.activity.PlainActivity;
+import com.cop.zip4j.model.activity.Zip64Activity;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +48,7 @@ public class ZipModel {
     @NonNull
     private Zip64 zip64 = Zip64.NULL;
     private long splitLength = NO_SPLIT;
+    private Activity activity = new PlainActivity();
 
     public void setEndCentralDirectory(@NonNull EndCentralDirectory endCentralDirectory) {
         this.endCentralDirectory = endCentralDirectory;
@@ -65,6 +69,11 @@ public class ZipModel {
 
     public boolean isZip64() {
         return zip64 != Zip64.NULL;
+    }
+
+    public void setZip64(Zip64 zip64) {
+        this.zip64 = zip64;
+        activity = zip64 == Zip64.NULL ? new PlainActivity() : new Zip64Activity();
     }
 
     public void zip64() {

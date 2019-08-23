@@ -10,6 +10,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.util.function.LongSupplier;
+import java.util.function.Supplier;
 
 /**
  * @author Oleg Cherednik
@@ -33,36 +34,42 @@ public final class LocalFileHeaderBuilder {
         localFileHeader.setGeneralPurposeFlag(fileHeader.getGeneralPurposeFlag().getAsInt());
         localFileHeader.setCompressionMethod(fileHeader.getEncryption().getCompressionMethod(fileHeader));
         localFileHeader.setLastModifiedTime(fileHeader.getLastModifiedTime());
-        localFileHeader.setCrc32(getValue(() -> fileHeader.getEncryption().getChecksum(fileHeader)));
-        localFileHeader.setCompressedSize(getValue(fileHeader::getOriginalCompressedSize));
-        localFileHeader.setUncompressedSize(getValue(fileHeader::getOriginalCompressedSize));
+        localFileHeader.setCrc32(getCrc32().getAsLong());
+        localFileHeader.setCompressedSize(getCompressedSize().getAsLong());
+        localFileHeader.setUncompressedSize(getUncompressedSize().getAsLong());
         localFileHeader.setFileName(fileHeader.getFileName());
         updateExtraField(localFileHeader.getExtraField());
 
         return localFileHeader;
     }
 
-    private long getValue(LongSupplier supplier) {
+    private LongSupplier getCrc32() {
         if (fileHeader.getGeneralPurposeFlag().isDataDescriptorExists())
-            return LOOK_IN_DATA_DESCRIPTOR;
-        if (zipModel.isZip64())
-            return LOOK_IN_EXTRA_FIELD;
-        return supplier.getAsLong();
+            return () -> LOOK_IN_DATA_DESCRIPTOR;
+        return zipModel.getActivity().getCrc32LocalFileHeader(fileHeader::getCrc32);
+    }
+
+    private LongSupplier getCompressedSize() {
+        if (fileHeader.getGeneralPurposeFlag().isDataDescriptorExists())
+            return () -> LOOK_IN_DATA_DESCRIPTOR;
+        return zipModel.getActivity().getCompressedSizeLocalFileHeader(fileHeader::getOriginalCompressedSize);
+    }
+
+    private LongSupplier getUncompressedSize() {
+        if (fileHeader.getGeneralPurposeFlag().isDataDescriptorExists())
+            return () -> LOOK_IN_DATA_DESCRIPTOR;
+        return zipModel.getActivity().getUncompressedSizeLocalFileHeader(fileHeader::getOriginalUncompressedSize);
     }
 
     private void updateExtraField(ExtraField extraField) {
-        extraField.setExtendedInfo(getExtendedInfo());
+        extraField.setExtendedInfo(getExtendedInfo().get());
         extraField.setAesExtraDataRecord(getAesExtraDataRecord());
     }
 
-    private Zip64.ExtendedInfo getExtendedInfo() {
-        if (fileHeader.getGeneralPurposeFlag().isDataDescriptorExists() || !zipModel.isZip64())
-            return Zip64.ExtendedInfo.NULL;
-
-        return Zip64.ExtendedInfo.builder()
-                                 .compressedSize(fileHeader.getCompressedSize())
-                                 .uncompressedSize(fileHeader.getUncompressedSize())
-                                 .build();
+    private Supplier<Zip64.ExtendedInfo> getExtendedInfo() {
+        if (fileHeader.getGeneralPurposeFlag().isDataDescriptorExists())
+            return () -> Zip64.ExtendedInfo.NULL;
+        return zipModel.getActivity().getExtendedInfoLocalFileHeader(fileHeader);
     }
 
     private AesExtraDataRecord getAesExtraDataRecord() {

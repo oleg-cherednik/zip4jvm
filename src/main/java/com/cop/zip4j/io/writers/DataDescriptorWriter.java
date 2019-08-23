@@ -2,6 +2,7 @@ package com.cop.zip4j.io.writers;
 
 import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.model.DataDescriptor;
+import com.cop.zip4j.model.activity.Activity;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -16,19 +17,13 @@ public final class DataDescriptorWriter {
 
     @NonNull
     private final DataDescriptor dataDescriptor;
-    private final boolean zip64;
+    private final Activity activity;
 
     public void write(@NonNull DataOutput out) throws IOException {
         out.writeDwordSignature(DataDescriptor.SIGNATURE);
         out.writeDword(dataDescriptor.getCrc32());
-
-        if (zip64) {
-            out.writeQword(dataDescriptor.getCompressedSize());
-            out.writeQword(dataDescriptor.getUncompressedSize());
-        } else {
-            out.writeDword(dataDescriptor.getCompressedSize());
-            out.writeDword(dataDescriptor.getUncompressedSize());
-        }
+        activity.writeValueDataDescriptor(dataDescriptor.getCompressedSize(), out);
+        activity.writeValueDataDescriptor(dataDescriptor.getUncompressedSize(), out);
     }
 
 }
