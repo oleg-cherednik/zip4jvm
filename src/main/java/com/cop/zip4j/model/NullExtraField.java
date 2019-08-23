@@ -20,11 +20,6 @@ public final class NullExtraField extends ExtraField {
     }
 
     @Override
-    public ExtraField deepCopy() {
-        return NULL;
-    }
-
-    @Override
     public String toString() {
         return "<null>";
     }

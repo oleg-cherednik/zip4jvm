@@ -23,12 +23,12 @@ final class AesExtraDataRecordReader {
         if (signature != AesExtraDataRecord.SIGNATURE)
             return AesExtraDataRecord.NULL;
 
-        AesExtraDataRecord record = new AesExtraDataRecord();
-        record.setDataSize(in.readWord());
-        record.setVersionNumber(in.readWord());
-        record.setVendor(in.readString(2));
-        record.setStrength(AesStrength.parseValue(in.readByte()));
-        record.setCompressionMethod(CompressionMethod.parseValue(in.readWord()));
-        return record;
+        return AesExtraDataRecord.builder()
+                                 .size(in.readWord())
+                                 .versionNumber(in.readWord())
+                                 .vendor(in.readString(2))
+                                 .strength(AesStrength.parseValue(in.readByte()))
+                                 .compressionMethod(CompressionMethod.parseValue(in.readWord()))
+                                 .build();
     }
 }

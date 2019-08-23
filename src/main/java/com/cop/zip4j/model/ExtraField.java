@@ -27,19 +27,7 @@ public class ExtraField {
     }
 
     public int getSize() {
-        return extendedInfo.getBlockSize() + aesExtraDataRecord.getSize();
-    }
-
-    @NonNull
-    public ExtraField deepCopy() {
-        ExtraField res = new ExtraField();
-
-        if (extendedInfo != Zip64.ExtendedInfo.NULL)
-            res.setExtendedInfo(extendedInfo.toBuilder().build());
-        if (aesExtraDataRecord != AesExtraDataRecord.NULL)
-            res.setAesExtraDataRecord(aesExtraDataRecord.toBuilder().build());
-
-        return res;
+        return extendedInfo.getBlockSize() + aesExtraDataRecord.getBlockSize();
     }
 
 }

@@ -81,17 +81,16 @@ public class CentralDirectoryBuilder {
         if (encryption != Encryption.AES)
             return AesExtraDataRecord.NULL;
 
-        AesExtraDataRecord aesDataRecord = new AesExtraDataRecord();
-        aesDataRecord.setDataSize(7);
-        aesDataRecord.setVendor("AE");
-        // Always set the version number to 2 as we do not store CRC for any AES encrypted files
-        // only MAC is stored and as per the specification, if version number is 2, then MAC is read
-        // and CRC is ignored
-        aesDataRecord.setVersionNumber((short)2);
-        aesDataRecord.setStrength(entry.getStrength());
-        aesDataRecord.setCompressionMethod(entry.getCompression().getMethod());
-
-        return aesDataRecord;
+        return AesExtraDataRecord.builder()
+                                 .size(7)
+                                 .vendor("AE")
+                                 // Always set the version number to 2 as we do not store CRC for any AES encrypted files
+                                 // only MAC is stored and as per the specification, if version number is 2, then MAC is read
+                                 // and CRC is ignored
+                                 .versionNumber((short)2)
+                                 .strength(entry.getStrength())
+                                 .compressionMethod(entry.getCompression().getMethod())
+                                 .build();
     }
 
 }
