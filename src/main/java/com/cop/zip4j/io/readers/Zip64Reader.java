@@ -99,13 +99,20 @@ final class Zip64Reader {
             if (signature != Zip64.ExtendedInfo.SIGNATURE)
                 return Zip64.ExtendedInfo.NULL;
 
-            return Zip64.ExtendedInfo.builder()
-                                     .size(in.readWord())
-                                     .uncompressedSize(uncompressedSize ? in.readQword() : ExtraField.NO_DATA)
-                                     .compressedSize(compressedSize ? in.readQword() : ExtraField.NO_DATA)
-                                     .offsLocalHeaderRelative(offs ? in.readQword() : ExtraField.NO_DATA)
-                                     .diskNumber(diskNumber ? in.readDword() : ExtraField.NO_DATA)
-                                     .build();
+            int size = in.readWord();
+            long offs = in.getOffs();
+
+            Zip64.ExtendedInfo extendedInfo = Zip64.ExtendedInfo.builder()
+                                                                .uncompressedSize(uncompressedSize ? in.readQword() : ExtraField.NO_DATA)
+                                                                .compressedSize(compressedSize ? in.readQword() : ExtraField.NO_DATA)
+                                                                .offsLocalHeaderRelative(this.offs ? in.readQword() : ExtraField.NO_DATA)
+                                                                .diskNumber(diskNumber ? in.readDword() : ExtraField.NO_DATA)
+                                                                .build();
+
+            if (in.getOffs() - offs != size)
+                throw new Zip4jException("Illegal number of written bytes");
+
+            return extendedInfo;
         }
 
     }

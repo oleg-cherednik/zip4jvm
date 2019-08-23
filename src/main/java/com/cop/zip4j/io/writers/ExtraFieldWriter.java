@@ -29,7 +29,7 @@ final class ExtraFieldWriter {
         new Zip64Writer.ExtendedInfo(extraField.getExtendedInfo()).write(out);
         new AesExtraDataRecordWriter(extraField.getAesExtraDataRecord(), charset).write(out);
 
-        if(extraField.getLength() != out.getWrittenBytesAmount(MARK))
+        if(extraField.getSize() != out.getWrittenBytesAmount(MARK))
             throw new Zip4jException("Illegal number of written bytes");
     }
 

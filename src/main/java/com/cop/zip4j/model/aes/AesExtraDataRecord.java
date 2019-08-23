@@ -52,7 +52,7 @@ public class AesExtraDataRecord {
         return buf;
     }
 
-    public int getLength() {
+    public int getSize() {
         return SIZE;
     }
 
@@ -84,7 +84,7 @@ public class AesExtraDataRecord {
         }
 
         @Override
-        public int getLength() {
+        public int getSize() {
             return 0;
         }
 

@@ -26,8 +26,8 @@ public class ExtraField {
         return extendedInfo == null && aesExtraDataRecord == null;
     }
 
-    public int getLength() {
-        return extendedInfo.getLength() + aesExtraDataRecord.getLength();
+    public int getSize() {
+        return extendedInfo.getBlockSize() + aesExtraDataRecord.getSize();
     }
 
     @NonNull

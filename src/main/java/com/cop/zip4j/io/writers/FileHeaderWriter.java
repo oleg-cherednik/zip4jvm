@@ -41,7 +41,7 @@ final class FileHeaderWriter {
         out.writeDword(fileHeader.getCompressedSize());
         out.writeDword(fileHeader.getUncompressedSize());
         out.writeWord(fileName.length);
-        out.writeWord(fileHeader.getExtraField().getLength());
+        out.writeWord(fileHeader.getExtraField().getSize());
         out.writeWord(fileComment.length);
         out.writeWord(fileHeader.getDiskNumber());
         out.writeBytes(fileHeader.getInternalFileAttributes().get());

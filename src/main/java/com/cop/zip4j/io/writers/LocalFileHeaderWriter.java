@@ -32,7 +32,7 @@ public final class LocalFileHeaderWriter {
         out.writeDword(localFileHeader.getCompressedSize());
         out.writeDword(localFileHeader.getUncompressedSize());
         out.writeWord(fileName.length);
-        out.writeWord(localFileHeader.getExtraField().getLength());
+        out.writeWord(localFileHeader.getExtraField().getSize());
         out.writeBytes(fileName);
 
         new ExtraFieldWriter(localFileHeader.getExtraField(), charset).write(out);

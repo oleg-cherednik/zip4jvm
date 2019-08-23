@@ -75,7 +75,6 @@ public final class ZipModelWriter {
                 fileHeader.setExtraField(new ExtraField());
 
             fileHeader.getExtraField().setExtendedInfo(Zip64.ExtendedInfo.builder()
-                                                                         .size(8 + 8)
                                                                          .compressedSize(fileHeader.getCompressedSize())
                                                                          .uncompressedSize(fileHeader.getUncompressedSize())
 //                                                                         .offsLocalHeaderRelative(fileHeader.getOffsLocalFileHeader())

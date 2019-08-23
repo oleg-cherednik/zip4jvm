@@ -103,7 +103,6 @@ public final class Zip64 {
 
         // size:2 - tag for this "extra" block type (ZIP64 = 0x001)
         // size:2 - size of this "extra" block
-        private final int size;
         // size:8 - original uncompressed file size
         @Builder.Default
         private final long uncompressedSize = ExtraField.NO_DATA;
@@ -117,17 +116,22 @@ public final class Zip64 {
         @Builder.Default
         private final long diskNumber = ExtraField.NO_DATA;
 
-        public int getLength() {
-            int length = 0;
+        public int getDataSize() {
+            int size = 0;
 
-            length += uncompressedSize != ExtraField.NO_DATA ? 8 : 0;
-            length += compressedSize != ExtraField.NO_DATA ? 8 : 0;
-            length += offsLocalHeaderRelative != ExtraField.NO_DATA ? 8 : 0;
+            size += uncompressedSize != ExtraField.NO_DATA ? 8 : 0;
+            size += compressedSize != ExtraField.NO_DATA ? 8 : 0;
+            size += offsLocalHeaderRelative != ExtraField.NO_DATA ? 8 : 0;
 
-            return length != 0 ? length + SIZE_FIELD : 0;
+            return size;
         }
 
-        public static final ExtendedInfo NULL = new ExtendedInfo(0, ExtraField.NO_DATA, ExtraField.NO_DATA, ExtraField.NO_DATA, ExtraField.NO_DATA) {
+        public int getBlockSize() {
+            int size = getDataSize();
+            return size == 0 ? 0 : size + SIZE_FIELD;
+        }
+
+        public static final ExtendedInfo NULL = new ExtendedInfo(ExtraField.NO_DATA, ExtraField.NO_DATA, ExtraField.NO_DATA, ExtraField.NO_DATA) {
 
             @Override
             public String toString() {
