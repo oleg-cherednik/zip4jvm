@@ -57,8 +57,8 @@ public final class LocalFileHeaderReader {
      */
     private LocalFileHeader readDataDescriptor(LocalFileHeader localFileHeader) {
         localFileHeader.setCrc32(getFromFileHeader(localFileHeader::getCrc32, fileHeader::getCrc32));
-        localFileHeader.setCompressedSize(getFromFileHeader(localFileHeader::getCompressedSize, fileHeader::getActualCompressedSize));
-        localFileHeader.setUncompressedSize(getFromFileHeader(localFileHeader::getUncompressedSize, fileHeader::getActualUncompressedSize));
+        localFileHeader.setCompressedSize(getFromFileHeader(localFileHeader::getCompressedSize, fileHeader::getOriginalCompressedSize));
+        localFileHeader.setUncompressedSize(getFromFileHeader(localFileHeader::getUncompressedSize, fileHeader::getOriginalUncompressedSize));
         return localFileHeader;
     }
 

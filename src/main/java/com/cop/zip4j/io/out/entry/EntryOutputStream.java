@@ -31,7 +31,7 @@ public abstract class EntryOutputStream extends OutputStream {
 
     public static final int SPLIT_SIGNATURE = 0x08074b50;
 
-    private static final String MARK = EntryOutputStream.class.getSimpleName();
+    private static final String COMPRESSED_DATA = EntryOutputStream.class.getSimpleName();
 
     private final ZipModel zipModel;
     private final CentralDirectory.FileHeader fileHeader;
@@ -71,11 +71,10 @@ public abstract class EntryOutputStream extends OutputStream {
     }
 
     private void writeLocalFileHeader() throws IOException {
-        // TODO is this always 0?
         fileHeader.setOffsLocalFileHeader(out.getOffs());
         LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(zipModel, fileHeader).create();
         new LocalFileHeaderWriter(localFileHeader, zipModel.getCharset()).write(out);
-        out.mark(MARK);
+        out.mark(COMPRESSED_DATA);
     }
 
     private void writeEncryptionHeader() throws IOException {
@@ -112,7 +111,7 @@ public abstract class EntryOutputStream extends OutputStream {
 
     private void checkCompressedSize() {
         long expected = fileHeader.getCompressedSize();
-        long actual = out.getWrittenBytesAmount(MARK);
+        long actual = out.getWrittenBytesAmount(COMPRESSED_DATA);
 
         if (expected != 0 && expected != actual)
             throw new Zip4jException("CompressedSize is not matched: " + fileHeader.getFileName());
@@ -120,7 +119,7 @@ public abstract class EntryOutputStream extends OutputStream {
 
     private void updateFileHeader() {
         fileHeader.setCrc32(fileHeader.getEncryption().getChecksum().apply(fileHeader));
-        fileHeader.setCompressedSize(out.getWrittenBytesAmount(MARK));
+        fileHeader.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
     }
 
     private void writeDataDescriptor() throws IOException {

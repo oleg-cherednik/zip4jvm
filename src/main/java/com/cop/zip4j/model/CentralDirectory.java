@@ -185,11 +185,11 @@ public class CentralDirectory {
             return offsLocalFileHeader > ZipModel.ZIP_64_LIMIT;
         }
 
-        public long getActualCompressedSize() {
+        public long getOriginalCompressedSize() {
             return compressedSize == LOOK_IN_EXTRA_FIELD ? extraField.getExtendedInfo().getCompressedSize() : compressedSize;
         }
 
-        public long getActualUncompressedSize() {
+        public long getOriginalUncompressedSize() {
             return uncompressedSize == LOOK_IN_EXTRA_FIELD ? extraField.getExtendedInfo().getUncompressedSize() : uncompressedSize;
         }
 
