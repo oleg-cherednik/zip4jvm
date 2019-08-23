@@ -33,8 +33,23 @@ public class PlainActivity implements Activity {
         return () -> Zip64.ExtendedInfo.NULL;
     }
 
+    // DataDescriptor
+
     public void writeValueDataDescriptor(long value, @NonNull DataOutput out) throws IOException {
         out.writeDword(value);
     }
 
+    // FileHeader
+
+    public LongSupplier getCompressedSizeFileHeader(LongSupplier originalCompressedSize) {
+        return originalCompressedSize;
+    }
+
+    public LongSupplier getUncompressedSizeFileHeader(LongSupplier originalUncompressedSize) {
+        return originalUncompressedSize;
+    }
+
+    public Supplier<Zip64.ExtendedInfo> getExtendedInfoFileHeader(CentralDirectory.FileHeader fileHeader) {
+        return () -> Zip64.ExtendedInfo.NULL;
+    }
 }

@@ -10,8 +10,8 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
-
-import static com.cop.zip4j.model.builders.LocalFileHeaderBuilder.LOOK_IN_EXTRA_FIELD;
+import java.util.function.LongSupplier;
+import java.util.function.Supplier;
 
 @RequiredArgsConstructor
 public final class ZipModelWriter {
@@ -62,23 +62,31 @@ public final class ZipModelWriter {
     }
 
     private void updateFileHeaders() {
-        zipModel.getCentralDirectory().getFileHeaders().forEach(this::updateZip64);
+        zipModel.getCentralDirectory().getFileHeaders().forEach(fileHeader -> {
+            // TODO probably it's better to get size first and then update fileHeader
+            fileHeader.getExtraField().setExtendedInfo(getExtendedInfo(fileHeader).get());
+            fileHeader.setCompressedSize(getCompressedSize(fileHeader).getAsLong());
+            fileHeader.setUncompressedSize(getUncompressedSize(fileHeader).getAsLong());
+        });
     }
 
-    private void updateZip64(CentralDirectory.FileHeader fileHeader) {
+    private LongSupplier getCompressedSize(CentralDirectory.FileHeader fileHeader) {
         if (ZipUtils.isDirectory(fileHeader.getFileName()))
-            fileHeader.getExtraField().setExtendedInfo(Zip64.ExtendedInfo.NULL);
-        else if (zipModel.isZip64()) {
-            fileHeader.getExtraField().setExtendedInfo(Zip64.ExtendedInfo.builder()
-                                                                         .compressedSize(fileHeader.getCompressedSize())
-                                                                         .uncompressedSize(fileHeader.getUncompressedSize())
-//                                                                         .offsLocalHeaderRelative(fileHeader.getOffsLocalFileHeader())
-                                                                         .build());
+            return () -> 0;
+        return zipModel.getActivity().getCompressedSizeFileHeader(fileHeader::getOriginalCompressedSize);
+    }
 
-            fileHeader.setCompressedSize(LOOK_IN_EXTRA_FIELD);
-            fileHeader.setUncompressedSize(LOOK_IN_EXTRA_FIELD);
-        } else
-            fileHeader.getExtraField().setExtendedInfo(Zip64.ExtendedInfo.NULL);
+    private LongSupplier getUncompressedSize(CentralDirectory.FileHeader fileHeader) {
+        if (ZipUtils.isDirectory(fileHeader.getFileName()))
+            return () -> 0;
+        return zipModel.getActivity().getUncompressedSizeFileHeader(fileHeader::getOriginalUncompressedSize);
+    }
+
+    private Supplier<Zip64.ExtendedInfo> getExtendedInfo(CentralDirectory.FileHeader fileHeader) {
+        if (ZipUtils.isDirectory(fileHeader.getFileName()))
+            return () -> Zip64.ExtendedInfo.NULL;
+        return zipModel.getActivity().getExtendedInfoFileHeader(fileHeader);
+
     }
 
 }

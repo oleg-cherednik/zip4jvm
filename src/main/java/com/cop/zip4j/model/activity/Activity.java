@@ -29,4 +29,12 @@ public interface Activity {
 
     void writeValueDataDescriptor(long value, @NonNull DataOutput out) throws IOException;
 
+    // FileHeader
+
+    LongSupplier getCompressedSizeFileHeader(LongSupplier originalCompressedSize);
+
+    LongSupplier getUncompressedSizeFileHeader(LongSupplier originalUncompressedSize);
+
+    Supplier<Zip64.ExtendedInfo> getExtendedInfoFileHeader(CentralDirectory.FileHeader fileHeader);
+
 }

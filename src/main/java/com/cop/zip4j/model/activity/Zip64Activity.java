@@ -44,4 +44,22 @@ public class Zip64Activity implements Activity {
         out.writeQword(value);
     }
 
+    // FileHeader
+
+    public LongSupplier getCompressedSizeFileHeader(LongSupplier originalCompressedSize) {
+        return () -> LOOK_IN_EXTRA_FIELD;
+    }
+
+    public LongSupplier getUncompressedSizeFileHeader(LongSupplier originalUncompressedSize) {
+        return () -> LOOK_IN_EXTRA_FIELD;
+    }
+
+    public Supplier<Zip64.ExtendedInfo> getExtendedInfoFileHeader(CentralDirectory.FileHeader fileHeader) {
+        return () -> Zip64.ExtendedInfo.builder()
+                                       .compressedSize(fileHeader.getOriginalCompressedSize())
+                                       .uncompressedSize(fileHeader.getOriginalUncompressedSize())
+//                                                                         .offsLocalHeaderRelative(fileHeader.getOffsLocalFileHeader())
+                                       .build();
+    }
+
 }
