@@ -15,6 +15,8 @@ import java.util.function.Supplier;
  */
 public interface Activity {
 
+    // LocalFileHeader
+
     LongSupplier getCrc32LocalFileHeader(LongSupplier originalCompressedSize);
 
     LongSupplier getCompressedSizeLocalFileHeader(LongSupplier originalCompressedSize);
@@ -22,6 +24,8 @@ public interface Activity {
     LongSupplier getUncompressedSizeLocalFileHeader(LongSupplier originalUncompressedSize);
 
     Supplier<Zip64.ExtendedInfo> getExtendedInfoLocalFileHeader(CentralDirectory.FileHeader fileHeader);
+
+    // DataDescriptor
 
     void writeValueDataDescriptor(long value, @NonNull DataOutput out) throws IOException;
 

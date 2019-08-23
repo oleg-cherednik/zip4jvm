@@ -15,6 +15,8 @@ import java.util.function.Supplier;
  */
 public class PlainActivity implements Activity {
 
+    // LocalFileHeader
+
     public LongSupplier getCrc32LocalFileHeader(LongSupplier originalCrc32) {
         return originalCrc32;
     }

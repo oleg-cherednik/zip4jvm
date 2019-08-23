@@ -17,6 +17,8 @@ import static com.cop.zip4j.model.builders.LocalFileHeaderBuilder.LOOK_IN_EXTRA_
  */
 public class Zip64Activity implements Activity {
 
+    // LocalFileHeader
+
     public LongSupplier getCrc32LocalFileHeader(LongSupplier originalCrc32) {
         return () -> LOOK_IN_EXTRA_FIELD;
     }
@@ -35,6 +37,8 @@ public class Zip64Activity implements Activity {
                                        .uncompressedSize(fileHeader.getOriginalUncompressedSize())
                                        .build();
     }
+
+    // DataDescriptor
 
     public void writeValueDataDescriptor(long value, @NonNull DataOutput out) throws IOException {
         out.writeQword(value);
