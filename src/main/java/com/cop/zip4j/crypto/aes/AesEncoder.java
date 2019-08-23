@@ -47,7 +47,7 @@ public final class AesEncoder implements Encoder {
     }
 
     @Override
-    public void writeHeader(@NonNull DataOutput out) throws IOException {
+    public void writeEncryptionHeader(@NonNull DataOutput out) throws IOException {
         out.writeBytes(salt);
         out.writeBytes(passwordChecksum);
     }

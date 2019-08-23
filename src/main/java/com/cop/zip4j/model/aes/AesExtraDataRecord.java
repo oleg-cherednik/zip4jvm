@@ -14,11 +14,11 @@ import java.nio.charset.Charset;
 @Builder
 public final class AesExtraDataRecord {
 
+    public static final AesExtraDataRecord NULL = builder().build();
+
     public static final int SIGNATURE = 0x9901;
     public static final int SIZE = 2 + 2 + 2 + 2 + 1 + 2;   // size:11
     public static final int SIZE_FIELD = 2 + 2; // 4 bytes: signature + size
-
-    public static final AesExtraDataRecord NULL = builder().build();
 
     // size:2 - signature (0x9901)
     // size:2

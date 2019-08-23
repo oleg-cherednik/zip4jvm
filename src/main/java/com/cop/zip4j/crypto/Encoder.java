@@ -13,7 +13,7 @@ public interface Encoder {
 
     Encoder NULL = new NullEncoder();
 
-    void writeHeader(@NonNull DataOutput out) throws IOException;
+    void writeEncryptionHeader(@NonNull DataOutput out) throws IOException;
 
     void encrypt(@NonNull byte[] buf, int offs, int len);
 

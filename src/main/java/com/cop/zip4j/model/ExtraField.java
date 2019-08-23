@@ -14,8 +14,6 @@ import lombok.Setter;
 public class ExtraField {
 
     public static final int NO_DATA = -1;
-    @SuppressWarnings("StaticInitializerReferencesSubClass")
-    public static final ExtraField NULL = new NullExtraField();
 
     @NonNull
     private Zip64.ExtendedInfo extendedInfo = Zip64.ExtendedInfo.NULL;

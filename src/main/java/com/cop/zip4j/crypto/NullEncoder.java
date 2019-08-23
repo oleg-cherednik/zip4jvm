@@ -12,7 +12,7 @@ import java.io.IOException;
 final class NullEncoder implements Encoder {
 
     @Override
-    public void writeHeader(@NonNull DataOutput out) throws IOException {
+    public void writeEncryptionHeader(@NonNull DataOutput out) throws IOException {
     }
 
     @Override

@@ -95,8 +95,10 @@ public final class Zip64 {
 
     /** see 4.5.3 */
     @Getter
-    @Builder(toBuilder = true)
-    public static class ExtendedInfo {
+    @Builder
+    public static final class ExtendedInfo {
+
+        public static final ExtendedInfo NULL = builder().build();
 
         public static final int SIGNATURE = 0x1;
         public static final int SIZE_FIELD = 2 + 2; // 4 bytes: signature + size
@@ -116,12 +118,13 @@ public final class Zip64 {
         @Builder.Default
         private final long diskNumber = ExtraField.NO_DATA;
 
+        @SuppressWarnings("ConstantConditions")
         public int getDataSize() {
             int size = 0;
 
-            size += uncompressedSize != ExtraField.NO_DATA ? 8 : 0;
-            size += compressedSize != ExtraField.NO_DATA ? 8 : 0;
-            size += offsLocalHeaderRelative != ExtraField.NO_DATA ? 8 : 0;
+            size += uncompressedSize == ExtraField.NO_DATA ? 0 : 8;
+            size += compressedSize == ExtraField.NO_DATA ? 0 : 8;
+            size += offsLocalHeaderRelative == ExtraField.NO_DATA ? 0 : 8;
 
             return size;
         }
@@ -131,13 +134,10 @@ public final class Zip64 {
             return size == 0 ? 0 : size + SIZE_FIELD;
         }
 
-        public static final ExtendedInfo NULL = new ExtendedInfo(ExtraField.NO_DATA, ExtraField.NO_DATA, ExtraField.NO_DATA, ExtraField.NO_DATA) {
-
-            @Override
-            public String toString() {
-                return "<null>";
-            }
-        };
+        @Override
+        public String toString() {
+            return this == NULL ? "<null>" : super.toString();
+        }
     }
 
 }

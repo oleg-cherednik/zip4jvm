@@ -25,7 +25,7 @@ public final class PkwareEncoder implements Encoder {
     }
 
     @Override
-    public void writeHeader(@NonNull DataOutput out) throws IOException {
+    public void writeEncryptionHeader(@NonNull DataOutput out) throws IOException {
         header.write(out);
     }
 

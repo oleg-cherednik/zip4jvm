@@ -63,8 +63,9 @@ public abstract class EntryOutputStream extends OutputStream {
             out.writeDwordSignature(SPLIT_SIGNATURE);
 
         zipModel.addFileHeader(fileHeader);
+
         writeLocalFileHeader();
-        encoder.writeHeader(out);
+        writeEncryptionHeader();
 
         return this;
     }
@@ -75,6 +76,10 @@ public abstract class EntryOutputStream extends OutputStream {
         LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(zipModel, fileHeader).create();
         new LocalFileHeaderWriter(localFileHeader, zipModel.getCharset()).write(out);
         out.mark(MARK);
+    }
+
+    private void writeEncryptionHeader() throws IOException {
+        encoder.writeEncryptionHeader(out);
     }
 
     protected final void updateChecksum(byte[] buf, int offs, int len) {
