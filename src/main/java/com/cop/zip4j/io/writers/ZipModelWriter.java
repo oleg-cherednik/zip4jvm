@@ -3,7 +3,6 @@ package com.cop.zip4j.io.writers;
 import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.EndCentralDirectory;
-import com.cop.zip4j.model.ExtraField;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.utils.ZipUtils;
@@ -71,9 +70,6 @@ public final class ZipModelWriter {
             if (fileHeader.getExtraField().getExtendedInfo() != Zip64.ExtendedInfo.NULL)
                 fileHeader.getExtraField().setExtendedInfo(Zip64.ExtendedInfo.NULL);
         } else {
-            if (fileHeader.getExtraField() == ExtraField.NULL)
-                fileHeader.setExtraField(new ExtraField());
-
             fileHeader.getExtraField().setExtendedInfo(Zip64.ExtendedInfo.builder()
                                                                          .compressedSize(fileHeader.getCompressedSize())
                                                                          .uncompressedSize(fileHeader.getUncompressedSize())

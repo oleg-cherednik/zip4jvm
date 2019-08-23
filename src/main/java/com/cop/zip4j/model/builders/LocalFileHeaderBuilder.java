@@ -51,15 +51,9 @@ public final class LocalFileHeaderBuilder {
     }
 
     private ExtraField getExtraField() {
-        Zip64.ExtendedInfo extendedInfo = getExtendedInfo();
-        AesExtraDataRecord aesExtraDataRecord = fileHeader.getExtraField().getAesExtraDataRecord();
-
-        if (extendedInfo == Zip64.ExtendedInfo.NULL && aesExtraDataRecord == AesExtraDataRecord.NULL)
-            return ExtraField.NULL;
-
         ExtraField extraField = new ExtraField();
-        extraField.setExtendedInfo(extendedInfo);
-        extraField.setAesExtraDataRecord(aesExtraDataRecord);
+        extraField.setExtendedInfo(getExtendedInfo());
+        extraField.setAesExtraDataRecord(getAesExtraDataRecord());
         return extraField;
     }
 
@@ -71,6 +65,10 @@ public final class LocalFileHeaderBuilder {
                                  .compressedSize(fileHeader.getCompressedSize())
                                  .uncompressedSize(fileHeader.getUncompressedSize())
                                  .build();
+    }
+
+    private AesExtraDataRecord getAesExtraDataRecord() {
+        return fileHeader.getExtraField().getAesExtraDataRecord();
     }
 
 }

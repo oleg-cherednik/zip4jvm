@@ -22,12 +22,13 @@ public class ExtraField {
     @NonNull
     private AesExtraDataRecord aesExtraDataRecord = AesExtraDataRecord.NULL;
 
-    public boolean isEmpty() {
-        return extendedInfo == null && aesExtraDataRecord == null;
-    }
-
     public int getSize() {
         return extendedInfo.getBlockSize() + aesExtraDataRecord.getBlockSize();
+    }
+
+    public void setFrom(@NonNull ExtraField extraField) {
+        extendedInfo = extraField.extendedInfo;
+        aesExtraDataRecord = extraField.aesExtraDataRecord;
     }
 
 }

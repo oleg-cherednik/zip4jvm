@@ -25,7 +25,7 @@ final class ExtraFieldReader {
     @NonNull
     public ExtraField read(@NonNull DataInput in) throws IOException {
         if (size <= 0)
-            return ExtraField.NULL;
+            return new ExtraField();
 
         ExtraField extraField = new ExtraField();
         final long offsMax = in.getOffs() + size;
@@ -44,7 +44,7 @@ final class ExtraFieldReader {
                 in.skip(in.readWord());
         }
 
-        return extraField.isEmpty() ? ExtraField.NULL : extraField;
+        return extraField;
     }
 
 }

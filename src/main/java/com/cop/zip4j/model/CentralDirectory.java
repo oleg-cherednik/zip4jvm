@@ -113,7 +113,7 @@ public class CentralDirectory {
         private String fileName;
         // size:m - extra field
         @NonNull
-        private ExtraField extraField = ExtraField.NULL;
+        private final ExtraField extraField = new ExtraField();
         // size:k - extra field
         private String fileComment;
 
@@ -143,9 +143,6 @@ public class CentralDirectory {
         }
 
         public void setZip64ExtendedInfo(@NonNull Zip64.ExtendedInfo info) {
-            if (extraField == ExtraField.NULL)
-                extraField = new ExtraField();
-
             extraField.setExtendedInfo(info);
 
 //            if (info != Zip64.ExtendedInfo.NULL) {
@@ -158,13 +155,11 @@ public class CentralDirectory {
         }
 
         public void setExtraField(@NonNull ExtraField extraField) {
-            this.extraField = extraField;
+            this.extraField.setFrom(extraField);
             generalPurposeFlag.setEncrypted(isEncrypted());
         }
 
         public void setAesExtraDataRecord(@NonNull AesExtraDataRecord record) {
-            if (extraField == ExtraField.NULL)
-                extraField = new ExtraField();
             extraField.setAesExtraDataRecord(record);
             generalPurposeFlag.setEncrypted(isEncrypted());
         }

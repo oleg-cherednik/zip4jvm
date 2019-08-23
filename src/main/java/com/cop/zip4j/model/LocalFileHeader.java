@@ -43,7 +43,7 @@ public class LocalFileHeader {
     private String fileName;
     // size:m - extra field
     @NonNull
-    private ExtraField extraField = ExtraField.NULL;
+    private final ExtraField extraField = new ExtraField();
 
     private long offs;
 
@@ -53,7 +53,7 @@ public class LocalFileHeader {
     }
 
     public void setExtraField(@NonNull ExtraField extraField) {
-        this.extraField = extraField;
+        this.extraField.setFrom(extraField);
         generalPurposeFlag.setEncrypted(isEncrypted());
     }
 
