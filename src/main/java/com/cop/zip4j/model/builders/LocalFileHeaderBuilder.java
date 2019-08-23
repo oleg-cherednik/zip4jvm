@@ -34,8 +34,8 @@ public final class LocalFileHeaderBuilder {
         localFileHeader.setCompressionMethod(fileHeader.getEncryption().getCompressionMethod(fileHeader));
         localFileHeader.setLastModifiedTime(fileHeader.getLastModifiedTime());
         localFileHeader.setCrc32(getValue(() -> fileHeader.getEncryption().getChecksum(fileHeader)));
-        localFileHeader.setCompressedSize(getValue(fileHeader::getCompressedSize));
-        localFileHeader.setUncompressedSize(getValue(fileHeader::getUncompressedSize));
+        localFileHeader.setCompressedSize(getValue(fileHeader::getOriginalCompressedSize));
+        localFileHeader.setUncompressedSize(getValue(fileHeader::getOriginalCompressedSize));
         localFileHeader.setFileName(fileHeader.getFileName());
         updateExtraField(localFileHeader.getExtraField());
 

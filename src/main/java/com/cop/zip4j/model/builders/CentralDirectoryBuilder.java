@@ -36,7 +36,7 @@ public class CentralDirectoryBuilder {
 
         fileHeader.setVersionMadeBy(CentralDirectory.FileHeader.VERSION);
         fileHeader.setVersionToExtract(CentralDirectory.FileHeader.VERSION);
-        updateGeneralPurposeFlag(fileHeader.getGeneralPurposeFlag());
+        updateGeneralPurposeFlag(fileHeader);
         fileHeader.setCompressionMethod(entry.getEncryption().getCompressionMethod(entry));
         fileHeader.setLastModifiedTime(entry.getLastModifiedTime());
         fileHeader.setCrc32(entry.checksum());
@@ -67,9 +67,11 @@ public class CentralDirectoryBuilder {
         return ZipUtils.normalizeFileName.apply(fileName);
     }
 
-    private void updateGeneralPurposeFlag(@NonNull GeneralPurposeFlag generalPurposeFlag) {
+    private void updateGeneralPurposeFlag(CentralDirectory.FileHeader fileHeader) {
+        GeneralPurposeFlag generalPurposeFlag = fileHeader.getGeneralPurposeFlag();
+
         generalPurposeFlag.setCompressionLevel(entry.getCompressionLevel());
-        generalPurposeFlag.setDataDescriptorExists(true);
+        generalPurposeFlag.setDataDescriptorExists(!ZipUtils.isDirectory(fileHeader.getFileName()));
         generalPurposeFlag.setUtf8(zipModel.getCharset() == StandardCharsets.UTF_8);
         generalPurposeFlag.setEncrypted(entry.getEncryption() != Encryption.OFF);
 //        generalPurposeFlag.setStrongEncryption(entry.getEncryption() == Encryption.STRONG);

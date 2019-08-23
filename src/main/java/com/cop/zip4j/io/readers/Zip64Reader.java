@@ -110,7 +110,7 @@ final class Zip64Reader {
                                                                 .build();
 
             if (in.getOffs() - offs != size)
-                throw new Zip4jException("Illegal number of written bytes");
+                throw new Zip4jException("Illegal number of read bytes");
 
             return extendedInfo;
         }
