@@ -7,6 +7,7 @@ import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.ExternalFileAttributes;
 import com.cop.zip4j.model.InternalFileAttributes;
 import com.cop.zip4j.utils.ZipUtils;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
@@ -24,7 +25,7 @@ final class FileHeaderReader {
 
     private final long totalEntries;
 
-    public List<CentralDirectory.FileHeader> read(DataInput in) throws IOException {
+    public List<CentralDirectory.FileHeader> read(@NonNull DataInput in) throws IOException {
         List<CentralDirectory.FileHeader> fileHeaders = new LinkedList<>();
 
         for (int i = 0; i < totalEntries; i++)
@@ -56,15 +57,18 @@ final class FileHeaderReader {
         fileHeader.setExternalFileAttributes(ExternalFileAttributes.read(in));
         fileHeader.setOffsLocalFileHeader(in.readDword());
         fileHeader.setFileName(ZipUtils.normalizeFileName.apply(in.readString(fileNameLength)));
+        updateExtraField(fileHeader, extraFieldLength, in);
+        fileHeader.setFileComment(in.readString(fileCommentLength));
 
+        return fileHeader;
+    }
+
+    private static void updateExtraField(CentralDirectory.FileHeader fileHeader, int extraFieldLength, DataInput in) throws IOException {
         boolean uncompressedSize = fileHeader.getUncompressedSize() == ZIP_64_LIMIT;
         boolean compressedSize = fileHeader.getCompressedSize() == ZIP_64_LIMIT;
         boolean offsHeader = fileHeader.getOffsLocalFileHeader() == ZIP_64_LIMIT;
         boolean diskNumber = fileHeader.getDiskNumber() == 0xFFFF;
-        fileHeader.setExtraField(new ExtraFieldReader(extraFieldLength, uncompressedSize, compressedSize, offsHeader, diskNumber).read(in));
-        fileHeader.setFileComment(in.readString(fileCommentLength));
-
-        return fileHeader;
+        new ExtraFieldReader(extraFieldLength, uncompressedSize, compressedSize, offsHeader, diskNumber, fileHeader.getExtraField()).read(in);
     }
 
 }

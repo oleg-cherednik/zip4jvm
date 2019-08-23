@@ -37,7 +37,7 @@ public final class LocalFileHeaderBuilder {
         localFileHeader.setCompressedSize(getValue(fileHeader::getCompressedSize));
         localFileHeader.setUncompressedSize(getValue(fileHeader::getUncompressedSize));
         localFileHeader.setFileName(fileHeader.getFileName());
-        localFileHeader.setExtraField(getExtraField());
+        updateExtraField(localFileHeader.getExtraField());
 
         return localFileHeader;
     }
@@ -50,11 +50,9 @@ public final class LocalFileHeaderBuilder {
         return supplier.getAsLong();
     }
 
-    private ExtraField getExtraField() {
-        ExtraField extraField = new ExtraField();
+    private void updateExtraField(ExtraField extraField) {
         extraField.setExtendedInfo(getExtendedInfo());
         extraField.setAesExtraDataRecord(getAesExtraDataRecord());
-        return extraField;
     }
 
     private Zip64.ExtendedInfo getExtendedInfo() {

@@ -41,14 +41,16 @@ public final class LocalFileHeaderReader {
         int fileNameLength = in.readWord();
         int extraFieldLength = in.readWord();
         localFileHeader.setFileName(ZipUtils.normalizeFileName.apply(in.readString(fileNameLength)));
-
-        boolean uncompressedSize = localFileHeader.getUncompressedSize() == LOOK_IN_EXTRA_FIELD;
-        boolean compressedSize = localFileHeader.getCompressedSize() == LOOK_IN_EXTRA_FIELD;
-        localFileHeader.setExtraField(new ExtraFieldReader(extraFieldLength, uncompressedSize, compressedSize, false, false).read(in));
-
+        updateExtraField(localFileHeader, extraFieldLength, in);
         localFileHeader.setOffs(in.getOffs());
 
         return readDataDescriptor(localFileHeader);
+    }
+
+    private static void updateExtraField(LocalFileHeader localFileHeader, int extraFieldLength, DataInput in) throws IOException {
+        boolean uncompressedSize = localFileHeader.getUncompressedSize() == LOOK_IN_EXTRA_FIELD;
+        boolean compressedSize = localFileHeader.getCompressedSize() == LOOK_IN_EXTRA_FIELD;
+        new ExtraFieldReader(extraFieldLength, uncompressedSize, compressedSize, false, false, localFileHeader.getExtraField()).read(in);
     }
 
     /**

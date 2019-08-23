@@ -21,13 +21,15 @@ final class ExtraFieldReader {
     private final boolean compressedSize;
     private final boolean offs;
     private final boolean diskNumber;
+    private final ExtraField extraField;
 
-    @NonNull
-    public ExtraField read(@NonNull DataInput in) throws IOException {
+    public void read(@NonNull DataInput in) throws IOException {
+        extraField.setExtendedInfo(Zip64.ExtendedInfo.NULL);
+        extraField.setAesExtraDataRecord(AesExtraDataRecord.NULL);
+
         if (size <= 0)
-            return new ExtraField();
+            return;
 
-        ExtraField extraField = new ExtraField();
         final long offsMax = in.getOffs() + size;
 
         while (in.getOffs() < offsMax) {
@@ -43,8 +45,6 @@ final class ExtraFieldReader {
             else
                 in.skip(in.readWord());
         }
-
-        return extraField;
     }
 
 }
