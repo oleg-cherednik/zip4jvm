@@ -70,6 +70,7 @@ public abstract class EntryOutputStream extends OutputStream {
     }
 
     private void writeLocalFileHeader() throws IOException {
+        // TODO is this always 0?
         fileHeader.setOffsLocalFileHeader(out.getOffs());
         LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(zipModel, fileHeader).create();
         new LocalFileHeaderWriter(localFileHeader, zipModel.getCharset()).write(out);

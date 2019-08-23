@@ -1,7 +1,9 @@
 package com.cop.zip4j;
 
 import com.cop.zip4j.model.Compression;
+import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ZipParameters;
+import com.cop.zip4j.model.aes.AesStrength;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -16,7 +18,6 @@ import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
  * @author Oleg Cherednik
  * @since 06.04.2019
  */
-@Test
 @SuppressWarnings({ "FieldNamingConvention", "NewClassNamingConvention" })
 public class Zip64Test {
 
@@ -32,16 +33,17 @@ public class Zip64Test {
         Zip4jSuite.removeDir(rootDir);
     }
 
-    private Path zipFile;
+    private Path zipFile1;
 
+    @Test
     public void shouldZipWhenZip64() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compression(Compression.STORE)
                                                 .zip64(true)
                                                 .build();
 
-        zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
+        zipFile1 = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        ZipIt zip = ZipIt.builder().zipFile(zipFile1).build();
         zip.add(Zip4jSuite.srcDir, parameters);
 
         // TODO it seems it could be checked with commons-compress
@@ -53,39 +55,42 @@ public class Zip64Test {
     public void shouldUnzipWhenZip64() throws IOException {
         Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         UnzipIt unzip = UnzipIt.builder()
-                               .zipFile(zipFile)
+                               .zipFile(zipFile1)
                                .build();
         unzip.extract(dstDir);
         assertThatDirectory(dstDir).matches(TestUtils.dirAssert);
     }
 
-//    public void shouldZipWhenZip64AndAesEncryption() throws IOException {
-//        ZipParameters parameters = ZipParameters.builder()
-//                                                .compressionMethod(Compression.STORE)
-//                                                .encryption(Encryption.AES)
-//                                                .strength(AesStrength.KEY_STRENGTH_256)
-//                                                .zip64(true)
-//                                                .build();
-//
-//        zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-//        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-//        zip.add(Zip4jSuite.srcDir, parameters);
-//
-//        // TODO it seems it could be checked with commons-compress
-////        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-////        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
-//    }
-//
-//    @Test(dependsOnMethods = "shouldZipWhenZip64AndAesEncryption")
-//    public void shouldUnzipWhenZip64AndAesEncryption() throws IOException {
-//        Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-//        UnzipIt unzip = UnzipIt.builder()
-//                               .zipFile(zipFile)
-//                               .build();
-//        unzip.extract(dstDir);
-//        assertThatDirectory(dstDir).matches(TestUtils.dirAssert);
-//    }
+    private Path zipFile2;
 
+    @Test
+    public void shouldZipWhenZip64AndAesEncryption() throws IOException {
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compression(Compression.STORE)
+                                                .encryption(Encryption.AES)
+                                                .strength(AesStrength.KEY_STRENGTH_256)
+                                                .zip64(true)
+                                                .comment("password: " + new String(Zip4jSuite.password))
+                                                .password(Zip4jSuite.password).build();
 
+        zipFile2 = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        ZipIt zip = ZipIt.builder().zipFile(zipFile2).build();
+        zip.add(Zip4jSuite.srcDir, parameters);
+
+        // TODO it seems it could be checked with commons-compress
+//        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+//        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
+    }
+
+    @Test(dependsOnMethods = "shouldZipWhenZip64AndAesEncryption")
+    public void shouldUnzipWhenZip64AndAesEncryption() throws IOException {
+        Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        UnzipIt unzip = UnzipIt.builder()
+                               .zipFile(zipFile2)
+                               .password(Zip4jSuite.password)
+                               .build();
+        unzip.extract(dstDir);
+        assertThatDirectory(dstDir).matches(TestUtils.dirAssert);
+    }
 
 }
