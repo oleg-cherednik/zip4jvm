@@ -95,7 +95,7 @@ public class ZipModel {
         dir.setDisk(endCentralDirectory.getSplitParts());
         dir.setStartDisk(endCentralDirectory.getStartDiskNumber());
         dir.setDiskEntries(countNumberOfFileHeaderEntriesOnDisk());
-        dir.setTotalEntries(getFileHeaders().size());
+//        dir.setTotalEntries(getFileHeaders().size());
         dir.setSize(endCentralDirectory.getSize());
         dir.setOffs(endCentralDirectory.getOffs());
 
@@ -190,6 +190,7 @@ public class ZipModel {
 
     public void addFileHeader(CentralDirectory.FileHeader fileHeader) {
         centralDirectory.addFileHeader(fileHeader);
+        activity.incTotalEntries(this);
         endCentralDirectory.incTotalEntries();
         endCentralDirectory.incDiskEntries();
     }

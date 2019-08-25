@@ -88,6 +88,10 @@ public final class Zip64 {
             offs += delta;
         }
 
+        public void incTotalEntries() {
+            totalEntries++;
+        }
+
     }
 
     /** see 4.5.3 */
