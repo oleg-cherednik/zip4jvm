@@ -24,7 +24,7 @@ public final class ZipModelWriter {
 
     public void write(@NonNull DataOutput out) throws IOException {
         writeCentralDirectoryHeaders(out);
-        writeZip64EndCentralDirectory(out);
+        writeZip64(out);
         writeEndCentralDirectory(out);
     }
 
@@ -38,7 +38,7 @@ public final class ZipModelWriter {
         endCentralDirectory.setSize(out.getWrittenBytesAmount(MARK));
     }
 
-    private void writeZip64EndCentralDirectory(DataOutput out) throws IOException {
+    private void writeZip64(DataOutput out) throws IOException {
         zipModel.updateZip64();
 
         if (zipModel.isZip64()) {

@@ -182,7 +182,7 @@ public class CentralDirectory {
         }
 
         public boolean isWriteZip64OffsetLocalHeader() {
-            return offsLocalFileHeader > ZipModel.ZIP_64_LIMIT;
+            return offsLocalFileHeader > Zip64.LIMIT;
         }
 
         public long getOriginalCompressedSize() {

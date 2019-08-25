@@ -2,7 +2,7 @@ package com.cop.zip4j.io.writers;
 
 import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.model.CentralDirectory;
-import com.cop.zip4j.model.ZipModel;
+import com.cop.zip4j.model.Zip64;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -46,7 +46,7 @@ final class FileHeaderWriter {
         out.writeWord(fileHeader.getDiskNumber());
         out.writeBytes(fileHeader.getInternalFileAttributes().get());
         out.writeBytes(fileHeader.getExternalFileAttributes().get());
-        out.writeDword(fileHeader.isWriteZip64OffsetLocalHeader() ? ZipModel.ZIP_64_LIMIT : fileHeader.getOffsLocalFileHeader());
+        out.writeDword(fileHeader.isWriteZip64OffsetLocalHeader() ? Zip64.LIMIT : fileHeader.getOffsLocalFileHeader());
         out.writeBytes(fileName);
         new ExtraFieldWriter(fileHeader.getExtraField(), charset).write(out);
         out.writeBytes(fileComment);

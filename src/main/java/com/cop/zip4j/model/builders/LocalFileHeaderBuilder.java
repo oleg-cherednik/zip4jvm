@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 public final class LocalFileHeaderBuilder {
 
     public static final long LOOK_IN_DATA_DESCRIPTOR = 0;
-    public static final long LOOK_IN_EXTRA_FIELD = ZipModel.ZIP_64_LIMIT;
+    public static final long LOOK_IN_EXTRA_FIELD = Zip64.LIMIT;
 
     @NonNull
     private final ZipModel zipModel;

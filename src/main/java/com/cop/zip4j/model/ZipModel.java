@@ -35,7 +35,6 @@ public class ZipModel {
     public static final int NO_SPLIT = -1;
     // MIN_SPLIT_LENGTH = 64K bytes
     public static final int MIN_SPLIT_LENGTH = 64 * 1024;
-    public static final long ZIP_64_LIMIT = 0xFFFF_FFFFL;
 
     @NonNull
     private final Path zipFile;

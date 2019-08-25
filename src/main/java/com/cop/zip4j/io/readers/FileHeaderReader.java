@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.cop.zip4j.model.ZipModel.ZIP_64_LIMIT;
+import static com.cop.zip4j.model.Zip64.LIMIT;
 
 /**
  * @author Oleg Cherednik
@@ -64,9 +64,9 @@ final class FileHeaderReader {
     }
 
     private static void updateExtraField(CentralDirectory.FileHeader fileHeader, int extraFieldLength, DataInput in) throws IOException {
-        boolean uncompressedSize = fileHeader.getUncompressedSize() == ZIP_64_LIMIT;
-        boolean compressedSize = fileHeader.getCompressedSize() == ZIP_64_LIMIT;
-        boolean offsHeader = fileHeader.getOffsLocalFileHeader() == ZIP_64_LIMIT;
+        boolean uncompressedSize = fileHeader.getUncompressedSize() == LIMIT;
+        boolean compressedSize = fileHeader.getCompressedSize() == LIMIT;
+        boolean offsHeader = fileHeader.getOffsLocalFileHeader() == LIMIT;
         boolean diskNumber = fileHeader.getDiskNumber() == 0xFFFF;
         new ExtraFieldReader(extraFieldLength, uncompressedSize, compressedSize, offsHeader, diskNumber, fileHeader.getExtraField()).read(in);
     }
