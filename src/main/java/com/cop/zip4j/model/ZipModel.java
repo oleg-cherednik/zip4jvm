@@ -116,18 +116,18 @@ public class ZipModel {
         return getTotalEntries() == 0;
     }
 
-    public long getTotalEntries() {
-        return isZip64() ? zip64.getEndCentralDirectory().getTotalEntries() : endCentralDirectory.getTotalEntries();
-    }
-
     public List<String> getEntryNames() {
         return getFileHeaders().stream()
                                .map(CentralDirectory.FileHeader::getFileName)
                                .collect(Collectors.toList());
     }
 
+    public long getTotalEntries() {
+        return activity.getTotalEntries(this);
+    }
+
     public long getCentralDirectoryOffs() {
-        return isZip64() ? zip64.getEndCentralDirectory().getOffs() : endCentralDirectory.getOffs();
+        return activity.getCentralDirectoryOffs(this);
     }
 
     public static Path getSplitFilePath(Path zipFile, int count) {

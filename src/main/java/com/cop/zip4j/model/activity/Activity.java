@@ -3,6 +3,7 @@ package com.cop.zip4j.model.activity;
 import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Zip64;
+import com.cop.zip4j.model.ZipModel;
 import lombok.NonNull;
 
 import java.io.IOException;
@@ -36,5 +37,11 @@ public interface Activity {
     LongSupplier getUncompressedSizeFileHeader(LongSupplier originalUncompressedSize);
 
     Supplier<Zip64.ExtendedInfo> getExtendedInfoFileHeader(CentralDirectory.FileHeader fileHeader);
+
+    // ZipModel
+
+    long getCentralDirectoryOffs(ZipModel zipModel);
+
+    long getTotalEntries(ZipModel zipModel);
 
 }

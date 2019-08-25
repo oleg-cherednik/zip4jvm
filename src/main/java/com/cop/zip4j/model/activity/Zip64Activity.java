@@ -3,6 +3,7 @@ package com.cop.zip4j.model.activity;
 import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Zip64;
+import com.cop.zip4j.model.ZipModel;
 import lombok.NonNull;
 
 import java.io.IOException;
@@ -60,6 +61,16 @@ public class Zip64Activity implements Activity {
                                        .uncompressedSize(fileHeader.getOriginalUncompressedSize())
 //                                                                         .offsLocalHeaderRelative(fileHeader.getOffsLocalFileHeader())
                                        .build();
+    }
+
+    // ZipModel
+
+    public long getCentralDirectoryOffs(ZipModel zipModel) {
+        return zipModel.getZip64().getEndCentralDirectory().getOffs();
+    }
+
+    public long getTotalEntries(ZipModel zipModel) {
+        return zipModel.getZip64().getEndCentralDirectory().getTotalEntries();
     }
 
 }

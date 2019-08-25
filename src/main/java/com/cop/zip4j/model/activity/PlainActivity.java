@@ -3,6 +3,7 @@ package com.cop.zip4j.model.activity;
 import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Zip64;
+import com.cop.zip4j.model.ZipModel;
 import lombok.NonNull;
 
 import java.io.IOException;
@@ -51,5 +52,15 @@ public class PlainActivity implements Activity {
 
     public Supplier<Zip64.ExtendedInfo> getExtendedInfoFileHeader(CentralDirectory.FileHeader fileHeader) {
         return () -> Zip64.ExtendedInfo.NULL;
+    }
+
+    // ZipModel
+
+    public long getCentralDirectoryOffs(ZipModel zipModel) {
+        return zipModel.getEndCentralDirectory().getOffs();
+    }
+
+    public long getTotalEntries(ZipModel zipModel) {
+        return zipModel.getEndCentralDirectory().getTotalEntries();
     }
 }
