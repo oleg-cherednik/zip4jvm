@@ -10,6 +10,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
@@ -20,36 +21,25 @@ public final class ZipModelWriter {
 
     @NonNull
     private final ZipModel zipModel;
-    private final boolean validate;
 
-    // TODO do we really need validate flag?
-    public void finalizeZipFile(@NonNull DataOutput out) throws IOException {
-        if (validate)
-            processHeaderData(out);
+    public void write(@NonNull DataOutput out) throws IOException {
+        writeCentralDirectoryHeaders(out);
+        writeZip64EndCentralDirectory(out);
+        writeEndCentralDirectory(out);
+    }
 
+    private void writeCentralDirectoryHeaders(DataOutput out) throws IOException {
+        updateEndCentralDirectory(out);
         updateFileHeaders();
 
         EndCentralDirectory endCentralDirectory = zipModel.getEndCentralDirectory();
         out.mark(MARK);
         new CentralDirectoryWriter(zipModel.getCentralDirectory(), zipModel.getCharset()).write(out);
         endCentralDirectory.setSize(out.getWrittenBytesAmount(MARK));
-
-        zipModel.updateZip64();
-
-        if (zipModel.isZip64() && validate) {
-            Zip64.EndCentralDirectoryLocator locator = zipModel.getZip64().getEndCentralDirectoryLocator();
-            locator.setStartDisk(out.getCounter());
-            locator.setTotalDisks(out.getCounter() + 1);
-        }
-
-        new Zip64Writer(zipModel.getZip64()).write(out);
-        new EndCentralDirectoryWriter(endCentralDirectory, zipModel.getCharset()).write(out);
     }
 
-    private void processHeaderData(DataOutput out) throws IOException {
-        EndCentralDirectory endCentralDirectory = zipModel.getEndCentralDirectory();
-        // TODO duplication set; see previous step
-        endCentralDirectory.setOffs(out.getOffs());
+    private void writeZip64EndCentralDirectory(DataOutput out) throws IOException {
+        zipModel.updateZip64();
 
         if (zipModel.isZip64()) {
             Zip64.EndCentralDirectoryLocator locator = zipModel.getZip64().getEndCentralDirectoryLocator();
@@ -57,6 +47,18 @@ public final class ZipModelWriter {
             locator.setTotalDisks(out.getCounter() + 1);
         }
 
+        new Zip64Writer(zipModel.getZip64()).write(out);
+    }
+
+    private void writeEndCentralDirectory(DataOutput out) throws IOException {
+        EndCentralDirectory dir = zipModel.getEndCentralDirectory();
+        Charset charset = zipModel.getCharset();
+        new EndCentralDirectoryWriter(dir, charset).write(out);
+    }
+
+    private void updateEndCentralDirectory(DataOutput out) {
+        EndCentralDirectory endCentralDirectory = zipModel.getEndCentralDirectory();
+        endCentralDirectory.setOffs(out.getOffs());
         endCentralDirectory.setSplitParts(out.getCounter());
         endCentralDirectory.setStartDiskNumber(out.getCounter());
     }

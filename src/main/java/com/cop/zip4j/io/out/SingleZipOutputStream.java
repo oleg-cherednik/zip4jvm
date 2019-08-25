@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 /**
- * This class is responsible for write and correctly close ons single zip file or single part of split zip file.
- *
  * @author Oleg Cherednik
  * @since 08.03.2019
  */
@@ -38,8 +36,7 @@ public class SingleZipOutputStream extends BaseDataOutput {
 
     @Override
     public void close() throws IOException {
-        zipModel.getEndCentralDirectory().setOffs(getOffs());
-        new ZipModelWriter(zipModel, true).finalizeZipFile(this);
+        new ZipModelWriter(zipModel).write(this);
         super.close();
     }
 

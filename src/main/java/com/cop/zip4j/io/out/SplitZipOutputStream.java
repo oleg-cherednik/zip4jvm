@@ -90,8 +90,7 @@ public class SplitZipOutputStream extends BaseDataOutput {
 
     @Override
     public void close() throws IOException {
-        zipModel.getEndCentralDirectory().setOffs(getOffs());
-        new ZipModelWriter(zipModel, true).finalizeZipFile(this);
+        new ZipModelWriter(zipModel).write(this);
         super.close();
     }
 

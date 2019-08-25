@@ -1,6 +1,5 @@
 package com.cop.zip4j.utils;
 
-import com.cop.zip4j.io.writers.ZipModelWriter;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.io.out.DataOutputStreamDecorator;
@@ -47,7 +46,6 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
 
         try (DataOutput out = SingleZipOutputStream.create(tmpZipFile, zipModel)) {
             writeFileHeaders(new DataOutputStreamDecorator(out), entries);
-            new ZipModelWriter(zipModel, true).finalizeZipFile(out);
         } catch(IOException e) {
             throw new Zip4jException(e);
         }
