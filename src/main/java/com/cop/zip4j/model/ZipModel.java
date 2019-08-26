@@ -9,7 +9,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.ArrayUtils;
 
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -61,11 +60,6 @@ public class ZipModel {
         return splitLength > 0 || endCentralDirectory.isSplitArchive();
     }
 
-    public void setNoSplitArchive() {
-        splitLength = NO_SPLIT;
-        endCentralDirectory.setNoSplitArchive();
-    }
-
     public boolean isZip64() {
         return zip64 != Zip64.NULL;
     }
@@ -84,14 +78,14 @@ public class ZipModel {
         endCentralDirectory.setComment(comment);
     }
 
-    public void updateZip64() {
+    public void updateZip64(int counter) {
         if (!isZip64())
             return;
 
         Zip64.EndCentralDirectory dir = zip64.getEndCentralDirectory();
-        dir.setSize(Zip64.EndCentralDirectory.SIZE + ArrayUtils.getLength(dir.getExtensibleDataSector()));
-        dir.setVersionMadeBy(isEmpty() ? CentralDirectory.FileHeader.VERSION : getFileHeaders().get(0).getVersionMadeBy());
-        dir.setVersionNeededToExtract(isEmpty() ? CentralDirectory.FileHeader.VERSION : getFileHeaders().get(0).getVersionToExtract());
+        dir.setSize(Zip64.EndCentralDirectory.SIZE + dir.getSizeEndCentralDirectory());
+        dir.setVersionMadeBy(CentralDirectory.FileHeader.VERSION);
+        dir.setVersionNeededToExtract(CentralDirectory.FileHeader.VERSION);
         dir.setDisk(endCentralDirectory.getSplitParts());
         dir.setStartDisk(endCentralDirectory.getStartDiskNumber());
         dir.setDiskEntries(countNumberOfFileHeaderEntriesOnDisk());
@@ -101,6 +95,17 @@ public class ZipModel {
 
         Zip64.EndCentralDirectoryLocator locator = zip64.getEndCentralDirectoryLocator();
         locator.setOffs(endCentralDirectory.getOffs() + endCentralDirectory.getSize());
+        locator.setStartDisk(counter);
+        locator.setTotalDisks(counter + 1);
+    }
+
+    private void updateZip64EndCentralDirLocator(long offs) throws Zip4jException {
+        if (isZip64()) {
+            Zip64.EndCentralDirectoryLocator locator = zip64.getEndCentralDirectoryLocator();
+            locator.setStartDisk(0);
+            locator.updateOffsetZip64EndOfCentralDirRec(offs);
+            locator.setTotalDisks(1);
+        }
     }
 
     private int countNumberOfFileHeaderEntriesOnDisk() {
@@ -113,7 +118,7 @@ public class ZipModel {
     }
 
     public boolean isEmpty() {
-        return centralDirectory.getFileHeaders().isEmpty();
+        return getFileHeaders().isEmpty();
     }
 
     public List<String> getEntryNames() {
@@ -136,13 +141,12 @@ public class ZipModel {
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")
     public void convertToSolid(long[] fileSizeList) {
-        long totalBytesWritten = Arrays.stream(fileSizeList).sum();
+        long offs = Arrays.stream(fileSizeList).sum();
 
-        setNoSplitArchive();
         updateFileHeaders(fileSizeList);
-        updateEndCentralDirectory(totalBytesWritten);
-        updateZip64EndCentralDirLocator(totalBytesWritten);
-        updateZip64EndCentralDirRec(totalBytesWritten);
+        updateEndCentralDirectory(offs);
+        updateZip64EndCentralDirLocator(offs);
+        updateZip64EndCentralDirRec(offs);
     }
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")
@@ -153,30 +157,22 @@ public class ZipModel {
         });
     }
 
-    private void updateEndCentralDirectory(long totalBytesWritten) throws Zip4jException {
+    private void updateEndCentralDirectory(long offs) throws Zip4jException {
+        splitLength = NO_SPLIT;
         endCentralDirectory.setSplitParts(0);
         endCentralDirectory.setStartDiskNumber(0);
         endCentralDirectory.setTotalEntries(getFileHeaders().size());
         endCentralDirectory.setDiskEntries(getFileHeaders().size());
-        endCentralDirectory.setOffs(totalBytesWritten);
+        endCentralDirectory.setOffs(offs);
     }
 
-    private void updateZip64EndCentralDirLocator(long totalBytesWritten) throws Zip4jException {
-        if (isZip64()) {
-            Zip64.EndCentralDirectoryLocator locator = zip64.getEndCentralDirectoryLocator();
-            locator.setStartDisk(0);
-            locator.updateOffsetZip64EndOfCentralDirRec(totalBytesWritten);
-            locator.setTotalDisks(1);
-        }
-    }
-
-    private void updateZip64EndCentralDirRec(long totalBytesWritten) throws Zip4jException {
+    private void updateZip64EndCentralDirRec(long offs) throws Zip4jException {
         if (isZip64()) {
             Zip64.EndCentralDirectory dir = zip64.getEndCentralDirectory();
             dir.setDisk(0);
             dir.setStartDisk(0);
             dir.setDiskEntries(endCentralDirectory.getTotalEntries());
-            dir.updateOffsetStartCenDirWRTStartDiskNo(totalBytesWritten);
+            dir.updateOffsetStartCenDirWRTStartDiskNo(offs);
         }
     }
 

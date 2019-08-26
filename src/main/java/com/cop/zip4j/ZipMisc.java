@@ -91,7 +91,7 @@ public final class ZipMisc {
         return new CreateZipModel(zipFile, charset).get().isSplitArchive();
     }
 
-    public void merge(@NonNull Path dstZipFile) {
+    public void merge(@NonNull Path destZipFile) {
         ZipModel zipModel = new CreateZipModel(zipFile, charset).get();
 
         // TODO probably if not split archive, just copy single zip file
@@ -99,12 +99,12 @@ public final class ZipMisc {
             throw new Zip4jException("archive not a split zip file");
 
         try {
-            Files.createDirectories(dstZipFile.getParent());
+            Files.createDirectories(destZipFile.getParent());
         } catch(IOException e) {
             throw new Zip4jException(e);
         }
 
-        try (DataOutput out = SingleZipOutputStream.create(dstZipFile, zipModel)) {
+        try (DataOutput out = SingleZipOutputStream.create(destZipFile, zipModel)) {
             zipModel.convertToSolid(copyAllParts(new DataOutputStreamDecorator(out), zipModel));
         } catch(Zip4jException e) {
             throw e;
@@ -114,12 +114,12 @@ public final class ZipMisc {
     }
 
     private static long[] copyAllParts(@NonNull OutputStream out, @NonNull ZipModel zipModel) throws IOException {
-        int noOfDisk = zipModel.getEndCentralDirectory().getSplitParts();
-        long[] fileSizeList = new long[noOfDisk + 1];
+        int totalSplitParts = zipModel.getEndCentralDirectory().getSplitParts();
+        long[] fileSizeList = new long[totalSplitParts + 1];
 
-        for (int i = 0; i <= noOfDisk; i++) {
-            try (InputStream in = new FileInputStream(zipModel.getPartFile(i + 1).toFile())) {
-                fileSizeList[i] = IOUtils.copyLarge(in, out, 0, i == noOfDisk ? zipModel.getCentralDirectoryOffs() : zipModel.getSplitLength());
+        for (int i = 0; i <= totalSplitParts; i++) {
+            try (InputStream in = new FileInputStream(zipModel.getPartFile(i).toFile())) {
+                fileSizeList[i] = IOUtils.copyLarge(in, out, 0, i == totalSplitParts ? zipModel.getCentralDirectoryOffs() : zipModel.getSplitLength());
             }
         }
 

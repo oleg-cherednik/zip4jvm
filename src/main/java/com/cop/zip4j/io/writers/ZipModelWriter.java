@@ -39,14 +39,7 @@ public final class ZipModelWriter {
     }
 
     private void writeZip64(DataOutput out) throws IOException {
-        zipModel.updateZip64();
-
-        if (zipModel.isZip64()) {
-            Zip64.EndCentralDirectoryLocator locator = zipModel.getZip64().getEndCentralDirectoryLocator();
-            locator.setStartDisk(out.getCounter());
-            locator.setTotalDisks(out.getCounter() + 1);
-        }
-
+        zipModel.updateZip64(out.getCounter());
         new Zip64Writer(zipModel.getZip64()).write(out);
     }
 
