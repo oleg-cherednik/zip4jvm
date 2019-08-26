@@ -54,7 +54,7 @@ public final class ZipModelReader {
         zipModel.setZip64(new Zip64Reader().read(in));
 
         long offs = zipModel.getCentralDirectoryOffs();
-        long totalEntries = zipModel.getTotalEntries();
+        long totalEntries = zipModel.getActivity().getTotalEntries(zipModel);
         zipModel.setCentralDirectory(new CentralDirectoryReader(offs, totalEntries).read(in));
 
         return zipModel;

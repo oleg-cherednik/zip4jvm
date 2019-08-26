@@ -63,8 +63,8 @@ public class ModifyCommentTest {
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
         assertThat(misc.getComment()).isEqualTo("Oleg Cherednik - Олег Чередник");
 
-        misc.setComment("this is new comment - ноый комментарий");
-        assertThat(misc.getComment()).isEqualTo("this is new comment - ноый комментарий");
+        misc.setComment("this is new comment - новый комментарий");
+        assertThat(misc.getComment()).isEqualTo("this is new comment - новый комментарий");
     }
 
     @Test(dependsOnMethods = "shouldAddCommentToExistedNoSplitZip")

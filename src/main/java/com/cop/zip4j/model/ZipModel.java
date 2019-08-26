@@ -113,17 +113,13 @@ public class ZipModel {
     }
 
     public boolean isEmpty() {
-        return getTotalEntries() == 0;
+        return centralDirectory.getFileHeaders().isEmpty();
     }
 
     public List<String> getEntryNames() {
         return getFileHeaders().stream()
                                .map(CentralDirectory.FileHeader::getFileName)
                                .collect(Collectors.toList());
-    }
-
-    public long getTotalEntries() {
-        return activity.getTotalEntries(this);
     }
 
     public long getCentralDirectoryOffs() {
