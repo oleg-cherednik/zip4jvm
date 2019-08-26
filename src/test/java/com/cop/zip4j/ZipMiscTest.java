@@ -116,4 +116,27 @@ public class ZipMiscTest {
         // TODO it's not working under gradle build
         assertThatZipFile(mergeZipFle).exists().rootEntry().matches(TestUtils.zipRootDirAssert);
     }
+
+//    public void shouldMergeZip64SplitZip() throws IOException {
+//        ZipParameters parameters = ZipParameters.builder()
+//                                                .compression(Compression.STORE)
+////                                                .splitLength(1024 * 1024)
+//                                                .zip64(true)
+//                                                .build();
+//
+//        Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+//        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
+//        zip.add(Zip4jSuite.srcDir, parameters);
+//
+//        ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
+//        assertThat(misc.isSplit()).isTrue();
+//
+//        Path mergeDir = zipFile.getParent().resolve("merges");
+//        Path mergeZipFle = mergeDir.resolve("src.zip");
+//        misc.merge(mergeZipFle);
+//
+//        assertThatDirectory(mergeDir).exists().hasSubDirectories(0).hasFiles(1);
+//        // TODO it's not working under gradle build
+//        assertThatZipFile(mergeZipFle).exists().rootEntry().matches(TestUtils.zipRootDirAssert);
+//    }
 }

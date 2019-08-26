@@ -93,4 +93,35 @@ public class Zip64Test {
         assertThatDirectory(dstDir).matches(TestUtils.dirAssert);
     }
 
+    private Path zipFile3;
+
+    @Test
+    public void shouldZipWhenZip64AndSplit() throws IOException {
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compression(Compression.STORE)
+                                                .zip64(true)
+                                                .splitLength(1024 * 1024)
+                                                .build();
+
+        zipFile3 = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        ZipIt zip = ZipIt.builder().zipFile(zipFile3).build();
+        zip.add(Zip4jSuite.srcDir, parameters);
+
+        // TODO it seems it could be checked with commons-compress
+//        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+//        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
+    }
+
+    @Test(dependsOnMethods = "shouldZipWhenZip64AndSplit")
+    public void shouldUnzipWhenZip64AndSplit() throws IOException {
+        Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        UnzipIt unzip = UnzipIt.builder()
+                               .zipFile(zipFile3)
+                               .password(Zip4jSuite.password)
+                               .build();
+        unzip.extract(dstDir);
+        assertThatDirectory(dstDir).matches(TestUtils.dirAssert);
+    }
+
+
 }

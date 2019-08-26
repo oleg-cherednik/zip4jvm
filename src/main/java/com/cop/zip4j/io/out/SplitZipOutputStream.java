@@ -35,7 +35,7 @@ public class SplitZipOutputStream extends BaseDataOutput {
     @Override
     public void writeWordSignature(int sig) throws IOException {
         doNotSplitSignature(2);
-        super.writeDwordSignature(sig);
+        super.writeWordSignature(sig);
     }
 
     @Override
