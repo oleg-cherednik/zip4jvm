@@ -65,6 +65,9 @@ public class PlainActivity implements Activity {
     }
 
     public void incTotalEntries(ZipModel zipModel) {
+        int a = 0;
+        a++;
         zipModel.getEndCentralDirectory().incTotalEntries();
+        a++;
     }
 }
