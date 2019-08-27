@@ -35,6 +35,11 @@ public abstract class PathZipEntry extends ZipEntry {
     @Setter
     protected char[] password;
 
+    @Setter
+    private long compressedSizeNew;
+    @Setter
+    private int disc;
+
     @Override
     public boolean isRegularFile() {
         return Files.isRegularFile(path);

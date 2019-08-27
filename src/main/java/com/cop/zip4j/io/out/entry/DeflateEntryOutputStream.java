@@ -5,6 +5,7 @@ import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.ZipModel;
+import com.cop.zip4j.model.entry.PathZipEntry;
 
 import java.io.IOException;
 import java.util.zip.Deflater;
@@ -20,9 +21,9 @@ final class DeflateEntryOutputStream extends EntryOutputStream {
 
     public boolean firstBytesRead;
 
-    public DeflateEntryOutputStream(ZipModel zipModel, CentralDirectory.FileHeader fileHeader, Encoder encoder, DataOutput out,
+    public DeflateEntryOutputStream(ZipModel zipModel, PathZipEntry entry, CentralDirectory.FileHeader fileHeader, Encoder encoder, DataOutput out,
             CompressionLevel compressionLevel) {
-        super(zipModel, fileHeader, encoder, out);
+        super(zipModel, entry, fileHeader, encoder, out);
         deflater.setLevel(compressionLevel.getCode());
     }
 
@@ -53,8 +54,7 @@ final class DeflateEntryOutputStream extends EntryOutputStream {
         if (firstBytesRead) {
             encoder.encrypt(buf, 0, len);
             out.write(buf, 0, len);
-        }
-        else {
+        } else {
             encoder.encrypt(buf, 2, len - 2);
             out.write(buf, 2, len - 2);
             firstBytesRead = true;

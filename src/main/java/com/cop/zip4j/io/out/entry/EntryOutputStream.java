@@ -34,6 +34,7 @@ public abstract class EntryOutputStream extends OutputStream {
     private static final String COMPRESSED_DATA = EntryOutputStream.class.getSimpleName();
 
     private final ZipModel zipModel;
+    private final PathZipEntry entry;
     private final CentralDirectory.FileHeader fileHeader;
     private final Checksum checksum = new CRC32();
 
@@ -50,9 +51,9 @@ public abstract class EntryOutputStream extends OutputStream {
         CentralDirectory.FileHeader fileHeader = new CentralDirectoryBuilder(entry, zipModel, out.getCounter()).create();
 
         if (compression == Compression.STORE)
-            return new StoreEntryOutputStream(zipModel, fileHeader, encoder, out);
+            return new StoreEntryOutputStream(zipModel, entry, fileHeader, encoder, out);
         if (compression == Compression.DEFLATE)
-            return new DeflateEntryOutputStream(zipModel, fileHeader, encoder, out, entry.getCompressionLevel());
+            return new DeflateEntryOutputStream(zipModel, entry, fileHeader, encoder, out, entry.getCompressionLevel());
 
         throw new Zip4jException("Compression is not supported: " + compression);
     }
@@ -96,6 +97,9 @@ public abstract class EntryOutputStream extends OutputStream {
 
         checkChecksum();
         checkCompressedSize();
+
+        entry.setCompressedSizeNew(out.getWrittenBytesAmount(COMPRESSED_DATA));
+        entry.setDisc(out.getCounter());
 
         updateFileHeader();
         writeDataDescriptor();

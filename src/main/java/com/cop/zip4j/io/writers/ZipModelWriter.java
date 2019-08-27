@@ -32,11 +32,13 @@ public final class ZipModelWriter {
         updateEndCentralDirectory(out);
         updateFileHeaders();
 
-        EndCentralDirectory endCentralDirectory = zipModel.getEndCentralDirectory();
+        CentralDirectory dir = new LocalCentralDirectoryBuilder().create(zipModel.getEntries(), zipModel);
+
         out.mark(MARK);
         new CentralDirectoryWriter(zipModel.getCentralDirectory(), zipModel.getCharset()).write(out);
-        endCentralDirectory.setSize(out.getWrittenBytesAmount(MARK));
+        zipModel.getEndCentralDirectory().setSize(out.getWrittenBytesAmount(MARK));
     }
+
 
     private void writeZip64(DataOutput out) throws IOException {
         zipModel.updateZip64(out.getCounter());

@@ -4,6 +4,7 @@ import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.activity.Activity;
 import com.cop.zip4j.model.activity.PlainActivity;
 import com.cop.zip4j.model.activity.Zip64Activity;
+import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.apache.commons.io.FilenameUtils;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,6 +48,8 @@ public class ZipModel {
     private Zip64 zip64 = Zip64.NULL;
     private long splitLength = NO_SPLIT;
     private Activity activity = new PlainActivity();
+
+    private final List<PathZipEntry> entries = new ArrayList<>();
 
     public void setEndCentralDirectory(@NonNull EndCentralDirectory endCentralDirectory) {
         this.endCentralDirectory = endCentralDirectory;
