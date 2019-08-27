@@ -5,6 +5,8 @@ import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.io.out.DataOutputStreamDecorator;
 import com.cop.zip4j.io.out.SingleZipOutputStream;
 import com.cop.zip4j.model.CentralDirectory;
+import com.cop.zip4j.model.EndCentralDirectory;
+import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.utils.CreateZipModel;
 import com.cop.zip4j.utils.RemoveEntryFunc;
@@ -21,6 +23,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -91,6 +94,19 @@ public final class ZipMisc {
         return new CreateZipModel(zipFile, charset).get().isSplitArchive();
     }
 
+    public void removeEntry(@NonNull String entryName) {
+        removeEntries(Collections.singletonList(entryName));
+    }
+
+    public void removeEntries(@NonNull Collection<String> entries) {
+        UnzipIt.checkZipFile(zipFile);
+
+        ZipModel zipModel = new CreateZipModel(zipFile, charset).get().noSplitOnly();
+        new RemoveEntryFunc(zipModel).accept(entries);
+    }
+
+    // --------- MergeSplitZip
+
     public void merge(@NonNull Path destZipFile) {
         ZipModel zipModel = new CreateZipModel(zipFile, charset).get();
 
@@ -105,11 +121,44 @@ public final class ZipMisc {
         }
 
         try (DataOutput out = SingleZipOutputStream.create(destZipFile, zipModel)) {
-            zipModel.convertToSolid(copyAllParts(new DataOutputStreamDecorator(out), zipModel));
+            convertToSolid(copyAllParts(new DataOutputStreamDecorator(out), zipModel), zipModel);
         } catch(Zip4jException e) {
             throw e;
         } catch(Exception e) {
             throw new Zip4jException(e);
+        }
+    }
+
+    private static void convertToSolid(long[] fileSizeList, ZipModel zipModel) {
+        long offs = Arrays.stream(fileSizeList).sum();
+
+        zipModel.getFileHeaders().forEach(fileHeader -> {
+            fileHeader.updateOffLocalHeaderRelative(Arrays.stream(fileSizeList, 0, fileHeader.getDiskNumber()).sum());
+            fileHeader.setDiskNumber(0);
+        });
+
+        zipModel.setSplitLength(ZipModel.NO_SPLIT);
+        EndCentralDirectory endCentralDirectory = zipModel.getEndCentralDirectory();
+        endCentralDirectory.setSplitParts(0);
+        endCentralDirectory.setStartDiskNumber(0);
+        endCentralDirectory.setTotalEntries(zipModel.getFileHeaders().size());
+        endCentralDirectory.setDiskEntries(zipModel.getFileHeaders().size());
+        endCentralDirectory.setOffs(offs);
+
+        Zip64 zip64 = zipModel.getZip64();
+
+        if (zip64 != Zip64.NULL) {
+            Zip64.EndCentralDirectoryLocator locator = zip64.getEndCentralDirectoryLocator();
+            locator.setStartDisk(0);
+            locator.setOffs(locator.getOffs() + offs);
+            ;
+            locator.setTotalDisks(1);
+
+            Zip64.EndCentralDirectory dir = zip64.getEndCentralDirectory();
+            dir.setDisk(0);
+            dir.setStartDisk(0);
+            dir.setDiskEntries(endCentralDirectory.getTotalEntries());
+            dir.setOffs(dir.getOffs() + offs);
         }
     }
 
@@ -119,22 +168,12 @@ public final class ZipMisc {
 
         for (int i = 0; i <= totalSplitParts; i++) {
             try (InputStream in = new FileInputStream(zipModel.getPartFile(i).toFile())) {
-                fileSizeList[i] = IOUtils.copyLarge(in, out, 0, i == totalSplitParts ? zipModel.getCentralDirectoryOffs() : zipModel.getSplitLength());
+                fileSizeList[i] = IOUtils.copyLarge(in, out, 0,
+                        i == totalSplitParts ? zipModel.getCentralDirectoryOffs() : zipModel.getSplitLength());
             }
         }
 
         return fileSizeList;
-    }
-
-    public void removeEntry(@NonNull String entryName) {
-        removeEntries(Collections.singletonList(entryName));
-    }
-
-    public void removeEntries(@NonNull Collection<String> entries) {
-        UnzipIt.checkZipFile(zipFile);
-
-        ZipModel zipModel = new CreateZipModel(zipFile, charset).get().noSplitOnly();
-        new RemoveEntryFunc(zipModel).accept(entries);
     }
 
 }

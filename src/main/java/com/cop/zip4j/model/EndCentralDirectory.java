@@ -68,7 +68,4 @@ public class EndCentralDirectory {
         return splitParts > 0;
     }
 
-    public void setNoSplitArchive() {
-        splitParts = 0;
-    }
 }

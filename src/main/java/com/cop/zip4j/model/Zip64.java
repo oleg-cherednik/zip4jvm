@@ -47,10 +47,6 @@ public final class Zip64 {
         // size:4 - total number of disks
         private long totalDisks;
 
-        public void updateOffsetZip64EndOfCentralDirRec(long delta) {
-            offs += delta;
-        }
-
     }
 
     /** see 4.3.14 */
