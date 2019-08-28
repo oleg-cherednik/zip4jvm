@@ -91,9 +91,9 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
                 CentralDirectory.FileHeader header = zipModel.getFileHeaders().get(i);
                 PathZipEntry zipEntry = zipModel.getEntries().get(i);
 
-                if (prv != null) {
+                if (prvEntry != null) {
                     long curOffs = offsOut;
-                    long length = header.getOffsLocalFileHeader() - prv.getOffsLocalFileHeader();
+                    long length = zipEntry.getOffsLocalFileHeader() - prvEntry.getOffsLocalFileHeader();
                     offsIn += skip + IOUtils.copyLarge(in, out, skip, length);
                     offsOut += length;
                     fileHeaders.add(prv);
@@ -113,7 +113,7 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
 //                fileHeader.setOffsLocalFileHeader(offsetLocalHdr - (offs - offsetLocalFileHeader) - 1);
                 }
 
-                if (entries.contains(header.getFileName())) {
+                if (entries.contains(zipEntry.getName())) {
                     prv = null;
                     prvEntry = null;
                 } else {
@@ -121,12 +121,12 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
                     prvEntry = zipEntry;
                 }
 
-                skip = header.getOffsLocalFileHeader() - offsIn;
+                skip = zipEntry.getOffsLocalFileHeader() - offsIn;
             }
 
-            if (prv != null) {
+            if (prvEntry != null) {
                 long curOffs = offsOut;
-                long length = zipModel.getCentralDirectoryOffs() - prv.getOffsLocalFileHeader();
+                long length = zipModel.getCentralDirectoryOffs() - prvEntry.getOffsLocalFileHeader();
                 offsOut += IOUtils.copyLarge(in, out, skip, length);
                 fileHeaders.add(prv);
                 zipEntries.add(prvEntry);
