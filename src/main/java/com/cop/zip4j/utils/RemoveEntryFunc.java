@@ -6,6 +6,7 @@ import com.cop.zip4j.io.out.DataOutputStreamDecorator;
 import com.cop.zip4j.io.out.SingleZipOutputStream;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.ZipModel;
+import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
@@ -72,21 +73,30 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
 
     private void writeFileHeaders(OutputStream out, Collection<String> entries) throws IOException {
         List<CentralDirectory.FileHeader> fileHeaders = new ArrayList<>();
+        List<PathZipEntry> zipEntries = new ArrayList<>();
         CentralDirectory.FileHeader prv = null;
+        PathZipEntry prvEntry = null;
 
         long offsIn = 0;
         long offsOut = 0;
         long skip = 0;
 
         try (InputStream in = new FileInputStream(zipModel.getZipFile().toFile())) {
-            for (CentralDirectory.FileHeader header : zipModel.getFileHeaders()) {
+            int total = zipModel.getFileHeaders().size();
+
+            for (int i = 0; i < total; i++) {
+                CentralDirectory.FileHeader header = zipModel.getFileHeaders().get(i);
+                PathZipEntry zipEntry = zipModel.getEntries().get(i);
+
                 if (prv != null) {
                     long curOffs = offsOut;
                     long length = header.getOffsLocalFileHeader() - prv.getOffsLocalFileHeader();
                     offsIn += skip + IOUtils.copyLarge(in, out, skip, length);
                     offsOut += length;
                     fileHeaders.add(prv);
+                    zipEntries.add(prvEntry);
                     prv.setOffsLocalFileHeader(curOffs);
+                    prvEntry.setOffsLocalFileHeader(curOffs);
                     skip = 0;
 
                     // TODO fix offs for zip64
@@ -100,7 +110,14 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
 //                fileHeader.setOffsLocalFileHeader(offsetLocalHdr - (offs - offsetLocalFileHeader) - 1);
                 }
 
-                prv = entries.contains(header.getFileName()) ? null : header;
+                if (entries.contains(header.getFileName())) {
+                    prv = null;
+                    prvEntry = null;
+                } else {
+                    prv = header;
+                    prvEntry = zipEntry;
+                }
+
                 skip = header.getOffsLocalFileHeader() - offsIn;
             }
 
@@ -109,11 +126,15 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
                 long length = zipModel.getCentralDirectoryOffs() - prv.getOffsLocalFileHeader();
                 offsOut += IOUtils.copyLarge(in, out, skip, length);
                 fileHeaders.add(prv);
+                zipEntries.add(prvEntry);
                 prv.setOffsLocalFileHeader(curOffs);
+                prvEntry.setOffsLocalFileHeader(curOffs);
             }
         }
 
         zipModel.setFileHeaders(fileHeaders);
+        zipModel.getEntries().clear();
+        zipModel.getEntries().addAll(zipEntries);
         zipModel.getEndCentralDirectory().setOffs(offsOut);
     }
 

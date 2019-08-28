@@ -46,7 +46,7 @@ public class RegularFileZipEntry extends PathZipEntry {
     }
 
     @Override
-    public void setCompression(@NonNull Compression compression) throws IOException {
+    public void setCompression(@NonNull Compression compression) {
         this.compression = size == 0 ? Compression.STORE : compression;
     }
 

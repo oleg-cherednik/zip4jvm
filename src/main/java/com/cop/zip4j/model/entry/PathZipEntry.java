@@ -9,7 +9,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -39,6 +38,8 @@ public abstract class PathZipEntry extends ZipEntry {
     private long compressedSizeNew;
     @Setter
     private int disc;
+    @Setter
+    private long offsLocalFileHeader;
 
     @Override
     public boolean isRegularFile() {
@@ -61,9 +62,9 @@ public abstract class PathZipEntry extends ZipEntry {
         return "/".equals(name) || "\\".equals(name);
     }
 
-    public abstract void setCompression(@NonNull Compression compression) throws IOException;
+    public abstract void setCompression(@NonNull Compression compression);
 
-    public void setCompressionLevel(@NonNull CompressionLevel compressionLevel) throws IOException {
+    public void setCompressionLevel(@NonNull CompressionLevel compressionLevel) {
         this.compressionLevel = CompressionLevel.NORMAL;
     }
 

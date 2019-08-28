@@ -137,6 +137,11 @@ public final class ZipMisc {
             fileHeader.setDiskNumber(0);
         });
 
+        zipModel.getEntries().forEach(entry -> {
+            entry.setOffsLocalFileHeader(entry.getOffsLocalFileHeader() + Arrays.stream(fileSizeList, 0, entry.getDisc()).sum());
+            entry.setDisc(0);
+        });
+
         zipModel.setSplitLength(ZipModel.NO_SPLIT);
         EndCentralDirectory endCentralDirectory = zipModel.getEndCentralDirectory();
         endCentralDirectory.setSplitParts(0);

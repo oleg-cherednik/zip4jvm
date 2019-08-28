@@ -25,8 +25,11 @@ class LocalCentralDirectoryBuilder {
     private List<CentralDirectory.FileHeader> getFileHeaders(List<PathZipEntry> entries, ZipModel zipModel) throws IOException {
         List<CentralDirectory.FileHeader> fileHeaders = new ArrayList<>(entries.size());
 
-        for (PathZipEntry entry : entries)
-            fileHeaders.add(new CentralDirectoryBuilder(entry, zipModel, entry.getDisc()).create());
+        for (PathZipEntry entry : entries) {
+            CentralDirectory.FileHeader fileHeader = new CentralDirectoryBuilder(entry, zipModel, entry.getDisc()).create();
+            fileHeader.setCrc32(fileHeader.getEncryption().getChecksum().apply(fileHeader));
+            fileHeaders.add(fileHeader);
+        }
         return fileHeaders;
     }
 }

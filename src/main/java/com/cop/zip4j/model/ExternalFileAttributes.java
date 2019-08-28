@@ -51,6 +51,11 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consum
 
     public static ExternalFileAttributes of(@NonNull Path path) throws IOException {
         ExternalFileAttributes delegate = createDelegate(null).get();
+
+        // TODO temporary
+        if (!Files.exists(path))
+            return delegate;
+
         delegate.readFrom(path);
         return delegate;
     }

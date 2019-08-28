@@ -108,7 +108,7 @@ public class ZipMiscTest {
         ZipMisc misc = ZipMisc.builder().zipFile(Zip4jSuite.deflateSplitZip).build();
         assertThat(misc.isSplit()).isTrue();
 
-        Path mergeDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
+        Path mergeDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         Path mergeZipFle = mergeDir.resolve("src.zip");
         misc.merge(mergeZipFle);
 

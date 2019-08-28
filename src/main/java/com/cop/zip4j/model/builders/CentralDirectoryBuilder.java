@@ -40,13 +40,13 @@ public class CentralDirectoryBuilder {
         fileHeader.setCompressionMethod(entry.getEncryption().getCompressionMethod(entry));
         fileHeader.setLastModifiedTime(entry.getLastModifiedTime());
         fileHeader.setCrc32(entry.checksum());
-        fileHeader.setCompressedSize(entry.getCompressedSize());
+        fileHeader.setCompressedSize(entry.getCompressedSizeNew());
         fileHeader.setUncompressedSize(entry.size());
         fileHeader.setFileCommentLength(0);
         fileHeader.setDiskNumber(currSplitFileCounter);
         fileHeader.setInternalFileAttributes(InternalFileAttributes.of(entry.getPath()));
         fileHeader.setExternalFileAttributes(ExternalFileAttributes.of(entry.getPath()));
-        fileHeader.setOffsLocalFileHeader(0);
+        fileHeader.setOffsLocalFileHeader(entry.getOffsLocalFileHeader());
         fileHeader.setZip64ExtendedInfo(Zip64.ExtendedInfo.NULL);
         fileHeader.setAesExtraDataRecord(getAesExtraDataRecord(entry.getEncryption()));
         fileHeader.setFileComment(null);

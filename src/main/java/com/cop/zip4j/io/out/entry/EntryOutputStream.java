@@ -48,6 +48,7 @@ public abstract class EntryOutputStream extends OutputStream {
     private static EntryOutputStream createOutputStream(PathZipEntry entry, ZipModel zipModel, DataOutput out) throws IOException {
         Compression compression = entry.getCompression();
         Encoder encoder = entry.getEncryption().getCreateEncoder().apply(entry);
+        entry.setDisc(out.getCounter());
         CentralDirectory.FileHeader fileHeader = new CentralDirectoryBuilder(entry, zipModel, out.getCounter()).create();
 
         if (compression == Compression.STORE)
@@ -64,6 +65,7 @@ public abstract class EntryOutputStream extends OutputStream {
             out.writeDwordSignature(SPLIT_SIGNATURE);
 
         zipModel.addFileHeader(fileHeader);
+        entry.setOffsLocalFileHeader(out.getOffs());
 
         writeLocalFileHeader();
         writeEncryptionHeader();
@@ -99,7 +101,6 @@ public abstract class EntryOutputStream extends OutputStream {
         checkCompressedSize();
 
         entry.setCompressedSizeNew(out.getWrittenBytesAmount(COMPRESSED_DATA));
-        entry.setDisc(out.getCounter());
 
         updateFileHeader();
         writeDataDescriptor();

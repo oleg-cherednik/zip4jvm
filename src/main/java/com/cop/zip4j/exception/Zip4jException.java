@@ -30,7 +30,7 @@ public class Zip4jException extends RuntimeException {
     }
 
     public Zip4jException(ErrorCode code, Throwable cause) {
-        this(null, code, cause);
+        this(cause.getMessage(), code, cause);
     }
 
     public Zip4jException(String message, ErrorCode code, Throwable cause) {

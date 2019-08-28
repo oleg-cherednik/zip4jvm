@@ -18,7 +18,6 @@ package com.cop.zip4j;
 import com.cop.zip4j.engine.ZipEngine;
 import com.cop.zip4j.exception.Zip4jAesStrengthNotSetException;
 import com.cop.zip4j.exception.Zip4jEmptyPasswordException;
-import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.exception.Zip4jPathNotExistsException;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ZipModel;
@@ -79,15 +78,11 @@ public final class ZipIt {
         List<PathZipEntry> entries = createEntries(withExistedEntries(paths));
 
         entries.forEach(entry -> {
-            try {
-                entry.setName(parameters.getRelativeEntryName(entry.getPath()));
-                entry.setCompression(parameters.getCompression());
-                entry.setEncryption(parameters.getEncryption());
-                entry.setStrength(parameters.getStrength());
-                entry.setPassword(parameters.getPassword());
-            } catch(IOException e) {
-                throw new Zip4jException(e);
-            }
+            entry.setName(parameters.getRelativeEntryName(entry.getPath()));
+            entry.setCompression(parameters.getCompression());
+            entry.setEncryption(parameters.getEncryption());
+            entry.setStrength(parameters.getStrength());
+            entry.setPassword(parameters.getPassword());
         });
 
         new ZipEngine(zipModel).addEntries(entries);
@@ -131,7 +126,7 @@ public final class ZipIt {
 
         if (encryption != Encryption.OFF && passwordEmpty)
             throw new Zip4jEmptyPasswordException();
-        if(encryption == Encryption.AES && strength == AesStrength.NONE)
+        if (encryption == Encryption.AES && strength == AesStrength.NONE)
             throw new Zip4jAesStrengthNotSetException();
     }
 

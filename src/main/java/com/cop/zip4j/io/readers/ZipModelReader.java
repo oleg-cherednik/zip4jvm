@@ -3,6 +3,7 @@ package com.cop.zip4j.io.readers;
 import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.io.in.LittleEndianReadFile;
 import com.cop.zip4j.model.ZipModel;
+import com.cop.zip4j.model.entry.FileHeaderPathZipEntry;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -57,7 +58,18 @@ public final class ZipModelReader {
         long totalEntries = zipModel.getActivity().getTotalEntries(zipModel);
         zipModel.setCentralDirectory(new CentralDirectoryReader(offs, totalEntries).read(in));
 
+        createEntries(zipModel);
+
         return zipModel;
+    }
+
+    private static void createEntries(ZipModel zipModel) {
+        if(!zipModel.getEntries().isEmpty())
+            return;
+
+        zipModel.getFileHeaders().forEach(fileHeader -> {
+            zipModel.getEntries().add(new FileHeaderPathZipEntry(fileHeader));
+        });
     }
 
 }
