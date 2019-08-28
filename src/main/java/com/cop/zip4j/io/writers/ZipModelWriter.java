@@ -8,7 +8,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 
 @RequiredArgsConstructor
 public final class ZipModelWriter {
@@ -17,6 +16,7 @@ public final class ZipModelWriter {
 
     @NonNull
     private final ZipModel zipModel;
+    private final EndCentralDirectory endCentralDirectory = new EndCentralDirectory();
 
     public void write(@NonNull DataOutput out) throws IOException {
         writeCentralDirectoryHeaders(out);
@@ -25,10 +25,20 @@ public final class ZipModelWriter {
     }
 
     private void writeCentralDirectoryHeaders(DataOutput out) throws IOException {
+        endCentralDirectory.setOffs(out.getOffs());
+        endCentralDirectory.setSplitParts(out.getCounter());
+        endCentralDirectory.setStartDiskNumber(out.getCounter());
+        endCentralDirectory.setDiskEntries(zipModel.getEntries().size());
+        endCentralDirectory.setTotalEntries(zipModel.getEntries().size());
+
+
         updateEndCentralDirectory(out);
 
         out.mark(MARK);
         new CentralDirectoryWriter(createCentralDirectory(), zipModel.getCharset()).write(out);
+
+        endCentralDirectory.setSize(out.getWrittenBytesAmount(MARK));
+
         zipModel.getEndCentralDirectory().setSize(out.getWrittenBytesAmount(MARK));
     }
 
@@ -43,8 +53,7 @@ public final class ZipModelWriter {
 
     private void writeEndCentralDirectory(DataOutput out) throws IOException {
         EndCentralDirectory dir = zipModel.getEndCentralDirectory();
-        Charset charset = zipModel.getCharset();
-        new EndCentralDirectoryWriter(dir, charset).write(out);
+        new EndCentralDirectoryWriter(dir, zipModel.getCharset()).write(out);
     }
 
     private void updateEndCentralDirectory(DataOutput out) {
