@@ -141,12 +141,6 @@ public class ZipModel {
         endCentralDirectory.incDiskEntries();
     }
 
-    public void setFileHeaders(List<CentralDirectory.FileHeader> fileHeaders) {
-        centralDirectory.setFileHeaders(fileHeaders);
-        endCentralDirectory.setTotalEntries(fileHeaders.size());
-        endCentralDirectory.setDiskEntries(fileHeaders.size());
-    }
-
     @NonNull
     public ZipModel noSplitOnly() {
         if (Files.exists(zipFile) && isSplitArchive())

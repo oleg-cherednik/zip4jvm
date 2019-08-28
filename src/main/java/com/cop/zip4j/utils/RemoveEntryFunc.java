@@ -135,9 +135,11 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
             }
         }
 
-        zipModel.setFileHeaders(fileHeaders);
         zipModel.getEntries().clear();
         zipModel.getEntries().addAll(zipEntries);
+
+        zipModel.getEndCentralDirectory().setTotalEntries(zipEntries.size());
+        zipModel.getEndCentralDirectory().setDiskEntries(zipEntries.size());
         zipModel.getEndCentralDirectory().setOffs(offsOut);
     }
 
