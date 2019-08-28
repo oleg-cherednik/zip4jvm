@@ -4,10 +4,10 @@ import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.io.out.DataOutputStreamDecorator;
 import com.cop.zip4j.io.out.SingleZipOutputStream;
-import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.EndCentralDirectory;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
+import com.cop.zip4j.model.entry.PathZipEntry;
 import com.cop.zip4j.utils.CreateZipModel;
 import com.cop.zip4j.utils.RemoveEntryFunc;
 import com.cop.zip4j.utils.ZipUtils;
@@ -71,8 +71,8 @@ public final class ZipMisc {
         UnzipIt.checkZipFile(zipFile);
         ZipModel zipModel = new CreateZipModel(zipFile, charset).get();
 
-        return zipModel.getFileHeaders().stream()
-                       .anyMatch(CentralDirectory.FileHeader::isEncrypted);
+        return zipModel.getEntries().stream()
+                              .anyMatch(PathZipEntry::isEncrypted);
     }
 
     public List<String> getEntryNames() throws Zip4jException {

@@ -64,6 +64,6 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
 
     @Override
     public void setEncryption(Encryption encryption) {
-
+        this.encryption = encryption;
     }
 }
