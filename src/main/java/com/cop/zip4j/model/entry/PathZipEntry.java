@@ -74,4 +74,8 @@ public abstract class PathZipEntry extends ZipEntry {
         return encryption == Encryption.AES ? strength : AesStrength.NONE;
     }
 
+    public boolean isEncrypted() {
+        return getEncryption() != Encryption.OFF;
+    }
+
 }

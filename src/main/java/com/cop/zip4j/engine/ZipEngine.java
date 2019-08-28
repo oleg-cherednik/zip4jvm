@@ -50,8 +50,6 @@ public class ZipEngine {
     }
 
     private void writeEntry(PathZipEntry entry, DataOutput out) {
-        zipModel.getEntries().add(entry);
-
         try (OutputStream os = EntryOutputStream.create(entry, zipModel, out)) {
             entry.write(os);
         } catch(IOException e) {

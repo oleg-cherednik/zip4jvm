@@ -100,21 +100,22 @@ public class ZipModel {
 
     private int countNumberOfFileHeaderEntriesOnDisk() {
         if (isSplitArchive())
-            return getFileHeaders().size();
+            return (int)entries.stream()
+                               .filter(entry -> entry.getDisc() == endCentralDirectory.getSplitParts())
+                               .count();
 
-        return (int)getFileHeaders().stream()
-                                    .filter(fileHeader -> fileHeader.getDiskNumber() == endCentralDirectory.getSplitParts())
-                                    .count();
+        return entries.size();
+
     }
 
     public boolean isEmpty() {
-        return getFileHeaders().isEmpty();
+        return entries.isEmpty();
     }
 
     public List<String> getEntryNames() {
-        return getFileHeaders().stream()
-                               .map(CentralDirectory.FileHeader::getFileName)
-                               .collect(Collectors.toList());
+        return entries.stream()
+                      .map(PathZipEntry::getName)
+                      .collect(Collectors.toList());
     }
 
     public long getCentralDirectoryOffs() {

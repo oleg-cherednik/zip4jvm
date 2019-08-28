@@ -146,8 +146,8 @@ public final class ZipMisc {
         EndCentralDirectory endCentralDirectory = zipModel.getEndCentralDirectory();
         endCentralDirectory.setSplitParts(0);
         endCentralDirectory.setStartDiskNumber(0);
-        endCentralDirectory.setTotalEntries(zipModel.getFileHeaders().size());
-        endCentralDirectory.setDiskEntries(zipModel.getFileHeaders().size());
+        endCentralDirectory.setTotalEntries(zipModel.getEntries().size());
+        endCentralDirectory.setDiskEntries(zipModel.getEntries().size());
         endCentralDirectory.setOffs(offs);
 
         Zip64 zip64 = zipModel.getZip64();
