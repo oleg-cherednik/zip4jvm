@@ -41,8 +41,6 @@ public class ZipModel {
     @NonNull
     private final Charset charset;
     @NonNull
-    private CentralDirectory centralDirectory = new CentralDirectory();
-    @NonNull
     private EndCentralDirectory endCentralDirectory = new EndCentralDirectory();
     @NonNull
     private Zip64 zip64 = Zip64.NULL;
@@ -130,12 +128,7 @@ public class ZipModel {
         return diskNumber == endCentralDirectory.getSplitParts() ? zipFile : getSplitFilePath(zipFile, diskNumber + 1);
     }
 
-    public List<CentralDirectory.FileHeader> getFileHeaders() {
-        return centralDirectory.getFileHeaders();
-    }
-
     public void addFileHeader(CentralDirectory.FileHeader fileHeader) {
-        centralDirectory.addFileHeader(fileHeader);
         activity.incTotalEntries(this);
 //        endCentralDirectory.incTotalEntries();
         endCentralDirectory.incDiskEntries();

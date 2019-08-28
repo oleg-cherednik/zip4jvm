@@ -132,11 +132,6 @@ public final class ZipMisc {
     private static void convertToSolid(long[] fileSizeList, ZipModel zipModel) {
         long offs = Arrays.stream(fileSizeList).sum();
 
-        zipModel.getFileHeaders().forEach(fileHeader -> {
-            fileHeader.updateOffLocalHeaderRelative(Arrays.stream(fileSizeList, 0, fileHeader.getDiskNumber()).sum());
-            fileHeader.setDiskNumber(0);
-        });
-
         zipModel.getEntries().forEach(entry -> {
             entry.setOffsLocalFileHeader(entry.getOffsLocalFileHeader() + Arrays.stream(fileSizeList, 0, entry.getDisc()).sum());
             entry.setDisc(0);
