@@ -6,6 +6,7 @@ import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.DataDescriptor;
 import com.cop.zip4j.model.LocalFileHeader;
+import com.cop.zip4j.model.entry.PathZipEntry;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,8 @@ import static com.cop.zip4j.model.builders.LocalFileHeaderBuilder.LOOK_IN_EXTRA_
 @RequiredArgsConstructor
 public final class LocalFileHeaderReader {
 
-    private final CentralDirectory.FileHeader fileHeader;
+    @NonNull
+    private final PathZipEntry entry;
 
     @NonNull
     public LocalFileHeader read(@NonNull DataInput in) throws IOException {
@@ -58,9 +60,9 @@ public final class LocalFileHeaderReader {
      * We do not use it while reading, because we could get this size from {@link CentralDirectory.FileHeader}.
      */
     private LocalFileHeader readDataDescriptor(LocalFileHeader localFileHeader) {
-        localFileHeader.setCrc32(getFromFileHeader(localFileHeader::getCrc32, fileHeader::getCrc32));
-        localFileHeader.setCompressedSize(getFromFileHeader(localFileHeader::getCompressedSize, fileHeader::getOriginalCompressedSize));
-        localFileHeader.setUncompressedSize(getFromFileHeader(localFileHeader::getUncompressedSize, fileHeader::getOriginalUncompressedSize));
+        localFileHeader.setCrc32(getFromFileHeader(localFileHeader::getCrc32, entry::checksum));
+        localFileHeader.setCompressedSize(getFromFileHeader(localFileHeader::getCompressedSize, entry::getCompressedSizeNew));
+        localFileHeader.setUncompressedSize(getFromFileHeader(localFileHeader::getUncompressedSize, entry::size));
         return localFileHeader;
     }
 
@@ -69,7 +71,7 @@ public final class LocalFileHeaderReader {
     }
 
     private void findHead(DataInput in) throws IOException {
-        in.seek(fileHeader.getOffsLocalFileHeader());
+        in.seek(entry.getOffsLocalFileHeader());
 
         if (in.readSignature() != LocalFileHeader.SIGNATURE)
             throw new Zip4jException("invalid local file header signature");
