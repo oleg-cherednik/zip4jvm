@@ -54,13 +54,16 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
         restoreFileName(tmpZipFile);
     }
 
-    private Set<String> getExistedEntries(Collection<String> entries) {
-        return entries.stream()
-                      .filter(Objects::nonNull)
-                      .map(entryName -> zipModel.getCentralDirectory().getFileHeadersByEntryName(entryName))
-                      .flatMap(List::stream)
-                      .map(CentralDirectory.FileHeader::getFileName)
-                      .collect(Collectors.toSet());
+    private Set<String> getExistedEntries(Collection<String> entryNames) {
+        return entryNames.stream()
+                         .filter(Objects::nonNull)
+                         .map(entryName -> ZipUtils.normalizeFileName.apply(entryName.toLowerCase()))
+                         .map(entryName -> zipModel.getEntries().stream()
+                                                   .filter(entry -> entry.getName().equalsIgnoreCase(entryName))
+                                                   .map(PathZipEntry::getName)
+                                                   .collect(Collectors.toList()))
+                         .flatMap(List::stream)
+                         .collect(Collectors.toSet());
     }
 
     private Path createTempFile() {
