@@ -50,6 +50,7 @@ public class ZipModel {
     private String comment;
     private int splitParts;
     private long centralDirectoryOffs;
+    private long centralDirectorySize;
 
     private final List<PathZipEntry> entries = new ArrayList<>();
 
@@ -92,11 +93,11 @@ public class ZipModel {
         dir.setStartDisk(endCentralDirectory.getStartDiskNumber());
         dir.setDiskEntries(countNumberOfFileHeaderEntriesOnDisk());
 //        dir.setTotalEntries(getFileHeaders().size());
-        dir.setSize(endCentralDirectory.getSize());
+        dir.setSize(centralDirectorySize);
         dir.setCentralDirectoryOffs(centralDirectoryOffs);
 
         Zip64.EndCentralDirectoryLocator locator = zip64.getEndCentralDirectoryLocator();
-        locator.setOffs(endCentralDirectory.getCentralDirectoryOffs() + endCentralDirectory.getSize());
+        locator.setOffs(centralDirectoryOffs + centralDirectorySize);
         locator.setStartDisk(counter);
         locator.setTotalDisks(counter + 1);
     }

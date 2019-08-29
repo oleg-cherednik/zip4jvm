@@ -35,15 +35,11 @@ public final class ZipModelWriter {
         endCentralDirectory.setTotalEntries(zipModel.getActivity().getTotalEntriesECD(zipModel));
         endCentralDirectory.setComment(zipModel.getComment());
 
-
-        updateEndCentralDirectory(out);
-
         out.mark(MARK);
         new CentralDirectoryWriter(createCentralDirectory(), zipModel.getCharset()).write(out);
 
-        endCentralDirectory.setSize(out.getWrittenBytesAmount(MARK));
-
-        zipModel.getEndCentralDirectory().setSize(out.getWrittenBytesAmount(MARK));
+        zipModel.setCentralDirectorySize(out.getWrittenBytesAmount(MARK));
+        endCentralDirectory.setCentralDirectorySize(out.getWrittenBytesAmount(MARK));
     }
 
     private CentralDirectory createCentralDirectory() throws IOException {
@@ -57,13 +53,6 @@ public final class ZipModelWriter {
 
     private void writeEndCentralDirectory(DataOutput out) throws IOException {
         new EndCentralDirectoryWriter(endCentralDirectory, zipModel.getCharset()).write(out);
-    }
-
-    private void updateEndCentralDirectory(DataOutput out) {
-        EndCentralDirectory endCentralDirectory = zipModel.getEndCentralDirectory();
-        endCentralDirectory.setCentralDirectoryOffs(out.getOffs());
-        endCentralDirectory.setSplitParts(out.getCounter());
-        endCentralDirectory.setStartDiskNumber(out.getCounter());
     }
 
 }

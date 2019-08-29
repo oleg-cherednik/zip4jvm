@@ -22,7 +22,7 @@ final class EndCentralDirectoryReader {
         dir.setStartDiskNumber(in.readWord());
         dir.setDiskEntries(in.readWord());
         dir.setTotalEntries(in.readWord());
-        dir.setSize(in.readDword());
+        dir.setCentralDirectorySize(in.readDword());
         dir.setCentralDirectoryOffs(in.readDword());
         dir.setComment(in.readString(in.readWord()));
 

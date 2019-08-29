@@ -37,7 +37,7 @@ public class EndCentralDirectory {
     // size:2 - total number of entries in the central directory
     private int totalEntries;
     // size:4 - CentralDirectory size
-    private long size;
+    private long centralDirectorySize;
     // size:4 - CentralDirectory offs
     private long centralDirectoryOffs;
     // size:2 - file comment length (n)
