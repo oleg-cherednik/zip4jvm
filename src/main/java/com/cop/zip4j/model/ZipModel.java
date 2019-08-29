@@ -55,10 +55,6 @@ public class ZipModel {
 
     private final List<PathZipEntry> entries = new ArrayList<>();
 
-    public void setEndCentralDirectory(@NonNull EndCentralDirectory endCentralDirectory) {
-        this.endCentralDirectory = endCentralDirectory;
-    }
-
     public void setSplitLength(long splitLength) {
         this.splitLength = splitLength < MIN_SPLIT_LENGTH ? NO_SPLIT : splitLength;
     }
@@ -116,10 +112,6 @@ public class ZipModel {
         return entries.stream()
                       .map(PathZipEntry::getName)
                       .collect(Collectors.toList());
-    }
-
-    public long getCentralDirectoryOffs() {
-        return activity.getCentralDirectoryOffs(this);
     }
 
     public static Path getSplitFilePath(Path zipFile, int count) {

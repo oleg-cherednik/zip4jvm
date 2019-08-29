@@ -40,7 +40,7 @@ public interface Activity {
 
     // ZipModel
 
-    long getCentralDirectoryOffs(ZipModel zipModel);
+//    long getCentralDirectoryOffs(ZipModel zipModel);
 
     long getTotalEntries(ZipModel zipModel);
 
