@@ -61,6 +61,7 @@ public final class ZipModelReader {
         zipModel.setSplitParts(endCentralDirectory.getSplitParts());
         zipModel.setCentralDirectoryOffs(endCentralDirectory.getCentralDirectoryOffs());
         zipModel.setCentralDirectorySize(endCentralDirectory.getCentralDirectorySize());
+        zipModel.setStartDiskNumber(endCentralDirectory.getStartDiskNumber());
 
 
         zipModel.setZip64(new Zip64Reader().read(in));
