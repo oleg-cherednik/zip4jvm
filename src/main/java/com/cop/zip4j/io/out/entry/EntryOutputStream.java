@@ -5,17 +5,13 @@ import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.io.writers.DataDescriptorWriter;
 import com.cop.zip4j.io.writers.LocalFileHeaderWriter;
-import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.DataDescriptor;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.ZipModel;
-import com.cop.zip4j.model.builders.CentralDirectoryBuilder;
 import com.cop.zip4j.model.builders.LocalFileHeaderEntryBuilder;
 import com.cop.zip4j.model.entry.PathZipEntry;
-import lombok.AccessLevel;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -26,7 +22,6 @@ import java.util.zip.Checksum;
  * @author Oleg Cherednik
  * @since 26.07.2019
  */
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class EntryOutputStream extends OutputStream {
 
     public static final int SPLIT_SIGNATURE = 0x08074b50;
@@ -35,7 +30,6 @@ public abstract class EntryOutputStream extends OutputStream {
 
     private final ZipModel zipModel;
     private final PathZipEntry entry;
-    private final CentralDirectory.FileHeader fileHeader;
     private final Checksum checksum = new CRC32();
 
     protected final Encoder encoder;
@@ -49,16 +43,21 @@ public abstract class EntryOutputStream extends OutputStream {
 
     private static EntryOutputStream createOutputStream(PathZipEntry entry, ZipModel zipModel, DataOutput out) throws IOException {
         Compression compression = entry.getCompression();
-        Encoder encoder = entry.getEncryption().getCreateEncoder().apply(entry);
         entry.setDisc(out.getCounter());
-        CentralDirectory.FileHeader fileHeader = new CentralDirectoryBuilder(entry, zipModel, out.getCounter()).create();
 
         if (compression == Compression.STORE)
-            return new StoreEntryOutputStream(zipModel, entry, fileHeader, encoder, out);
+            return new StoreEntryOutputStream(zipModel, entry, out);
         if (compression == Compression.DEFLATE)
-            return new DeflateEntryOutputStream(zipModel, entry, fileHeader, encoder, out, entry.getCompressionLevel());
+            return new DeflateEntryOutputStream(zipModel, entry, out);
 
         throw new Zip4jException("Compression is not supported: " + compression);
+    }
+
+    protected EntryOutputStream(ZipModel zipModel, PathZipEntry entry, DataOutput out) {
+        this.zipModel = zipModel;
+        this.entry = entry;
+        this.out = out;
+        encoder = entry.getEncryption().getCreateEncoder().apply(entry);
     }
 
     private EntryOutputStream writeHeader() throws IOException {
