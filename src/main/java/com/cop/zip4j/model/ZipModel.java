@@ -79,7 +79,7 @@ public class ZipModel {
         dir.setSize(Zip64.EndCentralDirectory.SIZE + dir.getSizeEndCentralDirectory());
         dir.setVersionMadeBy(CentralDirectory.FileHeader.VERSION);
         dir.setVersionNeededToExtract(CentralDirectory.FileHeader.VERSION);
-        dir.setDisk(splitLength);
+        dir.setDisk(splitParts);
         dir.setStartDisk(startDiskNumber);
         dir.setDiskEntries(countNumberOfFileHeaderEntriesOnDisk());
         dir.setTotalEntries(entries.size());
@@ -92,7 +92,7 @@ public class ZipModel {
         locator.setTotalDisks(counter + 1);
     }
 
-    private int countNumberOfFileHeaderEntriesOnDisk() {
+    public int countNumberOfFileHeaderEntriesOnDisk() {
         if (isSplitArchive())
             return (int)entries.stream()
                                .filter(entry -> entry.getDisc() == splitParts)

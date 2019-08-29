@@ -3,7 +3,9 @@ package com.cop.zip4j.io.writers;
 import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.EndCentralDirectory;
+import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
+import com.cop.zip4j.model.activity.Zip64Activity;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -49,7 +51,33 @@ public final class ZipModelWriter {
 
     private void writeZip64(DataOutput out) throws IOException {
         zipModel.updateZip64(out.getCounter());
-        new Zip64Writer(zipModel.getZip64()).write(out);
+
+        Zip64 zip64 = createZip64(out.getCounter());
+
+        new Zip64Writer(zip64).write(out);
+    }
+
+    private Zip64 createZip64(int counter) {
+        if(!(zipModel.getActivity() instanceof Zip64Activity))
+            return Zip64.NULL;
+
+        Zip64.EndCentralDirectory dir = new Zip64.EndCentralDirectory();
+        dir.setSize(Zip64.EndCentralDirectory.SIZE + dir.getSizeEndCentralDirectory());
+        dir.setVersionMadeBy(CentralDirectory.FileHeader.VERSION);
+        dir.setVersionNeededToExtract(CentralDirectory.FileHeader.VERSION);
+        dir.setDisk(zipModel.getSplitParts());
+        dir.setStartDisk(zipModel.getStartDiskNumber());
+        dir.setDiskEntries(zipModel.countNumberOfFileHeaderEntriesOnDisk());
+        dir.setTotalEntries(zipModel.getEntries().size());
+        dir.setSize(zipModel.getCentralDirectorySize());
+        dir.setCentralDirectoryOffs(zipModel.getCentralDirectoryOffs());
+
+        Zip64.EndCentralDirectoryLocator locator = new Zip64.EndCentralDirectoryLocator();
+        locator.setOffs(zipModel.getCentralDirectoryOffs() + zipModel.getCentralDirectorySize());
+        locator.setStartDisk(counter);
+        locator.setTotalDisks(counter + 1);
+
+        return Zip64.of(locator, dir);
     }
 
     private void writeEndCentralDirectory(DataOutput out) throws IOException {
