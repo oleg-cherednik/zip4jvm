@@ -71,7 +71,7 @@ public class CentralDirectoryBuilder {
         GeneralPurposeFlag generalPurposeFlag = fileHeader.getGeneralPurposeFlag();
 
         generalPurposeFlag.setCompressionLevel(entry.getCompressionLevel());
-        generalPurposeFlag.setDataDescriptorExists(!ZipUtils.isDirectory(fileHeader.getFileName()));
+        generalPurposeFlag.setDataDescriptor(!ZipUtils.isDirectory(fileHeader.getFileName()));
         generalPurposeFlag.setUtf8(zipModel.getCharset() == StandardCharsets.UTF_8);
         generalPurposeFlag.setEncrypted(entry.getEncryption() != Encryption.OFF);
 //        generalPurposeFlag.setStrongEncryption(entry.getEncryption() == Encryption.STRONG);

@@ -105,7 +105,7 @@ public abstract class EntryInputStream extends InputStream {
 
     /** Just read {@link DataDescriptor} and ignore it's value. We got it from {@link CentralDirectory.FileHeader} */
     private void readDataDescriptor() throws IOException {
-        if (localFileHeader.getGeneralPurposeFlag().isDataDescriptorExists())
+        if (localFileHeader.getGeneralPurposeFlag().isDataDescriptor())
             new DataDescriptorReader(false).read(in);
     }
 

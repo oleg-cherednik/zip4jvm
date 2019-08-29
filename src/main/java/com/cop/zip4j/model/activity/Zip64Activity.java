@@ -25,16 +25,16 @@ public class Zip64Activity implements Activity {
 
     // LocalFileHeader
 
-    public LongSupplier getCrc32LocalFileHeader(LongSupplier originalCrc32) {
-        return () -> LOOK_IN_EXTRA_FIELD;
+    public long getCrc32LocalFileHeader(long crc32) {
+        return LOOK_IN_EXTRA_FIELD;
     }
 
-    public LongSupplier getCompressedSizeLocalFileHeader(LongSupplier originalCompressedSize) {
-        return () -> LOOK_IN_EXTRA_FIELD;
+    public long getCompressedSizeLocalFileHeader(long compressedSize) {
+        return LOOK_IN_EXTRA_FIELD;
     }
 
-    public LongSupplier getUncompressedSizeLocalFileHeader(LongSupplier originalUncompressedSize) {
-        return () -> LOOK_IN_EXTRA_FIELD;
+    public long getUncompressedSizeLocalFileHeader(long uncompressedSize) {
+        return LOOK_IN_EXTRA_FIELD;
     }
 
     public Supplier<Zip64.ExtendedInfo> getExtendedInfoLocalFileHeader(CentralDirectory.FileHeader fileHeader) {

@@ -23,16 +23,16 @@ public final class PlainActivity implements Activity {
 
     // LocalFileHeader
 
-    public LongSupplier getCrc32LocalFileHeader(LongSupplier originalCrc32) {
-        return originalCrc32;
+    public long getCrc32LocalFileHeader(long crc32) {
+        return crc32;
     }
 
-    public LongSupplier getCompressedSizeLocalFileHeader(LongSupplier originalCompressedSize) {
-        return originalCompressedSize;
+    public long getCompressedSizeLocalFileHeader(long compressedSize) {
+        return compressedSize;
     }
 
-    public LongSupplier getUncompressedSizeLocalFileHeader(LongSupplier originalUncompressedSize) {
-        return originalUncompressedSize;
+    public long getUncompressedSizeLocalFileHeader(long uncompressedSize) {
+        return uncompressedSize;
     }
 
     public Supplier<Zip64.ExtendedInfo> getExtendedInfoLocalFileHeader(CentralDirectory.FileHeader fileHeader) {

@@ -78,7 +78,7 @@ public abstract class EntryOutputStream extends OutputStream {
     private void writeLocalFileHeader() throws IOException {
         Charset charset = zipModel.getCharset();
         LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(entry, charset).create();
-        dataDescriptorExists = localFileHeader.getGeneralPurposeFlag().isDataDescriptorExists();
+        dataDescriptorExists = localFileHeader.getGeneralPurposeFlag().isDataDescriptor();
         new LocalFileHeaderWriter(localFileHeader, charset).write(out);
         out.mark(COMPRESSED_DATA);
     }

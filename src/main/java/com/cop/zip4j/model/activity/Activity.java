@@ -18,11 +18,11 @@ public interface Activity {
 
     // LocalFileHeader
 
-    LongSupplier getCrc32LocalFileHeader(LongSupplier originalCompressedSize);
+    long getCrc32LocalFileHeader(long crc32);
 
-    LongSupplier getCompressedSizeLocalFileHeader(LongSupplier originalCompressedSize);
+    long getCompressedSizeLocalFileHeader(long compressedSize);
 
-    LongSupplier getUncompressedSizeLocalFileHeader(LongSupplier originalUncompressedSize);
+    long getUncompressedSizeLocalFileHeader(long uncompressedSize);
 
     Supplier<Zip64.ExtendedInfo> getExtendedInfoLocalFileHeader(CentralDirectory.FileHeader fileHeader);
 

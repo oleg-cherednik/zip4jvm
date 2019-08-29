@@ -5,6 +5,7 @@ import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.GeneralPurposeFlag;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.Zip64;
+import com.cop.zip4j.model.activity.Zip64Activity;
 import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.NonNull;
@@ -12,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.function.LongSupplier;
+import java.util.function.BooleanSupplier;
 
 /**
  * @author Oleg Cherednik
@@ -31,14 +32,15 @@ public final class LocalFileHeaderBuilder {
 
     public LocalFileHeader create() {
         LocalFileHeader localFileHeader = new LocalFileHeader();
+        BooleanSupplier dataDescriptor = () -> localFileHeader.getGeneralPurposeFlag().isDataDescriptor();
 
         localFileHeader.setVersionToExtract(CentralDirectory.FileHeader.VERSION);
         localFileHeader.setGeneralPurposeFlag(getGeneralPurposeFlag());
         localFileHeader.setCompressionMethod(entry.getEncryption().getCompressionMethod(entry));
         localFileHeader.setLastModifiedTime(entry.getLastModifiedTime());
-        localFileHeader.setCrc32(getCrc32(localFileHeader).getAsLong());
-        localFileHeader.setCompressedSize(getCompressedSize(localFileHeader).getAsLong());
-        localFileHeader.setUncompressedSize(getUncompressedSize(localFileHeader).getAsLong());
+        localFileHeader.setCrc32(getValue(dataDescriptor.getAsBoolean(), entry.checksum()));
+        localFileHeader.setCompressedSize(getValue(dataDescriptor.getAsBoolean(), entry.getCompressedSize()));
+        localFileHeader.setUncompressedSize(getValue(dataDescriptor.getAsBoolean(), entry.size()));
         localFileHeader.setFileName(entry.getName());
         localFileHeader.getExtraField().setAesExtraDataRecord(getAesExtraDataRecord(entry.getEncryption()));
 
@@ -48,7 +50,7 @@ public final class LocalFileHeaderBuilder {
     private GeneralPurposeFlag getGeneralPurposeFlag() {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         generalPurposeFlag.setCompressionLevel(entry.getCompressionLevel());
-        generalPurposeFlag.setDataDescriptorExists(entry.isRegularFile());
+        generalPurposeFlag.setDataDescriptor(entry.isRegularFile());
         generalPurposeFlag.setUtf8(charset == StandardCharsets.UTF_8);
         generalPurposeFlag.setEncrypted(entry.getEncryption() != Encryption.OFF);
 //        generalPurposeFlag.setStrongEncryption(entry.getEncryption() == Encryption.STRONG);
@@ -57,22 +59,12 @@ public final class LocalFileHeaderBuilder {
         return generalPurposeFlag;
     }
 
-    private LongSupplier getCrc32(LocalFileHeader localFileHeader) {
-        if (localFileHeader.getGeneralPurposeFlag().isDataDescriptorExists())
-            return () -> LOOK_IN_DATA_DESCRIPTOR;
-        return entry.getActivity().getCrc32LocalFileHeader(entry::checksum);
-    }
-
-    private LongSupplier getCompressedSize(LocalFileHeader localFileHeader) {
-        if (localFileHeader.getGeneralPurposeFlag().isDataDescriptorExists())
-            return () -> LOOK_IN_DATA_DESCRIPTOR;
-        return entry.getActivity().getCompressedSizeLocalFileHeader(entry::getCompressedSize);
-    }
-
-    private LongSupplier getUncompressedSize(LocalFileHeader localFileHeader) {
-        if (localFileHeader.getGeneralPurposeFlag().isDataDescriptorExists())
-            return () -> LOOK_IN_DATA_DESCRIPTOR;
-        return entry.getActivity().getUncompressedSizeLocalFileHeader(entry::size);
+    private long getValue(boolean dataDescriptor, long value) {
+        if (dataDescriptor)
+            return LOOK_IN_DATA_DESCRIPTOR;
+        if (entry.getActivity() instanceof Zip64Activity)
+            return LOOK_IN_EXTRA_FIELD;
+        return value;
     }
 
     private AesExtraDataRecord getAesExtraDataRecord(Encryption encryption) {

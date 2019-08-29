@@ -28,7 +28,7 @@ public class GeneralPurposeFlag implements IntSupplier {
     private boolean encrypted;
     private CompressionLevel compressionLevel;
     /** {@link DataDescriptor} */
-    private boolean dataDescriptorExists;
+    private boolean dataDescriptor;
     private boolean strongEncryption;
     private boolean utf8;
 
@@ -45,7 +45,7 @@ public class GeneralPurposeFlag implements IntSupplier {
             compressionLevel = CompressionLevel.FAST;
         else compressionLevel = BitUtils.isBitSet(data, BIT1) ? CompressionLevel.MAXIMUM : CompressionLevel.NORMAL;
 
-        dataDescriptorExists = BitUtils.isBitSet(data, BIT3);
+        dataDescriptor = BitUtils.isBitSet(data, BIT3);
         strongEncryption = BitUtils.isBitSet(data, BIT6);
         utf8 = BitUtils.isBitSet(data, BIT11);
     }
@@ -61,7 +61,7 @@ public class GeneralPurposeFlag implements IntSupplier {
         else if (compressionLevel == CompressionLevel.FASTEST)
             data = BitUtils.setBits(data, BIT1 | BIT2);
 
-        data = BitUtils.updateBits(data, BIT3, dataDescriptorExists);
+        data = BitUtils.updateBits(data, BIT3, dataDescriptor);
         data = BitUtils.updateBits(data, BIT6, strongEncryption);
         data = BitUtils.updateBits(data, BIT11, utf8);
 
