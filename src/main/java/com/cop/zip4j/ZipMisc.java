@@ -53,7 +53,7 @@ public final class ZipMisc {
         UnzipIt.checkZipFile(zipFile);
 
         ZipModel zipModel = new CreateZipModel(zipFile, charset).get().noSplitOnly();
-        zipModel.getEndCentralDirectory().setComment(comment);
+        zipModel.setComment(comment);
 
         try (SingleZipOutputStream out = SingleZipOutputStream.create(zipModel)) {
             out.seek(zipModel.getCentralDirectoryOffs());

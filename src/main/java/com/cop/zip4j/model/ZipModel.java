@@ -46,6 +46,7 @@ public class ZipModel {
     private Zip64 zip64 = Zip64.NULL;
     private long splitLength = NO_SPLIT;
     private Activity activity = new PlainActivity();
+    private String comment;
 
     private final List<PathZipEntry> entries = new ArrayList<>();
 
@@ -72,6 +73,7 @@ public class ZipModel {
     }
 
     public void setComment(String comment) {
+        this.comment = comment;
         endCentralDirectory.setComment(comment);
     }
 
