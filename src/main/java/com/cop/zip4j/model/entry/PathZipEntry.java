@@ -1,15 +1,18 @@
 package com.cop.zip4j.model.entry;
 
+import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.activity.Activity;
 import com.cop.zip4j.model.activity.PlainActivity;
 import com.cop.zip4j.model.aes.AesStrength;
+import com.cop.zip4j.utils.ZipUtils;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang.StringUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -80,6 +83,13 @@ public abstract class PathZipEntry extends ZipEntry {
 
     public boolean isEncrypted() {
         return getEncryption() != Encryption.OFF;
+    }
+
+    public void setName(String name) {
+        if (StringUtils.isBlank(name))
+            throw new Zip4jException("PathZipEntry.name cannot be blank");
+
+        this.name = ZipUtils.normalizeFileName.apply(name);
     }
 
 }

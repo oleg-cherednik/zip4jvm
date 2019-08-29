@@ -4,6 +4,7 @@ import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.utils.ZipUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.nio.file.Paths;
 
@@ -65,5 +66,12 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
     @Override
     public void setEncryption(Encryption encryption) {
         this.encryption = encryption;
+    }
+
+    @Override
+    public void setName(String name) {
+        if(dir && StringUtils.isNotBlank(name) && !ZipUtils.isDirectory(name))
+            name += '/';
+        super.setName(name);
     }
 }
