@@ -22,6 +22,8 @@ import com.cop.zip4j.exception.Zip4jPathNotExistsException;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.ZipParameters;
+import com.cop.zip4j.model.activity.PlainActivity;
+import com.cop.zip4j.model.activity.Zip64Activity;
 import com.cop.zip4j.model.aes.AesStrength;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import com.cop.zip4j.model.entry.ZipEntry;
@@ -83,6 +85,7 @@ public final class ZipIt {
             entry.setEncryption(parameters.getEncryption());
             entry.setStrength(parameters.getStrength());
             entry.setPassword(parameters.getPassword());
+            entry.setActivity(parameters.isZip64() ? Zip64Activity.INSTANCE : PlainActivity.INSTANCE);
         });
 
         new ZipEngine(zipModel).addEntries(entries);

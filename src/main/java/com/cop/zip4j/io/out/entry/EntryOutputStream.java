@@ -9,7 +9,7 @@ import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.DataDescriptor;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.ZipModel;
-import com.cop.zip4j.model.builders.LocalFileHeaderEntryBuilder;
+import com.cop.zip4j.model.builders.LocalFileHeaderBuilder;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.NonNull;
 
@@ -38,7 +38,9 @@ public abstract class EntryOutputStream extends OutputStream {
     private boolean dataDescriptorExists;
 
     public static EntryOutputStream create(@NonNull PathZipEntry entry, @NonNull ZipModel zipModel, @NonNull DataOutput out) throws IOException {
-        return createOutputStream(entry, zipModel, out).writeHeader();
+        EntryOutputStream res = createOutputStream(entry, zipModel, out);
+        res.writeHeader();
+        return res;
     }
 
     private static EntryOutputStream createOutputStream(PathZipEntry entry, ZipModel zipModel, DataOutput out) throws IOException {
@@ -60,7 +62,7 @@ public abstract class EntryOutputStream extends OutputStream {
         encoder = entry.getEncryption().getCreateEncoder().apply(entry);
     }
 
-    private EntryOutputStream writeHeader() throws IOException {
+    private void writeHeader() throws IOException {
         // only at the beginning of the split file
         if (zipModel.isSplitArchive() && zipModel.isEmpty())
             out.writeDwordSignature(SPLIT_SIGNATURE);
@@ -70,12 +72,10 @@ public abstract class EntryOutputStream extends OutputStream {
 
         writeLocalFileHeader();
         writeEncryptionHeader();
-
-        return this;
     }
 
     private void writeLocalFileHeader() throws IOException {
-        LocalFileHeader localFileHeader = new LocalFileHeaderEntryBuilder(entry, zipModel).create();
+        LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(entry, zipModel).create();
         dataDescriptorExists = localFileHeader.getGeneralPurposeFlag().isDataDescriptorExists();
         new LocalFileHeaderWriter(localFileHeader, zipModel.getCharset()).write(out);
         out.mark(COMPRESSED_DATA);
@@ -129,7 +129,7 @@ public abstract class EntryOutputStream extends OutputStream {
             dataDescriptor.setCompressedSize(entry.getCompressedSizeNew());
             dataDescriptor.setUncompressedSize(entry.size());
 
-            new DataDescriptorWriter(dataDescriptor, zipModel.getActivity()).write(out);
+            new DataDescriptorWriter(dataDescriptor, entry.getActivity()).write(out);
         }
     }
 

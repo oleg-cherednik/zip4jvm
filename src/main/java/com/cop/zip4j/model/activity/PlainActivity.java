@@ -4,6 +4,8 @@ import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 import java.io.IOException;
@@ -14,7 +16,10 @@ import java.util.function.Supplier;
  * @author Oleg Cherednik
  * @since 23.08.2019
  */
-public class PlainActivity implements Activity {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class PlainActivity implements Activity {
+
+    public static final PlainActivity INSTANCE = new PlainActivity();
 
     // LocalFileHeader
 

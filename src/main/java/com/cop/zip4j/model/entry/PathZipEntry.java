@@ -3,6 +3,8 @@ package com.cop.zip4j.model.entry;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.Encryption;
+import com.cop.zip4j.model.activity.Activity;
+import com.cop.zip4j.model.activity.PlainActivity;
 import com.cop.zip4j.model.aes.AesStrength;
 import lombok.Getter;
 import lombok.NonNull;
@@ -40,6 +42,8 @@ public abstract class PathZipEntry extends ZipEntry {
     private int disc;
     @Setter
     private long localFileHeaderOffs;
+    @Setter
+    private Activity activity = PlainActivity.INSTANCE;
 
     @Override
     public boolean isRegularFile() {

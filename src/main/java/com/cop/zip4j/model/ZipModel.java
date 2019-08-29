@@ -41,7 +41,7 @@ public class ZipModel {
     @NonNull
     private final Charset charset;
     private long splitLength = NO_SPLIT;
-    private Activity activity = new PlainActivity();
+    private Activity activity = PlainActivity.INSTANCE;
 
     private String comment;
     private int splitParts;
@@ -61,7 +61,7 @@ public class ZipModel {
 
     public void zip64() {
         if (!(activity instanceof Zip64Activity))
-            activity = new Zip64Activity();
+            activity = Zip64Activity.INSTANCE;
     }
 
     public boolean isEmpty() {
