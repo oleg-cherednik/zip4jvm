@@ -11,7 +11,7 @@ import com.cop.zip4j.model.DataDescriptor;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.builders.CentralDirectoryBuilder;
-import com.cop.zip4j.model.builders.LocalFileHeaderBuilder;
+import com.cop.zip4j.model.builders.LocalFileHeaderEntryBuilder;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.AccessLevel;
 import lombok.NonNull;
@@ -75,8 +75,8 @@ public abstract class EntryOutputStream extends OutputStream {
 
     private void writeLocalFileHeader() throws IOException {
         fileHeader.setOffsLocalFileHeader(out.getOffs());
-        LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(zipModel, fileHeader).create();
-        new LocalFileHeaderWriter(localFileHeader, zipModel.getCharset()).write(out);
+        LocalFileHeader localFileHeader1 = new LocalFileHeaderEntryBuilder(entry, zipModel).create();
+        new LocalFileHeaderWriter(localFileHeader1, zipModel.getCharset()).write(out);
         out.mark(COMPRESSED_DATA);
     }
 
