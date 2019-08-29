@@ -40,8 +40,6 @@ public class ZipModel {
     private final Path zipFile;
     @NonNull
     private final Charset charset;
-    @NonNull
-    private Zip64 zip64 = Zip64.NULL;
     private long splitLength = NO_SPLIT;
     private Activity activity = new PlainActivity();
 

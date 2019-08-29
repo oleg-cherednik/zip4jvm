@@ -14,35 +14,25 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public final class ZipModelWriter {
 
-    private static final String MARK = "header";
+    private static final String CENTRAL_DIRECTORY_OFFS = "centralDirectoryOffs";
 
     @NonNull
     private final ZipModel zipModel;
-    private final EndCentralDirectory endCentralDirectory = new EndCentralDirectory();
 
     public void write(@NonNull DataOutput out) throws IOException {
+        zipModel.setSplitParts(out.getCounter());
+        zipModel.setCentralDirectoryOffs(out.getOffs());
+        zipModel.setStartDiskNumber(out.getCounter());
+
         writeCentralDirectoryHeaders(out);
         writeZip64(out);
         writeEndCentralDirectory(out);
     }
 
     private void writeCentralDirectoryHeaders(DataOutput out) throws IOException {
-        zipModel.setSplitParts(out.getCounter());
-        zipModel.setCentralDirectoryOffs(out.getOffs());
-        zipModel.setStartDiskNumber(out.getCounter());
-
-        endCentralDirectory.setCentralDirectoryOffs(out.getOffs());
-        endCentralDirectory.setSplitParts(out.getCounter());
-        endCentralDirectory.setStartDiskNumber(out.getCounter());
-        endCentralDirectory.setDiskEntries(zipModel.getEntries().size());
-        endCentralDirectory.setTotalEntries(zipModel.getActivity().getTotalEntriesECD(zipModel));
-        endCentralDirectory.setComment(zipModel.getComment());
-
-        out.mark(MARK);
+        out.mark(CENTRAL_DIRECTORY_OFFS);
         new CentralDirectoryWriter(createCentralDirectory(), zipModel.getCharset()).write(out);
-
-        zipModel.setCentralDirectorySize(out.getWrittenBytesAmount(MARK));
-        endCentralDirectory.setCentralDirectorySize(out.getWrittenBytesAmount(MARK));
+        zipModel.setCentralDirectorySize(out.getWrittenBytesAmount(CENTRAL_DIRECTORY_OFFS));
     }
 
     private CentralDirectory createCentralDirectory() throws IOException {
@@ -87,6 +77,15 @@ public final class ZipModelWriter {
     }
 
     private void writeEndCentralDirectory(DataOutput out) throws IOException {
+        EndCentralDirectory endCentralDirectory = new EndCentralDirectory();
+        endCentralDirectory.setCentralDirectoryOffs(zipModel.getCentralDirectoryOffs());
+        endCentralDirectory.setSplitParts(zipModel.getSplitParts());
+        endCentralDirectory.setStartDiskNumber(zipModel.getSplitParts());
+        endCentralDirectory.setDiskEntries(zipModel.getEntries().size());
+        endCentralDirectory.setTotalEntries(zipModel.getActivity().getTotalEntriesECD(zipModel));
+        endCentralDirectory.setComment(zipModel.getComment());
+        endCentralDirectory.setCentralDirectorySize(zipModel.getCentralDirectorySize());
+
         new EndCentralDirectoryWriter(endCentralDirectory, zipModel.getCharset()).write(out);
     }
 
