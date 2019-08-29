@@ -4,7 +4,6 @@ import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.io.out.DataOutputStreamDecorator;
 import com.cop.zip4j.io.out.SingleZipOutputStream;
-import com.cop.zip4j.model.EndCentralDirectory;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.entry.PathZipEntry;
@@ -72,7 +71,7 @@ public final class ZipMisc {
         ZipModel zipModel = new CreateZipModel(zipFile, charset).get();
 
         return zipModel.getEntries().stream()
-                              .anyMatch(PathZipEntry::isEncrypted);
+                       .anyMatch(PathZipEntry::isEncrypted);
     }
 
     public List<String> getEntryNames() throws Zip4jException {
@@ -138,12 +137,6 @@ public final class ZipMisc {
         });
 
         zipModel.setSplitLength(ZipModel.NO_SPLIT);
-        EndCentralDirectory endCentralDirectory = zipModel.getEndCentralDirectory();
-        endCentralDirectory.setSplitParts(0);
-        endCentralDirectory.setStartDiskNumber(0);
-        endCentralDirectory.setTotalEntries(zipModel.getEntries().size());
-        endCentralDirectory.setDiskEntries(zipModel.getEntries().size());
-        endCentralDirectory.setOffs(offs);
 
         Zip64 zip64 = zipModel.getZip64();
 
@@ -151,13 +144,12 @@ public final class ZipMisc {
             Zip64.EndCentralDirectoryLocator locator = zip64.getEndCentralDirectoryLocator();
             locator.setStartDisk(0);
             locator.setOffs(locator.getOffs() + offs);
-            ;
             locator.setTotalDisks(1);
 
             Zip64.EndCentralDirectory dir = zip64.getEndCentralDirectory();
             dir.setDisk(0);
             dir.setStartDisk(0);
-            dir.setDiskEntries(endCentralDirectory.getTotalEntries());
+            dir.setDiskEntries(zipModel.getEntries().size());
             dir.setOffs(dir.getOffs() + offs);
         }
     }
