@@ -76,13 +76,9 @@ public final class Zip64 {
         // size:8 - size of the central directory
         private long size;
         // size:8 - offs of CentralDirectory in startDiskNumber
-        private long offs;
+        private long centralDirectoryOffs;
         // size:n-44 - extensible data sector
         private byte[] extensibleDataSector;
-
-        public void updateOffsetStartCenDirWRTStartDiskNo(long delta) {
-            offs += delta;
-        }
 
         public void incTotalEntries() {
             totalEntries++;

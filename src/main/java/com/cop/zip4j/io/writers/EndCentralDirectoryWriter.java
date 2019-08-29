@@ -30,7 +30,7 @@ final class EndCentralDirectoryWriter {
         out.writeWord(dir.getDiskEntries());
         out.writeWord(dir.getTotalEntries());
         out.writeDword(dir.getSize());
-        out.writeDword(Math.min(dir.getOffs(), Zip64.LIMIT));
+        out.writeDword(Math.min(dir.getCentralDirectoryOffs(), Zip64.LIMIT));
         out.writeWord(comment.length);
         out.writeBytes(comment);
     }

@@ -4,6 +4,7 @@ import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.io.in.LittleEndianReadFile;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.EndCentralDirectory;
+import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.entry.FileHeaderPathZipEntry;
 import lombok.NonNull;
@@ -58,9 +59,13 @@ public final class ZipModelReader {
         zipModel.setEndCentralDirectory(endCentralDirectory);
         zipModel.setComment(endCentralDirectory.getComment());
         zipModel.setSplitParts(endCentralDirectory.getSplitParts());
+        zipModel.setCentralDirectoryOffs(endCentralDirectory.getCentralDirectoryOffs());
 
 
         zipModel.setZip64(new Zip64Reader().read(in));
+
+        if(zipModel.getZip64() != Zip64.NULL)
+            zipModel.setCentralDirectoryOffs(zipModel.getZip64().getEndCentralDirectory().getCentralDirectoryOffs());
 
         long offs = zipModel.getCentralDirectoryOffs();
         long totalEntries = zipModel.getActivity().getTotalEntries(zipModel);

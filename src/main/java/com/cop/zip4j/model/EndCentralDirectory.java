@@ -39,7 +39,7 @@ public class EndCentralDirectory {
     // size:4 - CentralDirectory size
     private long size;
     // size:4 - CentralDirectory offs
-    private long offs;
+    private long centralDirectoryOffs;
     // size:2 - file comment length (n)
     // size:n - file comment
     private String comment;

@@ -68,10 +68,10 @@ final class Zip64Reader {
             dir.setDiskEntries(in.readQword());
             dir.setTotalEntries(in.readQword());
             dir.setSize(in.readQword());
-            dir.setOffs(in.readQword());
+            dir.setCentralDirectoryOffs(in.readQword());
             dir.setExtensibleDataSector(in.readBytes((int)(dir.getSizeEndCentralDirectory() - Zip64.EndCentralDirectory.SIZE)));
 
-            ZipUtils.requirePositive(dir.getOffs(), "offsCentralDirectory");
+            ZipUtils.requirePositive(dir.getCentralDirectoryOffs(), "offsCentralDirectory");
             ZipUtils.requirePositive(dir.getTotalEntries(), "totalEntries");
 
             return dir;

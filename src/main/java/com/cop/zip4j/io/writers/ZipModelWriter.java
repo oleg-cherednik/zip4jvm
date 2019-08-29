@@ -26,8 +26,9 @@ public final class ZipModelWriter {
 
     private void writeCentralDirectoryHeaders(DataOutput out) throws IOException {
         zipModel.setSplitParts(out.getCounter());
+        zipModel.setCentralDirectoryOffs(out.getOffs());
 
-        endCentralDirectory.setOffs(out.getOffs());
+        endCentralDirectory.setCentralDirectoryOffs(out.getOffs());
         endCentralDirectory.setSplitParts(out.getCounter());
         endCentralDirectory.setStartDiskNumber(out.getCounter());
         endCentralDirectory.setDiskEntries(zipModel.getEntries().size());
@@ -60,7 +61,7 @@ public final class ZipModelWriter {
 
     private void updateEndCentralDirectory(DataOutput out) {
         EndCentralDirectory endCentralDirectory = zipModel.getEndCentralDirectory();
-        endCentralDirectory.setOffs(out.getOffs());
+        endCentralDirectory.setCentralDirectoryOffs(out.getOffs());
         endCentralDirectory.setSplitParts(out.getCounter());
         endCentralDirectory.setStartDiskNumber(out.getCounter());
     }

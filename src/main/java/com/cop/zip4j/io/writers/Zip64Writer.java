@@ -41,7 +41,7 @@ final class Zip64Writer {
             out.writeQword(dir.getDiskEntries());
             out.writeQword(dir.getTotalEntries());
             out.writeQword(dir.getSize());
-            out.writeQword(dir.getOffs());
+            out.writeQword(dir.getCentralDirectoryOffs());
             out.writeBytes(dir.getExtensibleDataSector());
         }
     }

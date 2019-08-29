@@ -57,7 +57,7 @@ public class PlainActivity implements Activity {
     // ZipModel
 
     public long getCentralDirectoryOffs(ZipModel zipModel) {
-        return zipModel.getEndCentralDirectory().getOffs();
+        return zipModel.getEndCentralDirectory().getCentralDirectoryOffs();
     }
 
     public long getTotalEntries(ZipModel zipModel) {

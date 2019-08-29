@@ -137,6 +137,7 @@ public final class ZipMisc {
         });
 
         zipModel.setSplitLength(ZipModel.NO_SPLIT);
+        zipModel.setCentralDirectoryOffs(zipModel.getCentralDirectoryOffs() + offs);
 
         Zip64 zip64 = zipModel.getZip64();
 
@@ -150,12 +151,12 @@ public final class ZipMisc {
             dir.setDisk(0);
             dir.setStartDisk(0);
             dir.setDiskEntries(zipModel.getEntries().size());
-            dir.setOffs(dir.getOffs() + offs);
+            dir.setCentralDirectoryOffs(dir.getCentralDirectoryOffs() + offs);
         }
     }
 
     private static long[] copyAllParts(@NonNull OutputStream out, @NonNull ZipModel zipModel) throws IOException {
-        int totalSplitParts = zipModel.getEndCentralDirectory().getSplitParts();
+        int totalSplitParts = zipModel.getSplitParts();
         long[] fileSizeList = new long[totalSplitParts + 1];
 
         for (int i = 0; i <= totalSplitParts; i++) {
