@@ -71,7 +71,7 @@ public final class LocalFileHeaderReader {
     }
 
     private void findHead(DataInput in) throws IOException {
-        in.seek(entry.getOffsLocalFileHeader());
+        in.seek(entry.getLocalFileHeaderOffs());
 
         if (in.readSignature() != LocalFileHeader.SIGNATURE)
             throw new Zip4jException("invalid local file header signature");

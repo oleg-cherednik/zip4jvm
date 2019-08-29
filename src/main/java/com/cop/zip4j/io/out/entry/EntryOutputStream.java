@@ -65,7 +65,7 @@ public abstract class EntryOutputStream extends OutputStream {
             out.writeDwordSignature(SPLIT_SIGNATURE);
 
         zipModel.getEntries().add(entry);
-        entry.setOffsLocalFileHeader(out.getOffs());
+        entry.setLocalFileHeaderOffs(out.getOffs());
 
         writeLocalFileHeader();
         writeEncryptionHeader();
@@ -74,9 +74,8 @@ public abstract class EntryOutputStream extends OutputStream {
     }
 
     private void writeLocalFileHeader() throws IOException {
-        fileHeader.setOffsLocalFileHeader(out.getOffs());
-        LocalFileHeader localFileHeader1 = new LocalFileHeaderEntryBuilder(entry, zipModel).create();
-        new LocalFileHeaderWriter(localFileHeader1, zipModel.getCharset()).write(out);
+        LocalFileHeader localFileHeader = new LocalFileHeaderEntryBuilder(entry, zipModel).create();
+        new LocalFileHeaderWriter(localFileHeader, zipModel.getCharset()).write(out);
         out.mark(COMPRESSED_DATA);
     }
 
@@ -107,19 +106,19 @@ public abstract class EntryOutputStream extends OutputStream {
     }
 
     private void checkChecksum() {
-        long expected = fileHeader.getCrc32();
+        long expected = entry.checksum();
         long actual = checksum.getValue();
 
         if (expected != 0 && expected != actual)
-            throw new Zip4jException("Checksum is not matched: " + fileHeader.getFileName());
+            throw new Zip4jException("Checksum is not matched: " + entry.getName());
     }
 
     private void checkCompressedSize() {
-        long expected = fileHeader.getCompressedSize();
+        long expected = entry.getCompressedSize();
         long actual = out.getWrittenBytesAmount(COMPRESSED_DATA);
 
         if (expected != 0 && expected != actual)
-            throw new Zip4jException("CompressedSize is not matched: " + fileHeader.getFileName());
+            throw new Zip4jException("CompressedSize is not matched: " + entry.getName());
     }
 
     private void updateFileHeader() {

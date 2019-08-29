@@ -31,7 +31,7 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
 
         setCompressedSizeNew(fileHeader.getCompressedSize());
         setDisc(fileHeader.getDiskNumber());
-        setOffsLocalFileHeader(fileHeader.getOffsLocalFileHeader());
+        setLocalFileHeaderOffs(fileHeader.getOffsLocalFileHeader());
 
 
         setName(fileHeader.getFileName());

@@ -89,11 +89,11 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
 
                 if (prv != null) {
                     long curOffs = offsOut;
-                    long length = zipEntry.getOffsLocalFileHeader() - prv.getOffsLocalFileHeader();
+                    long length = zipEntry.getLocalFileHeaderOffs() - prv.getLocalFileHeaderOffs();
                     offsIn += skip + IOUtils.copyLarge(in, out, skip, length);
                     offsOut += length;
                     zipEntries.add(prv);
-                    prv.setOffsLocalFileHeader(curOffs);
+                    prv.setLocalFileHeaderOffs(curOffs);
                     skip = 0;
 
                     // TODO fix offs for zip64
@@ -113,15 +113,15 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
                     prv = zipEntry;
                 }
 
-                skip = zipEntry.getOffsLocalFileHeader() - offsIn;
+                skip = zipEntry.getLocalFileHeaderOffs() - offsIn;
             }
 
             if (prv != null) {
                 long curOffs = offsOut;
-                long length = zipModel.getCentralDirectoryOffs() - prv.getOffsLocalFileHeader();
+                long length = zipModel.getCentralDirectoryOffs() - prv.getLocalFileHeaderOffs();
                 offsOut += IOUtils.copyLarge(in, out, skip, length);
                 zipEntries.add(prv);
-                prv.setOffsLocalFileHeader(curOffs);
+                prv.setLocalFileHeaderOffs(curOffs);
             }
         }
 

@@ -46,7 +46,7 @@ public class CentralDirectoryBuilder {
         fileHeader.setDiskNumber(currSplitFileCounter);
         fileHeader.setInternalFileAttributes(InternalFileAttributes.of(entry.getPath()));
         fileHeader.setExternalFileAttributes(ExternalFileAttributes.of(entry.getPath()));
-        fileHeader.setOffsLocalFileHeader(entry.getOffsLocalFileHeader());
+        fileHeader.setOffsLocalFileHeader(entry.getLocalFileHeaderOffs());
         fileHeader.setZip64ExtendedInfo(Zip64.ExtendedInfo.NULL);
         fileHeader.setAesExtraDataRecord(getAesExtraDataRecord(entry.getEncryption()));
         fileHeader.setFileComment(null);

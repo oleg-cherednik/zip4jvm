@@ -131,7 +131,7 @@ public final class ZipMisc {
         long offs = Arrays.stream(fileSizeList).sum();
 
         zipModel.getEntries().forEach(entry -> {
-            entry.setOffsLocalFileHeader(entry.getOffsLocalFileHeader() + Arrays.stream(fileSizeList, 0, entry.getDisc()).sum());
+            entry.setLocalFileHeaderOffs(entry.getLocalFileHeaderOffs() + Arrays.stream(fileSizeList, 0, entry.getDisc()).sum());
             entry.setDisc(0);
         });
 

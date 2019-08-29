@@ -39,7 +39,7 @@ public abstract class PathZipEntry extends ZipEntry {
     @Setter
     private int disc;
     @Setter
-    private long offsLocalFileHeader;
+    private long localFileHeaderOffs;
 
     @Override
     public boolean isRegularFile() {
