@@ -56,7 +56,6 @@ public final class ZipModelReader {
         EndCentralDirectory endCentralDirectory = new EndCentralDirectoryReader().read(in);
 
         ZipModel zipModel = new ZipModel(zipFile, charset);
-        zipModel.setEndCentralDirectory(endCentralDirectory);
         zipModel.setComment(endCentralDirectory.getComment());
         zipModel.setSplitParts(endCentralDirectory.getSplitParts());
         zipModel.setCentralDirectoryOffs(endCentralDirectory.getCentralDirectoryOffs());
@@ -67,7 +66,7 @@ public final class ZipModelReader {
 
         zipModel.setZip64(new Zip64Reader().read(in));
 
-        if(zipModel.getZip64() != Zip64.NULL) {
+        if (zipModel.getZip64() != Zip64.NULL) {
             zipModel.setCentralDirectoryOffs(zipModel.getZip64().getEndCentralDirectory().getCentralDirectoryOffs());
             totalEntries = zipModel.getZip64().getEndCentralDirectory().getTotalEntries();
         }
@@ -86,9 +85,7 @@ public final class ZipModelReader {
         if (!zipModel.getEntries().isEmpty())
             return;
 
-        centralDirectory.getFileHeaders().forEach(fileHeader -> {
-            zipModel.getEntries().add(new FileHeaderPathZipEntry(fileHeader));
-        });
+        centralDirectory.getFileHeaders().forEach(fileHeader -> zipModel.getEntries().add(new FileHeaderPathZipEntry(fileHeader)));
     }
 
 }
