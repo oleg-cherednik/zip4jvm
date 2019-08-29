@@ -41,6 +41,8 @@ public abstract class EntryOutputStream extends OutputStream {
     protected final Encoder encoder;
     protected final DataOutput out;
 
+    private boolean dataDescriptorExists;
+
     public static EntryOutputStream create(@NonNull PathZipEntry entry, @NonNull ZipModel zipModel, @NonNull DataOutput out) throws IOException {
         return createOutputStream(entry, zipModel, out).writeHeader();
     }
@@ -75,6 +77,7 @@ public abstract class EntryOutputStream extends OutputStream {
 
     private void writeLocalFileHeader() throws IOException {
         LocalFileHeader localFileHeader = new LocalFileHeaderEntryBuilder(entry, zipModel).create();
+        dataDescriptorExists = localFileHeader.getGeneralPurposeFlag().isDataDescriptorExists();
         new LocalFileHeaderWriter(localFileHeader, zipModel.getCharset()).write(out);
         out.mark(COMPRESSED_DATA);
     }
@@ -101,7 +104,6 @@ public abstract class EntryOutputStream extends OutputStream {
 
         entry.setCompressedSizeNew(out.getWrittenBytesAmount(COMPRESSED_DATA));
 
-        updateFileHeader();
         writeDataDescriptor();
     }
 
@@ -121,17 +123,12 @@ public abstract class EntryOutputStream extends OutputStream {
             throw new Zip4jException("CompressedSize is not matched: " + entry.getName());
     }
 
-    private void updateFileHeader() {
-        fileHeader.setCrc32(fileHeader.getEncryption().getChecksum().apply(fileHeader));
-        fileHeader.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
-    }
-
     private void writeDataDescriptor() throws IOException {
-        if (fileHeader.getGeneralPurposeFlag().isDataDescriptorExists()) {
+        if (dataDescriptorExists) {
             DataDescriptor dataDescriptor = new DataDescriptor();
             dataDescriptor.setCrc32(checksum.getValue());
-            dataDescriptor.setCompressedSize(fileHeader.getOriginalCompressedSize());
-            dataDescriptor.setUncompressedSize(fileHeader.getOriginalUncompressedSize());
+            dataDescriptor.setCompressedSize(entry.getCompressedSizeNew());
+            dataDescriptor.setUncompressedSize(entry.size());
 
             new DataDescriptorWriter(dataDescriptor, zipModel.getActivity()).write(out);
         }
