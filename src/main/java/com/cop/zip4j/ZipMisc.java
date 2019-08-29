@@ -4,7 +4,6 @@ import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.io.out.DataOutputStreamDecorator;
 import com.cop.zip4j.io.out.SingleZipOutputStream;
-import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import com.cop.zip4j.utils.CreateZipModel;
@@ -138,21 +137,6 @@ public final class ZipMisc {
 
         zipModel.setSplitLength(ZipModel.NO_SPLIT);
         zipModel.setCentralDirectoryOffs(zipModel.getCentralDirectoryOffs() + offs);
-
-        Zip64 zip64 = zipModel.getZip64();
-
-        if (zip64 != Zip64.NULL) {
-            Zip64.EndCentralDirectoryLocator locator = zip64.getEndCentralDirectoryLocator();
-            locator.setStartDisk(0);
-            locator.setOffs(locator.getOffs() + offs);
-            locator.setTotalDisks(1);
-
-            Zip64.EndCentralDirectory dir = zip64.getEndCentralDirectory();
-            dir.setDisk(0);
-            dir.setStartDisk(0);
-            dir.setDiskEntries(zipModel.getEntries().size());
-            dir.setCentralDirectoryOffs(dir.getCentralDirectoryOffs() + offs);
-        }
     }
 
     private static long[] copyAllParts(@NonNull OutputStream out, @NonNull ZipModel zipModel) throws IOException {
