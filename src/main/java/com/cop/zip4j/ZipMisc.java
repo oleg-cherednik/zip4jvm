@@ -63,7 +63,7 @@ public final class ZipMisc {
 
     public String getComment() throws Zip4jException {
         UnzipIt.checkZipFile(zipFile);
-        return new CreateZipModel(zipFile, charset).get().getEndCentralDirectory().getComment();
+        return new CreateZipModel(zipFile, charset).get().getComment();
     }
 
     public boolean isEncrypted() {
@@ -83,7 +83,7 @@ public final class ZipMisc {
         UnzipIt.checkZipFile(zipFile);
         ZipModel zipModel = new CreateZipModel(zipFile, charset).get();
 
-        return IntStream.rangeClosed(0, zipModel.getEndCentralDirectory().getSplitParts())
+        return IntStream.rangeClosed(0, zipModel.getSplitParts())
                         .mapToObj(i -> i == 0 ? zipModel.getZipFile() : ZipModel.getSplitFilePath(zipFile, i))
                         .collect(Collectors.toList());
     }

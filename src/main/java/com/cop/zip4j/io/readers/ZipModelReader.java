@@ -3,6 +3,7 @@ package com.cop.zip4j.io.readers;
 import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.io.in.LittleEndianReadFile;
 import com.cop.zip4j.model.CentralDirectory;
+import com.cop.zip4j.model.EndCentralDirectory;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.entry.FileHeaderPathZipEntry;
 import lombok.NonNull;
@@ -51,8 +52,14 @@ public final class ZipModelReader {
     }
 
     private ZipModel read(@NonNull DataInput in) throws IOException {
+        EndCentralDirectory endCentralDirectory = new EndCentralDirectoryReader().read(in);
+
         ZipModel zipModel = new ZipModel(zipFile, charset);
-        zipModel.setEndCentralDirectory(new EndCentralDirectoryReader().read(in));
+        zipModel.setEndCentralDirectory(endCentralDirectory);
+        zipModel.setComment(endCentralDirectory.getComment());
+        zipModel.setSplitParts(endCentralDirectory.getSplitParts());
+
+
         zipModel.setZip64(new Zip64Reader().read(in));
 
         long offs = zipModel.getCentralDirectoryOffs();

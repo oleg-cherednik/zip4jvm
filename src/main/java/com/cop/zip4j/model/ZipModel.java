@@ -46,7 +46,9 @@ public class ZipModel {
     private Zip64 zip64 = Zip64.NULL;
     private long splitLength = NO_SPLIT;
     private Activity activity = new PlainActivity();
+
     private String comment;
+    private int splitParts;
 
     private final List<PathZipEntry> entries = new ArrayList<>();
 
