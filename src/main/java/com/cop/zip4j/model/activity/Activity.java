@@ -46,4 +46,8 @@ public interface Activity {
 
     void incTotalEntries(ZipModel zipModel);
 
+    // EndCentralDirectory
+
+    int getTotalEntriesECD(ZipModel zipModel);
+
 }

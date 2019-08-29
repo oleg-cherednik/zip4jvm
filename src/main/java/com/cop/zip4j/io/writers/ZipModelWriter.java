@@ -31,7 +31,7 @@ public final class ZipModelWriter {
         endCentralDirectory.setSplitParts(out.getCounter());
         endCentralDirectory.setStartDiskNumber(out.getCounter());
         endCentralDirectory.setDiskEntries(zipModel.getEntries().size());
-        endCentralDirectory.setTotalEntries(zipModel.getEntries().size());
+        endCentralDirectory.setTotalEntries(zipModel.getActivity().getTotalEntriesECD(zipModel));
         endCentralDirectory.setComment(zipModel.getComment());
 
 

@@ -61,7 +61,7 @@ public class ZipModel {
     }
 
     public boolean isSplitArchive() {
-        return splitLength > 0 || endCentralDirectory.isSplitArchive();
+        return splitLength > 0 || splitParts > 0;
     }
 
     public void setZip64(Zip64 zip64) {
@@ -103,7 +103,7 @@ public class ZipModel {
     private int countNumberOfFileHeaderEntriesOnDisk() {
         if (isSplitArchive())
             return (int)entries.stream()
-                               .filter(entry -> entry.getDisc() == endCentralDirectory.getSplitParts())
+                               .filter(entry -> entry.getDisc() == splitParts)
                                .count();
 
         return entries.size();
@@ -129,7 +129,7 @@ public class ZipModel {
     }
 
     public Path getPartFile(int diskNumber) {
-        return diskNumber == endCentralDirectory.getSplitParts() ? zipFile : getSplitFilePath(zipFile, diskNumber + 1);
+        return diskNumber == splitParts ? zipFile : getSplitFilePath(zipFile, diskNumber + 1);
     }
 
     public void addFileHeader(CentralDirectory.FileHeader fileHeader) {

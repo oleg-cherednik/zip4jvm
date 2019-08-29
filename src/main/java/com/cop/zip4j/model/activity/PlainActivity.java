@@ -67,4 +67,10 @@ public class PlainActivity implements Activity {
     public void incTotalEntries(ZipModel zipModel) {
         zipModel.getEndCentralDirectory().incTotalEntries();
     }
+
+    // ENdCentralDirectory
+
+    public int getTotalEntriesECD(ZipModel zipModel) {
+        return zipModel.getEntries().size();
+    }
 }
