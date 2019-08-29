@@ -69,9 +69,9 @@ public class Zip64Activity implements Activity {
 //        return zipModel.getZip64().getEndCentralDirectory().getCentralDirectoryOffs();
 //    }
 
-    public long getTotalEntries(ZipModel zipModel) {
-        return zipModel.getZip64().getEndCentralDirectory().getTotalEntries();
-    }
+//    public long getTotalEntries(ZipModel zipModel) {
+//        return zipModel.getZip64().getEndCentralDirectory().getTotalEntries();
+//    }
 
     public void incTotalEntries(ZipModel zipModel) {
 //        zipModel.getEndCentralDirectory().setTotalEntries(0xFFFF);

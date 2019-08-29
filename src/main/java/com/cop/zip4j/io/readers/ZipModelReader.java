@@ -63,14 +63,18 @@ public final class ZipModelReader {
         zipModel.setCentralDirectorySize(endCentralDirectory.getCentralDirectorySize());
         zipModel.setStartDiskNumber(endCentralDirectory.getStartDiskNumber());
 
+        long totalEntries = endCentralDirectory.getTotalEntries();
 
         zipModel.setZip64(new Zip64Reader().read(in));
 
-        if(zipModel.getZip64() != Zip64.NULL)
+        if(zipModel.getZip64() != Zip64.NULL) {
             zipModel.setCentralDirectoryOffs(zipModel.getZip64().getEndCentralDirectory().getCentralDirectoryOffs());
+            totalEntries = zipModel.getZip64().getEndCentralDirectory().getTotalEntries();
+        }
 
         long offs = zipModel.getCentralDirectoryOffs();
-        long totalEntries = zipModel.getActivity().getTotalEntries(zipModel);
+
+
         CentralDirectory centralDirectory = new CentralDirectoryReader(offs, totalEntries).read(in);
 
         createEntries(zipModel, centralDirectory);
