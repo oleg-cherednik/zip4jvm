@@ -64,7 +64,6 @@ public abstract class EntryOutputStream extends OutputStream {
         if (zipModel.isSplitArchive() && zipModel.isEmpty())
             out.writeDwordSignature(SPLIT_SIGNATURE);
 
-        zipModel.addFileHeader(fileHeader);
         zipModel.getEntries().add(entry);
         entry.setOffsLocalFileHeader(out.getOffs());
 

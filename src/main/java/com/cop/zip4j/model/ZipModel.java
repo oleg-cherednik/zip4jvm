@@ -84,7 +84,7 @@ public class ZipModel {
         dir.setDisk(splitLength);
         dir.setStartDisk(startDiskNumber);
         dir.setDiskEntries(countNumberOfFileHeaderEntriesOnDisk());
-//        dir.setTotalEntries(getFileHeaders().size());
+        dir.setTotalEntries(entries.size());
         dir.setSize(centralDirectorySize);
         dir.setCentralDirectoryOffs(centralDirectoryOffs);
 
@@ -120,12 +120,6 @@ public class ZipModel {
 
     public Path getPartFile(int diskNumber) {
         return diskNumber == splitParts ? zipFile : getSplitFilePath(zipFile, diskNumber + 1);
-    }
-
-    public void addFileHeader(CentralDirectory.FileHeader fileHeader) {
-        activity.incTotalEntries(this);
-//        endCentralDirectory.incTotalEntries();
-//        endCentralDirectory.incDiskEntries();
     }
 
     @NonNull
