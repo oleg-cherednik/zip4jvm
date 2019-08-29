@@ -6,7 +6,6 @@ import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.GeneralPurposeFlag;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.Zip64;
-import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import com.cop.zip4j.utils.ZipUtils;
@@ -14,6 +13,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.function.LongSupplier;
 
@@ -30,33 +30,35 @@ public final class LocalFileHeaderBuilder {
     @NonNull
     private final PathZipEntry entry;
     @NonNull
-    private final ZipModel zipModel;
+    private final Charset charset;
 
     public LocalFileHeader create() {
+        String fileName = getFileName();
         LocalFileHeader localFileHeader = new LocalFileHeader();
 
         localFileHeader.setVersionToExtract(CentralDirectory.FileHeader.VERSION);
-        updateGeneralPurposeFlag(localFileHeader);
+        localFileHeader.setGeneralPurposeFlag(getGeneralPurposeFlag(fileName));
         localFileHeader.setCompressionMethod(entry.getEncryption().getCompressionMethod(entry));
         localFileHeader.setLastModifiedTime(entry.getLastModifiedTime());
         localFileHeader.setCrc32(getCrc32(localFileHeader).getAsLong());
         localFileHeader.setCompressedSize(getCompressedSize(localFileHeader).getAsLong());
         localFileHeader.setUncompressedSize(getUncompressedSize(localFileHeader).getAsLong());
-        localFileHeader.setFileName(getFileName());
+        localFileHeader.setFileName(fileName);
         localFileHeader.getExtraField().setAesExtraDataRecord(getAesExtraDataRecord(entry.getEncryption()));
 
         return localFileHeader;
     }
 
-    private void updateGeneralPurposeFlag(LocalFileHeader localFileHeader) {
-        GeneralPurposeFlag generalPurposeFlag = localFileHeader.getGeneralPurposeFlag();
-
+    private GeneralPurposeFlag getGeneralPurposeFlag(String fileName) {
+        GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         generalPurposeFlag.setCompressionLevel(entry.getCompressionLevel());
-        generalPurposeFlag.setDataDescriptorExists(!ZipUtils.isDirectory(localFileHeader.getFileName()));
-        generalPurposeFlag.setUtf8(zipModel.getCharset() == StandardCharsets.UTF_8);
+        generalPurposeFlag.setDataDescriptorExists(ZipUtils.isRegularFile(fileName));
+        generalPurposeFlag.setUtf8(charset == StandardCharsets.UTF_8);
         generalPurposeFlag.setEncrypted(entry.getEncryption() != Encryption.OFF);
 //        generalPurposeFlag.setStrongEncryption(entry.getEncryption() == Encryption.STRONG);
         generalPurposeFlag.setStrongEncryption(false);
+
+        return generalPurposeFlag;
     }
 
     // TODO move to ZipEntry

@@ -24,7 +24,7 @@ public class LocalFileHeader {
     private int versionToExtract;
     // size:2 - general purpose bit flag
     @NonNull
-    private final GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
+    private GeneralPurposeFlag generalPurposeFlag;
     // size:2 - compression method
     @NonNull
     private CompressionMethod compressionMethod = CompressionMethod.STORE;
@@ -52,26 +52,12 @@ public class LocalFileHeader {
         return fileName != null ? fileName.getBytes(charset) : ArrayUtils.EMPTY_BYTE_ARRAY;
     }
 
-    public void setExtraField(@NonNull ExtraField extraField) {
-        this.extraField.setFrom(extraField);
-        generalPurposeFlag.setEncrypted(isEncrypted());
-    }
-
     public long getCompressedSize() {
         return extraField.getExtendedInfo() == Zip64.ExtendedInfo.NULL ? compressedSize : extraField.getExtendedInfo().getCompressedSize();
     }
 
     public long getUncompressedSize() {
         return extraField.getExtendedInfo() == Zip64.ExtendedInfo.NULL ? uncompressedSize : extraField.getExtendedInfo().getUncompressedSize();
-    }
-
-    public void setGeneralPurposeFlag(int data) {
-        generalPurposeFlag.read(data);
-        generalPurposeFlag.setEncrypted(isEncrypted());
-    }
-
-    public boolean isEncrypted() {
-        return getEncryption() != Encryption.OFF;
     }
 
     public Encryption getEncryption() {

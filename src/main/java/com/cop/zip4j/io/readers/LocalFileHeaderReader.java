@@ -5,6 +5,7 @@ import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.DataDescriptor;
+import com.cop.zip4j.model.GeneralPurposeFlag;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import com.cop.zip4j.utils.ZipUtils;
@@ -34,7 +35,7 @@ public final class LocalFileHeaderReader {
         LocalFileHeader localFileHeader = new LocalFileHeader();
 
         localFileHeader.setVersionToExtract(in.readWord());
-        localFileHeader.setGeneralPurposeFlag(in.readWord());
+        localFileHeader.setGeneralPurposeFlag(new GeneralPurposeFlag(in.readWord()));
         localFileHeader.setCompressionMethod(CompressionMethod.parseValue(in.readWord()));
         localFileHeader.setLastModifiedTime((int)in.readDword());
         localFileHeader.setCrc32(in.readDword());

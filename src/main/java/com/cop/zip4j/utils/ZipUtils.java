@@ -64,6 +64,10 @@ public class ZipUtils {
         return fileName != null && (fileName.endsWith("/") || fileName.endsWith("\\"));
     }
 
+    public static boolean isRegularFile(String fileName) {
+        return fileName != null && !(fileName.endsWith("/") || fileName.endsWith("\\"));
+    }
+
     @SuppressWarnings("FieldNamingConvention")
     public static final Function<String, String> normalizeComment = comment -> {
         if (StringUtils.isBlank(comment))

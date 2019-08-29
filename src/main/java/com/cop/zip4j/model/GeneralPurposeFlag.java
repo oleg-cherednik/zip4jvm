@@ -32,6 +32,10 @@ public class GeneralPurposeFlag implements IntSupplier {
     private boolean strongEncryption;
     private boolean utf8;
 
+    public GeneralPurposeFlag(int data) {
+        read(data);
+    }
+
     public void read(int data) {
         encrypted = BitUtils.isBitSet(data, BIT0);
 
