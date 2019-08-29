@@ -64,20 +64,18 @@ public final class ZipModelReader {
 
         long totalEntries = endCentralDirectory.getTotalEntries();
 
-        zipModel.setZip64(new Zip64Reader().read(in));
+        Zip64 zip64 = new Zip64Reader().read(in);
 
-        if (zipModel.getZip64() != Zip64.NULL) {
-            zipModel.setCentralDirectoryOffs(zipModel.getZip64().getEndCentralDirectory().getCentralDirectoryOffs());
-            totalEntries = zipModel.getZip64().getEndCentralDirectory().getTotalEntries();
+        if (zip64 != Zip64.NULL) {
+            zipModel.zip64();
+            zipModel.setCentralDirectoryOffs(zip64.getEndCentralDirectory().getCentralDirectoryOffs());
+            totalEntries = zip64.getEndCentralDirectory().getTotalEntries();
         }
 
         long offs = zipModel.getCentralDirectoryOffs();
 
-
         CentralDirectory centralDirectory = new CentralDirectoryReader(offs, totalEntries).read(in);
-
         createEntries(zipModel, centralDirectory);
-
         return zipModel;
     }
 

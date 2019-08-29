@@ -50,15 +50,12 @@ public final class ZipModelWriter {
     }
 
     private void writeZip64(DataOutput out) throws IOException {
-        zipModel.updateZip64(out.getCounter());
-
         Zip64 zip64 = createZip64(out.getCounter());
-
         new Zip64Writer(zip64).write(out);
     }
 
     private Zip64 createZip64(int counter) {
-        if(!(zipModel.getActivity() instanceof Zip64Activity))
+        if (!(zipModel.getActivity() instanceof Zip64Activity))
             return Zip64.NULL;
 
         Zip64.EndCentralDirectory dir = new Zip64.EndCentralDirectory();
@@ -67,7 +64,7 @@ public final class ZipModelWriter {
         dir.setVersionNeededToExtract(CentralDirectory.FileHeader.VERSION);
         dir.setDisk(zipModel.getSplitParts());
         dir.setStartDisk(zipModel.getStartDiskNumber());
-        dir.setDiskEntries(zipModel.countNumberOfFileHeaderEntriesOnDisk());
+        dir.setDiskEntries(countNumberOfFileHeaderEntriesOnDisk());
         dir.setTotalEntries(zipModel.getEntries().size());
         dir.setSize(zipModel.getCentralDirectorySize());
         dir.setCentralDirectoryOffs(zipModel.getCentralDirectoryOffs());
@@ -78,6 +75,15 @@ public final class ZipModelWriter {
         locator.setTotalDisks(counter + 1);
 
         return Zip64.of(locator, dir);
+    }
+
+    private int countNumberOfFileHeaderEntriesOnDisk() {
+        if (zipModel.isSplitArchive())
+            return (int)zipModel.getEntries().stream()
+                                .filter(entry -> entry.getDisc() == zipModel.getSplitParts())
+                                .count();
+
+        return zipModel.getEntries().size();
     }
 
     private void writeEndCentralDirectory(DataOutput out) throws IOException {

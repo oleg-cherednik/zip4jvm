@@ -61,45 +61,9 @@ public class ZipModel {
         return splitLength > 0 || splitParts > 0;
     }
 
-    public void setZip64(Zip64 zip64) {
-        this.zip64 = zip64;
-        activity = zip64 == Zip64.NULL ? new PlainActivity() : new Zip64Activity();
-    }
-
     public void zip64() {
-        if (zip64 == Zip64.NULL)
-            setZip64(Zip64.of(new Zip64.EndCentralDirectoryLocator(), new Zip64.EndCentralDirectory()));
-    }
-
-    public void updateZip64(int counter) {
-        if (zip64 == Zip64.NULL)
-            return;
-
-        Zip64.EndCentralDirectory dir = zip64.getEndCentralDirectory();
-        dir.setSize(Zip64.EndCentralDirectory.SIZE + dir.getSizeEndCentralDirectory());
-        dir.setVersionMadeBy(CentralDirectory.FileHeader.VERSION);
-        dir.setVersionNeededToExtract(CentralDirectory.FileHeader.VERSION);
-        dir.setDisk(splitParts);
-        dir.setStartDisk(startDiskNumber);
-        dir.setDiskEntries(countNumberOfFileHeaderEntriesOnDisk());
-        dir.setTotalEntries(entries.size());
-        dir.setSize(centralDirectorySize);
-        dir.setCentralDirectoryOffs(centralDirectoryOffs);
-
-        Zip64.EndCentralDirectoryLocator locator = zip64.getEndCentralDirectoryLocator();
-        locator.setOffs(centralDirectoryOffs + centralDirectorySize);
-        locator.setStartDisk(counter);
-        locator.setTotalDisks(counter + 1);
-    }
-
-    public int countNumberOfFileHeaderEntriesOnDisk() {
-        if (isSplitArchive())
-            return (int)entries.stream()
-                               .filter(entry -> entry.getDisc() == splitParts)
-                               .count();
-
-        return entries.size();
-
+        if (!(activity instanceof Zip64Activity))
+            activity = new Zip64Activity();
     }
 
     public boolean isEmpty() {
