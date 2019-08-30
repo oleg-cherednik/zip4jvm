@@ -2,6 +2,7 @@ package com.cop.zip4j.io.out;
 
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.writers.ZipModelWriter;
+import com.cop.zip4j.model.DataDescriptor;
 import com.cop.zip4j.model.ZipModel;
 import lombok.NonNull;
 
@@ -16,15 +17,20 @@ import java.nio.file.Path;
  */
 public class SplitZipOutputStream extends BaseDataOutput {
 
+    /** see 8.5.5 */
+    public static final int SPLIT_SIGNATURE = DataDescriptor.SIGNATURE;
+
     private int counter;
 
     @NonNull
-    public static SplitZipOutputStream create(@NonNull ZipModel zipModel) throws FileNotFoundException {
+    public static SplitZipOutputStream create(@NonNull ZipModel zipModel) throws IOException {
         // TODO move to ZipParameters
         if (zipModel.getSplitLength() >= 0 && zipModel.getSplitLength() < ZipModel.MIN_SPLIT_LENGTH)
             throw new Zip4jException("split length less than minimum allowed split length of " + ZipModel.MIN_SPLIT_LENGTH + " Bytes");
 
-        return new SplitZipOutputStream(zipModel);
+        SplitZipOutputStream out = new SplitZipOutputStream(zipModel);
+        out.writeDwordSignature(SPLIT_SIGNATURE);
+        return out;
     }
 
     private SplitZipOutputStream(@NonNull ZipModel zipModel) throws FileNotFoundException {

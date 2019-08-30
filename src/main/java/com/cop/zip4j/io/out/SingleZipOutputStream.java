@@ -15,7 +15,7 @@ import java.nio.file.Path;
 public class SingleZipOutputStream extends BaseDataOutput {
 
     @NonNull
-    public static SingleZipOutputStream create(@NonNull ZipModel zipModel) throws FileNotFoundException {
+    public static SingleZipOutputStream create(@NonNull ZipModel zipModel) throws IOException {
         return new SingleZipOutputStream(zipModel.getZipFile(), zipModel);
     }
 

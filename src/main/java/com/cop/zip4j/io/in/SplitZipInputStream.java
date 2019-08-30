@@ -1,7 +1,7 @@
 package com.cop.zip4j.io.in;
 
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.io.out.entry.EntryOutputStream;
+import com.cop.zip4j.io.out.SplitZipOutputStream;
 import com.cop.zip4j.model.ZipModel;
 import lombok.NonNull;
 import org.apache.commons.io.IOUtils;
@@ -32,7 +32,7 @@ public class SplitZipInputStream extends BaseDataInput {
     private void checkSignature() throws IOException {
         if (diskNumber != 0)
             return;
-        if (delegate.readSignature() != EntryOutputStream.SPLIT_SIGNATURE)
+        if (delegate.readSignature() != SplitZipOutputStream.SPLIT_SIGNATURE)
             throw new Zip4jException("Incorrect split file signature: " + zipModel.getZipFile().getFileName());
     }
 

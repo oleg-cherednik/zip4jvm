@@ -23,9 +23,7 @@ import java.util.zip.Checksum;
  */
 public abstract class EntryOutputStream extends OutputStream {
 
-    public static final int SPLIT_SIGNATURE = 0x08074b50;
-
-    private static final String COMPRESSED_DATA = EntryOutputStream.class.getSimpleName();
+    private static final String COMPRESSED_DATA = "entryCompressedDataOffs";
 
     private final PathZipEntry entry;
     private final Checksum checksum = new CRC32();
@@ -37,13 +35,8 @@ public abstract class EntryOutputStream extends OutputStream {
         EntryOutputStream os = createOutputStream(entry, out);
 
         // TODO move it to the separate method
-        // only at the beginning of the split file
-        if (zipModel.isSplitArchive() && zipModel.isEmpty())
-            out.writeDwordSignature(SPLIT_SIGNATURE);
-
         zipModel.getEntries().add(entry);
         entry.setLocalFileHeaderOffs(out.getOffs());
-        // ----------------
 
         os.writeLocalFileHeader();
         os.writeEncryptionHeader();
