@@ -1,12 +1,16 @@
 package com.cop.zip4j.model.builders;
 
 import com.cop.zip4j.model.CentralDirectory;
+import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ExtraField;
+import com.cop.zip4j.model.GeneralPurposeFlag;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author Oleg Cherednik
@@ -25,7 +29,7 @@ public final class LocalFileHeaderBuilder {
         LocalFileHeader localFileHeader = new LocalFileHeader();
 
         localFileHeader.setVersionToExtract(CentralDirectory.FileHeader.VERSION);
-        localFileHeader.setGeneralPurposeFlag(entry.createGeneralPurposeFlag());
+        localFileHeader.setGeneralPurposeFlag(createGeneralPurposeFlag());
         localFileHeader.setCompressionMethod(entry.getEncryption().getCompressionMethod(entry));
         localFileHeader.setLastModifiedTime(entry.getLastModifiedTime());
         localFileHeader.setCrc32(getValue(entry.checksum()));
@@ -35,6 +39,18 @@ public final class LocalFileHeaderBuilder {
         localFileHeader.setExtraField(createExtraField());
 
         return localFileHeader;
+    }
+
+    private GeneralPurposeFlag createGeneralPurposeFlag() {
+        GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
+        generalPurposeFlag.setCompressionLevel(entry.getCompressionLevel());
+        generalPurposeFlag.setDataDescriptorAvailable(entry.isDataDescriptorAvailable());
+        generalPurposeFlag.setUtf8(entry.getCharset() == StandardCharsets.UTF_8);
+        generalPurposeFlag.setEncrypted(entry.getEncryption() != Encryption.OFF);
+//        generalPurposeFlag.setStrongEncryption(entry.getEncryption() == Encryption.STRONG);
+        generalPurposeFlag.setStrongEncryption(false);
+
+        return generalPurposeFlag;
     }
 
     private ExtraField createExtraField() {

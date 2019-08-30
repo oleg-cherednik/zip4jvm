@@ -1,8 +1,10 @@
 package com.cop.zip4j.model.builders;
 
 import com.cop.zip4j.model.CentralDirectory;
+import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ExternalFileAttributes;
 import com.cop.zip4j.model.ExtraField;
+import com.cop.zip4j.model.GeneralPurposeFlag;
 import com.cop.zip4j.model.InternalFileAttributes;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.entry.PathZipEntry;
@@ -10,6 +12,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author Oleg Cherednik
@@ -27,7 +30,7 @@ final class FileHeaderBuilder {
 
         fileHeader.setVersionMadeBy(CentralDirectory.FileHeader.VERSION);
         fileHeader.setVersionToExtract(CentralDirectory.FileHeader.VERSION);
-        fileHeader.setGeneralPurposeFlag(entry.createGeneralPurposeFlag());
+        fileHeader.setGeneralPurposeFlag(createGeneralPurposeFlag());
         fileHeader.setCompressionMethod(entry.getEncryption().getCompressionMethod(entry));
         fileHeader.setLastModifiedTime(entry.getLastModifiedTime());
         fileHeader.setCrc32(entry.getEncryption().getChecksumFileHeader().apply(entry.checksum()));
@@ -44,6 +47,18 @@ final class FileHeaderBuilder {
         return fileHeader;
     }
 
+    private GeneralPurposeFlag createGeneralPurposeFlag() {
+        GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
+        generalPurposeFlag.setCompressionLevel(entry.getCompressionLevel());
+        generalPurposeFlag.setDataDescriptorAvailable(entry.isDataDescriptorAvailable());
+        generalPurposeFlag.setUtf8(entry.getCharset() == StandardCharsets.UTF_8);
+        generalPurposeFlag.setEncrypted(entry.getEncryption() != Encryption.OFF);
+//        generalPurposeFlag.setStrongEncryption(entry.getEncryption() == Encryption.STRONG);
+        generalPurposeFlag.setStrongEncryption(false);
+
+        return generalPurposeFlag;
+    }
+
     private ExtraField createExtraField() {
         ExtraField extraField = new ExtraField();
         extraField.setExtendedInfo(createExtendedInfo());
@@ -54,12 +69,12 @@ final class FileHeaderBuilder {
     private Zip64.ExtendedInfo createExtendedInfo() {
 //        if (entry.isDataDescriptorAvailable())
 //            return Zip64.ExtendedInfo.NULL;
-        if (entry.isZip64())
-            return Zip64.ExtendedInfo.builder()
-                                     .compressedSize(entry.getCompressedSizeNew())
-                                     .uncompressedSize(entry.size())
-//                                     .offsLocalHeaderRelative(entry.getLocalFileHeaderOffs())
-                                     .build();
+//        if (entry.isZip64())
+//            return Zip64.ExtendedInfo.builder()
+//                                     .compressedSize(entry.getCompressedSizeNew())
+//                                     .uncompressedSize(entry.size())
+////                                     .offsLocalHeaderRelative(entry.getLocalFileHeaderOffs())
+//                                     .build();
         return Zip64.ExtendedInfo.NULL;
     }
 
