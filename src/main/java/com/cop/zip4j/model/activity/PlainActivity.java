@@ -1,6 +1,7 @@
 package com.cop.zip4j.model.activity;
 
 import com.cop.zip4j.io.out.DataOutput;
+import com.cop.zip4j.io.readers.DataDescriptorReader;
 import com.cop.zip4j.io.writers.DataDescriptorWriter;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.DataDescriptor;
@@ -79,6 +80,10 @@ public final class PlainActivity implements Activity {
 
     public int getTotalEntriesECD(ZipModel zipModel) {
         return zipModel.getEntries().size();
+    }
+
+    public DataDescriptorReader getDataDescriptorReader() {
+        return new DataDescriptorReader.Plain();
     }
 
     public DataDescriptorWriter getDataDescriptorWriter(DataDescriptor dataDescriptor) {
