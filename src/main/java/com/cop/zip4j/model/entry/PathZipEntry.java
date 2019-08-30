@@ -4,6 +4,7 @@ import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.Encryption;
+import com.cop.zip4j.model.GeneralPurposeFlag;
 import com.cop.zip4j.model.activity.Activity;
 import com.cop.zip4j.model.activity.PlainActivity;
 import com.cop.zip4j.model.activity.Zip64Activity;
@@ -101,6 +102,18 @@ public abstract class PathZipEntry extends ZipEntry {
 
     public boolean isZip64() {
         return activity instanceof Zip64Activity;
+    }
+
+    public GeneralPurposeFlag createGeneralPurposeFlag() {
+        GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
+        generalPurposeFlag.setCompressionLevel(getCompressionLevel());
+        generalPurposeFlag.setDataDescriptorAvailable(isDataDescriptorAvailable());
+        generalPurposeFlag.setUtf8(getCharset() == StandardCharsets.UTF_8);
+        generalPurposeFlag.setEncrypted(getEncryption() != Encryption.OFF);
+//        generalPurposeFlag.setStrongEncryption(entry.getEncryption() == Encryption.STRONG);
+        generalPurposeFlag.setStrongEncryption(false);
+
+        return generalPurposeFlag;
     }
 
 }

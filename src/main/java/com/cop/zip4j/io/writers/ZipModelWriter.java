@@ -6,6 +6,7 @@ import com.cop.zip4j.model.EndCentralDirectory;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.activity.Zip64Activity;
+import com.cop.zip4j.model.builders.CentralDirectoryBuilder;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -31,7 +32,7 @@ public final class ZipModelWriter {
 
     private void writeCentralDirectoryHeaders(DataOutput out) throws IOException {
         out.mark(CENTRAL_DIRECTORY_OFFS);
-        CentralDirectory centralDirectory = new LocalCentralDirectoryBuilder(zipModel.getEntries()).create();
+        CentralDirectory centralDirectory = new CentralDirectoryBuilder(zipModel.getEntries()).create();
         new CentralDirectoryWriter(centralDirectory, zipModel.getCharset()).write(out);
         zipModel.setCentralDirectorySize(out.getWrittenBytesAmount(CENTRAL_DIRECTORY_OFFS));
     }
