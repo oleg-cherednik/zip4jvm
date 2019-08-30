@@ -54,12 +54,12 @@ final class FileHeaderBuilder {
     private Zip64.ExtendedInfo createExtendedInfo() {
 //        if (entry.isDataDescriptorAvailable())
 //            return Zip64.ExtendedInfo.NULL;
-//        if (entry.isZip64())
-//            return Zip64.ExtendedInfo.builder()
-//                                     .compressedSize(entry.getCompressedSizeNew())
-//                                     .uncompressedSize(entry.size())
-////                                     .offsLocalHeaderRelative(entry.getLocalFileHeaderOffs())
-//                                     .build();
+        if (entry.isZip64())
+            return Zip64.ExtendedInfo.builder()
+                                     .compressedSize(entry.getCompressedSizeNew())
+                                     .uncompressedSize(entry.size())
+//                                     .offsLocalHeaderRelative(entry.getLocalFileHeaderOffs())
+                                     .build();
         return Zip64.ExtendedInfo.NULL;
     }
 
