@@ -43,7 +43,7 @@ final class FileHeaderReader {
 
         fileHeader.setVersionMadeBy(in.readWord());
         fileHeader.setVersionToExtract(in.readWord());
-        fileHeader.setGeneralPurposeFlag(in.readWord());
+        fileHeader.setGeneralPurposeFlagData(in.readWord());
         fileHeader.setCompressionMethod(CompressionMethod.parseValue(in.readWord()));
         fileHeader.setLastModifiedTime((int)in.readDword());
         fileHeader.setCrc32(in.readDword());

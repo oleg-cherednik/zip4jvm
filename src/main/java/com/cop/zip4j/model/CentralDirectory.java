@@ -82,7 +82,7 @@ public class CentralDirectory {
         private int versionToExtract = VERSION;
         // size:2 - general purpose bit flag
         @NonNull
-        private final GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
+        private GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         // size:2 - compression method
         @NonNull
         private CompressionMethod compressionMethod = CompressionMethod.STORE;
@@ -164,7 +164,7 @@ public class CentralDirectory {
             generalPurposeFlag.setEncrypted(isEncrypted());
         }
 
-        public void setGeneralPurposeFlag(int data) {
+        public void setGeneralPurposeFlagData(int data) {
             generalPurposeFlag.read(data);
             generalPurposeFlag.setEncrypted(isEncrypted());
         }
