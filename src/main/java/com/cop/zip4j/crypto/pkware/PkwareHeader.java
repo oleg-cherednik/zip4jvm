@@ -3,7 +3,7 @@ package com.cop.zip4j.crypto.pkware;
 import com.cop.zip4j.exception.Zip4jIncorrectPasswordException;
 import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.io.out.DataOutput;
-import com.cop.zip4j.model.LocalFileHeader;
+import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -38,11 +38,9 @@ public final class PkwareHeader {
         return buf;
     }
 
-    public static PkwareHeader read(@NonNull DataInput in, @NonNull LocalFileHeader localFileHeader, @NonNull PkwareEngine engine)
-            throws IOException {
-        in.seek(localFileHeader.getOffs());
+    public static PkwareHeader read(@NonNull DataInput in, @NonNull PathZipEntry entry, @NonNull PkwareEngine engine) throws IOException {
         PkwareHeader header = new PkwareHeader(in.readBytes(SIZE));
-        header.requireMatchChecksum(localFileHeader, engine);
+        header.requireMatchChecksum(entry, engine);
         return header;
     }
 
@@ -50,16 +48,16 @@ public final class PkwareHeader {
         out.writeBytes(buf);
     }
 
-    private void requireMatchChecksum(LocalFileHeader localFileHeader, PkwareEngine engine) {
+    private void requireMatchChecksum(PathZipEntry entry, PkwareEngine engine) {
         engine.decrypt(buf, 0, buf.length);
-        int checksum = getChecksum(localFileHeader);
+        int checksum = getChecksum(entry);
 
         if (buf[buf.length - 1] != low(checksum) || buf[buf.length - 2] != high(checksum))
-            throw new Zip4jIncorrectPasswordException(localFileHeader.getFileName());
+            throw new Zip4jIncorrectPasswordException(entry.getName());
     }
 
-    private static int getChecksum(LocalFileHeader localFileHeader) {
-        return localFileHeader.getLastModifiedTime();
+    private static int getChecksum(PathZipEntry entry) {
+        return entry.getLastModifiedTime();
     }
 
     private static byte low(int checksum) {

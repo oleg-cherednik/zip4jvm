@@ -33,7 +33,7 @@ public enum Encryption {
             entry -> 0L,
             crc32 -> crc32) {
         @Override
-        public Decoder decoder(@NonNull DataInput in, @NonNull LocalFileHeader localFileHeader, char[] password) throws IOException {
+        public Decoder decoder(@NonNull DataInput in, PathZipEntry entry, @NonNull LocalFileHeader localFileHeader, char[] password) throws IOException {
             return Decoder.NULL;
         }
     },
@@ -41,15 +41,15 @@ public enum Encryption {
             entry -> entry.size() + PkwareHeader.SIZE,
             crc32 -> crc32) {
         @Override
-        public Decoder decoder(@NonNull DataInput in, @NonNull LocalFileHeader localFileHeader, char[] password) throws IOException {
-            return PkwareDecoder.create(in, localFileHeader, password);
+        public Decoder decoder(@NonNull DataInput in, PathZipEntry entry, @NonNull LocalFileHeader localFileHeader, char[] password) throws IOException {
+            return PkwareDecoder.create(in, entry, password);
         }
     },
     AES(AesEncoder::create,
             entry -> entry.size() + entry.getStrength().saltLength() + AesEngine.MAX_SIZE + AesEngine.PASSWORD_CHECKSUM_SIZE,
             crc32 -> 0L) {
         @Override
-        public Decoder decoder(DataInput in, @NonNull LocalFileHeader localFileHeader, char[] password) throws IOException {
+        public Decoder decoder(DataInput in, PathZipEntry entry, @NonNull LocalFileHeader localFileHeader, char[] password) throws IOException {
             return AesDecoder.create(in, localFileHeader, password);
         }
 
@@ -70,7 +70,7 @@ public enum Encryption {
     private final LongFunction<Long> checksumFileHeader;
 
     @NonNull
-    public Decoder decoder(@NonNull DataInput in, @NonNull LocalFileHeader localFileHeader, char[] password) throws IOException {
+    public Decoder decoder(@NonNull DataInput in, PathZipEntry entry, @NonNull LocalFileHeader localFileHeader, char[] password) throws IOException {
         throw new Zip4jException("unsupported encryption method");
     }
 

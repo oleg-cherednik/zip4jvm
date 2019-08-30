@@ -34,7 +34,6 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
         setDisc(fileHeader.getDiskNumber());
         setLocalFileHeaderOffs(fileHeader.getOffsLocalFileHeader());
 
-
         setName(fileHeader.getFileName());
     }
 

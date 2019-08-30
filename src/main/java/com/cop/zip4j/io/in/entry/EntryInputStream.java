@@ -39,7 +39,7 @@ public abstract class EntryInputStream extends InputStream {
 
     public static InputStream create(@NonNull PathZipEntry entry, char[] password, DataInput in) throws IOException {
         LocalFileHeader localFileHeader = new LocalFileHeaderReader(entry).read(in);
-        Decoder decoder = entry.getEncryption().decoder(in, localFileHeader, password);
+        Decoder decoder = entry.getEncryption().decoder(in, entry, localFileHeader, password);
         Compression compression = entry.getCompression();
 
         if (compression == Compression.STORE)
