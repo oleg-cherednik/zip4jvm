@@ -86,6 +86,7 @@ public final class ZipIt {
             entry.setStrength(parameters.getStrength());
             entry.setPassword(parameters.getPassword());
             entry.setActivity(parameters.isZip64() ? Zip64Activity.INSTANCE : PlainActivity.INSTANCE);
+            entry.setPassword(parameters.getPassword());
         });
 
         new ZipEngine(zipModel).addEntries(entries);

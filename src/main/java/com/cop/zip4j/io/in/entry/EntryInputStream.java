@@ -11,6 +11,7 @@ import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.NonNull;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,6 +38,10 @@ public abstract class EntryInputStream extends InputStream {
     protected long writtenUncompressedBytes;
 
     public static InputStream create(@NonNull PathZipEntry entry, char[] password, DataInput in) throws IOException {
+        if(!ArrayUtils.isEquals(password, entry.getPassword())) {
+            int a = 0;
+            a++;
+        }
         LocalFileHeader localFileHeader = new LocalFileHeaderReader(entry).read(in);
         // TODO check that localFileHeader matches fileHeader
         Decoder decoder = entry.getEncryption().decoder(in, entry, password);

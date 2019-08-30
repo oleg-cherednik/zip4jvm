@@ -85,5 +85,4 @@ public final class ZipModelReader {
 
         centralDirectory.getFileHeaders().forEach(fileHeader -> zipModel.getEntries().add(new FileHeaderPathZipEntry(fileHeader)));
     }
-
 }

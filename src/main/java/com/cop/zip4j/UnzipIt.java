@@ -35,6 +35,7 @@ public class UnzipIt {
         checkOutputFolder(dstDir);
 
         ZipModel zipModel = new CreateZipModel(zipFile, charset).get();
+        zipModel.getEntries().forEach(entry -> entry.setPassword(password));
         new UnzipEngine(zipModel, password).extractEntries(dstDir, zipModel.getEntryNames());
     }
 
@@ -47,11 +48,13 @@ public class UnzipIt {
         checkOutputFolder(dstDir);
 
         ZipModel zipModel = new CreateZipModel(zipFile, charset).get();
+        zipModel.getEntries().forEach(entry -> entry.setPassword(password));
         new UnzipEngine(zipModel, password).extractEntries(dstDir, entries);
     }
 
     public InputStream extract(@NonNull String entryName) throws IOException {
         ZipModel zipModel = new CreateZipModel(zipFile, charset).get();
+        zipModel.getEntries().forEach(entry -> entry.setPassword(password));
         return new UnzipEngine(zipModel, password).extractEntry(entryName);
     }
 
