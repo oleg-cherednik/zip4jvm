@@ -35,8 +35,6 @@ public abstract class EntryOutputStream extends OutputStream {
     protected final Encoder encoder;
     protected final DataOutput out;
 
-    private boolean dataDescriptorExists;
-
     public static EntryOutputStream create(@NonNull PathZipEntry entry, @NonNull ZipModel zipModel, @NonNull DataOutput out) throws IOException {
         EntryOutputStream res = createOutputStream(entry, zipModel, out);
         res.writeHeader();
@@ -77,7 +75,6 @@ public abstract class EntryOutputStream extends OutputStream {
     private void writeLocalFileHeader() throws IOException {
         Charset charset = zipModel.getCharset();
         LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(entry, charset).create();
-        dataDescriptorExists = localFileHeader.getGeneralPurposeFlag().isDataDescriptor();
         new LocalFileHeaderWriter(localFileHeader, charset).write(out);
         out.mark(COMPRESSED_DATA);
     }
@@ -124,7 +121,7 @@ public abstract class EntryOutputStream extends OutputStream {
     }
 
     private void writeDataDescriptor() throws IOException {
-        if (dataDescriptorExists) {
+        if (entry.isDataDescriptorAvailable()) {
             DataDescriptor dataDescriptor = new DataDescriptor();
             dataDescriptor.setCrc32(checksum.getValue());
             dataDescriptor.setCompressedSize(entry.getCompressedSizeNew());

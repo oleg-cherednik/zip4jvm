@@ -74,4 +74,8 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
             name += '/';
         super.setName(name);
     }
+
+    public boolean isDataDescriptorAvailable() {
+        return !dir;
+    }
 }

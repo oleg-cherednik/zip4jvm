@@ -35,9 +35,13 @@ public class DirectoryZipEntry extends PathZipEntry {
 
     @Override
     public void setName(String name) {
-        if(StringUtils.isNotBlank(name) && !ZipUtils.isDirectory(name))
+        if (StringUtils.isNotBlank(name) && !ZipUtils.isDirectory(name))
             name += '/';
         super.setName(name);
+    }
+
+    public boolean isDataDescriptorAvailable() {
+        return false;
     }
 
 }
