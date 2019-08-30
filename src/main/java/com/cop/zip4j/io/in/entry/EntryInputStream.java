@@ -34,7 +34,7 @@ public abstract class EntryInputStream extends InputStream {
     private final Checksum checksum = new CRC32();
     private final byte[] buf = new byte[1];
 
-    protected int readCompressedBytes;
+    protected long readCompressedBytes;
     protected long writtenUncompressedBytes;
 
     public static InputStream create(@NonNull PathZipEntry entry, char[] password, DataInput in) throws IOException {
@@ -55,7 +55,7 @@ public abstract class EntryInputStream extends InputStream {
         this.localFileHeader = localFileHeader;
         this.decoder = decoder;
         compressedSize = Math.max(0, decoder.getCompressedSize(localFileHeader));
-        uncompressedSize = Math.max(0, localFileHeader.getUncompressedSize());
+        uncompressedSize = Math.max(0, localFileHeader.getOriginalUncompressedSize());
     }
 
     protected final void updateChecksum(byte[] buf, int offs, int len) {

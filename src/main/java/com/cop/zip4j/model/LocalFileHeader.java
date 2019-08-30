@@ -52,11 +52,11 @@ public class LocalFileHeader {
         return fileName != null ? fileName.getBytes(charset) : ArrayUtils.EMPTY_BYTE_ARRAY;
     }
 
-    public long getCompressedSize() {
+    public long getOriginalCompressedSize() {
         return extraField.getExtendedInfo() == Zip64.ExtendedInfo.NULL ? compressedSize : extraField.getExtendedInfo().getCompressedSize();
     }
 
-    public long getUncompressedSize() {
+    public long getOriginalUncompressedSize() {
         return extraField.getExtendedInfo() == Zip64.ExtendedInfo.NULL ? uncompressedSize : extraField.getExtendedInfo().getUncompressedSize();
     }
 

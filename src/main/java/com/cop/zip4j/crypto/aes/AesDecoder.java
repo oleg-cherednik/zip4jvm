@@ -62,7 +62,7 @@ public final class AesDecoder implements Decoder {
 
     @Override
     public long getCompressedSize(@NonNull LocalFileHeader localFileHeader) {
-        return localFileHeader.getCompressedSize() - saltLength - PASSWORD_CHECKSUM_SIZE - MAX_SIZE;
+        return localFileHeader.getOriginalCompressedSize() - saltLength - PASSWORD_CHECKSUM_SIZE - MAX_SIZE;
     }
 
     @Override

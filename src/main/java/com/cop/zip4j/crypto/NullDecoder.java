@@ -15,7 +15,7 @@ final class NullDecoder implements Decoder {
 
     @Override
     public long getCompressedSize(@NonNull LocalFileHeader localFileHeader) {
-        return localFileHeader.getCompressedSize();
+        return localFileHeader.getOriginalCompressedSize();
     }
 
     @Override

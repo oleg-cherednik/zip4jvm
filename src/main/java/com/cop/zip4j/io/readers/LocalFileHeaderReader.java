@@ -51,8 +51,8 @@ public final class LocalFileHeaderReader {
     }
 
     private static void updateExtraField(LocalFileHeader localFileHeader, int extraFieldLength, DataInput in) throws IOException {
-        boolean uncompressedSize = localFileHeader.getUncompressedSize() == LOOK_IN_EXTRA_FIELD;
-        boolean compressedSize = localFileHeader.getCompressedSize() == LOOK_IN_EXTRA_FIELD;
+        boolean uncompressedSize = localFileHeader.getOriginalUncompressedSize() == LOOK_IN_EXTRA_FIELD;
+        boolean compressedSize = localFileHeader.getOriginalCompressedSize() == LOOK_IN_EXTRA_FIELD;
         new ExtraFieldReader(extraFieldLength, uncompressedSize, compressedSize, false, false, localFileHeader.getExtraField()).read(in);
     }
 
@@ -62,8 +62,8 @@ public final class LocalFileHeaderReader {
      */
     private LocalFileHeader readDataDescriptor(LocalFileHeader localFileHeader) {
         localFileHeader.setCrc32(getFromFileHeader(localFileHeader::getCrc32, entry::checksum));
-        localFileHeader.setCompressedSize(getFromFileHeader(localFileHeader::getCompressedSize, entry::getCompressedSizeNew));
-        localFileHeader.setUncompressedSize(getFromFileHeader(localFileHeader::getUncompressedSize, entry::size));
+        localFileHeader.setCompressedSize(getFromFileHeader(localFileHeader::getOriginalCompressedSize, entry::getCompressedSizeNew));
+        localFileHeader.setUncompressedSize(getFromFileHeader(localFileHeader::getOriginalUncompressedSize, entry::size));
         return localFileHeader;
     }
 
