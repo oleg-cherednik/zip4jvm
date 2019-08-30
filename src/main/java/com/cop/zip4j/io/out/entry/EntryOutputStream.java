@@ -27,7 +27,6 @@ public abstract class EntryOutputStream extends OutputStream {
 
     private static final String COMPRESSED_DATA = EntryOutputStream.class.getSimpleName();
 
-    private final ZipModel zipModel;
     private final PathZipEntry entry;
     private final Checksum checksum = new CRC32();
 
@@ -35,40 +34,38 @@ public abstract class EntryOutputStream extends OutputStream {
     protected final DataOutput out;
 
     public static EntryOutputStream create(@NonNull PathZipEntry entry, @NonNull ZipModel zipModel, @NonNull DataOutput out) throws IOException {
-        EntryOutputStream res = createOutputStream(entry, zipModel, out);
-        res.writeHeader();
-        return res;
-    }
+        EntryOutputStream os = createOutputStream(entry, out);
 
-    private static EntryOutputStream createOutputStream(PathZipEntry entry, ZipModel zipModel, DataOutput out) throws IOException {
-        Compression compression = entry.getCompression();
-        entry.setDisc(out.getCounter());
-
-        if (compression == Compression.STORE)
-            return new StoreEntryOutputStream(zipModel, entry, out);
-        if (compression == Compression.DEFLATE)
-            return new DeflateEntryOutputStream(zipModel, entry, out);
-
-        throw new Zip4jException("Compression is not supported: " + compression);
-    }
-
-    protected EntryOutputStream(ZipModel zipModel, PathZipEntry entry, DataOutput out) {
-        this.zipModel = zipModel;
-        this.entry = entry;
-        this.out = out;
-        encoder = entry.getEncryption().getCreateEncoder().apply(entry);
-    }
-
-    private void writeHeader() throws IOException {
+        // TODO move it to the separate method
         // only at the beginning of the split file
         if (zipModel.isSplitArchive() && zipModel.isEmpty())
             out.writeDwordSignature(SPLIT_SIGNATURE);
 
         zipModel.getEntries().add(entry);
         entry.setLocalFileHeaderOffs(out.getOffs());
+        // ----------------
 
-        writeLocalFileHeader();
-        writeEncryptionHeader();
+        os.writeLocalFileHeader();
+        os.writeEncryptionHeader();
+        return os;
+    }
+
+    private static EntryOutputStream createOutputStream(PathZipEntry entry, DataOutput out) throws IOException {
+        Compression compression = entry.getCompression();
+        entry.setDisc(out.getCounter());
+
+        if (compression == Compression.STORE)
+            return new StoreEntryOutputStream(entry, out);
+        if (compression == Compression.DEFLATE)
+            return new DeflateEntryOutputStream(entry, out);
+
+        throw new Zip4jException("Compression is not supported: " + compression);
+    }
+
+    protected EntryOutputStream(PathZipEntry entry, DataOutput out) {
+        this.entry = entry;
+        this.out = out;
+        encoder = entry.getEncryption().getCreateEncoder().apply(entry);
     }
 
     private void writeLocalFileHeader() throws IOException {
@@ -97,6 +94,7 @@ public abstract class EntryOutputStream extends OutputStream {
         checkChecksum();
         checkCompressedSize();
 
+        // TODO look at compressedSizeNew - rearrange this method
         entry.setCompressedSizeNew(out.getWrittenBytesAmount(COMPRESSED_DATA));
 
         writeDataDescriptor();
