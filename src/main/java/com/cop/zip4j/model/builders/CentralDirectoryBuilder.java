@@ -6,7 +6,6 @@ import com.cop.zip4j.model.ExternalFileAttributes;
 import com.cop.zip4j.model.GeneralPurposeFlag;
 import com.cop.zip4j.model.InternalFileAttributes;
 import com.cop.zip4j.model.Zip64;
-import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import com.cop.zip4j.utils.ZipUtils;
@@ -26,9 +25,6 @@ public class CentralDirectoryBuilder {
 
     @NonNull
     private final PathZipEntry entry;
-    @NonNull
-    private final ZipModel zipModel;
-    private final int currSplitFileCounter;
 
     @NonNull
     public CentralDirectory.FileHeader create() throws IOException {
@@ -43,7 +39,7 @@ public class CentralDirectoryBuilder {
         fileHeader.setCompressedSize(entry.getCompressedSizeNew());
         fileHeader.setUncompressedSize(entry.size());
         fileHeader.setFileCommentLength(0);
-        fileHeader.setDiskNumber(currSplitFileCounter);
+        fileHeader.setDiskNumber(entry.getDisc());
         fileHeader.setInternalFileAttributes(InternalFileAttributes.of(entry.getPath()));
         fileHeader.setExternalFileAttributes(ExternalFileAttributes.of(entry.getPath()));
         fileHeader.setOffsLocalFileHeader(entry.getLocalFileHeaderOffs());
@@ -72,7 +68,7 @@ public class CentralDirectoryBuilder {
 
         generalPurposeFlag.setCompressionLevel(entry.getCompressionLevel());
         generalPurposeFlag.setDataDescriptorAvailable(!ZipUtils.isDirectory(fileHeader.getFileName()));
-        generalPurposeFlag.setUtf8(zipModel.getCharset() == StandardCharsets.UTF_8);
+        generalPurposeFlag.setUtf8(entry.getCharset() == StandardCharsets.UTF_8);
         generalPurposeFlag.setEncrypted(entry.getEncryption() != Encryption.OFF);
 //        generalPurposeFlag.setStrongEncryption(entry.getEncryption() == Encryption.STRONG);
         generalPurposeFlag.setStrongEncryption(false);
