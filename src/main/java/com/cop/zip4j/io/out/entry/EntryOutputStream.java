@@ -14,7 +14,6 @@ import lombok.NonNull;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
@@ -73,9 +72,8 @@ public abstract class EntryOutputStream extends OutputStream {
     }
 
     private void writeLocalFileHeader() throws IOException {
-        Charset charset = zipModel.getCharset();
-        LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(entry, charset).create();
-        new LocalFileHeaderWriter(localFileHeader, charset).write(out);
+        LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(entry).create();
+        new LocalFileHeaderWriter(localFileHeader, entry.getCharset()).write(out);
         out.mark(COMPRESSED_DATA);
     }
 

@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -30,6 +32,8 @@ public abstract class PathZipEntry extends ZipEntry {
     @Setter
     protected String name;
     private final int lastModifiedTime;
+    // TODO set from ZipModel
+    private final Charset charset = StandardCharsets.UTF_8;
 
     protected Compression compression = Compression.STORE;
     protected CompressionLevel compressionLevel = CompressionLevel.NORMAL;

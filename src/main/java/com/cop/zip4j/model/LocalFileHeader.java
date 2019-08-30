@@ -43,7 +43,7 @@ public class LocalFileHeader {
     private String fileName;
     // size:m - extra field
     @NonNull
-    private final ExtraField extraField = new ExtraField();
+    private ExtraField extraField = new ExtraField();
 
     private long offs;
 
