@@ -1,7 +1,9 @@
 package com.cop.zip4j.model.activity;
 
 import com.cop.zip4j.io.out.DataOutput;
+import com.cop.zip4j.io.writers.DataDescriptorWriter;
 import com.cop.zip4j.model.CentralDirectory;
+import com.cop.zip4j.model.DataDescriptor;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
 import lombok.AccessLevel;
@@ -77,5 +79,9 @@ public final class PlainActivity implements Activity {
 
     public int getTotalEntriesECD(ZipModel zipModel) {
         return zipModel.getEntries().size();
+    }
+
+    public DataDescriptorWriter getDataDescriptorWriter(DataDescriptor dataDescriptor) {
+        return new DataDescriptorWriter.Plain(dataDescriptor);
     }
 }

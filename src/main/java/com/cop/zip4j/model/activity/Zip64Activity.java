@@ -1,7 +1,9 @@
 package com.cop.zip4j.model.activity;
 
 import com.cop.zip4j.io.out.DataOutput;
+import com.cop.zip4j.io.writers.DataDescriptorWriter;
 import com.cop.zip4j.model.CentralDirectory;
+import com.cop.zip4j.model.DataDescriptor;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
 import lombok.AccessLevel;
@@ -89,4 +91,7 @@ public class Zip64Activity implements Activity {
         return 0xFFFF;
     }
 
+    public DataDescriptorWriter getDataDescriptorWriter(DataDescriptor dataDescriptor) {
+        return new DataDescriptorWriter.Zip64(dataDescriptor);
+    }
 }

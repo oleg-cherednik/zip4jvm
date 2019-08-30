@@ -87,4 +87,19 @@ final class Zip64Writer {
 
     }
 
+    @RequiredArgsConstructor
+    public static final class DataDescriptor {
+
+        @NonNull
+        private final com.cop.zip4j.model.DataDescriptor dataDescriptor;
+
+        public void write(@NonNull DataOutput out) throws IOException {
+            out.writeDwordSignature(com.cop.zip4j.model.DataDescriptor.SIGNATURE);
+            out.writeDword(dataDescriptor.getCrc32());
+            out.writeQword(dataDescriptor.getCompressedSize());
+            out.writeQword(dataDescriptor.getUncompressedSize());
+        }
+
+    }
+
 }
