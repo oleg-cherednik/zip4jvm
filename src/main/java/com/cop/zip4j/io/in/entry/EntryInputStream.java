@@ -24,6 +24,7 @@ import java.util.zip.Checksum;
  */
 public abstract class EntryInputStream extends InputStream {
 
+    protected final PathZipEntry entry;
     protected final DataInput in;
     protected final LocalFileHeader localFileHeader;
     protected final Decoder decoder;
@@ -43,14 +44,15 @@ public abstract class EntryInputStream extends InputStream {
         Compression compression = entry.getCompression();
 
         if (compression == Compression.STORE)
-            return new StoreEntryInputStream(in, localFileHeader, decoder);
+            return new StoreEntryInputStream(entry, in, localFileHeader, decoder);
         if (compression == Compression.DEFLATE)
-            return new InflateEntryInputStream(in, localFileHeader, decoder);
+            return new InflateEntryInputStream(entry, in, localFileHeader, decoder);
 
         throw new Zip4jException("Compression is not supported: " + compression);
     }
 
-    protected EntryInputStream(DataInput in, LocalFileHeader localFileHeader, Decoder decoder) {
+    protected EntryInputStream(PathZipEntry entry, DataInput in, LocalFileHeader localFileHeader, Decoder decoder) {
+        this.entry = entry;
         this.in = in;
         this.localFileHeader = localFileHeader;
         this.decoder = decoder;
