@@ -6,6 +6,7 @@ import com.cop.zip4j.exception.Zip4jIncorrectPasswordException;
 import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.aes.AesStrength;
+import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.NonNull;
 import org.apache.commons.lang.ArrayUtils;
 
@@ -61,8 +62,8 @@ public final class AesDecoder implements Decoder {
     }
 
     @Override
-    public long getCompressedSize(@NonNull LocalFileHeader localFileHeader) {
-        return localFileHeader.getOriginalCompressedSize() - saltLength - PASSWORD_CHECKSUM_SIZE - MAX_SIZE;
+    public long getCompressedSize(@NonNull PathZipEntry entry) {
+        return entry.getCompressedSizeNew() - saltLength - PASSWORD_CHECKSUM_SIZE - MAX_SIZE;
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.cop.zip4j.crypto.pkware;
 import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.LocalFileHeader;
+import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -31,8 +32,8 @@ public final class PkwareDecoder implements Decoder {
     }
 
     @Override
-    public long getCompressedSize(@NonNull LocalFileHeader localFileHeader) {
-        return localFileHeader.getOriginalCompressedSize() - PkwareHeader.SIZE;
+    public long getCompressedSize(@NonNull PathZipEntry entry) {
+        return entry.getCompressedSizeNew() - PkwareHeader.SIZE;
     }
 
 }

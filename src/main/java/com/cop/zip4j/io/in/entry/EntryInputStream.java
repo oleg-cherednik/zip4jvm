@@ -26,7 +26,6 @@ public abstract class EntryInputStream extends InputStream {
 
     protected final PathZipEntry entry;
     protected final DataInput in;
-    protected final LocalFileHeader localFileHeader;
     protected final Decoder decoder;
 
     protected final long compressedSize;
@@ -40,24 +39,23 @@ public abstract class EntryInputStream extends InputStream {
 
     public static InputStream create(@NonNull PathZipEntry entry, char[] password, DataInput in) throws IOException {
         LocalFileHeader localFileHeader = new LocalFileHeaderReader(entry).read(in);
-        Decoder decoder = localFileHeader.getEncryption().decoder(in, localFileHeader, password);
+        Decoder decoder = entry.getEncryption().decoder(in, localFileHeader, password);
         Compression compression = entry.getCompression();
 
         if (compression == Compression.STORE)
-            return new StoreEntryInputStream(entry, in, localFileHeader, decoder);
+            return new StoreEntryInputStream(entry, in, decoder);
         if (compression == Compression.DEFLATE)
-            return new InflateEntryInputStream(entry, in, localFileHeader, decoder);
+            return new InflateEntryInputStream(entry, in, decoder);
 
         throw new Zip4jException("Compression is not supported: " + compression);
     }
 
-    protected EntryInputStream(PathZipEntry entry, DataInput in, LocalFileHeader localFileHeader, Decoder decoder) {
+    protected EntryInputStream(PathZipEntry entry, DataInput in, Decoder decoder) {
         this.entry = entry;
         this.in = in;
-        this.localFileHeader = localFileHeader;
         this.decoder = decoder;
-        compressedSize = Math.max(0, decoder.getCompressedSize(localFileHeader));
-        uncompressedSize = Math.max(0, localFileHeader.getOriginalUncompressedSize());
+        compressedSize = Math.max(0, decoder.getCompressedSize(entry));
+        uncompressedSize = Math.max(0, entry.size());
     }
 
     protected final void updateChecksum(byte[] buf, int offs, int len) {
@@ -93,30 +91,21 @@ public abstract class EntryInputStream extends InputStream {
     }
 
     private void checkChecksum() {
-        if(entry.checksum() != localFileHeader.getCrc32()) {
-            int a = 0;
-            a++;
-        }
-        long expected = localFileHeader.getCrc32();
+        long expected = entry.checksum();
         long actual = checksum.getValue();
 
         if (expected > 0 && expected != actual)
-            throw new Zip4jException("Checksum is not matched: " + localFileHeader.getFileName());
+            throw new Zip4jException("Checksum is not matched: " + entry.getName());
     }
 
     private void checkUncompressedSize() {
         if (uncompressedSize != writtenUncompressedBytes)
-            throw new Zip4jException("UncompressedSize is not matched: " + localFileHeader.getFileName());
+            throw new Zip4jException("UncompressedSize is not matched: " + entry.getName());
     }
 
     /** Just read {@link DataDescriptor} and ignore it's value. We got it from {@link CentralDirectory.FileHeader} */
     private void readDataDescriptor() throws IOException {
-        if(entry.isDataDescriptorAvailable() != localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable()) {
-            int a = 0;
-            a++;
-        }
-
-        if (localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable())
+        if (entry.isDataDescriptorAvailable())
             new DataDescriptorReader(false).read(in);
     }
 

@@ -2,7 +2,6 @@ package com.cop.zip4j.io.in.entry;
 
 import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.io.in.DataInput;
-import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import org.apache.commons.io.IOUtils;
 
@@ -14,8 +13,8 @@ import java.io.IOException;
  */
 final class StoreEntryInputStream extends EntryInputStream {
 
-    public StoreEntryInputStream(PathZipEntry entry, DataInput in, LocalFileHeader localFileHeader, Decoder decoder) {
-        super(entry, in, localFileHeader, decoder);
+    public StoreEntryInputStream(PathZipEntry entry, DataInput in, Decoder decoder) {
+        super(entry, in, decoder);
     }
 
     @Override

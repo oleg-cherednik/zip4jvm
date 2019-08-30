@@ -1,7 +1,7 @@
 package com.cop.zip4j.crypto;
 
 import com.cop.zip4j.io.in.DataInput;
-import com.cop.zip4j.model.LocalFileHeader;
+import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.NonNull;
 
 import java.io.IOException;
@@ -16,7 +16,7 @@ public interface Decoder {
 
     void decrypt(@NonNull byte[] buf, int offs, int len);
 
-    long getCompressedSize(@NonNull LocalFileHeader localFileHeader);
+    long getCompressedSize(@NonNull PathZipEntry entry);
 
     default void close(@NonNull DataInput in) throws IOException {
     }
