@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SuppressWarnings("FieldNamingConvention")
 public class ZipFolderSplitTest {
 
-    private static final Path rootDir = Zip4jSuite.rootDir.resolve(ZipFolderSplitTest.class.getSimpleName());
+    private static final Path rootDir = Zip4jSuite.generateSubDirNameWithTime(ZipFolderSplitTest.class);
     private static final Path zipFile = rootDir.resolve("src.zip");
 
     @BeforeClass

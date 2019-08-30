@@ -1,6 +1,7 @@
 package com.cop.zip4j.io.out;
 
 import com.cop.zip4j.model.ZipModel;
+import com.cop.zip4j.utils.ZipUtils;
 import lombok.NonNull;
 
 import java.io.FileNotFoundException;
@@ -43,12 +44,12 @@ abstract class BaseDataOutput implements DataOutput {
     }
 
     @Override
-    public final void writeWord(int val) throws IOException {
+    public void writeWord(int val) throws IOException {
         doWithTic(() -> delegate.write(delegate.convertWord(val)));
     }
 
     @Override
-    public final void writeDword(long val) throws IOException {
+    public void writeDword(long val) throws IOException {
         doWithTic(() -> delegate.write(delegate.convertDword(val)));
     }
 
@@ -85,7 +86,7 @@ abstract class BaseDataOutput implements DataOutput {
 
     @Override
     public String toString() {
-        return "offs: " + getOffs() + " (0x" + Long.toHexString(getOffs()) + ')';
+        return ZipUtils.toString(getOffs());
     }
 
     @FunctionalInterface
