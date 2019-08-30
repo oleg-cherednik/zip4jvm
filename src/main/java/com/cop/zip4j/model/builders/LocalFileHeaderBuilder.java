@@ -70,6 +70,14 @@ public final class LocalFileHeaderBuilder {
     }
 
     private Zip64.ExtendedInfo createExtendedInfo() {
+        if (entry.isDataDescriptorAvailable())
+            return Zip64.ExtendedInfo.NULL;
+        if (entry.isZip64())
+            return Zip64.ExtendedInfo.builder()
+                                     .compressedSize(entry.getCompressedSizeNew())
+                                     .uncompressedSize(entry.size())
+//                                                                         .offsLocalHeaderRelative(fileHeader.getOffsLocalFileHeader())
+                                     .build();
         return Zip64.ExtendedInfo.NULL;
     }
 
