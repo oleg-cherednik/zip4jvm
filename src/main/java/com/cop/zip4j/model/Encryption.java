@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.util.function.Function;
+import java.util.function.LongFunction;
 
 /**
  * @author Oleg Cherednik
@@ -30,7 +31,7 @@ import java.util.function.Function;
 public enum Encryption {
     OFF(pathZipEntry -> Encoder.NULL,
             entry -> 0L,
-            CentralDirectory.FileHeader::getCrc32) {
+            crc32 -> crc32) {
         @Override
         public Decoder decoder(@NonNull DataInput in, @NonNull LocalFileHeader localFileHeader, char[] password) throws IOException {
             return Decoder.NULL;
@@ -38,7 +39,7 @@ public enum Encryption {
     },
     PKWARE(PkwareEncoder::create,
             entry -> entry.size() + PkwareHeader.SIZE,
-            CentralDirectory.FileHeader::getCrc32) {
+            crc32 -> crc32) {
         @Override
         public Decoder decoder(@NonNull DataInput in, @NonNull LocalFileHeader localFileHeader, char[] password) throws IOException {
             return PkwareDecoder.create(in, localFileHeader, password);
@@ -46,15 +47,10 @@ public enum Encryption {
     },
     AES(AesEncoder::create,
             entry -> entry.size() + entry.getStrength().saltLength() + AesEngine.MAX_SIZE + AesEngine.PASSWORD_CHECKSUM_SIZE,
-            fileHeader -> 0L) {
+            crc32 -> 0L) {
         @Override
         public Decoder decoder(DataInput in, @NonNull LocalFileHeader localFileHeader, char[] password) throws IOException {
             return AesDecoder.create(in, localFileHeader, password);
-        }
-
-        @Override
-        public long getChecksum(CentralDirectory.FileHeader fileHeader) {
-            return 0;
         }
 
         @Override
@@ -71,14 +67,14 @@ public enum Encryption {
 
     private final Function<PathZipEntry, Encoder> createEncoder;
     private final Function<PathZipEntry, Long> compressedSize;
-    private final Function<CentralDirectory.FileHeader, Long> checksum;
+    private final LongFunction<Long> checksumFileHeader;
 
     @NonNull
     public Decoder decoder(@NonNull DataInput in, @NonNull LocalFileHeader localFileHeader, char[] password) throws IOException {
         throw new Zip4jException("unsupported encryption method");
     }
 
-    public long getChecksum(CentralDirectory.FileHeader fileHeader) {
+    public long getChecksumFileHeader(CentralDirectory.FileHeader fileHeader) {
         return fileHeader.getCrc32();
     }
 

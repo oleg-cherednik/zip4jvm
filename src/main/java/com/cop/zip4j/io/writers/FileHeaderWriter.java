@@ -37,7 +37,7 @@ final class FileHeaderWriter {
         out.writeWord(fileHeader.getGeneralPurposeFlag().getAsInt());
         out.writeWord(fileHeader.getCompressionMethod().getCode());
         out.writeDword(fileHeader.getLastModifiedTime());
-        out.writeDword(fileHeader.getEncryption().getChecksum(fileHeader));
+        out.writeDword(fileHeader.getEncryption().getChecksumFileHeader(fileHeader));
         out.writeDword(fileHeader.getCompressedSize());
         out.writeDword(fileHeader.getUncompressedSize());
         out.writeWord(fileName.length);

@@ -13,7 +13,7 @@ import java.util.List;
  * @since 27.08.2019
  */
 @RequiredArgsConstructor
-public class CentralDirectoryBuilder {
+public final class CentralDirectoryBuilder {
 
     private final List<PathZipEntry> entries;
 
@@ -27,11 +27,8 @@ public class CentralDirectoryBuilder {
     private List<CentralDirectory.FileHeader> createFileHeaders() throws IOException {
         List<CentralDirectory.FileHeader> fileHeaders = new ArrayList<>(entries.size());
 
-        for (PathZipEntry entry : entries) {
-            CentralDirectory.FileHeader fileHeader = new FileHeaderBuilder(entry).create();
-            fileHeader.setCrc32(fileHeader.getEncryption().getChecksum().apply(fileHeader));
-            fileHeaders.add(fileHeader);
-        }
+        for (PathZipEntry entry : entries)
+            fileHeaders.add(new FileHeaderBuilder(entry).create());
 
         return fileHeaders;
     }
