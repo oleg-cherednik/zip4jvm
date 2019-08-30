@@ -1,7 +1,6 @@
 package com.cop.zip4j.model;
 
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -113,7 +112,7 @@ public class CentralDirectory {
         private String fileName;
         // size:m - extra field
         @NonNull
-        private final ExtraField extraField = new ExtraField();
+        private ExtraField extraField = new ExtraField();
         // size:k - extra field
         private String fileComment;
 
@@ -142,25 +141,8 @@ public class CentralDirectory {
             return ZipUtils.isDirectory(fileName);
         }
 
-        public void setZip64ExtendedInfo(@NonNull Zip64.ExtendedInfo info) {
-            extraField.setExtendedInfo(info);
-
-//            if (info != Zip64.ExtendedInfo.NULL) {
-//                uncompressedSize = info.getUncompressedSize() != ExtraField.NO_DATA ? info.getUncompressedSize() : uncompressedSize;
-//                compressedSize = info.getCompressedSize() != ExtraField.NO_DATA ? info.getCompressedSize() : uncompressedSize;
-//                offsLocalFileHeader = info.getOffsLocalHeaderRelative() != ExtraField.NO_DATA ? info.getOffsLocalHeaderRelative()
-//                                                                                              : offsLocalFileHeader;
-//                diskNumber = info.getDiskNumber() != ExtraField.NO_DATA ? info.getDiskNumber() : diskNumber;
-//            }
-        }
-
         public void setExtraField(@NonNull ExtraField extraField) {
             this.extraField.setFrom(extraField);
-            generalPurposeFlag.setEncrypted(isEncrypted());
-        }
-
-        public void setAesExtraDataRecord(@NonNull AesExtraDataRecord record) {
-            extraField.setAesExtraDataRecord(record);
             generalPurposeFlag.setEncrypted(isEncrypted());
         }
 

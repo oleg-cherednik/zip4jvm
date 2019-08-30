@@ -1,11 +1,9 @@
 package com.cop.zip4j.model.builders;
 
 import com.cop.zip4j.model.CentralDirectory;
-import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ExtraField;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.Zip64;
-import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +40,7 @@ public final class LocalFileHeaderBuilder {
     private ExtraField createExtraField() {
         ExtraField extraField = new ExtraField();
         extraField.setExtendedInfo(createExtendedInfo());
-        extraField.setAesExtraDataRecord(createAesExtraDataRecord());
+        extraField.setAesExtraDataRecord(new AesExtraDataRecordBuilder(entry).create());
         return extraField;
     }
 
@@ -56,19 +54,6 @@ public final class LocalFileHeaderBuilder {
 //                                     .offsLocalHeaderRelative(entry.getLocalFileHeaderOffs())
                                      .build();
         return Zip64.ExtendedInfo.NULL;
-    }
-
-    private AesExtraDataRecord createAesExtraDataRecord() {
-        if (entry.getEncryption() != Encryption.AES)
-            return AesExtraDataRecord.NULL;
-
-        return AesExtraDataRecord.builder()
-                                 .size(7)
-                                 .vendor("AE")
-                                 .versionNumber((short)2)
-                                 .strength(entry.getStrength())
-                                 .compressionMethod(entry.getCompression().getMethod())
-                                 .build();
     }
 
     private long getValue(long value) {

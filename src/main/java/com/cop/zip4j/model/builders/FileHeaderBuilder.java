@@ -1,11 +1,10 @@
 package com.cop.zip4j.model.builders;
 
 import com.cop.zip4j.model.CentralDirectory;
-import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ExternalFileAttributes;
+import com.cop.zip4j.model.ExtraField;
 import com.cop.zip4j.model.InternalFileAttributes;
 import com.cop.zip4j.model.Zip64;
-import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -39,24 +38,29 @@ final class FileHeaderBuilder {
         fileHeader.setInternalFileAttributes(InternalFileAttributes.of(entry.getPath()));
         fileHeader.setExternalFileAttributes(ExternalFileAttributes.of(entry.getPath()));
         fileHeader.setOffsLocalFileHeader(entry.getLocalFileHeaderOffs());
-        fileHeader.setZip64ExtendedInfo(Zip64.ExtendedInfo.NULL);
-        fileHeader.setAesExtraDataRecord(getAesExtraDataRecord());
+        fileHeader.setExtraField(createExtraField());
         fileHeader.setFileComment(null);
 
         return fileHeader;
     }
 
-    @NonNull
-    private AesExtraDataRecord getAesExtraDataRecord() {
-        if (entry.getEncryption() != Encryption.AES)
-            return AesExtraDataRecord.NULL;
-
-        return AesExtraDataRecord.builder()
-                                 .size(7)
-                                 .vendor("AE")
-                                 .versionNumber((short)2)
-                                 .strength(entry.getStrength())
-                                 .compressionMethod(entry.getCompression().getMethod())
-                                 .build();
+    private ExtraField createExtraField() {
+        ExtraField extraField = new ExtraField();
+        extraField.setExtendedInfo(createExtendedInfo());
+        extraField.setAesExtraDataRecord(new AesExtraDataRecordBuilder(entry).create());
+        return extraField;
     }
+
+    private Zip64.ExtendedInfo createExtendedInfo() {
+//        if (entry.isDataDescriptorAvailable())
+//            return Zip64.ExtendedInfo.NULL;
+//        if (entry.isZip64())
+//            return Zip64.ExtendedInfo.builder()
+//                                     .compressedSize(entry.getCompressedSizeNew())
+//                                     .uncompressedSize(entry.size())
+////                                     .offsLocalHeaderRelative(entry.getLocalFileHeaderOffs())
+//                                     .build();
+        return Zip64.ExtendedInfo.NULL;
+    }
+
 }
