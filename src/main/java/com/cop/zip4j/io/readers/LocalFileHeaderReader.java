@@ -45,7 +45,6 @@ public final class LocalFileHeaderReader {
         int extraFieldLength = in.readWord();
         localFileHeader.setFileName(ZipUtils.normalizeFileName.apply(in.readString(fileNameLength)));
         updateExtraField(localFileHeader, extraFieldLength, in);
-        localFileHeader.setOffs(in.getOffs());
 
         entry.setDataDescriptorAvailable(localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
 

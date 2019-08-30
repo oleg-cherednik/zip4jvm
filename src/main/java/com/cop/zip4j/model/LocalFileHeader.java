@@ -45,8 +45,6 @@ public class LocalFileHeader {
     @NonNull
     private ExtraField extraField = new ExtraField();
 
-    private long offs;
-
     @NonNull
     public byte[] getFileName(@NonNull Charset charset) {
         return fileName != null ? fileName.getBytes(charset) : ArrayUtils.EMPTY_BYTE_ARRAY;
