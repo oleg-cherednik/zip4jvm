@@ -76,6 +76,8 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
     }
 
     public boolean isDataDescriptorAvailable() {
+        if(dataDescriptorAvailable != null)
+            return dataDescriptorAvailable;
         return !dir;
     }
 }

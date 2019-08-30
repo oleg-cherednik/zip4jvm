@@ -47,6 +47,8 @@ public final class LocalFileHeaderReader {
         updateExtraField(localFileHeader, extraFieldLength, in);
         localFileHeader.setOffs(in.getOffs());
 
+        entry.setDataDescriptorAvailable(localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
+
         return readDataDescriptor(localFileHeader);
     }
 

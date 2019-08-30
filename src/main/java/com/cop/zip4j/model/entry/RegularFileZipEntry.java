@@ -61,6 +61,8 @@ public class RegularFileZipEntry extends PathZipEntry {
     }
 
     public boolean isDataDescriptorAvailable() {
+        if(dataDescriptorAvailable != null)
+            return dataDescriptorAvailable;
         return true;
     }
 

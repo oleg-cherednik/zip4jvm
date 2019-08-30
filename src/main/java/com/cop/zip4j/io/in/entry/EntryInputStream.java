@@ -93,6 +93,10 @@ public abstract class EntryInputStream extends InputStream {
     }
 
     private void checkChecksum() {
+        if(entry.checksum() != localFileHeader.getCrc32()) {
+            int a = 0;
+            a++;
+        }
         long expected = localFileHeader.getCrc32();
         long actual = checksum.getValue();
 
@@ -107,6 +111,11 @@ public abstract class EntryInputStream extends InputStream {
 
     /** Just read {@link DataDescriptor} and ignore it's value. We got it from {@link CentralDirectory.FileHeader} */
     private void readDataDescriptor() throws IOException {
+        if(entry.isDataDescriptorAvailable() != localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable()) {
+            int a = 0;
+            a++;
+        }
+
         if (localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable())
             new DataDescriptorReader(false).read(in);
     }

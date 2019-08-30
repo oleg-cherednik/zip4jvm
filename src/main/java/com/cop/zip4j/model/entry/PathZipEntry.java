@@ -53,6 +53,9 @@ public abstract class PathZipEntry extends ZipEntry {
     @Setter
     private Activity activity = PlainActivity.INSTANCE;
 
+    @Setter
+    protected Boolean dataDescriptorAvailable;
+
     @Override
     public boolean isRegularFile() {
         return Files.isRegularFile(path);
