@@ -60,7 +60,7 @@ public final class AesDecoder implements Decoder {
 
     @Override
     public long getCompressedSize(@NonNull PathZipEntry entry) {
-        return entry.getCompressedSizeWithEncryptionHeader() - saltLength - PASSWORD_CHECKSUM_SIZE - MAX_SIZE;
+        return entry.getCompressedSize() - saltLength - PASSWORD_CHECKSUM_SIZE - MAX_SIZE;
     }
 
     @Override
@@ -77,7 +77,7 @@ public final class AesDecoder implements Decoder {
         byte[] expected = in.readBytes(PASSWORD_CHECKSUM_SIZE);
 
         if (!ArrayUtils.isEquals(expected, actual))
-            throw new Zip4jIncorrectPasswordException(entry.getName());
+            throw new Zip4jIncorrectPasswordException(entry.getFileName());
     }
 
     private void checkMessageAuthenticationCode(DataInput in) throws IOException {

@@ -29,7 +29,7 @@ import java.nio.file.Path;
 public abstract class PathZipEntry extends ZipEntry {
 
     protected final Path path;
-    protected String name;
+    protected String fileName;
     private final int lastModifiedTime;
     // TODO set from ZipModel
     private final Charset charset = StandardCharsets.UTF_8;
@@ -43,8 +43,6 @@ public abstract class PathZipEntry extends ZipEntry {
     @Setter
     protected char[] password;
 
-    @Setter
-    private long compressedSizeWithEncryptionHeader;
     @Setter
     private int disc;
     @Setter
@@ -72,8 +70,12 @@ public abstract class PathZipEntry extends ZipEntry {
 
     public abstract long getExpectedCompressedSize();
 
+    public abstract void setCompressedSize(long compressedSize);
+
+    public abstract long getCompressedSize();
+
     public boolean isRoot() {
-        return "/".equals(name) || "\\".equals(name);
+        return "/".equals(fileName) || "\\".equals(fileName);
     }
 
     public abstract void setCompression(@NonNull Compression compression);
@@ -92,11 +94,11 @@ public abstract class PathZipEntry extends ZipEntry {
         return getEncryption() != Encryption.OFF;
     }
 
-    public void setName(String name) {
-        if (StringUtils.isBlank(name))
+    public void setFileName(String fileName) {
+        if (StringUtils.isBlank(fileName))
             throw new Zip4jException("PathZipEntry.name cannot be blank");
 
-        this.name = ZipUtils.normalizeFileName.apply(name);
+        this.fileName = ZipUtils.normalizeFileName.apply(fileName);
     }
 
     public abstract boolean isDataDescriptorAvailable();

@@ -28,7 +28,7 @@ final class FileHeaderBuilder {
 
     @NonNull
     public CentralDirectory.FileHeader create() throws IOException {
-        CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader(entry.getName());
+        CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader(entry.getFileName());
 
         fileHeader.setVersionMadeBy(CentralDirectory.FileHeader.VERSION);
         fileHeader.setVersionToExtract(CentralDirectory.FileHeader.VERSION);
@@ -36,8 +36,8 @@ final class FileHeaderBuilder {
         fileHeader.setCompressionMethod(entry.getEncryption().getCompressionMethod().apply(entry));
         fileHeader.setLastModifiedTime(entry.getLastModifiedTime());
         fileHeader.setCrc32(entry.getEncryption().getChecksum().apply(entry));
-        fileHeader.setCompressedSize(getSize(entry.getCompressedSizeWithEncryptionHeader()));
-        fileHeader.setUncompressedSize(getSize(entry.size()));
+        fileHeader.setCompressedSize(getSize(entry.getCompressedSize()));
+        fileHeader.setUncompressedSize(getSize(entry.getUncompressedSize()));
         fileHeader.setFileCommentLength(0);
         fileHeader.setDiskNumber(entry.getDisc());
         fileHeader.setInternalFileAttributes(InternalFileAttributes.of(entry.getPath()));
@@ -71,8 +71,8 @@ final class FileHeaderBuilder {
     private Zip64.ExtendedInfo createExtendedInfo() {
         if (entry.isZip64())
             return Zip64.ExtendedInfo.builder()
-                                     .compressedSize(entry.getCompressedSizeWithEncryptionHeader())
-                                     .uncompressedSize(entry.size())
+                                     .compressedSize(entry.getCompressedSize())
+                                     .uncompressedSize(entry.getUncompressedSize())
 //                                     .offsLocalHeaderRelative(entry.getLocalFileHeaderOffs())
                                      .build();
         return Zip64.ExtendedInfo.NULL;

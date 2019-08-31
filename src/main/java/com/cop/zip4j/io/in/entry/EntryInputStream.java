@@ -60,7 +60,7 @@ public abstract class EntryInputStream extends InputStream {
         this.in = in;
         this.decoder = decoder;
         compressedSize = Math.max(0, decoder.getCompressedSize(entry));
-        uncompressedSize = Math.max(0, entry.size());
+        uncompressedSize = Math.max(0, entry.getUncompressedSize());
     }
 
     protected final void updateChecksum(byte[] buf, int offs, int len) {
@@ -100,12 +100,12 @@ public abstract class EntryInputStream extends InputStream {
         long actual = checksum.getValue();
 
         if (expected > 0 && expected != actual)
-            throw new Zip4jException("Checksum is not matched: " + entry.getName());
+            throw new Zip4jException("Checksum is not matched: " + entry.getFileName());
     }
 
     private void checkUncompressedSize() {
         if (uncompressedSize != writtenUncompressedBytes)
-            throw new Zip4jException("UncompressedSize is not matched: " + entry.getName());
+            throw new Zip4jException("UncompressedSize is not matched: " + entry.getFileName());
     }
 
     /** Just read {@link DataDescriptor} and ignore it's value. We got it from {@link CentralDirectory.FileHeader} */

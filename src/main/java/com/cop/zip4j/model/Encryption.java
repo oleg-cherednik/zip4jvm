@@ -35,12 +35,12 @@ public enum Encryption {
             entry -> entry.getCompression().getMethod()),
     PKWARE(PkwareEncoder::create,
             PkwareDecoder::create,
-            entry -> entry.size() + PkwareHeader.SIZE,
+            entry -> entry.getUncompressedSize() + PkwareHeader.SIZE,
             ZipEntry::checksum,
             entry -> entry.getCompression().getMethod()),
     AES(AesEncoder::create,
             AesDecoder::create,
-            entry -> entry.size() + entry.getStrength().saltLength() + AesEngine.MAX_SIZE + AesEngine.PASSWORD_CHECKSUM_SIZE,
+            entry -> entry.getUncompressedSize() + entry.getStrength().saltLength() + AesEngine.MAX_SIZE + AesEngine.PASSWORD_CHECKSUM_SIZE,
             entry -> 0L,
             entry -> CompressionMethod.AES_ENC);
 

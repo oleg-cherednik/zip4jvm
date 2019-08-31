@@ -4,6 +4,8 @@ import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.utils.ZipUtils;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 
 import java.nio.file.Paths;
@@ -16,7 +18,9 @@ import static com.cop.zip4j.model.builders.LocalFileHeaderBuilder.LOOK_IN_EXTRA_
  */
 public class FileHeaderPathZipEntry extends PathZipEntry {
 
-    private final long compressedSize;
+    @Setter
+    @Getter
+    private long compressedSize;
     private final long uncompressedSize;
     private final long checksum;
     private final boolean dir;
@@ -33,11 +37,11 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
         setCompressionLevel(fileHeader.getGeneralPurposeFlag().getCompressionLevel());
         setStrength(fileHeader.getExtraField().getAesExtraDataRecord().getStrength());
 
-        setCompressedSizeWithEncryptionHeader(compressedSize);
+        setCompressedSize(compressedSize);
         setDisc(fileHeader.getDiskNumber());
         setLocalFileHeaderOffs(fileHeader.getOffsLocalFileHeader());
 
-        setName(fileHeader.getFileName());
+        setFileName(fileHeader.getFileName());
     }
 
     private static long getCompressedSize(CentralDirectory.FileHeader fileHeader) {
@@ -63,7 +67,7 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
     }
 
     @Override
-    public long size() {
+    public long getUncompressedSize() {
         return uncompressedSize;
     }
 
@@ -83,10 +87,10 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
     }
 
     @Override
-    public void setName(String name) {
-        if (dir && StringUtils.isNotBlank(name) && !ZipUtils.isDirectory(name))
-            name += '/';
-        super.setName(name);
+    public void setFileName(String fileName) {
+        if (dir && StringUtils.isNotBlank(fileName) && !ZipUtils.isDirectory(fileName))
+            fileName += '/';
+        super.setFileName(fileName);
     }
 
     public boolean isDataDescriptorAvailable() {

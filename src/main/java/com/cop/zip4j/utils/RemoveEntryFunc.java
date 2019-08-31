@@ -58,8 +58,8 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
                          .filter(Objects::nonNull)
                          .map(entryName -> ZipUtils.normalizeFileName.apply(entryName.toLowerCase()))
                          .map(entryName -> zipModel.getEntries().stream()
-                                                   .filter(entry -> entry.getName().equalsIgnoreCase(entryName))
-                                                   .map(PathZipEntry::getName)
+                                                   .filter(entry -> entry.getFileName().equalsIgnoreCase(entryName))
+                                                   .map(PathZipEntry::getFileName)
                                                    .collect(Collectors.toList()))
                          .flatMap(List::stream)
                          .collect(Collectors.toSet());
@@ -107,7 +107,7 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
 //                fileHeader.setOffsLocalFileHeader(offsetLocalHdr - (offs - offsetLocalFileHeader) - 1);
                 }
 
-                if (entries.contains(zipEntry.getName())) {
+                if (entries.contains(zipEntry.getFileName())) {
                     prv = null;
                 } else {
                     prv = zipEntry;

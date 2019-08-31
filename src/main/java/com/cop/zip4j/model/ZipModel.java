@@ -70,7 +70,7 @@ public class ZipModel {
 
     public List<String> getEntryNames() {
         return entries.stream()
-                      .map(PathZipEntry::getName)
+                      .map(PathZipEntry::getFileName)
                       .collect(Collectors.toList());
     }
 

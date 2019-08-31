@@ -88,7 +88,7 @@ public abstract class EntryOutputStream extends OutputStream {
         checkCompressedSize();
 
         // TODO look at compressedSizeNew - rearrange this method
-        entry.setCompressedSizeWithEncryptionHeader(out.getWrittenBytesAmount(COMPRESSED_DATA));
+        entry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
 
         writeDataDescriptor();
     }
@@ -98,7 +98,7 @@ public abstract class EntryOutputStream extends OutputStream {
         long actual = checksum.getValue();
 
         if (expected != 0 && expected != actual)
-            throw new Zip4jException("Checksum is not matched: " + entry.getName());
+            throw new Zip4jException("Checksum is not matched: " + entry.getFileName());
     }
 
     private void checkCompressedSize() {
@@ -106,15 +106,15 @@ public abstract class EntryOutputStream extends OutputStream {
         long actual = out.getWrittenBytesAmount(COMPRESSED_DATA);
 
         if (expected != 0 && expected != actual)
-            throw new Zip4jException("CompressedSize is not matched: " + entry.getName());
+            throw new Zip4jException("CompressedSize is not matched: " + entry.getFileName());
     }
 
     private void writeDataDescriptor() throws IOException {
         if (entry.isDataDescriptorAvailable()) {
             DataDescriptor dataDescriptor = new DataDescriptor();
             dataDescriptor.setCrc32(checksum.getValue());
-            dataDescriptor.setCompressedSize(entry.getCompressedSizeWithEncryptionHeader());
-            dataDescriptor.setUncompressedSize(entry.size());
+            dataDescriptor.setCompressedSize(entry.getCompressedSize());
+            dataDescriptor.setUncompressedSize(entry.getUncompressedSize());
             entry.getActivity().getDataDescriptorWriter(dataDescriptor).write(out);
         }
     }

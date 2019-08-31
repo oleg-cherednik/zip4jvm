@@ -51,7 +51,7 @@ public abstract class ZipEntry {
         return false;
     }
 
-    public long size() {
+    public long getUncompressedSize() {
         return 0;
     }
 

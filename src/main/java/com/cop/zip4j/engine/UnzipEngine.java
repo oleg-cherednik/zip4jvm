@@ -51,7 +51,7 @@ public class UnzipEngine {
                           String name = ZipUtils.normalizeFileName.apply(prefix.toLowerCase());
 
                           return zipModel.getEntries().stream()
-                                         .filter(entry -> entry.getName().toLowerCase().startsWith(name))
+                                         .filter(entry -> entry.getFileName().toLowerCase().startsWith(name))
                                          .collect(Collectors.toList());
                       })
                       .flatMap(List::stream)
@@ -65,7 +65,7 @@ public class UnzipEngine {
         if (entry.isDirectory())
             extractDirectory(dstDir, entry);
         else {
-            Path file = dstDir.resolve(entry.getName());
+            Path file = dstDir.resolve(entry.getFileName());
             extractFile(file, entry);
             // TODO should be uncommented
 //            setFileAttributes(file, entry);
@@ -78,12 +78,12 @@ public class UnzipEngine {
         boolean passwordEmpty = ArrayUtils.isEmpty(password);
 
         if (encryption != Encryption.OFF && passwordEmpty)
-            throw new Zip4jIncorrectPasswordException(entry.getName());
+            throw new Zip4jIncorrectPasswordException(entry.getFileName());
     }
 
     private static void extractDirectory(Path dstDir, PathZipEntry entry) {
         try {
-            Files.createDirectories(dstDir.resolve(entry.getName()));
+            Files.createDirectories(dstDir.resolve(entry.getFileName()));
         } catch(IOException e) {
             throw new Zip4jException(e);
         }
@@ -114,7 +114,7 @@ public class UnzipEngine {
     @NonNull
     public InputStream extractEntry(@NonNull String entryName) throws IOException {
         PathZipEntry en = zipModel.getEntries().stream()
-                                  .filter(entry -> entry.getName().equalsIgnoreCase(entryName))
+                                  .filter(entry -> entry.getFileName().equalsIgnoreCase(entryName))
                                   .findFirst().orElseThrow(() -> new Zip4jException("File header with entry name '" + entryName + "' was not found"));
 
         return extractEntryAsStream(en);

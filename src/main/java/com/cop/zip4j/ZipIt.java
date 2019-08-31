@@ -80,7 +80,7 @@ public final class ZipIt {
         List<PathZipEntry> entries = createEntries(withExistedEntries(paths));
 
         entries.forEach(entry -> {
-            entry.setName(parameters.getRelativeEntryName(entry.getPath()));
+            entry.setFileName(parameters.getRelativeEntryName(entry.getPath()));
             entry.setCompression(parameters.getCompression());
             entry.setEncryption(parameters.getEncryption());
             entry.setStrength(parameters.getStrength());

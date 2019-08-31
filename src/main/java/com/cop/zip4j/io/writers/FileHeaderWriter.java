@@ -31,11 +31,6 @@ final class FileHeaderWriter {
         byte[] fileName = fileHeader.getFileName(charset);
         byte[] fileComment = fileHeader.getFileComment(charset);
 
-        if(fileHeader.getExtraField().getExtendedInfo() == Zip64.ExtendedInfo.NULL)
-            System.out.println(fileHeader.getFileName() + ": " + fileHeader.getCompressedSize());
-        else
-            System.out.println(fileHeader.getFileName() + ": " + fileHeader.getExtraField().getExtendedInfo().getCompressedSize());
-
         out.writeDwordSignature(CentralDirectory.FileHeader.SIGNATURE);
         out.writeWord(fileHeader.getVersionMadeBy());
         out.writeWord(fileHeader.getVersionToExtract());

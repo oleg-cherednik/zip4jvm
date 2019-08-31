@@ -33,9 +33,9 @@ public final class LocalFileHeaderBuilder {
         localFileHeader.setCompressionMethod(entry.getEncryption().getCompressionMethod().apply(entry));
         localFileHeader.setLastModifiedTime(entry.getLastModifiedTime());
         localFileHeader.setCrc32(getCrc32());
-        localFileHeader.setCompressedSize(getSize(entry.getCompressedSizeWithEncryptionHeader()));
-        localFileHeader.setUncompressedSize(getSize(entry.size()));
-        localFileHeader.setFileName(entry.getName());
+        localFileHeader.setCompressedSize(getSize(entry.getCompressedSize()));
+        localFileHeader.setUncompressedSize(getSize(entry.getUncompressedSize()));
+        localFileHeader.setFileName(entry.getFileName());
         localFileHeader.setExtraField(createExtraField());
 
         return localFileHeader;
@@ -65,8 +65,8 @@ public final class LocalFileHeaderBuilder {
             return Zip64.ExtendedInfo.NULL;
         if (entry.isZip64())
             return Zip64.ExtendedInfo.builder()
-                                     .compressedSize(entry.getCompressedSizeWithEncryptionHeader())
-                                     .uncompressedSize(entry.size())
+                                     .compressedSize(entry.getCompressedSize())
+                                     .uncompressedSize(entry.getUncompressedSize())
 //                                     .offsLocalHeaderRelative(entry.getLocalFileHeaderOffs())
                                      .build();
         return Zip64.ExtendedInfo.NULL;

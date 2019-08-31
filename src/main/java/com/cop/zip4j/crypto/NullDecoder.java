@@ -15,7 +15,7 @@ final class NullDecoder implements Decoder {
 
     @Override
     public long getCompressedSize(@NonNull PathZipEntry entry) {
-        return entry.getCompressedSizeWithEncryptionHeader();
+        return entry.getCompressedSize();
     }
 
     @Override

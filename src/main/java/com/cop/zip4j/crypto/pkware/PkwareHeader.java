@@ -53,7 +53,7 @@ public final class PkwareHeader {
         int checksum = getChecksum(entry);
 
         if (buf[buf.length - 1] != low(checksum) || buf[buf.length - 2] != high(checksum))
-            throw new Zip4jIncorrectPasswordException(entry.getName());
+            throw new Zip4jIncorrectPasswordException(entry.getFileName());
     }
 
     private static int getChecksum(PathZipEntry entry) {
