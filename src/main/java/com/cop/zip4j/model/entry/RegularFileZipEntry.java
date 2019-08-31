@@ -56,7 +56,7 @@ public class RegularFileZipEntry extends PathZipEntry {
     }
 
     @Override
-    public long getCompressedSize() {
+    public long getExpectedCompressedSize() {
         return compression == Compression.STORE ? encryption.getCompressedSize().apply(this) : 0;
     }
 

@@ -29,7 +29,7 @@ public class DirectoryZipEntry extends PathZipEntry {
     }
 
     @Override
-    public long getCompressedSize() {
+    public long getExpectedCompressedSize() {
         return 0;
     }
 

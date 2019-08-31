@@ -102,7 +102,7 @@ public abstract class EntryOutputStream extends OutputStream {
     }
 
     private void checkCompressedSize() {
-        long expected = entry.getCompressedSize();
+        long expected = entry.getExpectedCompressedSize();
         long actual = out.getWrittenBytesAmount(COMPRESSED_DATA);
 
         if (expected != 0 && expected != actual)

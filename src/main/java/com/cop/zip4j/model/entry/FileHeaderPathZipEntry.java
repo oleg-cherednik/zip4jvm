@@ -33,7 +33,7 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
         setCompressionLevel(fileHeader.getGeneralPurposeFlag().getCompressionLevel());
         setStrength(fileHeader.getExtraField().getAesExtraDataRecord().getStrength());
 
-        setCompressedSizeWithEncryptionHeader(getCompressedSizeWithEncryptionHeader(fileHeader));
+        setCompressedSizeWithEncryptionHeader(compressedSize);
         setDisc(fileHeader.getDiskNumber());
         setLocalFileHeaderOffs(fileHeader.getOffsLocalFileHeader());
 
@@ -41,12 +41,6 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
     }
 
     private static long getCompressedSize(CentralDirectory.FileHeader fileHeader) {
-        if (fileHeader.getCompressedSize() == LOOK_IN_EXTRA_FIELD)
-            return fileHeader.getExtraField().getExtendedInfo().getCompressedSize();
-        return fileHeader.getCompressedSize();
-    }
-
-    private static long getCompressedSizeWithEncryptionHeader(CentralDirectory.FileHeader fileHeader) {
         if (fileHeader.getCompressedSize() == LOOK_IN_EXTRA_FIELD)
             return fileHeader.getExtraField().getExtendedInfo().getCompressedSize();
         return fileHeader.getCompressedSize();
@@ -74,7 +68,7 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
     }
 
     @Override
-    public long getCompressedSize() {
+    public long getExpectedCompressedSize() {
         return compressedSize;
     }
 
