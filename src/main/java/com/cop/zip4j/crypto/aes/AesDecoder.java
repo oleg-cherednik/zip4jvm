@@ -28,14 +28,14 @@ public final class AesDecoder implements Decoder {
     public static AesDecoder create(@NonNull PathZipEntry entry, @NonNull DataInput in) {
         try {
             AesStrength strength = entry.getStrength();
-            byte[] salt = getSalt(in, entry);
+            byte[] salt = getSalt(entry, in);
             byte[] key = AesEngine.createKey(entry.getPassword(), salt, strength);
 
             Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
             Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
             byte[] passwordChecksum = strength.createPasswordChecksum(key);
 
-            checkPasswordChecksum(passwordChecksum, in, entry);
+            checkPasswordChecksum(passwordChecksum, entry, in);
 
             return new AesDecoder(cipher, mac, salt.length);
         } catch(Exception e) {
@@ -68,12 +68,12 @@ public final class AesDecoder implements Decoder {
         checkMessageAuthenticationCode(in);
     }
 
-    private static byte[] getSalt(DataInput in, PathZipEntry entry) throws IOException {
+    private static byte[] getSalt(PathZipEntry entry, DataInput in) throws IOException {
         int saltLength = entry.getStrength().saltLength();
         return in.readBytes(saltLength);
     }
 
-    private static void checkPasswordChecksum(byte[] actual, DataInput in, PathZipEntry entry) throws IOException {
+    private static void checkPasswordChecksum(byte[] actual, PathZipEntry entry, DataInput in) throws IOException {
         byte[] expected = in.readBytes(PASSWORD_CHECKSUM_SIZE);
 
         if (!ArrayUtils.isEquals(expected, actual))

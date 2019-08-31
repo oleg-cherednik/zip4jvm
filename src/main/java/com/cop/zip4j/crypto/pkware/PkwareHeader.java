@@ -38,9 +38,9 @@ public final class PkwareHeader {
         return buf;
     }
 
-    public static PkwareHeader read(@NonNull DataInput in, @NonNull PathZipEntry entry, @NonNull PkwareEngine engine) throws IOException {
+    public static PkwareHeader read(@NonNull PkwareEngine engine, @NonNull PathZipEntry entry, @NonNull DataInput in) throws IOException {
         PkwareHeader header = new PkwareHeader(in.readBytes(SIZE));
-        header.requireMatchChecksum(entry, engine);
+        header.requireMatchChecksum(engine, entry);
         return header;
     }
 
@@ -48,7 +48,7 @@ public final class PkwareHeader {
         out.writeBytes(buf);
     }
 
-    private void requireMatchChecksum(PathZipEntry entry, PkwareEngine engine) {
+    private void requireMatchChecksum(PkwareEngine engine, PathZipEntry entry) {
         engine.decrypt(buf, 0, buf.length);
         int checksum = getChecksum(entry);
 
