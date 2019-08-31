@@ -19,7 +19,7 @@ public class LocalFileHeader {
 
     public static final int SIGNATURE = 0x04034B50;
 
-    // size:4 - signature (0x04034b50)
+    // size:4 - signature (0x04034B50)
     // size:2 - version needed to extractEntries
     private int versionToExtract;
     // size:2 - general purpose bit flag
@@ -48,18 +48,6 @@ public class LocalFileHeader {
     @NonNull
     public byte[] getFileName(@NonNull Charset charset) {
         return fileName != null ? fileName.getBytes(charset) : ArrayUtils.EMPTY_BYTE_ARRAY;
-    }
-
-    public long getOriginalCompressedSize() {
-        return extraField.getExtendedInfo() == Zip64.ExtendedInfo.NULL ? compressedSize : extraField.getExtendedInfo().getCompressedSize();
-    }
-
-    public long getOriginalUncompressedSize() {
-        return extraField.getExtendedInfo() == Zip64.ExtendedInfo.NULL ? uncompressedSize : extraField.getExtendedInfo().getUncompressedSize();
-    }
-
-    public Encryption getEncryption() {
-        return Encryption.get(extraField, generalPurposeFlag);
     }
 
     @Override

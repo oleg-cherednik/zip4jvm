@@ -32,7 +32,7 @@ public final class LocalFileHeaderBuilder {
         localFileHeader.setGeneralPurposeFlag(createGeneralPurposeFlag());
         localFileHeader.setCompressionMethod(entry.getEncryption().getCompressionMethod(entry));
         localFileHeader.setLastModifiedTime(entry.getLastModifiedTime());
-        localFileHeader.setCrc32(getValue(entry.checksum()));
+        localFileHeader.setCrc32(getCrc32());
         localFileHeader.setCompressedSize(getValue(entry.getCompressedSize()));
         localFileHeader.setUncompressedSize(getValue(entry.size()));
         localFileHeader.setFileName(entry.getName());
@@ -70,6 +70,12 @@ public final class LocalFileHeaderBuilder {
 //                                     .offsLocalHeaderRelative(entry.getLocalFileHeaderOffs())
                                      .build();
         return Zip64.ExtendedInfo.NULL;
+    }
+
+    private long getCrc32() {
+        if (entry.isDataDescriptorAvailable())
+            return LOOK_IN_DATA_DESCRIPTOR;
+        return entry.checksum();
     }
 
     private long getValue(long value) {
