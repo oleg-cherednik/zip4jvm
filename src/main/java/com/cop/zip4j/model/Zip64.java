@@ -60,7 +60,7 @@ public final class Zip64 {
 
         // size:4 - signature (0x06064b50)
         // size:8 - directory record (n)
-        private long sizeEndCentralDirectory;
+        private long endCentralDirectorySize;
         // size:2 - version made by
         private int versionMadeBy;
         // size:2 - version needed to extractEntries
@@ -79,10 +79,6 @@ public final class Zip64 {
         private long centralDirectoryOffs;
         // size:n-44 - extensible data sector
         private byte[] extensibleDataSector;
-
-        public void incTotalEntries() {
-            totalEntries++;
-        }
 
     }
 

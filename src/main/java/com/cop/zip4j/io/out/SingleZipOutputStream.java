@@ -30,7 +30,7 @@ public class SingleZipOutputStream extends BaseDataOutput {
     }
 
     @Override
-    public int getCounter() {
+    public int getDisk() {
         return 0;
     }
 

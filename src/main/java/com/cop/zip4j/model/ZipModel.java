@@ -60,8 +60,12 @@ public class ZipModel {
     }
 
     public void zip64() {
-        if (!(activity instanceof Zip64Activity))
+        if (!isZip64())
             activity = Zip64Activity.INSTANCE;
+    }
+
+    public boolean isZip64() {
+        return activity instanceof Zip64Activity;
     }
 
     public boolean isEmpty() {

@@ -56,16 +56,4 @@ public class EndCentralDirectory {
         return comment != null ? comment.getBytes(charset) : ArrayUtils.EMPTY_BYTE_ARRAY;
     }
 
-    public void incTotalEntries() {
-        totalEntries++;
-    }
-
-    public void incDiskEntries() {
-        diskEntries++;
-    }
-
-    public boolean isSplitArchive() {
-        return splitParts > 0;
-    }
-
 }

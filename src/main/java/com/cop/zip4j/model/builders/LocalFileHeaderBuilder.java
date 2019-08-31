@@ -25,6 +25,7 @@ public final class LocalFileHeaderBuilder {
     @NonNull
     private final PathZipEntry entry;
 
+    @NonNull
     public LocalFileHeader create() {
         LocalFileHeader localFileHeader = new LocalFileHeader();
 

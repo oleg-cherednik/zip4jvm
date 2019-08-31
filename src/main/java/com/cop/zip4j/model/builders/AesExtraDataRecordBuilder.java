@@ -16,6 +16,7 @@ final class AesExtraDataRecordBuilder {
     @NonNull
     private final PathZipEntry entry;
 
+    @NonNull
     public AesExtraDataRecord create() {
         if (entry.getEncryption() != Encryption.AES)
             return AesExtraDataRecord.NULL;

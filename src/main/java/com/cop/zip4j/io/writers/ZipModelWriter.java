@@ -5,8 +5,9 @@ import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.EndCentralDirectory;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
-import com.cop.zip4j.model.activity.Zip64Activity;
 import com.cop.zip4j.model.builders.CentralDirectoryBuilder;
+import com.cop.zip4j.model.builders.EndCentralDirectoryBuilder;
+import com.cop.zip4j.model.builders.Zip64Builder;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -21,9 +22,9 @@ public final class ZipModelWriter {
     private final ZipModel zipModel;
 
     public void write(@NonNull DataOutput out) throws IOException {
-        zipModel.setSplitParts(out.getCounter());
+        zipModel.setSplitParts(out.getDisk());
         zipModel.setCentralDirectoryOffs(out.getOffs());
-        zipModel.setStartDiskNumber(out.getCounter());
+        zipModel.setStartDiskNumber(out.getDisk());
 
         writeCentralDirectoryHeaders(out);
         writeZip64(out);
@@ -38,52 +39,12 @@ public final class ZipModelWriter {
     }
 
     private void writeZip64(DataOutput out) throws IOException {
-        Zip64 zip64 = createZip64(out.getCounter());
+        Zip64 zip64 = new Zip64Builder(zipModel, out.getDisk()).create();
         new Zip64Writer(zip64).write(out);
     }
 
-    private Zip64 createZip64(int counter) {
-        if (!(zipModel.getActivity() instanceof Zip64Activity))
-            return Zip64.NULL;
-
-        Zip64.EndCentralDirectory dir = new Zip64.EndCentralDirectory();
-        dir.setSize(Zip64.EndCentralDirectory.SIZE + dir.getSizeEndCentralDirectory());
-        dir.setVersionMadeBy(CentralDirectory.FileHeader.VERSION);
-        dir.setVersionNeededToExtract(CentralDirectory.FileHeader.VERSION);
-        dir.setDisk(zipModel.getSplitParts());
-        dir.setStartDisk(zipModel.getStartDiskNumber());
-        dir.setDiskEntries(countNumberOfFileHeaderEntriesOnDisk());
-        dir.setTotalEntries(zipModel.getEntries().size());
-        dir.setSize(zipModel.getCentralDirectorySize());
-        dir.setCentralDirectoryOffs(zipModel.getCentralDirectoryOffs());
-
-        Zip64.EndCentralDirectoryLocator locator = new Zip64.EndCentralDirectoryLocator();
-        locator.setOffs(zipModel.getCentralDirectoryOffs() + zipModel.getCentralDirectorySize());
-        locator.setStartDisk(counter);
-        locator.setTotalDisks(counter + 1);
-
-        return Zip64.of(locator, dir);
-    }
-
-    private int countNumberOfFileHeaderEntriesOnDisk() {
-        if (zipModel.isSplitArchive())
-            return (int)zipModel.getEntries().stream()
-                                .filter(entry -> entry.getDisc() == zipModel.getSplitParts())
-                                .count();
-
-        return zipModel.getEntries().size();
-    }
-
     private void writeEndCentralDirectory(DataOutput out) throws IOException {
-        EndCentralDirectory endCentralDirectory = new EndCentralDirectory();
-        endCentralDirectory.setCentralDirectoryOffs(zipModel.getCentralDirectoryOffs());
-        endCentralDirectory.setSplitParts(zipModel.getSplitParts());
-        endCentralDirectory.setStartDiskNumber(zipModel.getSplitParts());
-        endCentralDirectory.setDiskEntries(zipModel.getEntries().size());
-        endCentralDirectory.setTotalEntries(zipModel.getActivity().getTotalEntriesECD(zipModel));
-        endCentralDirectory.setComment(zipModel.getComment());
-        endCentralDirectory.setCentralDirectorySize(zipModel.getCentralDirectorySize());
-
+        EndCentralDirectory endCentralDirectory = new EndCentralDirectoryBuilder(zipModel).create();
         new EndCentralDirectoryWriter(endCentralDirectory, zipModel.getCharset()).write(out);
     }
 

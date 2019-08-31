@@ -20,7 +20,7 @@ public class SplitZipOutputStream extends BaseDataOutput {
     /** see 8.5.5 */
     public static final int SPLIT_SIGNATURE = DataDescriptor.SIGNATURE;
 
-    private int counter;
+    private int disK;
 
     @NonNull
     public static SplitZipOutputStream create(@NonNull ZipModel zipModel) throws IOException {
@@ -76,7 +76,7 @@ public class SplitZipOutputStream extends BaseDataOutput {
     }
 
     private void openNextSplit() throws IOException {
-        Path splitFile = ZipModel.getSplitFilePath(zipModel.getZipFile(), ++counter);
+        Path splitFile = ZipModel.getSplitFilePath(zipModel.getZipFile(), ++disK);
 
         super.close();
 
@@ -90,8 +90,8 @@ public class SplitZipOutputStream extends BaseDataOutput {
     }
 
     @Override
-    public int getCounter() {
-        return counter;
+    public int getDisk() {
+        return disK;
     }
 
     @Override

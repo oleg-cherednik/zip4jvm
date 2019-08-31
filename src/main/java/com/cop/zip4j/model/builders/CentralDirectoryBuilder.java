@@ -2,6 +2,7 @@ package com.cop.zip4j.model.builders;
 
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.entry.PathZipEntry;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
@@ -17,6 +18,7 @@ public final class CentralDirectoryBuilder {
 
     private final List<PathZipEntry> entries;
 
+    @NonNull
     public CentralDirectory create() throws IOException {
         CentralDirectory centralDirectory = new CentralDirectory();
         centralDirectory.setFileHeaders(createFileHeaders());

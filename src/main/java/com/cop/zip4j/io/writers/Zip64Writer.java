@@ -26,23 +26,23 @@ final class Zip64Writer {
     @RequiredArgsConstructor
     private static final class EndCentralDirectory {
 
-        private final Zip64.EndCentralDirectory dir;
+        private final Zip64.EndCentralDirectory endCentralDirectory;
 
         public void write(@NonNull DataOutput out) throws IOException {
-            if (dir == null)
+            if (endCentralDirectory == null)
                 return;
 
             out.writeDwordSignature(Zip64.EndCentralDirectory.SIGNATURE);
-            out.writeQword(dir.getSizeEndCentralDirectory());
-            out.writeWord(dir.getVersionMadeBy());
-            out.writeWord(dir.getVersionNeededToExtract());
-            out.writeDword(dir.getDisk());
-            out.writeDword(dir.getStartDisk());
-            out.writeQword(dir.getDiskEntries());
-            out.writeQword(dir.getTotalEntries());
-            out.writeQword(dir.getSize());
-            out.writeQword(dir.getCentralDirectoryOffs());
-            out.writeBytes(dir.getExtensibleDataSector());
+            out.writeQword(endCentralDirectory.getEndCentralDirectorySize());
+            out.writeWord(endCentralDirectory.getVersionMadeBy());
+            out.writeWord(endCentralDirectory.getVersionNeededToExtract());
+            out.writeDword(endCentralDirectory.getDisk());
+            out.writeDword(endCentralDirectory.getStartDisk());
+            out.writeQword(endCentralDirectory.getDiskEntries());
+            out.writeQword(endCentralDirectory.getTotalEntries());
+            out.writeQword(endCentralDirectory.getSize());
+            out.writeQword(endCentralDirectory.getCentralDirectoryOffs());
+            out.writeBytes(endCentralDirectory.getExtensibleDataSector());
         }
     }
 

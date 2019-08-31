@@ -17,20 +17,20 @@ import java.nio.charset.Charset;
 final class EndCentralDirectoryWriter {
 
     @NonNull
-    private final EndCentralDirectory dir;
+    private final EndCentralDirectory endCentralDirectory;
     @NonNull
     private final Charset charset;
 
     public void write(@NonNull DataOutput out) throws IOException {
-        byte[] comment = dir.getComment(charset);
+        byte[] comment = endCentralDirectory.getComment(charset);
 
         out.writeDwordSignature(EndCentralDirectory.SIGNATURE);
-        out.writeWord(dir.getSplitParts());
-        out.writeWord(dir.getStartDiskNumber());
-        out.writeWord(dir.getDiskEntries());
-        out.writeWord(dir.getTotalEntries());
-        out.writeDword(dir.getCentralDirectorySize());
-        out.writeDword(Math.min(dir.getCentralDirectoryOffs(), Zip64.LIMIT));
+        out.writeWord(endCentralDirectory.getSplitParts());
+        out.writeWord(endCentralDirectory.getStartDiskNumber());
+        out.writeWord(endCentralDirectory.getDiskEntries());
+        out.writeWord(endCentralDirectory.getTotalEntries());
+        out.writeDword(endCentralDirectory.getCentralDirectorySize());
+        out.writeDword(Math.min(endCentralDirectory.getCentralDirectoryOffs(), Zip64.LIMIT));
         out.writeWord(comment.length);
         out.writeBytes(comment);
     }
