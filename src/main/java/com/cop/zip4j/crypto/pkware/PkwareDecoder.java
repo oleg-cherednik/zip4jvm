@@ -13,13 +13,12 @@ import java.io.IOException;
  * @since 22.03.2019
  */
 @RequiredArgsConstructor
-@SuppressWarnings("MethodCanBeVariableArityMethod")
 public final class PkwareDecoder implements Decoder {
 
     private final PkwareEngine engine;
 
-    public static PkwareDecoder create(@NonNull DataInput in, @NonNull PathZipEntry entry, char[] password) throws IOException {
-        PkwareEngine engine = new PkwareEngine(password);
+    public static PkwareDecoder create(@NonNull DataInput in, @NonNull PathZipEntry entry) throws IOException {
+        PkwareEngine engine = new PkwareEngine(entry.getPassword());
         PkwareHeader.read(in, entry, engine);
         return new PkwareDecoder(engine);
     }

@@ -29,7 +29,6 @@ import java.nio.file.Path;
 public abstract class PathZipEntry extends ZipEntry {
 
     protected final Path path;
-    @Setter
     protected String name;
     private final int lastModifiedTime;
     // TODO set from ZipModel

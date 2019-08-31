@@ -123,7 +123,7 @@ public class UnzipEngine {
     @NonNull
     private InputStream extractEntryAsStream(@NonNull PathZipEntry entry) throws IOException {
         DataInput in = zipModel.isSplitArchive() ? SplitZipInputStream.create(zipModel, entry.getDisc()) : SingleZipInputStream.create(zipModel);
-        return EntryInputStream.create(entry, password, in);
+        return EntryInputStream.create(entry, in);
     }
 
     private static FileOutputStream getOutputStream(Path file) {

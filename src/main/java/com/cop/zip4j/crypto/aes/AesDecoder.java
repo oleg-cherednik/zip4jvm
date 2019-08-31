@@ -25,12 +25,11 @@ public final class AesDecoder implements Decoder {
     private final int saltLength;
     private final AesEngine engine;
 
-    @SuppressWarnings("MethodCanBeVariableArityMethod")
-    public static AesDecoder create(@NonNull DataInput in, @NonNull PathZipEntry entry, @NonNull char[] password) {
+    public static AesDecoder create(@NonNull DataInput in, @NonNull PathZipEntry entry) {
         try {
             AesStrength strength = entry.getStrength();
             byte[] salt = getSalt(in, entry);
-            byte[] key = AesEngine.createKey(password, salt, strength);
+            byte[] key = AesEngine.createKey(entry.getPassword(), salt, strength);
 
             Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
             Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
