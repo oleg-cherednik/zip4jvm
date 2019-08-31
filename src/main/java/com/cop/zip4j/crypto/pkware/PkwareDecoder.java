@@ -30,7 +30,7 @@ public final class PkwareDecoder implements Decoder {
 
     @Override
     public long getCompressedSize(@NonNull PathZipEntry entry) {
-        return entry.getCompressedSizeNew() - PkwareHeader.SIZE;
+        return entry.getCompressedSizeWithEncryptionHeader() - PkwareHeader.SIZE;
     }
 
 }

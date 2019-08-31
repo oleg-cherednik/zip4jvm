@@ -28,7 +28,7 @@ final class AesExtraDataRecordReader {
                                  .versionNumber(in.readWord())
                                  .vendor(in.readString(2))
                                  .strength(AesStrength.parseValue(in.readByte()))
-                                 .compressionMethod(CompressionMethod.parseValue(in.readWord()))
+                                 .compressionMethod(CompressionMethod.parseCode(in.readWord()))
                                  .build();
     }
 }

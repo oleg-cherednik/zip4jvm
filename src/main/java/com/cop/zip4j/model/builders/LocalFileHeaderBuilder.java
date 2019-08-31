@@ -30,11 +30,11 @@ public final class LocalFileHeaderBuilder {
 
         localFileHeader.setVersionToExtract(CentralDirectory.FileHeader.VERSION);
         localFileHeader.setGeneralPurposeFlag(createGeneralPurposeFlag());
-        localFileHeader.setCompressionMethod(entry.getEncryption().getCompressionMethod(entry));
+        localFileHeader.setCompressionMethod(entry.getEncryption().getCompressionMethod().apply(entry));
         localFileHeader.setLastModifiedTime(entry.getLastModifiedTime());
         localFileHeader.setCrc32(getCrc32());
-        localFileHeader.setCompressedSize(getValue(entry.getCompressedSize()));
-        localFileHeader.setUncompressedSize(getValue(entry.size()));
+        localFileHeader.setCompressedSize(getSize(entry.getCompressedSizeWithEncryptionHeader()));
+        localFileHeader.setUncompressedSize(getSize(entry.size()));
         localFileHeader.setFileName(entry.getName());
         localFileHeader.setExtraField(createExtraField());
 
@@ -65,7 +65,7 @@ public final class LocalFileHeaderBuilder {
             return Zip64.ExtendedInfo.NULL;
         if (entry.isZip64())
             return Zip64.ExtendedInfo.builder()
-                                     .compressedSize(entry.getCompressedSizeNew())
+                                     .compressedSize(entry.getCompressedSizeWithEncryptionHeader())
                                      .uncompressedSize(entry.size())
 //                                     .offsLocalHeaderRelative(entry.getLocalFileHeaderOffs())
                                      .build();
@@ -75,15 +75,15 @@ public final class LocalFileHeaderBuilder {
     private long getCrc32() {
         if (entry.isDataDescriptorAvailable())
             return LOOK_IN_DATA_DESCRIPTOR;
-        return entry.checksum();
+        return entry.getEncryption().getChecksum().apply(entry);
     }
 
-    private long getValue(long value) {
+    private long getSize(long size) {
         if (entry.isDataDescriptorAvailable())
             return LOOK_IN_DATA_DESCRIPTOR;
         if (entry.isZip64())
             return LOOK_IN_EXTRA_FIELD;
-        return value;
+        return size;
     }
 
 }

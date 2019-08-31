@@ -60,7 +60,7 @@ public final class AesDecoder implements Decoder {
 
     @Override
     public long getCompressedSize(@NonNull PathZipEntry entry) {
-        return entry.getCompressedSizeNew() - saltLength - PASSWORD_CHECKSUM_SIZE - MAX_SIZE;
+        return entry.getCompressedSizeWithEncryptionHeader() - saltLength - PASSWORD_CHECKSUM_SIZE - MAX_SIZE;
     }
 
     @Override

@@ -12,6 +12,7 @@ import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import com.cop.zip4j.model.entry.PathZipEntry;
+import com.cop.zip4j.model.entry.ZipEntry;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -19,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.util.function.Function;
-import java.util.function.LongFunction;
 
 /**
  * @author Oleg Cherednik
@@ -31,34 +31,28 @@ public enum Encryption {
     OFF(entry -> Encoder.NULL,
             (entry, in) -> Decoder.NULL,
             entry -> 0L,
-            crc32 -> crc32),
+            entry -> 0,
+            ZipEntry::checksum,
+            entry -> entry.getCompression().getMethod()),
     PKWARE(PkwareEncoder::create,
             PkwareDecoder::create,
             entry -> entry.size() + PkwareHeader.SIZE,
-            crc32 -> crc32),
+            entry -> PkwareHeader.SIZE,
+            ZipEntry::checksum,
+            entry -> entry.getCompression().getMethod()),
     AES(AesEncoder::create,
             AesDecoder::create,
             entry -> entry.size() + entry.getStrength().saltLength() + AesEngine.MAX_SIZE + AesEngine.PASSWORD_CHECKSUM_SIZE,
-            crc32 -> 0L) {
-        @Override
-        public CompressionMethod getCompressionMethod(PathZipEntry entry) {
-            return CompressionMethod.AES_ENC;
-        }
-    };
+            entry -> entry.getStrength().saltLength() + AesEngine.MAX_SIZE + AesEngine.PASSWORD_CHECKSUM_SIZE,
+            entry -> 0L,
+            entry -> CompressionMethod.AES_ENC);
 
     private final Function<PathZipEntry, Encoder> createEncoder;
     private final CreateDecoder createDecoder;
     private final Function<PathZipEntry, Long> compressedSize;
-    private final LongFunction<Long> checksumFileHeader;
-
-    public long getChecksumFileHeader(CentralDirectory.FileHeader fileHeader) {
-        return fileHeader.getCrc32();
-    }
-
-    @NonNull
-    public CompressionMethod getCompressionMethod(PathZipEntry entry) {
-        return entry.getCompression().getMethod();
-    }
+    private final Function<PathZipEntry, Integer> encryptionHeaderSize;
+    private final Function<PathZipEntry, Long> checksum;
+    private final Function<PathZipEntry, CompressionMethod> compressionMethod;
 
     @NonNull
     public static Encryption get(@NonNull ExtraField extraField, @NonNull GeneralPurposeFlag generalPurposeFlag) {

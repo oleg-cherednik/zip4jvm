@@ -31,13 +31,18 @@ final class FileHeaderWriter {
         byte[] fileName = fileHeader.getFileName(charset);
         byte[] fileComment = fileHeader.getFileComment(charset);
 
+        if(fileHeader.getExtraField().getExtendedInfo() == Zip64.ExtendedInfo.NULL)
+            System.out.println(fileHeader.getFileName() + ": " + fileHeader.getCompressedSize());
+        else
+            System.out.println(fileHeader.getFileName() + ": " + fileHeader.getExtraField().getExtendedInfo().getCompressedSize());
+
         out.writeDwordSignature(CentralDirectory.FileHeader.SIGNATURE);
         out.writeWord(fileHeader.getVersionMadeBy());
         out.writeWord(fileHeader.getVersionToExtract());
         out.writeWord(fileHeader.getGeneralPurposeFlag().getAsInt());
         out.writeWord(fileHeader.getCompressionMethod().getCode());
         out.writeDword(fileHeader.getLastModifiedTime());
-        out.writeDword(fileHeader.getEncryption().getChecksumFileHeader(fileHeader));
+        out.writeDword(fileHeader.getCrc32());
         out.writeDword(fileHeader.getCompressedSize());
         out.writeDword(fileHeader.getUncompressedSize());
         out.writeWord(fileName.length);

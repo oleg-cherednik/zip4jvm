@@ -88,7 +88,7 @@ public abstract class EntryOutputStream extends OutputStream {
         checkCompressedSize();
 
         // TODO look at compressedSizeNew - rearrange this method
-        entry.setCompressedSizeNew(out.getWrittenBytesAmount(COMPRESSED_DATA));
+        entry.setCompressedSizeWithEncryptionHeader(out.getWrittenBytesAmount(COMPRESSED_DATA));
 
         writeDataDescriptor();
     }
@@ -113,7 +113,7 @@ public abstract class EntryOutputStream extends OutputStream {
         if (entry.isDataDescriptorAvailable()) {
             DataDescriptor dataDescriptor = new DataDescriptor();
             dataDescriptor.setCrc32(checksum.getValue());
-            dataDescriptor.setCompressedSize(entry.getCompressedSizeNew());
+            dataDescriptor.setCompressedSize(entry.getCompressedSizeWithEncryptionHeader());
             dataDescriptor.setUncompressedSize(entry.size());
             entry.getActivity().getDataDescriptorWriter(dataDescriptor).write(out);
         }

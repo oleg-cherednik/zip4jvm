@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+import static com.cop.zip4j.model.builders.LocalFileHeaderBuilder.LOOK_IN_EXTRA_FIELD;
+
 /**
  * @author Oleg Cherednik
  * @since 30.08.2019
@@ -31,11 +33,11 @@ final class FileHeaderBuilder {
         fileHeader.setVersionMadeBy(CentralDirectory.FileHeader.VERSION);
         fileHeader.setVersionToExtract(CentralDirectory.FileHeader.VERSION);
         fileHeader.setGeneralPurposeFlag(createGeneralPurposeFlag());
-        fileHeader.setCompressionMethod(entry.getEncryption().getCompressionMethod(entry));
+        fileHeader.setCompressionMethod(entry.getEncryption().getCompressionMethod().apply(entry));
         fileHeader.setLastModifiedTime(entry.getLastModifiedTime());
-        fileHeader.setCrc32(entry.getEncryption().getChecksumFileHeader().apply(entry.checksum()));
-        fileHeader.setCompressedSize(entry.getCompressedSizeNew());
-        fileHeader.setUncompressedSize(entry.size());
+        fileHeader.setCrc32(entry.getEncryption().getChecksum().apply(entry));
+        fileHeader.setCompressedSize(getSize(entry.getCompressedSizeWithEncryptionHeader()));
+        fileHeader.setUncompressedSize(getSize(entry.size()));
         fileHeader.setFileCommentLength(0);
         fileHeader.setDiskNumber(entry.getDisc());
         fileHeader.setInternalFileAttributes(InternalFileAttributes.of(entry.getPath()));
@@ -67,15 +69,19 @@ final class FileHeaderBuilder {
     }
 
     private Zip64.ExtendedInfo createExtendedInfo() {
-//        if (entry.isDataDescriptorAvailable())
-//            return Zip64.ExtendedInfo.NULL;
-//        if (entry.isZip64())
-//            return Zip64.ExtendedInfo.builder()
-//                                     .compressedSize(entry.getCompressedSizeNew())
-//                                     .uncompressedSize(entry.size())
-////                                     .offsLocalHeaderRelative(entry.getLocalFileHeaderOffs())
-//                                     .build();
+        if (entry.isZip64())
+            return Zip64.ExtendedInfo.builder()
+                                     .compressedSize(entry.getCompressedSizeWithEncryptionHeader())
+                                     .uncompressedSize(entry.size())
+//                                     .offsLocalHeaderRelative(entry.getLocalFileHeaderOffs())
+                                     .build();
         return Zip64.ExtendedInfo.NULL;
+    }
+
+    private long getSize(long size) {
+        if (entry.isZip64())
+            return LOOK_IN_EXTRA_FIELD;
+        return size;
     }
 
 }

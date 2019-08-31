@@ -5,7 +5,6 @@ import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.ExternalFileAttributes;
-import com.cop.zip4j.model.ExtraField;
 import com.cop.zip4j.model.InternalFileAttributes;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.NonNull;
@@ -45,7 +44,7 @@ final class FileHeaderReader {
         fileHeader.setVersionMadeBy(in.readWord());
         fileHeader.setVersionToExtract(in.readWord());
         fileHeader.setGeneralPurposeFlagData(in.readWord());
-        fileHeader.setCompressionMethod(CompressionMethod.parseValue(in.readWord()));
+        fileHeader.setCompressionMethod(CompressionMethod.parseCode(in.readWord()));
         fileHeader.setLastModifiedTime((int)in.readDword());
         fileHeader.setCrc32(in.readDword());
         fileHeader.setCompressedSize(in.readDword());
@@ -58,18 +57,18 @@ final class FileHeaderReader {
         fileHeader.setExternalFileAttributes(ExternalFileAttributes.read(in));
         fileHeader.setOffsLocalFileHeader(in.readDword());
         fileHeader.setFileName(ZipUtils.normalizeFileName.apply(in.readString(fileNameLength)));
-        fileHeader.setExtraField(readExtraFiled(extraFieldLength, fileHeader, in));
+        fileHeader.setExtraField(getExtraFieldReader(extraFieldLength, fileHeader).read(in));
         fileHeader.setFileComment(in.readString(fileCommentLength));
 
         return fileHeader;
     }
 
-    private static ExtraField readExtraFiled(int size, CentralDirectory.FileHeader fileHeader, DataInput in) throws IOException {
+    private static ExtraFieldReader getExtraFieldReader(int size, CentralDirectory.FileHeader fileHeader) {
         boolean uncompressedSize = fileHeader.getUncompressedSize() == LOOK_IN_EXTRA_FIELD;
         boolean compressedSize = fileHeader.getCompressedSize() == LOOK_IN_EXTRA_FIELD;
         boolean offsHeader = fileHeader.getOffsLocalFileHeader() == LOOK_IN_EXTRA_FIELD;
         boolean diskNumber = fileHeader.getDiskNumber() == 0xFFFF;
-        return new ExtraFieldReader(size, uncompressedSize, compressedSize, offsHeader, diskNumber).read(in);
+        return new ExtraFieldReader(size, uncompressedSize, compressedSize, offsHeader, diskNumber);
     }
 
 }

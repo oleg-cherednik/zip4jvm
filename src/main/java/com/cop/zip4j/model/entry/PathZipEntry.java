@@ -44,7 +44,7 @@ public abstract class PathZipEntry extends ZipEntry {
     protected char[] password;
 
     @Setter
-    private long compressedSizeNew;
+    private long compressedSizeWithEncryptionHeader;
     @Setter
     private int disc;
     @Setter
