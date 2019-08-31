@@ -25,7 +25,7 @@ public final class AesDecoder implements Decoder {
     private final int saltLength;
     private final AesEngine engine;
 
-    public static AesDecoder create(@NonNull DataInput in, @NonNull PathZipEntry entry) {
+    public static AesDecoder create(@NonNull PathZipEntry entry, @NonNull DataInput in) {
         try {
             AesStrength strength = entry.getStrength();
             byte[] salt = getSalt(in, entry);

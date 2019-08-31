@@ -36,11 +36,11 @@ public abstract class EntryInputStream extends InputStream {
     protected long readCompressedBytes;
     protected long writtenUncompressedBytes;
 
-    public static InputStream create(@NonNull PathZipEntry entry, DataInput in) throws IOException {
+    public static InputStream create(@NonNull PathZipEntry entry, @NonNull DataInput in) throws IOException {
         LocalFileHeader localFileHeader = new LocalFileHeaderReader(entry).read(in);
         updateEntry(entry, localFileHeader);
         // TODO check that localFileHeader matches fileHeader
-        Decoder decoder = entry.getEncryption().decoder(in, entry);
+        Decoder decoder = entry.getEncryption().getCreateDecoder().apply(entry, in);
         Compression compression = entry.getCompression();
 
         if (compression == Compression.STORE)

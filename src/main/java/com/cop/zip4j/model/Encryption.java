@@ -26,53 +26,30 @@ import java.util.function.LongFunction;
  * @since 09.03.2019
  */
 @Getter
-@SuppressWarnings("MethodCanBeVariableArityMethod")
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum Encryption {
-    OFF(pathZipEntry -> Encoder.NULL,
+    OFF(entry -> Encoder.NULL,
+            (entry, in) -> Decoder.NULL,
             entry -> 0L,
-            crc32 -> crc32) {
-        @Override
-        public Decoder decoder(@NonNull DataInput in, PathZipEntry entry) throws IOException {
-            return Decoder.NULL;
-        }
-    },
+            crc32 -> crc32),
     PKWARE(PkwareEncoder::create,
+            PkwareDecoder::create,
             entry -> entry.size() + PkwareHeader.SIZE,
-            crc32 -> crc32) {
-        @Override
-        public Decoder decoder(@NonNull DataInput in, PathZipEntry entry) throws IOException {
-            return PkwareDecoder.create(in, entry);
-        }
-    },
+            crc32 -> crc32),
     AES(AesEncoder::create,
+            AesDecoder::create,
             entry -> entry.size() + entry.getStrength().saltLength() + AesEngine.MAX_SIZE + AesEngine.PASSWORD_CHECKSUM_SIZE,
             crc32 -> 0L) {
-        @Override
-        public Decoder decoder(DataInput in, PathZipEntry entry) throws IOException {
-            return AesDecoder.create(in, entry);
-        }
-
         @Override
         public CompressionMethod getCompressionMethod(PathZipEntry entry) {
             return CompressionMethod.AES_ENC;
         }
-
-        @Override
-        public CompressionMethod getCompressionMethod(CentralDirectory.FileHeader fileHeader) {
-            return CompressionMethod.AES_ENC;
-        }
-
     };
 
     private final Function<PathZipEntry, Encoder> createEncoder;
+    private final CreateDecoder createDecoder;
     private final Function<PathZipEntry, Long> compressedSize;
     private final LongFunction<Long> checksumFileHeader;
-
-    @NonNull
-    public Decoder decoder(@NonNull DataInput in, @NonNull PathZipEntry entry) throws IOException {
-        throw new Zip4jException("unsupported encryption method");
-    }
 
     public long getChecksumFileHeader(CentralDirectory.FileHeader fileHeader) {
         return fileHeader.getCrc32();
@@ -81,11 +58,6 @@ public enum Encryption {
     @NonNull
     public CompressionMethod getCompressionMethod(PathZipEntry entry) {
         return entry.getCompression().getMethod();
-    }
-
-    @NonNull
-    public CompressionMethod getCompressionMethod(CentralDirectory.FileHeader fileHeader) {
-        return fileHeader.getCompressionMethod();
     }
 
     @NonNull
@@ -98,6 +70,11 @@ public enum Encryption {
             return AES;
 //        return generalPurposeFlag.isStrongEncryption() ? STRONG : PKWARE;
         return PKWARE;
+    }
+
+    public interface CreateDecoder {
+
+        Decoder apply(PathZipEntry entry, DataInput in) throws IOException;
     }
 
 }
