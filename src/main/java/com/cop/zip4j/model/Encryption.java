@@ -31,26 +31,22 @@ public enum Encryption {
     OFF(entry -> Encoder.NULL,
             (entry, in) -> Decoder.NULL,
             entry -> 0L,
-            entry -> 0,
             ZipEntry::checksum,
             entry -> entry.getCompression().getMethod()),
     PKWARE(PkwareEncoder::create,
             PkwareDecoder::create,
             entry -> entry.size() + PkwareHeader.SIZE,
-            entry -> PkwareHeader.SIZE,
             ZipEntry::checksum,
             entry -> entry.getCompression().getMethod()),
     AES(AesEncoder::create,
             AesDecoder::create,
             entry -> entry.size() + entry.getStrength().saltLength() + AesEngine.MAX_SIZE + AesEngine.PASSWORD_CHECKSUM_SIZE,
-            entry -> entry.getStrength().saltLength() + AesEngine.MAX_SIZE + AesEngine.PASSWORD_CHECKSUM_SIZE,
             entry -> 0L,
             entry -> CompressionMethod.AES_ENC);
 
     private final Function<PathZipEntry, Encoder> createEncoder;
     private final CreateDecoder createDecoder;
     private final Function<PathZipEntry, Long> compressedSize;
-    private final Function<PathZipEntry, Integer> encryptionHeaderSize;
     private final Function<PathZipEntry, Long> checksum;
     private final Function<PathZipEntry, CompressionMethod> compressionMethod;
 

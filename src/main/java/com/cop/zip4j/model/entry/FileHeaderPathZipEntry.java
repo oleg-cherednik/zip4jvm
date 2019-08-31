@@ -7,7 +7,6 @@ import com.cop.zip4j.utils.ZipUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.nio.file.Paths;
-import java.util.function.Function;
 
 import static com.cop.zip4j.model.builders.LocalFileHeaderBuilder.LOOK_IN_EXTRA_FIELD;
 
@@ -24,6 +23,7 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
 
     public FileHeaderPathZipEntry(CentralDirectory.FileHeader fileHeader) {
         super(Paths.get(fileHeader.getFileName()), fileHeader.getLastModifiedTime());
+        compressedSize = getCompressedSize(fileHeader);
         uncompressedSize = getUncompressedSize(fileHeader);
         checksum = fileHeader.getCrc32();
         dir = ZipUtils.isDirectory(fileHeader.getFileName());
@@ -33,8 +33,6 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
         setCompressionLevel(fileHeader.getGeneralPurposeFlag().getCompressionLevel());
         setStrength(fileHeader.getExtraField().getAesExtraDataRecord().getStrength());
 
-        compressedSize = getCompressedSize(fileHeader);
-
         setCompressedSizeWithEncryptionHeader(getCompressedSizeWithEncryptionHeader(fileHeader));
         setDisc(fileHeader.getDiskNumber());
         setLocalFileHeaderOffs(fileHeader.getOffsLocalFileHeader());
@@ -42,12 +40,10 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
         setName(fileHeader.getFileName());
     }
 
-    private long getCompressedSize(CentralDirectory.FileHeader fileHeader) {
-        // TODO it's not good use this
-        Function<PathZipEntry, Integer> encryptionHeaderSize = fileHeader.getEncryption().getEncryptionHeaderSize();
+    private static long getCompressedSize(CentralDirectory.FileHeader fileHeader) {
         if (fileHeader.getCompressedSize() == LOOK_IN_EXTRA_FIELD)
-            return fileHeader.getExtraField().getExtendedInfo().getCompressedSize() - encryptionHeaderSize.apply(this);
-        return fileHeader.getCompressedSize() - encryptionHeaderSize.apply(this);
+            return fileHeader.getExtraField().getExtendedInfo().getCompressedSize();
+        return fileHeader.getCompressedSize();
     }
 
     private static long getCompressedSizeWithEncryptionHeader(CentralDirectory.FileHeader fileHeader) {
