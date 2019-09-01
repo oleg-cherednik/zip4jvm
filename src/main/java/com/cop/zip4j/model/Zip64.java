@@ -69,7 +69,7 @@ public final class Zip64 {
         // size:4 - number of this disk
         private long disk;
         // size:4 - number of the disk with the start of the central directory
-        private long startDisk;
+        private long mainDisk;
         // size:8 - total number of entries in the central directory on this disk
         private long diskEntries;
         // size:8 - total number of entries in the central directory

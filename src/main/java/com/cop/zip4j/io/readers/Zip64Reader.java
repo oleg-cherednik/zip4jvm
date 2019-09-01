@@ -64,7 +64,7 @@ final class Zip64Reader {
             dir.setVersionMadeBy(in.readWord());
             dir.setVersionNeededToExtract(in.readWord());
             dir.setDisk(in.readDword());
-            dir.setStartDisk(in.readDword());
+            dir.setMainDisk(in.readDword());
             dir.setDiskEntries(in.readQword());
             dir.setTotalEntries(in.readQword());
             dir.setSize(in.readQword());

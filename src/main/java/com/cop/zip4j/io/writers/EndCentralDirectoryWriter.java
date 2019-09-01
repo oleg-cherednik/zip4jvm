@@ -26,7 +26,7 @@ final class EndCentralDirectoryWriter {
 
         out.writeDwordSignature(EndCentralDirectory.SIGNATURE);
         out.writeWord(endCentralDirectory.getTotalDisks());
-        out.writeWord(endCentralDirectory.getStartDiskNumber());
+        out.writeWord(endCentralDirectory.getMainDisk());
         out.writeWord(endCentralDirectory.getDiskEntries());
         out.writeWord(endCentralDirectory.getTotalEntries());
         out.writeDword(endCentralDirectory.getCentralDirectorySize());

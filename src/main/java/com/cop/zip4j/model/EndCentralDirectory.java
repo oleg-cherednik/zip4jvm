@@ -31,7 +31,7 @@ public class EndCentralDirectory {
     // size:2 - number of the disk
     private int totalDisks;
     // size:2 - number of the disk with the start of the central directory
-    private int startDiskNumber;
+    private int mainDisk;
     // size:2 - total number of entries in the central directory on this disk
     private int diskEntries;
     // size:2 - total number of entries in the central directory

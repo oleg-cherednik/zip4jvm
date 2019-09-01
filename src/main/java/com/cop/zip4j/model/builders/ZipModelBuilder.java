@@ -51,7 +51,7 @@ public final class ZipModelBuilder {
         zipModel.setTotalDisks(endCentralDirectory.getTotalDisks());
         zipModel.setCentralDirectoryOffs(getCentralDirectoryOffs(endCentralDirectory, zip64));
         zipModel.setCentralDirectorySize(endCentralDirectory.getCentralDirectorySize());
-        zipModel.setStartDiskNumber(endCentralDirectory.getStartDiskNumber());
+        zipModel.setMainDisk(endCentralDirectory.getMainDisk());
         zipModel.getEntries().addAll(createEntries());
 
         if (zipModel.isSplit())

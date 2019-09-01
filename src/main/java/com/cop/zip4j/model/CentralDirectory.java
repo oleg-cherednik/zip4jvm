@@ -141,6 +141,10 @@ public class CentralDirectory {
             return ZipUtils.isDirectory(fileName);
         }
 
+        public boolean isZip64() {
+            return extraField.getExtendedInfo() != Zip64.ExtendedInfo.NULL;
+        }
+
         public void setExtraField(@NonNull ExtraField extraField) {
             this.extraField.setFrom(extraField);
             generalPurposeFlag.setEncrypted(isEncrypted());

@@ -37,7 +37,7 @@ final class Zip64Writer {
             out.writeWord(endCentralDirectory.getVersionMadeBy());
             out.writeWord(endCentralDirectory.getVersionNeededToExtract());
             out.writeDword(endCentralDirectory.getDisk());
-            out.writeDword(endCentralDirectory.getStartDisk());
+            out.writeDword(endCentralDirectory.getMainDisk());
             out.writeQword(endCentralDirectory.getDiskEntries());
             out.writeQword(endCentralDirectory.getTotalEntries());
             out.writeQword(endCentralDirectory.getSize());

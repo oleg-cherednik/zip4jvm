@@ -32,6 +32,7 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
         checksum = fileHeader.getCrc32();
         dir = ZipUtils.isDirectory(fileHeader.getFileName());
 
+        setZip64(fileHeader.isZip64());
         setEncryption(fileHeader.getEncryption());
         setCompression(fileHeader.getCompression());
         setCompressionLevel(fileHeader.getGeneralPurposeFlag().getCompressionLevel());

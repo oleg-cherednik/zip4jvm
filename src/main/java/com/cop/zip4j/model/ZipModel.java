@@ -41,9 +41,9 @@ public class ZipModel {
 
     private String comment;
     private int totalDisks;
+    private int mainDisk;
     private long centralDirectoryOffs;
     private long centralDirectorySize;
-    private int startDiskNumber;
 
     private boolean zip64;
 
