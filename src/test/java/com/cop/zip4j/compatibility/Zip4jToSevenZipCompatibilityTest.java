@@ -49,24 +49,28 @@ public class Zip4jToSevenZipCompatibilityTest {
 
                     if (item.isFolder())
                         Files.createDirectories(path);
-                    else if (item.getSize() == 0)
-                        Files.createFile(path);
                     else {
-                        if (!Files.exists(path))
+                        Files.createDirectories(path.getParent());
+
+                        if (item.getSize() == 0)
                             Files.createFile(path);
+                        else {
+                            if (!Files.exists(path))
+                                Files.createFile(path);
 
-                        ExtractOperationResult res = item.extractSlow(data -> {
-                            try {
-                                Files.write(path, data, StandardOpenOption.APPEND);
-                                return ArrayUtils.getLength(data);
-                            } catch(IOException e) {
-                                e.printStackTrace();
-                                return 0;
-                            }
-                        }, password);
+                            ExtractOperationResult res = item.extractSlow(data -> {
+                                try {
+                                    Files.write(path, data, StandardOpenOption.APPEND);
+                                    return ArrayUtils.getLength(data);
+                                } catch(IOException e) {
+                                    e.printStackTrace();
+                                    return 0;
+                                }
+                            }, password);
 
-                        if (res != ExtractOperationResult.OK)
-                            throw new RuntimeException("Cannot extract zip entry");
+                            if (res != ExtractOperationResult.OK)
+                                throw new RuntimeException("Cannot extract zip entry");
+                        }
                     }
                 }
             }

@@ -105,8 +105,8 @@ public final class ZipIt {
 
         return paths.stream()
                     .filter(path -> Files.isRegularFile(path) || emptyDirectories.contains(path))
+                    .sorted()
                     .map(ZipEntry::of)
-                    .distinct()
                     .collect(Collectors.toList());
     }
 

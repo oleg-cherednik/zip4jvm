@@ -34,13 +34,17 @@ public class Zip4jToWinZipAesCompatibilityTest {
 
             if (zipEntry.isDirectory())
                 Files.createDirectories(path);
-            else if (zipEntry.getSize() == 0)
-                Files.createFile(path);
             else {
-                if (!Files.exists(path))
-                    Files.createFile(path);
+                Files.createDirectories(path.getParent());
 
-                decrypter.extractEntry(zipEntry, path.toFile(), password);
+                if (zipEntry.getSize() == 0)
+                    Files.createFile(path);
+                else {
+                    if (!Files.exists(path))
+                        Files.createFile(path);
+
+                    decrypter.extractEntry(zipEntry, path.toFile(), password);
+                }
             }
         }
 

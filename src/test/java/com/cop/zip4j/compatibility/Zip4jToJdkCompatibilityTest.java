@@ -41,8 +41,10 @@ public class Zip4jToJdkCompatibilityTest {
 
                     if (entry.isDirectory())
                         Files.createDirectories(path);
-                    else
+                    else {
+                        Files.createDirectories(path.getParent());
                         TestUtils.copyLarge(zipFile.getInputStream(entry), path);
+                    }
                 }
             }
 
