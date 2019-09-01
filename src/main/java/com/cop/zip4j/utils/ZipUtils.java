@@ -2,6 +2,7 @@ package com.cop.zip4j.utils;
 
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.exception.Zip4jRealBigZip64NotSupportedException;
+import com.cop.zip4j.model.Zip64;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
@@ -75,7 +76,7 @@ public class ZipUtils {
 
         comment = StringUtils.trimToNull(comment);
 
-        if (StringUtils.length(comment) > 0xFFFF)
+        if (StringUtils.length(comment) > Zip64.LIMIT_INT)
             throw new Zip4jException("comment length exceeds maximum length");
 
         return comment;

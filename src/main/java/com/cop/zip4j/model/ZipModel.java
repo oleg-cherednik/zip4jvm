@@ -1,9 +1,6 @@
 package com.cop.zip4j.model;
 
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.model.activity.Activity;
-import com.cop.zip4j.model.activity.PlainActivity;
-import com.cop.zip4j.model.activity.Zip64Activity;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.Getter;
 import lombok.NonNull;
@@ -41,13 +38,14 @@ public class ZipModel {
     @NonNull
     private final Charset charset;
     private long splitSize = NO_SPLIT;
-    private Activity activity = PlainActivity.INSTANCE;
 
     private String comment;
     private int totalDisks;
     private long centralDirectoryOffs;
     private long centralDirectorySize;
     private int startDiskNumber;
+
+    private boolean zip64;
 
     private final List<PathZipEntry> entries = new ArrayList<>();
 
@@ -57,15 +55,6 @@ public class ZipModel {
 
     public boolean isSplit() {
         return splitSize > 0 || totalDisks > 0;
-    }
-
-    public void zip64() {
-        if (!isZip64())
-            activity = Zip64Activity.INSTANCE;
-    }
-
-    public boolean isZip64() {
-        return activity instanceof Zip64Activity;
     }
 
     public boolean isEmpty() {

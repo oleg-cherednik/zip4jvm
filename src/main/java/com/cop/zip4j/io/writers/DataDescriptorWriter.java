@@ -2,6 +2,8 @@ package com.cop.zip4j.io.writers;
 
 import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.model.DataDescriptor;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -11,13 +13,17 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 25.07.2019
  */
-@SuppressWarnings("ClassMayBeInterface")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class DataDescriptorWriter {
+
+    public static DataDescriptorWriter get(boolean zip64, DataDescriptor dataDescriptor) {
+        return zip64 ? new Zip64(dataDescriptor) : new Plain(dataDescriptor);
+    }
 
     public abstract void write(@NonNull DataOutput out) throws IOException;
 
     @RequiredArgsConstructor
-    public static final class Plain extends DataDescriptorWriter {
+    private static final class Plain extends DataDescriptorWriter {
 
         @NonNull
         private final DataDescriptor dataDescriptor;
@@ -32,7 +38,7 @@ public abstract class DataDescriptorWriter {
     }
 
     @RequiredArgsConstructor
-    public static final class Zip64 extends DataDescriptorWriter {
+    private static final class Zip64 extends DataDescriptorWriter {
 
         @NonNull
         private final DataDescriptor dataDescriptor;

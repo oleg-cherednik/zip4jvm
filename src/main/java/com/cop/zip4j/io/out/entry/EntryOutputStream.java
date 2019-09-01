@@ -3,6 +3,7 @@ package com.cop.zip4j.io.out.entry;
 import com.cop.zip4j.crypto.Encoder;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.out.DataOutput;
+import com.cop.zip4j.io.writers.DataDescriptorWriter;
 import com.cop.zip4j.io.writers.LocalFileHeaderWriter;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.DataDescriptor;
@@ -115,7 +116,7 @@ public abstract class EntryOutputStream extends OutputStream {
             dataDescriptor.setCrc32(checksum.getValue());
             dataDescriptor.setCompressedSize(entry.getCompressedSize());
             dataDescriptor.setUncompressedSize(entry.getUncompressedSize());
-            entry.getActivity().getDataDescriptorWriter(dataDescriptor).write(out);
+            DataDescriptorWriter.get(entry.isZip64(), dataDescriptor).write(out);
         }
     }
 

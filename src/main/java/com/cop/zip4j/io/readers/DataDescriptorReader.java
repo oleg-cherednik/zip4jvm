@@ -3,6 +3,8 @@ package com.cop.zip4j.io.readers;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.DataDescriptor;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 import java.io.IOException;
@@ -11,12 +13,16 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 25.07.2019
  */
-@SuppressWarnings("ClassMayBeInterface")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class DataDescriptorReader {
+
+    public static DataDescriptorReader get(boolean zip64) {
+        return zip64 ? new Zip64() : new Plain();
+    }
 
     public abstract DataDescriptor read(@NonNull DataInput in) throws IOException;
 
-    public static final class Plain extends DataDescriptorReader {
+    private static final class Plain extends DataDescriptorReader {
 
         @Override
         public DataDescriptor read(@NonNull DataInput in) throws IOException {
@@ -34,7 +40,7 @@ public abstract class DataDescriptorReader {
         }
     }
 
-    public static final class Zip64 extends DataDescriptorReader {
+    private static final class Zip64 extends DataDescriptorReader {
 
         @Override
         public DataDescriptor read(@NonNull DataInput in) throws IOException {

@@ -16,6 +16,7 @@ public final class Zip64 {
 
     public static final Zip64 NULL = new Zip64(null, null);
     public static final long LIMIT = 0xFFFF_FFFFL;
+    public static final int LIMIT_INT = 0xFFFF;
 
     private final EndCentralDirectoryLocator endCentralDirectoryLocator;
     private final EndCentralDirectory endCentralDirectory;

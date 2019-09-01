@@ -1,6 +1,7 @@
 package com.cop.zip4j.model.builders;
 
 import com.cop.zip4j.model.EndCentralDirectory;
+import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -22,9 +23,13 @@ public final class EndCentralDirectoryBuilder {
         endCentralDirectory.setTotalDisks(zipModel.getTotalDisks());
         endCentralDirectory.setStartDiskNumber(zipModel.getTotalDisks());
         endCentralDirectory.setDiskEntries(zipModel.getEntries().size());
-        endCentralDirectory.setTotalEntries(zipModel.getActivity().getTotalEntriesECD(zipModel));
+        endCentralDirectory.setTotalEntries(getTotalEntries());
         endCentralDirectory.setComment(zipModel.getComment());
         endCentralDirectory.setCentralDirectorySize(zipModel.getCentralDirectorySize());
         return endCentralDirectory;
+    }
+
+    private int getTotalEntries() {
+        return zipModel.isZip64() ? Zip64.LIMIT_INT : zipModel.getEntries().size();
     }
 }

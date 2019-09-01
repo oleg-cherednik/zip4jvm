@@ -22,8 +22,6 @@ import com.cop.zip4j.exception.Zip4jPathNotExistsException;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.ZipParameters;
-import com.cop.zip4j.model.activity.PlainActivity;
-import com.cop.zip4j.model.activity.Zip64Activity;
 import com.cop.zip4j.model.aes.AesStrength;
 import com.cop.zip4j.model.builders.ZipModelBuilder;
 import com.cop.zip4j.model.entry.PathZipEntry;
@@ -74,8 +72,7 @@ public final class ZipIt {
         zipModel.setSplitSize(parameters.getSplitLength());
         zipModel.setComment(ZipUtils.normalizeComment.apply(parameters.getComment()));
 
-        if (parameters.isZip64())
-            zipModel.zip64();
+        zipModel.setZip64(parameters.isZip64());
 
         List<PathZipEntry> entries = createEntries(withExistedEntries(paths));
 
@@ -85,7 +82,7 @@ public final class ZipIt {
             entry.setEncryption(parameters.getEncryption());
             entry.setStrength(parameters.getStrength());
             entry.setPassword(parameters.getPassword());
-            entry.setActivity(parameters.isZip64() ? Zip64Activity.INSTANCE : PlainActivity.INSTANCE);
+            entry.setZip64(parameters.isZip64());
             entry.setPassword(parameters.getPassword());
         });
 

@@ -1,6 +1,5 @@
 package com.cop.zip4j.io.readers;
 
-import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.io.in.LittleEndianReadFile;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.EndCentralDirectory;
@@ -12,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -40,27 +38,15 @@ public final class ZipModelReader {
     @NonNull
     public ZipModel read() throws IOException {
         try (LittleEndianReadFile in = new LittleEndianReadFile(zipFile)) {
-            return read(in);
+            EndCentralDirectory endCentralDirectory = new EndCentralDirectoryReader().read(in);
+            Zip64 zip64 = new Zip64Reader().read(in);
+
+            long offs = ZipModelBuilder.getCentralDirectoryOffs(endCentralDirectory, zip64);
+            long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
+            CentralDirectory centralDirectory = new CentralDirectoryReader(offs, totalEntries).read(in);
+
+            return new ZipModelBuilder(zipFile, charset, endCentralDirectory, zip64, centralDirectory).create();
         }
     }
 
-    private ZipModel read(@NonNull DataInput in) throws IOException {
-        EndCentralDirectory endCentralDirectory = new EndCentralDirectoryReader().read(in);
-        Zip64 zip64 = new Zip64Reader().read(in);
-
-        long offs = ZipModelBuilder.getCentralDirectoryOffs(endCentralDirectory, zip64);
-        long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
-        CentralDirectory centralDirectory = new CentralDirectoryReader(offs, totalEntries).read(in);
-
-        return new ZipModelBuilder(zipFile, charset, endCentralDirectory, zip64, centralDirectory).create();
-    }
-
-    private static long getSplitSize(ZipModel zipModel) throws IOException {
-        long size = 0;
-
-        for (long i = 0; i <= zipModel.getTotalDisks(); i++)
-            size = Math.max(size, Files.size(zipModel.getPartFile(i)));
-
-        return size;
-    }
 }

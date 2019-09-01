@@ -4,9 +4,6 @@ import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.Encryption;
-import com.cop.zip4j.model.activity.Activity;
-import com.cop.zip4j.model.activity.PlainActivity;
-import com.cop.zip4j.model.activity.Zip64Activity;
 import com.cop.zip4j.model.aes.AesStrength;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.Getter;
@@ -47,11 +44,12 @@ public abstract class PathZipEntry extends ZipEntry {
     private int disc;
     @Setter
     private long localFileHeaderOffs;
-    @Setter
-    private Activity activity = PlainActivity.INSTANCE;
 
     @Setter
     protected Boolean dataDescriptorAvailable;
+
+    @Setter
+    private boolean zip64;
 
     @Override
     public boolean isRegularFile() {
@@ -102,9 +100,5 @@ public abstract class PathZipEntry extends ZipEntry {
     }
 
     public abstract boolean isDataDescriptorAvailable();
-
-    public boolean isZip64() {
-        return activity instanceof Zip64Activity;
-    }
 
 }

@@ -6,6 +6,7 @@ import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.ExternalFileAttributes;
 import com.cop.zip4j.model.InternalFileAttributes;
+import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -67,7 +68,7 @@ final class FileHeaderReader {
         boolean uncompressedSize = fileHeader.getUncompressedSize() == LOOK_IN_EXTRA_FIELD;
         boolean compressedSize = fileHeader.getCompressedSize() == LOOK_IN_EXTRA_FIELD;
         boolean offsHeader = fileHeader.getOffsLocalFileHeader() == LOOK_IN_EXTRA_FIELD;
-        boolean diskNumber = fileHeader.getDiskNumber() == 0xFFFF;
+        boolean diskNumber = fileHeader.getDiskNumber() == Zip64.LIMIT_INT;
         return new ExtraFieldReader(size, uncompressedSize, compressedSize, offsHeader, diskNumber);
     }
 

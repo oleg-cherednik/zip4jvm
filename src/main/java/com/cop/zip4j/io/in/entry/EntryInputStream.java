@@ -3,6 +3,7 @@ package com.cop.zip4j.io.in.entry;
 import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.in.DataInput;
+import com.cop.zip4j.io.readers.DataDescriptorReader;
 import com.cop.zip4j.io.readers.LocalFileHeaderReader;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Compression;
@@ -111,7 +112,7 @@ public abstract class EntryInputStream extends InputStream {
     /** Just read {@link DataDescriptor} and ignore it's value. We got it from {@link CentralDirectory.FileHeader} */
     private void readDataDescriptor() throws IOException {
         if (entry.isDataDescriptorAvailable())
-            entry.getActivity().getDataDescriptorReader().read(in);
+            DataDescriptorReader.get(entry.isZip64()).read(in);
     }
 
 }

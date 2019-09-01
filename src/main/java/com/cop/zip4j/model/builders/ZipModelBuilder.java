@@ -46,9 +46,7 @@ public final class ZipModelBuilder {
     public ZipModel create() throws IOException {
         ZipModel zipModel = new ZipModel(zipFile, charset);
 
-        if (zip64 != Zip64.NULL)
-            zipModel.zip64();
-
+        zipModel.setZip64(zip64 != Zip64.NULL);
         zipModel.setComment(endCentralDirectory.getComment());
         zipModel.setTotalDisks(endCentralDirectory.getTotalDisks());
         zipModel.setCentralDirectoryOffs(getCentralDirectoryOffs(endCentralDirectory, zip64));
