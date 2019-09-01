@@ -6,7 +6,7 @@ import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.EndCentralDirectory;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
-import com.cop.zip4j.model.entry.FileHeaderPathZipEntry;
+import com.cop.zip4j.model.builders.ZipModelBuilder;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -54,35 +54,12 @@ public final class ZipModelReader {
 
     private ZipModel read(@NonNull DataInput in) throws IOException {
         EndCentralDirectory endCentralDirectory = new EndCentralDirectoryReader().read(in);
-
-        ZipModel zipModel = new ZipModel(zipFile, charset);
-        zipModel.setComment(endCentralDirectory.getComment());
-        zipModel.setSplitParts(endCentralDirectory.getSplitParts());
-        zipModel.setCentralDirectoryOffs(endCentralDirectory.getCentralDirectoryOffs());
-        zipModel.setCentralDirectorySize(endCentralDirectory.getCentralDirectorySize());
-        zipModel.setStartDiskNumber(endCentralDirectory.getStartDiskNumber());
-
-        long totalEntries = endCentralDirectory.getTotalEntries();
-
         Zip64 zip64 = new Zip64Reader().read(in);
 
-        if (zip64 != Zip64.NULL) {
-            zipModel.zip64();
-            zipModel.setCentralDirectoryOffs(zip64.getEndCentralDirectory().getCentralDirectoryOffs());
-            totalEntries = zip64.getEndCentralDirectory().getTotalEntries();
-        }
-
-        long offs = zipModel.getCentralDirectoryOffs();
-
+        long offs = ZipModelBuilder.getCentralDirectoryOffs(endCentralDirectory, zip64);
+        long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
         CentralDirectory centralDirectory = new CentralDirectoryReader(offs, totalEntries).read(in);
-        createEntries(zipModel, centralDirectory);
-        return zipModel;
-    }
 
-    private static void createEntries(ZipModel zipModel, CentralDirectory centralDirectory) {
-        if (!zipModel.getEntries().isEmpty())
-            return;
-
-        centralDirectory.getFileHeaders().forEach(fileHeader -> zipModel.getEntries().add(new FileHeaderPathZipEntry(fileHeader)));
+        return new ZipModelBuilder(zipFile, charset, endCentralDirectory, zip64, centralDirectory).create();
     }
 }
