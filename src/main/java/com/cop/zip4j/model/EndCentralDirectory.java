@@ -29,7 +29,7 @@ public class EndCentralDirectory {
 
     // size:4 - signature (0x06054b50)
     // size:2 - number of the disk
-    private int splitParts;
+    private int totalDisks;
     // size:2 - number of the disk with the start of the central directory
     private int startDiskNumber;
     // size:2 - total number of entries in the central directory on this disk

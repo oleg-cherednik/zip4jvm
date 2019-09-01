@@ -22,7 +22,7 @@ public final class ZipModelWriter {
     private final ZipModel zipModel;
 
     public void write(@NonNull DataOutput out) throws IOException {
-        zipModel.setSplitParts(out.getDisk());
+        zipModel.setTotalDisks(out.getDisk());
         zipModel.setCentralDirectoryOffs(out.getOffs());
         zipModel.setStartDiskNumber(out.getDisk());
 

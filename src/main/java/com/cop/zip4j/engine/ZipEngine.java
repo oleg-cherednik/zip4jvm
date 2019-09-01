@@ -45,7 +45,7 @@ public class ZipEngine {
         if (parent != null)
             Files.createDirectories(parent);
 
-        return zipModel.isSplitArchive() ? SplitZipOutputStream.create(zipModel) : SingleZipOutputStream.create(zipModel);
+        return zipModel.isSplit() ? SplitZipOutputStream.create(zipModel) : SingleZipOutputStream.create(zipModel);
     }
 
     private void writeEntry(PathZipEntry entry, DataOutput out) {

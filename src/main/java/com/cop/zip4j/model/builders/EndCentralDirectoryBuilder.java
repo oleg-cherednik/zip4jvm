@@ -19,8 +19,8 @@ public final class EndCentralDirectoryBuilder {
     public EndCentralDirectory create() {
         EndCentralDirectory endCentralDirectory = new EndCentralDirectory();
         endCentralDirectory.setCentralDirectoryOffs(zipModel.getCentralDirectoryOffs());
-        endCentralDirectory.setSplitParts(zipModel.getSplitParts());
-        endCentralDirectory.setStartDiskNumber(zipModel.getSplitParts());
+        endCentralDirectory.setTotalDisks(zipModel.getTotalDisks());
+        endCentralDirectory.setStartDiskNumber(zipModel.getTotalDisks());
         endCentralDirectory.setDiskEntries(zipModel.getEntries().size());
         endCentralDirectory.setTotalEntries(zipModel.getActivity().getTotalEntriesECD(zipModel));
         endCentralDirectory.setComment(zipModel.getComment());

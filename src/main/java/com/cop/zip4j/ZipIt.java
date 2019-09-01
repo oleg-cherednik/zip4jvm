@@ -25,9 +25,9 @@ import com.cop.zip4j.model.ZipParameters;
 import com.cop.zip4j.model.activity.PlainActivity;
 import com.cop.zip4j.model.activity.Zip64Activity;
 import com.cop.zip4j.model.aes.AesStrength;
+import com.cop.zip4j.model.builders.ZipModelBuilder;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import com.cop.zip4j.model.entry.ZipEntry;
-import com.cop.zip4j.utils.CreateZipModel;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.Builder;
 import lombok.NonNull;
@@ -70,8 +70,8 @@ public final class ZipIt {
                 parameters.setDefaultFolderPath(path);
         }
 
-        ZipModel zipModel = new CreateZipModel(zipFile, charset).get().noSplitOnly();
-        zipModel.setSplitLength(parameters.getSplitLength());
+        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile, charset).noSplitOnly();
+        zipModel.setSplitSize(parameters.getSplitLength());
         zipModel.setComment(ZipUtils.normalizeComment.apply(parameters.getComment()));
 
         if (parameters.isZip64())

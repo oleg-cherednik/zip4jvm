@@ -25,7 +25,7 @@ final class EndCentralDirectoryWriter {
         byte[] comment = endCentralDirectory.getComment(charset);
 
         out.writeDwordSignature(EndCentralDirectory.SIGNATURE);
-        out.writeWord(endCentralDirectory.getSplitParts());
+        out.writeWord(endCentralDirectory.getTotalDisks());
         out.writeWord(endCentralDirectory.getStartDiskNumber());
         out.writeWord(endCentralDirectory.getDiskEntries());
         out.writeWord(endCentralDirectory.getTotalEntries());

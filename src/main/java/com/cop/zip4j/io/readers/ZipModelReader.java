@@ -40,15 +40,7 @@ public final class ZipModelReader {
     @NonNull
     public ZipModel read() throws IOException {
         try (LittleEndianReadFile in = new LittleEndianReadFile(zipFile)) {
-            ZipModel zipModel = read(in);
-
-            if (zipModel.isSplitArchive()) {
-                Path path = ZipModel.getSplitFilePath(zipFile, 1);
-                // TODO have to check all parts and get the max size
-                zipModel.setSplitLength(Files.exists(path) ? Files.size(path) : zipModel.getSplitLength());
-            }
-
-            return zipModel;
+            return read(in);
         }
     }
 
@@ -61,5 +53,14 @@ public final class ZipModelReader {
         CentralDirectory centralDirectory = new CentralDirectoryReader(offs, totalEntries).read(in);
 
         return new ZipModelBuilder(zipFile, charset, endCentralDirectory, zip64, centralDirectory).create();
+    }
+
+    private static long getSplitSize(ZipModel zipModel) throws IOException {
+        long size = 0;
+
+        for (long i = 0; i <= zipModel.getTotalDisks(); i++)
+            size = Math.max(size, Files.size(zipModel.getPartFile(i)));
+
+        return size;
     }
 }

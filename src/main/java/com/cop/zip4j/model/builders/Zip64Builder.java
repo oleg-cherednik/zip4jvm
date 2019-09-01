@@ -42,7 +42,7 @@ public final class Zip64Builder {
         endCentralDirectory.setSize(Zip64.EndCentralDirectory.SIZE + endCentralDirectory.getEndCentralDirectorySize());
         endCentralDirectory.setVersionMadeBy(CentralDirectory.FileHeader.VERSION);
         endCentralDirectory.setVersionNeededToExtract(CentralDirectory.FileHeader.VERSION);
-        endCentralDirectory.setDisk(zipModel.getSplitParts());
+        endCentralDirectory.setDisk(zipModel.getTotalDisks());
         endCentralDirectory.setStartDisk(zipModel.getStartDiskNumber());
         endCentralDirectory.setDiskEntries(countNumberOfFileHeaderEntriesOnDisk());
         endCentralDirectory.setTotalEntries(zipModel.getEntries().size());
@@ -52,9 +52,9 @@ public final class Zip64Builder {
     }
 
     private int countNumberOfFileHeaderEntriesOnDisk() {
-        if (zipModel.isSplitArchive())
+        if (zipModel.isSplit())
             return (int)zipModel.getEntries().stream()
-                                .filter(entry -> entry.getDisc() == zipModel.getSplitParts())
+                                .filter(entry -> entry.getDisc() == zipModel.getTotalDisks())
                                 .count();
 
         return zipModel.getEntries().size();

@@ -40,23 +40,23 @@ public class ZipModel {
     private final Path zipFile;
     @NonNull
     private final Charset charset;
-    private long splitLength = NO_SPLIT;
+    private long splitSize = NO_SPLIT;
     private Activity activity = PlainActivity.INSTANCE;
 
     private String comment;
-    private int splitParts;
+    private int totalDisks;
     private long centralDirectoryOffs;
     private long centralDirectorySize;
     private int startDiskNumber;
 
     private final List<PathZipEntry> entries = new ArrayList<>();
 
-    public void setSplitLength(long splitLength) {
-        this.splitLength = splitLength < MIN_SPLIT_LENGTH ? NO_SPLIT : splitLength;
+    public void setSplitSize(long splitSize) {
+        this.splitSize = splitSize < MIN_SPLIT_LENGTH ? NO_SPLIT : splitSize;
     }
 
-    public boolean isSplitArchive() {
-        return splitLength > 0 || splitParts > 0;
+    public boolean isSplit() {
+        return splitSize > 0 || totalDisks > 0;
     }
 
     public void zip64() {
@@ -78,17 +78,17 @@ public class ZipModel {
                       .collect(Collectors.toList());
     }
 
-    public static Path getSplitFilePath(Path zipFile, int count) {
-        return zipFile.getParent().resolve(String.format("%s.z%02d", FilenameUtils.getBaseName(zipFile.toString()), count));
+    public static Path getSplitFilePath(Path zipFile, long disk) {
+        return zipFile.getParent().resolve(String.format("%s.z%02d", FilenameUtils.getBaseName(zipFile.toString()), disk));
     }
 
-    public Path getPartFile(int diskNumber) {
-        return diskNumber == splitParts ? zipFile : getSplitFilePath(zipFile, diskNumber + 1);
+    public Path getPartFile(long disk) {
+        return disk == totalDisks ? zipFile : getSplitFilePath(zipFile, disk + 1);
     }
 
     @NonNull
     public ZipModel noSplitOnly() {
-        if (Files.exists(zipFile) && isSplitArchive())
+        if (Files.exists(zipFile) && isSplit())
             throw new Zip4jException("Zip file already exists. Zip file format does not allow updating split/spanned files");
 
         return this;
