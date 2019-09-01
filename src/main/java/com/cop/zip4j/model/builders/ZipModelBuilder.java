@@ -5,11 +5,14 @@ import com.cop.zip4j.model.EndCentralDirectory;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.entry.FileHeaderPathZipEntry;
+import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Oleg Cherednik
@@ -34,26 +37,23 @@ public final class ZipModelBuilder {
     public ZipModel create() {
         ZipModel zipModel = new ZipModel(zipFile, charset);
 
+        if (zip64 != Zip64.NULL)
+            zipModel.zip64();
+
         zipModel.setComment(endCentralDirectory.getComment());
         zipModel.setSplitParts(endCentralDirectory.getSplitParts());
-        zipModel.setCentralDirectoryOffs(endCentralDirectory.getCentralDirectoryOffs());
+        zipModel.setCentralDirectoryOffs(getCentralDirectoryOffs(endCentralDirectory, zip64));
         zipModel.setCentralDirectorySize(endCentralDirectory.getCentralDirectorySize());
         zipModel.setStartDiskNumber(endCentralDirectory.getStartDiskNumber());
+        zipModel.getEntries().addAll(createEntries());
 
-        if (zip64 != Zip64.NULL) {
-            zipModel.zip64();
-            zipModel.setCentralDirectoryOffs(zip64.getEndCentralDirectory().getCentralDirectoryOffs());
-        }
-
-        createEntries(zipModel, centralDirectory);
         return zipModel;
     }
 
-    private static void createEntries(ZipModel zipModel, CentralDirectory centralDirectory) {
-        if (!zipModel.getEntries().isEmpty())
-            return;
-
-        centralDirectory.getFileHeaders().forEach(fileHeader -> zipModel.getEntries().add(new FileHeaderPathZipEntry(fileHeader)));
+    private List<PathZipEntry> createEntries() {
+        return centralDirectory.getFileHeaders().stream()
+                               .map(FileHeaderPathZipEntry::new)
+                               .collect(Collectors.toList());
     }
 
     public static long getCentralDirectoryOffs(@NonNull EndCentralDirectory endCentralDirectory, @NonNull Zip64 zip64) {
