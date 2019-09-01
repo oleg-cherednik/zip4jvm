@@ -71,7 +71,6 @@ public final class ZipIt {
         ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile, charset).noSplitOnly();
         zipModel.setSplitSize(parameters.getSplitLength());
         zipModel.setComment(ZipUtils.normalizeComment.apply(parameters.getComment()));
-
         zipModel.setZip64(parameters.isZip64());
 
         List<PathZipEntry> entries = createEntries(withExistedEntries(paths));

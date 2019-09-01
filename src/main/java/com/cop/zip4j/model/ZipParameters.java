@@ -33,6 +33,11 @@ public class ZipParameters {
     @Builder.Default
     private long splitLength = ZipModel.NO_SPLIT;
     private String comment;
+
+    /**
+     * Write all entries as well as entire zip archive in ZIP64 format.
+     * If it's {@literal false}, then it will be automatically set if require.
+     */
     public boolean zip64;
 
     @NonNull
