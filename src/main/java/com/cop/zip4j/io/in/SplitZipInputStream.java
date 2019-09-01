@@ -1,7 +1,7 @@
 package com.cop.zip4j.io.in;
 
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.io.out.entry.EntryOutputStream;
+import com.cop.zip4j.io.out.SplitZipOutputStream;
 import com.cop.zip4j.model.ZipModel;
 import lombok.NonNull;
 import org.apache.commons.io.IOUtils;
@@ -15,27 +15,24 @@ import java.nio.file.Path;
  */
 public class SplitZipInputStream extends BaseDataInput {
 
-    private int diskNumber;
+    private int disk;
 
     @NonNull
-    public static SplitZipInputStream create(@NonNull ZipModel zipModel, int diskNumber) throws IOException {
-        return new SplitZipInputStream(zipModel, diskNumber);
+    public static SplitZipInputStream create(@NonNull ZipModel zipModel, int disk) throws IOException {
+        return new SplitZipInputStream(zipModel, disk);
     }
 
-    private SplitZipInputStream(@NonNull ZipModel zipModel, int diskNumber) throws IOException {
+    private SplitZipInputStream(@NonNull ZipModel zipModel, int disk) throws IOException {
         super(zipModel);
-        this.diskNumber = diskNumber;
-        delegate = new LittleEndianReadFile(zipModel.getPartFile(diskNumber));
+        this.disk = disk;
+        delegate = new LittleEndianReadFile(zipModel.getPartFile(disk));
         checkSignature();
     }
 
     private void checkSignature() throws IOException {
-        if (diskNumber != 0)
+        if (disk != 0)
             return;
-
-        int signature = delegate.readDword();
-
-        if (signature != EntryOutputStream.SPLIT_SIGNATURE)
+        if (delegate.readSignature() != SplitZipOutputStream.SPLIT_SIGNATURE)
             throw new Zip4jException("Incorrect split file signature: " + zipModel.getZipFile().getFileName());
     }
 
@@ -51,7 +48,7 @@ public class SplitZipInputStream extends BaseDataInput {
             }
 
             if (total == IOUtils.EOF || total < len) {
-                openNextSplit();
+                openNextDisk();
                 offs += Math.max(0, total);
                 len -= Math.max(0, total);
             }
@@ -60,8 +57,8 @@ public class SplitZipInputStream extends BaseDataInput {
         return res;
     }
 
-    private void openNextSplit() throws IOException {
-        Path splitFile = zipModel.getPartFile(++diskNumber);
+    private void openNextDisk() throws IOException {
+        Path splitFile = zipModel.getPartFile(++disk);
         delegate.close();
         delegate = new LittleEndianReadFile(splitFile);
     }

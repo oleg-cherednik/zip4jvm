@@ -16,7 +16,7 @@ final class DigitalSignatureReader {
 
     @NonNull
     public CentralDirectory.DigitalSignature read(@NonNull DataInput in) throws IOException {
-        if (in.readDword() != CentralDirectory.DigitalSignature.SIGNATURE)
+        if (in.readSignature() != CentralDirectory.DigitalSignature.SIGNATURE)
             return null;
 
         CentralDirectory.DigitalSignature digitalSignature = new CentralDirectory.DigitalSignature();

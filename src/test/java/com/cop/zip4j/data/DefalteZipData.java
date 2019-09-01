@@ -31,7 +31,7 @@ public class DefalteZipData {
 
     private static void createDeflateSolidZip() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(Compression.DEFLATE)
+                                                .compression(Compression.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL).build();
         ZipIt zip = ZipIt.builder().zipFile(Zip4jSuite.deflateSolidZip).build();
         zip.add(Zip4jSuite.srcDir, parameters);
@@ -43,7 +43,7 @@ public class DefalteZipData {
 
     private static void createDeflateSplitZip() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(Compression.DEFLATE)
+                                                .compression(Compression.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .splitLength(1024 * 1024).build();
         ZipIt zip = ZipIt.builder().zipFile(Zip4jSuite.deflateSplitZip).build();
@@ -56,7 +56,7 @@ public class DefalteZipData {
 
     private static void createDeflateSolidPkwareZip() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(Compression.DEFLATE)
+                                                .compression(Compression.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .encryption(Encryption.PKWARE)
                                                 .comment("password: " + new String(Zip4jSuite.password))
@@ -71,7 +71,7 @@ public class DefalteZipData {
 
     private static void createDeflateSolidAesZip() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(Compression.DEFLATE)
+                                                .compression(Compression.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .encryption(Encryption.AES)
                                                 .strength(AesStrength.KEY_STRENGTH_256)

@@ -39,7 +39,7 @@ public class ZipRemoveTest {
     @Test
     public void shouldRemoveGivenFilesFromExistedZip() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(Compression.DEFLATE)
+                                                .compression(Compression.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .defaultFolderPath(Zip4jSuite.srcDir).build();
 

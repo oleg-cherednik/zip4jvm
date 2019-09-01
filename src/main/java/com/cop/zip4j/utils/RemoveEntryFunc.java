@@ -1,12 +1,11 @@
 package com.cop.zip4j.utils;
 
-import com.cop.zip4j.io.writers.ZipModelWriter;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.io.out.DataOutputStreamDecorator;
 import com.cop.zip4j.io.out.SingleZipOutputStream;
-import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.ZipModel;
+import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
@@ -47,7 +46,6 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
 
         try (DataOutput out = SingleZipOutputStream.create(tmpZipFile, zipModel)) {
             writeFileHeaders(new DataOutputStreamDecorator(out), entries);
-            new ZipModelWriter(zipModel).finalizeZipFile(out, true);
         } catch(IOException e) {
             throw new Zip4jException(e);
         }
@@ -55,13 +53,16 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
         restoreFileName(tmpZipFile);
     }
 
-    private Set<String> getExistedEntries(Collection<String> entries) {
-        return entries.stream()
-                      .filter(Objects::nonNull)
-                      .map(entryName -> zipModel.getCentralDirectory().getFileHeadersByEntryName(entryName))
-                      .flatMap(List::stream)
-                      .map(CentralDirectory.FileHeader::getFileName)
-                      .collect(Collectors.toSet());
+    private Set<String> getExistedEntries(Collection<String> entryNames) {
+        return entryNames.stream()
+                         .filter(Objects::nonNull)
+                         .map(entryName -> ZipUtils.normalizeFileName.apply(entryName.toLowerCase()))
+                         .map(entryName -> zipModel.getEntries().stream()
+                                                   .filter(entry -> entry.getFileName().equalsIgnoreCase(entryName))
+                                                   .map(PathZipEntry::getFileName)
+                                                   .collect(Collectors.toList()))
+                         .flatMap(List::stream)
+                         .collect(Collectors.toSet());
     }
 
     private Path createTempFile() {
@@ -73,22 +74,26 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
     }
 
     private void writeFileHeaders(OutputStream out, Collection<String> entries) throws IOException {
-        List<CentralDirectory.FileHeader> fileHeaders = new ArrayList<>();
-        CentralDirectory.FileHeader prv = null;
+        List<PathZipEntry> zipEntries = new ArrayList<>();
+        PathZipEntry prv = null;
 
         long offsIn = 0;
         long offsOut = 0;
         long skip = 0;
 
         try (InputStream in = new FileInputStream(zipModel.getZipFile().toFile())) {
-            for (CentralDirectory.FileHeader header : zipModel.getFileHeaders()) {
+            int total = zipModel.getEntries().size();
+
+            for (int i = 0; i < total; i++) {
+                PathZipEntry zipEntry = zipModel.getEntries().get(i);
+
                 if (prv != null) {
                     long curOffs = offsOut;
-                    long length = header.getOffsLocalFileHeader() - prv.getOffsLocalFileHeader();
+                    long length = zipEntry.getLocalFileHeaderOffs() - prv.getLocalFileHeaderOffs();
                     offsIn += skip + IOUtils.copyLarge(in, out, skip, length);
                     offsOut += length;
-                    fileHeaders.add(prv);
-                    prv.setOffsLocalFileHeader(curOffs);
+                    zipEntries.add(prv);
+                    prv.setLocalFileHeaderOffs(curOffs);
                     skip = 0;
 
                     // TODO fix offs for zip64
@@ -102,21 +107,26 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
 //                fileHeader.setOffsLocalFileHeader(offsetLocalHdr - (offs - offsetLocalFileHeader) - 1);
                 }
 
-                prv = entries.contains(header.getFileName()) ? null : header;
-                skip = header.getOffsLocalFileHeader() - offsIn;
+                if (entries.contains(zipEntry.getFileName())) {
+                    prv = null;
+                } else {
+                    prv = zipEntry;
+                }
+
+                skip = zipEntry.getLocalFileHeaderOffs() - offsIn;
             }
 
             if (prv != null) {
                 long curOffs = offsOut;
-                long length = zipModel.getOffsCentralDirectory() - prv.getOffsLocalFileHeader();
+                long length = zipModel.getCentralDirectoryOffs() - prv.getLocalFileHeaderOffs();
                 offsOut += IOUtils.copyLarge(in, out, skip, length);
-                fileHeaders.add(prv);
-                prv.setOffsLocalFileHeader(curOffs);
+                zipEntries.add(prv);
+                prv.setLocalFileHeaderOffs(curOffs);
             }
         }
 
-        zipModel.setFileHeaders(fileHeaders);
-        zipModel.getEndCentralDirectory().setOffs(offsOut);
+        zipModel.getEntries().clear();
+        zipModel.getEntries().addAll(zipEntries);
     }
 
     private void restoreFileName(Path tmpZipFileName) {

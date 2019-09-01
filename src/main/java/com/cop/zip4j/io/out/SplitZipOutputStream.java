@@ -1,7 +1,8 @@
 package com.cop.zip4j.io.out;
 
-import com.cop.zip4j.io.writers.ZipModelWriter;
 import com.cop.zip4j.exception.Zip4jException;
+import com.cop.zip4j.io.writers.ZipModelWriter;
+import com.cop.zip4j.model.DataDescriptor;
 import com.cop.zip4j.model.ZipModel;
 import lombok.NonNull;
 
@@ -16,15 +17,20 @@ import java.nio.file.Path;
  */
 public class SplitZipOutputStream extends BaseDataOutput {
 
-    private int counter;
+    /** see 8.5.5 */
+    public static final int SPLIT_SIGNATURE = DataDescriptor.SIGNATURE;
+
+    private int disK;
 
     @NonNull
-    public static SplitZipOutputStream create(@NonNull ZipModel zipModel) throws FileNotFoundException {
+    public static SplitZipOutputStream create(@NonNull ZipModel zipModel) throws IOException {
         // TODO move to ZipParameters
-        if (zipModel.getSplitLength() >= 0 && zipModel.getSplitLength() < ZipModel.MIN_SPLIT_LENGTH)
+        if (zipModel.getSplitSize() >= 0 && zipModel.getSplitSize() < ZipModel.MIN_SPLIT_LENGTH)
             throw new Zip4jException("split length less than minimum allowed split length of " + ZipModel.MIN_SPLIT_LENGTH + " Bytes");
 
-        return new SplitZipOutputStream(zipModel);
+        SplitZipOutputStream out = new SplitZipOutputStream(zipModel);
+        out.writeDwordSignature(SPLIT_SIGNATURE);
+        return out;
     }
 
     private SplitZipOutputStream(@NonNull ZipModel zipModel) throws FileNotFoundException {
@@ -35,7 +41,7 @@ public class SplitZipOutputStream extends BaseDataOutput {
     @Override
     public void writeWordSignature(int sig) throws IOException {
         doNotSplitSignature(2);
-        super.writeDwordSignature(sig);
+        super.writeWordSignature(sig);
     }
 
     @Override
@@ -45,10 +51,10 @@ public class SplitZipOutputStream extends BaseDataOutput {
     }
 
     private void doNotSplitSignature(int len) throws IOException {
-        long available = zipModel.getSplitLength() - getOffs();
+        long available = zipModel.getSplitSize() - getOffs();
 
         if (available <= len)
-            openNextSplit();
+            openNextDisk();
     }
 
     @Override
@@ -56,11 +62,11 @@ public class SplitZipOutputStream extends BaseDataOutput {
         final int offsInit = offs;
 
         while (len > 0) {
-            long available = zipModel.getSplitLength() - getOffs();
+            long available = zipModel.getSplitSize() - getOffs();
             int writeBytes = Math.min(len, (int)available);
 
             if (available <= 0 || len > available && offsInit != offs)
-                openNextSplit();
+                openNextDisk();
 
             super.write(buf, offs, writeBytes);
 
@@ -69,8 +75,8 @@ public class SplitZipOutputStream extends BaseDataOutput {
         }
     }
 
-    private void openNextSplit() throws IOException {
-        Path splitFile = ZipModel.getSplitFilePath(zipModel.getZipFile(), ++counter);
+    private void openNextDisk() throws IOException {
+        Path splitFile = ZipModel.getSplitFilePath(zipModel.getZipFile(), ++disK);
 
         super.close();
 
@@ -84,14 +90,13 @@ public class SplitZipOutputStream extends BaseDataOutput {
     }
 
     @Override
-    public int getCounter() {
-        return counter;
+    public int getDisk() {
+        return disK;
     }
 
     @Override
     public void close() throws IOException {
-        zipModel.getEndCentralDirectory().setOffs(getOffs());
-        new ZipModelWriter(zipModel).finalizeZipFile(this, true);
+        new ZipModelWriter(zipModel).write(this);
         super.close();
     }
 

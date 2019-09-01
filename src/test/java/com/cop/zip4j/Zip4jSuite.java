@@ -2,6 +2,7 @@ package com.cop.zip4j;
 
 import com.cop.zip4j.data.DefalteZipData;
 import com.cop.zip4j.data.StoreZipData;
+import com.cop.zip4j.exception.Zip4jException;
 import org.apache.commons.io.FileUtils;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
@@ -24,7 +25,8 @@ import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
 @SuppressWarnings("FieldNamingConvention")
 public class Zip4jSuite {
 
-    public static final Path rootDir = Paths.get("d:/zip4j/foo");//Files.createTempDirectory("zip4j");
+//    public static final Path rootDir = createTempDirectory("zip4j");
+        public static final Path rootDir = Paths.get("d:/zip4j/foo");
     public static final Path srcDir = rootDir.resolve("src");
 
     public static final Path carsDir = srcDir.resolve("cars");
@@ -33,6 +35,14 @@ public class Zip4jSuite {
 
     public static final List<Path> filesCarsDir = collect(carsDir, "bentley-continental.jpg", "ferrari-458-italia.jpg", "wiesmann-gt-mf5.jpg");
     public static final List<Path> filesStarWarsDir = collect(starWarsDir, "one.jpg", "two.jpg", "three.jpg", "four.jpg");
+
+    private static Path createTempDirectory(String prefix) {
+        try {
+            return Files.createTempDirectory(prefix);
+        } catch(IOException e) {
+            throw new Zip4jException(e);
+        }
+    }
 
     private static List<Path> collect(Path dir, String... fileNames) {
         List<Path> paths = Stream.of(fileNames)

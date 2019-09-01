@@ -2,7 +2,7 @@ package com.cop.zip4j.io.writers;
 
 import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.model.EndCentralDirectory;
-import com.cop.zip4j.model.ZipModel;
+import com.cop.zip4j.model.Zip64;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -17,20 +17,20 @@ import java.nio.charset.Charset;
 final class EndCentralDirectoryWriter {
 
     @NonNull
-    private final EndCentralDirectory dir;
+    private final EndCentralDirectory endCentralDirectory;
     @NonNull
     private final Charset charset;
 
     public void write(@NonNull DataOutput out) throws IOException {
-        byte[] comment = dir.getComment(charset);
+        byte[] comment = endCentralDirectory.getComment(charset);
 
         out.writeDwordSignature(EndCentralDirectory.SIGNATURE);
-        out.writeWord(dir.getSplitParts());
-        out.writeWord(dir.getStartDiskNumber());
-        out.writeWord(dir.getDiskEntries());
-        out.writeWord(dir.getTotalEntries());
-        out.writeDword(dir.getSize());
-        out.writeDword(Math.min(dir.getOffs(), ZipModel.ZIP_64_LIMIT));
+        out.writeWord(endCentralDirectory.getTotalDisks());
+        out.writeWord(endCentralDirectory.getStartDiskNumber());
+        out.writeWord(endCentralDirectory.getDiskEntries());
+        out.writeWord(endCentralDirectory.getTotalEntries());
+        out.writeDword(endCentralDirectory.getCentralDirectorySize());
+        out.writeDword(Math.min(endCentralDirectory.getCentralDirectoryOffs(), Zip64.LIMIT));
         out.writeWord(comment.length);
         out.writeBytes(comment);
     }

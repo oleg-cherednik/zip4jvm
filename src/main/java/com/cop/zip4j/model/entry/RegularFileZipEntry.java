@@ -4,6 +4,7 @@ import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.Encryption;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import org.apache.commons.io.IOUtils;
 
 import java.io.FileInputStream;
@@ -22,6 +23,9 @@ public class RegularFileZipEntry extends PathZipEntry {
     private final long size;
     private final long checksum;
 
+    @Setter
+    private long compressedSize;
+
     public RegularFileZipEntry(Path file, long size, long checksum, int lastModifiedTime) {
         super(file, lastModifiedTime);
         this.size = size;
@@ -29,7 +33,7 @@ public class RegularFileZipEntry extends PathZipEntry {
     }
 
     @Override
-    public long size() {
+    public long getUncompressedSize() {
         return size;
     }
 
@@ -46,7 +50,7 @@ public class RegularFileZipEntry extends PathZipEntry {
     }
 
     @Override
-    public void setCompression(@NonNull Compression compression) throws IOException {
+    public void setCompression(@NonNull Compression compression) {
         this.compression = size == 0 ? Compression.STORE : compression;
     }
 
@@ -56,8 +60,14 @@ public class RegularFileZipEntry extends PathZipEntry {
     }
 
     @Override
-    public long getCompressedSize() {
+    public long getExpectedCompressedSize() {
         return compression == Compression.STORE ? encryption.getCompressedSize().apply(this) : 0;
+    }
+
+    public boolean isDataDescriptorAvailable() {
+        if (dataDescriptorAvailable != null)
+            return dataDescriptorAvailable;
+        return true;
     }
 
 }

@@ -1,8 +1,6 @@
 package com.cop.zip4j.model;
 
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.io.writers.ZipModelWriter;
-import com.cop.zip4j.model.aes.AesExtraDataRecord;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.cop.zip4j.model.builders.LocalFileHeaderBuilder.LOOK_IN_EXTRA_FIELD;
 
 /**
  * see 4.3.12
@@ -65,6 +65,7 @@ public class CentralDirectory {
                           .collect(Collectors.toList());
     }
 
+    /** see 4.3.12 */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -80,7 +81,7 @@ public class CentralDirectory {
         private int versionToExtract = VERSION;
         // size:2 - general purpose bit flag
         @NonNull
-        private final GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
+        private GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         // size:2 - compression method
         @NonNull
         private CompressionMethod compressionMethod = CompressionMethod.STORE;
@@ -111,7 +112,7 @@ public class CentralDirectory {
         private String fileName;
         // size:m - extra field
         @NonNull
-        private ExtraField extraField = ExtraField.NULL;
+        private ExtraField extraField = new ExtraField();
         // size:k - extra field
         private String fileComment;
 
@@ -140,34 +141,12 @@ public class CentralDirectory {
             return ZipUtils.isDirectory(fileName);
         }
 
-        public void setZip64ExtendedInfo(@NonNull Zip64.ExtendedInfo info) {
-            if (extraField == ExtraField.NULL)
-                extraField = new ExtraField();
-
-            extraField.setExtendedInfo(info);
-
-            if (info != Zip64.ExtendedInfo.NULL) {
-                uncompressedSize = info.getUncompressedSize() != ExtraField.NO_DATA ? info.getUncompressedSize() : uncompressedSize;
-                compressedSize = info.getCompressedSize() != ExtraField.NO_DATA ? info.getCompressedSize() : uncompressedSize;
-                offsLocalFileHeader = info.getOffsLocalHeaderRelative() != ExtraField.NO_DATA ? info.getOffsLocalHeaderRelative()
-                                                                                              : offsLocalFileHeader;
-                diskNumber = info.getDiskNumber() != -1 ? info.getDiskNumber() : diskNumber;
-            }
-        }
-
         public void setExtraField(@NonNull ExtraField extraField) {
-            this.extraField = extraField;
+            this.extraField.setFrom(extraField);
             generalPurposeFlag.setEncrypted(isEncrypted());
         }
 
-        public void setAesExtraDataRecord(@NonNull AesExtraDataRecord record) {
-            if (extraField == ExtraField.NULL)
-                extraField = new ExtraField();
-            extraField.setAesExtraDataRecord(record);
-            generalPurposeFlag.setEncrypted(isEncrypted());
-        }
-
-        public void setGeneralPurposeFlag(int data) {
+        public void setGeneralPurposeFlagData(int data) {
             generalPurposeFlag.read(data);
             generalPurposeFlag.setEncrypted(isEncrypted());
         }
@@ -180,17 +159,20 @@ public class CentralDirectory {
             return getEncryption() != Encryption.OFF;
         }
 
-        public boolean isWriteZip64FileSize() {
-            return compressedSize >= ZipModel.ZIP_64_LIMIT ||
-                    uncompressedSize + ZipModelWriter.ZIP64_EXTRA_BUF >= ZipModel.ZIP_64_LIMIT;
-        }
-
         public Encryption getEncryption() {
             return Encryption.get(extraField, generalPurposeFlag);
         }
 
         public boolean isWriteZip64OffsetLocalHeader() {
-            return offsLocalFileHeader > ZipModel.ZIP_64_LIMIT;
+            return offsLocalFileHeader > Zip64.LIMIT;
+        }
+
+        public long getOriginalCompressedSize() {
+            return compressedSize == LOOK_IN_EXTRA_FIELD ? extraField.getExtendedInfo().getCompressedSize() : compressedSize;
+        }
+
+        public long getOriginalUncompressedSize() {
+            return uncompressedSize == LOOK_IN_EXTRA_FIELD ? extraField.getExtendedInfo().getUncompressedSize() : uncompressedSize;
         }
 
         @Override

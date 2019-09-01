@@ -19,12 +19,12 @@ public class LocalFileHeader {
 
     public static final int SIGNATURE = 0x04034B50;
 
-    // size:4 - signature (0x04034b50)
+    // size:4 - signature (0x04034B50)
     // size:2 - version needed to extractEntries
     private int versionToExtract;
     // size:2 - general purpose bit flag
     @NonNull
-    private final GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
+    private GeneralPurposeFlag generalPurposeFlag;
     // size:2 - compression method
     @NonNull
     private CompressionMethod compressionMethod = CompressionMethod.STORE;
@@ -43,31 +43,11 @@ public class LocalFileHeader {
     private String fileName;
     // size:m - extra field
     @NonNull
-    private ExtraField extraField = ExtraField.NULL;
-
-    private long offs;
+    private ExtraField extraField = new ExtraField();
 
     @NonNull
     public byte[] getFileName(@NonNull Charset charset) {
         return fileName != null ? fileName.getBytes(charset) : ArrayUtils.EMPTY_BYTE_ARRAY;
-    }
-
-    public void setExtraField(@NonNull ExtraField extraField) {
-        this.extraField = extraField;
-        generalPurposeFlag.setEncrypted(isEncrypted());
-    }
-
-    public void setGeneralPurposeFlag(int data) {
-        generalPurposeFlag.read(data);
-        generalPurposeFlag.setEncrypted(isEncrypted());
-    }
-
-    public boolean isEncrypted() {
-        return getEncryption() != Encryption.OFF;
-    }
-
-    public Encryption getEncryption() {
-        return Encryption.get(extraField, generalPurposeFlag);
     }
 
     @Override

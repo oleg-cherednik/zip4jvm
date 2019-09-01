@@ -2,7 +2,7 @@ package com.cop.zip4j.io.in.entry;
 
 import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.io.in.DataInput;
-import com.cop.zip4j.model.LocalFileHeader;
+import com.cop.zip4j.model.entry.PathZipEntry;
 import org.apache.commons.io.IOUtils;
 
 import java.io.EOFException;
@@ -19,8 +19,8 @@ final class InflateEntryInputStream extends EntryInputStream {
     private final byte[] buf = new byte[1024 * 4];
     private final Inflater inflater = new Inflater(true);
 
-    public InflateEntryInputStream(DataInput in, LocalFileHeader localFileHeader, Decoder decoder) {
-        super(in, localFileHeader, decoder);
+    public InflateEntryInputStream(PathZipEntry entry, DataInput in, Decoder decoder) {
+        super(entry, in, decoder);
     }
 
     @Override

@@ -41,7 +41,7 @@ public class CompressionDeflateTest {
 
     public void shouldCreateSingleZipWithFilesWhenDeflateCompression() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(Compression.DEFLATE)
+                                                .compression(Compression.DEFLATE)
                                                 .defaultFolderPath(Zip4jSuite.srcDir).build();
 
         Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
@@ -55,7 +55,7 @@ public class CompressionDeflateTest {
 
     public void shouldCreateSplitZipWithFilesWhenDeflateCompression() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(Compression.DEFLATE)
+                                                .compression(Compression.DEFLATE)
                                                 .defaultFolderPath(Zip4jSuite.srcDir)
                                                 .splitLength(1024 * 1024)
                                                 .build();
@@ -70,7 +70,7 @@ public class CompressionDeflateTest {
 
     public void shouldCreateSingleZipWithEntireFolderWhenDeflateCompression() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(Compression.DEFLATE)
+                                                .compression(Compression.DEFLATE)
                                                 .defaultFolderPath(Zip4jSuite.srcDir).build();
 
         Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
@@ -84,7 +84,7 @@ public class CompressionDeflateTest {
 
     public void shouldCreateSplitZipWithEntireFolderWhenStoreCompression() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(Compression.STORE)
+                                                .compression(Compression.STORE)
                                                 .defaultFolderPath(Zip4jSuite.srcDir)
                                                 .splitLength(1024 * 1024)
                                                 .build();
@@ -108,7 +108,7 @@ public class CompressionDeflateTest {
 
     public void shouldUnzipWhenWhenStoreCompressionAndPkwareEncryption() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(Compression.DEFLATE)
+                                                .compression(Compression.DEFLATE)
                                                 .encryption(Encryption.PKWARE)
                                                 .defaultFolderPath(Zip4jSuite.srcDir)
                                                 .comment("password: " + new String(Zip4jSuite.password))
@@ -135,7 +135,7 @@ public class CompressionDeflateTest {
 
     public void shouldUnzipWhenWhenDeflateCompressionAndAesEncryption() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(Compression.DEFLATE)
+                                                .compression(Compression.DEFLATE)
                                                 .encryption(Encryption.AES)
                                                 .strength(AesStrength.KEY_STRENGTH_256)
                                                 .comment("password: " + new String(Zip4jSuite.password))

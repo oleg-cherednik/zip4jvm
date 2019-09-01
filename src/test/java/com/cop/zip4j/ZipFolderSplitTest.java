@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SuppressWarnings("FieldNamingConvention")
 public class ZipFolderSplitTest {
 
-    private static final Path rootDir = Zip4jSuite.rootDir.resolve(ZipFolderSplitTest.class.getSimpleName());
+    private static final Path rootDir = Zip4jSuite.generateSubDirNameWithTime(ZipFolderSplitTest.class);
     private static final Path zipFile = rootDir.resolve("src.zip");
 
     @BeforeClass
@@ -39,7 +39,7 @@ public class ZipFolderSplitTest {
     @Test
     public void shouldCreateNewZipWithFolder() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(Compression.DEFLATE)
+                                                .compression(Compression.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .splitLength(1024 * 1024).build();
 
@@ -56,7 +56,7 @@ public class ZipFolderSplitTest {
     @Test(dependsOnMethods = "shouldCreateNewZipWithFolder")
     public void shouldThrowExceptionWhenModifySplitZip() {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(Compression.DEFLATE)
+                                                .compression(Compression.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .defaultFolderPath(Zip4jSuite.srcDir)
                                                 .splitLength(1024 * 1024).build();

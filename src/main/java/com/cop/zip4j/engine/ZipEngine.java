@@ -30,7 +30,7 @@ public class ZipEngine {
         if (entries.isEmpty())
             return;
 
-        try (DataOutput out = createOutputStream()) {
+        try (DataOutput out = createDataOutput()) {
             entries.stream()
                    .filter(entry -> !entry.isRoot())
                    .forEach(entry -> writeEntry(entry, out));
@@ -39,14 +39,13 @@ public class ZipEngine {
         }
     }
 
-    private DataOutput createOutputStream() throws IOException {
-        Path zipFile = zipModel.getZipFile();
-        Path parent = zipFile.getParent();
+    private DataOutput createDataOutput() throws IOException {
+        Path parent = zipModel.getZipFile().getParent();
 
         if (parent != null)
             Files.createDirectories(parent);
 
-        return zipModel.isSplitArchive() ? SplitZipOutputStream.create(zipModel) : SingleZipOutputStream.create(zipModel);
+        return zipModel.isSplit() ? SplitZipOutputStream.create(zipModel) : SingleZipOutputStream.create(zipModel);
     }
 
     private void writeEntry(PathZipEntry entry, DataOutput out) {

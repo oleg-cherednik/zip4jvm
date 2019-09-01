@@ -1,6 +1,8 @@
 package com.cop.zip4j.utils;
 
 import com.cop.zip4j.exception.Zip4jException;
+import com.cop.zip4j.exception.Zip4jRealBigZip64NotSupportedException;
+import com.cop.zip4j.model.Zip64;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
@@ -54,8 +56,17 @@ public class ZipUtils {
         return cal.getTime().getTime();
     }
 
+    public static void requirePositive(long value, String type) {
+        if (value < 0)
+            throw new Zip4jRealBigZip64NotSupportedException(value, type);
+    }
+
     public static boolean isDirectory(String fileName) {
         return fileName != null && (fileName.endsWith("/") || fileName.endsWith("\\"));
+    }
+
+    public static boolean isRegularFile(String fileName) {
+        return fileName != null && !(fileName.endsWith("/") || fileName.endsWith("\\"));
     }
 
     @SuppressWarnings("FieldNamingConvention")
@@ -65,7 +76,7 @@ public class ZipUtils {
 
         comment = StringUtils.trimToNull(comment);
 
-        if (StringUtils.length(comment) > 0xFFFF)
+        if (StringUtils.length(comment) > Zip64.LIMIT_INT)
             throw new Zip4jException("comment length exceeds maximum length");
 
         return comment;
@@ -73,5 +84,9 @@ public class ZipUtils {
 
     @SuppressWarnings("FieldNamingConvention")
     public static final Function<String, String> normalizeFileName = fileName -> FilenameUtils.normalize(fileName, true);
+
+    public static String toString(long offs) {
+        return "offs: " + offs + " (0x" + Long.toHexString(offs) + ')';
+    }
 
 }

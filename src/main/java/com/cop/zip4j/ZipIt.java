@@ -18,15 +18,14 @@ package com.cop.zip4j;
 import com.cop.zip4j.engine.ZipEngine;
 import com.cop.zip4j.exception.Zip4jAesStrengthNotSetException;
 import com.cop.zip4j.exception.Zip4jEmptyPasswordException;
-import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.exception.Zip4jPathNotExistsException;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.ZipParameters;
 import com.cop.zip4j.model.aes.AesStrength;
+import com.cop.zip4j.model.builders.ZipModelBuilder;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import com.cop.zip4j.model.entry.ZipEntry;
-import com.cop.zip4j.utils.CreateZipModel;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.Builder;
 import lombok.NonNull;
@@ -69,25 +68,22 @@ public final class ZipIt {
                 parameters.setDefaultFolderPath(path);
         }
 
-        ZipModel zipModel = new CreateZipModel(zipFile, charset).get().noSplitOnly();
-        zipModel.setSplitLength(parameters.getSplitLength());
+        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile, charset).noSplitOnly();
+        zipModel.setSplitSize(parameters.getSplitLength());
         zipModel.setComment(ZipUtils.normalizeComment.apply(parameters.getComment()));
 
-        if (parameters.isZip64())
-            zipModel.zip64();
+        zipModel.setZip64(parameters.isZip64());
 
         List<PathZipEntry> entries = createEntries(withExistedEntries(paths));
 
         entries.forEach(entry -> {
-            try {
-                entry.setName(parameters.getRelativeEntryName(entry.getPath()));
-                entry.setCompression(parameters.getCompressionMethod());
-                entry.setEncryption(parameters.getEncryption());
-                entry.setStrength(parameters.getStrength());
-                entry.setPassword(parameters.getPassword());
-            } catch(IOException e) {
-                throw new Zip4jException(e);
-            }
+            entry.setFileName(parameters.getRelativeEntryName(entry.getPath()));
+            entry.setCompression(parameters.getCompression());
+            entry.setEncryption(parameters.getEncryption());
+            entry.setStrength(parameters.getStrength());
+            entry.setPassword(parameters.getPassword());
+            entry.setZip64(parameters.isZip64());
+            entry.setPassword(parameters.getPassword());
         });
 
         new ZipEngine(zipModel).addEntries(entries);
@@ -131,7 +127,7 @@ public final class ZipIt {
 
         if (encryption != Encryption.OFF && passwordEmpty)
             throw new Zip4jEmptyPasswordException();
-        if(encryption == Encryption.AES && strength == AesStrength.NONE)
+        if (encryption == Encryption.AES && strength == AesStrength.NONE)
             throw new Zip4jAesStrengthNotSetException();
     }
 

@@ -20,41 +20,13 @@ public class ExtraField {
     @NonNull
     private AesExtraDataRecord aesExtraDataRecord = AesExtraDataRecord.NULL;
 
-    public boolean isEmpty() {
-        return extendedInfo == null && aesExtraDataRecord == null;
+    public int getSize() {
+        return extendedInfo.getBlockSize() + aesExtraDataRecord.getBlockSize();
     }
 
-    public int getLength() {
-        return extendedInfo.getLength() + aesExtraDataRecord.getLength();
+    public void setFrom(@NonNull ExtraField extraField) {
+        extendedInfo = extraField.extendedInfo;
+        aesExtraDataRecord = extraField.aesExtraDataRecord;
     }
-
-    @NonNull
-    public ExtraField deepCopy() {
-        ExtraField res = new ExtraField();
-
-        if (extendedInfo != Zip64.ExtendedInfo.NULL)
-            res.setExtendedInfo(extendedInfo.toBuilder().build());
-        if (aesExtraDataRecord != AesExtraDataRecord.NULL)
-            res.setAesExtraDataRecord(aesExtraDataRecord.toBuilder().build());
-
-        return res;
-    }
-
-    public static final ExtraField NULL = new ExtraField() {
-        @Override
-        public void setExtendedInfo(@NonNull Zip64.ExtendedInfo extendedInfo) {
-            throw new NullPointerException("Null object modification: " + getClass().getSimpleName());
-        }
-
-        @Override
-        public void setAesExtraDataRecord(@NonNull AesExtraDataRecord aesExtraDataRecord) {
-            throw new NullPointerException("Null object modification: " + getClass().getSimpleName());
-        }
-
-        @Override
-        public ExtraField deepCopy() {
-            return NULL;
-        }
-    };
 
 }

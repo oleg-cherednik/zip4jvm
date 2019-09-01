@@ -2,7 +2,9 @@ package com.cop.zip4j.model.entry;
 
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.Encryption;
+import com.cop.zip4j.utils.ZipUtils;
 import lombok.NonNull;
+import org.apache.commons.lang.StringUtils;
 
 import java.nio.file.Path;
 
@@ -27,8 +29,30 @@ public class DirectoryZipEntry extends PathZipEntry {
     }
 
     @Override
+    public long getExpectedCompressedSize() {
+        return 0;
+    }
+
+    @Override
+    public void setCompressedSize(long compressedSize) {
+    }
+
+    @Override
     public long getCompressedSize() {
         return 0;
+    }
+
+    @Override
+    public void setFileName(String fileName) {
+        if (StringUtils.isNotBlank(fileName) && !ZipUtils.isDirectory(fileName))
+            fileName += '/';
+        super.setFileName(fileName);
+    }
+
+    public boolean isDataDescriptorAvailable() {
+        if (dataDescriptorAvailable != null)
+            return dataDescriptorAvailable;
+        return false;
     }
 
 }

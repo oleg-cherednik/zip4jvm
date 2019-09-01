@@ -32,8 +32,8 @@ abstract class BaseDataInput implements DataInput {
     }
 
     @Override
-    public long readDwordLong() throws IOException {
-        return delegate.readDwordLong();
+    public long readDword() throws IOException {
+        return delegate.readDword();
     }
 
     @Override

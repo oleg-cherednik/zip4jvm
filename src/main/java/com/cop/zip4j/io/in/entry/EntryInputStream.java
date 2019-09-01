@@ -9,6 +9,7 @@ import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.DataDescriptor;
 import com.cop.zip4j.model.LocalFileHeader;
+import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.NonNull;
 import org.apache.commons.io.IOUtils;
 
@@ -23,8 +24,8 @@ import java.util.zip.Checksum;
  */
 public abstract class EntryInputStream extends InputStream {
 
+    protected final PathZipEntry entry;
     protected final DataInput in;
-    protected final LocalFileHeader localFileHeader;
     protected final Decoder decoder;
 
     protected final long compressedSize;
@@ -33,28 +34,34 @@ public abstract class EntryInputStream extends InputStream {
     private final Checksum checksum = new CRC32();
     private final byte[] buf = new byte[1];
 
-    protected int readCompressedBytes;
+    protected long readCompressedBytes;
     protected long writtenUncompressedBytes;
 
-    public static InputStream create(@NonNull CentralDirectory.FileHeader fileHeader, char[] password, DataInput in) throws IOException {
-        LocalFileHeader localFileHeader = new LocalFileHeaderReader(fileHeader).read(in);
-        Decoder decoder = localFileHeader.getEncryption().decoder(in, localFileHeader, password);
-        Compression compression = fileHeader.getCompression();
+    public static InputStream create(@NonNull PathZipEntry entry, @NonNull DataInput in) throws IOException {
+        LocalFileHeader localFileHeader = new LocalFileHeaderReader(entry).read(in);
+        updateEntry(entry, localFileHeader);
+        // TODO check that localFileHeader matches fileHeader
+        Decoder decoder = entry.getEncryption().getCreateDecoder().apply(entry, in);
+        Compression compression = entry.getCompression();
 
         if (compression == Compression.STORE)
-            return new StoreEntryInputStream(in, localFileHeader, decoder);
+            return new StoreEntryInputStream(entry, in, decoder);
         if (compression == Compression.DEFLATE)
-            return new InflateEntryInputStream(in, localFileHeader, decoder);
+            return new InflateEntryInputStream(entry, in, decoder);
 
         throw new Zip4jException("Compression is not supported: " + compression);
     }
 
-    protected EntryInputStream(DataInput in, LocalFileHeader localFileHeader, Decoder decoder) {
+    private static void updateEntry(PathZipEntry entry, LocalFileHeader localFileHeader) {
+        entry.setDataDescriptorAvailable(localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
+    }
+
+    protected EntryInputStream(PathZipEntry entry, DataInput in, Decoder decoder) {
+        this.entry = entry;
         this.in = in;
-        this.localFileHeader = localFileHeader;
         this.decoder = decoder;
-        compressedSize = decoder.getCompressedSize(localFileHeader);
-        uncompressedSize = localFileHeader.getUncompressedSize();
+        compressedSize = Math.max(0, decoder.getCompressedSize(entry));
+        uncompressedSize = Math.max(0, entry.getUncompressedSize());
     }
 
     protected final void updateChecksum(byte[] buf, int offs, int len) {
@@ -90,29 +97,22 @@ public abstract class EntryInputStream extends InputStream {
     }
 
     private void checkChecksum() {
-        long expected = localFileHeader.getCrc32();
+        long expected = entry.checksum();
         long actual = checksum.getValue();
 
         if (expected > 0 && expected != actual)
-            throw new Zip4jException("Checksum is not matched: " + localFileHeader.getFileName());
+            throw new Zip4jException("Checksum is not matched: " + entry.getFileName());
     }
 
     private void checkUncompressedSize() {
-        long expected = localFileHeader.getUncompressedSize();
-        long actual = writtenUncompressedBytes;
-
-        if (expected != actual)
-            throw new Zip4jException("UncompressedSize is not matched: " + localFileHeader.getFileName());
+        if (uncompressedSize != writtenUncompressedBytes)
+            throw new Zip4jException("UncompressedSize is not matched: " + entry.getFileName());
     }
 
+    /** Just read {@link DataDescriptor} and ignore it's value. We got it from {@link CentralDirectory.FileHeader} */
     private void readDataDescriptor() throws IOException {
-        if (localFileHeader.getGeneralPurposeFlag().isDataDescriptorExists()) {
-            DataDescriptor dataDescriptor = new DataDescriptorReader(false).read(in);
-
-            localFileHeader.setCrc32(dataDescriptor.getCrc32());
-            localFileHeader.setCompressedSize(dataDescriptor.getCompressedSize());
-            localFileHeader.setUncompressedSize(dataDescriptor.getUncompressedSize());
-        }
+        if (entry.isDataDescriptorAvailable())
+            DataDescriptorReader.get(entry.isZip64()).read(in);
     }
 
 }

@@ -11,6 +11,11 @@ public interface DataOutputFile extends Closeable {
 
     void seek(long pos) throws IOException;
 
+    @SuppressWarnings("MethodCanBeVariableArityMethod")
+    default void write(byte[] buf) throws IOException {
+        write(buf, 0, buf.length);
+    }
+
     void write(byte[] buf, int offs, int len) throws IOException;
 
     long getOffs();

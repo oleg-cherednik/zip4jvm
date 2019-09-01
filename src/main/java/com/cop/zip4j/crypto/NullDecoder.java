@@ -1,6 +1,6 @@
 package com.cop.zip4j.crypto;
 
-import com.cop.zip4j.model.LocalFileHeader;
+import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.NonNull;
 
 /**
@@ -14,8 +14,8 @@ final class NullDecoder implements Decoder {
     }
 
     @Override
-    public long getCompressedSize(@NonNull LocalFileHeader localFileHeader) {
-        return localFileHeader.getCompressedSize();
+    public long getCompressedSize(@NonNull PathZipEntry entry) {
+        return entry.getCompressedSize();
     }
 
     @Override

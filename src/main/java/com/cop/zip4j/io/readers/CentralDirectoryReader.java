@@ -21,11 +21,10 @@ final class CentralDirectoryReader {
     public CentralDirectory read(@NonNull DataInput in) throws IOException {
         findHead(in);
 
-        CentralDirectory dir = new CentralDirectory();
-        dir.setFileHeaders(new FileHeaderReader(totalEntries).read(in));
-        dir.setDigitalSignature(new DigitalSignatureReader().read(in));
-
-        return dir;
+        CentralDirectory centralDirectory = new CentralDirectory();
+        centralDirectory.setFileHeaders(new FileHeaderReader(totalEntries).read(in));
+        centralDirectory.setDigitalSignature(new DigitalSignatureReader().read(in));
+        return centralDirectory;
     }
 
     private void findHead(DataInput in) throws IOException {

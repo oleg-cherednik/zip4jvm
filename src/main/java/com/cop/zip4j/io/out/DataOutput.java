@@ -15,8 +15,6 @@ public interface DataOutput extends Closeable {
 
     long getOffs();
 
-    void writeWord(int val) throws IOException;
-
     default void writeWordSignature(int sig) throws IOException {
         writeWord(sig);
     }
@@ -24,6 +22,8 @@ public interface DataOutput extends Closeable {
     default void writeDwordSignature(int sig) throws IOException {
         writeDword(sig);
     }
+
+    void writeWord(int val) throws IOException;
 
     void writeDword(long val) throws IOException;
 
@@ -40,6 +40,6 @@ public interface DataOutput extends Closeable {
 
     long getWrittenBytesAmount(String id);
 
-    int getCounter();
+    int getDisk();
 
 }

@@ -24,11 +24,12 @@ public class EndCentralDirectory {
     // size (22) with comment length = 0
     public static final int MIN_SIZE = 4 + 2 + 2 + 2 + 2 + 4 + 4 + 2;
     // comment length depend on size of other structures; it is definitely possible to write 33k bytes
+    // TODO I have test it with WinRar. But according to specification, 0xFFFF is max size
     public static final int MAX_COMMENT_LENGTH = 33_000;
 
     // size:4 - signature (0x06054b50)
     // size:2 - number of the disk
-    private int splitParts;
+    private int totalDisks;
     // size:2 - number of the disk with the start of the central directory
     private int startDiskNumber;
     // size:2 - total number of entries in the central directory on this disk
@@ -36,9 +37,9 @@ public class EndCentralDirectory {
     // size:2 - total number of entries in the central directory
     private int totalEntries;
     // size:4 - CentralDirectory size
-    private long size;
+    private long centralDirectorySize;
     // size:4 - CentralDirectory offs
-    private long offs;
+    private long centralDirectoryOffs;
     // size:2 - file comment length (n)
     // size:n - file comment
     private String comment;
@@ -55,19 +56,4 @@ public class EndCentralDirectory {
         return comment != null ? comment.getBytes(charset) : ArrayUtils.EMPTY_BYTE_ARRAY;
     }
 
-    public void incTotalEntries() {
-        totalEntries++;
-    }
-
-    public void incDiskEntries() {
-        diskEntries++;
-    }
-
-    public boolean isSplitArchive() {
-        return splitParts > 0;
-    }
-
-    public void setNoSplitArchive() {
-        splitParts = 0;
-    }
 }

@@ -19,35 +19,35 @@ final class Zip64Writer {
     private final Zip64 zip64;
 
     public void write(@NonNull DataOutput out) throws IOException {
-        new EndCentralDirectoryWriter(zip64.getEndCentralDirectory()).write(out);
-        new EndCentralDirectoryLocatorWriter(zip64.getEndCentralDirectoryLocator()).write(out);
+        new EndCentralDirectory(zip64.getEndCentralDirectory()).write(out);
+        new EndCentralDirectoryLocator(zip64.getEndCentralDirectoryLocator()).write(out);
     }
 
     @RequiredArgsConstructor
-    private static final class EndCentralDirectoryWriter {
+    private static final class EndCentralDirectory {
 
-        private final Zip64.EndCentralDirectory dir;
+        private final Zip64.EndCentralDirectory endCentralDirectory;
 
         public void write(@NonNull DataOutput out) throws IOException {
-            if (dir == null)
+            if (endCentralDirectory == null)
                 return;
 
             out.writeDwordSignature(Zip64.EndCentralDirectory.SIGNATURE);
-            out.writeQword(dir.getSizeOfZip64EndCentralDirRec());
-            out.writeWord(dir.getVersionMadeBy());
-            out.writeWord(dir.getVersionNeededToExtract());
-            out.writeDword(dir.getDiskNumber());
-            out.writeDword(dir.getStartDiskNumber());
-            out.writeQword(dir.getDiskEntries());
-            out.writeQword(dir.getTotalEntries());
-            out.writeQword(dir.getSize());
-            out.writeQword(dir.getOffs());
-            out.writeBytes(dir.getExtensibleDataSector());
+            out.writeQword(endCentralDirectory.getEndCentralDirectorySize());
+            out.writeWord(endCentralDirectory.getVersionMadeBy());
+            out.writeWord(endCentralDirectory.getVersionNeededToExtract());
+            out.writeDword(endCentralDirectory.getDisk());
+            out.writeDword(endCentralDirectory.getStartDisk());
+            out.writeQword(endCentralDirectory.getDiskEntries());
+            out.writeQword(endCentralDirectory.getTotalEntries());
+            out.writeQword(endCentralDirectory.getSize());
+            out.writeQword(endCentralDirectory.getCentralDirectoryOffs());
+            out.writeBytes(endCentralDirectory.getExtensibleDataSector());
         }
     }
 
     @RequiredArgsConstructor
-    private static final class EndCentralDirectoryLocatorWriter {
+    private static final class EndCentralDirectoryLocator {
 
         private final Zip64.EndCentralDirectoryLocator locator;
 
@@ -56,14 +56,14 @@ final class Zip64Writer {
                 return;
 
             out.writeDwordSignature(Zip64.EndCentralDirectoryLocator.SIGNATURE);
-            out.writeDword(locator.getNoOfDiskStartOfZip64EndOfCentralDirRec());
+            out.writeDword(locator.getStartDisk());
             out.writeQword(locator.getOffs());
-            out.writeDword(locator.getTotNumberOfDiscs());
+            out.writeDword(locator.getTotalDisks());
         }
     }
 
     @RequiredArgsConstructor
-    static final class ExtendedInfoWriter {
+    static final class ExtendedInfo {
 
         @NonNull
         private final Zip64.ExtendedInfo info;
@@ -72,8 +72,8 @@ final class Zip64Writer {
             if (info == Zip64.ExtendedInfo.NULL)
                 return;
 
-            out.writeDwordSignature(Zip64.ExtendedInfo.SIGNATURE);
-            out.writeWord(info.getSize());
+            out.writeWordSignature(Zip64.ExtendedInfo.SIGNATURE);
+            out.writeWord(info.getDataSize());
 
             if (info.getUncompressedSize() != ExtraField.NO_DATA)
                 out.writeQword(info.getUncompressedSize());
@@ -83,6 +83,21 @@ final class Zip64Writer {
                 out.writeQword(info.getOffsLocalHeaderRelative());
             if (info.getDiskNumber() != ExtraField.NO_DATA)
                 out.writeDword(info.getDiskNumber());
+        }
+
+    }
+
+    @RequiredArgsConstructor
+    public static final class DataDescriptor {
+
+        @NonNull
+        private final com.cop.zip4j.model.DataDescriptor dataDescriptor;
+
+        public void write(@NonNull DataOutput out) throws IOException {
+            out.writeDwordSignature(com.cop.zip4j.model.DataDescriptor.SIGNATURE);
+            out.writeDword(dataDescriptor.getCrc32());
+            out.writeQword(dataDescriptor.getCompressedSize());
+            out.writeQword(dataDescriptor.getUncompressedSize());
         }
 
     }

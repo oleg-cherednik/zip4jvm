@@ -35,7 +35,7 @@ public class LittleEndianReadFile implements DataInput {
     }
 
     @Override
-    public long readDwordLong() throws IOException {
+    public long readDword() throws IOException {
         long b0 = in.read();
         long b1 = in.read();
         long b2 = in.read();

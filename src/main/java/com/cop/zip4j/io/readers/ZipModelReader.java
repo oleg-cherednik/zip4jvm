@@ -1,15 +1,16 @@
 package com.cop.zip4j.io.readers;
 
-import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.io.in.LittleEndianReadFile;
+import com.cop.zip4j.model.CentralDirectory;
+import com.cop.zip4j.model.EndCentralDirectory;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
+import com.cop.zip4j.model.builders.ZipModelBuilder;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -37,33 +38,15 @@ public final class ZipModelReader {
     @NonNull
     public ZipModel read() throws IOException {
         try (LittleEndianReadFile in = new LittleEndianReadFile(zipFile)) {
-            ZipModel zipModel = read(in);
+            EndCentralDirectory endCentralDirectory = new EndCentralDirectoryReader().read(in);
+            Zip64 zip64 = new Zip64Reader().read(in);
 
-            if (zipModel.isSplitArchive()) {
-                Path path = ZipModel.getSplitFilePath(zipFile, 1);
-                zipModel.setSplitLength(Files.exists(path) ? Files.size(path) : zipModel.getSplitLength());
-            }
+            long offs = ZipModelBuilder.getCentralDirectoryOffs(endCentralDirectory, zip64);
+            long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
+            CentralDirectory centralDirectory = new CentralDirectoryReader(offs, totalEntries).read(in);
 
-            return zipModel;
+            return new ZipModelBuilder(zipFile, charset, endCentralDirectory, zip64, centralDirectory).create();
         }
-    }
-
-    private ZipModel read(@NonNull DataInput in) throws IOException {
-        EndCentralDirectoryReader reader = new EndCentralDirectoryReader();
-
-        ZipModel zipModel = new ZipModel(zipFile, charset);
-        zipModel.setEndCentralDirectory(reader.read(in));
-
-        Zip64.EndCentralDirectoryLocator locator = new Zip64EndCentralDirectoryLocatorReader(reader.getOffs()).read(in);
-
-        if (locator != null)
-            zipModel.zip64(locator, new Zip64EndCentralDirectoryReader(locator.getOffs()).read(in));
-
-        long offs = zipModel.getCentralDirectoryOffs();
-        long totalEntries = zipModel.getTotalEntries();
-        zipModel.setCentralDirectory(new CentralDirectoryReader(offs, totalEntries).read(in));
-
-        return zipModel;
     }
 
 }

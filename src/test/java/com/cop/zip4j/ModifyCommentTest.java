@@ -45,7 +45,7 @@ public class ModifyCommentTest {
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
 
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(Compression.DEFLATE)
+                                                .compression(Compression.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .comment("Oleg Cherednik - Олег Чередник").build();
 
@@ -59,17 +59,17 @@ public class ModifyCommentTest {
 
     @Test(dependsOnMethods = "shouldCreateNewZipWithComment")
 //    @Ignore("it's not working under gradle build")
-    public void shouldAddCommentToExistedNoSplitZip() {
+    public void shouldAddCommentToExistedNoSplitZip() throws IOException {
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
         assertThat(misc.getComment()).isEqualTo("Oleg Cherednik - Олег Чередник");
 
-        misc.setComment("this is new comment - ноый комментарий");
-        assertThat(misc.getComment()).isEqualTo("this is new comment - ноый комментарий");
+        misc.setComment("this is new comment - новый комментарий");
+        assertThat(misc.getComment()).isEqualTo("this is new comment - новый комментарий");
     }
 
     @Test(dependsOnMethods = "shouldAddCommentToExistedNoSplitZip")
 //    @Ignore("it's not working under gradle build")
-    public void shouldClearCommentForExistedZip() {
+    public void shouldClearCommentForExistedZip() throws IOException {
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
         assertThat(misc.getComment()).isNotBlank();
 

@@ -4,8 +4,8 @@ import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.exception.Zip4jIncorrectPasswordException;
 import com.cop.zip4j.io.in.DataInput;
-import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.aes.AesStrength;
+import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.NonNull;
 import org.apache.commons.lang.ArrayUtils;
 
@@ -25,19 +25,17 @@ public final class AesDecoder implements Decoder {
     private final int saltLength;
     private final AesEngine engine;
 
-    @SuppressWarnings("MethodCanBeVariableArityMethod")
-    public static AesDecoder create(@NonNull DataInput in, @NonNull LocalFileHeader localFileHeader, @NonNull char[] password) {
+    public static AesDecoder create(@NonNull PathZipEntry entry, @NonNull DataInput in) {
         try {
-            AesStrength strength = localFileHeader.getExtraField().getAesExtraDataRecord().getStrength();
-            byte[] salt = getSalt(in, localFileHeader);
-            byte[] key = AesEngine.createKey(password, salt, strength);
+            AesStrength strength = entry.getStrength();
+            byte[] salt = getSalt(entry, in);
+            byte[] key = AesEngine.createKey(entry.getPassword(), salt, strength);
 
             Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
             Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
             byte[] passwordChecksum = strength.createPasswordChecksum(key);
 
-            checkPasswordChecksum(passwordChecksum, in, localFileHeader);
-            in.seek(localFileHeader.getOffs() + strength.saltLength() + passwordChecksum.length);
+            checkPasswordChecksum(passwordChecksum, entry, in);
 
             return new AesDecoder(cipher, mac, salt.length);
         } catch(Exception e) {
@@ -61,8 +59,8 @@ public final class AesDecoder implements Decoder {
     }
 
     @Override
-    public long getCompressedSize(@NonNull LocalFileHeader localFileHeader) {
-        return localFileHeader.getCompressedSize() - saltLength - PASSWORD_CHECKSUM_SIZE - MAX_SIZE;
+    public long getCompressedSize(@NonNull PathZipEntry entry) {
+        return entry.getCompressedSize() - saltLength - PASSWORD_CHECKSUM_SIZE - MAX_SIZE;
     }
 
     @Override
@@ -70,19 +68,16 @@ public final class AesDecoder implements Decoder {
         checkMessageAuthenticationCode(in);
     }
 
-    private static byte[] getSalt(DataInput in, LocalFileHeader localFileHeader) throws IOException {
-        int saltLength = localFileHeader.getExtraField().getAesExtraDataRecord().getStrength().saltLength();
-        in.seek(localFileHeader.getOffs());
+    private static byte[] getSalt(PathZipEntry entry, DataInput in) throws IOException {
+        int saltLength = entry.getStrength().saltLength();
         return in.readBytes(saltLength);
     }
 
-    private static void checkPasswordChecksum(byte[] actual, DataInput in, LocalFileHeader localFileHeader) throws IOException {
-        int saltLength = localFileHeader.getExtraField().getAesExtraDataRecord().getStrength().saltLength();
-        in.seek(localFileHeader.getOffs() + saltLength);
+    private static void checkPasswordChecksum(byte[] actual, PathZipEntry entry, DataInput in) throws IOException {
         byte[] expected = in.readBytes(PASSWORD_CHECKSUM_SIZE);
 
         if (!ArrayUtils.isEquals(expected, actual))
-            throw new Zip4jIncorrectPasswordException(localFileHeader.getFileName());
+            throw new Zip4jIncorrectPasswordException(entry.getFileName());
     }
 
     private void checkMessageAuthenticationCode(DataInput in) throws IOException {

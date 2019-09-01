@@ -40,7 +40,7 @@ public class ZipFilesNoSplitTest {
     @Test
     public void shouldCreateNewZipWithFiles() throws IOException, Zip4jException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compressionMethod(Compression.DEFLATE)
+                                                .compression(Compression.DEFLATE)
                                                 .compressionLevel(CompressionLevel.NORMAL)
                                                 .defaultFolderPath(Zip4jSuite.srcDir).build();
 

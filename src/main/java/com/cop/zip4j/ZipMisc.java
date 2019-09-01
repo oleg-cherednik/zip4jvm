@@ -1,13 +1,12 @@
 package com.cop.zip4j;
 
-import com.cop.zip4j.io.writers.ZipModelWriter;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.io.out.DataOutputStreamDecorator;
 import com.cop.zip4j.io.out.SingleZipOutputStream;
-import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.ZipModel;
-import com.cop.zip4j.utils.CreateZipModel;
+import com.cop.zip4j.model.builders.ZipModelBuilder;
+import com.cop.zip4j.model.entry.PathZipEntry;
 import com.cop.zip4j.utils.RemoveEntryFunc;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.Builder;
@@ -22,6 +21,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -42,73 +42,84 @@ public final class ZipMisc {
     private final Charset charset = StandardCharsets.UTF_8;
     private final char[] password;
 
-    public void clearComment() throws Zip4jException {
+    public void clearComment() throws IOException {
         setComment(null);
     }
 
-    public void setComment(String comment) throws Zip4jException {
+    public void setComment(String comment) throws IOException {
         comment = ZipUtils.normalizeComment.apply(comment);
         UnzipIt.checkZipFile(zipFile);
 
-        ZipModel zipModel = new CreateZipModel(zipFile, charset).get().noSplitOnly();
-        zipModel.getEndCentralDirectory().setComment(comment);
+        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile, charset).noSplitOnly();
+        zipModel.setComment(comment);
 
         try (SingleZipOutputStream out = SingleZipOutputStream.create(zipModel)) {
-            out.seek(zipModel.getOffsCentralDirectory());
-            new ZipModelWriter(zipModel).finalizeZipFile(out, false);
+            out.seek(zipModel.getCentralDirectoryOffs());
         } catch(Exception e) {
             throw new Zip4jException(e);
         }
     }
 
-    public String getComment() throws Zip4jException {
+    public String getComment() throws IOException {
         UnzipIt.checkZipFile(zipFile);
-        return new CreateZipModel(zipFile, charset).get().getEndCentralDirectory().getComment();
+        return ZipModelBuilder.readOrCreate(zipFile, charset).getComment();
     }
 
-    public boolean isEncrypted() {
+    public boolean isEncrypted() throws IOException {
         UnzipIt.checkZipFile(zipFile);
-        ZipModel zipModel = new CreateZipModel(zipFile, charset).get();
+        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile, charset);
 
-        return zipModel.getFileHeaders().stream()
-                       .anyMatch(CentralDirectory.FileHeader::isEncrypted);
+        return zipModel.getEntries().stream()
+                       .anyMatch(PathZipEntry::isEncrypted);
     }
 
-    public List<String> getEntryNames() throws Zip4jException {
+    public List<String> getEntryNames() throws IOException {
         UnzipIt.checkZipFile(zipFile);
-        return new CreateZipModel(zipFile, charset).get().getEntryNames();
+        return ZipModelBuilder.readOrCreate(zipFile, charset).getEntryNames();
     }
 
-    public List<Path> getFiles() throws Zip4jException {
+    public List<Path> getFiles() throws IOException {
         UnzipIt.checkZipFile(zipFile);
-        ZipModel zipModel = new CreateZipModel(zipFile, charset).get();
+        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile, charset);
 
-        return IntStream.rangeClosed(0, zipModel.getEndCentralDirectory().getSplitParts())
+        return IntStream.rangeClosed(0, zipModel.getTotalDisks())
                         .mapToObj(i -> i == 0 ? zipModel.getZipFile() : ZipModel.getSplitFilePath(zipFile, i))
                         .collect(Collectors.toList());
     }
 
-    public boolean isSplit() throws Zip4jException {
+    public boolean isSplit() throws IOException {
         UnzipIt.checkZipFile(zipFile);
-        return new CreateZipModel(zipFile, charset).get().isSplitArchive();
+        return ZipModelBuilder.readOrCreate(zipFile, charset).isSplit();
     }
 
-    public void merge(@NonNull Path dstZipFile) {
-        ZipModel zipModel = new CreateZipModel(zipFile, charset).get();
+    public void removeEntry(@NonNull String entryName) throws IOException {
+        removeEntries(Collections.singletonList(entryName));
+    }
+
+    public void removeEntries(@NonNull Collection<String> entries) throws IOException {
+        UnzipIt.checkZipFile(zipFile);
+
+        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile, charset).noSplitOnly();
+        new RemoveEntryFunc(zipModel).accept(entries);
+    }
+
+    // --------- MergeSplitZip
+
+    public void merge(@NonNull Path destZipFile) throws IOException {
+        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile, charset);
 
         // TODO probably if not split archive, just copy single zip file
-        if (!zipModel.isSplitArchive())
+        if (!zipModel.isSplit())
             throw new Zip4jException("archive not a split zip file");
 
         try {
-            Files.createDirectories(dstZipFile.getParent());
+            Files.createDirectories(destZipFile.getParent());
         } catch(IOException e) {
             throw new Zip4jException(e);
         }
 
-        try (DataOutput out = SingleZipOutputStream.create(dstZipFile, zipModel)) {
-            zipModel.convertToSolid(copyAllParts(new DataOutputStreamDecorator(out), zipModel));
-            new ZipModelWriter(zipModel).finalizeZipFile(out, false);
+        try (DataOutput out = SingleZipOutputStream.create(destZipFile, zipModel)) {
+            convertToSolid(copyAllParts(new DataOutputStreamDecorator(out), zipModel), zipModel);
         } catch(Zip4jException e) {
             throw e;
         } catch(Exception e) {
@@ -116,28 +127,30 @@ public final class ZipMisc {
         }
     }
 
-    private static long[] copyAllParts(@NonNull OutputStream out, @NonNull ZipModel zipModel) throws IOException {
-        int noOfDisk = zipModel.getEndCentralDirectory().getSplitParts();
-        long[] fileSizeList = new long[noOfDisk + 1];
+    private static void convertToSolid(long[] fileSizeList, ZipModel zipModel) {
+        long offs = Arrays.stream(fileSizeList).sum();
 
-        for (int i = 0; i <= noOfDisk; i++) {
-            try (InputStream in = new FileInputStream(zipModel.getPartFile(i + 1).toFile())) {
-                fileSizeList[i] = IOUtils.copyLarge(in, out, 0, i == noOfDisk ? zipModel.getOffsCentralDirectory() : zipModel.getSplitLength());
+        zipModel.getEntries().forEach(entry -> {
+            entry.setLocalFileHeaderOffs(entry.getLocalFileHeaderOffs() + Arrays.stream(fileSizeList, 0, entry.getDisc()).sum());
+            entry.setDisc(0);
+        });
+
+        zipModel.setSplitSize(ZipModel.NO_SPLIT);
+        zipModel.setCentralDirectoryOffs(zipModel.getCentralDirectoryOffs() + offs);
+    }
+
+    private static long[] copyAllParts(@NonNull OutputStream out, @NonNull ZipModel zipModel) throws IOException {
+        int totalSplitParts = zipModel.getTotalDisks();
+        long[] fileSizeList = new long[totalSplitParts + 1];
+
+        for (int i = 0; i <= totalSplitParts; i++) {
+            try (InputStream in = new FileInputStream(zipModel.getPartFile(i).toFile())) {
+                fileSizeList[i] = IOUtils.copyLarge(in, out, 0,
+                        i == totalSplitParts ? zipModel.getCentralDirectoryOffs() : zipModel.getSplitSize());
             }
         }
 
         return fileSizeList;
-    }
-
-    public void removeEntry(@NonNull String entryName) {
-        removeEntries(Collections.singletonList(entryName));
-    }
-
-    public void removeEntries(@NonNull Collection<String> entries) {
-        UnzipIt.checkZipFile(zipFile);
-
-        ZipModel zipModel = new CreateZipModel(zipFile, charset).get().noSplitOnly();
-        new RemoveEntryFunc(zipModel).accept(entries);
     }
 
 }

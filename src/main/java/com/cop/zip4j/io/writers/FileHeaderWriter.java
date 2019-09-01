@@ -2,8 +2,7 @@ package com.cop.zip4j.io.writers;
 
 import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.model.CentralDirectory;
-import com.cop.zip4j.model.CompressionMethod;
-import com.cop.zip4j.model.ZipModel;
+import com.cop.zip4j.model.Zip64;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -38,16 +37,16 @@ final class FileHeaderWriter {
         out.writeWord(fileHeader.getGeneralPurposeFlag().getAsInt());
         out.writeWord(fileHeader.getCompressionMethod().getCode());
         out.writeDword(fileHeader.getLastModifiedTime());
-        out.writeDword(fileHeader.getCompressionMethod() == CompressionMethod.AES_ENC ? 0 : fileHeader.getCrc32());
-        out.writeDword(fileHeader.isWriteZip64FileSize() ? ZipModel.ZIP_64_LIMIT : fileHeader.getCompressedSize());
-        out.writeDword(fileHeader.isWriteZip64FileSize() ? ZipModel.ZIP_64_LIMIT : fileHeader.getUncompressedSize());
+        out.writeDword(fileHeader.getCrc32());
+        out.writeDword(fileHeader.getCompressedSize());
+        out.writeDword(fileHeader.getUncompressedSize());
         out.writeWord(fileName.length);
-        out.writeWord(fileHeader.getExtraField().getLength());
+        out.writeWord(fileHeader.getExtraField().getSize());
         out.writeWord(fileComment.length);
         out.writeWord(fileHeader.getDiskNumber());
         out.writeBytes(fileHeader.getInternalFileAttributes().get());
         out.writeBytes(fileHeader.getExternalFileAttributes().get());
-        out.writeDword(fileHeader.isWriteZip64OffsetLocalHeader() ? ZipModel.ZIP_64_LIMIT : fileHeader.getOffsLocalFileHeader());
+        out.writeDword(fileHeader.isWriteZip64OffsetLocalHeader() ? Zip64.LIMIT : fileHeader.getOffsLocalFileHeader());
         out.writeBytes(fileName);
         new ExtraFieldWriter(fileHeader.getExtraField(), charset).write(out);
         out.writeBytes(fileComment);

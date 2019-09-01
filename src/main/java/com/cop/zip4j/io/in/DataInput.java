@@ -11,13 +11,13 @@ public interface DataInput extends Closeable {
 
     long getOffs();
 
-    int readWord() throws IOException;
-
-    default int readDword() throws IOException {
-        return (int)readDwordLong();
+    default int readSignature() throws IOException {
+        return (int)readDword();
     }
 
-    long readDwordLong() throws IOException;
+    int readWord() throws IOException;
+
+    long readDword() throws IOException;
 
     long readQword() throws IOException;
 
