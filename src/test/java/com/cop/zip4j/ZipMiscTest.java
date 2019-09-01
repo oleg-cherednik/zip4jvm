@@ -9,6 +9,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -139,4 +140,27 @@ public class ZipMiscTest {
 //        // TODO it's not working under gradle build
 //        assertThatZipFile(mergeZipFle).exists().rootEntry().matches(TestUtils.zipRootDirAssert);
 //    }
+
+    public void shouldIgnoreDirEntryWhenDirIsNotEmpty() throws IOException {
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compression(Compression.STORE)
+                                                .defaultFolderPath(Zip4jSuite.srcDir).build();
+
+        Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
+        zip.add(Zip4jSuite.srcDir, parameters);
+
+        ZipMisc zipMisc = ZipMisc.builder()
+                                 .zipFile(zipFile)
+                                 .charset(StandardCharsets.UTF_8)
+                                 .build();
+                 // http://www.artpol-software.com/ZipArchive/KB/0610051629.aspx
+        List<String> entryNames = zipMisc.getEntryNames();
+        assertThat(entryNames).doesNotContain("cars/");
+        assertThat(entryNames).hasSize(14);
+
+        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatZipFile(zipFile).exists().rootEntry().hasSubDirectories(1).hasFiles(0);
+        assertThatZipFile(zipFile).directory("cars/").matches(TestUtils.zipCarsDirAssert);
+    }
 }

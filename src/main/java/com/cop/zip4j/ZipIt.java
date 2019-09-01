@@ -39,6 +39,8 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -98,12 +100,34 @@ public final class ZipIt {
 
     @NonNull
     private static List<PathZipEntry> createEntries(@NonNull Collection<Path> paths) {
+        paths = getUniqueRecursivePaths(paths);
+        Set<Path> emptyDirectories = getEmptyDirectories(paths);
+
+        return paths.stream()
+                    .filter(path -> Files.isRegularFile(path) || emptyDirectories.contains(path))
+                    .map(ZipEntry::of)
+                    .distinct()
+                    .collect(Collectors.toList());
+    }
+
+    private static Set<Path> getUniqueRecursivePaths(Collection<Path> paths) {
         return paths.stream()
                     .filter(path -> Files.isRegularFile(path) || Files.isDirectory(path))
                     .map(path -> Files.isDirectory(path) ? getDirectoryEntries(path) : Collections.singleton(path))
                     .flatMap(Collection::stream)
-                    .map(ZipEntry::of)
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toSet());
+    }
+
+    private static Set<Path> getEmptyDirectories(Collection<Path> paths) {
+        final Predicate<Path> emptyDirectory = path -> {
+            int pathLength = path.toAbsolutePath().toString().length();
+            return paths.stream().noneMatch(p -> p.startsWith(path) && p.toAbsolutePath().toString().length() > pathLength);
+        };
+
+        return paths.stream()
+                    .filter(Files::isDirectory)
+                    .filter(emptyDirectory)
+                    .collect(Collectors.toSet());
     }
 
     @NonNull
