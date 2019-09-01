@@ -123,5 +123,37 @@ public class Zip64Test {
         assertThatDirectory(dstDir).matches(TestUtils.dirAssert);
     }
 
+    @Test
+    public void shouldUseZip64WhenTotalEntriesOver65535() throws IOException {
+        Path dir = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("data");
+        createData(dir);
+
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compression(Compression.STORE)
+                                                .defaultFolderPath(Zip4jSuite.srcDir).build();
+
+        Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
+        zip.add(Zip4jSuite.filesCarsDir, parameters);
+
+
+
+
+        zipFile2 = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        ZipIt zipIt = ZipIt.builder().zipFile(zipFile2).build();
+        zipIt.add(Zip4jSuite.srcDir, parameters);
+
+        // TODO it seems it could be checked with commons-compress
+//        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+//        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
+    }
+
+    /**
+     * Create 65_535 + 1 entries under {@code root} directory
+     */
+    private static void createData(Path root) {
+
+    }
+
 
 }
