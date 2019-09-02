@@ -17,11 +17,7 @@ import java.util.stream.Collectors;
 
 /**
  * zip64:
- * 1. Size of archive is over 4Gb (2^32)
- * 2. Total entries is over 65535 (2^16 - 1)
- *
  * <ul>
- * zip64:
  * <li>Number of Files Inside an Archive - 65,535 <b>(implemented)</b></li>
  * <li>Size of a File Inside an Archive [bytes] - 4,294,967,295 <b>(implemented)</b></li>
  * <li>Size of an Archive [bytes] - 4,294,967,295 <b>(not implemented)</b></li>

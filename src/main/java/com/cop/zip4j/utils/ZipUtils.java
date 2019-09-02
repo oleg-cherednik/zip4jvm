@@ -20,7 +20,6 @@ public class ZipUtils {
     /**
      * Converts input time from Java to DOS format
      *
-     * @param time
      * @return time in DOS format
      */
     public int javaToDosTime(long time) {
@@ -39,7 +38,6 @@ public class ZipUtils {
     /**
      * Converts time in dos format to Java format
      *
-     * @param dosTime
      * @return time in java format
      */
     public static long dosToJavaTme(int dosTime) {

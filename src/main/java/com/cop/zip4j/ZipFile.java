@@ -9,9 +9,9 @@ import java.nio.file.Path;
 
 /**
  * ZipFile real-time implementation.
- * <p>
- * <ul>
+ * <br>
  * When create new instance of this class:
+ * <ul>
  * <li><i>zip file exists</i> - open zip archive</li>
  * <li><i>zip file not exists</i> - create new empty zip archive</li>
  * </ul>

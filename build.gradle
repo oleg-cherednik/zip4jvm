@@ -1,9 +1,22 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
+    }
+}
+
 plugins {
     id 'java'
     id 'application'
+    id 'jacoco'
     id 'io.franzbecker.gradle-lombok' version '1.14'
-//    id 'jacoco'
+    id 'io.codearte.nexus-staging' version '0.11.0'
 }
+
+apply plugin: 'com.bmuschko.nexus'
 
 repositories {
     mavenLocal()
@@ -47,10 +60,14 @@ jar {
     }
 }
 
-//jacoco {
-//    toolVersion = "0.8.4"
-//    reportsDir = file("$buildDir/customJacocoReportDir")
-//}
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        html.enabled true
+    }
+}
+
+check.dependsOn jacocoTestReport
 
 task fatJar(type: Jar) {
     manifest {
