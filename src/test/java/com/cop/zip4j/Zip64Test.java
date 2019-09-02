@@ -129,29 +129,31 @@ public class Zip64Test {
     @Test
     public void shouldUseZip64WhenTotalEntriesOver65535() throws IOException {
 
-        Path dir = Paths.get("d:/zip4j/tmp/data");//Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("data");
+//        Path dir = Paths.get("d:/zip4j/tmp/data/dir_00");//Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("data");
 //        createData(dir);
 
         ZipParameters parameters = ZipParameters.builder()
                                                 .compression(Compression.STORE)
-                                                .defaultFolderPath(dir).build();
+                                                .zip64(true)
+                                                .build();
 
         Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-        zip.add(dir, parameters);
-
-
-        int a = 0;
-        a++;
+        zip.add(Zip4jSuite.srcDir.resolve("Oleg Cherednik.txt"), parameters);
+//
+//
+//        int a = 0;
+//        a++;
 
 
 //        Path zipFile = Paths.get("d:/zip4j/tmp/data.zip");
+//        Path zipFile = Paths.get("d:/zip4j/tmp/winzip.zip");
 //        Path zipFile = Paths.get("d:/zip4j/foo/Zip64Test/1567417831668/shouldUseZip64WhenTotalEntriesOver65535/src.zip");
-//        UnzipIt unzipIt = UnzipIt.builder()
-//                                 .zipFile(zipFile)
-//                                 .build();
+        UnzipIt unzipIt = UnzipIt.builder()
+                                 .zipFile(zipFile)
+                                 .build();
 
-//        unzipIt.extract(Paths.get("d:/zip4j/tmp/zip64"));
+        unzipIt.extract(Paths.get("d:/zip4j/tmp/zip64"));
 
 
         // TODO it seems it could be checked with commons-compress
