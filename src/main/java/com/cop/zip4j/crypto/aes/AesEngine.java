@@ -63,11 +63,11 @@ public final class AesEngine {
         return mac.doFinal();
     }
 
-    static byte[] createKey(char[] password, byte[] salt, AesStrength strength)
-            throws NoSuchAlgorithmException, InvalidKeySpecException {
-        final int iterationCount = 1000;
+    private static final int ITERATION_COUNT = 1000;
+
+    static byte[] createKey(char[] password, byte[] salt, AesStrength strength) throws NoSuchAlgorithmException, InvalidKeySpecException {
         final int keyLength = strength.getSize() * 2 + 16;
-        PBEKeySpec keySpec = new PBEKeySpec(password, salt, iterationCount, keyLength);
+        PBEKeySpec keySpec = new PBEKeySpec(password, salt, ITERATION_COUNT, keyLength);
         return SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(keySpec).getEncoded();
     }
 
