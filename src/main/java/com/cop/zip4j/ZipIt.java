@@ -87,6 +87,8 @@ public final class ZipIt {
             entry.setPassword(parameters.getPassword());
         });
 
+        // TODO if at least one fileName is null then defaultRootPath is not correct
+
         new ZipEngine(zipModel).addEntries(entries);
     }
 

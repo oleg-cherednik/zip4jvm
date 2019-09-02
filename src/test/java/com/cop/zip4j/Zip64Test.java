@@ -133,7 +133,7 @@ public class Zip64Test {
 
         ZipParameters parameters = ZipParameters.builder()
                                                 .compression(Compression.STORE)
-                                                .defaultFolderPath(Zip4jSuite.srcDir).build();
+                                                .defaultFolderPath(dir).build();
 
         Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
