@@ -30,6 +30,9 @@ public class ZipEngine {
         if (entries.isEmpty())
             return;
 
+        if(zipModel.getEntries().size() + entries.size() > ZipModel.MAX_TOTAL_ENTRIES)
+            zipModel.setZip64(true);
+
         try (DataOutput out = createDataOutput()) {
             entries.stream()
                    .filter(entry -> !entry.isRoot())

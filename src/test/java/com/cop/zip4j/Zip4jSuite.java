@@ -26,7 +26,7 @@ import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
 public class Zip4jSuite {
 
 //    public static final Path rootDir = createTempDirectory("zip4j");
-        public static final Path rootDir = Paths.get("c:/zip4j/foo");
+        public static final Path rootDir = Paths.get("d:/zip4j/foo");
     public static final Path srcDir = rootDir.resolve("src");
 
     public static final Path carsDir = srcDir.resolve("cars");

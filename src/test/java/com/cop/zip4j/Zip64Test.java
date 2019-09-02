@@ -4,13 +4,16 @@ import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ZipParameters;
 import com.cop.zip4j.model.aes.AesStrength;
+import org.apache.commons.io.FileUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatDirectory;
 
@@ -125,8 +128,8 @@ public class Zip64Test {
 
     @Test
     public void shouldUseZip64WhenTotalEntriesOver65535() throws IOException {
-        Path dir = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("data");
-        createData(dir);
+        Path dir = Paths.get("d:/zip4j/tmp/data");//Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("data");
+//        createData(dir);
 
         ZipParameters parameters = ZipParameters.builder()
                                                 .compression(Compression.STORE)
@@ -134,14 +137,11 @@ public class Zip64Test {
 
         Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-        zip.add(Zip4jSuite.filesCarsDir, parameters);
+        zip.add(dir, parameters);
 
 
-
-
-        zipFile2 = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt zipIt = ZipIt.builder().zipFile(zipFile2).build();
-        zipIt.add(Zip4jSuite.srcDir, parameters);
+        int a = 0;
+        a++;
 
         // TODO it seems it could be checked with commons-compress
 //        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -151,7 +151,14 @@ public class Zip64Test {
     /**
      * Create 65_535 + 1 entries under {@code root} directory
      */
-    private static void createData(Path root) {
+    private static void createData(Path root) throws IOException {
+        for (int i = 1; i <= 66; i++) {
+            Path dir = root.resolve(String.format("dir_%02d", i));
+            Files.createDirectories(dir);
+
+            for (int j = 1; j <= (i == 66 ? 536 : 1000); j++)
+                FileUtils.writeStringToFile(dir.resolve(String.format("%04d.txt", j)).toFile(), "oleg_" + j, StandardCharsets.UTF_8);
+        }
 
     }
 

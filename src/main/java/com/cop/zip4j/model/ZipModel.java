@@ -33,6 +33,8 @@ public class ZipModel {
     // MIN_SPLIT_LENGTH = 64K bytes
     public static final int MIN_SPLIT_LENGTH = 64 * 1024;
 
+    public static final int MAX_TOTAL_ENTRIES = Zip64.LIMIT_INT;
+
     @NonNull
     private final Path zipFile;
     @NonNull
@@ -45,6 +47,7 @@ public class ZipModel {
     private long centralDirectoryOffs;
     private long centralDirectorySize;
 
+    /** {@literal true} only if section {@link Zip64} exists */
     private boolean zip64;
 
     private final List<PathZipEntry> entries = new ArrayList<>();

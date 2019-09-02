@@ -103,7 +103,7 @@ public final class ZipIt {
         paths = getUniqueRecursivePaths(paths);
         Set<Path> emptyDirectories = getEmptyDirectories(paths);
 
-        return paths.stream()
+        return paths.parallelStream()
                     .filter(path -> Files.isRegularFile(path) || emptyDirectories.contains(path))
                     .sorted()
                     .map(ZipEntry::of)
