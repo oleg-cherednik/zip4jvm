@@ -56,7 +56,7 @@ final class Zip64Writer {
                 return;
 
             out.writeDwordSignature(Zip64.EndCentralDirectoryLocator.SIGNATURE);
-            out.writeDword(locator.getStartDisk());
+            out.writeDword(locator.getMainDisk());
             out.writeQword(locator.getOffs());
             out.writeDword(locator.getTotalDisks());
         }

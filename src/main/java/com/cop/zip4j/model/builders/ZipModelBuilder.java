@@ -37,7 +37,7 @@ public final class ZipModelBuilder {
     private final CentralDirectory centralDirectory;
 
     @NonNull
-    // TODO do we really need it; we always know is is exists or not
+    // TODO do we really need it; we always know is it exists or not
     public static ZipModel readOrCreate(@NonNull Path zipFile, @NonNull Charset charset) throws IOException {
         return Files.exists(zipFile) ? new ZipModelReader(zipFile, charset).read() : new ZipModel(zipFile, charset);
     }

@@ -41,12 +41,13 @@ public class UnzipEngine {
     private final ZipModel zipModel;
     private final char[] password;
 
+    // TODO extract and get entires should be merged
     public void extractEntries(@NonNull Path dstDir, @NonNull Collection<String> entries) {
         getEntries(entries).forEach(entry -> extractEntry(dstDir, entry));
     }
 
     private List<PathZipEntry> getEntries(@NonNull Collection<String> entries) {
-        return entries.stream()
+        return entries.parallelStream()
                       .map(prefix -> {
                           String name = ZipUtils.normalizeFileName.apply(prefix.toLowerCase());
 

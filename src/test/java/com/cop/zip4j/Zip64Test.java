@@ -128,6 +128,7 @@ public class Zip64Test {
 
     @Test
     public void shouldUseZip64WhenTotalEntriesOver65535() throws IOException {
+
         Path dir = Paths.get("d:/zip4j/tmp/data");//Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("data");
 //        createData(dir);
 
@@ -143,6 +144,16 @@ public class Zip64Test {
         int a = 0;
         a++;
 
+
+//        Path zipFile = Paths.get("d:/zip4j/tmp/data.zip");
+//        Path zipFile = Paths.get("d:/zip4j/foo/Zip64Test/1567417831668/shouldUseZip64WhenTotalEntriesOver65535/src.zip");
+//        UnzipIt unzipIt = UnzipIt.builder()
+//                                 .zipFile(zipFile)
+//                                 .build();
+
+//        unzipIt.extract(Paths.get("d:/zip4j/tmp/zip64"));
+
+
         // TODO it seems it could be checked with commons-compress
 //        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
 //        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
@@ -152,12 +163,12 @@ public class Zip64Test {
      * Create 65_535 + 1 entries under {@code root} directory
      */
     private static void createData(Path root) throws IOException {
-        for (int i = 1; i <= 66; i++) {
+        for (int i = 0, j = 1; i <= 65; i++) {
             Path dir = root.resolve(String.format("dir_%02d", i));
             Files.createDirectories(dir);
 
-            for (int j = 1; j <= (i == 66 ? 536 : 1000); j++)
-                FileUtils.writeStringToFile(dir.resolve(String.format("%04d.txt", j)).toFile(), "oleg_" + j, StandardCharsets.UTF_8);
+            for (; j <= 1000 * i + (i == 65 ? 536 : 1000); j++)
+                FileUtils.writeStringToFile(dir.resolve(String.format("%04d.txt", j)).toFile(), "oleg", StandardCharsets.UTF_8);
         }
 
     }
