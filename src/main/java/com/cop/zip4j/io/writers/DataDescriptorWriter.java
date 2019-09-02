@@ -17,13 +17,13 @@ import java.io.IOException;
 public abstract class DataDescriptorWriter {
 
     public static DataDescriptorWriter get(boolean zip64, DataDescriptor dataDescriptor) {
-        return zip64 ? new Zip64(dataDescriptor) : new Plain(dataDescriptor);
+        return zip64 ? new Zip64(dataDescriptor) : new Standard(dataDescriptor);
     }
 
     public abstract void write(@NonNull DataOutput out) throws IOException;
 
     @RequiredArgsConstructor
-    private static final class Plain extends DataDescriptorWriter {
+    private static final class Standard extends DataDescriptorWriter {
 
         @NonNull
         private final DataDescriptor dataDescriptor;

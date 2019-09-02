@@ -17,12 +17,12 @@ import java.io.IOException;
 public abstract class DataDescriptorReader {
 
     public static DataDescriptorReader get(boolean zip64) {
-        return zip64 ? new Zip64() : new Plain();
+        return zip64 ? new Zip64() : new Standard();
     }
 
     public abstract DataDescriptor read(@NonNull DataInput in) throws IOException;
 
-    private static final class Plain extends DataDescriptorReader {
+    private static final class Standard extends DataDescriptorReader {
 
         @Override
         public DataDescriptor read(@NonNull DataInput in) throws IOException {

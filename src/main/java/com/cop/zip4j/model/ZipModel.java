@@ -19,6 +19,16 @@ import java.util.stream.Collectors;
  * zip64:
  * 1. Size of archive is over 4Gb (2^32)
  * 2. Total entries is over 65535 (2^16 - 1)
+ *
+ * <ul>
+ * zip64:
+ * <li>Number of Files Inside an Archive - 65,535 <b>(implemented)</b></li>
+ * <li>Size of a File Inside an Archive [bytes] - 4,294,967,295 <b>(implemented)</b></li>
+ * <li>Size of an Archive [bytes] - 4,294,967,295 <b>(not implemented)</b></li>
+ * <li>Number of Segments in a Segmented Archive - 999 (spanning), 65,535 (splitting) <b>(not implemented)</b></li>
+ * <li>Central Directory Size [bytes] - 4,294,967,295 <b>(not implemented)</b></li>
+ * </ul>
+ * <p>
  * http://www.artpol-software.com/ZipArchive/KB/0610051629.aspx#limits
  *
  * @author Oleg Cherednik
@@ -34,6 +44,7 @@ public class ZipModel {
     public static final int MIN_SPLIT_LENGTH = 64 * 1024;
 
     public static final int MAX_TOTAL_ENTRIES = Zip64.LIMIT_INT;
+    public static final long MAX_ENTRY_SIZE = Zip64.LIMIT;
 
     @NonNull
     private final Path zipFile;
