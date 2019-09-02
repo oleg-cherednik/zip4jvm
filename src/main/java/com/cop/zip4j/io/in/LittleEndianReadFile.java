@@ -1,6 +1,7 @@
 package com.cop.zip4j.io.in;
 
 import com.cop.zip4j.utils.CreateStringFunc;
+import com.cop.zip4j.utils.ZipUtils;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -58,6 +59,8 @@ public class LittleEndianReadFile implements DataInput {
 
     @Override
     public String readString(int length) throws IOException {
+        ZipUtils.requirePositive(length, "readString");
+
         if (length <= 0)
             return null;
 
@@ -73,6 +76,8 @@ public class LittleEndianReadFile implements DataInput {
 
     @Override
     public byte[] readBytes(int total) throws IOException {
+        ZipUtils.requirePositive(total, "readBytes");
+
         if (total <= 0)
             return null;
 

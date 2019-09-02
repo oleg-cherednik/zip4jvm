@@ -39,7 +39,7 @@ public final class Zip64Builder {
 
     private Zip64.EndCentralDirectory createEndCentralDirectory() {
         Zip64.EndCentralDirectory endCentralDirectory = new Zip64.EndCentralDirectory();
-        endCentralDirectory.setSize(Zip64.EndCentralDirectory.SIZE + endCentralDirectory.getEndCentralDirectorySize());
+        endCentralDirectory.setEndCentralDirectorySize(getEndCentralDirectorySize());
         endCentralDirectory.setVersionMadeBy(CentralDirectory.FileHeader.VERSION);
         endCentralDirectory.setVersionNeededToExtract(CentralDirectory.FileHeader.VERSION);
         endCentralDirectory.setDisk(zipModel.getTotalDisks());
@@ -48,6 +48,7 @@ public final class Zip64Builder {
         endCentralDirectory.setTotalEntries(zipModel.getEntries().size());
         endCentralDirectory.setSize(zipModel.getCentralDirectorySize());
         endCentralDirectory.setCentralDirectoryOffs(zipModel.getCentralDirectoryOffs());
+        endCentralDirectory.setExtensibleDataSector(new byte[getExtensibleDataSectorSize()]);
         return endCentralDirectory;
     }
 
@@ -58,6 +59,16 @@ public final class Zip64Builder {
                                 .count();
 
         return zipModel.getEntries().size();
+    }
+
+    /** see 4.3.14.1 */
+    private static long getEndCentralDirectorySize() {
+        return Zip64.EndCentralDirectory.SIZE + getExtensibleDataSectorSize();
+    }
+
+    /** see 4.4.27 */
+    private static int getExtensibleDataSectorSize() {
+        return 0;
     }
 
 }

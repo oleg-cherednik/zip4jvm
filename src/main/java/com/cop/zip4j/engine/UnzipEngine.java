@@ -41,7 +41,7 @@ public class UnzipEngine {
     private final ZipModel zipModel;
     private final char[] password;
 
-    // TODO extract and get entires should be merged
+    // TODO extract and get entries should be merged
     public void extractEntries(@NonNull Path dstDir, @NonNull Collection<String> entries) {
         getEntries(entries).forEach(entry -> extractEntry(dstDir, entry));
     }
