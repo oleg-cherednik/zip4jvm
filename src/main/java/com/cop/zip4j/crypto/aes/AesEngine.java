@@ -34,7 +34,7 @@ public final class AesEngine {
     private int nonce = BLOCK_SIZE;
 
     /**
-     * Custom implementation (com.sun.crypto.provider.CounterMode) of 'AES/CTR/NoPadding' is not compatible with WinZip specification.
+     * Sun implementation (com.sun.crypto.provider.CounterMode) of 'AES/CTR/NoPadding' is not compatible with WinZip specification.
      * Have to implement custom one.
      */
     public void cypherUpdate(byte[] buf, int offs, int len) throws ShortBufferException {
