@@ -30,6 +30,7 @@ public abstract class ZipEntry {
         if (Files.isRegularFile(path)) {
             try {
                 long size = Files.size(path);
+                // TODO it's slow for big files and should be postponed
                 long checksum = FileUtils.checksumCRC32(path.toFile());
                 int lastModifiedTime = ZipUtils.javaToDosTime(Files.getLastModifiedTime(path).toMillis());
                 return new RegularFileZipEntry(path, size, checksum, lastModifiedTime);

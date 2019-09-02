@@ -150,6 +150,30 @@ public class Zip64Test {
 //        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
     }
 
+//    @Test
+    public void shouldUseZip64WhenZipFileOver3Gb() throws IOException {
+//        Path dir = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("data");
+//        createData(dir);
+
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compression(Compression.STORE)
+                                                .build();
+
+        Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
+        zip.add(Paths.get("d:/zip4j/ferdinand.mkv"), parameters);
+
+
+//        UnzipIt unzipIt = UnzipIt.builder()
+//                                 .zipFile(zipFile)
+//                                 .build();
+//
+//        unzipIt.extract(Paths.get("d:/zip4j/tmp/zip64"));
+
+//        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+//        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
+    }
+
     /**
      * Create 65_535 + 1 entries under {@code root} directory
      */
