@@ -5,6 +5,8 @@ import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.Encryption;
+import com.cop.zip4j.model.ExternalFileAttributes;
+import com.cop.zip4j.model.InternalFileAttributes;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.aes.AesStrength;
@@ -101,6 +103,16 @@ public abstract class PathZipEntry extends ZipEntry {
     @Override
     public String toString() {
         return path.toAbsolutePath().toString();
+    }
+
+    public ExternalFileAttributes getExternalFileAttribute() throws IOException {
+        ExternalFileAttributes attributes = ExternalFileAttributes.createOperationBasedDelegate();
+        attributes.readFrom(path);
+        return attributes;
+    }
+
+    public InternalFileAttributes getInternalFileAttributes() throws IOException {
+        return InternalFileAttributes.create();
     }
 
 }

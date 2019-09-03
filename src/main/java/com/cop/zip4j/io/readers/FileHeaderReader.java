@@ -54,14 +54,26 @@ final class FileHeaderReader {
         int extraFieldLength = in.readWord();
         int fileCommentLength = in.readWord();
         fileHeader.setDisk(in.readWord());
-        fileHeader.setInternalFileAttributes(InternalFileAttributes.read(in));
-        fileHeader.setExternalFileAttributes(ExternalFileAttributes.read(in));
+        fileHeader.setInternalFileAttributes(getInternalFileAttribute(in.readBytes(InternalFileAttributes.SIZE)));
+        fileHeader.setExternalFileAttributes(getExternalFileAttribute(in.readBytes(ExternalFileAttributes.SIZE)));
         fileHeader.setOffsLocalFileHeader(in.readDword());
         fileHeader.setFileName(ZipUtils.normalizeFileName.apply(in.readString(fileNameLength)));
         fileHeader.setExtraField(getExtraFieldReader(extraFieldLength, fileHeader).read(in));
         fileHeader.setFileComment(in.readString(fileCommentLength));
 
         return fileHeader;
+    }
+
+    @SuppressWarnings("MethodCanBeVariableArityMethod")
+    private static InternalFileAttributes getInternalFileAttribute(byte[] data) {
+        return InternalFileAttributes.create(data);
+    }
+
+    @SuppressWarnings("MethodCanBeVariableArityMethod")
+    private static ExternalFileAttributes getExternalFileAttribute(byte[] data) {
+        ExternalFileAttributes attributes = ExternalFileAttributes.createDataBasedDelegate(data);
+        attributes.readFrom(data);
+        return attributes;
     }
 
     private static ExtraFieldReader getExtraFieldReader(int size, CentralDirectory.FileHeader fileHeader) {

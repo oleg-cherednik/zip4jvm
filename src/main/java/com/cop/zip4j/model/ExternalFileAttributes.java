@@ -1,11 +1,8 @@
 package com.cop.zip4j.model;
 
-import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.utils.BitUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import org.apache.commons.lang.ArrayUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -42,44 +39,28 @@ import static java.nio.file.attribute.PosixFilePermission.OWNER_WRITE;
  * @since 16.08.2019
  */
 @SuppressWarnings("MethodCanBeVariableArityMethod")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consumer<Path> {
 
-    public static final ExternalFileAttributes NULL = new UnknownFileAttribute();
+    public static final ExternalFileAttributes NULL = new Unknown();
+    public static final int SIZE = 4;
 
-    private static final int SIZE = 4;
-
-    public static ExternalFileAttributes of(@NonNull Path path) throws IOException {
-        ExternalFileAttributes delegate = createDelegate(null).get();
-
-        // TODO temporary
-        if (!Files.exists(path))
-            return delegate;
-
-        delegate.readFrom(path);
-        return delegate;
-    }
-
-    public static ExternalFileAttributes read(@NonNull DataInput in) throws IOException {
-        byte[] data = in.readBytes(SIZE);
-        ExternalFileAttributes delegate = createDelegate(data).get();
-        delegate.readFrom(data);
-        return delegate;
-    }
-
-    private static Supplier<ExternalFileAttributes> createDelegate(byte[] data) {
-        int length = ArrayUtils.getLength(data);
-
-        if (length != 0 && length != SIZE)
-            return () -> NULL;
-
+    public static ExternalFileAttributes createOperationBasedDelegate() {
         String os = System.getProperty("os.name").toLowerCase();
 
         if (os.contains("win"))
-            return () -> WindowsFileAttribute.create(data);
+            return new Windows();
         if (os.contains("mac") || os.contains("nux"))
-            return () -> PosixFileAttribute.create(data);
-        return () -> NULL;
+            return new Posix();
+        return NULL;
+    }
+
+    public static ExternalFileAttributes createDataBasedDelegate(byte[] data) {
+        if (Windows.isValid(data))
+            return new Windows();
+        if (Posix.isValid(data))
+            return new Posix();
+        return NULL;
     }
 
     @Override
@@ -97,22 +78,22 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consum
         }
     }
 
-    protected abstract void readFrom(Path path) throws IOException;
+    public abstract void readFrom(Path path) throws IOException;
 
-    protected abstract void readFrom(byte[] data);
+    public abstract void readFrom(byte[] data);
 
     protected abstract void saveToRowData(byte[] data);
 
     protected abstract void applyToPath(Path path) throws IOException;
 
-    private static class UnknownFileAttribute extends ExternalFileAttributes {
+    private static class Unknown extends ExternalFileAttributes {
 
         @Override
-        protected void readFrom(Path path) throws IOException {
+        public void readFrom(Path path) throws IOException {
         }
 
         @Override
-        protected void readFrom(byte[] data) {
+        public void readFrom(byte[] data) {
         }
 
         @Override
@@ -130,21 +111,19 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consum
 
     }
 
-    private static class WindowsFileAttribute extends ExternalFileAttributes {
+    private static class Windows extends ExternalFileAttributes {
 
         private boolean readOnly;
         private boolean hidden;
         private boolean system;
         private boolean archive;
 
-        public static ExternalFileAttributes create(byte[] data) {
-            if (data == null || data[0] != 0)
-                return new WindowsFileAttribute();
-            return NULL;
+        public static boolean isValid(byte[] data) {
+            return data[0] != 0;
         }
 
         @Override
-        protected void readFrom(Path path) throws IOException {
+        public void readFrom(Path path) throws IOException {
             DosFileAttributes dos = Files.getFileAttributeView(path, DosFileAttributeView.class).readAttributes();
             readOnly = dos.isReadOnly();
             hidden = dos.isHidden();
@@ -153,7 +132,7 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consum
         }
 
         @Override
-        protected void readFrom(byte[] data) {
+        public void readFrom(byte[] data) {
             readOnly = BitUtils.isBitSet(data[0], BIT0);
             hidden = BitUtils.isBitSet(data[0], BIT1);
             system = BitUtils.isBitSet(data[0], BIT2);
@@ -178,7 +157,7 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consum
         }
     }
 
-    private static class PosixFileAttribute extends ExternalFileAttributes {
+    private static class Posix extends ExternalFileAttributes {
 
         private boolean othersExecute;
         private boolean othersWrite;
@@ -192,18 +171,12 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consum
         private boolean directory;
         private boolean regularFile;
 
-        public static ExternalFileAttributes create() {
-            return new PosixFileAttribute();
-        }
-
-        public static ExternalFileAttributes create(byte[] data) {
-            if (data == null || data[2] != 0 || data[3] != 0)
-                return new PosixFileAttribute();
-            return NULL;
+        public static boolean isValid(byte[] data) {
+            return data[0] != 0 || data[2] != 0 && data[3] != 0;
         }
 
         @Override
-        protected void readFrom(Path path) throws IOException {
+        public void readFrom(Path path) throws IOException {
             Set<PosixFilePermission> permissions = Files.getFileAttributeView(path, PosixFileAttributeView.class).readAttributes().permissions();
 
             othersExecute = permissions.contains(OTHERS_EXECUTE);
@@ -220,7 +193,7 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consum
         }
 
         @Override
-        protected void readFrom(byte[] data) {
+        public void readFrom(byte[] data) {
             othersExecute = BitUtils.isBitSet(data[2], BIT0);
             othersWrite = BitUtils.isBitSet(data[2], BIT1);
             othersRead = BitUtils.isBitSet(data[2], BIT2);

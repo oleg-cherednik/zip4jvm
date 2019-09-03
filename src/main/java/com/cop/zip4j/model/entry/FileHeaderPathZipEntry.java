@@ -3,6 +3,7 @@ package com.cop.zip4j.model.entry;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.Encryption;
+import com.cop.zip4j.model.ExternalFileAttributes;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.Getter;
@@ -25,6 +26,7 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
 
     private final long uncompressedSize;
     private final boolean dir;
+    private final ExternalFileAttributes externalFileAttributes;
 
     private long compressedSize;
     private long checksum;
@@ -35,6 +37,7 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
         uncompressedSize = getUncompressedSize(fileHeader);
         checksum = fileHeader.getCrc32();
         dir = ZipUtils.isDirectory(fileHeader.getFileName());
+        externalFileAttributes = fileHeader.getExternalFileAttributes();
 
         setZip64(fileHeader.isZip64());
         setEncryption(fileHeader.getEncryption());
@@ -119,5 +122,10 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
     @Override
     public long write(OutputStream out) throws IOException {
         return 0;
+    }
+
+    @Override
+    public ExternalFileAttributes getExternalFileAttribute() throws IOException {
+        return externalFileAttributes;
     }
 }

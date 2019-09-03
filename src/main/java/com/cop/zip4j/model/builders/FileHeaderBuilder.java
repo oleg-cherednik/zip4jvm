@@ -2,10 +2,8 @@ package com.cop.zip4j.model.builders;
 
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Encryption;
-import com.cop.zip4j.model.ExternalFileAttributes;
 import com.cop.zip4j.model.ExtraField;
 import com.cop.zip4j.model.GeneralPurposeFlag;
-import com.cop.zip4j.model.InternalFileAttributes;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.entry.PathZipEntry;
@@ -41,8 +39,8 @@ final class FileHeaderBuilder {
         fileHeader.setUncompressedSize(getSize(entry.getUncompressedSize()));
         fileHeader.setFileCommentLength(0);
         fileHeader.setDisk(getDisk());
-        fileHeader.setInternalFileAttributes(InternalFileAttributes.of(entry.getPath()));
-        fileHeader.setExternalFileAttributes(ExternalFileAttributes.of(entry.getPath()));
+        fileHeader.setInternalFileAttributes(entry.getInternalFileAttributes());
+        fileHeader.setExternalFileAttributes(entry.getExternalFileAttribute());
         fileHeader.setOffsLocalFileHeader(entry.getLocalFileHeaderOffs());
         fileHeader.setExtraField(createExtraField());
         fileHeader.setFileComment(null);
