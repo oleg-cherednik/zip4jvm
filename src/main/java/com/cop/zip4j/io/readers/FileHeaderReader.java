@@ -66,7 +66,7 @@ final class FileHeaderReader {
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")
     private static InternalFileAttributes getInternalFileAttribute(byte[] data) {
-        return InternalFileAttributes.create(data);
+        return InternalFileAttributes.createDataBasedDelegate(data);
     }
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")

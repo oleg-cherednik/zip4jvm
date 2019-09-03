@@ -112,7 +112,7 @@ public abstract class PathZipEntry extends ZipEntry {
     }
 
     public InternalFileAttributes getInternalFileAttributes() throws IOException {
-        return InternalFileAttributes.create();
+        return InternalFileAttributes.NULL;
     }
 
 }

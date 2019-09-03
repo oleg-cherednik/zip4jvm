@@ -21,13 +21,11 @@ public class InternalFileAttributes implements Supplier<byte[]>, Consumer<Path> 
 
     private final byte[] data;
 
-    public static InternalFileAttributes create() {
-        return new InternalFileAttributes(new byte[SIZE]);
-    }
-
     @SuppressWarnings("MethodCanBeVariableArityMethod")
-    public static InternalFileAttributes create(@NonNull byte[] data) {
-        return new InternalFileAttributes(ArrayUtils.clone(data));
+    public static InternalFileAttributes createDataBasedDelegate(@NonNull byte[] data) {
+        if (ArrayUtils.isEmpty(data) || (data[0] == 0 && data[1] == 0))
+            return NULL;
+        return new InternalFileAttributes(data);
     }
 
     @Override
@@ -37,5 +35,10 @@ public class InternalFileAttributes implements Supplier<byte[]>, Consumer<Path> 
     @Override
     public byte[] get() {
         return ArrayUtils.clone(data);
+    }
+
+    @Override
+    public String toString() {
+        return this == NULL ? "<null>" : "internal";
     }
 }
