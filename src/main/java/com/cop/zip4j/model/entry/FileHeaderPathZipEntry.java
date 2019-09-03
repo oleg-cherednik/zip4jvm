@@ -31,7 +31,7 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
     private long compressedSize;
 
     public FileHeaderPathZipEntry(CentralDirectory.FileHeader fileHeader) {
-        super(null, fileHeader.getLastModifiedTime());
+        super(fileHeader.getLastModifiedTime());
         uncompressedSize = getUncompressedSize(fileHeader);
         checksum = fileHeader.getCrc32();
         compressedSize = getCompressedSize(fileHeader);

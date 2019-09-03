@@ -2,6 +2,7 @@ package com.cop.zip4j.model.entry;
 
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.Encryption;
+import com.cop.zip4j.model.ExternalFileAttributes;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.NonNull;
 import org.apache.commons.lang.StringUtils;
@@ -16,8 +17,11 @@ import java.nio.file.Path;
  */
 public class DirectoryZipEntry extends PathZipEntry {
 
+    private final Path dir;
+
     public DirectoryZipEntry(Path dir, int lastModifiedTime) {
-        super(dir, lastModifiedTime);
+        super(lastModifiedTime);
+        this.dir = dir;
     }
 
     @Override
@@ -61,6 +65,13 @@ public class DirectoryZipEntry extends PathZipEntry {
     @Override
     public boolean isDirectory() {
         return true;
+    }
+
+    @Override
+    public ExternalFileAttributes getExternalFileAttributes() throws IOException {
+        ExternalFileAttributes attributes = ExternalFileAttributes.createOperationBasedDelegate();
+        attributes.readFrom(dir);
+        return attributes;
     }
 
     @Override

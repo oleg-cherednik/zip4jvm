@@ -2,6 +2,7 @@ package com.cop.zip4j.model.entry;
 
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.Encryption;
+import com.cop.zip4j.model.ExternalFileAttributes;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -23,13 +24,15 @@ public class RegularFileZipEntry extends PathZipEntry {
 
     private static final long SIZE_2GB = 2_147_483_648L;
 
+    private final Path file;
     private final long size;
 
     private long checksum;
     private long compressedSize;
 
     public RegularFileZipEntry(Path file, long size, int lastModifiedTime) {
-        super(file, lastModifiedTime);
+        super(lastModifiedTime);
+        this.file = file;
         this.size = size;
     }
 
@@ -40,7 +43,7 @@ public class RegularFileZipEntry extends PathZipEntry {
 
     @Override
     public long write(@NonNull OutputStream out) throws IOException {
-        try (InputStream in = new FileInputStream(getPath().toFile())) {
+        try (InputStream in = new FileInputStream(file.toFile())) {
             return size > SIZE_2GB ? IOUtils.copyLarge(in, out) : IOUtils.copy(in, out);
         }
     }
@@ -70,6 +73,18 @@ public class RegularFileZipEntry extends PathZipEntry {
     @Override
     public boolean isRegularFile() {
         return true;
+    }
+
+    @Override
+    public ExternalFileAttributes getExternalFileAttributes() throws IOException {
+        ExternalFileAttributes attributes = ExternalFileAttributes.createOperationBasedDelegate();
+        attributes.readFrom(file);
+        return attributes;
+    }
+
+    @Override
+    public String toString() {
+        return file.toAbsolutePath().toString();
     }
 
 }

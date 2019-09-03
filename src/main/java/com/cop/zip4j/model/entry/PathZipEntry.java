@@ -1,6 +1,7 @@
 package com.cop.zip4j.model.entry;
 
 import com.cop.zip4j.crypto.aes.AesEngine;
+import com.cop.zip4j.crypto.aes.AesStrength;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Compression;
@@ -10,7 +11,6 @@ import com.cop.zip4j.model.ExternalFileAttributes;
 import com.cop.zip4j.model.InternalFileAttributes;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.Zip64;
-import com.cop.zip4j.crypto.aes.AesStrength;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.Getter;
 import lombok.NonNull;
@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 
 /**
  * @author Oleg Cherednik
@@ -33,7 +32,6 @@ import java.nio.file.Path;
 @RequiredArgsConstructor
 public abstract class PathZipEntry extends ZipEntry {
 
-    private final Path path;
     private String fileName;
     private final int lastModifiedTime;
     // TODO set from ZipModel
@@ -102,14 +100,10 @@ public abstract class PathZipEntry extends ZipEntry {
 
     @Override
     public String toString() {
-        return path.toAbsolutePath().toString();
+        return fileName;
     }
 
-    public ExternalFileAttributes getExternalFileAttributes() throws IOException {
-        ExternalFileAttributes attributes = ExternalFileAttributes.createOperationBasedDelegate();
-        attributes.readFrom(path);
-        return attributes;
-    }
+    public abstract ExternalFileAttributes getExternalFileAttributes() throws IOException;
 
     public InternalFileAttributes getInternalFileAttributes() throws IOException {
         return InternalFileAttributes.NULL;
