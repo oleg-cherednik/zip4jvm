@@ -1,6 +1,5 @@
 package com.cop.zip4j.model;
 
-import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,12 +8,8 @@ import lombok.Setter;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import static com.cop.zip4j.model.builders.LocalFileHeaderBuilder.LOOK_IN_EXTRA_FIELD;
 
 /**
  * see 4.3.12
@@ -29,41 +24,6 @@ public class CentralDirectory {
     @NonNull
     private List<FileHeader> fileHeaders = Collections.emptyList();
     private DigitalSignature digitalSignature;
-
-    public void addFileHeader(FileHeader fileHeader) {
-        fileHeaders = fileHeaders.isEmpty() ? new ArrayList<>() : fileHeaders;
-        fileHeaders.add(fileHeader);
-    }
-
-    @NonNull
-    public List<FileHeader> getFileHeadersByPrefix(@NonNull String prefix) {
-        String name = ZipUtils.normalizeFileName.apply(prefix.toLowerCase());
-
-        return fileHeaders.stream()
-                          .filter(fileHeader -> fileHeader.getFileName().toLowerCase().startsWith(name))
-                          .collect(Collectors.toList());
-    }
-
-    @NonNull
-    public FileHeader getFileHeaderByEntryName(@NonNull String entryName) {
-        List<FileHeader> fileHeaders = getFileHeadersByEntryName(entryName);
-
-        if (fileHeaders.size() > 1)
-            throw new Zip4jException("Multiple file headers found for entry name '" + entryName + '\'');
-        if (fileHeaders.isEmpty())
-            throw new Zip4jException("File header with entry name '" + entryName + "' was not found");
-
-        return fileHeaders.iterator().next();
-    }
-
-    @NonNull
-    public List<FileHeader> getFileHeadersByEntryName(@NonNull String entryName) {
-        String name = ZipUtils.normalizeFileName.apply(entryName.toLowerCase());
-
-        return fileHeaders.stream()
-                          .filter(fileHeader -> fileHeader.getFileName().toLowerCase().equals(name))
-                          .collect(Collectors.toList());
-    }
 
     /** see 4.3.12 */
     @Getter
@@ -132,7 +92,7 @@ public class CentralDirectory {
 
         @NonNull
         public Compression getCompression() {
-            if (compressionMethod == CompressionMethod.AES_ENC)
+            if (compressionMethod == CompressionMethod.AES)
                 return Compression.parseCompressionMethod(extraField.getAesExtraDataRecord().getCompressionMethod());
             return Compression.parseCompressionMethod(compressionMethod);
         }
@@ -155,10 +115,6 @@ public class CentralDirectory {
             generalPurposeFlag.setEncrypted(isEncrypted());
         }
 
-        public void updateOffLocalHeaderRelative(long delta) {
-            offsLocalFileHeader += delta;
-        }
-
         public boolean isEncrypted() {
             return getEncryption() != Encryption.OFF;
         }
@@ -169,14 +125,6 @@ public class CentralDirectory {
 
         public boolean isWriteZip64OffsetLocalHeader() {
             return offsLocalFileHeader > Zip64.LIMIT;
-        }
-
-        public long getOriginalCompressedSize() {
-            return compressedSize == LOOK_IN_EXTRA_FIELD ? extraField.getExtendedInfo().getCompressedSize() : compressedSize;
-        }
-
-        public long getOriginalUncompressedSize() {
-            return uncompressedSize == LOOK_IN_EXTRA_FIELD ? extraField.getExtendedInfo().getUncompressedSize() : uncompressedSize;
         }
 
         @Override

@@ -1,8 +1,7 @@
-package com.cop.zip4j.model.aes;
+package com.cop.zip4j.model;
 
+import com.cop.zip4j.crypto.aes.AesStrength;
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.model.CompressionMethod;
-import com.cop.zip4j.model.ExtraField;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -32,7 +31,7 @@ public final class AesExtraDataRecord {
     // size:1
     @NonNull
     @Builder.Default
-    private final AesStrength strength = AesStrength.NONE;
+    private final AesStrength strength = AesStrength.NULL;
     // size:2
     @NonNull
     @Builder.Default

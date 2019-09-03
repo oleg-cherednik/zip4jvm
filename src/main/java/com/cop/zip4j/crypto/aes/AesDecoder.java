@@ -4,7 +4,6 @@ import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.exception.Zip4jIncorrectPasswordException;
 import com.cop.zip4j.io.in.DataInput;
-import com.cop.zip4j.model.aes.AesStrength;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.NonNull;
 import org.apache.commons.lang.ArrayUtils;
@@ -27,7 +26,7 @@ public final class AesDecoder implements Decoder {
 
     public static AesDecoder create(@NonNull PathZipEntry entry, @NonNull DataInput in) {
         try {
-            AesStrength strength = entry.getStrength();
+            AesStrength strength = AesEngine.getStrength(entry.getEncryption());
             byte[] salt = getSalt(entry, in);
             byte[] key = AesEngine.createKey(entry.getPassword(), salt, strength);
 

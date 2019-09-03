@@ -32,7 +32,7 @@ final class FileHeaderBuilder {
         fileHeader.setVersionMadeBy(CentralDirectory.FileHeader.VERSION);
         fileHeader.setVersionToExtract(CentralDirectory.FileHeader.VERSION);
         fileHeader.setGeneralPurposeFlag(createGeneralPurposeFlag());
-        fileHeader.setCompressionMethod(entry.getEncryption().getCompressionMethod().apply(entry));
+        fileHeader.setCompressionMethod(entry.getEncryption().getCompressionMethod().apply(entry.getCompression()));
         fileHeader.setLastModifiedTime(entry.getLastModifiedTime());
         fileHeader.setCrc32(entry.getEncryption().getChecksum().apply(entry));
         fileHeader.setCompressedSize(getSize(entry.getCompressedSize()));

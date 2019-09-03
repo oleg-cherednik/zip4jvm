@@ -16,13 +16,11 @@
 package com.cop.zip4j;
 
 import com.cop.zip4j.engine.ZipEngine;
-import com.cop.zip4j.exception.Zip4jAesStrengthNotSetException;
 import com.cop.zip4j.exception.Zip4jEmptyPasswordException;
 import com.cop.zip4j.exception.Zip4jPathNotExistsException;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.ZipParameters;
-import com.cop.zip4j.model.aes.AesStrength;
 import com.cop.zip4j.model.builders.ZipModelBuilder;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import com.cop.zip4j.model.entry.ZipEntry;
@@ -75,20 +73,8 @@ public final class ZipIt {
         zipModel.setComment(ZipUtils.normalizeComment.apply(parameters.getComment()));
         zipModel.setZip64(parameters.isZip64());
 
-        List<PathZipEntry> entries = createEntries(withExistedEntries(paths));
-
-        entries.forEach(entry -> {
-            entry.setFileName(parameters.getRelativeEntryName(entry.getPath()));
-            entry.setCompression(parameters.getCompression());
-            entry.setEncryption(parameters.getEncryption());
-            entry.setStrength(parameters.getStrength());
-            entry.setPassword(parameters.getPassword());
-            entry.setZip64(parameters.isZip64());
-            entry.setPassword(parameters.getPassword());
-        });
-
+        List<PathZipEntry> entries = createEntries(withExistedEntries(paths), parameters);
         // TODO if at least one fileName is null then defaultRootPath is not correct
-
         new ZipEngine(zipModel).addEntries(entries);
     }
 
@@ -101,14 +87,23 @@ public final class ZipIt {
     }
 
     @NonNull
-    private static List<PathZipEntry> createEntries(@NonNull Collection<Path> paths) {
+    private static List<PathZipEntry> createEntries(Collection<Path> paths, ZipParameters parameters) {
         paths = getUniqueRecursivePaths(paths);
         Set<Path> emptyDirectories = getEmptyDirectories(paths);
 
         return paths.parallelStream()
                     .filter(path -> Files.isRegularFile(path) || emptyDirectories.contains(path))
                     .sorted()
-                    .map(ZipEntry::of)
+                    .map(path -> {
+                        PathZipEntry zipEntry = ZipEntry.of(path);
+                        zipEntry.setFileName(parameters.getRelativeEntryName(path));
+                        zipEntry.setCompression(parameters.getCompression());
+                        zipEntry.setEncryption(parameters.getEncryption());
+                        zipEntry.setPassword(parameters.getPassword());
+                        zipEntry.setZip64(parameters.isZip64());
+                        zipEntry.setPassword(parameters.getPassword());
+                        return zipEntry;
+                    })
                     .collect(Collectors.toList());
     }
 
@@ -147,13 +142,10 @@ public final class ZipIt {
 
     private static void checkParameters(ZipParameters parameters) {
         Encryption encryption = parameters.getEncryption();
-        AesStrength strength = parameters.getStrength();
         boolean passwordEmpty = ArrayUtils.isEmpty(parameters.getPassword());
 
         if (encryption != Encryption.OFF && passwordEmpty)
             throw new Zip4jEmptyPasswordException();
-        if (encryption == Encryption.AES && strength == AesStrength.NONE)
-            throw new Zip4jAesStrengthNotSetException();
     }
 
 }

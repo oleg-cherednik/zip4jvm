@@ -43,7 +43,6 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
         setEncryption(fileHeader.getEncryption());
         setCompression(fileHeader.getCompression());
         setCompressionLevel(fileHeader.getGeneralPurposeFlag().getCompressionLevel());
-        setStrength(fileHeader.getExtraField().getAesExtraDataRecord().getStrength());
 
         setCompressedSize(compressedSize);
         setDisk(getDisk(fileHeader));

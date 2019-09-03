@@ -3,7 +3,6 @@ package com.cop.zip4j;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ZipParameters;
-import com.cop.zip4j.model.aes.AesStrength;
 import org.apache.commons.io.FileUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -70,8 +69,7 @@ public class Zip64Test {
     public void shouldZipWhenZip64AndAesEncryption() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compression(Compression.STORE)
-                                                .encryption(Encryption.AES)
-                                                .strength(AesStrength.KEY_STRENGTH_256)
+                                                .encryption(Encryption.AES_256)
                                                 .zip64(true)
                                                 .comment("password: " + new String(Zip4jSuite.password))
                                                 .password(Zip4jSuite.password).build();

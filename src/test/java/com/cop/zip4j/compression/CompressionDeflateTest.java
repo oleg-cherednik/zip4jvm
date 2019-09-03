@@ -7,7 +7,6 @@ import com.cop.zip4j.ZipIt;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ZipParameters;
-import com.cop.zip4j.model.aes.AesStrength;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -136,8 +135,7 @@ public class CompressionDeflateTest {
     public void shouldUnzipWhenWhenDeflateCompressionAndAesEncryption() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compression(Compression.DEFLATE)
-                                                .encryption(Encryption.AES)
-                                                .strength(AesStrength.KEY_STRENGTH_256)
+                                                .encryption(Encryption.AES_256)
                                                 .comment("password: " + new String(Zip4jSuite.password))
                                                 .password(Zip4jSuite.password).build();
 

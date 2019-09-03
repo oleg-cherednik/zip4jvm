@@ -1,4 +1,4 @@
-package com.cop.zip4j.model.aes;
+package com.cop.zip4j.crypto.aes;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -15,10 +15,10 @@ import java.security.SecureRandom;
 @SuppressWarnings("MethodCanBeVariableArityMethod")
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum AesStrength {
-    NONE(0, 0),
-    KEY_STRENGTH_128(1, 128),
-    KEY_STRENGTH_192(2, 192),
-    KEY_STRENGTH_256(3, 256);
+    NULL(0, 0),
+    S128(1, 128),
+    S192(2, 192),
+    S256(3, 256);
 
     private final int code;
     private final int size;

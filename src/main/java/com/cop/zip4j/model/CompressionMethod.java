@@ -27,7 +27,7 @@ public enum CompressionMethod {
 //    IBM_LZ77(19),
 //    WAVPACK(97),
 //    PPMD(98),
-    AES_ENC(99);
+    AES(99);
 
     private final int code;
 

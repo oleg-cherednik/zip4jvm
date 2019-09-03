@@ -3,7 +3,6 @@ package com.cop.zip4j.crypto.aes;
 import com.cop.zip4j.crypto.Encoder;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.out.DataOutput;
-import com.cop.zip4j.model.aes.AesStrength;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.NonNull;
 

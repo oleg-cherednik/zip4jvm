@@ -1,6 +1,6 @@
 package com.cop.zip4j.crypto.aes;
 
-import com.cop.zip4j.model.aes.AesStrength;
+import com.cop.zip4j.model.Encryption;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
@@ -82,6 +82,30 @@ public final class AesEngine {
         Mac mac = Mac.getInstance("HmacSHA1");
         mac.init(secretKeySpec);
         return mac;
+    }
+
+    public static AesStrength getStrength(Encryption encryption) {
+        if (encryption == Encryption.AES_128)
+            return AesStrength.S128;
+        if (encryption == Encryption.AES_192)
+            return AesStrength.S192;
+        if (encryption == Encryption.AES_256)
+            return AesStrength.S256;
+        return AesStrength.NULL;
+    }
+
+    public static Encryption getEncryption(AesStrength strength) {
+        if (strength == AesStrength.S128)
+            return Encryption.AES_128;
+        if (strength == AesStrength.S192)
+            return Encryption.AES_192;
+        if (strength == AesStrength.S256)
+            return Encryption.AES_256;
+        return Encryption.OFF;
+    }
+
+    public static long getCompressedSize(long uncompressedSize, AesStrength strength) {
+        return uncompressedSize + strength.saltLength() + MAX_SIZE + PASSWORD_CHECKSUM_SIZE;
     }
 
 }

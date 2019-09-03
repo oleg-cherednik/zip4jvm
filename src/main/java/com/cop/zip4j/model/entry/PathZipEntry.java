@@ -1,5 +1,6 @@
 package com.cop.zip4j.model.entry;
 
+import com.cop.zip4j.crypto.aes.AesEngine;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Compression;
@@ -9,7 +10,7 @@ import com.cop.zip4j.model.ExternalFileAttributes;
 import com.cop.zip4j.model.InternalFileAttributes;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.Zip64;
-import com.cop.zip4j.model.aes.AesStrength;
+import com.cop.zip4j.crypto.aes.AesStrength;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.Getter;
 import lombok.NonNull;
@@ -42,7 +43,6 @@ public abstract class PathZipEntry extends ZipEntry {
     protected CompressionLevel compressionLevel = CompressionLevel.NORMAL;
     protected Encryption encryption = Encryption.OFF;
 
-    protected AesStrength strength = AesStrength.NONE;
     protected char[] password;
     private long disk;
     private long localFileHeaderOffs;
@@ -82,7 +82,7 @@ public abstract class PathZipEntry extends ZipEntry {
     public abstract void setEncryption(@NonNull Encryption encryption);
 
     public AesStrength getStrength() {
-        return encryption == Encryption.AES ? strength : AesStrength.NONE;
+        return AesEngine.getStrength(encryption);
     }
 
     public boolean isEncrypted() {

@@ -1,13 +1,12 @@
 package com.cop.zip4j.model;
 
-import com.cop.zip4j.model.aes.AesStrength;
+import com.cop.zip4j.utils.ZipUtils;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.io.FilenameUtils;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -26,8 +25,6 @@ public class ZipParameters {
     @Builder.Default
     private Encryption encryption = Encryption.OFF;
     private char[] password;
-    @Builder.Default
-    private AesStrength strength = AesStrength.NONE;
     private String rootFolderInZip;
     private Path defaultFolderPath;
     @Builder.Default
@@ -48,12 +45,12 @@ public class ZipParameters {
         String path = rootPath.relativize(entryPath).toString();
 
         if (Files.isDirectory(entryPath))
-            path += File.separator;
+            path += '/';
 
         if (rootFolderInZip != null)
             path = FilenameUtils.concat(path, rootFolderInZip);
 
-        return path;
+        return ZipUtils.normalizeFileName.apply(path);
     }
 
 }

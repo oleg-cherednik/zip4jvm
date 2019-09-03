@@ -1,7 +1,7 @@
 package com.cop.zip4j.model.builders;
 
-import com.cop.zip4j.model.Encryption;
-import com.cop.zip4j.model.aes.AesExtraDataRecord;
+import com.cop.zip4j.crypto.aes.AesStrength;
+import com.cop.zip4j.model.AesExtraDataRecord;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -18,14 +18,16 @@ final class AesExtraDataRecordBuilder {
 
     @NonNull
     public AesExtraDataRecord create() {
-        if (entry.getEncryption() != Encryption.AES)
+        AesStrength strength = entry.getStrength();
+
+        if (strength == AesStrength.NULL)
             return AesExtraDataRecord.NULL;
 
         return AesExtraDataRecord.builder()
                                  .size(7)
                                  .vendor("AE")
                                  .versionNumber((short)2)
-                                 .strength(entry.getStrength())
+                                 .strength(strength)
                                  .compressionMethod(entry.getCompression().getMethod())
                                  .build();
     }
