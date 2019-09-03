@@ -54,7 +54,10 @@ public class ZipModel {
     private long centralDirectoryOffs;
     private long centralDirectorySize;
 
-    /** {@literal true} only if section {@link Zip64} exists */
+    /**
+     * {@literal true} only if section {@link Zip64} exists. In other words, do set this to {@code true}, to write zip archive
+     * in ZIP64 format.
+     */
     private boolean zip64;
 
     private final List<PathZipEntry> entries = new ArrayList<>();

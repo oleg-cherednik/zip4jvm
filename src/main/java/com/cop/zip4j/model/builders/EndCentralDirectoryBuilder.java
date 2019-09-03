@@ -19,13 +19,13 @@ public final class EndCentralDirectoryBuilder {
     @NonNull
     public EndCentralDirectory create() {
         EndCentralDirectory endCentralDirectory = new EndCentralDirectory();
-        endCentralDirectory.setCentralDirectoryOffs(zipModel.getCentralDirectoryOffs());
         endCentralDirectory.setTotalDisks(zipModel.getTotalDisks());
         endCentralDirectory.setMainDisk(zipModel.getTotalDisks());
         endCentralDirectory.setDiskEntries(getDiskEntries());
         endCentralDirectory.setTotalEntries(getTotalEntries());
-        endCentralDirectory.setComment(zipModel.getComment());
         endCentralDirectory.setCentralDirectorySize(zipModel.getCentralDirectorySize());
+        endCentralDirectory.setCentralDirectoryOffs(getCentralDirectoryOffs());
+        endCentralDirectory.setComment(zipModel.getComment());
         return endCentralDirectory;
     }
 
@@ -36,4 +36,9 @@ public final class EndCentralDirectoryBuilder {
     private int getTotalEntries() {
         return zipModel.isZip64() ? Zip64.LIMIT_INT : zipModel.getEntries().size();
     }
+
+    private long getCentralDirectoryOffs() {
+        return zipModel.isZip64() ? Zip64.LIMIT : zipModel.getCentralDirectoryOffs();
+    }
+
 }

@@ -2,7 +2,6 @@ package com.cop.zip4j.io.writers;
 
 import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.model.EndCentralDirectory;
-import com.cop.zip4j.model.Zip64;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -30,7 +29,7 @@ final class EndCentralDirectoryWriter {
         out.writeWord(endCentralDirectory.getDiskEntries());
         out.writeWord(endCentralDirectory.getTotalEntries());
         out.writeDword(endCentralDirectory.getCentralDirectorySize());
-        out.writeDword(Math.min(endCentralDirectory.getCentralDirectoryOffs(), Zip64.LIMIT));
+        out.writeDword(endCentralDirectory.getCentralDirectoryOffs());
         out.writeWord(comment.length);
         out.writeBytes(comment);
     }

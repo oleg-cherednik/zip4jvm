@@ -28,7 +28,6 @@ public final class LocalFileHeaderBuilder {
     @NonNull
     public LocalFileHeader create() {
         LocalFileHeader localFileHeader = new LocalFileHeader();
-
         localFileHeader.setVersionToExtract(CentralDirectory.FileHeader.VERSION);
         localFileHeader.setGeneralPurposeFlag(createGeneralPurposeFlag());
         localFileHeader.setCompressionMethod(entry.getEncryption().getCompressionMethod().apply(entry));
@@ -38,7 +37,6 @@ public final class LocalFileHeaderBuilder {
         localFileHeader.setUncompressedSize(getSize(entry.getUncompressedSize()));
         localFileHeader.setFileName(entry.getFileName());
         localFileHeader.setExtraField(createExtraField());
-
         return localFileHeader;
     }
 
