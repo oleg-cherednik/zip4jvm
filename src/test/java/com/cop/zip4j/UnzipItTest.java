@@ -22,6 +22,7 @@ import static com.cop.zip4j.assertj.Zip4jAssertions.assertThatFile;
  * @author Oleg Cherednik
  * @since 14.03.2019
  */
+@Test
 @SuppressWarnings("FieldNamingConvention")
 public class UnzipItTest {
 
@@ -37,7 +38,6 @@ public class UnzipItTest {
         Zip4jSuite.removeDir(rootDir);
     }
 
-    @Test
     public void shouldUnzipRequiredFiles() throws IOException {
         Path dstDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
         List<String> entries = Arrays.asList("saint-petersburg.jpg", "cars/bentley-continental.jpg");
@@ -64,7 +64,6 @@ public class UnzipItTest {
         assertThatFile(dstDir.resolve("cars/bentley-continental.jpg")).exists().isImage().hasSize(1_395_362);
     }
 
-    @Test
     public void shouldUnzipOneFile() throws IOException {
         Path dstDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
         UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.deflateSolidZip).build();
@@ -75,7 +74,6 @@ public class UnzipItTest {
         assertThatFile(dstDir.resolve("cars/ferrari-458-italia.jpg")).exists().isImage().hasSize(320_894);
     }
 
-    @Test
     public void shouldUnzipFolder() throws IOException {
         Path dstDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
         UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.deflateSolidZip).build();
@@ -91,7 +89,6 @@ public class UnzipItTest {
         assertThatFile(starWarsDir.resolve("four.jpg")).isImage().hasSize(1_916_776);
     }
 
-    @Test
     public void shouldUnzipEncryptedZip() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
                                                 .compression(Compression.DEFLATE)

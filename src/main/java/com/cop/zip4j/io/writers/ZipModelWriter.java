@@ -30,6 +30,7 @@ public final class ZipModelWriter {
             zipModel.setZip64(true);
 
         writeCentralDirectoryHeaders(out);
+        // TODO see 4.4.1.5 - these sections must be on the same disk (probably add function to block the split)
         writeZip64(out);
         writeEndCentralDirectory(out);
     }

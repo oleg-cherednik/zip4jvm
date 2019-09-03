@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * <li>Number of Files Inside an Archive - 65,535 <b>(implemented)</b></li>
  * <li>Size of a File Inside an Archive [bytes] - 4,294,967,295 <b>(implemented)</b></li>
  * <li>Size of an Archive [bytes] - 4,294,967,295 <b>(not implemented)</b></li>
- * <li>Number of Segments in a Segmented Archive - 999 (spanning), 65,535 (splitting) <b>(not implemented)</b></li>
+ * <li>Number of Segments in a Segmented Archive - 999 (spanning), 65,535 (splitting) <b>(implemented for splitting)</b></li>
  * <li>Central Directory Size [bytes] - 4,294,967,295 <b>(not implemented)</b></li>
  * </ul>
  * <p>
