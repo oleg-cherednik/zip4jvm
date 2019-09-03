@@ -15,7 +15,7 @@ public final class Zip64Builder {
 
     @NonNull
     private final ZipModel zipModel;
-    private final int disk;
+    private final long disk;
 
     public Zip64 create() {
         Zip64 zip64 = Zip64.NULL;
@@ -33,7 +33,7 @@ public final class Zip64Builder {
         Zip64.EndCentralDirectoryLocator locator = new Zip64.EndCentralDirectoryLocator();
         locator.setOffs(zipModel.getCentralDirectoryOffs() + zipModel.getCentralDirectorySize());
         locator.setMainDisk(disk);
-        locator.setTotalDisks(disk + 1);
+        locator.setTotalDisks(disk);
         return locator;
     }
 
@@ -55,7 +55,7 @@ public final class Zip64Builder {
     private int countNumberOfFileHeaderEntriesOnDisk() {
         if (zipModel.isSplit())
             return (int)zipModel.getEntries().stream()
-                                .filter(entry -> entry.getDisc() == zipModel.getTotalDisks())
+                                .filter(entry -> entry.getDisk() == zipModel.getTotalDisks())
                                 .count();
 
         return zipModel.getEntries().size();

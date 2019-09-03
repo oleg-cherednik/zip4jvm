@@ -7,6 +7,7 @@ import com.cop.zip4j.model.ExtraField;
 import com.cop.zip4j.model.GeneralPurposeFlag;
 import com.cop.zip4j.model.InternalFileAttributes;
 import com.cop.zip4j.model.Zip64;
+import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.entry.PathZipEntry;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +40,7 @@ final class FileHeaderBuilder {
         fileHeader.setCompressedSize(getSize(entry.getCompressedSize()));
         fileHeader.setUncompressedSize(getSize(entry.getUncompressedSize()));
         fileHeader.setFileCommentLength(0);
-        fileHeader.setDiskNumber(entry.getDisc());
+        fileHeader.setDisk(getDisk());
         fileHeader.setInternalFileAttributes(InternalFileAttributes.of(entry.getPath()));
         fileHeader.setExternalFileAttributes(ExternalFileAttributes.of(entry.getPath()));
         fileHeader.setOffsLocalFileHeader(entry.getLocalFileHeaderOffs());
@@ -73,15 +74,18 @@ final class FileHeaderBuilder {
             return Zip64.ExtendedInfo.builder()
                                      .compressedSize(entry.getCompressedSize())
                                      .uncompressedSize(entry.getUncompressedSize())
+                                     .disk(entry.getDisk())
 //                                     .offsLocalHeaderRelative(entry.getLocalFileHeaderOffs())
                                      .build();
         return Zip64.ExtendedInfo.NULL;
     }
 
+    private int getDisk() {
+        return entry.isZip64() ? ZipModel.MAX_TOTAL_DISKS : (int)entry.getDisk();
+    }
+
     private long getSize(long size) {
-        if (entry.isZip64())
-            return LOOK_IN_EXTRA_FIELD;
-        return size;
+        return entry.isZip64() ? LOOK_IN_EXTRA_FIELD : size;
     }
 
 }

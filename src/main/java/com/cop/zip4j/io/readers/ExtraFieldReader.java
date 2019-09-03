@@ -20,7 +20,7 @@ final class ExtraFieldReader {
     private final boolean uncompressedSize;
     private final boolean compressedSize;
     private final boolean offs;
-    private final boolean diskNumber;
+    private final boolean disk;
 
     public ExtraField read(@NonNull DataInput in) throws IOException {
         ExtraField extraField = new ExtraField();
@@ -33,7 +33,7 @@ final class ExtraFieldReader {
         while (in.getOffs() < offsMax) {
             int signature = in.readWord();
 
-            Zip64.ExtendedInfo zip64 = new Zip64Reader.ExtendedInfo(signature, uncompressedSize, compressedSize, offs, diskNumber).read(in);
+            Zip64.ExtendedInfo zip64 = new Zip64Reader.ExtendedInfo(signature, uncompressedSize, compressedSize, offs, disk).read(in);
             AesExtraDataRecord aes = new AesExtraDataRecordReader(signature).read(in);
 
             if (zip64 != Zip64.ExtendedInfo.NULL)

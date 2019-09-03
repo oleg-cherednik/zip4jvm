@@ -41,6 +41,7 @@ public class ZipModel {
 
     public static final int MAX_TOTAL_ENTRIES = Zip64.LIMIT_INT;
     public static final long MAX_ENTRY_SIZE = Zip64.LIMIT;
+    public static final int MAX_TOTAL_DISKS = Zip64.LIMIT_INT;
 
     @NonNull
     private final Path zipFile;
@@ -49,8 +50,8 @@ public class ZipModel {
     private long splitSize = NO_SPLIT;
 
     private String comment;
-    private int totalDisks;
-    private int mainDisk;
+    private long totalDisks;
+    private long mainDisk;
     private long centralDirectoryOffs;
     private long centralDirectorySize;
 

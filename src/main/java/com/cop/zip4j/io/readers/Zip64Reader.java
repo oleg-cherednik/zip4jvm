@@ -93,7 +93,7 @@ final class Zip64Reader {
         private final boolean uncompressedSize;
         private final boolean compressedSize;
         private final boolean offs;
-        private final boolean diskNumber;
+        private final boolean disk;
 
         @NonNull
         public Zip64.ExtendedInfo read(@NonNull DataInput in) throws IOException {
@@ -107,7 +107,7 @@ final class Zip64Reader {
                                                                 .uncompressedSize(uncompressedSize ? in.readQword() : ExtraField.NO_DATA)
                                                                 .compressedSize(compressedSize ? in.readQword() : ExtraField.NO_DATA)
                                                                 .offsLocalHeaderRelative(this.offs ? in.readQword() : ExtraField.NO_DATA)
-                                                                .diskNumber(diskNumber ? in.readDword() : ExtraField.NO_DATA)
+                                                                .disk(disk ? in.readDword() : ExtraField.NO_DATA)
                                                                 .build();
 
             if (in.getOffs() - offs != size)

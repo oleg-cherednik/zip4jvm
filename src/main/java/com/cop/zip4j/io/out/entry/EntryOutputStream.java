@@ -46,7 +46,7 @@ public abstract class EntryOutputStream extends OutputStream {
 
     private static EntryOutputStream createOutputStream(PathZipEntry entry, DataOutput out) throws IOException {
         Compression compression = entry.getCompression();
-        entry.setDisc(out.getDisk());
+        entry.setDisk(out.getDisk());
 
         if (compression == Compression.STORE)
             return new StoreEntryOutputStream(entry, out);

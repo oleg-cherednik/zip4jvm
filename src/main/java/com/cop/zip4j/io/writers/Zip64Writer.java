@@ -81,8 +81,8 @@ final class Zip64Writer {
                 out.writeQword(info.getCompressedSize());
             if (info.getOffsLocalHeaderRelative() != ExtraField.NO_DATA)
                 out.writeQword(info.getOffsLocalHeaderRelative());
-            if (info.getDiskNumber() != ExtraField.NO_DATA)
-                out.writeDword(info.getDiskNumber());
+            if (info.getDisk() != ExtraField.NO_DATA)
+                out.writeDword(info.getDisk());
         }
 
     }

@@ -15,14 +15,14 @@ import java.nio.file.Path;
  */
 public class SplitZipInputStream extends BaseDataInput {
 
-    private int disk;
+    private long disk;
 
     @NonNull
-    public static SplitZipInputStream create(@NonNull ZipModel zipModel, int disk) throws IOException {
+    public static SplitZipInputStream create(@NonNull ZipModel zipModel, long disk) throws IOException {
         return new SplitZipInputStream(zipModel, disk);
     }
 
-    private SplitZipInputStream(@NonNull ZipModel zipModel, int disk) throws IOException {
+    private SplitZipInputStream(@NonNull ZipModel zipModel, long disk) throws IOException {
         super(zipModel);
         this.disk = disk;
         delegate = new LittleEndianReadFile(zipModel.getPartFile(disk));

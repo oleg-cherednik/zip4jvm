@@ -4,6 +4,7 @@ import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.writers.ZipModelWriter;
 import com.cop.zip4j.model.DataDescriptor;
 import com.cop.zip4j.model.ZipModel;
+import lombok.Getter;
 import lombok.NonNull;
 
 import java.io.FileNotFoundException;
@@ -15,12 +16,13 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 08.03.2019
  */
+@Getter
 public class SplitZipOutputStream extends BaseDataOutput {
 
     /** see 8.5.5 */
     public static final int SPLIT_SIGNATURE = DataDescriptor.SIGNATURE;
 
-    private int disK;
+    private long disk;
 
     @NonNull
     public static SplitZipOutputStream create(@NonNull ZipModel zipModel) throws IOException {
@@ -76,7 +78,7 @@ public class SplitZipOutputStream extends BaseDataOutput {
     }
 
     private void openNextDisk() throws IOException {
-        Path splitFile = ZipModel.getSplitFilePath(zipModel.getZipFile(), ++disK);
+        Path splitFile = ZipModel.getSplitFilePath(zipModel.getZipFile(), ++disk);
 
         super.close();
 
@@ -87,11 +89,6 @@ public class SplitZipOutputStream extends BaseDataOutput {
             throw new IOException("cannot rename newly created split file");
 
         createFile(zipModel.getZipFile());
-    }
-
-    @Override
-    public int getDisk() {
-        return disK;
     }
 
     @Override

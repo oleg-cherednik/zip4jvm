@@ -3,6 +3,7 @@ package com.cop.zip4j.model.entry;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.Encryption;
+import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -40,10 +41,16 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
         setStrength(fileHeader.getExtraField().getAesExtraDataRecord().getStrength());
 
         setCompressedSize(compressedSize);
-        setDisc(fileHeader.getDiskNumber());
+        setDisk(getDisk(fileHeader));
         setLocalFileHeaderOffs(fileHeader.getOffsLocalFileHeader());
 
         setFileName(fileHeader.getFileName());
+    }
+
+    private static long getDisk(CentralDirectory.FileHeader fileHeader) {
+        if (fileHeader.getDisk() == ZipModel.MAX_TOTAL_DISKS)
+            return fileHeader.getExtraField().getExtendedInfo().getDisk();
+        return fileHeader.getDisk();
     }
 
     private static long getCompressedSize(CentralDirectory.FileHeader fileHeader) {

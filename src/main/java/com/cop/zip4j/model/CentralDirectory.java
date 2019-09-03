@@ -99,7 +99,7 @@ public class CentralDirectory {
         // size:2 - file comment length
         private int fileCommentLength;
         // size:2 - disk number start
-        private int diskNumber;
+        private int disk;
         // size:2 - internal file attributes
         @NonNull
         private InternalFileAttributes internalFileAttributes = InternalFileAttributes.NULL;

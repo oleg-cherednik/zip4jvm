@@ -6,7 +6,7 @@ import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.ExternalFileAttributes;
 import com.cop.zip4j.model.InternalFileAttributes;
-import com.cop.zip4j.model.Zip64;
+import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -53,7 +53,7 @@ final class FileHeaderReader {
         int fileNameLength = in.readWord();
         int extraFieldLength = in.readWord();
         int fileCommentLength = in.readWord();
-        fileHeader.setDiskNumber(in.readWord());
+        fileHeader.setDisk(in.readWord());
         fileHeader.setInternalFileAttributes(InternalFileAttributes.read(in));
         fileHeader.setExternalFileAttributes(ExternalFileAttributes.read(in));
         fileHeader.setOffsLocalFileHeader(in.readDword());
@@ -68,8 +68,8 @@ final class FileHeaderReader {
         boolean uncompressedSize = fileHeader.getUncompressedSize() == LOOK_IN_EXTRA_FIELD;
         boolean compressedSize = fileHeader.getCompressedSize() == LOOK_IN_EXTRA_FIELD;
         boolean offsHeader = fileHeader.getOffsLocalFileHeader() == LOOK_IN_EXTRA_FIELD;
-        boolean diskNumber = fileHeader.getDiskNumber() == Zip64.LIMIT_INT;
-        return new ExtraFieldReader(size, uncompressedSize, compressedSize, offsHeader, diskNumber);
+        boolean disk = fileHeader.getDisk() == ZipModel.MAX_TOTAL_DISKS;
+        return new ExtraFieldReader(size, uncompressedSize, compressedSize, offsHeader, disk);
     }
 
 }

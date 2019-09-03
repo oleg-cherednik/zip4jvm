@@ -1,9 +1,12 @@
 package com.cop.zip4j.model.entry;
 
 import com.cop.zip4j.exception.Zip4jException;
+import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.Encryption;
+import com.cop.zip4j.model.LocalFileHeader;
+import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.aes.AesStrength;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.Getter;
@@ -22,6 +25,7 @@ import java.nio.file.Path;
  * @since 26.07.2019
  */
 @Getter
+@Setter
 @RequiredArgsConstructor
 public abstract class PathZipEntry extends ZipEntry {
 
@@ -35,19 +39,16 @@ public abstract class PathZipEntry extends ZipEntry {
     protected CompressionLevel compressionLevel = CompressionLevel.NORMAL;
     protected Encryption encryption = Encryption.OFF;
 
-    @Setter
     protected AesStrength strength = AesStrength.NONE;
-    @Setter
     protected char[] password;
-
-    @Setter
-    private int disc;
-    @Setter
+    private long disk;
     private long localFileHeaderOffs;
-
-    @Setter
     protected Boolean dataDescriptorAvailable;
 
+    /**
+     * {@literal true} only if section {@link Zip64.ExtendedInfo} exists in {@link LocalFileHeader} and {@link CentralDirectory.FileHeader}.
+     * In other words, do set this to {@code true}, to write given entry in ZIP64 format.
+     */
     @Setter
     private boolean zip64;
 

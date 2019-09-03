@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 /**
  * @author Oleg Cherednik
@@ -82,9 +82,9 @@ public final class ZipMisc {
         UnzipIt.checkZipFile(zipFile);
         ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile, charset);
 
-        return IntStream.rangeClosed(0, zipModel.getTotalDisks())
-                        .mapToObj(i -> i == 0 ? zipModel.getZipFile() : ZipModel.getSplitFilePath(zipFile, i))
-                        .collect(Collectors.toList());
+        return LongStream.rangeClosed(0, zipModel.getTotalDisks())
+                         .mapToObj(i -> i == 0 ? zipModel.getZipFile() : ZipModel.getSplitFilePath(zipFile, i))
+                         .collect(Collectors.toList());
     }
 
     public boolean isSplit() throws IOException {
@@ -131,8 +131,9 @@ public final class ZipMisc {
         long offs = Arrays.stream(fileSizeList).sum();
 
         zipModel.getEntries().forEach(entry -> {
-            entry.setLocalFileHeaderOffs(entry.getLocalFileHeaderOffs() + Arrays.stream(fileSizeList, 0, entry.getDisc()).sum());
-            entry.setDisc(0);
+            // TODO it doesn't work in ZIP64 where disk is long
+            entry.setLocalFileHeaderOffs(entry.getLocalFileHeaderOffs() + Arrays.stream(fileSizeList, 0, (int)entry.getDisk()).sum());
+            entry.setDisk(0);
         });
 
         zipModel.setSplitSize(ZipModel.NO_SPLIT);
@@ -140,13 +141,14 @@ public final class ZipMisc {
     }
 
     private static long[] copyAllParts(@NonNull OutputStream out, @NonNull ZipModel zipModel) throws IOException {
-        int totalSplitParts = zipModel.getTotalDisks();
-        long[] fileSizeList = new long[totalSplitParts + 1];
+        // TODO it doesn't work in ZIP64 where totalDisks is long
+        int totalDisks = (int)zipModel.getTotalDisks();
+        long[] fileSizeList = new long[totalDisks + 1];
 
-        for (int i = 0; i <= totalSplitParts; i++) {
+        for (int i = 0; i <= totalDisks; i++) {
             try (InputStream in = new FileInputStream(zipModel.getPartFile(i).toFile())) {
                 fileSizeList[i] = IOUtils.copyLarge(in, out, 0,
-                        i == totalSplitParts ? zipModel.getCentralDirectoryOffs() : zipModel.getSplitSize());
+                        i == totalDisks ? zipModel.getCentralDirectoryOffs() : zipModel.getSplitSize());
             }
         }
 

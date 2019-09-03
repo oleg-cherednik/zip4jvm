@@ -106,7 +106,7 @@ public final class Zip64 {
         private final long offsLocalHeaderRelative = ExtraField.NO_DATA;
         // size:4 - number of the disk on which  this file starts
         @Builder.Default
-        private final long diskNumber = ExtraField.NO_DATA;
+        private final long disk = ExtraField.NO_DATA;
 
         @SuppressWarnings("ConstantConditions")
         public int getDataSize() {
@@ -115,6 +115,7 @@ public final class Zip64 {
             size += uncompressedSize == ExtraField.NO_DATA ? 0 : 8;
             size += compressedSize == ExtraField.NO_DATA ? 0 : 8;
             size += offsLocalHeaderRelative == ExtraField.NO_DATA ? 0 : 8;
+            size += disk == ExtraField.NO_DATA ? 0 : 4;
 
             return size;
         }

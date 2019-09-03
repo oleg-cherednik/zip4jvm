@@ -49,6 +49,7 @@ public class DirectoryZipEntry extends PathZipEntry {
         super.setFileName(fileName);
     }
 
+    @Override
     public boolean isDataDescriptorAvailable() {
         if (dataDescriptorAvailable != null)
             return dataDescriptorAvailable;
