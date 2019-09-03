@@ -59,11 +59,6 @@ public abstract class PathZipEntry extends ZipEntry {
         return false;
     }
 
-    @Override
-    public String getAbsolutePath() {
-        return path.toAbsolutePath().toString();
-    }
-
     public abstract long getExpectedCompressedSize();
 
     public abstract void setCompressedSize(long compressedSize);
@@ -98,5 +93,10 @@ public abstract class PathZipEntry extends ZipEntry {
     }
 
     public abstract boolean isDataDescriptorAvailable();
+
+    @Override
+    public String toString() {
+        return path.toAbsolutePath().toString();
+    }
 
 }

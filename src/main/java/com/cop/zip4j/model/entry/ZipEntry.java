@@ -39,8 +39,6 @@ public abstract class ZipEntry {
         throw new Zip4jException("Cannot add neither directory nor regular file to zip");
     }
 
-    public abstract String getAbsolutePath();
-
     public long getUncompressedSize() {
         return 0;
     }
@@ -57,10 +55,5 @@ public abstract class ZipEntry {
     }
 
     public abstract int getLastModifiedTime();
-
-    @Override
-    public String toString() {
-        return getAbsolutePath();
-    }
 
 }
