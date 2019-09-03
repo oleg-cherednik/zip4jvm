@@ -4,17 +4,16 @@ import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ExternalFileAttributes;
-import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.NotImplementedException;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.file.Paths;
 
-import static com.cop.zip4j.model.builders.LocalFileHeaderBuilder.LOOK_IN_EXTRA_FIELD;
+import static com.cop.zip4j.model.ZipModel.MAX_ENTRY_SIZE;
+import static com.cop.zip4j.model.ZipModel.MAX_TOTAL_DISKS;
 
 /**
  * @author Oleg Cherednik
@@ -25,48 +24,29 @@ import static com.cop.zip4j.model.builders.LocalFileHeaderBuilder.LOOK_IN_EXTRA_
 public class FileHeaderPathZipEntry extends PathZipEntry {
 
     private final long uncompressedSize;
-    private final boolean dir;
+    private final long checksum;
     private final ExternalFileAttributes externalFileAttributes;
+    private final boolean dir;
 
     private long compressedSize;
-    private long checksum;
 
     public FileHeaderPathZipEntry(CentralDirectory.FileHeader fileHeader) {
-        super(Paths.get(fileHeader.getFileName()), fileHeader.getLastModifiedTime());
-        compressedSize = getCompressedSize(fileHeader);
+        super(null, fileHeader.getLastModifiedTime());
         uncompressedSize = getUncompressedSize(fileHeader);
         checksum = fileHeader.getCrc32();
-        dir = ZipUtils.isDirectory(fileHeader.getFileName());
+        compressedSize = getCompressedSize(fileHeader);
         externalFileAttributes = fileHeader.getExternalFileAttributes();
+        dir = ZipUtils.isDirectory(fileHeader.getFileName());
 
         setZip64(fileHeader.isZip64());
         setEncryption(fileHeader.getEncryption());
         setCompression(fileHeader.getCompression());
         setCompressionLevel(fileHeader.getGeneralPurposeFlag().getCompressionLevel());
 
-        setCompressedSize(compressedSize);
         setDisk(getDisk(fileHeader));
         setLocalFileHeaderOffs(fileHeader.getOffsLocalFileHeader());
 
-        setFileName(fileHeader.getFileName());
-    }
-
-    private static long getDisk(CentralDirectory.FileHeader fileHeader) {
-        if (fileHeader.getDisk() == ZipModel.MAX_TOTAL_DISKS)
-            return fileHeader.getExtraField().getExtendedInfo().getDisk();
-        return fileHeader.getDisk();
-    }
-
-    private static long getCompressedSize(CentralDirectory.FileHeader fileHeader) {
-        if (fileHeader.getCompressedSize() == LOOK_IN_EXTRA_FIELD)
-            return fileHeader.getExtraField().getExtendedInfo().getCompressedSize();
-        return fileHeader.getCompressedSize();
-    }
-
-    private static long getUncompressedSize(CentralDirectory.FileHeader fileHeader) {
-        if (fileHeader.getUncompressedSize() == LOOK_IN_EXTRA_FIELD)
-            return fileHeader.getExtraField().getExtendedInfo().getUncompressedSize();
-        return fileHeader.getUncompressedSize();
+        super.setFileName(fileHeader.getFileName());
     }
 
     @Override
@@ -106,9 +86,7 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
 
     @Override
     public void setFileName(String fileName) {
-        if (dir && StringUtils.isNotBlank(fileName) && !ZipUtils.isDirectory(fileName))
-            fileName += '/';
-        super.setFileName(fileName);
+        throw new NotImplementedException();
     }
 
     @Override
@@ -120,11 +98,29 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
 
     @Override
     public long write(OutputStream out) throws IOException {
-        return 0;
+        throw new NotImplementedException();
     }
 
     @Override
-    public ExternalFileAttributes getExternalFileAttribute() throws IOException {
-        return externalFileAttributes;
+    public String toString() {
+        return getFileName();
+    }
+
+    private static long getDisk(CentralDirectory.FileHeader fileHeader) {
+        if (fileHeader.getDisk() == MAX_TOTAL_DISKS)
+            return fileHeader.getExtraField().getExtendedInfo().getDisk();
+        return fileHeader.getDisk();
+    }
+
+    private static long getCompressedSize(CentralDirectory.FileHeader fileHeader) {
+        if (fileHeader.getCompressedSize() == MAX_ENTRY_SIZE)
+            return fileHeader.getExtraField().getExtendedInfo().getCompressedSize();
+        return fileHeader.getCompressedSize();
+    }
+
+    private static long getUncompressedSize(CentralDirectory.FileHeader fileHeader) {
+        if (fileHeader.getUncompressedSize() == MAX_ENTRY_SIZE)
+            return fileHeader.getExtraField().getExtendedInfo().getUncompressedSize();
+        return fileHeader.getUncompressedSize();
     }
 }

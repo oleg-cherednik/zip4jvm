@@ -40,7 +40,7 @@ public class RegularFileZipEntry extends PathZipEntry {
 
     @Override
     public long write(@NonNull OutputStream out) throws IOException {
-        try (InputStream in = new FileInputStream(path.toFile())) {
+        try (InputStream in = new FileInputStream(getPath().toFile())) {
             return size > SIZE_2GB ? IOUtils.copyLarge(in, out) : IOUtils.copy(in, out);
         }
     }

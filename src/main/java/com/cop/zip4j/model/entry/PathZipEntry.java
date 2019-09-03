@@ -33,8 +33,8 @@ import java.nio.file.Path;
 @RequiredArgsConstructor
 public abstract class PathZipEntry extends ZipEntry {
 
-    protected final Path path;
-    protected String fileName;
+    private final Path path;
+    private String fileName;
     private final int lastModifiedTime;
     // TODO set from ZipModel
     private final Charset charset = StandardCharsets.UTF_8;
@@ -105,7 +105,7 @@ public abstract class PathZipEntry extends ZipEntry {
         return path.toAbsolutePath().toString();
     }
 
-    public ExternalFileAttributes getExternalFileAttribute() throws IOException {
+    public ExternalFileAttributes getExternalFileAttributes() throws IOException {
         ExternalFileAttributes attributes = ExternalFileAttributes.createOperationBasedDelegate();
         attributes.readFrom(path);
         return attributes;

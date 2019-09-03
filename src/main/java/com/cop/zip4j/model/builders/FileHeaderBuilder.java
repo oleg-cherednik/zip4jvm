@@ -40,7 +40,7 @@ final class FileHeaderBuilder {
         fileHeader.setFileCommentLength(0);
         fileHeader.setDisk(getDisk());
         fileHeader.setInternalFileAttributes(entry.getInternalFileAttributes());
-        fileHeader.setExternalFileAttributes(entry.getExternalFileAttribute());
+        fileHeader.setExternalFileAttributes(entry.getExternalFileAttributes());
         fileHeader.setOffsLocalFileHeader(entry.getLocalFileHeaderOffs());
         fileHeader.setExtraField(createExtraField());
         fileHeader.setFileComment(null);
