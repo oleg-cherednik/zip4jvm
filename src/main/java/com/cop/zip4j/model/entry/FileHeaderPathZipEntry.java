@@ -66,6 +66,11 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
     }
 
     @Override
+    public boolean isRegularFile() {
+        return !dir;
+    }
+
+    @Override
     public boolean isDirectory() {
         return dir;
     }

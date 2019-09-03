@@ -56,4 +56,9 @@ public class DirectoryZipEntry extends PathZipEntry {
         return false;
     }
 
+    @Override
+    public boolean isDirectory() {
+        return true;
+    }
+
 }

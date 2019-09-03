@@ -65,4 +65,14 @@ public class RegularFileZipEntry extends PathZipEntry {
         return true;
     }
 
+    @Override
+    public boolean isRegularFile() {
+        return true;
+    }
+
+    @Override
+    public String getAbsolutePath() {
+        return path.toAbsolutePath().toString();
+    }
+
 }

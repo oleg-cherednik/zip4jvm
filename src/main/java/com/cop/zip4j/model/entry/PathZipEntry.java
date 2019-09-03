@@ -17,7 +17,6 @@ import org.apache.commons.lang.StringUtils;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -52,14 +51,12 @@ public abstract class PathZipEntry extends ZipEntry {
     @Setter
     private boolean zip64;
 
-    @Override
     public boolean isRegularFile() {
-        return Files.isRegularFile(path);
+        return false;
     }
 
-    @Override
     public boolean isDirectory() {
-        return Files.isDirectory(path);
+        return false;
     }
 
     @Override

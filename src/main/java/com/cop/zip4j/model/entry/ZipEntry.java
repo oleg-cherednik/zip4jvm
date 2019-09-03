@@ -41,14 +41,6 @@ public abstract class ZipEntry {
 
     public abstract String getAbsolutePath();
 
-    public boolean isRegularFile() {
-        return false;
-    }
-
-    public boolean isDirectory() {
-        return false;
-    }
-
     public long getUncompressedSize() {
         return 0;
     }
