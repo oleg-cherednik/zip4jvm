@@ -6,6 +6,8 @@ import com.cop.zip4j.utils.ZipUtils;
 import lombok.NonNull;
 import org.apache.commons.lang.StringUtils;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Path;
 
 /**
@@ -59,6 +61,11 @@ public class DirectoryZipEntry extends PathZipEntry {
     @Override
     public boolean isDirectory() {
         return true;
+    }
+
+    @Override
+    public long write(@NonNull OutputStream out) throws IOException {
+        return 0;
     }
 
 }

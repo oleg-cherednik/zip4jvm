@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -93,6 +95,8 @@ public abstract class PathZipEntry extends ZipEntry {
     }
 
     public abstract boolean isDataDescriptorAvailable();
+
+    public abstract long write(@NonNull OutputStream out) throws IOException;
 
     @Override
     public String toString() {

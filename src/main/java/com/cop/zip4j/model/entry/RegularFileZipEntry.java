@@ -21,6 +21,8 @@ import java.nio.file.Path;
 @Setter
 public class RegularFileZipEntry extends PathZipEntry {
 
+    private static final long SIZE_2GB = 2_147_483_648L;
+
     private final long size;
 
     private long checksum;
@@ -39,7 +41,7 @@ public class RegularFileZipEntry extends PathZipEntry {
     @Override
     public long write(@NonNull OutputStream out) throws IOException {
         try (InputStream in = new FileInputStream(path.toFile())) {
-            return IOUtils.copyLarge(in, out);
+            return size > SIZE_2GB ? IOUtils.copyLarge(in, out) : IOUtils.copy(in, out);
         }
     }
 

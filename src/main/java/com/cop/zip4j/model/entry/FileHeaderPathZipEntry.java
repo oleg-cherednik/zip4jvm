@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Paths;
 
 import static com.cop.zip4j.model.builders.LocalFileHeaderBuilder.LOOK_IN_EXTRA_FIELD;
@@ -112,5 +114,10 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
         if (dataDescriptorAvailable != null)
             return dataDescriptorAvailable;
         return !dir;
+    }
+
+    @Override
+    public long write(OutputStream out) throws IOException {
+        return 0;
     }
 }

@@ -2,10 +2,8 @@ package com.cop.zip4j.model.entry;
 
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.utils.ZipUtils;
-import lombok.NonNull;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -48,10 +46,6 @@ public abstract class ZipEntry {
     }
 
     public void setChecksum(long checksum) {
-    }
-
-    public long write(@NonNull OutputStream out) throws IOException {
-        return 0;
     }
 
     public abstract int getLastModifiedTime();
