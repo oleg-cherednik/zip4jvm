@@ -18,28 +18,22 @@ import java.nio.file.Path;
  * @since 26.07.2019
  */
 @Getter
+@Setter
 public class RegularFileZipEntry extends PathZipEntry {
 
     private final long size;
-    private final long checksum;
 
-    @Setter
+    private long checksum;
     private long compressedSize;
 
-    public RegularFileZipEntry(Path file, long size, long checksum, int lastModifiedTime) {
+    public RegularFileZipEntry(Path file, long size, int lastModifiedTime) {
         super(file, lastModifiedTime);
         this.size = size;
-        this.checksum = checksum;
     }
 
     @Override
     public long getUncompressedSize() {
         return size;
-    }
-
-    @Override
-    public long checksum() {
-        return checksum;
     }
 
     @Override
@@ -64,6 +58,7 @@ public class RegularFileZipEntry extends PathZipEntry {
         return compression == Compression.STORE ? encryption.getCompressedSize().apply(this) : 0;
     }
 
+    @Override
     public boolean isDataDescriptorAvailable() {
         if (dataDescriptorAvailable != null)
             return dataDescriptorAvailable;

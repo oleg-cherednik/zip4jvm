@@ -16,14 +16,15 @@ import static com.cop.zip4j.model.builders.LocalFileHeaderBuilder.LOOK_IN_EXTRA_
  * @author Oleg Cherednik
  * @since 28.08.2019
  */
+@Getter
+@Setter
 public class FileHeaderPathZipEntry extends PathZipEntry {
 
-    @Setter
-    @Getter
-    private long compressedSize;
     private final long uncompressedSize;
-    private final long checksum;
     private final boolean dir;
+
+    private long compressedSize;
+    private long checksum;
 
     public FileHeaderPathZipEntry(CentralDirectory.FileHeader fileHeader) {
         super(Paths.get(fileHeader.getFileName()), fileHeader.getLastModifiedTime());
@@ -63,7 +64,7 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
     }
 
     @Override
-    public long checksum() {
+    public long getChecksum() {
         return checksum;
     }
 
@@ -94,6 +95,7 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
         super.setFileName(fileName);
     }
 
+    @Override
     public boolean isDataDescriptorAvailable() {
         if (dataDescriptorAvailable != null)
             return dataDescriptorAvailable;

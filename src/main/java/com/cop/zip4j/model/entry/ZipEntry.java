@@ -3,7 +3,6 @@ package com.cop.zip4j.model.entry;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.NonNull;
-import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -30,10 +29,8 @@ public abstract class ZipEntry {
         if (Files.isRegularFile(path)) {
             try {
                 long size = Files.size(path);
-                // TODO it's slow for big files and should be postponed
-                long checksum = FileUtils.checksumCRC32(path.toFile());
                 int lastModifiedTime = ZipUtils.javaToDosTime(Files.getLastModifiedTime(path).toMillis());
-                return new RegularFileZipEntry(path, size, checksum, lastModifiedTime);
+                return new RegularFileZipEntry(path, size, lastModifiedTime);
             } catch(IOException e) {
                 throw new Zip4jException(e);
             }
@@ -56,8 +53,11 @@ public abstract class ZipEntry {
         return 0;
     }
 
-    public long checksum() {
+    public long getChecksum() {
         return 0;
+    }
+
+    public void setChecksum(long checksum) {
     }
 
     public long write(@NonNull OutputStream out) throws IOException {

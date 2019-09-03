@@ -97,7 +97,7 @@ public abstract class EntryInputStream extends InputStream {
     }
 
     private void checkChecksum() {
-        long expected = entry.checksum();
+        long expected = entry.getChecksum();
         long actual = checksum.getValue();
 
         if (expected > 0 && expected != actual)
