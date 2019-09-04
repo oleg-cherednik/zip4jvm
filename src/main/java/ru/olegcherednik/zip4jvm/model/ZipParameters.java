@@ -8,30 +8,30 @@ import lombok.Setter;
 import java.nio.file.Path;
 
 @Getter
-@Setter
 @Builder(toBuilder = true)
-public class ZipParameters {
+public final class ZipParameters {
 
     @NonNull
     @Builder.Default
-    private Compression compression = Compression.DEFLATE;
+    private final Compression compression = Compression.DEFLATE;
     @NonNull
     @Builder.Default
-    private CompressionLevel compressionLevel = CompressionLevel.NORMAL;
+    private final CompressionLevel compressionLevel = CompressionLevel.NORMAL;
     @NonNull
     @Builder.Default
-    private Encryption encryption = Encryption.OFF;
-    private char[] password;
-    private String rootFolderInZip;
-    private Path defaultFolderPath;
+    private final Encryption encryption = Encryption.OFF;
+    private final char[] password;
+    private final String rootFolderInZip;
     @Builder.Default
-    private long splitLength = ZipModel.NO_SPLIT;
-    private String comment;
-
+    private final long splitLength = ZipModel.NO_SPLIT;
+    private final String comment;
     /**
      * Write all entries as well as entire zip archive in ZIP64 format.
      * If it's {@literal false}, then it will be automatically set if require.
      */
-    public boolean zip64;
+    public final boolean zip64;
+
+    @Setter
+    private Path defaultFolderPath;
 
 }
