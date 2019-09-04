@@ -1,13 +1,10 @@
 package ru.olegcherednik.zip4jvm.model;
 
-import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import org.apache.commons.io.FilenameUtils;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 @Getter
@@ -36,21 +33,5 @@ public class ZipParameters {
      * If it's {@literal false}, then it will be automatically set if require.
      */
     public boolean zip64;
-
-    @NonNull
-    public String getRelativeEntryName(Path entry) {
-        Path entryPath = entry.toAbsolutePath();
-        Path rootPath = defaultFolderPath != null ? defaultFolderPath : entryPath.getParent();
-
-        String path = rootPath.relativize(entryPath).toString();
-
-        if (Files.isDirectory(entryPath))
-            path += '/';
-
-        if (rootFolderInZip != null)
-            path = FilenameUtils.concat(path, rootFolderInZip);
-
-        return ZipUtils.normalizeFileName(path);
-    }
 
 }

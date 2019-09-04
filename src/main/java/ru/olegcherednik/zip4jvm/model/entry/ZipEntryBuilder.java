@@ -1,5 +1,10 @@
 package ru.olegcherednik.zip4jvm.model.entry;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Compression;
@@ -9,10 +14,6 @@ import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.ZipParameters;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.IOSupplier;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import org.apache.commons.io.IOUtils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -48,7 +49,7 @@ public final class ZipEntryBuilder {
     }
 
     private static ZipEntry createDirectoryEntry(Path dir, ZipParameters parameters) throws IOException {
-        String fileName = parameters.getRelativeEntryName(dir);
+        String fileName = getRelativeFileName(dir, parameters.getDefaultFolderPath(), parameters.getRootFolderInZip());
         int lastModifiedTime = ZipUtils.javaToDosTime(Files.getLastModifiedTime(dir).toMillis());
         ExternalFileAttributes attributes = ExternalFileAttributes.createOperationBasedDelegate();
         attributes.readFrom(dir);
@@ -67,7 +68,7 @@ public final class ZipEntryBuilder {
     }
 
     private static ZipEntry createRegularFileEntry(Path file, ZipParameters parameters) throws IOException {
-        String fileName = parameters.getRelativeEntryName(file);
+        String fileName = getRelativeFileName(file, parameters.getDefaultFolderPath(), parameters.getRootFolderInZip());
         long uncompressedSize = Files.size(file);
         int lastModifiedTime = ZipUtils.javaToDosTime(Files.getLastModifiedTime(file).toMillis());
         Compression compression = parameters.getCompression();
@@ -126,6 +127,20 @@ public final class ZipEntryBuilder {
         if (fileHeader.getUncompressedSize() == MAX_ENTRY_SIZE)
             return fileHeader.getExtraField().getExtendedInfo().getUncompressedSize();
         return fileHeader.getUncompressedSize();
+    }
+
+    private static String getRelativeFileName(Path path, Path defaultFolderPath, String rootFolderInZip) {
+        path = path.toAbsolutePath();
+        Path root = defaultFolderPath != null ? defaultFolderPath : path.getParent();
+        String str = root.relativize(path).toString();
+
+        if (Files.isDirectory(path))
+            str += '/';
+
+        if (rootFolderInZip != null)
+            str = FilenameUtils.concat(str, rootFolderInZip);
+
+        return ZipUtils.normalizeFileName(str);
     }
 
 }
