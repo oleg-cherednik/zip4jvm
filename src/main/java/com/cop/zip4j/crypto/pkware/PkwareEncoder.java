@@ -2,7 +2,7 @@ package com.cop.zip4j.crypto.pkware;
 
 import com.cop.zip4j.crypto.Encoder;
 import com.cop.zip4j.io.out.DataOutput;
-import com.cop.zip4j.model.entry.PathZipEntry;
+import com.cop.zip4j.model.entry.ZipEntry;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -18,7 +18,7 @@ public final class PkwareEncoder implements Encoder {
     private final PkwareEngine engine;
     private final PkwareHeader header;
 
-    public static PkwareEncoder create(@NonNull PathZipEntry entry) {
+    public static PkwareEncoder create(@NonNull ZipEntry entry) {
         PkwareEngine engine = new PkwareEngine(entry.getPassword());
         PkwareHeader header = PkwareHeader.create(engine, entry.getLastModifiedTime());
         return new PkwareEncoder(engine, header);

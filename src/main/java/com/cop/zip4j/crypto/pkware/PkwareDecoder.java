@@ -2,7 +2,7 @@ package com.cop.zip4j.crypto.pkware;
 
 import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.io.in.DataInput;
-import com.cop.zip4j.model.entry.PathZipEntry;
+import com.cop.zip4j.model.entry.ZipEntry;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -17,7 +17,7 @@ public final class PkwareDecoder implements Decoder {
 
     private final PkwareEngine engine;
 
-    public static PkwareDecoder create(@NonNull PathZipEntry entry, @NonNull DataInput in) throws IOException {
+    public static PkwareDecoder create(@NonNull ZipEntry entry, @NonNull DataInput in) throws IOException {
         PkwareEngine engine = new PkwareEngine(entry.getPassword());
         PkwareHeader.read(engine, entry, in);
         return new PkwareDecoder(engine);
@@ -29,7 +29,7 @@ public final class PkwareDecoder implements Decoder {
     }
 
     @Override
-    public long getCompressedSize(@NonNull PathZipEntry entry) {
+    public long getCompressedSize(@NonNull ZipEntry entry) {
         return entry.getCompressedSize() - PkwareHeader.SIZE;
     }
 

@@ -5,7 +5,7 @@ import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.GeneralPurposeFlag;
 import com.cop.zip4j.model.LocalFileHeader;
-import com.cop.zip4j.model.entry.PathZipEntry;
+import com.cop.zip4j.model.entry.ZipEntry;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ import static com.cop.zip4j.model.builders.LocalFileHeaderBuilder.LOOK_IN_EXTRA_
 public final class LocalFileHeaderReader {
 
     @NonNull
-    private final PathZipEntry entry;
+    private final ZipEntry entry;
 
     @NonNull
     public LocalFileHeader read(@NonNull DataInput in) throws IOException {

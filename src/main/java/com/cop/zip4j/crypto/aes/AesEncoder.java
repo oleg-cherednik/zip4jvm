@@ -3,7 +3,7 @@ package com.cop.zip4j.crypto.aes;
 import com.cop.zip4j.crypto.Encoder;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.out.DataOutput;
-import com.cop.zip4j.model.entry.PathZipEntry;
+import com.cop.zip4j.model.entry.ZipEntry;
 import lombok.NonNull;
 
 import javax.crypto.Cipher;
@@ -22,7 +22,7 @@ public final class AesEncoder implements Encoder {
     private final byte[] passwordChecksum;
     private final AesEngine engine;
 
-    public static AesEncoder create(@NonNull PathZipEntry entry) {
+    public static AesEncoder create(@NonNull ZipEntry entry) {
         try {
             AesStrength strength = entry.getStrength();
             byte[] salt = strength.generateSalt();

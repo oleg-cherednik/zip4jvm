@@ -6,7 +6,7 @@ import com.cop.zip4j.model.ExtraField;
 import com.cop.zip4j.model.GeneralPurposeFlag;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
-import com.cop.zip4j.model.entry.PathZipEntry;
+import com.cop.zip4j.model.entry.ZipEntry;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -23,7 +23,7 @@ import static com.cop.zip4j.model.builders.LocalFileHeaderBuilder.LOOK_IN_EXTRA_
 final class FileHeaderBuilder {
 
     @NonNull
-    private final PathZipEntry entry;
+    private final ZipEntry entry;
 
     @NonNull
     public CentralDirectory.FileHeader create() throws IOException {

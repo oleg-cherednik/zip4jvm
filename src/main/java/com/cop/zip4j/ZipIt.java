@@ -22,7 +22,7 @@ import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.ZipParameters;
 import com.cop.zip4j.model.builders.ZipModelBuilder;
-import com.cop.zip4j.model.entry.PathZipEntry;
+import com.cop.zip4j.model.entry.ZipEntry;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.Builder;
 import lombok.NonNull;
@@ -73,7 +73,7 @@ public final class ZipIt {
         zipModel.setComment(ZipUtils.normalizeComment.apply(parameters.getComment()));
         zipModel.setZip64(parameters.isZip64());
 
-        List<PathZipEntry> entries = createEntries(withExistedEntries(paths), parameters);
+        List<ZipEntry> entries = createEntries(withExistedEntries(paths), parameters);
         // TODO if at least one fileName is null then defaultRootPath is not correct
         new ZipEngine(zipModel).addEntries(entries);
     }
@@ -87,14 +87,14 @@ public final class ZipIt {
     }
 
     @NonNull
-    private static List<PathZipEntry> createEntries(Collection<Path> paths, ZipParameters parameters) {
+    private static List<ZipEntry> createEntries(Collection<Path> paths, ZipParameters parameters) {
         paths = getUniqueRecursivePaths(paths);
         Set<Path> emptyDirectories = getEmptyDirectories(paths);
 
         return paths.parallelStream()
                     .filter(path -> Files.isRegularFile(path) || emptyDirectories.contains(path))
                     .sorted()
-                    .map(path -> PathZipEntry.of(path, parameters))
+                    .map(path -> ZipEntry.of(path, parameters))
                     .collect(Collectors.toList());
     }
 

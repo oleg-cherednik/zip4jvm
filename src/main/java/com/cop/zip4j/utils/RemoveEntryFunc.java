@@ -5,7 +5,7 @@ import com.cop.zip4j.io.out.DataOutput;
 import com.cop.zip4j.io.out.DataOutputStreamDecorator;
 import com.cop.zip4j.io.out.SingleZipOutputStream;
 import com.cop.zip4j.model.ZipModel;
-import com.cop.zip4j.model.entry.PathZipEntry;
+import com.cop.zip4j.model.entry.ZipEntry;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
@@ -59,7 +59,7 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
                          .map(entryName -> ZipUtils.normalizeFileName.apply(entryName.toLowerCase()))
                          .map(entryName -> zipModel.getEntries().stream()
                                                    .filter(entry -> entry.getFileName().equalsIgnoreCase(entryName))
-                                                   .map(PathZipEntry::getFileName)
+                                                   .map(ZipEntry::getFileName)
                                                    .collect(Collectors.toList()))
                          .flatMap(List::stream)
                          .collect(Collectors.toSet());
@@ -74,8 +74,8 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
     }
 
     private void writeFileHeaders(OutputStream out, Collection<String> entries) throws IOException {
-        List<PathZipEntry> zipEntries = new ArrayList<>();
-        PathZipEntry prv = null;
+        List<ZipEntry> zipEntries = new ArrayList<>();
+        ZipEntry prv = null;
 
         long offsIn = 0;
         long offsOut = 0;
@@ -85,7 +85,7 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
             int total = zipModel.getEntries().size();
 
             for (int i = 0; i < total; i++) {
-                PathZipEntry zipEntry = zipModel.getEntries().get(i);
+                ZipEntry zipEntry = zipModel.getEntries().get(i);
 
                 if (prv != null) {
                     long curOffs = offsOut;

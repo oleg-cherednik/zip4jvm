@@ -11,7 +11,7 @@ import com.cop.zip4j.crypto.pkware.PkwareEncoder;
 import com.cop.zip4j.crypto.pkware.PkwareEngine;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.io.in.DataInput;
-import com.cop.zip4j.model.entry.PathZipEntry;
+import com.cop.zip4j.model.entry.ZipEntry;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -31,9 +31,9 @@ public enum Encryption {
     OFF(entry -> Encoder.NULL,
             (entry, in) -> Decoder.NULL,
             uncompressedSize -> uncompressedSize,
-            PathZipEntry::getChecksum,
+            ZipEntry::getChecksum,
             Compression::getMethod),
-    PKWARE(PkwareEncoder::create, PkwareDecoder::create, PkwareEngine::getCompressedSize, PathZipEntry::getChecksum, Compression::getMethod),
+    PKWARE(PkwareEncoder::create, PkwareDecoder::create, PkwareEngine::getCompressedSize, ZipEntry::getChecksum, Compression::getMethod),
     AES_128(AesEncoder::create, AesDecoder::create,
             uncompressedSize -> AesEngine.getCompressedSize(uncompressedSize, AesStrength.S128),
             entry -> 0L, compression -> CompressionMethod.AES),
@@ -44,10 +44,10 @@ public enum Encryption {
             uncompressedSize -> AesEngine.getCompressedSize(uncompressedSize, AesStrength.S256),
             AES_128.checksum, AES_128.compressionMethod);
 
-    private final Function<PathZipEntry, Encoder> createEncoder;
+    private final Function<ZipEntry, Encoder> createEncoder;
     private final CreateDecoder createDecoder;
     private final LongFunction<Long> compressedSizeFunc;
-    private final Function<PathZipEntry, Long> checksum;
+    private final Function<ZipEntry, Long> checksum;
     private final Function<Compression, CompressionMethod> compressionMethod;
 
     @NonNull
@@ -64,7 +64,7 @@ public enum Encryption {
 
     public interface CreateDecoder {
 
-        Decoder apply(PathZipEntry entry, DataInput in) throws IOException;
+        Decoder apply(ZipEntry entry, DataInput in) throws IOException;
     }
 
 }

@@ -43,7 +43,7 @@ import static com.cop.zip4j.model.ZipModel.MAX_TOTAL_DISKS;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public abstract class PathZipEntry {
+public abstract class ZipEntry {
 
     protected final String fileName;
     protected final long uncompressedSize;
@@ -123,7 +123,7 @@ public abstract class PathZipEntry {
     // --------------------
 
     // TODO should be ZipEntry
-    public static PathZipEntry of(Path path, ZipParameters parameters) {
+    public static ZipEntry of(Path path, ZipParameters parameters) {
         if (Files.isDirectory(path)) {
             try {
                 String fileName = parameters.getRelativeEntryName(path);
@@ -158,12 +158,12 @@ public abstract class PathZipEntry {
         throw new Zip4jException("Cannot add neither directory nor regular file to zip");
     }
 
-    private static PathZipEntry apply(PathZipEntry zipEntry, ZipParameters parameters, Path path) {
+    private static ZipEntry apply(ZipEntry zipEntry, ZipParameters parameters, Path path) {
         zipEntry.setPassword(parameters.getPassword());
         return zipEntry;
     }
 
-    public static PathZipEntry create(CentralDirectory.FileHeader fileHeader) {
+    public static ZipEntry create(CentralDirectory.FileHeader fileHeader) {
         String fileName = ZipUtils.normalizeFileName.apply(fileHeader.getFileName());
         int lastModifiedTime = fileHeader.getLastModifiedTime();
         ExternalFileAttributes externalFileAttributes = fileHeader.getExternalFileAttributes();
@@ -192,7 +192,7 @@ public abstract class PathZipEntry {
         }
     }
 
-    private static PathZipEntry apply(PathZipEntry zipEntry, CentralDirectory.FileHeader fileHeader) {
+    private static ZipEntry apply(ZipEntry zipEntry, CentralDirectory.FileHeader fileHeader) {
         zipEntry.setChecksum(fileHeader.getCrc32());
         zipEntry.setCompressedSize(getCompressedSize(fileHeader));
         zipEntry.setDisk(getDisk(fileHeader));

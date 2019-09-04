@@ -22,7 +22,7 @@ import java.io.OutputStream;
  */
 @Getter
 @Setter
-public class RegularFileZipEntry extends PathZipEntry {
+public class RegularFileZipEntry extends ZipEntry {
 
     private static final long SIZE_2GB = 2_147_483_648L;
 

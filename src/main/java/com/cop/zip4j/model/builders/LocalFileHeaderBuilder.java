@@ -6,7 +6,7 @@ import com.cop.zip4j.model.ExtraField;
 import com.cop.zip4j.model.GeneralPurposeFlag;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.Zip64;
-import com.cop.zip4j.model.entry.PathZipEntry;
+import com.cop.zip4j.model.entry.ZipEntry;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -23,7 +23,7 @@ public final class LocalFileHeaderBuilder {
     public static final long LOOK_IN_EXTRA_FIELD = Zip64.LIMIT;
 
     @NonNull
-    private final PathZipEntry entry;
+    private final ZipEntry entry;
 
     @NonNull
     public LocalFileHeader create() {

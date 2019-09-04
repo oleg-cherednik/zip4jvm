@@ -3,7 +3,7 @@ package com.cop.zip4j.crypto.pkware;
 import com.cop.zip4j.exception.Zip4jIncorrectPasswordException;
 import com.cop.zip4j.io.in.DataInput;
 import com.cop.zip4j.io.out.DataOutput;
-import com.cop.zip4j.model.entry.PathZipEntry;
+import com.cop.zip4j.model.entry.ZipEntry;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,7 @@ public final class PkwareHeader {
         return buf;
     }
 
-    public static PkwareHeader read(@NonNull PkwareEngine engine, @NonNull PathZipEntry entry, @NonNull DataInput in) throws IOException {
+    public static PkwareHeader read(@NonNull PkwareEngine engine, @NonNull ZipEntry entry, @NonNull DataInput in) throws IOException {
         PkwareHeader header = new PkwareHeader(in.readBytes(SIZE));
         header.requireMatchChecksum(engine, entry);
         return header;
@@ -48,7 +48,7 @@ public final class PkwareHeader {
         out.writeBytes(buf);
     }
 
-    private void requireMatchChecksum(PkwareEngine engine, PathZipEntry entry) {
+    private void requireMatchChecksum(PkwareEngine engine, ZipEntry entry) {
         engine.decrypt(buf, 0, buf.length);
         int checksum = getChecksum(entry);
 
@@ -56,7 +56,7 @@ public final class PkwareHeader {
             throw new Zip4jIncorrectPasswordException(entry.getFileName());
     }
 
-    private static int getChecksum(PathZipEntry entry) {
+    private static int getChecksum(ZipEntry entry) {
         return entry.getLastModifiedTime();
     }
 

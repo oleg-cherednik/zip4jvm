@@ -6,7 +6,7 @@ import com.cop.zip4j.io.out.DataOutputStreamDecorator;
 import com.cop.zip4j.io.out.SingleZipOutputStream;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.builders.ZipModelBuilder;
-import com.cop.zip4j.model.entry.PathZipEntry;
+import com.cop.zip4j.model.entry.ZipEntry;
 import com.cop.zip4j.utils.RemoveEntryFunc;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.Builder;
@@ -71,7 +71,7 @@ public final class ZipMisc {
         ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile, charset);
 
         return zipModel.getEntries().stream()
-                       .anyMatch(PathZipEntry::isEncrypted);
+                       .anyMatch(ZipEntry::isEncrypted);
     }
 
     public List<String> getEntryNames() throws IOException {

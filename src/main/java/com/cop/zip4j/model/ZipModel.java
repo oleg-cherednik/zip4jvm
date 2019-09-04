@@ -1,7 +1,7 @@
 package com.cop.zip4j.model;
 
 import com.cop.zip4j.exception.Zip4jException;
-import com.cop.zip4j.model.entry.PathZipEntry;
+import com.cop.zip4j.model.entry.ZipEntry;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -61,7 +61,7 @@ public class ZipModel {
      */
     private boolean zip64;
 
-    private final List<PathZipEntry> entries = new ArrayList<>();
+    private final List<ZipEntry> entries = new ArrayList<>();
 
     public void setSplitSize(long splitSize) {
         this.splitSize = splitSize < MIN_SPLIT_LENGTH ? NO_SPLIT : splitSize;
@@ -77,7 +77,7 @@ public class ZipModel {
 
     public List<String> getEntryNames() {
         return entries.stream()
-                      .map(PathZipEntry::getFileName)
+                      .map(ZipEntry::getFileName)
                       .collect(Collectors.toList());
     }
 

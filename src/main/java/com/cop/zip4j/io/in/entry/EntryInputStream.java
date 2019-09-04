@@ -9,7 +9,7 @@ import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.DataDescriptor;
 import com.cop.zip4j.model.LocalFileHeader;
-import com.cop.zip4j.model.entry.PathZipEntry;
+import com.cop.zip4j.model.entry.ZipEntry;
 import lombok.NonNull;
 import org.apache.commons.io.IOUtils;
 
@@ -24,7 +24,7 @@ import java.util.zip.Checksum;
  */
 public abstract class EntryInputStream extends InputStream {
 
-    protected final PathZipEntry entry;
+    protected final ZipEntry entry;
     protected final DataInput in;
     protected final Decoder decoder;
 
@@ -37,7 +37,7 @@ public abstract class EntryInputStream extends InputStream {
     protected long readCompressedBytes;
     protected long writtenUncompressedBytes;
 
-    public static InputStream create(@NonNull PathZipEntry entry, @NonNull DataInput in) throws IOException {
+    public static InputStream create(@NonNull ZipEntry entry, @NonNull DataInput in) throws IOException {
         LocalFileHeader localFileHeader = new LocalFileHeaderReader(entry).read(in);
         entry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
         // TODO check that localFileHeader matches fileHeader
@@ -52,7 +52,7 @@ public abstract class EntryInputStream extends InputStream {
         throw new Zip4jException("Compression is not supported: " + compression);
     }
 
-    protected EntryInputStream(PathZipEntry entry, DataInput in, Decoder decoder) {
+    protected EntryInputStream(ZipEntry entry, DataInput in, Decoder decoder) {
         this.entry = entry;
         this.in = in;
         this.decoder = decoder;

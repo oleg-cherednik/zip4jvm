@@ -6,7 +6,7 @@ import com.cop.zip4j.io.out.SingleZipOutputStream;
 import com.cop.zip4j.io.out.SplitZipOutputStream;
 import com.cop.zip4j.io.out.entry.EntryOutputStream;
 import com.cop.zip4j.model.ZipModel;
-import com.cop.zip4j.model.entry.PathZipEntry;
+import com.cop.zip4j.model.entry.ZipEntry;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -26,7 +26,7 @@ public class ZipEngine {
     @NonNull
     private final ZipModel zipModel;
 
-    public void addEntries(@NonNull Collection<PathZipEntry> entries) {
+    public void addEntries(@NonNull Collection<ZipEntry> entries) {
         if (entries.isEmpty())
             return;
 
@@ -41,7 +41,7 @@ public class ZipEngine {
         }
     }
 
-    private void updateZip64(Collection<PathZipEntry> entries) {
+    private void updateZip64(Collection<ZipEntry> entries) {
         if (zipModel.getEntries().size() + entries.size() > ZipModel.MAX_TOTAL_ENTRIES)
             zipModel.setZip64(true);
     }
@@ -55,7 +55,7 @@ public class ZipEngine {
         return zipModel.isSplit() ? SplitZipOutputStream.create(zipModel) : SingleZipOutputStream.create(zipModel);
     }
 
-    private void writeEntry(PathZipEntry entry, DataOutput out) {
+    private void writeEntry(ZipEntry entry, DataOutput out) {
         try (OutputStream os = EntryOutputStream.create(entry, zipModel, out)) {
             entry.write(os);
         } catch(IOException e) {

@@ -9,7 +9,7 @@ import com.cop.zip4j.io.in.entry.EntryInputStream;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ZipModel;
-import com.cop.zip4j.model.entry.PathZipEntry;
+import com.cop.zip4j.model.entry.ZipEntry;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.Getter;
 import lombok.NonNull;
@@ -46,7 +46,7 @@ public class UnzipEngine {
         getEntries(entries).forEach(entry -> extractEntry(dstDir, entry));
     }
 
-    private List<PathZipEntry> getEntries(@NonNull Collection<String> entries) {
+    private List<ZipEntry> getEntries(@NonNull Collection<String> entries) {
         return entries.parallelStream()
                       .map(prefix -> {
                           String name = ZipUtils.normalizeFileName.apply(prefix.toLowerCase());
@@ -60,7 +60,7 @@ public class UnzipEngine {
                       .collect(Collectors.toList());
     }
 
-    private void extractEntry(Path dstDir, PathZipEntry entry) {
+    private void extractEntry(Path dstDir, ZipEntry entry) {
         checkPassword(entry);
 
         if (entry.isDirectory())
@@ -74,7 +74,7 @@ public class UnzipEngine {
         }
     }
 
-    private void checkPassword(PathZipEntry entry) {
+    private void checkPassword(ZipEntry entry) {
         Encryption encryption = entry.getEncryption();
         boolean passwordEmpty = ArrayUtils.isEmpty(password);
 
@@ -82,7 +82,7 @@ public class UnzipEngine {
             throw new Zip4jIncorrectPasswordException(entry.getFileName());
     }
 
-    private static void extractDirectory(Path dstDir, PathZipEntry entry) {
+    private static void extractDirectory(Path dstDir, ZipEntry entry) {
         try {
             Files.createDirectories(dstDir.resolve(entry.getFileName()));
         } catch(IOException e) {
@@ -90,7 +90,7 @@ public class UnzipEngine {
         }
     }
 
-    private void extractFile(Path file, PathZipEntry entry) {
+    private void extractFile(Path file, ZipEntry entry) {
         try (InputStream in = extractEntryAsStream(entry); OutputStream out = getOutputStream(file)) {
             IOUtils.copyLarge(in, out);
         } catch(IOException e) {
@@ -114,15 +114,15 @@ public class UnzipEngine {
 
     @NonNull
     public InputStream extractEntry(@NonNull String entryName) throws IOException {
-        PathZipEntry en = zipModel.getEntries().stream()
-                                  .filter(entry -> entry.getFileName().equalsIgnoreCase(entryName))
-                                  .findFirst().orElseThrow(() -> new Zip4jException("File header with entry name '" + entryName + "' was not found"));
+        ZipEntry en = zipModel.getEntries().stream()
+                              .filter(entry -> entry.getFileName().equalsIgnoreCase(entryName))
+                              .findFirst().orElseThrow(() -> new Zip4jException("File header with entry name '" + entryName + "' was not found"));
 
         return extractEntryAsStream(en);
     }
 
     @NonNull
-    private InputStream extractEntryAsStream(@NonNull PathZipEntry entry) throws IOException {
+    private InputStream extractEntryAsStream(@NonNull ZipEntry entry) throws IOException {
         DataInput in = zipModel.isSplit() ? SplitZipInputStream.create(zipModel, entry.getDisk()) : SingleZipInputStream.create(zipModel);
         return EntryInputStream.create(entry, in);
     }

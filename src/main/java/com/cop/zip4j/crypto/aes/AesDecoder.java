@@ -4,7 +4,7 @@ import com.cop.zip4j.crypto.Decoder;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.exception.Zip4jIncorrectPasswordException;
 import com.cop.zip4j.io.in.DataInput;
-import com.cop.zip4j.model.entry.PathZipEntry;
+import com.cop.zip4j.model.entry.ZipEntry;
 import lombok.NonNull;
 import org.apache.commons.lang.ArrayUtils;
 
@@ -24,7 +24,7 @@ public final class AesDecoder implements Decoder {
     private final int saltLength;
     private final AesEngine engine;
 
-    public static AesDecoder create(@NonNull PathZipEntry entry, @NonNull DataInput in) {
+    public static AesDecoder create(@NonNull ZipEntry entry, @NonNull DataInput in) {
         try {
             AesStrength strength = AesEngine.getStrength(entry.getEncryption());
             byte[] salt = getSalt(entry, in);
@@ -58,7 +58,7 @@ public final class AesDecoder implements Decoder {
     }
 
     @Override
-    public long getCompressedSize(@NonNull PathZipEntry entry) {
+    public long getCompressedSize(@NonNull ZipEntry entry) {
         return entry.getCompressedSize() - saltLength - PASSWORD_CHECKSUM_SIZE - MAX_SIZE;
     }
 
@@ -67,12 +67,12 @@ public final class AesDecoder implements Decoder {
         checkMessageAuthenticationCode(in);
     }
 
-    private static byte[] getSalt(PathZipEntry entry, DataInput in) throws IOException {
+    private static byte[] getSalt(ZipEntry entry, DataInput in) throws IOException {
         int saltLength = entry.getStrength().saltLength();
         return in.readBytes(saltLength);
     }
 
-    private static void checkPasswordChecksum(byte[] actual, PathZipEntry entry, DataInput in) throws IOException {
+    private static void checkPasswordChecksum(byte[] actual, ZipEntry entry, DataInput in) throws IOException {
         byte[] expected = in.readBytes(PASSWORD_CHECKSUM_SIZE);
 
         if (!ArrayUtils.isEquals(expected, actual))

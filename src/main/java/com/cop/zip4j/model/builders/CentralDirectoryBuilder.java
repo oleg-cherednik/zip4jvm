@@ -1,7 +1,7 @@
 package com.cop.zip4j.model.builders;
 
 import com.cop.zip4j.model.CentralDirectory;
-import com.cop.zip4j.model.entry.PathZipEntry;
+import com.cop.zip4j.model.entry.ZipEntry;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -16,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public final class CentralDirectoryBuilder {
 
-    private final List<PathZipEntry> entries;
+    private final List<ZipEntry> entries;
 
     @NonNull
     public CentralDirectory create() throws IOException {
@@ -29,7 +29,7 @@ public final class CentralDirectoryBuilder {
     private List<CentralDirectory.FileHeader> createFileHeaders() throws IOException {
         List<CentralDirectory.FileHeader> fileHeaders = new ArrayList<>(entries.size());
 
-        for (PathZipEntry entry : entries)
+        for (ZipEntry entry : entries)
             fileHeaders.add(new FileHeaderBuilder(entry).create());
 
         return fileHeaders;

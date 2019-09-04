@@ -10,7 +10,7 @@ import com.cop.zip4j.model.DataDescriptor;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.builders.LocalFileHeaderBuilder;
-import com.cop.zip4j.model.entry.PathZipEntry;
+import com.cop.zip4j.model.entry.ZipEntry;
 import lombok.NonNull;
 
 import java.io.IOException;
@@ -26,13 +26,13 @@ public abstract class EntryOutputStream extends OutputStream {
 
     private static final String COMPRESSED_DATA = "entryCompressedDataOffs";
 
-    private final PathZipEntry entry;
+    private final ZipEntry entry;
     private final Checksum checksum = new CRC32();
 
     protected final Encoder encoder;
     protected final DataOutput out;
 
-    public static EntryOutputStream create(@NonNull PathZipEntry entry, @NonNull ZipModel zipModel, @NonNull DataOutput out) throws IOException {
+    public static EntryOutputStream create(@NonNull ZipEntry entry, @NonNull ZipModel zipModel, @NonNull DataOutput out) throws IOException {
         EntryOutputStream os = createOutputStream(entry, out);
 
         // TODO move it to the separate method
@@ -44,7 +44,7 @@ public abstract class EntryOutputStream extends OutputStream {
         return os;
     }
 
-    private static EntryOutputStream createOutputStream(PathZipEntry entry, DataOutput out) throws IOException {
+    private static EntryOutputStream createOutputStream(ZipEntry entry, DataOutput out) throws IOException {
         Compression compression = entry.getCompression();
         entry.setDisk(out.getDisk());
 
@@ -56,7 +56,7 @@ public abstract class EntryOutputStream extends OutputStream {
         throw new Zip4jException("Compression is not supported: " + compression);
     }
 
-    protected EntryOutputStream(PathZipEntry entry, DataOutput out) {
+    protected EntryOutputStream(ZipEntry entry, DataOutput out) {
         this.entry = entry;
         this.out = out;
         encoder = entry.getEncryption().getCreateEncoder().apply(entry);
