@@ -1,9 +1,11 @@
 package com.cop.zip4j.model.entry;
 
+import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ExternalFileAttributes;
+import com.cop.zip4j.utils.ZipUtils;
 import com.cop.zip4j.utils.function.IOSupplier;
 import lombok.Getter;
 import lombok.NonNull;
@@ -24,17 +26,22 @@ public class RegularFileZipEntry extends PathZipEntry {
 
     private static final long SIZE_2GB = 2_147_483_648L;
 
-    private final ExternalFileAttributes externalFileAttributes;
     private final IOSupplier<InputStream> inputStream;
 
     private long checksum;
     private long compressedSize;
 
-    public RegularFileZipEntry(long uncompressedSize, int lastModifiedTime, Compression compression, CompressionLevel compressionLevel,
+    public RegularFileZipEntry(String fileName, long uncompressedSize, int lastModifiedTime, Compression compression,
+            CompressionLevel compressionLevel,
             Encryption encryption, boolean zip64, ExternalFileAttributes externalFileAttributes, IOSupplier<InputStream> inputStream) {
-        super(uncompressedSize, lastModifiedTime, compression, compressionLevel, encryption, zip64);
-        this.externalFileAttributes = externalFileAttributes;
+        super(ZipUtils.normalizeFileName.apply(fileName), uncompressedSize, lastModifiedTime, compression, compressionLevel, encryption, zip64,
+                externalFileAttributes);
         this.inputStream = inputStream;
+    }
+
+    @Override
+    public boolean isRegularFile() {
+        return true;
     }
 
     @Override
@@ -45,20 +52,22 @@ public class RegularFileZipEntry extends PathZipEntry {
     }
 
     @Override
-    public long getExpectedCompressedSize() {
-        return compression == Compression.STORE ? encryption.getCompressedSizeFunc().apply(uncompressedSize) : 0;
-    }
-
-    @Override
     public boolean isDataDescriptorAvailable() {
         if (dataDescriptorAvailable != null)
             return dataDescriptorAvailable;
         return true;
     }
 
+    /** It's able to check compressed size only for {@link Compression#STORE} */
     @Override
-    public boolean isRegularFile() {
-        return true;
+    public void checkCompressedSize(long actual) {
+        if (compression != Compression.STORE)
+            return;
+
+        long expected = encryption.getCompressedSizeFunc().apply(uncompressedSize);
+
+        if (expected != actual)
+            throw new Zip4jException("CompressedSize is not matched: " + fileName);
     }
 
 }

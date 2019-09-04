@@ -1,14 +1,9 @@
 package com.cop.zip4j.model.entry;
 
 import com.cop.zip4j.model.CentralDirectory;
-import com.cop.zip4j.model.ExternalFileAttributes;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang.NotImplementedException;
-
-import java.io.IOException;
-import java.io.OutputStream;
 
 import static com.cop.zip4j.model.ZipModel.MAX_ENTRY_SIZE;
 import static com.cop.zip4j.model.ZipModel.MAX_TOTAL_DISKS;
@@ -22,7 +17,6 @@ import static com.cop.zip4j.model.ZipModel.MAX_TOTAL_DISKS;
 public class FileHeaderPathZipEntry extends PathZipEntry {
 
     private final long checksum;
-    private final ExternalFileAttributes externalFileAttributes;
     private final boolean dir;
 
     private long compressedSize;
@@ -32,17 +26,15 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
     }
 
     private FileHeaderPathZipEntry(CentralDirectory.FileHeader fileHeader) {
-        super(getUncompressedSize(fileHeader), fileHeader.getLastModifiedTime(), fileHeader.getCompression(),
-                fileHeader.getGeneralPurposeFlag().getCompressionLevel(), fileHeader.getEncryption(), fileHeader.isZip64());
+        super(ZipUtils.normalizeFileName.apply(fileHeader.getFileName()), getUncompressedSize(fileHeader), fileHeader.getLastModifiedTime(),
+                fileHeader.getCompression(), fileHeader.getGeneralPurposeFlag().getCompressionLevel(), fileHeader.getEncryption(),
+                fileHeader.isZip64(), fileHeader.getExternalFileAttributes());
         checksum = fileHeader.getCrc32();
         compressedSize = getCompressedSize(fileHeader);
-        externalFileAttributes = fileHeader.getExternalFileAttributes();
         dir = ZipUtils.isDirectory(fileHeader.getFileName());
 
         setDisk(getDisk(fileHeader));
         setLocalFileHeaderOffs(fileHeader.getOffsLocalFileHeader());
-
-        super.setFileName(fileHeader.getFileName());
     }
 
     @Override
@@ -61,25 +53,10 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
     }
 
     @Override
-    public long getExpectedCompressedSize() {
-        return compressedSize;
-    }
-
-    @Override
-    public void setFileName(String fileName) {
-        throw new NotImplementedException();
-    }
-
-    @Override
     public boolean isDataDescriptorAvailable() {
         if (dataDescriptorAvailable != null)
             return dataDescriptorAvailable;
         return !dir;
-    }
-
-    @Override
-    public long write(OutputStream out) throws IOException {
-        throw new NotImplementedException();
     }
 
     private static long getDisk(CentralDirectory.FileHeader fileHeader) {

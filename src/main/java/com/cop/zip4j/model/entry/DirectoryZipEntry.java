@@ -6,11 +6,6 @@ import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ExternalFileAttributes;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.Getter;
-import lombok.NonNull;
-import org.apache.commons.lang.StringUtils;
-
-import java.io.IOException;
-import java.io.OutputStream;
 
 /**
  * @author Oleg Cherednik
@@ -19,16 +14,17 @@ import java.io.OutputStream;
 @Getter
 public class DirectoryZipEntry extends PathZipEntry {
 
-    private final ExternalFileAttributes externalFileAttributes;
+    public DirectoryZipEntry(String fileName, int lastModifiedTime, ExternalFileAttributes externalFileAttributes) {
+        super(dirFileName(fileName), 0, lastModifiedTime, Compression.STORE, CompressionLevel.NORMAL, Encryption.OFF, false, externalFileAttributes);
+    }
 
-    public DirectoryZipEntry(int lastModifiedTime, ExternalFileAttributes externalFileAttributes) {
-        super(0, lastModifiedTime, Compression.STORE, CompressionLevel.NORMAL, Encryption.OFF, false);
-        this.externalFileAttributes = externalFileAttributes;
+    private static String dirFileName(String fileName) {
+        return ZipUtils.normalizeFileName.apply(ZipUtils.isDirectory(fileName) ? fileName : fileName + '/');
     }
 
     @Override
-    public long getExpectedCompressedSize() {
-        return 0;
+    public boolean isDirectory() {
+        return true;
     }
 
     @Override
@@ -41,27 +37,10 @@ public class DirectoryZipEntry extends PathZipEntry {
     }
 
     @Override
-    public void setFileName(String fileName) {
-        if (StringUtils.isNotBlank(fileName) && !ZipUtils.isDirectory(fileName))
-            fileName += '/';
-        super.setFileName(fileName);
-    }
-
-    @Override
     public boolean isDataDescriptorAvailable() {
         if (dataDescriptorAvailable != null)
             return dataDescriptorAvailable;
         return false;
-    }
-
-    @Override
-    public boolean isDirectory() {
-        return true;
-    }
-
-    @Override
-    public long write(@NonNull OutputStream out) throws IOException {
-        return 0;
     }
 
 }

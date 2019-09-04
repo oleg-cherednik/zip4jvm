@@ -85,18 +85,10 @@ public abstract class EntryOutputStream extends OutputStream {
     public void close() throws IOException {
         encoder.close(out);
         entry.setChecksum(checksum.getValue());
+        entry.checkCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
 
-        checkCompressedSize();
         entry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
         writeDataDescriptor();
-    }
-
-    private void checkCompressedSize() {
-        long expected = entry.getExpectedCompressedSize();
-        long actual = out.getWrittenBytesAmount(COMPRESSED_DATA);
-
-        if (expected != 0 && expected != actual)
-            throw new Zip4jException("CompressedSize is not matched: " + entry.getFileName());
     }
 
     private void writeDataDescriptor() throws IOException {

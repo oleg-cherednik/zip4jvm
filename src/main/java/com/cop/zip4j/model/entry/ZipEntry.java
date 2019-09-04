@@ -26,10 +26,11 @@ public abstract class ZipEntry {
     public static PathZipEntry of(Path path, ZipParameters parameters) {
         if (Files.isDirectory(path)) {
             try {
+                String fileName = parameters.getRelativeEntryName(path);
                 int lastModifiedTime = ZipUtils.javaToDosTime(Files.getLastModifiedTime(path).toMillis());
                 ExternalFileAttributes attributes = ExternalFileAttributes.createOperationBasedDelegate();
                 attributes.readFrom(path);
-                return apply(new DirectoryZipEntry(lastModifiedTime, attributes), parameters, path);
+                return apply(new DirectoryZipEntry(fileName, lastModifiedTime, attributes), parameters, path);
             } catch(IOException e) {
                 throw new Zip4jException(e);
             }
@@ -37,6 +38,7 @@ public abstract class ZipEntry {
 
         if (Files.isRegularFile(path)) {
             try {
+                String fileName = parameters.getRelativeEntryName(path);
                 long uncompressedSize = Files.size(path);
                 int lastModifiedTime = ZipUtils.javaToDosTime(Files.getLastModifiedTime(path).toMillis());
                 Compression compression = parameters.getCompression();
@@ -46,7 +48,7 @@ public abstract class ZipEntry {
                 ExternalFileAttributes attributes = ExternalFileAttributes.createOperationBasedDelegate();
                 attributes.readFrom(path);
                 IOSupplier<InputStream> inputStream = () -> new FileInputStream(path.toFile());
-                return apply(new RegularFileZipEntry(uncompressedSize, lastModifiedTime, compression, compressionLevel, encryption, zip64,
+                return apply(new RegularFileZipEntry(fileName, uncompressedSize, lastModifiedTime, compression, compressionLevel, encryption, zip64,
                         attributes, inputStream), parameters, path);
             } catch(IOException e) {
                 throw new Zip4jException(e);
@@ -57,7 +59,6 @@ public abstract class ZipEntry {
     }
 
     private static PathZipEntry apply(PathZipEntry zipEntry, ZipParameters parameters, Path path) {
-        zipEntry.setFileName(parameters.getRelativeEntryName(path));
         zipEntry.setPassword(parameters.getPassword());
         return zipEntry;
     }

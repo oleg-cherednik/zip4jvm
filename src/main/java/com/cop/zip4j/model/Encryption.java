@@ -30,7 +30,7 @@ import java.util.function.LongFunction;
 public enum Encryption {
     OFF(entry -> Encoder.NULL,
             (entry, in) -> Decoder.NULL,
-            uncompressedSize -> 0L,
+            uncompressedSize -> uncompressedSize,
             PathZipEntry::getChecksum,
             Compression::getMethod),
     PKWARE(PkwareEncoder::create, PkwareDecoder::create, PkwareEngine::getCompressedSize, PathZipEntry::getChecksum, Compression::getMethod),

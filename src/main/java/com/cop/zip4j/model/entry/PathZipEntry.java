@@ -2,7 +2,6 @@ package com.cop.zip4j.model.entry;
 
 import com.cop.zip4j.crypto.aes.AesEngine;
 import com.cop.zip4j.crypto.aes.AesStrength;
-import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.CentralDirectory;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.CompressionLevel;
@@ -11,12 +10,10 @@ import com.cop.zip4j.model.ExternalFileAttributes;
 import com.cop.zip4j.model.InternalFileAttributes;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.Zip64;
-import com.cop.zip4j.utils.ZipUtils;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -32,6 +29,7 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public abstract class PathZipEntry extends ZipEntry {
 
+    protected final String fileName;
     protected final long uncompressedSize;
     private final int lastModifiedTime;
     // TODO set from ZipModel
@@ -44,13 +42,11 @@ public abstract class PathZipEntry extends ZipEntry {
      * In other words, do set this to {@code true}, to write given entry in ZIP64 format.
      */
     private final boolean zip64;
+    private final ExternalFileAttributes externalFileAttributes;
 
     // zip: set it in constructor
     // unzip: set it before unzip
     private char[] password;
-
-    private String fileName;
-
 
     private long disk;
     private long localFileHeaderOffs;
@@ -64,8 +60,6 @@ public abstract class PathZipEntry extends ZipEntry {
     public boolean isDirectory() {
         return false;
     }
-
-    public abstract long getExpectedCompressedSize();
 
     public abstract void setCompressedSize(long compressedSize);
 
@@ -83,23 +77,16 @@ public abstract class PathZipEntry extends ZipEntry {
         return getEncryption() != Encryption.OFF;
     }
 
-    public void setFileName(String fileName) {
-        if (StringUtils.isBlank(fileName))
-            throw new Zip4jException("PathZipEntry.name cannot be blank");
-
-        this.fileName = ZipUtils.normalizeFileName.apply(fileName);
-    }
-
     public abstract boolean isDataDescriptorAvailable();
 
-    public abstract long write(@NonNull OutputStream out) throws IOException;
+    public long write(@NonNull OutputStream out) throws IOException {
+        return 0;
+    }
 
     @Override
     public String toString() {
         return fileName;
     }
-
-    public abstract ExternalFileAttributes getExternalFileAttributes();
 
     public InternalFileAttributes getInternalFileAttributes() throws IOException {
         return InternalFileAttributes.NULL;
@@ -110,6 +97,9 @@ public abstract class PathZipEntry extends ZipEntry {
     }
 
     public void setChecksum(long checksum) {
+    }
+
+    public void checkCompressedSize(long actual) {
     }
 
 }
