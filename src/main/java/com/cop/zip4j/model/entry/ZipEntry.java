@@ -3,7 +3,9 @@ package com.cop.zip4j.model.entry;
 import com.cop.zip4j.exception.Zip4jException;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.CompressionLevel;
+import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ExternalFileAttributes;
+import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.ZipParameters;
 import com.cop.zip4j.utils.ZipUtils;
 import com.cop.zip4j.utils.function.IOSupplier;
@@ -35,15 +37,17 @@ public abstract class ZipEntry {
 
         if (Files.isRegularFile(path)) {
             try {
+                long uncompressedSize = Files.size(path);
                 int lastModifiedTime = ZipUtils.javaToDosTime(Files.getLastModifiedTime(path).toMillis());
                 Compression compression = parameters.getCompression();
                 CompressionLevel compressionLevel = parameters.getCompressionLevel();
-                long size = Files.size(path);
+                Encryption encryption = parameters.getEncryption();
+                boolean zip64 = parameters.isZip64() || uncompressedSize > ZipModel.MAX_ENTRY_SIZE;
                 ExternalFileAttributes attributes = ExternalFileAttributes.createOperationBasedDelegate();
                 attributes.readFrom(path);
                 IOSupplier<InputStream> inputStream = () -> new FileInputStream(path.toFile());
-                return apply(new RegularFileZipEntry(lastModifiedTime, compression, compressionLevel, size, attributes, inputStream), parameters,
-                        path);
+                return apply(new RegularFileZipEntry(uncompressedSize, lastModifiedTime, compression, compressionLevel, encryption, zip64,
+                        attributes, inputStream), parameters, path);
             } catch(IOException e) {
                 throw new Zip4jException(e);
             }
@@ -54,24 +58,8 @@ public abstract class ZipEntry {
 
     private static PathZipEntry apply(PathZipEntry zipEntry, ZipParameters parameters, Path path) {
         zipEntry.setFileName(parameters.getRelativeEntryName(path));
-        zipEntry.setEncryption(parameters.getEncryption());
-        zipEntry.setPassword(parameters.getPassword());
-        zipEntry.setZip64(parameters.isZip64());
         zipEntry.setPassword(parameters.getPassword());
         return zipEntry;
     }
-
-    public long getUncompressedSize() {
-        return 0;
-    }
-
-    public long getChecksum() {
-        return 0;
-    }
-
-    public void setChecksum(long checksum) {
-    }
-
-    public abstract int getLastModifiedTime();
 
 }

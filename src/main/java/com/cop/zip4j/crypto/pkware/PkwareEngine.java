@@ -7,7 +7,7 @@ import lombok.NonNull;
  * @since 22.03.2019
  */
 @SuppressWarnings({ "MethodCanBeVariableArityMethod", "NewMethodNamingConvention" })
-class PkwareEngine {
+public final class PkwareEngine {
 
     private static final int[] CRC_TABLE = createCrcTable();
 
@@ -78,6 +78,10 @@ class PkwareEngine {
 
     private static int crc32(int crc, byte b) {
         return (crc >>> 8) ^ CRC_TABLE[(crc ^ b) & 0xFF];
+    }
+
+    public static long getCompressedSize(long uncompressedSize) {
+        return uncompressedSize + PkwareHeader.SIZE;
     }
 
 }

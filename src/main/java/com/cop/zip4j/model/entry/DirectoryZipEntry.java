@@ -22,13 +22,8 @@ public class DirectoryZipEntry extends PathZipEntry {
     private final ExternalFileAttributes externalFileAttributes;
 
     public DirectoryZipEntry(int lastModifiedTime, ExternalFileAttributes externalFileAttributes) {
-        super(lastModifiedTime, Compression.STORE, CompressionLevel.NORMAL);
+        super(0, lastModifiedTime, Compression.STORE, CompressionLevel.NORMAL, Encryption.OFF, false);
         this.externalFileAttributes = externalFileAttributes;
-    }
-
-    @Override
-    public void setEncryption(@NonNull Encryption encryption) {
-        this.encryption = Encryption.OFF;
     }
 
     @Override

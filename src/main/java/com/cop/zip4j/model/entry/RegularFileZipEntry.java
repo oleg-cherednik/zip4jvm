@@ -24,41 +24,29 @@ public class RegularFileZipEntry extends PathZipEntry {
 
     private static final long SIZE_2GB = 2_147_483_648L;
 
-    private final long size;
     private final ExternalFileAttributes externalFileAttributes;
     private final IOSupplier<InputStream> inputStream;
 
     private long checksum;
     private long compressedSize;
 
-    public RegularFileZipEntry(int lastModifiedTime, Compression compression, CompressionLevel compressionLevel, long size,
-            ExternalFileAttributes externalFileAttributes, IOSupplier<InputStream> inputStream) {
-        super(lastModifiedTime, compression, compressionLevel);
-        this.size = size;
+    public RegularFileZipEntry(long uncompressedSize, int lastModifiedTime, Compression compression, CompressionLevel compressionLevel,
+            Encryption encryption, boolean zip64, ExternalFileAttributes externalFileAttributes, IOSupplier<InputStream> inputStream) {
+        super(uncompressedSize, lastModifiedTime, compression, compressionLevel, encryption, zip64);
         this.externalFileAttributes = externalFileAttributes;
         this.inputStream = inputStream;
     }
 
     @Override
-    public long getUncompressedSize() {
-        return size;
-    }
-
-    @Override
     public long write(@NonNull OutputStream out) throws IOException {
         try (InputStream in = inputStream.get()) {
-            return size > SIZE_2GB ? IOUtils.copyLarge(in, out) : IOUtils.copy(in, out);
+            return uncompressedSize > SIZE_2GB ? IOUtils.copyLarge(in, out) : IOUtils.copy(in, out);
         }
     }
 
     @Override
-    public void setEncryption(@NonNull Encryption encryption) {
-        this.encryption = encryption;
-    }
-
-    @Override
     public long getExpectedCompressedSize() {
-        return compression == Compression.STORE ? encryption.getCompressedSize().apply(this) : 0;
+        return compression == Compression.STORE ? encryption.getCompressedSizeFunc().apply(uncompressedSize) : 0;
     }
 
     @Override
@@ -71,11 +59,6 @@ public class RegularFileZipEntry extends PathZipEntry {
     @Override
     public boolean isRegularFile() {
         return true;
-    }
-
-    @Override
-    public String toString() {
-        return getFileName();
     }
 
 }

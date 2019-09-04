@@ -44,10 +44,6 @@ public class ZipEngine {
     private void updateZip64(Collection<PathZipEntry> entries) {
         if (zipModel.getEntries().size() + entries.size() > ZipModel.MAX_TOTAL_ENTRIES)
             zipModel.setZip64(true);
-
-        entries.stream()
-               .filter(entry -> entry.getUncompressedSize() > ZipModel.MAX_ENTRY_SIZE)
-               .forEach(entry -> entry.setZip64(true));
     }
 
     private DataOutput createDataOutput() throws IOException {

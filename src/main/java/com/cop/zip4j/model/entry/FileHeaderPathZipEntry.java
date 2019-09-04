@@ -1,7 +1,6 @@
 package com.cop.zip4j.model.entry;
 
 import com.cop.zip4j.model.CentralDirectory;
-import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ExternalFileAttributes;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.Getter;
@@ -22,7 +21,6 @@ import static com.cop.zip4j.model.ZipModel.MAX_TOTAL_DISKS;
 @Setter
 public class FileHeaderPathZipEntry extends PathZipEntry {
 
-    private final long uncompressedSize;
     private final long checksum;
     private final ExternalFileAttributes externalFileAttributes;
     private final boolean dir;
@@ -33,16 +31,13 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
         return new FileHeaderPathZipEntry(fileHeader);
     }
 
-    public FileHeaderPathZipEntry(CentralDirectory.FileHeader fileHeader) {
-        super(fileHeader.getLastModifiedTime(), fileHeader.getCompression(), fileHeader.getGeneralPurposeFlag().getCompressionLevel());
-        uncompressedSize = getUncompressedSize(fileHeader);
+    private FileHeaderPathZipEntry(CentralDirectory.FileHeader fileHeader) {
+        super(getUncompressedSize(fileHeader), fileHeader.getLastModifiedTime(), fileHeader.getCompression(),
+                fileHeader.getGeneralPurposeFlag().getCompressionLevel(), fileHeader.getEncryption(), fileHeader.isZip64());
         checksum = fileHeader.getCrc32();
         compressedSize = getCompressedSize(fileHeader);
         externalFileAttributes = fileHeader.getExternalFileAttributes();
         dir = ZipUtils.isDirectory(fileHeader.getFileName());
-
-        setZip64(fileHeader.isZip64());
-        setEncryption(fileHeader.getEncryption());
 
         setDisk(getDisk(fileHeader));
         setLocalFileHeaderOffs(fileHeader.getOffsLocalFileHeader());
@@ -66,18 +61,8 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
     }
 
     @Override
-    public long getUncompressedSize() {
-        return uncompressedSize;
-    }
-
-    @Override
     public long getExpectedCompressedSize() {
         return compressedSize;
-    }
-
-    @Override
-    public void setEncryption(Encryption encryption) {
-        this.encryption = encryption;
     }
 
     @Override
@@ -95,11 +80,6 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
     @Override
     public long write(OutputStream out) throws IOException {
         throw new NotImplementedException();
-    }
-
-    @Override
-    public String toString() {
-        return getFileName();
     }
 
     private static long getDisk(CentralDirectory.FileHeader fileHeader) {
