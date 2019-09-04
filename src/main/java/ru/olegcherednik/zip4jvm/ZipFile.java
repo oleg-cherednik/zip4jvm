@@ -65,9 +65,6 @@ public final class ZipFile implements Closeable {
         entries.stream()
                .filter(entry -> !entry.isRoot())
                .forEach(entry -> ZipEngine.writeEntry(entry, out, zipModel));
-
-        int a = 0;
-        a++;
     }
 
     @Override
