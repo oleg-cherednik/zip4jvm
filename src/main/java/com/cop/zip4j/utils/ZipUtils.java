@@ -80,8 +80,9 @@ public class ZipUtils {
         return comment;
     };
 
-    @SuppressWarnings("FieldNamingConvention")
-    public static final Function<String, String> normalizeFileName = fileName -> FilenameUtils.normalize(fileName, true);
+    public static String normalizeFileName(String fileName) {
+        return FilenameUtils.normalize(fileName, true);
+    }
 
     public static String toString(long offs) {
         return "offs: " + offs + " (0x" + Long.toHexString(offs) + ')';

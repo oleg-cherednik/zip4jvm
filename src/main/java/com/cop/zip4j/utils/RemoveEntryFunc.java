@@ -56,7 +56,7 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
     private Set<String> getExistedEntries(Collection<String> entryNames) {
         return entryNames.stream()
                          .filter(Objects::nonNull)
-                         .map(entryName -> ZipUtils.normalizeFileName.apply(entryName.toLowerCase()))
+                         .map(entryName -> ZipUtils.normalizeFileName(entryName.toLowerCase()))
                          .map(entryName -> zipModel.getEntries().stream()
                                                    .filter(entry -> entry.getFileName().equalsIgnoreCase(entryName))
                                                    .map(ZipEntry::getFileName)

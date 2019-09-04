@@ -4,22 +4,15 @@ import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ExternalFileAttributes;
-import com.cop.zip4j.utils.ZipUtils;
-import lombok.Getter;
 
 /**
  * @author Oleg Cherednik
  * @since 26.07.2019
  */
-@Getter
-public class DirectoryZipEntry extends ZipEntry {
+class DirectoryZipEntry extends ZipEntry {
 
     public DirectoryZipEntry(String fileName, int lastModifiedTime, ExternalFileAttributes externalFileAttributes) {
-        super(dirFileName(fileName), 0, lastModifiedTime, Compression.STORE, CompressionLevel.NORMAL, Encryption.OFF, false, externalFileAttributes);
-    }
-
-    private static String dirFileName(String fileName) {
-        return ZipUtils.normalizeFileName.apply(ZipUtils.isDirectory(fileName) ? fileName : fileName + '/');
+        super(fileName, 0, lastModifiedTime, Compression.STORE, CompressionLevel.NORMAL, Encryption.OFF, false, externalFileAttributes);
     }
 
     @Override
@@ -32,8 +25,8 @@ public class DirectoryZipEntry extends ZipEntry {
     }
 
     @Override
-    public long getCompressedSize() {
-        return 0;
+    public boolean isRoot() {
+        return "/".equals(fileName);
     }
 
 }

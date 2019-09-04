@@ -6,7 +6,6 @@ import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.GeneralPurposeFlag;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.entry.ZipEntry;
-import com.cop.zip4j.utils.ZipUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -39,7 +38,7 @@ public final class LocalFileHeaderReader {
         localFileHeader.setUncompressedSize(in.readDword());
         int fileNameLength = in.readWord();
         int extraFieldLength = in.readWord();
-        localFileHeader.setFileName(ZipUtils.normalizeFileName.apply(in.readString(fileNameLength)));
+        localFileHeader.setFileName(in.readString(fileNameLength));
         localFileHeader.setExtraField(getExtraFieldReader(extraFieldLength, localFileHeader).read(in));
 
         return localFileHeader;

@@ -49,7 +49,7 @@ public class UnzipEngine {
     private List<ZipEntry> getEntries(@NonNull Collection<String> entries) {
         return entries.parallelStream()
                       .map(prefix -> {
-                          String name = ZipUtils.normalizeFileName.apply(prefix.toLowerCase());
+                          String name = ZipUtils.normalizeFileName(prefix.toLowerCase());
 
                           return zipModel.getEntries().stream()
                                          .filter(entry -> entry.getFileName().toLowerCase().startsWith(name))

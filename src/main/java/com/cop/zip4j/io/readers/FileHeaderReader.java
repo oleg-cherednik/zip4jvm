@@ -7,7 +7,6 @@ import com.cop.zip4j.model.CompressionMethod;
 import com.cop.zip4j.model.ExternalFileAttributes;
 import com.cop.zip4j.model.InternalFileAttributes;
 import com.cop.zip4j.model.ZipModel;
-import com.cop.zip4j.utils.ZipUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -57,7 +56,7 @@ final class FileHeaderReader {
         fileHeader.setInternalFileAttributes(getInternalFileAttribute(in.readBytes(InternalFileAttributes.SIZE)));
         fileHeader.setExternalFileAttributes(getExternalFileAttribute(in.readBytes(ExternalFileAttributes.SIZE)));
         fileHeader.setOffsLocalFileHeader(in.readDword());
-        fileHeader.setFileName(ZipUtils.normalizeFileName.apply(in.readString(fileNameLength)));
+        fileHeader.setFileName(in.readString(fileNameLength));
         fileHeader.setExtraField(getExtraFieldReader(extraFieldLength, fileHeader).read(in));
         fileHeader.setFileComment(in.readString(fileCommentLength));
 

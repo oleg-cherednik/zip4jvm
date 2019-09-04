@@ -85,20 +85,20 @@ public abstract class EntryOutputStream extends OutputStream {
     public void close() throws IOException {
         encoder.close(out);
         entry.setChecksum(checksum.getValue());
-        // TODO merge these two methods
         entry.checkCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
         entry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
         writeDataDescriptor();
     }
 
     private void writeDataDescriptor() throws IOException {
-        if (entry.isDataDescriptorAvailable()) {
-            DataDescriptor dataDescriptor = new DataDescriptor();
-            dataDescriptor.setCrc32(checksum.getValue());
-            dataDescriptor.setCompressedSize(entry.getCompressedSize());
-            dataDescriptor.setUncompressedSize(entry.getUncompressedSize());
-            DataDescriptorWriter.get(entry.isZip64(), dataDescriptor).write(out);
-        }
+        if (!entry.isDataDescriptorAvailable())
+            return;
+
+        DataDescriptor dataDescriptor = new DataDescriptor();
+        dataDescriptor.setCrc32(checksum.getValue());
+        dataDescriptor.setCompressedSize(entry.getCompressedSize());
+        dataDescriptor.setUncompressedSize(entry.getUncompressedSize());
+        DataDescriptorWriter.get(entry.isZip64(), dataDescriptor).write(out);
     }
 
 }

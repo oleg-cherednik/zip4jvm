@@ -6,6 +6,7 @@ import com.cop.zip4j.model.EndCentralDirectory;
 import com.cop.zip4j.model.Zip64;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.entry.ZipEntry;
+import com.cop.zip4j.model.entry.ZipEntryBuilder;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -62,7 +63,7 @@ public final class ZipModelBuilder {
 
     private List<ZipEntry> createEntries() {
         return centralDirectory.getFileHeaders().stream()
-                               .map(ZipEntry::create)
+                               .map(ZipEntryBuilder::create)
                                .collect(Collectors.toList());
     }
 

@@ -50,7 +50,7 @@ public class ZipParameters {
         if (rootFolderInZip != null)
             path = FilenameUtils.concat(path, rootFolderInZip);
 
-        return ZipUtils.normalizeFileName.apply(path);
+        return ZipUtils.normalizeFileName(path);
     }
 
 }

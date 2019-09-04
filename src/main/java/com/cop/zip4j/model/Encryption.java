@@ -46,7 +46,7 @@ public enum Encryption {
 
     private final Function<ZipEntry, Encoder> createEncoder;
     private final CreateDecoder createDecoder;
-    private final LongFunction<Long> compressedSizeFunc;
+    private final LongFunction<Long> expectedCompressedSizeFunc;
     private final Function<ZipEntry, Long> checksum;
     private final Function<Compression, CompressionMethod> compressionMethod;
 

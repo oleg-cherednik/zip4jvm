@@ -21,6 +21,7 @@ import com.cop.zip4j.exception.Zip4jPathNotExistsException;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.ZipParameters;
+import com.cop.zip4j.model.entry.ZipEntryBuilder;
 import com.cop.zip4j.model.builders.ZipModelBuilder;
 import com.cop.zip4j.model.entry.ZipEntry;
 import com.cop.zip4j.utils.ZipUtils;
@@ -94,7 +95,7 @@ public final class ZipIt {
         return paths.parallelStream()
                     .filter(path -> Files.isRegularFile(path) || emptyDirectories.contains(path))
                     .sorted()
-                    .map(path -> ZipEntry.of(path, parameters))
+                    .map(path -> ZipEntryBuilder.create(path, parameters))
                     .collect(Collectors.toList());
     }
 
