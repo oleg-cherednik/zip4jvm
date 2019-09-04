@@ -1,6 +1,7 @@
 package com.cop.zip4j.model.entry;
 
 import com.cop.zip4j.model.Compression;
+import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ExternalFileAttributes;
 import com.cop.zip4j.utils.ZipUtils;
@@ -21,13 +22,8 @@ public class DirectoryZipEntry extends PathZipEntry {
     private final ExternalFileAttributes externalFileAttributes;
 
     public DirectoryZipEntry(int lastModifiedTime, ExternalFileAttributes externalFileAttributes) {
-        super(lastModifiedTime);
+        super(lastModifiedTime, Compression.STORE, CompressionLevel.NORMAL);
         this.externalFileAttributes = externalFileAttributes;
-    }
-
-    @Override
-    public void setCompression(@NonNull Compression compression) {
-        this.compression = Compression.STORE;
     }
 
     @Override

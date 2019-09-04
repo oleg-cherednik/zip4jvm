@@ -94,16 +94,7 @@ public final class ZipIt {
         return paths.parallelStream()
                     .filter(path -> Files.isRegularFile(path) || emptyDirectories.contains(path))
                     .sorted()
-                    .map(path -> {
-                        PathZipEntry zipEntry = ZipEntry.of(path);
-                        zipEntry.setFileName(parameters.getRelativeEntryName(path));
-                        zipEntry.setCompression(parameters.getCompression());
-                        zipEntry.setEncryption(parameters.getEncryption());
-                        zipEntry.setPassword(parameters.getPassword());
-                        zipEntry.setZip64(parameters.isZip64());
-                        zipEntry.setPassword(parameters.getPassword());
-                        return zipEntry;
-                    })
+                    .map(path -> ZipEntry.of(path, parameters))
                     .collect(Collectors.toList());
     }
 

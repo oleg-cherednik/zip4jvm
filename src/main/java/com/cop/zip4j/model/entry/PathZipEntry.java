@@ -32,13 +32,15 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public abstract class PathZipEntry extends ZipEntry {
 
-    private String fileName;
     private final int lastModifiedTime;
     // TODO set from ZipModel
-    private final Charset charset = StandardCharsets.UTF_8;
+    protected final Charset charset = StandardCharsets.UTF_8;
+    protected final Compression compression;
+    protected final CompressionLevel compressionLevel;
 
-    protected Compression compression = Compression.STORE;
-    protected CompressionLevel compressionLevel = CompressionLevel.NORMAL;
+    private String fileName;
+
+
     protected Encryption encryption = Encryption.OFF;
 
     protected char[] password;
@@ -69,12 +71,6 @@ public abstract class PathZipEntry extends ZipEntry {
 
     public boolean isRoot() {
         return "/".equals(fileName) || "\\".equals(fileName);
-    }
-
-    public abstract void setCompression(@NonNull Compression compression);
-
-    public void setCompressionLevel(@NonNull CompressionLevel compressionLevel) {
-        this.compressionLevel = CompressionLevel.NORMAL;
     }
 
     public abstract void setEncryption(@NonNull Encryption encryption);

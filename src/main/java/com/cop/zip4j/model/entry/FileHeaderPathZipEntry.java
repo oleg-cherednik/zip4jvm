@@ -1,7 +1,6 @@
 package com.cop.zip4j.model.entry;
 
 import com.cop.zip4j.model.CentralDirectory;
-import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ExternalFileAttributes;
 import com.cop.zip4j.utils.ZipUtils;
@@ -35,7 +34,7 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
     }
 
     public FileHeaderPathZipEntry(CentralDirectory.FileHeader fileHeader) {
-        super(fileHeader.getLastModifiedTime());
+        super(fileHeader.getLastModifiedTime(), fileHeader.getCompression(), fileHeader.getGeneralPurposeFlag().getCompressionLevel());
         uncompressedSize = getUncompressedSize(fileHeader);
         checksum = fileHeader.getCrc32();
         compressedSize = getCompressedSize(fileHeader);
@@ -44,8 +43,6 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
 
         setZip64(fileHeader.isZip64());
         setEncryption(fileHeader.getEncryption());
-        setCompression(fileHeader.getCompression());
-        setCompressionLevel(fileHeader.getGeneralPurposeFlag().getCompressionLevel());
 
         setDisk(getDisk(fileHeader));
         setLocalFileHeaderOffs(fileHeader.getOffsLocalFileHeader());
@@ -76,11 +73,6 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
     @Override
     public long getExpectedCompressedSize() {
         return compressedSize;
-    }
-
-    @Override
-    public void setCompression(Compression compression) {
-        this.compression = compression;
     }
 
     @Override

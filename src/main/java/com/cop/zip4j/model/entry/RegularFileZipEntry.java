@@ -1,6 +1,7 @@
 package com.cop.zip4j.model.entry;
 
 import com.cop.zip4j.model.Compression;
+import com.cop.zip4j.model.CompressionLevel;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ExternalFileAttributes;
 import com.cop.zip4j.utils.function.IOSupplier;
@@ -30,8 +31,9 @@ public class RegularFileZipEntry extends PathZipEntry {
     private long checksum;
     private long compressedSize;
 
-    public RegularFileZipEntry(long size, int lastModifiedTime, ExternalFileAttributes externalFileAttributes, IOSupplier<InputStream> inputStream) {
-        super(lastModifiedTime);
+    public RegularFileZipEntry(int lastModifiedTime, Compression compression, CompressionLevel compressionLevel, long size,
+            ExternalFileAttributes externalFileAttributes, IOSupplier<InputStream> inputStream) {
+        super(lastModifiedTime, compression, compressionLevel);
         this.size = size;
         this.externalFileAttributes = externalFileAttributes;
         this.inputStream = inputStream;
@@ -47,11 +49,6 @@ public class RegularFileZipEntry extends PathZipEntry {
         try (InputStream in = inputStream.get()) {
             return size > SIZE_2GB ? IOUtils.copyLarge(in, out) : IOUtils.copy(in, out);
         }
-    }
-
-    @Override
-    public void setCompression(@NonNull Compression compression) {
-        this.compression = size == 0 ? Compression.STORE : compression;
     }
 
     @Override
