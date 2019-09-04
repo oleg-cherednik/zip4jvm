@@ -23,7 +23,6 @@ import com.cop.zip4j.model.ZipModel;
 import com.cop.zip4j.model.ZipParameters;
 import com.cop.zip4j.model.builders.ZipModelBuilder;
 import com.cop.zip4j.model.entry.PathZipEntry;
-import com.cop.zip4j.model.entry.ZipEntry;
 import com.cop.zip4j.utils.ZipUtils;
 import lombok.Builder;
 import lombok.NonNull;
@@ -95,7 +94,7 @@ public final class ZipIt {
         return paths.parallelStream()
                     .filter(path -> Files.isRegularFile(path) || emptyDirectories.contains(path))
                     .sorted()
-                    .map(path -> ZipEntry.of(path, parameters))
+                    .map(path -> PathZipEntry.of(path, parameters))
                     .collect(Collectors.toList());
     }
 
