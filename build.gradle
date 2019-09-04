@@ -23,8 +23,8 @@ repositories {
     mavenCentral()
 }
 
-group 'com.cop.zip4j'
-version '2.0'
+group 'ru.oleg-cherednik.zip4jvm'
+version '1.0'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
