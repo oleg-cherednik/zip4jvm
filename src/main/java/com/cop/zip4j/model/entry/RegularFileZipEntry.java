@@ -3,16 +3,15 @@ package com.cop.zip4j.model.entry;
 import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ExternalFileAttributes;
+import com.cop.zip4j.utils.function.IOSupplier;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.io.IOUtils;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Path;
 
 /**
  * @author Oleg Cherednik
@@ -24,16 +23,18 @@ public class RegularFileZipEntry extends PathZipEntry {
 
     private static final long SIZE_2GB = 2_147_483_648L;
 
-    private final Path file;
     private final long size;
+    private final ExternalFileAttributes externalFileAttributes;
+    private final IOSupplier<InputStream> inputStream;
 
     private long checksum;
     private long compressedSize;
 
-    public RegularFileZipEntry(Path file, long size, int lastModifiedTime) {
+    public RegularFileZipEntry(long size, int lastModifiedTime, ExternalFileAttributes externalFileAttributes, IOSupplier<InputStream> inputStream) {
         super(lastModifiedTime);
-        this.file = file;
         this.size = size;
+        this.externalFileAttributes = externalFileAttributes;
+        this.inputStream = inputStream;
     }
 
     @Override
@@ -43,7 +44,7 @@ public class RegularFileZipEntry extends PathZipEntry {
 
     @Override
     public long write(@NonNull OutputStream out) throws IOException {
-        try (InputStream in = new FileInputStream(file.toFile())) {
+        try (InputStream in = inputStream.get()) {
             return size > SIZE_2GB ? IOUtils.copyLarge(in, out) : IOUtils.copy(in, out);
         }
     }
@@ -76,15 +77,8 @@ public class RegularFileZipEntry extends PathZipEntry {
     }
 
     @Override
-    public ExternalFileAttributes getExternalFileAttributes() throws IOException {
-        ExternalFileAttributes attributes = ExternalFileAttributes.createOperationBasedDelegate();
-        attributes.readFrom(file);
-        return attributes;
-    }
-
-    @Override
     public String toString() {
-        return file.toAbsolutePath().toString();
+        return getFileName();
     }
 
 }

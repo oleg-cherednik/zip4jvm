@@ -62,7 +62,7 @@ public final class ZipModelBuilder {
 
     private List<PathZipEntry> createEntries() {
         return centralDirectory.getFileHeaders().stream()
-                               .map(FileHeaderPathZipEntry::new)
+                               .map(FileHeaderPathZipEntry::create)
                                .collect(Collectors.toList());
     }
 

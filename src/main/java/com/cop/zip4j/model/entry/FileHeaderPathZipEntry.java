@@ -30,6 +30,10 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
 
     private long compressedSize;
 
+    public static PathZipEntry create(CentralDirectory.FileHeader fileHeader) {
+        return new FileHeaderPathZipEntry(fileHeader);
+    }
+
     public FileHeaderPathZipEntry(CentralDirectory.FileHeader fileHeader) {
         super(fileHeader.getLastModifiedTime());
         uncompressedSize = getUncompressedSize(fileHeader);

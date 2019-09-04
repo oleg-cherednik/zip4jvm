@@ -4,24 +4,25 @@ import com.cop.zip4j.model.Compression;
 import com.cop.zip4j.model.Encryption;
 import com.cop.zip4j.model.ExternalFileAttributes;
 import com.cop.zip4j.utils.ZipUtils;
+import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.file.Path;
 
 /**
  * @author Oleg Cherednik
  * @since 26.07.2019
  */
+@Getter
 public class DirectoryZipEntry extends PathZipEntry {
 
-    private final Path dir;
+    private final ExternalFileAttributes externalFileAttributes;
 
-    public DirectoryZipEntry(Path dir, int lastModifiedTime) {
+    public DirectoryZipEntry(int lastModifiedTime, ExternalFileAttributes externalFileAttributes) {
         super(lastModifiedTime);
-        this.dir = dir;
+        this.externalFileAttributes = externalFileAttributes;
     }
 
     @Override
@@ -65,13 +66,6 @@ public class DirectoryZipEntry extends PathZipEntry {
     @Override
     public boolean isDirectory() {
         return true;
-    }
-
-    @Override
-    public ExternalFileAttributes getExternalFileAttributes() throws IOException {
-        ExternalFileAttributes attributes = ExternalFileAttributes.createOperationBasedDelegate();
-        attributes.readFrom(dir);
-        return attributes;
     }
 
     @Override

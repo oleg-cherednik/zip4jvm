@@ -1,8 +1,10 @@
 package com.cop.zip4j.model.entry;
 
 import com.cop.zip4j.exception.Zip4jException;
+import com.cop.zip4j.model.ExternalFileAttributes;
 import com.cop.zip4j.utils.ZipUtils;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,7 +20,9 @@ public abstract class ZipEntry {
         if (Files.isDirectory(path)) {
             try {
                 int lastModifiedTime = ZipUtils.javaToDosTime(Files.getLastModifiedTime(path).toMillis());
-                return new DirectoryZipEntry(path, lastModifiedTime);
+                ExternalFileAttributes attributes = ExternalFileAttributes.createOperationBasedDelegate();
+                attributes.readFrom(path);
+                return new DirectoryZipEntry(path, lastModifiedTime, attributes);
             } catch(IOException e) {
                 throw new Zip4jException(e);
             }
@@ -28,7 +32,9 @@ public abstract class ZipEntry {
             try {
                 long size = Files.size(path);
                 int lastModifiedTime = ZipUtils.javaToDosTime(Files.getLastModifiedTime(path).toMillis());
-                return new RegularFileZipEntry(path, size, lastModifiedTime);
+                ExternalFileAttributes attributes = ExternalFileAttributes.createOperationBasedDelegate();
+                attributes.readFrom(path);
+                return new RegularFileZipEntry(path, size, lastModifiedTime, attributes, () -> new FileInputStream(path.toFile()));
             } catch(IOException e) {
                 throw new Zip4jException(e);
             }
