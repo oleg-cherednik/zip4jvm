@@ -1,5 +1,7 @@
 package ru.olegcherednik.zip4jvm.engine;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.SingleZipOutputStream;
@@ -7,8 +9,6 @@ import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.entry.EntryOutputStream;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -32,10 +32,10 @@ public class ZipEngine {
 
         updateZip64(entries);
 
-        try (DataOutput out = createDataOutput()) {
+        try (DataOutput out = createDataOutput(zipModel)) {
             entries.stream()
                    .filter(entry -> !entry.isRoot())
-                   .forEach(entry -> writeEntry(entry, out));
+                   .forEach(entry -> writeEntry(entry, out, zipModel));
         } catch(IOException e) {
             throw new Zip4jException(e);
         }
@@ -46,7 +46,7 @@ public class ZipEngine {
             zipModel.setZip64(true);
     }
 
-    private DataOutput createDataOutput() throws IOException {
+    public static DataOutput createDataOutput(ZipModel zipModel) throws IOException {
         Path parent = zipModel.getZipFile().getParent();
 
         if (parent != null)
@@ -55,7 +55,7 @@ public class ZipEngine {
         return zipModel.isSplit() ? SplitZipOutputStream.create(zipModel) : SingleZipOutputStream.create(zipModel);
     }
 
-    private void writeEntry(ZipEntry entry, DataOutput out) {
+    public static void writeEntry(ZipEntry entry, DataOutput out, ZipModel zipModel) {
         try (OutputStream os = EntryOutputStream.create(entry, zipModel, out)) {
             entry.write(os);
         } catch(IOException e) {

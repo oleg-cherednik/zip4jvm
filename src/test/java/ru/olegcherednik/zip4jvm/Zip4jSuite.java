@@ -24,8 +24,8 @@ import java.util.stream.Stream;
 @SuppressWarnings("FieldNamingConvention")
 public class Zip4jSuite {
 
-    public static final Path rootDir = createTempDirectory("zip4j");
-//            public static final Path rootDir = Paths.get("d:/zip4j/foo");
+    //    public static final Path rootDir = createTempDirectory("zip4j");
+    public static final Path rootDir = Paths.get("d:/zip4j/foo");
     public static final Path srcDir = rootDir.resolve("src");
 
     public static final Path carsDir = srcDir.resolve("cars");
@@ -71,7 +71,7 @@ public class Zip4jSuite {
     /** Password for encrypted zip */
     public static final char[] password = "1".toCharArray();
     /** Clear resources */
-    public static final boolean clear = true;
+    public static final boolean clear = false;
 
     private static final long time = System.currentTimeMillis();
 

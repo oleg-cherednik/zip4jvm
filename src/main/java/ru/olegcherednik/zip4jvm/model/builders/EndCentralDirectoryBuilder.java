@@ -42,6 +42,11 @@ public final class EndCentralDirectoryBuilder {
     }
 
     private long getCentralDirectoryOffs() {
+        return getCentralDirectoryOffs(zipModel);
+    }
+
+    @Deprecated
+    public static long getCentralDirectoryOffs(ZipModel zipModel) {
         return zipModel.isZip64() ? Zip64.LIMIT : zipModel.getCentralDirectoryOffs();
     }
 

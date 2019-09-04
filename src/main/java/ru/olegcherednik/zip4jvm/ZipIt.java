@@ -79,7 +79,7 @@ public final class ZipIt {
         new ZipEngine(zipModel).addEntries(entries);
     }
 
-    private static Collection<Path> withExistedEntries(Collection<Path> paths) {
+    public static Collection<Path> withExistedEntries(Collection<Path> paths) {
         for (Path path : paths)
             if (!Files.exists(path))
                 throw new Zip4jPathNotExistsException(path);
@@ -88,7 +88,7 @@ public final class ZipIt {
     }
 
     @NonNull
-    private static List<ZipEntry> createEntries(Collection<Path> paths, ZipParameters parameters) {
+    public static List<ZipEntry> createEntries(Collection<Path> paths, ZipParameters parameters) {
         paths = getUniqueRecursivePaths(paths);
         Set<Path> emptyDirectories = getEmptyDirectories(paths);
 

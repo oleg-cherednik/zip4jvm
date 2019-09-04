@@ -1,11 +1,22 @@
 package ru.olegcherednik.zip4jvm;
 
-import ru.olegcherednik.zip4jvm.model.ZipParameters;
 import lombok.NonNull;
+import ru.olegcherednik.zip4jvm.engine.ZipEngine;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.ZipParameters;
+import ru.olegcherednik.zip4jvm.model.builders.EndCentralDirectoryBuilder;
+import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * ZipFile real-time implementation.
@@ -28,16 +39,40 @@ import java.nio.file.Path;
  */
 public final class ZipFile implements Closeable {
 
-    public ZipFile(@NonNull Path zip) {
-        this(zip, ZipParameters.builder().build());
+    private final Charset charset = StandardCharsets.UTF_8;
+    private final ZipModel zipModel;
+    private final DataOutput out;
+
+    public ZipFile(@NonNull Path file) throws IOException {
+        this(file, ZipParameters.builder().build());
     }
 
-    public ZipFile(@NonNull Path zip, @NonNull ZipParameters parameters) {
+    public ZipFile(@NonNull Path file, @NonNull ZipParameters parameters) throws IOException {
+        zipModel = ZipModelBuilder.readOrCreate(file, charset).noSplitOnly();
+        out = ZipEngine.createDataOutput(zipModel);
+        out.seek(EndCentralDirectoryBuilder.getCentralDirectoryOffs(zipModel));
+    }
 
+    public void add(@NonNull Path path) {
+        ZipParameters parameters = ZipParameters.builder()
+                                                .compression(Compression.STORE)
+                                                .build();
+
+        List<Path> paths = Collections.singletonList(path);
+        List<ZipEntry> entries = ZipIt.createEntries(ZipIt.withExistedEntries(paths), parameters);
+
+        // TODO throw exception if duplication found
+        entries.stream()
+               .filter(entry -> !entry.isRoot())
+               .forEach(entry -> ZipEngine.writeEntry(entry, out, zipModel));
+
+        int a = 0;
+        a++;
     }
 
     @Override
     public void close() throws IOException {
-
+        // TODO check for zip64
+        out.close();
     }
 }

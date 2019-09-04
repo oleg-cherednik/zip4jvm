@@ -1,13 +1,13 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.LittleEndianReadFile;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -31,13 +31,13 @@ import java.nio.file.Path;
 public final class ZipModelReader {
 
     @NonNull
-    private final Path zipFile;
+    private final Path file;
     @NonNull
     private final Charset charset;
 
     @NonNull
     public ZipModel read() throws IOException {
-        try (LittleEndianReadFile in = new LittleEndianReadFile(zipFile)) {
+        try (LittleEndianReadFile in = new LittleEndianReadFile(file)) {
             EndCentralDirectory endCentralDirectory = new EndCentralDirectoryReader().read(in);
             Zip64 zip64 = new Zip64Reader().read(in);
 
@@ -45,7 +45,7 @@ public final class ZipModelReader {
             long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
             CentralDirectory centralDirectory = new CentralDirectoryReader(offs, totalEntries).read(in);
 
-            return new ZipModelBuilder(zipFile, charset, endCentralDirectory, zip64, centralDirectory).create();
+            return new ZipModelBuilder(file, charset, endCentralDirectory, zip64, centralDirectory).create();
         }
     }
 

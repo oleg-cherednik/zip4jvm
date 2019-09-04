@@ -54,4 +54,6 @@ public class ZipFilesNoSplitTest {
         Zip4jAssertions.assertThatZipFile(zipFile).exists().rootEntry().hasSubDirectories(1).hasFiles(0);
         Zip4jAssertions.assertThatZipFile(zipFile).directory("cars/").matches(TestUtils.zipCarsDirAssert);
     }
+
+    // TODO Test to add files to existed no split zip
 }
