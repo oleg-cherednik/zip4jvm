@@ -1,11 +1,12 @@
 package ru.olegcherednik.zip4jvm;
 
-import ru.olegcherednik.zip4jvm.data.DefalteZipData;
-import ru.olegcherednik.zip4jvm.data.StoreZipData;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import org.apache.commons.io.FileUtils;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
+import ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions;
+import ru.olegcherednik.zip4jvm.data.DefalteZipData;
+import ru.olegcherednik.zip4jvm.data.StoreZipData;
+import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,8 +17,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirectory;
-
 /**
  * @author Oleg Cherednik
  * @since 23.03.2019
@@ -25,8 +24,8 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirecto
 @SuppressWarnings("FieldNamingConvention")
 public class Zip4jSuite {
 
-    public static final Path rootDir = createTempDirectory("zip4j");
-    //        public static final Path rootDir = Paths.get("d:/zip4j/foo");
+//    public static final Path rootDir = createTempDirectory("zip4j");
+            public static final Path rootDir = Paths.get("d:/zip4j/foo");
     public static final Path srcDir = rootDir.resolve("src");
 
     public static final Path carsDir = srcDir.resolve("cars");
@@ -72,7 +71,7 @@ public class Zip4jSuite {
     /** Password for encrypted zip */
     public static final char[] password = "1".toCharArray();
     /** Clear resources */
-    public static final boolean clear = true;
+    public static final boolean clear = false;
 
     private static final long time = System.currentTimeMillis();
 

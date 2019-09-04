@@ -1,15 +1,14 @@
 package ru.olegcherednik.zip4jvm;
 
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions;
+import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatFile;
 
 /**
  * @author Oleg Cherednik
