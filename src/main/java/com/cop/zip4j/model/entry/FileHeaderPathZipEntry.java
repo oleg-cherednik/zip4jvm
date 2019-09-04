@@ -32,6 +32,7 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
         checksum = fileHeader.getCrc32();
         compressedSize = getCompressedSize(fileHeader);
         dir = ZipUtils.isDirectory(fileHeader.getFileName());
+        setDataDescriptorAvailable(() -> !dir);
 
         setDisk(getDisk(fileHeader));
         setLocalFileHeaderOffs(fileHeader.getOffsLocalFileHeader());
@@ -50,13 +51,6 @@ public class FileHeaderPathZipEntry extends PathZipEntry {
     @Override
     public long getChecksum() {
         return checksum;
-    }
-
-    @Override
-    public boolean isDataDescriptorAvailable() {
-        if (dataDescriptorAvailable != null)
-            return dataDescriptorAvailable;
-        return !dir;
     }
 
     private static long getDisk(CentralDirectory.FileHeader fileHeader) {

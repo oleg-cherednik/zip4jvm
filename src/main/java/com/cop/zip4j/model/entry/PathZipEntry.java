@@ -10,6 +10,7 @@ import com.cop.zip4j.model.ExternalFileAttributes;
 import com.cop.zip4j.model.InternalFileAttributes;
 import com.cop.zip4j.model.LocalFileHeader;
 import com.cop.zip4j.model.Zip64;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.function.BooleanSupplier;
 
 /**
  * @author Oleg Cherednik
@@ -50,8 +52,8 @@ public abstract class PathZipEntry extends ZipEntry {
 
     private long disk;
     private long localFileHeaderOffs;
-    protected Boolean dataDescriptorAvailable;
-
+    @Getter(AccessLevel.NONE)
+    private BooleanSupplier dataDescriptorAvailable = () -> false;
 
     public boolean isRegularFile() {
         return false;
@@ -77,8 +79,6 @@ public abstract class PathZipEntry extends ZipEntry {
         return getEncryption() != Encryption.OFF;
     }
 
-    public abstract boolean isDataDescriptorAvailable();
-
     public long write(@NonNull OutputStream out) throws IOException {
         return 0;
     }
@@ -100,6 +100,10 @@ public abstract class PathZipEntry extends ZipEntry {
     }
 
     public void checkCompressedSize(long actual) {
+    }
+
+    public final boolean isDataDescriptorAvailable() {
+        return dataDescriptorAvailable.getAsBoolean();
     }
 
 }

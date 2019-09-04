@@ -39,7 +39,7 @@ public abstract class EntryInputStream extends InputStream {
 
     public static InputStream create(@NonNull PathZipEntry entry, @NonNull DataInput in) throws IOException {
         LocalFileHeader localFileHeader = new LocalFileHeaderReader(entry).read(in);
-        updateEntry(entry, localFileHeader);
+        entry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
         // TODO check that localFileHeader matches fileHeader
         Decoder decoder = entry.getEncryption().getCreateDecoder().apply(entry, in);
         Compression compression = entry.getCompression();
@@ -50,10 +50,6 @@ public abstract class EntryInputStream extends InputStream {
             return new InflateEntryInputStream(entry, in, decoder);
 
         throw new Zip4jException("Compression is not supported: " + compression);
-    }
-
-    private static void updateEntry(PathZipEntry entry, LocalFileHeader localFileHeader) {
-        entry.setDataDescriptorAvailable(localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
     }
 
     protected EntryInputStream(PathZipEntry entry, DataInput in, Decoder decoder) {

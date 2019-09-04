@@ -36,11 +36,4 @@ public class DirectoryZipEntry extends PathZipEntry {
         return 0;
     }
 
-    @Override
-    public boolean isDataDescriptorAvailable() {
-        if (dataDescriptorAvailable != null)
-            return dataDescriptorAvailable;
-        return false;
-    }
-
 }

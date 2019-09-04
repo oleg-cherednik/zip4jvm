@@ -32,10 +32,11 @@ public class RegularFileZipEntry extends PathZipEntry {
     private long compressedSize;
 
     public RegularFileZipEntry(String fileName, long uncompressedSize, int lastModifiedTime, Compression compression,
-            CompressionLevel compressionLevel,
-            Encryption encryption, boolean zip64, ExternalFileAttributes externalFileAttributes, IOSupplier<InputStream> inputStream) {
+            CompressionLevel compressionLevel, Encryption encryption, boolean zip64, ExternalFileAttributes externalFileAttributes,
+            IOSupplier<InputStream> inputStream) {
         super(ZipUtils.normalizeFileName.apply(fileName), uncompressedSize, lastModifiedTime, compression, compressionLevel, encryption, zip64,
                 externalFileAttributes);
+        setDataDescriptorAvailable(() -> true);
         this.inputStream = inputStream;
     }
 
@@ -49,13 +50,6 @@ public class RegularFileZipEntry extends PathZipEntry {
         try (InputStream in = inputStream.get()) {
             return uncompressedSize > SIZE_2GB ? IOUtils.copyLarge(in, out) : IOUtils.copy(in, out);
         }
-    }
-
-    @Override
-    public boolean isDataDescriptorAvailable() {
-        if (dataDescriptorAvailable != null)
-            return dataDescriptorAvailable;
-        return true;
     }
 
     /** It's able to check compressed size only for {@link Compression#STORE} */
