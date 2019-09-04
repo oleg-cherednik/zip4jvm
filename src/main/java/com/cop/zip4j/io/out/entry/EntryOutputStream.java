@@ -85,8 +85,8 @@ public abstract class EntryOutputStream extends OutputStream {
     public void close() throws IOException {
         encoder.close(out);
         entry.setChecksum(checksum.getValue());
+        // TODO merge these two methods
         entry.checkCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
-
         entry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
         writeDataDescriptor();
     }
