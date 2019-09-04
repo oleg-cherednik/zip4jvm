@@ -27,6 +27,7 @@ public final class ZipModelBuilder {
     @NonNull
     private final Path zipFile;
     // TODO is should not be here, get from FileHeader is utf8 or not
+    // either UTF8 or cp437
     @NonNull
     private final Charset charset;
     @NonNull

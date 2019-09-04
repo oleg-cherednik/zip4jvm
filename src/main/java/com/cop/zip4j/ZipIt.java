@@ -52,6 +52,7 @@ public final class ZipIt {
     private final Path zipFile;
     @NonNull
     @Builder.Default
+    // either UTF8 or cp437
     private final Charset charset = StandardCharsets.UTF_8;
 
     public void add(@NonNull Path path, @NonNull ZipParameters parameters) throws IOException {

@@ -27,6 +27,7 @@ public class UnzipIt {
     private final Path zipFile;
     @NonNull
     @Builder.Default
+    // either UTF8 or cp437
     private final Charset charset = StandardCharsets.UTF_8;
     private final char[] password;
 
