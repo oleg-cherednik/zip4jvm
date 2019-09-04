@@ -22,7 +22,7 @@ public abstract class ZipEntry {
                 int lastModifiedTime = ZipUtils.javaToDosTime(Files.getLastModifiedTime(path).toMillis());
                 ExternalFileAttributes attributes = ExternalFileAttributes.createOperationBasedDelegate();
                 attributes.readFrom(path);
-                return new DirectoryZipEntry(path, lastModifiedTime, attributes);
+                return new DirectoryZipEntry(lastModifiedTime, attributes);
             } catch(IOException e) {
                 throw new Zip4jException(e);
             }
@@ -34,7 +34,7 @@ public abstract class ZipEntry {
                 int lastModifiedTime = ZipUtils.javaToDosTime(Files.getLastModifiedTime(path).toMillis());
                 ExternalFileAttributes attributes = ExternalFileAttributes.createOperationBasedDelegate();
                 attributes.readFrom(path);
-                return new RegularFileZipEntry(path, size, lastModifiedTime, attributes, () -> new FileInputStream(path.toFile()));
+                return new RegularFileZipEntry(size, lastModifiedTime, attributes, () -> new FileInputStream(path.toFile()));
             } catch(IOException e) {
                 throw new Zip4jException(e);
             }
