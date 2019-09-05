@@ -122,4 +122,23 @@ public class ZipFileTest {
 //        assertThatZipFile(file).file("ferrari-458-italia.jpg").exists().isImage().hasSize(320_894).hasComment("ferrari-458-italia");
 //        assertThatZipFile(file).file("wiesmann-gt-mf5.jpg").exists().isImage().hasSize(729_633).hasComment("wiesmann-gt-mf5");
     }
+
+    public void shouldCreateZipFileWithContentWhenUseZipFile() throws IOException {
+        ZipFileSettings zipFileSettings = ZipFileSettings.builder().build();
+        ZipEntrySettings defaultEntrySettings = ZipEntrySettings.builder()
+                                                                .compression(Compression.STORE)
+                                                                .build();
+
+        try (ZipFile zipFile = new ZipFile(file, zipFileSettings)) {
+            zipFile.add(Zip4jSuite.carsDir);            // add cars directory to the root (use default settings)
+            zipFile.add(Zip4jSuite.filesStarWarsDir);   // add starWars content to the "StartWars" dir
+            zipFile.add(Zip4jSuite.carsDir);            // add other files and empty folder from root content
+        }
+
+        assertThatDirectory(file.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatZipFile(file).exists().rootEntry().hasSubDirectories(0).hasFiles(3);
+        assertThatZipFile(file).file("bentley-continental.jpg").exists().isImage().hasSize(1_395_362);
+        assertThatZipFile(file).file("ferrari-458-italia.jpg").exists().isImage().hasSize(320_894);
+        assertThatZipFile(file).file("wiesmann-gt-mf5.jpg").exists().isImage().hasSize(729_633);
+    }
 }

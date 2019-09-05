@@ -12,6 +12,7 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import java.io.Closeable;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -47,6 +48,14 @@ public final class ZipFile implements Closeable {
         zipModel = ZipModelBuilder.readOrCreate(file, zipFileSettings);
         out = ZipEngine.createDataOutput(zipModel);
         out.seek(zipModel.getCentralDirectoryOffs());
+    }
+
+    public void add(@NonNull Path path) {
+
+    }
+
+    public void add(@NonNull Collection<Path> paths) {
+
     }
 
     public void add(@NonNull Path path, ZipEntrySettings settings) {

@@ -10,7 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 @Getter
-@Builder
+@Builder(toBuilder = true)
 public final class ZipEntrySettings {
 
     @NonNull
@@ -34,7 +34,6 @@ public final class ZipEntrySettings {
 
     @Setter
     private Path defaultFolderPath;
-
 
     public String getRelativeFileName(Path path) {
         path = path.toAbsolutePath();
