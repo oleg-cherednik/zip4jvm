@@ -1,5 +1,7 @@
 package ru.olegcherednik.zip4jvm.model.builders;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
@@ -7,11 +9,8 @@ import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -26,10 +25,6 @@ public final class ZipModelBuilder {
 
     @NonNull
     private final Path zipFile;
-    // TODO is should not be here, get from FileHeader is utf8 or not
-    // either UTF8 or IBM Code Page 437/Cp437
-    @NonNull
-    private final Charset charset;
     @NonNull
     private final EndCentralDirectory endCentralDirectory;
     @NonNull
@@ -39,13 +34,13 @@ public final class ZipModelBuilder {
 
     @NonNull
     // TODO do we really need it; we always know is it exists or not
-    public static ZipModel readOrCreate(@NonNull Path zipFile, @NonNull Charset charset) throws IOException {
-        return Files.exists(zipFile) ? new ZipModelReader(zipFile, charset).read() : new ZipModel(zipFile, charset);
+    public static ZipModel readOrCreate(@NonNull Path zipFile) throws IOException {
+        return Files.exists(zipFile) ? new ZipModelReader(zipFile).read() : new ZipModel(zipFile);
     }
 
     @NonNull
     public ZipModel create() throws IOException {
-        ZipModel zipModel = new ZipModel(zipFile, charset);
+        ZipModel zipModel = new ZipModel(zipFile);
 
         zipModel.setZip64(zip64 != Zip64.NULL);
         zipModel.setComment(endCentralDirectory.getComment());

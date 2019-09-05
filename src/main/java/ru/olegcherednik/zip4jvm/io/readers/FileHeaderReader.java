@@ -1,5 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
@@ -7,8 +9,6 @@ import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -70,9 +70,7 @@ final class FileHeaderReader {
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")
     private static ExternalFileAttributes getExternalFileAttribute(byte[] data) {
-        ExternalFileAttributes attributes = ExternalFileAttributes.createDataBasedDelegate(data);
-        attributes.readFrom(data);
-        return attributes;
+        return ExternalFileAttributes.createDataBasedDelegate(data);
     }
 
     private static ExtraFieldReader getExtraFieldReader(int size, CentralDirectory.FileHeader fileHeader) {

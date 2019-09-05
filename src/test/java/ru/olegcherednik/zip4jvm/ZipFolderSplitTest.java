@@ -39,8 +39,7 @@ public class ZipFolderSplitTest {
     @Test
     public void shouldCreateNewZipWithFolder() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compression(Compression.DEFLATE)
-                                                .compressionLevel(CompressionLevel.NORMAL)
+                                                .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
                                                 .splitLength(1024 * 1024).build();
 
         ZipIt zipIt = ZipIt.builder().zipFile(zipFile).build();
@@ -56,8 +55,7 @@ public class ZipFolderSplitTest {
     @Test(dependsOnMethods = "shouldCreateNewZipWithFolder")
     public void shouldThrowExceptionWhenModifySplitZip() {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compression(Compression.DEFLATE)
-                                                .compressionLevel(CompressionLevel.NORMAL)
+                                                .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
                                                 .defaultFolderPath(Zip4jSuite.srcDir)
                                                 .splitLength(1024 * 1024).build();
         ZipIt zip = ZipIt.builder().zipFile(zipFile).build();

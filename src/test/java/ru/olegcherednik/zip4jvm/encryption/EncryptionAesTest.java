@@ -1,5 +1,8 @@
 package ru.olegcherednik.zip4jvm.encryption;
 
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.TestUtils;
 import ru.olegcherednik.zip4jvm.Zip4jSuite;
 import ru.olegcherednik.zip4jvm.ZipIt;
@@ -7,9 +10,6 @@ import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ZipParameters;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -40,11 +40,9 @@ public class EncryptionAesTest {
     @Test
     public void shouldCreateNewZipWithFolderAndAesEncryption() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compression(Compression.STORE)
-                                                .compressionLevel(CompressionLevel.NORMAL)
-                                                .encryption(Encryption.AES_256)
-                                                .comment("password: " + new String(Zip4jSuite.password))
-                                                .password(Zip4jSuite.password).build();
+                                                .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                .encryption(Encryption.AES_256, Zip4jSuite.password)
+                                                .comment("password: " + new String(Zip4jSuite.password)).build();
 
         Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         Path zipFile = dstDir.resolve("src.zip");

@@ -44,8 +44,7 @@ public class ModifyCommentTest {
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
 
         ZipParameters parameters = ZipParameters.builder()
-                                                .compression(Compression.DEFLATE)
-                                                .compressionLevel(CompressionLevel.NORMAL)
+                                                .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
                                                 .comment("Oleg Cherednik - Олег Чередник").build();
 
         ZipIt zipIt = ZipIt.builder().zipFile(zipFile).build();

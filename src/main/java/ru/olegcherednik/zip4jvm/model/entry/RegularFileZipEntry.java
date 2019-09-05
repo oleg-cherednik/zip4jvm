@@ -1,15 +1,15 @@
 package ru.olegcherednik.zip4jvm.model.entry;
 
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.utils.function.IOSupplier;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,7 +21,7 @@ import java.io.OutputStream;
  */
 @Getter
 @Setter
-class RegularFileZipEntry extends ZipEntry {
+final class RegularFileZipEntry extends ZipEntry {
 
     private static final long SIZE_2GB = 2_147_483_648L;
 
@@ -29,10 +29,9 @@ class RegularFileZipEntry extends ZipEntry {
 
     private long checksum;
 
-    public RegularFileZipEntry(String fileName, long uncompressedSize, int lastModifiedTime, Compression compression,
-            CompressionLevel compressionLevel, Encryption encryption, boolean zip64, ExternalFileAttributes externalFileAttributes,
-            IOSupplier<InputStream> inputStream) {
-        super(fileName, uncompressedSize, lastModifiedTime, compression, compressionLevel, encryption, zip64, externalFileAttributes);
+    public RegularFileZipEntry(String fileName, int lastModifiedTime, ExternalFileAttributes externalFileAttributes, long uncompressedSize,
+            Compression compression, CompressionLevel compressionLevel, Encryption encryption, boolean zip64, IOSupplier<InputStream> inputStream) {
+        super(fileName, lastModifiedTime, externalFileAttributes, uncompressedSize, compression, compressionLevel, encryption, zip64);
         setDataDescriptorAvailable(() -> true);
         this.inputStream = inputStream;
     }
@@ -58,7 +57,7 @@ class RegularFileZipEntry extends ZipEntry {
         long expected = encryption.getExpectedCompressedSizeFunc().apply(uncompressedSize);
 
         if (expected != actual)
-            throw new Zip4jException("CompressedSize is not matched: " + fileName);
+            throw new Zip4jException("CompressedSize is not matched: " + getFileName());
     }
 
     @Override

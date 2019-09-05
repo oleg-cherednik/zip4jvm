@@ -1,12 +1,12 @@
 package ru.olegcherednik.zip4jvm.io.writers;
 
-import ru.olegcherednik.zip4jvm.io.out.DataOutput;
-import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author Oleg Cherednik
@@ -17,11 +17,9 @@ final class EndCentralDirectoryWriter {
 
     @NonNull
     private final EndCentralDirectory endCentralDirectory;
-    @NonNull
-    private final Charset charset;
 
     public void write(@NonNull DataOutput out) throws IOException {
-        byte[] comment = endCentralDirectory.getComment(charset);
+        byte[] comment = endCentralDirectory.getComment(StandardCharsets.UTF_8);
 
         out.writeDwordSignature(EndCentralDirectory.SIGNATURE);
         out.writeWord(endCentralDirectory.getTotalDisks());

@@ -60,11 +60,15 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consum
     }
 
     public static ExternalFileAttributes createDataBasedDelegate(byte[] data) {
+        ExternalFileAttributes attributes = NULL;
+
         if (Windows.isValid(data))
-            return new Windows();
-        if (Posix.isValid(data))
-            return new Posix();
-        return NULL;
+            attributes = new Windows();
+        else if (Posix.isValid(data))
+            attributes = new Posix();
+
+        attributes.readFrom(data);
+        return attributes;
     }
 
     @Override

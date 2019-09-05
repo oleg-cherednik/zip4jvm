@@ -4,6 +4,7 @@ import lombok.NonNull;
 import org.mozilla.universalchardet.UniversalDetector;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Function;
 
 /**
@@ -11,6 +12,7 @@ import java.util.function.Function;
  * @since 18.03.2019
  */
 public final class CreateStringFunc implements Function<byte[], String> {
+
     @Override
     public String apply(byte[] buf) {
         return new String(buf, detectCharset(buf));
@@ -23,6 +25,6 @@ public final class CreateStringFunc implements Function<byte[], String> {
         detector.dataEnd();
 
         String charsetName = detector.getDetectedCharset();
-        return charsetName != null ? Charset.forName(charsetName) : Charset.defaultCharset();
+        return charsetName != null ? Charset.forName(charsetName) : StandardCharsets.UTF_8;
     }
 }

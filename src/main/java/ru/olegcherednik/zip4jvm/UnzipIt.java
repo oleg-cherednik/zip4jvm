@@ -1,16 +1,14 @@
 package ru.olegcherednik.zip4jvm;
 
+import lombok.Builder;
+import lombok.NonNull;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
-import lombok.Builder;
-import lombok.NonNull;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -25,17 +23,13 @@ public class UnzipIt {
 
     @NonNull
     private final Path zipFile;
-    @NonNull
-    @Builder.Default
-    // either UTF8 or cp437
-    private final Charset charset = StandardCharsets.UTF_8;
     private final char[] password;
 
     public void extract(@NonNull Path dstDir) throws IOException {
         checkZipFile(zipFile);
         checkOutputFolder(dstDir);
 
-        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile, charset);
+        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile);
         zipModel.getEntries().forEach(entry -> entry.setPassword(password));
         new UnzipEngine(zipModel, password).extractEntries(dstDir, zipModel.getEntryNames());
     }
@@ -48,13 +42,13 @@ public class UnzipIt {
         checkZipFile(zipFile);
         checkOutputFolder(dstDir);
 
-        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile, charset);
+        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile);
         zipModel.getEntries().forEach(entry -> entry.setPassword(password));
         new UnzipEngine(zipModel, password).extractEntries(dstDir, entries);
     }
 
     public InputStream extract(@NonNull String entryName) throws IOException {
-        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile, charset);
+        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile);
         zipModel.getEntries().forEach(entry -> entry.setPassword(password));
         return new UnzipEngine(zipModel, password).extractEntry(entryName);
     }

@@ -1,5 +1,8 @@
 package ru.olegcherednik.zip4jvm;
 
+import lombok.Builder;
+import lombok.NonNull;
+import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.DataOutputStreamDecorator;
@@ -9,16 +12,11 @@ import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.RemoveEntryFunc;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
-import lombok.Builder;
-import lombok.NonNull;
-import org.apache.commons.io.IOUtils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -37,10 +35,6 @@ public final class ZipMisc {
 
     @NonNull
     private final Path zipFile;
-    @NonNull
-    @Builder.Default
-    // either UTF8 or cp437
-    private final Charset charset = StandardCharsets.UTF_8;
     private final char[] password;
 
     public void clearComment() throws IOException {
@@ -51,7 +45,7 @@ public final class ZipMisc {
         comment = ZipUtils.normalizeComment.apply(comment);
         UnzipIt.checkZipFile(zipFile);
 
-        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile, charset).noSplitOnly();
+        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile).noSplitOnly();
         zipModel.setComment(comment);
 
         try (SingleZipOutputStream out = SingleZipOutputStream.create(zipModel)) {
@@ -63,12 +57,12 @@ public final class ZipMisc {
 
     public String getComment() throws IOException {
         UnzipIt.checkZipFile(zipFile);
-        return ZipModelBuilder.readOrCreate(zipFile, charset).getComment();
+        return ZipModelBuilder.readOrCreate(zipFile).getComment();
     }
 
     public boolean isEncrypted() throws IOException {
         UnzipIt.checkZipFile(zipFile);
-        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile, charset);
+        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile);
 
         return zipModel.getEntries().stream()
                        .anyMatch(ZipEntry::isEncrypted);
@@ -76,12 +70,12 @@ public final class ZipMisc {
 
     public List<String> getEntryNames() throws IOException {
         UnzipIt.checkZipFile(zipFile);
-        return ZipModelBuilder.readOrCreate(zipFile, charset).getEntryNames();
+        return ZipModelBuilder.readOrCreate(zipFile).getEntryNames();
     }
 
     public List<Path> getFiles() throws IOException {
         UnzipIt.checkZipFile(zipFile);
-        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile, charset);
+        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile);
 
         return LongStream.rangeClosed(0, zipModel.getTotalDisks())
                          .mapToObj(i -> i == 0 ? zipModel.getZipFile() : ZipModel.getSplitFilePath(zipFile, i))
@@ -90,7 +84,7 @@ public final class ZipMisc {
 
     public boolean isSplit() throws IOException {
         UnzipIt.checkZipFile(zipFile);
-        return ZipModelBuilder.readOrCreate(zipFile, charset).isSplit();
+        return ZipModelBuilder.readOrCreate(zipFile).isSplit();
     }
 
     public void removeEntry(@NonNull String entryName) throws IOException {
@@ -100,14 +94,14 @@ public final class ZipMisc {
     public void removeEntries(@NonNull Collection<String> entries) throws IOException {
         UnzipIt.checkZipFile(zipFile);
 
-        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile, charset).noSplitOnly();
+        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile).noSplitOnly();
         new RemoveEntryFunc(zipModel).accept(entries);
     }
 
     // --------- MergeSplitZip
 
     public void merge(@NonNull Path destZipFile) throws IOException {
-        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile, charset);
+        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile);
 
         // TODO probably if not split archive, just copy single zip file
         if (!zipModel.isSplit())

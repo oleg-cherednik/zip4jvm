@@ -10,7 +10,6 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 
 /**
@@ -32,8 +31,6 @@ public final class ZipModelReader {
 
     @NonNull
     private final Path file;
-    @NonNull
-    private final Charset charset;
 
     @NonNull
     public ZipModel read() throws IOException {
@@ -45,7 +42,7 @@ public final class ZipModelReader {
             long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
             CentralDirectory centralDirectory = new CentralDirectoryReader(offs, totalEntries).read(in);
 
-            return new ZipModelBuilder(file, charset, endCentralDirectory, zip64, centralDirectory).create();
+            return new ZipModelBuilder(file, endCentralDirectory, zip64, centralDirectory).create();
         }
     }
 

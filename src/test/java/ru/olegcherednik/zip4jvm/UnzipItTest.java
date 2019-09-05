@@ -89,11 +89,9 @@ public class UnzipItTest {
 
     public void shouldUnzipEncryptedZip() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compression(Compression.DEFLATE)
-                                                .compressionLevel(CompressionLevel.NORMAL)
-                                                .encryption(Encryption.PKWARE)
-                                                .comment("password: " + new String(Zip4jSuite.password))
-                                                .password(Zip4jSuite.password).build();
+                                                .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
+                                                .encryption(Encryption.PKWARE, Zip4jSuite.password)
+                                                .comment("password: " + new String(Zip4jSuite.password)).build();
 
         Path dstDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
         Path zipFile = dstDir.resolve("src.zip");

@@ -1,11 +1,11 @@
 package ru.olegcherednik.zip4jvm;
 
-import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
-import ru.olegcherednik.zip4jvm.model.ZipParameters;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.CompressionLevel;
+import ru.olegcherednik.zip4jvm.model.ZipParameters;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -39,8 +39,7 @@ public class ZipRemoveTest {
     @Test
     public void shouldRemoveGivenFilesFromExistedZip() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compression(Compression.DEFLATE)
-                                                .compressionLevel(CompressionLevel.NORMAL)
+                                                .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
                                                 .defaultFolderPath(Zip4jSuite.srcDir).build();
 
         Path bentley = Zip4jSuite.carsDir.resolve("bentley-continental.jpg");

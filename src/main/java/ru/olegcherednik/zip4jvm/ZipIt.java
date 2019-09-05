@@ -15,6 +15,9 @@
  */
 package ru.olegcherednik.zip4jvm;
 
+import lombok.Builder;
+import lombok.NonNull;
+import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.engine.ZipEngine;
 import ru.olegcherednik.zip4jvm.exception.Zip4jEmptyPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jPathNotExistsException;
@@ -22,17 +25,12 @@ import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.ZipParameters;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
-import lombok.Builder;
-import lombok.NonNull;
-import org.apache.commons.lang.ArrayUtils;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -51,10 +49,6 @@ public final class ZipIt {
 
     @NonNull
     private final Path zipFile;
-    @NonNull
-    @Builder.Default
-    // either UTF8 or cp437
-    private final Charset charset = StandardCharsets.UTF_8;
 
     public void add(@NonNull Path path, @NonNull ZipParameters parameters) throws IOException {
         add(Collections.singleton(path), parameters);
@@ -70,10 +64,11 @@ public final class ZipIt {
                 parameters.setDefaultFolderPath(path);
         }
 
-        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile, charset).noSplitOnly();
+        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile).noSplitOnly();
         zipModel.setSplitSize(parameters.getSplitLength());
         zipModel.setComment(ZipUtils.normalizeComment.apply(parameters.getComment()));
         zipModel.setZip64(parameters.isZip64());
+        zipModel.setUtf8(parameters.isUtf8());
 
         List<ZipEntry> entries = createEntries(withExistedEntries(paths), parameters);
         // TODO if at least one fileName is null then defaultRootPath is not correct

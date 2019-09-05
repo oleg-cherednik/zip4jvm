@@ -11,8 +11,6 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -38,7 +36,6 @@ import java.util.List;
  */
 public final class ZipFile implements Closeable {
 
-    private final Charset charset = StandardCharsets.UTF_8;
     private final ZipModel zipModel;
     private final DataOutput out;
 
@@ -47,7 +44,7 @@ public final class ZipFile implements Closeable {
     }
 
     public ZipFile(@NonNull Path file, @NonNull ZipParameters parameters) throws IOException {
-        zipModel = ZipModelBuilder.readOrCreate(file, charset).noSplitOnly();
+        zipModel = ZipModelBuilder.readOrCreate(file).noSplitOnly();
         out = ZipEngine.createDataOutput(zipModel);
         out.seek(zipModel.getCentralDirectoryOffs());
     }

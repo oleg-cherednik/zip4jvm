@@ -6,6 +6,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions;
 import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ZipParameters;
 
@@ -39,9 +40,8 @@ public class Zip64Test {
     @Test
     public void shouldZipWhenZip64() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compression(Compression.STORE)
-                                                .zip64(true)
-                                                .build();
+                                                .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                .zip64(true).build();
 
         zipFile1 = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile1).build();
@@ -67,11 +67,10 @@ public class Zip64Test {
     @Test
     public void shouldZipWhenZip64AndAesEncryption() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compression(Compression.STORE)
-                                                .encryption(Encryption.AES_256)
-                                                .zip64(true)
+                                                .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                .encryption(Encryption.AES_256, Zip4jSuite.password)
                                                 .comment("password: " + new String(Zip4jSuite.password))
-                                                .password(Zip4jSuite.password).build();
+                                                .zip64(true).build();
 
         zipFile2 = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt zip = ZipIt.builder().zipFile(zipFile2).build();
@@ -98,7 +97,7 @@ public class Zip64Test {
     @Test
     public void shouldZipWhenZip64AndSplit() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compression(Compression.STORE)
+                                                .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                 .zip64(true)
                                                 .splitLength(1024 * 1024)
                                                 .build();
@@ -129,7 +128,7 @@ public class Zip64Test {
 //        createData(dir);
 
         ZipParameters parameters = ZipParameters.builder()
-                                                .compression(Compression.STORE)
+                                                .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                 .build();
 
         Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
@@ -147,13 +146,13 @@ public class Zip64Test {
 //        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
     }
 
-//    @Test
+    //    @Test
     public void shouldUseZip64WhenZipFileOver3Gb() throws IOException {
 //        Path dir = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("data");
 //        createData(dir);
 
         ZipParameters parameters = ZipParameters.builder()
-                                                .compression(Compression.STORE)
+                                                .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                 .build();
 
         Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");

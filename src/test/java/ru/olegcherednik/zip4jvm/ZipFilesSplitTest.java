@@ -1,12 +1,12 @@
 package ru.olegcherednik.zip4jvm;
 
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.ZipParameters;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -37,8 +37,7 @@ public class ZipFilesSplitTest {
     @Test
     public void shouldCreateNewSplitZipWithFiles() throws IOException, Zip4jException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compression(Compression.DEFLATE)
-                                                .compressionLevel(CompressionLevel.NORMAL)
+                                                .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
                                                 .defaultFolderPath(Zip4jSuite.carsDir)
                                                 .splitLength(1024 * 1024).build();
 

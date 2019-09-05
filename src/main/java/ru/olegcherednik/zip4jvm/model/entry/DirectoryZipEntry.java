@@ -9,10 +9,10 @@ import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
  * @author Oleg Cherednik
  * @since 26.07.2019
  */
-class DirectoryZipEntry extends ZipEntry {
+final class DirectoryZipEntry extends ZipEntry {
 
     public DirectoryZipEntry(String fileName, int lastModifiedTime, ExternalFileAttributes externalFileAttributes) {
-        super(fileName, 0, lastModifiedTime, Compression.STORE, CompressionLevel.NORMAL, Encryption.OFF, false, externalFileAttributes);
+        super(fileName, lastModifiedTime, externalFileAttributes, 0, Compression.STORE, CompressionLevel.NORMAL, Encryption.OFF, false);
     }
 
     @Override
@@ -26,7 +26,7 @@ class DirectoryZipEntry extends ZipEntry {
 
     @Override
     public boolean isRoot() {
-        return "/".equals(fileName);
+        return "/".equals(getFileName());
     }
 
 }

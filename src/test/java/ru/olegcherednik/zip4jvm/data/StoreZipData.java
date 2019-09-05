@@ -1,18 +1,19 @@
 package ru.olegcherednik.zip4jvm.data;
 
+import lombok.experimental.UtilityClass;
 import ru.olegcherednik.zip4jvm.TestUtils;
 import ru.olegcherednik.zip4jvm.Zip4jSuite;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.ZipParameters;
-import lombok.experimental.UtilityClass;
 
 import java.io.IOException;
 import java.nio.file.Files;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatZipFile;
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Oleg Cherednik
@@ -27,9 +28,7 @@ public class StoreZipData {
     }
 
     private static void createStoreSolidZip() throws IOException {
-        ZipParameters parameters = ZipParameters.builder()
-                                                .compression(Compression.STORE)
-                                                .build();
+        ZipParameters parameters = ZipParameters.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
         ZipIt zip = ZipIt.builder().zipFile(Zip4jSuite.storeSolidZip).build();
         zip.add(Zip4jSuite.srcDir, parameters);
 
@@ -41,7 +40,7 @@ public class StoreZipData {
 
     private static void createStoreSplitZip() throws IOException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compression(Compression.STORE)
+                                                .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                 .defaultFolderPath(Zip4jSuite.srcDir)
                                                 .splitLength(1024 * 1024)
                                                 .build();

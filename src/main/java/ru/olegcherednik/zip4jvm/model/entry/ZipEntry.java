@@ -1,5 +1,10 @@
 package ru.olegcherednik.zip4jvm.model.entry;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
@@ -10,11 +15,6 @@ import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.Zip64;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -33,9 +33,11 @@ import java.util.function.BooleanSupplier;
 @RequiredArgsConstructor
 public abstract class ZipEntry {
 
-    protected final String fileName;
-    protected final long uncompressedSize;
+    private final String fileName;
     private final int lastModifiedTime;
+    private final ExternalFileAttributes externalFileAttributes;
+
+    protected final long uncompressedSize;
     // TODO set from ZipModel
     protected final Charset charset = StandardCharsets.UTF_8;
     protected final Compression compression;
@@ -46,7 +48,6 @@ public abstract class ZipEntry {
      * In other words, do set this to {@code true}, to write given entry in ZIP64 format.
      */
     private final boolean zip64;
-    private final ExternalFileAttributes externalFileAttributes;
 
     // zip: set it in constructor
     // unzip: set it before unzip

@@ -38,8 +38,7 @@ public class ZipFilesNoSplitTest {
     @Test
     public void shouldCreateNewZipWithFiles() throws IOException, Zip4jException {
         ZipParameters parameters = ZipParameters.builder()
-                                                .compression(Compression.DEFLATE)
-                                                .compressionLevel(CompressionLevel.NORMAL)
+                                                .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
                                                 .defaultFolderPath(Zip4jSuite.srcDir).build();
 
         Path bentley = Zip4jSuite.carsDir.resolve("bentley-continental.jpg");
