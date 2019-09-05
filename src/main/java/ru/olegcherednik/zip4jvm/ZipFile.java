@@ -43,8 +43,8 @@ public final class ZipFile implements Closeable {
         this(file, ZipFileSettings.builder().build());
     }
 
-    public ZipFile(@NonNull Path file, @NonNull ZipFileSettings settings) throws IOException {
-        zipModel = ZipModelBuilder.readOrCreate(file).noSplitOnly();
+    public ZipFile(@NonNull Path file, @NonNull ZipFileSettings zipFileSettings) throws IOException {
+        zipModel = ZipModelBuilder.readOrCreate(file, zipFileSettings);
         out = ZipEngine.createDataOutput(zipModel);
         out.seek(zipModel.getCentralDirectoryOffs());
     }

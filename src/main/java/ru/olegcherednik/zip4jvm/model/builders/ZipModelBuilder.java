@@ -2,10 +2,12 @@ package ru.olegcherednik.zip4jvm.model.builders;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.exception.Zip4jZipFileSettingsNotSetException;
 import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
+import ru.olegcherednik.zip4jvm.model.ZipFileSettings;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
@@ -31,6 +33,23 @@ public final class ZipModelBuilder {
     private final Zip64 zip64;
     @NonNull
     private final CentralDirectory centralDirectory;
+
+    public static ZipModel readOrCreate(Path file, ZipFileSettings zipFileSettings) throws IOException {
+        if (Files.exists(file))
+            return new ZipModelReader(file).read();
+
+        if(zipFileSettings == null)
+            throw new Zip4jZipFileSettingsNotSetException(file);
+
+        ZipModel zipModel = new ZipModel(file);
+        zipModel.setSplitSize(zipFileSettings.getSplitSize());
+        zipModel.setComment(zipFileSettings.getComment());
+        zipModel.setZip64(zipFileSettings.isZip64());
+
+//        private final ZipEntrySettings entrySettings;
+
+        return zipModel;
+    }
 
     @NonNull
     // TODO do we really need it; we always know is it exists or not

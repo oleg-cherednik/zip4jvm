@@ -6,6 +6,7 @@ import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.model.ZipFileSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -36,11 +37,12 @@ public class ZipFileTest {
     }
 
     public void shouldCreateZipFileWhenUseZipFileAndAddFiles() throws IOException {
+        ZipFileSettings zipFileSettings = ZipFileSettings.builder().build();
         ZipEntrySettings settings = ZipEntrySettings.builder()
                                                     .compression(Compression.STORE)
                                                     .build();
 
-        try (ZipFile zipFile = new ZipFile(file)) {
+        try (ZipFile zipFile = new ZipFile(file, zipFileSettings)) {
             zipFile.add(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"), settings);
             zipFile.add(Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg"), settings);
             zipFile.add(Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg"), settings);

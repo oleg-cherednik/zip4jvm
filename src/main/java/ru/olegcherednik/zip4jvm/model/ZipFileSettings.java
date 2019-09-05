@@ -11,6 +11,10 @@ import lombok.Getter;
 @Builder
 public final class ZipFileSettings {
 
+    private final long splitSize;
+    private final String comment;
+    private final boolean zip64;
 
+    private final ZipEntrySettings entrySettings;
 
 }
