@@ -38,7 +38,7 @@ public final class ZipModelWriter {
     private void writeCentralDirectoryHeaders(DataOutput out) throws IOException {
         out.mark(CENTRAL_DIRECTORY_OFFS);
         CentralDirectory centralDirectory = new CentralDirectoryBuilder(zipModel.getEntries()).create();
-        new CentralDirectoryWriter(centralDirectory, zipModel.getCharset()).write(out);
+        new CentralDirectoryWriter(centralDirectory).write(out);
         zipModel.setCentralDirectorySize(out.getWrittenBytesAmount(CENTRAL_DIRECTORY_OFFS));
     }
 

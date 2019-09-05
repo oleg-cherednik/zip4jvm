@@ -1,10 +1,10 @@
 package ru.olegcherednik.zip4jvm.io.writers;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -19,15 +19,14 @@ final class FileHeaderWriter {
 
     @NonNull
     private final List<CentralDirectory.FileHeader> fileHeaders;
-    @NonNull
-    private final Charset charset;
 
     public void write(@NonNull DataOutput out) throws IOException {
         for (CentralDirectory.FileHeader fileHeader : fileHeaders)
             writeFileHeader(fileHeader, out);
     }
 
-    private void writeFileHeader(CentralDirectory.FileHeader fileHeader, DataOutput out) throws IOException {
+    private static void writeFileHeader(CentralDirectory.FileHeader fileHeader, DataOutput out) throws IOException {
+        Charset charset = fileHeader.getGeneralPurposeFlag().getCharset();
         byte[] fileName = fileHeader.getFileName(charset);
         byte[] fileComment = fileHeader.getFileComment(charset);
 

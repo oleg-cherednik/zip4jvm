@@ -1,10 +1,12 @@
 package ru.olegcherednik.zip4jvm.model;
 
-import ru.olegcherednik.zip4jvm.utils.BitUtils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.function.IntSupplier;
 
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT0;
@@ -66,5 +68,11 @@ public class GeneralPurposeFlag implements IntSupplier {
         data = BitUtils.updateBits(data, BIT11, utf8);
 
         return data;
+    }
+
+    private static final Charset IBM437 = Charset.forName("IBM437");
+
+    public Charset getCharset() {
+        return utf8 ? StandardCharsets.UTF_8 : IBM437;
     }
 }

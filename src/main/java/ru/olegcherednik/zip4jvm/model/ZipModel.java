@@ -8,8 +8,6 @@ import org.apache.commons.io.FilenameUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -35,8 +33,6 @@ import java.util.stream.Collectors;
 @Setter
 @RequiredArgsConstructor
 public class ZipModel {
-
-    public static final Charset IBM437 = Charset.forName("IBM437");
 
     public static final int NO_SPLIT = -1;
     // MIN_SPLIT_LENGTH = 64K bytes
@@ -97,11 +93,6 @@ public class ZipModel {
             throw new Zip4jException("Zip file already exists. Zip file format does not allow updating split/spanned files");
 
         return this;
-    }
-
-    @NonNull
-    public Charset getCharset() {
-        return utf8 ? StandardCharsets.UTF_8 : IBM437;
     }
 
 }
