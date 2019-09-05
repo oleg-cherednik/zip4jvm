@@ -4,7 +4,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 @Getter
@@ -21,9 +23,6 @@ public final class ZipEntrySettings {
     @Builder.Default
     private final Encryption encryption = Encryption.OFF;
     private final char[] password;
-    private final String rootFolderInZip;
-    @Builder.Default
-    private final long splitLength = ZipModel.NO_SPLIT;
     private final String comment;
     /**
      * Write all entries as well as entire zip archive in ZIP64 format.
@@ -34,4 +33,31 @@ public final class ZipEntrySettings {
     @Setter
     private Path defaultFolderPath;
 
+
+    public String getRelativeFileName(Path path) {
+        path = path.toAbsolutePath();
+        Path root = defaultFolderPath != null ? defaultFolderPath : path.getParent();
+        String str = root.relativize(path).toString();
+
+        if (Files.isDirectory(path))
+            str += '/';
+
+        return ZipUtils.normalizeFileName(str);
+    }
+
+    /*
+     * dir:
+     * 1. password
+     * 2. comment
+     */
+
+    /*
+     * file:
+     * 1. compression
+     * 2. compression level
+     * 3. encryption
+     * 4. zip64
+     * 5. password
+     * 6. comment
+     */
 }

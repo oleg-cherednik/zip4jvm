@@ -58,11 +58,9 @@ public final class ZipEntryBuilder {
     }
 
     private static ZipEntry createDirectoryEntry(Path dir, ZipEntrySettings settings) throws IOException {
-        String fileName = getRelativeFileName(dir, settings.getDefaultFolderPath(), settings.getRootFolderInZip());
+        String fileName = settings.getRelativeFileName(dir);
         int lastModifiedTime = ZipUtils.javaToDosTime(Files.getLastModifiedTime(dir).toMillis());
-        ExternalFileAttributes attributes = ExternalFileAttributes.createOperationBasedDelegate();
-        attributes.readFrom(dir);
-
+        ExternalFileAttributes attributes = ExternalFileAttributes.createOperationBasedDelegate(dir);
         DirectoryZipEntry zipEntry = new DirectoryZipEntry(fileName, lastModifiedTime, attributes);
         zipEntry.setPassword(settings.getPassword());
         zipEntry.setComment(settings.getComment());
@@ -73,9 +71,7 @@ public final class ZipEntryBuilder {
     private static ZipEntry createDirectoryEntry(Path dir, ZipParameters parameters) throws IOException {
         String fileName = getRelativeFileName(dir, parameters.getDefaultFolderPath(), parameters.getRootFolderInZip());
         int lastModifiedTime = ZipUtils.javaToDosTime(Files.getLastModifiedTime(dir).toMillis());
-        ExternalFileAttributes attributes = ExternalFileAttributes.createOperationBasedDelegate();
-        attributes.readFrom(dir);
-
+        ExternalFileAttributes attributes = ExternalFileAttributes.createOperationBasedDelegate(dir);
         DirectoryZipEntry zipEntry = new DirectoryZipEntry(fileName, lastModifiedTime, attributes);
         zipEntry.setPassword(parameters.getPassword());
 
@@ -90,15 +86,14 @@ public final class ZipEntryBuilder {
     }
 
     private static ZipEntry createRegularFileEntry(Path file, ZipEntrySettings settings) throws IOException {
-        String fileName = getRelativeFileName(file, settings.getDefaultFolderPath(), settings.getRootFolderInZip());
+        String fileName = settings.getRelativeFileName(file);
         long uncompressedSize = Files.size(file);
         int lastModifiedTime = ZipUtils.javaToDosTime(Files.getLastModifiedTime(file).toMillis());
         Compression compression = settings.getCompression();
         CompressionLevel compressionLevel = settings.getCompressionLevel();
         Encryption encryption = settings.getEncryption();
         boolean zip64 = settings.isZip64() || uncompressedSize > MAX_ENTRY_SIZE;
-        ExternalFileAttributes attributes = ExternalFileAttributes.createOperationBasedDelegate();
-        attributes.readFrom(file);
+        ExternalFileAttributes attributes = ExternalFileAttributes.createOperationBasedDelegate(file);
         IOSupplier<InputStream> inputStream = () -> new FileInputStream(file.toFile());
 
         RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName, uncompressedSize, lastModifiedTime, compression, compressionLevel,
@@ -117,8 +112,7 @@ public final class ZipEntryBuilder {
         CompressionLevel compressionLevel = parameters.getCompressionLevel();
         Encryption encryption = parameters.getEncryption();
         boolean zip64 = parameters.isZip64() || uncompressedSize > MAX_ENTRY_SIZE;
-        ExternalFileAttributes attributes = ExternalFileAttributes.createOperationBasedDelegate();
-        attributes.readFrom(file);
+        ExternalFileAttributes attributes = ExternalFileAttributes.createOperationBasedDelegate(file);
         IOSupplier<InputStream> inputStream = () -> new FileInputStream(file.toFile());
 
         RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName, uncompressedSize, lastModifiedTime, compression, compressionLevel,

@@ -1,8 +1,9 @@
 package ru.olegcherednik.zip4jvm.model;
 
-import ru.olegcherednik.zip4jvm.utils.BitUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,14 +17,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT0;
-import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT1;
-import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT2;
-import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT3;
-import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT4;
-import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT5;
-import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT6;
-import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT7;
 import static java.nio.file.attribute.PosixFilePermission.GROUP_EXECUTE;
 import static java.nio.file.attribute.PosixFilePermission.GROUP_READ;
 import static java.nio.file.attribute.PosixFilePermission.GROUP_WRITE;
@@ -33,6 +26,14 @@ import static java.nio.file.attribute.PosixFilePermission.OTHERS_WRITE;
 import static java.nio.file.attribute.PosixFilePermission.OWNER_EXECUTE;
 import static java.nio.file.attribute.PosixFilePermission.OWNER_READ;
 import static java.nio.file.attribute.PosixFilePermission.OWNER_WRITE;
+import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT0;
+import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT1;
+import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT2;
+import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT3;
+import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT4;
+import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT5;
+import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT6;
+import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT7;
 
 /**
  * @author Oleg Cherednik
@@ -45,14 +46,17 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consum
     public static final ExternalFileAttributes NULL = new Unknown();
     public static final int SIZE = 4;
 
-    public static ExternalFileAttributes createOperationBasedDelegate() {
+    public static ExternalFileAttributes createOperationBasedDelegate(@NonNull Path path) throws IOException {
         String os = System.getProperty("os.name").toLowerCase();
+        ExternalFileAttributes attributes = NULL;
 
         if (os.contains("win"))
-            return new Windows();
-        if (os.contains("mac") || os.contains("nux"))
-            return new Posix();
-        return NULL;
+            attributes = new Windows();
+        else if (os.contains("mac") || os.contains("nux"))
+            attributes = new Posix();
+
+        attributes.readFrom(path);
+        return attributes;
     }
 
     public static ExternalFileAttributes createDataBasedDelegate(byte[] data) {
