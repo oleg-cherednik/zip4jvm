@@ -10,7 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 @Getter
-@Builder(toBuilder = true)
+@Builder
 public final class ZipEntrySettings {
 
     @NonNull
@@ -28,7 +28,9 @@ public final class ZipEntrySettings {
      * Write all entries as well as entire zip archive in ZIP64 format.
      * If it's {@literal false}, then it will be automatically set if require.
      */
-    public final boolean zip64;
+    private final boolean zip64;
+    @Builder.Default
+    private final boolean utf8 = true;
 
     @Setter
     private Path defaultFolderPath;

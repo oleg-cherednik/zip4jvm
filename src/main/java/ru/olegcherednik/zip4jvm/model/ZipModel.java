@@ -57,7 +57,6 @@ public class ZipModel {
      * in ZIP64 format.
      */
     private boolean zip64;
-    private boolean utf8;
 
     private final List<ZipEntry> entries = new ArrayList<>();
 

@@ -47,6 +47,7 @@ public final class ZipEntryBuilder {
         DirectoryZipEntry zipEntry = new DirectoryZipEntry(fileName, lastModifiedTime, externalFileAttributes);
         zipEntry.setPassword(settings.getPassword());
         zipEntry.setComment(settings.getComment());
+        zipEntry.setUtf8(settings.isUtf8());
 
         return zipEntry;
     }
@@ -68,6 +69,7 @@ public final class ZipEntryBuilder {
                 compressionLevel, encryption, zip64, inputStream);
         zipEntry.setPassword(settings.getPassword());
         zipEntry.setComment(settings.getComment());
+        zipEntry.setUtf8(settings.isUtf8());
 
         return zipEntry;
     }
@@ -95,6 +97,7 @@ public final class ZipEntryBuilder {
         ExternalFileAttributes attributes = ExternalFileAttributes.createOperationBasedDelegate(dir);
         DirectoryZipEntry zipEntry = new DirectoryZipEntry(fileName, lastModifiedTime, attributes);
         zipEntry.setPassword(parameters.getPassword());
+        zipEntry.setUtf8(parameters.isUtf8());
 
         return zipEntry;
     }
@@ -120,6 +123,7 @@ public final class ZipEntryBuilder {
         RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName, lastModifiedTime, attributes, uncompressedSize, compression,
                 compressionLevel, encryption, zip64, inputStream);
         zipEntry.setPassword(parameters.getPassword());
+        zipEntry.setUtf8(parameters.isUtf8());
 
         return zipEntry;
     }
@@ -134,8 +138,12 @@ public final class ZipEntryBuilder {
         boolean zip64 = fileHeader.isZip64();
         ExternalFileAttributes externalFileAttributes = fileHeader.getExternalFileAttributes();
         IOSupplier<InputStream> inputStream = () -> NullInputStream.INSTANCE;
-        return new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, uncompressedSize, compression, compressionLevel,
+        RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, uncompressedSize, compression,
+                compressionLevel,
                 encryption, zip64, inputStream);
+        zipEntry.setComment(fileHeader.getComment());
+        zipEntry.setUtf8(fileHeader.getGeneralPurposeFlag().isUtf8());
+        return zipEntry;
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

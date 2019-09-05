@@ -7,6 +7,7 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.DataOutputStreamDecorator;
 import ru.olegcherednik.zip4jvm.io.out.SingleZipOutputStream;
+import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -45,7 +46,8 @@ public final class ZipMisc {
         comment = ZipUtils.normalizeComment.apply(comment);
         UnzipIt.checkZipFile(zipFile);
 
-        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile).noSplitOnly();
+        // TODO I think not problem to update comment in split archive
+        ZipModel zipModel = new ZipModelReader(zipFile).read().noSplitOnly();
         zipModel.setComment(comment);
 
         try (SingleZipOutputStream out = SingleZipOutputStream.create(zipModel)) {
@@ -57,12 +59,12 @@ public final class ZipMisc {
 
     public String getComment() throws IOException {
         UnzipIt.checkZipFile(zipFile);
-        return ZipModelBuilder.readOrCreate(zipFile).getComment();
+        return new ZipModelReader(zipFile).read().getComment();
     }
 
     public boolean isEncrypted() throws IOException {
         UnzipIt.checkZipFile(zipFile);
-        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile);
+        ZipModel zipModel = new ZipModelReader(zipFile).read();
 
         return zipModel.getEntries().stream()
                        .anyMatch(ZipEntry::isEncrypted);
@@ -70,12 +72,12 @@ public final class ZipMisc {
 
     public List<String> getEntryNames() throws IOException {
         UnzipIt.checkZipFile(zipFile);
-        return ZipModelBuilder.readOrCreate(zipFile).getEntryNames();
+        return new ZipModelReader(zipFile).read().getEntryNames();
     }
 
     public List<Path> getFiles() throws IOException {
         UnzipIt.checkZipFile(zipFile);
-        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile);
+        ZipModel zipModel = new ZipModelReader(zipFile).read();
 
         return LongStream.rangeClosed(0, zipModel.getTotalDisks())
                          .mapToObj(i -> i == 0 ? zipModel.getZipFile() : ZipModel.getSplitFilePath(zipFile, i))
@@ -84,7 +86,7 @@ public final class ZipMisc {
 
     public boolean isSplit() throws IOException {
         UnzipIt.checkZipFile(zipFile);
-        return ZipModelBuilder.readOrCreate(zipFile).isSplit();
+        return new ZipModelReader(zipFile).read().isSplit();
     }
 
     public void removeEntry(@NonNull String entryName) throws IOException {
@@ -93,19 +95,14 @@ public final class ZipMisc {
 
     public void removeEntries(@NonNull Collection<String> entries) throws IOException {
         UnzipIt.checkZipFile(zipFile);
-
-        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile).noSplitOnly();
+        ZipModel zipModel = new ZipModelReader(zipFile).read().noSplitOnly();
         new RemoveEntryFunc(zipModel).accept(entries);
     }
 
     // --------- MergeSplitZip
 
     public void merge(@NonNull Path destZipFile) throws IOException {
-        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile);
-
-        // TODO probably if not split archive, just copy single zip file
-        if (!zipModel.isSplit())
-            throw new Zip4jException("archive not a split zip file");
+        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile).noSplitOnly();
 
         try {
             Files.createDirectories(destZipFile.getParent());

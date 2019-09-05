@@ -1,11 +1,11 @@
 package ru.olegcherednik.zip4jvm.model;
 
-import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.lang.ArrayUtils;
+import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import java.nio.charset.Charset;
 import java.util.Collections;
@@ -56,8 +56,8 @@ public class CentralDirectory {
         private long uncompressedSize;
         // size:2 - file name length (n)
         // size:2 - extra field length (m)
-        // size:2 - file comment length
-        private int fileCommentLength;
+        // size:2 - comment length (k)
+        private int commentLength;
         // size:2 - disk number start
         private int disk;
         // size:2 - internal file attributes
@@ -73,8 +73,8 @@ public class CentralDirectory {
         // size:m - extra field
         @NonNull
         private ExtraField extraField = new ExtraField();
-        // size:k - extra field
-        private String fileComment;
+        // size:k - comment
+        private String comment;
 
         public FileHeader(String fileName) {
             this.fileName = fileName;
@@ -86,8 +86,8 @@ public class CentralDirectory {
         }
 
         @NonNull
-        public byte[] getFileComment(@NonNull Charset charset) {
-            return fileComment != null ? fileComment.getBytes(charset) : ArrayUtils.EMPTY_BYTE_ARRAY;
+        public byte[] getComment(@NonNull Charset charset) {
+            return comment != null ? comment.getBytes(charset) : ArrayUtils.EMPTY_BYTE_ARRAY;
         }
 
         @NonNull

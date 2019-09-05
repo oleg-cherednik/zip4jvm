@@ -4,8 +4,8 @@ import lombok.Builder;
 import lombok.NonNull;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
+import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +29,7 @@ public class UnzipIt {
         checkZipFile(zipFile);
         checkOutputFolder(dstDir);
 
-        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile);
+        ZipModel zipModel = new ZipModelReader(zipFile).read();
         zipModel.getEntries().forEach(entry -> entry.setPassword(password));
         new UnzipEngine(zipModel, password).extractEntries(dstDir, zipModel.getEntryNames());
     }
@@ -42,13 +42,13 @@ public class UnzipIt {
         checkZipFile(zipFile);
         checkOutputFolder(dstDir);
 
-        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile);
+        ZipModel zipModel = new ZipModelReader(zipFile).read();
         zipModel.getEntries().forEach(entry -> entry.setPassword(password));
         new UnzipEngine(zipModel, password).extractEntries(dstDir, entries);
     }
 
     public InputStream extract(@NonNull String entryName) throws IOException {
-        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile);
+        ZipModel zipModel = new ZipModelReader(zipFile).read();
         zipModel.getEntries().forEach(entry -> entry.setPassword(password));
         return new UnzipEngine(zipModel, password).extractEntry(entryName);
     }

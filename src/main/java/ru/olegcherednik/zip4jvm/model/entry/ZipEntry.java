@@ -18,8 +18,6 @@ import ru.olegcherednik.zip4jvm.model.Zip64;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.function.BooleanSupplier;
 
 /**
@@ -38,8 +36,6 @@ public abstract class ZipEntry {
     private final ExternalFileAttributes externalFileAttributes;
 
     protected final long uncompressedSize;
-    // TODO set from ZipModel
-    protected final Charset charset = StandardCharsets.UTF_8;
     protected final Compression compression;
     private final CompressionLevel compressionLevel;
     protected final Encryption encryption;
@@ -59,6 +55,7 @@ public abstract class ZipEntry {
     private BooleanSupplier dataDescriptorAvailable = () -> false;
     private long compressedSize;
     private String comment;
+    private boolean utf8;
 
     public boolean isRegularFile() {
         return false;

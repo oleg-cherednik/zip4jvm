@@ -1,5 +1,7 @@
 package ru.olegcherednik.zip4jvm.model.builders;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
@@ -7,10 +9,6 @@ import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-
-import java.nio.charset.StandardCharsets;
 
 /**
  * @author Oleg Cherednik
@@ -44,7 +42,7 @@ public final class LocalFileHeaderBuilder {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         generalPurposeFlag.setCompressionLevel(entry.getCompressionLevel());
         generalPurposeFlag.setDataDescriptorAvailable(entry.isDataDescriptorAvailable());
-        generalPurposeFlag.setUtf8(entry.getCharset() == StandardCharsets.UTF_8);
+        generalPurposeFlag.setUtf8(entry.isUtf8());
         generalPurposeFlag.setEncrypted(entry.getEncryption() != Encryption.OFF);
 //        generalPurposeFlag.setStrongEncryption(entry.getEncryption() == Encryption.STRONG);
         generalPurposeFlag.setStrongEncryption(false);

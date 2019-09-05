@@ -68,7 +68,6 @@ public final class ZipIt {
         zipModel.setSplitSize(parameters.getSplitLength());
         zipModel.setComment(ZipUtils.normalizeComment.apply(parameters.getComment()));
         zipModel.setZip64(parameters.isZip64());
-        zipModel.setUtf8(parameters.isUtf8());
 
         List<ZipEntry> entries = createEntries(withExistedEntries(paths), parameters);
         // TODO if at least one fileName is null then defaultRootPath is not correct

@@ -5,8 +5,6 @@ import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.lang.ArrayUtils;
 
-import java.nio.charset.Charset;
-
 /**
  * see 4.3.7
  *
@@ -46,8 +44,8 @@ public class LocalFileHeader {
     private ExtraField extraField = new ExtraField();
 
     @NonNull
-    public byte[] getFileName(@NonNull Charset charset) {
-        return fileName != null ? fileName.getBytes(charset) : ArrayUtils.EMPTY_BYTE_ARRAY;
+    public byte[] getFileName() {
+        return fileName != null ? fileName.getBytes(generalPurposeFlag.getCharset()) : ArrayUtils.EMPTY_BYTE_ARRAY;
     }
 
     @Override

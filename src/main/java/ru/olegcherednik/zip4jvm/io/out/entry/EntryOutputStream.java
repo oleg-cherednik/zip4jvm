@@ -1,5 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.out.entry;
 
+import lombok.NonNull;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
@@ -11,7 +12,6 @@ import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.LocalFileHeaderBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import lombok.NonNull;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -64,7 +64,7 @@ public abstract class EntryOutputStream extends OutputStream {
 
     private void writeLocalFileHeader() throws IOException {
         LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(entry).create();
-        new LocalFileHeaderWriter(localFileHeader, entry.getCharset()).write(out);
+        new LocalFileHeaderWriter(localFileHeader).write(out);
         out.mark(COMPRESSED_DATA);
     }
 

@@ -1,12 +1,11 @@
 package ru.olegcherednik.zip4jvm.io.writers;
 
-import ru.olegcherednik.zip4jvm.io.out.DataOutput;
-import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 
 /**
  * @author Oleg Cherednik
@@ -17,11 +16,9 @@ public final class LocalFileHeaderWriter {
 
     @NonNull
     private final LocalFileHeader localFileHeader;
-    @NonNull
-    private final Charset charset;
 
     public void write(@NonNull DataOutput out) throws IOException {
-        byte[] fileName = localFileHeader.getFileName(charset);
+        byte[] fileName = localFileHeader.getFileName();
 
         out.writeDwordSignature(LocalFileHeader.SIGNATURE);
         out.writeWord(localFileHeader.getVersionToExtract());
@@ -35,7 +32,7 @@ public final class LocalFileHeaderWriter {
         out.writeWord(localFileHeader.getExtraField().getSize());
         out.writeBytes(fileName);
 
-        new ExtraFieldWriter(localFileHeader.getExtraField(), charset).write(out);
+        new ExtraFieldWriter(localFileHeader.getExtraField(), localFileHeader.getGeneralPurposeFlag().getCharset()).write(out);
     }
 
 }

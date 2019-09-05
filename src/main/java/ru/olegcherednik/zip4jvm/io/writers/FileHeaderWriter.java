@@ -28,7 +28,7 @@ final class FileHeaderWriter {
     private static void writeFileHeader(CentralDirectory.FileHeader fileHeader, DataOutput out) throws IOException {
         Charset charset = fileHeader.getGeneralPurposeFlag().getCharset();
         byte[] fileName = fileHeader.getFileName(charset);
-        byte[] fileComment = fileHeader.getFileComment(charset);
+        byte[] fileComment = fileHeader.getComment(charset);
 
         out.writeDwordSignature(CentralDirectory.FileHeader.SIGNATURE);
         out.writeWord(fileHeader.getVersionMadeBy());

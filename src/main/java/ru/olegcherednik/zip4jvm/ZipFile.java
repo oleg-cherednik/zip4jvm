@@ -4,8 +4,8 @@ import lombok.NonNull;
 import ru.olegcherednik.zip4jvm.engine.ZipEngine;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.model.ZipFileSettings;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import ru.olegcherednik.zip4jvm.model.ZipParameters;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -40,10 +40,10 @@ public final class ZipFile implements Closeable {
     private final DataOutput out;
 
     public ZipFile(@NonNull Path file) throws IOException {
-        this(file, ZipParameters.builder().build());
+        this(file, ZipFileSettings.builder().build());
     }
 
-    public ZipFile(@NonNull Path file, @NonNull ZipParameters parameters) throws IOException {
+    public ZipFile(@NonNull Path file, @NonNull ZipFileSettings settings) throws IOException {
         zipModel = ZipModelBuilder.readOrCreate(file).noSplitOnly();
         out = ZipEngine.createDataOutput(zipModel);
         out.seek(zipModel.getCentralDirectoryOffs());

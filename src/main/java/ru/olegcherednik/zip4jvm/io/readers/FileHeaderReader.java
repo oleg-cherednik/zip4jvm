@@ -58,7 +58,7 @@ final class FileHeaderReader {
         fileHeader.setOffsLocalFileHeader(in.readDword());
         fileHeader.setFileName(in.readString(fileNameLength));
         fileHeader.setExtraField(getExtraFieldReader(extraFieldLength, fileHeader).read(in));
-        fileHeader.setFileComment(in.readString(fileCommentLength));
+        fileHeader.setComment(in.readString(fileCommentLength));
 
         return fileHeader;
     }

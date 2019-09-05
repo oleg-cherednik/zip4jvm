@@ -1,5 +1,7 @@
 package ru.olegcherednik.zip4jvm.model.builders;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
@@ -7,11 +9,8 @@ import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 import static ru.olegcherednik.zip4jvm.model.builders.LocalFileHeaderBuilder.LOOK_IN_EXTRA_FIELD;
 
@@ -37,13 +36,13 @@ final class FileHeaderBuilder {
         fileHeader.setCrc32(entry.getEncryption().getChecksum().apply(entry));
         fileHeader.setCompressedSize(getSize(entry.getCompressedSize()));
         fileHeader.setUncompressedSize(getSize(entry.getUncompressedSize()));
-        fileHeader.setFileCommentLength(0);
+        fileHeader.setCommentLength(0);
         fileHeader.setDisk(getDisk());
         fileHeader.setInternalFileAttributes(entry.getInternalFileAttributes());
         fileHeader.setExternalFileAttributes(entry.getExternalFileAttributes());
         fileHeader.setOffsLocalFileHeader(entry.getLocalFileHeaderOffs());
         fileHeader.setExtraField(createExtraField());
-        fileHeader.setFileComment(entry.getComment());
+        fileHeader.setComment(entry.getComment());
 
         return fileHeader;
     }
@@ -52,7 +51,7 @@ final class FileHeaderBuilder {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         generalPurposeFlag.setCompressionLevel(entry.getCompressionLevel());
         generalPurposeFlag.setDataDescriptorAvailable(entry.isDataDescriptorAvailable());
-        generalPurposeFlag.setUtf8(entry.getCharset() == StandardCharsets.UTF_8);
+        generalPurposeFlag.setUtf8(entry.isUtf8());
         generalPurposeFlag.setEncrypted(entry.getEncryption() != Encryption.OFF);
 //        generalPurposeFlag.setStrongEncryption(entry.getEncryption() == Encryption.STRONG);
         generalPurposeFlag.setStrongEncryption(false);
