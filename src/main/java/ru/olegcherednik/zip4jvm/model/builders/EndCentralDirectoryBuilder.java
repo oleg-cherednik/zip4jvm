@@ -1,10 +1,10 @@
 package ru.olegcherednik.zip4jvm.model.builders;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 /**
  * @author Oleg Cherednik
@@ -42,11 +42,6 @@ public final class EndCentralDirectoryBuilder {
     }
 
     private long getCentralDirectoryOffs() {
-        return getCentralDirectoryOffs(zipModel);
-    }
-
-    @Deprecated
-    public static long getCentralDirectoryOffs(ZipModel zipModel) {
         return zipModel.isZip64() ? Zip64.LIMIT : zipModel.getCentralDirectoryOffs();
     }
 

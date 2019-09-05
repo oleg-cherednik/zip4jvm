@@ -19,6 +19,7 @@ import ru.olegcherednik.zip4jvm.engine.ZipEngine;
 import ru.olegcherednik.zip4jvm.exception.Zip4jEmptyPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jPathNotExistsException;
 import ru.olegcherednik.zip4jvm.model.Encryption;
+import ru.olegcherednik.zip4jvm.model.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.ZipParameters;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
@@ -85,6 +86,18 @@ public final class ZipIt {
                 throw new Zip4jPathNotExistsException(path);
 
         return paths;
+    }
+
+    @NonNull
+    public static List<ZipEntry> createEntries(Collection<Path> paths, ZipEntrySettings settings) {
+        paths = getUniqueRecursivePaths(paths);
+        Set<Path> emptyDirectories = getEmptyDirectories(paths);
+
+        return paths.parallelStream()
+                    .filter(path -> Files.isRegularFile(path) || emptyDirectories.contains(path))
+                    .sorted()
+                    .map(path -> ZipEntryBuilder.create(path, settings))
+                    .collect(Collectors.toList());
     }
 
     @NonNull

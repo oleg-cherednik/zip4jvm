@@ -11,6 +11,7 @@ import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
+import ru.olegcherednik.zip4jvm.model.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.ZipParameters;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.IOSupplier;
@@ -31,6 +32,14 @@ import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ZipEntryBuilder {
 
+    public static ZipEntry create(@NonNull Path path, @NonNull ZipEntrySettings settings) {
+        try {
+            return Files.isDirectory(path) ? createDirectoryEntry(path, settings) : createRegularFileEntry(path, settings);
+        } catch(IOException e) {
+            throw new Zip4jException(e);
+        }
+    }
+
     public static ZipEntry create(@NonNull Path path, @NonNull ZipParameters parameters) {
         try {
             return Files.isDirectory(path) ? createDirectoryEntry(path, parameters) : createRegularFileEntry(path, parameters);
@@ -45,6 +54,19 @@ public final class ZipEntryBuilder {
         zipEntry.setCompressedSize(getCompressedSize(fileHeader));
         zipEntry.setDisk(getDisk(fileHeader));
         zipEntry.setLocalFileHeaderOffs(fileHeader.getOffsLocalFileHeader());
+        return zipEntry;
+    }
+
+    private static ZipEntry createDirectoryEntry(Path dir, ZipEntrySettings settings) throws IOException {
+        String fileName = getRelativeFileName(dir, settings.getDefaultFolderPath(), settings.getRootFolderInZip());
+        int lastModifiedTime = ZipUtils.javaToDosTime(Files.getLastModifiedTime(dir).toMillis());
+        ExternalFileAttributes attributes = ExternalFileAttributes.createOperationBasedDelegate();
+        attributes.readFrom(dir);
+
+        DirectoryZipEntry zipEntry = new DirectoryZipEntry(fileName, lastModifiedTime, attributes);
+        zipEntry.setPassword(settings.getPassword());
+        zipEntry.setComment(settings.getComment());
+
         return zipEntry;
     }
 
@@ -65,6 +87,26 @@ public final class ZipEntryBuilder {
         int lastModifiedTime = fileHeader.getLastModifiedTime();
         ExternalFileAttributes externalFileAttributes = fileHeader.getExternalFileAttributes();
         return new DirectoryZipEntry(fileName, lastModifiedTime, externalFileAttributes);
+    }
+
+    private static ZipEntry createRegularFileEntry(Path file, ZipEntrySettings settings) throws IOException {
+        String fileName = getRelativeFileName(file, settings.getDefaultFolderPath(), settings.getRootFolderInZip());
+        long uncompressedSize = Files.size(file);
+        int lastModifiedTime = ZipUtils.javaToDosTime(Files.getLastModifiedTime(file).toMillis());
+        Compression compression = settings.getCompression();
+        CompressionLevel compressionLevel = settings.getCompressionLevel();
+        Encryption encryption = settings.getEncryption();
+        boolean zip64 = settings.isZip64() || uncompressedSize > MAX_ENTRY_SIZE;
+        ExternalFileAttributes attributes = ExternalFileAttributes.createOperationBasedDelegate();
+        attributes.readFrom(file);
+        IOSupplier<InputStream> inputStream = () -> new FileInputStream(file.toFile());
+
+        RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName, uncompressedSize, lastModifiedTime, compression, compressionLevel,
+                encryption, zip64, attributes, inputStream);
+        zipEntry.setPassword(settings.getPassword());
+        zipEntry.setComment(settings.getComment());
+
+        return zipEntry;
     }
 
     private static ZipEntry createRegularFileEntry(Path file, ZipParameters parameters) throws IOException {

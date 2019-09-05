@@ -20,8 +20,12 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 @SuppressWarnings("NewClassNamingConvention")
 public abstract class AbstractZipEntryFileAssert<SELF extends AbstractZipEntryFileAssert<SELF>> extends AbstractZipEntryAssert<SELF> {
 
-    protected AbstractZipEntryFileAssert(ZipEntry actual, Class<?> selfType, ZipFileDecorator zipFile) {
+    private final char[] password;
+
+    @SuppressWarnings({ "MethodCanBeVariableArityMethod", "AssignmentOrReturnOfFieldWithMutableType" })
+    protected AbstractZipEntryFileAssert(ZipEntry actual, Class<?> selfType, ZipFileDecorator zipFile, char[] password) {
         super(actual, selfType, zipFile);
+        this.password = password;
     }
 
     public SELF hasSize(long size) {
@@ -60,8 +64,6 @@ public abstract class AbstractZipEntryFileAssert<SELF extends AbstractZipEntryFi
 
     public SELF hasContent(String expected) {
         try (InputStream in = zipFile.getInputStream(actual)) {
-            actual.setSize(in.available());
-
             String[] expectedLines = expected.isEmpty() ? ArrayUtils.EMPTY_STRING_ARRAY : NEW_LINE.split(expected);
 
             List<String> lines = IOUtils.readLines(in, StandardCharsets.UTF_8);
@@ -77,6 +79,14 @@ public abstract class AbstractZipEntryFileAssert<SELF extends AbstractZipEntryFi
             }).doesNotThrowAnyException();
         }
 
+        return myself;
+    }
+
+    public SELF hasComment(String comment) {
+        if (comment == null)
+            assertThat(actual.getComment()).isNull();
+        else
+            assertThat(actual.getComment()).isEqualTo(comment);
         return myself;
     }
 }

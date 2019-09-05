@@ -3,10 +3,9 @@ package ru.olegcherednik.zip4jvm;
 import lombok.NonNull;
 import ru.olegcherednik.zip4jvm.engine.ZipEngine;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
-import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.ZipParameters;
-import ru.olegcherednik.zip4jvm.model.builders.EndCentralDirectoryBuilder;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -50,16 +49,12 @@ public final class ZipFile implements Closeable {
     public ZipFile(@NonNull Path file, @NonNull ZipParameters parameters) throws IOException {
         zipModel = ZipModelBuilder.readOrCreate(file, charset).noSplitOnly();
         out = ZipEngine.createDataOutput(zipModel);
-        out.seek(EndCentralDirectoryBuilder.getCentralDirectoryOffs(zipModel));
+        out.seek(zipModel.getCentralDirectoryOffs());
     }
 
-    public void add(@NonNull Path path) {
-        ZipParameters parameters = ZipParameters.builder()
-                                                .compression(Compression.STORE)
-                                                .build();
-
+    public void add(@NonNull Path path, ZipEntrySettings settings) {
         List<Path> paths = Collections.singletonList(path);
-        List<ZipEntry> entries = ZipIt.createEntries(ZipIt.withExistedEntries(paths), parameters);
+        List<ZipEntry> entries = ZipIt.createEntries(ZipIt.withExistedEntries(paths), settings);
 
         // TODO throw exception if duplication found
         entries.stream()

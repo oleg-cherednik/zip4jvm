@@ -45,6 +45,10 @@ class ZipFileDecorator {
         return entries.containsKey(entryName) || map.containsKey(entryName);
     }
 
+    public ZipEntry getEntry(String entryName) {
+        return entries.get(entryName);
+    }
+
     public Set<String> getSubEntries(String entryName) {
         return map.containsKey(entryName) ? Collections.unmodifiableSet(map.get(entryName)) : Collections.emptySet();
     }

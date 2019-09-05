@@ -57,6 +57,7 @@ public abstract class ZipEntry {
     @Getter(AccessLevel.NONE)
     private BooleanSupplier dataDescriptorAvailable = () -> false;
     private long compressedSize;
+    private String comment;
 
     public boolean isRegularFile() {
         return false;

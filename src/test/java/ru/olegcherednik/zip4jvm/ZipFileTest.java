@@ -3,6 +3,9 @@ package ru.olegcherednik.zip4jvm;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.Encryption;
+import ru.olegcherednik.zip4jvm.model.ZipEntrySettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -33,10 +36,14 @@ public class ZipFileTest {
     }
 
     public void shouldCreateZipFileWhenUseZipFileAndAddFiles() throws IOException {
+        ZipEntrySettings settings = ZipEntrySettings.builder()
+                                                    .compression(Compression.STORE)
+                                                    .build();
+
         try (ZipFile zipFile = new ZipFile(file)) {
-            zipFile.add(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"));
-            zipFile.add(Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg"));
-            zipFile.add(Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg"));
+            zipFile.add(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"), settings);
+            zipFile.add(Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg"), settings);
+            zipFile.add(Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg"), settings);
         }
 
         assertThatDirectory(file.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -48,11 +55,15 @@ public class ZipFileTest {
 
     @Test(dependsOnMethods = "shouldCreateZipFileWhenUseZipFileAndAddFiles")
     public void shouldAddFilesToExistedZipWhenUseZipFile() throws IOException {
+        ZipEntrySettings settings = ZipEntrySettings.builder()
+                                                    .compression(Compression.STORE)
+                                                    .build();
+
         try (ZipFile zipFile = new ZipFile(file)) {
-            zipFile.add(Zip4jSuite.starWarsDir.resolve("one.jpg"));
-            zipFile.add(Zip4jSuite.starWarsDir.resolve("two.jpg"));
-            zipFile.add(Zip4jSuite.starWarsDir.resolve("three.jpg"));
-            zipFile.add(Zip4jSuite.starWarsDir.resolve("four.jpg"));
+            zipFile.add(Zip4jSuite.starWarsDir.resolve("one.jpg"), settings);
+            zipFile.add(Zip4jSuite.starWarsDir.resolve("two.jpg"), settings);
+            zipFile.add(Zip4jSuite.starWarsDir.resolve("three.jpg"), settings);
+            zipFile.add(Zip4jSuite.starWarsDir.resolve("four.jpg"), settings);
         }
 
         assertThatDirectory(file.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -64,5 +75,49 @@ public class ZipFileTest {
         assertThatZipFile(file).file("two.jpg").exists().isImage().hasSize(277_857);
         assertThatZipFile(file).file("three.jpg").exists().isImage().hasSize(1_601_879);
         assertThatZipFile(file).file("four.jpg").exists().isImage().hasSize(1_916_776);
+
+        System.currentTimeMillis();
+    }
+
+    public void shouldCreateZipFileWithEntryCommentWhenUseZipFile() throws IOException {
+        Path file = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+
+        try (ZipFile zipFile = new ZipFile(file)) {
+            zipFile.add(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"),
+                    ZipEntrySettings.builder().compression(Compression.STORE).comment("bentley-continental").build());
+            zipFile.add(Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg"),
+                    ZipEntrySettings.builder().compression(Compression.DEFLATE).comment("ferrari-458-italia").build());
+            zipFile.add(Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg"),
+                    ZipEntrySettings.builder().compression(Compression.STORE).comment("wiesmann-gt-mf5").build());
+        }
+
+        assertThatDirectory(file.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatZipFile(file).exists().rootEntry().hasSubDirectories(0).hasFiles(3);
+        assertThatZipFile(file).file("bentley-continental.jpg").exists().isImage().hasSize(1_395_362).hasComment("bentley-continental");
+        assertThatZipFile(file).file("ferrari-458-italia.jpg").exists().isImage().hasSize(320_894).hasComment("ferrari-458-italia");
+        assertThatZipFile(file).file("wiesmann-gt-mf5.jpg").exists().isImage().hasSize(729_633).hasComment("wiesmann-gt-mf5");
+    }
+
+    // TODO add unzip tests for such ZipFile
+
+    public void shouldCreateZipFileWithEntryDifferentEncryptionAndPasswordWhenUseZipFile() throws IOException {
+        char[] ferrariPassword = "1".toCharArray();
+        char[] wiesmannPassword = "2".toCharArray();
+        Path file = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+
+        try (ZipFile zipFile = new ZipFile(file)) {
+            zipFile.add(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"),
+                    ZipEntrySettings.builder().compression(Compression.STORE).build());
+            zipFile.add(Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg"),
+                    ZipEntrySettings.builder().compression(Compression.STORE).encryption(Encryption.PKWARE).password(ferrariPassword).build());
+            zipFile.add(Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg"),
+                    ZipEntrySettings.builder().compression(Compression.STORE).encryption(Encryption.AES_256).password(wiesmannPassword).build());
+        }
+
+        assertThatDirectory(file.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+//        assertThatZipFile(file).exists().rootEntry().hasSubDirectories(0).hasFiles(3);
+//        assertThatZipFile(file).file("bentley-continental.jpg").exists().isImage().hasSize(1_395_362).hasComment("bentley-continental");
+//        assertThatZipFile(file).file("ferrari-458-italia.jpg").exists().isImage().hasSize(320_894).hasComment("ferrari-458-italia");
+//        assertThatZipFile(file).file("wiesmann-gt-mf5.jpg").exists().isImage().hasSize(729_633).hasComment("wiesmann-gt-mf5");
     }
 }

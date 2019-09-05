@@ -43,7 +43,7 @@ final class FileHeaderBuilder {
         fileHeader.setExternalFileAttributes(entry.getExternalFileAttributes());
         fileHeader.setOffsLocalFileHeader(entry.getLocalFileHeaderOffs());
         fileHeader.setExtraField(createExtraField());
-        fileHeader.setFileComment(null);
+        fileHeader.setFileComment(entry.getComment());
 
         return fileHeader;
     }
