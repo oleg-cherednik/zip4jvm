@@ -10,6 +10,8 @@ import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
+import ru.olegcherednik.zip4jvm.model.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.model.ZipFileSettings;
 import ru.olegcherednik.zip4jvm.model.ZipParameters;
 
 import java.io.IOException;
@@ -68,30 +70,32 @@ public class CompressionDeflateTest {
     }
 
     public void shouldCreateSingleZipWithEntireFolderWhenDeflateCompression() throws IOException {
-        ZipParameters parameters = ZipParameters.builder()
-                                                .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                .defaultFolderPath(Zip4jSuite.srcDir).build();
+        ZipFileSettings settings = ZipFileSettings.builder()
+                                                  .entrySettings(
+                                                          ZipEntrySettings.builder()
+                                                                          .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
+                                                  .build();
 
-        Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt zipIt = ZipIt.builder().zipFile(zipFile).build();
-        zipIt.add(Zip4jSuite.starWarsDir, parameters);
+        Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        ZipIt.add(zip, Zip4jSuite.starWarsDir, settings);
 
-        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(zipFile).exists().rootEntry().hasSubDirectories(1).hasFiles(0);
-        assertThatZipFile(zipFile).directory("Star Wars/").matches(TestUtils.zipStarWarsDirAssert);
+        assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatZipFile(zip).exists().rootEntry().hasSubDirectories(1).hasFiles(0);
+        assertThatZipFile(zip).directory("Star Wars/").matches(TestUtils.zipStarWarsDirAssert);
     }
 
     public void shouldCreateSplitZipWithEntireFolderWhenStoreCompression() throws IOException {
-        ZipParameters parameters = ZipParameters.builder()
-                                                .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                .defaultFolderPath(Zip4jSuite.srcDir)
-                                                .splitLength(1024 * 1024).build();
+        ZipFileSettings settings = ZipFileSettings.builder()
+                                                  .splitSize(1024 * 1024)
+                                                  .entrySettings(
+                                                          ZipEntrySettings.builder()
+                                                                          .compression(Compression.STORE, CompressionLevel.NORMAL).build())
+                                                  .build();
 
-        Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt zipIt = ZipIt.builder().zipFile(zipFile).build();
-        zipIt.add(Zip4jSuite.starWarsDir, parameters);
+        Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        ZipIt.add(zip, Zip4jSuite.starWarsDir, settings);
 
-        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(6);
+        assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(6);
         // TODO check split zip file
     }
 

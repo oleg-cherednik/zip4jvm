@@ -7,6 +7,8 @@ import ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions;
 import ru.olegcherednik.zip4jvm.exception.Zip4jPathNotExistsException;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
+import ru.olegcherednik.zip4jvm.model.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.model.ZipFileSettings;
 import ru.olegcherednik.zip4jvm.model.ZipParameters;
 
 import java.io.IOException;
@@ -58,18 +60,18 @@ public class ZipMiscTest {
     }
 
     public void shouldRetrieveMultipleFilesWhenSplitZip() throws IOException {
-        Path rootDir = Zip4jSuite.subDirNameAsMethodNameWithTme(ZipMiscTest.rootDir);
+        ZipFileSettings settings = ZipFileSettings.builder()
+                                                  .entrySettings(
+                                                          ZipEntrySettings.builder()
+                                                                          .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
+                                                  .splitSize(1024 * 1024).build();
 
-        ZipParameters parameters = ZipParameters.builder()
-                                                .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                .splitLength(1024 * 1024).build();
+        Path zip = Zip4jSuite.subDirNameAsMethodNameWithTme(ZipMiscTest.rootDir).resolve("src.zip");
+        ZipIt.add(zip, Zip4jSuite.srcDir, settings);
 
-        Path zipFile = rootDir.resolve("src.zip");
-        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-        zip.add(Zip4jSuite.srcDir, parameters);
-        Zip4jAssertions.assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(10);
+        Zip4jAssertions.assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(10);
 
-        ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
+        ZipMisc misc = ZipMisc.builder().zipFile(zip).build();
         List<Path> files = misc.getFiles();
 
         assertThat(files).hasSize(10);

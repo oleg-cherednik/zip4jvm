@@ -6,7 +6,8 @@ import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
-import ru.olegcherednik.zip4jvm.model.ZipParameters;
+import ru.olegcherednik.zip4jvm.model.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.model.ZipFileSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -29,9 +30,13 @@ public class DefalteZipData {
     }
 
     private static void createDeflateSolidZip() throws IOException {
-        ZipParameters parameters = ZipParameters.builder().compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
-        ZipIt zip = ZipIt.builder().zipFile(Zip4jSuite.deflateSolidZip).build();
-        zip.add(Zip4jSuite.srcDir, parameters);
+        ZipFileSettings settings = ZipFileSettings.builder()
+                                                  .entrySettings(
+                                                          ZipEntrySettings.builder()
+                                                                          .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
+                                                  .build();
+
+        ZipIt.add(Zip4jSuite.deflateSolidZip, Zip4jSuite.contentSrcDir, settings);
 
         assertThat(Files.exists(Zip4jSuite.deflateSolidZip)).isTrue();
         assertThat(Files.isRegularFile(Zip4jSuite.deflateSolidZip)).isTrue();
@@ -39,11 +44,12 @@ public class DefalteZipData {
     }
 
     private static void createDeflateSplitZip() throws IOException {
-        ZipParameters parameters = ZipParameters.builder()
-                                                .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                .splitLength(1024 * 1024).build();
-        ZipIt zip = ZipIt.builder().zipFile(Zip4jSuite.deflateSplitZip).build();
-        zip.add(Zip4jSuite.srcDir, parameters);
+        ZipFileSettings settings = ZipFileSettings.builder()
+                                                  .entrySettings(
+                                                          ZipEntrySettings.builder()
+                                                                          .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
+                                                  .splitSize(1024 * 1024).build();
+        ZipIt.add(Zip4jSuite.deflateSplitZip, Zip4jSuite.contentSrcDir, settings);
 
         assertThat(Files.exists(Zip4jSuite.deflateSplitZip)).isTrue();
         assertThat(Files.isRegularFile(Zip4jSuite.deflateSplitZip)).isTrue();
@@ -51,12 +57,13 @@ public class DefalteZipData {
     }
 
     private static void createDeflateSolidPkwareZip() throws IOException {
-        ZipParameters parameters = ZipParameters.builder()
-                                                .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                .encryption(Encryption.PKWARE, Zip4jSuite.password)
-                                                .comment("password: " + new String(Zip4jSuite.password)).build();
-        ZipIt zip = ZipIt.builder().zipFile(Zip4jSuite.deflateSolidPkwareZip).build();
-        zip.add(Zip4jSuite.srcDir, parameters);
+        ZipFileSettings settings = ZipFileSettings.builder()
+                                                  .entrySettings(
+                                                          ZipEntrySettings.builder()
+                                                                          .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
+                                                                          .encryption(Encryption.PKWARE, Zip4jSuite.password).build())
+                                                  .comment("password: " + new String(Zip4jSuite.password)).build();
+        ZipIt.add(Zip4jSuite.deflateSolidPkwareZip, Zip4jSuite.contentSrcDir, settings);
 
         assertThat(Files.exists(Zip4jSuite.deflateSolidPkwareZip)).isTrue();
         assertThat(Files.isRegularFile(Zip4jSuite.deflateSolidPkwareZip)).isTrue();
@@ -64,12 +71,13 @@ public class DefalteZipData {
     }
 
     private static void createDeflateSolidAesZip() throws IOException {
-        ZipParameters parameters = ZipParameters.builder()
-                                                .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                .encryption(Encryption.AES_256, Zip4jSuite.password)
-                                                .comment("password: " + new String(Zip4jSuite.password)).build();
-        ZipIt zip = ZipIt.builder().zipFile(Zip4jSuite.deflateSolidAesZip).build();
-        zip.add(Zip4jSuite.srcDir, parameters);
+        ZipFileSettings settings = ZipFileSettings.builder()
+                                                  .entrySettings(
+                                                          ZipEntrySettings.builder()
+                                                                          .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
+                                                                          .encryption(Encryption.AES_256, Zip4jSuite.password).build())
+                                                  .comment("password: " + new String(Zip4jSuite.password)).build();
+        ZipIt.add(Zip4jSuite.deflateSolidAesZip, Zip4jSuite.contentSrcDir, settings);
 
         assertThat(Files.exists(Zip4jSuite.deflateSolidAesZip)).isTrue();
         assertThat(Files.isRegularFile(Zip4jSuite.deflateSolidAesZip)).isTrue();

@@ -30,11 +30,11 @@ import java.nio.file.Path;
 public final class ZipModelReader {
 
     @NonNull
-    private final Path file;
+    private final Path zip;
 
     @NonNull
     public ZipModel read() throws IOException {
-        try (LittleEndianReadFile in = new LittleEndianReadFile(file)) {
+        try (LittleEndianReadFile in = new LittleEndianReadFile(zip)) {
             EndCentralDirectory endCentralDirectory = new EndCentralDirectoryReader().read(in);
             Zip64 zip64 = new Zip64Reader().read(in);
 
@@ -42,7 +42,7 @@ public final class ZipModelReader {
             long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
             CentralDirectory centralDirectory = new CentralDirectoryReader(offs, totalEntries).read(in);
 
-            return new ZipModelBuilder(file, endCentralDirectory, zip64, centralDirectory).create();
+            return new ZipModelBuilder(zip, endCentralDirectory, zip64, centralDirectory).create();
         }
     }
 

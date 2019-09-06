@@ -32,6 +32,9 @@ public class Zip4jSuite {
     public static final Path starWarsDir = srcDir.resolve("Star Wars");
     public static final Path emptyDir = srcDir.resolve("empty_dir");
 
+    public static final List<Path> contentSrcDir = collect(srcDir, "cars", "Star Wars", "empty_dir", "empty_file.txt",
+            "mcdonnell-douglas-f15-eagle.jpg", "Oleg Cherednik.txt", "saint-petersburg.jpg", "sig-sauer-pistol.jpg");
+
     public static final List<Path> filesSrcDir = collect(srcDir, "empty_file.txt", "mcdonnell-douglas-f15-eagle.jpg", "Oleg Cherednik.txt",
             "saint-petersburg.jpg", "sig-sauer-pistol.jpg");
     public static final List<Path> filesCarsDir = collect(carsDir, "bentley-continental.jpg", "ferrari-458-italia.jpg", "wiesmann-gt-mf5.jpg");

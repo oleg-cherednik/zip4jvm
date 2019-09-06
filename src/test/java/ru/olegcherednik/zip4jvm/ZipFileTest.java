@@ -56,13 +56,13 @@ public class ZipFileTest {
 
     @Test(dependsOnMethods = "shouldCreateZipFileWhenUseZipFileAndAddFiles")
     public void shouldAddFilesToExistedZipWhenUseZipFile() throws IOException {
-        ZipEntrySettings settings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
 
         try (ZipFile zipFile = new ZipFile(file)) {
-            zipFile.add(Zip4jSuite.starWarsDir.resolve("one.jpg"), settings);
-            zipFile.add(Zip4jSuite.starWarsDir.resolve("two.jpg"), settings);
-            zipFile.add(Zip4jSuite.starWarsDir.resolve("three.jpg"), settings);
-            zipFile.add(Zip4jSuite.starWarsDir.resolve("four.jpg"), settings);
+            zipFile.add(Zip4jSuite.starWarsDir.resolve("one.jpg"), entrySettings);
+            zipFile.add(Zip4jSuite.starWarsDir.resolve("two.jpg"), entrySettings);
+            zipFile.add(Zip4jSuite.starWarsDir.resolve("three.jpg"), entrySettings);
+            zipFile.add(Zip4jSuite.starWarsDir.resolve("four.jpg"), entrySettings);
         }
 
         assertThatDirectory(file.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -123,9 +123,9 @@ public class ZipFileTest {
     public void shouldCreateZipFileWithContentWhenUseZipFile() throws IOException {
         ZipFileSettings zipFileSettings = ZipFileSettings.builder()
                                                          .comment("Global Comment")
-                                                         .defZipEntrySettings(ZipEntrySettings.builder()
-                                                                                              .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                                                              .build())
+                                                         .entrySettings(ZipEntrySettings.builder()
+                                                                                        .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                                                        .build())
                                                          .build();
 
         ZipEntrySettings starWarsSettings = ZipEntrySettings.builder()

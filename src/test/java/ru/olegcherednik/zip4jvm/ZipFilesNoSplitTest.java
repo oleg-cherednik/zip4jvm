@@ -22,8 +22,8 @@ import java.util.List;
 @SuppressWarnings("FieldNamingConvention")
 public class ZipFilesNoSplitTest {
 
-    private static final Path rootDir = Zip4jSuite.rootDir.resolve(ZipFilesNoSplitTest.class.getSimpleName());
-    private static final Path zipFile = rootDir.resolve("src.zip");
+    private static final Path rootDir = Zip4jSuite.generateSubDirNameWithTime(ZipFilesNoSplitTest.class);
+    private static final Path zip = rootDir.resolve("src.zip");
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -46,12 +46,12 @@ public class ZipFilesNoSplitTest {
         Path wiesmann = Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg");
         List<Path> files = Arrays.asList(bentley, ferrari, wiesmann);
 
-        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
+        ZipIt zip = ZipIt.builder().zipFile(ZipFilesNoSplitTest.zip).build();
         zip.add(files, parameters);
 
-        Zip4jAssertions.assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        Zip4jAssertions.assertThatZipFile(zipFile).exists().rootEntry().hasSubDirectories(1).hasFiles(0);
-        Zip4jAssertions.assertThatZipFile(zipFile).directory("cars/").matches(TestUtils.zipCarsDirAssert);
+        Zip4jAssertions.assertThatDirectory(ZipFilesNoSplitTest.zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        Zip4jAssertions.assertThatZipFile(ZipFilesNoSplitTest.zip).exists().rootEntry().hasSubDirectories(1).hasFiles(0);
+        Zip4jAssertions.assertThatZipFile(ZipFilesNoSplitTest.zip).directory("cars/").matches(TestUtils.zipCarsDirAssert);
     }
 
     // TODO Test to add files to existed no split zip

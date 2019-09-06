@@ -81,7 +81,7 @@ public final class ZipMisc {
         ZipModel zipModel = new ZipModelReader(zipFile).read();
 
         return LongStream.rangeClosed(0, zipModel.getTotalDisks())
-                         .mapToObj(i -> i == 0 ? zipModel.getZipFile() : ZipModel.getSplitFilePath(zipFile, i))
+                         .mapToObj(i -> i == 0 ? zipModel.getZip() : ZipModel.getSplitFilePath(zipFile, i))
                          .collect(Collectors.toList());
     }
 

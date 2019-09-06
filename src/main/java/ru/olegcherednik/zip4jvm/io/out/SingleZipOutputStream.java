@@ -16,7 +16,7 @@ public class SingleZipOutputStream extends BaseDataOutput {
 
     @NonNull
     public static SingleZipOutputStream create(@NonNull ZipModel zipModel) throws IOException {
-        return new SingleZipOutputStream(zipModel.getZipFile(), zipModel);
+        return new SingleZipOutputStream(zipModel.getZip(), zipModel);
     }
 
     @NonNull

@@ -44,7 +44,7 @@ public class ZipModel {
     public static final int MAX_TOTAL_DISKS = Zip64.LIMIT_INT;
 
     @NonNull
-    private final Path zipFile;
+    private final Path zip;
     private long splitSize = NO_SPLIT;
 
     private String comment;
@@ -84,12 +84,12 @@ public class ZipModel {
     }
 
     public Path getPartFile(long disk) {
-        return disk == totalDisks ? zipFile : getSplitFilePath(zipFile, disk + 1);
+        return disk == totalDisks ? zip : getSplitFilePath(zip, disk + 1);
     }
 
     @NonNull
     public ZipModel noSplitOnly() {
-        if (Files.exists(zipFile) && isSplit())
+        if (Files.exists(zip) && isSplit())
             throw new Zip4jException("Zip file already exists. Zip file format does not allow updating split/spanned files");
 
         return this;

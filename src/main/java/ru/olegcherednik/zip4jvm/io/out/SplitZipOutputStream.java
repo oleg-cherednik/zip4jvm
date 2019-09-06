@@ -1,11 +1,11 @@
 package ru.olegcherednik.zip4jvm.io.out;
 
+import lombok.Getter;
+import lombok.NonNull;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.io.writers.ZipModelWriter;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import lombok.Getter;
-import lombok.NonNull;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -32,12 +32,16 @@ public class SplitZipOutputStream extends BaseDataOutput {
 
         SplitZipOutputStream out = new SplitZipOutputStream(zipModel);
         out.writeDwordSignature(SPLIT_SIGNATURE);
+
+        if (zipModel.getCentralDirectoryOffs() == 0)
+            zipModel.setCentralDirectoryOffs(out.getOffs());
+
         return out;
     }
 
     private SplitZipOutputStream(@NonNull ZipModel zipModel) throws FileNotFoundException {
         super(zipModel);
-        createFile(zipModel.getZipFile());
+        createFile(zipModel.getZip());
     }
 
     @Override
@@ -78,17 +82,17 @@ public class SplitZipOutputStream extends BaseDataOutput {
     }
 
     private void openNextDisk() throws IOException {
-        Path splitFile = ZipModel.getSplitFilePath(zipModel.getZipFile(), ++disk);
+        Path splitFile = ZipModel.getSplitFilePath(zipModel.getZip(), ++disk);
 
         super.close();
 
         if (Files.exists(splitFile))
             throw new IOException("split file: " + splitFile.getFileName() + " already exists in the current directory, cannot rename this file");
 
-        if (!zipModel.getZipFile().toFile().renameTo(splitFile.toFile()))
+        if (!zipModel.getZip().toFile().renameTo(splitFile.toFile()))
             throw new IOException("cannot rename newly created split file");
 
-        createFile(zipModel.getZipFile());
+        createFile(zipModel.getZip());
     }
 
     @Override

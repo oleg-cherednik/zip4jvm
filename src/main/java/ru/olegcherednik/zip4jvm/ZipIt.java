@@ -22,7 +22,7 @@ import ru.olegcherednik.zip4jvm.engine.ZipEngine;
 import ru.olegcherednik.zip4jvm.exception.Zip4jEmptyPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jPathNotExistsException;
 import ru.olegcherednik.zip4jvm.model.Encryption;
-import ru.olegcherednik.zip4jvm.model.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.model.ZipFileSettings;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.ZipParameters;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
@@ -50,8 +50,14 @@ public final class ZipIt {
     @NonNull
     private final Path zipFile;
 
-    public void add(@NonNull Path path, @NonNull ZipParameters parameters) throws IOException {
-        add(Collections.singleton(path), parameters);
+    public static void add(@NonNull Path zip, @NonNull Path path, @NonNull ZipFileSettings settings) throws IOException {
+        add(zip, Collections.singleton(path), settings);
+    }
+
+    public static void add(@NonNull Path zip, @NonNull Collection<Path> paths, @NonNull ZipFileSettings settings) throws IOException {
+        try (ZipFile zipFile = new ZipFile(zip, settings)) {
+            zipFile.add(paths);
+        }
     }
 
     public void add(@NonNull Collection<Path> paths, @NonNull ZipParameters parameters) throws IOException {
@@ -80,18 +86,6 @@ public final class ZipIt {
                 throw new Zip4jPathNotExistsException(path);
 
         return paths;
-    }
-
-    @NonNull
-    public static List<ZipEntry> createEntries(Collection<Path> paths, ZipEntrySettings settings) {
-        paths = getUniqueRecursivePaths(paths);
-        Set<Path> emptyDirectories = getEmptyDirectories(paths);
-
-        return paths.parallelStream()
-                    .filter(path -> Files.isRegularFile(path) || emptyDirectories.contains(path))
-                    .sorted()
-                    .map(path -> ZipEntryBuilder.create(path, "", settings))
-                    .collect(Collectors.toList());
     }
 
     @NonNull

@@ -15,6 +15,6 @@ public final class ZipFileSettings {
     private final String comment;
     private final boolean zip64;
 
-    private final ZipEntrySettings defZipEntrySettings;
+    private final ZipEntrySettings entrySettings;
 
 }

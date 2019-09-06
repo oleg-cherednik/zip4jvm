@@ -9,7 +9,8 @@ import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
-import ru.olegcherednik.zip4jvm.model.ZipParameters;
+import ru.olegcherednik.zip4jvm.model.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.model.ZipFileSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -25,7 +26,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatZipFile
 @SuppressWarnings("FieldNamingConvention")
 public class EncryptionAesTest {
 
-    private static final Path rootDir = Zip4jSuite.generateSubDirName(EncryptionAesTest.class);
+    private static final Path rootDir = Zip4jSuite.generateSubDirNameWithTime(EncryptionAesTest.class);
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -39,18 +40,17 @@ public class EncryptionAesTest {
 
     @Test
     public void shouldCreateNewZipWithFolderAndAesEncryption() throws IOException {
-        ZipParameters parameters = ZipParameters.builder()
-                                                .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                .encryption(Encryption.AES_256, Zip4jSuite.password)
-                                                .comment("password: " + new String(Zip4jSuite.password)).build();
+        ZipFileSettings settings = ZipFileSettings.builder()
+                                                  .entrySettings(
+                                                          ZipEntrySettings.builder()
+                                                                          .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                                          .encryption(Encryption.AES_256, Zip4jSuite.password).build())
+                                                  .comment("password: " + new String(Zip4jSuite.password)).build();
+        Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        ZipIt.add(zip, Zip4jSuite.contentSrcDir, settings);
 
-        Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        Path zipFile = dstDir.resolve("src.zip");
-        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-        zip.add(Zip4jSuite.srcDir, parameters);
-
-        assertThatDirectory(dstDir).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(zipFile, Zip4jSuite.password).exists().rootEntry().matches(TestUtils.zipRootDirAssert);
+        assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatZipFile(zip, Zip4jSuite.password).exists().rootEntry().matches(TestUtils.zipRootDirAssert);
     }
 
 //    @Test

@@ -6,7 +6,8 @@ import ru.olegcherednik.zip4jvm.Zip4jSuite;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
-import ru.olegcherednik.zip4jvm.model.ZipParameters;
+import ru.olegcherednik.zip4jvm.model.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.model.ZipFileSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,9 +29,12 @@ public class StoreZipData {
     }
 
     private static void createStoreSolidZip() throws IOException {
-        ZipParameters parameters = ZipParameters.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
-        ZipIt zip = ZipIt.builder().zipFile(Zip4jSuite.storeSolidZip).build();
-        zip.add(Zip4jSuite.srcDir, parameters);
+        ZipFileSettings settings = ZipFileSettings.builder()
+                                                  .entrySettings(
+                                                          ZipEntrySettings.builder()
+                                                                          .compression(Compression.STORE, CompressionLevel.NORMAL).build())
+                                                  .build();
+        ZipIt.add(Zip4jSuite.storeSolidZip, Zip4jSuite.contentSrcDir, settings);
 
         assertThat(Files.exists(Zip4jSuite.storeSolidZip)).isTrue();
         assertThat(Files.isRegularFile(Zip4jSuite.storeSolidZip)).isTrue();
@@ -39,14 +43,12 @@ public class StoreZipData {
     }
 
     private static void createStoreSplitZip() throws IOException {
-        ZipParameters parameters = ZipParameters.builder()
-                                                .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                .defaultFolderPath(Zip4jSuite.srcDir)
-                                                .splitLength(1024 * 1024)
-                                                .build();
-
-        ZipIt zip = ZipIt.builder().zipFile(Zip4jSuite.storeSplitZip).build();
-        zip.add(Zip4jSuite.srcDir, parameters);
+        ZipFileSettings settings = ZipFileSettings.builder()
+                                                  .entrySettings(
+                                                          ZipEntrySettings.builder()
+                                                                          .compression(Compression.STORE, CompressionLevel.NORMAL).build())
+                                                  .splitSize(1024 * 1024).build();
+        ZipIt.add(Zip4jSuite.storeSplitZip, Zip4jSuite.contentSrcDir, settings);
 
         assertThat(Files.exists(Zip4jSuite.storeSplitZip)).isTrue();
         assertThat(Files.isRegularFile(Zip4jSuite.storeSplitZip)).isTrue();

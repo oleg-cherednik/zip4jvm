@@ -46,16 +46,15 @@ public final class ZipFile implements Closeable {
 
     private final ZipModel zipModel;
     private final DataOutput out;
-
     private final ZipEntrySettings defSettings;
 
-    public ZipFile(@NonNull Path file) throws IOException {
-        this(file, ZipFileSettings.builder().build());
+    public ZipFile(@NonNull Path zip) throws IOException {
+        this(zip, ZipFileSettings.builder().build());
     }
 
-    public ZipFile(@NonNull Path file, @NonNull ZipFileSettings zipFileSettings) throws IOException {
-        zipModel = ZipModelBuilder.readOrCreate(file, zipFileSettings);
-        defSettings = zipFileSettings.getDefZipEntrySettings();
+    public ZipFile(@NonNull Path zip, @NonNull ZipFileSettings zipFileSettings) throws IOException {
+        zipModel = ZipModelBuilder.readOrCreate(zip, zipFileSettings);
+        defSettings = zipFileSettings.getEntrySettings();
         out = ZipEngine.createDataOutput(zipModel);
         out.seek(zipModel.getCentralDirectoryOffs());
     }
@@ -65,8 +64,8 @@ public final class ZipFile implements Closeable {
         add(Collections.singleton(path), defSettings);
     }
 
-    public void add(@NonNull Path path, @NonNull ZipEntrySettings settings) throws IOException {
-        add(Collections.singleton(path), settings);
+    public void add(@NonNull Path path, @NonNull ZipEntrySettings entrySettings) throws IOException {
+        add(Collections.singleton(path), entrySettings);
     }
 
     public void add(@NonNull Collection<Path> paths) throws IOException {
@@ -74,10 +73,10 @@ public final class ZipFile implements Closeable {
         add(paths, defSettings);
     }
 
-    public void add(@NonNull Collection<Path> paths, @NonNull ZipEntrySettings settings) throws IOException {
+    public void add(@NonNull Collection<Path> paths, @NonNull ZipEntrySettings entrySettings) throws IOException {
         PathUtils.requireExistedPaths(paths);
 
-        List<ZipEntry> entries = createEntries(PathUtils.getRelativeContent(paths), settings);
+        List<ZipEntry> entries = createEntries(PathUtils.getRelativeContent(paths), entrySettings);
         requireNoDuplicates(entries);
 
         entries.forEach(entry -> ZipEngine.writeEntry(entry, out, zipModel));
@@ -95,9 +94,9 @@ public final class ZipFile implements Closeable {
             throw new Zip4jException("Entry with given name already exists: " + duplicateEntryName);
     }
 
-    private static List<ZipEntry> createEntries(Map<Path, String> pathFileName, ZipEntrySettings settings) {
+    private static List<ZipEntry> createEntries(Map<Path, String> pathFileName, ZipEntrySettings entrySettings) {
         return pathFileName.entrySet().parallelStream()
-                           .map(entry -> ZipEntryBuilder.create(entry.getKey(), entry.getValue(), settings))
+                           .map(entry -> ZipEntryBuilder.create(entry.getKey(), entry.getValue(), entrySettings))
                            .collect(Collectors.toList());
     }
 

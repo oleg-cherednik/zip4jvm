@@ -9,7 +9,8 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
-import ru.olegcherednik.zip4jvm.model.ZipParameters;
+import ru.olegcherednik.zip4jvm.model.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.model.ZipFileSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class ModifyCommentTest {
 
     private static final Path rootDir = Zip4jSuite.generateSubDirNameWithTime(ModifyCommentTest.class);
-    private static final Path zipFile = rootDir.resolve("src.zip");
+    private static final Path zip = rootDir.resolve("src.zip");
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -39,26 +40,26 @@ public class ModifyCommentTest {
     }
 
     @Test
-//    @Ignore("it's not working under gradle build")
     public void shouldCreateNewZipWithComment() throws IOException {
-        ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
+        ZipFileSettings settings = ZipFileSettings.builder()
+                                                  .entrySettings(
+                                                          ZipEntrySettings.builder()
+                                                                          .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
+                                                  .comment("Oleg Cherednik - Олег Чередник").build();
+        ZipIt.add(zip, Zip4jSuite.carsDir, settings);
 
-        ZipParameters parameters = ZipParameters.builder()
-                                                .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                .comment("Oleg Cherednik - Олег Чередник").build();
-
-        ZipIt zipIt = ZipIt.builder().zipFile(zipFile).build();
-        zipIt.add(Zip4jSuite.carsDir, parameters);
+        // TODO check comment using assertion
+        ZipMisc misc = ZipMisc.builder().zipFile(zip).build();
 
         Zip4jAssertions.assertThatDirectory(rootDir).exists().hasSubDirectories(0).hasFiles(1);
         assertThat(misc.getComment()).isEqualTo("Oleg Cherednik - Олег Чередник");
-        Zip4jAssertions.assertThatZipFile(zipFile).exists();
+        Zip4jAssertions.assertThatZipFile(zip).exists();
     }
 
     @Test(dependsOnMethods = "shouldCreateNewZipWithComment")
 //    @Ignore("it's not working under gradle build")
     public void shouldAddCommentToExistedNoSplitZip() throws IOException {
-        ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
+        ZipMisc misc = ZipMisc.builder().zipFile(zip).build();
         assertThat(misc.getComment()).isEqualTo("Oleg Cherednik - Олег Чередник");
 
         misc.setComment("this is new comment - новый комментарий");
@@ -68,7 +69,7 @@ public class ModifyCommentTest {
     @Test(dependsOnMethods = "shouldAddCommentToExistedNoSplitZip")
 //    @Ignore("it's not working under gradle build")
     public void shouldClearCommentForExistedZip() throws IOException {
-        ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
+        ZipMisc misc = ZipMisc.builder().zipFile(zip).build();
         assertThat(misc.getComment()).isNotBlank();
 
         misc.clearComment();
@@ -78,10 +79,10 @@ public class ModifyCommentTest {
     @Test(dependsOnMethods = "shouldClearCommentForExistedZip")
 //    @Ignore("it's not working under gradle build")
     public void shouldAddCommentToEncryptedZip() throws Zip4jException, IOException {
-        Files.deleteIfExists(zipFile);
-        Files.copy(Zip4jSuite.deflateSolidPkwareZip, zipFile);
+        Files.deleteIfExists(zip);
+        Files.copy(Zip4jSuite.deflateSolidPkwareZip, zip);
 
-        ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
+        ZipMisc misc = ZipMisc.builder().zipFile(zip).build();
         assertThat(misc.isEncrypted()).isTrue();
         assertThat(misc.getComment()).isEqualTo("password: " + new String(Zip4jSuite.password));
 

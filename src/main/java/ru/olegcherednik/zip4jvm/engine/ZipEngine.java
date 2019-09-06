@@ -47,7 +47,7 @@ public class ZipEngine {
     }
 
     public static DataOutput createDataOutput(ZipModel zipModel) throws IOException {
-        Path parent = zipModel.getZipFile().getParent();
+        Path parent = zipModel.getZip().getParent();
 
         if (parent != null)
             Files.createDirectories(parent);

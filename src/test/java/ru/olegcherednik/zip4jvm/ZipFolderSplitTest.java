@@ -3,11 +3,11 @@ package ru.olegcherednik.zip4jvm;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
-import ru.olegcherednik.zip4jvm.model.ZipParameters;
+import ru.olegcherednik.zip4jvm.model.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.model.ZipFileSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,6 +15,7 @@ import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertionsForClassTypes.assertThatDirectory;
 
 /**
  * @author Oleg Cherednik
@@ -24,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class ZipFolderSplitTest {
 
     private static final Path rootDir = Zip4jSuite.generateSubDirNameWithTime(ZipFolderSplitTest.class);
-    private static final Path zipFile = rootDir.resolve("src.zip");
+    private static final Path zip = rootDir.resolve("src.zip");
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -38,27 +39,28 @@ public class ZipFolderSplitTest {
 
     @Test
     public void shouldCreateNewZipWithFolder() throws IOException {
-        ZipParameters parameters = ZipParameters.builder()
-                                                .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                .splitLength(1024 * 1024).build();
+        ZipFileSettings settings = ZipFileSettings.builder()
+                                                  .entrySettings(
+                                                          ZipEntrySettings.builder()
+                                                                          .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
+                                                  .splitSize(1024 * 1024).build();
+        ZipIt.add(zip, Zip4jSuite.contentSrcDir, settings);
 
-        ZipIt zipIt = ZipIt.builder().zipFile(zipFile).build();
-        zipIt.add(Zip4jSuite.srcDir, parameters);
-
-        Zip4jAssertions.assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(10);
-        assertThat(Files.exists(zipFile)).isTrue();
-        assertThat(Files.isRegularFile(zipFile)).isTrue();
+        assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(10);
+        assertThat(Files.exists(zip)).isTrue();
+        assertThat(Files.isRegularFile(zip)).isTrue();
         // TODO ZipFile does not read split archive
 //        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
     }
 
     @Test(dependsOnMethods = "shouldCreateNewZipWithFolder")
     public void shouldThrowExceptionWhenModifySplitZip() {
-        ZipParameters parameters = ZipParameters.builder()
-                                                .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                .defaultFolderPath(Zip4jSuite.srcDir)
-                                                .splitLength(1024 * 1024).build();
-        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-        assertThatThrownBy(() -> zip.add(Zip4jSuite.carsDir, parameters)).isExactlyInstanceOf(Zip4jException.class);
+        ZipFileSettings settings = ZipFileSettings.builder()
+                                                  .entrySettings(
+                                                          ZipEntrySettings.builder()
+                                                                          .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
+                                                  .splitSize(2014 * 1024).build();
+
+        assertThatThrownBy(() -> ZipIt.add(zip, Zip4jSuite.starWarsDir, settings)).isExactlyInstanceOf(Zip4jException.class);
     }
 }

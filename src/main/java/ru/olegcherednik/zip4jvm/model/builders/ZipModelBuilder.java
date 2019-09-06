@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 public final class ZipModelBuilder {
 
     @NonNull
-    private final Path zipFile;
+    private final Path zip;
     @NonNull
     private final EndCentralDirectory endCentralDirectory;
     @NonNull
@@ -34,19 +34,17 @@ public final class ZipModelBuilder {
     @NonNull
     private final CentralDirectory centralDirectory;
 
-    public static ZipModel readOrCreate(Path file, ZipFileSettings zipFileSettings) throws IOException {
-        if (Files.exists(file))
-            return new ZipModelReader(file).read();
+    public static ZipModel readOrCreate(Path zip, ZipFileSettings zipFileSettings) throws IOException {
+        if (Files.exists(zip))
+            return new ZipModelReader(zip).read();
 
-        if(zipFileSettings == null)
-            throw new Zip4jZipFileSettingsNotSetException(file);
+        if (zipFileSettings == null)
+            throw new Zip4jZipFileSettingsNotSetException(zip);
 
-        ZipModel zipModel = new ZipModel(file);
+        ZipModel zipModel = new ZipModel(zip);
         zipModel.setSplitSize(zipFileSettings.getSplitSize());
         zipModel.setComment(zipFileSettings.getComment());
         zipModel.setZip64(zipFileSettings.isZip64());
-
-//        private final ZipEntrySettings entrySettings;
 
         return zipModel;
     }
@@ -59,7 +57,7 @@ public final class ZipModelBuilder {
 
     @NonNull
     public ZipModel create() throws IOException {
-        ZipModel zipModel = new ZipModel(zipFile);
+        ZipModel zipModel = new ZipModel(zip);
 
         zipModel.setZip64(zip64 != Zip64.NULL);
         zipModel.setComment(endCentralDirectory.getComment());

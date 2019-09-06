@@ -8,7 +8,8 @@ import ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
-import ru.olegcherednik.zip4jvm.model.ZipParameters;
+import ru.olegcherednik.zip4jvm.model.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.model.ZipFileSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -88,24 +89,23 @@ public class UnzipItTest {
     }
 
     public void shouldUnzipEncryptedZip() throws IOException {
-        ZipParameters parameters = ZipParameters.builder()
-                                                .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                .encryption(Encryption.PKWARE, Zip4jSuite.password)
-                                                .comment("password: " + new String(Zip4jSuite.password)).build();
+        ZipFileSettings settings = ZipFileSettings.builder()
+                                                  .entrySettings(
+                                                          ZipEntrySettings.builder()
+                                                                          .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
+                                                                          .encryption(Encryption.PKWARE, Zip4jSuite.password).build())
+                                                  .comment("password: " + new String(Zip4jSuite.password)).build();
 
-        Path dstDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
-        Path zipFile = dstDir.resolve("src.zip");
-        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-        zip.add(Zip4jSuite.srcDir, parameters);
+        Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        ZipIt.add(zip, Zip4jSuite.contentSrcDir, settings);
 
-        dstDir = dstDir.resolve("unzip");
-
+        Path destDir = zip.getParent().resolve("unzip");
         UnzipIt unzip = UnzipIt.builder()
-                               .zipFile(zipFile)
+                               .zipFile(zip)
                                .password(Zip4jSuite.password)
                                .build();
 
-        unzip.extract(dstDir);
-        Zip4jAssertions.assertThatDirectory(dstDir).matches(TestUtils.dirAssert);
+        unzip.extract(destDir);
+        Zip4jAssertions.assertThatDirectory(destDir).matches(TestUtils.dirAssert);
     }
 }
