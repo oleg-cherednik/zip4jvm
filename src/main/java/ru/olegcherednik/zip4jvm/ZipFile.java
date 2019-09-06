@@ -45,7 +45,7 @@ public final class ZipFile implements Closeable {
     private final ZipModel zipModel;
     private final DataOutput out;
 
-    private final ZipEntrySettings defEntrySettings;
+    private final ZipEntrySettings defSettings;
 
     public ZipFile(@NonNull Path file) throws IOException {
         this(file, ZipFileSettings.builder().build());
@@ -53,14 +53,14 @@ public final class ZipFile implements Closeable {
 
     public ZipFile(@NonNull Path file, @NonNull ZipFileSettings zipFileSettings) throws IOException {
         zipModel = ZipModelBuilder.readOrCreate(file, zipFileSettings);
-        defEntrySettings = zipFileSettings.getDefEntrySettings();
+        defSettings = zipFileSettings.getDefZipEntrySettings();
         out = ZipEngine.createDataOutput(zipModel);
         out.seek(zipModel.getCentralDirectoryOffs());
     }
 
     public void add(@NonNull Path path) throws IOException {
-        Objects.requireNonNull(defEntrySettings);
-        add(Collections.singleton(path), defEntrySettings);
+        Objects.requireNonNull(defSettings);
+        add(Collections.singleton(path), defSettings);
     }
 
     public void add(@NonNull Path path, @NonNull ZipEntrySettings settings) throws IOException {
@@ -68,13 +68,13 @@ public final class ZipFile implements Closeable {
     }
 
     public void add(@NonNull Collection<Path> paths) throws IOException {
-        Objects.requireNonNull(defEntrySettings);
-        add(paths, defEntrySettings);
+        Objects.requireNonNull(defSettings);
+        add(paths, defSettings);
     }
 
     public void add(@NonNull Collection<Path> paths, @NonNull ZipEntrySettings settings) throws IOException {
         PathUtils.requireExistedPaths(paths);
-        List<ZipEntry> entries = createEntries(PathUtils.getRelativeContentMap(paths), settings);
+        List<ZipEntry> entries = createEntries(PathUtils.getRelativeContent(paths), settings);
 
         // TODO throw exception if duplication found
         entries.forEach(entry -> ZipEngine.writeEntry(entry, out, zipModel));

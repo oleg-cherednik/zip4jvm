@@ -39,9 +39,7 @@ public class ZipFileTest {
 
     public void shouldCreateZipFileWhenUseZipFileAndAddFiles() throws IOException {
         ZipFileSettings zipFileSettings = ZipFileSettings.builder().build();
-        ZipEntrySettings settings = ZipEntrySettings.builder()
-                                                    .compression(Compression.STORE)
-                                                    .compressionLevel(CompressionLevel.NORMAL).build();
+        ZipEntrySettings settings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
 
         try (ZipFile zipFile = new ZipFile(file, zipFileSettings)) {
             zipFile.add(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"), settings);
@@ -58,9 +56,7 @@ public class ZipFileTest {
 
     @Test(dependsOnMethods = "shouldCreateZipFileWhenUseZipFileAndAddFiles")
     public void shouldAddFilesToExistedZipWhenUseZipFile() throws IOException {
-        ZipEntrySettings settings = ZipEntrySettings.builder()
-                                                    .compression(Compression.STORE)
-                                                    .build();
+        ZipEntrySettings settings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
 
         try (ZipFile zipFile = new ZipFile(file)) {
             zipFile.add(Zip4jSuite.starWarsDir.resolve("one.jpg"), settings);
@@ -85,11 +81,11 @@ public class ZipFileTest {
 
         try (ZipFile zipFile = new ZipFile(file)) {
             zipFile.add(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"),
-                    ZipEntrySettings.builder().compression(Compression.STORE).comment("bentley-continental").build());
+                    ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).comment("bentley-continental").build());
             zipFile.add(Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg"),
-                    ZipEntrySettings.builder().compression(Compression.DEFLATE).comment("ferrari-458-italia").build());
+                    ZipEntrySettings.builder().compression(Compression.DEFLATE, CompressionLevel.NORMAL).comment("ferrari-458-italia").build());
             zipFile.add(Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg"),
-                    ZipEntrySettings.builder().compression(Compression.STORE).comment("wiesmann-gt-mf5").build());
+                    ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).comment("wiesmann-gt-mf5").build());
         }
 
         assertThatDirectory(file.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -108,11 +104,13 @@ public class ZipFileTest {
 
         try (ZipFile zipFile = new ZipFile(file)) {
             zipFile.add(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"),
-                    ZipEntrySettings.builder().compression(Compression.STORE).build());
+                    ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build());
             zipFile.add(Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg"),
-                    ZipEntrySettings.builder().compression(Compression.STORE).encryption(Encryption.PKWARE).password(ferrariPassword).build());
+                    ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL)
+                                    .encryption(Encryption.PKWARE, ferrariPassword).build());
             zipFile.add(Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg"),
-                    ZipEntrySettings.builder().compression(Compression.STORE).encryption(Encryption.AES_256).password(wiesmannPassword).build());
+                    ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL)
+                                    .encryption(Encryption.AES_256, wiesmannPassword).build());
         }
 
         assertThatDirectory(file.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -125,21 +123,18 @@ public class ZipFileTest {
     public void shouldCreateZipFileWithContentWhenUseZipFile() throws IOException {
         ZipFileSettings zipFileSettings = ZipFileSettings.builder()
                                                          .comment("Global Comment")
-                                                         .defEntrySettings(ZipEntrySettings.builder()
-                                                                                           .compression(Compression.STORE)
-                                                                                           .compressionLevel(CompressionLevel.NORMAL).build())
+                                                         .defZipEntrySettings(ZipEntrySettings.builder()
+                                                                                              .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                                                              .build())
                                                          .build();
 
         ZipEntrySettings starWarsSettings = ZipEntrySettings.builder()
-                                                            .compression(Compression.DEFLATE)
-                                                            .compressionLevel(CompressionLevel.NORMAL)
+                                                            .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
                                                             .basePath(Zip4jSuite.starWarsDir.getFileName().toString()).build();
 
         ZipEntrySettings srcSettings = ZipEntrySettings.builder()
-                                                       .compression(Compression.DEFLATE)
-                                                       .compressionLevel(CompressionLevel.MAXIMUM)
-                                                       .encryption(Encryption.PKWARE)
-                                                       .password(Zip4jSuite.password).build();
+                                                       .compression(Compression.DEFLATE, CompressionLevel.MAXIMUM)
+                                                       .encryption(Encryption.PKWARE, Zip4jSuite.password).build();
 
         Path file = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 

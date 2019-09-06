@@ -8,13 +8,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.ToIntFunction;
 
@@ -28,7 +23,8 @@ public class PathUtils {
     private static final Comparator<Path> SORT_DIR_FIRST = Comparator.comparingInt((ToIntFunction<Path>)path -> Files.isDirectory(path) ? 0 : 1)
                                                                      .thenComparing(Path::compareTo);
 
-    public static Map<Path, String> getRelativeContentMap(Collection<Path> paths) throws IOException {
+    @NonNull
+    public static Map<Path, String> getRelativeContent(@NonNull Collection<Path> paths) throws IOException {
         Map<Path, String> pathFileName = new TreeMap<>(SORT_DIR_FIRST);
 
         for (Path path : paths) {
@@ -46,36 +42,6 @@ public class PathUtils {
         }
 
         return pathFileName;
-    }
-
-    public static List<Path> getRelativeContent(Collection<Path> paths) throws IOException {
-        List<Path> res = new LinkedList<>();
-        Set<Path> unique = new HashSet<>();
-
-        for (Path path : paths) {
-            unique.add(path);
-
-            if (Files.isRegularFile(path))
-                res.add(path.getFileName());
-            else if (Files.isDirectory(path)) {
-                if (isEmptyDirectory(path))
-                    res.add(path);
-                else {
-                    Files.walk(path)
-                         .filter(p -> Files.isRegularFile(p) || isEmptyDirectory(p))
-                         .forEach(p -> {
-                             if (unique.contains(p))
-                                 return;
-                             res.add(path.getParent().relativize(p));
-                             unique.add(p);
-                         });
-                }
-            }
-        }
-
-        unique.clear();
-
-        return res.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(res);
     }
 
     private static boolean isEmptyDirectory(Path path) {

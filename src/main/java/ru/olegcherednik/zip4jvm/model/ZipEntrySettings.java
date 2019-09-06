@@ -1,63 +1,91 @@
 package ru.olegcherednik.zip4jvm.model;
 
-import lombok.Builder;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.Setter;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
+import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 @Getter
-@Builder(toBuilder = true)
 public final class ZipEntrySettings {
 
-    @NonNull
-    @Builder.Default
-    private final Compression compression = Compression.DEFLATE;
-    @NonNull
-    @Builder.Default
-    private final CompressionLevel compressionLevel = CompressionLevel.NORMAL;
-    @NonNull
-    @Builder.Default
-    private final Encryption encryption = Encryption.OFF;
-    private final AesStrength strength = AesStrength.NULL;
+    private final Compression compression;
+    private final CompressionLevel compressionLevel;
+    private final Encryption encryption;
     private final char[] password;
     private final String comment;
-    /**
-     * Write all entries as well as entire zip archive in ZIP64 format.
-     * If it's {@literal false}, then it will be automatically set if require.
-     */
     private final boolean zip64;
-    @Builder.Default
-    private final boolean utf8 = true;
-
-    @Setter
-    @Builder.Default
+    private final boolean utf8;
     private String basePath = "";
 
-//    public String getRelativeFileName(Path path) {
-//        path = path.toAbsolutePath();
-//        Path root = defaultFolderPath != null ? defaultFolderPath : path.getParent();
-//        String str = root.relativize(path).toString();
-//
-//        if (Files.isDirectory(path))
-//            str += '/';
-//
-//        return ZipUtils.normalizeFileName(str);
-//    }
+    public static Builder builder() {
+        return new Builder();
+    }
 
-    /*
-     * dir:
-     * 1. password
-     * 2. comment
-     */
+    private ZipEntrySettings(Builder builder) {
+        compression = builder.compression;
+        compressionLevel = builder.compressionLevel;
+        encryption = builder.encryption;
+        password = builder.password;
+        comment = builder.comment;
+        zip64 = builder.zip64;
+        utf8 = builder.utf8;
+        basePath = builder.basePath;
+    }
 
-    /*
-     * file:
-     * 1. compression
-     * 2. compression level
-     * 3. encryption
-     * 4. zip64
-     * 5. password
-     * 6. comment
-     */
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class Builder {
+
+        private Compression compression = Compression.DEFLATE;
+        private CompressionLevel compressionLevel = CompressionLevel.NORMAL;
+        private Encryption encryption = Encryption.OFF;
+        private char[] password;
+        private String comment;
+        private boolean zip64;
+        private boolean utf8 = true;
+        private String basePath = "";
+
+        public ZipEntrySettings build() {
+            return new ZipEntrySettings(this);
+        }
+
+        public ZipEntrySettings.Builder compression(@NonNull Compression compression, @NonNull CompressionLevel compressionLevel) {
+            this.compression = compression;
+            this.compressionLevel = compressionLevel;
+            return this;
+        }
+
+        @SuppressWarnings("MethodCanBeVariableArityMethod")
+        public ZipEntrySettings.Builder encryption(@NonNull Encryption encryption, @NonNull char[] password) {
+            if (encryption != Encryption.OFF) {
+                this.encryption = encryption;
+                this.password = ArrayUtils.clone(password);
+            }
+
+            return this;
+        }
+
+        public ZipEntrySettings.Builder comment(String comment) {
+            this.comment = comment;
+            return this;
+        }
+
+        public ZipEntrySettings.Builder zip64(boolean zip64) {
+            this.zip64 = zip64;
+            return this;
+        }
+
+        public ZipEntrySettings.Builder utf8(boolean utf8) {
+            this.utf8 = utf8;
+            return this;
+        }
+
+        public ZipEntrySettings.Builder basePath(@NonNull String basePath) {
+            basePath = StringUtils.trimToEmpty(ZipUtils.normalizeFileName(basePath));
+            this.basePath = basePath.startsWith("/") ? basePath.substring(1) : basePath;
+            return this;
+        }
+    }
 }
