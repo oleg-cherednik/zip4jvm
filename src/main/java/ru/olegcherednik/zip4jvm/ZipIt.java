@@ -15,40 +15,21 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import lombok.Builder;
 import lombok.NonNull;
-import org.apache.commons.lang.ArrayUtils;
-import ru.olegcherednik.zip4jvm.engine.ZipEngine;
-import ru.olegcherednik.zip4jvm.exception.Zip4jEmptyPasswordException;
-import ru.olegcherednik.zip4jvm.exception.Zip4jPathNotExistsException;
-import ru.olegcherednik.zip4jvm.model.Encryption;
+import lombok.experimental.UtilityClass;
 import ru.olegcherednik.zip4jvm.model.ZipFileSettings;
-import ru.olegcherednik.zip4jvm.model.ZipModel;
-import ru.olegcherednik.zip4jvm.model.ZipParameters;
-import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
-import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * @author Oleg Cherednik
  * @since 14.03.2019
  */
-@Builder
-public final class ZipIt {
-
-    @NonNull
-    private final Path zipFile;
+@UtilityClass
+public class ZipIt {
 
     public static void add(@NonNull Path zip, @NonNull Path path, @NonNull ZipFileSettings settings) throws IOException {
         add(zip, Collections.singleton(path), settings);
@@ -58,87 +39,6 @@ public final class ZipIt {
         try (ZipFile zipFile = new ZipFile(zip, settings)) {
             zipFile.add(paths);
         }
-    }
-
-    public void add(@NonNull Collection<Path> paths, @NonNull ZipParameters parameters) throws IOException {
-        checkParameters(parameters);
-
-        if (paths.size() == 1) {
-            Path path = paths.iterator().next();
-
-            if (Files.isDirectory(path) && parameters.getDefaultFolderPath() == null)
-                parameters.setDefaultFolderPath(path);
-        }
-
-        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile).noSplitOnly();
-        zipModel.setSplitSize(parameters.getSplitLength());
-        zipModel.setComment(ZipUtils.normalizeComment.apply(parameters.getComment()));
-        zipModel.setZip64(parameters.isZip64());
-
-        List<ZipEntry> entries = createEntries(withExistedEntries(paths), parameters);
-        // TODO if at least one fileName is null then defaultRootPath is not correct
-        new ZipEngine(zipModel).addEntries(entries);
-    }
-
-    public static Collection<Path> withExistedEntries(Collection<Path> paths) {
-        for (Path path : paths)
-            if (!Files.exists(path))
-                throw new Zip4jPathNotExistsException(path);
-
-        return paths;
-    }
-
-    @NonNull
-    public static List<ZipEntry> createEntries(Collection<Path> paths, ZipParameters parameters) {
-        paths = getUniqueRecursivePaths(paths);
-        Set<Path> emptyDirectories = getEmptyDirectories(paths);
-
-        return paths.parallelStream()
-                    .filter(path -> Files.isRegularFile(path) || emptyDirectories.contains(path))
-                    .sorted()
-                    .map(path -> ZipEntryBuilder.create(path, parameters))
-                    .collect(Collectors.toList());
-    }
-
-    private static Set<Path> getUniqueRecursivePaths(Collection<Path> paths) {
-        return paths.stream()
-                    .filter(path -> Files.isRegularFile(path) || Files.isDirectory(path))
-                    .map(path -> Files.isDirectory(path) ? getDirectoryEntries(path) : Collections.singleton(path))
-                    .flatMap(Collection::stream)
-                    .collect(Collectors.toSet());
-    }
-
-    private static Set<Path> getEmptyDirectories(Collection<Path> paths) {
-        final Predicate<Path> emptyDirectory = path -> {
-            int pathLength = path.toAbsolutePath().toString().length();
-            return paths.stream().noneMatch(p -> p.startsWith(path) && p.toAbsolutePath().toString().length() > pathLength);
-        };
-
-        return paths.stream()
-                    .filter(Files::isDirectory)
-                    .filter(emptyDirectory)
-                    .collect(Collectors.toSet());
-    }
-
-    @NonNull
-    private static List<Path> getDirectoryEntries(@NonNull Path dir) {
-        assert Files.isDirectory(dir);
-
-        try {
-            return Files.walk(dir)
-                        .filter(path -> Files.isRegularFile(path) || Files.isDirectory(path))
-                        .collect(Collectors.toList());
-        } catch(IOException e) {
-            return Collections.emptyList();
-        }
-    }
-
-    private static void checkParameters(ZipParameters parameters) {
-        Encryption encryption = parameters.getEncryption();
-        boolean passwordEmpty = ArrayUtils.isEmpty(parameters.getPassword());
-
-        if (encryption != Encryption.OFF && passwordEmpty)
-            throw new Zip4jEmptyPasswordException();
     }
 
 }

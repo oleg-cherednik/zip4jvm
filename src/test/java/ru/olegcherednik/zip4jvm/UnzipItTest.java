@@ -95,7 +95,7 @@ public class UnzipItTest {
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
                                                                           .encryption(Encryption.PKWARE, Zip4jSuite.password).build())
                                                   .comment("password: " + new String(Zip4jSuite.password)).build();
-
+        // TODO do use initially created zip
         Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt.add(zip, Zip4jSuite.contentSrcDir, settings);
 

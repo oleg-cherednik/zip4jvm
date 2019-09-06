@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.utils;
 
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jPathNotExistsException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -53,7 +53,11 @@ public class PathUtils {
     }
 
     public static void requireExistedPaths(@NonNull Collection<Path> paths) {
-        if (paths.stream().anyMatch(path -> !Files.exists(path) || !Files.isReadable(path)))
-            throw new Zip4jException("Some files are not exists or not readable");
+        Path notExistedPath = paths.stream()
+                                   .filter(path -> !Files.exists(path) || !Files.isReadable(path))
+                                   .findFirst().orElse(null);
+
+        if (notExistedPath != null)
+            throw new Zip4jPathNotExistsException(notExistedPath);
     }
 }

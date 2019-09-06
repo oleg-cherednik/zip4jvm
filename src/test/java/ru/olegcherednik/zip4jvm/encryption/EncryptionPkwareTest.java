@@ -14,7 +14,6 @@ import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.ZipFileSettings;
-import ru.olegcherednik.zip4jvm.model.ZipParameters;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -61,20 +60,18 @@ public class EncryptionPkwareTest {
     }
 
     public void shouldCreateNewZipWithSelectedFilesAndStandardEncryption() throws IOException {
-        ZipParameters parameters = ZipParameters.builder()
-                                                .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                .encryption(Encryption.PKWARE, Zip4jSuite.password)
-                                                .comment("password: " + new String(Zip4jSuite.password)).build();
+        ZipFileSettings settings = ZipFileSettings.builder()
+                                                  .entrySettings(
+                                                          ZipEntrySettings.builder()
+                                                                          .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
+                                                                          .encryption(Encryption.PKWARE, Zip4jSuite.password).build())
+                                                  .comment("password: " + new String(Zip4jSuite.password)).build();
+        Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        ZipIt.add(zip, Zip4jSuite.filesCarsDir, settings);
 
-        Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        Path zipFile = dstDir.resolve("src.zip");
-
-        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-        zip.add(Zip4jSuite.filesCarsDir, parameters);
-
-        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(zipFile, Zip4jSuite.password).exists().rootEntry().hasSubDirectories(0).hasFiles(3);
-        assertThatZipFile(zipFile, Zip4jSuite.password).directory("/").matches(TestUtils.zipCarsDirAssert);
+        assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatZipFile(zip, Zip4jSuite.password).exists().rootEntry().hasSubDirectories(0).hasFiles(3);
+        assertThatZipFile(zip, Zip4jSuite.password).directory("/").matches(TestUtils.zipCarsDirAssert);
     }
 
     public void shouldThrowExceptionWhenStandardEncryptionAndEmptyPassword() throws IOException {

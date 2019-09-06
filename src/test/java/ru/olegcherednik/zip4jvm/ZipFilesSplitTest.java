@@ -3,10 +3,10 @@ package ru.olegcherednik.zip4jvm;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
-import ru.olegcherednik.zip4jvm.model.ZipParameters;
+import ru.olegcherednik.zip4jvm.model.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.model.ZipFileSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,7 +22,7 @@ import java.util.List;
 public class ZipFilesSplitTest {
 
     private static final Path rootDir = Zip4jSuite.generateSubDirNameWithTime(ZipFilesSplitTest.class);
-    private static final Path zipFile = rootDir.resolve("src.zip");
+    private static final Path zip = rootDir.resolve("src.zip");
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -35,19 +35,18 @@ public class ZipFilesSplitTest {
     }
 
     @Test
-    public void shouldCreateNewSplitZipWithFiles() throws IOException, Zip4jException {
-        ZipParameters parameters = ZipParameters.builder()
-                                                .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                .defaultFolderPath(Zip4jSuite.carsDir)
-                                                .splitLength(1024 * 1024).build();
-
+    public void shouldCreateNewSplitZipWithFiles() throws IOException {
+        ZipFileSettings settings = ZipFileSettings.builder()
+                                                  .entrySettings(
+                                                          ZipEntrySettings.builder()
+                                                                          .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
+                                                  .splitSize(1024 * 1024).build();
         Path bentley = Zip4jSuite.carsDir.resolve("bentley-continental.jpg");
         Path ferrari = Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg");
         Path wiesmann = Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg");
         List<Path> files = Arrays.asList(bentley, ferrari, wiesmann);
 
-        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-        zip.add(files, parameters);
+        ZipIt.add(zip, files, settings);
 
 //        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
 //        assertThatZipFile(zipFile).exists().rootEntry().hasSubDirectories(1).hasFiles(0);

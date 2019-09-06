@@ -82,6 +82,12 @@ public final class ZipFile implements Closeable {
         entries.forEach(entry -> ZipEngine.writeEntry(entry, out, zipModel));
     }
 
+    private static List<ZipEntry> createEntries(Map<Path, String> pathFileName, ZipEntrySettings entrySettings) {
+        return pathFileName.entrySet().parallelStream()
+                           .map(entry -> ZipEntryBuilder.create(entry.getKey(), entry.getValue(), entrySettings))
+                           .collect(Collectors.toList());
+    }
+
     private void requireNoDuplicates(List<ZipEntry> entries) {
         Set<String> entryNames = zipModel.getEntryNames();
 
@@ -94,15 +100,8 @@ public final class ZipFile implements Closeable {
             throw new Zip4jException("Entry with given name already exists: " + duplicateEntryName);
     }
 
-    private static List<ZipEntry> createEntries(Map<Path, String> pathFileName, ZipEntrySettings entrySettings) {
-        return pathFileName.entrySet().parallelStream()
-                           .map(entry -> ZipEntryBuilder.create(entry.getKey(), entry.getValue(), entrySettings))
-                           .collect(Collectors.toList());
-    }
-
     @Override
     public void close() throws IOException {
-        // TODO check for zip64
         out.close();
     }
 }

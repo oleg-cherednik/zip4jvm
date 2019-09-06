@@ -20,6 +20,8 @@ public class AbstractDirectoryAssert<SELF extends AbstractDirectoryAssert<SELF>>
         super(actual.toFile(), selfType);
     }
 
+    // TODO name == "/" -> will give root like d:\
+
     public AbstractDirectoryAssert<?> directory(String name) {
         return new DirectoryAssert(actual.toPath().resolve(name));
     }

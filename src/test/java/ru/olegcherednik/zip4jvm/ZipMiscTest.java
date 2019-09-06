@@ -9,7 +9,6 @@ import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.ZipFileSettings;
-import ru.olegcherednik.zip4jvm.model.ZipParameters;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -88,7 +87,11 @@ public class ZipMiscTest {
     }
 
     public void shouldThrowExceptionWhenAddedFileNotExists() throws IOException {
-        ZipParameters parameters = ZipParameters.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
+        ZipFileSettings settings = ZipFileSettings.builder()
+                                                  .entrySettings(
+                                                          ZipEntrySettings.builder()
+                                                                          .compression(Compression.STORE, CompressionLevel.NORMAL).build())
+                                                  .build();
 
         Path bentley = Zip4jSuite.carsDir.resolve("bentley-continental.jpg");
         Path ferrari = Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg");
@@ -96,10 +99,9 @@ public class ZipMiscTest {
         Path notExisted = Zip4jSuite.carsDir.resolve(UUID.randomUUID().toString());
         List<Path> files = Arrays.asList(bentley, ferrari, wiesmann, notExisted);
 
-        Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
+        Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        assertThatThrownBy(() -> zip.add(files, parameters)).isExactlyInstanceOf(Zip4jPathNotExistsException.class);
+        assertThatThrownBy(() -> ZipIt.add(zip, files, settings)).isExactlyInstanceOf(Zip4jPathNotExistsException.class);
     }
 
 //    @Ignore
