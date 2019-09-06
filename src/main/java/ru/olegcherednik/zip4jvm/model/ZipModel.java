@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -72,10 +73,10 @@ public class ZipModel {
         return entries.isEmpty();
     }
 
-    public List<String> getEntryNames() {
+    public Set<String> getEntryNames() {
         return entries.stream()
                       .map(ZipEntry::getFileName)
-                      .collect(Collectors.toList());
+                      .collect(Collectors.toSet());
     }
 
     public static Path getSplitFilePath(Path zipFile, long disk) {

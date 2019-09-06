@@ -2,6 +2,7 @@ package ru.olegcherednik.zip4jvm;
 
 import lombok.NonNull;
 import ru.olegcherednik.zip4jvm.engine.ZipEngine;
+import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.ZipFileSettings;
@@ -19,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -74,10 +76,23 @@ public final class ZipFile implements Closeable {
 
     public void add(@NonNull Collection<Path> paths, @NonNull ZipEntrySettings settings) throws IOException {
         PathUtils.requireExistedPaths(paths);
-        List<ZipEntry> entries = createEntries(PathUtils.getRelativeContent(paths), settings);
 
-        // TODO throw exception if duplication found
+        List<ZipEntry> entries = createEntries(PathUtils.getRelativeContent(paths), settings);
+        requireNoDuplicates(entries);
+
         entries.forEach(entry -> ZipEngine.writeEntry(entry, out, zipModel));
+    }
+
+    private void requireNoDuplicates(List<ZipEntry> entries) {
+        Set<String> entryNames = zipModel.getEntryNames();
+
+        String duplicateEntryName = entries.stream()
+                                           .map(ZipEntry::getFileName)
+                                           .filter(entryNames::contains)
+                                           .findFirst().orElse(null);
+
+        if (duplicateEntryName != null)
+            throw new Zip4jException("Entry with given name already exists: " + duplicateEntryName);
     }
 
     private static List<ZipEntry> createEntries(Map<Path, String> pathFileName, ZipEntrySettings settings) {

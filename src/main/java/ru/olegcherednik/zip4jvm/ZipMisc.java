@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
@@ -70,7 +71,7 @@ public final class ZipMisc {
                        .anyMatch(ZipEntry::isEncrypted);
     }
 
-    public List<String> getEntryNames() throws IOException {
+    public Set<String> getEntryNames() throws IOException {
         UnzipIt.checkZipFile(zipFile);
         return new ZipModelReader(zipFile).read().getEntryNames();
     }
