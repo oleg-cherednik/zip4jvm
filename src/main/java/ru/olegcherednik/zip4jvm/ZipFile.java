@@ -1,9 +1,11 @@
 package ru.olegcherednik.zip4jvm;
 
 import lombok.NonNull;
-import ru.olegcherednik.zip4jvm.engine.ZipEngine;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.SingleZipOutputStream;
+import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
+import ru.olegcherednik.zip4jvm.io.out.entry.EntryOutputStream;
 import ru.olegcherednik.zip4jvm.model.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.ZipFileSettings;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -14,6 +16,8 @@ import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
@@ -46,7 +50,7 @@ public final class ZipFile implements Closeable {
 
     private final ZipModel zipModel;
     private final DataOutput out;
-    private final ZipEntrySettings defSettings;
+    private final ZipEntrySettings defEntrySettings;
 
     public ZipFile(@NonNull Path zip) throws IOException {
         this(zip, ZipFileSettings.builder().build());
@@ -54,14 +58,23 @@ public final class ZipFile implements Closeable {
 
     public ZipFile(@NonNull Path zip, @NonNull ZipFileSettings zipFileSettings) throws IOException {
         zipModel = ZipModelBuilder.readOrCreate(zip, zipFileSettings);
-        defSettings = zipFileSettings.getEntrySettings();
-        out = ZipEngine.createDataOutput(zipModel);
+        defEntrySettings = zipFileSettings.getEntrySettings();
+        out = createDataOutput(zipModel);
         out.seek(zipModel.getCentralDirectoryOffs());
     }
 
+    private static DataOutput createDataOutput(ZipModel zipModel) throws IOException {
+        Path parent = zipModel.getZip().getParent();
+
+        if (parent != null)
+            Files.createDirectories(parent);
+
+        return zipModel.isSplit() ? SplitZipOutputStream.create(zipModel) : SingleZipOutputStream.create(zipModel);
+    }
+
     public void add(@NonNull Path path) throws IOException {
-        Objects.requireNonNull(defSettings);
-        add(Collections.singleton(path), defSettings);
+        Objects.requireNonNull(defEntrySettings);
+        add(Collections.singleton(path), defEntrySettings);
     }
 
     public void add(@NonNull Path path, @NonNull ZipEntrySettings entrySettings) throws IOException {
@@ -69,8 +82,8 @@ public final class ZipFile implements Closeable {
     }
 
     public void add(@NonNull Collection<Path> paths) throws IOException {
-        Objects.requireNonNull(defSettings);
-        add(paths, defSettings);
+        Objects.requireNonNull(defEntrySettings);
+        add(paths, defEntrySettings);
     }
 
     public void add(@NonNull Collection<Path> paths, @NonNull ZipEntrySettings entrySettings) throws IOException {
@@ -79,7 +92,15 @@ public final class ZipFile implements Closeable {
         List<ZipEntry> entries = createEntries(PathUtils.getRelativeContent(paths), entrySettings);
         requireNoDuplicates(entries);
 
-        entries.forEach(entry -> ZipEngine.writeEntry(entry, out, zipModel));
+        entries.forEach(entry -> writeEntry(entry, out));
+    }
+
+    private void writeEntry(ZipEntry entry, DataOutput out) {
+        try (OutputStream os = EntryOutputStream.create(entry, zipModel, out)) {
+            entry.write(os);
+        } catch(IOException e) {
+            throw new Zip4jException(e);
+        }
     }
 
     private static List<ZipEntry> createEntries(Map<Path, String> pathFileName, ZipEntrySettings entrySettings) {
