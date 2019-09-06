@@ -13,15 +13,12 @@ import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.function.Predicate;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -48,7 +45,7 @@ public final class ZipFile implements Closeable {
     private final ZipModel zipModel;
     private final DataOutput out;
 
-    private final ZipEntrySettings defaultEntrySettings;
+    private final ZipEntrySettings defEntrySettings;
 
     public ZipFile(@NonNull Path file) throws IOException {
         this(file, ZipFileSettings.builder().build());
@@ -56,17 +53,23 @@ public final class ZipFile implements Closeable {
 
     public ZipFile(@NonNull Path file, @NonNull ZipFileSettings zipFileSettings) throws IOException {
         zipModel = ZipModelBuilder.readOrCreate(file, zipFileSettings);
-        defaultEntrySettings = zipFileSettings.getEntrySettings();
+        defEntrySettings = zipFileSettings.getDefEntrySettings();
         out = ZipEngine.createDataOutput(zipModel);
         out.seek(zipModel.getCentralDirectoryOffs());
     }
 
     public void add(@NonNull Path path) throws IOException {
-        add(Collections.singleton(path));
+        Objects.requireNonNull(defEntrySettings);
+        add(Collections.singleton(path), defEntrySettings);
+    }
+
+    public void add(@NonNull Path path, @NonNull ZipEntrySettings settings) throws IOException {
+        add(Collections.singleton(path), settings);
     }
 
     public void add(@NonNull Collection<Path> paths) throws IOException {
-        add(paths, defaultEntrySettings);
+        Objects.requireNonNull(defEntrySettings);
+        add(paths, defEntrySettings);
     }
 
     public void add(@NonNull Collection<Path> paths, @NonNull ZipEntrySettings settings) throws IOException {
@@ -77,77 +80,10 @@ public final class ZipFile implements Closeable {
         entries.forEach(entry -> ZipEngine.writeEntry(entry, out, zipModel));
     }
 
-
-    @NonNull
-    public static List<ZipEntry> createEntries(Map<Path, String> pathFileName, ZipEntrySettings settings) {
+    private static List<ZipEntry> createEntries(Map<Path, String> pathFileName, ZipEntrySettings settings) {
         return pathFileName.entrySet().parallelStream()
                            .map(entry -> ZipEntryBuilder.create(entry.getKey(), entry.getValue(), settings))
                            .collect(Collectors.toList());
-    }
-
-    private static Set<Path> getUniqueRecursivePaths(Collection<Path> paths) throws IOException {
-        Set<Path> res = new TreeSet<>();
-
-        for (Path path : paths) {
-            Files.walk(path)
-                 .filter(p -> !p.equals(path))
-                 .filter(p -> Files.isRegularFile(p) || Files.isDirectory(p))
-                 .forEach(res::add);
-        }
-
-        return res;
-    }
-
-    @NonNull
-    private static List<Path> getDirectoryEntries(@NonNull Path dir) {
-        assert Files.isDirectory(dir);
-
-        try {
-            return Files.walk(dir)
-                        .filter(path -> Files.isRegularFile(path) || Files.isDirectory(path))
-                        .collect(Collectors.toList());
-        } catch(IOException e) {
-            return Collections.emptyList();
-        }
-    }
-
-
-    @NonNull
-    private static Set<Path> getAllEntries(Collection<Path> paths) throws IOException {
-        Set<Path> res = new TreeSet<>();
-
-        for (Path path : paths) {
-            Files.walk(path)
-                 .filter(p -> !p.equals(path))
-                 .filter(p -> Files.isRegularFile(p) || Files.isDirectory(p))
-                 .forEach(res::add);
-        }
-
-        return res;
-    }
-
-
-    private static Set<Path> getEmptyDirectories(Collection<Path> paths) {
-        final Predicate<Path> emptyDirectory = path -> {
-            int pathLength = path.toAbsolutePath().toString().length();
-            return paths.stream().noneMatch(p -> p.startsWith(path) && p.toAbsolutePath().toString().length() > pathLength);
-        };
-
-        return paths.stream()
-                    .filter(Files::isDirectory)
-                    .filter(emptyDirectory)
-                    .collect(Collectors.toSet());
-    }
-
-
-    public void add(@NonNull Path path, ZipEntrySettings settings) {
-        List<Path> paths = Collections.singletonList(path);
-//        List<ZipEntry> entries = createEntries(ZipIt.withExistedEntries(paths), settings);
-
-        // TODO throw exception if duplication found
-//        entries.stream()
-//               .filter(entry -> !entry.isRoot())
-//               .forEach(entry -> ZipEngine.writeEntry(entry, out, zipModel));
     }
 
     @Override

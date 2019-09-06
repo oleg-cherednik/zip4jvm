@@ -41,7 +41,7 @@ public class ZipFileTest {
         ZipFileSettings zipFileSettings = ZipFileSettings.builder().build();
         ZipEntrySettings settings = ZipEntrySettings.builder()
                                                     .compression(Compression.STORE)
-                                                    .build();
+                                                    .compressionLevel(CompressionLevel.NORMAL).build();
 
         try (ZipFile zipFile = new ZipFile(file, zipFileSettings)) {
             zipFile.add(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"), settings);
@@ -78,8 +78,6 @@ public class ZipFileTest {
         assertThatZipFile(file).file("two.jpg").exists().isImage().hasSize(277_857);
         assertThatZipFile(file).file("three.jpg").exists().isImage().hasSize(1_601_879);
         assertThatZipFile(file).file("four.jpg").exists().isImage().hasSize(1_916_776);
-
-        System.currentTimeMillis();
     }
 
     public void shouldCreateZipFileWithEntryCommentWhenUseZipFile() throws IOException {
@@ -125,26 +123,30 @@ public class ZipFileTest {
     }
 
     public void shouldCreateZipFileWithContentWhenUseZipFile() throws IOException {
-        ZipEntrySettings defaultEntrySettings = ZipEntrySettings.builder()
-                                                                .compression(Compression.STORE)
-                                                                .compressionLevel(CompressionLevel.NORMAL).build();
         ZipFileSettings zipFileSettings = ZipFileSettings.builder()
                                                          .comment("Global Comment")
-                                                         .entrySettings(defaultEntrySettings)
+                                                         .defEntrySettings(ZipEntrySettings.builder()
+                                                                                           .compression(Compression.STORE)
+                                                                                           .compressionLevel(CompressionLevel.NORMAL).build())
                                                          .build();
 
+        ZipEntrySettings starWarsSettings = ZipEntrySettings.builder()
+                                                            .compression(Compression.DEFLATE)
+                                                            .compressionLevel(CompressionLevel.NORMAL)
+                                                            .basePath(Zip4jSuite.starWarsDir.getFileName().toString()).build();
+
+        ZipEntrySettings srcSettings = ZipEntrySettings.builder()
+                                                       .compression(Compression.DEFLATE)
+                                                       .compressionLevel(CompressionLevel.MAXIMUM)
+                                                       .encryption(Encryption.PKWARE)
+                                                       .password(Zip4jSuite.password).build();
+
+        Path file = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
         try (ZipFile zipFile = new ZipFile(file, zipFileSettings)) {
             zipFile.add(Zip4jSuite.carsDir);
-            zipFile.add(Zip4jSuite.filesStarWarsDir, ZipEntrySettings.builder()
-                                                                     .compression(Compression.DEFLATE)
-                                                                     .compressionLevel(CompressionLevel.NORMAL)
-                                                                     .basePath(Zip4jSuite.starWarsDir.getFileName().toString()).build());
-            zipFile.add(Zip4jSuite.filesSrcDir, ZipEntrySettings.builder()
-                                                                .compression(Compression.DEFLATE)
-                                                                .compressionLevel(CompressionLevel.MAXIMUM)
-                                                                .encryption(Encryption.PKWARE)
-                                                                .password(Zip4jSuite.password).build());
+            zipFile.add(Zip4jSuite.filesStarWarsDir, starWarsSettings);
+            zipFile.add(Zip4jSuite.filesSrcDir, srcSettings);
         }
 
 //        assertThatDirectory(file.getParent()).exists().hasSubDirectories(0).hasFiles(1);
