@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.model.entry;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
@@ -31,16 +32,16 @@ import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ZipEntryBuilder {
 
-    public static ZipEntry create(@NonNull Path path, @NonNull ZipEntrySettings settings) {
+    public static ZipEntry create(@NonNull Path path, @NonNull String fileName, @NonNull ZipEntrySettings settings) {
         try {
-            return Files.isDirectory(path) ? createDirectoryEntry(path, settings) : createRegularFileEntry(path, settings);
+            return Files.isDirectory(path) ? createDirectoryEntry(path, fileName, settings) : createRegularFileEntry(path, fileName, settings);
         } catch(IOException e) {
             throw new Zip4jException(e);
         }
     }
 
-    private static ZipEntry createDirectoryEntry(Path dir, ZipEntrySettings settings) throws IOException {
-        String fileName = settings.getRelativeFileName(dir);
+    private static ZipEntry createDirectoryEntry(Path dir, String fileName, ZipEntrySettings settings) throws IOException {
+        fileName = ZipUtils.normalizeFileName(FilenameUtils.concat(settings.getBasePath(), fileName) + '/');
         int lastModifiedTime = ZipUtils.javaToDosTime(Files.getLastModifiedTime(dir).toMillis());
         ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.createOperationBasedDelegate(dir);
 
@@ -52,8 +53,8 @@ public final class ZipEntryBuilder {
         return zipEntry;
     }
 
-    private static ZipEntry createRegularFileEntry(Path file, ZipEntrySettings settings) throws IOException {
-        String fileName = settings.getRelativeFileName(file);
+    private static ZipEntry createRegularFileEntry(Path file, String fileName, ZipEntrySettings settings) throws IOException {
+        fileName = ZipUtils.normalizeFileName(FilenameUtils.concat(settings.getBasePath(), fileName));
         int lastModifiedTime = ZipUtils.javaToDosTime(Files.getLastModifiedTime(file).toMillis());
         ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.createOperationBasedDelegate(file);
 

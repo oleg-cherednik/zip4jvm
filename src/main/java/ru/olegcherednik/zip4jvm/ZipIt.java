@@ -90,7 +90,7 @@ public final class ZipIt {
         return paths.parallelStream()
                     .filter(path -> Files.isRegularFile(path) || emptyDirectories.contains(path))
                     .sorted()
-                    .map(path -> ZipEntryBuilder.create(path, settings))
+                    .map(path -> ZipEntryBuilder.create(path, "", settings))
                     .collect(Collectors.toList());
     }
 

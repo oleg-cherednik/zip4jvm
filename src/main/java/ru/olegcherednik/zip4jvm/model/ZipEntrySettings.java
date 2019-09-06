@@ -4,10 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import ru.olegcherednik.zip4jvm.utils.ZipUtils;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
+import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 
 @Getter
 @Builder(toBuilder = true)
@@ -22,6 +19,7 @@ public final class ZipEntrySettings {
     @NonNull
     @Builder.Default
     private final Encryption encryption = Encryption.OFF;
+    private final AesStrength strength = AesStrength.NULL;
     private final char[] password;
     private final String comment;
     /**
@@ -33,18 +31,19 @@ public final class ZipEntrySettings {
     private final boolean utf8 = true;
 
     @Setter
-    private Path defaultFolderPath;
+    @Builder.Default
+    private String basePath = "";
 
-    public String getRelativeFileName(Path path) {
-        path = path.toAbsolutePath();
-        Path root = defaultFolderPath != null ? defaultFolderPath : path.getParent();
-        String str = root.relativize(path).toString();
-
-        if (Files.isDirectory(path))
-            str += '/';
-
-        return ZipUtils.normalizeFileName(str);
-    }
+//    public String getRelativeFileName(Path path) {
+//        path = path.toAbsolutePath();
+//        Path root = defaultFolderPath != null ? defaultFolderPath : path.getParent();
+//        String str = root.relativize(path).toString();
+//
+//        if (Files.isDirectory(path))
+//            str += '/';
+//
+//        return ZipUtils.normalizeFileName(str);
+//    }
 
     /*
      * dir:
