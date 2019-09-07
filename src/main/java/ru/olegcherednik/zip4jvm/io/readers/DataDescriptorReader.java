@@ -1,11 +1,11 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import ru.olegcherednik.zip4jvm.exception.Zip4jException;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 
 import java.io.IOException;
 
@@ -14,12 +14,14 @@ import java.io.IOException;
  * @since 25.07.2019
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class DataDescriptorReader {
+public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
 
     public static DataDescriptorReader get(boolean zip64) {
         return zip64 ? new Zip64() : new Standard();
     }
 
+    @Override
+    @NonNull
     public abstract DataDescriptor read(@NonNull DataInput in) throws IOException;
 
     private static final class Standard extends DataDescriptorReader {

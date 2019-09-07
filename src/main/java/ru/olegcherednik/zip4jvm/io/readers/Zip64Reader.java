@@ -1,12 +1,12 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 
@@ -14,8 +14,10 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 22.08.2019
  */
-final class Zip64Reader {
+final class Zip64Reader implements Reader<Zip64> {
 
+    @NonNull
+    @Override
     public Zip64 read(@NonNull DataInput in) throws IOException {
         Zip64.EndCentralDirectoryLocator locator = new Zip64Reader.EndCentralDirectoryLocator().read(in);
         Zip64.EndCentralDirectory dir = locator == null ? null : new Zip64Reader.EndCentralDirectory(locator.getOffs()).read(in);

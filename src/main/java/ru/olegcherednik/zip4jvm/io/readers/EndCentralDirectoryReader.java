@@ -1,9 +1,9 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
+import lombok.NonNull;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
-import lombok.NonNull;
 
 import java.io.IOException;
 
@@ -11,9 +11,10 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 04.03.2019
  */
-final class EndCentralDirectoryReader {
+final class EndCentralDirectoryReader implements Reader<EndCentralDirectory> {
 
     @NonNull
+    @Override
     public EndCentralDirectory read(@NonNull DataInput in) throws IOException {
         long offs = findHead(in);
 

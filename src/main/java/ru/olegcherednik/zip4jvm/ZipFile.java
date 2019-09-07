@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm;
 
 import lombok.NonNull;
+import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.SingleZipOutputStream;
@@ -11,6 +12,7 @@ import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileReadSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
@@ -54,11 +56,6 @@ public class ZipFile implements Closeable {
 
     public static ZipFile write(@NonNull Path zip, @NonNull ZipFileSettings zipFileSettings) throws IOException {
         return new ZipFile(zip, zipFileSettings);
-    }
-
-    public static ZipFile.Read read(@NonNull Path zip) throws IOException {
-        PathUtils.requireExistedPath(zip);
-        return new ZipFile.Read(zip);
     }
 
     public ZipFile(@NonNull Path zip) throws IOException {
@@ -138,14 +135,16 @@ public class ZipFile implements Closeable {
     public static final class Read {
 
         private final ZipModel zipModel;
+        private final ZipFileReadSettings settings;
 
-        public Read(Path zip) throws IOException {
+        public Read(Path zip, ZipFileReadSettings settings) throws IOException {
             zipModel = ZipModelBuilder.read(zip);
+            this.settings = settings;
         }
 
-//        public void extract(@NonNull Path destDir) {
-//            zipModel.getEntries().forEach(entry -> entry.setPassword(password));
-//            new UnzipEngine(zipModel, password).extractEntries(destDir, zipModel.getEntryNames());
-//        }
+        public void extract(@NonNull Path destDir) {
+            zipModel.getEntries().forEach(entry -> entry.setPassword(settings.getPassword()));
+            new UnzipEngine(zipModel, settings.getPassword()).extractEntries(destDir, zipModel.getEntryNames());
+        }
     }
 }
