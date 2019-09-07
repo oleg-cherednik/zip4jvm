@@ -6,12 +6,12 @@ import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.SingleZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.entry.EntryOutputStream;
-import ru.olegcherednik.zip4jvm.model.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.ZipFileSettings;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
+import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import java.io.Closeable;
@@ -46,11 +46,20 @@ import java.util.stream.Collectors;
  * @author Oleg Cherednik
  * @since 01.09.2019
  */
-public final class ZipFile implements Closeable {
+public class ZipFile implements Closeable {
 
     private final ZipModel zipModel;
     private final DataOutput out;
     private final ZipEntrySettings defEntrySettings;
+
+    public static ZipFile write(@NonNull Path zip, @NonNull ZipFileSettings zipFileSettings) throws IOException {
+        return new ZipFile(zip, zipFileSettings);
+    }
+
+    public static ZipFile.Read read(@NonNull Path zip) throws IOException {
+        PathUtils.requireExistedPath(zip);
+        return new ZipFile.Read(zip);
+    }
 
     public ZipFile(@NonNull Path zip) throws IOException {
         this(zip, ZipFileSettings.builder().build());
@@ -124,5 +133,19 @@ public final class ZipFile implements Closeable {
     @Override
     public void close() throws IOException {
         out.close();
+    }
+
+    public static final class Read {
+
+        private final ZipModel zipModel;
+
+        public Read(Path zip) throws IOException {
+            zipModel = ZipModelBuilder.read(zip);
+        }
+
+//        public void extract(@NonNull Path destDir) {
+//            zipModel.getEntries().forEach(entry -> entry.setPassword(password));
+//            new UnzipEngine(zipModel, password).extractEntries(destDir, zipModel.getEntryNames());
+//        }
     }
 }
