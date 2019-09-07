@@ -43,7 +43,7 @@ final class RegularFileZipEntry extends ZipEntry {
 
     @Override
     public long write(@NonNull OutputStream out) throws IOException {
-        try (InputStream in = inputStream.get()) {
+        try (InputStream in = inputStream.get(this)) {
             return uncompressedSize > SIZE_2GB ? IOUtils.copyLarge(in, out) : IOUtils.copy(in, out);
         }
     }

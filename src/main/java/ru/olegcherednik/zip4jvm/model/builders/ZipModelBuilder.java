@@ -76,7 +76,7 @@ public final class ZipModelBuilder {
 
     private void createAndAddEntries(ZipModel zipModel) {
         centralDirectory.getFileHeaders().stream()
-                        .map(ZipEntryBuilder::create)
+                        .map(fileHeader -> ZipEntryBuilder.create(fileHeader, zipModel))
                         .forEach(zipModel::addEntry);
     }
 

@@ -1,5 +1,8 @@
 package ru.olegcherednik.zip4jvm.utils.function;
 
+import lombok.NonNull;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+
 import java.io.IOException;
 
 /**
@@ -8,6 +11,6 @@ import java.io.IOException;
  */
 public interface IOSupplier<T> {
 
-    T get() throws IOException;
+    T get(@NonNull ZipEntry entry) throws IOException;
 
 }

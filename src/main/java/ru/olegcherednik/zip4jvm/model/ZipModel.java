@@ -90,12 +90,12 @@ public class ZipModel {
         return isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(fileNameEntry.keySet());
     }
 
-    public static Path getSplitFilePath(Path zipFile, long disk) {
-        return zipFile.getParent().resolve(String.format("%s.z%02d", FilenameUtils.getBaseName(zipFile.toString()), disk));
-    }
-
     public Path getPartFile(long disk) {
         return disk == totalDisks ? zip : getSplitFilePath(zip, disk + 1);
+    }
+
+    public static Path getSplitFilePath(Path zipFile, long disk) {
+        return zipFile.getParent().resolve(String.format("%s.z%02d", FilenameUtils.getBaseName(zipFile.toString()), disk));
     }
 
     @NonNull

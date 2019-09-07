@@ -22,14 +22,14 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirecto
 @UtilityClass
 public class DefalteZipData {
 
-    public static void createDeflateZip() throws IOException {
+    public void createDeflateZip() throws IOException {
         createDeflateSolidZip();
         createDeflateSplitZip();
         createDeflateSolidPkwareZip();
         createDeflateSolidAesZip();
     }
 
-    private static void createDeflateSolidZip() throws IOException {
+    private void createDeflateSolidZip() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
@@ -43,7 +43,7 @@ public class DefalteZipData {
         assertThatDirectory(Zip4jSuite.deflateSolidZip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
     }
 
-    private static void createDeflateSplitZip() throws IOException {
+    private void createDeflateSplitZip() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
@@ -56,7 +56,7 @@ public class DefalteZipData {
         assertThatDirectory(Zip4jSuite.deflateSplitZip.getParent()).exists().hasSubDirectories(0).hasFiles(10);
     }
 
-    private static void createDeflateSolidPkwareZip() throws IOException {
+    private void createDeflateSolidPkwareZip() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
@@ -70,7 +70,7 @@ public class DefalteZipData {
         assertThatDirectory(Zip4jSuite.deflateSolidPkwareZip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
     }
 
-    private static void createDeflateSolidAesZip() throws IOException {
+    private void createDeflateSolidAesZip() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()

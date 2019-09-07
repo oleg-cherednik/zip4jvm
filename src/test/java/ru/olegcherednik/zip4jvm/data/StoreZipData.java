@@ -6,6 +6,7 @@ import ru.olegcherednik.zip4jvm.Zip4jSuite;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
+import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
@@ -23,12 +24,13 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatZipFile
 @UtilityClass
 public class StoreZipData {
 
-    public static void createStoreZip() throws IOException {
+    public void createStoreZip() throws IOException {
         createStoreSolidZip();
         createStoreSplitZip();
+        createStoreSolidPkwareZip();
     }
 
-    private static void createStoreSolidZip() throws IOException {
+    private void createStoreSolidZip() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
@@ -42,7 +44,7 @@ public class StoreZipData {
         assertThatZipFile(Zip4jSuite.storeSolidZip).exists().rootEntry().matches(TestUtils.zipRootDirAssert);
     }
 
-    private static void createStoreSplitZip() throws IOException {
+    private void createStoreSplitZip() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
@@ -53,6 +55,20 @@ public class StoreZipData {
         assertThat(Files.exists(Zip4jSuite.storeSplitZip)).isTrue();
         assertThat(Files.isRegularFile(Zip4jSuite.storeSplitZip)).isTrue();
         assertThatDirectory(Zip4jSuite.storeSplitZip.getParent()).exists().hasSubDirectories(0).hasFiles(11);
+    }
+
+    private void createStoreSolidPkwareZip() throws IOException {
+        ZipFileSettings settings = ZipFileSettings.builder()
+                                                  .entrySettings(
+                                                          ZipEntrySettings.builder()
+                                                                          .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                                          .encryption(Encryption.PKWARE, Zip4jSuite.password).build())
+                                                  .comment("password: " + new String(Zip4jSuite.password)).build();
+        ZipIt.add(Zip4jSuite.storeSolidPkwareZip, Zip4jSuite.contentSrcDir, settings);
+
+        assertThat(Files.exists(Zip4jSuite.storeSolidPkwareZip)).isTrue();
+        assertThat(Files.isRegularFile(Zip4jSuite.storeSolidPkwareZip)).isTrue();
+        assertThatDirectory(Zip4jSuite.storeSolidPkwareZip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
     }
 
 }

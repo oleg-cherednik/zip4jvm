@@ -38,7 +38,7 @@ public abstract class EntryInputStream extends InputStream {
     protected long writtenUncompressedBytes;
 
     public static InputStream create(@NonNull ZipEntry entry, @NonNull DataInput in) throws IOException {
-        LocalFileHeader localFileHeader = new LocalFileHeaderReader(entry).read(in);
+        LocalFileHeader localFileHeader = new LocalFileHeaderReader(entry.getLocalFileHeaderOffs()).read(in);
         entry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
         // TODO check that localFileHeader matches fileHeader
         Decoder decoder = entry.getEncryption().getCreateDecoder().apply(entry, in);

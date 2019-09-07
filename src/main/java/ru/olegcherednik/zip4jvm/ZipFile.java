@@ -98,14 +98,10 @@ public class ZipFile implements Closeable {
         List<ZipEntry> entries = createEntries(PathUtils.getRelativeContent(paths), entrySettings);
         requireNoDuplicates(entries);
 
-        entries.forEach(entry -> writeEntry(entry, out));
-    }
-
-    private void writeEntry(ZipEntry entry, DataOutput out) {
-        try (OutputStream os = EntryOutputStream.create(entry, zipModel, out)) {
-            entry.write(os);
-        } catch(IOException e) {
-            throw new Zip4jException(e);
+        for (ZipEntry entry : entries) {
+            try (OutputStream os = EntryOutputStream.create(entry, zipModel, out)) {
+                entry.write(os);
+            }
         }
     }
 

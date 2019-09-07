@@ -1,25 +1,20 @@
 package ru.olegcherednik.zip4jvm.io.in;
 
-import ru.olegcherednik.zip4jvm.model.ZipModel;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 abstract class BaseDataInput implements DataInput {
 
     @NonNull
-    protected final ZipModel zipModel;
-    @NonNull
     protected DataInput delegate;
-
-    protected BaseDataInput(@NonNull ZipModel zipModel) throws FileNotFoundException {
-        this.zipModel = zipModel;
-    }
 
     @Override
     public long getOffs() {

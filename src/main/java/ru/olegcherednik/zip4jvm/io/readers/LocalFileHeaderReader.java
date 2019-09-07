@@ -7,7 +7,6 @@ import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
 
@@ -20,8 +19,7 @@ import static ru.olegcherednik.zip4jvm.model.builders.LocalFileHeaderBuilder.LOO
 @RequiredArgsConstructor
 public final class LocalFileHeaderReader implements Reader<LocalFileHeader> {
 
-    @NonNull
-    private final ZipEntry entry;
+    private final long localFileHeaderOffs;
 
     @NonNull
     @Override
@@ -46,7 +44,7 @@ public final class LocalFileHeaderReader implements Reader<LocalFileHeader> {
     }
 
     private void findHead(DataInput in) throws IOException {
-        in.seek(entry.getLocalFileHeaderOffs());
+        in.seek(localFileHeaderOffs);
 
         if (in.readSignature() != LocalFileHeader.SIGNATURE)
             throw new Zip4jException("invalid local file header signature");

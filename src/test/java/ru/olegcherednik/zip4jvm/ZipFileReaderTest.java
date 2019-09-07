@@ -2,6 +2,7 @@ package ru.olegcherednik.zip4jvm;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileReadSettings;
 
 import java.io.IOException;
@@ -12,7 +13,7 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 07.09.2019
  */
-//@Test
+@Test
 @SuppressWarnings("FieldNamingConvention")
 public class ZipFileReaderTest {
 
@@ -44,11 +45,13 @@ public class ZipFileReaderTest {
 ////        Zip4jAssertions.assertThatFile(starWarsDir.resolve("four.jpg")).isImage().hasSize(1_916_776);
 //    }
 
-    public void shouldUnzipZipFileIntoDestinationFolderWhenDeflateSolid() throws IOException {
+    public void shouldUnzipZipFileIntoDestinationFolderWhenStoreSolidPkware() throws IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        ZipFileReadSettings settings = ZipFileReadSettings.builder().build();
-        ZipFileReader zipFile = new ZipFileReader(Zip4jSuite.deflateSolidZip, settings);
-//        zipFile.extract(destDir);
+        ZipFileReadSettings settings = ZipFileReadSettings.builder()
+                                                          .password(Zip4jSuite.password)
+                                                          .build();
+        ZipFileReader zipFile = new ZipFileReader(Zip4jSuite.storeSolidPkwareZip, settings);
+        zipFile.extract(destDir);
 
 //        Zip4jAssertions.assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);
 //
