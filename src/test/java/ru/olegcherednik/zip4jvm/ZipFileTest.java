@@ -1,5 +1,6 @@
 package ru.olegcherednik.zip4jvm;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -12,6 +13,7 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Function;
 
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatZipFile;
@@ -98,8 +100,14 @@ public class ZipFileTest {
     // TODO add unzip tests for such ZipFile
 
     public void shouldCreateZipFileWithEntryDifferentEncryptionAndPasswordWhenUseZipFile() throws IOException {
-        char[] ferrariPassword = "1".toCharArray();
-        char[] wiesmannPassword = "2".toCharArray();
+        final Function<String, char[]> password = fileName -> {
+            if ("ferrari-458-italia.jpg".equals(fileName))
+                return "1".toCharArray();
+            if ("wiesmann-gt-mf5.jpg".equals(fileName))
+                return "2".toCharArray();
+            return ArrayUtils.clone(Zip4jSuite.password);
+        };
+
         Path file = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
         try (ZipFile zipFile = new ZipFile(file)) {
@@ -107,10 +115,10 @@ public class ZipFileTest {
                     ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build());
             zipFile.add(Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg"),
                     ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL)
-                                    .encryption(Encryption.PKWARE, ferrariPassword).build());
+                                    .encryption(Encryption.PKWARE, password).build());
             zipFile.add(Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg"),
                     ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL)
-                                    .encryption(Encryption.AES_256, wiesmannPassword).build());
+                                    .encryption(Encryption.AES_256, password).build());
         }
 
         assertThatDirectory(file.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -134,7 +142,7 @@ public class ZipFileTest {
 
         ZipEntrySettings srcSettings = ZipEntrySettings.builder()
                                                        .compression(Compression.DEFLATE, CompressionLevel.MAXIMUM)
-                                                       .encryption(Encryption.PKWARE, Zip4jSuite.password).build();
+                                                       .encryption(Encryption.PKWARE, fileName -> Zip4jSuite.password).build();
 
         Path file = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 

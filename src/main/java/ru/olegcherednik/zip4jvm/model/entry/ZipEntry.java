@@ -45,10 +45,7 @@ public abstract class ZipEntry {
      */
     private final boolean zip64;
 
-    // zip: set it in constructor
-    // unzip: set it before unzip
     private char[] password;
-
     private long disk;
     private long localFileHeaderOffs;
     @Getter(AccessLevel.NONE)

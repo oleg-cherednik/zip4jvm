@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jEmptyPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
@@ -40,8 +39,9 @@ public final class ZipEntryBuilder {
 
     public static ZipEntry create(@NonNull Path path, @NonNull String fileName, @NonNull ZipEntrySettings entrySettings) {
         try {
-            return Files.isDirectory(path) ? createDirectoryEntry(path, fileName, entrySettings) : createRegularFileEntry(path, fileName,
-                    entrySettings);
+            if (Files.isDirectory(path))
+                return createDirectoryEntry(path, fileName, entrySettings);
+            return createRegularFileEntry(path, fileName, entrySettings);
         } catch(IOException e) {
             throw new Zip4jException(e);
         }
@@ -53,7 +53,7 @@ public final class ZipEntryBuilder {
         ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.createOperationBasedDelegate(dir);
 
         DirectoryZipEntry entry = new DirectoryZipEntry(fileName, lastModifiedTime, externalFileAttributes);
-        entry.setPassword(entrySettings.getPassword());
+        entry.setPassword(entrySettings.getPassword().apply(fileName));
         entry.setComment(entrySettings.getComment());
         entry.setUtf8(entrySettings.isUtf8());
 
@@ -78,7 +78,7 @@ public final class ZipEntryBuilder {
 
         RegularFileZipEntry entry = new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, uncompressedSize, compression,
                 compressionLevel, encryption, zip64, inputStream);
-        entry.setPassword(entrySettings.getPassword());
+        entry.setPassword(entrySettings.getPassword().apply(fileName));
         entry.setComment(entrySettings.getComment());
         entry.setUtf8(entrySettings.isUtf8());
 
@@ -123,17 +123,6 @@ public final class ZipEntryBuilder {
         zipEntry.setComment(fileHeader.getComment());
         zipEntry.setUtf8(fileHeader.getGeneralPurposeFlag().isUtf8());
         return zipEntry;
-    }
-
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    private static final class NullInputStream extends InputStream {
-
-        public static final NullInputStream INSTANCE = new NullInputStream();
-
-        @Override
-        public int read() throws IOException {
-            return IOUtils.EOF;
-        }
     }
 
     private static long getDisk(CentralDirectory.FileHeader fileHeader) {

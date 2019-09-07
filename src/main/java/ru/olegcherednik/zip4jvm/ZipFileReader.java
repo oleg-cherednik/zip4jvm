@@ -32,8 +32,7 @@ public class ZipFileReader {
     }
 
     private void extractEntry(Path destDir, ZipEntry entry) throws IOException {
-        entry.setPassword(settings.getPassword());
-
+        entry.setPassword(settings.getPassword().apply(entry.getFileName()));
         String fileName = entry.getFileName();
 
         if (entry.isDirectory())

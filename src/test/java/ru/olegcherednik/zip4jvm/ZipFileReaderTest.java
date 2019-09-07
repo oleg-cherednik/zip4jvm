@@ -48,7 +48,7 @@ public class ZipFileReaderTest {
     public void shouldUnzipZipFileIntoDestinationFolderWhenStoreSolidPkware() throws IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
         ZipFileReadSettings settings = ZipFileReadSettings.builder()
-                                                          .password(Zip4jSuite.password)
+                                                          .password(fileName -> Zip4jSuite.password)
                                                           .build();
         ZipFileReader zipFile = new ZipFileReader(Zip4jSuite.storeSolidPkwareZip, settings);
         zipFile.extract(destDir);

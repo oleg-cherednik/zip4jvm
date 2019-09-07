@@ -28,6 +28,7 @@ public class StoreZipData {
         createStoreSolidZip();
         createStoreSplitZip();
         createStoreSolidPkwareZip();
+        createStoreSolidAesZip();
     }
 
     private void createStoreSolidZip() throws IOException {
@@ -62,13 +63,27 @@ public class StoreZipData {
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                                          .encryption(Encryption.PKWARE, Zip4jSuite.password).build())
+                                                                          .encryption(Encryption.PKWARE, fileName -> Zip4jSuite.password).build())
                                                   .comment("password: " + new String(Zip4jSuite.password)).build();
         ZipIt.add(Zip4jSuite.storeSolidPkwareZip, Zip4jSuite.contentSrcDir, settings);
 
         assertThat(Files.exists(Zip4jSuite.storeSolidPkwareZip)).isTrue();
         assertThat(Files.isRegularFile(Zip4jSuite.storeSolidPkwareZip)).isTrue();
         assertThatDirectory(Zip4jSuite.storeSolidPkwareZip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+    }
+
+    private void createStoreSolidAesZip() throws IOException {
+        ZipFileSettings settings = ZipFileSettings.builder()
+                                                  .entrySettings(
+                                                          ZipEntrySettings.builder()
+                                                                          .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                                          .encryption(Encryption.PKWARE, fileName -> Zip4jSuite.password).build())
+                                                  .comment("password: " + new String(Zip4jSuite.password)).build();
+        ZipIt.add(Zip4jSuite.storeSolidAesZip, Zip4jSuite.contentSrcDir, settings);
+
+        assertThat(Files.exists(Zip4jSuite.storeSolidAesZip)).isTrue();
+        assertThat(Files.isRegularFile(Zip4jSuite.storeSolidAesZip)).isTrue();
+        assertThatDirectory(Zip4jSuite.storeSolidAesZip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
     }
 
 }

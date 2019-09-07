@@ -59,6 +59,7 @@ public class Zip4jSuite {
     public static final Path storeSolidZip = rootDir.resolve("store/solid/off/src.zip");
     public static final Path storeSplitZip = rootDir.resolve("store/split/off/src.zip");
     public static final Path storeSolidPkwareZip = rootDir.resolve("store/solid/pkware/src.zip");
+    public static final Path storeSolidAesZip = rootDir.resolve("store/solid/aes/src.zip");
 
     // deflate
     public static final Path deflateSolidZip = rootDir.resolve("deflate/solid/off/src.zip");
