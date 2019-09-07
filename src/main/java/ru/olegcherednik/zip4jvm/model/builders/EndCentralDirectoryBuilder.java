@@ -34,11 +34,11 @@ public final class EndCentralDirectoryBuilder {
     }
 
     private int getDiskEntries() {
-        return zipModel.isZip64() ? ZipModel.MAX_TOTAL_ENTRIES : zipModel.getEntries().size();
+        return zipModel.isZip64() ? ZipModel.MAX_TOTAL_ENTRIES : zipModel.getTotalEntries();
     }
 
     private int getTotalEntries() {
-        return zipModel.isZip64() ? ZipModel.MAX_TOTAL_ENTRIES : zipModel.getEntries().size();
+        return zipModel.isZip64() ? ZipModel.MAX_TOTAL_ENTRIES : zipModel.getTotalEntries();
     }
 
     private long getCentralDirectoryOffs() {

@@ -1,22 +1,18 @@
 package ru.olegcherednik.zip4jvm.utils;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.DataOutputStreamDecorator;
 import ru.olegcherednik.zip4jvm.io.out.SingleZipOutputStream;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.IOUtils;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -74,59 +70,59 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
     }
 
     private void writeFileHeaders(OutputStream out, Collection<String> entries) throws IOException {
-        List<ZipEntry> zipEntries = new ArrayList<>();
-        ZipEntry prv = null;
-
-        long offsIn = 0;
-        long offsOut = 0;
-        long skip = 0;
-
-        try (InputStream in = new FileInputStream(zipModel.getZip().toFile())) {
-            int total = zipModel.getEntries().size();
-
-            for (int i = 0; i < total; i++) {
-                ZipEntry zipEntry = zipModel.getEntries().get(i);
-
-                if (prv != null) {
-                    long curOffs = offsOut;
-                    long length = zipEntry.getLocalFileHeaderOffs() - prv.getLocalFileHeaderOffs();
-                    offsIn += skip + IOUtils.copyLarge(in, out, skip, length);
-                    offsOut += length;
-                    zipEntries.add(prv);
-                    prv.setLocalFileHeaderOffs(curOffs);
-                    skip = 0;
-
-                    // TODO fix offs for zip64
-
-                    //                long offsetLocalHdr = fileHeader.getOffsLocalFileHeader();
-//                if (fileHeader.getZip64ExtendedInfo() != null &&
-//                        fileHeader.getZip64ExtendedInfo().getOffsLocalHeaderRelative() != -1) {
-//                    offsetLocalHdr = fileHeader.getZip64ExtendedInfo().getOffsLocalHeaderRelative();
+//        List<ZipEntry> zipEntries = new ArrayList<>();
+//        ZipEntry prv = null;
+//
+//        long offsIn = 0;
+//        long offsOut = 0;
+//        long skip = 0;
+//
+//        try (InputStream in = new FileInputStream(zipModel.getZip().toFile())) {
+//            int total = zipModel.getEntries().size();
+//
+//            for (int i = 0; i < total; i++) {
+//                ZipEntry zipEntry = zipModel.getEntries().get(i);
+//
+//                if (prv != null) {
+//                    long curOffs = offsOut;
+//                    long length = zipEntry.getLocalFileHeaderOffs() - prv.getLocalFileHeaderOffs();
+//                    offsIn += skip + IOUtils.copyLarge(in, out, skip, length);
+//                    offsOut += length;
+//                    zipEntries.add(prv);
+//                    prv.setLocalFileHeaderOffs(curOffs);
+//                    skip = 0;
+//
+//                    // TODO fix offs for zip64
+//
+//                    //                long offsetLocalHdr = fileHeader.getOffsLocalFileHeader();
+////                if (fileHeader.getZip64ExtendedInfo() != null &&
+////                        fileHeader.getZip64ExtendedInfo().getOffsLocalHeaderRelative() != -1) {
+////                    offsetLocalHdr = fileHeader.getZip64ExtendedInfo().getOffsLocalHeaderRelative();
+////                }
+////
+////                fileHeader.setOffsLocalFileHeader(offsetLocalHdr - (offs - offsetLocalFileHeader) - 1);
 //                }
 //
-//                fileHeader.setOffsLocalFileHeader(offsetLocalHdr - (offs - offsetLocalFileHeader) - 1);
-                }
-
-                if (entries.contains(zipEntry.getFileName())) {
-                    prv = null;
-                } else {
-                    prv = zipEntry;
-                }
-
-                skip = zipEntry.getLocalFileHeaderOffs() - offsIn;
-            }
-
-            if (prv != null) {
-                long curOffs = offsOut;
-                long length = zipModel.getCentralDirectoryOffs() - prv.getLocalFileHeaderOffs();
-                offsOut += IOUtils.copyLarge(in, out, skip, length);
-                zipEntries.add(prv);
-                prv.setLocalFileHeaderOffs(curOffs);
-            }
-        }
-
-        zipModel.getEntries().clear();
-        zipModel.getEntries().addAll(zipEntries);
+//                if (entries.contains(zipEntry.getFileName())) {
+//                    prv = null;
+//                } else {
+//                    prv = zipEntry;
+//                }
+//
+//                skip = zipEntry.getLocalFileHeaderOffs() - offsIn;
+//            }
+//
+//            if (prv != null) {
+//                long curOffs = offsOut;
+//                long length = zipModel.getCentralDirectoryOffs() - prv.getLocalFileHeaderOffs();
+//                offsOut += IOUtils.copyLarge(in, out, skip, length);
+//                zipEntries.add(prv);
+//                prv.setLocalFileHeaderOffs(curOffs);
+//            }
+//        }
+//
+//        zipModel.getEntries().clear();
+//        zipModel.getEntries().addAll(zipEntries);
     }
 
     private void restoreFileName(Path tmpZipFileName) {

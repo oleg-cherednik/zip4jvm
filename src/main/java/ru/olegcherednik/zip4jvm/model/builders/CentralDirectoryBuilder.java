@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -16,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public final class CentralDirectoryBuilder {
 
-    private final List<ZipEntry> entries;
+    private final Collection<ZipEntry> entries;
 
     @NonNull
     public CentralDirectory create() throws IOException {

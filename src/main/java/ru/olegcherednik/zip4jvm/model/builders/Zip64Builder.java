@@ -1,10 +1,10 @@
 package ru.olegcherednik.zip4jvm.model.builders;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 /**
  * @author Oleg Cherednik
@@ -45,7 +45,7 @@ public final class Zip64Builder {
         endCentralDirectory.setDisk(zipModel.getTotalDisks());
         endCentralDirectory.setMainDisk(zipModel.getMainDisk());
         endCentralDirectory.setDiskEntries(countNumberOfFileHeaderEntriesOnDisk());
-        endCentralDirectory.setTotalEntries(zipModel.getEntries().size());
+        endCentralDirectory.setTotalEntries(zipModel.getTotalEntries());
         endCentralDirectory.setSize(zipModel.getCentralDirectorySize());
         endCentralDirectory.setCentralDirectoryOffs(zipModel.getCentralDirectoryOffs());
         endCentralDirectory.setExtensibleDataSector(new byte[getExtensibleDataSectorSize()]);
@@ -58,7 +58,7 @@ public final class Zip64Builder {
                                 .filter(entry -> entry.getDisk() == zipModel.getTotalDisks())
                                 .count();
 
-        return zipModel.getEntries().size();
+        return zipModel.getTotalEntries();
     }
 
     /** see 4.3.14.1 */

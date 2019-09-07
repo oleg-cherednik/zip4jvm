@@ -36,7 +36,7 @@ public abstract class EntryOutputStream extends OutputStream {
         EntryOutputStream os = createOutputStream(entry, out);
 
         // TODO move it to the separate method
-        zipModel.getEntries().add(entry);
+        zipModel.addEntry(entry);
         entry.setLocalFileHeaderOffs(out.getOffs());
 
         os.writeLocalFileHeader();

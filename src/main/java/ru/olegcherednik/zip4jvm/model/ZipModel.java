@@ -10,10 +10,11 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * zip64:
@@ -59,7 +60,7 @@ public class ZipModel {
      */
     private boolean zip64;
 
-    private final List<ZipEntry> entries = new ArrayList<>();
+    private final Map<String, ZipEntry> fileNameEntry = new LinkedHashMap<>();
 
     public void setSplitSize(long splitSize) {
         this.splitSize = splitSize < MIN_SPLIT_LENGTH ? NO_SPLIT : splitSize;
@@ -70,13 +71,23 @@ public class ZipModel {
     }
 
     public boolean isEmpty() {
-        return entries.isEmpty();
+        return fileNameEntry.isEmpty();
+    }
+
+    public int getTotalEntries() {
+        return fileNameEntry.size();
+    }
+
+    public void addEntry(@NonNull ZipEntry entry) {
+        fileNameEntry.put(entry.getFileName(), entry);
+    }
+
+    public Collection<ZipEntry> getEntries() {
+        return isEmpty() ? Collections.emptyList() : Collections.unmodifiableCollection(fileNameEntry.values());
     }
 
     public Set<String> getEntryNames() {
-        return entries.stream()
-                      .map(ZipEntry::getFileName)
-                      .collect(Collectors.toSet());
+        return isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(fileNameEntry.keySet());
     }
 
     public static Path getSplitFilePath(Path zipFile, long disk) {
