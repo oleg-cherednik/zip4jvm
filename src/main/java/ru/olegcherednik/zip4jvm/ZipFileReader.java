@@ -1,7 +1,5 @@
 package ru.olegcherednik.zip4jvm;
 
-import lombok.NonNull;
-import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileReadSettings;
@@ -23,19 +21,48 @@ public class ZipFileReader {
         this.settings = settings;
     }
 
-    public void extract(@NonNull Path destDir) {
-        zipModel.getEntries().forEach(entry -> entry.setPassword(settings.getPassword()));
-        new UnzipEngine(zipModel, settings.getPassword()).extractEntries(destDir, zipModel.getEntryNames());
-    }
-
-//    private List<ZipEntry> getEntries(@NonNull Collection<String> entrieNames) {
-//        return entrieNames.parallelStream()
-//                      .map(entrieName -> zipModel.getEntryNames()name -> zipModel.getEntries().stream()
-//                                       .filter(entry -> entry.getFileName().toLowerCase().startsWith(name))
-//                                       .collect(Collectors.toList()))
-//                      .flatMap(List::stream)
-//                      .filter(Objects::nonNull)
-//                      .collect(Collectors.toList());
+//    public void extract(@NonNull Path destDir) {
+//        zipModel.getEntries().forEach(entry -> extractEntry(destDir, entry));
 //    }
+
+//    private void extractEntry(Path dstDir, ZipEntry entry) {
+//        entry.setPassword(settings.getPassword());
+//        checkPassword(entry);
+//
+//        if (entry.isDirectory())
+//            extractDirectory(dstDir, entry);
+//        else {
+//            Path file = dstDir.resolve(entry.getFileName());
+//            extractFile(file, entry);
+//            // TODO should be uncommented
+////            setFileAttributes(file, entry);
+////            setFileLastModifiedTime(file, fileHeader);
+//        }
+//    }
+//
+//    private void checkPassword(ZipEntry entry) {
+//        Encryption encryption = entry.getEncryption();
+//        boolean passwordEmpty = ArrayUtils.isEmpty(entry.getPassword());
+//
+//        if (encryption != Encryption.OFF && passwordEmpty)
+//            throw new Zip4jIncorrectPasswordException(entry.getFileName());
+//    }
+//
+//    private static void extractDirectory(Path dstDir, ZipEntry entry) {
+//        try {
+//            Files.createDirectories(dstDir.resolve(entry.getFileName()));
+//        } catch(IOException e) {
+//            throw new Zip4jException(e);
+//        }
+//    }
+//
+//    private void extractFile(Path file, ZipEntry entry) {
+//        try (InputStream in = extractEntryAsStream(entry); OutputStream out = getOutputStream(file)) {
+//            IOUtils.copyLarge(in, out);
+//        } catch(IOException e) {
+//            throw new Zip4jException(e);
+//        }
+//    }
+
 
 }

@@ -5,11 +5,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions;
-import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
-import ru.olegcherednik.zip4jvm.model.Encryption;
-import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -88,24 +83,4 @@ public class UnzipItTest {
         Zip4jAssertions.assertThatFile(starWarsDir.resolve("four.jpg")).isImage().hasSize(1_916_776);
     }
 
-    public void shouldUnzipEncryptedZip() throws IOException {
-        ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettings(
-                                                          ZipEntrySettings.builder()
-                                                                          .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                                          .encryption(Encryption.PKWARE, Zip4jSuite.password).build())
-                                                  .comment("password: " + new String(Zip4jSuite.password)).build();
-        // TODO do use initially created zip
-        Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt.add(zip, Zip4jSuite.contentSrcDir, settings);
-
-        Path destDir = zip.getParent().resolve("unzip");
-        UnzipIt unzip = UnzipIt.builder()
-                               .zipFile(zip)
-                               .password(Zip4jSuite.password)
-                               .build();
-
-        unzip.extract(destDir);
-        Zip4jAssertions.assertThatDirectory(destDir).matches(TestUtils.dirAssert);
-    }
 }
