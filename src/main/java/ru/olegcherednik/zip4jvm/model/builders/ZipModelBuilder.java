@@ -7,7 +7,7 @@ import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
-import ru.olegcherednik.zip4jvm.model.ZipFileSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
@@ -33,6 +33,10 @@ public final class ZipModelBuilder {
     private final Zip64 zip64;
     @NonNull
     private final CentralDirectory centralDirectory;
+
+    public static ZipModel read(Path zip) throws IOException {
+        return new ZipModelReader(zip).read();
+    }
 
     public static ZipModel readOrCreate(Path zip, ZipFileSettings zipFileSettings) throws IOException {
         if (Files.exists(zip))

@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.model;
+package ru.olegcherednik.zip4jvm.model.settings;
 
 import lombok.Builder;
 import lombok.Getter;

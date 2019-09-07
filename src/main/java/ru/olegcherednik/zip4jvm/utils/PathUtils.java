@@ -53,11 +53,11 @@ public class PathUtils {
     }
 
     public static void requireExistedPaths(@NonNull Collection<Path> paths) {
-        Path notExistedPath = paths.stream()
-                                   .filter(path -> !Files.exists(path) || !Files.isReadable(path))
-                                   .findFirst().orElse(null);
+        paths.forEach(PathUtils::requireExistedPath);
+    }
 
-        if (notExistedPath != null)
-            throw new Zip4jPathNotExistsException(notExistedPath);
+    public static void requireExistedPath(@NonNull Path path) {
+        if (!Files.exists(path) || !Files.isReadable(path))
+            throw new Zip4jPathNotExistsException(path);
     }
 }

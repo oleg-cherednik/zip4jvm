@@ -17,7 +17,7 @@ package ru.olegcherednik.zip4jvm;
 
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-import ru.olegcherednik.zip4jvm.model.ZipFileSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
 import java.io.IOException;
 import java.nio.file.Path;
