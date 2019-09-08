@@ -77,8 +77,8 @@ public class StoreZipData {
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                                          .encryption(Encryption.PKWARE, fileName -> Zip4jSuite.password).build())
-                                                  .comment("password: " + new String(Zip4jSuite.password)).build();
+                                                                          .encryption(Encryption.PKWARE, String::toCharArray).build())
+                                                  .comment("password: fileName").build();
         ZipIt.add(Zip4jSuite.storeSolidAesZip, Zip4jSuite.contentSrcDir, settings);
 
         assertThat(Files.exists(Zip4jSuite.storeSolidAesZip)).isTrue();

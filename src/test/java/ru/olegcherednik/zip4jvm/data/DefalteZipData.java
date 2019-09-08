@@ -75,8 +75,8 @@ public class DefalteZipData {
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                                          .encryption(Encryption.AES_256, fileName -> Zip4jSuite.password).build())
-                                                  .comment("password: " + new String(Zip4jSuite.password)).build();
+                                                                          .encryption(Encryption.AES_256, String::toCharArray).build())
+                                                  .comment("password: fileName").build();
         ZipIt.add(Zip4jSuite.deflateSolidAesZip, Zip4jSuite.contentSrcDir, settings);
 
         assertThat(Files.exists(Zip4jSuite.deflateSolidAesZip)).isTrue();
