@@ -2,6 +2,7 @@ package ru.olegcherednik.zip4jvm.model.settings;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NonNull;
 
 import java.util.function.Function;
 
@@ -13,6 +14,8 @@ import java.util.function.Function;
 @Builder
 public final class ZipFileReadSettings {
 
-    private final Function<String, char[]> password;
+    @NonNull
+    @Builder.Default
+    private final Function<String, char[]> password = fileName -> null;
 
 }

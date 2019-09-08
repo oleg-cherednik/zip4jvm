@@ -1,11 +1,12 @@
 package ru.olegcherednik.zip4jvm.compatibility;
 
-import ru.olegcherednik.zip4jvm.TestUtils;
-import ru.olegcherednik.zip4jvm.UnzipIt;
-import ru.olegcherednik.zip4jvm.Zip4jSuite;
 import de.idyl.winzipaes.AesZipFileEncrypter;
 import de.idyl.winzipaes.impl.AESEncrypterJCA;
 import org.testng.annotations.Test;
+import ru.olegcherednik.zip4jvm.TestUtils;
+import ru.olegcherednik.zip4jvm.Zip4jSuite;
+import ru.olegcherednik.zip4jvm.ZipFileReader;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileReadSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -56,18 +57,14 @@ public class WinZipAesToZip4jCompatibilityTest {
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
-    private static Path unzipItWithZip4j(Path zipFile) throws IOException {
-        Path dir = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("unzip");
-        UnzipIt unzip = UnzipIt.builder()
-                               .zipFile(zipFile)
-                               .password(Zip4jSuite.password)
-                               .build();
-        unzip.extract(dir);
+    private static Path unzipItWithZip4j(Path zip) throws IOException {
+        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("unzip");
+        ZipFileReader zipFile = new ZipFileReader(zip, ZipFileReadSettings.builder().password(fileName -> Zip4jSuite.password).build());
+        zipFile.extract(destDir);
 
         // WinZipAes does not support empty folders in zip
-        Files.createDirectories(dir.resolve("empty_dir"));
-
-        return dir;
+        Files.createDirectories(destDir.resolve("empty_dir"));
+        return destDir;
     }
 
     private static List<Path> getDirectoryEntries(Path dir) {

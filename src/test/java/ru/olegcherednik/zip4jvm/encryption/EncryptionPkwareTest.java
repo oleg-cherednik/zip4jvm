@@ -4,8 +4,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.TestUtils;
-import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jSuite;
+import ru.olegcherednik.zip4jvm.ZipFileReader;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.exception.Zip4jEmptyPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jIncorrectPasswordException;
@@ -13,6 +13,7 @@ import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileReadSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
 import java.io.IOException;
@@ -97,13 +98,11 @@ public class EncryptionPkwareTest {
         Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt.add(zip, Zip4jSuite.contentSrcDir, settings);
 
-        Path dstDir = zip.getParent().resolve("unzip");
-        UnzipIt unzip = UnzipIt.builder()
-                               .zipFile(zip)
-                               .password(Zip4jSuite.password).build();
-        unzip.extract(dstDir);
+        Path destDir = zip.getParent().resolve("unzip");
+        ZipFileReader zipFile = new ZipFileReader(zip, ZipFileReadSettings.builder().password(fileName -> Zip4jSuite.password).build());
+        zipFile.extract(destDir);
 
-        assertThatDirectory(dstDir).matches(TestUtils.dirAssert);
+        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
     }
 
     public void shouldThrowExceptionWhenUnzipStandardEncryptedZipWithIncorrectPassword() throws IOException {
@@ -116,12 +115,11 @@ public class EncryptionPkwareTest {
         Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt.add(zip, Zip4jSuite.srcDir, settings);
 
-        Path dstDir1 = zip.getParent().resolve("unzip");
-        UnzipIt unzip = UnzipIt.builder()
-                               .zipFile(zip)
-                               .password(UUID.randomUUID().toString().toCharArray()).build();
+        Path destDir = zip.getParent().resolve("unzip");
+        ZipFileReader zipFile = new ZipFileReader(zip,
+                ZipFileReadSettings.builder().password(fileName -> UUID.randomUUID().toString().toCharArray()).build());
 
-        assertThatThrownBy(() -> unzip.extract(dstDir1)).isExactlyInstanceOf(Zip4jIncorrectPasswordException.class);
+        assertThatThrownBy(() -> zipFile.extract(destDir)).isExactlyInstanceOf(Zip4jIncorrectPasswordException.class);
     }
 
 }

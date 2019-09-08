@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm;
 
 import lombok.NonNull;
+import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -21,7 +22,12 @@ public class ZipFileReader {
     private final ZipModel zipModel;
     private final ZipFileReadSettings settings;
 
-    public ZipFileReader(Path zip, ZipFileReadSettings settings) throws IOException {
+    public ZipFileReader(@NonNull Path zip) throws IOException {
+        this(zip, ZipFileReadSettings.builder().build());
+    }
+
+    public ZipFileReader(@NonNull Path zip, ZipFileReadSettings settings) throws IOException {
+        checkZipFile(zip);
         zipModel = ZipModelBuilder.read(zip);
         this.settings = settings;
     }
@@ -56,6 +62,13 @@ public class ZipFileReader {
         Files.deleteIfExists(file);
 
         return new FileOutputStream(file.toFile());
+    }
+
+    static void checkZipFile(Path zip) {
+        if (!Files.exists(zip))
+            throw new Zip4jException("ZipFile not exists: " + zip);
+        if (!Files.isRegularFile(zip))
+            throw new Zip4jException("ZipFile is not a regular file: " + zip);
     }
 
 }
