@@ -1,5 +1,6 @@
 package ru.olegcherednik.zip4jvm.model;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -60,6 +61,7 @@ public class ZipModel {
      */
     private boolean zip64;
 
+    @Getter(AccessLevel.NONE)
     private final Map<String, ZipEntry> fileNameEntry = new LinkedHashMap<>();
 
     public void setSplitSize(long splitSize) {
@@ -84,6 +86,10 @@ public class ZipModel {
 
     public Collection<ZipEntry> getEntries() {
         return isEmpty() ? Collections.emptyList() : Collections.unmodifiableCollection(fileNameEntry.values());
+    }
+
+    public ZipEntry getEntryByFileName(@NonNull String fileName) {
+        return fileNameEntry.get(fileName);
     }
 
     public Set<String> getEntryNames() {

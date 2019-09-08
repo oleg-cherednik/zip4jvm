@@ -59,23 +59,22 @@ public class UnzipItTest {
     }
 
     public void shouldUnzipOneFile() throws IOException {
-        Path dstDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
-        UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.deflateSolidZip).build();
-        unzip.extract(dstDir, "cars/ferrari-458-italia.jpg");
+        Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
+        ZipFileReader zipFile = new ZipFileReader(Zip4jSuite.deflateSolidZip);
+        zipFile.extract(destDir, "cars/ferrari-458-italia.jpg");
 
-        Zip4jAssertions.assertThatDirectory(dstDir).exists().hasSubDirectories(1).hasFiles(0);
-        Zip4jAssertions.assertThatDirectory(dstDir.resolve("cars/")).exists().hasSubDirectories(0).hasFiles(1);
-        Zip4jAssertions.assertThatFile(dstDir.resolve("cars/ferrari-458-italia.jpg")).exists().isImage().hasSize(320_894);
+        Zip4jAssertions.assertThatDirectory(destDir).exists().hasSubDirectories(0).hasFiles(1);
+        Zip4jAssertions.assertThatFile(destDir.resolve("ferrari-458-italia.jpg")).exists().isImage().hasSize(320_894);
     }
 
     public void shouldUnzipFolder() throws IOException {
-        Path dstDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
-        UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.deflateSolidZip).build();
-        unzip.extract(dstDir, "Star Wars");
+        Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
+        ZipFileReader zipFile = new ZipFileReader(Zip4jSuite.deflateSolidZip);
+        zipFile.extract(destDir, "Star Wars");
 
-        Zip4jAssertions.assertThatDirectory(dstDir).exists().hasSubDirectories(1).hasFiles(0);
+        Zip4jAssertions.assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);
 
-        Path starWarsDir = dstDir.resolve("Star Wars/");
+        Path starWarsDir = destDir.resolve("Star Wars/");
         Zip4jAssertions.assertThatDirectory(starWarsDir).exists().hasSubDirectories(0).hasFiles(4);
         Zip4jAssertions.assertThatFile(starWarsDir.resolve("one.jpg")).isImage().hasSize(2_204_448);
         Zip4jAssertions.assertThatFile(starWarsDir.resolve("two.jpg")).isImage().hasSize(277_857);
