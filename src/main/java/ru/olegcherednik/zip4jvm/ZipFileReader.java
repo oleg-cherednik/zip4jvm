@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -39,7 +40,7 @@ public class ZipFileReader {
 
     public void extract(@NonNull Path destDir) throws IOException {
         for (ZipEntry entry : zipModel.getEntries())
-            extractEntry(destDir, entry);
+            extractEntry(destDir, entry, ZipEntry::getFileName);
     }
 
     public void extract(@NonNull Path destDir, @NonNull Collection<String> fileNames) throws IOException {
@@ -52,10 +53,10 @@ public class ZipFileReader {
         List<ZipEntry> entries = getEntriesWithFileNamePrefix(fileName + '/');
 
         if (entries.isEmpty())
-            extractFile(destDir, zipModel.getEntryByFileName(fileName));
+            extractEntry(destDir, zipModel.getEntryByFileName(fileName), e -> FilenameUtils.getName(e.getFileName()));
         else {
             for (ZipEntry entry : entries)
-                extractEntry(destDir, entry);
+                extractEntry(destDir, entry, ZipEntry::getFileName);
         }
     }
 
@@ -65,27 +66,12 @@ public class ZipFileReader {
                        .collect(Collectors.toList());
     }
 
-    private void extractFile(Path destDir, ZipEntry entry) throws IOException {
+    private void extractEntry(Path destDir, ZipEntry entry, Function<ZipEntry, String> getFileName) throws IOException {
         if (entry == null)
             throw new Zip4jException("Entry not found");
 
         entry.setPassword(settings.getPassword().apply(entry.getFileName()));
-        Path file = destDir.resolve(FilenameUtils.getName(entry.getFileName()));
-
-        try (OutputStream out = getOutputStream(file)) {
-            entry.write(out);
-        }
-        // TODO should be uncommented
-//            setFileAttributes(file, entry);
-//            setFileLastModifiedTime(file, fileHeader);
-    }
-
-    private void extractEntry(Path destDir, ZipEntry entry) throws IOException {
-        if (entry == null)
-            throw new Zip4jException("Entry not found");
-
-        entry.setPassword(settings.getPassword().apply(entry.getFileName()));
-        String fileName = entry.getFileName();
+        String fileName = getFileName.apply(entry);
         Path file = destDir.resolve(fileName);
 
         if (entry.isDirectory())
