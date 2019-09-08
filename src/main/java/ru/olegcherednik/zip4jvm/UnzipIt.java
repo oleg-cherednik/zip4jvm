@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
 
 /**
  * @author Oleg Cherednik
@@ -23,14 +22,6 @@ public class UnzipIt {
     @NonNull
     private final Path zipFile;
     private final char[] password;
-
-    public void extract(@NonNull Path dstDir, @NonNull Collection<String> entries) throws IOException {
-        checkZipFile(zipFile);
-
-        ZipModel zipModel = new ZipModelReader(zipFile).read();
-        zipModel.getEntries().forEach(entry -> entry.setPassword(password));
-        new UnzipEngine(zipModel, password).extractEntries(dstDir, entries);
-    }
 
     public InputStream extract(@NonNull String entryName) throws IOException {
         ZipModel zipModel = new ZipModelReader(zipFile).read();

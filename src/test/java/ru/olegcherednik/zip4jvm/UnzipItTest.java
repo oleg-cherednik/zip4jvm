@@ -33,29 +33,27 @@ public class UnzipItTest {
     }
 
     public void shouldUnzipRequiredFiles() throws IOException {
-        Path dstDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
-        List<String> entries = Arrays.asList("saint-petersburg.jpg", "cars/bentley-continental.jpg");
-        UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.deflateSolidZip).build();
-        unzip.extract(dstDir, entries);
+        Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
+        List<String> fileNames = Arrays.asList("saint-petersburg.jpg", "cars/bentley-continental.jpg");
+        ZipFileReader zipFile = new ZipFileReader(Zip4jSuite.deflateSolidZip);
+        zipFile.extract(destDir, fileNames);
 
-        Zip4jAssertions.assertThatDirectory(dstDir).exists().hasSubDirectories(1).hasFiles(1);
-        Zip4jAssertions.assertThatDirectory(dstDir.resolve("cars/")).exists().hasSubDirectories(0).hasFiles(1);
-        Zip4jAssertions.assertThatFile(dstDir.resolve("saint-petersburg.jpg")).exists().isImage().hasSize(1_074_836);
-        Zip4jAssertions.assertThatFile(dstDir.resolve("cars/bentley-continental.jpg")).exists().isImage().hasSize(1_395_362);
+        Zip4jAssertions.assertThatDirectory(destDir).exists().hasSubDirectories(0).hasFiles(2);
+        Zip4jAssertions.assertThatFile(destDir.resolve("saint-petersburg.jpg")).exists().isImage().hasSize(1_074_836);
+        Zip4jAssertions.assertThatFile(destDir.resolve("bentley-continental.jpg")).exists().isImage().hasSize(1_395_362);
     }
 
     @Test
     @Ignore
     public void shouldUnzipRequiredFilesWhenSplit() throws IOException {
-        Path dstDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
+        Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
         List<String> entries = Arrays.asList("saint-petersburg.jpg", "cars/bentley-continental.jpg");
-        UnzipIt unzip = UnzipIt.builder().zipFile(Zip4jSuite.deflateSplitZip).build();
-        unzip.extract(dstDir, entries);
+        ZipFileReader zipFile = new ZipFileReader(Zip4jSuite.deflateSplitZip);
+        zipFile.extract(destDir, entries);
 
-        Zip4jAssertions.assertThatDirectory(dstDir).exists().hasSubDirectories(1).hasFiles(1);
-        Zip4jAssertions.assertThatDirectory(dstDir.resolve("cars/")).exists().hasSubDirectories(0).hasFiles(1);
-        Zip4jAssertions.assertThatFile(dstDir.resolve("saint-petersburg.jpg")).exists().isImage().hasSize(1_074_836);
-        Zip4jAssertions.assertThatFile(dstDir.resolve("cars/bentley-continental.jpg")).exists().isImage().hasSize(1_395_362);
+        Zip4jAssertions.assertThatDirectory(destDir).exists().hasSubDirectories(0).hasFiles(2);
+        Zip4jAssertions.assertThatFile(destDir.resolve("saint-petersburg.jpg")).exists().isImage().hasSize(1_074_836);
+        Zip4jAssertions.assertThatFile(destDir.resolve("bentley-continental.jpg")).exists().isImage().hasSize(1_395_362);
     }
 
     public void shouldUnzipOneFile() throws IOException {

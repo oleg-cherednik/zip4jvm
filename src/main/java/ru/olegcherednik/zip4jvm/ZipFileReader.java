@@ -15,9 +15,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -44,29 +42,27 @@ public class ZipFileReader {
             extractEntry(destDir, entry);
     }
 
+    public void extract(@NonNull Path destDir, @NonNull Collection<String> fileNames) throws IOException {
+        for (String fileName : fileNames)
+            extract(destDir, fileName);
+    }
+
     public void extract(@NonNull Path destDir, @NonNull String fileName) throws IOException {
-        if (zipModel.getEntryByFileName(fileName + '/') != null)
-            extractDirectory(destDir, fileName);
-        else
+        fileName = ZipUtils.normalizeFileName(fileName);
+        List<ZipEntry> entries = getEntriesWithFileNamePrefix(fileName + '/');
+
+        if (entries.isEmpty())
             extractFile(destDir, zipModel.getEntryByFileName(fileName));
+        else {
+            for (ZipEntry entry : entries)
+                extractEntry(destDir, entry);
+        }
     }
 
-    private void extractDirectory(Path destDir, String fileName) throws IOException {
-        List<ZipEntry> entries = getEntriesWithFileNamePrefixes(Collections.singleton(fileName));
-
-        for (ZipEntry entry : entries)
-            extractEntry(destDir, entry);
-    }
-
-    private List<ZipEntry> getEntriesWithFileNamePrefixes(Collection<String> fileNamePrefixes) {
-        return fileNamePrefixes.parallelStream()
-                               .map(ZipUtils::normalizeFileName)
-                               .map(fileNamePrefix -> zipModel.getEntries().stream()
-                                                              .filter(entry -> entry.getFileName().startsWith(fileNamePrefix))
-                                                              .collect(Collectors.toList()))
-                               .flatMap(List::stream)
-                               .filter(Objects::nonNull)
-                               .collect(Collectors.toList());
+    private List<ZipEntry> getEntriesWithFileNamePrefix(String fileNamePrefix) {
+        return zipModel.getEntries().stream()
+                       .filter(entry -> entry.getFileName().startsWith(fileNamePrefix))
+                       .collect(Collectors.toList());
     }
 
     private void extractFile(Path destDir, ZipEntry entry) throws IOException {
