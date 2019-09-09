@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileReadSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileReaderSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -47,9 +47,9 @@ public class ZipFileReaderTest {
 
     public void shouldUnzipZipFileIntoDestinationFolderWhenStoreSolidPkware() throws IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        ZipFileReadSettings settings = ZipFileReadSettings.builder()
-                                                          .password(fileName -> Zip4jSuite.password)
-                                                          .build();
+        ZipFileReaderSettings settings = ZipFileReaderSettings.builder()
+                                                              .password(fileName -> Zip4jSuite.password)
+                                                              .build();
         ZipFile.Reader zipFile = ZipFile.read(Zip4jSuite.storeSolidPkwareZip, settings);
         zipFile.extract(destDir);
 
@@ -65,9 +65,9 @@ public class ZipFileReaderTest {
 
     public void shouldUnzipZipFileIntoDestinationFolderWhenStoreSolidAes() throws IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        ZipFileReadSettings settings = ZipFileReadSettings.builder()
-                                                          .password(String::toCharArray)
-                                                          .build();
+        ZipFileReaderSettings settings = ZipFileReaderSettings.builder()
+                                                              .password(String::toCharArray)
+                                                              .build();
         ZipFile.Reader zipFile = ZipFile.read(Zip4jSuite.storeSolidAesZip, settings);
         zipFile.extract(destDir);
 

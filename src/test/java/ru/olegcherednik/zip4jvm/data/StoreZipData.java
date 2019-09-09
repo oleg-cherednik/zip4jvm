@@ -8,7 +8,7 @@ import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileWriterSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -32,7 +32,7 @@ public class StoreZipData {
     }
 
     private void createStoreSolidZip() throws IOException {
-        ZipFileSettings settings = ZipFileSettings.builder()
+        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL).build())
@@ -46,7 +46,7 @@ public class StoreZipData {
     }
 
     private void createStoreSplitZip() throws IOException {
-        ZipFileSettings settings = ZipFileSettings.builder()
+        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL).build())
@@ -59,7 +59,7 @@ public class StoreZipData {
     }
 
     private void createStoreSolidPkwareZip() throws IOException {
-        ZipFileSettings settings = ZipFileSettings.builder()
+        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL)
@@ -73,7 +73,7 @@ public class StoreZipData {
     }
 
     private void createStoreSolidAesZip() throws IOException {
-        ZipFileSettings settings = ZipFileSettings.builder()
+        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL)

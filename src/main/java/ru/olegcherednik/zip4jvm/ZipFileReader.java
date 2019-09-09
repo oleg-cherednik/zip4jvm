@@ -7,7 +7,7 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileReadSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileReaderSettings;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import java.io.FileOutputStream;
@@ -28,9 +28,9 @@ import java.util.stream.Collectors;
 final class ZipFileReader implements ZipFile.Reader {
 
     private final ZipModel zipModel;
-    private final ZipFileReadSettings settings;
+    private final ZipFileReaderSettings settings;
 
-    public ZipFileReader(@NonNull Path zip, ZipFileReadSettings settings) throws IOException {
+    public ZipFileReader(@NonNull Path zip, ZipFileReaderSettings settings) throws IOException {
         checkZipFile(zip);
         zipModel = ZipModelBuilder.read(zip);
         this.settings = settings;

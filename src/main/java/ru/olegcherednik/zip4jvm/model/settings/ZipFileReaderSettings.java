@@ -12,7 +12,7 @@ import java.util.function.Function;
  */
 @Getter
 @Builder
-public final class ZipFileReadSettings {
+public final class ZipFileReaderSettings {
 
     @NonNull
     @Builder.Default

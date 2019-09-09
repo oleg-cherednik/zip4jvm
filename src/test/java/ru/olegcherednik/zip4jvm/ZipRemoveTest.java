@@ -29,7 +29,7 @@ public class ZipRemoveTest {
     }
 
 //    public void shouldRemoveGivenFilesFromExistedZip() throws IOException {
-//        ZipFileSettings settings = ZipFileSettings.builder()
+//        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
 //                                                  .entrySettings(
 //                                                          ZipEntrySettings.builder()
 //                                                                          .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())

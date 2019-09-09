@@ -8,7 +8,7 @@ import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileWriterSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -40,10 +40,10 @@ public class ZipFileTest {
     }
 
     public void shouldCreateZipFileWhenUseZipFileAndAddFiles() throws IOException {
-        ZipFileSettings zipFileSettings = ZipFileSettings.builder().build();
+        ZipFileWriterSettings zipFileSettings = ZipFileWriterSettings.builder().build();
         ZipEntrySettings settings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
 
-        try (ZipFile zipFile = new ZipFile(file, zipFileSettings)) {
+        try (ZipFile.Writer zipFile = ZipFile.write(file, zipFileSettings)) {
             zipFile.add(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"), settings);
             zipFile.add(Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg"), settings);
             zipFile.add(Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg"), settings);
@@ -60,7 +60,7 @@ public class ZipFileTest {
     public void shouldAddFilesToExistedZipWhenUseZipFile() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
 
-        try (ZipFile zipFile = new ZipFile(file)) {
+        try (ZipFile.Writer zipFile = ZipFile.write(file)) {
             zipFile.add(Zip4jSuite.starWarsDir.resolve("one.jpg"), entrySettings);
             zipFile.add(Zip4jSuite.starWarsDir.resolve("two.jpg"), entrySettings);
             zipFile.add(Zip4jSuite.starWarsDir.resolve("three.jpg"), entrySettings);
@@ -81,7 +81,7 @@ public class ZipFileTest {
     public void shouldCreateZipFileWithEntryCommentWhenUseZipFile() throws IOException {
         Path file = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        try (ZipFile zipFile = new ZipFile(file)) {
+        try (ZipFile.Writer zipFile = ZipFile.write(file)) {
             zipFile.add(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"),
                     ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).comment("bentley-continental").build());
             zipFile.add(Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg"),
@@ -110,7 +110,7 @@ public class ZipFileTest {
 
         Path file = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        try (ZipFile zipFile = new ZipFile(file)) {
+        try (ZipFile.Writer zipFile = ZipFile.write(file)) {
             zipFile.add(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"),
                     ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build());
             zipFile.add(Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg"),
@@ -129,7 +129,7 @@ public class ZipFileTest {
     }
 
     public void shouldCreateZipFileWithContentWhenUseZipFile() throws IOException {
-        ZipFileSettings zipFileSettings = ZipFileSettings.builder()
+        ZipFileWriterSettings zipFileSettings = ZipFileWriterSettings.builder()
                                                          .comment("Global Comment")
                                                          .entrySettings(ZipEntrySettings.builder()
                                                                                         .compression(Compression.STORE, CompressionLevel.NORMAL)
@@ -146,7 +146,7 @@ public class ZipFileTest {
 
         Path file = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        try (ZipFile zipFile = new ZipFile(file, zipFileSettings)) {
+        try (ZipFile.Writer zipFile = ZipFile.write(file, zipFileSettings)) {
             zipFile.add(Zip4jSuite.carsDir);
             zipFile.add(Zip4jSuite.filesStarWarsDir, starWarsSettings);
             zipFile.add(Zip4jSuite.filesSrcDir, srcSettings);

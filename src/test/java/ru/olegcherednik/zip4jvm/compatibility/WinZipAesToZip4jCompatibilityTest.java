@@ -6,7 +6,7 @@ import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.TestUtils;
 import ru.olegcherednik.zip4jvm.Zip4jSuite;
 import ru.olegcherednik.zip4jvm.ZipFile;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileReadSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileReaderSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -59,7 +59,7 @@ public class WinZipAesToZip4jCompatibilityTest {
     @SuppressWarnings("NewMethodNamingConvention")
     private static Path unzipItWithZip4j(Path zip) throws IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("unzip");
-        ZipFile.Reader zipFile = ZipFile.read(zip, ZipFileReadSettings.builder().password(fileName -> Zip4jSuite.password).build());
+        ZipFile.Reader zipFile = ZipFile.read(zip, ZipFileReaderSettings.builder().password(fileName -> Zip4jSuite.password).build());
         zipFile.extract(destDir);
 
         // WinZipAes does not support empty folders in zip

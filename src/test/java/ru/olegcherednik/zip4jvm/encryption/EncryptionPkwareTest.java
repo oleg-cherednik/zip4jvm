@@ -13,8 +13,8 @@ import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileReadSettings;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileReaderSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileWriterSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -46,7 +46,7 @@ public class EncryptionPkwareTest {
     }
 
     public void shouldCreateNewZipWithFolderAndStandardEncryption() throws IOException {
-        ZipFileSettings settings = ZipFileSettings.builder()
+        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
@@ -61,7 +61,7 @@ public class EncryptionPkwareTest {
     }
 
     public void shouldCreateNewZipWithSelectedFilesAndStandardEncryption() throws IOException {
-        ZipFileSettings settings = ZipFileSettings.builder()
+        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
@@ -76,7 +76,7 @@ public class EncryptionPkwareTest {
     }
 
     public void shouldThrowExceptionWhenStandardEncryptionAndEmptyPassword() throws IOException {
-        ZipFileSettings settings = ZipFileSettings.builder()
+        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
@@ -88,7 +88,7 @@ public class EncryptionPkwareTest {
     }
 
     public void shouldUnzipWhenStandardEncryption() throws IOException {
-        ZipFileSettings settings = ZipFileSettings.builder()
+        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
@@ -99,14 +99,14 @@ public class EncryptionPkwareTest {
         ZipIt.add(zip, Zip4jSuite.contentSrcDir, settings);
 
         Path destDir = zip.getParent().resolve("unzip");
-        ZipFile.Reader zipFile = ZipFile.read(zip, ZipFileReadSettings.builder().password(fileName -> Zip4jSuite.password).build());
+        ZipFile.Reader zipFile = ZipFile.read(zip, ZipFileReaderSettings.builder().password(fileName -> Zip4jSuite.password).build());
         zipFile.extract(destDir);
 
         assertThatDirectory(destDir).matches(TestUtils.dirAssert);
     }
 
     public void shouldThrowExceptionWhenUnzipStandardEncryptedZipWithIncorrectPassword() throws IOException {
-        ZipFileSettings settings = ZipFileSettings.builder()
+        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
@@ -117,7 +117,7 @@ public class EncryptionPkwareTest {
 
         Path destDir = zip.getParent().resolve("unzip");
         ZipFile.Reader zipFile = ZipFile.read(zip,
-                ZipFileReadSettings.builder().password(fileName -> UUID.randomUUID().toString().toCharArray()).build());
+                ZipFileReaderSettings.builder().password(fileName -> UUID.randomUUID().toString().toCharArray()).build());
 
         assertThatThrownBy(() -> zipFile.extract(destDir)).isExactlyInstanceOf(Zip4jIncorrectPasswordException.class);
     }
