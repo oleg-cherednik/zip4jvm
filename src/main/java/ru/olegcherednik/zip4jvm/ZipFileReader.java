@@ -73,6 +73,11 @@ final class ZipFileReader implements ZipFile.Reader {
         return entry.getIn();
     }
 
+    @Override
+    public String getComment() {
+        return zipModel.getComment();
+    }
+
     private List<ZipEntry> getEntriesWithFileNamePrefix(String fileNamePrefix) {
         return zipModel.getEntries().stream()
                        .filter(entry -> entry.getFileName().startsWith(fileNamePrefix))

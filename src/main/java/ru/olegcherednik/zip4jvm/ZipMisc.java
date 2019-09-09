@@ -12,7 +12,6 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.RemoveEntryFunc;
-import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -39,28 +38,14 @@ public final class ZipMisc {
     private final Path zipFile;
     private final char[] password;
 
-    public void clearComment() throws IOException {
-        setComment(null);
-    }
-
-    public void setComment(String comment) throws IOException {
-        comment = ZipUtils.normalizeComment.apply(comment);
-        checkZipFile(zipFile);
-
-        // TODO I think not problem to update comment in split archive
-        ZipModel zipModel = new ZipModelReader(zipFile).read().noSplitOnly();
-        zipModel.setComment(comment);
-
-        try (SingleZipOutputStream out = SingleZipOutputStream.create(zipModel)) {
-            out.seek(zipModel.getCentralDirectoryOffs());
-        } catch(Exception e) {
-            throw new Zip4jException(e);
+    public static void setComment(@NonNull Path zip, String comment) throws IOException {
+        try (ZipFile.Misc zipFile = ZipFile.misc(zip)) {
+            zipFile.setComment(comment);
         }
     }
 
-    public String getComment() throws IOException {
-        checkZipFile(zipFile);
-        return new ZipModelReader(zipFile).read().getComment();
+    public static String getComment(@NonNull Path zip) throws IOException {
+        return ZipFile.read(zip).getComment();
     }
 
     public boolean isEncrypted() throws IOException {

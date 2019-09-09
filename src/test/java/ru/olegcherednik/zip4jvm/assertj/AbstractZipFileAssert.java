@@ -54,7 +54,16 @@ public class AbstractZipFileAssert<SELF extends AbstractZipFileAssert<SELF>> ext
     }
 
     public SELF hasCommentSize(int size) {
-        assertThat(actual.getComment()).hasSize(size);
+        if (size == 0)
+            assertThat(actual.getComment()).isNull();
+        else
+            assertThat(actual.getComment()).hasSize(size);
+
+        return myself;
+    }
+
+    public SELF hasComment(String comment) {
+        assertThat(actual.getComment()).isEqualTo(comment);
         return myself;
     }
 

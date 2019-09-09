@@ -50,6 +50,10 @@ public final class ZipFile {
         return new ZipFileWriter(zip, zipFileSettings);
     }
 
+    public ZipFile.Misc misc(@NonNull Path zip) throws IOException {
+        return new ZipFileMisc(zip);
+    }
+
     public interface Reader {
 
         void extract(@NonNull Path destDir) throws IOException;
@@ -59,6 +63,8 @@ public final class ZipFile {
         void extract(@NonNull Path destDir, @NonNull String fileName) throws IOException;
 
         InputStream extract(@NonNull String fileName) throws IOException;
+
+        String getComment();
     }
 
     public interface Writer extends Closeable {
@@ -70,6 +76,13 @@ public final class ZipFile {
         void add(@NonNull Collection<Path> paths) throws IOException;
 
         void add(@NonNull Collection<Path> paths, @NonNull ZipEntrySettings entrySettings) throws IOException;
+    }
+
+    public interface Misc extends Closeable {
+
+        void setComment(String comment);
+
+        String getComment() throws IOException;
     }
 
 }
