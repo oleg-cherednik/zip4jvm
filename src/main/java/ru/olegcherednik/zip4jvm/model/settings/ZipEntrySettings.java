@@ -1,12 +1,16 @@
-package ru.olegcherednik.zip4jvm.model;
+package ru.olegcherednik.zip4jvm.model.settings;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.CompressionLevel;
+import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
+
+import java.util.function.Function;
 
 @Getter
 public final class ZipEntrySettings {
@@ -14,7 +18,7 @@ public final class ZipEntrySettings {
     private final Compression compression;
     private final CompressionLevel compressionLevel;
     private final Encryption encryption;
-    private final char[] password;
+    private final Function<String, char[]> password;
     private final String comment;
     private final boolean zip64;
     private final boolean utf8;
@@ -41,7 +45,7 @@ public final class ZipEntrySettings {
         private Compression compression = Compression.DEFLATE;
         private CompressionLevel compressionLevel = CompressionLevel.NORMAL;
         private Encryption encryption = Encryption.OFF;
-        private char[] password;
+        private Function<String, char[]> password = fileName -> null;
         private String comment;
         private boolean zip64;
         private boolean utf8 = true;
@@ -57,11 +61,10 @@ public final class ZipEntrySettings {
             return this;
         }
 
-        @SuppressWarnings("MethodCanBeVariableArityMethod")
-        public ZipEntrySettings.Builder encryption(@NonNull Encryption encryption, @NonNull char[] password) {
+        public ZipEntrySettings.Builder encryption(@NonNull Encryption encryption, @NonNull Function<String, char[]> password) {
             if (encryption != Encryption.OFF) {
                 this.encryption = encryption;
-                this.password = ArrayUtils.clone(password);
+                this.password = password;
             }
 
             return this;

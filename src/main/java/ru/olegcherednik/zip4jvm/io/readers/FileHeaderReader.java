@@ -21,10 +21,12 @@ import static ru.olegcherednik.zip4jvm.model.builders.LocalFileHeaderBuilder.LOO
  * @since 26.04.2019
  */
 @RequiredArgsConstructor
-final class FileHeaderReader {
+final class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader>> {
 
     private final long totalEntries;
 
+    @NonNull
+    @Override
     public List<CentralDirectory.FileHeader> read(@NonNull DataInput in) throws IOException {
         List<CentralDirectory.FileHeader> fileHeaders = new LinkedList<>();
 

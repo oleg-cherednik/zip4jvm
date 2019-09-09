@@ -9,8 +9,8 @@ import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
-import ru.olegcherednik.zip4jvm.model.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.ZipFileSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileWriterSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -40,11 +40,11 @@ public class EncryptionAesTest {
 
     @Test
     public void shouldCreateNewZipWithFolderAndAesEncryption() throws IOException {
-        ZipFileSettings settings = ZipFileSettings.builder()
+        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                                          .encryption(Encryption.AES_256, Zip4jSuite.password).build())
+                                                                          .encryption(Encryption.AES_256, fileName -> Zip4jSuite.password).build())
                                                   .comment("password: " + new String(Zip4jSuite.password)).build();
         Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt.add(zip, Zip4jSuite.contentSrcDir, settings);
@@ -76,7 +76,7 @@ public class EncryptionAesTest {
 //        unzip.extract(dstDir);
 //
 //        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-//        assertThatZipFile(zipFile, Zip4jSuite.password).exists().directory("/").matches(TestUtils.zipCarsDirAssert);
+//        assertThatZipFile(zipFile, fileName -> Zip4jSuite.password).exists().directory("/").matches(TestUtils.zipCarsDirAssert);
 //    }
 //
 //    public void shouldThrowExceptionWhenStandardEncryptionAndNullPassword() throws IOException {

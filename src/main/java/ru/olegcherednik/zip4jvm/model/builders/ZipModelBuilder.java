@@ -7,16 +7,13 @@ import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
-import ru.olegcherednik.zip4jvm.model.ZipFileSettings;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileWriterSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author Oleg Cherednik
@@ -34,10 +31,13 @@ public final class ZipModelBuilder {
     @NonNull
     private final CentralDirectory centralDirectory;
 
-    public static ZipModel readOrCreate(Path zip, ZipFileSettings zipFileSettings) throws IOException {
+    public static ZipModel read(Path zip) throws IOException {
+        return new ZipModelReader(zip).read();
+    }
+
+    public static ZipModel readOrCreate(Path zip, ZipFileWriterSettings zipFileSettings) throws IOException {
         if (Files.exists(zip))
             return new ZipModelReader(zip).read();
-
         if (zipFileSettings == null)
             throw new Zip4jZipFileSettingsNotSetException(zip);
 
@@ -65,7 +65,7 @@ public final class ZipModelBuilder {
         zipModel.setMainDisk(getMainDisks());
         zipModel.setCentralDirectoryOffs(getCentralDirectoryOffs(endCentralDirectory, zip64));
         zipModel.setCentralDirectorySize(endCentralDirectory.getCentralDirectorySize());
-        zipModel.getEntries().addAll(createEntries());
+        createAndAddEntries(zipModel);
 
         if (zipModel.isSplit())
             zipModel.setSplitSize(getSplitSize(zipModel));
@@ -73,10 +73,10 @@ public final class ZipModelBuilder {
         return zipModel;
     }
 
-    private List<ZipEntry> createEntries() {
-        return centralDirectory.getFileHeaders().stream()
-                               .map(ZipEntryBuilder::create)
-                               .collect(Collectors.toList());
+    private void createAndAddEntries(ZipModel zipModel) {
+        centralDirectory.getFileHeaders().stream()
+                        .map(fileHeader -> ZipEntryBuilder.create(fileHeader, zipModel))
+                        .forEach(zipModel::addEntry);
     }
 
     private long getTotalDisks() {

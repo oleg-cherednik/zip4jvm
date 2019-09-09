@@ -1,5 +1,10 @@
 package ru.olegcherednik.zip4jvm.engine;
 
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jIncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
@@ -11,11 +16,6 @@ import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.in;
 
-import ru.olegcherednik.zip4jvm.model.ZipModel;
 import lombok.NonNull;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -15,12 +15,11 @@ public class SingleZipInputStream extends BaseDataInput {
 
     @NonNull
     public static SingleZipInputStream create(@NonNull ZipModel zipModel) throws FileNotFoundException {
-        return new SingleZipInputStream(zipModel.getZip(), zipModel);
+        return new SingleZipInputStream(zipModel.getZip());
     }
 
-    private SingleZipInputStream(@NonNull Path zipFile, @NonNull ZipModel zipModel) throws FileNotFoundException {
-        super(zipModel);
-        delegate = new LittleEndianReadFile(zipFile);
+    private SingleZipInputStream(Path zip) throws FileNotFoundException {
+        delegate = new LittleEndianReadFile(zip);
     }
 
     @Override

@@ -1,11 +1,11 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.model.ExtraField;
-import ru.olegcherednik.zip4jvm.model.Zip64;
-import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
+import ru.olegcherednik.zip4jvm.model.ExtraField;
+import ru.olegcherednik.zip4jvm.model.Zip64;
 
 import java.io.IOException;
 
@@ -14,7 +14,7 @@ import java.io.IOException;
  * @since 14.04.2019
  */
 @RequiredArgsConstructor
-final class ExtraFieldReader {
+final class ExtraFieldReader implements Reader<ExtraField> {
 
     private final int size;
     private final boolean uncompressedSize;
@@ -22,6 +22,8 @@ final class ExtraFieldReader {
     private final boolean offs;
     private final boolean disk;
 
+    @NonNull
+    @Override
     public ExtraField read(@NonNull DataInput in) throws IOException {
         ExtraField extraField = new ExtraField();
 

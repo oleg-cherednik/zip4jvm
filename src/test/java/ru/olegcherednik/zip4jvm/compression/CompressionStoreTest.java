@@ -4,14 +4,15 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.TestUtils;
-import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jSuite;
+import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
-import ru.olegcherednik.zip4jvm.model.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.ZipFileSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileReaderSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileWriterSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,7 +42,7 @@ public class CompressionStoreTest {
     }
 
     public void shouldCreateSingleZipWithFilesWhenStoreCompression() throws IOException {
-        ZipFileSettings settings = ZipFileSettings.builder()
+        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL).build())
@@ -54,7 +55,7 @@ public class CompressionStoreTest {
     }
 
     public void shouldCreateSplitZipWithFilesWhenStoreCompression() throws IOException {
-        ZipFileSettings settings = ZipFileSettings.builder()
+        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL).build())
@@ -67,7 +68,7 @@ public class CompressionStoreTest {
     }
 
     public void shouldCreateSingleZipWithEntireFolderWhenStoreCompression() throws IOException {
-        ZipFileSettings settings = ZipFileSettings.builder()
+        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL).build())
@@ -82,7 +83,7 @@ public class CompressionStoreTest {
     }
 
     public void shouldCreateSplitZipWithEntireFolderWhenStoreCompression() throws IOException {
-        ZipFileSettings settings = ZipFileSettings.builder()
+        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL).build())
@@ -95,29 +96,25 @@ public class CompressionStoreTest {
     }
 
     public void shouldUnzipWhenStoreCompression() throws IOException {
-        Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt unzip = UnzipIt.builder()
-                               .zipFile(Zip4jSuite.storeSolidZip)
-                               .build();
-        unzip.extract(dstDir);
-        assertThatDirectory(dstDir).matches(TestUtils.dirAssert);
+        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        ZipFile.Reader zipFile = ZipFile.read(Zip4jSuite.storeSolidZip);
+        zipFile.extract(destDir);
+        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
     }
 
     public void shouldUnzipWhenSplitAndStoreCompression() throws IOException {
-        Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt unzip = UnzipIt.builder()
-                               .zipFile(Zip4jSuite.storeSplitZip)
-                               .build();
-        unzip.extract(dstDir);
-        assertThatDirectory(dstDir).matches(TestUtils.dirAssert);
+        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        ZipFile.Reader zipFile = ZipFile.read(Zip4jSuite.storeSplitZip);
+        zipFile.extract(destDir);
+        assertThatDirectory(destDir).matches(TestUtils.dirAssert);
     }
 
     public void shouldUnzipWhenWhenStoreCompressionAndPkwareEncryption() throws IOException {
-        ZipFileSettings settings = ZipFileSettings.builder()
+        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                                          .encryption(Encryption.PKWARE, Zip4jSuite.password).build())
+                                                                          .encryption(Encryption.PKWARE, fileName -> Zip4jSuite.password).build())
                                                   .comment("password: " + new String(Zip4jSuite.password)).build();
 
         Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
@@ -127,20 +124,17 @@ public class CompressionStoreTest {
         assertThatZipFile(zip, Zip4jSuite.password).directory("/").matches(TestUtils.zipCarsDirAssert);
 
         Path dirUnzip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("unzip");
-        UnzipIt unzip = UnzipIt.builder()
-                               .zipFile(zip)
-                               .password(Zip4jSuite.password)
-                               .build();
-        unzip.extract(dirUnzip);
+        ZipFile.Reader zipFile = ZipFile.read(zip, ZipFileReaderSettings.builder().password(fileName -> Zip4jSuite.password).build());
+        zipFile.extract(dirUnzip);
         assertThatDirectory(dirUnzip).matches(TestUtils.carsDirAssert);
     }
 
     public void shouldUnzipWhenWhenStoreCompressionAndAesEncryption() throws IOException {
-        ZipFileSettings settings = ZipFileSettings.builder()
+        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                                          .encryption(Encryption.AES_256, Zip4jSuite.password).build())
+                                                                          .encryption(Encryption.AES_256, fileName -> Zip4jSuite.password).build())
                                                   .comment("password: " + new String(Zip4jSuite.password)).build();
 
         Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
@@ -150,12 +144,8 @@ public class CompressionStoreTest {
         assertThatZipFile(zip, Zip4jSuite.password).directory("/").matches(TestUtils.zipCarsDirAssert);
 
         Path dirUnzip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("unzip");
-        UnzipIt unzip = UnzipIt.builder()
-                               .zipFile(zip)
-                               .password(Zip4jSuite.password)
-                               .build();
-        unzip.extract(dirUnzip);
-
+        ZipFile.Reader zipFile = ZipFile.read(zip, ZipFileReaderSettings.builder().password(fileName -> Zip4jSuite.password).build());
+        zipFile.extract(dirUnzip);
         assertThatDirectory(dirUnzip).matches(TestUtils.carsDirAssert);
     }
 

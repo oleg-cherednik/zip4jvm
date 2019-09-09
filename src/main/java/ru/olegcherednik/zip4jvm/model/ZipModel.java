@@ -1,5 +1,6 @@
 package ru.olegcherednik.zip4jvm.model;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -10,10 +11,11 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * zip64:
@@ -59,7 +61,8 @@ public class ZipModel {
      */
     private boolean zip64;
 
-    private final List<ZipEntry> entries = new ArrayList<>();
+    @Getter(AccessLevel.NONE)
+    private final Map<String, ZipEntry> fileNameEntry = new LinkedHashMap<>();
 
     public void setSplitSize(long splitSize) {
         this.splitSize = splitSize < MIN_SPLIT_LENGTH ? NO_SPLIT : splitSize;
@@ -70,21 +73,35 @@ public class ZipModel {
     }
 
     public boolean isEmpty() {
-        return entries.isEmpty();
+        return fileNameEntry.isEmpty();
+    }
+
+    public int getTotalEntries() {
+        return fileNameEntry.size();
+    }
+
+    public void addEntry(@NonNull ZipEntry entry) {
+        fileNameEntry.put(entry.getFileName(), entry);
+    }
+
+    public Collection<ZipEntry> getEntries() {
+        return isEmpty() ? Collections.emptyList() : Collections.unmodifiableCollection(fileNameEntry.values());
+    }
+
+    public ZipEntry getEntryByFileName(@NonNull String fileName) {
+        return fileNameEntry.get(fileName);
     }
 
     public Set<String> getEntryNames() {
-        return entries.stream()
-                      .map(ZipEntry::getFileName)
-                      .collect(Collectors.toSet());
-    }
-
-    public static Path getSplitFilePath(Path zipFile, long disk) {
-        return zipFile.getParent().resolve(String.format("%s.z%02d", FilenameUtils.getBaseName(zipFile.toString()), disk));
+        return isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(fileNameEntry.keySet());
     }
 
     public Path getPartFile(long disk) {
         return disk == totalDisks ? zip : getSplitFilePath(zip, disk + 1);
+    }
+
+    public static Path getSplitFilePath(Path zipFile, long disk) {
+        return zipFile.getParent().resolve(String.format("%s.z%02d", FilenameUtils.getBaseName(zipFile.toString()), disk));
     }
 
     @NonNull

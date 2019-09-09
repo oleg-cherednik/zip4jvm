@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.model;
+package ru.olegcherednik.zip4jvm.model.settings;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Getter;
  */
 @Getter
 @Builder
-public final class ZipFileSettings {
+public final class ZipFileWriterSettings {
 
     private final long splitSize;
     private final String comment;

@@ -1,17 +1,19 @@
 package ru.olegcherednik.zip4jvm;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
-import ru.olegcherednik.zip4jvm.model.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.ZipFileSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileWriterSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Function;
 
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatZipFile;
@@ -38,10 +40,10 @@ public class ZipFileTest {
     }
 
     public void shouldCreateZipFileWhenUseZipFileAndAddFiles() throws IOException {
-        ZipFileSettings zipFileSettings = ZipFileSettings.builder().build();
+        ZipFileWriterSettings zipFileSettings = ZipFileWriterSettings.builder().build();
         ZipEntrySettings settings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
 
-        try (ZipFile zipFile = new ZipFile(file, zipFileSettings)) {
+        try (ZipFile.Writer zipFile = ZipFile.write(file, zipFileSettings)) {
             zipFile.add(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"), settings);
             zipFile.add(Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg"), settings);
             zipFile.add(Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg"), settings);
@@ -58,7 +60,7 @@ public class ZipFileTest {
     public void shouldAddFilesToExistedZipWhenUseZipFile() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
 
-        try (ZipFile zipFile = new ZipFile(file)) {
+        try (ZipFile.Writer zipFile = ZipFile.write(file)) {
             zipFile.add(Zip4jSuite.starWarsDir.resolve("one.jpg"), entrySettings);
             zipFile.add(Zip4jSuite.starWarsDir.resolve("two.jpg"), entrySettings);
             zipFile.add(Zip4jSuite.starWarsDir.resolve("three.jpg"), entrySettings);
@@ -79,7 +81,7 @@ public class ZipFileTest {
     public void shouldCreateZipFileWithEntryCommentWhenUseZipFile() throws IOException {
         Path file = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        try (ZipFile zipFile = new ZipFile(file)) {
+        try (ZipFile.Writer zipFile = ZipFile.write(file)) {
             zipFile.add(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"),
                     ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).comment("bentley-continental").build());
             zipFile.add(Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg"),
@@ -98,19 +100,25 @@ public class ZipFileTest {
     // TODO add unzip tests for such ZipFile
 
     public void shouldCreateZipFileWithEntryDifferentEncryptionAndPasswordWhenUseZipFile() throws IOException {
-        char[] ferrariPassword = "1".toCharArray();
-        char[] wiesmannPassword = "2".toCharArray();
+        final Function<String, char[]> password = fileName -> {
+            if ("ferrari-458-italia.jpg".equals(fileName))
+                return "1".toCharArray();
+            if ("wiesmann-gt-mf5.jpg".equals(fileName))
+                return "2".toCharArray();
+            return ArrayUtils.clone(Zip4jSuite.password);
+        };
+
         Path file = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        try (ZipFile zipFile = new ZipFile(file)) {
+        try (ZipFile.Writer zipFile = ZipFile.write(file)) {
             zipFile.add(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"),
                     ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build());
             zipFile.add(Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg"),
                     ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL)
-                                    .encryption(Encryption.PKWARE, ferrariPassword).build());
+                                    .encryption(Encryption.PKWARE, password).build());
             zipFile.add(Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg"),
                     ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL)
-                                    .encryption(Encryption.AES_256, wiesmannPassword).build());
+                                    .encryption(Encryption.AES_256, password).build());
         }
 
         assertThatDirectory(file.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -121,7 +129,7 @@ public class ZipFileTest {
     }
 
     public void shouldCreateZipFileWithContentWhenUseZipFile() throws IOException {
-        ZipFileSettings zipFileSettings = ZipFileSettings.builder()
+        ZipFileWriterSettings zipFileSettings = ZipFileWriterSettings.builder()
                                                          .comment("Global Comment")
                                                          .entrySettings(ZipEntrySettings.builder()
                                                                                         .compression(Compression.STORE, CompressionLevel.NORMAL)
@@ -134,11 +142,11 @@ public class ZipFileTest {
 
         ZipEntrySettings srcSettings = ZipEntrySettings.builder()
                                                        .compression(Compression.DEFLATE, CompressionLevel.MAXIMUM)
-                                                       .encryption(Encryption.PKWARE, Zip4jSuite.password).build();
+                                                       .encryption(Encryption.PKWARE, fileName -> Zip4jSuite.password).build();
 
         Path file = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        try (ZipFile zipFile = new ZipFile(file, zipFileSettings)) {
+        try (ZipFile.Writer zipFile = ZipFile.write(file, zipFileSettings)) {
             zipFile.add(Zip4jSuite.carsDir);
             zipFile.add(Zip4jSuite.filesStarWarsDir, starWarsSettings);
             zipFile.add(Zip4jSuite.filesSrcDir, srcSettings);

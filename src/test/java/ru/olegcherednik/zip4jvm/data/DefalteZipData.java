@@ -6,8 +6,8 @@ import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
-import ru.olegcherednik.zip4jvm.model.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.ZipFileSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileWriterSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,15 +22,15 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirecto
 @UtilityClass
 public class DefalteZipData {
 
-    public static void createDeflateZip() throws IOException {
+    public void createDeflateZip() throws IOException {
         createDeflateSolidZip();
         createDeflateSplitZip();
         createDeflateSolidPkwareZip();
         createDeflateSolidAesZip();
     }
 
-    private static void createDeflateSolidZip() throws IOException {
-        ZipFileSettings settings = ZipFileSettings.builder()
+    private void createDeflateSolidZip() throws IOException {
+        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
@@ -43,8 +43,8 @@ public class DefalteZipData {
         assertThatDirectory(Zip4jSuite.deflateSolidZip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
     }
 
-    private static void createDeflateSplitZip() throws IOException {
-        ZipFileSettings settings = ZipFileSettings.builder()
+    private void createDeflateSplitZip() throws IOException {
+        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
@@ -56,12 +56,12 @@ public class DefalteZipData {
         assertThatDirectory(Zip4jSuite.deflateSplitZip.getParent()).exists().hasSubDirectories(0).hasFiles(10);
     }
 
-    private static void createDeflateSolidPkwareZip() throws IOException {
-        ZipFileSettings settings = ZipFileSettings.builder()
+    private void createDeflateSolidPkwareZip() throws IOException {
+        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                                          .encryption(Encryption.PKWARE, Zip4jSuite.password).build())
+                                                                          .encryption(Encryption.PKWARE, fileName -> Zip4jSuite.password).build())
                                                   .comment("password: " + new String(Zip4jSuite.password)).build();
         ZipIt.add(Zip4jSuite.deflateSolidPkwareZip, Zip4jSuite.contentSrcDir, settings);
 
@@ -70,13 +70,13 @@ public class DefalteZipData {
         assertThatDirectory(Zip4jSuite.deflateSolidPkwareZip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
     }
 
-    private static void createDeflateSolidAesZip() throws IOException {
-        ZipFileSettings settings = ZipFileSettings.builder()
+    private void createDeflateSolidAesZip() throws IOException {
+        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                                          .encryption(Encryption.AES_256, Zip4jSuite.password).build())
-                                                  .comment("password: " + new String(Zip4jSuite.password)).build();
+                                                                          .encryption(Encryption.AES_256, String::toCharArray).build())
+                                                  .comment("password: fileName").build();
         ZipIt.add(Zip4jSuite.deflateSolidAesZip, Zip4jSuite.contentSrcDir, settings);
 
         assertThat(Files.exists(Zip4jSuite.deflateSolidAesZip)).isTrue();

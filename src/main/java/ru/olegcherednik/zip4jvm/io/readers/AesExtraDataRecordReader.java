@@ -1,11 +1,11 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
+import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 
 import java.io.IOException;
 
@@ -14,11 +14,11 @@ import java.io.IOException;
  * @since 14.04.2019
  */
 @RequiredArgsConstructor
-final class AesExtraDataRecordReader {
+final class AesExtraDataRecordReader implements Reader<AesExtraDataRecord> {
 
     private final int signature;
 
-    @NonNull
+    @Override
     public AesExtraDataRecord read(@NonNull DataInput in) throws IOException {
         if (signature != AesExtraDataRecord.SIGNATURE)
             return AesExtraDataRecord.NULL;
