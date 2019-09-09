@@ -5,7 +5,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.TestUtils;
 import ru.olegcherednik.zip4jvm.Zip4jSuite;
-import ru.olegcherednik.zip4jvm.ZipFileReader;
+import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.exception.Zip4jEmptyPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jIncorrectPasswordException;
@@ -99,7 +99,7 @@ public class EncryptionPkwareTest {
         ZipIt.add(zip, Zip4jSuite.contentSrcDir, settings);
 
         Path destDir = zip.getParent().resolve("unzip");
-        ZipFileReader zipFile = new ZipFileReader(zip, ZipFileReadSettings.builder().password(fileName -> Zip4jSuite.password).build());
+        ZipFile.Reader zipFile = ZipFile.read(zip, ZipFileReadSettings.builder().password(fileName -> Zip4jSuite.password).build());
         zipFile.extract(destDir);
 
         assertThatDirectory(destDir).matches(TestUtils.dirAssert);
@@ -116,7 +116,7 @@ public class EncryptionPkwareTest {
         ZipIt.add(zip, Zip4jSuite.srcDir, settings);
 
         Path destDir = zip.getParent().resolve("unzip");
-        ZipFileReader zipFile = new ZipFileReader(zip,
+        ZipFile.Reader zipFile = ZipFile.read(zip,
                 ZipFileReadSettings.builder().password(fileName -> UUID.randomUUID().toString().toCharArray()).build());
 
         assertThatThrownBy(() -> zipFile.extract(destDir)).isExactlyInstanceOf(Zip4jIncorrectPasswordException.class);

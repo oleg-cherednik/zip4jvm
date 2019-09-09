@@ -50,7 +50,7 @@ public class ZipFileReaderTest {
         ZipFileReadSettings settings = ZipFileReadSettings.builder()
                                                           .password(fileName -> Zip4jSuite.password)
                                                           .build();
-        ZipFileReader zipFile = new ZipFileReader(Zip4jSuite.storeSolidPkwareZip, settings);
+        ZipFile.Reader zipFile = ZipFile.read(Zip4jSuite.storeSolidPkwareZip, settings);
         zipFile.extract(destDir);
 
 //        Zip4jAssertions.assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);
@@ -68,7 +68,7 @@ public class ZipFileReaderTest {
         ZipFileReadSettings settings = ZipFileReadSettings.builder()
                                                           .password(String::toCharArray)
                                                           .build();
-        ZipFileReader zipFile = new ZipFileReader(Zip4jSuite.storeSolidAesZip, settings);
+        ZipFile.Reader zipFile = ZipFile.read(Zip4jSuite.storeSolidAesZip, settings);
         zipFile.extract(destDir);
 
 //        Zip4jAssertions.assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);

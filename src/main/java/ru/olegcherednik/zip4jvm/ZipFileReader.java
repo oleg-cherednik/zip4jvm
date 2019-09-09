@@ -25,14 +25,10 @@ import java.util.stream.Collectors;
  * @author Oleg Cherednik
  * @since 07.09.2019
  */
-public class ZipFileReader {
+final class ZipFileReader implements ZipFile.Reader {
 
     private final ZipModel zipModel;
     private final ZipFileReadSettings settings;
-
-    public ZipFileReader(@NonNull Path zip) throws IOException {
-        this(zip, ZipFileReadSettings.builder().build());
-    }
 
     public ZipFileReader(@NonNull Path zip, ZipFileReadSettings settings) throws IOException {
         checkZipFile(zip);
@@ -40,16 +36,19 @@ public class ZipFileReader {
         this.settings = settings;
     }
 
+    @Override
     public void extract(@NonNull Path destDir) throws IOException {
         for (ZipEntry entry : zipModel.getEntries())
             extractEntry(destDir, entry, ZipEntry::getFileName);
     }
 
+    @Override
     public void extract(@NonNull Path destDir, @NonNull Collection<String> fileNames) throws IOException {
         for (String fileName : fileNames)
             extract(destDir, fileName);
     }
 
+    @Override
     public void extract(@NonNull Path destDir, @NonNull String fileName) throws IOException {
         fileName = ZipUtils.normalizeFileName(fileName);
         List<ZipEntry> entries = getEntriesWithFileNamePrefix(fileName + '/');
@@ -62,6 +61,7 @@ public class ZipFileReader {
         }
     }
 
+    @Override
     public InputStream extract(@NonNull String fileName) throws IOException {
         ZipEntry entry = zipModel.getEntryByFileName(ZipUtils.normalizeFileName(fileName));
 

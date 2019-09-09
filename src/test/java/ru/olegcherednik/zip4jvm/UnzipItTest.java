@@ -35,7 +35,7 @@ public class UnzipItTest {
     public void shouldUnzipRequiredFiles() throws IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
         List<String> fileNames = Arrays.asList("saint-petersburg.jpg", "cars/bentley-continental.jpg");
-        ZipFileReader zipFile = new ZipFileReader(Zip4jSuite.deflateSolidZip);
+        ZipFile.Reader zipFile = ZipFile.read(Zip4jSuite.deflateSolidZip);
         zipFile.extract(destDir, fileNames);
 
         Zip4jAssertions.assertThatDirectory(destDir).exists().hasSubDirectories(0).hasFiles(2);
@@ -48,7 +48,7 @@ public class UnzipItTest {
     public void shouldUnzipRequiredFilesWhenSplit() throws IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
         List<String> entries = Arrays.asList("saint-petersburg.jpg", "cars/bentley-continental.jpg");
-        ZipFileReader zipFile = new ZipFileReader(Zip4jSuite.deflateSplitZip);
+        ZipFile.Reader zipFile = ZipFile.read(Zip4jSuite.deflateSplitZip);
         zipFile.extract(destDir, entries);
 
         Zip4jAssertions.assertThatDirectory(destDir).exists().hasSubDirectories(0).hasFiles(2);
@@ -58,7 +58,7 @@ public class UnzipItTest {
 
     public void shouldUnzipOneFile() throws IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
-        ZipFileReader zipFile = new ZipFileReader(Zip4jSuite.deflateSolidZip);
+        ZipFile.Reader zipFile = ZipFile.read(Zip4jSuite.deflateSolidZip);
         zipFile.extract(destDir, "cars/ferrari-458-italia.jpg");
 
         Zip4jAssertions.assertThatDirectory(destDir).exists().hasSubDirectories(0).hasFiles(1);
@@ -67,7 +67,7 @@ public class UnzipItTest {
 
     public void shouldUnzipFolder() throws IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodNameWithTme(rootDir);
-        ZipFileReader zipFile = new ZipFileReader(Zip4jSuite.deflateSolidZip);
+        ZipFile.Reader zipFile = ZipFile.read(Zip4jSuite.deflateSolidZip);
         zipFile.extract(destDir, "Star Wars");
 
         Zip4jAssertions.assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);

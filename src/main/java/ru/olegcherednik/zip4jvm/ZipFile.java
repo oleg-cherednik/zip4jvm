@@ -12,6 +12,7 @@ import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileReadSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
@@ -48,11 +49,19 @@ import java.util.stream.Collectors;
  * @author Oleg Cherednik
  * @since 01.09.2019
  */
-public class ZipFile implements Closeable {
+public final class ZipFile implements Closeable {
 
     private final ZipModel zipModel;
     private final DataOutput out;
     private final ZipEntrySettings defEntrySettings;
+
+    public static ZipFile.Reader read(@NonNull Path zip) throws IOException {
+        return read(zip, ZipFileReadSettings.builder().build());
+    }
+
+    public static ZipFile.Reader read(@NonNull Path zip, ZipFileReadSettings settings) throws IOException {
+        return new ZipFileReader(zip, settings);
+    }
 
     public static ZipFile write(@NonNull Path zip, @NonNull ZipFileSettings zipFileSettings) throws IOException {
         return new ZipFile(zip, zipFileSettings);
@@ -129,6 +138,17 @@ public class ZipFile implements Closeable {
     @Override
     public void close() throws IOException {
         out.close();
+    }
+
+    public interface Reader {
+
+        void extract(@NonNull Path destDir) throws IOException;
+
+        void extract(@NonNull Path destDir, @NonNull Collection<String> fileNames) throws IOException;
+
+        void extract(@NonNull Path destDir, @NonNull String fileName) throws IOException;
+
+        InputStream extract(@NonNull String fileName) throws IOException;
     }
 
 }

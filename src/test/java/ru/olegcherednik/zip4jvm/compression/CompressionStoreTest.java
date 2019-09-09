@@ -5,7 +5,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.TestUtils;
 import ru.olegcherednik.zip4jvm.Zip4jSuite;
-import ru.olegcherednik.zip4jvm.ZipFileReader;
+import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
@@ -97,14 +97,14 @@ public class CompressionStoreTest {
 
     public void shouldUnzipWhenStoreCompression() throws IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        ZipFileReader zipFile = new ZipFileReader(Zip4jSuite.storeSolidZip);
+        ZipFile.Reader zipFile = ZipFile.read(Zip4jSuite.storeSolidZip);
         zipFile.extract(destDir);
         assertThatDirectory(destDir).matches(TestUtils.dirAssert);
     }
 
     public void shouldUnzipWhenSplitAndStoreCompression() throws IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        ZipFileReader zipFile = new ZipFileReader(Zip4jSuite.storeSplitZip);
+        ZipFile.Reader zipFile = ZipFile.read(Zip4jSuite.storeSplitZip);
         zipFile.extract(destDir);
         assertThatDirectory(destDir).matches(TestUtils.dirAssert);
     }
@@ -124,7 +124,7 @@ public class CompressionStoreTest {
         assertThatZipFile(zip, Zip4jSuite.password).directory("/").matches(TestUtils.zipCarsDirAssert);
 
         Path dirUnzip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("unzip");
-        ZipFileReader zipFile = new ZipFileReader(zip, ZipFileReadSettings.builder().password(fileName -> Zip4jSuite.password).build());
+        ZipFile.Reader zipFile = ZipFile.read(zip, ZipFileReadSettings.builder().password(fileName -> Zip4jSuite.password).build());
         zipFile.extract(dirUnzip);
         assertThatDirectory(dirUnzip).matches(TestUtils.carsDirAssert);
     }
@@ -144,7 +144,7 @@ public class CompressionStoreTest {
         assertThatZipFile(zip, Zip4jSuite.password).directory("/").matches(TestUtils.zipCarsDirAssert);
 
         Path dirUnzip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("unzip");
-        ZipFileReader zipFile = new ZipFileReader(zip, ZipFileReadSettings.builder().password(fileName -> Zip4jSuite.password).build());
+        ZipFile.Reader zipFile = ZipFile.read(zip, ZipFileReadSettings.builder().password(fileName -> Zip4jSuite.password).build());
         zipFile.extract(dirUnzip);
         assertThatDirectory(dirUnzip).matches(TestUtils.carsDirAssert);
     }

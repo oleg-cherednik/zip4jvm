@@ -57,7 +57,7 @@ public class Zip64Test {
     @Test(dependsOnMethods = "shouldZipWhenZip64")
     public void shouldUnzipWhenZip64() throws IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        ZipFileReader zipFile = new ZipFileReader(zipFile1);
+        ZipFile.Reader zipFile = ZipFile.read(zipFile1);
         zipFile.extract(destDir);
         Zip4jAssertions.assertThatDirectory(destDir).matches(TestUtils.dirAssert);
     }
@@ -85,7 +85,7 @@ public class Zip64Test {
     @Test(dependsOnMethods = "shouldZipWhenZip64AndAesEncryption")
     public void shouldUnzipWhenZip64AndAesEncryption() throws IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        ZipFileReader zipFile = new ZipFileReader(zipFile2, ZipFileReadSettings.builder().password(fileName -> Zip4jSuite.password).build());
+        ZipFile.Reader zipFile = ZipFile.read(zipFile2, ZipFileReadSettings.builder().password(fileName -> Zip4jSuite.password).build());
         zipFile.extract(destDir);
         Zip4jAssertions.assertThatDirectory(destDir).matches(TestUtils.dirAssert);
     }
@@ -113,7 +113,7 @@ public class Zip64Test {
     @Ignore
     public void shouldUnzipWhenZip64AndSplit() throws IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        ZipFileReader zipFile = new ZipFileReader(zipFile3, ZipFileReadSettings.builder().password(fileName -> Zip4jSuite.password).build());
+        ZipFile.Reader zipFile = ZipFile.read(zipFile3, ZipFileReadSettings.builder().password(fileName -> Zip4jSuite.password).build());
         zipFile.extract(destDir);
         Zip4jAssertions.assertThatDirectory(destDir).matches(TestUtils.dirAssert);
     }
