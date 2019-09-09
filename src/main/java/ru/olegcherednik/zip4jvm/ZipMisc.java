@@ -10,7 +10,6 @@ import ru.olegcherednik.zip4jvm.io.out.SingleZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.RemoveEntryFunc;
 
 import java.io.FileInputStream;
@@ -22,10 +21,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
 
 /**
  * @author Oleg Cherednik
@@ -48,26 +44,9 @@ public final class ZipMisc {
         return ZipFile.read(zip).getComment();
     }
 
-    public boolean isEncrypted() throws IOException {
-        checkZipFile(zipFile);
-        ZipModel zipModel = new ZipModelReader(zipFile).read();
-
-        return zipModel.getEntries().stream()
-                       .anyMatch(ZipEntry::isEncrypted);
-    }
-
     public Set<String> getEntryNames() throws IOException {
         checkZipFile(zipFile);
         return new ZipModelReader(zipFile).read().getEntryNames();
-    }
-
-    public List<Path> getFiles() throws IOException {
-        checkZipFile(zipFile);
-        ZipModel zipModel = new ZipModelReader(zipFile).read();
-
-        return LongStream.rangeClosed(0, zipModel.getTotalDisks())
-                         .mapToObj(i -> i == 0 ? zipModel.getZip() : ZipModel.getSplitFilePath(zipFile, i))
-                         .collect(Collectors.toList());
     }
 
     public boolean isSplit() throws IOException {

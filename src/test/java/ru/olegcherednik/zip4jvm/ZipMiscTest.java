@@ -3,7 +3,6 @@ package ru.olegcherednik.zip4jvm;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions;
 import ru.olegcherednik.zip4jvm.exception.Zip4jPathNotExistsException;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
@@ -49,41 +48,7 @@ public class ZipMiscTest {
         Path zipFile = Zip4jSuite.copy(rootDir, Zip4jSuite.deflateSolidPkwareZip);
 
         ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
-        assertThat(misc.isEncrypted()).isTrue();
         assertThat(misc.getEntryNames()).hasSize(13);
-    }
-
-    public void shouldRetrieveSingleFileWhenNoSplitZip() throws IOException {
-        ZipMisc misc = ZipMisc.builder().zipFile(Zip4jSuite.deflateSolidZip).build();
-        assertThat(misc.getFiles()).hasSize(1);
-    }
-
-    public void shouldRetrieveMultipleFilesWhenSplitZip() throws IOException {
-        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
-                                                  .entrySettings(
-                                                          ZipEntrySettings.builder()
-                                                                          .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
-                                                  .splitSize(1024 * 1024).build();
-
-        Path zip = Zip4jSuite.subDirNameAsMethodNameWithTme(ZipMiscTest.rootDir).resolve("src.zip");
-        ZipIt.add(zip, Zip4jSuite.srcDir, settings);
-
-        Zip4jAssertions.assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(10);
-
-        ZipMisc misc = ZipMisc.builder().zipFile(zip).build();
-        List<Path> files = misc.getFiles();
-
-        assertThat(files).hasSize(10);
-        assertThat(files.get(0).getFileName().toString()).isEqualTo("src.zip");
-        assertThat(files.get(1).getFileName().toString()).isEqualTo("src.z01");
-        assertThat(files.get(2).getFileName().toString()).isEqualTo("src.z02");
-        assertThat(files.get(3).getFileName().toString()).isEqualTo("src.z03");
-        assertThat(files.get(4).getFileName().toString()).isEqualTo("src.z04");
-        assertThat(files.get(5).getFileName().toString()).isEqualTo("src.z05");
-        assertThat(files.get(6).getFileName().toString()).isEqualTo("src.z06");
-        assertThat(files.get(7).getFileName().toString()).isEqualTo("src.z07");
-        assertThat(files.get(8).getFileName().toString()).isEqualTo("src.z08");
-        assertThat(files.get(9).getFileName().toString()).isEqualTo("src.z09");
     }
 
     public void shouldThrowExceptionWhenAddedFileNotExists() throws IOException {
