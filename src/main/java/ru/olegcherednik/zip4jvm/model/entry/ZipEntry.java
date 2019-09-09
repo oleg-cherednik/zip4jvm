@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.model.entry;
 
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
@@ -15,9 +14,10 @@ import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.Zip64;
+import ru.olegcherednik.zip4jvm.utils.function.IOSupplier;
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.InputStream;
 import java.util.function.BooleanSupplier;
 
 /**
@@ -30,6 +30,8 @@ import java.util.function.BooleanSupplier;
 @Setter
 @RequiredArgsConstructor
 public abstract class ZipEntry {
+
+    public static final long SIZE_2GB = 2_147_483_648L;
 
     private final String fileName;
     private final int lastModifiedTime;
@@ -44,6 +46,7 @@ public abstract class ZipEntry {
      * In other words, do set this to {@code true}, to write given entry in ZIP64 format.
      */
     private final boolean zip64;
+    private final IOSupplier<InputStream> inputStream;
 
     private char[] password;
     private long disk;
@@ -62,8 +65,6 @@ public abstract class ZipEntry {
         return false;
     }
 
-    public abstract boolean isRoot();
-
     public final AesStrength getStrength() {
         return AesEngine.getStrength(encryption);
     }
@@ -72,8 +73,8 @@ public abstract class ZipEntry {
         return encryption != Encryption.OFF;
     }
 
-    public long write(@NonNull OutputStream out) throws IOException {
-        return 0;
+    public InputStream getIn() throws IOException {
+        return inputStream.get(this);
     }
 
     @Override

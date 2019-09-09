@@ -45,7 +45,7 @@ public final class ZipMisc {
 
     public void setComment(String comment) throws IOException {
         comment = ZipUtils.normalizeComment.apply(comment);
-        UnzipIt.checkZipFile(zipFile);
+        checkZipFile(zipFile);
 
         // TODO I think not problem to update comment in split archive
         ZipModel zipModel = new ZipModelReader(zipFile).read().noSplitOnly();
@@ -59,12 +59,12 @@ public final class ZipMisc {
     }
 
     public String getComment() throws IOException {
-        UnzipIt.checkZipFile(zipFile);
+        checkZipFile(zipFile);
         return new ZipModelReader(zipFile).read().getComment();
     }
 
     public boolean isEncrypted() throws IOException {
-        UnzipIt.checkZipFile(zipFile);
+        checkZipFile(zipFile);
         ZipModel zipModel = new ZipModelReader(zipFile).read();
 
         return zipModel.getEntries().stream()
@@ -72,12 +72,12 @@ public final class ZipMisc {
     }
 
     public Set<String> getEntryNames() throws IOException {
-        UnzipIt.checkZipFile(zipFile);
+        checkZipFile(zipFile);
         return new ZipModelReader(zipFile).read().getEntryNames();
     }
 
     public List<Path> getFiles() throws IOException {
-        UnzipIt.checkZipFile(zipFile);
+        checkZipFile(zipFile);
         ZipModel zipModel = new ZipModelReader(zipFile).read();
 
         return LongStream.rangeClosed(0, zipModel.getTotalDisks())
@@ -86,7 +86,7 @@ public final class ZipMisc {
     }
 
     public boolean isSplit() throws IOException {
-        UnzipIt.checkZipFile(zipFile);
+        checkZipFile(zipFile);
         return new ZipModelReader(zipFile).read().isSplit();
     }
 
@@ -95,7 +95,7 @@ public final class ZipMisc {
     }
 
     public void removeEntries(@NonNull Collection<String> entries) throws IOException {
-        UnzipIt.checkZipFile(zipFile);
+        checkZipFile(zipFile);
         ZipModel zipModel = new ZipModelReader(zipFile).read().noSplitOnly();
         new RemoveEntryFunc(zipModel).accept(entries);
     }
@@ -146,6 +146,13 @@ public final class ZipMisc {
         }
 
         return fileSizeList;
+    }
+
+    private static void checkZipFile(Path zipFile) {
+        if (!Files.exists(zipFile))
+            throw new Zip4jException("ZipFile not exists: " + zipFile);
+        if (!Files.isRegularFile(zipFile))
+            throw new Zip4jException("ZipFile is not a regular file: " + zipFile);
     }
 
 }

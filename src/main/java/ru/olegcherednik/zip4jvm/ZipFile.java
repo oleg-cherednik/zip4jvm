@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm;
 
 import lombok.NonNull;
+import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.SingleZipOutputStream;
@@ -16,6 +17,7 @@ import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -97,8 +99,11 @@ public class ZipFile implements Closeable {
         requireNoDuplicates(entries);
 
         for (ZipEntry entry : entries) {
-            try (OutputStream os = EntryOutputStream.create(entry, zipModel, out)) {
-                entry.write(os);
+            try (InputStream in = entry.getIn(); OutputStream os = EntryOutputStream.create(entry, zipModel, out)) {
+                if (entry.getUncompressedSize() > ZipEntry.SIZE_2GB)
+                    IOUtils.copyLarge(in, os);
+                else
+                    IOUtils.copy(in, os);
             }
         }
     }

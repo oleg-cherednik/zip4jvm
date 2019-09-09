@@ -2,6 +2,7 @@ package ru.olegcherednik.zip4jvm;
 
 import lombok.NonNull;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
@@ -11,6 +12,7 @@ import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -60,6 +62,17 @@ public class ZipFileReader {
         }
     }
 
+    public InputStream extract(@NonNull String fileName) throws IOException {
+        ZipEntry entry = zipModel.getEntryByFileName(ZipUtils.normalizeFileName(fileName));
+
+        if (entry == null)
+            throw new Zip4jException("No entry found for '" + fileName + '\'');
+
+        entry.setPassword(settings.getPassword().apply(entry.getFileName()));
+
+        return entry.getIn();
+    }
+
     private List<ZipEntry> getEntriesWithFileNamePrefix(String fileNamePrefix) {
         return zipModel.getEntries().stream()
                        .filter(entry -> entry.getFileName().startsWith(fileNamePrefix))
@@ -77,14 +90,18 @@ public class ZipFileReader {
         if (entry.isDirectory())
             Files.createDirectories(file);
         else {
-            try (OutputStream out = getOutputStream(file)) {
-                entry.write(out);
+            try (InputStream in = entry.getIn(); OutputStream out = getOutputStream(file)) {
+                if (entry.getUncompressedSize() > ZipEntry.SIZE_2GB)
+                    IOUtils.copyLarge(in, out);
+                else
+                    IOUtils.copy(in, out);
             }
             // TODO should be uncommented
 //            setFileAttributes(file, entry);
 //            setFileLastModifiedTime(file, fileHeader);
         }
     }
+
 
     private static FileOutputStream getOutputStream(Path file) throws IOException {
         Path parent = file.getParent();
