@@ -40,23 +40,21 @@ public class ZipMiscTest {
     }
 
     public void shouldRetrieveAllEntryNamesForExistedZip() throws IOException {
-        ZipMisc misc = ZipMisc.builder().zipFile(Zip4jSuite.deflateSolidZip).build();
-        assertThat(misc.getEntryNames()).hasSize(13);
+        assertThat(ZipMisc.getEntryNames(Zip4jSuite.deflateSolidZip)).hasSize(13);
     }
 
     public void shouldRetrieveAllEntryNamesForExistedEncryptedZip() throws IOException {
-        Path zipFile = Zip4jSuite.copy(rootDir, Zip4jSuite.deflateSolidPkwareZip);
-
-        ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
-        assertThat(misc.getEntryNames()).hasSize(13);
+        Path zip = Zip4jSuite.copy(rootDir, Zip4jSuite.deflateSolidPkwareZip);
+        assertThat(ZipMisc.getEntryNames(zip)).hasSize(13);
     }
 
     public void shouldThrowExceptionWhenAddedFileNotExists() throws IOException {
         ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
-                                                  .entrySettings(
-                                                          ZipEntrySettings.builder()
-                                                                          .compression(Compression.STORE, CompressionLevel.NORMAL).build())
-                                                  .build();
+                                                              .entrySettings(
+                                                                      ZipEntrySettings.builder()
+                                                                                      .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                                                      .build())
+                                                              .build();
 
         Path bentley = Zip4jSuite.carsDir.resolve("bentley-continental.jpg");
         Path ferrari = Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg");

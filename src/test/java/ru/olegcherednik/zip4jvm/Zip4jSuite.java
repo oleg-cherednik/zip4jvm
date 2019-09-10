@@ -49,8 +49,6 @@ public class Zip4jSuite {
     }
 
     private static List<Path> collect(Path dir, String... fileNames) {
-        for(String fileName : fileNames)
-            System.out.println(fileName);
         List<Path> paths = Arrays.stream(fileNames)
                                  .map(dir::resolve)
                                  .collect(Collectors.toList());

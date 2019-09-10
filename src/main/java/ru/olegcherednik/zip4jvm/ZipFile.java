@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * ZipFile real-time implementation.
@@ -62,9 +63,13 @@ public final class ZipFile {
 
         void extract(@NonNull Path destDir, @NonNull String fileName) throws IOException;
 
+        @NonNull
         InputStream extract(@NonNull String fileName) throws IOException;
 
         String getComment();
+
+        @NonNull
+        Set<String> getEntryNames();
     }
 
     public interface Writer extends Closeable {

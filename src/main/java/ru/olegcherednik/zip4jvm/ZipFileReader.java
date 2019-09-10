@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -61,6 +62,7 @@ final class ZipFileReader implements ZipFile.Reader {
         }
     }
 
+    @NonNull
     @Override
     public InputStream extract(@NonNull String fileName) throws IOException {
         ZipEntry entry = zipModel.getEntryByFileName(ZipUtils.normalizeFileName(fileName));
@@ -76,6 +78,12 @@ final class ZipFileReader implements ZipFile.Reader {
     @Override
     public String getComment() {
         return zipModel.getComment();
+    }
+
+    @NonNull
+    @Override
+    public Set<String> getEntryNames() {
+        return zipModel.getEntryNames();
     }
 
     private List<ZipEntry> getEntriesWithFileNamePrefix(String fileNamePrefix) {

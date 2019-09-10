@@ -44,9 +44,8 @@ public final class ZipMisc {
         return ZipFile.read(zip).getComment();
     }
 
-    public Set<String> getEntryNames() throws IOException {
-        checkZipFile(zipFile);
-        return new ZipModelReader(zipFile).read().getEntryNames();
+    public static Set<String> getEntryNames(@NonNull Path zip) throws IOException {
+        return ZipFile.read(zip).getEntryNames();
     }
 
     public boolean isSplit() throws IOException {
