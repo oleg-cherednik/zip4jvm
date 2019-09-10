@@ -13,6 +13,7 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileWriterSettings;
+import ru.olegcherednik.zip4jvm.tasks.Task;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import java.io.IOException;
@@ -20,6 +21,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -37,6 +39,7 @@ final class ZipFileWriter implements ZipFile.Writer {
     private final ZipModel zipModel;
     private final DataOutput out;
     private final ZipEntrySettings defEntrySettings;
+    private final List<Task> tasks = new ArrayList<>();
 
     public ZipFileWriter(@NonNull Path zip, @NonNull ZipFileWriterSettings zipFileSettings) throws IOException {
         zipModel = ZipModelBuilder.readOrCreate(zip, zipFileSettings);
