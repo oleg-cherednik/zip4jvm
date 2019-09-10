@@ -44,7 +44,7 @@ public class WinZipAesToZip4jCompatibilityTest {
         for (Path file : getDirectoryEntries(Zip4jSuite.srcDir)) {
             if (Files.isDirectory(file))
                 continue;
-            if ("Олег Чередник.txt".equals(file.getFileName().toString()))
+            if ("Oleg Cherednik.txt".equals(file.getFileName().toString()))
                 continue;
 
             String pathForEntry = Zip4jSuite.srcDir.relativize(file).toString();
@@ -65,7 +65,7 @@ public class WinZipAesToZip4jCompatibilityTest {
         // WinZipAes does not support empty folders in zip
         Files.createDirectories(destDir.resolve("empty_dir"));
         // WinZipAes uses 'iso-8859-1' for file names
-        Files.copy(Zip4jSuite.srcDir.resolve("Олег Чередник.txt"), destDir.resolve("Олег Чередник.txt"));
+        Files.copy(Zip4jSuite.srcDir.resolve("Oleg Cherednik.txt"), destDir.resolve("Oleg Cherednik.txt"));
         return destDir;
     }
 

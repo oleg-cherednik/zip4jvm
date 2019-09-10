@@ -1,8 +1,8 @@
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
-import ru.olegcherednik.zip4jvm.model.Encryption;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.model.Encryption;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
@@ -33,7 +33,7 @@ public final class AesEngine {
     private final byte[] counter = new byte[BLOCK_SIZE];
     private int nonce = BLOCK_SIZE;
 
-    /**
+    /*
      * Sun implementation (com.sun.crypto.provider.CounterMode) of 'AES/CTR/NoPadding' is not compatible with WinZip specification.
      * Have to implement custom one.
      */

@@ -21,7 +21,7 @@ import java.util.Collection;
  * <li><i>zip file not exists</i> - create new empty zip archive</li>
  * </ul>
  * <p>
- * To close zip archive correctly, do call {@link ZipFile#close()} method.
+ * To close zip archive correctly, do call {@link ZipFile.Writer#close()} method.
  * <pre>
  * try (ZipFile zipFile = new ZipFile(Paths.get("~/src.zip"))) {
  *     zipFile.addEntry(...);

@@ -1,11 +1,11 @@
 package ru.olegcherednik.zip4jvm.utils;
 
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
-import ru.olegcherednik.zip4jvm.exception.Zip4jRealBigZip64NotSupportedException;
-import ru.olegcherednik.zip4jvm.model.Zip64;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import ru.olegcherednik.zip4jvm.exception.Zip4jException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jRealBigZip64NotSupportedException;
+import ru.olegcherednik.zip4jvm.model.Zip64;
 
 import java.util.Calendar;
 import java.util.function.Function;
@@ -17,11 +17,6 @@ import java.util.function.Function;
 @UtilityClass
 public class ZipUtils {
 
-    /**
-     * Converts input time from Java to DOS format
-     *
-     * @return time in DOS format
-     */
     public int javaToDosTime(long time) {
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(time);
@@ -35,11 +30,6 @@ public class ZipUtils {
                 cal.get(Calendar.SECOND) >> 1;
     }
 
-    /**
-     * Converts time in dos format to Java format
-     *
-     * @return time in java format
-     */
     public static long dosToJavaTme(int dosTime) {
         int sec = 2 * (dosTime & 0x1f);
         int min = (dosTime >> 5) & 0x3f;
