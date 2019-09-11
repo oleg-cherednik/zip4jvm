@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.tasks;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.ZipModelContext;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -9,6 +10,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * @author Oleg Cherednik
@@ -16,11 +18,13 @@ import java.util.Set;
  */
 public class TaskEngine {
 
-    private final Set<String> entryNames = new HashSet<>();
+    private final ZipModel zipModel;
+    private final Set<String> entryNames;
     private final Map<String, Task> fileNameTask = new LinkedHashMap<>();
 
-    public TaskEngine(Set<String> entryNames) {
-        this.entryNames.addAll(entryNames);
+    public TaskEngine(ZipModel zipModel) {
+        this.zipModel = zipModel;
+        entryNames = new HashSet<>(zipModel.getEntryNames());
     }
 
     public void addEntry(ZipEntry entry) {
@@ -40,6 +44,10 @@ public class TaskEngine {
     public void accept(ZipModelContext context) throws IOException {
         for (Task task : fileNameTask.values())
             task.accept(context);
+    }
+
+    public void addTask(Task task) {
+        fileNameTask.put(UUID.randomUUID().toString(), task);
     }
 
 }

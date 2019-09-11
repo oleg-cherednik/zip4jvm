@@ -10,7 +10,6 @@ import ru.olegcherednik.zip4jvm.io.out.SingleZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
-import ru.olegcherednik.zip4jvm.utils.RemoveEntryFunc;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -20,7 +19,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -48,19 +46,15 @@ public final class ZipMisc {
         return ZipFile.read(zip).getEntryNames();
     }
 
+    public static void removeEntry(@NonNull Path zip, @NonNull Collection<String> entryNames) throws IOException {
+        try (ZipFile.Writer zipFile = ZipFile.write(zip)) {
+            zipFile.remove(entryNames);
+        }
+    }
+
     public boolean isSplit() throws IOException {
         checkZipFile(zipFile);
         return new ZipModelReader(zipFile).read().isSplit();
-    }
-
-    public void removeEntry(@NonNull String entryName) throws IOException {
-        removeEntries(Collections.singletonList(entryName));
-    }
-
-    public void removeEntries(@NonNull Collection<String> entries) throws IOException {
-        checkZipFile(zipFile);
-        ZipModel zipModel = new ZipModelReader(zipFile).read().noSplitOnly();
-        new RemoveEntryFunc(zipModel).accept(entries);
     }
 
     // --------- MergeSplitZip

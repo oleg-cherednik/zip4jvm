@@ -81,6 +81,12 @@ public final class ZipFile {
         void add(@NonNull Collection<Path> paths) throws IOException;
 
         void add(@NonNull Collection<Path> paths, @NonNull ZipEntrySettings entrySettings) throws IOException;
+
+        void remove(@NonNull String entryName);
+
+        default void remove(@NonNull Collection<String> entryNames) {
+            entryNames.forEach(this::remove);
+        }
     }
 
     public interface Misc extends Closeable {

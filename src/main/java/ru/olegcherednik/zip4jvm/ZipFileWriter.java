@@ -39,8 +39,7 @@ final class ZipFileWriter implements ZipFile.Writer {
         zipModel = ZipModelBuilder.readOrCreate(zip, zipFileSettings);
         defEntrySettings = zipFileSettings.getEntrySettings();
         out = createDataOutput(zipModel);
-        engine = new TaskEngine(zipModel.getEntryNames());
-
+        engine = new TaskEngine(zipModel);
         out.seek(zipModel.getCentralDirectoryOffs());
     }
 
@@ -74,6 +73,11 @@ final class ZipFileWriter implements ZipFile.Writer {
     public void add(@NonNull Collection<Path> paths, @NonNull ZipEntrySettings entrySettings) throws IOException {
         PathUtils.requireExistedPaths(paths);
         createEntries(PathUtils.getRelativeContent(paths), entrySettings).forEach(engine::addEntry);
+    }
+
+    @Override
+    public void remove(@NonNull String entryName) {
+        engine.removeEntry(entryName);
     }
 
     private static List<ZipEntry> createEntries(Map<Path, String> pathFileName, ZipEntrySettings entrySettings) {
