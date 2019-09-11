@@ -1,41 +1,36 @@
-﻿package ru.olegcherednik.zip4jvm.tasks;
+package ru.olegcherednik.zip4jvm.tasks;
 
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.IOUtils;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.entry.EntryOutputStream;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.ZipModelContext;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * @author Oleg Cherednik
  * @since 10.09.2019
  */
+@RequiredArgsConstructor
 public final class AddEntryTask implements Task {
 
-    public static void main(String... args) {
-        int[] arr = { 0, 1, 2, 3, 4, 5 };
-        int[] res = removeItem(arr, 2);
-        int a = 0;
-        a++;
-    }
-
-    public static int[] removeItem(int[] dices, int i) {
-        if (dices == null || dices.length == 0)
-            return dices;
-        if (i < 0 || i >= dices.length)
-            throw new ArrayIndexOutOfBoundsException();
-
-        // 0 1 2 3 4 5 -> 2 -> 0 1 - 3 4 5
-
-        int[] res = new int[dices.length - 1];
-        System.arraycopy(dices, 0, res, 0, i + 1);
-        System.arraycopy(dices, i, res, i, i + 1);
-        return res;
-    }
+    private final ZipEntry entry;
 
     @Override
-    public void accept(ZipModelContext context) {
+    public void accept(ZipModelContext context) throws IOException {
+        ZipModel zipModel = context.getZipModel();
+        DataOutput out = context.getOut();
 
+        try (InputStream in = entry.getIn(); OutputStream os = EntryOutputStream.create(entry, zipModel, out)) {
+            if (entry.getUncompressedSize() > ZipEntry.SIZE_2GB)
+                IOUtils.copyLarge(in, os);
+            else
+                IOUtils.copy(in, os);
+        }
     }
 }
-
-class Dice {
-
-}
-

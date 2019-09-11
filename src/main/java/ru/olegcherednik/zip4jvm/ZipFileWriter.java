@@ -1,24 +1,22 @@
 package ru.olegcherednik.zip4jvm;
 
 import lombok.NonNull;
-import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.SingleZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
-import ru.olegcherednik.zip4jvm.io.out.entry.EntryOutputStream;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.ZipModelContext;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileWriterSettings;
+import ru.olegcherednik.zip4jvm.tasks.AddEntryTask;
 import ru.olegcherednik.zip4jvm.tasks.Task;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -81,14 +79,9 @@ final class ZipFileWriter implements ZipFile.Writer {
         List<ZipEntry> entries = createEntries(PathUtils.getRelativeContent(paths), entrySettings);
         requireNoDuplicates(entries);
 
-        for (ZipEntry entry : entries) {
-            try (InputStream in = entry.getIn(); OutputStream os = EntryOutputStream.create(entry, zipModel, out)) {
-                if (entry.getUncompressedSize() > ZipEntry.SIZE_2GB)
-                    IOUtils.copyLarge(in, os);
-                else
-                    IOUtils.copy(in, os);
-            }
-        }
+        for (ZipEntry entry : entries)
+            tasks.add(new AddEntryTask(entry));
+
     }
 
     private static List<ZipEntry> createEntries(Map<Path, String> pathFileName, ZipEntrySettings entrySettings) {
@@ -111,6 +104,11 @@ final class ZipFileWriter implements ZipFile.Writer {
 
     @Override
     public void close() throws IOException {
+        ZipModelContext context = ZipModelContext.builder().zipModel(zipModel).out(out).build();
+
+        for (Task task : tasks)
+            task.accept(context);
+
         out.close();
     }
 
