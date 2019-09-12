@@ -29,8 +29,8 @@ abstract class BaseDataOutput implements DataOutput {
         this.zipModel = zipModel;
     }
 
-    protected void createFile(Path zipFile) throws FileNotFoundException {
-        delegate = new LittleEndianWriteFile(zipFile);
+    protected void createFile(Path zip) throws FileNotFoundException {
+        delegate = new LittleEndianWriteFile(zip);
     }
 
     @Override

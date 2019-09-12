@@ -30,7 +30,7 @@ final class ZipFileMisc implements ZipFile.Misc {
     }
 
     private static DataOutput createDataOutput(ZipModel zipModel) throws IOException {
-        Path parent = zipModel.getZip().getParent();
+        Path parent = zipModel.getFile().getParent();
 
         if (parent != null)
             Files.createDirectories(parent);

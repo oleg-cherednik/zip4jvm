@@ -15,7 +15,7 @@ public class SingleZipInputStream extends BaseDataInput {
 
     @NonNull
     public static SingleZipInputStream create(@NonNull ZipModel zipModel) throws FileNotFoundException {
-        return new SingleZipInputStream(zipModel.getZip());
+        return new SingleZipInputStream(zipModel.getFile());
     }
 
     private SingleZipInputStream(Path zip) throws FileNotFoundException {

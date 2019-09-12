@@ -63,7 +63,7 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
 
     private Path createTempFile() {
         try {
-            return Files.createTempFile(zipModel.getZip().getParent(), null, ".zip");
+            return Files.createTempFile(zipModel.getFile().getParent(), null, ".zip");
         } catch(IOException e) {
             throw new Zip4jException(e);
         }
@@ -129,8 +129,8 @@ public final class RemoveEntryFunc implements Consumer<Collection<String>> {
         try {
             if (tmpZipFileName == null)
                 return;
-            if (Files.deleteIfExists(zipModel.getZip()))
-                Files.move(tmpZipFileName, zipModel.getZip());
+            if (Files.deleteIfExists(zipModel.getFile()))
+                Files.move(tmpZipFileName, zipModel.getFile());
             else
                 throw new Zip4jException("cannot delete old zip file");
         } catch(IOException e) {

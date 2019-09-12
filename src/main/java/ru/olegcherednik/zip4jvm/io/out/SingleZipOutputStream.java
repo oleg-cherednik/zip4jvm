@@ -16,17 +16,17 @@ public class SingleZipOutputStream extends BaseDataOutput {
 
     @NonNull
     public static SingleZipOutputStream create(@NonNull ZipModel zipModel) throws IOException {
-        return new SingleZipOutputStream(zipModel.getZip(), zipModel);
+        return new SingleZipOutputStream(zipModel.getFile(), zipModel);
     }
 
     @NonNull
-    public static SingleZipOutputStream create(@NonNull Path zipFile, @NonNull ZipModel zipModel) throws FileNotFoundException {
-        return new SingleZipOutputStream(zipFile, zipModel);
+    public static SingleZipOutputStream create(@NonNull Path zip, @NonNull ZipModel zipModel) throws FileNotFoundException {
+        return new SingleZipOutputStream(zip, zipModel);
     }
 
-    private SingleZipOutputStream(Path zipFile, ZipModel zipModel) throws FileNotFoundException {
+    private SingleZipOutputStream(Path zip, ZipModel zipModel) throws FileNotFoundException {
         super(zipModel);
-        createFile(zipFile);
+        createFile(zip);
     }
 
     @Override

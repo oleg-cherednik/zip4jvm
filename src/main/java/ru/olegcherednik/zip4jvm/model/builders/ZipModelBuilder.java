@@ -2,6 +2,7 @@ package ru.olegcherednik.zip4jvm.model.builders;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jZipFileSettingsNotSetException;
 import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
@@ -33,6 +34,18 @@ public final class ZipModelBuilder {
 
     public static ZipModel read(Path zip) throws IOException {
         return new ZipModelReader(zip).read();
+    }
+
+    public static ZipModel create(Path zip, ZipFileWriterSettings zipFileSettings) {
+        if (Files.exists(zip))
+            throw new Zip4jException("ZipFile '" + zip.toAbsolutePath() + "' exists");
+
+        ZipModel zipModel = new ZipModel(zip);
+        zipModel.setSplitSize(zipFileSettings.getSplitSize());
+        zipModel.setComment(zipFileSettings.getComment());
+        zipModel.setZip64(zipFileSettings.isZip64());
+
+        return zipModel;
     }
 
     public static ZipModel readOrCreate(Path zip, ZipFileWriterSettings zipFileSettings) throws IOException {

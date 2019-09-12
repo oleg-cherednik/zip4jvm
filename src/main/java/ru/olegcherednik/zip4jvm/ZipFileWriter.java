@@ -5,7 +5,6 @@ import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.SingleZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import ru.olegcherednik.zip4jvm.model.ZipModelContext;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
@@ -30,21 +29,18 @@ import java.util.stream.Collectors;
  */
 final class ZipFileWriter implements ZipFile.Writer {
 
-    private final ZipModel zipModel;
-    private final DataOutput out;
     private final ZipEntrySettings defEntrySettings;
     private final TaskEngine engine;
 
     public ZipFileWriter(@NonNull Path zip, @NonNull ZipFileWriterSettings zipFileSettings) throws IOException {
-        zipModel = ZipModelBuilder.readOrCreate(zip, zipFileSettings);
         defEntrySettings = zipFileSettings.getEntrySettings();
-        out = createDataOutput(zipModel);
+
+        ZipModel zipModel = Files.exists(zip) ? ZipModelBuilder.read(zip) : ZipModelBuilder.create(zip, zipFileSettings);
         engine = new TaskEngine(zipModel);
-        out.seek(zipModel.getCentralDirectoryOffs());
     }
 
     private static DataOutput createDataOutput(ZipModel zipModel) throws IOException {
-        Path parent = zipModel.getZip().getParent();
+        Path parent = zipModel.getFile().getParent();
 
         if (parent != null)
             Files.createDirectories(parent);
@@ -88,9 +84,8 @@ final class ZipFileWriter implements ZipFile.Writer {
 
     @Override
     public void close() throws IOException {
-        ZipModelContext context = ZipModelContext.builder().zipModel(zipModel).out(out).build();
-        engine.accept(context);
-        out.close();
+        engine.accept();
+//        out.close();
     }
 
 }
