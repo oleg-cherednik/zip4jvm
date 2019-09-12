@@ -48,8 +48,8 @@ public class AbstractZipFileAssert<SELF extends AbstractZipFileAssert<SELF>> ext
 
     public SELF exists() {
         isNotNull();
-        assertThat(Files.exists(actual.getZipFile())).isTrue();
-        assertThat(Files.isRegularFile(actual.getZipFile())).isTrue();
+        assertThat(Files.exists(actual.getZip())).isTrue();
+        assertThat(Files.isRegularFile(actual.getZip())).isTrue();
         return myself;
     }
 

@@ -39,7 +39,7 @@ class ZipFileEncryptedDecoder extends ZipFileDecorator {
 
     @Override
     public InputStream getInputStream(@NonNull ZipEntry entry) {
-        try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(zipFile.toFile(), "r"));
+        try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(zip.toFile(), "r"));
              IInArchive zip = SevenZip.openInArchive(ArchiveFormat.ZIP, in)) {
 
             for (ISimpleInArchiveItem item : zip.getSimpleInterface().getArchiveItems()) {
@@ -62,7 +62,7 @@ class ZipFileEncryptedDecoder extends ZipFileDecorator {
     @Override
     public String getComment() {
         // supports only ASCII symbols
-        try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(zipFile.toFile(), "r"));
+        try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(zip.toFile(), "r"));
              IInArchive zip = SevenZip.openInArchive(ArchiveFormat.ZIP, in)) {
             String str = zip.getStringArchiveProperty(PropID.COMMENT);
             return StringUtils.length(str) == 0 ? null : str;

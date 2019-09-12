@@ -26,17 +26,17 @@ import java.util.zip.ZipFile;
 class ZipFileDecorator {
 
     @Getter
-    protected final Path zipFile;
+    protected final Path zip;
     private final Map<String, ZipEntry> entries;
     private final Map<String, Set<String>> map;
 
-    public ZipFileDecorator(Path zipFile) {
-        this(zipFile, entries(zipFile));
+    public ZipFileDecorator(Path zip) {
+        this(zip, entries(zip));
     }
 
     @SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-    protected ZipFileDecorator(Path zipFile, Map<String, ZipEntry> entries) {
-        this.zipFile = zipFile;
+    protected ZipFileDecorator(Path zip, Map<String, ZipEntry> entries) {
+        this.zip = zip;
         this.entries = entries;
         map = walk(entries.keySet());
     }
@@ -55,14 +55,35 @@ class ZipFileDecorator {
 
     public InputStream getInputStream(@NonNull ZipEntry entry) {
         try {
-            return new ZipFile(zipFile.toFile()).getInputStream(entry);
+            ZipFile zipFile = new ZipFile(zip.toFile());
+            InputStream delegate = zipFile.getInputStream(entry);
+
+            return new InputStream() {
+                @Override
+                public int available() throws IOException {
+                    return delegate.available();
+                }
+
+                @Override
+                public int read() throws IOException {
+                    available();
+                    return delegate.read();
+                }
+
+                @Override
+                public void close() throws IOException {
+                    delegate.close();
+                    zipFile.close();
+                }
+
+            };
         } catch(Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     public String getComment() {
-        try (ZipFile zipFile = new ZipFile(this.zipFile.toFile())) {
+        try (ZipFile zipFile = new ZipFile(this.zip.toFile())) {
             return zipFile.getComment();
         } catch(Exception e) {
             throw new RuntimeException(e);
