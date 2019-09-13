@@ -1,10 +1,10 @@
 package ru.olegcherednik.zip4jvm.tasks;
 
+import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.ZipModelContext;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 
 /**
  * @author Oleg Cherednik
@@ -14,7 +14,9 @@ public class RemoveOriginalZipFileTask implements Task {
 
     @Override
     public void accept(ZipModelContext context) throws IOException {
-        Path file = context.getZipModel().getFile();
-        Files.deleteIfExists(file);
+        ZipModel zipModel = context.getZipModel();
+
+        for (long i = 0; i <= zipModel.getTotalDisks(); i++)
+            Files.deleteIfExists(zipModel.getPartFile(i));
     }
 }

@@ -84,10 +84,9 @@ public class ZipFileWriterTest {
                                                     .build();
 
         try (ZipFile.Writer zipFile = ZipFile.write(splitFile, zipFileSettings)) {
-//            zipFile.add(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"), settings);
-//            zipFile.add(Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg"), settings);
-//            zipFile.add(Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg"), settings);
-            zipFile.add(Zip4jSuite.srcDir.resolve("Oleg Cherednik.txt"), settings);
+            zipFile.add(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"), settings);
+            zipFile.add(Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg"), settings);
+            zipFile.add(Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg"), settings);
         }
 
 //        assertThatDirectory(splitFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -106,9 +105,9 @@ public class ZipFileWriterTest {
 
         try (ZipFile.Writer zipFile = ZipFile.write(splitFile, zipFileSettings)) {
             zipFile.add(Zip4jSuite.starWarsDir.resolve("one.jpg"), entrySettings);
-//            zipFile.add(Zip4jSuite.starWarsDir.resolve("two.jpg"), entrySettings);
-//            zipFile.add(Zip4jSuite.starWarsDir.resolve("three.jpg"), entrySettings);
-//            zipFile.add(Zip4jSuite.starWarsDir.resolve("four.jpg"), entrySettings);
+            zipFile.add(Zip4jSuite.starWarsDir.resolve("two.jpg"), entrySettings);
+            zipFile.add(Zip4jSuite.starWarsDir.resolve("three.jpg"), entrySettings);
+            zipFile.add(Zip4jSuite.starWarsDir.resolve("four.jpg"), entrySettings);
         }
 
 //        assertThatDirectory(splitFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
