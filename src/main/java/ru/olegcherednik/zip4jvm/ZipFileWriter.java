@@ -1,9 +1,6 @@
 package ru.olegcherednik.zip4jvm;
 
 import lombok.NonNull;
-import ru.olegcherednik.zip4jvm.io.out.DataOutput;
-import ru.olegcherednik.zip4jvm.io.out.SingleZipOutputStream;
-import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -30,22 +27,14 @@ import java.util.stream.Collectors;
 final class ZipFileWriter implements ZipFile.Writer {
 
     private final ZipEntrySettings defEntrySettings;
+    private final ZipModel zipModel;
     private final TaskEngine engine;
 
     public ZipFileWriter(@NonNull Path zip, @NonNull ZipFileWriterSettings zipFileSettings) throws IOException {
         defEntrySettings = zipFileSettings.getEntrySettings();
 
-        ZipModel zipModel = Files.exists(zip) ? ZipModelBuilder.read(zip, zipFileSettings) : ZipModelBuilder.create(zip, zipFileSettings);
+        zipModel = Files.exists(zip) ? ZipModelBuilder.read(zip, zipFileSettings) : ZipModelBuilder.create(zip, zipFileSettings);
         engine = new TaskEngine(zipModel);
-    }
-
-    private static DataOutput createDataOutput(ZipModel zipModel) throws IOException {
-        Path parent = zipModel.getFile().getParent();
-
-        if (parent != null)
-            Files.createDirectories(parent);
-
-        return zipModel.isSplit() ? SplitZipOutputStream.create(zipModel) : SingleZipOutputStream.create(zipModel);
     }
 
     @Override
@@ -76,6 +65,11 @@ final class ZipFileWriter implements ZipFile.Writer {
         engine.removeEntry(entryName);
     }
 
+    @Override
+    public void setComment(String comment) {
+        zipModel.setComment(comment);
+    }
+
     private static List<ZipEntry> createEntries(Map<Path, String> pathFileName, ZipEntrySettings entrySettings) {
         return pathFileName.entrySet().parallelStream()
                            .map(entry -> ZipEntryBuilder.create(entry.getKey(), entry.getValue(), entrySettings))
@@ -85,7 +79,6 @@ final class ZipFileWriter implements ZipFile.Writer {
     @Override
     public void close() throws IOException {
         engine.accept();
-//        out.close();
     }
 
 }

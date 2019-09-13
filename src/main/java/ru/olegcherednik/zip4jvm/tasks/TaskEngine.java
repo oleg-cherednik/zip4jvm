@@ -23,7 +23,6 @@ public class TaskEngine {
 
     private final ZipModel zipModel;
     private final Set<String> existedEntryNames;
-    private final Map<String, Task> fileNameTask = new LinkedHashMap<>();
     private final Map<String, ZipEntry> addEntries = new LinkedHashMap<>();
 
     public TaskEngine(ZipModel zipModel) {
@@ -38,13 +37,11 @@ public class TaskEngine {
             throw new Zip4jException("File name duplication");
 
         addEntries.put(entryName, entry);
-        fileNameTask.put(entry.getFileName(), new AddEntryTask(entry));
     }
 
     public void removeEntry(String entryName) {
         addEntries.remove(entryName);
         existedEntryNames.remove(entryName);
-        fileNameTask.remove(entryName);
     }
 
     public void accept() throws IOException {
@@ -63,9 +60,6 @@ public class TaskEngine {
 
         for (Task task : tasks)
             task.accept(context);
-
-//        for (Task task : fileNameTask.values())
-//            task.accept(context);
     }
 
 }

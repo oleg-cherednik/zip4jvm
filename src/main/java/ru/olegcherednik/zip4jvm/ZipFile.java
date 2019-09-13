@@ -89,6 +89,8 @@ public final class ZipFile {
         default void remove(@NonNull Collection<String> entryNames) {
             entryNames.forEach(this::remove);
         }
+
+        void setComment(String comment);
     }
 
     public interface Misc extends Closeable {
