@@ -69,7 +69,7 @@ public class ZipModel {
     private final Map<String, ZipEntry> fileNameEntry = new LinkedHashMap<>();
 
     public void setSplitSize(long splitSize) {
-        this.splitSize = Math.max(MIN_SPLIT_SIZE, splitSize);
+        this.splitSize = splitSize <= 0 ? NO_SPLIT : Math.max(MIN_SPLIT_SIZE, splitSize);
     }
 
     public boolean isSplit() {

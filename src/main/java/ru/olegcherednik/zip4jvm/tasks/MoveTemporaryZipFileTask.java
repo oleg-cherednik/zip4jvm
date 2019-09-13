@@ -4,7 +4,6 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.ZipModelContext;
 
 import java.io.IOException;
-import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -24,13 +23,6 @@ public class MoveTemporaryZipFileTask implements Task {
             Files.move(src, dest);
         }
 
-        if (zipModel.isSplit()) {
-            try {
-                Files.deleteIfExists(zipModel.getStreamFile().getParent());
-            } catch(DirectoryNotEmptyException ignored) {
-            }
-        } else
-            Files.deleteIfExists(zipModel.getStreamFile());
-
+        Files.deleteIfExists(zipModel.getStreamFile().getParent());
     }
 }
