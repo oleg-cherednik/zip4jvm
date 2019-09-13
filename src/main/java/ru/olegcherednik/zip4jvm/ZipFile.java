@@ -7,6 +7,7 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipFileReaderSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileWriterSettings;
 
 import java.io.Closeable;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -84,10 +85,11 @@ public final class ZipFile {
 
         void add(@NonNull Collection<Path> paths, @NonNull ZipEntrySettings entrySettings) throws IOException;
 
-        void remove(@NonNull String entryName);
+        void remove(@NonNull String entryName) throws FileNotFoundException;
 
-        default void remove(@NonNull Collection<String> entryNames) {
-            entryNames.forEach(this::remove);
+        default void remove(@NonNull Collection<String> entryNames) throws FileNotFoundException {
+            for (String entryName : entryNames)
+                remove(entryName);
         }
 
         void setComment(String comment);

@@ -3,7 +3,6 @@ package ru.olegcherednik.zip4jvm.model.builders;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
-import ru.olegcherednik.zip4jvm.exception.Zip4jZipFileSettingsNotSetException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.LittleEndianReadFile;
 import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
@@ -41,35 +40,12 @@ public final class ZipModelBuilder {
     private final CentralDirectory centralDirectory;
 
     public static ZipModel read(@NonNull Path zip) throws IOException {
-        return read(zip, ZipFileWriterSettings.builder().build());
-    }
-
-    public static ZipModel read(@NonNull Path zip, @NonNull ZipFileWriterSettings zipFileSettings) throws IOException {
-        ZipModel zipModel = new ZipModelReader(zip).read();
-
-        if (zipModel.isSplit())
-            zipModel.setSplitSize(zipFileSettings.getSplitSize());
-
-        return zipModel;
+        return new ZipModelReader(zip).read();
     }
 
     public static ZipModel create(Path zip, ZipFileWriterSettings zipFileSettings) {
         if (Files.exists(zip))
             throw new Zip4jException("ZipFile '" + zip.toAbsolutePath() + "' exists");
-
-        ZipModel zipModel = new ZipModel(zip);
-        zipModel.setSplitSize(zipFileSettings.getSplitSize());
-        zipModel.setComment(zipFileSettings.getComment());
-        zipModel.setZip64(zipFileSettings.isZip64());
-
-        return zipModel;
-    }
-
-    public static ZipModel readOrCreate(Path zip, ZipFileWriterSettings zipFileSettings) throws IOException {
-        if (Files.exists(zip))
-            return new ZipModelReader(zip).read();
-        if (zipFileSettings == null)
-            throw new Zip4jZipFileSettingsNotSetException(zip);
 
         ZipModel zipModel = new ZipModel(zip);
         zipModel.setSplitSize(zipFileSettings.getSplitSize());

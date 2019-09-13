@@ -13,6 +13,5 @@ public class CloseZipFileTask implements Task {
     @Override
     public void accept(ZipModelContext context) throws IOException {
         context.getOut().close();
-        context.setOut(null);
     }
 }

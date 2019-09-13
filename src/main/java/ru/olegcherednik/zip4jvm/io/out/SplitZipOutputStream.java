@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.io.out;
 
 import lombok.Getter;
 import lombok.NonNull;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.io.writers.ZipModelWriter;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -25,17 +24,8 @@ public class SplitZipOutputStream extends BaseDataOutput {
     private long disk;
 
     public static SplitZipOutputStream create(@NonNull ZipModel zipModel) throws IOException {
-        // TODO move to ZipParameters
-        if (zipModel.getSplitSize() >= 0 && zipModel.getSplitSize() < ZipModel.MIN_SPLIT_SIZE)
-            throw new Zip4jException("split length less than minimum allowed split length of " + ZipModel.MIN_SPLIT_SIZE + " Bytes");
-
         SplitZipOutputStream out = new SplitZipOutputStream(zipModel);
         out.writeDwordSignature(SPLIT_SIGNATURE);
-
-        // TODO it will not work for existed zip archive
-        if (zipModel.getCentralDirectoryOffs() == 0)
-            zipModel.setCentralDirectoryOffs(out.getOffs());
-
         return out;
     }
 

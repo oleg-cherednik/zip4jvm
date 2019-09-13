@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -43,6 +44,10 @@ public final class ZipMisc {
 
     public static Set<String> getEntryNames(@NonNull Path zip) throws IOException {
         return ZipFile.read(zip).getEntryNames();
+    }
+
+    public static void removeEntry(@NonNull Path zip, @NonNull String entryName) throws IOException {
+        removeEntry(zip, Collections.singleton(entryName));
     }
 
     public static void removeEntry(@NonNull Path zip, @NonNull Collection<String> entryNames) throws IOException {

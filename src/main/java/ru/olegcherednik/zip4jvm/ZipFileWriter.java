@@ -10,6 +10,7 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipFileWriterSettings;
 import ru.olegcherednik.zip4jvm.tasks.TaskEngine;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,9 +33,23 @@ final class ZipFileWriter implements ZipFile.Writer {
 
     public ZipFileWriter(@NonNull Path zip, @NonNull ZipFileWriterSettings zipFileSettings) throws IOException {
         defEntrySettings = zipFileSettings.getEntrySettings();
-
-        zipModel = Files.exists(zip) ? ZipModelBuilder.read(zip, zipFileSettings) : ZipModelBuilder.create(zip, zipFileSettings);
+        zipModel = createZipModel(zip, zipFileSettings);
         engine = new TaskEngine(zipModel);
+    }
+
+    private static ZipModel createZipModel(Path zip, ZipFileWriterSettings zipFileSettings) throws IOException {
+        if (Files.exists(zip)) {
+            ZipModel zipModel = ZipModelBuilder.read(zip);
+
+            if (zipModel.isSplit())
+                zipModel.setSplitSize(zipFileSettings.getSplitSize());
+            if (zipFileSettings.getComment() != null)
+                zipModel.setComment(zipFileSettings.getComment());
+
+            return zipModel;
+        }
+
+        return ZipModelBuilder.create(zip, zipFileSettings);
     }
 
     @Override
@@ -61,7 +76,7 @@ final class ZipFileWriter implements ZipFile.Writer {
     }
 
     @Override
-    public void remove(@NonNull String entryName) {
+    public void remove(@NonNull String entryName) throws FileNotFoundException {
         engine.removeEntry(entryName);
     }
 

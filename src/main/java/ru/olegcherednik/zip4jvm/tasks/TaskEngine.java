@@ -5,7 +5,9 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.ZipModelContext;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -13,6 +15,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Oleg Cherednik
@@ -39,9 +42,21 @@ public class TaskEngine {
         addEntries.put(entryName, entry);
     }
 
-    public void removeEntry(String entryName) {
-        addEntries.remove(entryName);
-        existedEntryNames.remove(entryName);
+    public void removeEntry(String prefixEntryName) throws FileNotFoundException {
+        String normalizedPrefixEntryName = ZipUtils.normalizeFileName(prefixEntryName);
+
+        Set<String> entryNames = zipModel.getEntryNames().stream()
+                                         .filter(entryName -> entryName.startsWith(normalizedPrefixEntryName))
+                                         .collect(Collectors.toSet());
+
+        if (entryNames.isEmpty())
+            throw new FileNotFoundException(prefixEntryName);
+
+        entryNames.forEach(entryName -> {
+            addEntries.remove(entryName);
+            existedEntryNames.remove(entryName);
+            zipModel.removeEntry(entryName);
+        });
     }
 
     public void accept() throws IOException {

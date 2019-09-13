@@ -88,6 +88,10 @@ public class ZipModel {
         fileNameEntry.put(entry.getFileName(), entry);
     }
 
+    public void removeEntry(@NonNull String fileName) {
+        fileNameEntry.remove(fileName);
+    }
+
     public Collection<ZipEntry> getEntries() {
         return isEmpty() ? Collections.emptyList() : Collections.unmodifiableCollection(fileNameEntry.values());
     }

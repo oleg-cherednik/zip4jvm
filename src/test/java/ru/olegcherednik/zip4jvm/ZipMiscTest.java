@@ -16,9 +16,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatZipFile;
 
 /**
  * @author Oleg Cherednik
@@ -122,4 +124,26 @@ public class ZipMiscTest {
         assertThat(ZipMisc.isSplit(Zip4jSuite.storeSplitZip)).isTrue();
     }
 
+    public void shouldRemoveGivenFilesFromExistedZip() throws IOException {
+        Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        Files.createDirectories(zip.getParent());
+        Files.copy(Zip4jSuite.storeSolidZip, zip);
+        assertThatZipFile(zip).exists().rootEntry().matches(TestUtils.zipRootDirAssert);
+
+        List<String> entryNames = Zip4jSuite.filesCarsDir.stream()
+                                                         .map(file -> Zip4jSuite.srcDir.relativize(file).toString())
+                                                         .collect(Collectors.toList());
+        ZipMisc.removeEntry(zip, entryNames);
+        assertThat(ZipMisc.getEntryNames(zip)).hasSize(10);
+    }
+
+    public void shouldRemoveFolderFromExistedZip() throws IOException {
+        Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        Files.createDirectories(zip.getParent());
+        Files.copy(Zip4jSuite.storeSolidZip, zip);
+        assertThatZipFile(zip).exists().rootEntry().matches(TestUtils.zipRootDirAssert);
+
+        ZipMisc.removeEntry(zip, Zip4jSuite.srcDir.relativize(Zip4jSuite.carsDir).toString());
+        assertThat(ZipMisc.getEntryNames(zip)).hasSize(10);
+    }
 }
