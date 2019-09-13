@@ -7,7 +7,6 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.DataOutputStreamDecorator;
 import ru.olegcherednik.zip4jvm.io.out.SingleZipOutputStream;
-import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 
@@ -52,9 +51,8 @@ public final class ZipMisc {
         }
     }
 
-    public boolean isSplit() throws IOException {
-        checkZipFile(zipFile);
-        return new ZipModelReader(zipFile).read().isSplit();
+    public static boolean isSplit(@NonNull Path zip) throws IOException {
+        return ZipFile.read(zip).isSplit();
     }
 
     // --------- MergeSplitZip

@@ -27,13 +27,12 @@ public final class CreateTemporaryZipFileTask implements Task {
     private static DataOutput createDataOutput(ZipModelContext context) throws IOException {
         ZipModel zipModel = context.getZipModel();
         Path file = zipModel.getFile();
-        Path parent = file.getParent();
+        Path parent = file.getParent().resolve("tmp");
 
-        if (parent != null)
-            Files.createDirectories(parent);
+        Files.createDirectories(parent);
 
-        String fileName = file.getFileName().toString() + ".tmp";
-        file = file.getParent().resolve(fileName);
+        file = parent.resolve(file.getFileName());
+        zipModel.setStreamFile(file);
 
         context.setTmpFile(file);
 

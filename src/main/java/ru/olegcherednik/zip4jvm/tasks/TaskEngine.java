@@ -13,7 +13,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * @author Oleg Cherednik
@@ -56,7 +55,7 @@ public class TaskEngine {
         addEntries.forEach((entryName, entry) -> tasks.add(new AddEntryTask(entry)));
         tasks.add(new CloseZipFileTask());
         tasks.add(new RemoveOriginalZipFileTask());
-        tasks.add(new RenameTemporaryZipFileTask());
+        tasks.add(new MoveTemporaryZipFileTask());
 
         ZipModelContext context = ZipModelContext.builder()
                                                  .zipModel(zipModel)
@@ -67,10 +66,6 @@ public class TaskEngine {
 
 //        for (Task task : fileNameTask.values())
 //            task.accept(context);
-    }
-
-    public void addTask(Task task) {
-        fileNameTask.put(UUID.randomUUID().toString(), task);
     }
 
 }

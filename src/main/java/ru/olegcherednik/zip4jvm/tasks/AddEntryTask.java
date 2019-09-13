@@ -27,10 +27,7 @@ public final class AddEntryTask implements Task {
         DataOutput out = context.getOut();
 
         try (InputStream in = entry.getIn(); OutputStream os = EntryOutputStream.create(entry, zipModel, out)) {
-            if (entry.getUncompressedSize() > ZipEntry.SIZE_2GB)
-                IOUtils.copyLarge(in, os);
-            else
-                IOUtils.copy(in, os);
+            IOUtils.copyLarge(in, os);
         }
     }
 }

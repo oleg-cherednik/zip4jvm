@@ -86,6 +86,11 @@ final class ZipFileReader implements ZipFile.Reader {
         return zipModel.getEntryNames();
     }
 
+    @Override
+    public boolean isSplit() {
+        return zipModel.isSplit();
+    }
+
     private List<ZipEntry> getEntriesWithFileNamePrefix(String fileNamePrefix) {
         return zipModel.getEntries().stream()
                        .filter(entry -> entry.getFileName().startsWith(fileNamePrefix))

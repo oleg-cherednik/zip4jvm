@@ -70,6 +70,8 @@ public final class ZipFile {
 
         @NonNull
         Set<String> getEntryNames();
+
+        boolean isSplit();
     }
 
     public interface Writer extends Closeable {

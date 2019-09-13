@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -102,5 +103,23 @@ public class ZipMiscTest {
 //        // TODO it's not working under gradle build
 //        assertThatZipFile(mergeZipFle).exists().rootEntry().matches(TestUtils.zipRootDirAssert);
 //    }
+
+    public void shouldRetrieveTrueWhenSplitZipWithMultipleDisks() throws IOException {
+        assertThat(ZipMisc.isSplit(Zip4jSuite.storeSplitZip)).isTrue();
+    }
+
+    public void shouldRetrieveTrueWhenSplitZipWithOneDisk() throws IOException {
+        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
+                                                              .splitSize(1024 * 1024)
+                                                              .entrySettings(
+                                                                      ZipEntrySettings.builder()
+                                                                                      .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                                                      .build())
+                                                              .build();
+        Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        ZipIt.add(zip, Collections.singleton(Zip4jSuite.srcDir.resolve("Oleg Cherednik.txt")), settings);
+
+        assertThat(ZipMisc.isSplit(Zip4jSuite.storeSplitZip)).isTrue();
+    }
 
 }

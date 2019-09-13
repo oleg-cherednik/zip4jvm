@@ -18,6 +18,7 @@ import ru.olegcherednik.zip4jvm.utils.function.IOSupplier;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Comparator;
 import java.util.function.BooleanSupplier;
 
 /**
@@ -30,6 +31,9 @@ import java.util.function.BooleanSupplier;
 @Setter
 @RequiredArgsConstructor
 public abstract class ZipEntry {
+
+    public static final Comparator<ZipEntry> SORT_BY_DISC_LOCAL_FILE_HEADER_OFFS =
+            Comparator.comparingLong(ZipEntry::getDisk).thenComparing(ZipEntry::getLocalFileHeaderOffs);
 
     public static final long SIZE_2GB = 2_147_483_648L;
 
@@ -56,6 +60,7 @@ public abstract class ZipEntry {
     private long compressedSize;
     private String comment;
     private boolean utf8;
+    private long size;
 
     public boolean isRegularFile() {
         return false;

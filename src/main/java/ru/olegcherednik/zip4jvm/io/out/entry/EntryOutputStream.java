@@ -33,7 +33,7 @@ public abstract class EntryOutputStream extends OutputStream {
     protected final DataOutput out;
 
     public static EntryOutputStream create(@NonNull ZipEntry entry, @NonNull ZipModel zipModel, @NonNull DataOutput out) throws IOException {
-        EntryOutputStream os = createOutputStream(entry, out);
+        EntryOutputStream os = createOutputStream(entry, entry.getCompression(), out);
 
         // TODO move it to the separate method
         zipModel.addEntry(entry);
@@ -44,8 +44,17 @@ public abstract class EntryOutputStream extends OutputStream {
         return os;
     }
 
-    private static EntryOutputStream createOutputStream(ZipEntry entry, DataOutput out) throws IOException {
-        Compression compression = entry.getCompression();
+    public static EntryOutputStream create(@NonNull ZipEntry entry, @NonNull Compression compression, @NonNull DataOutput out) throws IOException {
+        EntryOutputStream os = createOutputStream(entry, compression, out);
+
+        entry.setLocalFileHeaderOffs(out.getOffs());
+
+        os.writeLocalFileHeader();
+        os.writeEncryptionHeader();
+        return os;
+    }
+
+    private static EntryOutputStream createOutputStream(ZipEntry entry, Compression compression, DataOutput out) throws IOException {
         entry.setDisk(out.getDisk());
 
         if (compression == Compression.STORE)

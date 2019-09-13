@@ -35,7 +35,7 @@ final class ZipFileWriter implements ZipFile.Writer {
     public ZipFileWriter(@NonNull Path zip, @NonNull ZipFileWriterSettings zipFileSettings) throws IOException {
         defEntrySettings = zipFileSettings.getEntrySettings();
 
-        ZipModel zipModel = Files.exists(zip) ? ZipModelBuilder.read(zip) : ZipModelBuilder.create(zip, zipFileSettings);
+        ZipModel zipModel = Files.exists(zip) ? ZipModelBuilder.read(zip, zipFileSettings) : ZipModelBuilder.create(zip, zipFileSettings);
         engine = new TaskEngine(zipModel);
     }
 

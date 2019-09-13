@@ -3,7 +3,6 @@ package ru.olegcherednik.zip4jvm.model;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.io.FilenameUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
@@ -34,12 +33,11 @@ import java.util.Set;
  */
 @Getter
 @Setter
-@RequiredArgsConstructor
 public class ZipModel {
 
     public static final int NO_SPLIT = -1;
     // MIN_SPLIT_LENGTH = 64K bytes
-    public static final int MIN_SPLIT_LENGTH = 64 * 1024;
+    public static final int MIN_SPLIT_SIZE = 64 * 1024;
 
     public static final int MAX_TOTAL_ENTRIES = Zip64.LIMIT_INT;
     public static final long MAX_ENTRY_SIZE = Zip64.LIMIT;
@@ -48,6 +46,7 @@ public class ZipModel {
     @NonNull
     private final Path file;
     private long splitSize = NO_SPLIT;
+    private Path streamFile;
 
     private String comment;
     private long totalDisks;
@@ -61,11 +60,16 @@ public class ZipModel {
      */
     private boolean zip64;
 
+    public ZipModel(@NonNull Path file) {
+        this.file = file;
+        streamFile = file;
+    }
+
     @Getter(AccessLevel.NONE)
     private final Map<String, ZipEntry> fileNameEntry = new LinkedHashMap<>();
 
     public void setSplitSize(long splitSize) {
-        this.splitSize = splitSize < MIN_SPLIT_LENGTH ? NO_SPLIT : splitSize;
+        this.splitSize = Math.max(MIN_SPLIT_SIZE, splitSize);
     }
 
     public boolean isSplit() {
@@ -101,8 +105,8 @@ public class ZipModel {
         return disk == totalDisks ? file : getSplitFilePath(file, disk + 1);
     }
 
-    public static Path getSplitFilePath(Path zipFile, long disk) {
-        return zipFile.getParent().resolve(String.format("%s.z%02d", FilenameUtils.getBaseName(zipFile.toString()), disk));
+    public Path getStreamPartFile(long disk) {
+        return disk == totalDisks ? streamFile : getSplitFilePath(streamFile, disk + 1);
     }
 
     @NonNull
@@ -111,6 +115,10 @@ public class ZipModel {
             throw new Zip4jException("Zip file already exists. Zip file format does not allow updating split/spanned files");
 
         return this;
+    }
+
+    public static Path getSplitFilePath(Path zip, long disk) {
+        return zip.getParent().resolve(String.format("%s.z%02d", FilenameUtils.getBaseName(zip.toString()), disk));
     }
 
 }
