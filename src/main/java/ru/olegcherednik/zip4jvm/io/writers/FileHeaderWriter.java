@@ -15,11 +15,12 @@ import java.util.List;
  * @since 26.04.2019
  */
 @RequiredArgsConstructor
-final class FileHeaderWriter {
+final class FileHeaderWriter implements Writer {
 
     @NonNull
     private final List<CentralDirectory.FileHeader> fileHeaders;
 
+    @Override
     public void write(@NonNull DataOutput out) throws IOException {
         for (CentralDirectory.FileHeader fileHeader : fileHeaders)
             writeFileHeader(fileHeader, out);

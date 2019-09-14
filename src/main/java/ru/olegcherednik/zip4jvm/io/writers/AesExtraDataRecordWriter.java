@@ -1,9 +1,9 @@
 package ru.olegcherednik.zip4jvm.io.writers;
 
-import ru.olegcherednik.zip4jvm.io.out.DataOutput;
-import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -13,13 +13,14 @@ import java.nio.charset.Charset;
  * @since 15.04.2019
  */
 @RequiredArgsConstructor
-final class AesExtraDataRecordWriter {
+final class AesExtraDataRecordWriter implements Writer {
 
     @NonNull
     private final AesExtraDataRecord record;
     @NonNull
     private final Charset charset;
 
+    @Override
     public void write(@NonNull DataOutput out) throws IOException {
         if (record == AesExtraDataRecord.NULL)
             return;

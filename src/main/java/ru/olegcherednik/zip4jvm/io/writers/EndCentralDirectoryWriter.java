@@ -13,11 +13,12 @@ import java.nio.charset.StandardCharsets;
  * @since 10.04.2019
  */
 @RequiredArgsConstructor
-final class EndCentralDirectoryWriter {
+final class EndCentralDirectoryWriter implements Writer {
 
     @NonNull
     private final EndCentralDirectory endCentralDirectory;
 
+    @Override
     public void write(@NonNull DataOutput out) throws IOException {
         byte[] comment = endCentralDirectory.getComment(StandardCharsets.UTF_8);
 

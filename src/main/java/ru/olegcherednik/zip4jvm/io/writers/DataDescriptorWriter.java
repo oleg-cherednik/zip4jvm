@@ -1,11 +1,11 @@
 package ru.olegcherednik.zip4jvm.io.writers;
 
-import ru.olegcherednik.zip4jvm.io.out.DataOutput;
-import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 
 import java.io.IOException;
 
@@ -14,13 +14,11 @@ import java.io.IOException;
  * @since 25.07.2019
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class DataDescriptorWriter {
+public abstract class DataDescriptorWriter implements Writer {
 
     public static DataDescriptorWriter get(boolean zip64, DataDescriptor dataDescriptor) {
         return zip64 ? new Zip64(dataDescriptor) : new Standard(dataDescriptor);
     }
-
-    public abstract void write(@NonNull DataOutput out) throws IOException;
 
     @RequiredArgsConstructor
     private static final class Standard extends DataDescriptorWriter {

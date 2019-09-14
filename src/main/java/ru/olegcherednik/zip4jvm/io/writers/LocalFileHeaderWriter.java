@@ -12,11 +12,12 @@ import java.io.IOException;
  * @since 10.03.2019
  */
 @RequiredArgsConstructor
-public final class LocalFileHeaderWriter {
+public final class LocalFileHeaderWriter implements Writer {
 
     @NonNull
     private final LocalFileHeader localFileHeader;
 
+    @Override
     public void write(@NonNull DataOutput out) throws IOException {
         byte[] fileName = localFileHeader.getFileName();
 

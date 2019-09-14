@@ -9,7 +9,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 07.09.2019
  */
-interface Reader<T> {
+public interface Reader<T> {
 
     @NonNull
     T read(@NonNull DataInput in) throws IOException;

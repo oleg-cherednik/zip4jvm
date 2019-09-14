@@ -14,13 +14,14 @@ import ru.olegcherednik.zip4jvm.model.builders.Zip64Builder;
 import java.io.IOException;
 
 @RequiredArgsConstructor
-public final class ZipModelWriter {
+public final class ZipModelWriter implements Writer {
 
     private static final String CENTRAL_DIRECTORY_OFFS = "centralDirectoryOffs";
 
     @NonNull
     private final ZipModel zipModel;
 
+    @Override
     public void write(@NonNull DataOutput out) throws IOException {
         zipModel.setTotalDisks(out.getDisk());
         zipModel.setCentralDirectoryOffs(out.getOffs());

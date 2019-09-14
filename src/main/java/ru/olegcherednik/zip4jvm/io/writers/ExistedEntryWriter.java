@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.tasks;
+package ru.olegcherednik.zip4jvm.io.writers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -11,8 +11,6 @@ import ru.olegcherednik.zip4jvm.io.in.SplitZipInputStream;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
-import ru.olegcherednik.zip4jvm.io.writers.DataDescriptorWriter;
-import ru.olegcherednik.zip4jvm.io.writers.LocalFileHeaderWriter;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -26,21 +24,20 @@ import java.io.IOException;
  * @since 12.09.2019
  */
 @RequiredArgsConstructor
-public class CopyExistedEntryTask implements Task {
+public class ExistedEntryWriter implements Writer {
 
     private static final String LOCAL_FILE_HEADER_OFFS = "localFileHeaderOffs";
 
-    private final ZipModel srcModel;
+    private final ZipModel srcZipModel;
     private final String entryName;
     private final ZipModel destZipModel;
 
     @Override
-    public void accept(ZipModelContext context) throws IOException {
-        ZipEntry entry = srcModel.getEntryByFileName(entryName);
-        DataOutput out = context.getOut();
+    public void write(@NonNull DataOutput out) throws IOException {
+        ZipEntry entry = srcZipModel.getEntryByFileName(entryName);
 
-        try (CopyEntryInputStream in = new CopyEntryInputStream(entry, srcModel)) {
-            if (srcModel != destZipModel)
+        try (CopyEntryInputStream in = new CopyEntryInputStream(entry, srcZipModel)) {
+            if (srcZipModel != destZipModel)
                 destZipModel.addEntry(entry);
 
             out.mark(LOCAL_FILE_HEADER_OFFS);
