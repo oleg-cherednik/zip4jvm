@@ -19,11 +19,11 @@ import java.io.OutputStream;
 @RequiredArgsConstructor
 public final class AddEntryTask implements Task {
 
+    private final ZipModel zipModel;
     private final ZipEntry entry;
 
     @Override
     public void accept(ZipModelContext context) throws IOException {
-        ZipModel zipModel = context.getZipModel();
         DataOutput out = context.getOut();
 
         try (InputStream in = entry.getIn(); OutputStream os = EntryOutputStream.create(entry, zipModel, out)) {

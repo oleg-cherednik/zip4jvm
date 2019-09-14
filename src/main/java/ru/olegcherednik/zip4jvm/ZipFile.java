@@ -69,6 +69,8 @@ public final class ZipFile {
         Set<String> getEntryNames();
 
         boolean isSplit();
+
+        boolean isZip64();
     }
 
     public interface Writer extends Closeable {
@@ -88,7 +90,10 @@ public final class ZipFile {
                 remove(prefixEntryName);
         }
 
+        void copy(@NonNull Path zip) throws IOException;
+
         void setComment(String comment);
+
     }
 
 }

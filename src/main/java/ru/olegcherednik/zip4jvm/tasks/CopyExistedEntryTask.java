@@ -29,17 +29,20 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class CopyExistedEntryTask implements Task {
 
+    private final ZipModel zipModel;
     private final String entryName;
 
     private static final String LOCAL_FILE_HEADER_OFFS = "localFileHeaderOffs";
 
     @Override
     public void accept(ZipModelContext context) throws IOException {
-        ZipEntry entry = context.getZipModel().getEntryByFileName(entryName);
+        ZipEntry entry = zipModel.getEntryByFileName(entryName);
         DataOutput out = context.getOut();
-        ZipModel zipModel = context.getZipModel();
 
         try (CopyEntryInputStream in = new CopyEntryInputStream(entry, zipModel)) {
+            if (zipModel != context.getZipModel())
+                context.getZipModel().addEntry(entry);
+
             out.mark(LOCAL_FILE_HEADER_OFFS);
 
             in.copyLocalFileHeader(out);

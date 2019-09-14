@@ -5,10 +5,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.io.FilenameUtils;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
@@ -111,14 +109,6 @@ public class ZipModel {
 
     public Path getStreamPartFile(long disk) {
         return disk == totalDisks ? streamFile : getSplitFilePath(streamFile, disk + 1);
-    }
-
-    @NonNull
-    public ZipModel noSplitOnly() {
-        if (Files.exists(file) && isSplit())
-            throw new Zip4jException("Zip file already exists. Zip file format does not allow updating split/spanned files");
-
-        return this;
     }
 
     public static Path getSplitFilePath(Path zip, long disk) {

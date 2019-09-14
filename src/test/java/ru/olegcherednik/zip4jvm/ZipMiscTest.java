@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatZipFile;
 
 /**
@@ -70,38 +71,15 @@ public class ZipMiscTest {
         assertThatThrownBy(() -> ZipIt.add(zip, files, settings)).isExactlyInstanceOf(Zip4jPathNotExistsException.class);
     }
 
-//    public void shouldMergeSplitZip() throws IOException {
-//        assertThat(ZipMisc.isSplit(Zip4jSuite.deflateSplitZip)).isTrue();
-//
-//        Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-//        ZipMisc.merge(Zip4jSuite.deflateSplitZip, zip);
-//
-//        assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-//        assertThatZipFile(zip).exists().rootEntry().matches(TestUtils.zipRootDirAssert);
-//    }
+    public void shouldMergeSplitZip() throws IOException {
+        assertThat(ZipMisc.isSplit(Zip4jSuite.deflateSplitZip)).isTrue();
 
-//    public void shouldMergeZip64SplitZip() throws IOException {
-//        ZipParameters parameters = ZipParameters.builder()
-//                                                .compression(Compression.STORE)
-////                                                .splitLength(1024 * 1024)
-//                                                .zip64(true)
-//                                                .build();
-//
-//        Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-//        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-//        zip.add(Zip4jSuite.srcDir, parameters);
-//
-//        ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
-//        assertThat(misc.isSplit()).isTrue();
-//
-//        Path mergeDir = zipFile.getParent().resolve("merges");
-//        Path mergeZipFle = mergeDir.resolve("src.zip");
-//        misc.merge(mergeZipFle);
-//
-//        assertThatDirectory(mergeDir).exists().hasSubDirectories(0).hasFiles(1);
-//        // TODO it's not working under gradle build
-//        assertThatZipFile(mergeZipFle).exists().rootEntry().matches(TestUtils.zipRootDirAssert);
-//    }
+        Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        ZipMisc.merge(Zip4jSuite.deflateSplitZip, zip);
+
+        assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatZipFile(zip).exists().rootEntry().matches(TestUtils.zipRootDirAssert);
+    }
 
     public void shouldRetrieveTrueWhenSplitZipWithMultipleDisks() throws IOException {
         assertThat(ZipMisc.isSplit(Zip4jSuite.storeSplitZip)).isTrue();
