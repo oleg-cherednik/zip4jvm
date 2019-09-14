@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.assertj;
 
-import lombok.experimental.UtilityClass;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.nio.file.Path;
 import java.util.zip.ZipEntry;
@@ -9,8 +10,8 @@ import java.util.zip.ZipEntry;
  * @author Oleg Cherednik
  * @since 25.03.2019
  */
-@UtilityClass
-public class Zip4jAssertionsForClassTypes {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class Zip4jAssertionsForClassTypes {
 
     public static AbstractZipFileAssert<?> assertThat(ZipFileDecorator actual) {
         return new ZipFileAssert(actual);

@@ -1,7 +1,8 @@
 package ru.olegcherednik.zip4jvm;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.experimental.UtilityClass;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
@@ -19,22 +20,22 @@ import java.util.function.Function;
  * @author Oleg Cherednik
  * @since 01.09.2019
  */
-@UtilityClass
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ZipFile {
 
-    public ZipFile.Reader read(@NonNull Path zip) throws IOException {
+    public static ZipFile.Reader read(@NonNull Path zip) throws IOException {
         return read(zip, fileName -> null);
     }
 
-    public ZipFile.Reader read(@NonNull Path zip, Function<String, char[]> createPassword) throws IOException {
+    public static ZipFile.Reader read(@NonNull Path zip, Function<String, char[]> createPassword) throws IOException {
         return new ZipFileReader(zip, createPassword);
     }
 
-    public ZipFile.Writer write(@NonNull Path zip) throws IOException {
+    public static ZipFile.Writer write(@NonNull Path zip) throws IOException {
         return write(zip, ZipFileSettings.builder().build());
     }
 
-    public ZipFile.Writer write(@NonNull Path zip, @NonNull ZipFileSettings zipFileSettings) throws IOException {
+    public static ZipFile.Writer write(@NonNull Path zip, @NonNull ZipFileSettings zipFileSettings) throws IOException {
         return new ZipFileWriter(zip, zipFileSettings);
     }
 

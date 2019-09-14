@@ -1,9 +1,10 @@
 package ru.olegcherednik.zip4jvm;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.assertj.AbstractDirectoryAssert;
 import ru.olegcherednik.zip4jvm.assertj.AbstractZipEntryDirectoryAssert;
-import lombok.experimental.UtilityClass;
-import org.apache.commons.io.IOUtils;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -16,11 +17,11 @@ import java.util.function.Consumer;
  * @author Oleg Cherednik
  * @since 14.03.2019
  */
-@UtilityClass
 @SuppressWarnings("FieldNamingConvention")
-public class TestUtils {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class TestUtils {
 
-    public final Consumer<AbstractDirectoryAssert<?>> dirAssert = dir -> {
+    public static final Consumer<AbstractDirectoryAssert<?>> dirAssert = dir -> {
         dir.exists().hasSubDirectories(3).hasFiles(5);
 
         TestUtils.carsDirAssert.accept(dir.directory("cars/"));
@@ -34,14 +35,14 @@ public class TestUtils {
 //        dir.file("Oleg Cherednik.txt").exists().hasContent("Oleg Cherednik\nОлег Чередник").hasSize(41);
     };
 
-    public final Consumer<AbstractDirectoryAssert<?>> carsDirAssert = dir -> {
+    public static final Consumer<AbstractDirectoryAssert<?>> carsDirAssert = dir -> {
         dir.exists().hasSubDirectories(0).hasFiles(3);
         dir.file("bentley-continental.jpg").exists().isImage().hasSize(1_395_362);
         dir.file("ferrari-458-italia.jpg").exists().isImage().hasSize(320_894);
         dir.file("wiesmann-gt-mf5.jpg").exists().isImage().hasSize(729_633);
     };
 
-    public final Consumer<AbstractDirectoryAssert<?>> starWarsDirAssert = dir -> {
+    public static final Consumer<AbstractDirectoryAssert<?>> starWarsDirAssert = dir -> {
         dir.exists().hasSubDirectories(0).hasFiles(4);
         dir.file("one.jpg").exists().isImage().hasSize(2_204_448);
         dir.file("two.jpg").exists().isImage().hasSize(277_857);
@@ -49,9 +50,9 @@ public class TestUtils {
         dir.file("four.jpg").exists().isImage().hasSize(1_916_776);
     };
 
-    public final Consumer<AbstractDirectoryAssert<?>> emptyDirAssert = dir -> dir.exists().hasSubDirectories(0).hasFiles(0);
+    public static final Consumer<AbstractDirectoryAssert<?>> emptyDirAssert = dir -> dir.exists().hasSubDirectories(0).hasFiles(0);
 
-    public final Consumer<AbstractZipEntryDirectoryAssert<?>> zipRootDirAssert = dir -> {
+    public static final Consumer<AbstractZipEntryDirectoryAssert<?>> zipRootDirAssert = dir -> {
         dir.exists().hasSubDirectories(3).hasFiles(5);
 
         TestUtils.zipCarsDirAssert.accept(dir.directory("cars/"));
@@ -65,14 +66,14 @@ public class TestUtils {
 //        dir.file("Oleg Cherednik.txt").exists().hasContent("Oleg Cherednik\nОлег Чередник").hasSize(41);
     };
 
-    public final Consumer<AbstractZipEntryDirectoryAssert<?>> zipCarsDirAssert = dir -> {
+    public static final Consumer<AbstractZipEntryDirectoryAssert<?>> zipCarsDirAssert = dir -> {
         dir.exists().hasSubDirectories(0).hasFiles(3);
         dir.file("bentley-continental.jpg").exists().isImage().hasSize(1_395_362);
         dir.file("ferrari-458-italia.jpg").exists().isImage().hasSize(320_894);
         dir.file("wiesmann-gt-mf5.jpg").exists().isImage().hasSize(729_633);
     };
 
-    public final Consumer<AbstractZipEntryDirectoryAssert<?>> zipStarWarsDirAssert = dir -> {
+    public static final Consumer<AbstractZipEntryDirectoryAssert<?>> zipStarWarsDirAssert = dir -> {
         dir.exists().hasSubDirectories(0).hasFiles(4);
         dir.file("one.jpg").exists().isImage().hasSize(2_204_448);
         dir.file("two.jpg").exists().isImage().hasSize(277_857);
@@ -80,9 +81,9 @@ public class TestUtils {
         dir.file("four.jpg").exists().isImage().hasSize(1_916_776);
     };
 
-    public final Consumer<AbstractZipEntryDirectoryAssert<?>> zipEmptyDirAssert = dir -> dir.exists().hasSubDirectories(0).hasFiles(0);
+    public static final Consumer<AbstractZipEntryDirectoryAssert<?>> zipEmptyDirAssert = dir -> dir.exists().hasSubDirectories(0).hasFiles(0);
 
-    public void copyLarge(InputStream in, Path dst) throws IOException {
+    public static void copyLarge(InputStream in, Path dst) throws IOException {
         try (OutputStream out = new FileOutputStream(dst.toFile())) {
             IOUtils.copyLarge(in, out);
         } finally {
@@ -90,7 +91,7 @@ public class TestUtils {
         }
     }
 
-    public String getMethodName() {
+    public static String getMethodName() {
         for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
             String className = element.getClassName();
 

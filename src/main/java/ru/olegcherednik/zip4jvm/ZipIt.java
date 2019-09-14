@@ -15,8 +15,9 @@
  */
 package ru.olegcherednik.zip4jvm;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.experimental.UtilityClass;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
 import java.io.IOException;
@@ -28,8 +29,8 @@ import java.util.Collections;
  * @author Oleg Cherednik
  * @since 14.03.2019
  */
-@UtilityClass
-public class ZipIt {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class ZipIt {
 
     public static void add(@NonNull Path zip, @NonNull Path path, @NonNull ZipFileSettings settings) throws IOException {
         add(zip, Collections.singleton(path), settings);

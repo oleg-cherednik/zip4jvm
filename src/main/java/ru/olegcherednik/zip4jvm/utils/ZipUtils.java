@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.utils;
 
-import lombok.experimental.UtilityClass;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jRealBigZip64NotSupportedException;
 
@@ -10,10 +11,10 @@ import java.util.Calendar;
  * @author Oleg CHerednik
  * @since 20.03.2019
  */
-@UtilityClass
-public class ZipUtils {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class ZipUtils {
 
-    public int javaToDosTime(long time) {
+    public static int javaToDosTime(long time) {
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(time);
 

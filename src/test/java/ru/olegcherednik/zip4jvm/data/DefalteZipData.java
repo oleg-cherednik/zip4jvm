@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.data;
 
-import lombok.experimental.UtilityClass;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.Zip4jSuite;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.Compression;
@@ -19,17 +20,17 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirecto
  * @author Oleg Cherednik
  * @since 06.08.2019
  */
-@UtilityClass
-public class DefalteZipData {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class DefalteZipData {
 
-    public void createDeflateZip() throws IOException {
+    public static void createDeflateZip() throws IOException {
         createDeflateSolidZip();
         createDeflateSplitZip();
         createDeflateSolidPkwareZip();
         createDeflateSolidAesZip();
     }
 
-    private void createDeflateSolidZip() throws IOException {
+    private static void createDeflateSolidZip() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
@@ -43,7 +44,7 @@ public class DefalteZipData {
         assertThatDirectory(Zip4jSuite.deflateSolidZip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
     }
 
-    private void createDeflateSplitZip() throws IOException {
+    private static void createDeflateSplitZip() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
@@ -56,7 +57,7 @@ public class DefalteZipData {
         assertThatDirectory(Zip4jSuite.deflateSplitZip.getParent()).exists().hasSubDirectories(0).hasFiles(10);
     }
 
-    private void createDeflateSolidPkwareZip() throws IOException {
+    private static void createDeflateSolidPkwareZip() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
@@ -70,7 +71,7 @@ public class DefalteZipData {
         assertThatDirectory(Zip4jSuite.deflateSolidPkwareZip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
     }
 
-    private void createDeflateSolidAesZip() throws IOException {
+    private static void createDeflateSolidAesZip() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
