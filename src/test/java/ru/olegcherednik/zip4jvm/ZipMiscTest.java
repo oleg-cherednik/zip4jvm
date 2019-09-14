@@ -70,17 +70,14 @@ public class ZipMiscTest {
         assertThatThrownBy(() -> ZipIt.add(zip, files, settings)).isExactlyInstanceOf(Zip4jPathNotExistsException.class);
     }
 
-//    @Ignore
 //    public void shouldMergeSplitZip() throws IOException {
-//        ZipMisc misc = ZipMisc.builder().zipFile(Zip4jSuite.deflateSplitZip).build();
-//        assertThat(misc.isSplit()).isTrue();
+//        assertThat(ZipMisc.isSplit(Zip4jSuite.deflateSplitZip)).isTrue();
 //
-//        Path mergeDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-//        Path mergeZipFle = mergeDir.resolve("src.zip");
-//        misc.merge(mergeZipFle);
+//        Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+//        ZipMisc.merge(Zip4jSuite.deflateSplitZip, zip);
 //
-//        Zip4jAssertions.assertThatDirectory(mergeDir).exists().hasSubDirectories(0).hasFiles(1);
-//        Zip4jAssertions.assertThatZipFile(mergeZipFle).exists().rootEntry().matches(TestUtils.zipRootDirAssert);
+//        assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+//        assertThatZipFile(zip).exists().rootEntry().matches(TestUtils.zipRootDirAssert);
 //    }
 
 //    public void shouldMergeZip64SplitZip() throws IOException {

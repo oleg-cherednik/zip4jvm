@@ -3,18 +3,12 @@ package ru.olegcherednik.zip4jvm;
 import lombok.Builder;
 import lombok.NonNull;
 import org.apache.commons.io.IOUtils;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
-import ru.olegcherednik.zip4jvm.io.out.DataOutput;
-import ru.olegcherednik.zip4jvm.io.out.DataOutputStreamDecorator;
-import ru.olegcherednik.zip4jvm.io.out.SingleZipOutputStream;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
@@ -33,7 +27,7 @@ public final class ZipMisc {
     private final char[] password;
 
     public static void setComment(@NonNull Path zip, String comment) throws IOException {
-        try (ZipFile.Misc zipFile = ZipFile.misc(zip)) {
+        try (ZipFile.Writer zipFile = ZipFile.write(zip)) {
             zipFile.setComment(comment);
         }
     }
@@ -60,24 +54,31 @@ public final class ZipMisc {
         return ZipFile.read(zip).isSplit();
     }
 
-    // --------- MergeSplitZip
-
-    public void merge(@NonNull Path destZipFile) throws IOException {
-        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile).noSplitOnly();
-
-        try {
-            Files.createDirectories(destZipFile.getParent());
-        } catch(IOException e) {
-            throw new Zip4jException(e);
-        }
-
-        try (DataOutput out = SingleZipOutputStream.create(destZipFile, zipModel)) {
-            convertToSolid(copyAllParts(new DataOutputStreamDecorator(out), zipModel), zipModel);
-        } catch(Zip4jException e) {
-            throw e;
-        } catch(Exception e) {
-            throw new Zip4jException(e);
-        }
+    public static void merge(@NonNull Path src, @NonNull Path dest) throws IOException {
+//        try (ZipFile.Writer zipFile = ZipFile.write(dest)) {
+//            zipFile.
+//
+//                           getEntryNames(src);
+//
+//            zipFile.remove(entryNames);
+//        }
+//
+//
+//        ZipModel zipModel = ZipModelBuilder.readOrCreate(zipFile).noSplitOnly();
+//
+//        try {
+//            Files.createDirectories(destZipFile.getParent());
+//        } catch(IOException e) {
+//            throw new Zip4jException(e);
+//        }
+//
+//        try (DataOutput out = SingleZipOutputStream.create(destZipFile, zipModel)) {
+//            convertToSolid(copyAllParts(new DataOutputStreamDecorator(out), zipModel), zipModel);
+//        } catch(Zip4jException e) {
+//            throw e;
+//        } catch(Exception e) {
+//            throw new Zip4jException(e);
+//        }
     }
 
     private static void convertToSolid(long[] fileSizeList, ZipModel zipModel) {
@@ -106,13 +107,6 @@ public final class ZipMisc {
         }
 
         return fileSizeList;
-    }
-
-    private static void checkZipFile(Path zipFile) {
-        if (!Files.exists(zipFile))
-            throw new Zip4jException("ZipFile not exists: " + zipFile);
-        if (!Files.isRegularFile(zipFile))
-            throw new Zip4jException("ZipFile is not a regular file: " + zipFile);
     }
 
 }
