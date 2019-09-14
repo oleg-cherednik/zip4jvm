@@ -38,6 +38,8 @@ public interface DataOutput extends Closeable {
 
     void mark(String id);
 
+    long getMark(String id);
+
     long getWrittenBytesAmount(String id);
 
     long getDisk();

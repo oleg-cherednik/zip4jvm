@@ -44,6 +44,7 @@ public final class CopyEntryInputStream extends EntryInputStream {
 
     public void copyLocalFileHeader(@NonNull DataOutput out) throws IOException {
         LocalFileHeader localFileHeader = new LocalFileHeaderReader(entry.getLocalFileHeaderOffs()).read(in);
+        entry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
         new LocalFileHeaderWriter(localFileHeader).write(out);
         out.mark(EntryOutputStream.COMPRESSED_DATA);
     }

@@ -138,8 +138,15 @@ final class ZipFileWriter implements ZipFile.Writer {
                                                  .zipModel(zipModel)
                                                  .build();
 
-        for (Task task : tasks)
-            task.accept(context);
+        for (Task task : tasks) {
+            try {
+                int a = 0;
+                task.accept(context);
+                a++;
+            } catch(IOException e) {
+                throw e;
+            }
+        }
     }
 
 }

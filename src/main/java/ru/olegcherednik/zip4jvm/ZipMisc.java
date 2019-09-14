@@ -47,6 +47,8 @@ public final class ZipMisc {
     public static void removeEntry(@NonNull Path zip, @NonNull Collection<String> entryNames) throws IOException {
         try (ZipFile.Writer zipFile = ZipFile.write(zip)) {
             zipFile.remove(entryNames);
+        } catch(IOException e) {
+            throw e;
         }
     }
 

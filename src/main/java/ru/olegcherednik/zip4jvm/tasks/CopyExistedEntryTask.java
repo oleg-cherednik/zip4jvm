@@ -24,6 +24,8 @@ public class CopyExistedEntryTask implements Task {
 
     private final String entryName;
 
+    private static final String LOCAL_FILE_HEADER_OFFS = "localFileHeaderOffs";
+
     @Override
     public void accept(ZipModelContext context) throws IOException {
         ZipEntry entry = context.getZipModel().getEntryByFileName(entryName);
@@ -34,16 +36,18 @@ public class CopyExistedEntryTask implements Task {
         DataInput di = zipModel.isSplit() ? SplitZipInputStream.create(zipModel, entry.getDisk()) : SingleZipInputStream.create(zipModel);
 
         try (CopyEntryInputStream in = EntryInputStream.copy(entry, di); OutputStream os = EntryOutputStream.copy(entry, out)) {
-            entry.setLocalFileHeaderOffs(out.getOffs());
+            out.mark(LOCAL_FILE_HEADER_OFFS);
 
             in.copyLocalFileHeader(out);
             in.copyEncryptionHeaderAndData(out);
             in.copyDataDescriptor(out);
+
+            entry.setLocalFileHeaderOffs(out.getMark(LOCAL_FILE_HEADER_OFFS));
         }
     }
 
     @Override
     public String toString() {
-        return '~' + entryName;
+        return "->" + entryName;
     }
 }
