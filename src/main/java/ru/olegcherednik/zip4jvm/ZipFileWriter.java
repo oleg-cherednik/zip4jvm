@@ -2,15 +2,13 @@ package ru.olegcherednik.zip4jvm;
 
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileWriterSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 import ru.olegcherednik.zip4jvm.tasks.AddEntryTask;
 import ru.olegcherednik.zip4jvm.tasks.CloseZipFileTask;
 import ru.olegcherednik.zip4jvm.tasks.CopyExistedEntryTask;
@@ -30,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -46,17 +43,15 @@ final class ZipFileWriter implements ZipFile.Writer, ZipModelContext {
     private final ZipEntrySettings defEntrySettings;
     @Getter
     private final ZipModel zipModel;
-    private final Set<String> existedEntryNames;
-    private final Map<String, AddEntryTask> addEntryTasks = new LinkedHashMap<>();
-    private final Map<String, ZipModelEntry> copyEntryNameZipModelEntry = new LinkedHashMap<>();
+    private final Map<String, Task> addEntryTasks = new LinkedHashMap<>();
 
-    public ZipFileWriter(@NonNull Path zip, @NonNull ZipFileWriterSettings zipFileSettings) throws IOException {
+    public ZipFileWriter(@NonNull Path zip, @NonNull ZipFileSettings zipFileSettings) throws IOException {
         defEntrySettings = zipFileSettings.getEntrySettings();
         zipModel = createZipModel(zip, zipFileSettings);
-        existedEntryNames = new LinkedHashSet<>(zipModel.getEntryNames());
+        addEntryTasks.putAll(createCopyExistedEntryTask(zipModel));
     }
 
-    private static ZipModel createZipModel(Path zip, ZipFileWriterSettings zipFileSettings) throws IOException {
+    private static ZipModel createZipModel(Path zip, ZipFileSettings zipFileSettings) throws IOException {
         if (Files.exists(zip)) {
             ZipModel zipModel = ZipModelBuilder.read(zip);
 
@@ -69,6 +64,12 @@ final class ZipFileWriter implements ZipFile.Writer, ZipModelContext {
         }
 
         return ZipModelBuilder.create(zip, zipFileSettings);
+    }
+
+    private static Map<String, Task> createCopyExistedEntryTask(ZipModel zipModel) {
+        Map<String, Task> map = new LinkedHashMap<>();
+        zipModel.getEntryNames().forEach(entryName -> map.put(entryName, new CopyExistedEntryTask(zipModel, entryName)));
+        return map;
     }
 
     @Override
@@ -96,8 +97,6 @@ final class ZipFileWriter implements ZipFile.Writer, ZipModelContext {
             Path path = entry.getKey();
             String fileName = entry.getValue();
 
-            if (copyEntryNameZipModelEntry.containsKey(fileName))
-                throw new Zip4jException("File name duplication");
             if (addEntryTasks.put(fileName, new AddEntryTask(path, fileName, entrySettings)) != null)
                 throw new Zip4jException("File name duplication");
         }
@@ -117,8 +116,6 @@ final class ZipFileWriter implements ZipFile.Writer, ZipModelContext {
 
         entryNames.forEach(entryName -> {
             addEntryTasks.remove(entryName);
-            copyEntryNameZipModelEntry.remove(entryName);
-            existedEntryNames.remove(entryName);
             zipModel.removeEntry(entryName);
         });
     }
@@ -127,10 +124,10 @@ final class ZipFileWriter implements ZipFile.Writer, ZipModelContext {
     public void copy(@NonNull Path zip) throws IOException {
         ZipModel zipModel = ZipModelBuilder.read(zip);
 
-        for (ZipEntry entry : zipModel.getEntries()) {
-            if (addEntryTasks.containsKey(entry.getFileName()))
+        for (String fileName : zipModel.getEntryNames()) {
+            if (addEntryTasks.containsKey(fileName))
                 throw new Zip4jException("File name duplication");
-            if (copyEntryNameZipModelEntry.put(entry.getFileName(), new ZipModelEntry(zipModel, entry)) != null)
+            if (addEntryTasks.put(fileName, new CopyExistedEntryTask(zipModel, fileName)) != null)
                 throw new Zip4jException("File name duplication");
         }
     }
@@ -143,31 +140,15 @@ final class ZipFileWriter implements ZipFile.Writer, ZipModelContext {
     @Override
     public void close() throws IOException {
         List<Task> tasks = new ArrayList<>();
-        tasks.add(new CreateTemporaryZipFileTask());
 
-        existedEntryNames.forEach(entryName -> tasks.add(new CopyExistedEntryTask(zipModel, entryName)));
+        tasks.add(new CreateTemporaryZipFileTask());
         tasks.addAll(addEntryTasks.values());
-        copyEntryNameZipModelEntry.forEach(
-                (entryName, data) -> tasks.add(new CopyExistedEntryTask(data.getZipModel(), data.getZipEntry().getFileName())));
         tasks.add(new CloseZipFileTask());
         tasks.add(new RemoveOriginalZipFileTask());
         tasks.add(new MoveTemporaryZipFileTask());
 
         for (Task task : tasks)
             task.accept(this);
-    }
-
-    @Getter
-    @RequiredArgsConstructor
-    private static final class ZipModelEntry {
-
-        private final ZipModel zipModel;
-        private final ZipEntry zipEntry;
-
-        @Override
-        public String toString() {
-            return zipModel.getFile().toString() + " ->" + zipEntry.getFileName();
-        }
     }
 
     @Getter

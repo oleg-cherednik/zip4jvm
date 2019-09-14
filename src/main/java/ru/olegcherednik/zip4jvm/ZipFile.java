@@ -3,8 +3,7 @@ package ru.olegcherednik.zip4jvm;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileReaderSettings;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileWriterSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
 import java.io.Closeable;
 import java.io.FileNotFoundException;
@@ -13,6 +12,7 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * ZipFile real-time implementation.
@@ -37,18 +37,18 @@ import java.util.Set;
 public final class ZipFile {
 
     public ZipFile.Reader read(@NonNull Path zip) throws IOException {
-        return read(zip, ZipFileReaderSettings.builder().build());
+        return read(zip, fileName -> null);
     }
 
-    public ZipFile.Reader read(@NonNull Path zip, ZipFileReaderSettings settings) throws IOException {
-        return new ZipFileReader(zip, settings);
+    public ZipFile.Reader read(@NonNull Path zip, Function<String, char[]> createPassword) throws IOException {
+        return new ZipFileReader(zip, createPassword);
     }
 
     public ZipFile.Writer write(@NonNull Path zip) throws IOException {
-        return write(zip, ZipFileWriterSettings.builder().build());
+        return write(zip, ZipFileSettings.builder().build());
     }
 
-    public ZipFile.Writer write(@NonNull Path zip, @NonNull ZipFileWriterSettings zipFileSettings) throws IOException {
+    public ZipFile.Writer write(@NonNull Path zip, @NonNull ZipFileSettings zipFileSettings) throws IOException {
         return new ZipFileWriter(zip, zipFileSettings);
     }
 

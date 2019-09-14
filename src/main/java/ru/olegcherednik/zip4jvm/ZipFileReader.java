@@ -7,7 +7,6 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileReaderSettings;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import java.io.FileOutputStream;
@@ -29,12 +28,12 @@ import java.util.stream.Collectors;
 final class ZipFileReader implements ZipFile.Reader {
 
     private final ZipModel zipModel;
-    private final ZipFileReaderSettings settings;
+    private final Function<String, char[]> createPassword;
 
-    public ZipFileReader(@NonNull Path zip, ZipFileReaderSettings settings) throws IOException {
+    public ZipFileReader(@NonNull Path zip, Function<String, char[]> createPassword) throws IOException {
         checkZipFile(zip);
         zipModel = ZipModelBuilder.read(zip);
-        this.settings = settings;
+        this.createPassword = createPassword;
     }
 
     @Override
@@ -70,7 +69,7 @@ final class ZipFileReader implements ZipFile.Reader {
         if (entry == null)
             throw new Zip4jException("No entry found for '" + fileName + '\'');
 
-        entry.setPassword(settings.getPassword().apply(entry.getFileName()));
+        entry.setPassword(createPassword.apply(entry.getFileName()));
 
         return entry.getIn();
     }
@@ -106,7 +105,7 @@ final class ZipFileReader implements ZipFile.Reader {
         if (entry == null)
             throw new Zip4jException("Entry not found");
 
-        entry.setPassword(settings.getPassword().apply(entry.getFileName()));
+        entry.setPassword(createPassword.apply(entry.getFileName()));
         String fileName = getFileName.apply(entry);
         Path file = destDir.resolve(fileName);
 

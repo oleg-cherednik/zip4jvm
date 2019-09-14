@@ -6,7 +6,7 @@ import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileWriterSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -38,7 +38,7 @@ public class ZipFileWriterTest {
     }
 
     public void shouldCreateZipFileWhenUseZipFileAndAddFiles() throws IOException {
-        ZipFileWriterSettings zipFileSettings = ZipFileWriterSettings.builder().build();
+        ZipFileSettings zipFileSettings = ZipFileSettings.builder().build();
         ZipEntrySettings settings = ZipEntrySettings.builder()
                                                     .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                     .build();
@@ -79,9 +79,9 @@ public class ZipFileWriterTest {
     }
 
     public void shouldCreateZipFileWhenUseZipFileAndAddFilesSplit() throws IOException {
-        ZipFileWriterSettings zipFileSettings = ZipFileWriterSettings.builder()
-                                                                     .splitSize(1024 * 1024)
-                                                                     .build();
+        ZipFileSettings zipFileSettings = ZipFileSettings.builder()
+                                                         .splitSize(1024 * 1024)
+                                                         .build();
         ZipEntrySettings settings = ZipEntrySettings.builder()
                                                     .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                     .build();
@@ -101,9 +101,9 @@ public class ZipFileWriterTest {
 
     @Test(dependsOnMethods = "shouldCreateZipFileWhenUseZipFileAndAddFilesSplit")
     public void shouldAddFilesToExistedZipWhenUseZipFileSplit() throws IOException {
-        ZipFileWriterSettings zipFileSettings = ZipFileWriterSettings.builder()
-                                                                     .splitSize(1024 * 1024)
-                                                                     .build();
+        ZipFileSettings zipFileSettings = ZipFileSettings.builder()
+                                                         .splitSize(1024 * 1024)
+                                                         .build();
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
 
         try (ZipFile.Writer zipFile = ZipFile.write(splitFile, zipFileSettings)) {

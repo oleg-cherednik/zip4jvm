@@ -13,7 +13,7 @@ import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileWriterSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -43,7 +43,7 @@ public final class ZipModelBuilder {
         return new ZipModelReader(zip).read();
     }
 
-    public static ZipModel create(Path zip, ZipFileWriterSettings zipFileSettings) {
+    public static ZipModel create(Path zip, ZipFileSettings zipFileSettings) {
         if (Files.exists(zip))
             throw new Zip4jException("ZipFile '" + zip.toAbsolutePath() + "' exists");
 

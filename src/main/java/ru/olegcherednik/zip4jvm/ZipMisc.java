@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm;
 
 import lombok.Builder;
 import lombok.NonNull;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileWriterSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -52,9 +52,9 @@ public final class ZipMisc {
     public static void merge(@NonNull Path src, @NonNull Path dest) throws IOException {
         ZipFile.Reader reader = ZipFile.read(src);
 
-        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
-                                                              .comment(reader.getComment())
-                                                              .zip64(reader.isZip64()).build();
+        ZipFileSettings settings = ZipFileSettings.builder()
+                                                  .comment(reader.getComment())
+                                                  .zip64(reader.isZip64()).build();
 
         try (ZipFile.Writer zipFile = ZipFile.write(dest, settings)) {
             zipFile.copy(src);

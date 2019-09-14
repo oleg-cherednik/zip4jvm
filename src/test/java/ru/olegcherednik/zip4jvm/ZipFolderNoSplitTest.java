@@ -9,7 +9,7 @@ import ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileWriterSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -37,7 +37,7 @@ public class ZipFolderNoSplitTest {
 
     @Test
     public void shouldCreateNewZipWithFolder() throws IOException {
-        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
+        ZipFileSettings settings = ZipFileSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
@@ -55,7 +55,7 @@ public class ZipFolderNoSplitTest {
         Assertions.assertThat(Files.exists(zip)).isTrue();
         Assertions.assertThat(Files.isRegularFile(zip)).isTrue();
 
-        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
+        ZipFileSettings settings = ZipFileSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
@@ -74,7 +74,7 @@ public class ZipFolderNoSplitTest {
         Assertions.assertThat(Files.exists(zip)).isTrue();
         Assertions.assertThat(Files.isRegularFile(zip)).isTrue();
 
-        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
+        ZipFileSettings settings = ZipFileSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
