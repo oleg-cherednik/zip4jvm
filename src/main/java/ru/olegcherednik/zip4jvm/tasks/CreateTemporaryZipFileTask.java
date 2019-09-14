@@ -1,5 +1,6 @@
 package ru.olegcherednik.zip4jvm.tasks;
 
+import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.SingleZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
@@ -13,23 +14,25 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 11.09.2019
  */
+@RequiredArgsConstructor
 public final class CreateTemporaryZipFileTask implements Task {
+
+    private final ZipModel destZipModel;
 
     @Override
     public void accept(ZipModelContext context) throws IOException {
-        context.setOut(createDataOutput(context));
+        context.setOut(createDataOutput());
     }
 
-    private static DataOutput createDataOutput(ZipModelContext context) throws IOException {
-        ZipModel zipModel = context.getZipModel();
-        Path file = zipModel.getFile();
+    private DataOutput createDataOutput() throws IOException {
+        Path file = destZipModel.getFile();
         Path parent = file.getParent().resolve("tmp");
 
         Files.createDirectories(parent);
 
         file = parent.resolve(file.getFileName());
-        zipModel.setStreamFile(file);
+        destZipModel.setStreamFile(file);
 
-        return zipModel.isSplit() ? SplitZipOutputStream.create(zipModel) : SingleZipOutputStream.create(file, zipModel);
+        return destZipModel.isSplit() ? SplitZipOutputStream.create(destZipModel) : SingleZipOutputStream.create(file, destZipModel);
     }
 }

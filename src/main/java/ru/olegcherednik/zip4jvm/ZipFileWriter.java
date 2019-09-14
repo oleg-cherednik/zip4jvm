@@ -41,14 +41,13 @@ import java.util.stream.Collectors;
 final class ZipFileWriter implements ZipFile.Writer, ZipModelContext {
 
     private final ZipEntrySettings defEntrySettings;
-    @Getter
-    private final ZipModel zipModel;
-    private final Map<String, Task> addEntryTasks = new LinkedHashMap<>();
+    private final ZipModel destZipModel;
+    private final Map<String, Task> tasks = new LinkedHashMap<>();
 
     public ZipFileWriter(@NonNull Path zip, @NonNull ZipFileSettings zipFileSettings) throws IOException {
         defEntrySettings = zipFileSettings.getEntrySettings();
-        zipModel = createZipModel(zip, zipFileSettings);
-        addEntryTasks.putAll(createCopyExistedEntryTask(zipModel));
+        destZipModel = createZipModel(zip, zipFileSettings);
+        tasks.putAll(createCopyExistedEntryTask(destZipModel));
     }
 
     private static ZipModel createZipModel(Path zip, ZipFileSettings zipFileSettings) throws IOException {
@@ -68,7 +67,7 @@ final class ZipFileWriter implements ZipFile.Writer, ZipModelContext {
 
     private static Map<String, Task> createCopyExistedEntryTask(ZipModel zipModel) {
         Map<String, Task> map = new LinkedHashMap<>();
-        zipModel.getEntryNames().forEach(entryName -> map.put(entryName, new CopyExistedEntryTask(zipModel, entryName)));
+        zipModel.getEntryNames().forEach(entryName -> map.put(entryName, new CopyExistedEntryTask(zipModel, entryName, zipModel)));
         return map;
     }
 
@@ -97,7 +96,7 @@ final class ZipFileWriter implements ZipFile.Writer, ZipModelContext {
             Path path = entry.getKey();
             String fileName = entry.getValue();
 
-            if (addEntryTasks.put(fileName, new AddEntryTask(path, fileName, entrySettings)) != null)
+            if (tasks.put(fileName, new AddEntryTask(path, fileName, entrySettings, destZipModel)) != null)
                 throw new Zip4jException("File name duplication");
         }
     }
@@ -106,17 +105,17 @@ final class ZipFileWriter implements ZipFile.Writer, ZipModelContext {
     public void remove(@NonNull String prefixEntryName) throws FileNotFoundException {
         String normalizedPrefixEntryName = ZipUtils.normalizeFileName(prefixEntryName);
 
-        Set<String> entryNames = zipModel.getEntryNames().stream()
-                                         .filter(entryName -> entryName.startsWith(normalizedPrefixEntryName))
-                                         .collect(Collectors.toSet());
+        Set<String> entryNames = destZipModel.getEntryNames().stream()
+                                             .filter(entryName -> entryName.startsWith(normalizedPrefixEntryName))
+                                             .collect(Collectors.toSet());
 
         // TODO it's not working, check it in test
         if (entryNames.isEmpty())
             throw new FileNotFoundException(prefixEntryName);
 
         entryNames.forEach(entryName -> {
-            addEntryTasks.remove(entryName);
-            zipModel.removeEntry(entryName);
+            tasks.remove(entryName);
+            destZipModel.removeEntry(entryName);
         });
     }
 
@@ -125,27 +124,27 @@ final class ZipFileWriter implements ZipFile.Writer, ZipModelContext {
         ZipModel zipModel = ZipModelBuilder.read(zip);
 
         for (String fileName : zipModel.getEntryNames()) {
-            if (addEntryTasks.containsKey(fileName))
+            if (tasks.containsKey(fileName))
                 throw new Zip4jException("File name duplication");
-            if (addEntryTasks.put(fileName, new CopyExistedEntryTask(zipModel, fileName)) != null)
+            if (tasks.put(fileName, new CopyExistedEntryTask(zipModel, fileName, destZipModel)) != null)
                 throw new Zip4jException("File name duplication");
         }
     }
 
     @Override
     public void setComment(String comment) {
-        zipModel.setComment(comment);
+        destZipModel.setComment(comment);
     }
 
     @Override
     public void close() throws IOException {
         List<Task> tasks = new ArrayList<>();
 
-        tasks.add(new CreateTemporaryZipFileTask());
-        tasks.addAll(addEntryTasks.values());
+        tasks.add(new CreateTemporaryZipFileTask(destZipModel));
+        tasks.addAll(this.tasks.values());
         tasks.add(new CloseZipFileTask());
-        tasks.add(new RemoveOriginalZipFileTask());
-        tasks.add(new MoveTemporaryZipFileTask());
+        tasks.add(new RemoveOriginalZipFileTask(destZipModel));
+        tasks.add(new MoveTemporaryZipFileTask(destZipModel));
 
         for (Task task : tasks)
             task.accept(this);
