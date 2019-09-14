@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -123,30 +124,15 @@ public class ZipMiscTest {
     public void shouldRemoveGivenFilesFromExistedZip() throws IOException {
         Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         Files.createDirectories(zip.getParent());
-//        Files.copy(Zip4jSuite.storeSolidZip, zip);
-//        assertThatZipFile(zip).exists().rootEntry().matches(TestUtils.zipRootDirAssert);
+        Files.copy(Zip4jSuite.storeSolidZip, zip);
+        assertThatZipFile(zip).exists().rootEntry().matches(TestUtils.zipRootDirAssert);
 
-        ZipFileWriterSettings zipFileSettings = ZipFileWriterSettings.builder().build();
-        ZipEntrySettings settings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
+        List<String> entryNames = Zip4jSuite.filesCarsDir.stream()
+                                                         .map(file -> Zip4jSuite.srcDir.relativize(file).toString())
+                                                         .collect(Collectors.toList());
 
-        try (ZipFile.Writer zipFile = ZipFile.write(zip, zipFileSettings)) {
-            zipFile.add(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"), settings);
-            zipFile.add(Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg"), settings);
-            zipFile.add(Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg"), settings);
-        }
-
-
-        List<String> entryNames = Arrays.asList(Zip4jSuite.carsDir.relativize(Zip4jSuite.fileFerrari).toString());
-//                Zip4jSuite.filesCarsDir.stream()
-//                                                         .map(file -> Zip4jSuite.srcDir.relativize(file).toString())
-//                                                         .collect(Collectors.toList());
-
-        try {
-            ZipMisc.removeEntry(zip, entryNames);
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
-//        assertThat(ZipMisc.getEntryNames(zip)).hasSize(10);
+        ZipMisc.removeEntry(zip, entryNames);
+        assertThat(ZipMisc.getEntryNames(zip)).hasSize(10);
     }
 
     public void shouldRemoveFolderFromExistedZip() throws IOException {

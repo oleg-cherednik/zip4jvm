@@ -24,8 +24,7 @@ import java.util.zip.Checksum;
  */
 public abstract class EntryOutputStream extends OutputStream {
 
-    // TODO temporary
-    public static final String COMPRESSED_DATA = "entryCompressedDataOffs";
+    private static final String COMPRESSED_DATA = "entryCompressedDataOffs";
 
     private final ZipEntry entry;
     private final Checksum checksum = new CRC32();
@@ -42,16 +41,6 @@ public abstract class EntryOutputStream extends OutputStream {
 
         os.writeLocalFileHeader();
         os.writeEncryptionHeader();
-        return os;
-    }
-
-    public static EntryOutputStream copy(@NonNull ZipEntry entry, @NonNull DataOutput out) throws IOException {
-        EntryOutputStream os = new CopyEntryOutputStream(entry, out);
-
-//        entry.setLocalFileHeaderOffs(out.getOffs());
-
-//        os.writeLocalFileHeader();
-//        os.writeEncryptionHeader();
         return os;
     }
 
