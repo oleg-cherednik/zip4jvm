@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<suite name="zip4j" parallel="classes" thread-count="4">
+<suite name="zip4jvm" parallel="classes" thread-count="4">
     <test name="pkg">
         <packages>
-            <package name="com.cop.zip4j.*"/>
+            <package name="ru.olegcherednik.zip4jvm.*"/>
         </packages>
     </test>
 </suite>

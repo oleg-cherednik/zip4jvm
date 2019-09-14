@@ -5,11 +5,13 @@ import net.sf.sevenzipjbinding.ArchiveFormat;
 import net.sf.sevenzipjbinding.ExtractOperationResult;
 import net.sf.sevenzipjbinding.IInArchive;
 import net.sf.sevenzipjbinding.IInStream;
+import net.sf.sevenzipjbinding.PropID;
 import net.sf.sevenzipjbinding.SevenZip;
 import net.sf.sevenzipjbinding.SevenZipException;
 import net.sf.sevenzipjbinding.impl.RandomAccessFileInStream;
 import net.sf.sevenzipjbinding.simple.ISimpleInArchiveItem;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -37,7 +39,7 @@ class ZipFileEncryptedDecoder extends ZipFileDecorator {
 
     @Override
     public InputStream getInputStream(@NonNull ZipEntry entry) {
-        try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(zipFile.toFile(), "r"));
+        try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(zip.toFile(), "r"));
              IInArchive zip = SevenZip.openInArchive(ArchiveFormat.ZIP, in)) {
 
             for (ISimpleInArchiveItem item : zip.getSimpleInterface().getArchiveItems()) {
@@ -50,6 +52,20 @@ class ZipFileEncryptedDecoder extends ZipFileDecorator {
             }
 
             throw new RuntimeException("Entry '" + entry + "' was not found");
+        } catch(RuntimeException e) {
+            throw e;
+        } catch(Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public String getComment() {
+        // supports only ASCII symbols
+        try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(zip.toFile(), "r"));
+             IInArchive zip = SevenZip.openInArchive(ArchiveFormat.ZIP, in)) {
+            String str = zip.getStringArchiveProperty(PropID.COMMENT);
+            return StringUtils.length(str) == 0 ? null : str;
         } catch(RuntimeException e) {
             throw e;
         } catch(Exception e) {

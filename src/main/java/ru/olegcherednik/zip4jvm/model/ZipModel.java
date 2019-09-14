@@ -3,13 +3,10 @@ package ru.olegcherednik.zip4jvm.model;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.io.FilenameUtils;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,20 +31,20 @@ import java.util.Set;
  */
 @Getter
 @Setter
-@RequiredArgsConstructor
 public class ZipModel {
 
     public static final int NO_SPLIT = -1;
     // MIN_SPLIT_LENGTH = 64K bytes
-    public static final int MIN_SPLIT_LENGTH = 64 * 1024;
+    public static final int MIN_SPLIT_SIZE = 64 * 1024;
 
     public static final int MAX_TOTAL_ENTRIES = Zip64.LIMIT_INT;
     public static final long MAX_ENTRY_SIZE = Zip64.LIMIT;
     public static final int MAX_TOTAL_DISKS = Zip64.LIMIT_INT;
 
     @NonNull
-    private final Path zip;
+    private final Path file;
     private long splitSize = NO_SPLIT;
+    private Path streamFile;
 
     private String comment;
     private long totalDisks;
@@ -61,11 +58,16 @@ public class ZipModel {
      */
     private boolean zip64;
 
+    public ZipModel(@NonNull Path file) {
+        this.file = file;
+        streamFile = file;
+    }
+
     @Getter(AccessLevel.NONE)
     private final Map<String, ZipEntry> fileNameEntry = new LinkedHashMap<>();
 
     public void setSplitSize(long splitSize) {
-        this.splitSize = splitSize < MIN_SPLIT_LENGTH ? NO_SPLIT : splitSize;
+        this.splitSize = splitSize <= 0 ? NO_SPLIT : Math.max(MIN_SPLIT_SIZE, splitSize);
     }
 
     public boolean isSplit() {
@@ -84,6 +86,10 @@ public class ZipModel {
         fileNameEntry.put(entry.getFileName(), entry);
     }
 
+    public void removeEntry(@NonNull String fileName) {
+        fileNameEntry.remove(fileName);
+    }
+
     public Collection<ZipEntry> getEntries() {
         return isEmpty() ? Collections.emptyList() : Collections.unmodifiableCollection(fileNameEntry.values());
     }
@@ -92,24 +98,21 @@ public class ZipModel {
         return fileNameEntry.get(fileName);
     }
 
+    @NonNull
     public Set<String> getEntryNames() {
         return isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(fileNameEntry.keySet());
     }
 
     public Path getPartFile(long disk) {
-        return disk == totalDisks ? zip : getSplitFilePath(zip, disk + 1);
+        return disk == totalDisks ? file : getSplitFilePath(file, disk + 1);
     }
 
-    public static Path getSplitFilePath(Path zipFile, long disk) {
-        return zipFile.getParent().resolve(String.format("%s.z%02d", FilenameUtils.getBaseName(zipFile.toString()), disk));
+    public Path getStreamPartFile(long disk) {
+        return disk == totalDisks ? streamFile : getSplitFilePath(streamFile, disk + 1);
     }
 
-    @NonNull
-    public ZipModel noSplitOnly() {
-        if (Files.exists(zip) && isSplit())
-            throw new Zip4jException("Zip file already exists. Zip file format does not allow updating split/spanned files");
-
-        return this;
+    public static Path getSplitFilePath(Path zip, long disk) {
+        return zip.getParent().resolve(String.format("%s.z%02d", FilenameUtils.getBaseName(zip.toString()), disk));
     }
 
 }

@@ -35,7 +35,7 @@ public class SplitZipInputStream extends BaseDataInput {
         if (disk != 0)
             return;
         if (delegate.readSignature() != SplitZipOutputStream.SPLIT_SIGNATURE)
-            throw new Zip4jException("Incorrect split file signature: " + zipModel.getZip().getFileName());
+            throw new Zip4jException("Incorrect split file signature: " + zipModel.getFile().getFileName());
     }
 
     @Override

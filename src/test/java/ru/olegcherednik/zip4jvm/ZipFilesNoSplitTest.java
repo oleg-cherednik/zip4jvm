@@ -7,7 +7,7 @@ import ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileWriterSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -37,7 +37,7 @@ public class ZipFilesNoSplitTest {
     }
 
     public void shouldCreateNewZipWithFiles() throws IOException {
-        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
+        ZipFileSettings settings = ZipFileSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())

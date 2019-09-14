@@ -3,18 +3,16 @@ package ru.olegcherednik.zip4jvm;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileWriterSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertionsForClassTypes.assertThatDirectory;
 
 /**
@@ -39,7 +37,7 @@ public class ZipFolderSplitTest {
 
     @Test
     public void shouldCreateNewZipWithFolder() throws IOException {
-        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
+        ZipFileSettings settings = ZipFileSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
@@ -53,14 +51,14 @@ public class ZipFolderSplitTest {
 //        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
     }
 
-    @Test(dependsOnMethods = "shouldCreateNewZipWithFolder")
-    public void shouldThrowExceptionWhenModifySplitZip() {
-        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
-                                                  .entrySettings(
-                                                          ZipEntrySettings.builder()
-                                                                          .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
-                                                  .splitSize(2014 * 1024).build();
-
-        assertThatThrownBy(() -> ZipIt.add(zip, Zip4jSuite.starWarsDir, settings)).isExactlyInstanceOf(Zip4jException.class);
-    }
+//    @Test(dependsOnMethods = "shouldCreateNewZipWithFolder")
+//    public void shouldThrowExceptionWhenModifySplitZip() {
+//        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
+//                                                  .entrySettings(
+//                                                          ZipEntrySettings.builder()
+//                                                                          .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
+//                                                  .splitSize(2014 * 1024).build();
+//
+//        assertThatThrownBy(() -> ZipIt.add(zip, Zip4jSuite.starWarsDir, settings)).isExactlyInstanceOf(Zip4jException.class);
+//    }
 }

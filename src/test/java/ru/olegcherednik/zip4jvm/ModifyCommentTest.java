@@ -4,25 +4,27 @@ import org.apache.commons.lang.StringUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
+import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileWriterSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatZipFile;
 
 /**
  * @author Oleg Cherednik
  * @since 15.03.2019
  */
+@Test
 @SuppressWarnings("FieldNamingConvention")
 public class ModifyCommentTest {
 
@@ -39,79 +41,63 @@ public class ModifyCommentTest {
         Zip4jSuite.removeDir(rootDir);
     }
 
-    @Test
     public void shouldCreateNewZipWithComment() throws IOException {
-        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
+        ZipFileSettings settings = ZipFileSettings.builder()
                                                   .entrySettings(
-                                                          ZipEntrySettings.builder()
-                                                                          .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
+                                                                      ZipEntrySettings.builder()
+                                                                                      .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
+                                                                                      .build())
                                                   .comment("Oleg Cherednik - Олег Чередник").build();
-        ZipIt.add(zip, Zip4jSuite.carsDir, settings);
-
-        // TODO check comment using assertion
-        ZipMisc misc = ZipMisc.builder().zipFile(zip).build();
-
-        Zip4jAssertions.assertThatDirectory(rootDir).exists().hasSubDirectories(0).hasFiles(1);
-        assertThat(misc.getComment()).isEqualTo("Oleg Cherednik - Олег Чередник");
-        Zip4jAssertions.assertThatZipFile(zip).exists();
+        ZipIt.add(zip, Zip4jSuite.fileSrcOlegCherednik, settings);
+        assertThatZipFile(zip).exists().hasComment("Oleg Cherednik - Олег Чередник");
     }
 
     @Test(dependsOnMethods = "shouldCreateNewZipWithComment")
-//    @Ignore("it's not working under gradle build")
     public void shouldAddCommentToExistedNoSplitZip() throws IOException {
-        ZipMisc misc = ZipMisc.builder().zipFile(zip).build();
-        assertThat(misc.getComment()).isEqualTo("Oleg Cherednik - Олег Чередник");
-
-        misc.setComment("this is new comment - новый комментарий");
-        assertThat(misc.getComment()).isEqualTo("this is new comment - новый комментарий");
+        ZipMisc.setComment(zip, "this is new comment - новый комментарий");
+        assertThatZipFile(zip).exists().hasComment("this is new comment - новый комментарий");
     }
 
     @Test(dependsOnMethods = "shouldAddCommentToExistedNoSplitZip")
-//    @Ignore("it's not working under gradle build")
     public void shouldClearCommentForExistedZip() throws IOException {
-        ZipMisc misc = ZipMisc.builder().zipFile(zip).build();
-        assertThat(misc.getComment()).isNotBlank();
-
-        misc.clearComment();
-        assertThat(misc.getComment()).isNull();
+        ZipMisc.setComment(zip, null);
+        assertThatZipFile(zip).exists().hasCommentSize(0);
     }
 
     @Test(dependsOnMethods = "shouldClearCommentForExistedZip")
-//    @Ignore("it's not working under gradle build")
-    public void shouldAddCommentToEncryptedZip() throws Zip4jException, IOException {
+    public void shouldAddCommentToEncryptedZip() throws IOException {
         Files.deleteIfExists(zip);
-        Files.copy(Zip4jSuite.deflateSolidPkwareZip, zip);
 
-        ZipMisc misc = ZipMisc.builder().zipFile(zip).build();
-        assertThat(misc.isEncrypted()).isTrue();
-        assertThat(misc.getComment()).isEqualTo("password: " + new String(Zip4jSuite.password));
+        ZipFileSettings settings = ZipFileSettings.builder()
+                                                  .entrySettings(
+                                                                      ZipEntrySettings.builder()
+                                                                                      .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                                                      .encryption(Encryption.PKWARE, fileName -> Zip4jSuite.password)
+                                                                                      .build())
+                                                  .build();
+        ZipIt.add(zip, Collections.emptyList(), settings);
+        assertThatZipFile(zip, Zip4jSuite.password).hasCommentSize(0);
 
-        misc.setComment("Oleg Cherednik - Олег Чередник");
-        assertThat(misc.getComment()).isEqualTo("Oleg Cherednik - Олег Чередник");
+        ZipMisc.setComment(zip, "this is new comment");
+        assertThatZipFile(zip, Zip4jSuite.password).hasComment("this is new comment");
     }
 
-    @Test
-//    @Ignore("it's not working under gradle build")
     public void shouldSetCommentWithMaxLength() throws IOException {
-        Path zipFile = rootDir.resolve("src_" + System.currentTimeMillis() + ".zip");
-        Files.copy(Zip4jSuite.deflateSolidZip, zipFile);
+        Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        Files.createDirectories(zip.getParent());
+        Files.copy(Zip4jSuite.deflateSolidZip, zip);
 
-        ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
-        assertThat(misc.getComment()).isNull();
-
-        misc.setComment(StringUtils.repeat("_", EndCentralDirectory.MAX_COMMENT_LENGTH));
-        Zip4jAssertions.assertThatZipFile(zipFile).hasCommentSize(EndCentralDirectory.MAX_COMMENT_LENGTH);
+        ZipMisc.setComment(zip, StringUtils.repeat("_", EndCentralDirectory.MAX_COMMENT_LENGTH));
+        assertThatZipFile(zip).hasCommentSize(EndCentralDirectory.MAX_COMMENT_LENGTH);
     }
 
     @Test
-//    @Ignore("it's not working under gradle build")
     public void shouldThrowExceptionWhenCommentIsOverMaxLength() throws IOException {
-        Path zipFile = Zip4jSuite.copy(rootDir, Zip4jSuite.deflateSolidZip);
+        Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        Files.createDirectories(zip.getParent());
+        Files.copy(Zip4jSuite.deflateSolidZip, zip);
 
-        ZipMisc misc = ZipMisc.builder().zipFile(zipFile).build();
-        assertThat(misc.getComment()).isNull();
-
-        assertThatThrownBy(() -> misc.setComment(StringUtils.repeat("_", EndCentralDirectory.MAX_COMMENT_LENGTH + 1)))
+        assertThatThrownBy(() -> ZipMisc.setComment(zip, StringUtils.repeat("_", EndCentralDirectory.MAX_COMMENT_LENGTH + 1)))
                 .isInstanceOf(Zip4jException.class);
     }
 

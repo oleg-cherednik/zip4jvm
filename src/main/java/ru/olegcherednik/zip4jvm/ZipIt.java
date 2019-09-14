@@ -17,7 +17,7 @@ package ru.olegcherednik.zip4jvm;
 
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileWriterSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -31,11 +31,11 @@ import java.util.Collections;
 @UtilityClass
 public class ZipIt {
 
-    public static void add(@NonNull Path zip, @NonNull Path path, @NonNull ZipFileWriterSettings settings) throws IOException {
+    public static void add(@NonNull Path zip, @NonNull Path path, @NonNull ZipFileSettings settings) throws IOException {
         add(zip, Collections.singleton(path), settings);
     }
 
-    public static void add(@NonNull Path zip, @NonNull Collection<Path> paths, @NonNull ZipFileWriterSettings settings) throws IOException {
+    public static void add(@NonNull Path zip, @NonNull Collection<Path> paths, @NonNull ZipFileSettings settings) throws IOException {
         try (ZipFile.Writer zipFile = ZipFile.write(zip, settings)) {
             zipFile.add(paths);
         }

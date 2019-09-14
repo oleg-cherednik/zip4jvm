@@ -12,10 +12,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author Oleg Cherednik
@@ -35,9 +35,15 @@ public class Zip4jSuite {
     public static final List<Path> contentSrcDir = collect(srcDir, "cars", "Star Wars", "empty_dir", "empty_file.txt",
             "mcdonnell-douglas-f15-eagle.jpg", "Oleg Cherednik.txt", "saint-petersburg.jpg", "sig-sauer-pistol.jpg");
 
+    public static final Path fileBentleyContinental = carsDir.resolve("bentley-continental.jpg");
+    public static final Path fileFerrari = carsDir.resolve("ferrari-458-italia.jpg");
+    public static final Path fileWiesmann = carsDir.resolve("wiesmann-gt-mf5.jpg");
+
+    public static final Path fileSrcOlegCherednik = srcDir.resolve("Oleg Cherednik.txt");
+
     public static final List<Path> filesSrcDir = collect(srcDir, "empty_file.txt", "mcdonnell-douglas-f15-eagle.jpg", "Oleg Cherednik.txt",
             "saint-petersburg.jpg", "sig-sauer-pistol.jpg");
-    public static final List<Path> filesCarsDir = collect(carsDir, "bentley-continental.jpg", "ferrari-458-italia.jpg", "wiesmann-gt-mf5.jpg");
+    public static final List<Path> filesCarsDir = Arrays.asList(fileBentleyContinental, fileFerrari, fileWiesmann);
     public static final List<Path> filesStarWarsDir = collect(starWarsDir, "one.jpg", "two.jpg", "three.jpg", "four.jpg");
 
     private static Path createTempDirectory(String prefix) {
@@ -49,7 +55,7 @@ public class Zip4jSuite {
     }
 
     private static List<Path> collect(Path dir, String... fileNames) {
-        List<Path> paths = Stream.of(fileNames)
+        List<Path> paths = Arrays.stream(fileNames)
                                  .map(dir::resolve)
                                  .collect(Collectors.toList());
         return Collections.unmodifiableList(paths);

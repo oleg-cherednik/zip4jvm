@@ -10,7 +10,7 @@ import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import java.io.IOException;
 
-import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.MAX_SIZE;
+import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.MAC_SIZE;
 
 /**
  * @author Oleg Cherednik
@@ -63,7 +63,7 @@ public final class AesEncoder implements Encoder {
 
     @Override
     public void close(@NonNull DataOutput out) throws IOException {
-        out.write(engine.getMac(), 0, MAX_SIZE);
+        out.write(engine.getMac(), 0, MAC_SIZE);
     }
 
 }

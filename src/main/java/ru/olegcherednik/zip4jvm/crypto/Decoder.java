@@ -18,6 +18,8 @@ public interface Decoder {
 
     long getCompressedSize(@NonNull ZipEntry entry);
 
+    long getSizeOnDisk(@NonNull ZipEntry entry);
+
     default void close(@NonNull DataInput in) throws IOException {
     }
 

@@ -1,5 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.in.entry;
 
+import lombok.NonNull;
+import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
@@ -10,8 +12,6 @@ import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import lombok.NonNull;
-import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -90,6 +90,7 @@ public abstract class EntryInputStream extends InputStream {
         readDataDescriptor();
         checkChecksum();
         checkUncompressedSize();
+        in.close();
     }
 
     private void checkChecksum() {

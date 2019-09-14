@@ -20,10 +20,6 @@ public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
         return zip64 ? new Zip64() : new Standard();
     }
 
-    @Override
-    @NonNull
-    public abstract DataDescriptor read(@NonNull DataInput in) throws IOException;
-
     private static final class Standard extends DataDescriptorReader {
 
         @Override

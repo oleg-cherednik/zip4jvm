@@ -8,7 +8,7 @@ import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileWriterSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -32,11 +32,12 @@ public class StoreZipData {
     }
 
     private void createStoreSolidZip() throws IOException {
-        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
+        ZipFileSettings settings = ZipFileSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL).build())
                                                   .build();
+
         ZipIt.add(Zip4jSuite.storeSolidZip, Zip4jSuite.contentSrcDir, settings);
 
         assertThat(Files.exists(Zip4jSuite.storeSolidZip)).isTrue();
@@ -46,7 +47,7 @@ public class StoreZipData {
     }
 
     private void createStoreSplitZip() throws IOException {
-        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
+        ZipFileSettings settings = ZipFileSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL).build())
@@ -59,7 +60,7 @@ public class StoreZipData {
     }
 
     private void createStoreSolidPkwareZip() throws IOException {
-        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
+        ZipFileSettings settings = ZipFileSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL)
@@ -73,7 +74,7 @@ public class StoreZipData {
     }
 
     private void createStoreSolidAesZip() throws IOException {
-        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
+        ZipFileSettings settings = ZipFileSettings.builder()
                                                   .entrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL)

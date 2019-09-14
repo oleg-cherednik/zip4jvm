@@ -1,18 +1,18 @@
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
+import lombok.NonNull;
+import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jIncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import lombok.NonNull;
-import org.apache.commons.lang.ArrayUtils;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import java.io.IOException;
 
-import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.MAX_SIZE;
+import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.MAC_SIZE;
 import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.PASSWORD_CHECKSUM_SIZE;
 
 /**
@@ -59,12 +59,17 @@ public final class AesDecoder implements Decoder {
 
     @Override
     public long getCompressedSize(@NonNull ZipEntry entry) {
-        return entry.getCompressedSize() - saltLength - PASSWORD_CHECKSUM_SIZE - MAX_SIZE;
+        return entry.getCompressedSize() - saltLength - PASSWORD_CHECKSUM_SIZE - MAC_SIZE;
     }
 
     @Override
     public void close(@NonNull DataInput in) throws IOException {
         checkMessageAuthenticationCode(in);
+    }
+
+    @Override
+    public long getSizeOnDisk(@NonNull ZipEntry entry) {
+        return entry.getCompressedSize() + saltLength + PASSWORD_CHECKSUM_SIZE + MAC_SIZE;
     }
 
     private static byte[] getSalt(ZipEntry entry, DataInput in) throws IOException {
@@ -80,8 +85,8 @@ public final class AesDecoder implements Decoder {
     }
 
     private void checkMessageAuthenticationCode(DataInput in) throws IOException {
-        byte[] expected = in.readBytes(MAX_SIZE);
-        byte[] actual = ArrayUtils.subarray(engine.getMac(), 0, MAX_SIZE);
+        byte[] expected = in.readBytes(MAC_SIZE);
+        byte[] actual = ArrayUtils.subarray(engine.getMac(), 0, MAC_SIZE);
 
         if (!ArrayUtils.isEquals(expected, actual))
             throw new Zip4jException("Message Authentication Code (MAC) is incorrect");

@@ -10,8 +10,7 @@ import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileReaderSettings;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileWriterSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -41,10 +40,11 @@ public class Zip64Test {
 
     @Test
     public void shouldZipWhenZip64() throws IOException {
-        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
+        ZipFileSettings settings = ZipFileSettings.builder()
                                                   .entrySettings(
-                                                          ZipEntrySettings.builder()
-                                                                          .compression(Compression.STORE, CompressionLevel.NORMAL).build())
+                                                                      ZipEntrySettings.builder()
+                                                                                      .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                                                      .build())
                                                   .zip64(true).build();
         zipFile1 = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt.add(zipFile1, Zip4jSuite.contentSrcDir, settings);
@@ -66,11 +66,12 @@ public class Zip64Test {
 
     @Test
     public void shouldZipWhenZip64AndAesEncryption() throws IOException {
-        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
+        ZipFileSettings settings = ZipFileSettings.builder()
                                                   .entrySettings(
-                                                          ZipEntrySettings.builder()
-                                                                          .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                                          .encryption(Encryption.AES_256, fileName -> Zip4jSuite.password).build())
+                                                                      ZipEntrySettings.builder()
+                                                                                      .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                                                      .encryption(Encryption.AES_256, fileName -> Zip4jSuite.password)
+                                                                                      .build())
                                                   .comment("password: " + new String(Zip4jSuite.password))
                                                   .zip64(true).build();
 
@@ -85,7 +86,7 @@ public class Zip64Test {
     @Test(dependsOnMethods = "shouldZipWhenZip64AndAesEncryption")
     public void shouldUnzipWhenZip64AndAesEncryption() throws IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        ZipFile.Reader zipFile = ZipFile.read(zipFile2, ZipFileReaderSettings.builder().password(fileName -> Zip4jSuite.password).build());
+        ZipFile.Reader zipFile = ZipFile.read(zipFile2, fileName -> Zip4jSuite.password);
         zipFile.extract(destDir);
         Zip4jAssertions.assertThatDirectory(destDir).matches(TestUtils.dirAssert);
     }
@@ -94,10 +95,11 @@ public class Zip64Test {
 
     @Test
     public void shouldZipWhenZip64AndSplit() throws IOException {
-        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
+        ZipFileSettings settings = ZipFileSettings.builder()
                                                   .entrySettings(
-                                                          ZipEntrySettings.builder()
-                                                                          .compression(Compression.STORE, CompressionLevel.NORMAL).build())
+                                                                      ZipEntrySettings.builder()
+                                                                                      .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                                                      .build())
                                                   .splitSize(1024 * 1024)
                                                   .zip64(true).build();
 
@@ -113,7 +115,7 @@ public class Zip64Test {
     @Ignore
     public void shouldUnzipWhenZip64AndSplit() throws IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        ZipFile.Reader zipFile = ZipFile.read(zipFile3, ZipFileReaderSettings.builder().password(fileName -> Zip4jSuite.password).build());
+        ZipFile.Reader zipFile = ZipFile.read(zipFile3, fileName -> Zip4jSuite.password);
         zipFile.extract(destDir);
         Zip4jAssertions.assertThatDirectory(destDir).matches(TestUtils.dirAssert);
     }

@@ -9,7 +9,7 @@ import lombok.Getter;
  */
 @Getter
 @Builder
-public final class ZipFileWriterSettings {
+public final class ZipFileSettings {
 
     private final long splitSize;
     private final String comment;

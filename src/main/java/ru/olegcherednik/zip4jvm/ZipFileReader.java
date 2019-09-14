@@ -7,7 +7,6 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileReaderSettings;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import java.io.FileOutputStream;
@@ -18,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -28,12 +28,12 @@ import java.util.stream.Collectors;
 final class ZipFileReader implements ZipFile.Reader {
 
     private final ZipModel zipModel;
-    private final ZipFileReaderSettings settings;
+    private final Function<String, char[]> createPassword;
 
-    public ZipFileReader(@NonNull Path zip, ZipFileReaderSettings settings) throws IOException {
+    public ZipFileReader(@NonNull Path zip, Function<String, char[]> createPassword) throws IOException {
         checkZipFile(zip);
         zipModel = ZipModelBuilder.read(zip);
-        this.settings = settings;
+        this.createPassword = createPassword;
     }
 
     @Override
@@ -61,6 +61,7 @@ final class ZipFileReader implements ZipFile.Reader {
         }
     }
 
+    @NonNull
     @Override
     public InputStream extract(@NonNull String fileName) throws IOException {
         ZipEntry entry = zipModel.getEntryByFileName(ZipUtils.normalizeFileName(fileName));
@@ -68,9 +69,30 @@ final class ZipFileReader implements ZipFile.Reader {
         if (entry == null)
             throw new Zip4jException("No entry found for '" + fileName + '\'');
 
-        entry.setPassword(settings.getPassword().apply(entry.getFileName()));
+        entry.setPassword(createPassword.apply(entry.getFileName()));
 
         return entry.getIn();
+    }
+
+    @Override
+    public String getComment() {
+        return zipModel.getComment();
+    }
+
+    @NonNull
+    @Override
+    public Set<String> getEntryNames() {
+        return zipModel.getEntryNames();
+    }
+
+    @Override
+    public boolean isSplit() {
+        return zipModel.isSplit();
+    }
+
+    @Override
+    public boolean isZip64() {
+        return zipModel.isZip64();
     }
 
     private List<ZipEntry> getEntriesWithFileNamePrefix(String fileNamePrefix) {
@@ -83,7 +105,7 @@ final class ZipFileReader implements ZipFile.Reader {
         if (entry == null)
             throw new Zip4jException("Entry not found");
 
-        entry.setPassword(settings.getPassword().apply(entry.getFileName()));
+        entry.setPassword(createPassword.apply(entry.getFileName()));
         String fileName = getFileName.apply(entry);
         Path file = destDir.resolve(fileName);
 

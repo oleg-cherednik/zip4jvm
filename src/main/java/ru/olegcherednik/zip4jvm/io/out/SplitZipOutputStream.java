@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.io.out;
 
 import lombok.Getter;
 import lombok.NonNull;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.io.writers.ZipModelWriter;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -24,24 +23,15 @@ public class SplitZipOutputStream extends BaseDataOutput {
 
     private long disk;
 
-    @NonNull
     public static SplitZipOutputStream create(@NonNull ZipModel zipModel) throws IOException {
-        // TODO move to ZipParameters
-        if (zipModel.getSplitSize() >= 0 && zipModel.getSplitSize() < ZipModel.MIN_SPLIT_LENGTH)
-            throw new Zip4jException("split length less than minimum allowed split length of " + ZipModel.MIN_SPLIT_LENGTH + " Bytes");
-
         SplitZipOutputStream out = new SplitZipOutputStream(zipModel);
         out.writeDwordSignature(SPLIT_SIGNATURE);
-
-        if (zipModel.getCentralDirectoryOffs() == 0)
-            zipModel.setCentralDirectoryOffs(out.getOffs());
-
         return out;
     }
 
-    private SplitZipOutputStream(@NonNull ZipModel zipModel) throws FileNotFoundException {
+    private SplitZipOutputStream(ZipModel zipModel) throws FileNotFoundException {
         super(zipModel);
-        createFile(zipModel.getZip());
+        createFile(zipModel.getStreamFile());
     }
 
     @Override
@@ -82,17 +72,17 @@ public class SplitZipOutputStream extends BaseDataOutput {
     }
 
     private void openNextDisk() throws IOException {
-        Path splitFile = ZipModel.getSplitFilePath(zipModel.getZip(), ++disk);
+        Path splitFile = ZipModel.getSplitFilePath(zipModel.getStreamFile(), ++disk);
 
         super.close();
 
         if (Files.exists(splitFile))
             throw new IOException("split file: " + splitFile.getFileName() + " already exists in the current directory, cannot rename this file");
 
-        if (!zipModel.getZip().toFile().renameTo(splitFile.toFile()))
+        if (!zipModel.getStreamFile().toFile().renameTo(splitFile.toFile()))
             throw new IOException("cannot rename newly created split file");
 
-        createFile(zipModel.getZip());
+        createFile(zipModel.getStreamFile());
     }
 
     @Override

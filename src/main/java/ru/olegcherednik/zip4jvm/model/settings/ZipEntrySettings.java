@@ -19,7 +19,7 @@ public final class ZipEntrySettings {
     private final CompressionLevel compressionLevel;
     private final Encryption encryption;
     private final Function<String, char[]> password;
-    private final String comment;
+    private final Function<String, String> comment;
     private final boolean zip64;
     private final boolean utf8;
     private String basePath = "";
@@ -46,7 +46,7 @@ public final class ZipEntrySettings {
         private CompressionLevel compressionLevel = CompressionLevel.NORMAL;
         private Encryption encryption = Encryption.OFF;
         private Function<String, char[]> password = fileName -> null;
-        private String comment;
+        private Function<String, String> comment = fileName -> null;
         private boolean zip64;
         private boolean utf8 = true;
         private String basePath = "";
@@ -71,6 +71,10 @@ public final class ZipEntrySettings {
         }
 
         public ZipEntrySettings.Builder comment(String comment) {
+            return comment(fileName -> comment);
+        }
+
+        public ZipEntrySettings.Builder comment(@NonNull Function<String, String> comment) {
             this.comment = comment;
             return this;
         }

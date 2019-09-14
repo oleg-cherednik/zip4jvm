@@ -8,7 +8,7 @@ import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileWriterSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -40,7 +40,7 @@ public class ZipFileTest {
     }
 
     public void shouldCreateZipFileWhenUseZipFileAndAddFiles() throws IOException {
-        ZipFileWriterSettings zipFileSettings = ZipFileWriterSettings.builder().build();
+        ZipFileSettings zipFileSettings = ZipFileSettings.builder().build();
         ZipEntrySettings settings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
 
         try (ZipFile.Writer zipFile = ZipFile.write(file, zipFileSettings)) {
@@ -129,11 +129,12 @@ public class ZipFileTest {
     }
 
     public void shouldCreateZipFileWithContentWhenUseZipFile() throws IOException {
-        ZipFileWriterSettings zipFileSettings = ZipFileWriterSettings.builder()
+        ZipFileSettings zipFileSettings = ZipFileSettings.builder()
                                                          .comment("Global Comment")
                                                          .entrySettings(ZipEntrySettings.builder()
-                                                                                        .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                                                        .build())
+                                                                                                    .compression(Compression.STORE,
+                                                                                                            CompressionLevel.NORMAL)
+                                                                                                    .build())
                                                          .build();
 
         ZipEntrySettings starWarsSettings = ZipEntrySettings.builder()
