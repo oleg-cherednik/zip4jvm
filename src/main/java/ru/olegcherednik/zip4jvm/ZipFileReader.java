@@ -15,7 +15,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
@@ -40,12 +39,6 @@ final class ZipFileReader implements ZipFile.Reader {
     public void extract(@NonNull Path destDir) throws IOException {
         for (ZipEntry entry : zipModel.getEntries())
             extractEntry(destDir, entry, ZipEntry::getFileName);
-    }
-
-    @Override
-    public void extract(@NonNull Path destDir, @NonNull Collection<String> fileNames) throws IOException {
-        for (String fileName : fileNames)
-            extract(destDir, fileName);
     }
 
     @Override

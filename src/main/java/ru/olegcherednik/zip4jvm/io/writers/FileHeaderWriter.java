@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
+import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import java.io.IOException;
 import java.nio.charset.Charset;

@@ -7,7 +7,7 @@ import ru.olegcherednik.zip4jvm.io.out.SingleZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.writers.ExistedEntryWriter;
 import ru.olegcherednik.zip4jvm.io.writers.RegularFileWriter;
-import ru.olegcherednik.zip4jvm.io.writers.Writer;
+import ru.olegcherednik.zip4jvm.utils.function.Writer;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -42,17 +41,6 @@ final class ZipFileWriter implements ZipFile.Writer {
         this.zip = zip;
         defEntrySettings = zipFileSettings.getEntrySettings();
         tempZipModel = createTempZipModel(zip, zipFileSettings, fileNameWriter);
-    }
-
-    @Override
-    public void add(@NonNull Path path) throws IOException {
-        Objects.requireNonNull(defEntrySettings);
-        add(Collections.singleton(path), defEntrySettings);
-    }
-
-    @Override
-    public void add(@NonNull Path path, @NonNull ZipEntrySettings entrySettings) throws IOException {
-        add(Collections.singleton(path), entrySettings);
     }
 
     @Override

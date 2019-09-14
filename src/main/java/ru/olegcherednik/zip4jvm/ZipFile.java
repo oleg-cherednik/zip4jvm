@@ -11,25 +11,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 import java.util.function.Function;
 
 /**
- * ZipFile real-time implementation.
- * <br>
- * When create new instance of this class:
- * <ul>
- * <li><i>zip file exists</i> - open zip archive</li>
- * <li><i>zip file not exists</i> - create new empty zip archive</li>
- * </ul>
- * <p>
- * To close zip archive correctly, do call {@link ZipFile.Writer#close()} method.
- * <pre>
- * try (ZipFile zipFile = new ZipFile(Paths.get("~/src.zip"))) {
- *     zipFile.addEntry(...);
- * }
- * </pre>
- *
  * @author Oleg Cherednik
  * @since 01.09.2019
  */
@@ -56,7 +42,10 @@ public final class ZipFile {
 
         void extract(@NonNull Path destDir) throws IOException;
 
-        void extract(@NonNull Path destDir, @NonNull Collection<String> fileNames) throws IOException;
+        default void extract(@NonNull Path destDir, @NonNull Collection<String> fileNames) throws IOException {
+            for (String fileName : fileNames)
+                extract(destDir, fileName);
+        }
 
         void extract(@NonNull Path destDir, @NonNull String fileName) throws IOException;
 
@@ -75,9 +64,13 @@ public final class ZipFile {
 
     public interface Writer extends Closeable {
 
-        void add(@NonNull Path path) throws IOException;
+        default void add(@NonNull Path path) throws IOException {
+            add(Collections.singleton(path));
+        }
 
-        void add(@NonNull Path path, @NonNull ZipEntrySettings entrySettings) throws IOException;
+        default void add(@NonNull Path path, @NonNull ZipEntrySettings entrySettings) throws IOException {
+            add(Collections.singleton(path), entrySettings);
+        }
 
         void add(@NonNull Collection<Path> paths) throws IOException;
 

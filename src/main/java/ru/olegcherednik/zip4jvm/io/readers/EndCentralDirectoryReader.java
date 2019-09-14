@@ -4,6 +4,7 @@ import lombok.NonNull;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
 

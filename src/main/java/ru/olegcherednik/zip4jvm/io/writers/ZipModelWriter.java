@@ -10,6 +10,7 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.CentralDirectoryBuilder;
 import ru.olegcherednik.zip4jvm.model.builders.EndCentralDirectoryBuilder;
 import ru.olegcherednik.zip4jvm.model.builders.Zip64Builder;
+import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import java.io.IOException;
 
