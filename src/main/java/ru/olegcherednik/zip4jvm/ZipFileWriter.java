@@ -131,12 +131,12 @@ final class ZipFileWriter implements ZipFile.Writer {
 
     private void moveTempZipFiles() throws IOException {
         for (long i = 0; i <= tempZipModel.getTotalDisks(); i++) {
-            Path src = tempZipModel.getStreamPartFile(i);
+            Path src = tempZipModel.getPartFile(i);
             Path dest = zip.getParent().resolve(src.getFileName());
             Files.move(src, dest);
         }
 
-        Files.deleteIfExists(tempZipModel.getStreamFile().getParent());
+        Files.deleteIfExists(tempZipModel.getFile().getParent());
     }
 
     private static ZipModel createTempZipModel(Path zip, ZipFileSettings zipFileSettings, Map<String, Writer> fileNameWriter) throws IOException {
