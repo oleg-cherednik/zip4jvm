@@ -23,7 +23,7 @@ import java.security.spec.InvalidKeySpecException;
 public final class AesEngine {
 
     private static final int BLOCK_SIZE = 16;
-    public static final int MAX_SIZE = 10;
+    public static final int MAC_SIZE = 10;
     public static final int PASSWORD_CHECKSUM_SIZE = 2;
 
     private final Cipher cipher;
@@ -105,7 +105,7 @@ public final class AesEngine {
     }
 
     public static long getCompressedSize(long uncompressedSize, AesStrength strength) {
-        return uncompressedSize + strength.saltLength() + MAX_SIZE + PASSWORD_CHECKSUM_SIZE;
+        return uncompressedSize + strength.saltLength() + MAC_SIZE + PASSWORD_CHECKSUM_SIZE;
     }
 
 }

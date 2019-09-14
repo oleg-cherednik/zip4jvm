@@ -81,11 +81,11 @@ public final class ZipFile {
 
         void add(@NonNull Collection<Path> paths, @NonNull ZipEntrySettings entrySettings) throws IOException;
 
-        void remove(@NonNull String entryName) throws FileNotFoundException;
+        void remove(@NonNull String prefixEntryName) throws FileNotFoundException;
 
-        default void remove(@NonNull Collection<String> entryNames) throws FileNotFoundException {
-            for (String entryName : entryNames)
-                remove(entryName);
+        default void remove(@NonNull Collection<String> prefixEntryNames) throws FileNotFoundException {
+            for (String prefixEntryName : prefixEntryNames)
+                remove(prefixEntryName);
         }
 
         void setComment(String comment);

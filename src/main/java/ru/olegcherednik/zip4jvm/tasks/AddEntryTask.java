@@ -30,4 +30,9 @@ public final class AddEntryTask implements Task {
             IOUtils.copyLarge(in, os);
         }
     }
+
+    @Override
+    public String toString() {
+        return '+' + entry.getFileName();
+    }
 }

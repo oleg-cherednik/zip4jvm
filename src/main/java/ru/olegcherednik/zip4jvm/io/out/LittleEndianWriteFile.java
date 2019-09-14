@@ -51,9 +51,16 @@ public class LittleEndianWriteFile implements DataOutputFile {
         return buf;
     }
 
+    int of;
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
+        for (int i = offs; i < offs + len; i++, of++) {
+            if (of % 16 == 0)
+                System.out.println();
+            System.out.print(String.format("%02X ", buf[i]));
+        }
+
         out.write(buf, offs, len);
     }
 

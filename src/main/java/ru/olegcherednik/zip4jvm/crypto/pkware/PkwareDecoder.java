@@ -1,10 +1,10 @@
 package ru.olegcherednik.zip4jvm.crypto.pkware;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 
@@ -31,6 +31,11 @@ public final class PkwareDecoder implements Decoder {
     @Override
     public long getCompressedSize(@NonNull ZipEntry entry) {
         return entry.getCompressedSize() - PkwareHeader.SIZE;
+    }
+
+    @Override
+    public long getSizeOnDisk(@NonNull ZipEntry entry) {
+        return entry.getCompressedSize() + PkwareHeader.SIZE;
     }
 
 }

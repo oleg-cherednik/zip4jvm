@@ -52,6 +52,15 @@ public abstract class EntryInputStream extends InputStream {
         throw new Zip4jException("Compression is not supported: " + compression);
     }
 
+    public static CopyEntryInputStream copy(@NonNull ZipEntry entry, @NonNull DataInput in) throws IOException {
+//        LocalFileHeader localFileHeader = new LocalFileHeaderReader(entry.getLocalFileHeaderOffs()).read(in);
+//        entry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
+        // TODO check that localFileHeader matches fileHeader
+        Decoder decoder = entry.getEncryption().getCreateDecoder().apply(entry, in);
+
+        return new CopyEntryInputStream(entry, in, decoder);
+    }
+
     protected EntryInputStream(ZipEntry entry, DataInput in, Decoder decoder) {
         this.entry = entry;
         this.in = in;

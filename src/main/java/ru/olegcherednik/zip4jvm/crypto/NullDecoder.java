@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.crypto;
 
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import lombok.NonNull;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 /**
  * @author Oleg Cherednik
@@ -15,6 +15,11 @@ final class NullDecoder implements Decoder {
 
     @Override
     public long getCompressedSize(@NonNull ZipEntry entry) {
+        return entry.getCompressedSize();
+    }
+
+    @Override
+    public long getSizeOnDisk(@NonNull ZipEntry entry) {
         return entry.getCompressedSize();
     }
 

@@ -24,6 +24,8 @@ public final class CreateTemporaryZipFileTask implements Task {
 //        out.seek(zipModel.getCentralDirectoryOffs());
     }
 
+
+
     private static DataOutput createDataOutput(ZipModelContext context) throws IOException {
         ZipModel zipModel = context.getZipModel();
         Path file = zipModel.getFile();

@@ -24,7 +24,8 @@ import java.util.zip.Checksum;
  */
 public abstract class EntryOutputStream extends OutputStream {
 
-    private static final String COMPRESSED_DATA = "entryCompressedDataOffs";
+    // TODO temporary
+    public static final String COMPRESSED_DATA = "entryCompressedDataOffs";
 
     private final ZipEntry entry;
     private final Checksum checksum = new CRC32();
@@ -33,7 +34,7 @@ public abstract class EntryOutputStream extends OutputStream {
     protected final DataOutput out;
 
     public static EntryOutputStream create(@NonNull ZipEntry entry, @NonNull ZipModel zipModel, @NonNull DataOutput out) throws IOException {
-        EntryOutputStream os = createOutputStream(entry, entry.getCompression(), out);
+        EntryOutputStream os = createOutputStream(entry, out);
 
         // TODO move it to the separate method
         zipModel.addEntry(entry);
@@ -44,17 +45,18 @@ public abstract class EntryOutputStream extends OutputStream {
         return os;
     }
 
-    public static EntryOutputStream create(@NonNull ZipEntry entry, @NonNull Compression compression, @NonNull DataOutput out) throws IOException {
-        EntryOutputStream os = createOutputStream(entry, compression, out);
+    public static EntryOutputStream copy(@NonNull ZipEntry entry, @NonNull DataOutput out) throws IOException {
+        EntryOutputStream os = new CopyEntryOutputStream(entry, out);
 
-        entry.setLocalFileHeaderOffs(out.getOffs());
+//        entry.setLocalFileHeaderOffs(out.getOffs());
 
-        os.writeLocalFileHeader();
-        os.writeEncryptionHeader();
+//        os.writeLocalFileHeader();
+//        os.writeEncryptionHeader();
         return os;
     }
 
-    private static EntryOutputStream createOutputStream(ZipEntry entry, Compression compression, DataOutput out) throws IOException {
+    private static EntryOutputStream createOutputStream(ZipEntry entry, DataOutput out) throws IOException {
+        Compression compression = entry.getCompression();
         entry.setDisk(out.getDisk());
 
         if (compression == Compression.STORE)
