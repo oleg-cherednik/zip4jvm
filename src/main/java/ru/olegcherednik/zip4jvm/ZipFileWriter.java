@@ -3,9 +3,10 @@ package ru.olegcherednik.zip4jvm;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import ru.olegcherednik.zip4jvm.model.ZipModelContext;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
@@ -18,6 +19,7 @@ import ru.olegcherednik.zip4jvm.tasks.CreateTemporaryZipFileTask;
 import ru.olegcherednik.zip4jvm.tasks.MoveTemporaryZipFileTask;
 import ru.olegcherednik.zip4jvm.tasks.RemoveOriginalZipFileTask;
 import ru.olegcherednik.zip4jvm.tasks.Task;
+import ru.olegcherednik.zip4jvm.tasks.ZipModelContext;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
@@ -40,9 +42,10 @@ import java.util.stream.Collectors;
  * @author Oleg Cherednik
  * @since 09.09.2019
  */
-final class ZipFileWriter implements ZipFile.Writer {
+final class ZipFileWriter implements ZipFile.Writer, ZipModelContext {
 
     private final ZipEntrySettings defEntrySettings;
+    @Getter
     private final ZipModel zipModel;
     private final Set<String> existedEntryNames;
     private final Map<String, ZipModelEntry> addEntryNameZipModelEntry = new LinkedHashMap<>();
@@ -114,6 +117,7 @@ final class ZipFileWriter implements ZipFile.Writer {
                                          .filter(entryName -> entryName.startsWith(normalizedPrefixEntryName))
                                          .collect(Collectors.toSet());
 
+        // TODO it's not working, check it in test
         if (entryNames.isEmpty())
             throw new FileNotFoundException(prefixEntryName);
 
@@ -155,12 +159,8 @@ final class ZipFileWriter implements ZipFile.Writer {
         tasks.add(new RemoveOriginalZipFileTask());
         tasks.add(new MoveTemporaryZipFileTask());
 
-        ZipModelContext context = ZipModelContext.builder()
-                                                 .zipModel(zipModel)
-                                                 .build();
-
         for (Task task : tasks)
-            task.accept(context);
+            task.accept(this);
     }
 
     @Getter
@@ -175,5 +175,9 @@ final class ZipFileWriter implements ZipFile.Writer {
             return zipModel.getFile().toString() + " ->" + zipEntry.getFileName();
         }
     }
+
+    @Getter
+    @Setter
+    private DataOutput out;
 
 }

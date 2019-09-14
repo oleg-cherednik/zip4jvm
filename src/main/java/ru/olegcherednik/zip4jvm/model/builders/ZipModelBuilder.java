@@ -56,12 +56,6 @@ public final class ZipModelBuilder {
     }
 
     @NonNull
-    // TODO do we really need it; we always know is it exists or not
-    public static ZipModel readOrCreate(@NonNull Path zipFile) throws IOException {
-        return Files.exists(zipFile) ? new ZipModelReader(zipFile).read() : new ZipModel(zipFile);
-    }
-
-    @NonNull
     public ZipModel create() throws IOException {
         ZipModel zipModel = new ZipModel(zip);
 

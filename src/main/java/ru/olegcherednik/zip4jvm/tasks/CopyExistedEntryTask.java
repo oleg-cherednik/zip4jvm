@@ -16,7 +16,6 @@ import ru.olegcherednik.zip4jvm.io.writers.LocalFileHeaderWriter;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import ru.olegcherednik.zip4jvm.model.ZipModelContext;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.Closeable;

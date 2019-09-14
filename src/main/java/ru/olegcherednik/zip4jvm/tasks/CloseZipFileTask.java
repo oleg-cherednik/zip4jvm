@@ -1,7 +1,5 @@
 package ru.olegcherednik.zip4jvm.tasks;
 
-import ru.olegcherednik.zip4jvm.model.ZipModelContext;
-
 import java.io.IOException;
 
 /**
