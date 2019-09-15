@@ -3,7 +3,6 @@ package ru.olegcherednik.zip4jvm.io.writers;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
-import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
@@ -15,6 +14,7 @@ import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import java.io.Closeable;
@@ -32,10 +32,12 @@ public class ExistedEntryWriter implements Writer {
     private final ZipModel srcZipModel;
     private final String entryName;
     private final ZipModel destZipModel;
+    private final char[] password;
 
     @Override
     public void write(@NonNull DataOutput out) throws IOException {
         ZipEntry entry = srcZipModel.getEntryByFileName(entryName);
+        entry.setPassword(entry.isEncrypted() ? password : null);
 
         try (CopyEntryInputStream in = new CopyEntryInputStream(entry, srcZipModel)) {
             if (srcZipModel != destZipModel)
@@ -60,12 +62,10 @@ public class ExistedEntryWriter implements Writer {
 
         private final ZipEntry entry;
         private final DataInput in;
-        private final Decoder decoder;
 
         public CopyEntryInputStream(ZipEntry entry, ZipModel zipModel) throws IOException {
             this.entry = entry;
             in = zipModel.isSplit() ? SplitZipInputStream.create(zipModel, entry.getDisk()) : SingleZipInputStream.create(zipModel);
-            decoder = entry.getEncryption().getCreateDecoder().apply(entry, in);
         }
 
         public void copyLocalFileHeader(@NonNull DataOutput out) throws IOException {
@@ -75,7 +75,7 @@ public class ExistedEntryWriter implements Writer {
         }
 
         public void copyEncryptionHeaderAndData(@NonNull DataOutput out) throws IOException {
-            long size = decoder.getSizeOnDisk(entry);
+            long size = entry.getCompressedSize();
             byte[] buf = new byte[1024 * 4];
 
             while (size > 0) {
@@ -99,6 +99,11 @@ public class ExistedEntryWriter implements Writer {
         @Override
         public void close() throws IOException {
             in.close();
+        }
+
+        @Override
+        public String toString() {
+            return ZipUtils.toString(in.getOffs());
         }
 
     }

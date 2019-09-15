@@ -70,6 +70,11 @@ public final class ZipEntrySettings {
             return this;
         }
 
+        public ZipEntrySettings.Builder password(@NonNull Function<String, char[]> password) {
+            this.password = password;
+            return this;
+        }
+
         public ZipEntrySettings.Builder comment(String comment) {
             return comment(fileName -> comment);
         }

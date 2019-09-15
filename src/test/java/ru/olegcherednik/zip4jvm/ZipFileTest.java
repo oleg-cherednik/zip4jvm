@@ -131,10 +131,10 @@ public class ZipFileTest {
     public void shouldCreateZipFileWithContentWhenUseZipFile() throws IOException {
         ZipFileSettings zipFileSettings = ZipFileSettings.builder()
                                                          .comment("Global Comment")
-                                                         .entrySettings(ZipEntrySettings.builder()
-                                                                                                    .compression(Compression.STORE,
+                                                         .defEntrySettings(ZipEntrySettings.builder()
+                                                                                           .compression(Compression.STORE,
                                                                                                             CompressionLevel.NORMAL)
-                                                                                                    .build())
+                                                                                           .build())
                                                          .build();
 
         ZipEntrySettings starWarsSettings = ZipEntrySettings.builder()

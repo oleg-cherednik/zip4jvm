@@ -54,7 +54,7 @@ public class ZipMiscTest {
 
     public void shouldThrowExceptionWhenAddedFileNotExists() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettings(
+                                                  .defEntrySettings(
                                                                       ZipEntrySettings.builder()
                                                                                       .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                                                       .build())
@@ -88,7 +88,7 @@ public class ZipMiscTest {
     public void shouldRetrieveTrueWhenSplitZipWithOneDisk() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
                                                   .splitSize(1024 * 1024)
-                                                  .entrySettings(
+                                                  .defEntrySettings(
                                                                       ZipEntrySettings.builder()
                                                                                       .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                                                       .build())

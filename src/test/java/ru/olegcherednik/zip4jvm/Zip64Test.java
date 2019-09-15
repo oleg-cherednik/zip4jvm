@@ -41,7 +41,7 @@ public class Zip64Test {
     @Test
     public void shouldZipWhenZip64() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettings(
+                                                  .defEntrySettings(
                                                                       ZipEntrySettings.builder()
                                                                                       .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                                                       .build())
@@ -67,7 +67,7 @@ public class Zip64Test {
     @Test
     public void shouldZipWhenZip64AndAesEncryption() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettings(
+                                                  .defEntrySettings(
                                                                       ZipEntrySettings.builder()
                                                                                       .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                                                       .encryption(Encryption.AES_256, fileName -> Zip4jSuite.password)
@@ -96,7 +96,7 @@ public class Zip64Test {
     @Test
     public void shouldZipWhenZip64AndSplit() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettings(
+                                                  .defEntrySettings(
                                                                       ZipEntrySettings.builder()
                                                                                       .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                                                       .build())

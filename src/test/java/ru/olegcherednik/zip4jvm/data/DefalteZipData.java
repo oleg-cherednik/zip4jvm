@@ -32,7 +32,7 @@ public final class DefalteZipData {
 
     private static void createDeflateSolidZip() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettings(
+                                                  .defEntrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
                                                   .build();
@@ -46,7 +46,7 @@ public final class DefalteZipData {
 
     private static void createDeflateSplitZip() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettings(
+                                                  .defEntrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
                                                   .splitSize(1024 * 1024).build();
@@ -59,7 +59,7 @@ public final class DefalteZipData {
 
     private static void createDeflateSolidPkwareZip() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettings(
+                                                  .defEntrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
                                                                           .encryption(Encryption.PKWARE, fileName -> Zip4jSuite.password).build())
@@ -73,7 +73,7 @@ public final class DefalteZipData {
 
     private static void createDeflateSolidAesZip() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettings(
+                                                  .defEntrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
                                                                           .encryption(Encryption.AES_256, String::toCharArray).build())

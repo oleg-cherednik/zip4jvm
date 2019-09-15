@@ -42,7 +42,7 @@ public class CompressionStoreTest {
 
     public void shouldCreateSingleZipWithFilesWhenStoreCompression() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettings(
+                                                  .defEntrySettings(
                                                                       ZipEntrySettings.builder()
                                                                                       .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                                                       .build())
@@ -56,7 +56,7 @@ public class CompressionStoreTest {
 
     public void shouldCreateSplitZipWithFilesWhenStoreCompression() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettings(
+                                                  .defEntrySettings(
                                                                       ZipEntrySettings.builder()
                                                                                       .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                                                       .build())
@@ -70,7 +70,7 @@ public class CompressionStoreTest {
 
     public void shouldCreateSingleZipWithEntireFolderWhenStoreCompression() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettings(
+                                                  .defEntrySettings(
                                                                       ZipEntrySettings.builder()
                                                                                       .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                                                       .build())
@@ -86,7 +86,7 @@ public class CompressionStoreTest {
 
     public void shouldCreateSplitZipWithEntireFolderWhenStoreCompression() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettings(
+                                                  .defEntrySettings(
                                                                       ZipEntrySettings.builder()
                                                                                       .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                                                       .build())
@@ -114,7 +114,7 @@ public class CompressionStoreTest {
 
     public void shouldUnzipWhenWhenStoreCompressionAndPkwareEncryption() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettings(
+                                                  .defEntrySettings(
                                                                       ZipEntrySettings.builder()
                                                                                       .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                                                       .encryption(Encryption.PKWARE, fileName -> Zip4jSuite.password)
@@ -135,7 +135,7 @@ public class CompressionStoreTest {
 
     public void shouldUnzipWhenWhenStoreCompressionAndAesEncryption() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettings(
+                                                  .defEntrySettings(
                                                                       ZipEntrySettings.builder()
                                                                                       .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                                                       .encryption(Encryption.AES_256, fileName -> Zip4jSuite.password)

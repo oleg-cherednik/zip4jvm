@@ -33,9 +33,4 @@ public final class PkwareDecoder implements Decoder {
         return entry.getCompressedSize() - PkwareHeader.SIZE;
     }
 
-    @Override
-    public long getSizeOnDisk(@NonNull ZipEntry entry) {
-        return entry.getCompressedSize() + PkwareHeader.SIZE;
-    }
-
 }

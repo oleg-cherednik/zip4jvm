@@ -7,13 +7,13 @@ import ru.olegcherednik.zip4jvm.io.out.SingleZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.writers.ExistedEntryWriter;
 import ru.olegcherednik.zip4jvm.io.writers.RegularFileWriter;
-import ru.olegcherednik.zip4jvm.utils.function.Writer;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
+import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -33,14 +33,14 @@ import java.util.stream.Collectors;
 final class ZipFileWriter implements ZipFile.Writer {
 
     private final Path zip;
-    private final ZipEntrySettings defEntrySettings;
     private final ZipModel tempZipModel;
+    private final ZipEntrySettings defEntrySettings;
     private final Map<String, Writer> fileNameWriter = new LinkedHashMap<>();
 
     public ZipFileWriter(@NonNull Path zip, @NonNull ZipFileSettings zipFileSettings) throws IOException {
         this.zip = zip;
-        defEntrySettings = zipFileSettings.getEntrySettings();
         tempZipModel = createTempZipModel(zip, zipFileSettings, fileNameWriter);
+        defEntrySettings = zipFileSettings.getDefEntrySettings();
     }
 
     @Override
@@ -84,7 +84,10 @@ final class ZipFileWriter implements ZipFile.Writer {
         for (String fileName : srcZipModel.getEntryNames()) {
             if (fileNameWriter.containsKey(fileName))
                 throw new Zip4jException("File name duplication");
-            if (fileNameWriter.put(fileName, new ExistedEntryWriter(srcZipModel, fileName, tempZipModel)) != null)
+
+            char[] password = defEntrySettings == null ? null : defEntrySettings.getPassword().apply(fileName);
+
+            if (fileNameWriter.put(fileName, new ExistedEntryWriter(srcZipModel, fileName, tempZipModel, password)) != null)
                 throw new Zip4jException("File name duplication");
         }
     }
@@ -103,8 +106,8 @@ final class ZipFileWriter implements ZipFile.Writer {
 
     private void createTempZipFiles() throws IOException {
         try (DataOutput out = creatDataOutput(tempZipModel)) {
-            for (Writer task : fileNameWriter.values())
-                task.write(out);
+            for (Writer writer : fileNameWriter.values())
+                writer.write(out);
         }
     }
 
@@ -141,7 +144,14 @@ final class ZipFileWriter implements ZipFile.Writer {
             if (zipModel.isZip64())
                 tempZipModel.setZip64(zipModel.isZip64());
 
-            zipModel.getEntryNames().forEach(entryName -> fileNameWriter.put(entryName, new ExistedEntryWriter(zipModel, entryName, tempZipModel)));
+            zipModel.getEntryNames().forEach(entryName -> {
+                char[] password = null;
+
+                if (zipFileSettings.getDefEntrySettings() != null)
+                    password = zipFileSettings.getDefEntrySettings().getPassword().apply(entryName);
+
+                fileNameWriter.put(entryName, new ExistedEntryWriter(zipModel, entryName, tempZipModel, password));
+            });
         }
 
         return tempZipModel;

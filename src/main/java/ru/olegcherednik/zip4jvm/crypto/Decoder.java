@@ -1,8 +1,8 @@
 package ru.olegcherednik.zip4jvm.crypto;
 
+import lombok.NonNull;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import lombok.NonNull;
 
 import java.io.IOException;
 
@@ -17,8 +17,6 @@ public interface Decoder {
     void decrypt(@NonNull byte[] buf, int offs, int len);
 
     long getCompressedSize(@NonNull ZipEntry entry);
-
-    long getSizeOnDisk(@NonNull ZipEntry entry);
 
     default void close(@NonNull DataInput in) throws IOException {
     }

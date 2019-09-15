@@ -1,7 +1,6 @@
 package ru.olegcherednik.zip4jvm.crypto;
 
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
-import lombok.NonNull;
 
 import java.io.IOException;
 
@@ -12,11 +11,11 @@ import java.io.IOException;
 final class NullEncoder implements Encoder {
 
     @Override
-    public void writeEncryptionHeader(@NonNull DataOutput out) throws IOException {
+    public void writeEncryptionHeader(DataOutput out) throws IOException {
     }
 
     @Override
-    public void encrypt(@NonNull byte[] buf, int offs, int len) {
+    public void encrypt(byte[] buf, int offs, int len) {
     }
 
     @Override

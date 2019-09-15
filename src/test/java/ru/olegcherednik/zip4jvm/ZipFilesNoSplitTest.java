@@ -38,7 +38,7 @@ public class ZipFilesNoSplitTest {
 
     public void shouldCreateNewZipWithFiles() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettings(
+                                                  .defEntrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
                                                   .build();

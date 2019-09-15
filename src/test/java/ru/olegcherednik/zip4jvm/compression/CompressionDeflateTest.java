@@ -42,7 +42,7 @@ public class CompressionDeflateTest {
 
     public void shouldCreateSingleZipWithFilesWhenDeflateCompression() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettings(
+                                                  .defEntrySettings(
                                                                       ZipEntrySettings.builder()
                                                                                       .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
                                                                                       .build())
@@ -56,7 +56,7 @@ public class CompressionDeflateTest {
 
     public void shouldCreateSplitZipWithFilesWhenDeflateCompression() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettings(
+                                                  .defEntrySettings(
                                                                       ZipEntrySettings.builder()
                                                                                       .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
                                                                                       .build())
@@ -70,7 +70,7 @@ public class CompressionDeflateTest {
 
     public void shouldCreateSingleZipWithEntireFolderWhenDeflateCompression() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettings(
+                                                  .defEntrySettings(
                                                                       ZipEntrySettings.builder()
                                                                                       .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
                                                                                       .build())
@@ -87,7 +87,7 @@ public class CompressionDeflateTest {
     public void shouldCreateSplitZipWithEntireFolderWhenStoreCompression() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
                                                   .splitSize(1024 * 1024)
-                                                  .entrySettings(
+                                                  .defEntrySettings(
                                                                       ZipEntrySettings.builder()
                                                                                       .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                                                       .build())
@@ -110,7 +110,7 @@ public class CompressionDeflateTest {
 
     public void shouldUnzipWhenWhenStoreCompressionAndPkwareEncryption() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettings(
+                                                  .defEntrySettings(
                                                                       ZipEntrySettings.builder()
                                                                                       .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
                                                                                       .encryption(Encryption.PKWARE, fileName -> Zip4jSuite.password)
@@ -130,7 +130,7 @@ public class CompressionDeflateTest {
 
     public void shouldUnzipWhenWhenDeflateCompressionAndAesEncryption() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettings(
+                                                  .defEntrySettings(
                                                                       ZipEntrySettings.builder()
                                                                                       .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
                                                                                       .encryption(Encryption.AES_256, fileName -> Zip4jSuite.password)
