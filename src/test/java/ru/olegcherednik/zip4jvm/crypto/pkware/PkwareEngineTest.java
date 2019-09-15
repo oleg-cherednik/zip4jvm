@@ -2,17 +2,16 @@ package ru.olegcherednik.zip4jvm.crypto.pkware;
 
 import org.testng.annotations.Test;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 /**
  * @author Oleg Cherednik
  * @since 15.09.2019
  */
 @Test
-public class PkwareDecoderTest {
+public class PkwareEngineTest {
 
-    @SuppressWarnings("ConstantConditions")
     public void shouldThrowNullPointerExceptionWhenNull() {
-//        assertThatThrownBy(() -> PkwareDecoder.create(null, createDataInput())).isExactlyInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> new PkwareEngine(null)).isExactlyInstanceOf(NullPointerException.class);
     }
-
-
 }

@@ -82,12 +82,12 @@ public class CentralDirectory {
 
         @NonNull
         public byte[] getFileName(@NonNull Charset charset) {
-            return fileName != null ? fileName.getBytes(charset) : ArrayUtils.EMPTY_BYTE_ARRAY;
+            return fileName == null ? ArrayUtils.EMPTY_BYTE_ARRAY : fileName.getBytes(charset);
         }
 
         @NonNull
         public byte[] getComment(@NonNull Charset charset) {
-            return comment != null ? comment.getBytes(charset) : ArrayUtils.EMPTY_BYTE_ARRAY;
+            return comment == null ? ArrayUtils.EMPTY_BYTE_ARRAY : comment.getBytes(charset);
         }
 
         @NonNull
