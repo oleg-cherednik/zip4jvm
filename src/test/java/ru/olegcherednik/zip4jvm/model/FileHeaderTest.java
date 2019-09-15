@@ -34,7 +34,7 @@ public class FileHeaderTest {
         Zip4jSuite.removeDir(rootDir);
     }
 
-    public void shouldUseSettersCorrectly() throws IOException {
+    public void shouldUseSettersGettersCorrectly() throws IOException {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         InternalFileAttributes internalFileAttributes = InternalFileAttributes.createDataBasedDelegate(new byte[] { 1, 2 });
         ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.createOperationBasedDelegate(Zip4jSuite.fileBentleyContinental);
@@ -98,15 +98,22 @@ public class FileHeaderTest {
         assertThat(new CentralDirectory.FileHeader("zip4jvm").toString()).isEqualTo("zip4jvm");
     }
 
-    public void shouldRetrieveTrueWhenIsDirectoryForFileNameEndsWithDirectoryMarker() {
-        assertThat(new CentralDirectory.FileHeader().isDirectory()).isFalse();
-        assertThat(new CentralDirectory.FileHeader("zip4jvm").isDirectory()).isFalse();
-        assertThat(new CentralDirectory.FileHeader("zip4jvm/").isDirectory()).isTrue();
-        assertThat(new CentralDirectory.FileHeader("zip4jvm\\").isDirectory()).isTrue();
-    }
-
     public void shouldThrowNullPointerExceptionWhenNull() {
         assertThatThrownBy(() -> new CentralDirectory.FileHeader().getFileName(null)).isExactlyInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> new CentralDirectory.FileHeader().getComment(null)).isExactlyInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> new CentralDirectory.FileHeader().setExtraField(null)).isExactlyInstanceOf(NullPointerException.class);
+    }
+
+    public void shouldRetrieveIsZip64TrueWhenZip64ExtendedInfoIsNotNull() {
+        CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
+        assertThat(fileHeader.getExtraField().getExtendedInfo()).isSameAs(Zip64.ExtendedInfo.NULL);
+        assertThat(fileHeader.isZip64()).isFalse();
+
+        Zip64.ExtendedInfo extendedInfo = Zip64.ExtendedInfo.builder().uncompressedSize(1).compressedSize(2).offsLocalHeaderRelative(3)
+                                                            .disk(4).build();
+
+        fileHeader.getExtraField().setExtendedInfo(extendedInfo);
+        assertThat(fileHeader.isZip64()).isTrue();
     }
 
 }

@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.lang.ArrayUtils;
-import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import java.nio.charset.Charset;
 import java.util.Collections;
@@ -95,10 +94,6 @@ public class CentralDirectory {
             if (compressionMethod == CompressionMethod.AES)
                 return Compression.parseCompressionMethod(extraField.getAesExtraDataRecord().getCompressionMethod());
             return Compression.parseCompressionMethod(compressionMethod);
-        }
-
-        public boolean isDirectory() {
-            return ZipUtils.isDirectory(fileName);
         }
 
         public boolean isZip64() {
