@@ -64,7 +64,7 @@ ZipIt.add(zip, dir, ZipFileSettings.builder().build());
 ##### Create (or add to existed) zip archive and add directory files and directories.
 ```
 Path zip = Paths.get("filename.zip");
-List<Path> paths = Arrays.asList("/cars", "/Star Wars/one.jpg", "/Star Wars/two.jpg", "saint-petersburg.jpg");
+Collection<Path> paths = Arrays.asList("/cars", "/Star Wars/one.jpg", "/Star Wars/two.jpg", "saint-petersburg.jpg");
 ZipIt.add(zip, paths, ZipFileSettings.builder().build());
 ```
 > ```
