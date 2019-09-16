@@ -25,22 +25,11 @@ compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.0'
 
 ## Usage
 
-### Settings
-
-#### Zip archive
-
-`ZipFileSettings` represents entire zip archive settings:
-  - **splitSize** - 
-  - **comment**
-  - defEntrySettings
-
-#### Create zip archive with given file/directory
-
 ##### Create (or add to existed) zip archive and add file */cars/bentley-continental.jpg*.  
 ```
 Path zip = Paths.get("filename.zip");
 Path file = Path.get("/cars/bentley-continental.jpg")
-ZipIt.add(zip, file, ZipFileSettings.builder().build());
+ZipIt.add(zip, file);
 ```
 > ```
 > filename.zip
@@ -51,7 +40,7 @@ ZipIt.add(zip, file, ZipFileSettings.builder().build());
 ```
 Path zip = Paths.get("filename.zip");
 Path dir = Path.get("/cars")
-ZipIt.add(zip, dir, ZipFileSettings.builder().build());
+ZipIt.add(zip, dir);
 ```
 > ```
 > filename.zip
@@ -69,7 +58,7 @@ Collection<Path> paths = Arrays.asList(
         Paths.get("/Star Wars/one.jpg"),
         Paths.get("/Star Wars/two.jpg"),
         Paths.get("saint-petersburg.jpg"));
-ZipIt.add(zip, paths, ZipFileSettings.builder().build());
+ZipIt.add(zip, paths);
 ```
 > ```
 > filename.zip
@@ -81,15 +70,3 @@ ZipIt.add(zip, paths, ZipFileSettings.builder().build());
 >  |-- two.jpg
 >  |-- saint-petersburg.jpg 
 >```
-
- 
-
-#### Create zip archive with given files
-#### Add given files to the existed zip archive 
-
-```
-compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.0'
-```
- 
-
-### Advanced Mode 
