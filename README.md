@@ -43,7 +43,7 @@ Path file = Path.get("/cars/bentley-continental.jpg")
 ZipIt.add(zip, file, ZipFileSettings.builder().build());
 ```
 > ```
-> /--
+> filename.zip
 >  |-- bentley-continental.jpg
 >```
 
@@ -54,7 +54,7 @@ Path dir = Path.get("/cars")
 ZipIt.add(zip, dir, ZipFileSettings.builder().build());
 ```
 > ```
-> /--
+> filename.zip
 >  |-- cars
 >       |-- bentley-continental.jpg
 >       |-- feffari-458-italia.jpg
@@ -68,7 +68,7 @@ Collection<Path> paths = Arrays.asList("/cars", "/Star Wars/one.jpg", "/Star War
 ZipIt.add(zip, paths, ZipFileSettings.builder().build());
 ```
 > ```
-> /--
+> filename.zip
 >  |-- cars
 >  |    |-- bentley-continental.jpg
 >  |    |-- feffari-458-italia.jpg
