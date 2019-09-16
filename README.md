@@ -25,10 +25,22 @@ compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.0'
 
 ## Usage
 
-### Standard Mode
+### Settings
 
-#### Create zip archive with given files / Add given files to the existed zip archive 
+#### Zip archive
 
+`ZipFileSettings` represents entire zip archive settings:
+  - **splitSize** - 
+  - **comment**
+  - defEntrySettings
+1. 
+
+#### Create zip archive with given files
+#### Add given files to the existed zip archive 
+
+```
+compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.0'
+```
  
 
 ### Advanced Mode 
