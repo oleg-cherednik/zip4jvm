@@ -57,7 +57,7 @@ Collection<Path> paths = Arrays.asList(
         Paths.get("/cars"),
         Paths.get("/Star Wars/one.jpg"),
         Paths.get("/Star Wars/two.jpg"),
-        Paths.get("saint-petersburg.jpg"));
+        Paths.get("/saint-petersburg.jpg"));
 ZipIt.add(zip, paths);
 ```
 > ```
