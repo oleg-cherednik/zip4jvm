@@ -36,11 +36,48 @@ compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.0'
 
 #### Create zip archive with given file/directory
 
-Create new zip archive with given *settings* and add existed file or directory.  
+##### Create (or add to existed) zip archive and add file */cars/bentley-continental.jpg*.  
 ```
-Path 
-ZipIt.add(zip, path, settings);
+Path zip = Paths.get("filename.zip");
+Path file = Path.get("/cars/bentley-continental.jpg")
+ZipIt.add(zip, file, ZipFileSettings.builder().build());
 ```
+> ```
+> /--
+>  |-- bentley-continental.jpg
+>```
+
+##### Create (or add to existed) zip archive and add directory */cars*.
+```
+Path zip = Paths.get("filename.zip");
+Path dir = Path.get("/cars")
+ZipIt.add(zip, dir, ZipFileSettings.builder().build());
+```
+> ```
+> /--
+>  |-- cars
+>       |-- bentley-continental.jpg
+>       |-- feffari-458-italia.jpg
+>       |-- wiesmann-gt-mf5.jpg 
+>```
+
+##### Create (or add to existed) zip archive and add directory files and directories.
+```
+Path zip = Paths.get("filename.zip");
+List<Path> paths = Arrays.asList("/cars", "/Star Wars/one.jpg", "/Star Wars/two.jpg", "saint-petersburg.jpg");
+ZipIt.add(zip, paths, ZipFileSettings.builder().build());
+```
+> ```
+> /--
+>  |-- cars
+>  |    |-- bentley-continental.jpg
+>  |    |-- feffari-458-italia.jpg
+>  |    |-- wiesmann-gt-mf5.jpg
+>  |-- one.jpg
+>  |-- two.jpg
+>  |-- saint-petersburg.jpg 
+>```
+
  
 
 #### Create zip archive with given files
