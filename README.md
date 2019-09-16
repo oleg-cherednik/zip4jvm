@@ -33,7 +33,15 @@ compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.0'
   - **splitSize** - 
   - **comment**
   - defEntrySettings
-1. 
+
+#### Create zip archive with given file/directory
+
+Create new zip archive with given *settings* and add existed file or directory.  
+```
+Path 
+ZipIt.add(zip, path, settings);
+```
+ 
 
 #### Create zip archive with given files
 #### Add given files to the existed zip archive 
