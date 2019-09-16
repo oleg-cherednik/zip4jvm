@@ -50,7 +50,7 @@ ZipIt.add(zip, dir);
 >       |-- wiesmann-gt-mf5.jpg 
 >```
 
-##### Create (or add to existed) zip archive and add directory files and directories.
+##### Create (or add to existed) zip archive and add some files and/or directories.
 ```
 Path zip = Paths.get("filename.zip");
 Collection<Path> paths = Arrays.asList(
