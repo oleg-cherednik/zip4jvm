@@ -32,8 +32,16 @@ import java.util.Collections;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ZipIt {
 
+    public static void add(@NonNull Path zip, @NonNull Path path) throws IOException {
+        add(zip, path, ZipFileSettings.builder().build());
+    }
+
     public static void add(@NonNull Path zip, @NonNull Path path, @NonNull ZipFileSettings settings) throws IOException {
         add(zip, Collections.singleton(path), settings);
+    }
+
+    public static void add(@NonNull Path zip, @NonNull Collection<Path> paths) throws IOException {
+        add(zip, paths, ZipFileSettings.builder().build());
     }
 
     public static void add(@NonNull Path zip, @NonNull Collection<Path> paths, @NonNull ZipFileSettings settings) throws IOException {
