@@ -8,7 +8,7 @@
 Zip files support for JVM application
 
 ### Maven
-> [Custom foo description](#foo) See ZipIt (Advanced Mode) for using extended zip it operations.
+> [Custom foo description](#zipit-advanced-mode) See ZipIt (Advanced Mode) for using extended zip it operations.
 ~~~~
 <dependency>
     <groupId>ru.oleg-cherednik.zip4jvm</groupId>
