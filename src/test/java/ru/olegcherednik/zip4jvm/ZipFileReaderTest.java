@@ -46,8 +46,7 @@ public class ZipFileReaderTest {
 
     public void shouldUnzipZipFileIntoDestinationFolderWhenStoreSolidPkware() throws IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        ZipFile.Reader zipFile = ZipFile.read(Zip4jSuite.storeSolidPkwareZip, fileName -> Zip4jSuite.password);
-        zipFile.extract(destDir);
+        UnzipIt.extract(Zip4jSuite.storeSolidPkwareZip, destDir, fileName -> Zip4jSuite.password);
 
 //        Zip4jAssertions.assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);
 //
@@ -61,8 +60,7 @@ public class ZipFileReaderTest {
 
     public void shouldUnzipZipFileIntoDestinationFolderWhenStoreSolidAes() throws IOException {
         Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        ZipFile.Reader zipFile = ZipFile.read(Zip4jSuite.storeSolidAesZip, String::toCharArray);
-        zipFile.extract(destDir);
+        UnzipIt.extract(Zip4jSuite.storeSolidAesZip, destDir, String::toCharArray);
 
 //        Zip4jAssertions.assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);
 //

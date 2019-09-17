@@ -27,7 +27,7 @@ public final class ZipFile {
         return read(zip, fileName -> null);
     }
 
-    public static ZipFile.Reader read(@NonNull Path zip, Function<String, char[]> createPassword) throws IOException {
+    public static ZipFile.Reader read(@NonNull Path zip, @NonNull Function<String, char[]> createPassword) throws IOException {
         return new ZipFileReader(zip, createPassword);
     }
 
