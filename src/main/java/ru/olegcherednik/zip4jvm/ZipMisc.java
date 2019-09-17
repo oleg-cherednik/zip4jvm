@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm;
 
-import lombok.Builder;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
@@ -14,12 +15,8 @@ import java.util.Set;
  * @author Oleg Cherednik
  * @since 15.03.2019
  */
-@Builder
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ZipMisc {
-
-    @NonNull
-    private final Path zipFile;
-    private final char[] password;
 
     public static void setComment(@NonNull Path zip, String comment) throws IOException {
         try (ZipFile.Writer zipFile = ZipFile.write(zip)) {
