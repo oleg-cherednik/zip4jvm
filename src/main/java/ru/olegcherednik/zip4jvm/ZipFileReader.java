@@ -29,7 +29,7 @@ final class ZipFileReader implements ZipFile.Reader {
     private final ZipModel zipModel;
     private final Function<String, char[]> createPassword;
 
-    public ZipFileReader(@NonNull Path zip, Function<String, char[]> createPassword) throws IOException {
+    public ZipFileReader(@NonNull Path zip, @NonNull Function<String, char[]> createPassword) throws IOException {
         checkZipFile(zip);
         zipModel = ZipModelBuilder.read(zip);
         this.createPassword = createPassword;

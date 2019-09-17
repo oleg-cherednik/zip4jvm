@@ -2,8 +2,8 @@ package ru.olegcherednik.zip4jvm.compatibility;
 
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.TestUtils;
+import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jSuite;
-import ru.olegcherednik.zip4jvm.ZipFile;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -62,10 +62,9 @@ public class WinRarToZip4jCompatibilityTest {
 
         for (Path zip4jFile : Arrays.asList(winRarStoreSolidZip, winRarStoreSolidPkwareZip, winRarStoreSolidAesZip, winRarDeflateSolidZip,
                 winRarDeflateSolidPkwareZip, winRarDeflateSolidAesZip)) {
-            Path dstDir = Zip4jSuite.subDirNameAsRelativePathToRoot(parentDir, zip4jFile);
-            ZipFile.Reader zipFile = ZipFile.read(zip4jFile, fileName -> Zip4jSuite.password);
-            zipFile.extract(dstDir);
-            assertThatDirectory(dstDir).matches(TestUtils.starWarsDirAssert);
+            Path destDir = Zip4jSuite.subDirNameAsRelativePathToRoot(parentDir, zip4jFile);
+            UnzipIt.extract(zip4jFile, destDir, fileName -> Zip4jSuite.password);
+            assertThatDirectory(destDir).matches(TestUtils.starWarsDirAssert);
         }
     }
 
