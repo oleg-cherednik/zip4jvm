@@ -8,7 +8,7 @@
 Zip files support for JVM application
 
 ### Maven
-
+> [Custom foo description](#foo) See ZipIt (Advanced Mode) for using extended zip it operations.
 ~~~~
 <dependency>
     <groupId>ru.oleg-cherednik.zip4jvm</groupId>
@@ -24,6 +24,8 @@ compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.0'
 ~~~~
 
 ## Usage
+
+### ZipIt (Standard Mode)
 
 ##### Create (or add to existed) zip archive and add file */cars/bentley-continental.jpg*.  
 ```
@@ -70,3 +72,16 @@ ZipIt.add(zip, paths);
 >  |-- two.jpg
 >  |-- saint-petersburg.jpg 
 >```
+
+> **ZipFileSettings** could be additionally set for all methods. See default settings.
+
+> [Custom foo description](#ZipIt (Advanced Mode)) See ZipIt (Advanced Mode) for using extended zip it operations.                
+
+### UnzipIt (Standard Mode)
+
+
+### ZipIt (Advanced Mode)
+
+### UnzipIt (Advanced Mode)
+
+### foo
