@@ -78,10 +78,33 @@ ZipIt.add(zip, paths);
 
 ### UnzipIt (Standard Mode)
 
-
-
-
-
+##### Extract all entries form given zip archive into given directory.
+```
+Path zip = Paths.get("filename.zip");
+Path destDir = Paths.get("filename_content");
+UnzipIt.extract(zip, destDir);
+```
+> ```
+> filename.zip
+>  |-- cars
+>  |    |-- bentley-continental.jpg
+>  |    |-- feffari-458-italia.jpg
+>  |    |-- wiesmann-gt-mf5.jpg
+>  |-- one.jpg
+>  |-- two.jpg
+>  |-- saint-petersburg.jpg 
+>```
+> ```
+> filename_content
+>  |-- cars
+>  |    |-- bentley-continental.jpg
+>  |    |-- feffari-458-italia.jpg
+>  |    |-- wiesmann-gt-mf5.jpg
+>  |-- one.jpg
+>  |-- two.jpg
+>  |-- saint-petersburg.jpg 
+>```                                                    
+> 
 ### ZipIt (Advanced Mode)
 
 ### UnzipIt (Advanced Mode)
