@@ -32,7 +32,7 @@ Path zip = Paths.get("filename.zip");
 Path file = Path.get("/cars/bentley-continental.jpg")
 ZipIt.add(zip, file);
 ```
-> ```
+>```
 > filename.zip
 >  |-- bentley-continental.jpg
 >```
@@ -43,7 +43,7 @@ Path zip = Paths.get("filename.zip");
 Path dir = Path.get("/cars")
 ZipIt.add(zip, dir);
 ```
-> ```
+>```
 > filename.zip
 >  |-- cars
 >       |-- bentley-continental.jpg
@@ -61,7 +61,7 @@ Collection<Path> paths = Arrays.asList(
         Paths.get("/saint-petersburg.jpg"));
 ZipIt.add(zip, paths);
 ```
-> ```
+>```
 > filename.zip
 >  |-- cars
 >  |    |-- bentley-continental.jpg
@@ -78,13 +78,13 @@ ZipIt.add(zip, paths);
 
 ### UnzipIt (Standard Mode)
 
-##### Extract all entries form given zip archive into given directory.
+##### Extract all entries into given directory.
 ```
 Path zip = Paths.get("filename.zip");
 Path destDir = Paths.get("/filename_content");
 UnzipIt.extract(zip, destDir);
 ```
-> ```
+>```
 > filename.zip
 >  |-- cars
 >  |    |-- bentley-continental.jpg
@@ -94,7 +94,7 @@ UnzipIt.extract(zip, destDir);
 >  |-- two.jpg
 >  |-- saint-petersburg.jpg 
 >```
-> ```
+>```
 > /filename_content
 >   |-- cars
 >   |    |-- bentley-continental.jpg
@@ -105,8 +105,86 @@ UnzipIt.extract(zip, destDir);
 >   |-- saint-petersburg.jpg 
 >```                                                    
  
-##### Extract some files form given zip archive into given directory.
+##### Extract a file into given directory.
+```
+Path zip = Paths.get("filename.zip");
+Path destDir = Paths.get("/filename_content");
+UnzipIt.extract(zip, destDir, "cars/bentley-continental.jpg");
+```
+>```
+> filename.zip
+>  |-- cars
+>  |    |-- bentley-continental.jpg
+>  |    |-- feffari-458-italia.jpg
+>  |    |-- wiesmann-gt-mf5.jpg
+>  |-- one.jpg
+>  |-- two.jpg
+>  |-- saint-petersburg.jpg 
+>```
+>```
+> /filename_content
+>   |-- bentley-continental.jpg
+>```
+
+##### Extract one directory into given directory.
+```
+Path zip = Paths.get("filename.zip");
+Path destDir = Paths.get("/filename_content");
+UnzipIt.extract(zip, destDir, "cars");
+```
+>```
+> filename.zip
+>  |-- cars
+>  |    |-- bentley-continental.jpg
+>  |    |-- feffari-458-italia.jpg
+>  |    |-- wiesmann-gt-mf5.jpg
+>  |-- one.jpg
+>  |-- two.jpg
+>  |-- saint-petersburg.jpg 
+>```
+>```
+> /filename_content
+>   |-- cars
+>   |    |-- bentley-continental.jpg
+>   |    |-- feffari-458-italia.jpg
+>   |    |-- wiesmann-gt-mf5.jpg
+>```
+
+##### Extract some files and/or directories into given directory.
+```
+Path zip = Paths.get("filename.zip");
+Path destDir = Paths.get("/filename_content");
+Collection<Path> fileNames = Arrays.asList(
+        "cars",
+        "Star Wars/one.jpg",
+        "saint-petersburg.jpg");
+UnzipIt.extract(zip, destDir, fileName);
+```
+>```
+> filename.zip
+>  |-- cars
+>  |    |-- bentley-continental.jpg
+>  |    |-- feffari-458-italia.jpg
+>  |    |-- wiesmann-gt-mf5.jpg
+>  |-- Star Wars
+>  |    |-- one.jpg
+>  |    |-- two.jpg
+>  |-- saint-petersburg.jpg 
+>```
+>```
+> /filename_content
+>   |-- cars
+>   |    |-- bentley-continental.jpg
+>   |    |-- feffari-458-italia.jpg
+>   |    |-- wiesmann-gt-mf5.jpg
+>   |-- one.jpg
+>   |-- two.jpg            
+>   |-- saint-petersburg.jpg
+>```                     
+> **CreatePassword** function could be optionally added to all methods. See details in [CreatePassword function](#createpassword-function).
 
 ### ZipIt (Advanced Mode)
 
 ### UnzipIt (Advanced Mode)
+
+### CreatePassword function
