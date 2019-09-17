@@ -74,7 +74,7 @@ ZipIt.add(zip, paths);
 
 > **ZipFileSettings** could be additionally set for all methods. See default settings.
 
-> see [ZipIt (Advanced Mode)](#zipit-advanced-mode) for using extended zip it operations.              
+_**Note:** see [ZipIt (Advanced Mode)](#zipit-advanced-mode) for using extended zip it operations_              
 
 ### UnzipIt (Standard Mode)
 
@@ -181,7 +181,7 @@ UnzipIt.extract(zip, destDir, fileName);
 >   |-- two.jpg            
 >   |-- saint-petersburg.jpg
 >```                     
-> **CreatePassword** function could be optionally added to all methods. See details in [CreatePassword function](#createpassword-function).
+_**Note:** `CreatePassword` function could be optionally added to all methods. See details in [CreatePassword function](#createpassword-function)._
 
 ### ZipIt (Advanced Mode)
 
