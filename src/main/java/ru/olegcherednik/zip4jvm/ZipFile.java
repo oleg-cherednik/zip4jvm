@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
@@ -15,6 +16,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * @author Oleg Cherednik
@@ -39,7 +42,7 @@ public final class ZipFile {
         return new ZipFileWriter(zip, zipFileSettings);
     }
 
-    public interface Reader {
+    public interface Reader extends Iterable<ZipEntry> {
 
         void extract(@NonNull Path destDir) throws IOException;
 
@@ -48,6 +51,10 @@ public final class ZipFile {
         default void extract(@NonNull Path destDir, @NonNull Collection<String> fileNames) throws IOException {
             for (String fileName : fileNames)
                 extract(destDir, fileName);
+        }
+
+        default Stream<ZipEntry> stream() {
+            return StreamSupport.stream(spliterator(), false);
         }
 
         @NonNull

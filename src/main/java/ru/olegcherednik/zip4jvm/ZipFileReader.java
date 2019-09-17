@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
@@ -54,6 +55,12 @@ final class ZipFileReader implements ZipFile.Reader {
         }
     }
 
+    private List<ZipEntry> getEntriesWithFileNamePrefix(String fileNamePrefix) {
+        return zipModel.getEntries().stream()
+                       .filter(entry -> entry.getFileName().startsWith(fileNamePrefix))
+                       .collect(Collectors.toList());
+    }
+
     @NonNull
     @Override
     public InputStream extract(@NonNull String fileName) throws IOException {
@@ -88,10 +95,21 @@ final class ZipFileReader implements ZipFile.Reader {
         return zipModel.isZip64();
     }
 
-    private List<ZipEntry> getEntriesWithFileNamePrefix(String fileNamePrefix) {
-        return zipModel.getEntries().stream()
-                       .filter(entry -> entry.getFileName().startsWith(fileNamePrefix))
-                       .collect(Collectors.toList());
+    @Override
+    public Iterator<ZipEntry> iterator() {
+        return new Iterator<ZipEntry>() {
+            private final Iterator<String> it = zipModel.getEntryNames().iterator();
+
+            @Override
+            public boolean hasNext() {
+                return it.hasNext();
+            }
+
+            @Override
+            public ZipEntry next() {
+                return zipModel.getEntryByFileName(it.next());
+            }
+        };
     }
 
     private void extractEntry(Path destDir, ZipEntry entry, Function<ZipEntry, String> getFileName) throws IOException {

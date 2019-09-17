@@ -3,10 +3,16 @@ package ru.olegcherednik.zip4jvm;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Oleg Cherednik
@@ -70,5 +76,48 @@ public class ZipFileReaderTest {
 //        Zip4jAssertions.assertThatFile(starWarsDir.resolve("two.jpg")).isImage().hasSize(277_857);
 //        Zip4jAssertions.assertThatFile(starWarsDir.resolve("three.jpg")).isImage().hasSize(1_601_879);
 //        Zip4jAssertions.assertThatFile(starWarsDir.resolve("four.jpg")).isImage().hasSize(1_916_776);
+    }
+
+    public void shouldIterateOverAllEntriesWhenStoreSolidPkware() throws IOException {
+        List<String> entryNames = new ArrayList<>();
+
+        for (ZipEntry entry : ZipFile.read(Zip4jSuite.storeSolidPkwareZip))
+            entryNames.add(entry.getFileName());
+
+        assertThat(entryNames).containsExactlyInAnyOrder(
+                "cars/bentley-continental.jpg",
+                "cars/ferrari-458-italia.jpg",
+                "cars/wiesmann-gt-mf5.jpg",
+                "Star Wars/one.jpg",
+                "Star Wars/two.jpg",
+                "Star Wars/three.jpg",
+                "Star Wars/four.jpg",
+                "empty_dir/",
+                "empty_file.txt",
+                "mcdonnell-douglas-f15-eagle.jpg",
+                "Oleg Cherednik.txt",
+                "saint-petersburg.jpg",
+                "sig-sauer-pistol.jpg");
+    }
+
+    public void shouldRetrieveStreamWithAllEntriesWhenStoreSolidPkware() throws IOException {
+        List<String> entryNames = ZipFile.read(Zip4jSuite.storeSolidPkwareZip).stream()
+                                         .map(ZipEntry::getFileName)
+                                         .collect(Collectors.toList());
+
+        assertThat(entryNames).containsExactlyInAnyOrder(
+                "cars/bentley-continental.jpg",
+                "cars/ferrari-458-italia.jpg",
+                "cars/wiesmann-gt-mf5.jpg",
+                "Star Wars/one.jpg",
+                "Star Wars/two.jpg",
+                "Star Wars/three.jpg",
+                "Star Wars/four.jpg",
+                "empty_dir/",
+                "empty_file.txt",
+                "mcdonnell-douglas-f15-eagle.jpg",
+                "Oleg Cherednik.txt",
+                "saint-petersburg.jpg",
+                "sig-sauer-pistol.jpg");
     }
 }
