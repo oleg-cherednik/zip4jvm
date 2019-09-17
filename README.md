@@ -8,7 +8,6 @@
 Zip files support for JVM application
 
 ### Maven
-> [Custom foo description](#zipit-advanced-mode) See ZipIt (Advanced Mode) for using extended zip it operations.
 ~~~~
 <dependency>
     <groupId>ru.oleg-cherednik.zip4jvm</groupId>
@@ -75,13 +74,13 @@ ZipIt.add(zip, paths);
 
 > **ZipFileSettings** could be additionally set for all methods. See default settings.
 
-> [Custom foo description](#ZipIt (Advanced Mode)) See ZipIt (Advanced Mode) for using extended zip it operations.                
+> see [ZipIt (Advanced Mode)](#zipit-advanced-mode) for using extended zip it operations.              
 
 ### UnzipIt (Standard Mode)
+
+
 
 
 ### ZipIt (Advanced Mode)
 
 ### UnzipIt (Advanced Mode)
-
-### foo
