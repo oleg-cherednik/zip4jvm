@@ -43,12 +43,12 @@ public final class ZipFile {
 
         void extract(@NonNull Path destDir) throws IOException;
 
+        void extract(@NonNull Path destDir, @NonNull String fileName) throws IOException;
+
         default void extract(@NonNull Path destDir, @NonNull Collection<String> fileNames) throws IOException {
             for (String fileName : fileNames)
                 extract(destDir, fileName);
         }
-
-        void extract(@NonNull Path destDir, @NonNull String fileName) throws IOException;
 
         @NonNull
         InputStream extract(@NonNull String fileName) throws IOException;
