@@ -14,6 +14,7 @@ plugins {
     id 'jacoco'
     id 'io.franzbecker.gradle-lombok' version '1.14'
     id 'io.codearte.nexus-staging' version '0.11.0'
+//    id "com.github.hierynomus.license" version "0.15.0"
 }
 
 apply plugin: 'com.bmuschko.nexus'
@@ -82,3 +83,9 @@ task fatJar(type: Jar) {
 test {
     useTestNG()
 }
+
+//license {
+//    header = file('license_header.txt')
+//    include "**/*.java"
+//    exclude "**/*Test.java"
+//}

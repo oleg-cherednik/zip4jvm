@@ -43,7 +43,7 @@ public class ModifyCommentTest {
 
     public void shouldCreateNewZipWithComment() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettings(
+                                                  .defEntrySettings(
                                                                       ZipEntrySettings.builder()
                                                                                       .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
                                                                                       .build())
@@ -69,7 +69,7 @@ public class ModifyCommentTest {
         Files.deleteIfExists(zip);
 
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettings(
+                                                  .defEntrySettings(
                                                                       ZipEntrySettings.builder()
                                                                                       .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                                                       .encryption(Encryption.PKWARE, fileName -> Zip4jSuite.password)

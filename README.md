@@ -6,3 +6,41 @@
 
 # zip4jvm
 Zip files support for JVM application
+
+### Maven
+
+~~~~
+<dependency>
+    <groupId>ru.oleg-cherednik.zip4jvm</groupId>
+    <artifactId>zip4jvm</artifactId>
+    <version>1.0</version>
+</dependency>
+~~~~
+
+### Gradle
+
+~~~~
+compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.0'
+~~~~
+
+## Usage
+
+### Settings
+
+#### Zip archive
+
+`ZipFileSettings` represents entire zip archive settings:
+  - **splitSize** - 
+  - **comment**
+  - defEntrySettings
+1. 
+
+#### Create zip archive with given files
+#### Add given files to the existed zip archive 
+
+```
+compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.0'
+```
+ 
+
+### Advanced Mode 

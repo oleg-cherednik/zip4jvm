@@ -1,23 +1,20 @@
 package ru.olegcherednik.zip4jvm.utils;
 
-import lombok.experimental.UtilityClass;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jRealBigZip64NotSupportedException;
-import ru.olegcherednik.zip4jvm.model.Zip64;
 
 import java.util.Calendar;
-import java.util.function.Function;
 
 /**
  * @author Oleg CHerednik
  * @since 20.03.2019
  */
-@UtilityClass
-public class ZipUtils {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class ZipUtils {
 
-    public int javaToDosTime(long time) {
+    public static int javaToDosTime(long time) {
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(time);
 
@@ -56,19 +53,6 @@ public class ZipUtils {
     public static boolean isRegularFile(String fileName) {
         return fileName != null && !(fileName.endsWith("/") || fileName.endsWith("\\"));
     }
-
-    @SuppressWarnings("FieldNamingConvention")
-    public static final Function<String, String> normalizeComment = comment -> {
-        if (StringUtils.isBlank(comment))
-            return null;
-
-        comment = StringUtils.trimToNull(comment);
-
-        if (StringUtils.length(comment) > Zip64.LIMIT_INT)
-            throw new Zip4jException("comment length exceeds maximum length");
-
-        return comment;
-    };
 
     public static String normalizeFileName(String fileName) {
         return FilenameUtils.normalize(fileName, true);

@@ -1,34 +1,26 @@
 package ru.olegcherednik.zip4jvm;
 
-import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.SingleZipOutputStream;
+import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
+import ru.olegcherednik.zip4jvm.io.writers.ExistedEntryWriter;
+import ru.olegcherednik.zip4jvm.io.writers.RegularFileWriter;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
-import ru.olegcherednik.zip4jvm.tasks.AddEntryTask;
-import ru.olegcherednik.zip4jvm.tasks.CloseZipFileTask;
-import ru.olegcherednik.zip4jvm.tasks.CopyExistedEntryTask;
-import ru.olegcherednik.zip4jvm.tasks.CreateTemporaryZipFileTask;
-import ru.olegcherednik.zip4jvm.tasks.MoveTemporaryZipFileTask;
-import ru.olegcherednik.zip4jvm.tasks.RemoveOriginalZipFileTask;
-import ru.olegcherednik.zip4jvm.tasks.Task;
-import ru.olegcherednik.zip4jvm.tasks.ZipModelContext;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
+import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -38,48 +30,17 @@ import java.util.stream.Collectors;
  * @author Oleg Cherednik
  * @since 09.09.2019
  */
-final class ZipFileWriter implements ZipFile.Writer, ZipModelContext {
+final class ZipFileWriter implements ZipFile.Writer {
 
+    private final Path zip;
+    private final ZipModel tempZipModel;
     private final ZipEntrySettings defEntrySettings;
-    private final ZipModel destZipModel;
-    private final Map<String, Task> tasks = new LinkedHashMap<>();
+    private final Map<String, Writer> fileNameWriter = new LinkedHashMap<>();
 
     public ZipFileWriter(@NonNull Path zip, @NonNull ZipFileSettings zipFileSettings) throws IOException {
-        defEntrySettings = zipFileSettings.getEntrySettings();
-        destZipModel = createZipModel(zip, zipFileSettings);
-        tasks.putAll(createCopyExistedEntryTask(destZipModel));
-    }
-
-    private static ZipModel createZipModel(Path zip, ZipFileSettings zipFileSettings) throws IOException {
-        if (Files.exists(zip)) {
-            ZipModel zipModel = ZipModelBuilder.read(zip);
-
-            if (zipModel.isSplit())
-                zipModel.setSplitSize(zipFileSettings.getSplitSize());
-            if (zipFileSettings.getComment() != null)
-                zipModel.setComment(zipFileSettings.getComment());
-
-            return zipModel;
-        }
-
-        return ZipModelBuilder.create(zip, zipFileSettings);
-    }
-
-    private static Map<String, Task> createCopyExistedEntryTask(ZipModel zipModel) {
-        Map<String, Task> map = new LinkedHashMap<>();
-        zipModel.getEntryNames().forEach(entryName -> map.put(entryName, new CopyExistedEntryTask(zipModel, entryName, zipModel)));
-        return map;
-    }
-
-    @Override
-    public void add(@NonNull Path path) throws IOException {
-        Objects.requireNonNull(defEntrySettings);
-        add(Collections.singleton(path), defEntrySettings);
-    }
-
-    @Override
-    public void add(@NonNull Path path, @NonNull ZipEntrySettings entrySettings) throws IOException {
-        add(Collections.singleton(path), entrySettings);
+        this.zip = zip;
+        tempZipModel = createTempZipModel(zip, zipFileSettings, fileNameWriter);
+        defEntrySettings = zipFileSettings.getDefEntrySettings();
     }
 
     @Override
@@ -96,7 +57,7 @@ final class ZipFileWriter implements ZipFile.Writer, ZipModelContext {
             Path path = entry.getKey();
             String fileName = entry.getValue();
 
-            if (tasks.put(fileName, new AddEntryTask(path, fileName, entrySettings, destZipModel)) != null)
+            if (fileNameWriter.put(fileName, new RegularFileWriter(path, fileName, entrySettings, tempZipModel)) != null)
                 throw new Zip4jException("File name duplication");
         }
     }
@@ -105,53 +66,105 @@ final class ZipFileWriter implements ZipFile.Writer, ZipModelContext {
     public void remove(@NonNull String prefixEntryName) throws FileNotFoundException {
         String normalizedPrefixEntryName = ZipUtils.normalizeFileName(prefixEntryName);
 
-        Set<String> entryNames = destZipModel.getEntryNames().stream()
-                                             .filter(entryName -> entryName.startsWith(normalizedPrefixEntryName))
-                                             .collect(Collectors.toSet());
+        Set<String> entryNames = fileNameWriter.keySet().stream()
+                                               .filter(entryName -> entryName.startsWith(normalizedPrefixEntryName))
+                                               .collect(Collectors.toSet());
 
         // TODO it's not working, check it in test
         if (entryNames.isEmpty())
             throw new FileNotFoundException(prefixEntryName);
 
-        entryNames.forEach(entryName -> {
-            tasks.remove(entryName);
-            destZipModel.removeEntry(entryName);
-        });
+        entryNames.forEach(fileNameWriter::remove);
     }
 
     @Override
     public void copy(@NonNull Path zip) throws IOException {
-        ZipModel zipModel = ZipModelBuilder.read(zip);
+        ZipModel srcZipModel = ZipModelBuilder.read(zip);
 
-        for (String fileName : zipModel.getEntryNames()) {
-            if (tasks.containsKey(fileName))
+        for (String fileName : srcZipModel.getEntryNames()) {
+            if (fileNameWriter.containsKey(fileName))
                 throw new Zip4jException("File name duplication");
-            if (tasks.put(fileName, new CopyExistedEntryTask(zipModel, fileName, destZipModel)) != null)
+
+            char[] password = defEntrySettings == null ? null : defEntrySettings.getPassword().apply(fileName);
+
+            if (fileNameWriter.put(fileName, new ExistedEntryWriter(srcZipModel, fileName, tempZipModel, password)) != null)
                 throw new Zip4jException("File name duplication");
         }
     }
 
     @Override
     public void setComment(String comment) {
-        destZipModel.setComment(comment);
+        tempZipModel.setComment(comment);
     }
 
     @Override
     public void close() throws IOException {
-        List<Task> tasks = new ArrayList<>();
-
-        tasks.add(new CreateTemporaryZipFileTask(destZipModel));
-        tasks.addAll(this.tasks.values());
-        tasks.add(new CloseZipFileTask());
-        tasks.add(new RemoveOriginalZipFileTask(destZipModel));
-        tasks.add(new MoveTemporaryZipFileTask(destZipModel));
-
-        for (Task task : tasks)
-            task.accept(this);
+        createTempZipFiles();
+        removeOriginalZipFiles();
+        moveTempZipFiles();
     }
 
-    @Getter
-    @Setter
-    private DataOutput out;
+    private void createTempZipFiles() throws IOException {
+        try (DataOutput out = creatDataOutput(tempZipModel)) {
+            for (Writer writer : fileNameWriter.values())
+                writer.write(out);
+        }
+    }
+
+    private void removeOriginalZipFiles() throws IOException {
+        if (Files.exists(zip)) {
+            ZipModel zipModel = ZipModelBuilder.read(zip);
+
+            for (long i = 0; i <= zipModel.getTotalDisks(); i++)
+                Files.deleteIfExists(zipModel.getPartFile(i));
+        }
+    }
+
+    private void moveTempZipFiles() throws IOException {
+        for (long i = 0; i <= tempZipModel.getTotalDisks(); i++) {
+            Path src = tempZipModel.getPartFile(i);
+            Path dest = zip.getParent().resolve(src.getFileName());
+            Files.move(src, dest);
+        }
+
+        Files.deleteIfExists(tempZipModel.getFile().getParent());
+    }
+
+    private static ZipModel createTempZipModel(Path zip, ZipFileSettings zipFileSettings, Map<String, Writer> fileNameWriter) throws IOException {
+        Path tempZip = createTempZip(zip);
+        ZipModel tempZipModel = ZipModelBuilder.create(tempZip, zipFileSettings);
+
+        if (Files.exists(zip)) {
+            ZipModel zipModel = ZipModelBuilder.read(zip);
+
+            if (zipModel.isSplit())
+                tempZipModel.setSplitSize(zipModel.getSplitSize());
+            if (zipModel.getComment() != null)
+                tempZipModel.setComment(zipModel.getComment());
+            if (zipModel.isZip64())
+                tempZipModel.setZip64(zipModel.isZip64());
+
+            zipModel.getEntryNames().forEach(entryName -> {
+                char[] password = null;
+
+                if (zipFileSettings.getDefEntrySettings() != null)
+                    password = zipFileSettings.getDefEntrySettings().getPassword().apply(entryName);
+
+                fileNameWriter.put(entryName, new ExistedEntryWriter(zipModel, entryName, tempZipModel, password));
+            });
+        }
+
+        return tempZipModel;
+    }
+
+    private static Path createTempZip(Path zip) throws IOException {
+        Path dir = zip.getParent().resolve("tmp");
+        Files.createDirectories(dir);
+        return dir.resolve(zip.getFileName());
+    }
+
+    private static DataOutput creatDataOutput(ZipModel zipModel) throws IOException {
+        return zipModel.isSplit() ? SplitZipOutputStream.create(zipModel) : SingleZipOutputStream.create(zipModel);
+    }
 
 }

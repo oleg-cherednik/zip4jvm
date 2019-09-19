@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.lang.ArrayUtils;
-import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import java.nio.charset.Charset;
 import java.util.Collections;
@@ -82,12 +81,12 @@ public class CentralDirectory {
 
         @NonNull
         public byte[] getFileName(@NonNull Charset charset) {
-            return fileName != null ? fileName.getBytes(charset) : ArrayUtils.EMPTY_BYTE_ARRAY;
+            return fileName == null ? ArrayUtils.EMPTY_BYTE_ARRAY : fileName.getBytes(charset);
         }
 
         @NonNull
         public byte[] getComment(@NonNull Charset charset) {
-            return comment != null ? comment.getBytes(charset) : ArrayUtils.EMPTY_BYTE_ARRAY;
+            return comment == null ? ArrayUtils.EMPTY_BYTE_ARRAY : comment.getBytes(charset);
         }
 
         @NonNull
@@ -95,10 +94,6 @@ public class CentralDirectory {
             if (compressionMethod == CompressionMethod.AES)
                 return Compression.parseCompressionMethod(extraField.getAesExtraDataRecord().getCompressionMethod());
             return Compression.parseCompressionMethod(compressionMethod);
-        }
-
-        public boolean isDirectory() {
-            return ZipUtils.isDirectory(fileName);
         }
 
         public boolean isZip64() {

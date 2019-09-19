@@ -9,6 +9,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 04.09.2019
  */
+@FunctionalInterface
 public interface IOSupplier<T> {
 
     T get(@NonNull ZipEntry entry) throws IOException;

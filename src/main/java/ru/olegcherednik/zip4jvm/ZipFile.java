@@ -1,7 +1,9 @@
 package ru.olegcherednik.zip4jvm;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.experimental.UtilityClass;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
@@ -11,54 +13,49 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
- * ZipFile real-time implementation.
- * <br>
- * When create new instance of this class:
- * <ul>
- * <li><i>zip file exists</i> - open zip archive</li>
- * <li><i>zip file not exists</i> - create new empty zip archive</li>
- * </ul>
- * <p>
- * To close zip archive correctly, do call {@link ZipFile.Writer#close()} method.
- * <pre>
- * try (ZipFile zipFile = new ZipFile(Paths.get("~/src.zip"))) {
- *     zipFile.addEntry(...);
- * }
- * </pre>
- *
  * @author Oleg Cherednik
  * @since 01.09.2019
  */
-@UtilityClass
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ZipFile {
 
-    public ZipFile.Reader read(@NonNull Path zip) throws IOException {
+    public static ZipFile.Reader read(@NonNull Path zip) throws IOException {
         return read(zip, fileName -> null);
     }
 
-    public ZipFile.Reader read(@NonNull Path zip, Function<String, char[]> createPassword) throws IOException {
+    public static ZipFile.Reader read(@NonNull Path zip, @NonNull Function<String, char[]> createPassword) throws IOException {
         return new ZipFileReader(zip, createPassword);
     }
 
-    public ZipFile.Writer write(@NonNull Path zip) throws IOException {
+    public static ZipFile.Writer write(@NonNull Path zip) throws IOException {
         return write(zip, ZipFileSettings.builder().build());
     }
 
-    public ZipFile.Writer write(@NonNull Path zip, @NonNull ZipFileSettings zipFileSettings) throws IOException {
+    public static ZipFile.Writer write(@NonNull Path zip, @NonNull ZipFileSettings zipFileSettings) throws IOException {
         return new ZipFileWriter(zip, zipFileSettings);
     }
 
-    public interface Reader {
+    public interface Reader extends Iterable<ZipEntry> {
 
         void extract(@NonNull Path destDir) throws IOException;
 
-        void extract(@NonNull Path destDir, @NonNull Collection<String> fileNames) throws IOException;
-
         void extract(@NonNull Path destDir, @NonNull String fileName) throws IOException;
+
+        default void extract(@NonNull Path destDir, @NonNull Collection<String> fileNames) throws IOException {
+            for (String fileName : fileNames)
+                extract(destDir, fileName);
+        }
+
+        default Stream<ZipEntry> stream() {
+            return StreamSupport.stream(spliterator(), false);
+        }
 
         @NonNull
         InputStream extract(@NonNull String fileName) throws IOException;
@@ -75,9 +72,13 @@ public final class ZipFile {
 
     public interface Writer extends Closeable {
 
-        void add(@NonNull Path path) throws IOException;
+        default void add(@NonNull Path path) throws IOException {
+            add(Collections.singleton(path));
+        }
 
-        void add(@NonNull Path path, @NonNull ZipEntrySettings entrySettings) throws IOException;
+        default void add(@NonNull Path path, @NonNull ZipEntrySettings entrySettings) throws IOException {
+            add(Collections.singleton(path), entrySettings);
+        }
 
         void add(@NonNull Collection<Path> paths) throws IOException;
 

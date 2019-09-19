@@ -10,16 +10,11 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 final class NullDecoder implements Decoder {
 
     @Override
-    public void decrypt(@NonNull byte[] buf, int offs, int len) {
+    public void decrypt(byte[] buf, int offs, int len) {
     }
 
     @Override
     public long getCompressedSize(@NonNull ZipEntry entry) {
-        return entry.getCompressedSize();
-    }
-
-    @Override
-    public long getSizeOnDisk(@NonNull ZipEntry entry) {
         return entry.getCompressedSize();
     }
 

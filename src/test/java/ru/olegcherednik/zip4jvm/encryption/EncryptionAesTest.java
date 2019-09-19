@@ -41,7 +41,7 @@ public class EncryptionAesTest {
     @Test
     public void shouldCreateNewZipWithFolderAndAesEncryption() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettings(
+                                                  .defEntrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                                           .encryption(Encryption.AES_256, fileName -> Zip4jSuite.password).build())

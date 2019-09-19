@@ -67,11 +67,6 @@ public final class AesDecoder implements Decoder {
         checkMessageAuthenticationCode(in);
     }
 
-    @Override
-    public long getSizeOnDisk(@NonNull ZipEntry entry) {
-        return entry.getCompressedSize() + saltLength + PASSWORD_CHECKSUM_SIZE + MAC_SIZE;
-    }
-
     private static byte[] getSalt(ZipEntry entry, DataInput in) throws IOException {
         int saltLength = entry.getStrength().saltLength();
         return in.readBytes(saltLength);

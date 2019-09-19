@@ -1,7 +1,8 @@
 package ru.olegcherednik.zip4jvm.utils;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.experimental.UtilityClass;
 import ru.olegcherednik.zip4jvm.exception.Zip4jPathNotExistsException;
 
 import java.io.IOException;
@@ -17,8 +18,8 @@ import java.util.function.ToIntFunction;
  * @author Oleg Cherednik
  * @since 05.09.2019
  */
-@UtilityClass
-public class PathUtils {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class PathUtils {
 
     private static final Comparator<Path> SORT_DIR_FIRST = Comparator.comparingInt((ToIntFunction<Path>)path -> Files.isDirectory(path) ? 0 : 1)
                                                                      .thenComparing(Path::compareTo);

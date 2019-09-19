@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.model;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.io.FilenameUtils;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -31,11 +32,11 @@ import java.util.Set;
  */
 @Getter
 @Setter
+@RequiredArgsConstructor
 public class ZipModel {
 
     public static final int NO_SPLIT = -1;
-    // MIN_SPLIT_LENGTH = 64K bytes
-    public static final int MIN_SPLIT_SIZE = 64 * 1024;
+    public static final int MIN_SPLIT_SIZE = 64 * 1024; // 64Kb
 
     public static final int MAX_TOTAL_ENTRIES = Zip64.LIMIT_INT;
     public static final long MAX_ENTRY_SIZE = Zip64.LIMIT;
@@ -44,7 +45,6 @@ public class ZipModel {
     @NonNull
     private final Path file;
     private long splitSize = NO_SPLIT;
-    private Path streamFile;
 
     private String comment;
     private long totalDisks;
@@ -57,11 +57,6 @@ public class ZipModel {
      * in ZIP64 format.
      */
     private boolean zip64;
-
-    public ZipModel(@NonNull Path file) {
-        this.file = file;
-        streamFile = file;
-    }
 
     @Getter(AccessLevel.NONE)
     private final Map<String, ZipEntry> fileNameEntry = new LinkedHashMap<>();
@@ -86,10 +81,6 @@ public class ZipModel {
         fileNameEntry.put(entry.getFileName(), entry);
     }
 
-    public void removeEntry(@NonNull String fileName) {
-        fileNameEntry.remove(fileName);
-    }
-
     public Collection<ZipEntry> getEntries() {
         return isEmpty() ? Collections.emptyList() : Collections.unmodifiableCollection(fileNameEntry.values());
     }
@@ -105,10 +96,6 @@ public class ZipModel {
 
     public Path getPartFile(long disk) {
         return disk == totalDisks ? file : getSplitFilePath(file, disk + 1);
-    }
-
-    public Path getStreamPartFile(long disk) {
-        return disk == totalDisks ? streamFile : getSplitFilePath(streamFile, disk + 1);
     }
 
     public static Path getSplitFilePath(Path zip, long disk) {

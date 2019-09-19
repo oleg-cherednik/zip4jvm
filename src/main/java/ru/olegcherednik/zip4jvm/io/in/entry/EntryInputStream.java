@@ -12,6 +12,7 @@ import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -110,6 +111,11 @@ public abstract class EntryInputStream extends InputStream {
     private void readDataDescriptor() throws IOException {
         if (entry.isDataDescriptorAvailable())
             DataDescriptorReader.get(entry.isZip64()).read(in);
+    }
+
+    @Override
+    public String toString() {
+        return ZipUtils.toString(in.getOffs());
     }
 
 }

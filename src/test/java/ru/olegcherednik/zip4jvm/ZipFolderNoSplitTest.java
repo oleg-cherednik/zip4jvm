@@ -38,7 +38,7 @@ public class ZipFolderNoSplitTest {
     @Test
     public void shouldCreateNewZipWithFolder() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettings(
+                                                  .defEntrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
                                                   .build();
@@ -56,7 +56,7 @@ public class ZipFolderNoSplitTest {
         Assertions.assertThat(Files.isRegularFile(zip)).isTrue();
 
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettings(
+                                                  .defEntrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
                                                   .build();
@@ -75,7 +75,7 @@ public class ZipFolderNoSplitTest {
         Assertions.assertThat(Files.isRegularFile(zip)).isTrue();
 
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettings(
+                                                  .defEntrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
                                                   .build();

@@ -1,5 +1,9 @@
 package ru.olegcherednik.zip4jvm.model;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesDecoder;
@@ -12,10 +16,6 @@ import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareEngine;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.util.function.Function;

@@ -1,13 +1,14 @@
 package ru.olegcherednik.zip4jvm.utils;
 
-import lombok.experimental.UtilityClass;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * @author Oleg Cherednik
  * @since 06.03.2019
  */
-@UtilityClass
-public class BitUtils {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class BitUtils {
 
     public static final int BIT0 = 0b00000000_00000001;
     public static final int BIT1 = 0b00000000_00000010;
@@ -27,7 +28,7 @@ public class BitUtils {
     public static final int BIT14 = 0b01000000_00000000;
     public static final int BIT15 = 0b10000000_00000000;
 
-    public long getByte(long val, int i) {
+    public static long getByte(long val, int i) {
         return (val >> i * 8) & 0xFF;
     }
 
@@ -38,7 +39,7 @@ public class BitUtils {
      * @param bits checked bit or bit set
      * @return {@literal true} if all selected bit(s) are set
      */
-    public boolean isBitSet(int val, int bits) {
+    public static boolean isBitSet(int val, int bits) {
         return (val & bits) == bits;
     }
 
@@ -49,11 +50,11 @@ public class BitUtils {
      * @param bits bit or bit set to set in the val
      * @return {@literal val} with set selected bits
      */
-    public int setBits(int val, int bits) {
+    public static int setBits(int val, int bits) {
         return val | bits;
     }
 
-    public short setBits(short val, int bits) {
+    public static short setBits(short val, int bits) {
         return (short)setBits((int)val, bits);
     }
 
@@ -72,15 +73,15 @@ public class BitUtils {
         return (short)clearBits((int)val, bits);
     }
 
-    public int updateBits(int val, int bits, boolean value) {
+    public static int updateBits(int val, int bits, boolean value) {
         return value ? setBits(val, bits) : clearBits(val, bits);
     }
 
-    public short updateBits(short val, int bits, boolean value) {
+    public static short updateBits(short val, int bits, boolean value) {
         return (short)updateBits((int)val, bits, value);
     }
 
-    public byte updateBits(byte val, int bits, boolean value) {
+    public static byte updateBits(byte val, int bits, boolean value) {
         return (byte)updateBits((int)val, bits, value);
     }
 }

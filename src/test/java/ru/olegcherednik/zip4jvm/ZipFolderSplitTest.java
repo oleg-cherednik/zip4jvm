@@ -38,7 +38,7 @@ public class ZipFolderSplitTest {
     @Test
     public void shouldCreateNewZipWithFolder() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettings(
+                                                  .defEntrySettings(
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
                                                   .splitSize(1024 * 1024).build();

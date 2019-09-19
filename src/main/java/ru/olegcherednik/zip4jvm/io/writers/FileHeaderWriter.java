@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
+import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -15,11 +16,12 @@ import java.util.List;
  * @since 26.04.2019
  */
 @RequiredArgsConstructor
-final class FileHeaderWriter {
+final class FileHeaderWriter implements Writer {
 
     @NonNull
     private final List<CentralDirectory.FileHeader> fileHeaders;
 
+    @Override
     public void write(@NonNull DataOutput out) throws IOException {
         for (CentralDirectory.FileHeader fileHeader : fileHeaders)
             writeFileHeader(fileHeader, out);

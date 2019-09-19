@@ -1,10 +1,11 @@
 package ru.olegcherednik.zip4jvm.io.writers;
 
-import ru.olegcherednik.zip4jvm.io.out.DataOutput;
-import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.ArrayUtils;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import java.io.IOException;
 
@@ -13,10 +14,11 @@ import java.io.IOException;
  * @since 13.04.2019
  */
 @RequiredArgsConstructor
-final class DigitalSignatureWriter {
+final class DigitalSignatureWriter implements Writer {
 
     private final CentralDirectory.DigitalSignature digitalSignature;
 
+    @Override
     public void write(@NonNull DataOutput out) throws IOException {
         if (digitalSignature == null)
             return;

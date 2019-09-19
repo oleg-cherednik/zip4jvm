@@ -1,10 +1,11 @@
 package ru.olegcherednik.zip4jvm.io.writers;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.Zip64;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import java.io.IOException;
 
@@ -13,11 +14,12 @@ import java.io.IOException;
  * @since 14.08.2019
  */
 @RequiredArgsConstructor
-final class Zip64Writer {
+final class Zip64Writer implements Writer {
 
     @NonNull
     private final Zip64 zip64;
 
+    @Override
     public void write(@NonNull DataOutput out) throws IOException {
         new EndCentralDirectory(zip64.getEndCentralDirectory()).write(out);
         new EndCentralDirectoryLocator(zip64.getEndCentralDirectoryLocator()).write(out);
