@@ -47,6 +47,16 @@ public final class ZipEntryBuilder {
         }
     }
 
+    public static ZipEntry create(@NonNull ZipEntryMeta src, @NonNull ZipEntrySettings entrySettings) {
+        try {
+            if (src.isDirectory())
+                return createDirectoryEntry(src, entrySettings);
+            return createRegularFileEntry(src, entrySettings);
+        } catch(IOException e) {
+            throw new Zip4jException(e);
+        }
+    }
+
     private static ZipEntry createDirectoryEntry(Path dir, String fileName, ZipEntrySettings entrySettings) throws IOException {
         fileName = ZipUtils.normalizeFileName(fileName + '/');
         int lastModifiedTime = ZipUtils.javaToDosTime(Files.getLastModifiedTime(dir).toMillis());
@@ -87,8 +97,20 @@ public final class ZipEntryBuilder {
         return entry;
     }
 
-    public static ZipEntry createRegularFileEntry(ZipEntryMeta src, ZipEntrySettings entrySettings) throws IOException {
-        String fileName = ZipUtils.normalizeFileName(src.getFileName());
+    private static ZipEntry createDirectoryEntry(ZipEntryMeta src, ZipEntrySettings entrySettings) throws IOException {
+        String fileName = src.getFileName();
+        int lastModifiedTime = ZipUtils.javaToDosTime(src.getLastModifiedTime());
+        ExternalFileAttributes externalFileAttributes = src.getExternalFileAttributes();
+
+        DirectoryZipEntry entry = new DirectoryZipEntry(fileName, lastModifiedTime, externalFileAttributes);
+        entry.setComment(entrySettings.getComment());
+        entry.setUtf8(entrySettings.isUtf8());
+
+        return entry;
+    }
+
+    private static ZipEntry createRegularFileEntry(ZipEntryMeta src, ZipEntrySettings entrySettings) throws IOException {
+        String fileName = src.getFileName();
         int lastModifiedTime = ZipUtils.javaToDosTime(src.getLastModifiedTime());
         ExternalFileAttributes externalFileAttributes = src.getExternalFileAttributes();
 

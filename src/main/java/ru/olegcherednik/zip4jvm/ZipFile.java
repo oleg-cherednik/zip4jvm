@@ -85,6 +85,10 @@ public final class ZipFile {
 
         void addMeta(@NonNull ZipEntryMeta meta);
 
+        default void addMeta(@NonNull Collection<ZipEntryMeta> metas) {
+            metas.forEach(this::addMeta);
+        }
+
         void remove(@NonNull String prefixEntryName) throws FileNotFoundException;
 
         default void remove(@NonNull Collection<String> prefixEntryNames) throws FileNotFoundException {

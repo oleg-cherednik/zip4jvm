@@ -4,8 +4,10 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
+import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
+import ru.olegcherednik.zip4jvm.utils.EmptyInputStream;
+import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.IOSupplier2;
 
 import java.io.FileInputStream;
@@ -22,20 +24,23 @@ import java.util.Optional;
 @Getter
 public final class ZipEntryMeta {
 
+    @NonNull
     private final IOSupplier2<InputStream> inputStream;
+    @NonNull
     private final String fileName;
     private final long lastModifiedTime;
     private final ExternalFileAttributes externalFileAttributes;
 
     public static ZipEntryMeta of(@NonNull Path path, @NonNull String fileName) throws IOException {
-        if (Files.isRegularFile(path))
-            return builder()
-                    .inputStream(() -> new FileInputStream(path.toFile()))
-                    .fileName(fileName)
-                    .lastModifiedTime(Files.getLastModifiedTime(path).toMillis())
-                    .externalFileAttributes(ExternalFileAttributes.createOperationBasedDelegate(path)).build();
+        fileName = StringUtils.removeEnd(fileName, "/");
+        fileName = StringUtils.removeEnd(fileName, "\\");
+        fileName = Files.isDirectory(path) ? fileName + '/' : fileName;
 
-        throw new Zip4jException("Cannot create source for directory");
+        return builder()
+                .inputStream(Files.isRegularFile(path) ? () -> new FileInputStream(path.toFile()) : () -> EmptyInputStream.INSTANCE)
+                .fileName(fileName)
+                .lastModifiedTime(Files.getLastModifiedTime(path).toMillis())
+                .externalFileAttributes(ExternalFileAttributes.createOperationBasedDelegate(path)).build();
     }
 
     public static Builder builder() {
@@ -43,10 +48,14 @@ public final class ZipEntryMeta {
     }
 
     private ZipEntryMeta(Builder builder) {
-        inputStream = builder.inputStream;
-        fileName = builder.fileName;
+        fileName = ZipUtils.normalizeFileName(builder.fileName);
+        inputStream = ZipUtils.isDirectory(fileName) ? () -> EmptyInputStream.INSTANCE : builder.inputStream;
         lastModifiedTime = builder.lastModifiedTime;
         externalFileAttributes = builder.externalFileAttributes;
+    }
+
+    public boolean isDirectory() {
+        return ZipUtils.isDirectory(fileName);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

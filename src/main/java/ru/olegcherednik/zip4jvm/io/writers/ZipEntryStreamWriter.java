@@ -29,7 +29,7 @@ public final class ZipEntryStreamWriter implements Writer {
 
     @Override
     public void write(@NonNull DataOutput out) throws IOException {
-        ZipEntry entry = ZipEntryBuilder.createRegularFileEntry(meta, entrySettings);
+        ZipEntry entry = ZipEntryBuilder.create(meta, entrySettings);
 
         try (InputStream in = entry.getIn(); OutputStream os = EntryOutputStream.create(entry, tempZipModel, out)) {
             IOUtils.copyLarge(in, os);

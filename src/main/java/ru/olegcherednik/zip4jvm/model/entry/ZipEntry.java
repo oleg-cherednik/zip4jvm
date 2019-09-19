@@ -100,9 +100,6 @@ public abstract class ZipEntry {
     public void setChecksum(long checksum) {
     }
 
-    public void checkCompressedSize(long actual) {
-    }
-
     public final boolean isDataDescriptorAvailable() {
         return dataDescriptorAvailable.getAsBoolean();
     }
