@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.model.entry.v2.RegularFileZipEntrySource;
+import ru.olegcherednik.zip4jvm.model.entry.v2.ZipEntryMeta;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
@@ -85,10 +85,9 @@ public final class ZipFile {
 
         void add(@NonNull Collection<Path> paths, @NonNull ZipEntrySettings entrySettings) throws IOException;
 
+        void addMeta(@NonNull ZipEntryMeta meta);
 
-        void add(@NonNull RegularFileZipEntrySource src);
-
-        void add(@NonNull RegularFileZipEntrySource src, @NonNull ZipEntrySettings entrySettings);
+        void addMeta(@NonNull ZipEntryMeta meta, @NonNull ZipEntrySettings entrySettings);
 
         void remove(@NonNull String prefixEntryName) throws FileNotFoundException;
 

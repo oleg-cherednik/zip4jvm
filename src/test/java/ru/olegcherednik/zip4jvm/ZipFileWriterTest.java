@@ -7,7 +7,7 @@ import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
-import ru.olegcherednik.zip4jvm.model.entry.v2.RegularFileZipEntrySource;
+import ru.olegcherednik.zip4jvm.model.entry.v2.ZipEntryMeta;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
@@ -159,10 +159,10 @@ public class ZipFileWriterTest {
                                                        .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
 
         try (ZipFile.Writer zipFile = ZipFile.write(supplierSolidFile, zipFileSettings)) {
-            zipFile.add(RegularFileZipEntrySource.of(Zip4jSuite.fileBentleyContinental, "bentley-continental.jpg"), bentleySettings);
-            zipFile.add(RegularFileZipEntrySource.of(Zip4jSuite.fileFerrari, "ferrari-458-italia.jpg"), ferrariSettings);
-            zipFile.add(RegularFileZipEntrySource.of(Zip4jSuite.fileWiesmann, "wiesmann-gt-mf5.jpg"), wiesmannSettings);
-            zipFile.add(RegularFileZipEntrySource.of(Zip4jSuite.starWarsDir.resolve("one.jpg"), "one.jpg"), oneSettings);
+            zipFile.addMeta(ZipEntryMeta.of(Zip4jSuite.fileBentleyContinental, "bentley-continental.jpg"), bentleySettings);
+            zipFile.addMeta(ZipEntryMeta.of(Zip4jSuite.fileFerrari, "ferrari-458-italia.jpg"), ferrariSettings);
+            zipFile.addMeta(ZipEntryMeta.of(Zip4jSuite.fileWiesmann, "wiesmann-gt-mf5.jpg"), wiesmannSettings);
+            zipFile.addMeta(ZipEntryMeta.of(Zip4jSuite.starWarsDir.resolve("one.jpg"), "one.jpg"), oneSettings);
         }
 
         assertThatDirectory(supplierSolidFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -176,18 +176,18 @@ public class ZipFileWriterTest {
     public void shouldCreateZipFileWhenUseZipFileAndAddFilesWithText() throws IOException {
         ZipFileSettings zipFileSettings = ZipFileSettings.builder().build();
 
-        RegularFileZipEntrySource oneSource = RegularFileZipEntrySource.builder()
-                                                                       .inputStream(() -> IOUtils.toInputStream("one.txt", StandardCharsets.UTF_8))
-                                                                       .fileName("one.txt").build();
-        RegularFileZipEntrySource twoSource = RegularFileZipEntrySource.builder()
-                                                                       .inputStream(() -> IOUtils.toInputStream("two.txt", StandardCharsets.UTF_8))
-                                                                       .fileName("two.txt").build();
-        RegularFileZipEntrySource threeSource = RegularFileZipEntrySource.builder()
-                                                                       .inputStream(() -> IOUtils.toInputStream("three.txt", StandardCharsets.UTF_8))
-                                                                       .fileName("three.txt").build();
-        RegularFileZipEntrySource fourSource = RegularFileZipEntrySource.builder()
-                                                                       .inputStream(() -> IOUtils.toInputStream("four.txt", StandardCharsets.UTF_8))
-                                                                       .fileName("four.txt").build();
+        ZipEntryMeta oneSource = ZipEntryMeta.builder()
+                                             .inputStream(() -> IOUtils.toInputStream("one.txt", StandardCharsets.UTF_8))
+                                             .fileName("one.txt").build();
+        ZipEntryMeta twoSource = ZipEntryMeta.builder()
+                                             .inputStream(() -> IOUtils.toInputStream("two.txt", StandardCharsets.UTF_8))
+                                             .fileName("two.txt").build();
+        ZipEntryMeta threeSource = ZipEntryMeta.builder()
+                                               .inputStream(() -> IOUtils.toInputStream("three.txt", StandardCharsets.UTF_8))
+                                               .fileName("three.txt").build();
+        ZipEntryMeta fourSource = ZipEntryMeta.builder()
+                                              .inputStream(() -> IOUtils.toInputStream("four.txt", StandardCharsets.UTF_8))
+                                              .fileName("four.txt").build();
 
         ZipEntrySettings oneSettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
         ZipEntrySettings twoSettings = ZipEntrySettings.builder().compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
@@ -199,10 +199,10 @@ public class ZipFileWriterTest {
                                                         .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
 
         try (ZipFile.Writer zipFile = ZipFile.write(memorySolidFile, zipFileSettings)) {
-            zipFile.add(oneSource, oneSettings);
-            zipFile.add(twoSource, twoSettings);
-            zipFile.add(threeSource, threeSettings);
-            zipFile.add(fourSource, fourSettings);
+            zipFile.addMeta(oneSource, oneSettings);
+            zipFile.addMeta(twoSource, twoSettings);
+            zipFile.addMeta(threeSource, threeSettings);
+            zipFile.addMeta(fourSource, fourSettings);
         }
 
         assertThatDirectory(memorySolidFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);

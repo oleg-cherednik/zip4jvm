@@ -17,7 +17,7 @@ import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import ru.olegcherednik.zip4jvm.model.entry.v2.RegularFileZipEntrySource;
+import ru.olegcherednik.zip4jvm.model.entry.v2.ZipEntryMeta;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.IOSupplier;
@@ -88,7 +88,7 @@ public final class ZipEntryBuilder {
         return entry;
     }
 
-    public static ZipEntry createRegularFileEntry(RegularFileZipEntrySource src, ZipEntrySettings entrySettings) throws IOException {
+    public static ZipEntry createRegularFileEntry(ZipEntryMeta src, ZipEntrySettings entrySettings) throws IOException {
         String fileName = ZipUtils.normalizeFileName(FilenameUtils.concat(entrySettings.getBasePath(), src.getFileName()));
         int lastModifiedTime = ZipUtils.javaToDosTime(src.getLastModifiedTime());
         ExternalFileAttributes externalFileAttributes = src.getExternalFileAttributes();

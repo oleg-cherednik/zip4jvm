@@ -11,7 +11,7 @@ import ru.olegcherednik.zip4jvm.io.writers.RegularFileWriter;
 import ru.olegcherednik.zip4jvm.io.writers.ZipEntryStreamWriter;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
-import ru.olegcherednik.zip4jvm.model.entry.v2.RegularFileZipEntrySource;
+import ru.olegcherednik.zip4jvm.model.entry.v2.ZipEntryMeta;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
@@ -25,7 +25,6 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -48,7 +47,6 @@ final class ZipFileWriter implements ZipFile.Writer {
 
     @Override
     public void add(@NonNull Collection<Path> paths) throws IOException {
-        Objects.requireNonNull(defEntrySettings);
         add(paths, defEntrySettings);
     }
 
@@ -66,14 +64,14 @@ final class ZipFileWriter implements ZipFile.Writer {
     }
 
     @Override
-    public void add(@NonNull RegularFileZipEntrySource src) {
-        add(src, defEntrySettings);
+    public void addMeta(@NonNull ZipEntryMeta meta) {
+        addMeta(meta, defEntrySettings);
     }
 
     @Override
-    public void add(@NonNull RegularFileZipEntrySource src, @NonNull ZipEntrySettings entrySettings) {
-        if (fileNameWriter.put(src.getFileName(), new ZipEntryStreamWriter(src, entrySettings, tempZipModel)) != null)
-            throw new Zip4jEntryDuplicationException(src.getFileName());
+    public void addMeta(@NonNull ZipEntryMeta meta, @NonNull ZipEntrySettings entrySettings) {
+        if (fileNameWriter.put(meta.getFileName(), new ZipEntryStreamWriter(meta, entrySettings, tempZipModel)) != null)
+            throw new Zip4jEntryDuplicationException(meta.getFileName());
     }
 
     @Override

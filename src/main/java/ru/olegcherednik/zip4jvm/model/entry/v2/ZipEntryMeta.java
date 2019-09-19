@@ -20,14 +20,14 @@ import java.util.Optional;
  * @since 19.09.2019
  */
 @Getter
-public final class RegularFileZipEntrySource {
+public final class ZipEntryMeta {
 
     private final IOSupplier2<InputStream> inputStream;
     private final String fileName;
     private final long lastModifiedTime;
     private final ExternalFileAttributes externalFileAttributes;
 
-    public static RegularFileZipEntrySource of(@NonNull Path path, @NonNull String fileName) throws IOException {
+    public static ZipEntryMeta of(@NonNull Path path, @NonNull String fileName) throws IOException {
         if (Files.isRegularFile(path))
             return builder()
                     .inputStream(() -> new FileInputStream(path.toFile()))
@@ -42,7 +42,7 @@ public final class RegularFileZipEntrySource {
         return new Builder();
     }
 
-    private RegularFileZipEntrySource(Builder builder) {
+    private ZipEntryMeta(Builder builder) {
         inputStream = builder.inputStream;
         fileName = builder.fileName;
         lastModifiedTime = builder.lastModifiedTime;
@@ -57,8 +57,8 @@ public final class RegularFileZipEntrySource {
         private long lastModifiedTime = System.currentTimeMillis();
         private ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.NULL;
 
-        public RegularFileZipEntrySource build() {
-            return new RegularFileZipEntrySource(this);
+        public ZipEntryMeta build() {
+            return new ZipEntryMeta(this);
         }
 
         public Builder inputStream(IOSupplier2<InputStream> inputStream) {
