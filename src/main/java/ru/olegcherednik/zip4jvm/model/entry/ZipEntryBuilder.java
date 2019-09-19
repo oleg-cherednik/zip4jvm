@@ -19,10 +19,9 @@ import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
-import ru.olegcherednik.zip4jvm.utils.function.IOSupplier;
+import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_ENTRY_SIZE;
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
@@ -63,10 +62,10 @@ public final class ZipEntryBuilder {
         CompressionLevel compressionLevel = entrySettings.getCompressionLevel();
         Encryption encryption = entrySettings.getEncryption();
 
-        IOSupplier<InputStream> inputStream = zipEntry -> entry.getInputStreamSup().get();
+        ZipEntryInputStreamSupplier inputStreamSup = zipEntry -> entry.getInputStreamSup().get();
 
         RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, compression, compressionLevel,
-                encryption, inputStream);
+                encryption, inputStreamSup);
 
         zipEntry.setZip64(entrySettings.isZip64());
         zipEntry.setPassword(entrySettings.getPassword());
@@ -104,12 +103,14 @@ public final class ZipEntryBuilder {
         CompressionLevel compressionLevel = fileHeader.getGeneralPurposeFlag().getCompressionLevel();
         Encryption encryption = fileHeader.getEncryption();
         ExternalFileAttributes externalFileAttributes = fileHeader.getExternalFileAttributes();
-        IOSupplier<InputStream> inputStream = entry -> {
+
+        ZipEntryInputStreamSupplier inputStreamSup = entry -> {
             DataInput in = zipModel.isSplit() ? SplitZipInputStream.create(zipModel, entry.getDisk()) : SingleZipInputStream.create(zipModel);
             return EntryInputStream.create(entry, in);
         };
+
         RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, compression, compressionLevel,
-                encryption, inputStream);
+                encryption, inputStreamSup);
         zipEntry.setZip64(fileHeader.isZip64());
         zipEntry.setComment(fileHeader.getComment());
         zipEntry.setUtf8(fileHeader.getGeneralPurposeFlag().isUtf8());

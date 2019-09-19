@@ -4,7 +4,7 @@ import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
-import ru.olegcherednik.zip4jvm.utils.EmptyInputStream;
+import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamSupplier;
 
 /**
  * @author Oleg Cherednik
@@ -14,7 +14,7 @@ final class DirectoryZipEntry extends ZipEntry {
 
     public DirectoryZipEntry(String fileName, int lastModifiedTime, ExternalFileAttributes externalFileAttributes) {
         super(fileName, lastModifiedTime, externalFileAttributes, Compression.STORE, CompressionLevel.NORMAL, Encryption.OFF,
-                zipEntry -> EmptyInputStream.INSTANCE);
+                EmptyInputStreamSupplier.INSTANCE);
     }
 
     @Override

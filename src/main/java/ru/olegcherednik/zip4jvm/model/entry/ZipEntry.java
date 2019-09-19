@@ -17,7 +17,7 @@ import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
-import ru.olegcherednik.zip4jvm.utils.function.IOSupplier;
+import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,7 +47,7 @@ public abstract class ZipEntry {
     protected final Compression compression;
     private final CompressionLevel compressionLevel;
     protected final Encryption encryption;
-    private final IOSupplier<InputStream> inputStream;
+    private final ZipEntryInputStreamSupplier inputStreamSup;
 
     /**
      * {@literal true} only if section {@link Zip64.ExtendedInfo} exists in {@link LocalFileHeader} and {@link CentralDirectory.FileHeader}.
@@ -84,7 +84,7 @@ public abstract class ZipEntry {
     }
 
     public InputStream getIn() throws IOException {
-        return inputStream.get(this);
+        return inputStreamSup.get(this);
     }
 
     @Override

@@ -6,9 +6,7 @@ import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
-import ru.olegcherednik.zip4jvm.utils.function.IOSupplier;
-
-import java.io.InputStream;
+import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
 
 /**
  * @author Oleg Cherednik
@@ -21,8 +19,8 @@ final class RegularFileZipEntry extends ZipEntry {
     private long checksum;
 
     public RegularFileZipEntry(String fileName, int lastModifiedTime, ExternalFileAttributes externalFileAttributes, Compression compression,
-            CompressionLevel compressionLevel, Encryption encryption, IOSupplier<InputStream> inputStream) {
-        super(fileName, lastModifiedTime, externalFileAttributes, compression, compressionLevel, encryption, inputStream);
+            CompressionLevel compressionLevel, Encryption encryption, ZipEntryInputStreamSupplier inputStreamSup) {
+        super(fileName, lastModifiedTime, externalFileAttributes, compression, compressionLevel, encryption, inputStreamSup);
         setDataDescriptorAvailable(() -> true);
     }
 
@@ -30,6 +28,5 @@ final class RegularFileZipEntry extends ZipEntry {
     public boolean isRegularFile() {
         return true;
     }
-
 
 }
