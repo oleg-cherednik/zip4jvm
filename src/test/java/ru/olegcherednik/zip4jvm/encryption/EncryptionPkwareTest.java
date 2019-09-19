@@ -1,5 +1,6 @@
 package ru.olegcherednik.zip4jvm.encryption;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -49,8 +50,7 @@ public class EncryptionPkwareTest {
                                                   .entrySettingsProvider(fileName ->
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                                          .encryption(Encryption.PKWARE, fn -> Zip4jSuite.password)
-                                                                          .build())
+                                                                          .encryption(Encryption.PKWARE, Zip4jSuite.password).build())
                                                   .comment("password: " + new String(Zip4jSuite.password)).build();
 
         Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
@@ -65,8 +65,7 @@ public class EncryptionPkwareTest {
                                                   .entrySettingsProvider(fileName ->
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                                          .encryption(Encryption.PKWARE, fn -> Zip4jSuite.password)
-                                                                          .build())
+                                                                          .encryption(Encryption.PKWARE, Zip4jSuite.password).build())
                                                   .comment("password: " + new String(Zip4jSuite.password)).build();
         Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt.add(zip, Zip4jSuite.filesCarsDir, settings);
@@ -81,8 +80,7 @@ public class EncryptionPkwareTest {
                                                   .entrySettingsProvider(fileName ->
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                                          .encryption(Encryption.PKWARE, fn -> "".toCharArray())
-                                                                          .build())
+                                                                          .encryption(Encryption.PKWARE, ArrayUtils.EMPTY_CHAR_ARRAY).build())
                                                   .build();
         Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
@@ -94,7 +92,7 @@ public class EncryptionPkwareTest {
                                                   .entrySettingsProvider(fileName ->
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                                          .encryption(Encryption.PKWARE, fn -> Zip4jSuite.password).build())
+                                                                          .encryption(Encryption.PKWARE, Zip4jSuite.password).build())
                                                   .comment("password: " + new String(Zip4jSuite.password)).build();
 
         Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
@@ -110,8 +108,7 @@ public class EncryptionPkwareTest {
                                                   .entrySettingsProvider(fileName ->
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                                          .encryption(Encryption.PKWARE, fn -> Zip4jSuite.password)
-                                                                          .build())
+                                                                          .encryption(Encryption.PKWARE, Zip4jSuite.password).build())
                                                   .comment("password: " + new String(Zip4jSuite.password)).build();
         Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt.add(zip, Zip4jSuite.srcDir, settings);

@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -106,26 +105,18 @@ public class ZipFileTest {
     // TODO add unzip tests for such ZipFile
 
     public void shouldCreateZipFileWithEntryDifferentEncryptionAndPasswordWhenUseZipFile() throws IOException {
-        Function<String, char[]> password = fileName -> {
-            if ("ferrari-458-italia.jpg".equals(fileName))
-                return "1".toCharArray();
-            if ("wiesmann-gt-mf5.jpg".equals(fileName))
-                return "2".toCharArray();
-            return ArrayUtils.clone(Zip4jSuite.password);
-        };
-
         Function<String, ZipEntrySettings> entrySettingsProvider = fileName -> {
             if ("bentley-continental.jpg".equals(fileName))
                 return ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
             if ("ferrari-458-italia.jpg".equals(fileName))
                 return ZipEntrySettings.builder()
                                        .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                       .encryption(Encryption.PKWARE, password).build();
+                                       .encryption(Encryption.PKWARE, "1".toCharArray()).build();
             if ("wiesmann-gt-mf5.jpg".equals(fileName))
                 return ZipEntrySettings.builder()
                                        .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                       .encryption(Encryption.AES_256, password).build();
-            return ZipEntrySettings.DEFAULT;
+                                       .encryption(Encryption.AES_256, "2".toCharArray()).build();
+            return ZipEntrySettings.DEFAULT.toBuilder().password(Zip4jSuite.password).build();
         };
 
         Path file = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
@@ -152,7 +143,7 @@ public class ZipFileTest {
             if (!fileName.contains("/"))
                 return ZipEntrySettings.builder()
                                        .compression(Compression.DEFLATE, CompressionLevel.MAXIMUM)
-                                       .encryption(Encryption.PKWARE, fn -> Zip4jSuite.password).build();
+                                       .encryption(Encryption.PKWARE, Zip4jSuite.password).build();
             return ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
         };
 

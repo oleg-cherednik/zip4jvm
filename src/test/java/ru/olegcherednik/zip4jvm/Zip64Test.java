@@ -69,8 +69,7 @@ public class Zip64Test {
                                                   .entrySettingsProvider(fileName ->
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                                          .encryption(Encryption.AES_256, fn -> Zip4jSuite.password)
-                                                                          .build())
+                                                                          .encryption(Encryption.AES_256, Zip4jSuite.password).build())
                                                   .comment("password: " + new String(Zip4jSuite.password))
                                                   .zip64(true).build();
 

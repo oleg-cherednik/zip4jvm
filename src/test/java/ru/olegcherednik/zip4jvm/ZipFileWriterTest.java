@@ -52,11 +52,11 @@ public class ZipFileWriterTest {
                 return ZipEntrySettings.builder().compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
             if ("wiesmann-gt-mf5.jpg".equals(fileName))
                 return ZipEntrySettings.builder()
-                                       .encryption(Encryption.PKWARE, fn -> Zip4jSuite.password)
+                                       .encryption(Encryption.PKWARE, Zip4jSuite.password)
                                        .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
             if ("one.jpg".equals(fileName))
                 return ZipEntrySettings.builder()
-                                       .encryption(Encryption.AES_256, fn -> Zip4jSuite.password)
+                                       .encryption(Encryption.AES_256, Zip4jSuite.password)
                                        .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
             return ZipEntrySettings.DEFAULT;
         };
@@ -82,11 +82,11 @@ public class ZipFileWriterTest {
             if ("two.jpg".equals(fileName))
                 return ZipEntrySettings.builder()
                                        .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                       .encryption(Encryption.PKWARE, fn -> Zip4jSuite.password).build();
+                                       .encryption(Encryption.PKWARE, Zip4jSuite.password).build();
             if ("three.jpg".equals(fileName))
                 return ZipEntrySettings.builder()
                                        .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                       .encryption(Encryption.AES_256, fn -> Zip4jSuite.password).build();
+                                       .encryption(Encryption.AES_256, Zip4jSuite.password).build();
             return ZipEntrySettings.DEFAULT;
         };
 
@@ -161,11 +161,11 @@ public class ZipFileWriterTest {
                 return ZipEntrySettings.builder().compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
             if ("wiesmann-gt-mf5.jpg".equals(fileName))
                 return ZipEntrySettings.builder()
-                                       .encryption(Encryption.PKWARE, fn -> Zip4jSuite.password)
+                                       .encryption(Encryption.PKWARE, Zip4jSuite.password)
                                        .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
             if ("one.jpg".equals(fileName))
                 return ZipEntrySettings.builder()
-                                       .encryption(Encryption.AES_256, fn -> Zip4jSuite.password)
+                                       .encryption(Encryption.AES_256, Zip4jSuite.password)
                                        .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
             return ZipEntrySettings.DEFAULT;
         };
@@ -193,11 +193,11 @@ public class ZipFileWriterTest {
                 return ZipEntrySettings.builder().compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
             if ("three.txt".equals(fileName))
                 return ZipEntrySettings.builder()
-                                       .encryption(Encryption.PKWARE, fn -> Zip4jSuite.password)
+                                       .encryption(Encryption.PKWARE, Zip4jSuite.password)
                                        .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
             if ("four.txt".equals(fileName))
                 return ZipEntrySettings.builder()
-                                       .encryption(Encryption.AES_256, fn -> Zip4jSuite.password)
+                                       .encryption(Encryption.AES_256, Zip4jSuite.password)
                                        .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
             return ZipEntrySettings.DEFAULT;
         };

@@ -91,7 +91,7 @@ final class ZipFileWriter implements ZipFile.Writer {
             if (fileNameWriter.containsKey(fileName))
                 throw new Zip4jException("File name duplication");
 
-            char[] password = entrySettingsProvider == null ? null : entrySettingsProvider.apply(fileName).getPassword().apply(fileName);
+            char[] password = entrySettingsProvider == null ? null : entrySettingsProvider.apply(fileName).getPassword();
 
             if (fileNameWriter.put(fileName, new ExistedEntryWriter(srcZipModel, fileName, tempZipModel, password)) != null)
                 throw new Zip4jException("File name duplication");
@@ -154,7 +154,7 @@ final class ZipFileWriter implements ZipFile.Writer {
                 char[] password = null;
 
                 if (zipFileSettings.getEntrySettingsProvider() != null)
-                    password = zipFileSettings.getEntrySettingsProvider().apply(entryName).getPassword().apply(entryName);
+                    password = zipFileSettings.getEntrySettingsProvider().apply(entryName).getPassword();
 
                 fileNameWriter.put(entryName, new ExistedEntryWriter(zipModel, entryName, tempZipModel, password));
             });

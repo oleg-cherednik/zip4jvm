@@ -72,7 +72,7 @@ public class ModifyCommentTest {
                                                   .entrySettingsProvider(fileName ->
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                                          .encryption(Encryption.PKWARE, fn -> Zip4jSuite.password).build())
+                                                                          .encryption(Encryption.PKWARE, Zip4jSuite.password).build())
                                                   .build();
         ZipIt.add(zip, Collections.emptyList(), settings);
         assertThatZipFile(zip, Zip4jSuite.password).hasCommentSize(0);

@@ -54,7 +54,7 @@ public final class ZipEntryBuilder {
         ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.createOperationBasedDelegate(dir);
 
         DirectoryZipEntry entry = new DirectoryZipEntry(fileName, lastModifiedTime, externalFileAttributes);
-        entry.setPassword(entrySettings.getPassword().apply(fileName));
+        entry.setPassword(entrySettings.getPassword());
         entry.setComment(entrySettings.getComment().apply(fileName));
         entry.setUtf8(entrySettings.isUtf8());
 
@@ -78,7 +78,7 @@ public final class ZipEntryBuilder {
         RegularFileZipEntry entry = new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, compression, compressionLevel,
                 encryption, inputStream);
         entry.setZip64(entrySettings.isZip64());
-        entry.setPassword(entrySettings.getPassword().apply(fileName));
+        entry.setPassword(entrySettings.getPassword());
         entry.setComment(entrySettings.getComment().apply(fileName));
         entry.setUtf8(entrySettings.isUtf8());
 
@@ -103,7 +103,7 @@ public final class ZipEntryBuilder {
                 encryption, inputStream);
 
         entry.setZip64(entrySettings.isZip64());
-        entry.setPassword(entrySettings.getPassword().apply(fileName));
+        entry.setPassword(entrySettings.getPassword());
         entry.setComment(entrySettings.getComment().apply(fileName));
         entry.setUtf8(entrySettings.isUtf8());
 

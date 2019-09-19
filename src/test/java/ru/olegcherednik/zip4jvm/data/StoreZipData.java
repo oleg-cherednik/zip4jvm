@@ -65,7 +65,7 @@ public final class StoreZipData {
                                                   .entrySettingsProvider(fileName ->
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                                          .encryption(Encryption.PKWARE, fn -> Zip4jSuite.password).build())
+                                                                          .encryption(Encryption.PKWARE, Zip4jSuite.password).build())
                                                   .comment("password: " + new String(Zip4jSuite.password)).build();
         ZipIt.add(Zip4jSuite.storeSolidPkwareZip, Zip4jSuite.contentSrcDir, settings);
 
@@ -79,7 +79,7 @@ public final class StoreZipData {
                                                   .entrySettingsProvider(fileName ->
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                                          .encryption(Encryption.PKWARE, String::toCharArray).build())
+                                                                          .encryption(Encryption.PKWARE, fileName.toCharArray()).build())
                                                   .comment("password: fileName").build();
         ZipIt.add(Zip4jSuite.storeSolidAesZip, Zip4jSuite.contentSrcDir, settings);
 
