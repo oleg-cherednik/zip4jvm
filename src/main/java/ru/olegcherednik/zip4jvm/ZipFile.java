@@ -39,6 +39,10 @@ public final class ZipFile {
         return write(zip, ZipFileSettings.builder().build());
     }
 
+    public static ZipFile.Writer write(@NonNull Path zip, @NonNull Function<String, ZipEntrySettings> entrySettingsProvider) throws IOException {
+        return write(zip, ZipFileSettings.builder().entrySettingsProvider(entrySettingsProvider).build());
+    }
+
     public static ZipFile.Writer write(@NonNull Path zip, @NonNull ZipFileSettings zipFileSettings) throws IOException {
         return new ZipFileWriter(zip, zipFileSettings);
     }
@@ -75,10 +79,6 @@ public final class ZipFile {
 
         default void add(@NonNull Path path) throws IOException {
             add(Collections.singleton(path));
-        }
-
-        default void add(@NonNull Path path, @NonNull ZipEntrySettings entrySettings) throws IOException {
-            add(Collections.singleton(path), entrySettings);
         }
 
         void add(@NonNull Collection<Path> paths) throws IOException;

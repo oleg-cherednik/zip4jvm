@@ -15,6 +15,8 @@ import java.util.function.Function;
 @Getter
 public final class ZipEntrySettings {
 
+    public static final ZipEntrySettings DEFAULT = builder().build();
+
     private final Compression compression;
     private final CompressionLevel compressionLevel;
     private final Encryption encryption;
@@ -22,6 +24,8 @@ public final class ZipEntrySettings {
     private final Function<String, String> comment;
     private final boolean zip64;
     private final boolean utf8;
+
+    // TODO this is artefact, check why it's here
     private String basePath = "";
 
     public static Builder builder() {

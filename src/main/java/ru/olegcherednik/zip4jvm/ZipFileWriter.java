@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -37,17 +38,29 @@ final class ZipFileWriter implements ZipFile.Writer {
     private final Path zip;
     private final ZipModel tempZipModel;
     private final ZipEntrySettings defEntrySettings;
+    private final Function<String, ZipEntrySettings> entrySettingsProvider;
     private final Map<String, Writer> fileNameWriter = new LinkedHashMap<>();
 
     public ZipFileWriter(@NonNull Path zip, @NonNull ZipFileSettings zipFileSettings) throws IOException {
         this.zip = zip;
         tempZipModel = createTempZipModel(zip, zipFileSettings, fileNameWriter);
+        entrySettingsProvider = zipFileSettings.getEntrySettingsProvider();
         defEntrySettings = zipFileSettings.getDefEntrySettings();
     }
 
     @Override
     public void add(@NonNull Collection<Path> paths) throws IOException {
-        add(paths, defEntrySettings);
+//        add(paths, defEntrySettings);
+        PathUtils.requireExistedPaths(paths);
+
+        for (Map.Entry<Path, String> entry : PathUtils.getRelativeContent(paths).entrySet()) {
+            Path path = entry.getKey();
+            String fileName = entry.getValue();
+            ZipEntrySettings entrySettings = entrySettingsProvider.apply(fileName);
+
+            if (fileNameWriter.put(fileName, new RegularFileWriter(path, fileName, entrySettings, tempZipModel)) != null)
+                throw new Zip4jException("File name duplication");
+        }
     }
 
     @Override
