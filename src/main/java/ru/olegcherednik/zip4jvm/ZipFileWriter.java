@@ -13,7 +13,6 @@ import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.v2.ZipEntryMeta;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
-import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
@@ -21,7 +20,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -43,17 +41,6 @@ final class ZipFileWriter implements ZipFile.Writer {
         this.zip = zip;
         tempZipModel = createTempZipModel(zip, zipFileSettings, fileNameWriter);
         entrySettingsProvider = zipFileSettings.getEntrySettingsProvider();
-    }
-
-    @Override
-    public void add(@NonNull Collection<Path> paths) throws IOException {
-        PathUtils.requireExistedPaths(paths);
-
-        for (Map.Entry<Path, String> entry : PathUtils.getRelativeContent(paths).entrySet()) {
-            Path path = entry.getKey();
-            String fileName = entry.getValue();
-            addMeta(ZipEntryMeta.of(path, fileName));
-        }
     }
 
     @Override

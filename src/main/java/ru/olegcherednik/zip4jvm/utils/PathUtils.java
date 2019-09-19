@@ -26,6 +26,8 @@ public final class PathUtils {
 
     @NonNull
     public static Map<Path, String> getRelativeContent(@NonNull Collection<Path> paths) throws IOException {
+        requireExistedPaths(paths);
+
         Map<Path, String> pathFileName = new TreeMap<>(SORT_DIR_FIRST);
 
         for (Path path : paths) {

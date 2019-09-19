@@ -7,6 +7,7 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.entry.v2.ZipEntryMeta;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import java.io.Closeable;
 import java.io.FileNotFoundException;
@@ -15,6 +16,7 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -81,7 +83,10 @@ public final class ZipFile {
             add(Collections.singleton(path));
         }
 
-        void add(@NonNull Collection<Path> paths) throws IOException;
+        default void add(@NonNull Collection<Path> paths) throws IOException {
+            for (Map.Entry<Path, String> entry : PathUtils.getRelativeContent(paths).entrySet())
+                addMeta(ZipEntryMeta.of(entry.getKey(), entry.getValue()));
+        }
 
         void addMeta(@NonNull ZipEntryMeta meta);
 
