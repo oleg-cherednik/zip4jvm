@@ -9,6 +9,7 @@ import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  * @author Oleg Cherednik
@@ -22,6 +23,7 @@ final class ExtraFieldReader implements Reader<ExtraField> {
     private final boolean compressedSize;
     private final boolean offs;
     private final boolean disk;
+    private final Charset charset;
 
     @NonNull
     @Override
@@ -37,7 +39,7 @@ final class ExtraFieldReader implements Reader<ExtraField> {
             int signature = in.readWord();
 
             Zip64.ExtendedInfo zip64 = new Zip64Reader.ExtendedInfo(signature, uncompressedSize, compressedSize, offs, disk).read(in);
-            AesExtraDataRecord aes = new AesExtraDataRecordReader(signature).read(in);
+            AesExtraDataRecord aes = new AesExtraDataRecordReader(signature, charset).read(in);
 
             if (zip64 != Zip64.ExtendedInfo.NULL)
                 extraField.setExtendedInfo(zip64);
