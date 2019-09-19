@@ -17,7 +17,6 @@ Zip files support for JVM application
 ~~~~
 
 ### Gradle
-
 ~~~~
 compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.0'
 ~~~~
