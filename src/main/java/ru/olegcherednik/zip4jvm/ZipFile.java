@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
@@ -87,11 +86,11 @@ public final class ZipFile {
 
     public interface Writer extends Closeable {
 
-        default void addPath(@NonNull Path path) throws IOException {
-            addPath(Collections.singleton(path));
+        default void add(@NonNull Path path) throws IOException {
+            add(Collections.singleton(path));
         }
 
-        default void addPath(@NonNull Collection<Path> paths) throws IOException {
+        default void add(@NonNull Collection<Path> paths) throws IOException {
             for (Map.Entry<Path, String> entry : PathUtils.getRelativeContent(paths).entrySet())
                 addEntry(Entry.of(entry.getKey(), entry.getValue()));
         }
@@ -128,10 +127,6 @@ public final class ZipFile {
         private final boolean regularFile;
 
         public static Entry of(@NonNull Path path, @NonNull String fileName) throws IOException {
-            fileName = StringUtils.removeEnd(fileName, "/");
-            fileName = StringUtils.removeEnd(fileName, "\\");
-            fileName = Files.isDirectory(path) ? fileName + '/' : fileName;
-
             return builder()
                     .inputStreamSup(Files.isRegularFile(path) ? () -> new FileInputStream(path.toFile()) : EmptyInputStreamSupplier.INSTANCE)
                     .fileName(fileName)

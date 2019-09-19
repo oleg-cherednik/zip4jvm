@@ -33,11 +33,11 @@ import java.util.Collections;
 public final class ZipIt {
 
     public static void add(@NonNull Path zip, @NonNull Path path) throws IOException {
-        add(zip, path, ZipFileSettings.builder().build());
+        add(zip, path, ZipFileSettings.DEFAULT);
     }
 
     public static void add(@NonNull Path zip, @NonNull Collection<Path> paths) throws IOException {
-        add(zip, paths, ZipFileSettings.builder().build());
+        add(zip, paths, ZipFileSettings.DEFAULT);
     }
 
     public static void add(@NonNull Path zip, @NonNull Path path, @NonNull ZipFileSettings settings) throws IOException {
@@ -46,7 +46,25 @@ public final class ZipIt {
 
     public static void add(@NonNull Path zip, @NonNull Collection<Path> paths, @NonNull ZipFileSettings settings) throws IOException {
         try (ZipFile.Writer zipFile = ZipFile.write(zip, settings)) {
-            zipFile.addPath(paths);
+            zipFile.add(paths);
+        }
+    }
+
+    public static void addEntry(@NonNull Path zip, @NonNull ZipFile.Entry entry) throws IOException {
+        addEntry(zip, entry, ZipFileSettings.DEFAULT);
+    }
+
+    public static void addEntry(@NonNull Path zip, @NonNull Collection<ZipFile.Entry> entries) throws IOException {
+        addEntry(zip, entries, ZipFileSettings.DEFAULT);
+    }
+
+    public static void addEntry(@NonNull Path zip, @NonNull ZipFile.Entry entry, @NonNull ZipFileSettings settings) throws IOException {
+        addEntry(zip, Collections.singleton(entry), settings);
+    }
+
+    public static void addEntry(@NonNull Path zip, @NonNull Collection<ZipFile.Entry> entries, @NonNull ZipFileSettings settings) throws IOException {
+        try (ZipFile.Writer zipFile = ZipFile.write(zip, settings)) {
+            zipFile.addEntry(entries);
         }
     }
 

@@ -61,10 +61,10 @@ public class ZipFileWriterTest {
         };
 
         try (ZipFile.Writer zipFile = ZipFile.write(solidFile, entrySettingsProvider)) {
-            zipFile.addPath(Zip4jSuite.fileBentleyContinental);
-            zipFile.addPath(Zip4jSuite.fileFerrari);
-            zipFile.addPath(Zip4jSuite.fileWiesmann);
-            zipFile.addPath(Zip4jSuite.starWarsDir.resolve("one.jpg"));
+            zipFile.add(Zip4jSuite.fileBentleyContinental);
+            zipFile.add(Zip4jSuite.fileFerrari);
+            zipFile.add(Zip4jSuite.fileWiesmann);
+            zipFile.add(Zip4jSuite.starWarsDir.resolve("one.jpg"));
         }
 
         assertThatDirectory(solidFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -91,8 +91,8 @@ public class ZipFileWriterTest {
 
 
         try (ZipFile.Writer zipFile = ZipFile.write(solidFile, entrySettingsProvider)) {
-            zipFile.addPath(Zip4jSuite.starWarsDir.resolve("two.jpg"));
-            zipFile.addPath(Zip4jSuite.starWarsDir.resolve("three.jpg"));
+            zipFile.add(Zip4jSuite.starWarsDir.resolve("two.jpg"));
+            zipFile.add(Zip4jSuite.starWarsDir.resolve("three.jpg"));
         }
 
         assertThatDirectory(solidFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -113,9 +113,9 @@ public class ZipFileWriterTest {
                                                          .splitSize(1024 * 1024).build();
 
         try (ZipFile.Writer zipFile = ZipFile.write(splitFile, zipFileSettings)) {
-            zipFile.addPath(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"));
-            zipFile.addPath(Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg"));
-            zipFile.addPath(Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg"));
+            zipFile.add(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"));
+            zipFile.add(Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg"));
+            zipFile.add(Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg"));
         }
 
         assertThatDirectory(splitFile.getParent()).exists().hasSubDirectories(0).hasFiles(3);
@@ -135,10 +135,10 @@ public class ZipFileWriterTest {
                                                          .splitSize(1024 * 1024).build();
 
         try (ZipFile.Writer zipFile = ZipFile.write(splitFile, zipFileSettings)) {
-            zipFile.addPath(Zip4jSuite.starWarsDir.resolve("one.jpg"));
-            zipFile.addPath(Zip4jSuite.starWarsDir.resolve("two.jpg"));
-            zipFile.addPath(Zip4jSuite.starWarsDir.resolve("three.jpg"));
-            zipFile.addPath(Zip4jSuite.starWarsDir.resolve("four.jpg"));
+            zipFile.add(Zip4jSuite.starWarsDir.resolve("one.jpg"));
+            zipFile.add(Zip4jSuite.starWarsDir.resolve("two.jpg"));
+            zipFile.add(Zip4jSuite.starWarsDir.resolve("three.jpg"));
+            zipFile.add(Zip4jSuite.starWarsDir.resolve("four.jpg"));
         }
 
         assertThatDirectory(splitFile.getParent()).exists().hasSubDirectories(0).hasFiles(9);

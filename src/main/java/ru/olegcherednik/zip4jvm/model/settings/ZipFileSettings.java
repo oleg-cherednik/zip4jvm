@@ -14,6 +14,8 @@ import java.util.function.Function;
 @Builder
 public final class ZipFileSettings {
 
+    public static final ZipFileSettings DEFAULT = builder().build();
+
     private final long splitSize;
     private final String comment;
     private final boolean zip64;
