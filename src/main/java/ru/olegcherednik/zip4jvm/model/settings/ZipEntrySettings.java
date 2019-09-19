@@ -5,13 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
-import ru.olegcherednik.zip4jvm.utils.ZipUtils;
-
-import java.util.function.Function;
 
 @Getter
 public final class ZipEntrySettings {
@@ -22,12 +18,9 @@ public final class ZipEntrySettings {
     private final CompressionLevel compressionLevel;
     private final Encryption encryption;
     private final char[] password;
-    private final Function<String, String> comment;
+    private final String comment;
     private final boolean zip64;
     private final boolean utf8;
-
-    // TODO this is artefact, check why it's here
-    private String basePath = "";
 
     public static Builder builder() {
         return new Builder();
@@ -45,7 +38,6 @@ public final class ZipEntrySettings {
         comment = builder.comment;
         zip64 = builder.zip64;
         utf8 = builder.utf8;
-        basePath = builder.basePath;
     }
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")
@@ -56,10 +48,9 @@ public final class ZipEntrySettings {
         private CompressionLevel compressionLevel = CompressionLevel.NORMAL;
         private Encryption encryption = Encryption.OFF;
         private char[] password;
-        private Function<String, String> comment = fileName -> null;
+        private String comment;
         private boolean zip64;
         private boolean utf8 = true;
-        private String basePath = "";
 
         private Builder(ZipEntrySettings entrySettings) {
             compression = entrySettings.compression;
@@ -69,7 +60,6 @@ public final class ZipEntrySettings {
             comment = entrySettings.comment;
             zip64 = entrySettings.zip64;
             utf8 = entrySettings.utf8;
-            basePath = entrySettings.basePath;
         }
 
         public ZipEntrySettings build() {
@@ -97,10 +87,6 @@ public final class ZipEntrySettings {
         }
 
         public ZipEntrySettings.Builder comment(String comment) {
-            return comment(fileName -> comment);
-        }
-
-        public ZipEntrySettings.Builder comment(@NonNull Function<String, String> comment) {
             this.comment = comment;
             return this;
         }
@@ -115,10 +101,5 @@ public final class ZipEntrySettings {
             return this;
         }
 
-        public ZipEntrySettings.Builder basePath(@NonNull String basePath) {
-            basePath = StringUtils.trimToEmpty(ZipUtils.normalizeFileName(basePath));
-            this.basePath = basePath.startsWith("/") ? basePath.substring(1) : basePath;
-            return this;
-        }
     }
 }

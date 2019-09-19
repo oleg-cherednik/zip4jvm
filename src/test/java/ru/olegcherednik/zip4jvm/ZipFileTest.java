@@ -137,9 +137,7 @@ public class ZipFileTest {
     public void shouldCreateZipFileWithContentWhenUseZipFile() throws IOException {
         Function<String, ZipEntrySettings> entrySettingsProvider = fileName -> {
             if (fileName.startsWith("Star Wars/"))
-                return ZipEntrySettings.builder()
-                                       .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                       .basePath(Zip4jSuite.starWarsDir.getFileName().toString()).build();
+                return ZipEntrySettings.builder().compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
             if (!fileName.contains("/"))
                 return ZipEntrySettings.builder()
                                        .compression(Compression.DEFLATE, CompressionLevel.MAXIMUM)
