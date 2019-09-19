@@ -3,10 +3,10 @@ package ru.olegcherednik.zip4jvm;
 import org.apache.commons.io.FileUtils;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
-import ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions;
+import ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions;
 import ru.olegcherednik.zip4jvm.data.DefalteZipData;
 import ru.olegcherednik.zip4jvm.data.StoreZipData;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  * @since 23.03.2019
  */
 @SuppressWarnings("FieldNamingConvention")
-public class Zip4jSuite {
+public class Zip4jvmSuite {
 
         public static final Path rootDir = createTempDirectory("zip4j");
 //    public static final Path rootDir = Paths.get("d:/zip4j/foo");
@@ -50,7 +50,7 @@ public class Zip4jSuite {
         try {
             return Files.createTempDirectory(prefix);
         } catch(IOException e) {
-            throw new Zip4jException(e);
+            throw new Zip4jvmException(e);
         }
     }
 
@@ -118,7 +118,7 @@ public class Zip4jSuite {
             }
         });
 
-        Zip4jAssertions.assertThatDirectory(srcDir).matches(TestUtils.dirAssert);
+        Zip4jvmAssertions.assertThatDirectory(srcDir).matches(TestUtils.dirAssert);
     }
 
     public static void removeDir(Path path) throws IOException {
@@ -141,7 +141,7 @@ public class Zip4jSuite {
     }
 
     public static Path generateSubDirNameWithTime(Class<?> cls) {
-        String baseDir = Zip4jSuite.class.getPackage().getName();
+        String baseDir = Zip4jvmSuite.class.getPackage().getName();
         String relativePath = cls.getName().substring(baseDir.length() + 1).replaceAll("\\.", "/");
         return rootDir.resolve(relativePath).resolve(Paths.get(String.valueOf(time)));
     }
@@ -160,7 +160,7 @@ public class Zip4jSuite {
         if (zipFile.toAbsolutePath().toString().contains("resources"))
             path = Paths.get("src/test/resources/winrar").toAbsolutePath().relativize(zipFile);
         else
-            path = Zip4jSuite.rootDir.relativize(zipFile);
+            path = Zip4jvmSuite.rootDir.relativize(zipFile);
 
         String dirName = path.toString().replaceAll("\\\\", "_");
 

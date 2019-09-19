@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import lombok.NonNull;
@@ -34,7 +34,7 @@ public final class AesEncoder implements Encoder {
 
             return new AesEncoder(cipher, mac, salt, passwordChecksum);
         } catch(Exception e) {
-            throw new Zip4jException(e);
+            throw new Zip4jvmException(e);
         }
     }
 
@@ -57,7 +57,7 @@ public final class AesEncoder implements Encoder {
             engine.cypherUpdate(buf, offs, len);
             engine.updateMac(buf, offs, len);
         } catch(Exception e) {
-            throw new Zip4jException(e);
+            throw new Zip4jvmException(e);
         }
     }
 

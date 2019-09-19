@@ -13,7 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertionsForClassTypes.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertionsForClassTypes.assertThatDirectory;
 
 /**
  * @author Oleg Cherednik
@@ -22,7 +22,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertionsForClassTypes.asse
 @SuppressWarnings("FieldNamingConvention")
 public class ZipFolderSplitTest {
 
-    private static final Path rootDir = Zip4jSuite.generateSubDirNameWithTime(ZipFolderSplitTest.class);
+    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ZipFolderSplitTest.class);
     private static final Path zip = rootDir.resolve("src.zip");
 
     @BeforeClass
@@ -30,9 +30,9 @@ public class ZipFolderSplitTest {
         Files.createDirectories(rootDir);
     }
 
-    @AfterClass(enabled = Zip4jSuite.clear)
+    @AfterClass(enabled = Zip4jvmSuite.clear)
     public static void removeDir() throws IOException {
-        Zip4jSuite.removeDir(rootDir);
+        Zip4jvmSuite.removeDir(rootDir);
     }
 
     @Test
@@ -42,7 +42,7 @@ public class ZipFolderSplitTest {
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
                                                   .splitSize(1024 * 1024).build();
-        ZipIt.add(zip, Zip4jSuite.contentSrcDir, settings);
+        ZipIt.add(zip, Zip4jvmSuite.contentSrcDir, settings);
 
         assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(10);
         assertThat(Files.exists(zip)).isTrue();

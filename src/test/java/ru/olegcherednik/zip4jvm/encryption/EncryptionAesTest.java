@@ -4,7 +4,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.TestUtils;
-import ru.olegcherednik.zip4jvm.Zip4jSuite;
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
@@ -16,8 +16,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirectory;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatZipFile;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
  * @author Oleg Cherednik
@@ -26,16 +26,16 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatZipFile
 @SuppressWarnings("FieldNamingConvention")
 public class EncryptionAesTest {
 
-    private static final Path rootDir = Zip4jSuite.generateSubDirNameWithTime(EncryptionAesTest.class);
+    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(EncryptionAesTest.class);
 
     @BeforeClass
     public static void createDir() throws IOException {
         Files.createDirectories(rootDir);
     }
 
-    @AfterClass(enabled = Zip4jSuite.clear)
+    @AfterClass(enabled = Zip4jvmSuite.clear)
     public static void removeDir() throws IOException {
-        Zip4jSuite.removeDir(rootDir);
+        Zip4jvmSuite.removeDir(rootDir);
     }
 
     @Test
@@ -44,13 +44,13 @@ public class EncryptionAesTest {
                                                   .entrySettingsProvider(fileName ->
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                                          .encryption(Encryption.AES_256, Zip4jSuite.password).build())
-                                                  .comment("password: " + new String(Zip4jSuite.password)).build();
-        Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt.add(zip, Zip4jSuite.contentSrcDir, settings);
+                                                                          .encryption(Encryption.AES_256, Zip4jvmSuite.password).build())
+                                                  .comment("password: " + new String(Zip4jvmSuite.password)).build();
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        ZipIt.add(zip, Zip4jvmSuite.contentSrcDir, settings);
 
         assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(zip, Zip4jSuite.password).exists().rootEntry().matches(TestUtils.zipRootDirAssert);
+        assertThatZipFile(zip, Zip4jvmSuite.password).exists().rootEntry().matches(TestUtils.zipRootDirAssert);
     }
 
 //    @Test

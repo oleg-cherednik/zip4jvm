@@ -1,8 +1,8 @@
 package ru.olegcherednik.zip4jvm;
 
 import lombok.NonNull;
-import ru.olegcherednik.zip4jvm.exception.Zip4jEntryDuplicationException;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmEntryDuplicationException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.SingleZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
@@ -47,7 +47,7 @@ final class ZipFileWriter implements ZipFile.Writer {
         String fileName = entry.getFileName();
 
         if (fileNameWriter.put(fileName, new ZipFileEntryWriter(entry, entrySettingsProvider.apply(fileName), tempZipModel)) != null)
-            throw new Zip4jEntryDuplicationException(fileName);
+            throw new Zip4jvmEntryDuplicationException(fileName);
     }
 
     @Override
@@ -71,12 +71,12 @@ final class ZipFileWriter implements ZipFile.Writer {
 
         for (String fileName : srcZipModel.getEntryNames()) {
             if (fileNameWriter.containsKey(fileName))
-                throw new Zip4jException("File name duplication");
+                throw new Zip4jvmException("File name duplication");
 
             char[] password = entrySettingsProvider == null ? null : entrySettingsProvider.apply(fileName).getPassword();
 
             if (fileNameWriter.put(fileName, new ExistedEntryWriter(srcZipModel, fileName, tempZipModel, password)) != null)
-                throw new Zip4jException("File name duplication");
+                throw new Zip4jvmException("File name duplication");
         }
     }
 

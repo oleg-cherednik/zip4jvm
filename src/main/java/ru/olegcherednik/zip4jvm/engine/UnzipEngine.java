@@ -5,8 +5,8 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
-import ru.olegcherednik.zip4jvm.exception.Zip4jIncorrectPasswordException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmIncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.io.in.SplitZipInputStream;
@@ -79,14 +79,14 @@ public class UnzipEngine {
         boolean passwordEmpty = ArrayUtils.isEmpty(password);
 
         if (encryption != Encryption.OFF && passwordEmpty)
-            throw new Zip4jIncorrectPasswordException(entry.getFileName());
+            throw new Zip4jvmIncorrectPasswordException(entry.getFileName());
     }
 
     private static void extractDirectory(Path dstDir, ZipEntry entry) {
         try {
             Files.createDirectories(dstDir.resolve(entry.getFileName()));
         } catch(IOException e) {
-            throw new Zip4jException(e);
+            throw new Zip4jvmException(e);
         }
     }
 
@@ -94,7 +94,7 @@ public class UnzipEngine {
         try (InputStream in = extractEntryAsStream(entry); OutputStream out = getOutputStream(file)) {
             IOUtils.copyLarge(in, out);
         } catch(IOException e) {
-            throw new Zip4jException(e);
+            throw new Zip4jvmException(e);
         }
     }
 
@@ -116,7 +116,7 @@ public class UnzipEngine {
     public InputStream extractEntry(@NonNull String entryName) throws IOException {
         ZipEntry en = zipModel.getEntries().stream()
                               .filter(entry -> entry.getFileName().equalsIgnoreCase(entryName))
-                              .findFirst().orElseThrow(() -> new Zip4jException("File header with entry name '" + entryName + "' was not found"));
+                              .findFirst().orElseThrow(() -> new Zip4jvmException("File header with entry name '" + entryName + "' was not found"));
 
         return extractEntryAsStream(en);
     }
@@ -138,7 +138,7 @@ public class UnzipEngine {
 
             return new FileOutputStream(file.toFile());
         } catch(IOException e) {
-            throw new Zip4jException(e);
+            throw new Zip4jvmException(e);
         }
     }
 

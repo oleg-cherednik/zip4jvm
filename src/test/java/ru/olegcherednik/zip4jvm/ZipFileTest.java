@@ -14,8 +14,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Function;
 
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirectory;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatZipFile;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
  * @author Oleg Cherednik
@@ -25,7 +25,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatZipFile
 @SuppressWarnings("FieldNamingConvention")
 public class ZipFileTest {
 
-    private static final Path rootDir = Zip4jSuite.generateSubDirNameWithTime(ZipFileTest.class);
+    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ZipFileTest.class);
     private static final Path file = rootDir.resolve("createZipArchiveAndAddFiles/src.zip");
 
     @BeforeClass
@@ -33,18 +33,18 @@ public class ZipFileTest {
         Files.createDirectories(rootDir);
     }
 
-    @AfterClass(enabled = Zip4jSuite.clear)
+    @AfterClass(enabled = Zip4jvmSuite.clear)
     public static void removeDir() throws IOException {
-        Zip4jSuite.removeDir(rootDir);
+        Zip4jvmSuite.removeDir(rootDir);
     }
 
     public void shouldCreateZipFileWhenUseZipFileAndAddFiles() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
 
         try (ZipFile.Writer zipFile = ZipFile.write(file, fileName -> entrySettings)) {
-            zipFile.add(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"));
-            zipFile.add(Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg"));
-            zipFile.add(Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg"));
+            zipFile.add(Zip4jvmSuite.carsDir.resolve("bentley-continental.jpg"));
+            zipFile.add(Zip4jvmSuite.carsDir.resolve("ferrari-458-italia.jpg"));
+            zipFile.add(Zip4jvmSuite.carsDir.resolve("wiesmann-gt-mf5.jpg"));
         }
 
         assertThatDirectory(file.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -59,10 +59,10 @@ public class ZipFileTest {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
 
         try (ZipFile.Writer zipFile = ZipFile.write(file, fileName -> entrySettings)) {
-            zipFile.add(Zip4jSuite.starWarsDir.resolve("one.jpg"));
-            zipFile.add(Zip4jSuite.starWarsDir.resolve("two.jpg"));
-            zipFile.add(Zip4jSuite.starWarsDir.resolve("three.jpg"));
-            zipFile.add(Zip4jSuite.starWarsDir.resolve("four.jpg"));
+            zipFile.add(Zip4jvmSuite.starWarsDir.resolve("one.jpg"));
+            zipFile.add(Zip4jvmSuite.starWarsDir.resolve("two.jpg"));
+            zipFile.add(Zip4jvmSuite.starWarsDir.resolve("three.jpg"));
+            zipFile.add(Zip4jvmSuite.starWarsDir.resolve("four.jpg"));
         }
 
         assertThatDirectory(file.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -77,7 +77,7 @@ public class ZipFileTest {
     }
 
     public void shouldCreateZipFileWithEntryCommentWhenUseZipFile() throws IOException {
-        Path file = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
         Function<String, ZipEntrySettings> entrySettingsProvider = fileName -> {
             if ("bentley-continental.jpg".equals(fileName))
@@ -90,9 +90,9 @@ public class ZipFileTest {
         };
 
         try (ZipFile.Writer zipFile = ZipFile.write(file, entrySettingsProvider)) {
-            zipFile.add(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"));
-            zipFile.add(Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg"));
-            zipFile.add(Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg"));
+            zipFile.add(Zip4jvmSuite.carsDir.resolve("bentley-continental.jpg"));
+            zipFile.add(Zip4jvmSuite.carsDir.resolve("ferrari-458-italia.jpg"));
+            zipFile.add(Zip4jvmSuite.carsDir.resolve("wiesmann-gt-mf5.jpg"));
         }
 
         assertThatDirectory(file.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -116,15 +116,15 @@ public class ZipFileTest {
                 return ZipEntrySettings.builder()
                                        .compression(Compression.STORE, CompressionLevel.NORMAL)
                                        .encryption(Encryption.AES_256, "2".toCharArray()).build();
-            return ZipEntrySettings.DEFAULT.toBuilder().password(Zip4jSuite.password).build();
+            return ZipEntrySettings.DEFAULT.toBuilder().password(Zip4jvmSuite.password).build();
         };
 
-        Path file = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
         try (ZipFile.Writer zipFile = ZipFile.write(file, entrySettingsProvider)) {
-            zipFile.add(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"));
-            zipFile.add(Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg"));
-            zipFile.add(Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg"));
+            zipFile.add(Zip4jvmSuite.carsDir.resolve("bentley-continental.jpg"));
+            zipFile.add(Zip4jvmSuite.carsDir.resolve("ferrari-458-italia.jpg"));
+            zipFile.add(Zip4jvmSuite.carsDir.resolve("wiesmann-gt-mf5.jpg"));
         }
 
         assertThatDirectory(file.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -141,7 +141,7 @@ public class ZipFileTest {
             if (!fileName.contains("/"))
                 return ZipEntrySettings.builder()
                                        .compression(Compression.DEFLATE, CompressionLevel.MAXIMUM)
-                                       .encryption(Encryption.PKWARE, Zip4jSuite.password).build();
+                                       .encryption(Encryption.PKWARE, Zip4jvmSuite.password).build();
             return ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
         };
 
@@ -149,12 +149,12 @@ public class ZipFileTest {
                                                          .comment("Global Comment")
                                                          .entrySettingsProvider(entrySettingsProvider).build();
 
-        Path file = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
         try (ZipFile.Writer zipFile = ZipFile.write(file, zipFileSettings)) {
-            zipFile.add(Zip4jSuite.carsDir);
-            zipFile.add(Zip4jSuite.filesStarWarsDir);
-            zipFile.add(Zip4jSuite.filesSrcDir);
+            zipFile.add(Zip4jvmSuite.carsDir);
+            zipFile.add(Zip4jvmSuite.filesStarWarsDir);
+            zipFile.add(Zip4jvmSuite.filesSrcDir);
         }
 
 //        assertThatDirectory(file.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -169,10 +169,10 @@ public class ZipFileTest {
                                                          .entrySettingsProvider(fileName -> ZipEntrySettings.builder().build())
                                                          .build();
 
-        Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
         try (ZipFile.Writer zipFile = ZipFile.write(zip, zipFileSettings)) {
-            zipFile.add(Zip4jSuite.emptyDir);
+            zipFile.add(Zip4jvmSuite.emptyDir);
         }
 
         assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);

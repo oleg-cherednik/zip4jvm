@@ -25,11 +25,15 @@ repositories {
 }
 
 group 'ru.oleg-cherednik.zip4jvm'
-version '1.0'
+version '0.7'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 mainClassName = 'unknown'
+
+configurations {
+    jar.archiveName = "zip4jvm-${version}.jar"
+}
 
 dependencies {
     compile 'org.slf4j:slf4j-api:1.7.25'

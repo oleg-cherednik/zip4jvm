@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.io.in.entry;
 import lombok.NonNull;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
@@ -50,7 +50,7 @@ public abstract class EntryInputStream extends InputStream {
         if (compression == Compression.DEFLATE)
             return new InflateEntryInputStream(entry, in, decoder);
 
-        throw new Zip4jException("Compression is not supported: " + compression);
+        throw new Zip4jvmException("Compression is not supported: " + compression);
     }
 
     protected EntryInputStream(ZipEntry entry, DataInput in, Decoder decoder) {
@@ -99,12 +99,12 @@ public abstract class EntryInputStream extends InputStream {
         long actual = checksum.getValue();
 
         if (expected > 0 && expected != actual)
-            throw new Zip4jException("Checksum is not matched: " + entry.getFileName());
+            throw new Zip4jvmException("Checksum is not matched: " + entry.getFileName());
     }
 
     private void checkUncompressedSize() {
         if (uncompressedSize != writtenUncompressedBytes)
-            throw new Zip4jException("UncompressedSize is not matched: " + entry.getFileName());
+            throw new Zip4jvmException("UncompressedSize is not matched: " + entry.getFileName());
     }
 
     /** Just read {@link DataDescriptor} and ignore it's value. We got it from {@link CentralDirectory.FileHeader} */

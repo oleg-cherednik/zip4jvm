@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.NonNull;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
@@ -48,7 +48,7 @@ final class EndCentralDirectoryReader implements Reader<EndCentralDirectory> {
                 return offs;
         } while (commentLength >= 0 && available >= 0);
 
-        throw new Zip4jException("zip headers not found. probably not a zip file");
+        throw new Zip4jvmException("zip headers not found. probably not a zip file");
     }
 
 }

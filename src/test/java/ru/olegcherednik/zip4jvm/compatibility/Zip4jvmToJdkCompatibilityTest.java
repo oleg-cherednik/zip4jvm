@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.compatibility;
 
 import ru.olegcherednik.zip4jvm.TestUtils;
-import ru.olegcherednik.zip4jvm.Zip4jSuite;
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -12,9 +12,9 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import static ru.olegcherednik.zip4jvm.Zip4jSuite.deflateSolidZip;
-import static ru.olegcherednik.zip4jvm.Zip4jSuite.storeSolidZip;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.deflateSolidZip;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.storeSolidZip;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
 /**
  * @author Oleg Cherednik
@@ -22,15 +22,15 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirecto
  */
 @Test
 @SuppressWarnings({ "NewClassNamingConvention", "FieldNamingConvention", "LocalVariableNamingConvention" })
-public class Zip4jToJdkCompatibilityTest {
+public class Zip4jvmToJdkCompatibilityTest {
 
-    private static final Path rootDir = Zip4jSuite.generateSubDirNameWithTime(Zip4jToJdkCompatibilityTest.class);
+    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(Zip4jvmToJdkCompatibilityTest.class);
 
     public void checkCompatibilityWithJdk() throws IOException {
-        Path parentDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path parentDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
         for (Path zip4jFile : Arrays.asList(storeSolidZip, deflateSolidZip)) {
-            Path dstDir = Zip4jSuite.subDirNameAsRelativePathToRoot(parentDir, zip4jFile);
+            Path dstDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(parentDir, zip4jFile);
 
             try (ZipFile zipFile = new ZipFile(zip4jFile.toFile())) {
                 Enumeration<? extends ZipEntry> entries = zipFile.entries();

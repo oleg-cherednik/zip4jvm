@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.io.writers;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.io.in.SplitZipInputStream;
@@ -82,7 +82,7 @@ public class ExistedEntryWriter implements Writer {
                 int n = in.read(buf, 0, (int)Math.min(buf.length, size));
 
                 if (n == IOUtils.EOF)
-                    throw new Zip4jException("Unexpected end of file");
+                    throw new Zip4jvmException("Unexpected end of file");
 
                 out.write(buf, 0, n);
                 size -= n;

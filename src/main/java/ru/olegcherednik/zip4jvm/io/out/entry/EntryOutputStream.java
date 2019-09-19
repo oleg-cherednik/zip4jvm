@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.io.out.entry;
 
 import lombok.NonNull;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.writers.DataDescriptorWriter;
 import ru.olegcherednik.zip4jvm.io.writers.LocalFileHeaderWriter;
@@ -58,7 +58,7 @@ public abstract class EntryOutputStream extends OutputStream {
         if (compression == Compression.DEFLATE)
             return new DeflateEntryOutputStream(entry, out);
 
-        throw new Zip4jException("Compression is not supported: " + compression);
+        throw new Zip4jvmException("Compression is not supported: " + compression);
     }
 
     protected EntryOutputStream(ZipEntry entry, DataOutput out) {

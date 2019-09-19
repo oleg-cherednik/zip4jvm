@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.compatibility;
 
 import ru.olegcherednik.zip4jvm.TestUtils;
-import ru.olegcherednik.zip4jvm.Zip4jSuite;
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import net.sf.sevenzipjbinding.ArchiveFormat;
 import net.sf.sevenzipjbinding.ExtractOperationResult;
 import net.sf.sevenzipjbinding.IInArchive;
@@ -19,10 +19,10 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 
-import static ru.olegcherednik.zip4jvm.Zip4jSuite.deflateSolidPkwareZip;
-import static ru.olegcherednik.zip4jvm.Zip4jSuite.deflateSolidZip;
-import static ru.olegcherednik.zip4jvm.Zip4jSuite.storeSolidZip;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.deflateSolidPkwareZip;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.deflateSolidZip;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.storeSolidZip;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
 /**
  * @author Oleg Cherednik
@@ -30,16 +30,16 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirecto
  */
 @Test
 @SuppressWarnings({ "FieldNamingConvention", "NewClassNamingConvention", "LocalVariableNamingConvention" })
-public class Zip4jToSevenZipCompatibilityTest {
+public class Zip4jvmToSevenZipCompatibilityTest {
 
-    private static final Path rootDir = Zip4jSuite.generateSubDirNameWithTime(Zip4jToSevenZipCompatibilityTest.class);
+    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(Zip4jvmToSevenZipCompatibilityTest.class);
 
     public void checkCompatibilityWithSevenZip() throws IOException {
-        String password = new String(Zip4jSuite.password);
-        Path parentDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        String password = new String(Zip4jvmSuite.password);
+        Path parentDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
         for (Path zip4jFile : Arrays.asList(storeSolidZip, deflateSolidZip, deflateSolidPkwareZip)) {
-            Path dstDir = Zip4jSuite.subDirNameAsRelativePathToRoot(parentDir, zip4jFile);
+            Path dstDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(parentDir, zip4jFile);
 
             try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(zip4jFile.toFile(), "r"));
                  IInArchive zip = SevenZip.openInArchive(ArchiveFormat.ZIP, in)) {

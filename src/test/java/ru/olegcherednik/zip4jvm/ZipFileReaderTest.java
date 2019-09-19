@@ -21,16 +21,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SuppressWarnings("FieldNamingConvention")
 public class ZipFileReaderTest {
 
-    private static final Path rootDir = Zip4jSuite.generateSubDirNameWithTime(ZipFileReaderTest.class);
+    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ZipFileReaderTest.class);
 
     @BeforeClass
     public static void createDir() throws IOException {
         Files.createDirectories(rootDir);
     }
 
-    @AfterClass(enabled = Zip4jSuite.clear)
+    @AfterClass(enabled = Zip4jvmSuite.clear)
     public static void removeDir() throws IOException {
-        Zip4jSuite.removeDir(rootDir);
+        Zip4jvmSuite.removeDir(rootDir);
     }
 
 //    public void shouldUnzipZipFileIntoDestinationFolderWhenDeflateSolid() throws IOException {
@@ -50,8 +50,8 @@ public class ZipFileReaderTest {
 //    }
 
     public void shouldUnzipZipFileIntoDestinationFolderWhenStoreSolidPkware() throws IOException {
-        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.extract(Zip4jSuite.storeSolidPkwareZip, destDir, fileName -> Zip4jSuite.password);
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        UnzipIt.extract(Zip4jvmSuite.storeSolidPkwareZip, destDir, fileName -> Zip4jvmSuite.password);
 
 //        Zip4jAssertions.assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);
 //
@@ -64,8 +64,8 @@ public class ZipFileReaderTest {
     }
 
     public void shouldUnzipZipFileIntoDestinationFolderWhenStoreSolidAes() throws IOException {
-        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.extract(Zip4jSuite.storeSolidAesZip, destDir, String::toCharArray);
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        UnzipIt.extract(Zip4jvmSuite.storeSolidAesZip, destDir, String::toCharArray);
 
 //        Zip4jAssertions.assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);
 //
@@ -80,7 +80,7 @@ public class ZipFileReaderTest {
     public void shouldIterateOverAllEntriesWhenStoreSolidPkware() throws IOException {
         List<String> entryNames = new ArrayList<>();
 
-        for (ZipFile.Entry entry : ZipFile.read(Zip4jSuite.storeSolidPkwareZip))
+        for (ZipFile.Entry entry : ZipFile.read(Zip4jvmSuite.storeSolidPkwareZip))
             entryNames.add(entry.getFileName());
 
         assertThat(entryNames).containsExactlyInAnyOrder(
@@ -100,7 +100,7 @@ public class ZipFileReaderTest {
     }
 
     public void shouldRetrieveStreamWithAllEntriesWhenStoreSolidPkware() throws IOException {
-        List<String> entryNames = ZipFile.read(Zip4jSuite.storeSolidPkwareZip).stream()
+        List<String> entryNames = ZipFile.read(Zip4jvmSuite.storeSolidPkwareZip).stream()
                                          .map(ZipFile.Entry::getFileName)
                                          .collect(Collectors.toList());
 

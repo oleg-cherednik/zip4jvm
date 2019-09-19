@@ -5,7 +5,7 @@ import de.idyl.winzipaes.impl.AESEncrypterJCA;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.TestUtils;
 import ru.olegcherednik.zip4jvm.UnzipIt;
-import ru.olegcherednik.zip4jvm.Zip4jSuite;
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
 /**
  * @author Oleg Cherednik
@@ -22,31 +22,31 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirecto
  */
 @Test
 @SuppressWarnings({ "NewClassNamingConvention", "FieldNamingConvention" })
-public class WinZipAesToZip4jCompatibilityTest {
+public class WinZipAesToZip4jvmCompatibilityTest {
 
-    private static final Path rootDir = Zip4jSuite.generateSubDirNameWithTime(WinZipAesToZip4jCompatibilityTest.class);
+    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(WinZipAesToZip4jvmCompatibilityTest.class);
 
-    public void winZipAesShouldBeReadableForZip4j() throws IOException {
-        Path zip = zipItWithWinZipAes(Zip4jSuite.subDirNameAsMethodName(rootDir));
+    public void winZipAesShouldBeReadableForZip4jvm() throws IOException {
+        Path zip = zipItWithWinZipAes(Zip4jvmSuite.subDirNameAsMethodName(rootDir));
         Path dir = unzipItWithZip4j(zip);
         assertThatDirectory(dir).matches(TestUtils.dirAssert);
     }
 
     private static Path zipItWithWinZipAes(Path dir) throws IOException {
-        String password = new String(Zip4jSuite.password);
+        String password = new String(Zip4jvmSuite.password);
         Path zip = dir.resolve("src.zip");
         Files.createDirectories(zip.getParent());
 
         AesZipFileEncrypter encrypter = new AesZipFileEncrypter(zip.toFile(), new AESEncrypterJCA());
         encrypter.setComment("password: " + password);
 
-        for (Path file : getDirectoryEntries(Zip4jSuite.srcDir)) {
+        for (Path file : getDirectoryEntries(Zip4jvmSuite.srcDir)) {
             if (Files.isDirectory(file))
                 continue;
             if ("Oleg Cherednik.txt".equals(file.getFileName().toString()))
                 continue;
 
-            String pathForEntry = Zip4jSuite.srcDir.relativize(file).toString();
+            String pathForEntry = Zip4jvmSuite.srcDir.relativize(file).toString();
             encrypter.add(file.toFile(), pathForEntry, password);
         }
 
@@ -58,12 +58,12 @@ public class WinZipAesToZip4jCompatibilityTest {
     @SuppressWarnings("NewMethodNamingConvention")
     private static Path unzipItWithZip4j(Path zip) throws IOException {
         Path destDir = zip.getParent().resolve("unzip");
-        UnzipIt.extract(zip, destDir, fileName -> Zip4jSuite.password);
+        UnzipIt.extract(zip, destDir, fileName -> Zip4jvmSuite.password);
 
         // WinZipAes does not support empty folders in zip
         Files.createDirectories(destDir.resolve("empty_dir"));
         // WinZipAes uses 'iso-8859-1' for file names
-        Files.copy(Zip4jSuite.srcDir.resolve("Oleg Cherednik.txt"), destDir.resolve("Oleg Cherednik.txt"));
+        Files.copy(Zip4jvmSuite.srcDir.resolve("Oleg Cherednik.txt"), destDir.resolve("Oleg Cherednik.txt"));
         return destDir;
     }
 
