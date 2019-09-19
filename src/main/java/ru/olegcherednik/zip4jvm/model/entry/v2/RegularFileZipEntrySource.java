@@ -31,6 +31,7 @@ public final class RegularFileZipEntrySource {
         if (Files.isRegularFile(path))
             return builder()
                     .inputStream(() -> new FileInputStream(path.toFile()))
+                    .fileName(fileName)
                     .lastModifiedTime(Files.getLastModifiedTime(path).toMillis())
                     .externalFileAttributes(ExternalFileAttributes.createOperationBasedDelegate(path)).build();
 

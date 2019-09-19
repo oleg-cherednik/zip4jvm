@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm;
 
 import lombok.NonNull;
+import ru.olegcherednik.zip4jvm.exception.Zip4jEntryDuplicationException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.SingleZipOutputStream;
@@ -72,7 +73,7 @@ final class ZipFileWriter implements ZipFile.Writer {
     @Override
     public void add(@NonNull RegularFileZipEntrySource src, @NonNull ZipEntrySettings entrySettings) {
         if (fileNameWriter.put(src.getFileName(), new ZipEntryStreamWriter(src, entrySettings, tempZipModel)) != null)
-            throw new Zip4jException("File name duplication");
+            throw new Zip4jEntryDuplicationException(src.getFileName());
     }
 
     @Override

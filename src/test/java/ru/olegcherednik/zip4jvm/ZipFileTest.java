@@ -133,7 +133,7 @@ public class ZipFileTest {
                                                          .comment("Global Comment")
                                                          .defEntrySettings(ZipEntrySettings.builder()
                                                                                            .compression(Compression.STORE,
-                                                                                                            CompressionLevel.NORMAL)
+                                                                                                   CompressionLevel.NORMAL)
                                                                                            .build())
                                                          .build();
 
@@ -155,6 +155,23 @@ public class ZipFileTest {
 
 //        assertThatDirectory(file.getParent()).exists().hasSubDirectories(0).hasFiles(1);
 //        assertThatZipFile(file).exists().rootEntry().hasSubDirectories(0).hasFiles(3);
+//        assertThatZipFile(file).file("bentley-continental.jpg").exists().isImage().hasSize(1_395_362);
+//        assertThatZipFile(file).file("ferrari-458-italia.jpg").exists().isImage().hasSize(320_894);
+//        assertThatZipFile(file).file("wiesmann-gt-mf5.jpg").exists().isImage().hasSize(729_633);
+    }
+
+    public void shouldCreateZipFileWithEmptyDirectoryWhenAddEmptyDirectory() throws IOException {
+        ZipFileSettings zipFileSettings = ZipFileSettings.builder()
+                                                         .defEntrySettings(ZipEntrySettings.builder().build()).build();
+
+        Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+
+        try (ZipFile.Writer zipFile = ZipFile.write(zip, zipFileSettings)) {
+            zipFile.add(Zip4jSuite.emptyDir);
+        }
+
+        assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatZipFile(zip).exists().rootEntry().hasSubDirectories(1).hasFiles(0);
 //        assertThatZipFile(file).file("bentley-continental.jpg").exists().isImage().hasSize(1_395_362);
 //        assertThatZipFile(file).file("ferrari-458-italia.jpg").exists().isImage().hasSize(320_894);
 //        assertThatZipFile(file).file("wiesmann-gt-mf5.jpg").exists().isImage().hasSize(729_633);

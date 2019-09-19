@@ -16,7 +16,8 @@ public enum ErrorCode {
     EMPTY_PASSWORD(2),
     PATH_NOT_EXISTS(3),
     AES_STRENGTH_NOT_SET(4),
-    ZIP_FILE_SETTING_NOT_SET(5);
+    ZIP_FILE_SETTING_NOT_SET(5),
+    ENTRY_DUPLICATION(6);
 
     private final int code;
 
