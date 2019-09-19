@@ -7,8 +7,10 @@ import ru.olegcherednik.zip4jvm.io.out.SingleZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.writers.ExistedEntryWriter;
 import ru.olegcherednik.zip4jvm.io.writers.RegularFileWriter;
+import ru.olegcherednik.zip4jvm.io.writers.ZipEntryStreamWriter;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
+import ru.olegcherednik.zip4jvm.model.entry.v2.RegularFileZipEntrySource;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
@@ -60,6 +62,17 @@ final class ZipFileWriter implements ZipFile.Writer {
             if (fileNameWriter.put(fileName, new RegularFileWriter(path, fileName, entrySettings, tempZipModel)) != null)
                 throw new Zip4jException("File name duplication");
         }
+    }
+
+    @Override
+    public void add(@NonNull RegularFileZipEntrySource src) {
+        add(src, defEntrySettings);
+    }
+
+    @Override
+    public void add(@NonNull RegularFileZipEntrySource src, @NonNull ZipEntrySettings entrySettings) {
+        if (fileNameWriter.put(src.getFileName(), new ZipEntryStreamWriter(src, entrySettings, tempZipModel)) != null)
+            throw new Zip4jException("File name duplication");
     }
 
     @Override

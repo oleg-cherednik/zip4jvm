@@ -41,7 +41,6 @@ public abstract class ZipEntry {
     private final int lastModifiedTime;
     private final ExternalFileAttributes externalFileAttributes;
 
-    protected final long uncompressedSize;
     protected final Compression compression;
     private final CompressionLevel compressionLevel;
     protected final Encryption encryption;
@@ -57,7 +56,9 @@ public abstract class ZipEntry {
     private long localFileHeaderOffs;
     @Getter(AccessLevel.NONE)
     private BooleanSupplier dataDescriptorAvailable = () -> false;
+    private long uncompressedSize;
     private long compressedSize;
+
     private String comment;
     private boolean utf8;
     private long size;

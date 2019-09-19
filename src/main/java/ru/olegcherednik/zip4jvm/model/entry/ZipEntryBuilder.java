@@ -17,6 +17,7 @@ import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.entry.v2.RegularFileZipEntrySource;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.IOSupplier;
@@ -63,7 +64,7 @@ public final class ZipEntryBuilder {
         return entry;
     }
 
-    private static ZipEntry createRegularFileEntry(Path file, String fileName, ZipEntrySettings entrySettings) throws IOException {
+    public static ZipEntry createRegularFileEntry(Path file, String fileName, ZipEntrySettings entrySettings) throws IOException {
         fileName = ZipUtils.normalizeFileName(FilenameUtils.concat(entrySettings.getBasePath(), fileName));
         int lastModifiedTime = ZipUtils.javaToDosTime(Files.getLastModifiedTime(file).toMillis());
         ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.createOperationBasedDelegate(file);
@@ -76,8 +77,33 @@ public final class ZipEntryBuilder {
 
         IOSupplier<InputStream> inputStream = entry -> new FileInputStream(file.toFile());
 
-        RegularFileZipEntry entry = new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, uncompressedSize, compression,
-                compressionLevel, encryption, zip64, inputStream);
+        RegularFileZipEntry entry = new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, compression, compressionLevel,
+                encryption, zip64, inputStream);
+        entry.setPassword(entrySettings.getPassword().apply(fileName));
+        entry.setComment(entrySettings.getComment().apply(fileName));
+        entry.setUtf8(entrySettings.isUtf8());
+
+        if (entry.isEncrypted() && ArrayUtils.isEmpty(entry.getPassword()))
+            throw new Zip4jEmptyPasswordException();
+
+        return entry;
+    }
+
+    public static ZipEntry createRegularFileEntry(RegularFileZipEntrySource src, ZipEntrySettings entrySettings) throws IOException {
+        String fileName = ZipUtils.normalizeFileName(FilenameUtils.concat(entrySettings.getBasePath(), src.getFileName()));
+        int lastModifiedTime = ZipUtils.javaToDosTime(src.getLastModifiedTime());
+        ExternalFileAttributes externalFileAttributes = src.getExternalFileAttributes();
+
+        long uncompressedSize = src.getUncompressedSize();
+        Compression compression = entrySettings.getCompression();
+        CompressionLevel compressionLevel = entrySettings.getCompressionLevel();
+        Encryption encryption = entrySettings.getEncryption();
+        boolean zip64 = entrySettings.isZip64() || uncompressedSize > MAX_ENTRY_SIZE;
+
+        IOSupplier<InputStream> inputStream = entry -> src.getInputStream().get();
+
+        RegularFileZipEntry entry = new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, compression, compressionLevel,
+                encryption, zip64, inputStream);
         entry.setPassword(entrySettings.getPassword().apply(fileName));
         entry.setComment(entrySettings.getComment().apply(fileName));
         entry.setUtf8(entrySettings.isUtf8());
@@ -92,6 +118,7 @@ public final class ZipEntryBuilder {
         boolean dir = ZipUtils.isDirectory(fileHeader.getFileName());
         ZipEntry zipEntry = dir ? createDirectoryEntry(fileHeader) : createRegularFileEntry(fileHeader, zipModel);
         zipEntry.setChecksum(fileHeader.getCrc32());
+        zipEntry.setUncompressedSize(getUncompressedSize(fileHeader));
         zipEntry.setCompressedSize(getCompressedSize(fileHeader));
         zipEntry.setDisk(getDisk(fileHeader));
         zipEntry.setLocalFileHeaderOffs(fileHeader.getOffsLocalFileHeader());
@@ -107,7 +134,6 @@ public final class ZipEntryBuilder {
 
     private static ZipEntry createRegularFileEntry(CentralDirectory.FileHeader fileHeader, ZipModel zipModel) {
         String fileName = ZipUtils.normalizeFileName(fileHeader.getFileName());
-        long uncompressedSize = getUncompressedSize(fileHeader);
         int lastModifiedTime = fileHeader.getLastModifiedTime();
         Compression compression = fileHeader.getCompression();
         CompressionLevel compressionLevel = fileHeader.getGeneralPurposeFlag().getCompressionLevel();
@@ -118,7 +144,7 @@ public final class ZipEntryBuilder {
             DataInput in = zipModel.isSplit() ? SplitZipInputStream.create(zipModel, entry.getDisk()) : SingleZipInputStream.create(zipModel);
             return EntryInputStream.create(entry, in);
         };
-        RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, uncompressedSize, compression,
+        RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, compression,
                 compressionLevel, encryption, zip64, inputStream);
         zipEntry.setComment(fileHeader.getComment());
         zipEntry.setUtf8(fileHeader.getGeneralPurposeFlag().isUtf8());

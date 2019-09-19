@@ -33,6 +33,8 @@ public abstract class EntryOutputStream extends OutputStream {
     protected final Encoder encoder;
     protected final DataOutput out;
 
+    private long uncompressedSize;
+
     public static EntryOutputStream create(@NonNull ZipEntry entry, @NonNull ZipModel zipModel, @NonNull DataOutput out) throws IOException {
         EntryOutputStream os = createOutputStream(entry, out);
 
@@ -73,20 +75,22 @@ public abstract class EntryOutputStream extends OutputStream {
         encoder.writeEncryptionHeader(out);
     }
 
-    protected final void updateChecksum(byte[] buf, int offs, int len) {
-        checksum.update(buf, offs, len);
-    }
-
     @Override
     public final void write(int b) throws IOException {
         write(new byte[] { (byte)b }, 0, 1);
     }
 
     @Override
+    public void write(byte[] buf, int offs, int len) throws IOException {
+        checksum.update(buf, offs, len);
+        uncompressedSize += Math.max(0, len);
+    }
+
+    @Override
     public void close() throws IOException {
         encoder.close(out);
         entry.setChecksum(checksum.getValue());
-        entry.checkCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
+        entry.setUncompressedSize(uncompressedSize);
         entry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
         writeDataDescriptor();
     }
