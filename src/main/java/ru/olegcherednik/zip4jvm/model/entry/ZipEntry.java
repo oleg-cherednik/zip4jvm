@@ -44,12 +44,13 @@ public abstract class ZipEntry {
     protected final Compression compression;
     private final CompressionLevel compressionLevel;
     protected final Encryption encryption;
+    private final IOSupplier<InputStream> inputStream;
+
     /**
      * {@literal true} only if section {@link Zip64.ExtendedInfo} exists in {@link LocalFileHeader} and {@link CentralDirectory.FileHeader}.
      * In other words, do set this to {@code true}, to write given entry in ZIP64 format.
      */
-    private final boolean zip64;
-    private final IOSupplier<InputStream> inputStream;
+    private boolean zip64;
 
     private char[] password;
     private long disk;

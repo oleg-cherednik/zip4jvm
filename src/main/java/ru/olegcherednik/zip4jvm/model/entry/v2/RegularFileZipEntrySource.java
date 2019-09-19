@@ -1,8 +1,9 @@
 package ru.olegcherednik.zip4jvm.model.entry.v2;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.utils.function.IOSupplier2;
@@ -12,31 +13,73 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
 /**
  * @author Oleg Cherednik
  * @since 19.09.2019
  */
 @Getter
-@RequiredArgsConstructor
 public final class RegularFileZipEntrySource {
 
     private final IOSupplier2<InputStream> inputStream;
     private final String fileName;
     private final long lastModifiedTime;
     private final ExternalFileAttributes externalFileAttributes;
-    private final long uncompressedSize;
 
     public static RegularFileZipEntrySource of(@NonNull Path path, @NonNull String fileName) throws IOException {
-        if (Files.isRegularFile(path)) {
-            IOSupplier2<InputStream> inputStream = () -> new FileInputStream(path.toFile());
-            long lastModifiedTime = Files.getLastModifiedTime(path).toMillis();
-            ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.createOperationBasedDelegate(path);
-            long uncompressedSize = Files.size(path);
-            return new RegularFileZipEntrySource(inputStream, fileName, lastModifiedTime, externalFileAttributes, uncompressedSize);
-        }
+        if (Files.isRegularFile(path))
+            return builder()
+                    .inputStream(() -> new FileInputStream(path.toFile()))
+                    .lastModifiedTime(Files.getLastModifiedTime(path).toMillis())
+                    .externalFileAttributes(ExternalFileAttributes.createOperationBasedDelegate(path)).build();
 
         throw new Zip4jException("Cannot create source for directory");
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    private RegularFileZipEntrySource(Builder builder) {
+        inputStream = builder.inputStream;
+        fileName = builder.fileName;
+        lastModifiedTime = builder.lastModifiedTime;
+        externalFileAttributes = builder.externalFileAttributes;
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class Builder {
+
+        private IOSupplier2<InputStream> inputStream;
+        private String fileName;
+        private long lastModifiedTime = System.currentTimeMillis();
+        private ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.NULL;
+
+        public RegularFileZipEntrySource build() {
+            return new RegularFileZipEntrySource(this);
+        }
+
+        public Builder inputStream(IOSupplier2<InputStream> inputStream) {
+            this.inputStream = Optional.ofNullable(inputStream).orElseGet(() -> () -> null);
+            return this;
+        }
+
+        public Builder fileName(@NonNull String fileName) {
+            this.fileName = fileName;
+            return this;
+        }
+
+        public Builder lastModifiedTime(long lastModifiedTime) {
+            this.lastModifiedTime = lastModifiedTime;
+            return this;
+        }
+
+        public Builder externalFileAttributes(@NonNull ExternalFileAttributes externalFileAttributes) {
+            this.externalFileAttributes = externalFileAttributes;
+            return this;
+        }
+
     }
 
 }

@@ -21,8 +21,8 @@ final class RegularFileZipEntry extends ZipEntry {
     private long checksum;
 
     public RegularFileZipEntry(String fileName, int lastModifiedTime, ExternalFileAttributes externalFileAttributes, Compression compression,
-            CompressionLevel compressionLevel, Encryption encryption, boolean zip64, IOSupplier<InputStream> inputStream) {
-        super(fileName, lastModifiedTime, externalFileAttributes, compression, compressionLevel, encryption, zip64, inputStream);
+            CompressionLevel compressionLevel, Encryption encryption, IOSupplier<InputStream> inputStream) {
+        super(fileName, lastModifiedTime, externalFileAttributes, compression, compressionLevel, encryption, inputStream);
         setDataDescriptorAvailable(() -> true);
     }
 

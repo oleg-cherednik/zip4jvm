@@ -1,5 +1,6 @@
 package ru.olegcherednik.zip4jvm;
 
+import org.apache.commons.io.IOUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -11,6 +12,7 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -29,6 +31,7 @@ public class ZipFileWriterTest {
     private static final Path solidFile = rootDir.resolve("solid/src.zip");
     private static final Path splitFile = rootDir.resolve("split/src.zip");
     private static final Path supplierSolidFile = rootDir.resolve("supplier/split/src.zip");
+    private static final Path memorySolidFile = rootDir.resolve("memory/split/src.zip");
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -168,5 +171,45 @@ public class ZipFileWriterTest {
         assertThatZipFile(supplierSolidFile, Zip4jSuite.password).file("ferrari-458-italia.jpg").exists().isImage().hasSize(320_894);
         assertThatZipFile(supplierSolidFile, Zip4jSuite.password).file("wiesmann-gt-mf5.jpg").exists().isImage().hasSize(729_633);
         assertThatZipFile(supplierSolidFile, Zip4jSuite.password).file("one.jpg").exists().isImage().hasSize(2_204_448);
+    }
+
+    public void shouldCreateZipFileWhenUseZipFileAndAddFilesWithText() throws IOException {
+        ZipFileSettings zipFileSettings = ZipFileSettings.builder().build();
+
+        RegularFileZipEntrySource oneSource = RegularFileZipEntrySource.builder()
+                                                                       .inputStream(() -> IOUtils.toInputStream("one.txt", StandardCharsets.UTF_8))
+                                                                       .fileName("one.txt").build();
+        RegularFileZipEntrySource twoSource = RegularFileZipEntrySource.builder()
+                                                                       .inputStream(() -> IOUtils.toInputStream("two.txt", StandardCharsets.UTF_8))
+                                                                       .fileName("two.txt").build();
+        RegularFileZipEntrySource threeSource = RegularFileZipEntrySource.builder()
+                                                                       .inputStream(() -> IOUtils.toInputStream("three.txt", StandardCharsets.UTF_8))
+                                                                       .fileName("three.txt").build();
+        RegularFileZipEntrySource fourSource = RegularFileZipEntrySource.builder()
+                                                                       .inputStream(() -> IOUtils.toInputStream("four.txt", StandardCharsets.UTF_8))
+                                                                       .fileName("four.txt").build();
+
+        ZipEntrySettings oneSettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
+        ZipEntrySettings twoSettings = ZipEntrySettings.builder().compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
+        ZipEntrySettings threeSettings = ZipEntrySettings.builder()
+                                                            .encryption(Encryption.PKWARE, fileName -> Zip4jSuite.password)
+                                                            .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
+        ZipEntrySettings fourSettings = ZipEntrySettings.builder()
+                                                        .encryption(Encryption.AES_256, fileName -> Zip4jSuite.password)
+                                                        .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
+
+        try (ZipFile.Writer zipFile = ZipFile.write(memorySolidFile, zipFileSettings)) {
+            zipFile.add(oneSource, oneSettings);
+            zipFile.add(twoSource, twoSettings);
+            zipFile.add(threeSource, threeSettings);
+            zipFile.add(fourSource, fourSettings);
+        }
+
+        assertThatDirectory(memorySolidFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatZipFile(memorySolidFile, Zip4jSuite.password).exists().rootEntry().hasSubDirectories(0).hasFiles(4);
+//        assertThatZipFile(memorySolidFile, Zip4jSuite.password).file("bentley-continental.jpg").exists().isImage().hasSize(1_395_362);
+//        assertThatZipFile(memorySolidFile, Zip4jSuite.password).file("ferrari-458-italia.jpg").exists().isImage().hasSize(320_894);
+//        assertThatZipFile(memorySolidFile, Zip4jSuite.password).file("wiesmann-gt-mf5.jpg").exists().isImage().hasSize(729_633);
+//        assertThatZipFile(memorySolidFile, Zip4jSuite.password).file("one.jpg").exists().isImage().hasSize(2_204_448);
     }
 }

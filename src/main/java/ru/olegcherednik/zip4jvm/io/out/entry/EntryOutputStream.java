@@ -19,6 +19,8 @@ import java.io.OutputStream;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
+import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_ENTRY_SIZE;
+
 /**
  * @author Oleg Cherednik
  * @since 26.07.2019
@@ -92,7 +94,17 @@ public abstract class EntryOutputStream extends OutputStream {
         entry.setChecksum(checksum.getValue());
         entry.setUncompressedSize(uncompressedSize);
         entry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
+        updateZip64();
         writeDataDescriptor();
+    }
+
+    private void updateZip64() {
+        if (entry.isZip64())
+            return;
+
+        boolean uncompressedSizeExceeded = entry.getUncompressedSize() > MAX_ENTRY_SIZE;
+        boolean compressedSizeExceeded = entry.getCompressedSize() > MAX_ENTRY_SIZE;
+        entry.setZip64(uncompressedSizeExceeded || compressedSizeExceeded);
     }
 
     private void writeDataDescriptor() throws IOException {

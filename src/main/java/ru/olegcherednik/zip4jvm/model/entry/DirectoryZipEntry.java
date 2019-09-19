@@ -13,7 +13,7 @@ import ru.olegcherednik.zip4jvm.utils.EmptyInputStream;
 final class DirectoryZipEntry extends ZipEntry {
 
     public DirectoryZipEntry(String fileName, int lastModifiedTime, ExternalFileAttributes externalFileAttributes) {
-        super(fileName, lastModifiedTime, externalFileAttributes, Compression.STORE, CompressionLevel.NORMAL, Encryption.OFF, false,
+        super(fileName, lastModifiedTime, externalFileAttributes, Compression.STORE, CompressionLevel.NORMAL, Encryption.OFF,
                 zipEntry -> EmptyInputStream.INSTANCE);
     }
 
