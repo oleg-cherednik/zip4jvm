@@ -34,7 +34,7 @@ public final class StoreZipData {
 
     private static void createStoreSolidZip() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .defEntrySettings(
+                                                  .entrySettingsProvider(fileName ->
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL).build())
                                                   .build();
@@ -49,7 +49,7 @@ public final class StoreZipData {
 
     private static void createStoreSplitZip() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .defEntrySettings(
+                                                  .entrySettingsProvider(fileName ->
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL).build())
                                                   .splitSize(1024 * 1024).build();
@@ -62,10 +62,10 @@ public final class StoreZipData {
 
     private static void createStoreSolidPkwareZip() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .defEntrySettings(
+                                                  .entrySettingsProvider(fileName ->
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                                          .encryption(Encryption.PKWARE, fileName -> Zip4jSuite.password).build())
+                                                                          .encryption(Encryption.PKWARE, fn -> Zip4jSuite.password).build())
                                                   .comment("password: " + new String(Zip4jSuite.password)).build();
         ZipIt.add(Zip4jSuite.storeSolidPkwareZip, Zip4jSuite.contentSrcDir, settings);
 
@@ -76,7 +76,7 @@ public final class StoreZipData {
 
     private static void createStoreSolidAesZip() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .defEntrySettings(
+                                                  .entrySettingsProvider(fileName ->
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                                           .encryption(Encryption.PKWARE, String::toCharArray).build())

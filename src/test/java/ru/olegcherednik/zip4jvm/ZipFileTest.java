@@ -144,28 +144,28 @@ public class ZipFileTest {
     }
 
     public void shouldCreateZipFileWithContentWhenUseZipFile() throws IOException {
+        Function<String, ZipEntrySettings> entrySettingsProvider = fileName -> {
+            if (fileName.startsWith("Star Wars/"))
+                return ZipEntrySettings.builder()
+                                       .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
+                                       .basePath(Zip4jSuite.starWarsDir.getFileName().toString()).build();
+            if (!fileName.contains("/"))
+                return ZipEntrySettings.builder()
+                                       .compression(Compression.DEFLATE, CompressionLevel.MAXIMUM)
+                                       .encryption(Encryption.PKWARE, fn -> Zip4jSuite.password).build();
+            return ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
+        };
+
         ZipFileSettings zipFileSettings = ZipFileSettings.builder()
                                                          .comment("Global Comment")
-                                                         .defEntrySettings(ZipEntrySettings.builder()
-                                                                                           .compression(Compression.STORE,
-                                                                                                   CompressionLevel.NORMAL)
-                                                                                           .build())
-                                                         .build();
-
-        ZipEntrySettings starWarsSettings = ZipEntrySettings.builder()
-                                                            .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                            .basePath(Zip4jSuite.starWarsDir.getFileName().toString()).build();
-
-        ZipEntrySettings srcSettings = ZipEntrySettings.builder()
-                                                       .compression(Compression.DEFLATE, CompressionLevel.MAXIMUM)
-                                                       .encryption(Encryption.PKWARE, fileName -> Zip4jSuite.password).build();
+                                                         .entrySettingsProvider(entrySettingsProvider).build();
 
         Path file = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
         try (ZipFile.Writer zipFile = ZipFile.write(file, zipFileSettings)) {
             zipFile.add(Zip4jSuite.carsDir);
-            zipFile.add(Zip4jSuite.filesStarWarsDir, starWarsSettings);
-            zipFile.add(Zip4jSuite.filesSrcDir, srcSettings);
+            zipFile.add(Zip4jSuite.filesStarWarsDir);
+            zipFile.add(Zip4jSuite.filesSrcDir);
         }
 
 //        assertThatDirectory(file.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -177,7 +177,8 @@ public class ZipFileTest {
 
     public void shouldCreateZipFileWithEmptyDirectoryWhenAddEmptyDirectory() throws IOException {
         ZipFileSettings zipFileSettings = ZipFileSettings.builder()
-                                                         .defEntrySettings(ZipEntrySettings.builder().build()).build();
+                                                         .entrySettingsProvider(fileName -> ZipEntrySettings.builder().build())
+                                                         .build();
 
         Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 

@@ -50,26 +50,12 @@ final class ZipFileWriter implements ZipFile.Writer {
 
     @Override
     public void add(@NonNull Collection<Path> paths) throws IOException {
-//        add(paths, defEntrySettings);
         PathUtils.requireExistedPaths(paths);
 
         for (Map.Entry<Path, String> entry : PathUtils.getRelativeContent(paths).entrySet()) {
             Path path = entry.getKey();
             String fileName = entry.getValue();
             ZipEntrySettings entrySettings = entrySettingsProvider.apply(fileName);
-
-            if (fileNameWriter.put(fileName, new RegularFileWriter(path, fileName, entrySettings, tempZipModel)) != null)
-                throw new Zip4jException("File name duplication");
-        }
-    }
-
-    @Override
-    public void add(@NonNull Collection<Path> paths, @NonNull ZipEntrySettings entrySettings) throws IOException {
-        PathUtils.requireExistedPaths(paths);
-
-        for (Map.Entry<Path, String> entry : PathUtils.getRelativeContent(paths).entrySet()) {
-            Path path = entry.getKey();
-            String fileName = entry.getValue();
 
             if (fileNameWriter.put(fileName, new RegularFileWriter(path, fileName, entrySettings, tempZipModel)) != null)
                 throw new Zip4jException("File name duplication");

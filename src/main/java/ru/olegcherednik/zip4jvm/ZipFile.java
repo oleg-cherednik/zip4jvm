@@ -83,8 +83,6 @@ public final class ZipFile {
 
         void add(@NonNull Collection<Path> paths) throws IOException;
 
-        void add(@NonNull Collection<Path> paths, @NonNull ZipEntrySettings entrySettings) throws IOException;
-
         void addMeta(@NonNull ZipEntryMeta meta);
 
         void addMeta(@NonNull ZipEntryMeta meta, @NonNull ZipEntrySettings entrySettings);
