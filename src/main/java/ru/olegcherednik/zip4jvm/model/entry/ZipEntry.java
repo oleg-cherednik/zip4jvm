@@ -2,8 +2,10 @@ package ru.olegcherednik.zip4jvm.model.entry;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
@@ -14,6 +16,7 @@ import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.Zip64;
+import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.IOSupplier;
 
 import java.io.IOException;
@@ -102,6 +105,16 @@ public abstract class ZipEntry {
 
     public final boolean isDataDescriptorAvailable() {
         return dataDescriptorAvailable.getAsBoolean();
+    }
+
+    @NonNull
+    public final ZipFile.Entry createImmutableEntry() {
+        return ZipFile.Entry.builder()
+                            .inputStreamSup(this::getIn)
+                            .fileName(ZipUtils.getFileNameNoDirectoryMarker(fileName))
+                            .lastModifiedTime(lastModifiedTime)
+                            .externalFileAttributes(externalFileAttributes)
+                            .regularFile(isRegularFile()).build();
     }
 
 }

@@ -2,7 +2,9 @@ package ru.olegcherednik.zip4jvm.utils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jRealBigZip64NotSupportedException;
 
 import java.util.Calendar;
@@ -60,6 +62,16 @@ public final class ZipUtils {
 
     public static String toString(long offs) {
         return "offs: " + offs + " (0x" + Long.toHexString(offs) + ')';
+    }
+
+    public static String getFileName(@NonNull String fileName, boolean regularFile) {
+        fileName = getFileNameNoDirectoryMarker(fileName);
+        return regularFile ? fileName : fileName + '/';
+    }
+
+    public static String getFileNameNoDirectoryMarker(@NonNull String fileName) {
+        fileName = normalizeFileName(fileName);
+        return StringUtils.removeEnd(fileName, "/");
     }
 
 }

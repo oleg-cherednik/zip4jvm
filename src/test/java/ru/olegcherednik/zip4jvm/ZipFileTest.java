@@ -42,9 +42,9 @@ public class ZipFileTest {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
 
         try (ZipFile.Writer zipFile = ZipFile.write(file, fileName -> entrySettings)) {
-            zipFile.add(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"));
-            zipFile.add(Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg"));
-            zipFile.add(Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg"));
+            zipFile.addPath(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"));
+            zipFile.addPath(Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg"));
+            zipFile.addPath(Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg"));
         }
 
         assertThatDirectory(file.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -59,10 +59,10 @@ public class ZipFileTest {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
 
         try (ZipFile.Writer zipFile = ZipFile.write(file, fileName -> entrySettings)) {
-            zipFile.add(Zip4jSuite.starWarsDir.resolve("one.jpg"));
-            zipFile.add(Zip4jSuite.starWarsDir.resolve("two.jpg"));
-            zipFile.add(Zip4jSuite.starWarsDir.resolve("three.jpg"));
-            zipFile.add(Zip4jSuite.starWarsDir.resolve("four.jpg"));
+            zipFile.addPath(Zip4jSuite.starWarsDir.resolve("one.jpg"));
+            zipFile.addPath(Zip4jSuite.starWarsDir.resolve("two.jpg"));
+            zipFile.addPath(Zip4jSuite.starWarsDir.resolve("three.jpg"));
+            zipFile.addPath(Zip4jSuite.starWarsDir.resolve("four.jpg"));
         }
 
         assertThatDirectory(file.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -90,9 +90,9 @@ public class ZipFileTest {
         };
 
         try (ZipFile.Writer zipFile = ZipFile.write(file, entrySettingsProvider)) {
-            zipFile.add(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"));
-            zipFile.add(Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg"));
-            zipFile.add(Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg"));
+            zipFile.addPath(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"));
+            zipFile.addPath(Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg"));
+            zipFile.addPath(Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg"));
         }
 
         assertThatDirectory(file.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -122,9 +122,9 @@ public class ZipFileTest {
         Path file = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
         try (ZipFile.Writer zipFile = ZipFile.write(file, entrySettingsProvider)) {
-            zipFile.add(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"));
-            zipFile.add(Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg"));
-            zipFile.add(Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg"));
+            zipFile.addPath(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"));
+            zipFile.addPath(Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg"));
+            zipFile.addPath(Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg"));
         }
 
         assertThatDirectory(file.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -152,9 +152,9 @@ public class ZipFileTest {
         Path file = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
         try (ZipFile.Writer zipFile = ZipFile.write(file, zipFileSettings)) {
-            zipFile.add(Zip4jSuite.carsDir);
-            zipFile.add(Zip4jSuite.filesStarWarsDir);
-            zipFile.add(Zip4jSuite.filesSrcDir);
+            zipFile.addPath(Zip4jSuite.carsDir);
+            zipFile.addPath(Zip4jSuite.filesStarWarsDir);
+            zipFile.addPath(Zip4jSuite.filesSrcDir);
         }
 
 //        assertThatDirectory(file.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -172,7 +172,7 @@ public class ZipFileTest {
         Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
         try (ZipFile.Writer zipFile = ZipFile.write(zip, zipFileSettings)) {
-            zipFile.add(Zip4jSuite.emptyDir);
+            zipFile.addPath(Zip4jSuite.emptyDir);
         }
 
         assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);

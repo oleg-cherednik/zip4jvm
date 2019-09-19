@@ -43,14 +43,14 @@ public final class ZipModelBuilder {
         return new ZipModelReader(zip).read();
     }
 
-    public static ZipModel create(Path zip, ZipFileSettings zipFileSettings) {
+    public static ZipModel create(Path zip, ZipFileSettings settings) {
         if (Files.exists(zip))
             throw new Zip4jException("ZipFile '" + zip.toAbsolutePath() + "' exists");
 
         ZipModel zipModel = new ZipModel(zip);
-        zipModel.setSplitSize(zipFileSettings.getSplitSize());
-        zipModel.setComment(zipFileSettings.getComment());
-        zipModel.setZip64(zipFileSettings.isZip64());
+        zipModel.setSplitSize(settings.getSplitSize());
+        zipModel.setComment(settings.getComment());
+        zipModel.setZip64(settings.isZip64());
 
         return zipModel;
     }

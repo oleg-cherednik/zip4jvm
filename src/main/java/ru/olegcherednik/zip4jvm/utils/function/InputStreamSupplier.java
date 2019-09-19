@@ -1,14 +1,15 @@
 package ru.olegcherednik.zip4jvm.utils.function;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * @author Oleg Cherednik
  * @since 19.09.2019
  */
 @FunctionalInterface
-public interface IOSupplier2<T> {
+public interface InputStreamSupplier {
 
-    T get() throws IOException;
+    InputStream get() throws IOException;
 
 }

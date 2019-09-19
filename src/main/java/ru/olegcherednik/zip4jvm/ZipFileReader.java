@@ -28,12 +28,12 @@ import java.util.stream.Collectors;
 final class ZipFileReader implements ZipFile.Reader {
 
     private final ZipModel zipModel;
-    private final Function<String, char[]> createPassword;
+    private final Function<String, char[]> passwordProvider;
 
-    public ZipFileReader(@NonNull Path zip, @NonNull Function<String, char[]> createPassword) throws IOException {
+    public ZipFileReader(@NonNull Path zip, @NonNull Function<String, char[]> passwordProvider) throws IOException {
         checkZipFile(zip);
         zipModel = ZipModelBuilder.read(zip);
-        this.createPassword = createPassword;
+        this.passwordProvider = passwordProvider;
     }
 
     @Override
@@ -63,15 +63,14 @@ final class ZipFileReader implements ZipFile.Reader {
 
     @NonNull
     @Override
-    public InputStream extract(@NonNull String fileName) throws IOException {
-        ZipEntry entry = zipModel.getEntryByFileName(ZipUtils.normalizeFileName(fileName));
+    public ZipFile.Entry extract(@NonNull String fileName) throws IOException {
+        ZipEntry zipEntry = zipModel.getEntryByFileName(ZipUtils.normalizeFileName(fileName));
 
-        if (entry == null)
+        if (zipEntry == null)
             throw new Zip4jException("No entry found for '" + fileName + '\'');
 
-        entry.setPassword(createPassword.apply(entry.getFileName()));
-
-        return entry.getIn();
+        zipEntry.setPassword(passwordProvider.apply(zipEntry.getFileName()));
+        return zipEntry.createImmutableEntry();
     }
 
     @Override
@@ -96,8 +95,8 @@ final class ZipFileReader implements ZipFile.Reader {
     }
 
     @Override
-    public Iterator<ZipEntry> iterator() {
-        return new Iterator<ZipEntry>() {
+    public Iterator<ZipFile.Entry> iterator() {
+        return new Iterator<ZipFile.Entry>() {
             private final Iterator<String> it = zipModel.getEntryNames().iterator();
 
             @Override
@@ -106,8 +105,8 @@ final class ZipFileReader implements ZipFile.Reader {
             }
 
             @Override
-            public ZipEntry next() {
-                return zipModel.getEntryByFileName(it.next());
+            public ZipFile.Entry next() {
+                return zipModel.getEntryByFileName(it.next()).createImmutableEntry();
             }
         };
     }
@@ -116,7 +115,7 @@ final class ZipFileReader implements ZipFile.Reader {
         if (entry == null)
             throw new Zip4jException("Entry not found");
 
-        entry.setPassword(createPassword.apply(entry.getFileName()));
+        entry.setPassword(passwordProvider.apply(entry.getFileName()));
         String fileName = getFileName.apply(entry);
         Path file = destDir.resolve(fileName);
 

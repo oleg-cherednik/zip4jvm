@@ -7,7 +7,6 @@ import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
-import ru.olegcherednik.zip4jvm.model.entry.v2.ZipEntryMeta;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
@@ -62,10 +61,10 @@ public class ZipFileWriterTest {
         };
 
         try (ZipFile.Writer zipFile = ZipFile.write(solidFile, entrySettingsProvider)) {
-            zipFile.add(Zip4jSuite.fileBentleyContinental);
-            zipFile.add(Zip4jSuite.fileFerrari);
-            zipFile.add(Zip4jSuite.fileWiesmann);
-            zipFile.add(Zip4jSuite.starWarsDir.resolve("one.jpg"));
+            zipFile.addPath(Zip4jSuite.fileBentleyContinental);
+            zipFile.addPath(Zip4jSuite.fileFerrari);
+            zipFile.addPath(Zip4jSuite.fileWiesmann);
+            zipFile.addPath(Zip4jSuite.starWarsDir.resolve("one.jpg"));
         }
 
         assertThatDirectory(solidFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -92,8 +91,8 @@ public class ZipFileWriterTest {
 
 
         try (ZipFile.Writer zipFile = ZipFile.write(solidFile, entrySettingsProvider)) {
-            zipFile.add(Zip4jSuite.starWarsDir.resolve("two.jpg"));
-            zipFile.add(Zip4jSuite.starWarsDir.resolve("three.jpg"));
+            zipFile.addPath(Zip4jSuite.starWarsDir.resolve("two.jpg"));
+            zipFile.addPath(Zip4jSuite.starWarsDir.resolve("three.jpg"));
         }
 
         assertThatDirectory(solidFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -114,9 +113,9 @@ public class ZipFileWriterTest {
                                                          .splitSize(1024 * 1024).build();
 
         try (ZipFile.Writer zipFile = ZipFile.write(splitFile, zipFileSettings)) {
-            zipFile.add(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"));
-            zipFile.add(Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg"));
-            zipFile.add(Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg"));
+            zipFile.addPath(Zip4jSuite.carsDir.resolve("bentley-continental.jpg"));
+            zipFile.addPath(Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg"));
+            zipFile.addPath(Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg"));
         }
 
         assertThatDirectory(splitFile.getParent()).exists().hasSubDirectories(0).hasFiles(3);
@@ -136,10 +135,10 @@ public class ZipFileWriterTest {
                                                          .splitSize(1024 * 1024).build();
 
         try (ZipFile.Writer zipFile = ZipFile.write(splitFile, zipFileSettings)) {
-            zipFile.add(Zip4jSuite.starWarsDir.resolve("one.jpg"));
-            zipFile.add(Zip4jSuite.starWarsDir.resolve("two.jpg"));
-            zipFile.add(Zip4jSuite.starWarsDir.resolve("three.jpg"));
-            zipFile.add(Zip4jSuite.starWarsDir.resolve("four.jpg"));
+            zipFile.addPath(Zip4jSuite.starWarsDir.resolve("one.jpg"));
+            zipFile.addPath(Zip4jSuite.starWarsDir.resolve("two.jpg"));
+            zipFile.addPath(Zip4jSuite.starWarsDir.resolve("three.jpg"));
+            zipFile.addPath(Zip4jSuite.starWarsDir.resolve("four.jpg"));
         }
 
         assertThatDirectory(splitFile.getParent()).exists().hasSubDirectories(0).hasFiles(9);
@@ -171,10 +170,10 @@ public class ZipFileWriterTest {
         };
 
         try (ZipFile.Writer zipFile = ZipFile.write(supplierSolidFile, entrySettingsProvider)) {
-            zipFile.addMeta(ZipEntryMeta.of(Zip4jSuite.fileBentleyContinental, "bentley-continental.jpg"));
-            zipFile.addMeta(ZipEntryMeta.of(Zip4jSuite.fileFerrari, "ferrari-458-italia.jpg"));
-            zipFile.addMeta(ZipEntryMeta.of(Zip4jSuite.fileWiesmann, "wiesmann-gt-mf5.jpg"));
-            zipFile.addMeta(ZipEntryMeta.of(Zip4jSuite.starWarsDir.resolve("one.jpg"), "one.jpg"));
+            zipFile.addEntry(ZipFile.Entry.of(Zip4jSuite.fileBentleyContinental, "bentley-continental.jpg"));
+            zipFile.addEntry(ZipFile.Entry.of(Zip4jSuite.fileFerrari, "ferrari-458-italia.jpg"));
+            zipFile.addEntry(ZipFile.Entry.of(Zip4jSuite.fileWiesmann, "wiesmann-gt-mf5.jpg"));
+            zipFile.addEntry(ZipFile.Entry.of(Zip4jSuite.starWarsDir.resolve("one.jpg"), "one.jpg"));
         }
 
         assertThatDirectory(supplierSolidFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -202,24 +201,24 @@ public class ZipFileWriterTest {
             return ZipEntrySettings.DEFAULT;
         };
 
-        ZipEntryMeta oneSource = ZipEntryMeta.builder()
-                                             .inputStream(() -> IOUtils.toInputStream("one.txt", StandardCharsets.UTF_8))
-                                             .fileName("one.txt").build();
-        ZipEntryMeta twoSource = ZipEntryMeta.builder()
-                                             .inputStream(() -> IOUtils.toInputStream("two.txt", StandardCharsets.UTF_8))
-                                             .fileName("two.txt").build();
-        ZipEntryMeta threeSource = ZipEntryMeta.builder()
-                                               .inputStream(() -> IOUtils.toInputStream("three.txt", StandardCharsets.UTF_8))
-                                               .fileName("three.txt").build();
-        ZipEntryMeta fourSource = ZipEntryMeta.builder()
-                                              .inputStream(() -> IOUtils.toInputStream("four.txt", StandardCharsets.UTF_8))
-                                              .fileName("four.txt").build();
+        ZipFile.Entry entryOne = ZipFile.Entry.builder()
+                                              .inputStreamSup(() -> IOUtils.toInputStream("one.txt", StandardCharsets.UTF_8))
+                                              .fileName("one.txt").build();
+        ZipFile.Entry entryTwo = ZipFile.Entry.builder()
+                                              .inputStreamSup(() -> IOUtils.toInputStream("two.txt", StandardCharsets.UTF_8))
+                                              .fileName("two.txt").build();
+        ZipFile.Entry entryThree = ZipFile.Entry.builder()
+                                                .inputStreamSup(() -> IOUtils.toInputStream("three.txt", StandardCharsets.UTF_8))
+                                                .fileName("three.txt").build();
+        ZipFile.Entry entryFour = ZipFile.Entry.builder()
+                                               .inputStreamSup(() -> IOUtils.toInputStream("four.txt", StandardCharsets.UTF_8))
+                                               .fileName("four.txt").build();
 
         try (ZipFile.Writer zipFile = ZipFile.write(memorySolidFile, entrySettingsProvider)) {
-            zipFile.addMeta(oneSource);
-            zipFile.addMeta(twoSource);
-            zipFile.addMeta(threeSource);
-            zipFile.addMeta(fourSource);
+            zipFile.addEntry(entryOne);
+            zipFile.addEntry(entryTwo);
+            zipFile.addEntry(entryThree);
+            zipFile.addEntry(entryFour);
         }
 
         assertThatDirectory(memorySolidFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);

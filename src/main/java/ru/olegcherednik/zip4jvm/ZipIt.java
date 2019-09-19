@@ -46,7 +46,7 @@ public final class ZipIt {
 
     public static void add(@NonNull Path zip, @NonNull Collection<Path> paths, @NonNull ZipFileSettings settings) throws IOException {
         try (ZipFile.Writer zipFile = ZipFile.write(zip, settings)) {
-            zipFile.add(paths);
+            zipFile.addPath(paths);
         }
     }
 

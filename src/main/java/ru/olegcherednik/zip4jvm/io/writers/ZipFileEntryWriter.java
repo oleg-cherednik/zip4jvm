@@ -3,12 +3,12 @@ package ru.olegcherednik.zip4jvm.io.writers;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
+import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.entry.EntryOutputStream;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
-import ru.olegcherednik.zip4jvm.model.entry.v2.ZipEntryMeta;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
@@ -21,15 +21,15 @@ import java.io.OutputStream;
  * @since 19.09.2019
  */
 @RequiredArgsConstructor
-public final class ZipEntryStreamWriter implements Writer {
+public final class ZipFileEntryWriter implements Writer {
 
-    private final ZipEntryMeta meta;
+    private final ZipFile.Entry entry;
     private final ZipEntrySettings entrySettings;
     private final ZipModel tempZipModel;
 
     @Override
     public void write(@NonNull DataOutput out) throws IOException {
-        ZipEntry entry = ZipEntryBuilder.create(meta, entrySettings);
+        ZipEntry entry = ZipEntryBuilder.create(this.entry, entrySettings);
 
         try (InputStream in = entry.getIn(); OutputStream os = EntryOutputStream.create(entry, tempZipModel, out)) {
             IOUtils.copyLarge(in, os);
@@ -38,6 +38,6 @@ public final class ZipEntryStreamWriter implements Writer {
 
     @Override
     public String toString() {
-        return '+' + meta.getFileName();
+        return '+' + entry.getFileName();
     }
 }

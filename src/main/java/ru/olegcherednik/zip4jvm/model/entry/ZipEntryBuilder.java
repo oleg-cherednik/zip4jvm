@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.apache.commons.lang.ArrayUtils;
+import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.Zip4jEmptyPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
@@ -16,16 +17,12 @@ import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import ru.olegcherednik.zip4jvm.model.entry.v2.ZipEntryMeta;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.IOSupplier;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_ENTRY_SIZE;
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
@@ -37,101 +34,49 @@ import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ZipEntryBuilder {
 
-    public static ZipEntry create(@NonNull Path path, @NonNull String fileName, @NonNull ZipEntrySettings entrySettings) {
+    public static ZipEntry create(@NonNull ZipFile.Entry entry, @NonNull ZipEntrySettings entrySettings) {
         try {
-            if (Files.isDirectory(path))
-                return createDirectoryEntry(path, fileName, entrySettings);
-            return createRegularFileEntry(path, fileName, entrySettings);
+            return entry.isRegularFile() ? createRegularFileEntry(entry, entrySettings) : createDirectoryEntry(entry, entrySettings);
         } catch(IOException e) {
             throw new Zip4jException(e);
         }
     }
 
-    public static ZipEntry create(@NonNull ZipEntryMeta src, @NonNull ZipEntrySettings entrySettings) {
-        try {
-            if (src.isDirectory())
-                return createDirectoryEntry(src, entrySettings);
-            return createRegularFileEntry(src, entrySettings);
-        } catch(IOException e) {
-            throw new Zip4jException(e);
-        }
+    private static ZipEntry createDirectoryEntry(ZipFile.Entry entry, ZipEntrySettings entrySettings) throws IOException {
+        String fileName = ZipUtils.getFileName(entry.getFileName(), false);
+        int lastModifiedTime = ZipUtils.javaToDosTime(entry.getLastModifiedTime());
+        ExternalFileAttributes externalFileAttributes = entry.getExternalFileAttributes();
+
+        DirectoryZipEntry zipEntry = new DirectoryZipEntry(fileName, lastModifiedTime, externalFileAttributes);
+        zipEntry.setComment(entrySettings.getComment());
+        zipEntry.setUtf8(entrySettings.isUtf8());
+
+        return zipEntry;
     }
 
-    private static ZipEntry createDirectoryEntry(Path dir, String fileName, ZipEntrySettings entrySettings) throws IOException {
-        fileName = ZipUtils.normalizeFileName(fileName + '/');
-        int lastModifiedTime = ZipUtils.javaToDosTime(Files.getLastModifiedTime(dir).toMillis());
-        ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.createOperationBasedDelegate(dir);
-
-        DirectoryZipEntry entry = new DirectoryZipEntry(fileName, lastModifiedTime, externalFileAttributes);
-        entry.setPassword(entrySettings.getPassword());
-        entry.setComment(entrySettings.getComment());
-        entry.setUtf8(entrySettings.isUtf8());
-
-        if (entry.isEncrypted() && ArrayUtils.isEmpty(entry.getPassword()))
-            throw new Zip4jEmptyPasswordException();
-
-        return entry;
-    }
-
-    public static ZipEntry createRegularFileEntry(Path file, String fileName, ZipEntrySettings entrySettings) throws IOException {
-        fileName = ZipUtils.normalizeFileName(fileName);
-        int lastModifiedTime = ZipUtils.javaToDosTime(Files.getLastModifiedTime(file).toMillis());
-        ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.createOperationBasedDelegate(file);
+    private static ZipEntry createRegularFileEntry(ZipFile.Entry entry, ZipEntrySettings entrySettings) throws IOException {
+        String fileName = ZipUtils.getFileName(entry.getFileName(), true);
+        int lastModifiedTime = ZipUtils.javaToDosTime(entry.getLastModifiedTime());
+        ExternalFileAttributes externalFileAttributes = entry.getExternalFileAttributes();
 
         Compression compression = entrySettings.getCompression();
         CompressionLevel compressionLevel = entrySettings.getCompressionLevel();
         Encryption encryption = entrySettings.getEncryption();
 
-        IOSupplier<InputStream> inputStream = entry -> new FileInputStream(file.toFile());
+        IOSupplier<InputStream> inputStream = zipEntry -> entry.getInputStreamSup().get();
 
-        RegularFileZipEntry entry = new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, compression, compressionLevel,
-                encryption, inputStream);
-        entry.setZip64(entrySettings.isZip64());
-        entry.setPassword(entrySettings.getPassword());
-        entry.setComment(entrySettings.getComment());
-        entry.setUtf8(entrySettings.isUtf8());
-
-        if (entry.isEncrypted() && ArrayUtils.isEmpty(entry.getPassword()))
-            throw new Zip4jEmptyPasswordException();
-
-        return entry;
-    }
-
-    private static ZipEntry createDirectoryEntry(ZipEntryMeta src, ZipEntrySettings entrySettings) throws IOException {
-        String fileName = src.getFileName();
-        int lastModifiedTime = ZipUtils.javaToDosTime(src.getLastModifiedTime());
-        ExternalFileAttributes externalFileAttributes = src.getExternalFileAttributes();
-
-        DirectoryZipEntry entry = new DirectoryZipEntry(fileName, lastModifiedTime, externalFileAttributes);
-        entry.setComment(entrySettings.getComment());
-        entry.setUtf8(entrySettings.isUtf8());
-
-        return entry;
-    }
-
-    private static ZipEntry createRegularFileEntry(ZipEntryMeta src, ZipEntrySettings entrySettings) throws IOException {
-        String fileName = src.getFileName();
-        int lastModifiedTime = ZipUtils.javaToDosTime(src.getLastModifiedTime());
-        ExternalFileAttributes externalFileAttributes = src.getExternalFileAttributes();
-
-        Compression compression = entrySettings.getCompression();
-        CompressionLevel compressionLevel = entrySettings.getCompressionLevel();
-        Encryption encryption = entrySettings.getEncryption();
-
-        IOSupplier<InputStream> inputStream = entry -> src.getInputStream().get();
-
-        RegularFileZipEntry entry = new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, compression, compressionLevel,
+        RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, compression, compressionLevel,
                 encryption, inputStream);
 
-        entry.setZip64(entrySettings.isZip64());
-        entry.setPassword(entrySettings.getPassword());
-        entry.setComment(entrySettings.getComment());
-        entry.setUtf8(entrySettings.isUtf8());
+        zipEntry.setZip64(entrySettings.isZip64());
+        zipEntry.setPassword(entrySettings.getPassword());
+        zipEntry.setComment(entrySettings.getComment());
+        zipEntry.setUtf8(entrySettings.isUtf8());
 
-        if (entry.isEncrypted() && ArrayUtils.isEmpty(entry.getPassword()))
+        if (zipEntry.isEncrypted() && ArrayUtils.isEmpty(zipEntry.getPassword()))
             throw new Zip4jEmptyPasswordException();
 
-        return entry;
+        return zipEntry;
     }
 
     public static ZipEntry create(@NonNull CentralDirectory.FileHeader fileHeader, @NonNull ZipModel zipModel) {
