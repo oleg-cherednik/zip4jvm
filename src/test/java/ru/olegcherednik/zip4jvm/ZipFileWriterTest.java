@@ -154,23 +154,27 @@ public class ZipFileWriterTest {
     }
 
     public void shouldCreateZipFileWhenUseZipFileAndAddFilesUsingSupplier() throws IOException {
-        ZipFileSettings zipFileSettings = ZipFileSettings.builder().build();
-        ZipEntrySettings bentleySettings = ZipEntrySettings.builder()
-                                                           .compression(Compression.STORE, CompressionLevel.NORMAL).build();
-        ZipEntrySettings ferrariSettings = ZipEntrySettings.builder()
-                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
-        ZipEntrySettings wiesmannSettings = ZipEntrySettings.builder()
-                                                            .encryption(Encryption.PKWARE, fileName -> Zip4jSuite.password)
-                                                            .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
-        ZipEntrySettings oneSettings = ZipEntrySettings.builder()
-                                                       .encryption(Encryption.AES_256, fileName -> Zip4jSuite.password)
-                                                       .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
+        Function<String, ZipEntrySettings> entrySettingsProvider = fileName -> {
+            if ("bentley-continental.jpg".equals(fileName))
+                return ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
+            if ("ferrari-458-italia.jpg".equals(fileName))
+                return ZipEntrySettings.builder().compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
+            if ("wiesmann-gt-mf5.jpg".equals(fileName))
+                return ZipEntrySettings.builder()
+                                       .encryption(Encryption.PKWARE, fn -> Zip4jSuite.password)
+                                       .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
+            if ("one.jpg".equals(fileName))
+                return ZipEntrySettings.builder()
+                                       .encryption(Encryption.AES_256, fn -> Zip4jSuite.password)
+                                       .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
+            return ZipEntrySettings.DEFAULT;
+        };
 
-        try (ZipFile.Writer zipFile = ZipFile.write(supplierSolidFile, zipFileSettings)) {
-            zipFile.addMeta(ZipEntryMeta.of(Zip4jSuite.fileBentleyContinental, "bentley-continental.jpg"), bentleySettings);
-            zipFile.addMeta(ZipEntryMeta.of(Zip4jSuite.fileFerrari, "ferrari-458-italia.jpg"), ferrariSettings);
-            zipFile.addMeta(ZipEntryMeta.of(Zip4jSuite.fileWiesmann, "wiesmann-gt-mf5.jpg"), wiesmannSettings);
-            zipFile.addMeta(ZipEntryMeta.of(Zip4jSuite.starWarsDir.resolve("one.jpg"), "one.jpg"), oneSettings);
+        try (ZipFile.Writer zipFile = ZipFile.write(supplierSolidFile, entrySettingsProvider)) {
+            zipFile.addMeta(ZipEntryMeta.of(Zip4jSuite.fileBentleyContinental, "bentley-continental.jpg"));
+            zipFile.addMeta(ZipEntryMeta.of(Zip4jSuite.fileFerrari, "ferrari-458-italia.jpg"));
+            zipFile.addMeta(ZipEntryMeta.of(Zip4jSuite.fileWiesmann, "wiesmann-gt-mf5.jpg"));
+            zipFile.addMeta(ZipEntryMeta.of(Zip4jSuite.starWarsDir.resolve("one.jpg"), "one.jpg"));
         }
 
         assertThatDirectory(supplierSolidFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -182,7 +186,21 @@ public class ZipFileWriterTest {
     }
 
     public void shouldCreateZipFileWhenUseZipFileAndAddFilesWithText() throws IOException {
-        ZipFileSettings zipFileSettings = ZipFileSettings.builder().build();
+        Function<String, ZipEntrySettings> entrySettingsProvider = fileName -> {
+            if ("one.txt".equals(fileName))
+                return ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
+            if ("two.txt".equals(fileName))
+                return ZipEntrySettings.builder().compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
+            if ("three.txt".equals(fileName))
+                return ZipEntrySettings.builder()
+                                       .encryption(Encryption.PKWARE, fn -> Zip4jSuite.password)
+                                       .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
+            if ("four.txt".equals(fileName))
+                return ZipEntrySettings.builder()
+                                       .encryption(Encryption.AES_256, fn -> Zip4jSuite.password)
+                                       .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
+            return ZipEntrySettings.DEFAULT;
+        };
 
         ZipEntryMeta oneSource = ZipEntryMeta.builder()
                                              .inputStream(() -> IOUtils.toInputStream("one.txt", StandardCharsets.UTF_8))
@@ -197,20 +215,11 @@ public class ZipFileWriterTest {
                                               .inputStream(() -> IOUtils.toInputStream("four.txt", StandardCharsets.UTF_8))
                                               .fileName("four.txt").build();
 
-        ZipEntrySettings oneSettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
-        ZipEntrySettings twoSettings = ZipEntrySettings.builder().compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
-        ZipEntrySettings threeSettings = ZipEntrySettings.builder()
-                                                         .encryption(Encryption.PKWARE, fileName -> Zip4jSuite.password)
-                                                         .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
-        ZipEntrySettings fourSettings = ZipEntrySettings.builder()
-                                                        .encryption(Encryption.AES_256, fileName -> Zip4jSuite.password)
-                                                        .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
-
-        try (ZipFile.Writer zipFile = ZipFile.write(memorySolidFile, zipFileSettings)) {
-            zipFile.addMeta(oneSource, oneSettings);
-            zipFile.addMeta(twoSource, twoSettings);
-            zipFile.addMeta(threeSource, threeSettings);
-            zipFile.addMeta(fourSource, fourSettings);
+        try (ZipFile.Writer zipFile = ZipFile.write(memorySolidFile, entrySettingsProvider)) {
+            zipFile.addMeta(oneSource);
+            zipFile.addMeta(twoSource);
+            zipFile.addMeta(threeSource);
+            zipFile.addMeta(fourSource);
         }
 
         assertThatDirectory(memorySolidFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);

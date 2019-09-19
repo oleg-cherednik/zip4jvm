@@ -85,8 +85,6 @@ public final class ZipFile {
 
         void addMeta(@NonNull ZipEntryMeta meta);
 
-        void addMeta(@NonNull ZipEntryMeta meta, @NonNull ZipEntrySettings entrySettings);
-
         void remove(@NonNull String prefixEntryName) throws FileNotFoundException;
 
         default void remove(@NonNull Collection<String> prefixEntryNames) throws FileNotFoundException {

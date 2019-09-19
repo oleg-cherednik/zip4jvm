@@ -16,14 +16,6 @@ public final class ZipFileSettings {
     private final long splitSize;
     private final String comment;
     private final boolean zip64;
-
-    private final ZipEntrySettings defEntrySettings;
-
     private final Function<String, ZipEntrySettings> entrySettingsProvider;
-
-    public Function<String, ZipEntrySettings> getEntrySettingsProvider() {
-        return entrySettingsProvider == null ? fileName -> defEntrySettings : entrySettingsProvider;
-    }
-
 
 }
