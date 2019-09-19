@@ -32,7 +32,7 @@ public final class DefalteZipData {
 
     private static void createDeflateSolidZip() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .defEntrySettings(
+                                                  .entrySettingsProvider(fileName ->
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
                                                   .build();
@@ -46,7 +46,7 @@ public final class DefalteZipData {
 
     private static void createDeflateSplitZip() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .defEntrySettings(
+                                                  .entrySettingsProvider(fileName ->
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
                                                   .splitSize(1024 * 1024).build();
@@ -59,10 +59,10 @@ public final class DefalteZipData {
 
     private static void createDeflateSolidPkwareZip() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .defEntrySettings(
+                                                  .entrySettingsProvider(fileName ->
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                                          .encryption(Encryption.PKWARE, fileName -> Zip4jSuite.password).build())
+                                                                          .encryption(Encryption.PKWARE, Zip4jSuite.password).build())
                                                   .comment("password: " + new String(Zip4jSuite.password)).build();
         ZipIt.add(Zip4jSuite.deflateSolidPkwareZip, Zip4jSuite.contentSrcDir, settings);
 
@@ -73,10 +73,10 @@ public final class DefalteZipData {
 
     private static void createDeflateSolidAesZip() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .defEntrySettings(
+                                                  .entrySettingsProvider(fileName ->
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                                          .encryption(Encryption.AES_256, String::toCharArray).build())
+                                                                          .encryption(Encryption.AES_256, fileName.toCharArray()).build())
                                                   .comment("password: fileName").build();
         ZipIt.add(Zip4jSuite.deflateSolidAesZip, Zip4jSuite.contentSrcDir, settings);
 

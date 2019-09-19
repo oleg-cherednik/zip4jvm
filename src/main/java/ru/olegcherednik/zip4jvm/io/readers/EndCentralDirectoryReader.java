@@ -7,6 +7,7 @@ import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author Oleg Cherednik
@@ -27,7 +28,7 @@ final class EndCentralDirectoryReader implements Reader<EndCentralDirectory> {
         dir.setCentralDirectorySize(in.readDword());
         dir.setCentralDirectoryOffs(in.readDword());
         int commentLength = in.readWord();
-        dir.setComment(in.readString(commentLength));
+        dir.setComment(in.readString(commentLength, StandardCharsets.UTF_8));
 
         in.seek(offs);
 

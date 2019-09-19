@@ -41,7 +41,7 @@ public class Zip64Test {
     @Test
     public void shouldZipWhenZip64() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .defEntrySettings(
+                                                  .entrySettingsProvider(fileName ->
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                                           .build())
@@ -66,11 +66,10 @@ public class Zip64Test {
     @Test
     public void shouldZipWhenZip64AndAesEncryption() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .defEntrySettings(
+                                                  .entrySettingsProvider(fileName ->
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                                          .encryption(Encryption.AES_256, fileName -> Zip4jSuite.password)
-                                                                          .build())
+                                                                          .encryption(Encryption.AES_256, Zip4jSuite.password).build())
                                                   .comment("password: " + new String(Zip4jSuite.password))
                                                   .zip64(true).build();
 
@@ -94,7 +93,7 @@ public class Zip64Test {
     @Test
     public void shouldZipWhenZip64AndSplit() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .defEntrySettings(
+                                                  .entrySettingsProvider(fileName ->
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                                           .build())

@@ -17,7 +17,7 @@ final class StoreEntryOutputStream extends EntryOutputStream {
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
-        updateChecksum(buf, offs, len);
+        super.write(buf, offs, len);
         encoder.encrypt(buf, offs, len);
         out.write(buf, offs, len);
     }

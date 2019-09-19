@@ -55,10 +55,10 @@ public class ZipMiscTest {
 
     public void shouldThrowExceptionWhenAddedFileNotExists() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .defEntrySettings(
-                                                                      ZipEntrySettings.builder()
-                                                                                      .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                                                      .build())
+                                                  .entrySettingsProvider(fileName ->
+                                                          ZipEntrySettings.builder()
+                                                                          .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                                          .build())
                                                   .build();
 
         Path bentley = Zip4jSuite.carsDir.resolve("bentley-continental.jpg");
@@ -89,10 +89,10 @@ public class ZipMiscTest {
     public void shouldRetrieveTrueWhenSplitZipWithOneDisk() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
                                                   .splitSize(1024 * 1024)
-                                                  .defEntrySettings(
-                                                                      ZipEntrySettings.builder()
-                                                                                      .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                                                      .build())
+                                                  .entrySettingsProvider(fileName ->
+                                                          ZipEntrySettings.builder()
+                                                                          .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                                          .build())
                                                   .build();
         Path zip = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt.add(zip, Collections.singleton(Zip4jSuite.srcDir.resolve("Oleg Cherednik.txt")), settings);

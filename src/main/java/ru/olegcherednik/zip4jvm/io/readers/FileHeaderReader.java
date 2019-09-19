@@ -12,6 +12,7 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -59,9 +60,9 @@ final class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader>
         fileHeader.setInternalFileAttributes(getInternalFileAttribute(in.readBytes(InternalFileAttributes.SIZE)));
         fileHeader.setExternalFileAttributes(getExternalFileAttribute(in.readBytes(ExternalFileAttributes.SIZE)));
         fileHeader.setOffsLocalFileHeader(in.readDword());
-        fileHeader.setFileName(in.readString(fileNameLength));
+        fileHeader.setFileName(in.readString(fileNameLength, fileHeader.getGeneralPurposeFlag().getCharset()));
         fileHeader.setExtraField(getExtraFieldReader(extraFieldLength, fileHeader).read(in));
-        fileHeader.setComment(in.readString(fileCommentLength));
+        fileHeader.setComment(in.readString(fileCommentLength, fileHeader.getGeneralPurposeFlag().getCharset()));
 
         return fileHeader;
     }
@@ -81,7 +82,8 @@ final class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader>
         boolean compressedSize = fileHeader.getCompressedSize() == LOOK_IN_EXTRA_FIELD;
         boolean offsHeader = fileHeader.getOffsLocalFileHeader() == LOOK_IN_EXTRA_FIELD;
         boolean disk = fileHeader.getDisk() == ZipModel.MAX_TOTAL_DISKS;
-        return new ExtraFieldReader(size, uncompressedSize, compressedSize, offsHeader, disk);
+        Charset charset = fileHeader.getGeneralPurposeFlag().getCharset();
+        return new ExtraFieldReader(size, uncompressedSize, compressedSize, offsHeader, disk, charset);
     }
 
 }

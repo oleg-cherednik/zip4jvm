@@ -43,10 +43,10 @@ public class ModifyCommentTest {
 
     public void shouldCreateNewZipWithComment() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .defEntrySettings(
-                                                                      ZipEntrySettings.builder()
-                                                                                      .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                                                      .build())
+                                                  .entrySettingsProvider(fileName ->
+                                                          ZipEntrySettings.builder()
+                                                                          .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
+                                                                          .build())
                                                   .comment("Oleg Cherednik - Олег Чередник").build();
         ZipIt.add(zip, Zip4jSuite.fileSrcOlegCherednik, settings);
         assertThatZipFile(zip).exists().hasComment("Oleg Cherednik - Олег Чередник");
@@ -69,11 +69,10 @@ public class ModifyCommentTest {
         Files.deleteIfExists(zip);
 
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .defEntrySettings(
-                                                                      ZipEntrySettings.builder()
-                                                                                      .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                                                      .encryption(Encryption.PKWARE, fileName -> Zip4jSuite.password)
-                                                                                      .build())
+                                                  .entrySettingsProvider(fileName ->
+                                                          ZipEntrySettings.builder()
+                                                                          .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                                          .encryption(Encryption.PKWARE, Zip4jSuite.password).build())
                                                   .build();
         ZipIt.add(zip, Collections.emptyList(), settings);
         assertThatZipFile(zip, Zip4jSuite.password).hasCommentSize(0);

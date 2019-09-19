@@ -28,18 +28,18 @@ public final class UnzipIt {
         ZipFile.read(zip).extract(destDir, fileNames);
     }
 
-    public static void extract(@NonNull Path zip, @NonNull Path destDir, @NonNull Function<String, char[]> createPassword) throws IOException {
-        ZipFile.read(zip, createPassword).extract(destDir);
+    public static void extract(@NonNull Path zip, @NonNull Path destDir, @NonNull Function<String, char[]> passwordProvider) throws IOException {
+        ZipFile.read(zip, passwordProvider).extract(destDir);
     }
 
-    public static void extract(@NonNull Path zip, @NonNull Path destDir, @NonNull String fileName, @NonNull Function<String, char[]> createPassword)
+    public static void extract(@NonNull Path zip, @NonNull Path destDir, @NonNull String fileName, @NonNull Function<String, char[]> passwordProvider)
             throws IOException {
-        ZipFile.read(zip, createPassword).extract(destDir, fileName);
+        ZipFile.read(zip, passwordProvider).extract(destDir, fileName);
     }
 
     public static void extract(@NonNull Path zip, @NonNull Path destDir, @NonNull Collection<String> fileNames,
-            @NonNull Function<String, char[]> createPassword) throws IOException {
-        ZipFile.read(zip, createPassword).extract(destDir, fileNames);
+            @NonNull Function<String, char[]> passwordProvider) throws IOException {
+        ZipFile.read(zip, passwordProvider).extract(destDir, fileNames);
     }
 
 }

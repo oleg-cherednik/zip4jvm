@@ -2,8 +2,10 @@ package ru.olegcherednik.zip4jvm.model.entry;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
@@ -14,7 +16,8 @@ import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.Zip64;
-import ru.olegcherednik.zip4jvm.utils.function.IOSupplier;
+import ru.olegcherednik.zip4jvm.utils.ZipUtils;
+import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,23 +44,25 @@ public abstract class ZipEntry {
     private final int lastModifiedTime;
     private final ExternalFileAttributes externalFileAttributes;
 
-    protected final long uncompressedSize;
     protected final Compression compression;
     private final CompressionLevel compressionLevel;
     protected final Encryption encryption;
+    private final ZipEntryInputStreamSupplier inputStreamSup;
+
     /**
      * {@literal true} only if section {@link Zip64.ExtendedInfo} exists in {@link LocalFileHeader} and {@link CentralDirectory.FileHeader}.
      * In other words, do set this to {@code true}, to write given entry in ZIP64 format.
      */
-    private final boolean zip64;
-    private final IOSupplier<InputStream> inputStream;
+    private boolean zip64;
 
     private char[] password;
     private long disk;
     private long localFileHeaderOffs;
     @Getter(AccessLevel.NONE)
     private BooleanSupplier dataDescriptorAvailable = () -> false;
+    private long uncompressedSize;
     private long compressedSize;
+
     private String comment;
     private boolean utf8;
     private long size;
@@ -79,7 +84,7 @@ public abstract class ZipEntry {
     }
 
     public InputStream getIn() throws IOException {
-        return inputStream.get(this);
+        return inputStreamSup.get(this);
     }
 
     @Override
@@ -98,11 +103,18 @@ public abstract class ZipEntry {
     public void setChecksum(long checksum) {
     }
 
-    public void checkCompressedSize(long actual) {
-    }
-
     public final boolean isDataDescriptorAvailable() {
         return dataDescriptorAvailable.getAsBoolean();
+    }
+
+    @NonNull
+    public final ZipFile.Entry createImmutableEntry() {
+        return ZipFile.Entry.builder()
+                            .inputStreamSup(this::getIn)
+                            .fileName(ZipUtils.getFileNameNoDirectoryMarker(fileName))
+                            .lastModifiedTime(lastModifiedTime)
+                            .externalFileAttributes(externalFileAttributes)
+                            .regularFile(isRegularFile()).build();
     }
 
 }

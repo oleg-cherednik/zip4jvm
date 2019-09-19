@@ -4,7 +4,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -30,26 +29,26 @@ public class UnzipStreamTest {
     }
 
     @Test
-    public void shouldUnzipEntryToStreamWhenNoSplit() throws Zip4jException, IOException {
+    public void shouldUnzipEntryToStreamWhenNoSplit() throws IOException {
         Path imgFile = rootDir.resolve("bentley-continental.jpg");
         ZipFile.Reader zipFile = ZipFile.read(Zip4jSuite.deflateSolidZip);
-        TestUtils.copyLarge(zipFile.extract("cars/bentley-continental.jpg"), imgFile);
+        TestUtils.copyLarge(zipFile.extract("cars/bentley-continental.jpg").getInputStream(), imgFile);
         Zip4jAssertions.assertThatFile(imgFile).exists().isImage().hasSize(1_395_362);
     }
 
     @Test
-    public void shouldUnzipEntryToStreamWhenSplit() throws Zip4jException, IOException {
+    public void shouldUnzipEntryToStreamWhenSplit() throws IOException {
         Path imgFile = rootDir.resolve("ferrari-458-italia.jpg");
         ZipFile.Reader zipFile = ZipFile.read(Zip4jSuite.deflateSolidZip);
-        TestUtils.copyLarge(zipFile.extract("cars/ferrari-458-italia.jpg"), imgFile);
+        TestUtils.copyLarge(zipFile.extract("cars/ferrari-458-italia.jpg").getInputStream(), imgFile);
         Zip4jAssertions.assertThatFile(imgFile).exists().isImage().hasSize(320_894);
     }
 
     @Test
-    public void shouldUnzipEntryToStreamWhenPkwareNoSplit() throws Zip4jException, IOException {
+    public void shouldUnzipEntryToStreamWhenPkwareNoSplit() throws IOException {
         Path imgFile = rootDir.resolve("bentley-continental.jpg");
         ZipFile.Reader zipFile = ZipFile.read(Zip4jSuite.deflateSolidPkwareZip, fileName -> Zip4jSuite.password);
-        TestUtils.copyLarge(zipFile.extract("cars/bentley-continental.jpg"), imgFile);
+        TestUtils.copyLarge(zipFile.extract("cars/bentley-continental.jpg").getInputStream(), imgFile);
         Zip4jAssertions.assertThatFile(imgFile).exists().isImage().hasSize(1_395_362);
     }
 }

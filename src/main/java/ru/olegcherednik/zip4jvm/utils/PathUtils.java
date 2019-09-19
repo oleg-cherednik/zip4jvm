@@ -26,18 +26,20 @@ public final class PathUtils {
 
     @NonNull
     public static Map<Path, String> getRelativeContent(@NonNull Collection<Path> paths) throws IOException {
+        requireExistedPaths(paths);
+
         Map<Path, String> pathFileName = new TreeMap<>(SORT_DIR_FIRST);
 
         for (Path path : paths) {
             if (Files.isRegularFile(path))
-                pathFileName.put(path, path.getFileName().toString());
+                pathFileName.put(path, ZipUtils.normalizeFileName(path.getFileName().toString()));
             else if (Files.isDirectory(path)) {
                 if (isEmptyDirectory(path))
                     pathFileName.put(path, path.getFileName().toString());
                 else {
                     Files.walk(path)
                          .filter(p -> Files.isRegularFile(p) || isEmptyDirectory(p))
-                         .forEach(p -> pathFileName.putIfAbsent(p, path.getParent().relativize(p).toString()));
+                         .forEach(p -> pathFileName.putIfAbsent(p, ZipUtils.normalizeFileName(path.getParent().relativize(p).toString())));
                 }
             }
         }

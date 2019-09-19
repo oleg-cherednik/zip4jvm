@@ -3,7 +3,6 @@ package ru.olegcherednik.zip4jvm;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -81,7 +80,7 @@ public class ZipFileReaderTest {
     public void shouldIterateOverAllEntriesWhenStoreSolidPkware() throws IOException {
         List<String> entryNames = new ArrayList<>();
 
-        for (ZipEntry entry : ZipFile.read(Zip4jSuite.storeSolidPkwareZip))
+        for (ZipFile.Entry entry : ZipFile.read(Zip4jSuite.storeSolidPkwareZip))
             entryNames.add(entry.getFileName());
 
         assertThat(entryNames).containsExactlyInAnyOrder(
@@ -92,7 +91,7 @@ public class ZipFileReaderTest {
                 "Star Wars/two.jpg",
                 "Star Wars/three.jpg",
                 "Star Wars/four.jpg",
-                "empty_dir/",
+                "empty_dir",
                 "empty_file.txt",
                 "mcdonnell-douglas-f15-eagle.jpg",
                 "Oleg Cherednik.txt",
@@ -102,7 +101,7 @@ public class ZipFileReaderTest {
 
     public void shouldRetrieveStreamWithAllEntriesWhenStoreSolidPkware() throws IOException {
         List<String> entryNames = ZipFile.read(Zip4jSuite.storeSolidPkwareZip).stream()
-                                         .map(ZipEntry::getFileName)
+                                         .map(ZipFile.Entry::getFileName)
                                          .collect(Collectors.toList());
 
         assertThat(entryNames).containsExactlyInAnyOrder(
@@ -113,7 +112,7 @@ public class ZipFileReaderTest {
                 "Star Wars/two.jpg",
                 "Star Wars/three.jpg",
                 "Star Wars/four.jpg",
-                "empty_dir/",
+                "empty_dir",
                 "empty_file.txt",
                 "mcdonnell-douglas-f15-eagle.jpg",
                 "Oleg Cherednik.txt",
