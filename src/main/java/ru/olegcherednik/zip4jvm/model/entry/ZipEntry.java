@@ -14,7 +14,6 @@ import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
-import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
 
@@ -50,8 +49,9 @@ public abstract class ZipEntry {
     private final ZipEntryInputStreamSupplier inputStreamSup;
 
     /**
-     * {@literal true} only if section {@link Zip64.ExtendedInfo} exists in {@link LocalFileHeader} and {@link ru.olegcherednik.zip4jvm.model.CentralDirectory.FileHeader}.
-     * In other words, do set this to {@code true}, to write given entry in ZIP64 format.
+     * {@literal true} only if section {@link ru.olegcherednik.zip4jvm.model.Zip64.ExtendedInfo} exists in {@link LocalFileHeader} and
+     * {@link ru.olegcherednik.zip4jvm.model.CentralDirectory.FileHeader}. In other words, do set this to {@code true}, to write given entry in
+     * ZIP64 format.
      */
     private boolean zip64;
 
@@ -101,6 +101,7 @@ public abstract class ZipEntry {
     }
 
     public void setChecksum(long checksum) {
+        /* nothing to set */
     }
 
     public final boolean isDataDescriptorAvailable() {
