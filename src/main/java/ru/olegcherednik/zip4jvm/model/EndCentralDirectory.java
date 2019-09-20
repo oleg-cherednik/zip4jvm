@@ -1,6 +1,6 @@
 package ru.olegcherednik.zip4jvm.model;
 
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -46,7 +46,7 @@ public class EndCentralDirectory {
 
     public void setComment(String comment) {
         if (StringUtils.length(comment) > MAX_COMMENT_LENGTH)
-            throw new Zip4jException("File comment should be " + MAX_COMMENT_LENGTH + " characters maximum");
+            throw new Zip4jvmException("File comment should be " + MAX_COMMENT_LENGTH + " characters maximum");
 
         this.comment = comment;
     }

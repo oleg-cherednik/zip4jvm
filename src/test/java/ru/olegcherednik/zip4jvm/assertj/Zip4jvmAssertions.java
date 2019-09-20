@@ -13,22 +13,22 @@ import java.nio.file.Path;
  */
 @SuppressWarnings("ExtendsUtilityClass")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class Zip4jAssertions extends Assertions {
+public final class Zip4jvmAssertions extends Assertions {
 
     public static AbstractZipFileAssert<?> assertThatZipFile(Path zipFile) throws IOException {
-        return Zip4jAssertionsForClassTypes.assertThat(new ZipFileDecorator(zipFile));
+        return Zip4jvmAssertionsForClassTypes.assertThat(new ZipFileDecorator(zipFile));
     }
 
     public static AbstractZipFileAssert<?> assertThatZipFile(Path zipFile, char[] password) throws IOException {
-        return Zip4jAssertionsForClassTypes.assertThat(new ZipFileEncryptedDecoder(zipFile, password));
+        return Zip4jvmAssertionsForClassTypes.assertThat(new ZipFileEncryptedDecoder(zipFile, password));
     }
 
     public static AbstractDirectoryAssert<?> assertThatDirectory(Path path) {
-        return Zip4jAssertionsForClassTypes.assertThatDirectory(path);
+        return Zip4jvmAssertionsForClassTypes.assertThatDirectory(path);
     }
 
     public static AbstractFileExtAssert<?> assertThatFile(Path path) {
-        return Zip4jAssertionsForClassTypes.assertThatFile(path);
+        return Zip4jvmAssertionsForClassTypes.assertThatFile(path);
     }
 
 }

@@ -43,7 +43,7 @@ public class AbstractZipFileAssert<SELF extends AbstractZipFileAssert<SELF>> ext
     }
 
     public static AbstractZipFileAssert<?> assertThatZipFile(Path zipFile, char[] password) throws IOException {
-        return Zip4jAssertionsForClassTypes.assertThat(new ZipFileEncryptedDecoder(zipFile, password));
+        return Zip4jvmAssertionsForClassTypes.assertThat(new ZipFileEncryptedDecoder(zipFile, password));
     }
 
     public SELF exists() {

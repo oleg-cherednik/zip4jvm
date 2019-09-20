@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -85,7 +85,7 @@ final class Zip64Reader implements Reader<Zip64> {
             in.seek(offs);
 
             if (in.readSignature() != Zip64.EndCentralDirectory.SIGNATURE)
-                throw new Zip4jException("invalid zip64 end of central directory");
+                throw new Zip4jvmException("invalid zip64 end of central directory");
         }
     }
 
@@ -114,7 +114,7 @@ final class Zip64Reader implements Reader<Zip64> {
                                                                 .build();
 
             if (in.getOffs() - offs != size)
-                throw new Zip4jException("Illegal number of read bytes");
+                throw new Zip4jvmException("Illegal number of read bytes");
 
             return extendedInfo;
         }

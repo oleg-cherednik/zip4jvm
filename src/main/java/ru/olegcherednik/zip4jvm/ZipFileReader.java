@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm;
 import lombok.NonNull;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -67,7 +67,7 @@ final class ZipFileReader implements ZipFile.Reader {
         ZipEntry zipEntry = zipModel.getEntryByFileName(ZipUtils.normalizeFileName(fileName));
 
         if (zipEntry == null)
-            throw new Zip4jException("No entry found for '" + fileName + '\'');
+            throw new Zip4jvmException("No entry found for '" + fileName + '\'');
 
         zipEntry.setPassword(passwordProvider.apply(zipEntry.getFileName()));
         return zipEntry.createImmutableEntry();
@@ -113,7 +113,7 @@ final class ZipFileReader implements ZipFile.Reader {
 
     private void extractEntry(Path destDir, ZipEntry entry, Function<ZipEntry, String> getFileName) throws IOException {
         if (entry == null)
-            throw new Zip4jException("Entry not found");
+            throw new Zip4jvmException("Entry not found");
 
         entry.setPassword(passwordProvider.apply(entry.getFileName()));
         String fileName = getFileName.apply(entry);
@@ -148,9 +148,9 @@ final class ZipFileReader implements ZipFile.Reader {
 
     private static void checkZipFile(Path zip) {
         if (!Files.exists(zip))
-            throw new Zip4jException("ZipFile not exists: " + zip);
+            throw new Zip4jvmException("ZipFile not exists: " + zip);
         if (!Files.isRegularFile(zip))
-            throw new Zip4jException("ZipFile is not a regular file: " + zip);
+            throw new Zip4jvmException("ZipFile is not a regular file: " + zip);
     }
 
 }

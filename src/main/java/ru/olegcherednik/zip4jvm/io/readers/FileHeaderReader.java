@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
@@ -43,7 +43,7 @@ final class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader>
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
         if (in.readSignature() != CentralDirectory.FileHeader.SIGNATURE)
-            throw new Zip4jException("Expected central directory entry not found offs=" + offs);
+            throw new Zip4jvmException("Expected central directory entry not found offs=" + offs);
 
         fileHeader.setVersionMadeBy(in.readWord());
         fileHeader.setVersionToExtract(in.readWord());

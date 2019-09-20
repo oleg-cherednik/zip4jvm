@@ -25,11 +25,15 @@ repositories {
 }
 
 group 'ru.oleg-cherednik.zip4jvm'
-version '0.8'
+version '0.7'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 mainClassName = 'unknown'
+
+configurations {
+    jar.archiveName = "zip4jvm-${version}.jar"
+}
 
 dependencies {
     compile 'org.slf4j:slf4j-api:1.7.25'
@@ -50,16 +54,6 @@ dependencies {
     testCompile 'de.idyl:winzipaes:1.0.1'
 }
 
-jar {
-    manifest {
-        attributes 'Main-Class': mainClassName
-    }
-
-    from {
-        configurations.compile.collect {it.isDirectory() ? it : zipTree(it)}
-    }
-}
-
 jacocoTestReport {
     reports {
         xml.enabled true
@@ -68,16 +62,6 @@ jacocoTestReport {
 }
 
 check.dependsOn jacocoTestReport
-
-task fatJar(type: Jar) {
-    manifest {
-        attributes 'Main-Class': mainClassName
-    }
-
-    baseName = project.name
-    from {configurations.compile.collect {it.isDirectory() ? it : zipTree(it)}}
-    with jar
-}
 
 test {
     useTestNG()
@@ -88,3 +72,51 @@ test {
 //    include "**/*.java"
 //    exclude "**/*Test.java"
 //}
+
+modifyPom {
+    project {
+        name 'zip4jvm'
+        description 'Zip files support for JDK application'
+        url 'https://github.com/oleg-cherednik/zip4jvm'
+        inceptionYear '2019'
+
+        scm {
+            url 'https://github.com/oleg-cherednik/zip4jvm'
+            connection 'scm:https://github.com/oleg-cherednik/zip4jvm.git'
+            developerConnection 'scm:git@github.com:oleg-cherednik/zip4jvm.git'
+        }
+
+        licenses {
+            license {
+                name 'The Apache Software License, Version 2.0'
+                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                distribution 'repo'
+            }
+        }
+
+        developers {
+            developer {
+                id 'oleg.cherednik'
+                name 'Oleg Cherednik'
+                email 'oleg.cherednik@gmail.com'
+            }
+        }
+    }
+}
+
+extraArchive {
+    sources true
+    tests true
+    javadoc true
+}
+
+nexus {
+    sign true
+    repositoryUrl 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
+    snapshotRepositoryUrl 'https://oss.sonatype.org/content/repositories/snapshots'
+}
+
+nexusStaging {
+    packageGroup 'ru.oleg-cherednik'
+    stagingProfileId 'D3835BF60F05B9'
+}

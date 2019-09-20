@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.io.in;
 
 import lombok.NonNull;
 import org.apache.commons.io.IOUtils;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
@@ -35,7 +35,7 @@ public class SplitZipInputStream extends BaseDataInput {
         if (disk != 0)
             return;
         if (delegate.readSignature() != SplitZipOutputStream.SPLIT_SIGNATURE)
-            throw new Zip4jException("Incorrect split file signature: " + zipModel.getFile().getFileName());
+            throw new Zip4jvmException("Incorrect split file signature: " + zipModel.getFile().getFileName());
     }
 
     @Override
