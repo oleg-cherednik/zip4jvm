@@ -24,6 +24,10 @@ public class Zip64Test {
 
     private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(Zip64Test.class);
 
+    private Path zipFile1;
+    private Path zipFile2;
+    private Path zipFile3;
+
     @BeforeClass
     public static void createDir() throws IOException {
         Files.createDirectories(rootDir);
@@ -33,8 +37,6 @@ public class Zip64Test {
     public static void removeDir() throws IOException {
         Zip4jvmSuite.removeDir(rootDir);
     }
-
-    private Path zipFile1;
 
     @Test
     public void shouldZipWhenZip64() throws IOException {
@@ -59,7 +61,6 @@ public class Zip64Test {
         Zip4jvmAssertions.assertThatDirectory(destDir).matches(TestDataAssert.dirAssert);
     }
 
-    private Path zipFile2;
 
     @Test
     public void shouldZipWhenZip64AndAesEncryption() throws IOException {
@@ -86,7 +87,6 @@ public class Zip64Test {
         Zip4jvmAssertions.assertThatDirectory(destDir).matches(TestDataAssert.dirAssert);
     }
 
-    private Path zipFile3;
 
     @Test
     public void shouldZipWhenZip64AndSplit() throws IOException {

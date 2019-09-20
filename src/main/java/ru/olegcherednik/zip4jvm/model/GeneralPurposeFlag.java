@@ -27,6 +27,8 @@ import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT6;
 @NoArgsConstructor
 public class GeneralPurposeFlag implements IntSupplier {
 
+    private static final Charset IBM437 = Charset.forName("IBM437");
+
     private boolean encrypted;
     private CompressionLevel compressionLevel;
     /** {@link DataDescriptor} */
@@ -69,8 +71,6 @@ public class GeneralPurposeFlag implements IntSupplier {
 
         return data;
     }
-
-    private static final Charset IBM437 = Charset.forName("IBM437");
 
     public Charset getCharset() {
         return utf8 ? StandardCharsets.UTF_8 : IBM437;

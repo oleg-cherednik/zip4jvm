@@ -12,10 +12,12 @@ final class NullEncoder implements Encoder {
 
     @Override
     public void writeEncryptionHeader(DataOutput out) throws IOException {
+        /* nothing to write */
     }
 
     @Override
     public void encrypt(byte[] buf, int offs, int len) {
+        /* nothing to encrypt */
     }
 
     @Override

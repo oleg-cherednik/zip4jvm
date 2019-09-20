@@ -82,9 +82,9 @@ public class LittleEndianReadFile implements DataInput {
             return null;
 
         byte[] buf = new byte[total];
-        total = in.read(buf);
+        int len = in.read(buf);
 
-        return total == buf.length ? buf : ArrayUtils.subarray(buf, 0, total);
+        return len == buf.length ? buf : ArrayUtils.subarray(buf, 0, len);
     }
 
     @Override

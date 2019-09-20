@@ -25,7 +25,7 @@ repositories {
 }
 
 group 'ru.oleg-cherednik.zip4jvm'
-version '0.7'
+version '0.8'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8

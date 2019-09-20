@@ -110,6 +110,7 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consum
 
         @Override
         protected void applyToPath(Path path) throws IOException {
+            /* nothing to apply */
         }
 
         @Override
@@ -157,6 +158,7 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consum
 
         @Override
         protected void applyToPath(Path path) throws IOException {
+            //
         }
 
         @Override

@@ -58,7 +58,7 @@ public class AbstractDirectoryAssert<SELF extends AbstractDirectoryAssert<SELF>>
         try {
             return Files.list(actual.toPath()).filter(path -> Files.isDirectory(path)).count();
         } catch(IOException e) {
-            throw new RuntimeException(e);
+            throw new Zip4jvmException(e);
         }
     }
 

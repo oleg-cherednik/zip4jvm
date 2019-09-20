@@ -98,7 +98,7 @@ class ZipFileDecorator {
                 try {
                     zipFile.getInputStream(entry).available();
                 } catch(IOException e) {
-                    throw new RuntimeException(e);
+                    throw new Zip4jvmException(e);
                 }
             });
             return map;

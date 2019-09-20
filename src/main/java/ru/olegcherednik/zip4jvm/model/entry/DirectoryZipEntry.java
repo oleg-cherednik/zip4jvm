@@ -24,6 +24,7 @@ final class DirectoryZipEntry extends ZipEntry {
 
     @Override
     public void setCompressedSize(long compressedSize) {
+        /* nothing to set */
     }
 
 }
