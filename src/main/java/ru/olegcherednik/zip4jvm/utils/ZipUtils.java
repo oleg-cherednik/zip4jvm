@@ -64,14 +64,16 @@ public final class ZipUtils {
         return "offs: " + offs + " (0x" + Long.toHexString(offs) + ')';
     }
 
+    @SuppressWarnings("PMD.AvoidReassigningParameters")
     public static String getFileName(@NonNull String fileName, boolean regularFile) {
         fileName = getFileNameNoDirectoryMarker(fileName);
         return regularFile ? fileName : fileName + '/';
     }
 
+    @SuppressWarnings("PMD.AvoidReassigningParameters")
     public static String getFileNameNoDirectoryMarker(@NonNull String fileName) {
         fileName = normalizeFileName(fileName);
-        return StringUtils.removeEnd(fileName, "/");
+        return StringUtils.removeEnd(normalizeFileName(fileName), "/");
     }
 
 }

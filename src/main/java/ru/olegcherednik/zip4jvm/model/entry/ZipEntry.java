@@ -8,7 +8,6 @@ import lombok.Setter;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
@@ -25,7 +24,7 @@ import java.util.Comparator;
 import java.util.function.BooleanSupplier;
 
 /**
- * Represents one single entry in zip archive, i.e. one instance of {@link LocalFileHeader} and related {@link CentralDirectory.FileHeader}.
+ * Represents one single entry in zip archive, i.e. one instance of {@link LocalFileHeader} and related {@link ru.olegcherednik.zip4jvm.model.CentralDirectory.FileHeader}.
  *
  * @author Oleg Cherednik
  * @since 26.07.2019
@@ -33,6 +32,7 @@ import java.util.function.BooleanSupplier;
 @Getter
 @Setter
 @RequiredArgsConstructor
+@SuppressWarnings("UnnecessaryFullyQualifiedName")
 public abstract class ZipEntry {
 
     public static final Comparator<ZipEntry> SORT_BY_DISC_LOCAL_FILE_HEADER_OFFS =
@@ -50,7 +50,7 @@ public abstract class ZipEntry {
     private final ZipEntryInputStreamSupplier inputStreamSup;
 
     /**
-     * {@literal true} only if section {@link Zip64.ExtendedInfo} exists in {@link LocalFileHeader} and {@link CentralDirectory.FileHeader}.
+     * {@literal true} only if section {@link Zip64.ExtendedInfo} exists in {@link LocalFileHeader} and {@link ru.olegcherednik.zip4jvm.model.CentralDirectory.FileHeader}.
      * In other words, do set this to {@code true}, to write given entry in ZIP64 format.
      */
     private boolean zip64;

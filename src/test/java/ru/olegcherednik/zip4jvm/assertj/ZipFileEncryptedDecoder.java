@@ -48,10 +48,10 @@ class ZipFileEncryptedDecoder extends ZipFileDecorator {
                     return getInputStream(item);
 
             throw new Zip4jvmException("Entry '" + entry + "' was not found");
-        } catch(RuntimeException e) {
+        } catch(Zip4jvmException e) {
             throw e;
         } catch(Exception e) {
-            throw new RuntimeException(e);
+            throw new Zip4jvmException(e);
         }
     }
 
@@ -62,7 +62,7 @@ class ZipFileEncryptedDecoder extends ZipFileDecorator {
              IInArchive zip = SevenZip.openInArchive(ArchiveFormat.ZIP, in)) {
             String str = zip.getStringArchiveProperty(PropID.COMMENT);
             return StringUtils.length(str) == 0 ? null : str;
-        } catch(RuntimeException e) {
+        } catch(Zip4jvmException e) {
             throw e;
         } catch(Exception e) {
             throw new Zip4jvmException(e);
@@ -108,6 +108,8 @@ class ZipFileEncryptedDecoder extends ZipFileDecorator {
             }
 
             return map;
+        } catch(Zip4jvmException e) {
+            throw e;
         } catch(Exception e) {
             throw new Zip4jvmException(e);
         }

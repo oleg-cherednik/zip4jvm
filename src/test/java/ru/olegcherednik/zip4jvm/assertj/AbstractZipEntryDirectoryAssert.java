@@ -35,6 +35,7 @@ public class AbstractZipEntryDirectoryAssert<S extends AbstractZipEntryDirectory
         return new ZipEntryDirectoryAssert(new ZipEntry(name), zipFile);
     }
 
+    @SuppressWarnings("PMD.AvoidReassigningParameters")
     private ZipEntry getZipEntry(String name) {
         name = "/".equals(actual.getName()) ? name : actual.getName() + name;
         return new ZipEntry(name);

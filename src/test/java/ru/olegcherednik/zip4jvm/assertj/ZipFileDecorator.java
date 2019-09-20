@@ -118,6 +118,7 @@ class ZipFileDecorator {
         return map;
     }
 
+    @SuppressWarnings("PMD.AvoidReassigningParameters")
     private static void add(String entryName, Map<String, Set<String>> map) {
         if ("/".equals(entryName))
             return;

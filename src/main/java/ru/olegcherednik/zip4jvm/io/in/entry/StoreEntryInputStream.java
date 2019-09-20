@@ -1,9 +1,9 @@
 package ru.olegcherednik.zip4jvm.io.in.entry;
 
+import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 
@@ -18,6 +18,7 @@ final class StoreEntryInputStream extends EntryInputStream {
     }
 
     @Override
+    @SuppressWarnings("PMD.AvoidReassigningParameters")
     public int read(byte[] buf, int offs, int len) throws IOException {
         len = (int)Math.min(len, getAvailableCompressedBytes());
         len = in.read(buf, offs, len);

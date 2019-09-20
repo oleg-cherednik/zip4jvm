@@ -39,6 +39,7 @@ public class SplitZipInputStream extends BaseDataInput {
     }
 
     @Override
+    @SuppressWarnings("PMD.AvoidReassigningParameters")
     public int read(byte[] buf, int offs, int len) throws IOException {
         int res = 0;
 

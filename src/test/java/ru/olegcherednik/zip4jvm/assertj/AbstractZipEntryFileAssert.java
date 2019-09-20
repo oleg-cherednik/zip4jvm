@@ -18,6 +18,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
  */
 public abstract class AbstractZipEntryFileAssert<S extends AbstractZipEntryFileAssert<S>> extends AbstractZipEntryAssert<S> {
 
+    private static final Pattern NEW_LINE = Pattern.compile("\\r?\\n");
+
     protected AbstractZipEntryFileAssert(ZipEntry actual, Class<?> selfType, ZipFileDecorator zipFile) {
         super(actual, selfType, zipFile);
     }
@@ -54,8 +56,6 @@ public abstract class AbstractZipEntryFileAssert<S extends AbstractZipEntryFileA
     public S hasEmptyContent() {
         return hasContent("");
     }
-
-    private static final Pattern NEW_LINE = Pattern.compile("\\r?\\n");
 
     public S hasContent(String expected) {
         try (InputStream in = zipFile.getInputStream(actual)) {

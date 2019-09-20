@@ -43,12 +43,13 @@ final class ZipFileReader implements ZipFile.Reader {
     }
 
     @Override
+    @SuppressWarnings("PMD.AvoidReassigningParameters")
     public void extract(@NonNull Path destDir, @NonNull String fileName) throws IOException {
-        String normalizeFileName = ZipUtils.normalizeFileName(fileName);
-        List<ZipEntry> entries = getEntriesWithFileNamePrefix(normalizeFileName + '/');
+        fileName = ZipUtils.normalizeFileName(fileName);
+        List<ZipEntry> entries = getEntriesWithFileNamePrefix(fileName + '/');
 
         if (entries.isEmpty())
-            extractEntry(destDir, zipModel.getEntryByFileName(normalizeFileName), e -> FilenameUtils.getName(e.getFileName()));
+            extractEntry(destDir, zipModel.getEntryByFileName(fileName), e -> FilenameUtils.getName(e.getFileName()));
         else {
             for (ZipEntry entry : entries)
                 extractEntry(destDir, entry, ZipEntry::getFileName);
