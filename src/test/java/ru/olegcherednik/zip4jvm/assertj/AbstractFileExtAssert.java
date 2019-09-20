@@ -14,14 +14,13 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
  * @author Oleg Cherednik
  * @since 28.03.2019
  */
-@SuppressWarnings("NewClassNamingConvention")
-public class AbstractFileExtAssert<SELF extends AbstractFileExtAssert<SELF>> extends AbstractFileAssert<SELF> {
+public class AbstractFileExtAssert<S extends AbstractFileExtAssert<S>> extends AbstractFileAssert<S> {
 
     public AbstractFileExtAssert(Path actual, Class<?> selfType) {
         super(actual.toFile(), selfType);
     }
 
-    public SELF isImage() {
+    public S isImage() {
         try (InputStream in = new FileInputStream(actual)) {
             assertThat(ImageIO.read(in)).isNotNull();
         } catch(Exception e) {
@@ -33,7 +32,7 @@ public class AbstractFileExtAssert<SELF extends AbstractFileExtAssert<SELF>> ext
         return myself;
     }
 
-    public SELF hasSize(long size) {
+    public S hasSize(long size) {
         try {
             assertThat(actual.length()).isEqualTo(size);
         } catch(Exception e) {
@@ -45,12 +44,12 @@ public class AbstractFileExtAssert<SELF extends AbstractFileExtAssert<SELF>> ext
         return myself;
     }
 
-    public SELF hasEmptyContent() {
+    public S hasEmptyContent() {
         return hasContent("");
     }
 
     @Override
-    public SELF exists() {
+    public S exists() {
         super.exists();
         isFile();
         return myself;

@@ -7,7 +7,6 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
-import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
@@ -107,7 +106,8 @@ public abstract class EntryInputStream extends InputStream {
             throw new Zip4jvmException("UncompressedSize is not matched: " + entry.getFileName());
     }
 
-    /** Just read {@link DataDescriptor} and ignore it's value. We got it from {@link CentralDirectory.FileHeader} */
+    /** Just read {@link DataDescriptor} and ignore it's value. We got it from {@link ru.olegcherednik.zip4jvm.model.CentralDirectory.FileHeader} */
+    @SuppressWarnings("UnnecessaryFullyQualifiedName")
     private void readDataDescriptor() throws IOException {
         if (entry.isDataDescriptorAvailable())
             DataDescriptorReader.get(entry.isZip64()).read(in);

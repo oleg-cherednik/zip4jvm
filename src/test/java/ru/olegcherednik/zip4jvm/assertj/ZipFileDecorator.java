@@ -84,7 +84,7 @@ class ZipFileDecorator {
     }
 
     public String getComment() {
-        try (ZipFile zipFile = new ZipFile(this.zip.toFile())) {
+        try (ZipFile zipFile = new ZipFile(zip.toFile())) {
             return zipFile.getComment();
         } catch(Exception e) {
             throw new Zip4jvmException(e);

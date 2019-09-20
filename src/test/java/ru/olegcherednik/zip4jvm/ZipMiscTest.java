@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm;
 
-import org.assertj.core.api.Assertions;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -51,7 +50,7 @@ public class ZipMiscTest {
     }
 
     public void shouldRetrieveAllEntryNamesForExistedZip() throws IOException {
-        Assertions.assertThat(ZipMisc.getEntryNames(deflateSolidZip)).hasSize(13);
+        assertThat(ZipMisc.getEntryNames(deflateSolidZip)).hasSize(13);
     }
 
     public void shouldRetrieveAllEntryNamesForExistedEncryptedZip() throws IOException {

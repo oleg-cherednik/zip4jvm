@@ -13,8 +13,7 @@ import java.util.function.Consumer;
  * @author Oleg Cherednik
  * @since 27.03.2019
  */
-@SuppressWarnings("NewClassNamingConvention")
-public class AbstractDirectoryAssert<SELF extends AbstractDirectoryAssert<SELF>> extends AbstractFileAssert<SELF> {
+public class AbstractDirectoryAssert<S extends AbstractDirectoryAssert<S>> extends AbstractFileAssert<S> {
 
     public AbstractDirectoryAssert(Path actual, Class<?> selfType) {
         super(actual.toFile(), selfType);
@@ -26,7 +25,7 @@ public class AbstractDirectoryAssert<SELF extends AbstractDirectoryAssert<SELF>>
         return new DirectoryAssert(actual.toPath().resolve(name));
     }
 
-    public SELF hasSubDirectories(int expected) {
+    public S hasSubDirectories(int expected) {
         long actual = getFoldersAmount();
 
         if (actual != expected)
@@ -37,7 +36,7 @@ public class AbstractDirectoryAssert<SELF extends AbstractDirectoryAssert<SELF>>
         return myself;
     }
 
-    public SELF hasFiles(int expected) {
+    public S hasFiles(int expected) {
         long actual = getRegularFilesAmount();
 
         if (actual != expected)
@@ -48,7 +47,7 @@ public class AbstractDirectoryAssert<SELF extends AbstractDirectoryAssert<SELF>>
     }
 
     @Override
-    public SELF exists() {
+    public S exists() {
         super.exists();
         isDirectory();
         return myself;
@@ -62,7 +61,7 @@ public class AbstractDirectoryAssert<SELF extends AbstractDirectoryAssert<SELF>>
         }
     }
 
-    public SELF matches(Consumer<AbstractDirectoryAssert<?>> consumer) {
+    public S matches(Consumer<AbstractDirectoryAssert<?>> consumer) {
         consumer.accept(this);
         return myself;
     }

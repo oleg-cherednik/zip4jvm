@@ -25,8 +25,8 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
 @SuppressWarnings("FieldNamingConvention")
 public class Zip4jvmSuite {
 
-    public static final Path dirRoot = createTempDirectory("zip4jvm");
-    //    public static final Path dirRoot = Paths.get("d:/zip4jvm/foo");
+    //    public static final Path dirRoot = createTempDirectory("zip4jvm");
+    public static final Path dirRoot = Paths.get("d:/zip4jvm/foo");
     public static final Path dirSrc = dirRoot.resolve("src");
 
     public static final Path dirBikes = dirSrc.resolve("bikes");
@@ -36,7 +36,16 @@ public class Zip4jvmSuite {
     public static final List<Path> contentSrcDir = collect(dirSrc, "bikes", "cars", "empty_dir", "empty_file.txt",
             "mcdonnell-douglas-f15-eagle.jpg", "Oleg Cherednik.txt", "saint-petersburg.jpg", "sig-sauer-pistol.jpg");
 
-    static Path createTempDirectory(String prefix) {
+    /** Password for encrypted zip */
+    public static final char[] password = "1".toCharArray();
+    /** Clear resources */
+    public static final boolean clear = false;
+
+    public static final long SIZE_1MB = 1024 * 1024;
+
+    private static final long time = System.currentTimeMillis();
+
+    private static Path createTempDirectory(String prefix) {
         try {
             return Files.createTempDirectory(prefix);
         } catch(IOException e) {
@@ -50,16 +59,6 @@ public class Zip4jvmSuite {
                                  .collect(Collectors.toList());
         return Collections.unmodifiableList(paths);
     }
-
-
-    /** Password for encrypted zip */
-    public static final char[] password = "1".toCharArray();
-    /** Clear resources */
-    public static final boolean clear = true;
-
-    public static final long SIZE_1MB = 1024 * 1024;
-
-    private static final long time = System.currentTimeMillis();
 
     @BeforeSuite
     public void beforeSuite() throws IOException {
