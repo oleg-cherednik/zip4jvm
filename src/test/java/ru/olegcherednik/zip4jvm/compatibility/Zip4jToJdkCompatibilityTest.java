@@ -1,8 +1,8 @@
 package ru.olegcherednik.zip4jvm.compatibility;
 
-import ru.olegcherednik.zip4jvm.TestUtils;
-import ru.olegcherednik.zip4jvm.Zip4jSuite;
 import org.testng.annotations.Test;
+import ru.olegcherednik.zip4jvm.TestDataAssert;
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -12,8 +12,8 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import static ru.olegcherednik.zip4jvm.Zip4jSuite.deflateSolidZip;
-import static ru.olegcherednik.zip4jvm.Zip4jSuite.storeSolidZip;
+import static ru.olegcherednik.zip4jvm.TestData.deflateSolidZip;
+import static ru.olegcherednik.zip4jvm.TestData.storeSolidZip;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirectory;
 
 /**
@@ -24,13 +24,13 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirecto
 @SuppressWarnings({ "NewClassNamingConvention", "FieldNamingConvention", "LocalVariableNamingConvention" })
 public class Zip4jToJdkCompatibilityTest {
 
-    private static final Path rootDir = Zip4jSuite.generateSubDirNameWithTime(Zip4jToJdkCompatibilityTest.class);
+    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(Zip4jToJdkCompatibilityTest.class);
 
     public void checkCompatibilityWithJdk() throws IOException {
-        Path parentDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path parentDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
         for (Path zip4jFile : Arrays.asList(storeSolidZip, deflateSolidZip)) {
-            Path dstDir = Zip4jSuite.subDirNameAsRelativePathToRoot(parentDir, zip4jFile);
+            Path dstDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(parentDir, zip4jFile);
 
             try (ZipFile zipFile = new ZipFile(zip4jFile.toFile())) {
                 Enumeration<? extends ZipEntry> entries = zipFile.entries();
@@ -43,12 +43,12 @@ public class Zip4jToJdkCompatibilityTest {
                         Files.createDirectories(path);
                     else {
                         Files.createDirectories(path.getParent());
-                        TestUtils.copyLarge(zipFile.getInputStream(entry), path);
+                        TestDataAssert.copyLarge(zipFile.getInputStream(entry), path);
                     }
                 }
             }
 
-            assertThatDirectory(dstDir).matches(TestUtils.dirAssert);
+            assertThatDirectory(dstDir).matches(TestDataAssert.dirAssert);
         }
 
     }

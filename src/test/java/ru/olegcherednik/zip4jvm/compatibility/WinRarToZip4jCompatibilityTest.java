@@ -1,20 +1,20 @@
 package ru.olegcherednik.zip4jvm.compatibility;
 
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.TestUtils;
+import ru.olegcherednik.zip4jvm.TestDataAssert;
 import ru.olegcherednik.zip4jvm.UnzipIt;
-import ru.olegcherednik.zip4jvm.Zip4jSuite;
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 
-import static ru.olegcherednik.zip4jvm.Zip4jSuite.winRarDeflateSolidAesZip;
-import static ru.olegcherednik.zip4jvm.Zip4jSuite.winRarDeflateSolidPkwareZip;
-import static ru.olegcherednik.zip4jvm.Zip4jSuite.winRarDeflateSolidZip;
-import static ru.olegcherednik.zip4jvm.Zip4jSuite.winRarStoreSolidAesZip;
-import static ru.olegcherednik.zip4jvm.Zip4jSuite.winRarStoreSolidPkwareZip;
-import static ru.olegcherednik.zip4jvm.Zip4jSuite.winRarStoreSolidZip;
+import static ru.olegcherednik.zip4jvm.TestData.winRarDeflateSolidAesZip;
+import static ru.olegcherednik.zip4jvm.TestData.winRarDeflateSolidPkwareZip;
+import static ru.olegcherednik.zip4jvm.TestData.winRarDeflateSolidZip;
+import static ru.olegcherednik.zip4jvm.TestData.winRarStoreSolidAesZip;
+import static ru.olegcherednik.zip4jvm.TestData.winRarStoreSolidPkwareZip;
+import static ru.olegcherednik.zip4jvm.TestData.winRarStoreSolidZip;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirectory;
 
 /**
@@ -25,7 +25,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirecto
 @SuppressWarnings({ "FieldNamingConvention", "NewClassNamingConvention", "LocalVariableNamingConvention" })
 public class WinRarToZip4jCompatibilityTest {
 
-    private static final Path rootDir = Zip4jSuite.generateSubDirNameWithTime(WinRarToZip4jCompatibilityTest.class);
+    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(WinRarToZip4jCompatibilityTest.class);
 
 //    public void zip4jShouldBeReadableForZipInputStream() throws IOException {
 //        Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
@@ -58,13 +58,13 @@ public class WinRarToZip4jCompatibilityTest {
 //    }
 
     public void checkCompatibilityWithWinRar() throws IOException {
-        Path parentDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
+        Path parentDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
         for (Path zip4jFile : Arrays.asList(winRarStoreSolidZip, winRarStoreSolidPkwareZip, winRarStoreSolidAesZip, winRarDeflateSolidZip,
                 winRarDeflateSolidPkwareZip, winRarDeflateSolidAesZip)) {
-            Path destDir = Zip4jSuite.subDirNameAsRelativePathToRoot(parentDir, zip4jFile);
-            UnzipIt.extract(zip4jFile, destDir, fileName -> Zip4jSuite.password);
-            assertThatDirectory(destDir).matches(TestUtils.starWarsDirAssert);
+            Path destDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(parentDir, zip4jFile);
+            UnzipIt.extract(zip4jFile, destDir, fileName -> Zip4jvmSuite.password);
+            assertThatDirectory(destDir).matches(TestDataAssert.starWarsDirAssert);
         }
     }
 

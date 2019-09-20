@@ -42,6 +42,7 @@ public abstract class AbstractZipEntryFileAssert<SELF extends AbstractZipEntryFi
         return myself;
     }
 
+    @Deprecated
     public SELF isImage() {
 //        try (InputStream in = zipFile.getInputStream(actual)) {
 //            actual.setSize(in.available());

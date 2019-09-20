@@ -12,6 +12,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameDucati;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameHonda;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameKawasaki;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameSuzuki;
+import static ru.olegcherednik.zip4jvm.TestData.storeSolidAesZip;
+import static ru.olegcherednik.zip4jvm.TestData.storeSolidPkwareZip;
 
 /**
  * @author Oleg Cherednik
@@ -21,16 +27,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SuppressWarnings("FieldNamingConvention")
 public class ZipFileReaderTest {
 
-    private static final Path rootDir = Zip4jSuite.generateSubDirNameWithTime(ZipFileReaderTest.class);
+    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ZipFileReaderTest.class);
 
     @BeforeClass
     public static void createDir() throws IOException {
         Files.createDirectories(rootDir);
     }
 
-    @AfterClass(enabled = Zip4jSuite.clear)
+    @AfterClass(enabled = Zip4jvmSuite.clear)
     public static void removeDir() throws IOException {
-        Zip4jSuite.removeDir(rootDir);
+        Zip4jvmSuite.removeDir(rootDir);
     }
 
 //    public void shouldUnzipZipFileIntoDestinationFolderWhenDeflateSolid() throws IOException {
@@ -50,8 +56,8 @@ public class ZipFileReaderTest {
 //    }
 
     public void shouldUnzipZipFileIntoDestinationFolderWhenStoreSolidPkware() throws IOException {
-        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.extract(Zip4jSuite.storeSolidPkwareZip, destDir, fileName -> Zip4jSuite.password);
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        UnzipIt.extract(storeSolidPkwareZip, destDir, fileName -> Zip4jvmSuite.password);
 
 //        Zip4jAssertions.assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);
 //
@@ -64,8 +70,8 @@ public class ZipFileReaderTest {
     }
 
     public void shouldUnzipZipFileIntoDestinationFolderWhenStoreSolidAes() throws IOException {
-        Path destDir = Zip4jSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.extract(Zip4jSuite.storeSolidAesZip, destDir, String::toCharArray);
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        UnzipIt.extract(storeSolidAesZip, destDir, String::toCharArray);
 
 //        Zip4jAssertions.assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);
 //
@@ -77,20 +83,21 @@ public class ZipFileReaderTest {
 //        Zip4jAssertions.assertThatFile(starWarsDir.resolve("four.jpg")).isImage().hasSize(1_916_776);
     }
 
+    // TODO use constants
     public void shouldIterateOverAllEntriesWhenStoreSolidPkware() throws IOException {
         List<String> entryNames = new ArrayList<>();
 
-        for (ZipFile.Entry entry : ZipFile.read(Zip4jSuite.storeSolidPkwareZip))
+        for (ZipFile.Entry entry : ZipFile.read(storeSolidPkwareZip))
             entryNames.add(entry.getFileName());
 
         assertThat(entryNames).containsExactlyInAnyOrder(
+                "bikes/" + fileNameDucati,
+                "bikes/" + fileNameHonda,
+                "bikes/" + fileNameKawasaki,
+                "bikes/" + fileNameSuzuki,
                 "cars/bentley-continental.jpg",
                 "cars/ferrari-458-italia.jpg",
                 "cars/wiesmann-gt-mf5.jpg",
-                "Star Wars/one.jpg",
-                "Star Wars/two.jpg",
-                "Star Wars/three.jpg",
-                "Star Wars/four.jpg",
                 "empty_dir",
                 "empty_file.txt",
                 "mcdonnell-douglas-f15-eagle.jpg",
@@ -100,18 +107,18 @@ public class ZipFileReaderTest {
     }
 
     public void shouldRetrieveStreamWithAllEntriesWhenStoreSolidPkware() throws IOException {
-        List<String> entryNames = ZipFile.read(Zip4jSuite.storeSolidPkwareZip).stream()
+        List<String> entryNames = ZipFile.read(storeSolidPkwareZip).stream()
                                          .map(ZipFile.Entry::getFileName)
                                          .collect(Collectors.toList());
 
         assertThat(entryNames).containsExactlyInAnyOrder(
+                "bikes/" + fileNameDucati,
+                "bikes/" + fileNameHonda,
+                "bikes/" + fileNameKawasaki,
+                "bikes/" + fileNameSuzuki,
                 "cars/bentley-continental.jpg",
                 "cars/ferrari-458-italia.jpg",
                 "cars/wiesmann-gt-mf5.jpg",
-                "Star Wars/one.jpg",
-                "Star Wars/two.jpg",
-                "Star Wars/three.jpg",
-                "Star Wars/four.jpg",
                 "empty_dir",
                 "empty_file.txt",
                 "mcdonnell-douglas-f15-eagle.jpg",

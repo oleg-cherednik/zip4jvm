@@ -4,7 +4,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.Zip4jSuite;
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -13,6 +13,7 @@ import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 
 /**
  * @author Oleg Cherednik
@@ -22,22 +23,22 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SuppressWarnings("FieldNamingConvention")
 public class FileHeaderTest {
 
-    private static final Path rootDir = Zip4jSuite.generateSubDirNameWithTime(FileHeaderTest.class);
+    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(FileHeaderTest.class);
 
     @BeforeClass
     public static void createDir() throws IOException {
         Files.createDirectories(rootDir);
     }
 
-    @AfterClass(enabled = Zip4jSuite.clear)
+    @AfterClass(enabled = Zip4jvmSuite.clear)
     public static void removeDir() throws IOException {
-        Zip4jSuite.removeDir(rootDir);
+        Zip4jvmSuite.removeDir(rootDir);
     }
 
     public void shouldUseSettersGettersCorrectly() throws IOException {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         InternalFileAttributes internalFileAttributes = InternalFileAttributes.createDataBasedDelegate(new byte[] { 1, 2 });
-        ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.createOperationBasedDelegate(Zip4jSuite.fileBentleyContinental);
+        ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.createOperationBasedDelegate(fileBentley);
 
         assertThat(internalFileAttributes).isNotSameAs(InternalFileAttributes.NULL);
         assertThat(externalFileAttributes).isNotSameAs(ExternalFileAttributes.NULL);

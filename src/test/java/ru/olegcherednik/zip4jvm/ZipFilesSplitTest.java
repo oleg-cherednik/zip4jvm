@@ -21,7 +21,7 @@ import java.util.List;
 @SuppressWarnings("FieldNamingConvention")
 public class ZipFilesSplitTest {
 
-    private static final Path rootDir = Zip4jSuite.generateSubDirNameWithTime(ZipFilesSplitTest.class);
+    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ZipFilesSplitTest.class);
     private static final Path zip = rootDir.resolve("src.zip");
 
     @BeforeClass
@@ -29,9 +29,9 @@ public class ZipFilesSplitTest {
         Files.createDirectories(rootDir);
     }
 
-    @AfterClass(enabled = Zip4jSuite.clear)
+    @AfterClass(enabled = Zip4jvmSuite.clear)
     public static void removeDir() throws IOException {
-        Zip4jSuite.removeDir(rootDir);
+        Zip4jvmSuite.removeDir(rootDir);
     }
 
     @Test
@@ -41,9 +41,9 @@ public class ZipFilesSplitTest {
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
                                                   .splitSize(1024 * 1024).build();
-        Path bentley = Zip4jSuite.carsDir.resolve("bentley-continental.jpg");
-        Path ferrari = Zip4jSuite.carsDir.resolve("ferrari-458-italia.jpg");
-        Path wiesmann = Zip4jSuite.carsDir.resolve("wiesmann-gt-mf5.jpg");
+        Path bentley = Zip4jvmSuite.dirCars.resolve("bentley-continental.jpg");
+        Path ferrari = Zip4jvmSuite.dirCars.resolve("ferrari-458-italia.jpg");
+        Path wiesmann = Zip4jvmSuite.dirCars.resolve("wiesmann-gt-mf5.jpg");
         List<Path> files = Arrays.asList(bentley, ferrari, wiesmann);
 
         ZipIt.add(zip, files, settings);

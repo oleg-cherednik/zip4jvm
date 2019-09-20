@@ -1,13 +1,12 @@
 package ru.olegcherednik.zip4jvm.assertj;
 
 import org.assertj.core.api.AbstractFileAssert;
+import org.assertj.core.internal.Failures;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Consumer;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Oleg Cherednik
@@ -27,12 +26,23 @@ public class AbstractDirectoryAssert<SELF extends AbstractDirectoryAssert<SELF>>
     }
 
     public SELF hasSubDirectories(int expected) {
-        assertThat(getFoldersAmount()).isEqualTo(expected);
+        long actual = getFoldersAmount();
+
+        if (actual != expected)
+            throw Failures.instance().failure(
+                    String.format("Directory '%s' contains illegal amount of sub directories: actual - '%d', expected - '%d'",
+                            this.actual.getAbsolutePath(), actual, expected));
+
         return myself;
     }
 
     public SELF hasFiles(int expected) {
-        assertThat(getRegularFilesAmount()).isEqualTo(expected);
+        long actual = getRegularFilesAmount();
+
+        if (actual != expected)
+            throw Failures.instance().failure(String.format("Directory '%s' contains illegal amount of files: actual - '%d', expected - '%d'",
+                    this.actual.getAbsolutePath(), actual, expected));
+
         return myself;
     }
 
