@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.ZipFile;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmEmptyPasswordException;
+import ru.olegcherednik.zip4jvm.exception.EmptyPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
@@ -73,7 +73,7 @@ public final class ZipEntryBuilder {
         zipEntry.setUtf8(entrySettings.isUtf8());
 
         if (zipEntry.isEncrypted() && ArrayUtils.isEmpty(zipEntry.getPassword()))
-            throw new Zip4jvmEmptyPasswordException();
+            throw new EmptyPasswordException();
 
         return zipEntry;
     }

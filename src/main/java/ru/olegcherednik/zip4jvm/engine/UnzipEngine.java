@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmIncorrectPasswordException;
+import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.io.in.SplitZipInputStream;
@@ -79,7 +79,7 @@ public class UnzipEngine {
         boolean passwordEmpty = ArrayUtils.isEmpty(password);
 
         if (encryption != Encryption.OFF && passwordEmpty)
-            throw new Zip4jvmIncorrectPasswordException(entry.getFileName());
+            throw new IncorrectPasswordException(entry.getFileName());
     }
 
     private static void extractDirectory(Path dstDir, ZipEntry entry) {

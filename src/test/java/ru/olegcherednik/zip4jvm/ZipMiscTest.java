@@ -4,7 +4,7 @@ import org.assertj.core.api.Assertions;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmPathNotExistsException;
+import ru.olegcherednik.zip4jvm.exception.PathNotExistsException;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
@@ -75,7 +75,7 @@ public class ZipMiscTest {
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        assertThatThrownBy(() -> ZipIt.add(zip, files, settings)).isExactlyInstanceOf(Zip4jvmPathNotExistsException.class);
+        assertThatThrownBy(() -> ZipIt.add(zip, files, settings)).isExactlyInstanceOf(PathNotExistsException.class);
     }
 
     public void shouldMergeSplitZip() throws IOException {

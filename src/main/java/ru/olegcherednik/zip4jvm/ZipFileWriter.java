@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm;
 
 import lombok.NonNull;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmEntryDuplicationException;
+import ru.olegcherednik.zip4jvm.exception.EntryDuplicationException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.SingleZipOutputStream;
@@ -47,7 +47,7 @@ final class ZipFileWriter implements ZipFile.Writer {
         String fileName = entry.getFileName();
 
         if (fileNameWriter.put(fileName, new ZipFileEntryWriter(entry, entrySettingsProvider.apply(fileName), tempZipModel)) != null)
-            throw new Zip4jvmEntryDuplicationException(fileName);
+            throw new EntryDuplicationException(fileName);
     }
 
     @Override

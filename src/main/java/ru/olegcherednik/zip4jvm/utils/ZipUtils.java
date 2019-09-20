@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmRealBigZip64NotSupportedException;
+import ru.olegcherednik.zip4jvm.exception.RealBigZip64NotSupportedException;
 
 import java.util.Calendar;
 
@@ -45,7 +45,7 @@ public final class ZipUtils {
 
     public static void requirePositive(long value, String type) {
         if (value < 0)
-            throw new Zip4jvmRealBigZip64NotSupportedException(value, type);
+            throw new RealBigZip64NotSupportedException(value, type);
     }
 
     public static boolean isDirectory(String fileName) {

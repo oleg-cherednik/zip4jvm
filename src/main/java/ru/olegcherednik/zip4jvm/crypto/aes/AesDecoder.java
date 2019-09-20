@@ -4,7 +4,7 @@ import lombok.NonNull;
 import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmIncorrectPasswordException;
+import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -76,7 +76,7 @@ public final class AesDecoder implements Decoder {
         byte[] expected = in.readBytes(PASSWORD_CHECKSUM_SIZE);
 
         if (!ArrayUtils.isEquals(expected, actual))
-            throw new Zip4jvmIncorrectPasswordException(entry.getFileName());
+            throw new IncorrectPasswordException(entry.getFileName());
     }
 
     private void checkMessageAuthenticationCode(DataInput in) throws IOException {

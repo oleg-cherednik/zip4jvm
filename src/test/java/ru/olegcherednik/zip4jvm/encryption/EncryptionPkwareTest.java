@@ -8,8 +8,8 @@ import ru.olegcherednik.zip4jvm.TestDataAssert;
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipIt;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmEmptyPasswordException;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmIncorrectPasswordException;
+import ru.olegcherednik.zip4jvm.exception.EmptyPasswordException;
+import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
@@ -85,7 +85,7 @@ public class EncryptionPkwareTest {
                                                   .build();
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        assertThatThrownBy(() -> ZipIt.add(zip, Zip4jvmSuite.dirSrc, settings)).isInstanceOf(Zip4jvmEmptyPasswordException.class);
+        assertThatThrownBy(() -> ZipIt.add(zip, Zip4jvmSuite.dirSrc, settings)).isInstanceOf(EmptyPasswordException.class);
     }
 
     public void shouldUnzipWhenStandardEncryption() throws IOException {
@@ -116,7 +116,7 @@ public class EncryptionPkwareTest {
 
         Path destDir = zip.getParent().resolve("unzip");
         assertThatThrownBy(() -> UnzipIt.extract(zip, destDir, fileName -> UUID.randomUUID().toString().toCharArray()))
-                .isExactlyInstanceOf(Zip4jvmIncorrectPasswordException.class);
+                .isExactlyInstanceOf(IncorrectPasswordException.class);
     }
 
 }
