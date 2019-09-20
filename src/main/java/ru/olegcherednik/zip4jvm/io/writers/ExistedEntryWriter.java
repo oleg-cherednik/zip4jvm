@@ -40,7 +40,7 @@ public class ExistedEntryWriter implements Writer {
         entry.setPassword(entry.isEncrypted() ? password : null);
 
         try (CopyEntryInputStream in = new CopyEntryInputStream(entry, srcZipModel)) {
-            if (srcZipModel != destZipModel)
+            if (!destZipModel.hasEntry(entryName))
                 destZipModel.addEntry(entry);
 
             out.mark(LOCAL_FILE_HEADER_OFFS);

@@ -19,12 +19,9 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 @SuppressWarnings("NewClassNamingConvention")
 public abstract class AbstractZipEntryFileAssert<SELF extends AbstractZipEntryFileAssert<SELF>> extends AbstractZipEntryAssert<SELF> {
 
-    private final char[] password;
-
-    @SuppressWarnings({ "MethodCanBeVariableArityMethod", "AssignmentOrReturnOfFieldWithMutableType" })
+    // TODO check out useless password
     protected AbstractZipEntryFileAssert(ZipEntry actual, Class<?> selfType, ZipFileDecorator zipFile, char[] password) {
         super(actual, selfType, zipFile);
-        this.password = password;
     }
 
     public SELF hasSize(long size) {

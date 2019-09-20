@@ -5,6 +5,7 @@ import lombok.NonNull;
 import net.sf.sevenzipjbinding.SevenZipException;
 import net.sf.sevenzipjbinding.simple.ISimpleInArchiveItem;
 import org.apache.commons.io.FilenameUtils;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -102,7 +103,7 @@ class ZipFileDecorator {
             });
             return map;
         } catch(Exception e) {
-            throw new RuntimeException(e);
+            throw new Zip4jvmException(e);
         }
     }
 

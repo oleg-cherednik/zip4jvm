@@ -89,6 +89,10 @@ public class ZipModel {
         return fileNameEntry.get(fileName);
     }
 
+    public boolean hasEntry(@NonNull String fileName) {
+        return fileNameEntry.containsKey(fileName);
+    }
+
     @NonNull
     public Set<String> getEntryNames() {
         return isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(fileNameEntry.keySet());

@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.assertj.AbstractDirectoryAssert;
 import ru.olegcherednik.zip4jvm.assertj.AbstractZipEntryDirectoryAssert;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -13,9 +14,6 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 
-import static ru.olegcherednik.zip4jvm.TestData.zipDirNameBikes;
-import static ru.olegcherednik.zip4jvm.TestData.zipDirNameCars;
-import static ru.olegcherednik.zip4jvm.TestData.zipDirNameEmpty;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameDucati;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameFerrari;
@@ -23,6 +21,9 @@ import static ru.olegcherednik.zip4jvm.TestData.fileNameHonda;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameKawasaki;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameSuzuki;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameWiesmann;
+import static ru.olegcherednik.zip4jvm.TestData.zipDirNameBikes;
+import static ru.olegcherednik.zip4jvm.TestData.zipDirNameCars;
+import static ru.olegcherednik.zip4jvm.TestData.zipDirNameEmpty;
 
 /**
  * @author Oleg Cherednik
@@ -126,7 +127,7 @@ public final class TestDataAssert {
                 return element.getMethodName();
         }
 
-        throw new RuntimeException("Cannot detect ");
+        throw new Zip4jvmException("Cannot detect method name");
     }
 
 }

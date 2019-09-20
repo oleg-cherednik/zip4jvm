@@ -12,6 +12,7 @@ import net.sf.sevenzipjbinding.impl.RandomAccessFileInStream;
 import net.sf.sevenzipjbinding.simple.ISimpleInArchiveItem;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -42,16 +43,11 @@ class ZipFileEncryptedDecoder extends ZipFileDecorator {
         try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(zip.toFile(), "r"));
              IInArchive zip = SevenZip.openInArchive(ArchiveFormat.ZIP, in)) {
 
-            for (ISimpleInArchiveItem item : zip.getSimpleInterface().getArchiveItems()) {
-                String name = getItemName(item);
+            for (ISimpleInArchiveItem item : zip.getSimpleInterface().getArchiveItems())
+                if (getItemName(item).equals(entry.getName()))
+                    return getInputStream(item);
 
-                if (!name.equals(entry.getName()))
-                    continue;
-
-                return getInputStream(item);
-            }
-
-            throw new RuntimeException("Entry '" + entry + "' was not found");
+            throw new Zip4jvmException("Entry '" + entry + "' was not found");
         } catch(RuntimeException e) {
             throw e;
         } catch(Exception e) {
@@ -85,7 +81,7 @@ class ZipFileEncryptedDecoder extends ZipFileDecorator {
             }, password);
 
             if (tmp.isEmpty() || res != ExtractOperationResult.OK)
-                throw new RuntimeException("Cannot extract zip entry");
+                throw new Zip4jvmException("Cannot extract zip entry");
         }
 
         int size = tmp.stream().mapToInt(buf -> buf.length).sum();

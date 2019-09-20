@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm;
 
-import org.apache.commons.io.FileUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Ignore;
@@ -13,7 +12,6 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -167,16 +165,16 @@ public class Zip64Test {
     /**
      * Create 65_535 + 1 entries under {@code root} directory
      */
-    private static void createData(Path root) throws IOException {
-        for (int i = 0, j = 1; i <= 65; i++) {
-            Path dir = root.resolve(String.format("dir_%02d", i));
-            Files.createDirectories(dir);
-
-            for (; j <= 1000 * i + (i == 65 ? 536 : 1000); j++)
-                FileUtils.writeStringToFile(dir.resolve(String.format("%04d.txt", j)).toFile(), "oleg", StandardCharsets.UTF_8);
-        }
-
-    }
+//    private static void createData(Path root) throws IOException {
+//        for (int i = 0, j = 1; i <= 65; i++) {
+//            Path dir = root.resolve(String.format("dir_%02d", i));
+//            Files.createDirectories(dir);
+//
+//            for (; j <= 1000 * i + (i == 65 ? 536 : 1000); j++)
+//                FileUtils.writeStringToFile(dir.resolve(String.format("%04d.txt", j)).toFile(), "oleg", StandardCharsets.UTF_8);
+//        }
+//
+//    }
 
 
 }

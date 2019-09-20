@@ -2,6 +2,7 @@ package ru.olegcherednik.zip4jvm.assertj;
 
 import org.assertj.core.api.AbstractFileAssert;
 import org.assertj.core.internal.Failures;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -74,7 +75,7 @@ public class AbstractDirectoryAssert<SELF extends AbstractDirectoryAssert<SELF>>
         try {
             return Files.list(actual.toPath()).filter(path -> Files.isRegularFile(path)).count();
         } catch(IOException e) {
-            throw new RuntimeException(e);
+            throw new Zip4jvmException(e);
         }
     }
 

@@ -11,6 +11,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.TestDataAssert;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -69,7 +70,7 @@ public class Zip4jvmToSevenZipCompatibilityTest {
                             }, password);
 
                             if (res != ExtractOperationResult.OK)
-                                throw new RuntimeException("Cannot extract zip entry");
+                                throw new Zip4jvmException("Cannot extract zip entry");
                         }
                     }
                 }
