@@ -14,14 +14,14 @@ Zip files support for JVM application
 <dependency>
     <groupId>ru.oleg-cherednik.zip4jvm</groupId>
     <artifactId>zip4jvm</artifactId>
-    <version>1.0</version>
+    <version>0.7</version>
 </dependency>
 ~~~~
 
 ### Gradle
 
 ~~~~
-compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.0'
+compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:0.7'
 ~~~~
 
 ## Usage
