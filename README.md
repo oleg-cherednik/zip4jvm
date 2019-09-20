@@ -191,3 +191,10 @@ _**Note:** see [UnzipIt (Advanced Mode)](#unzipit-advanced-mode) for using exten
 ### UnzipIt (Advanced Mode)
 
 ### CreatePassword function
+
+
+##### Links
+* Home page: https://github.com/oleg-cherednik/zip4jvm
+* Maven:
+  * **central:** https://mvnrepository.com/artifact/ru.oleg-cherednik.zip4jvm/zip4jvm
+  * **download:** http://repo1.maven.org/maven2/ru/oleg-cherednik/zip4jvm/zip4jvm/

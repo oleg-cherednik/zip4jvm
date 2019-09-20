@@ -1,8 +1,9 @@
-package ru.olegcherednik.zip4jvm;
+package ru.olegcherednik.zip4jvm.engine;
 
 import lombok.NonNull;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
@@ -25,12 +26,12 @@ import java.util.stream.Collectors;
  * @author Oleg Cherednik
  * @since 07.09.2019
  */
-final class ZipFileReader implements ZipFile.Reader {
+public final class ZipEngine implements ZipFile.Reader {
 
     private final ZipModel zipModel;
     private final Function<String, char[]> passwordProvider;
 
-    public ZipFileReader(@NonNull Path zip, @NonNull Function<String, char[]> passwordProvider) throws IOException {
+    public ZipEngine(@NonNull Path zip, @NonNull Function<String, char[]> passwordProvider) throws IOException {
         checkZipFile(zip);
         zipModel = ZipModelBuilder.read(zip);
         this.passwordProvider = passwordProvider;

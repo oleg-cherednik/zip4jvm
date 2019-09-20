@@ -1,8 +1,11 @@
-package ru.olegcherednik.zip4jvm;
+package ru.olegcherednik.zip4jvm.engine;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import ru.olegcherednik.zip4jvm.UnzipIt;
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.ZipFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -25,9 +28,9 @@ import static ru.olegcherednik.zip4jvm.TestData.storeSolidPkwareZip;
  */
 @Test
 @SuppressWarnings("FieldNamingConvention")
-public class ZipFileReaderTest {
+public class ZipEngineTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ZipFileReaderTest.class);
+    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ZipEngineTest.class);
 
     @BeforeClass
     public static void createDir() throws IOException {

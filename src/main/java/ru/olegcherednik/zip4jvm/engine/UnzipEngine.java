@@ -1,6 +1,7 @@
-package ru.olegcherednik.zip4jvm;
+package ru.olegcherednik.zip4jvm.engine;
 
 import lombok.NonNull;
+import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.EntryDuplicationException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
@@ -29,14 +30,14 @@ import java.util.stream.Collectors;
  * @author Oleg Cherednik
  * @since 09.09.2019
  */
-final class ZipFileWriter implements ZipFile.Writer {
+public final class UnzipEngine implements ZipFile.Writer {
 
     private final Path zip;
     private final ZipModel tempZipModel;
     private final Function<String, ZipEntrySettings> entrySettingsProvider;
     private final Map<String, Writer> fileNameWriter = new LinkedHashMap<>();
 
-    public ZipFileWriter(@NonNull Path zip, @NonNull ZipFileSettings settings) throws IOException {
+    public UnzipEngine(@NonNull Path zip, @NonNull ZipFileSettings settings) throws IOException {
         this.zip = zip;
         tempZipModel = createTempZipModel(zip, settings, fileNameWriter);
         entrySettingsProvider = settings.getEntrySettingsProvider();

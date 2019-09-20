@@ -1,9 +1,11 @@
-package ru.olegcherednik.zip4jvm;
+package ru.olegcherednik.zip4jvm.engine;
 
 import org.apache.commons.io.IOUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
@@ -38,9 +40,9 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  */
 @Test
 @SuppressWarnings("FieldNamingConvention")
-public class ZipFileWriterTest {
+public class UnzipEngineTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ZipFileWriterTest.class);
+    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(UnzipEngineTest.class);
     private static final Path solidFile = rootDir.resolve("solid/src.zip");
     private static final Path splitFile = rootDir.resolve("split/src.zip");
     private static final Path supplierSolidFile = rootDir.resolve("supplier/split/src.zip");

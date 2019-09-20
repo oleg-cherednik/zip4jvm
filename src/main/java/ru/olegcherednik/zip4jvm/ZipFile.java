@@ -4,6 +4,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import ru.olegcherednik.zip4jvm.engine.ZipEngine;
+import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
@@ -41,7 +43,7 @@ public final class ZipFile {
     }
 
     public static ZipFile.Reader read(@NonNull Path zip, @NonNull Function<String, char[]> passwordProvider) throws IOException {
-        return new ZipFileReader(zip, passwordProvider);
+        return new ZipEngine(zip, passwordProvider);
     }
 
     public static ZipFile.Writer write(@NonNull Path zip) throws IOException {
@@ -53,7 +55,7 @@ public final class ZipFile {
     }
 
     public static ZipFile.Writer write(@NonNull Path zip, @NonNull ZipFileSettings settings) throws IOException {
-        return new ZipFileWriter(zip, settings);
+        return new UnzipEngine(zip, settings);
     }
 
     public interface Reader extends Iterable<ZipFile.Entry> {
