@@ -14,8 +14,8 @@ import java.util.List;
 import static ru.olegcherednik.zip4jvm.TestData.deflateSolidZip;
 import static ru.olegcherednik.zip4jvm.TestData.deflateSplitZip;
 import static ru.olegcherednik.zip4jvm.TestData.dirNameBikes;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirectory;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatFile;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
 
 /**
  * @author Oleg Cherednik

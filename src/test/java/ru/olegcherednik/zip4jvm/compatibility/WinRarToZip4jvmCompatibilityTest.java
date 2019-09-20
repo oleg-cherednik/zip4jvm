@@ -15,7 +15,7 @@ import static ru.olegcherednik.zip4jvm.TestData.winRarDeflateSolidZip;
 import static ru.olegcherednik.zip4jvm.TestData.winRarStoreSolidAesZip;
 import static ru.olegcherednik.zip4jvm.TestData.winRarStoreSolidPkwareZip;
 import static ru.olegcherednik.zip4jvm.TestData.winRarStoreSolidZip;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
 /**
  * @author Oleg Cherednik
@@ -23,9 +23,9 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirecto
  */
 @Test
 @SuppressWarnings({ "FieldNamingConvention", "NewClassNamingConvention", "LocalVariableNamingConvention" })
-public class WinRarToZip4jCompatibilityTest {
+public class WinRarToZip4jvmCompatibilityTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(WinRarToZip4jCompatibilityTest.class);
+    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(WinRarToZip4jvmCompatibilityTest.class);
 
 //    public void zip4jShouldBeReadableForZipInputStream() throws IOException {
 //        Path dstDir = Zip4jSuite.subDirNameAsMethodName(rootDir);

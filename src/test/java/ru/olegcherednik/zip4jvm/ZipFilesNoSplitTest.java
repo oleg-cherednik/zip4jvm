@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions;
+import ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
@@ -50,8 +50,8 @@ public class ZipFilesNoSplitTest {
 
         ZipIt.add(zip, files, settings);
 
-        Zip4jAssertions.assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        Zip4jAssertions.assertThatZipFile(zip).directory("/").matches(TestDataAssert.zipCarsDirAssert);
+        Zip4jvmAssertions.assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        Zip4jvmAssertions.assertThatZipFile(zip).directory("/").matches(TestDataAssert.zipCarsDirAssert);
     }
 
     // TODO Test to add files to existed no split zip

@@ -22,7 +22,7 @@ import java.util.Arrays;
 import static ru.olegcherednik.zip4jvm.TestData.deflateSolidPkwareZip;
 import static ru.olegcherednik.zip4jvm.TestData.deflateSolidZip;
 import static ru.olegcherednik.zip4jvm.TestData.storeSolidZip;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
 /**
  * @author Oleg Cherednik
@@ -30,9 +30,9 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirecto
  */
 @Test
 @SuppressWarnings({ "FieldNamingConvention", "NewClassNamingConvention", "LocalVariableNamingConvention" })
-public class Zip4jToSevenZipCompatibilityTest {
+public class Zip4jvmToSevenZipCompatibilityTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(Zip4jToSevenZipCompatibilityTest.class);
+    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(Zip4jvmToSevenZipCompatibilityTest.class);
 
     public void checkCompatibilityWithSevenZip() throws IOException {
         String password = new String(Zip4jvmSuite.password);

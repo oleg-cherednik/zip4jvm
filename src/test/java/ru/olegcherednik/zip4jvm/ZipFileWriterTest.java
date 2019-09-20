@@ -29,8 +29,8 @@ import static ru.olegcherednik.zip4jvm.TestData.fileNameSuzuki;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameWiesmann;
 import static ru.olegcherednik.zip4jvm.TestData.fileSuzuki;
 import static ru.olegcherednik.zip4jvm.TestData.fileWiesmann;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirectory;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatZipFile;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
  * @author Oleg Cherednik

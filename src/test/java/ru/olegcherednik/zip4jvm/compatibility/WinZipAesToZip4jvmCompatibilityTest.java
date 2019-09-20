@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
 /**
  * @author Oleg Cherednik
@@ -22,13 +22,13 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirecto
  */
 @Test
 @SuppressWarnings({ "NewClassNamingConvention", "FieldNamingConvention" })
-public class WinZipAesToZip4jCompatibilityTest {
+public class WinZipAesToZip4jvmCompatibilityTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(WinZipAesToZip4jCompatibilityTest.class);
+    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(WinZipAesToZip4jvmCompatibilityTest.class);
 
-    public void winZipAesShouldBeReadableForZip4j() throws IOException {
+    public void winZipAesShouldBeReadableForZip4jvm() throws IOException {
         Path zip = zipItWithWinZipAes(Zip4jvmSuite.subDirNameAsMethodName(rootDir));
-        Path dir = unzipItWithZip4j(zip);
+        Path dir = unzipItWithZip4jvm(zip);
         assertThatDirectory(dir).matches(TestDataAssert.dirAssert);
     }
 
@@ -56,7 +56,7 @@ public class WinZipAesToZip4jCompatibilityTest {
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
-    private static Path unzipItWithZip4j(Path zip) throws IOException {
+    private static Path unzipItWithZip4jvm(Path zip) throws IOException {
         Path destDir = zip.getParent().resolve("unzip");
         UnzipIt.extract(zip, destDir, fileName -> Zip4jvmSuite.password);
 

@@ -16,8 +16,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirectory;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatZipFile;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
  * @author Oleg Cherednik
@@ -90,7 +90,7 @@ public class EncryptionAesTest {
 //        Path zipFile = dstDir.resolve("src.zip");
 //        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
 //
-//        assertThatThrownBy(() -> zip.add(Zip4jSuite.srcDir, parameters)).isExactlyInstanceOf(Zip4jException.class);
+//        assertThatThrownBy(() -> zip.add(Zip4jSuite.srcDir, parameters)).isExactlyInstanceOf(Zip4jvmException.class);
 //    }
 //
 //    public void shouldThrowExceptionWhenStandardEncryptionAndEmptyPassword() throws IOException {
@@ -104,7 +104,7 @@ public class EncryptionAesTest {
 //        Path zipFile = dstDir.resolve("src.zip");
 //        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
 //
-//        assertThatThrownBy(() -> zip.add(Zip4jSuite.srcDir, parameters)).isExactlyInstanceOf(Zip4jException.class);
+//        assertThatThrownBy(() -> zip.add(Zip4jSuite.srcDir, parameters)).isExactlyInstanceOf(Zip4jvmException.class);
 //    }
 //
 //    public void shouldUnzipWhenStandardEncryption() throws IOException {
@@ -149,7 +149,7 @@ public class EncryptionAesTest {
 //                               .zipFile(zipFile)
 //                               .password(UUID.randomUUID().toString().toCharArray()).build();
 //
-//        assertThatThrownBy(() -> unzip.extract(dstDir1)).isExactlyInstanceOf(Zip4jException.class);
+//        assertThatThrownBy(() -> unzip.extract(dstDir1)).isExactlyInstanceOf(Zip4jvmException.class);
 //    }
 
 //    public void shouldUnzipWhenAesEncryption() throws IOException {

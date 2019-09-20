@@ -19,7 +19,7 @@ import static ru.olegcherednik.zip4jvm.TestData.deflateSolidPkwareZip;
 import static ru.olegcherednik.zip4jvm.TestData.deflateSolidZip;
 import static ru.olegcherednik.zip4jvm.TestData.deflateSplitZip;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
 /**
  * @author Oleg Cherednik

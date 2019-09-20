@@ -20,8 +20,8 @@ import java.nio.file.Path;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirCars;
 import static ru.olegcherednik.zip4jvm.TestData.storeSolidZip;
 import static ru.olegcherednik.zip4jvm.TestData.storeSplitZip;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirectory;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatZipFile;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
  * @author Oleg Cherednik

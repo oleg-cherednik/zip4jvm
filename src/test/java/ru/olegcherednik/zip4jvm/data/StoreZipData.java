@@ -19,6 +19,7 @@ import static ru.olegcherednik.zip4jvm.TestData.storeSolidAesZip;
 import static ru.olegcherednik.zip4jvm.TestData.storeSolidPkwareZip;
 import static ru.olegcherednik.zip4jvm.TestData.storeSolidZip;
 import static ru.olegcherednik.zip4jvm.TestData.storeSplitZip;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 

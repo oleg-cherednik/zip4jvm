@@ -4,7 +4,7 @@ import org.assertj.core.api.Assertions;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.exception.Zip4jPathNotExistsException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmPathNotExistsException;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
@@ -27,8 +27,8 @@ import static ru.olegcherednik.zip4jvm.TestData.deflateSplitZip;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirCars;
 import static ru.olegcherednik.zip4jvm.TestData.storeSolidZip;
 import static ru.olegcherednik.zip4jvm.TestData.storeSplitZip;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirectory;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatZipFile;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
  * @author Oleg Cherednik
@@ -75,7 +75,7 @@ public class ZipMiscTest {
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        assertThatThrownBy(() -> ZipIt.add(zip, files, settings)).isExactlyInstanceOf(Zip4jPathNotExistsException.class);
+        assertThatThrownBy(() -> ZipIt.add(zip, files, settings)).isExactlyInstanceOf(Zip4jvmPathNotExistsException.class);
     }
 
     public void shouldMergeSplitZip() throws IOException {

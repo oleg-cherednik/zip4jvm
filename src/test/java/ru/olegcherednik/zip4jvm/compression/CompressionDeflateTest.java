@@ -25,8 +25,8 @@ import static ru.olegcherednik.zip4jvm.TestData.filesDirCars;
 import static ru.olegcherednik.zip4jvm.TestData.zipDirNameBikes;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.zipBikesDirAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirectory;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatZipFile;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
  * @author Oleg Cherednik

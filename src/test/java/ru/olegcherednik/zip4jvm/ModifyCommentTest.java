@@ -4,7 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
@@ -20,7 +20,7 @@ import java.util.Collections;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static ru.olegcherednik.zip4jvm.TestData.deflateSolidZip;
 import static ru.olegcherednik.zip4jvm.TestData.fileOlegCherednik;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatZipFile;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
  * @author Oleg Cherednik
@@ -99,7 +99,7 @@ public class ModifyCommentTest {
         Files.copy(deflateSolidZip, zip);
 
         assertThatThrownBy(() -> ZipMisc.setComment(zip, StringUtils.repeat("_", EndCentralDirectory.MAX_COMMENT_LENGTH + 1)))
-                .isInstanceOf(Zip4jException.class);
+                .isInstanceOf(Zip4jvmException.class);
     }
 
 }

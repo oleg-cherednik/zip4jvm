@@ -14,7 +14,7 @@ import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertionsForClassTypes.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertionsForClassTypes.assertThatDirectory;
 
 /**
  * @author Oleg Cherednik
@@ -57,6 +57,6 @@ public class ZipFolderSplitTest {
 //                                                                          .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
 //                                                  .splitSize(2014 * 1024).build();
 //
-//        assertThatThrownBy(() -> ZipIt.add(zip, Zip4jSuite.starWarsDir, settings)).isExactlyInstanceOf(Zip4jException.class);
+//        assertThatThrownBy(() -> ZipIt.add(zip, Zip4jSuite.starWarsDir, settings)).isExactlyInstanceOf(Zip4jvmException.class);
 //    }
 }

@@ -5,7 +5,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions;
+import ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
@@ -58,7 +58,7 @@ public class Zip64Test {
     public void shouldUnzipWhenZip64() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         UnzipIt.extract(zipFile1, destDir);
-        Zip4jAssertions.assertThatDirectory(destDir).matches(TestDataAssert.dirAssert);
+        Zip4jvmAssertions.assertThatDirectory(destDir).matches(TestDataAssert.dirAssert);
     }
 
     private Path zipFile2;
@@ -85,7 +85,7 @@ public class Zip64Test {
     public void shouldUnzipWhenZip64AndAesEncryption() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         UnzipIt.extract(zipFile2, destDir, fileName -> Zip4jvmSuite.password);
-        Zip4jAssertions.assertThatDirectory(destDir).matches(TestDataAssert.dirAssert);
+        Zip4jvmAssertions.assertThatDirectory(destDir).matches(TestDataAssert.dirAssert);
     }
 
     private Path zipFile3;
@@ -113,7 +113,7 @@ public class Zip64Test {
     public void shouldUnzipWhenZip64AndSplit() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         UnzipIt.extract(zipFile3, destDir, fileName -> Zip4jvmSuite.password);
-        Zip4jAssertions.assertThatDirectory(destDir).matches(TestDataAssert.dirAssert);
+        Zip4jvmAssertions.assertThatDirectory(destDir).matches(TestDataAssert.dirAssert);
     }
 
 //    //    @Test

@@ -14,7 +14,7 @@ import java.util.zip.ZipFile;
 
 import static ru.olegcherednik.zip4jvm.TestData.deflateSolidZip;
 import static ru.olegcherednik.zip4jvm.TestData.storeSolidZip;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
 /**
  * @author Oleg Cherednik
@@ -22,9 +22,9 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirecto
  */
 @Test
 @SuppressWarnings({ "NewClassNamingConvention", "FieldNamingConvention", "LocalVariableNamingConvention" })
-public class Zip4jToJdkCompatibilityTest {
+public class Zip4jvmToJdkCompatibilityTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(Zip4jToJdkCompatibilityTest.class);
+    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(Zip4jvmToJdkCompatibilityTest.class);
 
     public void checkCompatibilityWithJdk() throws IOException {
         Path parentDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);

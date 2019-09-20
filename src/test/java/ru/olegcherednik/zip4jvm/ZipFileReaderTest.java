@@ -45,42 +45,42 @@ public class ZipFileReaderTest {
 //        ZipFileReader zipFile = new ZipFileReader(Zip4jSuite.deflateSolidZip, settings);
 //        zipFile.extract(destDir);
 //
-////        Zip4jAssertions.assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);
+////        Zip4jvmAssertions.assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);
 ////
 ////        Path starWarsDir = destDir.resolve("Star Wars/");
-////        Zip4jAssertions.assertThatDirectory(starWarsDir).exists().hasSubDirectories(0).hasFiles(4);
-////        Zip4jAssertions.assertThatFile(starWarsDir.resolve("one.jpg")).isImage().hasSize(2_204_448);
-////        Zip4jAssertions.assertThatFile(starWarsDir.resolve("two.jpg")).isImage().hasSize(277_857);
-////        Zip4jAssertions.assertThatFile(starWarsDir.resolve("three.jpg")).isImage().hasSize(1_601_879);
-////        Zip4jAssertions.assertThatFile(starWarsDir.resolve("four.jpg")).isImage().hasSize(1_916_776);
+////        Zip4jvmAssertions.assertThatDirectory(starWarsDir).exists().hasSubDirectories(0).hasFiles(4);
+////        Zip4jvmAssertions.assertThatFile(starWarsDir.resolve("one.jpg")).isImage().hasSize(2_204_448);
+////        Zip4jvmAssertions.assertThatFile(starWarsDir.resolve("two.jpg")).isImage().hasSize(277_857);
+////        Zip4jvmAssertions.assertThatFile(starWarsDir.resolve("three.jpg")).isImage().hasSize(1_601_879);
+////        Zip4jvmAssertions.assertThatFile(starWarsDir.resolve("four.jpg")).isImage().hasSize(1_916_776);
 //    }
 
     public void shouldUnzipZipFileIntoDestinationFolderWhenStoreSolidPkware() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         UnzipIt.extract(storeSolidPkwareZip, destDir, fileName -> Zip4jvmSuite.password);
 
-//        Zip4jAssertions.assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);
+//        Zip4jvmAssertions.assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);
 //
 //        Path starWarsDir = destDir.resolve("Star Wars/");
-//        Zip4jAssertions.assertThatDirectory(starWarsDir).exists().hasSubDirectories(0).hasFiles(4);
-//        Zip4jAssertions.assertThatFile(starWarsDir.resolve("one.jpg")).isImage().hasSize(2_204_448);
-//        Zip4jAssertions.assertThatFile(starWarsDir.resolve("two.jpg")).isImage().hasSize(277_857);
-//        Zip4jAssertions.assertThatFile(starWarsDir.resolve("three.jpg")).isImage().hasSize(1_601_879);
-//        Zip4jAssertions.assertThatFile(starWarsDir.resolve("four.jpg")).isImage().hasSize(1_916_776);
+//        Zip4jvmAssertions.assertThatDirectory(starWarsDir).exists().hasSubDirectories(0).hasFiles(4);
+//        Zip4jvmAssertions.assertThatFile(starWarsDir.resolve("one.jpg")).isImage().hasSize(2_204_448);
+//        Zip4jvmAssertions.assertThatFile(starWarsDir.resolve("two.jpg")).isImage().hasSize(277_857);
+//        Zip4jvmAssertions.assertThatFile(starWarsDir.resolve("three.jpg")).isImage().hasSize(1_601_879);
+//        Zip4jvmAssertions.assertThatFile(starWarsDir.resolve("four.jpg")).isImage().hasSize(1_916_776);
     }
 
     public void shouldUnzipZipFileIntoDestinationFolderWhenStoreSolidAes() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         UnzipIt.extract(storeSolidAesZip, destDir, String::toCharArray);
 
-//        Zip4jAssertions.assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);
+//        Zip4jvmAssertions.assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);
 //
 //        Path starWarsDir = destDir.resolve("Star Wars/");
-//        Zip4jAssertions.assertThatDirectory(starWarsDir).exists().hasSubDirectories(0).hasFiles(4);
-//        Zip4jAssertions.assertThatFile(starWarsDir.resolve("one.jpg")).isImage().hasSize(2_204_448);
-//        Zip4jAssertions.assertThatFile(starWarsDir.resolve("two.jpg")).isImage().hasSize(277_857);
-//        Zip4jAssertions.assertThatFile(starWarsDir.resolve("three.jpg")).isImage().hasSize(1_601_879);
-//        Zip4jAssertions.assertThatFile(starWarsDir.resolve("four.jpg")).isImage().hasSize(1_916_776);
+//        Zip4jvmAssertions.assertThatDirectory(starWarsDir).exists().hasSubDirectories(0).hasFiles(4);
+//        Zip4jvmAssertions.assertThatFile(starWarsDir.resolve("one.jpg")).isImage().hasSize(2_204_448);
+//        Zip4jvmAssertions.assertThatFile(starWarsDir.resolve("two.jpg")).isImage().hasSize(277_857);
+//        Zip4jvmAssertions.assertThatFile(starWarsDir.resolve("three.jpg")).isImage().hasSize(1_601_879);
+//        Zip4jvmAssertions.assertThatFile(starWarsDir.resolve("four.jpg")).isImage().hasSize(1_916_776);
     }
 
     // TODO use constants

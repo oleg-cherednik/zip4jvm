@@ -8,8 +8,8 @@ import ru.olegcherednik.zip4jvm.TestDataAssert;
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipIt;
-import ru.olegcherednik.zip4jvm.exception.Zip4jEmptyPasswordException;
-import ru.olegcherednik.zip4jvm.exception.Zip4jIncorrectPasswordException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmEmptyPasswordException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmIncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
@@ -23,8 +23,8 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirCars;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatDirectory;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions.assertThatZipFile;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
  * @author Oleg Cherednik
@@ -85,7 +85,7 @@ public class EncryptionPkwareTest {
                                                   .build();
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        assertThatThrownBy(() -> ZipIt.add(zip, Zip4jvmSuite.dirSrc, settings)).isInstanceOf(Zip4jEmptyPasswordException.class);
+        assertThatThrownBy(() -> ZipIt.add(zip, Zip4jvmSuite.dirSrc, settings)).isInstanceOf(Zip4jvmEmptyPasswordException.class);
     }
 
     public void shouldUnzipWhenStandardEncryption() throws IOException {
@@ -116,7 +116,7 @@ public class EncryptionPkwareTest {
 
         Path destDir = zip.getParent().resolve("unzip");
         assertThatThrownBy(() -> UnzipIt.extract(zip, destDir, fileName -> UUID.randomUUID().toString().toCharArray()))
-                .isExactlyInstanceOf(Zip4jIncorrectPasswordException.class);
+                .isExactlyInstanceOf(Zip4jvmIncorrectPasswordException.class);
     }
 
 }

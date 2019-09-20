@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.assertj.Zip4jAssertions;
+import ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -36,7 +36,7 @@ public class UnzipStreamTest {
         Path imgFile = rootDir.resolve("bentley-continental.jpg");
         ZipFile.Reader zipFile = ZipFile.read(deflateSolidZip);
         TestDataAssert.copyLarge(zipFile.extract("cars/bentley-continental.jpg").getInputStream(), imgFile);
-        Zip4jAssertions.assertThatFile(imgFile).exists().isImage().hasSize(1_395_362);
+        Zip4jvmAssertions.assertThatFile(imgFile).exists().isImage().hasSize(1_395_362);
     }
 
     @Test
@@ -44,7 +44,7 @@ public class UnzipStreamTest {
         Path imgFile = rootDir.resolve("ferrari-458-italia.jpg");
         ZipFile.Reader zipFile = ZipFile.read(deflateSolidZip);
         TestDataAssert.copyLarge(zipFile.extract("cars/ferrari-458-italia.jpg").getInputStream(), imgFile);
-        Zip4jAssertions.assertThatFile(imgFile).exists().isImage().hasSize(320_894);
+        Zip4jvmAssertions.assertThatFile(imgFile).exists().isImage().hasSize(320_894);
     }
 
     @Test
@@ -52,6 +52,6 @@ public class UnzipStreamTest {
         Path imgFile = rootDir.resolve("bentley-continental.jpg");
         ZipFile.Reader zipFile = ZipFile.read(deflateSolidPkwareZip, fileName -> Zip4jvmSuite.password);
         TestDataAssert.copyLarge(zipFile.extract("cars/bentley-continental.jpg").getInputStream(), imgFile);
-        Zip4jAssertions.assertThatFile(imgFile).exists().isImage().hasSize(1_395_362);
+        Zip4jvmAssertions.assertThatFile(imgFile).exists().isImage().hasSize(1_395_362);
     }
 }
