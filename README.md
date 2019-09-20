@@ -10,6 +10,7 @@
 Zip files support for JVM application
 
 ### Maven
+
 ~~~~
 <dependency>
     <groupId>ru.oleg-cherednik.zip4jvm</groupId>
