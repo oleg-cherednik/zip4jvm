@@ -25,6 +25,7 @@ public final class AesEngine {
     private static final int BLOCK_SIZE = 16;
     public static final int MAC_SIZE = 10;
     public static final int PASSWORD_CHECKSUM_SIZE = 2;
+    private static final int ITERATION_COUNT = 1000;
 
     private final Cipher cipher;
     private final Mac mac;
@@ -62,8 +63,6 @@ public final class AesEngine {
     public byte[] getMac() {
         return mac.doFinal();
     }
-
-    private static final int ITERATION_COUNT = 1000;
 
     /* package */ static byte[] createKey(char[] password, byte[] salt, AesStrength strength) throws NoSuchAlgorithmException, InvalidKeySpecException {
         final int keyLength = strength.getSize() * 2 + 16;

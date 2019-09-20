@@ -45,9 +45,8 @@ public class SplitZipInputStream extends BaseDataInput {
         while (res < len) {
             int total = delegate.read(buf, offs, len);
 
-            if (total > 0) {
+            if (total > 0)
                 res += total;
-            }
 
             if (total == IOUtils.EOF || total < len) {
                 openNextDisk();

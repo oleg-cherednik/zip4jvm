@@ -65,7 +65,7 @@ class ZipFileEncryptedDecoder extends ZipFileDecorator {
         } catch(RuntimeException e) {
             throw e;
         } catch(Exception e) {
-            throw new RuntimeException(e);
+            throw new Zip4jvmException(e);
         }
     }
 

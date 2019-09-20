@@ -44,11 +44,11 @@ final class ZipFileReader implements ZipFile.Reader {
 
     @Override
     public void extract(@NonNull Path destDir, @NonNull String fileName) throws IOException {
-        fileName = ZipUtils.normalizeFileName(fileName);
-        List<ZipEntry> entries = getEntriesWithFileNamePrefix(fileName + '/');
+        String normalizeFileName = ZipUtils.normalizeFileName(fileName);
+        List<ZipEntry> entries = getEntriesWithFileNamePrefix(normalizeFileName + '/');
 
         if (entries.isEmpty())
-            extractEntry(destDir, zipModel.getEntryByFileName(fileName), e -> FilenameUtils.getName(e.getFileName()));
+            extractEntry(destDir, zipModel.getEntryByFileName(normalizeFileName), e -> FilenameUtils.getName(e.getFileName()));
         else {
             for (ZipEntry entry : entries)
                 extractEntry(destDir, entry, ZipEntry::getFileName);

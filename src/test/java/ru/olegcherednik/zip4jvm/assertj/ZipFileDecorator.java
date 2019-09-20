@@ -79,7 +79,7 @@ class ZipFileDecorator {
 
             };
         } catch(Exception e) {
-            throw new RuntimeException(e);
+            throw new Zip4jvmException(e);
         }
     }
 
@@ -87,7 +87,7 @@ class ZipFileDecorator {
         try (ZipFile zipFile = new ZipFile(this.zip.toFile())) {
             return zipFile.getComment();
         } catch(Exception e) {
-            throw new RuntimeException(e);
+            throw new Zip4jvmException(e);
         }
     }
 
