@@ -213,8 +213,8 @@ Entry contains following data (all fields are mandatory):
 * **lastModifiedTime** - last modification time _(by default it's `System.currentTimeMillis()`)_;
 * **regularFile** - `true` if entry is a regular file; internally zip adds special marker `/` to
  the _**fileName**_ for directory and _**inputStreamSup**_ result is ignored (i.e. directory
-  cannot have `InputStream`). _**Note**_, the no need to add marker `/` to the _**fileName**_
-  manually - this is internal representation; _zip4jvm_ retrieves this instance without this marker.  
+  cannot have `InputStream`). _Note:_, no need to add marker `/` to the _**fileName**_ manually -
+  this is internal representation; _zip4jvm_ retrieves this instance without this marker.  
 
 ##### Links
 * Home page: https://github.com/oleg-cherednik/zip4jvm
