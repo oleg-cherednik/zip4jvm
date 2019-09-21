@@ -26,8 +26,16 @@ compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:0.7'
 ~~~~
 
 ## Usage
-### ZipIt (Standard Mode)
-#### Create (or open existed) zip archive and add file */cars/bentley-continental.jpg*.
+
+### Standard Mode
+
+To simplify usage of _zip4jvm_, there're utility classes:
+* [ZipIt](#zipit) - add files to archive;
+* UnzipIt - extract files from archive;
+* ZipMisc - other zip file activities. These classes contains most common operations with limited set of settings.
+ 
+#### ZipIt
+##### Create (or open existed) zip archive and add file */cars/bentley-continental.jpg*.
   
 ```
 Path zip = Paths.get("filename.zip");
@@ -39,7 +47,7 @@ ZipIt.add(zip, file);
 >  |-- bentley-continental.jpg
 >```
 
-#### Create (or open existed) zip archive and add directory */cars*.
+##### Create (or open existed) zip archive and add directory */cars*.
 
 ```
 Path zip = Paths.get("filename.zip");
@@ -54,7 +62,7 @@ ZipIt.add(zip, dir);
 >       |-- wiesmann-gt-mf5.jpg 
 >```
 
-#### Create (or open existed) zip archive and add some files and/or directories.
+##### Create (or open existed) zip archive and add some files and/or directories.
 
 ```
 Path zip = Paths.get("filename.zip");
@@ -79,6 +87,18 @@ ZipIt.add(zip, paths);
 **Note:** added directories will hold the initial structure.
 
 **Note:** added files will be added to the root of the zip archive.
+
+##### Create (or open existed) zip archive and add file */cars/bentley-continental.jpg* using stream.
+  
+```
+Path zip = Paths.get("filename.zip");
+Path file = Path.get("/cars/bentley-continental.jpg")
+ZipIt.add(zip, file);
+```
+>```
+> filename.zip
+>  |-- bentley-continental.jpg
+>```
 
 > **ZipFileSettings** could be additionally set for all methods. See default settings.
 
@@ -191,7 +211,7 @@ UnzipIt.extract(zip, destDir, fileName);
 >   |-- saint-petersburg.jpg
 >```                     
 _**Note:** `CreatePassword` function could be optionally added to all methods. See details in [CreatePassword function](#createpassword-function)._
-_**Note:** see [UnzipIt (Advanced Mode)](#unzipit-advanced-mode) for using extended unzip it operations._ 
+_**Note:** see [UnzipIt (Advanced Mode)](#unzipit-advanced-mode) for using extended unzip it operations._
 
 ### ZipIt (Advanced Mode)
 
@@ -203,9 +223,7 @@ _**Note:** see [UnzipIt (Advanced Mode)](#unzipit-advanced-mode) for using exten
 ### ZipFile.Entry
 
 This is a user friendly definition of the zip entry. It could be a regular file or a directory (i
-.e. _empty directory_, because no need to add additional entity for each directory with content).
-
-Entry contains following data (all fields are mandatory):
+.e. _empty directory_, because no need to add additional entry for each directory with content).
 
 * **inputStreamSup** - input stream supplier; it should retrieve `null` or `InputStream`;
 * **fileName** - full file name of the entry relative to the root of the zip archive (i.e.
@@ -213,7 +231,7 @@ Entry contains following data (all fields are mandatory):
 * **lastModifiedTime** - last modification time _(by default it's `System.currentTimeMillis()`)_;
 * **regularFile** - `true` if entry is a regular file; internally zip adds special marker `/` to
  the _**fileName**_ for directory and _**inputStreamSup**_ result is ignored (i.e. directory
-  cannot have `InputStream`). _Note:_, no need to add marker `/` to the _**fileName**_ manually -
+  cannot have `InputStream`). _Note:_ no need to add marker `/` to the _**fileName**_ manually -
   this is internal representation; _zip4jvm_ retrieves this instance without this marker.  
 
 ##### Links
