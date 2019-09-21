@@ -20,15 +20,15 @@ Zip files support for JVM application
 ~~~~
 
 ### Gradle
+
 ~~~~
 compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:0.7'
 ~~~~
 
 ## Usage
-
 ### ZipIt (Standard Mode)
-
-##### Create (or add to existed) zip archive and add file */cars/bentley-continental.jpg*.  
+#### Create (or open existed) zip archive and add file */cars/bentley-continental.jpg*.
+  
 ```
 Path zip = Paths.get("filename.zip");
 Path file = Path.get("/cars/bentley-continental.jpg")
@@ -39,7 +39,8 @@ ZipIt.add(zip, file);
 >  |-- bentley-continental.jpg
 >```
 
-##### Create (or add to existed) zip archive and add directory */cars*.
+#### Create (or open existed) zip archive and add directory */cars*.
+
 ```
 Path zip = Paths.get("filename.zip");
 Path dir = Path.get("/cars")
@@ -53,13 +54,14 @@ ZipIt.add(zip, dir);
 >       |-- wiesmann-gt-mf5.jpg 
 >```
 
-##### Create (or add to existed) zip archive and add some files and/or directories.
+#### Create (or open existed) zip archive and add some files and/or directories.
+
 ```
 Path zip = Paths.get("filename.zip");
 Collection<Path> paths = Arrays.asList(
+        Paths.get("/bikes/ducati-panigale-1199.jpg"),
+        Paths.get("/bikes/honda-cbr600rr.jpg"),
         Paths.get("/cars"),
-        Paths.get("/Star Wars/one.jpg"),
-        Paths.get("/Star Wars/two.jpg"),
         Paths.get("/saint-petersburg.jpg"));
 ZipIt.add(zip, paths);
 ```
@@ -69,10 +71,14 @@ ZipIt.add(zip, paths);
 >  |    |-- bentley-continental.jpg
 >  |    |-- feffari-458-italia.jpg
 >  |    |-- wiesmann-gt-mf5.jpg
->  |-- one.jpg
->  |-- two.jpg
+>  |-- ducati-panigale-1199.jpg
+>  |-- honda-cbr600rr.jpg
 >  |-- saint-petersburg.jpg 
 >```
+
+**Note 1:** added directories will hold the initial structure.
+
+**Note 2:** added files will be added to the root of the zip archive.
 
 > **ZipFileSettings** could be additionally set for all methods. See default settings.
 
