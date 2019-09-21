@@ -210,12 +210,11 @@ Entry contains following data (all fields are mandatory):
 * **inputStreamSup** - input stream supplier; it should retrieve `null` or `InputStream`;
 * **fileName** - full file name of the entry relative to the root of the zip archive (i.e.
  `cars/bentley-continental.jpg`);
-* **lastModifiedTime** - last modification time (by default it's `System.currentTimeMillis()`);
+* **lastModifiedTime** - last modification time _(by default it's `System.currentTimeMillis()`)_;
 * **regularFile** - `true` if entry is a regular file; internally zip adds special marker `/` to
- the **fileName** for directory and **inputStreamSup** result will be ignored (i.e. directory
-  cannot have `InputStream`). **Note**, the no need to add marker `/` to the **fileName
-  ** manually - this is internal representation; _zip4jvm_ retrieves this instance without this
-   marker.  
+ the _**fileName**_ for directory and _**inputStreamSup**_ result is ignored (i.e. directory
+  cannot have `InputStream`). _**Note**_, the no need to add marker `/` to the _**fileName**_
+  manually - this is internal representation; _zip4jvm_ retrieves this instance without this marker.  
 
 ##### Links
 * Home page: https://github.com/oleg-cherednik/zip4jvm
