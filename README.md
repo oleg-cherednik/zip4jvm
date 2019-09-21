@@ -76,13 +76,14 @@ ZipIt.add(zip, paths);
 >  |-- saint-petersburg.jpg 
 >```
 
-**Note 1:** added directories will hold the initial structure.
+**Note:** added directories will hold the initial structure.
 
-**Note 2:** added files will be added to the root of the zip archive.
+**Note:** added files will be added to the root of the zip archive.
 
 > **ZipFileSettings** could be additionally set for all methods. See default settings.
 
-_**Note:** see [ZipIt (Advanced Mode)](#zipit-advanced-mode) for using extended zip it operations._              
+**Note:** _see [ZipIt (Advanced Mode)](#zipit-advanced-mode) for using extended zip it operations
+._              
 
 ### UnzipIt (Standard Mode)
 
@@ -198,6 +199,23 @@ _**Note:** see [UnzipIt (Advanced Mode)](#unzipit-advanced-mode) for using exten
 
 ### CreatePassword function
 
+## Model
+### ZipFile.Entry
+
+This is a user friendly definition of the zip entry. It could be a regular file or a directory (i
+.e. _empty directory_, because no need to add additional entity for each directory with content).
+
+Entry contains following data (all fields are mandatory):
+
+* **inputStreamSup** - input stream supplier; it should retrieve `null` or `InputStream`;
+* **fileName** - full file name of the entry relative to the root of the zip archive (i.e.
+ `cars/bentley-continental.jpg`);
+* **lastModifiedTime** - last modification time (by default it's `System.currentTimeMillis()`);
+* **regularFile** - `true` if entry is a regular file; internally zip adds special marker `/` to
+ the **fileName** for directory and **inputStreamSup** result will be ignored (i.e. directory
+  cannot have `InputStream`). **Note**, the no need to add marker `/` to the **fileName
+  ** manually - this is internal representation; _zip4jvm_ retrieves this instance without this
+   marker.  
 
 ##### Links
 * Home page: https://github.com/oleg-cherednik/zip4jvm
