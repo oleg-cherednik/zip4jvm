@@ -11,7 +11,7 @@ import java.util.zip.ZipEntry;
  * @since 25.03.2019
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class Zip4jAssertionsForClassTypes {
+public final class Zip4jvmAssertionsForClassTypes {
 
     public static AbstractZipFileAssert<?> assertThat(ZipFileDecorator actual) {
         return new ZipFileAssert(actual);

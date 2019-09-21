@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  * @author Oleg Cherednik
@@ -37,8 +38,8 @@ abstract class BaseDataInput implements DataInput {
     }
 
     @Override
-    public String readString(int length) throws IOException {
-        return delegate.readString(length);
+    public String readString(int length, @NonNull Charset charset) throws IOException {
+        return delegate.readString(length, charset);
     }
 
     @Override

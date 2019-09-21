@@ -1,6 +1,6 @@
 package ru.olegcherednik.zip4jvm.crypto.pkware;
 
-import ru.olegcherednik.zip4jvm.exception.Zip4jIncorrectPasswordException;
+import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -53,7 +53,7 @@ public final class PkwareHeader {
         int checksum = getChecksum(entry);
 
         if (buf[buf.length - 1] != low(checksum) || buf[buf.length - 2] != high(checksum))
-            throw new Zip4jIncorrectPasswordException(entry.getFileName());
+            throw new IncorrectPasswordException(entry.getFileName());
     }
 
     private static int getChecksum(ZipEntry entry) {

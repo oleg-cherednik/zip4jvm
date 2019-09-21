@@ -18,6 +18,7 @@ public interface Encoder {
     void encrypt(@NonNull byte[] buf, int offs, int len);
 
     default void close(@NonNull DataOutput out) throws IOException {
+        /* nothing to close */
     }
 
 }

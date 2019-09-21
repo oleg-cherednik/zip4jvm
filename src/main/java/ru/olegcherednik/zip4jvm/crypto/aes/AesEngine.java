@@ -25,6 +25,7 @@ public final class AesEngine {
     private static final int BLOCK_SIZE = 16;
     public static final int MAC_SIZE = 10;
     public static final int PASSWORD_CHECKSUM_SIZE = 2;
+    private static final int ITERATION_COUNT = 1000;
 
     private final Cipher cipher;
     private final Mac mac;
@@ -63,22 +64,20 @@ public final class AesEngine {
         return mac.doFinal();
     }
 
-    private static final int ITERATION_COUNT = 1000;
-
-    static byte[] createKey(char[] password, byte[] salt, AesStrength strength) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public static byte[] createKey(char[] password, byte[] salt, AesStrength strength) throws NoSuchAlgorithmException, InvalidKeySpecException {
         final int keyLength = strength.getSize() * 2 + 16;
         PBEKeySpec keySpec = new PBEKeySpec(password, salt, ITERATION_COUNT, keyLength);
         return SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(keySpec).getEncoded();
     }
 
-    static Cipher createCipher(SecretKeySpec secretKeySpec) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+    public static Cipher createCipher(SecretKeySpec secretKeySpec) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
         Cipher cipher = Cipher.getInstance("AES");
         // use custom AES implementation, so no worry for DECRYPT_MODE
         cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
         return cipher;
     }
 
-    static Mac createMac(SecretKeySpec secretKeySpec) throws NoSuchAlgorithmException, InvalidKeyException {
+    public static Mac createMac(SecretKeySpec secretKeySpec) throws NoSuchAlgorithmException, InvalidKeyException {
         Mac mac = Mac.getInstance("HmacSHA1");
         mac.init(secretKeySpec);
         return mac;

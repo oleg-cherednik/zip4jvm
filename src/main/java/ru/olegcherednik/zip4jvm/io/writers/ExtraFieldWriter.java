@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.io.writers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
@@ -32,7 +32,7 @@ final class ExtraFieldWriter implements Writer {
         new AesExtraDataRecordWriter(extraField.getAesExtraDataRecord(), charset).write(out);
 
         if (extraField.getSize() != out.getWrittenBytesAmount(MARK))
-            throw new Zip4jException("Illegal number of written bytes");
+            throw new Zip4jvmException("Illegal number of written bytes");
     }
 
 }

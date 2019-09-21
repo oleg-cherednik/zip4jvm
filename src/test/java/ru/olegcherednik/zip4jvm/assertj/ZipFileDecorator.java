@@ -5,6 +5,7 @@ import lombok.NonNull;
 import net.sf.sevenzipjbinding.SevenZipException;
 import net.sf.sevenzipjbinding.simple.ISimpleInArchiveItem;
 import org.apache.commons.io.FilenameUtils;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -78,15 +79,15 @@ class ZipFileDecorator {
 
             };
         } catch(Exception e) {
-            throw new RuntimeException(e);
+            throw new Zip4jvmException(e);
         }
     }
 
     public String getComment() {
-        try (ZipFile zipFile = new ZipFile(this.zip.toFile())) {
+        try (ZipFile zipFile = new ZipFile(zip.toFile())) {
             return zipFile.getComment();
         } catch(Exception e) {
-            throw new RuntimeException(e);
+            throw new Zip4jvmException(e);
         }
     }
 
@@ -97,12 +98,12 @@ class ZipFileDecorator {
                 try {
                     zipFile.getInputStream(entry).available();
                 } catch(IOException e) {
-                    throw new RuntimeException(e);
+                    throw new Zip4jvmException(e);
                 }
             });
             return map;
         } catch(Exception e) {
-            throw new RuntimeException(e);
+            throw new Zip4jvmException(e);
         }
     }
 
@@ -117,6 +118,7 @@ class ZipFileDecorator {
         return map;
     }
 
+    @SuppressWarnings("PMD.AvoidReassigningParameters")
     private static void add(String entryName, Map<String, Set<String>> map) {
         if ("/".equals(entryName))
             return;

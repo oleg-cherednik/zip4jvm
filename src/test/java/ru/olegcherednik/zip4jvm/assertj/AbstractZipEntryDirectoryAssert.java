@@ -11,19 +11,18 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Oleg Cherednik
  * @since 25.03.2019
  */
-@SuppressWarnings("NewClassNamingConvention")
-public class AbstractZipEntryDirectoryAssert<SELF extends AbstractZipEntryDirectoryAssert<SELF>> extends AbstractZipEntryAssert<SELF> {
+public class AbstractZipEntryDirectoryAssert<S extends AbstractZipEntryDirectoryAssert<S>> extends AbstractZipEntryAssert<S> {
 
     public AbstractZipEntryDirectoryAssert(ZipEntry actual, Class<?> selfType, ZipFileDecorator zipFile) {
         super(actual, selfType, zipFile);
     }
 
-    public SELF hasSubDirectories(int expected) {
+    public S hasSubDirectories(int expected) {
         assertThat(getFoldersAmount()).isEqualTo(expected);
         return myself;
     }
 
-    public SELF hasFiles(int expected) {
+    public S hasFiles(int expected) {
         assertThat(getRegularFilesAmount()).isEqualTo(expected);
         return myself;
     }
@@ -36,12 +35,13 @@ public class AbstractZipEntryDirectoryAssert<SELF extends AbstractZipEntryDirect
         return new ZipEntryDirectoryAssert(new ZipEntry(name), zipFile);
     }
 
+    @SuppressWarnings("PMD.AvoidReassigningParameters")
     private ZipEntry getZipEntry(String name) {
         name = "/".equals(actual.getName()) ? name : actual.getName() + name;
         return new ZipEntry(name);
     }
 
-    public SELF matches(Consumer<AbstractZipEntryDirectoryAssert<?>> consumer) {
+    public S matches(Consumer<AbstractZipEntryDirectoryAssert<?>> consumer) {
         consumer.accept(this);
         return myself;
     }

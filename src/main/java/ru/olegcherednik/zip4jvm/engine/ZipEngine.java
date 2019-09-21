@@ -1,9 +1,10 @@
-package ru.olegcherednik.zip4jvm;
+package ru.olegcherednik.zip4jvm.engine;
 
 import lombok.NonNull;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
+import ru.olegcherednik.zip4jvm.ZipFile;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -25,15 +26,15 @@ import java.util.stream.Collectors;
  * @author Oleg Cherednik
  * @since 07.09.2019
  */
-final class ZipFileReader implements ZipFile.Reader {
+public final class ZipEngine implements ZipFile.Reader {
 
     private final ZipModel zipModel;
-    private final Function<String, char[]> createPassword;
+    private final Function<String, char[]> passwordProvider;
 
-    public ZipFileReader(@NonNull Path zip, @NonNull Function<String, char[]> createPassword) throws IOException {
+    public ZipEngine(@NonNull Path zip, @NonNull Function<String, char[]> passwordProvider) throws IOException {
         checkZipFile(zip);
         zipModel = ZipModelBuilder.read(zip);
-        this.createPassword = createPassword;
+        this.passwordProvider = passwordProvider;
     }
 
     @Override
@@ -43,6 +44,7 @@ final class ZipFileReader implements ZipFile.Reader {
     }
 
     @Override
+    @SuppressWarnings("PMD.AvoidReassigningParameters")
     public void extract(@NonNull Path destDir, @NonNull String fileName) throws IOException {
         fileName = ZipUtils.normalizeFileName(fileName);
         List<ZipEntry> entries = getEntriesWithFileNamePrefix(fileName + '/');
@@ -63,15 +65,14 @@ final class ZipFileReader implements ZipFile.Reader {
 
     @NonNull
     @Override
-    public InputStream extract(@NonNull String fileName) throws IOException {
-        ZipEntry entry = zipModel.getEntryByFileName(ZipUtils.normalizeFileName(fileName));
+    public ZipFile.Entry extract(@NonNull String fileName) throws IOException {
+        ZipEntry zipEntry = zipModel.getEntryByFileName(ZipUtils.normalizeFileName(fileName));
 
-        if (entry == null)
-            throw new Zip4jException("No entry found for '" + fileName + '\'');
+        if (zipEntry == null)
+            throw new Zip4jvmException("No entry found for '" + fileName + '\'');
 
-        entry.setPassword(createPassword.apply(entry.getFileName()));
-
-        return entry.getIn();
+        zipEntry.setPassword(passwordProvider.apply(zipEntry.getFileName()));
+        return zipEntry.createImmutableEntry();
     }
 
     @Override
@@ -96,8 +97,8 @@ final class ZipFileReader implements ZipFile.Reader {
     }
 
     @Override
-    public Iterator<ZipEntry> iterator() {
-        return new Iterator<ZipEntry>() {
+    public Iterator<ZipFile.Entry> iterator() {
+        return new Iterator<ZipFile.Entry>() {
             private final Iterator<String> it = zipModel.getEntryNames().iterator();
 
             @Override
@@ -106,17 +107,17 @@ final class ZipFileReader implements ZipFile.Reader {
             }
 
             @Override
-            public ZipEntry next() {
-                return zipModel.getEntryByFileName(it.next());
+            public ZipFile.Entry next() {
+                return zipModel.getEntryByFileName(it.next()).createImmutableEntry();
             }
         };
     }
 
     private void extractEntry(Path destDir, ZipEntry entry, Function<ZipEntry, String> getFileName) throws IOException {
         if (entry == null)
-            throw new Zip4jException("Entry not found");
+            throw new Zip4jvmException("Entry not found");
 
-        entry.setPassword(createPassword.apply(entry.getFileName()));
+        entry.setPassword(passwordProvider.apply(entry.getFileName()));
         String fileName = getFileName.apply(entry);
         Path file = destDir.resolve(fileName);
 
@@ -149,9 +150,9 @@ final class ZipFileReader implements ZipFile.Reader {
 
     private static void checkZipFile(Path zip) {
         if (!Files.exists(zip))
-            throw new Zip4jException("ZipFile not exists: " + zip);
+            throw new Zip4jvmException("ZipFile not exists: " + zip);
         if (!Files.isRegularFile(zip))
-            throw new Zip4jException("ZipFile is not a regular file: " + zip);
+            throw new Zip4jvmException("ZipFile is not a regular file: " + zip);
     }
 
 }

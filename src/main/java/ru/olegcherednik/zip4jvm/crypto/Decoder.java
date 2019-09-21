@@ -19,6 +19,7 @@ public interface Decoder {
     long getCompressedSize(@NonNull ZipEntry entry);
 
     default void close(@NonNull DataInput in) throws IOException {
+        /* nothing to close */
     }
 
 }

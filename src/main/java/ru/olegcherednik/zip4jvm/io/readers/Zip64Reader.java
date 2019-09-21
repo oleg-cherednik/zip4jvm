@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -85,7 +85,7 @@ final class Zip64Reader implements Reader<Zip64> {
             in.seek(offs);
 
             if (in.readSignature() != Zip64.EndCentralDirectory.SIGNATURE)
-                throw new Zip4jException("invalid zip64 end of central directory");
+                throw new Zip4jvmException("invalid zip64 end of central directory");
         }
     }
 
@@ -93,10 +93,10 @@ final class Zip64Reader implements Reader<Zip64> {
     static final class ExtendedInfo {
 
         private final int signature;
-        private final boolean uncompressedSize;
-        private final boolean compressedSize;
-        private final boolean offs;
-        private final boolean disk;
+        private final boolean uncompressedSizeExists;
+        private final boolean compressedSizeExists;
+        private final boolean offsLocalHeaderRelativeExists;
+        private final boolean diskExists;
 
         @NonNull
         public Zip64.ExtendedInfo read(@NonNull DataInput in) throws IOException {
@@ -106,17 +106,26 @@ final class Zip64Reader implements Reader<Zip64> {
             int size = in.readWord();
             long offs = in.getOffs();
 
-            Zip64.ExtendedInfo extendedInfo = Zip64.ExtendedInfo.builder()
-                                                                .uncompressedSize(uncompressedSize ? in.readQword() : ExtraField.NO_DATA)
-                                                                .compressedSize(compressedSize ? in.readQword() : ExtraField.NO_DATA)
-                                                                .offsLocalHeaderRelative(this.offs ? in.readQword() : ExtraField.NO_DATA)
-                                                                .disk(disk ? in.readDword() : ExtraField.NO_DATA)
-                                                                .build();
+            Zip64.ExtendedInfo extendedInfo = readExtendedInfo(in);
 
             if (in.getOffs() - offs != size)
-                throw new Zip4jException("Illegal number of read bytes");
+                throw new Zip4jvmException("Illegal number of read bytes");
 
             return extendedInfo;
+        }
+
+        private Zip64.ExtendedInfo readExtendedInfo(DataInput in) throws IOException {
+            long uncompressedSize = uncompressedSizeExists ? in.readQword() : ExtraField.NO_DATA;
+            long compressedSize = compressedSizeExists ? in.readQword() : ExtraField.NO_DATA;
+            long offsLocalHeaderRelative = offsLocalHeaderRelativeExists ? in.readQword() : ExtraField.NO_DATA;
+            long disk = diskExists ? in.readDword() : ExtraField.NO_DATA;
+
+            return Zip64.ExtendedInfo.builder()
+                                     .uncompressedSize(uncompressedSize)
+                                     .compressedSize(compressedSize)
+                                     .offsLocalHeaderRelative(offsLocalHeaderRelative)
+                                     .disk(disk)
+                                     .build();
         }
 
     }

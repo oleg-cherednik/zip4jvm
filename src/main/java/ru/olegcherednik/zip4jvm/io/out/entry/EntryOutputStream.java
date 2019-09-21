@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.io.out.entry;
 
 import lombok.NonNull;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.writers.DataDescriptorWriter;
 import ru.olegcherednik.zip4jvm.io.writers.LocalFileHeaderWriter;
@@ -19,6 +19,8 @@ import java.io.OutputStream;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
+import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_ENTRY_SIZE;
+
 /**
  * @author Oleg Cherednik
  * @since 26.07.2019
@@ -32,6 +34,8 @@ public abstract class EntryOutputStream extends OutputStream {
 
     protected final Encoder encoder;
     protected final DataOutput out;
+
+    private long uncompressedSize;
 
     public static EntryOutputStream create(@NonNull ZipEntry entry, @NonNull ZipModel zipModel, @NonNull DataOutput out) throws IOException {
         EntryOutputStream os = createOutputStream(entry, out);
@@ -54,7 +58,7 @@ public abstract class EntryOutputStream extends OutputStream {
         if (compression == Compression.DEFLATE)
             return new DeflateEntryOutputStream(entry, out);
 
-        throw new Zip4jException("Compression is not supported: " + compression);
+        throw new Zip4jvmException("Compression is not supported: " + compression);
     }
 
     protected EntryOutputStream(ZipEntry entry, DataOutput out) {
@@ -73,22 +77,34 @@ public abstract class EntryOutputStream extends OutputStream {
         encoder.writeEncryptionHeader(out);
     }
 
-    protected final void updateChecksum(byte[] buf, int offs, int len) {
-        checksum.update(buf, offs, len);
-    }
-
     @Override
     public final void write(int b) throws IOException {
         write(new byte[] { (byte)b }, 0, 1);
     }
 
     @Override
+    public void write(byte[] buf, int offs, int len) throws IOException {
+        checksum.update(buf, offs, len);
+        uncompressedSize += Math.max(0, len);
+    }
+
+    @Override
     public void close() throws IOException {
         encoder.close(out);
         entry.setChecksum(checksum.getValue());
-        entry.checkCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
+        entry.setUncompressedSize(uncompressedSize);
         entry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
+        updateZip64();
         writeDataDescriptor();
+    }
+
+    private void updateZip64() {
+        if (entry.isZip64())
+            return;
+
+        boolean uncompressedSizeExceeded = entry.getUncompressedSize() > MAX_ENTRY_SIZE;
+        boolean compressedSizeExceeded = entry.getCompressedSize() > MAX_ENTRY_SIZE;
+        entry.setZip64(uncompressedSizeExceeded || compressedSizeExceeded);
     }
 
     private void writeDataDescriptor() throws IOException {

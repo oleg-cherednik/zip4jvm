@@ -9,6 +9,7 @@ import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  * @author Oleg Cherednik
@@ -18,6 +19,8 @@ import java.io.IOException;
 final class AesExtraDataRecordReader implements Reader<AesExtraDataRecord> {
 
     private final int signature;
+    @NonNull
+    private final Charset charset;
 
     @Override
     public AesExtraDataRecord read(@NonNull DataInput in) throws IOException {
@@ -27,7 +30,7 @@ final class AesExtraDataRecordReader implements Reader<AesExtraDataRecord> {
         return AesExtraDataRecord.builder()
                                  .size(in.readWord())
                                  .versionNumber(in.readWord())
-                                 .vendor(in.readString(2))
+                                 .vendor(in.readString(2, charset))
                                  .strength(AesStrength.parseValue(in.readByte()))
                                  .compressionMethod(CompressionMethod.parseCode(in.readWord()))
                                  .build();

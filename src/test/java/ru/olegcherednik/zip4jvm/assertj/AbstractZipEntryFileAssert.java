@@ -16,18 +16,15 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
  * @author Oleg Cherednik
  * @since 25.03.2019
  */
-@SuppressWarnings("NewClassNamingConvention")
-public abstract class AbstractZipEntryFileAssert<SELF extends AbstractZipEntryFileAssert<SELF>> extends AbstractZipEntryAssert<SELF> {
+public abstract class AbstractZipEntryFileAssert<S extends AbstractZipEntryFileAssert<S>> extends AbstractZipEntryAssert<S> {
 
-    private final char[] password;
+    private static final Pattern NEW_LINE = Pattern.compile("\\r?\\n");
 
-    @SuppressWarnings({ "MethodCanBeVariableArityMethod", "AssignmentOrReturnOfFieldWithMutableType" })
-    protected AbstractZipEntryFileAssert(ZipEntry actual, Class<?> selfType, ZipFileDecorator zipFile, char[] password) {
+    protected AbstractZipEntryFileAssert(ZipEntry actual, Class<?> selfType, ZipFileDecorator zipFile) {
         super(actual, selfType, zipFile);
-        this.password = password;
     }
 
-    public SELF hasSize(long size) {
+    public S hasSize(long size) {
         if (actual.getSize() == -1) {
             try (InputStream in = zipFile.getInputStream(actual)) {
                 actual.setSize(in.available());
@@ -42,7 +39,8 @@ public abstract class AbstractZipEntryFileAssert<SELF extends AbstractZipEntryFi
         return myself;
     }
 
-    public SELF isImage() {
+    @Deprecated
+    public S isImage() {
 //        try (InputStream in = zipFile.getInputStream(actual)) {
 //            actual.setSize(in.available());
 //            assertThat(ImageIO.read(in)).isNotNull();
@@ -55,13 +53,11 @@ public abstract class AbstractZipEntryFileAssert<SELF extends AbstractZipEntryFi
         return myself;
     }
 
-    public SELF hasEmptyContent() {
+    public S hasEmptyContent() {
         return hasContent("");
     }
 
-    private static final Pattern NEW_LINE = Pattern.compile("\\r?\\n");
-
-    public SELF hasContent(String expected) {
+    public S hasContent(String expected) {
         try (InputStream in = zipFile.getInputStream(actual)) {
             String[] expectedLines = expected.isEmpty() ? ArrayUtils.EMPTY_STRING_ARRAY : NEW_LINE.split(expected);
 
@@ -81,7 +77,7 @@ public abstract class AbstractZipEntryFileAssert<SELF extends AbstractZipEntryFi
         return myself;
     }
 
-    public SELF hasComment(String comment) {
+    public S hasComment(String comment) {
         if (comment == null)
             assertThat(actual.getComment()).isNull();
         else

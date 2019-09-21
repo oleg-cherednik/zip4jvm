@@ -3,8 +3,8 @@ package ru.olegcherednik.zip4jvm.crypto.aes;
 import lombok.NonNull;
 import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
-import ru.olegcherednik.zip4jvm.exception.Zip4jIncorrectPasswordException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -38,7 +38,7 @@ public final class AesDecoder implements Decoder {
 
             return new AesDecoder(cipher, mac, salt.length);
         } catch(Exception e) {
-            throw new Zip4jException(e);
+            throw new Zip4jvmException(e);
         }
     }
 
@@ -53,7 +53,7 @@ public final class AesDecoder implements Decoder {
             engine.updateMac(buf, offs, len);
             engine.cypherUpdate(buf, offs, len);
         } catch(Exception e) {
-            throw new Zip4jException(e);
+            throw new Zip4jvmException(e);
         }
     }
 
@@ -76,7 +76,7 @@ public final class AesDecoder implements Decoder {
         byte[] expected = in.readBytes(PASSWORD_CHECKSUM_SIZE);
 
         if (!ArrayUtils.isEquals(expected, actual))
-            throw new Zip4jIncorrectPasswordException(entry.getFileName());
+            throw new IncorrectPasswordException(entry.getFileName());
     }
 
     private void checkMessageAuthenticationCode(DataInput in) throws IOException {
@@ -84,7 +84,7 @@ public final class AesDecoder implements Decoder {
         byte[] actual = ArrayUtils.subarray(engine.getMac(), 0, MAC_SIZE);
 
         if (!ArrayUtils.isEquals(expected, actual))
-            throw new Zip4jException("Message Authentication Code (MAC) is incorrect");
+            throw new Zip4jvmException("Message Authentication Code (MAC) is incorrect");
     }
 
 }

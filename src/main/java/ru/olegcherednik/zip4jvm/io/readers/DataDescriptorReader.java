@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
@@ -28,7 +28,7 @@ public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
             long offs = in.getOffs();
 
             if (in.readSignature() != DataDescriptor.SIGNATURE)
-                throw new Zip4jException("DataDescriptor signature expected at offs=" + offs);
+                throw new Zip4jvmException("DataDescriptor signature expected at offs=" + offs);
 
             DataDescriptor dataDescriptor = new DataDescriptor();
             dataDescriptor.setCrc32(in.readDword());
@@ -46,7 +46,7 @@ public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
             long offs = in.getOffs();
 
             if (in.readSignature() != DataDescriptor.SIGNATURE)
-                throw new Zip4jException("DataDescriptor signature expected at offs=" + offs);
+                throw new Zip4jvmException("DataDescriptor signature expected at offs=" + offs);
 
             DataDescriptor dataDescriptor = new DataDescriptor();
             dataDescriptor.setCrc32(in.readDword());

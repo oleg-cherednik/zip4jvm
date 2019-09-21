@@ -2,6 +2,9 @@ package ru.olegcherednik.zip4jvm.model.settings;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NonNull;
+
+import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -11,10 +14,13 @@ import lombok.Getter;
 @Builder
 public final class ZipFileSettings {
 
+    public static final ZipFileSettings DEFAULT = builder().build();
+
     private final long splitSize;
     private final String comment;
     private final boolean zip64;
-
-    private final ZipEntrySettings defEntrySettings;
+    @NonNull
+    @Builder.Default
+    private final Function<String, ZipEntrySettings> entrySettingsProvider = fileName -> ZipEntrySettings.DEFAULT;
 
 }

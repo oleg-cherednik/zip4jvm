@@ -11,6 +11,7 @@ final class NullDecoder implements Decoder {
 
     @Override
     public void decrypt(byte[] buf, int offs, int len) {
+        /* nothing to decrypt */
     }
 
     @Override

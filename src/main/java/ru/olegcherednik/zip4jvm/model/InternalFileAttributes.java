@@ -30,6 +30,7 @@ public class InternalFileAttributes implements Supplier<byte[]>, Consumer<Path> 
 
     @Override
     public void accept(Path path) {
+        /* nothing to accept */
     }
 
     @Override

@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.model;
 
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -42,7 +42,7 @@ public final class AesExtraDataRecord {
         byte[] buf = vendor != null ? vendor.getBytes(charset) : null;
 
         if (ArrayUtils.getLength(buf) > 2)
-            throw new Zip4jException("AESExtraDataRecord.vendor should be maximum 2 characters");
+            throw new Zip4jvmException("AESExtraDataRecord.vendor should be maximum 2 characters");
 
         return buf;
     }

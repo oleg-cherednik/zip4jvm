@@ -98,18 +98,22 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consum
 
         @Override
         public void readFrom(Path path) throws IOException {
+            /* nothing to read */
         }
 
         @Override
         public void readFrom(byte[] data) {
+            /* nothing to read */
         }
 
         @Override
         protected void saveToRowData(byte[] data) {
+            /* nothing to save */
         }
 
         @Override
         protected void applyToPath(Path path) throws IOException {
+            /* nothing to apply */
         }
 
         @Override
@@ -157,6 +161,7 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consum
 
         @Override
         protected void applyToPath(Path path) throws IOException {
+            //
         }
 
         @Override

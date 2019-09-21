@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.out;
 
 import lombok.NonNull;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
@@ -80,7 +80,7 @@ abstract class BaseDataOutput implements DataOutput {
         if (map.containsKey(id))
             return map.get(id);
 
-        throw new Zip4jException("Cannot find mark: " + id);
+        throw new Zip4jvmException("Cannot find mark: " + id);
     }
 
     @Override

@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.exception.Zip4jException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
@@ -10,6 +10,7 @@ import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import static ru.olegcherednik.zip4jvm.model.builders.LocalFileHeaderBuilder.LOOK_IN_EXTRA_FIELD;
 
@@ -38,7 +39,7 @@ public final class LocalFileHeaderReader implements Reader<LocalFileHeader> {
         localFileHeader.setUncompressedSize(in.readDword());
         int fileNameLength = in.readWord();
         int extraFieldLength = in.readWord();
-        localFileHeader.setFileName(in.readString(fileNameLength));
+        localFileHeader.setFileName(in.readString(fileNameLength, localFileHeader.getGeneralPurposeFlag().getCharset()));
         localFileHeader.setExtraField(getExtraFieldReader(extraFieldLength, localFileHeader).read(in));
 
         return localFileHeader;
@@ -48,13 +49,14 @@ public final class LocalFileHeaderReader implements Reader<LocalFileHeader> {
         in.seek(localFileHeaderOffs);
 
         if (in.readSignature() != LocalFileHeader.SIGNATURE)
-            throw new Zip4jException("invalid local file header signature");
+            throw new Zip4jvmException("invalid local file header signature");
     }
 
     private static ExtraFieldReader getExtraFieldReader(int size, LocalFileHeader localFileHeader) {
         boolean uncompressedSize = localFileHeader.getUncompressedSize() == LOOK_IN_EXTRA_FIELD;
         boolean compressedSize = localFileHeader.getCompressedSize() == LOOK_IN_EXTRA_FIELD;
-        return new ExtraFieldReader(size, uncompressedSize, compressedSize, false, false);
+        Charset charset = localFileHeader.getGeneralPurposeFlag().getCharset();
+        return new ExtraFieldReader(size, uncompressedSize, compressedSize, false, false, charset);
     }
 
 }

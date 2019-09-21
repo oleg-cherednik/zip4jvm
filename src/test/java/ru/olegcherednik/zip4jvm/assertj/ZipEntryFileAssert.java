@@ -9,11 +9,7 @@ import java.util.zip.ZipEntry;
 public class ZipEntryFileAssert extends AbstractZipEntryFileAssert<ZipEntryFileAssert> {
 
     public ZipEntryFileAssert(ZipEntry actual, ZipFileDecorator zipFile) {
-        this(actual, zipFile, null);
+        super(actual, ZipEntryFileAssert.class, zipFile);
     }
 
-    @SuppressWarnings("MethodCanBeVariableArityMethod")
-    public ZipEntryFileAssert(ZipEntry actual, ZipFileDecorator zipFile, char[] password) {
-        super(actual, ZipEntryFileAssert.class, zipFile, password);
-    }
 }

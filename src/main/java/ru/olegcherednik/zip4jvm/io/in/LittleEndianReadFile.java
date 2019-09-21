@@ -1,15 +1,15 @@
 package ru.olegcherednik.zip4jvm.io.in;
 
-import ru.olegcherednik.zip4jvm.utils.CreateStringFunc;
-import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.ArrayUtils;
+import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 
 /**
@@ -58,7 +58,7 @@ public class LittleEndianReadFile implements DataInput {
     }
 
     @Override
-    public String readString(int length) throws IOException {
+    public String readString(int length, @NonNull Charset charset) throws IOException {
         ZipUtils.requirePositive(length, "readString");
 
         if (length <= 0)
@@ -66,7 +66,7 @@ public class LittleEndianReadFile implements DataInput {
 
         byte[] buf = new byte[length];
         in.readFully(buf);
-        return new CreateStringFunc().apply(buf);
+        return new String(buf, charset);
     }
 
     @Override
@@ -82,9 +82,9 @@ public class LittleEndianReadFile implements DataInput {
             return null;
 
         byte[] buf = new byte[total];
-        total = in.read(buf);
+        int len = in.read(buf);
 
-        return total == buf.length ? buf : ArrayUtils.subarray(buf, 0, total);
+        return len == buf.length ? buf : ArrayUtils.subarray(buf, 0, len);
     }
 
     @Override
