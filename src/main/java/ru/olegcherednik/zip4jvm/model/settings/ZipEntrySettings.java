@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.apache.commons.lang.ArrayUtils;
+import ru.olegcherednik.zip4jvm.exception.EmptyPasswordException;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
@@ -63,6 +64,9 @@ public final class ZipEntrySettings {
         }
 
         public ZipEntrySettings build() {
+            if (encryption != Encryption.OFF && ArrayUtils.isEmpty(password))
+                throw new EmptyPasswordException();
+
             return new ZipEntrySettings(this);
         }
 

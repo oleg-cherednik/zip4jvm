@@ -4,8 +4,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import ru.olegcherednik.zip4jvm.engine.ZipEngine;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
+import ru.olegcherednik.zip4jvm.engine.ZipEngine;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
@@ -120,6 +120,7 @@ public final class ZipFile {
     public static final class Entry {
 
         @NonNull
+        @Getter(AccessLevel.NONE)
         private final InputStreamSupplier inputStreamSup;
         @NonNull
         private final String fileName;
@@ -143,7 +144,7 @@ public final class ZipFile {
 
         private Entry(Entry.Builder builder) {
             fileName = ZipUtils.normalizeFileName(builder.fileName);
-            inputStreamSup = ZipUtils.isDirectory(fileName) ? () -> EmptyInputStream.INSTANCE : builder.inputStreamSup;
+            inputStreamSup = builder.regularFile ? builder.inputStreamSup : () -> EmptyInputStream.INSTANCE;
             lastModifiedTime = builder.lastModifiedTime;
             externalFileAttributes = builder.externalFileAttributes;
             regularFile = builder.regularFile;

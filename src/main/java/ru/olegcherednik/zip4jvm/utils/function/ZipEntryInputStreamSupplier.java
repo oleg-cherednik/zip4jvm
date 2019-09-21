@@ -13,6 +13,6 @@ import java.io.InputStream;
 @FunctionalInterface
 public interface ZipEntryInputStreamSupplier {
 
-    InputStream get(@NonNull ZipEntry entry) throws IOException;
+    InputStream get(@NonNull ZipEntry zipEntry) throws IOException;
 
 }

@@ -13,8 +13,8 @@ import java.io.IOException;
  */
 final class StoreEntryInputStream extends EntryInputStream {
 
-    public StoreEntryInputStream(ZipEntry entry, DataInput in, Decoder decoder) {
-        super(entry, in, decoder);
+    public StoreEntryInputStream(ZipEntry zipEntry, DataInput in, Decoder decoder) {
+        super(zipEntry, in, decoder);
     }
 
     @Override

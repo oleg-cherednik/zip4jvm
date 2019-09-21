@@ -19,8 +19,8 @@ final class InflateEntryInputStream extends EntryInputStream {
     private final byte[] buf = new byte[1024 * 4];
     private final Inflater inflater = new Inflater(true);
 
-    public InflateEntryInputStream(ZipEntry entry, DataInput in, Decoder decoder) {
-        super(entry, in, decoder);
+    public InflateEntryInputStream(ZipEntry zipEntry, DataInput in, Decoder decoder) {
+        super(zipEntry, in, decoder);
     }
 
     @Override

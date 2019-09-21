@@ -16,7 +16,7 @@ public interface Decoder {
 
     void decrypt(@NonNull byte[] buf, int offs, int len);
 
-    long getCompressedSize(@NonNull ZipEntry entry);
+    long getCompressedSize(@NonNull ZipEntry zipEntry);
 
     default void close(@NonNull DataInput in) throws IOException {
         /* nothing to close */

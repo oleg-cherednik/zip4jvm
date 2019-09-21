@@ -58,8 +58,8 @@ public final class AesDecoder implements Decoder {
     }
 
     @Override
-    public long getCompressedSize(@NonNull ZipEntry entry) {
-        return entry.getCompressedSize() - saltLength - PASSWORD_CHECKSUM_SIZE - MAC_SIZE;
+    public long getCompressedSize(@NonNull ZipEntry zipEntry) {
+        return zipEntry.getCompressedSize() - saltLength - PASSWORD_CHECKSUM_SIZE - MAC_SIZE;
     }
 
     @Override
