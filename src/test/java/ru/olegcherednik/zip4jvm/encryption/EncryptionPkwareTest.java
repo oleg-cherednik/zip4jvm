@@ -22,6 +22,8 @@ import java.nio.file.Path;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
+import static ru.olegcherednik.zip4jvm.TestData.dirSrc;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirCars;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
@@ -55,7 +57,7 @@ public class EncryptionPkwareTest {
                                                   .comment("password: " + new String(Zip4jvmSuite.password)).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt.add(zip, Zip4jvmSuite.contentSrcDir, settings);
+        ZipIt.add(zip, contentDirSrc, settings);
 
         assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
         assertThatZipFile(zip, Zip4jvmSuite.password).exists().rootEntry().matches(TestDataAssert.zipRootDirAssert);
@@ -85,7 +87,7 @@ public class EncryptionPkwareTest {
                                                   .build();
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        assertThatThrownBy(() -> ZipIt.add(zip, Zip4jvmSuite.dirSrc, settings)).isInstanceOf(EmptyPasswordException.class);
+        assertThatThrownBy(() -> ZipIt.add(zip, dirSrc, settings)).isInstanceOf(EmptyPasswordException.class);
     }
 
     public void shouldUnzipWhenStandardEncryption() throws IOException {
@@ -97,7 +99,7 @@ public class EncryptionPkwareTest {
                                                   .comment("password: " + new String(Zip4jvmSuite.password)).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt.add(zip, Zip4jvmSuite.contentSrcDir, settings);
+        ZipIt.add(zip, contentDirSrc, settings);
 
         Path destDir = zip.getParent().resolve("unzip");
         UnzipIt.extract(zip, destDir, fileName -> Zip4jvmSuite.password);
@@ -112,7 +114,7 @@ public class EncryptionPkwareTest {
                                                                           .encryption(Encryption.PKWARE, Zip4jvmSuite.password).build())
                                                   .comment("password: " + new String(Zip4jvmSuite.password)).build();
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt.add(zip, Zip4jvmSuite.dirSrc, settings);
+        ZipIt.add(zip, dirSrc, settings);
 
         Path destDir = zip.getParent().resolve("unzip");
         assertThatThrownBy(() -> UnzipIt.extract(zip, destDir, fileName -> UUID.randomUUID().toString().toCharArray()))

@@ -14,7 +14,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Function;
 
+import static ru.olegcherednik.zip4jvm.TestData.dirEmpty;
+import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileDucati;
+import static ru.olegcherednik.zip4jvm.TestData.fileFerrari;
 import static ru.olegcherednik.zip4jvm.TestData.fileHonda;
 import static ru.olegcherednik.zip4jvm.TestData.fileKawasaki;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
@@ -25,6 +28,7 @@ import static ru.olegcherednik.zip4jvm.TestData.fileNameKawasaki;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameSuzuki;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameWiesmann;
 import static ru.olegcherednik.zip4jvm.TestData.fileSuzuki;
+import static ru.olegcherednik.zip4jvm.TestData.fileWiesmann;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirBikes;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirCars;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirSrc;
@@ -56,9 +60,9 @@ public class ZipFileTest {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
 
         try (ZipFile.Writer zipFile = ZipFile.write(file, fileName -> entrySettings)) {
-            zipFile.add(Zip4jvmSuite.dirCars.resolve("bentley-continental.jpg"));
-            zipFile.add(Zip4jvmSuite.dirCars.resolve("ferrari-458-italia.jpg"));
-            zipFile.add(Zip4jvmSuite.dirCars.resolve("wiesmann-gt-mf5.jpg"));
+            zipFile.add(fileBentley);
+            zipFile.add(fileFerrari);
+            zipFile.add(fileWiesmann);
         }
 
         assertThatDirectory(file.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -104,9 +108,9 @@ public class ZipFileTest {
         };
 
         try (ZipFile.Writer zipFile = ZipFile.write(file, entrySettingsProvider)) {
-            zipFile.add(Zip4jvmSuite.dirCars.resolve("bentley-continental.jpg"));
-            zipFile.add(Zip4jvmSuite.dirCars.resolve("ferrari-458-italia.jpg"));
-            zipFile.add(Zip4jvmSuite.dirCars.resolve("wiesmann-gt-mf5.jpg"));
+            zipFile.add(fileBentley);
+            zipFile.add(fileFerrari);
+            zipFile.add(fileWiesmann);
         }
 
         assertThatDirectory(file.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -136,9 +140,9 @@ public class ZipFileTest {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
         try (ZipFile.Writer zipFile = ZipFile.write(file, entrySettingsProvider)) {
-            zipFile.add(Zip4jvmSuite.dirCars.resolve("bentley-continental.jpg"));
-            zipFile.add(Zip4jvmSuite.dirCars.resolve("ferrari-458-italia.jpg"));
-            zipFile.add(Zip4jvmSuite.dirCars.resolve("wiesmann-gt-mf5.jpg"));
+            zipFile.add(fileBentley);
+            zipFile.add(fileFerrari);
+            zipFile.add(fileWiesmann);
         }
 
         assertThatDirectory(file.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -186,7 +190,7 @@ public class ZipFileTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
         try (ZipFile.Writer zipFile = ZipFile.write(zip, zipFileSettings)) {
-            zipFile.add(Zip4jvmSuite.emptyDir);
+            zipFile.add(dirEmpty);
         }
 
         assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);

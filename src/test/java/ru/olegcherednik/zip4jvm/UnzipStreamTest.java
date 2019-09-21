@@ -19,7 +19,7 @@ import static ru.olegcherednik.zip4jvm.TestData.deflateSolidZip;
 @SuppressWarnings("FieldNamingConvention")
 public class UnzipStreamTest {
 
-    private static final Path rootDir = Zip4jvmSuite.dirRoot.resolve(UnzipStreamTest.class.getSimpleName());
+    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(UnzipStreamTest.class);
 
     @BeforeClass
     public static void createDir() throws IOException {

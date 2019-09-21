@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
@@ -47,7 +48,7 @@ public class EncryptionAesTest {
                                                                           .encryption(Encryption.AES_256, Zip4jvmSuite.password).build())
                                                   .comment("password: " + new String(Zip4jvmSuite.password)).build();
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt.add(zip, Zip4jvmSuite.contentSrcDir, settings);
+        ZipIt.add(zip, contentDirSrc, settings);
 
         assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
         assertThatZipFile(zip, Zip4jvmSuite.password).exists().rootEntry().matches(TestDataAssert.zipRootDirAssert);

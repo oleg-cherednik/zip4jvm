@@ -79,7 +79,7 @@ public class UnzipEngineTest {
             zipFile.add(fileBentley);
             zipFile.add(fileFerrari);
             zipFile.add(fileWiesmann);
-            zipFile.add(Zip4jvmSuite.dirBikes.resolve(fileNameHonda));
+            zipFile.add(fileHonda);
         }
 
         assertThatDirectory(solidFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -128,9 +128,9 @@ public class UnzipEngineTest {
                                                          .splitSize(1024 * 1024).build();
 
         try (ZipFile.Writer zipFile = ZipFile.write(splitFile, zipFileSettings)) {
-            zipFile.add(Zip4jvmSuite.dirCars.resolve("bentley-continental.jpg"));
-            zipFile.add(Zip4jvmSuite.dirCars.resolve("ferrari-458-italia.jpg"));
-            zipFile.add(Zip4jvmSuite.dirCars.resolve("wiesmann-gt-mf5.jpg"));
+            zipFile.add(fileBentley);
+            zipFile.add(fileFerrari);
+            zipFile.add(fileWiesmann);
         }
 
         assertThatDirectory(splitFile.getParent()).exists().hasSubDirectories(0).hasFiles(3);

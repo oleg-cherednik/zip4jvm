@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertionsForClassTypes.assertThatDirectory;
 
@@ -41,7 +42,7 @@ public class ZipFolderSplitTest {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
         ZipFileSettings settings = ZipFileSettings.builder().entrySettingsProvider(fileName -> entrySettings).splitSize(SIZE_1MB).build();
 
-        ZipIt.add(zip, Zip4jvmSuite.contentSrcDir, settings);
+        ZipIt.add(zip, contentDirSrc, settings);
         assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(6);
         assertThat(Files.exists(zip)).isTrue();
         assertThat(Files.isRegularFile(zip)).isTrue();

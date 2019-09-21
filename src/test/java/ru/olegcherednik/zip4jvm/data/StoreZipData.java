@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
 import static ru.olegcherednik.zip4jvm.TestData.storeSolidAesZip;
 import static ru.olegcherednik.zip4jvm.TestData.storeSolidPkwareZip;
 import static ru.olegcherednik.zip4jvm.TestData.storeSolidZip;
@@ -41,7 +42,7 @@ public final class StoreZipData {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
         ZipFileSettings settings = ZipFileSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
 
-        ZipIt.add(storeSolidZip, Zip4jvmSuite.contentSrcDir, settings);
+        ZipIt.add(storeSolidZip, contentDirSrc, settings);
 
         assertThat(Files.exists(storeSolidZip)).isTrue();
         assertThat(Files.isRegularFile(storeSolidZip)).isTrue();
@@ -53,7 +54,7 @@ public final class StoreZipData {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
         ZipFileSettings settings = ZipFileSettings.builder().entrySettingsProvider(fileName -> entrySettings).splitSize(SIZE_1MB).build();
 
-        ZipIt.add(storeSplitZip, Zip4jvmSuite.contentSrcDir, settings);
+        ZipIt.add(storeSplitZip, contentDirSrc, settings);
         assertThat(Files.exists(storeSplitZip)).isTrue();
         assertThat(Files.isRegularFile(storeSplitZip)).isTrue();
         assertThatDirectory(storeSplitZip.getParent()).exists().hasSubDirectories(0).hasFiles(6);
@@ -67,7 +68,7 @@ public final class StoreZipData {
                                                   .entrySettingsProvider(fileName -> entrySettings)
                                                   .comment("password: " + new String(Zip4jvmSuite.password)).build();
 
-        ZipIt.add(storeSolidPkwareZip, Zip4jvmSuite.contentSrcDir, settings);
+        ZipIt.add(storeSolidPkwareZip, contentDirSrc, settings);
         assertThat(Files.exists(storeSolidPkwareZip)).isTrue();
         assertThat(Files.isRegularFile(storeSolidPkwareZip)).isTrue();
         assertThatDirectory(storeSolidPkwareZip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -80,7 +81,7 @@ public final class StoreZipData {
                                                           entrySettings.toBuilder().encryption(Encryption.PKWARE, fileName.toCharArray()).build())
                                                   .comment("password: <fileName>").build();
 
-        ZipIt.add(storeSolidAesZip, Zip4jvmSuite.contentSrcDir, settings);
+        ZipIt.add(storeSolidAesZip, contentDirSrc, settings);
         assertThat(Files.exists(storeSolidAesZip)).isTrue();
         assertThat(Files.isRegularFile(storeSolidAesZip)).isTrue();
         assertThatDirectory(storeSolidAesZip.getParent()).exists().hasSubDirectories(0).hasFiles(1);

@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
+
 /**
  * @author Oleg Cherednik
  * @since 06.04.2019
@@ -47,7 +49,7 @@ public class Zip64Test {
                                                                           .build())
                                                   .zip64(true).build();
         zipFile1 = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt.add(zipFile1, Zip4jvmSuite.contentSrcDir, settings);
+        ZipIt.add(zipFile1, contentDirSrc, settings);
 
         // TODO it seems it could be checked with commons-compress
 //        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -73,7 +75,7 @@ public class Zip64Test {
                                                   .zip64(true).build();
 
         zipFile2 = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt.add(zipFile2, Zip4jvmSuite.contentSrcDir, settings);
+        ZipIt.add(zipFile2, contentDirSrc, settings);
 
         // TODO it seems it could be checked with commons-compress
 //        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -99,7 +101,7 @@ public class Zip64Test {
                                                   .zip64(true).build();
 
         zipFile3 = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt.add(zipFile3, Zip4jvmSuite.contentSrcDir, settings);
+        ZipIt.add(zipFile3, contentDirSrc, settings);
 
         // TODO it seems it could be checked with commons-compress
 //        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);

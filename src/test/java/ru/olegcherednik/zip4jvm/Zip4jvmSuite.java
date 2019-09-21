@@ -5,17 +5,15 @@ import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import ru.olegcherednik.zip4jvm.data.DefalteZipData;
 import ru.olegcherednik.zip4jvm.data.StoreZipData;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
+import static ru.olegcherednik.zip4jvm.TestData.dirEmpty;
+import static ru.olegcherednik.zip4jvm.TestData.dirRoot;
+import static ru.olegcherednik.zip4jvm.TestData.dirSrc;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
 /**
@@ -25,17 +23,6 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
 @SuppressWarnings("FieldNamingConvention")
 public class Zip4jvmSuite {
 
-    //    public static final Path dirRoot = createTempDirectory("zip4jvm");
-    public static final Path dirRoot = Paths.get("d:/zip4jvm/foo");
-    public static final Path dirSrc = dirRoot.resolve("src");
-
-    public static final Path dirBikes = dirSrc.resolve("bikes");
-    public static final Path dirCars = dirSrc.resolve("cars");
-    public static final Path emptyDir = dirSrc.resolve("empty_dir");
-
-    public static final List<Path> contentSrcDir = collect(dirSrc, "bikes", "cars", "empty_dir", "empty_file.txt",
-            "mcdonnell-douglas-f15-eagle.jpg", "Oleg Cherednik.txt", "saint-petersburg.jpg", "sig-sauer-pistol.jpg");
-
     /** Password for encrypted zip */
     public static final char[] password = "1".toCharArray();
     /** Clear resources */
@@ -44,21 +31,6 @@ public class Zip4jvmSuite {
     public static final long SIZE_1MB = 1024 * 1024;
 
     private static final long time = System.currentTimeMillis();
-
-    private static Path createTempDirectory(String prefix) {
-        try {
-            return Files.createTempDirectory(prefix);
-        } catch(IOException e) {
-            throw new Zip4jvmException(e);
-        }
-    }
-
-    private static List<Path> collect(Path dir, String... fileNames) {
-        List<Path> paths = Arrays.stream(fileNames)
-                                 .map(dir::resolve)
-                                 .collect(Collectors.toList());
-        return Collections.unmodifiableList(paths);
-    }
 
     @BeforeSuite
     public void beforeSuite() throws IOException {
@@ -75,7 +47,7 @@ public class Zip4jvmSuite {
     }
 
     private static void copyTestData() throws IOException {
-        Files.createDirectories(emptyDir);
+        Files.createDirectories(dirEmpty);
 
         Path dataDir = Paths.get("src/test/resources/data").toAbsolutePath();
 

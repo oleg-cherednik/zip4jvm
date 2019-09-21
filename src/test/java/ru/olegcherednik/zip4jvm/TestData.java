@@ -37,16 +37,15 @@ public final class TestData {
     public static final String fileNameFerrari = "ferrari-458-italia.jpg";
     public static final String fileNameWiesmann = "wiesmann-gt-mf5.jpg";
 
-    public static final String fileNameEmptyFile = "empty_file.txt";
+    public static final String fileNameEmpty = "empty_file.txt";
     public static final String fileNameMcdonnelDouglas = "mcdonnell-douglas-f15-eagle.jpg";
     public static final String fileNameOlegCherednik = "Oleg Cherednik.txt";
     public static final String fileNameSaintPetersburg = "saint-petersburg.jpg";
     public static final String fileNameSigSauer = "sig-sauer-pistol.jpg";
 
-    public static final Path dirBikes = dirSrc.resolve("bikes");
-    public static final Path dirCars = dirSrc.resolve("cars");
-    public static final Path starWarsDir = dirSrc.resolve("Star Wars");
-    public static final Path emptyDir = dirSrc.resolve("empty_dir");
+    public static final Path dirBikes = dirSrc.resolve(dirNameBikes);
+    public static final Path dirCars = dirSrc.resolve(dirNameCars);
+    public static final Path dirEmpty = dirSrc.resolve(dirNameEmpty);
 
     public static final Path fileDucati = dirBikes.resolve(fileNameDucati);
     public static final Path fileHonda = dirBikes.resolve(fileNameHonda);
@@ -57,7 +56,7 @@ public final class TestData {
     public static final Path fileFerrari = dirCars.resolve(fileNameFerrari);
     public static final Path fileWiesmann = dirCars.resolve(fileNameWiesmann);
 
-    public static final Path fileEmptyFile = dirSrc.resolve(fileNameEmptyFile);
+    public static final Path fileEmpty = dirSrc.resolve(fileNameEmpty);
     public static final Path fileMcdonnelDouglas = dirSrc.resolve(fileNameMcdonnelDouglas);
     public static final Path fileOlegCherednik = dirSrc.resolve(fileNameOlegCherednik);
     public static final Path fileSaintPetersburg = dirSrc.resolve(fileNameSaintPetersburg);
@@ -65,8 +64,11 @@ public final class TestData {
 
     public static final List<Path> filesDirBikes = Arrays.asList(fileDucati, fileHonda, fileKawasaki, fileSuzuki);
     public static final List<Path> filesDirCars = Arrays.asList(fileBentley, fileFerrari, fileWiesmann);
-    public static final List<Path> filesDirSrc =
-            Arrays.asList(fileEmptyFile, fileMcdonnelDouglas, fileOlegCherednik, fileSaintPetersburg, fileSigSauer);
+    public static final List<Path> filesDirSrc = Arrays.asList(fileEmpty, fileMcdonnelDouglas, fileOlegCherednik, fileSaintPetersburg,
+            fileSigSauer);
+
+    public static final List<Path> contentDirSrc = Arrays.asList(dirBikes, dirCars, dirEmpty, fileEmpty, fileMcdonnelDouglas, fileOlegCherednik,
+            fileSaintPetersburg, fileSigSauer);
 
     // store
     public static final Path storeSolidZip = dirRoot.resolve("store/solid/off/src.zip");

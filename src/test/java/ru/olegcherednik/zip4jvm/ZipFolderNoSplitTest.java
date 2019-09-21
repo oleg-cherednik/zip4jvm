@@ -15,6 +15,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static ru.olegcherednik.zip4jvm.TestData.dirCars;
+import static ru.olegcherednik.zip4jvm.TestData.dirEmpty;
+
 /**
  * @author Oleg Cherednik
  * @since 14.03.2019
@@ -42,7 +45,7 @@ public class ZipFolderNoSplitTest {
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
                                                   .build();
-        ZipIt.add(zip, Zip4jvmSuite.dirCars, settings);
+        ZipIt.add(zip, dirCars, settings);
 
         Zip4jvmAssertions.assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
         Zip4jvmAssertions.assertThatZipFile(zip).exists().rootEntry().hasSubDirectories(1).hasFiles(0);
@@ -79,7 +82,7 @@ public class ZipFolderNoSplitTest {
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
                                                   .build();
-        ZipIt.add(zip, Zip4jvmSuite.emptyDir, settings);
+        ZipIt.add(zip, dirEmpty, settings);
 
         Zip4jvmAssertions.assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
         Zip4jvmAssertions.assertThatZipFile(zip).exists().rootEntry().hasSubDirectories(3).hasFiles(0);

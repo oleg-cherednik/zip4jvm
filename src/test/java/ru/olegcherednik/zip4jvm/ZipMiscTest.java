@@ -23,6 +23,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static ru.olegcherednik.zip4jvm.TestData.deflateSolidPkwareZip;
 import static ru.olegcherednik.zip4jvm.TestData.deflateSolidZip;
 import static ru.olegcherednik.zip4jvm.TestData.deflateSplitZip;
+import static ru.olegcherednik.zip4jvm.TestData.dirCars;
+import static ru.olegcherednik.zip4jvm.TestData.dirSrc;
+import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
+import static ru.olegcherednik.zip4jvm.TestData.fileFerrari;
+import static ru.olegcherednik.zip4jvm.TestData.fileWiesmann;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirCars;
 import static ru.olegcherednik.zip4jvm.TestData.storeSolidZip;
 import static ru.olegcherednik.zip4jvm.TestData.storeSplitZip;
@@ -66,11 +71,8 @@ public class ZipMiscTest {
                                                                           .build())
                                                   .build();
 
-        Path bentley = Zip4jvmSuite.dirCars.resolve("bentley-continental.jpg");
-        Path ferrari = Zip4jvmSuite.dirCars.resolve("ferrari-458-italia.jpg");
-        Path wiesmann = Zip4jvmSuite.dirCars.resolve("wiesmann-gt-mf5.jpg");
-        Path notExisted = Zip4jvmSuite.dirCars.resolve(UUID.randomUUID().toString());
-        List<Path> files = Arrays.asList(bentley, ferrari, wiesmann, notExisted);
+        Path notExisted = dirCars.resolve(UUID.randomUUID().toString());
+        List<Path> files = Arrays.asList(fileBentley, fileFerrari, fileWiesmann, notExisted);
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
@@ -100,7 +102,7 @@ public class ZipMiscTest {
                                                                           .build())
                                                   .build();
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt.add(zip, Collections.singleton(Zip4jvmSuite.dirSrc.resolve("Oleg Cherednik.txt")), settings);
+        ZipIt.add(zip, Collections.singleton(dirSrc.resolve("Oleg Cherednik.txt")), settings);
 
         assertThat(ZipMisc.isSplit(storeSplitZip)).isTrue();
     }
@@ -112,7 +114,7 @@ public class ZipMiscTest {
         assertThatZipFile(zip).exists().rootEntry().matches(TestDataAssert.zipRootDirAssert);
 
         List<String> entryNames = filesDirCars.stream()
-                                              .map(file -> Zip4jvmSuite.dirSrc.relativize(file).toString())
+                                              .map(file -> dirSrc.relativize(file).toString())
                                               .collect(Collectors.toList());
 
         ZipMisc.removeEntry(zip, entryNames);
@@ -125,7 +127,7 @@ public class ZipMiscTest {
         Files.copy(storeSolidZip, zip);
         assertThatZipFile(zip).exists().rootEntry().matches(TestDataAssert.zipRootDirAssert);
 
-        ZipMisc.removeEntry(zip, Zip4jvmSuite.dirSrc.relativize(Zip4jvmSuite.dirCars).toString());
+        ZipMisc.removeEntry(zip, dirSrc.relativize(dirCars).toString());
         assertThat(ZipMisc.getEntryNames(zip)).hasSize(10);
     }
 }
