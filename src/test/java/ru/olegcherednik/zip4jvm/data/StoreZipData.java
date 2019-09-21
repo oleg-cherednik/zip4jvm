@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.data;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import ru.olegcherednik.zip4jvm.TestDataAssert;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.Compression;
@@ -20,6 +19,7 @@ import static ru.olegcherednik.zip4jvm.TestData.storeSolidAesZip;
 import static ru.olegcherednik.zip4jvm.TestData.storeSolidPkwareZip;
 import static ru.olegcherednik.zip4jvm.TestData.storeSolidZip;
 import static ru.olegcherednik.zip4jvm.TestData.storeSplitZip;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.zipRootDirAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
@@ -47,7 +47,7 @@ public final class StoreZipData {
         assertThat(Files.exists(storeSolidZip)).isTrue();
         assertThat(Files.isRegularFile(storeSolidZip)).isTrue();
         assertThatDirectory(storeSolidZip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(storeSolidZip).exists().rootEntry().matches(TestDataAssert.zipRootDirAssert);
+        assertThatZipFile(storeSolidZip).exists().rootEntry().matches(zipRootDirAssert);
     }
 
     private static void createStoreSplitZip() throws IOException {
@@ -58,6 +58,7 @@ public final class StoreZipData {
         assertThat(Files.exists(storeSplitZip)).isTrue();
         assertThat(Files.isRegularFile(storeSplitZip)).isTrue();
         assertThatDirectory(storeSplitZip.getParent()).exists().hasSubDirectories(0).hasFiles(6);
+        assertThatZipFile(storeSplitZip).exists().rootEntry().matches(zipRootDirAssert);
     }
 
     private static void createStoreSolidPkwareZip() throws IOException {

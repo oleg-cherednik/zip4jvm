@@ -5,9 +5,21 @@
 [![Known Vulnerabilities](https://snyk.io//test/github/oleg-cherednik/zip4jvm/badge.svg?targetFile=build.gradle)](https://snyk.io//test/github/oleg-cherednik/zip4jvm?targetFile=build.gradle)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/7b6b963fef254ff4b00b8be0304e829b)](https://www.codacy.com/app/oleg-cherednik/zip4jvm?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=oleg-cherednik/zip4jvm&amp;utm_campaign=Badge_Grade)
 
-# zip4jvm
+zip4jvm - a java library for working with zip files
+=====================
 
-Zip files support for JVM application
+## Features
+
+* Add regular files or directories to new or existed zip archive;
+* Extract regular files or directories from zip archive;
+* [PKWare](https://en.wikipedia.org/wiki/PKWare) and [AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard) encryption algorithms support;
+* Store and [Deflate](https://en.wikipedia.org/wiki/DEFLATE) compression support;  
+* Individual settings for each zip entry (i.e. some of files can be encrypted, and some - not);
+* Streaming support for adding and extracting; 
+* Read/Write password protected Zip files and streams;
+* ZIP64 format support;
+* Multi-volume zip archive support (i.e. `filename.zip`, `filename.z01`, `filename.z02`);
+* Unicode for comments and file names.
 
 ### Maven
 

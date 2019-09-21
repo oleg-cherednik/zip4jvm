@@ -19,8 +19,10 @@ import static ru.olegcherednik.zip4jvm.TestData.deflateSolidAesZip;
 import static ru.olegcherednik.zip4jvm.TestData.deflateSolidPkwareZip;
 import static ru.olegcherednik.zip4jvm.TestData.deflateSolidZip;
 import static ru.olegcherednik.zip4jvm.TestData.deflateSplitZip;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.zipRootDirAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
  * @author Oleg Cherednik
@@ -44,6 +46,7 @@ public final class DefalteZipData {
         assertThat(Files.exists(deflateSolidZip)).isTrue();
         assertThat(Files.isRegularFile(deflateSolidZip)).isTrue();
         assertThatDirectory(deflateSolidZip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatZipFile(deflateSolidZip).exists().rootEntry().matches(zipRootDirAssert);
     }
 
     private static void createDeflateSplitZip() throws IOException {

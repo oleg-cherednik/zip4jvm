@@ -56,10 +56,10 @@ class ZipFileDecorator {
 
     public InputStream getInputStream(@NonNull ZipEntry entry) {
         try {
-            ZipFile zipFile = new ZipFile(zip.toFile());
-            InputStream delegate = zipFile.getInputStream(entry);
-
             return new InputStream() {
+                private final ZipFile zipFile = new ZipFile(zip.toFile());
+                private final InputStream delegate = zipFile.getInputStream(entry);
+
                 @Override
                 public int available() throws IOException {
                     return delegate.available();
@@ -67,7 +67,6 @@ class ZipFileDecorator {
 
                 @Override
                 public int read() throws IOException {
-                    available();
                     return delegate.read();
                 }
 
