@@ -51,7 +51,7 @@ public class EncryptionAesTest {
         ZipIt.add(zip, contentDirSrc, settings);
 
         assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(zip, Zip4jvmSuite.password).exists().root().matches(TestDataAssert.zipRootDirAssert);
+        assertThatZipFile(zip, Zip4jvmSuite.password).exists().root().matches(TestDataAssert.zipDirRootAssert);
     }
 
 //    @Test

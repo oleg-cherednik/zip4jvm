@@ -55,7 +55,7 @@ public class CompressionStoreTest {
         ZipIt.add(zip, filesDirCars, settings);
 
         assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(zip).root().matches(TestDataAssert.zipCarsDirAssert);
+        assertThatZipFile(zip).root().matches(TestDataAssert.zipDirCarsAssert);
     }
 
     public void shouldCreateSplitZipWithFilesWhenStoreCompression() throws IOException {
@@ -85,7 +85,7 @@ public class CompressionStoreTest {
 
         assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
         assertThatZipFile(zip).exists().root().hasSubDirectories(1).hasFiles(0);
-        assertThatZipFile(zip).directory("cars/").matches(TestDataAssert.zipCarsDirAssert);
+        assertThatZipFile(zip).directory("cars/").matches(TestDataAssert.zipDirCarsAssert);
     }
 
     public void shouldCreateSplitZipWithEntireFolderWhenStoreCompression() throws IOException {
@@ -126,7 +126,7 @@ public class CompressionStoreTest {
         ZipIt.add(zip, filesDirCars, settings);
 
         assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(zip, Zip4jvmSuite.password).root().matches(TestDataAssert.zipCarsDirAssert);
+        assertThatZipFile(zip, Zip4jvmSuite.password).root().matches(TestDataAssert.zipDirCarsAssert);
 
         Path dirUnzip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("unzip");
         UnzipIt.extract(zip, dirUnzip, fileName -> Zip4jvmSuite.password);
@@ -145,7 +145,7 @@ public class CompressionStoreTest {
         ZipIt.add(zip, filesDirCars, settings);
 
         assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(zip, Zip4jvmSuite.password).root().matches(TestDataAssert.zipCarsDirAssert);
+        assertThatZipFile(zip, Zip4jvmSuite.password).root().matches(TestDataAssert.zipDirCarsAssert);
 
         Path dirUnzip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("unzip");
         UnzipIt.extract(zip, dirUnzip, fileName -> Zip4jvmSuite.password);

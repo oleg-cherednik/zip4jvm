@@ -1,11 +1,10 @@
 package ru.olegcherednik.zip4jvm.assertj;
 
 import org.apache.commons.io.FilenameUtils;
+import org.assertj.core.internal.Failures;
 
 import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Oleg Cherednik
@@ -18,12 +17,23 @@ public class AbstractZipEntryDirectoryAssert<S extends AbstractZipEntryDirectory
     }
 
     public S hasSubDirectories(int expected) {
-        assertThat(getFoldersAmount()).isEqualTo(expected);
+        long actual = getFoldersAmount();
+
+        if (actual != expected)
+            throw Failures.instance().failure(
+                    String.format("Zip directory '%s' contains illegal amount of sub directories: actual - '%d', expected - '%d'",
+                            this.actual, actual, expected));
+
         return myself;
     }
 
     public S hasFiles(int expected) {
-        assertThat(getRegularFilesAmount()).isEqualTo(expected);
+        long actual = getRegularFilesAmount();
+
+        if (actual != expected)
+            throw Failures.instance().failure(String.format("Zip directory '%s' contains illegal amount of files: actual - '%d', expected - '%d'",
+                    this.actual, actual, expected));
+
         return myself;
     }
 

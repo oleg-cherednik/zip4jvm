@@ -68,12 +68,12 @@ public final class TestDataAssert {
 
     public static final Consumer<AbstractDirectoryAssert<?>> emptyDirAssert = dir -> dir.exists().hasSubDirectories(0).hasFiles(0);
 
-    public static final Consumer<AbstractZipEntryDirectoryAssert<?>> zipRootDirAssert = dir -> {
+    public static final Consumer<AbstractZipEntryDirectoryAssert<?>> zipDirRootAssert = dir -> {
         dir.exists().hasSubDirectories(3).hasFiles(5);
 
-        TestDataAssert.zipBikesDirAssert.accept(dir.directory(zipDirNameBikes));
-        TestDataAssert.zipCarsDirAssert.accept(dir.directory(zipDirNameCars));
-        TestDataAssert.zipEmptyDirAssert.accept(dir.directory(zipDirNameEmpty));
+        TestDataAssert.zipDirBikesAssert.accept(dir.directory(zipDirNameBikes));
+        TestDataAssert.zipDirCarsAssert.accept(dir.directory(zipDirNameCars));
+        TestDataAssert.zipDirEmptyAssert.accept(dir.directory(zipDirNameEmpty));
 
         dir.file("mcdonnell-douglas-f15-eagle.jpg").exists().hasSize(624_746);
         dir.file("saint-petersburg.jpg").exists().hasSize(1_074_836);
@@ -82,7 +82,7 @@ public final class TestDataAssert {
 //        dir.file("Oleg Cherednik.txt").exists().hasContent("Oleg Cherednik\nОлег Чередник").hasSize(41);
     };
 
-    public static final Consumer<AbstractZipEntryDirectoryAssert<?>> zipBikesDirAssert = dir -> {
+    public static final Consumer<AbstractZipEntryDirectoryAssert<?>> zipDirBikesAssert = dir -> {
         dir.exists().hasSubDirectories(0).hasFiles(4);
         dir.file(fileNameDucati).exists().hasSize(293_823);
         dir.file(fileNameHonda).exists().hasSize(154_591);
@@ -90,14 +90,14 @@ public final class TestDataAssert {
         dir.file(fileNameSuzuki).exists().hasSize(287_349);
     };
 
-    public static final Consumer<AbstractZipEntryDirectoryAssert<?>> zipCarsDirAssert = dir -> {
+    public static final Consumer<AbstractZipEntryDirectoryAssert<?>> zipDirCarsAssert = dir -> {
         dir.exists().hasSubDirectories(0).hasFiles(3);
-        dir.file("bentley-continental.jpg").exists().hasSize(1_395_362);
-        dir.file("ferrari-458-italia.jpg").exists().hasSize(320_894);
-        dir.file("wiesmann-gt-mf5.jpg").exists().hasSize(729_633);
+        dir.file(fileNameBentley).exists().hasSize(1_395_362);
+        dir.file(fileNameFerrari).exists().hasSize(320_894);
+        dir.file(fileNameWiesmann).exists().hasSize(729_633);
     };
 
-    public static final Consumer<AbstractZipEntryDirectoryAssert<?>> zipEmptyDirAssert = dir -> dir.exists().hasSubDirectories(0).hasFiles(0);
+    public static final Consumer<AbstractZipEntryDirectoryAssert<?>> zipDirEmptyAssert = dir -> dir.exists().hasSubDirectories(0).hasFiles(0);
 
     public static void copyLarge(InputStream in, Path dst) throws IOException {
         try (OutputStream out = new FileOutputStream(dst.toFile())) {
