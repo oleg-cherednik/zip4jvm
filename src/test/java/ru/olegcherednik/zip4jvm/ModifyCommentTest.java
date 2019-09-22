@@ -18,7 +18,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static ru.olegcherednik.zip4jvm.TestData.deflateSolidZip;
+import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
 import static ru.olegcherednik.zip4jvm.TestData.fileOlegCherednik;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
@@ -86,7 +86,7 @@ public class ModifyCommentTest {
     public void shouldSetCommentWithMaxLength() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         Files.createDirectories(zip.getParent());
-        Files.copy(deflateSolidZip, zip);
+        Files.copy(zipDeflateSolid, zip);
 
         ZipMisc.setComment(zip, StringUtils.repeat("_", EndCentralDirectory.MAX_COMMENT_LENGTH));
         assertThatZipFile(zip).hasCommentSize(EndCentralDirectory.MAX_COMMENT_LENGTH);
@@ -96,7 +96,7 @@ public class ModifyCommentTest {
     public void shouldThrowExceptionWhenCommentIsOverMaxLength() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         Files.createDirectories(zip.getParent());
-        Files.copy(deflateSolidZip, zip);
+        Files.copy(zipDeflateSolid, zip);
 
         assertThatThrownBy(() -> ZipMisc.setComment(zip, StringUtils.repeat("_", EndCentralDirectory.MAX_COMMENT_LENGTH + 1)))
                 .isInstanceOf(Zip4jvmException.class);

@@ -20,17 +20,17 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static ru.olegcherednik.zip4jvm.TestData.deflateSolidPkwareZip;
-import static ru.olegcherednik.zip4jvm.TestData.deflateSolidZip;
-import static ru.olegcherednik.zip4jvm.TestData.deflateSplitZip;
+import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolidPkware;
+import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
+import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSplit;
 import static ru.olegcherednik.zip4jvm.TestData.dirCars;
 import static ru.olegcherednik.zip4jvm.TestData.dirSrc;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileFerrari;
 import static ru.olegcherednik.zip4jvm.TestData.fileWiesmann;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirCars;
-import static ru.olegcherednik.zip4jvm.TestData.storeSolidZip;
-import static ru.olegcherednik.zip4jvm.TestData.storeSplitZip;
+import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolid;
+import static ru.olegcherednik.zip4jvm.TestData.zipStoreSplit;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
@@ -55,11 +55,11 @@ public class ZipMiscTest {
     }
 
     public void shouldRetrieveAllEntryNamesForExistedZip() throws IOException {
-        assertThat(ZipMisc.getEntryNames(deflateSolidZip)).hasSize(13);
+        assertThat(ZipMisc.getEntryNames(zipDeflateSolid)).hasSize(13);
     }
 
     public void shouldRetrieveAllEntryNamesForExistedEncryptedZip() throws IOException {
-        Path zip = Zip4jvmSuite.copy(rootDir, deflateSolidPkwareZip);
+        Path zip = Zip4jvmSuite.copy(rootDir, zipDeflateSolidPkware);
         assertThat(ZipMisc.getEntryNames(zip)).hasSize(13);
     }
 
@@ -80,17 +80,17 @@ public class ZipMiscTest {
     }
 
     public void shouldMergeSplitZip() throws IOException {
-        assertThat(ZipMisc.isSplit(deflateSplitZip)).isTrue();
+        assertThat(ZipMisc.isSplit(zipDeflateSplit)).isTrue();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipMisc.merge(deflateSplitZip, zip);
+        ZipMisc.merge(zipDeflateSplit, zip);
 
         assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
         assertThatZipFile(zip).exists().root().matches(TestDataAssert.zipDirRootAssert);
     }
 
     public void shouldRetrieveTrueWhenSplitZipWithMultipleDisks() throws IOException {
-        assertThat(ZipMisc.isSplit(storeSplitZip)).isTrue();
+        assertThat(ZipMisc.isSplit(zipStoreSplit)).isTrue();
     }
 
     public void shouldRetrieveTrueWhenSplitZipWithOneDisk() throws IOException {
@@ -104,13 +104,13 @@ public class ZipMiscTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt.add(zip, Collections.singleton(dirSrc.resolve("Oleg Cherednik.txt")), settings);
 
-        assertThat(ZipMisc.isSplit(storeSplitZip)).isTrue();
+        assertThat(ZipMisc.isSplit(zipStoreSplit)).isTrue();
     }
 
     public void shouldRemoveGivenFilesFromExistedZip() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         Files.createDirectories(zip.getParent());
-        Files.copy(storeSolidZip, zip);
+        Files.copy(zipStoreSolid, zip);
         assertThatZipFile(zip).exists().root().matches(TestDataAssert.zipDirRootAssert);
 
         List<String> entryNames = filesDirCars.stream()
@@ -124,7 +124,7 @@ public class ZipMiscTest {
     public void shouldRemoveFolderFromExistedZip() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         Files.createDirectories(zip.getParent());
-        Files.copy(storeSolidZip, zip);
+        Files.copy(zipStoreSolid, zip);
         assertThatZipFile(zip).exists().root().matches(TestDataAssert.zipDirRootAssert);
 
         ZipMisc.removeEntry(zip, dirSrc.relativize(dirCars).toString());

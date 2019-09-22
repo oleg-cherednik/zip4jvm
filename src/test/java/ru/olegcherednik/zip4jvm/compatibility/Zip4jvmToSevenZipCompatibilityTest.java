@@ -20,9 +20,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 
-import static ru.olegcherednik.zip4jvm.TestData.deflateSolidPkwareZip;
-import static ru.olegcherednik.zip4jvm.TestData.deflateSolidZip;
-import static ru.olegcherednik.zip4jvm.TestData.storeSolidZip;
+import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolidPkware;
+import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
+import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolid;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
 /**
@@ -39,7 +39,7 @@ public class Zip4jvmToSevenZipCompatibilityTest {
         String password = new String(Zip4jvmSuite.password);
         Path parentDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        for (Path zip4jFile : Arrays.asList(storeSolidZip, deflateSolidZip, deflateSolidPkwareZip)) {
+        for (Path zip4jFile : Arrays.asList(zipStoreSolid, zipDeflateSolid, zipDeflateSolidPkware)) {
             Path dstDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(parentDir, zip4jFile);
 
             try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(zip4jFile.toFile(), "r"));

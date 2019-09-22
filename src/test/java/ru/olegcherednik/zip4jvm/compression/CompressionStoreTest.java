@@ -18,10 +18,10 @@ import java.nio.file.Path;
 import static ru.olegcherednik.zip4jvm.TestData.dirCars;
 import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirCars;
-import static ru.olegcherednik.zip4jvm.TestData.storeSolidAesZip;
-import static ru.olegcherednik.zip4jvm.TestData.storeSolidPkwareZip;
-import static ru.olegcherednik.zip4jvm.TestData.storeSolidZip;
-import static ru.olegcherednik.zip4jvm.TestData.storeSplitZip;
+import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolidAes;
+import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolidPkware;
+import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolid;
+import static ru.olegcherednik.zip4jvm.TestData.zipStoreSplit;
 import static ru.olegcherednik.zip4jvm.TestData.zipDirNameCars;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirSrcAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
@@ -99,20 +99,20 @@ public class CompressionStoreTest {
 
     public void shouldUnzipWhenStoreCompression() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.extract(storeSolidZip, destDir);
+        UnzipIt.extract(zipStoreSolid, destDir);
         assertThatDirectory(destDir).matches(dirSrcAssert);
     }
 
     public void shouldUnzipWhenSplitAndStoreCompression() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.extract(storeSplitZip, destDir);
+        UnzipIt.extract(zipStoreSplit, destDir);
         assertThatDirectory(destDir).matches(dirSrcAssert);
     }
 
     public void shouldUnzipWhenWhenStoreCompressionAndPkwareEncryption() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        UnzipIt.extract(storeSolidPkwareZip, destDir, dirNameCars, fileName -> password);
+        UnzipIt.extract(zipStoreSolidPkware, destDir, dirNameCars, fileName -> password);
         assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);
         assertThatDirectory(destDir.resolve(dirNameCars)).matches(dirCarsAssert);
     }
@@ -120,7 +120,7 @@ public class CompressionStoreTest {
     public void shouldUnzipWhenWhenStoreCompressionAndAesEncryption() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        UnzipIt.extract(storeSolidAesZip, destDir, dirNameCars, String::toCharArray);
+        UnzipIt.extract(zipStoreSolidAes, destDir, dirNameCars, String::toCharArray);
         assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);
         assertThatDirectory(destDir.resolve(dirNameCars)).matches(dirCarsAssert);
     }

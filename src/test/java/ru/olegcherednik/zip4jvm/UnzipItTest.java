@@ -11,8 +11,8 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
-import static ru.olegcherednik.zip4jvm.TestData.deflateSolidZip;
-import static ru.olegcherednik.zip4jvm.TestData.deflateSplitZip;
+import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
+import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSplit;
 import static ru.olegcherednik.zip4jvm.TestData.dirNameBikes;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
@@ -40,7 +40,7 @@ public class UnzipItTest {
     public void shouldUnzipRequiredFiles() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTme(rootDir);
         List<String> fileNames = Arrays.asList("saint-petersburg.jpg", "cars/bentley-continental.jpg");
-        UnzipIt.extract(deflateSolidZip, destDir, fileNames);
+        UnzipIt.extract(zipDeflateSolid, destDir, fileNames);
 
         assertThatDirectory(destDir).exists().hasSubDirectories(0).hasFiles(2);
         assertThatFile(destDir.resolve("saint-petersburg.jpg")).exists().isImage().hasSize(1_074_836);
@@ -52,7 +52,7 @@ public class UnzipItTest {
     public void shouldUnzipRequiredFilesWhenSplit() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTme(rootDir);
         List<String> fileNames = Arrays.asList("saint-petersburg.jpg", "cars/bentley-continental.jpg");
-        UnzipIt.extract(deflateSplitZip, destDir, fileNames);
+        UnzipIt.extract(zipDeflateSplit, destDir, fileNames);
 
         assertThatDirectory(destDir).exists().hasSubDirectories(0).hasFiles(2);
         assertThatFile(destDir.resolve("saint-petersburg.jpg")).exists().isImage().hasSize(1_074_836);
@@ -61,7 +61,7 @@ public class UnzipItTest {
 
     public void shouldUnzipOneFile() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTme(rootDir);
-        UnzipIt.extract(deflateSolidZip, destDir, "cars/ferrari-458-italia.jpg");
+        UnzipIt.extract(zipDeflateSolid, destDir, "cars/ferrari-458-italia.jpg");
 
         assertThatDirectory(destDir).exists().hasSubDirectories(0).hasFiles(1);
         assertThatFile(destDir.resolve("ferrari-458-italia.jpg")).exists().isImage().hasSize(320_894);
@@ -69,7 +69,7 @@ public class UnzipItTest {
 
     public void shouldUnzipFolder() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTme(rootDir);
-        UnzipIt.extract(deflateSolidZip, destDir, dirNameBikes);
+        UnzipIt.extract(zipDeflateSolid, destDir, dirNameBikes);
 
         assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);
         assertThatDirectory(destDir.resolve(dirNameBikes)).matches(TestDataAssert.dirBikesAssert);

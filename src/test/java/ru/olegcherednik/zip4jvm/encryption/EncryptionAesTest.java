@@ -23,8 +23,8 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirCars;
-import static ru.olegcherednik.zip4jvm.TestData.storeSolidAesZip;
-import static ru.olegcherednik.zip4jvm.TestData.storeSplitAesZip;
+import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolidAes;
+import static ru.olegcherednik.zip4jvm.TestData.zipStoreSplitAes;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirSrcAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.zipDirCarsAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.zipDirRootAssert;
@@ -128,21 +128,21 @@ public class EncryptionAesTest {
     public void shouldUnzipWhenStoreSolidAes() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        UnzipIt.extract(storeSolidAesZip, destDir, String::toCharArray);
+        UnzipIt.extract(zipStoreSolidAes, destDir, String::toCharArray);
         assertThatDirectory(destDir).matches(dirSrcAssert);
     }
 
     public void shouldUnzipWhenStoreSplitAes() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        UnzipIt.extract(storeSplitAesZip, destDir, String::toCharArray);
+        UnzipIt.extract(zipStoreSplitAes, destDir, String::toCharArray);
         assertThatDirectory(destDir).matches(dirSrcAssert);
     }
 
     public void shouldThrowExceptionWhenUnzipAesEncryptedZipWithIncorrectPassword() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        assertThatThrownBy(() -> UnzipIt.extract(storeSplitAesZip, destDir, fileName -> UUID.randomUUID().toString().toCharArray()))
+        assertThatThrownBy(() -> UnzipIt.extract(zipStoreSplitAes, destDir, fileName -> UUID.randomUUID().toString().toCharArray()))
                 .isExactlyInstanceOf(IncorrectPasswordException.class);
     }
 }

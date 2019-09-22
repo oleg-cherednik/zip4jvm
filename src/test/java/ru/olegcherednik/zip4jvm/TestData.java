@@ -71,18 +71,18 @@ public final class TestData {
             fileSaintPetersburg, fileSigSauer);
 
     // store
-    public static final Path storeSolidZip = dirRoot.resolve("store/solid/off/src.zip");
-    public static final Path storeSolidPkwareZip = dirRoot.resolve("store/solid/pkware/src.zip");
-    public static final Path storeSolidAesZip = dirRoot.resolve("store/solid/aes/src.zip");
-    public static final Path storeSplitZip = dirRoot.resolve("store/split/off/src.zip");
-    public static final Path storeSplitPkwareZip = dirRoot.resolve("store/split/pkware/src.zip");
-    public static final Path storeSplitAesZip = dirRoot.resolve("store/split/aes/src.zip");
+    public static final Path zipStoreSolid = dirRoot.resolve("store/solid/off/src.zip");
+    public static final Path zipStoreSolidPkware = dirRoot.resolve("store/solid/pkware/src.zip");
+    public static final Path zipStoreSolidAes = dirRoot.resolve("store/solid/aes/src.zip");
+    public static final Path zipStoreSplit = dirRoot.resolve("store/split/off/src.zip");
+    public static final Path zipStoreSplitPkware = dirRoot.resolve("store/split/pkware/src.zip");
+    public static final Path zipStoreSplitAes = dirRoot.resolve("store/split/aes/src.zip");
 
     // deflate
-    public static final Path deflateSolidZip = dirRoot.resolve("deflate/solid/off/src.zip");
-    public static final Path deflateSplitZip = dirRoot.resolve("deflate/split/off/src.zip");
-    public static final Path deflateSolidPkwareZip = dirRoot.resolve("deflate/solid/pkware/src.zip");
-    public static final Path deflateSolidAesZip = dirRoot.resolve("deflate/solid/aes/src.zip");
+    public static final Path zipDeflateSolid = dirRoot.resolve("deflate/solid/off/src.zip");
+    public static final Path zipDeflateSplit = dirRoot.resolve("deflate/split/off/src.zip");
+    public static final Path zipDeflateSolidPkware = dirRoot.resolve("deflate/solid/pkware/src.zip");
+    public static final Path zipDeflateSolidAes = dirRoot.resolve("deflate/solid/aes/src.zip");
 
     // winrar
     public static final Path winRarStoreSolidZip = Paths.get("src/test/resources/winrar/store_solid_off.zip").toAbsolutePath();

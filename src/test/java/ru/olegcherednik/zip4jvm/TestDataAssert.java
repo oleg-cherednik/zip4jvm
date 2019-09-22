@@ -75,10 +75,10 @@ public final class TestDataAssert {
         TestDataAssert.zipDirCarsAssert.accept(dir.directory(zipDirNameCars));
         TestDataAssert.zipDirEmptyAssert.accept(dir.directory(zipDirNameEmpty));
 
-        dir.file("mcdonnell-douglas-f15-eagle.jpg").exists().hasSize(624_746);
-        dir.file("saint-petersburg.jpg").exists().hasSize(1_074_836);
-        dir.file("sig-sauer-pistol.jpg").exists().hasSize(431_478);
-        dir.file("empty_file.txt").exists().hasEmptyContent().hasSize(0);
+        dir.file(fileNameMcdonnelDouglas).exists().hasSize(624_746);
+        dir.file(fileNameSaintPetersburg).exists().hasSize(1_074_836);
+        dir.file(fileNameSigSauer).exists().hasSize(431_478);
+        dir.file(fileNameEmpty).exists().hasEmptyContent().hasSize(0);
 //        dir.file("Oleg Cherednik.txt").exists().hasContent("Oleg Cherednik\nОлег Чередник").hasSize(41);
     };
 

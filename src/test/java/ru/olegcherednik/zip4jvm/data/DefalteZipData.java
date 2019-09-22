@@ -14,10 +14,10 @@ import java.nio.file.Files;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
-import static ru.olegcherednik.zip4jvm.TestData.deflateSolidAesZip;
-import static ru.olegcherednik.zip4jvm.TestData.deflateSolidPkwareZip;
-import static ru.olegcherednik.zip4jvm.TestData.deflateSolidZip;
-import static ru.olegcherednik.zip4jvm.TestData.deflateSplitZip;
+import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolidAes;
+import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolidPkware;
+import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
+import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSplit;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.zipDirRootAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
@@ -43,21 +43,21 @@ public final class DefalteZipData {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
         ZipFileSettings settings = ZipFileSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
 
-        ZipIt.add(deflateSolidZip, contentDirSrc, settings);
-        assertThat(Files.exists(deflateSolidZip)).isTrue();
-        assertThat(Files.isRegularFile(deflateSolidZip)).isTrue();
-        assertThatDirectory(deflateSolidZip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(deflateSolidZip).exists().root().matches(zipDirRootAssert);
+        ZipIt.add(zipDeflateSolid, contentDirSrc, settings);
+        assertThat(Files.exists(zipDeflateSolid)).isTrue();
+        assertThat(Files.isRegularFile(zipDeflateSolid)).isTrue();
+        assertThatDirectory(zipDeflateSolid.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatZipFile(zipDeflateSolid).exists().root().matches(zipDirRootAssert);
     }
 
     private static void createDeflateSplitZip() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
         ZipFileSettings settings = ZipFileSettings.builder().entrySettingsProvider(fileName -> entrySettings).splitSize(SIZE_1MB).build();
 
-        ZipIt.add(deflateSplitZip, contentDirSrc, settings);
-        assertThat(Files.exists(deflateSplitZip)).isTrue();
-        assertThat(Files.isRegularFile(deflateSplitZip)).isTrue();
-        assertThatDirectory(deflateSplitZip.getParent()).exists().hasSubDirectories(0).hasFiles(6);
+        ZipIt.add(zipDeflateSplit, contentDirSrc, settings);
+        assertThat(Files.exists(zipDeflateSplit)).isTrue();
+        assertThat(Files.isRegularFile(zipDeflateSplit)).isTrue();
+        assertThatDirectory(zipDeflateSplit.getParent()).exists().hasSubDirectories(0).hasFiles(6);
     }
 
     private static void createDeflateSolidPkwareZip() throws IOException {
@@ -68,11 +68,11 @@ public final class DefalteZipData {
                                                   .entrySettingsProvider(fileName -> entrySettings)
                                                   .comment("password: " + passwordStr).build();
 
-        ZipIt.add(deflateSolidPkwareZip, contentDirSrc, settings);
-        assertThat(Files.exists(deflateSolidPkwareZip)).isTrue();
-        assertThat(Files.isRegularFile(deflateSolidPkwareZip)).isTrue();
-        assertThatDirectory(deflateSolidPkwareZip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(deflateSolidPkwareZip, password).exists().root().matches(zipDirRootAssert);
+        ZipIt.add(zipDeflateSolidPkware, contentDirSrc, settings);
+        assertThat(Files.exists(zipDeflateSolidPkware)).isTrue();
+        assertThat(Files.isRegularFile(zipDeflateSolidPkware)).isTrue();
+        assertThatDirectory(zipDeflateSolidPkware.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatZipFile(zipDeflateSolidPkware, password).exists().root().matches(zipDirRootAssert);
     }
 
     private static void createDeflateSolidAesZip() throws IOException {
@@ -82,10 +82,10 @@ public final class DefalteZipData {
                                                           entrySettings.toBuilder().encryption(Encryption.AES_256, fileName.toCharArray()).build())
                                                   .comment("password: <fileName>").build();
 
-        ZipIt.add(deflateSolidAesZip, contentDirSrc, settings);
-        assertThat(Files.exists(deflateSolidAesZip)).isTrue();
-        assertThat(Files.isRegularFile(deflateSolidAesZip)).isTrue();
-        assertThatDirectory(deflateSolidAesZip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        ZipIt.add(zipDeflateSolidAes, contentDirSrc, settings);
+        assertThat(Files.exists(zipDeflateSolidAes)).isTrue();
+        assertThat(Files.isRegularFile(zipDeflateSolidAes)).isTrue();
+        assertThatDirectory(zipDeflateSolidAes.getParent()).exists().hasSubDirectories(0).hasFiles(1);
     }
 
 }

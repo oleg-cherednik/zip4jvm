@@ -12,8 +12,8 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import static ru.olegcherednik.zip4jvm.TestData.deflateSolidZip;
-import static ru.olegcherednik.zip4jvm.TestData.storeSolidZip;
+import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
+import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolid;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
 /**
@@ -29,7 +29,7 @@ public class Zip4jvmToJdkCompatibilityTest {
     public void checkCompatibilityWithJdk() throws IOException {
         Path parentDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        for (Path zip4jFile : Arrays.asList(storeSolidZip, deflateSolidZip)) {
+        for (Path zip4jFile : Arrays.asList(zipStoreSolid, zipDeflateSolid)) {
             Path dstDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(parentDir, zip4jFile);
 
             try (ZipFile zipFile = new ZipFile(zip4jFile.toFile())) {

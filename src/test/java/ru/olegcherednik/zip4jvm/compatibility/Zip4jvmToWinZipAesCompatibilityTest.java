@@ -13,7 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.zip.DataFormatException;
 
-import static ru.olegcherednik.zip4jvm.TestData.deflateSolidAesZip;
+import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolidAes;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
 /**
@@ -28,7 +28,7 @@ public class Zip4jvmToWinZipAesCompatibilityTest {
 
     public void checkCompatibilityWithWinZipAes() throws IOException, DataFormatException {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        AesZipFileDecrypter decrypter = new AesZipFileDecrypter(deflateSolidAesZip.toFile(), new AESDecrypterJCA());
+        AesZipFileDecrypter decrypter = new AesZipFileDecrypter(zipDeflateSolidAes.toFile(), new AESDecrypterJCA());
         AesZipFileDecrypter.charset = StandardCharsets.UTF_8.name();
 
         for (ExtZipEntry zipEntry : decrypter.getEntryList()) {

@@ -43,7 +43,7 @@ public final class ZipFile {
     }
 
     public static ZipFile.Reader read(@NonNull Path zip, @NonNull Function<String, char[]> passwordProvider) throws IOException {
-        return new ZipEngine(zip, passwordProvider);
+        return new UnzipEngine(zip, passwordProvider);
     }
 
     public static ZipFile.Writer write(@NonNull Path zip) throws IOException {
@@ -55,7 +55,7 @@ public final class ZipFile {
     }
 
     public static ZipFile.Writer write(@NonNull Path zip, @NonNull ZipFileSettings settings) throws IOException {
-        return new UnzipEngine(zip, settings);
+        return new ZipEngine(zip, settings);
     }
 
     public interface Reader extends Iterable<ZipFile.Entry> {

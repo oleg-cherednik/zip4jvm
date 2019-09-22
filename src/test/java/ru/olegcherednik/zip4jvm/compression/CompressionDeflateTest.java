@@ -15,9 +15,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static ru.olegcherednik.zip4jvm.TestData.deflateSolidAesZip;
-import static ru.olegcherednik.zip4jvm.TestData.deflateSolidPkwareZip;
-import static ru.olegcherednik.zip4jvm.TestData.deflateSolidZip;
+import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolidAes;
+import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolidPkware;
+import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
 import static ru.olegcherednik.zip4jvm.TestData.dirBikes;
 import static ru.olegcherednik.zip4jvm.TestData.dirCars;
 import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
@@ -102,14 +102,14 @@ public class CompressionDeflateTest {
 
     public void shouldUnzipWhenDeflateCompression() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.extract(deflateSolidZip, destDir);
+        UnzipIt.extract(zipDeflateSolid, destDir);
         assertThatDirectory(destDir).matches(dirSrcAssert);
     }
 
     public void shouldUnzipWhenWhenDeflateCompressionAndPkwareEncryption() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        UnzipIt.extract(deflateSolidPkwareZip, destDir, dirNameCars, fileName -> password);
+        UnzipIt.extract(zipDeflateSolidPkware, destDir, dirNameCars, fileName -> password);
         assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);
         assertThatDirectory(destDir.resolve(dirNameCars)).matches(dirCarsAssert);
     }
@@ -117,7 +117,7 @@ public class CompressionDeflateTest {
     public void shouldUnzipWhenWhenDeflateCompressionAndAesEncryption() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        UnzipIt.extract(deflateSolidAesZip, destDir, dirNameCars, String::toCharArray);
+        UnzipIt.extract(zipDeflateSolidAes, destDir, dirNameCars, String::toCharArray);
         assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);
         assertThatDirectory(destDir.resolve(dirNameCars)).matches(dirCarsAssert);
     }

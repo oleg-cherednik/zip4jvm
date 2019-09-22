@@ -23,8 +23,8 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirCars;
-import static ru.olegcherednik.zip4jvm.TestData.storeSolidPkwareZip;
-import static ru.olegcherednik.zip4jvm.TestData.storeSplitPkwareZip;
+import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolidPkware;
+import static ru.olegcherednik.zip4jvm.TestData.zipStoreSplitPkware;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirSrcAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.zipDirCarsAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.zipDirRootAssert;
@@ -99,21 +99,21 @@ public class EncryptionPkwareTest {
     public void shouldUnzipWhenStoreSolidPkware() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        UnzipIt.extract(storeSolidPkwareZip, destDir, fileName -> password);
+        UnzipIt.extract(zipStoreSolidPkware, destDir, fileName -> password);
         assertThatDirectory(destDir).matches(dirSrcAssert);
     }
 
     public void shouldUnzipWhenStoreSplitPkware() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        UnzipIt.extract(storeSplitPkwareZip, destDir, fileName -> password);
+        UnzipIt.extract(zipStoreSplitPkware, destDir, fileName -> password);
         assertThatDirectory(destDir).matches(dirSrcAssert);
     }
 
     public void shouldThrowExceptionWhenUnzipPkwareEncryptedZipWithIncorrectPassword() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        assertThatThrownBy(() -> UnzipIt.extract(storeSplitPkwareZip, destDir, fileName -> UUID.randomUUID().toString().toCharArray()))
+        assertThatThrownBy(() -> UnzipIt.extract(zipStoreSplitPkware, destDir, fileName -> UUID.randomUUID().toString().toCharArray()))
                 .isExactlyInstanceOf(IncorrectPasswordException.class);
     }
 
