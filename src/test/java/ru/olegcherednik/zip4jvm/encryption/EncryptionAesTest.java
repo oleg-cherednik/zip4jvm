@@ -52,10 +52,40 @@ public class EncryptionAesTest {
         Zip4jvmSuite.removeDir(rootDir);
     }
 
-    public void shouldCreateNewZipWithFolderAndAesEncryption() throws IOException {
+    public void shouldCreateNewZipWithFolderAndAes256Encryption() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
                                                          .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                          .encryption(Encryption.AES_256, password).build();
+        ZipFileSettings settings = ZipFileSettings.builder()
+                                                  .entrySettingsProvider(fileName -> entrySettings)
+                                                  .comment("password: " + passwordStr).build();
+
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+
+        ZipIt.add(zip, contentDirSrc, settings);
+        assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatZipFile(zip, password).exists().root().matches(zipDirRootAssert);
+    }
+
+    public void shouldCreateNewZipWithFolderAndAes192Encryption() throws IOException {
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                         .encryption(Encryption.AES_192, password).build();
+        ZipFileSettings settings = ZipFileSettings.builder()
+                                                  .entrySettingsProvider(fileName -> entrySettings)
+                                                  .comment("password: " + passwordStr).build();
+
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+
+        ZipIt.add(zip, contentDirSrc, settings);
+        assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatZipFile(zip, password).exists().root().matches(zipDirRootAssert);
+    }
+
+    public void shouldCreateNewZipWithFolderAndAes128Encryption() throws IOException {
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                         .encryption(Encryption.AES_128, password).build();
         ZipFileSettings settings = ZipFileSettings.builder()
                                                   .entrySettingsProvider(fileName -> entrySettings)
                                                   .comment("password: " + passwordStr).build();

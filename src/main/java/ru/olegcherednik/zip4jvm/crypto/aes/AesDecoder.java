@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
-import lombok.NonNull;
 import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
@@ -24,7 +23,7 @@ public final class AesDecoder implements Decoder {
     private final int saltLength;
     private final AesEngine engine;
 
-    public static AesDecoder create(@NonNull ZipEntry entry, @NonNull DataInput in) {
+    public static AesDecoder create(ZipEntry entry, DataInput in) {
         try {
             AesStrength strength = AesEngine.getStrength(entry.getEncryption());
             byte[] salt = getSalt(entry, in);
@@ -50,7 +49,7 @@ public final class AesDecoder implements Decoder {
     }
 
     @Override
-    public void decrypt(@NonNull byte[] buf, int offs, int len) {
+    public void decrypt(byte[] buf, int offs, int len) {
         try {
             engine.updateMac(buf, offs, len);
             engine.cypherUpdate(buf, offs, len);
@@ -60,13 +59,21 @@ public final class AesDecoder implements Decoder {
     }
 
     @Override
-    public long getCompressedSize(@NonNull ZipEntry zipEntry) {
+    public long getCompressedSize(ZipEntry zipEntry) {
         return zipEntry.getCompressedSize() - saltLength - PASSWORD_CHECKSUM_SIZE - MAC_SIZE;
     }
 
     @Override
-    public void close(@NonNull DataInput in) throws IOException {
+    public void close(DataInput in) throws IOException {
         checkMessageAuthenticationCode(in);
+    }
+
+    private void checkMessageAuthenticationCode(DataInput in) throws IOException {
+        byte[] expected = in.readBytes(MAC_SIZE);
+        byte[] actual = ArrayUtils.subarray(engine.getMac(), 0, MAC_SIZE);
+
+        if (!ArrayUtils.isEquals(expected, actual))
+            throw new Zip4jvmException("Message Authentication Code (MAC) is incorrect");
     }
 
     private static byte[] getSalt(ZipEntry entry, DataInput in) throws IOException {
@@ -79,14 +86,6 @@ public final class AesDecoder implements Decoder {
 
         if (!ArrayUtils.isEquals(expected, actual))
             throw new IncorrectPasswordException(entry.getFileName());
-    }
-
-    private void checkMessageAuthenticationCode(DataInput in) throws IOException {
-        byte[] expected = in.readBytes(MAC_SIZE);
-        byte[] actual = ArrayUtils.subarray(engine.getMac(), 0, MAC_SIZE);
-
-        if (!ArrayUtils.isEquals(expected, actual))
-            throw new Zip4jvmException("Message Authentication Code (MAC) is incorrect");
     }
 
 }

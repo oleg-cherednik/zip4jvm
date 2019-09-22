@@ -22,16 +22,16 @@ import java.security.spec.InvalidKeySpecException;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class AesEngine {
 
-    private static final int BLOCK_SIZE = 16;
     public static final int MAC_SIZE = 10;
     public static final int PASSWORD_CHECKSUM_SIZE = 2;
+    private static final int BLOCK_SIZE = 16;
     private static final int ITERATION_COUNT = 1000;
 
     private final Cipher cipher;
     private final Mac mac;
-
     private final byte[] iv = new byte[BLOCK_SIZE];
     private final byte[] counter = new byte[BLOCK_SIZE];
+
     private int nonce = BLOCK_SIZE;
 
     /*
