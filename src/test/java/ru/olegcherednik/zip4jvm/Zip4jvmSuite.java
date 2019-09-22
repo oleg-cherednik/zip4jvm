@@ -24,7 +24,8 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
 public class Zip4jvmSuite {
 
     /** Password for encrypted zip */
-    public static final char[] password = "1".toCharArray();
+    public static final String passwordStr = "1";
+    public static final char[] password = passwordStr.toCharArray();
     /** Clear resources */
     public static final boolean clear = false;
 
@@ -62,7 +63,7 @@ public class Zip4jvmSuite {
             }
         });
 
-        assertThatDirectory(dirSrc).matches(TestDataAssert.dirAssert);
+        assertThatDirectory(dirSrc).matches(TestDataAssert.dirSrcAssert);
     }
 
     public static void removeDir(Path path) throws IOException {

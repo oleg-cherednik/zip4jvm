@@ -48,7 +48,7 @@ public class Zip4jvmToJdkCompatibilityTest {
                 }
             }
 
-            assertThatDirectory(dstDir).matches(TestDataAssert.dirAssert);
+            assertThatDirectory(dstDir).matches(TestDataAssert.dirSrcAssert);
         }
 
     }

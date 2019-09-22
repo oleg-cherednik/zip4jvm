@@ -50,7 +50,7 @@ public class Zip4jvmToWinZipAesCompatibilityTest {
             }
         }
 
-        assertThatDirectory(dstDir).matches(TestDataAssert.dirAssert);
+        assertThatDirectory(dstDir).matches(TestDataAssert.dirSrcAssert);
     }
 
 }

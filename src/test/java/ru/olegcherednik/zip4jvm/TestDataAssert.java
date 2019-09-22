@@ -37,7 +37,7 @@ import static ru.olegcherednik.zip4jvm.TestData.zipDirNameEmpty;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TestDataAssert {
 
-    public static final Consumer<AbstractDirectoryAssert<?>> dirAssert = dir -> {
+    public static final Consumer<AbstractDirectoryAssert<?>> dirSrcAssert = dir -> {
         dir.exists().hasSubDirectories(3).hasFiles(5);
 
         TestDataAssert.dirBikesAssert.accept(dir.directory(zipDirNameBikes));

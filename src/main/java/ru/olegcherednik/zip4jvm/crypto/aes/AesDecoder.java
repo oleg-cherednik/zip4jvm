@@ -3,8 +3,8 @@ package ru.olegcherednik.zip4jvm.crypto.aes;
 import lombok.NonNull;
 import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -37,6 +37,8 @@ public final class AesDecoder implements Decoder {
             checkPasswordChecksum(passwordChecksum, entry, in);
 
             return new AesDecoder(cipher, mac, salt.length);
+        } catch(Zip4jvmException e) {
+            throw e;
         } catch(Exception e) {
             throw new Zip4jvmException(e);
         }

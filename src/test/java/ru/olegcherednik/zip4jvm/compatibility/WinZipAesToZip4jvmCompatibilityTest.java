@@ -30,7 +30,7 @@ public class WinZipAesToZip4jvmCompatibilityTest {
     public void winZipAesShouldBeReadableForZip4jvm() throws IOException {
         Path zip = zipItWithWinZipAes(Zip4jvmSuite.subDirNameAsMethodName(rootDir));
         Path dir = unzipItWithZip4jvm(zip);
-        assertThatDirectory(dir).matches(TestDataAssert.dirAssert);
+        assertThatDirectory(dir).matches(TestDataAssert.dirSrcAssert);
     }
 
     private static Path zipItWithWinZipAes(Path dir) throws IOException {

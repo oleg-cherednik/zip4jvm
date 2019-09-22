@@ -103,7 +103,7 @@ public class EncryptionPkwareTest {
 
         Path destDir = zip.getParent().resolve("unzip");
         UnzipIt.extract(zip, destDir, fileName -> Zip4jvmSuite.password);
-        assertThatDirectory(destDir).matches(TestDataAssert.dirAssert);
+        assertThatDirectory(destDir).matches(TestDataAssert.dirSrcAssert);
     }
 
     public void shouldThrowExceptionWhenUnzipStandardEncryptedZipWithIncorrectPassword() throws IOException {

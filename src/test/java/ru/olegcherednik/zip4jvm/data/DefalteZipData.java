@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.data;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
@@ -21,6 +20,8 @@ import static ru.olegcherednik.zip4jvm.TestData.deflateSolidZip;
 import static ru.olegcherednik.zip4jvm.TestData.deflateSplitZip;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.zipDirRootAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.passwordStr;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
@@ -62,15 +63,16 @@ public final class DefalteZipData {
     private static void createDeflateSolidPkwareZip() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
                                                          .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                         .encryption(Encryption.PKWARE, Zip4jvmSuite.password).build();
+                                                         .encryption(Encryption.PKWARE, password).build();
         ZipFileSettings settings = ZipFileSettings.builder()
                                                   .entrySettingsProvider(fileName -> entrySettings)
-                                                  .comment("password: " + new String(Zip4jvmSuite.password)).build();
+                                                  .comment("password: " + passwordStr).build();
 
         ZipIt.add(deflateSolidPkwareZip, contentDirSrc, settings);
         assertThat(Files.exists(deflateSolidPkwareZip)).isTrue();
         assertThat(Files.isRegularFile(deflateSolidPkwareZip)).isTrue();
         assertThatDirectory(deflateSolidPkwareZip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatZipFile(deflateSolidPkwareZip, password).exists().root().matches(zipDirRootAssert);
     }
 
     private static void createDeflateSolidAesZip() throws IOException {

@@ -72,9 +72,11 @@ public final class TestData {
 
     // store
     public static final Path storeSolidZip = dirRoot.resolve("store/solid/off/src.zip");
-    public static final Path storeSplitZip = dirRoot.resolve("store/split/off/src.zip");
     public static final Path storeSolidPkwareZip = dirRoot.resolve("store/solid/pkware/src.zip");
     public static final Path storeSolidAesZip = dirRoot.resolve("store/solid/aes/src.zip");
+    public static final Path storeSplitZip = dirRoot.resolve("store/split/off/src.zip");
+    public static final Path storeSplitPkwareZip = dirRoot.resolve("store/split/pkware/src.zip");
+    public static final Path storeSplitAesZip = dirRoot.resolve("store/split/aes/src.zip");
 
     // deflate
     public static final Path deflateSolidZip = dirRoot.resolve("deflate/solid/off/src.zip");
