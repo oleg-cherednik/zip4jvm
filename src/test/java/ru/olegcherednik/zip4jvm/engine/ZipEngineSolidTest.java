@@ -14,6 +14,7 @@ import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -22,6 +23,9 @@ import java.util.Arrays;
 import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static ru.olegcherednik.zip4jvm.TestData.dirBikes;
+import static ru.olegcherednik.zip4jvm.TestData.dirCars;
+import static ru.olegcherednik.zip4jvm.TestData.dirNameBikes;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileDucati;
 import static ru.olegcherednik.zip4jvm.TestData.fileFerrari;
@@ -35,7 +39,11 @@ import static ru.olegcherednik.zip4jvm.TestData.fileNameSuzuki;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameWiesmann;
 import static ru.olegcherednik.zip4jvm.TestData.fileSuzuki;
 import static ru.olegcherednik.zip4jvm.TestData.fileWiesmann;
+import static ru.olegcherednik.zip4jvm.TestData.zipDirNameBikes;
+import static ru.olegcherednik.zip4jvm.TestData.zipDirNameCars;
 import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolid;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.zipDirBikesAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.zipDirCarsAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
@@ -147,7 +155,7 @@ public class ZipEngineSolidTest {
     }
 
     @SuppressWarnings("ConstantConditions")
-    @Test(dependsOnMethods = "shouldAddFilesToExistedZipWhenUseZipFile")
+    @Test(dependsOnMethods = "shouldThrowExceptionWhenAddDuplicateEntry")
     public void shouldThrowExceptionWhenAddNullEntry() throws IOException {
         assertThatThrownBy(() -> {
             try (ZipEngine engine = new ZipEngine(solidFile, ZipFileSettings.DEFAULT)) {
@@ -156,7 +164,7 @@ public class ZipEngineSolidTest {
         }).isExactlyInstanceOf(NullPointerException.class);
     }
 
-    @Test(dependsOnMethods = "shouldAddFilesToExistedZipWhenUseZipFile")
+    @Test(dependsOnMethods = "shouldThrowExceptionWhenAddNullEntry")
     public void shouldThrowExceptionWhenRemoveWithNullPrefix() throws IOException {
         assertThatThrownBy(() -> {
             try (ZipEngine engine = new ZipEngine(solidFile, ZipFileSettings.DEFAULT)) {
@@ -165,7 +173,7 @@ public class ZipEngineSolidTest {
         }).isExactlyInstanceOf(NullPointerException.class);
     }
 
-    @Test(dependsOnMethods = "shouldAddFilesToExistedZipWhenUseZipFile")
+    @Test(dependsOnMethods = "shouldThrowExceptionWhenRemoveWithNullPrefix")
     public void shouldThrowExceptionWhenRemoveWithBlankPrefix() throws IOException {
         for (String prefixEntryName : Arrays.asList("", "  ")) {
             assertThatThrownBy(() -> {
@@ -176,7 +184,66 @@ public class ZipEngineSolidTest {
         }
     }
 
-    // TODO add test for remove not normalize prefix
+    @Test(dependsOnMethods = "shouldThrowExceptionWhenRemoveWithBlankPrefix")
+    public void shouldRemoveExistedEntityWhenNormalizePrefix() throws IOException {
+        try (ZipFile.Writer zipFile = ZipFile.write(solidFile)) {
+            zipFile.remove(fileNameKawasaki);
+        }
+
+        assertThatDirectory(solidFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatZipFile(solidFile, password).exists().root().hasSubDirectories(0).hasFiles(5);
+    }
+
+    @Test(dependsOnMethods = "shouldRemoveExistedEntityWhenNormalizePrefix")
+    public void shouldAddDirectoryWhenZipExists() throws IOException {
+        try (ZipFile.Writer zipFile = ZipFile.write(solidFile)) {
+            zipFile.add(dirBikes);
+            zipFile.add(dirCars);
+        }
+
+        assertThatDirectory(solidFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatZipFile(solidFile, password).exists().directory(zipDirNameBikes).matches(zipDirBikesAssert);
+        assertThatZipFile(solidFile, password).exists().directory(zipDirNameCars).matches(zipDirCarsAssert);
+    }
+
+    @Test(dependsOnMethods = "shouldAddDirectoryWhenZipExists")
+    public void shouldRemoveEntryWhenNormalizePrefix() throws IOException {
+        try (ZipFile.Writer zipFile = ZipFile.write(solidFile)) {
+            zipFile.remove(dirNameBikes + '/' + fileNameHonda);
+        }
+
+        assertThatDirectory(solidFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatZipFile(solidFile, password).exists().directory(zipDirNameBikes).hasFiles(3);
+    }
+
+    @Test(dependsOnMethods = "shouldRemoveEntryWhenNormalizePrefix")
+    public void shouldRemoveEntryWhenNotNormalizePrefix() throws IOException {
+        try (ZipFile.Writer zipFile = ZipFile.write(solidFile)) {
+            zipFile.remove(dirNameBikes + '\\' + fileNameKawasaki);
+        }
+
+        assertThatDirectory(solidFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatZipFile(solidFile, password).exists().directory(zipDirNameBikes).hasFiles(2);
+    }
+
+    @Test(dependsOnMethods = "shouldRemoveEntryWhenNotNormalizePrefix")
+    public void shouldRemoveDirectoryWhenNoDirectoryMarker() throws IOException {
+        try (ZipFile.Writer zipFile = ZipFile.write(solidFile)) {
+            zipFile.remove(dirNameBikes);
+        }
+
+        assertThatDirectory(solidFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatZipFile(solidFile, password).exists().directory(zipDirNameBikes).notExists();
+    }
+
+    @Test(dependsOnMethods = "shouldRemoveDirectoryWhenNoDirectoryMarker")
+    public void shouldThrowExceptionWhenRemoveNotExistedEntry() throws IOException {
+        assertThatThrownBy(() -> {
+            try (ZipFile.Writer zipFile = ZipFile.write(solidFile)) {
+                zipFile.remove(dirNameBikes);
+            }
+        }).isExactlyInstanceOf(FileNotFoundException.class);
+    }
 
     public void shouldCreateZipFileWhenUseZipFileAndAddFilesSplit() throws IOException {
         Function<String, ZipEntrySettings> entrySettingsProvider =

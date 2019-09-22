@@ -30,7 +30,7 @@ public final class TestData {
 
     public static final String fileNameDucati = "ducati-panigale-1199.jpg";
     public static final String fileNameHonda = "honda-cbr600rr.jpg";
-    public static final String fileNameKawasaki = "kawasaki_ninja_300_.jpg";
+    public static final String fileNameKawasaki = "kawasaki-ninja-300.jpg";
     public static final String fileNameSuzuki = "suzuki-gsxr750.jpg";
 
     public static final String fileNameBentley = "bentley-continental.jpg";

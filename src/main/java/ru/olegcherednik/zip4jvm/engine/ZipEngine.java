@@ -63,7 +63,6 @@ public final class ZipEngine implements ZipFile.Writer {
                                                .filter(entryName -> entryName.startsWith(normalizedPrefixEntryName))
                                                .collect(Collectors.toSet());
 
-        // TODO it's not working, check it in test
         if (entryNames.isEmpty())
             throw new FileNotFoundException(prefixEntryName);
 

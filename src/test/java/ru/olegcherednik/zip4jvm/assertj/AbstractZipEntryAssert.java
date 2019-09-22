@@ -25,6 +25,12 @@ public abstract class AbstractZipEntryAssert<S extends AbstractZipEntryAssert<S>
         return myself;
     }
 
+    public S notExists() {
+        isNotNull();
+        assertThat(zipFile.containsEntry(actual.getName())).isFalse();
+        return myself;
+    }
+
     @Override
     public String toString() {
         return actual.getName();
