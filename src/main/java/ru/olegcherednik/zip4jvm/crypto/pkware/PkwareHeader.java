@@ -1,12 +1,11 @@
 package ru.olegcherednik.zip4jvm.crypto.pkware;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import lombok.AccessLevel;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.util.Random;
@@ -22,8 +21,7 @@ public final class PkwareHeader {
 
     private final byte[] buf;
 
-    public static PkwareHeader create(@NonNull PkwareEngine engine, int checksum) {
-        // TODO Instead of CRC32, time should be used along with {@link GeneralPurposeFlag} bit 3 should be true
+    public static PkwareHeader create(PkwareEngine engine, int checksum) {
         return new PkwareHeader(createBuf(engine, checksum));
     }
 
@@ -38,13 +36,13 @@ public final class PkwareHeader {
         return buf;
     }
 
-    public static PkwareHeader read(@NonNull PkwareEngine engine, @NonNull ZipEntry zipEntry, @NonNull DataInput in) throws IOException {
+    public static PkwareHeader read(PkwareEngine engine, ZipEntry zipEntry, DataInput in) throws IOException {
         PkwareHeader header = new PkwareHeader(in.readBytes(SIZE));
         header.requireMatchChecksum(engine, zipEntry);
         return header;
     }
 
-    public void write(@NonNull DataOutput out) throws IOException {
+    public void write(DataOutput out) throws IOException {
         out.writeBytes(buf);
     }
 

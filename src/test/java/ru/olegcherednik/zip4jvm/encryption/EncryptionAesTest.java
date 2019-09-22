@@ -1,5 +1,6 @@
 package ru.olegcherednik.zip4jvm.encryption;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -120,7 +121,7 @@ public class EncryptionAesTest {
 
         assertThatThrownBy(() -> ZipEntrySettings.builder()
                                                  .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                 .encryption(Encryption.AES_256, "".toCharArray()).build())
+                                                 .encryption(Encryption.AES_256, ArrayUtils.EMPTY_CHAR_ARRAY).build())
                 .isExactlyInstanceOf(EmptyPasswordException.class);
     }
 
@@ -138,7 +139,7 @@ public class EncryptionAesTest {
         assertThatDirectory(destDir).matches(dirSrcAssert);
     }
 
-    public void shouldThrowExceptionWhenUnzipStandardEncryptedZipWithIncorrectPassword() throws IOException {
+    public void shouldThrowExceptionWhenUnzipAesEncryptedZipWithIncorrectPassword() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
         assertThatThrownBy(() -> UnzipIt.extract(storeSplitAesZip, destDir, fileName -> UUID.randomUUID().toString().toCharArray()))
