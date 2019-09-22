@@ -86,7 +86,7 @@ public class ZipMiscTest {
         ZipMisc.merge(deflateSplitZip, zip);
 
         assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(zip).exists().rootEntry().matches(TestDataAssert.zipRootDirAssert);
+        assertThatZipFile(zip).exists().root().matches(TestDataAssert.zipRootDirAssert);
     }
 
     public void shouldRetrieveTrueWhenSplitZipWithMultipleDisks() throws IOException {
@@ -111,7 +111,7 @@ public class ZipMiscTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         Files.createDirectories(zip.getParent());
         Files.copy(storeSolidZip, zip);
-        assertThatZipFile(zip).exists().rootEntry().matches(TestDataAssert.zipRootDirAssert);
+        assertThatZipFile(zip).exists().root().matches(TestDataAssert.zipRootDirAssert);
 
         List<String> entryNames = filesDirCars.stream()
                                               .map(file -> dirSrc.relativize(file).toString())
@@ -125,7 +125,7 @@ public class ZipMiscTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         Files.createDirectories(zip.getParent());
         Files.copy(storeSolidZip, zip);
-        assertThatZipFile(zip).exists().rootEntry().matches(TestDataAssert.zipRootDirAssert);
+        assertThatZipFile(zip).exists().root().matches(TestDataAssert.zipRootDirAssert);
 
         ZipMisc.removeEntry(zip, dirSrc.relativize(dirCars).toString());
         assertThat(ZipMisc.getEntryNames(zip)).hasSize(10);

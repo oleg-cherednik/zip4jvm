@@ -38,9 +38,9 @@ public final class PkwareHeader {
         return buf;
     }
 
-    public static PkwareHeader read(@NonNull PkwareEngine engine, @NonNull ZipEntry entry, @NonNull DataInput in) throws IOException {
+    public static PkwareHeader read(@NonNull PkwareEngine engine, @NonNull ZipEntry zipEntry, @NonNull DataInput in) throws IOException {
         PkwareHeader header = new PkwareHeader(in.readBytes(SIZE));
-        header.requireMatchChecksum(engine, entry);
+        header.requireMatchChecksum(engine, zipEntry);
         return header;
     }
 
@@ -48,16 +48,16 @@ public final class PkwareHeader {
         out.writeBytes(buf);
     }
 
-    private void requireMatchChecksum(PkwareEngine engine, ZipEntry entry) {
+    private void requireMatchChecksum(PkwareEngine engine, ZipEntry zipEntry) {
         engine.decrypt(buf, 0, buf.length);
-        int checksum = getChecksum(entry);
+        int checksum = getChecksum(zipEntry);
 
         if (buf[buf.length - 1] != low(checksum) || buf[buf.length - 2] != high(checksum))
-            throw new IncorrectPasswordException(entry.getFileName());
+            throw new IncorrectPasswordException(zipEntry.getFileName());
     }
 
-    private static int getChecksum(ZipEntry entry) {
-        return entry.getLastModifiedTime();
+    private static int getChecksum(ZipEntry zipEntry) {
+        return zipEntry.getLastModifiedTime();
     }
 
     private static byte low(int checksum) {

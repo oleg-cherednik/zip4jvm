@@ -47,7 +47,7 @@ public final class StoreZipData {
         assertThat(Files.exists(storeSolidZip)).isTrue();
         assertThat(Files.isRegularFile(storeSolidZip)).isTrue();
         assertThatDirectory(storeSolidZip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(storeSolidZip).exists().rootEntry().matches(zipRootDirAssert);
+        assertThatZipFile(storeSolidZip).exists().root().matches(zipRootDirAssert);
     }
 
     private static void createStoreSplitZip() throws IOException {
@@ -58,7 +58,7 @@ public final class StoreZipData {
         assertThat(Files.exists(storeSplitZip)).isTrue();
         assertThat(Files.isRegularFile(storeSplitZip)).isTrue();
         assertThatDirectory(storeSplitZip.getParent()).exists().hasSubDirectories(0).hasFiles(6);
-        assertThatZipFile(storeSplitZip).exists().rootEntry().matches(zipRootDirAssert);
+        assertThatZipFile(storeSplitZip).exists().root().matches(zipRootDirAssert);
     }
 
     private static void createStoreSolidPkwareZip() throws IOException {

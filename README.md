@@ -17,11 +17,17 @@ zip4jvm - a java library for working with zip files
 * Individual settings for each zip entry (i.e. some of files can be encrypted, and some - not);
 * Streaming support for adding and extracting; 
 * Read/Write password protected Zip files and streams;
-* ZIP64 format support;
+* [ZIP64](https://en.wikipedia.org/wiki/Zip_(file_format)#ZIP64) format support;
 * Multi-volume zip archive support (i.e. `filename.zip`, `filename.z01`, `filename.z02`);
 * Unicode for comments and file names.
 
-### Maven
+## Gradle
+
+~~~~
+compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:0.7'
+~~~~
+
+## Maven
 
 ~~~~
 <dependency>
@@ -29,12 +35,6 @@ zip4jvm - a java library for working with zip files
     <artifactId>zip4jvm</artifactId>
     <version>0.7</version>
 </dependency>
-~~~~
-
-### Gradle
-
-~~~~
-compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:0.7'
 ~~~~
 
 ## Usage

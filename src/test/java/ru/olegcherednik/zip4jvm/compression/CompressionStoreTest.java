@@ -55,7 +55,7 @@ public class CompressionStoreTest {
         ZipIt.add(zip, filesDirCars, settings);
 
         assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(zip).directory("/").matches(TestDataAssert.zipCarsDirAssert);
+        assertThatZipFile(zip).root().matches(TestDataAssert.zipCarsDirAssert);
     }
 
     public void shouldCreateSplitZipWithFilesWhenStoreCompression() throws IOException {
@@ -84,7 +84,7 @@ public class CompressionStoreTest {
         ZipIt.add(zip, dirCars, settings);
 
         assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(zip).exists().rootEntry().hasSubDirectories(1).hasFiles(0);
+        assertThatZipFile(zip).exists().root().hasSubDirectories(1).hasFiles(0);
         assertThatZipFile(zip).directory("cars/").matches(TestDataAssert.zipCarsDirAssert);
     }
 
@@ -126,7 +126,7 @@ public class CompressionStoreTest {
         ZipIt.add(zip, filesDirCars, settings);
 
         assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(zip, Zip4jvmSuite.password).directory("/").matches(TestDataAssert.zipCarsDirAssert);
+        assertThatZipFile(zip, Zip4jvmSuite.password).root().matches(TestDataAssert.zipCarsDirAssert);
 
         Path dirUnzip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("unzip");
         UnzipIt.extract(zip, dirUnzip, fileName -> Zip4jvmSuite.password);
@@ -145,7 +145,7 @@ public class CompressionStoreTest {
         ZipIt.add(zip, filesDirCars, settings);
 
         assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(zip, Zip4jvmSuite.password).directory("/").matches(TestDataAssert.zipCarsDirAssert);
+        assertThatZipFile(zip, Zip4jvmSuite.password).root().matches(TestDataAssert.zipCarsDirAssert);
 
         Path dirUnzip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("unzip");
         UnzipIt.extract(zip, dirUnzip, fileName -> Zip4jvmSuite.password);

@@ -46,7 +46,7 @@ public final class DefalteZipData {
         assertThat(Files.exists(deflateSolidZip)).isTrue();
         assertThat(Files.isRegularFile(deflateSolidZip)).isTrue();
         assertThatDirectory(deflateSolidZip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(deflateSolidZip).exists().rootEntry().matches(zipRootDirAssert);
+        assertThatZipFile(deflateSolidZip).exists().root().matches(zipRootDirAssert);
     }
 
     private static void createDeflateSplitZip() throws IOException {

@@ -17,9 +17,9 @@ public final class PkwareDecoder implements Decoder {
 
     private final PkwareEngine engine;
 
-    public static PkwareDecoder create(@NonNull ZipEntry entry, @NonNull DataInput in) throws IOException {
-        PkwareEngine engine = new PkwareEngine(entry.getPassword());
-        PkwareHeader.read(engine, entry, in);
+    public static PkwareDecoder create(@NonNull ZipEntry zipEntry, @NonNull DataInput in) throws IOException {
+        PkwareEngine engine = new PkwareEngine(zipEntry.getPassword());
+        PkwareHeader.read(engine, zipEntry, in);
         return new PkwareDecoder(engine);
     }
 

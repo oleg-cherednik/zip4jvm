@@ -16,9 +16,13 @@ import java.util.function.Consumer;
 
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameDucati;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameEmpty;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameFerrari;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameHonda;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameKawasaki;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameMcdonnelDouglas;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameSaintPetersburg;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameSigSauer;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameSuzuki;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameWiesmann;
 import static ru.olegcherednik.zip4jvm.TestData.zipDirNameBikes;
@@ -40,11 +44,11 @@ public final class TestDataAssert {
         TestDataAssert.dirCarsAssert.accept(dir.directory(zipDirNameCars));
         TestDataAssert.emptyDirAssert.accept(dir.directory(zipDirNameEmpty));
 
-        dir.file("mcdonnell-douglas-f15-eagle.jpg").exists().isImage().hasSize(624_746);
-        dir.file("saint-petersburg.jpg").exists().isImage().hasSize(1_074_836);
-        dir.file("sig-sauer-pistol.jpg").exists().isImage().hasSize(431_478);
-        dir.file("empty_file.txt").exists().hasEmptyContent().hasSize(0);
+        dir.file(fileNameEmpty).exists().hasEmptyContent().hasSize(0);
+        dir.file(fileNameMcdonnelDouglas).exists().isImage().hasSize(624_746);
 //        dir.file("Oleg Cherednik.txt").exists().hasContent("Oleg Cherednik\nОлег Чередник").hasSize(41);
+        dir.file(fileNameSaintPetersburg).exists().isImage().hasSize(1_074_836);
+        dir.file(fileNameSigSauer).exists().isImage().hasSize(431_478);
     };
 
     public static final Consumer<AbstractDirectoryAssert<?>> dirBikesAssert = dir -> {
@@ -62,14 +66,6 @@ public final class TestDataAssert {
         dir.file(fileNameWiesmann).exists().isImage().hasSize(729_633);
     };
 
-    public static final Consumer<AbstractDirectoryAssert<?>> starWarsDirAssert = dir -> {
-        dir.exists().hasSubDirectories(0).hasFiles(4);
-        dir.file("one.jpg").exists().isImage().hasSize(2_204_448);
-        dir.file("two.jpg").exists().isImage().hasSize(277_857);
-        dir.file("three.jpg").exists().isImage().hasSize(1_601_879);
-        dir.file("four.jpg").exists().isImage().hasSize(1_916_776);
-    };
-
     public static final Consumer<AbstractDirectoryAssert<?>> emptyDirAssert = dir -> dir.exists().hasSubDirectories(0).hasFiles(0);
 
     public static final Consumer<AbstractZipEntryDirectoryAssert<?>> zipRootDirAssert = dir -> {
@@ -79,34 +75,26 @@ public final class TestDataAssert {
         TestDataAssert.zipCarsDirAssert.accept(dir.directory(zipDirNameCars));
         TestDataAssert.zipEmptyDirAssert.accept(dir.directory(zipDirNameEmpty));
 
-        dir.file("mcdonnell-douglas-f15-eagle.jpg").exists().isImage().hasSize(624_746);
-        dir.file("saint-petersburg.jpg").exists().isImage().hasSize(1_074_836);
-        dir.file("sig-sauer-pistol.jpg").exists().isImage().hasSize(431_478);
+        dir.file("mcdonnell-douglas-f15-eagle.jpg").exists().hasSize(624_746);
+        dir.file("saint-petersburg.jpg").exists().hasSize(1_074_836);
+        dir.file("sig-sauer-pistol.jpg").exists().hasSize(431_478);
         dir.file("empty_file.txt").exists().hasEmptyContent().hasSize(0);
 //        dir.file("Oleg Cherednik.txt").exists().hasContent("Oleg Cherednik\nОлег Чередник").hasSize(41);
     };
 
     public static final Consumer<AbstractZipEntryDirectoryAssert<?>> zipBikesDirAssert = dir -> {
         dir.exists().hasSubDirectories(0).hasFiles(4);
-        dir.file(fileNameDucati).exists().isImage().hasSize(293_823);
-        dir.file(fileNameHonda).exists().isImage().hasSize(154_591);
-        dir.file(fileNameKawasaki).exists().isImage().hasSize(167_026);
-        dir.file(fileNameSuzuki).exists().isImage().hasSize(287_349);
+        dir.file(fileNameDucati).exists().hasSize(293_823);
+        dir.file(fileNameHonda).exists().hasSize(154_591);
+        dir.file(fileNameKawasaki).exists().hasSize(167_026);
+        dir.file(fileNameSuzuki).exists().hasSize(287_349);
     };
 
     public static final Consumer<AbstractZipEntryDirectoryAssert<?>> zipCarsDirAssert = dir -> {
         dir.exists().hasSubDirectories(0).hasFiles(3);
-        dir.file("bentley-continental.jpg").exists().isImage().hasSize(1_395_362);
-        dir.file("ferrari-458-italia.jpg").exists().isImage().hasSize(320_894);
-        dir.file("wiesmann-gt-mf5.jpg").exists().isImage().hasSize(729_633);
-    };
-
-    public static final Consumer<AbstractZipEntryDirectoryAssert<?>> zipStarWarsDirAssert = dir -> {
-        dir.exists().hasSubDirectories(0).hasFiles(4);
-        dir.file("one.jpg").exists().isImage().hasSize(2_204_448);
-        dir.file("two.jpg").exists().isImage().hasSize(277_857);
-        dir.file("three.jpg").exists().isImage().hasSize(1_601_879);
-        dir.file("four.jpg").exists().isImage().hasSize(1_916_776);
+        dir.file("bentley-continental.jpg").exists().hasSize(1_395_362);
+        dir.file("ferrari-458-italia.jpg").exists().hasSize(320_894);
+        dir.file("wiesmann-gt-mf5.jpg").exists().hasSize(729_633);
     };
 
     public static final Consumer<AbstractZipEntryDirectoryAssert<?>> zipEmptyDirAssert = dir -> dir.exists().hasSubDirectories(0).hasFiles(0);

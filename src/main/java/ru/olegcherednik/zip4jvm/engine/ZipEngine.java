@@ -47,13 +47,13 @@ public final class ZipEngine implements ZipFile.Reader {
     @SuppressWarnings("PMD.AvoidReassigningParameters")
     public void extract(@NonNull Path destDir, @NonNull String fileName) throws IOException {
         fileName = ZipUtils.normalizeFileName(fileName);
-        List<ZipEntry> entries = getEntriesWithFileNamePrefix(fileName + '/');
+        List<ZipEntry> zipEntries = getEntriesWithFileNamePrefix(fileName + '/');
 
-        if (entries.isEmpty())
+        if (zipEntries.isEmpty())
             extractEntry(destDir, zipModel.getEntryByFileName(fileName), e -> FilenameUtils.getName(e.getFileName()));
         else {
-            for (ZipEntry entry : entries)
-                extractEntry(destDir, entry, ZipEntry::getFileName);
+            for (ZipEntry zipEntry : zipEntries)
+                extractEntry(destDir, zipEntry, ZipEntry::getFileName);
         }
     }
 
@@ -113,25 +113,25 @@ public final class ZipEngine implements ZipFile.Reader {
         };
     }
 
-    private void extractEntry(Path destDir, ZipEntry entry, Function<ZipEntry, String> getFileName) throws IOException {
-        if (entry == null)
+    private void extractEntry(Path destDir, ZipEntry zipEntry, Function<ZipEntry, String> getFileName) throws IOException {
+        if (zipEntry == null)
             throw new Zip4jvmException("Entry not found");
 
-        entry.setPassword(passwordProvider.apply(entry.getFileName()));
-        String fileName = getFileName.apply(entry);
+        zipEntry.setPassword(passwordProvider.apply(zipEntry.getFileName()));
+        String fileName = getFileName.apply(zipEntry);
         Path file = destDir.resolve(fileName);
 
-        if (entry.isDirectory())
+        if (zipEntry.isDirectory())
             Files.createDirectories(file);
         else {
-            try (InputStream in = entry.getIn(); OutputStream out = getOutputStream(file)) {
-                if (entry.getUncompressedSize() > ZipEntry.SIZE_2GB)
+            try (InputStream in = zipEntry.getIn(); OutputStream out = getOutputStream(file)) {
+                if (zipEntry.getUncompressedSize() > ZipEntry.SIZE_2GB)
                     IOUtils.copyLarge(in, out);
                 else
                     IOUtils.copy(in, out);
             }
             // TODO should be uncommented
-//            setFileAttributes(file, entry);
+//            setFileAttributes(file, zipEntry);
 //            setFileLastModifiedTime(file, fileHeader);
         }
     }

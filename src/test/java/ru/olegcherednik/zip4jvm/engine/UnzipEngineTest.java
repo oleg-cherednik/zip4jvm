@@ -83,11 +83,11 @@ public class UnzipEngineTest {
         }
 
         assertThatDirectory(solidFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(solidFile, Zip4jvmSuite.password).exists().rootEntry().hasSubDirectories(0).hasFiles(4);
-        assertThatZipFile(solidFile, Zip4jvmSuite.password).file(fileNameBentley).exists().isImage().hasSize(1_395_362);
-        assertThatZipFile(solidFile, Zip4jvmSuite.password).file(fileNameFerrari).exists().isImage().hasSize(320_894);
-        assertThatZipFile(solidFile, Zip4jvmSuite.password).file(fileNameWiesmann).exists().isImage().hasSize(729_633);
-        assertThatZipFile(solidFile, Zip4jvmSuite.password).file(fileNameHonda).exists().isImage().hasSize(154_591);
+        assertThatZipFile(solidFile, Zip4jvmSuite.password).exists().root().hasSubDirectories(0).hasFiles(4);
+        assertThatZipFile(solidFile, Zip4jvmSuite.password).file(fileNameBentley).exists().hasSize(1_395_362);
+        assertThatZipFile(solidFile, Zip4jvmSuite.password).file(fileNameFerrari).exists().hasSize(320_894);
+        assertThatZipFile(solidFile, Zip4jvmSuite.password).file(fileNameWiesmann).exists().hasSize(729_633);
+        assertThatZipFile(solidFile, Zip4jvmSuite.password).file(fileNameHonda).exists().hasSize(154_591);
     }
 
     @Test(dependsOnMethods = "shouldCreateZipFileWhenUseZipFileAndAddFiles")
@@ -111,12 +111,12 @@ public class UnzipEngineTest {
         }
 
         assertThatDirectory(solidFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(solidFile, Zip4jvmSuite.password).exists().rootEntry().hasSubDirectories(0).hasFiles(6);
-        assertThatZipFile(solidFile, Zip4jvmSuite.password).file(fileNameBentley).exists().isImage().hasSize(1_395_362);
-        assertThatZipFile(solidFile, Zip4jvmSuite.password).file(fileNameFerrari).exists().isImage().hasSize(320_894);
-        assertThatZipFile(solidFile, Zip4jvmSuite.password).file(fileNameHonda).exists().isImage().hasSize(154_591);
-        assertThatZipFile(solidFile, Zip4jvmSuite.password).file(fileNameKawasaki).exists().isImage().hasSize(167_026);
-        assertThatZipFile(solidFile, Zip4jvmSuite.password).file(fileNameSuzuki).exists().isImage().hasSize(287_349);
+        assertThatZipFile(solidFile, Zip4jvmSuite.password).exists().root().hasSubDirectories(0).hasFiles(6);
+        assertThatZipFile(solidFile, Zip4jvmSuite.password).file(fileNameBentley).exists().hasSize(1_395_362);
+        assertThatZipFile(solidFile, Zip4jvmSuite.password).file(fileNameFerrari).exists().hasSize(320_894);
+        assertThatZipFile(solidFile, Zip4jvmSuite.password).file(fileNameHonda).exists().hasSize(154_591);
+        assertThatZipFile(solidFile, Zip4jvmSuite.password).file(fileNameKawasaki).exists().hasSize(167_026);
+        assertThatZipFile(solidFile, Zip4jvmSuite.password).file(fileNameSuzuki).exists().hasSize(287_349);
     }
 
     public void shouldCreateZipFileWhenUseZipFileAndAddFilesSplit() throws IOException {
@@ -192,11 +192,11 @@ public class UnzipEngineTest {
         }
 
         assertThatDirectory(supplierSolidFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(supplierSolidFile, Zip4jvmSuite.password).exists().rootEntry().hasSubDirectories(0).hasFiles(4);
-        assertThatZipFile(supplierSolidFile, Zip4jvmSuite.password).file(fileNameBentley).exists().isImage().hasSize(1_395_362);
-        assertThatZipFile(supplierSolidFile, Zip4jvmSuite.password).file(fileNameFerrari).exists().isImage().hasSize(320_894);
-        assertThatZipFile(supplierSolidFile, Zip4jvmSuite.password).file(fileNameWiesmann).exists().isImage().hasSize(729_633);
-        assertThatZipFile(supplierSolidFile, Zip4jvmSuite.password).file(fileNameHonda).exists().isImage().hasSize(154_591);
+        assertThatZipFile(supplierSolidFile, Zip4jvmSuite.password).exists().root().hasSubDirectories(0).hasFiles(4);
+        assertThatZipFile(supplierSolidFile, Zip4jvmSuite.password).file(fileNameBentley).exists().hasSize(1_395_362);
+        assertThatZipFile(supplierSolidFile, Zip4jvmSuite.password).file(fileNameFerrari).exists().hasSize(320_894);
+        assertThatZipFile(supplierSolidFile, Zip4jvmSuite.password).file(fileNameWiesmann).exists().hasSize(729_633);
+        assertThatZipFile(supplierSolidFile, Zip4jvmSuite.password).file(fileNameHonda).exists().hasSize(154_591);
     }
 
     public void shouldCreateZipFileWhenUseZipFileAndAddFilesWithText() throws IOException {
@@ -237,7 +237,7 @@ public class UnzipEngineTest {
         }
 
         assertThatDirectory(memorySolidFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(memorySolidFile, Zip4jvmSuite.password).exists().rootEntry().hasSubDirectories(0).hasFiles(4);
+        assertThatZipFile(memorySolidFile, Zip4jvmSuite.password).exists().root().hasSubDirectories(0).hasFiles(4);
 //        assertThatZipFile(memorySolidFile, Zip4jSuite.password).file("bentley-continental.jpg").exists().isImage().hasSize(1_395_362);
 //        assertThatZipFile(memorySolidFile, Zip4jSuite.password).file("ferrari-458-italia.jpg").exists().isImage().hasSize(320_894);
 //        assertThatZipFile(memorySolidFile, Zip4jSuite.password).file("wiesmann-gt-mf5.jpg").exists().isImage().hasSize(729_633);

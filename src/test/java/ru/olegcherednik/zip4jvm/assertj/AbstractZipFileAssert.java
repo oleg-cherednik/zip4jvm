@@ -19,7 +19,7 @@ public class AbstractZipFileAssert<S extends AbstractZipFileAssert<S>> extends A
         super(actual, selfType);
     }
 
-    public AbstractZipEntryDirectoryAssert<?> rootEntry() {
+    public AbstractZipEntryDirectoryAssert<?> root() {
         return directory("/");
     }
 

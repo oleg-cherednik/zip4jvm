@@ -60,7 +60,7 @@ public class EncryptionPkwareTest {
         ZipIt.add(zip, contentDirSrc, settings);
 
         assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(zip, Zip4jvmSuite.password).exists().rootEntry().matches(TestDataAssert.zipRootDirAssert);
+        assertThatZipFile(zip, Zip4jvmSuite.password).exists().root().matches(TestDataAssert.zipRootDirAssert);
     }
 
     public void shouldCreateNewZipWithSelectedFilesAndStandardEncryption() throws IOException {
@@ -74,8 +74,8 @@ public class EncryptionPkwareTest {
         ZipIt.add(zip, filesDirCars, settings);
 
         assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(zip, Zip4jvmSuite.password).exists().rootEntry().hasSubDirectories(0).hasFiles(3);
-        assertThatZipFile(zip, Zip4jvmSuite.password).directory("/").matches(TestDataAssert.zipCarsDirAssert);
+        assertThatZipFile(zip, Zip4jvmSuite.password).exists().root().hasSubDirectories(0).hasFiles(3);
+        assertThatZipFile(zip, Zip4jvmSuite.password).root().matches(TestDataAssert.zipCarsDirAssert);
     }
 
     public void shouldThrowExceptionWhenStandardEncryptionAndEmptyPassword() throws IOException {

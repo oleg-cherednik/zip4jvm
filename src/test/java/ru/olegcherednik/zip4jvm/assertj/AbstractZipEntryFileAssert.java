@@ -39,20 +39,6 @@ public abstract class AbstractZipEntryFileAssert<S extends AbstractZipEntryFileA
         return myself;
     }
 
-    @Deprecated
-    public S isImage() {
-//        try (InputStream in = zipFile.getInputStream(actual)) {
-//            actual.setSize(in.available());
-//            assertThat(ImageIO.read(in)).isNotNull();
-//        } catch(Exception e) {
-//            assertThatThrownBy(() -> {
-//                throw e;
-//            }).doesNotThrowAnyException();
-//        }
-
-        return myself;
-    }
-
     public S hasEmptyContent() {
         return hasContent("");
     }
