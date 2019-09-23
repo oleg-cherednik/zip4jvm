@@ -81,7 +81,7 @@ public class CompressionStoreTest {
 
         ZipIt.add(zip, dirCars, settings);
         assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(zip).exists().root().hasSubDirectories(1).hasFiles(0);
+        assertThatZipFile(zip).exists().root().hasDirectories(1).hasFiles(0);
         assertThatZipFile(zip).directory(zipDirNameCars).matches(zipDirCarsAssert);
     }
 
@@ -93,7 +93,7 @@ public class CompressionStoreTest {
 
         ZipIt.add(zip, dirCars, settings);
         assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(3);
-        assertThatZipFile(zip).root().hasSubDirectories(1).hasFiles(0);
+        assertThatZipFile(zip).root().hasDirectories(1).hasFiles(0);
         assertThatZipFile(zip).directory(zipDirNameCars).matches(zipDirCarsAssert);
     }
 

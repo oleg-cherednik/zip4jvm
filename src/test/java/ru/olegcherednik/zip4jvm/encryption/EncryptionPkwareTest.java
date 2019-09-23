@@ -80,7 +80,7 @@ public class EncryptionPkwareTest {
 
         ZipIt.add(zip, filesDirCars, settings);
         assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(zip, password).exists().root().hasSubDirectories(0).hasFiles(3);
+        assertThatZipFile(zip, password).exists().root().hasDirectories(0).hasFiles(3);
         assertThatZipFile(zip, password).root().matches(zipDirCarsAssert);
     }
 

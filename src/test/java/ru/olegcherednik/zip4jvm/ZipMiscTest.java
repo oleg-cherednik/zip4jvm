@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import ru.olegcherednik.zip4jvm.exception.EntryDuplicationException;
 import ru.olegcherednik.zip4jvm.exception.PathNotExistsException;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
@@ -20,18 +21,21 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolidPkware;
-import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
-import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSplit;
+import static ru.olegcherednik.zip4jvm.TestData.dirBikes;
 import static ru.olegcherednik.zip4jvm.TestData.dirCars;
 import static ru.olegcherednik.zip4jvm.TestData.dirSrc;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileFerrari;
 import static ru.olegcherednik.zip4jvm.TestData.fileWiesmann;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirCars;
+import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
+import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolidPkware;
+import static ru.olegcherednik.zip4jvm.TestData.zipDirNameBikes;
+import static ru.olegcherednik.zip4jvm.TestData.zipDirNameCars;
 import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolid;
 import static ru.olegcherednik.zip4jvm.TestData.zipStoreSplit;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.zipDirBikesAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.zipDirCarsAssert;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
@@ -43,6 +47,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
 public class ZipMiscTest {
 
     private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ZipMiscTest.class);
+    private static final Path zipMerge = rootDir.resolve("merge/src.zip");
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -80,13 +85,23 @@ public class ZipMiscTest {
     }
 
     public void shouldMergeSplitZip() throws IOException {
-        assertThat(ZipMisc.isSplit(zipDeflateSplit)).isTrue();
+        ZipIt.add(zipMerge, dirBikes);
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipMisc.merge(zipDeflateSplit, zip);
+        ZipIt.add(zip, dirCars);
 
-        assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(zip).exists().root().matches(TestDataAssert.zipDirRootAssert);
+        ZipMisc.merge(zipMerge, zip);
+        assertThatZipFile(zipMerge).root().hasDirectories(2).hasFiles(0);
+        assertThatZipFile(zipMerge).exists().directory(zipDirNameBikes).matches(zipDirBikesAssert);
+        assertThatZipFile(zipMerge).exists().directory(zipDirNameCars).matches(zipDirCarsAssert);
+    }
+
+    @Test(dependsOnMethods = "shouldMergeSplitZip")
+    public void shouldThrowExceptionWhenMergeWithDuplicatedEntries() throws IOException {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        ZipIt.add(zip, dirCars);
+
+        assertThatThrownBy(() -> ZipMisc.merge(zipMerge, zip)).isExactlyInstanceOf(EntryDuplicationException.class);
     }
 
     public void shouldRetrieveTrueWhenSplitZipWithMultipleDisks() throws IOException {

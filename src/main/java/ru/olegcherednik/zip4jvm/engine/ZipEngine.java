@@ -75,12 +75,10 @@ public final class ZipEngine implements ZipFile.Writer {
 
         for (String fileName : srcZipModel.getEntryNames()) {
             if (fileNameWriter.containsKey(fileName))
-                throw new Zip4jvmException("File name duplication");
+                throw new EntryDuplicationException(fileName);
 
-            char[] password = entrySettingsProvider == null ? null : entrySettingsProvider.apply(fileName).getPassword();
-
-            if (fileNameWriter.put(fileName, new ExistedEntryWriter(srcZipModel, fileName, tempZipModel, password)) != null)
-                throw new Zip4jvmException("File name duplication");
+            char[] password = entrySettingsProvider.apply(fileName).getPassword();
+            fileNameWriter.put(fileName, new ExistedEntryWriter(srcZipModel, fileName, tempZipModel, password));
         }
     }
 

@@ -69,7 +69,7 @@ public final class TestDataAssert {
     public static final Consumer<AbstractDirectoryAssert<?>> emptyDirAssert = dir -> dir.exists().hasSubDirectories(0).hasFiles(0);
 
     public static final Consumer<AbstractZipEntryDirectoryAssert<?>> zipDirRootAssert = dir -> {
-        dir.exists().hasSubDirectories(3).hasFiles(5);
+        dir.exists().hasDirectories(3).hasFiles(5);
 
         TestDataAssert.zipDirBikesAssert.accept(dir.directory(zipDirNameBikes));
         TestDataAssert.zipDirCarsAssert.accept(dir.directory(zipDirNameCars));
@@ -83,7 +83,7 @@ public final class TestDataAssert {
     };
 
     public static final Consumer<AbstractZipEntryDirectoryAssert<?>> zipDirBikesAssert = dir -> {
-        dir.exists().hasSubDirectories(0).hasFiles(4);
+        dir.exists().hasDirectories(0).hasFiles(4);
         dir.file(fileNameDucati).exists().hasSize(293_823);
         dir.file(fileNameHonda).exists().hasSize(154_591);
         dir.file(fileNameKawasaki).exists().hasSize(167_026);
@@ -91,13 +91,13 @@ public final class TestDataAssert {
     };
 
     public static final Consumer<AbstractZipEntryDirectoryAssert<?>> zipDirCarsAssert = dir -> {
-        dir.exists().hasSubDirectories(0).hasFiles(3);
+        dir.exists().hasDirectories(0).hasFiles(3);
         dir.file(fileNameBentley).exists().hasSize(1_395_362);
         dir.file(fileNameFerrari).exists().hasSize(320_894);
         dir.file(fileNameWiesmann).exists().hasSize(729_633);
     };
 
-    public static final Consumer<AbstractZipEntryDirectoryAssert<?>> zipDirEmptyAssert = dir -> dir.exists().hasSubDirectories(0).hasFiles(0);
+    public static final Consumer<AbstractZipEntryDirectoryAssert<?>> zipDirEmptyAssert = dir -> dir.exists().hasDirectories(0).hasFiles(0);
 
     public static void copyLarge(InputStream in, Path dst) throws IOException {
         try (OutputStream out = new FileOutputStream(dst.toFile())) {

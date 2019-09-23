@@ -90,11 +90,15 @@ public class Zip4jvmSuite {
         String[] parts = cls.getName().substring(baseDir.length() + 1).split("\\.");
         Path path = dirRoot;
 
-        for (int i = 0; i < parts.length; i++) {
-            if (i == 1)
-                path = path.resolve(String.valueOf(time));
+        if (parts.length == 1)
+            path = path.resolve(parts[0]).resolve(String.valueOf(time));
+        else {
+            for (int i = 0; i < parts.length; i++) {
+                if (i == 1)
+                    path = path.resolve(String.valueOf(time));
 
-            path = path.resolve(parts[i]);
+                path = path.resolve(parts[i]);
+            }
         }
 
         return path;

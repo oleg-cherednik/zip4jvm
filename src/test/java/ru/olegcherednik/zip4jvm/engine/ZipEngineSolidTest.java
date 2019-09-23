@@ -102,7 +102,7 @@ public class ZipEngineSolidTest {
         }
 
         assertThatDirectory(solidFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(solidFile, password).exists().root().hasSubDirectories(0).hasFiles(4);
+        assertThatZipFile(solidFile, password).exists().root().hasDirectories(0).hasFiles(4);
         assertThatZipFile(solidFile, password).file(fileNameBentley).exists().hasSize(1_395_362);
         assertThatZipFile(solidFile, password).file(fileNameFerrari).exists().hasSize(320_894);
         assertThatZipFile(solidFile, password).file(fileNameWiesmann).exists().hasSize(729_633);
@@ -129,7 +129,7 @@ public class ZipEngineSolidTest {
         }
 
         assertThatDirectory(solidFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(solidFile, password).exists().root().hasSubDirectories(0).hasFiles(6);
+        assertThatZipFile(solidFile, password).exists().root().hasDirectories(0).hasFiles(6);
         assertThatZipFile(solidFile, password).file(fileNameBentley).exists().hasSize(1_395_362);
         assertThatZipFile(solidFile, password).file(fileNameFerrari).exists().hasSize(320_894);
         assertThatZipFile(solidFile, fileNameHonda.toCharArray()).file(fileNameHonda).exists().hasSize(154_591);
@@ -191,7 +191,7 @@ public class ZipEngineSolidTest {
         }
 
         assertThatDirectory(solidFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(solidFile, password).exists().root().hasSubDirectories(0).hasFiles(5);
+        assertThatZipFile(solidFile, password).exists().root().hasDirectories(0).hasFiles(5);
     }
 
     @Test(dependsOnMethods = "shouldRemoveExistedEntityWhenNormalizePrefix")
@@ -244,6 +244,16 @@ public class ZipEngineSolidTest {
             }
         }).isExactlyInstanceOf(FileNotFoundException.class);
     }
+
+    @Test(dependsOnMethods = "shouldThrowExceptionWhenRemoveNotExistedEntry")
+    public void shouldThrowExceptionWhenCopyNullEntry() throws IOException {
+        assertThatThrownBy(() -> {
+            try (ZipEngine engine = new ZipEngine(solidFile, ZipFileSettings.DEFAULT)) {
+                engine.copy(null);
+            }
+        }).isExactlyInstanceOf(NullPointerException.class);
+    }
+
 
     public void shouldCreateZipFileWhenUseZipFileAndAddFilesSplit() throws IOException {
         Function<String, ZipEntrySettings> entrySettingsProvider =
@@ -318,7 +328,7 @@ public class ZipEngineSolidTest {
         }
 
         assertThatDirectory(supplierSolidFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(supplierSolidFile, Zip4jvmSuite.password).exists().root().hasSubDirectories(0).hasFiles(4);
+        assertThatZipFile(supplierSolidFile, Zip4jvmSuite.password).exists().root().hasDirectories(0).hasFiles(4);
         assertThatZipFile(supplierSolidFile, Zip4jvmSuite.password).file(fileNameBentley).exists().hasSize(1_395_362);
         assertThatZipFile(supplierSolidFile, Zip4jvmSuite.password).file(fileNameFerrari).exists().hasSize(320_894);
         assertThatZipFile(supplierSolidFile, Zip4jvmSuite.password).file(fileNameWiesmann).exists().hasSize(729_633);
@@ -363,7 +373,7 @@ public class ZipEngineSolidTest {
         }
 
         assertThatDirectory(memorySolidFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        assertThatZipFile(memorySolidFile, Zip4jvmSuite.password).exists().root().hasSubDirectories(0).hasFiles(4);
+        assertThatZipFile(memorySolidFile, Zip4jvmSuite.password).exists().root().hasDirectories(0).hasFiles(4);
 //        assertThatZipFile(memorySolidFile, Zip4jSuite.password).file("bentley-continental.jpg").exists().isImage().hasSize(1_395_362);
 //        assertThatZipFile(memorySolidFile, Zip4jSuite.password).file("ferrari-458-italia.jpg").exists().isImage().hasSize(320_894);
 //        assertThatZipFile(memorySolidFile, Zip4jSuite.password).file("wiesmann-gt-mf5.jpg").exists().isImage().hasSize(729_633);

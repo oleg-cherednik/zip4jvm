@@ -16,12 +16,12 @@ public class AbstractZipEntryDirectoryAssert<S extends AbstractZipEntryDirectory
         super(actual, selfType, zipFile);
     }
 
-    public S hasSubDirectories(int expected) {
+    public S hasDirectories(int expected) {
         long actual = getFoldersAmount();
 
         if (actual != expected)
             throw Failures.instance().failure(
-                    String.format("Zip directory '%s' contains illegal amount of sub directories: actual - '%d', expected - '%d'",
+                    String.format("Zip directory '%s' contains illegal amount of directories: actual - '%d', expected - '%d'",
                             this.actual, actual, expected));
 
         return myself;
