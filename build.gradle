@@ -52,6 +52,7 @@ dependencies {
     testCompile 'net.sf.sevenzipjbinding:sevenzipjbinding:9.20-2.00beta'
     testCompile 'net.sf.sevenzipjbinding:sevenzipjbinding-all-platforms:9.20-2.00beta'
     testCompile 'de.idyl:winzipaes:1.0.1'
+    testCompile 'org.mockito:mockito-core:3.0.0'
 }
 
 jacocoTestReport {

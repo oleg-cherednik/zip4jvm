@@ -134,7 +134,7 @@ public final class ZipFile {
                     .inputStreamSup(Files.isRegularFile(path) ? () -> new FileInputStream(path.toFile()) : EmptyInputStreamSupplier.INSTANCE)
                     .fileName(fileName)
                     .lastModifiedTime(Files.getLastModifiedTime(path).toMillis())
-                    .externalFileAttributes(ExternalFileAttributes.createOperationBasedDelegate(path))
+                    .externalFileAttributes(ExternalFileAttributes.createOperationBasedDelegate(path, () -> System.getProperty("os.name")))
                     .regularFile(Files.isRegularFile(path)).build();
         }
 

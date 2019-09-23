@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
+import static ru.olegcherednik.zip4jvm.model.ExternalFileAttributes.WIN;
 
 /**
  * @author Oleg Cherednik
@@ -38,7 +39,7 @@ public class FileHeaderTest {
     public void shouldUseSettersGettersCorrectly() throws IOException {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         InternalFileAttributes internalFileAttributes = InternalFileAttributes.createDataBasedDelegate(new byte[] { 1, 2 });
-        ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.createOperationBasedDelegate(fileBentley);
+        ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.createOperationBasedDelegate(fileBentley, () -> WIN);
 
         assertThat(internalFileAttributes).isNotSameAs(InternalFileAttributes.NULL);
         assertThat(externalFileAttributes).isNotSameAs(ExternalFileAttributes.NULL);

@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.model;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import java.io.IOException;
@@ -43,16 +42,20 @@ import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT7;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consumer<Path> {
 
+    public static final String WIN = "win";
+    public static final String MAC = "mac";
+    public static final String UNIX = "nux";
+
     public static final ExternalFileAttributes NULL = new Unknown();
     public static final int SIZE = 4;
 
-    public static ExternalFileAttributes createOperationBasedDelegate(@NonNull Path path) throws IOException {
-        String os = System.getProperty("os.name").toLowerCase();
+    public static ExternalFileAttributes createOperationBasedDelegate(Path path, Supplier<String> osNameProvider) throws IOException {
+        String os = osNameProvider.get().toLowerCase();
         ExternalFileAttributes attributes = NULL;
 
-        if (os.contains("win"))
+        if (os.contains(WIN))
             attributes = new Windows();
-        else if (os.contains("mac") || os.contains("nux"))
+        else if (os.contains(MAC) || os.contains(UNIX))
             attributes = new Posix();
 
         attributes.readFrom(path);
