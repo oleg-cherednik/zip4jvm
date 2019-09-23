@@ -42,7 +42,7 @@ public class UnzipItTest {
         List<String> fileNames = Arrays.asList("saint-petersburg.jpg", "cars/bentley-continental.jpg");
         UnzipIt.extract(zipDeflateSolid, destDir, fileNames);
 
-        assertThatDirectory(destDir).exists().hasSubDirectories(0).hasFiles(2);
+        assertThatDirectory(destDir).exists().hasDirectories(0).hasFiles(2);
         assertThatFile(destDir.resolve("saint-petersburg.jpg")).exists().isImage().hasSize(1_074_836);
         assertThatFile(destDir.resolve("bentley-continental.jpg")).exists().isImage().hasSize(1_395_362);
     }
@@ -54,7 +54,7 @@ public class UnzipItTest {
         List<String> fileNames = Arrays.asList("saint-petersburg.jpg", "cars/bentley-continental.jpg");
         UnzipIt.extract(zipDeflateSplit, destDir, fileNames);
 
-        assertThatDirectory(destDir).exists().hasSubDirectories(0).hasFiles(2);
+        assertThatDirectory(destDir).exists().hasDirectories(0).hasFiles(2);
         assertThatFile(destDir.resolve("saint-petersburg.jpg")).exists().isImage().hasSize(1_074_836);
         assertThatFile(destDir.resolve("bentley-continental.jpg")).exists().isImage().hasSize(1_395_362);
     }
@@ -63,7 +63,7 @@ public class UnzipItTest {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTme(rootDir);
         UnzipIt.extract(zipDeflateSolid, destDir, "cars/ferrari-458-italia.jpg");
 
-        assertThatDirectory(destDir).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatDirectory(destDir).exists().hasDirectories(0).hasFiles(1);
         assertThatFile(destDir.resolve("ferrari-458-italia.jpg")).exists().isImage().hasSize(320_894);
     }
 
@@ -71,7 +71,7 @@ public class UnzipItTest {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTme(rootDir);
         UnzipIt.extract(zipDeflateSolid, destDir, dirNameBikes);
 
-        assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);
+        assertThatDirectory(destDir).exists().hasDirectories(1).hasFiles(0);
         assertThatDirectory(destDir.resolve(dirNameBikes)).matches(TestDataAssert.dirBikesAssert);
     }
 

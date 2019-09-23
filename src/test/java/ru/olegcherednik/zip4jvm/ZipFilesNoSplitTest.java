@@ -51,7 +51,7 @@ public class ZipFilesNoSplitTest {
 
         ZipIt.add(zip, files, settings);
 
-        Zip4jvmAssertions.assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        Zip4jvmAssertions.assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
         Zip4jvmAssertions.assertThatZipFile(zip).root().matches(TestDataAssert.zipDirCarsAssert);
     }
 

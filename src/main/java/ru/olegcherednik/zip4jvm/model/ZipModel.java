@@ -77,8 +77,8 @@ public class ZipModel {
         return fileNameEntry.size();
     }
 
-    public void addEntry(@NonNull ZipEntry entry) {
-        fileNameEntry.put(entry.getFileName(), entry);
+    public void addEntry(@NonNull ZipEntry zipEntry) {
+        fileNameEntry.put(zipEntry.getFileName(), zipEntry);
     }
 
     public Collection<ZipEntry> getEntries() {

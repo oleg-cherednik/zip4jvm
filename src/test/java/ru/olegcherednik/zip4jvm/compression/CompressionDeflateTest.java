@@ -61,7 +61,7 @@ public class CompressionDeflateTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
         ZipIt.add(zip, filesDirBikes, settings);
-        assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
         assertThatZipFile(zip).root().matches(zipDirBikesAssert);
     }
 
@@ -72,7 +72,7 @@ public class CompressionDeflateTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
         ZipIt.add(zip, filesDirCars, settings);
-        assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(3);
+        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(3);
         assertThatZipFile(zip).root().matches(zipDirCarsAssert);
     }
 
@@ -83,7 +83,7 @@ public class CompressionDeflateTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt.add(zip, dirBikes, settings);
 
-        assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
         assertThatZipFile(zip).exists().root().hasDirectories(1).hasFiles(0);
         assertThatZipFile(zip).directory(zipDirNameBikes).matches(zipDirBikesAssert);
     }
@@ -95,7 +95,7 @@ public class CompressionDeflateTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
         ZipIt.add(zip, dirCars, settings);
-        assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(3);
+        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(3);
         assertThatZipFile(zip).root().hasDirectories(1).hasFiles(0);
         assertThatZipFile(zip).directory(zipDirNameCars).matches(zipDirCarsAssert);
     }
@@ -110,7 +110,7 @@ public class CompressionDeflateTest {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
         UnzipIt.extract(zipDeflateSolidPkware, destDir, dirNameCars, fileName -> password);
-        assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);
+        assertThatDirectory(destDir).exists().hasDirectories(1).hasFiles(0);
         assertThatDirectory(destDir.resolve(dirNameCars)).matches(dirCarsAssert);
     }
 
@@ -118,7 +118,7 @@ public class CompressionDeflateTest {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
         UnzipIt.extract(zipDeflateSolidAes, destDir, dirNameCars, String::toCharArray);
-        assertThatDirectory(destDir).exists().hasSubDirectories(1).hasFiles(0);
+        assertThatDirectory(destDir).exists().hasDirectories(1).hasFiles(0);
         assertThatDirectory(destDir.resolve(dirNameCars)).matches(dirCarsAssert);
     }
 

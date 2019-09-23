@@ -37,8 +37,6 @@ public abstract class ZipEntry {
     public static final Comparator<ZipEntry> SORT_BY_DISC_LOCAL_FILE_HEADER_OFFS =
             Comparator.comparingLong(ZipEntry::getDisk).thenComparing(ZipEntry::getLocalFileHeaderOffs);
 
-    public static final long SIZE_2GB = 2_147_483_648L;
-
     private final String fileName;
     private final int lastModifiedTime;
     private final ExternalFileAttributes externalFileAttributes;

@@ -43,7 +43,7 @@ public class ZipFolderSplitTest {
         ZipFileSettings settings = ZipFileSettings.builder().entrySettingsProvider(fileName -> entrySettings).splitSize(SIZE_1MB).build();
 
         ZipIt.add(zip, contentDirSrc, settings);
-        assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(6);
+        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(6);
         assertThat(Files.exists(zip)).isTrue();
         assertThat(Files.isRegularFile(zip)).isTrue();
         // TODO ZipFile does not read split archive

@@ -2,18 +2,15 @@ package ru.olegcherednik.zip4jvm.engine;
 
 import lombok.NonNull;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.ZipFile;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
@@ -69,7 +66,7 @@ public final class UnzipEngine implements ZipFile.Reader {
         ZipEntry zipEntry = zipModel.getEntryByFileName(ZipUtils.normalizeFileName(fileName));
 
         if (zipEntry == null)
-            throw new Zip4jvmException("No entry found for '" + fileName + '\'');
+            throw new FileNotFoundException("Entry '" + fileName + "' was not found");
 
         zipEntry.setPassword(passwordProvider.apply(zipEntry.getFileName()));
         return zipEntry.createImmutableEntry();
@@ -114,9 +111,6 @@ public final class UnzipEngine implements ZipFile.Reader {
     }
 
     private void extractEntry(Path destDir, ZipEntry zipEntry, Function<ZipEntry, String> getFileName) throws IOException {
-        if (zipEntry == null)
-            throw new Zip4jvmException("Entry not found");
-
         zipEntry.setPassword(passwordProvider.apply(zipEntry.getFileName()));
         String fileName = getFileName.apply(zipEntry);
         Path file = destDir.resolve(fileName);
@@ -124,12 +118,7 @@ public final class UnzipEngine implements ZipFile.Reader {
         if (zipEntry.isDirectory())
             Files.createDirectories(file);
         else {
-            try (InputStream in = zipEntry.getIn(); OutputStream out = getOutputStream(file)) {
-                if (zipEntry.getUncompressedSize() > ZipEntry.SIZE_2GB)
-                    IOUtils.copyLarge(in, out);
-                else
-                    IOUtils.copy(in, out);
-            }
+            ZipUtils.copyLarge(zipEntry.getIn(), getOutputStream(file));
             // TODO should be uncommented
 //            setFileAttributes(file, zipEntry);
 //            setFileLastModifiedTime(file, fileHeader);
@@ -148,11 +137,11 @@ public final class UnzipEngine implements ZipFile.Reader {
         return new FileOutputStream(file.toFile());
     }
 
-    private static void checkZipFile(Path zip) {
+    private static void checkZipFile(Path zip) throws IOException {
         if (!Files.exists(zip))
-            throw new Zip4jvmException("ZipFile not exists: " + zip);
+            throw new FileNotFoundException("ZipFile not exists: " + zip);
         if (!Files.isRegularFile(zip))
-            throw new Zip4jvmException("ZipFile is not a regular file: " + zip);
+            throw new IOException("ZipFile is not a regular file: " + zip);
     }
 
 }

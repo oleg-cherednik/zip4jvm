@@ -47,7 +47,7 @@ public class ZipFolderNoSplitTest {
                                                   .build();
         ZipIt.add(zip, dirCars, settings);
 
-        Zip4jvmAssertions.assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        Zip4jvmAssertions.assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
         Zip4jvmAssertions.assertThatZipFile(zip).exists().root().hasDirectories(1).hasFiles(0);
         Zip4jvmAssertions.assertThatZipFile(zip).directory("cars/").matches(TestDataAssert.zipDirCarsAssert);
     }
@@ -84,7 +84,7 @@ public class ZipFolderNoSplitTest {
                                                   .build();
         ZipIt.add(zip, dirEmpty, settings);
 
-        Zip4jvmAssertions.assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        Zip4jvmAssertions.assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
         Zip4jvmAssertions.assertThatZipFile(zip).exists().root().hasDirectories(3).hasFiles(0);
         Zip4jvmAssertions.assertThatZipFile(zip).directory("cars/").matches(TestDataAssert.zipDirCarsAssert);
 //        Zip4jvmAssertions.assertThatZipFile(zip).directory("Star Wars/").matches(TestDataAssert.zipStarWarsDirAssert);

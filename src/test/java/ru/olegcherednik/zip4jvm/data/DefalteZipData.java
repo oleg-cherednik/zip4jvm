@@ -46,7 +46,7 @@ public final class DefalteZipData {
         ZipIt.add(zipDeflateSolid, contentDirSrc, settings);
         assertThat(Files.exists(zipDeflateSolid)).isTrue();
         assertThat(Files.isRegularFile(zipDeflateSolid)).isTrue();
-        assertThatDirectory(zipDeflateSolid.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatDirectory(zipDeflateSolid.getParent()).exists().hasDirectories(0).hasFiles(1);
         assertThatZipFile(zipDeflateSolid).exists().root().matches(zipDirRootAssert);
     }
 
@@ -57,7 +57,7 @@ public final class DefalteZipData {
         ZipIt.add(zipDeflateSplit, contentDirSrc, settings);
         assertThat(Files.exists(zipDeflateSplit)).isTrue();
         assertThat(Files.isRegularFile(zipDeflateSplit)).isTrue();
-        assertThatDirectory(zipDeflateSplit.getParent()).exists().hasSubDirectories(0).hasFiles(6);
+        assertThatDirectory(zipDeflateSplit.getParent()).exists().hasDirectories(0).hasFiles(6);
     }
 
     private static void createDeflateSolidPkwareZip() throws IOException {
@@ -71,7 +71,7 @@ public final class DefalteZipData {
         ZipIt.add(zipDeflateSolidPkware, contentDirSrc, settings);
         assertThat(Files.exists(zipDeflateSolidPkware)).isTrue();
         assertThat(Files.isRegularFile(zipDeflateSolidPkware)).isTrue();
-        assertThatDirectory(zipDeflateSolidPkware.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatDirectory(zipDeflateSolidPkware.getParent()).exists().hasDirectories(0).hasFiles(1);
         assertThatZipFile(zipDeflateSolidPkware, password).exists().root().matches(zipDirRootAssert);
     }
 
@@ -85,7 +85,7 @@ public final class DefalteZipData {
         ZipIt.add(zipDeflateSolidAes, contentDirSrc, settings);
         assertThat(Files.exists(zipDeflateSolidAes)).isTrue();
         assertThat(Files.isRegularFile(zipDeflateSolidAes)).isTrue();
-        assertThatDirectory(zipDeflateSolidAes.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        assertThatDirectory(zipDeflateSolidAes.getParent()).exists().hasDirectories(0).hasFiles(1);
     }
 
 }

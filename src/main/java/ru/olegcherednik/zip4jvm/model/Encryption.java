@@ -28,7 +28,7 @@ import java.util.function.LongFunction;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum Encryption {
-    OFF(entry -> Encoder.NULL,
+    OFF(zipEntry -> Encoder.NULL,
             (zipEntry, in) -> Decoder.NULL,
             uncompressedSize -> uncompressedSize,
             ZipEntry::getChecksum,

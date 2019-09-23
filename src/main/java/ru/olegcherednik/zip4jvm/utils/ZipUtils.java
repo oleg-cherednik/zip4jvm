@@ -4,9 +4,13 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.exception.RealBigZip64NotSupportedException;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Calendar;
 
 /**
@@ -74,6 +78,12 @@ public final class ZipUtils {
     public static String getFileNameNoDirectoryMarker(@NonNull String fileName) {
         fileName = normalizeFileName(fileName);
         return StringUtils.removeEnd(normalizeFileName(fileName), "/");
+    }
+
+    public static long copyLarge(InputStream input, OutputStream output) throws IOException {
+        try (InputStream in = input; OutputStream out = output) {
+            return IOUtils.copyLarge(in, out);
+        }
     }
 
 }

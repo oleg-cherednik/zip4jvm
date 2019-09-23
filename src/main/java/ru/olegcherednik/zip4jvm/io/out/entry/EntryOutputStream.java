@@ -37,34 +37,34 @@ public abstract class EntryOutputStream extends OutputStream {
 
     private long uncompressedSize;
 
-    public static EntryOutputStream create(@NonNull ZipEntry entry, @NonNull ZipModel zipModel, @NonNull DataOutput out) throws IOException {
-        EntryOutputStream os = createOutputStream(entry, out);
+    public static EntryOutputStream create(@NonNull ZipEntry zipEntry, @NonNull ZipModel zipModel, @NonNull DataOutput out) throws IOException {
+        EntryOutputStream os = createOutputStream(zipEntry, out);
 
         // TODO move it to the separate method
-        zipModel.addEntry(entry);
-        entry.setLocalFileHeaderOffs(out.getOffs());
+        zipModel.addEntry(zipEntry);
+        zipEntry.setLocalFileHeaderOffs(out.getOffs());
 
         os.writeLocalFileHeader();
         os.writeEncryptionHeader();
         return os;
     }
 
-    private static EntryOutputStream createOutputStream(ZipEntry entry, DataOutput out) throws IOException {
-        Compression compression = entry.getCompression();
-        entry.setDisk(out.getDisk());
+    private static EntryOutputStream createOutputStream(ZipEntry zipEntry, DataOutput out) throws IOException {
+        Compression compression = zipEntry.getCompression();
+        zipEntry.setDisk(out.getDisk());
 
         if (compression == Compression.STORE)
-            return new StoreEntryOutputStream(entry, out);
+            return new StoreEntryOutputStream(zipEntry, out);
         if (compression == Compression.DEFLATE)
-            return new DeflateEntryOutputStream(entry, out);
+            return new DeflateEntryOutputStream(zipEntry, out);
 
         throw new Zip4jvmException("Compression is not supported: " + compression);
     }
 
-    protected EntryOutputStream(ZipEntry entry, DataOutput out) {
-        this.entry = entry;
+    protected EntryOutputStream(ZipEntry zipEntry, DataOutput out) {
+        this.entry = zipEntry;
         this.out = out;
-        encoder = entry.getEncryption().getCreateEncoder().apply(entry);
+        encoder = zipEntry.getEncryption().getCreateEncoder().apply(zipEntry);
     }
 
     private void writeLocalFileHeader() throws IOException {

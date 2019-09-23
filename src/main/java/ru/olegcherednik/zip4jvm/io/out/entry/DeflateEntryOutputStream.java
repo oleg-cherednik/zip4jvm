@@ -17,9 +17,9 @@ final class DeflateEntryOutputStream extends EntryOutputStream {
 
     public boolean firstBytesRead;
 
-    public DeflateEntryOutputStream(ZipEntry entry, DataOutput out) {
-        super(entry, out);
-        deflater.setLevel(entry.getCompressionLevel().getCode());
+    public DeflateEntryOutputStream(ZipEntry zipEntry, DataOutput out) {
+        super(zipEntry, out);
+        deflater.setLevel(zipEntry.getCompressionLevel().getCode());
     }
 
     @Override

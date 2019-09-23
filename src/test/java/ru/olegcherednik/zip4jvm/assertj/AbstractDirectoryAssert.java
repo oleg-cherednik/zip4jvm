@@ -25,12 +25,12 @@ public class AbstractDirectoryAssert<S extends AbstractDirectoryAssert<S>> exten
         return new DirectoryAssert(actual.toPath().resolve(name));
     }
 
-    public S hasSubDirectories(int expected) {
+    public S hasDirectories(int expected) {
         long actual = getFoldersAmount();
 
         if (actual != expected)
             throw Failures.instance().failure(
-                    String.format("Directory '%s' contains illegal amount of sub directories: actual - '%d', expected - '%d'",
+                    String.format("Directory '%s' contains illegal amount of directories: actual - '%d', expected - '%d'",
                             this.actual.getAbsolutePath(), actual, expected));
 
         return myself;
