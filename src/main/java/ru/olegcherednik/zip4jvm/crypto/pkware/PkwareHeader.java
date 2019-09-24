@@ -46,11 +46,12 @@ public final class PkwareHeader {
         out.writeBytes(buf);
     }
 
+    /** see 6.1.6 */
     private void requireMatchChecksum(PkwareEngine engine, ZipEntry zipEntry) {
         engine.decrypt(buf, 0, buf.length);
         int checksum = getChecksum(zipEntry);
 
-        if (buf[buf.length - 1] != low(checksum) || buf[buf.length - 2] != high(checksum))
+        if (buf[buf.length - 1] != low(checksum) /*|| buf[buf.length - 2] != high(checksum)*/)
             throw new IncorrectPasswordException(zipEntry.getFileName());
     }
 

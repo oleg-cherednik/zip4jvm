@@ -124,8 +124,7 @@ final class Zip64Reader implements Reader<Zip64> {
                                      .uncompressedSize(uncompressedSize)
                                      .compressedSize(compressedSize)
                                      .offsLocalHeaderRelative(offsLocalHeaderRelative)
-                                     .disk(disk)
-                                     .build();
+                                     .disk(disk).build();
         }
 
     }
