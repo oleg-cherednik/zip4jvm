@@ -103,13 +103,17 @@ final class Zip64Reader implements Reader<Zip64> {
             if (signature != Zip64.ExtendedInfo.SIGNATURE)
                 return Zip64.ExtendedInfo.NULL;
 
+            long offs1 = in.getOffs();
             int size = in.readWord();
-            long offs = in.getOffs();
+            long offs2 = in.getOffs();
 
             Zip64.ExtendedInfo extendedInfo = readExtendedInfo(in);
 
-            if (in.getOffs() - offs != size)
-                throw new Zip4jvmException("Illegal number of read bytes");
+            if (in.getOffs() - offs2 != size) {
+                // section exists, but not need to read it; all data in FileHeader
+                extendedInfo = Zip64.ExtendedInfo.NULL;
+                in.seek(offs1);
+            }
 
             return extendedInfo;
         }
