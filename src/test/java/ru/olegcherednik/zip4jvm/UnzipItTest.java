@@ -8,7 +8,6 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -74,15 +73,6 @@ public class UnzipItTest {
 
         assertThatDirectory(destDir).exists().hasDirectories(1).hasFiles(0);
         assertThatDirectory(destDir.resolve(dirNameBikes)).matches(TestDataAssert.dirBikesAssert);
-    }
-
-    public void shouldUnzipWhenZip64ExtensionContainsFileSizesOnly() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTme(rootDir);
-        Path zip = Paths.get("src/test/resources/zip/zip64_crc1byte_check.zip").toAbsolutePath();
-
-        UnzipIt.extract(zip, destDir, fileName -> "Shu1an@2019GTS".toCharArray());
-        assertThatDirectory(destDir).exists().hasDirectories(0).hasFiles(1);
-        assertThatDirectory(destDir).file("hello.txt").exists().hasSize(11).hasContent("hello,itsme");
     }
 
 }

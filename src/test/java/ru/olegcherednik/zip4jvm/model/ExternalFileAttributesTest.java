@@ -80,6 +80,19 @@ public class ExternalFileAttributesTest {
         assertThat(externalFileAttributes.toString()).isEqualTo("<null>");
     }
 
-    // TODO add checks that permissions set correctly
+    public void shouldRetrievePosixImplementationWhen2And3BytesNotZero() {
+        for (byte[] data : Arrays.asList(new byte[] { 0x0, 0x0, 0xA, 0x0 }, new byte[] { 0x0, 0x0, 0x0, 0xA }))
+            assertThat(ExternalFileAttributes.createDataBasedDelegate(data).toString()).isEqualTo("posix");
+    }
+
+    public void shouldRetrieveWindowsPosixImplementationWhen0byteNotZero() {
+        ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.createDataBasedDelegate(new byte[] { 0xA, 0x0, 0x0, 0x0 });
+        assertThat(externalFileAttributes.toString()).isEqualTo("win");
+    }
+
+    public void shouldRetrieveWindowsPosixImplementationWhenAllBytesZero() {
+        ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.createDataBasedDelegate(new byte[] { 0x0, 0x0, 0x0, 0x0 });
+        assertThat(externalFileAttributes.toString()).isEqualTo("<null>");
+    }
 
 }

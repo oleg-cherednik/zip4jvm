@@ -32,7 +32,6 @@ final class AesExtraDataRecordReader implements Reader<AesExtraDataRecord> {
                                  .versionNumber(in.readWord())
                                  .vendor(in.readString(2, charset))
                                  .strength(AesStrength.parseValue(in.readByte()))
-                                 .compressionMethod(CompressionMethod.parseCode(in.readWord()))
-                                 .build();
+                                 .compressionMethod(CompressionMethod.parseCode(in.readWord())).build();
     }
 }

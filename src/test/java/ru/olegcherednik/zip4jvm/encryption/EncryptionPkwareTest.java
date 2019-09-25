@@ -18,6 +18,7 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -115,6 +116,15 @@ public class EncryptionPkwareTest {
 
         assertThatThrownBy(() -> UnzipIt.extract(zipStoreSplitPkware, destDir, fileName -> UUID.randomUUID().toString().toCharArray()))
                 .isExactlyInstanceOf(IncorrectPasswordException.class);
+    }
+
+    public void shouldUnzipWhenZip64ContainsOnlyOneCrcByteMatch() throws IOException {
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTme(rootDir);
+        Path zip = Paths.get("src/test/resources/zip/zip64_crc1byte_check.zip").toAbsolutePath();
+
+        UnzipIt.extract(zip, destDir, fileName -> "Shu1an@2019GTS".toCharArray());
+        assertThatDirectory(destDir).exists().hasDirectories(0).hasFiles(1);
+        assertThatDirectory(destDir).file("hello.txt").exists().hasSize(11).hasContent("hello,itsme");
     }
 
 }
