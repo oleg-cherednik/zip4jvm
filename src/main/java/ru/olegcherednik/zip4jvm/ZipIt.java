@@ -32,7 +32,7 @@ import java.util.Collections;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ZipIt {
 
-    public static void add(Path zip, Path path) throws IOException {
+    public static void add(Path zip, @NonNull Path path) throws IOException {
         add(zip, path, ZipFileSettings.DEFAULT);
     }
 

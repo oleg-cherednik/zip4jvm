@@ -55,12 +55,12 @@ public final class PathUtils {
         }
     }
 
-    public static void requireExistedPaths(@NonNull Collection<Path> paths) {
+    public static void requireExistedPaths(Collection<Path> paths) {
         paths.forEach(PathUtils::requireExistedPath);
     }
 
-    public static void requireExistedPath(@NonNull Path path) {
-        if (!Files.exists(path) || !Files.isReadable(path))
+    public static void requireExistedPath(Path path) {
+        if (path == null || !Files.exists(path) || !Files.isReadable(path))
             throw new PathNotExistsException(path);
     }
 }
