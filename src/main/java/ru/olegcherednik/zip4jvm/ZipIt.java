@@ -32,37 +32,37 @@ import java.util.Collections;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ZipIt {
 
-    public static void add(@NonNull Path zip, @NonNull Path path) throws IOException {
+    public static void add(Path zip, Path path) throws IOException {
         add(zip, path, ZipFileSettings.DEFAULT);
     }
 
-    public static void add(@NonNull Path zip, @NonNull Collection<Path> paths) throws IOException {
+    public static void add(Path zip, Collection<Path> paths) throws IOException {
         add(zip, paths, ZipFileSettings.DEFAULT);
     }
 
-    public static void add(@NonNull Path zip, @NonNull Path path, @NonNull ZipFileSettings settings) throws IOException {
+    public static void add(Path zip, @NonNull Path path, ZipFileSettings settings) throws IOException {
         add(zip, Collections.singleton(path), settings);
     }
 
-    public static void add(@NonNull Path zip, @NonNull Collection<Path> paths, @NonNull ZipFileSettings settings) throws IOException {
+    public static void add(Path zip, Collection<Path> paths, ZipFileSettings settings) throws IOException {
         try (ZipFile.Writer zipFile = ZipFile.write(zip, settings)) {
             zipFile.add(paths);
         }
     }
 
-    public static void addEntry(@NonNull Path zip, @NonNull ZipFile.Entry entry) throws IOException {
+    public static void addEntry(Path zip, ZipFile.Entry entry) throws IOException {
         addEntry(zip, entry, ZipFileSettings.DEFAULT);
     }
 
-    public static void addEntry(@NonNull Path zip, @NonNull Collection<ZipFile.Entry> entries) throws IOException {
+    public static void addEntry(Path zip, Collection<ZipFile.Entry> entries) throws IOException {
         addEntry(zip, entries, ZipFileSettings.DEFAULT);
     }
 
-    public static void addEntry(@NonNull Path zip, @NonNull ZipFile.Entry entry, @NonNull ZipFileSettings settings) throws IOException {
+    public static void addEntry(Path zip, @NonNull ZipFile.Entry entry, ZipFileSettings settings) throws IOException {
         addEntry(zip, Collections.singleton(entry), settings);
     }
 
-    public static void addEntry(@NonNull Path zip, @NonNull Collection<ZipFile.Entry> entries, @NonNull ZipFileSettings settings) throws IOException {
+    public static void addEntry(Path zip, Collection<ZipFile.Entry> entries, ZipFileSettings settings) throws IOException {
         try (ZipFile.Writer zipFile = ZipFile.write(zip, settings)) {
             zipFile.addEntry(entries);
         }
