@@ -4,7 +4,10 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -59,7 +62,7 @@ public final class ExtraField {
         return this == NULL ? "<null>" : ("total: " + map.size());
     }
 
-    public interface Record {
+    public interface Record extends Writer {
 
         int getSignature();
 
@@ -67,11 +70,11 @@ public final class ExtraField {
 
         boolean isNull();
 
-        @Getter
         @RequiredArgsConstructor
         @SuppressWarnings("InnerClassOfInterface")
         final class Unknown implements ExtraField.Record {
 
+            @Getter
             private final int signature;
             private final byte[] data;
 
@@ -83,6 +86,13 @@ public final class ExtraField {
             @Override
             public boolean isNull() {
                 return false;
+            }
+
+            @Override
+            public void write(DataOutput out) throws IOException {
+                out.writeWordSignature(Zip64.ExtendedInfo.SIGNATURE);
+                out.writeWord(data.length);
+                out.write(data, 0, data.length);
             }
         }
 

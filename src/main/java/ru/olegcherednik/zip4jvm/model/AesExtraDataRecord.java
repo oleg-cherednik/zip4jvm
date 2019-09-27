@@ -6,8 +6,11 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 @Getter
@@ -65,6 +68,19 @@ public final class AesExtraDataRecord implements ExtraField.Record {
     @Override
     public String toString() {
         return this == NULL ? "<null>" : super.toString();
+    }
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        if (this == NULL)
+            return;
+
+        out.writeWordSignature(SIGNATURE);
+        out.writeWord(size);
+        out.writeWord(versionNumber);
+        out.writeBytes(getVendor(StandardCharsets.UTF_8));
+        out.writeBytes((byte)strength.getCode());
+        out.writeWord(compressionMethod.getCode());
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
