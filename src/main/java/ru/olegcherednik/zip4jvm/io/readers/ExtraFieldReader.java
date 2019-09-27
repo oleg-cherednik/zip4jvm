@@ -73,9 +73,7 @@ final class ExtraFieldReader implements Reader<ExtraField> {
 
         while (in.getOffs() < offsMax) {
             int signature = in.readWord();
-            Reader<? extends ExtraField.Record> reader = getReader(signature);
-            ExtraField.Record record = reader.read(in);
-            builder.addRecord(record);
+            builder.addRecord(getReader(signature).read(in));
         }
 
         return builder.build();
