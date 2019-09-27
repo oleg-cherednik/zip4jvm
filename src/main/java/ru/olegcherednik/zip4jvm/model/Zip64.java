@@ -86,7 +86,7 @@ public final class Zip64 {
     /** see 4.5.3 */
     @Getter
     @Builder
-    public static final class ExtendedInfo {
+    public static final class ExtendedInfo implements ExtraField.Record {
 
         public static final ExtendedInfo NULL = builder().build();
 
@@ -120,9 +120,20 @@ public final class Zip64 {
             return size;
         }
 
+        @Override
         public int getBlockSize() {
             int size = getDataSize();
             return size == 0 ? 0 : size + SIZE_FIELD;
+        }
+
+        @Override
+        public int getSignature() {
+            return SIGNATURE;
+        }
+
+        @Override
+        public boolean isNull() {
+            return this == NULL;
         }
 
         @Override

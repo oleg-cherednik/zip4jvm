@@ -7,7 +7,7 @@ import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author Oleg Cherednik
@@ -18,8 +18,6 @@ final class AesExtraDataRecordWriter implements Writer {
 
     @NonNull
     private final AesExtraDataRecord record;
-    @NonNull
-    private final Charset charset;
 
     @Override
     public void write(@NonNull DataOutput out) throws IOException {
@@ -29,7 +27,7 @@ final class AesExtraDataRecordWriter implements Writer {
         out.writeWordSignature(AesExtraDataRecord.SIGNATURE);
         out.writeWord(record.getSize());
         out.writeWord(record.getVersionNumber());
-        out.writeBytes(record.getVendor(charset));
+        out.writeBytes(record.getVendor(StandardCharsets.UTF_8));
         out.writeBytes((byte)record.getStrength().getCode());
         out.writeWord(record.getCompressionMethod().getCode());
     }

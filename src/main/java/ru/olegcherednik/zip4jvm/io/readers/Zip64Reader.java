@@ -90,19 +90,16 @@ final class Zip64Reader implements Reader<Zip64> {
     }
 
     @RequiredArgsConstructor
-    static final class ExtendedInfo {
+    static final class ExtendedInfo implements Reader<Zip64.ExtendedInfo> {
 
-        private final int signature;
         private final boolean uncompressedSizeExists;
         private final boolean compressedSizeExists;
         private final boolean offsLocalHeaderRelativeExists;
         private final boolean diskExists;
 
         @NonNull
+        @Override
         public Zip64.ExtendedInfo read(@NonNull DataInput in) throws IOException {
-            if (signature != Zip64.ExtendedInfo.SIGNATURE)
-                return Zip64.ExtendedInfo.NULL;
-
             long offs1 = in.getOffs();
             int size = in.readWord();
             long offs2 = in.getOffs();

@@ -6,8 +6,10 @@ import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -73,6 +75,15 @@ public class UnzipItTest {
 
         assertThatDirectory(destDir).exists().hasDirectories(1).hasFiles(0);
         assertThatDirectory(destDir.resolve(dirNameBikes)).matches(TestDataAssert.dirBikesAssert);
+    }
+
+    public void shouldFoo() throws IOException, URISyntaxException {
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTme(rootDir);
+        Path zip = Paths.get(UnzipItTest.class.getResource("/zip/cjk_filename.zip").toURI()).toAbsolutePath();
+
+        UnzipIt.extract(zip, destDir);
+//        assertThatDirectory(destDir).exists().hasDirectories(0).hasFiles(1);
+//        assertThatDirectory(destDir).file("hello.txt").exists().hasSize(11).hasContent("hello,itsme");
     }
 
 }

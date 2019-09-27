@@ -10,9 +10,6 @@ import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
-
-import static ru.olegcherednik.zip4jvm.model.builders.LocalFileHeaderBuilder.LOOK_IN_EXTRA_FIELD;
 
 /**
  * @author Oleg Cherednik
@@ -40,7 +37,7 @@ public final class LocalFileHeaderReader implements Reader<LocalFileHeader> {
         int fileNameLength = in.readWord();
         int extraFieldLength = in.readWord();
         localFileHeader.setFileName(in.readString(fileNameLength, localFileHeader.getGeneralPurposeFlag().getCharset()));
-        localFileHeader.setExtraField(getExtraFieldReader(extraFieldLength, localFileHeader).read(in));
+        localFileHeader.setExtraField(ExtraFieldReader.build(extraFieldLength, localFileHeader).read(in));
 
         return localFileHeader;
     }
@@ -50,13 +47,6 @@ public final class LocalFileHeaderReader implements Reader<LocalFileHeader> {
 
         if (in.readSignature() != LocalFileHeader.SIGNATURE)
             throw new Zip4jvmException("invalid local file header signature");
-    }
-
-    private static ExtraFieldReader getExtraFieldReader(int size, LocalFileHeader localFileHeader) {
-        boolean uncompressedSize = localFileHeader.getUncompressedSize() == LOOK_IN_EXTRA_FIELD;
-        boolean compressedSize = localFileHeader.getCompressedSize() == LOOK_IN_EXTRA_FIELD;
-        Charset charset = localFileHeader.getGeneralPurposeFlag().getCharset();
-        return new ExtraFieldReader(size, uncompressedSize, compressedSize, false, false, charset);
     }
 
 }

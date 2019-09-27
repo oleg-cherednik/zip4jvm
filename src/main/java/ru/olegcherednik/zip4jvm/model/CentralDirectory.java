@@ -71,7 +71,7 @@ public class CentralDirectory {
         private String fileName;
         // size:m - extra field
         @NonNull
-        private ExtraField extraField = new ExtraField();
+        private ExtraField extraField = ExtraField.NULL;
         // size:k - comment
         private String comment;
 
@@ -101,7 +101,7 @@ public class CentralDirectory {
         }
 
         public void setExtraField(@NonNull ExtraField extraField) {
-            this.extraField.setFrom(extraField);
+            this.extraField = ExtraField.builder().addRecord(extraField).build();
             generalPurposeFlag.setEncrypted(isEncrypted());
         }
 

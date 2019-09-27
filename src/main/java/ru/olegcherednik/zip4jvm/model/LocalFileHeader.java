@@ -41,7 +41,7 @@ public class LocalFileHeader {
     private String fileName;
     // size:m - extra field
     @NonNull
-    private ExtraField extraField = new ExtraField();
+    private ExtraField extraField = ExtraField.NULL;
 
     @NonNull
     public byte[] getFileName() {

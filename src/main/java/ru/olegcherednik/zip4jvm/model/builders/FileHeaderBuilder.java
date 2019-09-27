@@ -60,10 +60,9 @@ final class FileHeaderBuilder {
     }
 
     private ExtraField createExtraField() {
-        ExtraField extraField = new ExtraField();
-        extraField.setExtendedInfo(createExtendedInfo());
-        extraField.setAesExtraDataRecord(new AesExtraDataRecordBuilder(entry).create());
-        return extraField;
+        return ExtraField.builder()
+                         .addRecord(createExtendedInfo())
+                         .addRecord(new AesExtraDataRecordBuilder(entry).create()).build();
     }
 
     private Zip64.ExtendedInfo createExtendedInfo() {

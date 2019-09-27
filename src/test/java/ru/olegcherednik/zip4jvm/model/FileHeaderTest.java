@@ -114,7 +114,7 @@ public class FileHeaderTest {
         Zip64.ExtendedInfo extendedInfo = Zip64.ExtendedInfo.builder().uncompressedSize(1).compressedSize(2).offsLocalHeaderRelative(3)
                                                             .disk(4).build();
 
-        fileHeader.getExtraField().setExtendedInfo(extendedInfo);
+        fileHeader.setExtraField(ExtraField.builder().addRecord(extendedInfo).build());
         assertThat(fileHeader.isZip64()).isTrue();
     }
 

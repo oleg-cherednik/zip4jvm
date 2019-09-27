@@ -8,15 +8,11 @@ import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
-import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
-
-import static ru.olegcherednik.zip4jvm.model.builders.LocalFileHeaderBuilder.LOOK_IN_EXTRA_FIELD;
 
 /**
  * @author Oleg Cherednik
@@ -61,7 +57,7 @@ final class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader>
         fileHeader.setExternalFileAttributes(getExternalFileAttribute(in.readBytes(ExternalFileAttributes.SIZE)));
         fileHeader.setOffsLocalFileHeader(in.readDword());
         fileHeader.setFileName(in.readString(fileNameLength, fileHeader.getGeneralPurposeFlag().getCharset()));
-        fileHeader.setExtraField(getExtraFieldReader(extraFieldLength, fileHeader).read(in));
+        fileHeader.setExtraField(ExtraFieldReader.build(extraFieldLength, fileHeader).read(in));
         fileHeader.setComment(in.readString(fileCommentLength, fileHeader.getGeneralPurposeFlag().getCharset()));
 
         return fileHeader;
@@ -75,15 +71,6 @@ final class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader>
     @SuppressWarnings("MethodCanBeVariableArityMethod")
     private static ExternalFileAttributes getExternalFileAttribute(byte[] data) {
         return ExternalFileAttributes.createDataBasedDelegate(data);
-    }
-
-    private static ExtraFieldReader getExtraFieldReader(int size, CentralDirectory.FileHeader fileHeader) {
-        boolean uncompressedSize = fileHeader.getUncompressedSize() == LOOK_IN_EXTRA_FIELD;
-        boolean compressedSize = fileHeader.getCompressedSize() == LOOK_IN_EXTRA_FIELD;
-        boolean offsHeader = fileHeader.getOffsLocalFileHeader() == LOOK_IN_EXTRA_FIELD;
-        boolean disk = fileHeader.getDisk() == ZipModel.MAX_TOTAL_DISKS;
-        Charset charset = fileHeader.getGeneralPurposeFlag().getCharset();
-        return new ExtraFieldReader(size, uncompressedSize, compressedSize, offsHeader, disk, charset);
     }
 
 }

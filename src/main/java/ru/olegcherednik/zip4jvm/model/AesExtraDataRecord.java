@@ -11,7 +11,7 @@ import java.nio.charset.Charset;
 import java.util.Optional;
 
 @Getter
-public final class AesExtraDataRecord {
+public final class AesExtraDataRecord implements ExtraField.Record {
 
     public static final AesExtraDataRecord NULL = builder().build();
 
@@ -47,8 +47,19 @@ public final class AesExtraDataRecord {
         return vendor == null ? null : vendor.getBytes(charset);
     }
 
+    @Override
     public int getBlockSize() {
         return this == NULL ? 0 : SIZE;
+    }
+
+    @Override
+    public int getSignature() {
+        return SIGNATURE;
+    }
+
+    @Override
+    public boolean isNull() {
+        return this == NULL;
     }
 
     @Override

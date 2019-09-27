@@ -34,7 +34,7 @@ public final class LocalFileHeaderWriter implements Writer {
         out.writeWord(localFileHeader.getExtraField().getSize());
         out.writeBytes(fileName);
 
-        new ExtraFieldWriter(localFileHeader.getExtraField(), localFileHeader.getGeneralPurposeFlag().getCharset()).write(out);
+        new ExtraFieldWriter(localFileHeader.getExtraField()).write(out);
     }
 
 }
