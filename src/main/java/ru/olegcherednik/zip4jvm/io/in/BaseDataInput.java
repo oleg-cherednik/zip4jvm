@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.io.in;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -12,9 +11,8 @@ import java.nio.charset.Charset;
  * @since 04.08.2019
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-abstract class BaseDataInput implements DataInput {
+abstract class  BaseDataInput implements DataInput {
 
-    @NonNull
     protected DataInput delegate;
 
     @Override
@@ -38,7 +36,7 @@ abstract class BaseDataInput implements DataInput {
     }
 
     @Override
-    public String readString(int length, @NonNull Charset charset) throws IOException {
+    public String readString(int length, Charset charset) throws IOException {
         return delegate.readString(length, charset);
     }
 

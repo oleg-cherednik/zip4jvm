@@ -1,7 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.in;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
@@ -21,10 +20,9 @@ import java.nio.file.Path;
 public class LittleEndianReadFile implements DataInput {
 
     @Getter
-    @NonNull
     private final RandomAccessFile in;
 
-    public LittleEndianReadFile(@NonNull Path path) throws FileNotFoundException {
+    public LittleEndianReadFile(Path path) throws FileNotFoundException {
         in = new RandomAccessFile(path.toFile(), "r");
     }
 
@@ -58,7 +56,7 @@ public class LittleEndianReadFile implements DataInput {
     }
 
     @Override
-    public String readString(int length, @NonNull Charset charset) throws IOException {
+    public String readString(int length, Charset charset) throws IOException {
         ZipUtils.requirePositive(length, "readString");
 
         if (length <= 0)

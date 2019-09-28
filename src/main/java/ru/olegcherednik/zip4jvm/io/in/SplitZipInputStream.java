@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.in;
 
-import lombok.NonNull;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
@@ -15,16 +14,14 @@ import java.nio.file.Path;
  */
 public class SplitZipInputStream extends BaseDataInput {
 
-    @NonNull
     protected final ZipModel zipModel;
     private long disk;
 
-    @NonNull
-    public static SplitZipInputStream create(@NonNull ZipModel zipModel, long disk) throws IOException {
+    public static SplitZipInputStream create(ZipModel zipModel, long disk) throws IOException {
         return new SplitZipInputStream(zipModel, disk);
     }
 
-    private SplitZipInputStream(@NonNull ZipModel zipModel, long disk) throws IOException {
+    private SplitZipInputStream(ZipModel zipModel, long disk) throws IOException {
         this.zipModel = zipModel;
         this.disk = disk;
         delegate = new LittleEndianReadFile(zipModel.getPartFile(disk));
@@ -32,9 +29,7 @@ public class SplitZipInputStream extends BaseDataInput {
     }
 
     private void checkSignature() throws IOException {
-        if (disk != 0)
-            return;
-        if (delegate.readSignature() != SplitZipOutputStream.SPLIT_SIGNATURE)
+        if (disk == 0 && delegate.readSignature() != SplitZipOutputStream.SPLIT_SIGNATURE)
             throw new Zip4jvmException("Incorrect split file signature: " + zipModel.getFile().getFileName());
     }
 

@@ -1,7 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.in;
 
-import lombok.NonNull;
-
 import java.io.Closeable;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -24,7 +22,7 @@ public interface DataInput extends Closeable {
 
     long readQword() throws IOException;
 
-    String readString(int length, @NonNull Charset charset) throws IOException;
+    String readString(int length, Charset charset) throws IOException;
 
     int readByte() throws IOException;
 
