@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.model;
 
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.io.FilenameUtils;
@@ -44,7 +43,6 @@ public class ZipModel {
     public static final int MAX_TOTAL_DISKS = Zip64.LIMIT_INT;
     public static final int MAX_COMMENT_LENGTH = Zip64.LIMIT_INT;
 
-    @NonNull
     private final Path file;
     private long splitSize = NO_SPLIT;
 
@@ -85,7 +83,7 @@ public class ZipModel {
         return fileNameEntry.size();
     }
 
-    public void addEntry(@NonNull ZipEntry zipEntry) {
+    public void addEntry(ZipEntry zipEntry) {
         fileNameEntry.put(zipEntry.getFileName(), zipEntry);
     }
 
@@ -93,15 +91,14 @@ public class ZipModel {
         return isEmpty() ? Collections.emptyList() : Collections.unmodifiableCollection(fileNameEntry.values());
     }
 
-    public ZipEntry getEntryByFileName(@NonNull String fileName) {
+    public ZipEntry getEntryByFileName(String fileName) {
         return fileNameEntry.get(fileName);
     }
 
-    public boolean hasEntry(@NonNull String fileName) {
+    public boolean hasEntry(String fileName) {
         return fileNameEntry.containsKey(fileName);
     }
 
-    @NonNull
     public Set<String> getEntryNames() {
         return isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(fileNameEntry.keySet());
     }

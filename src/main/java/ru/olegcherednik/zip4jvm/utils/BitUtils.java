@@ -43,6 +43,10 @@ public final class BitUtils {
         return (val & bits) == bits;
     }
 
+    public static boolean isBitClear(int val, int bits) {
+        return !isBitSet(val, bits);
+    }
+
     /**
      * Set selected bit(s) in giving val
      *
