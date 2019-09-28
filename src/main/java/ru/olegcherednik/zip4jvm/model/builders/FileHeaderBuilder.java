@@ -26,7 +26,7 @@ final class FileHeaderBuilder {
 
     @NonNull
     public CentralDirectory.FileHeader create() throws IOException {
-        CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader(entry.getFileName());
+        CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
         fileHeader.setVersionMadeBy(CentralDirectory.FileHeader.VERSION);
         fileHeader.setVersionToExtract(CentralDirectory.FileHeader.VERSION);
@@ -41,6 +41,7 @@ final class FileHeaderBuilder {
         fileHeader.setInternalFileAttributes(entry.getInternalFileAttributes());
         fileHeader.setExternalFileAttributes(entry.getExternalFileAttributes());
         fileHeader.setOffsLocalFileHeader(entry.getLocalFileHeaderOffs());
+        fileHeader.setFileName(entry.getFileName());
         fileHeader.setExtraField(createExtraField());
         fileHeader.setComment(entry.getComment());
 

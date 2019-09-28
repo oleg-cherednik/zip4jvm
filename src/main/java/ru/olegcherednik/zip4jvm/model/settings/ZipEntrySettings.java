@@ -5,10 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.exception.EmptyPasswordException;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 @Getter
 public final class ZipEntrySettings {
@@ -91,6 +93,9 @@ public final class ZipEntrySettings {
         }
 
         public ZipEntrySettings.Builder comment(String comment) {
+            if (StringUtils.length(comment) > ZipModel.MAX_COMMENT_LENGTH)
+                throw new IllegalArgumentException("Entry comment should not exceed '" + ZipModel.MAX_COMMENT_LENGTH + "' in length");
+
             this.comment = comment;
             return this;
         }

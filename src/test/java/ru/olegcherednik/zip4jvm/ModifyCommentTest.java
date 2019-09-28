@@ -4,11 +4,10 @@ import org.apache.commons.lang.StringUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
-import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
@@ -18,8 +17,8 @@ import java.nio.file.Path;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
 import static ru.olegcherednik.zip4jvm.TestData.fileOlegCherednik;
+import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
@@ -88,18 +87,17 @@ public class ModifyCommentTest {
         Files.createDirectories(zip.getParent());
         Files.copy(zipDeflateSolid, zip);
 
-        ZipMisc.setComment(zip, StringUtils.repeat("_", EndCentralDirectory.MAX_COMMENT_LENGTH));
-        assertThatZipFile(zip).hasCommentSize(EndCentralDirectory.MAX_COMMENT_LENGTH);
+        ZipMisc.setComment(zip, StringUtils.repeat("_", ZipModel.MAX_COMMENT_LENGTH));
+        assertThatZipFile(zip).hasCommentSize(ZipModel.MAX_COMMENT_LENGTH);
     }
 
-    @Test
     public void shouldThrowExceptionWhenCommentIsOverMaxLength() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         Files.createDirectories(zip.getParent());
         Files.copy(zipDeflateSolid, zip);
 
-        assertThatThrownBy(() -> ZipMisc.setComment(zip, StringUtils.repeat("_", EndCentralDirectory.MAX_COMMENT_LENGTH + 1)))
-                .isInstanceOf(Zip4jvmException.class);
+        assertThatThrownBy(() -> ZipMisc.setComment(zip, StringUtils.repeat("_", ZipModel.MAX_COMMENT_LENGTH + 1)))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
 }

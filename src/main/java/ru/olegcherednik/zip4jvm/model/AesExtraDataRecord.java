@@ -67,7 +67,7 @@ public final class AesExtraDataRecord implements ExtraField.Record {
 
     @Override
     public String toString() {
-        return this == NULL ? "<null>" : super.toString();
+        return this == NULL ? "<null>" : "strength:" + strength.getSize() + ", compression:" + compressionMethod.name();
     }
 
     @Override

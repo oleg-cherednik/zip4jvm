@@ -1,8 +1,6 @@
 package ru.olegcherednik.zip4jvm.model;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.lang.ArrayUtils;
 
@@ -20,14 +18,12 @@ import java.util.List;
 @Setter
 public class CentralDirectory {
 
-    @NonNull
     private List<FileHeader> fileHeaders = Collections.emptyList();
     private DigitalSignature digitalSignature;
 
     /** see 4.3.12 */
     @Getter
     @Setter
-    @NoArgsConstructor
     public static class FileHeader {
 
         public static final int SIGNATURE = 0x02014B50;
@@ -39,10 +35,8 @@ public class CentralDirectory {
         // size:2 - version needed to extractEntries
         private int versionToExtract = VERSION;
         // size:2 - general purpose bit flag
-        @NonNull
         private GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         // size:2 - compression method
-        @NonNull
         private CompressionMethod compressionMethod = CompressionMethod.STORE;
         // size:2 - last mod file time
         // size:2 - last mod file date
@@ -60,36 +54,26 @@ public class CentralDirectory {
         // size:2 - disk number start
         private int disk;
         // size:2 - internal file attributes
-        @NonNull
         private InternalFileAttributes internalFileAttributes = InternalFileAttributes.NULL;
         // size:4 - external file attributes
-        @NonNull
         private ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.NULL;
         // size:4 - relative offset of local header
         private long offsLocalFileHeader;
         // size:n - file name
         private String fileName;
         // size:m - extra field
-        @NonNull
         private ExtraField extraField = ExtraField.NULL;
         // size:k - comment
         private String comment;
 
-        public FileHeader(String fileName) {
-            this.fileName = fileName;
-        }
-
-        @NonNull
-        public byte[] getFileName(@NonNull Charset charset) {
+        public byte[] getFileName(Charset charset) {
             return fileName == null ? ArrayUtils.EMPTY_BYTE_ARRAY : fileName.getBytes(charset);
         }
 
-        @NonNull
-        public byte[] getComment(@NonNull Charset charset) {
+        public byte[] getComment(Charset charset) {
             return comment == null ? ArrayUtils.EMPTY_BYTE_ARRAY : comment.getBytes(charset);
         }
 
-        @NonNull
         public Compression getCompression() {
             if (compressionMethod == CompressionMethod.AES)
                 return Compression.parseCompressionMethod(extraField.getAesExtraDataRecord().getCompressionMethod());
@@ -100,7 +84,7 @@ public class CentralDirectory {
             return extraField.getExtendedInfo() != Zip64.ExtendedInfo.NULL;
         }
 
-        public void setExtraField(@NonNull ExtraField extraField) {
+        public void setExtraField(ExtraField extraField) {
             this.extraField = ExtraField.builder().addRecord(extraField).build();
             generalPurposeFlag.setEncrypted(isEncrypted());
         }
