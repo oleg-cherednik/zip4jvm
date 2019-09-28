@@ -49,7 +49,7 @@ final class FileHeaderWriter implements Writer {
         out.writeBytes(fileHeader.getExternalFileAttributes().get());
         out.writeDword(fileHeader.isWriteZip64OffsetLocalHeader() ? Zip64.LIMIT : fileHeader.getOffsLocalFileHeader());
         out.writeBytes(fileName);
-        new ExtraFieldWriter(fileHeader.getExtraField(), charset).write(out);
+        new ExtraFieldWriter(fileHeader.getExtraField()).write(out);
         out.writeBytes(fileComment);
     }
 }

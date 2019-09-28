@@ -46,7 +46,8 @@ public final class ZipMisc {
         return ZipFile.read(zip).isSplit();
     }
 
-    public static void merge(@NonNull Path src, @NonNull Path dest) throws IOException {
+    // TODO refactoring; it's not clear where is source and destination
+    public static void merge(@NonNull Path dest, @NonNull Path src) throws IOException {
         ZipFile.Reader reader = ZipFile.read(src);
 
         ZipFileSettings settings = ZipFileSettings.builder()

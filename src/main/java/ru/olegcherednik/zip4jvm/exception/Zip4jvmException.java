@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.exception;
 import lombok.Getter;
 
 @Getter
+@SuppressWarnings("ClassWithTooManyConstructors")
 public class Zip4jvmException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;

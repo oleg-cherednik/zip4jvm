@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.model;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import java.io.IOException;
@@ -43,16 +43,20 @@ import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT7;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consumer<Path> {
 
+    public static final String WIN = "win";
+    public static final String MAC = "mac";
+    public static final String UNIX = "nux";
+
     public static final ExternalFileAttributes NULL = new Unknown();
     public static final int SIZE = 4;
 
-    public static ExternalFileAttributes createOperationBasedDelegate(@NonNull Path path) throws IOException {
-        String os = System.getProperty("os.name").toLowerCase();
+    public static ExternalFileAttributes createOperationBasedDelegate(Path path, Supplier<String> osNameProvider) throws IOException {
+        String os = osNameProvider.get().toLowerCase();
         ExternalFileAttributes attributes = NULL;
 
-        if (os.contains("win"))
+        if (os.contains(WIN))
             attributes = new Windows();
-        else if (os.contains("mac") || os.contains("nux"))
+        else if (os.contains(MAC) || os.contains(UNIX))
             attributes = new Posix();
 
         attributes.readFrom(path);
@@ -62,12 +66,15 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consum
     public static ExternalFileAttributes createDataBasedDelegate(byte[] data) {
         ExternalFileAttributes attributes = NULL;
 
-        if (Windows.isValid(data))
-            attributes = new Windows();
-        else if (Posix.isValid(data))
-            attributes = new Posix();
+        if (ArrayUtils.getLength(data) == SIZE) {
+            if (Windows.isValid(data))
+                attributes = new Windows();
+            else if (Posix.isValid(data))
+                attributes = new Posix();
+        }
 
         attributes.readFrom(data);
+
         return attributes;
     }
 
@@ -98,18 +105,22 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consum
 
         @Override
         public void readFrom(Path path) throws IOException {
+            /* nothing to read */
         }
 
         @Override
         public void readFrom(byte[] data) {
+            /* nothing to read */
         }
 
         @Override
         protected void saveToRowData(byte[] data) {
+            /* nothing to save */
         }
 
         @Override
         protected void applyToPath(Path path) throws IOException {
+            /* nothing to apply */
         }
 
         @Override
@@ -157,6 +168,7 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consum
 
         @Override
         protected void applyToPath(Path path) throws IOException {
+            //
         }
 
         @Override
@@ -180,7 +192,7 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consum
         private boolean regularFile;
 
         public static boolean isValid(byte[] data) {
-            return data[0] != 0 || data[2] != 0 && data[3] != 0;
+            return data[2] != 0 || data[3] != 0;
         }
 
         @Override
@@ -217,17 +229,17 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]>, Consum
 
         @Override
         protected void saveToRowData(byte[] data) {
-            data[2] = BitUtils.updateBits(data[0], BIT0, othersExecute);
-            data[2] = BitUtils.updateBits(data[0], BIT1, othersWrite);
-            data[2] = BitUtils.updateBits(data[0], BIT2, othersRead);
-            data[2] = BitUtils.updateBits(data[0], BIT3, groupExecute);
-            data[2] = BitUtils.updateBits(data[0], BIT4, groupWrite);
-            data[2] = BitUtils.updateBits(data[0], BIT4, groupRead);
-            data[2] = BitUtils.updateBits(data[0], BIT5, ownerExecute);
-            data[2] = BitUtils.updateBits(data[0], BIT7, ownerWrite);
-            data[3] = BitUtils.updateBits(data[0], BIT0, ownerRead);
-            data[3] = BitUtils.updateBits(data[0], BIT6, directory);
-            data[3] = BitUtils.updateBits(data[0], BIT7, regularFile);
+            data[2] = BitUtils.updateBits(data[2], BIT0, othersExecute);
+            data[2] = BitUtils.updateBits(data[2], BIT1, othersWrite);
+            data[2] = BitUtils.updateBits(data[2], BIT2, othersRead);
+            data[2] = BitUtils.updateBits(data[2], BIT3, groupExecute);
+            data[2] = BitUtils.updateBits(data[2], BIT4, groupWrite);
+            data[2] = BitUtils.updateBits(data[2], BIT4, groupRead);
+            data[2] = BitUtils.updateBits(data[2], BIT5, ownerExecute);
+            data[2] = BitUtils.updateBits(data[2], BIT7, ownerWrite);
+            data[3] = BitUtils.updateBits(data[3], BIT0, ownerRead);
+            data[3] = BitUtils.updateBits(data[3], BIT6, directory);
+            data[3] = BitUtils.updateBits(data[3], BIT7, regularFile);
         }
 
         @Override

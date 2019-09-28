@@ -27,8 +27,10 @@ import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT6;
 @NoArgsConstructor
 public class GeneralPurposeFlag implements IntSupplier {
 
+    private static final Charset IBM437 = Charset.forName("IBM437");
+
     private boolean encrypted;
-    private CompressionLevel compressionLevel;
+    private CompressionLevel compressionLevel = CompressionLevel.NORMAL;
     /** {@link DataDescriptor} */
     private boolean dataDescriptorAvailable;
     private boolean strongEncryption;
@@ -40,29 +42,24 @@ public class GeneralPurposeFlag implements IntSupplier {
 
     public void read(int data) {
         encrypted = BitUtils.isBitSet(data, BIT0);
-
-        if (BitUtils.isBitSet(data, BIT1 | BIT2))
-            compressionLevel = CompressionLevel.FASTEST;
-        else if (BitUtils.isBitSet(data, BIT2))
-            compressionLevel = CompressionLevel.FAST;
-        else compressionLevel = BitUtils.isBitSet(data, BIT1) ? CompressionLevel.MAXIMUM : CompressionLevel.NORMAL;
-
+        compressionLevel = getCompressionLevel(data);
         dataDescriptorAvailable = BitUtils.isBitSet(data, BIT3);
         strongEncryption = BitUtils.isBitSet(data, BIT6);
         utf8 = BitUtils.isBitSet(data, BIT11);
     }
 
+    private static CompressionLevel getCompressionLevel(int data) {
+        if (BitUtils.isBitSet(data, BIT1 | BIT2))
+            return CompressionLevel.FASTEST;
+        if (BitUtils.isBitSet(data, BIT2))
+            return CompressionLevel.FAST;
+        return BitUtils.isBitSet(data, BIT1) ? CompressionLevel.MAXIMUM : CompressionLevel.NORMAL;
+    }
+
     @Override
     public int getAsInt() {
         int data = BitUtils.updateBits(0, BIT0, encrypted);
-
-        if (compressionLevel == CompressionLevel.MAXIMUM)
-            data = BitUtils.setBits(data, BIT1);
-        else if (compressionLevel == CompressionLevel.FAST)
-            data = BitUtils.setBits(data, BIT2);
-        else if (compressionLevel == CompressionLevel.FASTEST)
-            data = BitUtils.setBits(data, BIT1 | BIT2);
-
+        data |= getCompressionLevelBits();
         data = BitUtils.updateBits(data, BIT3, dataDescriptorAvailable);
         data = BitUtils.updateBits(data, BIT6, strongEncryption);
         data = BitUtils.updateBits(data, BIT11, utf8);
@@ -70,7 +67,15 @@ public class GeneralPurposeFlag implements IntSupplier {
         return data;
     }
 
-    private static final Charset IBM437 = Charset.forName("IBM437");
+    private int getCompressionLevelBits() {
+        if (compressionLevel == CompressionLevel.MAXIMUM)
+            return BIT1;
+        if (compressionLevel == CompressionLevel.FAST)
+            return BIT2;
+        if (compressionLevel == CompressionLevel.FASTEST)
+            return BIT1 | BIT2;
+        return 0x0;
+    }
 
     public Charset getCharset() {
         return utf8 ? StandardCharsets.UTF_8 : IBM437;

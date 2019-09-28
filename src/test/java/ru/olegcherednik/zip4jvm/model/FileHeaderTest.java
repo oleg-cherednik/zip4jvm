@@ -12,7 +12,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
+import static ru.olegcherednik.zip4jvm.model.ExternalFileAttributes.WIN;
 
 /**
  * @author Oleg Cherednik
@@ -37,10 +38,12 @@ public class FileHeaderTest {
     public void shouldUseSettersGettersCorrectly() throws IOException {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         InternalFileAttributes internalFileAttributes = InternalFileAttributes.createDataBasedDelegate(new byte[] { 1, 2 });
-        ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.createOperationBasedDelegate(Zip4jvmSuite.fileBentleyContinental);
+        ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.createOperationBasedDelegate(fileBentley, () -> WIN);
+        ExtraField extraField = ExtraField.builder().addRecord(Zip64.ExtendedInfo.builder().uncompressedSize(4).build()).build();
 
         assertThat(internalFileAttributes).isNotSameAs(InternalFileAttributes.NULL);
         assertThat(externalFileAttributes).isNotSameAs(ExternalFileAttributes.NULL);
+        assertThat(extraField).isNotSameAs(ExtraField.NULL);
 
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
         fileHeader.setVersionMadeBy(1);
@@ -57,7 +60,7 @@ public class FileHeaderTest {
         fileHeader.setExternalFileAttributes(externalFileAttributes);
         fileHeader.setOffsLocalFileHeader(9);
         fileHeader.setFileName("fileName");
-//        fileHeader.setExtraField(extraField);
+        fileHeader.setExtraField(extraField);
 
         assertThat(fileHeader.getVersionMadeBy()).isEqualTo(1);
         assertThat(fileHeader.getVersionToExtract()).isEqualTo(2);
@@ -72,6 +75,7 @@ public class FileHeaderTest {
         assertThat(fileHeader.getInternalFileAttributes()).isSameAs(internalFileAttributes);
         assertThat(fileHeader.getExternalFileAttributes()).isSameAs(externalFileAttributes);
         assertThat(fileHeader.getOffsLocalFileHeader()).isEqualTo(9);
+        assertThat(fileHeader.getExtraField().getExtendedInfo()).isNotNull();
         assertThat(fileHeader.getFileName()).isEqualTo("fileName");
     }
 
@@ -94,14 +98,11 @@ public class FileHeaderTest {
     }
 
     public void shouldRetrieveFileNameWhenToString() {
-        assertThat(new CentralDirectory.FileHeader().toString()).isNull();
-        assertThat(new CentralDirectory.FileHeader("zip4jvm").toString()).isEqualTo("zip4jvm");
-    }
+        CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
+        assertThat(fileHeader.toString()).isNull();
 
-    public void shouldThrowNullPointerExceptionWhenNull() {
-        assertThatThrownBy(() -> new CentralDirectory.FileHeader().getFileName(null)).isExactlyInstanceOf(NullPointerException.class);
-        assertThatThrownBy(() -> new CentralDirectory.FileHeader().getComment(null)).isExactlyInstanceOf(NullPointerException.class);
-        assertThatThrownBy(() -> new CentralDirectory.FileHeader().setExtraField(null)).isExactlyInstanceOf(NullPointerException.class);
+        fileHeader.setFileName("zip4jvm");
+        assertThat(fileHeader.toString()).isEqualTo("zip4jvm");
     }
 
     public void shouldRetrieveIsZip64TrueWhenZip64ExtendedInfoIsNotNull() {
@@ -112,8 +113,18 @@ public class FileHeaderTest {
         Zip64.ExtendedInfo extendedInfo = Zip64.ExtendedInfo.builder().uncompressedSize(1).compressedSize(2).offsLocalHeaderRelative(3)
                                                             .disk(4).build();
 
-        fileHeader.getExtraField().setExtendedInfo(extendedInfo);
+        fileHeader.setExtraField(ExtraField.builder().addRecord(extendedInfo).build());
         assertThat(fileHeader.isZip64()).isTrue();
+    }
+
+    public void shouldWriteZip64WhenLocalFileHeaderOffsIsOverLimit() {
+        CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
+
+        fileHeader.setOffsLocalFileHeader(Zip64.LIMIT);
+        assertThat(fileHeader.isWriteZip64OffsetLocalHeader()).isFalse();
+
+        fileHeader.setOffsLocalFileHeader(Zip64.LIMIT + 1);
+        assertThat(fileHeader.isWriteZip64OffsetLocalHeader()).isTrue();
     }
 
 }

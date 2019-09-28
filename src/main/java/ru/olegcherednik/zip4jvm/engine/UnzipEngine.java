@@ -1,145 +1,147 @@
 package ru.olegcherednik.zip4jvm.engine;
 
-import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmIncorrectPasswordException;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
-import ru.olegcherednik.zip4jvm.io.in.SplitZipInputStream;
-import ru.olegcherednik.zip4jvm.io.in.entry.EntryInputStream;
-import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.Encryption;
+import org.apache.commons.io.FilenameUtils;
+import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.FileTime;
-import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
  * @author Oleg Cherednik
- * @since 14.03.2019
+ * @since 07.09.2019
  */
-@RequiredArgsConstructor
-public class UnzipEngine {
+public final class UnzipEngine implements ZipFile.Reader {
 
-    @Getter
-    @NonNull
     private final ZipModel zipModel;
-    private final char[] password;
+    private final Function<String, char[]> passwordProvider;
 
-    // TODO extract and get entries should be merged
-    public void extractEntries(@NonNull Path dstDir, @NonNull Collection<String> entries) {
-        getEntries(entries).forEach(entry -> extractEntry(dstDir, entry));
+    public UnzipEngine(Path zip, Function<String, char[]> passwordProvider) throws IOException {
+        checkZipFile(zip);
+        zipModel = ZipModelBuilder.read(zip);
+        this.passwordProvider = passwordProvider;
     }
 
-    private List<ZipEntry> getEntries(@NonNull Collection<String> entries) {
-        return entries.parallelStream()
-                      .map(prefix -> {
-                          String name = ZipUtils.normalizeFileName(prefix.toLowerCase());
-
-                          return zipModel.getEntries().stream()
-                                         .filter(entry -> entry.getFileName().toLowerCase().startsWith(name))
-                                         .collect(Collectors.toList());
-                      })
-                      .flatMap(List::stream)
-                      .filter(Objects::nonNull)
-                      .collect(Collectors.toList());
+    @Override
+    public void extract(Path destDir) throws IOException {
+        for (ZipEntry entry : zipModel.getEntries())
+            extractEntry(destDir, entry, ZipEntry::getFileName);
     }
 
-    private void extractEntry(Path dstDir, ZipEntry entry) {
-        checkPassword(entry);
+    @Override
+    @SuppressWarnings("PMD.AvoidReassigningParameters")
+    public void extract(Path destDir, String fileName) throws IOException {
+        fileName = ZipUtils.normalizeFileName(fileName);
+        List<ZipEntry> zipEntries = getEntriesWithFileNamePrefix(fileName + '/');
 
-        if (entry.isDirectory())
-            extractDirectory(dstDir, entry);
+        if (zipEntries.isEmpty())
+            extractEntry(destDir, zipModel.getEntryByFileName(fileName), e -> FilenameUtils.getName(e.getFileName()));
         else {
-            Path file = dstDir.resolve(entry.getFileName());
-            extractFile(file, entry);
+            for (ZipEntry zipEntry : zipEntries)
+                extractEntry(destDir, zipEntry, ZipEntry::getFileName);
+        }
+    }
+
+    private List<ZipEntry> getEntriesWithFileNamePrefix(String fileNamePrefix) {
+        return zipModel.getEntries().stream()
+                       .filter(entry -> entry.getFileName().startsWith(fileNamePrefix))
+                       .collect(Collectors.toList());
+    }
+
+    @NonNull
+    @Override
+    public ZipFile.Entry extract(@NonNull String fileName) throws IOException {
+        ZipEntry zipEntry = zipModel.getEntryByFileName(ZipUtils.normalizeFileName(fileName));
+
+        if (zipEntry == null)
+            throw new FileNotFoundException("Entry '" + fileName + "' was not found");
+
+        zipEntry.setPassword(passwordProvider.apply(zipEntry.getFileName()));
+        return zipEntry.createImmutableEntry();
+    }
+
+    @Override
+    public String getComment() {
+        return zipModel.getComment();
+    }
+
+    @NonNull
+    @Override
+    public Set<String> getEntryNames() {
+        return zipModel.getEntryNames();
+    }
+
+    @Override
+    public boolean isSplit() {
+        return zipModel.isSplit();
+    }
+
+    @Override
+    public boolean isZip64() {
+        return zipModel.isZip64();
+    }
+
+    @Override
+    public Iterator<ZipFile.Entry> iterator() {
+        return new Iterator<ZipFile.Entry>() {
+            private final Iterator<String> it = zipModel.getEntryNames().iterator();
+
+            @Override
+            public boolean hasNext() {
+                return it.hasNext();
+            }
+
+            @Override
+            public ZipFile.Entry next() {
+                return zipModel.getEntryByFileName(it.next()).createImmutableEntry();
+            }
+        };
+    }
+
+    private void extractEntry(Path destDir, ZipEntry zipEntry, Function<ZipEntry, String> getFileName) throws IOException {
+        zipEntry.setPassword(passwordProvider.apply(zipEntry.getFileName()));
+        String fileName = getFileName.apply(zipEntry);
+        Path file = destDir.resolve(fileName);
+
+        if (zipEntry.isDirectory())
+            Files.createDirectories(file);
+        else {
+            ZipUtils.copyLarge(zipEntry.getIn(), getOutputStream(file));
             // TODO should be uncommented
-//            setFileAttributes(file, entry);
+//            setFileAttributes(file, zipEntry);
 //            setFileLastModifiedTime(file, fileHeader);
         }
     }
 
-    private void checkPassword(ZipEntry entry) {
-        Encryption encryption = entry.getEncryption();
-        boolean passwordEmpty = ArrayUtils.isEmpty(password);
 
-        if (encryption != Encryption.OFF && passwordEmpty)
-            throw new Zip4jvmIncorrectPasswordException(entry.getFileName());
+    private static FileOutputStream getOutputStream(Path file) throws IOException {
+        Path parent = file.getParent();
+
+        if (!Files.exists(file))
+            Files.createDirectories(parent);
+
+        Files.deleteIfExists(file);
+
+        return new FileOutputStream(file.toFile());
     }
 
-    private static void extractDirectory(Path dstDir, ZipEntry entry) {
-        try {
-            Files.createDirectories(dstDir.resolve(entry.getFileName()));
-        } catch(IOException e) {
-            throw new Zip4jvmException(e);
-        }
-    }
-
-    private void extractFile(Path file, ZipEntry entry) {
-        try (InputStream in = extractEntryAsStream(entry); OutputStream out = getOutputStream(file)) {
-            IOUtils.copyLarge(in, out);
-        } catch(IOException e) {
-            throw new Zip4jvmException(e);
-        }
-    }
-
-    private static void setFileAttributes(Path file, CentralDirectory.FileHeader fileHeader) {
-        fileHeader.getExternalFileAttributes().accept(file);
-    }
-
-    private static void setFileLastModifiedTime(Path file, CentralDirectory.FileHeader fileHeader) {
-        try {
-            int lastModifiedTime = fileHeader.getLastModifiedTime();
-
-            if (lastModifiedTime > 0 && Files.exists(file))
-                Files.setLastModifiedTime(file, FileTime.fromMillis(ZipUtils.dosToJavaTme(lastModifiedTime)));
-        } catch(IOException ignored) {
-        }
-    }
-
-    @NonNull
-    public InputStream extractEntry(@NonNull String entryName) throws IOException {
-        ZipEntry en = zipModel.getEntries().stream()
-                              .filter(entry -> entry.getFileName().equalsIgnoreCase(entryName))
-                              .findFirst().orElseThrow(() -> new Zip4jvmException("File header with entry name '" + entryName + "' was not found"));
-
-        return extractEntryAsStream(en);
-    }
-
-    @NonNull
-    private InputStream extractEntryAsStream(@NonNull ZipEntry entry) throws IOException {
-        DataInput in = zipModel.isSplit() ? SplitZipInputStream.create(zipModel, entry.getDisk()) : SingleZipInputStream.create(zipModel);
-        return EntryInputStream.create(entry, in);
-    }
-
-    private static FileOutputStream getOutputStream(Path file) {
-        try {
-            Path parent = file.getParent();
-
-            if (!Files.exists(file))
-                Files.createDirectories(parent);
-
-            Files.deleteIfExists(file);
-
-            return new FileOutputStream(file.toFile());
-        } catch(IOException e) {
-            throw new Zip4jvmException(e);
-        }
+    private static void checkZipFile(Path zip) throws IOException {
+        if (!Files.exists(zip))
+            throw new FileNotFoundException("ZipFile not exists: " + zip);
+        if (!Files.isRegularFile(zip))
+            throw new IOException("ZipFile is not a regular file: " + zip);
     }
 
 }

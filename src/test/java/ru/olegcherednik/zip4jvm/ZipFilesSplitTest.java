@@ -14,6 +14,10 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
+import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
+import static ru.olegcherednik.zip4jvm.TestData.fileFerrari;
+import static ru.olegcherednik.zip4jvm.TestData.fileWiesmann;
+
 /**
  * @author Oleg Cherednik
  * @since 27.04.2019
@@ -41,10 +45,7 @@ public class ZipFilesSplitTest {
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
                                                   .splitSize(1024 * 1024).build();
-        Path bentley = Zip4jvmSuite.carsDir.resolve("bentley-continental.jpg");
-        Path ferrari = Zip4jvmSuite.carsDir.resolve("ferrari-458-italia.jpg");
-        Path wiesmann = Zip4jvmSuite.carsDir.resolve("wiesmann-gt-mf5.jpg");
-        List<Path> files = Arrays.asList(bentley, ferrari, wiesmann);
+        List<Path> files = Arrays.asList(fileBentley, fileFerrari, fileWiesmann);
 
         ZipIt.add(zip, files, settings);
 

@@ -14,11 +14,12 @@ public interface Decoder {
 
     Decoder NULL = new NullDecoder();
 
-    void decrypt(@NonNull byte[] buf, int offs, int len);
+    void decrypt(byte[] buf, int offs, int len);
 
-    long getCompressedSize(@NonNull ZipEntry entry);
+    long getCompressedSize(ZipEntry zipEntry);
 
     default void close(@NonNull DataInput in) throws IOException {
+        /* nothing to close */
     }
 
 }

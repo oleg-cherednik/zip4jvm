@@ -4,6 +4,7 @@ import lombok.NonNull;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
@@ -36,7 +37,7 @@ final class EndCentralDirectoryReader implements Reader<EndCentralDirectory> {
     }
 
     private static long findHead(DataInput in) throws IOException {
-        int commentLength = EndCentralDirectory.MAX_COMMENT_LENGTH;
+        int commentLength = ZipModel.MAX_COMMENT_LENGTH;
         long available = in.length() - EndCentralDirectory.MIN_SIZE;
 
         do {

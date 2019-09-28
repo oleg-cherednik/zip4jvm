@@ -1,17 +1,20 @@
 package ru.olegcherednik.zip4jvm.model;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NonNull;
-import org.apache.commons.lang.ArrayUtils;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 @Getter
-@Builder
-public final class AesExtraDataRecord {
+public final class AesExtraDataRecord implements ExtraField.Record {
 
     public static final AesExtraDataRecord NULL = builder().build();
 
@@ -21,39 +24,105 @@ public final class AesExtraDataRecord {
 
     // size:2 - signature (0x9901)
     // size:2
-    @Builder.Default
-    private final int size = ExtraField.NO_DATA;
+    private final int size;
     // size:2
-    @Builder.Default
-    private final int versionNumber = ExtraField.NO_DATA;
+    private final int versionNumber;
     // size:2
     private final String vendor;
     // size:1
-    @NonNull
-    @Builder.Default
-    private final AesStrength strength = AesStrength.NULL;
+    private final AesStrength strength;
     // size:2
-    @NonNull
-    @Builder.Default
-    private final CompressionMethod compressionMethod = CompressionMethod.STORE;
+    private final CompressionMethod compressionMethod;
 
-    // TODO should be checked on set
-    public byte[] getVendor(@NonNull Charset charset) {
-        byte[] buf = vendor != null ? vendor.getBytes(charset) : null;
-
-        if (ArrayUtils.getLength(buf) > 2)
-            throw new Zip4jvmException("AESExtraDataRecord.vendor should be maximum 2 characters");
-
-        return buf;
+    public static Builder builder() {
+        return new Builder();
     }
 
+    private AesExtraDataRecord(Builder builder) {
+        size = builder.size;
+        versionNumber = builder.versionNumber;
+        vendor = builder.vendor;
+        strength = builder.strength;
+        compressionMethod = builder.compressionMethod;
+    }
+
+    public byte[] getVendor(Charset charset) {
+        return vendor == null ? null : vendor.getBytes(charset);
+    }
+
+    @Override
     public int getBlockSize() {
         return this == NULL ? 0 : SIZE;
     }
 
     @Override
+    public int getSignature() {
+        return SIGNATURE;
+    }
+
+    @Override
+    public boolean isNull() {
+        return this == NULL;
+    }
+
+    @Override
     public String toString() {
-        return this == NULL ? "<null>" : super.toString();
+        return this == NULL ? "<null>" : "strength:" + strength.getSize() + ", compression:" + compressionMethod.name();
+    }
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        if (this == NULL)
+            return;
+
+        out.writeWordSignature(SIGNATURE);
+        out.writeWord(size);
+        out.writeWord(versionNumber);
+        out.writeBytes(getVendor(StandardCharsets.UTF_8));
+        out.writeBytes((byte)strength.getCode());
+        out.writeWord(compressionMethod.getCode());
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class Builder {
+
+        private int size = ExtraField.NO_DATA;
+        private int versionNumber = ExtraField.NO_DATA;
+        private String vendor;
+        private AesStrength strength = AesStrength.NULL;
+        private CompressionMethod compressionMethod = CompressionMethod.DEFLATE;
+
+        public AesExtraDataRecord build() {
+            return new AesExtraDataRecord(this);
+        }
+
+        public Builder size(int size) {
+            this.size = size;
+            return this;
+        }
+
+        public Builder versionNumber(int versionNumber) {
+            this.versionNumber = versionNumber;
+            return this;
+        }
+
+        public Builder vendor(String vendor) {
+            if (StringUtils.length(vendor) > 2)
+                throw new Zip4jvmException("AESExtraDataRecord.vendor should be maximum 2 characters");
+
+            this.vendor = vendor;
+            return this;
+        }
+
+        public Builder strength(AesStrength strength) {
+            this.strength = Optional.ofNullable(strength).orElse(AesStrength.NULL);
+            return this;
+        }
+
+        public Builder compressionMethod(CompressionMethod compressionMethod) {
+            this.compressionMethod = Optional.ofNullable(compressionMethod).orElse(CompressionMethod.DEFLATE);
+            return this;
+        }
     }
 
 }

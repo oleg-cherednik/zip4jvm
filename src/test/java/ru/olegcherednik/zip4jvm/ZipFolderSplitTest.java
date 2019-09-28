@@ -13,6 +13,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertionsForClassTypes.assertThatDirectory;
 
 /**
@@ -37,14 +39,11 @@ public class ZipFolderSplitTest {
 
     @Test
     public void shouldCreateNewZipWithFolder() throws IOException {
-        ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettingsProvider(fileName ->
-                                                          ZipEntrySettings.builder()
-                                                                          .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
-                                                  .splitSize(1024 * 1024).build();
-        ZipIt.add(zip, Zip4jvmSuite.contentSrcDir, settings);
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
+        ZipFileSettings settings = ZipFileSettings.builder().entrySettingsProvider(fileName -> entrySettings).splitSize(SIZE_1MB).build();
 
-        assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(10);
+        ZipIt.add(zip, contentDirSrc, settings);
+        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(6);
         assertThat(Files.exists(zip)).isTrue();
         assertThat(Files.isRegularFile(zip)).isTrue();
         // TODO ZipFile does not read split archive
@@ -59,6 +58,6 @@ public class ZipFolderSplitTest {
 //                                                                          .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
 //                                                  .splitSize(2014 * 1024).build();
 //
-//        assertThatThrownBy(() -> ZipIt.add(zip, Zip4jSuite.starWarsDir, settings)).isExactlyInstanceOf(Zip4jException.class);
+//        assertThatThrownBy(() -> ZipIt.add(zip, Zip4jSuite.starWarsDir, settings)).isExactlyInstanceOf(Zip4jvmException.class);
 //    }
 }

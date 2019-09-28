@@ -7,6 +7,7 @@ import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  * @author Oleg Cherednik
@@ -20,7 +21,8 @@ public final class LocalFileHeaderWriter implements Writer {
 
     @Override
     public void write(@NonNull DataOutput out) throws IOException {
-        byte[] fileName = localFileHeader.getFileName();
+        Charset charset = localFileHeader.getGeneralPurposeFlag().getCharset();
+        byte[] fileName = localFileHeader.getFileName(charset);
 
         out.writeDwordSignature(LocalFileHeader.SIGNATURE);
         out.writeWord(localFileHeader.getVersionToExtract());
@@ -34,7 +36,7 @@ public final class LocalFileHeaderWriter implements Writer {
         out.writeWord(localFileHeader.getExtraField().getSize());
         out.writeBytes(fileName);
 
-        new ExtraFieldWriter(localFileHeader.getExtraField(), localFileHeader.getGeneralPurposeFlag().getCharset()).write(out);
+        new ExtraFieldWriter(localFileHeader.getExtraField()).write(out);
     }
 
 }

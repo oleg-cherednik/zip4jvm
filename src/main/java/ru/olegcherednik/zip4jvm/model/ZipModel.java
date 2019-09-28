@@ -2,10 +2,10 @@ package ru.olegcherednik.zip4jvm.model;
 
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.nio.file.Path;
@@ -41,8 +41,8 @@ public class ZipModel {
     public static final int MAX_TOTAL_ENTRIES = Zip64.LIMIT_INT;
     public static final long MAX_ENTRY_SIZE = Zip64.LIMIT;
     public static final int MAX_TOTAL_DISKS = Zip64.LIMIT_INT;
+    public static final int MAX_COMMENT_LENGTH = Zip64.LIMIT_INT;
 
-    @NonNull
     private final Path file;
     private long splitSize = NO_SPLIT;
 
@@ -51,6 +51,12 @@ public class ZipModel {
     private long mainDisk;
     private long centralDirectoryOffs;
     private long centralDirectorySize;
+
+    public void setComment(String comment) {
+        if (StringUtils.length(comment) > MAX_COMMENT_LENGTH)
+            throw new IllegalArgumentException("File comment should be " + MAX_COMMENT_LENGTH + " characters maximum");
+        this.comment = StringUtils.isEmpty(comment) ? null : comment;
+    }
 
     /**
      * {@literal true} only if section {@link Zip64} exists. In other words, do set this to {@code true}, to write zip archive
@@ -77,19 +83,22 @@ public class ZipModel {
         return fileNameEntry.size();
     }
 
-    public void addEntry(@NonNull ZipEntry entry) {
-        fileNameEntry.put(entry.getFileName(), entry);
+    public void addEntry(ZipEntry zipEntry) {
+        fileNameEntry.put(zipEntry.getFileName(), zipEntry);
     }
 
     public Collection<ZipEntry> getEntries() {
         return isEmpty() ? Collections.emptyList() : Collections.unmodifiableCollection(fileNameEntry.values());
     }
 
-    public ZipEntry getEntryByFileName(@NonNull String fileName) {
+    public ZipEntry getEntryByFileName(String fileName) {
         return fileNameEntry.get(fileName);
     }
 
-    @NonNull
+    public boolean hasEntry(String fileName) {
+        return fileNameEntry.containsKey(fileName);
+    }
+
     public Set<String> getEntryNames() {
         return isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(fileNameEntry.keySet());
     }

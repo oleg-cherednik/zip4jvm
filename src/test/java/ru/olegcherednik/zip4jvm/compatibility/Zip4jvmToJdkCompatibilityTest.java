@@ -1,8 +1,8 @@
 package ru.olegcherednik.zip4jvm.compatibility;
 
-import ru.olegcherednik.zip4jvm.TestUtils;
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import org.testng.annotations.Test;
+import ru.olegcherednik.zip4jvm.TestDataAssert;
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -12,8 +12,8 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.deflateSolidZip;
-import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.storeSolidZip;
+import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
+import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolid;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
 /**
@@ -29,7 +29,7 @@ public class Zip4jvmToJdkCompatibilityTest {
     public void checkCompatibilityWithJdk() throws IOException {
         Path parentDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        for (Path zip4jFile : Arrays.asList(storeSolidZip, deflateSolidZip)) {
+        for (Path zip4jFile : Arrays.asList(zipStoreSolid, zipDeflateSolid)) {
             Path dstDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(parentDir, zip4jFile);
 
             try (ZipFile zipFile = new ZipFile(zip4jFile.toFile())) {
@@ -43,12 +43,12 @@ public class Zip4jvmToJdkCompatibilityTest {
                         Files.createDirectories(path);
                     else {
                         Files.createDirectories(path.getParent());
-                        TestUtils.copyLarge(zipFile.getInputStream(entry), path);
+                        TestDataAssert.copyLarge(zipFile.getInputStream(entry), path);
                     }
                 }
             }
 
-            assertThatDirectory(dstDir).matches(TestUtils.dirAssert);
+            assertThatDirectory(dstDir).matches(TestDataAssert.dirSrcAssert);
         }
 
     }

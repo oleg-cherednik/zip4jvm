@@ -1,9 +1,10 @@
 package ru.olegcherednik.zip4jvm.model;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.lang.ArrayUtils;
+
+import java.nio.charset.Charset;
 
 /**
  * see 4.3.7
@@ -21,10 +22,8 @@ public class LocalFileHeader {
     // size:2 - version needed to extractEntries
     private int versionToExtract;
     // size:2 - general purpose bit flag
-    @NonNull
-    private GeneralPurposeFlag generalPurposeFlag;
+    private GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
     // size:2 - compression method
-    @NonNull
     private CompressionMethod compressionMethod = CompressionMethod.STORE;
     // size:2 - last mod file time
     // size:2 - ast mod file date
@@ -40,12 +39,10 @@ public class LocalFileHeader {
     // size:n - file name
     private String fileName;
     // size:m - extra field
-    @NonNull
-    private ExtraField extraField = new ExtraField();
+    private ExtraField extraField = ExtraField.NULL;
 
-    @NonNull
-    public byte[] getFileName() {
-        return fileName != null ? fileName.getBytes(generalPurposeFlag.getCharset()) : ArrayUtils.EMPTY_BYTE_ARRAY;
+    public byte[] getFileName(Charset charset) {
+        return fileName == null ? ArrayUtils.EMPTY_BYTE_ARRAY : fileName.getBytes(charset);
     }
 
     @Override

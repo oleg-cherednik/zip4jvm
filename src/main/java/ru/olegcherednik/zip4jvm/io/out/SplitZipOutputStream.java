@@ -54,6 +54,7 @@ public class SplitZipOutputStream extends BaseDataOutput {
     }
 
     @Override
+    @SuppressWarnings("PMD.AvoidReassigningParameters")
     public void write(byte[] buf, int offs, int len) throws IOException {
         final int offsInit = offs;
 

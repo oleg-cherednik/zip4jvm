@@ -4,7 +4,7 @@ import de.idyl.winzipaes.AesZipFileDecrypter;
 import de.idyl.winzipaes.impl.AESDecrypterJCA;
 import de.idyl.winzipaes.impl.ExtZipEntry;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.TestUtils;
+import ru.olegcherednik.zip4jvm.TestDataAssert;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 
 import java.io.IOException;
@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.zip.DataFormatException;
 
+import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolidAes;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
 /**
@@ -27,7 +28,7 @@ public class Zip4jvmToWinZipAesCompatibilityTest {
 
     public void checkCompatibilityWithWinZipAes() throws IOException, DataFormatException {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        AesZipFileDecrypter decrypter = new AesZipFileDecrypter(Zip4jvmSuite.deflateSolidAesZip.toFile(), new AESDecrypterJCA());
+        AesZipFileDecrypter decrypter = new AesZipFileDecrypter(zipDeflateSolidAes.toFile(), new AESDecrypterJCA());
         AesZipFileDecrypter.charset = StandardCharsets.UTF_8.name();
 
         for (ExtZipEntry zipEntry : decrypter.getEntryList()) {
@@ -49,7 +50,7 @@ public class Zip4jvmToWinZipAesCompatibilityTest {
             }
         }
 
-        assertThatDirectory(dstDir).matches(TestUtils.dirAssert);
+        assertThatDirectory(dstDir).matches(TestDataAssert.dirSrcAssert);
     }
 
 }

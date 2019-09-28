@@ -28,8 +28,8 @@ import java.util.function.LongFunction;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum Encryption {
-    OFF(entry -> Encoder.NULL,
-            (entry, in) -> Decoder.NULL,
+    OFF(zipEntry -> Encoder.NULL,
+            (zipEntry, in) -> Decoder.NULL,
             uncompressedSize -> uncompressedSize,
             ZipEntry::getChecksum,
             Compression::getMethod),
@@ -64,7 +64,7 @@ public enum Encryption {
 
     public interface CreateDecoder {
 
-        Decoder apply(ZipEntry entry, DataInput in) throws IOException;
+        Decoder apply(ZipEntry zipEntry, DataInput in) throws IOException;
     }
 
 }

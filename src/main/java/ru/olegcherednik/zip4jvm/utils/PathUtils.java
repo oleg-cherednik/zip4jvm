@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.utils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmPathNotExistsException;
+import ru.olegcherednik.zip4jvm.exception.PathNotExistsException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -55,12 +55,12 @@ public final class PathUtils {
         }
     }
 
-    public static void requireExistedPaths(@NonNull Collection<Path> paths) {
+    public static void requireExistedPaths(Collection<Path> paths) {
         paths.forEach(PathUtils::requireExistedPath);
     }
 
-    public static void requireExistedPath(@NonNull Path path) {
-        if (!Files.exists(path) || !Files.isReadable(path))
-            throw new Zip4jvmPathNotExistsException(path);
+    public static void requireExistedPath(Path path) {
+        if (path == null || !Files.exists(path) || !Files.isReadable(path))
+            throw new PathNotExistsException(path);
     }
 }

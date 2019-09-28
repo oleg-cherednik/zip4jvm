@@ -4,7 +4,6 @@ import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import lombok.NonNull;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
@@ -22,7 +21,7 @@ public final class AesEncoder implements Encoder {
     private final byte[] passwordChecksum;
     private final AesEngine engine;
 
-    public static AesEncoder create(@NonNull ZipEntry entry) {
+    public static AesEncoder create(ZipEntry entry) {
         try {
             AesStrength strength = entry.getStrength();
             byte[] salt = strength.generateSalt();
@@ -46,13 +45,13 @@ public final class AesEncoder implements Encoder {
     }
 
     @Override
-    public void writeEncryptionHeader(@NonNull DataOutput out) throws IOException {
+    public void writeEncryptionHeader(DataOutput out) throws IOException {
         out.writeBytes(salt);
         out.writeBytes(passwordChecksum);
     }
 
     @Override
-    public void encrypt(@NonNull byte[] buf, int offs, int len) {
+    public void encrypt(byte[] buf, int offs, int len) {
         try {
             engine.cypherUpdate(buf, offs, len);
             engine.updateMac(buf, offs, len);
@@ -62,7 +61,7 @@ public final class AesEncoder implements Encoder {
     }
 
     @Override
-    public void close(@NonNull DataOutput out) throws IOException {
+    public void close(DataOutput out) throws IOException {
         out.write(engine.getMac(), 0, MAC_SIZE);
     }
 

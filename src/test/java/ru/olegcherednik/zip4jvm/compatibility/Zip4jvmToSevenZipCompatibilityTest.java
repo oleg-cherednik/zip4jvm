@@ -1,7 +1,5 @@
 package ru.olegcherednik.zip4jvm.compatibility;
 
-import ru.olegcherednik.zip4jvm.TestUtils;
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import net.sf.sevenzipjbinding.ArchiveFormat;
 import net.sf.sevenzipjbinding.ExtractOperationResult;
 import net.sf.sevenzipjbinding.IInArchive;
@@ -11,6 +9,9 @@ import net.sf.sevenzipjbinding.impl.RandomAccessFileInStream;
 import net.sf.sevenzipjbinding.simple.ISimpleInArchiveItem;
 import org.apache.commons.lang.ArrayUtils;
 import org.testng.annotations.Test;
+import ru.olegcherednik.zip4jvm.TestDataAssert;
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -19,9 +20,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 
-import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.deflateSolidPkwareZip;
-import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.deflateSolidZip;
-import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.storeSolidZip;
+import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolidPkware;
+import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
+import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolid;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
 /**
@@ -38,7 +39,7 @@ public class Zip4jvmToSevenZipCompatibilityTest {
         String password = new String(Zip4jvmSuite.password);
         Path parentDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        for (Path zip4jFile : Arrays.asList(storeSolidZip, deflateSolidZip, deflateSolidPkwareZip)) {
+        for (Path zip4jFile : Arrays.asList(zipStoreSolid, zipDeflateSolid, zipDeflateSolidPkware)) {
             Path dstDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(parentDir, zip4jFile);
 
             try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(zip4jFile.toFile(), "r"));
@@ -69,13 +70,13 @@ public class Zip4jvmToSevenZipCompatibilityTest {
                             }, password);
 
                             if (res != ExtractOperationResult.OK)
-                                throw new RuntimeException("Cannot extract zip entry");
+                                throw new Zip4jvmException("Cannot extract zip entry");
                         }
                     }
                 }
             }
 
-            assertThatDirectory(dstDir).matches(TestUtils.dirAssert);
+            assertThatDirectory(dstDir).matches(TestDataAssert.dirSrcAssert);
         }
 
     }

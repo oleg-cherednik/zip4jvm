@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.model.builders;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
@@ -30,16 +29,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public final class ZipModelBuilder {
 
-    @NonNull
     private final Path zip;
-    @NonNull
     private final EndCentralDirectory endCentralDirectory;
-    @NonNull
     private final Zip64 zip64;
-    @NonNull
     private final CentralDirectory centralDirectory;
 
-    public static ZipModel read(@NonNull Path zip) throws IOException {
+    public static ZipModel read(Path zip) throws IOException {
         return new ZipModelReader(zip).read();
     }
 
@@ -55,7 +50,6 @@ public final class ZipModelBuilder {
         return zipModel;
     }
 
-    @NonNull
     public ZipModel create() throws IOException {
         ZipModel zipModel = new ZipModel(zip);
 
@@ -90,13 +84,13 @@ public final class ZipModelBuilder {
         return zip64.getEndCentralDirectoryLocator().getMainDisk();
     }
 
-    public static long getCentralDirectoryOffs(@NonNull EndCentralDirectory endCentralDirectory, @NonNull Zip64 zip64) {
+    public static long getCentralDirectoryOffs(EndCentralDirectory endCentralDirectory, Zip64 zip64) {
         if (zip64 == Zip64.NULL)
             return endCentralDirectory.getCentralDirectoryOffs();
         return zip64.getEndCentralDirectory().getCentralDirectoryOffs();
     }
 
-    public static long getTotalEntries(@NonNull EndCentralDirectory endCentralDirectory, @NonNull Zip64 zip64) {
+    public static long getTotalEntries(EndCentralDirectory endCentralDirectory, Zip64 zip64) {
         if (zip64 == Zip64.NULL)
             return endCentralDirectory.getTotalEntries();
         return zip64.getEndCentralDirectory().getTotalEntries();

@@ -1,7 +1,6 @@
 package ru.olegcherednik.zip4jvm.model;
 
 import lombok.AccessLevel;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.ArrayUtils;
 
@@ -22,14 +21,15 @@ public class InternalFileAttributes implements Supplier<byte[]>, Consumer<Path> 
     private final byte[] data;
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")
-    public static InternalFileAttributes createDataBasedDelegate(@NonNull byte[] data) {
-        if (ArrayUtils.isEmpty(data) || (data[0] == 0 && data[1] == 0))
-            return NULL;
-        return new InternalFileAttributes(data);
+    public static InternalFileAttributes createDataBasedDelegate(byte[] data) {
+        if (ArrayUtils.getLength(data) == SIZE && (data[0] != 0 || data[1] != 0))
+            return new InternalFileAttributes(data);
+        return NULL;
     }
 
     @Override
     public void accept(Path path) {
+        /* nothing to accept */
     }
 
     @Override

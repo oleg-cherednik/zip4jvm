@@ -8,7 +8,6 @@ import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 
 /**
  * @author Oleg Cherednik
@@ -21,15 +20,13 @@ final class ExtraFieldWriter implements Writer {
 
     @NonNull
     private final ExtraField extraField;
-    @NonNull
-    private final Charset charset;
 
     @Override
     public void write(@NonNull DataOutput out) throws IOException {
         out.mark(MARK);
 
-        new Zip64Writer.ExtendedInfo(extraField.getExtendedInfo()).write(out);
-        new AesExtraDataRecordWriter(extraField.getAesExtraDataRecord(), charset).write(out);
+        for (ExtraField.Record record : extraField.getRecords())
+            record.write(out);
 
         if (extraField.getSize() != out.getWrittenBytesAmount(MARK))
             throw new Zip4jvmException("Illegal number of written bytes");

@@ -11,8 +11,8 @@ import java.io.IOException;
  */
 final class StoreEntryOutputStream extends EntryOutputStream {
 
-    public StoreEntryOutputStream(ZipEntry entry, DataOutput out) {
-        super(entry, out);
+    public StoreEntryOutputStream(ZipEntry zipEntry, DataOutput out) {
+        super(zipEntry, out);
     }
 
     @Override

@@ -3,11 +3,8 @@ package ru.olegcherednik.zip4jvm.model.entry;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.ZipFile;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmEmptyPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.io.in.SplitZipInputStream;
 import ru.olegcherednik.zip4jvm.io.in.entry.EntryInputStream;
@@ -61,8 +58,7 @@ public final class ZipEntryBuilder {
         Compression compression = entrySettings.getCompression();
         CompressionLevel compressionLevel = entrySettings.getCompressionLevel();
         Encryption encryption = entrySettings.getEncryption();
-
-        ZipEntryInputStreamSupplier inputStreamSup = zipEntry -> entry.getInputStreamSup().get();
+        ZipEntryInputStreamSupplier inputStreamSup = zipEntry -> entry.getInputStream();
 
         RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, compression, compressionLevel,
                 encryption, inputStreamSup);
@@ -71,9 +67,6 @@ public final class ZipEntryBuilder {
         zipEntry.setPassword(entrySettings.getPassword());
         zipEntry.setComment(entrySettings.getComment());
         zipEntry.setUtf8(entrySettings.isUtf8());
-
-        if (zipEntry.isEncrypted() && ArrayUtils.isEmpty(zipEntry.getPassword()))
-            throw new Zip4jvmEmptyPasswordException();
 
         return zipEntry;
     }
@@ -104,17 +97,22 @@ public final class ZipEntryBuilder {
         Encryption encryption = fileHeader.getEncryption();
         ExternalFileAttributes externalFileAttributes = fileHeader.getExternalFileAttributes();
 
-        ZipEntryInputStreamSupplier inputStreamSup = entry -> {
-            DataInput in = zipModel.isSplit() ? SplitZipInputStream.create(zipModel, entry.getDisk()) : SingleZipInputStream.create(zipModel);
-            return EntryInputStream.create(entry, in);
-        };
+        ZipEntryInputStreamSupplier inputStreamSup = createInputStreamSupplier(zipModel);
 
         RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, compression, compressionLevel,
                 encryption, inputStreamSup);
+
         zipEntry.setZip64(fileHeader.isZip64());
         zipEntry.setComment(fileHeader.getComment());
         zipEntry.setUtf8(fileHeader.getGeneralPurposeFlag().isUtf8());
+
         return zipEntry;
+    }
+
+    private static ZipEntryInputStreamSupplier createInputStreamSupplier(ZipModel zipModel) {
+        if (zipModel.isSplit())
+            return zipEntry -> EntryInputStream.create(zipEntry, SplitZipInputStream.create(zipModel, zipEntry.getDisk()));
+        return zipEntry -> EntryInputStream.create(zipEntry, SingleZipInputStream.create(zipModel));
     }
 
     private static long getDisk(CentralDirectory.FileHeader fileHeader) {

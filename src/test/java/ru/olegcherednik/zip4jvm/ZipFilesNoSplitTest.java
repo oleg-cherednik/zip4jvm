@@ -15,6 +15,10 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
+import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
+import static ru.olegcherednik.zip4jvm.TestData.fileFerrari;
+import static ru.olegcherednik.zip4jvm.TestData.fileWiesmann;
+
 /**
  * @author Oleg Cherednik
  * @since 15.03.2019
@@ -43,15 +47,12 @@ public class ZipFilesNoSplitTest {
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
                                                   .build();
 
-        Path bentley = Zip4jvmSuite.carsDir.resolve("bentley-continental.jpg");
-        Path ferrari = Zip4jvmSuite.carsDir.resolve("ferrari-458-italia.jpg");
-        Path wiesmann = Zip4jvmSuite.carsDir.resolve("wiesmann-gt-mf5.jpg");
-        List<Path> files = Arrays.asList(bentley, ferrari, wiesmann);
+        List<Path> files = Arrays.asList(fileBentley, fileFerrari, fileWiesmann);
 
         ZipIt.add(zip, files, settings);
 
-        Zip4jvmAssertions.assertThatDirectory(zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        Zip4jvmAssertions.assertThatZipFile(zip).directory("/").matches(TestUtils.zipCarsDirAssert);
+        Zip4jvmAssertions.assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
+        Zip4jvmAssertions.assertThatZipFile(zip).root().matches(TestDataAssert.zipDirCarsAssert);
     }
 
     // TODO Test to add files to existed no split zip

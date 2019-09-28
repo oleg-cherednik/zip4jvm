@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm;
 
-import org.apache.commons.io.FileUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Ignore;
@@ -13,9 +12,10 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
 
 /**
  * @author Oleg Cherednik
@@ -25,6 +25,10 @@ import java.nio.file.Path;
 public class Zip64Test {
 
     private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(Zip64Test.class);
+
+    private Path zipFile1;
+    private Path zipFile2;
+    private Path zipFile3;
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -36,8 +40,6 @@ public class Zip64Test {
         Zip4jvmSuite.removeDir(rootDir);
     }
 
-    private Path zipFile1;
-
     @Test
     public void shouldZipWhenZip64() throws IOException {
         ZipFileSettings settings = ZipFileSettings.builder()
@@ -47,7 +49,7 @@ public class Zip64Test {
                                                                           .build())
                                                   .zip64(true).build();
         zipFile1 = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt.add(zipFile1, Zip4jvmSuite.contentSrcDir, settings);
+        ZipIt.add(zipFile1, contentDirSrc, settings);
 
         // TODO it seems it could be checked with commons-compress
 //        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -58,10 +60,9 @@ public class Zip64Test {
     public void shouldUnzipWhenZip64() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         UnzipIt.extract(zipFile1, destDir);
-        Zip4jvmAssertions.assertThatDirectory(destDir).matches(TestUtils.dirAssert);
+        Zip4jvmAssertions.assertThatDirectory(destDir).matches(TestDataAssert.dirSrcAssert);
     }
 
-    private Path zipFile2;
 
     @Test
     public void shouldZipWhenZip64AndAesEncryption() throws IOException {
@@ -74,7 +75,7 @@ public class Zip64Test {
                                                   .zip64(true).build();
 
         zipFile2 = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt.add(zipFile2, Zip4jvmSuite.contentSrcDir, settings);
+        ZipIt.add(zipFile2, contentDirSrc, settings);
 
         // TODO it seems it could be checked with commons-compress
 //        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -85,10 +86,9 @@ public class Zip64Test {
     public void shouldUnzipWhenZip64AndAesEncryption() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         UnzipIt.extract(zipFile2, destDir, fileName -> Zip4jvmSuite.password);
-        Zip4jvmAssertions.assertThatDirectory(destDir).matches(TestUtils.dirAssert);
+        Zip4jvmAssertions.assertThatDirectory(destDir).matches(TestDataAssert.dirSrcAssert);
     }
 
-    private Path zipFile3;
 
     @Test
     public void shouldZipWhenZip64AndSplit() throws IOException {
@@ -101,7 +101,7 @@ public class Zip64Test {
                                                   .zip64(true).build();
 
         zipFile3 = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt.add(zipFile3, Zip4jvmSuite.contentSrcDir, settings);
+        ZipIt.add(zipFile3, contentDirSrc, settings);
 
         // TODO it seems it could be checked with commons-compress
 //        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -113,7 +113,7 @@ public class Zip64Test {
     public void shouldUnzipWhenZip64AndSplit() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         UnzipIt.extract(zipFile3, destDir, fileName -> Zip4jvmSuite.password);
-        Zip4jvmAssertions.assertThatDirectory(destDir).matches(TestUtils.dirAssert);
+        Zip4jvmAssertions.assertThatDirectory(destDir).matches(TestDataAssert.dirSrcAssert);
     }
 
 //    //    @Test
@@ -167,16 +167,16 @@ public class Zip64Test {
     /**
      * Create 65_535 + 1 entries under {@code root} directory
      */
-    private static void createData(Path root) throws IOException {
-        for (int i = 0, j = 1; i <= 65; i++) {
-            Path dir = root.resolve(String.format("dir_%02d", i));
-            Files.createDirectories(dir);
-
-            for (; j <= 1000 * i + (i == 65 ? 536 : 1000); j++)
-                FileUtils.writeStringToFile(dir.resolve(String.format("%04d.txt", j)).toFile(), "oleg", StandardCharsets.UTF_8);
-        }
-
-    }
+//    private static void createData(Path root) throws IOException {
+//        for (int i = 0, j = 1; i <= 65; i++) {
+//            Path dir = root.resolve(String.format("dir_%02d", i));
+//            Files.createDirectories(dir);
+//
+//            for (; j <= 1000 * i + (i == 65 ? 536 : 1000); j++)
+//                FileUtils.writeStringToFile(dir.resolve(String.format("%04d.txt", j)).toFile(), "oleg", StandardCharsets.UTF_8);
+//        }
+//
+//    }
 
 
 }

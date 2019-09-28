@@ -1,7 +1,5 @@
 package ru.olegcherednik.zip4jvm.crypto.pkware;
 
-import lombok.NonNull;
-
 /**
  * @author Oleg Cherednik
  * @since 22.03.2019
@@ -13,7 +11,7 @@ public final class PkwareEngine {
 
     private final int[] keys;
 
-    public PkwareEngine(@NonNull char[] password) {
+    public PkwareEngine(char[] password) {
         keys = createKeys(password);
     }
 

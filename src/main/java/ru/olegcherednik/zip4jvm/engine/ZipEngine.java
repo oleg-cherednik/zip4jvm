@@ -1,7 +1,9 @@
-package ru.olegcherednik.zip4jvm;
+package ru.olegcherednik.zip4jvm.engine;
 
 import lombok.NonNull;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmEntryDuplicationException;
+import org.apache.commons.lang.StringUtils;
+import ru.olegcherednik.zip4jvm.ZipFile;
+import ru.olegcherednik.zip4jvm.exception.EntryDuplicationException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.SingleZipOutputStream;
@@ -29,14 +31,14 @@ import java.util.stream.Collectors;
  * @author Oleg Cherednik
  * @since 09.09.2019
  */
-final class ZipFileWriter implements ZipFile.Writer {
+public final class ZipEngine implements ZipFile.Writer {
 
     private final Path zip;
     private final ZipModel tempZipModel;
     private final Function<String, ZipEntrySettings> entrySettingsProvider;
     private final Map<String, Writer> fileNameWriter = new LinkedHashMap<>();
 
-    public ZipFileWriter(@NonNull Path zip, @NonNull ZipFileSettings settings) throws IOException {
+    public ZipEngine(@NonNull Path zip, @NonNull ZipFileSettings settings) throws IOException {
         this.zip = zip;
         tempZipModel = createTempZipModel(zip, settings, fileNameWriter);
         entrySettingsProvider = settings.getEntrySettingsProvider();
@@ -47,18 +49,20 @@ final class ZipFileWriter implements ZipFile.Writer {
         String fileName = entry.getFileName();
 
         if (fileNameWriter.put(fileName, new ZipFileEntryWriter(entry, entrySettingsProvider.apply(fileName), tempZipModel)) != null)
-            throw new Zip4jvmEntryDuplicationException(fileName);
+            throw new EntryDuplicationException(fileName);
     }
 
     @Override
     public void remove(@NonNull String prefixEntryName) throws FileNotFoundException {
+        if (StringUtils.isBlank(prefixEntryName))
+            throw new Zip4jvmException("Prefix should not be empty");
+
         String normalizedPrefixEntryName = ZipUtils.normalizeFileName(prefixEntryName);
 
         Set<String> entryNames = fileNameWriter.keySet().stream()
                                                .filter(entryName -> entryName.startsWith(normalizedPrefixEntryName))
                                                .collect(Collectors.toSet());
 
-        // TODO it's not working, check it in test
         if (entryNames.isEmpty())
             throw new FileNotFoundException(prefixEntryName);
 
@@ -71,12 +75,10 @@ final class ZipFileWriter implements ZipFile.Writer {
 
         for (String fileName : srcZipModel.getEntryNames()) {
             if (fileNameWriter.containsKey(fileName))
-                throw new Zip4jvmException("File name duplication");
+                throw new EntryDuplicationException(fileName);
 
-            char[] password = entrySettingsProvider == null ? null : entrySettingsProvider.apply(fileName).getPassword();
-
-            if (fileNameWriter.put(fileName, new ExistedEntryWriter(srcZipModel, fileName, tempZipModel, password)) != null)
-                throw new Zip4jvmException("File name duplication");
+            char[] password = entrySettingsProvider.apply(fileName).getPassword();
+            fileNameWriter.put(fileName, new ExistedEntryWriter(srcZipModel, fileName, tempZipModel, password));
         }
     }
 

@@ -8,14 +8,12 @@ import lombok.Setter;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
-import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
 
@@ -25,7 +23,7 @@ import java.util.Comparator;
 import java.util.function.BooleanSupplier;
 
 /**
- * Represents one single entry in zip archive, i.e. one instance of {@link LocalFileHeader} and related {@link CentralDirectory.FileHeader}.
+ * Represents one single entry in zip archive, i.e. one instance of {@link LocalFileHeader} and related {@link ru.olegcherednik.zip4jvm.model.CentralDirectory.FileHeader}.
  *
  * @author Oleg Cherednik
  * @since 26.07.2019
@@ -33,12 +31,11 @@ import java.util.function.BooleanSupplier;
 @Getter
 @Setter
 @RequiredArgsConstructor
+@SuppressWarnings("UnnecessaryFullyQualifiedName")
 public abstract class ZipEntry {
 
     public static final Comparator<ZipEntry> SORT_BY_DISC_LOCAL_FILE_HEADER_OFFS =
             Comparator.comparingLong(ZipEntry::getDisk).thenComparing(ZipEntry::getLocalFileHeaderOffs);
-
-    public static final long SIZE_2GB = 2_147_483_648L;
 
     private final String fileName;
     private final int lastModifiedTime;
@@ -50,8 +47,9 @@ public abstract class ZipEntry {
     private final ZipEntryInputStreamSupplier inputStreamSup;
 
     /**
-     * {@literal true} only if section {@link Zip64.ExtendedInfo} exists in {@link LocalFileHeader} and {@link CentralDirectory.FileHeader}.
-     * In other words, do set this to {@code true}, to write given entry in ZIP64 format.
+     * {@literal true} only if section {@link ru.olegcherednik.zip4jvm.model.Zip64.ExtendedInfo} exists in {@link LocalFileHeader} and
+     * {@link ru.olegcherednik.zip4jvm.model.CentralDirectory.FileHeader}. In other words, do set this to {@code true}, to write given entry in
+     * ZIP64 format.
      */
     private boolean zip64;
 
@@ -101,6 +99,7 @@ public abstract class ZipEntry {
     }
 
     public void setChecksum(long checksum) {
+        /* nothing to set */
     }
 
     public final boolean isDataDescriptorAvailable() {

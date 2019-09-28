@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+
+import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
@@ -86,7 +89,7 @@ public final class Zip64 {
     /** see 4.5.3 */
     @Getter
     @Builder
-    public static final class ExtendedInfo {
+    public static final class ExtendedInfo implements ExtraField.Record {
 
         public static final ExtendedInfo NULL = builder().build();
 
@@ -120,14 +123,43 @@ public final class Zip64 {
             return size;
         }
 
+        @Override
         public int getBlockSize() {
             int size = getDataSize();
             return size == 0 ? 0 : size + SIZE_FIELD;
         }
 
         @Override
+        public int getSignature() {
+            return SIGNATURE;
+        }
+
+        @Override
+        public boolean isNull() {
+            return this == NULL;
+        }
+
+        @Override
         public String toString() {
             return this == NULL ? "<null>" : super.toString();
+        }
+
+        @Override
+        public void write(DataOutput out) throws IOException {
+            if (this == NULL)
+                return;
+
+            out.writeWordSignature(SIGNATURE);
+            out.writeWord(getDataSize());
+
+            if (getUncompressedSize() != ExtraField.NO_DATA)
+                out.writeQword(getUncompressedSize());
+            if (getCompressedSize() != ExtraField.NO_DATA)
+                out.writeQword(getCompressedSize());
+            if (getOffsLocalHeaderRelative() != ExtraField.NO_DATA)
+                out.writeQword(getOffsLocalHeaderRelative());
+            if (getDisk() != ExtraField.NO_DATA)
+                out.writeDword(getDisk());
         }
     }
 

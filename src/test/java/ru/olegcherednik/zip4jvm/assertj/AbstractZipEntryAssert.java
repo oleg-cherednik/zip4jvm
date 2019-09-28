@@ -10,8 +10,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
  * @author Oleg Cherednik
  * @since 25.03.2019
  */
-@SuppressWarnings("NewClassNamingConvention")
-public abstract class AbstractZipEntryAssert<SELF extends AbstractZipEntryAssert<SELF>> extends AbstractAssert<SELF, ZipEntry> {
+public abstract class AbstractZipEntryAssert<S extends AbstractZipEntryAssert<S>> extends AbstractAssert<S, ZipEntry> {
 
     protected final ZipFileDecorator zipFile;
 
@@ -20,9 +19,15 @@ public abstract class AbstractZipEntryAssert<SELF extends AbstractZipEntryAssert
         this.zipFile = zipFile;
     }
 
-    public SELF exists() {
+    public S exists() {
         isNotNull();
         assertThat(zipFile.containsEntry(actual.getName())).isTrue();
+        return myself;
+    }
+
+    public S notExists() {
+        isNotNull();
+        assertThat(zipFile.containsEntry(actual.getName())).isFalse();
         return myself;
     }
 
