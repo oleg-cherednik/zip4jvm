@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.model.builders;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.LittleEndianReadFile;
 import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
@@ -102,8 +102,8 @@ public final class ZipModelBuilder {
     }
 
     private static boolean isSplit(ZipModel zipModel) throws IOException {
-        try (DataInput in = new LittleEndianReadFile(zipModel.getPartFile(0))) {
-            return in.readSignature() == SplitZipOutputStream.SPLIT_SIGNATURE;
+        try (DataInputFile in = new LittleEndianReadFile(zipModel.getPartFile(0))) {
+            return in.readDwordSignature() == SplitZipOutputStream.SPLIT_SIGNATURE;
         }
     }
 

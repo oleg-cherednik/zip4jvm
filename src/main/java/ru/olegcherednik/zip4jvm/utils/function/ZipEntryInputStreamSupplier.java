@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.utils.function;
 
-import lombok.NonNull;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
@@ -13,6 +12,6 @@ import java.io.InputStream;
 @FunctionalInterface
 public interface ZipEntryInputStreamSupplier {
 
-    InputStream get(@NonNull ZipEntry zipEntry) throws IOException;
+    InputStream get(ZipEntry zipEntry) throws IOException;
 
 }

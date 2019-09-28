@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.io.in;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
-import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -15,7 +14,7 @@ import java.nio.file.Path;
  * @since 21.02.2019
  */
 @SuppressWarnings("SpellCheckingInspection")
-public class LittleEndianReadFile implements DataInput {
+public class LittleEndianReadFile implements DataInputFile {
 
     private final RandomAccessFile in;
 
@@ -24,62 +23,37 @@ public class LittleEndianReadFile implements DataInput {
     }
 
     @Override
-    public int readWord() throws IOException {
-        int b0 = in.read();
-        int b1 = in.read();
+    public int readWord(byte[] buf) {
+        int b0 = buf[0] & 0xFF;
+        int b1 = buf[1] & 0xFF;
         return (b1 << 8) + b0;
     }
 
     @Override
-    public long readDword() throws IOException {
-        long b0 = in.read();
-        long b1 = in.read();
-        long b2 = in.read();
-        long b3 = in.read();
+    public long readDword(byte[] buf) {
+        int b0 = buf[0] & 0xFF;
+        int b1 = buf[1] & 0xFF;
+        int b2 = buf[2] & 0xFF;
+        long b3 = buf[3] & 0xFF;
         return b3 << 24 | b2 << 16 | b1 << 8 | b0;
     }
 
     @Override
-    public long readQword() throws IOException {
-        long b0 = in.read();
-        long b1 = in.read();
-        long b2 = in.read();
-        long b3 = in.read();
-        long b4 = in.read();
-        long b5 = in.read();
-        long b6 = in.read();
-        long b7 = in.read();
+    public long readQword(byte[] buf) {
+        int b0 = buf[0] & 0xFF;
+        int b1 = buf[1] & 0xFF;
+        int b2 = buf[2] & 0xFF;
+        int b3 = buf[3] & 0xFF;
+        long b4 = buf[4] & 0xFF;
+        long b5 = buf[5] & 0xFF;
+        long b6 = buf[6] & 0xFF;
+        long b7 = buf[7] & 0xFF;
         return b7 << 56 | b6 << 48 | b5 << 40 | b4 << 32 | b3 << 24 | b2 << 16 | b1 << 8 | b0;
     }
 
     @Override
-    public String readString(int length, Charset charset) throws IOException {
-        ZipUtils.requirePositive(length, "readString");
-
-        if (length <= 0)
-            return null;
-
-        byte[] buf = new byte[length];
-        in.readFully(buf);
-        return new String(buf, charset);
-    }
-
-    @Override
-    public int readByte() throws IOException {
-        return in.read();
-    }
-
-    @Override
-    public byte[] readBytes(int total) throws IOException {
-        ZipUtils.requirePositive(total, "readBytes");
-
-        if (total <= 0)
-            return null;
-
-        byte[] buf = new byte[total];
-        int len = in.read(buf);
-
-        return len == buf.length ? buf : ArrayUtils.subarray(buf, 0, len);
+    public String readString(byte[] buf, Charset charset) {
+        return ArrayUtils.isEmpty(buf) ? null : new String(buf, charset);
     }
 
     @Override

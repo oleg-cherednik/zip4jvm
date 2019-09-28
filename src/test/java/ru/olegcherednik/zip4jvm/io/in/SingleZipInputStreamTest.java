@@ -6,7 +6,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -46,7 +45,7 @@ public class SingleZipInputStreamTest {
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x11 }, true);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x12, 0x13, 0x14 }, true);
 
-        try (SingleZipInputStream in = SingleZipInputStream.create(new ZipModel(file))) {
+        try (SingleZipInputStream in = new SingleZipInputStream(file)) {
             assertThat(in.getOffs()).isEqualTo(0);
 
             assertThat(in.readWord()).isEqualTo(0x201);
@@ -79,7 +78,7 @@ public class SingleZipInputStreamTest {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.data");
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x1, 0x2 }, true);
 
-        try (SingleZipInputStream in = SingleZipInputStream.create(new ZipModel(file))) {
+        try (SingleZipInputStream in = new SingleZipInputStream(file)) {
             assertThat(in.getOffs()).isEqualTo(0);
 
             assertThatCode(() -> in.skip(-1)).doesNotThrowAnyException();
@@ -92,7 +91,7 @@ public class SingleZipInputStreamTest {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.data");
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x1, 0x2 }, true);
 
-        try (SingleZipInputStream in = SingleZipInputStream.create(new ZipModel(file))) {
+        try (SingleZipInputStream in = new SingleZipInputStream(file)) {
             assertThat(in.readBytes(3)).isEqualTo(new byte[] { 0x1, 0x2 });
             assertThat(in.getOffs()).isEqualTo(2);
         }
@@ -102,7 +101,7 @@ public class SingleZipInputStreamTest {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.data");
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x1, 0x2 }, true);
 
-        SingleZipInputStream in = SingleZipInputStream.create(new ZipModel(file));
+        SingleZipInputStream in = new SingleZipInputStream(file);
         assertThat(in.getOffs()).isEqualTo(0);
 
         in.close();

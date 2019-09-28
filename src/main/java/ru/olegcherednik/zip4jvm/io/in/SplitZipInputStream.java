@@ -29,25 +29,26 @@ public class SplitZipInputStream extends BaseDataInput {
     }
 
     private void checkSignature() throws IOException {
-        if (disk == 0 && delegate.readSignature() != SplitZipOutputStream.SPLIT_SIGNATURE)
+        if (disk == 0 && delegate.readDwordSignature() != SplitZipOutputStream.SPLIT_SIGNATURE)
             throw new Zip4jvmException("Incorrect split file signature: " + zipModel.getFile().getFileName());
     }
 
     @Override
     @SuppressWarnings("PMD.AvoidReassigningParameters")
-    public int read(byte[] buf, int offs, int len) throws IOException {
+    public int read(byte[] buf, int offs, final int len) throws IOException {
         int res = 0;
+        int size = len;
 
         while (res < len) {
-            int total = delegate.read(buf, offs, len);
+            int total = delegate.read(buf, offs, size);
 
             if (total > 0)
                 res += total;
 
-            if (total == IOUtils.EOF || total < len) {
+            if (total == IOUtils.EOF || total < size) {
                 openNextDisk();
                 offs += Math.max(0, total);
-                len -= Math.max(0, total);
+                size -= Math.max(0, total);
             }
         }
 
