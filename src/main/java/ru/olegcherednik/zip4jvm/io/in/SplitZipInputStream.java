@@ -61,9 +61,4 @@ public class SplitZipInputStream extends BaseDataInput {
         delegate = new LittleEndianReadFile(splitFile);
     }
 
-    @Override
-    public void close() throws IOException {
-        delegate.close();
-    }
-
 }

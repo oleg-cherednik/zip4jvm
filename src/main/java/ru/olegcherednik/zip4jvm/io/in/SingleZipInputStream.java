@@ -19,9 +19,4 @@ public class SingleZipInputStream extends BaseDataInput {
         return delegate.read(buf, offs, len);
     }
 
-    @Override
-    public void close() throws IOException {
-        delegate.close();
-    }
-
 }

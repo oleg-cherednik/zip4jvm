@@ -18,21 +18,12 @@ public interface DataInputFile extends Closeable {
 
     void seek(long pos) throws IOException;
 
-    int readWord(byte[] buf);
-
-    long readDword(byte[] buf);
-
-    long readQword(byte[] buf);
+    long convert(byte[] buf, int offs, int len);
 
     String readString(byte[] buf, Charset charset);
 
     int read(byte[] buf, int offs, int len) throws IOException;
 
-    // TODO probably should be removed
-    default int readSignature() throws IOException {
-        byte[] buf = new byte[4];
-        read(buf, 0, buf.length);
-        return (int)readDword(buf);
-    }
+    int readSignature() throws IOException;
 
 }

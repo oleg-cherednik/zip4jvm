@@ -13,42 +13,12 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 21.02.2019
  */
-@SuppressWarnings("SpellCheckingInspection")
 public class LittleEndianReadFile implements DataInputFile {
 
     private final RandomAccessFile in;
 
     public LittleEndianReadFile(Path path) throws FileNotFoundException {
         in = new RandomAccessFile(path.toFile(), "r");
-    }
-
-    @Override
-    public int readWord(byte[] buf) {
-        int b0 = buf[0] & 0xFF;
-        int b1 = buf[1] & 0xFF;
-        return (b1 << 8) + b0;
-    }
-
-    @Override
-    public long readDword(byte[] buf) {
-        int b0 = buf[0] & 0xFF;
-        int b1 = buf[1] & 0xFF;
-        int b2 = buf[2] & 0xFF;
-        long b3 = buf[3] & 0xFF;
-        return b3 << 24 | b2 << 16 | b1 << 8 | b0;
-    }
-
-    @Override
-    public long readQword(byte[] buf) {
-        int b0 = buf[0] & 0xFF;
-        int b1 = buf[1] & 0xFF;
-        int b2 = buf[2] & 0xFF;
-        int b3 = buf[3] & 0xFF;
-        long b4 = buf[4] & 0xFF;
-        long b5 = buf[5] & 0xFF;
-        long b6 = buf[6] & 0xFF;
-        long b7 = buf[7] & 0xFF;
-        return b7 << 56 | b6 << 48 | b5 << 40 | b4 << 32 | b3 << 24 | b2 << 16 | b1 << 8 | b0;
     }
 
     @Override
@@ -73,8 +43,27 @@ public class LittleEndianReadFile implements DataInputFile {
     }
 
     @Override
+    public long convert(byte[] buf, int offs, int len) {
+        long res = 0;
+
+        for (int i = offs + len - 1; i >= offs; i--)
+            res = res << 8 | buf[i] & 0xFF;
+
+        return res;
+    }
+
+    @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
         return in.read(buf, offs, len);
+    }
+
+    @Override
+    public int readSignature() throws IOException {
+        int b0 = in.read();
+        int b1 = in.read();
+        int b2 = in.read();
+        int b3 = in.read();
+        return b3 << 24 | b2 << 16 | b1 << 8 | b0;
     }
 
     @Override
