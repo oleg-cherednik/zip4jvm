@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
@@ -21,7 +20,7 @@ final class AesExtraDataRecordReader implements Reader<AesExtraDataRecord> {
     private final int signature;
 
     @Override
-    public AesExtraDataRecord read(@NonNull DataInput in) throws IOException {
+    public AesExtraDataRecord read(DataInput in) throws IOException {
         if (signature != AesExtraDataRecord.SIGNATURE)
             return AesExtraDataRecord.NULL;
 

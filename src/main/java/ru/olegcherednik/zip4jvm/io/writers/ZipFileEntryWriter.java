@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.writers;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
@@ -26,7 +25,7 @@ public final class ZipFileEntryWriter implements Writer {
     private final ZipModel tempZipModel;
 
     @Override
-    public void write(@NonNull DataOutput out) throws IOException {
+    public void write(DataOutput out) throws IOException {
         ZipEntry zipEntry = ZipEntryBuilder.create(entry, entrySettings);
         ZipUtils.copyLarge(zipEntry.getIn(), EntryOutputStream.create(zipEntry, tempZipModel, out));
     }

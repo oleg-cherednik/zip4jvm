@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.writers;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
@@ -19,11 +18,10 @@ public final class ZipModelWriter implements Writer {
 
     private static final String CENTRAL_DIRECTORY_OFFS = "centralDirectoryOffs";
 
-    @NonNull
     private final ZipModel zipModel;
 
     @Override
-    public void write(@NonNull DataOutput out) throws IOException {
+    public void write(DataOutput out) throws IOException {
         zipModel.setTotalDisks(out.getDisk());
         zipModel.setCentralDirectoryOffs(out.getOffs());
         zipModel.setMainDisk(out.getDisk());

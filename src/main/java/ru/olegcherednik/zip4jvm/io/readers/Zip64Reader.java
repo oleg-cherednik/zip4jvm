@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
@@ -17,9 +16,8 @@ import java.io.IOException;
  */
 final class Zip64Reader implements Reader<Zip64> {
 
-    @NonNull
     @Override
-    public Zip64 read(@NonNull DataInput in) throws IOException {
+    public Zip64 read(DataInput in) throws IOException {
         Zip64.EndCentralDirectoryLocator locator = new Zip64Reader.EndCentralDirectoryLocator().read(in);
         Zip64.EndCentralDirectory dir = locator == null ? null : new Zip64Reader.EndCentralDirectory(locator.getOffs()).read(in);
         return Zip64.of(locator, dir);
@@ -27,8 +25,7 @@ final class Zip64Reader implements Reader<Zip64> {
 
     private static final class EndCentralDirectoryLocator {
 
-        @NonNull
-        public Zip64.EndCentralDirectoryLocator read(@NonNull DataInput in) throws IOException {
+        public Zip64.EndCentralDirectoryLocator read(DataInput in) throws IOException {
             if (!findHead(in))
                 return null;
 
@@ -58,8 +55,7 @@ final class Zip64Reader implements Reader<Zip64> {
 
         private final long offs;
 
-        @NonNull
-        public Zip64.EndCentralDirectory read(@NonNull DataInput in) throws IOException {
+        public Zip64.EndCentralDirectory read(DataInput in) throws IOException {
             findHead(in);
 
             Zip64.EndCentralDirectory dir = new Zip64.EndCentralDirectory();
@@ -97,9 +93,8 @@ final class Zip64Reader implements Reader<Zip64> {
         private final boolean offsLocalHeaderRelativeExists;
         private final boolean diskExists;
 
-        @NonNull
         @Override
-        public Zip64.ExtendedInfo read(@NonNull DataInput in) throws IOException {
+        public Zip64.ExtendedInfo read(DataInput in) throws IOException {
             long offs1 = in.getOffs();
             int size = in.readWord();
             long offs2 = in.getOffs();

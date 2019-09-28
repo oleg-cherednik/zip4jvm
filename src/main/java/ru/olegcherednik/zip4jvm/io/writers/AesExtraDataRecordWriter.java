@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.writers;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
@@ -16,11 +15,10 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 final class AesExtraDataRecordWriter implements Writer {
 
-    @NonNull
     private final AesExtraDataRecord record;
 
     @Override
-    public void write(@NonNull DataOutput out) throws IOException {
+    public void write(DataOutput out) throws IOException {
         if (record == AesExtraDataRecord.NULL)
             return;
 

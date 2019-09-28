@@ -1,7 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.AccessLevel;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
@@ -61,9 +60,8 @@ final class ExtraFieldReader implements Reader<ExtraField> {
         return new UnknownExtraFileRecordReader(Zip64.ExtendedInfo.SIGNATURE);
     }
 
-    @NonNull
     @Override
-    public ExtraField read(@NonNull DataInput in) throws IOException {
+    public ExtraField read(DataInput in) throws IOException {
         ExtraField.Builder builder = ExtraField.builder();
 
         if (size <= 0)
@@ -89,7 +87,7 @@ final class ExtraFieldReader implements Reader<ExtraField> {
         private final int signature;
 
         @Override
-        public ExtraField.Record.Unknown read(@NonNull DataInput in) throws IOException {
+        public ExtraField.Record.Unknown read(DataInput in) throws IOException {
             int size = in.readWord();
             byte[] data = in.readBytes(size);
             return new ExtraField.Record.Unknown(signature, data == null ? ArrayUtils.EMPTY_BYTE_ARRAY : data);
