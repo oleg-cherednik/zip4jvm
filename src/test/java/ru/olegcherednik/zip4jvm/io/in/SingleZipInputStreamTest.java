@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.in;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -13,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 /**
  * @author Oleg Cherednik
@@ -72,4 +74,41 @@ public class SingleZipInputStreamTest {
             assertThat(in.getOffs()).isEqualTo(in.length());
         }
     }
+
+    public void shouldIgnoreSkipWhenZeroOrNegative() throws IOException {
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.data");
+        FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x1, 0x2 }, true);
+
+        try (SingleZipInputStream in = SingleZipInputStream.create(new ZipModel(file))) {
+            assertThat(in.getOffs()).isEqualTo(0);
+
+            assertThatCode(() -> in.skip(-1)).doesNotThrowAnyException();
+            assertThatCode(() -> in.skip(0)).doesNotThrowAnyException();
+            assertThat(in.getOffs()).isEqualTo(0);
+        }
+    }
+
+    public void shouldRetrieveAllBytesWhenReadTooManyBytes() throws IOException {
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.data");
+        FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x1, 0x2 }, true);
+
+        try (SingleZipInputStream in = SingleZipInputStream.create(new ZipModel(file))) {
+            assertThat(in.readBytes(3)).isEqualTo(new byte[] { 0x1, 0x2 });
+            assertThat(in.getOffs()).isEqualTo(2);
+        }
+    }
+
+    public void shouldRetrieveNegativeOffsWhenCannotGetFilePointer() throws IOException {
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.data");
+        FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x1, 0x2 }, true);
+
+        SingleZipInputStream in = SingleZipInputStream.create(new ZipModel(file));
+        assertThat(in.getOffs()).isEqualTo(0);
+
+        in.close();
+        assertThatCode(in::getOffs).doesNotThrowAnyException();
+        assertThat(in.getOffs()).isEqualTo(IOUtils.EOF);
+    }
+
+
 }

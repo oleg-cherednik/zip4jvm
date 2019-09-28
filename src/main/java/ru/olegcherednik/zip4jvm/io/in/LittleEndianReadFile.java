@@ -1,7 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.in;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
@@ -15,11 +14,9 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 21.02.2019
  */
-@RequiredArgsConstructor
 @SuppressWarnings("SpellCheckingInspection")
 public class LittleEndianReadFile implements DataInput {
 
-    @Getter
     private final RandomAccessFile in;
 
     public LittleEndianReadFile(Path path) throws FileNotFoundException {
@@ -87,9 +84,8 @@ public class LittleEndianReadFile implements DataInput {
 
     @Override
     public void skip(int bytes) throws IOException {
-        if (bytes > 0) {
+        if (bytes > 0)
             in.skipBytes(bytes);
-        }
     }
 
     @Override
@@ -112,7 +108,7 @@ public class LittleEndianReadFile implements DataInput {
         try {
             return in.getFilePointer();
         } catch(IOException e) {
-            return -1;
+            return IOUtils.EOF;
         }
     }
 

@@ -11,7 +11,7 @@ import java.nio.charset.Charset;
  * @since 04.08.2019
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-abstract class  BaseDataInput implements DataInput {
+abstract class BaseDataInput implements DataInput {
 
     protected DataInput delegate;
 
@@ -66,7 +66,7 @@ abstract class  BaseDataInput implements DataInput {
     }
 
     @Override
-    public String toString() {
-        return "offs: " + getOffs() + " (0x" + Long.toHexString(getOffs()) + ')';
+    public final String toString() {
+        return delegate.toString();
     }
 }
