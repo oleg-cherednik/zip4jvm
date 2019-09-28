@@ -1,9 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.out;
 
-import lombok.NonNull;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -17,26 +15,25 @@ import java.util.Map;
  */
 abstract class BaseDataOutput implements DataOutput {
 
+    private static final int OFFS_WORD = 1;
+    private static final int OFFS_DWORD = 3;
+    private static final int OFFS_QWORD = 7;
+
+    private static final ThreadLocal<byte[]> THREAD_LOCAL_BUF = ThreadLocal.withInitial(() -> new byte[15]);
+
     private final Map<String, Long> map = new HashMap<>();
 
     private long tic;
 
-    @NonNull
     protected final ZipModel zipModel;
-    @NonNull
     private DataOutputFile delegate;
 
-    protected BaseDataOutput(@NonNull ZipModel zipModel) throws FileNotFoundException {
+    protected BaseDataOutput(ZipModel zipModel) throws FileNotFoundException {
         this.zipModel = zipModel;
     }
 
     protected void createFile(Path zip) throws FileNotFoundException {
         delegate = new LittleEndianWriteFile(zip);
-    }
-
-    @Override
-    public final void seek(long pos) throws IOException {
-        delegate.seek(pos);
     }
 
     @Override
@@ -46,17 +43,23 @@ abstract class BaseDataOutput implements DataOutput {
 
     @Override
     public void writeWord(int val) throws IOException {
-        doWithTic(() -> delegate.write(delegate.convertWord(val)));
+        doWithTic(() -> convertAndWrite(val, OFFS_WORD, 2));
     }
 
     @Override
     public void writeDword(long val) throws IOException {
-        doWithTic(() -> delegate.write(delegate.convertDword(val)));
+        doWithTic(() -> convertAndWrite(val, OFFS_DWORD, 4));
     }
 
     @Override
     public void writeQword(long val) throws IOException {
-        doWithTic(() -> delegate.write(delegate.convertQword(val)));
+        doWithTic(() -> convertAndWrite(val, OFFS_QWORD, 8));
+    }
+
+    private void convertAndWrite(long val, int offs, int len) throws IOException {
+        byte[] buf = THREAD_LOCAL_BUF.get();
+        delegate.convert(val, buf, offs, len);
+        delegate.write(buf, offs, len);
     }
 
     @Override
@@ -94,8 +97,8 @@ abstract class BaseDataOutput implements DataOutput {
     }
 
     @Override
-    public String toString() {
-        return ZipUtils.toString(getOffs());
+    public final String toString() {
+        return delegate.toString();
     }
 
     @FunctionalInterface
