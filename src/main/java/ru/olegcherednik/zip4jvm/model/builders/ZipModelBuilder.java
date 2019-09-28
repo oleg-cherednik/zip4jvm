@@ -103,7 +103,7 @@ public final class ZipModelBuilder {
 
     private static boolean isSplit(ZipModel zipModel) throws IOException {
         try (DataInputFile in = new LittleEndianReadFile(zipModel.getPartFile(0))) {
-            return in.readDwordSignature() == SplitZipOutputStream.SPLIT_SIGNATURE;
+            return in.readSignature() == SplitZipOutputStream.SPLIT_SIGNATURE;
         }
     }
 

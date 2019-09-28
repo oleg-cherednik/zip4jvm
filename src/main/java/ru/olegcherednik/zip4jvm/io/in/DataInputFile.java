@@ -29,7 +29,7 @@ public interface DataInputFile extends Closeable {
     int read(byte[] buf, int offs, int len) throws IOException;
 
     // TODO probably should be removed
-    default int readDwordSignature() throws IOException {
+    default int readSignature() throws IOException {
         byte[] buf = new byte[4];
         read(buf, 0, buf.length);
         return (int)readDword(buf);

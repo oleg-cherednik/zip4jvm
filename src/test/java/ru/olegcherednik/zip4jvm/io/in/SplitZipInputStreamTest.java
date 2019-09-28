@@ -5,6 +5,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
@@ -14,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author Oleg Cherednik
@@ -82,6 +84,23 @@ public class SplitZipInputStreamTest {
 
             assertThat(in.getOffs()).isEqualTo(in.length());
         }
+    }
+
+    public void shouldThrowExceptionWhenDisk0DoesNotContainSignature() throws IOException {
+        Path z01 = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.z01");
+        FileUtils.writeByteArrayToFile(z01.toFile(), new byte[] { 0x1, 0x2 }, true);
+
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        FileUtils.writeStringToFile(zip.toFile(), "oleg", StandardCharsets.UTF_8, true);
+
+        ZipModel zipModel = new ZipModel(zip);
+        zipModel.setTotalDisks(1);
+
+        assertThatThrownBy(() -> {
+            try (SplitZipInputStream in = SplitZipInputStream.create(zipModel, 0)) {
+                assertThat(in.getOffs()).isEqualTo(4);
+            }
+        }).isExactlyInstanceOf(Zip4jvmException.class);
     }
 
     private static byte[] convertDword(long val) {

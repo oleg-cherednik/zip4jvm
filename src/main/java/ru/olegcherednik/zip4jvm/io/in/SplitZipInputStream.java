@@ -29,7 +29,7 @@ public class SplitZipInputStream extends BaseDataInput {
     }
 
     private void checkSignature() throws IOException {
-        if (disk == 0 && delegate.readDwordSignature() != SplitZipOutputStream.SPLIT_SIGNATURE)
+        if (disk == 0 && delegate.readSignature() != SplitZipOutputStream.SPLIT_SIGNATURE)
             throw new Zip4jvmException("Incorrect split file signature: " + zipModel.getFile().getFileName());
     }
 
