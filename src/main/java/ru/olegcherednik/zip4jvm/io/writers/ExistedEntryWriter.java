@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.writers;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
@@ -35,7 +34,7 @@ public class ExistedEntryWriter implements Writer {
     private final char[] password;
 
     @Override
-    public void write(@NonNull DataOutput out) throws IOException {
+    public void write(DataOutput out) throws IOException {
         ZipEntry entry = srcZipModel.getEntryByFileName(entryName);
         entry.setPassword(entry.isEncrypted() ? password : null);
 
@@ -65,16 +64,16 @@ public class ExistedEntryWriter implements Writer {
 
         public CopyEntryInputStream(ZipEntry entry, ZipModel zipModel) throws IOException {
             this.entry = entry;
-            in = zipModel.isSplit() ? SplitZipInputStream.create(zipModel, entry.getDisk()) : SingleZipInputStream.create(zipModel);
+            in = zipModel.isSplit() ? SplitZipInputStream.create(zipModel, entry.getDisk()) : new SingleZipInputStream(zipModel.getFile());
         }
 
-        public void copyLocalFileHeader(@NonNull DataOutput out) throws IOException {
+        public void copyLocalFileHeader(DataOutput out) throws IOException {
             LocalFileHeader localFileHeader = new LocalFileHeaderReader(entry.getLocalFileHeaderOffs()).read(in);
             entry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
             new LocalFileHeaderWriter(localFileHeader).write(out);
         }
 
-        public void copyEncryptionHeaderAndData(@NonNull DataOutput out) throws IOException {
+        public void copyEncryptionHeaderAndData(DataOutput out) throws IOException {
             long size = entry.getCompressedSize();
             byte[] buf = new byte[1024 * 4];
 
@@ -89,7 +88,7 @@ public class ExistedEntryWriter implements Writer {
             }
         }
 
-        public void copyDataDescriptor(@NonNull DataOutput out) throws IOException {
+        public void copyDataDescriptor(DataOutput out) throws IOException {
             if (entry.isDataDescriptorAvailable()) {
                 DataDescriptor dataDescriptor = DataDescriptorReader.get(entry.isZip64()).read(in);
                 DataDescriptorWriter.get(entry.isZip64(), dataDescriptor).write(out);

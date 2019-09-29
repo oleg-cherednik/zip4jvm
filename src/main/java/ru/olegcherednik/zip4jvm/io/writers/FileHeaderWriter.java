@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.writers;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
@@ -18,11 +17,10 @@ import java.util.List;
 @RequiredArgsConstructor
 final class FileHeaderWriter implements Writer {
 
-    @NonNull
     private final List<CentralDirectory.FileHeader> fileHeaders;
 
     @Override
-    public void write(@NonNull DataOutput out) throws IOException {
+    public void write(DataOutput out) throws IOException {
         for (CentralDirectory.FileHeader fileHeader : fileHeaders)
             writeFileHeader(fileHeader, out);
     }

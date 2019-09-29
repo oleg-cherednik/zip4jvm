@@ -1,7 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.out;
 
 import lombok.Getter;
-import lombok.NonNull;
 import ru.olegcherednik.zip4jvm.io.writers.ZipModelWriter;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -23,7 +22,7 @@ public class SplitZipOutputStream extends BaseDataOutput {
 
     private long disk;
 
-    public static SplitZipOutputStream create(@NonNull ZipModel zipModel) throws IOException {
+    public static SplitZipOutputStream create(ZipModel zipModel) throws IOException {
         SplitZipOutputStream out = new SplitZipOutputStream(zipModel);
         out.writeDwordSignature(SPLIT_SIGNATURE);
         return out;

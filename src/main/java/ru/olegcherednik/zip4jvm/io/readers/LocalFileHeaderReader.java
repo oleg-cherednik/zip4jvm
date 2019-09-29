@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
@@ -20,9 +19,8 @@ public final class LocalFileHeaderReader implements Reader<LocalFileHeader> {
 
     private final long localFileHeaderOffs;
 
-    @NonNull
     @Override
-    public LocalFileHeader read(@NonNull DataInput in) throws IOException {
+    public LocalFileHeader read(DataInput in) throws IOException {
         findHead(in);
 
         LocalFileHeader localFileHeader = new LocalFileHeader();

@@ -11,8 +11,6 @@ import java.io.IOException;
  */
 public interface DataOutput extends Closeable {
 
-    void seek(long pos) throws IOException;
-
     long getOffs();
 
     default void writeWordSignature(int sig) throws IOException {

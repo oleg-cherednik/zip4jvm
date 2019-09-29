@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
@@ -23,9 +22,8 @@ final class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader>
 
     private final long totalEntries;
 
-    @NonNull
     @Override
-    public List<CentralDirectory.FileHeader> read(@NonNull DataInput in) throws IOException {
+    public List<CentralDirectory.FileHeader> read(DataInput in) throws IOException {
         List<CentralDirectory.FileHeader> fileHeaders = new LinkedList<>();
 
         for (int i = 0; i < totalEntries; i++)

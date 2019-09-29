@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.io.writers;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
@@ -24,11 +23,10 @@ public abstract class DataDescriptorWriter implements Writer {
     @RequiredArgsConstructor
     private static final class Standard extends DataDescriptorWriter {
 
-        @NonNull
         private final DataDescriptor dataDescriptor;
 
         @Override
-        public void write(@NonNull DataOutput out) throws IOException {
+        public void write(DataOutput out) throws IOException {
             out.writeDwordSignature(DataDescriptor.SIGNATURE);
             out.writeDword(dataDescriptor.getCrc32());
             out.writeDword(dataDescriptor.getCompressedSize());
@@ -39,11 +37,10 @@ public abstract class DataDescriptorWriter implements Writer {
     @RequiredArgsConstructor
     private static final class Zip64 extends DataDescriptorWriter {
 
-        @NonNull
         private final DataDescriptor dataDescriptor;
 
         @Override
-        public void write(@NonNull DataOutput out) throws IOException {
+        public void write(DataOutput out) throws IOException {
             out.writeDwordSignature(DataDescriptor.SIGNATURE);
             out.writeDword(dataDescriptor.getCrc32());
             out.writeQword(dataDescriptor.getCompressedSize());

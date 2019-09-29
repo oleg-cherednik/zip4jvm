@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.writers;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
@@ -16,11 +15,10 @@ import java.nio.charset.Charset;
 @RequiredArgsConstructor
 public final class LocalFileHeaderWriter implements Writer {
 
-    @NonNull
     private final LocalFileHeader localFileHeader;
 
     @Override
-    public void write(@NonNull DataOutput out) throws IOException {
+    public void write(DataOutput out) throws IOException {
         Charset charset = localFileHeader.getGeneralPurposeFlag().getCharset();
         byte[] fileName = localFileHeader.getFileName(charset);
 

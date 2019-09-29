@@ -2,7 +2,8 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.in.LittleEndianReadFile;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -34,7 +35,7 @@ public final class ZipModelReader {
 
     @NonNull
     public ZipModel read() throws IOException {
-        try (LittleEndianReadFile in = new LittleEndianReadFile(zip)) {
+        try (DataInput in = new SingleZipInputStream(zip)) {
             EndCentralDirectory endCentralDirectory = new EndCentralDirectoryReader().read(in);
             Zip64 zip64 = new Zip64Reader().read(in);
 

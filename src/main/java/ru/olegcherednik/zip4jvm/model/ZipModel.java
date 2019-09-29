@@ -104,7 +104,7 @@ public class ZipModel {
     }
 
     public Path getPartFile(long disk) {
-        return disk == totalDisks ? file : getSplitFilePath(file, disk + 1);
+        return disk >= totalDisks ? file : getSplitFilePath(file, disk + 1);
     }
 
     public static Path getSplitFilePath(Path zip, long disk) {

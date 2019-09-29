@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.model.entry;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
@@ -30,7 +29,7 @@ import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ZipEntryBuilder {
 
-    public static ZipEntry create(@NonNull ZipFile.Entry entry, @NonNull ZipEntrySettings entrySettings) {
+    public static ZipEntry create(ZipFile.Entry entry, ZipEntrySettings entrySettings) {
         try {
             return entry.isRegularFile() ? createRegularFileEntry(entry, entrySettings) : createDirectoryEntry(entry, entrySettings);
         } catch(IOException e) {
@@ -71,7 +70,7 @@ public final class ZipEntryBuilder {
         return zipEntry;
     }
 
-    public static ZipEntry create(@NonNull CentralDirectory.FileHeader fileHeader, @NonNull ZipModel zipModel) {
+    public static ZipEntry create(CentralDirectory.FileHeader fileHeader, ZipModel zipModel) {
         boolean dir = ZipUtils.isDirectory(fileHeader.getFileName());
         ZipEntry zipEntry = dir ? createDirectoryEntry(fileHeader) : createRegularFileEntry(fileHeader, zipModel);
         zipEntry.setChecksum(fileHeader.getCrc32());
@@ -112,7 +111,7 @@ public final class ZipEntryBuilder {
     private static ZipEntryInputStreamSupplier createInputStreamSupplier(ZipModel zipModel) {
         if (zipModel.isSplit())
             return zipEntry -> EntryInputStream.create(zipEntry, SplitZipInputStream.create(zipModel, zipEntry.getDisk()));
-        return zipEntry -> EntryInputStream.create(zipEntry, SingleZipInputStream.create(zipModel));
+        return zipEntry -> EntryInputStream.create(zipEntry, new SingleZipInputStream(zipModel.getFile()));
     }
 
     private static long getDisk(CentralDirectory.FileHeader fileHeader) {

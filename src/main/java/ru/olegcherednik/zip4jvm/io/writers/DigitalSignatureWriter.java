@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.writers;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
@@ -19,7 +18,7 @@ final class DigitalSignatureWriter implements Writer {
     private final CentralDirectory.DigitalSignature digitalSignature;
 
     @Override
-    public void write(@NonNull DataOutput out) throws IOException {
+    public void write(DataOutput out) throws IOException {
         if (digitalSignature == null)
             return;
 

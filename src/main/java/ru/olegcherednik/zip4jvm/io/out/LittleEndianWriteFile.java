@@ -20,45 +20,16 @@ public class LittleEndianWriteFile implements DataOutputFile {
     }
 
     @Override
-    public byte[] convertWord(int val) {
-        byte[] buf = new byte[2];
-        buf[0] = (byte)val;
-        buf[1] = (byte)(val >> 8);
-        return buf;
-    }
-
-    @Override
-    public byte[] convertDword(long val) {
-        byte[] buf = new byte[4];
-        buf[0] = (byte)val;
-        buf[1] = (byte)(val >> 8);
-        buf[2] = (byte)(val >> 16);
-        buf[3] = (byte)(val >> 24);
-        return buf;
-    }
-
-    @Override
-    public byte[] convertQword(long val) {
-        byte[] buf = new byte[8];
-        buf[0] = (byte)val;
-        buf[1] = (byte)(val >> 8);
-        buf[2] = (byte)(val >> 16);
-        buf[3] = (byte)(val >> 24);
-        buf[4] = (byte)(val >> 32);
-        buf[5] = (byte)(val >> 40);
-        buf[6] = (byte)(val >> 48);
-        buf[7] = (byte)(val >> 56);
-        return buf;
+    public void convert(long val, byte[] buf, int offs, int len) {
+        for (int i = 0; i < len; i++) {
+            buf[offs + i] = (byte)val;
+            val >>= 8;
+        }
     }
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
         out.write(buf, offs, len);
-    }
-
-    @Override
-    public void seek(long pos) throws IOException {
-        out.seek(pos);
     }
 
     @Override

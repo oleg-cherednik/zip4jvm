@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.writers;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
@@ -16,11 +15,10 @@ import java.io.IOException;
 @RequiredArgsConstructor
 final class Zip64Writer implements Writer {
 
-    @NonNull
     private final Zip64 zip64;
 
     @Override
-    public void write(@NonNull DataOutput out) throws IOException {
+    public void write(DataOutput out) throws IOException {
         new EndCentralDirectory(zip64.getEndCentralDirectory()).write(out);
         new EndCentralDirectoryLocator(zip64.getEndCentralDirectoryLocator()).write(out);
     }
@@ -30,7 +28,7 @@ final class Zip64Writer implements Writer {
 
         private final Zip64.EndCentralDirectory endCentralDirectory;
 
-        public void write(@NonNull DataOutput out) throws IOException {
+        public void write(DataOutput out) throws IOException {
             if (endCentralDirectory == null)
                 return;
 
@@ -53,7 +51,7 @@ final class Zip64Writer implements Writer {
 
         private final Zip64.EndCentralDirectoryLocator locator;
 
-        public void write(@NonNull DataOutput out) throws IOException {
+        public void write(DataOutput out) throws IOException {
             if (locator == null)
                 return;
 
@@ -67,10 +65,9 @@ final class Zip64Writer implements Writer {
     @RequiredArgsConstructor
     static final class ExtendedInfo {
 
-        @NonNull
         private final Zip64.ExtendedInfo info;
 
-        public void write(@NonNull DataOutput out) throws IOException {
+        public void write(DataOutput out) throws IOException {
             if (info == Zip64.ExtendedInfo.NULL)
                 return;
 
@@ -92,10 +89,9 @@ final class Zip64Writer implements Writer {
     @RequiredArgsConstructor
     public static final class DataDescriptor {
 
-        @NonNull
         private final ru.olegcherednik.zip4jvm.model.DataDescriptor dataDescriptor;
 
-        public void write(@NonNull DataOutput out) throws IOException {
+        public void write(DataOutput out) throws IOException {
             out.writeDwordSignature(ru.olegcherednik.zip4jvm.model.DataDescriptor.SIGNATURE);
             out.writeDword(dataDescriptor.getCrc32());
             out.writeQword(dataDescriptor.getCompressedSize());

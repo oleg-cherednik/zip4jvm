@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.writers;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
@@ -16,11 +15,10 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 final class EndCentralDirectoryWriter implements Writer {
 
-    @NonNull
     private final EndCentralDirectory endCentralDirectory;
 
     @Override
-    public void write(@NonNull DataOutput out) throws IOException {
+    public void write(DataOutput out) throws IOException {
         byte[] comment = endCentralDirectory.getComment(StandardCharsets.UTF_8);
 
         out.writeDwordSignature(EndCentralDirectory.SIGNATURE);

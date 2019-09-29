@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.utils.function;
 
-import lombok.NonNull;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 
 import java.io.IOException;
@@ -12,7 +11,6 @@ import java.io.IOException;
 @FunctionalInterface
 public interface Reader<T> {
 
-    @NonNull
-    T read(@NonNull DataInput in) throws IOException;
+    T read(DataInput in) throws IOException;
 
 }

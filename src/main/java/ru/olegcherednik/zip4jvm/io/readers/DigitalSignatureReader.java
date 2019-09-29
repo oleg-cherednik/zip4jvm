@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
@@ -15,9 +14,8 @@ import java.io.IOException;
 @RequiredArgsConstructor
 final class DigitalSignatureReader implements Reader<CentralDirectory.DigitalSignature> {
 
-    @NonNull
     @Override
-    public CentralDirectory.DigitalSignature read(@NonNull DataInput in) throws IOException {
+    public CentralDirectory.DigitalSignature read(DataInput in) throws IOException {
         if (in.readSignature() != CentralDirectory.DigitalSignature.SIGNATURE)
             return null;
 

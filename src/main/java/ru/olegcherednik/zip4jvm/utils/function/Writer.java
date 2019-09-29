@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.utils.function;
 
-import lombok.NonNull;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 
 import java.io.IOException;
@@ -12,6 +11,6 @@ import java.io.IOException;
 @FunctionalInterface
 public interface Writer {
 
-    void write(@NonNull DataOutput out) throws IOException;
+    void write(DataOutput out) throws IOException;
 
 }

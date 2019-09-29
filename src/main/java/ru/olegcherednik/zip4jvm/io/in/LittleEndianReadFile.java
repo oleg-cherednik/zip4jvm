@@ -1,10 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.in;
 
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
-import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -16,82 +13,23 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 21.02.2019
  */
-@RequiredArgsConstructor
-@SuppressWarnings("SpellCheckingInspection")
-public class LittleEndianReadFile implements DataInput {
+public class LittleEndianReadFile implements DataInputFile {
 
-    @Getter
-    @NonNull
     private final RandomAccessFile in;
 
-    public LittleEndianReadFile(@NonNull Path path) throws FileNotFoundException {
+    public LittleEndianReadFile(Path path) throws FileNotFoundException {
         in = new RandomAccessFile(path.toFile(), "r");
     }
 
     @Override
-    public int readWord() throws IOException {
-        int b0 = in.read();
-        int b1 = in.read();
-        return (b1 << 8) + b0;
-    }
-
-    @Override
-    public long readDword() throws IOException {
-        long b0 = in.read();
-        long b1 = in.read();
-        long b2 = in.read();
-        long b3 = in.read();
-        return b3 << 24 | b2 << 16 | b1 << 8 | b0;
-    }
-
-    @Override
-    public long readQword() throws IOException {
-        long b0 = in.read();
-        long b1 = in.read();
-        long b2 = in.read();
-        long b3 = in.read();
-        long b4 = in.read();
-        long b5 = in.read();
-        long b6 = in.read();
-        long b7 = in.read();
-        return b7 << 56 | b6 << 48 | b5 << 40 | b4 << 32 | b3 << 24 | b2 << 16 | b1 << 8 | b0;
-    }
-
-    @Override
-    public String readString(int length, @NonNull Charset charset) throws IOException {
-        ZipUtils.requirePositive(length, "readString");
-
-        if (length <= 0)
-            return null;
-
-        byte[] buf = new byte[length];
-        in.readFully(buf);
-        return new String(buf, charset);
-    }
-
-    @Override
-    public int readByte() throws IOException {
-        return in.read();
-    }
-
-    @Override
-    public byte[] readBytes(int total) throws IOException {
-        ZipUtils.requirePositive(total, "readBytes");
-
-        if (total <= 0)
-            return null;
-
-        byte[] buf = new byte[total];
-        int len = in.read(buf);
-
-        return len == buf.length ? buf : ArrayUtils.subarray(buf, 0, len);
+    public String readString(byte[] buf, Charset charset) {
+        return ArrayUtils.isEmpty(buf) ? null : new String(buf, charset);
     }
 
     @Override
     public void skip(int bytes) throws IOException {
-        if (bytes > 0) {
+        if (bytes > 0)
             in.skipBytes(bytes);
-        }
     }
 
     @Override
@@ -105,8 +43,27 @@ public class LittleEndianReadFile implements DataInput {
     }
 
     @Override
+    public long convert(byte[] buf, int offs, int len) {
+        long res = 0;
+
+        for (int i = offs + len - 1; i >= offs; i--)
+            res = res << 8 | buf[i] & 0xFF;
+
+        return res;
+    }
+
+    @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
         return in.read(buf, offs, len);
+    }
+
+    @Override
+    public int readSignature() throws IOException {
+        int b0 = in.read();
+        int b1 = in.read();
+        int b2 = in.read();
+        int b3 = in.read();
+        return b3 << 24 | b2 << 16 | b1 << 8 | b0;
     }
 
     @Override
@@ -114,7 +71,7 @@ public class LittleEndianReadFile implements DataInput {
         try {
             return in.getFilePointer();
         } catch(IOException e) {
-            return -1;
+            return IOUtils.EOF;
         }
     }
 

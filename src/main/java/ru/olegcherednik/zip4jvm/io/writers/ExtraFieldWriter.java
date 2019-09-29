@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.writers;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
@@ -18,11 +17,10 @@ final class ExtraFieldWriter implements Writer {
 
     private static final String MARK = ExtraFieldWriter.class.getSimpleName();
 
-    @NonNull
     private final ExtraField extraField;
 
     @Override
-    public void write(@NonNull DataOutput out) throws IOException {
+    public void write(DataOutput out) throws IOException {
         out.mark(MARK);
 
         for (ExtraField.Record record : extraField.getRecords())
