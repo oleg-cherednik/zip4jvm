@@ -38,7 +38,7 @@ public final class ZipModelBuilder {
         return new ZipModelReader(zip).read();
     }
 
-    public static ZipModel create(Path zip, ZipFileSettings settings) {
+    public static ZipModel build(Path zip, ZipFileSettings settings) {
         if (Files.exists(zip))
             throw new Zip4jvmException("ZipFile '" + zip.toAbsolutePath() + "' exists");
 
@@ -50,7 +50,7 @@ public final class ZipModelBuilder {
         return zipModel;
     }
 
-    public ZipModel create() throws IOException {
+    public ZipModel build() throws IOException {
         ZipModel zipModel = new ZipModel(zip);
 
         zipModel.setZip64(zip64 != Zip64.NULL);
@@ -68,7 +68,7 @@ public final class ZipModelBuilder {
 
     private void createAndAddEntries(ZipModel zipModel) {
         centralDirectory.getFileHeaders().stream()
-                        .map(fileHeader -> ZipEntryBuilder.create(fileHeader, zipModel))
+                        .map(fileHeader -> ZipEntryBuilder.build(fileHeader, zipModel))
                         .forEach(zipModel::addEntry);
     }
 

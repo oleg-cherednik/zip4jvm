@@ -18,7 +18,7 @@ public final class CentralDirectoryBuilder {
 
     private final Collection<ZipEntry> entries;
 
-    public CentralDirectory create() throws IOException {
+    public CentralDirectory build() throws IOException {
         CentralDirectory centralDirectory = new CentralDirectory();
         centralDirectory.setFileHeaders(createFileHeaders());
         centralDirectory.setDigitalSignature(null);
@@ -29,7 +29,7 @@ public final class CentralDirectoryBuilder {
         List<CentralDirectory.FileHeader> fileHeaders = new ArrayList<>(entries.size());
 
         for (ZipEntry entry : entries)
-            fileHeaders.add(new FileHeaderBuilder(entry).create());
+            fileHeaders.add(new FileHeaderBuilder(entry).build());
 
         return fileHeaders;
     }

@@ -29,7 +29,7 @@ import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ZipEntryBuilder {
 
-    public static ZipEntry create(ZipFile.Entry entry, ZipEntrySettings entrySettings) {
+    public static ZipEntry build(ZipFile.Entry entry, ZipEntrySettings entrySettings) {
         try {
             return entry.isRegularFile() ? createRegularFileEntry(entry, entrySettings) : createDirectoryEntry(entry, entrySettings);
         } catch(IOException e) {
@@ -70,7 +70,7 @@ public final class ZipEntryBuilder {
         return zipEntry;
     }
 
-    public static ZipEntry create(CentralDirectory.FileHeader fileHeader, ZipModel zipModel) {
+    public static ZipEntry build(CentralDirectory.FileHeader fileHeader, ZipModel zipModel) {
         boolean dir = ZipUtils.isDirectory(fileHeader.getFileName());
         ZipEntry zipEntry = dir ? createDirectoryEntry(fileHeader) : createRegularFileEntry(fileHeader, zipModel);
         zipEntry.setChecksum(fileHeader.getCrc32());

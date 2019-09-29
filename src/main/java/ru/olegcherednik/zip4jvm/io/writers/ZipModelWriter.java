@@ -37,18 +37,18 @@ public final class ZipModelWriter implements Writer {
 
     private void writeCentralDirectoryHeaders(DataOutput out) throws IOException {
         out.mark(CENTRAL_DIRECTORY_OFFS);
-        CentralDirectory centralDirectory = new CentralDirectoryBuilder(zipModel.getEntries()).create();
+        CentralDirectory centralDirectory = new CentralDirectoryBuilder(zipModel.getEntries()).build();
         new CentralDirectoryWriter(centralDirectory).write(out);
         zipModel.setCentralDirectorySize(out.getWrittenBytesAmount(CENTRAL_DIRECTORY_OFFS));
     }
 
     private void writeZip64(DataOutput out) throws IOException {
-        Zip64 zip64 = new Zip64Builder(zipModel, out.getDisk()).create();
+        Zip64 zip64 = new Zip64Builder(zipModel, out.getDisk()).build();
         new Zip64Writer(zip64).write(out);
     }
 
     private void writeEndCentralDirectory(DataOutput out) throws IOException {
-        EndCentralDirectory endCentralDirectory = new EndCentralDirectoryBuilder(zipModel).create();
+        EndCentralDirectory endCentralDirectory = new EndCentralDirectoryBuilder(zipModel).build();
         new EndCentralDirectoryWriter(endCentralDirectory).write(out);
     }
 

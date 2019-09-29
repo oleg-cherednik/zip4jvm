@@ -14,7 +14,7 @@ final class AesExtraDataRecordBuilder {
 
     private final ZipEntry entry;
 
-    public AesExtraDataRecord create() {
+    public AesExtraDataRecord build() {
         AesStrength strength = entry.getStrength();
 
         if (strength == AesStrength.NULL)

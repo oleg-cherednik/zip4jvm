@@ -21,7 +21,7 @@ public final class LocalFileHeaderBuilder {
 
     private final ZipEntry zipEntry;
 
-    public LocalFileHeader create() {
+    public LocalFileHeader build() {
         LocalFileHeader localFileHeader = new LocalFileHeader();
         localFileHeader.setVersionToExtract(CentralDirectory.FileHeader.VERSION);
         localFileHeader.setGeneralPurposeFlag(createGeneralPurposeFlag());
@@ -50,7 +50,7 @@ public final class LocalFileHeaderBuilder {
     private ExtraField createExtraField() {
         return ExtraField.builder()
                          .addRecord(createExtendedInfo())
-                         .addRecord(new AesExtraDataRecordBuilder(zipEntry).create()).build();
+                         .addRecord(new AesExtraDataRecordBuilder(zipEntry).build()).build();
     }
 
     private Zip64.ExtendedInfo createExtendedInfo() {

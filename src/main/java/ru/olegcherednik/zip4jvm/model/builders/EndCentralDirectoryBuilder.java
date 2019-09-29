@@ -14,7 +14,7 @@ public final class EndCentralDirectoryBuilder {
 
     private final ZipModel zipModel;
 
-    public EndCentralDirectory create() {
+    public EndCentralDirectory build() {
         EndCentralDirectory endCentralDirectory = new EndCentralDirectory();
         endCentralDirectory.setTotalDisks(getTotalDisks());
         endCentralDirectory.setMainDisk(getTotalDisks());

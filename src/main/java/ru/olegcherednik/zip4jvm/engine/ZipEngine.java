@@ -122,7 +122,7 @@ public final class ZipEngine implements ZipFile.Writer {
 
     private static ZipModel createTempZipModel(Path zip, ZipFileSettings settings, Map<String, Writer> fileNameWriter) throws IOException {
         Path tempZip = createTempZip(zip);
-        ZipModel tempZipModel = ZipModelBuilder.create(tempZip, settings);
+        ZipModel tempZipModel = ZipModelBuilder.build(tempZip, settings);
 
         if (Files.exists(zip)) {
             ZipModel zipModel = ZipModelBuilder.read(zip);

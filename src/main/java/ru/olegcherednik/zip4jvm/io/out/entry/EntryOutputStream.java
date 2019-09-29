@@ -66,7 +66,7 @@ public abstract class EntryOutputStream extends OutputStream {
     }
 
     private void writeLocalFileHeader() throws IOException {
-        LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(zipEntry).create();
+        LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(zipEntry).build();
         new LocalFileHeaderWriter(localFileHeader).write(out);
         out.mark(COMPRESSED_DATA);
     }

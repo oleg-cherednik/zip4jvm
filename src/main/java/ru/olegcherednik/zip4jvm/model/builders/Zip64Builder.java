@@ -15,7 +15,7 @@ public final class Zip64Builder {
     private final ZipModel zipModel;
     private final long disk;
 
-    public Zip64 create() {
+    public Zip64 build() {
         Zip64 zip64 = Zip64.NULL;
 
         if (zipModel.isZip64()) {
