@@ -5,6 +5,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author Oleg Cherednik
@@ -70,5 +72,22 @@ public class SingleZipOutputStreamTest {
         assertThat(new String(Arrays.copyOfRange(buf, 14, 18), StandardCharsets.UTF_8)).isEqualTo("oleg");
         assertThat(Arrays.copyOfRange(buf, 18, 19)).isEqualTo(new byte[] { 0x11 });
         assertThat(Arrays.copyOfRange(buf, 19, 22)).isEqualTo(new byte[] { 0x12, 0x13, 0x14 });
+    }
+
+    public void shouldThrowExceptionWhenGetUnknownMark() throws IOException {
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.data");
+        ZipModel zipModel = new ZipModel(file);
+
+        assertThatThrownBy(() -> {
+            try (SingleZipOutputStream out = new SingleZipOutputStream(zipModel)) {
+                out.writeWord(0x0201);
+                out.writeDword(0x06050403);
+
+                out.mark("mark");
+
+                out.writeQword(0x0E0D0C0B0A090807L);
+                out.getMark("<unknwon>");
+            }
+        }).isExactlyInstanceOf(Zip4jvmException.class);
     }
 }

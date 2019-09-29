@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author Oleg Cherednik
@@ -78,6 +79,54 @@ public class SplitZipOutputStreamTest {
         assertThat(new String(Arrays.copyOfRange(buf, 0, 2), StandardCharsets.UTF_8)).isEqualTo("eg");
         assertThat(Arrays.copyOfRange(buf, 2, 3)).isEqualTo(new byte[] { 0x11 });
         assertThat(Arrays.copyOfRange(buf, 3, 6)).isEqualTo(new byte[] { 0x12, 0x13, 0x14 });
+    }
+
+    public void shouldMoveToNextDiskWhenNotEnoughSpaceToWriteSignature() throws IOException {
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.data");
+        ZipModel zipModel = new ZipModel(file);
+        zipModel.setSplitSize(10);
+
+        try (SplitZipOutputStream out = new SplitZipOutputStream(zipModel)) {
+            assertThat(out.getOffs()).isEqualTo(4);
+
+            out.writeDwordSignature(0x01020304);
+            assertThat(out.getOffs()).isEqualTo(8);
+
+            out.writeDwordSignature(0x05060708);
+            assertThat(out.getOffs()).isEqualTo(4);
+        }
+
+        zipModel.setTotalDisks(5);
+
+        byte[] buf = FileUtils.readFileToByteArray(zipModel.getPartFile(0).toFile());
+        assertThat(Arrays.copyOfRange(buf, 0, 4)).isEqualTo(new byte[] { 0x50, 0x4B, 0x7, 0x8 });
+        assertThat(Arrays.copyOfRange(buf, 4, 8)).isEqualTo(new byte[] { 0x4, 0x3, 0x2, 0x1 });
+        assertThat(buf).hasSize(8);
+
+        buf = FileUtils.readFileToByteArray(zipModel.getPartFile(1).toFile());
+        assertThat(Arrays.copyOfRange(buf, 0, 4)).isEqualTo(new byte[] { 0x8, 0x7, 0x6, 0x5 });
+    }
+
+    public void shouldThrowExceptionWhenSplitFileExists() throws IOException {
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.data");
+        ZipModel zipModel = new ZipModel(file);
+        zipModel.setSplitSize(10);
+
+        zipModel.setTotalDisks(5);
+        FileUtils.writeByteArrayToFile(zipModel.getPartFile(0).toFile(), new byte[] { 0x1, 0x2 }, true);
+        zipModel.setTotalDisks(0);
+
+        assertThatThrownBy(() -> {
+            try (SplitZipOutputStream out = new SplitZipOutputStream(zipModel)) {
+                assertThat(out.getOffs()).isEqualTo(4);
+
+                out.writeDwordSignature(0x01020304);
+                assertThat(out.getOffs()).isEqualTo(8);
+
+                out.writeDwordSignature(0x05060708);
+                out.writeDwordSignature(0x05060708);
+            }
+        }).isExactlyInstanceOf(IOException.class);
     }
 
 }
