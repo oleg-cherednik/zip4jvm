@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.model.builders;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
@@ -13,10 +12,8 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 @RequiredArgsConstructor
 final class AesExtraDataRecordBuilder {
 
-    @NonNull
     private final ZipEntry entry;
 
-    @NonNull
     public AesExtraDataRecord create() {
         AesStrength strength = entry.getStrength();
 

@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.model.builders;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Encryption;
@@ -20,10 +19,8 @@ public final class LocalFileHeaderBuilder {
     public static final long LOOK_IN_DATA_DESCRIPTOR = 0;
     public static final long LOOK_IN_EXTRA_FIELD = Zip64.LIMIT;
 
-    @NonNull
     private final ZipEntry zipEntry;
 
-    @NonNull
     public LocalFileHeader create() {
         LocalFileHeader localFileHeader = new LocalFileHeader();
         localFileHeader.setVersionToExtract(CentralDirectory.FileHeader.VERSION);

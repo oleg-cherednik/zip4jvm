@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.model.builders;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -13,7 +12,6 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 @RequiredArgsConstructor
 public final class Zip64Builder {
 
-    @NonNull
     private final ZipModel zipModel;
     private final long disk;
 

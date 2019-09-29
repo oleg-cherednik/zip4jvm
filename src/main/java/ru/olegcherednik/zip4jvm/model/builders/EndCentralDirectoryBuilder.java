@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.model.builders;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -13,10 +12,8 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 @RequiredArgsConstructor
 public final class EndCentralDirectoryBuilder {
 
-    @NonNull
     private final ZipModel zipModel;
 
-    @NonNull
     public EndCentralDirectory create() {
         EndCentralDirectory endCentralDirectory = new EndCentralDirectory();
         endCentralDirectory.setTotalDisks(getTotalDisks());
