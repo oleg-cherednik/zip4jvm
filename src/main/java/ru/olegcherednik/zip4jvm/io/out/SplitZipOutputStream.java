@@ -4,6 +4,7 @@ import lombok.Getter;
 import ru.olegcherednik.zip4jvm.io.writers.ZipModelWriter;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -23,6 +24,7 @@ public class SplitZipOutputStream extends BaseDataOutput {
 
     public SplitZipOutputStream(ZipModel zipModel) throws IOException {
         super(zipModel);
+        ZipUtils.requirePositive(zipModel.getSplitSize(), "zipModel.splitSize");
         writeDwordSignature(SPLIT_SIGNATURE);
     }
 
@@ -52,11 +54,13 @@ public class SplitZipOutputStream extends BaseDataOutput {
 
         while (len > 0) {
             long available = zipModel.getSplitSize() - getOffs();
-            int writeBytes = Math.min(len, (int)available);
 
             if (available <= 0 || len > available && offsInit != offs)
                 openNextDisk();
 
+            available = zipModel.getSplitSize() - getOffs();
+
+            int writeBytes = Math.min(len, (int)available);
             super.write(buf, offs, writeBytes);
 
             offs += writeBytes;

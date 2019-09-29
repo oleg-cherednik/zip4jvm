@@ -67,10 +67,6 @@ public class ZipModel {
     @Getter(AccessLevel.NONE)
     private final Map<String, ZipEntry> fileNameEntry = new LinkedHashMap<>();
 
-    public void setSplitSize(long splitSize) {
-        this.splitSize = splitSize <= 0 ? NO_SPLIT : Math.max(MIN_SPLIT_SIZE, splitSize);
-    }
-
     public boolean isSplit() {
         return splitSize > 0 || totalDisks > 0;
     }

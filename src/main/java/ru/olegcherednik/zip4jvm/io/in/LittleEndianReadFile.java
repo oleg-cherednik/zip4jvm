@@ -15,8 +15,8 @@ public class LittleEndianReadFile implements DataInputFile {
 
     private final RandomAccessFile in;
 
-    public LittleEndianReadFile(Path path) throws FileNotFoundException {
-        in = new RandomAccessFile(path.toFile(), "r");
+    public LittleEndianReadFile(Path file) throws FileNotFoundException {
+        in = new RandomAccessFile(file.toFile(), "r");
     }
 
     @Override

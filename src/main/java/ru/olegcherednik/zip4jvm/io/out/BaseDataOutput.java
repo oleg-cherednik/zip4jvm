@@ -3,7 +3,6 @@ package ru.olegcherednik.zip4jvm.io.out;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -28,12 +27,12 @@ abstract class BaseDataOutput implements DataOutput {
     protected final ZipModel zipModel;
     private DataOutputFile delegate;
 
-    protected BaseDataOutput(ZipModel zipModel) throws FileNotFoundException {
+    protected BaseDataOutput(ZipModel zipModel) throws IOException {
         this.zipModel = zipModel;
         createFile(zipModel.getFile());
     }
 
-    protected void createFile(Path zip) throws FileNotFoundException {
+    protected void createFile(Path zip) throws IOException {
         delegate = new LittleEndianWriteFile(zip);
     }
 
@@ -44,34 +43,30 @@ abstract class BaseDataOutput implements DataOutput {
 
     @Override
     public void writeWord(int val) throws IOException {
-        doWithTic(() -> convertAndWrite(val, OFFS_WORD, 2));
+        convertAndWrite(val, OFFS_WORD, 2);
     }
 
     @Override
     public void writeDword(long val) throws IOException {
-        doWithTic(() -> convertAndWrite(val, OFFS_DWORD, 4));
+        convertAndWrite(val, OFFS_DWORD, 4);
     }
 
     @Override
     public void writeQword(long val) throws IOException {
-        doWithTic(() -> convertAndWrite(val, OFFS_QWORD, 8));
+        convertAndWrite(val, OFFS_QWORD, 8);
     }
 
     private void convertAndWrite(long val, int offs, int len) throws IOException {
         byte[] buf = THREAD_LOCAL_BUF.get();
         delegate.convert(val, buf, offs, len);
-        delegate.write(buf, offs, len);
+        write(buf, offs, len);
     }
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
-        doWithTic(() -> delegate.write(buf, offs, len));
-    }
-
-    private void doWithTic(Task task) throws IOException {
-        long offs = getOffs();
-        task.apply();
-        tic += getOffs() - offs;
+        long offsFrom = getOffs();
+        delegate.write(buf, offs, len);
+        tic += getOffs() - offsFrom;
     }
 
     @Override
@@ -100,12 +95,6 @@ abstract class BaseDataOutput implements DataOutput {
     @Override
     public final String toString() {
         return delegate.toString();
-    }
-
-    @FunctionalInterface
-    private interface Task {
-
-        void apply() throws IOException;
     }
 
 }

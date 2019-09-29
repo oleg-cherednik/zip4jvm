@@ -3,7 +3,6 @@ package ru.olegcherednik.zip4jvm.io.out;
 import ru.olegcherednik.zip4jvm.io.writers.ZipModelWriter;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -12,7 +11,7 @@ import java.io.IOException;
  */
 public class SingleZipOutputStream extends BaseDataOutput {
 
-    public SingleZipOutputStream(ZipModel zipModel) throws FileNotFoundException {
+    public SingleZipOutputStream(ZipModel zipModel) throws IOException {
         super(zipModel);
     }
 
