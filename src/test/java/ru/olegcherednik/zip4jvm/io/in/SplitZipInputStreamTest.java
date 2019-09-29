@@ -57,7 +57,7 @@ public class SplitZipInputStreamTest {
         ZipModel zipModel = new ZipModel(zip);
         zipModel.setTotalDisks(2);
 
-        try (SplitZipInputStream in = SplitZipInputStream.create(zipModel, 0)) {
+        try (SplitZipInputStream in = new SplitZipInputStream(zipModel, 0)) {
             assertThat(in.getOffs()).isEqualTo(4);
 
             assertThat(in.readWord()).isEqualTo(0x201);
@@ -97,7 +97,7 @@ public class SplitZipInputStreamTest {
         zipModel.setTotalDisks(1);
 
         assertThatThrownBy(() -> {
-            try (SplitZipInputStream in = SplitZipInputStream.create(zipModel, 0)) {
+            try (SplitZipInputStream in = new SplitZipInputStream(zipModel, 0)) {
                 assertThat(in.getOffs()).isEqualTo(4);
             }
         }).isExactlyInstanceOf(Zip4jvmException.class);

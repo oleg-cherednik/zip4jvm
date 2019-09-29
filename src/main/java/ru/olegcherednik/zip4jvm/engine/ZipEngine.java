@@ -150,7 +150,7 @@ public final class ZipEngine implements ZipFile.Writer {
     }
 
     private static DataOutput creatDataOutput(ZipModel zipModel) throws IOException {
-        return zipModel.isSplit() ? SplitZipOutputStream.create(zipModel) : SingleZipOutputStream.create(zipModel);
+        return zipModel.isSplit() ? new SplitZipOutputStream(zipModel) : new SingleZipOutputStream(zipModel);
     }
 
 }

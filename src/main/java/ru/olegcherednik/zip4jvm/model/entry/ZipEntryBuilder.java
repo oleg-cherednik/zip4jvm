@@ -110,7 +110,7 @@ public final class ZipEntryBuilder {
 
     private static ZipEntryInputStreamSupplier createInputStreamSupplier(ZipModel zipModel) {
         if (zipModel.isSplit())
-            return zipEntry -> EntryInputStream.create(zipEntry, SplitZipInputStream.create(zipModel, zipEntry.getDisk()));
+            return zipEntry -> EntryInputStream.create(zipEntry, new SplitZipInputStream(zipModel, zipEntry.getDisk()));
         return zipEntry -> EntryInputStream.create(zipEntry, new SingleZipInputStream(zipModel.getFile()));
     }
 

@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.in.entry;
 
-import lombok.NonNull;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
@@ -11,7 +10,6 @@ import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,7 +35,7 @@ public abstract class EntryInputStream extends InputStream {
     protected long readCompressedBytes;
     protected long writtenUncompressedBytes;
 
-    public static InputStream create(@NonNull ZipEntry zipEntry, @NonNull DataInput in) throws IOException {
+    public static InputStream create(ZipEntry zipEntry, DataInput in) throws IOException {
         LocalFileHeader localFileHeader = new LocalFileHeaderReader(zipEntry.getLocalFileHeaderOffs()).read(in);
         zipEntry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
         // TODO check that localFileHeader matches fileHeader
@@ -115,7 +113,7 @@ public abstract class EntryInputStream extends InputStream {
 
     @Override
     public String toString() {
-        return ZipUtils.toString(in.getOffs());
+        return in.toString();
     }
 
 }

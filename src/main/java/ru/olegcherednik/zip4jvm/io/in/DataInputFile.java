@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.io.in;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.nio.charset.Charset;
 
 /**
  * @author Oleg Cherednik
@@ -19,8 +18,6 @@ public interface DataInputFile extends Closeable {
     void seek(long pos) throws IOException;
 
     long convert(byte[] buf, int offs, int len);
-
-    String readString(byte[] buf, Charset charset);
 
     int read(byte[] buf, int offs, int len) throws IOException;
 

@@ -5,7 +5,6 @@ import ru.olegcherednik.zip4jvm.io.writers.ZipModelWriter;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,15 +21,9 @@ public class SplitZipOutputStream extends BaseDataOutput {
 
     private long disk;
 
-    public static SplitZipOutputStream create(ZipModel zipModel) throws IOException {
-        SplitZipOutputStream out = new SplitZipOutputStream(zipModel);
-        out.writeDwordSignature(SPLIT_SIGNATURE);
-        return out;
-    }
-
-    private SplitZipOutputStream(ZipModel zipModel) throws FileNotFoundException {
+    public SplitZipOutputStream(ZipModel zipModel) throws IOException {
         super(zipModel);
-        createFile(zipModel.getFile());
+        writeDwordSignature(SPLIT_SIGNATURE);
     }
 
     @Override

@@ -30,6 +30,7 @@ abstract class BaseDataOutput implements DataOutput {
 
     protected BaseDataOutput(ZipModel zipModel) throws FileNotFoundException {
         this.zipModel = zipModel;
+        createFile(zipModel.getFile());
     }
 
     protected void createFile(Path zip) throws FileNotFoundException {

@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.out.entry;
 
-import lombok.NonNull;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
@@ -12,7 +11,6 @@ import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.LocalFileHeaderBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,7 +27,7 @@ public abstract class EntryOutputStream extends OutputStream {
 
     private static final String COMPRESSED_DATA = "entryCompressedDataOffs";
 
-    private final ZipEntry entry;
+    private final ZipEntry zipEntry;
     private final Checksum checksum = new CRC32();
 
     protected final Encoder encoder;
@@ -37,7 +35,7 @@ public abstract class EntryOutputStream extends OutputStream {
 
     private long uncompressedSize;
 
-    public static EntryOutputStream create(@NonNull ZipEntry zipEntry, @NonNull ZipModel zipModel, @NonNull DataOutput out) throws IOException {
+    public static EntryOutputStream create(ZipEntry zipEntry, ZipModel zipModel, DataOutput out) throws IOException {
         EntryOutputStream os = createOutputStream(zipEntry, out);
 
         // TODO move it to the separate method
@@ -62,13 +60,13 @@ public abstract class EntryOutputStream extends OutputStream {
     }
 
     protected EntryOutputStream(ZipEntry zipEntry, DataOutput out) {
-        this.entry = zipEntry;
+        this.zipEntry = zipEntry;
         this.out = out;
         encoder = zipEntry.getEncryption().getCreateEncoder().apply(zipEntry);
     }
 
     private void writeLocalFileHeader() throws IOException {
-        LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(entry).create();
+        LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(zipEntry).create();
         new LocalFileHeaderWriter(localFileHeader).write(out);
         out.mark(COMPRESSED_DATA);
     }
@@ -91,36 +89,36 @@ public abstract class EntryOutputStream extends OutputStream {
     @Override
     public void close() throws IOException {
         encoder.close(out);
-        entry.setChecksum(checksum.getValue());
-        entry.setUncompressedSize(uncompressedSize);
-        entry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
+        zipEntry.setChecksum(checksum.getValue());
+        zipEntry.setUncompressedSize(uncompressedSize);
+        zipEntry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
         updateZip64();
         writeDataDescriptor();
     }
 
     private void updateZip64() {
-        if (entry.isZip64())
+        if (zipEntry.isZip64())
             return;
 
-        boolean uncompressedSizeExceeded = entry.getUncompressedSize() > MAX_ENTRY_SIZE;
-        boolean compressedSizeExceeded = entry.getCompressedSize() > MAX_ENTRY_SIZE;
-        entry.setZip64(uncompressedSizeExceeded || compressedSizeExceeded);
+        boolean uncompressedSizeExceeded = zipEntry.getUncompressedSize() > MAX_ENTRY_SIZE;
+        boolean compressedSizeExceeded = zipEntry.getCompressedSize() > MAX_ENTRY_SIZE;
+        zipEntry.setZip64(uncompressedSizeExceeded || compressedSizeExceeded);
     }
 
     private void writeDataDescriptor() throws IOException {
-        if (!entry.isDataDescriptorAvailable())
+        if (!zipEntry.isDataDescriptorAvailable())
             return;
 
         DataDescriptor dataDescriptor = new DataDescriptor();
         dataDescriptor.setCrc32(checksum.getValue());
-        dataDescriptor.setCompressedSize(entry.getCompressedSize());
-        dataDescriptor.setUncompressedSize(entry.getUncompressedSize());
-        DataDescriptorWriter.get(entry.isZip64(), dataDescriptor).write(out);
+        dataDescriptor.setCompressedSize(zipEntry.getCompressedSize());
+        dataDescriptor.setUncompressedSize(zipEntry.getUncompressedSize());
+        DataDescriptorWriter.get(zipEntry.isZip64(), dataDescriptor).write(out);
     }
 
     @Override
     public String toString() {
-        return ZipUtils.toString(out.getOffs());
+        return out.toString();
     }
 
 }

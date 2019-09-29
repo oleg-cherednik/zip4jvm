@@ -59,7 +59,7 @@ abstract class BaseDataInput implements DataInput {
     @Override
     public String readString(int length, Charset charset) throws IOException {
         byte[] buf = readBytes(length);
-        return delegate.readString(buf, charset);
+        return buf.length == 0 ? null : new String(buf, charset);
     }
 
     @Override
