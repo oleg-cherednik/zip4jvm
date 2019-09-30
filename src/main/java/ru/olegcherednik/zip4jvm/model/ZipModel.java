@@ -16,13 +16,6 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * zip64:
- * <ul>
- * <li>Central Directory Size [bytes] - 4,294,967,295 <b>(not implemented)</b></li>
- * </ul>
- * <p>
- * http://www.artpol-software.com/ZipArchive/KB/0610051629.aspx#limits
- *
  * @author Oleg Cherednik
  * @since 10.03.2019
  */
