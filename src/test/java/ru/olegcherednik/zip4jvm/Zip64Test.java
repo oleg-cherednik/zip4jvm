@@ -4,6 +4,8 @@ import org.apache.commons.io.IOUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
@@ -11,6 +13,7 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,6 +43,7 @@ public class Zip64Test {
     private Path zipAes;
     private Path zipSplit;
     private Path zipManyEntries;
+    private Path zipHugeEntry;
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -107,7 +111,7 @@ public class Zip64Test {
         assertThatDirectory(destDir).matches(dirSrcAssert);
     }
 
-    public void shouldUseZip64WhenTotalEntriesOver65535() throws IOException {
+    public void shouldUseZip64WhenTotalEntriesOverFFFF() throws IOException {
         zipManyEntries = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
         try (ZipFile.Writer zipFile = ZipFile.write(zipManyEntries)) {
@@ -127,35 +131,30 @@ public class Zip64Test {
     }
 
 //    // TODO it works but it's too slow
-//    @Test(dependsOnMethods = "shouldUseZip64WhenTotalEntriesOver65535")
-//    public void shouldUnzipZip64WhenTotalEntriesOver65535() throws IOException {
+//    @Test(dependsOnMethods = "shouldUseZip64WhenTotalEntriesOverFFFF")
+//    public void shouldUnzipZip64WhenTotalEntriesOverFFFF() throws IOException {
 //        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 //        UnzipIt.extract(zipManyEntries, destDir);
 //        assertThatDirectory(destDir).hasDirectories(0).hasFiles(ZipModel.MAX_TOTAL_ENTRIES + 1);
 //    }
 
-//    //    @Test
-//    public void shouldUseZip64WhenZipFileOver3Gb() throws IOException {
-////        Path dir = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("data");
-////        createData(dir);
-//
-//        ZipParameters parameters = ZipParameters.builder()
-//                                                .compression(Compression.STORE, CompressionLevel.NORMAL)
-//                                                .build();
-//
-//        Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-//        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-//        zip.add(Paths.get("d:/zip4j/ferdinand.mkv"), parameters);
-//
-//
-////        UnzipIt unzipIt = UnzipIt.builder()
-////                                 .zipFile(zipFile)
-////                                 .build();
-////
-////        unzipIt.extract(Paths.get("d:/zip4j/tmp/zip64"));
-//
-////        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-////        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
-//    }
+    public void shouldUseZip64WhenEntrySizeOverFFFFFFFF() throws IOException {
+        Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Files.createDirectories(dir);
+
+        Path file = dir.resolve("file.txt");
+
+        try (RandomAccessFile f = new RandomAccessFile(file.toFile(), "rw")) {
+            f.setLength(ZipModel.MAX_ENTRY_SIZE + 1);
+        }
+
+        zipHugeEntry = dir.resolve("src.zip");
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
+        ZipFileSettings settings = ZipFileSettings.builder().entrySettingsProvider(fileNam -> entrySettings).build();
+        ZipIt.add(zipHugeEntry, file, settings);
+
+        ZipModel zipModel = ZipModelBuilder.read(zipHugeEntry);
+        assertThat(zipModel.getEntryByFileName("file.txt").getUncompressedSize()).isEqualTo(ZipModel.MAX_ENTRY_SIZE + 1);
+    }
 
 }

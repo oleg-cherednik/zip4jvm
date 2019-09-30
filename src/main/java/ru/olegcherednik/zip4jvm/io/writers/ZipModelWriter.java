@@ -26,15 +26,20 @@ public final class ZipModelWriter implements Writer {
         zipModel.setCentralDirectoryOffs(out.getOffs());
         zipModel.setMainDisk(out.getDisk());
 
-        if (zipModel.getEntries().size() > ZipModel.MAX_TOTAL_ENTRIES)
-            zipModel.setZip64(true);
-        if (zipModel.getTotalDisks() > ZipModel.MAX_TOTAL_DISKS)
-            zipModel.setZip64(true);
-
+        updateZip64(out.getOffs());
         writeCentralDirectoryHeaders(out);
         // TODO see 4.4.1.5 - these sections must be on the same disk (probably add function to block the split)
         writeZip64(out);
         writeEndCentralDirectory(out);
+    }
+
+    private void updateZip64(long offs) {
+        if (zipModel.getEntries().size() > ZipModel.MAX_TOTAL_ENTRIES)
+            zipModel.setZip64(true);
+        if (zipModel.getTotalDisks() > ZipModel.MAX_TOTAL_DISKS)
+            zipModel.setZip64(true);
+        if (offs > ZipModel.MAX_CENTRAL_DIRECTORY_OFFS)
+            zipModel.setZip64(true);
     }
 
     private void writeCentralDirectoryHeaders(DataOutput out) throws IOException {

@@ -40,6 +40,7 @@ public class ZipModel {
 
     public static final int MAX_TOTAL_ENTRIES = Zip64.LIMIT_WORD;
     public static final long MAX_ENTRY_SIZE = Zip64.LIMIT_DWORD;
+    public static final long MAX_CENTRAL_DIRECTORY_OFFS = Zip64.LIMIT_DWORD;
     public static final int MAX_TOTAL_DISKS = Zip64.LIMIT_WORD;
     public static final int MAX_COMMENT_LENGTH = Zip64.LIMIT_WORD;
 

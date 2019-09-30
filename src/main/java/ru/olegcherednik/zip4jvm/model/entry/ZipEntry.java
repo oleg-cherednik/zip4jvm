@@ -63,6 +63,8 @@ public abstract class ZipEntry {
 
     private String comment;
     private boolean utf8;
+
+    // TODO it's not clear what is this. do comment
     private long size;
 
     public boolean isRegularFile() {
