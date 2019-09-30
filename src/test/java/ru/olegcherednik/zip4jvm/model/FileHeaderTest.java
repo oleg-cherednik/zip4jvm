@@ -120,10 +120,10 @@ public class FileHeaderTest {
     public void shouldWriteZip64WhenLocalFileHeaderOffsIsOverLimit() {
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
-        fileHeader.setOffsLocalFileHeader(Zip64.LIMIT);
+        fileHeader.setOffsLocalFileHeader(Zip64.LIMIT_DWORD);
         assertThat(fileHeader.isWriteZip64OffsetLocalHeader()).isFalse();
 
-        fileHeader.setOffsLocalFileHeader(Zip64.LIMIT + 1);
+        fileHeader.setOffsLocalFileHeader(Zip64.LIMIT_DWORD + 1);
         assertThat(fileHeader.isWriteZip64OffsetLocalHeader()).isTrue();
     }
 

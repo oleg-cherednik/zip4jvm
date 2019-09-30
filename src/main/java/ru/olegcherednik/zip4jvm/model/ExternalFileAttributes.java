@@ -54,28 +54,18 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]> {
 
     public static ExternalFileAttributes build(Supplier<String> osNameProvider) {
         String os = Optional.ofNullable(osNameProvider).orElse(() -> "<unknown>").get().toLowerCase();
-        ExternalFileAttributes attributes = NULL;
 
         if (os.contains(WIN))
-            attributes = new Windows();
-        else if (os.contains(MAC) || os.contains(UNIX))
-            attributes = new Posix();
+            return new Windows();
+        if (os.contains(MAC) || os.contains(UNIX))
+            return new Posix();
 
-        return attributes;
-    }
-
-    @Override
-    public byte[] get() {
-        byte[] data = new byte[SIZE];
-        saveToRowData(data);
-        return data;
+        return NULL;
     }
 
     public abstract ExternalFileAttributes readFrom(Path path) throws IOException;
 
     public abstract ExternalFileAttributes readFrom(byte[] data);
-
-    protected abstract void saveToRowData(byte[] data);
 
     public abstract void apply(Path path) throws IOException;
 
@@ -92,13 +82,13 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]> {
         }
 
         @Override
-        protected void saveToRowData(byte[] data) {
-            /* nothing to save */
+        public void apply(Path path) throws IOException {
+            /* nothing to apply */
         }
 
         @Override
-        public void apply(Path path) throws IOException {
-            /* nothing to apply */
+        public byte[] get() {
+            return new byte[SIZE];
         }
 
         @Override
@@ -157,20 +147,22 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]> {
         }
 
         @Override
-        protected void saveToRowData(byte[] data) {
-            data[0] = BitUtils.updateBits(data[0], BIT0, readOnly);
-            data[0] = BitUtils.updateBits(data[0], BIT1, hidden);
-            data[0] = BitUtils.updateBits(data[0], BIT2, system);
-            data[0] = BitUtils.updateBits(data[0], BIT5, archive);
-        }
-
-        @Override
         public void apply(Path path) throws IOException {
             DosFileAttributeView dos = Files.getFileAttributeView(path, DosFileAttributeView.class);
             dos.setReadOnly(readOnly);
             dos.setHidden(hidden);
             dos.setSystem(system);
             dos.setArchive(archive);
+        }
+
+        @Override
+        public byte[] get() {
+            byte[] data = new byte[SIZE];
+            data[0] = BitUtils.updateBits(data[0], BIT0, readOnly);
+            data[0] = BitUtils.updateBits(data[0], BIT1, hidden);
+            data[0] = BitUtils.updateBits(data[0], BIT2, system);
+            data[0] = BitUtils.updateBits(data[0], BIT5, archive);
+            return data;
         }
 
         @Override
@@ -216,7 +208,7 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]> {
             ownerWrite = true;
             ownerRead = true;
             directory = false;
-            regularFile = false;
+            regularFile = true;
         }
 
         @Override
@@ -262,21 +254,6 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]> {
         }
 
         @Override
-        protected void saveToRowData(byte[] data) {
-            data[2] = BitUtils.updateBits(data[2], BIT0, othersExecute);
-            data[2] = BitUtils.updateBits(data[2], BIT1, othersWrite);
-            data[2] = BitUtils.updateBits(data[2], BIT2, othersRead);
-            data[2] = BitUtils.updateBits(data[2], BIT3, groupExecute);
-            data[2] = BitUtils.updateBits(data[2], BIT4, groupWrite);
-            data[2] = BitUtils.updateBits(data[2], BIT4, groupRead);
-            data[2] = BitUtils.updateBits(data[2], BIT5, ownerExecute);
-            data[2] = BitUtils.updateBits(data[2], BIT7, ownerWrite);
-            data[3] = BitUtils.updateBits(data[3], BIT0, ownerRead);
-            data[3] = BitUtils.updateBits(data[3], BIT6, directory);
-            data[3] = BitUtils.updateBits(data[3], BIT7, regularFile);
-        }
-
-        @Override
         public void apply(Path path) throws IOException {
             Set<PosixFilePermission> permissions = EnumSet.noneOf(PosixFilePermission.class);
             addIfSet(othersExecute, permissions, OTHERS_EXECUTE);
@@ -288,9 +265,24 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]> {
             addIfSet(ownerExecute, permissions, OWNER_EXECUTE);
             addIfSet(ownerWrite, permissions, OWNER_WRITE);
             addIfSet(ownerRead, permissions, OWNER_READ);
+            Files.setPosixFilePermissions(path, permissions);
+        }
 
-            if (!permissions.isEmpty())
-                Files.setPosixFilePermissions(path, permissions);
+        @Override
+        public byte[] get() {
+            byte[] data = new byte[SIZE];
+            data[2] = BitUtils.updateBits(data[2], BIT0, othersExecute);
+            data[2] = BitUtils.updateBits(data[2], BIT1, othersWrite);
+            data[2] = BitUtils.updateBits(data[2], BIT2, othersRead);
+            data[2] = BitUtils.updateBits(data[2], BIT3, groupExecute);
+            data[2] = BitUtils.updateBits(data[2], BIT4, groupWrite);
+            data[2] = BitUtils.updateBits(data[2], BIT5, groupRead);
+            data[2] = BitUtils.updateBits(data[2], BIT6, ownerExecute);
+            data[2] = BitUtils.updateBits(data[2], BIT7, ownerWrite);
+            data[3] = BitUtils.updateBits(data[3], BIT0, ownerRead);
+            data[3] = BitUtils.updateBits(data[3], BIT6, directory);
+            data[3] = BitUtils.updateBits(data[3], BIT7, regularFile);
+            return data;
         }
 
         @Override

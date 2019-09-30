@@ -38,10 +38,10 @@ public class ZipModel {
     public static final int NO_SPLIT = -1;
     public static final int MIN_SPLIT_SIZE = 64 * 1024; // 64Kb
 
-    public static final int MAX_TOTAL_ENTRIES = Zip64.LIMIT_INT;
-    public static final long MAX_ENTRY_SIZE = Zip64.LIMIT;
-    public static final int MAX_TOTAL_DISKS = Zip64.LIMIT_INT;
-    public static final int MAX_COMMENT_LENGTH = Zip64.LIMIT_INT;
+    public static final int MAX_TOTAL_ENTRIES = Zip64.LIMIT_WORD;
+    public static final long MAX_ENTRY_SIZE = Zip64.LIMIT_DWORD;
+    public static final int MAX_TOTAL_DISKS = Zip64.LIMIT_WORD;
+    public static final int MAX_COMMENT_LENGTH = Zip64.LIMIT_WORD;
 
     private final Path file;
     private long splitSize = NO_SPLIT;

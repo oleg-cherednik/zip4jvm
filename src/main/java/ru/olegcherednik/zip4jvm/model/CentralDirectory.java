@@ -103,7 +103,7 @@ public class CentralDirectory {
         }
 
         public boolean isWriteZip64OffsetLocalHeader() {
-            return offsLocalFileHeader > Zip64.LIMIT;
+            return offsLocalFileHeader > Zip64.LIMIT_DWORD;
         }
 
         @Override

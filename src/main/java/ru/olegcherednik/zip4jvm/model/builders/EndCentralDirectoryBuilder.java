@@ -39,7 +39,7 @@ public final class EndCentralDirectoryBuilder {
     }
 
     private long getCentralDirectoryOffs() {
-        return zipModel.isZip64() ? Zip64.LIMIT : zipModel.getCentralDirectoryOffs();
+        return zipModel.isZip64() ? Zip64.LIMIT_DWORD : zipModel.getCentralDirectoryOffs();
     }
 
 }

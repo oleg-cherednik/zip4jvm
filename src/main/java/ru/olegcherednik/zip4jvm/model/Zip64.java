@@ -18,8 +18,8 @@ import java.io.IOException;
 public final class Zip64 {
 
     public static final Zip64 NULL = new Zip64(null, null);
-    public static final long LIMIT = 0xFFFF_FFFFL;
-    public static final int LIMIT_INT = 0xFFFF;
+    public static final int LIMIT_WORD = 0xFFFF;
+    public static final long LIMIT_DWORD = 0xFFFF_FFFFL;
 
     private final EndCentralDirectoryLocator endCentralDirectoryLocator;
     private final EndCentralDirectory endCentralDirectory;

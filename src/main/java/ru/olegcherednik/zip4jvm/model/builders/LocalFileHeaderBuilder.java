@@ -17,7 +17,7 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 public final class LocalFileHeaderBuilder {
 
     public static final long LOOK_IN_DATA_DESCRIPTOR = 0;
-    public static final long LOOK_IN_EXTRA_FIELD = Zip64.LIMIT;
+    public static final long LOOK_IN_EXTRA_FIELD = Zip64.LIMIT_DWORD;
 
     private final ZipEntry zipEntry;
 
