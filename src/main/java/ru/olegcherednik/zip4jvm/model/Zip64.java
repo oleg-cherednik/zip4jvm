@@ -70,7 +70,7 @@ public final class Zip64 {
         // size:2 - version needed to extractEntries
         private int versionNeededToExtract;
         // size:4 - number of this disk
-        private long disk;
+        private long totalDisks;
         // size:4 - number of the disk with the start of the central directory
         private long mainDisk;
         // size:8 - total number of entries in the central directory on this disk
@@ -78,7 +78,7 @@ public final class Zip64 {
         // size:8 - total number of entries in the central directory
         private long totalEntries;
         // size:8 - size of the central directory
-        private long size;
+        private long centralDirectorySize;
         // size:8 - offs of CentralDirectory in startDiskNumber
         private long centralDirectoryOffs;
         // size:n-44 - extensible data sector

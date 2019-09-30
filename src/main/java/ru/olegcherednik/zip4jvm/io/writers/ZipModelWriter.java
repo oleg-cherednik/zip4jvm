@@ -26,6 +26,8 @@ public final class ZipModelWriter implements Writer {
         zipModel.setCentralDirectoryOffs(out.getOffs());
         zipModel.setMainDisk(out.getDisk());
 
+        if (zipModel.getEntries().size() > ZipModel.MAX_TOTAL_ENTRIES)
+            zipModel.setZip64(true);
         if (zipModel.getTotalDisks() > ZipModel.MAX_TOTAL_DISKS)
             zipModel.setZip64(true);
 

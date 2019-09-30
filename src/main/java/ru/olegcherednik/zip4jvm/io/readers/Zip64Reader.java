@@ -63,11 +63,11 @@ final class Zip64Reader implements Reader<Zip64> {
             dir.setEndCentralDirectorySize(endCentralDirectorySize);
             dir.setVersionMadeBy(in.readWord());
             dir.setVersionNeededToExtract(in.readWord());
-            dir.setDisk(in.readDword());
+            dir.setTotalDisks(in.readDword());
             dir.setMainDisk(in.readDword());
             dir.setDiskEntries(in.readQword());
             dir.setTotalEntries(in.readQword());
-            dir.setSize(in.readQword());
+            dir.setCentralDirectorySize(in.readQword());
             dir.setCentralDirectoryOffs(in.readQword());
             dir.setExtensibleDataSector(in.readBytes((int)endCentralDirectorySize - Zip64.EndCentralDirectory.SIZE));
 

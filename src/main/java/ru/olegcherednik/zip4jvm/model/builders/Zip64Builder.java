@@ -40,11 +40,11 @@ public final class Zip64Builder {
         endCentralDirectory.setEndCentralDirectorySize(getEndCentralDirectorySize());
         endCentralDirectory.setVersionMadeBy(CentralDirectory.FileHeader.VERSION);
         endCentralDirectory.setVersionNeededToExtract(CentralDirectory.FileHeader.VERSION);
-        endCentralDirectory.setDisk(zipModel.getTotalDisks());
+        endCentralDirectory.setTotalDisks(zipModel.getTotalDisks());
         endCentralDirectory.setMainDisk(zipModel.getMainDisk());
         endCentralDirectory.setDiskEntries(countNumberOfFileHeaderEntriesOnDisk());
         endCentralDirectory.setTotalEntries(zipModel.getTotalEntries());
-        endCentralDirectory.setSize(zipModel.getCentralDirectorySize());
+        endCentralDirectory.setCentralDirectorySize(zipModel.getCentralDirectorySize());
         endCentralDirectory.setCentralDirectoryOffs(zipModel.getCentralDirectoryOffs());
         endCentralDirectory.setExtensibleDataSector(new byte[getExtensibleDataSectorSize()]);
         return endCentralDirectory;

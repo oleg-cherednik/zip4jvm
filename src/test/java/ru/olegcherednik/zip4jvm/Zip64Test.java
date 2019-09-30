@@ -1,34 +1,45 @@
 package ru.olegcherednik.zip4jvm;
 
+import org.apache.commons.io.IOUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions;
-import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.IntStream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.dirSrcAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.zipDirRootAssert;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.passwordStr;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
  * @author Oleg Cherednik
  * @since 06.04.2019
  */
+@Test
 @SuppressWarnings({ "FieldNamingConvention", "NewClassNamingConvention" })
 public class Zip64Test {
 
     private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(Zip64Test.class);
 
-    private Path zipFile1;
-    private Path zipFile2;
-    private Path zipFile3;
+    private Path zipSimple;
+    private Path zipAes;
+    private Path zipSplit;
+    private Path zipManyEntries;
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -40,68 +51,49 @@ public class Zip64Test {
         Zip4jvmSuite.removeDir(rootDir);
     }
 
-    @Test
     public void shouldZipWhenZip64() throws IOException {
-        ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettingsProvider(fileName ->
-                                                          ZipEntrySettings.builder()
-                                                                          .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                                          .build())
-                                                  .zip64(true).build();
-        zipFile1 = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt.add(zipFile1, contentDirSrc, settings);
+        ZipFileSettings settings = ZipFileSettings.builder().zip64(true).build();
 
-        // TODO it seems it could be checked with commons-compress
-//        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-//        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
+        zipSimple = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        ZipIt.add(zipSimple, contentDirSrc, settings);
+
+        assertThatDirectory(zipSimple.getParent()).exists().hasDirectories(0).hasFiles(1);
+        assertThatZipFile(zipSimple).root().matches(zipDirRootAssert);
     }
 
     @Test(dependsOnMethods = "shouldZipWhenZip64")
     public void shouldUnzipWhenZip64() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.extract(zipFile1, destDir);
-        Zip4jvmAssertions.assertThatDirectory(destDir).matches(TestDataAssert.dirSrcAssert);
+        UnzipIt.extract(zipSimple, destDir);
+        assertThatDirectory(destDir).matches(dirSrcAssert);
     }
 
-
-    @Test
     public void shouldZipWhenZip64AndAesEncryption() throws IOException {
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder().encryption(Encryption.AES_256, password).build();
         ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettingsProvider(fileName ->
-                                                          ZipEntrySettings.builder()
-                                                                          .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                                          .encryption(Encryption.AES_256, Zip4jvmSuite.password).build())
-                                                  .comment("password: " + new String(Zip4jvmSuite.password))
+                                                  .entrySettingsProvider(fileName -> entrySettings)
+                                                  .comment("password: " + passwordStr)
                                                   .zip64(true).build();
 
-        zipFile2 = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt.add(zipFile2, contentDirSrc, settings);
+        zipAes = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        ZipIt.add(zipAes, contentDirSrc, settings);
 
-        // TODO it seems it could be checked with commons-compress
-//        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-//        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
+        assertThatDirectory(zipAes.getParent()).exists().hasDirectories(0).hasFiles(1);
+        assertThatZipFile(zipAes, password).root().matches(zipDirRootAssert);
     }
 
     @Test(dependsOnMethods = "shouldZipWhenZip64AndAesEncryption")
     public void shouldUnzipWhenZip64AndAesEncryption() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.extract(zipFile2, destDir, fileName -> Zip4jvmSuite.password);
-        Zip4jvmAssertions.assertThatDirectory(destDir).matches(TestDataAssert.dirSrcAssert);
+        UnzipIt.extract(zipAes, destDir, fileName -> password);
+        assertThatDirectory(destDir).matches(dirSrcAssert);
     }
 
-
-    @Test
     public void shouldZipWhenZip64AndSplit() throws IOException {
-        ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettingsProvider(fileName ->
-                                                          ZipEntrySettings.builder()
-                                                                          .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                                          .build())
-                                                  .splitSize(1024 * 1024)
-                                                  .zip64(true).build();
+        ZipFileSettings settings = ZipFileSettings.builder().splitSize(SIZE_1MB).zip64(true).build();
 
-        zipFile3 = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt.add(zipFile3, contentDirSrc, settings);
+        zipSplit = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        ZipIt.add(zipSplit, contentDirSrc, settings);
 
         // TODO it seems it could be checked with commons-compress
 //        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -109,35 +101,37 @@ public class Zip64Test {
     }
 
     @Test(dependsOnMethods = "shouldZipWhenZip64AndSplit")
-    @Ignore
     public void shouldUnzipWhenZip64AndSplit() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.extract(zipFile3, destDir, fileName -> Zip4jvmSuite.password);
-        Zip4jvmAssertions.assertThatDirectory(destDir).matches(TestDataAssert.dirSrcAssert);
+        UnzipIt.extract(zipSplit, destDir);
+        assertThatDirectory(destDir).matches(dirSrcAssert);
     }
 
-//    //    @Test
-//    public void shouldUseZip64WhenTotalEntriesOver65535() throws IOException {
-//        Path dir = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("data");
-////        createData(dir);
-//
-//        ZipParameters parameters = ZipParameters.builder()
-//                                                .compression(Compression.STORE, CompressionLevel.NORMAL)
-//                                                .build();
-//
-//        Path zipFile = Zip4jSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-//        ZipIt zip = ZipIt.builder().zipFile(zipFile).build();
-//        zip.add(Paths.get("d:/zip4j/tmp/data"), parameters);
-//
-//
-////        UnzipIt unzipIt = UnzipIt.builder()
-////                                 .zipFile(zipFile)
-////                                 .build();
-////
-////        unzipIt.extract(Paths.get("d:/zip4j/tmp/zip64"));
-//
-////        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-////        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
+    public void shouldUseZip64WhenTotalEntriesOver65535() throws IOException {
+        zipManyEntries = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+
+        try (ZipFile.Writer zipFile = ZipFile.write(zipManyEntries)) {
+            IntStream.rangeClosed(1, ZipModel.MAX_TOTAL_ENTRIES + 1)
+                     .mapToObj(i -> "file_" + i + ".txt")
+                     .map(fileName -> ZipFile.Entry.builder()
+                                                   .inputStreamSup(() -> IOUtils.toInputStream(fileName, StandardCharsets.UTF_8))
+                                                   .fileName(fileName).build())
+                     .forEach(zipFile::addEntry);
+        }
+
+        ZipModel zipModel = ZipModelBuilder.read(zipManyEntries);
+
+        assertThatDirectory(zipManyEntries.getParent()).exists().hasDirectories(0).hasFiles(1);
+        assertThat(zipModel.getEntryNames()).hasSize(ZipModel.MAX_TOTAL_ENTRIES + 1);
+        assertThat(zipModel.isZip64()).isTrue();
+    }
+
+//    // TODO it works but it's too slow
+//    @Test(dependsOnMethods = "shouldUseZip64WhenTotalEntriesOver65535")
+//    public void shouldUnzipZip64WhenTotalEntriesOver65535() throws IOException {
+//        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+//        UnzipIt.extract(zipManyEntries, destDir);
+//        assertThatDirectory(destDir).hasDirectories(0).hasFiles(ZipModel.MAX_TOTAL_ENTRIES + 1);
 //    }
 
 //    //    @Test
@@ -163,20 +157,5 @@ public class Zip64Test {
 ////        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
 ////        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
 //    }
-
-    /**
-     * Create 65_535 + 1 entries under {@code root} directory
-     */
-//    private static void createData(Path root) throws IOException {
-//        for (int i = 0, j = 1; i <= 65; i++) {
-//            Path dir = root.resolve(String.format("dir_%02d", i));
-//            Files.createDirectories(dir);
-//
-//            for (; j <= 1000 * i + (i == 65 ? 536 : 1000); j++)
-//                FileUtils.writeStringToFile(dir.resolve(String.format("%04d.txt", j)).toFile(), "oleg", StandardCharsets.UTF_8);
-//        }
-//
-//    }
-
 
 }
