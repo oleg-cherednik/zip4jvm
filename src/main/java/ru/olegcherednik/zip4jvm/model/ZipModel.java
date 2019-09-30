@@ -18,10 +18,6 @@ import java.util.Set;
 /**
  * zip64:
  * <ul>
- * <li>Number of Files Inside an Archive - 65,535 <b>(implemented)</b></li>
- * <li>Size of a File Inside an Archive [bytes] - 4,294,967,295 <b>(implemented)</b></li>
- * <li>Size of an Archive [bytes] - 4,294,967,295 <b>(not implemented)</b></li>
- * <li>Number of Segments in a Segmented Archive - 999 (spanning), 65,535 (splitting) <b>(implemented for splitting)</b></li>
  * <li>Central Directory Size [bytes] - 4,294,967,295 <b>(not implemented)</b></li>
  * </ul>
  * <p>
@@ -42,7 +38,7 @@ public class ZipModel {
     public static final long MAX_ENTRY_SIZE = Zip64.LIMIT_DWORD;
     public static final long MAX_CENTRAL_DIRECTORY_OFFS = Zip64.LIMIT_DWORD;
     public static final int MAX_TOTAL_DISKS = Zip64.LIMIT_WORD;
-    public static final int MAX_COMMENT_LENGTH = Zip64.LIMIT_WORD;
+    public static final int MAX_COMMENT_SIZE = Zip64.LIMIT_WORD;
 
     private final Path file;
     private long splitSize = NO_SPLIT;
@@ -63,8 +59,8 @@ public class ZipModel {
     private final Map<String, ZipEntry> fileNameEntry = new LinkedHashMap<>();
 
     public void setComment(String comment) {
-        if (StringUtils.length(comment) > MAX_COMMENT_LENGTH)
-            throw new IllegalArgumentException("File comment should be " + MAX_COMMENT_LENGTH + " characters maximum");
+        if (StringUtils.length(comment) > MAX_COMMENT_SIZE)
+            throw new IllegalArgumentException("File comment should be " + MAX_COMMENT_SIZE + " characters maximum");
         this.comment = StringUtils.isEmpty(comment) ? null : comment;
     }
 

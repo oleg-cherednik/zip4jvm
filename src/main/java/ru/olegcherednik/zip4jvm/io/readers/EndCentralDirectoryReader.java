@@ -35,7 +35,7 @@ final class EndCentralDirectoryReader implements Reader<EndCentralDirectory> {
     }
 
     private static long findHead(DataInput in) throws IOException {
-        int commentLength = ZipModel.MAX_COMMENT_LENGTH;
+        int commentLength = ZipModel.MAX_COMMENT_SIZE;
         long available = in.length() - EndCentralDirectory.MIN_SIZE;
 
         do {

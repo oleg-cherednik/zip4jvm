@@ -87,8 +87,8 @@ public class ModifyCommentTest {
         Files.createDirectories(zip.getParent());
         Files.copy(zipDeflateSolid, zip);
 
-        ZipMisc.setComment(zip, StringUtils.repeat("_", ZipModel.MAX_COMMENT_LENGTH));
-        assertThatZipFile(zip).hasCommentSize(ZipModel.MAX_COMMENT_LENGTH);
+        ZipMisc.setComment(zip, StringUtils.repeat("_", ZipModel.MAX_COMMENT_SIZE));
+        assertThatZipFile(zip).hasCommentSize(ZipModel.MAX_COMMENT_SIZE);
     }
 
     public void shouldThrowExceptionWhenCommentIsOverMaxLength() throws IOException {
@@ -96,7 +96,7 @@ public class ModifyCommentTest {
         Files.createDirectories(zip.getParent());
         Files.copy(zipDeflateSolid, zip);
 
-        assertThatThrownBy(() -> ZipMisc.setComment(zip, StringUtils.repeat("_", ZipModel.MAX_COMMENT_LENGTH + 1)))
+        assertThatThrownBy(() -> ZipMisc.setComment(zip, StringUtils.repeat("_", ZipModel.MAX_COMMENT_SIZE + 1)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
