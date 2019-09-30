@@ -17,15 +17,15 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 public class InternalFileAttributesTest {
 
     public void shouldRetrieveNullWhenDataEmpty() {
-        assertThat(InternalFileAttributes.createDataBasedDelegate(null)).isSameAs(InternalFileAttributes.NULL);
-        assertThat(InternalFileAttributes.createDataBasedDelegate(new byte[] { 0xA })).isSameAs(InternalFileAttributes.NULL);
-        assertThat(InternalFileAttributes.createDataBasedDelegate(new byte[] { 0xA, 0xA, 0xA })).isSameAs(InternalFileAttributes.NULL);
-        assertThat(InternalFileAttributes.createDataBasedDelegate(new byte[] { 0x0, 0x0 })).isSameAs(InternalFileAttributes.NULL);
+        assertThat(InternalFileAttributes.build(null)).isSameAs(InternalFileAttributes.NULL);
+        assertThat(InternalFileAttributes.build(new byte[] { 0xA })).isSameAs(InternalFileAttributes.NULL);
+        assertThat(InternalFileAttributes.build(new byte[] { 0xA, 0xA, 0xA })).isSameAs(InternalFileAttributes.NULL);
+        assertThat(InternalFileAttributes.build(new byte[] { 0x0, 0x0 })).isSameAs(InternalFileAttributes.NULL);
     }
 
     public void shouldRetrieveNotNullWhenDataNotEmpty() {
         for (byte[] data : Arrays.asList(new byte[] { 0x0, 0xA }, new byte[] { 0xA, 0x0 }, new byte[] { 0xA, 0xA })) {
-            InternalFileAttributes attributes = InternalFileAttributes.createDataBasedDelegate(data);
+            InternalFileAttributes attributes = InternalFileAttributes.build(data);
             assertThat(attributes).isNotNull();
             assertThat(attributes).isNotSameAs(InternalFileAttributes.NULL);
             assertThat(attributes.toString()).isEqualTo("internal");
@@ -38,7 +38,7 @@ public class InternalFileAttributesTest {
 
     public void shouldNotThrowExceptionWhenAcceptPath() {
         Path path = Paths.get("foo");
-        assertThatCode(() -> InternalFileAttributes.createDataBasedDelegate(new byte[] { 0xA, 0xA }).accept(path)).doesNotThrowAnyException();
+        assertThatCode(() -> InternalFileAttributes.build(new byte[] { 0xA, 0xA }).accept(path)).doesNotThrowAnyException();
         assertThatCode(() -> InternalFileAttributes.NULL.accept(path)).doesNotThrowAnyException();
     }
 

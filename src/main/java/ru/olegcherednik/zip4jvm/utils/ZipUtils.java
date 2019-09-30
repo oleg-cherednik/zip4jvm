@@ -41,7 +41,7 @@ public final class ZipUtils {
      * @see {@link java.util.zip.ZipUtils#dosToJavaTime(long)}
      */
     @SuppressWarnings({ "deprecation", "MagicConstant" })
-    public static long dosToJavaTme(int dtime) {
+    public static long dosToJavaTime(int dtime) {
         return new Date(((dtime >> 25) & 0x7F) + 80, ((dtime >> 21) & 0x0F) - 1, (dtime >> 16) & 0x1F, (dtime >> 11) & 0x1F,
                 (dtime >> 5) & 0x3F, (dtime << 1) & 0x3E).getTime();
     }

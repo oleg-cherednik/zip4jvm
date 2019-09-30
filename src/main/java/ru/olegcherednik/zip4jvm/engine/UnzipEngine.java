@@ -118,16 +118,26 @@ public final class UnzipEngine implements ZipFile.Reader {
 
         if (zipEntry.isDirectory())
             Files.createDirectories(file);
-        else {
+        else
             ZipUtils.copyLarge(zipEntry.getIn(), getOutputStream(file));
-//            setFileAttributes(file, zipEntry);
-            setFileLastModifiedTime(file, zipEntry);
+
+        setFileAttributes(file, zipEntry);
+        setFileLastModifiedTime(file, zipEntry);
+    }
+
+    private static void setFileLastModifiedTime(Path path, ZipEntry zipEntry) {
+        try {
+            long lastModifiedTime = ZipUtils.dosToJavaTime(zipEntry.getLastModifiedTime());
+            Files.setLastModifiedTime(path, FileTime.fromMillis(lastModifiedTime));
+        } catch(IOException ignored) {
         }
     }
 
-    private static void setFileLastModifiedTime(Path path, ZipEntry zipEntry) throws IOException {
-        long lastModifiedTime = ZipUtils.dosToJavaTme(zipEntry.getLastModifiedTime());
-        Files.setLastModifiedTime(path, FileTime.fromMillis(lastModifiedTime));
+    private static void setFileAttributes(Path path, ZipEntry zipEntry) {
+        try {
+            zipEntry.getExternalFileAttributes().apply(path);
+        } catch(IOException ignored) {
+        }
     }
 
     private static FileOutputStream getOutputStream(Path file) throws IOException {

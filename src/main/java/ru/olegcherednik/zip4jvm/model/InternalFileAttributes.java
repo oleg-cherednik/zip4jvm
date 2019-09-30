@@ -21,7 +21,7 @@ public class InternalFileAttributes implements Supplier<byte[]>, Consumer<Path> 
     private final byte[] data;
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")
-    public static InternalFileAttributes createDataBasedDelegate(byte[] data) {
+    public static InternalFileAttributes build(byte[] data) {
         if (ArrayUtils.getLength(data) == SIZE && (data[0] != 0 || data[1] != 0))
             return new InternalFileAttributes(data);
         return NULL;

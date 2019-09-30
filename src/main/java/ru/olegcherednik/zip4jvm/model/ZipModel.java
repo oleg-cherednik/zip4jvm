@@ -52,12 +52,6 @@ public class ZipModel {
     private long centralDirectoryOffs;
     private long centralDirectorySize;
 
-    public void setComment(String comment) {
-        if (StringUtils.length(comment) > MAX_COMMENT_LENGTH)
-            throw new IllegalArgumentException("File comment should be " + MAX_COMMENT_LENGTH + " characters maximum");
-        this.comment = StringUtils.isEmpty(comment) ? null : comment;
-    }
-
     /**
      * {@literal true} only if section {@link Zip64} exists. In other words, do set this to {@code true}, to write zip archive
      * in ZIP64 format.
@@ -66,6 +60,12 @@ public class ZipModel {
 
     @Getter(AccessLevel.NONE)
     private final Map<String, ZipEntry> fileNameEntry = new LinkedHashMap<>();
+
+    public void setComment(String comment) {
+        if (StringUtils.length(comment) > MAX_COMMENT_LENGTH)
+            throw new IllegalArgumentException("File comment should be " + MAX_COMMENT_LENGTH + " characters maximum");
+        this.comment = StringUtils.isEmpty(comment) ? null : comment;
+    }
 
     public boolean isSplit() {
         return splitSize > 0 || totalDisks > 0;

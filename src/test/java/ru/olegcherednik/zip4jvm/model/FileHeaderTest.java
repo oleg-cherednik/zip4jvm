@@ -37,8 +37,8 @@ public class FileHeaderTest {
 
     public void shouldUseSettersGettersCorrectly() throws IOException {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
-        InternalFileAttributes internalFileAttributes = InternalFileAttributes.createDataBasedDelegate(new byte[] { 1, 2 });
-        ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.createOperationBasedDelegate(fileBentley, () -> WIN);
+        InternalFileAttributes internalFileAttributes = InternalFileAttributes.build(new byte[] { 1, 2 });
+        ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.build(() -> WIN).readFrom(fileBentley);
         ExtraField extraField = ExtraField.builder().addRecord(Zip64.ExtendedInfo.builder().uncompressedSize(4).build()).build();
 
         assertThat(internalFileAttributes).isNotSameAs(InternalFileAttributes.NULL);
