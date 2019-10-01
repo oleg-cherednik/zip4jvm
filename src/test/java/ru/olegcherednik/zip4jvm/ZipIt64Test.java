@@ -3,7 +3,6 @@ package ru.olegcherednik.zip4jvm;
 import org.apache.commons.io.IOUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
@@ -24,6 +23,7 @@ import java.util.stream.IntStream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirSrcAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.zipDirRootAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
@@ -141,12 +141,11 @@ public class ZipIt64Test {
 //        assertThatDirectory(destDir).hasDirectories(0).hasFiles(ZipModel.MAX_TOTAL_ENTRIES + 1);
 //    }
 
-    @Ignore
     public void shouldUseZip64WhenEntrySizeOverFFFFFFFF() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         Files.createDirectories(dir);
 
-        Path file = dir.resolve("afile.txt");
+        Path file = dir.resolve("file.txt");
 
         try (RandomAccessFile f = new RandomAccessFile(file.toFile(), "rw")) {
             f.setLength(ZipModel.MAX_ENTRY_SIZE + 1);
@@ -158,7 +157,10 @@ public class ZipIt64Test {
         ZipIt.add(zipHugeEntry, Arrays.asList(file, fileBentley), settings);
 
         ZipModel zipModel = ZipModelBuilder.read(zipHugeEntry);
-        assertThat(zipModel.getEntryByFileName("afile.txt").getUncompressedSize()).isEqualTo(ZipModel.MAX_ENTRY_SIZE + 1);
+        assertThat(zipModel.getEntryByFileName("file.txt").getUncompressedSize()).isEqualTo(ZipModel.MAX_ENTRY_SIZE + 1);
+        assertThat(zipModel.getEntryByFileName(fileNameBentley).getUncompressedSize()).isEqualTo(1_395_362);
+
+        // TODO asserts in zip should be using
     }
 
 }
