@@ -58,7 +58,7 @@ public class FileHeaderTest {
         fileHeader.setDisk(8);
         fileHeader.setInternalFileAttributes(internalFileAttributes);
         fileHeader.setExternalFileAttributes(externalFileAttributes);
-        fileHeader.setOffsLocalFileHeader(9);
+        fileHeader.setLocalFileHeaderOffs(9);
         fileHeader.setFileName("fileName");
         fileHeader.setExtraField(extraField);
 
@@ -74,7 +74,7 @@ public class FileHeaderTest {
         assertThat(fileHeader.getDisk()).isEqualTo(8);
         assertThat(fileHeader.getInternalFileAttributes()).isSameAs(internalFileAttributes);
         assertThat(fileHeader.getExternalFileAttributes()).isSameAs(externalFileAttributes);
-        assertThat(fileHeader.getOffsLocalFileHeader()).isEqualTo(9);
+        assertThat(fileHeader.getLocalFileHeaderOffs()).isEqualTo(9);
         assertThat(fileHeader.getExtraField().getExtendedInfo()).isNotNull();
         assertThat(fileHeader.getFileName()).isEqualTo("fileName");
     }
@@ -110,7 +110,7 @@ public class FileHeaderTest {
         assertThat(fileHeader.getExtraField().getExtendedInfo()).isSameAs(Zip64.ExtendedInfo.NULL);
         assertThat(fileHeader.isZip64()).isFalse();
 
-        Zip64.ExtendedInfo extendedInfo = Zip64.ExtendedInfo.builder().uncompressedSize(1).compressedSize(2).offsLocalHeaderRelative(3)
+        Zip64.ExtendedInfo extendedInfo = Zip64.ExtendedInfo.builder().uncompressedSize(1).compressedSize(2).localFileHeaderOffs(3)
                                                             .disk(4).build();
 
         fileHeader.setExtraField(ExtraField.builder().addRecord(extendedInfo).build());
@@ -120,10 +120,10 @@ public class FileHeaderTest {
     public void shouldWriteZip64WhenLocalFileHeaderOffsIsOverLimit() {
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
-        fileHeader.setOffsLocalFileHeader(Zip64.LIMIT_DWORD);
+        fileHeader.setLocalFileHeaderOffs(Zip64.LIMIT_DWORD);
         assertThat(fileHeader.isWriteZip64OffsetLocalHeader()).isFalse();
 
-        fileHeader.setOffsLocalFileHeader(Zip64.LIMIT_DWORD + 1);
+        fileHeader.setLocalFileHeaderOffs(Zip64.LIMIT_DWORD + 1);
         assertThat(fileHeader.isWriteZip64OffsetLocalHeader()).isTrue();
     }
 

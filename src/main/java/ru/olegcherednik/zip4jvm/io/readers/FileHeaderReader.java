@@ -55,7 +55,7 @@ final class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader>
         fileHeader.setDisk(in.readWord());
         fileHeader.setInternalFileAttributes(getInternalFileAttribute(in.readBytes(InternalFileAttributes.SIZE)));
         fileHeader.setExternalFileAttributes(getExternalFileAttribute(in.readBytes(ExternalFileAttributes.SIZE)));
-        fileHeader.setOffsLocalFileHeader(in.readDword());
+        fileHeader.setLocalFileHeaderOffs(in.readDword());
         fileHeader.setFileName(in.readString(fileNameLength, fileHeader.getGeneralPurposeFlag().getCharset()));
         fileHeader.setExtraField(ExtraFieldReader.build(extraFieldLength, fileHeader).read(in));
         fileHeader.setComment(in.readString(fileCommentLength, fileHeader.getGeneralPurposeFlag().getCharset()));

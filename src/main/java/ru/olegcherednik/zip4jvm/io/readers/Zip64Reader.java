@@ -119,7 +119,7 @@ final class Zip64Reader implements Reader<Zip64> {
             return Zip64.ExtendedInfo.builder()
                                      .uncompressedSize(uncompressedSize)
                                      .compressedSize(compressedSize)
-                                     .offsLocalHeaderRelative(offsLocalHeaderRelative)
+                                     .localFileHeaderOffs(offsLocalHeaderRelative)
                                      .disk(disk).build();
         }
 

@@ -24,8 +24,8 @@ public final class Zip64 {
     private final EndCentralDirectoryLocator endCentralDirectoryLocator;
     private final EndCentralDirectory endCentralDirectory;
 
-    public static Zip64 of(EndCentralDirectoryLocator locator, EndCentralDirectory dir) {
-        return locator == null || dir == null ? NULL : new Zip64(locator, dir);
+    public static Zip64 of(EndCentralDirectoryLocator endCentralDirectoryLocator, EndCentralDirectory endCentralDirectory) {
+        return endCentralDirectoryLocator == null || endCentralDirectory == null ? NULL : new Zip64(endCentralDirectoryLocator, endCentralDirectory);
     }
 
     @Override
@@ -106,7 +106,7 @@ public final class Zip64 {
         private final long compressedSize = ExtraField.NO_DATA;
         // size:8 - offset of local header record
         @Builder.Default
-        private final long offsLocalHeaderRelative = ExtraField.NO_DATA;
+        private final long localFileHeaderOffs = ExtraField.NO_DATA;
         // size:4 - number of the disk on which  this file starts
         @Builder.Default
         private final long disk = ExtraField.NO_DATA;
@@ -115,18 +115,21 @@ public final class Zip64 {
         public int getDataSize() {
             int size = 0;
 
-            size += uncompressedSize == ExtraField.NO_DATA ? 0 : 8;
-            size += compressedSize == ExtraField.NO_DATA ? 0 : 8;
-            size += offsLocalHeaderRelative == ExtraField.NO_DATA ? 0 : 8;
-            size += disk == ExtraField.NO_DATA ? 0 : 4;
+            if (uncompressedSize != ExtraField.NO_DATA)
+                size += 8;
+            if (compressedSize != ExtraField.NO_DATA)
+                size += 8;
+            if (localFileHeaderOffs != ExtraField.NO_DATA)
+                size += 8;
+            if (disk != ExtraField.NO_DATA)
+                size += 4;
 
             return size;
         }
 
         @Override
         public int getBlockSize() {
-            int size = getDataSize();
-            return size == 0 ? 0 : size + SIZE_FIELD;
+            return isNull() ? 0 : getDataSize() + SIZE_FIELD;
         }
 
         @Override
@@ -141,12 +144,12 @@ public final class Zip64 {
 
         @Override
         public String toString() {
-            return this == NULL ? "<null>" : super.toString();
+            return isNull() ? "<null>" : super.toString();
         }
 
         @Override
         public void write(DataOutput out) throws IOException {
-            if (this == NULL)
+            if (isNull())
                 return;
 
             out.writeWordSignature(SIGNATURE);
@@ -156,8 +159,8 @@ public final class Zip64 {
                 out.writeQword(getUncompressedSize());
             if (getCompressedSize() != ExtraField.NO_DATA)
                 out.writeQword(getCompressedSize());
-            if (getOffsLocalHeaderRelative() != ExtraField.NO_DATA)
-                out.writeQword(getOffsLocalHeaderRelative());
+            if (getLocalFileHeaderOffs() != ExtraField.NO_DATA)
+                out.writeQword(getLocalFileHeaderOffs());
             if (getDisk() != ExtraField.NO_DATA)
                 out.writeDword(getDisk());
         }

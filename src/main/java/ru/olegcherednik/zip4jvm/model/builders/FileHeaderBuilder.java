@@ -6,11 +6,12 @@ import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.Zip64;
-import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
 
+import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_LOCAL_FILE_HEADER_OFFS;
+import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
 import static ru.olegcherednik.zip4jvm.model.builders.LocalFileHeaderBuilder.LOOK_IN_EXTRA_FIELD;
 
 /**
@@ -37,7 +38,7 @@ final class FileHeaderBuilder {
         fileHeader.setDisk(getDisk());
         fileHeader.setInternalFileAttributes(zipEntry.getInternalFileAttributes());
         fileHeader.setExternalFileAttributes(zipEntry.getExternalFileAttributes());
-        fileHeader.setOffsLocalFileHeader(zipEntry.getLocalFileHeaderOffs());
+        fileHeader.setLocalFileHeaderOffs(getOffsLocalFileHeader());
         fileHeader.setFileName(zipEntry.getFileName());
         fileHeader.setExtraField(createExtraField());
         fileHeader.setComment(zipEntry.getComment());
@@ -69,17 +70,20 @@ final class FileHeaderBuilder {
                                      .compressedSize(zipEntry.getCompressedSize())
                                      .uncompressedSize(zipEntry.getUncompressedSize())
                                      .disk(zipEntry.getDisk())
-//                                     .offsLocalHeaderRelative(entry.getLocalFileHeaderOffs())
-                                     .build();
+                                     .localFileHeaderOffs(zipEntry.getLocalFileHeaderOffs()).build();
         return Zip64.ExtendedInfo.NULL;
-    }
-
-    private int getDisk() {
-        return zipEntry.isZip64() ? ZipModel.MAX_TOTAL_DISKS : (int)zipEntry.getDisk();
     }
 
     private long getSize(long size) {
         return zipEntry.isZip64() ? LOOK_IN_EXTRA_FIELD : size;
+    }
+
+    private int getDisk() {
+        return zipEntry.isZip64() ? MAX_TOTAL_DISKS : (int)zipEntry.getDisk();
+    }
+
+    private long getOffsLocalFileHeader() {
+        return zipEntry.isZip64() ? MAX_LOCAL_FILE_HEADER_OFFS : zipEntry.getLocalFileHeaderOffs();
     }
 
 }

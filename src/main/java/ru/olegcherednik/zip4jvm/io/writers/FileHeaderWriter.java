@@ -3,7 +3,6 @@ package ru.olegcherednik.zip4jvm.io.writers;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import java.io.IOException;
@@ -45,7 +44,7 @@ final class FileHeaderWriter implements Writer {
         out.writeWord(fileHeader.getDisk());
         out.writeBytes(fileHeader.getInternalFileAttributes().get());
         out.writeBytes(fileHeader.getExternalFileAttributes().get());
-        out.writeDword(fileHeader.isWriteZip64OffsetLocalHeader() ? Zip64.LIMIT_DWORD : fileHeader.getOffsLocalFileHeader());
+        out.writeDword(fileHeader.getLocalFileHeaderOffs());
         out.writeBytes(fileName);
         new ExtraFieldWriter(fileHeader.getExtraField()).write(out);
         out.writeBytes(fileComment);

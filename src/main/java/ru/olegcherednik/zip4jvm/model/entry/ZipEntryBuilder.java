@@ -20,6 +20,7 @@ import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
 import java.io.IOException;
 
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_ENTRY_SIZE;
+import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_LOCAL_FILE_HEADER_OFFS;
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
 
 /**
@@ -77,7 +78,7 @@ public final class ZipEntryBuilder {
         zipEntry.setUncompressedSize(getUncompressedSize(fileHeader));
         zipEntry.setCompressedSize(getCompressedSize(fileHeader));
         zipEntry.setDisk(getDisk(fileHeader));
-        zipEntry.setLocalFileHeaderOffs(fileHeader.getOffsLocalFileHeader());
+        zipEntry.setLocalFileHeaderOffs(getLocalFileHeaderOffs(fileHeader));
         return zipEntry;
     }
 
@@ -130,6 +131,12 @@ public final class ZipEntryBuilder {
         if (fileHeader.getUncompressedSize() == MAX_ENTRY_SIZE)
             return fileHeader.getExtraField().getExtendedInfo().getUncompressedSize();
         return fileHeader.getUncompressedSize();
+    }
+
+    private static long getLocalFileHeaderOffs(CentralDirectory.FileHeader fileHeader) {
+        if (fileHeader.getLocalFileHeaderOffs() == MAX_LOCAL_FILE_HEADER_OFFS)
+            return fileHeader.getExtraField().getExtendedInfo().getLocalFileHeaderOffs();
+        return fileHeader.getLocalFileHeaderOffs();
     }
 
 }

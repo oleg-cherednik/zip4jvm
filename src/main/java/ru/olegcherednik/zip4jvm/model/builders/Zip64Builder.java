@@ -16,15 +16,7 @@ public final class Zip64Builder {
     private final long disk;
 
     public Zip64 build() {
-        Zip64 zip64 = Zip64.NULL;
-
-        if (zipModel.isZip64()) {
-            Zip64.EndCentralDirectory dir = createEndCentralDirectory();
-            Zip64.EndCentralDirectoryLocator locator = createLocator();
-            zip64 = Zip64.of(locator, dir);
-        }
-
-        return zip64;
+        return zipModel.isZip64() ? Zip64.of(createLocator(), createEndCentralDirectory()) : Zip64.NULL;
     }
 
     private Zip64.EndCentralDirectoryLocator createLocator() {

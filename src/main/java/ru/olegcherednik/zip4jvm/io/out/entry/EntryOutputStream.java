@@ -18,6 +18,8 @@ import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_ENTRY_SIZE;
+import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_LOCAL_FILE_HEADER_OFFS;
+import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
 
 /**
  * @author Oleg Cherednik
@@ -97,12 +99,14 @@ public abstract class EntryOutputStream extends OutputStream {
     }
 
     private void updateZip64() {
-        if (zipEntry.isZip64())
-            return;
-
-        boolean uncompressedSizeExceeded = zipEntry.getUncompressedSize() > MAX_ENTRY_SIZE;
-        boolean compressedSizeExceeded = zipEntry.getCompressedSize() > MAX_ENTRY_SIZE;
-        zipEntry.setZip64(uncompressedSizeExceeded || compressedSizeExceeded);
+        if (zipEntry.getCompressedSize() > MAX_ENTRY_SIZE)
+            zipEntry.setZip64(true);
+        if (zipEntry.getUncompressedSize() > MAX_ENTRY_SIZE)
+            zipEntry.setZip64(true);
+        if (zipEntry.getDisk() > MAX_TOTAL_DISKS)
+            zipEntry.setZip64(true);
+        if (zipEntry.getLocalFileHeaderOffs() > MAX_LOCAL_FILE_HEADER_OFFS)
+            zipEntry.setZip64(true);
     }
 
     private void writeDataDescriptor() throws IOException {
