@@ -27,7 +27,7 @@ public final class ZipFileEntryWriter implements Writer {
     @Override
     public void write(DataOutput out) throws IOException {
         ZipEntry zipEntry = ZipEntryBuilder.build(entry, entrySettings);
-        ZipUtils.copyLarge(zipEntry.getIn(), EntryOutputStream.create(zipEntry, tempZipModel, out));
+        ZipUtils.copyLarge(zipEntry.getInputStream(), EntryOutputStream.create(zipEntry, tempZipModel, out));
     }
 
     @Override

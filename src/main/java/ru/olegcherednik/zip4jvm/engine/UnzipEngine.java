@@ -119,7 +119,7 @@ public final class UnzipEngine implements ZipFile.Reader {
         if (zipEntry.isDirectory())
             Files.createDirectories(file);
         else
-            ZipUtils.copyLarge(zipEntry.getIn(), getOutputStream(file));
+            ZipUtils.copyLarge(zipEntry.getInputStream(), getOutputStream(file));
 
         setFileAttributes(file, zipEntry);
         setFileLastModifiedTime(file, zipEntry);

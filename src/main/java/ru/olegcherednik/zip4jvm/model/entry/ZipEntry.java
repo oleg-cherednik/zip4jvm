@@ -23,7 +23,8 @@ import java.util.Comparator;
 import java.util.function.BooleanSupplier;
 
 /**
- * Represents one single entry in zip archive, i.e. one instance of {@link LocalFileHeader} and related {@link ru.olegcherednik.zip4jvm.model.CentralDirectory.FileHeader}.
+ * Represents one single entry in zip archive, i.e. one instance of {@link LocalFileHeader} and related {@link
+ * ru.olegcherednik.zip4jvm.model.CentralDirectory.FileHeader}.
  *
  * @author Oleg Cherednik
  * @since 26.07.2019
@@ -44,6 +45,7 @@ public abstract class ZipEntry {
     protected final Compression compression;
     private final CompressionLevel compressionLevel;
     protected final Encryption encryption;
+    @Getter(AccessLevel.NONE)
     private final ZipEntryInputStreamSupplier inputStreamSup;
 
     /**
@@ -80,7 +82,7 @@ public abstract class ZipEntry {
         return encryption != Encryption.OFF;
     }
 
-    public InputStream getIn() throws IOException {
+    public InputStream getInputStream() throws IOException {
         return inputStreamSup.get(this);
     }
 
@@ -108,7 +110,7 @@ public abstract class ZipEntry {
     @NonNull
     public final ZipFile.Entry createImmutableEntry() {
         return ZipFile.Entry.builder()
-                            .inputStreamSup(this::getIn)
+                            .inputStreamSup(this::getInputStream)
                             .fileName(ZipUtils.getFileNameNoDirectoryMarker(fileName))
                             .lastModifiedTime(lastModifiedTime)
                             .externalFileAttributes(externalFileAttributes)

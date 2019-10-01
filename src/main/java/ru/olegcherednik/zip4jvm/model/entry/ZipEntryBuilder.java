@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.ZipFile;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.io.in.SplitZipInputStream;
 import ru.olegcherednik.zip4jvm.io.in.entry.EntryInputStream;
@@ -17,8 +16,6 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
-
-import java.io.IOException;
 
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_ENTRY_SIZE;
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_LOCAL_FILE_HEADER_OFFS;
@@ -46,25 +43,21 @@ public final class ZipEntryBuilder {
         private final ZipEntrySettings entrySettings;
 
         public ZipEntry build() {
-            try {
-                boolean regularFile = entry.isRegularFile();
-                ZipEntry zipEntry = regularFile ? createRegularFileEntry() : createDirectoryEntry();
-                zipEntry.setComment(entrySettings.getComment());
-                zipEntry.setUtf8(entrySettings.isUtf8());
-                return zipEntry;
-            } catch(IOException e) {
-                throw new Zip4jvmException(e);
-            }
+            boolean regularFile = entry.isRegularFile();
+            ZipEntry zipEntry = regularFile ? createRegularFileEntry() : createDirectoryEntry();
+            zipEntry.setComment(entrySettings.getComment());
+            zipEntry.setUtf8(entrySettings.isUtf8());
+            return zipEntry;
         }
 
-        private ZipEntry createDirectoryEntry() throws IOException {
+        private ZipEntry createDirectoryEntry() {
             String fileName = ZipUtils.getFileName(entry.getFileName(), false);
             int lastModifiedTime = ZipUtils.javaToDosTime(entry.getLastModifiedTime());
             ExternalFileAttributes externalFileAttributes = entry.getExternalFileAttributes();
             return new DirectoryZipEntry(fileName, lastModifiedTime, externalFileAttributes);
         }
 
-        private ZipEntry createRegularFileEntry() throws IOException {
+        private ZipEntry createRegularFileEntry() {
             String fileName = ZipUtils.getFileName(entry.getFileName(), true);
             int lastModifiedTime = ZipUtils.javaToDosTime(entry.getLastModifiedTime());
             ExternalFileAttributes externalFileAttributes = entry.getExternalFileAttributes();
