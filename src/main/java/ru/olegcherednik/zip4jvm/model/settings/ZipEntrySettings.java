@@ -93,8 +93,8 @@ public final class ZipEntrySettings {
         }
 
         public ZipEntrySettings.Builder comment(String comment) {
-            if (StringUtils.length(comment) > ZipModel.MAX_COMMENT_LENGTH)
-                throw new IllegalArgumentException("Entry comment should not exceed '" + ZipModel.MAX_COMMENT_LENGTH + "' in length");
+            if (StringUtils.length(comment) > ZipModel.MAX_COMMENT_SIZE)
+                throw new IllegalArgumentException("Entry comment should not exceed '" + ZipModel.MAX_COMMENT_SIZE + "' in length");
 
             this.comment = comment;
             return this;

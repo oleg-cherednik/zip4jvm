@@ -1,12 +1,10 @@
 package ru.olegcherednik.zip4jvm.io.in;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 
 /**
@@ -17,13 +15,8 @@ public class LittleEndianReadFile implements DataInputFile {
 
     private final RandomAccessFile in;
 
-    public LittleEndianReadFile(Path path) throws FileNotFoundException {
-        in = new RandomAccessFile(path.toFile(), "r");
-    }
-
-    @Override
-    public String readString(byte[] buf, Charset charset) {
-        return ArrayUtils.isEmpty(buf) ? null : new String(buf, charset);
+    public LittleEndianReadFile(Path file) throws FileNotFoundException {
+        in = new RandomAccessFile(file.toFile(), "r");
     }
 
     @Override

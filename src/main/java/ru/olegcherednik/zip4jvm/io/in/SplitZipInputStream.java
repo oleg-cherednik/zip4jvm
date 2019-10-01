@@ -17,11 +17,7 @@ public class SplitZipInputStream extends BaseDataInput {
     protected final ZipModel zipModel;
     private long disk;
 
-    public static SplitZipInputStream create(ZipModel zipModel, long disk) throws IOException {
-        return new SplitZipInputStream(zipModel, disk);
-    }
-
-    private SplitZipInputStream(ZipModel zipModel, long disk) throws IOException {
+    public SplitZipInputStream(ZipModel zipModel, long disk) throws IOException {
         this.zipModel = zipModel;
         this.disk = disk;
         delegate = new LittleEndianReadFile(zipModel.getPartFile(disk));

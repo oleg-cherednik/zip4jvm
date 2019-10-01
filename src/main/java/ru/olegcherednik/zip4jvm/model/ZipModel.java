@@ -16,17 +16,6 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * zip64:
- * <ul>
- * <li>Number of Files Inside an Archive - 65,535 <b>(implemented)</b></li>
- * <li>Size of a File Inside an Archive [bytes] - 4,294,967,295 <b>(implemented)</b></li>
- * <li>Size of an Archive [bytes] - 4,294,967,295 <b>(not implemented)</b></li>
- * <li>Number of Segments in a Segmented Archive - 999 (spanning), 65,535 (splitting) <b>(implemented for splitting)</b></li>
- * <li>Central Directory Size [bytes] - 4,294,967,295 <b>(not implemented)</b></li>
- * </ul>
- * <p>
- * http://www.artpol-software.com/ZipArchive/KB/0610051629.aspx#limits
- *
  * @author Oleg Cherednik
  * @since 10.03.2019
  */
@@ -38,10 +27,12 @@ public class ZipModel {
     public static final int NO_SPLIT = -1;
     public static final int MIN_SPLIT_SIZE = 64 * 1024; // 64Kb
 
-    public static final int MAX_TOTAL_ENTRIES = Zip64.LIMIT_INT;
-    public static final long MAX_ENTRY_SIZE = Zip64.LIMIT;
-    public static final int MAX_TOTAL_DISKS = Zip64.LIMIT_INT;
-    public static final int MAX_COMMENT_LENGTH = Zip64.LIMIT_INT;
+    public static final int MAX_TOTAL_ENTRIES = Zip64.LIMIT_WORD;
+    public static final long MAX_ENTRY_SIZE = Zip64.LIMIT_DWORD;
+    public static final long MAX_CENTRAL_DIRECTORY_OFFS = Zip64.LIMIT_DWORD;
+    public static final long MAX_LOCAL_FILE_HEADER_OFFS = Zip64.LIMIT_DWORD;
+    public static final int MAX_TOTAL_DISKS = Zip64.LIMIT_WORD;
+    public static final int MAX_COMMENT_SIZE = Zip64.LIMIT_WORD;
 
     private final Path file;
     private long splitSize = NO_SPLIT;
@@ -52,12 +43,6 @@ public class ZipModel {
     private long centralDirectoryOffs;
     private long centralDirectorySize;
 
-    public void setComment(String comment) {
-        if (StringUtils.length(comment) > MAX_COMMENT_LENGTH)
-            throw new IllegalArgumentException("File comment should be " + MAX_COMMENT_LENGTH + " characters maximum");
-        this.comment = StringUtils.isEmpty(comment) ? null : comment;
-    }
-
     /**
      * {@literal true} only if section {@link Zip64} exists. In other words, do set this to {@code true}, to write zip archive
      * in ZIP64 format.
@@ -67,8 +52,10 @@ public class ZipModel {
     @Getter(AccessLevel.NONE)
     private final Map<String, ZipEntry> fileNameEntry = new LinkedHashMap<>();
 
-    public void setSplitSize(long splitSize) {
-        this.splitSize = splitSize <= 0 ? NO_SPLIT : Math.max(MIN_SPLIT_SIZE, splitSize);
+    public void setComment(String comment) {
+        if (StringUtils.length(comment) > MAX_COMMENT_SIZE)
+            throw new IllegalArgumentException("File comment should be " + MAX_COMMENT_SIZE + " characters maximum");
+        this.comment = StringUtils.isEmpty(comment) ? null : comment;
     }
 
     public boolean isSplit() {

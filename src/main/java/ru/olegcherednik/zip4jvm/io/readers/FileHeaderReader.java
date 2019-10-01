@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import static ru.olegcherednik.zip4jvm.model.ExternalFileAttributes.PROP_OS_NAME;
+
 /**
  * @author Oleg Cherednik
  * @since 26.04.2019
@@ -53,7 +55,7 @@ final class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader>
         fileHeader.setDisk(in.readWord());
         fileHeader.setInternalFileAttributes(getInternalFileAttribute(in.readBytes(InternalFileAttributes.SIZE)));
         fileHeader.setExternalFileAttributes(getExternalFileAttribute(in.readBytes(ExternalFileAttributes.SIZE)));
-        fileHeader.setOffsLocalFileHeader(in.readDword());
+        fileHeader.setLocalFileHeaderOffs(in.readDword());
         fileHeader.setFileName(in.readString(fileNameLength, fileHeader.getGeneralPurposeFlag().getCharset()));
         fileHeader.setExtraField(ExtraFieldReader.build(extraFieldLength, fileHeader).read(in));
         fileHeader.setComment(in.readString(fileCommentLength, fileHeader.getGeneralPurposeFlag().getCharset()));
@@ -63,12 +65,12 @@ final class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader>
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")
     private static InternalFileAttributes getInternalFileAttribute(byte[] data) {
-        return InternalFileAttributes.createDataBasedDelegate(data);
+        return InternalFileAttributes.build(data);
     }
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")
-    private static ExternalFileAttributes getExternalFileAttribute(byte[] data) {
-        return ExternalFileAttributes.createDataBasedDelegate(data);
+    private static ExternalFileAttributes getExternalFileAttribute(byte[] data) throws IOException {
+        return ExternalFileAttributes.build(PROP_OS_NAME).readFrom(data);
     }
 
 }

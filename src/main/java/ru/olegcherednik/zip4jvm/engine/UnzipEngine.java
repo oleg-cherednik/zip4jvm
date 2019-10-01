@@ -13,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -117,14 +118,27 @@ public final class UnzipEngine implements ZipFile.Reader {
 
         if (zipEntry.isDirectory())
             Files.createDirectories(file);
-        else {
-            ZipUtils.copyLarge(zipEntry.getIn(), getOutputStream(file));
-            // TODO should be uncommented
-//            setFileAttributes(file, zipEntry);
-//            setFileLastModifiedTime(file, fileHeader);
+        else
+            ZipUtils.copyLarge(zipEntry.getInputStream(), getOutputStream(file));
+
+        setFileAttributes(file, zipEntry);
+        setFileLastModifiedTime(file, zipEntry);
+    }
+
+    private static void setFileLastModifiedTime(Path path, ZipEntry zipEntry) {
+        try {
+            long lastModifiedTime = ZipUtils.dosToJavaTime(zipEntry.getLastModifiedTime());
+            Files.setLastModifiedTime(path, FileTime.fromMillis(lastModifiedTime));
+        } catch(IOException ignored) {
         }
     }
 
+    private static void setFileAttributes(Path path, ZipEntry zipEntry) {
+        try {
+            zipEntry.getExternalFileAttributes().apply(path);
+        } catch(IOException ignored) {
+        }
+    }
 
     private static FileOutputStream getOutputStream(Path file) throws IOException {
         Path parent = file.getParent();

@@ -40,6 +40,8 @@ public interface DataOutput extends Closeable {
 
     long getWrittenBytesAmount(String id);
 
-    long getDisk();
+    default long getDisk() {
+        return 0;
+    }
 
 }

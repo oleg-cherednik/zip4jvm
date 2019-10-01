@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.model.builders;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -13,20 +12,11 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 @RequiredArgsConstructor
 public final class Zip64Builder {
 
-    @NonNull
     private final ZipModel zipModel;
     private final long disk;
 
-    public Zip64 create() {
-        Zip64 zip64 = Zip64.NULL;
-
-        if (zipModel.isZip64()) {
-            Zip64.EndCentralDirectory dir = createEndCentralDirectory();
-            Zip64.EndCentralDirectoryLocator locator = createLocator();
-            zip64 = Zip64.of(locator, dir);
-        }
-
-        return zip64;
+    public Zip64 build() {
+        return zipModel.isZip64() ? Zip64.of(createLocator(), createEndCentralDirectory()) : Zip64.NULL;
     }
 
     private Zip64.EndCentralDirectoryLocator createLocator() {
@@ -42,11 +32,11 @@ public final class Zip64Builder {
         endCentralDirectory.setEndCentralDirectorySize(getEndCentralDirectorySize());
         endCentralDirectory.setVersionMadeBy(CentralDirectory.FileHeader.VERSION);
         endCentralDirectory.setVersionNeededToExtract(CentralDirectory.FileHeader.VERSION);
-        endCentralDirectory.setDisk(zipModel.getTotalDisks());
+        endCentralDirectory.setTotalDisks(zipModel.getTotalDisks());
         endCentralDirectory.setMainDisk(zipModel.getMainDisk());
         endCentralDirectory.setDiskEntries(countNumberOfFileHeaderEntriesOnDisk());
         endCentralDirectory.setTotalEntries(zipModel.getTotalEntries());
-        endCentralDirectory.setSize(zipModel.getCentralDirectorySize());
+        endCentralDirectory.setCentralDirectorySize(zipModel.getCentralDirectorySize());
         endCentralDirectory.setCentralDirectoryOffs(zipModel.getCentralDirectoryOffs());
         endCentralDirectory.setExtensibleDataSector(new byte[getExtensibleDataSectorSize()]);
         return endCentralDirectory;

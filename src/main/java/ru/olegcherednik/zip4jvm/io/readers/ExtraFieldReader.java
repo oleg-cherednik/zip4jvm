@@ -31,7 +31,7 @@ final class ExtraFieldReader implements Reader<ExtraField> {
     public static ExtraFieldReader build(int size, CentralDirectory.FileHeader fileHeader) {
         boolean uncompressedSize = fileHeader.getUncompressedSize() == LOOK_IN_EXTRA_FIELD;
         boolean compressedSize = fileHeader.getCompressedSize() == LOOK_IN_EXTRA_FIELD;
-        boolean offs = fileHeader.getOffsLocalFileHeader() == LOOK_IN_EXTRA_FIELD;
+        boolean offs = fileHeader.getLocalFileHeaderOffs() == LOOK_IN_EXTRA_FIELD;
         boolean disk = fileHeader.getDisk() == ZipModel.MAX_TOTAL_DISKS;
 
         Map<Integer, Reader<? extends ExtraField.Record>> map = new HashMap<>();

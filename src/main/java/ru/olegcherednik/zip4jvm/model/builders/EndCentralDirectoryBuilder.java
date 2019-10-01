@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.model.builders;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -13,17 +12,15 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 @RequiredArgsConstructor
 public final class EndCentralDirectoryBuilder {
 
-    @NonNull
     private final ZipModel zipModel;
 
-    @NonNull
-    public EndCentralDirectory create() {
+    public EndCentralDirectory build() {
         EndCentralDirectory endCentralDirectory = new EndCentralDirectory();
         endCentralDirectory.setTotalDisks(getTotalDisks());
         endCentralDirectory.setMainDisk(getTotalDisks());
         endCentralDirectory.setDiskEntries(getDiskEntries());
         endCentralDirectory.setTotalEntries(getTotalEntries());
-        endCentralDirectory.setCentralDirectorySize(zipModel.getCentralDirectorySize());
+        endCentralDirectory.setCentralDirectorySize(getCentralDirectorySize());
         endCentralDirectory.setCentralDirectoryOffs(getCentralDirectoryOffs());
         endCentralDirectory.setComment(zipModel.getComment());
         return endCentralDirectory;
@@ -41,8 +38,12 @@ public final class EndCentralDirectoryBuilder {
         return zipModel.isZip64() ? ZipModel.MAX_TOTAL_ENTRIES : zipModel.getTotalEntries();
     }
 
+    private long getCentralDirectorySize() {
+        return zipModel.isZip64() ? Zip64.LIMIT_DWORD : zipModel.getCentralDirectorySize();
+    }
+
     private long getCentralDirectoryOffs() {
-        return zipModel.isZip64() ? Zip64.LIMIT : zipModel.getCentralDirectoryOffs();
+        return zipModel.isZip64() ? Zip64.LIMIT_DWORD : zipModel.getCentralDirectoryOffs();
     }
 
 }

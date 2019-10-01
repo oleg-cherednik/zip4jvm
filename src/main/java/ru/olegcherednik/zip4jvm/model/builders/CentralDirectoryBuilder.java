@@ -1,9 +1,8 @@
 package ru.olegcherednik.zip4jvm.model.builders;
 
+import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,8 +18,7 @@ public final class CentralDirectoryBuilder {
 
     private final Collection<ZipEntry> entries;
 
-    @NonNull
-    public CentralDirectory create() throws IOException {
+    public CentralDirectory build() throws IOException {
         CentralDirectory centralDirectory = new CentralDirectory();
         centralDirectory.setFileHeaders(createFileHeaders());
         centralDirectory.setDigitalSignature(null);
@@ -31,7 +29,7 @@ public final class CentralDirectoryBuilder {
         List<CentralDirectory.FileHeader> fileHeaders = new ArrayList<>(entries.size());
 
         for (ZipEntry entry : entries)
-            fileHeaders.add(new FileHeaderBuilder(entry).create());
+            fileHeaders.add(new FileHeaderBuilder(entry).build());
 
         return fileHeaders;
     }

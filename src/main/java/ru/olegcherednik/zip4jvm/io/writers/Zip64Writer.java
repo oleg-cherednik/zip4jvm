@@ -36,11 +36,11 @@ final class Zip64Writer implements Writer {
             out.writeQword(endCentralDirectory.getEndCentralDirectorySize());
             out.writeWord(endCentralDirectory.getVersionMadeBy());
             out.writeWord(endCentralDirectory.getVersionNeededToExtract());
-            out.writeDword(endCentralDirectory.getDisk());
+            out.writeDword(endCentralDirectory.getTotalDisks());
             out.writeDword(endCentralDirectory.getMainDisk());
             out.writeQword(endCentralDirectory.getDiskEntries());
             out.writeQword(endCentralDirectory.getTotalEntries());
-            out.writeQword(endCentralDirectory.getSize());
+            out.writeQword(endCentralDirectory.getCentralDirectorySize());
             out.writeQword(endCentralDirectory.getCentralDirectoryOffs());
             out.writeBytes(endCentralDirectory.getExtensibleDataSector());
         }
@@ -78,8 +78,8 @@ final class Zip64Writer implements Writer {
                 out.writeQword(info.getUncompressedSize());
             if (info.getCompressedSize() != ExtraField.NO_DATA)
                 out.writeQword(info.getCompressedSize());
-            if (info.getOffsLocalHeaderRelative() != ExtraField.NO_DATA)
-                out.writeQword(info.getOffsLocalHeaderRelative());
+            if (info.getLocalFileHeaderOffs() != ExtraField.NO_DATA)
+                out.writeQword(info.getLocalFileHeaderOffs());
             if (info.getDisk() != ExtraField.NO_DATA)
                 out.writeDword(info.getDisk());
         }

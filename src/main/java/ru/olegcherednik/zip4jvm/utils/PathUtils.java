@@ -2,17 +2,14 @@ package ru.olegcherednik.zip4jvm.utils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import ru.olegcherednik.zip4jvm.exception.PathNotExistsException;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
-import java.util.function.ToIntFunction;
 
 /**
  * @author Oleg Cherednik
@@ -21,14 +18,10 @@ import java.util.function.ToIntFunction;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PathUtils {
 
-    private static final Comparator<Path> SORT_DIR_FIRST = Comparator.comparingInt((ToIntFunction<Path>)path -> Files.isDirectory(path) ? 0 : 1)
-                                                                     .thenComparing(Path::compareTo);
-
-    @NonNull
-    public static Map<Path, String> getRelativeContent(@NonNull Collection<Path> paths) throws IOException {
+    public static Map<Path, String> getRelativeContent(Collection<Path> paths) throws IOException {
         requireExistedPaths(paths);
 
-        Map<Path, String> pathFileName = new TreeMap<>(SORT_DIR_FIRST);
+        Map<Path, String> pathFileName = new LinkedHashMap<>();
 
         for (Path path : paths) {
             if (Files.isRegularFile(path))

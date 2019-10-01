@@ -31,6 +31,8 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import static ru.olegcherednik.zip4jvm.model.ExternalFileAttributes.PROP_OS_NAME;
+
 /**
  * @author Oleg Cherednik
  * @since 01.09.2019
@@ -134,7 +136,7 @@ public final class ZipFile {
                     .inputStreamSup(Files.isRegularFile(path) ? () -> new FileInputStream(path.toFile()) : EmptyInputStreamSupplier.INSTANCE)
                     .fileName(fileName)
                     .lastModifiedTime(Files.getLastModifiedTime(path).toMillis())
-                    .externalFileAttributes(ExternalFileAttributes.createOperationBasedDelegate(path, () -> System.getProperty("os.name")))
+                    .externalFileAttributes(ExternalFileAttributes.build(PROP_OS_NAME).readFrom(path))
                     .regularFile(Files.isRegularFile(path)).build();
         }
 

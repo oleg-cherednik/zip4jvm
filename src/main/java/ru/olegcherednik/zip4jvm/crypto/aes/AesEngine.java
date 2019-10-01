@@ -103,8 +103,4 @@ public final class AesEngine {
         return Encryption.OFF;
     }
 
-    public static long getCompressedSize(long uncompressedSize, AesStrength strength) {
-        return uncompressedSize + strength.saltLength() + MAC_SIZE + PASSWORD_CHECKSUM_SIZE;
-    }
-
 }

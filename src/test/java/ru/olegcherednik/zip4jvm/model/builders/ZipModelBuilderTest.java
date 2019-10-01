@@ -15,7 +15,7 @@ import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolid;
 public class ZipModelBuilderTest {
 
     public void shouldThrowExceptionWhenCreateModelForExistedFile() {
-        assertThatThrownBy(() -> ZipModelBuilder.create(zipStoreSolid, ZipFileSettings.DEFAULT)).isExactlyInstanceOf(Zip4jvmException.class);
+        assertThatThrownBy(() -> ZipModelBuilder.build(zipStoreSolid, ZipFileSettings.DEFAULT)).isExactlyInstanceOf(Zip4jvmException.class);
     }
 
 }

@@ -11,7 +11,7 @@ import ru.olegcherednik.zip4jvm.exception.RealBigZip64NotSupportedException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Calendar;
+import java.util.Date;
 
 /**
  * @author Oleg CHerednik
@@ -20,31 +20,30 @@ import java.util.Calendar;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ZipUtils {
 
-    public static int javaToDosTime(long time) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(time);
+    private static final int DOSTIME_BEFORE_1980 = (1 << 21) | (1 << 16);
 
-        int year = cal.get(Calendar.YEAR);
-        if (year < 1980) {
-            return (1 << 21) | (1 << 16);
-        }
-        return (year - 1980) << 25 | (cal.get(Calendar.MONTH) + 1) << 21 |
-                cal.get(Calendar.DATE) << 16 | cal.get(Calendar.HOUR_OF_DAY) << 11 | cal.get(Calendar.MINUTE) << 5 |
-                cal.get(Calendar.SECOND) >> 1;
+    /*
+     * @see {@link java.util.zip.ZipUtils#javaToDosTime(long)}
+     */
+    @SuppressWarnings("deprecation")
+    public static int javaToDosTime(long time) {
+        Date date = new Date(time);
+        int year = date.getYear() + 1900;
+
+        if (year < 1980)
+            return DOSTIME_BEFORE_1980;
+
+        return (year - 1980) << 25 | (date.getMonth() + 1) << 21 | date.getDate() << 16 | date.getHours() << 11
+                | date.getMinutes() << 5 | date.getSeconds() >> 1;
     }
 
-    public static long dosToJavaTme(int dosTime) {
-        int sec = 2 * (dosTime & 0x1f);
-        int min = (dosTime >> 5) & 0x3f;
-        int hrs = (dosTime >> 11) & 0x1f;
-        int day = (dosTime >> 16) & 0x1f;
-        int mon = ((dosTime >> 21) & 0xf) - 1;
-        int year = ((dosTime >> 25) & 0x7f) + 1980;
-
-        Calendar cal = Calendar.getInstance();
-        cal.set(year, mon, day, hrs, min, sec);
-        cal.set(Calendar.MILLISECOND, 0);
-        return cal.getTime().getTime();
+    /*
+     * @see {@link java.util.zip.ZipUtils#dosToJavaTime(long)}
+     */
+    @SuppressWarnings({ "deprecation", "MagicConstant" })
+    public static long dosToJavaTime(int dtime) {
+        return new Date(((dtime >> 25) & 0x7F) + 80, ((dtime >> 21) & 0x0F) - 1, (dtime >> 16) & 0x1F, (dtime >> 11) & 0x1F,
+                (dtime >> 5) & 0x3F, (dtime << 1) & 0x3E).getTime();
     }
 
     public static void requirePositive(long value, String type) {

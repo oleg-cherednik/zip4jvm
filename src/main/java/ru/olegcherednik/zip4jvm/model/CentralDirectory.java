@@ -58,7 +58,7 @@ public class CentralDirectory {
         // size:4 - external file attributes
         private ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.NULL;
         // size:4 - relative offset of local header
-        private long offsLocalFileHeader;
+        private long localFileHeaderOffs;
         // size:n - file name
         private String fileName;
         // size:m - extra field
@@ -103,7 +103,7 @@ public class CentralDirectory {
         }
 
         public boolean isWriteZip64OffsetLocalHeader() {
-            return offsLocalFileHeader > Zip64.LIMIT;
+            return localFileHeaderOffs > Zip64.LIMIT_DWORD;
         }
 
         @Override

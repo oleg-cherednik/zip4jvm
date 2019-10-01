@@ -3,9 +3,7 @@ package ru.olegcherednik.zip4jvm.io.out;
 import ru.olegcherednik.zip4jvm.io.writers.ZipModelWriter;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Path;
 
 /**
  * @author Oleg Cherednik
@@ -13,18 +11,8 @@ import java.nio.file.Path;
  */
 public class SingleZipOutputStream extends BaseDataOutput {
 
-    public static SingleZipOutputStream create(ZipModel zipModel) throws IOException {
-        return new SingleZipOutputStream(zipModel.getFile(), zipModel);
-    }
-
-    private SingleZipOutputStream(Path zip, ZipModel zipModel) throws FileNotFoundException {
+    public SingleZipOutputStream(ZipModel zipModel) throws IOException {
         super(zipModel);
-        createFile(zip);
-    }
-
-    @Override
-    public long getDisk() {
-        return 0;
     }
 
     @Override

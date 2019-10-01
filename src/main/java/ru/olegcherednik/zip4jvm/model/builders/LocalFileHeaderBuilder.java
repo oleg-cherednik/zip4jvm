@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.model.builders;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Encryption;
@@ -18,32 +17,30 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 public final class LocalFileHeaderBuilder {
 
     public static final long LOOK_IN_DATA_DESCRIPTOR = 0;
-    public static final long LOOK_IN_EXTRA_FIELD = Zip64.LIMIT;
+    public static final long LOOK_IN_EXTRA_FIELD = Zip64.LIMIT_DWORD;
 
-    @NonNull
-    private final ZipEntry entry;
+    private final ZipEntry zipEntry;
 
-    @NonNull
-    public LocalFileHeader create() {
+    public LocalFileHeader build() {
         LocalFileHeader localFileHeader = new LocalFileHeader();
         localFileHeader.setVersionToExtract(CentralDirectory.FileHeader.VERSION);
         localFileHeader.setGeneralPurposeFlag(createGeneralPurposeFlag());
-        localFileHeader.setCompressionMethod(entry.getEncryption().getCompressionMethod().apply(entry.getCompression()));
-        localFileHeader.setLastModifiedTime(entry.getLastModifiedTime());
+        localFileHeader.setCompressionMethod(zipEntry.getEncryption().getCompressionMethod().apply(zipEntry.getCompression()));
+        localFileHeader.setLastModifiedTime(zipEntry.getLastModifiedTime());
         localFileHeader.setCrc32(getCrc32());
-        localFileHeader.setCompressedSize(getSize(entry.getCompressedSize()));
-        localFileHeader.setUncompressedSize(getSize(entry.getUncompressedSize()));
-        localFileHeader.setFileName(entry.getFileName());
+        localFileHeader.setCompressedSize(getSize(zipEntry.getCompressedSize()));
+        localFileHeader.setUncompressedSize(getSize(zipEntry.getUncompressedSize()));
+        localFileHeader.setFileName(zipEntry.getFileName());
         localFileHeader.setExtraField(createExtraField());
         return localFileHeader;
     }
 
     private GeneralPurposeFlag createGeneralPurposeFlag() {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
-        generalPurposeFlag.setCompressionLevel(entry.getCompressionLevel());
-        generalPurposeFlag.setDataDescriptorAvailable(entry.isDataDescriptorAvailable());
-        generalPurposeFlag.setUtf8(entry.isUtf8());
-        generalPurposeFlag.setEncrypted(entry.getEncryption() != Encryption.OFF);
+        generalPurposeFlag.setCompressionLevel(zipEntry.getCompressionLevel());
+        generalPurposeFlag.setDataDescriptorAvailable(zipEntry.isDataDescriptorAvailable());
+        generalPurposeFlag.setUtf8(zipEntry.isUtf8());
+        generalPurposeFlag.setEncrypted(zipEntry.getEncryption() != Encryption.OFF);
 //        generalPurposeFlag.setStrongEncryption(entry.getEncryption() == Encryption.STRONG);
         generalPurposeFlag.setStrongEncryption(false);
 
@@ -53,31 +50,29 @@ public final class LocalFileHeaderBuilder {
     private ExtraField createExtraField() {
         return ExtraField.builder()
                          .addRecord(createExtendedInfo())
-                         .addRecord(new AesExtraDataRecordBuilder(entry).create()).build();
+                         .addRecord(new AesExtraDataRecordBuilder(zipEntry).build()).build();
     }
 
     private Zip64.ExtendedInfo createExtendedInfo() {
-        if (entry.isDataDescriptorAvailable())
+        if (zipEntry.isDataDescriptorAvailable())
             return Zip64.ExtendedInfo.NULL;
-        if (entry.isZip64())
+        if (zipEntry.isZip64())
             return Zip64.ExtendedInfo.builder()
-                                     .compressedSize(entry.getCompressedSize())
-                                     .uncompressedSize(entry.getUncompressedSize())
-//                                     .offsLocalHeaderRelative(entry.getLocalFileHeaderOffs())
-                                     .build();
+                                     .compressedSize(zipEntry.getCompressedSize())
+                                     .uncompressedSize(zipEntry.getUncompressedSize()).build();
         return Zip64.ExtendedInfo.NULL;
     }
 
     private long getCrc32() {
-        if (entry.isDataDescriptorAvailable())
+        if (zipEntry.isDataDescriptorAvailable())
             return LOOK_IN_DATA_DESCRIPTOR;
-        return entry.getEncryption().getChecksum().apply(entry);
+        return zipEntry.getEncryption().getChecksum().apply(zipEntry);
     }
 
     private long getSize(long size) {
-        if (entry.isDataDescriptorAvailable())
+        if (zipEntry.isDataDescriptorAvailable())
             return LOOK_IN_DATA_DESCRIPTOR;
-        if (entry.isZip64())
+        if (zipEntry.isZip64())
             return LOOK_IN_EXTRA_FIELD;
         return size;
     }

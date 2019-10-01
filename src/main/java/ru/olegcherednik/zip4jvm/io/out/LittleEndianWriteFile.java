@@ -1,10 +1,8 @@
 package ru.olegcherednik.zip4jvm.io.out;
 
-import lombok.NonNull;
-
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -15,8 +13,9 @@ public class LittleEndianWriteFile implements DataOutputFile {
 
     private final RandomAccessFile out;
 
-    public LittleEndianWriteFile(@NonNull Path path) throws FileNotFoundException {
-        out = new RandomAccessFile(path.toFile(), "rw");
+    public LittleEndianWriteFile(Path file) throws IOException {
+        Files.createDirectories(file.getParent());
+        out = new RandomAccessFile(file.toFile(), "rw");
     }
 
     @Override

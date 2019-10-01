@@ -52,8 +52,8 @@ public final class ZipFileSettings {
         }
 
         public Builder comment(String comment) {
-            if (StringUtils.length(comment) > ZipModel.MAX_COMMENT_LENGTH)
-                throw new IllegalArgumentException("File comment should be " + ZipModel.MAX_COMMENT_LENGTH + " characters maximum");
+            if (StringUtils.length(comment) > ZipModel.MAX_COMMENT_SIZE)
+                throw new IllegalArgumentException("File comment should be " + ZipModel.MAX_COMMENT_SIZE + " characters maximum");
 
             this.comment = StringUtils.isEmpty(comment) ? null : comment;
             return this;

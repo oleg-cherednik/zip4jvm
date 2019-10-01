@@ -59,22 +59,22 @@ public class ExistedEntryWriter implements Writer {
 
     private static final class CopyEntryInputStream implements Closeable {
 
-        private final ZipEntry entry;
+        private final ZipEntry zipEntry;
         private final DataInput in;
 
-        public CopyEntryInputStream(ZipEntry entry, ZipModel zipModel) throws IOException {
-            this.entry = entry;
-            in = zipModel.isSplit() ? SplitZipInputStream.create(zipModel, entry.getDisk()) : new SingleZipInputStream(zipModel.getFile());
+        public CopyEntryInputStream(ZipEntry zipEntry, ZipModel zipModel) throws IOException {
+            this.zipEntry = zipEntry;
+            in = zipModel.isSplit() ? new SplitZipInputStream(zipModel, zipEntry.getDisk()) : new SingleZipInputStream(zipModel.getFile());
         }
 
         public void copyLocalFileHeader(DataOutput out) throws IOException {
-            LocalFileHeader localFileHeader = new LocalFileHeaderReader(entry.getLocalFileHeaderOffs()).read(in);
-            entry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
+            LocalFileHeader localFileHeader = new LocalFileHeaderReader(zipEntry.getLocalFileHeaderOffs()).read(in);
+            zipEntry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
             new LocalFileHeaderWriter(localFileHeader).write(out);
         }
 
         public void copyEncryptionHeaderAndData(DataOutput out) throws IOException {
-            long size = entry.getCompressedSize();
+            long size = zipEntry.getCompressedSize();
             byte[] buf = new byte[1024 * 4];
 
             while (size > 0) {
@@ -89,9 +89,9 @@ public class ExistedEntryWriter implements Writer {
         }
 
         public void copyDataDescriptor(DataOutput out) throws IOException {
-            if (entry.isDataDescriptorAvailable()) {
-                DataDescriptor dataDescriptor = DataDescriptorReader.get(entry.isZip64()).read(in);
-                DataDescriptorWriter.get(entry.isZip64(), dataDescriptor).write(out);
+            if (zipEntry.isDataDescriptorAvailable()) {
+                DataDescriptor dataDescriptor = DataDescriptorReader.get(zipEntry.isZip64()).read(in);
+                DataDescriptorWriter.get(zipEntry.isZip64(), dataDescriptor).write(out);
             }
         }
 

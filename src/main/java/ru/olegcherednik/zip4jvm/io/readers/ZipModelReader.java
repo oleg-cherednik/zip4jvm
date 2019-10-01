@@ -43,7 +43,7 @@ public final class ZipModelReader {
             long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
             CentralDirectory centralDirectory = new CentralDirectoryReader(offs, totalEntries).read(in);
 
-            return new ZipModelBuilder(zip, endCentralDirectory, zip64, centralDirectory).create();
+            return new ZipModelBuilder(zip, endCentralDirectory, zip64, centralDirectory).build();
         }
     }
 
