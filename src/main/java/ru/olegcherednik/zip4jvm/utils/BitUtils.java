@@ -28,10 +28,6 @@ public final class BitUtils {
     public static final int BIT14 = BIT6 << 8;
     public static final int BIT15 = BIT7 << 8;
 
-    public static long getByte(long val, int i) {
-        return (val >> i * 8) & 0xFF;
-    }
-
     /**
      * Checks if all bits of giving bit set are set or not
      *
@@ -43,8 +39,15 @@ public final class BitUtils {
         return (val & bits) == bits;
     }
 
+    /**
+     * Checks if all bits of giving bit set are clear or not
+     *
+     * @param val  checked value
+     * @param bits checked bit or bit set
+     * @return <code>true</code> if all selected bit(s) are clear
+     */
     public static boolean isBitClear(int val, int bits) {
-        return !isBitSet(val, bits);
+        return (val & bits) == 0;
     }
 
     /**
@@ -58,10 +61,6 @@ public final class BitUtils {
         return val | bits;
     }
 
-    public static short setBits(short val, int bits) {
-        return (short)setBits((int)val, bits);
-    }
-
     /**
      * Clear selected bit(s) in giving val
      *
@@ -73,16 +72,8 @@ public final class BitUtils {
         return val & ~bits;
     }
 
-    public static short clearBits(short val, int bits) {
-        return (short)clearBits((int)val, bits);
-    }
-
     public static int updateBits(int val, int bits, boolean value) {
         return value ? setBits(val, bits) : clearBits(val, bits);
-    }
-
-    public static short updateBits(short val, int bits, boolean value) {
-        return (short)updateBits((int)val, bits, value);
     }
 
     public static byte updateBits(byte val, int bits, boolean value) {

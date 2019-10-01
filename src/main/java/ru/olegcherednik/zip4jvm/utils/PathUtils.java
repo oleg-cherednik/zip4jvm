@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.utils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import ru.olegcherednik.zip4jvm.exception.PathNotExistsException;
 
 import java.io.IOException;
@@ -19,8 +18,7 @@ import java.util.Map;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PathUtils {
 
-    @NonNull
-    public static Map<Path, String> getRelativeContent(@NonNull Collection<Path> paths) throws IOException {
+    public static Map<Path, String> getRelativeContent(Collection<Path> paths) throws IOException {
         requireExistedPaths(paths);
 
         Map<Path, String> pathFileName = new LinkedHashMap<>();
