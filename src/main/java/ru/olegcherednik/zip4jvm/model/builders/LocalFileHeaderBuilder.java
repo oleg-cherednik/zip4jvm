@@ -59,9 +59,7 @@ public final class LocalFileHeaderBuilder {
         if (zipEntry.isZip64())
             return Zip64.ExtendedInfo.builder()
                                      .compressedSize(zipEntry.getCompressedSize())
-                                     .uncompressedSize(zipEntry.getUncompressedSize())
-                                     .localFileHeaderOffs(zipEntry.getLocalFileHeaderOffs())
-                                     .build();
+                                     .uncompressedSize(zipEntry.getUncompressedSize()).build();
         return Zip64.ExtendedInfo.NULL;
     }
 
