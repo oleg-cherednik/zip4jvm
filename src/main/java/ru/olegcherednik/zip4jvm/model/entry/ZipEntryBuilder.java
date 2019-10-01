@@ -35,6 +35,10 @@ public final class ZipEntryBuilder {
         return new EntryBased(entry, entrySettings).build();
     }
 
+    public static ZipEntry build(CentralDirectory.FileHeader fileHeader, ZipModel zipModel) {
+        return new FileHeaderBased(fileHeader, zipModel).build();
+    }
+
     @RequiredArgsConstructor
     private static final class EntryBased {
 
@@ -82,72 +86,79 @@ public final class ZipEntryBuilder {
         }
     }
 
-    public static ZipEntry build(CentralDirectory.FileHeader fileHeader, ZipModel zipModel) {
-        boolean dir = ZipUtils.isDirectory(fileHeader.getFileName());
-        ZipEntry zipEntry = dir ? createDirectoryEntry(fileHeader) : createRegularFileEntry(fileHeader, zipModel);
-        zipEntry.setChecksum(fileHeader.getCrc32());
-        zipEntry.setUncompressedSize(getUncompressedSize(fileHeader));
-        zipEntry.setCompressedSize(getCompressedSize(fileHeader));
-        zipEntry.setDisk(getDisk(fileHeader));
-        zipEntry.setLocalFileHeaderOffs(getLocalFileHeaderOffs(fileHeader));
-        return zipEntry;
+    @RequiredArgsConstructor
+    private static final class FileHeaderBased {
+
+        private final CentralDirectory.FileHeader fileHeader;
+        private final ZipModel zipModel;
+
+        public ZipEntry build() {
+            boolean regularFile = ZipUtils.isRegularFile(fileHeader.getFileName());
+            ZipEntry zipEntry = regularFile ? createRegularFileEntry() : createDirectoryEntry();
+            zipEntry.setChecksum(fileHeader.getCrc32());
+            zipEntry.setUncompressedSize(getUncompressedSize());
+            zipEntry.setCompressedSize(getCompressedSize());
+            zipEntry.setDisk(getDisk());
+            zipEntry.setLocalFileHeaderOffs(getLocalFileHeaderOffs());
+            return zipEntry;
+        }
+
+        private ZipEntry createRegularFileEntry() {
+            String fileName = ZipUtils.normalizeFileName(fileHeader.getFileName());
+            int lastModifiedTime = fileHeader.getLastModifiedTime();
+            Compression compression = fileHeader.getCompression();
+            CompressionLevel compressionLevel = fileHeader.getGeneralPurposeFlag().getCompressionLevel();
+            Encryption encryption = fileHeader.getEncryption();
+            ExternalFileAttributes externalFileAttributes = fileHeader.getExternalFileAttributes();
+
+            ZipEntryInputStreamSupplier inputStreamSup = createInputStreamSupplier();
+
+            RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, compression, compressionLevel,
+                    encryption, inputStreamSup);
+
+            zipEntry.setZip64(fileHeader.isZip64());
+            zipEntry.setComment(fileHeader.getComment());
+            zipEntry.setUtf8(fileHeader.getGeneralPurposeFlag().isUtf8());
+
+            return zipEntry;
+        }
+
+        private ZipEntry createDirectoryEntry() {
+            String fileName = ZipUtils.normalizeFileName(fileHeader.getFileName());
+            int lastModifiedTime = fileHeader.getLastModifiedTime();
+            ExternalFileAttributes externalFileAttributes = fileHeader.getExternalFileAttributes();
+            return new DirectoryZipEntry(fileName, lastModifiedTime, externalFileAttributes);
+        }
+
+        private ZipEntryInputStreamSupplier createInputStreamSupplier() {
+            if (zipModel.isSplit())
+                return zipEntry -> EntryInputStream.create(zipEntry, new SplitZipInputStream(zipModel, zipEntry.getDisk()));
+            return zipEntry -> EntryInputStream.create(zipEntry, new SingleZipInputStream(zipModel.getFile()));
+        }
+
+        private long getDisk() {
+            if (fileHeader.getDisk() == MAX_TOTAL_DISKS)
+                return fileHeader.getExtraField().getExtendedInfo().getDisk();
+            return fileHeader.getDisk();
+        }
+
+        private long getCompressedSize() {
+            if (fileHeader.getCompressedSize() == MAX_ENTRY_SIZE)
+                return fileHeader.getExtraField().getExtendedInfo().getCompressedSize();
+            return fileHeader.getCompressedSize();
+        }
+
+        private long getUncompressedSize() {
+            if (fileHeader.getUncompressedSize() == MAX_ENTRY_SIZE)
+                return fileHeader.getExtraField().getExtendedInfo().getUncompressedSize();
+            return fileHeader.getUncompressedSize();
+        }
+
+        private long getLocalFileHeaderOffs() {
+            if (fileHeader.getLocalFileHeaderOffs() == MAX_LOCAL_FILE_HEADER_OFFS)
+                return fileHeader.getExtraField().getExtendedInfo().getLocalFileHeaderOffs();
+            return fileHeader.getLocalFileHeaderOffs();
+        }
+
     }
-
-    private static ZipEntry createDirectoryEntry(CentralDirectory.FileHeader fileHeader) {
-        String fileName = ZipUtils.normalizeFileName(fileHeader.getFileName());
-        int lastModifiedTime = fileHeader.getLastModifiedTime();
-        ExternalFileAttributes externalFileAttributes = fileHeader.getExternalFileAttributes();
-        return new DirectoryZipEntry(fileName, lastModifiedTime, externalFileAttributes);
-    }
-
-    private static ZipEntry createRegularFileEntry(CentralDirectory.FileHeader fileHeader, ZipModel zipModel) {
-        String fileName = ZipUtils.normalizeFileName(fileHeader.getFileName());
-        int lastModifiedTime = fileHeader.getLastModifiedTime();
-        Compression compression = fileHeader.getCompression();
-        CompressionLevel compressionLevel = fileHeader.getGeneralPurposeFlag().getCompressionLevel();
-        Encryption encryption = fileHeader.getEncryption();
-        ExternalFileAttributes externalFileAttributes = fileHeader.getExternalFileAttributes();
-
-        ZipEntryInputStreamSupplier inputStreamSup = createInputStreamSupplier(zipModel);
-
-        RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, compression, compressionLevel,
-                encryption, inputStreamSup);
-
-        zipEntry.setZip64(fileHeader.isZip64());
-        zipEntry.setComment(fileHeader.getComment());
-        zipEntry.setUtf8(fileHeader.getGeneralPurposeFlag().isUtf8());
-
-        return zipEntry;
-    }
-
-    private static ZipEntryInputStreamSupplier createInputStreamSupplier(ZipModel zipModel) {
-        if (zipModel.isSplit())
-            return zipEntry -> EntryInputStream.create(zipEntry, new SplitZipInputStream(zipModel, zipEntry.getDisk()));
-        return zipEntry -> EntryInputStream.create(zipEntry, new SingleZipInputStream(zipModel.getFile()));
-    }
-
-    private static long getDisk(CentralDirectory.FileHeader fileHeader) {
-        if (fileHeader.getDisk() == MAX_TOTAL_DISKS)
-            return fileHeader.getExtraField().getExtendedInfo().getDisk();
-        return fileHeader.getDisk();
-    }
-
-    private static long getCompressedSize(CentralDirectory.FileHeader fileHeader) {
-        if (fileHeader.getCompressedSize() == MAX_ENTRY_SIZE)
-            return fileHeader.getExtraField().getExtendedInfo().getCompressedSize();
-        return fileHeader.getCompressedSize();
-    }
-
-    private static long getUncompressedSize(CentralDirectory.FileHeader fileHeader) {
-        if (fileHeader.getUncompressedSize() == MAX_ENTRY_SIZE)
-            return fileHeader.getExtraField().getExtendedInfo().getUncompressedSize();
-        return fileHeader.getUncompressedSize();
-    }
-
-    private static long getLocalFileHeaderOffs(CentralDirectory.FileHeader fileHeader) {
-        if (fileHeader.getLocalFileHeaderOffs() == MAX_LOCAL_FILE_HEADER_OFFS)
-            return fileHeader.getExtraField().getExtendedInfo().getLocalFileHeaderOffs();
-        return fileHeader.getLocalFileHeaderOffs();
-    }
-
 }
