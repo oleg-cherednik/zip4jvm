@@ -34,7 +34,7 @@ public final class ExtraField {
     }
 
     private ExtraField(Builder builder) {
-        map = builder.map.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(builder.map);
+        map = Collections.unmodifiableMap(builder.map);
     }
 
     public Zip64.ExtendedInfo getExtendedInfo() {
@@ -90,7 +90,7 @@ public final class ExtraField {
 
             @Override
             public void write(DataOutput out) throws IOException {
-                out.writeWordSignature(Zip64.ExtendedInfo.SIGNATURE);
+                out.writeWordSignature(signature);
                 out.writeWord(data.length);
                 out.write(data, 0, data.length);
             }
