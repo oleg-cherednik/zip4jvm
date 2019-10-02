@@ -45,7 +45,7 @@ public class ZipFolderNoSplitTest {
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
                                                   .build();
-        ZipIt.add(zip, dirCars, settings);
+        ZipIt.zip(zip).settings(settings).add(dirCars);
 
         Zip4jvmAssertions.assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
         Zip4jvmAssertions.assertThatZipFile(zip).exists().root().hasDirectories(1).hasFiles(0);
@@ -82,7 +82,7 @@ public class ZipFolderNoSplitTest {
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
                                                   .build();
-        ZipIt.add(zip, dirEmpty, settings);
+        ZipIt.zip(zip).settings(settings).add(dirEmpty);
 
         Zip4jvmAssertions.assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
         Zip4jvmAssertions.assertThatZipFile(zip).exists().root().hasDirectories(3).hasFiles(0);

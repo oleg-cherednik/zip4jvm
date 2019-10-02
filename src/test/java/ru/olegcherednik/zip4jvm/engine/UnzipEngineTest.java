@@ -157,7 +157,7 @@ public class UnzipEngineTest {
         Files.setLastModifiedTime(file, FileTime.fromMillis(convert(str)));
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt.add(zip, file);
+        ZipIt.zip(zip).add(file);
 
         Path unzipDir = destDir.resolve("unzip");
         UnzipIt.extract(zip, unzipDir);

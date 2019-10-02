@@ -64,7 +64,7 @@ public class EncryptionPkwareTest {
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        ZipIt.add(zip, contentDirSrc, settings);
+        ZipIt.zip(zip).settings(settings).add(contentDirSrc);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
         assertThatZipFile(zip, password).exists().root().matches(zipDirRootAssert);
     }
@@ -79,7 +79,7 @@ public class EncryptionPkwareTest {
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        ZipIt.add(zip, filesDirCars, settings);
+        ZipIt.zip(zip).settings(settings).add(filesDirCars);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
         assertThatZipFile(zip, password).exists().root().hasDirectories(0).hasFiles(3);
         assertThatZipFile(zip, password).root().matches(zipDirCarsAssert);

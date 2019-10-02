@@ -62,7 +62,7 @@ public class ZipIt64Test {
         ZipFileSettings settings = ZipFileSettings.builder().zip64(true).build();
 
         zipSimple = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt.add(zipSimple, contentDirSrc, settings);
+        ZipIt.zip(zipSimple).settings(settings).add(contentDirSrc);
 
         assertThatDirectory(zipSimple.getParent()).exists().hasDirectories(0).hasFiles(1);
         assertThatZipFile(zipSimple).root().matches(zipDirRootAssert);
@@ -83,7 +83,7 @@ public class ZipIt64Test {
                                                   .zip64(true).build();
 
         zipAes = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt.add(zipAes, contentDirSrc, settings);
+        ZipIt.zip(zipAes).settings(settings).add(contentDirSrc);
 
         assertThatDirectory(zipAes.getParent()).exists().hasDirectories(0).hasFiles(1);
         assertThatZipFile(zipAes, password).root().matches(zipDirRootAssert);
@@ -100,7 +100,7 @@ public class ZipIt64Test {
         ZipFileSettings settings = ZipFileSettings.builder().splitSize(SIZE_1MB).zip64(true).build();
 
         zipSplit = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt.add(zipSplit, contentDirSrc, settings);
+        ZipIt.zip(zipSplit).settings(settings).add(contentDirSrc);
 
         // TODO it seems it could be checked with commons-compress
 //        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -154,7 +154,7 @@ public class ZipIt64Test {
         zipHugeEntry = dir.resolve("src.zip");
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
         ZipFileSettings settings = ZipFileSettings.builder().entrySettingsProvider(fileNam -> entrySettings).build();
-        ZipIt.add(zipHugeEntry, Arrays.asList(file, fileBentley), settings);
+        ZipIt.zip(zipHugeEntry).settings(settings).add(Arrays.asList(file, fileBentley));
 
         ZipModel zipModel = ZipModelBuilder.read(zipHugeEntry);
         assertThat(zipModel.getEntryByFileName("file.txt").getUncompressedSize()).isEqualTo(ZipModel.MAX_ENTRY_SIZE + 1);

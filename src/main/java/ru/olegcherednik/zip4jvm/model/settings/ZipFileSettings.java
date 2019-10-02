@@ -47,7 +47,10 @@ public final class ZipFileSettings {
         }
 
         public Builder splitSize(long splitSize) {
-            this.splitSize = splitSize <= 0 ? ZipModel.NO_SPLIT : Math.max(ZipModel.MIN_SPLIT_SIZE, splitSize);
+            if (splitSize > 0 && splitSize < ZipModel.MIN_SPLIT_SIZE)
+                throw new IllegalArgumentException("Zip split size should be <= 0 (no split) or >= " + ZipModel.MIN_SPLIT_SIZE);
+
+            this.splitSize = splitSize;
             return this;
         }
 

@@ -60,7 +60,7 @@ public class CompressionDeflateTest {
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        ZipIt.add(zip, filesDirBikes, settings);
+        ZipIt.zip(zip).settings(settings).add(filesDirBikes);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
         assertThatZipFile(zip).root().matches(zipDirBikesAssert);
     }
@@ -71,7 +71,7 @@ public class CompressionDeflateTest {
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        ZipIt.add(zip, filesDirCars, settings);
+        ZipIt.zip(zip).settings(settings).add(filesDirCars);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(3);
         assertThatZipFile(zip).root().matches(zipDirCarsAssert);
     }
@@ -81,7 +81,7 @@ public class CompressionDeflateTest {
         ZipFileSettings settings = ZipFileSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt.add(zip, dirBikes, settings);
+        ZipIt.zip(zip).settings(settings).add(dirBikes);
 
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
         assertThatZipFile(zip).exists().root().hasDirectories(1).hasFiles(0);
@@ -94,7 +94,7 @@ public class CompressionDeflateTest {
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        ZipIt.add(zip, dirCars, settings);
+        ZipIt.zip(zip).settings(settings).add(dirCars);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(3);
         assertThatZipFile(zip).root().hasDirectories(1).hasFiles(0);
         assertThatZipFile(zip).directory(zipDirNameCars).matches(zipDirCarsAssert);

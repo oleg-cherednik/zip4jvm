@@ -81,14 +81,14 @@ public class ZipMiscTest {
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        assertThatThrownBy(() -> ZipIt.add(zip, files, settings)).isExactlyInstanceOf(PathNotExistsException.class);
+        assertThatThrownBy(() -> ZipIt.zip(zip).settings(settings).add(files)).isExactlyInstanceOf(PathNotExistsException.class);
     }
 
     public void shouldMergeSplitZip() throws IOException {
-        ZipIt.add(zipMerge, dirBikes);
+        ZipIt.zip(zipMerge).add(dirBikes);
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt.add(zip, dirCars);
+        ZipIt.zip(zip).add(dirCars);
 
         ZipMisc.merge(zipMerge, zip);
         assertThatZipFile(zipMerge).root().hasDirectories(2).hasFiles(0);
@@ -99,7 +99,7 @@ public class ZipMiscTest {
     @Test(dependsOnMethods = "shouldMergeSplitZip")
     public void shouldThrowExceptionWhenMergeWithDuplicatedEntries() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt.add(zip, dirCars);
+        ZipIt.zip(zip).add(dirCars);
 
         assertThatThrownBy(() -> ZipMisc.merge(zipMerge, zip)).isExactlyInstanceOf(EntryDuplicationException.class);
     }
@@ -117,7 +117,7 @@ public class ZipMiscTest {
                                                                           .build())
                                                   .build();
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt.add(zip, Collections.singleton(dirSrc.resolve("Oleg Cherednik.txt")), settings);
+        ZipIt.zip(zip).settings(settings).add(Collections.singleton(dirSrc.resolve("Oleg Cherednik.txt")));
 
         assertThat(ZipMisc.isSplit(zipStoreSplit)).isTrue();
     }
