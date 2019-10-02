@@ -31,7 +31,7 @@ import java.util.Optional;
  * @author Oleg Cherednik
  * @since 14.03.2019
  */
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class ZipIt {
 
     private final Path zip;

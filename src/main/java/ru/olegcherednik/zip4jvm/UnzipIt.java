@@ -17,7 +17,7 @@ import java.util.function.Function;
  * @author Oleg Cherednik
  * @since 14.03.2019
  */
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class UnzipIt {
 
     private static final Function<String, char[]> DEFAULT_PASSWORD_PROVIDER = fileName -> null;

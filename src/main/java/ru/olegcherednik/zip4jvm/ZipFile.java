@@ -40,6 +40,14 @@ import static ru.olegcherednik.zip4jvm.model.ExternalFileAttributes.PROP_OS_NAME
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ZipFile {
 
+    public static ZipIt zip(Path zip) {
+        return new ZipIt(zip);
+    }
+
+    public static UnzipIt unzip(Path zip) {
+        return new UnzipIt(zip);
+    }
+
     public static ZipFile.Reader read(@NonNull Path zip) throws IOException {
         return read(zip, fileName -> null);
     }
