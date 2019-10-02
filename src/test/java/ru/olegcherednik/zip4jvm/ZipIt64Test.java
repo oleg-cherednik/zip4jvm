@@ -71,7 +71,7 @@ public class ZipIt64Test {
     @Test(dependsOnMethods = "shouldZipWhenZip64")
     public void shouldUnzipWhenZip64() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.extract(zipSimple, destDir);
+        UnzipIt.zip(zipSimple).destDir(destDir).extract();
         assertThatDirectory(destDir).matches(dirSrcAssert);
     }
 
@@ -92,7 +92,7 @@ public class ZipIt64Test {
     @Test(dependsOnMethods = "shouldZipWhenZip64AndAesEncryption")
     public void shouldUnzipWhenZip64AndAesEncryption() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.extract(zipAes, destDir, fileName -> password);
+        UnzipIt.zip(zipAes).destDir(destDir).password(password).extract();
         assertThatDirectory(destDir).matches(dirSrcAssert);
     }
 
@@ -110,7 +110,7 @@ public class ZipIt64Test {
     @Test(dependsOnMethods = "shouldZipWhenZip64AndSplit")
     public void shouldUnzipWhenZip64AndSplit() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.extract(zipSplit, destDir);
+        UnzipIt.zip(zipSplit).destDir(destDir).extract();
         assertThatDirectory(destDir).matches(dirSrcAssert);
     }
 

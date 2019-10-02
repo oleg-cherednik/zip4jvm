@@ -128,21 +128,22 @@ public class EncryptionAesTest {
     public void shouldUnzipWhenStoreSolidAes() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        UnzipIt.extract(zipStoreSolidAes, destDir, String::toCharArray);
+        UnzipIt.zip(zipStoreSolidAes).destDir(destDir).passwordProvider(String::toCharArray).extract();
         assertThatDirectory(destDir).matches(dirSrcAssert);
     }
 
     public void shouldUnzipWhenStoreSplitAes() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        UnzipIt.extract(zipStoreSplitAes, destDir, String::toCharArray);
+        UnzipIt.zip(zipStoreSplitAes).destDir(destDir).passwordProvider(String::toCharArray).extract();
         assertThatDirectory(destDir).matches(dirSrcAssert);
     }
 
     public void shouldThrowExceptionWhenUnzipAesEncryptedZipWithIncorrectPassword() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        assertThatThrownBy(() -> UnzipIt.extract(zipStoreSplitAes, destDir, fileName -> UUID.randomUUID().toString().toCharArray()))
+        assertThatThrownBy(() ->
+                UnzipIt.zip(zipStoreSplitAes).destDir(destDir).passwordProvider(fileName -> UUID.randomUUID().toString().toCharArray()).extract())
                 .isExactlyInstanceOf(IncorrectPasswordException.class);
     }
 }

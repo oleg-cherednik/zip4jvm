@@ -18,6 +18,7 @@ package ru.olegcherednik.zip4jvm;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.engine.ZipEngine;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
 import java.io.IOException;
@@ -51,7 +52,7 @@ public final class ZipIt {
 
     public void add(Collection<Path> paths) throws IOException {
         // TODO check that path != zip
-        try (ZipFile.Writer zipFile = ZipFile.write(zip, settings)) {
+        try (ZipFile.Writer zipFile = new ZipEngine(zip, settings)) {
             zipFile.add(paths);
         }
     }

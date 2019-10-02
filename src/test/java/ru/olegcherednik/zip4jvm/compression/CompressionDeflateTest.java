@@ -15,18 +15,18 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolidAes;
-import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolidPkware;
-import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
 import static ru.olegcherednik.zip4jvm.TestData.dirBikes;
 import static ru.olegcherednik.zip4jvm.TestData.dirCars;
 import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirBikes;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirCars;
+import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
+import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolidAes;
+import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolidPkware;
 import static ru.olegcherednik.zip4jvm.TestData.zipDirNameBikes;
 import static ru.olegcherednik.zip4jvm.TestData.zipDirNameCars;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.dirSrcAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.dirSrcAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.zipDirBikesAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.zipDirCarsAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
@@ -102,14 +102,14 @@ public class CompressionDeflateTest {
 
     public void shouldUnzipWhenDeflateCompression() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.extract(zipDeflateSolid, destDir);
+        UnzipIt.zip(zipDeflateSolid).destDir(destDir).extract();
         assertThatDirectory(destDir).matches(dirSrcAssert);
     }
 
     public void shouldUnzipWhenWhenDeflateCompressionAndPkwareEncryption() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        UnzipIt.extract(zipDeflateSolidPkware, destDir, dirNameCars, fileName -> password);
+        UnzipIt.zip(zipDeflateSolidPkware).destDir(destDir).password(password).extract(dirNameCars);
         assertThatDirectory(destDir).exists().hasDirectories(1).hasFiles(0);
         assertThatDirectory(destDir.resolve(dirNameCars)).matches(dirCarsAssert);
     }
@@ -117,7 +117,7 @@ public class CompressionDeflateTest {
     public void shouldUnzipWhenWhenDeflateCompressionAndAesEncryption() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        UnzipIt.extract(zipDeflateSolidAes, destDir, dirNameCars, String::toCharArray);
+        UnzipIt.zip(zipDeflateSolidAes).destDir(destDir).passwordProvider(String::toCharArray).extract(dirNameCars);
         assertThatDirectory(destDir).exists().hasDirectories(1).hasFiles(0);
         assertThatDirectory(destDir.resolve(dirNameCars)).matches(dirCarsAssert);
     }

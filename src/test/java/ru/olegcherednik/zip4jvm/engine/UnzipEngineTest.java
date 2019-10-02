@@ -160,7 +160,7 @@ public class UnzipEngineTest {
         ZipIt.zip(zip).add(file);
 
         Path unzipDir = destDir.resolve("unzip");
-        UnzipIt.extract(zip, unzipDir);
+        UnzipIt.zip(zip).destDir(unzipDir).extract();
 
         Path fileFooUnzip = unzipDir.resolve("foo.txt");
         assertThat(convert(Files.getLastModifiedTime(fileFooUnzip).toMillis())).isEqualTo(str);
