@@ -10,7 +10,7 @@ import java.util.zip.ZipEntry;
  * @author Oleg Cherednik
  * @since 25.03.2019
  */
-public class AbstractZipEntryDirectoryAssert<S extends AbstractZipEntryDirectoryAssert<S>> extends AbstractZipEntryAssert<S> implements EntryAssert {
+public class AbstractZipEntryDirectoryAssert<S extends AbstractZipEntryDirectoryAssert<S>> extends AbstractZipEntryAssert<S> implements IDirectoryAssert<S> {
 
     public AbstractZipEntryDirectoryAssert(ZipEntry actual, Class<?> selfType, ZipFileDecorator zipFile) {
         super(actual, selfType, zipFile);
@@ -54,7 +54,7 @@ public class AbstractZipEntryDirectoryAssert<S extends AbstractZipEntryDirectory
         return new ZipEntry(name);
     }
 
-    public S matches(Consumer<AbstractZipEntryDirectoryAssert<?>> consumer) {
+    public S matches(Consumer<IDirectoryAssert<?>> consumer) {
         consumer.accept(this);
         return myself;
     }

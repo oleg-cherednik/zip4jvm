@@ -24,8 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.dirSrcAssert;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.zipDirRootAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.passwordStr;
@@ -65,14 +64,14 @@ public class ZipIt64Test {
         ZipIt.zip(zipSimple).settings(settings).add(contentDirSrc);
 
         assertThatDirectory(zipSimple.getParent()).exists().hasDirectories(0).hasFiles(1);
-        assertThatZipFile(zipSimple).root().matches(zipDirRootAssert);
+        assertThatZipFile(zipSimple).root().matches(rootAssert);
     }
 
     @Test(dependsOnMethods = "shouldZipWhenZip64")
     public void shouldUnzipWhenZip64() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         UnzipIt.zip(zipSimple).destDir(destDir).extract();
-        assertThatDirectory(destDir).matches(dirSrcAssert);
+        assertThatDirectory(destDir).matches(rootAssert);
     }
 
     public void shouldZipWhenZip64AndAesEncryption() throws IOException {
@@ -86,14 +85,14 @@ public class ZipIt64Test {
         ZipIt.zip(zipAes).settings(settings).add(contentDirSrc);
 
         assertThatDirectory(zipAes.getParent()).exists().hasDirectories(0).hasFiles(1);
-        assertThatZipFile(zipAes, password).root().matches(zipDirRootAssert);
+        assertThatZipFile(zipAes, password).root().matches(rootAssert);
     }
 
     @Test(dependsOnMethods = "shouldZipWhenZip64AndAesEncryption")
     public void shouldUnzipWhenZip64AndAesEncryption() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         UnzipIt.zip(zipAes).destDir(destDir).password(password).extract();
-        assertThatDirectory(destDir).matches(dirSrcAssert);
+        assertThatDirectory(destDir).matches(rootAssert);
     }
 
     public void shouldZipWhenZip64AndSplit() throws IOException {
@@ -111,7 +110,7 @@ public class ZipIt64Test {
     public void shouldUnzipWhenZip64AndSplit() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         UnzipIt.zip(zipSplit).destDir(destDir).extract();
-        assertThatDirectory(destDir).matches(dirSrcAssert);
+        assertThatDirectory(destDir).matches(rootAssert);
     }
 
     public void shouldUseZip64WhenTotalEntriesOverFFFF() throws IOException {

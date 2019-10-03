@@ -10,10 +10,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirEmpty;
 import static ru.olegcherednik.zip4jvm.TestData.dirRoot;
 import static ru.olegcherednik.zip4jvm.TestData.dirSrc;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
 /**
@@ -63,7 +65,7 @@ public class Zip4jvmSuite {
             }
         });
 
-        assertThatDirectory(dirSrc).matches(TestDataAssert.dirSrcAssert);
+        assertThatDirectory(dirSrc).matches(rootAssert);
     }
 
     public static void removeDir(Path path) throws IOException {
@@ -102,6 +104,14 @@ public class Zip4jvmSuite {
         }
 
         return path;
+    }
+
+    public static Path temp() {
+        return dirRoot.resolve("tmp");
+    }
+
+    public static Path temporaryFile(String ext) {
+        return temp().resolve(UUID.randomUUID().toString() + '.' + ext);
     }
 
     public static Path subDirNameAsMethodNameWithTme(Path rootDir) {

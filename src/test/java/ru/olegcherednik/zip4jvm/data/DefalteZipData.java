@@ -18,7 +18,7 @@ import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
 import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolidAes;
 import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolidPkware;
 import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSplit;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.zipDirRootAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.passwordStr;
@@ -47,7 +47,7 @@ public final class DefalteZipData {
         assertThat(Files.exists(zipDeflateSolid)).isTrue();
         assertThat(Files.isRegularFile(zipDeflateSolid)).isTrue();
         assertThatDirectory(zipDeflateSolid.getParent()).exists().hasDirectories(0).hasFiles(1);
-        assertThatZipFile(zipDeflateSolid).exists().root().matches(zipDirRootAssert);
+        assertThatZipFile(zipDeflateSolid).exists().root().matches(rootAssert);
     }
 
     private static void createDeflateSplitZip() throws IOException {
@@ -72,7 +72,7 @@ public final class DefalteZipData {
         assertThat(Files.exists(zipDeflateSolidPkware)).isTrue();
         assertThat(Files.isRegularFile(zipDeflateSolidPkware)).isTrue();
         assertThatDirectory(zipDeflateSolidPkware.getParent()).exists().hasDirectories(0).hasFiles(1);
-        assertThatZipFile(zipDeflateSolidPkware, password).exists().root().matches(zipDirRootAssert);
+        assertThatZipFile(zipDeflateSolidPkware, password).exists().root().matches(rootAssert);
     }
 
     private static void createDeflateSolidAesZip() throws IOException {

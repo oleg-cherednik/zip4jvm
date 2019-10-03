@@ -13,7 +13,7 @@ import java.util.function.Consumer;
  * @author Oleg Cherednik
  * @since 27.03.2019
  */
-public class AbstractDirectoryAssert<S extends AbstractDirectoryAssert<S>> extends AbstractFileAssert<S> implements EntryAssert<S> {
+public class AbstractDirectoryAssert<S extends AbstractDirectoryAssert<S>> extends AbstractFileAssert<S> implements IDirectoryAssert<S> {
 
     public AbstractDirectoryAssert(Path actual, Class<?> selfType) {
         super(actual.toFile(), selfType);
@@ -65,7 +65,7 @@ public class AbstractDirectoryAssert<S extends AbstractDirectoryAssert<S>> exten
         }
     }
 
-    public S matches(Consumer<AbstractDirectoryAssert<?>> consumer) {
+    public S matches(Consumer<IDirectoryAssert<?>> consumer) {
         consumer.accept(this);
         return myself;
     }

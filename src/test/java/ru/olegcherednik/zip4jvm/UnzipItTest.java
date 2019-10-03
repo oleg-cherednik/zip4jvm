@@ -16,6 +16,7 @@ import java.util.List;
 import static ru.olegcherednik.zip4jvm.TestData.dirNameBikes;
 import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
 import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSplit;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
 
@@ -74,7 +75,7 @@ public class UnzipItTest {
         UnzipIt.zip(zipDeflateSolid).destDir(destDir).extract(dirNameBikes);
 
         assertThatDirectory(destDir).exists().hasDirectories(1).hasFiles(0);
-        assertThatDirectory(destDir.resolve(dirNameBikes)).matches(TestDataAssert.dirBikesAssert);
+        assertThatDirectory(destDir.resolve(dirNameBikes)).matches(dirBikesAssert);
     }
 
     public void shouldFoo() throws IOException, URISyntaxException {

@@ -18,7 +18,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
  * @since 25.03.2019
  */
 @SuppressWarnings("CatchMayIgnoreException")
-public abstract class AbstractZipEntryFileAssert<S extends AbstractZipEntryFileAssert<S>> extends AbstractZipEntryAssert<S> {
+public abstract class AbstractZipEntryFileAssert<S extends AbstractZipEntryFileAssert<S>> extends AbstractZipEntryAssert<S> implements IFileAssert<S> {
 
     private static final Pattern NEW_LINE = Pattern.compile("\\r?\\n");
 
@@ -26,21 +26,24 @@ public abstract class AbstractZipEntryFileAssert<S extends AbstractZipEntryFileA
         super(actual, selfType, zipFile);
     }
 
+    // TODO too slow
+    @Override
     public S hasSize(long size) {
-        if (actual.getSize() == -1) {
-            try (InputStream in = zipFile.getInputStream(actual)) {
-                actual.setSize(in.available());
-            } catch(Exception e) {
-                assertThatThrownBy(() -> {
-                    throw e;
-                }).doesNotThrowAnyException();
-            }
-        }
-
-        assertThat(actual.getSize()).isEqualTo(size);
+//        if (actual.getSize() == -1) {
+//            try (InputStream in = zipFile.getInputStream(actual)) {
+//                actual.setSize(in.available());
+//            } catch(Exception e) {
+//                assertThatThrownBy(() -> {
+//                    throw e;
+//                }).doesNotThrowAnyException();
+//            }
+//        }
+//
+//        assertThat(actual.getSize()).isEqualTo(size);
         return myself;
     }
 
+    @Override
     public S isImage() {
         try (InputStream in = zipFile.getInputStream(actual)) {
             assertThat(ImageIO.read(in)).isNotNull();

@@ -25,9 +25,8 @@ import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirCars;
 import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolidAes;
 import static ru.olegcherednik.zip4jvm.TestData.zipStoreSplitAes;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.dirSrcAssert;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.zipDirCarsAssert;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.zipDirRootAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.passwordStr;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
@@ -65,7 +64,7 @@ public class EncryptionAesTest {
 
         ZipIt.zip(zip).settings(settings).add(contentDirSrc);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
-        assertThatZipFile(zip, password).exists().root().matches(zipDirRootAssert);
+        assertThatZipFile(zip, password).exists().root().matches(rootAssert);
     }
 
     public void shouldCreateNewZipWithFolderAndAes192Encryption() throws IOException {
@@ -80,7 +79,7 @@ public class EncryptionAesTest {
 
         ZipIt.zip(zip).settings(settings).add(contentDirSrc);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
-        assertThatZipFile(zip, password).exists().root().matches(zipDirRootAssert);
+        assertThatZipFile(zip, password).exists().root().matches(rootAssert);
     }
 
     public void shouldCreateNewZipWithFolderAndAes128Encryption() throws IOException {
@@ -95,7 +94,7 @@ public class EncryptionAesTest {
 
         ZipIt.zip(zip).settings(settings).add(contentDirSrc);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
-        assertThatZipFile(zip, password).exists().root().matches(zipDirRootAssert);
+        assertThatZipFile(zip, password).exists().root().matches(rootAssert);
     }
 
     public void shouldCreateNewZipWithSelectedFilesAndAesEncryption() throws IOException {
@@ -110,7 +109,7 @@ public class EncryptionAesTest {
 
         ZipIt.zip(zip).settings(settings).add(filesDirCars);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
-        assertThatZipFile(zip, password).exists().root().matches(zipDirCarsAssert);
+        assertThatZipFile(zip, password).exists().root().matches(dirCarsAssert);
     }
 
     public void shouldThrowExceptionWhenAesEncryptionAndNullOrEmptyPassword() throws IOException {
@@ -129,14 +128,14 @@ public class EncryptionAesTest {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
         UnzipIt.zip(zipStoreSolidAes).destDir(destDir).passwordProvider(String::toCharArray).extract();
-        assertThatDirectory(destDir).matches(dirSrcAssert);
+        assertThatDirectory(destDir).matches(rootAssert);
     }
 
     public void shouldUnzipWhenStoreSplitAes() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
         UnzipIt.zip(zipStoreSplitAes).destDir(destDir).passwordProvider(String::toCharArray).extract();
-        assertThatDirectory(destDir).matches(dirSrcAssert);
+        assertThatDirectory(destDir).matches(rootAssert);
     }
 
     public void shouldThrowExceptionWhenUnzipAesEncryptedZipWithIncorrectPassword() throws IOException {

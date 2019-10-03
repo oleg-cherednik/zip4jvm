@@ -13,7 +13,7 @@ import java.nio.file.Path;
 import java.util.zip.DataFormatException;
 
 import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolidAes;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.dirSrcAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
 /**
@@ -50,7 +50,7 @@ public class Zip4jvmToWinZipAesCompatibilityTest {
             }
         }
 
-        assertThatDirectory(dstDir).matches(dirSrcAssert);
+        assertThatDirectory(dstDir).matches(rootAssert);
     }
 
 }

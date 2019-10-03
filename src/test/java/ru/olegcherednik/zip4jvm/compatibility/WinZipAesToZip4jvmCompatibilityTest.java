@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirSrc;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.dirSrcAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.passwordStr;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
@@ -32,7 +32,7 @@ public class WinZipAesToZip4jvmCompatibilityTest {
     public void winZipAesShouldBeReadableForZip4jvm() throws IOException {
         Path zip = zipItWithWinZipAes(Zip4jvmSuite.subDirNameAsMethodName(rootDir));
         Path dir = unzipItWithZip4jvm(zip);
-        assertThatDirectory(dir).matches(dirSrcAssert);
+        assertThatDirectory(dir).matches(rootAssert);
     }
 
     private static Path zipItWithWinZipAes(Path dir) throws IOException {

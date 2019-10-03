@@ -24,8 +24,7 @@ import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolidAes;
 import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolidPkware;
 import static ru.olegcherednik.zip4jvm.TestData.zipStoreSplit;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.dirSrcAssert;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.zipDirCarsAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
@@ -59,7 +58,7 @@ public class CompressionStoreTest {
 
         ZipIt.zip(zip).settings(settings).add(filesDirCars);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
-        assertThatZipFile(zip).root().matches(zipDirCarsAssert);
+        assertThatZipFile(zip).root().matches(dirCarsAssert);
     }
 
     public void shouldCreateSplitZipWithFilesWhenStoreCompression() throws IOException {
@@ -70,7 +69,7 @@ public class CompressionStoreTest {
 
         ZipIt.zip(zip).settings(settings).add(filesDirCars);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(3);
-        assertThatZipFile(zip).root().matches(zipDirCarsAssert);
+        assertThatZipFile(zip).root().matches(dirCarsAssert);
     }
 
     public void shouldCreateSingleZipWithEntireFolderWhenStoreCompression() throws IOException {
@@ -82,7 +81,7 @@ public class CompressionStoreTest {
         ZipIt.zip(zip).settings(settings).add(dirCars);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
         assertThatZipFile(zip).exists().root().hasDirectories(1).hasFiles(0);
-        assertThatZipFile(zip).directory(zipDirNameCars).matches(zipDirCarsAssert);
+        assertThatZipFile(zip).directory(zipDirNameCars).matches(dirCarsAssert);
     }
 
     public void shouldCreateSplitZipWithEntireFolderWhenStoreCompression() throws IOException {
@@ -94,19 +93,19 @@ public class CompressionStoreTest {
         ZipIt.zip(zip).settings(settings).add(dirCars);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(3);
         assertThatZipFile(zip).root().hasDirectories(1).hasFiles(0);
-        assertThatZipFile(zip).directory(zipDirNameCars).matches(zipDirCarsAssert);
+        assertThatZipFile(zip).directory(zipDirNameCars).matches(dirCarsAssert);
     }
 
     public void shouldUnzipWhenStoreCompression() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         UnzipIt.zip(zipStoreSolid).destDir(destDir).extract();
-        assertThatDirectory(destDir).matches(dirSrcAssert);
+        assertThatDirectory(destDir).matches(rootAssert);
     }
 
     public void shouldUnzipWhenSplitAndStoreCompression() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         UnzipIt.zip(zipStoreSplit).destDir(destDir).extract();
-        assertThatDirectory(destDir).matches(dirSrcAssert);
+        assertThatDirectory(destDir).matches(rootAssert);
     }
 
     public void shouldUnzipWhenWhenStoreCompressionAndPkwareEncryption() throws IOException {

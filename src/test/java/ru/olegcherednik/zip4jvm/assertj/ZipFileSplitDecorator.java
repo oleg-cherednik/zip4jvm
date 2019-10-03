@@ -1,11 +1,11 @@
 package ru.olegcherednik.zip4jvm.assertj;
 
 import net.lingala.zip4j.ZipFile;
-import net.lingala.zip4j.io.inputstream.ZipInputStream;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
-import java.io.IOException;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Map;
@@ -13,11 +13,13 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.temporaryFile;
+
 /**
  * @author Oleg Cherednik
  * @since 03.10.2019
  */
-@SuppressWarnings("MethodCanBeVariableArityMethod")
+@SuppressWarnings({ "MethodCanBeVariableArityMethod", "unused" })
 class ZipFileSplitDecorator extends ZipFileDecorator {
 
     private final char[] password;
@@ -34,30 +36,11 @@ class ZipFileSplitDecorator extends ZipFileDecorator {
     @Override
     public InputStream getInputStream(ZipEntry entry) {
         try {
-            return new InputStream() {
-                private final ZipInputStream delegate;
+            Path tmp = temporaryFile(FilenameUtils.getExtension(entry.getName()));
+            ZipFile zipFile = new ZipFile(zip.toFile(), password);
+            zipFile.extractFile(entry.getName(), tmp.getParent().toString(), tmp.getFileName().toString());
 
-                {
-                    ZipFile zipFile = new ZipFile(zip.toFile(), password);
-                    delegate = zipFile.getInputStream(zipFile.getFileHeader(entry.getName()));
-                }
-
-                @Override
-                public int available() throws IOException {
-                    return (int)entries.get(entry.getName()).getSize();
-                }
-
-                @Override
-                public int read() throws IOException {
-                    return delegate.read();
-                }
-
-                @Override
-                public void close() throws IOException {
-                    delegate.close();
-                }
-
-            };
+            return new FileInputStream(tmp.toFile());
         } catch(Exception e) {
             throw new Zip4jvmException(e);
         }
