@@ -78,8 +78,4 @@ public final class PkwareEngine {
         return (crc >>> 8) ^ CRC_TABLE[(crc ^ b) & 0xFF];
     }
 
-    public static long getCompressedSize(long uncompressedSize) {
-        return uncompressedSize + PkwareHeader.SIZE;
-    }
-
 }
