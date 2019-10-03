@@ -19,6 +19,7 @@ import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.engine.ZipEngine;
+import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
 import java.io.IOException;
@@ -26,6 +27,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -46,6 +48,15 @@ public final class ZipIt {
         return this;
     }
 
+    public ZipIt entrySettings(ZipEntrySettings entrySettings) {
+        return entrySettings == null ? entrySettings(fileName -> ZipEntrySettings.DEFAULT) : entrySettings(fileName -> entrySettings);
+    }
+
+    public ZipIt entrySettings(Function<String, ZipEntrySettings> entrySettingsProvider) {
+        settings = ZipFileSettings.builder().entrySettingsProvider(entrySettingsProvider).build();
+        return this;
+    }
+
     public void add(@NonNull Path path) throws IOException {
         add(Collections.singleton(path));
     }
@@ -62,9 +73,13 @@ public final class ZipIt {
     }
 
     public void addEntry(Collection<ZipFile.Entry> entries) throws IOException {
-        try (ZipFile.Writer zipFile = ZipFile.write(zip, settings)) {
+        try (ZipFile.Writer zipFile = zip(zip).settings(settings).stream()) {
             zipFile.addEntry(entries);
         }
+    }
+
+    public ZipFile.Writer stream() throws IOException {
+        return new ZipEngine(zip, settings);
     }
 
 }

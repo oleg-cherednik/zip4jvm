@@ -7,6 +7,7 @@ import lombok.NonNull;
 import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -40,7 +41,7 @@ public final class ZipFileSettings {
         private long splitSize = ZipModel.NO_SPLIT;
         private String comment;
         private boolean zip64;
-        private Function<String, ZipEntrySettings> entrySettingsProvider = fileName -> ZipEntrySettings.DEFAULT;
+        private Function<String, ZipEntrySettings> entrySettingsProvider = ZipEntrySettings.DEFAULT_PROVIDER;
 
         public ZipFileSettings build() {
             return new ZipFileSettings(this);
@@ -68,7 +69,7 @@ public final class ZipFileSettings {
         }
 
         public Builder entrySettingsProvider(@NonNull Function<String, ZipEntrySettings> entrySettingsProvider) {
-            this.entrySettingsProvider = entrySettingsProvider;
+            this.entrySettingsProvider = Optional.ofNullable(entrySettingsProvider).orElse(ZipEntrySettings.DEFAULT_PROVIDER);
             return this;
         }
     }

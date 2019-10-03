@@ -19,7 +19,7 @@ import java.util.Set;
 public final class ZipMisc {
 
     public static void setComment(@NonNull Path zip, String comment) throws IOException {
-        try (ZipFile.Writer zipFile = ZipFile.write(zip)) {
+        try (ZipFile.Writer zipFile = ZipIt.zip(zip).stream()) {
             zipFile.setComment(comment);
         }
     }
@@ -37,7 +37,7 @@ public final class ZipMisc {
     }
 
     public static void removeEntry(@NonNull Path zip, @NonNull Collection<String> entryNames) throws IOException {
-        try (ZipFile.Writer zipFile = ZipFile.write(zip)) {
+        try (ZipFile.Writer zipFile = ZipIt.zip(zip).stream()) {
             zipFile.remove(entryNames);
         }
     }
@@ -54,7 +54,7 @@ public final class ZipMisc {
                                                   .comment(reader.getComment())
                                                   .zip64(reader.isZip64()).build();
 
-        try (ZipFile.Writer zipFile = ZipFile.write(dest, settings)) {
+        try (ZipFile.Writer zipFile = ZipIt.zip(dest).settings(settings).stream()) {
             zipFile.copy(src);
         }
     }

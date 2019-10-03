@@ -12,10 +12,13 @@ import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
+import java.util.function.Function;
+
 @Getter
 public final class ZipEntrySettings {
 
     public static final ZipEntrySettings DEFAULT = builder().build();
+    public static final Function<String, ZipEntrySettings> DEFAULT_PROVIDER = fileName -> DEFAULT;
 
     private final Compression compression;
     private final CompressionLevel compressionLevel;
