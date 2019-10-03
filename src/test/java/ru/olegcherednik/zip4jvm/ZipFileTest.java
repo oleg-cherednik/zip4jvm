@@ -59,7 +59,7 @@ public class ZipFileTest {
     public void shouldCreateZipFileWhenUseZipFileAndAddFiles() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
 
-        try (ZipFile.Writer zipFile = ZipFile.write(file, fileName -> entrySettings)) {
+        try (ZipFile.Writer zipFile = ZipIt.zip(file).entrySettings(entrySettings).stream()) {
             zipFile.add(fileBentley);
             zipFile.add(fileFerrari);
             zipFile.add(fileWiesmann);
@@ -76,7 +76,7 @@ public class ZipFileTest {
     public void shouldAddFilesToExistedZipWhenUseZipFile() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
 
-        try (ZipFile.Writer zipFile = ZipFile.write(file, fileName -> entrySettings)) {
+        try (ZipFile.Writer zipFile = ZipIt.zip(file).entrySettings(entrySettings).stream()) {
             zipFile.add(fileDucati);
             zipFile.add(fileHonda);
             zipFile.add(fileKawasaki);
@@ -107,7 +107,7 @@ public class ZipFileTest {
             return ZipEntrySettings.DEFAULT;
         };
 
-        try (ZipFile.Writer zipFile = ZipFile.write(file, entrySettingsProvider)) {
+        try (ZipFile.Writer zipFile = ZipIt.zip(file).entrySettings(entrySettingsProvider).stream()) {
             zipFile.add(fileBentley);
             zipFile.add(fileFerrari);
             zipFile.add(fileWiesmann);
@@ -139,7 +139,7 @@ public class ZipFileTest {
 
         Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        try (ZipFile.Writer zipFile = ZipFile.write(file, entrySettingsProvider)) {
+        try (ZipFile.Writer zipFile = ZipIt.zip(file).entrySettings(entrySettingsProvider).stream()) {
             zipFile.add(fileBentley);
             zipFile.add(fileFerrari);
             zipFile.add(fileWiesmann);
@@ -163,13 +163,13 @@ public class ZipFileTest {
             return ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
         };
 
-        ZipFileSettings zipFileSettings = ZipFileSettings.builder()
-                                                         .comment("Global Comment")
-                                                         .entrySettingsProvider(entrySettingsProvider).build();
+        ZipFileSettings settings = ZipFileSettings.builder()
+                                                  .comment("Global Comment")
+                                                  .entrySettingsProvider(entrySettingsProvider).build();
 
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        try (ZipFile.Writer zipFile = ZipFile.write(file, zipFileSettings)) {
+        try (ZipFile.Writer zipFile = ZipIt.zip(zip).settings(settings).stream()) {
             zipFile.add(filesDirBikes);
             zipFile.add(filesDirCars);
             zipFile.add(filesDirSrc);
@@ -183,13 +183,13 @@ public class ZipFileTest {
     }
 
     public void shouldCreateZipFileWithEmptyDirectoryWhenAddEmptyDirectory() throws IOException {
-        ZipFileSettings zipFileSettings = ZipFileSettings.builder()
-                                                         .entrySettingsProvider(fileName -> ZipEntrySettings.builder().build())
-                                                         .build();
+        ZipFileSettings settings = ZipFileSettings.builder()
+                                                  .entrySettingsProvider(fileName -> ZipEntrySettings.builder().build())
+                                                  .build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        try (ZipFile.Writer zipFile = ZipFile.write(zip, zipFileSettings)) {
+        try (ZipFile.Writer zipFile = ZipIt.zip(zip).settings(settings).stream()) {
             zipFile.add(dirEmpty);
         }
 

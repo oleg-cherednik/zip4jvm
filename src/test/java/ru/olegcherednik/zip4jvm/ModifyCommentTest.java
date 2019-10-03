@@ -49,7 +49,7 @@ public class ModifyCommentTest {
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
                                                                           .build())
                                                   .comment("Oleg Cherednik - Олег Чередник").build();
-        ZipIt.add(zip, fileOlegCherednik, settings);
+        ZipIt.zip(zip).settings(settings).add(fileOlegCherednik);
         assertThatZipFile(zip).exists().hasComment("Oleg Cherednik - Олег Чередник");
     }
 
@@ -75,7 +75,7 @@ public class ModifyCommentTest {
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                                           .encryption(Encryption.PKWARE, Zip4jvmSuite.password).build())
                                                   .build();
-        ZipIt.add(zip, Collections.emptyList(), settings);
+        ZipIt.zip(zip).settings(settings).add(Collections.emptyList());
         assertThatZipFile(zip, Zip4jvmSuite.password).hasCommentSize(0);
 
         ZipMisc.setComment(zip, "this is new comment");

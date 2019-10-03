@@ -64,7 +64,7 @@ public class EncryptionPkwareTest {
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        ZipIt.add(zip, contentDirSrc, settings);
+        ZipIt.zip(zip).settings(settings).add(contentDirSrc);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
         assertThatZipFile(zip, password).exists().root().matches(zipDirRootAssert);
     }
@@ -79,7 +79,7 @@ public class EncryptionPkwareTest {
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        ZipIt.add(zip, filesDirCars, settings);
+        ZipIt.zip(zip).settings(settings).add(filesDirCars);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
         assertThatZipFile(zip, password).exists().root().hasDirectories(0).hasFiles(3);
         assertThatZipFile(zip, password).root().matches(zipDirCarsAssert);
@@ -100,21 +100,22 @@ public class EncryptionPkwareTest {
     public void shouldUnzipWhenStoreSolidPkware() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        UnzipIt.extract(zipStoreSolidPkware, destDir, fileName -> password);
+        UnzipIt.zip(zipStoreSolidPkware).destDir(destDir).password(password).extract();
         assertThatDirectory(destDir).matches(dirSrcAssert);
     }
 
     public void shouldUnzipWhenStoreSplitPkware() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        UnzipIt.extract(zipStoreSplitPkware, destDir, fileName -> password);
+        UnzipIt.zip(zipStoreSplitPkware).destDir(destDir).password(password).extract();
         assertThatDirectory(destDir).matches(dirSrcAssert);
     }
 
     public void shouldThrowExceptionWhenUnzipPkwareEncryptedZipWithIncorrectPassword() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        assertThatThrownBy(() -> UnzipIt.extract(zipStoreSplitPkware, destDir, fileName -> UUID.randomUUID().toString().toCharArray()))
+        assertThatThrownBy(() ->
+                UnzipIt.zip(zipStoreSplitPkware).destDir(destDir).passwordProvider(fileName -> UUID.randomUUID().toString().toCharArray()).extract())
                 .isExactlyInstanceOf(IncorrectPasswordException.class);
     }
 
@@ -122,7 +123,7 @@ public class EncryptionPkwareTest {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTme(rootDir);
         Path zip = Paths.get("src/test/resources/zip/zip64_crc1byte_check.zip").toAbsolutePath();
 
-        UnzipIt.extract(zip, destDir, fileName -> "Shu1an@2019GTS".toCharArray());
+        UnzipIt.zip(zip).destDir(destDir).password("Shu1an@2019GTS".toCharArray()).extract();
         assertThatDirectory(destDir).exists().hasDirectories(0).hasFiles(1);
         assertThatDirectory(destDir).file("hello.txt").exists().hasSize(11).hasContent("hello,itsme");
     }

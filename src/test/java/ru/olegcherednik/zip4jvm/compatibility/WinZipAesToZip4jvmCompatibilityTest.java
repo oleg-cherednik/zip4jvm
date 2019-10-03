@@ -59,7 +59,7 @@ public class WinZipAesToZip4jvmCompatibilityTest {
     @SuppressWarnings("NewMethodNamingConvention")
     private static Path unzipItWithZip4jvm(Path zip) throws IOException {
         Path destDir = zip.getParent().resolve("unzip");
-        UnzipIt.extract(zip, destDir, fileName -> Zip4jvmSuite.password);
+        UnzipIt.zip(zip).destDir(destDir).password(Zip4jvmSuite.password).extract();
 
         // WinZipAes does not support empty folders in zip
         Files.createDirectories(destDir.resolve("empty_dir"));

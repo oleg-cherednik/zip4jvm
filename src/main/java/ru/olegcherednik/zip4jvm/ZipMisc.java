@@ -19,17 +19,17 @@ import java.util.Set;
 public final class ZipMisc {
 
     public static void setComment(@NonNull Path zip, String comment) throws IOException {
-        try (ZipFile.Writer zipFile = ZipFile.write(zip)) {
+        try (ZipFile.Writer zipFile = ZipIt.zip(zip).stream()) {
             zipFile.setComment(comment);
         }
     }
 
     public static String getComment(@NonNull Path zip) throws IOException {
-        return ZipFile.read(zip).getComment();
+        return UnzipIt.zip(zip).open().getComment();
     }
 
     public static Set<String> getEntryNames(@NonNull Path zip) throws IOException {
-        return ZipFile.read(zip).getEntryNames();
+        return UnzipIt.zip(zip).open().getEntryNames();
     }
 
     public static void removeEntry(@NonNull Path zip, @NonNull String entryName) throws IOException {
@@ -37,24 +37,24 @@ public final class ZipMisc {
     }
 
     public static void removeEntry(@NonNull Path zip, @NonNull Collection<String> entryNames) throws IOException {
-        try (ZipFile.Writer zipFile = ZipFile.write(zip)) {
+        try (ZipFile.Writer zipFile = ZipIt.zip(zip).stream()) {
             zipFile.remove(entryNames);
         }
     }
 
     public static boolean isSplit(@NonNull Path zip) throws IOException {
-        return ZipFile.read(zip).isSplit();
+        return UnzipIt.zip(zip).open().isSplit();
     }
 
     // TODO refactoring; it's not clear where is source and destination
     public static void merge(@NonNull Path dest, @NonNull Path src) throws IOException {
-        ZipFile.Reader reader = ZipFile.read(src);
+        ZipFile.Reader reader = UnzipIt.zip(src).open();
 
         ZipFileSettings settings = ZipFileSettings.builder()
                                                   .comment(reader.getComment())
                                                   .zip64(reader.isZip64()).build();
 
-        try (ZipFile.Writer zipFile = ZipFile.write(dest, settings)) {
+        try (ZipFile.Writer zipFile = ZipIt.zip(dest).settings(settings).stream()) {
             zipFile.copy(src);
         }
     }

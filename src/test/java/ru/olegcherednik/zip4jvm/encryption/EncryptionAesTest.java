@@ -63,7 +63,7 @@ public class EncryptionAesTest {
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        ZipIt.add(zip, contentDirSrc, settings);
+        ZipIt.zip(zip).settings(settings).add(contentDirSrc);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
         assertThatZipFile(zip, password).exists().root().matches(zipDirRootAssert);
     }
@@ -78,7 +78,7 @@ public class EncryptionAesTest {
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        ZipIt.add(zip, contentDirSrc, settings);
+        ZipIt.zip(zip).settings(settings).add(contentDirSrc);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
         assertThatZipFile(zip, password).exists().root().matches(zipDirRootAssert);
     }
@@ -93,7 +93,7 @@ public class EncryptionAesTest {
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        ZipIt.add(zip, contentDirSrc, settings);
+        ZipIt.zip(zip).settings(settings).add(contentDirSrc);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
         assertThatZipFile(zip, password).exists().root().matches(zipDirRootAssert);
     }
@@ -108,7 +108,7 @@ public class EncryptionAesTest {
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        ZipIt.add(zip, filesDirCars, settings);
+        ZipIt.zip(zip).settings(settings).add(filesDirCars);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
         assertThatZipFile(zip, password).exists().root().matches(zipDirCarsAssert);
     }
@@ -128,21 +128,22 @@ public class EncryptionAesTest {
     public void shouldUnzipWhenStoreSolidAes() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        UnzipIt.extract(zipStoreSolidAes, destDir, String::toCharArray);
+        UnzipIt.zip(zipStoreSolidAes).destDir(destDir).passwordProvider(String::toCharArray).extract();
         assertThatDirectory(destDir).matches(dirSrcAssert);
     }
 
     public void shouldUnzipWhenStoreSplitAes() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        UnzipIt.extract(zipStoreSplitAes, destDir, String::toCharArray);
+        UnzipIt.zip(zipStoreSplitAes).destDir(destDir).passwordProvider(String::toCharArray).extract();
         assertThatDirectory(destDir).matches(dirSrcAssert);
     }
 
     public void shouldThrowExceptionWhenUnzipAesEncryptedZipWithIncorrectPassword() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        assertThatThrownBy(() -> UnzipIt.extract(zipStoreSplitAes, destDir, fileName -> UUID.randomUUID().toString().toCharArray()))
+        assertThatThrownBy(() ->
+                UnzipIt.zip(zipStoreSplitAes).destDir(destDir).passwordProvider(fileName -> UUID.randomUUID().toString().toCharArray()).extract())
                 .isExactlyInstanceOf(IncorrectPasswordException.class);
     }
 }
