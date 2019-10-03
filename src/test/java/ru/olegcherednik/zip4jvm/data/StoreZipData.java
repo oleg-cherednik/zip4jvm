@@ -108,8 +108,7 @@ public final class StoreZipData {
         assertThat(Files.exists(zipStoreSplitPkware)).isTrue();
         assertThat(Files.isRegularFile(zipStoreSplitPkware)).isTrue();
         assertThatDirectory(zipStoreSplitPkware.getParent()).exists().hasDirectories(0).hasFiles(6);
-        // TODO should be implemented
-//        assertThatZipFile(storeSplitPkwareZip, password).exists().root().matches(zipDirRootAssert);
+        assertThatZipFile(zipStoreSplitPkware, password).exists().root().matches(zipDirRootAssert);
     }
 
     private static void createStoreSplitAesZip() throws IOException {

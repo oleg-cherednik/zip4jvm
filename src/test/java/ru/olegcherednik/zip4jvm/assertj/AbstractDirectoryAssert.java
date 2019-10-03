@@ -19,9 +19,10 @@ public class AbstractDirectoryAssert<S extends AbstractDirectoryAssert<S>> exten
         super(actual.toFile(), selfType);
     }
 
-    // TODO name == "/" -> will give root like d:\
-
     public AbstractDirectoryAssert<?> directory(String name) {
+        if ("/".equals(name))
+            throw new Zip4jvmException("Name cannot be '/'");
+
         return new DirectoryAssert(actual.toPath().resolve(name));
     }
 

@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.assertj;
 
-import lombok.NonNull;
 import net.sf.sevenzipjbinding.ArchiveFormat;
 import net.sf.sevenzipjbinding.ExtractOperationResult;
 import net.sf.sevenzipjbinding.IInArchive;
@@ -10,6 +9,7 @@ import net.sf.sevenzipjbinding.SevenZip;
 import net.sf.sevenzipjbinding.SevenZipException;
 import net.sf.sevenzipjbinding.impl.RandomAccessFileInStream;
 import net.sf.sevenzipjbinding.simple.ISimpleInArchiveItem;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
@@ -39,7 +39,7 @@ class ZipFileEncryptedDecoder extends ZipFileDecorator {
     }
 
     @Override
-    public InputStream getInputStream(@NonNull ZipEntry entry) {
+    public InputStream getInputStream(ZipEntry entry) {
         try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(zip.toFile(), "r"));
              IInArchive zip = SevenZip.openInArchive(ArchiveFormat.ZIP, in)) {
 
@@ -53,6 +53,11 @@ class ZipFileEncryptedDecoder extends ZipFileDecorator {
         } catch(Exception e) {
             throw new Zip4jvmException(e);
         }
+    }
+
+    private static String getItemName(ISimpleInArchiveItem item) throws SevenZipException {
+        String name = FilenameUtils.normalize(item.getPath(), true);
+        return item.isFolder() ? name + '/' : name;
     }
 
     @Override

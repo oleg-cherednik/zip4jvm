@@ -16,6 +16,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
  * @author Oleg Cherednik
  * @since 25.03.2019
  */
+@SuppressWarnings("CatchMayIgnoreException")
 public abstract class AbstractZipEntryFileAssert<S extends AbstractZipEntryFileAssert<S>> extends AbstractZipEntryAssert<S> {
 
     private static final Pattern NEW_LINE = Pattern.compile("\\r?\\n");

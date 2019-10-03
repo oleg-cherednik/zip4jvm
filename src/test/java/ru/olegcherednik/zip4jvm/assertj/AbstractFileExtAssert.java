@@ -14,6 +14,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
  * @author Oleg Cherednik
  * @since 28.03.2019
  */
+@SuppressWarnings("CatchMayIgnoreException")
 public class AbstractFileExtAssert<S extends AbstractFileExtAssert<S>> extends AbstractFileAssert<S> {
 
     public AbstractFileExtAssert(Path actual, Class<?> selfType) {
