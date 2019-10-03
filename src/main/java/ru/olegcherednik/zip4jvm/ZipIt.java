@@ -18,7 +18,6 @@ package ru.olegcherednik.zip4jvm;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.engine.ZipEngine;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
 
@@ -63,7 +62,7 @@ public final class ZipIt {
 
     public void add(Collection<Path> paths) throws IOException {
         // TODO check that path != zip
-        try (ZipFile.Writer zipFile = new ZipEngine(zip, settings)) {
+        try (ZipFile.Writer zipFile = ZipFile.writer(zip, settings)) {
             zipFile.add(paths);
         }
     }
@@ -79,7 +78,7 @@ public final class ZipIt {
     }
 
     public ZipFile.Writer stream() throws IOException {
-        return new ZipEngine(zip, settings);
+        return ZipFile.writer(zip, settings);
     }
 
 }

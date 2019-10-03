@@ -25,11 +25,11 @@ public final class ZipMisc {
     }
 
     public static String getComment(@NonNull Path zip) throws IOException {
-        return ZipFile.read(zip).getComment();
+        return UnzipIt.zip(zip).open().getComment();
     }
 
     public static Set<String> getEntryNames(@NonNull Path zip) throws IOException {
-        return ZipFile.read(zip).getEntryNames();
+        return UnzipIt.zip(zip).open().getEntryNames();
     }
 
     public static void removeEntry(@NonNull Path zip, @NonNull String entryName) throws IOException {
@@ -43,12 +43,12 @@ public final class ZipMisc {
     }
 
     public static boolean isSplit(@NonNull Path zip) throws IOException {
-        return ZipFile.read(zip).isSplit();
+        return UnzipIt.zip(zip).open().isSplit();
     }
 
     // TODO refactoring; it's not clear where is source and destination
     public static void merge(@NonNull Path dest, @NonNull Path src) throws IOException {
-        ZipFile.Reader reader = ZipFile.read(src);
+        ZipFile.Reader reader = UnzipIt.zip(src).open();
 
         ZipFileSettings settings = ZipFileSettings.builder()
                                                   .comment(reader.getComment())

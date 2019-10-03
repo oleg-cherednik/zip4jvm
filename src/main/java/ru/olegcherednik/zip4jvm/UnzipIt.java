@@ -55,10 +55,14 @@ public final class UnzipIt {
     }
 
     public void extract(Collection<String> fileNames) throws IOException {
-        UnzipEngine engine = new UnzipEngine(zip, passwordProvider);
+        ZipFile.Reader zipFile = ZipFile.reader(zip, passwordProvider);
 
         for (String fileName : fileNames)
-            engine.extract(destDir, fileName);
+            zipFile.extract(destDir, fileName);
+    }
+
+    public ZipFile.Reader open() throws IOException {
+        return ZipFile.reader(zip, passwordProvider);
     }
 
 }
