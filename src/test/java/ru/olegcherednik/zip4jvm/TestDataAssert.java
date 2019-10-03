@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.assertj.AbstractDirectoryAssert;
 import ru.olegcherednik.zip4jvm.assertj.AbstractZipEntryDirectoryAssert;
+import ru.olegcherednik.zip4jvm.assertj.AbstractZipEntryFileAssert;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
@@ -74,27 +75,42 @@ public final class TestDataAssert {
         TestDataAssert.zipDirCarsAssert.accept(dir.directory(zipDirNameCars));
         TestDataAssert.zipDirEmptyAssert.accept(dir.directory(zipDirNameEmpty));
 
-        dir.file(fileNameMcdonnelDouglas).exists().hasSize(624_746);
-        dir.file(fileNameSaintPetersburg).exists().hasSize(1_074_836);
-        dir.file(fileNameSigSauer).exists().hasSize(431_478);
-        dir.file(fileNameEmpty).exists().hasEmptyContent().hasSize(0);
-//        dir.file("Oleg Cherednik.txt").exists().hasContent("Oleg Cherednik\nОлег Чередник").hasSize(41);
+        TestDataAssert.zipFileMcdonnelDouglasAssert.accept(dir.file(fileNameMcdonnelDouglas));
+        TestDataAssert.zipFileSaintPetersburgAssert.accept(dir.file(fileNameSaintPetersburg));
+        TestDataAssert.zipFileSigSauerAssert.accept(dir.file(fileNameSigSauer));
+        TestDataAssert.zipFileEmptyAssert.accept(dir.file(fileNameEmpty));
+//        TestDataAssert.zipFileOlegCherednikAssert.accept(dir.file(fileNameOlegCherednik));
     };
+
+    public static final Consumer<AbstractZipEntryFileAssert<?>> zipFileMcdonnelDouglasAssert = file -> file.exists().hasSize(624_746);
+    public static final Consumer<AbstractZipEntryFileAssert<?>> zipFileSaintPetersburgAssert = file -> file.exists().hasSize(1_074_836);
+    public static final Consumer<AbstractZipEntryFileAssert<?>> zipFileSigSauerAssert = file -> file.exists().hasSize(431_478);
+    public static final Consumer<AbstractZipEntryFileAssert<?>> zipFileEmptyAssert = file -> file.exists().hasSize(0);
+    public static final Consumer<AbstractZipEntryFileAssert<?>> zipFileOlegCherednikAssert = file -> file.exists().hasSize(1_395_362);
 
     public static final Consumer<AbstractZipEntryDirectoryAssert<?>> zipDirBikesAssert = dir -> {
         dir.exists().hasDirectories(0).hasFiles(4);
-        dir.file(fileNameDucati).exists().hasSize(293_823);
-        dir.file(fileNameHonda).exists().hasSize(154_591);
-        dir.file(fileNameKawasaki).exists().hasSize(167_026);
-        dir.file(fileNameSuzuki).exists().hasSize(287_349);
+        TestDataAssert.zipFileDucatiAssert.accept(dir.file(fileNameDucati));
+        TestDataAssert.zipFileHondaAssert.accept(dir.file(fileNameHonda));
+        TestDataAssert.zipFileKawasakiAssert.accept(dir.file(fileNameKawasaki));
+        TestDataAssert.zipFileSuzukiAssert.accept(dir.file(fileNameSuzuki));
     };
+
+    public static final Consumer<AbstractZipEntryFileAssert<?>> zipFileDucatiAssert = file -> file.exists().hasSize(293_823);
+    public static final Consumer<AbstractZipEntryFileAssert<?>> zipFileHondaAssert = file -> file.exists().hasSize(154_591);
+    public static final Consumer<AbstractZipEntryFileAssert<?>> zipFileKawasakiAssert = file -> file.exists().hasSize(167_026);
+    public static final Consumer<AbstractZipEntryFileAssert<?>> zipFileSuzukiAssert = file -> file.exists().hasSize(287_349);
 
     public static final Consumer<AbstractZipEntryDirectoryAssert<?>> zipDirCarsAssert = dir -> {
         dir.exists().hasDirectories(0).hasFiles(3);
-        dir.file(fileNameBentley).exists().hasSize(1_395_362);
-        dir.file(fileNameFerrari).exists().hasSize(320_894);
-        dir.file(fileNameWiesmann).exists().hasSize(729_633);
+        TestDataAssert.zipFileBentleyAssert.accept(dir.file(fileNameBentley));
+        TestDataAssert.zipFileFerrariAssert.accept(dir.file(fileNameFerrari));
+        TestDataAssert.zipFileWiesmannAssert.accept(dir.file(fileNameWiesmann));
     };
+
+    public static final Consumer<AbstractZipEntryFileAssert<?>> zipFileBentleyAssert = file -> file.exists().hasSize(1_395_362);
+    public static final Consumer<AbstractZipEntryFileAssert<?>> zipFileFerrariAssert = file -> file.exists().hasSize(320_894);
+    public static final Consumer<AbstractZipEntryFileAssert<?>> zipFileWiesmannAssert = file -> file.exists().hasSize(729_633);
 
     public static final Consumer<AbstractZipEntryDirectoryAssert<?>> zipDirEmptyAssert = dir -> dir.exists().hasDirectories(0).hasFiles(0);
 

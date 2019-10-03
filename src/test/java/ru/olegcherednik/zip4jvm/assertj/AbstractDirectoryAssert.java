@@ -13,12 +13,13 @@ import java.util.function.Consumer;
  * @author Oleg Cherednik
  * @since 27.03.2019
  */
-public class AbstractDirectoryAssert<S extends AbstractDirectoryAssert<S>> extends AbstractFileAssert<S> {
+public class AbstractDirectoryAssert<S extends AbstractDirectoryAssert<S>> extends AbstractFileAssert<S> implements EntryAssert<S> {
 
     public AbstractDirectoryAssert(Path actual, Class<?> selfType) {
         super(actual.toFile(), selfType);
     }
 
+    @Override
     public AbstractDirectoryAssert<?> directory(String name) {
         if ("/".equals(name))
             throw new Zip4jvmException("Name cannot be '/'");
@@ -26,6 +27,7 @@ public class AbstractDirectoryAssert<S extends AbstractDirectoryAssert<S>> exten
         return new DirectoryAssert(actual.toPath().resolve(name));
     }
 
+    @Override
     public S hasDirectories(int expected) {
         long actual = getFoldersAmount();
 
@@ -37,6 +39,7 @@ public class AbstractDirectoryAssert<S extends AbstractDirectoryAssert<S>> exten
         return myself;
     }
 
+    @Override
     public S hasFiles(int expected) {
         long actual = getRegularFilesAmount();
 

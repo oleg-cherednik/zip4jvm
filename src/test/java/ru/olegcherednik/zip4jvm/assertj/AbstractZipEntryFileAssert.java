@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.assertj;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 
+import javax.imageio.ImageIO;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -37,6 +38,18 @@ public abstract class AbstractZipEntryFileAssert<S extends AbstractZipEntryFileA
         }
 
         assertThat(actual.getSize()).isEqualTo(size);
+        return myself;
+    }
+
+    public S isImage() {
+        try (InputStream in = zipFile.getInputStream(actual)) {
+            assertThat(ImageIO.read(in)).isNotNull();
+        } catch(Exception e) {
+            assertThatThrownBy(() -> {
+                throw e;
+            }).doesNotThrowAnyException();
+        }
+
         return myself;
     }
 
