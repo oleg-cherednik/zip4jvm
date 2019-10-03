@@ -20,9 +20,10 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 
-import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolidPkware;
 import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
+import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolidPkware;
 import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolid;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.passwordStr;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
 /**
@@ -36,7 +37,6 @@ public class Zip4jvmToSevenZipCompatibilityTest {
     private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(Zip4jvmToSevenZipCompatibilityTest.class);
 
     public void checkCompatibilityWithSevenZip() throws IOException {
-        String password = new String(Zip4jvmSuite.password);
         Path parentDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
         for (Path zip4jFile : Arrays.asList(zipStoreSolid, zipDeflateSolid, zipDeflateSolidPkware)) {
@@ -67,7 +67,7 @@ public class Zip4jvmToSevenZipCompatibilityTest {
                                     e.printStackTrace();
                                     return 0;
                                 }
-                            }, password);
+                            }, passwordStr);
 
                             if (res != ExtractOperationResult.OK)
                                 throw new Zip4jvmException("Cannot extract zip entry");
