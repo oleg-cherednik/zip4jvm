@@ -39,19 +39,11 @@ import static ru.olegcherednik.zip4jvm.model.ExternalFileAttributes.PROP_OS_NAME
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ZipFile {
 
-    public static ZipIt zip(Path zip) {
-        return new ZipIt(zip);
-    }
-
-    public static UnzipIt unzip(Path zip) {
-        return new UnzipIt(zip);
-    }
-
-    public static Writer writer(Path zip, ZipFileSettings settings) throws IOException {
+    static Writer writer(Path zip, ZipFileSettings settings) throws IOException {
         return new ZipEngine(zip, settings);
     }
 
-    public static Reader reader(Path zip, Function<String, char[]> passwordProvider) throws IOException {
+    static Reader reader(Path zip, Function<String, char[]> passwordProvider) throws IOException {
         return new UnzipEngine(zip, passwordProvider);
     }
 
