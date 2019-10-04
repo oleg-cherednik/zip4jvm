@@ -47,7 +47,7 @@ To simplify usage of _zip4jvm_, there're following classes:
  
 ### ZipIt
 
-#### Regular files and empty directories can be represented as `Path` 
+#### Regular files and directories can be represented as `Path` 
 
 ##### Create (or open existed) zip archive and add regular file */cars/bentley-continental.jpg*.
   
