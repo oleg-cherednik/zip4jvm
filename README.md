@@ -40,32 +40,35 @@ compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:0.7'
 
 ## Usage
 
-### Standard Mode
-
-To simplify usage of _zip4jvm_, there're utility classes:
+To simplify usage of _zip4jvm_, there're following classes:
 * [ZipIt](#zipit) - add files to archive;
 * UnzipIt - extract files from archive;
 * ZipMisc - other zip file activities. These classes contains most common operations with limited set of settings.
  
-#### ZipIt
-##### Create (or open existed) zip archive and add file */cars/bentley-continental.jpg*.
+### ZipIt
+
+#### Regular files and directory can be represented as `Path` 
+
+##### Create (or open existed) zip archive and add regular file */cars/bentley-continental.jpg*.
   
 ```
 Path zip = Paths.get("filename.zip");
 Path file = Path.get("/cars/bentley-continental.jpg")
-ZipIt.add(zip, file);
+ZipIt.zip(zip).add(file);
 ```
 >```
 > filename.zip
 >  |-- bentley-continental.jpg
 >```
 
+**Note:** regular file is added to the root of the zip archive.
+
 ##### Create (or open existed) zip archive and add directory */cars*.
 
 ```
 Path zip = Paths.get("filename.zip");
-Path dir = Path.get("/cars")
-ZipIt.add(zip, dir);
+Path dir = Path.get("/catalog/cars")
+ZipIt.zip(zip).add(dir);
 ```
 >```
 > filename.zip
@@ -75,7 +78,9 @@ ZipIt.add(zip, dir);
 >       |-- wiesmann-gt-mf5.jpg 
 >```
 
-##### Create (or open existed) zip archive and add some files and/or directories.
+**Note:** directory is added to the root of the zip archive keeping the initial structure.
+
+##### Create (or open existed) zip archive and add some regular files and/or directories.
 
 ```
 Path zip = Paths.get("filename.zip");
@@ -84,7 +89,7 @@ Collection<Path> paths = Arrays.asList(
         Paths.get("/bikes/honda-cbr600rr.jpg"),
         Paths.get("/cars"),
         Paths.get("/saint-petersburg.jpg"));
-ZipIt.add(zip, paths);
+ZipIt.zip(zip).add(paths);
 ```
 >```
 > filename.zip
@@ -97,26 +102,45 @@ ZipIt.add(zip, paths);
 >  |-- saint-petersburg.jpg 
 >```
 
-**Note:** added directories will hold the initial structure.
+**Note:** each regular file from the list is added to the root of the zip archive.
 
-**Note:** added files will be added to the root of the zip archive.
+**Note:** each directory from the list is added to the root of the zip archive keeping the initial structure. 
 
-##### Create (or open existed) zip archive and add file */cars/bentley-continental.jpg* using stream.
+##### Create (or open existed) zip archive and add some regular files and/or directories using stream.
   
 ```
 Path zip = Paths.get("filename.zip");
-Path file = Path.get("/cars/bentley-continental.jpg")
-ZipIt.add(zip, file);
+try (ZipFile.Writer zipFile = ZipIt.zip(zip).stream()) {
+    zipFile.add(Paths.get("/bikes/ducati-panigale-1199.jpg"));
+    zipFile.add(Paths.get("/bikes/honda-cbr600rr.jpg"));
+    zipFile.add(Paths.get("/cars"));
+    zipFile.add(Paths.get("/saint-petersburg.jpg");
+}
 ```
 >```
 > filename.zip
->  |-- bentley-continental.jpg
->```
+>  |-- cars
+>  |    |-- bentley-continental.jpg
+>  |    |-- feffari-458-italia.jpg
+>  |    |-- wiesmann-gt-mf5.jpg
+>  |-- ducati-panigale-1199.jpg
+>  |-- honda-cbr600rr.jpg
+>  |-- saint-petersburg.jpg 
+>```                                                                                                         
+
+**Note:** each regular file from the list is added to the root of the zip archive.
+
+**Note:** each directory from the list is added to the root of the zip archive keeping the initial structure.
+
+#### Regular files and directory can be represented as `Path`
+
+
+
 
 > **ZipFileSettings** could be additionally set for all methods. See default settings.
 
 **Note:** _see [ZipIt (Advanced Mode)](#zipit-advanced-mode) for using extended zip it operations
-._              
+_              
 
 ### UnzipIt (Standard Mode)
 
