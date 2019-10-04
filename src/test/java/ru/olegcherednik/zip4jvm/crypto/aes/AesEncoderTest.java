@@ -22,8 +22,7 @@ import static org.mockito.Mockito.mock;
 public class AesEncoderTest {
 
     public void shouldThrowZip4jvmExceptionWhenCreateAndException() {
-        ZipEntry entry = mock(ZipEntry.class);
-        assertThatThrownBy(() -> AesEncoder.create(entry)).isExactlyInstanceOf(Zip4jvmException.class);
+        assertThatThrownBy(() -> AesEncoder.create(mock(ZipEntry.class))).isExactlyInstanceOf(Zip4jvmException.class);
     }
 
     public void shouldThrowZip4jvmExceptionWhenEncryptAndException() throws ShortBufferException {
@@ -37,7 +36,7 @@ public class AesEncoderTest {
     }
 
     private static AesEncoder createAesEncoder(Cipher cipher, Mac mac, byte[] salt, byte[] passwordChecksum) {
-        return ReflectionUtils.invokeConstructor(AesEncoder.class, Cipher.class, Mac.class, byte[].class, byte[].class,
+        return ReflectionUtils.invokeConstructor(AesEncoder.class, new Class<?>[] { Cipher.class, Mac.class, byte[].class, byte[].class },
                 cipher, mac, salt, passwordChecksum);
 
     }

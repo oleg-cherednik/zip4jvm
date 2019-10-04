@@ -36,12 +36,11 @@ public class ReflectionUtils {
         }
     }
 
-    public static <T> T invokeConstructor(Class<T> cls, Class<?> type1, Class<?> type2, Class<?> type3, Class<?> type4,
-            Object value1, Object value2, Object value3, Object value4) {
+    public static <T> T invokeConstructor(Class<T> cls, Class<?>[] types, Object... values) {
         try {
-            Constructor<T> constructor = cls.getDeclaredConstructor(type1, type2, type3, type4);
+            Constructor<T> constructor = cls.getDeclaredConstructor(types);
             constructor.setAccessible(true);
-            return constructor.newInstance(value1, value2, value3, value4);
+            return constructor.newInstance(values);
         } catch(Exception ignored) {
             return null;
         }
