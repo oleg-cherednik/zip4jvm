@@ -182,14 +182,46 @@ ZipIt.zip(zip).addEntry(entries);
 
 #### Zip file settings: `ZipFileSettings`
 
-All zip operations include `ZipFileSettings`. [Default seeetinngs](#zip-file-settings-defaults) is
-used when it's not explicitly set. Settings contains zip archive scope settings as well as provider
-for entry specific settings. The key for entry settings is **fileName**.
+All zip operations include `ZipFileSettings`. [Default setings](#zip-file-settings-defaults) is
+used when it's not explicitly set. Settings contains zip archive scope properties as well as
+provider for entry specific settings. The key for entry settings is **fileName**.
 
 **Note:** user should not worry about directory marker `/`, because `zip4jvm` does not support
-duplicated file names and it's impossible to have same file name for file and directory.  
+duplicated file names and it's impossible to have same file name for file and directory.
 
-#### Zip file settings defaults 
+ - _splitSize_ - `-1` solid archive or split archive with given size for each part
+   - _min size_ - `64 * 1024 = 64Kb` 
+ - _comment_ - `null`, i.e. no comment
+   - _no comment_ - `null` or `empty string`
+   - _max length_ - `65,535` symbols 
+ - _zip64_ - use `true` or not `false` zip64 format for global zip structure
+   - **Note:** _zip64_ is switched on automatically if needed
+   - **Note:** it does not mean that entry structure is in _zip64_ format as well
+ - _entrySettingsProvider_ - file name base provider of settings for entry
+   - **Note:** each entry could have different settings 
+
+#### Zip file settings defaults
+
+ - _splitSize_ - `-1`, i.e. off or solid archive
+ - _comment_ - `null`, i.e. no comment
+ - _zip64_ - `false`, i.e. standard format for global zip structure
+   - **Note:** _zip64_ is switched on automatically if needed
+   - **Note:** it does not mean that entry structure is in _zip64_ format as well
+ - _entrySettingsProvider_ - `default`, i.e. all entries has same default entry settings 
+
+#### Zip entry settings: `ZipEntrySettings`
+
+Each entry has it's own settings. These settings could be different for every entry. If this settings
+are not explicitly set, then `default` entry settings are used for all added entries.
+
+#### Zip entry settings defaults
+
+ - _compression_ - `deflate`
+ - _compressionLevel_ - `normal`
+ - _encryption_ - `off`, i.e. no encryption
+ - _comment_ - `null`, i.e. no comment
+ - _zip64_ - `false`, i.e. standard format for entry structure
+ - _utf8_ - `true`, i.e. entry's name and comment are stored using `UTF8` charset   
 
 ### UnzipIt (Standard Mode)
 
