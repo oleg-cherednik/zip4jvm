@@ -120,7 +120,7 @@ public class ZipIt64Test {
             IntStream.rangeClosed(1, ZipModel.MAX_TOTAL_ENTRIES + 1)
                      .mapToObj(i -> "file_" + i + ".txt")
                      .map(fileName -> ZipFile.Entry.builder()
-                                                   .inputStreamSup(() -> IOUtils.toInputStream(fileName, StandardCharsets.UTF_8))
+                                                   .inputStreamSupplier(() -> IOUtils.toInputStream(fileName, StandardCharsets.UTF_8))
                                                    .fileName(fileName).build())
                      .forEach(zipFile::addEntry);
         }

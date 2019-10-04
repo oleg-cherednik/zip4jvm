@@ -5,16 +5,18 @@ import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.ZipIt;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirCars;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileDucati;
 import static ru.olegcherednik.zip4jvm.TestData.fileHonda;
+import static ru.olegcherednik.zip4jvm.TestData.fileKawasaki;
 import static ru.olegcherednik.zip4jvm.TestData.fileSaintPetersburg;
 
 /**
@@ -39,11 +41,7 @@ public class ZipItSnippet {
 
     public void createOrOpenExistedZipArchiveAndAddSomeRegularFilesAndDirectories() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
-        Collection<Path> paths = Arrays.asList(
-                Paths.get("/bikes/ducati-panigale-1199.jpg"),
-                Paths.get("/bikes/honda-cbr600rr.jpg"),
-                Paths.get("/cars"),
-                Paths.get("/saint-petersburg.jpg"));
+        Collection<Path> paths = Arrays.asList(fileDucati, fileHonda, dirCars, fileSaintPetersburg);
         ZipIt.zip(zip).add(paths);
     }
 
@@ -56,6 +54,33 @@ public class ZipItSnippet {
             zipFile.add(dirCars);
             zipFile.add(fileSaintPetersburg);
         }
+    }
+
+    public void createOrOpenExistedZipArchiveAndAddInputStreamContentAsRegularFile() throws IOException {
+        ZipFile.Entry entry = ZipFile.Entry.builder()
+                                           .inputStreamSupplier(() -> new FileInputStream(fileBentley.toFile()))
+                                           .fileName("my_cars/bentley-continental.jpg")
+                                           .lastModifiedTime(System.currentTimeMillis()).build();
+
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
+        ZipIt.zip(zip).addEntry(entry);
+    }
+
+    public void createOrOpenExistedZipArchiveAndAddInputStreamsContentAsRegularFiles() throws IOException {
+        ZipFile.Entry entryBentley = ZipFile.Entry.builder()
+                                                  .inputStreamSupplier(() -> new FileInputStream(fileBentley.toFile()))
+                                                  .fileName("my_cars/bentley-continental.jpg")
+                                                  .lastModifiedTime(System.currentTimeMillis()).build();
+
+        ZipFile.Entry entryKawasaki = ZipFile.Entry.builder()
+                                                   .inputStreamSupplier(() -> new FileInputStream(fileKawasaki.toFile()))
+                                                   .fileName("my_bikes/kawasaki.jpg")
+                                                   .lastModifiedTime(System.currentTimeMillis()).build();
+
+        List<ZipFile.Entry> entries = Arrays.asList(entryBentley, entryKawasaki);
+
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
+        ZipIt.zip(zip).addEntry(entries);
     }
 
 }

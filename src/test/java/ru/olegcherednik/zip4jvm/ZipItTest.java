@@ -42,6 +42,7 @@ public class ZipItTest {
     private static final Path defMultiZip = rootDir.resolve("def/multi/src.zip");
     private static final Path customSingleZip = rootDir.resolve("custom/single/src.zip");
     private static final Path customMultiZip = rootDir.resolve("custom/multi/src.zip");
+    private static final Path defEntryZip = rootDir.resolve("def/entry/src.zip");
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -53,14 +54,14 @@ public class ZipItTest {
         Zip4jvmSuite.removeDir(rootDir);
     }
 
-    public void shouldCreateZipWhenAddRegularFileAndDefaultSettings() throws IOException {
+    public void shouldCreateZipWhenAddRegularFileDefaultSettings() throws IOException {
         ZipIt.zip(defSingleZip).add(fileBentley);
         assertThatDirectory(defSingleZip.getParent()).exists().hasDirectories(0).hasFiles(1);
         assertThatZipFile(defSingleZip).root().hasDirectories(0).hasFiles(1);
         assertThatZipFile(defSingleZip).file(fileNameBentley).exists().hasSize(1_395_362);
     }
 
-    public void shouldCreateZipWhenAddDirectoryAndDefaultSettings() throws IOException {
+    public void shouldCreateZipWhenAddDirectoryDefaultSettings() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
         ZipIt.zip(zip).add(dirCars);
@@ -69,7 +70,7 @@ public class ZipItTest {
         assertThatZipFile(zip).directory(zipDirNameCars).matches(dirCarsAssert);
     }
 
-    @Test(dependsOnMethods = "shouldCreateZipWhenAddRegularFileAndDefaultSettings")
+    @Test(dependsOnMethods = "shouldCreateZipWhenAddRegularFileDefaultSettings")
     public void shouldAddRegularFileWhenZipExistsDefaultSettings() throws IOException {
         ZipIt.zip(defSingleZip).add(fileSaintPetersburg);
         assertThatDirectory(defSingleZip.getParent()).exists().hasDirectories(0).hasFiles(1);
@@ -187,6 +188,15 @@ public class ZipItTest {
         assertThatZipFile(customMultiZip).file(fileNameSaintPetersburg).exists().hasSize(1_074_836);
         assertThatZipFile(customMultiZip).directory(zipDirNameCars).matches(dirCarsAssert);
         assertThatZipFile(customMultiZip).directory(zipDirNameBikes).matches(dirBikesAssert);
+    }
+
+    public void shouldCreateZipWhenAddRegularFileDefaultSettingsZipEntry() throws IOException {
+        ZipFile.Entry entry = ZipFile.Entry.of(fileBentley, "foo.jpg");
+
+        ZipIt.zip(defEntryZip).addEntry(entry);
+        assertThatDirectory(defEntryZip.getParent()).exists().hasDirectories(0).hasFiles(1);
+        assertThatZipFile(defEntryZip).root().hasDirectories(0).hasFiles(1);
+        assertThatZipFile(defEntryZip).file("foo.jpg").exists().hasSize(1_395_362);
     }
 
 }

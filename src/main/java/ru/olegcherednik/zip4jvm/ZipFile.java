@@ -50,23 +50,26 @@ public final class ZipFile {
     @Getter
     public static final class Entry {
 
-        @NonNull
         @Getter(AccessLevel.NONE)
-        private final InputStreamSupplier inputStreamSup;
-        @NonNull
+        private final InputStreamSupplier inputStreamSupplier;
+        /** Normalized file name without directory marker {@literal /} */
         private final String fileName;
         private final long lastModifiedTime;
-        @NonNull
         private final ExternalFileAttributes externalFileAttributes;
         private final boolean regularFile;
 
-        public static Entry of(@NonNull Path path, @NonNull String fileName) throws IOException {
-            return builder()
-                    .inputStreamSup(Files.isRegularFile(path) ? () -> new FileInputStream(path.toFile()) : EmptyInputStreamSupplier.INSTANCE)
-                    .fileName(fileName)
+        public static Entry of(Path path, String fileName) throws IOException {
+            ZipFile.Entry.Builder builder = builder()
                     .lastModifiedTime(Files.getLastModifiedTime(path).toMillis())
-                    .externalFileAttributes(ExternalFileAttributes.build(PROP_OS_NAME).readFrom(path))
-                    .regularFile(Files.isRegularFile(path)).build();
+                    .externalFileAttributes(ExternalFileAttributes.build(PROP_OS_NAME).readFrom(path));
+
+            if (Files.isRegularFile(path)) {
+                builder.fileName(fileName);
+                builder.inputStreamSupplier(() -> new FileInputStream(path.toFile()));
+            } else
+                builder.directoryName(fileName);
+
+            return builder.build();
         }
 
         public static Entry.Builder builder() {
@@ -75,20 +78,20 @@ public final class ZipFile {
 
         private Entry(Entry.Builder builder) {
             fileName = ZipUtils.normalizeFileName(builder.fileName);
-            inputStreamSup = builder.regularFile ? builder.inputStreamSup : () -> EmptyInputStream.INSTANCE;
+            inputStreamSupplier = builder.regularFile ? builder.inputStreamSupplier : () -> EmptyInputStream.INSTANCE;
             lastModifiedTime = builder.lastModifiedTime;
             externalFileAttributes = builder.externalFileAttributes;
             regularFile = builder.regularFile;
         }
 
         public InputStream getInputStream() throws IOException {
-            return inputStreamSup.get();
+            return inputStreamSupplier.get();
         }
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static final class Builder {
 
-            private InputStreamSupplier inputStreamSup = EmptyInputStreamSupplier.INSTANCE;
+            private InputStreamSupplier inputStreamSupplier = EmptyInputStreamSupplier.INSTANCE;
             private String fileName;
             private long lastModifiedTime = System.currentTimeMillis();
             private ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.NULL;
@@ -98,13 +101,20 @@ public final class ZipFile {
                 return new Entry(this);
             }
 
-            public Entry.Builder inputStreamSup(InputStreamSupplier inputStreamSup) {
-                this.inputStreamSup = Optional.ofNullable(inputStreamSup).orElse(EmptyInputStreamSupplier.INSTANCE);
+            public Entry.Builder inputStreamSupplier(InputStreamSupplier inputStreamSupplier) {
+                this.inputStreamSupplier = Optional.ofNullable(inputStreamSupplier).orElse(EmptyInputStreamSupplier.INSTANCE);
                 return this;
             }
 
             public Entry.Builder fileName(@NonNull String fileName) {
-                this.fileName = fileName;
+                this.fileName = ZipUtils.getFileName(fileName, true);
+                regularFile = true;
+                return this;
+            }
+
+            public Entry.Builder directoryName(@NonNull String fileName) {
+                this.fileName = ZipUtils.getFileName(fileName, false);
+                regularFile = false;
                 return this;
             }
 
@@ -115,11 +125,6 @@ public final class ZipFile {
 
             public Entry.Builder externalFileAttributes(@NonNull ExternalFileAttributes externalFileAttributes) {
                 this.externalFileAttributes = externalFileAttributes;
-                return this;
-            }
-
-            public Entry.Builder regularFile(boolean regularFile) {
-                this.regularFile = regularFile;
                 return this;
             }
 

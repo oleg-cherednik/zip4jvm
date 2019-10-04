@@ -47,7 +47,7 @@ To simplify usage of _zip4jvm_, there're following classes:
  
 ### ZipIt
 
-#### Regular files and directory can be represented as `Path` 
+#### Regular files and empty directories can be represented as `Path` 
 
 ##### Create (or open existed) zip archive and add regular file */cars/bentley-continental.jpg*.
   
@@ -132,15 +132,64 @@ try (ZipFile.Writer zipFile = ZipIt.zip(zip).stream()) {
 
 **Note:** each directory from the list is added to the root of the zip archive keeping the initial structure.
 
-#### Regular files and directory can be represented as `Path`
+#### Regular files and empty directories are available as `InputStream`
 
+##### Create (or open existed) zip archive and add input stream content as regular files.
 
+```
+ZipFile.Entry entry = ZipFile.Entry.builder()
+                                   .inputStreamSupplier(() -> new FileInputStream("/cars/bentley-continental.jpg"))
+                                   .fileName("my_cars/bentley-continental.jpg")
+                                   .lastModifiedTime(System.currentTimeMillis()).build();
+Path zip = Paths.get("filename.zip");
+ZipIt.zip(zip).addEntry(entry);
+```
+>```
+> filename.zip
+>  |-- my_cars
+>  |    |-- bentley-continental.jpg
+>```  
 
+**Note:** any content form input stream is treated as regular file with given full name.
 
-> **ZipFileSettings** could be additionally set for all methods. See default settings.
+##### Create (or open existed) zip archive and add input streams content as regular files.
 
-**Note:** _see [ZipIt (Advanced Mode)](#zipit-advanced-mode) for using extended zip it operations
-_              
+```
+ZipFile.Entry entryBentley = ZipFile.Entry.builder()
+                                          .inputStreamSupplier(() -> new FileInputStream("/cars/bentley-continental.jpg"))
+                                          .fileName("my_cars/bentley-continental.jpg")
+                                          .lastModifiedTime(System.currentTimeMillis()).build();
+
+ZipFile.Entry entryKawasaki = ZipFile.Entry.builder()
+                                           .inputStreamSupplier(() -> new FileInputStream("/bikes/kawasaki-ninja-300.jpg"))
+                                           .fileName("my_bikes/kawasaki.jpg")
+                                           .lastModifiedTime(System.currentTimeMillis()).build();
+
+List<ZipFile.Entry> entries = Arrays.asList(entryBentley, entryKawasaki);
+
+Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
+ZipIt.zip(zip).addEntry(entries);
+```
+>```
+> filename.zip
+>  |-- my_cars
+>  |    |-- bentley-continental.jpg
+>  |-- my_bikes
+>  |    |-- kawasaki.jpg
+>```  
+
+**Note:** each entry is treated as separate input stream of the regular file.   
+
+#### Zip file settings: `ZipFileSettings`
+
+All zip operations include `ZipFileSettings`. [Default seeetinngs](#zip-file-settings-defaults) is
+used when it's not explicitly set. Settings contains zip archive scope settings as well as provider
+for entry specific settings. The key for entry settings is **fileName**.
+
+**Note:** user should not worry about directory marker `/`, because `zip4jvm` does not support
+duplicated file names and it's impossible to have same file name for file and directory.  
+
+#### Zip file settings defaults 
 
 ### UnzipIt (Standard Mode)
 

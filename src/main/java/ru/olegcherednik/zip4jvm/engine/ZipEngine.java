@@ -46,9 +46,10 @@ public final class ZipEngine implements ZipFile.Writer {
 
     @Override
     public void addEntry(@NonNull ZipFile.Entry entry) {
-        String fileName = entry.getFileName();
+        ZipEntrySettings entrySettings = entrySettingsProvider.apply(entry.getFileName());
+        String fileName = ZipUtils.getFileName(entry);
 
-        if (fileNameWriter.put(fileName, new ZipFileEntryWriter(entry, entrySettingsProvider.apply(fileName), tempZipModel)) != null)
+        if (fileNameWriter.put(ZipUtils.getFileName(entry), new ZipFileEntryWriter(entry, entrySettings, tempZipModel)) != null)
             throw new EntryDuplicationException(fileName);
     }
 
