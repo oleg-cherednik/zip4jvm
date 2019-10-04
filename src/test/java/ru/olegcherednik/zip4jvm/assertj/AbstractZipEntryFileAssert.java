@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.assertj;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 
+import javax.imageio.ImageIO;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -16,7 +17,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
  * @author Oleg Cherednik
  * @since 25.03.2019
  */
-public abstract class AbstractZipEntryFileAssert<S extends AbstractZipEntryFileAssert<S>> extends AbstractZipEntryAssert<S> {
+@SuppressWarnings("CatchMayIgnoreException")
+public abstract class AbstractZipEntryFileAssert<S extends AbstractZipEntryFileAssert<S>> extends AbstractZipEntryAssert<S> implements IFileAssert<S> {
 
     private static final Pattern NEW_LINE = Pattern.compile("\\r?\\n");
 
@@ -24,6 +26,7 @@ public abstract class AbstractZipEntryFileAssert<S extends AbstractZipEntryFileA
         super(actual, selfType, zipFile);
     }
 
+    @Override
     public S hasSize(long size) {
         if (actual.getSize() == -1) {
             try (InputStream in = zipFile.getInputStream(actual)) {
@@ -36,6 +39,19 @@ public abstract class AbstractZipEntryFileAssert<S extends AbstractZipEntryFileA
         }
 
         assertThat(actual.getSize()).isEqualTo(size);
+        return myself;
+    }
+
+    @Override
+    public S isImage() {
+        try (InputStream in = zipFile.getInputStream(actual)) {
+            assertThat(ImageIO.read(in)).isNotNull();
+        } catch(Exception e) {
+            assertThatThrownBy(() -> {
+                throw e;
+            }).doesNotThrowAnyException();
+        }
+
         return myself;
     }
 

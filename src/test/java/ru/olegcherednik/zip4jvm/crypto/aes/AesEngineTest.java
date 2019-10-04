@@ -2,8 +2,13 @@ package ru.olegcherednik.zip4jvm.crypto.aes;
 
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.model.Encryption;
+import ru.olegcherednik.zip4jvm.utils.ReflectionUtils;
+
+import javax.crypto.Cipher;
+import javax.crypto.Mac;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Oleg Cherednik
@@ -30,5 +35,36 @@ public class AesEngineTest {
         assertThat(AesEngine.getEncryption(AesStrength.S128)).isSameAs(Encryption.AES_128);
         assertThat(AesEngine.getEncryption(AesStrength.S192)).isSameAs(Encryption.AES_192);
         assertThat(AesEngine.getEncryption(AesStrength.S256)).isSameAs(Encryption.AES_256);
+    }
+
+    public void shouldUpdateIv() throws Throwable {
+        AesEngine engine = new AesEngine(mock(Cipher.class), mock(Mac.class));
+        assertThat(getIv(engine)).isEqualTo(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+
+        ivUpdate(engine);
+        assertThat(getIv(engine)).isEqualTo(new byte[] { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+
+        ivUpdate(engine);
+        assertThat(getIv(engine)).isEqualTo(new byte[] { 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+
+        setIv(engine, new byte[] { -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        ivUpdate(engine);
+        assertThat(getIv(engine)).isEqualTo(new byte[] { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+
+        setIv(engine, new byte[] { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 });
+        ivUpdate(engine);
+        assertThat(getIv(engine)).isEqualTo(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+    }
+
+    private static byte[] getIv(AesEngine engine) throws NoSuchFieldException, IllegalAccessException {
+        return ReflectionUtils.getFieldValue(engine, "iv");
+    }
+
+    private static void ivUpdate(AesEngine engine) throws Throwable {
+        ReflectionUtils.invokeMethod(engine, "ivUpdate");
+    }
+
+    private static void setIv(AesEngine engine, byte[] iv) throws NoSuchFieldException, IllegalAccessException {
+        ReflectionUtils.setFieldValue(engine, "iv", iv);
     }
 }

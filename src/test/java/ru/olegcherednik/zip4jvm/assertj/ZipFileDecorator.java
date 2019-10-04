@@ -1,10 +1,6 @@
 package ru.olegcherednik.zip4jvm.assertj;
 
 import lombok.Getter;
-import lombok.NonNull;
-import net.sf.sevenzipjbinding.SevenZipException;
-import net.sf.sevenzipjbinding.simple.ISimpleInArchiveItem;
-import org.apache.commons.io.FilenameUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import java.io.IOException;
@@ -24,14 +20,14 @@ import java.util.zip.ZipFile;
  * @author Oleg Cherednik
  * @since 27.03.2019
  */
-class ZipFileDecorator {
+abstract class ZipFileDecorator {
 
     @Getter
     protected final Path zip;
-    private final Map<String, ZipEntry> entries;
-    private final Map<String, Set<String>> map;
+    protected final Map<String, ZipEntry> entries;
+    protected final Map<String, Set<String>> map;
 
-    public ZipFileDecorator(Path zip) {
+    protected ZipFileDecorator(Path zip) {
         this(zip, entries(zip));
     }
 
@@ -54,33 +50,7 @@ class ZipFileDecorator {
         return map.containsKey(entryName) ? Collections.unmodifiableSet(map.get(entryName)) : Collections.emptySet();
     }
 
-    public InputStream getInputStream(@NonNull ZipEntry entry) {
-        try {
-            return new InputStream() {
-                private final ZipFile zipFile = new ZipFile(zip.toFile());
-                private final InputStream delegate = zipFile.getInputStream(entry);
-
-                @Override
-                public int available() throws IOException {
-                    return delegate.available();
-                }
-
-                @Override
-                public int read() throws IOException {
-                    return delegate.read();
-                }
-
-                @Override
-                public void close() throws IOException {
-                    delegate.close();
-                    zipFile.close();
-                }
-
-            };
-        } catch(Exception e) {
-            throw new Zip4jvmException(e);
-        }
-    }
+    public abstract InputStream getInputStream(ZipEntry entry);
 
     public String getComment() {
         try (ZipFile zipFile = new ZipFile(zip.toFile())) {
@@ -104,11 +74,6 @@ class ZipFileDecorator {
         } catch(Exception e) {
             throw new Zip4jvmException(e);
         }
-    }
-
-    protected static String getItemName(ISimpleInArchiveItem item) throws SevenZipException {
-        String name = FilenameUtils.normalize(item.getPath(), true);
-        return item.isFolder() ? name + '/' : name;
     }
 
     private static Map<String, Set<String>> walk(Set<String> entries) {

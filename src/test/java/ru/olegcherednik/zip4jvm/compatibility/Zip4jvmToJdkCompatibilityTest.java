@@ -14,6 +14,7 @@ import java.util.zip.ZipFile;
 
 import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
 import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolid;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
 /**
@@ -48,7 +49,7 @@ public class Zip4jvmToJdkCompatibilityTest {
                 }
             }
 
-            assertThatDirectory(dstDir).matches(TestDataAssert.dirSrcAssert);
+            assertThatDirectory(dstDir).matches(rootAssert);
         }
 
     }

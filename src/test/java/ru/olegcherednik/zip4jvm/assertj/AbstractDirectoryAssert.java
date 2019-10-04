@@ -13,18 +13,21 @@ import java.util.function.Consumer;
  * @author Oleg Cherednik
  * @since 27.03.2019
  */
-public class AbstractDirectoryAssert<S extends AbstractDirectoryAssert<S>> extends AbstractFileAssert<S> {
+public class AbstractDirectoryAssert<S extends AbstractDirectoryAssert<S>> extends AbstractFileAssert<S> implements IDirectoryAssert<S> {
 
     public AbstractDirectoryAssert(Path actual, Class<?> selfType) {
         super(actual.toFile(), selfType);
     }
 
-    // TODO name == "/" -> will give root like d:\
-
+    @Override
     public AbstractDirectoryAssert<?> directory(String name) {
+        if ("/".equals(name))
+            throw new Zip4jvmException("Name cannot be '/'");
+
         return new DirectoryAssert(actual.toPath().resolve(name));
     }
 
+    @Override
     public S hasDirectories(int expected) {
         long actual = getFoldersAmount();
 
@@ -36,6 +39,7 @@ public class AbstractDirectoryAssert<S extends AbstractDirectoryAssert<S>> exten
         return myself;
     }
 
+    @Override
     public S hasFiles(int expected) {
         long actual = getRegularFilesAmount();
 
@@ -61,7 +65,7 @@ public class AbstractDirectoryAssert<S extends AbstractDirectoryAssert<S>> exten
         }
     }
 
-    public S matches(Consumer<AbstractDirectoryAssert<?>> consumer) {
+    public S matches(Consumer<IDirectoryAssert<?>> consumer) {
         consumer.accept(this);
         return myself;
     }

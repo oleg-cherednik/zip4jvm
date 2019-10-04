@@ -26,9 +26,8 @@ import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirCars;
 import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolidPkware;
 import static ru.olegcherednik.zip4jvm.TestData.zipStoreSplitPkware;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.dirSrcAssert;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.zipDirCarsAssert;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.zipDirRootAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.passwordStr;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
@@ -64,9 +63,9 @@ public class EncryptionPkwareTest {
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        ZipIt.add(zip, contentDirSrc, settings);
+        ZipIt.zip(zip).settings(settings).add(contentDirSrc);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
-        assertThatZipFile(zip, password).exists().root().matches(zipDirRootAssert);
+        assertThatZipFile(zip, password).exists().root().matches(rootAssert);
     }
 
     public void shouldCreateNewZipWithSelectedFilesAndPkwareEncryption() throws IOException {
@@ -79,10 +78,10 @@ public class EncryptionPkwareTest {
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        ZipIt.add(zip, filesDirCars, settings);
+        ZipIt.zip(zip).settings(settings).add(filesDirCars);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
         assertThatZipFile(zip, password).exists().root().hasDirectories(0).hasFiles(3);
-        assertThatZipFile(zip, password).root().matches(zipDirCarsAssert);
+        assertThatZipFile(zip, password).root().matches(dirCarsAssert);
     }
 
     public void shouldThrowExceptionWhenPkwareEncryptionAndEmptyPassword() throws IOException {
@@ -100,21 +99,22 @@ public class EncryptionPkwareTest {
     public void shouldUnzipWhenStoreSolidPkware() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        UnzipIt.extract(zipStoreSolidPkware, destDir, fileName -> password);
-        assertThatDirectory(destDir).matches(dirSrcAssert);
+        UnzipIt.zip(zipStoreSolidPkware).destDir(destDir).password(password).extract();
+        assertThatDirectory(destDir).matches(rootAssert);
     }
 
     public void shouldUnzipWhenStoreSplitPkware() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        UnzipIt.extract(zipStoreSplitPkware, destDir, fileName -> password);
-        assertThatDirectory(destDir).matches(dirSrcAssert);
+        UnzipIt.zip(zipStoreSplitPkware).destDir(destDir).password(password).extract();
+        assertThatDirectory(destDir).matches(rootAssert);
     }
 
     public void shouldThrowExceptionWhenUnzipPkwareEncryptedZipWithIncorrectPassword() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        assertThatThrownBy(() -> UnzipIt.extract(zipStoreSplitPkware, destDir, fileName -> UUID.randomUUID().toString().toCharArray()))
+        assertThatThrownBy(() ->
+                UnzipIt.zip(zipStoreSplitPkware).destDir(destDir).passwordProvider(fileName -> UUID.randomUUID().toString().toCharArray()).extract())
                 .isExactlyInstanceOf(IncorrectPasswordException.class);
     }
 
@@ -122,7 +122,7 @@ public class EncryptionPkwareTest {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTme(rootDir);
         Path zip = Paths.get("src/test/resources/zip/zip64_crc1byte_check.zip").toAbsolutePath();
 
-        UnzipIt.extract(zip, destDir, fileName -> "Shu1an@2019GTS".toCharArray());
+        UnzipIt.zip(zip).destDir(destDir).password("Shu1an@2019GTS".toCharArray()).extract();
         assertThatDirectory(destDir).exists().hasDirectories(0).hasFiles(1);
         assertThatDirectory(destDir).file("hello.txt").exists().hasSize(11).hasContent("hello,itsme");
     }
