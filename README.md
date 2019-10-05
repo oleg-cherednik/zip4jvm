@@ -6,11 +6,7 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/7b6b963fef254ff4b00b8be0304e829b)](https://www.codacy.com/app/oleg-cherednik/zip4jvm?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=oleg-cherednik/zip4jvm&amp;utm_campaign=Badge_Grade)
 [![coverity](https://scan.coverity.com/projects/4735/badge.svg)](https://scan.coverity.com/projects/oleg-cherednik-zip4jvm)
 
-<p align="center"><a href="https://github.com/oleg-cherednik/zip4jvm"><img src="https://github.com/oleg-cherednik/DailyCodingProblem/blob/master/dcp.jpg"></a><a href="https://www.java.com/"><img src="https://github.com/oleg-cherednik/DailyCodingProblem/blob/master/java.png"></a></p>
-
----
-
-[<img src="java.png">](https://github.com/oleg-cherednik/zip4jvm)
+<p align="center"><img src="java.png"></a><img src="zip.png"></a></p>
 
 zip4jvm - a java library for working with zip files
 =====================
