@@ -218,12 +218,12 @@ are not explicitly set, then `default` entry settings are used for all added ent
    - `store` - no compression   
    - `deflate` - use [Deflate](https://en.wikipedia.org/wiki/DEFLATE) compression algorithm 
  - _compressionLevel_ - compression level
-   - `fastest`, `fast`, `normal`, `maximum`, `ultra`
+   - `fastest` `fast` `normal` `maximum` `ultra`
  - _encryption_ - encryption algorithm
    - `off` - not encryption
    - `pkware` - [PKWare](https://en.wikipedia.org/wiki/PKWare) encryption algorithm
-   - `aes_128`, `aes_192`, `aes_256` - [AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
-     encryption algorithm with given `128`, `192` or `255` key strength
+   - `aes_128` `aes_192` `aes_256` - [AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
+     encryption algorithm with given `128` `192` `255` key strength
  - _comment_ - comment for entry
    - _no comment_ - `null` or `empty string`
    - _max length_ - `65_535` symbols
