@@ -218,11 +218,7 @@ are not explicitly set, then `default` entry settings are used for all added ent
    - `store` - no compression   
    - `deflate` - use [Deflate](https://en.wikipedia.org/wiki/DEFLATE) compression algorithm 
  - _compressionLevel_ - compression level
-   - `fastest`
-   - `fast`
-   - `normal`
-   - `maximum`
-   - `ultra`
+   - `fastest`, `fast`, `normal`, `maximum`, `ultra`
  - _encryption_ - encryption algorithm
    - `off` - not encryption
    - `pkware` - [PKWare](https://en.wikipedia.org/wiki/PKWare) encryption algorithm
