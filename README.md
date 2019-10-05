@@ -386,7 +386,7 @@ Function<String, char[]> passwordProvider = fileName -> {
 };             
 
 List<Path> fileNames = Arrays.asList("cars", "bikes/ducati-panigale-1199.jpg", "saint-petersburg.jpg");
-UnzipIt.zip(zip).destDir(destDir).passwordProvider(passwordProvider).extract(fileNames);
+UnzipIt.zip(zip).destDir(destDir).password(passwordProvider).extract(fileNames);
 ```                                     
 >```
 >filename.zip

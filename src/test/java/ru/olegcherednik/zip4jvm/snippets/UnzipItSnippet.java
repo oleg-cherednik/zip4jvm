@@ -98,7 +98,7 @@ public class UnzipItSnippet {
 
         Function<String, char[]> passwordProvider = String::toCharArray;
         List<String> fileNames = Arrays.asList(dirNameCars, dirNameBikes + '/' + fileNameDucati, fileNameSaintPetersburg);
-        UnzipIt.zip(zip).destDir(destDir).passwordProvider(passwordProvider).extract(fileNames);
+        UnzipIt.zip(zip).destDir(destDir).password(passwordProvider).extract(fileNames);
     }
 
 }

@@ -52,6 +52,11 @@ public final class ZipUtils {
             throw new RealBigZip64NotSupportedException(value, type);
     }
 
+    public static <T> void requireNotNull(T obj, String name) {
+        if (obj == null)
+            throw new IllegalArgumentException("Parameter should not be null: " + name);
+    }
+
     public static boolean isDirectory(String fileName) {
         return fileName.endsWith("/") || fileName.endsWith("\\");
     }

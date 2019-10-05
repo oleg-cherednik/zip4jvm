@@ -7,12 +7,14 @@ import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
+import ru.olegcherednik.zip4jvm.utils.ReflectionUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static ru.olegcherednik.zip4jvm.TestData.dirBikes;
 import static ru.olegcherednik.zip4jvm.TestData.dirCars;
@@ -109,13 +111,13 @@ public class ZipItTest {
     }
 
     public void shouldThrowExceptionWhenAddNullPathAndDefaultSettings() {
-        assertThatThrownBy(() -> ZipIt.zip(defSingleZip).add((Path)null)).isExactlyInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> ZipIt.zip(defSingleZip).add((Path)null)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
     public void shouldThrowExceptionWhenAddNullPathAndCustomSettings() {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
         ZipFileSettings settings = ZipFileSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
-        assertThatThrownBy(() -> ZipIt.zip(customSingleZip).settings(settings).add((Path)null)).isExactlyInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> ZipIt.zip(customSingleZip).settings(settings).add((Path)null)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
     public void shouldCreateZipWhenAddRegularFileAndCustomSettings() throws IOException {
@@ -197,6 +199,22 @@ public class ZipItTest {
         assertThatDirectory(defEntryZip.getParent()).exists().hasDirectories(0).hasFiles(1);
         assertThatZipFile(defEntryZip).root().hasDirectories(0).hasFiles(1);
         assertThatZipFile(defEntryZip).file("foo.jpg").exists().hasSize(1_395_362);
+    }
+
+    public void shouldUseDefaultZipFileSettingsWhenSetNull() throws NoSuchFieldException, IllegalAccessException {
+        ZipIt zipIt = ZipIt.zip(defEntryZip);
+        assertThat(getSettings(zipIt)).isSameAs(ZipFileSettings.DEFAULT);
+
+        ZipFileSettings settings = ZipFileSettings.builder().comment("comment").build();
+        zipIt.settings(settings);
+        assertThat(getSettings(zipIt)).isSameAs(settings);
+
+        zipIt.settings(null);
+        assertThat(getSettings(zipIt)).isSameAs(ZipFileSettings.DEFAULT);
+    }
+
+    private static ZipFileSettings getSettings(ZipIt zipIt) throws NoSuchFieldException, IllegalAccessException {
+        return ReflectionUtils.getFieldValue(zipIt, "settings");
     }
 
 }

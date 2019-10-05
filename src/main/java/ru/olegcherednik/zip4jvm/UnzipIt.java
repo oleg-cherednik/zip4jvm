@@ -1,3 +1,18 @@
+/*
+ * Copyright © 2019 Cherednik Oleg
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package ru.olegcherednik.zip4jvm;
 
 import lombok.AccessLevel;
@@ -42,7 +57,7 @@ public final class UnzipIt {
         return this;
     }
 
-    public UnzipIt passwordProvider(Function<String, char[]> passwordProvider) {
+    public UnzipIt password(Function<String, char[]> passwordProvider) {
         this.passwordProvider = Optional.ofNullable(passwordProvider).orElse(DEFAULT_PASSWORD_PROVIDER);
         return this;
     }
