@@ -72,12 +72,12 @@ public final class ZipIt {
     }
 
     public void addEntry(Collection<ZipFile.Entry> entries) throws IOException {
-        try (ZipFile.Writer zipFile = zip(zip).settings(settings).stream()) {
+        try (ZipFile.Writer zipFile = zip(zip).settings(settings).open()) {
             zipFile.addEntry(entries);
         }
     }
 
-    public ZipFile.Writer stream() throws IOException {
+    public ZipFile.Writer open() throws IOException {
         return ZipFile.writer(zip, settings);
     }
 

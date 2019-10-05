@@ -7,6 +7,7 @@ import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
@@ -59,6 +60,10 @@ public final class UnzipIt {
 
         for (String fileName : fileNames)
             zipFile.extract(destDir, fileName);
+    }
+
+    public InputStream stream(String fileName) throws IOException {
+        return ZipFile.reader(zip, passwordProvider).extract(fileName).getInputStream();
     }
 
     public ZipFile.Reader open() throws IOException {

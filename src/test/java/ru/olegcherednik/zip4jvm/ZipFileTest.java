@@ -59,7 +59,7 @@ public class ZipFileTest {
     public void shouldCreateZipFileWhenUseZipFileAndAddFiles() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(file).entrySettings(entrySettings).stream()) {
+        try (ZipFile.Writer zipFile = ZipIt.zip(file).entrySettings(entrySettings).open()) {
             zipFile.add(fileBentley);
             zipFile.add(fileFerrari);
             zipFile.add(fileWiesmann);
@@ -76,7 +76,7 @@ public class ZipFileTest {
     public void shouldAddFilesToExistedZipWhenUseZipFile() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(file).entrySettings(entrySettings).stream()) {
+        try (ZipFile.Writer zipFile = ZipIt.zip(file).entrySettings(entrySettings).open()) {
             zipFile.add(fileDucati);
             zipFile.add(fileHonda);
             zipFile.add(fileKawasaki);
@@ -107,7 +107,7 @@ public class ZipFileTest {
             return ZipEntrySettings.DEFAULT;
         };
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(file).entrySettings(entrySettingsProvider).stream()) {
+        try (ZipFile.Writer zipFile = ZipIt.zip(file).entrySettings(entrySettingsProvider).open()) {
             zipFile.add(fileBentley);
             zipFile.add(fileFerrari);
             zipFile.add(fileWiesmann);
@@ -139,7 +139,7 @@ public class ZipFileTest {
 
         Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(file).entrySettings(entrySettingsProvider).stream()) {
+        try (ZipFile.Writer zipFile = ZipIt.zip(file).entrySettings(entrySettingsProvider).open()) {
             zipFile.add(fileBentley);
             zipFile.add(fileFerrari);
             zipFile.add(fileWiesmann);
@@ -169,7 +169,7 @@ public class ZipFileTest {
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(zip).settings(settings).stream()) {
+        try (ZipFile.Writer zipFile = ZipIt.zip(zip).settings(settings).open()) {
             zipFile.add(filesDirBikes);
             zipFile.add(filesDirCars);
             zipFile.add(filesDirSrc);
@@ -189,7 +189,7 @@ public class ZipFileTest {
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(zip).settings(settings).stream()) {
+        try (ZipFile.Writer zipFile = ZipIt.zip(zip).settings(settings).open()) {
             zipFile.add(dirEmpty);
         }
 

@@ -66,7 +66,6 @@ public final class UnzipEngine implements ZipFile.Reader {
                        .collect(Collectors.toList());
     }
 
-    @NonNull
     @Override
     public ZipFile.Entry extract(@NonNull String fileName) throws IOException {
         ZipEntry zipEntry = zipModel.getEntryByFileName(ZipUtils.normalizeFileName(fileName));
@@ -83,7 +82,6 @@ public final class UnzipEngine implements ZipFile.Reader {
         return zipModel.getComment();
     }
 
-    @NonNull
     @Override
     public Set<String> getEntryNames() {
         return zipModel.getEntryNames();
@@ -123,7 +121,7 @@ public final class UnzipEngine implements ZipFile.Reader {
         if (zipEntry.isDirectory())
             Files.createDirectories(file);
         else {
-            zipEntry.setPassword(passwordProvider.apply(fileName));
+            zipEntry.setPassword(passwordProvider.apply(ZipUtils.getFileNameNoDirectoryMarker(zipEntry.getFileName())));
             ZipUtils.copyLarge(zipEntry.getInputStream(), getOutputStream(file));
         }
 

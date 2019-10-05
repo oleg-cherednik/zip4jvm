@@ -61,7 +61,7 @@ public class ZipItSnippet {
     public void createOrOpenExistedZipArchiveAndAddSomeRegularFilesAndDirectoriesUsingStream() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(zip).stream()) {
+        try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
             zipFile.add(fileDucati);
             zipFile.add(fileHonda);
             zipFile.add(dirCars);

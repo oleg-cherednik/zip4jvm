@@ -57,8 +57,8 @@ Path file = Path.get("/cars/bentley-continental.jpg")
 ZipIt.zip(zip).add(file);
 ```
 >```
-> filename.zip
->  |-- bentley-continental.jpg
+>filename.zip
+> |-- bentley-continental.jpg
 >```
 
 **Note:** regular file is added to the root of the zip archive.
@@ -71,11 +71,11 @@ Path dir = Path.get("/catalog/cars")
 ZipIt.zip(zip).add(dir);
 ```
 >```
-> filename.zip
->  |-- cars
->       |-- bentley-continental.jpg
->       |-- feffari-458-italia.jpg
->       |-- wiesmann-gt-mf5.jpg 
+>filename.zip
+> |-- cars
+>      |-- bentley-continental.jpg
+>      |-- feffari-458-italia.jpg
+>      |-- wiesmann-gt-mf5.jpg 
 >```
 
 **Note:** directory is added to the root of the zip archive keeping the initial structure.
@@ -92,14 +92,14 @@ Collection<Path> paths = Arrays.asList(
 ZipIt.zip(zip).add(paths);
 ```
 >```
-> filename.zip
->  |-- cars
->  |    |-- bentley-continental.jpg
->  |    |-- feffari-458-italia.jpg
->  |    |-- wiesmann-gt-mf5.jpg
->  |-- ducati-panigale-1199.jpg
->  |-- honda-cbr600rr.jpg
->  |-- saint-petersburg.jpg 
+>filename.zip
+> |-- cars
+> |    |-- bentley-continental.jpg
+> |    |-- feffari-458-italia.jpg
+> |    |-- wiesmann-gt-mf5.jpg
+> |-- ducati-panigale-1199.jpg
+> |-- honda-cbr600rr.jpg
+> |-- saint-petersburg.jpg 
 >```
 
 **Note:** each regular file from the list is added to the root of the zip archive.
@@ -110,7 +110,7 @@ ZipIt.zip(zip).add(paths);
   
 ```
 Path zip = Paths.get("filename.zip");
-try (ZipFile.Writer zipFile = ZipIt.zip(zip).stream()) {
+try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
     zipFile.add(Paths.get("/bikes/ducati-panigale-1199.jpg"));
     zipFile.add(Paths.get("/bikes/honda-cbr600rr.jpg"));
     zipFile.add(Paths.get("/cars"));
@@ -118,14 +118,14 @@ try (ZipFile.Writer zipFile = ZipIt.zip(zip).stream()) {
 }
 ```
 >```
-> filename.zip
->  |-- cars
->  |    |-- bentley-continental.jpg
->  |    |-- feffari-458-italia.jpg
->  |    |-- wiesmann-gt-mf5.jpg
->  |-- ducati-panigale-1199.jpg
->  |-- honda-cbr600rr.jpg
->  |-- saint-petersburg.jpg 
+>filename.zip
+> |-- cars
+> |    |-- bentley-continental.jpg
+> |    |-- feffari-458-italia.jpg
+> |    |-- wiesmann-gt-mf5.jpg
+> |-- ducati-panigale-1199.jpg
+> |-- honda-cbr600rr.jpg
+> |-- saint-petersburg.jpg 
 >```                                                                                                         
 
 **Note:** each regular file from the list is added to the root of the zip archive.
@@ -145,14 +145,14 @@ Path zip = Paths.get("filename.zip");
 ZipIt.zip(zip).addEntry(entry);
 ```
 >```
-> filename.zip
->  |-- my_cars
->  |    |-- bentley-continental.jpg
+>filename.zip
+> |-- my_cars
+> |    |-- bentley-continental.jpg
 >```  
 
 **Note:** any content form input stream is treated as regular file with given full name.
 
-##### Create (or open existed) zip archive and add input streams content as regular files.
+##### Create (or open existed) zip archive and add input streams content as regular files
 
 ```
 ZipFile.Entry entryBentley = ZipFile.Entry.builder()
@@ -171,11 +171,11 @@ Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
 ZipIt.zip(zip).addEntry(entries);
 ```
 >```
-> filename.zip
->  |-- my_cars
->  |    |-- bentley-continental.jpg
->  |-- my_bikes
->  |    |-- kawasaki.jpg
+>filename.zip
+> |-- my_cars
+> |    |-- bentley-continental.jpg
+> |-- my_bikes
+> |    |-- kawasaki.jpg
 >```  
 
 **Note:** each entry is treated as separate input stream of the regular file.   
@@ -192,27 +192,27 @@ Path destDir = Paths.get("/filename_content");
 UnzipIt.zip(zip).destDir(destDir).extract();
 ```
 >```
-> filename.zip
+>filename.zip
+> |-- cars
+> |    |-- bentley-continental.jpg
+> |    |-- feffari-458-italia.jpg
+> |    |-- wiesmann-gt-mf5.jpg
+> |-- bikes
+> |    |-- ducati-panigale-1199.jpg
+> |    |-- kawasaki-ninja-300.jpg
+> |-- saint-petersburg.jpg 
+>```
+>```
+>/filename_content
+>  |-- cars
 >  |-- cars
 >  |    |-- bentley-continental.jpg
 >  |    |-- feffari-458-italia.jpg
 >  |    |-- wiesmann-gt-mf5.jpg
->  |-- biles
+>  |-- bikes
 >  |    |-- ducati-panigale-1199.jpg
 >  |    |-- kawasaki-ninja-300.jpg
 >  |-- saint-petersburg.jpg 
->```
->```
-> /filename_content
->   |-- cars
->   |-- cars
->   |    |-- bentley-continental.jpg
->   |    |-- feffari-458-italia.jpg
->   |    |-- wiesmann-gt-mf5.jpg
->   |-- biles
->   |    |-- ducati-panigale-1199.jpg
->   |    |-- kawasaki-ninja-300.jpg
->   |-- saint-petersburg.jpg 
 >```
 
 **Note:** all entries (i.e. regular files and empty directories) are added to the destination
@@ -226,19 +226,19 @@ Path destDir = Paths.get("/filename_content");
 UnzipIt.zip(zip).destDir(destDir).extract("cars/bentley-continental.jpg");
 ```
 >```
-> filename.zip
->  |-- cars
->  |    |-- bentley-continental.jpg
->  |    |-- feffari-458-italia.jpg
->  |    |-- wiesmann-gt-mf5.jpg
->  |-- biles
->  |    |-- ducati-panigale-1199.jpg
->  |    |-- kawasaki-ninja-300.jpg
->  |-- saint-petersburg.jpg 
+>filename.zip
+> |-- cars
+> |    |-- bentley-continental.jpg
+> |    |-- feffari-458-italia.jpg
+> |    |-- wiesmann-gt-mf5.jpg
+> |-- bikes
+> |    |-- ducati-panigale-1199.jpg
+> |    |-- kawasaki-ninja-300.jpg
+> |-- saint-petersburg.jpg 
 >```
 >```
-> /filename_content
->   |-- bentley-continental.jpg
+>/filename_content
+>  |-- bentley-continental.jpg
 >```
 
 **Note:** regular file's entry is added to the root of the destination directory.
@@ -250,65 +250,164 @@ Path destDir = Paths.get("/filename_content");
 UnzipIt.zip(zip).destDir(destDir).extract("cars");
 ```
 >```
-> filename.zip
+>filename.zip
+> |-- cars
+> |    |-- bentley-continental.jpg
+> |    |-- feffari-458-italia.jpg
+> |    |-- wiesmann-gt-mf5.jpg
+> |-- bikes
+> |    |-- ducati-panigale-1199.jpg
+> |    |-- kawasaki-ninja-300.jpg
+> |-- saint-petersburg.jpg 
+>```
+>```
+>/filename_content
 >  |-- cars
 >  |    |-- bentley-continental.jpg
 >  |    |-- feffari-458-italia.jpg
 >  |    |-- wiesmann-gt-mf5.jpg
->  |-- biles
->  |    |-- ducati-panigale-1199.jpg
->  |    |-- kawasaki-ninja-300.jpg
->  |-- saint-petersburg.jpg 
->```
->```
-> /filename_content
->   |-- cars
->   |    |-- bentley-continental.jpg
->   |    |-- feffari-458-italia.jpg
->   |    |-- wiesmann-gt-mf5.jpg
 >```
 
 **Note:** extract all entries belong to the given directory; content of these entries is added to
 the destination directory keeping the initial structure.
 
 ##### Extract some entries into given directory
+
 ```
 Path zip = Paths.get("filename.zip");
 Path destDir = Paths.get("/filename_content");
 Collection<Path> fileNames = Arrays.asList("cars", "bikes/ducati-panigale-1199.jpg", "saint-petersburg.jpg"); 
-UnzipIt.extract(zip, destDir, fileName);
+UnzipIt.zip(zip).destDir(destDir).extract(fileNames);
 ```
 >```
-> filename.zip
+>filename.zip
+> |-- cars
+> |    |-- bentley-continental.jpg
+> |    |-- feffari-458-italia.jpg
+> |    |-- wiesmann-gt-mf5.jpg
+> |-- bikes
+> |    |-- ducati-panigale-1199.jpg
+> |    |-- kawasaki-ninja-300.jpg
+> |-- saint-petersburg.jpg 
+>```
+>```
+>/filename_content
 >  |-- cars
 >  |    |-- bentley-continental.jpg
 >  |    |-- feffari-458-italia.jpg
 >  |    |-- wiesmann-gt-mf5.jpg
->  |-- biles
->  |    |-- ducati-panigale-1199.jpg
->  |    |-- kawasaki-ninja-300.jpg
->  |-- saint-petersburg.jpg 
->```
->```
-> /filename_content
->   |-- cars
->   |    |-- bentley-continental.jpg
->   |    |-- feffari-458-italia.jpg
->   |    |-- wiesmann-gt-mf5.jpg
->   |-- ducati-panigale-1199.jpg
->   |-- saint-petersburg.jpg
+>  |-- ducati-panigale-1199.jpg
+>  |-- saint-petersburg.jpg
 >```                     
 
 **Note:** directory is extracting keeping the initial structure; regular file is extracted into root of
 destination directory
 
-_**Note:** `CreatePassword` function could be optionally added to all methods. See details in
+### Regular files as `InputStream` source
 
+##### Get input stream for regular file's entry
 
+```
+Path zip = Paths.get("filename.zip");
+Path destFile = Paths.get("filename_content/bentley.jpg");
+try (InputStream in = UnzipIt.zip(zip).stream("cars/bentley-continental.jpg");
+     OutputStream out = new FileOutputStream(destFile.toFile())) {
+    IOUtils.copyLarge(in, out);
+}
+```                                     
+>```
+>filename.zip
+> |-- cars
+> |    |-- bentley-continental.jpg
+> |    |-- feffari-458-italia.jpg
+> |    |-- wiesmann-gt-mf5.jpg
+> |-- bikes
+> |    |-- ducati-panigale-1199.jpg
+> |    |-- kawasaki-ninja-300.jpg
+> |-- saint-petersburg.jpg 
+>```
+>```
+>/filename_content
+>  |-- bentley-continental.jpg
+>```
 
-[CreatePassword function](#createpassword-function)._
+**Note:** Input stream for regular file's entry should be correctly closed to flush all data
 
-### CreatePassword function
+### Use password to unzip
+
+For all unzip operation _password provider_ could be optionally set. It could be either single password or
+password provider with _fileName_ of the entry as a key.
+
+#### Unzip with single password for entries
+
+```
+char[] password = "1".toCharArray();
+Path destDir = Paths.get("/filename_content");
+List<Path> fileNames = Arrays.asList("cars", "bikes/ducati-panigale-1199.jpg", "saint-petersburg.jpg"); 
+UnzipIt.zip(zip).destDir(destDir).password(password).extract(fileNames);
+```
+>```
+>filename.zip  --> password: 1
+> |-- cars
+> |    |-- bentley-continental.jpg
+> |    |-- feffari-458-italia.jpg
+> |    |-- wiesmann-gt-mf5.jpg
+> |-- bikes
+> |    |-- ducati-panigale-1199.jpg
+> |    |-- kawasaki-ninja-300.jpg
+> |-- saint-petersburg.jpg 
+>```
+>```
+>/filename_content
+>  |-- cars
+>  |    |-- bentley-continental.jpg
+>  |    |-- feffari-458-italia.jpg
+>  |    |-- wiesmann-gt-mf5.jpg
+>  |-- ducati-panigale-1199.jpg
+>  |-- saint-petersburg.jpg
+>``` 
+
+Or separate password for each entry. The key is the _fileName_ of the entry:  
+
+#### Unzip with separate password for each entry
+
+```
+Path zip = Paths.get("filename.zip");
+Path destFile = Paths.get("filename_content/bentley.jpg");                                      
+
+Function<String, char[]> passwordProvider = fileName -> {
+    if (fileName.startsWith("cars/"))
+        return "1".toCharArray();
+    if (fileName.startsWith("bikes/ducati-panigale-1199.jpg"))
+        return "2".toCharArray();
+    if (fileName.startsWith("saint-petersburg.jpg"))
+            return "3".toCharArray();
+    return null;
+};             
+
+List<Path> fileNames = Arrays.asList("cars", "bikes/ducati-panigale-1199.jpg", "saint-petersburg.jpg");
+UnzipIt.zip(zip).destDir(destDir).passwordProvider(passwordProvider).extract(fileNames);
+```                                     
+>```
+>filename.zip
+>  |-- cars
+>  |    |-- bentley-continental.jpg   --> password: 1 
+>  |    |-- feffari-458-italia.jpg    --> password: 1
+>  |    |-- wiesmann-gt-mf5.jpg       --> password: 1
+>  |-- bikes
+>  |    |-- ducati-panigale-1199.jpg  --> password: 2
+>  |    |-- kawasaki-ninja-300.jpg
+>  |-- saint-petersburg.jpg           --> password: 3 
+>```
+>```
+>/filename_content
+>  |-- cars
+>  |    |-- bentley-continental.jpg
+>  |    |-- feffari-458-italia.jpg
+>  |    |-- wiesmann-gt-mf5.jpg
+>  |-- ducati-panigale-1199.jpg
+>  |-- saint-petersburg.jpg
+>```
 
 ## Model
 

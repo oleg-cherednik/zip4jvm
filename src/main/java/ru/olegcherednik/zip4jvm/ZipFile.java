@@ -143,7 +143,7 @@ public final class ZipFile {
                 addEntry(Entry.of(entry.getKey(), entry.getValue()));
         }
 
-        default void addEntry(@NonNull Collection<Entry> entries) {
+        default void addEntry(Collection<Entry> entries) {
             entries.forEach(this::addEntry);
         }
 
@@ -177,12 +177,10 @@ public final class ZipFile {
             return StreamSupport.stream(spliterator(), false);
         }
 
-        @NonNull
         ZipFile.Entry extract(@NonNull String fileName) throws IOException;
 
         String getComment();
 
-        @NonNull
         Set<String> getEntryNames();
 
         boolean isSplit();
