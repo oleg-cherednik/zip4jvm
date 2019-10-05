@@ -138,9 +138,9 @@ try (ZipFile.Writer zipFile = ZipIt.zip(zip).stream()) {
 
 ```
 ZipFile.Entry entry = ZipFile.Entry.builder()
-                           .inputStreamSupplier(() -> new FileInputStream("/cars/bentley-continental.jpg"))
-                           .fileName("my_cars/bentley-continental.jpg")
-                           .lastModifiedTime(System.currentTimeMillis()).build();
+                       .inputStreamSupplier(() -> new FileInputStream("/cars/bentley-continental.jpg"))
+                       .fileName("my_cars/bentley-continental.jpg")
+                       .lastModifiedTime(System.currentTimeMillis()).build();
 Path zip = Paths.get("filename.zip");
 ZipIt.zip(zip).addEntry(entry);
 ```
@@ -156,14 +156,14 @@ ZipIt.zip(zip).addEntry(entry);
 
 ```
 ZipFile.Entry entryBentley = ZipFile.Entry.builder()
-                                  .inputStreamSupplier(() -> new FileInputStream("/cars/bentley-continental.jpg"))
-                                  .fileName("my_cars/bentley-continental.jpg")
-                                  .lastModifiedTime(System.currentTimeMillis()).build();
+                              .inputStreamSupplier(() -> new FileInputStream("/cars/bentley-continental.jpg"))
+                              .fileName("my_cars/bentley-continental.jpg")
+                              .lastModifiedTime(System.currentTimeMillis()).build();
 
 ZipFile.Entry entryKawasaki = ZipFile.Entry.builder()
-                                   .inputStreamSupplier(() -> new FileInputStream("/bikes/kawasaki-ninja-300.jpg"))
-                                   .fileName("my_bikes/kawasaki.jpg")
-                                   .lastModifiedTime(System.currentTimeMillis()).build();
+                              .inputStreamSupplier(() -> new FileInputStream("/bikes/kawasaki-ninja-300.jpg"))
+                              .fileName("my_bikes/kawasaki.jpg")
+                              .lastModifiedTime(System.currentTimeMillis()).build();
 
 List<ZipFile.Entry> entries = Arrays.asList(entryBentley, entryKawasaki);
 
