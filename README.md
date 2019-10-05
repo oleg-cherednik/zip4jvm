@@ -42,7 +42,7 @@ compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:0.7'
 
 To simplify usage of _zip4jvm_, there're following classes:
 * [ZipIt](#zipit) - add files to archive;
-* UnzipIt - extract files from archive;
+* [UnzipIt](#unzipit) - extract files from archive;
 * ZipMisc - other zip file activities. These classes contains most common operations with limited set of settings.
  
 ### ZipIt
@@ -241,7 +241,7 @@ are not explicitly set, then `default` entry settings are used for all added ent
  - _zip64_ - `false`, i.e. standard format for entry structure
  - _utf8_ - `true`, i.e. entry's name and comment are stored using `UTF8` charset   
 
-### UnzipIt (Standard Mode)
+### UnzipIt
 
 ##### Extract all entries into given directory.
 ```
