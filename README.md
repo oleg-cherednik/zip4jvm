@@ -189,11 +189,13 @@ provider for entry specific settings. The key for entry settings is **fileName**
 **Note:** user should not worry about directory marker `/`, because `zip4jvm` does not support
 duplicated file names and it's impossible to have same file name for file and directory.
 
- - _splitSize_ - `-1` solid archive or split archive with given size for each part
-   - _min size_ - `64 * 1024 = 64Kb` 
- - _comment_ - `null`, i.e. no comment
+ - _splitSize_ - size of each part in split archive
+   - `-1` - no split or solid archive
+   - _min size_ - `64Kb` i.e. `65_536`
+   - _min size_ - `~2Gb` i.e. `2_147_483_647` 
+ - _comment_ - global archive comment
    - _no comment_ - `null` or `empty string`
-   - _max length_ - `65,535` symbols 
+   - _max length_ - `65_535` symbols 
  - _zip64_ - use `true` or not `false` zip64 format for global zip structure
    - **Note:** _zip64_ is switched on automatically if needed
    - **Note:** it does not mean that entry structure is in _zip64_ format as well
@@ -205,14 +207,34 @@ duplicated file names and it's impossible to have same file name for file and di
  - _splitSize_ - `-1`, i.e. off or solid archive
  - _comment_ - `null`, i.e. no comment
  - _zip64_ - `false`, i.e. standard format for global zip structure
-   - **Note:** _zip64_ is switched on automatically if needed
-   - **Note:** it does not mean that entry structure is in _zip64_ format as well
- - _entrySettingsProvider_ - `default`, i.e. all entries has same default entry settings 
+ - _entrySettingsProvider_ - `default`, i.e. all entries has same [default entry settings](#zip-entry-settings-defaults)  
 
 #### Zip entry settings: `ZipEntrySettings`
 
 Each entry has it's own settings. These settings could be different for every entry. If this settings
 are not explicitly set, then `default` entry settings are used for all added entries.
+
+ - _compression_ - compression algorithm
+   - `store` - no compression   
+   - `deflate` - use [Deflate](https://en.wikipedia.org/wiki/DEFLATE) compression algorithm 
+ - _compressionLevel_ - compression level
+   - `fastest`
+   - `fast`
+   - `normal`
+   - `maximum`
+   - `ultra`
+ - _encryption_ - encryption algorithm
+   - `off` - not encryption
+   - `pkware` - [PKWare](https://en.wikipedia.org/wiki/PKWare) encryption algorithm
+   - `aes_128`, `aes_192`, `aes_256` - [AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
+     encryption algorithm with given `128`, `192` or `255` key strength
+ - _comment_ - comment for entry
+   - _no comment_ - `null` or `empty string`
+   - _max length_ - `65_535` symbols
+ - _zip64_ - use `true` or not `false` zip64 format for global zip structure
+   - **Note:** _zip64_ is switched on automatically if needed
+ - _utf8_ - use [UTF8](https://en.wikipedia.org/wiki/UTF-8) charset for file name and comment instead
+   of [IBM437](https://en.wikipedia.org/wiki/Code_page_437)  
 
 #### Zip entry settings defaults
 
