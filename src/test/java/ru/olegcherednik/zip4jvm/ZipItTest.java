@@ -213,6 +213,18 @@ public class ZipItTest {
         assertThat(getSettings(zipIt)).isSameAs(ZipFileSettings.DEFAULT);
     }
 
+    public void shouldUseDefaultZipEntrySettingsWhenSetNull() throws NoSuchFieldException, IllegalAccessException {
+        ZipIt zipIt = ZipIt.zip(defEntryZip);
+        assertThat(getSettings(zipIt).getEntrySettingsProvider()).isSameAs(ZipEntrySettings.DEFAULT_PROVIDER);
+
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
+        zipIt.entrySettings(entrySettings);
+        assertThat(getSettings(zipIt).getEntrySettingsProvider().apply("aa")).isSameAs(entrySettings);
+
+        zipIt.entrySettings((ZipEntrySettings)null);
+        assertThat(getSettings(zipIt).getEntrySettingsProvider()).isSameAs(ZipEntrySettings.DEFAULT_PROVIDER);
+    }
+
     private static ZipFileSettings getSettings(ZipIt zipIt) throws NoSuchFieldException, IllegalAccessException {
         return ReflectionUtils.getFieldValue(zipIt, "settings");
     }

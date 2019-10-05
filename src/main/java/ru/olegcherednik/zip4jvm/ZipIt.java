@@ -72,10 +72,7 @@ public final class ZipIt {
      * @return not {@literal null} {@link ZipIt} instance
      */
     public ZipIt entrySettings(ZipEntrySettings entrySettings) {
-        if(entrySettings == null)
-            return entrySettings(ZipEntrySettings.DEFAULT_PROVIDER);
-        return entrySettings(fileName -> entrySettings);
-//        return entrySettings == null ? entrySettings(ZipEntrySettings.DEFAULT_PROVIDER) : entrySettings(fileName -> entrySettings);
+        return entrySettings == null ? entrySettings(ZipEntrySettings.DEFAULT_PROVIDER) : entrySettings(fileName -> entrySettings);
     }
 
     /**
