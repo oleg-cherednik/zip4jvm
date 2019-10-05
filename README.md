@@ -243,11 +243,14 @@ are not explicitly set, then `default` entry settings are used for all added ent
 
 ### UnzipIt
 
-##### Extract all entries into given directory.
+### Regular files and directories to `Path` destination 
+
+##### Extract all entries into given directory
+
 ```
 Path zip = Paths.get("filename.zip");
 Path destDir = Paths.get("/filename_content");
-UnzipIt.extract(zip, destDir);
+UnzipIt.zip(zip).destDir(destDir).extract();
 ```
 >```
 > filename.zip
@@ -255,26 +258,33 @@ UnzipIt.extract(zip, destDir);
 >  |    |-- bentley-continental.jpg
 >  |    |-- feffari-458-italia.jpg
 >  |    |-- wiesmann-gt-mf5.jpg
->  |-- one.jpg
->  |-- two.jpg
+>  |-- biles
+>  |    |-- ducati-panigale-1199.jpg
+>  |    |-- kawasaki-ninja-300.jpg
 >  |-- saint-petersburg.jpg 
 >```
 >```
 > /filename_content
 >   |-- cars
+>   |-- cars
 >   |    |-- bentley-continental.jpg
 >   |    |-- feffari-458-italia.jpg
 >   |    |-- wiesmann-gt-mf5.jpg
->   |-- one.jpg
->   |-- two.jpg
+>   |-- biles
+>   |    |-- ducati-panigale-1199.jpg
+>   |    |-- kawasaki-ninja-300.jpg
 >   |-- saint-petersburg.jpg 
->```                                                    
+>```
+
+**Note:** all entries (i.e. regular files and empty directories) are added to the destination
+ directory keeping the initial structure.                                                    
  
-##### Extract a file into given directory.
+##### Extract regular file's entry into given directory
+
 ```
 Path zip = Paths.get("filename.zip");
 Path destDir = Paths.get("/filename_content");
-UnzipIt.extract(zip, destDir, "cars/bentley-continental.jpg");
+UnzipIt.zip(zip).destDir(destDir).extract("cars/bentley-continental.jpg");
 ```
 >```
 > filename.zip
@@ -282,20 +292,24 @@ UnzipIt.extract(zip, destDir, "cars/bentley-continental.jpg");
 >  |    |-- bentley-continental.jpg
 >  |    |-- feffari-458-italia.jpg
 >  |    |-- wiesmann-gt-mf5.jpg
->  |-- one.jpg
->  |-- two.jpg
+>  |-- biles
+>  |    |-- ducati-panigale-1199.jpg
+>  |    |-- kawasaki-ninja-300.jpg
 >  |-- saint-petersburg.jpg 
+
 >```
 >```
 > /filename_content
 >   |-- bentley-continental.jpg
 >```
 
-##### Extract one directory into given directory.
+**Note:** regular file's entry is added to the root of the destination directory.
+
+##### Extract directory entries into given directory
 ```
 Path zip = Paths.get("filename.zip");
 Path destDir = Paths.get("/filename_content");
-UnzipIt.extract(zip, destDir, "cars");
+UnzipIt.zip(zip).destDir(destDir).extract("cars");
 ```
 >```
 > filename.zip
@@ -303,9 +317,11 @@ UnzipIt.extract(zip, destDir, "cars");
 >  |    |-- bentley-continental.jpg
 >  |    |-- feffari-458-italia.jpg
 >  |    |-- wiesmann-gt-mf5.jpg
->  |-- one.jpg
->  |-- two.jpg
+>  |-- biles
+>  |    |-- ducati-panigale-1199.jpg
+>  |    |-- kawasaki-ninja-300.jpg
 >  |-- saint-petersburg.jpg 
+
 >```
 >```
 > /filename_content
@@ -315,14 +331,14 @@ UnzipIt.extract(zip, destDir, "cars");
 >   |    |-- wiesmann-gt-mf5.jpg
 >```
 
-##### Extract some files and/or directories into given directory.
+**Note:** extract all entries belong to the given directory; content of these entries is added to
+the destination directory keeping the initial structure.
+
+##### Extract some entries into given directory
 ```
 Path zip = Paths.get("filename.zip");
 Path destDir = Paths.get("/filename_content");
-Collection<Path> fileNames = Arrays.asList(
-        "cars",
-        "Star Wars/one.jpg",
-        "saint-petersburg.jpg");
+Collection<Path> fileNames = Arrays.asList("cars", "bikes/ducati-panigale-1199.jpg", "saint-petersburg.jpg"); 
 UnzipIt.extract(zip, destDir, fileName);
 ```
 >```
@@ -331,9 +347,9 @@ UnzipIt.extract(zip, destDir, fileName);
 >  |    |-- bentley-continental.jpg
 >  |    |-- feffari-458-italia.jpg
 >  |    |-- wiesmann-gt-mf5.jpg
->  |-- Star Wars
->  |    |-- one.jpg
->  |    |-- two.jpg
+>  |-- biles
+>  |    |-- ducati-panigale-1199.jpg
+>  |    |-- kawasaki-ninja-300.jpg
 >  |-- saint-petersburg.jpg 
 >```
 >```
@@ -342,16 +358,18 @@ UnzipIt.extract(zip, destDir, fileName);
 >   |    |-- bentley-continental.jpg
 >   |    |-- feffari-458-italia.jpg
 >   |    |-- wiesmann-gt-mf5.jpg
->   |-- one.jpg
->   |-- two.jpg            
+>   |-- ducati-panigale-1199.jpg
 >   |-- saint-petersburg.jpg
 >```                     
-_**Note:** `CreatePassword` function could be optionally added to all methods. See details in [CreatePassword function](#createpassword-function)._
-_**Note:** see [UnzipIt (Advanced Mode)](#unzipit-advanced-mode) for using extended unzip it operations._
 
-### ZipIt (Advanced Mode)
+**Note:** directory is extracting keeping the initial structure; regular file is extracted into root of
+destination directory
 
-### UnzipIt (Advanced Mode)
+_**Note:** `CreatePassword` function could be optionally added to all methods. See details in
+
+
+
+[CreatePassword function](#createpassword-function)._
 
 ### CreatePassword function
 

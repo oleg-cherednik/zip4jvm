@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.engine;
 import lombok.NonNull;
 import org.apache.commons.io.FilenameUtils;
 import ru.olegcherednik.zip4jvm.ZipFile;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -44,13 +45,17 @@ public final class UnzipEngine implements ZipFile.Reader {
     @Override
     @SuppressWarnings("PMD.AvoidReassigningParameters")
     public void extract(Path destDir, String fileName) throws IOException {
-        fileName = ZipUtils.normalizeFileName(fileName);
-        List<ZipEntry> zipEntries = getEntriesWithFileNamePrefix(fileName + '/');
+        fileName = ZipUtils.getFileNameNoDirectoryMarker(fileName);
 
-        if (zipEntries.isEmpty())
+        if (zipModel.hasEntry(fileName))
             extractEntry(destDir, zipModel.getEntryByFileName(fileName), e -> FilenameUtils.getName(e.getFileName()));
         else {
-            for (ZipEntry zipEntry : zipEntries)
+            List<ZipEntry> subEntries = getEntriesWithFileNamePrefix(fileName + '/');
+
+            if (subEntries.isEmpty())
+                throw new Zip4jvmException("Zip entry not found: " + fileName);
+
+            for (ZipEntry zipEntry : subEntries)
                 extractEntry(destDir, zipEntry, ZipEntry::getFileName);
         }
     }
@@ -112,14 +117,15 @@ public final class UnzipEngine implements ZipFile.Reader {
     }
 
     private void extractEntry(Path destDir, ZipEntry zipEntry, Function<ZipEntry, String> getFileName) throws IOException {
-        zipEntry.setPassword(passwordProvider.apply(zipEntry.getFileName()));
         String fileName = getFileName.apply(zipEntry);
         Path file = destDir.resolve(fileName);
 
         if (zipEntry.isDirectory())
             Files.createDirectories(file);
-        else
+        else {
+            zipEntry.setPassword(passwordProvider.apply(fileName));
             ZipUtils.copyLarge(zipEntry.getInputStream(), getOutputStream(file));
+        }
 
         setFileAttributes(file, zipEntry);
         setFileLastModifiedTime(file, zipEntry);
