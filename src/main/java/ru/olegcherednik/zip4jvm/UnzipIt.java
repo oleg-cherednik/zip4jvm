@@ -30,6 +30,8 @@ import java.util.Optional;
 import java.util.function.Function;
 
 /**
+ * Extract regular files and/or directories from the zip archive
+ *
  * @author Oleg Cherednik
  * @since 14.03.2019
  */

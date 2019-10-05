@@ -51,7 +51,7 @@ To simplify usage of _zip4jvm_, there're following classes:
 
 #### Regular files and directories can be represented as `Path` 
 
-##### Create (or open existed) zip archive and add regular file */cars/bentley-continental.jpg*.
+##### Create (or open existed) zip archive and add regular file */cars/bentley-continental.jpg*
   
 ```
 Path zip = Paths.get("filename.zip");
@@ -65,7 +65,7 @@ ZipIt.zip(zip).add(file);
 
 **Note:** regular file is added to the root of the zip archive.
 
-##### Create (or open existed) zip archive and add directory */cars*.
+##### Create (or open existed) zip archive and add directory */cars*
 
 ```
 Path zip = Paths.get("filename.zip");
@@ -82,7 +82,7 @@ ZipIt.zip(zip).add(dir);
 
 **Note:** directory is added to the root of the zip archive keeping the initial structure.
 
-##### Create (or open existed) zip archive and add some regular files and/or directories.
+##### Create (or open existed) zip archive and add some regular files and/or directories
 
 ```
 Path zip = Paths.get("filename.zip");
@@ -108,7 +108,7 @@ ZipIt.zip(zip).add(paths);
 
 **Note:** each directory from the list is added to the root of the zip archive keeping the initial structure. 
 
-##### Create (or open existed) zip archive and add some regular files and/or directories using stream.
+##### Create (or open existed) zip archive and add some regular files and/or directories using stream
   
 ```
 Path zip = Paths.get("filename.zip");
@@ -136,7 +136,7 @@ try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
 
 #### Regular files and empty directories are available as `InputStream`
 
-##### Create (or open existed) zip archive and add input stream content as regular files.
+##### Create (or open existed) zip archive and add input stream content as regular files
 
 ```
 ZipFile.Entry entry = ZipFile.Entry.builder()
