@@ -296,7 +296,6 @@ UnzipIt.zip(zip).destDir(destDir).extract("cars/bentley-continental.jpg");
 >  |    |-- ducati-panigale-1199.jpg
 >  |    |-- kawasaki-ninja-300.jpg
 >  |-- saint-petersburg.jpg 
-
 >```
 >```
 > /filename_content
@@ -321,7 +320,6 @@ UnzipIt.zip(zip).destDir(destDir).extract("cars");
 >  |    |-- ducati-panigale-1199.jpg
 >  |    |-- kawasaki-ninja-300.jpg
 >  |-- saint-petersburg.jpg 
-
 >```
 >```
 > /filename_content
