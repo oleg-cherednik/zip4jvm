@@ -229,8 +229,8 @@ are not explicitly set, then `default` entry settings are used for all added ent
    - _max length_ - `65_535` symbols
  - _zip64_ - use `true` or not `false` zip64 format for global zip structure
    - **Note:** _zip64_ is switched on automatically if needed
- - _utf8_ - use [UTF8](https://en.wikipedia.org/wiki/UTF-8) charset for file name and comment instead
-   of [IBM437](https://en.wikipedia.org/wiki/Code_page_437)  
+ - _utf8_ - `true` use [UTF8](https://en.wikipedia.org/wiki/UTF-8) charset for file name and comment
+   instead of [IBM437](https://en.wikipedia.org/wiki/Code_page_437) when `false`  
 
 #### Zip entry settings defaults
 
