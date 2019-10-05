@@ -180,67 +180,6 @@ ZipIt.zip(zip).addEntry(entries);
 
 **Note:** each entry is treated as separate input stream of the regular file.   
 
-#### Zip file settings: `ZipFileSettings`
-
-All zip operations include `ZipFileSettings`. [Default setings](#zip-file-settings-defaults) is
-used when it's not explicitly set. Settings contains zip archive scope properties as well as
-provider for entry specific settings. The key for entry settings is **fileName**.
-
-**Note:** user should not worry about directory marker `/`, because `zip4jvm` does not support
-duplicated file names and it's impossible to have same file name for file and directory.
-
- - _splitSize_ - size of each part in split archive
-   - `-1` - no split or solid archive
-   - _min size_ - `64Kb` i.e. `65_536`
-   - _min size_ - `~2Gb` i.e. `2_147_483_647` 
- - _comment_ - global archive comment
-   - _no comment_ - `null` or `empty string`
-   - _max length_ - `65_535` symbols 
- - _zip64_ - use `true` or not `false` zip64 format for global zip structure
-   - **Note:** _zip64_ is switched on automatically if needed
-   - **Note:** it does not mean that entry structure is in _zip64_ format as well
- - _entrySettingsProvider_ - file name base provider of settings for entry
-   - **Note:** each entry could have different settings 
-
-#### Zip file settings defaults
-
- - _splitSize_ - `-1`, i.e. off or solid archive
- - _comment_ - `null`, i.e. no comment
- - _zip64_ - `false`, i.e. standard format for global zip structure
- - _entrySettingsProvider_ - `default`, i.e. all entries has same [default entry settings](#zip-entry-settings-defaults)  
-
-#### Zip entry settings: `ZipEntrySettings`
-
-Each entry has it's own settings. These settings could be different for every entry. If this settings
-are not explicitly set, then `default` entry settings are used for all added entries.
-
- - _compression_ - compression algorithm
-   - `store` - no compression   
-   - `deflate` - use [Deflate](https://en.wikipedia.org/wiki/DEFLATE) compression algorithm 
- - _compressionLevel_ - compression level
-   - `fastest` `fast` `normal` `maximum` `ultra`
- - _encryption_ - encryption algorithm
-   - `off` - not encryption
-   - `pkware` - [PKWare](https://en.wikipedia.org/wiki/PKWare) encryption algorithm
-   - `aes_128` `aes_192` `aes_256` - [AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
-     encryption algorithm with given `128` `192` `255` key strength
- - _comment_ - comment for entry
-   - _no comment_ - `null` or `empty string`
-   - _max length_ - `65_535` symbols
- - _zip64_ - use `true` or not `false` zip64 format for global zip structure
-   - **Note:** _zip64_ is switched on automatically if needed
- - _utf8_ - `true` use [UTF8](https://en.wikipedia.org/wiki/UTF-8) charset for file name and comment
-   instead of [IBM437](https://en.wikipedia.org/wiki/Code_page_437) when `false`  
-
-#### Zip entry settings defaults
-
- - _compression_ - `deflate`
- - _compressionLevel_ - `normal`
- - _encryption_ - `off`, i.e. no encryption
- - _comment_ - `null`, i.e. no comment
- - _zip64_ - `false`, i.e. standard format for entry structure
- - _utf8_ - `true`, i.e. entry's name and comment are stored using `UTF8` charset   
-
 ### UnzipIt
 
 ### Regular files and directories to `Path` destination 
@@ -372,19 +311,67 @@ _**Note:** `CreatePassword` function could be optionally added to all methods. S
 ### CreatePassword function
 
 ## Model
-### ZipFile.Entry
 
-This is a user friendly definition of the zip entry. It could be a regular file or a directory (i
-.e. _empty directory_, because no need to add additional entry for each directory with content).
+### Zip file settings: `ZipFileSettings`
 
-* **inputStreamSup** - input stream supplier; it should retrieve `null` or `InputStream`;
-* **fileName** - full file name of the entry relative to the root of the zip archive (i.e.
- `cars/bentley-continental.jpg`);
-* **lastModifiedTime** - last modification time _(by default it's `System.currentTimeMillis()`)_;
-* **regularFile** - `true` if entry is a regular file; internally zip adds special marker `/` to
- the _**fileName**_ for directory and _**inputStreamSup**_ result is ignored (i.e. directory
-  cannot have `InputStream`). _Note:_ no need to add marker `/` to the _**fileName**_ manually -
-  this is internal representation; _zip4jvm_ retrieves this instance without this marker.  
+All zip operations include `ZipFileSettings`. [Default setings](#zip-file-settings-defaults) is
+used when it's not explicitly set. Settings contains zip archive scope properties as well as
+provider for entry specific settings. The key for entry settings is **fileName**.
+
+**Note:** user should not worry about directory marker `/`, because `zip4jvm` does not support
+duplicated file names and it's impossible to have same file name for file and directory.
+
+ - _splitSize_ - size of each part in split archive
+   - `-1` - no split or solid archive
+   - _min size_ - `64Kb` i.e. `65_536`
+   - _min size_ - `~2Gb` i.e. `2_147_483_647` 
+ - _comment_ - global archive comment
+   - _no comment_ - `null` or `empty string`
+   - _max length_ - `65_535` symbols 
+ - _zip64_ - use `true` or not `false` zip64 format for global zip structure
+   - **Note:** _zip64_ is switched on automatically if needed
+   - **Note:** it does not mean that entry structure is in _zip64_ format as well
+ - _entrySettingsProvider_ - file name base provider of settings for entry
+   - **Note:** each entry could have different settings 
+
+#### Zip file settings defaults
+
+ - _splitSize_ - `-1`, i.e. off or solid archive
+ - _comment_ - `null`, i.e. no comment
+ - _zip64_ - `false`, i.e. standard format for global zip structure
+ - _entrySettingsProvider_ - `default`, i.e. all entries has same [default entry settings](#zip-entry-settings-defaults)  
+
+### Zip entry settings: `ZipEntrySettings`
+
+Each entry has it's own settings. These settings could be different for every entry. If this settings
+are not explicitly set, then `default` entry settings are used for all added entries.
+
+ - _compression_ - compression algorithm
+   - `store` - no compression   
+   - `deflate` - use [Deflate](https://en.wikipedia.org/wiki/DEFLATE) compression algorithm 
+ - _compressionLevel_ - compression level
+   - `fastest` `fast` `normal` `maximum` `ultra`
+ - _encryption_ - encryption algorithm
+   - `off` - not encryption
+   - `pkware` - [PKWare](https://en.wikipedia.org/wiki/PKWare) encryption algorithm
+   - `aes_128` `aes_192` `aes_256` - [AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
+     encryption algorithm with given `128` `192` `255` key strength
+ - _comment_ - comment for entry
+   - _no comment_ - `null` or `empty string`
+   - _max length_ - `65_535` symbols
+ - _zip64_ - use `true` or not `false` zip64 format for global zip structure
+   - **Note:** _zip64_ is switched on automatically if needed
+ - _utf8_ - `true` use [UTF8](https://en.wikipedia.org/wiki/UTF-8) charset for file name and comment
+   instead of [IBM437](https://en.wikipedia.org/wiki/Code_page_437) when `false`  
+
+#### Zip entry settings defaults
+
+ - _compression_ - `deflate`
+ - _compressionLevel_ - `normal`
+ - _encryption_ - `off`, i.e. no encryption
+ - _comment_ - `null`, i.e. no comment
+ - _zip64_ - `false`, i.e. standard format for entry structure
+ - _utf8_ - `true`, i.e. entry's name and comment are stored using `UTF8` charset  
 
 ##### Links
 * Home page: https://github.com/oleg-cherednik/zip4jvm
