@@ -12,8 +12,9 @@ import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
+import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -56,9 +57,9 @@ public class EncryptionAesTest {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
                                                          .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                          .encryption(Encryption.AES_256, password).build();
-        ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettingsProvider(fileName -> entrySettings)
-                                                  .comment("password: " + passwordStr).build();
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettingsProvider(fileName -> entrySettings)
+                                          .comment("password: " + passwordStr).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
@@ -71,9 +72,9 @@ public class EncryptionAesTest {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
                                                          .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                          .encryption(Encryption.AES_192, password).build();
-        ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettingsProvider(fileName -> entrySettings)
-                                                  .comment("password: " + passwordStr).build();
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettingsProvider(fileName -> entrySettings)
+                                          .comment("password: " + passwordStr).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
@@ -86,9 +87,9 @@ public class EncryptionAesTest {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
                                                          .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                          .encryption(Encryption.AES_128, password).build();
-        ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettingsProvider(fileName -> entrySettings)
-                                                  .comment("password: " + passwordStr).build();
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettingsProvider(fileName -> entrySettings)
+                                          .comment("password: " + passwordStr).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
@@ -101,9 +102,9 @@ public class EncryptionAesTest {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
                                                          .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                          .encryption(Encryption.AES_256, password).build();
-        ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettingsProvider(fileName -> entrySettings)
-                                                  .comment("password: " + passwordStr).build();
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettingsProvider(fileName -> entrySettings)
+                                          .comment("password: " + passwordStr).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
@@ -127,22 +128,28 @@ public class EncryptionAesTest {
     public void shouldUnzipWhenStoreSolidAes() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        UnzipIt.zip(zipStoreSolidAes).destDir(destDir).password(String::toCharArray).extract();
+        UnzipSettings settings = UnzipSettings.builder().password(String::toCharArray).build();
+
+        UnzipIt.zip(zipStoreSolidAes).destDir(destDir).settings(settings).extract();
         assertThatDirectory(destDir).matches(rootAssert);
     }
 
     public void shouldUnzipWhenStoreSplitAes() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        UnzipIt.zip(zipStoreSplitAes).destDir(destDir).password(String::toCharArray).extract();
+        UnzipSettings settings = UnzipSettings.builder().password(String::toCharArray).build();
+
+        UnzipIt.zip(zipStoreSplitAes).destDir(destDir).settings(settings).extract();
         assertThatDirectory(destDir).matches(rootAssert);
     }
 
     public void shouldThrowExceptionWhenUnzipAesEncryptedZipWithIncorrectPassword() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        assertThatThrownBy(() ->
-                UnzipIt.zip(zipStoreSplitAes).destDir(destDir).password(fileName -> UUID.randomUUID().toString().toCharArray()).extract())
+        char[] password = UUID.randomUUID().toString().toCharArray();
+        UnzipSettings settings = UnzipSettings.builder().password(fileName -> password).build();
+
+        assertThatThrownBy(() -> UnzipIt.zip(zipStoreSplitAes).destDir(destDir).settings(settings).extract())
                 .isExactlyInstanceOf(IncorrectPasswordException.class);
     }
 }

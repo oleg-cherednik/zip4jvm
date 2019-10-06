@@ -10,7 +10,7 @@ import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -58,7 +58,7 @@ public class ZipIt64Test {
     }
 
     public void shouldZipWhenZip64() throws IOException {
-        ZipFileSettings settings = ZipFileSettings.builder().zip64(true).build();
+        ZipSettings settings = ZipSettings.builder().zip64(true).build();
 
         zipSimple = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt.zip(zipSimple).settings(settings).add(contentDirSrc);
@@ -76,10 +76,10 @@ public class ZipIt64Test {
 
     public void shouldZipWhenZip64AndAesEncryption() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().encryption(Encryption.AES_256, password).build();
-        ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettingsProvider(fileName -> entrySettings)
-                                                  .comment("password: " + passwordStr)
-                                                  .zip64(true).build();
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettingsProvider(fileName -> entrySettings)
+                                          .comment("password: " + passwordStr)
+                                          .zip64(true).build();
 
         zipAes = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt.zip(zipAes).settings(settings).add(contentDirSrc);
@@ -96,7 +96,7 @@ public class ZipIt64Test {
     }
 
     public void shouldZipWhenZip64AndSplit() throws IOException {
-        ZipFileSettings settings = ZipFileSettings.builder().splitSize(SIZE_1MB).zip64(true).build();
+        ZipSettings settings = ZipSettings.builder().splitSize(SIZE_1MB).zip64(true).build();
 
         zipSplit = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt.zip(zipSplit).settings(settings).add(contentDirSrc);
@@ -152,7 +152,7 @@ public class ZipIt64Test {
 
         zipHugeEntry = dir.resolve("src.zip");
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
-        ZipFileSettings settings = ZipFileSettings.builder().entrySettingsProvider(fileNam -> entrySettings).build();
+        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileNam -> entrySettings).build();
         ZipIt.zip(zipHugeEntry).settings(settings).add(Arrays.asList(file, fileBentley));
 
         ZipModel zipModel = ZipModelBuilder.read(zipHugeEntry);

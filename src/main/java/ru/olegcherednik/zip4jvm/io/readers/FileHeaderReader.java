@@ -10,8 +10,10 @@ import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
 
 import static ru.olegcherednik.zip4jvm.model.ExternalFileAttributes.PROP_OS_NAME;
 
@@ -23,6 +25,7 @@ import static ru.olegcherednik.zip4jvm.model.ExternalFileAttributes.PROP_OS_NAME
 final class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader>> {
 
     private final long totalEntries;
+    private final Function<Charset, Charset> charsetCustomizer;
 
     @Override
     public List<CentralDirectory.FileHeader> read(DataInput in) throws IOException {
@@ -34,7 +37,7 @@ final class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader>
         return fileHeaders;
     }
 
-    private static CentralDirectory.FileHeader readFileHeader(DataInput in) throws IOException {
+    private CentralDirectory.FileHeader readFileHeader(DataInput in) throws IOException {
         long offs = in.getOffs();
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
@@ -49,16 +52,19 @@ final class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader>
         fileHeader.setCrc32(in.readDword());
         fileHeader.setCompressedSize(in.readDword());
         fileHeader.setUncompressedSize(in.readDword());
+
         int fileNameLength = in.readWord();
         int extraFieldLength = in.readWord();
         int fileCommentLength = in.readWord();
+        Charset charset = fileHeader.getGeneralPurposeFlag().getCharset();
+
         fileHeader.setDisk(in.readWord());
         fileHeader.setInternalFileAttributes(getInternalFileAttribute(in.readBytes(InternalFileAttributes.SIZE)));
         fileHeader.setExternalFileAttributes(getExternalFileAttribute(in.readBytes(ExternalFileAttributes.SIZE)));
         fileHeader.setLocalFileHeaderOffs(in.readDword());
-        fileHeader.setFileName(in.readString(fileNameLength, fileHeader.getGeneralPurposeFlag().getCharset()));
+        fileHeader.setFileName(in.readString(fileNameLength, charsetCustomizer.apply(charset)));
         fileHeader.setExtraField(ExtraFieldReader.build(extraFieldLength, fileHeader).read(in));
-        fileHeader.setComment(in.readString(fileCommentLength, fileHeader.getGeneralPurposeFlag().getCharset()));
+        fileHeader.setComment(in.readString(fileCommentLength, charsetCustomizer.apply(charset)));
 
         return fileHeader;
     }

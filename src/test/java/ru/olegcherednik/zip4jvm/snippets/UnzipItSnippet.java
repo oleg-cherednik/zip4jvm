@@ -7,6 +7,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -97,8 +98,9 @@ public class UnzipItSnippet {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename_content");
 
         Function<String, char[]> passwordProvider = String::toCharArray;
+        UnzipSettings settings = UnzipSettings.builder().password(passwordProvider).build();
         List<String> fileNames = Arrays.asList(dirNameCars, dirNameBikes + '/' + fileNameDucati, fileNameSaintPetersburg);
-        UnzipIt.zip(zip).destDir(destDir).password(passwordProvider).extract(fileNames);
+        UnzipIt.zip(zip).destDir(destDir).settings(settings).extract(fileNames);
     }
 
 }

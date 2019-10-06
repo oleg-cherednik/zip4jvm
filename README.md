@@ -387,8 +387,9 @@ Function<String, char[]> passwordProvider = fileName -> {
     return null;
 };             
 
+UnzipSettings settings = UnzipSettings.builder().password(passwordProvider).build();
 List<Path> fileNames = Arrays.asList("cars", "bikes/ducati-panigale-1199.jpg", "saint-petersburg.jpg");
-UnzipIt.zip(zip).destDir(destDir).password(passwordProvider).extract(fileNames);
+UnzipIt.zip(zip).destDir(destDir).settings(settings).extract(fileNames);
 ```                                     
 >```
 >filename.zip
@@ -413,9 +414,9 @@ UnzipIt.zip(zip).destDir(destDir).password(passwordProvider).extract(fileNames);
 
 ## Model
 
-### Zip file settings: `ZipFileSettings`
+### Zip settings: `ZipSettings`
 
-All zip operations include `ZipFileSettings`. [Default setings](#zip-file-settings-defaults) is
+All zip operations include `ZipSettings`. [Default setings](#zip-settings-defaults) is
 used when it's not explicitly set. Settings contains zip archive scope properties as well as
 provider for entry specific settings. The key for entry settings is **fileName**.
 
@@ -435,7 +436,7 @@ duplicated file names and it's impossible to have same file name for file and di
  - _entrySettingsProvider_ - file name base provider of settings for entry
    - **Note:** each entry could have different settings 
 
-#### Zip file settings defaults
+#### Zip settings defaults
 
  - _splitSize_ - `-1`, i.e. off or solid archive
  - _comment_ - `null`, i.e. no comment

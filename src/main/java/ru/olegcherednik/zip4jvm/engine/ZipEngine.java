@@ -13,7 +13,7 @@ import ru.olegcherednik.zip4jvm.io.writers.ZipFileEntryWriter;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
@@ -38,7 +38,7 @@ public final class ZipEngine implements ZipFile.Writer {
     private final Function<String, ZipEntrySettings> entrySettingsProvider;
     private final Map<String, Writer> fileNameWriter = new LinkedHashMap<>();
 
-    public ZipEngine(@NonNull Path zip, @NonNull ZipFileSettings settings) throws IOException {
+    public ZipEngine(@NonNull Path zip, @NonNull ZipSettings settings) throws IOException {
         this.zip = zip;
         tempZipModel = createTempZipModel(zip, settings, fileNameWriter);
         entrySettingsProvider = settings.getEntrySettingsProvider();
@@ -121,7 +121,7 @@ public final class ZipEngine implements ZipFile.Writer {
         Files.deleteIfExists(tempZipModel.getFile().getParent());
     }
 
-    private static ZipModel createTempZipModel(Path zip, ZipFileSettings settings, Map<String, Writer> fileNameWriter) throws IOException {
+    private static ZipModel createTempZipModel(Path zip, ZipSettings settings, Map<String, Writer> fileNameWriter) throws IOException {
         Path tempZip = createTempZip(zip);
         ZipModel tempZipModel = ZipModelBuilder.build(tempZip, settings);
 

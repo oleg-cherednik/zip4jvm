@@ -18,8 +18,8 @@ package ru.olegcherednik.zip4jvm;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
+import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +27,6 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * Extract regular files and/or directories from the zip archive
@@ -38,11 +37,9 @@ import java.util.function.Function;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class UnzipIt {
 
-    private static final Function<String, char[]> DEFAULT_PASSWORD_PROVIDER = fileName -> null;
-
     private final Path zip;
     private Path destDir;
-    private Function<String, char[]> passwordProvider = DEFAULT_PASSWORD_PROVIDER;
+    private UnzipSettings settings = UnzipSettings.DEFAULT;
 
     public static UnzipIt zip(Path zip) {
         return new UnzipIt(zip).destDir(zip.getParent());
@@ -53,19 +50,19 @@ public final class UnzipIt {
         return this;
     }
 
-    @SuppressWarnings("MethodCanBeVariableArityMethod")
-    public UnzipIt password(char[] password) {
-        passwordProvider = ArrayUtils.isEmpty(password) ? DEFAULT_PASSWORD_PROVIDER : fileName -> password;
+    public UnzipIt settings(UnzipSettings settings) {
+        this.settings = Optional.ofNullable(settings).orElse(UnzipSettings.DEFAULT);
         return this;
     }
 
-    public UnzipIt password(Function<String, char[]> passwordProvider) {
-        this.passwordProvider = Optional.ofNullable(passwordProvider).orElse(DEFAULT_PASSWORD_PROVIDER);
+    @SuppressWarnings("MethodCanBeVariableArityMethod")
+    public UnzipIt password(char[] password) {
+        settings = settings.toBuilder().password(password).build();
         return this;
     }
 
     public void extract() throws IOException {
-        new UnzipEngine(zip, passwordProvider).extract(destDir);
+        new UnzipEngine(zip, settings).extract(destDir);
     }
 
     public void extract(@NonNull String fileName) throws IOException {
@@ -73,18 +70,18 @@ public final class UnzipIt {
     }
 
     public void extract(Collection<String> fileNames) throws IOException {
-        ZipFile.Reader zipFile = ZipFile.reader(zip, passwordProvider);
+        ZipFile.Reader zipFile = ZipFile.reader(zip, settings);
 
         for (String fileName : fileNames)
             zipFile.extract(destDir, fileName);
     }
 
     public InputStream stream(String fileName) throws IOException {
-        return ZipFile.reader(zip, passwordProvider).extract(fileName).getInputStream();
+        return ZipFile.reader(zip, settings).extract(fileName).getInputStream();
     }
 
     public ZipFile.Reader open() throws IOException {
-        return ZipFile.reader(zip, passwordProvider);
+        return ZipFile.reader(zip, settings);
     }
 
 }

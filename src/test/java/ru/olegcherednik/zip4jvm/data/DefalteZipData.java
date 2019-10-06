@@ -7,7 +7,7 @@ import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,7 +41,7 @@ public final class DefalteZipData {
 
     private static void createDeflateSolidZip() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
-        ZipFileSettings settings = ZipFileSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
+        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
 
         ZipIt.zip(zipDeflateSolid).settings(settings).add(contentDirSrc);
         assertThat(Files.exists(zipDeflateSolid)).isTrue();
@@ -52,7 +52,7 @@ public final class DefalteZipData {
 
     private static void createDeflateSplitZip() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
-        ZipFileSettings settings = ZipFileSettings.builder().entrySettingsProvider(fileName -> entrySettings).splitSize(SIZE_1MB).build();
+        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).splitSize(SIZE_1MB).build();
 
         ZipIt.zip(zipDeflateSplit).settings(settings).add(contentDirSrc);
         assertThat(Files.exists(zipDeflateSplit)).isTrue();
@@ -64,9 +64,9 @@ public final class DefalteZipData {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
                                                          .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
                                                          .encryption(Encryption.PKWARE, password).build();
-        ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettingsProvider(fileName -> entrySettings)
-                                                  .comment("password: " + passwordStr).build();
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettingsProvider(fileName -> entrySettings)
+                                          .comment("password: " + passwordStr).build();
 
         ZipIt.zip(zipDeflateSolidPkware).settings(settings).add(contentDirSrc);
         assertThat(Files.exists(zipDeflateSolidPkware)).isTrue();
@@ -77,10 +77,10 @@ public final class DefalteZipData {
 
     private static void createDeflateSolidAesZip() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
-        ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettingsProvider(fileName ->
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettingsProvider(fileName ->
                                                           entrySettings.toBuilder().encryption(Encryption.AES_256, fileName.toCharArray()).build())
-                                                  .comment("password: <fileName>").build();
+                                          .comment("password: <fileName>").build();
 
         ZipIt.zip(zipDeflateSolidAes).settings(settings).add(contentDirSrc);
         assertThat(Files.exists(zipDeflateSolidAes)).isTrue();

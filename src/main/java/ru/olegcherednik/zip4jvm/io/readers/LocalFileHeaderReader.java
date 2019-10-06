@@ -9,6 +9,8 @@ import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -18,6 +20,7 @@ import java.io.IOException;
 public final class LocalFileHeaderReader implements Reader<LocalFileHeader> {
 
     private final long localFileHeaderOffs;
+    private final Function<Charset, Charset> charsetCustomizer;
 
     @Override
     public LocalFileHeader read(DataInput in) throws IOException {
@@ -32,9 +35,12 @@ public final class LocalFileHeaderReader implements Reader<LocalFileHeader> {
         localFileHeader.setCrc32(in.readDword());
         localFileHeader.setCompressedSize(in.readDword());
         localFileHeader.setUncompressedSize(in.readDword());
+
         int fileNameLength = in.readWord();
         int extraFieldLength = in.readWord();
-        localFileHeader.setFileName(in.readString(fileNameLength, localFileHeader.getGeneralPurposeFlag().getCharset()));
+        Charset charset = localFileHeader.getGeneralPurposeFlag().getCharset();
+
+        localFileHeader.setFileName(in.readString(fileNameLength, charsetCustomizer.apply(charset)));
         localFileHeader.setExtraField(ExtraFieldReader.build(extraFieldLength, localFileHeader).read(in));
 
         return localFileHeader;

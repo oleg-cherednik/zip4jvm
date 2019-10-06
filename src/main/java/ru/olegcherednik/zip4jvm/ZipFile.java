@@ -22,7 +22,8 @@ import lombok.NonNull;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.engine.ZipEngine;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
+import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.utils.EmptyInputStream;
 import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamSupplier;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
@@ -41,7 +42,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -54,12 +54,12 @@ import static ru.olegcherednik.zip4jvm.model.ExternalFileAttributes.PROP_OS_NAME
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ZipFile {
 
-    static Writer writer(Path zip, ZipFileSettings settings) throws IOException {
+    static Writer writer(Path zip, ZipSettings settings) throws IOException {
         return new ZipEngine(zip, settings);
     }
 
-    static Reader reader(Path zip, Function<String, char[]> passwordProvider) throws IOException {
-        return new UnzipEngine(zip, passwordProvider);
+    static Reader reader(Path zip, UnzipSettings settings) throws IOException {
+        return new UnzipEngine(zip, settings);
     }
 
     @Getter

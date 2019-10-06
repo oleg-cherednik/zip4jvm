@@ -7,7 +7,7 @@ import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -46,7 +46,7 @@ public final class StoreZipData {
 
     private static void createStoreSolidZip() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
-        ZipFileSettings settings = ZipFileSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
+        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
 
         ZipIt.zip(zipStoreSolid).settings(settings).add(contentDirSrc);
 
@@ -58,7 +58,7 @@ public final class StoreZipData {
 
     private static void createStoreSplitZip() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
-        ZipFileSettings settings = ZipFileSettings.builder().entrySettingsProvider(fileName -> entrySettings).splitSize(SIZE_1MB).build();
+        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).splitSize(SIZE_1MB).build();
 
         ZipIt.zip(zipStoreSplit).settings(settings).add(contentDirSrc);
         assertThat(Files.exists(zipStoreSplit)).isTrue();
@@ -71,9 +71,9 @@ public final class StoreZipData {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
                                                          .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                          .encryption(Encryption.PKWARE, password).build();
-        ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettingsProvider(fileName -> entrySettings)
-                                                  .comment("password: " + passwordStr).build();
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettingsProvider(fileName -> entrySettings)
+                                          .comment("password: " + passwordStr).build();
 
         ZipIt.zip(zipStoreSolidPkware).settings(settings).add(contentDirSrc);
         assertThat(Files.exists(zipStoreSolidPkware)).isTrue();
@@ -84,10 +84,10 @@ public final class StoreZipData {
 
     private static void createStoreSolidAesZip() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
-        ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettingsProvider(fileName ->
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettingsProvider(fileName ->
                                                           entrySettings.toBuilder().encryption(Encryption.AES_256, fileName.toCharArray()).build())
-                                                  .comment("password: <fileName>").build();
+                                          .comment("password: <fileName>").build();
 
         ZipIt.zip(zipStoreSolidAes).settings(settings).add(contentDirSrc);
         assertThat(Files.exists(zipStoreSolidAes)).isTrue();
@@ -99,10 +99,10 @@ public final class StoreZipData {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
                                                          .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                          .encryption(Encryption.PKWARE, password).build();
-        ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettingsProvider(fileName -> entrySettings)
-                                                  .splitSize(SIZE_1MB)
-                                                  .comment("password: " + passwordStr).build();
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettingsProvider(fileName -> entrySettings)
+                                          .splitSize(SIZE_1MB)
+                                          .comment("password: " + passwordStr).build();
 
         ZipIt.zip(zipStoreSplitPkware).settings(settings).add(contentDirSrc);
         assertThat(Files.exists(zipStoreSplitPkware)).isTrue();
@@ -113,11 +113,11 @@ public final class StoreZipData {
 
     private static void createStoreSplitAesZip() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
-        ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettingsProvider(fileName ->
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettingsProvider(fileName ->
                                                           entrySettings.toBuilder().encryption(Encryption.AES_256, fileName.toCharArray()).build())
-                                                  .splitSize(SIZE_1MB)
-                                                  .comment("password: <fileName>").build();
+                                          .splitSize(SIZE_1MB)
+                                          .comment("password: <fileName>").build();
 
         ZipIt.zip(zipStoreSplitAes).settings(settings).add(contentDirSrc);
         assertThat(Files.exists(zipStoreSplitAes)).isTrue();

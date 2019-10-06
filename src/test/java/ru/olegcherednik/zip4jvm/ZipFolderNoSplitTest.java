@@ -9,7 +9,7 @@ import ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -40,11 +40,11 @@ public class ZipFolderNoSplitTest {
 
     @Test
     public void shouldCreateNewZipWithFolder() throws IOException {
-        ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettingsProvider(fileName ->
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettingsProvider(fileName ->
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
-                                                  .build();
+                                          .build();
         ZipIt.zip(zip).settings(settings).add(dirCars);
 
         Zip4jvmAssertions.assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
@@ -58,11 +58,11 @@ public class ZipFolderNoSplitTest {
         Assertions.assertThat(Files.exists(zip)).isTrue();
         Assertions.assertThat(Files.isRegularFile(zip)).isTrue();
 
-        ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettingsProvider(fileName ->
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettingsProvider(fileName ->
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
-                                                  .build();
+                                          .build();
 //        ZipIt.add(zip, Zip4jvmSuite.starWarsDir, settings);
 //
 //        Zip4jvmAssertions.assertThatDirectory(ZipFolderNoSplitTest.zip.getParent()).exists().hasSubDirectories(0).hasFiles(1);
@@ -77,11 +77,11 @@ public class ZipFolderNoSplitTest {
         Assertions.assertThat(Files.exists(zip)).isTrue();
         Assertions.assertThat(Files.isRegularFile(zip)).isTrue();
 
-        ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettingsProvider(fileName ->
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettingsProvider(fileName ->
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
-                                                  .build();
+                                          .build();
         ZipIt.zip(zip).settings(settings).add(dirEmpty);
 
         Zip4jvmAssertions.assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
