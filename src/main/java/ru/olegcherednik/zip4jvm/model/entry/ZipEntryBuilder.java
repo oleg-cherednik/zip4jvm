@@ -17,6 +17,9 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
 
+import java.nio.charset.Charset;
+import java.util.function.Function;
+
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_ENTRY_SIZE;
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_LOCAL_FILE_HEADER_OFFS;
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
@@ -32,8 +35,8 @@ public final class ZipEntryBuilder {
         return new EntryBased(entry, entrySettings).build();
     }
 
-    public static ZipEntry build(CentralDirectory.FileHeader fileHeader, ZipModel zipModel) {
-        return new FileHeaderBased(fileHeader, zipModel).build();
+    public static ZipEntry build(CentralDirectory.FileHeader fileHeader, ZipModel zipModel, Function<Charset, Charset> charsetCustomizer) {
+        return new FileHeaderBased(fileHeader, zipModel, charsetCustomizer).build();
     }
 
     @RequiredArgsConstructor
@@ -84,6 +87,7 @@ public final class ZipEntryBuilder {
 
         private final CentralDirectory.FileHeader fileHeader;
         private final ZipModel zipModel;
+        private final Function<Charset, Charset> charsetCustomizer;
 
         public ZipEntry build() {
             boolean regularFile = ZipUtils.isRegularFile(fileHeader.getFileName());
@@ -125,8 +129,8 @@ public final class ZipEntryBuilder {
 
         private ZipEntryInputStreamSupplier createInputStreamSupplier() {
             if (zipModel.isSplit())
-                return zipEntry -> EntryInputStream.create(zipEntry, new SplitZipInputStream(zipModel, zipEntry.getDisk()));
-            return zipEntry -> EntryInputStream.create(zipEntry, new SingleZipInputStream(zipModel.getFile()));
+                return zipEntry -> EntryInputStream.create(zipEntry, charsetCustomizer, new SplitZipInputStream(zipModel, zipEntry.getDisk()));
+            return zipEntry -> EntryInputStream.create(zipEntry, charsetCustomizer, new SingleZipInputStream(zipModel.getFile()));
         }
 
         private long getDisk() {

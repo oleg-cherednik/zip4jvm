@@ -18,6 +18,8 @@ import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -68,7 +70,8 @@ public class ExistedEntryWriter implements Writer {
         }
 
         public void copyLocalFileHeader(DataOutput out) throws IOException {
-            LocalFileHeader localFileHeader = new LocalFileHeaderReader(zipEntry.getLocalFileHeaderOffs()).read(in);
+            Function<Charset, Charset> charsetCustomizer = ZipModel.GENERA_PURPOSE_FLAG_CHARSET;
+            LocalFileHeader localFileHeader = new LocalFileHeaderReader(zipEntry.getLocalFileHeaderOffs(), charsetCustomizer).read(in);
             zipEntry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
             new LocalFileHeaderWriter(localFileHeader).write(out);
         }

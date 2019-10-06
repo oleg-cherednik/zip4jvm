@@ -6,6 +6,8 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/7b6b963fef254ff4b00b8be0304e829b)](https://www.codacy.com/app/oleg-cherednik/zip4jvm?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=oleg-cherednik/zip4jvm&amp;utm_campaign=Badge_Grade)
 [![coverity](https://scan.coverity.com/projects/4735/badge.svg)](https://scan.coverity.com/projects/oleg-cherednik-zip4jvm)
 
+<p align="center"><img src="zip.png"><img src="java.png"></p>
+
 zip4jvm - a java library for working with zip files
 =====================
 
@@ -49,7 +51,7 @@ To simplify usage of _zip4jvm_, there're following classes:
 
 #### Regular files and directories can be represented as `Path` 
 
-##### Create (or open existed) zip archive and add regular file */cars/bentley-continental.jpg*.
+##### Create (or open existed) zip archive and add regular file */cars/bentley-continental.jpg*
   
 ```
 Path zip = Paths.get("filename.zip");
@@ -63,7 +65,7 @@ ZipIt.zip(zip).add(file);
 
 **Note:** regular file is added to the root of the zip archive.
 
-##### Create (or open existed) zip archive and add directory */cars*.
+##### Create (or open existed) zip archive and add directory */cars*
 
 ```
 Path zip = Paths.get("filename.zip");
@@ -80,7 +82,7 @@ ZipIt.zip(zip).add(dir);
 
 **Note:** directory is added to the root of the zip archive keeping the initial structure.
 
-##### Create (or open existed) zip archive and add some regular files and/or directories.
+##### Create (or open existed) zip archive and add some regular files and/or directories
 
 ```
 Path zip = Paths.get("filename.zip");
@@ -106,7 +108,7 @@ ZipIt.zip(zip).add(paths);
 
 **Note:** each directory from the list is added to the root of the zip archive keeping the initial structure. 
 
-##### Create (or open existed) zip archive and add some regular files and/or directories using stream.
+##### Create (or open existed) zip archive and add some regular files and/or directories using stream
   
 ```
 Path zip = Paths.get("filename.zip");
@@ -134,7 +136,7 @@ try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
 
 #### Regular files and empty directories are available as `InputStream`
 
-##### Create (or open existed) zip archive and add input stream content as regular files.
+##### Create (or open existed) zip archive and add input stream content as regular files
 
 ```
 ZipFile.Entry entry = ZipFile.Entry.builder()
@@ -385,8 +387,9 @@ Function<String, char[]> passwordProvider = fileName -> {
     return null;
 };             
 
+UnzipSettings settings = UnzipSettings.builder().password(passwordProvider).build();
 List<Path> fileNames = Arrays.asList("cars", "bikes/ducati-panigale-1199.jpg", "saint-petersburg.jpg");
-UnzipIt.zip(zip).destDir(destDir).password(passwordProvider).extract(fileNames);
+UnzipIt.zip(zip).destDir(destDir).settings(settings).extract(fileNames);
 ```                                     
 >```
 >filename.zip
@@ -411,9 +414,9 @@ UnzipIt.zip(zip).destDir(destDir).password(passwordProvider).extract(fileNames);
 
 ## Model
 
-### Zip file settings: `ZipFileSettings`
+### Zip settings: `ZipSettings`
 
-All zip operations include `ZipFileSettings`. [Default setings](#zip-file-settings-defaults) is
+All zip operations include `ZipSettings`. [Default setings](#zip-settings-defaults) is
 used when it's not explicitly set. Settings contains zip archive scope properties as well as
 provider for entry specific settings. The key for entry settings is **fileName**.
 
@@ -433,7 +436,7 @@ duplicated file names and it's impossible to have same file name for file and di
  - _entrySettingsProvider_ - file name base provider of settings for entry
    - **Note:** each entry could have different settings 
 
-#### Zip file settings defaults
+#### Zip settings defaults
 
  - _splitSize_ - `-1`, i.e. off or solid archive
  - _comment_ - `null`, i.e. no comment

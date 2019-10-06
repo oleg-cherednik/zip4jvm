@@ -11,11 +11,13 @@ import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -28,12 +30,17 @@ public final class ZipModelBuilder {
     private final EndCentralDirectory endCentralDirectory;
     private final Zip64 zip64;
     private final CentralDirectory centralDirectory;
+    private final Function<Charset, Charset> charsetCustomizer;
 
     public static ZipModel read(Path zip) throws IOException {
-        return new ZipModelReader(zip).read();
+        return read(zip, ZipModel.GENERA_PURPOSE_FLAG_CHARSET);
     }
 
-    public static ZipModel build(Path zip, ZipFileSettings settings) {
+    public static ZipModel read(Path zip, Function<Charset, Charset> charsetCustomizer) throws IOException {
+        return new ZipModelReader(zip, charsetCustomizer).read();
+    }
+
+    public static ZipModel build(Path zip, ZipSettings settings) {
         if (Files.exists(zip))
             throw new Zip4jvmException("ZipFile '" + zip.toAbsolutePath() + "' exists");
 
@@ -62,7 +69,7 @@ public final class ZipModelBuilder {
 
     private void createAndAddEntries(ZipModel zipModel) {
         centralDirectory.getFileHeaders().stream()
-                        .map(fileHeader -> ZipEntryBuilder.build(fileHeader, zipModel))
+                        .map(fileHeader -> ZipEntryBuilder.build(fileHeader, zipModel, charsetCustomizer))
                         .forEach(zipModel::addEntry);
     }
 

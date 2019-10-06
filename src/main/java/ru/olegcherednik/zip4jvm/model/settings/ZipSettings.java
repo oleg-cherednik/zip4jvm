@@ -15,9 +15,9 @@ import java.util.function.Function;
  * @since 05.09.2019
  */
 @Getter
-public final class ZipFileSettings {
+public final class ZipSettings {
 
-    public static final ZipFileSettings DEFAULT = builder().build();
+    public static final ZipSettings DEFAULT = builder().build();
 
     private final long splitSize;
     private final String comment;
@@ -28,11 +28,15 @@ public final class ZipFileSettings {
         return new Builder();
     }
 
-    private ZipFileSettings(Builder builder) {
+    private ZipSettings(Builder builder) {
         splitSize = builder.splitSize;
         comment = builder.comment;
         zip64 = builder.zip64;
         entrySettingsProvider = builder.entrySettingsProvider;
+    }
+
+    public Builder toBuilder() {
+        return builder().splitSize(splitSize).comment(comment).zip64(zip64).entrySettingsProvider(entrySettingsProvider);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -43,8 +47,8 @@ public final class ZipFileSettings {
         private boolean zip64;
         private Function<String, ZipEntrySettings> entrySettingsProvider = ZipEntrySettings.DEFAULT_PROVIDER;
 
-        public ZipFileSettings build() {
-            return new ZipFileSettings(this);
+        public ZipSettings build() {
+            return new ZipSettings(this);
         }
 
         public Builder splitSize(long splitSize) {

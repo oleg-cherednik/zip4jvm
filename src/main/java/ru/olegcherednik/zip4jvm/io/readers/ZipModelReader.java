@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
@@ -11,7 +10,9 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.function.Function;
 
 /**
  * Start reading from the end of the file.
@@ -30,20 +31,19 @@ import java.nio.file.Path;
 @RequiredArgsConstructor
 public final class ZipModelReader {
 
-    @NonNull
     private final Path zip;
+    private final Function<Charset, Charset> charsetCustomizer;
 
-    @NonNull
     public ZipModel read() throws IOException {
         try (DataInput in = new SingleZipInputStream(zip)) {
-            EndCentralDirectory endCentralDirectory = new EndCentralDirectoryReader().read(in);
+            EndCentralDirectory endCentralDirectory = new EndCentralDirectoryReader(charsetCustomizer).read(in);
             Zip64 zip64 = new Zip64Reader().read(in);
 
             long offs = ZipModelBuilder.getCentralDirectoryOffs(endCentralDirectory, zip64);
             long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
-            CentralDirectory centralDirectory = new CentralDirectoryReader(offs, totalEntries).read(in);
+            CentralDirectory centralDirectory = new CentralDirectoryReader(offs, totalEntries, charsetCustomizer).read(in);
 
-            return new ZipModelBuilder(zip, endCentralDirectory, zip64, centralDirectory).build();
+            return new ZipModelBuilder(zip, endCentralDirectory, zip64, centralDirectory, charsetCustomizer).build();
         }
     }
 

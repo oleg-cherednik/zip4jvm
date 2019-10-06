@@ -4,9 +4,11 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
+import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -82,9 +84,11 @@ public class UnzipItTest {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTme(rootDir);
         Path zip = Paths.get(UnzipItTest.class.getResource("/zip/cjk_filename.zip").toURI()).toAbsolutePath();
 
-        UnzipIt.zip(zip).destDir(destDir).extract();
-//        assertThatDirectory(destDir).exists().hasDirectories(0).hasFiles(1);
-//        assertThatDirectory(destDir).file("hello.txt").exists().hasSize(11).hasContent("hello,itsme");
+        UnzipSettings settings = UnzipSettings.builder().charset(Charset.forName("GBK")).build();
+
+        UnzipIt.zip(zip).destDir(destDir).settings(settings).extract();
+        assertThatDirectory(destDir).hasDirectories(0).hasFiles(2);
+        assertThatDirectory(destDir).file("fff - 副本.txt").exists();
     }
 
 }

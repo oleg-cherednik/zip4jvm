@@ -7,6 +7,7 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import java.io.FileNotFoundException;
@@ -28,12 +29,12 @@ import java.util.stream.Collectors;
 public final class UnzipEngine implements ZipFile.Reader {
 
     private final ZipModel zipModel;
-    private final Function<String, char[]> passwordProvider;
+    private final UnzipSettings settings;
 
-    public UnzipEngine(Path zip, Function<String, char[]> passwordProvider) throws IOException {
+    public UnzipEngine(Path zip, UnzipSettings settings) throws IOException {
         checkZipFile(zip);
-        zipModel = ZipModelBuilder.read(zip);
-        this.passwordProvider = passwordProvider;
+        zipModel = ZipModelBuilder.read(zip, settings.getCharsetCustomizer());
+        this.settings = settings;
     }
 
     @Override
@@ -73,7 +74,7 @@ public final class UnzipEngine implements ZipFile.Reader {
         if (zipEntry == null)
             throw new FileNotFoundException("Entry '" + fileName + "' was not found");
 
-        zipEntry.setPassword(passwordProvider.apply(zipEntry.getFileName()));
+        zipEntry.setPassword(settings.getPasswordProvider().apply(zipEntry.getFileName()));
         return zipEntry.createImmutableEntry();
     }
 
@@ -121,7 +122,7 @@ public final class UnzipEngine implements ZipFile.Reader {
         if (zipEntry.isDirectory())
             Files.createDirectories(file);
         else {
-            zipEntry.setPassword(passwordProvider.apply(ZipUtils.getFileNameNoDirectoryMarker(zipEntry.getFileName())));
+            zipEntry.setPassword(settings.getPasswordProvider().apply(ZipUtils.getFileNameNoDirectoryMarker(zipEntry.getFileName())));
             ZipUtils.copyLarge(zipEntry.getInputStream(), getOutputStream(file));
         }
 

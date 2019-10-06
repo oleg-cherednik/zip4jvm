@@ -13,6 +13,8 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.function.Function;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
@@ -35,8 +37,8 @@ public abstract class EntryInputStream extends InputStream {
     protected long readCompressedBytes;
     protected long writtenUncompressedBytes;
 
-    public static InputStream create(ZipEntry zipEntry, DataInput in) throws IOException {
-        LocalFileHeader localFileHeader = new LocalFileHeaderReader(zipEntry.getLocalFileHeaderOffs()).read(in);
+    public static InputStream create(ZipEntry zipEntry, Function<Charset, Charset> charsetCustomizer, DataInput in) throws IOException {
+        LocalFileHeader localFileHeader = new LocalFileHeaderReader(zipEntry.getLocalFileHeaderOffs(), charsetCustomizer).read(in);
         zipEntry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
         // TODO check that localFileHeader matches fileHeader
         Decoder decoder = zipEntry.getEncryption().getCreateDecoder().apply(zipEntry, in);

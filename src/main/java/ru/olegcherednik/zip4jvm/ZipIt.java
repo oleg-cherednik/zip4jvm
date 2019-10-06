@@ -18,7 +18,7 @@ package ru.olegcherednik.zip4jvm;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -41,7 +41,7 @@ public final class ZipIt {
     /** path to the zip file */
     private final Path zip;
     /** zip file scope settings */
-    private ZipFileSettings settings = ZipFileSettings.DEFAULT;
+    private ZipSettings settings = ZipSettings.DEFAULT;
 
     /**
      * Create {@link ZipIt} instance with given {@code zip} path to the zip archive
@@ -54,13 +54,13 @@ public final class ZipIt {
     }
 
     /**
-     * Set custom settings for zip archive. If it's {@literal null}, then {@link ZipFileSettings#DEFAULT} will be used.
+     * Set custom settings for zip archive. If it's {@literal null}, then {@link ZipSettings#DEFAULT} will be used.
      *
      * @param settings custom zip file settings
      * @return not {@literal null} {@link ZipIt} instance
      */
-    public ZipIt settings(ZipFileSettings settings) {
-        this.settings = Optional.ofNullable(settings).orElse(ZipFileSettings.DEFAULT);
+    public ZipIt settings(ZipSettings settings) {
+        this.settings = Optional.ofNullable(settings).orElse(ZipSettings.DEFAULT);
         return this;
     }
 
@@ -83,7 +83,7 @@ public final class ZipIt {
      * @return not {@literal null} {@link ZipIt} instance
      */
     public ZipIt entrySettings(Function<String, ZipEntrySettings> entrySettingsProvider) {
-        settings = ZipFileSettings.builder().entrySettingsProvider(entrySettingsProvider).build();
+        settings = settings.toBuilder().entrySettingsProvider(entrySettingsProvider).build();
         return this;
     }
 

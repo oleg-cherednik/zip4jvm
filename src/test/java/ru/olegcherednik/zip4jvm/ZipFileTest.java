@@ -7,7 +7,7 @@ import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -163,9 +163,9 @@ public class ZipFileTest {
             return ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
         };
 
-        ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .comment("Global Comment")
-                                                  .entrySettingsProvider(entrySettingsProvider).build();
+        ZipSettings settings = ZipSettings.builder()
+                                          .comment("Global Comment")
+                                          .entrySettingsProvider(entrySettingsProvider).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
@@ -183,9 +183,9 @@ public class ZipFileTest {
     }
 
     public void shouldCreateZipFileWithEmptyDirectoryWhenAddEmptyDirectory() throws IOException {
-        ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettingsProvider(fileName -> ZipEntrySettings.builder().build())
-                                                  .build();
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettingsProvider(fileName -> ZipEntrySettings.builder().build())
+                                          .build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 

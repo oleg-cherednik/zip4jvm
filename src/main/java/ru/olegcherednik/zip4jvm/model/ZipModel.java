@@ -8,12 +8,14 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -26,6 +28,8 @@ public class ZipModel {
 
     public static final int NO_SPLIT = -1;
     public static final int MIN_SPLIT_SIZE = 64 * 1024; // 64Kb
+
+    public static final Function<Charset, Charset> GENERA_PURPOSE_FLAG_CHARSET = charset -> charset;
 
     public static final int MAX_TOTAL_ENTRIES = Zip64.LIMIT_WORD;
     public static final long MAX_ENTRY_SIZE = Zip64.LIMIT_DWORD;

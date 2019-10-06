@@ -8,7 +8,7 @@ import ru.olegcherednik.zip4jvm.exception.PathNotExistsException;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -69,12 +69,12 @@ public class ZipMiscTest {
     }
 
     public void shouldThrowExceptionWhenAddedFileNotExists() throws IOException {
-        ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .entrySettingsProvider(fileName ->
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettingsProvider(fileName ->
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                                           .build())
-                                                  .build();
+                                          .build();
 
         Path notExisted = dirCars.resolve(UUID.randomUUID().toString());
         List<Path> files = Arrays.asList(fileBentley, fileFerrari, fileWiesmann, notExisted);
@@ -109,13 +109,13 @@ public class ZipMiscTest {
     }
 
     public void shouldRetrieveTrueWhenSplitZipWithOneDisk() throws IOException {
-        ZipFileSettings settings = ZipFileSettings.builder()
-                                                  .splitSize(1024 * 1024)
-                                                  .entrySettingsProvider(fileName ->
+        ZipSettings settings = ZipSettings.builder()
+                                          .splitSize(1024 * 1024)
+                                          .entrySettingsProvider(fileName ->
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                                           .build())
-                                                  .build();
+                                          .build();
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt.zip(zip).settings(settings).add(Collections.singleton(dirSrc.resolve("Oleg Cherednik.txt")));
 
