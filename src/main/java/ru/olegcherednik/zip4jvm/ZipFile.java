@@ -1,3 +1,18 @@
+/*
+ * Copyright © 2019 Cherednik Oleg
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package ru.olegcherednik.zip4jvm;
 
 import lombok.AccessLevel;
@@ -50,23 +65,26 @@ public final class ZipFile {
     @Getter
     public static final class Entry {
 
-        @NonNull
         @Getter(AccessLevel.NONE)
-        private final InputStreamSupplier inputStreamSup;
-        @NonNull
+        private final InputStreamSupplier inputStreamSupplier;
+        /** Normalized file name without directory marker {@literal /} */
         private final String fileName;
         private final long lastModifiedTime;
-        @NonNull
         private final ExternalFileAttributes externalFileAttributes;
         private final boolean regularFile;
 
-        public static Entry of(@NonNull Path path, @NonNull String fileName) throws IOException {
-            return builder()
-                    .inputStreamSup(Files.isRegularFile(path) ? () -> new FileInputStream(path.toFile()) : EmptyInputStreamSupplier.INSTANCE)
-                    .fileName(fileName)
+        public static Entry of(Path path, String fileName) throws IOException {
+            ZipFile.Entry.Builder builder = builder()
                     .lastModifiedTime(Files.getLastModifiedTime(path).toMillis())
-                    .externalFileAttributes(ExternalFileAttributes.build(PROP_OS_NAME).readFrom(path))
-                    .regularFile(Files.isRegularFile(path)).build();
+                    .externalFileAttributes(ExternalFileAttributes.build(PROP_OS_NAME).readFrom(path));
+
+            if (Files.isRegularFile(path)) {
+                builder.fileName(fileName);
+                builder.inputStreamSupplier(() -> new FileInputStream(path.toFile()));
+            } else
+                builder.directoryName(fileName);
+
+            return builder.build();
         }
 
         public static Entry.Builder builder() {
@@ -75,20 +93,20 @@ public final class ZipFile {
 
         private Entry(Entry.Builder builder) {
             fileName = ZipUtils.normalizeFileName(builder.fileName);
-            inputStreamSup = builder.regularFile ? builder.inputStreamSup : () -> EmptyInputStream.INSTANCE;
+            inputStreamSupplier = builder.regularFile ? builder.inputStreamSupplier : () -> EmptyInputStream.INSTANCE;
             lastModifiedTime = builder.lastModifiedTime;
             externalFileAttributes = builder.externalFileAttributes;
             regularFile = builder.regularFile;
         }
 
         public InputStream getInputStream() throws IOException {
-            return inputStreamSup.get();
+            return inputStreamSupplier.get();
         }
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static final class Builder {
 
-            private InputStreamSupplier inputStreamSup = EmptyInputStreamSupplier.INSTANCE;
+            private InputStreamSupplier inputStreamSupplier = EmptyInputStreamSupplier.INSTANCE;
             private String fileName;
             private long lastModifiedTime = System.currentTimeMillis();
             private ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.NULL;
@@ -98,13 +116,20 @@ public final class ZipFile {
                 return new Entry(this);
             }
 
-            public Entry.Builder inputStreamSup(InputStreamSupplier inputStreamSup) {
-                this.inputStreamSup = Optional.ofNullable(inputStreamSup).orElse(EmptyInputStreamSupplier.INSTANCE);
+            public Entry.Builder inputStreamSupplier(InputStreamSupplier inputStreamSupplier) {
+                this.inputStreamSupplier = Optional.ofNullable(inputStreamSupplier).orElse(EmptyInputStreamSupplier.INSTANCE);
                 return this;
             }
 
             public Entry.Builder fileName(@NonNull String fileName) {
-                this.fileName = fileName;
+                this.fileName = ZipUtils.getFileName(fileName, true);
+                regularFile = true;
+                return this;
+            }
+
+            public Entry.Builder directoryName(@NonNull String fileName) {
+                this.fileName = ZipUtils.getFileName(fileName, false);
+                regularFile = false;
                 return this;
             }
 
@@ -118,13 +143,64 @@ public final class ZipFile {
                 return this;
             }
 
-            public Entry.Builder regularFile(boolean regularFile) {
-                this.regularFile = regularFile;
-                return this;
-            }
-
         }
 
+    }
+
+    public interface Writer extends Closeable {
+
+        default void add(@NonNull Path path) throws IOException {
+            add(Collections.singleton(path));
+        }
+
+        default void add(@NonNull Collection<Path> paths) throws IOException {
+            for (Map.Entry<Path, String> entry : PathUtils.getRelativeContent(paths).entrySet())
+                addEntry(Entry.of(entry.getKey(), entry.getValue()));
+        }
+
+        default void addEntry(Collection<Entry> entries) {
+            entries.forEach(this::addEntry);
+        }
+
+        void addEntry(@NonNull Entry entry);
+
+        void remove(@NonNull String prefixEntryName) throws FileNotFoundException;
+
+        default void remove(@NonNull Collection<String> prefixEntryNames) throws FileNotFoundException {
+            for (String prefixEntryName : prefixEntryNames)
+                remove(prefixEntryName);
+        }
+
+        void copy(@NonNull Path zip) throws IOException;
+
+        void setComment(String comment);
+
+    }
+
+    public interface Reader extends Iterable<ZipFile.Entry> {
+
+        void extract(@NonNull Path destDir) throws IOException;
+
+        void extract(@NonNull Path destDir, @NonNull String fileName) throws IOException;
+
+        default void extract(@NonNull Path destDir, @NonNull Collection<String> fileNames) throws IOException {
+            for (String fileName : fileNames)
+                extract(destDir, fileName);
+        }
+
+        default Stream<ZipFile.Entry> stream() {
+            return StreamSupport.stream(spliterator(), false);
+        }
+
+        ZipFile.Entry extract(@NonNull String fileName) throws IOException;
+
+        String getComment();
+
+        Set<String> getEntryNames();
+
+        boolean isSplit();
+
+        boolean isZip64();
     }
 
     public interface Writer extends Closeable {

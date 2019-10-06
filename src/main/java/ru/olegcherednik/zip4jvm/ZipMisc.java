@@ -1,3 +1,18 @@
+/*
+ * Copyright © 2019 Cherednik Oleg
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package ru.olegcherednik.zip4jvm;
 
 import lombok.AccessLevel;
@@ -19,7 +34,7 @@ import java.util.Set;
 public final class ZipMisc {
 
     public static void setComment(@NonNull Path zip, String comment) throws IOException {
-        try (ZipFile.Writer zipFile = ZipIt.zip(zip).stream()) {
+        try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
             zipFile.setComment(comment);
         }
     }
@@ -37,7 +52,7 @@ public final class ZipMisc {
     }
 
     public static void removeEntry(@NonNull Path zip, @NonNull Collection<String> entryNames) throws IOException {
-        try (ZipFile.Writer zipFile = ZipIt.zip(zip).stream()) {
+        try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
             zipFile.remove(entryNames);
         }
     }
@@ -54,7 +69,7 @@ public final class ZipMisc {
                                                   .comment(reader.getComment())
                                                   .zip64(reader.isZip64()).build();
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(dest).settings(settings).stream()) {
+        try (ZipFile.Writer zipFile = ZipIt.zip(dest).settings(settings).open()) {
             zipFile.copy(src);
         }
     }

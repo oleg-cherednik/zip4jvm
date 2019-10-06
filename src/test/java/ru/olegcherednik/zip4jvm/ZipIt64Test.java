@@ -116,11 +116,11 @@ public class ZipIt64Test {
     public void shouldUseZip64WhenTotalEntriesOverFFFF() throws IOException {
         zipManyEntries = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(zipManyEntries).stream()) {
+        try (ZipFile.Writer zipFile = ZipIt.zip(zipManyEntries).open()) {
             IntStream.rangeClosed(1, ZipModel.MAX_TOTAL_ENTRIES + 1)
                      .mapToObj(i -> "file_" + i + ".txt")
                      .map(fileName -> ZipFile.Entry.builder()
-                                                   .inputStreamSup(() -> IOUtils.toInputStream(fileName, StandardCharsets.UTF_8))
+                                                   .inputStreamSupplier(() -> IOUtils.toInputStream(fileName, StandardCharsets.UTF_8))
                                                    .fileName(fileName).build())
                      .forEach(zipFile::addEntry);
         }

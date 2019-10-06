@@ -7,12 +7,14 @@ import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipFileSettings;
+import ru.olegcherednik.zip4jvm.utils.ReflectionUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static ru.olegcherednik.zip4jvm.TestData.dirBikes;
 import static ru.olegcherednik.zip4jvm.TestData.dirCars;
@@ -42,6 +44,7 @@ public class ZipItTest {
     private static final Path defMultiZip = rootDir.resolve("def/multi/src.zip");
     private static final Path customSingleZip = rootDir.resolve("custom/single/src.zip");
     private static final Path customMultiZip = rootDir.resolve("custom/multi/src.zip");
+    private static final Path defEntryZip = rootDir.resolve("def/entry/src.zip");
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -53,14 +56,14 @@ public class ZipItTest {
         Zip4jvmSuite.removeDir(rootDir);
     }
 
-    public void shouldCreateZipWhenAddRegularFileAndDefaultSettings() throws IOException {
+    public void shouldCreateZipWhenAddRegularFileDefaultSettings() throws IOException {
         ZipIt.zip(defSingleZip).add(fileBentley);
         assertThatDirectory(defSingleZip.getParent()).exists().hasDirectories(0).hasFiles(1);
         assertThatZipFile(defSingleZip).root().hasDirectories(0).hasFiles(1);
         assertThatZipFile(defSingleZip).file(fileNameBentley).exists().hasSize(1_395_362);
     }
 
-    public void shouldCreateZipWhenAddDirectoryAndDefaultSettings() throws IOException {
+    public void shouldCreateZipWhenAddDirectoryDefaultSettings() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
         ZipIt.zip(zip).add(dirCars);
@@ -69,7 +72,7 @@ public class ZipItTest {
         assertThatZipFile(zip).directory(zipDirNameCars).matches(dirCarsAssert);
     }
 
-    @Test(dependsOnMethods = "shouldCreateZipWhenAddRegularFileAndDefaultSettings")
+    @Test(dependsOnMethods = "shouldCreateZipWhenAddRegularFileDefaultSettings")
     public void shouldAddRegularFileWhenZipExistsDefaultSettings() throws IOException {
         ZipIt.zip(defSingleZip).add(fileSaintPetersburg);
         assertThatDirectory(defSingleZip.getParent()).exists().hasDirectories(0).hasFiles(1);
@@ -108,13 +111,13 @@ public class ZipItTest {
     }
 
     public void shouldThrowExceptionWhenAddNullPathAndDefaultSettings() {
-        assertThatThrownBy(() -> ZipIt.zip(defSingleZip).add((Path)null)).isExactlyInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> ZipIt.zip(defSingleZip).add((Path)null)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
     public void shouldThrowExceptionWhenAddNullPathAndCustomSettings() {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
         ZipFileSettings settings = ZipFileSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
-        assertThatThrownBy(() -> ZipIt.zip(customSingleZip).settings(settings).add((Path)null)).isExactlyInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> ZipIt.zip(customSingleZip).settings(settings).add((Path)null)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
     public void shouldCreateZipWhenAddRegularFileAndCustomSettings() throws IOException {
@@ -187,6 +190,43 @@ public class ZipItTest {
         assertThatZipFile(customMultiZip).file(fileNameSaintPetersburg).exists().hasSize(1_074_836);
         assertThatZipFile(customMultiZip).directory(zipDirNameCars).matches(dirCarsAssert);
         assertThatZipFile(customMultiZip).directory(zipDirNameBikes).matches(dirBikesAssert);
+    }
+
+    public void shouldCreateZipWhenAddRegularFileDefaultSettingsZipEntry() throws IOException {
+        ZipFile.Entry entry = ZipFile.Entry.of(fileBentley, "foo.jpg");
+
+        ZipIt.zip(defEntryZip).addEntry(entry);
+        assertThatDirectory(defEntryZip.getParent()).exists().hasDirectories(0).hasFiles(1);
+        assertThatZipFile(defEntryZip).root().hasDirectories(0).hasFiles(1);
+        assertThatZipFile(defEntryZip).file("foo.jpg").exists().hasSize(1_395_362);
+    }
+
+    public void shouldUseDefaultZipFileSettingsWhenSetNull() throws NoSuchFieldException, IllegalAccessException {
+        ZipIt zipIt = ZipIt.zip(defEntryZip);
+        assertThat(getSettings(zipIt)).isSameAs(ZipFileSettings.DEFAULT);
+
+        ZipFileSettings settings = ZipFileSettings.builder().comment("comment").build();
+        zipIt.settings(settings);
+        assertThat(getSettings(zipIt)).isSameAs(settings);
+
+        zipIt.settings(null);
+        assertThat(getSettings(zipIt)).isSameAs(ZipFileSettings.DEFAULT);
+    }
+
+    public void shouldUseDefaultZipEntrySettingsWhenSetNull() throws NoSuchFieldException, IllegalAccessException {
+        ZipIt zipIt = ZipIt.zip(defEntryZip);
+        assertThat(getSettings(zipIt).getEntrySettingsProvider()).isSameAs(ZipEntrySettings.DEFAULT_PROVIDER);
+
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
+        zipIt.entrySettings(entrySettings);
+        assertThat(getSettings(zipIt).getEntrySettingsProvider().apply("aa")).isSameAs(entrySettings);
+
+        zipIt.entrySettings((ZipEntrySettings)null);
+        assertThat(getSettings(zipIt).getEntrySettingsProvider()).isSameAs(ZipEntrySettings.DEFAULT_PROVIDER);
+    }
+
+    private static ZipFileSettings getSettings(ZipIt zipIt) throws NoSuchFieldException, IllegalAccessException {
+        return ReflectionUtils.getFieldValue(zipIt, "settings");
     }
 
 }

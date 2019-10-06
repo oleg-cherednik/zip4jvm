@@ -14,7 +14,6 @@ import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
-import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
 
 import java.io.IOException;
@@ -109,12 +108,17 @@ public abstract class ZipEntry {
 
     @NonNull
     public final ZipFile.Entry createImmutableEntry() {
-        return ZipFile.Entry.builder()
-                            .inputStreamSup(this::getInputStream)
-                            .fileName(ZipUtils.getFileNameNoDirectoryMarker(fileName))
-                            .lastModifiedTime(lastModifiedTime)
-                            .externalFileAttributes(externalFileAttributes)
-                            .regularFile(isRegularFile()).build();
+        ZipFile.Entry.Builder builder = ZipFile.Entry.builder()
+                                                     .inputStreamSupplier(this::getInputStream)
+                                                     .lastModifiedTime(lastModifiedTime)
+                                                     .externalFileAttributes(externalFileAttributes);
+
+        if (isRegularFile())
+            builder.fileName(fileName);
+        else
+            builder.directoryName(fileName);
+
+        return builder.build();
     }
 
 }

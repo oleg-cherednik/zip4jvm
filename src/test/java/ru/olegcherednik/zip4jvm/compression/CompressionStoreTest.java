@@ -119,7 +119,7 @@ public class CompressionStoreTest {
     public void shouldUnzipWhenWhenStoreCompressionAndAesEncryption() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        UnzipIt.zip(zipStoreSolidAes).destDir(destDir).passwordProvider(String::toCharArray).extract(dirNameCars);
+        UnzipIt.zip(zipStoreSolidAes).destDir(destDir).password(String::toCharArray).extract(dirNameCars);
         assertThatDirectory(destDir).exists().hasDirectories(1).hasFiles(0);
         assertThatDirectory(destDir.resolve(dirNameCars)).matches(dirCarsAssert);
     }

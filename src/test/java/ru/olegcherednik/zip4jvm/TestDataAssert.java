@@ -87,11 +87,15 @@ public final class TestDataAssert {
     }
 
     public static String getMethodName() {
+        boolean get = false;
+
         for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
             String className = element.getClassName();
 
-            if (className.startsWith(ZipIt.class.getPackage().getName()) && className.endsWith("Test"))
+            if (get)
                 return element.getMethodName();
+            if (Zip4jvmSuite.class.getName().equals(className))
+                get = true;
         }
 
         throw new Zip4jvmException("Cannot detect method name");

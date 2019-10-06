@@ -1,3 +1,18 @@
+/*
+ * Copyright © 2019 Cherednik Oleg
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package ru.olegcherednik.zip4jvm;
 
 import lombok.AccessLevel;
@@ -7,6 +22,7 @@ import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
@@ -41,7 +57,7 @@ public final class UnzipIt {
         return this;
     }
 
-    public UnzipIt passwordProvider(Function<String, char[]> passwordProvider) {
+    public UnzipIt password(Function<String, char[]> passwordProvider) {
         this.passwordProvider = Optional.ofNullable(passwordProvider).orElse(DEFAULT_PASSWORD_PROVIDER);
         return this;
     }
@@ -59,6 +75,10 @@ public final class UnzipIt {
 
         for (String fileName : fileNames)
             zipFile.extract(destDir, fileName);
+    }
+
+    public InputStream stream(String fileName) throws IOException {
+        return ZipFile.reader(zip, passwordProvider).extract(fileName).getInputStream();
     }
 
     public ZipFile.Reader open() throws IOException {

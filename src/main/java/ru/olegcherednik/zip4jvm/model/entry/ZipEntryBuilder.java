@@ -51,14 +51,14 @@ public final class ZipEntryBuilder {
         }
 
         private ZipEntry createDirectoryEntry() {
-            String fileName = ZipUtils.getFileName(entry.getFileName(), false);
+            String fileName = ZipUtils.getFileName(entry);
             int lastModifiedTime = ZipUtils.javaToDosTime(entry.getLastModifiedTime());
             ExternalFileAttributes externalFileAttributes = entry.getExternalFileAttributes();
             return new DirectoryZipEntry(fileName, lastModifiedTime, externalFileAttributes);
         }
 
         private ZipEntry createRegularFileEntry() {
-            String fileName = ZipUtils.getFileName(entry.getFileName(), true);
+            String fileName = ZipUtils.getFileName(entry);
             int lastModifiedTime = ZipUtils.javaToDosTime(entry.getLastModifiedTime());
             ExternalFileAttributes externalFileAttributes = entry.getExternalFileAttributes();
 

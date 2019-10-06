@@ -114,7 +114,7 @@ public class EncryptionPkwareTest {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
         assertThatThrownBy(() ->
-                UnzipIt.zip(zipStoreSplitPkware).destDir(destDir).passwordProvider(fileName -> UUID.randomUUID().toString().toCharArray()).extract())
+                UnzipIt.zip(zipStoreSplitPkware).destDir(destDir).password(fileName -> UUID.randomUUID().toString().toCharArray()).extract())
                 .isExactlyInstanceOf(IncorrectPasswordException.class);
     }
 

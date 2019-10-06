@@ -6,6 +6,7 @@ import lombok.NonNull;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.RealBigZip64NotSupportedException;
 
 import java.io.IOException;
@@ -51,16 +52,21 @@ public final class ZipUtils {
             throw new RealBigZip64NotSupportedException(value, type);
     }
 
+    public static <T> void requireNotNull(T obj, String name) {
+        if (obj == null)
+            throw new IllegalArgumentException("Parameter should not be null: " + name);
+    }
+
     public static boolean isDirectory(String fileName) {
-        return fileName != null && (fileName.endsWith("/") || fileName.endsWith("\\"));
+        return fileName.endsWith("/") || fileName.endsWith("\\");
     }
 
     public static boolean isRegularFile(String fileName) {
-        return fileName != null && !(fileName.endsWith("/") || fileName.endsWith("\\"));
+        return !isDirectory(fileName);
     }
 
     public static String normalizeFileName(String fileName) {
-        return FilenameUtils.normalize(fileName, true);
+        return StringUtils.removeStart(FilenameUtils.normalize(fileName, true), "/");
     }
 
     public static String toString(long offs) {
@@ -68,9 +74,13 @@ public final class ZipUtils {
     }
 
     @SuppressWarnings("PMD.AvoidReassigningParameters")
-    public static String getFileName(@NonNull String fileName, boolean regularFile) {
+    public static String getFileName(String fileName, boolean regularFile) {
         fileName = getFileNameNoDirectoryMarker(fileName);
         return regularFile ? fileName : fileName + '/';
+    }
+
+    public static String getFileName(ZipFile.Entry entry) {
+        return getFileName(entry.getFileName(), entry.isRegularFile());
     }
 
     @SuppressWarnings("PMD.AvoidReassigningParameters")

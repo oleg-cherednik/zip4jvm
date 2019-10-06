@@ -32,6 +32,6 @@ public final class ZipFileEntryWriter implements Writer {
 
     @Override
     public String toString() {
-        return '+' + entry.getFileName();
+        return '+' + ZipUtils.getFileName(entry);
     }
 }
