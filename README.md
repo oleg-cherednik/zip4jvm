@@ -76,7 +76,7 @@ ZipIt.zip(zip).add(dir);
 >filename.zip
 > |-- cars
 >      |-- bentley-continental.jpg
->      |-- feffari-458-italia.jpg
+>      |-- ferrari-458-italia.jpg
 >      |-- wiesmann-gt-mf5.jpg 
 >```
 
@@ -97,7 +97,7 @@ ZipIt.zip(zip).add(paths);
 >filename.zip
 > |-- cars
 > |    |-- bentley-continental.jpg
-> |    |-- feffari-458-italia.jpg
+> |    |-- ferrari-458-italia.jpg
 > |    |-- wiesmann-gt-mf5.jpg
 > |-- ducati-panigale-1199.jpg
 > |-- honda-cbr600rr.jpg
@@ -123,7 +123,7 @@ try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
 >filename.zip
 > |-- cars
 > |    |-- bentley-continental.jpg
-> |    |-- feffari-458-italia.jpg
+> |    |-- ferrari-458-italia.jpg
 > |    |-- wiesmann-gt-mf5.jpg
 > |-- ducati-panigale-1199.jpg
 > |-- honda-cbr600rr.jpg
@@ -197,7 +197,7 @@ UnzipIt.zip(zip).destDir(destDir).extract();
 >filename.zip
 > |-- cars
 > |    |-- bentley-continental.jpg
-> |    |-- feffari-458-italia.jpg
+> |    |-- ferrari-458-italia.jpg
 > |    |-- wiesmann-gt-mf5.jpg
 > |-- bikes
 > |    |-- ducati-panigale-1199.jpg
@@ -209,7 +209,7 @@ UnzipIt.zip(zip).destDir(destDir).extract();
 >  |-- cars
 >  |-- cars
 >  |    |-- bentley-continental.jpg
->  |    |-- feffari-458-italia.jpg
+>  |    |-- ferrari-458-italia.jpg
 >  |    |-- wiesmann-gt-mf5.jpg
 >  |-- bikes
 >  |    |-- ducati-panigale-1199.jpg
@@ -231,7 +231,7 @@ UnzipIt.zip(zip).destDir(destDir).extract("cars/bentley-continental.jpg");
 >filename.zip
 > |-- cars
 > |    |-- bentley-continental.jpg
-> |    |-- feffari-458-italia.jpg
+> |    |-- ferrari-458-italia.jpg
 > |    |-- wiesmann-gt-mf5.jpg
 > |-- bikes
 > |    |-- ducati-panigale-1199.jpg
@@ -255,7 +255,7 @@ UnzipIt.zip(zip).destDir(destDir).extract("cars");
 >filename.zip
 > |-- cars
 > |    |-- bentley-continental.jpg
-> |    |-- feffari-458-italia.jpg
+> |    |-- ferrari-458-italia.jpg
 > |    |-- wiesmann-gt-mf5.jpg
 > |-- bikes
 > |    |-- ducati-panigale-1199.jpg
@@ -266,7 +266,7 @@ UnzipIt.zip(zip).destDir(destDir).extract("cars");
 >/filename_content
 >  |-- cars
 >  |    |-- bentley-continental.jpg
->  |    |-- feffari-458-italia.jpg
+>  |    |-- ferrari-458-italia.jpg
 >  |    |-- wiesmann-gt-mf5.jpg
 >```
 
@@ -285,7 +285,7 @@ UnzipIt.zip(zip).destDir(destDir).extract(fileNames);
 >filename.zip
 > |-- cars
 > |    |-- bentley-continental.jpg
-> |    |-- feffari-458-italia.jpg
+> |    |-- ferrari-458-italia.jpg
 > |    |-- wiesmann-gt-mf5.jpg
 > |-- bikes
 > |    |-- ducati-panigale-1199.jpg
@@ -296,7 +296,7 @@ UnzipIt.zip(zip).destDir(destDir).extract(fileNames);
 >/filename_content
 >  |-- cars
 >  |    |-- bentley-continental.jpg
->  |    |-- feffari-458-italia.jpg
+>  |    |-- ferrari-458-italia.jpg
 >  |    |-- wiesmann-gt-mf5.jpg
 >  |-- ducati-panigale-1199.jpg
 >  |-- saint-petersburg.jpg
@@ -321,7 +321,7 @@ try (InputStream in = UnzipIt.zip(zip).stream("cars/bentley-continental.jpg");
 >filename.zip
 > |-- cars
 > |    |-- bentley-continental.jpg
-> |    |-- feffari-458-italia.jpg
+> |    |-- ferrari-458-italia.jpg
 > |    |-- wiesmann-gt-mf5.jpg
 > |-- bikes
 > |    |-- ducati-panigale-1199.jpg
@@ -352,7 +352,7 @@ UnzipIt.zip(zip).destDir(destDir).password(password).extract(fileNames);
 >filename.zip  --> password: 1
 > |-- cars
 > |    |-- bentley-continental.jpg
-> |    |-- feffari-458-italia.jpg
+> |    |-- ferrari-458-italia.jpg
 > |    |-- wiesmann-gt-mf5.jpg
 > |-- bikes
 > |    |-- ducati-panigale-1199.jpg
@@ -363,7 +363,7 @@ UnzipIt.zip(zip).destDir(destDir).password(password).extract(fileNames);
 >/filename_content
 >  |-- cars
 >  |    |-- bentley-continental.jpg
->  |    |-- feffari-458-italia.jpg
+>  |    |-- ferrari-458-italia.jpg
 >  |    |-- wiesmann-gt-mf5.jpg
 >  |-- ducati-panigale-1199.jpg
 >  |-- saint-petersburg.jpg
@@ -395,7 +395,7 @@ UnzipIt.zip(zip).destDir(destDir).settings(settings).extract(fileNames);
 >filename.zip
 >  |-- cars
 >  |    |-- bentley-continental.jpg   --> password: 1 
->  |    |-- feffari-458-italia.jpg    --> password: 1
+>  |    |-- ferrari-458-italia.jpg    --> password: 1
 >  |    |-- wiesmann-gt-mf5.jpg       --> password: 1
 >  |-- bikes
 >  |    |-- ducati-panigale-1199.jpg  --> password: 2
@@ -406,7 +406,7 @@ UnzipIt.zip(zip).destDir(destDir).settings(settings).extract(fileNames);
 >/filename_content
 >  |-- cars
 >  |    |-- bentley-continental.jpg
->  |    |-- feffari-458-italia.jpg
+>  |    |-- ferrari-458-italia.jpg
 >  |    |-- wiesmann-gt-mf5.jpg
 >  |-- ducati-panigale-1199.jpg
 >  |-- saint-petersburg.jpg
@@ -435,7 +435,7 @@ List<ZipFile.Entry> entires = zipFile.getEntries().collect(Collectors.toList());
 /*
 [entryNames]
 cars/bentley-continental.jpg
-cars/feffari-458-italia.jpg
+cars/ferrari-458-italia.jpg
 cars/wiesmann-gt-mf5.jpg
 bikes/ducati-panigale-1199.jpg
 bikes/kawasaki-ninja-300.jpg
@@ -446,7 +446,7 @@ saint-petersburg.jpg
 >filename.zip
 > |-- cars
 > |    |-- bentley-continental.jpg
-> |    |-- feffari-458-italia.jpg
+> |    |-- ferrari-458-italia.jpg
 > |    |-- wiesmann-gt-mf5.jpg
 > |-- bikes
 > |    |-- ducati-panigale-1199.jpg
@@ -466,7 +466,7 @@ ZipMisc.zip(zip).entryName("cars/bentley-continental.jpg").removeEntryByName();
 >filename.zip (before)
 >  |-- cars
 >  |    |-- bentley-continental.jpg 
->  |    |-- feffari-458-italia.jpg
+>  |    |-- ferrari-458-italia.jpg
 >  |    |-- wiesmann-gt-mf5.jpg
 >  |-- bikes
 >  |    |-- ducati-panigale-1199.jpg
@@ -476,7 +476,7 @@ ZipMisc.zip(zip).entryName("cars/bentley-continental.jpg").removeEntryByName();
 >```
 >filename.zip (after)
 >  |-- cars
->  |    |-- feffari-458-italia.jpg
+>  |    |-- ferrari-458-italia.jpg
 >  |    |-- wiesmann-gt-mf5.jpg
 >  |-- bikes
 >  |    |-- ducati-panigale-1199.jpg
@@ -496,7 +496,7 @@ ZipMisc.zip(zip).entryName("cars").removeEntryByNamePrefix();
 >filename.zip (before)
 >  |-- cars
 >  |    |-- bentley-continental.jpg 
->  |    |-- feffari-458-italia.jpg
+>  |    |-- ferrari-458-italia.jpg
 >  |    |-- wiesmann-gt-mf5.jpg
 >  |-- bikes
 >  |    |-- ducati-panigale-1199.jpg
