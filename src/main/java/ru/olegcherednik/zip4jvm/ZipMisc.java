@@ -16,7 +16,6 @@
 package ru.olegcherednik.zip4jvm;
 
 import lombok.AccessLevel;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
@@ -105,20 +104,19 @@ public final class ZipMisc {
         }
     }
 
-    public static boolean isSplit(Path zip) throws IOException {
+    public boolean isSplit() throws IOException {
         return UnzipIt.zip(zip).open().isSplit();
     }
 
-    // TODO refactoring; it's not clear where is source and destination
-    public static void merge(@NonNull Path dest, @NonNull Path src) throws IOException {
-        ZipFile.Reader reader = UnzipIt.zip(src).open();
+    public void merge(Path dest) throws IOException {
+        ZipFile.Reader reader = UnzipIt.zip(zip).open();
 
         ZipSettings settings = ZipSettings.builder()
                                           .comment(reader.getComment())
                                           .zip64(reader.isZip64()).build();
 
         try (ZipFile.Writer zipFile = ZipIt.zip(dest).settings(settings).open()) {
-            zipFile.copy(src);
+            zipFile.copy(zip);
         }
     }
 

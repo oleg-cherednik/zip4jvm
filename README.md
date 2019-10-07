@@ -510,6 +510,15 @@ ZipMisc.zip(zip).entryName("cars").removeEntryByNamePrefix();
 >  |-- saint-petersburg.jpg 
 >```
 
+**Note:** multiple entries could be removed
+
+#### Check whether zip archive split or not
+
+```
+Path zip = Paths.get("filename.zip");
+boolean split = zipFile.isSplit();
+```
+
 ## Model
 
 ### Zip settings: `ZipSettings`

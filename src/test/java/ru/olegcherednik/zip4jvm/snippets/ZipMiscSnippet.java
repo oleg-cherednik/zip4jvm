@@ -85,4 +85,9 @@ public class ZipMiscSnippet {
         int a = 0;
         a++;
     }
+
+    public void checkWhetherZipArchiveSplitOrNot() throws IOException {
+        ZipMisc zipFile = ZipMisc.zip(zip);
+        assertThat(zipFile.isSplit()).isFalse();
+    }
 }
