@@ -27,7 +27,9 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.function.Function;
 
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireExists;
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireRegularFile;
 
 /**
  * Add regular files and/or directories to the zip archive
@@ -50,6 +52,9 @@ public final class ZipIt {
      * @return not {@literal null} {@link ZipIt} instance
      */
     public static ZipIt zip(Path zip) {
+        requireNotNull(zip, "zipit.zip");
+        requireRegularFile(zip, "zipit.zip");
+
         return new ZipIt(zip);
     }
 
@@ -83,6 +88,7 @@ public final class ZipIt {
      * @return not {@literal null} {@link ZipIt} instance
      */
     public ZipIt entrySettings(Function<String, ZipEntrySettings> entrySettingsProvider) {
+        requireNotNull(entrySettingsProvider, "zipit.entrySettingsProvider");
         settings = settings.toBuilder().entrySettingsProvider(entrySettingsProvider).build();
         return this;
     }
@@ -94,7 +100,9 @@ public final class ZipIt {
      * @throws IOException in case of any problem
      */
     public void add(Path path) throws IOException {
-        requireNotNull(path, "add path");
+        requireNotNull(path, "zipit.path");
+        requireExists(path, "zipit.path");
+
         add(Collections.singleton(path));
     }
 
@@ -118,7 +126,7 @@ public final class ZipIt {
      * @throws IOException in case of any problem
      */
     public void addEntry(ZipFile.Entry entry) throws IOException {
-        requireNotNull(entry, "add entry");
+        requireNotNull(entry, "zipit.entry");
         addEntry(Collections.singleton(entry));
     }
 

@@ -18,7 +18,6 @@ package ru.olegcherednik.zip4jvm;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.engine.ZipEngine;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
@@ -121,13 +120,13 @@ public final class ZipFile {
                 return this;
             }
 
-            public Entry.Builder fileName(@NonNull String fileName) {
+            public Entry.Builder fileName(String fileName) {
                 this.fileName = ZipUtils.getFileName(fileName, true);
                 regularFile = true;
                 return this;
             }
 
-            public Entry.Builder directoryName(@NonNull String fileName) {
+            public Entry.Builder directoryName(String fileName) {
                 this.fileName = ZipUtils.getFileName(fileName, false);
                 regularFile = false;
                 return this;
@@ -138,7 +137,7 @@ public final class ZipFile {
                 return this;
             }
 
-            public Entry.Builder externalFileAttributes(@NonNull ExternalFileAttributes externalFileAttributes) {
+            public Entry.Builder externalFileAttributes(ExternalFileAttributes externalFileAttributes) {
                 this.externalFileAttributes = externalFileAttributes;
                 return this;
             }
@@ -149,11 +148,11 @@ public final class ZipFile {
 
     public interface Writer extends Closeable {
 
-        default void add(@NonNull Path path) throws IOException {
+        default void add(Path path) throws IOException {
             add(Collections.singleton(path));
         }
 
-        default void add(@NonNull Collection<Path> paths) throws IOException {
+        default void add(Collection<Path> paths) throws IOException {
             for (Map.Entry<Path, String> entry : PathUtils.getRelativeContent(paths).entrySet())
                 addEntry(Entry.of(entry.getKey(), entry.getValue()));
         }
@@ -162,16 +161,16 @@ public final class ZipFile {
             entries.forEach(this::addEntry);
         }
 
-        void addEntry(@NonNull Entry entry);
+        void addEntry(Entry entry);
 
-        void remove(@NonNull String prefixEntryName) throws FileNotFoundException;
+        void remove(String prefixEntryName) throws FileNotFoundException;
 
         default void remove(Collection<String> prefixEntryNames) throws FileNotFoundException {
             for (String prefixEntryName : prefixEntryNames)
                 remove(prefixEntryName);
         }
 
-        void copy(@NonNull Path zip) throws IOException;
+        void copy(Path zip) throws IOException;
 
         void setComment(String comment);
 

@@ -59,9 +59,9 @@ public final class UnzipIt {
      * @throws {@link IllegalArgumentException} in case of given {@code zip} is {@literal null}, not exists or not regular file
      */
     public static UnzipIt zip(Path zip) {
-        requireNotNull(zip, "unzip.zip");
-        requireExists(zip, "unzip.zip");
-        requireRegularFile(zip, "unzip.zip");
+        requireNotNull(zip, "unzipit.zip");
+        requireExists(zip, "unzipit.zip");
+        requireRegularFile(zip, "unzipit.zip");
 
         return new UnzipIt(zip).destDir(zip.getParent());
     }
@@ -75,8 +75,8 @@ public final class UnzipIt {
      * @throws {@link IllegalArgumentException} in case of {@code destDir} is {@literal null} or not a directory
      */
     public UnzipIt destDir(Path destDir) {
-        requireNotNull(destDir, "unzip.destDir");
-        requireDirectory(destDir, "unzip.destDir");
+        requireNotNull(destDir, "unzipit.destDir");
+        requireDirectory(destDir, "unzipit.destDir");
 
         this.destDir = destDir;
         return this;
@@ -101,7 +101,7 @@ public final class UnzipIt {
      */
     @SuppressWarnings("MethodCanBeVariableArityMethod")
     public UnzipIt password(char[] password) {
-        requireNotEmpty(password, "unzip.password");
+        requireNotEmpty(password, "unzipit.password");
 
         settings = settings.toBuilder().password(password).build();
         return this;
@@ -127,7 +127,7 @@ public final class UnzipIt {
      * @throws IncorrectPasswordException in case of password incorrect
      */
     public void extract(String fileName) throws IOException, IncorrectPasswordException {
-        requireNotBlank(fileName, "unzip.fileName");
+        requireNotBlank(fileName, "unzipit.fileName");
 
         extract(Collections.singleton(fileName));
     }
@@ -142,7 +142,7 @@ public final class UnzipIt {
      * @throws IncorrectPasswordException in case of password incorrect
      */
     public void extract(Collection<String> fileNames) throws IOException {
-        requireNotNull(fileNames, "unzip.fileNames");
+        requireNotNull(fileNames, "unzipit.fileNames");
         open().extract(destDir, fileNames);
     }
 
@@ -156,10 +156,16 @@ public final class UnzipIt {
      * @throws IncorrectPasswordException in case of password incorrect
      */
     public InputStream stream(String fileName) throws IOException {
-        requireNotBlank(fileName, "unzip.fileName");
+        requireNotBlank(fileName, "unzipit.fileName");
         return ZipFile.reader(zip, settings).extract(fileName).getInputStream();
     }
 
+    /**
+     * Retrieves not {@literal null} instance of {@link ZipFile.Reader}. It provides all available methods to unzip an archive.
+     *
+     * @return not {@literal null} instance of {@link ZipFile.Reader}
+     * @throws IOException in case of any problem with file access
+     */
     public ZipFile.Reader open() throws IOException {
         return ZipFile.reader(zip, settings);
     }
