@@ -80,7 +80,7 @@ public class UnzipItTest {
         assertThatDirectory(destDir.resolve(dirNameBikes)).matches(dirBikesAssert);
     }
 
-    public void shouldExtractrZipArchiveWhenEntryNameWithCustomCharset() throws IOException, URISyntaxException {
+    public void shouldExtractZipArchiveWhenEntryNameWithCustomCharset() throws IOException, URISyntaxException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTme(rootDir);
         Path zip = Paths.get(UnzipItTest.class.getResource("/zip/cjk_filename.zip").toURI()).toAbsolutePath();
 
