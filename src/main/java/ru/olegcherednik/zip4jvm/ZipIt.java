@@ -27,7 +27,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static ru.olegcherednik.zip4jvm.utils.ZipUtils.requireNotNull;
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
 /**
  * Add regular files and/or directories to the zip archive
@@ -38,13 +38,13 @@ import static ru.olegcherednik.zip4jvm.utils.ZipUtils.requireNotNull;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class ZipIt {
 
-    /** path to the zip file */
+    /** path to the zip file (new or existed) */
     private final Path zip;
     /** zip file scope settings */
     private ZipSettings settings = ZipSettings.DEFAULT;
 
     /**
-     * Create {@link ZipIt} instance with given {@code zip} path to the zip archive
+     * Create {@link ZipIt} instance with given {@code zip} path to the new or existed zip archive.
      *
      * @param zip zip file path
      * @return not {@literal null} {@link ZipIt} instance

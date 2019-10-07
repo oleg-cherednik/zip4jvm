@@ -19,7 +19,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
-import ru.olegcherednik.zip4jvm.utils.ZipUtils;
+import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -49,7 +49,7 @@ public final class ZipMisc {
     }
 
     public static void removeEntry(Path zip, String entryName) throws IOException {
-        ZipUtils.requireNotNull(entryName, "remove entryName");
+        ValidationUtils.requireNotNull(entryName, "remove entryName");
         removeEntry(zip, Collections.singleton(entryName));
     }
 

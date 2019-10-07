@@ -179,11 +179,11 @@ public final class ZipFile {
 
     public interface Reader extends Iterable<ZipFile.Entry> {
 
-        void extract(@NonNull Path destDir) throws IOException;
+        void extract(Path destDir) throws IOException;
 
-        void extract(@NonNull Path destDir, @NonNull String fileName) throws IOException;
+        void extract(Path destDir, String fileName) throws IOException;
 
-        default void extract(@NonNull Path destDir, @NonNull Collection<String> fileNames) throws IOException {
+        default void extract(Path destDir, Collection<String> fileNames) throws IOException {
             for (String fileName : fileNames)
                 extract(destDir, fileName);
         }
@@ -192,7 +192,7 @@ public final class ZipFile {
             return StreamSupport.stream(spliterator(), false);
         }
 
-        ZipFile.Entry extract(@NonNull String fileName) throws IOException;
+        ZipFile.Entry extract(String fileName) throws IOException;
 
         String getComment();
 

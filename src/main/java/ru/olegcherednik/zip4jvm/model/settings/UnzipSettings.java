@@ -38,9 +38,9 @@ public final class UnzipSettings {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class Builder {
 
-        private static final Function<String, char[]> DEFAULT_PASSWORD_PROVIDER = fileName -> null;
+        private static final Function<String, char[]> NO_PASSWORD_PROVIDER = fileName -> null;
 
-        private Function<String, char[]> passwordProvider = DEFAULT_PASSWORD_PROVIDER;
+        private Function<String, char[]> passwordProvider = NO_PASSWORD_PROVIDER;
         private Function<Charset, Charset> charsetCustomizer = ZipModel.STANDARD_ZIP_CHARSET;
 
         public UnzipSettings build() {
@@ -49,12 +49,12 @@ public final class UnzipSettings {
 
         @SuppressWarnings("MethodCanBeVariableArityMethod")
         public Builder password(char[] password) {
-            passwordProvider = ArrayUtils.isEmpty(password) ? DEFAULT_PASSWORD_PROVIDER : fileName -> password;
+            passwordProvider = ArrayUtils.isEmpty(password) ? NO_PASSWORD_PROVIDER : fileName -> password;
             return this;
         }
 
         public Builder password(Function<String, char[]> passwordProvider) {
-            this.passwordProvider = Optional.ofNullable(passwordProvider).orElse(DEFAULT_PASSWORD_PROVIDER);
+            this.passwordProvider = Optional.ofNullable(passwordProvider).orElse(NO_PASSWORD_PROVIDER);
             return this;
         }
 
