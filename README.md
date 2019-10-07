@@ -57,7 +57,19 @@ To simplify usage of _zip4jvm_, there're following classes:
 Path zip = Paths.get("filename.zip");
 Path file = Path.get("/cars/bentley-continental.jpg")
 ZipIt.zip(zip).add(file);
-```
+``` 
+>```
+>/-
+> |-- cars
+> |    |-- bentley-continental.jpg
+> |    |-- ferrari-458-italia.jpg
+> |    |-- wiesmann-gt-mf5.jpg
+> |-- bikes
+> |    |-- ducati-panigale-1199.jpg
+> |    |-- kawasaki-ninja-300.jpg
+> |    |-- honda-cbr600rr.jpg
+> |-- saint-petersburg.jpg 
+>```
 >```
 >filename.zip
 > |-- bentley-continental.jpg
@@ -69,9 +81,21 @@ ZipIt.zip(zip).add(file);
 
 ```
 Path zip = Paths.get("filename.zip");
-Path dir = Path.get("/catalog/cars")
+Path dir = Path.get("/cars")
 ZipIt.zip(zip).add(dir);
 ```
+>```
+>/-
+> |-- cars
+> |    |-- bentley-continental.jpg
+> |    |-- ferrari-458-italia.jpg
+> |    |-- wiesmann-gt-mf5.jpg
+> |-- bikes
+> |    |-- ducati-panigale-1199.jpg
+> |    |-- kawasaki-ninja-300.jpg
+> |    |-- honda-cbr600rr.jpg
+> |-- saint-petersburg.jpg 
+>```
 >```
 >filename.zip
 > |-- cars
@@ -94,6 +118,18 @@ Collection<Path> paths = Arrays.asList(
 ZipIt.zip(zip).add(paths);
 ```
 >```
+>/-
+> |-- cars
+> |    |-- bentley-continental.jpg
+> |    |-- ferrari-458-italia.jpg
+> |    |-- wiesmann-gt-mf5.jpg
+> |-- bikes
+> |    |-- ducati-panigale-1199.jpg
+> |    |-- kawasaki-ninja-300.jpg
+> |    |-- honda-cbr600rr.jpg
+> |-- saint-petersburg.jpg 
+>```
+>```
 >filename.zip
 > |-- cars
 > |    |-- bentley-continental.jpg
@@ -108,32 +144,6 @@ ZipIt.zip(zip).add(paths);
 
 **Note:** each directory from the list is added to the root of the zip archive keeping the initial structure. 
 
-##### Create (or open existed) zip archive and add some regular files and/or directories using stream
-  
-```
-Path zip = Paths.get("filename.zip");
-try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
-    zipFile.add(Paths.get("/bikes/ducati-panigale-1199.jpg"));
-    zipFile.add(Paths.get("/bikes/honda-cbr600rr.jpg"));
-    zipFile.add(Paths.get("/cars"));
-    zipFile.add(Paths.get("/saint-petersburg.jpg");
-}
-```
->```
->filename.zip
-> |-- cars
-> |    |-- bentley-continental.jpg
-> |    |-- ferrari-458-italia.jpg
-> |    |-- wiesmann-gt-mf5.jpg
-> |-- ducati-panigale-1199.jpg
-> |-- honda-cbr600rr.jpg
-> |-- saint-petersburg.jpg 
->```                                                                                                         
-
-**Note:** each regular file from the list is added to the root of the zip archive.
-
-**Note:** each directory from the list is added to the root of the zip archive keeping the initial structure.
-
 #### Regular files and empty directories are available as `InputStream`
 
 ##### Create (or open existed) zip archive and add input streams content as regular files
@@ -143,16 +153,28 @@ Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
 
 try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
     zipFile.add(ZipFile.Entry.builder()
-                             .inputStreamSupplier(() -> new FileInputStream(fileBentley.toFile()))
+                             .inputStreamSupplier(() -> new FileInputStream("/cars/bentley-continental.jpg"))
                              .fileName("my_cars/bentley-continental.jpg")
                              .lastModifiedTime(System.currentTimeMillis()).build());
 
     zipFile.add(ZipFile.Entry.builder()
-                             .inputStreamSupplier(() -> new FileInputStream(fileKawasaki.toFile()))
+                             .inputStreamSupplier(() -> new FileInputStream("bikes/kawasaki-ninja-300.jpg"))
                              .fileName("my_bikes/kawasaki.jpg")
                              .lastModifiedTime(System.currentTimeMillis()).build());
 }
 ```
+>```
+>/-
+> |-- cars
+> |    |-- bentley-continental.jpg
+> |    |-- ferrari-458-italia.jpg
+> |    |-- wiesmann-gt-mf5.jpg
+> |-- bikes
+> |    |-- ducati-panigale-1199.jpg
+> |    |-- kawasaki-ninja-300.jpg
+> |    |-- honda-cbr600rr.jpg
+> |-- saint-petersburg.jpg 
+>```
 >```
 >filename.zip
 > |-- my_cars
