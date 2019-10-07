@@ -36,8 +36,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -146,19 +144,11 @@ public final class ZipFile {
     public interface Writer extends Closeable {
 
         default void add(Path path) throws IOException {
-            add(Collections.singleton(path));
+            for (Map.Entry<Path, String> entry : PathUtils.getRelativeContent(path).entrySet())
+                add(Entry.of(entry.getKey(), entry.getValue()));
         }
 
-        default void add(Collection<Path> paths) throws IOException {
-            for (Map.Entry<Path, String> entry : PathUtils.getRelativeContent(paths).entrySet())
-                addEntry(Entry.of(entry.getKey(), entry.getValue()));
-        }
-
-        default void addEntry(Collection<Entry> entries) {
-            entries.forEach(this::addEntry);
-        }
-
-        void addEntry(Entry entry);
+        void add(Entry entry);
 
         void removeEntryByName(String entryName);
 
@@ -174,11 +164,6 @@ public final class ZipFile {
         void extract(Path destDir) throws IOException;
 
         void extract(Path destDir, String fileName) throws IOException;
-
-        default void extract(Path destDir, Collection<String> fileNames) throws IOException {
-            for (String fileName : fileNames)
-                extract(destDir, fileName);
-        }
 
         default Stream<ZipFile.Entry> stream() {
             return StreamSupport.stream(spliterator(), false);

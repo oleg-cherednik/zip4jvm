@@ -45,7 +45,7 @@ public final class ZipEngine implements ZipFile.Writer {
     }
 
     @Override
-    public void addEntry(ZipFile.Entry entry) {
+    public void add(ZipFile.Entry entry) {
         ZipEntrySettings entrySettings = entrySettingsProvider.apply(entry.getFileName());
         String fileName = ZipUtils.getFileName(entry);
 

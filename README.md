@@ -431,16 +431,84 @@ zipFile.setComment(null);       // remove comment
 Path zip = Paths.get("filename.zip");
 ZipMisc zipFile = ZipMisc.zip(zip);
 List<ZipFile.Entry> entires = zipFile.getEntries().collect(Collectors.toList());
+/*
+[entryNames]
+cars/bentley-continental.jpg
+cars/feffari-458-italia.jpg
+cars/wiesmann-gt-mf5.jpg
+bikes/ducati-panigale-1199.jpg
+bikes/kawasaki-ninja-300.jpg
+saint-petersburg.jpg 
+*/
 ```
+>```
+>filename.zip
+> |-- cars
+> |    |-- bentley-continental.jpg
+> |    |-- feffari-458-italia.jpg
+> |    |-- wiesmann-gt-mf5.jpg
+> |-- bikes
+> |    |-- ducati-panigale-1199.jpg
+> |    |-- kawasaki-ninja-300.jpg
+> |-- saint-petersburg.jpg 
+>```
 
 **Note:** `zipFile.getEntries()` retrieves `Stream` with immutable `ZupFile.Entry` objects represent all entries in zip archive
 
-#### Remove entry by entry name
+#### Remove entry by name
 
 ```
 Path zip = Paths.get("filename.zip");
-List<ZipFile.Entry> entires = ZipMisc.getEntries(zip).collect(Collectors.toList());
+ZipMisc.zip(zip).entryName("cars/bentley-continental.jpg").removeEntryByName();
 ```
+>```
+>filename.zip (before)
+>  |-- cars
+>  |    |-- bentley-continental.jpg 
+>  |    |-- feffari-458-italia.jpg
+>  |    |-- wiesmann-gt-mf5.jpg
+>  |-- bikes
+>  |    |-- ducati-panigale-1199.jpg
+>  |    |-- kawasaki-ninja-300.jpg
+>  |-- saint-petersburg.jpg 
+>```
+>```
+>filename.zip (after)
+>  |-- cars
+>  |    |-- feffari-458-italia.jpg
+>  |    |-- wiesmann-gt-mf5.jpg
+>  |-- bikes
+>  |    |-- ducati-panigale-1199.jpg
+>  |    |-- kawasaki-ninja-300.jpg
+>  |-- saint-petersburg.jpg 
+>```
+
+**Note:** exactly one entry will be removed in case of entry with exact this name exists
+
+#### Remove entry by name prefix
+
+```
+Path zip = Paths.get("filename.zip");
+ZipMisc.zip(zip).entryName("cars").removeEntryByNamePrefix();
+```
+>```
+>filename.zip (before)
+>  |-- cars
+>  |    |-- bentley-continental.jpg 
+>  |    |-- feffari-458-italia.jpg
+>  |    |-- wiesmann-gt-mf5.jpg
+>  |-- bikes
+>  |    |-- ducati-panigale-1199.jpg
+>  |    |-- kawasaki-ninja-300.jpg
+>  |-- saint-petersburg.jpg 
+>```
+>```
+>filename.zip (after)
+>  |-- bikes
+>  |    |-- ducati-panigale-1199.jpg
+>  |    |-- kawasaki-ninja-300.jpg
+>  |-- saint-petersburg.jpg 
+>```
 
 ## Model
 

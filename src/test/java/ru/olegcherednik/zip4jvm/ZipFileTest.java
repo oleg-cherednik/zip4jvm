@@ -170,9 +170,12 @@ public class ZipFileTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
         try (ZipFile.Writer zipFile = ZipIt.zip(zip).settings(settings).open()) {
-            zipFile.add(filesDirBikes);
-            zipFile.add(filesDirCars);
-            zipFile.add(filesDirSrc);
+            for (Path path : filesDirBikes)
+                zipFile.add(path);
+            for (Path path : filesDirCars)
+                zipFile.add(path);
+            for (Path path : filesDirSrc)
+                zipFile.add(path);
         }
 
 //        assertThatDirectory(file.getParent()).exists().hasSubDirectories(0).hasFiles(1);

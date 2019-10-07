@@ -52,8 +52,8 @@ public final class ZipIt {
      * @return not {@literal null} {@link ZipIt} instance
      */
     public static ZipIt zip(Path zip) {
-        requireNotNull(zip, "zipit.zip");
-        requireRegularFile(zip, "zipit.zip");
+        requireNotNull(zip, "ZipIt.zip");
+        requireRegularFile(zip, "ZipIt.zip");
 
         return new ZipIt(zip);
     }
@@ -88,7 +88,7 @@ public final class ZipIt {
      * @return not {@literal null} {@link ZipIt} instance
      */
     public ZipIt entrySettings(Function<String, ZipEntrySettings> entrySettingsProvider) {
-        requireNotNull(entrySettingsProvider, "zipit.entrySettingsProvider");
+        requireNotNull(entrySettingsProvider, "ZipIt.entrySettingsProvider");
         settings = settings.toBuilder().entrySettingsProvider(entrySettingsProvider).build();
         return this;
     }
@@ -100,8 +100,8 @@ public final class ZipIt {
      * @throws IOException in case of any problem
      */
     public void add(Path path) throws IOException {
-        requireNotNull(path, "zipit.path");
-        requireExists(path, "zipit.path");
+        requireNotNull(path, "ZipIt.path");
+        requireExists(path);
 
         add(Collections.singleton(path));
     }
@@ -115,7 +115,8 @@ public final class ZipIt {
     public void add(Collection<Path> paths) throws IOException {
         // TODO check that path != zip
         try (ZipFile.Writer zipFile = ZipFile.writer(zip, settings)) {
-            zipFile.add(paths);
+            for (Path path : paths)
+                zipFile.add(path);
         }
     }
 
@@ -126,7 +127,7 @@ public final class ZipIt {
      * @throws IOException in case of any problem
      */
     public void addEntry(ZipFile.Entry entry) throws IOException {
-        requireNotNull(entry, "zipit.entry");
+        requireNotNull(entry, "ZipIt.entry");
         addEntry(Collections.singleton(entry));
     }
 
@@ -138,7 +139,7 @@ public final class ZipIt {
      */
     public void addEntry(Collection<ZipFile.Entry> entries) throws IOException {
         try (ZipFile.Writer zipFile = zip(zip).settings(settings).open()) {
-            zipFile.addEntry(entries);
+            entries.forEach(zipFile::add);
         }
     }
 

@@ -67,11 +67,22 @@ public class ZipMiscSnippet {
         List<ZipFile.Entry> entries = zipFile.getEntries().collect(Collectors.toList());
     }
 
-    public void removeEntryByEntryName() throws IOException {
+    public void removeEntryByName() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
         FileUtils.copyFile(zipDeflateSolid.toFile(), zip.toFile());
 
         ZipMisc zipFile = ZipMisc.zip(zip);
         zipFile.entryName(dirNameCars + '/' + fileNameFerrari).removeEntryByName();
+    }
+
+    public void removeEntryByNamePrefix() throws IOException {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
+        FileUtils.copyFile(zipDeflateSolid.toFile(), zip.toFile());
+
+        ZipMisc zipFile = ZipMisc.zip(zip);
+        zipFile.entryName(dirNameCars).removeEntryByNamePrefix();
+
+        int a = 0;
+        a++;
     }
 }

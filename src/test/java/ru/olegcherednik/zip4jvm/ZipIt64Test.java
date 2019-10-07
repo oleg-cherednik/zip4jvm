@@ -122,7 +122,7 @@ public class ZipIt64Test {
                      .map(fileName -> ZipFile.Entry.builder()
                                                    .inputStreamSupplier(() -> IOUtils.toInputStream(fileName, Charsets.UTF_8))
                                                    .fileName(fileName).build())
-                     .forEach(zipFile::addEntry);
+                     .forEach(zipFile::add);
         }
 
         ZipModel zipModel = ZipModelBuilder.read(zipManyEntries);

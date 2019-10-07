@@ -60,7 +60,7 @@ public final class UnzipIt {
      */
     public static UnzipIt zip(Path zip) {
         requireNotNull(zip, "unzipit.zip");
-        requireExists(zip, "unzipit.zip");
+        requireExists(zip);
         requireRegularFile(zip, "unzipit.zip");
 
         return new UnzipIt(zip).destDir(zip.getParent());
@@ -143,7 +143,11 @@ public final class UnzipIt {
      */
     public void extract(Collection<String> fileNames) throws IOException {
         requireNotNull(fileNames, "unzipit.fileNames");
-        open().extract(destDir, fileNames);
+
+        ZipFile.Reader zipFile = open();
+
+        for (String fileName : fileNames)
+            zipFile.extract(destDir, fileName);
     }
 
     /**

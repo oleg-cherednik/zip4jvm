@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import ru.olegcherednik.zip4jvm.exception.PathNotExistsException;
 import ru.olegcherednik.zip4jvm.exception.RealBigZip64NotSupportedException;
 
 import java.nio.file.Files;
@@ -34,9 +35,9 @@ public final class ValidationUtils {
             throw new IllegalArgumentException("Parameter should not be null: " + name);
     }
 
-    public static void requireExists(Path path, String name) {
+    public static void requireExists(Path path) {
         if (!Files.exists(path))
-            throw new IllegalArgumentException("Path should exists: " + name);
+            throw new PathNotExistsException(path);
     }
 
     public static void requireRegularFile(Path path, String name) {

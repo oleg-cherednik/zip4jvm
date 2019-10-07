@@ -48,7 +48,7 @@ public final class ZipMisc {
 
     public static ZipMisc zip(Path zip) {
         requireNotNull(zip, "ZipMisc.zip");
-        requireExists(zip, "ZipMisc.zip");
+        requireExists(zip);
         requireRegularFile(zip, "ZipMisc.zip");
 
         return new ZipMisc(zip);
