@@ -33,7 +33,7 @@ public final class ZipModelBuilder {
     private final Function<Charset, Charset> charsetCustomizer;
 
     public static ZipModel read(Path zip) throws IOException {
-        return read(zip, ZipModel.GENERA_PURPOSE_FLAG_CHARSET);
+        return read(zip, ZipModel.STANDARD_ZIP_CHARSET);
     }
 
     public static ZipModel read(Path zip, Function<Charset, Charset> charsetCustomizer) throws IOException {

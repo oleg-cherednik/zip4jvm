@@ -7,7 +7,6 @@ import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -82,19 +81,19 @@ public class FileHeaderTest {
     public void shouldRetrieveNotNullFileName() {
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
         assertThat(fileHeader.getFileName()).isNull();
-        assertThat(fileHeader.getFileName(StandardCharsets.UTF_8)).isSameAs(ArrayUtils.EMPTY_BYTE_ARRAY);
+        assertThat(fileHeader.getFileName(Charsets.UTF_8)).isSameAs(ArrayUtils.EMPTY_BYTE_ARRAY);
 
         fileHeader.setFileName("zip4jvm");
-        assertThat(fileHeader.getFileName(StandardCharsets.UTF_8)).isEqualTo("zip4jvm".getBytes(StandardCharsets.UTF_8));
+        assertThat(fileHeader.getFileName(Charsets.UTF_8)).isEqualTo("zip4jvm".getBytes(Charsets.UTF_8));
     }
 
     public void shouldRetrieveNotNullComment() {
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
         assertThat(fileHeader.getComment()).isNull();
-        assertThat(fileHeader.getComment(StandardCharsets.UTF_8)).isSameAs(ArrayUtils.EMPTY_BYTE_ARRAY);
+        assertThat(fileHeader.getComment(Charsets.UTF_8)).isSameAs(ArrayUtils.EMPTY_BYTE_ARRAY);
 
         fileHeader.setComment("zip4jvm");
-        assertThat(fileHeader.getComment(StandardCharsets.UTF_8)).isEqualTo("zip4jvm".getBytes(StandardCharsets.UTF_8));
+        assertThat(fileHeader.getComment(Charsets.UTF_8)).isEqualTo("zip4jvm".getBytes(Charsets.UTF_8));
     }
 
     public void shouldRetrieveFileNameWhenToString() {

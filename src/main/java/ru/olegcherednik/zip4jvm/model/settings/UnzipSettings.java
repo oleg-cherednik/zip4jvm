@@ -41,7 +41,7 @@ public final class UnzipSettings {
         private static final Function<String, char[]> DEFAULT_PASSWORD_PROVIDER = fileName -> null;
 
         private Function<String, char[]> passwordProvider = DEFAULT_PASSWORD_PROVIDER;
-        private Function<Charset, Charset> charsetCustomizer = ZipModel.GENERA_PURPOSE_FLAG_CHARSET;
+        private Function<Charset, Charset> charsetCustomizer = ZipModel.STANDARD_ZIP_CHARSET;
 
         public UnzipSettings build() {
             return new UnzipSettings(this);
@@ -59,12 +59,12 @@ public final class UnzipSettings {
         }
 
         public Builder charset(Charset charset) {
-            charsetCustomizer = charset == null ? ZipModel.GENERA_PURPOSE_FLAG_CHARSET : curCharset -> charset;
+            charsetCustomizer = charset == null ? ZipModel.STANDARD_ZIP_CHARSET : curCharset -> charset;
             return this;
         }
 
         private Builder charsetCustomizer(Function<Charset, Charset> charsetCustomizer) {
-            this.charsetCustomizer = Optional.ofNullable(charsetCustomizer).orElse(ZipModel.GENERA_PURPOSE_FLAG_CHARSET);
+            this.charsetCustomizer = Optional.ofNullable(charsetCustomizer).orElse(ZipModel.STANDARD_ZIP_CHARSET);
             return this;
         }
 

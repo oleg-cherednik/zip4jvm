@@ -4,7 +4,6 @@ import org.apache.commons.lang.ArrayUtils;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -54,10 +53,10 @@ public class LocalFileHeaderTest {
     public void shouldRetrieveNotNullFileName() {
         LocalFileHeader localFileHeader = new LocalFileHeader();
         assertThat(localFileHeader.getFileName()).isNull();
-        assertThat(localFileHeader.getFileName(StandardCharsets.UTF_8)).isSameAs(ArrayUtils.EMPTY_BYTE_ARRAY);
+        assertThat(localFileHeader.getFileName(Charsets.UTF_8)).isSameAs(ArrayUtils.EMPTY_BYTE_ARRAY);
 
         localFileHeader.setFileName("zip4jvm");
-        assertThat(localFileHeader.getFileName(StandardCharsets.UTF_8)).isEqualTo("zip4jvm".getBytes(StandardCharsets.UTF_8));
+        assertThat(localFileHeader.getFileName(Charsets.UTF_8)).isEqualTo("zip4jvm".getBytes(Charsets.UTF_8));
     }
 
 }

@@ -5,9 +5,9 @@ import de.idyl.winzipaes.impl.AESDecrypterJCA;
 import de.idyl.winzipaes.impl.ExtZipEntry;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.model.Charsets;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.zip.DataFormatException;
@@ -29,7 +29,7 @@ public class Zip4jvmToWinZipAesCompatibilityTest {
     public void checkCompatibilityWithWinZipAes() throws IOException, DataFormatException {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         AesZipFileDecrypter decrypter = new AesZipFileDecrypter(zipDeflateSolidAes.toFile(), new AESDecrypterJCA());
-        AesZipFileDecrypter.charset = StandardCharsets.UTF_8.name();
+        AesZipFileDecrypter.charset = Charsets.UTF_8.name();
 
         for (ExtZipEntry zipEntry : decrypter.getEntryList()) {
             Path path = dstDir.resolve(zipEntry.getName());

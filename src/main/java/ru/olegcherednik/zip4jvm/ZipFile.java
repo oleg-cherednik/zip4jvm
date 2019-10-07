@@ -166,7 +166,7 @@ public final class ZipFile {
 
         void remove(@NonNull String prefixEntryName) throws FileNotFoundException;
 
-        default void remove(@NonNull Collection<String> prefixEntryNames) throws FileNotFoundException {
+        default void remove(Collection<String> prefixEntryNames) throws FileNotFoundException {
             for (String prefixEntryName : prefixEntryNames)
                 remove(prefixEntryName);
         }

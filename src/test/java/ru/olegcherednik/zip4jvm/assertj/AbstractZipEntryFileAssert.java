@@ -2,10 +2,10 @@ package ru.olegcherednik.zip4jvm.assertj;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
+import ru.olegcherednik.zip4jvm.model.Charsets;
 
 import javax.imageio.ImageIO;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -63,7 +63,7 @@ public abstract class AbstractZipEntryFileAssert<S extends AbstractZipEntryFileA
         try (InputStream in = zipFile.getInputStream(actual)) {
             String[] expectedLines = expected.isEmpty() ? ArrayUtils.EMPTY_STRING_ARRAY : NEW_LINE.split(expected);
 
-            List<String> lines = IOUtils.readLines(in, StandardCharsets.UTF_8);
+            List<String> lines = IOUtils.readLines(in, Charsets.UTF_8);
             assertThat(lines).hasSize(expectedLines.length);
 
             int i = 0;

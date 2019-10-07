@@ -19,6 +19,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
+import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -33,31 +34,32 @@ import java.util.Set;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ZipMisc {
 
-    public static void setComment(@NonNull Path zip, String comment) throws IOException {
+    public static void setComment(Path zip, String comment) throws IOException {
         try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
             zipFile.setComment(comment);
         }
     }
 
-    public static String getComment(@NonNull Path zip) throws IOException {
+    public static String getComment(Path zip) throws IOException {
         return UnzipIt.zip(zip).open().getComment();
     }
 
-    public static Set<String> getEntryNames(@NonNull Path zip) throws IOException {
+    public static Set<String> getEntryNames(Path zip) throws IOException {
         return UnzipIt.zip(zip).open().getEntryNames();
     }
 
-    public static void removeEntry(@NonNull Path zip, @NonNull String entryName) throws IOException {
+    public static void removeEntry(Path zip, String entryName) throws IOException {
+        ZipUtils.requireNotNull(entryName, "remove entryName");
         removeEntry(zip, Collections.singleton(entryName));
     }
 
-    public static void removeEntry(@NonNull Path zip, @NonNull Collection<String> entryNames) throws IOException {
+    public static void removeEntry(Path zip, Collection<String> entryNames) throws IOException {
         try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
             zipFile.remove(entryNames);
         }
     }
 
-    public static boolean isSplit(@NonNull Path zip) throws IOException {
+    public static boolean isSplit(Path zip) throws IOException {
         return UnzipIt.zip(zip).open().isSplit();
     }
 

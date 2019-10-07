@@ -70,7 +70,7 @@ public class ExistedEntryWriter implements Writer {
         }
 
         public void copyLocalFileHeader(DataOutput out) throws IOException {
-            Function<Charset, Charset> charsetCustomizer = ZipModel.GENERA_PURPOSE_FLAG_CHARSET;
+            Function<Charset, Charset> charsetCustomizer = ZipModel.STANDARD_ZIP_CHARSET;
             LocalFileHeader localFileHeader = new LocalFileHeaderReader(zipEntry.getLocalFileHeaderOffs(), charsetCustomizer).read(in);
             zipEntry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
             new LocalFileHeaderWriter(localFileHeader).write(out);
