@@ -431,6 +431,7 @@ zipFile.setComment(null);       // remove comment
 Path zip = Paths.get("filename.zip");
 ZipMisc zipFile = ZipMisc.zip(zip);
 List<ZipFile.Entry> entires = zipFile.getEntries().collect(Collectors.toList());
+
 /*
 [entryNames]
 cars/bentley-continental.jpg
