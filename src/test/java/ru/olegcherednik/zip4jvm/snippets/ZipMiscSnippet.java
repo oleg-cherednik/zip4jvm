@@ -11,12 +11,16 @@ import ru.olegcherednik.zip4jvm.ZipMisc;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.olegcherednik.zip4jvm.TestData.dirNameBikes;
 import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameFerrari;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameHonda;
 import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
 
 /**
@@ -73,6 +77,19 @@ public class ZipMiscSnippet {
 
         ZipMisc zipFile = ZipMisc.zip(zip);
         zipFile.entryName(dirNameCars + '/' + fileNameFerrari).removeEntryByName();
+    }
+
+    public void removeSomeEntriesByName() throws IOException {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
+        FileUtils.copyFile(zipDeflateSolid.toFile(), zip.toFile());
+
+        Collection<String> entryNames = Arrays.asList(dirNameCars + '/' + fileNameFerrari, dirNameBikes + '/' + fileNameHonda);
+
+        ZipMisc zipFile = ZipMisc.zip(zip);
+        zipFile.entryName(entryNames).removeEntryByName();
+
+        int a = 0;
+        a++;
     }
 
     public void removeEntryByNamePrefix() throws IOException {

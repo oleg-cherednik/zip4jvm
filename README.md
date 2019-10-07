@@ -486,6 +486,34 @@ ZipMisc.zip(zip).entryName("cars/bentley-continental.jpg").removeEntryByName();
 
 **Note:** exactly one entry will be removed in case of entry with exact this name exists
 
+#### Remove some entries by name
+
+```
+Path zip = Paths.get("filename.zip");
+Collection<String> entryNames = Arrays.asList("cars/ferrari-458-italia.jpg", "bikes/ducati-panigale-1199.jpg");
+ZipMisc.zip(zip).entryName(entryNames).removeEntryByName();
+```
+>```
+>filename.zip (before)
+>  |-- cars
+>  |    |-- bentley-continental.jpg 
+>  |    |-- ferrari-458-italia.jpg
+>  |    |-- wiesmann-gt-mf5.jpg
+>  |-- bikes
+>  |    |-- ducati-panigale-1199.jpg
+>  |    |-- kawasaki-ninja-300.jpg
+>  |-- saint-petersburg.jpg 
+>```
+>```
+>filename.zip (after)
+>  |-- cars
+>  |    |-- ferrari-458-italia.jpg
+>  |    |-- wiesmann-gt-mf5.jpg
+>  |-- bikes
+>  |    |-- kawasaki-ninja-300.jpg
+>  |-- saint-petersburg.jpg 
+>```
+
 #### Remove entry by name prefix
 
 ```
