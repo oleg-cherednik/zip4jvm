@@ -136,41 +136,22 @@ try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
 
 #### Regular files and empty directories are available as `InputStream`
 
-##### Create (or open existed) zip archive and add input stream content as regular files
-
-```
-ZipFile.Entry entry = ZipFile.Entry.builder()
-                       .inputStreamSupplier(() -> new FileInputStream("/cars/bentley-continental.jpg"))
-                       .fileName("my_cars/bentley-continental.jpg")
-                       .lastModifiedTime(System.currentTimeMillis()).build();
-Path zip = Paths.get("filename.zip");
-ZipIt.zip(zip).addEntry(entry);
-```
->```
->filename.zip
-> |-- my_cars
-> |    |-- bentley-continental.jpg
->```  
-
-**Note:** any content form input stream is treated as regular file with given full name.
-
 ##### Create (or open existed) zip archive and add input streams content as regular files
 
 ```
-ZipFile.Entry entryBentley = ZipFile.Entry.builder()
-                              .inputStreamSupplier(() -> new FileInputStream("/cars/bentley-continental.jpg"))
-                              .fileName("my_cars/bentley-continental.jpg")
-                              .lastModifiedTime(System.currentTimeMillis()).build();
-
-ZipFile.Entry entryKawasaki = ZipFile.Entry.builder()
-                              .inputStreamSupplier(() -> new FileInputStream("/bikes/kawasaki-ninja-300.jpg"))
-                              .fileName("my_bikes/kawasaki.jpg")
-                              .lastModifiedTime(System.currentTimeMillis()).build();
-
-List<ZipFile.Entry> entries = Arrays.asList(entryBentley, entryKawasaki);
-
 Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
-ZipIt.zip(zip).addEntry(entries);
+
+try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
+    zipFile.add(ZipFile.Entry.builder()
+                             .inputStreamSupplier(() -> new FileInputStream(fileBentley.toFile()))
+                             .fileName("my_cars/bentley-continental.jpg")
+                             .lastModifiedTime(System.currentTimeMillis()).build());
+
+    zipFile.add(ZipFile.Entry.builder()
+                             .inputStreamSupplier(() -> new FileInputStream(fileKawasaki.toFile()))
+                             .fileName("my_bikes/kawasaki.jpg")
+                             .lastModifiedTime(System.currentTimeMillis()).build());
+}
 ```
 >```
 >filename.zip

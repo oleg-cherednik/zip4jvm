@@ -167,8 +167,11 @@ public class ZipMiscTest {
 
     public void shouldRemoveOnlyOneEntryWhenEntryContainsSubEntries() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt.zip(zip).addEntry(ZipFile.Entry.of(dirCars, dirNameCars));
-        ZipIt.zip(zip).addEntry(ZipFile.Entry.of(fileFerrari, dirNameCars + '/' + fileNameFerrari));
+
+        try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
+            zipFile.add(ZipFile.Entry.of(dirCars, dirNameCars));
+            zipFile.add(ZipFile.Entry.of(fileFerrari, dirNameCars + '/' + fileNameFerrari));
+        }
 
         ZipMisc zipFile = ZipMisc.zip(zip);
         assertThat(zipFile.getEntries()).hasSize(2);

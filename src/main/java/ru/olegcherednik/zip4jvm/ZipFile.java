@@ -165,11 +165,11 @@ public final class ZipFile {
 
         void extract(Path destDir, String fileName) throws IOException;
 
-        default Stream<ZipFile.Entry> stream() {
+        ZipFile.Entry extract(String fileName) throws IOException;
+
+        default Stream<Entry> stream() {
             return StreamSupport.stream(spliterator(), false);
         }
-
-        ZipFile.Entry extract(String fileName) throws IOException;
 
         String getComment();
 

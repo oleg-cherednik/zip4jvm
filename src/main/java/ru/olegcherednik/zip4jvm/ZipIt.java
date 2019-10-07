@@ -121,29 +121,6 @@ public final class ZipIt {
     }
 
     /**
-     * Add zip entry to the new or existed zip archive. The source of the {@link ZipFile.Entry} is representing with input stream supplier.
-     *
-     * @param entry zip file entry description
-     * @throws IOException in case of any problem
-     */
-    public void addEntry(ZipFile.Entry entry) throws IOException {
-        requireNotNull(entry, "ZipIt.entry");
-        addEntry(Collections.singleton(entry));
-    }
-
-    /**
-     * Add zip entries to the new or existed zip archive. The source of the {@link ZipFile.Entry} is representing with input stream supplier.
-     *
-     * @param entries zip file entries description
-     * @throws IOException in case of any problem
-     */
-    public void addEntry(Collection<ZipFile.Entry> entries) throws IOException {
-        try (ZipFile.Writer zipFile = zip(zip).settings(settings).open()) {
-            entries.forEach(zipFile::add);
-        }
-    }
-
-    /**
      * Creates instance of zip file stream. It could be used to add multiple entries to the zip archive. It should be correctly closed to flush all
      * data.
      *
