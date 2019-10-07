@@ -16,46 +16,92 @@
 package ru.olegcherednik.zip4jvm;
 
 import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
-import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Stream;
+
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireExists;
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotBlank;
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotEmpty;
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireRegularFile;
 
 /**
  * @author Oleg Cherednik
  * @since 15.03.2019
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ZipMisc {
 
-    public static void setComment(Path zip, String comment) throws IOException {
+    /** path to the zip file (new or existed) */
+    private final Path zip;
+    private Set<String> entryNames = Collections.emptySet();
+
+    public static ZipMisc zip(Path zip) {
+        requireNotNull(zip, "ZipMisc.zip");
+        requireExists(zip, "ZipMisc.zip");
+        requireRegularFile(zip, "ZipMisc.zip");
+
+        return new ZipMisc(zip);
+    }
+
+    public ZipMisc entryName(String entryName) {
+        requireNotBlank(entryName, "ZipMisc.entryName");
+        entryNames = Collections.singleton(entryName);
+        return this;
+    }
+
+    public ZipMisc entryName(Collection<String> entryNames) {
+        requireNotNull(entryNames, "ZipMisc.entryNames");
+        this.entryNames = Collections.unmodifiableSet(new HashSet<>(entryNames));
+        return this;
+    }
+
+    public void setComment(String comment) throws IOException {
         try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
             zipFile.setComment(comment);
         }
     }
 
-    public static String getComment(Path zip) throws IOException {
+    public String getComment() throws IOException {
         return UnzipIt.zip(zip).open().getComment();
     }
 
-    public static Set<String> getEntryNames(Path zip) throws IOException {
-        return UnzipIt.zip(zip).open().getEntryNames();
+    public Stream<ZipFile.Entry> getEntries() throws IOException {
+        return UnzipIt.zip(zip).open().stream();
     }
 
-    public static void removeEntry(Path zip, String entryName) throws IOException {
-        ValidationUtils.requireNotNull(entryName, "remove entryName");
-        removeEntry(zip, Collections.singleton(entryName));
-    }
+    /**
+     * Remove all entries from {@link #entryNames}. Exact match of the entry name is required; i.e. in case of given entry name represents a directory
+     * and zip archive sub entries of this entry, then only the root entry will removed (if it's exist); all sub entries will not be removed.
+     *
+     * @throws IOException            in case of any problem with file access
+     * @throws EntryNotFoundException in case of entry with given {@code entryName} was not found
+     */
+    public void removeEntryByName() throws IOException, EntryNotFoundException {
+        requireNotEmpty(entryNames, "ZipMisc.entryName");
 
-    public static void removeEntry(Path zip, Collection<String> entryNames) throws IOException {
         try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
-            zipFile.remove(entryNames);
+            for (String entryName : entryNames)
+                zipFile.removeEntryByName(entryName);
+        }
+    }
+
+    public void removeEntryByNamePrefix() throws IOException, EntryNotFoundException {
+        requireNotEmpty(entryNames, "ZipMisc.entryName");
+
+        try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
+            for (String entryName : entryNames)
+                zipFile.removeEntryByNamePrefix(entryName);
         }
     }
 

@@ -45,7 +45,7 @@ compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:0.7'
 To simplify usage of _zip4jvm_, there're following classes:
 * [ZipIt](#zipit) - add files to archive;
 * [UnzipIt](#unzipit) - extract files from archive;
-* ZipMisc - other zip file activities. These classes contains most common operations with limited set of settings.
+* [ZipMisc](#zipmisc) - other zip file activities.
  
 ### ZipIt
 
@@ -412,11 +412,41 @@ UnzipIt.zip(zip).destDir(destDir).settings(settings).extract(fileNames);
 >  |-- saint-petersburg.jpg
 >```
 
+### ZipMisc
+
+#### Modify zip archive comment
+
+```
+Path zip = Paths.get("filename.zip");
+ZipMisc zipFile = ZipMisc.zip(zip);
+
+zipFile.getComment();           // get current comment (null if it's not set)
+zipFile.setComment("comment");  // set comment to 'comment'
+zipFile.setComment(null);       // remove comment
+```
+
+#### Get all entries
+
+```
+Path zip = Paths.get("filename.zip");
+ZipMisc zipFile = ZipMisc.zip(zip);
+List<ZipFile.Entry> entires = zipFile.getEntries().collect(Collectors.toList());
+```
+
+**Note:** `zipFile.getEntries()` retrieves `Stream` with immutable `ZupFile.Entry` objects represent all entries in zip archive
+
+#### Remove entry by entry name
+
+```
+Path zip = Paths.get("filename.zip");
+List<ZipFile.Entry> entires = ZipMisc.getEntries(zip).collect(Collectors.toList());
+```
+
 ## Model
 
 ### Zip settings: `ZipSettings`
 
-All zip operations include `ZipSettings`. [Default setings](#zip-settings-defaults) is
+All zip operations include `ZipSettings`. [Default settings](#zip-settings-defaults) is
 used when it's not explicitly set. Settings contains zip archive scope properties as well as
 provider for entry specific settings. The key for entry settings is **fileName**.
 

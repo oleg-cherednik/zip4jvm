@@ -40,7 +40,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -121,13 +120,13 @@ public final class ZipFile {
             }
 
             public Entry.Builder fileName(String fileName) {
-                this.fileName = ZipUtils.getFileName(fileName, true);
+                this.fileName = ZipUtils.getFileNameNoDirectoryMarker(fileName);
                 regularFile = true;
                 return this;
             }
 
             public Entry.Builder directoryName(String fileName) {
-                this.fileName = ZipUtils.getFileName(fileName, false);
+                this.fileName = ZipUtils.getFileNameNoDirectoryMarker(fileName);
                 regularFile = false;
                 return this;
             }
@@ -141,9 +140,7 @@ public final class ZipFile {
                 this.externalFileAttributes = externalFileAttributes;
                 return this;
             }
-
         }
-
     }
 
     public interface Writer extends Closeable {
@@ -163,17 +160,13 @@ public final class ZipFile {
 
         void addEntry(Entry entry);
 
-        void remove(String prefixEntryName) throws FileNotFoundException;
+        void removeEntryByName(String entryName);
 
-        default void remove(Collection<String> prefixEntryNames) throws FileNotFoundException {
-            for (String prefixEntryName : prefixEntryNames)
-                remove(prefixEntryName);
-        }
+        void removeEntryByNamePrefix(String entryNamePrefix) throws FileNotFoundException;
 
         void copy(Path zip) throws IOException;
 
         void setComment(String comment);
-
     }
 
     public interface Reader extends Iterable<ZipFile.Entry> {
@@ -194,8 +187,6 @@ public final class ZipFile {
         ZipFile.Entry extract(String fileName) throws IOException;
 
         String getComment();
-
-        Set<String> getEntryNames();
 
         boolean isSplit();
 

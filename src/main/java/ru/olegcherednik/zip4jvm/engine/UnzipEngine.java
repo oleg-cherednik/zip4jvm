@@ -17,7 +17,6 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -80,11 +79,6 @@ public final class UnzipEngine implements ZipFile.Reader {
     @Override
     public String getComment() {
         return zipModel.getComment();
-    }
-
-    @Override
-    public Set<String> getEntryNames() {
-        return zipModel.getEntryNames();
     }
 
     @Override

@@ -2,12 +2,14 @@ package ru.olegcherednik.zip4jvm.utils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.exception.RealBigZip64NotSupportedException;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 
 /**
  * @author Oleg Cherednik
@@ -55,6 +57,11 @@ public final class ValidationUtils {
     public static void requireNotBlank(String str, String name) {
         if (StringUtils.isBlank(str))
             throw new IllegalArgumentException("Parameter should be not blank: " + name);
+    }
+
+    public static <T> void requireNotEmpty(Collection<T> obj, String name) {
+        if (CollectionUtils.isEmpty(obj))
+            throw new IllegalArgumentException("Collection should be empty: " + name);
     }
 
 }
