@@ -80,13 +80,14 @@ public class UnzipItTest {
         assertThatDirectory(destDir.resolve(dirNameBikes)).matches(dirBikesAssert);
     }
 
-    public void shouldFoo() throws IOException, URISyntaxException {
+    public void shouldExtractrZipArchiveWhenEntryNameWithCustomCharset() throws IOException, URISyntaxException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTme(rootDir);
         Path zip = Paths.get(UnzipItTest.class.getResource("/zip/cjk_filename.zip").toURI()).toAbsolutePath();
 
         UnzipSettings settings = UnzipSettings.builder().charset(Charset.forName("GBK")).build();
 
         UnzipIt.zip(zip).destDir(destDir).settings(settings).extract();
+
         assertThatDirectory(destDir).hasDirectories(0).hasFiles(2);
         assertThatDirectory(destDir).file("fff - 副本.txt").exists();
     }

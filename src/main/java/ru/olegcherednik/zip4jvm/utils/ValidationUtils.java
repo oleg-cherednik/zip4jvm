@@ -38,12 +38,12 @@ public final class ValidationUtils {
     }
 
     public static void requireRegularFile(Path path, String name) {
-        if (!Files.isRegularFile(path))
+        if (Files.exists(path) && !Files.isRegularFile(path))
             throw new IllegalArgumentException("Path should be a regular file: " + name);
     }
 
     public static void requireDirectory(Path path, String name) {
-        if (!Files.isDirectory(path))
+        if (Files.exists(path) && !Files.isDirectory(path))
             throw new IllegalArgumentException("Path should be a directory: " + name);
     }
 
