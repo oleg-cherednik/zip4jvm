@@ -154,13 +154,11 @@ Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
 try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
     zipFile.add(ZipFile.Entry.builder()
                              .inputStreamSupplier(() -> new FileInputStream("/cars/bentley-continental.jpg"))
-                             .fileName("my_cars/bentley-continental.jpg")
-                             .lastModifiedTime(System.currentTimeMillis()).build());
+                             .fileName("my_cars/bentley-continental.jpg").build());
 
     zipFile.add(ZipFile.Entry.builder()
                              .inputStreamSupplier(() -> new FileInputStream("bikes/kawasaki-ninja-300.jpg"))
-                             .fileName("my_bikes/kawasaki.jpg")
-                             .lastModifiedTime(System.currentTimeMillis()).build());
+                             .fileName("my_bikes/kawasaki.jpg").build());
 }
 ```
 >```
