@@ -463,7 +463,8 @@ saint-petersburg.jpg
 
 ```
 Path zip = Paths.get("filename.zip");
-ZipMisc.zip(zip).entryName("cars/bentley-continental.jpg").removeEntryByName();
+ZipMisc zipFile = ZipMisc.zip(zip);
+zipFile.entryName("cars/bentley-continental.jpg").removeEntryByName();
 ```
 >```
 >filename.zip (before)
@@ -493,8 +494,9 @@ ZipMisc.zip(zip).entryName("cars/bentley-continental.jpg").removeEntryByName();
 
 ```
 Path zip = Paths.get("filename.zip");
+ZipMisc zipFile = ZipMisc.zip(zip);
 Collection<String> entryNames = Arrays.asList("cars/ferrari-458-italia.jpg", "bikes/ducati-panigale-1199.jpg");
-ZipMisc.zip(zip).entryName(entryNames).removeEntryByName();
+zipFileentryName(entryNames).removeEntryByName();
 ```
 >```
 >filename.zip (before)
@@ -521,7 +523,8 @@ ZipMisc.zip(zip).entryName(entryNames).removeEntryByName();
 
 ```
 Path zip = Paths.get("filename.zip");
-ZipMisc.zip(zip).entryName("cars").removeEntryByNamePrefix();
+ZipMisc zipFile = ZipMisc.zip(zip);
+zipFile.entryName("cars").removeEntryByNamePrefix();
 ```
 >```
 >filename.zip (before)
@@ -548,8 +551,30 @@ ZipMisc.zip(zip).entryName("cars").removeEntryByNamePrefix();
 
 ```
 Path zip = Paths.get("filename.zip");
+ZipMisc zipFile = ZipMisc.zip(zip);
 boolean split = zipFile.isSplit();
+```      
+
+#### Merge split archive into solid one
+
 ```
+Path zip = Paths.get("split.zip");
+Path zipSrc = Paths.get("filename.zip");
+ZipMisc zipFile = ZipMisc.zip(zipSrc);
+zipFile.merge(zip);
+``` 
+
+>```
+>/- (before)
+> |-- split.z01
+> |-- split.z02
+> |-- split.z03
+> |-- split.zip
+>```
+>```
+>/- (after)
+> |-- filename.zip
+>```
 
 ## Model
 

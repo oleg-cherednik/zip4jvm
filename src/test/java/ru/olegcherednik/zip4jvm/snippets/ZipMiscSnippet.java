@@ -22,6 +22,7 @@ import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameFerrari;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameHonda;
 import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
+import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSplit;
 
 /**
  * @author Oleg Cherednik
@@ -105,6 +106,12 @@ public class ZipMiscSnippet {
 
     public void checkWhetherZipArchiveSplitOrNot() throws IOException {
         ZipMisc zipFile = ZipMisc.zip(zip);
-        assertThat(zipFile.isSplit()).isFalse();
+        assertThat(ZipMisc.zip(zip).isSplit()).isFalse();
+    }
+
+    public void mergeSplitArchiveIntoSolidOne() throws IOException {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
+        ZipMisc zipFile = ZipMisc.zip(zipDeflateSplit);
+        zipFile.merge(zip);
     }
 }
