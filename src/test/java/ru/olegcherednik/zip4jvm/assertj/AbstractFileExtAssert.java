@@ -1,11 +1,13 @@
 package ru.olegcherednik.zip4jvm.assertj;
 
-import org.assertj.core.api.AbstractFileAssert;
+import org.assertj.core.api.AbstractPathAssert;
 
 import javax.imageio.ImageIO;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -15,15 +17,15 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
  * @since 28.03.2019
  */
 @SuppressWarnings("CatchMayIgnoreException")
-public class AbstractFileExtAssert<S extends AbstractFileExtAssert<S>> extends AbstractFileAssert<S> implements IFileAssert<S> {
+public class AbstractFileExtAssert<S extends AbstractFileExtAssert<S>> extends AbstractPathAssert<S> implements IFileAssert<S> {
 
     public AbstractFileExtAssert(Path actual, Class<?> selfType) {
-        super(actual.toFile(), selfType);
+        super(actual, selfType);
     }
 
     @Override
     public S isImage() {
-        try (InputStream in = new FileInputStream(actual)) {
+        try (InputStream in = new FileInputStream(actual.toFile())) {
             assertThat(ImageIO.read(in)).isNotNull();
         } catch(Exception e) {
             assertThatThrownBy(() -> {
@@ -37,7 +39,7 @@ public class AbstractFileExtAssert<S extends AbstractFileExtAssert<S>> extends A
     @Override
     public S hasSize(long size) {
         try {
-            assertThat(actual.length()).isEqualTo(size);
+            assertThat(Files.size(actual)).isEqualTo(size);
         } catch(Exception e) {
             assertThatThrownBy(() -> {
                 throw e;
@@ -47,14 +49,17 @@ public class AbstractFileExtAssert<S extends AbstractFileExtAssert<S>> extends A
         return myself;
     }
 
-    public S hasEmptyContent() {
-        return hasContent("");
+    public S matches(Consumer<IFileAssert<?>> consumer) {
+        consumer.accept(this);
+        return myself;
     }
 
     @Override
     public S exists() {
+        int a = 0;
+        a++;
         super.exists();
-        isFile();
+        isRegularFile();
         return myself;
     }
 

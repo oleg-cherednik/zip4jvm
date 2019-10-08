@@ -3,10 +3,10 @@ package ru.olegcherednik.zip4jvm.io.writers;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
+import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 /**
  * @author Oleg Cherednik
@@ -25,7 +25,7 @@ final class AesExtraDataRecordWriter implements Writer {
         out.writeWordSignature(AesExtraDataRecord.SIGNATURE);
         out.writeWord(record.getSize());
         out.writeWord(record.getVersionNumber());
-        out.writeBytes(record.getVendor(StandardCharsets.UTF_8));
+        out.writeBytes(record.getVendor(Charsets.UTF_8));
         out.writeBytes((byte)record.getStrength().getCode());
         out.writeWord(record.getCompressionMethod().getCode());
     }

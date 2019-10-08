@@ -7,10 +7,10 @@ import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
+import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -50,7 +50,7 @@ public class SplitZipInputStreamTest {
         FileUtils.writeByteArrayToFile(z02.toFile(), new byte[] { 0xF, 0x10 }, true);
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        FileUtils.writeStringToFile(zip.toFile(), "oleg", StandardCharsets.UTF_8, true);
+        FileUtils.writeStringToFile(zip.toFile(), "oleg", Charsets.UTF_8, true);
         FileUtils.writeByteArrayToFile(zip.toFile(), new byte[] { 0x11 }, true);
         FileUtils.writeByteArrayToFile(zip.toFile(), new byte[] { 0x12, 0x13, 0x14 }, true);
 
@@ -73,7 +73,7 @@ public class SplitZipInputStreamTest {
             in.skip(2);
             assertThat(in.getOffs()).isEqualTo(6);
 
-            assertThat(in.readString(4, StandardCharsets.UTF_8)).isEqualTo("oleg");
+            assertThat(in.readString(4, Charsets.UTF_8)).isEqualTo("oleg");
             assertThat(in.getOffs()).isEqualTo(4);
 
             assertThat(in.readByte()).isEqualTo(0x11);
@@ -91,7 +91,7 @@ public class SplitZipInputStreamTest {
         FileUtils.writeByteArrayToFile(z01.toFile(), new byte[] { 0x1, 0x2 }, true);
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        FileUtils.writeStringToFile(zip.toFile(), "oleg", StandardCharsets.UTF_8, true);
+        FileUtils.writeStringToFile(zip.toFile(), "oleg", Charsets.UTF_8, true);
 
         ZipModel zipModel = new ZipModel(zip);
         zipModel.setTotalDisks(1);

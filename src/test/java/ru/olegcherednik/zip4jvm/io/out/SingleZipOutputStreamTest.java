@@ -6,10 +6,10 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -54,7 +54,7 @@ public class SingleZipOutputStreamTest {
             assertThat(out.getOffs()).isEqualTo(14);
             assertThat(out.toString()).isEqualTo("offs: 14 (0xe)");
 
-            out.writeBytes("oleg".getBytes(StandardCharsets.UTF_8));
+            out.writeBytes("oleg".getBytes(Charsets.UTF_8));
             assertThat(out.getOffs()).isEqualTo(18);
 
             out.writeBytes((byte)0x11);
@@ -69,7 +69,7 @@ public class SingleZipOutputStreamTest {
         assertThat(Arrays.copyOfRange(buf, 0, 2)).isEqualTo(new byte[] { 0x1, 0x2 });
         assertThat(Arrays.copyOfRange(buf, 2, 6)).isEqualTo(new byte[] { 0x3, 0x4, 0x5, 0x6 });
         assertThat(Arrays.copyOfRange(buf, 6, 14)).isEqualTo(new byte[] { 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE });
-        assertThat(new String(Arrays.copyOfRange(buf, 14, 18), StandardCharsets.UTF_8)).isEqualTo("oleg");
+        assertThat(new String(Arrays.copyOfRange(buf, 14, 18), Charsets.UTF_8)).isEqualTo("oleg");
         assertThat(Arrays.copyOfRange(buf, 18, 19)).isEqualTo(new byte[] { 0x11 });
         assertThat(Arrays.copyOfRange(buf, 19, 22)).isEqualTo(new byte[] { 0x12, 0x13, 0x14 });
     }

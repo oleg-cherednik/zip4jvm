@@ -2,7 +2,10 @@ package ru.olegcherednik.zip4jvm;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -16,8 +19,8 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TestData {
 
-    //    public static final Path dirRoot = Zip4jvmSuite.createTempDirectory("zip4jvm");
-    public static final Path dirRoot = Paths.get("d:/zip4jvm/foo");
+    public static final Path dirRoot = createTempDirectory("zip4jvm");
+    //    public static final Path dirRoot = Paths.get("d:/zip4jvm/foo");
     public static final Path dirSrc = dirRoot.resolve("src");
 
     public static final String dirNameBikes = "bikes";
@@ -91,5 +94,13 @@ public final class TestData {
     public static final Path winRarDeflateSolidZip = Paths.get("src/test/resources/winrar/deflate_solid_off.zip").toAbsolutePath();
     public static final Path winRarDeflateSolidPkwareZip = Paths.get("src/test/resources/winrar/deflate_solid_pkware.zip").toAbsolutePath();
     public static final Path winRarDeflateSolidAesZip = Paths.get("src/test/resources/winrar/deflate_solid_aes.zip").toAbsolutePath();
+
+    private static Path createTempDirectory(String prefix) {
+        try {
+            return Files.createTempDirectory(prefix);
+        } catch(IOException e) {
+            throw new Zip4jvmException(e);
+        }
+    }
 
 }

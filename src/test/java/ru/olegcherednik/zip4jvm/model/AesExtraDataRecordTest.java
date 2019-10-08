@@ -6,7 +6,6 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -34,7 +33,7 @@ public class AesExtraDataRecordTest {
         assertThat(record).isNotSameAs(AesExtraDataRecord.NULL);
         assertThat(record.getSize()).isEqualTo(7);
         assertThat(record.getVendor()).isEqualTo("AE");
-        assertThat(record.getVendor(StandardCharsets.UTF_8)).isEqualTo(new byte[] { 0x41, 0x45 });
+        assertThat(record.getVendor(Charsets.UTF_8)).isEqualTo(new byte[] { 0x41, 0x45 });
         assertThat(record.getVersionNumber()).isEqualTo(2);
         assertThat(record.getStrength()).isSameAs(AesStrength.S256);
         assertThat(record.getCompressionMethod()).isSameAs(CompressionMethod.AES);
@@ -62,7 +61,7 @@ public class AesExtraDataRecordTest {
                                                       .versionNumber(2)
                                                       .strength(AesStrength.S256)
                                                       .compressionMethod(CompressionMethod.AES).build();
-        assertThat(record.getVendor(StandardCharsets.UTF_8)).isNull();
+        assertThat(record.getVendor(Charsets.UTF_8)).isNull();
     }
 
     public void shouldRetrieve0WhenGetBlockSizeForNullObject() {

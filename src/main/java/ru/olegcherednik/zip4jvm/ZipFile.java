@@ -18,9 +18,9 @@ package ru.olegcherednik.zip4jvm;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.engine.ZipEngine;
+import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
@@ -32,16 +32,12 @@ import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
 
 import java.io.Closeable;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -121,14 +117,14 @@ public final class ZipFile {
                 return this;
             }
 
-            public Entry.Builder fileName(@NonNull String fileName) {
-                this.fileName = ZipUtils.getFileName(fileName, true);
+            public Entry.Builder fileName(String fileName) {
+                this.fileName = ZipUtils.getFileNameNoDirectoryMarker(fileName);
                 regularFile = true;
                 return this;
             }
 
-            public Entry.Builder directoryName(@NonNull String fileName) {
-                this.fileName = ZipUtils.getFileName(fileName, false);
+            public Entry.Builder directoryName(String fileName) {
+                this.fileName = ZipUtils.getFileNameNoDirectoryMarker(fileName);
                 regularFile = false;
                 return this;
             }
@@ -138,65 +134,44 @@ public final class ZipFile {
                 return this;
             }
 
-            public Entry.Builder externalFileAttributes(@NonNull ExternalFileAttributes externalFileAttributes) {
+            public Entry.Builder externalFileAttributes(ExternalFileAttributes externalFileAttributes) {
                 this.externalFileAttributes = externalFileAttributes;
                 return this;
             }
-
         }
-
     }
 
     public interface Writer extends Closeable {
 
-        default void add(@NonNull Path path) throws IOException {
-            add(Collections.singleton(path));
+        default void add(Path path) throws IOException {
+            for (Map.Entry<Path, String> entry : PathUtils.getRelativeContent(path).entrySet())
+                add(Entry.of(entry.getKey(), entry.getValue()));
         }
 
-        default void add(@NonNull Collection<Path> paths) throws IOException {
-            for (Map.Entry<Path, String> entry : PathUtils.getRelativeContent(paths).entrySet())
-                addEntry(Entry.of(entry.getKey(), entry.getValue()));
-        }
+        void add(Entry entry);
 
-        default void addEntry(Collection<Entry> entries) {
-            entries.forEach(this::addEntry);
-        }
+        void removeEntryByName(String entryName) throws EntryNotFoundException;
 
-        void addEntry(@NonNull Entry entry);
+        void removeEntryByNamePrefix(String entryNamePrefix) throws EntryNotFoundException;
 
-        void remove(@NonNull String prefixEntryName) throws FileNotFoundException;
-
-        default void remove(@NonNull Collection<String> prefixEntryNames) throws FileNotFoundException {
-            for (String prefixEntryName : prefixEntryNames)
-                remove(prefixEntryName);
-        }
-
-        void copy(@NonNull Path zip) throws IOException;
+        void copy(Path zip) throws IOException;
 
         void setComment(String comment);
-
     }
 
     public interface Reader extends Iterable<ZipFile.Entry> {
 
-        void extract(@NonNull Path destDir) throws IOException;
+        void extract(Path destDir) throws IOException;
 
-        void extract(@NonNull Path destDir, @NonNull String fileName) throws IOException;
+        void extract(Path destDir, String fileName) throws IOException;
 
-        default void extract(@NonNull Path destDir, @NonNull Collection<String> fileNames) throws IOException {
-            for (String fileName : fileNames)
-                extract(destDir, fileName);
-        }
+        ZipFile.Entry extract(String fileName) throws IOException;
 
-        default Stream<ZipFile.Entry> stream() {
+        default Stream<Entry> stream() {
             return StreamSupport.stream(spliterator(), false);
         }
 
-        ZipFile.Entry extract(@NonNull String fileName) throws IOException;
-
         String getComment();
-
-        Set<String> getEntryNames();
 
         boolean isSplit();
 

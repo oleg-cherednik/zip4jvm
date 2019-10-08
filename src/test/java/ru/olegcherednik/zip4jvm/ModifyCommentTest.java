@@ -45,9 +45,7 @@ public class ModifyCommentTest {
     public void shouldCreateNewZipWithComment() throws IOException {
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettingsProvider(fileName ->
-                                                          ZipEntrySettings.builder()
-                                                                          .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                                          .build())
+                                                  ZipEntrySettings.builder().compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
                                           .comment("Oleg Cherednik - Олег Чередник").build();
         ZipIt.zip(zip).settings(settings).add(fileOlegCherednik);
         assertThatZipFile(zip).exists().hasComment("Oleg Cherednik - Олег Чередник");
@@ -55,13 +53,13 @@ public class ModifyCommentTest {
 
     @Test(dependsOnMethods = "shouldCreateNewZipWithComment")
     public void shouldAddCommentToExistedNoSplitZip() throws IOException {
-        ZipMisc.setComment(zip, "this is new comment - новый комментарий");
+        ZipMisc.zip(zip).setComment("this is new comment - новый комментарий");
         assertThatZipFile(zip).exists().hasComment("this is new comment - новый комментарий");
     }
 
     @Test(dependsOnMethods = "shouldAddCommentToExistedNoSplitZip")
     public void shouldClearCommentForExistedZip() throws IOException {
-        ZipMisc.setComment(zip, null);
+        ZipMisc.zip(zip).setComment(null);
         assertThatZipFile(zip).exists().hasCommentSize(0);
     }
 
@@ -71,14 +69,14 @@ public class ModifyCommentTest {
 
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettingsProvider(fileName ->
-                                                          ZipEntrySettings.builder()
-                                                                          .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                                          .encryption(Encryption.PKWARE, Zip4jvmSuite.password).build())
+                                                  ZipEntrySettings.builder()
+                                                                  .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                                  .encryption(Encryption.PKWARE, Zip4jvmSuite.password).build())
                                           .build();
         ZipIt.zip(zip).settings(settings).add(Collections.emptyList());
         assertThatZipFile(zip, Zip4jvmSuite.password).hasCommentSize(0);
 
-        ZipMisc.setComment(zip, "this is new comment");
+        ZipMisc.zip(zip).setComment("this is new comment");
         assertThatZipFile(zip, Zip4jvmSuite.password).hasComment("this is new comment");
     }
 
@@ -87,7 +85,7 @@ public class ModifyCommentTest {
         Files.createDirectories(zip.getParent());
         Files.copy(zipDeflateSolid, zip);
 
-        ZipMisc.setComment(zip, StringUtils.repeat("_", ZipModel.MAX_COMMENT_SIZE));
+        ZipMisc.zip(zip).setComment(StringUtils.repeat("_", ZipModel.MAX_COMMENT_SIZE));
         assertThatZipFile(zip).hasCommentSize(ZipModel.MAX_COMMENT_SIZE);
     }
 
@@ -96,7 +94,7 @@ public class ModifyCommentTest {
         Files.createDirectories(zip.getParent());
         Files.copy(zipDeflateSolid, zip);
 
-        assertThatThrownBy(() -> ZipMisc.setComment(zip, StringUtils.repeat("_", ZipModel.MAX_COMMENT_SIZE + 1)))
+        assertThatThrownBy(() -> ZipMisc.zip(zip).setComment(StringUtils.repeat("_", ZipModel.MAX_COMMENT_SIZE + 1)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 

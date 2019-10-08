@@ -2,14 +2,15 @@ package ru.olegcherednik.zip4jvm.utils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import ru.olegcherednik.zip4jvm.exception.PathNotExistsException;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireExists;
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
 /**
  * @author Oleg Cherednik
@@ -18,22 +19,21 @@ import java.util.Map;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PathUtils {
 
-    public static Map<Path, String> getRelativeContent(Collection<Path> paths) throws IOException {
-        requireExistedPaths(paths);
+    public static Map<Path, String> getRelativeContent(Path path) throws IOException {
+        requireNotNull(path, "PathUtils.path");
+        requireExists(path);
 
         Map<Path, String> pathFileName = new LinkedHashMap<>();
 
-        for (Path path : paths) {
-            if (Files.isRegularFile(path))
-                pathFileName.put(path, ZipUtils.normalizeFileName(path.getFileName().toString()));
-            else if (Files.isDirectory(path)) {
-                if (isEmptyDirectory(path))
-                    pathFileName.put(path, path.getFileName().toString());
-                else {
-                    Files.walk(path)
-                         .filter(p -> Files.isRegularFile(p) || isEmptyDirectory(p))
-                         .forEach(p -> pathFileName.putIfAbsent(p, ZipUtils.normalizeFileName(path.getParent().relativize(p).toString())));
-                }
+        if (Files.isRegularFile(path))
+            pathFileName.put(path, ZipUtils.normalizeFileName(path.getFileName().toString()));
+        else if (Files.isDirectory(path)) {
+            if (isEmptyDirectory(path))
+                pathFileName.put(path, path.getFileName().toString());
+            else {
+                Files.walk(path)
+                     .filter(p -> Files.isRegularFile(p) || isEmptyDirectory(p))
+                     .forEach(p -> pathFileName.putIfAbsent(p, ZipUtils.normalizeFileName(path.getParent().relativize(p).toString())));
             }
         }
 
@@ -48,12 +48,4 @@ public final class PathUtils {
         }
     }
 
-    public static void requireExistedPaths(Collection<Path> paths) {
-        paths.forEach(PathUtils::requireExistedPath);
-    }
-
-    public static void requireExistedPath(Path path) {
-        if (path == null || !Files.exists(path) || !Files.isReadable(path))
-            throw new PathNotExistsException(path);
-    }
 }

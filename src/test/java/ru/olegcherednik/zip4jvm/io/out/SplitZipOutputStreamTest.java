@@ -5,10 +5,10 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -54,7 +54,7 @@ public class SplitZipOutputStreamTest {
             assertThat(out.getOffs()).isEqualTo(8);
             assertThat(out.toString()).isEqualTo("offs: 8 (0x8)");
 
-            out.writeBytes("oleg".getBytes(StandardCharsets.UTF_8));
+            out.writeBytes("oleg".getBytes(Charsets.UTF_8));
             assertThat(out.getOffs()).isEqualTo(2);
 
             out.writeBytes((byte)0x11);
@@ -73,10 +73,10 @@ public class SplitZipOutputStreamTest {
 
         buf = FileUtils.readFileToByteArray(zipModel.getPartFile(1).toFile());
         assertThat(Arrays.copyOfRange(buf, 0, 8)).isEqualTo(new byte[] { 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE });
-        assertThat(new String(Arrays.copyOfRange(buf, 8, 10), StandardCharsets.UTF_8)).isEqualTo("ol");
+        assertThat(new String(Arrays.copyOfRange(buf, 8, 10), Charsets.UTF_8)).isEqualTo("ol");
 
         buf = FileUtils.readFileToByteArray(zipModel.getPartFile(2).toFile());
-        assertThat(new String(Arrays.copyOfRange(buf, 0, 2), StandardCharsets.UTF_8)).isEqualTo("eg");
+        assertThat(new String(Arrays.copyOfRange(buf, 0, 2), Charsets.UTF_8)).isEqualTo("eg");
         assertThat(Arrays.copyOfRange(buf, 2, 3)).isEqualTo(new byte[] { 0x11 });
         assertThat(Arrays.copyOfRange(buf, 3, 6)).isEqualTo(new byte[] { 0x12, 0x13, 0x14 });
     }

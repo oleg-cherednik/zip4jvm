@@ -1,10 +1,8 @@
 package ru.olegcherednik.zip4jvm.engine;
 
-import lombok.NonNull;
-import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.EntryDuplicationException;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.SingleZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
@@ -17,7 +15,6 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,6 +23,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotBlank;
 
 /**
  * @author Oleg Cherednik
@@ -38,14 +37,14 @@ public final class ZipEngine implements ZipFile.Writer {
     private final Function<String, ZipEntrySettings> entrySettingsProvider;
     private final Map<String, Writer> fileNameWriter = new LinkedHashMap<>();
 
-    public ZipEngine(@NonNull Path zip, @NonNull ZipSettings settings) throws IOException {
+    public ZipEngine(Path zip, ZipSettings settings) throws IOException {
         this.zip = zip;
         tempZipModel = createTempZipModel(zip, settings, fileNameWriter);
         entrySettingsProvider = settings.getEntrySettingsProvider();
     }
 
     @Override
-    public void addEntry(@NonNull ZipFile.Entry entry) {
+    public void add(ZipFile.Entry entry) {
         ZipEntrySettings entrySettings = entrySettingsProvider.apply(entry.getFileName());
         String fileName = ZipUtils.getFileName(entry);
 
@@ -54,24 +53,36 @@ public final class ZipEngine implements ZipFile.Writer {
     }
 
     @Override
-    public void remove(@NonNull String prefixEntryName) throws FileNotFoundException {
-        if (StringUtils.isBlank(prefixEntryName))
-            throw new Zip4jvmException("Prefix should not be empty");
+    public void removeEntryByName(String entryName) {
+        requireNotBlank(entryName, "ZipEngine.entryName");
 
-        String normalizedPrefixEntryName = ZipUtils.normalizeFileName(prefixEntryName);
+        entryName = ZipUtils.getFileNameNoDirectoryMarker(entryName);
+
+        if (fileNameWriter.remove(entryName) != null)
+            return;
+        if (fileNameWriter.remove(entryName + '/') != null)
+            return;
+        throw new EntryNotFoundException(entryName);
+    }
+
+    @Override
+    public void removeEntryByNamePrefix(String entryNamePrefix)  {
+        requireNotBlank(entryNamePrefix, "ZipEngine.entryNamePrefix");
+
+        String normalizedPrefixEntryName = ZipUtils.normalizeFileName(entryNamePrefix);
 
         Set<String> entryNames = fileNameWriter.keySet().stream()
                                                .filter(entryName -> entryName.startsWith(normalizedPrefixEntryName))
                                                .collect(Collectors.toSet());
 
         if (entryNames.isEmpty())
-            throw new FileNotFoundException(prefixEntryName);
+            throw new EntryNotFoundException(entryNamePrefix);
 
         entryNames.forEach(fileNameWriter::remove);
     }
 
     @Override
-    public void copy(@NonNull Path zip) throws IOException {
+    public void copy(Path zip) throws IOException {
         ZipModel srcZipModel = ZipModelBuilder.read(zip);
 
         for (String fileName : srcZipModel.getEntryNames()) {

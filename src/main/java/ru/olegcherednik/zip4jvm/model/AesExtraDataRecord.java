@@ -10,7 +10,6 @@ import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 @Getter
@@ -78,7 +77,7 @@ public final class AesExtraDataRecord implements ExtraField.Record {
         out.writeWordSignature(SIGNATURE);
         out.writeWord(size);
         out.writeWord(versionNumber);
-        out.writeBytes(getVendor(StandardCharsets.UTF_8));
+        out.writeBytes(getVendor(Charsets.UTF_8));
         out.writeBytes((byte)strength.getCode());
         out.writeWord(compressionMethod.getCode());
     }

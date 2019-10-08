@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.engine;
 
-import lombok.NonNull;
 import org.apache.commons.io.FilenameUtils;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
@@ -18,7 +17,6 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -68,7 +66,7 @@ public final class UnzipEngine implements ZipFile.Reader {
     }
 
     @Override
-    public ZipFile.Entry extract(@NonNull String fileName) throws IOException {
+    public ZipFile.Entry extract(String fileName) throws IOException {
         ZipEntry zipEntry = zipModel.getEntryByFileName(ZipUtils.normalizeFileName(fileName));
 
         if (zipEntry == null)
@@ -81,11 +79,6 @@ public final class UnzipEngine implements ZipFile.Reader {
     @Override
     public String getComment() {
         return zipModel.getComment();
-    }
-
-    @Override
-    public Set<String> getEntryNames() {
-        return zipModel.getEntryNames();
     }
 
     @Override

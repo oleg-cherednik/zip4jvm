@@ -5,7 +5,7 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.Zip64;
-import ru.olegcherednik.zip4jvm.utils.ZipUtils;
+import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
@@ -34,7 +34,7 @@ final class Zip64Reader implements Reader<Zip64> {
             locator.setOffs(in.readQword());
             locator.setTotalDisks(in.readDword());
 
-            ZipUtils.requirePositive(locator.getOffs(), "Zip64.EndCentralDirectory");
+            ValidationUtils.realBigZip64(locator.getOffs(), "Zip64.EndCentralDirectory");
 
             return locator;
         }
@@ -71,8 +71,8 @@ final class Zip64Reader implements Reader<Zip64> {
             dir.setCentralDirectoryOffs(in.readQword());
             dir.setExtensibleDataSector(in.readBytes((int)endCentralDirectorySize - Zip64.EndCentralDirectory.SIZE));
 
-            ZipUtils.requirePositive(dir.getCentralDirectoryOffs(), "offsCentralDirectory");
-            ZipUtils.requirePositive(dir.getTotalEntries(), "totalEntries");
+            ValidationUtils.realBigZip64(dir.getCentralDirectoryOffs(), "offsCentralDirectory");
+            ValidationUtils.realBigZip64(dir.getTotalEntries(), "totalEntries");
 
             return dir;
         }

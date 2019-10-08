@@ -6,7 +6,6 @@ import lombok.Setter;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.function.IntSupplier;
 
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT0;
@@ -26,8 +25,6 @@ import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT6;
 @Setter
 @NoArgsConstructor
 public class GeneralPurposeFlag implements IntSupplier {
-
-    private static final Charset IBM437 = Charset.forName("IBM437");
 
     private boolean encrypted;
     private CompressionLevel compressionLevel = CompressionLevel.NORMAL;
@@ -78,6 +75,6 @@ public class GeneralPurposeFlag implements IntSupplier {
     }
 
     public Charset getCharset() {
-        return utf8 ? StandardCharsets.UTF_8 : IBM437;
+        return utf8 ? Charsets.UTF_8 : Charsets.IBM437;
     }
 }

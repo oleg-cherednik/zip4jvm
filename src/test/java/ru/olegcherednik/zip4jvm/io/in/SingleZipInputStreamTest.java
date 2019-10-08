@@ -6,9 +6,9 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.model.Charsets;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -41,7 +41,7 @@ public class SingleZipInputStreamTest {
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x3, 0x4, 0x5, 0x6 }, true);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE }, true);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0xF, 0x10 }, true);
-        FileUtils.writeStringToFile(file.toFile(), "oleg", StandardCharsets.UTF_8, true);
+        FileUtils.writeStringToFile(file.toFile(), "oleg", Charsets.UTF_8, true);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x11 }, true);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x12, 0x13, 0x14 }, true);
 
@@ -61,7 +61,7 @@ public class SingleZipInputStreamTest {
             in.skip(2);
             assertThat(in.getOffs()).isEqualTo(16);
 
-            assertThat(in.readString(4, StandardCharsets.UTF_8)).isEqualTo("oleg");
+            assertThat(in.readString(4, Charsets.UTF_8)).isEqualTo("oleg");
             assertThat(in.getOffs()).isEqualTo(20);
 
             assertThat(in.readByte()).isEqualTo(0x11);

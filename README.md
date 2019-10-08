@@ -45,7 +45,7 @@ compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:0.7'
 To simplify usage of _zip4jvm_, there're following classes:
 * [ZipIt](#zipit) - add files to archive;
 * [UnzipIt](#unzipit) - extract files from archive;
-* ZipMisc - other zip file activities. These classes contains most common operations with limited set of settings.
+* [ZipMisc](#zipmisc) - other zip file activities.
  
 ### ZipIt
 
@@ -57,7 +57,19 @@ To simplify usage of _zip4jvm_, there're following classes:
 Path zip = Paths.get("filename.zip");
 Path file = Path.get("/cars/bentley-continental.jpg")
 ZipIt.zip(zip).add(file);
-```
+``` 
+>```
+>/-
+> |-- cars
+> |    |-- bentley-continental.jpg
+> |    |-- ferrari-458-italia.jpg
+> |    |-- wiesmann-gt-mf5.jpg
+> |-- bikes
+> |    |-- ducati-panigale-1199.jpg
+> |    |-- kawasaki-ninja-300.jpg
+> |    |-- honda-cbr600rr.jpg
+> |-- saint-petersburg.jpg 
+>```
 >```
 >filename.zip
 > |-- bentley-continental.jpg
@@ -69,14 +81,26 @@ ZipIt.zip(zip).add(file);
 
 ```
 Path zip = Paths.get("filename.zip");
-Path dir = Path.get("/catalog/cars")
+Path dir = Path.get("/cars")
 ZipIt.zip(zip).add(dir);
 ```
+>```
+>/-
+> |-- cars
+> |    |-- bentley-continental.jpg
+> |    |-- ferrari-458-italia.jpg
+> |    |-- wiesmann-gt-mf5.jpg
+> |-- bikes
+> |    |-- ducati-panigale-1199.jpg
+> |    |-- kawasaki-ninja-300.jpg
+> |    |-- honda-cbr600rr.jpg
+> |-- saint-petersburg.jpg 
+>```
 >```
 >filename.zip
 > |-- cars
 >      |-- bentley-continental.jpg
->      |-- feffari-458-italia.jpg
+>      |-- ferrari-458-italia.jpg
 >      |-- wiesmann-gt-mf5.jpg 
 >```
 
@@ -94,10 +118,22 @@ Collection<Path> paths = Arrays.asList(
 ZipIt.zip(zip).add(paths);
 ```
 >```
+>/-
+> |-- cars
+> |    |-- bentley-continental.jpg
+> |    |-- ferrari-458-italia.jpg
+> |    |-- wiesmann-gt-mf5.jpg
+> |-- bikes
+> |    |-- ducati-panigale-1199.jpg
+> |    |-- kawasaki-ninja-300.jpg
+> |    |-- honda-cbr600rr.jpg
+> |-- saint-petersburg.jpg 
+>```
+>```
 >filename.zip
 > |-- cars
 > |    |-- bentley-continental.jpg
-> |    |-- feffari-458-italia.jpg
+> |    |-- ferrari-458-italia.jpg
 > |    |-- wiesmann-gt-mf5.jpg
 > |-- ducati-panigale-1199.jpg
 > |-- honda-cbr600rr.jpg
@@ -108,70 +144,37 @@ ZipIt.zip(zip).add(paths);
 
 **Note:** each directory from the list is added to the root of the zip archive keeping the initial structure. 
 
-##### Create (or open existed) zip archive and add some regular files and/or directories using stream
-  
-```
-Path zip = Paths.get("filename.zip");
-try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
-    zipFile.add(Paths.get("/bikes/ducati-panigale-1199.jpg"));
-    zipFile.add(Paths.get("/bikes/honda-cbr600rr.jpg"));
-    zipFile.add(Paths.get("/cars"));
-    zipFile.add(Paths.get("/saint-petersburg.jpg");
-}
-```
->```
->filename.zip
-> |-- cars
-> |    |-- bentley-continental.jpg
-> |    |-- feffari-458-italia.jpg
-> |    |-- wiesmann-gt-mf5.jpg
-> |-- ducati-panigale-1199.jpg
-> |-- honda-cbr600rr.jpg
-> |-- saint-petersburg.jpg 
->```                                                                                                         
-
-**Note:** each regular file from the list is added to the root of the zip archive.
-
-**Note:** each directory from the list is added to the root of the zip archive keeping the initial structure.
-
 #### Regular files and empty directories are available as `InputStream`
-
-##### Create (or open existed) zip archive and add input stream content as regular files
-
-```
-ZipFile.Entry entry = ZipFile.Entry.builder()
-                       .inputStreamSupplier(() -> new FileInputStream("/cars/bentley-continental.jpg"))
-                       .fileName("my_cars/bentley-continental.jpg")
-                       .lastModifiedTime(System.currentTimeMillis()).build();
-Path zip = Paths.get("filename.zip");
-ZipIt.zip(zip).addEntry(entry);
-```
->```
->filename.zip
-> |-- my_cars
-> |    |-- bentley-continental.jpg
->```  
-
-**Note:** any content form input stream is treated as regular file with given full name.
 
 ##### Create (or open existed) zip archive and add input streams content as regular files
 
 ```
-ZipFile.Entry entryBentley = ZipFile.Entry.builder()
-                              .inputStreamSupplier(() -> new FileInputStream("/cars/bentley-continental.jpg"))
-                              .fileName("my_cars/bentley-continental.jpg")
-                              .lastModifiedTime(System.currentTimeMillis()).build();
-
-ZipFile.Entry entryKawasaki = ZipFile.Entry.builder()
-                              .inputStreamSupplier(() -> new FileInputStream("/bikes/kawasaki-ninja-300.jpg"))
-                              .fileName("my_bikes/kawasaki.jpg")
-                              .lastModifiedTime(System.currentTimeMillis()).build();
-
-List<ZipFile.Entry> entries = Arrays.asList(entryBentley, entryKawasaki);
-
 Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
-ZipIt.zip(zip).addEntry(entries);
+
+try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
+    zipFile.add(ZipFile.Entry.builder()
+                             .inputStreamSupplier(() -> new FileInputStream("/cars/bentley-continental.jpg"))
+                             .fileName("my_cars/bentley-continental.jpg")
+                             .lastModifiedTime(System.currentTimeMillis()).build());
+
+    zipFile.add(ZipFile.Entry.builder()
+                             .inputStreamSupplier(() -> new FileInputStream("bikes/kawasaki-ninja-300.jpg"))
+                             .fileName("my_bikes/kawasaki.jpg")
+                             .lastModifiedTime(System.currentTimeMillis()).build());
+}
 ```
+>```
+>/-
+> |-- cars
+> |    |-- bentley-continental.jpg
+> |    |-- ferrari-458-italia.jpg
+> |    |-- wiesmann-gt-mf5.jpg
+> |-- bikes
+> |    |-- ducati-panigale-1199.jpg
+> |    |-- kawasaki-ninja-300.jpg
+> |    |-- honda-cbr600rr.jpg
+> |-- saint-petersburg.jpg 
+>```
 >```
 >filename.zip
 > |-- my_cars
@@ -197,7 +200,7 @@ UnzipIt.zip(zip).destDir(destDir).extract();
 >filename.zip
 > |-- cars
 > |    |-- bentley-continental.jpg
-> |    |-- feffari-458-italia.jpg
+> |    |-- ferrari-458-italia.jpg
 > |    |-- wiesmann-gt-mf5.jpg
 > |-- bikes
 > |    |-- ducati-panigale-1199.jpg
@@ -209,7 +212,7 @@ UnzipIt.zip(zip).destDir(destDir).extract();
 >  |-- cars
 >  |-- cars
 >  |    |-- bentley-continental.jpg
->  |    |-- feffari-458-italia.jpg
+>  |    |-- ferrari-458-italia.jpg
 >  |    |-- wiesmann-gt-mf5.jpg
 >  |-- bikes
 >  |    |-- ducati-panigale-1199.jpg
@@ -231,7 +234,7 @@ UnzipIt.zip(zip).destDir(destDir).extract("cars/bentley-continental.jpg");
 >filename.zip
 > |-- cars
 > |    |-- bentley-continental.jpg
-> |    |-- feffari-458-italia.jpg
+> |    |-- ferrari-458-italia.jpg
 > |    |-- wiesmann-gt-mf5.jpg
 > |-- bikes
 > |    |-- ducati-panigale-1199.jpg
@@ -255,7 +258,7 @@ UnzipIt.zip(zip).destDir(destDir).extract("cars");
 >filename.zip
 > |-- cars
 > |    |-- bentley-continental.jpg
-> |    |-- feffari-458-italia.jpg
+> |    |-- ferrari-458-italia.jpg
 > |    |-- wiesmann-gt-mf5.jpg
 > |-- bikes
 > |    |-- ducati-panigale-1199.jpg
@@ -266,7 +269,7 @@ UnzipIt.zip(zip).destDir(destDir).extract("cars");
 >/filename_content
 >  |-- cars
 >  |    |-- bentley-continental.jpg
->  |    |-- feffari-458-italia.jpg
+>  |    |-- ferrari-458-italia.jpg
 >  |    |-- wiesmann-gt-mf5.jpg
 >```
 
@@ -285,7 +288,7 @@ UnzipIt.zip(zip).destDir(destDir).extract(fileNames);
 >filename.zip
 > |-- cars
 > |    |-- bentley-continental.jpg
-> |    |-- feffari-458-italia.jpg
+> |    |-- ferrari-458-italia.jpg
 > |    |-- wiesmann-gt-mf5.jpg
 > |-- bikes
 > |    |-- ducati-panigale-1199.jpg
@@ -296,7 +299,7 @@ UnzipIt.zip(zip).destDir(destDir).extract(fileNames);
 >/filename_content
 >  |-- cars
 >  |    |-- bentley-continental.jpg
->  |    |-- feffari-458-italia.jpg
+>  |    |-- ferrari-458-italia.jpg
 >  |    |-- wiesmann-gt-mf5.jpg
 >  |-- ducati-panigale-1199.jpg
 >  |-- saint-petersburg.jpg
@@ -321,7 +324,7 @@ try (InputStream in = UnzipIt.zip(zip).stream("cars/bentley-continental.jpg");
 >filename.zip
 > |-- cars
 > |    |-- bentley-continental.jpg
-> |    |-- feffari-458-italia.jpg
+> |    |-- ferrari-458-italia.jpg
 > |    |-- wiesmann-gt-mf5.jpg
 > |-- bikes
 > |    |-- ducati-panigale-1199.jpg
@@ -352,7 +355,7 @@ UnzipIt.zip(zip).destDir(destDir).password(password).extract(fileNames);
 >filename.zip  --> password: 1
 > |-- cars
 > |    |-- bentley-continental.jpg
-> |    |-- feffari-458-italia.jpg
+> |    |-- ferrari-458-italia.jpg
 > |    |-- wiesmann-gt-mf5.jpg
 > |-- bikes
 > |    |-- ducati-panigale-1199.jpg
@@ -363,7 +366,7 @@ UnzipIt.zip(zip).destDir(destDir).password(password).extract(fileNames);
 >/filename_content
 >  |-- cars
 >  |    |-- bentley-continental.jpg
->  |    |-- feffari-458-italia.jpg
+>  |    |-- ferrari-458-italia.jpg
 >  |    |-- wiesmann-gt-mf5.jpg
 >  |-- ducati-panigale-1199.jpg
 >  |-- saint-petersburg.jpg
@@ -395,7 +398,7 @@ UnzipIt.zip(zip).destDir(destDir).settings(settings).extract(fileNames);
 >filename.zip
 >  |-- cars
 >  |    |-- bentley-continental.jpg   --> password: 1 
->  |    |-- feffari-458-italia.jpg    --> password: 1
+>  |    |-- ferrari-458-italia.jpg    --> password: 1
 >  |    |-- wiesmann-gt-mf5.jpg       --> password: 1
 >  |-- bikes
 >  |    |-- ducati-panigale-1199.jpg  --> password: 2
@@ -406,17 +409,178 @@ UnzipIt.zip(zip).destDir(destDir).settings(settings).extract(fileNames);
 >/filename_content
 >  |-- cars
 >  |    |-- bentley-continental.jpg
->  |    |-- feffari-458-italia.jpg
+>  |    |-- ferrari-458-italia.jpg
 >  |    |-- wiesmann-gt-mf5.jpg
 >  |-- ducati-panigale-1199.jpg
 >  |-- saint-petersburg.jpg
+>```
+
+### ZipMisc
+
+#### Modify zip archive comment
+
+```
+Path zip = Paths.get("filename.zip");
+ZipMisc zipFile = ZipMisc.zip(zip);
+
+zipFile.getComment();           // get current comment (null if it's not set)
+zipFile.setComment("comment");  // set comment to 'comment'
+zipFile.setComment(null);       // remove comment
+```
+
+#### Get all entries
+
+```
+Path zip = Paths.get("filename.zip");
+ZipMisc zipFile = ZipMisc.zip(zip);
+List<ZipFile.Entry> entires = zipFile.getEntries().collect(Collectors.toList());
+
+/*
+[entryNames]
+cars/bentley-continental.jpg
+cars/ferrari-458-italia.jpg
+cars/wiesmann-gt-mf5.jpg
+bikes/ducati-panigale-1199.jpg
+bikes/kawasaki-ninja-300.jpg
+saint-petersburg.jpg 
+*/
+```
+>```
+>filename.zip
+> |-- cars
+> |    |-- bentley-continental.jpg
+> |    |-- ferrari-458-italia.jpg
+> |    |-- wiesmann-gt-mf5.jpg
+> |-- bikes
+> |    |-- ducati-panigale-1199.jpg
+> |    |-- kawasaki-ninja-300.jpg
+> |-- saint-petersburg.jpg 
+>```
+
+**Note:** `zipFile.getEntries()` retrieves `Stream` with immutable `ZupFile.Entry` objects represent all entries in zip archive
+
+#### Remove entry by name
+
+```
+Path zip = Paths.get("filename.zip");
+ZipMisc zipFile = ZipMisc.zip(zip);
+zipFile.removeEntryByName("cars/bentley-continental.jpg");
+```
+>```
+>filename.zip (before)
+>  |-- cars
+>  |    |-- bentley-continental.jpg 
+>  |    |-- ferrari-458-italia.jpg
+>  |    |-- wiesmann-gt-mf5.jpg
+>  |-- bikes
+>  |    |-- ducati-panigale-1199.jpg
+>  |    |-- kawasaki-ninja-300.jpg
+>  |-- saint-petersburg.jpg 
+>```
+>```
+>filename.zip (after)
+>  |-- cars
+>  |    |-- ferrari-458-italia.jpg
+>  |    |-- wiesmann-gt-mf5.jpg
+>  |-- bikes
+>  |    |-- ducati-panigale-1199.jpg
+>  |    |-- kawasaki-ninja-300.jpg
+>  |-- saint-petersburg.jpg 
+>```
+
+**Note:** exactly one entry will be removed in case of entry with exact this name exists
+
+#### Remove some entries by name
+
+```
+Path zip = Paths.get("filename.zip");
+ZipMisc zipFile = ZipMisc.zip(zip);
+Collection<String> entryNames = Arrays.asList("cars/ferrari-458-italia.jpg", "bikes/ducati-panigale-1199.jpg");
+zipFile.removeEntryByName(entryNames);
+```
+>```
+>filename.zip (before)
+>  |-- cars
+>  |    |-- bentley-continental.jpg 
+>  |    |-- ferrari-458-italia.jpg
+>  |    |-- wiesmann-gt-mf5.jpg
+>  |-- bikes
+>  |    |-- ducati-panigale-1199.jpg
+>  |    |-- kawasaki-ninja-300.jpg
+>  |-- saint-petersburg.jpg 
+>```
+>```
+>filename.zip (after)
+>  |-- cars
+>  |    |-- ferrari-458-italia.jpg
+>  |    |-- wiesmann-gt-mf5.jpg
+>  |-- bikes
+>  |    |-- kawasaki-ninja-300.jpg
+>  |-- saint-petersburg.jpg 
+>```
+
+#### Remove entry by name prefix
+
+```
+Path zip = Paths.get("filename.zip");
+ZipMisc zipFile = ZipMisc.zip(zip);
+zipFile.removeEntryByNamePrefix("cars")
+```
+>```
+>filename.zip (before)
+>  |-- cars
+>  |    |-- bentley-continental.jpg 
+>  |    |-- ferrari-458-italia.jpg
+>  |    |-- wiesmann-gt-mf5.jpg
+>  |-- bikes
+>  |    |-- ducati-panigale-1199.jpg
+>  |    |-- kawasaki-ninja-300.jpg
+>  |-- saint-petersburg.jpg 
+>```
+>```
+>filename.zip (after)
+>  |-- bikes
+>  |    |-- ducati-panigale-1199.jpg
+>  |    |-- kawasaki-ninja-300.jpg
+>  |-- saint-petersburg.jpg 
+>```
+
+**Note:** multiple entries could be removed
+
+#### Check whether zip archive split or not
+
+```
+Path zip = Paths.get("filename.zip");
+ZipMisc zipFile = ZipMisc.zip(zip);
+boolean split = zipFile.isSplit();
+```      
+
+#### Merge split archive into solid one
+
+```
+Path zipSrc = Paths.get("split.zip");
+Path zip = Paths.get("filename.zip");
+ZipMisc zipFile = ZipMisc.zip(zipSrc);
+zipFile.merge(zip);
+``` 
+
+>```
+>/- (before)
+> |-- split.z01
+> |-- split.z02
+> |-- split.z03
+> |-- split.zip
+>```
+>```
+>/- (after)
+> |-- filename.zip
 >```
 
 ## Model
 
 ### Zip settings: `ZipSettings`
 
-All zip operations include `ZipSettings`. [Default setings](#zip-settings-defaults) is
+All zip operations include `ZipSettings`. [Default settings](#zip-settings-defaults) is
 used when it's not explicitly set. Settings contains zip archive scope properties as well as
 provider for entry specific settings. The key for entry settings is **fileName**.
 

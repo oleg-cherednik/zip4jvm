@@ -64,6 +64,7 @@ public class AesEngineTest {
         ReflectionUtils.invokeMethod(engine, "ivUpdate");
     }
 
+    @SuppressWarnings("MethodCanBeVariableArityMethod")
     private static void setIv(AesEngine engine, byte[] iv) throws NoSuchFieldException, IllegalAccessException {
         ReflectionUtils.setFieldValue(engine, "iv", iv);
     }

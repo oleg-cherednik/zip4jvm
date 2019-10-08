@@ -27,7 +27,9 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static ru.olegcherednik.zip4jvm.utils.ZipUtils.requireNotNull;
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireExists;
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireRegularFile;
 
 /**
  * Add regular files and/or directories to the zip archive
@@ -38,18 +40,21 @@ import static ru.olegcherednik.zip4jvm.utils.ZipUtils.requireNotNull;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class ZipIt {
 
-    /** path to the zip file */
+    /** path to the zip file (new or existed) */
     private final Path zip;
     /** zip file scope settings */
     private ZipSettings settings = ZipSettings.DEFAULT;
 
     /**
-     * Create {@link ZipIt} instance with given {@code zip} path to the zip archive
+     * Create {@link ZipIt} instance with given {@code zip} path to the new or existed zip archive.
      *
      * @param zip zip file path
      * @return not {@literal null} {@link ZipIt} instance
      */
     public static ZipIt zip(Path zip) {
+        requireNotNull(zip, "ZipIt.zip");
+        requireRegularFile(zip, "ZipIt.zip");
+
         return new ZipIt(zip);
     }
 
@@ -83,6 +88,7 @@ public final class ZipIt {
      * @return not {@literal null} {@link ZipIt} instance
      */
     public ZipIt entrySettings(Function<String, ZipEntrySettings> entrySettingsProvider) {
+        requireNotNull(entrySettingsProvider, "ZipIt.entrySettingsProvider");
         settings = settings.toBuilder().entrySettingsProvider(entrySettingsProvider).build();
         return this;
     }
@@ -91,10 +97,12 @@ public final class ZipIt {
      * Add regular file or directory (keeping initial structure) to the new or existed zip archive.
      *
      * @param path not {@literal null} path to the regular file or directory
-     * @throws IOException in case of any problem
+     * @throws IOException in case of any problem with file access
      */
     public void add(Path path) throws IOException {
-        requireNotNull(path, "add path");
+        requireNotNull(path, "ZipIt.path");
+        requireExists(path);
+
         add(Collections.singleton(path));
     }
 
@@ -102,35 +110,13 @@ public final class ZipIt {
      * Add regular files and/or directories (keeping initial structure) to the new or existed zip archive.
      *
      * @param paths path to the regular files and/or directories
-     * @throws IOException in case of any problem
+     * @throws IOException in case of any problem with file access
      */
     public void add(Collection<Path> paths) throws IOException {
         // TODO check that path != zip
         try (ZipFile.Writer zipFile = ZipFile.writer(zip, settings)) {
-            zipFile.add(paths);
-        }
-    }
-
-    /**
-     * Add zip entry to the new or existed zip archive. The source of the {@link ZipFile.Entry} is representing with input stream supplier.
-     *
-     * @param entry zip file entry description
-     * @throws IOException in case of any problem
-     */
-    public void addEntry(ZipFile.Entry entry) throws IOException {
-        requireNotNull(entry, "add entry");
-        addEntry(Collections.singleton(entry));
-    }
-
-    /**
-     * Add zip entries to the new or existed zip archive. The source of the {@link ZipFile.Entry} is representing with input stream supplier.
-     *
-     * @param entries zip file entries description
-     * @throws IOException in case of any problem
-     */
-    public void addEntry(Collection<ZipFile.Entry> entries) throws IOException {
-        try (ZipFile.Writer zipFile = zip(zip).settings(settings).open()) {
-            zipFile.addEntry(entries);
+            for (Path path : paths)
+                zipFile.add(path);
         }
     }
 
@@ -139,7 +125,7 @@ public final class ZipIt {
      * data.
      *
      * @return not {@literal null} instance of {@link ZipFile.Writer}
-     * @throws IOException in case of any problem
+     * @throws IOException in case of any problem with file access
      */
     public ZipFile.Writer open() throws IOException {
         return ZipFile.writer(zip, settings);

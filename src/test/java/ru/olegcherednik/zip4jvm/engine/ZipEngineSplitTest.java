@@ -305,16 +305,16 @@ public class ZipEngineSplitTest {
 //        };
 //
 //        ZipFile.Entry entryOne = ZipFile.Entry.builder()
-//                                              .inputStreamSup(() -> IOUtils.toInputStream("one.txt", StandardCharsets.UTF_8))
+//                                              .inputStreamSup(() -> IOUtils.toInputStream("one.txt", Charsets.UTF_8))
 //                                              .fileName("one.txt").build();
 //        ZipFile.Entry entryTwo = ZipFile.Entry.builder()
-//                                              .inputStreamSup(() -> IOUtils.toInputStream("two.txt", StandardCharsets.UTF_8))
+//                                              .inputStreamSup(() -> IOUtils.toInputStream("two.txt", Charsets.UTF_8))
 //                                              .fileName("two.txt").build();
 //        ZipFile.Entry entryThree = ZipFile.Entry.builder()
-//                                                .inputStreamSup(() -> IOUtils.toInputStream("three.txt", StandardCharsets.UTF_8))
+//                                                .inputStreamSup(() -> IOUtils.toInputStream("three.txt", Charsets.UTF_8))
 //                                                .fileName("three.txt").build();
 //        ZipFile.Entry entryFour = ZipFile.Entry.builder()
-//                                               .inputStreamSup(() -> IOUtils.toInputStream("four.txt", StandardCharsets.UTF_8))
+//                                               .inputStreamSup(() -> IOUtils.toInputStream("four.txt", Charsets.UTF_8))
 //                                               .fileName("four.txt").build();
 //
 //        try (ZipFile.Writer zipFile = ZipFile.write(memorySolidFile, entrySettingsProvider)) {

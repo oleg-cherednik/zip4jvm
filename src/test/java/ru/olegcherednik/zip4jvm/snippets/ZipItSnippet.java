@@ -13,7 +13,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirCars;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
@@ -69,31 +68,20 @@ public class ZipItSnippet {
         }
     }
 
-    public void createOrOpenExistedZipArchiveAndAddInputStreamContentAsRegularFile() throws IOException {
-        ZipFile.Entry entry = ZipFile.Entry.builder()
-                                           .inputStreamSupplier(() -> new FileInputStream(fileBentley.toFile()))
-                                           .fileName("my_cars/bentley-continental.jpg")
-                                           .lastModifiedTime(System.currentTimeMillis()).build();
-
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
-        ZipIt.zip(zip).addEntry(entry);
-    }
-
     public void createOrOpenExistedZipArchiveAndAddInputStreamsContentAsRegularFiles() throws IOException {
-        ZipFile.Entry entryBentley = ZipFile.Entry.builder()
-                                                  .inputStreamSupplier(() -> new FileInputStream(fileBentley.toFile()))
-                                                  .fileName("my_cars/bentley-continental.jpg")
-                                                  .lastModifiedTime(System.currentTimeMillis()).build();
-
-        ZipFile.Entry entryKawasaki = ZipFile.Entry.builder()
-                                                   .inputStreamSupplier(() -> new FileInputStream(fileKawasaki.toFile()))
-                                                   .fileName("my_bikes/kawasaki.jpg")
-                                                   .lastModifiedTime(System.currentTimeMillis()).build();
-
-        List<ZipFile.Entry> entries = Arrays.asList(entryBentley, entryKawasaki);
-
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
-        ZipIt.zip(zip).addEntry(entries);
+
+        try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
+            zipFile.add(ZipFile.Entry.builder()
+                                     .inputStreamSupplier(() -> new FileInputStream(fileBentley.toFile()))
+                                     .fileName("my_cars/bentley-continental.jpg")
+                                     .lastModifiedTime(System.currentTimeMillis()).build());
+
+            zipFile.add(ZipFile.Entry.builder()
+                                     .inputStreamSupplier(() -> new FileInputStream(fileKawasaki.toFile()))
+                                     .fileName("my_bikes/kawasaki.jpg")
+                                     .lastModifiedTime(System.currentTimeMillis()).build());
+        }
     }
 
 }

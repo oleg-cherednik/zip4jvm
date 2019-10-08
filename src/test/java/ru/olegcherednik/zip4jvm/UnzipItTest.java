@@ -16,9 +16,16 @@ import java.util.Arrays;
 import java.util.List;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirNameBikes;
+import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameFerrari;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameSaintPetersburg;
 import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
 import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSplit;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.fileFerrariAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.fileSaintPetersburgAssert;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
 
@@ -44,32 +51,32 @@ public class UnzipItTest {
 
     public void shouldUnzipRequiredFiles() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTme(rootDir);
-        List<String> fileNames = Arrays.asList("saint-petersburg.jpg", "cars/bentley-continental.jpg");
+        List<String> fileNames = Arrays.asList(fileNameSaintPetersburg, dirNameCars + '/' + fileNameBentley);
         UnzipIt.zip(zipDeflateSolid).destDir(destDir).extract(fileNames);
 
         assertThatDirectory(destDir).exists().hasDirectories(0).hasFiles(2);
-        assertThatFile(destDir.resolve("saint-petersburg.jpg")).exists().isImage().hasSize(1_074_836);
-        assertThatFile(destDir.resolve("bentley-continental.jpg")).exists().isImage().hasSize(1_395_362);
+        assertThatFile(destDir.resolve(fileNameSaintPetersburg)).matches(fileSaintPetersburgAssert);
+        assertThatFile(destDir.resolve(fileNameBentley)).matches(fileBentleyAssert);
     }
 
     @Test
     @Ignore
     public void shouldUnzipRequiredFilesWhenSplit() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTme(rootDir);
-        List<String> fileNames = Arrays.asList("saint-petersburg.jpg", "cars/bentley-continental.jpg");
+        List<String> fileNames = Arrays.asList("saint-fileNameSaintPetersburg.jpg", dirNameCars + '/' + fileNameBentley);
         UnzipIt.zip(zipDeflateSplit).destDir(destDir).extract(fileNames);
 
         assertThatDirectory(destDir).exists().hasDirectories(0).hasFiles(2);
-        assertThatFile(destDir.resolve("saint-petersburg.jpg")).exists().isImage().hasSize(1_074_836);
-        assertThatFile(destDir.resolve("bentley-continental.jpg")).exists().isImage().hasSize(1_395_362);
+        assertThatFile(destDir.resolve(fileNameSaintPetersburg)).matches(fileSaintPetersburgAssert);
+        assertThatFile(destDir.resolve(fileNameBentley)).matches(fileBentleyAssert);
     }
 
     public void shouldUnzipOneFile() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTme(rootDir);
-        UnzipIt.zip(zipDeflateSolid).destDir(destDir).extract("cars/ferrari-458-italia.jpg");
+        UnzipIt.zip(zipDeflateSolid).destDir(destDir).extract(dirNameCars + '/' + fileNameFerrari);
 
         assertThatDirectory(destDir).exists().hasDirectories(0).hasFiles(1);
-        assertThatFile(destDir.resolve("ferrari-458-italia.jpg")).exists().isImage().hasSize(320_894);
+        assertThatFile(destDir.resolve(fileNameFerrari)).matches(fileFerrariAssert);
     }
 
     public void shouldUnzipFolder() throws IOException {
@@ -80,13 +87,14 @@ public class UnzipItTest {
         assertThatDirectory(destDir.resolve(dirNameBikes)).matches(dirBikesAssert);
     }
 
-    public void shouldFoo() throws IOException, URISyntaxException {
+    public void shouldExtractZipArchiveWhenEntryNameWithCustomCharset() throws IOException, URISyntaxException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTme(rootDir);
         Path zip = Paths.get(UnzipItTest.class.getResource("/zip/cjk_filename.zip").toURI()).toAbsolutePath();
 
         UnzipSettings settings = UnzipSettings.builder().charset(Charset.forName("GBK")).build();
 
         UnzipIt.zip(zip).destDir(destDir).settings(settings).extract();
+
         assertThatDirectory(destDir).hasDirectories(0).hasFiles(2);
         assertThatDirectory(destDir).file("fff - 副本.txt").exists();
     }

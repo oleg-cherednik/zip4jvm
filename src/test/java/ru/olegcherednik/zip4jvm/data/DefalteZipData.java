@@ -11,6 +11,7 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
@@ -76,11 +77,11 @@ public final class DefalteZipData {
     }
 
     private static void createDeflateSolidAesZip() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
-        ZipSettings settings = ZipSettings.builder()
-                                          .entrySettingsProvider(fileName ->
-                                                          entrySettings.toBuilder().encryption(Encryption.AES_256, fileName.toCharArray()).build())
-                                          .comment("password: <fileName>").build();
+        Function<String, ZipEntrySettings> entrySettingsProvider =
+                fileName -> ZipEntrySettings.builder()
+                                            .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
+                                            .encryption(Encryption.AES_256, fileName.toCharArray()).build();
+        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(entrySettingsProvider).comment("password: <fileName>").build();
 
         ZipIt.zip(zipDeflateSolidAes).settings(settings).add(contentDirSrc);
         assertThat(Files.exists(zipDeflateSolidAes)).isTrue();
