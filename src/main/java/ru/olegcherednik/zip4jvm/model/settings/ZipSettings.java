@@ -3,7 +3,6 @@ package ru.olegcherednik.zip4jvm.model.settings;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
@@ -72,7 +71,7 @@ public final class ZipSettings {
             return this;
         }
 
-        public Builder entrySettingsProvider(@NonNull Function<String, ZipEntrySettings> entrySettingsProvider) {
+        public Builder entrySettingsProvider(Function<String, ZipEntrySettings> entrySettingsProvider) {
             this.entrySettingsProvider = Optional.ofNullable(entrySettingsProvider).orElse(ZipEntrySettings.DEFAULT_PROVIDER);
             return this;
         }

@@ -26,6 +26,5 @@ public class ZipEntryTest {
 
         assertThat(file.toString()).isEqualTo(fileNameBentley);
         assertThat(dir.toString()).isEqualTo(zipDirNameBikes);
-
     }
 }

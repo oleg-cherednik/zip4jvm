@@ -11,6 +11,7 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
@@ -83,11 +84,11 @@ public final class StoreZipData {
     }
 
     private static void createStoreSolidAesZip() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
-        ZipSettings settings = ZipSettings.builder()
-                                          .entrySettingsProvider(fileName ->
-                                                          entrySettings.toBuilder().encryption(Encryption.AES_256, fileName.toCharArray()).build())
-                                          .comment("password: <fileName>").build();
+        Function<String, ZipEntrySettings> entrySettingsProvider =
+                fileName -> ZipEntrySettings.builder()
+                                            .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                            .encryption(Encryption.AES_192, fileName.toCharArray()).build();
+        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(entrySettingsProvider).comment("password: <fileName>").build();
 
         ZipIt.zip(zipStoreSolidAes).settings(settings).add(contentDirSrc);
         assertThat(Files.exists(zipStoreSolidAes)).isTrue();
@@ -112,10 +113,12 @@ public final class StoreZipData {
     }
 
     private static void createStoreSplitAesZip() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
+        Function<String, ZipEntrySettings> entrySettingsProvider =
+                fileName -> ZipEntrySettings.builder()
+                                            .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                            .encryption(Encryption.AES_128, fileName.toCharArray()).build();
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettingsProvider(fileName ->
-                                                          entrySettings.toBuilder().encryption(Encryption.AES_256, fileName.toCharArray()).build())
+                                          .entrySettingsProvider(entrySettingsProvider)
                                           .splitSize(SIZE_1MB)
                                           .comment("password: <fileName>").build();
 

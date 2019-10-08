@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -48,8 +49,9 @@ public class AbstractFileExtAssert<S extends AbstractFileExtAssert<S>> extends A
         return myself;
     }
 
-    public S hasEmptyContent() {
-        return hasContent("");
+    public S matches(Consumer<IFileAssert<?>> consumer) {
+        consumer.accept(this);
+        return myself;
     }
 
     @Override
