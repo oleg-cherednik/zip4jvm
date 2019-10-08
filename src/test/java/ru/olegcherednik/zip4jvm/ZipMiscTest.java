@@ -137,7 +137,7 @@ public class ZipMiscTest {
 
         ZipMisc zipFile = ZipMisc.zip(zip);
 
-        zipFile.entryName(entryNames).removeEntryByNamePrefix();
+        zipFile.removeEntryByNamePrefix(entryNames);
         assertThat(zipFile.getEntries()).hasSize(10);
     }
 
@@ -149,7 +149,7 @@ public class ZipMiscTest {
 
         ZipMisc zipFile = ZipMisc.zip(zip);
 
-        zipFile.entryName(dirSrc.relativize(dirCars).toString()).removeEntryByNamePrefix();
+        zipFile.removeEntryByNamePrefix(dirSrc.relativize(dirCars).toString());
         assertThat(zipFile.getEntries()).hasSize(10);
     }
 
@@ -161,7 +161,7 @@ public class ZipMiscTest {
         ZipMisc zipFile = ZipMisc.zip(zip);
         assertThat(zipFile.getEntries()).hasSize(13);
 
-        assertThatThrownBy(() -> ZipMisc.zip(zip).entryName(dirNameCars).removeEntryByName()).isExactlyInstanceOf(EntryNotFoundException.class);
+        assertThatThrownBy(() -> ZipMisc.zip(zip).removeEntryByName(dirNameCars)).isExactlyInstanceOf(EntryNotFoundException.class);
         assertThat(zipFile.getEntries()).hasSize(13);
     }
 
@@ -176,7 +176,7 @@ public class ZipMiscTest {
         ZipMisc zipFile = ZipMisc.zip(zip);
         assertThat(zipFile.getEntries()).hasSize(2);
 
-        zipFile.entryName(dirNameCars).removeEntryByName();
+        zipFile.removeEntryByName(dirNameCars);
         assertThat(zipFile.getEntries()).hasSize(1);
     }
 }

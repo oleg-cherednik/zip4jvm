@@ -77,7 +77,7 @@ public class ZipMiscSnippet {
         FileUtils.copyFile(zipDeflateSolid.toFile(), zip.toFile());
 
         ZipMisc zipFile = ZipMisc.zip(zip);
-        zipFile.entryName(dirNameCars + '/' + fileNameFerrari).removeEntryByName();
+        zipFile.removeEntryByName(dirNameCars + '/' + fileNameFerrari);
     }
 
     public void removeSomeEntriesByName() throws IOException {
@@ -87,7 +87,7 @@ public class ZipMiscSnippet {
         Collection<String> entryNames = Arrays.asList(dirNameCars + '/' + fileNameFerrari, dirNameBikes + '/' + fileNameHonda);
 
         ZipMisc zipFile = ZipMisc.zip(zip);
-        zipFile.entryName(entryNames).removeEntryByName();
+        zipFile.removeEntryByName(entryNames);
 
         int a = 0;
         a++;
@@ -98,7 +98,7 @@ public class ZipMiscSnippet {
         FileUtils.copyFile(zipDeflateSolid.toFile(), zip.toFile());
 
         ZipMisc zipFile = ZipMisc.zip(zip);
-        zipFile.entryName(dirNameCars).removeEntryByNamePrefix();
+        zipFile.removeEntryByNamePrefix(dirNameCars);
 
         int a = 0;
         a++;

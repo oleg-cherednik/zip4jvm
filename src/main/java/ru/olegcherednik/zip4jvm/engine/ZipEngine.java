@@ -3,7 +3,6 @@ package ru.olegcherednik.zip4jvm.engine;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.EntryDuplicationException;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
-import ru.olegcherednik.zip4jvm.exception.EntryWithPrefixNotFoundException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.SingleZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
@@ -67,7 +66,7 @@ public final class ZipEngine implements ZipFile.Writer {
     }
 
     @Override
-    public void removeEntryByNamePrefix(String entryNamePrefix) throws EntryWithPrefixNotFoundException {
+    public void removeEntryByNamePrefix(String entryNamePrefix)  {
         requireNotBlank(entryNamePrefix, "ZipEngine.entryNamePrefix");
 
         String normalizedPrefixEntryName = ZipUtils.normalizeFileName(entryNamePrefix);
@@ -77,7 +76,7 @@ public final class ZipEngine implements ZipFile.Writer {
                                                .collect(Collectors.toSet());
 
         if (entryNames.isEmpty())
-            throw new EntryWithPrefixNotFoundException(entryNamePrefix);
+            throw new EntryNotFoundException(entryNamePrefix);
 
         entryNames.forEach(fileNameWriter::remove);
     }

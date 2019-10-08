@@ -16,8 +16,7 @@ public enum ErrorCode {
     EMPTY_PASSWORD(2),
     PATH_NOT_EXISTS(3),
     ENTRY_DUPLICATION(4),
-    ENTRY_NOT_FOUND(5),
-    ENTRY_WITH_PREFIX_NOT_FOUND(6);
+    ENTRY_NOT_FOUND(5);
 
     private final int code;
 

@@ -20,6 +20,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.engine.ZipEngine;
+import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
@@ -31,7 +32,6 @@ import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
 
 import java.io.Closeable;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -150,9 +150,9 @@ public final class ZipFile {
 
         void add(Entry entry);
 
-        void removeEntryByName(String entryName);
+        void removeEntryByName(String entryName) throws EntryNotFoundException;
 
-        void removeEntryByNamePrefix(String entryNamePrefix) throws FileNotFoundException;
+        void removeEntryByNamePrefix(String entryNamePrefix) throws EntryNotFoundException;
 
         void copy(Path zip) throws IOException;
 

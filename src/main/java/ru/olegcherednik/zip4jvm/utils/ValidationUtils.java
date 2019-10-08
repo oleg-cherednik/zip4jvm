@@ -65,4 +65,9 @@ public final class ValidationUtils {
             throw new IllegalArgumentException("Collection should be empty: " + name);
     }
 
+    public static void requireMaxSizeComment(String str, int maxLength) {
+        if (StringUtils.length(str) > maxLength)
+            throw new IllegalArgumentException("File comment should be " + maxLength + " characters maximum");
+    }
+
 }

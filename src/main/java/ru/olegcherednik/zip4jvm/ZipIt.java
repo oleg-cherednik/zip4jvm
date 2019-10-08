@@ -97,7 +97,7 @@ public final class ZipIt {
      * Add regular file or directory (keeping initial structure) to the new or existed zip archive.
      *
      * @param path not {@literal null} path to the regular file or directory
-     * @throws IOException in case of any problem
+     * @throws IOException in case of any problem with file access
      */
     public void add(Path path) throws IOException {
         requireNotNull(path, "ZipIt.path");
@@ -110,7 +110,7 @@ public final class ZipIt {
      * Add regular files and/or directories (keeping initial structure) to the new or existed zip archive.
      *
      * @param paths path to the regular files and/or directories
-     * @throws IOException in case of any problem
+     * @throws IOException in case of any problem with file access
      */
     public void add(Collection<Path> paths) throws IOException {
         // TODO check that path != zip
@@ -125,7 +125,7 @@ public final class ZipIt {
      * data.
      *
      * @return not {@literal null} instance of {@link ZipFile.Writer}
-     * @throws IOException in case of any problem
+     * @throws IOException in case of any problem with file access
      */
     public ZipFile.Writer open() throws IOException {
         return ZipFile.writer(zip, settings);

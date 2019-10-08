@@ -17,6 +17,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireMaxSizeComment;
+
 /**
  * @author Oleg Cherednik
  * @since 10.03.2019
@@ -57,8 +59,7 @@ public class ZipModel {
     private final Map<String, ZipEntry> fileNameEntry = new LinkedHashMap<>();
 
     public void setComment(String comment) {
-        if (StringUtils.length(comment) > MAX_COMMENT_SIZE)
-            throw new IllegalArgumentException("File comment should be " + MAX_COMMENT_SIZE + " characters maximum");
+        requireMaxSizeComment(comment, MAX_COMMENT_SIZE);
         this.comment = StringUtils.isEmpty(comment) ? null : comment;
     }
 

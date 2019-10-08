@@ -464,7 +464,7 @@ saint-petersburg.jpg
 ```
 Path zip = Paths.get("filename.zip");
 ZipMisc zipFile = ZipMisc.zip(zip);
-zipFile.entryName("cars/bentley-continental.jpg").removeEntryByName();
+zipFile.removeEntryByName("cars/bentley-continental.jpg");
 ```
 >```
 >filename.zip (before)
@@ -496,7 +496,7 @@ zipFile.entryName("cars/bentley-continental.jpg").removeEntryByName();
 Path zip = Paths.get("filename.zip");
 ZipMisc zipFile = ZipMisc.zip(zip);
 Collection<String> entryNames = Arrays.asList("cars/ferrari-458-italia.jpg", "bikes/ducati-panigale-1199.jpg");
-zipFileentryName(entryNames).removeEntryByName();
+zipFile.removeEntryByName(entryNames);
 ```
 >```
 >filename.zip (before)
@@ -524,7 +524,7 @@ zipFileentryName(entryNames).removeEntryByName();
 ```
 Path zip = Paths.get("filename.zip");
 ZipMisc zipFile = ZipMisc.zip(zip);
-zipFile.entryName("cars").removeEntryByNamePrefix();
+zipFile.removeEntryByNamePrefix("cars")
 ```
 >```
 >filename.zip (before)
