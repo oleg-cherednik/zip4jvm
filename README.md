@@ -558,8 +558,8 @@ boolean split = zipFile.isSplit();
 #### Merge split archive into solid one
 
 ```
-Path zip = Paths.get("split.zip");
-Path zipSrc = Paths.get("filename.zip");
+Path zipSrc = Paths.get("split.zip");
+Path zip = Paths.get("filename.zip");
 ZipMisc zipFile = ZipMisc.zip(zipSrc);
 zipFile.merge(zip);
 ``` 
