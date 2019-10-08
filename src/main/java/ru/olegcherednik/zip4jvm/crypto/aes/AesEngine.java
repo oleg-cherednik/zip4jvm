@@ -24,6 +24,7 @@ public final class AesEngine {
 
     public static final int MAC_SIZE = 10;
     public static final int PASSWORD_CHECKSUM_SIZE = 2;
+    /** see 7.2.5.1 */
     private static final int BLOCK_SIZE = 16;
     private static final int ITERATION_COUNT = 1000;
 

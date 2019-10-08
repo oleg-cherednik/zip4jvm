@@ -21,6 +21,7 @@ public final class ZipSettings {
     private final long splitSize;
     private final String comment;
     private final boolean zip64;
+    private final boolean encryptFileNames;
     private final Function<String, ZipEntrySettings> entrySettingsProvider;
 
     public static Builder builder() {
@@ -31,6 +32,7 @@ public final class ZipSettings {
         splitSize = builder.splitSize;
         comment = builder.comment;
         zip64 = builder.zip64;
+        encryptFileNames = builder.encryptFileNames;
         entrySettingsProvider = builder.entrySettingsProvider;
     }
 
@@ -44,6 +46,7 @@ public final class ZipSettings {
         private long splitSize = ZipModel.NO_SPLIT;
         private String comment;
         private boolean zip64;
+        private boolean encryptFileNames;
         private Function<String, ZipEntrySettings> entrySettingsProvider = ZipEntrySettings.DEFAULT_PROVIDER;
 
         public ZipSettings build() {
@@ -68,6 +71,11 @@ public final class ZipSettings {
 
         public Builder zip64(boolean zip64) {
             this.zip64 = zip64;
+            return this;
+        }
+
+        public Builder encryptFileNames(boolean encryptFileNames) {
+            this.encryptFileNames = encryptFileNames;
             return this;
         }
 

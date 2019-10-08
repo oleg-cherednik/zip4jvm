@@ -11,6 +11,7 @@ import java.util.function.IntSupplier;
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT0;
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT1;
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT11;
+import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT13;
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT2;
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT3;
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT6;
@@ -32,6 +33,7 @@ public class GeneralPurposeFlag implements IntSupplier {
     private boolean dataDescriptorAvailable;
     private boolean strongEncryption;
     private boolean utf8;
+    private boolean encryptFileNames;
 
     public GeneralPurposeFlag(int data) {
         read(data);
@@ -43,6 +45,7 @@ public class GeneralPurposeFlag implements IntSupplier {
         dataDescriptorAvailable = BitUtils.isBitSet(data, BIT3);
         strongEncryption = BitUtils.isBitSet(data, BIT6);
         utf8 = BitUtils.isBitSet(data, BIT11);
+        encryptFileNames = BitUtils.isBitSet(data, BIT13);
     }
 
     private static CompressionLevel getCompressionLevel(int data) {
@@ -60,6 +63,7 @@ public class GeneralPurposeFlag implements IntSupplier {
         data = BitUtils.updateBits(data, BIT3, dataDescriptorAvailable);
         data = BitUtils.updateBits(data, BIT6, strongEncryption);
         data = BitUtils.updateBits(data, BIT11, utf8);
+        data = BitUtils.updateBits(data, BIT13, encryptFileNames);
 
         return data;
     }
@@ -78,3 +82,47 @@ public class GeneralPurposeFlag implements IntSupplier {
         return utf8 ? Charsets.UTF_8 : Charsets.IBM437;
     }
 }
+
+/*
+   7.1.6 Version 6.2 introduces support for encrypting metadata by compressing
+   and encrypting the central directory data structure to reduce information
+   leakage.   Information leakage can occur in legacy ZIP applications
+   through exposure of information about a file even though that file is
+   stored encrypted.  The information exposed consists of file
+   characteristics stored within the records and fields defined by this
+   specification.  This includes data such as a file's name, its original
+   size, timestamp and CRC32 value.
+
+   7.1.8 Central Directory Encryption provides greater protection against
+   information leakage by encrypting the Central Directory structure and
+   by masking key values that are replicated in the unencrypted Local
+   Header.   ZIP compatible programs that cannot interpret an encrypted
+   Central Directory structure cannot rely on the data in the corresponding
+   Local Header for decompression information.
+
+   7.1.9 Extra Field records that MAY contain information about a file that SHOULD
+   not be exposed SHOULD NOT be stored in the Local Header and SHOULD only
+   be written to the Central Directory where they can be encrypted.  This
+   design currently does not support streaming.  Information in the End of
+   Central Directory record, the Zip64 End of Central Directory Locator,
+   and the Zip64 End of Central Directory records are not encrypted.  Access
+   to view data on files within a ZIP file with an encrypted Central Directory
+   requires the appropriate password or private key for decryption prior to
+   viewing any files, or any information about the files, in the archive.
+
+   7.1.10 Older ZIP compatible programs not familiar with the Central Directory
+   Encryption feature will no longer be able to recognize the Central
+   Directory and MAY assume the ZIP file is corrupt.  Programs that
+   attempt streaming access using Local Headers will see invalid
+   information for each file.  Central Directory Encryption need not be
+   used for every ZIP file.  Its use is recommended for greater security.
+   ZIP files not using Central Directory Encryption SHOULD operate as
+   in the past.
+
+
+7.3 Single Password - Central Directory Encryption
+
+https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT
+
+
+ */
