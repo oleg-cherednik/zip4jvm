@@ -103,7 +103,7 @@ public final class ZipMisc {
     }
 
     /**
-     * Remove all entries with given {@code entryNames. Exact match of the entry name is required; i.e. in case of given entry name represents a
+     * Remove all entries with given {@code entryNames}. Exact match of the entry name is required; i.e. in case of given entry name represents a
      * directory and zip archive sub entries of this entry, then only the root entry will removed (if it's exist); all sub entries will not be
      * removed.
      *
