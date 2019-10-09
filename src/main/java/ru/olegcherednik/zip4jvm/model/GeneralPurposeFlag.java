@@ -78,6 +78,7 @@ public class GeneralPurposeFlag implements IntSupplier {
         return 0x0;
     }
 
+    /** see D.1 */
     public Charset getCharset() {
         return utf8 ? Charsets.UTF_8 : Charsets.IBM437;
     }

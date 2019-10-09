@@ -25,7 +25,7 @@ public final class AesExtraDataRecord implements ExtraField.Record {
     // size:2
     private final int size;
     // size:2
-    private final int versionNumber;
+    private final int vendorVersion;
     // size:2
     private final String vendor;
     // size:1
@@ -39,7 +39,7 @@ public final class AesExtraDataRecord implements ExtraField.Record {
 
     private AesExtraDataRecord(Builder builder) {
         size = builder.size;
-        versionNumber = builder.versionNumber;
+        vendorVersion = builder.vendorVersion;
         vendor = builder.vendor;
         strength = builder.strength;
         compressionMethod = builder.compressionMethod;
@@ -76,7 +76,7 @@ public final class AesExtraDataRecord implements ExtraField.Record {
 
         out.writeWordSignature(SIGNATURE);
         out.writeWord(size);
-        out.writeWord(versionNumber);
+        out.writeWord(vendorVersion);
         out.writeBytes(getVendor(Charsets.UTF_8));
         out.writeBytes((byte)strength.getCode());
         out.writeWord(compressionMethod.getCode());
@@ -86,7 +86,7 @@ public final class AesExtraDataRecord implements ExtraField.Record {
     public static final class Builder {
 
         private int size = ExtraField.NO_DATA;
-        private int versionNumber = ExtraField.NO_DATA;
+        private int vendorVersion = ExtraField.NO_DATA;
         private String vendor;
         private AesStrength strength = AesStrength.NULL;
         private CompressionMethod compressionMethod = CompressionMethod.DEFLATE;
@@ -101,7 +101,7 @@ public final class AesExtraDataRecord implements ExtraField.Record {
         }
 
         public Builder versionNumber(int versionNumber) {
-            this.versionNumber = versionNumber;
+            this.vendorVersion = versionNumber;
             return this;
         }
 

@@ -24,7 +24,7 @@ final class AesExtraDataRecordWriter implements Writer {
 
         out.writeWordSignature(AesExtraDataRecord.SIGNATURE);
         out.writeWord(record.getSize());
-        out.writeWord(record.getVersionNumber());
+        out.writeWord(record.getVendorVersion());
         out.writeBytes(record.getVendor(Charsets.UTF_8));
         out.writeBytes((byte)record.getStrength().getCode());
         out.writeWord(record.getCompressionMethod().getCode());
