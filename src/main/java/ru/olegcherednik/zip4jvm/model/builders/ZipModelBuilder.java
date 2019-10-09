@@ -48,6 +48,7 @@ public final class ZipModelBuilder {
         zipModel.setSplitSize(settings.getSplitSize());
         zipModel.setComment(settings.getComment());
         zipModel.setZip64(settings.isZip64());
+        zipModel.setEncryptFileNames(settings.isEncryptFileNames());
 
         return zipModel;
     }

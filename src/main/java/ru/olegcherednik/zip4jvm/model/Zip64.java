@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import ru.olegcherednik.zip4jvm.crypto.strong.HashId;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 
 import java.io.IOException;
@@ -84,6 +85,33 @@ public final class Zip64 {
         // size:n-44 - extensible data sector
         private byte[] extensibleDataSector;
 
+    }
+
+    /** see 7.3.4 */
+    @Getter
+    @Setter
+    public static final class ExtensibleDataSector {
+
+        public static final ExtensibleDataSector NULL = new ExtensibleDataSector();
+
+        // size:2 - compression method
+        private CompressionMethod compressionMethod = CompressionMethod.STORE;
+        // size:8 - size of compressed data
+        private long compressedSize;
+        // size:8 - original uncompressed file size
+        private long uncompressedSize;
+        // size:2 - encryption algorithm id
+        private int algId;
+        // size:2 - encryption key length
+        private int bitLen;
+        // size:2 - encryption flags
+        private int flags;
+        // size:2 - hash algorithm identifier
+        private HashId hashId;
+        // size:2 - length of hash data (m)
+        private int hashLength;
+        // size:m - hash data
+        private byte[] hashData;
     }
 
     /** see 4.5.3 */

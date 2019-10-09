@@ -3,7 +3,9 @@ package ru.olegcherednik.zip4jvm.model;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.ArrayUtils;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.List;
@@ -27,7 +29,7 @@ public class CentralDirectory {
     public static class FileHeader {
 
         public static final int SIGNATURE = 0x02014B50;
-        public static final int VERSION = 20;
+        public static final int VERSION = 62;
 
         // size:4 - signature (0x02014b50)
         // size:2 - version made by
@@ -124,6 +126,45 @@ public class CentralDirectory {
         // size:n - signature data
         private byte[] signatureData;
 
+    }
+
+    @Getter
+    @Setter
+    public static class StrongEncryption implements ExtraField.Record {
+
+
+        public static final int SIGNATURE = 0x0017;
+
+        // size:2 - tag for this "extra" block type (0x0017)
+        // size:2 - the data format identifier
+        private int format;
+        // size:8 - size of compressed data
+        private long compressedSize;
+        // size:8 - offset of local header record
+        private long localFileHeaderOffs;
+        // size:4 - number of the disk on which  this file starts
+        private long disk;
+
+
+        @Override
+        public int getSignature() {
+            return SIGNATURE;
+        }
+
+        @Override
+        public int getBlockSize() {
+            return 0;
+        }
+
+        @Override
+        public boolean isNull() {
+            return false;
+        }
+
+        @Override
+        public void write(DataOutput out) throws IOException {
+
+        }
     }
 
 }

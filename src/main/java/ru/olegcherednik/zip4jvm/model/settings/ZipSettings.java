@@ -37,7 +37,12 @@ public final class ZipSettings {
     }
 
     public Builder toBuilder() {
-        return builder().splitSize(splitSize).comment(comment).zip64(zip64).entrySettingsProvider(entrySettingsProvider);
+        return builder()
+                .splitSize(splitSize)
+                .comment(comment)
+                .zip64(zip64)
+                .encryptFileNames(encryptFileNames)
+                .entrySettingsProvider(entrySettingsProvider);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -76,6 +81,11 @@ public final class ZipSettings {
 
         public Builder encryptFileNames(boolean encryptFileNames) {
             this.encryptFileNames = encryptFileNames;
+            return this;
+        }
+
+        public Builder entrySettings(ZipEntrySettings entrySettings) {
+            entrySettingsProvider = entrySettings == null ? ZipEntrySettings.DEFAULT_PROVIDER : fileName -> entrySettings;
             return this;
         }
 

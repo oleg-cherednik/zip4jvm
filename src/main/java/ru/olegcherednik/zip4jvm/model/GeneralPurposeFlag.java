@@ -125,5 +125,7 @@ public class GeneralPurposeFlag implements IntSupplier {
 
 https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT
 
+https://commons.apache.org/proper/commons-compress/apidocs/org/apache/commons/compress/archivers/zip/X0017_StrongEncryptionHeader.html
+
 
  */

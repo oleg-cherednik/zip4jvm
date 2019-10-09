@@ -54,6 +54,7 @@ public class ZipModel {
      * in ZIP64 format.
      */
     private boolean zip64;
+    private boolean encryptFileNames;
 
     @Getter(AccessLevel.NONE)
     private final Map<String, ZipEntry> fileNameEntry = new LinkedHashMap<>();

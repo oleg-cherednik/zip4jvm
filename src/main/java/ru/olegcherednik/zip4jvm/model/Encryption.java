@@ -10,6 +10,8 @@ import ru.olegcherednik.zip4jvm.crypto.aes.AesEncoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareDecoder;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareEncoder;
+import ru.olegcherednik.zip4jvm.crypto.strong.StrongDecoder;
+import ru.olegcherednik.zip4jvm.crypto.strong.StrongEncoder;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -25,6 +27,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum Encryption {
     OFF(zipEntry -> Encoder.NULL, (zipEntry, in) -> Decoder.NULL, ZipEntry::getChecksum, Compression::getMethod),
+    STRONG(StrongEncoder::create, StrongDecoder::create, ZipEntry::getChecksum, Compression::getMethod),
     PKWARE(PkwareEncoder::create, PkwareDecoder::create, ZipEntry::getChecksum, Compression::getMethod),
     AES_128(AesEncoder::create, AesDecoder::create, entry -> 0L, compression -> CompressionMethod.AES),
     AES_192(AES_128.createEncoder, AES_128.createDecoder, AES_128.checksum, AES_128.compressionMethod),
@@ -42,8 +45,7 @@ public enum Encryption {
             return OFF;
         if (extraField.getAesExtraDataRecord() != AesExtraDataRecord.NULL)
             return AesEngine.getEncryption(extraField.getAesExtraDataRecord().getStrength());
-//        return generalPurposeFlag.isStrongEncryption() ? STRONG : PKWARE;
-        return PKWARE;
+        return generalPurposeFlag.isStrongEncryption() ? STRONG : PKWARE;
     }
 
     public interface CreateDecoder {

@@ -41,9 +41,7 @@ public final class LocalFileHeaderBuilder {
         generalPurposeFlag.setDataDescriptorAvailable(zipEntry.isDataDescriptorAvailable());
         generalPurposeFlag.setUtf8(zipEntry.isUtf8());
         generalPurposeFlag.setEncrypted(zipEntry.getEncryption() != Encryption.OFF);
-//        generalPurposeFlag.setStrongEncryption(entry.getEncryption() == Encryption.STRONG);
-        generalPurposeFlag.setStrongEncryption(false);
-
+        generalPurposeFlag.setStrongEncryption(zipEntry.getEncryption() == Encryption.STRONG);
         return generalPurposeFlag;
     }
 
