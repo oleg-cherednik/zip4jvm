@@ -1,12 +1,14 @@
-package ru.olegcherednik.zip4jvm.model;
+package ru.olegcherednik.zip4jvm.crypto.aes;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang.StringUtils;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.ExtraField;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -19,7 +21,6 @@ public final class AesExtraDataRecord implements ExtraField.Record {
 
     public static final int SIGNATURE = 0x9901;
     public static final int SIZE = 2 + 2 + 2 + 2 + 1 + 2;   // size:11
-    public static final int SIZE_FIELD = 2 + 2; // 4 bytes: signature + size
 
     // size:2 - signature (0x9901)
     // size:2
@@ -39,7 +40,7 @@ public final class AesExtraDataRecord implements ExtraField.Record {
 
     private AesExtraDataRecord(Builder builder) {
         size = builder.size;
-        vendorVersion = builder.vendorVersion;
+        vendorVersion = builder.versionNumber;
         vendor = builder.vendor;
         strength = builder.strength;
         compressionMethod = builder.compressionMethod;
@@ -85,8 +86,8 @@ public final class AesExtraDataRecord implements ExtraField.Record {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class Builder {
 
-        private int size = ExtraField.NO_DATA;
-        private int vendorVersion = ExtraField.NO_DATA;
+        private int size;
+        private int versionNumber;
         private String vendor;
         private AesStrength strength = AesStrength.NULL;
         private CompressionMethod compressionMethod = CompressionMethod.DEFLATE;
@@ -101,7 +102,7 @@ public final class AesExtraDataRecord implements ExtraField.Record {
         }
 
         public Builder versionNumber(int versionNumber) {
-            this.vendorVersion = versionNumber;
+            this.versionNumber = versionNumber;
             return this;
         }
 

@@ -3,8 +3,9 @@ package ru.olegcherednik.zip4jvm.io.readers;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.ArrayUtils;
+import ru.olegcherednik.zip4jvm.crypto.aes.AesExtraDataRecord;
+import ru.olegcherednik.zip4jvm.crypto.strong.StrongEncryptionHeader;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
@@ -36,7 +37,8 @@ final class ExtraFieldReader implements Reader<ExtraField> {
 
         Map<Integer, Reader<? extends ExtraField.Record>> map = new HashMap<>();
         map.put(Zip64.ExtendedInfo.SIGNATURE, createZip64ExtendedInfoReader(uncompressedSize, compressedSize, offs, disk));
-        map.put(AesExtraDataRecord.SIGNATURE, new AesExtraDataRecordReader(AesExtraDataRecord.SIGNATURE));
+        map.put(AesExtraDataRecord.SIGNATURE, new AesExtraDataRecordReader());
+        map.put(StrongEncryptionHeader.SIGNATURE, new StrongEncryptionHeaderReader());
 
         return new ExtraFieldReader(size, map);
     }
@@ -47,7 +49,7 @@ final class ExtraFieldReader implements Reader<ExtraField> {
 
         Map<Integer, Reader<? extends ExtraField.Record>> map = new HashMap<>();
         map.put(Zip64.ExtendedInfo.SIGNATURE, createZip64ExtendedInfoReader(uncompressedSize, compressedSize, false, false));
-        map.put(AesExtraDataRecord.SIGNATURE, new AesExtraDataRecordReader(AesExtraDataRecord.SIGNATURE));
+        map.put(AesExtraDataRecord.SIGNATURE, new AesExtraDataRecordReader());
 
         return new ExtraFieldReader(size, map);
     }

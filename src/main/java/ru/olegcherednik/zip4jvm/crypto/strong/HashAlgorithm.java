@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
  * @since 09.10.2019
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public enum HashId {
+public enum HashAlgorithm {
 
     NONE(0x0),
     CRC32(0x1),

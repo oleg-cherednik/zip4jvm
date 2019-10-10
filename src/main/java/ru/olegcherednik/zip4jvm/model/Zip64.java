@@ -5,7 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import ru.olegcherednik.zip4jvm.crypto.strong.HashId;
+import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
+import ru.olegcherednik.zip4jvm.crypto.strong.HashAlgorithm;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 
 import java.io.IOException;
@@ -100,14 +101,14 @@ public final class Zip64 {
         private long compressedSize;
         // size:8 - original uncompressed file size
         private long uncompressedSize;
-        // size:2 - encryption algorithm id
-        private int algId;
+        // size:2 - encryption algorithm
+        private EncryptionAlgorithm encryptionAlgorithm;
         // size:2 - encryption key length
-        private int bitLen;
+        private int bitLength;
         // size:2 - encryption flags
         private int flags;
         // size:2 - hash algorithm identifier
-        private HashId hashId;
+        private HashAlgorithm hashAlgorithm;
         // size:2 - length of hash data (m)
         private int hashLength;
         // size:m - hash data
@@ -127,7 +128,7 @@ public final class Zip64 {
             return new Builder();
         }
 
-        // size:2 - tag for this "extra" block type (ZIP64 = 0x001)
+        // size:2 - tag for this "extra" block type (0x1)
         // size:2 - size of this "extra" block
         // size:8 - original uncompressed file size
         private final long uncompressedSize;

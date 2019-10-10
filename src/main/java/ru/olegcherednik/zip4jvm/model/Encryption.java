@@ -8,6 +8,7 @@ import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesDecoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEncoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
+import ru.olegcherednik.zip4jvm.crypto.aes.AesExtraDataRecord;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareDecoder;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareEncoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.StrongDecoder;
