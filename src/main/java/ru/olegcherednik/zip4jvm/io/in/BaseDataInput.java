@@ -14,7 +14,7 @@ import java.util.Arrays;
  * @since 04.08.2019
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class BaseDataInput implements DataInput {
+abstract class BaseDataInput implements DataInput {
 
     private static final int OFFS_BYTE = 0;
     private static final int OFFS_WORD = 1;

@@ -39,8 +39,10 @@ public class EncryptionCentralDirectoryTest {
 //        ZipIt.zip(zip).settings(settings).add(fileOlegCherednik);
 
 
-        Path zip = Paths.get("d:/zip4jvm/securezip/strong.zip");
+//        Path zip = Paths.get("d:/zip4jvm/securezip/strong.zip");
 //        Path zip = Paths.get("d:/zip4jvm/securezip/strong_128.zip");
+//        Path zip = Paths.get("d:/zip4jvm/securezip/threedes.zip");
+        Path zip = Paths.get("d:/zip4jvm/securezip/aes128.zip");
         UnzipIt.zip(zip).destDir(rootDir).extract();
     }
 }
