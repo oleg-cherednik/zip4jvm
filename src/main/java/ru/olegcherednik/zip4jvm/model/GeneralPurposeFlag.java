@@ -128,4 +128,8 @@ https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT
 https://commons.apache.org/proper/commons-compress/apidocs/org/apache/commons/compress/archivers/zip/X0017_StrongEncryptionHeader.html
 
 
+EndCentralDirectory
+totalEntries: 0xFFFF -> real value in Zip64.EndCentralDirectory.totalEntries
+
+
  */

@@ -23,4 +23,11 @@ public enum HashAlgorithm {
 
     private final int code;
 
+    public static HashAlgorithm parseCode(int code) {
+        for (HashAlgorithm hashAlgorithm : values())
+            if (hashAlgorithm.code == code)
+                return hashAlgorithm;
+        throw new EnumConstantNotPresentException(HashAlgorithm.class, "code: " + code);
+    }
+
 }

@@ -25,7 +25,7 @@ public final class ValidationUtils {
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static void realBigZip64(long value, String type) {
+    public static void realBigZip64NotSupported(long value, String type) {
         if (value < 0)
             throw new RealBigZip64NotSupportedException(value, type);
     }

@@ -5,11 +5,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.crypto.strong.HashAlgorithm;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * @author Oleg Cherednik
@@ -84,35 +86,118 @@ public final class Zip64 {
         // size:8 - offs of CentralDirectory in startDiskNumber
         private long centralDirectoryOffs;
         // size:n-44 - extensible data sector
-        private byte[] extensibleDataSector;
+        private Zip64.ExtensibleDataSector extensibleDataSector = ExtensibleDataSector.NULL;
 
     }
 
     /** see 7.3.4 */
     @Getter
-    @Setter
     public static final class ExtensibleDataSector {
 
-        public static final ExtensibleDataSector NULL = new ExtensibleDataSector();
+        public static final ExtensibleDataSector NULL = builder().build();
 
         // size:2 - compression method
-        private CompressionMethod compressionMethod = CompressionMethod.STORE;
+        private final CompressionMethod compressionMethod;
         // size:8 - size of compressed data
-        private long compressedSize;
+        private final long compressedSize;
         // size:8 - original uncompressed file size
-        private long uncompressedSize;
+        private final long uncompressedSize;
         // size:2 - encryption algorithm
-        private EncryptionAlgorithm encryptionAlgorithm;
+        private final EncryptionAlgorithm encryptionAlgorithm;
         // size:2 - encryption key length
-        private int bitLength;
+        private final int bitLength;
         // size:2 - encryption flags
-        private int flags;
+        private final int flags;
         // size:2 - hash algorithm identifier
-        private HashAlgorithm hashAlgorithm;
+        private final HashAlgorithm hashAlgorithm;
         // size:2 - length of hash data (m)
-        private int hashLength;
+        private final int hashLength;
         // size:m - hash data
-        private byte[] hashData;
+        private final byte[] hashData;
+
+        public static Builder builder() {
+            return new Builder();
+        }
+
+        @Override
+        public String toString() {
+            return this == NULL ? "<null>" : super.toString();
+        }
+
+        private ExtensibleDataSector(Builder builder) {
+            compressionMethod = builder.compressionMethod;
+            compressedSize = builder.compressedSize;
+            uncompressedSize = builder.uncompressedSize;
+            encryptionAlgorithm = builder.encryptionAlgorithm;
+            bitLength = builder.bitLength;
+            flags = builder.flags;
+            hashAlgorithm = builder.hashAlgorithm;
+            hashLength = builder.hashLength;
+            hashData = builder.hashData;
+        }
+
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static final class Builder {
+
+            private CompressionMethod compressionMethod = CompressionMethod.STORE;
+            private long compressedSize;
+            private long uncompressedSize;
+            private EncryptionAlgorithm encryptionAlgorithm = EncryptionAlgorithm.AES_256;
+            private int bitLength;
+            private int flags;
+            private HashAlgorithm hashAlgorithm = HashAlgorithm.SHA256;
+            private int hashLength;
+            private byte[] hashData;
+
+            public ExtensibleDataSector build() {
+                return new ExtensibleDataSector(this);
+            }
+
+            public Builder compressionMethod(CompressionMethod compressionMethod) {
+                this.compressionMethod = compressionMethod;
+                return this;
+            }
+
+            public Builder compressedSize(long compressedSize) {
+                this.compressedSize = compressedSize;
+                return this;
+            }
+
+            public Builder uncompressedSize(long uncompressedSize) {
+                this.uncompressedSize = uncompressedSize;
+                return this;
+            }
+
+            public Builder encryptionAlgorithm(EncryptionAlgorithm encryptionAlgorithm) {
+                this.encryptionAlgorithm = Optional.ofNullable(encryptionAlgorithm).orElse(EncryptionAlgorithm.AES_256);
+                return this;
+            }
+
+            public Builder bitLength(int bitLength) {
+                this.bitLength = bitLength;
+                return this;
+            }
+
+            public Builder flags(int flags) {
+                this.flags = flags;
+                return this;
+            }
+
+            public Builder hashAlgorithm(HashAlgorithm hashAlgorithm) {
+                this.hashAlgorithm = Optional.ofNullable(hashAlgorithm).orElse(HashAlgorithm.SHA256);
+                return this;
+            }
+
+            public Builder hashLength(int hashLength) {
+                this.hashLength = hashLength;
+                return this;
+            }
+
+            public Builder hashData(byte[] hashData) {
+                this.hashData = ArrayUtils.clone(hashData);
+                return this;
+            }
+        }
     }
 
     /** see 4.5.3 */
@@ -124,10 +209,6 @@ public final class Zip64 {
         public static final int SIGNATURE = 0x1;
         public static final int SIZE_FIELD = 2 + 2; // 4 bytes: signature + size
 
-        public static Builder builder() {
-            return new Builder();
-        }
-
         // size:2 - tag for this "extra" block type (0x1)
         // size:2 - size of this "extra" block
         // size:8 - original uncompressed file size
@@ -138,6 +219,10 @@ public final class Zip64 {
         private final long localFileHeaderOffs;
         // size:4 - number of the disk on which  this file starts
         private final long disk;
+
+        public static Builder builder() {
+            return new Builder();
+        }
 
         private ExtendedInfo(Builder builder) {
             uncompressedSize = builder.uncompressedSize;

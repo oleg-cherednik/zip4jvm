@@ -1,14 +1,18 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
+import ru.olegcherednik.zip4jvm.crypto.strong.HashAlgorithm;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.Zip64;
-import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
+
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64NotSupported;
 
 /**
  * @author Oleg Cherednik
@@ -34,7 +38,7 @@ final class Zip64Reader implements Reader<Zip64> {
             locator.setOffs(in.readQword());
             locator.setTotalDisks(in.readDword());
 
-            ValidationUtils.realBigZip64(locator.getOffs(), "Zip64.EndCentralDirectory");
+            realBigZip64NotSupported(locator.getOffs(), "Zip64.EndCentralDirectory");
 
             return locator;
         }
@@ -69,10 +73,10 @@ final class Zip64Reader implements Reader<Zip64> {
             dir.setTotalEntries(in.readQword());
             dir.setCentralDirectorySize(in.readQword());
             dir.setCentralDirectoryOffs(in.readQword());
-            dir.setExtensibleDataSector(in.readBytes((int)endCentralDirectorySize - Zip64.EndCentralDirectory.SIZE));
+            dir.setExtensibleDataSector(new ExtensibleDataSector((int)endCentralDirectorySize - Zip64.EndCentralDirectory.SIZE).read(in));
 
-            ValidationUtils.realBigZip64(dir.getCentralDirectoryOffs(), "offsCentralDirectory");
-            ValidationUtils.realBigZip64(dir.getTotalEntries(), "totalEntries");
+            realBigZip64NotSupported(dir.getCentralDirectoryOffs(), "offsCentralDirectory");
+            realBigZip64NotSupported(dir.getTotalEntries(), "totalEntries");
 
             return dir;
         }
@@ -122,6 +126,52 @@ final class Zip64Reader implements Reader<Zip64> {
                                      .localFileHeaderOffs(offsLocalHeaderRelative)
                                      .disk(disk).build();
         }
+
+    }
+
+    @RequiredArgsConstructor
+    static final class ExtensibleDataSector implements Reader<Zip64.ExtensibleDataSector> {
+
+        private final int size;
+
+        @Override
+        public Zip64.ExtensibleDataSector read(DataInput in) throws IOException {
+            if (size == 0)
+                return Zip64.ExtensibleDataSector.NULL;
+
+            long offs = in.getOffs();
+
+            Zip64.ExtensibleDataSector extensibleDataSector = readExtensibleDataSector(in);
+
+            if (in.getOffs() - offs != size)
+                throw new Zip4jvmException("Incorrect ExtensibleDataSector");
+
+            return extensibleDataSector;
+        }
+
+        private static Zip64.ExtensibleDataSector readExtensibleDataSector(DataInput in) throws IOException {
+            CompressionMethod compressionMethod = CompressionMethod.parseCode(in.readWord());
+            long compressedSize = in.readQword();
+            long uncompressedSize = in.readQword();
+            EncryptionAlgorithm encryptionAlgorithm = EncryptionAlgorithm.parseCode(in.readWord());
+            int bitLength = in.readWord();
+            int flags = in.readWord();
+            HashAlgorithm hashAlgorithm = HashAlgorithm.parseCode(in.readWord());
+            int hashLength = in.readWord();
+            byte[] hashData = in.readBytes(hashLength);
+
+            return Zip64.ExtensibleDataSector.builder()
+                                             .compressionMethod(compressionMethod)
+                                             .compressedSize(compressedSize)
+                                             .uncompressedSize(uncompressedSize)
+                                             .encryptionAlgorithm(encryptionAlgorithm)
+                                             .bitLength(bitLength)
+                                             .flags(flags)
+                                             .hashAlgorithm(hashAlgorithm)
+                                             .hashLength(hashLength)
+                                             .hashData(hashData).build();
+        }
+
 
     }
 
