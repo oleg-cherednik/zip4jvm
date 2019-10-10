@@ -27,17 +27,18 @@ import java.util.function.Function;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum Encryption {
-    OFF(zipEntry -> Encoder.NULL, (zipEntry, in) -> Decoder.NULL, ZipEntry::getChecksum, Compression::getMethod),
-    STRONG(StrongEncoder::create, StrongDecoder::create, ZipEntry::getChecksum, Compression::getMethod),
-    PKWARE(PkwareEncoder::create, PkwareDecoder::create, ZipEntry::getChecksum, Compression::getMethod),
-    AES_128(AesEncoder::create, AesDecoder::create, entry -> 0L, compression -> CompressionMethod.AES),
-    AES_192(AES_128.createEncoder, AES_128.createDecoder, AES_128.checksum, AES_128.compressionMethod),
-    AES_256(AES_128.createEncoder, AES_128.createDecoder, AES_128.checksum, AES_128.compressionMethod);
+    OFF(zipEntry -> Encoder.NULL, (zipEntry, in) -> Decoder.NULL, ZipEntry::getChecksum, Compression::getMethod, (extensibleDataSector, in) -> null),
+    STRONG(StrongEncoder::create, StrongDecoder::create, ZipEntry::getChecksum, Compression::getMethod, (extensibleDataSector, in) -> null),
+    PKWARE(PkwareEncoder::create, PkwareDecoder::create, ZipEntry::getChecksum, Compression::getMethod, (extensibleDataSector, in) -> null),
+    AES_128(AesEncoder::create, AesDecoder::create, entry -> 0L, compression -> CompressionMethod.AES, (extensibleDataSector, in) -> null),
+    AES_192(AES_128.createEncoder, AES_128.createDecoder, AES_128.checksum, AES_128.compressionMethod, (extensibleDataSector, in) -> null),
+    AES_256(AES_128.createEncoder, AES_128.createDecoder, AES_128.checksum, AES_128.compressionMethod, AesDecoder::create);
 
     private final Function<ZipEntry, Encoder> createEncoder;
     private final CreateDecoder createDecoder;
     private final Function<ZipEntry, Long> checksum;
     private final Function<Compression, CompressionMethod> compressionMethod;
+    private final CreateDecoderCentral createDecoderCentral;
 
     public static Encryption get(ExtraField extraField, GeneralPurposeFlag generalPurposeFlag) {
         if (generalPurposeFlag.isStrongEncryption())
@@ -52,6 +53,13 @@ public enum Encryption {
     public interface CreateDecoder {
 
         Decoder apply(ZipEntry zipEntry, DataInput in) throws IOException;
+
+    }
+
+    public interface CreateDecoderCentral {
+
+        Decoder apply(Zip64.ExtensibleDataSector extensibleDataSector, DataInput in) throws IOException;
+
     }
 
 }

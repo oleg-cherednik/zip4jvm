@@ -40,6 +40,7 @@ public class EncryptionCentralDirectoryTest {
 
 
         Path zip = Paths.get("d:/zip4jvm/securezip/strong.zip");
+//        Path zip = Paths.get("d:/zip4jvm/securezip/strong_128.zip");
         UnzipIt.zip(zip).destDir(rootDir).extract();
     }
 }

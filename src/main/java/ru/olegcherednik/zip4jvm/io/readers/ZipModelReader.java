@@ -8,6 +8,7 @@ import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -41,10 +42,18 @@ public final class ZipModelReader {
 
             long offs = ZipModelBuilder.getCentralDirectoryOffs(endCentralDirectory, zip64);
             long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
-            CentralDirectory centralDirectory = new CentralDirectoryReader(offs, totalEntries, charsetCustomizer).read(in);
+            CentralDirectory centralDirectory = getCentralDirectoryReader(zip64, offs, totalEntries).read(in);
 
             return new ZipModelBuilder(zip, endCentralDirectory, zip64, centralDirectory, charsetCustomizer).build();
         }
+    }
+
+    private Reader<CentralDirectory> getCentralDirectoryReader(Zip64 zip64, long offs, long totalEntries) {
+        Zip64.ExtensibleDataSector extensibleDataSector = zip64.getEndCentralDirectory().getExtensibleDataSector();
+
+        if (extensibleDataSector == Zip64.ExtensibleDataSector.NULL)
+            return new CentralDirectoryReader(offs, totalEntries, charsetCustomizer);
+        return new SecureCentralDirectoryReader(offs, totalEntries, charsetCustomizer, extensibleDataSector);
     }
 
 }

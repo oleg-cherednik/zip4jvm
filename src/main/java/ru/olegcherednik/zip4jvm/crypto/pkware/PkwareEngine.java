@@ -28,9 +28,11 @@ public final class PkwareEngine {
     }
 
     private byte encrypt(byte b) {
-        byte cipher = (byte)(stream() ^ b);
-        updateKeys(keys, b);
-        return cipher;
+        try {
+            return (byte)(stream() ^ b);
+        } finally {
+            updateKeys(keys, b);
+        }
     }
 
     private byte decrypt() {

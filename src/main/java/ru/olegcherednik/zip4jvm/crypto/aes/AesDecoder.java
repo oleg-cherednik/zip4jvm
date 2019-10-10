@@ -5,6 +5,7 @@ import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import javax.crypto.Cipher;
@@ -23,9 +24,32 @@ public final class AesDecoder implements Decoder {
     private final int saltLength;
     private final AesEngine engine;
 
+    public static AesDecoder create(Zip64.ExtensibleDataSector extensibleDataSector, DataInput in) {
+        try {
+            AesStrength strength = AesStrength.S256;
+            int saltLength = strength.saltLength();
+
+            byte[] salt = in.readBytes(saltLength);
+            byte[] key = AesEngine.createKey("1".toCharArray(), salt, strength);
+
+            Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
+            Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
+            byte[] passwordChecksum = strength.createPasswordChecksum(key);
+            byte[] expected = in.readBytes(PASSWORD_CHECKSUM_SIZE);
+
+//            checkPasswordChecksum(passwordChecksum, null, in);
+
+            return new AesDecoder(cipher, mac, salt.length);
+        } catch(Zip4jvmException e) {
+            throw e;
+        } catch(Exception e) {
+            throw new Zip4jvmException(e);
+        }
+    }
+
     public static AesDecoder create(ZipEntry entry, DataInput in) {
         try {
-            AesStrength strength = AesEngine.getStrength(entry.getEncryption());
+            AesStrength strength = entry.getStrength();
             byte[] salt = getSalt(entry, in);
             byte[] key = AesEngine.createKey(entry.getPassword(), salt, strength);
 
