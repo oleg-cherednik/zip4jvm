@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+import ru.olegcherednik.zip4jvm.model.DiagnosticModel;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -31,6 +32,9 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public final class ZipModelReader {
 
+    public static final String MARK_END_CENTRAL_DIRECTORY_OFFS = "endCentralDirectoryOffs";
+    public static final String MARK_END_CENTRAL_DIRECTORY_END_OFFS = "endCentralDirectoryEndOffs";
+
     private final Path zip;
     private final Function<Charset, Charset> charsetCustomizer;
 
@@ -44,6 +48,25 @@ public final class ZipModelReader {
             CentralDirectory centralDirectory = new CentralDirectoryReader(offs, totalEntries, charsetCustomizer).read(in);
 
             return new ZipModelBuilder(zip, endCentralDirectory, zip64, centralDirectory, charsetCustomizer).build();
+        }
+    }
+
+    public DiagnosticModel readDiagnostic() throws IOException {
+        try (DataInput in = new SingleZipInputStream(zip)) {
+            EndCentralDirectory endCentralDirectory = new EndCentralDirectoryReader(charsetCustomizer).read(in);
+            Zip64 zip64 = new Zip64Reader().read(in);
+
+            long offs = ZipModelBuilder.getCentralDirectoryOffs(endCentralDirectory, zip64);
+            long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
+            CentralDirectory centralDirectory = new CentralDirectoryReader(offs, totalEntries, charsetCustomizer).read(in);
+
+            return DiagnosticModel.builder()
+                                  .endCentralDirectory(endCentralDirectory)
+                                  .endCentralDirectoryOffs(in.getMark(MARK_END_CENTRAL_DIRECTORY_OFFS))
+                                  .endCentralDirectorySize(
+                                          in.getMark(MARK_END_CENTRAL_DIRECTORY_END_OFFS) - in.getMark(MARK_END_CENTRAL_DIRECTORY_OFFS))
+                                  .zip64(zip64)
+                                  .centralDirectory(centralDirectory).build();
         }
     }
 

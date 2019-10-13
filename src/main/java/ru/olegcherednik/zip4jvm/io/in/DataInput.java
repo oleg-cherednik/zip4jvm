@@ -36,4 +36,10 @@ public interface DataInput extends Closeable {
 
     int read(byte[] buf, int offs, int len) throws IOException;
 
+    void mark(String id);
+
+    long getMark(String id);
+
+    void seek(String id) throws IOException;
+
 }

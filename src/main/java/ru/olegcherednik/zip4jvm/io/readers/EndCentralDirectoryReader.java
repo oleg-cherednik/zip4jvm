@@ -12,6 +12,9 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.function.Function;
 
+import static ru.olegcherednik.zip4jvm.io.readers.ZipModelReader.MARK_END_CENTRAL_DIRECTORY_END_OFFS;
+import static ru.olegcherednik.zip4jvm.io.readers.ZipModelReader.MARK_END_CENTRAL_DIRECTORY_OFFS;
+
 /**
  * @author Oleg Cherednik
  * @since 04.03.2019
@@ -23,7 +26,7 @@ final class EndCentralDirectoryReader implements Reader<EndCentralDirectory> {
 
     @Override
     public EndCentralDirectory read(DataInput in) throws IOException {
-        long offs = findHead(in);
+        findHead(in);
 
         EndCentralDirectory dir = new EndCentralDirectory();
         dir.setTotalDisks(in.readWord());
@@ -33,27 +36,28 @@ final class EndCentralDirectoryReader implements Reader<EndCentralDirectory> {
         dir.setCentralDirectorySize(in.readDword());
         dir.setCentralDirectoryOffs(in.readDword());
         int commentLength = in.readWord();
-        dir.setComment(in.readString(commentLength, charsetCustomizer.apply(Charsets.UTF_8)));
+        dir.setComment(in.readString(commentLength, charsetCustomizer.apply(Charsets.IBM437)));
 
-        in.seek(offs);
+        in.mark(MARK_END_CENTRAL_DIRECTORY_END_OFFS);
+        in.seek(MARK_END_CENTRAL_DIRECTORY_OFFS);
 
         return dir;
     }
 
-    private static long findHead(DataInput in) throws IOException {
+    private static void findHead(DataInput in) throws IOException {
         int commentLength = ZipModel.MAX_COMMENT_SIZE;
         long available = in.length() - EndCentralDirectory.MIN_SIZE;
 
         do {
             in.seek(available--);
             commentLength--;
-            long offs = in.getOffs();
+            in.mark(MARK_END_CENTRAL_DIRECTORY_OFFS);
 
             if (in.readSignature() == EndCentralDirectory.SIGNATURE)
-                return offs;
+                return;
         } while (commentLength >= 0 && available >= 0);
 
-        throw new Zip4jvmException("zip headers not found. probably not a zip file");
+        throw new Zip4jvmException("EncCentralDirectory was not found");
     }
 
 }

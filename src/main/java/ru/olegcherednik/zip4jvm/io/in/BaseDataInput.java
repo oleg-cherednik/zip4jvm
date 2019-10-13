@@ -4,10 +4,13 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Oleg Cherednik
@@ -22,6 +25,8 @@ abstract class BaseDataInput implements DataInput {
     private static final int OFFS_QWORD = 7;
 
     private static final ThreadLocal<byte[]> THREAD_LOCAL_BUF = ThreadLocal.withInitial(() -> new byte[15]);
+
+    private final Map<String, Long> map = new HashMap<>();
 
     protected DataInputFile delegate;
 
@@ -92,6 +97,23 @@ abstract class BaseDataInput implements DataInput {
     @Override
     public void close() throws IOException {
         delegate.close();
+    }
+
+    @Override
+    public void mark(String id) {
+        map.put(id, getOffs());
+    }
+
+    @Override
+    public long getMark(String id) {
+        if (!map.containsKey(id))
+            throw new Zip4jvmException("Cannot find mark: " + id);
+        return map.get(id);
+    }
+
+    @Override
+    public void seek(String id) throws IOException {
+        seek(getMark(id));
     }
 
     @Override
