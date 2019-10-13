@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.view;
 import lombok.Builder;
 
 import java.io.PrintStream;
+import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -28,10 +29,12 @@ public final class StringHexView {
         Deque<Integer> hexs = new LinkedList<>();
         Deque<Character> chars = new LinkedList<>();
         Deque<Integer> charsLength = new LinkedList<>();
+        char[] arr = new char[1];
 
         for (int i = 0, j = 0; i < str.length(); i++) {
             char ch = str.charAt(i);
-            byte[] buf = String.valueOf(ch).getBytes(charset);
+            arr[0] = ch;
+            byte[] buf = charset.encode(CharBuffer.wrap(arr)).array();
 
             charsLength.add(buf.length);
 
