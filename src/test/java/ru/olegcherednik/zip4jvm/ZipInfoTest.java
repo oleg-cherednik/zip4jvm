@@ -31,8 +31,9 @@ public class ZipInfoTest {
 
     public void foo() throws IOException {
 //        ZipInfo.zip(zipDeflateSolidPkware).getShortInfo();
-        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/src.zip"))
+//        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/src.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/pkware.zip"))
+        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/ferdinand.zip"))
                .getShortInfo();
     }
 

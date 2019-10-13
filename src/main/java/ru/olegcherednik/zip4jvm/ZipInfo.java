@@ -5,6 +5,7 @@ import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.DiagnosticModel;
 import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
+import ru.olegcherednik.zip4jvm.view.Zip64View;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -35,16 +36,25 @@ public final class ZipInfo {
     public void getShortInfo() throws IOException {
 //        Function<Charset, Charset> charsetCustomizer = charset -> Charsets.UTF_8;//Charsets.SYSTEM_CHARSET;
         Function<Charset, Charset> charsetCustomizer = Charsets.SYSTEM_CHARSET;
+        Charset charset = charsetCustomizer.apply(Charsets.IBM437);
         DiagnosticModel diagnosticModel = new ZipModelReader(zip, charsetCustomizer).readDiagnostic();
 
 
-        EndCentralDirectoryView view = EndCentralDirectoryView.builder()
-                                                              .offs(diagnosticModel.getEndCentralDirectoryOffs())
-                                                              .size(diagnosticModel.getEndCentralDirectorySize())
-                                                              .charset(charsetCustomizer.apply(Charsets.IBM437))
-                                                              .endCentralDirectory(diagnosticModel.getEndCentralDirectory()).build();
+        EndCentralDirectoryView.builder()
+                               .offs(diagnosticModel.getEndCentralDirectoryOffs())
+                               .size(diagnosticModel.getEndCentralDirectorySize())
+                               .charset(charset)
+                               .endCentralDirectory(diagnosticModel.getEndCentralDirectory())
+                               .prefix("    ").build().print(System.out);
 
-        view.print(System.out);
+        System.out.println();
+
+        Zip64View.EndCentralDirectoryLocator.builder()
+                                            .offs(diagnosticModel.getZip64EndCentralDirectoryLocatorOffs())
+                                            .size(diagnosticModel.getZip64EndCentralDirectoryLocatorSize())
+                                            .charset(charset)
+                                            .locator(diagnosticModel.getZip64().getEndCentralDirectoryLocator())
+                                            .prefix("    ").build().print(System.out);
         int a = 0;
         a++;
     }

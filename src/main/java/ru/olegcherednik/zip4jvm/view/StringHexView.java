@@ -3,7 +3,6 @@ package ru.olegcherednik.zip4jvm.view;
 import lombok.Builder;
 
 import java.io.PrintStream;
-import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -18,30 +17,28 @@ public final class StringHexView {
 
     private final String str;
     private final Charset charset;
-    @Builder.Default
-    @SuppressWarnings("FieldMayBeStatic")
-    private final String prefix = "";
+    private final String prefix;
 
     public void print(PrintStream out) {
         if (str == null)
             return;
 
+        out.format("%s                                                %s\n", prefix, charset.name());
+
         Deque<Integer> hexs = new LinkedList<>();
         Deque<Character> chars = new LinkedList<>();
         Deque<Integer> charsLength = new LinkedList<>();
-        char[] arr = new char[1];
 
-        for (int i = 0, j = 0; i < str.length(); i++) {
+        for (int i = 0; i < str.length(); i++) {
             char ch = str.charAt(i);
-            arr[0] = ch;
-            byte[] buf = charset.encode(CharBuffer.wrap(arr)).array();
+            byte[] buf = String.valueOf(ch).getBytes(charset);
 
             charsLength.add(buf.length);
 
-            for (int k = 0; k < buf.length; k++) {
-                hexs.add((int)buf[k]);
+            for (int j = 0; j < buf.length; j++) {
+                hexs.add((int)buf[j]);
 
-                if (k == buf.length - 1)
+                if (j == buf.length - 1)
                     chars.add(Character.isISOControl(ch) ? '.' : ch);
             }
         }

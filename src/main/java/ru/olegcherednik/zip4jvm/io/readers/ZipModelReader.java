@@ -29,11 +29,14 @@ import java.util.function.Function;
  * @author Oleg Cherednik
  * @since 06.03.2019
  */
+@SuppressWarnings("FieldNamingConvention")
 @RequiredArgsConstructor
 public final class ZipModelReader {
 
     public static final String MARK_END_CENTRAL_DIRECTORY_OFFS = "endCentralDirectoryOffs";
     public static final String MARK_END_CENTRAL_DIRECTORY_END_OFFS = "endCentralDirectoryEndOffs";
+    public static final String MARK_ZIP64_END_CENTRAL_DIRECTORY_LOCATOR_OFFS = "zip64EndCentralDirectoryOffs";
+    public static final String MARK_ZIP64_END_CENTRAL_DIRECTORY_LOCATOR_END_OFFS = "zip64EndCentralDirectoryEndOffs";
 
     private final Path zip;
     private final Function<Charset, Charset> charsetCustomizer;
@@ -66,6 +69,9 @@ public final class ZipModelReader {
                                   .endCentralDirectorySize(
                                           in.getMark(MARK_END_CENTRAL_DIRECTORY_END_OFFS) - in.getMark(MARK_END_CENTRAL_DIRECTORY_OFFS))
                                   .zip64(zip64)
+                                  .zip64EndCentralDirectoryLocatorOffs(in.getMark(MARK_ZIP64_END_CENTRAL_DIRECTORY_LOCATOR_OFFS))
+                                  .zip64EndCentralDirectoryLocatorSize(in.getMark(MARK_ZIP64_END_CENTRAL_DIRECTORY_LOCATOR_END_OFFS) -
+                                          in.getMark(MARK_ZIP64_END_CENTRAL_DIRECTORY_LOCATOR_OFFS))
                                   .centralDirectory(centralDirectory).build();
         }
     }

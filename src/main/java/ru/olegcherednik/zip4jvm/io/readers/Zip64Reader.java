@@ -5,10 +5,13 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.Zip64;
-import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
+
+import static ru.olegcherednik.zip4jvm.io.readers.ZipModelReader.MARK_ZIP64_END_CENTRAL_DIRECTORY_LOCATOR_END_OFFS;
+import static ru.olegcherednik.zip4jvm.io.readers.ZipModelReader.MARK_ZIP64_END_CENTRAL_DIRECTORY_LOCATOR_OFFS;
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64;
 
 /**
  * @author Oleg Cherednik
@@ -34,7 +37,8 @@ final class Zip64Reader implements Reader<Zip64> {
             locator.setOffs(in.readQword());
             locator.setTotalDisks(in.readDword());
 
-            ValidationUtils.realBigZip64(locator.getOffs(), "Zip64.EndCentralDirectory");
+            in.mark(MARK_ZIP64_END_CENTRAL_DIRECTORY_LOCATOR_END_OFFS);
+            realBigZip64(locator.getOffs(), "Zip64.EndCentralDirectory");
 
             return locator;
         }
@@ -46,6 +50,7 @@ final class Zip64Reader implements Reader<Zip64> {
                 return false;
 
             in.seek(offs);
+            in.mark(MARK_ZIP64_END_CENTRAL_DIRECTORY_LOCATOR_OFFS);
             return in.readSignature() == Zip64.EndCentralDirectoryLocator.SIGNATURE;
         }
     }
@@ -71,8 +76,8 @@ final class Zip64Reader implements Reader<Zip64> {
             dir.setCentralDirectoryOffs(in.readQword());
             dir.setExtensibleDataSector(in.readBytes((int)endCentralDirectorySize - Zip64.EndCentralDirectory.SIZE));
 
-            ValidationUtils.realBigZip64(dir.getCentralDirectoryOffs(), "offsCentralDirectory");
-            ValidationUtils.realBigZip64(dir.getTotalEntries(), "totalEntries");
+            realBigZip64(dir.getCentralDirectoryOffs(), "offsCentralDirectory");
+            realBigZip64(dir.getTotalEntries(), "totalEntries");
 
             return dir;
         }

@@ -7,6 +7,7 @@ import lombok.Getter;
  * @author Oleg Cherednik
  * @since 12.10.2019
  */
+@SuppressWarnings("FieldNamingConvention")
 @Getter
 @Builder
 public final class DiagnosticModel {
@@ -16,4 +17,7 @@ public final class DiagnosticModel {
 
     private final long endCentralDirectoryOffs;
     private final long endCentralDirectorySize;
+
+    private final long zip64EndCentralDirectoryLocatorOffs;
+    private final long zip64EndCentralDirectoryLocatorSize;
 }

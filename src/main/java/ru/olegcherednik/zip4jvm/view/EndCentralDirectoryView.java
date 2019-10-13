@@ -6,6 +6,8 @@ import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 
 import java.io.PrintStream;
 import java.nio.charset.Charset;
+import java.util.Optional;
+import java.util.stream.IntStream;
 
 /**
  * @author Oleg Cherednik
@@ -14,20 +16,17 @@ import java.nio.charset.Charset;
 @Builder
 public class EndCentralDirectoryView {
 
+    private final EndCentralDirectory endCentralDirectory;
     private final long offs;
     private final long size;
-    private final EndCentralDirectory endCentralDirectory;
     private final Charset charset;
+    private final String prefix;
 
     public void print(PrintStream out) {
         String str = String.format("End central directory record %s: %d bytes", ViewUtils.signature(EndCentralDirectory.SIGNATURE), size);
         out.println(str);
 
-        String prefix = "    ";
-
-        // --------
-        for (int i = 0; i < str.length(); i++)
-            out.print('=');
+        IntStream.range(0, str.length()).forEach(i -> out.print('='));
 
         out.println();
         // TODO duplicate of ZipUtils.toString()
@@ -42,11 +41,10 @@ public class EndCentralDirectoryView {
                 prefix, endCentralDirectory.getCentralDirectorySize());
         out.format("%srelative offset of central dir:                 %2$d (0x%2$08X) bytes\n",
                 prefix, endCentralDirectory.getCentralDirectoryOffs());
+        out.format("%szipfile comment length:                         %d bytes\n",
+                prefix, Optional.ofNullable(endCentralDirectory.getComment()).orElse("").getBytes(charset).length);
 
         if (StringUtils.isNotEmpty(endCentralDirectory.getComment())) {
-            out.format("%szipfile comment length:                         %d bytes\n",
-                    prefix, endCentralDirectory.getComment().getBytes(charset).length);
-            out.format("%s                                                %s\n", prefix, charset.name());
             StringHexView.builder()
                          .str(endCentralDirectory.getComment())
                          .charset(charset)
