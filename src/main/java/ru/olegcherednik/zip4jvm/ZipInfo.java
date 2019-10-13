@@ -44,7 +44,7 @@ public final class ZipInfo {
                                .offs(diagnosticModel.getEndCentralDirectoryOffs())
                                .size(diagnosticModel.getEndCentralDirectorySize())
                                .charset(charset)
-                               .endCentralDirectory(diagnosticModel.getEndCentralDirectory())
+                               .dir(diagnosticModel.getEndCentralDirectory())
                                .prefix("    ").build().print(System.out);
 
         System.out.println();
@@ -55,6 +55,15 @@ public final class ZipInfo {
                                             .charset(charset)
                                             .locator(diagnosticModel.getZip64().getEndCentralDirectoryLocator())
                                             .prefix("    ").build().print(System.out);
+
+        System.out.println();
+
+        Zip64View.EndCentralDirectory.builder()
+                                     .offs(diagnosticModel.getZip64EndCentralDirectoryOffs())
+                                     .size(diagnosticModel.getZip64EndCentralDirectorySize())
+                                     .charset(charset)
+                                     .dir(diagnosticModel.getZip64().getEndCentralDirectory())
+                                     .prefix("    ").build().print(System.out);
         int a = 0;
         a++;
     }

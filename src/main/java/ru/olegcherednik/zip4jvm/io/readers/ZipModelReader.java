@@ -35,8 +35,10 @@ public final class ZipModelReader {
 
     public static final String MARK_END_CENTRAL_DIRECTORY_OFFS = "endCentralDirectoryOffs";
     public static final String MARK_END_CENTRAL_DIRECTORY_END_OFFS = "endCentralDirectoryEndOffs";
-    public static final String MARK_ZIP64_END_CENTRAL_DIRECTORY_LOCATOR_OFFS = "zip64EndCentralDirectoryOffs";
-    public static final String MARK_ZIP64_END_CENTRAL_DIRECTORY_LOCATOR_END_OFFS = "zip64EndCentralDirectoryEndOffs";
+    public static final String MARK_ZIP64_END_CENTRAL_DIRECTORY_LOCATOR_OFFS = "zip64EndCentralDirectoryLocatorOffs";
+    public static final String MARK_ZIP64_END_CENTRAL_DIRECTORY_LOCATOR_END_OFFS = "zip64EndCentralDirectoryLocatorEndOffs";
+    public static final String MARK_ZIP64_END_CENTRAL_DIRECTORY_OFFS = "zip64EndCentralDirectoryOffs";
+    public static final String MARK_ZIP64_END_CENTRAL_DIRECTORY_END_OFFS = "zip64EndCentralDirectoryEndOffs";
 
     private final Path zip;
     private final Function<Charset, Charset> charsetCustomizer;
@@ -68,10 +70,14 @@ public final class ZipModelReader {
                                   .endCentralDirectoryOffs(in.getMark(MARK_END_CENTRAL_DIRECTORY_OFFS))
                                   .endCentralDirectorySize(
                                           in.getMark(MARK_END_CENTRAL_DIRECTORY_END_OFFS) - in.getMark(MARK_END_CENTRAL_DIRECTORY_OFFS))
+
                                   .zip64(zip64)
                                   .zip64EndCentralDirectoryLocatorOffs(in.getMark(MARK_ZIP64_END_CENTRAL_DIRECTORY_LOCATOR_OFFS))
                                   .zip64EndCentralDirectoryLocatorSize(in.getMark(MARK_ZIP64_END_CENTRAL_DIRECTORY_LOCATOR_END_OFFS) -
                                           in.getMark(MARK_ZIP64_END_CENTRAL_DIRECTORY_LOCATOR_OFFS))
+                                  .zip64EndCentralDirectoryOffs(in.getMark(MARK_ZIP64_END_CENTRAL_DIRECTORY_OFFS))
+                                  .zip64EndCentralDirectorySize(in.getMark(MARK_ZIP64_END_CENTRAL_DIRECTORY_END_OFFS) -
+                                          in.getMark(MARK_ZIP64_END_CENTRAL_DIRECTORY_OFFS))
                                   .centralDirectory(centralDirectory).build();
         }
     }

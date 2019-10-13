@@ -20,4 +20,7 @@ public final class DiagnosticModel {
 
     private final long zip64EndCentralDirectoryLocatorOffs;
     private final long zip64EndCentralDirectoryLocatorSize;
+
+    private final long zip64EndCentralDirectoryOffs;
+    private final long zip64EndCentralDirectorySize;
 }

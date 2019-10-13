@@ -9,8 +9,10 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
 
+import static ru.olegcherednik.zip4jvm.io.readers.ZipModelReader.MARK_ZIP64_END_CENTRAL_DIRECTORY_END_OFFS;
 import static ru.olegcherednik.zip4jvm.io.readers.ZipModelReader.MARK_ZIP64_END_CENTRAL_DIRECTORY_LOCATOR_END_OFFS;
 import static ru.olegcherednik.zip4jvm.io.readers.ZipModelReader.MARK_ZIP64_END_CENTRAL_DIRECTORY_LOCATOR_OFFS;
+import static ru.olegcherednik.zip4jvm.io.readers.ZipModelReader.MARK_ZIP64_END_CENTRAL_DIRECTORY_OFFS;
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64;
 
 /**
@@ -76,6 +78,7 @@ final class Zip64Reader implements Reader<Zip64> {
             dir.setCentralDirectoryOffs(in.readQword());
             dir.setExtensibleDataSector(in.readBytes((int)endCentralDirectorySize - Zip64.EndCentralDirectory.SIZE));
 
+            in.mark(MARK_ZIP64_END_CENTRAL_DIRECTORY_END_OFFS);
             realBigZip64(dir.getCentralDirectoryOffs(), "offsCentralDirectory");
             realBigZip64(dir.getTotalEntries(), "totalEntries");
 
@@ -84,6 +87,8 @@ final class Zip64Reader implements Reader<Zip64> {
 
         private void findHead(DataInput in) throws IOException {
             in.seek(offs);
+
+            in.mark(MARK_ZIP64_END_CENTRAL_DIRECTORY_OFFS);
 
             if (in.readSignature() != Zip64.EndCentralDirectory.SIGNATURE)
                 throw new Zip4jvmException("invalid zip64 end of central directory");
