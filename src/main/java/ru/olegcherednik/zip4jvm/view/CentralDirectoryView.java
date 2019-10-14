@@ -34,6 +34,7 @@ public class CentralDirectoryView {
 
         out.println();
         out.format("%slocation of end-of-central-dir record:          %2$d (0x%2$08X) bytes\n", prefix, offs);
+        out.format("%stotal number of entries in central dir:         %d\n", prefix, centralDirectory.getFileHeaders().size());
 
         out.println();
 

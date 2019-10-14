@@ -1,10 +1,12 @@
 package ru.olegcherednik.zip4jvm.view;
 
 import lombok.Builder;
+import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 
 import java.io.PrintStream;
 import java.nio.charset.Charset;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
@@ -30,14 +32,19 @@ public class FileHeaderView {
         IntStream.range(0, str.length()).forEach(i -> out.print('='));
 
         out.println();
+        out.format("%sfilename (%s):                               %s\n", prefix, charset.name(), fileHeader.getFileName());
         out.format("%slocation of central-directory-record:           %2$d (0x%2$08X) bytes\n", prefix, offs);
-        out.format("%spart number of this part (%04d):                %d\n", prefix, fileHeader.getDisk(), fileHeader.getDisk() + 1);
+        out.format("%spart number of this part (%04X):                %d\n", prefix, fileHeader.getDisk(), fileHeader.getDisk() + 1);
         out.format("%srelative offset of local header:                %2$d (0x%2$08X) bytes\n", prefix, fileHeader.getLocalFileHeaderOffs());
+        out.format(Locale.US, "%sversion made by zip software (%02d):              %.1f\n",
+                prefix, fileHeader.getVersionMadeBy(), (double)fileHeader.getVersionMadeBy() / 10);
+        out.format(Locale.US, "%sunzip software version needed to extract (%02d):  %.1f\n",
+                prefix, fileHeader.getVersionToExtract(), (double)fileHeader.getVersionToExtract() / 10);
 
-//        version made by operating system (00):          MS-DOS, OS/2, NT FAT
-//        version made by zip software (20):              2.0
-//        operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
-//        unzip software version needed to extract (20):  2.0
+        GeneralPurposeFlagView.builder()
+                              .generalPurposeFlag(fileHeader.getGeneralPurposeFlag())
+                              .prefix(prefix).build().print(out);
+
 //        general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
 //        file security status  (bit 0):                encrypted
 //        extended local header (bit 3):                yes
@@ -59,7 +66,14 @@ public class FileHeaderView {
 //        external file attributes:                       0x00000020
 //        non-MSDOS external file attributes:           0x000000
 //        MS-DOS file attributes (0x20):                arc
-        out.format("%sfilename (%s): %s\n", prefix, charset.name(), fileHeader.getFileName());
+
+
+        if (StringUtils.isNotEmpty(fileHeader.getComment())) {
+            StringHexView.builder()
+                         .str(fileHeader.getComment())
+                         .charset(charset)
+                         .prefix(prefix).build().print(out);
+        }
 
         int a = 0;
         a++;

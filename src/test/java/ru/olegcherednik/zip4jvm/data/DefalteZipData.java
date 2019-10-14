@@ -66,6 +66,7 @@ public final class DefalteZipData {
                                                          .encryption(Encryption.PKWARE, password).build();
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettingsProvider(fileName -> entrySettings)
+                                          // TODO temporary
                                           .comment("abcабвгдеёжзийклмнопрстуфхцчшщъыьэюя").build();
 //                                          .comment("password: " + passwordStr).build();
 

@@ -31,7 +31,7 @@ public final class Zip64Builder {
         Zip64.EndCentralDirectory endCentralDirectory = new Zip64.EndCentralDirectory();
         endCentralDirectory.setEndCentralDirectorySize(getEndCentralDirectorySize());
         endCentralDirectory.setVersionMadeBy(CentralDirectory.FileHeader.VERSION);
-        endCentralDirectory.setVersionNeededToExtract(CentralDirectory.FileHeader.VERSION);
+        endCentralDirectory.setVersionToExtract(CentralDirectory.FileHeader.VERSION);
         endCentralDirectory.setTotalDisks(zipModel.getTotalDisks());
         endCentralDirectory.setMainDisk(zipModel.getMainDisk());
         endCentralDirectory.setDiskEntries(countNumberOfFileHeaderEntriesOnDisk());

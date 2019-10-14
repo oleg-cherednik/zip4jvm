@@ -68,7 +68,7 @@ public final class Zip64 {
         // size:2 - version made by
         private int versionMadeBy;
         // size:2 - version needed to extractEntries
-        private int versionNeededToExtract;
+        private int versionToExtract;
         // size:4 - number of this disk
         private long totalDisks;
         // size:4 - number of the disk with the start of the central directory

@@ -31,8 +31,8 @@ public class EndCentralDirectoryView {
         out.println();
         // TODO duplicate of ZipUtils.toString()
         out.format("%slocation of end-of-central-dir record:          %2$d (0x%2$08X) bytes\n", prefix, offs);
-        out.format("%spart number of this part (%04d):                %d\n", prefix, dir.getTotalDisks(), dir.getTotalDisks() + 1);
-        out.format("%spart number of start of central dir (%04d):     %d\n", prefix, dir.getMainDisk(), dir.getMainDisk() + 1);
+        out.format("%spart number of this part (%04X):                %d\n", prefix, dir.getTotalDisks(), dir.getTotalDisks() + 1);
+        out.format("%spart number of start of central dir (%04X):     %d\n", prefix, dir.getMainDisk(), dir.getMainDisk() + 1);
         out.format("%snumber of entries in central dir in this part:  %d\n", prefix, dir.getDiskEntries());
         out.format("%stotal number of entries in central dir:         %d\n", prefix, dir.getTotalEntries());
         out.format("%ssize of central dir:                            %2$d (0x%2$08X) bytes\n", prefix, dir.getCentralDirectorySize());
@@ -47,7 +47,5 @@ public class EndCentralDirectoryView {
                          .prefix(prefix).build().print(out);
         }
     }
-
-
 }
 
