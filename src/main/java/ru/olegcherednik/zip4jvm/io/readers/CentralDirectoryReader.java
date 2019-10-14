@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.function.Function;
 
+import static ru.olegcherednik.zip4jvm.io.readers.ZipModelReader.MARK_CENTRAL_DIRECTORY_END_OFFS;
+import static ru.olegcherednik.zip4jvm.io.readers.ZipModelReader.MARK_CENTRAL_DIRECTORY_OFFS;
+
 /**
  * @author Oleg Cherednik
  * @since 05.03.2019
@@ -27,10 +30,14 @@ final class CentralDirectoryReader implements Reader<CentralDirectory> {
         CentralDirectory centralDirectory = new CentralDirectory();
         centralDirectory.setFileHeaders(new FileHeaderReader(totalEntries, charsetCustomizer).read(in));
         centralDirectory.setDigitalSignature(new DigitalSignatureReader().read(in));
+
+        in.mark(MARK_CENTRAL_DIRECTORY_END_OFFS);
+
         return centralDirectory;
     }
 
     private void findHead(DataInput in) throws IOException {
         in.seek(offs);
+        in.mark(MARK_CENTRAL_DIRECTORY_OFFS);
     }
 }

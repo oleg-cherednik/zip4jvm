@@ -3,6 +3,8 @@ package ru.olegcherednik.zip4jvm.model;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.Map;
+
 /**
  * @author Oleg Cherednik
  * @since 12.10.2019
@@ -23,4 +25,10 @@ public final class DiagnosticModel {
 
     private final long zip64EndCentralDirectoryOffs;
     private final long zip64EndCentralDirectorySize;
+
+    private final long centralDirectoryOffs;
+    private final long centralDirectorySize;
+
+    private final Map<String, Long> fileHeaderOffs;
+    private final Map<String, Long> fileHeaderSize;
 }

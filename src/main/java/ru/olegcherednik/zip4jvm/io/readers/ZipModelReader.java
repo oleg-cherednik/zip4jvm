@@ -13,6 +13,8 @@ import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -39,6 +41,10 @@ public final class ZipModelReader {
     public static final String MARK_ZIP64_END_CENTRAL_DIRECTORY_LOCATOR_END_OFFS = "zip64EndCentralDirectoryLocatorEndOffs";
     public static final String MARK_ZIP64_END_CENTRAL_DIRECTORY_OFFS = "zip64EndCentralDirectoryOffs";
     public static final String MARK_ZIP64_END_CENTRAL_DIRECTORY_END_OFFS = "zip64EndCentralDirectoryEndOffs";
+    public static final String MARK_CENTRAL_DIRECTORY_OFFS = "centralDirectoryOffs";
+    public static final String MARK_CENTRAL_DIRECTORY_END_OFFS = "centralDirectoryEndOffs";
+    public static final String MARK_FILE_HEADER_OFFS = "fileHeaderOffs";
+    public static final String MARK_FILE_HEADER_END_OFFS = "fileHeaderEndOffs";
 
     private final Path zip;
     private final Function<Charset, Charset> charsetCustomizer;
@@ -65,6 +71,15 @@ public final class ZipModelReader {
             long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
             CentralDirectory centralDirectory = new CentralDirectoryReader(offs, totalEntries, charsetCustomizer).read(in);
 
+            Map<String, Long> fileHeaderOffs = new HashMap<>();
+            Map<String, Long> fileHeaderSize = new HashMap<>();
+
+            for (CentralDirectory.FileHeader fileHeader : centralDirectory.getFileHeaders()) {
+                fileHeaderOffs.put(fileHeader.getFileName(), in.getMark(MARK_FILE_HEADER_OFFS + '_' + fileHeader.getFileName()));
+                fileHeaderSize.put(fileHeader.getFileName(), in.getMark(MARK_FILE_HEADER_END_OFFS + '_' + fileHeader.getFileName()) -
+                        in.getMark(MARK_FILE_HEADER_OFFS + '_' + fileHeader.getFileName()));
+            }
+
             return DiagnosticModel.builder()
                                   .endCentralDirectory(endCentralDirectory)
                                   .endCentralDirectoryOffs(in.getMark(MARK_END_CENTRAL_DIRECTORY_OFFS))
@@ -72,12 +87,21 @@ public final class ZipModelReader {
                                           in.getMark(MARK_END_CENTRAL_DIRECTORY_END_OFFS) - in.getMark(MARK_END_CENTRAL_DIRECTORY_OFFS))
 
                                   .zip64(zip64)
-                                  .zip64EndCentralDirectoryLocatorOffs(in.getMark(MARK_ZIP64_END_CENTRAL_DIRECTORY_LOCATOR_OFFS))
-                                  .zip64EndCentralDirectoryLocatorSize(in.getMark(MARK_ZIP64_END_CENTRAL_DIRECTORY_LOCATOR_END_OFFS) -
-                                          in.getMark(MARK_ZIP64_END_CENTRAL_DIRECTORY_LOCATOR_OFFS))
-                                  .zip64EndCentralDirectoryOffs(in.getMark(MARK_ZIP64_END_CENTRAL_DIRECTORY_OFFS))
-                                  .zip64EndCentralDirectorySize(in.getMark(MARK_ZIP64_END_CENTRAL_DIRECTORY_END_OFFS) -
+                                  .zip64EndCentralDirectoryLocatorOffs(
+                                          zip64 == Zip64.NULL ? 0 : in.getMark(MARK_ZIP64_END_CENTRAL_DIRECTORY_LOCATOR_OFFS))
+                                  .zip64EndCentralDirectoryLocatorSize(
+                                          zip64 == Zip64.NULL ? 0 : in.getMark(MARK_ZIP64_END_CENTRAL_DIRECTORY_LOCATOR_END_OFFS) -
+                                                  in.getMark(MARK_ZIP64_END_CENTRAL_DIRECTORY_LOCATOR_OFFS))
+                                  .zip64EndCentralDirectoryOffs(zip64 == Zip64.NULL ? 0 : in.getMark(MARK_ZIP64_END_CENTRAL_DIRECTORY_OFFS))
+                                  .zip64EndCentralDirectorySize(zip64 == Zip64.NULL ? 0 : in.getMark(MARK_ZIP64_END_CENTRAL_DIRECTORY_END_OFFS) -
                                           in.getMark(MARK_ZIP64_END_CENTRAL_DIRECTORY_OFFS))
+
+                                  .fileHeaderOffs(fileHeaderOffs)
+                                  .fileHeaderSize(fileHeaderSize)
+
+                                  .centralDirectory(centralDirectory)
+                                  .centralDirectoryOffs(in.getMark(MARK_CENTRAL_DIRECTORY_OFFS))
+                                  .centralDirectorySize(in.getMark(MARK_CENTRAL_DIRECTORY_END_OFFS) - in.getMark(MARK_CENTRAL_DIRECTORY_OFFS))
                                   .centralDirectory(centralDirectory).build();
         }
     }

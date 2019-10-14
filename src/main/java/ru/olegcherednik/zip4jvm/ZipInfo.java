@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.DiagnosticModel;
+import ru.olegcherednik.zip4jvm.view.CentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.Zip64View;
 
@@ -34,8 +35,8 @@ public final class ZipInfo {
     }
 
     public void getShortInfo() throws IOException {
-//        Function<Charset, Charset> charsetCustomizer = charset -> Charsets.UTF_8;//Charsets.SYSTEM_CHARSET;
-        Function<Charset, Charset> charsetCustomizer = Charsets.SYSTEM_CHARSET;
+        Function<Charset, Charset> charsetCustomizer = charset -> Charsets.UTF_8;//Charsets.SYSTEM_CHARSET;
+//        Function<Charset, Charset> charsetCustomizer = Charsets.SYSTEM_CHARSET;
         Charset charset = charsetCustomizer.apply(Charsets.IBM437);
         DiagnosticModel diagnosticModel = new ZipModelReader(zip, charsetCustomizer).readDiagnostic();
 
@@ -64,6 +65,18 @@ public final class ZipInfo {
                                      .charset(charset)
                                      .dir(diagnosticModel.getZip64().getEndCentralDirectory())
                                      .prefix("    ").build().print(System.out);
+
+        System.out.println();
+
+        CentralDirectoryView.builder()
+                            .offs(diagnosticModel.getCentralDirectoryOffs())
+                            .size(diagnosticModel.getCentralDirectorySize())
+                            .fileHeaderOffs(diagnosticModel.getFileHeaderOffs())
+                            .fileHeaderSize(diagnosticModel.getFileHeaderSize())
+                            .centralDirectory(diagnosticModel.getCentralDirectory())
+                            .charset(charset)
+                            .prefix("    ")
+                            .build().print(System.out);
         int a = 0;
         a++;
     }
