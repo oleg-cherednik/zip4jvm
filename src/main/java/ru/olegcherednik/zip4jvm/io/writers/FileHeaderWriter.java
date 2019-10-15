@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.io.writers;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import java.io.IOException;
@@ -28,12 +29,13 @@ final class FileHeaderWriter implements Writer {
         Charset charset = fileHeader.getGeneralPurposeFlag().getCharset();
         byte[] fileName = fileHeader.getFileName(charset);
         byte[] fileComment = fileHeader.getComment(charset);
+        CompressionMethod compressionMethod = fileHeader.getCompressionMethod();
 
         out.writeDwordSignature(CentralDirectory.FileHeader.SIGNATURE);
         out.writeWord(fileHeader.getVersionMadeBy());
         out.writeWord(fileHeader.getVersionToExtract());
-        out.writeWord(fileHeader.getGeneralPurposeFlag().getAsInt());
-        out.writeWord(fileHeader.getCompressionMethod().getCode());
+        out.writeWord(fileHeader.getGeneralPurposeFlag().getAsInt(compressionMethod));
+        out.writeWord(compressionMethod.getCode());
         out.writeDword(fileHeader.getLastModifiedTime());
         out.writeDword(fileHeader.getCrc32());
         out.writeDword(fileHeader.getCompressedSize());
