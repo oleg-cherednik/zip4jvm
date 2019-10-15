@@ -158,9 +158,9 @@ public abstract class ExternalFileAttributes {
                 readOnly = isReadOnly(data);
                 hidden = BitUtils.isBitSet(data[0], BIT1);
                 system = BitUtils.isBitSet(data[0], BIT2);
-                laboratory = BitUtils.isBitSet(data[0], BIT4);
-                archive = BitUtils.isBitSet(data[0], BIT5);
+                laboratory = BitUtils.isBitSet(data[0], BIT3);
                 directory = isDirectory(data);
+                archive = BitUtils.isBitSet(data[0], BIT5);
             }
 // TODO this is not correct vor a view but it should be applied when unzip
 //            else if (Posix.isValid(data)) {
@@ -187,9 +187,9 @@ public abstract class ExternalFileAttributes {
             data[0] = BitUtils.updateBits((byte)0x0, BIT0, readOnly);
             data[0] = BitUtils.updateBits(data[0], BIT1, hidden);
             data[0] = BitUtils.updateBits(data[0], BIT2, system);
-            data[0] = BitUtils.updateBits(data[0], BIT4, laboratory);
+            data[0] = BitUtils.updateBits(data[0], BIT3, laboratory);
+            data[0] = BitUtils.updateBits(data[0], BIT4, directory);
             data[0] = BitUtils.updateBits(data[0], BIT5, archive);
-            data[0] = BitUtils.updateBits(data[0], BIT6, directory);
 
             return data;
         }
@@ -204,8 +204,6 @@ public abstract class ExternalFileAttributes {
                 attributes.add("hid");
             if (system)
                 attributes.add("sys");
-//            if (BitUtils.isBitSet(data, BIT3))
-//                attributes.add("arc");
             if (laboratory)
                 attributes.add("lab");
             if (directory)
@@ -230,7 +228,7 @@ public abstract class ExternalFileAttributes {
         }
 
         private static boolean isDirectory(byte[] data) {
-            return BitUtils.isBitSet(data[0], BIT6);
+            return BitUtils.isBitSet(data[0], BIT4);
         }
     }
 
