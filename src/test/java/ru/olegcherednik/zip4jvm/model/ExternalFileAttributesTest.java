@@ -99,22 +99,22 @@ public class ExternalFileAttributesTest {
 
         when(dos.isReadOnly()).thenReturn(true);
         externalFileAttributes.readFrom(path);
-        assertThat(externalFileAttributes.get()[0] & 0xFF).isEqualTo(BIT0);
+        assertThat(externalFileAttributes.getData()[0] & 0xFF).isEqualTo(BIT0);
         reset(dos);
 
         when(dos.isHidden()).thenReturn(true);
         externalFileAttributes.readFrom(path);
-        assertThat(externalFileAttributes.get()[0] & 0xFF).isEqualTo(BIT1);
+        assertThat(externalFileAttributes.getData()[0] & 0xFF).isEqualTo(BIT1);
         reset(dos);
 
         when(dos.isSystem()).thenReturn(true);
         externalFileAttributes.readFrom(path);
-        assertThat(externalFileAttributes.get()[0] & 0xFF).isEqualTo(BIT2);
+        assertThat(externalFileAttributes.getData()[0] & 0xFF).isEqualTo(BIT2);
         reset(dos);
 
         when(dos.isArchive()).thenReturn(true);
         externalFileAttributes.readFrom(path);
-        assertThat(externalFileAttributes.get()[0] & 0xFF).isEqualTo(BIT5);
+        assertThat(externalFileAttributes.getData()[0] & 0xFF).isEqualTo(BIT5);
         reset(dos);
     }
 
@@ -136,57 +136,57 @@ public class ExternalFileAttributesTest {
 
         when(attributes.permissions()).thenReturn(Collections.singleton(OTHERS_EXECUTE));
         externalFileAttributes.readFrom(path);
-        assertThat(externalFileAttributes.get()[2] & 0xFF).isEqualTo(BIT0);
+        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(BIT0);
         reset(attributes);
 
         when(attributes.permissions()).thenReturn(Collections.singleton(OTHERS_WRITE));
         externalFileAttributes.readFrom(path);
-        assertThat(externalFileAttributes.get()[2] & 0xFF).isEqualTo(BIT1);
+        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(BIT1);
         reset(attributes);
 
         when(attributes.permissions()).thenReturn(Collections.singleton(OTHERS_READ));
         externalFileAttributes.readFrom(path);
-        assertThat(externalFileAttributes.get()[2] & 0xFF).isEqualTo(BIT2);
+        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(BIT2);
         reset(attributes);
 
         when(attributes.permissions()).thenReturn(Collections.singleton(GROUP_EXECUTE));
         externalFileAttributes.readFrom(path);
-        assertThat(externalFileAttributes.get()[2] & 0xFF).isEqualTo(BIT3);
+        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(BIT3);
         reset(attributes);
 
         when(attributes.permissions()).thenReturn(Collections.singleton(GROUP_WRITE));
         externalFileAttributes.readFrom(path);
-        assertThat(externalFileAttributes.get()[2] & 0xFF).isEqualTo(BIT4);
+        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(BIT4);
         reset(attributes);
 
         when(attributes.permissions()).thenReturn(Collections.singleton(GROUP_READ));
         externalFileAttributes.readFrom(path);
-        assertThat(externalFileAttributes.get()[2] & 0xFF).isEqualTo(BIT5);
+        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(BIT5);
         reset(attributes);
 
         when(attributes.permissions()).thenReturn(Collections.singleton(OWNER_EXECUTE));
         externalFileAttributes.readFrom(path);
-        assertThat(externalFileAttributes.get()[2] & 0xFF).isEqualTo(BIT6);
+        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(BIT6);
         reset(attributes);
 
         when(attributes.permissions()).thenReturn(Collections.singleton(OWNER_WRITE));
         externalFileAttributes.readFrom(path);
-        assertThat(externalFileAttributes.get()[2] & 0xFF).isEqualTo(BIT7);
+        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(BIT7);
         reset(attributes);
 
         when(attributes.permissions()).thenReturn(Collections.singleton(OWNER_READ));
         externalFileAttributes.readFrom(path);
-        assertThat(externalFileAttributes.get()[3] & 0xFF).isEqualTo(BIT0);
+        assertThat(externalFileAttributes.getData()[3] & 0xFF).isEqualTo(BIT0);
         reset(attributes);
 
         when(basicFileAttributes.isDirectory()).thenReturn(true);
         externalFileAttributes.readFrom(path);
-        assertThat(externalFileAttributes.get()[3] & 0xFF).isEqualTo(BIT6);
+        assertThat(externalFileAttributes.getData()[3] & 0xFF).isEqualTo(BIT6);
         reset(basicFileAttributes);
 
         when(basicFileAttributes.isRegularFile()).thenReturn(true);
         externalFileAttributes.readFrom(path);
-        assertThat(externalFileAttributes.get()[3] & 0xFF).isEqualTo(BIT7);
+        assertThat(externalFileAttributes.getData()[3] & 0xFF).isEqualTo(BIT7);
         reset(basicFileAttributes);
     }
 
@@ -239,13 +239,13 @@ public class ExternalFileAttributesTest {
     public void shouldIgnoreReadFromByteArrayFromWhenNullObject() {
         ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.NULL;
         externalFileAttributes.readFrom(new byte[] { 0xA, 0xA, 0xA, 0xA });
-        assertThat(externalFileAttributes.get()).isEqualTo(new byte[] { 0x0, 0x0, 0x0, 0x0 });
+        assertThat(externalFileAttributes.getData()).isEqualTo(new byte[] { 0x0, 0x0, 0x0, 0x0 });
     }
 
     public void shouldIgnoreReadFromPathNullObject() throws IOException {
         ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.NULL;
         externalFileAttributes.readFrom(fileBentley);
-        assertThat(externalFileAttributes.get()).isEqualTo(new byte[] { 0x0, 0x0, 0x0, 0x0 });
+        assertThat(externalFileAttributes.getData()).isEqualTo(new byte[] { 0x0, 0x0, 0x0, 0x0 });
     }
 
     public void shouldIgnoreApplyPathWhenNullObject() throws IOException {
@@ -259,11 +259,11 @@ public class ExternalFileAttributesTest {
 
         for (int b0 : Arrays.asList(BIT0, BIT1, BIT2, BIT5)) {
             externalFileAttributes.readFrom(new byte[] { (byte)b0, 0x0, 0x0, 0x0 });
-            assertThat(externalFileAttributes.get()[0] & 0xFF).isEqualTo(b0);
+            assertThat(externalFileAttributes.getData()[0] & 0xFF).isEqualTo(b0);
         }
 
         externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, (byte)BitUtils.clearBits(0xFF, BIT1 | BIT4 | BIT7), 0x0 });
-        assertThat(externalFileAttributes.get()[0] & 0xFF).isEqualTo(BIT0 | BIT5);
+        assertThat(externalFileAttributes.getData()[0] & 0xFF).isEqualTo(BIT0 | BIT5);
     }
 
     public void shouldReadFromByteArrayWenPosix() {
@@ -271,36 +271,36 @@ public class ExternalFileAttributesTest {
 
         for (int b2 : Arrays.asList(BIT0, BIT1, BIT2, BIT3, BIT4, BIT5, BIT6, BIT7)) {
             externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, (byte)b2, 0x0 });
-            assertThat(externalFileAttributes.get()[2] & 0xFF).isEqualTo(b2);
-            assertThat(externalFileAttributes.get()[3] & 0xFF).isEqualTo(0x0);
+            assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(b2);
+            assertThat(externalFileAttributes.getData()[3] & 0xFF).isEqualTo(0x0);
         }
 
         externalFileAttributes.readFrom(new byte[] { BIT0, 0x0, 0x0, 0x0 });
-        assertThat(externalFileAttributes.get()[2] & 0xFF).isEqualTo(BIT2 | BIT5);
-        assertThat(externalFileAttributes.get()[3] & 0xFF).isEqualTo(BIT0 | BIT7);
+        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(BIT2 | BIT5);
+        assertThat(externalFileAttributes.getData()[3] & 0xFF).isEqualTo(BIT0 | BIT7);
 
         externalFileAttributes.readFrom(new byte[] { (byte)BitUtils.clearBits(0xFF, BIT0), 0x0, 0x0, 0x0 });
-        assertThat(externalFileAttributes.get()[2] & 0xFF).isEqualTo(BIT2 | BIT5 | BIT7);
-        assertThat(externalFileAttributes.get()[3] & 0xFF).isEqualTo(BIT0 | BIT7);
+        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(BIT2 | BIT5 | BIT7);
+        assertThat(externalFileAttributes.getData()[3] & 0xFF).isEqualTo(BIT0 | BIT7);
 
         externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, 0x0, BIT6 });
-        assertThat(externalFileAttributes.get()[2] & 0xFF).isEqualTo(0x0);
-        assertThat(externalFileAttributes.get()[3] & 0xFF).isEqualTo(BIT6);
+        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(0x0);
+        assertThat(externalFileAttributes.getData()[3] & 0xFF).isEqualTo(BIT6);
 
         externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, 0x0, (byte)BIT7 });
-        assertThat(externalFileAttributes.get()[2] & 0xFF).isEqualTo(0x0);
-        assertThat(externalFileAttributes.get()[3] & 0xFF).isEqualTo(BIT7);
+        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(0x0);
+        assertThat(externalFileAttributes.getData()[3] & 0xFF).isEqualTo(BIT7);
     }
 
     public void shouldRestoreDefaultWhenReadFromEmptyByteArray() {
         ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.build(() -> WIN);
         externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, 0x0, 0x0 });
-        assertThat(externalFileAttributes.get()[0] & 0xFF).isEqualTo(BIT5);
+        assertThat(externalFileAttributes.getData()[0] & 0xFF).isEqualTo(BIT5);
 
         externalFileAttributes = ExternalFileAttributes.build(() -> MAC);
         externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, 0x0, 0x0 });
-        assertThat(externalFileAttributes.get()[2] & 0xFF).isEqualTo(BIT2 | BIT5 | BIT7);
-        assertThat(externalFileAttributes.get()[3] & 0xFF).isEqualTo(BIT0 | BIT7);
+        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(BIT2 | BIT5 | BIT7);
+        assertThat(externalFileAttributes.getData()[3] & 0xFF).isEqualTo(BIT0 | BIT7);
     }
 
     public void shouldApplyPathWhenWindows() throws IOException {
