@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
+ * see 4.4.5
+ *
  * @author Oleg Cherednik
  * @since 09.03.2019
  */
@@ -17,16 +19,17 @@ public enum CompressionMethod {
 //    FILE_RED_COMP_FACTOR_2(3),
 //    FILE_RED_COMP_FACTOR_3(4),
 //    FILE_RED_COMP_FACTOR_4(5),
-//    FILE_IMPLODED(6),
+    FILE_IMPLODED(6),
     DEFLATE(8),
-    //    FILE_ENHANCED_DEFLATED(9),
-//    PKWARE_DATA_COMP_LIB_IMPL(10),
-//    BZIP2(12),
-//    LZMA(14),
-//    IBM_TERSE(18),
+    FILE_ENHANCED_DEFLATED(9),
+    //    PKWARE_DATA_COMP_LIB_IMPL(10),
+    BZIP2(12),
+    LZMA(14),
+    //    IBM_TERSE(18),
 //    IBM_LZ77(19),
-//    WAVPACK(97),
-//    PPMD(98),
+//    96 - JPEG variant
+    WAVPACK(97),
+    PPMD(98),
     AES(99);
 
     private final int code;

@@ -45,10 +45,6 @@ public class FileHeaderView {
                               .generalPurposeFlag(fileHeader.getGeneralPurposeFlag())
                               .prefix(prefix).build().print(out);
 
-//        general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
-//        file security status  (bit 0):                encrypted
-//        extended local header (bit 3):                yes
-//        UTF-8 names          (bit 11):                yes
 //        compression method (08):                        deflated
 //        compression sub-type (deflation):             normal
 //        file last modified on (0x00004f3c 0x00005ae0):  2019-09-28 11:23:00
@@ -78,4 +74,37 @@ public class FileHeaderView {
         int a = 0;
         a++;
     }
+
+/*
+compression method (01):                        shrunk
+compression method (02):                        reduced (factor 1)
+compression method (03):                        reduced (factor 2)
+compression method (04):                        reduced (factor 3)
+compression method (05):                        reduced (factor 4)
+
+compression method (06):                        imploded
+  size of sliding dictionary (implosion):       4K
+  number of Shannon-Fano trees (implosion):     2
+  size of sliding dictionary (implosion):       8K
+  number of Shannon-Fano trees (implosion):     3
+
+compression method (08):                        deflated
+
+compression method (09):                        deflated (enhanced)
+  compression sub-type (deflation):             normal
+  compression sub-type (deflation):             maximum
+  compression sub-type (deflation):             superfast
+  compression sub-type (deflation):             fast
+
+compression method (12):                        bzip2 algorithm
+
+compression method (14):                        lzma encoding
+  end-of-stream (EOS) marker:                   no
+  end-of-stream (EOS) marker:                   yes
+
+compression method (96):                        jpeg compression
+compression method (97):                        wavpack compression
+compression method (98):                        ppmd encoding
+compression method (99):                        AES encryption
+ */
 }

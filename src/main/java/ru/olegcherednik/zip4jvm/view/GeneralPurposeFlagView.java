@@ -32,17 +32,6 @@ public class GeneralPurposeFlagView {
             out.format("%s  strong encryption     (bit 6):                %b\n", prefix, generalPurposeFlag.isStrongEncryption());
         if (generalPurposeFlag.isUtf8())
             out.format("%s  UTF-8 names          (bit 11):                %b\n", prefix, generalPurposeFlag.isUtf8());
-        /*
-        file security status  (bit 0):                not encrypted
-file security status  (bit 0):                encrypted
-
-extended local header (bit 3):                no
-extended local header (bit 3):                yes
-
-UTF-8 names          (bit 11):                yes
-
-strong encryption     (bit 6):                yes
-         */
     }
 
 }
