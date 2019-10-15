@@ -27,13 +27,12 @@ public class CentralDirectory {
     public static class FileHeader {
 
         public static final int SIGNATURE = 0x02014B50;
-        public static final int VERSION = 20;
 
         // size:4 - signature (0x02014b50)
         // size:2 - version made by
-        private int versionMadeBy = VERSION;
+        private Version versionMadeBy = Version.NULL;
         // size:2 - version needed to extractEntries
-        private int versionToExtract = VERSION;
+        private Version versionToExtract = Version.NULL;
         // size:2 - general purpose bit flag
         private GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         // size:2 - compression method

@@ -1,7 +1,6 @@
 package ru.olegcherednik.zip4jvm.model.builders;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
@@ -23,7 +22,7 @@ public final class LocalFileHeaderBuilder {
 
     public LocalFileHeader build() {
         LocalFileHeader localFileHeader = new LocalFileHeader();
-        localFileHeader.setVersionToExtract(CentralDirectory.FileHeader.VERSION);
+        localFileHeader.setVersionToExtract(20);
         localFileHeader.setGeneralPurposeFlag(createGeneralPurposeFlag());
         localFileHeader.setCompressionMethod(zipEntry.getEncryption().getCompressionMethod().apply(zipEntry.getCompression()));
         localFileHeader.setLastModifiedTime(zipEntry.getLastModifiedTime());

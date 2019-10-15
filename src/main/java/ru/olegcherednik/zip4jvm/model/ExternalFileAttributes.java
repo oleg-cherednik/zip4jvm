@@ -354,10 +354,28 @@ public abstract class ExternalFileAttributes {
 
         @Override
         public String getDetails() {
-            return String.valueOf(directory ? 'd' : '-') +
-                    (ownerRead ? 'r' : '-') + (ownerWrite ? 'w' : '-') + (ownerExecute ? 'x' : '-') +
-                    (groupRead ? 'r' : '-') + (groupWrite ? 'w' : '-') + (groupExecute ? 'x' : '-') +
-                    (othersRead ? 'r' : '-') + (othersWrite ? 'w' : '-') + (othersExecute ? 'x' : '-');
+            StringBuilder buf = new StringBuilder();
+
+            if (directory)
+                buf.append('d');
+            else if (regularFile)
+                buf.append('-');
+            else
+                buf.append('?');
+
+            buf.append(ownerRead ? 'r' : '-');
+            buf.append(ownerWrite ? 'w' : '-');
+            buf.append(ownerExecute ? 'x' : '-');
+
+            buf.append(groupRead ? 'r' : '-');
+            buf.append(groupWrite ? 'w' : '-');
+            buf.append(groupExecute ? 'x' : '-');
+
+            buf.append(othersRead ? 'r' : '-');
+            buf.append(othersWrite ? 'w' : '-');
+            buf.append(othersExecute ? 'x' : '-');
+
+            return buf.toString();
         }
 
         @Override

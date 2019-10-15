@@ -7,6 +7,7 @@ import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
+import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
@@ -52,8 +53,8 @@ final class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader>
     private CentralDirectory.FileHeader readFileHeader(DataInput in) throws IOException {
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
-        fileHeader.setVersionMadeBy(in.readWord());
-        fileHeader.setVersionToExtract(in.readWord());
+        fileHeader.setVersionMadeBy(getVersion(in.readWord()));
+        fileHeader.setVersionToExtract(getVersion(in.readWord()));
         fileHeader.setGeneralPurposeFlagData(in.readWord());
         fileHeader.setCompressionMethod(CompressionMethod.parseCode(in.readWord()));
         fileHeader.setLastModifiedTime((int)in.readDword());
@@ -85,6 +86,10 @@ final class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader>
     @SuppressWarnings("MethodCanBeVariableArityMethod")
     private static ExternalFileAttributes getExternalFileAttribute(byte[] data) throws IOException {
         return ExternalFileAttributes.build(PROP_OS_NAME).readFrom(data);
+    }
+
+    private static Version getVersion(int data) {
+        return new Version(Version.FileSystem.parseCode(data >> 8), data & 0xFF);
     }
 
 }

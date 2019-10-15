@@ -46,8 +46,8 @@ public class FileHeaderTest {
         assertThat(extraField).isNotSameAs(ExtraField.NULL);
 
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
-        fileHeader.setVersionMadeBy(1);
-        fileHeader.setVersionToExtract(2);
+        fileHeader.setVersionMadeBy(new Version(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));
+        fileHeader.setVersionToExtract(new Version(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));
         fileHeader.setGeneralPurposeFlag(generalPurposeFlag);
         fileHeader.setCompressionMethod(CompressionMethod.AES);
         fileHeader.setLastModifiedTime(3);

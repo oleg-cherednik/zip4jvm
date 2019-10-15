@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import java.io.IOException;
@@ -32,8 +33,8 @@ final class FileHeaderWriter implements Writer {
         CompressionMethod compressionMethod = fileHeader.getCompressionMethod();
 
         out.writeDwordSignature(CentralDirectory.FileHeader.SIGNATURE);
-        out.writeWord(fileHeader.getVersionMadeBy());
-        out.writeWord(fileHeader.getVersionToExtract());
+        out.writeWord(getCode(fileHeader.getVersionMadeBy()));
+        out.writeWord(getCode(fileHeader.getVersionToExtract()));
         out.writeWord(fileHeader.getGeneralPurposeFlag().getAsInt(compressionMethod));
         out.writeWord(compressionMethod.getCode());
         out.writeDword(fileHeader.getLastModifiedTime());
@@ -50,5 +51,9 @@ final class FileHeaderWriter implements Writer {
         out.writeBytes(fileName);
         new ExtraFieldWriter(fileHeader.getExtraField()).write(out);
         out.writeBytes(fileComment);
+    }
+
+    private static int getCode(Version version) {
+        return version.getFileSystem().getCode() << 8 | version.getZipSpecificationVersion() & 0xFF;
     }
 }

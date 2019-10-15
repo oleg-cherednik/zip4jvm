@@ -2,10 +2,10 @@ package ru.olegcherednik.zip4jvm.view;
 
 import lombok.Builder;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+import ru.olegcherednik.zip4jvm.model.Version;
 
 import java.io.PrintStream;
 import java.nio.charset.Charset;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
@@ -24,6 +24,11 @@ public class FileHeaderView {
     private final String prefix;
 
     public void print(PrintStream out) {
+        Version.FileSystem fileSystemMadeBy = fileHeader.getVersionMadeBy().getFileSystem();
+        int zipVersionMadeBy = fileHeader.getVersionMadeBy().getZipSpecificationVersion();
+        Version.FileSystem fileSystemToExtract = fileHeader.getVersionToExtract().getFileSystem();
+        int zipVersionToExtract = fileHeader.getVersionToExtract().getZipSpecificationVersion();
+
         String str = String.format("Central directory entry %s #%d: %d bytes",
                 ViewUtils.signature(CentralDirectory.FileHeader.SIGNATURE), pos + 1, size);
         out.println(str);
@@ -35,10 +40,10 @@ public class FileHeaderView {
         out.format("%slocation of central-directory-record:           %2$d (0x%2$08X) bytes\n", prefix, offs);
         out.format("%spart number of this part (%04X):                %d\n", prefix, fileHeader.getDisk(), fileHeader.getDisk() + 1);
         out.format("%srelative offset of local header:                %2$d (0x%2$08X) bytes\n", prefix, fileHeader.getLocalFileHeaderOffs());
-        out.format(Locale.US, "%sversion made by zip software (%02d):              %.1f\n",
-                prefix, fileHeader.getVersionMadeBy(), (double)fileHeader.getVersionMadeBy() / 10);
-        out.format(Locale.US, "%sunzip software version needed to extract (%02d):  %.1f\n",
-                prefix, fileHeader.getVersionToExtract(), (double)fileHeader.getVersionToExtract() / 10);
+        out.format("%sversion made by operating system (%02d):          %s\n", prefix, fileSystemMadeBy.getCode(), fileSystemMadeBy.getTitle());
+        out.format("%sversion made by zip software (%02d):              %s\n", prefix, zipVersionMadeBy, zipVersionMadeBy / 10.);
+        out.format("%soperat. system version needed to extract (%02d):  %s\n", prefix, fileSystemToExtract.getCode(), fileSystemToExtract.getTitle());
+        out.format("%sunzip software version needed to extract (%02d):  %s\n", prefix, zipVersionToExtract, zipVersionToExtract / 10.);
 
         GeneralPurposeFlagView.builder()
                               .generalPurposeFlag(fileHeader.getGeneralPurposeFlag())
@@ -76,16 +81,6 @@ public class FileHeaderView {
         ExternalFileAttributesView.builder()
                                   .externalFileAttributes(fileHeader.getExternalFileAttributes())
                                   .prefix(prefix).build().print(out);
-
-        //        internal file attributes:                       0x0000
-//        apparent file type:                           binary
-//        external file attributes:                       0x00000020
-//        non-MSDOS external file attributes:           0x000000
-//        MS-DOS file attributes (0x20):                arc
-
-
-        int a = 0;
-        a++;
     }
 
 }
