@@ -54,7 +54,7 @@ public class CentralDirectory {
         // size:2 - disk number start
         private int disk;
         // size:2 - internal file attributes
-        private InternalFileAttributes internalFileAttributes = InternalFileAttributes.NULL;
+        private final InternalFileAttributes internalFileAttributes = new InternalFileAttributes();
         // size:4 - external file attributes
         private ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.NULL;
         // size:4 - relative offset of local header
@@ -82,6 +82,10 @@ public class CentralDirectory {
 
         public boolean isZip64() {
             return extraField.getExtendedInfo() != Zip64.ExtendedInfo.NULL;
+        }
+
+        public void setInternalFileAttributes(InternalFileAttributes internalFileAttributes) {
+            this.internalFileAttributes.readFrom(internalFileAttributes);
         }
 
         public void setExtraField(ExtraField extraField) {

@@ -44,7 +44,7 @@ final class FileHeaderWriter implements Writer {
         out.writeWord(fileHeader.getExtraField().getSize());
         out.writeWord(fileComment.length);
         out.writeWord(fileHeader.getDisk());
-        out.writeBytes(fileHeader.getInternalFileAttributes().get());
+        out.writeBytes(fileHeader.getInternalFileAttributes().getData());
         out.writeBytes(fileHeader.getExternalFileAttributes().getData());
         out.writeDword(fileHeader.getLocalFileHeaderOffs());
         out.writeBytes(fileName);

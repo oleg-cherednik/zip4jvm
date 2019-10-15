@@ -70,10 +70,12 @@ public class FileHeaderView {
                      .charset(charset)
                      .prefix(prefix).build().print(out);
 
+        InternalFileAttributesView.builder()
+                                  .internalFileAttributes(fileHeader.getInternalFileAttributes())
+                                  .prefix(prefix).build().print(out);
         ExternalFileAttributesView.builder()
                                   .externalFileAttributes(fileHeader.getExternalFileAttributes())
-                                  .prefix(prefix)
-                                  .build().print(out);
+                                  .prefix(prefix).build().print(out);
 
         //        internal file attributes:                       0x0000
 //        apparent file type:                           binary

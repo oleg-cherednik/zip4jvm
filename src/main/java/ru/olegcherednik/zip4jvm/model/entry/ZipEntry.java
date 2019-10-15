@@ -91,7 +91,7 @@ public abstract class ZipEntry {
     }
 
     public InternalFileAttributes getInternalFileAttributes() throws IOException {
-        return InternalFileAttributes.NULL;
+        return new InternalFileAttributes();
     }
 
     public long getChecksum() {
