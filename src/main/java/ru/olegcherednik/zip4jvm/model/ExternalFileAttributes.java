@@ -104,6 +104,7 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]> {
         private boolean hidden;
         private boolean system;
         private boolean archive;
+        private final byte[] data = new byte[SIZE];
 
         public static boolean isValid(byte[] data) {
             return data[0] != 0;
@@ -133,6 +134,8 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]> {
 
         @Override
         public Windows readFrom(byte[] data) {
+            System.arraycopy(data, 0, this.data, 0, SIZE);
+
             defaults();
 
             if (isValid(data)) {
@@ -158,10 +161,15 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]> {
         @Override
         public byte[] get() {
             byte[] data = new byte[SIZE];
+
             data[0] = BitUtils.updateBits(data[0], BIT0, readOnly);
             data[0] = BitUtils.updateBits(data[0], BIT1, hidden);
             data[0] = BitUtils.updateBits(data[0], BIT2, system);
             data[0] = BitUtils.updateBits(data[0], BIT5, archive);
+
+            data[1] = this.data[1];
+            data[2] = this.data[2];
+            data[3] = this.data[3];
             return data;
         }
 
@@ -188,6 +196,7 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]> {
         private boolean ownerRead;
         private boolean directory;
         private boolean regularFile;
+        private final byte[] data = new byte[SIZE];
 
         public static boolean isValid(byte[] data) {
             return data[2] != 0 || data[3] != 0;
@@ -233,6 +242,7 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]> {
 
         @Override
         public Posix readFrom(byte[] data) {
+            System.arraycopy(data, 0, this.data, 0, SIZE);
             defaults();
 
             if (isValid(data)) {
@@ -271,6 +281,9 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]> {
         @Override
         public byte[] get() {
             byte[] data = new byte[SIZE];
+            data[0] = this.data[0];
+            data[1] = this.data[1];
+
             data[2] = BitUtils.updateBits(data[2], BIT0, othersExecute);
             data[2] = BitUtils.updateBits(data[2], BIT1, othersWrite);
             data[2] = BitUtils.updateBits(data[2], BIT2, othersRead);

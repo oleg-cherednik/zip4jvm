@@ -1,7 +1,6 @@
 package ru.olegcherednik.zip4jvm.view;
 
 import lombok.Builder;
-import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 
 import java.io.PrintStream;
@@ -66,19 +65,22 @@ public class FileHeaderView {
 //        length of extra field:                          0 bytes
         out.format("%slength of file comment:                         %d bytes\n",
                 prefix, Optional.ofNullable(fileHeader.getComment()).orElse("").getBytes(charset).length);
-//        internal file attributes:                       0x0000
+        StringHexView.builder()
+                     .str(fileHeader.getComment())
+                     .charset(charset)
+                     .prefix(prefix).build().print(out);
+
+        ExternalFileAttributesView.builder()
+                                  .externalFileAttributes(fileHeader.getExternalFileAttributes())
+                                  .prefix(prefix)
+                                  .build().print(out);
+
+        //        internal file attributes:                       0x0000
 //        apparent file type:                           binary
 //        external file attributes:                       0x00000020
 //        non-MSDOS external file attributes:           0x000000
 //        MS-DOS file attributes (0x20):                arc
 
-
-        if (StringUtils.isNotEmpty(fileHeader.getComment())) {
-            StringHexView.builder()
-                         .str(fileHeader.getComment())
-                         .charset(charset)
-                         .prefix(prefix).build().print(out);
-        }
 
         int a = 0;
         a++;
