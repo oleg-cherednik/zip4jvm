@@ -138,7 +138,7 @@ public abstract class ExternalFileAttributes {
 
         @Override
         public Windows readFrom(Path path) throws IOException {
-            defaults();
+//            defaults();
             DosFileAttributes dos = Files.getFileAttributeView(path, DosFileAttributeView.class).readAttributes();
             readOnly = dos.isReadOnly();
             hidden = dos.isHidden();
@@ -152,7 +152,7 @@ public abstract class ExternalFileAttributes {
         public Windows readFrom(byte[] data) {
             System.arraycopy(data, 0, this.data, 0, SIZE);
 
-            defaults();
+//            defaults();
 
             if (isValid(data)) {
                 readOnly = isReadOnly(data);
@@ -161,10 +161,12 @@ public abstract class ExternalFileAttributes {
                 laboratory = BitUtils.isBitSet(data[0], BIT4);
                 archive = BitUtils.isBitSet(data[0], BIT5);
                 directory = isDirectory(data);
-            } else if (Posix.isValid(data)) {
-                readOnly = Posix.isReadOnly(data);
-                directory = Posix.isDirectory(data);
             }
+// TODO this is not correct vor a view but it should be applied when unzip
+//            else if (Posix.isValid(data)) {
+//                readOnly = Posix.isReadOnly(data);
+//                directory = Posix.isDirectory(data);
+//            }
 
             return this;
         }
@@ -252,7 +254,7 @@ public abstract class ExternalFileAttributes {
         }
 
         private Posix() {
-            defaults();
+//            defaults();
         }
 
         private void defaults() {
@@ -271,7 +273,7 @@ public abstract class ExternalFileAttributes {
 
         @Override
         public Posix readFrom(Path path) throws IOException {
-            defaults();
+//            defaults();
             Set<PosixFilePermission> permissions = Files.getFileAttributeView(path, PosixFileAttributeView.class).readAttributes().permissions();
 
             othersExecute = permissions.contains(OTHERS_EXECUTE);
@@ -292,7 +294,7 @@ public abstract class ExternalFileAttributes {
         @Override
         public Posix readFrom(byte[] data) {
             System.arraycopy(data, 0, this.data, 0, SIZE);
-            defaults();
+//            defaults();
 
             if (isValid(data)) {
                 othersExecute = BitUtils.isBitSet(data[2], BIT0);
@@ -306,11 +308,14 @@ public abstract class ExternalFileAttributes {
                 ownerRead = BitUtils.isBitSet(data[3], BIT0);
                 directory = isDirectory(data);
                 regularFile = BitUtils.isBitSet(data[3], BIT7);
-            } else if (Windows.isValid(data)) {
-                ownerWrite = !Windows.isReadOnly(data);
-                directory = Windows.isDirectory(data);
-                regularFile = !Windows.isDirectory(data);
             }
+
+// TODO this is not correct vor a view but it should be applied when unzip
+//            else if (Windows.isValid(data)) {
+//                ownerWrite = !Windows.isReadOnly(data);
+//                directory = Windows.isDirectory(data);
+//                regularFile = !Windows.isDirectory(data);
+//            }
 
             return this;
         }
@@ -351,7 +356,10 @@ public abstract class ExternalFileAttributes {
 
         @Override
         public String getDetails() {
-            return "---";
+            return String.valueOf(directory ? 'd' : '-') +
+                    (ownerRead ? 'r' : '-') + (ownerWrite ? 'w' : '-') + (ownerExecute ? 'x' : '-') +
+                    (groupRead ? 'r' : '-') + (groupWrite ? 'w' : '-') + (groupExecute ? 'x' : '-') +
+                    (othersRead ? 'r' : '-') + (othersWrite ? 'w' : '-') + (othersExecute ? 'x' : '-');
         }
 
         @Override
