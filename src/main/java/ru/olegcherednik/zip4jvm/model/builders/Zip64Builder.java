@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.model.builders;
 
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
@@ -29,9 +30,8 @@ public final class Zip64Builder {
     private Zip64.EndCentralDirectory createEndCentralDirectory() {
         Zip64.EndCentralDirectory endCentralDirectory = new Zip64.EndCentralDirectory();
         endCentralDirectory.setEndCentralDirectorySize(getEndCentralDirectorySize());
-        // TODO should be Version here
-        endCentralDirectory.setVersionMadeBy(20);
-        endCentralDirectory.setVersionToExtract(20);
+        endCentralDirectory.setVersionMadeBy(new Version(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));
+        endCentralDirectory.setVersionToExtract(new Version(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));
         endCentralDirectory.setTotalDisks(zipModel.getTotalDisks());
         endCentralDirectory.setMainDisk(zipModel.getMainDisk());
         endCentralDirectory.setDiskEntries(countNumberOfFileHeaderEntriesOnDisk());

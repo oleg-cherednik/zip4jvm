@@ -66,9 +66,9 @@ public final class Zip64 {
         // size:8 - directory record (n)
         private long endCentralDirectorySize;
         // size:2 - version made by
-        private int versionMadeBy;
+        private Version versionMadeBy = Version.NULL;
         // size:2 - version needed to extractEntries
-        private int versionToExtract;
+        private Version versionToExtract = Version.NULL;
         // size:4 - number of this disk
         private long totalDisks;
         // size:4 - number of the disk with the start of the central directory

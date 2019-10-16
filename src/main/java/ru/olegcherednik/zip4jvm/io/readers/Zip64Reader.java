@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
+import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
@@ -68,8 +69,8 @@ final class Zip64Reader implements Reader<Zip64> {
             Zip64.EndCentralDirectory dir = new Zip64.EndCentralDirectory();
             long endCentralDirectorySize = in.readQword();
             dir.setEndCentralDirectorySize(endCentralDirectorySize);
-            dir.setVersionMadeBy(in.readWord());
-            dir.setVersionToExtract(in.readWord());
+            dir.setVersionMadeBy(Version.build(in.readWord()));
+            dir.setVersionToExtract(Version.build(in.readWord()));
             dir.setTotalDisks(in.readDword());
             dir.setMainDisk(in.readDword());
             dir.setDiskEntries(in.readQword());
@@ -92,6 +93,10 @@ final class Zip64Reader implements Reader<Zip64> {
 
             if (in.readSignature() != Zip64.EndCentralDirectory.SIGNATURE)
                 throw new Zip4jvmException("invalid zip64 end of central directory");
+        }
+
+        private static Version getVersion(int data) {
+            return new Version(Version.FileSystem.parseCode(data >> 8), data & 0xFF);
         }
     }
 

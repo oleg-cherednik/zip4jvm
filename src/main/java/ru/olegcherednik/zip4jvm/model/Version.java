@@ -17,6 +17,14 @@ public final class Version {
     private final FileSystem fileSystem;
     private final int zipSpecificationVersion;
 
+    public static Version build(int data) {
+        return new Version(Version.FileSystem.parseCode(data >> 8), data & 0xFF);
+    }
+
+    public int getData() {
+        return fileSystem.getCode() << 8 | zipSpecificationVersion & 0xFF;
+    }
+
     @Override
     public String toString() {
         return fileSystem.title + " / " + zipSpecificationVersion / 10.;
