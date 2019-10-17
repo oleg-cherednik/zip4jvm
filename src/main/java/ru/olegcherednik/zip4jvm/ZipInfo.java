@@ -73,12 +73,11 @@ public final class ZipInfo {
                             .size(diagnosticModel.getCentralDirectorySize())
                             .fileHeaderOffs(diagnosticModel.getFileHeaderOffs())
                             .fileHeaderSize(diagnosticModel.getFileHeaderSize())
+                            .fileHeaderExternalFieldOffs(diagnosticModel.getFileHeaderExtraFieldOffs())
+                            .fileHeaderExternalFieldOffs(diagnosticModel.getFileHeaderExtraFieldOffs())
                             .centralDirectory(diagnosticModel.getCentralDirectory())
                             .charset(charset)
-                            .prefix("    ")
-                            .build().print(System.out);
-        int a = 0;
-        a++;
+                            .prefix("    ").build().print(System.out);
     }
 
 }

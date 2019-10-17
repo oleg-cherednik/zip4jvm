@@ -45,6 +45,7 @@ public final class ZipModelReader {
     public static final String MARK_CENTRAL_DIRECTORY_END_OFFS = "centralDirectoryEndOffs";
     public static final String MARK_FILE_HEADER_OFFS = "fileHeaderOffs";
     public static final String MARK_FILE_HEADER_END_OFFS = "fileHeaderEndOffs";
+    public static final String MARK_EXTRA_FIELD_OFFS = "extraFieldOffs";
 
     private final Path zip;
     private final Function<Charset, Charset> charsetCustomizer;
@@ -73,11 +74,18 @@ public final class ZipModelReader {
 
             Map<String, Long> fileHeaderOffs = new HashMap<>();
             Map<String, Long> fileHeaderSize = new HashMap<>();
+            Map<String, Long> fileHeaderExtraFieldOffs = new HashMap<>();
+
+            int i = 0;
 
             for (CentralDirectory.FileHeader fileHeader : centralDirectory.getFileHeaders()) {
-                fileHeaderOffs.put(fileHeader.getFileName(), in.getMark(MARK_FILE_HEADER_OFFS + '_' + fileHeader.getFileName()));
-                fileHeaderSize.put(fileHeader.getFileName(), in.getMark(MARK_FILE_HEADER_END_OFFS + '_' + fileHeader.getFileName()) -
-                        in.getMark(MARK_FILE_HEADER_OFFS + '_' + fileHeader.getFileName()));
+                fileHeaderOffs.put(fileHeader.getFileName(), in.getMark(MARK_FILE_HEADER_OFFS + '_' + i));
+                fileHeaderSize.put(fileHeader.getFileName(), in.getMark(MARK_FILE_HEADER_END_OFFS + '_' + i) -
+                        in.getMark(MARK_FILE_HEADER_OFFS + '_' + i));
+
+                fileHeaderExtraFieldOffs.put(fileHeader.getFileName(), in.getMark(MARK_EXTRA_FIELD_OFFS + '_' + fileHeader.getFileName()));
+
+                i++;
             }
 
             return DiagnosticModel.builder()
@@ -98,6 +106,8 @@ public final class ZipModelReader {
 
                                   .fileHeaderOffs(fileHeaderOffs)
                                   .fileHeaderSize(fileHeaderSize)
+
+                                  .fileHeaderExtraFieldOffs(fileHeaderExtraFieldOffs)
 
                                   .centralDirectory(centralDirectory)
                                   .centralDirectoryOffs(in.getMark(MARK_CENTRAL_DIRECTORY_OFFS))

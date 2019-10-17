@@ -8,6 +8,7 @@ import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
+import ru.olegcherednik.zip4jvm.utils.time.DosTimestampConverter;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -125,7 +126,7 @@ public final class UnzipEngine implements ZipFile.Reader {
 
     private static void setFileLastModifiedTime(Path path, ZipEntry zipEntry) {
         try {
-            long lastModifiedTime = ZipUtils.dosToJavaTime(zipEntry.getLastModifiedTime());
+            long lastModifiedTime = DosTimestampConverter.dosToJavaTime(zipEntry.getLastModifiedTime());
             Files.setLastModifiedTime(path, FileTime.fromMillis(lastModifiedTime));
         } catch(IOException ignored) {
         }

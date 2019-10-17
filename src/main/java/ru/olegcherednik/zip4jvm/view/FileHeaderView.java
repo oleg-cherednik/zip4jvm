@@ -17,6 +17,7 @@ public class FileHeaderView {
 
     private final long offs;
     private final long size;
+    private final long extraFieldOffs;
     private final long pos;
     private final CentralDirectory.FileHeader fileHeader;
     private final Charset charset;
@@ -62,7 +63,6 @@ public class FileHeaderView {
                      .charset(charset)
                      .prefix(prefix).build().print(out);
 
-//        length of extra field:                          0 bytes
         out.format("%slength of file comment:                         %d bytes\n",
                 prefix, Optional.ofNullable(fileHeader.getComment()).orElse("").getBytes(charset).length);
         StringHexView.builder()
@@ -76,6 +76,12 @@ public class FileHeaderView {
         ExternalFileAttributesView.builder()
                                   .externalFileAttributes(fileHeader.getExternalFileAttributes())
                                   .prefix(prefix).build().print(out);
+        ExtendedFieldView.builder()
+                         .offs(extraFieldOffs)
+                         .extraField(fileHeader.getExtraField())
+                         .generalPurposeFlag(fileHeader.getGeneralPurposeFlag())
+                         .prefix(prefix).build().print(out);
+
     }
 
 }

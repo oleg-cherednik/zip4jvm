@@ -13,7 +13,7 @@ import java.util.Optional;
  * @since 13.10.2019
  */
 @Builder
-public final class StringHexView {
+final class StringHexView {
 
     private final String str;
     private final Charset charset;

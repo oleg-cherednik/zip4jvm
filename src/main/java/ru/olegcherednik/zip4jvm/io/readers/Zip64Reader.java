@@ -95,14 +95,12 @@ final class Zip64Reader implements Reader<Zip64> {
                 throw new Zip4jvmException("invalid zip64 end of central directory");
         }
 
-        private static Version getVersion(int data) {
-            return new Version(Version.FileSystem.parseCode(data >> 8), data & 0xFF);
-        }
     }
 
     @RequiredArgsConstructor
     static final class ExtendedInfo implements Reader<Zip64.ExtendedInfo> {
 
+        private final int size;
         private final boolean uncompressedSizeExists;
         private final boolean compressedSizeExists;
         private final boolean offsLocalHeaderRelativeExists;
@@ -110,16 +108,14 @@ final class Zip64Reader implements Reader<Zip64> {
 
         @Override
         public Zip64.ExtendedInfo read(DataInput in) throws IOException {
-            long offs1 = in.getOffs();
-            int size = in.readWord();
-            long offs2 = in.getOffs();
+            long offs = in.getOffs();
 
             Zip64.ExtendedInfo extendedInfo = readExtendedInfo(in);
 
-            if (in.getOffs() - offs2 != size) {
-                // section exists, but not need to read it; all data in FileHeader
+            if (in.getOffs() - offs != size) {
+                // section exists, but not need to read it; all data is in FileHeader
                 extendedInfo = Zip64.ExtendedInfo.NULL;
-                in.seek(offs1);
+                in.seek(offs + size);
             }
 
             return extendedInfo;
@@ -136,6 +132,11 @@ final class Zip64Reader implements Reader<Zip64> {
                                      .compressedSize(compressedSize)
                                      .localFileHeaderOffs(offsLocalHeaderRelative)
                                      .disk(disk).build();
+        }
+
+        @Override
+        public String toString() {
+            return "ZIP64";
         }
 
     }

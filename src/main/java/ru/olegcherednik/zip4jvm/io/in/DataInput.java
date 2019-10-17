@@ -38,8 +38,6 @@ public interface DataInput extends Closeable {
 
     void mark(String id);
 
-    void mark(String id, long offs);
-
     long getMark(String id);
 
     void seek(String id) throws IOException;

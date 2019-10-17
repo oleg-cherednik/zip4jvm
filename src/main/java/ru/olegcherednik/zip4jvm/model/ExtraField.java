@@ -4,14 +4,15 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author Oleg Cherednik
@@ -76,11 +77,15 @@ public final class ExtraField {
 
             @Getter
             private final int signature;
-            private final byte[] data;
+            private final byte[] blockData;
+
+            public byte[] getBlockData() {
+                return ArrayUtils.clone(blockData);
+            }
 
             @Override
             public int getBlockSize() {
-                return data.length;
+                return blockData.length;
             }
 
             @Override
@@ -90,9 +95,7 @@ public final class ExtraField {
 
             @Override
             public void write(DataOutput out) throws IOException {
-                out.writeWordSignature(signature);
-                out.writeWord(data.length);
-                out.write(data, 0, data.length);
+                out.write(blockData, 0, blockData.length);
             }
         }
 
@@ -101,7 +104,7 @@ public final class ExtraField {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class Builder {
 
-        private final Map<Integer, Record> map = new HashMap<>();
+        private final Map<Integer, Record> map = new TreeMap<>();
 
         public ExtraField build() {
             return map.isEmpty() ? NULL : new ExtraField(this);

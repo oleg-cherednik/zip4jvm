@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.model;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
  * @since 16.10.2019
  */
 @Getter
+@EqualsAndHashCode(doNotUseGetters = true)
 @RequiredArgsConstructor
 public final class Version {
 

@@ -31,4 +31,6 @@ public final class DiagnosticModel {
 
     private final Map<String, Long> fileHeaderOffs;
     private final Map<String, Long> fileHeaderSize;
+
+    private final Map<String, Long> fileHeaderExtraFieldOffs;
 }

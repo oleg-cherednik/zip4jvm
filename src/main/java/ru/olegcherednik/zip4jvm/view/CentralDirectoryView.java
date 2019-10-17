@@ -19,6 +19,7 @@ public class CentralDirectoryView {
     private final long size;
     private final Map<String, Long> fileHeaderOffs;
     private final Map<String, Long> fileHeaderSize;
+    private final Map<String, Long> fileHeaderExternalFieldOffs;
     private final CentralDirectory centralDirectory;
     private final Charset charset;
     private final String prefix;
@@ -44,6 +45,7 @@ public class CentralDirectoryView {
             FileHeaderView.builder()
                           .offs(fileHeaderOffs.get(fileHeader.getFileName()))
                           .size(fileHeaderSize.get(fileHeader.getFileName()))
+                          .extraFieldOffs(fileHeaderExternalFieldOffs.getOrDefault(fileHeader.getFileName(), -1L))
                           .pos(pos++)
                           .fileHeader(fileHeader)
                           .charset(charset)

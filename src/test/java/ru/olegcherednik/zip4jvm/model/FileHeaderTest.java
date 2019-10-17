@@ -45,9 +45,16 @@ public class FileHeaderTest {
         assertThat(externalFileAttributes).isNotSameAs(ExternalFileAttributes.NULL);
         assertThat(extraField).isNotSameAs(ExtraField.NULL);
 
+        Version versionMadeBy = new Version(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20);
+        Version versionToExtract = new Version(Version.FileSystem.Z_SYSTEM, 15);
+
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
-        fileHeader.setVersionMadeBy(new Version(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));
-        fileHeader.setVersionToExtract(new Version(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));
+
+        assertThat(fileHeader.getVersionMadeBy()).isSameAs(Version.NULL);
+        assertThat(fileHeader.getVersionToExtract()).isSameAs(Version.NULL);
+
+        fileHeader.setVersionMadeBy(versionMadeBy);
+        fileHeader.setVersionToExtract(versionToExtract);
         fileHeader.setGeneralPurposeFlag(generalPurposeFlag);
         fileHeader.setCompressionMethod(CompressionMethod.AES);
         fileHeader.setLastModifiedTime(3);
@@ -62,8 +69,8 @@ public class FileHeaderTest {
         fileHeader.setFileName("fileName");
         fileHeader.setExtraField(extraField);
 
-        assertThat(fileHeader.getVersionMadeBy()).isEqualTo(1);
-        assertThat(fileHeader.getVersionToExtract()).isEqualTo(2);
+        assertThat(fileHeader.getVersionMadeBy()).isSameAs(versionMadeBy);
+        assertThat(fileHeader.getVersionToExtract()).isSameAs(versionToExtract);
         assertThat(fileHeader.getGeneralPurposeFlag()).isSameAs(generalPurposeFlag);
         assertThat(fileHeader.getCompressionMethod()).isSameAs(CompressionMethod.AES);
         assertThat(fileHeader.getLastModifiedTime()).isEqualTo(3);

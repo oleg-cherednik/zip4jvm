@@ -37,20 +37,19 @@ final class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader>
         for (int i = 0; i < totalEntries; i++) {
             long offs = in.getOffs();
 
+            in.mark(MARK_FILE_HEADER_OFFS + '_' + i);
+
             if (in.readSignature() != CentralDirectory.FileHeader.SIGNATURE)
                 throw new Zip4jvmException("Expected central directory entry not found offs=" + offs);
 
-            CentralDirectory.FileHeader fileHeader = readFileHeader(in);
-            fileHeaders.add(fileHeader);
-
-            in.mark(MARK_FILE_HEADER_OFFS + '_' + fileHeader.getFileName(), offs);
-            in.mark(MARK_FILE_HEADER_END_OFFS + '_' + fileHeader.getFileName());
+            fileHeaders.add(readFileHeader(in, i));
+            in.mark(MARK_FILE_HEADER_END_OFFS + '_' + i);
         }
 
         return fileHeaders;
     }
 
-    private CentralDirectory.FileHeader readFileHeader(DataInput in) throws IOException {
+    private CentralDirectory.FileHeader readFileHeader(DataInput in, int i) throws IOException {
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
         fileHeader.setVersionMadeBy(Version.build(in.readWord()));
