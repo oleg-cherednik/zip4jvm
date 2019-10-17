@@ -6,7 +6,7 @@ import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
-import ru.olegcherednik.zip4jvm.model.NTFSTimestampExtraField;
+import ru.olegcherednik.zip4jvm.model.NtfsTimestampExtraField;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 
 import java.io.PrintStream;
@@ -34,8 +34,8 @@ public class ExtendedFieldView {
         for (ExtraField.Record record : extraField.getRecords()) {
             if (record.isNull())
                 continue;
-            if (record instanceof NTFSTimestampExtraField)
-                print((NTFSTimestampExtraField)record, out);
+            if (record instanceof NtfsTimestampExtraField)
+                print((NtfsTimestampExtraField)record, out);
             else if (record instanceof Zip64.ExtendedInfo)
                 print((Zip64.ExtendedInfo)record, out);
             else if (record instanceof AesExtraDataRecord)
@@ -47,12 +47,12 @@ public class ExtendedFieldView {
         }
     }
 
-    private void print(NTFSTimestampExtraField record, PrintStream out) {
+    private void print(NtfsTimestampExtraField record, PrintStream out) {
         out.format("%s(0x%04X) NTFS Timestamps:                       %d bytes\n", prefix, record.getSignature(), record.getBlockSize());
         out.format("%s  - location:                                   %2$d (0x%2$08X) bytes\n", prefix, 0);
-        out.format("%s  Creation Date:                                %2$tY-%2$tm-%2$td %2$tH:%2$tM:%2$tS\n", prefix, record.getCreationDate());
-        out.format("%s  Last Modified Date:                           %2$tY-%2$tm-%2$td %2$tH:%2$tM:%2$tS\n", prefix, record.getLastModifiedDate());
-        out.format("%s  Last Accessed Date:                           %2$tY-%2$tm-%2$td %2$tH:%2$tM:%2$tS\n", prefix, record.getLastAccessedDate());
+        out.format("%s  Creation Date:                                %2$tY-%2$tm-%2$td %2$tH:%2$tM:%2$tS\n", prefix, record.getCreationTime());
+        out.format("%s  Last Modified Date:                           %2$tY-%2$tm-%2$td %2$tH:%2$tM:%2$tS\n", prefix, record.getLastModificationTime());
+        out.format("%s  Last Accessed Date:                           %2$tY-%2$tm-%2$td %2$tH:%2$tM:%2$tS\n", prefix, record.getLastAccessTime());
     }
 
     private void print(Zip64.ExtendedInfo record, PrintStream out) {

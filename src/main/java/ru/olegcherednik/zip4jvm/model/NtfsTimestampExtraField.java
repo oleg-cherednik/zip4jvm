@@ -15,20 +15,33 @@ import java.io.IOException;
  */
 @Getter
 @Builder
-@SuppressWarnings("NewClassNamingConvention")
-public final class NTFSTimestampExtraField implements ExtraField.Record {
+public final class NtfsTimestampExtraField implements ExtraField.Record {
 
-    public static final NTFSTimestampExtraField NULL = builder().build();
+    public static final NtfsTimestampExtraField NULL = builder().build();
 
     public static final int SIGNATURE = 0x0000A;
     public static final int SIZE_FIELD = 2 + 2; // 4 bytes: signature + size
     public static final int TAG_ONE = 0x0001;
 
+    // size:2 - tag for this "extra" block type (NTFS = 0x000A)
+    // size:2 - size of total "extra" block
+    // size:4 - reserved for future use
+
+    // size:2 - attribute tag value #i
+    // size:2 - size of attribute #i (n)
+    // size:n - attribute tag #i data
+
     private final int dataSize;
+
     // TAG_ONE
-    private final long creationDate;
-    private final long lastModifiedDate;
-    private final long lastAccessedDate;
+    // size:2 - attribute tag value #1 (0x0001)
+    // size:2 - size of attribute #i (24)
+    // size:8 - file last modification time
+    private final long lastModificationTime;
+    // size:8 - file last access time
+    private final long lastAccessTime;
+    // size:8 - file creation time
+    private final long creationTime;
 
     @Override
     public int getSignature() {

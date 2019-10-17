@@ -9,7 +9,7 @@ import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
-import ru.olegcherednik.zip4jvm.model.NTFSTimestampExtraField;
+import ru.olegcherednik.zip4jvm.model.NtfsTimestampExtraField;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
@@ -61,7 +61,7 @@ final class ExtraFieldReader implements Reader<ExtraField> {
             map.put(Zip64.ExtendedInfo.SIGNATURE, size -> new Zip64Reader.ExtendedInfo(size, uncompressedSize, compressedSize, offs, disk));
 
         map.put(AesExtraDataRecord.SIGNATURE, AesExtraDataRecordReader::new);
-        map.put(NTFSTimestampExtraField.SIGNATURE, NTFSTimestampExtraFieldReader::new);
+        map.put(NtfsTimestampExtraField.SIGNATURE, NtfsTimestampExtraFieldReader::new);
         return map;
     }
 
