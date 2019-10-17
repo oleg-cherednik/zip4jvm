@@ -13,7 +13,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * @author Oleg CHerednik
+ * @author Oleg Cherednik
  * @since 20.03.2019
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
