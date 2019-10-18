@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.model.builders;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
@@ -22,11 +21,7 @@ public final class CentralDirectoryBuilder {
     public CentralDirectory build() throws IOException {
         CentralDirectory centralDirectory = new CentralDirectory();
         centralDirectory.setFileHeaders(createFileHeaders());
-
-        CentralDirectory.DigitalSignature digitalSignature = new CentralDirectory.DigitalSignature();
-        digitalSignature.setSignatureData("oleg.cherednik & олег.чередник".getBytes(Charsets.UTF_8));
-
-        centralDirectory.setDigitalSignature(digitalSignature);
+        centralDirectory.setDigitalSignature(null);
         return centralDirectory;
     }
 

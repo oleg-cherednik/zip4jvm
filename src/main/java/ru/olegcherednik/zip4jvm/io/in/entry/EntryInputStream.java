@@ -39,6 +39,7 @@ public abstract class EntryInputStream extends InputStream {
 
     public static InputStream create(ZipEntry zipEntry, Function<Charset, Charset> charsetCustomizer, DataInput in) throws IOException {
         LocalFileHeader localFileHeader = new LocalFileHeaderReader(zipEntry.getLocalFileHeaderOffs(), charsetCustomizer).read(in);
+        // TODO check why do I use Supplier here
         zipEntry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
         // TODO check that localFileHeader matches fileHeader
         Decoder decoder = zipEntry.getEncryption().getCreateDecoder().apply(zipEntry, in);

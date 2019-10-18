@@ -9,6 +9,7 @@ import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.Zip64View;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.function.Function;
@@ -38,35 +39,37 @@ public final class ZipInfo {
         Function<Charset, Charset> charsetCustomizer = charset -> Charsets.UTF_8;//Charsets.SYSTEM_CHARSET;
 //        Function<Charset, Charset> charsetCustomizer = Charsets.SYSTEM_CHARSET;
         Charset charset = charsetCustomizer.apply(Charsets.IBM437);
+        final String prefix = "    ";
         DiagnosticModel diagnosticModel = new ZipModelReader(zip, charsetCustomizer).readDiagnostic();
 
+        PrintStream out = System.out;
 
         EndCentralDirectoryView.builder()
                                .offs(diagnosticModel.getEndCentralDirectoryOffs())
                                .size(diagnosticModel.getEndCentralDirectorySize())
                                .charset(charset)
                                .dir(diagnosticModel.getEndCentralDirectory())
-                               .prefix("    ").build().print(System.out);
+                               .prefix(prefix).build().print(out);
 
-        System.out.println();
+        out.println();
 
         Zip64View.EndCentralDirectoryLocator.builder()
                                             .offs(diagnosticModel.getZip64EndCentralDirectoryLocatorOffs())
                                             .size(diagnosticModel.getZip64EndCentralDirectoryLocatorSize())
                                             .charset(charset)
                                             .locator(diagnosticModel.getZip64().getEndCentralDirectoryLocator())
-                                            .prefix("    ").build().print(System.out);
+                                            .prefix(prefix).build().print(out);
 
-        System.out.println();
+        out.println();
 
         Zip64View.EndCentralDirectory.builder()
                                      .offs(diagnosticModel.getZip64EndCentralDirectoryOffs())
                                      .size(diagnosticModel.getZip64EndCentralDirectorySize())
                                      .charset(charset)
                                      .dir(diagnosticModel.getZip64().getEndCentralDirectory())
-                                     .prefix("    ").build().print(System.out);
+                                     .prefix(prefix).build().print(out);
 
-        System.out.println();
+        out.println();
 
         CentralDirectoryView.builder()
                             .offs(diagnosticModel.getCentralDirectoryOffs())
@@ -79,7 +82,7 @@ public final class ZipInfo {
                             .digitalSignatureOffs(diagnosticModel.getDigitalSignatureOffs())
                             .getDigitalSignatureSize(diagnosticModel.getDigitalSignatureSize())
                             .charset(charset)
-                            .prefix("    ").build().print(System.out);
+                            .prefix(prefix).build().print(out);
     }
 
 }
