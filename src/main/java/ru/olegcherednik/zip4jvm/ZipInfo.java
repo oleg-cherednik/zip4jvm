@@ -74,8 +74,10 @@ public final class ZipInfo {
                             .fileHeaderOffs(diagnosticModel.getFileHeaderOffs())
                             .fileHeaderSize(diagnosticModel.getFileHeaderSize())
                             .fileHeaderExternalFieldOffs(diagnosticModel.getFileHeaderExtraFieldOffs())
-                            .fileHeaderExternalFieldOffs(diagnosticModel.getFileHeaderExtraFieldOffs())
+                            .fileHeaderExternalFieldSize(diagnosticModel.getFileHeaderExtraFieldSize())
                             .centralDirectory(diagnosticModel.getCentralDirectory())
+                            .digitalSignatureOffs(diagnosticModel.getDigitalSignatureOffs())
+                            .getDigitalSignatureSize(diagnosticModel.getDigitalSignatureSize())
                             .charset(charset)
                             .prefix("    ").build().print(System.out);
     }

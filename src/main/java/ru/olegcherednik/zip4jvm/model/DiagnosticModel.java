@@ -33,4 +33,8 @@ public final class DiagnosticModel {
     private final Map<String, Long> fileHeaderSize;
 
     private final Map<String, Long> fileHeaderExtraFieldOffs;
+    private final Map<String, Long> fileHeaderExtraFieldSize;
+
+    private final long digitalSignatureOffs;
+    private final long digitalSignatureSize;
 }

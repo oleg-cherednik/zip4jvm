@@ -51,7 +51,8 @@ public class ExtendedFieldView {
         out.format("%s(0x%04X) NTFS Timestamps:                       %d bytes\n", prefix, record.getSignature(), record.getBlockSize());
         out.format("%s  - location:                                   %2$d (0x%2$08X) bytes\n", prefix, 0);
         out.format("%s  Creation Date:                                %2$tY-%2$tm-%2$td %2$tH:%2$tM:%2$tS\n", prefix, record.getCreationTime());
-        out.format("%s  Last Modified Date:                           %2$tY-%2$tm-%2$td %2$tH:%2$tM:%2$tS\n", prefix, record.getLastModificationTime());
+        out.format("%s  Last Modified Date:                           %2$tY-%2$tm-%2$td %2$tH:%2$tM:%2$tS\n", prefix,
+                record.getLastModificationTime());
         out.format("%s  Last Accessed Date:                           %2$tY-%2$tm-%2$td %2$tH:%2$tM:%2$tS\n", prefix, record.getLastAccessTime());
     }
 
@@ -91,6 +92,5 @@ public class ExtendedFieldView {
                         .buf(record.getBlockData())
                         .prefix(prefix).build().print(out);
     }
-
 
 }

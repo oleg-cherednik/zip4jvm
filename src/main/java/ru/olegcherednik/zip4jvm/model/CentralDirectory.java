@@ -116,6 +116,7 @@ public class CentralDirectory {
 
     }
 
+    /** see 4.3.13 */
     @Getter
     @Setter
     public static class DigitalSignature {

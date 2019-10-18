@@ -6,6 +6,7 @@ import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.DiagnosticModel;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
+import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
@@ -46,6 +47,9 @@ public final class ZipModelReader {
     public static final String MARK_FILE_HEADER_OFFS = "fileHeaderOffs";
     public static final String MARK_FILE_HEADER_END_OFFS = "fileHeaderEndOffs";
     public static final String MARK_EXTRA_FIELD_OFFS = "extraFieldOffs";
+    public static final String MARK_EXTRA_FIELD_END_OFFS = "extraFieldEndOffs";
+    public static final String MARK_DIGITAL_SIGNATURE_OFFS = "digitalSignatureOffs";
+    public static final String MARK_DIGITAL_SIGNATURE_END_OFFS = "digitalSignatureEndOffs";
 
     private final Path zip;
     private final Function<Charset, Charset> charsetCustomizer;
@@ -75,6 +79,7 @@ public final class ZipModelReader {
             Map<String, Long> fileHeaderOffs = new HashMap<>();
             Map<String, Long> fileHeaderSize = new HashMap<>();
             Map<String, Long> fileHeaderExtraFieldOffs = new HashMap<>();
+            Map<String, Long> fileHeaderExtraFieldSize = new HashMap<>();
 
             int i = 0;
 
@@ -83,7 +88,11 @@ public final class ZipModelReader {
                 fileHeaderSize.put(fileHeader.getFileName(), in.getMark(MARK_FILE_HEADER_END_OFFS + '_' + i) -
                         in.getMark(MARK_FILE_HEADER_OFFS + '_' + i));
 
-                fileHeaderExtraFieldOffs.put(fileHeader.getFileName(), in.getMark(MARK_EXTRA_FIELD_OFFS + '_' + fileHeader.getFileName()));
+                if (fileHeader.getExtraField() != ExtraField.NULL) {
+                    fileHeaderExtraFieldOffs.put(fileHeader.getFileName(), in.getMark(MARK_EXTRA_FIELD_OFFS + '_' + fileHeader.getFileName()));
+                    fileHeaderExtraFieldSize.put(fileHeader.getFileName(), in.getMark(MARK_EXTRA_FIELD_END_OFFS + '_' + fileHeader.getFileName()) -
+                            in.getMark(MARK_EXTRA_FIELD_OFFS + '_' + fileHeader.getFileName()));
+                }
 
                 i++;
             }
@@ -108,6 +117,11 @@ public final class ZipModelReader {
                                   .fileHeaderSize(fileHeaderSize)
 
                                   .fileHeaderExtraFieldOffs(fileHeaderExtraFieldOffs)
+                                  .fileHeaderExtraFieldSize(fileHeaderExtraFieldSize)
+
+                                  .digitalSignatureOffs(centralDirectory.getDigitalSignature() == null ? 0 : in.getMark(MARK_DIGITAL_SIGNATURE_OFFS))
+                                  .digitalSignatureSize(centralDirectory.getDigitalSignature() == null ?
+                                                        0 : in.getMark(MARK_DIGITAL_SIGNATURE_END_OFFS) - in.getMark(MARK_DIGITAL_SIGNATURE_OFFS))
 
                                   .centralDirectory(centralDirectory)
                                   .centralDirectoryOffs(in.getMark(MARK_CENTRAL_DIRECTORY_OFFS))

@@ -3,11 +3,19 @@ package ru.olegcherednik.zip4jvm;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.CompressionLevel;
+import ru.olegcherednik.zip4jvm.model.Encryption;
+import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.function.Function;
+
+import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
 
 /**
  * @author Oleg Cherednik
@@ -30,6 +38,16 @@ public class ZipInfoTest {
     }
 
     public void foo() throws IOException {
+        Path path = Paths.get("d:/zip4jvm/tmp/aes.zip");
+        Files.deleteIfExists(path);
+
+        Function<String, ZipEntrySettings> entrySettingsProvider =
+                fileName -> ZipEntrySettings.builder()
+                                            .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
+                                            .encryption(Encryption.AES_256, "1".toCharArray()).build();
+        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(entrySettingsProvider).comment("password: 1").build();
+        ZipIt.zip(path).settings(settings).add(contentDirSrc);
+
 //        ZipInfo.zip(zipDeflateSolidPkware).getShortInfo();
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/foo/deflate/solid/off/src.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/pkware.zip"))

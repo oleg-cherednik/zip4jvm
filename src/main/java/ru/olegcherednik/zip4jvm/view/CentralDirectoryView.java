@@ -20,7 +20,10 @@ public class CentralDirectoryView {
     private final Map<String, Long> fileHeaderOffs;
     private final Map<String, Long> fileHeaderSize;
     private final Map<String, Long> fileHeaderExternalFieldOffs;
+    private final Map<String, Long> fileHeaderExternalFieldSize;
     private final CentralDirectory centralDirectory;
+    private final long digitalSignatureOffs;
+    private final long getDigitalSignatureSize;
     private final Charset charset;
     private final String prefix;
 
@@ -34,14 +37,27 @@ public class CentralDirectoryView {
         IntStream.range(0, str.length()).forEach(i -> out.print('='));
 
         out.println();
-        out.format("%slocation of end-of-central-dir record:          %2$d (0x%2$08X) bytes\n", prefix, offs);
+        out.format("%slocation of central-dir record:                 %2$d (0x%2$08X) bytes\n", prefix, offs);
         out.format("%stotal number of entries in central dir:         %d\n", prefix, centralDirectory.getFileHeaders().size());
 
         out.println();
+        printFileHeaders(out);
+        out.println();
+        DigitalSignatureView.builder()
+                            .offs(digitalSignatureOffs)
+                            .size(getDigitalSignatureSize)
+                            .digitalSignature(centralDirectory.getDigitalSignature())
+                            .charset(charset)
+                            .prefix(prefix).build().print(out);
+    }
 
+    private void printFileHeaders(PrintStream out) {
         int pos = 0;
 
         for (CentralDirectory.FileHeader fileHeader : centralDirectory.getFileHeaders()) {
+            if (pos != 0)
+                out.println();
+
             FileHeaderView.builder()
                           .offs(fileHeaderOffs.get(fileHeader.getFileName()))
                           .size(fileHeaderSize.get(fileHeader.getFileName()))
@@ -49,26 +65,8 @@ public class CentralDirectoryView {
                           .pos(pos++)
                           .fileHeader(fileHeader)
                           .charset(charset)
-                          .prefix(prefix)
-                          .build().print(out);
-            out.println();
+                          .prefix(prefix).build().print(out);
         }
-
-        int a = 0;
-        a++;
     }
 
-
-
-    /*
-    file security status  (bit 0):                not encrypted
-file security status  (bit 0):                encrypted
-
-extended local header (bit 3):                no
-extended local header (bit 3):                yes
-
-UTF-8 names          (bit 11):                yes
-
-strong encryption     (bit 6):                yes
-     */
 }

@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import static ru.olegcherednik.zip4jvm.io.readers.ZipModelReader.MARK_EXTRA_FIELD_END_OFFS;
 import static ru.olegcherednik.zip4jvm.io.readers.ZipModelReader.MARK_EXTRA_FIELD_OFFS;
 import static ru.olegcherednik.zip4jvm.model.builders.LocalFileHeaderBuilder.LOOK_IN_EXTRA_FIELD;
 
@@ -89,6 +90,8 @@ final class ExtraFieldReader implements Reader<ExtraField> {
             if (in.getOffs() - offs != size)
                 throw new Zip4jvmException("External field incorrect size");
         }
+
+        in.mark(MARK_EXTRA_FIELD_END_OFFS + '_' + fileName);
 
         return builder.build();
     }
