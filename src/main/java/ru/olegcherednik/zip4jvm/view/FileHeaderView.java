@@ -18,6 +18,7 @@ public class FileHeaderView {
     private final long offs;
     private final long size;
     private final long extraFieldOffs;
+    private final long extraFieldSize;
     private final long pos;
     private final CentralDirectory.FileHeader fileHeader;
     private final Charset charset;
@@ -76,11 +77,12 @@ public class FileHeaderView {
         ExternalFileAttributesView.builder()
                                   .externalFileAttributes(fileHeader.getExternalFileAttributes())
                                   .prefix(prefix).build().print(out);
-        ExtendedFieldView.builder()
-                         .offs(extraFieldOffs)
-                         .extraField(fileHeader.getExtraField())
-                         .generalPurposeFlag(fileHeader.getGeneralPurposeFlag())
-                         .prefix(prefix).build().print(out);
+        ExtraFieldView.builder()
+                      .offs(extraFieldOffs)
+                      .size(extraFieldSize)
+                      .extraField(fileHeader.getExtraField())
+                      .generalPurposeFlag(fileHeader.getGeneralPurposeFlag())
+                      .prefix(prefix).build().print(out);
 
     }
 

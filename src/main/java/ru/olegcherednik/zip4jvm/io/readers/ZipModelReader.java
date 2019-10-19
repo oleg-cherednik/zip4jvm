@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+import ru.olegcherednik.zip4jvm.model.Diagnostic;
 import ru.olegcherednik.zip4jvm.model.DiagnosticModel;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
@@ -32,24 +33,8 @@ import java.util.function.Function;
  * @author Oleg Cherednik
  * @since 06.03.2019
  */
-@SuppressWarnings("FieldNamingConvention")
 @RequiredArgsConstructor
 public final class ZipModelReader {
-
-    public static final String MARK_END_CENTRAL_DIRECTORY_OFFS = "endCentralDirectoryOffs";
-    public static final String MARK_END_CENTRAL_DIRECTORY_END_OFFS = "endCentralDirectoryEndOffs";
-    public static final String MARK_ZIP64_END_CENTRAL_DIRECTORY_LOCATOR_OFFS = "zip64EndCentralDirectoryLocatorOffs";
-    public static final String MARK_ZIP64_END_CENTRAL_DIRECTORY_LOCATOR_END_OFFS = "zip64EndCentralDirectoryLocatorEndOffs";
-    public static final String MARK_ZIP64_END_CENTRAL_DIRECTORY_OFFS = "zip64EndCentralDirectoryOffs";
-    public static final String MARK_ZIP64_END_CENTRAL_DIRECTORY_END_OFFS = "zip64EndCentralDirectoryEndOffs";
-    public static final String MARK_CENTRAL_DIRECTORY_OFFS = "centralDirectoryOffs";
-    public static final String MARK_CENTRAL_DIRECTORY_END_OFFS = "centralDirectoryEndOffs";
-    public static final String MARK_FILE_HEADER_OFFS = "fileHeaderOffs";
-    public static final String MARK_FILE_HEADER_END_OFFS = "fileHeaderEndOffs";
-    public static final String MARK_EXTRA_FIELD_OFFS = "extraFieldOffs";
-    public static final String MARK_EXTRA_FIELD_END_OFFS = "extraFieldEndOffs";
-    public static final String MARK_DIGITAL_SIGNATURE_OFFS = "digitalSignatureOffs";
-    public static final String MARK_DIGITAL_SIGNATURE_END_OFFS = "digitalSignatureEndOffs";
 
     private final Path zip;
     private final Function<Charset, Charset> charsetCustomizer;
@@ -69,6 +54,7 @@ public final class ZipModelReader {
 
     public DiagnosticModel readDiagnostic() throws IOException {
         try (DataInput in = new SingleZipInputStream(zip)) {
+            Diagnostic.createInstance();
             EndCentralDirectory endCentralDirectory = new EndCentralDirectoryReader(charsetCustomizer).read(in);
             Zip64 zip64 = new Zip64Reader().read(in);
 
@@ -81,37 +67,30 @@ public final class ZipModelReader {
             Map<String, Long> fileHeaderExtraFieldOffs = new HashMap<>();
             Map<String, Long> fileHeaderExtraFieldSize = new HashMap<>();
 
-            int i = 0;
+            Diagnostic diagnostic = Diagnostic.removeInstance();
+            Diagnostic.CentralDirectory diagnosticCentralDirectory = diagnostic.getCentralDirectory();
 
             for (CentralDirectory.FileHeader fileHeader : centralDirectory.getFileHeaders()) {
-                fileHeaderOffs.put(fileHeader.getFileName(), in.getMark(MARK_FILE_HEADER_OFFS + '_' + i));
-                fileHeaderSize.put(fileHeader.getFileName(), in.getMark(MARK_FILE_HEADER_END_OFFS + '_' + i) -
-                        in.getMark(MARK_FILE_HEADER_OFFS + '_' + i));
+                Diagnostic.CentralDirectory.FileHeader diagnosticFileHeader = diagnosticCentralDirectory.getFileHeader(fileHeader.getFileName());
+                fileHeaderOffs.put(fileHeader.getFileName(), diagnosticFileHeader.getOffs());
+                fileHeaderSize.put(fileHeader.getFileName(), diagnosticFileHeader.getSize());
 
                 if (fileHeader.getExtraField() != ExtraField.NULL) {
-                    fileHeaderExtraFieldOffs.put(fileHeader.getFileName(), in.getMark(MARK_EXTRA_FIELD_OFFS + '_' + fileHeader.getFileName()));
-                    fileHeaderExtraFieldSize.put(fileHeader.getFileName(), in.getMark(MARK_EXTRA_FIELD_END_OFFS + '_' + fileHeader.getFileName()) -
-                            in.getMark(MARK_EXTRA_FIELD_OFFS + '_' + fileHeader.getFileName()));
+                    fileHeaderExtraFieldOffs.put(fileHeader.getFileName(), diagnosticFileHeader.getExtraField().getOffs());
+                    fileHeaderExtraFieldSize.put(fileHeader.getFileName(), diagnosticFileHeader.getExtraField().getSize());
                 }
-
-                i++;
             }
 
             return DiagnosticModel.builder()
                                   .endCentralDirectory(endCentralDirectory)
-                                  .endCentralDirectoryOffs(in.getMark(MARK_END_CENTRAL_DIRECTORY_OFFS))
-                                  .endCentralDirectorySize(
-                                          in.getMark(MARK_END_CENTRAL_DIRECTORY_END_OFFS) - in.getMark(MARK_END_CENTRAL_DIRECTORY_OFFS))
+                                  .endCentralDirectoryOffs(diagnostic.getEndCentralDirectoryOffs())
+                                  .endCentralDirectorySize(diagnostic.getEndCentralDirectorySize())
 
                                   .zip64(zip64)
-                                  .zip64EndCentralDirectoryLocatorOffs(
-                                          zip64 == Zip64.NULL ? 0 : in.getMark(MARK_ZIP64_END_CENTRAL_DIRECTORY_LOCATOR_OFFS))
-                                  .zip64EndCentralDirectoryLocatorSize(
-                                          zip64 == Zip64.NULL ? 0 : in.getMark(MARK_ZIP64_END_CENTRAL_DIRECTORY_LOCATOR_END_OFFS) -
-                                                  in.getMark(MARK_ZIP64_END_CENTRAL_DIRECTORY_LOCATOR_OFFS))
-                                  .zip64EndCentralDirectoryOffs(zip64 == Zip64.NULL ? 0 : in.getMark(MARK_ZIP64_END_CENTRAL_DIRECTORY_OFFS))
-                                  .zip64EndCentralDirectorySize(zip64 == Zip64.NULL ? 0 : in.getMark(MARK_ZIP64_END_CENTRAL_DIRECTORY_END_OFFS) -
-                                          in.getMark(MARK_ZIP64_END_CENTRAL_DIRECTORY_OFFS))
+                                  .zip64EndCentralDirectoryLocatorOffs(diagnostic.getZip64().getEndCentralDirectoryLocatorOffs())
+                                  .zip64EndCentralDirectoryLocatorSize(diagnostic.getZip64().getEndCentralDirectoryLocatorSize())
+                                  .zip64EndCentralDirectoryOffs(diagnostic.getZip64().getEndCentralDirectoryOffs())
+                                  .zip64EndCentralDirectorySize(diagnostic.getZip64().getEndCentralDirectorySize())
 
                                   .fileHeaderOffs(fileHeaderOffs)
                                   .fileHeaderSize(fileHeaderSize)
@@ -119,13 +98,12 @@ public final class ZipModelReader {
                                   .fileHeaderExtraFieldOffs(fileHeaderExtraFieldOffs)
                                   .fileHeaderExtraFieldSize(fileHeaderExtraFieldSize)
 
-                                  .digitalSignatureOffs(centralDirectory.getDigitalSignature() == null ? 0 : in.getMark(MARK_DIGITAL_SIGNATURE_OFFS))
-                                  .digitalSignatureSize(centralDirectory.getDigitalSignature() == null ?
-                                                        0 : in.getMark(MARK_DIGITAL_SIGNATURE_END_OFFS) - in.getMark(MARK_DIGITAL_SIGNATURE_OFFS))
+                                  .digitalSignatureOffs(diagnostic.getCentralDirectory().getDigitalSignatureOffs())
+                                  .digitalSignatureSize(diagnostic.getCentralDirectory().getDigitalSignatureSize())
 
                                   .centralDirectory(centralDirectory)
-                                  .centralDirectoryOffs(in.getMark(MARK_CENTRAL_DIRECTORY_OFFS))
-                                  .centralDirectorySize(in.getMark(MARK_CENTRAL_DIRECTORY_END_OFFS) - in.getMark(MARK_CENTRAL_DIRECTORY_OFFS))
+                                  .centralDirectoryOffs(diagnostic.getCentralDirectory().getOffs())
+                                  .centralDirectorySize(diagnostic.getCentralDirectory().getSize())
                                   .centralDirectory(centralDirectory).build();
         }
     }

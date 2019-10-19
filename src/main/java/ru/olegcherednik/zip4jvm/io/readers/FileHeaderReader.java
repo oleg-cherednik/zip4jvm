@@ -5,6 +5,7 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.Diagnostic;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.Version;
@@ -16,8 +17,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 
-import static ru.olegcherednik.zip4jvm.io.readers.ZipModelReader.MARK_FILE_HEADER_END_OFFS;
-import static ru.olegcherednik.zip4jvm.io.readers.ZipModelReader.MARK_FILE_HEADER_OFFS;
 import static ru.olegcherednik.zip4jvm.model.ExternalFileAttributes.PROP_OS_NAME;
 
 /**
@@ -35,21 +34,28 @@ final class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader>
         List<CentralDirectory.FileHeader> fileHeaders = new LinkedList<>();
 
         for (int i = 0; i < totalEntries; i++) {
-            long offs = in.getOffs();
+            checkFileHeaderSignature(in);
 
-            in.mark(MARK_FILE_HEADER_OFFS + '_' + i);
+            CentralDirectory.FileHeader fileHeader = readFileHeader(in);
+            fileHeaders.add(fileHeader);
 
-            if (in.readSignature() != CentralDirectory.FileHeader.SIGNATURE)
-                throw new Zip4jvmException("Expected central directory entry not found offs=" + offs);
-
-            fileHeaders.add(readFileHeader(in, i));
-            in.mark(MARK_FILE_HEADER_END_OFFS + '_' + i);
+            Diagnostic.getInstance().getCentralDirectory().getFileHeader().setEndOffs(in.getOffs());
+            Diagnostic.getInstance().getCentralDirectory().saveFileHeader(fileHeader.getFileName());
         }
 
         return fileHeaders;
     }
 
-    private CentralDirectory.FileHeader readFileHeader(DataInput in, int i) throws IOException {
+    private static void checkFileHeaderSignature(DataInput in) throws IOException {
+        long offs = in.getOffs();
+
+        if (in.readSignature() != CentralDirectory.FileHeader.SIGNATURE)
+            throw new Zip4jvmException("Expected central directory entry not found offs=" + offs);
+
+        Diagnostic.getInstance().getCentralDirectory().createFileHeader().setOffs(offs);
+    }
+
+    private CentralDirectory.FileHeader readFileHeader(DataInput in) throws IOException {
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
         fileHeader.setVersionMadeBy(Version.build(in.readWord()));

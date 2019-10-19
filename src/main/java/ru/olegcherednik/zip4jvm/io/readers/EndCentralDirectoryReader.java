@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.model.Diagnostic;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
@@ -12,15 +13,14 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.function.Function;
 
-import static ru.olegcherednik.zip4jvm.io.readers.ZipModelReader.MARK_END_CENTRAL_DIRECTORY_END_OFFS;
-import static ru.olegcherednik.zip4jvm.io.readers.ZipModelReader.MARK_END_CENTRAL_DIRECTORY_OFFS;
-
 /**
  * @author Oleg Cherednik
  * @since 04.03.2019
  */
 @RequiredArgsConstructor
 final class EndCentralDirectoryReader implements Reader<EndCentralDirectory> {
+
+    private static final String MARK_END_CENTRAL_DIRECTORY_OFFS = "endCentralDirectoryOffs";
 
     private final Function<Charset, Charset> charsetCustomizer;
 
@@ -38,7 +38,7 @@ final class EndCentralDirectoryReader implements Reader<EndCentralDirectory> {
         int commentLength = in.readWord();
         dir.setComment(in.readString(commentLength, charsetCustomizer.apply(Charsets.IBM437)));
 
-        in.mark(MARK_END_CENTRAL_DIRECTORY_END_OFFS);
+        Diagnostic.getInstance().setEndCentralDirectoryEndOffs(in.getOffs());
         in.seek(MARK_END_CENTRAL_DIRECTORY_OFFS);
 
         return dir;
@@ -51,10 +51,13 @@ final class EndCentralDirectoryReader implements Reader<EndCentralDirectory> {
         do {
             in.seek(available--);
             commentLength--;
+
             in.mark(MARK_END_CENTRAL_DIRECTORY_OFFS);
 
-            if (in.readSignature() == EndCentralDirectory.SIGNATURE)
+            if (in.readSignature() == EndCentralDirectory.SIGNATURE) {
+                Diagnostic.getInstance().setEndCentralDirectoryOffs(in.getMark(MARK_END_CENTRAL_DIRECTORY_OFFS));
                 return;
+            }
         } while (commentLength >= 0 && available >= 0);
 
         throw new Zip4jvmException("EncCentralDirectory was not found");

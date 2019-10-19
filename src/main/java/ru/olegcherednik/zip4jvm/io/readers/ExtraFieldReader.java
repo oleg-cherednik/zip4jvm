@@ -7,6 +7,7 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+import ru.olegcherednik.zip4jvm.model.Diagnostic;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.NtfsTimestampExtraField;
@@ -19,8 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import static ru.olegcherednik.zip4jvm.io.readers.ZipModelReader.MARK_EXTRA_FIELD_END_OFFS;
-import static ru.olegcherednik.zip4jvm.io.readers.ZipModelReader.MARK_EXTRA_FIELD_OFFS;
 import static ru.olegcherednik.zip4jvm.model.builders.LocalFileHeaderBuilder.LOOK_IN_EXTRA_FIELD;
 
 /**
@@ -33,7 +32,6 @@ final class ExtraFieldReader implements Reader<ExtraField> {
     private static final String MARK_EXTRA_FIELD_RECORD_OFFS = "extraFieldRecordOffs";
 
     private final int size;
-    private final String fileName;
     private final Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> map;
 
     public static ExtraFieldReader build(int size, CentralDirectory.FileHeader fileHeader) {
@@ -43,7 +41,7 @@ final class ExtraFieldReader implements Reader<ExtraField> {
         boolean disk = fileHeader.getDisk() == ZipModel.MAX_TOTAL_DISKS;
 
         Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> map = getReaders(uncompressedSize, compressedSize, offs, disk);
-        return new ExtraFieldReader(size, fileHeader.getFileName(), map);
+        return new ExtraFieldReader(size, map);
     }
 
     public static ExtraFieldReader build(int size, LocalFileHeader localFileHeader) {
@@ -51,7 +49,7 @@ final class ExtraFieldReader implements Reader<ExtraField> {
         boolean compressedSize = localFileHeader.getCompressedSize() == LOOK_IN_EXTRA_FIELD;
 
         Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> map = getReaders(uncompressedSize, compressedSize, false, false);
-        return new ExtraFieldReader(size, localFileHeader.getFileName(), map);
+        return new ExtraFieldReader(size, map);
     }
 
     private static Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> getReaders(boolean uncompressedSize, boolean compressedSize,
@@ -70,15 +68,19 @@ final class ExtraFieldReader implements Reader<ExtraField> {
     public ExtraField read(DataInput in) throws IOException {
         ExtraField.Builder builder = ExtraField.builder();
 
-        in.mark(MARK_EXTRA_FIELD_OFFS + '_' + fileName);
-
         if (size <= 0)
             return builder.build();
+
+        Diagnostic.getInstance().getCentralDirectory().getFileHeader().createExtraField();
+        Diagnostic.getInstance().getCentralDirectory().getFileHeader().getExtraField().setOffs(in.getOffs());
 
         final long offsMax = in.getOffs() + size;
 
         while (in.getOffs() < offsMax) {
             in.mark(MARK_EXTRA_FIELD_RECORD_OFFS);
+
+            Diagnostic.getInstance().getCentralDirectory().getFileHeader().getExtraField().createRecord();
+            Diagnostic.getInstance().getCentralDirectory().getFileHeader().getExtraField().getRecord().setOffs(in.getOffs());
 
             int signature = in.readWord();
             int size = in.readWord();
@@ -87,11 +89,14 @@ final class ExtraFieldReader implements Reader<ExtraField> {
 
             builder.addRecord(getRecord(signature, size, in));
 
+            Diagnostic.getInstance().getCentralDirectory().getFileHeader().getExtraField().getRecord().setEndOffs(in.getOffs());
+            Diagnostic.getInstance().getCentralDirectory().getFileHeader().getExtraField().saveRecord(signature);
+
             if (in.getOffs() - offs != size)
                 throw new Zip4jvmException("External field incorrect size");
         }
 
-        in.mark(MARK_EXTRA_FIELD_END_OFFS + '_' + fileName);
+        Diagnostic.getInstance().getCentralDirectory().getFileHeader().getExtraField().setEndOffs(in.getOffs());
 
         return builder.build();
     }

@@ -16,9 +16,10 @@ import java.io.PrintStream;
  * @since 16.10.2019
  */
 @Builder
-public class ExtendedFieldView {
+public class ExtraFieldView {
 
     private final long offs;
+    private final long size;
     private final ExtraField extraField;
     private final GeneralPurposeFlag generalPurposeFlag;
     private final String prefix;
@@ -28,8 +29,7 @@ public class ExtendedFieldView {
             return;
 
         out.format("%sextra field location:                           %2$d (0x%2$08X) bytes\n", prefix, offs);
-        out.format("%s  size:                                         %d bytes (%d records)\n",
-                prefix, extraField.getSize(), extraField.getRecords().size());
+        out.format("%s  size:                                         %d bytes (%d records)\n", prefix, size, extraField.getRecords().size());
 
         for (ExtraField.Record record : extraField.getRecords()) {
             if (record.isNull())

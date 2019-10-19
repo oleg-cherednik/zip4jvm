@@ -3,12 +3,10 @@ package ru.olegcherednik.zip4jvm.io.readers;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+import ru.olegcherednik.zip4jvm.model.Diagnostic;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
-
-import static ru.olegcherednik.zip4jvm.io.readers.ZipModelReader.MARK_DIGITAL_SIGNATURE_END_OFFS;
-import static ru.olegcherednik.zip4jvm.io.readers.ZipModelReader.MARK_DIGITAL_SIGNATURE_OFFS;
 
 /**
  * @author Oleg Cherednik
@@ -19,15 +17,17 @@ final class DigitalSignatureReader implements Reader<CentralDirectory.DigitalSig
 
     @Override
     public CentralDirectory.DigitalSignature read(DataInput in) throws IOException {
-        in.mark(MARK_DIGITAL_SIGNATURE_OFFS);
+        long offs = in.getOffs();
 
         if (in.readSignature() != CentralDirectory.DigitalSignature.SIGNATURE)
             return null;
 
+        Diagnostic.getInstance().getCentralDirectory().setDigitalSignatureOffs(offs);
+
         CentralDirectory.DigitalSignature digitalSignature = new CentralDirectory.DigitalSignature();
         digitalSignature.setSignatureData(in.readBytes(in.readWord()));
 
-        in.mark(MARK_DIGITAL_SIGNATURE_END_OFFS);
+        Diagnostic.getInstance().getCentralDirectory().setDigitalSignatureEndOffs(in.getOffs());
 
         return digitalSignature;
     }

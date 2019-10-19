@@ -62,6 +62,7 @@ public class CentralDirectoryView {
                           .offs(fileHeaderOffs.get(fileHeader.getFileName()))
                           .size(fileHeaderSize.get(fileHeader.getFileName()))
                           .extraFieldOffs(fileHeaderExternalFieldOffs.getOrDefault(fileHeader.getFileName(), -1L))
+                          .extraFieldSize(fileHeaderExternalFieldSize.getOrDefault(fileHeader.getFileName(), -1L))
                           .pos(pos++)
                           .fileHeader(fileHeader)
                           .charset(charset)

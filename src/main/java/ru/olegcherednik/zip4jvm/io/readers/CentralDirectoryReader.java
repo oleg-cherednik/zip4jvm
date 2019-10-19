@@ -3,14 +3,12 @@ package ru.olegcherednik.zip4jvm.io.readers;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+import ru.olegcherednik.zip4jvm.model.Diagnostic;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.function.Function;
-
-import static ru.olegcherednik.zip4jvm.io.readers.ZipModelReader.MARK_CENTRAL_DIRECTORY_END_OFFS;
-import static ru.olegcherednik.zip4jvm.io.readers.ZipModelReader.MARK_CENTRAL_DIRECTORY_OFFS;
 
 /**
  * @author Oleg Cherednik
@@ -31,13 +29,13 @@ final class CentralDirectoryReader implements Reader<CentralDirectory> {
         centralDirectory.setFileHeaders(new FileHeaderReader(totalEntries, charsetCustomizer).read(in));
         centralDirectory.setDigitalSignature(new DigitalSignatureReader().read(in));
 
-        in.mark(MARK_CENTRAL_DIRECTORY_END_OFFS);
+        Diagnostic.getInstance().getCentralDirectory().setEndOffs(in.getOffs());
 
         return centralDirectory;
     }
 
     private void findHead(DataInput in) throws IOException {
         in.seek(offs);
-        in.mark(MARK_CENTRAL_DIRECTORY_OFFS);
+        Diagnostic.getInstance().createCentralDirectory().setOffs(in.getOffs());
     }
 }
