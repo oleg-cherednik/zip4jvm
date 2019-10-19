@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
+import ru.olegcherednik.zip4jvm.io.readers.DiagnosticModelReader;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.DiagnosticModel;
 import ru.olegcherednik.zip4jvm.view.CentralDirectoryView;
@@ -40,47 +40,30 @@ public final class ZipInfo {
 //        Function<Charset, Charset> charsetCustomizer = Charsets.SYSTEM_CHARSET;
         Charset charset = charsetCustomizer.apply(Charsets.IBM437);
         final String prefix = "    ";
-        DiagnosticModel diagnosticModel = new ZipModelReader(zip, charsetCustomizer).readDiagnostic();
+        DiagnosticModel diagnosticModel = new DiagnosticModelReader(zip, charsetCustomizer).read();
 
         PrintStream out = System.out;
 
         EndCentralDirectoryView.builder()
-                               .offs(diagnosticModel.getEndCentralDirectoryOffs())
-                               .size(diagnosticModel.getEndCentralDirectorySize())
-                               .charset(charset)
+                               .offs(diagnosticModel.getDiagnostic().getEndCentralDirectoryOffs())
+                               .size(diagnosticModel.getDiagnostic().getEndCentralDirectorySize())
                                .dir(diagnosticModel.getEndCentralDirectory())
+                               .charset(charset)
                                .prefix(prefix).build().print(out);
 
         out.println();
 
-        Zip64View.EndCentralDirectoryLocator.builder()
-                                            .offs(diagnosticModel.getZip64EndCentralDirectoryLocatorOffs())
-                                            .size(diagnosticModel.getZip64EndCentralDirectoryLocatorSize())
-                                            .charset(charset)
-                                            .locator(diagnosticModel.getZip64().getEndCentralDirectoryLocator())
-                                            .prefix(prefix).build().print(out);
-
-        out.println();
-
-        Zip64View.EndCentralDirectory.builder()
-                                     .offs(diagnosticModel.getZip64EndCentralDirectoryOffs())
-                                     .size(diagnosticModel.getZip64EndCentralDirectorySize())
-                                     .charset(charset)
-                                     .dir(diagnosticModel.getZip64().getEndCentralDirectory())
-                                     .prefix(prefix).build().print(out);
+        Zip64View.builder()
+                 .zip64(diagnosticModel.getZip64())
+                 .diagZip64(diagnosticModel.getDiagnostic().getZip64())
+                 .charset(charset)
+                 .prefix(prefix).build().print(out);
 
         out.println();
 
         CentralDirectoryView.builder()
-                            .offs(diagnosticModel.getCentralDirectoryOffs())
-                            .size(diagnosticModel.getCentralDirectorySize())
-                            .fileHeaderOffs(diagnosticModel.getFileHeaderOffs())
-                            .fileHeaderSize(diagnosticModel.getFileHeaderSize())
-                            .fileHeaderExternalFieldOffs(diagnosticModel.getFileHeaderExtraFieldOffs())
-                            .fileHeaderExternalFieldSize(diagnosticModel.getFileHeaderExtraFieldSize())
                             .centralDirectory(diagnosticModel.getCentralDirectory())
-                            .digitalSignatureOffs(diagnosticModel.getDigitalSignatureOffs())
-                            .getDigitalSignatureSize(diagnosticModel.getDigitalSignatureSize())
+                            .diagCentralDirectory(diagnosticModel.getDiagnostic().getCentralDirectory())
                             .charset(charset)
                             .prefix(prefix).build().print(out);
     }

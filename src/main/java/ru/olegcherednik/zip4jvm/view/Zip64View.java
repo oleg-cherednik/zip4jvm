@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.view;
 
 import lombok.Builder;
+import ru.olegcherednik.zip4jvm.model.Diagnostic;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 
 import java.io.PrintStream;
@@ -11,14 +12,38 @@ import java.util.stream.IntStream;
  * @author Oleg Cherednik
  * @since 14.10.2019
  */
+@Builder
 public class Zip64View {
+
+    private final Zip64 zip64;
+    private final Diagnostic.Zip64 diagZip64;
+    private final Charset charset;
+    private final String prefix;
+
+    public void print(PrintStream out) {
+        EndCentralDirectoryLocator.builder()
+                                  .offs(diagZip64.getEndCentralDirectoryLocatorOffs())
+                                  .size(diagZip64.getEndCentralDirectoryLocatorSize())
+                                  .locator(zip64.getEndCentralDirectoryLocator())
+                                  .charset(charset)
+                                  .prefix(prefix).build().print(out);
+
+        out.println();
+
+        Zip64View.EndCentralDirectory.builder()
+                                     .offs(diagZip64.getEndCentralDirectorySize())
+                                     .size(diagZip64.getEndCentralDirectorySize())
+                                     .dir(zip64.getEndCentralDirectory())
+                                     .charset(charset)
+                                     .prefix(prefix).build().print(out);
+    }
 
     @Builder
     public static class EndCentralDirectoryLocator {
 
-        private final Zip64.EndCentralDirectoryLocator locator;
         private final long offs;
         private final long size;
+        private final Zip64.EndCentralDirectoryLocator locator;
         private final Charset charset;
         private final String prefix;
 
@@ -44,9 +69,9 @@ public class Zip64View {
     @Builder
     public static class EndCentralDirectory {
 
-        private final Zip64.EndCentralDirectory dir;
         private final long offs;
         private final long size;
+        private final Zip64.EndCentralDirectory dir;
         private final Charset charset;
         private final String prefix;
 

@@ -46,12 +46,12 @@ public final class Diagnostic {
         endCentralDirectorySize = offs - endCentralDirectoryOffs;
     }
 
-    public Zip64 createZip64() {
-        return zip64 = new Zip64();
+    public void createZip64() {
+        zip64 = new Zip64();
     }
 
-    public CentralDirectory createCentralDirectory() {
-        return centralDirectory = new CentralDirectory();
+    public void createCentralDirectory() {
+        centralDirectory = new CentralDirectory();
     }
 
     @Getter
@@ -100,8 +100,8 @@ public final class Diagnostic {
             digitalSignatureSize = offs - digitalSignatureOffs;
         }
 
-        public FileHeader createFileHeader() {
-            return fileHeader = new FileHeader();
+        public void createFileHeader() {
+            fileHeader = new FileHeader();
         }
 
         public void saveFileHeader(String fileName) {
@@ -154,6 +154,10 @@ public final class Diagnostic {
         public void saveRecord(int signature) {
             records.put(signature, record);
             record = null;
+        }
+
+        public Record getRecord(int signature) {
+            return records.get(signature);
         }
 
         @Getter

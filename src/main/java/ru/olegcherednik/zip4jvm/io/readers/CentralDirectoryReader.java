@@ -36,6 +36,7 @@ final class CentralDirectoryReader implements Reader<CentralDirectory> {
 
     private void findHead(DataInput in) throws IOException {
         in.seek(offs);
-        Diagnostic.getInstance().createCentralDirectory().setOffs(in.getOffs());
+        Diagnostic.getInstance().createCentralDirectory();
+        Diagnostic.getInstance().getCentralDirectory().setOffs(in.getOffs());
     }
 }

@@ -16,9 +16,9 @@ import java.util.stream.IntStream;
 @Builder
 public class EndCentralDirectoryView {
 
-    private final EndCentralDirectory dir;
     private final long offs;
     private final long size;
+    private final EndCentralDirectory dir;
     private final Charset charset;
     private final String prefix;
 

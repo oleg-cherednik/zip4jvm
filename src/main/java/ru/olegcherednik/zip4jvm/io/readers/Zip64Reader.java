@@ -55,8 +55,10 @@ final class Zip64Reader implements Reader<Zip64> {
 
             boolean exists = in.readSignature() == Zip64.EndCentralDirectoryLocator.SIGNATURE;
 
-            if (exists)
-                Diagnostic.getInstance().createZip64().setEndCentralDirectoryLocatorOffs(offs);
+            if (exists) {
+                Diagnostic.getInstance().createZip64();
+                Diagnostic.getInstance().getZip64().setEndCentralDirectoryLocatorOffs(offs);
+            }
 
             return exists;
         }

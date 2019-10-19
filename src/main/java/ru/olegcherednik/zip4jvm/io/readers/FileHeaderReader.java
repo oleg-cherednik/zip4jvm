@@ -52,7 +52,8 @@ final class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader>
         if (in.readSignature() != CentralDirectory.FileHeader.SIGNATURE)
             throw new Zip4jvmException("Expected central directory entry not found offs=" + offs);
 
-        Diagnostic.getInstance().getCentralDirectory().createFileHeader().setOffs(offs);
+        Diagnostic.getInstance().getCentralDirectory().createFileHeader();
+        Diagnostic.getInstance().getCentralDirectory().getFileHeader().setOffs(offs);
     }
 
     private CentralDirectory.FileHeader readFileHeader(DataInput in) throws IOException {

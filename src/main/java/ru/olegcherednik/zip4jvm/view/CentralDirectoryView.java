@@ -2,10 +2,10 @@ package ru.olegcherednik.zip4jvm.view;
 
 import lombok.Builder;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+import ru.olegcherednik.zip4jvm.model.Diagnostic;
 
 import java.io.PrintStream;
 import java.nio.charset.Charset;
-import java.util.Map;
 import java.util.stream.IntStream;
 
 /**
@@ -15,15 +15,8 @@ import java.util.stream.IntStream;
 @Builder
 public class CentralDirectoryView {
 
-    private final long offs;
-    private final long size;
-    private final Map<String, Long> fileHeaderOffs;
-    private final Map<String, Long> fileHeaderSize;
-    private final Map<String, Long> fileHeaderExternalFieldOffs;
-    private final Map<String, Long> fileHeaderExternalFieldSize;
     private final CentralDirectory centralDirectory;
-    private final long digitalSignatureOffs;
-    private final long getDigitalSignatureSize;
+    private final Diagnostic.CentralDirectory diagCentralDirectory;
     private final Charset charset;
     private final String prefix;
 
@@ -31,21 +24,22 @@ public class CentralDirectoryView {
         if (centralDirectory == null)
             return;
 
-        String str = String.format("Central directory %s: %d bytes", ViewUtils.signature(CentralDirectory.FileHeader.SIGNATURE), size);
+        String str = String.format("Central directory %s: %d bytes", ViewUtils.signature(CentralDirectory.FileHeader.SIGNATURE),
+                diagCentralDirectory.getSize());
         out.println(str);
 
         IntStream.range(0, str.length()).forEach(i -> out.print('='));
 
         out.println();
-        out.format("%slocation of central-dir record:                 %2$d (0x%2$08X) bytes\n", prefix, offs);
+        out.format("%slocation of central-dir record:                 %2$d (0x%2$08X) bytes\n", prefix, diagCentralDirectory.getOffs());
         out.format("%stotal number of entries in central dir:         %d\n", prefix, centralDirectory.getFileHeaders().size());
 
         out.println();
         printFileHeaders(out);
         out.println();
         DigitalSignatureView.builder()
-                            .offs(digitalSignatureOffs)
-                            .size(getDigitalSignatureSize)
+                            .offs(diagCentralDirectory.getDigitalSignatureOffs())
+                            .size(diagCentralDirectory.getDigitalSignatureSize())
                             .digitalSignature(centralDirectory.getDigitalSignature())
                             .charset(charset)
                             .prefix(prefix).build().print(out);
@@ -59,12 +53,9 @@ public class CentralDirectoryView {
                 out.println();
 
             FileHeaderView.builder()
-                          .offs(fileHeaderOffs.get(fileHeader.getFileName()))
-                          .size(fileHeaderSize.get(fileHeader.getFileName()))
-                          .extraFieldOffs(fileHeaderExternalFieldOffs.getOrDefault(fileHeader.getFileName(), -1L))
-                          .extraFieldSize(fileHeaderExternalFieldSize.getOrDefault(fileHeader.getFileName(), -1L))
-                          .pos(pos++)
                           .fileHeader(fileHeader)
+                          .diagFileHeader(diagCentralDirectory.getFileHeader(fileHeader.getFileName()))
+                          .pos(pos++)
                           .charset(charset)
                           .prefix(prefix).build().print(out);
         }
