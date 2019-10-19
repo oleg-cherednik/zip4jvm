@@ -48,8 +48,8 @@ final class Zip64Reader implements Reader<Zip64> {
 
     private static Zip64.EndCentralDirectoryLocator readEndCentralDirectoryLocator(DataInput in) throws IOException {
         Diagnostic.getInstance().addZip64();
-        return Block.foo(in, diagnostic -> diagnostic.getZip64().getEndCentralDirectoryLocator(),
-                () -> new Zip64Reader.EndCentralDirectoryLocator().read(in));
+        Block block = Diagnostic.getInstance().getZip64().getEndCentralDirectoryLocator();
+        return Block.foo(in, block, () -> new Zip64Reader.EndCentralDirectoryLocator().read(in));
     }
 
     private static Zip64.EndCentralDirectory readEndCentralDirectory(long offs, DataInput in) throws IOException {
@@ -59,7 +59,8 @@ final class Zip64Reader implements Reader<Zip64> {
             throw new Zip4jvmException("invalid zip64 end of central directory");
 
         in.backward(in.signatureSize());
-        return Block.foo(in, diagnostic -> diagnostic.getZip64().getEndCentralDirectory(), () -> new Zip64Reader.EndCentralDirectory().read(in));
+        Block block = Diagnostic.getInstance().getZip64().getEndCentralDirectory();
+        return Block.foo(in, block, () -> new Zip64Reader.EndCentralDirectory().read(in));
     }
 
     private static final class EndCentralDirectoryLocator {

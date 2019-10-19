@@ -80,15 +80,15 @@ final class ExtraFieldReader implements Reader<ExtraField> {
             in.mark(MARK_EXTRA_FIELD_RECORD_OFFS);
 
             Diagnostic.getInstance().getCentralDirectory().getFileHeader().getExtraField().addRecord();
+            Block block = Diagnostic.getInstance().getCentralDirectory().getFileHeader().getExtraField().getRecord();
 
-            ExtraField.Record record = Block.foo(in, diagnostic -> diagnostic.getCentralDirectory().getFileHeader().getExtraField().getRecord(),
-                    () -> {
-                        int signature = in.readWord();
-                        int size = in.readWord();
-                        ExtraField.Record r = getRecord(signature, size, in);
-                        builder.addRecord(r);
-                        return r;
-                    });
+            ExtraField.Record record = Block.foo(in, block, () -> {
+                int signature = in.readWord();
+                int size = in.readWord();
+                ExtraField.Record r = getRecord(signature, size, in);
+                builder.addRecord(r);
+                return r;
+            });
             Diagnostic.getInstance().getCentralDirectory().getFileHeader().getExtraField().saveRecord(record.getSignature());
         }
 

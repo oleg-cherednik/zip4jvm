@@ -6,7 +6,6 @@ import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;
 
 import java.io.IOException;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -26,13 +25,13 @@ public class Block {
         size = offs - this.offs;
     }
 
-    public static <T> T foo(DataInput in, Function<Diagnostic, Block> getBlock, LocalSupplier<T> task)
+    public static <T> T foo(DataInput in, Block block, LocalSupplier<T> task)
             throws IOException {
         try {
-            getBlock.apply(Diagnostic.getInstance()).setOffs(in.getOffs());
+            block.setOffs(in.getOffs());
             return task.get();
         } finally {
-            getBlock.apply(Diagnostic.getInstance()).setEndOffs(in.getOffs());
+            block.setEndOffs(in.getOffs());
         }
     }
 
