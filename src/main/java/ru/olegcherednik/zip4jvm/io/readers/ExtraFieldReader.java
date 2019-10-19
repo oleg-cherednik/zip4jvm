@@ -3,16 +3,16 @@ package ru.olegcherednik.zip4jvm.io.readers;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.ArrayUtils;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.diagnostic.Diagnostic;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.NtfsTimestampExtraField;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.diagnostic.Block;
+import ru.olegcherednik.zip4jvm.model.diagnostic.Diagnostic;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
@@ -80,26 +80,23 @@ final class ExtraFieldReader implements Reader<ExtraField> {
             in.mark(MARK_EXTRA_FIELD_RECORD_OFFS);
 
             Diagnostic.getInstance().getCentralDirectory().getFileHeader().getExtraField().addRecord();
-            Diagnostic.getInstance().getCentralDirectory().getFileHeader().getExtraField().getRecord().setOffs(in.getOffs());
 
-            int signature = in.readWord();
-            int size = in.readWord();
-
-            long offs = in.getOffs();
-
-            builder.addRecord(getRecord(signature, size, in));
-
-            Diagnostic.getInstance().getCentralDirectory().getFileHeader().getExtraField().getRecord().setEndOffs(in.getOffs());
-            Diagnostic.getInstance().getCentralDirectory().getFileHeader().getExtraField().saveRecord(signature);
-
-            if (in.getOffs() - offs != size)
-                throw new Zip4jvmException("External field incorrect size");
+            ExtraField.Record record = Block.foo(in, diagnostic -> diagnostic.getCentralDirectory().getFileHeader().getExtraField().getRecord(),
+                    () -> {
+                        int signature = in.readWord();
+                        int size = in.readWord();
+                        ExtraField.Record r = getRecord(signature, size, in);
+                        builder.addRecord(r);
+                        return r;
+                    });
+            Diagnostic.getInstance().getCentralDirectory().getFileHeader().getExtraField().saveRecord(record.getSignature());
         }
 
         Diagnostic.getInstance().getCentralDirectory().getFileHeader().getExtraField().setEndOffs(in.getOffs());
 
         return builder.build();
     }
+
 
     private ExtraField.Record getRecord(int signature, int size, DataInput in) throws IOException {
         if (map.containsKey(signature))

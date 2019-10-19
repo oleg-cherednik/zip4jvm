@@ -42,14 +42,13 @@ public final class DiagnosticModelReader {
 
     private EndCentralDirectory readEndCentralDirectory(DataInput in) throws IOException {
         ZipModelReader.findCentralDirectorySignature(in);
-
         long offs = in.getOffs();
 
-        EndCentralDirectory endCentralDirectory = Block.foo(in, Diagnostic::getEndCentralDirectory,
-                () -> new EndCentralDirectoryReader(charsetCustomizer).read(in));
-
-        in.seek(offs);
-        return endCentralDirectory;
+        try {
+            return Block.foo(in, Diagnostic::getEndCentralDirectory, () -> new EndCentralDirectoryReader(charsetCustomizer).read(in));
+        } finally {
+            in.seek(offs);
+        }
     }
 
     private CentralDirectory readCentralDirectory(EndCentralDirectory endCentralDirectory, Zip64 zip64, DataInput in) throws IOException {

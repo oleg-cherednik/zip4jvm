@@ -95,6 +95,8 @@ public final class ExtraField {
 
             @Override
             public void write(DataOutput out) throws IOException {
+                out.writeWordSignature(signature);
+                out.writeWord(blockData.length);
                 out.write(blockData, 0, blockData.length);
             }
         }

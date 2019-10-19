@@ -59,7 +59,6 @@ final class Zip64Reader implements Reader<Zip64> {
             throw new Zip4jvmException("invalid zip64 end of central directory");
 
         in.backward(in.signatureSize());
-
         return Block.foo(in, diagnostic -> diagnostic.getZip64().getEndCentralDirectory(), () -> new Zip64Reader.EndCentralDirectory().read(in));
     }
 
@@ -73,7 +72,7 @@ final class Zip64Reader implements Reader<Zip64> {
             locator.setOffs(in.readQword());
             locator.setTotalDisks(in.readDword());
 
-            realBigZip64(locator.getOffs(), "Zip64.EndCentralDirectory");
+            realBigZip64(locator.getOffs(), "zip64.centralDirectoryOffs");
 
             return locator;
         }
@@ -99,7 +98,7 @@ final class Zip64Reader implements Reader<Zip64> {
             dir.setCentralDirectoryOffs(in.readQword());
             dir.setExtensibleDataSector(in.readBytes((int)endCentralDirectorySize - Zip64.EndCentralDirectory.SIZE));
 
-            realBigZip64(dir.getCentralDirectoryOffs(), "offsCentralDirectory");
+            realBigZip64(dir.getCentralDirectoryOffs(), "centralDirectoryOffs");
             realBigZip64(dir.getTotalEntries(), "totalEntries");
 
             return dir;

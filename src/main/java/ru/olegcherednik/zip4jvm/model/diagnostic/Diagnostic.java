@@ -67,7 +67,7 @@ public final class Diagnostic {
         private final Map<String, FileHeader> fileHeaders = new LinkedHashMap<>();
 
         @Setter(AccessLevel.NONE)
-        private FileHeader fileHeader;
+        private FileHeader fileHeader = FileHeader.NULL;
 
         public void addDigitalSignature() {
             digitalSignature = new Block();
@@ -79,7 +79,7 @@ public final class Diagnostic {
 
         public void saveFileHeader(String fileName) {
             fileHeaders.put(fileName, fileHeader);
-            fileHeader = null;
+            fileHeader = FileHeader.NULL;
         }
 
         public FileHeader getFileHeader(String fileName) {
@@ -89,6 +89,8 @@ public final class Diagnostic {
         @Getter
         @Setter
         public static final class FileHeader extends Block {
+
+            public static final FileHeader NULL = new FileHeader();
 
             private ExtraField extraField;
 
