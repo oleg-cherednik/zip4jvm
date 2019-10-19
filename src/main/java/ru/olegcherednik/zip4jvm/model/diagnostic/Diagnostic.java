@@ -45,10 +45,6 @@ public final class Diagnostic {
         zip64 = new Zip64();
     }
 
-    public void createCentralDirectory() {
-        centralDirectory = new CentralDirectory();
-    }
-
     @Getter
     @Setter
     public static final class Zip64 {

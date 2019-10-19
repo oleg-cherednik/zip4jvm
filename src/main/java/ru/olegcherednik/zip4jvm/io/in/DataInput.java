@@ -10,6 +10,12 @@ import java.nio.charset.Charset;
  */
 public interface DataInput extends Closeable {
 
+    default int signatureSize() {
+        return dwordSize();
+    }
+
+    int dwordSize();
+
     long getOffs();
 
     default int readSignature() throws IOException {
@@ -33,6 +39,10 @@ public interface DataInput extends Closeable {
     long length() throws IOException;
 
     void seek(long pos) throws IOException;
+
+    default void backward(int bytes) throws IOException {
+        seek(getOffs() - bytes);
+    }
 
     int read(byte[] buf, int offs, int len) throws IOException;
 
