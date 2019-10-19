@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.view;
 import lombok.Builder;
 import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
+import ru.olegcherednik.zip4jvm.model.diagnostic.Block;
 
 import java.io.PrintStream;
 import java.nio.charset.Charset;
@@ -16,21 +17,20 @@ import java.util.stream.IntStream;
 @Builder
 public class EndCentralDirectoryView {
 
-    private final long offs;
-    private final long size;
     private final EndCentralDirectory dir;
+    private final Block block;
     private final Charset charset;
     private final String prefix;
 
     public void print(PrintStream out) {
-        String str = String.format("End central directory record %s: %d bytes", ViewUtils.signature(EndCentralDirectory.SIGNATURE), size);
+        String str = String.format("End central directory record %s: %d bytes", ViewUtils.signature(EndCentralDirectory.SIGNATURE), block.getSize());
         out.println(str);
 
         IntStream.range(0, str.length()).forEach(i -> out.print('='));
 
         out.println();
         // TODO duplicate of ZipUtils.toString()
-        out.format("%slocation of end-of-central-dir record:          %2$d (0x%2$08X) bytes\n", prefix, offs);
+        out.format("%slocation of end-of-central-dir record:          %2$d (0x%2$08X) bytes\n", prefix, block.getOffs());
         out.format("%spart number of this part (%04X):                %d\n", prefix, dir.getTotalDisks(), dir.getTotalDisks() + 1);
         out.format("%spart number of start of central dir (%04X):     %d\n", prefix, dir.getMainDisk(), dir.getMainDisk() + 1);
         out.format("%snumber of entries in central dir in this part:  %d\n", prefix, dir.getDiskEntries());

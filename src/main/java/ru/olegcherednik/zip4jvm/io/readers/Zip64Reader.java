@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.model.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.diagnostic.Diagnostic;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -40,7 +40,7 @@ final class Zip64Reader implements Reader<Zip64> {
 
             realBigZip64(locator.getOffs(), "Zip64.EndCentralDirectory");
 
-            Diagnostic.getInstance().getZip64().setEndCentralDirectoryLocatorEndOffs(in.getOffs());
+            Diagnostic.getInstance().getZip64().getEndCentralDirectoryLocator().setEndOffs(in.getOffs());
 
             return locator;
         }
@@ -56,8 +56,8 @@ final class Zip64Reader implements Reader<Zip64> {
             boolean exists = in.readSignature() == Zip64.EndCentralDirectoryLocator.SIGNATURE;
 
             if (exists) {
-                Diagnostic.getInstance().createZip64();
-                Diagnostic.getInstance().getZip64().setEndCentralDirectoryLocatorOffs(offs);
+                Diagnostic.getInstance().addZip64();
+                Diagnostic.getInstance().getZip64().getEndCentralDirectoryLocator().setOffs(offs);
             }
 
             return exists;
@@ -88,7 +88,7 @@ final class Zip64Reader implements Reader<Zip64> {
             realBigZip64(dir.getCentralDirectoryOffs(), "offsCentralDirectory");
             realBigZip64(dir.getTotalEntries(), "totalEntries");
 
-            Diagnostic.getInstance().getZip64().setEndCentralDirectoryEndOffs(in.getOffs());
+            Diagnostic.getInstance().getZip64().getEndCentralDirectory().setEndOffs(in.getOffs());
 
             return dir;
         }
@@ -99,7 +99,7 @@ final class Zip64Reader implements Reader<Zip64> {
             if (in.readSignature() != Zip64.EndCentralDirectory.SIGNATURE)
                 throw new Zip4jvmException("invalid zip64 end of central directory");
 
-            Diagnostic.getInstance().getZip64().setEndCentralDirectoryEndOffs(offs);
+            Diagnostic.getInstance().getZip64().getEndCentralDirectory().setOffs(offs);
         }
 
     }

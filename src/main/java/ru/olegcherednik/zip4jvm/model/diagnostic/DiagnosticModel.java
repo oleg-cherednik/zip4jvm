@@ -1,7 +1,10 @@
-package ru.olegcherednik.zip4jvm.model;
+package ru.olegcherednik.zip4jvm.model.diagnostic;
 
 import lombok.Builder;
 import lombok.Getter;
+import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
+import ru.olegcherednik.zip4jvm.model.Zip64;
 
 /**
  * @author Oleg Cherednik

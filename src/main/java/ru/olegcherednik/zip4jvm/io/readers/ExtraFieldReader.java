@@ -7,7 +7,7 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.diagnostic.Diagnostic;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.NtfsTimestampExtraField;
@@ -71,7 +71,7 @@ final class ExtraFieldReader implements Reader<ExtraField> {
         if (size <= 0)
             return builder.build();
 
-        Diagnostic.getInstance().getCentralDirectory().getFileHeader().createExtraField();
+        Diagnostic.getInstance().getCentralDirectory().getFileHeader().addExtraField();
         Diagnostic.getInstance().getCentralDirectory().getFileHeader().getExtraField().setOffs(in.getOffs());
 
         final long offsMax = in.getOffs() + size;
@@ -79,7 +79,7 @@ final class ExtraFieldReader implements Reader<ExtraField> {
         while (in.getOffs() < offsMax) {
             in.mark(MARK_EXTRA_FIELD_RECORD_OFFS);
 
-            Diagnostic.getInstance().getCentralDirectory().getFileHeader().getExtraField().createRecord();
+            Diagnostic.getInstance().getCentralDirectory().getFileHeader().getExtraField().addRecord();
             Diagnostic.getInstance().getCentralDirectory().getFileHeader().getExtraField().getRecord().setOffs(in.getOffs());
 
             int signature = in.readWord();

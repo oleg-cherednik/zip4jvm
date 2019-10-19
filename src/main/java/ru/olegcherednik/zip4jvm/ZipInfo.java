@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.readers.DiagnosticModelReader;
 import ru.olegcherednik.zip4jvm.model.Charsets;
-import ru.olegcherednik.zip4jvm.model.DiagnosticModel;
+import ru.olegcherednik.zip4jvm.model.diagnostic.DiagnosticModel;
 import ru.olegcherednik.zip4jvm.view.CentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.Zip64View;
@@ -45,8 +45,7 @@ public final class ZipInfo {
         PrintStream out = System.out;
 
         EndCentralDirectoryView.builder()
-                               .offs(diagnosticModel.getDiagnostic().getEndCentralDirectoryOffs())
-                               .size(diagnosticModel.getDiagnostic().getEndCentralDirectorySize())
+                               .block(diagnosticModel.getDiagnostic().getEndCentralDirectory())
                                .dir(diagnosticModel.getEndCentralDirectory())
                                .charset(charset)
                                .prefix(prefix).build().print(out);

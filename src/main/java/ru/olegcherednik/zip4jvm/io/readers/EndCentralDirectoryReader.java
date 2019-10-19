@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.Charsets;
-import ru.olegcherednik.zip4jvm.model.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.diagnostic.Diagnostic;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
@@ -38,7 +38,7 @@ final class EndCentralDirectoryReader implements Reader<EndCentralDirectory> {
         int commentLength = in.readWord();
         dir.setComment(in.readString(commentLength, charsetCustomizer.apply(Charsets.IBM437)));
 
-        Diagnostic.getInstance().setEndCentralDirectoryEndOffs(in.getOffs());
+        Diagnostic.getInstance().getEndCentralDirectory().setEndOffs(in.getOffs());
         in.seek(MARK_END_CENTRAL_DIRECTORY_OFFS);
 
         return dir;
@@ -55,7 +55,7 @@ final class EndCentralDirectoryReader implements Reader<EndCentralDirectory> {
             in.mark(MARK_END_CENTRAL_DIRECTORY_OFFS);
 
             if (in.readSignature() == EndCentralDirectory.SIGNATURE) {
-                Diagnostic.getInstance().setEndCentralDirectoryOffs(in.getMark(MARK_END_CENTRAL_DIRECTORY_OFFS));
+                Diagnostic.getInstance().getEndCentralDirectory().setOffs(in.getMark(MARK_END_CENTRAL_DIRECTORY_OFFS));
                 return;
             }
         } while (commentLength >= 0 && available >= 0);

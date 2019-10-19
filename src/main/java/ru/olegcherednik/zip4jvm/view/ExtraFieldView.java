@@ -4,11 +4,12 @@ import lombok.Builder;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.diagnostic.Diagnostic;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.NtfsTimestampExtraField;
 import ru.olegcherednik.zip4jvm.model.Zip64;
+import ru.olegcherednik.zip4jvm.model.diagnostic.Block;
 
 import java.io.PrintStream;
 
@@ -49,10 +50,10 @@ public class ExtraFieldView {
     }
 
     private void print(NtfsTimestampExtraField record, PrintStream out) {
-        Diagnostic.ExtraField.Record diagRecord = diagExtraField.getRecord(record.getSignature());
+        Block block = diagExtraField.getRecord(record.getSignature());
 
-        out.format("%s(0x%04X) NTFS Timestamps:                       %d bytes\n", prefix, record.getSignature(), diagRecord.getSize());
-        out.format("%s  - location:                                   %2$d (0x%2$08X) bytes\n", prefix, diagRecord.getOffs());
+        out.format("%s(0x%04X) NTFS Timestamps:                       %d bytes\n", prefix, record.getSignature(), block.getSize());
+        out.format("%s  - location:                                   %2$d (0x%2$08X) bytes\n", prefix, block.getOffs());
         out.format("%s  Creation Date:                                %2$tY-%2$tm-%2$td %2$tH:%2$tM:%2$tS\n", prefix, record.getCreationTime());
         out.format("%s  Last Modified Date:                           %2$tY-%2$tm-%2$td %2$tH:%2$tM:%2$tS\n", prefix,
                 record.getLastModificationTime());
@@ -60,10 +61,10 @@ public class ExtraFieldView {
     }
 
     private void print(Zip64.ExtendedInfo record, PrintStream out) {
-        Diagnostic.ExtraField.Record diagRecord = diagExtraField.getRecord(record.getSignature());
+        Block block = diagExtraField.getRecord(record.getSignature());
 
-        out.format("%s(0x%04X) Zip64 Extended Information:            %d bytes\n", prefix, record.getSignature(), diagRecord.getSize());
-        out.format("%s  - location:                                   %2$d (0x%2$08X) bytes\n", prefix, diagRecord.getOffs());
+        out.format("%s(0x%04X) Zip64 Extended Information:            %d bytes\n", prefix, record.getSignature(), block.getSize());
+        out.format("%s  - location:                                   %2$d (0x%2$08X) bytes\n", prefix, block.getOffs());
 
         if (record.getUncompressedSize() != ExtraField.NO_DATA)
             out.format("%s  original compressed size                      %d bytes\n", prefix, record.getUncompressedSize());
@@ -76,11 +77,11 @@ public class ExtraFieldView {
     }
 
     private void print(AesExtraDataRecord record, PrintStream out) {
-        Diagnostic.ExtraField.Record diagRecord = diagExtraField.getRecord(record.getSignature());
+        Block block = diagExtraField.getRecord(record.getSignature());
         CompressionMethod compressionMethod = record.getCompressionMethod();
 
-        out.format("%s(0x%04X) AES Encryption Tag:                    %d bytes\n", prefix, record.getSignature(), diagRecord.getSize());
-        out.format("%s  - location:                                   %2$d (0x%2$08X) bytes\n", prefix, diagRecord.getOffs());
+        out.format("%s(0x%04X) AES Encryption Tag:                    %d bytes\n", prefix, record.getSignature(), block.getSize());
+        out.format("%s  - location:                                   %2$d (0x%2$08X) bytes\n", prefix, block.getOffs());
         out.format("%s  Encryption Tag Version:                       %s-%d\n", prefix, record.getVendor(), record.getVersionNumber());
         out.format("%s  Encryption Key Bits:                          %s\n", prefix, record.getStrength().getSize());
 
@@ -91,10 +92,10 @@ public class ExtraFieldView {
     }
 
     private void print(ExtraField.Record.Unknown record, PrintStream out) {
-        Diagnostic.ExtraField.Record diagRecord = diagExtraField.getRecord(record.getSignature());
+        Block block = diagExtraField.getRecord(record.getSignature());
 
-        out.format("%s(0x%04X) Unknown:                               %d bytes; \n", prefix, record.getSignature(), diagRecord.getSize());
-        out.format("%s  - location:                                   %2$d (0x%2$08X) bytes\n", prefix, diagRecord.getOffs());
+        out.format("%s(0x%04X) Unknown:                               %d bytes; \n", prefix, record.getSignature(), block.getSize());
+        out.format("%s  - location:                                   %2$d (0x%2$08X) bytes\n", prefix, block.getOffs());
 
         ByteArrayHexView.builder()
                         .buf(record.getBlockData())

@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.diagnostic.Diagnostic;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
@@ -22,12 +22,13 @@ final class DigitalSignatureReader implements Reader<CentralDirectory.DigitalSig
         if (in.readSignature() != CentralDirectory.DigitalSignature.SIGNATURE)
             return null;
 
-        Diagnostic.getInstance().getCentralDirectory().setDigitalSignatureOffs(offs);
+        Diagnostic.getInstance().getCentralDirectory().addDigitalSignature();
+        Diagnostic.getInstance().getCentralDirectory().getDigitalSignature().setOffs(offs);
 
         CentralDirectory.DigitalSignature digitalSignature = new CentralDirectory.DigitalSignature();
         digitalSignature.setSignatureData(in.readBytes(in.readWord()));
 
-        Diagnostic.getInstance().getCentralDirectory().setDigitalSignatureEndOffs(in.getOffs());
+        Diagnostic.getInstance().getCentralDirectory().getDigitalSignature().setEndOffs(in.getOffs());
 
         return digitalSignature;
     }

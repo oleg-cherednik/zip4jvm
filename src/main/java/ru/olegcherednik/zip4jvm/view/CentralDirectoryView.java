@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.view;
 
 import lombok.Builder;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.diagnostic.Diagnostic;
 
 import java.io.PrintStream;
 import java.nio.charset.Charset;
@@ -38,9 +38,8 @@ public class CentralDirectoryView {
         printFileHeaders(out);
         out.println();
         DigitalSignatureView.builder()
-                            .offs(diagCentralDirectory.getDigitalSignatureOffs())
-                            .size(diagCentralDirectory.getDigitalSignatureSize())
                             .digitalSignature(centralDirectory.getDigitalSignature())
+                            .block(diagCentralDirectory.getDigitalSignature())
                             .charset(charset)
                             .prefix(prefix).build().print(out);
     }

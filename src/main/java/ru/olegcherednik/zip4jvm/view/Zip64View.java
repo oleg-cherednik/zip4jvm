@@ -1,8 +1,9 @@
 package ru.olegcherednik.zip4jvm.view;
 
 import lombok.Builder;
-import ru.olegcherednik.zip4jvm.model.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.diagnostic.Diagnostic;
 import ru.olegcherednik.zip4jvm.model.Zip64;
+import ru.olegcherednik.zip4jvm.model.diagnostic.Block;
 
 import java.io.PrintStream;
 import java.nio.charset.Charset;
@@ -22,28 +23,25 @@ public class Zip64View {
 
     public void print(PrintStream out) {
         EndCentralDirectoryLocator.builder()
-                                  .offs(diagZip64.getEndCentralDirectoryLocatorOffs())
-                                  .size(diagZip64.getEndCentralDirectoryLocatorSize())
                                   .locator(zip64.getEndCentralDirectoryLocator())
+                                  .block(diagZip64.getEndCentralDirectoryLocator())
                                   .charset(charset)
                                   .prefix(prefix).build().print(out);
 
         out.println();
 
-        Zip64View.EndCentralDirectory.builder()
-                                     .offs(diagZip64.getEndCentralDirectorySize())
-                                     .size(diagZip64.getEndCentralDirectorySize())
-                                     .dir(zip64.getEndCentralDirectory())
-                                     .charset(charset)
-                                     .prefix(prefix).build().print(out);
+        EndCentralDirectory.builder()
+                           .dir(zip64.getEndCentralDirectory())
+                           .block(diagZip64.getEndCentralDirectory())
+                           .charset(charset)
+                           .prefix(prefix).build().print(out);
     }
 
     @Builder
     public static class EndCentralDirectoryLocator {
 
-        private final long offs;
-        private final long size;
         private final Zip64.EndCentralDirectoryLocator locator;
+        private final Block block;
         private final Charset charset;
         private final String prefix;
 
@@ -52,13 +50,13 @@ public class Zip64View {
                 return;
 
             String str = String.format("New End of Central directory locator %s: %d bytes",
-                    ViewUtils.signature(Zip64.EndCentralDirectoryLocator.SIGNATURE), size);
+                    ViewUtils.signature(Zip64.EndCentralDirectoryLocator.SIGNATURE), block.getSize());
             out.println(str);
 
             IntStream.range(0, str.length()).forEach(i -> out.print('='));
 
             out.println();
-            out.format("%slocation of new-end-of-central-dir-locator:     %2$d (0x%2$08X) bytes\n", prefix, offs);
+            out.format("%slocation of new-end-of-central-dir-locator:     %2$d (0x%2$08X) bytes\n", prefix, block.getOffs());
             out.format("%spart number of new-end-of-central-dir (%04X):   %d\n",
                     prefix, locator.getMainDisk(), locator.getMainDisk() + 1);
             out.format("%srelative offset of new-end-of-central-dir:      %2$d (0x%2$08X) bytes\n", prefix, locator.getOffs());
@@ -69,9 +67,8 @@ public class Zip64View {
     @Builder
     public static class EndCentralDirectory {
 
-        private final long offs;
-        private final long size;
         private final Zip64.EndCentralDirectory dir;
+        private final Block block;
         private final Charset charset;
         private final String prefix;
 
@@ -79,13 +76,14 @@ public class Zip64View {
             if (dir == null)
                 return;
 
-            String str = String.format("New End of Central directory %s: %d bytes", ViewUtils.signature(Zip64.EndCentralDirectory.SIGNATURE), size);
+            String str = String.format("New End of Central directory %s: %d bytes",
+                    ViewUtils.signature(Zip64.EndCentralDirectory.SIGNATURE), block.getSize());
             out.println(str);
 
             IntStream.range(0, str.length()).forEach(i -> out.print('='));
 
             out.println();
-            out.format("%slocation of new-end-of-central-dir:             %2$d (0x%2$08X) bytes\n", prefix, offs);
+            out.format("%slocation of new-end-of-central-dir:             %2$d (0x%2$08X) bytes\n", prefix, block.getOffs());
             out.format("%snumber of bytes in rest of record:              %d bytes\n", prefix, dir.getEndCentralDirectorySize());
 
             VersionView.builder()

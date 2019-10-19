@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.model;
+package ru.olegcherednik.zip4jvm.model.diagnostic;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -21,8 +21,7 @@ public final class Diagnostic {
 
     private static volatile Diagnostic instance = NULL;
 
-    private long endCentralDirectoryOffs;
-    private long endCentralDirectorySize;
+    private final Block endCentralDirectory = new Block();
     private Zip64 zip64 = Zip64.NULL;
     private CentralDirectory centralDirectory = new CentralDirectory();
 
@@ -42,11 +41,7 @@ public final class Diagnostic {
         return instance;
     }
 
-    public void setEndCentralDirectoryEndOffs(long offs) {
-        endCentralDirectorySize = offs - endCentralDirectoryOffs;
-    }
-
-    public void createZip64() {
+    public void addZip64() {
         zip64 = new Zip64();
     }
 
@@ -60,44 +55,26 @@ public final class Diagnostic {
 
         public static final Zip64 NULL = new Zip64();
 
-        private long endCentralDirectoryLocatorOffs;
-        private long endCentralDirectoryLocatorSize;
-        private long endCentralDirectoryOffs;
-        private long endCentralDirectorySize;
-
-        public void setEndCentralDirectoryLocatorEndOffs(long offs) {
-            endCentralDirectoryLocatorSize = offs - endCentralDirectoryLocatorOffs;
-        }
-
-        public void setEndCentralDirectoryEndOffs(long offs) {
-            endCentralDirectorySize = offs - endCentralDirectoryOffs;
-        }
+        private final Block endCentralDirectoryLocator = new Block();
+        private final Block endCentralDirectory = new Block();
 
     }
 
     @Getter
     @Setter
-    public static final class CentralDirectory {
+    public static final class CentralDirectory extends Block {
 
         public static final CentralDirectory NULL = new CentralDirectory();
 
-        private long offs;
-        private long size;
-
-        private long digitalSignatureOffs;
-        private long digitalSignatureSize;
+        private Block digitalSignature = Block.NULL;
 
         private final Map<String, FileHeader> fileHeaders = new LinkedHashMap<>();
 
         @Setter(AccessLevel.NONE)
         private FileHeader fileHeader;
 
-        public void setEndOffs(long offs) {
-            size = offs - this.offs;
-        }
-
-        public void setDigitalSignatureEndOffs(long offs) {
-            digitalSignatureSize = offs - digitalSignatureOffs;
+        public void addDigitalSignature() {
+            digitalSignature = new Block();
         }
 
         public void createFileHeader() {
@@ -115,17 +92,11 @@ public final class Diagnostic {
 
         @Getter
         @Setter
-        public static final class FileHeader {
+        public static final class FileHeader extends Block {
 
-            private long offs;
-            private long size;
             private ExtraField extraField;
 
-            public void setEndOffs(long offs) {
-                size = offs - this.offs;
-            }
-
-            public void createExtraField() {
+            public void addExtraField() {
                 extraField = new ExtraField();
             }
         }
@@ -134,21 +105,15 @@ public final class Diagnostic {
 
     @Getter
     @Setter
-    public static final class ExtraField {
+    public static final class ExtraField extends Block {
 
-        private long offs;
-        private long size;
-        private final Map<Integer, Record> records = new LinkedHashMap<>();
+        private final Map<Integer, Block> records = new LinkedHashMap<>();
 
         @Setter(AccessLevel.NONE)
-        private Record record;
+        private Block record;
 
-        public void setEndOffs(long offs) {
-            size = offs - this.offs;
-        }
-
-        public void createRecord() {
-            record = new Record();
+        public void addRecord() {
+            record = new Block();
         }
 
         public void saveRecord(int signature) {
@@ -156,21 +121,10 @@ public final class Diagnostic {
             record = null;
         }
 
-        public Record getRecord(int signature) {
+        public Block getRecord(int signature) {
             return records.get(signature);
         }
 
-        @Getter
-        @Setter
-        public static final class Record {
-
-            private long offs;
-            private long size;
-
-            public void setEndOffs(long offs) {
-                size = offs - this.offs;
-            }
-        }
     }
 
 }

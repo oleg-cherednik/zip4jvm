@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.Diagnostic;
-import ru.olegcherednik.zip4jvm.model.DiagnosticModel;
+import ru.olegcherednik.zip4jvm.model.diagnostic.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.diagnostic.DiagnosticModel;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
@@ -35,10 +35,8 @@ public final class DiagnosticModelReader {
             long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
             CentralDirectory centralDirectory = new CentralDirectoryReader(offs, totalEntries, charsetCustomizer).read(in);
 
-            Diagnostic diagnostic = Diagnostic.removeInstance();
-
             return DiagnosticModel.builder()
-                                  .diagnostic(diagnostic)
+                                  .diagnostic(Diagnostic.removeInstance())
                                   .endCentralDirectory(endCentralDirectory)
                                   .zip64(zip64)
                                   .centralDirectory(centralDirectory).build();
