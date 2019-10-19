@@ -10,7 +10,6 @@ import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.diagnostic.Block;
 import ru.olegcherednik.zip4jvm.model.diagnostic.Diagnostic;
 import ru.olegcherednik.zip4jvm.model.diagnostic.DiagnosticModel;
-import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -29,8 +28,6 @@ public final class DiagnosticModelReader {
 
     public DiagnosticModel read() throws IOException {
         try (DataInput in = new SingleZipInputStream(zip)) {
-            ZipModelReader.findCentralDirectory(in);
-
             EndCentralDirectory endCentralDirectory = readEndCentralDirectory(in);
             Zip64 zip64 = ZipModelReader.readZip64(in);
             CentralDirectory centralDirectory = readCentralDirectory(endCentralDirectory, zip64, in);
@@ -44,9 +41,11 @@ public final class DiagnosticModelReader {
     }
 
     private EndCentralDirectory readEndCentralDirectory(DataInput in) throws IOException {
+        ZipModelReader.findCentralDirectorySignature(in);
+
         long offs = in.getOffs();
 
-        EndCentralDirectory endCentralDirectory = foo(in, Diagnostic::getEndCentralDirectory,
+        EndCentralDirectory endCentralDirectory = Block.foo(in, Diagnostic::getEndCentralDirectory,
                 () -> new EndCentralDirectoryReader(charsetCustomizer).read(in));
 
         in.seek(offs);
@@ -56,17 +55,7 @@ public final class DiagnosticModelReader {
     private CentralDirectory readCentralDirectory(EndCentralDirectory endCentralDirectory, Zip64 zip64, DataInput in) throws IOException {
         in.seek(ZipModelBuilder.getCentralDirectoryOffs(endCentralDirectory, zip64));
         long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
-        return foo(in, Diagnostic::getCentralDirectory, () -> new CentralDirectoryReader(totalEntries, charsetCustomizer).read(in));
-    }
-
-    private static <T> T foo(DataInput in, Function<Diagnostic, Block> getBlock, LocalSupplier<T> task)
-            throws IOException {
-        try {
-            getBlock.apply(Diagnostic.getInstance()).setOffs(in.getOffs());
-            return task.get();
-        } finally {
-            getBlock.apply(Diagnostic.getInstance()).setEndOffs(in.getOffs());
-        }
+        return Block.foo(in, Diagnostic::getCentralDirectory, () -> new CentralDirectoryReader(totalEntries, charsetCustomizer).read(in));
     }
 
 }

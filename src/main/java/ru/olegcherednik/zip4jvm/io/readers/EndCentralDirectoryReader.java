@@ -21,8 +21,9 @@ final class EndCentralDirectoryReader implements Reader<EndCentralDirectory> {
 
     @Override
     public EndCentralDirectory read(DataInput in) throws IOException {
-        EndCentralDirectory endCentralDirectory = new EndCentralDirectory();
         in.skip(in.signatureSize());
+
+        EndCentralDirectory endCentralDirectory = new EndCentralDirectory();
         endCentralDirectory.setTotalDisks(in.readWord());
         endCentralDirectory.setMainDisk(in.readWord());
         endCentralDirectory.setDiskEntries(in.readWord());

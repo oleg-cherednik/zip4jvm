@@ -9,7 +9,6 @@ import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
-import ru.olegcherednik.zip4jvm.model.diagnostic.Diagnostic;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -38,8 +37,6 @@ public final class ZipModelReader {
 
     public ZipModel read() throws IOException {
         try (DataInput in = new SingleZipInputStream(zip)) {
-            findCentralDirectory(in);
-
             EndCentralDirectory endCentralDirectory = readEndCentralDirectory(in);
             Zip64 zip64 = readZip64(in);
             CentralDirectory centralDirectory = readCentralDirectory(endCentralDirectory, zip64, in);
@@ -49,10 +46,14 @@ public final class ZipModelReader {
     }
 
     private EndCentralDirectory readEndCentralDirectory(DataInput in) throws IOException {
+        findCentralDirectorySignature(in);
         long offs = in.getOffs();
-        EndCentralDirectory endCentralDirectory = new EndCentralDirectoryReader(charsetCustomizer).read(in);
-        in.seek(offs);
-        return endCentralDirectory;
+
+        try {
+            return new EndCentralDirectoryReader(charsetCustomizer).read(in);
+        } finally {
+            in.seek(offs);
+        }
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
@@ -66,7 +67,7 @@ public final class ZipModelReader {
         return new CentralDirectoryReader(totalEntries, charsetCustomizer).read(in);
     }
 
-    static void findCentralDirectory(DataInput in) throws IOException {
+    static void findCentralDirectorySignature(DataInput in) throws IOException {
         int commentLength = ZipModel.MAX_COMMENT_SIZE;
         long available = in.length() - EndCentralDirectory.MIN_SIZE;
 
@@ -76,13 +77,11 @@ public final class ZipModelReader {
 
             if (in.readSignature() == EndCentralDirectory.SIGNATURE) {
                 in.backward(in.signatureSize());
-                Diagnostic.getInstance().getEndCentralDirectory().setOffs(in.getOffs());
                 return;
             }
         } while (commentLength >= 0 && available >= 0);
 
         throw new Zip4jvmException("EndCentralDirectory was not found");
     }
-
 
 }
