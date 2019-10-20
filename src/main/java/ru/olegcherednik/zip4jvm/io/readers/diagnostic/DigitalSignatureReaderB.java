@@ -2,6 +2,7 @@ package ru.olegcherednik.zip4jvm.io.readers.diagnostic;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.readers.DigitalSignatureReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.diagnostic.Block;
 import ru.olegcherednik.zip4jvm.model.diagnostic.Diagnostic;
@@ -13,7 +14,7 @@ import java.io.IOException;
  * @since 20.10.2019
  */
 @RequiredArgsConstructor
-public class DigitalSignatureReaderB extends DigitalSignatureReaderA {
+public class DigitalSignatureReaderB extends DigitalSignatureReader {
 
     @Override
     protected CentralDirectory.DigitalSignature readDigitalSignature(DataInput in) throws IOException {

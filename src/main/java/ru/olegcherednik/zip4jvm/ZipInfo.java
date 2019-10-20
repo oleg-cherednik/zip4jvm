@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.readers.DiagnosticModelReader;
+import ru.olegcherednik.zip4jvm.io.readers.diagnostic.DiagnosticModelReader;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.diagnostic.DiagnosticModel;
 import ru.olegcherednik.zip4jvm.view.CentralDirectoryView;

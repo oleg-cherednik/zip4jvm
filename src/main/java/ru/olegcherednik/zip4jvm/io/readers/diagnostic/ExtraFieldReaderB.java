@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.diagnostic;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.diagnostic.Block;
 import ru.olegcherednik.zip4jvm.model.diagnostic.Diagnostic;
@@ -14,7 +15,7 @@ import java.util.function.Function;
  * @author Oleg Cherednik
  * @since 20.10.2019
  */
-public class ExtraFieldReaderB extends ExtraFieldReaderA {
+public class ExtraFieldReaderB extends ExtraFieldReader {
 
     public ExtraFieldReaderB(int size, Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> readers) {
         super(size, new ExtraFieldRecordReaderB(readers));

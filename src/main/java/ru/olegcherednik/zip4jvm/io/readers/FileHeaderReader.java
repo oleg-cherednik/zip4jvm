@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.io.readers.diagnostic;
+package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
@@ -23,13 +23,13 @@ import static ru.olegcherednik.zip4jvm.model.ExternalFileAttributes.PROP_OS_NAME
  * @since 26.04.2019
  */
 @RequiredArgsConstructor
-public class FileHeaderReaderA implements Reader<List<CentralDirectory.FileHeader>> {
+public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader>> {
 
     private final long totalEntries;
     private final Function<Charset, Charset> charsetCustomizer;
 
     @Override
-    public List<CentralDirectory.FileHeader> read(DataInput in) throws IOException {
+    public final List<CentralDirectory.FileHeader> read(DataInput in) throws IOException {
         List<CentralDirectory.FileHeader> fileHeaders = new LinkedList<>();
 
         for (int i = 0; i < totalEntries; i++) {
@@ -89,8 +89,8 @@ public class FileHeaderReaderA implements Reader<List<CentralDirectory.FileHeade
         return ExternalFileAttributes.build(PROP_OS_NAME).readFrom(data);
     }
 
-    protected ExtraFieldReaderA getExtraFiledReader(int size, CentralDirectory.FileHeader fileHeader) {
-        return new ExtraFieldReaderA(size, ExtraFieldReaderA.getReaders(fileHeader));
+    protected ExtraFieldReader getExtraFiledReader(int size, CentralDirectory.FileHeader fileHeader) {
+        return new ExtraFieldReader(size, ExtraFieldReader.getReaders(fileHeader));
     }
 
 }

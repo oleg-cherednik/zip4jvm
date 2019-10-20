@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.io.readers.diagnostic;
+package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
@@ -14,28 +14,24 @@ import java.util.function.Function;
  * @since 05.03.2019
  */
 @RequiredArgsConstructor
-public class CentralDirectoryReaderA implements Reader<CentralDirectory> {
+public class CentralDirectoryReader implements Reader<CentralDirectory> {
 
     private final long totalEntries;
     private final Function<Charset, Charset> charsetCustomizer;
 
     @Override
     public CentralDirectory read(DataInput in) throws IOException {
-        return readCentralDirectory(in);
-    }
-
-    protected CentralDirectory readCentralDirectory(DataInput in) throws IOException {
         CentralDirectory centralDirectory = new CentralDirectory();
         centralDirectory.setFileHeaders(getFileHeaderReader(totalEntries, charsetCustomizer).read(in));
         centralDirectory.setDigitalSignature(getDigitalSignatureReader().read(in));
         return centralDirectory;
     }
 
-    protected FileHeaderReaderA getFileHeaderReader(long totalEntries, Function<Charset, Charset> charsetCustomizer) {
-        return new FileHeaderReaderA(totalEntries, charsetCustomizer);
+    protected FileHeaderReader getFileHeaderReader(long totalEntries, Function<Charset, Charset> charsetCustomizer) {
+        return new FileHeaderReader(totalEntries, charsetCustomizer);
     }
 
-    protected DigitalSignatureReaderA getDigitalSignatureReader() {
-        return new DigitalSignatureReaderA();
+    protected DigitalSignatureReader getDigitalSignatureReader() {
+        return new DigitalSignatureReader();
     }
 }

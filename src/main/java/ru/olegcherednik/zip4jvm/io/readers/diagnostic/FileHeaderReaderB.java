@@ -1,6 +1,8 @@
 package ru.olegcherednik.zip4jvm.io.readers.diagnostic;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldReader;
+import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.diagnostic.Block;
 import ru.olegcherednik.zip4jvm.model.diagnostic.Diagnostic;
@@ -13,7 +15,7 @@ import java.util.function.Function;
  * @author Oleg Cherednik
  * @since 20.10.2019
  */
-public class FileHeaderReaderB extends FileHeaderReaderA {
+public class FileHeaderReaderB extends FileHeaderReader {
 
     public FileHeaderReaderB(long totalEntries, Function<Charset, Charset> charsetCustomizer) {
         super(totalEntries, charsetCustomizer);
@@ -31,8 +33,8 @@ public class FileHeaderReaderB extends FileHeaderReaderA {
     }
 
     @Override
-    protected ExtraFieldReaderA getExtraFiledReader(int size, CentralDirectory.FileHeader fileHeader) {
-        return new ExtraFieldReaderB(size, ExtraFieldReaderA.getReaders(fileHeader));
+    protected ExtraFieldReader getExtraFiledReader(int size, CentralDirectory.FileHeader fileHeader) {
+        return new ExtraFieldReaderB(size, ExtraFieldReader.getReaders(fileHeader));
     }
 
 }

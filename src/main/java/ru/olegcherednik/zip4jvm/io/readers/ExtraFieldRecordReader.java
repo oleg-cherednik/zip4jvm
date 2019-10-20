@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.io.readers.diagnostic;
+package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.ArrayUtils;
@@ -15,7 +15,7 @@ import java.util.function.Function;
  * @since 20.10.2019
  */
 @RequiredArgsConstructor
-public class ExtraFieldRecordReaderA implements Reader<ExtraField.Record> {
+public class ExtraFieldRecordReader implements Reader<ExtraField.Record> {
 
     private final Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> readers;
 

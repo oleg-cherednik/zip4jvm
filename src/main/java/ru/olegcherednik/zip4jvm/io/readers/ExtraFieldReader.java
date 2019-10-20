@@ -1,11 +1,8 @@
-package ru.olegcherednik.zip4jvm.io.readers.diagnostic;
+package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.readers.AesExtraDataRecordReader;
-import ru.olegcherednik.zip4jvm.io.readers.NtfsTimestampExtraFieldReader;
-import ru.olegcherednik.zip4jvm.io.readers.Zip64Reader;
 import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
@@ -27,13 +24,13 @@ import static ru.olegcherednik.zip4jvm.model.builders.LocalFileHeaderBuilder.LOO
  * @since 14.04.2019
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class ExtraFieldReaderA implements Reader<ExtraField> {
+public class ExtraFieldReader implements Reader<ExtraField> {
 
     private final int size;
-    private final ExtraFieldRecordReaderA extraFieldRecordReader;
+    private final ExtraFieldRecordReader extraFieldRecordReader;
 
-    public ExtraFieldReaderA(int size, Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> readers) {
-        this(size, new ExtraFieldRecordReaderA(readers));
+    public ExtraFieldReader(int size, Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> readers) {
+        this(size, new ExtraFieldRecordReader(readers));
     }
 
     public static Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> getReaders(CentralDirectory.FileHeader fileHeader) {
@@ -63,7 +60,7 @@ public class ExtraFieldReaderA implements Reader<ExtraField> {
     }
 
     @Override
-    public ExtraField read(DataInput in) throws IOException {
+    public final ExtraField read(DataInput in) throws IOException {
         return size > 0 ? readExtraField(in) : ExtraField.NULL;
     }
 
