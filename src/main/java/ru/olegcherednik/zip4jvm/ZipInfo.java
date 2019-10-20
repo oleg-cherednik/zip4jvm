@@ -1,9 +1,9 @@
 package ru.olegcherednik.zip4jvm;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.readers.diagnostic.DiagnosticModelReader;
+import ru.olegcherednik.zip4jvm.io.readers.block.BlockModelReader;
 import ru.olegcherednik.zip4jvm.model.Charsets;
-import ru.olegcherednik.zip4jvm.model.diagnostic.DiagnosticModel;
+import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.view.CentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.Zip64View;
@@ -40,29 +40,29 @@ public final class ZipInfo {
 //        Function<Charset, Charset> charsetCustomizer = Charsets.SYSTEM_CHARSET;
         Charset charset = charsetCustomizer.apply(Charsets.IBM437);
         final String prefix = "    ";
-        DiagnosticModel diagnosticModel = new DiagnosticModelReader(zip, charsetCustomizer).read();
+        BlockModel blockModel = new BlockModelReader(zip, charsetCustomizer).read();
 
         PrintStream out = System.out;
 
         EndCentralDirectoryView.builder()
-                               .block(diagnosticModel.getDiagnostic().getEndCentralDirectory())
-                               .dir(diagnosticModel.getEndCentralDirectory())
+                               .block(blockModel.getDiagnostic().getEndCentralDirectory())
+                               .dir(blockModel.getEndCentralDirectory())
                                .charset(charset)
                                .prefix(prefix).build().print(out);
 
         out.println();
 
         Zip64View.builder()
-                 .zip64(diagnosticModel.getZip64())
-                 .diagZip64(diagnosticModel.getDiagnostic().getZip64())
+                 .zip64(blockModel.getZip64())
+                 .diagZip64(blockModel.getDiagnostic().getZip64())
                  .charset(charset)
                  .prefix(prefix).build().print(out);
 
         out.println();
 
         CentralDirectoryView.builder()
-                            .centralDirectory(diagnosticModel.getCentralDirectory())
-                            .diagCentralDirectory(diagnosticModel.getDiagnostic().getCentralDirectory())
+                            .centralDirectory(blockModel.getCentralDirectory())
+                            .diagCentralDirectory(blockModel.getDiagnostic().getCentralDirectory())
                             .charset(charset)
                             .prefix(prefix).build().print(out);
     }

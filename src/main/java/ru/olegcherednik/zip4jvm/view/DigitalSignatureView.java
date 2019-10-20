@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.view;
 
 import lombok.Builder;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.diagnostic.Block;
+import ru.olegcherednik.zip4jvm.model.block.Block;
 
 import java.io.PrintStream;
 import java.nio.charset.Charset;

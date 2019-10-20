@@ -1,11 +1,11 @@
-package ru.olegcherednik.zip4jvm.io.readers.diagnostic;
+package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.CentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.DigitalSignatureReader;
 import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.diagnostic.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -23,11 +23,11 @@ public class BlockCentralDirectoryReader extends CentralDirectoryReader {
 
     @Override
     public CentralDirectory read(DataInput in) throws IOException {
-        return Diagnostic.getInstance().getCentralDirectory().wrapper(in, () -> super.read(in));
+        return Diagnostic.getInstance().getCentralDirectory().calc(in, () -> super.read(in));
     }
 
     @Override
-    protected FileHeaderReader getFileHeaderReader(long totalEntries, Function<Charset, Charset> charsetCustomizer) {
+    protected FileHeaderReader getFileHeaderReader() {
         return new BlockFileHeaderReader(totalEntries, charsetCustomizer);
     }
 

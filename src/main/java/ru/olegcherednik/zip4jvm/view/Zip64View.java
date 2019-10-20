@@ -1,9 +1,9 @@
 package ru.olegcherednik.zip4jvm.view;
 
 import lombok.Builder;
-import ru.olegcherednik.zip4jvm.model.diagnostic.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 import ru.olegcherednik.zip4jvm.model.Zip64;
-import ru.olegcherednik.zip4jvm.model.diagnostic.Block;
+import ru.olegcherednik.zip4jvm.model.block.Block;
 
 import java.io.PrintStream;
 import java.nio.charset.Charset;

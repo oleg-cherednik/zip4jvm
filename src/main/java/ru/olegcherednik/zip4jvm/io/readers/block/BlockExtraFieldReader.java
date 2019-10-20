@@ -1,9 +1,9 @@
-package ru.olegcherednik.zip4jvm.io.readers.diagnostic;
+package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
-import ru.olegcherednik.zip4jvm.model.diagnostic.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
@@ -24,7 +24,7 @@ public class BlockExtraFieldReader extends ExtraFieldReader {
     protected ExtraField readExtraField(DataInput in) throws IOException {
         Diagnostic.CentralDirectory.FileHeader fileHeader = Diagnostic.getInstance().getCentralDirectory().getFileHeader();
         fileHeader.addExtraField();
-        return fileHeader.getExtraField().wrapper(in, () -> super.readExtraField(in));
+        return fileHeader.getExtraField().calc(in, () -> super.readExtraField(in));
     }
 
 }

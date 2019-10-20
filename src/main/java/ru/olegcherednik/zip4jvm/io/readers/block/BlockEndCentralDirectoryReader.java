@@ -1,9 +1,9 @@
-package ru.olegcherednik.zip4jvm.io.readers.diagnostic;
+package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.EndCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
-import ru.olegcherednik.zip4jvm.model.diagnostic.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -21,7 +21,7 @@ public class BlockEndCentralDirectoryReader extends EndCentralDirectoryReader {
 
     @Override
     public EndCentralDirectory read(DataInput in) throws IOException {
-        return Diagnostic.getInstance().getEndCentralDirectory().wrapper(in, () -> super.read(in));
+        return Diagnostic.getInstance().getEndCentralDirectory().calc(in, () -> super.read(in));
     }
 
 }

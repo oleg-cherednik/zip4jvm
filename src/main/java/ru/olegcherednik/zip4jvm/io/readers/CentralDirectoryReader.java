@@ -16,18 +16,18 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class CentralDirectoryReader implements Reader<CentralDirectory> {
 
-    private final long totalEntries;
-    private final Function<Charset, Charset> charsetCustomizer;
+    protected final long totalEntries;
+    protected final Function<Charset, Charset> charsetCustomizer;
 
     @Override
     public CentralDirectory read(DataInput in) throws IOException {
         CentralDirectory centralDirectory = new CentralDirectory();
-        centralDirectory.setFileHeaders(getFileHeaderReader(totalEntries, charsetCustomizer).read(in));
+        centralDirectory.setFileHeaders(getFileHeaderReader().read(in));
         centralDirectory.setDigitalSignature(getDigitalSignatureReader().read(in));
         return centralDirectory;
     }
 
-    protected FileHeaderReader getFileHeaderReader(long totalEntries, Function<Charset, Charset> charsetCustomizer) {
+    protected FileHeaderReader getFileHeaderReader() {
         return new FileHeaderReader(totalEntries, charsetCustomizer);
     }
 

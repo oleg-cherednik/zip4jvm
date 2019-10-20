@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.model.diagnostic;
+package ru.olegcherednik.zip4jvm.model.block;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -12,7 +12,7 @@ import ru.olegcherednik.zip4jvm.model.Zip64;
  */
 @Getter
 @Builder
-public final class DiagnosticModel {
+public final class BlockModel {
 
     private final EndCentralDirectory endCentralDirectory;
     private final Zip64 zip64;

@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.model.diagnostic;
+package ru.olegcherednik.zip4jvm.model.block;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -21,7 +21,7 @@ public class Block {
     @Getter
     private long size;
 
-    public <T> T wrapper(DataInput in, LocalSupplier<T> task) throws IOException {
+    public <T> T calc(DataInput in, LocalSupplier<T> task) throws IOException {
         try {
             offs = in.getOffs();
             return task.get();

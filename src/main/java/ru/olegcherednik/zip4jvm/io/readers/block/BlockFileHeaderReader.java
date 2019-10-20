@@ -1,10 +1,10 @@
-package ru.olegcherednik.zip4jvm.io.readers.diagnostic;
+package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.diagnostic.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -25,7 +25,7 @@ public class BlockFileHeaderReader extends FileHeaderReader {
         Diagnostic.CentralDirectory centralDirectory = Diagnostic.getInstance().getCentralDirectory();
         centralDirectory.createFileHeader();
 
-        CentralDirectory.FileHeader fileHeader = centralDirectory.getFileHeader().wrapper(in, () -> super.readFileHeader(in));
+        CentralDirectory.FileHeader fileHeader = centralDirectory.getFileHeader().calc(in, () -> super.readFileHeader(in));
         centralDirectory.saveFileHeader(fileHeader.getFileName());
 
         return fileHeader;

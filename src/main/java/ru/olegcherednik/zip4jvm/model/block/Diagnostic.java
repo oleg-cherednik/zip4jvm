@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.model.diagnostic;
+package ru.olegcherednik.zip4jvm.model.block;
 
 import lombok.AccessLevel;
 import lombok.Getter;
