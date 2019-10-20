@@ -2,8 +2,11 @@ package ru.olegcherednik.zip4jvm;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.readers.block.BlockModelReader;
+import ru.olegcherednik.zip4jvm.io.readers.block.BlockZipEntryModelReader;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
+import ru.olegcherednik.zip4jvm.model.block.BlockZipEntryModel;
+import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 import ru.olegcherednik.zip4jvm.view.CentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.Zip64View;
@@ -40,31 +43,49 @@ public final class ZipInfo {
 //        Function<Charset, Charset> charsetCustomizer = Charsets.SYSTEM_CHARSET;
         Charset charset = charsetCustomizer.apply(Charsets.IBM437);
         final String prefix = "    ";
-        BlockModel blockModel = new BlockModelReader(zip, charsetCustomizer).read();
+
+        Diagnostic diagnostic = new Diagnostic();
+        BlockModel blockModel = new BlockModelReader(zip, charsetCustomizer, diagnostic).read();
+        BlockZipEntryModel zipEntryModel = new BlockZipEntryModelReader(blockModel.getZipModel(), charsetCustomizer,
+                diagnostic.getZipEntryBlock()).read();
 
         PrintStream out = System.out;
 
+        printEndCentralDirectoryView(blockModel, charset, prefix, out);
+        out.println();
+        printZip64View(blockModel, charset, prefix, out);
+        out.println();
+        printCentralDirectory(blockModel, charset, prefix, out);
+        out.println();
+        printZipEntries(blockModel, charset, prefix, out);
+    }
+
+    private static void printEndCentralDirectoryView(BlockModel blockModel, Charset charset, String prefix, PrintStream out) {
         EndCentralDirectoryView.builder()
                                .block(blockModel.getDiagnostic().getEndCentralDirectory())
                                .dir(blockModel.getEndCentralDirectory())
                                .charset(charset)
                                .prefix(prefix).build().print(out);
+    }
 
-        out.println();
-
+    @SuppressWarnings("NewMethodNamingConvention")
+    private static void printZip64View(BlockModel blockModel, Charset charset, String prefix, PrintStream out) {
         Zip64View.builder()
                  .zip64(blockModel.getZip64())
                  .diagZip64(blockModel.getDiagnostic().getZip64())
                  .charset(charset)
                  .prefix(prefix).build().print(out);
+    }
 
-        out.println();
-
+    private static void printCentralDirectory(BlockModel blockModel, Charset charset, String prefix, PrintStream out) {
         CentralDirectoryView.builder()
                             .centralDirectory(blockModel.getCentralDirectory())
                             .diagCentralDirectory(blockModel.getDiagnostic().getCentralDirectory())
                             .charset(charset)
                             .prefix(prefix).build().print(out);
+    }
+
+    private static void printZipEntries(BlockModel blockModel, Charset charset, String prefix, PrintStream out) throws IOException {
     }
 
 }

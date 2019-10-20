@@ -38,8 +38,8 @@ public final class UnzipEngine implements ZipFile.Reader {
 
     @Override
     public void extract(Path destDir) throws IOException {
-        for (ZipEntry entry : zipModel.getEntries())
-            extractEntry(destDir, entry, ZipEntry::getFileName);
+        for (ZipEntry zipEntry : zipModel.getEntries())
+            extractEntry(destDir, zipEntry, ZipEntry::getFileName);
     }
 
     @Override

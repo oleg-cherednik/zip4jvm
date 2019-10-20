@@ -16,14 +16,16 @@ import java.util.function.Function;
  */
 public class BlockFileHeaderReader extends FileHeaderReader {
 
-    public BlockFileHeaderReader(long totalEntries, Function<Charset, Charset> charsetCustomizer) {
+    private final Diagnostic.CentralDirectory centralDirectory;
+
+    public BlockFileHeaderReader(long totalEntries, Function<Charset, Charset> charsetCustomizer, Diagnostic.CentralDirectory centralDirectory) {
         super(totalEntries, charsetCustomizer);
+        this.centralDirectory = centralDirectory;
     }
 
     @Override
     protected CentralDirectory.FileHeader readFileHeader(DataInput in) throws IOException {
-        Diagnostic.CentralDirectory centralDirectory = Diagnostic.getInstance().getCentralDirectory();
-        centralDirectory.createFileHeader();
+        centralDirectory.addFileHeader();
 
         CentralDirectory.FileHeader fileHeader = centralDirectory.getFileHeader().calc(in, () -> super.readFileHeader(in));
         centralDirectory.saveFileHeader(fileHeader.getFileName());
@@ -33,7 +35,7 @@ public class BlockFileHeaderReader extends FileHeaderReader {
 
     @Override
     protected ExtraFieldReader getExtraFiledReader(int size, CentralDirectory.FileHeader fileHeader) {
-        return new BlockExtraFieldReader(size, ExtraFieldReader.getReaders(fileHeader));
+        return new BlockExtraFieldReader(size, ExtraFieldReader.getReaders(fileHeader), centralDirectory.getFileHeader());
     }
 
 }

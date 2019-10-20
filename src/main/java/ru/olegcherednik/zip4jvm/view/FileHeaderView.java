@@ -30,6 +30,7 @@ public class FileHeaderView {
         IntStream.range(0, str.length()).forEach(i -> out.print('='));
 
         out.println();
+
         out.format("%sfilename (%s): %s\n", prefix, charset.name(), fileHeader.getFileName());
         out.format("%slocation of central-directory-record:           %2$d (0x%2$08X) bytes\n", prefix, diagFileHeader.getOffs());
         out.format("%spart number of this part (%04X):                %d\n", prefix, fileHeader.getDisk(), fileHeader.getDisk() + 1);

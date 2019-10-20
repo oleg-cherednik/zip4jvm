@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.model.block;
 
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.LinkedHashMap;
@@ -14,32 +13,12 @@ import java.util.Map;
  */
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Diagnostic {
-
-    public static final Diagnostic NULL = new Diagnostic();
-
-    private static volatile Diagnostic instance = NULL;
 
     private final Block endCentralDirectory = new Block();
     private Zip64 zip64 = Zip64.NULL;
-    private CentralDirectory centralDirectory = new CentralDirectory();
-
-    public static synchronized void createInstance() {
-        instance = new Diagnostic();
-    }
-
-    public static synchronized Diagnostic removeInstance() {
-        try {
-            return instance;
-        } finally {
-            instance = NULL;
-        }
-    }
-
-    public static synchronized Diagnostic getInstance() {
-        return instance;
-    }
+    private final CentralDirectory centralDirectory = new CentralDirectory();
+    private final ZipEntryBlock zipEntryBlock = new ZipEntryBlock();
 
     public void addZip64() {
         zip64 = new Zip64();
@@ -73,7 +52,7 @@ public final class Diagnostic {
             digitalSignature = new Block();
         }
 
-        public void createFileHeader() {
+        public void addFileHeader() {
             fileHeader = new FileHeader();
         }
 
@@ -88,18 +67,25 @@ public final class Diagnostic {
 
         @Getter
         @Setter
-        public static final class FileHeader extends Block {
+        public static final class FileHeader extends ExtraFieldBlock {
 
             public static final FileHeader NULL = new FileHeader();
 
-            private ExtraField extraField;
-
-            public void addExtraField() {
-                extraField = new ExtraField();
-            }
         }
 
     }
+
+    @Getter
+    @Setter
+    public abstract static class ExtraFieldBlock extends Block {
+
+        private ExtraField extraField;
+
+        public void addExtraField() {
+            extraField = new ExtraField();
+        }
+    }
+
 
     @Getter
     @Setter
@@ -121,6 +107,82 @@ public final class Diagnostic {
 
         public Block getRecord(int signature) {
             return records.get(signature);
+        }
+
+    }
+
+    @Getter
+    @Setter
+    public static final class ZipEntryBlock {
+
+        public static final ZipEntry NULL = new ZipEntry();
+
+        private final Map<String, LocalFileHeader> localFileHeaders = new LinkedHashMap<>();
+
+        @Setter(AccessLevel.NONE)
+        private LocalFileHeader localFileHeader = LocalFileHeader.NULL;
+
+        public void addLocalFileHeader() {
+            localFileHeader = new LocalFileHeader();
+        }
+
+        public void saveLocalFileHeader(String fileName) {
+            localFileHeaders.put(fileName, localFileHeader);
+            localFileHeader = LocalFileHeader.NULL;
+        }
+
+        public LocalFileHeader getLocalFileHeader(String fileName) {
+            return localFileHeaders.get(fileName);
+        }
+
+        @Getter
+        @Setter
+        public static final class LocalFileHeader extends ExtraFieldBlock {
+
+            public static final LocalFileHeader NULL = new LocalFileHeader();
+
+            private long disk;
+
+        }
+
+    }
+
+    @Getter
+    @Setter
+    public static final class ZipEntry extends Block {
+
+        public static final ZipEntry NULL = new ZipEntry();
+
+        private final Map<String, LocalFileHeader> localFileHeaders = new LinkedHashMap<>();
+
+        @Setter(AccessLevel.NONE)
+        private LocalFileHeader localFileHeader = LocalFileHeader.NULL;
+
+
+        public void createLocalFileHeader() {
+            localFileHeader = new LocalFileHeader();
+        }
+
+        public void saveLOcalFileHeader(String fileName) {
+            localFileHeaders.put(fileName, localFileHeader);
+            localFileHeader = LocalFileHeader.NULL;
+        }
+
+        public LocalFileHeader getLocalFileHeader(String fileName) {
+            return localFileHeaders.get(fileName);
+        }
+
+        @Getter
+        @Setter
+        public static final class LocalFileHeader extends Block {
+
+            public static final LocalFileHeader NULL = new LocalFileHeader();
+
+            private ExtraField extraField;
+
+            public void addExtraField() {
+                extraField = new ExtraField();
+            }
         }
 
     }

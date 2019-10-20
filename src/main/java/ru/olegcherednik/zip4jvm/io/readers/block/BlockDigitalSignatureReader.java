@@ -15,9 +15,10 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class BlockDigitalSignatureReader extends DigitalSignatureReader {
 
+    private final Diagnostic.CentralDirectory centralDirectory;
+
     @Override
     protected CentralDirectory.DigitalSignature readDigitalSignature(DataInput in) throws IOException {
-        Diagnostic.CentralDirectory centralDirectory = Diagnostic.getInstance().getCentralDirectory();
         centralDirectory.addDigitalSignature();
         return centralDirectory.getDigitalSignature().calc(in, () -> super.readDigitalSignature(in));
     }

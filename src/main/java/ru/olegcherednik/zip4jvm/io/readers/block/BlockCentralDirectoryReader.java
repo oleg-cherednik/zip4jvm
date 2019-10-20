@@ -17,22 +17,26 @@ import java.util.function.Function;
  */
 public class BlockCentralDirectoryReader extends CentralDirectoryReader {
 
-    public BlockCentralDirectoryReader(long totalEntries, Function<Charset, Charset> charsetCustomizer) {
+    private final Diagnostic.CentralDirectory centralDirectory;
+
+    public BlockCentralDirectoryReader(long totalEntries, Function<Charset, Charset> charsetCustomizer,
+            Diagnostic.CentralDirectory centralDirectory) {
         super(totalEntries, charsetCustomizer);
+        this.centralDirectory = centralDirectory;
     }
 
     @Override
     public CentralDirectory read(DataInput in) throws IOException {
-        return Diagnostic.getInstance().getCentralDirectory().calc(in, () -> super.read(in));
+        return centralDirectory.calc(in, () -> super.read(in));
     }
 
     @Override
     protected FileHeaderReader getFileHeaderReader() {
-        return new BlockFileHeaderReader(totalEntries, charsetCustomizer);
+        return new BlockFileHeaderReader(totalEntries, charsetCustomizer, centralDirectory);
     }
 
     @Override
     protected DigitalSignatureReader getDigitalSignatureReader() {
-        return new BlockDigitalSignatureReader();
+        return new BlockDigitalSignatureReader(centralDirectory);
     }
 }

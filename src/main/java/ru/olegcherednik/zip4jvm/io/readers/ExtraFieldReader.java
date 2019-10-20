@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
@@ -23,15 +22,11 @@ import static ru.olegcherednik.zip4jvm.model.builders.LocalFileHeaderBuilder.LOO
  * @author Oleg Cherednik
  * @since 14.04.2019
  */
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+@RequiredArgsConstructor
 public class ExtraFieldReader implements Reader<ExtraField> {
 
     private final int size;
-    private final ExtraFieldRecordReader extraFieldRecordReader;
-
-    public ExtraFieldReader(int size, Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> readers) {
-        this(size, new ExtraFieldRecordReader(readers));
-    }
+    protected final Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> readers;
 
     public static Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> getReaders(CentralDirectory.FileHeader fileHeader) {
         boolean uncompressedSize = fileHeader.getUncompressedSize() == LOOK_IN_EXTRA_FIELD;
@@ -69,9 +64,13 @@ public class ExtraFieldReader implements Reader<ExtraField> {
         long offsMax = in.getOffs() + size;
 
         while (in.getOffs() < offsMax)
-            builder.addRecord(extraFieldRecordReader.read(in));
+            builder.addRecord(getExtraFieldRecordReader().read(in));
 
         return builder.build();
+    }
+
+    protected ExtraFieldRecordReader getExtraFieldRecordReader() {
+        return new ExtraFieldRecordReader(readers);
     }
 
 }

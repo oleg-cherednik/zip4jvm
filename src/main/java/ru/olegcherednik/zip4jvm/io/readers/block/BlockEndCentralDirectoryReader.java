@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.io.readers.block;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.EndCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
-import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.block.Block;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -15,13 +15,16 @@ import java.util.function.Function;
  */
 public class BlockEndCentralDirectoryReader extends EndCentralDirectoryReader {
 
-    public BlockEndCentralDirectoryReader(Function<Charset, Charset> charsetCustomizer) {
+    private final Block endCentralDirectory;
+
+    public BlockEndCentralDirectoryReader(Function<Charset, Charset> charsetCustomizer, Block endCentralDirectory) {
         super(charsetCustomizer);
+        this.endCentralDirectory = endCentralDirectory;
     }
 
     @Override
     public EndCentralDirectory read(DataInput in) throws IOException {
-        return Diagnostic.getInstance().getEndCentralDirectory().calc(in, () -> super.read(in));
+        return endCentralDirectory.calc(in, () -> super.read(in));
     }
 
 }

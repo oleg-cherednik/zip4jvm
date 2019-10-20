@@ -45,7 +45,7 @@ public final class Zip64Builder {
     private int countNumberOfFileHeaderEntriesOnDisk() {
         if (zipModel.isSplit())
             return (int)zipModel.getEntries().stream()
-                                .filter(entry -> entry.getDisk() == zipModel.getTotalDisks())
+                                .filter(zipEntry -> zipEntry.getDisk() == zipModel.getTotalDisks())
                                 .count();
 
         return zipModel.getTotalEntries();

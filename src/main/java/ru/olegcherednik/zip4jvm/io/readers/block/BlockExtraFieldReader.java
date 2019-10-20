@@ -2,6 +2,7 @@ package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldReader;
+import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldRecordReader;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
@@ -16,15 +17,23 @@ import java.util.function.Function;
  */
 public class BlockExtraFieldReader extends ExtraFieldReader {
 
-    public BlockExtraFieldReader(int size, Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> readers) {
-        super(size, new BlockExtraFieldRecordReader(readers));
+    private final Diagnostic.ExtraFieldBlock extraFieldBlock;
+
+    public BlockExtraFieldReader(int size, Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> readers,
+            Diagnostic.ExtraFieldBlock extraFieldBlock) {
+        super(size, readers);
+        this.extraFieldBlock = extraFieldBlock;
     }
 
     @Override
     protected ExtraField readExtraField(DataInput in) throws IOException {
-        Diagnostic.CentralDirectory.FileHeader fileHeader = Diagnostic.getInstance().getCentralDirectory().getFileHeader();
-        fileHeader.addExtraField();
-        return fileHeader.getExtraField().calc(in, () -> super.readExtraField(in));
+        extraFieldBlock.addExtraField();
+        return extraFieldBlock.getExtraField().calc(in, () -> super.readExtraField(in));
+    }
+
+    @Override
+    protected ExtraFieldRecordReader getExtraFieldRecordReader() {
+        return new BlockExtraFieldRecordReader(readers, extraFieldBlock.getExtraField());
     }
 
 }

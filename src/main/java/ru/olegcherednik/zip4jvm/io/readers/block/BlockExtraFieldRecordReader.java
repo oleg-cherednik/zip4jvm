@@ -16,13 +16,16 @@ import java.util.function.Function;
  */
 public class BlockExtraFieldRecordReader extends ExtraFieldRecordReader {
 
-    public BlockExtraFieldRecordReader(Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> readers) {
+    private final Diagnostic.ExtraField extraField;
+
+    public BlockExtraFieldRecordReader(Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> readers,
+            Diagnostic.ExtraField extraField) {
         super(readers);
+        this.extraField = extraField;
     }
 
     @Override
     public ExtraField.Record read(DataInput in) throws IOException {
-        Diagnostic.ExtraField extraField = Diagnostic.getInstance().getCentralDirectory().getFileHeader().getExtraField();
         extraField.addRecord();
 
         ExtraField.Record record = extraField.getRecord().calc(in, () -> super.read(in));
