@@ -15,7 +15,7 @@ import java.io.IOException;
  * @since 14.04.2019
  */
 @RequiredArgsConstructor
-final class AesExtraDataRecordReader implements Reader<AesExtraDataRecord> {
+public final class AesExtraDataRecordReader implements Reader<AesExtraDataRecord> {
 
     private final int size;
 

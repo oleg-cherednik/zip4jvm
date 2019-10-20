@@ -1,11 +1,10 @@
-package ru.olegcherednik.zip4jvm.io.readers;
+package ru.olegcherednik.zip4jvm.io.readers.diagnostic;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.diagnostic.Diagnostic;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.Version;
@@ -24,7 +23,7 @@ import static ru.olegcherednik.zip4jvm.model.ExternalFileAttributes.PROP_OS_NAME
  * @since 26.04.2019
  */
 @RequiredArgsConstructor
-final class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader>> {
+public class FileHeaderReaderA implements Reader<List<CentralDirectory.FileHeader>> {
 
     private final long totalEntries;
     private final Function<Charset, Charset> charsetCustomizer;
@@ -34,29 +33,25 @@ final class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader>
         List<CentralDirectory.FileHeader> fileHeaders = new LinkedList<>();
 
         for (int i = 0; i < totalEntries; i++) {
-            checkFileHeaderSignature(in);
-
-            CentralDirectory.FileHeader fileHeader = readFileHeader(in);
-            fileHeaders.add(fileHeader);
-
-            Diagnostic.getInstance().getCentralDirectory().getFileHeader().setEndOffs(in.getOffs());
-            Diagnostic.getInstance().getCentralDirectory().saveFileHeader(fileHeader.getFileName());
+            checkSignature(in);
+            fileHeaders.add(readFileHeader(in));
         }
 
         return fileHeaders;
     }
 
-    private static void checkFileHeaderSignature(DataInput in) throws IOException {
+    private static void checkSignature(DataInput in) throws IOException {
         long offs = in.getOffs();
 
-        if (in.readSignature() != CentralDirectory.FileHeader.SIGNATURE)
+        if (in.readDwordSignature() != CentralDirectory.FileHeader.SIGNATURE)
             throw new Zip4jvmException("Expected central directory entry not found offs=" + offs);
 
-        Diagnostic.getInstance().getCentralDirectory().createFileHeader();
-        Diagnostic.getInstance().getCentralDirectory().getFileHeader().setOffs(offs);
+        in.backward(in.dwordSignatureSize());
     }
 
-    private CentralDirectory.FileHeader readFileHeader(DataInput in) throws IOException {
+    protected CentralDirectory.FileHeader readFileHeader(DataInput in) throws IOException {
+        in.skip(in.dwordSignatureSize());
+
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
         fileHeader.setVersionMadeBy(Version.build(in.readWord()));
@@ -78,7 +73,7 @@ final class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader>
         fileHeader.setExternalFileAttributes(getExternalFileAttribute(in.readBytes(ExternalFileAttributes.SIZE)));
         fileHeader.setLocalFileHeaderOffs(in.readDword());
         fileHeader.setFileName(in.readString(fileNameLength, charsetCustomizer.apply(charset)));
-        fileHeader.setExtraField(ExtraFieldReader.build(extraFieldLength, fileHeader).read(in));
+        fileHeader.setExtraField(getExtraFiledReader(extraFieldLength, fileHeader).read(in));
         fileHeader.setComment(in.readString(fileCommentLength, charsetCustomizer.apply(charset)));
 
         return fileHeader;
@@ -92,6 +87,10 @@ final class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader>
     @SuppressWarnings("MethodCanBeVariableArityMethod")
     private static ExternalFileAttributes getExternalFileAttribute(byte[] data) throws IOException {
         return ExternalFileAttributes.build(PROP_OS_NAME).readFrom(data);
+    }
+
+    protected ExtraFieldReaderA getExtraFiledReader(int size, CentralDirectory.FileHeader fileHeader) {
+        return new ExtraFieldReaderA(size, ExtraFieldReaderA.getReaders(fileHeader));
     }
 
 }

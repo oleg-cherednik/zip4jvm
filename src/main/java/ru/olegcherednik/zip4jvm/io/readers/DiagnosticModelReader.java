@@ -3,11 +3,12 @@ package ru.olegcherednik.zip4jvm.io.readers;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
+import ru.olegcherednik.zip4jvm.io.readers.diagnostic.CentralDirectoryReaderB;
+import ru.olegcherednik.zip4jvm.io.readers.diagnostic.EndCentralDirectoryReaderB;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
-import ru.olegcherednik.zip4jvm.model.diagnostic.Block;
 import ru.olegcherednik.zip4jvm.model.diagnostic.Diagnostic;
 import ru.olegcherednik.zip4jvm.model.diagnostic.DiagnosticModel;
 
@@ -28,6 +29,8 @@ public final class DiagnosticModelReader {
 
     public DiagnosticModel read() throws IOException {
         try (DataInput in = new SingleZipInputStream(zip)) {
+            Diagnostic.createInstance();
+
             EndCentralDirectory endCentralDirectory = readEndCentralDirectory(in);
             Zip64 zip64 = ZipModelReader.readZip64(in);
             CentralDirectory centralDirectory = readCentralDirectory(endCentralDirectory, zip64, in);
@@ -45,8 +48,7 @@ public final class DiagnosticModelReader {
         long offs = in.getOffs();
 
         try {
-            Block block = Diagnostic.getInstance().getEndCentralDirectory();
-            return Block.foo(in, block, () -> new EndCentralDirectoryReader(charsetCustomizer).read(in));
+            return new EndCentralDirectoryReaderB(charsetCustomizer).read(in);
         } finally {
             in.seek(offs);
         }
@@ -55,8 +57,7 @@ public final class DiagnosticModelReader {
     private CentralDirectory readCentralDirectory(EndCentralDirectory endCentralDirectory, Zip64 zip64, DataInput in) throws IOException {
         in.seek(ZipModelBuilder.getCentralDirectoryOffs(endCentralDirectory, zip64));
         long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
-        Block block = Diagnostic.getInstance().getCentralDirectory();
-        return Block.foo(in, block, () -> new CentralDirectoryReader(totalEntries, charsetCustomizer).read(in));
+        return new CentralDirectoryReaderB(totalEntries, charsetCustomizer).read(in);
     }
 
 }

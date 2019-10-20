@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
+import ru.olegcherednik.zip4jvm.io.readers.diagnostic.CentralDirectoryReaderA;
+import ru.olegcherednik.zip4jvm.io.readers.diagnostic.EndCentralDirectoryReaderA;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -50,7 +52,7 @@ public final class ZipModelReader {
         long offs = in.getOffs();
 
         try {
-            return new EndCentralDirectoryReader(charsetCustomizer).read(in);
+            return new EndCentralDirectoryReaderA(charsetCustomizer).read(in);
         } finally {
             in.seek(offs);
         }
@@ -64,7 +66,7 @@ public final class ZipModelReader {
     private CentralDirectory readCentralDirectory(EndCentralDirectory endCentralDirectory, Zip64 zip64, DataInput in) throws IOException {
         in.seek(ZipModelBuilder.getCentralDirectoryOffs(endCentralDirectory, zip64));
         long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
-        return new CentralDirectoryReader(totalEntries, charsetCustomizer).read(in);
+        return new CentralDirectoryReaderA(totalEntries, charsetCustomizer).read(in);
     }
 
     static void findCentralDirectorySignature(DataInput in) throws IOException {
@@ -75,8 +77,8 @@ public final class ZipModelReader {
             in.seek(available--);
             commentLength--;
 
-            if (in.readSignature() == EndCentralDirectory.SIGNATURE) {
-                in.backward(in.signatureSize());
+            if (in.readDwordSignature() == EndCentralDirectory.SIGNATURE) {
+                in.backward(in.dwordSignatureSize());
                 return;
             }
         } while (commentLength >= 0 && available >= 0);

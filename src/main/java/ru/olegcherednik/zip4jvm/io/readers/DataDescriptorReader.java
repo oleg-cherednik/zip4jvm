@@ -26,7 +26,7 @@ public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
         public DataDescriptor read(DataInput in) throws IOException {
             long offs = in.getOffs();
 
-            if (in.readSignature() != DataDescriptor.SIGNATURE)
+            if (in.readDwordSignature() != DataDescriptor.SIGNATURE)
                 throw new Zip4jvmException("DataDescriptor signature expected at offs=" + offs);
 
             DataDescriptor dataDescriptor = new DataDescriptor();
@@ -44,7 +44,7 @@ public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
         public DataDescriptor read(DataInput in) throws IOException {
             long offs = in.getOffs();
 
-            if (in.readSignature() != DataDescriptor.SIGNATURE)
+            if (in.readDwordSignature() != DataDescriptor.SIGNATURE)
                 throw new Zip4jvmException("DataDescriptor signature expected at offs=" + offs);
 
             DataDescriptor dataDescriptor = new DataDescriptor();

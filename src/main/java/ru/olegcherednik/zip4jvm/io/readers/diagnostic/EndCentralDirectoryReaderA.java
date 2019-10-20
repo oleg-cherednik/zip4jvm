@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.io.readers;
+package ru.olegcherednik.zip4jvm.io.readers.diagnostic;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
@@ -15,13 +15,17 @@ import java.util.function.Function;
  * @since 04.03.2019
  */
 @RequiredArgsConstructor
-final class EndCentralDirectoryReader implements Reader<EndCentralDirectory> {
+public class EndCentralDirectoryReaderA implements Reader<EndCentralDirectory> {
 
     private final Function<Charset, Charset> charsetCustomizer;
 
     @Override
     public EndCentralDirectory read(DataInput in) throws IOException {
-        in.skip(in.signatureSize());
+        return readEndCentralDirectory(in);
+    }
+
+    protected EndCentralDirectory readEndCentralDirectory(DataInput in) throws IOException {
+        in.skip(in.dwordSignatureSize());
 
         EndCentralDirectory endCentralDirectory = new EndCentralDirectory();
         endCentralDirectory.setTotalDisks(in.readWord());

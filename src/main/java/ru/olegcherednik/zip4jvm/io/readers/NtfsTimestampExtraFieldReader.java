@@ -13,7 +13,7 @@ import java.io.IOException;
  * @since 16.10.2019
  */
 @RequiredArgsConstructor
-final class NtfsTimestampExtraFieldReader implements Reader<NtfsTimestampExtraField> {
+public final class NtfsTimestampExtraFieldReader implements Reader<NtfsTimestampExtraField> {
 
     private final int size;
 

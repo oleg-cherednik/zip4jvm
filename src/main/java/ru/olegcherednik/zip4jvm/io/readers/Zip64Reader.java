@@ -19,7 +19,7 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64;
  * @since 22.08.2019
  */
 @RequiredArgsConstructor
-final class Zip64Reader implements Reader<Zip64> {
+public final class Zip64Reader implements Reader<Zip64> {
 
     @Override
     public Zip64 read(DataInput in) throws IOException {
@@ -39,10 +39,10 @@ final class Zip64Reader implements Reader<Zip64> {
 
         in.seek(offs);
 
-        if (in.readSignature() != Zip64.EndCentralDirectoryLocator.SIGNATURE)
+        if (in.readDwordSignature() != Zip64.EndCentralDirectoryLocator.SIGNATURE)
             return false;
 
-        in.backward(in.signatureSize());
+        in.backward(in.dwordSignatureSize());
         return true;
     }
 
@@ -55,10 +55,10 @@ final class Zip64Reader implements Reader<Zip64> {
     private static Zip64.EndCentralDirectory readEndCentralDirectory(long offs, DataInput in) throws IOException {
         in.seek(offs);
 
-        if (in.readSignature() != Zip64.EndCentralDirectory.SIGNATURE)
+        if (in.readDwordSignature() != Zip64.EndCentralDirectory.SIGNATURE)
             throw new Zip4jvmException("invalid zip64 end of central directory");
 
-        in.backward(in.signatureSize());
+        in.backward(in.dwordSignatureSize());
         Block block = Diagnostic.getInstance().getZip64().getEndCentralDirectory();
         return Block.foo(in, block, () -> new Zip64Reader.EndCentralDirectory().read(in));
     }
@@ -66,7 +66,7 @@ final class Zip64Reader implements Reader<Zip64> {
     private static final class EndCentralDirectoryLocator {
 
         public Zip64.EndCentralDirectoryLocator read(DataInput in) throws IOException {
-            in.skip(in.signatureSize());
+            in.skip(in.dwordSignatureSize());
 
             Zip64.EndCentralDirectoryLocator locator = new Zip64.EndCentralDirectoryLocator();
             locator.setMainDisk(in.readDword());
@@ -84,7 +84,7 @@ final class Zip64Reader implements Reader<Zip64> {
     private static final class EndCentralDirectory {
 
         public Zip64.EndCentralDirectory read(DataInput in) throws IOException {
-            in.skip(in.signatureSize());
+            in.skip(in.dwordSignatureSize());
 
             Zip64.EndCentralDirectory dir = new Zip64.EndCentralDirectory();
             long endCentralDirectorySize = in.readQword();
@@ -108,7 +108,7 @@ final class Zip64Reader implements Reader<Zip64> {
     }
 
     @RequiredArgsConstructor
-    static final class ExtendedInfo implements Reader<Zip64.ExtendedInfo> {
+    public static final class ExtendedInfo implements Reader<Zip64.ExtendedInfo> {
 
         private final int size;
         private final boolean uncompressedSizeExists;

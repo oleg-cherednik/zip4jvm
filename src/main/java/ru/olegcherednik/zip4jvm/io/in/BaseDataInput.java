@@ -31,6 +31,11 @@ abstract class BaseDataInput implements DataInput {
     protected DataInputFile delegate;
 
     @Override
+    public int wordSize() {
+        return 2;
+    }
+
+    @Override
     public int dwordSize() {
         return 4;
     }
@@ -47,7 +52,7 @@ abstract class BaseDataInput implements DataInput {
 
     @Override
     public int readWord() throws IOException {
-        return (int)readAndConvert(OFFS_WORD, 2);
+        return (int)readAndConvert(OFFS_WORD, wordSize());
     }
 
     @Override

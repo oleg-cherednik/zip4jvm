@@ -10,15 +10,25 @@ import java.nio.charset.Charset;
  */
 public interface DataInput extends Closeable {
 
-    default int signatureSize() {
+    default int wordSignatureSize() {
+        return wordSize();
+    }
+
+    default int dwordSignatureSize() {
         return dwordSize();
     }
+
+    int wordSize();
 
     int dwordSize();
 
     long getOffs();
 
-    default int readSignature() throws IOException {
+    default int readWordSignature() throws IOException {
+        return readWord();
+    }
+
+    default int readDwordSignature() throws IOException {
         return (int)readDword();
     }
 
