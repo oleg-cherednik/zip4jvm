@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.readers.diagnostic.ExtraFieldReaderB;
+import ru.olegcherednik.zip4jvm.io.readers.diagnostic.BlockExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
@@ -51,7 +51,7 @@ public final class LocalFileHeaderReader implements Reader<LocalFileHeader> {
     private static ExtraFieldReader getExtraFiledReader(int size, LocalFileHeader localFileHeader) {
         if (Diagnostic.getInstance() == Diagnostic.NULL)
             return new ExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader));
-        return new ExtraFieldReaderB(size, ExtraFieldReader.getReaders(localFileHeader));
+        return new BlockExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader));
     }
 
     private void findHead(DataInput in) throws IOException {

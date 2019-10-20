@@ -47,7 +47,7 @@ public final class DiagnosticModelReader {
         long offs = in.getOffs();
 
         try {
-            return new EndCentralDirectoryReaderB(charsetCustomizer).read(in);
+            return new BlockEndCentralDirectoryReader(charsetCustomizer).read(in);
         } finally {
             in.seek(offs);
         }
@@ -56,7 +56,7 @@ public final class DiagnosticModelReader {
     private CentralDirectory readCentralDirectory(EndCentralDirectory endCentralDirectory, Zip64 zip64, DataInput in) throws IOException {
         in.seek(ZipModelBuilder.getCentralDirectoryOffs(endCentralDirectory, zip64));
         long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
-        return new CentralDirectoryReaderB(totalEntries, charsetCustomizer).read(in);
+        return new BlockCentralDirectoryReader(totalEntries, charsetCustomizer).read(in);
     }
 
 }

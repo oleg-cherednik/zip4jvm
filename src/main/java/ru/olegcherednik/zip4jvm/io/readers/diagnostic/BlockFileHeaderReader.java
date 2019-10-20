@@ -4,7 +4,6 @@ import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.diagnostic.Block;
 import ru.olegcherednik.zip4jvm.model.diagnostic.Diagnostic;
 
 import java.io.IOException;
@@ -15,9 +14,9 @@ import java.util.function.Function;
  * @author Oleg Cherednik
  * @since 20.10.2019
  */
-public class FileHeaderReaderB extends FileHeaderReader {
+public class BlockFileHeaderReader extends FileHeaderReader {
 
-    public FileHeaderReaderB(long totalEntries, Function<Charset, Charset> charsetCustomizer) {
+    public BlockFileHeaderReader(long totalEntries, Function<Charset, Charset> charsetCustomizer) {
         super(totalEntries, charsetCustomizer);
     }
 
@@ -26,7 +25,7 @@ public class FileHeaderReaderB extends FileHeaderReader {
         Diagnostic.CentralDirectory centralDirectory = Diagnostic.getInstance().getCentralDirectory();
         centralDirectory.createFileHeader();
 
-        CentralDirectory.FileHeader fileHeader = Block.foo(in, centralDirectory.getFileHeader(), () -> super.readFileHeader(in));
+        CentralDirectory.FileHeader fileHeader = centralDirectory.getFileHeader().wrapper(in, () -> super.readFileHeader(in));
         centralDirectory.saveFileHeader(fileHeader.getFileName());
 
         return fileHeader;
@@ -34,7 +33,7 @@ public class FileHeaderReaderB extends FileHeaderReader {
 
     @Override
     protected ExtraFieldReader getExtraFiledReader(int size, CentralDirectory.FileHeader fileHeader) {
-        return new ExtraFieldReaderB(size, ExtraFieldReader.getReaders(fileHeader));
+        return new BlockExtraFieldReader(size, ExtraFieldReader.getReaders(fileHeader));
     }
 
 }

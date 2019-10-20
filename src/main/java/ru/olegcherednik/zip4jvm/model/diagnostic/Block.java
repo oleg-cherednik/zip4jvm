@@ -21,17 +21,12 @@ public class Block {
     @Getter
     private long size;
 
-    public void setEndOffs(long offs) {
-        size = offs - this.offs;
-    }
-
-    public static <T> T foo(DataInput in, Block block, LocalSupplier<T> task)
-            throws IOException {
+    public <T> T wrapper(DataInput in, LocalSupplier<T> task) throws IOException {
         try {
-            block.setOffs(in.getOffs());
+            offs = in.getOffs();
             return task.get();
         } finally {
-            block.setEndOffs(in.getOffs());
+            size = in.getOffs() - offs;
         }
     }
 

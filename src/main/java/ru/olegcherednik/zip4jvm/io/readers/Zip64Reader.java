@@ -49,7 +49,7 @@ public final class Zip64Reader implements Reader<Zip64> {
     private static Zip64.EndCentralDirectoryLocator readEndCentralDirectoryLocator(DataInput in) throws IOException {
         Diagnostic.getInstance().addZip64();
         Block block = Diagnostic.getInstance().getZip64().getEndCentralDirectoryLocator();
-        return Block.foo(in, block, () -> new Zip64Reader.EndCentralDirectoryLocator().read(in));
+        return block.wrapper(in, () -> new Zip64Reader.EndCentralDirectoryLocator().read(in));
     }
 
     private static Zip64.EndCentralDirectory readEndCentralDirectory(long offs, DataInput in) throws IOException {
@@ -60,7 +60,7 @@ public final class Zip64Reader implements Reader<Zip64> {
 
         in.backward(in.dwordSignatureSize());
         Block block = Diagnostic.getInstance().getZip64().getEndCentralDirectory();
-        return Block.foo(in, block, () -> new Zip64Reader.EndCentralDirectory().read(in));
+        return block.wrapper(in, () -> new Zip64Reader.EndCentralDirectory().read(in));
     }
 
     private static final class EndCentralDirectoryLocator {
