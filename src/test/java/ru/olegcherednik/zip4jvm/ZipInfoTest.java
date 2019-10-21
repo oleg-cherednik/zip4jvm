@@ -52,8 +52,8 @@ public class ZipInfoTest {
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/foo/deflate/solid/off/src.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/pkware.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/ferdinand.zip"))
-//        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/aes.zip"))
-        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/split/src.zip"))
+        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/aes.zip"))
+//        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/split/src.zip"))
                .getShortInfo();
     }
 

@@ -1,9 +1,11 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.io.in.SplitZipInputStream;
+import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BlockZipEntryModel;
@@ -37,8 +39,16 @@ public class BlockZipEntryModelReader {
                 long offs = zipEntry.getLocalFileHeaderOffs();
                 LocalFileHeader localFileHeader = new LocalFileHeaderReaderB(offs, charsetCustomizer, zipEntryBlock.getLocalFileHeader()).read(in);
                 zipEntryBlock.saveLocalFileHeader(localFileHeader.getFileName());
-
                 localFileHeaders.put(localFileHeader.getFileName(), localFileHeader);
+
+                //---
+
+                Encryption encryption = zipEntry.getEncryption();
+                Encryption.CreateDecoder createDecoder = encryption.getCreateDecoder();
+
+                Decoder decoder = createDecoder.apply(zipEntry, in);
+                int a = 0;
+                a++;
             }
         }
 
