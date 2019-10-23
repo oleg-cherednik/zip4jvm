@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.crypto.Decoder;
+import ru.olegcherednik.zip4jvm.crypto.aes.AesView;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.io.in.SplitZipInputStream;
@@ -46,7 +46,16 @@ public class BlockZipEntryModelReader {
                 Encryption encryption = zipEntry.getEncryption();
                 Encryption.CreateDecoder createDecoder = encryption.getCreateDecoder();
 
-                Decoder decoder = createDecoder.apply(zipEntry, in);
+                if (zipEntry.getEncryption() == Encryption.AES_256) {
+                    AesView aesView = new AesView(zipEntry, in);
+                    in.skip((int)aesView.getCompressedSize(zipEntry));
+                    aesView.close(in);
+
+                    int a = 0;
+                    a++;
+                }
+
+
                 int a = 0;
                 a++;
             }
