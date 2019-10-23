@@ -14,11 +14,11 @@ import java.util.function.Function;
  * @author Oleg Cherednik
  * @since 20.10.2019
  */
-public class LocalFileHeaderReaderB extends LocalFileHeaderReader {
+public class BlockLocalFileHeaderReader extends LocalFileHeaderReader {
 
     private final Diagnostic.ExtraFieldBlock localFileHeader;
 
-    public LocalFileHeaderReaderB(long offs, Function<Charset, Charset> charsetCustomizer, Diagnostic.ExtraFieldBlock localFileHeader) {
+    public BlockLocalFileHeaderReader(long offs, Function<Charset, Charset> charsetCustomizer, Diagnostic.ExtraFieldBlock localFileHeader) {
         super(offs, charsetCustomizer);
         this.localFileHeader = localFileHeader;
     }

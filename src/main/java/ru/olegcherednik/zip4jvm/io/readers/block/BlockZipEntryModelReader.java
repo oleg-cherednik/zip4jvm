@@ -1,10 +1,11 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesView;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.io.in.SplitZipInputStream;
+import ru.olegcherednik.zip4jvm.io.readers.block.aes.AesEncryptionHeader;
+import ru.olegcherednik.zip4jvm.io.readers.block.aes.BlockAesHeaderReader;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -37,7 +38,8 @@ public class BlockZipEntryModelReader {
                 zipEntryBlock.addLocalFileHeader();
                 zipEntryBlock.getLocalFileHeader().setDisk(zipEntry.getDisk());
                 long offs = zipEntry.getLocalFileHeaderOffs();
-                LocalFileHeader localFileHeader = new LocalFileHeaderReaderB(offs, charsetCustomizer, zipEntryBlock.getLocalFileHeader()).read(in);
+                LocalFileHeader localFileHeader = new BlockLocalFileHeaderReader(offs, charsetCustomizer, zipEntryBlock.getLocalFileHeader()).read(
+                        in);
                 zipEntryBlock.saveLocalFileHeader(localFileHeader.getFileName());
                 localFileHeaders.put(localFileHeader.getFileName(), localFileHeader);
 
@@ -47,9 +49,10 @@ public class BlockZipEntryModelReader {
                 Encryption.CreateDecoder createDecoder = encryption.getCreateDecoder();
 
                 if (zipEntry.getEncryption() == Encryption.AES_256) {
-                    AesView aesView = new AesView(zipEntry, in);
-                    in.skip((int)aesView.getCompressedSize(zipEntry));
-                    aesView.close(in);
+                    BlockAesHeaderReader reader = new BlockAesHeaderReader(zipEntry.getStrength(), zipEntry.getCompressedSize());
+                    AesEncryptionHeader encryptionHeader = reader.read(in);
+                    zipEntryBlock.saveEncryptionHeader(zipEntry.getFileName(), encryptionHeader);
+
 
                     int a = 0;
                     a++;

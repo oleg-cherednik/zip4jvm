@@ -15,8 +15,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.Function;
 
-import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
-
 /**
  * @author Oleg Cherednik
  * @since 11.10.2019
@@ -39,14 +37,15 @@ public class ZipInfoTest {
 
     public void foo() throws IOException {
         Path path = Paths.get("d:/zip4jvm/tmp/aes.zip");
-        Files.deleteIfExists(path);
+//        Files.deleteIfExists(path);
 
         Function<String, ZipEntrySettings> entrySettingsProvider =
                 fileName -> ZipEntrySettings.builder()
                                             .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
                                             .encryption(Encryption.AES_256, "1".toCharArray()).build();
         ZipSettings settings = ZipSettings.builder().entrySettingsProvider(entrySettingsProvider).comment("password: 1").build();
-        ZipIt.zip(path).settings(settings).add(contentDirSrc);
+//        ZipIt.zip(path).settings(settings).add(contentDirSrc);
+//        ZipIt.zip(path).settings(settings).add(fileDucati);
 
 //        ZipInfo.zip(zipDeflateSolidPkware).getShortInfo();
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/foo/deflate/solid/off/src.zip"))

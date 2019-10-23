@@ -57,7 +57,7 @@ public abstract class EntryInputStream extends InputStream {
         this.zipEntry = zipEntry;
         this.in = in;
         this.decoder = decoder;
-        compressedSize = Math.max(0, decoder.getCompressedSize(zipEntry));
+        compressedSize = Math.max(0, decoder.getDataCompressedSize(zipEntry.getCompressedSize()));
         uncompressedSize = Math.max(0, zipEntry.getUncompressedSize());
     }
 

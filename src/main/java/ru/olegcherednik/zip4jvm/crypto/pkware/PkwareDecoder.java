@@ -28,8 +28,8 @@ public final class PkwareDecoder implements Decoder {
     }
 
     @Override
-    public long getCompressedSize(ZipEntry zipEntry) {
-        return zipEntry.getCompressedSize() - PkwareHeader.SIZE;
+    public long getDataCompressedSize(long compressedSize) {
+        return compressedSize - PkwareHeader.SIZE;
     }
 
 }

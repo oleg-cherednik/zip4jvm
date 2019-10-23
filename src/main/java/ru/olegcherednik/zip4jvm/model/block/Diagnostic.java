@@ -118,6 +118,7 @@ public final class Diagnostic {
         public static final ZipEntry NULL = new ZipEntry();
 
         private final Map<String, LocalFileHeader> localFileHeaders = new LinkedHashMap<>();
+        private final Map<String, EncryptionHeader> encryptionHeaders = new LinkedHashMap<>();
 
         @Setter(AccessLevel.NONE)
         private LocalFileHeader localFileHeader = LocalFileHeader.NULL;
@@ -131,6 +132,10 @@ public final class Diagnostic {
             localFileHeader = LocalFileHeader.NULL;
         }
 
+        public void saveEncryptionHeader(String fileName, EncryptionHeader encryptionHeader) {
+            encryptionHeaders.put(fileName, encryptionHeader);
+        }
+
         public LocalFileHeader getLocalFileHeader(String fileName) {
             return localFileHeaders.get(fileName);
         }
@@ -142,6 +147,10 @@ public final class Diagnostic {
             public static final LocalFileHeader NULL = new LocalFileHeader();
 
             private long disk;
+
+        }
+
+        public interface EncryptionHeader {
 
         }
 

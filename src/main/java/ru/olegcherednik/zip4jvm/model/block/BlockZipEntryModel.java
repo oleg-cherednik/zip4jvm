@@ -15,4 +15,6 @@ public class BlockZipEntryModel {
     private final Diagnostic.ZipEntryBlock zipEntryBlock;
     private final Map<String, LocalFileHeader> localFileHeaders;
 
+
+
 }
