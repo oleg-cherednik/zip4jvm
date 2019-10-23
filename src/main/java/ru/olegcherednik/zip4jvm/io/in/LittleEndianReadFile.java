@@ -20,9 +20,8 @@ public class LittleEndianReadFile implements DataInputFile {
     }
 
     @Override
-    public void skip(int bytes) throws IOException {
-        if (bytes > 0)
-            in.skipBytes(bytes);
+    public int skip(int bytes) throws IOException {
+        return in.skipBytes(bytes);
     }
 
     @Override

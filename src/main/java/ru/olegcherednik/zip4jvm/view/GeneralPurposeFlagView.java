@@ -27,12 +27,12 @@ public class GeneralPurposeFlagView {
                 StringUtils.leftPad(Integer.toBinaryString(val & 0xF), 4, '0'));
         out.format("%s  file security status  (bit 0):                %s\n", prefix,
                 generalPurposeFlag.isEncrypted() ? "encrypted" : "not encrypted");
-        out.format("%s  extended local header (bit 3):                %b\n", prefix, generalPurposeFlag.isDataDescriptorAvailable());
+        out.format("%s  extended local header (bit 3):                %s\n", prefix, generalPurposeFlag.isDataDescriptorAvailable() ? "yes" : "no");
 
         if (generalPurposeFlag.isStrongEncryption())
-            out.format("%s  strong encryption     (bit 6):                %b\n", prefix, generalPurposeFlag.isStrongEncryption());
+            out.format("%s  strong encryption     (bit 6):                yes\n", prefix);
         if (generalPurposeFlag.isUtf8())
-            out.format("%s  UTF-8 names          (bit 11):                %b\n", prefix, generalPurposeFlag.isUtf8());
+            out.format("%s  UTF-8 names          (bit 11):                yes\n", prefix);
     }
 
 }

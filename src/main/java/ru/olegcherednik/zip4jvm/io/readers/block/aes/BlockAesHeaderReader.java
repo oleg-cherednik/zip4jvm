@@ -21,22 +21,13 @@ public class BlockAesHeaderReader implements Reader<AesEncryptionHeader> {
     private final AesStrength strength;
     private final long compressedSize;
 
-    private byte[] salt;
-    private byte[] passwordChecksum;
-    private byte[] mac;
-
     @Override
     public AesEncryptionHeader read(DataInput in) throws IOException {
         AesEncryptionHeader encryptionHeader = new AesEncryptionHeader();
-        salt = encryptionHeader.getSalt().calc(in, () -> in.readBytes(strength.saltLength()));
-        passwordChecksum = encryptionHeader.getPasswordChecksum().calc(in, () -> in.readBytes(PASSWORD_CHECKSUM_SIZE));
-        // TODO should be fixed; skip is not working with split zip and with over int
-        in.skip((int)AesEngine.getDataCompressedSize(compressedSize, strength.saltLength()));
-        mac = encryptionHeader.getMac().calc(in, () -> in.readBytes(MAC_SIZE));
-
-        int a = 0;
-        a++;
-
+        encryptionHeader.getSalt().calc(in, () -> in.readBytes(strength.saltLength()));
+        encryptionHeader.getPasswordChecksum().calc(in, () -> in.readBytes(PASSWORD_CHECKSUM_SIZE));
+        in.skip(AesEngine.getDataCompressedSize(compressedSize, strength.saltLength()));
+        encryptionHeader.getMac().calc(in, () -> in.readBytes(MAC_SIZE));
         return encryptionHeader;
     }
 

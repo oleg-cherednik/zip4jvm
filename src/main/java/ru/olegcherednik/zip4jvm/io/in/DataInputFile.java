@@ -11,7 +11,7 @@ public interface DataInputFile extends Closeable {
 
     long getOffs();
 
-    void skip(int bytes) throws IOException;
+    int skip(int bytes) throws IOException;
 
     long length() throws IOException;
 

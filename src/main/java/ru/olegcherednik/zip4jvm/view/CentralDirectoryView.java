@@ -36,6 +36,7 @@ public class CentralDirectoryView {
 
         out.println();
         printFileHeaders(out);
+
         out.println();
         DigitalSignatureView.builder()
                             .digitalSignature(centralDirectory.getDigitalSignature())

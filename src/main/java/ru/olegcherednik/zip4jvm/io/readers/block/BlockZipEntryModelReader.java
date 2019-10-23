@@ -52,11 +52,9 @@ public class BlockZipEntryModelReader {
                     BlockAesHeaderReader reader = new BlockAesHeaderReader(zipEntry.getStrength(), zipEntry.getCompressedSize());
                     AesEncryptionHeader encryptionHeader = reader.read(in);
                     zipEntryBlock.saveEncryptionHeader(zipEntry.getFileName(), encryptionHeader);
-
-
-                    int a = 0;
-                    a++;
                 }
+
+
 
 
                 int a = 0;

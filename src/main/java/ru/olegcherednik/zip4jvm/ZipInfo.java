@@ -10,6 +10,7 @@ import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 import ru.olegcherednik.zip4jvm.view.CentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.Zip64View;
+import ru.olegcherednik.zip4jvm.view.ZipEntryView;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -57,7 +58,7 @@ public final class ZipInfo {
         out.println();
         printCentralDirectory(blockModel, charset, prefix, out);
         out.println();
-        printZipEntries(blockModel, charset, prefix, out);
+        printZipEntries(zipEntryModel, charset, prefix, out);
     }
 
     private static void printEndCentralDirectoryView(BlockModel blockModel, Charset charset, String prefix, PrintStream out) {
@@ -85,7 +86,11 @@ public final class ZipInfo {
                             .prefix(prefix).build().print(out);
     }
 
-    private static void printZipEntries(BlockModel blockModel, Charset charset, String prefix, PrintStream out) throws IOException {
+    private static void printZipEntries(BlockZipEntryModel zipEntryModel, Charset charset, String prefix, PrintStream out) throws IOException {
+        ZipEntryView.builder()
+                    .blockZipEntryModel(zipEntryModel)
+                    .charset(charset)
+                    .prefix(prefix).build().print(out);
     }
 
 }

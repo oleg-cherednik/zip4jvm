@@ -3,7 +3,10 @@ package ru.olegcherednik.zip4jvm.model.block;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;
 
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -140,6 +143,10 @@ public final class Diagnostic {
             return localFileHeaders.get(fileName);
         }
 
+        public EncryptionHeader getEncryptionHeader(String fileName) {
+            return encryptionHeaders.get(fileName);
+        }
+
         @Getter
         @Setter
         public static final class LocalFileHeader extends ExtraFieldBlock {
@@ -153,7 +160,20 @@ public final class Diagnostic {
         public interface EncryptionHeader {
 
         }
+    }
 
+    @Getter
+    @Setter
+    public static final class ByteArrayBlock extends Block {
+
+        private byte[] data;
+
+        @Override
+        public <T> T calc(DataInput in, LocalSupplier<T> task) throws IOException {
+            T res = super.calc(in, task);
+            data = (byte[])res;
+            return res;
+        }
     }
 
     @Getter

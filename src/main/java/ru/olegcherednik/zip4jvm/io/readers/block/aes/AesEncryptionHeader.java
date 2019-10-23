@@ -1,7 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.readers.block.aes;
 
 import lombok.Getter;
-import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 
 /**
@@ -11,8 +10,8 @@ import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 @Getter
 public class AesEncryptionHeader implements Diagnostic.ZipEntryBlock.EncryptionHeader {
 
-    private final Block salt = new Block();
-    private final Block passwordChecksum = new Block();
-    private final Block mac = new Block();
+    private final Diagnostic.ByteArrayBlock salt = new Diagnostic.ByteArrayBlock();
+    private final Diagnostic.ByteArrayBlock passwordChecksum = new Diagnostic.ByteArrayBlock();
+    private final Diagnostic.ByteArrayBlock mac = new Diagnostic.ByteArrayBlock();
 
 }

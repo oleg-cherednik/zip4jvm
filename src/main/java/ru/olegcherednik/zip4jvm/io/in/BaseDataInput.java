@@ -90,11 +90,6 @@ abstract class BaseDataInput implements DataInput {
     }
 
     @Override
-    public void skip(int bytes) throws IOException {
-        delegate.skip(bytes);
-    }
-
-    @Override
     public long length() throws IOException {
         return delegate.length();
     }
