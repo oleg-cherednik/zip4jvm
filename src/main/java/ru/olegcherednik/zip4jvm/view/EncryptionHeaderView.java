@@ -24,13 +24,6 @@ public class EncryptionHeaderView {
         if (encryptionHeader == null)
             return;
 
-        String str = String.format("#%d (%s) Encryption header - %d bytes", pos + 1, "11", 1);
-        out.println(str);
-
-        IntStream.range(0, str.length()).forEach(i -> out.print('='));
-
-        out.println();
-
         if (encryptionHeader instanceof AesEncryptionHeader)
             print((AesEncryptionHeader)encryptionHeader, out);
 
@@ -39,14 +32,33 @@ public class EncryptionHeaderView {
     }
 
     private void print(AesEncryptionHeader encryptionHeader, PrintStream out) {
-        out.format("%sEncryption header AES \n", prefix);
+        String str = String.format("#%d (AES) encryption header", pos + 1);
+        out.println(str);
 
-        out.format("%s  salt: %2$d (0x%2$08X) bytes\n", prefix, encryptionHeader.getSalt().getOffs());
-        out.format("%s  - size: %d bytes\n", prefix, encryptionHeader.getSalt().getSize());
+        IntStream.range(0, str.length()).forEach(i -> out.print('='));
+
+        out.println();
+        out.format("%ssalt:                                           %d bytes\n", prefix, encryptionHeader.getSalt().getSize());
+        out.format("%s  - location:                                   %2$d (0x%2$08X) bytes\n", prefix, encryptionHeader.getSalt().getOffs());
+
         ByteArrayHexView.builder()
                         .buf(encryptionHeader.getSalt().getData())
                         .prefix(prefix).build().print(out);
-        int a = 0;
-        a++;
+
+        out.format("%spassword checksum:                              %d bytes\n",
+                prefix, encryptionHeader.getPasswordChecksum().getSize());
+        out.format("%s  - location:                                   %2$d (0x%2$08X) bytes\n",
+                prefix, encryptionHeader.getPasswordChecksum().getOffs());
+
+        ByteArrayHexView.builder()
+                        .buf(encryptionHeader.getPasswordChecksum().getData())
+                        .prefix(prefix).build().print(out);
+
+        out.format("%smac:                                            %d bytes\n", prefix, encryptionHeader.getMac().getSize());
+        out.format("%s  - location:                                   %2$d (0x%2$08X) bytes\n", prefix, encryptionHeader.getMac().getOffs());
+
+        ByteArrayHexView.builder()
+                        .buf(encryptionHeader.getMac().getData())
+                        .prefix(prefix).build().print(out);
     }
 }
