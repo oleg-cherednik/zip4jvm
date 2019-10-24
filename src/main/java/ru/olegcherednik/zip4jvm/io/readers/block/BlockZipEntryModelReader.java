@@ -15,7 +15,7 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -31,7 +31,7 @@ public class BlockZipEntryModelReader {
     private final Diagnostic.ZipEntryBlock zipEntryBlock;
 
     public BlockZipEntryModel read() throws IOException {
-        Map<String, LocalFileHeader> localFileHeaders = new HashMap<>();
+        Map<String, LocalFileHeader> localFileHeaders = new LinkedHashMap<>();
 
         for (ZipEntry zipEntry : zipModel.getEntries()) {
             try (DataInput in = createDataInput(zipModel, zipEntry)) {
@@ -53,8 +53,6 @@ public class BlockZipEntryModelReader {
                     AesEncryptionHeader encryptionHeader = reader.read(in);
                     zipEntryBlock.saveEncryptionHeader(zipEntry.getFileName(), encryptionHeader);
                 }
-
-
 
 
                 int a = 0;

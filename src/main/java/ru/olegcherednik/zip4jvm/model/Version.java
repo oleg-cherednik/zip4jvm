@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public final class Version {
 
-    public static final Version NULL = new Version(FileSystem.UNKNOWN, 20);
+    public static final Version NULL = new Version(FileSystem.UNKNOWN, 0);
 
     private final FileSystem fileSystem;
     private final int zipSpecificationVersion;
@@ -29,7 +29,7 @@ public final class Version {
 
     @Override
     public String toString() {
-        return fileSystem.title + " / " + zipSpecificationVersion / 10.;
+        return this == NULL ? "<null>" : fileSystem.title + " / " + zipSpecificationVersion / 10.;
     }
 
     @Getter

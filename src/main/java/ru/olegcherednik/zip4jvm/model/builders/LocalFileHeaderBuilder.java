@@ -5,6 +5,7 @@ import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
+import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -22,7 +23,7 @@ public final class LocalFileHeaderBuilder {
 
     public LocalFileHeader build() {
         LocalFileHeader localFileHeader = new LocalFileHeader();
-        localFileHeader.setVersionToExtract(20);
+        localFileHeader.setVersionToExtract(new Version(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));
         localFileHeader.setGeneralPurposeFlag(createGeneralPurposeFlag());
         localFileHeader.setCompressionMethod(zipEntry.getEncryption().getCompressionMethod().apply(zipEntry.getCompression()));
         localFileHeader.setLastModifiedTime(zipEntry.getLastModifiedTime());

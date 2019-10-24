@@ -25,14 +25,13 @@ public class VersionView {
     }
 
     private void printVersionMadeBy(PrintStream out) {
-        if (versionMadeBy == Version.NULL)
-            return;
-
         Version.FileSystem fileSystem = versionMadeBy.getFileSystem();
         int zipVersion = versionMadeBy.getZipSpecificationVersion();
 
-        out.format("%sversion made by operating system (%02d):          %s\n", prefix, fileSystem.getCode(), fileSystem.getTitle());
-        out.format(Locale.US, "%sversion made by zip software (%02d):              %s\n", prefix, zipVersion, zipVersion / 10.);
+        if (versionMadeBy != Version.NULL)
+            out.format("%sversion made by operating system (%02d):          %s\n", prefix, fileSystem.getCode(), fileSystem.getTitle());
+        if (versionToExtract != Version.NULL)
+            out.format(Locale.US, "%sversion made by zip software (%02d):              %s\n", prefix, zipVersion, zipVersion / 10.);
     }
 
     private void printVersionToExtract(PrintStream out) {

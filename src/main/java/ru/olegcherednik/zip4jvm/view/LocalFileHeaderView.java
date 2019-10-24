@@ -18,30 +18,25 @@ public class LocalFileHeaderView {
 
     private final LocalFileHeader localFileHeader;
     private final Diagnostic.ZipEntryBlock.LocalFileHeader diagLocalFileHeader;
-    private final Diagnostic.ZipEntryBlock.EncryptionHeader diagEncryptionHeader;
     private final long pos;
     private final Charset charset;
     private final String prefix;
 
     public void print(PrintStream out) {
-        String str = String.format("Local directory entry %s #%d: %d bytes",
-                ViewUtils.signature(LocalFileHeader.SIGNATURE), pos + 1, diagLocalFileHeader.getSize());
+        String str = String.format("#%d (%s) Local directory entry - %d bytes",
+                pos + 1, ViewUtils.signature(LocalFileHeader.SIGNATURE), diagLocalFileHeader.getSize());
         out.println(str);
 
         IntStream.range(0, str.length()).forEach(i -> out.print('='));
 
         out.println();
-
-        out.format("%sfilename (%s): %s\n", prefix, charset.name(), localFileHeader.getFileName());
+        out.format("%sfilename (%s): %s\n\n", prefix, charset.name(), localFileHeader.getFileName());
+        out.format("%s--- part number (%04X): %d ---\n", prefix, diagLocalFileHeader.getDisk(), diagLocalFileHeader.getDisk() + 1);
         out.format("%slocation:                                       %2$d (0x%2$08X) bytes\n", prefix, diagLocalFileHeader.getOffs());
-        out.format("%spart number (%04X):                             %d\n", prefix, diagLocalFileHeader.getDisk(),
-                diagLocalFileHeader.getDisk() + 1);
-        out.format("%soffset:                                         %2$d (0x%2$08X) bytes\n", prefix, diagLocalFileHeader.getOffs());
 
-//        VersionView.builder()
-//                   .versionMadeBy(localFileHeader.getVersionToExtract()getVersionMadeBy())
-//                   .versionToExtract(localFileHeader.getVersionToExtract())
-//                   .prefix(prefix).build().print(out);
+        VersionView.builder()
+                   .versionToExtract(localFileHeader.getVersionToExtract())
+                   .prefix(prefix).build().print(out);
 
         GeneralPurposeFlagView.builder()
                               .generalPurposeFlag(localFileHeader.getGeneralPurposeFlag())
@@ -70,7 +65,6 @@ public class LocalFileHeaderView {
                       .diagExtraField(diagLocalFileHeader.getExtraField())
                       .generalPurposeFlag(localFileHeader.getGeneralPurposeFlag())
                       .prefix(prefix).build().print(out);
-
     }
 
 }

@@ -25,7 +25,7 @@ public final class LocalFileHeaderWriter implements Writer {
         CompressionMethod compressionMethod = localFileHeader.getCompressionMethod();
 
         out.writeDwordSignature(LocalFileHeader.SIGNATURE);
-        out.writeWord(localFileHeader.getVersionToExtract());
+        out.writeWord(localFileHeader.getVersionToExtract().getData());
         out.writeWord(localFileHeader.getGeneralPurposeFlag().getAsInt(compressionMethod));
         out.writeWord(compressionMethod.getCode());
         out.writeDword(localFileHeader.getLastModifiedTime());

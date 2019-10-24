@@ -27,7 +27,7 @@ public class GeneralPurposeFlagView {
                 StringUtils.leftPad(Integer.toBinaryString(val & 0xF), 4, '0'));
         out.format("%s  file security status  (bit 0):                %s\n", prefix,
                 generalPurposeFlag.isEncrypted() ? "encrypted" : "not encrypted");
-        out.format("%s  extended local header (bit 3):                %s\n", prefix, generalPurposeFlag.isDataDescriptorAvailable() ? "yes" : "no");
+        out.format("%s  data descriptor       (bit 3):                %s\n", prefix, generalPurposeFlag.isDataDescriptorAvailable() ? "yes" : "no");
 
         if (generalPurposeFlag.isStrongEncryption())
             out.format("%s  strong encryption     (bit 6):                yes\n", prefix);

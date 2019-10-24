@@ -30,7 +30,7 @@ public class ExtraFieldView {
             return;
 
         out.format("%sextra field location:                           %2$d (0x%2$08X) bytes\n", prefix, diagExtraField.getOffs());
-        out.format("%s  size:                                         %d bytes (%d records)\n",
+        out.format("%s  - size:                                       %d bytes (%d records)\n",
                 prefix, diagExtraField.getSize(), extraField.getRecords().size());
 
         for (ExtraField.Record record : extraField.getRecords()) {

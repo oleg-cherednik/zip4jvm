@@ -51,10 +51,18 @@ public class ZipEntryView {
             LocalFileHeaderView.builder()
                                .localFileHeader(localFileHeader)
                                .diagLocalFileHeader(blockZipEntryModel.getZipEntryBlock().getLocalFileHeader(localFileHeader.getFileName()))
-                               .diagEncryptionHeader(blockZipEntryModel.getZipEntryBlock().getEncryptionHeader(localFileHeader.getFileName()))
-                               .pos(pos++)
+                               .pos(pos)
                                .charset(charset)
                                .prefix(prefix).build().print(out);
+
+            out.println();
+            EncryptionHeaderView.builder()
+                                .encryptionHeader(blockZipEntryModel.getZipEntryBlock().getEncryptionHeader(localFileHeader.getFileName()))
+                                .pos(pos)
+                                .charset(charset)
+                                .prefix(prefix).build().print(out);
+
+            pos++;
         }
     }
 }

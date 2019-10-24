@@ -27,5 +27,4 @@ public final class ViewUtils {
         return buf.toString();
     }
 
-
 }

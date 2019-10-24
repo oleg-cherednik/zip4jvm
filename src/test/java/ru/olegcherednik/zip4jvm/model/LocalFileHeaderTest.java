@@ -18,10 +18,12 @@ public class LocalFileHeaderTest {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         ExtraField extraField = ExtraField.builder().addRecord(Zip64.ExtendedInfo.builder().uncompressedSize(4).build()).build();
 
+        Version versionToExtract = new Version(Version.FileSystem.Z_SYSTEM, 15);
+
         assertThat(extraField).isNotSameAs(ExtraField.NULL);
 
         LocalFileHeader localFileHeader = new LocalFileHeader();
-        localFileHeader.setVersionToExtract(2);
+        localFileHeader.setVersionToExtract(versionToExtract);
         localFileHeader.setGeneralPurposeFlag(generalPurposeFlag);
         localFileHeader.setCompressionMethod(CompressionMethod.AES);
         localFileHeader.setLastModifiedTime(3);
@@ -31,7 +33,7 @@ public class LocalFileHeaderTest {
         localFileHeader.setFileName("fileName");
         localFileHeader.setExtraField(extraField);
 
-        assertThat(localFileHeader.getVersionToExtract()).isEqualTo(2);
+        assertThat(localFileHeader.getVersionToExtract()).isSameAs(versionToExtract);
         assertThat(localFileHeader.getGeneralPurposeFlag()).isSameAs(generalPurposeFlag);
         assertThat(localFileHeader.getCompressionMethod()).isSameAs(CompressionMethod.AES);
         assertThat(localFileHeader.getLastModifiedTime()).isEqualTo(3);
