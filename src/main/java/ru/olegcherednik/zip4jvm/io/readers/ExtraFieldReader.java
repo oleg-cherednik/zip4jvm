@@ -2,13 +2,15 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.readers.os.InfoZipUnitExtraFieldReader;
+import ru.olegcherednik.zip4jvm.io.readers.os.NtfsTimestampExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
-import ru.olegcherednik.zip4jvm.model.NtfsTimestampExtraField;
 import ru.olegcherednik.zip4jvm.model.Zip64;
-import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.os.InfoZipUnixExtraField;
+import ru.olegcherednik.zip4jvm.model.os.NtfsTimestampExtraField;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
@@ -16,7 +18,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import static ru.olegcherednik.zip4jvm.model.builders.LocalFileHeaderBuilder.LOOK_IN_EXTRA_FIELD;
+import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_ENTRY_SIZE;
+import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_LOCAL_FILE_HEADER_OFFS;
+import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
 
 /**
  * @author Oleg Cherednik
@@ -29,16 +33,16 @@ public class ExtraFieldReader implements Reader<ExtraField> {
     protected final Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> readers;
 
     public static Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> getReaders(CentralDirectory.FileHeader fileHeader) {
-        boolean uncompressedSize = fileHeader.getUncompressedSize() == LOOK_IN_EXTRA_FIELD;
-        boolean compressedSize = fileHeader.getCompressedSize() == LOOK_IN_EXTRA_FIELD;
-        boolean offs = fileHeader.getLocalFileHeaderOffs() == LOOK_IN_EXTRA_FIELD;
-        boolean disk = fileHeader.getDisk() == ZipModel.MAX_TOTAL_DISKS;
+        boolean uncompressedSize = fileHeader.getUncompressedSize() == MAX_ENTRY_SIZE;
+        boolean compressedSize = fileHeader.getCompressedSize() == MAX_ENTRY_SIZE;
+        boolean offs = fileHeader.getLocalFileHeaderOffs() == MAX_LOCAL_FILE_HEADER_OFFS;
+        boolean disk = fileHeader.getDisk() == MAX_TOTAL_DISKS;
         return getReaders(uncompressedSize, compressedSize, offs, disk);
     }
 
     public static Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> getReaders(LocalFileHeader localFileHeader) {
-        boolean uncompressedSize = localFileHeader.getUncompressedSize() == LOOK_IN_EXTRA_FIELD;
-        boolean compressedSize = localFileHeader.getCompressedSize() == LOOK_IN_EXTRA_FIELD;
+        boolean uncompressedSize = localFileHeader.getUncompressedSize() == MAX_ENTRY_SIZE;
+        boolean compressedSize = localFileHeader.getCompressedSize() == MAX_ENTRY_SIZE;
         return getReaders(uncompressedSize, compressedSize, false, false);
     }
 
@@ -51,6 +55,7 @@ public class ExtraFieldReader implements Reader<ExtraField> {
 
         map.put(AesExtraDataRecord.SIGNATURE, AesExtraDataRecordReader::new);
         map.put(NtfsTimestampExtraField.SIGNATURE, NtfsTimestampExtraFieldReader::new);
+        map.put(InfoZipUnixExtraField.SIGNATURE, InfoZipUnitExtraFieldReader::new);
         return map;
     }
 

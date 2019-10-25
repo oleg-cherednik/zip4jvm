@@ -4,14 +4,17 @@ import lombok.Builder;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
-import ru.olegcherednik.zip4jvm.model.NtfsTimestampExtraField;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.os.InfoZipUnixExtraField;
+import ru.olegcherednik.zip4jvm.model.os.NtfsTimestampExtraField;
 
 import java.io.PrintStream;
+
+import static ru.olegcherednik.zip4jvm.model.ExtraField.NO_DATA;
 
 /**
  * @author Oleg Cherednik
@@ -38,6 +41,8 @@ public class ExtraFieldView {
                 continue;
             if (record instanceof NtfsTimestampExtraField)
                 print((NtfsTimestampExtraField)record, out);
+            else if (record instanceof InfoZipUnixExtraField)
+                print((InfoZipUnixExtraField)record, out);
             else if (record instanceof Zip64.ExtendedInfo)
                 print((Zip64.ExtendedInfo)record, out);
             else if (record instanceof AesExtraDataRecord)
@@ -58,6 +63,21 @@ public class ExtraFieldView {
         out.format("%s  Last Modified Date:                           %2$tY-%2$tm-%2$td %2$tH:%2$tM:%2$tS\n", prefix,
                 record.getLastModificationTime());
         out.format("%s  Last Accessed Date:                           %2$tY-%2$tm-%2$td %2$tH:%2$tM:%2$tS\n", prefix, record.getLastAccessTime());
+    }
+
+    private void print(InfoZipUnixExtraField record, PrintStream out) {
+        Block block = diagExtraField.getRecord(record.getSignature());
+
+        out.format("%s(0x%04X) old InfoZIP Unix/OS2/NT:               %d bytes\n", prefix, record.getSignature(), block.getSize());
+        out.format("%s  - location:                                   %2$d (0x%2$08X) bytes\n", prefix, block.getOffs());
+        out.format("%s  Last Modified Date:                           %2$tY-%2$tm-%2$td %2$tH:%2$tM:%2$tS\n", prefix,
+                record.getLastModificationTime());
+        out.format("%s  Last Accessed Date:                           %2$tY-%2$tm-%2$td %2$tH:%2$tM:%2$tS\n", prefix, record.getLastAccessTime());
+
+        if (record.getUid() != NO_DATA)
+            out.format("%s  User identifier (UID):                        %d\n", prefix, record.getUid());
+        if (record.getGid() != NO_DATA)
+            out.format("%s  Group Identifier (GID):                       %d\n", prefix, record.getGid());
     }
 
     private void print(Zip64.ExtendedInfo record, PrintStream out) {
