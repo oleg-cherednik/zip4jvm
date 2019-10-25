@@ -9,6 +9,8 @@ import ru.olegcherednik.zip4jvm.model.ExtraField;
 import java.io.IOException;
 
 /**
+ * Added under MacOS
+ *
  * @author Oleg Cherednik
  * @since 25.10.2019
  */
