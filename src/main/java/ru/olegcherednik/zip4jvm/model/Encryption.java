@@ -42,7 +42,6 @@ public enum Encryption {
             return OFF;
         if (extraField.getAesExtraDataRecord() != AesExtraDataRecord.NULL)
             return AesEngine.getEncryption(extraField.getAesExtraDataRecord().getStrength());
-//        return generalPurposeFlag.isStrongEncryption() ? STRONG : PKWARE;
         return PKWARE;
     }
 

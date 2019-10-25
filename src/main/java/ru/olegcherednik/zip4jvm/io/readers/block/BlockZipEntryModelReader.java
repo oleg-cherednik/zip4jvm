@@ -6,6 +6,8 @@ import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.io.in.SplitZipInputStream;
 import ru.olegcherednik.zip4jvm.io.readers.block.aes.AesEncryptionHeader;
 import ru.olegcherednik.zip4jvm.io.readers.block.aes.BlockAesHeaderReader;
+import ru.olegcherednik.zip4jvm.io.readers.block.pkware.BlockPkwareHeaderReader;
+import ru.olegcherednik.zip4jvm.io.readers.block.pkware.PkwareEncryptionHeader;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -48,15 +50,15 @@ public class BlockZipEntryModelReader {
                 Encryption encryption = zipEntry.getEncryption();
                 Encryption.CreateDecoder createDecoder = encryption.getCreateDecoder();
 
-                if (zipEntry.getEncryption() == Encryption.AES_256) {
+                if (zipEntry.getEncryption() == Encryption.AES_256 || zipEntry.getEncryption() == Encryption.AES_192
+                        || zipEntry.getEncryption() == Encryption.AES_128) {
                     BlockAesHeaderReader reader = new BlockAesHeaderReader(zipEntry.getStrength(), zipEntry.getCompressedSize());
                     AesEncryptionHeader encryptionHeader = reader.read(in);
                     zipEntryBlock.saveEncryptionHeader(zipEntry.getFileName(), encryptionHeader);
+                } else if (zipEntry.getEncryption() == Encryption.PKWARE) {
+                    PkwareEncryptionHeader encryptionHeader = new BlockPkwareHeaderReader().read(in);
+                    zipEntryBlock.saveEncryptionHeader(zipEntry.getFileName(), encryptionHeader);
                 }
-
-
-                int a = 0;
-                a++;
             }
         }
 
