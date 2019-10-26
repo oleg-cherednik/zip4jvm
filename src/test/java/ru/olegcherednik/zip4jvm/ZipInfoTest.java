@@ -59,4 +59,11 @@ public class ZipInfoTest {
                .getShortInfo();
     }
 
+    public void decompose() {
+        Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+
+        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/pkware.zip"))
+               .decompose(dir);
+    }
+
 }

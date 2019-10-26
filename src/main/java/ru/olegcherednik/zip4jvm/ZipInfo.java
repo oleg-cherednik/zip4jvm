@@ -93,4 +93,9 @@ public final class ZipInfo {
                     .prefix(prefix).build().print(out);
     }
 
+    public void decompose(Path path) {
+        int a = 0;
+        a++;
+    }
+
 }
