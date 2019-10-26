@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.view;
 
 import lombok.Builder;
+import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
@@ -10,7 +11,8 @@ import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 import ru.olegcherednik.zip4jvm.model.os.ExtendedTimestampExtraField;
-import ru.olegcherednik.zip4jvm.model.os.InfoZipUnixExtraField;
+import ru.olegcherednik.zip4jvm.model.os.InfoZipNewUnixExtraField;
+import ru.olegcherednik.zip4jvm.model.os.InfoZipOldUnixExtraField;
 import ru.olegcherednik.zip4jvm.model.os.NtfsTimestampExtraField;
 
 import java.io.PrintStream;
@@ -42,8 +44,10 @@ public class ExtraFieldView {
                 continue;
             if (record instanceof NtfsTimestampExtraField)
                 print((NtfsTimestampExtraField)record, out);
-            else if (record instanceof InfoZipUnixExtraField)
-                print((InfoZipUnixExtraField)record, out);
+            else if (record instanceof InfoZipOldUnixExtraField)
+                print((InfoZipOldUnixExtraField)record, out);
+            else if (record instanceof InfoZipNewUnixExtraField)
+                print((InfoZipNewUnixExtraField)record, out);
             else if (record instanceof ExtendedTimestampExtraField)
                 print((ExtendedTimestampExtraField)record, out);
             else if (record instanceof Zip64.ExtendedInfo)
@@ -68,7 +72,7 @@ public class ExtraFieldView {
         out.format("%s  Last Accessed Date:                           %2$tY-%2$tm-%2$td %2$tH:%2$tM:%2$tS\n", prefix, record.getLastAccessTime());
     }
 
-    private void print(InfoZipUnixExtraField record, PrintStream out) {
+    private void print(InfoZipOldUnixExtraField record, PrintStream out) {
         Block block = diagExtraField.getRecord(record.getSignature());
 
         out.format("%s(0x%04X) old InfoZIP Unix/OS2/NT:               %d bytes\n", prefix, record.getSignature(), block.getSize());
@@ -81,6 +85,30 @@ public class ExtraFieldView {
             out.format("%s  User identifier (UID):                        %d\n", prefix, record.getUid());
         if (record.getGid() != NO_DATA)
             out.format("%s  Group Identifier (GID):                       %d\n", prefix, record.getGid());
+    }
+
+    private void print(InfoZipNewUnixExtraField record, PrintStream out) {
+        Block block = diagExtraField.getRecord(record.getSignature());
+
+        out.format("%s(0x%04X) new InfoZIP Unix/OS2/NT:               %d bytes\n", prefix, record.getSignature(), block.getSize());
+        out.format("%s  - location:                                   %2$d (0x%2$08X) bytes\n", prefix, block.getOffs());
+
+        if (record.getVersion() == 1) {
+            out.format("%s  version:                                      %d\n", prefix, record.getVersion());
+
+            InfoZipNewUnixExtraField.VersionOnePayload payload = record.getPayload();
+
+            if (StringUtils.isNotBlank(payload.getUid()))
+                out.format("%s  User identifier (UID):                        %s\n", prefix, payload.getUid());
+            if (StringUtils.isNotBlank(payload.getGid()))
+                out.format("%s  Group Identifier (GID):                       %s\n", prefix, payload.getGid());
+        } else {
+            out.format("%s  version:                                      %d (unknown)\n", prefix, record.getVersion());
+
+            ByteArrayHexView.builder()
+                            .buf(((InfoZipNewUnixExtraField.VersionUnknownPayload)record.getPayload()).getData())
+                            .prefix(prefix).build().print(out);
+        }
     }
 
     private void print(ExtendedTimestampExtraField record, PrintStream out) {

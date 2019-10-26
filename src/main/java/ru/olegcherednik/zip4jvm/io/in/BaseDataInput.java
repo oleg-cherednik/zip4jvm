@@ -7,10 +7,13 @@ import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * @author Oleg Cherednik
@@ -31,6 +34,11 @@ abstract class BaseDataInput implements DataInput {
     protected DataInputFile delegate;
 
     @Override
+    public int byteSize() {
+        return 1;
+    }
+
+    @Override
     public int wordSize() {
         return 2;
     }
@@ -47,7 +55,7 @@ abstract class BaseDataInput implements DataInput {
 
     @Override
     public int readByte() throws IOException {
-        return (int)readAndConvert(OFFS_BYTE, 1);
+        return (int)readAndConvert(OFFS_BYTE, byteSize());
     }
 
     @Override
@@ -63,6 +71,21 @@ abstract class BaseDataInput implements DataInput {
     @Override
     public long readQword() throws IOException {
         return readAndConvert(OFFS_QWORD, 8);
+    }
+
+    @Override
+    public String readNumber(int bytes, int radix) throws IOException {
+        if (bytes <= 0)
+            return null;
+
+        byte[] buf = readBytes(bytes);
+
+        String hexStr = IntStream.rangeClosed(1, bytes)
+                                 .map(i -> buf[buf.length - i] & 0xFF)
+                                 .mapToObj(Integer::toHexString)
+                                 .collect(Collectors.joining());
+
+        return new BigInteger(hexStr, radix).toString();
     }
 
     private long readAndConvert(int offs, int len) throws IOException {
