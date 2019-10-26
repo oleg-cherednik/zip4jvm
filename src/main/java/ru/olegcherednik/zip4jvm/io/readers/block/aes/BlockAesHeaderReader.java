@@ -16,14 +16,14 @@ import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.PASSWORD_CHECKSUM_SI
  * @since 23.10.2019
  */
 @RequiredArgsConstructor
-public class BlockAesHeaderReader implements Reader<AesEncryptionHeader> {
+public class BlockAesHeaderReader implements Reader<BlockAesEncryptionHeader> {
 
     private final AesStrength strength;
     private final long compressedSize;
 
     @Override
-    public AesEncryptionHeader read(DataInput in) throws IOException {
-        AesEncryptionHeader encryptionHeader = new AesEncryptionHeader();
+    public BlockAesEncryptionHeader read(DataInput in) throws IOException {
+        BlockAesEncryptionHeader encryptionHeader = new BlockAesEncryptionHeader();
         encryptionHeader.getSalt().calc(in, () -> in.readBytes(strength.saltLength()));
         encryptionHeader.getPasswordChecksum().calc(in, () -> in.readBytes(PASSWORD_CHECKSUM_SIZE));
         in.skip(AesEngine.getDataCompressedSize(compressedSize, strength.saltLength()));

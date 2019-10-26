@@ -34,7 +34,7 @@ public final class ZipModelWriter implements Writer {
     }
 
     private void updateZip64(long offs) {
-        if (zipModel.getEntries().size() > ZipModel.MAX_TOTAL_ENTRIES)
+        if (zipModel.getZipEntries().size() > ZipModel.MAX_TOTAL_ENTRIES)
             zipModel.setZip64(true);
         if (zipModel.getTotalDisks() > ZipModel.MAX_TOTAL_DISKS)
             zipModel.setZip64(true);
@@ -44,7 +44,7 @@ public final class ZipModelWriter implements Writer {
 
     private void writeCentralDirectoryHeaders(DataOutput out) throws IOException {
         out.mark(CENTRAL_DIRECTORY_OFFS);
-        CentralDirectory centralDirectory = new CentralDirectoryBuilder(zipModel.getEntries()).build();
+        CentralDirectory centralDirectory = new CentralDirectoryBuilder(zipModel.getZipEntries()).build();
         new CentralDirectoryWriter(centralDirectory).write(out);
         zipModel.setCentralDirectorySize(out.getWrittenBytesAmount(CENTRAL_DIRECTORY_OFFS));
     }

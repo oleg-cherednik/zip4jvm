@@ -62,6 +62,13 @@ public class ZipEntryView {
                                 .charset(charset)
                                 .prefix(prefix).build().print(out);
 
+            out.println();
+            DataDescriptorView.builder()
+                              .dataDescriptor(blockZipEntryModel.getDataDescriptors().get(localFileHeader.getFileName()))
+                              .block(blockZipEntryModel.getZipEntryBlock().getDataDescriptor(localFileHeader.getFileName()))
+                              .pos(pos)
+                              .prefix(prefix).build().print(out);
+
             pos++;
         }
     }

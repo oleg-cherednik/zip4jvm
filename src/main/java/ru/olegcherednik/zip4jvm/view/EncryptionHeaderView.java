@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.view;
 
 import lombok.Builder;
-import ru.olegcherednik.zip4jvm.io.readers.block.aes.AesEncryptionHeader;
+import ru.olegcherednik.zip4jvm.io.readers.block.aes.BlockAesEncryptionHeader;
 import ru.olegcherednik.zip4jvm.io.readers.block.pkware.PkwareEncryptionHeader;
 import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 
@@ -25,13 +25,13 @@ public class EncryptionHeaderView {
         if (encryptionHeader == null)
             return;
 
-        if (encryptionHeader instanceof AesEncryptionHeader)
-            print((AesEncryptionHeader)encryptionHeader, out);
+        if (encryptionHeader instanceof BlockAesEncryptionHeader)
+            print((BlockAesEncryptionHeader)encryptionHeader, out);
         else if(encryptionHeader instanceof PkwareEncryptionHeader)
             print((PkwareEncryptionHeader)encryptionHeader, out);
     }
 
-    private void print(AesEncryptionHeader encryptionHeader, PrintStream out) {
+    private void print(BlockAesEncryptionHeader encryptionHeader, PrintStream out) {
         String str = String.format("#%d (AES) encryption header", pos + 1);
         out.println(str);
 

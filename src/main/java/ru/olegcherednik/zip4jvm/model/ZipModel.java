@@ -77,7 +77,7 @@ public class ZipModel {
         fileNameEntry.put(zipEntry.getFileName(), zipEntry);
     }
 
-    public Collection<ZipEntry> getEntries() {
+    public Collection<ZipEntry> getZipEntries() {
         return isEmpty() ? Collections.emptyList() : Collections.unmodifiableCollection(fileNameEntry.values());
     }
 

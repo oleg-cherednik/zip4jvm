@@ -122,6 +122,7 @@ public final class Diagnostic {
 
         private final Map<String, LocalFileHeader> localFileHeaders = new LinkedHashMap<>();
         private final Map<String, EncryptionHeader> encryptionHeaders = new LinkedHashMap<>();
+        private final Map<String, Block> dataDescriptors = new LinkedHashMap<>();
 
         @Setter(AccessLevel.NONE)
         private LocalFileHeader localFileHeader = LocalFileHeader.NULL;
@@ -139,12 +140,20 @@ public final class Diagnostic {
             encryptionHeaders.put(fileName, encryptionHeader);
         }
 
+        public void saveDataDescriptor(String fileName, Block block) {
+            dataDescriptors.put(fileName, block);
+        }
+
         public LocalFileHeader getLocalFileHeader(String fileName) {
             return localFileHeaders.get(fileName);
         }
 
         public EncryptionHeader getEncryptionHeader(String fileName) {
             return encryptionHeaders.get(fileName);
+        }
+
+        public Block getDataDescriptor(String fileName) {
+            return dataDescriptors.get(fileName);
         }
 
         @Getter
@@ -160,6 +169,7 @@ public final class Diagnostic {
         public interface EncryptionHeader {
 
         }
+
     }
 
     @Getter
