@@ -12,7 +12,7 @@ import java.util.LinkedList;
  * @since 17.10.2019
  */
 @Builder
-final class ByteArrayHexView {
+public final class ByteArrayHexView {
 
     private final byte[] buf;
     private final String prefix;

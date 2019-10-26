@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.view;
 import lombok.Builder;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
+import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
 
 import java.io.PrintStream;
 import java.nio.charset.Charset;

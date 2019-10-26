@@ -52,6 +52,12 @@ public final class ExtraField {
         return map.isEmpty() ? Collections.emptyList() : Collections.unmodifiableCollection(map.values());
     }
 
+    public int getTotalRecords() {
+        return (int)map.values().stream()
+                       .filter(record -> !record.isNull())
+                       .count();
+    }
+
     public int getSize() {
         return map.values().stream()
                   .mapToInt(Record::getBlockSize)
@@ -60,7 +66,7 @@ public final class ExtraField {
 
     @Override
     public String toString() {
-        return this == NULL ? "<null>" : ("total: " + map.size());
+        return this == NULL ? "<null>" : ("total: " + getTotalRecords());
     }
 
     public interface Record extends Writer {
