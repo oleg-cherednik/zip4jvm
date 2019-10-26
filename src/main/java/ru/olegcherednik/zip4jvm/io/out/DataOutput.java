@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.out;
 
 import org.apache.commons.lang.ArrayUtils;
+import ru.olegcherednik.zip4jvm.io.Marker;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -9,7 +10,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 03.08.2019
  */
-public interface DataOutput extends Closeable {
+public interface DataOutput extends Marker, Closeable {
 
     long getOffs();
 
@@ -33,12 +34,6 @@ public interface DataOutput extends Closeable {
     }
 
     void write(byte[] buf, int offs, int len) throws IOException;
-
-    void mark(String id);
-
-    long getMark(String id);
-
-    long getWrittenBytesAmount(String id);
 
     default long getDisk() {
         return 0;

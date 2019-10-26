@@ -21,7 +21,7 @@ final class AesExtraDataRecordBuilder {
             return AesExtraDataRecord.NULL;
 
         return AesExtraDataRecord.builder()
-                                 .size(7)
+                                 .dataSize(7)
                                  .vendor("AE")
                                  .versionNumber(2)
                                  .strength(strength)

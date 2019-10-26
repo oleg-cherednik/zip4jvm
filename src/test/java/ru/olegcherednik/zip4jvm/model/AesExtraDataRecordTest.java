@@ -23,7 +23,7 @@ public class AesExtraDataRecordTest {
 
     public void shouldCreateRecordWhenAllDataValid() {
         AesExtraDataRecord record = AesExtraDataRecord.builder()
-                                                      .size(7)
+                                                      .dataSize(7)
                                                       .vendor("AE")
                                                       .versionNumber(2)
                                                       .strength(AesStrength.S256)
@@ -31,7 +31,7 @@ public class AesExtraDataRecordTest {
 
         assertThat(record).isNotNull();
         assertThat(record).isNotSameAs(AesExtraDataRecord.NULL);
-        assertThat(record.getSize()).isEqualTo(7);
+        assertThat(record.getDataSize()).isEqualTo(7);
         assertThat(record.getVendor()).isEqualTo("AE");
         assertThat(record.getVendor(Charsets.UTF_8)).isEqualTo(new byte[] { 0x41, 0x45 });
         assertThat(record.getVersionNumber()).isEqualTo(2);
@@ -41,7 +41,7 @@ public class AesExtraDataRecordTest {
 
     public void shouldRetrieveNullStringWhenToStringForNullObject() {
         AesExtraDataRecord record = AesExtraDataRecord.builder()
-                                                      .size(7)
+                                                      .dataSize(7)
                                                       .vendor("AE")
                                                       .versionNumber(2)
                                                       .strength(AesStrength.S256)
@@ -57,7 +57,7 @@ public class AesExtraDataRecordTest {
 
     public void shouldRetrieveNullWhenGetVendorWithGivenCharset() {
         AesExtraDataRecord record = AesExtraDataRecord.builder()
-                                                      .size(7)
+                                                      .dataSize(7)
                                                       .versionNumber(2)
                                                       .strength(AesStrength.S256)
                                                       .compressionMethod(CompressionMethod.AES).build();
@@ -66,7 +66,7 @@ public class AesExtraDataRecordTest {
 
     public void shouldRetrieve0WhenGetBlockSizeForNullObject() {
         AesExtraDataRecord record = AesExtraDataRecord.builder()
-                                                      .size(7)
+                                                      .dataSize(7)
                                                       .versionNumber(2)
                                                       .strength(AesStrength.S256)
                                                       .compressionMethod(CompressionMethod.AES).build();

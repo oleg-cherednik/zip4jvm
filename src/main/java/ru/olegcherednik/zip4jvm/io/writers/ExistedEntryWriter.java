@@ -9,6 +9,7 @@ import ru.olegcherednik.zip4jvm.io.in.SplitZipInputStream;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
+import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -70,7 +71,7 @@ public class ExistedEntryWriter implements Writer {
         }
 
         public void copyLocalFileHeader(DataOutput out) throws IOException {
-            Function<Charset, Charset> charsetCustomizer = ZipModel.STANDARD_ZIP_CHARSET;
+            Function<Charset, Charset> charsetCustomizer = Charsets.STANDARD_ZIP_CHARSET;
             LocalFileHeader localFileHeader = new LocalFileHeaderReader(zipEntry.getLocalFileHeaderOffs(), charsetCustomizer).read(in);
             zipEntry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
             new LocalFileHeaderWriter(localFileHeader).write(out);

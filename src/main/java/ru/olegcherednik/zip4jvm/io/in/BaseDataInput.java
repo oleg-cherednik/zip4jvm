@@ -4,10 +4,16 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * @author Oleg Cherednik
@@ -23,7 +29,24 @@ abstract class BaseDataInput implements DataInput {
 
     private static final ThreadLocal<byte[]> THREAD_LOCAL_BUF = ThreadLocal.withInitial(() -> new byte[15]);
 
+    private final Map<String, Long> map = new HashMap<>();
+
     protected DataInputFile delegate;
+
+    @Override
+    public int byteSize() {
+        return 1;
+    }
+
+    @Override
+    public int wordSize() {
+        return 2;
+    }
+
+    @Override
+    public int dwordSize() {
+        return 4;
+    }
 
     @Override
     public long getOffs() {
@@ -32,22 +55,37 @@ abstract class BaseDataInput implements DataInput {
 
     @Override
     public int readByte() throws IOException {
-        return (int)readAndConvert(OFFS_BYTE, 1);
+        return (int)readAndConvert(OFFS_BYTE, byteSize());
     }
 
     @Override
     public int readWord() throws IOException {
-        return (int)readAndConvert(OFFS_WORD, 2);
+        return (int)readAndConvert(OFFS_WORD, wordSize());
     }
 
     @Override
     public long readDword() throws IOException {
-        return readAndConvert(OFFS_DWORD, 4);
+        return readAndConvert(OFFS_DWORD, dwordSize());
     }
 
     @Override
     public long readQword() throws IOException {
         return readAndConvert(OFFS_QWORD, 8);
+    }
+
+    @Override
+    public String readNumber(int bytes, int radix) throws IOException {
+        if (bytes <= 0)
+            return null;
+
+        byte[] buf = readBytes(bytes);
+
+        String hexStr = IntStream.rangeClosed(1, bytes)
+                                 .map(i -> buf[buf.length - i] & 0xFF)
+                                 .mapToObj(Integer::toHexString)
+                                 .collect(Collectors.joining());
+
+        return new BigInteger(hexStr, radix).toString();
     }
 
     private long readAndConvert(int offs, int len) throws IOException {
@@ -75,11 +113,6 @@ abstract class BaseDataInput implements DataInput {
     }
 
     @Override
-    public void skip(int bytes) throws IOException {
-        delegate.skip(bytes);
-    }
-
-    @Override
     public long length() throws IOException {
         return delegate.length();
     }
@@ -92,6 +125,23 @@ abstract class BaseDataInput implements DataInput {
     @Override
     public void close() throws IOException {
         delegate.close();
+    }
+
+    @Override
+    public void mark(String id) {
+        map.put(id, getOffs());
+    }
+
+    @Override
+    public long getMark(String id) {
+        if (!map.containsKey(id))
+            throw new Zip4jvmException("Cannot find mark: " + id);
+        return map.get(id);
+    }
+
+    @Override
+    public void seek(String id) throws IOException {
+        seek(getMark(id));
     }
 
     @Override

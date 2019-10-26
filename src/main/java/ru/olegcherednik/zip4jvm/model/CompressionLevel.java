@@ -5,18 +5,20 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
+ * see 4.4.4
+ *
  * @author Oleg Cherednik
  * @since 09.03.2019
  */
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum CompressionLevel {
-    FASTEST(1),
-    FAST(3),
-    NORMAL(5),
-    MAXIMUM(7),
-    ULTRA(9);
+    SUPER_FAST(1, "superfast"),
+    FAST(3, "fast"),
+    NORMAL(5, "normal"),
+    MAXIMUM(7, "maximum");
 
     private final int code;
+    private final String title;
 
 }

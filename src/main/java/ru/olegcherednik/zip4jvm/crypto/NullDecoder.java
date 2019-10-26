@@ -1,7 +1,5 @@
 package ru.olegcherednik.zip4jvm.crypto;
 
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-
 /**
  * @author Oleg Cherednik
  * @since 11.08.2019
@@ -14,8 +12,8 @@ final class NullDecoder implements Decoder {
     }
 
     @Override
-    public long getCompressedSize(ZipEntry zipEntry) {
-        return zipEntry.getCompressedSize();
+    public long getDataCompressedSize(long compressedSize) {
+        return compressedSize;
     }
 
     @Override

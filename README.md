@@ -27,7 +27,7 @@ zip4jvm - a java library for working with zip files
 ## Gradle
 
 ~~~~
-compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:0.7'
+compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:0.8'
 ~~~~
 
 ## Maven
@@ -36,7 +36,7 @@ compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:0.7'
 <dependency>
     <groupId>ru.oleg-cherednik.zip4jvm</groupId>
     <artifactId>zip4jvm</artifactId>
-    <version>0.7</version>
+    <version>0.8</version>
 </dependency>
 ~~~~
 
@@ -154,13 +154,11 @@ Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
 try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
     zipFile.add(ZipFile.Entry.builder()
                              .inputStreamSupplier(() -> new FileInputStream("/cars/bentley-continental.jpg"))
-                             .fileName("my_cars/bentley-continental.jpg")
-                             .lastModifiedTime(System.currentTimeMillis()).build());
+                             .fileName("my_cars/bentley-continental.jpg").build());
 
     zipFile.add(ZipFile.Entry.builder()
-                             .inputStreamSupplier(() -> new FileInputStream("bikes/kawasaki-ninja-300.jpg"))
-                             .fileName("my_bikes/kawasaki.jpg")
-                             .lastModifiedTime(System.currentTimeMillis()).build());
+                             .inputStreamSupplier(() -> new FileInputStream("/bikes/kawasaki-ninja-300.jpg"))
+                             .fileName("my_bikes/kawasaki.jpg").build());
 }
 ```
 >```
@@ -228,7 +226,7 @@ UnzipIt.zip(zip).destDir(destDir).extract();
 ```
 Path zip = Paths.get("filename.zip");
 Path destDir = Paths.get("/filename_content");
-UnzipIt.zip(zip).destDir(destDir).extract("cars/bentley-continental.jpg");
+UnzipIt.zip(zip).destDir(destDir).extract("/cars/bentley-continental.jpg");
 ```
 >```
 >filename.zip
@@ -314,8 +312,8 @@ destination directory
 
 ```
 Path zip = Paths.get("filename.zip");
-Path destFile = Paths.get("filename_content/bentley.jpg");
-try (InputStream in = UnzipIt.zip(zip).stream("cars/bentley-continental.jpg");
+Path destFile = Paths.get("/filename_content/bentley.jpg");
+try (InputStream in = UnzipIt.zip(zip).stream("/cars/bentley-continental.jpg");
      OutputStream out = new FileOutputStream(destFile.toFile())) {
     IOUtils.copyLarge(in, out);
 }
@@ -348,7 +346,7 @@ password provider with _fileName_ of the entry as a key.
 ```
 char[] password = "1".toCharArray();
 Path destDir = Paths.get("/filename_content");
-List<Path> fileNames = Arrays.asList("cars", "bikes/ducati-panigale-1199.jpg", "saint-petersburg.jpg"); 
+List<String> fileNames = Arrays.asList("cars", "bikes/ducati-panigale-1199.jpg", "saint-petersburg.jpg"); 
 UnzipIt.zip(zip).destDir(destDir).password(password).extract(fileNames);
 ```
 >```

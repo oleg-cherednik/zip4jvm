@@ -4,65 +4,91 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
+import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.Zip64;
-import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
+
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64;
 
 /**
  * @author Oleg Cherednik
  * @since 22.08.2019
  */
-final class Zip64Reader implements Reader<Zip64> {
+public class Zip64Reader implements Reader<Zip64> {
 
     @Override
-    public Zip64 read(DataInput in) throws IOException {
-        Zip64.EndCentralDirectoryLocator locator = new Zip64Reader.EndCentralDirectoryLocator().read(in);
-        Zip64.EndCentralDirectory dir = locator == null ? null : new Zip64Reader.EndCentralDirectory(locator.getOffs()).read(in);
-        return Zip64.of(locator, dir);
+    public final Zip64 read(DataInput in) throws IOException {
+        if (findCentralDirectoryLocatorSignature(in)) {
+            Zip64.EndCentralDirectoryLocator locator = readEndCentralDirectoryLocator(in);
+            findCentralDirectorySignature(locator.getOffs(), in);
+            Zip64.EndCentralDirectory dir = readEndCentralDirectory(in);
+            return Zip64.of(locator, dir);
+        }
+
+        return Zip64.NULL;
+    }
+
+    private static boolean findCentralDirectoryLocatorSignature(DataInput in) throws IOException {
+        long offs = in.getOffs() - Zip64.EndCentralDirectoryLocator.SIZE;
+
+        if (offs < 0)
+            return false;
+
+        in.seek(offs);
+
+        if (in.readDwordSignature() != Zip64.EndCentralDirectoryLocator.SIGNATURE)
+            return false;
+
+        in.backward(in.dwordSignatureSize());
+        return true;
+    }
+
+    private static void findCentralDirectorySignature(long offs, DataInput in) throws IOException {
+        in.seek(offs);
+
+        if (in.readDwordSignature() != Zip64.EndCentralDirectory.SIGNATURE)
+            throw new Zip4jvmException("invalid zip64 end of central directory");
+
+        in.backward(in.dwordSignatureSize());
+    }
+
+    protected Zip64.EndCentralDirectoryLocator readEndCentralDirectoryLocator(DataInput in) throws IOException {
+        return new Zip64Reader.EndCentralDirectoryLocator().read(in);
+    }
+
+    protected Zip64.EndCentralDirectory readEndCentralDirectory(DataInput in) throws IOException {
+        return new Zip64Reader.EndCentralDirectory().read(in);
     }
 
     private static final class EndCentralDirectoryLocator {
 
         public Zip64.EndCentralDirectoryLocator read(DataInput in) throws IOException {
-            if (!findHead(in))
-                return null;
+            in.skip(in.dwordSignatureSize());
 
             Zip64.EndCentralDirectoryLocator locator = new Zip64.EndCentralDirectoryLocator();
             locator.setMainDisk(in.readDword());
             locator.setOffs(in.readQword());
             locator.setTotalDisks(in.readDword());
 
-            ValidationUtils.realBigZip64(locator.getOffs(), "Zip64.EndCentralDirectory");
+            realBigZip64(locator.getOffs(), "zip64.centralDirectoryOffs");
 
             return locator;
         }
 
-        private static boolean findHead(DataInput in) throws IOException {
-            long offs = in.getOffs() - Zip64.EndCentralDirectoryLocator.SIZE;
-
-            if (offs < 0)
-                return false;
-
-            in.seek(offs);
-            return in.readSignature() == Zip64.EndCentralDirectoryLocator.SIGNATURE;
-        }
     }
 
-    @RequiredArgsConstructor
     private static final class EndCentralDirectory {
 
-        private final long offs;
-
         public Zip64.EndCentralDirectory read(DataInput in) throws IOException {
-            findHead(in);
+            in.skip(in.dwordSignatureSize());
 
             Zip64.EndCentralDirectory dir = new Zip64.EndCentralDirectory();
             long endCentralDirectorySize = in.readQword();
             dir.setEndCentralDirectorySize(endCentralDirectorySize);
-            dir.setVersionMadeBy(in.readWord());
-            dir.setVersionNeededToExtract(in.readWord());
+            dir.setVersionMadeBy(Version.build(in.readWord()));
+            dir.setVersionToExtract(Version.build(in.readWord()));
             dir.setTotalDisks(in.readDword());
             dir.setMainDisk(in.readDword());
             dir.setDiskEntries(in.readQword());
@@ -71,23 +97,18 @@ final class Zip64Reader implements Reader<Zip64> {
             dir.setCentralDirectoryOffs(in.readQword());
             dir.setExtensibleDataSector(in.readBytes((int)endCentralDirectorySize - Zip64.EndCentralDirectory.SIZE));
 
-            ValidationUtils.realBigZip64(dir.getCentralDirectoryOffs(), "offsCentralDirectory");
-            ValidationUtils.realBigZip64(dir.getTotalEntries(), "totalEntries");
+            realBigZip64(dir.getCentralDirectoryOffs(), "centralDirectoryOffs");
+            realBigZip64(dir.getTotalEntries(), "totalEntries");
 
             return dir;
         }
 
-        private void findHead(DataInput in) throws IOException {
-            in.seek(offs);
-
-            if (in.readSignature() != Zip64.EndCentralDirectory.SIGNATURE)
-                throw new Zip4jvmException("invalid zip64 end of central directory");
-        }
     }
 
     @RequiredArgsConstructor
-    static final class ExtendedInfo implements Reader<Zip64.ExtendedInfo> {
+    public static final class ExtendedInfo implements Reader<Zip64.ExtendedInfo> {
 
+        private final int size;
         private final boolean uncompressedSizeExists;
         private final boolean compressedSizeExists;
         private final boolean offsLocalHeaderRelativeExists;
@@ -95,16 +116,14 @@ final class Zip64Reader implements Reader<Zip64> {
 
         @Override
         public Zip64.ExtendedInfo read(DataInput in) throws IOException {
-            long offs1 = in.getOffs();
-            int size = in.readWord();
-            long offs2 = in.getOffs();
+            long offs = in.getOffs();
 
             Zip64.ExtendedInfo extendedInfo = readExtendedInfo(in);
 
-            if (in.getOffs() - offs2 != size) {
-                // section exists, but not need to read it; all data in FileHeader
+            if (in.getOffs() - offs != size) {
+                // section exists, but not need to read it; all data is in FileHeader
                 extendedInfo = Zip64.ExtendedInfo.NULL;
-                in.seek(offs1);
+                in.seek(offs + size);
             }
 
             return extendedInfo;
@@ -121,6 +140,11 @@ final class Zip64Reader implements Reader<Zip64> {
                                      .compressedSize(compressedSize)
                                      .localFileHeaderOffs(offsLocalHeaderRelative)
                                      .disk(disk).build();
+        }
+
+        @Override
+        public String toString() {
+            return "ZIP64";
         }
 
     }

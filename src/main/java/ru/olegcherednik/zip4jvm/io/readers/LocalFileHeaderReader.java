@@ -6,6 +6,7 @@ import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
+import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
@@ -17,18 +18,23 @@ import java.util.function.Function;
  * @since 08.03.2019
  */
 @RequiredArgsConstructor
-public final class LocalFileHeaderReader implements Reader<LocalFileHeader> {
+public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
 
-    private final long localFileHeaderOffs;
+    private final long offs;
     private final Function<Charset, Charset> charsetCustomizer;
 
     @Override
-    public LocalFileHeader read(DataInput in) throws IOException {
-        findHead(in);
+    public final LocalFileHeader read(DataInput in) throws IOException {
+        findSignature(in);
+        return readLocalFileHeader(in);
+    }
+
+    protected LocalFileHeader readLocalFileHeader(DataInput in) throws IOException {
+        in.skip(in.dwordSignatureSize());
 
         LocalFileHeader localFileHeader = new LocalFileHeader();
 
-        localFileHeader.setVersionToExtract(in.readWord());
+        localFileHeader.setVersionToExtract(Version.build(in.readWord()));
         localFileHeader.setGeneralPurposeFlag(new GeneralPurposeFlag(in.readWord()));
         localFileHeader.setCompressionMethod(CompressionMethod.parseCode(in.readWord()));
         localFileHeader.setLastModifiedTime((int)in.readDword());
@@ -41,16 +47,22 @@ public final class LocalFileHeaderReader implements Reader<LocalFileHeader> {
         Charset charset = localFileHeader.getGeneralPurposeFlag().getCharset();
 
         localFileHeader.setFileName(in.readString(fileNameLength, charsetCustomizer.apply(charset)));
-        localFileHeader.setExtraField(ExtraFieldReader.build(extraFieldLength, localFileHeader).read(in));
+        localFileHeader.setExtraField(getExtraFiledReader(extraFieldLength, localFileHeader).read(in));
 
         return localFileHeader;
     }
 
-    private void findHead(DataInput in) throws IOException {
-        in.seek(localFileHeaderOffs);
+    protected ExtraFieldReader getExtraFiledReader(int size, LocalFileHeader localFileHeader) {
+        return new ExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader));
+    }
 
-        if (in.readSignature() != LocalFileHeader.SIGNATURE)
+    private void findSignature(DataInput in) throws IOException {
+        in.seek(offs);
+
+        if (in.readDwordSignature() != LocalFileHeader.SIGNATURE)
             throw new Zip4jvmException("invalid local file header signature");
+
+        in.backward(in.dwordSignatureSize());
     }
 
 }

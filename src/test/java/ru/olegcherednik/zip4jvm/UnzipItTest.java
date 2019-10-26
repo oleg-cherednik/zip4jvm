@@ -99,4 +99,17 @@ public class UnzipItTest {
         assertThatDirectory(destDir).file("fff - 副本.txt").exists();
     }
 
+    public void shouldExtractZipArchiveWhenZipUnderMac() throws IOException, URISyntaxException {
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTme(rootDir);
+        Path zip = Paths.get(UnzipItTest.class.getResource("/zip/macos_10.zip").toURI()).toAbsolutePath();
+
+        UnzipIt.zip(zip).destDir(destDir).extract();
+
+        int a = 0;
+        a++;
+
+//        assertThatDirectory(destDir).hasDirectories(0).hasFiles(2);
+//        assertThatDirectory(destDir).file("fff - 副本.txt").exists();
+    }
+
 }

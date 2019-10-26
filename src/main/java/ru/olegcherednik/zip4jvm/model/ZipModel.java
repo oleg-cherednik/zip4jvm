@@ -31,8 +31,6 @@ public class ZipModel {
     public static final int NO_SPLIT = -1;
     public static final int MIN_SPLIT_SIZE = 64 * 1024; // 64Kb
 
-    public static final Function<Charset, Charset> STANDARD_ZIP_CHARSET = charset -> charset;
-
     public static final int MAX_TOTAL_ENTRIES = Zip64.LIMIT_WORD;
     public static final long MAX_ENTRY_SIZE = Zip64.LIMIT_DWORD;
     public static final long MAX_CENTRAL_DIRECTORY_OFFS = Zip64.LIMIT_DWORD;
@@ -79,7 +77,7 @@ public class ZipModel {
         fileNameEntry.put(zipEntry.getFileName(), zipEntry);
     }
 
-    public Collection<ZipEntry> getEntries() {
+    public Collection<ZipEntry> getZipEntries() {
         return isEmpty() ? Collections.emptyList() : Collections.unmodifiableCollection(fileNameEntry.values());
     }
 

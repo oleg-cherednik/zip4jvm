@@ -22,7 +22,6 @@ import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSplit;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
-import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.passwordStr;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
@@ -67,7 +66,9 @@ public final class DefalteZipData {
                                                          .encryption(Encryption.PKWARE, password).build();
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettingsProvider(fileName -> entrySettings)
-                                          .comment("password: " + passwordStr).build();
+                                          // TODO temporary
+                                          .comment("abcабвгдеёжзийклмнопрстуфхцчшщъыьэюя").build();
+//                                          .comment("password: " + passwordStr).build();
 
         ZipIt.zip(zipDeflateSolidPkware).settings(settings).add(contentDirSrc);
         assertThat(Files.exists(zipDeflateSolidPkware)).isTrue();

@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.model.builders;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
@@ -30,8 +30,8 @@ public final class Zip64Builder {
     private Zip64.EndCentralDirectory createEndCentralDirectory() {
         Zip64.EndCentralDirectory endCentralDirectory = new Zip64.EndCentralDirectory();
         endCentralDirectory.setEndCentralDirectorySize(getEndCentralDirectorySize());
-        endCentralDirectory.setVersionMadeBy(CentralDirectory.FileHeader.VERSION);
-        endCentralDirectory.setVersionNeededToExtract(CentralDirectory.FileHeader.VERSION);
+        endCentralDirectory.setVersionMadeBy(new Version(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));
+        endCentralDirectory.setVersionToExtract(new Version(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));
         endCentralDirectory.setTotalDisks(zipModel.getTotalDisks());
         endCentralDirectory.setMainDisk(zipModel.getMainDisk());
         endCentralDirectory.setDiskEntries(countNumberOfFileHeaderEntriesOnDisk());
@@ -44,8 +44,8 @@ public final class Zip64Builder {
 
     private int countNumberOfFileHeaderEntriesOnDisk() {
         if (zipModel.isSplit())
-            return (int)zipModel.getEntries().stream()
-                                .filter(entry -> entry.getDisk() == zipModel.getTotalDisks())
+            return (int)zipModel.getZipEntries().stream()
+                                .filter(zipEntry -> zipEntry.getDisk() == zipModel.getTotalDisks())
                                 .count();
 
         return zipModel.getTotalEntries();

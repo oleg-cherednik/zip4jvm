@@ -7,6 +7,7 @@ import ru.olegcherednik.zip4jvm.io.in.LittleEndianReadFile;
 import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -33,7 +34,7 @@ public final class ZipModelBuilder {
     private final Function<Charset, Charset> charsetCustomizer;
 
     public static ZipModel read(Path zip) throws IOException {
-        return read(zip, ZipModel.STANDARD_ZIP_CHARSET);
+        return read(zip, Charsets.STANDARD_ZIP_CHARSET);
     }
 
     public static ZipModel read(Path zip, Function<Charset, Charset> charsetCustomizer) throws IOException {
@@ -76,7 +77,7 @@ public final class ZipModelBuilder {
     private long getTotalDisks() {
         if (zip64 == Zip64.NULL)
             return endCentralDirectory.getTotalDisks();
-        return zip64.getEndCentralDirectoryLocator().getTotalDisks();
+        return zip64.getEndCentralDirectory().getTotalDisks();
     }
 
     private long getMainDisks() {

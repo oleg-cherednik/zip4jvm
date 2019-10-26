@@ -19,11 +19,10 @@ public final class AesExtraDataRecord implements ExtraField.Record {
 
     public static final int SIGNATURE = 0x9901;
     public static final int SIZE = 2 + 2 + 2 + 2 + 1 + 2;   // size:11
-    public static final int SIZE_FIELD = 2 + 2; // 4 bytes: signature + size
 
     // size:2 - signature (0x9901)
     // size:2
-    private final int size;
+    private final int dataSize;
     // size:2
     private final int versionNumber;
     // size:2
@@ -38,7 +37,7 @@ public final class AesExtraDataRecord implements ExtraField.Record {
     }
 
     private AesExtraDataRecord(Builder builder) {
-        size = builder.size;
+        dataSize = builder.dataSize;
         versionNumber = builder.versionNumber;
         vendor = builder.vendor;
         strength = builder.strength;
@@ -75,7 +74,7 @@ public final class AesExtraDataRecord implements ExtraField.Record {
             return;
 
         out.writeWordSignature(SIGNATURE);
-        out.writeWord(size);
+        out.writeWord(dataSize);
         out.writeWord(versionNumber);
         out.writeBytes(getVendor(Charsets.UTF_8));
         out.writeBytes((byte)strength.getCode());
@@ -85,7 +84,7 @@ public final class AesExtraDataRecord implements ExtraField.Record {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class Builder {
 
-        private int size = ExtraField.NO_DATA;
+        private int dataSize = ExtraField.NO_DATA;
         private int versionNumber = ExtraField.NO_DATA;
         private String vendor;
         private AesStrength strength = AesStrength.NULL;
@@ -95,8 +94,8 @@ public final class AesExtraDataRecord implements ExtraField.Record {
             return new AesExtraDataRecord(this);
         }
 
-        public Builder size(int size) {
-            this.size = size;
+        public Builder dataSize(int dataSize) {
+            this.dataSize = dataSize;
             return this;
         }
 

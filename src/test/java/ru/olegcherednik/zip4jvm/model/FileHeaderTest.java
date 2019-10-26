@@ -40,13 +40,21 @@ public class FileHeaderTest {
         ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.build(() -> WIN).readFrom(fileBentley);
         ExtraField extraField = ExtraField.builder().addRecord(Zip64.ExtendedInfo.builder().uncompressedSize(4).build()).build();
 
-        assertThat(internalFileAttributes).isNotSameAs(InternalFileAttributes.NULL);
+// TODO temporary
+//        assertThat(internalFileAttributes).isNotSameAs(InternalFileAttributes.NULL);
         assertThat(externalFileAttributes).isNotSameAs(ExternalFileAttributes.NULL);
         assertThat(extraField).isNotSameAs(ExtraField.NULL);
 
+        Version versionMadeBy = new Version(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20);
+        Version versionToExtract = new Version(Version.FileSystem.Z_SYSTEM, 15);
+
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
-        fileHeader.setVersionMadeBy(1);
-        fileHeader.setVersionToExtract(2);
+
+        assertThat(fileHeader.getVersionMadeBy()).isSameAs(Version.NULL);
+        assertThat(fileHeader.getVersionToExtract()).isSameAs(Version.NULL);
+
+        fileHeader.setVersionMadeBy(versionMadeBy);
+        fileHeader.setVersionToExtract(versionToExtract);
         fileHeader.setGeneralPurposeFlag(generalPurposeFlag);
         fileHeader.setCompressionMethod(CompressionMethod.AES);
         fileHeader.setLastModifiedTime(3);
@@ -61,8 +69,8 @@ public class FileHeaderTest {
         fileHeader.setFileName("fileName");
         fileHeader.setExtraField(extraField);
 
-        assertThat(fileHeader.getVersionMadeBy()).isEqualTo(1);
-        assertThat(fileHeader.getVersionToExtract()).isEqualTo(2);
+        assertThat(fileHeader.getVersionMadeBy()).isSameAs(versionMadeBy);
+        assertThat(fileHeader.getVersionToExtract()).isSameAs(versionToExtract);
         assertThat(fileHeader.getGeneralPurposeFlag()).isSameAs(generalPurposeFlag);
         assertThat(fileHeader.getCompressionMethod()).isSameAs(CompressionMethod.AES);
         assertThat(fileHeader.getLastModifiedTime()).isEqualTo(3);
@@ -71,7 +79,7 @@ public class FileHeaderTest {
         assertThat(fileHeader.getUncompressedSize()).isEqualTo(6);
         assertThat(fileHeader.getCommentLength()).isEqualTo(7);
         assertThat(fileHeader.getDisk()).isEqualTo(8);
-        assertThat(fileHeader.getInternalFileAttributes()).isSameAs(internalFileAttributes);
+        assertThat(fileHeader.getInternalFileAttributes().getData()).isEqualTo(internalFileAttributes.getData());
         assertThat(fileHeader.getExternalFileAttributes()).isSameAs(externalFileAttributes);
         assertThat(fileHeader.getLocalFileHeaderOffs()).isEqualTo(9);
         assertThat(fileHeader.getExtraField().getExtendedInfo()).isNotNull();

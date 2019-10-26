@@ -51,6 +51,19 @@ public class SplitZipInputStream extends BaseDataInput {
         return res;
     }
 
+    @Override
+    public void skip(long bytes) throws IOException {
+        while (bytes > 0) {
+            int expected = (int)Math.min(bytes, Integer.MAX_VALUE);
+            int actual = delegate.skip(expected);
+
+            bytes -= actual;
+
+            if (actual < expected)
+                openNextDisk();
+        }
+    }
+
     private void openNextDisk() throws IOException {
         Path splitFile = zipModel.getPartFile(++disk);
         delegate.close();
