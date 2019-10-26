@@ -71,6 +71,7 @@ public class BlockZipEntryModelReader {
         } else if (zipEntry.getEncryption() == Encryption.PKWARE) {
             PkwareEncryptionHeader encryptionHeader = new BlockPkwareHeaderReader().read(in);
             zipEntryBlock.saveEncryptionHeader(zipEntry.getFileName(), encryptionHeader);
+            in.skip(zipEntry.getCompressedSize() - encryptionHeader.getData().getData().length);
         } else
             in.skip(zipEntry.getCompressedSize());
     }
