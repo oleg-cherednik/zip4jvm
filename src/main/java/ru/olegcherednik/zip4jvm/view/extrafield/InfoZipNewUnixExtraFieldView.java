@@ -23,21 +23,28 @@ final class InfoZipNewUnixExtraFieldView {
         out.format("%s(0x%04X) new InfoZIP Unix/OS2/NT:               %d bytes\n", prefix, record.getSignature(), block.getSize());
         out.format("%s  - location:                                   %2$d (0x%2$08X) bytes\n", prefix, block.getOffs());
 
-        if (record.getVersion() == 1) {
-            out.format("%s  version:                                      %d\n", prefix, record.getVersion());
+        InfoZipNewUnixExtraField.Payload payload = record.getPayload();
 
-            InfoZipNewUnixExtraField.VersionOnePayload payload = record.getPayload();
+        if (payload instanceof InfoZipNewUnixExtraField.VersionOnePayload)
+            print((InfoZipNewUnixExtraField.VersionOnePayload)record.getPayload(), out);
+        else if (payload instanceof InfoZipNewUnixExtraField.VersionUnknownPayload)
+            print((InfoZipNewUnixExtraField.VersionUnknownPayload)record.getPayload(), out);
+    }
 
-            if (StringUtils.isNotBlank(payload.getUid()))
-                out.format("%s  User identifier (UID):                        %s\n", prefix, payload.getUid());
-            if (StringUtils.isNotBlank(payload.getGid()))
-                out.format("%s  Group Identifier (GID):                       %s\n", prefix, payload.getGid());
-        } else {
-            out.format("%s  version:                                      %d (unknown)\n", prefix, record.getVersion());
+    private void print(InfoZipNewUnixExtraField.VersionOnePayload payload, PrintStream out) {
+        out.format("%s  version:                                      %d\n", prefix, payload.getVersion());
 
-            ByteArrayHexView.builder()
-                            .buf(((InfoZipNewUnixExtraField.VersionUnknownPayload)record.getPayload()).getData())
-                            .prefix(prefix).build().print(out);
-        }
+        if (StringUtils.isNotBlank(payload.getUid()))
+            out.format("%s  User identifier (UID):                        %s\n", prefix, payload.getUid());
+        if (StringUtils.isNotBlank(payload.getGid()))
+            out.format("%s  Group Identifier (GID):                       %s\n", prefix, payload.getGid());
+    }
+
+    private void print(InfoZipNewUnixExtraField.VersionUnknownPayload payload, PrintStream out) {
+        out.format("%s  version:                                      %d (unknown)\n", prefix, payload.getVersion());
+
+        ByteArrayHexView.builder()
+                        .buf(payload.getData())
+                        .prefix(prefix).build().print(out);
     }
 }

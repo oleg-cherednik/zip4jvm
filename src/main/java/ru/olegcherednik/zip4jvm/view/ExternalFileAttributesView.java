@@ -23,6 +23,6 @@ public class ExternalFileAttributesView {
 
         out.format("%sexternal file attributes:                       0x%08X\n", prefix, val);
         out.format("%s  MS-DOS file attributes (0x%02X)                 %s\n", prefix, val & 0xFF, win);
-        out.format("%s  non-MSDOS file attributes (0x%06X):       %s\n", prefix, val >> 8, posix);
+        out.format("%s  non-MSDOS file attributes (0x%06X):         %s\n", prefix, val >> 8, posix);
     }
 }

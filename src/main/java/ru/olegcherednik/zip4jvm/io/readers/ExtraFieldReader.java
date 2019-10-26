@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.os.ExtendedTimestampExtraFieldReader;
-import ru.olegcherednik.zip4jvm.io.readers.os.InfoZipNewUnitExtraFieldReader;
+import ru.olegcherednik.zip4jvm.io.readers.os.InfoZipNewUnixExtraFieldReader;
 import ru.olegcherednik.zip4jvm.io.readers.os.InfoZipOldUnitExtraFieldReader;
 import ru.olegcherednik.zip4jvm.io.readers.os.NtfsTimestampExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
@@ -60,7 +60,7 @@ public class ExtraFieldReader implements Reader<ExtraField> {
         map.put(AesExtraDataRecord.SIGNATURE, AesExtraDataRecordReader::new);
         map.put(NtfsTimestampExtraField.SIGNATURE, NtfsTimestampExtraFieldReader::new);
         map.put(InfoZipOldUnixExtraField.SIGNATURE, InfoZipOldUnitExtraFieldReader::new);
-        map.put(InfoZipNewUnixExtraField.SIGNATURE, InfoZipNewUnitExtraFieldReader::new);
+        map.put(InfoZipNewUnixExtraField.SIGNATURE, InfoZipNewUnixExtraFieldReader::new);
         map.put(ExtendedTimestampExtraField.SIGNATURE, ExtendedTimestampExtraFieldReader::new);
         return map;
     }

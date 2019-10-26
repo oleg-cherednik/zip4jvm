@@ -7,6 +7,9 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 import ru.olegcherednik.zip4jvm.utils.time.NtfsTimestampConverter;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Oleg Cherednik
@@ -23,31 +26,44 @@ public final class NtfsTimestampExtraFieldReader implements Reader<NtfsTimestamp
 
         in.skip(4);
 
-        NtfsTimestampExtraField extraField = NtfsTimestampExtraField.NULL;
+        List<NtfsTimestampExtraField.Tag> tags = readTags(offs, in);
+
+        return NtfsTimestampExtraField.builder()
+                                      .dataSize(size)
+                                      .tags(tags).build();
+    }
+
+    private List<NtfsTimestampExtraField.Tag> readTags(long offs, DataInput in) throws IOException {
+        List<NtfsTimestampExtraField.Tag> tags = new ArrayList<>();
 
         while (in.getOffs() < offs + size) {
             int tag = in.readWord();
-
-            if (tag == NtfsTimestampExtraField.TAG_ONE && extraField == NtfsTimestampExtraField.NULL)
-                extraField = readTagOne(in);
-            else
-                in.skip(in.readWord());
+            tags.add(tag == NtfsTimestampExtraField.OneTag.SIGNATURE ? readOneTag(in) : readUnknownTag(tag, in));
         }
 
-        return extraField;
+        return tags.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(tags);
     }
 
-    private static NtfsTimestampExtraField readTagOne(DataInput in) throws IOException {
+    private static NtfsTimestampExtraField.OneTag readOneTag(DataInput in) throws IOException {
         int size = in.readWord();
+        // TODO size should be equal to 8 * 3
+
         long lastModificationTime = NtfsTimestampConverter.ntfsToJavaTime(in.readQword());
         long lastAccessTime = NtfsTimestampConverter.ntfsToJavaTime(in.readQword());
         long creationTime = NtfsTimestampConverter.ntfsToJavaTime(in.readQword());
 
-        return NtfsTimestampExtraField.builder()
-                                      .dataSize(size)
-                                      .lastModificationTime(lastModificationTime)
-                                      .lastAccessTime(lastAccessTime)
-                                      .creationTime(creationTime).build();
+        return NtfsTimestampExtraField.OneTag.builder()
+                                             .lastModificationTime(lastModificationTime)
+                                             .lastAccessTime(lastAccessTime)
+                                             .creationTime(creationTime).build();
+    }
+
+    private static NtfsTimestampExtraField.UnknownTag readUnknownTag(int tag, DataInput in) throws IOException {
+        int size = in.readWord();
+        byte[] data = in.readBytes(size);
+        return NtfsTimestampExtraField.UnknownTag.builder()
+                                                 .signature(tag)
+                                                 .data(data).build();
     }
 
     @Override

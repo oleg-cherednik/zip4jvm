@@ -26,8 +26,6 @@ public class InfoZipNewUnixExtraField implements ExtraField.Record {
     // size:2 - attribute tag value #1 (0x5855)
     // size:2 - total data size for this block
     private final int dataSize;
-    // size:1 - version of this extra field, currently 1
-    private final int version;
     private final Payload payload;
 
     @Override
@@ -62,6 +60,8 @@ public class InfoZipNewUnixExtraField implements ExtraField.Record {
     @Builder
     public static final class VersionOnePayload implements Payload {
 
+        // size:1 - version of this extra field, currently 1
+        private final int version;
         // size:1 - size of uid field (n)
         // size:n - unix user ID
         private final String uid;
@@ -74,6 +74,8 @@ public class InfoZipNewUnixExtraField implements ExtraField.Record {
     @Builder
     public static final class VersionUnknownPayload implements Payload {
 
+        // size:1 - version of this extra field, currently 1
+        private final int version;
         private final byte[] data;
     }
 
