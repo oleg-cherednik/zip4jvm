@@ -16,7 +16,9 @@ public class SingleZipInputStream extends BaseDataInput {
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        return delegate.read(buf, offs, len);
+        int res = delegate.read(buf, offs, len);
+        cycleBuffer.write(buf, offs, len);
+        return res;
     }
 
     @Override

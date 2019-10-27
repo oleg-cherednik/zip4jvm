@@ -12,7 +12,6 @@ import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockZipEntryModel;
 import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -76,7 +75,7 @@ public class BlockZipEntryModelReader {
     }
 
     private DataDescriptor readDataDescriptor(ZipEntry zipEntry, DataInput in) throws IOException {
-        Block block = new Block();
+        Diagnostic.ByteArrayBlockB block = new Diagnostic.ByteArrayBlockB();
         DataDescriptor dataDescriptor = new BlockDataDescriptorReader(zipEntry.isZip64(), block).read(in);
         zipEntryBlock.saveDataDescriptor(zipEntry.getFileName(), block);
         return dataDescriptor;

@@ -94,13 +94,13 @@ public final class Diagnostic {
     @Setter
     public static final class ExtraField extends Block {
 
-        private final Map<Integer, Block> records = new LinkedHashMap<>();
+        private final Map<Integer, ByteArrayBlockB> records = new LinkedHashMap<>();
 
         @Setter(AccessLevel.NONE)
-        private Block record;
+        private ByteArrayBlockB record;
 
         public void addRecord() {
-            record = new Block();
+            record = new ByteArrayBlockB();
         }
 
         public void saveRecord(int signature) {
@@ -108,7 +108,7 @@ public final class Diagnostic {
             record = null;
         }
 
-        public Block getRecord(int signature) {
+        public ByteArrayBlockB getRecord(int signature) {
             return records.get(signature);
         }
 
@@ -122,7 +122,7 @@ public final class Diagnostic {
 
         private final Map<String, LocalFileHeader> localFileHeaders = new LinkedHashMap<>();
         private final Map<String, EncryptionHeader> encryptionHeaders = new LinkedHashMap<>();
-        private final Map<String, Block> dataDescriptors = new LinkedHashMap<>();
+        private final Map<String, Diagnostic.ByteArrayBlockB> dataDescriptors = new LinkedHashMap<>();
 
         @Setter(AccessLevel.NONE)
         private LocalFileHeader localFileHeader = LocalFileHeader.NULL;
@@ -140,7 +140,7 @@ public final class Diagnostic {
             encryptionHeaders.put(fileName, encryptionHeader);
         }
 
-        public void saveDataDescriptor(String fileName, Block block) {
+        public void saveDataDescriptor(String fileName, Diagnostic.ByteArrayBlockB block) {
             dataDescriptors.put(fileName, block);
         }
 
@@ -152,7 +152,7 @@ public final class Diagnostic {
             return encryptionHeaders.get(fileName);
         }
 
-        public Block getDataDescriptor(String fileName) {
+        public Diagnostic.ByteArrayBlockB getDataDescriptor(String fileName) {
             return dataDescriptors.get(fileName);
         }
 
@@ -182,6 +182,22 @@ public final class Diagnostic {
         public <T> T calc(DataInput in, LocalSupplier<T> task) throws IOException {
             T res = super.calc(in, task);
             data = (byte[])res;
+            return res;
+        }
+    }
+
+    @Getter
+    @Setter
+    public static final class ByteArrayBlockB extends Block {
+
+        private byte[] data;
+
+        @Override
+        public <T> T calc(DataInput in, LocalSupplier<T> task) throws IOException {
+            long offs = in.getOffs();
+            in.cleanBuffer();
+            T res = super.calc(in, task);
+            data = in.getLastBytes((int)(in.getOffs() - offs));
             return res;
         }
     }
