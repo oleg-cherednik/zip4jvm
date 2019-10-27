@@ -154,12 +154,51 @@ public final class ZipInfo {
             try (InputStream in = createDataInput(blockModel.getZipModel(), zipEntry)) {
                 // print local file header
 
-
                 try (OutputStream out = new FileOutputStream(dir.resolve("local_file_header.data").toFile())) {
                     long offs = diagLocalFileHeader.getOffs();
                     long length = diagLocalFileHeader.getSize();
+
+//                    if (diagLocalFileHeader.getExtraField() != null)
+//                        length -= diagLocalFileHeader.getExtraField().getSize();
+
                     IOUtils.copyLarge(in, out, offs, length);
                 }
+
+//                // print extra filed
+//
+//                if (diagLocalFileHeader.getExtraField() != null) {
+//                    Path extraFieldDir = dir.resolve("extra_fields");
+//                    Files.createDirectories(extraFieldDir);
+//
+//                    Diagnostic.ExtraField diagExtraField = diagLocalFileHeader.getExtraField();
+//                    LocalFileHeader localFileHeader = zipEntryModel.getLocalFileHeaders().get(fileName);
+//
+//                    for (int signature : diagExtraField.getRecords().keySet()) {
+//                        Block block1 = diagExtraField.getRecord(signature);
+//                        ExtraField.Record rec = localFileHeader.getExtraField().getRecords().stream()
+//                                                             .filter(r -> r.getSignature() == signature)
+//                                                             .findFirst().orElse(null);
+//
+//                        String title = null;
+//
+//                        if(rec instanceof ExtendedTimestampExtraField)
+//                            title = "(0x5455)_universal_time.data";
+//                        else if(rec instanceof InfoZipNewUnixExtraField)
+//                            title = "(0x7875)_new_InfoZIP_Unix_OS2_NT.data";
+//                        else
+//                            throw new NotImplementedException();
+//
+//
+//                        try (OutputStream out = new FileOutputStream(extraFieldDir.resolve(title).toFile())) {
+////                            long offs = block1.getOffs();
+//                            long length = block1.getSize();
+//                            IOUtils.copyLarge(in, out, 0, length);
+//                        }
+//
+//
+//                    }
+//
+//                }
 
                 // print encryption header
 
@@ -224,6 +263,7 @@ public final class ZipInfo {
 
             pos++;
         }
+
 
     }
 
