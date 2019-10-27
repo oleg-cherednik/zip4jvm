@@ -1,20 +1,34 @@
 package ru.olegcherednik.zip4jvm;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.IOUtils;
+import ru.olegcherednik.zip4jvm.io.in.ng.BaseZipInputStream;
+import ru.olegcherednik.zip4jvm.io.in.ng.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.io.readers.block.BlockModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.BlockZipEntryModelReader;
+import ru.olegcherednik.zip4jvm.io.readers.block.pkware.PkwareEncryptionHeader;
 import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.model.Encryption;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.BlockZipEntryModel;
 import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.view.CentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.Zip64View;
-import ru.olegcherednik.zip4jvm.view.ZipEntryView;
+import ru.olegcherednik.zip4jvm.view.entry.ZipEntryListView;
+import ru.olegcherednik.zip4jvm.view.entry.ZipEntryView;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Function;
 
@@ -87,15 +101,110 @@ public final class ZipInfo {
     }
 
     private static void printZipEntries(BlockZipEntryModel zipEntryModel, Charset charset, String prefix, PrintStream out) throws IOException {
-        ZipEntryView.builder()
-                    .blockZipEntryModel(zipEntryModel)
-                    .charset(charset)
-                    .prefix(prefix).build().print(out);
+        ZipEntryListView.builder()
+                        .blockZipEntryModel(zipEntryModel)
+                        .charset(charset)
+                        .prefix(prefix).build().print(out);
     }
 
-    public void decompose(Path path) {
-        int a = 0;
-        a++;
+    public void decompose(Path destDir) throws IOException {
+        Charset charset = Charsets.UTF_8;
+        Diagnostic diagnostic = new Diagnostic();
+        BlockModel blockModel = new BlockModelReader(zip, Charsets.STANDARD_ZIP_CHARSET, diagnostic).read();
+        BlockZipEntryModel zipEntryModel = new BlockZipEntryModelReader(blockModel.getZipModel(), Charsets.STANDARD_ZIP_CHARSET,
+                diagnostic.getZipEntryBlock()).read();
+
+        String prefix = "";
+
+        int pos = 0;
+
+        for (String fileName : zipEntryModel.getLocalFileHeaders().keySet()) {
+            ZipEntry zipEntry = blockModel.getZipModel().getZipEntryByFileName(fileName);
+            Diagnostic.ZipEntryBlock block = zipEntryModel.getZipEntryBlock();
+            Diagnostic.ZipEntryBlock.LocalFileHeader diagLocalFileHeader = block.getLocalFileHeader(fileName);
+
+            String str = fileName;
+
+            if (zipEntry.isDirectory())
+                str = str.substring(0, str.length() - 1);
+
+            str = str.replaceAll("[\\/]", "_-_");
+
+            Path dir = destDir.resolve(str);
+            Files.createDirectories(dir);
+
+            // info
+
+            try (PrintStream out = new PrintStream(new FileOutputStream(dir.resolve("info.txt").toFile()))) {
+                ZipEntryView.builder()
+                            .pos(pos)
+                            .localFileHeader(zipEntryModel.getLocalFileHeaders().get(fileName))
+                            .diagLocalFileHeader(diagLocalFileHeader)
+                            .encryptionHeader(block.getEncryptionHeader(fileName))
+                            .dataDescriptor(zipEntryModel.getDataDescriptors().get(fileName))
+                            .blockDataDescriptor(block.getDataDescriptor(fileName))
+                            .charset(charset)
+                            .prefix(prefix)
+                            .build().print(out);
+            }
+
+            // print zip entry
+
+            try (InputStream in = createDataInput(blockModel.getZipModel(), zipEntry)) {
+                // print local file header
+
+
+                try (OutputStream out = new FileOutputStream(dir.resolve("local_file_header.data").toFile())) {
+                    long offs = diagLocalFileHeader.getOffs();
+                    long length = diagLocalFileHeader.getSize();
+                    IOUtils.copyLarge(in, out, offs, length);
+                }
+
+                // print encryption header
+
+                Encryption encryption = zipEntry.getEncryption();
+
+                if (encryption == Encryption.AES_128 || encryption == Encryption.AES_192 || encryption == Encryption.AES_256) {
+                    throw new NotImplementedException();
+
+                } else if (encryption == Encryption.PKWARE) {
+                    PkwareEncryptionHeader encryptionHeader = (PkwareEncryptionHeader)block.getEncryptionHeader(fileName);
+//                    long offs = encryptionHeader.getData().getOffs();
+                    long length = encryptionHeader.getData().getSize();
+
+                    try (OutputStream out = new FileOutputStream(dir.resolve("pkware_encryption_header.data").toFile())) {
+                        IOUtils.copyLarge(in, out, 0, length);
+                    }
+
+                    try (OutputStream out = new FileOutputStream(dir.resolve("compressed_content.data").toFile())) {
+                        long size = zipEntry.getCompressedSize() - encryptionHeader.getData().getData().length;
+                        IOUtils.copyLarge(in, out, 0, size);
+                    }
+                }
+
+                // print data descriptor
+
+                if (zipEntry.isDataDescriptorAvailable()) {
+                    Block dataDescriptor = block.getDataDescriptor(fileName);
+
+                    try (OutputStream out = new FileOutputStream(dir.resolve("data_descriptor.data").toFile())) {
+                        long size = dataDescriptor.getSize();
+                        IOUtils.copyLarge(in, out, 0, size);
+                    }
+                }
+            }
+
+
+            pos++;
+        }
+
+    }
+
+    private static BaseZipInputStream createDataInput(ZipModel zipModel, ZipEntry zipEntry) throws IOException {
+        return new SingleZipInputStream(zipModel.getFile());
+//        if (zipModel.isSplit())
+//            return new SplitZipInputStream(zipModel, zipEntry.getDisk());
+//        return new SingleZipInputStream(zipModel.getFile());
     }
 
 }

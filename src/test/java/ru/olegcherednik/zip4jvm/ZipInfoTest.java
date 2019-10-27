@@ -59,7 +59,7 @@ public class ZipInfoTest {
                .getShortInfo();
     }
 
-    public void decompose() {
+    public void decompose() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
         ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/pkware.zip"))

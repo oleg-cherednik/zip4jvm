@@ -83,6 +83,7 @@ public class BlockZipEntryModelReader {
         return dataDescriptor;
     }
 
+    // TODO duplication with ZipInfo
     private static DataInput createDataInput(ZipModel zipModel, ZipEntry zipEntry) throws IOException {
         if (zipModel.isSplit())
             return new SplitZipInputStream(zipModel, zipEntry.getDisk());

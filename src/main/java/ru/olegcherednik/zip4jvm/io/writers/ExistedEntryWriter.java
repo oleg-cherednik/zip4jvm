@@ -38,7 +38,7 @@ public class ExistedEntryWriter implements Writer {
 
     @Override
     public void write(DataOutput out) throws IOException {
-        ZipEntry entry = srcZipModel.getEntryByFileName(entryName);
+        ZipEntry entry = srcZipModel.getZipEntryByFileName(entryName);
         entry.setPassword(entry.isEncrypted() ? password : null);
 
         try (CopyEntryInputStream in = new CopyEntryInputStream(entry, srcZipModel)) {

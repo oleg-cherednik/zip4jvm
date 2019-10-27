@@ -23,7 +23,7 @@ public class DataDescriptorView {
         if (dataDescriptor == null)
             return;
 
-        String str = String.format("#%d Data descriptor", pos + 1);
+        String str = String.format("#%d (%s) Data descriptor", pos + 1, ViewUtils.signature(DataDescriptor.SIGNATURE));
         out.println(str);
 
         IntStream.range(0, str.length()).forEach(i -> out.print('='));

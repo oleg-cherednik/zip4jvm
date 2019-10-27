@@ -69,7 +69,7 @@ public class EncryptionHeaderView {
         IntStream.range(0, str.length()).forEach(i -> out.print('='));
 
         out.println();
-        out.format("%sdata                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     :                                           %d bytes\n", prefix, encryptionHeader.getData().getSize());
+        out.format("%sdata:                                           %d bytes\n", prefix, encryptionHeader.getData().getSize());
         out.format("%s  - location:                                   %2$d (0x%2$08X) bytes\n", prefix, encryptionHeader.getData().getOffs());
 
         ByteArrayHexView.builder()
