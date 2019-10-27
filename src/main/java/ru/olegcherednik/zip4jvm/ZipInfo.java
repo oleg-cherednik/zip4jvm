@@ -2,10 +2,12 @@ package ru.olegcherednik.zip4jvm;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
+import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.io.in.ng.BaseZipInputStream;
 import ru.olegcherednik.zip4jvm.io.in.ng.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.io.readers.block.BlockModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.BlockZipEntryModelReader;
+import ru.olegcherednik.zip4jvm.io.readers.block.aes.BlockAesEncryptionHeader;
 import ru.olegcherednik.zip4jvm.io.readers.block.pkware.PkwareEncryptionHeader;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Encryption;
@@ -20,7 +22,6 @@ import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.Zip64View;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntryListView;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntryView;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -164,15 +165,41 @@ public final class ZipInfo {
 
                 Encryption encryption = zipEntry.getEncryption();
 
+                // TODO probably same with block reader
                 if (encryption == Encryption.AES_128 || encryption == Encryption.AES_192 || encryption == Encryption.AES_256) {
-                    throw new NotImplementedException();
+                    BlockAesEncryptionHeader encryptionHeader = (BlockAesEncryptionHeader)block.getEncryptionHeader(fileName);
 
+                    //                    FileUtils.writeByteArrayToFile(dir.resolve("aes_salt.data").toFile(), encryptionHeader.getSalt().getData());
+//                    FileUtils.writeByteArrayToFile(dir.resolve("aes_password_checksum.data").toFile(),
+//                            encryptionHeader.getPasswordChecksum().getData());
+
+                    try (OutputStream out = new FileOutputStream(dir.resolve("aes_salt.data").toFile())) {
+                        long length = encryptionHeader.getSalt().getSize();
+                        IOUtils.copyLarge(in, out, 0, length);
+                    }
+
+                    try (OutputStream out = new FileOutputStream(dir.resolve("aes_password_checksum.data").toFile())) {
+                        long length = encryptionHeader.getPasswordChecksum().getSize();
+                        IOUtils.copyLarge(in, out, 0, length);
+                    }
+
+                    try (OutputStream out = new FileOutputStream(dir.resolve("compressed_content.data").toFile())) {
+                        long size = AesEngine.getDataCompressedSize(zipEntry.getCompressedSize(), zipEntry.getStrength().saltLength());
+                        IOUtils.copyLarge(in, out, 0, size);
+                    }
+
+                    try (OutputStream out = new FileOutputStream(dir.resolve("aes_mac.data").toFile())) {
+                        long length = encryptionHeader.getMac().getSize();
+                        IOUtils.copyLarge(in, out, 0, length);
+                    }
+
+//                    FileUtils.writeByteArrayToFile(dir.resolve("aes_mac.data").toFile(), encryptionHeader.getMac().getData());
                 } else if (encryption == Encryption.PKWARE) {
                     PkwareEncryptionHeader encryptionHeader = (PkwareEncryptionHeader)block.getEncryptionHeader(fileName);
-//                    long offs = encryptionHeader.getData().getOffs();
-                    long length = encryptionHeader.getData().getSize();
 
-                    try (OutputStream out = new FileOutputStream(dir.resolve("pkware_encryption_header.data").toFile())) {
+                    try (OutputStream out = new FileOutputStream(dir.resolve("pkware_header.data").toFile())) {
+                        //                    long offs = encryptionHeader.getData().getOffs();
+                        long length = encryptionHeader.getData().getSize();
                         IOUtils.copyLarge(in, out, 0, length);
                     }
 

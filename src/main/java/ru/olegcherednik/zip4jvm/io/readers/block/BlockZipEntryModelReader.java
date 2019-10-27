@@ -65,8 +65,7 @@ public class BlockZipEntryModelReader {
         Encryption encryption = zipEntry.getEncryption();
 
         if (encryption == Encryption.AES_256 || encryption == Encryption.AES_192 || encryption == Encryption.AES_128) {
-            BlockAesHeaderReader reader = new BlockAesHeaderReader(zipEntry.getStrength(), zipEntry.getCompressedSize());
-            BlockAesEncryptionHeader encryptionHeader = reader.read(in);
+            BlockAesEncryptionHeader encryptionHeader = new BlockAesHeaderReader(zipEntry.getStrength(), zipEntry.getCompressedSize()).read(in);
             zipEntryBlock.saveEncryptionHeader(zipEntry.getFileName(), encryptionHeader);
         } else if (zipEntry.getEncryption() == Encryption.PKWARE) {
             PkwareEncryptionHeader encryptionHeader = new BlockPkwareHeaderReader().read(in);
