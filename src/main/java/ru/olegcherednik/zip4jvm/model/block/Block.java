@@ -16,18 +16,22 @@ public class Block {
     public static final Block NULL = new Block();
 
     @Getter
+    private long size;
+    @Getter
     @Setter
     private long offs;
-    @Getter
-    private long size;
 
     public <T> T calc(DataInput in, LocalSupplier<T> task) throws IOException {
         try {
             offs = in.getOffs();
             return task.get();
         } finally {
-            size = in.getOffs() - offs;
+            calc(in.getOffs());
         }
+    }
+
+    public void calc(long offs) {
+        size = offs - this.offs;
     }
 
 }

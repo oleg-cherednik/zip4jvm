@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.Version;
@@ -30,7 +31,7 @@ public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
     }
 
     protected LocalFileHeader readLocalFileHeader(DataInput in) throws IOException {
-        in.skip(in.dwordSignatureSize());
+        in.readDwordSignature();
 
         LocalFileHeader localFileHeader = new LocalFileHeader();
 
@@ -47,13 +48,13 @@ public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
         Charset charset = localFileHeader.getGeneralPurposeFlag().getCharset();
 
         localFileHeader.setFileName(in.readString(fileNameLength, charsetCustomizer.apply(charset)));
-        localFileHeader.setExtraField(getExtraFiledReader(extraFieldLength, localFileHeader).read(in));
+        localFileHeader.setExtraField(readExtraFiled(extraFieldLength, localFileHeader, in));
 
         return localFileHeader;
     }
 
-    protected ExtraFieldReader getExtraFiledReader(int size, LocalFileHeader localFileHeader) {
-        return new ExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader));
+    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) throws IOException {
+        return new ExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader)).read(in);
     }
 
     private void findSignature(DataInput in) throws IOException {

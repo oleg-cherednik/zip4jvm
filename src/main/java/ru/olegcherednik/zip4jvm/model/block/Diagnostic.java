@@ -80,7 +80,8 @@ public final class Diagnostic {
 
     @Getter
     @Setter
-    public abstract static class ExtraFieldBlock extends Block {
+    // TODO it should not extends from byte array
+    public abstract static class ExtraFieldBlock extends ByteArrayBlockB {
 
         private ExtraField extraField;
 
@@ -120,20 +121,20 @@ public final class Diagnostic {
 
         public static final ZipEntry NULL = new ZipEntry();
 
-        private final Map<String, LocalFileHeader> localFileHeaders = new LinkedHashMap<>();
+        private final Map<String, LocalFileHeaderB> localFileHeaders = new LinkedHashMap<>();
         private final Map<String, EncryptionHeader> encryptionHeaders = new LinkedHashMap<>();
         private final Map<String, Diagnostic.ByteArrayBlockB> dataDescriptors = new LinkedHashMap<>();
 
         @Setter(AccessLevel.NONE)
-        private LocalFileHeader localFileHeader = LocalFileHeader.NULL;
+        private LocalFileHeaderB localFileHeader;
 
         public void addLocalFileHeader() {
-            localFileHeader = new LocalFileHeader();
+            localFileHeader = new LocalFileHeaderB();
         }
 
         public void saveLocalFileHeader(String fileName) {
             localFileHeaders.put(fileName, localFileHeader);
-            localFileHeader = LocalFileHeader.NULL;
+            localFileHeader = null;
         }
 
         public void saveEncryptionHeader(String fileName, EncryptionHeader encryptionHeader) {
@@ -144,7 +145,7 @@ public final class Diagnostic {
             dataDescriptors.put(fileName, block);
         }
 
-        public LocalFileHeader getLocalFileHeader(String fileName) {
+        public LocalFileHeaderB getLocalFileHeader(String fileName) {
             return localFileHeaders.get(fileName);
         }
 
@@ -162,9 +163,22 @@ public final class Diagnostic {
 
             public static final LocalFileHeader NULL = new LocalFileHeader();
 
+
             private long disk;
 
         }
+
+        @Getter
+        @Setter
+        public static final class LocalFileHeaderB {
+
+            private final ByteArrayBlockB content = new ByteArrayBlockB();
+            private final ExtraField extraField = new ExtraField();
+
+            private long disk;
+
+        }
+
 
         public interface EncryptionHeader {
 
@@ -188,7 +202,7 @@ public final class Diagnostic {
 
     @Getter
     @Setter
-    public static final class ByteArrayBlockB extends Block {
+    public static class ByteArrayBlockB extends Block {
 
         private byte[] data;
 

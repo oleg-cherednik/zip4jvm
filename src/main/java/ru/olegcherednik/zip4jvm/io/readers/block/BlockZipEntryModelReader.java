@@ -54,7 +54,7 @@ public class BlockZipEntryModelReader {
         zipEntryBlock.addLocalFileHeader();
         zipEntryBlock.getLocalFileHeader().setDisk(zipEntry.getDisk());
         long offs = zipEntry.getLocalFileHeaderOffs();
-        Diagnostic.ExtraFieldBlock blockLocalFileHeader = zipEntryBlock.getLocalFileHeader();
+        Diagnostic.ZipEntryBlock.LocalFileHeaderB blockLocalFileHeader = zipEntryBlock.getLocalFileHeader();
         LocalFileHeader localFileHeader = new BlockLocalFileHeaderReader(offs, charsetCustomizer, blockLocalFileHeader).read(in);
         zipEntryBlock.saveLocalFileHeader(localFileHeader.getFileName());
         return localFileHeader;

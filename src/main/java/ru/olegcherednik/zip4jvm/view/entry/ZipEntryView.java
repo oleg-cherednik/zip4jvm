@@ -21,7 +21,7 @@ public class ZipEntryView {
 
     private final int pos;
     private final LocalFileHeader localFileHeader;
-    private final Diagnostic.ZipEntryBlock.LocalFileHeader diagLocalFileHeader;
+    private final Diagnostic.ZipEntryBlock.LocalFileHeaderB diagLocalFileHeader;
     private final Diagnostic.ZipEntryBlock.EncryptionHeader encryptionHeader;
     private final DataDescriptor dataDescriptor;
     private final Block blockDataDescriptor;
