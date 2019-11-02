@@ -10,6 +10,6 @@ import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 @Getter
 public class PkwareEncryptionHeader implements Diagnostic.ZipEntryBlock.EncryptionHeader {
 
-    private final Diagnostic.ByteArrayBlock data = new Diagnostic.ByteArrayBlock();
+    private final Diagnostic.ByteArrayBlockB data = new Diagnostic.ByteArrayBlockB();
 
 }

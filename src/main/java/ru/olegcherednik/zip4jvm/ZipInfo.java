@@ -156,84 +156,90 @@ public final class ZipInfo {
 
             // print zip entry
 
-            try (InputStream in = createDataInput(blockModel.getZipModel(), zipEntry)) {
-                FileUtils.writeByteArrayToFile(dir.resolve("local_file_header.data").toFile(), diagLocalFileHeader.getContent().getData());
+            FileUtils.writeByteArrayToFile(dir.resolve("local_file_header.data").toFile(), diagLocalFileHeader.getContent().getData());
 
-                // print extra filed
+            // print extra filed
 
-                if (diagLocalFileHeader.getExtraField() != null) {
-                    Path extraFieldDir = dir.resolve("extra_fields");
-                    Files.createDirectories(extraFieldDir);
+            if (diagLocalFileHeader.getExtraField() != null && !diagLocalFileHeader.getExtraField().getRecords().isEmpty()) {
+                Path extraFieldDir = dir.resolve("extra_fields");
+                Files.createDirectories(extraFieldDir);
 
-                    Diagnostic.ExtraField diagExtraField = diagLocalFileHeader.getExtraField();
-                    LocalFileHeader localFileHeader = zipEntryModel.getLocalFileHeaders().get(fileName);
+                Diagnostic.ExtraField diagExtraField = diagLocalFileHeader.getExtraField();
+                LocalFileHeader localFileHeader = zipEntryModel.getLocalFileHeaders().get(fileName);
 
-                    for (int signature : diagExtraField.getRecords().keySet()) {
-                        Diagnostic.ByteArrayBlockB block1 = diagExtraField.getRecord(signature);
-                        ExtraField.Record rec = localFileHeader.getExtraField().getRecords().stream()
-                                                               .filter(r -> r.getSignature() == signature)
-                                                               .findFirst().orElse(null);
+                for (int signature : diagExtraField.getRecords().keySet()) {
+                    Diagnostic.ByteArrayBlockB block1 = diagExtraField.getRecord(signature);
+                    ExtraField.Record rec = localFileHeader.getExtraField().getRecords().stream()
+                                                           .filter(r -> r.getSignature() == signature)
+                                                           .findFirst().orElse(null);
 
-                        String title = null;
+                    String title = null;
 
-                        if (rec instanceof ExtendedTimestampExtraField)
-                            title = "(0x5455)_universal_time.data";
-                        else if (rec instanceof InfoZipNewUnixExtraField)
-                            title = "(0x7875)_new_InfoZIP_Unix_OS2_NT.data";
-                        else if (rec instanceof AesExtraDataRecord)
-                            title = "(0x9901)_AES_Encryption_Tag.data";
-                        else
-                            throw new NotImplementedException();
+                    if (rec instanceof ExtendedTimestampExtraField)
+                        title = "(0x5455)_universal_time.data";
+                    else if (rec instanceof InfoZipNewUnixExtraField)
+                        title = "(0x7875)_new_InfoZIP_Unix_OS2_NT.data";
+                    else if (rec instanceof AesExtraDataRecord)
+                        title = "(0x9901)_AES_Encryption_Tag.data";
+                    else
+                        throw new NotImplementedException();
 
-                        FileUtils.writeByteArrayToFile(extraFieldDir.resolve(title).toFile(), block1.getData());
-                    }
+                    FileUtils.writeByteArrayToFile(extraFieldDir.resolve(title).toFile(), block1.getData());
                 }
+            }
 
-                // print encryption header
+            // print encryption header
 
-                Encryption encryption = zipEntry.getEncryption();
+            Encryption encryption = zipEntry.getEncryption();
 
-                // TODO probably same with block reader
+            // TODO probably same with block reader
+            if (encryption == Encryption.AES_128 || encryption == Encryption.AES_192 || encryption == Encryption.AES_256) {
+                BlockAesEncryptionHeader encryptionHeader = (BlockAesEncryptionHeader)block.getEncryptionHeader(fileName);
+
+                FileUtils.writeByteArrayToFile(dir.resolve("aes_salt.data").toFile(), encryptionHeader.getSalt().getData());
+                FileUtils.writeByteArrayToFile(dir.resolve("aes_password_checksum.data").toFile(),
+                        encryptionHeader.getPasswordChecksum().getData());
+                FileUtils.writeByteArrayToFile(dir.resolve("aes_mac.data").toFile(), encryptionHeader.getMac().getData());
+            } else if (encryption == Encryption.PKWARE) {
+                PkwareEncryptionHeader encryptionHeader = (PkwareEncryptionHeader)block.getEncryptionHeader(fileName);
+                FileUtils.writeByteArrayToFile(dir.resolve("pkware_header.data").toFile(), encryptionHeader.getData().getData());
+            }
+
+            // print data descriptor
+
+            if (zipEntry.isDataDescriptorAvailable()) {
+                Diagnostic.ByteArrayBlockB dataDescriptor = block.getDataDescriptor(fileName);
+                FileUtils.writeByteArrayToFile(dir.resolve("data_descriptor.data").toFile(), dataDescriptor.getData());
+            }
+
+            // payload
+
+            if (zipEntry.getCompressedSize() != 0) {
+                long size = zipEntry.getCompressedSize();
+                long offs = diagLocalFileHeader.getContent().getOffs() + diagLocalFileHeader.getContent().getSize();
+
+                if (diagLocalFileHeader.getExtraField() != null)
+                    offs += diagLocalFileHeader.getExtraField().getSize();
+
                 if (encryption == Encryption.AES_128 || encryption == Encryption.AES_192 || encryption == Encryption.AES_256) {
-                    Path encryptionHeaderDir = dir.resolve("encryption_header");
-                    Files.createDirectories(encryptionHeaderDir);
-
-
                     BlockAesEncryptionHeader encryptionHeader = (BlockAesEncryptionHeader)block.getEncryptionHeader(fileName);
 
-                    FileUtils.writeByteArrayToFile(encryptionHeaderDir.resolve("aes_salt.data").toFile(), encryptionHeader.getSalt().getData());
-                    FileUtils.writeByteArrayToFile(encryptionHeaderDir.resolve("aes_password_checksum.data").toFile(),
-                            encryptionHeader.getPasswordChecksum().getData());
-                    FileUtils.writeByteArrayToFile(encryptionHeaderDir.resolve("aes_mac.data").toFile(), encryptionHeader.getMac().getData());
+                    offs += encryptionHeader.getSalt().getSize();
+                    offs += encryptionHeader.getPasswordChecksum().getSize();
 
-
-//                    try (OutputStream out = new FileOutputStream(dir.resolve("payload.data").toFile())) {
-//                        long size = AesEngine.getDataCompressedSize(zipEntry.getCompressedSize(), zipEntry.getStrength().saltLength());
-//                        IOUtils.copyLarge(in, out, 0, size);
-//                    }
+                    size -= encryptionHeader.getSalt().getSize();
+                    size -= encryptionHeader.getPasswordChecksum().getSize();
+                    size -= encryptionHeader.getMac().getSize();
                 } else if (encryption == Encryption.PKWARE) {
-                    Path encryptionHeaderDir = dir.resolve("encryption_header");
-                    Files.createDirectories(encryptionHeaderDir);
-
                     PkwareEncryptionHeader encryptionHeader = (PkwareEncryptionHeader)block.getEncryptionHeader(fileName);
-
-                    try (OutputStream out = new FileOutputStream(encryptionHeaderDir.resolve("pkware_header.data").toFile())) {
-                        //                    long offs = encryptionHeader.getData().getOffs();
-                        long length = encryptionHeader.getData().getSize();
-                        IOUtils.copyLarge(in, out, 0, length);
-                    }
-
-//                    try (OutputStream out = new FileOutputStream(dir.resolve("payload.data").toFile())) {
-//                        long size = zipEntry.getCompressedSize() - encryptionHeader.getData().getData().length;
-//                        IOUtils.copyLarge(in, out, 0, size);
-//                    }
+                    offs += encryptionHeader.getData().getSize();
+                    size -= encryptionHeader.getData().getSize();
                 }
 
-                // print data descriptor
-
-                if (zipEntry.isDataDescriptorAvailable()) {
-                    Diagnostic.ByteArrayBlockB dataDescriptor = block.getDataDescriptor(fileName);
-                    FileUtils.writeByteArrayToFile(dir.resolve("data_descriptor.data").toFile(), dataDescriptor.getData());
+                try (InputStream in = createDataInput(blockModel.getZipModel(), zipEntry)) {
+                    try (OutputStream out = new FileOutputStream(dir.resolve("payload.data").toFile())) {
+                        IOUtils.copyLarge(in, out, offs, size);
+                    }
                 }
             }
 
