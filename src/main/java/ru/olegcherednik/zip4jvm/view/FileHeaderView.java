@@ -46,10 +46,7 @@ public class FileHeaderView {
                               .generalPurposeFlag(fileHeader.getGeneralPurposeFlag())
                               .compressionMethod(fileHeader.getCompressionMethod())
                               .prefix(prefix).build().print(out);
-        CompressionMethodView.builder()
-                             .compressionMethod(fileHeader.getCompressionMethod())
-                             .generalPurposeFlag(fileHeader.getGeneralPurposeFlag())
-                             .prefix(prefix).build().print(out);
+        new CompressionMethodView(fileHeader.getCompressionMethod(), fileHeader.getGeneralPurposeFlag(), prefix.length() + 2, 52).print(out);
         LastModifiedTimeView.builder()
                             .lastModifiedTime(fileHeader.getLastModifiedTime())
                             .prefix(prefix).build().print(out);

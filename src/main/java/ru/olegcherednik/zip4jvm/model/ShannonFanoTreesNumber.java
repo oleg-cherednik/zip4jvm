@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.model;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.view.Title;
 
 /**
  * @author Oleg Cherednik
@@ -10,7 +11,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public enum ShannonFanoTreesNumber {
+public enum ShannonFanoTreesNumber implements Title {
     TWO("2"),
     THREE("3");
 

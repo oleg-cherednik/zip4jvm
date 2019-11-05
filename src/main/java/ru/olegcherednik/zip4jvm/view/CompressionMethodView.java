@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.view;
 
-import lombok.Builder;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 
@@ -10,29 +9,28 @@ import java.io.PrintStream;
  * @author Oleg Cherednik
  * @since 15.10.2019
  */
-@Builder
-public class CompressionMethodView implements BlockView {
+public class CompressionMethodView extends View {
 
     private final CompressionMethod compressionMethod;
     private final GeneralPurposeFlag generalPurposeFlag;
-    private final String prefix;
+
+    public CompressionMethodView(CompressionMethod compressionMethod, GeneralPurposeFlag generalPurposeFlag, int offs, int columnWidth) {
+        super(offs, columnWidth);
+        this.compressionMethod = compressionMethod;
+        this.generalPurposeFlag = generalPurposeFlag;
+    }
 
     @Override
     public void print(PrintStream out) {
-        String str = String.format("%scompression method (%02d):", prefix, compressionMethod.getCode());
-        out.format("%-52s%s\n", str, compressionMethod.getTitle());
+        printLine(out, String.format("compression method (%02d):", compressionMethod.getCode()), compressionMethod);
 
         if (compressionMethod == CompressionMethod.FILE_IMPLODED) {
-            out.format("%-52s%s\n", String.format("%s  size of sliding dictionary (implosion):", prefix),
-                    generalPurposeFlag.getSlidingDictionarySize().getTitle());
-            out.format("%-52s%s\n", String.format("%s  number of Shannon-Fano trees (implosion):", prefix),
-                    generalPurposeFlag.getShannonFanoTreesNumber().getTitle());
-        } else if (compressionMethod == CompressionMethod.DEFLATE || compressionMethod == CompressionMethod.FILE_ENHANCED_DEFLATED)
-            out.format("%-52s%s\n", String.format("%s  compression sub-type (deflation):", prefix),
-                    generalPurposeFlag.getCompressionLevel().getTitle());
-        else if (compressionMethod == CompressionMethod.LZMA)
-            out.format("%-52s%s\n", String.format("%s  end-of-stream (EOS) marker:", prefix),
-                    generalPurposeFlag.isEosMarker() ? "yes" : "no");
+            printLine(out, "  size of sliding dictionary (implosion):", generalPurposeFlag.getSlidingDictionarySize());
+            printLine(out, "  number of Shannon-Fano trees (implosion):", generalPurposeFlag.getShannonFanoTreesNumber());
+        } else if (compressionMethod == CompressionMethod.LZMA)
+            printLine(out, "  end-of-stream (EOS) marker:", generalPurposeFlag.isEosMarker() ? "yes" : "no");
+        else if (compressionMethod == CompressionMethod.DEFLATE || compressionMethod == CompressionMethod.FILE_ENHANCED_DEFLATED)
+            printLine(out, "  compression sub-type (deflation):", generalPurposeFlag.getCompressionLevel());
     }
 
 }

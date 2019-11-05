@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.model;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.view.Title;
 
 /**
  * see 4.4.4
@@ -12,7 +13,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public enum CompressionLevel {
+public enum CompressionLevel implements Title {
     SUPER_FAST(1, "superfast"),
     FAST(3, "fast"),
     NORMAL(5, "normal"),

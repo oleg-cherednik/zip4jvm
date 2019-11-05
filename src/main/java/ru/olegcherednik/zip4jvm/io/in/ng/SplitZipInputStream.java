@@ -1,9 +1,9 @@
 package ru.olegcherednik.zip4jvm.io.in.ng;
 
+import org.apache.commons.lang.NotImplementedException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.FileInputStream;
 import java.io.IOException;

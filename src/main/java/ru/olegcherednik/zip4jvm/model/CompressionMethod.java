@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.model;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.view.Title;
 
 /**
  * see 4.4.5
@@ -12,7 +13,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public enum CompressionMethod {
+public enum CompressionMethod implements Title {
     STORE(0, "none (stored)"),
     FILE_SHRUNK(1, "shrunk"),
     FILE_RED_COMP_FACTOR_1(2, "reduced (factor 1)"),

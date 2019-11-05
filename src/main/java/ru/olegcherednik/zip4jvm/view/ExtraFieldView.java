@@ -85,10 +85,7 @@ public class ExtraFieldView {
         out.format("%s  Encryption Tag Version:                       %s-%d\n", prefix, record.getVendor(), record.getVersionNumber());
         out.format("%s  Encryption Key Bits:                          %s\n", prefix, record.getStrength().getSize());
 
-        CompressionMethodView.builder()
-                             .compressionMethod(compressionMethod)
-                             .generalPurposeFlag(generalPurposeFlag)
-                             .prefix(prefix + "  ").build().print(out);
+        new CompressionMethodView(compressionMethod, generalPurposeFlag, prefix.length() + 2, 52).print(out);
     }
 
     private void print(ExtraField.Record.Unknown record, PrintStream out) {
