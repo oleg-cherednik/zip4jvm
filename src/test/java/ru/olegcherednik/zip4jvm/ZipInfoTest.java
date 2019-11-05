@@ -42,7 +42,8 @@ public class ZipInfoTest {
         Function<String, ZipEntrySettings> entrySettingsProvider =
                 fileName -> ZipEntrySettings.builder()
                                             .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                            .encryption(Encryption.AES_256, "1".toCharArray()).build();
+                                            .encryption(Encryption.AES_256, "1".toCharArray())
+                                            .build();
         ZipSettings settings = ZipSettings.builder().entrySettingsProvider(entrySettingsProvider).comment("password: 1").build();
 //        ZipIt.zip(path).settings(settings).add(contentDirSrc);
 //        ZipIt.zip(path).settings(settings).add(fileDucati);
@@ -53,7 +54,19 @@ public class ZipInfoTest {
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/ferdinand.zip"))
         ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/aes.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/split/src.zip"))
+//        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/macos_10.zip"))
+//        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/ubuntu_18.zip"))
                .getShortInfo();
+    }
+
+    public void decompose() throws IOException {
+        Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+
+        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/aes.zip"))
+//        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/pkware.zip"))
+//        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/pkware.zip"))
+//        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/ubuntu_18.zip"))
+               .decompose(dir);
     }
 
 }

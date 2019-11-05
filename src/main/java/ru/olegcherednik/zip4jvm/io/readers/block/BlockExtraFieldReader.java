@@ -17,23 +17,23 @@ import java.util.function.Function;
  */
 public class BlockExtraFieldReader extends ExtraFieldReader {
 
-    private final Diagnostic.ExtraFieldBlock extraFieldBlock;
+    private final Diagnostic.ExtraField extraFieldBlock;
 
     public BlockExtraFieldReader(int size, Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> readers,
-            Diagnostic.ExtraFieldBlock extraFieldBlock) {
+            Diagnostic.ExtraField extraFieldBlock) {
         super(size, readers);
         this.extraFieldBlock = extraFieldBlock;
     }
 
     @Override
     protected ExtraField readExtraField(DataInput in) throws IOException {
-        extraFieldBlock.addExtraField();
-        return extraFieldBlock.getExtraField().calc(in, () -> super.readExtraField(in));
+        extraFieldBlock.addRecord();
+        return extraFieldBlock.getRecord().calc(in, () -> super.readExtraField(in));
     }
 
     @Override
     protected ExtraFieldRecordReader getExtraFieldRecordReader() {
-        return new BlockExtraFieldRecordReader(readers, extraFieldBlock.getExtraField());
+        return new BlockExtraFieldRecordReader(readers, extraFieldBlock);
     }
 
 }

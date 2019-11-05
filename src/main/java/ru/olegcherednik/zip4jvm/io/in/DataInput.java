@@ -18,6 +18,8 @@ public interface DataInput extends Closeable {
         return dwordSize();
     }
 
+    int byteSize();
+
     int wordSize();
 
     int dwordSize();
@@ -37,6 +39,8 @@ public interface DataInput extends Closeable {
     long readDword() throws IOException;
 
     long readQword() throws IOException;
+
+    String readNumber(int bytes, int radix) throws IOException;
 
     String readString(int length, Charset charset) throws IOException;
 
@@ -61,5 +65,8 @@ public interface DataInput extends Closeable {
     long getMark(String id);
 
     void seek(String id) throws IOException;
+
+    void cleanBuffer();
+    byte[] getLastBytes(int bytes);
 
 }

@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.view;
 import lombok.Builder;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
+import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
 
 import java.io.PrintStream;
 import java.nio.charset.Charset;
@@ -17,14 +18,15 @@ import java.util.stream.IntStream;
 public class LocalFileHeaderView {
 
     private final LocalFileHeader localFileHeader;
-    private final Diagnostic.ZipEntryBlock.LocalFileHeader diagLocalFileHeader;
+    // TODO should be block
+    private final Diagnostic.ZipEntryBlock.LocalFileHeaderB diagLocalFileHeader;
     private final long pos;
     private final Charset charset;
     private final String prefix;
 
     public void print(PrintStream out) {
         String str = String.format("#%d (%s) Local directory entry - %d bytes",
-                pos + 1, ViewUtils.signature(LocalFileHeader.SIGNATURE), diagLocalFileHeader.getSize());
+                pos + 1, ViewUtils.signature(LocalFileHeader.SIGNATURE), diagLocalFileHeader.getContent().getSize());
         out.println(str);
 
         IntStream.range(0, str.length()).forEach(i -> out.print('='));
@@ -32,7 +34,7 @@ public class LocalFileHeaderView {
         out.println();
         out.format("%sfilename (%s): %s\n\n", prefix, charset.name(), localFileHeader.getFileName());
         out.format("%s--- part number (%04X): %d ---\n", prefix, diagLocalFileHeader.getDisk(), diagLocalFileHeader.getDisk() + 1);
-        out.format("%slocation:                                       %2$d (0x%2$08X) bytes\n", prefix, diagLocalFileHeader.getOffs());
+        out.format("%slocation:                                       %2$d (0x%2$08X) bytes\n", prefix, diagLocalFileHeader.getContent().getOffs());
 
         VersionView.builder()
                    .versionToExtract(localFileHeader.getVersionToExtract())

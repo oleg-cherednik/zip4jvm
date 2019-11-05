@@ -37,6 +37,7 @@ public class SplitZipInputStream extends BaseDataInput {
 
         while (res < len) {
             int total = delegate.read(buf, offs, size);
+            cycleBuffer.write(buf, offs, size);
 
             if (total > 0)
                 res += total;

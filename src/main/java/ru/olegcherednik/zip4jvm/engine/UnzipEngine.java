@@ -38,7 +38,7 @@ public final class UnzipEngine implements ZipFile.Reader {
 
     @Override
     public void extract(Path destDir) throws IOException {
-        for (ZipEntry zipEntry : zipModel.getEntries())
+        for (ZipEntry zipEntry : zipModel.getZipEntries())
             extractEntry(destDir, zipEntry, ZipEntry::getFileName);
     }
 
@@ -48,7 +48,7 @@ public final class UnzipEngine implements ZipFile.Reader {
         fileName = ZipUtils.getFileNameNoDirectoryMarker(fileName);
 
         if (zipModel.hasEntry(fileName))
-            extractEntry(destDir, zipModel.getEntryByFileName(fileName), e -> FilenameUtils.getName(e.getFileName()));
+            extractEntry(destDir, zipModel.getZipEntryByFileName(fileName), e -> FilenameUtils.getName(e.getFileName()));
         else {
             List<ZipEntry> subEntries = getEntriesWithFileNamePrefix(fileName + '/');
 
@@ -61,14 +61,14 @@ public final class UnzipEngine implements ZipFile.Reader {
     }
 
     private List<ZipEntry> getEntriesWithFileNamePrefix(String fileNamePrefix) {
-        return zipModel.getEntries().stream()
+        return zipModel.getZipEntries().stream()
                        .filter(entry -> entry.getFileName().startsWith(fileNamePrefix))
                        .collect(Collectors.toList());
     }
 
     @Override
     public ZipFile.Entry extract(String fileName) throws IOException {
-        ZipEntry zipEntry = zipModel.getEntryByFileName(ZipUtils.normalizeFileName(fileName));
+        ZipEntry zipEntry = zipModel.getZipEntryByFileName(ZipUtils.normalizeFileName(fileName));
 
         if (zipEntry == null)
             throw new FileNotFoundException("Entry '" + fileName + "' was not found");
@@ -104,7 +104,7 @@ public final class UnzipEngine implements ZipFile.Reader {
 
             @Override
             public ZipFile.Entry next() {
-                return zipModel.getEntryByFileName(it.next()).createImmutableEntry();
+                return zipModel.getZipEntryByFileName(it.next()).createImmutableEntry();
             }
         };
     }

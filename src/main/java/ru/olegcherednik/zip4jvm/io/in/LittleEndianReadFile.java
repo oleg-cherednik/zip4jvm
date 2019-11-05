@@ -51,6 +51,7 @@ public class LittleEndianReadFile implements DataInputFile {
 
     @Override
     public int readSignature() throws IOException {
+        // TODO probably it's better to use convert
         int b0 = in.read();
         int b1 = in.read();
         int b2 = in.read();

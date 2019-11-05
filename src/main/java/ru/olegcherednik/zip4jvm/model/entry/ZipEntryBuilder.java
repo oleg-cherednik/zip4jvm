@@ -74,6 +74,7 @@ public final class ZipEntryBuilder {
             RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, compression, compressionLevel,
                     encryption, inputStreamSup);
 
+            zipEntry.setDataDescriptorAvailable(() -> true);
             zipEntry.setZip64(entrySettings.isZip64());
             zipEntry.setPassword(entrySettings.getPassword());
             zipEntry.setComment(entrySettings.getComment());
@@ -114,6 +115,7 @@ public final class ZipEntryBuilder {
             RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, compression, compressionLevel,
                     encryption, inputStreamSup);
 
+            zipEntry.setDataDescriptorAvailable(() -> fileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
             zipEntry.setZip64(fileHeader.isZip64());
             zipEntry.setComment(fileHeader.getComment());
             zipEntry.setUtf8(fileHeader.getGeneralPurposeFlag().isUtf8());

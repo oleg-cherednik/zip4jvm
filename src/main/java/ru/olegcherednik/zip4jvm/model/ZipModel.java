@@ -8,14 +8,14 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
+
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireMaxSizeComment;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireMaxSizeComment;
 
@@ -77,11 +77,11 @@ public class ZipModel {
         fileNameEntry.put(zipEntry.getFileName(), zipEntry);
     }
 
-    public Collection<ZipEntry> getEntries() {
+    public Collection<ZipEntry> getZipEntries() {
         return isEmpty() ? Collections.emptyList() : Collections.unmodifiableCollection(fileNameEntry.values());
     }
 
-    public ZipEntry getEntryByFileName(String fileName) {
+    public ZipEntry getZipEntryByFileName(String fileName) {
         return fileNameEntry.get(fileName);
     }
 

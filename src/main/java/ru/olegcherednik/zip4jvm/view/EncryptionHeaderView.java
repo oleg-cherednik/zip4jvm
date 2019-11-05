@@ -1,7 +1,8 @@
 package ru.olegcherednik.zip4jvm.view;
 
 import lombok.Builder;
-import ru.olegcherednik.zip4jvm.io.readers.block.aes.AesEncryptionHeader;
+import ru.olegcherednik.zip4jvm.io.readers.block.aes.BlockAesEncryptionHeader;
+import ru.olegcherednik.zip4jvm.io.readers.block.pkware.PkwareEncryptionHeader;
 import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 
 import java.io.PrintStream;
@@ -24,18 +25,17 @@ public class EncryptionHeaderView {
         if (encryptionHeader == null)
             return;
 
-        if (encryptionHeader instanceof AesEncryptionHeader)
-            print((AesEncryptionHeader)encryptionHeader, out);
-
-        int a = 0;
-        a++;
+        if (encryptionHeader instanceof BlockAesEncryptionHeader)
+            print((BlockAesEncryptionHeader)encryptionHeader, out);
+        else if(encryptionHeader instanceof PkwareEncryptionHeader)
+            print((PkwareEncryptionHeader)encryptionHeader, out);
     }
 
-    private void print(AesEncryptionHeader encryptionHeader, PrintStream out) {
+    private void print(BlockAesEncryptionHeader encryptionHeader, PrintStream out) {
         String str = String.format("#%d (AES) encryption header", pos + 1);
         out.println(str);
 
-        IntStream.range(0, str.length()).forEach(i -> out.print('='));
+        IntStream.range(0, str.length()).forEach(i -> out.print('-'));
 
         out.println();
         out.format("%ssalt:                                           %d bytes\n", prefix, encryptionHeader.getSalt().getSize());
@@ -59,6 +59,21 @@ public class EncryptionHeaderView {
 
         ByteArrayHexView.builder()
                         .buf(encryptionHeader.getMac().getData())
+                        .prefix(prefix).build().print(out);
+    }
+
+    private void print(PkwareEncryptionHeader encryptionHeader, PrintStream out) {
+        String str = String.format("#%d (PKWARE) encryption header", pos + 1);
+        out.println(str);
+
+        IntStream.range(0, str.length()).forEach(i -> out.print('='));
+
+        out.println();
+        out.format("%sdata:                                           %d bytes\n", prefix, encryptionHeader.getData().getSize());
+        out.format("%s  - location:                                   %2$d (0x%2$08X) bytes\n", prefix, encryptionHeader.getData().getOffs());
+
+        ByteArrayHexView.builder()
+                        .buf(encryptionHeader.getData().getData())
                         .prefix(prefix).build().print(out);
     }
 }

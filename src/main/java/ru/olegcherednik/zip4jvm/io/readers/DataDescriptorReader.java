@@ -20,7 +20,7 @@ public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
         return zip64 ? new Zip64() : new Standard();
     }
 
-    private static final class Standard extends DataDescriptorReader {
+    public static class Standard extends DataDescriptorReader {
 
         @Override
         public DataDescriptor read(DataInput in) throws IOException {
@@ -38,7 +38,7 @@ public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
         }
     }
 
-    private static final class Zip64 extends DataDescriptorReader {
+    public static class Zip64 extends DataDescriptorReader {
 
         @Override
         public DataDescriptor read(DataInput in) throws IOException {

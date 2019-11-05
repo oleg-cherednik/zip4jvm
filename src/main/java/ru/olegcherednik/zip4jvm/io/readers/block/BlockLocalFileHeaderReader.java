@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.io.readers.block;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
+import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 
@@ -16,21 +17,26 @@ import java.util.function.Function;
  */
 public class BlockLocalFileHeaderReader extends LocalFileHeaderReader {
 
-    private final Diagnostic.ExtraFieldBlock localFileHeader;
+    private final Diagnostic.ZipEntryBlock.LocalFileHeaderB localFileHeader;
 
-    public BlockLocalFileHeaderReader(long offs, Function<Charset, Charset> charsetCustomizer, Diagnostic.ExtraFieldBlock localFileHeader) {
+    public BlockLocalFileHeaderReader(long offs, Function<Charset, Charset> charsetCustomizer, Diagnostic.ZipEntryBlock.LocalFileHeaderB localFileHeader) {
         super(offs, charsetCustomizer);
         this.localFileHeader = localFileHeader;
     }
 
     @Override
     protected LocalFileHeader readLocalFileHeader(DataInput in) throws IOException {
-        return localFileHeader.calc(in, () -> super.readLocalFileHeader(in));
+        in.cleanBuffer();
+        localFileHeader.getContent().setOffs(in.getOffs());
+        return super.readLocalFileHeader(in);
     }
 
     @Override
-    protected ExtraFieldReader getExtraFiledReader(int size, LocalFileHeader localFileHeader) {
-        return new BlockExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader), this.localFileHeader);
+    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) throws IOException {
+        this.localFileHeader.getContent().calc(in.getOffs());
+        this.localFileHeader.getContent().setData(in.getLastBytes((int)this.localFileHeader.getContent().getSize()));
+        in.cleanBuffer();
+        return new BlockExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader), this.localFileHeader.getExtraField()).read(in);
     }
 
 }

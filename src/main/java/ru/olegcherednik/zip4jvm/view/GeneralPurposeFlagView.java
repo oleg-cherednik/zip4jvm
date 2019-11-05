@@ -28,11 +28,8 @@ public class GeneralPurposeFlagView {
         out.format("%s  file security status  (bit 0):                %s\n", prefix,
                 generalPurposeFlag.isEncrypted() ? "encrypted" : "not encrypted");
         out.format("%s  data descriptor       (bit 3):                %s\n", prefix, generalPurposeFlag.isDataDescriptorAvailable() ? "yes" : "no");
-
-        if (generalPurposeFlag.isStrongEncryption())
-            out.format("%s  strong encryption     (bit 6):                yes\n", prefix);
-        if (generalPurposeFlag.isUtf8())
-            out.format("%s  UTF-8 names          (bit 11):                yes\n", prefix);
+        out.format("%s  strong encryption     (bit 6):                %s\n", prefix, generalPurposeFlag.isStrongEncryption() ? "yes" : "no");
+        out.format("%s  UTF-8 names          (bit 11):                %s\n", prefix, generalPurposeFlag.isUtf8() ? "yes" : "no");
     }
 
 }

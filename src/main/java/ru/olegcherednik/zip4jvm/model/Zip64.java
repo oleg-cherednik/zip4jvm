@@ -92,7 +92,7 @@ public final class Zip64 {
 
         public static final ExtendedInfo NULL = new ExtendedInfo(new Builder());
 
-        public static final int SIGNATURE = 0x1;
+        public static final int SIGNATURE = 0x0001;
         public static final int SIZE_FIELD = 2 + 2; // 4 bytes: signature + size
 
         public static Builder builder() {

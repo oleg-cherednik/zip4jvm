@@ -77,7 +77,7 @@ public final class ZipModelBuilder {
     private long getTotalDisks() {
         if (zip64 == Zip64.NULL)
             return endCentralDirectory.getTotalDisks();
-        return zip64.getEndCentralDirectoryLocator().getTotalDisks();
+        return zip64.getEndCentralDirectory().getTotalDisks();
     }
 
     private long getMainDisks() {

@@ -80,7 +80,8 @@ public final class Diagnostic {
 
     @Getter
     @Setter
-    public abstract static class ExtraFieldBlock extends Block {
+    // TODO it should not extends from byte array
+    public abstract static class ExtraFieldBlock extends ByteArrayBlockB {
 
         private ExtraField extraField;
 
@@ -94,13 +95,13 @@ public final class Diagnostic {
     @Setter
     public static final class ExtraField extends Block {
 
-        private final Map<Integer, Block> records = new LinkedHashMap<>();
+        private final Map<Integer, ByteArrayBlockB> records = new LinkedHashMap<>();
 
         @Setter(AccessLevel.NONE)
-        private Block record;
+        private ByteArrayBlockB record;
 
         public void addRecord() {
-            record = new Block();
+            record = new ByteArrayBlockB();
         }
 
         public void saveRecord(int signature) {
@@ -108,7 +109,7 @@ public final class Diagnostic {
             record = null;
         }
 
-        public Block getRecord(int signature) {
+        public ByteArrayBlockB getRecord(int signature) {
             return records.get(signature);
         }
 
@@ -120,31 +121,40 @@ public final class Diagnostic {
 
         public static final ZipEntry NULL = new ZipEntry();
 
-        private final Map<String, LocalFileHeader> localFileHeaders = new LinkedHashMap<>();
+        private final Map<String, LocalFileHeaderB> localFileHeaders = new LinkedHashMap<>();
         private final Map<String, EncryptionHeader> encryptionHeaders = new LinkedHashMap<>();
+        private final Map<String, Diagnostic.ByteArrayBlockB> dataDescriptors = new LinkedHashMap<>();
 
         @Setter(AccessLevel.NONE)
-        private LocalFileHeader localFileHeader = LocalFileHeader.NULL;
+        private LocalFileHeaderB localFileHeader;
 
         public void addLocalFileHeader() {
-            localFileHeader = new LocalFileHeader();
+            localFileHeader = new LocalFileHeaderB();
         }
 
         public void saveLocalFileHeader(String fileName) {
             localFileHeaders.put(fileName, localFileHeader);
-            localFileHeader = LocalFileHeader.NULL;
+            localFileHeader = null;
         }
 
         public void saveEncryptionHeader(String fileName, EncryptionHeader encryptionHeader) {
             encryptionHeaders.put(fileName, encryptionHeader);
         }
 
-        public LocalFileHeader getLocalFileHeader(String fileName) {
+        public void saveDataDescriptor(String fileName, Diagnostic.ByteArrayBlockB block) {
+            dataDescriptors.put(fileName, block);
+        }
+
+        public LocalFileHeaderB getLocalFileHeader(String fileName) {
             return localFileHeaders.get(fileName);
         }
 
         public EncryptionHeader getEncryptionHeader(String fileName) {
             return encryptionHeaders.get(fileName);
+        }
+
+        public Diagnostic.ByteArrayBlockB getDataDescriptor(String fileName) {
+            return dataDescriptors.get(fileName);
         }
 
         @Getter
@@ -153,13 +163,25 @@ public final class Diagnostic {
 
             public static final LocalFileHeader NULL = new LocalFileHeader();
 
+
             private long disk;
 
+        }
+
+        @Getter
+        @Setter
+        public static final class LocalFileHeaderB {
+
+            private final ByteArrayBlockB content = new ByteArrayBlockB();
+            private final ExtraField extraField = new ExtraField();
+
+            private long disk;
         }
 
         public interface EncryptionHeader {
 
         }
+
     }
 
     @Getter
@@ -172,6 +194,22 @@ public final class Diagnostic {
         public <T> T calc(DataInput in, LocalSupplier<T> task) throws IOException {
             T res = super.calc(in, task);
             data = (byte[])res;
+            return res;
+        }
+    }
+
+    @Getter
+    @Setter
+    public static class ByteArrayBlockB extends Block {
+
+        private byte[] data;
+
+        @Override
+        public <T> T calc(DataInput in, LocalSupplier<T> task) throws IOException {
+            long offs = in.getOffs();
+            in.cleanBuffer();
+            T res = super.calc(in, task);
+            data = in.getLastBytes((int)(in.getOffs() - offs));
             return res;
         }
     }

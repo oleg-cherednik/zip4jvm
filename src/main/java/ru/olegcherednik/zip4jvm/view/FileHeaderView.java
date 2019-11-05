@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.view;
 import lombok.Builder;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
+import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
 
 import java.io.PrintStream;
 import java.nio.charset.Charset;
@@ -76,13 +77,11 @@ public class FileHeaderView {
         ExternalFileAttributesView.builder()
                                   .externalFileAttributes(fileHeader.getExternalFileAttributes())
                                   .prefix(prefix).build().print(out);
-
         ExtraFieldView.builder()
                       .extraField(fileHeader.getExtraField())
                       .diagExtraField(diagFileHeader.getExtraField())
                       .generalPurposeFlag(fileHeader.getGeneralPurposeFlag())
                       .prefix(prefix).build().print(out);
-
     }
 
 }
