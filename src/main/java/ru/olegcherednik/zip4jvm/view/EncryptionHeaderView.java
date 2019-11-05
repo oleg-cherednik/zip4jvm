@@ -35,7 +35,7 @@ public class EncryptionHeaderView {
         String str = String.format("#%d (AES) encryption header", pos + 1);
         out.println(str);
 
-        IntStream.range(0, str.length()).forEach(i -> out.print('='));
+        IntStream.range(0, str.length()).forEach(i -> out.print('-'));
 
         out.println();
         out.format("%ssalt:                                           %d bytes\n", prefix, encryptionHeader.getSalt().getSize());

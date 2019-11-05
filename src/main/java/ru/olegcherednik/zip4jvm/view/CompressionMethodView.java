@@ -11,14 +11,16 @@ import java.io.PrintStream;
  * @since 15.10.2019
  */
 @Builder
-public class CompressionMethodView {
+public class CompressionMethodView implements BlockView {
 
     private final CompressionMethod compressionMethod;
     private final GeneralPurposeFlag generalPurposeFlag;
     private final String prefix;
 
+    @Override
     public void print(PrintStream out) {
-        out.format("%-52s%s\n", String.format("%scompression method (%02d):", prefix, compressionMethod.getCode()), compressionMethod.getTitle());
+        String str = String.format("%scompression method (%02d):", prefix, compressionMethod.getCode());
+        out.format("%-52s%s\n", str, compressionMethod.getTitle());
 
         if (compressionMethod == CompressionMethod.FILE_IMPLODED) {
             out.format("%-52s%s\n", String.format("%s  size of sliding dictionary (implosion):", prefix),

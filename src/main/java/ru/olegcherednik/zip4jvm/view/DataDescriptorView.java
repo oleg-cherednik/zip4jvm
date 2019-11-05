@@ -26,7 +26,7 @@ public class DataDescriptorView {
         String str = String.format("#%d (%s) Data descriptor", pos + 1, ViewUtils.signature(DataDescriptor.SIGNATURE));
         out.println(str);
 
-        IntStream.range(0, str.length()).forEach(i -> out.print('='));
+        IntStream.range(0, str.length()).forEach(i -> out.print('-'));
 
         out.println();
         out.format("%s  - location:                                   %2$d (0x%2$08X) bytes\n", prefix, block.getOffs());

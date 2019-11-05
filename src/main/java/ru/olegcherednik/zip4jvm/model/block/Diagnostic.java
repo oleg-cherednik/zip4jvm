@@ -176,9 +176,7 @@ public final class Diagnostic {
             private final ExtraField extraField = new ExtraField();
 
             private long disk;
-
         }
-
 
         public interface EncryptionHeader {
 
