@@ -24,7 +24,6 @@ public class CompressionMethodViewTest {
         String[] lines = Zip4jvmSuite.execute(CompressionMethodView.builder()
                                                                    .compressionMethod(CompressionMethod.STORE)
                                                                    .generalPurposeFlag(new GeneralPurposeFlag())
-                                                                   .offs(0)
                                                                    .columnWidth(52).build());
         assertThat(lines).hasSize(1);
         assertThat(lines[0]).isEqualTo("compression method (00):                            none (stored)");
@@ -38,7 +37,6 @@ public class CompressionMethodViewTest {
         String[] lines = Zip4jvmSuite.execute(CompressionMethodView.builder()
                                                                    .compressionMethod(CompressionMethod.FILE_IMPLODED)
                                                                    .generalPurposeFlag(generalPurposeFlag)
-                                                                   .offs(0)
                                                                    .columnWidth(52).build());
         assertThat(lines).hasSize(3);
         assertThat(lines[0]).isEqualTo("compression method (06):                            imploded");
@@ -54,7 +52,6 @@ public class CompressionMethodViewTest {
             String[] lines = Zip4jvmSuite.execute(CompressionMethodView.builder()
                                                                        .compressionMethod(CompressionMethod.LZMA)
                                                                        .generalPurposeFlag(generalPurposeFlag)
-                                                                       .offs(0)
                                                                        .columnWidth(52).build());
             assertThat(lines).hasSize(2);
             assertThat(lines[0]).isEqualTo("compression method (14):                            lzma encoding");
@@ -70,7 +67,6 @@ public class CompressionMethodViewTest {
             String[] lines = Zip4jvmSuite.execute(CompressionMethodView.builder()
                                                                        .compressionMethod(compressionMethod)
                                                                        .generalPurposeFlag(generalPurposeFlag)
-                                                                       .offs(0)
                                                                        .columnWidth(52).build());
             assertThat(lines).hasSize(2);
 

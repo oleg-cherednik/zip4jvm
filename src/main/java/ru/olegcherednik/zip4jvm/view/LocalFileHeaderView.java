@@ -43,12 +43,13 @@ public class LocalFileHeaderView {
         GeneralPurposeFlagView.builder()
                               .generalPurposeFlag(localFileHeader.getGeneralPurposeFlag())
                               .compressionMethod(localFileHeader.getCompressionMethod())
-                              .prefix(prefix).build().print(out);
+                              .offs(prefix.length())
+                              .columnWidth(52).build().print(out);
 
         CompressionMethodView.builder()
                              .compressionMethod(localFileHeader.getCompressionMethod())
                              .generalPurposeFlag(localFileHeader.getGeneralPurposeFlag())
-                             .offs(prefix.length() + 2)
+                             .offs(prefix.length())
                              .columnWidth(52).build().print(out);
 
         LastModifiedTimeView.builder()

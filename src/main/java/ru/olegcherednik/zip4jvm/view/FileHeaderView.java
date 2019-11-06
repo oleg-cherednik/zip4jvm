@@ -45,12 +45,13 @@ public class FileHeaderView {
         GeneralPurposeFlagView.builder()
                               .generalPurposeFlag(fileHeader.getGeneralPurposeFlag())
                               .compressionMethod(fileHeader.getCompressionMethod())
-                              .prefix(prefix).build().print(out);
+                              .offs(prefix.length())
+                              .columnWidth(52).build().print(out);
 
         CompressionMethodView.builder()
                              .compressionMethod(fileHeader.getCompressionMethod())
                              .generalPurposeFlag(fileHeader.getGeneralPurposeFlag())
-                             .offs(prefix.length() + 2)
+                             .offs(prefix.length())
                              .columnWidth(52).build().print(out);
 
         LastModifiedTimeView.builder()
