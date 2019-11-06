@@ -29,6 +29,10 @@ final class AesExtraDataRecordView {
         out.format("%s  Encryption Tag Version:                       %s-%d\n", prefix, record.getVendor(), record.getVersionNumber());
         out.format("%s  Encryption Key Bits:                          %s\n", prefix, record.getStrength().getSize());
 
-        new CompressionMethodView(compressionMethod, generalPurposeFlag, prefix.length() + 2, 52).print(out);
+        CompressionMethodView.builder()
+                             .compressionMethod(compressionMethod)
+                             .generalPurposeFlag(generalPurposeFlag)
+                             .offs(prefix.length() + 2)
+                             .columnWidth(52).build().print(out);
     }
 }

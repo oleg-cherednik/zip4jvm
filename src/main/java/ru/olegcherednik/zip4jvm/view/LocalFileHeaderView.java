@@ -44,8 +44,13 @@ public class LocalFileHeaderView {
                               .generalPurposeFlag(localFileHeader.getGeneralPurposeFlag())
                               .compressionMethod(localFileHeader.getCompressionMethod())
                               .prefix(prefix).build().print(out);
-        new CompressionMethodView(localFileHeader.getCompressionMethod(), localFileHeader.getGeneralPurposeFlag(),
-                prefix.length() + 2, 52).print(out);
+
+        CompressionMethodView.builder()
+                             .compressionMethod(localFileHeader.getCompressionMethod())
+                             .generalPurposeFlag(localFileHeader.getGeneralPurposeFlag())
+                             .offs(prefix.length() + 2)
+                             .columnWidth(52).build().print(out);
+
         LastModifiedTimeView.builder()
                             .lastModifiedTime(localFileHeader.getLastModifiedTime())
                             .prefix(prefix).build().print(out);

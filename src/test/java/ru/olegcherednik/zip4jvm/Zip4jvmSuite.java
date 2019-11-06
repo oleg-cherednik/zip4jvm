@@ -5,8 +5,12 @@ import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import ru.olegcherednik.zip4jvm.data.DefalteZipData;
 import ru.olegcherednik.zip4jvm.data.StoreZipData;
+import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.view.View;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -133,6 +137,13 @@ public class Zip4jvmSuite {
         String dirName = path.toString().replaceAll("\\\\", "_");
 
         return rootDir.resolve(dirName);
+    }
+
+    public static String[] execute(View view) throws IOException {
+        try (ByteArrayOutputStream os = new ByteArrayOutputStream(); PrintStream out = new PrintStream(os, true, Charsets.UTF_8.name())) {
+            view.print(out);
+            return new String(os.toByteArray(), Charsets.UTF_8).split("\n");
+        }
     }
 
 }
