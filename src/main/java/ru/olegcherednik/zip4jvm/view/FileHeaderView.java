@@ -37,27 +37,10 @@ public class FileHeaderView {
         out.format("%spart number of this part (%04X):                %d\n", prefix, fileHeader.getDisk(), fileHeader.getDisk() + 1);
         out.format("%srelative offset of local header:                %2$d (0x%2$08X) bytes\n", prefix, fileHeader.getLocalFileHeaderOffs());
 
-        VersionView.builder()
-                   .versionMadeBy(fileHeader.getVersionMadeBy())
-                   .versionToExtract(fileHeader.getVersionToExtract())
-                   .offs(prefix.length())
-                   .columnWidth(52).build().print(out);
-
-        GeneralPurposeFlagView.builder()
-                              .generalPurposeFlag(fileHeader.getGeneralPurposeFlag())
-                              .compressionMethod(fileHeader.getCompressionMethod())
-                              .offs(prefix.length())
-                              .columnWidth(52).build().print(out);
-
-        CompressionMethodView.builder()
-                             .compressionMethod(fileHeader.getCompressionMethod())
-                             .generalPurposeFlag(fileHeader.getGeneralPurposeFlag())
-                             .offs(prefix.length())
-                             .columnWidth(52).build().print(out);
-
-        LastModifiedTimeView.builder()
-                            .lastModifiedTime(fileHeader.getLastModifiedTime())
-                            .prefix(prefix).build().print(out);
+        printVersion(out);
+        printGeneralPurposeFlag(out);
+        printCompressionMethod(out);
+        printLastModifiedTime(out);
 
         out.format("%s32-bit CRC value:                               0x%2$08X\n", prefix, fileHeader.getCrc32());
         out.format("%scompressed size:                                %d bytes\n", prefix, fileHeader.getCompressedSize());
@@ -82,11 +65,47 @@ public class FileHeaderView {
         ExternalFileAttributesView.builder()
                                   .externalFileAttributes(fileHeader.getExternalFileAttributes())
                                   .prefix(prefix).build().print(out);
+
+        printExtraField(out);
+    }
+
+    private void printVersion(PrintStream out) {
+        VersionView.builder()
+                   .versionMadeBy(fileHeader.getVersionMadeBy())
+                   .versionToExtract(fileHeader.getVersionToExtract())
+                   .offs(prefix.length())
+                   .columnWidth(52).build().print(out);
+    }
+
+    private void printGeneralPurposeFlag(PrintStream out) {
+        GeneralPurposeFlagView.builder()
+                              .generalPurposeFlag(fileHeader.getGeneralPurposeFlag())
+                              .compressionMethod(fileHeader.getCompressionMethod())
+                              .offs(prefix.length())
+                              .columnWidth(52).build().print(out);
+    }
+
+    private void printCompressionMethod(PrintStream out) {
+        CompressionMethodView.builder()
+                             .compressionMethod(fileHeader.getCompressionMethod())
+                             .generalPurposeFlag(fileHeader.getGeneralPurposeFlag())
+                             .offs(prefix.length())
+                             .columnWidth(52).build().print(out);
+    }
+
+    private void printLastModifiedTime(PrintStream out) {
+        LastModifiedTimeView.builder()
+                            .lastModifiedTime(fileHeader.getLastModifiedTime())
+                            .prefix(prefix).build().print(out);
+    }
+
+    private void printExtraField(PrintStream out) {
         ExtraFieldView.builder()
                       .extraField(fileHeader.getExtraField())
                       .diagExtraField(diagFileHeader.getExtraField())
                       .generalPurposeFlag(fileHeader.getGeneralPurposeFlag())
-                      .prefix(prefix).build().print(out);
+                      .offs(prefix.length())
+                      .columnWidth(52).build().print(out);
     }
 
 }

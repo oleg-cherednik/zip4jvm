@@ -1,10 +1,10 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.os.InfoZipNewUnixExtraField;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
+import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
 
@@ -12,16 +12,25 @@ import java.io.PrintStream;
  * @author Oleg Cherednik
  * @since 26.10.2019
  */
-@RequiredArgsConstructor
-final class InfoZipNewUnixExtraFieldView {
+final class InfoZipNewUnixExtraFieldView extends View {
 
     private final InfoZipNewUnixExtraField record;
     private final Block block;
-    private final String prefix;
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    private InfoZipNewUnixExtraFieldView(Builder builder) {
+        super(builder.offs, builder.columnWidth);
+        record = builder.record;
+        block = builder.block;
+    }
+
+    @Override
     public void print(PrintStream out) {
-        out.format("%s(0x%04X) new InfoZIP Unix/OS2/NT:               %d bytes\n", prefix, record.getSignature(), block.getSize());
-        out.format("%s  - location:                                   %2$d (0x%2$08X) bytes\n", prefix, block.getOffs());
+        printLine(out, String.format("(0x%04X) new InfoZIP Unix/OS2/NT: ", record.getSignature()), String.format("%d bytes", block.getSize()));
+        printLine(out, "  - location:", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
 
         InfoZipNewUnixExtraField.Payload payload = record.getPayload();
 
@@ -32,19 +41,52 @@ final class InfoZipNewUnixExtraFieldView {
     }
 
     private void print(InfoZipNewUnixExtraField.VersionOnePayload payload, PrintStream out) {
-        out.format("%s  version:                                      %d\n", prefix, payload.getVersion());
+        printLine(out, "  version:", String.format("%d", payload.getVersion()));
 
         if (StringUtils.isNotBlank(payload.getUid()))
-            out.format("%s  User identifier (UID):                        %s\n", prefix, payload.getUid());
+            printLine(out, "  User identifier (UID):", String.format("%s", payload.getUid()));
         if (StringUtils.isNotBlank(payload.getGid()))
-            out.format("%s  Group Identifier (GID):                       %s\n", prefix, payload.getGid());
+            printLine(out, "  Group Identifier (GID):", String.format("%s", payload.getGid()));
     }
 
     private void print(InfoZipNewUnixExtraField.VersionUnknownPayload payload, PrintStream out) {
-        out.format("%s  version:                                      %d (unknown)\n", prefix, payload.getVersion());
+        printLine(out, "  version:", String.format("%d (unknown)", payload.getVersion()));
 
         ByteArrayHexView.builder()
                         .buf(payload.getData())
-                        .prefix(prefix).build().print(out);
+                        .offs(offs)
+                        .columnWidth(columnWidth).build().print(out);
+    }
+
+    public static final class Builder {
+
+        private InfoZipNewUnixExtraField record;
+        private Block block;
+        private int offs;
+        private int columnWidth;
+
+        public InfoZipNewUnixExtraFieldView build() {
+            return new InfoZipNewUnixExtraFieldView(this);
+        }
+
+        public Builder record(InfoZipNewUnixExtraField record) {
+            this.record = record;
+            return this;
+        }
+
+        public Builder block(Block block) {
+            this.block = block;
+            return this;
+        }
+
+        public Builder offs(int offs) {
+            this.offs = offs;
+            return this;
+        }
+
+        public Builder columnWidth(int columnWidth) {
+            this.columnWidth = columnWidth;
+            return this;
+        }
     }
 }

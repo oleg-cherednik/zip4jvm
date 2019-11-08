@@ -1,9 +1,9 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.os.NtfsTimestampExtraField;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
+import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
 
@@ -11,17 +11,26 @@ import java.io.PrintStream;
  * @author Oleg Cherednik
  * @since 26.10.2019
  */
-@RequiredArgsConstructor
-final class NtfsTimestampExtraFieldView {
+final class NtfsTimestampExtraFieldView extends View {
 
     private final NtfsTimestampExtraField record;
     private final Block block;
-    private final String prefix;
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    private NtfsTimestampExtraFieldView(Builder builder) {
+        super(builder.offs, builder.columnWidth);
+        record = builder.record;
+        block = builder.block;
+    }
+
+    @Override
     public void print(PrintStream out) {
-        out.format("%s(0x%04X) NTFS Timestamps:                       %d bytes\n", prefix, record.getSignature(), block.getSize());
-        out.format("%s  - location:                                   %2$d (0x%2$08X) bytes\n", prefix, block.getOffs());
-        out.format("%s  - total tags:                                 %d\n", prefix, record.getTags().size());
+        printLine(out, String.format("(0x%04X) NTFS Timestamps:", record.getSignature()), String.format("%d bytes", block.getSize()));
+        printLine(out, "  - location", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
+        printLine(out, "  - total tags:", String.format("%d", record.getTags().size()));
 
         for (NtfsTimestampExtraField.Tag tag : record.getTags()) {
             if (tag instanceof NtfsTimestampExtraField.OneTag)
@@ -32,17 +41,50 @@ final class NtfsTimestampExtraFieldView {
     }
 
     private void print(NtfsTimestampExtraField.OneTag tag, PrintStream out) {
-        out.format("%s  (0x%04X) Tag1:                                %d bytes\n", prefix, tag.getSignature(), tag.getSize());
-        out.format("%s    Creation Date:                              %2$tY-%2$tm-%2$td %2$tH:%2$tM:%2$tS\n", prefix, tag.getCreationTime());
-        out.format("%s    Last Modified Date:                         %2$tY-%2$tm-%2$td %2$tH:%2$tM:%2$tS\n", prefix, tag.getLastModificationTime());
-        out.format("%s    Last Accessed Date:                         %2$tY-%2$tm-%2$td %2$tH:%2$tM:%2$tS\n", prefix, tag.getLastAccessTime());
+        printLine(out, String.format("  (0x%04X) Tag1:", tag.getSignature()), String.format("%d bytes", tag.getSize()));
+        printLine(out, "    Creation Date:", String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", tag.getCreationTime()));
+        printLine(out, "    Last Modified Date:", String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", tag.getLastModificationTime()));
+        printLine(out, "    Last Accessed Date:", String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", tag.getLastAccessTime()));
     }
 
     private void print(NtfsTimestampExtraField.UnknownTag tag, PrintStream out) {
-        out.format("%s  (0x%04X) Unknown Tag:                         %d bytes\n", prefix, tag.getSignature(), tag.getSize());
+        printLine(out, String.format("  (0x%04X) Unknown Tag:", tag.getSignature()), String.format("%d bytes", tag.getSize()));
 
         ByteArrayHexView.builder()
                         .buf(tag.getData())
-                        .prefix(prefix).build().print(out);
+                        .offs(offs)
+                        .columnWidth(columnWidth).build().print(out);
+    }
+
+    public static final class Builder {
+
+        private NtfsTimestampExtraField record;
+        private Block block;
+        private int offs;
+        private int columnWidth;
+
+        public NtfsTimestampExtraFieldView build() {
+            return new NtfsTimestampExtraFieldView(this);
+        }
+
+        public Builder record(NtfsTimestampExtraField record) {
+            this.record = record;
+            return this;
+        }
+
+        public Builder block(Block block) {
+            this.block = block;
+            return this;
+        }
+
+        public Builder offs(int offs) {
+            this.offs = offs;
+            return this;
+        }
+
+        public Builder columnWidth(int columnWidth) {
+            this.columnWidth = columnWidth;
+            return this;
+        }
     }
 }

@@ -27,7 +27,7 @@ public class EncryptionHeaderView {
 
         if (encryptionHeader instanceof BlockAesEncryptionHeader)
             print((BlockAesEncryptionHeader)encryptionHeader, out);
-        else if(encryptionHeader instanceof PkwareEncryptionHeader)
+        else if (encryptionHeader instanceof PkwareEncryptionHeader)
             print((PkwareEncryptionHeader)encryptionHeader, out);
     }
 
@@ -43,7 +43,8 @@ public class EncryptionHeaderView {
 
         ByteArrayHexView.builder()
                         .buf(encryptionHeader.getSalt().getData())
-                        .prefix(prefix).build().print(out);
+                        .offs(prefix.length())
+                        .columnWidth(52).build().print(out);
 
         out.format("%spassword checksum:                              %d bytes\n",
                 prefix, encryptionHeader.getPasswordChecksum().getSize());
@@ -52,14 +53,16 @@ public class EncryptionHeaderView {
 
         ByteArrayHexView.builder()
                         .buf(encryptionHeader.getPasswordChecksum().getData())
-                        .prefix(prefix).build().print(out);
+                        .offs(prefix.length())
+                        .columnWidth(52).build().print(out);
 
         out.format("%smac:                                            %d bytes\n", prefix, encryptionHeader.getMac().getSize());
         out.format("%s  - location:                                   %2$d (0x%2$08X) bytes\n", prefix, encryptionHeader.getMac().getOffs());
 
         ByteArrayHexView.builder()
                         .buf(encryptionHeader.getMac().getData())
-                        .prefix(prefix).build().print(out);
+                        .offs(prefix.length())
+                        .columnWidth(52).build().print(out);
     }
 
     private void print(PkwareEncryptionHeader encryptionHeader, PrintStream out) {
@@ -74,6 +77,7 @@ public class EncryptionHeaderView {
 
         ByteArrayHexView.builder()
                         .buf(encryptionHeader.getData().getData())
-                        .prefix(prefix).build().print(out);
+                        .offs(prefix.length())
+                        .columnWidth(52).build().print(out);
     }
 }

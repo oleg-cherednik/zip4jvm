@@ -1,22 +1,30 @@
 package ru.olegcherednik.zip4jvm.view;
 
-import lombok.Builder;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.io.PrintStream;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.stream.IntStream;
 
 /**
  * @author Oleg Cherednik
  * @since 17.10.2019
  */
-@Builder
-public final class ByteArrayHexView {
+public final class ByteArrayHexView extends View {
 
     private final byte[] buf;
-    private final String prefix;
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    private ByteArrayHexView(Builder builder) {
+        super(builder.offs, builder.columnWidth);
+        buf = builder.buf;
+    }
+
+    @Override
     public void print(PrintStream out) {
         if (ArrayUtils.isEmpty(buf))
             return;
@@ -27,7 +35,7 @@ public final class ByteArrayHexView {
             hexs.add((int)buf[i]);
 
         while (!hexs.isEmpty()) {
-            out.print(prefix);
+            IntStream.range(0, offs).forEach(i -> out.print(' '));
 
             for (int i = 0; i < 16; i++) {
                 if (hexs.isEmpty())
@@ -37,6 +45,33 @@ public final class ByteArrayHexView {
             }
 
             out.println();
+        }
+    }
+
+    public static final class Builder {
+
+        private byte[] buf;
+        private int offs;
+        private int columnWidth;
+
+        public ByteArrayHexView build() {
+            return new ByteArrayHexView(this);
+        }
+
+        @SuppressWarnings("MethodCanBeVariableArityMethod")
+        public Builder buf(byte[] buf) {
+            this.buf = ArrayUtils.clone(buf);
+            return this;
+        }
+
+        public Builder offs(int offs) {
+            this.offs = offs;
+            return this;
+        }
+
+        public Builder columnWidth(int columnWidth) {
+            this.columnWidth = columnWidth;
+            return this;
         }
     }
 }

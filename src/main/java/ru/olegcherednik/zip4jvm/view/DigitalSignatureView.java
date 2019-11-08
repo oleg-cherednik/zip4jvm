@@ -35,7 +35,8 @@ public class DigitalSignatureView {
 
         ByteArrayHexView.builder()
                         .buf(digitalSignature.getSignatureData())
-                        .prefix(prefix).build().print(out);
+                        .offs(prefix.length())
+                        .columnWidth(52).build().print(out);
     }
 
 }

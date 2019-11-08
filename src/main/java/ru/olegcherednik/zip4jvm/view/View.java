@@ -14,8 +14,8 @@ import java.util.Locale;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class View {
 
-    private final int offs;
-    private final int secondColumnPos;
+    protected final int offs;
+    protected final int columnWidth;
 
     public abstract void print(PrintStream out);
 
@@ -26,7 +26,7 @@ public abstract class View {
     protected void printLine(PrintStream out, String one, String two) {
         if (offs > 0)
             one = StringUtils.repeat(" ", offs) + one;
-        out.format(Locale.US, "%-" + secondColumnPos + "s%s\n", one, two);
+        out.format(Locale.US, "%-" + columnWidth + "s%s\n", one, two);
     }
 
 }
