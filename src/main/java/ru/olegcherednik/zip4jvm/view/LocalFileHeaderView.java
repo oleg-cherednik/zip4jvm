@@ -38,7 +38,8 @@ public class LocalFileHeaderView {
 
         VersionView.builder()
                    .versionToExtract(localFileHeader.getVersionToExtract())
-                   .prefix(prefix).build().print(out);
+                   .offs(prefix.length())
+                   .columnWidth(52).build().print(out);
 
         GeneralPurposeFlagView.builder()
                               .generalPurposeFlag(localFileHeader.getGeneralPurposeFlag())

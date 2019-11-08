@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.PrintStream;
+import java.util.Locale;
 
 /**
  * @author Oleg Cherednik
@@ -25,7 +26,7 @@ public abstract class View {
     protected void printLine(PrintStream out, String one, String two) {
         if (offs > 0)
             one = StringUtils.repeat(" ", offs) + one;
-        out.format("%-" + secondColumnPos + "s%s\n", one, two);
+        out.format(Locale.US, "%-" + secondColumnPos + "s%s\n", one, two);
     }
 
 }

@@ -40,7 +40,8 @@ public class FileHeaderView {
         VersionView.builder()
                    .versionMadeBy(fileHeader.getVersionMadeBy())
                    .versionToExtract(fileHeader.getVersionToExtract())
-                   .prefix(prefix).build().print(out);
+                   .offs(prefix.length())
+                   .columnWidth(52).build().print(out);
 
         GeneralPurposeFlagView.builder()
                               .generalPurposeFlag(fileHeader.getGeneralPurposeFlag())

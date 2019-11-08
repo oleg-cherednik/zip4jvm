@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
+ * see 4.4.2
+ *
  * @author Oleg Cherednik
  * @since 16.10.2019
  */
@@ -19,7 +21,7 @@ public final class Version {
     private final FileSystem fileSystem;
     private final int zipSpecificationVersion;
 
-    public static Version build(int data) {
+    public static Version of(int data) {
         return new Version(Version.FileSystem.parseCode(data >> 8), data & 0xFF);
     }
 

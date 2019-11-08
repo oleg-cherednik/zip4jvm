@@ -89,7 +89,8 @@ public class Zip64View {
             VersionView.builder()
                        .versionMadeBy(dir.getVersionMadeBy())
                        .versionToExtract(dir.getVersionToExtract())
-                       .prefix(prefix).build().print(out);
+                       .offs(prefix.length())
+                       .columnWidth(52).build().print(out);
 
             out.format("%spart number of this part (%04d):                %d\n", prefix, dir.getTotalDisks(), dir.getTotalDisks() + 1);
             out.format("%spart number of start of central dir (%04d):     %d\n", prefix, dir.getMainDisk(), dir.getMainDisk() + 1);

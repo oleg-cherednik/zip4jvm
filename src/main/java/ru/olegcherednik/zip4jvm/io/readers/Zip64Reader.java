@@ -87,8 +87,8 @@ public class Zip64Reader implements Reader<Zip64> {
             Zip64.EndCentralDirectory dir = new Zip64.EndCentralDirectory();
             long endCentralDirectorySize = in.readQword();
             dir.setEndCentralDirectorySize(endCentralDirectorySize);
-            dir.setVersionMadeBy(Version.build(in.readWord()));
-            dir.setVersionToExtract(Version.build(in.readWord()));
+            dir.setVersionMadeBy(Version.of(in.readWord()));
+            dir.setVersionToExtract(Version.of(in.readWord()));
             dir.setTotalDisks(in.readDword());
             dir.setMainDisk(in.readDword());
             dir.setDiskEntries(in.readQword());

@@ -54,8 +54,8 @@ public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader
 
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
-        fileHeader.setVersionMadeBy(Version.build(in.readWord()));
-        fileHeader.setVersionToExtract(Version.build(in.readWord()));
+        fileHeader.setVersionMadeBy(Version.of(in.readWord()));
+        fileHeader.setVersionToExtract(Version.of(in.readWord()));
         fileHeader.setGeneralPurposeFlagData(in.readWord());
         fileHeader.setCompressionMethod(CompressionMethod.parseCode(in.readWord()));
         fileHeader.setLastModifiedTime((int)in.readDword());

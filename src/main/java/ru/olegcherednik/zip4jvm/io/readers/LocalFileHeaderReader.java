@@ -35,7 +35,7 @@ public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
 
         LocalFileHeader localFileHeader = new LocalFileHeader();
 
-        localFileHeader.setVersionToExtract(Version.build(in.readWord()));
+        localFileHeader.setVersionToExtract(Version.of(in.readWord()));
         localFileHeader.setGeneralPurposeFlag(new GeneralPurposeFlag(in.readWord()));
         localFileHeader.setCompressionMethod(CompressionMethod.parseCode(in.readWord()));
         localFileHeader.setLastModifiedTime((int)in.readDword());
