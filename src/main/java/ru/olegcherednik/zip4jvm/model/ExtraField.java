@@ -3,7 +3,6 @@ package ru.olegcherednik.zip4jvm.model;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
@@ -97,21 +96,21 @@ public final class ExtraField {
 
         boolean isNull();
 
-        @RequiredArgsConstructor
+        @lombok.Builder
         @SuppressWarnings("InnerClassOfInterface")
         final class Unknown implements ExtraField.Record {
 
             @Getter
             private final int signature;
-            private final byte[] blockData;
+            private final byte[] data;
 
-            public byte[] getBlockData() {
-                return ArrayUtils.clone(blockData);
+            public byte[] getData() {
+                return ArrayUtils.clone(data);
             }
 
             @Override
             public int getBlockSize() {
-                return blockData.length;
+                return data.length;
             }
 
             @Override
@@ -122,8 +121,8 @@ public final class ExtraField {
             @Override
             public void write(DataOutput out) throws IOException {
                 out.writeWordSignature(signature);
-                out.writeWord(blockData.length);
-                out.write(blockData, 0, blockData.length);
+                out.writeWord(data.length);
+                out.write(data, 0, data.length);
             }
         }
 

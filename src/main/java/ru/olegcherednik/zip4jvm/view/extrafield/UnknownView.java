@@ -6,6 +6,7 @@ import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
+import java.util.Optional;
 
 /**
  * @author Oleg Cherednik
@@ -28,11 +29,14 @@ final class UnknownView extends View {
 
     @Override
     public void print(PrintStream out) {
+        if (block == Block.NULL)
+            return;
+
         printLine(out, String.format("(0x%04X) Unknown:", record.getSignature()), String.format("%d bytes", block.getSize()));
-        printLine(out, "  - location:", String.format("%1$d (0x%1$08X) bytes", block.getSize()));
+        printLine(out, "  - location:", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
 
         ByteArrayHexView.builder()
-                        .buf(record.getBlockData())
+                        .buf(record.getData())
                         .offs(offs)
                         .columnWidth(columnWidth).build().print(out);
     }
@@ -40,7 +44,7 @@ final class UnknownView extends View {
     public static final class Builder {
 
         private ExtraField.Record.Unknown record;
-        private Block block;
+        private Block block = Block.NULL;
         private int offs;
         private int columnWidth;
 
@@ -54,7 +58,7 @@ final class UnknownView extends View {
         }
 
         public Builder block(Block block) {
-            this.block = block;
+            this.block = Optional.ofNullable(block).orElse(Block.NULL);
             return this;
         }
 

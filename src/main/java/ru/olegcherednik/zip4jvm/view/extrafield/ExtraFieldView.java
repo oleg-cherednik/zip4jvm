@@ -70,19 +70,11 @@ public final class ExtraFieldView extends View {
                       else if (record instanceof ExtendedTimestampExtraField)
                           print((ExtendedTimestampExtraField)record, out);
                       else if (record instanceof Zip64.ExtendedInfo)
-                          Zip64ExtendedInfoView.builder()
-                                               .record((Zip64.ExtendedInfo)record)
-                                               .block(diagExtraField.getRecord(record.getSignature()))
-                                               .offs(offs)
-                                               .columnWidth(columnWidth).build().print(out);
+                          print((Zip64.ExtendedInfo)record, out);
                       else if (record instanceof AesExtraDataRecord)
                           print((AesExtraDataRecord)record, out);
                       else if (record instanceof ExtraField.Record.Unknown)
-                          UnknownView.builder()
-                                     .record((ExtraField.Record.Unknown)record)
-                                     .block(diagExtraField.getRecord(record.getSignature()))
-                                     .offs(offs)
-                                     .columnWidth(columnWidth).build().print(out);
+                          print((ExtraField.Record.Unknown)record, out);
                   });
     }
 
@@ -118,6 +110,14 @@ public final class ExtraFieldView extends View {
                                        .columnWidth(columnWidth).build().print(out);
     }
 
+    private void print(Zip64.ExtendedInfo record, PrintStream out) {
+        Zip64ExtendedInfoView.builder()
+                             .record(record)
+                             .block(diagExtraField.getRecord(record.getSignature()))
+                             .offs(offs)
+                             .columnWidth(columnWidth).build().print(out);
+    }
+
     private void print(AesExtraDataRecord record, PrintStream out) {
         AesExtraDataRecordView.builder()
                               .record(record)
@@ -125,6 +125,14 @@ public final class ExtraFieldView extends View {
                               .block(diagExtraField.getRecord(record.getSignature()))
                               .offs(offs)
                               .columnWidth(columnWidth).build().print(out);
+    }
+
+    private void print(ExtraField.Record.Unknown record, PrintStream out) {
+        UnknownView.builder()
+                   .record(record)
+                   .block(diagExtraField.getRecord(record.getSignature()))
+                   .offs(offs)
+                   .columnWidth(columnWidth).build().print(out);
     }
 
     public static final class Builder {

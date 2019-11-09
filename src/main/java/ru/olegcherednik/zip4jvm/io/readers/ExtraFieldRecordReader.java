@@ -29,6 +29,8 @@ public class ExtraFieldRecordReader implements Reader<ExtraField.Record> {
 
         in.backward(in.wordSignatureSize() + in.wordSize());
         byte[] data = in.readBytes(in.wordSignatureSize() + in.wordSize() + size);
-        return new ExtraField.Record.Unknown(signature, data == null ? ArrayUtils.EMPTY_BYTE_ARRAY : data);
+        return ExtraField.Record.Unknown.builder()
+                                        .signature(signature)
+                                        .data(data == null ? ArrayUtils.EMPTY_BYTE_ARRAY : data).build();
     }
 }
