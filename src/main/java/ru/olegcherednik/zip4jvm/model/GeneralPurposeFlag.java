@@ -72,7 +72,6 @@ public class GeneralPurposeFlag {
         data = BitUtils.updateBits(data, BIT3, dataDescriptorAvailable);
         data = BitUtils.updateBits(data, BIT6, strongEncryption);
         data = BitUtils.updateBits(data, BIT11, utf8);
-
         return data;
     }
 

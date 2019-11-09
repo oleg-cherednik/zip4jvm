@@ -1,11 +1,11 @@
 package ru.olegcherednik.zip4jvm.view;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.PrintStream;
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.stream.IntStream;
 
 /**
  * @author Oleg Cherednik
@@ -34,8 +34,10 @@ public final class ByteArrayHexView extends View {
         for (int i = 0; i < buf.length; i++)
             hexs.add((int)buf[i]);
 
+        final String empty = StringUtils.repeat(" ", offs);
+
         while (!hexs.isEmpty()) {
-            IntStream.range(0, offs).forEach(i -> out.print(' '));
+            out.print(empty);
 
             for (int i = 0; i < 16; i++) {
                 if (hexs.isEmpty())

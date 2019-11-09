@@ -26,7 +26,6 @@ public class AesExtraDataRecordViewTest {
         when(block.getSize()).thenReturn(11L);
         when(block.getOffs()).thenReturn(255603L);
 
-
         AesExtraDataRecord record = AesExtraDataRecord.builder()
                                                       .dataSize(7)
                                                       .versionNumber(2)
@@ -52,7 +51,7 @@ public class AesExtraDataRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(AesExtraDataRecordView.builder()
                                                                     .record(AesExtraDataRecord.NULL)
                                                                     .generalPurposeFlag(mock(GeneralPurposeFlag.class))
-                                                                    .block(mock(Block.class))
+                                                                    .block(Block.NULL)
                                                                     .columnWidth(52).build());
         assertThat(lines).hasSize(1);
         assertThat(lines[0]).isEmpty();

@@ -5,11 +5,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import java.io.IOException;
+import java.util.function.IntSupplier;
 
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT0;
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT1;
@@ -62,10 +64,15 @@ public final class ExtendedTimestampExtraField implements ExtraField.Record {
         throw new NotImplementedException();
     }
 
+    @Override
+    public String toString() {
+        return this == NULL ? "<null>" : StringUtils.leftPad(Integer.toBinaryString(flag.getAsInt()), 3, '0');
+    }
+
     @Getter
     @Setter
     @NoArgsConstructor
-    public static class Flag {
+    public static class Flag implements IntSupplier {
 
         private boolean lastModificationTime;
         private boolean lastAccessTime;
@@ -79,6 +86,14 @@ public final class ExtendedTimestampExtraField implements ExtraField.Record {
             lastModificationTime = BitUtils.isBitSet(data, BIT0);
             lastAccessTime = BitUtils.isBitSet(data, BIT1);
             creationTime = BitUtils.isBitSet(data, BIT2);
+        }
+
+        @Override
+        public int getAsInt() {
+            int data = BitUtils.updateBits(0, BIT0, lastModificationTime);
+            data = BitUtils.updateBits(data, BIT1, lastAccessTime);
+            data = BitUtils.updateBits(data, BIT2, creationTime);
+            return data;
         }
     }
 
