@@ -72,11 +72,7 @@ public final class ExtraFieldView extends View {
                                            .offs(offs)
                                            .columnWidth(columnWidth).build().print(out);
             else if (record instanceof InfoZipOldUnixExtraField)
-                InfoZipOldUnixExtraFieldView.builder()
-                                            .record((InfoZipOldUnixExtraField)record)
-                                            .block(block)
-                                            .offs(offs)
-                                            .columnWidth(columnWidth).build().print(out);
+                print((InfoZipOldUnixExtraField)record, out);
             else if (record instanceof InfoZipNewUnixExtraField)
                 print((InfoZipNewUnixExtraField)record, out);
             else if (record instanceof ExtendedTimestampExtraField)
@@ -96,6 +92,14 @@ public final class ExtraFieldView extends View {
                            .offs(offs)
                            .columnWidth(columnWidth).build().print(out);
         }
+    }
+
+    private void print(InfoZipOldUnixExtraField record, PrintStream out) {
+        InfoZipOldUnixExtraFieldView.builder()
+                                    .record(record)
+                                    .block(diagExtraField.getRecord(record.getSignature()))
+                                    .offs(offs)
+                                    .columnWidth(columnWidth).build().print(out);
     }
 
     private void print(InfoZipNewUnixExtraField record, PrintStream out) {

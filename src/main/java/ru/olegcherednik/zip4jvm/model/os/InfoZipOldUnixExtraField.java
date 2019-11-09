@@ -8,6 +8,8 @@ import ru.olegcherednik.zip4jvm.model.ExtraField;
 
 import java.io.IOException;
 
+import static ru.olegcherednik.zip4jvm.model.ExtraField.NO_DATA;
+
 /**
  * Added under MacOS
  *
@@ -31,9 +33,13 @@ public final class InfoZipOldUnixExtraField implements ExtraField.Record {
     // size:4 - file last modification time
     private final long lastModificationTime;
     // size:2 - unix user ID (optional, LocalFileHeader only)
-    private final int uid;
+    @Builder.Default
+    @SuppressWarnings("FieldMayBeStatic")
+    private final int uid = NO_DATA;
     // size:2 - unix group ID (optional, LocalFileHeader only)
-    private final int gid;
+    @Builder.Default
+    @SuppressWarnings("FieldMayBeStatic")
+    private final int gid = NO_DATA;
 
     @Override
     public int getSignature() {
