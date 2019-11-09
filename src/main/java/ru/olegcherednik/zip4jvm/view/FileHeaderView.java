@@ -62,10 +62,7 @@ public class FileHeaderView {
         InternalFileAttributesView.builder()
                                   .internalFileAttributes(fileHeader.getInternalFileAttributes())
                                   .prefix(prefix).build().print(out);
-        ExternalFileAttributesView.builder()
-                                  .externalFileAttributes(fileHeader.getExternalFileAttributes())
-                                  .prefix(prefix).build().print(out);
-
+        printExternalFileAttributes(out);
         printExtraField(out);
     }
 
@@ -97,6 +94,13 @@ public class FileHeaderView {
         LastModifiedTimeView.builder()
                             .lastModifiedTime(fileHeader.getLastModifiedTime())
                             .prefix(prefix).build().print(out);
+    }
+
+    private void printExternalFileAttributes(PrintStream out) {
+        ExternalFileAttributesView.builder()
+                                  .externalFileAttributes(fileHeader.getExternalFileAttributes())
+                                  .offs(prefix.length())
+                                  .columnWidth(52).build().print(out);
     }
 
     private void printExtraField(PrintStream out) {
