@@ -6,6 +6,7 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
+import java.util.Optional;
 
 /**
  * @author Oleg Cherednik
@@ -28,8 +29,11 @@ final class Zip64ExtendedInfoView extends View {
 
     @Override
     public void print(PrintStream out) {
+        if (record.isNull() || block == Block.NULL)
+            return;
+
         printLine(out, String.format("(0x%04X) Zip64 Extended Information:", record.getSignature()), String.format("%d bytes", block.getSize()));
-        printLine(out, "  - location:", String.format("%1$d (0x%1$08X) bytes", block.getSize()));
+        printLine(out, "  - location:", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
 
         if (record.getUncompressedSize() != ExtraField.NO_DATA)
             printLine(out, "  original compressed size:", String.format("%d bytes", record.getUncompressedSize()));
@@ -43,8 +47,8 @@ final class Zip64ExtendedInfoView extends View {
 
     public static final class Builder {
 
-        private Zip64.ExtendedInfo record;
-        private Block block;
+        private Zip64.ExtendedInfo record = Zip64.ExtendedInfo.NULL;
+        private Block block = Block.NULL;
         private int offs;
         private int columnWidth;
 
@@ -53,12 +57,12 @@ final class Zip64ExtendedInfoView extends View {
         }
 
         public Builder record(Zip64.ExtendedInfo record) {
-            this.record = record;
+            this.record = Optional.ofNullable(record).orElse(Zip64.ExtendedInfo.NULL);
             return this;
         }
 
         public Builder block(Block block) {
-            this.block = block;
+            this.block = Optional.ofNullable(block).orElse(Block.NULL);
             return this;
         }
 

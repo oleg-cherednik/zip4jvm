@@ -1,12 +1,11 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
-import org.testng.annotations.Test;
-
 /**
  * @author Oleg Cherednik
  * @since 08.11.2019
  */
-@Test
+//@Test
+// TODO test should be implemented
 public class ExtraFieldViewTest {
 
 }

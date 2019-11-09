@@ -12,6 +12,7 @@ import ru.olegcherednik.zip4jvm.model.os.NtfsTimestampExtraField;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
+import java.util.Optional;
 
 /**
  * @author Oleg Cherednik
@@ -137,7 +138,7 @@ public final class ExtraFieldView extends View {
 
     public static final class Builder {
 
-        private ExtraField extraField;
+        private ExtraField extraField = ExtraField.NULL;
         private Diagnostic.ExtraField diagExtraField;
         private GeneralPurposeFlag generalPurposeFlag;
         private int offs;
@@ -148,7 +149,7 @@ public final class ExtraFieldView extends View {
         }
 
         public Builder extraField(ExtraField extraField) {
-            this.extraField = extraField;
+            this.extraField = Optional.ofNullable(extraField).orElse(ExtraField.NULL);
             return this;
         }
 
