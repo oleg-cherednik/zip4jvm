@@ -48,7 +48,7 @@ public class VersionViewTest {
         assertThat(lines[1]).isEqualTo("unzip software version needed to extract (52):      5.2");
     }
 
-    public void shouldRetrieveVersionToExtractOnlyWhenOnlyItsSet1() throws IOException {
+    public void shouldRetrieveEmptyStringWhenVersionNull() throws IOException {
         String[] lines = Zip4jvmSuite.execute(VersionView.builder().columnWidth(52).build());
 
         assertThat(lines).hasSize(1);

@@ -1,13 +1,13 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
 import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
+import java.util.Optional;
 
 /**
  * @author Oleg Cherednik
@@ -32,7 +32,8 @@ final class AesExtraDataRecordView extends View {
 
     @Override
     public void print(PrintStream out) {
-        CompressionMethod compressionMethod = record.getCompressionMethod();
+        if (record.isNull())
+            return;
 
         printLine(out, String.format("(0x%04X) AES Encryption Tag:", record.getSignature()), String.format("%d bytes", block.getSize()));
         printLine(out, "  - location:", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
@@ -40,15 +41,15 @@ final class AesExtraDataRecordView extends View {
         printLine(out, "  Encryption Key Bits:", String.format("%s", record.getStrength().getSize()));
 
         CompressionMethodView.builder()
-                             .compressionMethod(compressionMethod)
+                             .compressionMethod(record.getCompressionMethod())
                              .generalPurposeFlag(generalPurposeFlag)
                              .offs(offs + 2)
-                             .columnWidth(52).build().print(out);
+                             .columnWidth(columnWidth).build().print(out);
     }
 
     public static final class Builder {
 
-        private AesExtraDataRecord record;
+        private AesExtraDataRecord record = AesExtraDataRecord.NULL;
         private GeneralPurposeFlag generalPurposeFlag;
         private Block block;
         private int offs;
@@ -59,7 +60,7 @@ final class AesExtraDataRecordView extends View {
         }
 
         public Builder record(AesExtraDataRecord record) {
-            this.record = record;
+            this.record = Optional.ofNullable(record).orElse(AesExtraDataRecord.NULL);
             return this;
         }
 
