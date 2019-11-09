@@ -59,7 +59,8 @@ public class ZipEntryView {
                           .dataDescriptor(dataDescriptor)
                           .block(blockDataDescriptor)
                           .pos(pos)
-                          .prefix(prefix).build().print(out);
+                          .offs(prefix.length())
+                          .columnWidth(52).build().print(out);
     }
 
 }

@@ -113,10 +113,10 @@ public abstract class EntryOutputStream extends OutputStream {
         if (!zipEntry.isDataDescriptorAvailable())
             return;
 
-        DataDescriptor dataDescriptor = new DataDescriptor();
-        dataDescriptor.setCrc32(checksum.getValue());
-        dataDescriptor.setCompressedSize(zipEntry.getCompressedSize());
-        dataDescriptor.setUncompressedSize(zipEntry.getUncompressedSize());
+        DataDescriptor dataDescriptor = DataDescriptor.builder()
+                                                      .crc32(checksum.getValue())
+                                                      .compressedSize(zipEntry.getCompressedSize())
+                                                      .uncompressedSize(zipEntry.getUncompressedSize()).build();
         DataDescriptorWriter.get(zipEntry.isZip64(), dataDescriptor).write(out);
     }
 

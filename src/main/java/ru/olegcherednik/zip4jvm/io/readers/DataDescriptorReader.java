@@ -29,12 +29,14 @@ public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
             if (in.readDwordSignature() != DataDescriptor.SIGNATURE)
                 throw new Zip4jvmException("DataDescriptor signature expected at offs=" + offs);
 
-            DataDescriptor dataDescriptor = new DataDescriptor();
-            dataDescriptor.setCrc32(in.readDword());
-            dataDescriptor.setCompressedSize(in.readDword());
-            dataDescriptor.setUncompressedSize(in.readDword());
+            long crc32 = in.readDword();
+            long compressedSize = in.readDword();
+            long uncompressedSize = in.readDword();
 
-            return dataDescriptor;
+            return DataDescriptor.builder()
+                                 .crc32(crc32)
+                                 .compressedSize(compressedSize)
+                                 .uncompressedSize(uncompressedSize).build();
         }
     }
 
@@ -47,12 +49,14 @@ public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
             if (in.readDwordSignature() != DataDescriptor.SIGNATURE)
                 throw new Zip4jvmException("DataDescriptor signature expected at offs=" + offs);
 
-            DataDescriptor dataDescriptor = new DataDescriptor();
-            dataDescriptor.setCrc32(in.readDword());
-            dataDescriptor.setCompressedSize(in.readQword());
-            dataDescriptor.setUncompressedSize(in.readQword());
+            long crc32 = in.readDword();
+            long compressedSize = in.readQword();
+            long uncompressedSize = in.readQword();
 
-            return dataDescriptor;
+            return DataDescriptor.builder()
+                                 .crc32(crc32)
+                                 .compressedSize(compressedSize)
+                                 .uncompressedSize(uncompressedSize).build();
         }
     }
 

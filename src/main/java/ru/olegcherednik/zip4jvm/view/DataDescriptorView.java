@@ -1,39 +1,85 @@
 package ru.olegcherednik.zip4jvm.view;
 
-import lombok.Builder;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 
 import java.io.PrintStream;
-import java.util.stream.IntStream;
+import java.util.Optional;
 
 /**
  * @author Oleg Cherednik
  * @since 26.10.2019
  */
-@Builder
-public class DataDescriptorView {
+public final class DataDescriptorView extends View {
 
     private final DataDescriptor dataDescriptor;
     private final Block block;
-    private final long pos;
-    private final String prefix;
+    private final int pos;
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    private DataDescriptorView(Builder builder) {
+        super(builder.offs, builder.columnWidth);
+        dataDescriptor = builder.dataDescriptor;
+        block = builder.block;
+        pos = builder.pos;
+    }
+
+    @Override
     public void print(PrintStream out) {
-        if (dataDescriptor == null)
+        if (dataDescriptor == null || block == Block.NULL)
             return;
 
-        String str = String.format("#%d (%s) Data descriptor", pos + 1, ViewUtils.signature(DataDescriptor.SIGNATURE));
-        out.println(str);
-
-        IntStream.range(0, str.length()).forEach(i -> out.print('-'));
-
+        printTitle(out, String.format("#%d (%s) Data descriptor", pos + 1, ViewUtils.signature(DataDescriptor.SIGNATURE)));
         out.println();
-        out.format("%s  - location:                                   %2$d (0x%2$08X) bytes\n", prefix, block.getOffs());
-        out.format("%s  - size:                                       %d bytes\n", prefix, block.getSize());
-        out.format("%s32-bit CRC value:                               0x%2$08X\n", prefix, dataDescriptor.getCrc32());
-        out.format("%scompressed size:                                %d bytes\n", prefix, dataDescriptor.getCompressedSize());
-        out.format("%suncompressed size:                              %d bytes\n", prefix, dataDescriptor.getUncompressedSize());
+        printLine(out, "  - location:", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
+        printLine(out, "  - size:", String.format("%d bytes", block.getSize()));
+        printLine(out, "  32-bit CRC value:", String.format("0x%08X", dataDescriptor.getCrc32()));
+        printLine(out, "  compressed size:", String.format("%d bytes", dataDescriptor.getCompressedSize()));
+        printLine(out, "  uncompressed size:", String.format("%d bytes", dataDescriptor.getUncompressedSize()));
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class Builder {
+
+        private DataDescriptor dataDescriptor;
+        private Block block = Block.NULL;
+        private int pos;
+        private int offs;
+        private int columnWidth;
+
+        public DataDescriptorView build() {
+            return new DataDescriptorView(this);
+        }
+
+        public Builder dataDescriptor(DataDescriptor dataDescriptor) {
+            this.dataDescriptor = dataDescriptor;
+            return this;
+        }
+
+        public Builder block(Block block) {
+            this.block = Optional.ofNullable(block).orElse(Block.NULL);
+            return this;
+        }
+
+        public Builder pos(int pos) {
+            this.pos = pos;
+            return this;
+        }
+
+        public Builder offs(int offs) {
+            this.offs = offs;
+            return this;
+        }
+
+        public Builder columnWidth(int columnWidth) {
+            this.columnWidth = columnWidth;
+            return this;
+        }
     }
 
 }
