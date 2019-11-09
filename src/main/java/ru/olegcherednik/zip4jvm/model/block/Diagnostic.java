@@ -186,7 +186,7 @@ public final class Diagnostic {
 
     @Getter
     @Setter
-    public static final class ByteArrayBlock extends Block {
+    public static class ByteArrayBlock extends Block {
 
         private byte[] data;
 

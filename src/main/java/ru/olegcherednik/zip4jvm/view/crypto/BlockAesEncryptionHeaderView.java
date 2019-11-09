@@ -7,7 +7,6 @@ import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
-import java.util.stream.IntStream;
 
 /**
  * @author Oleg Cherednik
@@ -30,37 +29,41 @@ final class BlockAesEncryptionHeaderView extends View {
 
     @Override
     public void print(PrintStream out) {
-        String str = String.format("#%d (AES) encryption header", pos + 1);
-        out.println(str);
-
-        IntStream.range(0, str.length()).forEach(i -> out.print('-'));
-
+        printTitle(out, String.format("#%d (AES) encryption header", pos + 1));
         out.println();
-        out.format("%ssalt:                                           %d bytes\n", prefix, encryptionHeader.getSalt().getSize());
-        out.format("%s  - location:                                   %2$d (0x%2$08X) bytes\n", prefix, encryptionHeader.getSalt().getOffs());
+        printSalt(out);
+        printPasswordChecksum(out);
+        printMac(out);
+    }
+
+    private void printSalt(PrintStream out) {
+        printLine(out, "salt:", String.format("%d bytes", encryptionHeader.getSalt().getSize()));
+        printLine(out, "  - location:", String.format("%1$d (0x%1$08X) bytes", encryptionHeader.getSalt().getOffs()));
 
         ByteArrayHexView.builder()
                         .buf(encryptionHeader.getSalt().getData())
-                        .offs(prefix.length())
-                        .columnWidth(52).build().print(out);
+                        .offs(offs)
+                        .columnWidth(columnWidth).build().print(out);
+    }
 
-        out.format("%spassword checksum:                              %d bytes\n",
-                prefix, encryptionHeader.getPasswordChecksum().getSize());
-        out.format("%s  - location:                                   %2$d (0x%2$08X) bytes\n",
-                prefix, encryptionHeader.getPasswordChecksum().getOffs());
+    private void printPasswordChecksum(PrintStream out) {
+        printLine(out, "password checksum:", String.format("%d bytes", encryptionHeader.getPasswordChecksum().getSize()));
+        printLine(out, "  - location:", String.format("%1$d (0x%1$08X) bytes", encryptionHeader.getPasswordChecksum().getOffs()));
 
         ByteArrayHexView.builder()
                         .buf(encryptionHeader.getPasswordChecksum().getData())
-                        .offs(prefix.length())
-                        .columnWidth(52).build().print(out);
+                        .offs(offs)
+                        .columnWidth(columnWidth).build().print(out);
+    }
 
-        out.format("%smac:                                            %d bytes\n", prefix, encryptionHeader.getMac().getSize());
-        out.format("%s  - location:                                   %2$d (0x%2$08X) bytes\n", prefix, encryptionHeader.getMac().getOffs());
+    private void printMac(PrintStream out) {
+        printLine(out, "mac:", String.format("%d bytes", encryptionHeader.getMac().getSize()));
+        printLine(out, "  - location:", String.format("%1$d (0x%1$08X) bytes", encryptionHeader.getMac().getOffs()));
 
         ByteArrayHexView.builder()
                         .buf(encryptionHeader.getMac().getData())
-                        .offs(prefix.length())
-                        .columnWidth(52).build().print(out);
+                        .offs(offs)
+                        .columnWidth(columnWidth).build().print(out);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 @Test
 public class PkwareEncryptionHeaderViewTest {
 
-    public void shouldRetrieveCompressionMethodTitleWhenSingleLine() throws IOException {
+    public void shouldRetrieveMultipleLinesWhenPkwareEncryptionHeader() throws IOException {
         PkwareEncryptionHeader encryptionHeader = mock(PkwareEncryptionHeader.class);
         Diagnostic.ByteArrayBlockB data = mock(Diagnostic.ByteArrayBlockB.class);
 
