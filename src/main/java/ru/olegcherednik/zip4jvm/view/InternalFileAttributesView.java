@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.view;
 
-import lombok.Builder;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 
 import java.io.PrintStream;
@@ -9,19 +10,52 @@ import java.io.PrintStream;
  * @author Oleg Cherednik
  * @since 15.10.2019
  */
-@Builder
-public class InternalFileAttributesView {
+public class InternalFileAttributesView extends View {
 
     private final InternalFileAttributes internalFileAttributes;
-    private final String prefix;
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    private InternalFileAttributesView(Builder builder) {
+        super(builder.offs, builder.columnWidth);
+        internalFileAttributes = builder.internalFileAttributes;
+    }
+
+    @Override
     public void print(PrintStream out) {
         byte[] data = internalFileAttributes.getData();
-        int val = data[1] << 8 | data[0];
 
-        out.format("%sinternal file attributes:                       0x%04X\n", prefix, val);
-        out.format("%s  apparent file type:                           %s\n", prefix, internalFileAttributes.getApparentFileType().getTitle());
+        printLine(out, "internal file attributes:", String.format("0x%04X", data[1] << 8 | data[0]));
+        printLine(out, "  apparent file type: ", internalFileAttributes.getApparentFileType().getTitle());
+    }
 
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class Builder {
+
+        private InternalFileAttributes internalFileAttributes;
+        private int offs;
+        private int columnWidth;
+
+        public InternalFileAttributesView build() {
+            return new InternalFileAttributesView(this);
+        }
+
+        public Builder internalFileAttributes(InternalFileAttributes internalFileAttributes) {
+            this.internalFileAttributes = internalFileAttributes;
+            return this;
+        }
+
+        public Builder offs(int offs) {
+            this.offs = offs;
+            return this;
+        }
+
+        public Builder columnWidth(int columnWidth) {
+            this.columnWidth = columnWidth;
+            return this;
+        }
     }
 
 }

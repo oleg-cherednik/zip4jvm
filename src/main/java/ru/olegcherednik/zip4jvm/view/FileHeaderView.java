@@ -22,6 +22,7 @@ public class FileHeaderView {
     private final long pos;
     private final Charset charset;
     private final String prefix;
+    private final int columnWidth = 52;
 
     public void print(PrintStream out) {
         String str = String.format("Central directory entry %s #%d: %d bytes",
@@ -59,9 +60,7 @@ public class FileHeaderView {
                      .charset(charset)
                      .prefix(prefix).build().print(out);
 
-        InternalFileAttributesView.builder()
-                                  .internalFileAttributes(fileHeader.getInternalFileAttributes())
-                                  .prefix(prefix).build().print(out);
+        printInternalFileAttributesView(out);
         printExternalFileAttributes(out);
         printExtraField(out);
     }
@@ -71,7 +70,7 @@ public class FileHeaderView {
                    .versionMadeBy(fileHeader.getVersionMadeBy())
                    .versionToExtract(fileHeader.getVersionToExtract())
                    .offs(prefix.length())
-                   .columnWidth(52).build().print(out);
+                   .columnWidth(columnWidth).build().print(out);
     }
 
     private void printGeneralPurposeFlag(PrintStream out) {
@@ -79,7 +78,7 @@ public class FileHeaderView {
                               .generalPurposeFlag(fileHeader.getGeneralPurposeFlag())
                               .compressionMethod(fileHeader.getCompressionMethod())
                               .offs(prefix.length())
-                              .columnWidth(52).build().print(out);
+                              .columnWidth(columnWidth).build().print(out);
     }
 
     private void printCompressionMethod(PrintStream out) {
@@ -87,7 +86,7 @@ public class FileHeaderView {
                              .compressionMethod(fileHeader.getCompressionMethod())
                              .generalPurposeFlag(fileHeader.getGeneralPurposeFlag())
                              .offs(prefix.length())
-                             .columnWidth(52).build().print(out);
+                             .columnWidth(columnWidth).build().print(out);
     }
 
     private void printLastModifiedTime(PrintStream out) {
@@ -96,11 +95,18 @@ public class FileHeaderView {
                             .prefix(prefix).build().print(out);
     }
 
+    private void printInternalFileAttributesView(PrintStream out) {
+        InternalFileAttributesView.builder()
+                                  .internalFileAttributes(fileHeader.getInternalFileAttributes())
+                                  .offs(prefix.length())
+                                  .columnWidth(columnWidth).build().print(out);
+    }
+
     private void printExternalFileAttributes(PrintStream out) {
         ExternalFileAttributesView.builder()
                                   .externalFileAttributes(fileHeader.getExternalFileAttributes())
                                   .offs(prefix.length())
-                                  .columnWidth(52).build().print(out);
+                                  .columnWidth(columnWidth).build().print(out);
     }
 
     private void printExtraField(PrintStream out) {
@@ -109,7 +115,7 @@ public class FileHeaderView {
                       .diagExtraField(diagFileHeader.getExtraField())
                       .generalPurposeFlag(fileHeader.getGeneralPurposeFlag())
                       .offs(prefix.length())
-                      .columnWidth(52).build().print(out);
+                      .columnWidth(columnWidth).build().print(out);
     }
 
 }
