@@ -44,8 +44,8 @@ final class ExtendedTimestampExtraFieldView extends View {
 
     public static final class Builder {
 
-        private ExtendedTimestampExtraField record;
-        private Block block;
+        private ExtendedTimestampExtraField record = ExtendedTimestampExtraField.NULL;
+        private Block block = Block.NULL;
         private int offs;
         private int columnWidth;
 
@@ -59,7 +59,7 @@ final class ExtendedTimestampExtraFieldView extends View {
         }
 
         public Builder block(Block block) {
-            this.block = block;
+            this.block = Optional.ofNullable(block).orElse(Block.NULL);
             return this;
         }
 

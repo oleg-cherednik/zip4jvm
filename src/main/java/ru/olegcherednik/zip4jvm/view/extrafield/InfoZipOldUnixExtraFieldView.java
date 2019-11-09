@@ -5,6 +5,7 @@ import ru.olegcherednik.zip4jvm.model.os.InfoZipOldUnixExtraField;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
+import java.util.Optional;
 
 import static ru.olegcherednik.zip4jvm.model.ExtraField.NO_DATA;
 
@@ -45,8 +46,8 @@ final class InfoZipOldUnixExtraFieldView extends View {
 
     public static final class Builder {
 
-        private InfoZipOldUnixExtraField record;
-        private Block block;
+        private InfoZipOldUnixExtraField record = InfoZipOldUnixExtraField.NULL;
+        private Block block = Block.NULL;
         private int offs;
         private int columnWidth;
 
@@ -55,12 +56,12 @@ final class InfoZipOldUnixExtraFieldView extends View {
         }
 
         public Builder record(InfoZipOldUnixExtraField record) {
-            this.record = record;
+            this.record = Optional.ofNullable(record).orElse(InfoZipOldUnixExtraField.NULL);
             return this;
         }
 
         public Builder block(Block block) {
-            this.block = block;
+            this.block = Optional.ofNullable(block).orElse(Block.NULL);
             return this;
         }
 

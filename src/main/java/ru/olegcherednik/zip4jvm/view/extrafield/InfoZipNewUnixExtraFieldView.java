@@ -7,6 +7,7 @@ import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
+import java.util.Optional;
 
 /**
  * @author Oleg Cherednik
@@ -63,8 +64,8 @@ final class InfoZipNewUnixExtraFieldView extends View {
 
     public static final class Builder {
 
-        private InfoZipNewUnixExtraField record;
-        private Block block;
+        private InfoZipNewUnixExtraField record = InfoZipNewUnixExtraField.NULL;
+        private Block block = Block.NULL;
         private int offs;
         private int columnWidth;
 
@@ -73,12 +74,12 @@ final class InfoZipNewUnixExtraFieldView extends View {
         }
 
         public Builder record(InfoZipNewUnixExtraField record) {
-            this.record = record;
+            this.record = Optional.ofNullable(record).orElse(InfoZipNewUnixExtraField.NULL);
             return this;
         }
 
         public Builder block(Block block) {
-            this.block = block;
+            this.block = Optional.ofNullable(block).orElse(Block.NULL);
             return this;
         }
 

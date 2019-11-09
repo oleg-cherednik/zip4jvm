@@ -4,7 +4,6 @@ import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.Zip64;
-import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 import ru.olegcherednik.zip4jvm.model.os.ExtendedTimestampExtraField;
 import ru.olegcherednik.zip4jvm.model.os.InfoZipNewUnixExtraField;
@@ -59,39 +58,40 @@ public final class ExtraFieldView extends View {
     }
 
     private void printRecords(PrintStream out) {
-        for (ExtraField.Record record : extraField.getRecords()) {
-            if (record.isNull())
-                continue;
-
-            Block block = diagExtraField.getRecord(record.getSignature());
-
-            if (record instanceof NtfsTimestampExtraField)
-                NtfsTimestampExtraFieldView.builder()
-                                           .record((NtfsTimestampExtraField)record)
-                                           .block(block)
-                                           .offs(offs)
-                                           .columnWidth(columnWidth).build().print(out);
-            else if (record instanceof InfoZipOldUnixExtraField)
-                print((InfoZipOldUnixExtraField)record, out);
-            else if (record instanceof InfoZipNewUnixExtraField)
-                print((InfoZipNewUnixExtraField)record, out);
-            else if (record instanceof ExtendedTimestampExtraField)
-                print((ExtendedTimestampExtraField)record, out);
-            else if (record instanceof Zip64.ExtendedInfo)
-                Zip64ExtendedInfoView.builder()
-                                     .record((Zip64.ExtendedInfo)record)
-                                     .block(block)
+        extraField.getRecords().stream()
+                  .filter(record -> !record.isNull())
+                  .forEach(record -> {
+                      if (record instanceof NtfsTimestampExtraField)
+                          print((NtfsTimestampExtraField)record, out);
+                      else if (record instanceof InfoZipOldUnixExtraField)
+                          print((InfoZipOldUnixExtraField)record, out);
+                      else if (record instanceof InfoZipNewUnixExtraField)
+                          print((InfoZipNewUnixExtraField)record, out);
+                      else if (record instanceof ExtendedTimestampExtraField)
+                          print((ExtendedTimestampExtraField)record, out);
+                      else if (record instanceof Zip64.ExtendedInfo)
+                          Zip64ExtendedInfoView.builder()
+                                               .record((Zip64.ExtendedInfo)record)
+                                               .block(diagExtraField.getRecord(record.getSignature()))
+                                               .offs(offs)
+                                               .columnWidth(columnWidth).build().print(out);
+                      else if (record instanceof AesExtraDataRecord)
+                          print((AesExtraDataRecord)record, out);
+                      else if (record instanceof ExtraField.Record.Unknown)
+                          UnknownView.builder()
+                                     .record((ExtraField.Record.Unknown)record)
+                                     .block(diagExtraField.getRecord(record.getSignature()))
                                      .offs(offs)
                                      .columnWidth(columnWidth).build().print(out);
-            else if (record instanceof AesExtraDataRecord)
-                print((AesExtraDataRecord)record, out);
-            else if (record instanceof ExtraField.Record.Unknown)
-                UnknownView.builder()
-                           .record((ExtraField.Record.Unknown)record)
-                           .block(block)
-                           .offs(offs)
-                           .columnWidth(columnWidth).build().print(out);
-        }
+                  });
+    }
+
+    private void print(NtfsTimestampExtraField record, PrintStream out) {
+        NtfsTimestampExtraFieldView.builder()
+                                   .record(record)
+                                   .block(diagExtraField.getRecord(record.getSignature()))
+                                   .offs(offs)
+                                   .columnWidth(columnWidth).build().print(out);
     }
 
     private void print(InfoZipOldUnixExtraField record, PrintStream out) {
