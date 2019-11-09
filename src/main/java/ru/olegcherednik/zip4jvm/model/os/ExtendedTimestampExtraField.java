@@ -66,7 +66,7 @@ public final class ExtendedTimestampExtraField implements ExtraField.Record {
 
     @Override
     public String toString() {
-        return this == NULL ? "<null>" : StringUtils.leftPad(Integer.toBinaryString(flag.getAsInt()), 3, '0');
+        return isNull() ? "<null>" : StringUtils.leftPad(Integer.toBinaryString(flag.getAsInt()), 3, '0');
     }
 
     @Getter

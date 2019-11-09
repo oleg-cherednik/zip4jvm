@@ -51,7 +51,7 @@ public class AesExtraDataRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(AesExtraDataRecordView.builder()
                                                                     .record(AesExtraDataRecord.NULL)
                                                                     .generalPurposeFlag(mock(GeneralPurposeFlag.class))
-                                                                    .block(Block.NULL)
+                                                                    .block(mock(Block.class))
                                                                     .columnWidth(52).build());
         assertThat(lines).hasSize(1);
         assertThat(lines[0]).isEmpty();

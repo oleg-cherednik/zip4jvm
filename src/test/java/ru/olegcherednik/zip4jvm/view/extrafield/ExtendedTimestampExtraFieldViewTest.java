@@ -119,7 +119,7 @@ public class ExtendedTimestampExtraFieldViewTest {
     public void shouldRetrieveEmptyStringWhenRecordNull() throws IOException {
         String[] lines = Zip4jvmSuite.execute(ExtendedTimestampExtraFieldView.builder()
                                                                              .record(ExtendedTimestampExtraField.NULL)
-                                                                             .block(Block.NULL)
+                                                                             .block(mock(Block.class))
                                                                              .columnWidth(52).build());
         assertThat(lines).hasSize(1);
         assertThat(lines[0]).isEmpty();

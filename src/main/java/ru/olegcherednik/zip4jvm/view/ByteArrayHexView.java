@@ -41,9 +41,10 @@ public final class ByteArrayHexView extends View {
 
             for (int i = 0; i < 16; i++) {
                 if (hexs.isEmpty())
-                    out.print("   ");
-                else
-                    out.format("%02X ", hexs.remove().byteValue());
+                    break;
+                if (i > 0)
+                    out.print(' ');
+                out.format("%02X", hexs.remove().byteValue());
             }
 
             out.println();

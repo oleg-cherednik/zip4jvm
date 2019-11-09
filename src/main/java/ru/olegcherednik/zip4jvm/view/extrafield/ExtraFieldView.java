@@ -78,17 +78,9 @@ public final class ExtraFieldView extends View {
                                             .offs(offs)
                                             .columnWidth(columnWidth).build().print(out);
             else if (record instanceof InfoZipNewUnixExtraField)
-                InfoZipNewUnixExtraFieldView.builder()
-                                            .record((InfoZipNewUnixExtraField)record)
-                                            .block(block)
-                                            .offs(offs)
-                                            .columnWidth(columnWidth).build().print(out);
+                print((InfoZipNewUnixExtraField)record, out);
             else if (record instanceof ExtendedTimestampExtraField)
-                ExtendedTimestampExtraFieldView.builder()
-                                               .record((ExtendedTimestampExtraField)record)
-                                               .block(block)
-                                               .offs(offs)
-                                               .columnWidth(columnWidth).build().print(out);
+                print((ExtendedTimestampExtraField)record, out);
             else if (record instanceof Zip64.ExtendedInfo)
                 Zip64ExtendedInfoView.builder()
                                      .record((Zip64.ExtendedInfo)record)
@@ -96,12 +88,7 @@ public final class ExtraFieldView extends View {
                                      .offs(offs)
                                      .columnWidth(columnWidth).build().print(out);
             else if (record instanceof AesExtraDataRecord)
-                AesExtraDataRecordView.builder()
-                                      .record((AesExtraDataRecord)record)
-                                      .generalPurposeFlag(generalPurposeFlag)
-                                      .block(block)
-                                      .offs(offs)
-                                      .columnWidth(columnWidth).build().print(out);
+                print((AesExtraDataRecord)record, out);
             else if (record instanceof ExtraField.Record.Unknown)
                 UnknownView.builder()
                            .record((ExtraField.Record.Unknown)record)
@@ -109,6 +96,31 @@ public final class ExtraFieldView extends View {
                            .offs(offs)
                            .columnWidth(columnWidth).build().print(out);
         }
+    }
+
+    private void print(InfoZipNewUnixExtraField record, PrintStream out) {
+        InfoZipNewUnixExtraFieldView.builder()
+                                    .record(record)
+                                    .block(diagExtraField.getRecord(record.getSignature()))
+                                    .offs(offs)
+                                    .columnWidth(columnWidth).build().print(out);
+    }
+
+    private void print(ExtendedTimestampExtraField record, PrintStream out) {
+        ExtendedTimestampExtraFieldView.builder()
+                                       .record(record)
+                                       .block(diagExtraField.getRecord(record.getSignature()))
+                                       .offs(offs)
+                                       .columnWidth(columnWidth).build().print(out);
+    }
+
+    private void print(AesExtraDataRecord record, PrintStream out) {
+        AesExtraDataRecordView.builder()
+                              .record(record)
+                              .generalPurposeFlag(generalPurposeFlag)
+                              .block(diagExtraField.getRecord(record.getSignature()))
+                              .offs(offs)
+                              .columnWidth(columnWidth).build().print(out);
     }
 
     public static final class Builder {

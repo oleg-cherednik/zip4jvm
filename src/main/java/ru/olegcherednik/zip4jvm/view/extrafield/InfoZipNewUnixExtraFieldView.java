@@ -29,6 +29,9 @@ final class InfoZipNewUnixExtraFieldView extends View {
 
     @Override
     public void print(PrintStream out) {
+        if (record.isNull() || block == Block.NULL)
+            return;
+
         printLine(out, String.format("(0x%04X) new InfoZIP Unix/OS2/NT: ", record.getSignature()), String.format("%d bytes", block.getSize()));
         printLine(out, "  - location:", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
 

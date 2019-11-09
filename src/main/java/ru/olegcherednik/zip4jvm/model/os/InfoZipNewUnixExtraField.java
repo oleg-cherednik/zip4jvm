@@ -48,20 +48,27 @@ public class InfoZipNewUnixExtraField implements ExtraField.Record {
         throw new NotImplementedException();
     }
 
+    @Override
+    public String toString() {
+        return isNull() ? "<null>" : "version: " + payload.getVersion();
+    }
+
     public <T extends Payload> T getPayload() {
         return (T)payload;
     }
 
     public interface Payload {
 
+        int getVersion();
     }
 
     @Getter
     @Builder
     public static final class VersionOnePayload implements Payload {
 
-        // size:1 - version of this extra field, currently 1
-        private final int version;
+        // size:1 - version of this extra field
+        @SuppressWarnings("FieldMayBeStatic")
+        private final int version = 1;
         // size:1 - size of uid field (n)
         // size:n - unix user ID
         private final String uid;
@@ -74,7 +81,7 @@ public class InfoZipNewUnixExtraField implements ExtraField.Record {
     @Builder
     public static final class VersionUnknownPayload implements Payload {
 
-        // size:1 - version of this extra field, currently 1
+        // size:1 - version of this extra field
         private final int version;
         private final byte[] data;
     }

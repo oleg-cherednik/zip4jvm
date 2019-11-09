@@ -26,7 +26,8 @@ public abstract class View {
     protected void printLine(PrintStream out, String one, String two) {
         if (offs > 0)
             one = StringUtils.repeat(" ", offs) + one;
-        out.format(Locale.US, "%-" + columnWidth + "s%s\n", one, two);
+        out.format(Locale.US, "%-" + columnWidth + "s%s", one, two);
+        out.println();
     }
 
 }

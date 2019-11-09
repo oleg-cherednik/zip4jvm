@@ -32,7 +32,6 @@ public final class InfoZipNewUnixExtraFieldReader implements Reader<InfoZipNewUn
         String gid = in.readNumber(in.readByte(), 16);
 
         return InfoZipNewUnixExtraField.VersionOnePayload.builder()
-                                                         .version(1)
                                                          .uid(uid)
                                                          .gid(gid).build();
     }
