@@ -28,15 +28,15 @@ public final class CompressionMethodView extends View {
 
     @Override
     public void print(PrintStream out) {
-        printLine(out, String.format("compression method (%02d):", compressionMethod.getCode()), compressionMethod);
+        printLine(out, String.format("compression method (%02d):", compressionMethod.getCode()), compressionMethod.getTitle());
 
         if (compressionMethod == CompressionMethod.FILE_IMPLODED) {
-            printLine(out, "  size of sliding dictionary (implosion):", generalPurposeFlag.getSlidingDictionarySize());
-            printLine(out, "  number of Shannon-Fano trees (implosion):", generalPurposeFlag.getShannonFanoTreesNumber());
+            printLine(out, "  size of sliding dictionary (implosion):", generalPurposeFlag.getSlidingDictionarySize().getTitle());
+            printLine(out, "  number of Shannon-Fano trees (implosion):", generalPurposeFlag.getShannonFanoTreesNumber().getTitle());
         } else if (compressionMethod == CompressionMethod.LZMA)
             printLine(out, "  end-of-stream (EOS) marker:", generalPurposeFlag.isEosMarker() ? "yes" : "no");
         else if (compressionMethod == CompressionMethod.DEFLATE || compressionMethod == CompressionMethod.FILE_ENHANCED_DEFLATED)
-            printLine(out, "  compression sub-type (deflation):", generalPurposeFlag.getCompressionLevel());
+            printLine(out, "  compression sub-type (deflation):", generalPurposeFlag.getCompressionLevel().getTitle());
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

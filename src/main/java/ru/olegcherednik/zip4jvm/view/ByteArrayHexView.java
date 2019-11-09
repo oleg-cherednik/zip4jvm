@@ -1,7 +1,6 @@
 package ru.olegcherednik.zip4jvm.view;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
 
 import java.io.PrintStream;
 import java.util.Deque;
@@ -34,10 +33,8 @@ public final class ByteArrayHexView extends View {
         for (int i = 0; i < buf.length; i++)
             hexs.add((int)buf[i]);
 
-        final String empty = StringUtils.repeat(" ", offs);
-
         while (!hexs.isEmpty()) {
-            out.print(empty);
+            out.print(prefix);
 
             for (int i = 0; i < 16; i++) {
                 if (hexs.isEmpty())

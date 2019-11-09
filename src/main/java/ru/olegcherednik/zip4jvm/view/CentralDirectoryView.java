@@ -57,7 +57,8 @@ public class CentralDirectoryView {
                           .diagFileHeader(diagCentralDirectory.getFileHeader(fileHeader.getFileName()))
                           .pos(pos++)
                           .charset(charset)
-                          .prefix(prefix).build().print(out);
+                          .offs(prefix.length())
+                          .columnWidth(52).build().print(out);
         }
     }
 

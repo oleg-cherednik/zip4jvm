@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.view;
 
-import lombok.Builder;
+import org.apache.commons.lang.StringUtils;
+import ru.olegcherednik.zip4jvm.model.Charsets;
 
 import java.io.PrintStream;
 import java.nio.charset.Charset;
@@ -12,18 +13,27 @@ import java.util.Optional;
  * @author Oleg Cherednik
  * @since 13.10.2019
  */
-@Builder
-public final class StringHexView {
+public final class StringHexView extends View {
 
     private final String str;
     private final Charset charset;
-    private final String prefix;
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    private StringHexView(Builder builder) {
+        super(builder.offs, builder.columnWidth);
+        str = builder.str;
+        charset = builder.charset;
+    }
+
+    @Override
     public void print(PrintStream out) {
         if (str == null)
             return;
 
-        out.format("%s                                                %s\n", prefix, charset.name());
+        printLine(out, "", charset.name());
 
         Deque<Integer> hexs = new LinkedList<>();
         Deque<Character> chars = new LinkedList<>();
@@ -61,6 +71,38 @@ public final class StringHexView {
             }
 
             out.println();
+        }
+    }
+
+    public static final class Builder {
+
+        private String str;
+        private Charset charset = Charsets.IBM437;
+        private int offs;
+        private int columnWidth;
+
+        public StringHexView build() {
+            return new StringHexView(this);
+        }
+
+        public Builder str(String str) {
+            this.str = StringUtils.isEmpty(str) ? null : str;
+            return this;
+        }
+
+        public Builder charset(Charset charset) {
+            this.charset = Optional.ofNullable(charset).orElse(Charsets.IBM437);
+            return this;
+        }
+
+        public Builder offs(int offs) {
+            this.offs = offs;
+            return this;
+        }
+
+        public Builder columnWidth(int columnWidth) {
+            this.columnWidth = columnWidth;
+            return this;
         }
     }
 }

@@ -29,21 +29,32 @@ public class ZipEntryView {
     private final String prefix;
 
     public void print(PrintStream out) {
+        printLocalFileHeader(out);
+        out.println();
+        printEncryptionHeader(out);
+        out.println();
+        printDataDescriptor(out);
+    }
+
+    private void printLocalFileHeader(PrintStream out) {
         LocalFileHeaderView.builder()
                            .localFileHeader(localFileHeader)
                            .diagLocalFileHeader(diagLocalFileHeader)
                            .pos(pos)
                            .charset(charset)
-                           .prefix(prefix).build().print(out);
+                           .offs(prefix.length())
+                           .columnWidth(52).build().print(out);
+    }
 
-        out.println();
+    private void printEncryptionHeader(PrintStream out) {
         EncryptionHeaderView.builder()
                             .encryptionHeader(encryptionHeader)
                             .pos(pos)
                             .charset(charset)
                             .prefix(prefix).build().print(out);
+    }
 
-        out.println();
+    private void printDataDescriptor(PrintStream out) {
         DataDescriptorView.builder()
                           .dataDescriptor(dataDescriptor)
                           .block(blockDataDescriptor)

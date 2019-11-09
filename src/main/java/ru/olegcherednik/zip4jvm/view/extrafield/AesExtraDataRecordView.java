@@ -38,7 +38,7 @@ final class AesExtraDataRecordView extends View {
         printLine(out, String.format("(0x%04X) AES Encryption Tag:", record.getSignature()), String.format("%d bytes", block.getSize()));
         printLine(out, "  - location:", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
         printLine(out, "  Encryption Tag Version:", String.format("%s-%d", record.getVendor(), record.getVersionNumber()));
-        printLine(out, "  Encryption Key Bits:", String.format("%s", record.getStrength().getSize()));
+        printLine(out, "  Encryption Key Bits:", String.valueOf(record.getStrength().getSize()));
 
         CompressionMethodView.builder()
                              .compressionMethod(record.getCompressionMethod())

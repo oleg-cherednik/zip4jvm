@@ -39,9 +39,9 @@ final class InfoZipOldUnixExtraFieldView extends View {
         printLine(out, "  Last Accessed Date:", String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", record.getLastAccessTime()));
 
         if (record.getUid() != NO_DATA)
-            printLine(out, "  User identifier (UID):", String.format("%d", record.getUid()));
+            printLine(out, "  User identifier (UID):", String.valueOf(record.getUid()));
         if (record.getGid() != NO_DATA)
-            printLine(out, "  Group Identifier (GID):", String.format("%d", record.getGid()));
+            printLine(out, "  Group Identifier (GID):", String.valueOf(record.getGid()));
     }
 
     public static final class Builder {

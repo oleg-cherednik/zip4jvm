@@ -45,12 +45,12 @@ final class InfoZipNewUnixExtraFieldView extends View {
     }
 
     private void print(InfoZipNewUnixExtraField.VersionOnePayload payload, PrintStream out) {
-        printLine(out, "  version:", String.format("%d", payload.getVersion()));
+        printLine(out, "  version:", String.valueOf(payload.getVersion()));
 
         if (StringUtils.isNotBlank(payload.getUid()))
-            printLine(out, "  User identifier (UID):", String.format("%s", payload.getUid()));
+            printLine(out, "  User identifier (UID):", payload.getUid());
         if (StringUtils.isNotBlank(payload.getGid()))
-            printLine(out, "  Group Identifier (GID):", String.format("%s", payload.getGid()));
+            printLine(out, "  Group Identifier (GID):", payload.getGid());
     }
 
     private void print(InfoZipNewUnixExtraField.VersionUnknownPayload payload, PrintStream out) {

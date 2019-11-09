@@ -34,7 +34,7 @@ final class NtfsTimestampExtraFieldView extends View {
 
         printLine(out, String.format("(0x%04X) NTFS Timestamps:", record.getSignature()), String.format("%d bytes", block.getSize()));
         printLine(out, "  - location:", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
-        printLine(out, "  - total tags:", String.format("%d", record.getTags().size()));
+        printLine(out, "  - total tags:", String.valueOf(record.getTags().size()));
 
         for (NtfsTimestampExtraField.Tag tag : record.getTags()) {
             if (tag instanceof NtfsTimestampExtraField.OneTag)

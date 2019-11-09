@@ -3,7 +3,6 @@ package ru.olegcherednik.zip4jvm.model;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.view.Title;
 
 /**
  * see 4.4.4
@@ -13,7 +12,7 @@ import ru.olegcherednik.zip4jvm.view.Title;
  */
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public enum SlidingDictionarySize implements Title {
+public enum SlidingDictionarySize {
     SD_4K("4K"),
     SD_8K("8K");
 

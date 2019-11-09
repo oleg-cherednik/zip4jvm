@@ -42,7 +42,7 @@ final class Zip64ExtendedInfoView extends View {
         if (record.getLocalFileHeaderOffs() != ExtraField.NO_DATA)
             printLine(out, "  original relative offset of local header:", String.format("%1$d (0x%1$08X) bytes", record.getLocalFileHeaderOffs()));
         if (record.getDisk() != ExtraField.NO_DATA)
-            printLine(out, String.format("  original part number of this part (%04X):", record.getDisk()), String.format("%d", record.getDisk()));
+            printLine(out, String.format("  original part number of this part (%04X):", record.getDisk()), String.valueOf(record.getDisk()));
     }
 
     public static final class Builder {

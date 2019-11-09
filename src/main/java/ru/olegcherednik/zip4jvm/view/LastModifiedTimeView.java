@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.view;
 
-import lombok.Builder;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.utils.time.DosTimestampConverter;
 
 import java.io.PrintStream;
@@ -9,17 +10,52 @@ import java.io.PrintStream;
  * @author Oleg Cherednik
  * @since 15.10.2019
  */
-@Builder
-public class LastModifiedTimeView {
+public final class LastModifiedTimeView extends View {
 
     private final int lastModifiedTime;
-    private final String prefix;
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    private LastModifiedTimeView(Builder builder) {
+        super(builder.offs, builder.columnWidth);
+        lastModifiedTime = builder.lastModifiedTime;
+    }
+
+    @Override
     public void print(PrintStream out) {
         int date = lastModifiedTime >> 16;
         int time = lastModifiedTime & 0xFFFF;
         long ms = DosTimestampConverter.dosToJavaTime(lastModifiedTime);
 
-        out.format("%sfile last modified on (0x%04X 0x%04X):          %4$tY-%4$tm-%4$td %4$tH:%4$tM:%4$tS\n", prefix, date, time, ms);
+        printLine(out, String.format("file last modified on (0x%04X 0x%04X):", date, time), String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", ms));
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class Builder {
+
+        private int lastModifiedTime;
+        private int offs;
+        private int columnWidth;
+
+        public LastModifiedTimeView build() {
+            return new LastModifiedTimeView(this);
+        }
+
+        public Builder lastModifiedTime(int lastModifiedTime) {
+            this.lastModifiedTime = lastModifiedTime;
+            return this;
+        }
+
+        public Builder offs(int offs) {
+            this.offs = offs;
+            return this;
+        }
+
+        public Builder columnWidth(int columnWidth) {
+            this.columnWidth = columnWidth;
+            return this;
+        }
     }
 }
