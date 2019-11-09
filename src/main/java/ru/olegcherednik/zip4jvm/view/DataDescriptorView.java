@@ -16,7 +16,7 @@ public final class DataDescriptorView extends View {
 
     private final DataDescriptor dataDescriptor;
     private final Block block;
-    private final int pos;
+    private final long pos;
 
     public static Builder builder() {
         return new Builder();
@@ -36,11 +36,11 @@ public final class DataDescriptorView extends View {
 
         printTitle(out, String.format("#%d (%s) Data descriptor", pos + 1, ViewUtils.signature(DataDescriptor.SIGNATURE)));
         out.println();
-        printLine(out, "  - location:", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
-        printLine(out, "  - size:", String.format("%d bytes", block.getSize()));
-        printLine(out, "  32-bit CRC value:", String.format("0x%08X", dataDescriptor.getCrc32()));
-        printLine(out, "  compressed size:", String.format("%d bytes", dataDescriptor.getCompressedSize()));
-        printLine(out, "  uncompressed size:", String.format("%d bytes", dataDescriptor.getUncompressedSize()));
+        printLine(out, "- location:", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
+        printLine(out, "- size:", String.format("%d bytes", block.getSize()));
+        printLine(out, "32-bit CRC value:", String.format("0x%08X", dataDescriptor.getCrc32()));
+        printLine(out, "compressed size:", String.format("%d bytes", dataDescriptor.getCompressedSize()));
+        printLine(out, "uncompressed size:", String.format("%d bytes", dataDescriptor.getUncompressedSize()));
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -48,7 +48,7 @@ public final class DataDescriptorView extends View {
 
         private DataDescriptor dataDescriptor;
         private Block block = Block.NULL;
-        private int pos;
+        private long pos;
         private int offs;
         private int columnWidth;
 
@@ -66,7 +66,7 @@ public final class DataDescriptorView extends View {
             return this;
         }
 
-        public Builder pos(int pos) {
+        public Builder pos(long pos) {
             this.pos = pos;
             return this;
         }

@@ -36,7 +36,7 @@ public abstract class View {
 
     protected void printLine(PrintStream out, String one) {
         if (offs > 0)
-            one = StringUtils.repeat(" ", offs) + one;
+            one = prefix + one;
         out.println(one);
     }
 

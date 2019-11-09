@@ -1,37 +1,35 @@
-package ru.olegcherednik.zip4jvm.view;
+package ru.olegcherednik.zip4jvm.view.crypto;
 
-import lombok.Builder;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.readers.block.aes.BlockAesEncryptionHeader;
-import ru.olegcherednik.zip4jvm.io.readers.block.pkware.PkwareEncryptionHeader;
-import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
+import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
+import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
-import java.nio.charset.Charset;
 import java.util.stream.IntStream;
 
 /**
  * @author Oleg Cherednik
- * @since 24.10.2019
+ * @since 09.11.2019
  */
-@Builder
-public class EncryptionHeaderView {
+final class BlockAesEncryptionHeaderView extends View {
 
-    private final Diagnostic.ZipEntryBlock.EncryptionHeader encryptionHeader;
+    private final BlockAesEncryptionHeader encryptionHeader;
     private final long pos;
-    private final Charset charset;
-    private final String prefix;
 
-    public void print(PrintStream out) {
-        if (encryptionHeader == null)
-            return;
-
-        if (encryptionHeader instanceof BlockAesEncryptionHeader)
-            print((BlockAesEncryptionHeader)encryptionHeader, out);
-        else if (encryptionHeader instanceof PkwareEncryptionHeader)
-            print((PkwareEncryptionHeader)encryptionHeader, out);
+    public static Builder builder() {
+        return new Builder();
     }
 
-    private void print(BlockAesEncryptionHeader encryptionHeader, PrintStream out) {
+    private BlockAesEncryptionHeaderView(Builder builder) {
+        super(builder.offs, builder.columnWidth);
+        encryptionHeader = builder.encryptionHeader;
+        pos = builder.pos;
+    }
+
+    @Override
+    public void print(PrintStream out) {
         String str = String.format("#%d (AES) encryption header", pos + 1);
         out.println(str);
 
@@ -65,19 +63,36 @@ public class EncryptionHeaderView {
                         .columnWidth(52).build().print(out);
     }
 
-    private void print(PkwareEncryptionHeader encryptionHeader, PrintStream out) {
-        String str = String.format("#%d (PKWARE) encryption header", pos + 1);
-        out.println(str);
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class Builder {
 
-        IntStream.range(0, str.length()).forEach(i -> out.print('='));
+        private BlockAesEncryptionHeader encryptionHeader;
+        private long pos;
+        private int offs;
+        private int columnWidth;
 
-        out.println();
-        out.format("%sdata:                                           %d bytes\n", prefix, encryptionHeader.getData().getSize());
-        out.format("%s  - location:                                   %2$d (0x%2$08X) bytes\n", prefix, encryptionHeader.getData().getOffs());
+        public BlockAesEncryptionHeaderView build() {
+            return new BlockAesEncryptionHeaderView(this);
+        }
 
-        ByteArrayHexView.builder()
-                        .buf(encryptionHeader.getData().getData())
-                        .offs(prefix.length())
-                        .columnWidth(52).build().print(out);
+        public Builder encryptionHeader(BlockAesEncryptionHeader encryptionHeader) {
+            this.encryptionHeader = encryptionHeader;
+            return this;
+        }
+
+        public Builder pos(long pos) {
+            this.pos = pos;
+            return this;
+        }
+
+        public Builder offs(int offs) {
+            this.offs = offs;
+            return this;
+        }
+
+        public Builder columnWidth(int columnWidth) {
+            this.columnWidth = columnWidth;
+            return this;
+        }
     }
 }

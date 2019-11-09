@@ -150,8 +150,8 @@ public final class ZipInfo {
                             .dataDescriptor(zipEntryModel.getDataDescriptors().get(fileName))
                             .blockDataDescriptor(block.getDataDescriptor(fileName))
                             .charset(charset)
-                            .prefix(prefix)
-                            .build().print(out);
+                            .offs(prefix.length())
+                            .columnWidth(52).build().print(out);
             }
 
             // print zip entry

@@ -1,33 +1,52 @@
 package ru.olegcherednik.zip4jvm.view.entry;
 
-import lombok.Builder;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 import ru.olegcherednik.zip4jvm.view.DataDescriptorView;
-import ru.olegcherednik.zip4jvm.view.EncryptionHeaderView;
 import ru.olegcherednik.zip4jvm.view.LocalFileHeaderView;
+import ru.olegcherednik.zip4jvm.view.View;
+import ru.olegcherednik.zip4jvm.view.crypto.EncryptionHeaderView;
 
 import java.io.PrintStream;
 import java.nio.charset.Charset;
+import java.util.Optional;
 
 /**
  * @author Oleg Cherednik
  * @since 27.10.2019
  */
-@Builder
-public class ZipEntryView {
+public final class ZipEntryView extends View {
 
-    private final int pos;
+    private final long pos;
     private final LocalFileHeader localFileHeader;
     private final Diagnostic.ZipEntryBlock.LocalFileHeaderB diagLocalFileHeader;
     private final Diagnostic.ZipEntryBlock.EncryptionHeader encryptionHeader;
+    // TODO duplication of data descriptor
     private final DataDescriptor dataDescriptor;
     private final Block blockDataDescriptor;
     private final Charset charset;
-    private final String prefix;
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    private ZipEntryView(Builder builder) {
+        super(builder.offs, builder.columnWidth);
+        pos = builder.pos;
+        localFileHeader = builder.localFileHeader;
+        diagLocalFileHeader = builder.diagLocalFileHeader;
+        encryptionHeader = builder.encryptionHeader;
+        dataDescriptor = builder.dataDescriptor;
+        blockDataDescriptor = builder.blockDataDescriptor;
+        charset = builder.charset;
+    }
+
+    @Override
     public void print(PrintStream out) {
         printLocalFileHeader(out);
         out.println();
@@ -42,16 +61,16 @@ public class ZipEntryView {
                            .diagLocalFileHeader(diagLocalFileHeader)
                            .pos(pos)
                            .charset(charset)
-                           .offs(prefix.length())
-                           .columnWidth(52).build().print(out);
+                           .offs(offs)
+                           .columnWidth(columnWidth).build().print(out);
     }
 
     private void printEncryptionHeader(PrintStream out) {
         EncryptionHeaderView.builder()
                             .encryptionHeader(encryptionHeader)
                             .pos(pos)
-                            .charset(charset)
-                            .prefix(prefix).build().print(out);
+                            .offs(offs)
+                            .columnWidth(columnWidth).build().print(out);
     }
 
     private void printDataDescriptor(PrintStream out) {
@@ -59,8 +78,71 @@ public class ZipEntryView {
                           .dataDescriptor(dataDescriptor)
                           .block(blockDataDescriptor)
                           .pos(pos)
-                          .offs(prefix.length())
-                          .columnWidth(52).build().print(out);
+                          .offs(offs)
+                          .columnWidth(columnWidth).build().print(out);
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class Builder {
+
+        private long pos;
+        private LocalFileHeader localFileHeader;
+        private Diagnostic.ZipEntryBlock.LocalFileHeaderB diagLocalFileHeader;
+        private Diagnostic.ZipEntryBlock.EncryptionHeader encryptionHeader;
+        private DataDescriptor dataDescriptor;
+        private Block blockDataDescriptor = Block.NULL;
+        private Charset charset = Charsets.IBM437;
+        private int offs;
+        private int columnWidth;
+
+        public ZipEntryView build() {
+            return new ZipEntryView(this);
+        }
+
+        public Builder pos(long pos) {
+            this.pos = pos;
+            return this;
+        }
+
+        public Builder localFileHeader(LocalFileHeader localFileHeader) {
+            this.localFileHeader = localFileHeader;
+            return this;
+        }
+
+        public Builder diagLocalFileHeader(Diagnostic.ZipEntryBlock.LocalFileHeaderB diagLocalFileHeader) {
+            this.diagLocalFileHeader = diagLocalFileHeader;
+            return this;
+        }
+
+        public Builder encryptionHeader(Diagnostic.ZipEntryBlock.EncryptionHeader encryptionHeader) {
+            this.encryptionHeader = encryptionHeader;
+            return this;
+        }
+
+        public Builder dataDescriptor(DataDescriptor dataDescriptor) {
+            this.dataDescriptor = dataDescriptor;
+            return this;
+        }
+
+        public Builder blockDataDescriptor(Block blockDataDescriptor) {
+            this.blockDataDescriptor = Optional.ofNullable(blockDataDescriptor).orElse(Block.NULL);
+            return this;
+        }
+
+        public Builder charset(Charset charset) {
+            this.charset = Optional.ofNullable(charset).orElse(Charsets.IBM437);
+            return this;
+        }
+
+        public Builder offs(int offs) {
+            this.offs = offs;
+            return this;
+        }
+
+        public Builder columnWidth(int columnWidth) {
+            this.columnWidth = columnWidth;
+            return this;
+        }
     }
 
 }

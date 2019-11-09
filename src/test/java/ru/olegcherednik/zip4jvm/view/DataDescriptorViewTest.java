@@ -32,6 +32,7 @@ public class DataDescriptorViewTest {
                                                                 .dataDescriptor(dataDescriptor)
                                                                 .block(block)
                                                                 .pos(1)
+                                                                .offs(2)
                                                                 .columnWidth(52).build());
 
         assertThat(lines).hasSize(7);
