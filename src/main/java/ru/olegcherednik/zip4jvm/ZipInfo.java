@@ -83,10 +83,11 @@ public final class ZipInfo {
 
     private static void printEndCentralDirectoryView(BlockModel blockModel, Charset charset, String prefix, PrintStream out) {
         EndCentralDirectoryView.builder()
+                               .endCentralDirectory(blockModel.getEndCentralDirectory())
                                .block(blockModel.getDiagnostic().getEndCentralDirectory())
-                               .dir(blockModel.getEndCentralDirectory())
                                .charset(charset)
-                               .prefix(prefix).build().print(out);
+                               .offs(prefix.length())
+                               .columnWidth(52).build().print(out);
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
@@ -110,7 +111,8 @@ public final class ZipInfo {
         ZipEntryListView.builder()
                         .blockZipEntryModel(zipEntryModel)
                         .charset(charset)
-                        .prefix(prefix).build().print(out);
+                        .offs(prefix.length())
+                        .columnWidth(52).build().print(out);
     }
 
     public void decompose(Path destDir) throws IOException {

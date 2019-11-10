@@ -1,36 +1,43 @@
 package ru.olegcherednik.zip4jvm.view.entry;
 
-import lombok.Builder;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.block.BlockZipEntryModel;
+import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
 import java.nio.charset.Charset;
-import java.util.stream.IntStream;
+import java.util.Optional;
 
 /**
  * @author Oleg Cherednik
  * @since 20.10.2019
  */
-@Builder
-public class ZipEntryListView {
+public final class ZipEntryListView extends View {
 
     private final BlockZipEntryModel blockZipEntryModel;
     private final Charset charset;
-    private final String prefix;
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    private ZipEntryListView(Builder builder) {
+        super(builder.offs, builder.columnWidth);
+        blockZipEntryModel = builder.blockZipEntryModel;
+        charset = builder.charset;
+    }
+
+    @Override
     public void print(PrintStream out) {
         if (blockZipEntryModel == null || blockZipEntryModel.getLocalFileHeaders() == null || blockZipEntryModel.getLocalFileHeaders().isEmpty())
             return;
 
-        String str = "Zip entry:";
-        out.println(str);
-
-        IntStream.range(0, str.length()).forEach(i -> out.print('='));
-
+        printTitle(out, "Zip entry:");
         out.println();
-        out.format("%stotal number of entries:                        %d\n", prefix, blockZipEntryModel.getLocalFileHeaders().size());
-
+        printLine(out, "total number of entries:", String.valueOf(blockZipEntryModel.getLocalFileHeaders().size()));
         out.println();
         printZipEntries(out);
     }
@@ -54,6 +61,39 @@ public class ZipEntryListView {
                         .columnWidth(52).build().print(out);
 
             pos++;
+        }
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class Builder {
+
+        private BlockZipEntryModel blockZipEntryModel;
+        private Charset charset = Charsets.IBM437;
+        private int offs;
+        private int columnWidth;
+
+        public ZipEntryListView build() {
+            return new ZipEntryListView(this);
+        }
+
+        public Builder blockZipEntryModel(BlockZipEntryModel blockZipEntryModel) {
+            this.blockZipEntryModel = blockZipEntryModel;
+            return this;
+        }
+
+        public Builder charset(Charset charset) {
+            this.charset = Optional.ofNullable(charset).orElse(Charsets.IBM437);
+            return this;
+        }
+
+        public Builder offs(int offs) {
+            this.offs = offs;
+            return this;
+        }
+
+        public Builder columnWidth(int columnWidth) {
+            this.columnWidth = columnWidth;
+            return this;
         }
     }
 }

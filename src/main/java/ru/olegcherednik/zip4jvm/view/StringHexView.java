@@ -56,18 +56,25 @@ public final class StringHexView extends View {
         while (!hexs.isEmpty()) {
             out.print(prefix);
 
+            int total = hexs.size();
+
             for (int i = 0; i < 16; i++) {
                 if (hexs.isEmpty())
-                    out.print("   ");
-                else
-                    out.format("%02X ", hexs.remove().byteValue());
+                    break;
+                if(i > 0)
+                    out.print(' ');
+                out.format("%02X", hexs.remove().byteValue());
             }
+
+            int end = total * 3 + offs;
+
+            for(int i = 0; i <= columnWidth - end; i++)
+                out.print(' ');
 
             for (int i = 0; i < 16; i += Optional.ofNullable(charsLength.poll()).orElse(1)) {
                 if (chars.isEmpty())
-                    out.print("   ");
-                else
-                    out.format("%s", chars.remove());
+                    break;
+                out.print(chars.remove());
             }
 
             out.println();
