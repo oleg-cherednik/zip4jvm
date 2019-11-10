@@ -36,9 +36,7 @@ public final class EndCentralDirectoryView extends View {
         if (dir == null || block == Block.NULL)
             return;
 
-        printTitle(out, EndCentralDirectory.SIGNATURE, "End central directory record");
-        printLine(out, "- location:", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
-        printLine(out, "- size:", String.format("%s bytes", block.getSize()));
+        printTitle(out, EndCentralDirectory.SIGNATURE, "End central directory record", block);
         printLine(out, String.format("part number of this part (%04X):", dir.getTotalDisks()), String.valueOf(dir.getTotalDisks() + 1));
         printLine(out, String.format("part number of start of central dir (%04X):", dir.getMainDisk()), String.valueOf(dir.getMainDisk() + 1));
         printLine(out, "number of entries in central dir in this part:", String.valueOf(dir.getDiskEntries()));
