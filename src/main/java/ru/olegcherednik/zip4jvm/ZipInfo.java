@@ -24,7 +24,7 @@ import ru.olegcherednik.zip4jvm.model.os.ExtendedTimestampExtraField;
 import ru.olegcherednik.zip4jvm.model.os.InfoZipNewUnixExtraField;
 import ru.olegcherednik.zip4jvm.view.CentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
-import ru.olegcherednik.zip4jvm.view.Zip64View;
+import ru.olegcherednik.zip4jvm.view.zip64.Zip64View;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntryListView;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntryView;
 
@@ -72,16 +72,16 @@ public final class ZipInfo {
 
         PrintStream out = System.out;
 
-        printEndCentralDirectoryView(blockModel, charset, prefix, out);
+        printEndCentralDirectory(blockModel, charset, prefix, out);
         out.println();
-        printZip64View(blockModel, charset, prefix, out);
+        printZip64(blockModel, charset, prefix, out);
         out.println();
         printCentralDirectory(blockModel, charset, prefix, out);
         out.println();
         printZipEntries(zipEntryModel, charset, prefix, out);
     }
 
-    private static void printEndCentralDirectoryView(BlockModel blockModel, Charset charset, String prefix, PrintStream out) {
+    private static void printEndCentralDirectory(BlockModel blockModel, Charset charset, String prefix, PrintStream out) {
         EndCentralDirectoryView.builder()
                                .endCentralDirectory(blockModel.getEndCentralDirectory())
                                .block(blockModel.getDiagnostic().getEndCentralDirectory())
@@ -91,7 +91,7 @@ public final class ZipInfo {
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
-    private static void printZip64View(BlockModel blockModel, Charset charset, String prefix, PrintStream out) {
+    private static void printZip64(BlockModel blockModel, Charset charset, String prefix, PrintStream out) {
         Zip64View.builder()
                  .zip64(blockModel.getZip64())
                  .diagZip64(blockModel.getDiagnostic().getZip64())

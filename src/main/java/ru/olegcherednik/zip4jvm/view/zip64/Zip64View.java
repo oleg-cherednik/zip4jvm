@@ -1,9 +1,11 @@
-package ru.olegcherednik.zip4jvm.view;
+package ru.olegcherednik.zip4jvm.view.zip64;
 
 import lombok.Builder;
-import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
+import ru.olegcherednik.zip4jvm.view.VersionView;
+import ru.olegcherednik.zip4jvm.view.ViewUtils;
 
 import java.io.PrintStream;
 import java.nio.charset.Charset;
@@ -22,12 +24,7 @@ public class Zip64View {
     private final String prefix;
 
     public void print(PrintStream out) {
-        EndCentralDirectoryLocator.builder()
-                                  .locator(zip64.getEndCentralDirectoryLocator())
-                                  .block(diagZip64.getEndCentralDirectoryLocator())
-                                  .charset(charset)
-                                  .prefix(prefix).build().print(out);
-
+        printEndCentralDirectorLocator(out);
         out.println();
 
         EndCentralDirectory.builder()
@@ -37,31 +34,12 @@ public class Zip64View {
                            .prefix(prefix).build().print(out);
     }
 
-    @Builder
-    public static class EndCentralDirectoryLocator {
-
-        private final Zip64.EndCentralDirectoryLocator locator;
-        private final Block block;
-        private final Charset charset;
-        private final String prefix;
-
-        public void print(PrintStream out) {
-            if (locator == null)
-                return;
-
-            String str = String.format("New End of Central directory locator %s: %d bytes",
-                    ViewUtils.signature(Zip64.EndCentralDirectoryLocator.SIGNATURE), block.getSize());
-            out.println(str);
-
-            IntStream.range(0, str.length()).forEach(i -> out.print('='));
-
-            out.println();
-            out.format("%slocation of new-end-of-central-dir-locator:     %2$d (0x%2$08X) bytes\n", prefix, block.getOffs());
-            out.format("%spart number of new-end-of-central-dir (%04X):   %d\n",
-                    prefix, locator.getMainDisk(), locator.getMainDisk() + 1);
-            out.format("%srelative offset of new-end-of-central-dir:      %2$d (0x%2$08X) bytes\n", prefix, locator.getOffs());
-            out.format("%stotal number of parts in archive:               %d\n", prefix, locator.getTotalDisks());
-        }
+    private void printEndCentralDirectorLocator(PrintStream out) {
+        EndCentralDirectoryLocatorView.builder()
+                                      .locator(zip64.getEndCentralDirectoryLocator())
+                                      .block(diagZip64.getEndCentralDirectoryLocator())
+                                      .offs(prefix.length())
+                                      .columnWidth(52).build().print(out);
     }
 
     @Builder

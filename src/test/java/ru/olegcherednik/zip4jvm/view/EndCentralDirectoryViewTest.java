@@ -40,8 +40,8 @@ public class EndCentralDirectoryViewTest {
                                                                      .offs(2)
                                                                      .columnWidth(52).build());
         assertThat(lines).hasSize(13);
-        assertThat(lines[0]).isEqualTo("(PK0506) End central directory record");
-        assertThat(lines[1]).isEqualTo("=====================================");
+        assertThat(lines[0]).isEqualTo("(PK0506) End of Central directory record");
+        assertThat(lines[1]).isEqualTo("========================================");
         assertThat(lines[2]).isEqualTo("  - location:                                       255614 (0x0003E67E) bytes");
         assertThat(lines[3]).isEqualTo("  - size:                                           33 bytes");
         assertThat(lines[4]).isEqualTo("  part number of this part (0001):                  2");
