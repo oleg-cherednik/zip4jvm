@@ -24,9 +24,9 @@ import ru.olegcherednik.zip4jvm.model.os.ExtendedTimestampExtraField;
 import ru.olegcherednik.zip4jvm.model.os.InfoZipNewUnixExtraField;
 import ru.olegcherednik.zip4jvm.view.CentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
-import ru.olegcherednik.zip4jvm.view.zip64.Zip64View;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntryListView;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntryView;
+import ru.olegcherednik.zip4jvm.view.zip64.Zip64View;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -64,6 +64,8 @@ public final class ZipInfo {
 //        Function<Charset, Charset> charsetCustomizer = Charsets.SYSTEM_CHARSET;
         Charset charset = charsetCustomizer.apply(Charsets.IBM437);
         final String prefix = "    ";
+        final int offs = prefix.length();
+        final int columnWidth = 52;
 
         Diagnostic diagnostic = new Diagnostic();
         BlockModel blockModel = new BlockModelReader(zip, charsetCustomizer, diagnostic).read();
@@ -72,31 +74,31 @@ public final class ZipInfo {
 
         PrintStream out = System.out;
 
-        printEndCentralDirectory(blockModel, charset, prefix, out);
+        printEndCentralDirectory(out, blockModel, charset, offs, columnWidth);
         out.println();
-        printZip64(blockModel, charset, prefix, out);
+        printZip64(out, blockModel, offs, columnWidth);
         out.println();
         printCentralDirectory(blockModel, charset, prefix, out);
         out.println();
         printZipEntries(zipEntryModel, charset, prefix, out);
     }
 
-    private static void printEndCentralDirectory(BlockModel blockModel, Charset charset, String prefix, PrintStream out) {
+    private static void printEndCentralDirectory(PrintStream out, BlockModel blockModel, Charset charset, int offs, int columnWidth) {
         EndCentralDirectoryView.builder()
                                .endCentralDirectory(blockModel.getEndCentralDirectory())
                                .block(blockModel.getDiagnostic().getEndCentralDirectory())
                                .charset(charset)
-                               .offs(prefix.length())
-                               .columnWidth(52).build().print(out);
+                               .offs(offs)
+                               .columnWidth(columnWidth).build().print(out);
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
-    private static void printZip64(BlockModel blockModel, Charset charset, String prefix, PrintStream out) {
+    private static void printZip64(PrintStream out, BlockModel blockModel, int offs, int columnWidth) {
         Zip64View.builder()
                  .zip64(blockModel.getZip64())
                  .diagZip64(blockModel.getDiagnostic().getZip64())
-                 .charset(charset)
-                 .prefix(prefix).build().print(out);
+                 .offs(offs)
+                 .columnWidth(columnWidth).build().print(out);
     }
 
     private static void printCentralDirectory(BlockModel blockModel, Charset charset, String prefix, PrintStream out) {
