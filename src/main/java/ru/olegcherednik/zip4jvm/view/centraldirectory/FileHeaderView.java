@@ -1,10 +1,18 @@
-package ru.olegcherednik.zip4jvm.view;
+package ru.olegcherednik.zip4jvm.view.centraldirectory;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
+import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
+import ru.olegcherednik.zip4jvm.view.ExternalFileAttributesView;
+import ru.olegcherednik.zip4jvm.view.GeneralPurposeFlagView;
+import ru.olegcherednik.zip4jvm.view.InternalFileAttributesView;
+import ru.olegcherednik.zip4jvm.view.LastModifiedTimeView;
+import ru.olegcherednik.zip4jvm.view.StringHexView;
+import ru.olegcherednik.zip4jvm.view.VersionView;
+import ru.olegcherednik.zip4jvm.view.View;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
 
 import java.io.PrintStream;
@@ -15,7 +23,7 @@ import java.util.Optional;
  * @author Oleg Cherednik
  * @since 14.10.2019
  */
-public final class FileHeaderView extends View {
+final class FileHeaderView extends View {
 
     private final CentralDirectory.FileHeader fileHeader;
     private final Diagnostic.CentralDirectory.FileHeader diagFileHeader;
@@ -36,12 +44,7 @@ public final class FileHeaderView extends View {
 
     @Override
     public boolean print(PrintStream out) {
-        printTitle(out, String.format("Central directory entry %s #%d: %d bytes",
-                ViewUtils.signature(CentralDirectory.FileHeader.SIGNATURE), pos + 1, diagFileHeader.getSize()));
-
-        out.println();
-
-        printFileNameTitle(out);
+        printSubTitle(out, pos, charset, fileHeader.getFileName(), diagFileHeader);
         printLocation(out);
         printVersion(out);
         printGeneralPurposeFlag(out);
@@ -54,12 +57,7 @@ public final class FileHeaderView extends View {
         printInternalFileAttributesView(out);
         printExternalFileAttributes(out);
         printExtraField(out);
-
         return true;
-    }
-
-    private void printFileNameTitle(PrintStream out) {
-        printLine(out, String.format("filename (%s): %s", charset.name(), fileHeader.getFileName()));
     }
 
     private void printLocation(PrintStream out) {

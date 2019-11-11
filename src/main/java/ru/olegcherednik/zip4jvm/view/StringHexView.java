@@ -68,8 +68,10 @@ public final class StringHexView extends View {
 
             int end = total * 3 + offs;
 
-            for(int i = 0; i <= columnWidth - end; i++)
+            for(int i = 0; i < columnWidth - end; i++)
                 out.print(' ');
+
+            out.print(' ');
 
             for (int i = 0; i < 16; i += Optional.ofNullable(charsLength.poll()).orElse(1)) {
                 if (chars.isEmpty())

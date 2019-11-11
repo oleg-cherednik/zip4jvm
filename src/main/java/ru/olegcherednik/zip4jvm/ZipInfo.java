@@ -22,7 +22,7 @@ import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.os.ExtendedTimestampExtraField;
 import ru.olegcherednik.zip4jvm.model.os.InfoZipNewUnixExtraField;
-import ru.olegcherednik.zip4jvm.view.CentralDirectoryView;
+import ru.olegcherednik.zip4jvm.view.centraldirectory.CentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntryListView;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntryView;
@@ -78,8 +78,8 @@ public final class ZipInfo {
             out.println();
         if (printZip64(out, blockModel, offs, columnWidth))
             out.println();
-        printCentralDirectory(blockModel, charset, prefix, out);
-        out.println();
+        if (printCentralDirectory(out, blockModel, charset, offs, columnWidth))
+            out.println();
         printZipEntries(zipEntryModel, charset, prefix, out);
     }
 
@@ -101,12 +101,13 @@ public final class ZipInfo {
                         .columnWidth(columnWidth).build().print(out);
     }
 
-    private static void printCentralDirectory(BlockModel blockModel, Charset charset, String prefix, PrintStream out) {
-        CentralDirectoryView.builder()
-                            .centralDirectory(blockModel.getCentralDirectory())
-                            .diagCentralDirectory(blockModel.getDiagnostic().getCentralDirectory())
-                            .charset(charset)
-                            .prefix(prefix).build().print(out);
+    private static boolean printCentralDirectory(PrintStream out, BlockModel blockModel, Charset charset, int offs, int columnWidth) {
+        return CentralDirectoryView.builder()
+                                   .centralDirectory(blockModel.getCentralDirectory())
+                                   .diagCentralDirectory(blockModel.getDiagnostic().getCentralDirectory())
+                                   .charset(charset)
+                                   .offs(offs)
+                                   .columnWidth(columnWidth).build().print(out);
     }
 
     private static void printZipEntries(BlockZipEntryModel zipEntryModel, Charset charset, String prefix, PrintStream out) throws IOException {
