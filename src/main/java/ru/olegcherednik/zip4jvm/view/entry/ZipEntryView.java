@@ -47,39 +47,48 @@ public final class ZipEntryView extends View {
     }
 
     @Override
-    public void print(PrintStream out) {
-        printLocalFileHeader(out);
-        out.println();
-        printEncryptionHeader(out);
-        out.println();
-        printDataDescriptor(out);
+    public boolean print(PrintStream out) {
+        boolean res = false;
+
+        if (printLocalFileHeader(out)) {
+            res = true;
+            out.println();
+        }
+
+        if (printEncryptionHeader(out)) {
+            res = true;
+            out.println();
+        }
+
+        res |= printDataDescriptor(out);
+        return res;
     }
 
-    private void printLocalFileHeader(PrintStream out) {
-        LocalFileHeaderView.builder()
-                           .localFileHeader(localFileHeader)
-                           .diagLocalFileHeader(diagLocalFileHeader)
-                           .pos(pos)
-                           .charset(charset)
-                           .offs(offs)
-                           .columnWidth(columnWidth).build().print(out);
+    private boolean printLocalFileHeader(PrintStream out) {
+        return LocalFileHeaderView.builder()
+                                  .localFileHeader(localFileHeader)
+                                  .diagLocalFileHeader(diagLocalFileHeader)
+                                  .pos(pos)
+                                  .charset(charset)
+                                  .offs(offs)
+                                  .columnWidth(columnWidth).build().print(out);
     }
 
-    private void printEncryptionHeader(PrintStream out) {
-        EncryptionHeaderView.builder()
-                            .encryptionHeader(encryptionHeader)
-                            .pos(pos)
-                            .offs(offs)
-                            .columnWidth(columnWidth).build().print(out);
+    private boolean printEncryptionHeader(PrintStream out) {
+        return EncryptionHeaderView.builder()
+                                   .encryptionHeader(encryptionHeader)
+                                   .pos(pos)
+                                   .offs(offs)
+                                   .columnWidth(columnWidth).build().print(out);
     }
 
-    private void printDataDescriptor(PrintStream out) {
-        DataDescriptorView.builder()
-                          .dataDescriptor(dataDescriptor)
-                          .block(blockDataDescriptor)
-                          .pos(pos)
-                          .offs(offs)
-                          .columnWidth(columnWidth).build().print(out);
+    private boolean printDataDescriptor(PrintStream out) {
+        return DataDescriptorView.builder()
+                                 .dataDescriptor(dataDescriptor)
+                                 .block(blockDataDescriptor)
+                                 .pos(pos)
+                                 .offs(offs)
+                                 .columnWidth(columnWidth).build().print(out);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

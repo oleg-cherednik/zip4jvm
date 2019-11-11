@@ -25,7 +25,7 @@ public abstract class View {
         prefix = StringUtils.repeat(" ", offs);
     }
 
-    public abstract void print(PrintStream out);
+    public abstract boolean print(PrintStream out);
 
     protected final void printLine(PrintStream out, String one, String two) {
         if (offs > 0)

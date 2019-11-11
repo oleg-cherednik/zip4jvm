@@ -29,15 +29,17 @@ public final class EncryptionHeaderView extends View {
     }
 
     @Override
-    public void print(PrintStream out) {
+    public boolean print(PrintStream out) {
         if (encryptionHeader == null)
-            return;
+            return false;
 
         if (encryptionHeader instanceof BlockAesEncryptionHeader)
             createView((BlockAesEncryptionHeader)encryptionHeader).print(out);
         else if (encryptionHeader instanceof PkwareEncryptionHeader)
             createView((PkwareEncryptionHeader)encryptionHeader).print(out);
         // TODO add for unknown encryption header
+
+        return true;
     }
 
     private BlockAesEncryptionHeaderView createView(BlockAesEncryptionHeader encryptionHeader) {

@@ -29,9 +29,9 @@ final class InfoZipNewUnixExtraFieldView extends View {
     }
 
     @Override
-    public void print(PrintStream out) {
+    public boolean print(PrintStream out) {
         if (record.isNull() || block == Block.NULL)
-            return;
+            return false;
 
         printLine(out, String.format("(0x%04X) new InfoZIP Unix/OS2/NT: ", record.getSignature()), String.format("%d bytes", block.getSize()));
         printLine(out, "  - location:", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
@@ -42,6 +42,8 @@ final class InfoZipNewUnixExtraFieldView extends View {
             print((InfoZipNewUnixExtraField.VersionOnePayload)record.getPayload(), out);
         else if (payload instanceof InfoZipNewUnixExtraField.VersionUnknownPayload)
             print((InfoZipNewUnixExtraField.VersionUnknownPayload)record.getPayload(), out);
+
+        return true;
     }
 
     private void print(InfoZipNewUnixExtraField.VersionOnePayload payload, PrintStream out) {

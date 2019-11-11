@@ -29,26 +29,32 @@ public final class Zip64View extends View {
     }
 
     @Override
-    public void print(PrintStream out) {
-        printEndCentralDirectorLocator(out);
-        out.println();
-        printEndCentralDirectory(out);
+    public boolean print(PrintStream out) {
+        boolean res = false;
+
+        if (printEndCentralDirectorLocator(out)) {
+            res = true;
+            out.println();
+        }
+
+        res |= printEndCentralDirectory(out);
+        return res;
     }
 
-    private void printEndCentralDirectorLocator(PrintStream out) {
-        EndCentralDirectoryLocatorView.builder()
-                                      .locator(zip64.getEndCentralDirectoryLocator())
-                                      .block(diagZip64.getEndCentralDirectoryLocator())
+    private boolean printEndCentralDirectorLocator(PrintStream out) {
+        return EndCentralDirectoryLocatorView.builder()
+                                             .locator(zip64.getEndCentralDirectoryLocator())
+                                             .block(diagZip64.getEndCentralDirectoryLocator())
+                                             .offs(offs)
+                                             .columnWidth(columnWidth).build().print(out);
+    }
+
+    private boolean printEndCentralDirectory(PrintStream out) {
+        return EndCentralDirectoryView.builder()
+                                      .endCentralDirectory(zip64.getEndCentralDirectory())
+                                      .block(diagZip64.getEndCentralDirectory())
                                       .offs(offs)
                                       .columnWidth(columnWidth).build().print(out);
-    }
-
-    private void printEndCentralDirectory(PrintStream out) {
-        EndCentralDirectoryView.builder()
-                               .endCentralDirectory(zip64.getEndCentralDirectory())
-                               .block(diagZip64.getEndCentralDirectory())
-                               .offs(offs)
-                               .columnWidth(columnWidth).build().print(out);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

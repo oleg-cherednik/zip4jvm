@@ -35,7 +35,7 @@ public final class FileHeaderView extends View {
     }
 
     @Override
-    public void print(PrintStream out) {
+    public boolean print(PrintStream out) {
         printTitle(out, String.format("Central directory entry %s #%d: %d bytes",
                 ViewUtils.signature(CentralDirectory.FileHeader.SIGNATURE), pos + 1, diagFileHeader.getSize()));
 
@@ -54,6 +54,8 @@ public final class FileHeaderView extends View {
         printInternalFileAttributesView(out);
         printExternalFileAttributes(out);
         printExtraField(out);
+
+        return true;
     }
 
     private void printFileNameTitle(PrintStream out) {

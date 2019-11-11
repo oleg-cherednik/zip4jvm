@@ -74,31 +74,31 @@ public final class ZipInfo {
 
         PrintStream out = System.out;
 
-        printEndCentralDirectory(out, blockModel, charset, offs, columnWidth);
-        out.println();
-        printZip64(out, blockModel, offs, columnWidth);
-        out.println();
+        if (printEndCentralDirectory(out, blockModel, charset, offs, columnWidth))
+            out.println();
+        if (printZip64(out, blockModel, offs, columnWidth))
+            out.println();
         printCentralDirectory(blockModel, charset, prefix, out);
         out.println();
         printZipEntries(zipEntryModel, charset, prefix, out);
     }
 
-    private static void printEndCentralDirectory(PrintStream out, BlockModel blockModel, Charset charset, int offs, int columnWidth) {
-        EndCentralDirectoryView.builder()
-                               .endCentralDirectory(blockModel.getEndCentralDirectory())
-                               .block(blockModel.getDiagnostic().getEndCentralDirectory())
-                               .charset(charset)
-                               .offs(offs)
-                               .columnWidth(columnWidth).build().print(out);
+    private static boolean printEndCentralDirectory(PrintStream out, BlockModel blockModel, Charset charset, int offs, int columnWidth) {
+        return EndCentralDirectoryView.builder()
+                                      .endCentralDirectory(blockModel.getEndCentralDirectory())
+                                      .block(blockModel.getDiagnostic().getEndCentralDirectory())
+                                      .charset(charset)
+                                      .offs(offs)
+                                      .columnWidth(columnWidth).build().print(out);
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
-    private static void printZip64(PrintStream out, BlockModel blockModel, int offs, int columnWidth) {
-        Zip64View.builder()
-                 .zip64(blockModel.getZip64())
-                 .diagZip64(blockModel.getDiagnostic().getZip64())
-                 .offs(offs)
-                 .columnWidth(columnWidth).build().print(out);
+    private static boolean printZip64(PrintStream out, BlockModel blockModel, int offs, int columnWidth) {
+        return Zip64View.builder()
+                        .zip64(blockModel.getZip64())
+                        .diagZip64(blockModel.getDiagnostic().getZip64())
+                        .offs(offs)
+                        .columnWidth(columnWidth).build().print(out);
     }
 
     private static void printCentralDirectory(BlockModel blockModel, Charset charset, String prefix, PrintStream out) {

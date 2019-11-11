@@ -24,11 +24,13 @@ public class InternalFileAttributesView extends View {
     }
 
     @Override
-    public void print(PrintStream out) {
+    public boolean print(PrintStream out) {
         byte[] data = internalFileAttributes.getData();
 
         printLine(out, "internal file attributes:", String.format("0x%04X", data[1] << 8 | data[0]));
         printLine(out, "  apparent file type: ", internalFileAttributes.getApparentFileType().getTitle());
+
+        return true;
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

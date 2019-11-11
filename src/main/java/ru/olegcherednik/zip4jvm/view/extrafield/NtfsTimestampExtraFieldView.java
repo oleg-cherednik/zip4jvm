@@ -28,9 +28,9 @@ final class NtfsTimestampExtraFieldView extends View {
     }
 
     @Override
-    public void print(PrintStream out) {
+    public boolean print(PrintStream out) {
         if (record.isNull() || block == Block.NULL)
-            return;
+            return false;
 
         printLine(out, String.format("(0x%04X) NTFS Timestamps:", record.getSignature()), String.format("%d bytes", block.getSize()));
         printLine(out, "  - location:", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
@@ -42,6 +42,8 @@ final class NtfsTimestampExtraFieldView extends View {
             else if (tag instanceof NtfsTimestampExtraField.UnknownTag)
                 print((NtfsTimestampExtraField.UnknownTag)tag, out);
         }
+
+        return true;
     }
 
     private void print(NtfsTimestampExtraField.OneTag tag, PrintStream out) {

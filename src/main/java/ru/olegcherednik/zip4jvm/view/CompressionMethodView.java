@@ -27,7 +27,7 @@ public final class CompressionMethodView extends View {
     }
 
     @Override
-    public void print(PrintStream out) {
+    public boolean print(PrintStream out) {
         printLine(out, String.format("compression method (%02d):", compressionMethod.getCode()), compressionMethod.getTitle());
 
         if (compressionMethod == CompressionMethod.FILE_IMPLODED) {
@@ -37,6 +37,10 @@ public final class CompressionMethodView extends View {
             printLine(out, "  end-of-stream (EOS) marker:", generalPurposeFlag.isEosMarker() ? "yes" : "no");
         else if (compressionMethod == CompressionMethod.DEFLATE || compressionMethod == CompressionMethod.FILE_ENHANCED_DEFLATED)
             printLine(out, "  compression sub-type (deflation):", generalPurposeFlag.getCompressionLevel().getTitle());
+
+        // TODO add for unknown compression method
+
+        return true;
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

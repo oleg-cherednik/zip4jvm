@@ -28,7 +28,7 @@ final class PkwareEncryptionHeaderView extends View {
     }
 
     @Override
-    public void print(PrintStream out) {
+    public boolean print(PrintStream out) {
         printTitle(out, String.format("#%d (PKWARE) encryption header", pos + 1));
         out.println();
         printLine(out, "data:", String.format("%d bytes", encryptionHeader.getData().getSize()));
@@ -38,6 +38,8 @@ final class PkwareEncryptionHeaderView extends View {
                         .buf(encryptionHeader.getData().getData())
                         .offs(offs)
                         .columnWidth(columnWidth).build().print(out);
+
+        return true;
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

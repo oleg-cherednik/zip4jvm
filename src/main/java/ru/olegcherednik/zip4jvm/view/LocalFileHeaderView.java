@@ -36,7 +36,7 @@ public final class LocalFileHeaderView extends View {
     }
 
     @Override
-    public void print(PrintStream out) {
+    public boolean print(PrintStream out) {
         printTitle(out, String.format("#%d (%s) Local directory entry - %d bytes",
                 pos + 1, ViewUtils.signature(LocalFileHeader.SIGNATURE), diagLocalFileHeader.getContent().getSize()));
 
@@ -52,6 +52,8 @@ public final class LocalFileHeaderView extends View {
         printSize(out);
         printFileName(out);
         printExtraField(out);
+
+        return true;
     }
 
     private void printFileNameTitle(PrintStream out) {

@@ -31,9 +31,9 @@ final class AesExtraDataRecordView extends View {
     }
 
     @Override
-    public void print(PrintStream out) {
+    public boolean print(PrintStream out) {
         if (record.isNull() || block == Block.NULL)
-            return;
+            return false;
 
         printLine(out, String.format("(0x%04X) AES Encryption Tag:", record.getSignature()), String.format("%d bytes", block.getSize()));
         printLine(out, "  - location:", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
@@ -45,6 +45,8 @@ final class AesExtraDataRecordView extends View {
                              .generalPurposeFlag(generalPurposeFlag)
                              .offs(offs + 2)
                              .columnWidth(columnWidth).build().print(out);
+
+        return true;
     }
 
     public static final class Builder {

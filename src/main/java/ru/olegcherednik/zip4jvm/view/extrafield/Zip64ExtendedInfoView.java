@@ -28,9 +28,9 @@ final class Zip64ExtendedInfoView extends View {
     }
 
     @Override
-    public void print(PrintStream out) {
+    public boolean print(PrintStream out) {
         if (record.isNull() || block == Block.NULL)
-            return;
+            return false;
 
         printLine(out, String.format("(0x%04X) Zip64 Extended Information:", record.getSignature()), String.format("%d bytes", block.getSize()));
         printLine(out, "  - location:", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
@@ -43,6 +43,8 @@ final class Zip64ExtendedInfoView extends View {
             printLine(out, "  original relative offset of local header:", String.format("%1$d (0x%1$08X) bytes", record.getLocalFileHeaderOffs()));
         if (record.getDisk() != ExtraField.NO_DATA)
             printLine(out, String.format("  original part number of this part (%04X):", record.getDisk()), String.valueOf(record.getDisk()));
+
+        return true;
     }
 
     public static final class Builder {

@@ -29,9 +29,9 @@ public final class StringHexView extends View {
     }
 
     @Override
-    public void print(PrintStream out) {
+    public boolean print(PrintStream out) {
         if (str == null)
-            return;
+            return false;
 
         printLine(out, "", charset.name());
 
@@ -79,6 +79,8 @@ public final class StringHexView extends View {
 
             out.println();
         }
+
+        return true;
     }
 
     public static final class Builder {

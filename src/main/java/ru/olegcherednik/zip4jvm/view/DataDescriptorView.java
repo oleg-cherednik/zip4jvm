@@ -30,9 +30,9 @@ public final class DataDescriptorView extends View {
     }
 
     @Override
-    public void print(PrintStream out) {
+    public boolean print(PrintStream out) {
         if (dataDescriptor == null || block == Block.NULL)
-            return;
+            return false;
 
         printTitle(out, String.format("#%d (%s) Data descriptor", pos + 1, ViewUtils.signature(DataDescriptor.SIGNATURE)));
         out.println();
@@ -41,6 +41,8 @@ public final class DataDescriptorView extends View {
         printLine(out, "32-bit CRC value:", String.format("0x%08X", dataDescriptor.getCrc32()));
         printLine(out, "compressed size:", String.format("%d bytes", dataDescriptor.getCompressedSize()));
         printLine(out, "uncompressed size:", String.format("%d bytes", dataDescriptor.getUncompressedSize()));
+
+        return true;
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

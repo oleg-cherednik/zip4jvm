@@ -28,12 +28,13 @@ final class BlockAesEncryptionHeaderView extends View {
     }
 
     @Override
-    public void print(PrintStream out) {
+    public boolean print(PrintStream out) {
         printTitle(out, String.format("#%d (AES) encryption header", pos + 1));
         out.println();
         printSalt(out);
         printPasswordChecksum(out);
         printMac(out);
+        return true;
     }
 
     private void printSalt(PrintStream out) {

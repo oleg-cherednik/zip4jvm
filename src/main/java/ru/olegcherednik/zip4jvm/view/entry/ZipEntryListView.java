@@ -31,15 +31,17 @@ public final class ZipEntryListView extends View {
     }
 
     @Override
-    public void print(PrintStream out) {
+    public boolean print(PrintStream out) {
         if (blockZipEntryModel == null || blockZipEntryModel.getLocalFileHeaders() == null || blockZipEntryModel.getLocalFileHeaders().isEmpty())
-            return;
+            return false;
 
         printTitle(out, "Zip entry:");
         out.println();
         printLine(out, "total number of entries:", String.valueOf(blockZipEntryModel.getLocalFileHeaders().size()));
         out.println();
         printZipEntries(out);
+
+        return true;
     }
 
     private void printZipEntries(PrintStream out) {

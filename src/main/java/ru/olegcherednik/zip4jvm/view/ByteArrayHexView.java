@@ -24,9 +24,9 @@ public final class ByteArrayHexView extends View {
     }
 
     @Override
-    public void print(PrintStream out) {
+    public boolean print(PrintStream out) {
         if (ArrayUtils.isEmpty(buf))
-            return;
+            return false;
 
         Deque<Integer> hexs = new LinkedList<>();
 
@@ -46,6 +46,8 @@ public final class ByteArrayHexView extends View {
 
             out.println();
         }
+
+        return true;
     }
 
     public static final class Builder {

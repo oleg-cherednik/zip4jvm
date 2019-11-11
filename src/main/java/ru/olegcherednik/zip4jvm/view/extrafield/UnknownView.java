@@ -28,9 +28,9 @@ final class UnknownView extends View {
     }
 
     @Override
-    public void print(PrintStream out) {
+    public boolean print(PrintStream out) {
         if (block == Block.NULL)
-            return;
+            return false;
 
         printLine(out, String.format("(0x%04X) Unknown:", record.getSignature()), String.format("%d bytes", block.getSize()));
         printLine(out, "  - location:", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
@@ -39,6 +39,8 @@ final class UnknownView extends View {
                         .buf(record.getData())
                         .offs(offs)
                         .columnWidth(columnWidth).build().print(out);
+
+        return true;
     }
 
     public static final class Builder {

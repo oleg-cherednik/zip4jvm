@@ -24,12 +24,13 @@ public final class LastModifiedTimeView extends View {
     }
 
     @Override
-    public void print(PrintStream out) {
+    public boolean print(PrintStream out) {
         int date = lastModifiedTime >> 16;
         int time = lastModifiedTime & 0xFFFF;
         long ms = DosTimestampConverter.dosToJavaTime(lastModifiedTime);
 
         printLine(out, String.format("file last modified on (0x%04X 0x%04X):", date, time), String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", ms));
+        return true;
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

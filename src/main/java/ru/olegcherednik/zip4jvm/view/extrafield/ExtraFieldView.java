@@ -37,15 +37,17 @@ public final class ExtraFieldView extends View {
     }
 
     @Override
-    public void print(PrintStream out) {
+    public boolean print(PrintStream out) {
         int total = extraField.getTotalRecords();
 
         if (total == 0)
-            return;
+            return false;
 
         printLocation(out);
         printSize(total, out);
         printRecords(out);
+
+        return true;
     }
 
     private void printLocation(PrintStream out) {

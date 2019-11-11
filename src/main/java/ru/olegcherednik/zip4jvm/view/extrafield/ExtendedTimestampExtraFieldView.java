@@ -27,9 +27,9 @@ final class ExtendedTimestampExtraFieldView extends View {
     }
 
     @Override
-    public void print(PrintStream out) {
+    public boolean print(PrintStream out) {
         if (record.isNull() || block == Block.NULL)
-            return;
+            return false;
 
         printLine(out, String.format("(0x%04X) Universal time:", record.getSignature()), String.format("%d bytes", block.getSize()));
         printLine(out, "  - location:", String.format("%1$d (0x%1$08X) bytes", block.getSize()));
@@ -40,6 +40,8 @@ final class ExtendedTimestampExtraFieldView extends View {
             printLine(out, "  Last Accessed Date:", String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", record.getLastAccessTime()));
         if (record.getFlag().isCreationTime())
             printLine(out, "  Creation Date:", String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", record.getCreationTime()));
+
+        return true;
     }
 
     public static final class Builder {

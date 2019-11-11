@@ -29,9 +29,9 @@ final class InfoZipOldUnixExtraFieldView extends View {
     }
 
     @Override
-    public void print(PrintStream out) {
+    public boolean print(PrintStream out) {
         if (record.isNull() || block == Block.NULL)
-            return;
+            return false;
 
         printLine(out, String.format("(0x%04X) old InfoZIP Unix/OS2/NT:", record.getSignature()), String.format("%d bytes", block.getSize()));
         printLine(out, "  - location:", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
@@ -42,6 +42,8 @@ final class InfoZipOldUnixExtraFieldView extends View {
             printLine(out, "  User identifier (UID):", String.valueOf(record.getUid()));
         if (record.getGid() != NO_DATA)
             printLine(out, "  Group Identifier (GID):", String.valueOf(record.getGid()));
+
+        return true;
     }
 
     public static final class Builder {

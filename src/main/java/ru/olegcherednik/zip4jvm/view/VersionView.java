@@ -27,31 +27,36 @@ public final class VersionView extends View {
     }
 
     @Override
-    public void print(PrintStream out) {
-        printVersionMadeBy(out);
-        printVersionToExtract(out);
+    public boolean print(PrintStream out) {
+        boolean res = printVersionMadeBy(out);
+        res |= printVersionToExtract(out);
+        return res;
     }
 
-    private void printVersionMadeBy(PrintStream out) {
+    private boolean printVersionMadeBy(PrintStream out) {
         if (versionMadeBy == Version.NULL)
-            return;
+            return false;
 
         Version.FileSystem fileSystem = versionMadeBy.getFileSystem();
         int zipVersion = versionMadeBy.getZipSpecificationVersion();
 
         printLine(out, String.format("version made by operating system (%02d):", fileSystem.getCode()), fileSystem.getTitle());
         printLine(out, String.format("version made by zip software (%02d):", zipVersion), String.valueOf(zipVersion / 10.));
+
+        return true;
     }
 
-    private void printVersionToExtract(PrintStream out) {
+    private boolean printVersionToExtract(PrintStream out) {
         if (versionToExtract == Version.NULL)
-            return;
+            return false;
 
         Version.FileSystem fileSystem = versionToExtract.getFileSystem();
         int zipVersion = versionToExtract.getZipSpecificationVersion();
 
         printLine(out, String.format("operat. system version needed to extract (%02d):", fileSystem.getCode()), fileSystem.getTitle());
         printLine(out, String.format("unzip software version needed to extract (%02d):", zipVersion), String.valueOf(zipVersion / 10.));
+
+        return true;
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

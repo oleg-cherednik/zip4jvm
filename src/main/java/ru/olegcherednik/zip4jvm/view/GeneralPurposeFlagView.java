@@ -28,7 +28,7 @@ public final class GeneralPurposeFlagView extends View {
     }
 
     @Override
-    public void print(PrintStream out) {
+    public boolean print(PrintStream out) {
         int val = generalPurposeFlag.getAsInt(compressionMethod);
 
         printLine(out, String.format("general purpose bit flag (0x%04X) (bit 15..0):", val),
@@ -41,6 +41,8 @@ public final class GeneralPurposeFlagView extends View {
         printLine(out, "  data descriptor       (bit 3):", generalPurposeFlag.isDataDescriptorAvailable() ? "yes" : "no");
         printLine(out, "  strong encryption     (bit 6):", generalPurposeFlag.isStrongEncryption() ? "yes" : "no");
         printLine(out, "  UTF-8 names          (bit 11):", generalPurposeFlag.isUtf8() ? "yes" : "no");
+
+        return true;
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
