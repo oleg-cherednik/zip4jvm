@@ -108,7 +108,7 @@ public final class ZipInfo {
                                    .columnWidth(columnWidth).build();
     }
 
-    private static ZipEntryListView createZipEntriesView(BlockZipEntryModel zipEntryModel, Charset charset, int offs, int columnWidth) {
+    private static IView createZipEntriesView(BlockZipEntryModel zipEntryModel, Charset charset, int offs, int columnWidth) {
         return ZipEntryListView.builder()
                                .blockZipEntryModel(zipEntryModel)
                                .charset(charset)

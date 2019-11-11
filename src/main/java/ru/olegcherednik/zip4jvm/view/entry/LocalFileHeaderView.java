@@ -12,7 +12,6 @@ import ru.olegcherednik.zip4jvm.view.LastModifiedTimeView;
 import ru.olegcherednik.zip4jvm.view.StringHexView;
 import ru.olegcherednik.zip4jvm.view.VersionView;
 import ru.olegcherednik.zip4jvm.view.View;
-import ru.olegcherednik.zip4jvm.view.ViewUtils;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
 
 import java.io.PrintStream;
@@ -45,13 +44,8 @@ final class LocalFileHeaderView extends View {
 
     @Override
     public boolean print(PrintStream out) {
-        printTitle(out, String.format("#%d (%s) Local directory entry - %d bytes",
-                pos + 1, ViewUtils.signature(LocalFileHeader.SIGNATURE), diagLocalFileHeader.getContent().getSize()));
-
-        out.println();
-
-        printFileNameTitle(out);
-        printLocation(out);
+        printSubTitle(out, LocalFileHeader.SIGNATURE, pos, '[' + charset.name() + "] " + localFileHeader.getFileName(),
+                diagLocalFileHeader.getContent());
         printVersion(out);
         printGeneralPurposeFlag(out);
         printCompressionMethod(out);
@@ -62,15 +56,6 @@ final class LocalFileHeaderView extends View {
         printExtraField(out);
 
         return true;
-    }
-
-    private void printFileNameTitle(PrintStream out) {
-        printLine(out, String.format("filename (%s): %s", charset.name(), localFileHeader.getFileName()));
-    }
-
-    private void printLocation(PrintStream out) {
-        printLine(out, String.format("--- part number (%04X): %d ---", diagLocalFileHeader.getDisk(), diagLocalFileHeader.getDisk() + 1));
-        printLine(out, "location:", String.format("%1$d (0x%1$08X) bytes", diagLocalFileHeader.getContent().getOffs()));
     }
 
     private void printVersion(PrintStream out) {

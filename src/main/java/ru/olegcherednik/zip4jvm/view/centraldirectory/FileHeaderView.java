@@ -44,7 +44,7 @@ final class FileHeaderView extends View {
 
     @Override
     public boolean print(PrintStream out) {
-        printSubTitle(out, pos, charset, fileHeader.getFileName(), diagFileHeader);
+        printSubTitle(out, CentralDirectory.FileHeader.SIGNATURE, pos, '[' + charset.name() + "] " + fileHeader.getFileName(), diagFileHeader);
         printLocation(out);
         printVersion(out);
         printGeneralPurposeFlag(out);

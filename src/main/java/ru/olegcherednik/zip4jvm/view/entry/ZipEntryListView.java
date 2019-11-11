@@ -2,9 +2,11 @@ package ru.olegcherednik.zip4jvm.view.entry;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.apache.commons.collections4.MapUtils;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.block.BlockZipEntryModel;
+import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
@@ -32,15 +34,9 @@ public final class ZipEntryListView extends View {
 
     @Override
     public boolean print(PrintStream out) {
-        if (blockZipEntryModel == null || blockZipEntryModel.getLocalFileHeaders() == null || blockZipEntryModel.getLocalFileHeaders().isEmpty())
-            return false;
-
-        printTitle(out, "Zip entry:");
-        out.println();
-        printLine(out, "total number of entries:", String.valueOf(blockZipEntryModel.getLocalFileHeaders().size()));
-        out.println();
+        printTitle(out, LocalFileHeader.SIGNATURE, "ZIP entries");
+        printLine(out, "total entries:", String.valueOf(blockZipEntryModel.getLocalFileHeaders().size()));
         printZipEntries(out);
-
         return true;
     }
 
@@ -48,8 +44,7 @@ public final class ZipEntryListView extends View {
         int pos = 0;
 
         for (LocalFileHeader localFileHeader : blockZipEntryModel.getLocalFileHeaders().values()) {
-            if (pos != 0)
-                out.println();
+            out.println();
 
             ZipEntryView.builder()
                         .pos(pos)
@@ -74,8 +69,8 @@ public final class ZipEntryListView extends View {
         private int offs;
         private int columnWidth;
 
-        public ZipEntryListView build() {
-            return new ZipEntryListView(this);
+        public IView build() {
+            return blockZipEntryModel == null || MapUtils.isEmpty(blockZipEntryModel.getLocalFileHeaders()) ? IView.NULL : new ZipEntryListView(this);
         }
 
         public Builder blockZipEntryModel(BlockZipEntryModel blockZipEntryModel) {
