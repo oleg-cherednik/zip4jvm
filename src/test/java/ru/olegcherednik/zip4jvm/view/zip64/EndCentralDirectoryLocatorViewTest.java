@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 @Test
 public class EndCentralDirectoryLocatorViewTest {
 
-    public void shouldRetrieveCompressionMethodTitleWhenSingleLine() throws IOException {
+    public void shouldRetrieveAllLinesWhenLocatorExists() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(20L);
         when(block.getOffs()).thenReturn(11208273384L);
