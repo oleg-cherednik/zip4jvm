@@ -29,8 +29,7 @@ final class BlockAesEncryptionHeaderView extends View {
 
     @Override
     public boolean print(PrintStream out) {
-        printTitle(out, String.format("#%d (AES) encryption header", pos + 1));
-        out.println();
+        printSubTitle(out, pos, "(AES) encryption header");
         printSalt(out);
         printPasswordChecksum(out);
         printMac(out);
@@ -38,8 +37,7 @@ final class BlockAesEncryptionHeaderView extends View {
     }
 
     private void printSalt(PrintStream out) {
-        printLine(out, "salt:", String.format("%d bytes", encryptionHeader.getSalt().getSize()));
-        printLine(out, "  - location:", String.format("%1$d (0x%1$08X) bytes", encryptionHeader.getSalt().getOffs()));
+        printValueLocation(out, "salt:", encryptionHeader.getSalt());
 
         ByteArrayHexView.builder()
                         .buf(encryptionHeader.getSalt().getData())
@@ -48,8 +46,7 @@ final class BlockAesEncryptionHeaderView extends View {
     }
 
     private void printPasswordChecksum(PrintStream out) {
-        printLine(out, "password checksum:", String.format("%d bytes", encryptionHeader.getPasswordChecksum().getSize()));
-        printLine(out, "  - location:", String.format("%1$d (0x%1$08X) bytes", encryptionHeader.getPasswordChecksum().getOffs()));
+        printValueLocation(out, "password checksum:", encryptionHeader.getPasswordChecksum());
 
         ByteArrayHexView.builder()
                         .buf(encryptionHeader.getPasswordChecksum().getData())
@@ -58,8 +55,7 @@ final class BlockAesEncryptionHeaderView extends View {
     }
 
     private void printMac(PrintStream out) {
-        printLine(out, "mac:", String.format("%d bytes", encryptionHeader.getMac().getSize()));
-        printLine(out, "  - location:", String.format("%1$d (0x%1$08X) bytes", encryptionHeader.getMac().getOffs()));
+        printValueLocation(out, "mac:", encryptionHeader.getMac());
 
         ByteArrayHexView.builder()
                         .buf(encryptionHeader.getMac().getData())

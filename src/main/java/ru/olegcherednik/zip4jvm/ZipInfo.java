@@ -22,6 +22,7 @@ import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.os.ExtendedTimestampExtraField;
 import ru.olegcherednik.zip4jvm.model.os.InfoZipNewUnixExtraField;
+import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.CentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntryListView;
@@ -74,48 +75,45 @@ public final class ZipInfo {
 
         PrintStream out = System.out;
 
-        if (printEndCentralDirectory(out, blockModel, charset, offs, columnWidth))
-            out.println();
-        if (printZip64(out, blockModel, offs, columnWidth))
-            out.println();
-        if (printCentralDirectory(out, blockModel, charset, offs, columnWidth))
-            out.println();
-        printZipEntries(zipEntryModel, charset, prefix, out);
+        boolean emptyLine = createEndCentralDirectoryView(blockModel, charset, offs, columnWidth).print(out);
+        emptyLine = createZip64View(blockModel, offs, columnWidth).print(out, emptyLine);
+        emptyLine = createCentralDirectoryView(blockModel, charset, offs, columnWidth).print(out, emptyLine);
+        createZipEntriesView(zipEntryModel, charset, offs, columnWidth).print(out, emptyLine);
     }
 
-    private static boolean printEndCentralDirectory(PrintStream out, BlockModel blockModel, Charset charset, int offs, int columnWidth) {
+    private static IView createEndCentralDirectoryView(BlockModel blockModel, Charset charset, int offs, int columnWidth) {
         return EndCentralDirectoryView.builder()
                                       .endCentralDirectory(blockModel.getEndCentralDirectory())
                                       .block(blockModel.getDiagnostic().getEndCentralDirectory())
                                       .charset(charset)
                                       .offs(offs)
-                                      .columnWidth(columnWidth).build().print(out);
+                                      .columnWidth(columnWidth).build();
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
-    private static boolean printZip64(PrintStream out, BlockModel blockModel, int offs, int columnWidth) {
+    private static IView createZip64View(BlockModel blockModel, int offs, int columnWidth) {
         return Zip64View.builder()
                         .zip64(blockModel.getZip64())
                         .diagZip64(blockModel.getDiagnostic().getZip64())
                         .offs(offs)
-                        .columnWidth(columnWidth).build().print(out);
+                        .columnWidth(columnWidth).build();
     }
 
-    private static boolean printCentralDirectory(PrintStream out, BlockModel blockModel, Charset charset, int offs, int columnWidth) {
+    private static IView createCentralDirectoryView(BlockModel blockModel, Charset charset, int offs, int columnWidth) {
         return CentralDirectoryView.builder()
                                    .centralDirectory(blockModel.getCentralDirectory())
                                    .diagCentralDirectory(blockModel.getDiagnostic().getCentralDirectory())
                                    .charset(charset)
                                    .offs(offs)
-                                   .columnWidth(columnWidth).build().print(out);
+                                   .columnWidth(columnWidth).build();
     }
 
-    private static void printZipEntries(BlockZipEntryModel zipEntryModel, Charset charset, String prefix, PrintStream out) throws IOException {
-        ZipEntryListView.builder()
-                        .blockZipEntryModel(zipEntryModel)
-                        .charset(charset)
-                        .offs(prefix.length())
-                        .columnWidth(52).build().print(out);
+    private static ZipEntryListView createZipEntriesView(BlockZipEntryModel zipEntryModel, Charset charset, int offs, int columnWidth) {
+        return ZipEntryListView.builder()
+                               .blockZipEntryModel(zipEntryModel)
+                               .charset(charset)
+                               .offs(offs)
+                               .columnWidth(columnWidth).build();
     }
 
     public void decompose(Path destDir) throws IOException {

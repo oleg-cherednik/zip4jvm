@@ -12,7 +12,7 @@ import java.util.stream.IntStream;
  * @author Oleg Cherednik
  * @since 05.11.2019
  */
-public abstract class View {
+public abstract class View implements IView {
 
     protected final int offs;
     protected final int columnWidth;
@@ -25,8 +25,6 @@ public abstract class View {
         format = "%-" + columnWidth + "s%s";
         prefix = StringUtils.repeat(" ", offs);
     }
-
-    public abstract boolean print(PrintStream out);
 
     protected final void printLine(PrintStream out, String one, String two) {
         if (offs > 0)
@@ -73,9 +71,21 @@ public abstract class View {
         printLocationAndSize(out, block);
     }
 
+    protected void printSubTitle(PrintStream out, long pos, String title) {
+        String str = String.format("#%d %s", pos + 1, title);
+        out.println(str);
+        IntStream.range(0, str.length()).forEach(i -> out.print('-'));
+        out.println();
+    }
+
     protected void printLocationAndSize(PrintStream out, Block block) {
         printLine(out, "- location:", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
         printLine(out, "- size:", String.format("%s bytes", block.getSize()));
+    }
+
+    protected final void printValueLocation(PrintStream out, String valueName, Block block) {
+        printLine(out, valueName, String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
+        printLine(out, "  - size:", String.format("%s bytes", block.getSize()));
     }
 
 }

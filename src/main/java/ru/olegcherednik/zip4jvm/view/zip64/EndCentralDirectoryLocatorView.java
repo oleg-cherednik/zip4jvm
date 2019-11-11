@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
@@ -30,15 +31,11 @@ final class EndCentralDirectoryLocatorView extends View {
 
     @Override
     public boolean print(PrintStream out) {
-        if (locator == null || block == Block.NULL)
-            return false;
-
         printTitle(out, Zip64.EndCentralDirectoryLocator.SIGNATURE, "ZIP64 End of Central directory locator", block);
         printLine(out, String.format("part number of new-end-of-central-dir (%04X):", locator.getMainDisk()),
                 String.valueOf(locator.getMainDisk() + 1));
         printLine(out, "relative offset of new-end-of-central-dir:", String.format("%1$d (0x%1$08X) bytes", locator.getOffs()));
         printLine(out, "total number of parts in archive:", String.valueOf(locator.getTotalDisks()));
-
         return true;
     }
 
@@ -50,8 +47,8 @@ final class EndCentralDirectoryLocatorView extends View {
         private int offs;
         private int columnWidth;
 
-        public EndCentralDirectoryLocatorView build() {
-            return new EndCentralDirectoryLocatorView(this);
+        public IView build() {
+            return locator == null || block == Block.NULL ? IView.NULL : new EndCentralDirectoryLocatorView(this);
         }
 
         public Builder locator(Zip64.EndCentralDirectoryLocator locator) {

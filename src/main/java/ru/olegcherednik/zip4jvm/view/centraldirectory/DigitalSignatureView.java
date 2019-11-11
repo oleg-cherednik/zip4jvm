@@ -15,7 +15,7 @@ import java.util.Optional;
  * @author Oleg Cherednik
  * @since 18.10.2019
  */
-public final class DigitalSignatureView extends View {
+final class DigitalSignatureView extends View {
 
     private final CentralDirectory.DigitalSignature digitalSignature;
     private final Block block;

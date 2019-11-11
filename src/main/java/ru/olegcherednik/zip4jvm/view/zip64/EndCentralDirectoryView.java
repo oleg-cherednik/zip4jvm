@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.VersionView;
 import ru.olegcherednik.zip4jvm.view.View;
 
@@ -31,9 +32,6 @@ final class EndCentralDirectoryView extends View {
 
     @Override
     public boolean print(PrintStream out) {
-        if (dir == null || block == Block.NULL)
-            return false;
-
         printTitle(out, Zip64.EndCentralDirectory.SIGNATURE, "ZIP64 End of Central directory record", block);
         printLine(out, "number of bytes in rest of record:", String.format("%d bytes", dir.getEndCentralDirectorySize()));
         printVersion(out);
@@ -43,7 +41,6 @@ final class EndCentralDirectoryView extends View {
         printLine(out, "total number of entries in central dir:", String.valueOf(dir.getTotalEntries()));
         printLine(out, "size of central dir:", String.format("%1$d (0x%1$08X) bytes", dir.getCentralDirectorySize()));
         printLine(out, "relative offset of central dir:", String.format("%1$d (0x%1$08X) bytes", dir.getCentralDirectoryOffs()));
-
         return true;
     }
 
@@ -63,8 +60,8 @@ final class EndCentralDirectoryView extends View {
         private int offs;
         private int columnWidth;
 
-        public EndCentralDirectoryView build() {
-            return new EndCentralDirectoryView(this);
+        public IView build() {
+            return endCentralDirectory == null || block == Block.NULL ? IView.NULL : new EndCentralDirectoryView(this);
         }
 
         public Builder endCentralDirectory(Zip64.EndCentralDirectory endCentralDirectory) {

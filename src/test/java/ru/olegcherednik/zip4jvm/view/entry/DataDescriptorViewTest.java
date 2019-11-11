@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.view;
+package ru.olegcherednik.zip4jvm.view.entry;
 
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
@@ -37,7 +37,7 @@ public class DataDescriptorViewTest {
 
         assertThat(lines).hasSize(7);
         assertThat(lines[0]).isEqualTo("#2 (PK0708) Data descriptor");
-        assertThat(lines[1]).isEqualTo("===========================");
+        assertThat(lines[1]).isEqualTo("---------------------------");
         assertThat(lines[2]).isEqualTo("  - location:                                       255496 (0x0003E608) bytes");
         assertThat(lines[3]).isEqualTo("  - size:                                           16 bytes");
         assertThat(lines[4]).isEqualTo("  32-bit CRC value:                                 0xEDF5F6AB");

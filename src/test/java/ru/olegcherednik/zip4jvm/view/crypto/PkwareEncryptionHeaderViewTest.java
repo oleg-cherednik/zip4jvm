@@ -34,9 +34,9 @@ public class PkwareEncryptionHeaderViewTest {
                                                                         .columnWidth(52).build());
         assertThat(lines).hasSize(5);
         assertThat(lines[0]).isEqualTo("#2 (PKWARE) encryption header");
-        assertThat(lines[1]).isEqualTo("=============================");
-        assertThat(lines[2]).isEqualTo("  data:                                             12 bytes");
-        assertThat(lines[3]).isEqualTo("  - location:                                       60 (0x0000003C) bytes");
+        assertThat(lines[1]).isEqualTo("-----------------------------");
+        assertThat(lines[2]).isEqualTo("  data:                                             60 (0x0000003C) bytes");
+        assertThat(lines[3]).isEqualTo("    - size:                                         12 bytes");
         assertThat(lines[4]).isEqualTo("  00 01 02 03");
     }
 

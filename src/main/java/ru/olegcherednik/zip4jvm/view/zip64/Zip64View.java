@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
+import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
@@ -30,31 +31,24 @@ public final class Zip64View extends View {
 
     @Override
     public boolean print(PrintStream out) {
-        boolean res = false;
-
-        if (printEndCentralDirectorLocator(out)) {
-            res = true;
-            out.println();
-        }
-
-        res |= printEndCentralDirectory(out);
-        return res;
+        boolean emptyLine = createEndCentralDirectorLocatorView().print(out);
+        return createEndCentralDirectoryView().print(out, emptyLine);
     }
 
-    private boolean printEndCentralDirectorLocator(PrintStream out) {
+    private IView createEndCentralDirectorLocatorView() {
         return EndCentralDirectoryLocatorView.builder()
                                              .locator(zip64.getEndCentralDirectoryLocator())
                                              .block(diagZip64.getEndCentralDirectoryLocator())
                                              .offs(offs)
-                                             .columnWidth(columnWidth).build().print(out);
+                                             .columnWidth(columnWidth).build();
     }
 
-    private boolean printEndCentralDirectory(PrintStream out) {
+    private IView createEndCentralDirectoryView() {
         return EndCentralDirectoryView.builder()
                                       .endCentralDirectory(zip64.getEndCentralDirectory())
                                       .block(diagZip64.getEndCentralDirectory())
                                       .offs(offs)
-                                      .columnWidth(columnWidth).build().print(out);
+                                      .columnWidth(columnWidth).build();
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -65,8 +59,8 @@ public final class Zip64View extends View {
         private int offs;
         private int columnWidth;
 
-        public Zip64View build() {
-            return new Zip64View(this);
+        public IView build() {
+            return zip64 == Zip64.NULL || diagZip64 == Diagnostic.Zip64.NULL ? IView.NULL : new Zip64View(this);
         }
 
         public Builder zip64(Zip64 zip64) {

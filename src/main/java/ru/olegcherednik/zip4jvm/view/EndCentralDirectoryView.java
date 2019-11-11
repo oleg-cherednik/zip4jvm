@@ -34,9 +34,6 @@ public final class EndCentralDirectoryView extends View {
 
     @Override
     public boolean print(PrintStream out) {
-        if (dir == null || block == Block.NULL)
-            return false;
-
         printTitle(out, EndCentralDirectory.SIGNATURE, "End of Central directory record", block);
         printLine(out, String.format("part number of this part (%04X):", dir.getTotalDisks()), String.valueOf(dir.getTotalDisks() + 1));
         printLine(out, String.format("part number of start of central dir (%04X):", dir.getMainDisk()), String.valueOf(dir.getMainDisk() + 1));
@@ -45,7 +42,6 @@ public final class EndCentralDirectoryView extends View {
         printLine(out, "size of central dir:", String.format("%1$d (0x%1$08X) bytes", dir.getCentralDirectorySize()));
         printCentralDirectoryOffs(out);
         printComment(out);
-
         return true;
     }
 
@@ -79,8 +75,8 @@ public final class EndCentralDirectoryView extends View {
         private int offs;
         private int columnWidth;
 
-        public EndCentralDirectoryView build() {
-            return new EndCentralDirectoryView(this);
+        public IView build() {
+            return endCentralDirectory == null || block == Block.NULL ? IView.NULL : new EndCentralDirectoryView(this);
         }
 
         public Builder endCentralDirectory(EndCentralDirectory endCentralDirectory) {

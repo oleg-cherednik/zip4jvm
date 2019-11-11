@@ -1,10 +1,18 @@
-package ru.olegcherednik.zip4jvm.view;
+package ru.olegcherednik.zip4jvm.view.entry;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
+import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
+import ru.olegcherednik.zip4jvm.view.GeneralPurposeFlagView;
+import ru.olegcherednik.zip4jvm.view.IView;
+import ru.olegcherednik.zip4jvm.view.LastModifiedTimeView;
+import ru.olegcherednik.zip4jvm.view.StringHexView;
+import ru.olegcherednik.zip4jvm.view.VersionView;
+import ru.olegcherednik.zip4jvm.view.View;
+import ru.olegcherednik.zip4jvm.view.ViewUtils;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
 
 import java.io.PrintStream;
@@ -15,7 +23,7 @@ import java.util.Optional;
  * @author Oleg Cherednik
  * @since 23.10.2019
  */
-public final class LocalFileHeaderView extends View {
+final class LocalFileHeaderView extends View {
 
     private final LocalFileHeader localFileHeader;
     // TODO should be block
@@ -133,7 +141,7 @@ public final class LocalFileHeaderView extends View {
         private int offs;
         private int columnWidth;
 
-        public LocalFileHeaderView build() {
+        public IView build() {
             return new LocalFileHeaderView(this);
         }
 

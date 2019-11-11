@@ -7,8 +7,7 @@ import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
-import ru.olegcherednik.zip4jvm.view.DataDescriptorView;
-import ru.olegcherednik.zip4jvm.view.LocalFileHeaderView;
+import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.View;
 import ru.olegcherednik.zip4jvm.view.crypto.EncryptionHeaderView;
 
@@ -48,47 +47,36 @@ public final class ZipEntryView extends View {
 
     @Override
     public boolean print(PrintStream out) {
-        boolean res = false;
-
-        if (printLocalFileHeader(out)) {
-            res = true;
-            out.println();
-        }
-
-        if (printEncryptionHeader(out)) {
-            res = true;
-            out.println();
-        }
-
-        res |= printDataDescriptor(out);
-        return res;
+        boolean emptyLine = createLocalFileHeaderView().print(out);
+        emptyLine = createEncryptionHeaderView().print(out, emptyLine);
+        return createDataDescriptorView().print(out, emptyLine);
     }
 
-    private boolean printLocalFileHeader(PrintStream out) {
+    private IView createLocalFileHeaderView() {
         return LocalFileHeaderView.builder()
                                   .localFileHeader(localFileHeader)
                                   .diagLocalFileHeader(diagLocalFileHeader)
                                   .pos(pos)
                                   .charset(charset)
                                   .offs(offs)
-                                  .columnWidth(columnWidth).build().print(out);
+                                  .columnWidth(columnWidth).build();
     }
 
-    private boolean printEncryptionHeader(PrintStream out) {
+    private IView createEncryptionHeaderView() {
         return EncryptionHeaderView.builder()
                                    .encryptionHeader(encryptionHeader)
                                    .pos(pos)
                                    .offs(offs)
-                                   .columnWidth(columnWidth).build().print(out);
+                                   .columnWidth(columnWidth).build();
     }
 
-    private boolean printDataDescriptor(PrintStream out) {
+    private IView createDataDescriptorView() {
         return DataDescriptorView.builder()
                                  .dataDescriptor(dataDescriptor)
                                  .block(blockDataDescriptor)
                                  .pos(pos)
                                  .offs(offs)
-                                 .columnWidth(columnWidth).build().print(out);
+                                 .columnWidth(columnWidth).build();
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

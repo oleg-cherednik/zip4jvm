@@ -29,17 +29,18 @@ final class PkwareEncryptionHeaderView extends View {
 
     @Override
     public boolean print(PrintStream out) {
-        printTitle(out, String.format("#%d (PKWARE) encryption header", pos + 1));
-        out.println();
-        printLine(out, "data:", String.format("%d bytes", encryptionHeader.getData().getSize()));
-        printLine(out, "- location:", String.format("%1$d (0x%1$08X) bytes", encryptionHeader.getData().getOffs()));
+        printSubTitle(out, pos, "(PKWARE) encryption header");
+        printData(out);
+        return true;
+    }
+
+    private void printData(PrintStream out) {
+        printValueLocation(out, "data:", encryptionHeader.getData());
 
         ByteArrayHexView.builder()
                         .buf(encryptionHeader.getData().getData())
                         .offs(offs)
                         .columnWidth(columnWidth).build().print(out);
-
-        return true;
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

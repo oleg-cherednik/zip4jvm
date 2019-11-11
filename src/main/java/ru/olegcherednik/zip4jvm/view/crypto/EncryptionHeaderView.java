@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.readers.block.aes.BlockAesEncryptionHeader;
 import ru.olegcherednik.zip4jvm.io.readers.block.pkware.PkwareEncryptionHeader;
 import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
+import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
@@ -66,8 +67,8 @@ public final class EncryptionHeaderView extends View {
         private int offs;
         private int columnWidth;
 
-        public EncryptionHeaderView build() {
-            return new EncryptionHeaderView(this);
+        public IView build() {
+            return encryptionHeader == null ? IView.NULL : new EncryptionHeaderView(this);
         }
 
         public Builder encryptionHeader(Diagnostic.ZipEntryBlock.EncryptionHeader encryptionHeader) {

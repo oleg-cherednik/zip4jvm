@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
+import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
@@ -34,14 +35,11 @@ public final class CentralDirectoryView extends View {
 
     @Override
     public boolean print(PrintStream out) {
-        if (centralDirectory == null)
-            return false;
-
         printTitle(out, CentralDirectory.FileHeader.SIGNATURE, "Central directory", diagCentralDirectory);
         printLine(out, "total entries:", String.valueOf(centralDirectory.getFileHeaders().size()));
-        createFileHeaderListView().print(out);
-        createDigitalSignatureView().print(out);
-        return true;
+
+        boolean emptyLine = createFileHeaderListView().print(out);
+        return createDigitalSignatureView().print(out, emptyLine);
     }
 
     private FileHeaderListView createFileHeaderListView() {
@@ -70,8 +68,8 @@ public final class CentralDirectoryView extends View {
         private int offs;
         private int columnWidth;
 
-        public CentralDirectoryView build() {
-            return new CentralDirectoryView(this);
+        public IView build() {
+            return centralDirectory == null || diagCentralDirectory == Diagnostic.CentralDirectory.NULL ? IView.NULL : new CentralDirectoryView(this);
         }
 
         public Builder centralDirectory(CentralDirectory centralDirectory) {

@@ -1,9 +1,11 @@
-package ru.olegcherednik.zip4jvm.view;
+package ru.olegcherednik.zip4jvm.view.entry;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.view.IView;
+import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
 import java.util.Optional;
@@ -12,7 +14,7 @@ import java.util.Optional;
  * @author Oleg Cherednik
  * @since 26.10.2019
  */
-public final class DataDescriptorView extends View {
+final class DataDescriptorView extends View {
 
     private final DataDescriptor dataDescriptor;
     private final Block block;
@@ -31,17 +33,10 @@ public final class DataDescriptorView extends View {
 
     @Override
     public boolean print(PrintStream out) {
-        if (dataDescriptor == null || block == Block.NULL)
-            return false;
-
-        printTitle(out, String.format("#%d (%s) Data descriptor", pos + 1, ViewUtils.signature(DataDescriptor.SIGNATURE)));
-        out.println();
-        printLine(out, "- location:", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
-        printLine(out, "- size:", String.format("%d bytes", block.getSize()));
+        printSubTitle(out, DataDescriptor.SIGNATURE, pos, "Data descriptor", block);
         printLine(out, "32-bit CRC value:", String.format("0x%08X", dataDescriptor.getCrc32()));
         printLine(out, "compressed size:", String.format("%d bytes", dataDescriptor.getCompressedSize()));
         printLine(out, "uncompressed size:", String.format("%d bytes", dataDescriptor.getUncompressedSize()));
-
         return true;
     }
 
@@ -54,8 +49,8 @@ public final class DataDescriptorView extends View {
         private int offs;
         private int columnWidth;
 
-        public DataDescriptorView build() {
-            return new DataDescriptorView(this);
+        public IView build() {
+            return dataDescriptor == null || block == Block.NULL ? IView.NULL : new DataDescriptorView(this);
         }
 
         public Builder dataDescriptor(DataDescriptor dataDescriptor) {

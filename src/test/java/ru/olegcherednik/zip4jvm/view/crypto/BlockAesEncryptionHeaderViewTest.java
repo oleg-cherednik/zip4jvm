@@ -47,15 +47,15 @@ public class BlockAesEncryptionHeaderViewTest {
                                                                           .columnWidth(52).build());
         assertThat(lines).hasSize(11);
         assertThat(lines[0]).isEqualTo("#2 (AES) encryption header");
-        assertThat(lines[1]).isEqualTo("==========================");
-        assertThat(lines[2]).isEqualTo("  salt:                                             16 bytes");
-        assertThat(lines[3]).isEqualTo("    - location:                                     65 (0x00000041) bytes");
+        assertThat(lines[1]).isEqualTo("--------------------------");
+        assertThat(lines[2]).isEqualTo("  salt:                                             65 (0x00000041) bytes");
+        assertThat(lines[3]).isEqualTo("    - size:                                         16 bytes");
         assertThat(lines[4]).isEqualTo("  00 01 02 03 04");
-        assertThat(lines[5]).isEqualTo("  password checksum:                                2 bytes");
-        assertThat(lines[6]).isEqualTo("    - location:                                     81 (0x00000051) bytes");
+        assertThat(lines[5]).isEqualTo("  password checksum:                                81 (0x00000051) bytes");
+        assertThat(lines[6]).isEqualTo("    - size:                                         2 bytes");
         assertThat(lines[7]).isEqualTo("  05 06");
-        assertThat(lines[8]).isEqualTo("  mac:                                              10 bytes");
-        assertThat(lines[9]).isEqualTo("    - location:                                     255507 (0x0003E613) bytes");
+        assertThat(lines[8]).isEqualTo("  mac:                                              255507 (0x0003E613) bytes");
+        assertThat(lines[9]).isEqualTo("    - size:                                         10 bytes");
         assertThat(lines[10]).isEqualTo("  07 08 09 0A 0B 0C 0D 0E 0F");
     }
 }
