@@ -30,7 +30,7 @@ final class EndCentralDirectoryLocatorView extends View {
 
     @Override
     public void print(PrintStream out) {
-        if (locator == null)
+        if (locator == null || block == Block.NULL)
             return;
 
         printTitle(out, Zip64.EndCentralDirectoryLocator.SIGNATURE, "ZIP64 End of Central directory locator", block);
