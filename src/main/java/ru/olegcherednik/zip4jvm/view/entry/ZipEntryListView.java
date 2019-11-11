@@ -54,8 +54,8 @@ public final class ZipEntryListView extends View {
                         .dataDescriptor(blockZipEntryModel.getDataDescriptors().get(localFileHeader.getFileName()))
                         .blockDataDescriptor(blockZipEntryModel.getZipEntryBlock().getDataDescriptor(localFileHeader.getFileName()))
                         .charset(charset)
-                        .offs(prefix.length())
-                        .columnWidth(52).build().print(out);
+                        .offs(offs)
+                        .columnWidth(columnWidth).build().print(out);
 
             pos++;
         }
