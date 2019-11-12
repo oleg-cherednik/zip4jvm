@@ -1,8 +1,9 @@
-package ru.olegcherednik.zip4jvm;
+package ru.olegcherednik.zip4jvm.info;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.ZipInfo;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
@@ -19,7 +20,7 @@ import java.util.function.Function;
  * @author Oleg Cherednik
  * @since 11.10.2019
  */
-@Test
+//@Test
 @SuppressWarnings("FieldNamingConvention")
 public class ZipInfoTest {
 
@@ -34,7 +35,6 @@ public class ZipInfoTest {
     public static void removeDir() throws IOException {
         Zip4jvmSuite.removeDir(rootDir);
     }
-
 
 
     public void foo() throws IOException {
@@ -59,7 +59,7 @@ public class ZipInfoTest {
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/macos_10.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/ubuntu_18.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/securezip/aes128.zip"))
-               .getShortInfo();
+               .getShortInfo(System.out);
     }
 
     public void decompose() throws IOException {

@@ -56,11 +56,10 @@ public final class ZipInfo {
         requireNotNull(zip, "ZipInfo.zip");
         requireExists(zip);
         requireRegularFile(zip, "ZipInfo.zip");
-
         return new ZipInfo(zip);
     }
 
-    public void getShortInfo() throws IOException {
+    public void getShortInfo(PrintStream out) throws IOException {
         Function<Charset, Charset> charsetCustomizer = charset -> Charsets.UTF_8;//Charsets.SYSTEM_CHARSET;
 //        Function<Charset, Charset> charsetCustomizer = Charsets.SYSTEM_CHARSET;
         Charset charset = charsetCustomizer.apply(Charsets.IBM437);
@@ -72,8 +71,6 @@ public final class ZipInfo {
         BlockModel blockModel = new BlockModelReader(zip, charsetCustomizer, diagnostic).read();
         BlockZipEntryModel zipEntryModel = new BlockZipEntryModelReader(blockModel.getZipModel(), charsetCustomizer,
                 diagnostic.getZipEntryBlock()).read();
-
-        PrintStream out = System.out;
 
         boolean emptyLine = createEndCentralDirectoryView(blockModel, charset, offs, columnWidth).print(out);
         emptyLine = createZip64View(blockModel, offs, columnWidth).print(out, emptyLine);
