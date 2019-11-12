@@ -43,8 +43,8 @@ public class NtfsTimestampExtraFieldViewTest {
                                                                          .columnWidth(52).build());
 
         assertThat(lines).hasSize(9);
-        assertThat(lines[0]).isEqualTo("(0x000A) NTFS Timestamps:                           36 bytes");
-        assertThat(lines[1]).isEqualTo("  - location:                                       11208273272 (0x29C10AD78) bytes");
+        assertThat(lines[0]).isEqualTo("(0x000A) NTFS Timestamps:                           11208273272 (0x29C10AD78) bytes");
+        assertThat(lines[1]).isEqualTo("  - size:                                           36 bytes");
         assertThat(lines[2]).isEqualTo("  - total tags:                                     2");
         assertThat(lines[3]).isEqualTo("  (0x0001) Tag1:                                    24 bytes");
         assertThat(lines[4]).isEqualTo("    Creation Date:                                  2019-04-10 00:25:02");

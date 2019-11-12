@@ -37,8 +37,8 @@ public class InfoZipNewUnixExtraFieldViewTest {
                                                                           .columnWidth(52).build());
 
         assertThat(lines).hasSize(5);
-        assertThat(lines[0]).isEqualTo("(0x7875) new InfoZIP Unix/OS2/NT:                   15 bytes");
-        assertThat(lines[1]).isEqualTo("  - location:                                       5296740 (0x0050D264) bytes");
+        assertThat(lines[0]).isEqualTo("(0x7875) new InfoZIP Unix/OS2/NT:                   5296740 (0x0050D264) bytes");
+        assertThat(lines[1]).isEqualTo("  - size:                                           15 bytes");
         assertThat(lines[2]).isEqualTo("  version:                                          1");
         assertThat(lines[3]).isEqualTo("  User identifier (UID):                            aaa");
         assertThat(lines[4]).isEqualTo("  Group Identifier (GID):                           bbb");
@@ -63,8 +63,8 @@ public class InfoZipNewUnixExtraFieldViewTest {
                                                                           .columnWidth(52).build());
 
         assertThat(lines).hasSize(4);
-        assertThat(lines[0]).isEqualTo("(0x7875) new InfoZIP Unix/OS2/NT:                   15 bytes");
-        assertThat(lines[1]).isEqualTo("  - location:                                       5296740 (0x0050D264) bytes");
+        assertThat(lines[0]).isEqualTo("(0x7875) new InfoZIP Unix/OS2/NT:                   5296740 (0x0050D264) bytes");
+        assertThat(lines[1]).isEqualTo("  - size:                                           15 bytes");
         assertThat(lines[2]).isEqualTo("  version:                                          2 (unknown)");
         assertThat(lines[3]).isEqualTo("00 01 02 03");
     }

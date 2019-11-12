@@ -40,8 +40,8 @@ public class ExtendedTimestampExtraFieldViewTest {
                                                                              .columnWidth(52).build());
 
         assertThat(lines).hasSize(5);
-        assertThat(lines[0]).isEqualTo("(0x5455) Universal time:                            17 bytes");
-        assertThat(lines[1]).isEqualTo("  - location:                                       17 (0x00000011) bytes");
+        assertThat(lines[0]).isEqualTo("(0x5455) Universal time:                            5296723 (0x0050D253) bytes");
+        assertThat(lines[1]).isEqualTo("  - size:                                           17 bytes");
         assertThat(lines[2]).isEqualTo("  Last Modified Date:                               2019-10-24 10:46:22");
         assertThat(lines[3]).isEqualTo("  Last Accessed Date:                               2019-10-24 10:46:25");
         assertThat(lines[4]).isEqualTo("  Creation Date:                                    2019-10-24 10:46:22");
@@ -65,8 +65,8 @@ public class ExtendedTimestampExtraFieldViewTest {
                                                                              .columnWidth(52).build());
 
         assertThat(lines).hasSize(3);
-        assertThat(lines[0]).isEqualTo("(0x5455) Universal time:                            17 bytes");
-        assertThat(lines[1]).isEqualTo("  - location:                                       17 (0x00000011) bytes");
+        assertThat(lines[0]).isEqualTo("(0x5455) Universal time:                            5296723 (0x0050D253) bytes");
+        assertThat(lines[1]).isEqualTo("  - size:                                           17 bytes");
         assertThat(lines[2]).isEqualTo("  Last Modified Date:                               2019-10-24 10:46:22");
     }
 
@@ -88,8 +88,8 @@ public class ExtendedTimestampExtraFieldViewTest {
                                                                              .columnWidth(52).build());
 
         assertThat(lines).hasSize(3);
-        assertThat(lines[0]).isEqualTo("(0x5455) Universal time:                            17 bytes");
-        assertThat(lines[1]).isEqualTo("  - location:                                       17 (0x00000011) bytes");
+        assertThat(lines[0]).isEqualTo("(0x5455) Universal time:                            5296723 (0x0050D253) bytes");
+        assertThat(lines[1]).isEqualTo("  - size:                                           17 bytes");
         assertThat(lines[2]).isEqualTo("  Last Accessed Date:                               2019-10-24 10:46:25");
     }
 
@@ -111,8 +111,8 @@ public class ExtendedTimestampExtraFieldViewTest {
                                                                              .columnWidth(52).build());
 
         assertThat(lines).hasSize(3);
-        assertThat(lines[0]).isEqualTo("(0x5455) Universal time:                            17 bytes");
-        assertThat(lines[1]).isEqualTo("  - location:                                       17 (0x00000011) bytes");
+        assertThat(lines[0]).isEqualTo("(0x5455) Universal time:                            5296723 (0x0050D253) bytes");
+        assertThat(lines[1]).isEqualTo("  - size:                                           17 bytes");
         assertThat(lines[2]).isEqualTo("  Creation Date:                                    2019-10-24 10:46:22");
     }
 

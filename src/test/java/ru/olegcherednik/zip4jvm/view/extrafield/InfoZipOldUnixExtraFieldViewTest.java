@@ -36,8 +36,8 @@ public class InfoZipOldUnixExtraFieldViewTest {
                                                                           .columnWidth(52).build());
 
         assertThat(lines).hasSize(6);
-        assertThat(lines[0]).isEqualTo("(0x5855) old InfoZIP Unix/OS2/NT:                   12 bytes");
-        assertThat(lines[1]).isEqualTo("  - location:                                       5300395 (0x0050E0AB) bytes");
+        assertThat(lines[0]).isEqualTo("(0x5855) old InfoZIP Unix/OS2/NT:                   5300395 (0x0050E0AB) bytes");
+        assertThat(lines[1]).isEqualTo("  - size:                                           12 bytes");
         assertThat(lines[2]).isEqualTo("  Last Modified Date:                               2019-10-24 10:46:22");
         assertThat(lines[3]).isEqualTo("  Last Accessed Date:                               2019-10-24 10:55:01");
         assertThat(lines[4]).isEqualTo("  User identifier (UID):                            111");
@@ -60,8 +60,8 @@ public class InfoZipOldUnixExtraFieldViewTest {
                                                                           .columnWidth(52).build());
 
         assertThat(lines).hasSize(4);
-        assertThat(lines[0]).isEqualTo("(0x5855) old InfoZIP Unix/OS2/NT:                   12 bytes");
-        assertThat(lines[1]).isEqualTo("  - location:                                       5300395 (0x0050E0AB) bytes");
+        assertThat(lines[0]).isEqualTo("(0x5855) old InfoZIP Unix/OS2/NT:                   5300395 (0x0050E0AB) bytes");
+        assertThat(lines[1]).isEqualTo("  - size:                                           12 bytes");
         assertThat(lines[2]).isEqualTo("  Last Modified Date:                               2019-10-24 10:46:22");
         assertThat(lines[3]).isEqualTo("  Last Accessed Date:                               2019-10-24 10:55:01");
     }

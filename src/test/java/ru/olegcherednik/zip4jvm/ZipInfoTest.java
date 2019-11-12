@@ -35,6 +35,8 @@ public class ZipInfoTest {
         Zip4jvmSuite.removeDir(rootDir);
     }
 
+
+
     public void foo() throws IOException {
         Path path = Paths.get("d:/zip4jvm/tmp/aes.zip");
 //        Files.deleteIfExists(path);

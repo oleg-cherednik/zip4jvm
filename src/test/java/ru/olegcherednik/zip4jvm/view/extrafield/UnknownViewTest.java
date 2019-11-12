@@ -33,8 +33,8 @@ public class UnknownViewTest {
                                                          .columnWidth(52).build());
 
         assertThat(lines).hasSize(3);
-        assertThat(lines[0]).isEqualTo("(0x0666) Unknown:                                   36 bytes");
-        assertThat(lines[1]).isEqualTo("  - location:                                       11208273272 (0x29C10AD78) bytes");
+        assertThat(lines[0]).isEqualTo("(0x0666) Unknown:                                   11208273272 (0x29C10AD78) bytes");
+        assertThat(lines[1]).isEqualTo("  - size:                                           36 bytes");
         assertThat(lines[2]).isEqualTo("00 01 02 03");
     }
 }
