@@ -35,10 +35,10 @@ final class EndCentralDirectoryView extends View {
         printTitle(out, Zip64.EndCentralDirectory.SIGNATURE, "ZIP64 End of Central directory record", block);
         printLine(out, "number of bytes in rest of record:", String.format("%d bytes", dir.getEndCentralDirectorySize()));
         printVersion(out);
-        printLine(out, String.format("part number of this part (%04d):", dir.getTotalDisks()), String.valueOf(dir.getTotalDisks() + 1));
-        printLine(out, String.format("part number of start of central dir (%04d):", dir.getMainDisk()), String.valueOf(dir.getMainDisk() + 1));
-        printLine(out, "number of entries in central dir in this part:", String.valueOf(dir.getDiskEntries()));
-        printLine(out, "total number of entries in central dir:", String.valueOf(dir.getTotalEntries()));
+        printLine(out, String.format("part number of this part (%04d):", dir.getTotalDisks()), dir.getTotalDisks() + 1);
+        printLine(out, String.format("part number of start of central dir (%04d):", dir.getMainDisk()), dir.getMainDisk() + 1);
+        printLine(out, "number of entries in central dir in this part:", dir.getDiskEntries());
+        printLine(out, "total number of entries in central dir:", dir.getTotalEntries());
         printLine(out, "size of central dir:", String.format("%1$d (0x%1$08X) bytes", dir.getCentralDirectorySize()));
         printLine(out, "relative offset of central dir:", String.format("%1$d (0x%1$08X) bytes", dir.getCentralDirectoryOffs()));
         return true;

@@ -16,18 +16,17 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public final class BlockZip64Reader extends Zip64Reader {
 
-    private final Diagnostic diagnostic;
+    private final Diagnostic.Zip64 zip64;
 
     @Override
     protected Zip64.EndCentralDirectoryLocator readEndCentralDirectoryLocator(DataInput in) throws IOException {
-        diagnostic.addZip64();
-        Block block = diagnostic.getZip64().getEndCentralDirectoryLocator();
+        Block block = zip64.getEndCentralDirectoryLocator();
         return block.calc(in, () -> super.readEndCentralDirectoryLocator(in));
     }
 
     @Override
     protected Zip64.EndCentralDirectory readEndCentralDirectory(DataInput in) throws IOException {
-        Block block = diagnostic.getZip64().getEndCentralDirectory();
+        Block block = zip64.getEndCentralDirectory();
         return block.calc(in, () -> super.readEndCentralDirectory(in));
     }
 

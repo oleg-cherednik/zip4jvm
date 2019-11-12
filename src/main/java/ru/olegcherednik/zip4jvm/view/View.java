@@ -4,7 +4,6 @@ import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 
 import java.io.PrintStream;
-import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.stream.IntStream;
 
@@ -26,7 +25,7 @@ public abstract class View implements IView {
         prefix = StringUtils.repeat(" ", offs);
     }
 
-    protected final void printLine(PrintStream out, String one, String two) {
+    protected final void printLine(PrintStream out, Object one, Object two) {
         if (offs > 0)
             one = prefix + one;
 
@@ -57,14 +56,6 @@ public abstract class View implements IView {
 
     protected void printSubTitle(PrintStream out, int signature, long pos, String title, Block block) {
         String str = String.format("#%d (%s) %s", pos + 1, ViewUtils.signature(signature), title);
-        out.println(str);
-        IntStream.range(0, str.length()).forEach(i -> out.print('-'));
-        out.println();
-        printLocationAndSize(out, block);
-    }
-
-    protected void printSubTitle(PrintStream out, long pos, Charset charset, String title, Block block) {
-        String str = String.format("#%d (%s) %s", pos + 1, charset.name(), title);
         out.println(str);
         IntStream.range(0, str.length()).forEach(i -> out.print('-'));
         out.println();

@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.os.InfoZipNewUnixExtraField;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
+import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
@@ -30,11 +31,7 @@ final class InfoZipNewUnixExtraFieldView extends View {
 
     @Override
     public boolean print(PrintStream out) {
-        if (record.isNull() || block == Block.NULL)
-            return false;
-
-        printLine(out, String.format("(0x%04X) new InfoZIP Unix/OS2/NT: ", record.getSignature()), String.format("%d bytes", block.getSize()));
-        printLine(out, "  - location:", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
+        printValueLocation(out, String.format("(0x%04X) new InfoZIP Unix/OS2/NT:", record.getSignature()), block);
 
         InfoZipNewUnixExtraField.Payload payload = record.getPayload();
 
@@ -42,6 +39,8 @@ final class InfoZipNewUnixExtraFieldView extends View {
             print((InfoZipNewUnixExtraField.VersionOnePayload)record.getPayload(), out);
         else if (payload instanceof InfoZipNewUnixExtraField.VersionUnknownPayload)
             print((InfoZipNewUnixExtraField.VersionUnknownPayload)record.getPayload(), out);
+
+        // TODO add final else
 
         return true;
     }
@@ -71,8 +70,8 @@ final class InfoZipNewUnixExtraFieldView extends View {
         private int offs;
         private int columnWidth;
 
-        public InfoZipNewUnixExtraFieldView build() {
-            return new InfoZipNewUnixExtraFieldView(this);
+        public IView build() {
+            return record.isNull() || block == Block.NULL ? IView.NULL : new InfoZipNewUnixExtraFieldView(this);
         }
 
         public Builder record(InfoZipNewUnixExtraField record) {

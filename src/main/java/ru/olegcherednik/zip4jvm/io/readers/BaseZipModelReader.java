@@ -44,7 +44,7 @@ public abstract class BaseZipModelReader {
         try (DataInput in = new SingleZipInputStream(zip)) {
             findCentralDirectorySignature(in);
             endCentralDirectory = readEndCentralDirectory(in);
-            zip64 = getZip64Reader().read(in);
+            zip64 = readZip64(in);
             centralDirectory = readCentralDirectory(endCentralDirectory, zip64, in);
         }
     }
@@ -59,6 +59,8 @@ public abstract class BaseZipModelReader {
         }
     }
 
+    protected abstract Zip64 readZip64(DataInput in) throws IOException;
+
     private CentralDirectory readCentralDirectory(EndCentralDirectory endCentralDirectory, Zip64 zip64, DataInput in) throws IOException {
         in.seek(ZipModelBuilder.getCentralDirectoryOffs(endCentralDirectory, zip64));
         long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
@@ -66,8 +68,6 @@ public abstract class BaseZipModelReader {
     }
 
     protected abstract EndCentralDirectoryReader getEndCentralDirectoryReader();
-
-    protected abstract Zip64Reader getZip64Reader();
 
     protected abstract CentralDirectoryReader getCentralDirectoryReader(long totalEntries);
 

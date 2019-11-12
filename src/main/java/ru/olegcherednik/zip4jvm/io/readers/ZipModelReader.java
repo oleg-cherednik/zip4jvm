@@ -1,5 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 
@@ -29,8 +31,8 @@ public final class ZipModelReader extends BaseZipModelReader {
     }
 
     @Override
-    protected Zip64Reader getZip64Reader() {
-        return new Zip64Reader();
+    protected Zip64 readZip64(DataInput in) throws IOException {
+        return new Zip64Reader().read(in);
     }
 
     @Override

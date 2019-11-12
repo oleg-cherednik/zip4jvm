@@ -2,6 +2,7 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.os.ExtendedTimestampExtraField;
+import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
@@ -31,8 +32,7 @@ final class ExtendedTimestampExtraFieldView extends View {
         if (record.isNull() || block == Block.NULL)
             return false;
 
-        printLine(out, String.format("(0x%04X) Universal time:", record.getSignature()), String.format("%d bytes", block.getSize()));
-        printLine(out, "  - location:", String.format("%1$d (0x%1$08X) bytes", block.getSize()));
+        printValueLocation(out, String.format("(0x%04X) Universal time:", record.getSignature()), block);
 
         if (record.getFlag().isLastModificationTime())
             printLine(out, "  Last Modified Date:", String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", record.getLastModificationTime()));
@@ -51,8 +51,8 @@ final class ExtendedTimestampExtraFieldView extends View {
         private int offs;
         private int columnWidth;
 
-        public ExtendedTimestampExtraFieldView build() {
-            return new ExtendedTimestampExtraFieldView(this);
+        public IView build() {
+            return record.isNull() || block == Block.NULL ? IView.NULL : new ExtendedTimestampExtraFieldView(this);
         }
 
         public Builder record(ExtendedTimestampExtraField record) {

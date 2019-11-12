@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
@@ -29,11 +30,7 @@ final class Zip64ExtendedInfoView extends View {
 
     @Override
     public boolean print(PrintStream out) {
-        if (record.isNull() || block == Block.NULL)
-            return false;
-
-        printLine(out, String.format("(0x%04X) Zip64 Extended Information:", record.getSignature()), String.format("%d bytes", block.getSize()));
-        printLine(out, "  - location:", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
+        printValueLocation(out, String.format("(0x%04X) Zip64 Extended Information:", record.getSignature()), block);
 
         if (record.getUncompressedSize() != ExtraField.NO_DATA)
             printLine(out, "  original compressed size:", String.format("%d bytes", record.getUncompressedSize()));
@@ -42,7 +39,7 @@ final class Zip64ExtendedInfoView extends View {
         if (record.getLocalFileHeaderOffs() != ExtraField.NO_DATA)
             printLine(out, "  original relative offset of local header:", String.format("%1$d (0x%1$08X) bytes", record.getLocalFileHeaderOffs()));
         if (record.getDisk() != ExtraField.NO_DATA)
-            printLine(out, String.format("  original part number of this part (%04X):", record.getDisk()), String.valueOf(record.getDisk()));
+            printLine(out, String.format("  original part number of this part (%04X):", record.getDisk()), record.getDisk());
 
         return true;
     }
@@ -54,8 +51,8 @@ final class Zip64ExtendedInfoView extends View {
         private int offs;
         private int columnWidth;
 
-        public Zip64ExtendedInfoView build() {
-            return new Zip64ExtendedInfoView(this);
+        public IView build() {
+            return record.isNull() || block == Block.NULL ? IView.NULL : new Zip64ExtendedInfoView(this);
         }
 
         public Builder record(Zip64.ExtendedInfo record) {

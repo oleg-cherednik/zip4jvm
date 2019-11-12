@@ -4,6 +4,7 @@ import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
+import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
@@ -32,13 +33,9 @@ final class AesExtraDataRecordView extends View {
 
     @Override
     public boolean print(PrintStream out) {
-        if (record.isNull() || block == Block.NULL)
-            return false;
-
-        printLine(out, String.format("(0x%04X) AES Encryption Tag:", record.getSignature()), String.format("%d bytes", block.getSize()));
-        printLine(out, "  - location:", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
+        printValueLocation(out, String.format("(0x%04X) AES Encryption Tag:", record.getSignature()), block);
         printLine(out, "  Encryption Tag Version:", String.format("%s-%d", record.getVendor(), record.getVersionNumber()));
-        printLine(out, "  Encryption Key Bits:", String.valueOf(record.getStrength().getSize()));
+        printLine(out, "  Encryption Key Bits:", record.getStrength().getSize());
 
         CompressionMethodView.builder()
                              .compressionMethod(record.getCompressionMethod())
@@ -57,8 +54,8 @@ final class AesExtraDataRecordView extends View {
         private int offs;
         private int columnWidth;
 
-        public AesExtraDataRecordView build() {
-            return new AesExtraDataRecordView(this);
+        public IView build() {
+            return record.isNull() || block == Block.NULL ? IView.NULL : new AesExtraDataRecordView(this);
         }
 
         public Builder record(AesExtraDataRecord record) {

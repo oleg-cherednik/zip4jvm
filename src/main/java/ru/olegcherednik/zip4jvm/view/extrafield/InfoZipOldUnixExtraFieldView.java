@@ -2,6 +2,7 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.os.InfoZipOldUnixExtraField;
+import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
@@ -30,11 +31,7 @@ final class InfoZipOldUnixExtraFieldView extends View {
 
     @Override
     public boolean print(PrintStream out) {
-        if (record.isNull() || block == Block.NULL)
-            return false;
-
-        printLine(out, String.format("(0x%04X) old InfoZIP Unix/OS2/NT:", record.getSignature()), String.format("%d bytes", block.getSize()));
-        printLine(out, "  - location:", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
+        printValueLocation(out, String.format("(0x%04X) old InfoZIP Unix/OS2/NT:", record.getSignature()), block);
         printLine(out, "  Last Modified Date:", String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", record.getLastModificationTime()));
         printLine(out, "  Last Accessed Date:", String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", record.getLastAccessTime()));
 
@@ -53,8 +50,8 @@ final class InfoZipOldUnixExtraFieldView extends View {
         private int offs;
         private int columnWidth;
 
-        public InfoZipOldUnixExtraFieldView build() {
-            return new InfoZipOldUnixExtraFieldView(this);
+        public IView build() {
+            return record.isNull() || block == Block.NULL ? IView.NULL : new InfoZipOldUnixExtraFieldView(this);
         }
 
         public Builder record(InfoZipOldUnixExtraField record) {

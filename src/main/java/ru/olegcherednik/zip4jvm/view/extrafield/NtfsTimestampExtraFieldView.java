@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.os.NtfsTimestampExtraField;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
+import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
@@ -29,11 +30,7 @@ final class NtfsTimestampExtraFieldView extends View {
 
     @Override
     public boolean print(PrintStream out) {
-        if (record.isNull() || block == Block.NULL)
-            return false;
-
-        printLine(out, String.format("(0x%04X) NTFS Timestamps:", record.getSignature()), String.format("%d bytes", block.getSize()));
-        printLine(out, "  - location:", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
+        printValueLocation(out, String.format("(0x%04X) NTFS Timestamps:", record.getSignature()), block);
         printLine(out, "  - total tags:", String.valueOf(record.getTags().size()));
 
         for (NtfsTimestampExtraField.Tag tag : record.getTags()) {
@@ -69,8 +66,8 @@ final class NtfsTimestampExtraFieldView extends View {
         private int offs;
         private int columnWidth;
 
-        public NtfsTimestampExtraFieldView build() {
-            return new NtfsTimestampExtraFieldView(this);
+        public IView build() {
+            return record.isNull() || block == Block.NULL ? IView.NULL : new NtfsTimestampExtraFieldView(this);
         }
 
         public Builder record(NtfsTimestampExtraField record) {

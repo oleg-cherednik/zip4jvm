@@ -1,9 +1,10 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.BaseZipModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.CentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.EndCentralDirectoryReader;
-import ru.olegcherednik.zip4jvm.io.readers.Zip64Reader;
+import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
@@ -42,8 +43,8 @@ public final class BlockModelReader extends BaseZipModelReader {
     }
 
     @Override
-    protected Zip64Reader getZip64Reader() {
-        return new BlockZip64Reader(diagnostic);
+    protected Zip64 readZip64(DataInput in) throws IOException {
+        return new BlockZip64Reader(diagnostic.getZip64()).read(in);
     }
 
     @Override

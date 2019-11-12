@@ -55,12 +55,12 @@ public final class Zip64View extends View {
     public static final class Builder {
 
         private Zip64 zip64 = Zip64.NULL;
-        private Diagnostic.Zip64 diagZip64 = Diagnostic.Zip64.NULL;
+        private Diagnostic.Zip64 diagZip64;
         private int offs;
         private int columnWidth;
 
         public IView build() {
-            return zip64 == Zip64.NULL || diagZip64 == Diagnostic.Zip64.NULL ? IView.NULL : new Zip64View(this);
+            return zip64 == Zip64.NULL || diagZip64 == null ? IView.NULL : new Zip64View(this);
         }
 
         public Builder zip64(Zip64 zip64) {
@@ -69,7 +69,7 @@ public final class Zip64View extends View {
         }
 
         public Builder diagZip64(Diagnostic.Zip64 diagZip64) {
-            this.diagZip64 = Optional.ofNullable(diagZip64).orElse(Diagnostic.Zip64.NULL);
+            this.diagZip64 = diagZip64;
             return this;
         }
 
