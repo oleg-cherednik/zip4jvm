@@ -39,7 +39,7 @@ public class AbstractZipEntryDirectoryAssert<S extends AbstractZipEntryDirectory
         return myself;
     }
 
-    public AbstractZipEntryFileAssert<?> file(String name) {
+    public ZipEntryFileAssert file(String name) {
         return new ZipEntryFileAssert(getZipEntry(name), zipFile);
     }
 

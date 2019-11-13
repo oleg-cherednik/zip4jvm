@@ -35,7 +35,7 @@ public class ZipFileAssert extends AbstractAssert<ZipFileAssert, ZipFileDecorato
         return new ZipEntryDirectoryAssert(entry, actual);
     }
 
-    public AbstractZipEntryFileAssert<?> file(String name) {
+    public ZipEntryFileAssert file(String name) {
         ZipEntry entry = actual.getEntry(name);
 
         if (entry.isDirectory())
@@ -45,7 +45,7 @@ public class ZipFileAssert extends AbstractAssert<ZipFileAssert, ZipFileDecorato
         return new ZipEntryFileAssert(entry, actual);
     }
 
-    public AbstractZipEntryFileAssert<?> file(String name, char[] password) {
+    public ZipEntryFileAssert file(String name, char[] password) {
         ZipEntry entry = actual.getEntry(name);
         assertThat(entry.isDirectory()).isFalse();
         return new ZipEntryFileAssert(entry, actual);

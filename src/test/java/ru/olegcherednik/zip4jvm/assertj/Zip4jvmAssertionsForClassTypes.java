@@ -21,7 +21,7 @@ public final class Zip4jvmAssertionsForClassTypes {
         return actual.isDirectory() ? new ZipEntryFileAssert(actual, zipFile) : new ZipEntryDirectoryAssert(actual, zipFile);
     }
 
-    public static AbstractDirectoryAssert<?> assertThatDirectory(Path path) {
+    public static DirectoryAssert assertThatDirectory(Path path) {
         return new DirectoryAssert(path);
     }
 

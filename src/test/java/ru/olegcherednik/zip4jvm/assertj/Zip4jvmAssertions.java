@@ -27,7 +27,7 @@ public final class Zip4jvmAssertions extends Assertions {
         return Zip4jvmAssertionsForClassTypes.assertThat(decorator);
     }
 
-    public static AbstractDirectoryAssert<?> assertThatDirectory(Path path) {
+    public static DirectoryAssert assertThatDirectory(Path path) {
         return Zip4jvmAssertionsForClassTypes.assertThatDirectory(path);
     }
 
