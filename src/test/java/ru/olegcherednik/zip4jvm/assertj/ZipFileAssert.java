@@ -52,7 +52,7 @@ public class ZipFileAssert extends AbstractAssert<ZipFileAssert, ZipFileDecorato
     }
 
     public static ZipFileAssert assertThatZipFile(Path zipFile, char[] password) throws IOException {
-        return Zip4jvmAssertionsForClassTypes.assertThat(new ZipFileEncryptedDecoder(zipFile, password));
+        return new ZipFileAssert(new ZipFileEncryptedDecoder(zipFile, password));
     }
 
     public ZipFileAssert exists() {

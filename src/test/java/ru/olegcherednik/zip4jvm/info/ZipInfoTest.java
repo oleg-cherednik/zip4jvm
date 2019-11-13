@@ -2,6 +2,8 @@ package ru.olegcherednik.zip4jvm.info;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+import ru.olegcherednik.zip4jvm.TestData;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipInfo;
 import ru.olegcherednik.zip4jvm.model.Compression;
@@ -11,16 +13,19 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.Function;
 
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
+
 /**
  * @author Oleg Cherednik
  * @since 11.10.2019
  */
-//@Test
+@Test
 @SuppressWarnings("FieldNamingConvention")
 public class ZipInfoTest {
 
@@ -36,7 +41,29 @@ public class ZipInfoTest {
         Zip4jvmSuite.removeDir(rootDir);
     }
 
+    public void shouldRetrieveInfoWhenStoreSolidPkware() throws IOException {
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("actual.txt");
+        Files.createDirectories(file.getParent());
 
+        try (PrintStream out = new PrintStream(file.toFile())) {
+            ZipInfo.zip(TestData.zipStoreSolidPkware).getShortInfo(out);
+        }
+
+        assertThatFile(file).matchesResourceLines("/info/store_solid_pkware.txt");
+    }
+
+    public void shouldRetrieveInfoWhenStoreSolidAes() throws IOException {
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("actual.txt");
+        Files.createDirectories(file.getParent());
+
+        try (PrintStream out = new PrintStream(file.toFile())) {
+            ZipInfo.zip(TestData.zipStoreSolidAes).getShortInfo(out);
+        }
+
+        assertThatFile(file).matchesResourceLines("/info/store_solid_aes.txt");
+    }
+
+    @Test(enabled = false)
     public void foo() throws IOException {
         Path path = Paths.get("d:/zip4jvm/tmp/aes.zip");
 //        Files.deleteIfExists(path);
@@ -53,12 +80,13 @@ public class ZipInfoTest {
 //        ZipInfo.zip(zipDeflateSolidPkware).getShortInfo();
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/foo/deflate/solid/off/src.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/pkware.zip"))
-        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/ferdinand.zip"))
+//        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/ferdinand.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/aes.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/split/src.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/macos_10.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/ubuntu_18.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/securezip/aes128.zip"))
+        ZipInfo.zip(TestData.zipStoreSolidAes)
                .getShortInfo(System.out);
     }
 

@@ -18,21 +18,23 @@ import java.nio.file.Path;
 public final class Zip4jvmAssertions extends Assertions {
 
     public static ZipFileAssert assertThatZipFile(Path zip) throws IOException {
-        ZipFileDecorator decorator = isSplit(zip) ? new ZipFileSplitDecorator(zip) : new ZipFileNoSplitNoEncryptedDecorator(zip);
-        return Zip4jvmAssertionsForClassTypes.assertThat(decorator);
+        return new ZipFileAssert(isSplit(zip) ? new ZipFileSplitDecorator(zip) : new ZipFileNoSplitNoEncryptedDecorator(zip));
     }
 
     public static ZipFileAssert assertThatZipFile(Path zip, char[] password) throws IOException {
-        ZipFileDecorator decorator = isSplit(zip) ? new ZipFileSplitDecorator(zip, password) : new ZipFileEncryptedDecoder(zip, password);
-        return Zip4jvmAssertionsForClassTypes.assertThat(decorator);
+        return new ZipFileAssert(isSplit(zip) ? new ZipFileSplitDecorator(zip, password) : new ZipFileEncryptedDecoder(zip, password));
     }
 
     public static DirectoryAssert assertThatDirectory(Path path) {
-        return Zip4jvmAssertionsForClassTypes.assertThatDirectory(path);
+        return new DirectoryAssert(path);
     }
 
-    public static FileExtAssert assertThatFile(Path path) {
-        return Zip4jvmAssertionsForClassTypes.assertThatFile(path);
+    public static FileAssert assertThatFile(Path path) {
+        return new FileAssert(path);
+    }
+
+    public static StringLineAssert assertThatStringLine(int pos, String str) {
+        return new StringLineAssert(pos, str);
     }
 
     private static boolean isSplit(Path zip) {
