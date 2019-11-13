@@ -21,11 +21,11 @@ public class ZipFileAssert extends AbstractAssert<ZipFileAssert, ZipFileDecorato
         super(actual, ZipFileAssert.class);
     }
 
-    public AbstractZipEntryDirectoryAssert<?> root() {
+    public ZipEntryDirectoryAssert root() {
         return directory("/");
     }
 
-    public AbstractZipEntryDirectoryAssert<?> directory(String name) {
+    public ZipEntryDirectoryAssert directory(String name) {
         ZipEntry entry = new ZipEntry(name);
 
         if (!entry.isDirectory())

@@ -25,7 +25,7 @@ public final class Zip4jvmAssertionsForClassTypes {
         return new DirectoryAssert(path);
     }
 
-    public static AbstractFileExtAssert<?> assertThatFile(Path path) {
-        return new FileAssert(path);
+    public static FileExtAssert assertThatFile(Path path) {
+        return new FileExtAssert(path);
     }
 }

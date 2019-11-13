@@ -71,8 +71,8 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
     }
 
     @Override
-    public AbstractFileExtAssert<?> file(String name) {
-        return new FileAssert(actual.toPath().resolve(name));
+    public FileExtAssert file(String name) {
+        return new FileExtAssert(actual.toPath().resolve(name));
     }
 
     private long getRegularFilesAmount() {
