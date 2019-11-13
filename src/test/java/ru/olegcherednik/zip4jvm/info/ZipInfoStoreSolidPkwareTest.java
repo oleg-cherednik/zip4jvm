@@ -40,6 +40,8 @@ public class ZipInfoStoreSolidPkwareTest {
             ZipInfo.zip(TestData.zipStoreSolidPkware).getShortInfo(out);
         }
 
+//        assertThat(file).;
+
 //        boolean isTwoEqual = FileUtils.contentEqualsIgnoreEOL() ntEquals(file1, file2);
 
     }

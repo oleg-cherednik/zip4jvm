@@ -70,6 +70,7 @@ public class AbstractDirectoryAssert<S extends AbstractDirectoryAssert<S>> exten
         return myself;
     }
 
+    @Override
     public AbstractFileExtAssert<?> file(String name) {
         return new FileAssert(actual.toPath().resolve(name));
     }

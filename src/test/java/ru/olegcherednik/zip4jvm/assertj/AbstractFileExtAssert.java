@@ -56,8 +56,6 @@ public class AbstractFileExtAssert<S extends AbstractFileExtAssert<S>> extends A
 
     @Override
     public S exists() {
-        int a = 0;
-        a++;
         super.exists();
         isRegularFile();
         return myself;

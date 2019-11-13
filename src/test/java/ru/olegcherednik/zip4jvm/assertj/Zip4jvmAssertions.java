@@ -17,12 +17,12 @@ import java.nio.file.Path;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Zip4jvmAssertions extends Assertions {
 
-    public static AbstractZipFileAssert<?> assertThatZipFile(Path zip) throws IOException {
+    public static ZipFileAssert assertThatZipFile(Path zip) throws IOException {
         ZipFileDecorator decorator = isSplit(zip) ? new ZipFileSplitDecorator(zip) : new ZipFileNoSplitNoEncryptedDecorator(zip);
         return Zip4jvmAssertionsForClassTypes.assertThat(decorator);
     }
 
-    public static AbstractZipFileAssert<?> assertThatZipFile(Path zip, char[] password) throws IOException {
+    public static ZipFileAssert assertThatZipFile(Path zip, char[] password) throws IOException {
         ZipFileDecorator decorator = isSplit(zip) ? new ZipFileSplitDecorator(zip, password) : new ZipFileEncryptedDecoder(zip, password);
         return Zip4jvmAssertionsForClassTypes.assertThat(decorator);
     }

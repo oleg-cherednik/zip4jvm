@@ -13,7 +13,7 @@ import java.util.zip.ZipEntry;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Zip4jvmAssertionsForClassTypes {
 
-    public static AbstractZipFileAssert<?> assertThat(ZipFileDecorator actual) {
+    public static ZipFileAssert assertThat(ZipFileDecorator actual) {
         return new ZipFileAssert(actual);
     }
 
