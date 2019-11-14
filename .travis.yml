@@ -5,7 +5,7 @@ dist: trusty
 jdk: openjdk8
 
 script:
-  - gradle clean build --scan -s
-  - gradle jacocoTestReport
+  - ./gradlew clean build --scan -s
+  - ./gradlew jacocoTestReport
 after_success:
   - bash <(curl -s https://codecov.io/bash)
