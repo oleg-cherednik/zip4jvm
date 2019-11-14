@@ -31,8 +31,7 @@ public final class Diagnostic {
 
     @Getter
     @Setter
-    // TODO it should not extends from byte array
-    public static class ExtraFieldBlock extends ByteArrayBlock {
+    public static class ExtraFieldBlock extends Block {
 
         private ExtraField extraField;
 

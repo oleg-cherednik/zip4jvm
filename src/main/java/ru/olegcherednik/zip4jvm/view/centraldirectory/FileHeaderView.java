@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
-import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
 import ru.olegcherednik.zip4jvm.view.ExternalFileAttributesView;
 import ru.olegcherednik.zip4jvm.view.GeneralPurposeFlagView;
@@ -26,7 +26,7 @@ import java.util.Optional;
 final class FileHeaderView extends View {
 
     private final CentralDirectory.FileHeader fileHeader;
-    private final Diagnostic.ExtraFieldBlock diagFileHeader;
+    private final CentralDirectoryBlock.FileHeaderBlock diagFileHeader;
     private final long pos;
     private final Charset charset;
 
@@ -155,7 +155,7 @@ final class FileHeaderView extends View {
     public static final class Builder {
 
         private CentralDirectory.FileHeader fileHeader;
-        private Diagnostic.ExtraFieldBlock diagFileHeader;
+        private CentralDirectoryBlock.FileHeaderBlock diagFileHeader;
         private long pos;
         private Charset charset = Charsets.IBM437;
         private int offs;
@@ -170,7 +170,7 @@ final class FileHeaderView extends View {
             return this;
         }
 
-        public Builder diagFileHeader(Diagnostic.ExtraFieldBlock diagFileHeader) {
+        public Builder diagFileHeader(CentralDirectoryBlock.FileHeaderBlock diagFileHeader) {
             this.diagFileHeader = diagFileHeader;
             return this;
         }

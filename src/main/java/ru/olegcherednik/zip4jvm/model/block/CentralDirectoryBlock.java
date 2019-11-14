@@ -15,18 +15,18 @@ import java.util.Map;
 @Setter
 public class CentralDirectoryBlock extends Block {
 
-    private final Map<String, Diagnostic.ExtraFieldBlock> fileHeaders = new LinkedHashMap<>();
+    private final Map<String, FileHeaderBlock> fileHeaders = new LinkedHashMap<>();
     private Block digitalSignature = Block.NULL;
 
     @Setter(AccessLevel.NONE)
-    private Diagnostic.ExtraFieldBlock fileHeader;
+    private FileHeaderBlock fileHeader;
 
     public void addDigitalSignature() {
         digitalSignature = new Block();
     }
 
     public void addFileHeader() {
-        fileHeader = new Diagnostic.ExtraFieldBlock();
+        fileHeader = new FileHeaderBlock();
     }
 
     public void saveFileHeader(String fileName) {
@@ -34,8 +34,24 @@ public class CentralDirectoryBlock extends Block {
         fileHeader = null;
     }
 
-    public Diagnostic.ExtraFieldBlock getFileHeader(String fileName) {
+    public FileHeaderBlock getFileHeader(String fileName) {
         return fileHeaders.get(fileName);
+    }
+
+    @Getter
+    @Setter
+    public static final class FileHeaderBlock extends Block {
+
+        private final Diagnostic.ExtraFieldBlock extraFieldBlock = new Diagnostic.ExtraFieldBlock();
+
+        public void addExtraField() {
+            extraFieldBlock.addExtraField();
+        }
+
+        public Diagnostic.ExtraField getExtraField() {
+            return extraFieldBlock.getExtraField();
+        }
+
     }
 
 }
