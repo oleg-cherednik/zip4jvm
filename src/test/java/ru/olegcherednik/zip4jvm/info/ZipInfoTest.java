@@ -90,6 +90,7 @@ public class ZipInfoTest {
                .getShortInfo(System.out);
     }
 
+    @Test(enabled = false)
     public void decompose() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
