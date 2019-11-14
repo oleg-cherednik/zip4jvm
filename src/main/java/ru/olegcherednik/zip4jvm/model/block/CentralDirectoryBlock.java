@@ -19,7 +19,7 @@ public class CentralDirectoryBlock extends Block {
     private Block digitalSignature = Block.NULL;
 
     @Setter(AccessLevel.NONE)
-    private Diagnostic.ExtraFieldBlock fileHeader = null;
+    private Diagnostic.ExtraFieldBlock fileHeader;
 
     public void addDigitalSignature() {
         digitalSignature = new Block();

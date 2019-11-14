@@ -23,7 +23,6 @@
 --------------------------------------------------
     - location:                                     5481079 (0x0053A277) bytes
     - size:                                         87 bytes
-    location of central-directory-record:           5481079 (0x0053A277) bytes
     part number of this part (0000):                1
     relative offset of local header:                0 (0x00000000) bytes
     version made by operating system (00):          MS-DOS, OS/2, NT FAT
@@ -36,7 +35,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
     32-bit CRC value:                               0x00000000
     compressed size:                                293847
     uncompressed size:                              293823
@@ -62,7 +61,6 @@
 --------------------------------------------
     - location:                                     5481166 (0x0053A2CE) bytes
     - size:                                         81 bytes
-    location of central-directory-record:           5481166 (0x0053A2CE) bytes
     part number of this part (0000):                1
     relative offset of local header:                293934 (0x00047C2E) bytes
     version made by operating system (00):          MS-DOS, OS/2, NT FAT
@@ -75,7 +73,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
     32-bit CRC value:                               0x00000000
     compressed size:                                154615
     uncompressed size:                              154591
@@ -101,7 +99,6 @@
 ------------------------------------------------
     - location:                                     5481247 (0x0053A31F) bytes
     - size:                                         85 bytes
-    location of central-directory-record:           5481247 (0x0053A31F) bytes
     part number of this part (0000):                1
     relative offset of local header:                448630 (0x0006D876) bytes
     version made by operating system (00):          MS-DOS, OS/2, NT FAT
@@ -114,7 +111,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F44 0x6344):          2019-10-04 12:26:08
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F44 0x6344):          2019-10-04 12:26:08
     32-bit CRC value:                               0x00000000
     compressed size:                                167050
     uncompressed size:                              167026
@@ -140,7 +137,6 @@
 --------------------------------------------
     - location:                                     5481332 (0x0053A374) bytes
     - size:                                         81 bytes
-    location of central-directory-record:           5481332 (0x0053A374) bytes
     part number of this part (0000):                1
     relative offset of local header:                615765 (0x00096555) bytes
     version made by operating system (00):          MS-DOS, OS/2, NT FAT
@@ -153,7 +149,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
     32-bit CRC value:                               0x00000000
     compressed size:                                287373
     uncompressed size:                              287349
@@ -179,7 +175,6 @@
 ------------------------------------------------
     - location:                                     5481413 (0x0053A3C5) bytes
     - size:                                         85 bytes
-    location of central-directory-record:           5481413 (0x0053A3C5) bytes
     part number of this part (0000):                1
     relative offset of local header:                903219 (0x000DC833) bytes
     version made by operating system (00):          MS-DOS, OS/2, NT FAT
@@ -192,7 +187,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
     compressed size:                                1395386
     uncompressed size:                              1395362
@@ -218,7 +213,6 @@
 -----------------------------------------------
     - location:                                     5481498 (0x0053A41A) bytes
     - size:                                         84 bytes
-    location of central-directory-record:           5481498 (0x0053A41A) bytes
     part number of this part (0000):                1
     relative offset of local header:                2298690 (0x00231342) bytes
     version made by operating system (00):          MS-DOS, OS/2, NT FAT
@@ -231,7 +225,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
     compressed size:                                320918
     uncompressed size:                              320894
@@ -257,7 +251,6 @@
 --------------------------------------------
     - location:                                     5481582 (0x0053A46E) bytes
     - size:                                         81 bytes
-    location of central-directory-record:           5481582 (0x0053A46E) bytes
     part number of this part (0000):                1
     relative offset of local header:                2619692 (0x0027F92C) bytes
     version made by operating system (00):          MS-DOS, OS/2, NT FAT
@@ -270,7 +263,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
     compressed size:                                729657
     uncompressed size:                              729633
@@ -296,7 +289,6 @@
 ------------------------------
     - location:                                     5481663 (0x0053A4BF) bytes
     - size:                                         56 bytes
-    location of central-directory-record:           5481663 (0x0053A4BF) bytes
     part number of this part (0000):                1
     relative offset of local header:                3349430 (0x00331BB6) bytes
     version made by operating system (00):          MS-DOS, OS/2, NT FAT
@@ -327,7 +319,6 @@
 ----------------------------------
     - location:                                     5481719 (0x0053A4F7) bytes
     - size:                                         71 bytes
-    location of central-directory-record:           5481719 (0x0053A4F7) bytes
     part number of this part (0000):                1
     relative offset of local header:                3349470 (0x00331BDE) bytes
     version made by operating system (00):          MS-DOS, OS/2, NT FAT
@@ -340,7 +331,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F2F 0x9DCE):          2019-09-15 19:46:28
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F2F 0x9DCE):          2019-09-15 19:46:28
     32-bit CRC value:                               0x00000000
     compressed size:                                24
     uncompressed size:                              0
@@ -365,7 +356,6 @@
 ----------------------------------------------------
     - location:                                     5481790 (0x0053A53E) bytes
     - size:                                         88 bytes
-    location of central-directory-record:           5481790 (0x0053A53E) bytes
     part number of this part (0000):                1
     relative offset of local header:                3349565 (0x00331C3D) bytes
     version made by operating system (00):          MS-DOS, OS/2, NT FAT
@@ -378,7 +368,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
     compressed size:                                624770
     uncompressed size:                              624746
@@ -404,7 +394,6 @@
 ---------------------------------------
     - location:                                     5481878 (0x0053A596) bytes
     - size:                                         75 bytes
-    location of central-directory-record:           5481878 (0x0053A596) bytes
     part number of this part (0000):                1
     relative offset of local header:                3974423 (0x003CA517) bytes
     version made by operating system (00):          MS-DOS, OS/2, NT FAT
@@ -417,7 +406,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F2F 0x9DCE):          2019-09-15 19:46:28
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F2F 0x9DCE):          2019-09-15 19:46:28
     32-bit CRC value:                               0x00000000
     compressed size:                                65
     uncompressed size:                              41
@@ -443,7 +432,6 @@
 -----------------------------------------
     - location:                                     5481953 (0x0053A5E1) bytes
     - size:                                         77 bytes
-    location of central-directory-record:           5481953 (0x0053A5E1) bytes
     part number of this part (0000):                1
     relative offset of local header:                3974563 (0x003CA5A3) bytes
     version made by operating system (00):          MS-DOS, OS/2, NT FAT
@@ -456,7 +444,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
     compressed size:                                1074860
     uncompressed size:                              1074836
@@ -482,7 +470,6 @@
 -----------------------------------------
     - location:                                     5482030 (0x0053A62E) bytes
     - size:                                         77 bytes
-    location of central-directory-record:           5482030 (0x0053A62E) bytes
     part number of this part (0000):                1
     relative offset of local header:                5049500 (0x004D0C9C) bytes
     version made by operating system (00):          MS-DOS, OS/2, NT FAT
@@ -495,7 +482,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
     compressed size:                                431502
     uncompressed size:                              431478
@@ -533,7 +520,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
     32-bit CRC value:                               0x00000000
     compressed size:                                0
     uncompressed size:                              0
@@ -581,7 +568,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
     32-bit CRC value:                               0x00000000
     compressed size:                                0
     uncompressed size:                              0
@@ -629,7 +616,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F44 0x6344):          2019-10-04 12:26:08
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F44 0x6344):          2019-10-04 12:26:08
     32-bit CRC value:                               0x00000000
     compressed size:                                0
     uncompressed size:                              0
@@ -677,7 +664,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
     32-bit CRC value:                               0x00000000
     compressed size:                                0
     uncompressed size:                              0
@@ -725,7 +712,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
     compressed size:                                0
     uncompressed size:                              0
@@ -773,7 +760,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
     compressed size:                                0
     uncompressed size:                              0
@@ -821,7 +808,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
     compressed size:                                0
     uncompressed size:                              0
@@ -890,7 +877,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F2F 0x9DCE):          2019-09-15 19:46:28
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F2F 0x9DCE):          2019-09-15 19:46:28
     32-bit CRC value:                               0x00000000
     compressed size:                                0
     uncompressed size:                              0
@@ -937,7 +924,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
     compressed size:                                0
     uncompressed size:                              0
@@ -985,7 +972,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F2F 0x9DCE):          2019-09-15 19:46:28
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F2F 0x9DCE):          2019-09-15 19:46:28
     32-bit CRC value:                               0x00000000
     compressed size:                                0
     uncompressed size:                              0
@@ -1033,7 +1020,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
     compressed size:                                0
     uncompressed size:                              0
@@ -1081,7 +1068,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
     compressed size:                                0
     uncompressed size:                              0

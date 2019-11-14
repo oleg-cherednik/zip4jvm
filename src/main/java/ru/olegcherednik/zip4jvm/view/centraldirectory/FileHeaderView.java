@@ -60,8 +60,8 @@ final class FileHeaderView extends View {
         return true;
     }
 
+    // TODO this is not location; method should be renamed
     private void printLocation(PrintStream out) {
-        printLine(out, "location of central-directory-record:", String.format("%1$d (0x%1$08X) bytes", diagFileHeader.getOffs()));
         printLine(out, String.format("part number of this part (%04X):", fileHeader.getDisk()), String.valueOf(fileHeader.getDisk() + 1));
         printLine(out, "relative offset of local header:", String.format("%1$d (0x%1$08X) bytes", fileHeader.getLocalFileHeaderOffs()));
     }
