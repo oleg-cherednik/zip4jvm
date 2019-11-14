@@ -42,15 +42,7 @@ public class CentralDirectoryBlock extends Block {
     @Setter
     public static final class FileHeaderBlock extends Block {
 
-        private final Diagnostic.ExtraFieldBlock extraFieldBlock = new Diagnostic.ExtraFieldBlock();
-
-        public void addExtraField() {
-            extraFieldBlock.addExtraField();
-        }
-
-        public Diagnostic.ExtraField getExtraField() {
-            return extraFieldBlock.getExtraField();
-        }
+        private final ExtraFieldListBlock extraFields = new ExtraFieldListBlock();
 
     }
 

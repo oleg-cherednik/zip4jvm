@@ -20,6 +20,7 @@ import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.BlockZipEntryModel;
 import ru.olegcherednik.zip4jvm.model.block.ByteArrayBlock;
 import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.block.ExtraFieldListBlock;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.os.ExtendedTimestampExtraField;
 import ru.olegcherednik.zip4jvm.model.os.InfoZipNewUnixExtraField;
@@ -165,7 +166,7 @@ public final class ZipInfo {
                 Path extraFieldDir = dir.resolve("extra_fields");
                 Files.createDirectories(extraFieldDir);
 
-                Diagnostic.ExtraField diagExtraField = diagLocalFileHeader.getExtraField();
+                ExtraFieldListBlock diagExtraField = diagLocalFileHeader.getExtraField();
                 LocalFileHeader localFileHeader = zipEntryModel.getLocalFileHeaders().get(fileName);
 
                 for (int signature : diagExtraField.getRecords().keySet()) {

@@ -31,42 +31,6 @@ public final class Diagnostic {
 
     @Getter
     @Setter
-    public static class ExtraFieldBlock extends Block {
-
-        private ExtraField extraField;
-
-        public void addExtraField() {
-            extraField = new ExtraField();
-        }
-    }
-
-
-    @Getter
-    @Setter
-    public static final class ExtraField extends Block {
-
-        private final Map<Integer, ByteArrayBlock> records = new LinkedHashMap<>();
-
-        @Setter(AccessLevel.NONE)
-        private ByteArrayBlock record;
-
-        public void addRecord() {
-            record = new ByteArrayBlock();
-        }
-
-        public void saveRecord(int signature) {
-            records.put(signature, record);
-            record = null;
-        }
-
-        public ByteArrayBlock getRecord(int signature) {
-            return records.get(signature);
-        }
-
-    }
-
-    @Getter
-    @Setter
     public static final class ZipEntryBlock {
 
         public static final ZipEntry NULL = new ZipEntry();
@@ -109,10 +73,11 @@ public final class Diagnostic {
 
         @Getter
         @Setter
-        public static final class LocalFileHeader extends ExtraFieldBlock {
+        public static final class LocalFileHeader extends Block {
 
             public static final LocalFileHeader NULL = new LocalFileHeader();
 
+            private final ExtraFieldListBlock extraFields = new ExtraFieldListBlock();
 
             private long disk;
 
@@ -123,7 +88,7 @@ public final class Diagnostic {
         public static final class LocalFileHeaderB {
 
             private final ByteArrayBlock content = new ByteArrayBlock();
-            private final ExtraField extraField = new ExtraField();
+            private final ExtraFieldListBlock extraField = new ExtraFieldListBlock();
 
             private long disk;
         }
@@ -165,10 +130,10 @@ public final class Diagnostic {
 
             public static final LocalFileHeader NULL = new LocalFileHeader();
 
-            private ExtraField extraField;
+            private ExtraFieldListBlock extraField;
 
             public void addExtraField() {
-                extraField = new ExtraField();
+                extraField = new ExtraFieldListBlock();
             }
         }
 

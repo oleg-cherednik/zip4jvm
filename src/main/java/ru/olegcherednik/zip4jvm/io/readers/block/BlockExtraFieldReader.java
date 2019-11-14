@@ -4,7 +4,7 @@ import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldRecordReader;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
-import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.block.ExtraFieldListBlock;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
@@ -17,10 +17,10 @@ import java.util.function.Function;
  */
 public class BlockExtraFieldReader extends ExtraFieldReader {
 
-    private final Diagnostic.ExtraField extraFieldBlock;
+    private final ExtraFieldListBlock extraFieldBlock;
 
     public BlockExtraFieldReader(int size, Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> readers,
-            Diagnostic.ExtraField extraFieldBlock) {
+            ExtraFieldListBlock extraFieldBlock) {
         super(size, readers);
         this.extraFieldBlock = extraFieldBlock;
     }

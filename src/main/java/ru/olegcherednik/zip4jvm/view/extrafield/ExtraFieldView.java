@@ -4,7 +4,7 @@ import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.Zip64;
-import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.block.ExtraFieldListBlock;
 import ru.olegcherednik.zip4jvm.model.os.ExtendedTimestampExtraField;
 import ru.olegcherednik.zip4jvm.model.os.InfoZipNewUnixExtraField;
 import ru.olegcherednik.zip4jvm.model.os.InfoZipOldUnixExtraField;
@@ -23,7 +23,7 @@ import java.util.function.Function;
 public final class ExtraFieldView extends View {
 
     private final ExtraField extraField;
-    private final Diagnostic.ExtraField diagExtraField;
+    private final ExtraFieldListBlock diagExtraField;
     private final GeneralPurposeFlag generalPurposeFlag;
 
     public static Builder builder() {
@@ -139,7 +139,7 @@ public final class ExtraFieldView extends View {
     public static final class Builder {
 
         private ExtraField extraField = ExtraField.NULL;
-        private Diagnostic.ExtraField diagExtraField;
+        private ExtraFieldListBlock diagExtraField;
         private GeneralPurposeFlag generalPurposeFlag;
         private int offs;
         private int columnWidth;
@@ -153,7 +153,7 @@ public final class ExtraFieldView extends View {
             return this;
         }
 
-        public Builder diagExtraField(Diagnostic.ExtraField diagExtraField) {
+        public Builder diagExtraField(ExtraFieldListBlock diagExtraField) {
             this.diagExtraField = diagExtraField;
             return this;
         }
