@@ -41,6 +41,17 @@ public class ZipInfoTest {
         Zip4jvmSuite.removeDir(rootDir);
     }
 
+    public void shouldRetrieveInfoWhenStoreSolid() throws IOException {
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("actual.txt");
+        Files.createDirectories(file.getParent());
+
+        try (PrintStream out = new PrintStream(file.toFile())) {
+            ZipInfo.zip(TestData.zipStoreSolid).getShortInfo(out);
+        }
+
+        assertThatFile(file).matchesResourceLines("/info/store_solid.txt");
+    }
+
     public void shouldRetrieveInfoWhenStoreSolidPkware() throws IOException {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("actual.txt");
         Files.createDirectories(file.getParent());
@@ -86,7 +97,7 @@ public class ZipInfoTest {
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/macos_10.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/ubuntu_18.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/securezip/aes128.zip"))
-        ZipInfo.zip(TestData.zipStoreSolidAes)
+        ZipInfo.zip(TestData.zipStoreSolid)
                .getShortInfo(System.out);
     }
 
