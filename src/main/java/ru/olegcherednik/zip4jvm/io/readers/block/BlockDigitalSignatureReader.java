@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DigitalSignatureReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 
 import java.io.IOException;
 
@@ -15,7 +15,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class BlockDigitalSignatureReader extends DigitalSignatureReader {
 
-    private final Diagnostic.CentralDirectory centralDirectory;
+    private final CentralDirectoryBlock centralDirectory;
 
     @Override
     protected CentralDirectory.DigitalSignature readDigitalSignature(DataInput in) throws IOException {

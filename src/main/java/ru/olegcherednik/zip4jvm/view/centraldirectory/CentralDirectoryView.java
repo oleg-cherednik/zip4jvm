@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
-import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.View;
 
@@ -19,7 +19,7 @@ import java.util.Optional;
 public final class CentralDirectoryView extends View {
 
     private final CentralDirectory centralDirectory;
-    private final Diagnostic.CentralDirectory diagCentralDirectory;
+    private final CentralDirectoryBlock diagCentralDirectory;
     private final Charset charset;
 
     public static Builder builder() {
@@ -63,13 +63,13 @@ public final class CentralDirectoryView extends View {
     public static final class Builder {
 
         private CentralDirectory centralDirectory;
-        private Diagnostic.CentralDirectory diagCentralDirectory = Diagnostic.CentralDirectory.NULL;
+        private CentralDirectoryBlock diagCentralDirectory;
         private Charset charset = Charsets.IBM437;
         private int offs;
         private int columnWidth;
 
         public IView build() {
-            return centralDirectory == null || diagCentralDirectory == Diagnostic.CentralDirectory.NULL ? IView.NULL : new CentralDirectoryView(this);
+            return centralDirectory == null || diagCentralDirectory == null ? IView.NULL : new CentralDirectoryView(this);
         }
 
         public Builder centralDirectory(CentralDirectory centralDirectory) {
@@ -77,8 +77,8 @@ public final class CentralDirectoryView extends View {
             return this;
         }
 
-        public Builder diagCentralDirectory(Diagnostic.CentralDirectory diagCentralDirectory) {
-            this.diagCentralDirectory = Optional.ofNullable(diagCentralDirectory).orElse(Diagnostic.CentralDirectory.NULL);
+        public Builder diagCentralDirectory(CentralDirectoryBlock diagCentralDirectory) {
+            this.diagCentralDirectory = diagCentralDirectory;
             return this;
         }
 

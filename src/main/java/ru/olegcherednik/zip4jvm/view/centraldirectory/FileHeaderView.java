@@ -26,7 +26,7 @@ import java.util.Optional;
 final class FileHeaderView extends View {
 
     private final CentralDirectory.FileHeader fileHeader;
-    private final Diagnostic.CentralDirectory.FileHeader diagFileHeader;
+    private final Diagnostic.ExtraFieldBlock diagFileHeader;
     private final long pos;
     private final Charset charset;
 
@@ -155,7 +155,7 @@ final class FileHeaderView extends View {
     public static final class Builder {
 
         private CentralDirectory.FileHeader fileHeader;
-        private Diagnostic.CentralDirectory.FileHeader diagFileHeader = Diagnostic.CentralDirectory.FileHeader.NULL;
+        private Diagnostic.ExtraFieldBlock diagFileHeader;
         private long pos;
         private Charset charset = Charsets.IBM437;
         private int offs;
@@ -170,8 +170,8 @@ final class FileHeaderView extends View {
             return this;
         }
 
-        public Builder diagFileHeader(Diagnostic.CentralDirectory.FileHeader diagFileHeader) {
-            this.diagFileHeader = Optional.ofNullable(diagFileHeader).orElse(Diagnostic.CentralDirectory.FileHeader.NULL);
+        public Builder diagFileHeader(Diagnostic.ExtraFieldBlock diagFileHeader) {
+            this.diagFileHeader = diagFileHeader;
             return this;
         }
 

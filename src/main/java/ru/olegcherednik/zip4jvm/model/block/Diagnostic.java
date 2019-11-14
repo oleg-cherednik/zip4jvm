@@ -17,7 +17,7 @@ public final class Diagnostic {
 
     private final Block endCentralDirectory = new Block();
     private final Zip64 zip64 = new Zip64();
-    private final CentralDirectory centralDirectory = new CentralDirectory();
+    private final CentralDirectoryBlock centralDirectory = new CentralDirectoryBlock();
     private final ZipEntryBlock zipEntryBlock = new ZipEntryBlock();
 
     @Getter
@@ -31,48 +31,8 @@ public final class Diagnostic {
 
     @Getter
     @Setter
-    public static final class CentralDirectory extends Block {
-
-        public static final CentralDirectory NULL = new CentralDirectory();
-
-        private Block digitalSignature = Block.NULL;
-
-        private final Map<String, FileHeader> fileHeaders = new LinkedHashMap<>();
-
-        @Setter(AccessLevel.NONE)
-        private FileHeader fileHeader = FileHeader.NULL;
-
-        public void addDigitalSignature() {
-            digitalSignature = new Block();
-        }
-
-        public void addFileHeader() {
-            fileHeader = new FileHeader();
-        }
-
-        public void saveFileHeader(String fileName) {
-            fileHeaders.put(fileName, fileHeader);
-            fileHeader = FileHeader.NULL;
-        }
-
-        public FileHeader getFileHeader(String fileName) {
-            return fileHeaders.get(fileName);
-        }
-
-        @Getter
-        @Setter
-        public static final class FileHeader extends ExtraFieldBlock {
-
-            public static final FileHeader NULL = new FileHeader();
-
-        }
-
-    }
-
-    @Getter
-    @Setter
     // TODO it should not extends from byte array
-    public abstract static class ExtraFieldBlock extends ByteArrayBlock {
+    public static class ExtraFieldBlock extends ByteArrayBlock {
 
         private ExtraField extraField;
 

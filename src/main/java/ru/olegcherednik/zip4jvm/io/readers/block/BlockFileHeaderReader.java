@@ -4,7 +4,7 @@ import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -16,9 +16,9 @@ import java.util.function.Function;
  */
 public class BlockFileHeaderReader extends FileHeaderReader {
 
-    private final Diagnostic.CentralDirectory centralDirectory;
+    private final CentralDirectoryBlock centralDirectory;
 
-    public BlockFileHeaderReader(long totalEntries, Function<Charset, Charset> charsetCustomizer, Diagnostic.CentralDirectory centralDirectory) {
+    public BlockFileHeaderReader(long totalEntries, Function<Charset, Charset> charsetCustomizer, CentralDirectoryBlock centralDirectory) {
         super(totalEntries, charsetCustomizer);
         this.centralDirectory = centralDirectory;
     }

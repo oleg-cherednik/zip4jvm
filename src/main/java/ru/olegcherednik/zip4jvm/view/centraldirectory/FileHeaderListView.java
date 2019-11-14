@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
-import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
@@ -18,7 +18,7 @@ import java.util.Optional;
 final class FileHeaderListView extends View {
 
     private final CentralDirectory centralDirectory;
-    private final Diagnostic.CentralDirectory diagCentralDirectory;
+    private final CentralDirectoryBlock diagCentralDirectory;
     private final Charset charset;
 
     public static Builder builder() {
@@ -61,7 +61,7 @@ final class FileHeaderListView extends View {
     public static final class Builder {
 
         private CentralDirectory centralDirectory;
-        private Diagnostic.CentralDirectory diagCentralDirectory = Diagnostic.CentralDirectory.NULL;
+        private CentralDirectoryBlock diagCentralDirectory;
         private Charset charset = Charsets.IBM437;
         private int offs;
         private int columnWidth;
@@ -75,8 +75,8 @@ final class FileHeaderListView extends View {
             return this;
         }
 
-        public Builder diagCentralDirectory(Diagnostic.CentralDirectory diagCentralDirectory) {
-            this.diagCentralDirectory = Optional.ofNullable(diagCentralDirectory).orElse(Diagnostic.CentralDirectory.NULL);
+        public Builder diagCentralDirectory(CentralDirectoryBlock diagCentralDirectory) {
+            this.diagCentralDirectory = diagCentralDirectory;
             return this;
         }
 
