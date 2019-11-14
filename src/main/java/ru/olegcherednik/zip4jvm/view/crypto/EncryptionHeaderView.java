@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.view.crypto;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.readers.block.aes.BlockAesEncryptionHeader;
+import ru.olegcherednik.zip4jvm.io.readers.block.aes.AesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.io.readers.block.pkware.PkwareEncryptionHeader;
 import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 import ru.olegcherednik.zip4jvm.view.IView;
@@ -34,8 +34,8 @@ public final class EncryptionHeaderView extends View {
         if (encryptionHeader == null)
             return false;
 
-        if (encryptionHeader instanceof BlockAesEncryptionHeader)
-            createView((BlockAesEncryptionHeader)encryptionHeader).print(out);
+        if (encryptionHeader instanceof AesEncryptionHeaderBlock)
+            createView((AesEncryptionHeaderBlock)encryptionHeader).print(out);
         else if (encryptionHeader instanceof PkwareEncryptionHeader)
             createView((PkwareEncryptionHeader)encryptionHeader).print(out);
         // TODO add for unknown encryption header
@@ -43,7 +43,7 @@ public final class EncryptionHeaderView extends View {
         return true;
     }
 
-    private BlockAesEncryptionHeaderView createView(BlockAesEncryptionHeader encryptionHeader) {
+    private BlockAesEncryptionHeaderView createView(AesEncryptionHeaderBlock encryptionHeader) {
         return BlockAesEncryptionHeaderView.builder()
                                            .encryptionHeader(encryptionHeader)
                                            .pos(pos)

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.io.in.SplitZipInputStream;
-import ru.olegcherednik.zip4jvm.io.readers.block.aes.BlockAesEncryptionHeader;
+import ru.olegcherednik.zip4jvm.io.readers.block.aes.AesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.io.readers.block.aes.BlockAesHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.pkware.BlockPkwareHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.pkware.PkwareEncryptionHeader;
@@ -13,6 +13,7 @@ import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BlockZipEntryModel;
+import ru.olegcherednik.zip4jvm.model.block.ByteArrayBlock;
 import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -64,7 +65,7 @@ public class BlockZipEntryModelReader {
         Encryption encryption = zipEntry.getEncryption();
 
         if (encryption == Encryption.AES_256 || encryption == Encryption.AES_192 || encryption == Encryption.AES_128) {
-            BlockAesEncryptionHeader encryptionHeader = new BlockAesHeaderReader(zipEntry.getStrength(), zipEntry.getCompressedSize()).read(in);
+            AesEncryptionHeaderBlock encryptionHeader = new BlockAesHeaderReader(zipEntry.getStrength(), zipEntry.getCompressedSize()).read(in);
             zipEntryBlock.saveEncryptionHeader(zipEntry.getFileName(), encryptionHeader);
         } else if (zipEntry.getEncryption() == Encryption.PKWARE) {
             PkwareEncryptionHeader encryptionHeader = new BlockPkwareHeaderReader().read(in);
@@ -75,7 +76,7 @@ public class BlockZipEntryModelReader {
     }
 
     private DataDescriptor readDataDescriptor(ZipEntry zipEntry, DataInput in) throws IOException {
-        Diagnostic.ByteArrayBlockB block = new Diagnostic.ByteArrayBlockB();
+        ByteArrayBlock block = new ByteArrayBlock();
         DataDescriptor dataDescriptor = new BlockDataDescriptorReader(zipEntry.isZip64(), block).read(in);
         zipEntryBlock.saveDataDescriptor(zipEntry.getFileName(), block);
         return dataDescriptor;

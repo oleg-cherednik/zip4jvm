@@ -3,10 +3,7 @@ package ru.olegcherednik.zip4jvm.model.block;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;
 
-import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -75,7 +72,7 @@ public final class Diagnostic {
     @Getter
     @Setter
     // TODO it should not extends from byte array
-    public abstract static class ExtraFieldBlock extends ByteArrayBlockB {
+    public abstract static class ExtraFieldBlock extends ByteArrayBlock {
 
         private ExtraField extraField;
 
@@ -89,13 +86,13 @@ public final class Diagnostic {
     @Setter
     public static final class ExtraField extends Block {
 
-        private final Map<Integer, ByteArrayBlockB> records = new LinkedHashMap<>();
+        private final Map<Integer, ByteArrayBlock> records = new LinkedHashMap<>();
 
         @Setter(AccessLevel.NONE)
-        private ByteArrayBlockB record;
+        private ByteArrayBlock record;
 
         public void addRecord() {
-            record = new ByteArrayBlockB();
+            record = new ByteArrayBlock();
         }
 
         public void saveRecord(int signature) {
@@ -103,7 +100,7 @@ public final class Diagnostic {
             record = null;
         }
 
-        public ByteArrayBlockB getRecord(int signature) {
+        public ByteArrayBlock getRecord(int signature) {
             return records.get(signature);
         }
 
@@ -117,7 +114,7 @@ public final class Diagnostic {
 
         private final Map<String, LocalFileHeaderB> localFileHeaders = new LinkedHashMap<>();
         private final Map<String, EncryptionHeader> encryptionHeaders = new LinkedHashMap<>();
-        private final Map<String, Diagnostic.ByteArrayBlockB> dataDescriptors = new LinkedHashMap<>();
+        private final Map<String, ByteArrayBlock> dataDescriptors = new LinkedHashMap<>();
 
         @Setter(AccessLevel.NONE)
         private LocalFileHeaderB localFileHeader;
@@ -135,7 +132,7 @@ public final class Diagnostic {
             encryptionHeaders.put(fileName, encryptionHeader);
         }
 
-        public void saveDataDescriptor(String fileName, Diagnostic.ByteArrayBlockB block) {
+        public void saveDataDescriptor(String fileName, ByteArrayBlock block) {
             dataDescriptors.put(fileName, block);
         }
 
@@ -147,7 +144,7 @@ public final class Diagnostic {
             return encryptionHeaders.get(fileName);
         }
 
-        public Diagnostic.ByteArrayBlockB getDataDescriptor(String fileName) {
+        public ByteArrayBlock getDataDescriptor(String fileName) {
             return dataDescriptors.get(fileName);
         }
 
@@ -166,7 +163,7 @@ public final class Diagnostic {
         @Setter
         public static final class LocalFileHeaderB {
 
-            private final ByteArrayBlockB content = new ByteArrayBlockB();
+            private final ByteArrayBlock content = new ByteArrayBlock();
             private final ExtraField extraField = new ExtraField();
 
             private long disk;
@@ -176,36 +173,6 @@ public final class Diagnostic {
 
         }
 
-    }
-
-    @Getter
-    @Setter
-    public static class ByteArrayBlock extends Block {
-
-        private byte[] data;
-
-        @Override
-        public <T> T calc(DataInput in, LocalSupplier<T> task) throws IOException {
-            T res = super.calc(in, task);
-            data = (byte[])res;
-            return res;
-        }
-    }
-
-    @Getter
-    @Setter
-    public static class ByteArrayBlockB extends Block {
-
-        private byte[] data;
-
-        @Override
-        public <T> T calc(DataInput in, LocalSupplier<T> task) throws IOException {
-            long offs = in.getOffs();
-            in.cleanBuffer();
-            T res = super.calc(in, task);
-            data = in.getLastBytes((int)(in.getOffs() - offs));
-            return res;
-        }
     }
 
     @Getter

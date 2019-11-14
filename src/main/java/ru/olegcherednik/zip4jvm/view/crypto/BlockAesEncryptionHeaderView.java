@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.view.crypto;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.readers.block.aes.BlockAesEncryptionHeader;
+import ru.olegcherednik.zip4jvm.io.readers.block.aes.AesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.View;
 
@@ -14,7 +14,7 @@ import java.io.PrintStream;
  */
 final class BlockAesEncryptionHeaderView extends View {
 
-    private final BlockAesEncryptionHeader encryptionHeader;
+    private final AesEncryptionHeaderBlock encryptionHeader;
     private final long pos;
 
     public static Builder builder() {
@@ -66,7 +66,7 @@ final class BlockAesEncryptionHeaderView extends View {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class Builder {
 
-        private BlockAesEncryptionHeader encryptionHeader;
+        private AesEncryptionHeaderBlock encryptionHeader;
         private long pos;
         private int offs;
         private int columnWidth;
@@ -75,7 +75,7 @@ final class BlockAesEncryptionHeaderView extends View {
             return new BlockAesEncryptionHeaderView(this);
         }
 
-        public Builder encryptionHeader(BlockAesEncryptionHeader encryptionHeader) {
+        public Builder encryptionHeader(AesEncryptionHeaderBlock encryptionHeader) {
             this.encryptionHeader = encryptionHeader;
             return this;
         }

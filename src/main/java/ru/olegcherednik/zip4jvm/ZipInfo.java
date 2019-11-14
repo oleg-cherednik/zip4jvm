@@ -8,7 +8,7 @@ import ru.olegcherednik.zip4jvm.io.in.ng.BaseZipInputStream;
 import ru.olegcherednik.zip4jvm.io.in.ng.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.io.readers.block.BlockModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.BlockZipEntryModelReader;
-import ru.olegcherednik.zip4jvm.io.readers.block.aes.BlockAesEncryptionHeader;
+import ru.olegcherednik.zip4jvm.io.readers.block.aes.AesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.io.readers.block.pkware.PkwareEncryptionHeader;
 import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
 import ru.olegcherednik.zip4jvm.model.Charsets;
@@ -18,13 +18,14 @@ import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.BlockZipEntryModel;
+import ru.olegcherednik.zip4jvm.model.block.ByteArrayBlock;
 import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.os.ExtendedTimestampExtraField;
 import ru.olegcherednik.zip4jvm.model.os.InfoZipNewUnixExtraField;
+import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.CentralDirectoryView;
-import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntryListView;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntryView;
 import ru.olegcherednik.zip4jvm.view.zip64.Zip64View;
@@ -168,7 +169,7 @@ public final class ZipInfo {
                 LocalFileHeader localFileHeader = zipEntryModel.getLocalFileHeaders().get(fileName);
 
                 for (int signature : diagExtraField.getRecords().keySet()) {
-                    Diagnostic.ByteArrayBlockB block1 = diagExtraField.getRecord(signature);
+                    ByteArrayBlock block1 = diagExtraField.getRecord(signature);
                     ExtraField.Record rec = localFileHeader.getExtraField().getRecords().stream()
                                                            .filter(r -> r.getSignature() == signature)
                                                            .findFirst().orElse(null);
@@ -194,7 +195,7 @@ public final class ZipInfo {
 
             // TODO probably same with block reader
             if (encryption == Encryption.AES_128 || encryption == Encryption.AES_192 || encryption == Encryption.AES_256) {
-                BlockAesEncryptionHeader encryptionHeader = (BlockAesEncryptionHeader)block.getEncryptionHeader(fileName);
+                AesEncryptionHeaderBlock encryptionHeader = (AesEncryptionHeaderBlock)block.getEncryptionHeader(fileName);
 
                 FileUtils.writeByteArrayToFile(dir.resolve("aes_salt.data").toFile(), encryptionHeader.getSalt().getData());
                 FileUtils.writeByteArrayToFile(dir.resolve("aes_password_checksum.data").toFile(),
@@ -208,7 +209,7 @@ public final class ZipInfo {
             // print data descriptor
 
             if (zipEntry.isDataDescriptorAvailable()) {
-                Diagnostic.ByteArrayBlockB dataDescriptor = block.getDataDescriptor(fileName);
+                ByteArrayBlock dataDescriptor = block.getDataDescriptor(fileName);
                 FileUtils.writeByteArrayToFile(dir.resolve("data_descriptor.data").toFile(), dataDescriptor.getData());
             }
 
@@ -222,7 +223,7 @@ public final class ZipInfo {
                     offs += diagLocalFileHeader.getExtraField().getSize();
 
                 if (encryption == Encryption.AES_128 || encryption == Encryption.AES_192 || encryption == Encryption.AES_256) {
-                    BlockAesEncryptionHeader encryptionHeader = (BlockAesEncryptionHeader)block.getEncryptionHeader(fileName);
+                    AesEncryptionHeaderBlock encryptionHeader = (AesEncryptionHeaderBlock)block.getEncryptionHeader(fileName);
 
                     offs += encryptionHeader.getSalt().getSize();
                     offs += encryptionHeader.getPasswordChecksum().getSize();

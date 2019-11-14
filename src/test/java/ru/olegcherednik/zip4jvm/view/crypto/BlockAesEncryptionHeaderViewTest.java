@@ -2,8 +2,8 @@ package ru.olegcherednik.zip4jvm.view.crypto;
 
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.io.readers.block.aes.BlockAesEncryptionHeader;
-import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
+import ru.olegcherednik.zip4jvm.io.readers.block.aes.AesEncryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.model.block.ByteArrayBlock;
 
 import java.io.IOException;
 
@@ -19,10 +19,10 @@ import static org.mockito.Mockito.when;
 public class BlockAesEncryptionHeaderViewTest {
 
     public void shouldRetrieveMultipleLinesWhenAesEncryptionHeader() throws IOException {
-        BlockAesEncryptionHeader encryptionHeader = mock(BlockAesEncryptionHeader.class);
-        Diagnostic.ByteArrayBlock salt = mock(Diagnostic.ByteArrayBlock.class);
-        Diagnostic.ByteArrayBlock passwordChecksum = mock(Diagnostic.ByteArrayBlock.class);
-        Diagnostic.ByteArrayBlock mac = mock(Diagnostic.ByteArrayBlock.class);
+        AesEncryptionHeaderBlock encryptionHeader = mock(AesEncryptionHeaderBlock.class);
+        ByteArrayBlock salt = mock(ByteArrayBlock.class);
+        ByteArrayBlock passwordChecksum = mock(ByteArrayBlock.class);
+        ByteArrayBlock mac = mock(ByteArrayBlock.class);
 
         when(encryptionHeader.getSalt()).thenReturn(salt);
         when(encryptionHeader.getPasswordChecksum()).thenReturn(passwordChecksum);

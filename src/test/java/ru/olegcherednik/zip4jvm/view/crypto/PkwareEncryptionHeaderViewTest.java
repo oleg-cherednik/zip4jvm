@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.view.crypto;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.io.readers.block.pkware.PkwareEncryptionHeader;
-import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.block.ByteArrayBlock;
 
 import java.io.IOException;
 
@@ -20,7 +20,7 @@ public class PkwareEncryptionHeaderViewTest {
 
     public void shouldRetrieveMultipleLinesWhenPkwareEncryptionHeader() throws IOException {
         PkwareEncryptionHeader encryptionHeader = mock(PkwareEncryptionHeader.class);
-        Diagnostic.ByteArrayBlockB data = mock(Diagnostic.ByteArrayBlockB.class);
+        ByteArrayBlock data = mock(ByteArrayBlock.class);
 
         when(encryptionHeader.getData()).thenReturn(data);
         when(data.getSize()).thenReturn(12L);
