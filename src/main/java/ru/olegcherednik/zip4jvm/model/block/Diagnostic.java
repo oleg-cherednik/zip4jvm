@@ -77,7 +77,7 @@ public final class Diagnostic {
 
             public static final LocalFileHeader NULL = new LocalFileHeader();
 
-            private final ExtraFieldListBlock extraFields = new ExtraFieldListBlock();
+            private final ExtraFieldBlock extraFields = new ExtraFieldBlock();
 
             private long disk;
 
@@ -88,7 +88,7 @@ public final class Diagnostic {
         public static final class LocalFileHeaderB {
 
             private final ByteArrayBlock content = new ByteArrayBlock();
-            private final ExtraFieldListBlock extraField = new ExtraFieldListBlock();
+            private final ExtraFieldBlock extraField = new ExtraFieldBlock();
 
             private long disk;
         }
@@ -130,10 +130,10 @@ public final class Diagnostic {
 
             public static final LocalFileHeader NULL = new LocalFileHeader();
 
-            private ExtraFieldListBlock extraField;
+            private ExtraFieldBlock extraField;
 
             public void addExtraField() {
-                extraField = new ExtraFieldListBlock();
+                extraField = new ExtraFieldBlock();
             }
         }
 

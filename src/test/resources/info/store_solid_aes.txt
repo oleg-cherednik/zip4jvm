@@ -49,8 +49,8 @@
     external file attributes:                       0x00000020
       MS-DOS file attributes (0x20):                arc
       non-MSDOS file attributes (0x000000):         ?---------
-    extra field location:                           0 (0x00000000) bytes
-      - size:                                       0 bytes (1 record)
+    extra field location:                           5481155 (0x0053A2C3) bytes
+      - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5481155 (0x0053A2C3) bytes
       - size:                                       11 bytes
       Encryption Tag Version:                       AE-2
@@ -87,8 +87,8 @@
     external file attributes:                       0x00000020
       MS-DOS file attributes (0x20):                arc
       non-MSDOS file attributes (0x000000):         ?---------
-    extra field location:                           0 (0x00000000) bytes
-      - size:                                       0 bytes (1 record)
+    extra field location:                           5481236 (0x0053A314) bytes
+      - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5481236 (0x0053A314) bytes
       - size:                                       11 bytes
       Encryption Tag Version:                       AE-2
@@ -125,8 +125,8 @@
     external file attributes:                       0x00000020
       MS-DOS file attributes (0x20):                arc
       non-MSDOS file attributes (0x000000):         ?---------
-    extra field location:                           0 (0x00000000) bytes
-      - size:                                       0 bytes (1 record)
+    extra field location:                           5481321 (0x0053A369) bytes
+      - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5481321 (0x0053A369) bytes
       - size:                                       11 bytes
       Encryption Tag Version:                       AE-2
@@ -163,8 +163,8 @@
     external file attributes:                       0x00000020
       MS-DOS file attributes (0x20):                arc
       non-MSDOS file attributes (0x000000):         ?---------
-    extra field location:                           0 (0x00000000) bytes
-      - size:                                       0 bytes (1 record)
+    extra field location:                           5481402 (0x0053A3BA) bytes
+      - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5481402 (0x0053A3BA) bytes
       - size:                                       11 bytes
       Encryption Tag Version:                       AE-2
@@ -201,8 +201,8 @@
     external file attributes:                       0x00000020
       MS-DOS file attributes (0x20):                arc
       non-MSDOS file attributes (0x000000):         ?---------
-    extra field location:                           0 (0x00000000) bytes
-      - size:                                       0 bytes (1 record)
+    extra field location:                           5481487 (0x0053A40F) bytes
+      - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5481487 (0x0053A40F) bytes
       - size:                                       11 bytes
       Encryption Tag Version:                       AE-2
@@ -239,8 +239,8 @@
     external file attributes:                       0x00000020
       MS-DOS file attributes (0x20):                arc
       non-MSDOS file attributes (0x000000):         ?---------
-    extra field location:                           0 (0x00000000) bytes
-      - size:                                       0 bytes (1 record)
+    extra field location:                           5481571 (0x0053A463) bytes
+      - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5481571 (0x0053A463) bytes
       - size:                                       11 bytes
       Encryption Tag Version:                       AE-2
@@ -277,8 +277,8 @@
     external file attributes:                       0x00000020
       MS-DOS file attributes (0x20):                arc
       non-MSDOS file attributes (0x000000):         ?---------
-    extra field location:                           0 (0x00000000) bytes
-      - size:                                       0 bytes (1 record)
+    extra field location:                           5481652 (0x0053A4B4) bytes
+      - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5481652 (0x0053A4B4) bytes
       - size:                                       11 bytes
       Encryption Tag Version:                       AE-2
@@ -344,8 +344,8 @@
     external file attributes:                       0x00000020
       MS-DOS file attributes (0x20):                arc
       non-MSDOS file attributes (0x000000):         ?---------
-    extra field location:                           0 (0x00000000) bytes
-      - size:                                       0 bytes (1 record)
+    extra field location:                           5481779 (0x0053A533) bytes
+      - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5481779 (0x0053A533) bytes
       - size:                                       11 bytes
       Encryption Tag Version:                       AE-2
@@ -382,8 +382,8 @@
     external file attributes:                       0x00000020
       MS-DOS file attributes (0x20):                arc
       non-MSDOS file attributes (0x000000):         ?---------
-    extra field location:                           0 (0x00000000) bytes
-      - size:                                       0 bytes (1 record)
+    extra field location:                           5481867 (0x0053A58B) bytes
+      - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5481867 (0x0053A58B) bytes
       - size:                                       11 bytes
       Encryption Tag Version:                       AE-2
@@ -420,8 +420,8 @@
     external file attributes:                       0x00000020
       MS-DOS file attributes (0x20):                arc
       non-MSDOS file attributes (0x000000):         ?---------
-    extra field location:                           0 (0x00000000) bytes
-      - size:                                       0 bytes (1 record)
+    extra field location:                           5481942 (0x0053A5D6) bytes
+      - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5481942 (0x0053A5D6) bytes
       - size:                                       11 bytes
       Encryption Tag Version:                       AE-2
@@ -458,8 +458,8 @@
     external file attributes:                       0x00000020
       MS-DOS file attributes (0x20):                arc
       non-MSDOS file attributes (0x000000):         ?---------
-    extra field location:                           0 (0x00000000) bytes
-      - size:                                       0 bytes (1 record)
+    extra field location:                           5482019 (0x0053A623) bytes
+      - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5482019 (0x0053A623) bytes
       - size:                                       11 bytes
       Encryption Tag Version:                       AE-2
@@ -496,8 +496,8 @@
     external file attributes:                       0x00000020
       MS-DOS file attributes (0x20):                arc
       non-MSDOS file attributes (0x000000):         ?---------
-    extra field location:                           0 (0x00000000) bytes
-      - size:                                       0 bytes (1 record)
+    extra field location:                           5482096 (0x0053A670) bytes
+      - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5482096 (0x0053A670) bytes
       - size:                                       11 bytes
       Encryption Tag Version:                       AE-2
@@ -528,8 +528,8 @@
                                                     UTF-8
     62 69 6B 65 73 2F 64 75 63 61 74 69 2D 70 61 6E bikes/ducati-pan
     69 67 61 6C 65 2D 31 31 39 39 2E 6A 70 67       igale-1199.jpg
-    extra field location:                           0 (0x00000000) bytes
-      - size:                                       0 bytes (1 record)
+    extra field location:                           60 (0x0000003C) bytes
+      - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    60 (0x0000003C) bytes
       - size:                                       11 bytes
       Encryption Tag Version:                       AE-2
@@ -576,8 +576,8 @@
                                                     UTF-8
     62 69 6B 65 73 2F 68 6F 6E 64 61 2D 63 62 72 36 bikes/honda-cbr6
     30 30 72 72 2E 6A 70 67                         00rr.jpg
-    extra field location:                           0 (0x00000000) bytes
-      - size:                                       0 bytes (1 record)
+    extra field location:                           293988 (0x00047C64) bytes
+      - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    293988 (0x00047C64) bytes
       - size:                                       11 bytes
       Encryption Tag Version:                       AE-2
@@ -624,8 +624,8 @@
                                                     UTF-8
     62 69 6B 65 73 2F 6B 61 77 61 73 61 6B 69 2D 6E bikes/kawasaki-n
     69 6E 6A 61 2D 33 30 30 2E 6A 70 67             inja-300.jpg
-    extra field location:                           0 (0x00000000) bytes
-      - size:                                       0 bytes (1 record)
+    extra field location:                           448688 (0x0006D8B0) bytes
+      - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    448688 (0x0006D8B0) bytes
       - size:                                       11 bytes
       Encryption Tag Version:                       AE-2
@@ -672,8 +672,8 @@
                                                     UTF-8
     62 69 6B 65 73 2F 73 75 7A 75 6B 69 2D 67 73 78 bikes/suzuki-gsx
     72 37 35 30 2E 6A 70 67                         r750.jpg
-    extra field location:                           0 (0x00000000) bytes
-      - size:                                       0 bytes (1 record)
+    extra field location:                           615819 (0x0009658B) bytes
+      - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    615819 (0x0009658B) bytes
       - size:                                       11 bytes
       Encryption Tag Version:                       AE-2
@@ -720,8 +720,8 @@
                                                     UTF-8
     63 61 72 73 2F 62 65 6E 74 6C 65 79 2D 63 6F 6E cars/bentley-con
     74 69 6E 65 6E 74 61 6C 2E 6A 70 67             tinental.jpg
-    extra field location:                           0 (0x00000000) bytes
-      - size:                                       0 bytes (1 record)
+    extra field location:                           903277 (0x000DC86D) bytes
+      - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    903277 (0x000DC86D) bytes
       - size:                                       11 bytes
       Encryption Tag Version:                       AE-2
@@ -768,8 +768,8 @@
                                                     UTF-8
     63 61 72 73 2F 66 65 72 72 61 72 69 2D 34 35 38 cars/ferrari-458
     2D 69 74 61 6C 69 61 2E 6A 70 67                -italia.jpg
-    extra field location:                           0 (0x00000000) bytes
-      - size:                                       0 bytes (1 record)
+    extra field location:                           2298747 (0x0023137B) bytes
+      - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    2298747 (0x0023137B) bytes
       - size:                                       11 bytes
       Encryption Tag Version:                       AE-2
@@ -816,8 +816,8 @@
                                                     UTF-8
     63 61 72 73 2F 77 69 65 73 6D 61 6E 6E 2D 67 74 cars/wiesmann-gt
     2D 6D 66 35 2E 6A 70 67                         -mf5.jpg
-    extra field location:                           0 (0x00000000) bytes
-      - size:                                       0 bytes (1 record)
+    extra field location:                           2619746 (0x0027F962) bytes
+      - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    2619746 (0x0027F962) bytes
       - size:                                       11 bytes
       Encryption Tag Version:                       AE-2
@@ -884,8 +884,8 @@
     length of filename:                             14
                                                     UTF-8
     65 6D 70 74 79 5F 66 69 6C 65 2E 74 78 74       empty_file.txt
-    extra field location:                           0 (0x00000000) bytes
-      - size:                                       0 bytes (1 record)
+    extra field location:                           3349514 (0x00331C0A) bytes
+      - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    3349514 (0x00331C0A) bytes
       - size:                                       11 bytes
       Encryption Tag Version:                       AE-2
@@ -932,8 +932,8 @@
                                                     UTF-8
     6D 63 64 6F 6E 6E 65 6C 6C 2D 64 6F 75 67 6C 61 mcdonnell-dougla
     73 2D 66 31 35 2D 65 61 67 6C 65 2E 6A 70 67    s-f15-eagle.jpg
-    extra field location:                           0 (0x00000000) bytes
-      - size:                                       0 bytes (1 record)
+    extra field location:                           3349626 (0x00331C7A) bytes
+      - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    3349626 (0x00331C7A) bytes
       - size:                                       11 bytes
       Encryption Tag Version:                       AE-2
@@ -980,8 +980,8 @@
                                                     UTF-8
     4F 6C 65 67 20 43 68 65 72 65 64 6E 69 6B 2E 74 Oleg Cherednik.t
     78 74                                           xt
-    extra field location:                           0 (0x00000000) bytes
-      - size:                                       0 bytes (1 record)
+    extra field location:                           3974471 (0x003CA547) bytes
+      - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    3974471 (0x003CA547) bytes
       - size:                                       11 bytes
       Encryption Tag Version:                       AE-2
@@ -1028,8 +1028,8 @@
                                                     UTF-8
     73 61 69 6E 74 2D 70 65 74 65 72 73 62 75 72 67 saint-petersburg
     2E 6A 70 67                                     .jpg
-    extra field location:                           0 (0x00000000) bytes
-      - size:                                       0 bytes (1 record)
+    extra field location:                           3974613 (0x003CA5D5) bytes
+      - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    3974613 (0x003CA5D5) bytes
       - size:                                       11 bytes
       Encryption Tag Version:                       AE-2
@@ -1076,8 +1076,8 @@
                                                     UTF-8
     73 69 67 2D 73 61 75 65 72 2D 70 69 73 74 6F 6C sig-sauer-pistol
     2E 6A 70 67                                     .jpg
-    extra field location:                           0 (0x00000000) bytes
-      - size:                                       0 bytes (1 record)
+    extra field location:                           5049550 (0x004D0CCE) bytes
+      - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5049550 (0x004D0CCE) bytes
       - size:                                       11 bytes
       Encryption Tag Version:                       AE-2

@@ -145,7 +145,7 @@ final class FileHeaderView extends View {
     private void printExtraField(PrintStream out) {
         ExtraFieldView.builder()
                       .extraField(fileHeader.getExtraField())
-                      .diagExtraField(diagFileHeader.getExtraFields())
+                      .extraFieldBlock(diagFileHeader.getExtraFields())
                       .generalPurposeFlag(fileHeader.getGeneralPurposeFlag())
                       .offs(offs)
                       .columnWidth(columnWidth).build().print(out);

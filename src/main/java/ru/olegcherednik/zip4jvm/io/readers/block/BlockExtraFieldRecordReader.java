@@ -3,7 +3,8 @@ package ru.olegcherednik.zip4jvm.io.readers.block;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldRecordReader;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
-import ru.olegcherednik.zip4jvm.model.block.ExtraFieldListBlock;
+import ru.olegcherednik.zip4jvm.model.block.ByteArrayBlock;
+import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
@@ -16,20 +17,19 @@ import java.util.function.Function;
  */
 public class BlockExtraFieldRecordReader extends ExtraFieldRecordReader {
 
-    private final ExtraFieldListBlock extraField;
+    private final ExtraFieldBlock extraFieldBlock;
 
-    public BlockExtraFieldRecordReader(Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> readers, ExtraFieldListBlock extraField) {
+    public BlockExtraFieldRecordReader(Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> readers,
+            ExtraFieldBlock extraFieldBlock) {
         super(readers);
-        this.extraField = extraField;
+        this.extraFieldBlock = extraFieldBlock;
     }
 
     @Override
     public ExtraField.Record read(DataInput in) throws IOException {
-        extraField.addRecord();
-
-        ExtraField.Record record = extraField.getRecord().calc(in, () -> super.read(in));
-        extraField.saveRecord(record.getSignature());
-
+        ByteArrayBlock block = new ByteArrayBlock();
+        ExtraField.Record record = block.calc(in, () -> super.read(in));
+        extraFieldBlock.addRecord(record.getSignature(), block);
         return record;
     }
 }

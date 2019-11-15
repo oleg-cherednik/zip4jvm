@@ -110,7 +110,7 @@ final class LocalFileHeaderView extends View {
     private void printExtraField(PrintStream out) {
         ExtraFieldView.builder()
                       .extraField(localFileHeader.getExtraField())
-                      .diagExtraField(diagLocalFileHeader.getExtraField())
+                      .extraFieldBlock(diagLocalFileHeader.getExtraField())
                       .generalPurposeFlag(localFileHeader.getGeneralPurposeFlag())
                       .offs(offs)
                       .columnWidth(columnWidth).build().print(out);
