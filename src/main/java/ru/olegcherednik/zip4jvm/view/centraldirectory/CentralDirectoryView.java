@@ -5,11 +5,11 @@ import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
-import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
 import java.nio.charset.Charset;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -42,6 +42,15 @@ public final class CentralDirectoryView extends View {
         return createDigitalSignatureView().print(out, emptyLine);
     }
 
+    public boolean printHeader(PrintStream out, boolean emptyLine) {
+        if (emptyLine)
+            out.println();
+
+        printTitle(out, CentralDirectory.FileHeader.SIGNATURE, "Central directory", diagCentralDirectory);
+        printLine(out, "total entries:", String.valueOf(centralDirectory.getFileHeaders().size()));
+        return true;
+    }
+
     private FileHeaderListView createFileHeaderListView() {
         return FileHeaderListView.builder()
                                  .centralDirectory(centralDirectory)
@@ -68,8 +77,10 @@ public final class CentralDirectoryView extends View {
         private int offs;
         private int columnWidth;
 
-        public IView build() {
-            return centralDirectory == null || diagCentralDirectory == null ? IView.NULL : new CentralDirectoryView(this);
+        public CentralDirectoryView build() {
+            Objects.requireNonNull(centralDirectory, "'centralDirectory' must not be null");
+            Objects.requireNonNull(diagCentralDirectory, "'diagCentralDirectory' must not be null");
+            return new CentralDirectoryView(this);
         }
 
         public Builder centralDirectory(CentralDirectory centralDirectory) {

@@ -27,8 +27,10 @@ import ru.olegcherednik.zip4jvm.model.os.ExtendedTimestampExtraField;
 import ru.olegcherednik.zip4jvm.model.os.InfoZipNewUnixExtraField;
 import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.IView;
+import ru.olegcherednik.zip4jvm.view.centraldirectory.CentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntryView;
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -60,7 +62,10 @@ public final class DecomposeEngine {
 
         Files.createDirectories(destDir);
 
-        boolean emptyLine = writeEndCentralDirectory(blockModel, destDir.resolve("info.txt"));
+        Path info = destDir.resolve("info.txt");
+
+        boolean emptyLine = writeEndCentralDirectory(blockModel, info);
+        emptyLine = writeCentralDirectory(blockModel, info, emptyLine);
 
 
         int pos = 0;
@@ -206,9 +211,25 @@ public final class DecomposeEngine {
             }
         }
 
-        try (PrintStream out = new PrintStream(info.toFile())) {
+        try (PrintStream out = new PrintStream(new FileOutputStream(info.toFile(), true))) {
             return createEndCentralDirectoryView(blockModel).print(out);
         }
+    }
+
+    private boolean writeCentralDirectory(BlockModel blockModel, Path info, boolean emptyLine) throws FileNotFoundException {
+        try (PrintStream out = new PrintStream(new FileOutputStream(info.toFile(), true))) {
+            CentralDirectoryView view = createCentralDirectoryView(blockModel);
+            return view.printHeader(out, emptyLine);
+        }
+    }
+
+    private CentralDirectoryView createCentralDirectoryView(BlockModel blockModel) {
+        return CentralDirectoryView.builder()
+                                   .centralDirectory(blockModel.getCentralDirectory())
+                                   .diagCentralDirectory(blockModel.getDiagnostic().getCentralDirectoryBlock())
+                                   .charset(charset)
+                                   .offs(offs)
+                                   .columnWidth(columnWidth).build();
     }
 
     private IView createEndCentralDirectoryView(BlockModel blockModel) {
@@ -219,4 +240,5 @@ public final class DecomposeEngine {
                                       .offs(offs)
                                       .columnWidth(columnWidth).build();
     }
+
 }
