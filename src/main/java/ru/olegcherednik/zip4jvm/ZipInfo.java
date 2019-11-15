@@ -83,7 +83,7 @@ public final class ZipInfo {
     private static IView createEndCentralDirectoryView(BlockModel blockModel, Charset charset, int offs, int columnWidth) {
         return EndCentralDirectoryView.builder()
                                       .endCentralDirectory(blockModel.getEndCentralDirectory())
-                                      .block(blockModel.getDiagnostic().getEndCentralDirectory())
+                                      .block(blockModel.getDiagnostic().getEndCentralDirectoryBlock())
                                       .charset(charset)
                                       .offs(offs)
                                       .columnWidth(columnWidth).build();
@@ -101,7 +101,7 @@ public final class ZipInfo {
     private static IView createCentralDirectoryView(BlockModel blockModel, Charset charset, int offs, int columnWidth) {
         return CentralDirectoryView.builder()
                                    .centralDirectory(blockModel.getCentralDirectory())
-                                   .diagCentralDirectory(blockModel.getDiagnostic().getCentralDirectory())
+                                   .diagCentralDirectory(blockModel.getDiagnostic().getCentralDirectoryBlock())
                                    .charset(charset)
                                    .offs(offs)
                                    .columnWidth(columnWidth).build();

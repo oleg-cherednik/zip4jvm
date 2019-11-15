@@ -16,14 +16,10 @@ import java.util.Map;
 public class CentralDirectoryBlock extends Block {
 
     private final Map<String, FileHeaderBlock> fileHeaders = new LinkedHashMap<>();
-    private Block digitalSignature = Block.NULL;
+    private Block digitalSignatureBlock = Block.NULL;
 
     @Setter(AccessLevel.NONE)
     private FileHeaderBlock fileHeader;
-
-    public void addDigitalSignature() {
-        digitalSignature = new Block();
-    }
 
     public void addFileHeader() {
         fileHeader = new FileHeaderBlock();

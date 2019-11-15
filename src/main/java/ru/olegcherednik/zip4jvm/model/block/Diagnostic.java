@@ -15,9 +15,9 @@ import java.util.Map;
 @Setter
 public final class Diagnostic {
 
-    private final Block endCentralDirectory = new Block();
+    private final Block endCentralDirectoryBlock = new Block();
     private final Zip64 zip64 = new Zip64();
-    private final CentralDirectoryBlock centralDirectory = new CentralDirectoryBlock();
+    private final CentralDirectoryBlock centralDirectoryBlock = new CentralDirectoryBlock();
     private final ZipEntryBlock zipEntryBlock = new ZipEntryBlock();
 
     @Getter

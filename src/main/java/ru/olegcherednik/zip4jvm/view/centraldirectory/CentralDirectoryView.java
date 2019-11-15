@@ -54,7 +54,7 @@ public final class CentralDirectoryView extends View {
     private DigitalSignatureView createDigitalSignatureView() {
         return DigitalSignatureView.builder()
                                    .digitalSignature(centralDirectory.getDigitalSignature())
-                                   .block(diagCentralDirectory.getDigitalSignature())
+                                   .block(diagCentralDirectory.getDigitalSignatureBlock())
                                    .offs(offs)
                                    .columnWidth(columnWidth).build();
     }

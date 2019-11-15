@@ -12,6 +12,7 @@ import java.util.Map;
 @Getter
 public class ExtraFieldBlock extends Block {
 
+    // TODO it seems that it should be block; array is used to save into file
     private final Map<Integer, ByteArrayBlock> records = new LinkedHashMap<>();
 
     public void addRecord(int signature, ByteArrayBlock block) {

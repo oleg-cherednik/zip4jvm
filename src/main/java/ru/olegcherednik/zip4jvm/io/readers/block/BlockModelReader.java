@@ -39,7 +39,7 @@ public final class BlockModelReader extends BaseZipModelReader {
 
     @Override
     protected EndCentralDirectoryReader getEndCentralDirectoryReader() {
-        return new BlockEndCentralDirectoryReader(charsetCustomizer, diagnostic.getEndCentralDirectory());
+        return new BlockEndCentralDirectoryReader(charsetCustomizer, diagnostic.getEndCentralDirectoryBlock());
     }
 
     @Override
@@ -49,7 +49,7 @@ public final class BlockModelReader extends BaseZipModelReader {
 
     @Override
     protected CentralDirectoryReader getCentralDirectoryReader(long totalEntries) {
-        return new BlockCentralDirectoryReader(totalEntries, charsetCustomizer, diagnostic.getCentralDirectory());
+        return new BlockCentralDirectoryReader(totalEntries, charsetCustomizer, diagnostic.getCentralDirectoryBlock());
     }
 }
 
