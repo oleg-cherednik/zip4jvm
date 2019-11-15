@@ -16,6 +16,7 @@ import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.BlockZipEntryModel;
 import ru.olegcherednik.zip4jvm.model.block.ByteArrayBlock;
@@ -24,6 +25,8 @@ import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.os.ExtendedTimestampExtraField;
 import ru.olegcherednik.zip4jvm.model.os.InfoZipNewUnixExtraField;
+import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
+import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntryView;
 
 import java.io.FileOutputStream;
@@ -44,6 +47,9 @@ public final class DecomposeEngine {
 
     private final Path zip;
     private final Path destDir;
+    private final Charset charset;
+    private final int offs;
+    private final int columnWidth;
 
     public void decompose() throws IOException {
         Charset charset = Charsets.UTF_8;
@@ -51,6 +57,10 @@ public final class DecomposeEngine {
         BlockModel blockModel = new BlockModelReader(zip, Charsets.STANDARD_ZIP_CHARSET, diagnostic).read();
         BlockZipEntryModel zipEntryModel = new BlockZipEntryModelReader(blockModel.getZipModel(), Charsets.STANDARD_ZIP_CHARSET,
                 diagnostic.getZipEntryBlock()).read();
+
+        Files.createDirectories(destDir);
+
+        boolean emptyLine = writeEndCentralDirectory(blockModel, destDir.resolve("info.txt"));
 
 
         int pos = 0;
@@ -167,7 +177,7 @@ public final class DecomposeEngine {
                     size -= encryptionHeader.getData().getSize();
                 }
 
-                try (InputStream in = createDataInput(blockModel.getZipModel(), zipEntry)) {
+                try (InputStream in = new SingleZipInputStream(blockModel.getZipModel().getFile())) {
                     try (OutputStream out = new FileOutputStream(dir.resolve("payload.data").toFile())) {
                         IOUtils.copyLarge(in, out, offs, size);
                     }
@@ -187,7 +197,26 @@ public final class DecomposeEngine {
 //        return new SingleZipInputStream(zipModel.getFile());
     }
 
-    private void writeEndCentralDirectory() {
+    private boolean writeEndCentralDirectory(BlockModel blockModel, Path info) throws IOException {
+        Block block = blockModel.getDiagnostic().getEndCentralDirectoryBlock();
 
+        try (InputStream in = new SingleZipInputStream(blockModel.getZipModel().getFile())) {
+            try (OutputStream out = new FileOutputStream(destDir.resolve("end_central_directory.data").toFile())) {
+                IOUtils.copyLarge(in, out, block.getOffs(), block.getSize());
+            }
+        }
+
+        try (PrintStream out = new PrintStream(info.toFile())) {
+            return createEndCentralDirectoryView(blockModel).print(out);
+        }
+    }
+
+    private IView createEndCentralDirectoryView(BlockModel blockModel) {
+        return EndCentralDirectoryView.builder()
+                                      .endCentralDirectory(blockModel.getEndCentralDirectory())
+                                      .block(blockModel.getDiagnostic().getEndCentralDirectoryBlock())
+                                      .charset(charset)
+                                      .offs(offs)
+                                      .columnWidth(columnWidth).build();
     }
 }

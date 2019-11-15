@@ -95,7 +95,7 @@ public final class ZipInfo {
     }
 
     public void decompose(Path destDir) throws IOException {
-        new DecomposeEngine(zip, destDir).decompose();
+        new DecomposeEngine(zip, destDir, Charsets.UTF_8, 4, 52).decompose();
     }
 
 }
