@@ -347,20 +347,11 @@ public final class DecomposeEngine {
                 continue;
             }
 
-            Path subDir = dir.resolve(title);
-            Files.createDirectories(subDir);
-
-            try (PrintStream out = new PrintStream(new FileOutputStream(subDir.resolve("info.txt").toFile()))) {
-                view.printRecord(out, record);
-            }
-
             try (InputStream in = new SingleZipInputStream(blockModel.getZipModel().getFile())) {
-                try (OutputStream out = new FileOutputStream(subDir.resolve("data").toFile())) {
+                try (OutputStream out = new FileOutputStream(dir.resolve(title + ".data").toFile())) {
                     copyLarge(in, out, extraFieldBlock.getRecordBlock(signature));
                 }
             }
-
-//            FileUtils.writeByteArrayToFile(dir.resolve(title).toFile(), block.getData());
         }
     }
 
