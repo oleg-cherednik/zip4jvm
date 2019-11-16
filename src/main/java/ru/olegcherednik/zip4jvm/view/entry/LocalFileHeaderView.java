@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.view.entry;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
@@ -108,6 +109,9 @@ final class LocalFileHeaderView extends View {
     }
 
     private void printExtraField(PrintStream out) {
+        if (localFileHeader.getExtraField() == ExtraField.NULL)
+            return;
+
         ExtraFieldView.builder()
                       .extraField(localFileHeader.getExtraField())
                       .extraFieldBlock(diagLocalFileHeader.getExtraField())

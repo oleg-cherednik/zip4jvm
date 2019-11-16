@@ -316,8 +316,7 @@ public final class DecomposeEngine {
     }
 
     private void writeExtraField(BlockModel blockModel, ExtraField extraField, ExtraFieldBlock extraFieldBlock, GeneralPurposeFlag generalPurposeFlag,
-            Path parent)
-            throws IOException {
+            Path parent) throws IOException {
         if (extraField == ExtraField.NULL)
             return;
 

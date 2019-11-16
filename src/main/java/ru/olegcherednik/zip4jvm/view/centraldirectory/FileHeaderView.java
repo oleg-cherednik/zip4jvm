@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
 import ru.olegcherednik.zip4jvm.view.ExternalFileAttributesView;
@@ -144,6 +145,9 @@ public final class FileHeaderView extends View {
     }
 
     private void printExtraField(PrintStream out) {
+        if (fileHeader.getExtraField() == ExtraField.NULL)
+            return;
+
         ExtraFieldView.builder()
                       .extraField(fileHeader.getExtraField())
                       .extraFieldBlock(diagFileHeader.getExtraFields())
