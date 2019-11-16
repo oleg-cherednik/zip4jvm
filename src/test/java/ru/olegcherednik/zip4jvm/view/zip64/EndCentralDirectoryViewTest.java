@@ -5,6 +5,7 @@ import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.view.Zip64View;
 
 import java.io.IOException;
 
@@ -35,11 +36,11 @@ public class EndCentralDirectoryViewTest {
         endCentralDirectory.setCentralDirectorySize(115);
         endCentralDirectory.setCentralDirectoryOffs(11208273213L);
 
-        String[] lines = Zip4jvmSuite.execute(EndCentralDirectoryView.builder()
-                                                                     .endCentralDirectory(endCentralDirectory)
-                                                                     .block(block)
-                                                                     .offs(2)
-                                                                     .columnWidth(52).build());
+        String[] lines = Zip4jvmSuite.execute(Zip64View.EndCentralDirectoryView.builder()
+                                                                               .endCentralDirectory(endCentralDirectory)
+                                                                               .block(block)
+                                                                               .offs(2)
+                                                                               .columnWidth(52).build());
 
         assertThat(lines).hasSize(15);
         assertThat(lines[0]).isEqualTo("(PK0606) ZIP64 End of Central directory record");

@@ -4,8 +4,7 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.Zip64Reader;
 import ru.olegcherednik.zip4jvm.model.Zip64;
-import ru.olegcherednik.zip4jvm.model.block.Block;
-import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.block.Zip64Block;
 
 import java.io.IOException;
 
@@ -16,18 +15,16 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public final class BlockZip64Reader extends Zip64Reader {
 
-    private final Diagnostic.Zip64 zip64;
+    private final Zip64Block zip64Block;
 
     @Override
     protected Zip64.EndCentralDirectoryLocator readEndCentralDirectoryLocator(DataInput in) throws IOException {
-        Block block = zip64.getEndCentralDirectoryLocator();
-        return block.calc(in, () -> super.readEndCentralDirectoryLocator(in));
+        return zip64Block.getEndCentralDirectoryLocatorBlock().calc(in, () -> super.readEndCentralDirectoryLocator(in));
     }
 
     @Override
     protected Zip64.EndCentralDirectory readEndCentralDirectory(DataInput in) throws IOException {
-        Block block = zip64.getEndCentralDirectory();
-        return block.calc(in, () -> super.readEndCentralDirectory(in));
+        return zip64Block.getEndCentralDirectoryBlock().calc(in, () -> super.readEndCentralDirectory(in));
     }
 
 }

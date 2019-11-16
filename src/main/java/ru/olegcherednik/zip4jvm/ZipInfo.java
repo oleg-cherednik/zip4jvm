@@ -12,7 +12,7 @@ import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.CentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntryListView;
-import ru.olegcherednik.zip4jvm.view.zip64.Zip64View;
+import ru.olegcherednik.zip4jvm.view.Zip64View;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -72,7 +72,7 @@ public final class ZipInfo {
     private static IView createZip64View(BlockModel blockModel, int offs, int columnWidth) {
         return Zip64View.builder()
                         .zip64(blockModel.getZip64())
-                        .diagZip64(blockModel.getDiagnostic().getZip64())
+                        .block(blockModel.getDiagnostic().getZip64Block())
                         .offs(offs)
                         .columnWidth(columnWidth).build();
     }

@@ -44,7 +44,7 @@ public final class BlockModelReader extends BaseZipModelReader {
 
     @Override
     protected Zip64 readZip64(DataInput in) throws IOException {
-        return new BlockZip64Reader(diagnostic.getZip64()).read(in);
+        return new BlockZip64Reader(diagnostic.getZip64Block()).read(in);
     }
 
     @Override

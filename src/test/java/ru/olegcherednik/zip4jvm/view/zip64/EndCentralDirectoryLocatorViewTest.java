@@ -4,6 +4,7 @@ import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.view.Zip64View;
 
 import java.io.IOException;
 
@@ -28,11 +29,11 @@ public class EndCentralDirectoryLocatorViewTest {
         when(locator.getOffs()).thenReturn(11208273328L);
         when(locator.getTotalDisks()).thenReturn(5L);
 
-        String[] lines = Zip4jvmSuite.execute(EndCentralDirectoryLocatorView.builder()
-                                                                            .locator(locator)
-                                                                            .block(block)
-                                                                            .offs(2)
-                                                                            .columnWidth(52).build());
+        String[] lines = Zip4jvmSuite.execute(Zip64View.EndCentralDirectoryLocatorView.builder()
+                                                                                      .locator(locator)
+                                                                                      .block(block)
+                                                                                      .offs(2)
+                                                                                      .columnWidth(52).build());
         assertThat(lines).hasSize(7);
         assertThat(lines[0]).isEqualTo("(PK0607) ZIP64 End of Central directory locator");
         assertThat(lines[1]).isEqualTo("===============================================");

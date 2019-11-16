@@ -9,6 +9,7 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 
 import java.io.PrintStream;
 import java.nio.charset.Charset;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -70,13 +71,15 @@ public final class EndCentralDirectoryView extends View {
     public static final class Builder {
 
         private EndCentralDirectory endCentralDirectory;
-        private Block block = Block.NULL;
+        private Block block;
         private Charset charset = Charsets.IBM437;
         private int offs;
         private int columnWidth;
 
-        public IView build() {
-            return endCentralDirectory == null || block == Block.NULL ? IView.NULL : new EndCentralDirectoryView(this);
+        public EndCentralDirectoryView build() {
+            Objects.requireNonNull(endCentralDirectory, "'endCentralDirectory' must not be null");
+            Objects.requireNonNull(block, "'block' must not be null");
+            return new EndCentralDirectoryView(this);
         }
 
         public Builder endCentralDirectory(EndCentralDirectory endCentralDirectory) {
@@ -85,7 +88,7 @@ public final class EndCentralDirectoryView extends View {
         }
 
         public Builder block(Block block) {
-            this.block = Optional.ofNullable(block).orElse(Block.NULL);
+            this.block = block == Block.NULL ? null : block;
             return this;
         }
 

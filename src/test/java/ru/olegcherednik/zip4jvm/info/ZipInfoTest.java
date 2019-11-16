@@ -74,7 +74,7 @@ public class ZipInfoTest {
         assertThatFile(file).matchesResourceLines("/info/store_solid_aes.txt");
     }
 
-    @Test(enabled = false)
+//    @Test(enabled = false)
     public void foo() throws IOException {
         Path path = Paths.get("d:/zip4jvm/tmp/aes.zip");
 //        Files.deleteIfExists(path);
@@ -91,13 +91,13 @@ public class ZipInfoTest {
 //        ZipInfo.zip(zipDeflateSolidPkware).getShortInfo();
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/foo/deflate/solid/off/src.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/pkware.zip"))
-//        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/ferdinand.zip"))
+        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/ferdinand.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/aes.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/split/src.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/macos_10.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/ubuntu_18.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/securezip/aes128.zip"))
-        ZipInfo.zip(TestData.zipStoreSolid)
+//        ZipInfo.zip(TestData.zipStoreSolid)
                .getShortInfo(System.out);
     }
 
@@ -105,7 +105,8 @@ public class ZipInfoTest {
     public void decompose() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/aes.zip"))
+//        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/aes.zip"))
+        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/ferdinand.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/pkware.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/pkware.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/ubuntu_18.zip"))
