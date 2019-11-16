@@ -14,6 +14,7 @@ import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
+import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -33,6 +34,7 @@ import ru.olegcherednik.zip4jvm.view.Zip64View;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.CentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.FileHeaderView;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntryView;
+import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -107,35 +109,8 @@ public final class DecomposeEngine {
 
             // print extra filed
 
-            if (diagLocalFileHeader.getExtraField() != null && !diagLocalFileHeader.getExtraField().getRecords().isEmpty()) {
-                Path extraFieldDir = dir.resolve("extra_fields");
-                Files.createDirectories(extraFieldDir);
-
-                ExtraFieldBlock diagExtraField = diagLocalFileHeader.getExtraField();
-                LocalFileHeader localFileHeader = zipEntryModel.getLocalFileHeaders().get(fileName);
-
-                for (int signature : diagExtraField.getRecords().keySet()) {
-                    ByteArrayBlock block1 = diagExtraField.getRecord(signature);
-                    ExtraField.Record rec = localFileHeader.getExtraField().getRecords().stream()
-                                                           .filter(r -> r.getSignature() == signature)
-                                                           .findFirst().orElse(null);
-
-                    String title = null;
-
-                    if (rec instanceof ExtendedTimestampExtraField)
-                        title = "(0x5455)_universal_time.data";
-                    else if (rec instanceof InfoZipNewUnixExtraField)
-                        title = "(0x7875)_new_InfoZIP_Unix_OS2_NT.data";
-                    else if (rec instanceof AesExtraDataRecord)
-                        title = "(0x9901)_AES_Encryption_Tag.data";
-                    else {
-                        System.err.println("unknown extra field");
-                        continue;
-                    }
-
-                    FileUtils.writeByteArrayToFile(extraFieldDir.resolve(title).toFile(), block1.getData());
-                }
-            }
+            LocalFileHeader localFileHeader = zipEntryModel.getLocalFileHeaders().get(fileName);
+            writeExtraField(blockModel, localFileHeader.getExtraField(), diagLocalFileHeader.getExtraField(), localFileHeader.getGeneralPurposeFlag(), dir);
 
             // print encryption header
 
@@ -286,6 +261,8 @@ public final class DecomposeEngine {
                 }
             }
 
+            writeExtraField(blockModel, fileHeader.getExtraField(), block.getExtraFields(), fileHeader.getGeneralPurposeFlag(), subDir);
+
             pos++;
         }
     }
@@ -332,6 +309,55 @@ public final class DecomposeEngine {
     private static void copyLarge(InputStream in, OutputStream out, long offs, long length) throws IOException {
         in.skip(offs);
         IOUtils.copyLarge(in, out, 0, length);
+    }
+
+    private void writeExtraField(BlockModel blockModel, ExtraField extraField, ExtraFieldBlock extraFieldBlock, GeneralPurposeFlag generalPurposeFlag, Path parent)
+            throws IOException {
+        if (extraField == ExtraField.NULL)
+            return;
+
+        Path dir = parent.resolve("extra_fields");
+        Files.createDirectories(dir);
+
+        ExtraFieldView view = ExtraFieldView.builder()
+                                            .extraField(extraField)
+                                            .extraFieldBlock(extraFieldBlock)
+                                            .generalPurposeFlag(generalPurposeFlag)
+                                            .offs(offs)
+                                            .columnWidth(columnWidth).build();
+
+        for (int signature : extraField.getSignatures()) {
+            ExtraField.Record record = extraField.getRecord(signature);
+
+            String title = null;
+
+            if (record instanceof ExtendedTimestampExtraField)
+                title = "(0x5455)_universal_time";
+            else if (record instanceof InfoZipNewUnixExtraField)
+                title = "(0x7875)_new_InfoZIP_Unix_OS2_NT";
+            else if (record instanceof AesExtraDataRecord)
+                title = "(0x9901)_AES_Encryption_Tag";
+            else {
+                // TODO should be print smth
+                System.err.println("unknown extra field");
+                continue;
+            }
+
+            Path subDir = dir.resolve(title);
+            Files.createDirectories(subDir);
+
+            try (PrintStream out = new PrintStream(new FileOutputStream(subDir.resolve("info.txt").toFile()))) {
+                view.printRecord(out, record);
+            }
+
+            try (InputStream in = new SingleZipInputStream(blockModel.getZipModel().getFile())) {
+                try (OutputStream out = new FileOutputStream(subDir.resolve("data").toFile())) {
+                    copyLarge(in, out, extraFieldBlock.getRecord(signature));
+                }
+            }
+
+//            FileUtils.writeByteArrayToFile(dir.resolve(title).toFile(), block.getData());
+        }
     }
 
 }

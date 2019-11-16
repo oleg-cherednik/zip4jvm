@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 /**
@@ -47,8 +48,16 @@ public final class ExtraField {
         return record instanceof AesExtraDataRecord ? (AesExtraDataRecord)record : AesExtraDataRecord.NULL;
     }
 
+    public Set<Integer> getSignatures() {
+        return map.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(map.keySet());
+    }
+
     public Collection<Record> getRecords() {
         return map.isEmpty() ? Collections.emptyList() : Collections.unmodifiableCollection(map.values());
+    }
+
+    public ExtraField.Record getRecord(int signature) {
+        return map.get(signature);
     }
 
     public int getTotalRecords() {

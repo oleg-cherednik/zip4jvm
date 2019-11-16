@@ -13,7 +13,7 @@ import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.function.Function;
 
 /**
@@ -57,10 +57,12 @@ public final class ExtraFieldView extends View {
     }
 
     private void printRecords(PrintStream out) {
-        extraField.getRecords().stream()
-                  .filter(record -> !record.isNull())
-                  .map(createView)
-                  .forEach(view -> view.print(out));
+        extraField.getRecords().forEach(record -> printRecord(out, record));
+    }
+
+    public void printRecord(PrintStream out, ExtraField.Record record) {
+        if (record != null && !record.isNull())
+            createView.apply(record).print(out);
     }
 
     private final Function<ExtraField.Record, IView> createView = record -> {
@@ -138,18 +140,21 @@ public final class ExtraFieldView extends View {
 
     public static final class Builder {
 
-        private ExtraField extraField = ExtraField.NULL;
+        private ExtraField extraField;
         private ExtraFieldBlock extraFieldBlock;
         private GeneralPurposeFlag generalPurposeFlag;
         private int offs;
         private int columnWidth;
 
-        public IView build() {
-            return extraField.getTotalRecords() == 0 || extraFieldBlock == null ? IView.NULL : new ExtraFieldView(this);
+        public ExtraFieldView build() {
+            Objects.requireNonNull(extraField, "'extraField' must not be null");
+            Objects.requireNonNull(extraFieldBlock, "'extraFieldBlock' must not be null");
+            Objects.requireNonNull(generalPurposeFlag, "'generalPurposeFlag' must not be null");
+            return new ExtraFieldView(this);
         }
 
         public Builder extraField(ExtraField extraField) {
-            this.extraField = Optional.ofNullable(extraField).orElse(ExtraField.NULL);
+            this.extraField = extraField == ExtraField.NULL || extraField.getTotalRecords() == 0 ? null : extraField;
             return this;
         }
 
