@@ -10,6 +10,7 @@ import ru.olegcherednik.zip4jvm.io.readers.block.BlockZipEntryModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.aes.AesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.io.readers.block.pkware.PkwareEncryptionHeader;
 import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
+import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
@@ -20,6 +21,7 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.BlockZipEntryModel;
 import ru.olegcherednik.zip4jvm.model.block.ByteArrayBlock;
+import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.block.Zip64Block;
@@ -29,9 +31,9 @@ import ru.olegcherednik.zip4jvm.model.os.InfoZipNewUnixExtraField;
 import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.Zip64View;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.CentralDirectoryView;
+import ru.olegcherednik.zip4jvm.view.centraldirectory.FileHeaderView;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntryView;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,11 +65,9 @@ public final class DecomposeEngine {
 
         Files.createDirectories(destDir);
 
-        Path info = destDir.resolve("info.txt");
-
-        boolean emptyLine = writeEndCentralDirectory(blockModel);
+        writeEndCentralDirectory(blockModel);
         writeZip64(blockModel);
-        emptyLine = writeCentralDirectory(blockModel, info, emptyLine);
+        writeCentralDirectory(blockModel);
 
         int pos = 0;
 
@@ -205,17 +205,15 @@ public final class DecomposeEngine {
 //        return new SingleZipInputStream(zipModel.getFile());
     }
 
-    private boolean writeEndCentralDirectory(BlockModel blockModel) throws IOException {
-        Block block = blockModel.getDiagnostic().getEndCentralDirectoryBlock();
+    private void writeEndCentralDirectory(BlockModel blockModel) throws IOException {
+        try (PrintStream out = new PrintStream(destDir.resolve("end_central_directory.txt").toFile())) {
+            createEndCentralDirectoryView(blockModel).print(out);
+        }
 
         try (InputStream in = new SingleZipInputStream(blockModel.getZipModel().getFile())) {
             try (OutputStream out = new FileOutputStream(destDir.resolve("end_central_directory.data").toFile())) {
-                copyLarge(in, out, offs, block.getSize());
+                copyLarge(in, out, blockModel.getDiagnostic().getEndCentralDirectoryBlock());
             }
-        }
-
-        try (PrintStream out = new PrintStream(destDir.resolve("end_central_directory.txt").toFile())) {
-            return createEndCentralDirectoryView(blockModel).print(out);
         }
     }
 
@@ -227,36 +225,68 @@ public final class DecomposeEngine {
         Files.createDirectories(dir);
 
         // (PK0607) ZIP64 End of Central directory locator
-        Block block = blockModel.getDiagnostic().getZip64Block().getEndCentralDirectoryLocatorBlock();
-
-        try (InputStream in = new SingleZipInputStream(blockModel.getZipModel().getFile())) {
-            try (OutputStream out = new FileOutputStream(dir.resolve("zip64_end_central_directory_locator.data").toFile())) {
-                copyLarge(in, out, block.getOffs(), block.getSize());
-            }
-        }
-
         try (PrintStream out = new PrintStream(dir.resolve("zip64_end_central_directory_locator.txt").toFile())) {
             createZip64EndCentralDirectoryLocatorView(blockModel.getZip64(), blockModel.getDiagnostic().getZip64Block()).print(out);
         }
 
-        // (PK0606) ZIP64 End of Central directory record
-        block = blockModel.getDiagnostic().getZip64Block().getEndCentralDirectoryBlock();
-
         try (InputStream in = new SingleZipInputStream(blockModel.getZipModel().getFile())) {
-            try (OutputStream out = new FileOutputStream(dir.resolve("zip64_end_central_directory.data").toFile())) {
-                copyLarge(in, out, block.getOffs(), block.getSize());
+            try (OutputStream out = new FileOutputStream(dir.resolve("zip64_end_central_directory_locator.data").toFile())) {
+                copyLarge(in, out, blockModel.getDiagnostic().getZip64Block().getEndCentralDirectoryLocatorBlock());
             }
         }
 
+        // (PK0606) ZIP64 End of Central directory record
         try (PrintStream out = new PrintStream(dir.resolve("zip64_end_central_directory.txt").toFile())) {
             createZip64EndCentralDirectoryView(blockModel.getZip64(), blockModel.getDiagnostic().getZip64Block()).print(out);
         }
+
+        try (InputStream in = new SingleZipInputStream(blockModel.getZipModel().getFile())) {
+            try (OutputStream out = new FileOutputStream(dir.resolve("zip64_end_central_directory.data").toFile())) {
+                copyLarge(in, out, blockModel.getDiagnostic().getZip64Block().getEndCentralDirectoryBlock());
+            }
+        }
     }
 
-    private boolean writeCentralDirectory(BlockModel blockModel, Path info, boolean emptyLine) throws FileNotFoundException {
-        try (PrintStream out = new PrintStream(new FileOutputStream(info.toFile(), true))) {
-            CentralDirectoryView view = createCentralDirectoryView(blockModel);
-            return view.printHeader(out, emptyLine);
+    private void writeCentralDirectory(BlockModel blockModel) throws IOException {
+        Path dir = destDir.resolve("central_directory");
+        Files.createDirectories(dir);
+
+        try (PrintStream out = new PrintStream(new FileOutputStream(dir.resolve("info.txt").toFile(), true))) {
+            createCentralDirectoryView(blockModel).printHeader(out);
+        }
+
+        int pos = 0;
+
+        for (CentralDirectory.FileHeader fileHeader : blockModel.getCentralDirectory().getFileHeaders()) {
+            String fileName = fileHeader.getFileName();
+            ZipEntry zipEntry = blockModel.getZipModel().getZipEntryByFileName(fileName);
+            CentralDirectoryBlock.FileHeaderBlock block = blockModel.getDiagnostic().getCentralDirectoryBlock().getFileHeader(fileName);
+
+            if (zipEntry.isDirectory())
+                fileName = fileName.substring(0, fileName.length() - 1);
+
+            fileName = "#" + (pos + 1) + " - " + fileName.replaceAll("[\\/]", "_-_");
+
+            Path subDir = dir.resolve(fileName);
+            Files.createDirectories(subDir);
+
+            try (PrintStream out = new PrintStream(new FileOutputStream(subDir.resolve("info.txt").toFile()))) {
+                FileHeaderView.builder()
+                              .fileHeader(fileHeader)
+                              .diagFileHeader(block)
+                              .pos(pos)
+                              .charset(charset)
+                              .offs(offs)
+                              .columnWidth(columnWidth).build().print(out);
+            }
+
+            try (InputStream in = new SingleZipInputStream(blockModel.getZipModel().getFile())) {
+                try (OutputStream out = new FileOutputStream(subDir.resolve("data").toFile())) {
+                    copyLarge(in, out, block);
+                }
+            }
+
+            pos++;
         }
     }
 
@@ -292,6 +322,11 @@ public final class DecomposeEngine {
                                                 .block(block.getEndCentralDirectoryBlock())
                                                 .offs(offs)
                                                 .columnWidth(columnWidth).build();
+    }
+
+    private static void copyLarge(InputStream in, OutputStream out, Block block) throws IOException {
+        in.skip(block.getOffs());
+        IOUtils.copyLarge(in, out, 0, block.getSize());
     }
 
     private static void copyLarge(InputStream in, OutputStream out, long offs, long length) throws IOException {

@@ -35,20 +35,14 @@ public final class CentralDirectoryView extends View {
 
     @Override
     public boolean print(PrintStream out) {
-        printTitle(out, CentralDirectory.FileHeader.SIGNATURE, "Central directory", diagCentralDirectory);
-        printLine(out, "total entries:", String.valueOf(centralDirectory.getFileHeaders().size()));
-
+        printHeader(out);
         boolean emptyLine = createFileHeaderListView().print(out);
         return createDigitalSignatureView().print(out, emptyLine);
     }
 
-    public boolean printHeader(PrintStream out, boolean emptyLine) {
-        if (emptyLine)
-            out.println();
-
+    public void printHeader(PrintStream out) {
         printTitle(out, CentralDirectory.FileHeader.SIGNATURE, "Central directory", diagCentralDirectory);
         printLine(out, "total entries:", String.valueOf(centralDirectory.getFileHeaders().size()));
-        return true;
     }
 
     private FileHeaderListView createFileHeaderListView() {

@@ -17,13 +17,14 @@ import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
 
 import java.io.PrintStream;
 import java.nio.charset.Charset;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
  * @author Oleg Cherednik
  * @since 14.10.2019
  */
-final class FileHeaderView extends View {
+public final class FileHeaderView extends View {
 
     private final CentralDirectory.FileHeader fileHeader;
     private final CentralDirectoryBlock.FileHeaderBlock diagFileHeader;
@@ -162,6 +163,8 @@ final class FileHeaderView extends View {
         private int columnWidth;
 
         public FileHeaderView build() {
+            Objects.requireNonNull(fileHeader, "'fileHeader' must not be null");
+            Objects.requireNonNull(diagFileHeader, "'diagFileHeader' must not be null");
             return new FileHeaderView(this);
         }
 
