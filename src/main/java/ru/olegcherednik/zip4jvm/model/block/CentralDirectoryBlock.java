@@ -26,9 +26,9 @@ public class CentralDirectoryBlock extends Block {
     }
 
     @Getter
-    public static final class FileHeaderBlock extends Block {
+    public static class FileHeaderBlock extends Block {
 
-        private final ExtraFieldBlock extraFields = new ExtraFieldBlock();
+        private final ExtraFieldBlock extraFieldBlock = new ExtraFieldBlock();
 
     }
 

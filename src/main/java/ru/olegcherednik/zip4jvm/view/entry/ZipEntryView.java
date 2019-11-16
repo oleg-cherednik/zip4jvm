@@ -23,7 +23,7 @@ public final class ZipEntryView extends View {
 
     private final long pos;
     private final LocalFileHeader localFileHeader;
-    private final Diagnostic.ZipEntryBlock.LocalFileHeaderB diagLocalFileHeader;
+    private final Diagnostic.ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader;
     private final Diagnostic.ZipEntryBlock.EncryptionHeader encryptionHeader;
     // TODO duplication of data descriptor
     private final DataDescriptor dataDescriptor;
@@ -84,7 +84,7 @@ public final class ZipEntryView extends View {
 
         private long pos;
         private LocalFileHeader localFileHeader;
-        private Diagnostic.ZipEntryBlock.LocalFileHeaderB diagLocalFileHeader;
+        private Diagnostic.ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader;
         private Diagnostic.ZipEntryBlock.EncryptionHeader encryptionHeader;
         private DataDescriptor dataDescriptor;
         private Block blockDataDescriptor = Block.NULL;
@@ -106,7 +106,7 @@ public final class ZipEntryView extends View {
             return this;
         }
 
-        public Builder diagLocalFileHeader(Diagnostic.ZipEntryBlock.LocalFileHeaderB diagLocalFileHeader) {
+        public Builder diagLocalFileHeader(Diagnostic.ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader) {
             this.diagLocalFileHeader = diagLocalFileHeader;
             return this;
         }

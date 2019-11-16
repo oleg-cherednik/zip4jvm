@@ -34,7 +34,7 @@ public class BlockFileHeaderReader extends FileHeaderReader {
 
     @Override
     protected ExtraFieldReader getExtraFiledReader(int size, CentralDirectory.FileHeader fileHeader) {
-        return new BlockExtraFieldReader(size, ExtraFieldReader.getReaders(fileHeader), block.getExtraFields());
+        return new BlockExtraFieldReader(size, ExtraFieldReader.getReaders(fileHeader), block.getExtraFieldBlock());
     }
 
 }

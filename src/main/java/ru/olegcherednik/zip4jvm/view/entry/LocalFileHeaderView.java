@@ -27,7 +27,7 @@ final class LocalFileHeaderView extends View {
 
     private final LocalFileHeader localFileHeader;
     // TODO should be block
-    private final Diagnostic.ZipEntryBlock.LocalFileHeaderB diagLocalFileHeader;
+    private final Diagnostic.ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader;
     private final long pos;
     private final Charset charset;
 
@@ -114,7 +114,7 @@ final class LocalFileHeaderView extends View {
 
         ExtraFieldView.builder()
                       .extraField(localFileHeader.getExtraField())
-                      .extraFieldBlock(diagLocalFileHeader.getExtraField())
+                      .extraFieldBlock(diagLocalFileHeader.getExtraFieldBlock())
                       .generalPurposeFlag(localFileHeader.getGeneralPurposeFlag())
                       .offs(offs)
                       .columnWidth(columnWidth).build().print(out);
@@ -124,7 +124,7 @@ final class LocalFileHeaderView extends View {
     public static final class Builder {
 
         private LocalFileHeader localFileHeader;
-        private Diagnostic.ZipEntryBlock.LocalFileHeaderB diagLocalFileHeader;
+        private Diagnostic.ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader;
         private long pos;
         private Charset charset = Charsets.IBM437;
         private int offs;
@@ -139,7 +139,7 @@ final class LocalFileHeaderView extends View {
             return this;
         }
 
-        public Builder diagLocalFileHeader(Diagnostic.ZipEntryBlock.LocalFileHeaderB diagLocalFileHeader) {
+        public Builder diagLocalFileHeader(Diagnostic.ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader) {
             this.diagLocalFileHeader = diagLocalFileHeader;
             return this;
         }

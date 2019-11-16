@@ -160,7 +160,7 @@ public final class DecomposeEngine {
                 }
             }
 
-            writeExtraField(blockModel, fileHeader.getExtraField(), block.getExtraFields(), fileHeader.getGeneralPurposeFlag(), subDir);
+            writeExtraField(blockModel, fileHeader.getExtraField(), block.getExtraFieldBlock(), fileHeader.getGeneralPurposeFlag(), subDir);
 
             pos++;
         }
@@ -175,7 +175,7 @@ public final class DecomposeEngine {
         for (String fileName : zipEntryModel.getLocalFileHeaders().keySet()) {
             ZipEntry zipEntry = blockModel.getZipModel().getZipEntryByFileName(fileName);
             Diagnostic.ZipEntryBlock block = zipEntryModel.getZipEntryBlock();
-            Diagnostic.ZipEntryBlock.LocalFileHeaderB diagLocalFileHeader = block.getLocalFileHeader(fileName);
+            Diagnostic.ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader = block.getLocalFileHeader(fileName);
 
             String str = fileName;
 
@@ -209,7 +209,7 @@ public final class DecomposeEngine {
             // print extra filed
 
             LocalFileHeader localFileHeader = zipEntryModel.getLocalFileHeaders().get(fileName);
-            writeExtraField(blockModel, localFileHeader.getExtraField(), diagLocalFileHeader.getExtraField(), localFileHeader.getGeneralPurposeFlag(),
+            writeExtraField(blockModel, localFileHeader.getExtraField(), diagLocalFileHeader.getExtraFieldBlock(), localFileHeader.getGeneralPurposeFlag(),
                     subDir);
 
             // print encryption header
@@ -242,8 +242,8 @@ public final class DecomposeEngine {
                 long size = zipEntry.getCompressedSize();
                 long offs = diagLocalFileHeader.getContent().getOffs() + diagLocalFileHeader.getContent().getSize();
 
-                if (diagLocalFileHeader.getExtraField() != null)
-                    offs += diagLocalFileHeader.getExtraField().getSize();
+                if (diagLocalFileHeader.getExtraFieldBlock() != null)
+                    offs += diagLocalFileHeader.getExtraFieldBlock().getSize();
 
                 if (encryption == Encryption.AES_128 || encryption == Encryption.AES_192 || encryption == Encryption.AES_256) {
                     AesEncryptionHeaderBlock encryptionHeader = (AesEncryptionHeaderBlock)block.getEncryptionHeader(fileName);

@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 28.09.2019
  */
 @Test
-public class LocalFileHeaderTest {
+public class LocalFileHeaderBlockTest {
 
     public void shouldUseSettersGettersCorrectly() throws IOException {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();

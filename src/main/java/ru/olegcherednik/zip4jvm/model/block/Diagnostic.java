@@ -24,17 +24,15 @@ public final class Diagnostic {
     @Setter
     public static final class ZipEntryBlock {
 
-        public static final ZipEntry NULL = new ZipEntry();
-
-        private final Map<String, LocalFileHeaderB> localFileHeaders = new LinkedHashMap<>();
+        private final Map<String, LocalFileHeaderBlock> localFileHeaders = new LinkedHashMap<>();
         private final Map<String, EncryptionHeader> encryptionHeaders = new LinkedHashMap<>();
         private final Map<String, ByteArrayBlock> dataDescriptors = new LinkedHashMap<>();
 
         @Setter(AccessLevel.NONE)
-        private LocalFileHeaderB localFileHeader;
+        private LocalFileHeaderBlock localFileHeader;
 
         public void addLocalFileHeader() {
-            localFileHeader = new LocalFileHeaderB();
+            localFileHeader = new LocalFileHeaderBlock();
         }
 
         public void saveLocalFileHeader(String fileName) {
@@ -50,7 +48,7 @@ public final class Diagnostic {
             dataDescriptors.put(fileName, block);
         }
 
-        public LocalFileHeaderB getLocalFileHeader(String fileName) {
+        public LocalFileHeaderBlock getLocalFileHeader(String fileName) {
             return localFileHeaders.get(fileName);
         }
 
@@ -64,68 +62,16 @@ public final class Diagnostic {
 
         @Getter
         @Setter
-        public static final class LocalFileHeader extends Block {
-
-            public static final LocalFileHeader NULL = new LocalFileHeader();
-
-            private final ExtraFieldBlock extraFields = new ExtraFieldBlock();
-
-            private long disk;
-
-        }
-
-        @Getter
-        @Setter
-        public static final class LocalFileHeaderB {
+        public static final class LocalFileHeaderBlock {
 
             private final ByteArrayBlock content = new ByteArrayBlock();
-            private final ExtraFieldBlock extraField = new ExtraFieldBlock();
+            private final ExtraFieldBlock extraFieldBlock = new ExtraFieldBlock();
 
             private long disk;
         }
 
         public interface EncryptionHeader {
 
-        }
-
-    }
-
-    @Getter
-    @Setter
-    public static final class ZipEntry extends Block {
-
-        public static final ZipEntry NULL = new ZipEntry();
-
-        private final Map<String, LocalFileHeader> localFileHeaders = new LinkedHashMap<>();
-
-        @Setter(AccessLevel.NONE)
-        private LocalFileHeader localFileHeader = LocalFileHeader.NULL;
-
-
-        public void createLocalFileHeader() {
-            localFileHeader = new LocalFileHeader();
-        }
-
-        public void saveLOcalFileHeader(String fileName) {
-            localFileHeaders.put(fileName, localFileHeader);
-            localFileHeader = LocalFileHeader.NULL;
-        }
-
-        public LocalFileHeader getLocalFileHeader(String fileName) {
-            return localFileHeaders.get(fileName);
-        }
-
-        @Getter
-        @Setter
-        public static final class LocalFileHeader extends Block {
-
-            public static final LocalFileHeader NULL = new LocalFileHeader();
-
-            private ExtraFieldBlock extraField;
-
-            public void addExtraField() {
-                extraField = new ExtraFieldBlock();
-            }
         }
 
     }

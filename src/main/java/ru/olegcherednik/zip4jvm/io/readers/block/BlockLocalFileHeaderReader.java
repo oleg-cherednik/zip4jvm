@@ -17,9 +17,9 @@ import java.util.function.Function;
  */
 public class BlockLocalFileHeaderReader extends LocalFileHeaderReader {
 
-    private final Diagnostic.ZipEntryBlock.LocalFileHeaderB localFileHeader;
+    private final Diagnostic.ZipEntryBlock.LocalFileHeaderBlock localFileHeader;
 
-    public BlockLocalFileHeaderReader(long offs, Function<Charset, Charset> charsetCustomizer, Diagnostic.ZipEntryBlock.LocalFileHeaderB localFileHeader) {
+    public BlockLocalFileHeaderReader(long offs, Function<Charset, Charset> charsetCustomizer, Diagnostic.ZipEntryBlock.LocalFileHeaderBlock localFileHeader) {
         super(offs, charsetCustomizer);
         this.localFileHeader = localFileHeader;
     }
@@ -36,7 +36,7 @@ public class BlockLocalFileHeaderReader extends LocalFileHeaderReader {
         this.localFileHeader.getContent().calc(in.getOffs());
         this.localFileHeader.getContent().setData(in.getLastBytes((int)this.localFileHeader.getContent().getSize()));
         in.cleanBuffer();
-        return new BlockExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader), this.localFileHeader.getExtraField()).read(in);
+        return new BlockExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader), this.localFileHeader.getExtraFieldBlock()).read(in);
     }
 
 }

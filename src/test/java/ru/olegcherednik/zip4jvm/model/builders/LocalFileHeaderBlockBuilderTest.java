@@ -20,7 +20,7 @@ import static ru.olegcherednik.zip4jvm.model.builders.LocalFileHeaderBuilder.LOO
  * @since 29.09.2019
  */
 @Test
-public class LocalFileHeaderBuilderTest {
+public class LocalFileHeaderBlockBuilderTest {
 
     public void shouldCreateLocalFileHeaderWhenZip64Entry() throws IOException {
         ZipFile.Entry entry = ZipFile.Entry.of(fileDucati, fileNameDucati);
