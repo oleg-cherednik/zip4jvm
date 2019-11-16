@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.io.readers.block;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldRecordReader;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
-import ru.olegcherednik.zip4jvm.model.block.ByteArrayBlock;
+import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
@@ -27,9 +27,9 @@ public class BlockExtraFieldRecordReader extends ExtraFieldRecordReader {
 
     @Override
     public ExtraField.Record read(DataInput in) throws IOException {
-        ByteArrayBlock block = new ByteArrayBlock();
+        Block block = new Block();
         ExtraField.Record record = block.calc(in, () -> super.read(in));
-        extraFieldBlock.addRecord(record.getSignature(), block);
+        extraFieldBlock.addRecordBlock(record.getSignature(), block);
         return record;
     }
 }

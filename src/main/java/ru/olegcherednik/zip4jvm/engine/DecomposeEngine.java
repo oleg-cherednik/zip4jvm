@@ -59,7 +59,6 @@ public final class DecomposeEngine {
     private final int columnWidth;
 
     public void decompose() throws IOException {
-        Charset charset = Charsets.UTF_8;
         Diagnostic diagnostic = new Diagnostic();
         BlockModel blockModel = new BlockModelReader(zip, Charsets.STANDARD_ZIP_CHARSET, diagnostic).read();
         BlockZipEntryModel zipEntryModel = new BlockZipEntryModelReader(blockModel.getZipModel(), Charsets.STANDARD_ZIP_CHARSET,
@@ -70,107 +69,7 @@ public final class DecomposeEngine {
         writeEndCentralDirectory(blockModel);
         writeZip64(blockModel);
         writeCentralDirectory(blockModel);
-
-        int pos = 0;
-
-        for (String fileName : zipEntryModel.getLocalFileHeaders().keySet()) {
-            ZipEntry zipEntry = blockModel.getZipModel().getZipEntryByFileName(fileName);
-            Diagnostic.ZipEntryBlock block = zipEntryModel.getZipEntryBlock();
-            Diagnostic.ZipEntryBlock.LocalFileHeaderB diagLocalFileHeader = block.getLocalFileHeader(fileName);
-
-            String str = fileName;
-
-            if (zipEntry.isDirectory())
-                str = str.substring(0, str.length() - 1);
-
-            str = str.replaceAll("[\\/]", "_-_");
-
-            Path dir = destDir.resolve(str);
-            Files.createDirectories(dir);
-
-            // info
-
-            try (PrintStream out = new PrintStream(new FileOutputStream(dir.resolve("info.txt").toFile()))) {
-                ZipEntryView.builder()
-                            .pos(pos)
-                            .localFileHeader(zipEntryModel.getLocalFileHeaders().get(fileName))
-                            .diagLocalFileHeader(diagLocalFileHeader)
-                            .encryptionHeader(block.getEncryptionHeader(fileName))
-                            .dataDescriptor(zipEntryModel.getDataDescriptors().get(fileName))
-                            .blockDataDescriptor(block.getDataDescriptor(fileName))
-                            .charset(charset)
-                            .offs(4)
-                            .columnWidth(52).build().print(out);
-            }
-
-            // print zip entry
-
-            FileUtils.writeByteArrayToFile(dir.resolve("local_file_header.data").toFile(), diagLocalFileHeader.getContent().getData());
-
-            // print extra filed
-
-            LocalFileHeader localFileHeader = zipEntryModel.getLocalFileHeaders().get(fileName);
-            writeExtraField(blockModel, localFileHeader.getExtraField(), diagLocalFileHeader.getExtraField(), localFileHeader.getGeneralPurposeFlag(), dir);
-
-            // print encryption header
-
-            Encryption encryption = zipEntry.getEncryption();
-
-            // TODO probably same with block reader
-            if (encryption == Encryption.AES_128 || encryption == Encryption.AES_192 || encryption == Encryption.AES_256) {
-                AesEncryptionHeaderBlock encryptionHeader = (AesEncryptionHeaderBlock)block.getEncryptionHeader(fileName);
-
-                FileUtils.writeByteArrayToFile(dir.resolve("aes_salt.data").toFile(), encryptionHeader.getSalt().getData());
-                FileUtils.writeByteArrayToFile(dir.resolve("aes_password_checksum.data").toFile(),
-                        encryptionHeader.getPasswordChecksum().getData());
-                FileUtils.writeByteArrayToFile(dir.resolve("aes_mac.data").toFile(), encryptionHeader.getMac().getData());
-            } else if (encryption == Encryption.PKWARE) {
-                PkwareEncryptionHeader encryptionHeader = (PkwareEncryptionHeader)block.getEncryptionHeader(fileName);
-                FileUtils.writeByteArrayToFile(dir.resolve("pkware_header.data").toFile(), encryptionHeader.getData().getData());
-            }
-
-            // print data descriptor
-
-            if (zipEntry.isDataDescriptorAvailable()) {
-                ByteArrayBlock dataDescriptor = block.getDataDescriptor(fileName);
-                FileUtils.writeByteArrayToFile(dir.resolve("data_descriptor.data").toFile(), dataDescriptor.getData());
-            }
-
-            // payload
-
-            if (zipEntry.getCompressedSize() != 0) {
-                long size = zipEntry.getCompressedSize();
-                long offs = diagLocalFileHeader.getContent().getOffs() + diagLocalFileHeader.getContent().getSize();
-
-                if (diagLocalFileHeader.getExtraField() != null)
-                    offs += diagLocalFileHeader.getExtraField().getSize();
-
-                if (encryption == Encryption.AES_128 || encryption == Encryption.AES_192 || encryption == Encryption.AES_256) {
-                    AesEncryptionHeaderBlock encryptionHeader = (AesEncryptionHeaderBlock)block.getEncryptionHeader(fileName);
-
-                    offs += encryptionHeader.getSalt().getSize();
-                    offs += encryptionHeader.getPasswordChecksum().getSize();
-
-                    size -= encryptionHeader.getSalt().getSize();
-                    size -= encryptionHeader.getPasswordChecksum().getSize();
-                    size -= encryptionHeader.getMac().getSize();
-                } else if (encryption == Encryption.PKWARE) {
-                    PkwareEncryptionHeader encryptionHeader = (PkwareEncryptionHeader)block.getEncryptionHeader(fileName);
-                    offs += encryptionHeader.getData().getSize();
-                    size -= encryptionHeader.getData().getSize();
-                }
-
-                try (InputStream in = new SingleZipInputStream(blockModel.getZipModel().getFile())) {
-                    try (OutputStream out = new FileOutputStream(dir.resolve("payload.data").toFile())) {
-                        copyLarge(in, out, offs, size);
-                    }
-                }
-            }
-
-            pos++;
-        }
-
-
+        writeZipEntries(blockModel, zipEntryModel);
     }
 
     private static BaseZipInputStream createDataInput(ZipModel zipModel, ZipEntry zipEntry) throws IOException {
@@ -235,7 +134,7 @@ public final class DecomposeEngine {
         for (CentralDirectory.FileHeader fileHeader : blockModel.getCentralDirectory().getFileHeaders()) {
             String fileName = fileHeader.getFileName();
             ZipEntry zipEntry = blockModel.getZipModel().getZipEntryByFileName(fileName);
-            CentralDirectoryBlock.FileHeaderBlock block = blockModel.getDiagnostic().getCentralDirectoryBlock().getFileHeader(fileName);
+            CentralDirectoryBlock.FileHeaderBlock block = blockModel.getDiagnostic().getCentralDirectoryBlock().getFileHeaderBlock(fileName);
 
             if (zipEntry.isDirectory())
                 fileName = fileName.substring(0, fileName.length() - 1);
@@ -262,6 +161,111 @@ public final class DecomposeEngine {
             }
 
             writeExtraField(blockModel, fileHeader.getExtraField(), block.getExtraFields(), fileHeader.getGeneralPurposeFlag(), subDir);
+
+            pos++;
+        }
+    }
+
+    private void writeZipEntries(BlockModel blockModel, BlockZipEntryModel zipEntryModel) throws IOException {
+        Path dir = destDir.resolve("entries");
+        Files.createDirectories(dir);
+
+        int pos = 0;
+
+        for (String fileName : zipEntryModel.getLocalFileHeaders().keySet()) {
+            ZipEntry zipEntry = blockModel.getZipModel().getZipEntryByFileName(fileName);
+            Diagnostic.ZipEntryBlock block = zipEntryModel.getZipEntryBlock();
+            Diagnostic.ZipEntryBlock.LocalFileHeaderB diagLocalFileHeader = block.getLocalFileHeader(fileName);
+
+            String str = fileName;
+
+            if (zipEntry.isDirectory())
+                str = str.substring(0, str.length() - 1);
+
+            str = "#" + (pos + 1) + " - " + str.replaceAll("[\\/]", "_-_");
+
+            Path subDir = dir.resolve(str);
+            Files.createDirectories(subDir);
+
+            // info
+
+            try (PrintStream out = new PrintStream(new FileOutputStream(subDir.resolve("info.txt").toFile()))) {
+                ZipEntryView.builder()
+                            .pos(pos)
+                            .localFileHeader(zipEntryModel.getLocalFileHeaders().get(fileName))
+                            .diagLocalFileHeader(diagLocalFileHeader)
+                            .encryptionHeader(block.getEncryptionHeader(fileName))
+                            .dataDescriptor(zipEntryModel.getDataDescriptors().get(fileName))
+                            .blockDataDescriptor(block.getDataDescriptor(fileName))
+                            .charset(charset)
+                            .offs(4)
+                            .columnWidth(52).build().print(out);
+            }
+
+            // print zip entry
+
+            FileUtils.writeByteArrayToFile(subDir.resolve("local_file_header.data").toFile(), diagLocalFileHeader.getContent().getData());
+
+            // print extra filed
+
+            LocalFileHeader localFileHeader = zipEntryModel.getLocalFileHeaders().get(fileName);
+            writeExtraField(blockModel, localFileHeader.getExtraField(), diagLocalFileHeader.getExtraField(), localFileHeader.getGeneralPurposeFlag(),
+                    subDir);
+
+            // print encryption header
+
+            Encryption encryption = zipEntry.getEncryption();
+
+            // TODO probably same with block reader
+            if (encryption == Encryption.AES_128 || encryption == Encryption.AES_192 || encryption == Encryption.AES_256) {
+                AesEncryptionHeaderBlock encryptionHeader = (AesEncryptionHeaderBlock)block.getEncryptionHeader(fileName);
+
+                FileUtils.writeByteArrayToFile(subDir.resolve("aes_salt.data").toFile(), encryptionHeader.getSalt().getData());
+                FileUtils.writeByteArrayToFile(subDir.resolve("aes_password_checksum.data").toFile(),
+                        encryptionHeader.getPasswordChecksum().getData());
+                FileUtils.writeByteArrayToFile(subDir.resolve("aes_mac.data").toFile(), encryptionHeader.getMac().getData());
+            } else if (encryption == Encryption.PKWARE) {
+                PkwareEncryptionHeader encryptionHeader = (PkwareEncryptionHeader)block.getEncryptionHeader(fileName);
+                FileUtils.writeByteArrayToFile(subDir.resolve("pkware_header.data").toFile(), encryptionHeader.getData().getData());
+            }
+
+            // print data descriptor
+
+            if (zipEntry.isDataDescriptorAvailable()) {
+                ByteArrayBlock dataDescriptor = block.getDataDescriptor(fileName);
+                FileUtils.writeByteArrayToFile(subDir.resolve("data_descriptor.data").toFile(), dataDescriptor.getData());
+            }
+
+            // payload
+
+            if (zipEntry.getCompressedSize() != 0) {
+                long size = zipEntry.getCompressedSize();
+                long offs = diagLocalFileHeader.getContent().getOffs() + diagLocalFileHeader.getContent().getSize();
+
+                if (diagLocalFileHeader.getExtraField() != null)
+                    offs += diagLocalFileHeader.getExtraField().getSize();
+
+                if (encryption == Encryption.AES_128 || encryption == Encryption.AES_192 || encryption == Encryption.AES_256) {
+                    AesEncryptionHeaderBlock encryptionHeader = (AesEncryptionHeaderBlock)block.getEncryptionHeader(fileName);
+
+                    offs += encryptionHeader.getSalt().getSize();
+                    offs += encryptionHeader.getPasswordChecksum().getSize();
+
+                    size -= encryptionHeader.getSalt().getSize();
+                    size -= encryptionHeader.getPasswordChecksum().getSize();
+                    size -= encryptionHeader.getMac().getSize();
+                } else if (encryption == Encryption.PKWARE) {
+                    PkwareEncryptionHeader encryptionHeader = (PkwareEncryptionHeader)block.getEncryptionHeader(fileName);
+                    offs += encryptionHeader.getData().getSize();
+                    size -= encryptionHeader.getData().getSize();
+                }
+
+                try (InputStream in = new SingleZipInputStream(blockModel.getZipModel().getFile())) {
+                    try (OutputStream out = new FileOutputStream(subDir.resolve("payload.data").toFile())) {
+                        copyLarge(in, out, offs, size);
+                    }
+                }
+            }
 
             pos++;
         }
@@ -311,7 +315,8 @@ public final class DecomposeEngine {
         IOUtils.copyLarge(in, out, 0, length);
     }
 
-    private void writeExtraField(BlockModel blockModel, ExtraField extraField, ExtraFieldBlock extraFieldBlock, GeneralPurposeFlag generalPurposeFlag, Path parent)
+    private void writeExtraField(BlockModel blockModel, ExtraField extraField, ExtraFieldBlock extraFieldBlock, GeneralPurposeFlag generalPurposeFlag,
+            Path parent)
             throws IOException {
         if (extraField == ExtraField.NULL)
             return;
@@ -352,7 +357,7 @@ public final class DecomposeEngine {
 
             try (InputStream in = new SingleZipInputStream(blockModel.getZipModel().getFile())) {
                 try (OutputStream out = new FileOutputStream(subDir.resolve("data").toFile())) {
-                    copyLarge(in, out, extraFieldBlock.getRecord(signature));
+                    copyLarge(in, out, extraFieldBlock.getRecordBlock(signature));
                 }
             }
 

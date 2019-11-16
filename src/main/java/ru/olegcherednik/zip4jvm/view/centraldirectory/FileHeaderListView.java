@@ -47,7 +47,7 @@ final class FileHeaderListView extends View {
 
             FileHeaderView.builder()
                           .fileHeader(fileHeader)
-                          .diagFileHeader(diagCentralDirectory.getFileHeader(fileHeader.getFileName()))
+                          .diagFileHeader(diagCentralDirectory.getFileHeaderBlock(fileHeader.getFileName()))
                           .pos(pos++)
                           .charset(charset)
                           .offs(offs)

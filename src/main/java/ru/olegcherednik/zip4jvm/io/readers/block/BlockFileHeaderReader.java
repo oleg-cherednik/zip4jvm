@@ -16,26 +16,25 @@ import java.util.function.Function;
  */
 public class BlockFileHeaderReader extends FileHeaderReader {
 
-    private final CentralDirectoryBlock centralDirectory;
+    private final CentralDirectoryBlock centralDirectoryBlock;
+    private CentralDirectoryBlock.FileHeaderBlock block;
 
-    public BlockFileHeaderReader(long totalEntries, Function<Charset, Charset> charsetCustomizer, CentralDirectoryBlock centralDirectory) {
+    public BlockFileHeaderReader(long totalEntries, Function<Charset, Charset> charsetCustomizer, CentralDirectoryBlock centralDirectoryBlock) {
         super(totalEntries, charsetCustomizer);
-        this.centralDirectory = centralDirectory;
+        this.centralDirectoryBlock = centralDirectoryBlock;
     }
 
     @Override
     protected CentralDirectory.FileHeader readFileHeader(DataInput in) throws IOException {
-        centralDirectory.addFileHeader();
-
-        CentralDirectory.FileHeader fileHeader = centralDirectory.getFileHeader().calc(in, () -> super.readFileHeader(in));
-        centralDirectory.saveFileHeader(fileHeader.getFileName());
-
+        block = new CentralDirectoryBlock.FileHeaderBlock();
+        CentralDirectory.FileHeader fileHeader = block.calc(in, () -> super.readFileHeader(in));
+        centralDirectoryBlock.addFileHeaderBlock(fileHeader.getFileName(), block);
         return fileHeader;
     }
 
     @Override
     protected ExtraFieldReader getExtraFiledReader(int size, CentralDirectory.FileHeader fileHeader) {
-        return new BlockExtraFieldReader(size, ExtraFieldReader.getReaders(fileHeader), centralDirectory.getFileHeader().getExtraFields());
+        return new BlockExtraFieldReader(size, ExtraFieldReader.getReaders(fileHeader), block.getExtraFields());
     }
 
 }
