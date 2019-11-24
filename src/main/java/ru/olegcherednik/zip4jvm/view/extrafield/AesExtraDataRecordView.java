@@ -4,17 +4,16 @@ import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
-import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
-import java.util.Optional;
+import java.util.Objects;
 
 /**
  * @author Oleg Cherednik
  * @since 26.10.2019
  */
-final class AesExtraDataRecordView extends View {
+final class AesExtraDataRecordView extends View implements IExtraFieldView {
 
     private final AesExtraDataRecord record;
     private final GeneralPurposeFlag generalPurposeFlag;
@@ -46,20 +45,37 @@ final class AesExtraDataRecordView extends View {
         return true;
     }
 
+    @Override
+    public int getSignature() {
+        return record.getSignature();
+    }
+
+    @Override
+    public String getTitle() {
+        return "AES Encryption Tag";
+    }
+
+    @Override
+    public String getFileName() {
+        return String.format("(0x%04X)_AES_Encryption_Tag", record.getSignature());
+    }
+
     public static final class Builder {
 
-        private AesExtraDataRecord record = AesExtraDataRecord.NULL;
+        private AesExtraDataRecord record;
         private GeneralPurposeFlag generalPurposeFlag;
-        private Block block = Block.NULL;
+        private Block block;
         private int offs;
         private int columnWidth;
 
-        public IView build() {
-            return record.isNull() || block == Block.NULL ? IView.NULL : new AesExtraDataRecordView(this);
+        public AesExtraDataRecordView build() {
+            Objects.requireNonNull(record, "'record' must not be null");
+            Objects.requireNonNull(block, "'block' must not be null");
+            return new AesExtraDataRecordView(this);
         }
 
         public Builder record(AesExtraDataRecord record) {
-            this.record = Optional.ofNullable(record).orElse(AesExtraDataRecord.NULL);
+            this.record = record == AesExtraDataRecord.NULL ? null : record;
             return this;
         }
 
@@ -69,7 +85,7 @@ final class AesExtraDataRecordView extends View {
         }
 
         public Builder block(Block block) {
-            this.block = Optional.ofNullable(block).orElse(Block.NULL);
+            this.block = block == Block.NULL ? null : block;
             return this;
         }
 

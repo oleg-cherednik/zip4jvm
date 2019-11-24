@@ -3,17 +3,16 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
-import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
-import java.util.Optional;
+import java.util.Objects;
 
 /**
  * @author Oleg Cherednik
  * @since 26.10.2019
  */
-final class UnknownView extends View {
+final class UnknownView extends View implements IExtraFieldView {
 
     private final ExtraField.Record.Unknown record;
     private final Block block;
@@ -40,15 +39,27 @@ final class UnknownView extends View {
         return true;
     }
 
+    @Override
+    public int getSignature() {
+        return record.getSignature();
+    }
+
+    @Override
+    public String getTitle() {
+        return "Unknown";
+    }
+
     public static final class Builder {
 
         private ExtraField.Record.Unknown record;
-        private Block block = Block.NULL;
+        private Block block;
         private int offs;
         private int columnWidth;
 
-        public IView build() {
-            return record == null || block == Block.NULL ? IView.NULL : new UnknownView(this);
+        public UnknownView build() {
+            Objects.requireNonNull(record, "'record' must not be null");
+            Objects.requireNonNull(block, "'block' must not be null");
+            return new UnknownView(this);
         }
 
         public Builder record(ExtraField.Record.Unknown record) {
@@ -57,7 +68,7 @@ final class UnknownView extends View {
         }
 
         public Builder block(Block block) {
-            this.block = Optional.ofNullable(block).orElse(Block.NULL);
+            this.block = block == Block.NULL ? null : block;
             return this;
         }
 

@@ -9,7 +9,6 @@ import ru.olegcherednik.zip4jvm.io.readers.block.BlockModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.BlockZipEntryModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.aes.AesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.io.readers.block.pkware.PkwareEncryptionHeader;
-import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Encryption;
@@ -27,23 +26,27 @@ import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.block.Zip64Block;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.model.os.ExtendedTimestampExtraField;
-import ru.olegcherednik.zip4jvm.model.os.InfoZipNewUnixExtraField;
 import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.Zip64View;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.CentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.FileHeaderView;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntryView;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
+import ru.olegcherednik.zip4jvm.view.extrafield.IExtraFieldView;
 
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Oleg Cherednik
@@ -84,11 +87,8 @@ public final class DecomposeEngine {
             createEndCentralDirectoryView(blockModel).print(out);
         }
 
-        try (InputStream in = new SingleZipInputStream(blockModel.getZipModel().getFile())) {
-            try (OutputStream out = new FileOutputStream(destDir.resolve("end_central_directory.data").toFile())) {
-                copyLarge(in, out, blockModel.getDiagnostic().getEndCentralDirectoryBlock());
-            }
-        }
+        copyLarge(blockModel.getZipModel().getFile(), destDir.resolve("end_central_directory.data"),
+                blockModel.getDiagnostic().getEndCentralDirectoryBlock());
     }
 
     private void writeZip64(BlockModel blockModel) throws IOException {
@@ -103,29 +103,23 @@ public final class DecomposeEngine {
             createZip64EndCentralDirectoryLocatorView(blockModel.getZip64(), blockModel.getDiagnostic().getZip64Block()).print(out);
         }
 
-        try (InputStream in = new SingleZipInputStream(blockModel.getZipModel().getFile())) {
-            try (OutputStream out = new FileOutputStream(dir.resolve("zip64_end_central_directory_locator.data").toFile())) {
-                copyLarge(in, out, blockModel.getDiagnostic().getZip64Block().getEndCentralDirectoryLocatorBlock());
-            }
-        }
+        copyLarge(blockModel.getZipModel().getFile(), dir.resolve("zip64_end_central_directory_locator.data"),
+                blockModel.getDiagnostic().getZip64Block().getEndCentralDirectoryLocatorBlock());
 
         // (PK0606) ZIP64 End of Central directory record
         try (PrintStream out = new PrintStream(dir.resolve("zip64_end_central_directory.txt").toFile())) {
             createZip64EndCentralDirectoryView(blockModel.getZip64(), blockModel.getDiagnostic().getZip64Block()).print(out);
         }
 
-        try (InputStream in = new SingleZipInputStream(blockModel.getZipModel().getFile())) {
-            try (OutputStream out = new FileOutputStream(dir.resolve("zip64_end_central_directory.data").toFile())) {
-                copyLarge(in, out, blockModel.getDiagnostic().getZip64Block().getEndCentralDirectoryBlock());
-            }
-        }
+        copyLarge(blockModel.getZipModel().getFile(), dir.resolve("zip64_end_central_directory.data"),
+                blockModel.getDiagnostic().getZip64Block().getEndCentralDirectoryBlock());
     }
 
     private void writeCentralDirectory(BlockModel blockModel) throws IOException {
         Path dir = destDir.resolve("central_directory");
         Files.createDirectories(dir);
 
-        try (PrintStream out = new PrintStream(new FileOutputStream(dir.resolve("info.txt").toFile(), true))) {
+        try (PrintStream out = new PrintStream(new FileOutputStream(dir.resolve("central_directory.txt").toFile(), true))) {
             createCentralDirectoryView(blockModel).printHeader(out);
         }
 
@@ -144,7 +138,7 @@ public final class DecomposeEngine {
             Path subDir = dir.resolve(fileName);
             Files.createDirectories(subDir);
 
-            try (PrintStream out = new PrintStream(new FileOutputStream(subDir.resolve("info.txt").toFile()))) {
+            try (PrintStream out = new PrintStream(new FileOutputStream(subDir.resolve("file_header.txt").toFile()))) {
                 FileHeaderView.builder()
                               .fileHeader(fileHeader)
                               .diagFileHeader(block)
@@ -154,12 +148,7 @@ public final class DecomposeEngine {
                               .columnWidth(columnWidth).build().print(out);
             }
 
-            try (InputStream in = new SingleZipInputStream(blockModel.getZipModel().getFile())) {
-                try (OutputStream out = new FileOutputStream(subDir.resolve("data").toFile())) {
-                    copyLarge(in, out, block);
-                }
-            }
-
+            copyLarge(blockModel.getZipModel().getFile(), subDir.resolve("file_header.data"), block);
             writeExtraField(blockModel, fileHeader.getExtraField(), block.getExtraFieldBlock(), fileHeader.getGeneralPurposeFlag(), subDir);
 
             pos++;
@@ -209,7 +198,8 @@ public final class DecomposeEngine {
             // print extra filed
 
             LocalFileHeader localFileHeader = zipEntryModel.getLocalFileHeaders().get(fileName);
-            writeExtraField(blockModel, localFileHeader.getExtraField(), diagLocalFileHeader.getExtraFieldBlock(), localFileHeader.getGeneralPurposeFlag(),
+            writeExtraField(blockModel, localFileHeader.getExtraField(), diagLocalFileHeader.getExtraFieldBlock(),
+                    localFileHeader.getGeneralPurposeFlag(),
                     subDir);
 
             // print encryption header
@@ -260,11 +250,7 @@ public final class DecomposeEngine {
                     size -= encryptionHeader.getData().getSize();
                 }
 
-                try (InputStream in = new SingleZipInputStream(blockModel.getZipModel().getFile())) {
-                    try (OutputStream out = new FileOutputStream(subDir.resolve("payload.data").toFile())) {
-                        copyLarge(in, out, offs, size);
-                    }
-                }
+                copyLarge(blockModel.getZipModel().getFile(), subDir.resolve("payload.data"), offs, size);
             }
 
             pos++;
@@ -305,17 +291,105 @@ public final class DecomposeEngine {
                                                 .columnWidth(columnWidth).build();
     }
 
-    private static void copyLarge(InputStream in, OutputStream out, Block block) throws IOException {
-        in.skip(block.getOffs());
-        IOUtils.copyLarge(in, out, 0, block.getSize());
+    private static void copyLarge(Path in, Path out, Block block) throws IOException {
+        copyLarge(in, out, block.getOffs(), block.getSize());
     }
 
-    private static void copyLarge(InputStream in, OutputStream out, long offs, long length) throws IOException {
+    private static void copyLarge(Path in, Path out, long offs, long size) throws IOException {
+        try (FileInputStream fis = new FileInputStream(in.toFile()); FileOutputStream fos = new FileOutputStream(out.toFile())) {
+            copyLarge(fis, fos, offs, size);
+        }
+    }
+
+    private static void copyLarge(FileInputStream in, FileOutputStream out, long offs, long size) throws IOException {
         in.skip(offs);
-        IOUtils.copyLarge(in, out, 0, length);
+        IOUtils.copyLarge(in, out, 0, size);
     }
 
-    private void writeExtraField(BlockModel blockModel, ExtraField extraField, ExtraFieldBlock extraFieldBlock, GeneralPurposeFlag generalPurposeFlag,
+    @RequiredArgsConstructor
+    static class Task implements Runnable {
+
+        private static final ThreadLocal<byte[]> THREAD_LOCAL_BUFFER = ThreadLocal.withInitial(() -> new byte[1024 * 4]);
+
+        private final long i;
+        private final Path src;
+        private final Path dest;
+        private final CountDownLatch barrier;
+        private final long srcOffs;
+        private final long destOffs;
+        private final long s;
+
+        @Override
+        public void run() {
+            try {
+                System.out.format("%d: offs = %d (%d)\tsize = %d\n", i, srcOffs, Files.size(src) - srcOffs, s);
+            } catch(IOException e) {
+                e.printStackTrace();
+            }
+
+            try (RandomAccessFile in = new RandomAccessFile(src.toFile(), "r");
+                 RandomAccessFile out = new RandomAccessFile(dest.toFile(), "rw")) {
+                in.seek(srcOffs);
+                out.seek(destOffs);
+
+                byte[] buf = THREAD_LOCAL_BUFFER.get();
+                int total = 0;
+
+                while (total < s) {
+                    int n = in.read(buf);
+
+                    if (n == IOUtils.EOF)
+                        break;
+
+                    out.write(buf, 0, n);
+                    total += n;
+                }
+
+                barrier.countDown();
+            } catch(Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    public static void main(String... args) throws Exception {
+//        Path src = Paths.get("f:/1997.The.Swan.Princess.and.the.Secret.of.the.Castle.DVDRip.XviD.AC3.Dub.Eng.avi");
+//        Path dest = Paths.get("e:/1997.The.Swan.Princess.and.the.Secret.of.the.Castle.DVDRip.XviD.AC3.Dub.Eng.avi");
+        Path src = Paths.get("d:/zip4jvm/ferdinand.mkv");
+        Path dest = Paths.get("e:/ferdinand.mkv");
+
+        final long srcSize = Files.size(src);
+
+        try (RandomAccessFile file = new RandomAccessFile(dest.toFile(), "rw")) {
+            file.setLength(srcSize);
+        }
+
+        final int size = 1024 * 1024 * 100;
+        final int count = (int)(srcSize / size + (srcSize % size == 0 ? 0 : 1));
+
+        long time = System.currentTimeMillis();
+
+        ExecutorService pool = Executors.newFixedThreadPool(16);
+        CountDownLatch barrier = new CountDownLatch(count);
+
+        long pos = 0;
+        long i = 0;
+
+        while (pos < srcSize) {
+            System.err.println(i + "run offs: " + pos + ", more: " + (srcSize - pos));
+            int n = (int)Math.min(size, srcSize - size);
+            pool.submit(new Task(i, src, dest, barrier, pos, pos, n));
+            pos += n;
+            i++;
+        }
+
+        barrier.await();
+        pool.shutdown();
+        System.out.println("complete: " + TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - time));
+    }
+
+    private void writeExtraField(BlockModel blockModel, ExtraField extraField, ExtraFieldBlock extraFieldBlock, GeneralPurposeFlag
+            generalPurposeFlag,
             Path parent) throws IOException {
         if (extraField == ExtraField.NULL)
             return;
@@ -332,26 +406,9 @@ public final class DecomposeEngine {
 
         for (int signature : extraField.getSignatures()) {
             ExtraField.Record record = extraField.getRecord(signature);
-
-            String title = null;
-
-            if (record instanceof ExtendedTimestampExtraField)
-                title = "(0x5455)_universal_time";
-            else if (record instanceof InfoZipNewUnixExtraField)
-                title = "(0x7875)_new_InfoZIP_Unix_OS2_NT";
-            else if (record instanceof AesExtraDataRecord)
-                title = "(0x9901)_AES_Encryption_Tag";
-            else {
-                // TODO should be print smth
-                System.err.println("unknown extra field");
-                continue;
-            }
-
-            try (InputStream in = new SingleZipInputStream(blockModel.getZipModel().getFile())) {
-                try (OutputStream out = new FileOutputStream(dir.resolve(title + ".data").toFile())) {
-                    copyLarge(in, out, extraFieldBlock.getRecordBlock(signature));
-                }
-            }
+            IExtraFieldView recordView = view.getView(record);
+            String fileName = recordView.getFileName();
+            copyLarge(blockModel.getZipModel().getFile(), dir.resolve(fileName + ".data"), extraFieldBlock.getRecordBlock(signature));
         }
     }
 

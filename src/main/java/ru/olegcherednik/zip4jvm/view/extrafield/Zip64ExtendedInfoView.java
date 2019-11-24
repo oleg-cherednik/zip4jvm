@@ -3,17 +3,16 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
-import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
-import java.util.Optional;
+import java.util.Objects;
 
 /**
  * @author Oleg Cherednik
  * @since 26.10.2019
  */
-final class Zip64ExtendedInfoView extends View {
+final class Zip64ExtendedInfoView extends View implements IExtraFieldView {
 
     private final Zip64.ExtendedInfo record;
     private final Block block;
@@ -44,24 +43,36 @@ final class Zip64ExtendedInfoView extends View {
         return true;
     }
 
+    @Override
+    public int getSignature() {
+        return record.getSignature();
+    }
+
+    @Override
+    public String getTitle() {
+        return "Zip64 Extended Information";
+    }
+
     public static final class Builder {
 
-        private Zip64.ExtendedInfo record = Zip64.ExtendedInfo.NULL;
-        private Block block = Block.NULL;
+        private Zip64.ExtendedInfo record;
+        private Block block;
         private int offs;
         private int columnWidth;
 
-        public IView build() {
-            return record.isNull() || block == Block.NULL ? IView.NULL : new Zip64ExtendedInfoView(this);
+        public Zip64ExtendedInfoView build() {
+            Objects.requireNonNull(record, "'record' must not be null");
+            Objects.requireNonNull(block, "'block' must not be null");
+            return new Zip64ExtendedInfoView(this);
         }
 
         public Builder record(Zip64.ExtendedInfo record) {
-            this.record = Optional.ofNullable(record).orElse(Zip64.ExtendedInfo.NULL);
+            this.record = record == Zip64.ExtendedInfo.NULL ? null : record;
             return this;
         }
 
         public Builder block(Block block) {
-            this.block = Optional.ofNullable(block).orElse(Block.NULL);
+            this.block = block == Block.NULL ? null : block;
             return this;
         }
 

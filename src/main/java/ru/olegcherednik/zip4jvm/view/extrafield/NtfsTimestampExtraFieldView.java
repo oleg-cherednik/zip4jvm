@@ -3,17 +3,17 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.os.NtfsTimestampExtraField;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
-import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
  * @author Oleg Cherednik
  * @since 26.10.2019
  */
-final class NtfsTimestampExtraFieldView extends View {
+final class NtfsTimestampExtraFieldView extends View implements IExtraFieldView {
 
     private final NtfsTimestampExtraField record;
     private final Block block;
@@ -59,19 +59,31 @@ final class NtfsTimestampExtraFieldView extends View {
                         .columnWidth(columnWidth).build().print(out);
     }
 
+    @Override
+    public int getSignature() {
+        return record.getSignature();
+    }
+
+    @Override
+    public String getTitle() {
+        return "NTFS Timestamps";
+    }
+
     public static final class Builder {
 
-        private NtfsTimestampExtraField record = NtfsTimestampExtraField.NULL;
-        private Block block = Block.NULL;
+        private NtfsTimestampExtraField record;
+        private Block block;
         private int offs;
         private int columnWidth;
 
-        public IView build() {
-            return record.isNull() || block == Block.NULL ? IView.NULL : new NtfsTimestampExtraFieldView(this);
+        public NtfsTimestampExtraFieldView build() {
+            Objects.requireNonNull(record, "'record' must not be null");
+            Objects.requireNonNull(block, "'block' must not be null");
+            return new NtfsTimestampExtraFieldView(this);
         }
 
         public Builder record(NtfsTimestampExtraField record) {
-            this.record = Optional.ofNullable(record).orElse(NtfsTimestampExtraField.NULL);
+            this.record = record == NtfsTimestampExtraField.NULL ? null : record;
             return this;
         }
 

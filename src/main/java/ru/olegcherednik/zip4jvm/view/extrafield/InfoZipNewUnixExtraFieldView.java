@@ -4,17 +4,16 @@ import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.os.InfoZipNewUnixExtraField;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
-import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
-import java.util.Optional;
+import java.util.Objects;
 
 /**
  * @author Oleg Cherednik
  * @since 26.10.2019
  */
-final class InfoZipNewUnixExtraFieldView extends View {
+final class InfoZipNewUnixExtraFieldView extends View implements IExtraFieldView {
 
     private final InfoZipNewUnixExtraField record;
     private final Block block;
@@ -63,24 +62,41 @@ final class InfoZipNewUnixExtraFieldView extends View {
                         .columnWidth(columnWidth).build().print(out);
     }
 
+    @Override
+    public int getSignature() {
+        return record.getSignature();
+    }
+
+    @Override
+    public String getTitle() {
+        return "new InfoZIP Unix-OS2-NT";
+    }
+
+    @Override
+    public String getFileName() {
+        return String.format("(0x%04X)_new_InfoZIP_Unix_OS2_NT", record.getSignature());
+    }
+
     public static final class Builder {
 
-        private InfoZipNewUnixExtraField record = InfoZipNewUnixExtraField.NULL;
-        private Block block = Block.NULL;
+        private InfoZipNewUnixExtraField record;
+        private Block block;
         private int offs;
         private int columnWidth;
 
-        public IView build() {
-            return record.isNull() || block == Block.NULL ? IView.NULL : new InfoZipNewUnixExtraFieldView(this);
+        public InfoZipNewUnixExtraFieldView build() {
+            Objects.requireNonNull(record, "'record' must not be null");
+            Objects.requireNonNull(block, "'block' must not be null");
+            return new InfoZipNewUnixExtraFieldView(this);
         }
 
         public Builder record(InfoZipNewUnixExtraField record) {
-            this.record = Optional.ofNullable(record).orElse(InfoZipNewUnixExtraField.NULL);
+            this.record = record == InfoZipNewUnixExtraField.NULL ? null : record;
             return this;
         }
 
         public Builder block(Block block) {
-            this.block = Optional.ofNullable(block).orElse(Block.NULL);
+            this.block = block == Block.NULL ? null : block;
             return this;
         }
 

@@ -28,6 +28,7 @@ public final class Zip64 {
         return endCentralDirectoryLocator == null || endCentralDirectory == null ? NULL : new Zip64(endCentralDirectoryLocator, endCentralDirectory);
     }
 
+
     @Override
     public String toString() {
         return this == NULL ? "<null>" : super.toString();
