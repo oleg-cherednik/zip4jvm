@@ -3,7 +3,6 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
-import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
 import java.util.Objects;
@@ -12,19 +11,17 @@ import java.util.Objects;
  * @author Oleg Cherednik
  * @since 26.10.2019
  */
-final class Zip64ExtendedInfoView extends View implements IExtraFieldView {
+final class Zip64ExtendedInfoView extends ExtraFieldRecordView {
 
     private final Zip64.ExtendedInfo record;
-    private final Block block;
 
     public static Builder builder() {
         return new Builder();
     }
 
     private Zip64ExtendedInfoView(Builder builder) {
-        super(builder.offs, builder.columnWidth);
+        super(builder.block, builder.offs, builder.columnWidth);
         record = builder.record;
-        block = builder.block;
     }
 
     @Override

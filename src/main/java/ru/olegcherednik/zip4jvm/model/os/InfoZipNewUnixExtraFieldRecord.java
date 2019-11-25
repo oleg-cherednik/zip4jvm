@@ -16,9 +16,9 @@ import java.io.IOException;
  */
 @Getter
 @Builder
-public class InfoZipNewUnixExtraField implements ExtraField.Record {
+public class InfoZipNewUnixExtraFieldRecord implements ExtraField.Record {
 
-    public static final InfoZipNewUnixExtraField NULL = builder().build();
+    public static final InfoZipNewUnixExtraFieldRecord NULL = builder().build();
 
     public static final int SIGNATURE = 0x7875;
     public static final int SIZE_FIELD = 2 + 2; // 4 bytes: signature + size

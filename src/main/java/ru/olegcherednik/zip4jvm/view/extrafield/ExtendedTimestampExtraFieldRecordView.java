@@ -1,8 +1,7 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
 import ru.olegcherednik.zip4jvm.model.block.Block;
-import ru.olegcherednik.zip4jvm.model.os.ExtendedTimestampExtraField;
-import ru.olegcherednik.zip4jvm.view.View;
+import ru.olegcherednik.zip4jvm.model.os.ExtendedTimestampExtraFieldRecord;
 
 import java.io.PrintStream;
 import java.util.Objects;
@@ -11,26 +10,21 @@ import java.util.Objects;
  * @author Oleg Cherednik
  * @since 26.10.2019
  */
-final class ExtendedTimestampExtraFieldView extends View implements IExtraFieldView {
+final class ExtendedTimestampExtraFieldRecordView extends ExtraFieldRecordView {
 
-    private final ExtendedTimestampExtraField record;
-    private final Block block;
+    private final ExtendedTimestampExtraFieldRecord record;
 
     public static Builder builder() {
         return new Builder();
     }
 
-    private ExtendedTimestampExtraFieldView(Builder builder) {
-        super(builder.offs, builder.columnWidth);
+    private ExtendedTimestampExtraFieldRecordView(Builder builder) {
+        super(builder.block, builder.offs, builder.columnWidth);
         record = builder.record;
-        block = builder.block;
     }
 
     @Override
     public boolean print(PrintStream out) {
-        if (record.isNull() || block == Block.NULL)
-            return false;
-
         printValueLocation(out, String.format("(0x%04X) Universal time:", record.getSignature()), block);
 
         if (record.getFlag().isLastModificationTime())
@@ -60,19 +54,19 @@ final class ExtendedTimestampExtraFieldView extends View implements IExtraFieldV
 
     public static final class Builder {
 
-        private ExtendedTimestampExtraField record;
+        private ExtendedTimestampExtraFieldRecord record;
         private Block block;
         private int offs;
         private int columnWidth;
 
-        public ExtendedTimestampExtraFieldView build() {
+        public ExtendedTimestampExtraFieldRecordView build() {
             Objects.requireNonNull(record, "'record' must not be null");
             Objects.requireNonNull(block, "'block' must not be null");
-            return new ExtendedTimestampExtraFieldView(this);
+            return new ExtendedTimestampExtraFieldRecordView(this);
         }
 
-        public Builder record(ExtendedTimestampExtraField record) {
-            this.record = record == ExtendedTimestampExtraField.NULL ? null : record;
+        public Builder record(ExtendedTimestampExtraFieldRecord record) {
+            this.record = record == ExtendedTimestampExtraFieldRecord.NULL ? null : record;
             return this;
         }
 

@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
  * @since 09.11.2019
  */
 @Test
-public class UnknownViewTest {
+public class UnknownExtraFieldRecordViewTest {
 
     public void shouldRetrieveAllDataWhenAllDataSet() throws IOException {
         Block block = mock(Block.class);
@@ -27,10 +27,10 @@ public class UnknownViewTest {
                                                                     .signature(0x0666)
                                                                     .data(new byte[] { 0x0, 0x1, 0x2, 0x3 }).build();
 
-        String[] lines = Zip4jvmSuite.execute(UnknownView.builder()
-                                                         .record(record)
-                                                         .block(block)
-                                                         .columnWidth(52).build());
+        String[] lines = Zip4jvmSuite.execute(UnknownExtraFieldRecordView.builder()
+                                                                         .record(record)
+                                                                         .block(block)
+                                                                         .columnWidth(52).build());
 
         assertThat(lines).hasSize(3);
         assertThat(lines[0]).isEqualTo("(0x0666) Unknown:                                   11208273272 (0x29C10AD78) bytes");

@@ -1,8 +1,7 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
 import ru.olegcherednik.zip4jvm.model.block.Block;
-import ru.olegcherednik.zip4jvm.model.os.InfoZipOldUnixExtraField;
-import ru.olegcherednik.zip4jvm.view.View;
+import ru.olegcherednik.zip4jvm.model.os.InfoZipOldUnixExtraFieldRecord;
 
 import java.io.PrintStream;
 import java.util.Objects;
@@ -13,19 +12,17 @@ import static ru.olegcherednik.zip4jvm.model.ExtraField.NO_DATA;
  * @author Oleg Cherednik
  * @since 26.10.2019
  */
-final class InfoZipOldUnixExtraFieldView extends View implements IExtraFieldView {
+final class InfoZipOldUnixExtraFieldRecordView extends ExtraFieldRecordView {
 
-    private final InfoZipOldUnixExtraField record;
-    private final Block block;
+    private final InfoZipOldUnixExtraFieldRecord record;
 
     public static Builder builder() {
         return new Builder();
     }
 
-    private InfoZipOldUnixExtraFieldView(Builder builder) {
-        super(builder.offs, builder.columnWidth);
+    private InfoZipOldUnixExtraFieldRecordView(Builder builder) {
+        super(builder.block, builder.offs, builder.columnWidth);
         record = builder.record;
-        block = builder.block;
     }
 
     @Override
@@ -54,19 +51,19 @@ final class InfoZipOldUnixExtraFieldView extends View implements IExtraFieldView
 
     public static final class Builder {
 
-        private InfoZipOldUnixExtraField record;
+        private InfoZipOldUnixExtraFieldRecord record;
         private Block block;
         private int offs;
         private int columnWidth;
 
-        public InfoZipOldUnixExtraFieldView build() {
+        public InfoZipOldUnixExtraFieldRecordView build() {
             Objects.requireNonNull(record, "'record' must not be null");
             Objects.requireNonNull(block, "'block' must not be null");
-            return new InfoZipOldUnixExtraFieldView(this);
+            return new InfoZipOldUnixExtraFieldRecordView(this);
         }
 
-        public Builder record(InfoZipOldUnixExtraField record) {
-            this.record = record == InfoZipOldUnixExtraField.NULL ? null : record;
+        public Builder record(InfoZipOldUnixExtraFieldRecord record) {
+            this.record = record == InfoZipOldUnixExtraFieldRecord.NULL ? null : record;
             return this;
         }
 

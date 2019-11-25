@@ -2,9 +2,8 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 
 import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.model.block.Block;
-import ru.olegcherednik.zip4jvm.model.os.InfoZipNewUnixExtraField;
+import ru.olegcherednik.zip4jvm.model.os.InfoZipNewUnixExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
-import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
 import java.util.Objects;
@@ -13,38 +12,36 @@ import java.util.Objects;
  * @author Oleg Cherednik
  * @since 26.10.2019
  */
-final class InfoZipNewUnixExtraFieldView extends View implements IExtraFieldView {
+final class InfoZipNewUnixExtraFieldRecordView extends ExtraFieldRecordView {
 
-    private final InfoZipNewUnixExtraField record;
-    private final Block block;
+    private final InfoZipNewUnixExtraFieldRecord record;
 
     public static Builder builder() {
         return new Builder();
     }
 
-    private InfoZipNewUnixExtraFieldView(Builder builder) {
-        super(builder.offs, builder.columnWidth);
+    private InfoZipNewUnixExtraFieldRecordView(Builder builder) {
+        super(builder.block, builder.offs, builder.columnWidth);
         record = builder.record;
-        block = builder.block;
     }
 
     @Override
     public boolean print(PrintStream out) {
         printValueLocation(out, String.format("(0x%04X) new InfoZIP Unix/OS2/NT:", record.getSignature()), block);
 
-        InfoZipNewUnixExtraField.Payload payload = record.getPayload();
+        InfoZipNewUnixExtraFieldRecord.Payload payload = record.getPayload();
 
-        if (payload instanceof InfoZipNewUnixExtraField.VersionOnePayload)
-            print((InfoZipNewUnixExtraField.VersionOnePayload)record.getPayload(), out);
-        else if (payload instanceof InfoZipNewUnixExtraField.VersionUnknownPayload)
-            print((InfoZipNewUnixExtraField.VersionUnknownPayload)record.getPayload(), out);
+        if (payload instanceof InfoZipNewUnixExtraFieldRecord.VersionOnePayload)
+            print((InfoZipNewUnixExtraFieldRecord.VersionOnePayload)record.getPayload(), out);
+        else if (payload instanceof InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload)
+            print((InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload)record.getPayload(), out);
 
         // TODO add final else
 
         return true;
     }
 
-    private void print(InfoZipNewUnixExtraField.VersionOnePayload payload, PrintStream out) {
+    private void print(InfoZipNewUnixExtraFieldRecord.VersionOnePayload payload, PrintStream out) {
         printLine(out, "  version:", String.valueOf(payload.getVersion()));
 
         if (StringUtils.isNotBlank(payload.getUid()))
@@ -53,7 +50,7 @@ final class InfoZipNewUnixExtraFieldView extends View implements IExtraFieldView
             printLine(out, "  Group Identifier (GID):", payload.getGid());
     }
 
-    private void print(InfoZipNewUnixExtraField.VersionUnknownPayload payload, PrintStream out) {
+    private void print(InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload payload, PrintStream out) {
         printLine(out, "  version:", String.format("%d (unknown)", payload.getVersion()));
 
         ByteArrayHexView.builder()
@@ -79,19 +76,19 @@ final class InfoZipNewUnixExtraFieldView extends View implements IExtraFieldView
 
     public static final class Builder {
 
-        private InfoZipNewUnixExtraField record;
+        private InfoZipNewUnixExtraFieldRecord record;
         private Block block;
         private int offs;
         private int columnWidth;
 
-        public InfoZipNewUnixExtraFieldView build() {
+        public InfoZipNewUnixExtraFieldRecordView build() {
             Objects.requireNonNull(record, "'record' must not be null");
             Objects.requireNonNull(block, "'block' must not be null");
-            return new InfoZipNewUnixExtraFieldView(this);
+            return new InfoZipNewUnixExtraFieldRecordView(this);
         }
 
-        public Builder record(InfoZipNewUnixExtraField record) {
-            this.record = record == InfoZipNewUnixExtraField.NULL ? null : record;
+        public Builder record(InfoZipNewUnixExtraFieldRecord record) {
+            this.record = record == InfoZipNewUnixExtraFieldRecord.NULL ? null : record;
             return this;
         }
 

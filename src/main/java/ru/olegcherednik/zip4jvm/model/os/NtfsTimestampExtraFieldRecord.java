@@ -18,9 +18,9 @@ import java.util.List;
  */
 @Getter
 @Builder
-public final class NtfsTimestampExtraField implements ExtraField.Record {
+public final class NtfsTimestampExtraFieldRecord implements ExtraField.Record {
 
-    public static final NtfsTimestampExtraField NULL = builder().build();
+    public static final NtfsTimestampExtraFieldRecord NULL = builder().build();
 
     public static final int SIGNATURE = 0x000A;
     public static final int SIZE_FIELD = 2 + 2; // 4 bytes: signature + size

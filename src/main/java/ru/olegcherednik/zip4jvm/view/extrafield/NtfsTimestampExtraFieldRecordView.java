@@ -1,9 +1,8 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
 import ru.olegcherednik.zip4jvm.model.block.Block;
-import ru.olegcherednik.zip4jvm.model.os.NtfsTimestampExtraField;
+import ru.olegcherednik.zip4jvm.model.os.NtfsTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
-import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
 import java.util.Objects;
@@ -13,19 +12,17 @@ import java.util.Optional;
  * @author Oleg Cherednik
  * @since 26.10.2019
  */
-final class NtfsTimestampExtraFieldView extends View implements IExtraFieldView {
+final class NtfsTimestampExtraFieldRecordView extends ExtraFieldRecordView {
 
-    private final NtfsTimestampExtraField record;
-    private final Block block;
+    private final NtfsTimestampExtraFieldRecord record;
 
     public static Builder builder() {
         return new Builder();
     }
 
-    private NtfsTimestampExtraFieldView(Builder builder) {
-        super(builder.offs, builder.columnWidth);
+    private NtfsTimestampExtraFieldRecordView(Builder builder) {
+        super(builder.block, builder.offs, builder.columnWidth);
         record = builder.record;
-        block = builder.block;
     }
 
     @Override
@@ -33,24 +30,24 @@ final class NtfsTimestampExtraFieldView extends View implements IExtraFieldView 
         printValueLocation(out, String.format("(0x%04X) NTFS Timestamps:", record.getSignature()), block);
         printLine(out, "  - total tags:", String.valueOf(record.getTags().size()));
 
-        for (NtfsTimestampExtraField.Tag tag : record.getTags()) {
-            if (tag instanceof NtfsTimestampExtraField.OneTag)
-                print((NtfsTimestampExtraField.OneTag)tag, out);
-            else if (tag instanceof NtfsTimestampExtraField.UnknownTag)
-                print((NtfsTimestampExtraField.UnknownTag)tag, out);
+        for (NtfsTimestampExtraFieldRecord.Tag tag : record.getTags()) {
+            if (tag instanceof NtfsTimestampExtraFieldRecord.OneTag)
+                print((NtfsTimestampExtraFieldRecord.OneTag)tag, out);
+            else if (tag instanceof NtfsTimestampExtraFieldRecord.UnknownTag)
+                print((NtfsTimestampExtraFieldRecord.UnknownTag)tag, out);
         }
 
         return true;
     }
 
-    private void print(NtfsTimestampExtraField.OneTag tag, PrintStream out) {
+    private void print(NtfsTimestampExtraFieldRecord.OneTag tag, PrintStream out) {
         printLine(out, String.format("  (0x%04X) Tag1:", tag.getSignature()), String.format("%d bytes", tag.getSize()));
         printLine(out, "    Creation Date:", String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", tag.getCreationTime()));
         printLine(out, "    Last Modified Date:", String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", tag.getLastModificationTime()));
         printLine(out, "    Last Accessed Date:", String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", tag.getLastAccessTime()));
     }
 
-    private void print(NtfsTimestampExtraField.UnknownTag tag, PrintStream out) {
+    private void print(NtfsTimestampExtraFieldRecord.UnknownTag tag, PrintStream out) {
         printLine(out, String.format("  (0x%04X) Unknown Tag:", tag.getSignature()), String.format("%d bytes", tag.getSize()));
 
         ByteArrayHexView.builder()
@@ -71,19 +68,19 @@ final class NtfsTimestampExtraFieldView extends View implements IExtraFieldView 
 
     public static final class Builder {
 
-        private NtfsTimestampExtraField record;
+        private NtfsTimestampExtraFieldRecord record;
         private Block block;
         private int offs;
         private int columnWidth;
 
-        public NtfsTimestampExtraFieldView build() {
+        public NtfsTimestampExtraFieldRecordView build() {
             Objects.requireNonNull(record, "'record' must not be null");
             Objects.requireNonNull(block, "'block' must not be null");
-            return new NtfsTimestampExtraFieldView(this);
+            return new NtfsTimestampExtraFieldRecordView(this);
         }
 
-        public Builder record(NtfsTimestampExtraField record) {
-            this.record = record == NtfsTimestampExtraField.NULL ? null : record;
+        public Builder record(NtfsTimestampExtraFieldRecord record) {
+            this.record = record == NtfsTimestampExtraFieldRecord.NULL ? null : record;
             return this;
         }
 

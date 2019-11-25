@@ -43,9 +43,9 @@ public final class ExtraField {
         return record instanceof Zip64.ExtendedInfo ? (Zip64.ExtendedInfo)record : Zip64.ExtendedInfo.NULL;
     }
 
-    public AesExtraDataRecord getAesExtraDataRecord() {
-        ExtraField.Record record = map.get(AesExtraDataRecord.SIGNATURE);
-        return record instanceof AesExtraDataRecord ? (AesExtraDataRecord)record : AesExtraDataRecord.NULL;
+    public AesExtraFieldRecord getAesExtraDataRecord() {
+        ExtraField.Record record = map.get(AesExtraFieldRecord.SIGNATURE);
+        return record instanceof AesExtraFieldRecord ? (AesExtraFieldRecord)record : AesExtraFieldRecord.NULL;
     }
 
     public Set<Integer> getSignatures() {

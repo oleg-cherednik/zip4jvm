@@ -3,7 +3,6 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
-import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
 import java.util.Objects;
@@ -12,19 +11,17 @@ import java.util.Objects;
  * @author Oleg Cherednik
  * @since 26.10.2019
  */
-final class UnknownView extends View implements IExtraFieldView {
+final class UnknownExtraFieldRecordView extends ExtraFieldRecordView {
 
     private final ExtraField.Record.Unknown record;
-    private final Block block;
 
     public static Builder builder() {
         return new Builder();
     }
 
-    private UnknownView(Builder builder) {
-        super(builder.offs, builder.columnWidth);
+    private UnknownExtraFieldRecordView(Builder builder) {
+        super(builder.block, builder.offs, builder.columnWidth);
         record = builder.record;
-        block = builder.block;
     }
 
     @Override
@@ -56,10 +53,10 @@ final class UnknownView extends View implements IExtraFieldView {
         private int offs;
         private int columnWidth;
 
-        public UnknownView build() {
+        public UnknownExtraFieldRecordView build() {
             Objects.requireNonNull(record, "'record' must not be null");
             Objects.requireNonNull(block, "'block' must not be null");
-            return new UnknownView(this);
+            return new UnknownExtraFieldRecordView(this);
         }
 
         public Builder record(ExtraField.Record.Unknown record) {

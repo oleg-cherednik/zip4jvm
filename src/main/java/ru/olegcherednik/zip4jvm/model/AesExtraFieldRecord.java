@@ -13,9 +13,9 @@ import java.nio.charset.Charset;
 import java.util.Optional;
 
 @Getter
-public final class AesExtraDataRecord implements ExtraField.Record {
+public final class AesExtraFieldRecord implements ExtraField.Record {
 
-    public static final AesExtraDataRecord NULL = builder().build();
+    public static final AesExtraFieldRecord NULL = builder().build();
 
     public static final int SIGNATURE = 0x9901;
     public static final int SIZE = 2 + 2 + 2 + 2 + 1 + 2;   // size:11
@@ -36,7 +36,7 @@ public final class AesExtraDataRecord implements ExtraField.Record {
         return new Builder();
     }
 
-    private AesExtraDataRecord(Builder builder) {
+    private AesExtraFieldRecord(Builder builder) {
         dataSize = builder.dataSize;
         versionNumber = builder.versionNumber;
         vendor = builder.vendor;
@@ -90,8 +90,8 @@ public final class AesExtraDataRecord implements ExtraField.Record {
         private AesStrength strength = AesStrength.NULL;
         private CompressionMethod compressionMethod = CompressionMethod.DEFLATE;
 
-        public AesExtraDataRecord build() {
-            return new AesExtraDataRecord(this);
+        public AesExtraFieldRecord build() {
+            return new AesExtraFieldRecord(this);
         }
 
         public Builder dataSize(int dataSize) {

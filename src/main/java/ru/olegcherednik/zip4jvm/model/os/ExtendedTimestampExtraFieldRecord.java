@@ -25,9 +25,9 @@ import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT2;
  */
 @Getter
 @Builder
-public final class ExtendedTimestampExtraField implements ExtraField.Record {
+public final class ExtendedTimestampExtraFieldRecord implements ExtraField.Record {
 
-    public static final ExtendedTimestampExtraField NULL = builder().build();
+    public static final ExtendedTimestampExtraFieldRecord NULL = builder().build();
 
     public static final int SIGNATURE = 0x5455;
     public static final int SIZE_FIELD = 2 + 2; // 4 bytes: signature + size

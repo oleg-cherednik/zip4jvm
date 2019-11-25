@@ -31,8 +31,8 @@ import ru.olegcherednik.zip4jvm.view.Zip64View;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.CentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.FileHeaderView;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntryView;
+import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldRecordView;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
-import ru.olegcherednik.zip4jvm.view.extrafield.IExtraFieldView;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -397,7 +397,7 @@ public final class DecomposeEngine {
         Path dir = parent.resolve("extra_fields");
         Files.createDirectories(dir);
 
-        ExtraFieldView view = ExtraFieldView.builder()
+        ExtraFieldView extraFieldView = ExtraFieldView.builder()
                                             .extraField(extraField)
                                             .extraFieldBlock(extraFieldBlock)
                                             .generalPurposeFlag(generalPurposeFlag)
@@ -406,7 +406,7 @@ public final class DecomposeEngine {
 
         for (int signature : extraField.getSignatures()) {
             ExtraField.Record record = extraField.getRecord(signature);
-            IExtraFieldView recordView = view.getView(record);
+            ExtraFieldRecordView recordView = extraFieldView.getView(record);
             String fileName = recordView.getFileName();
             copyLarge(blockModel.getZipModel().getFile(), dir.resolve(fileName + ".data"), extraFieldBlock.getRecordBlock(signature));
         }

@@ -1,10 +1,9 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
-import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
+import ru.olegcherednik.zip4jvm.model.AesExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
-import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
 import java.util.Objects;
@@ -13,21 +12,19 @@ import java.util.Objects;
  * @author Oleg Cherednik
  * @since 26.10.2019
  */
-final class AesExtraDataRecordView extends View implements IExtraFieldView {
+final class AesExtraFieldRecordView extends ExtraFieldRecordView {
 
-    private final AesExtraDataRecord record;
+    private final AesExtraFieldRecord record;
     private final GeneralPurposeFlag generalPurposeFlag;
-    private final Block block;
 
     public static Builder builder() {
         return new Builder();
     }
 
-    private AesExtraDataRecordView(Builder builder) {
-        super(builder.offs, builder.columnWidth);
+    private AesExtraFieldRecordView(Builder builder) {
+        super(builder.block, builder.offs, builder.columnWidth);
         record = builder.record;
         generalPurposeFlag = builder.generalPurposeFlag;
-        block = builder.block;
     }
 
     @Override
@@ -62,20 +59,20 @@ final class AesExtraDataRecordView extends View implements IExtraFieldView {
 
     public static final class Builder {
 
-        private AesExtraDataRecord record;
+        private AesExtraFieldRecord record;
         private GeneralPurposeFlag generalPurposeFlag;
         private Block block;
         private int offs;
         private int columnWidth;
 
-        public AesExtraDataRecordView build() {
+        public AesExtraFieldRecordView build() {
             Objects.requireNonNull(record, "'record' must not be null");
             Objects.requireNonNull(block, "'block' must not be null");
-            return new AesExtraDataRecordView(this);
+            return new AesExtraFieldRecordView(this);
         }
 
-        public Builder record(AesExtraDataRecord record) {
-            this.record = record == AesExtraDataRecord.NULL ? null : record;
+        public Builder record(AesExtraFieldRecord record) {
+            this.record = record == AesExtraFieldRecord.NULL ? null : record;
             return this;
         }
 
