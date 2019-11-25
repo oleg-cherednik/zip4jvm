@@ -27,7 +27,8 @@ final class NtfsTimestampExtraFieldRecordView extends ExtraFieldRecordView {
 
     @Override
     public boolean print(PrintStream out) {
-        printValueLocation(out, String.format("(0x%04X) NTFS Timestamps:", record.getSignature()), block);
+        super.print(out);
+
         printLine(out, "  - total tags:", String.valueOf(record.getTags().size()));
 
         for (NtfsTimestampExtraFieldRecord.Tag tag : record.getTags()) {
@@ -57,12 +58,12 @@ final class NtfsTimestampExtraFieldRecordView extends ExtraFieldRecordView {
     }
 
     @Override
-    public int getSignature() {
+    protected int getSignature() {
         return record.getSignature();
     }
 
     @Override
-    public String getTitle() {
+    protected String getTitle() {
         return "NTFS Timestamps";
     }
 

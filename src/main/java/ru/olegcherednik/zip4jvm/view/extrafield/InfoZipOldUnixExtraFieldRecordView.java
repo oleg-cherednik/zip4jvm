@@ -27,7 +27,8 @@ final class InfoZipOldUnixExtraFieldRecordView extends ExtraFieldRecordView {
 
     @Override
     public boolean print(PrintStream out) {
-        printValueLocation(out, String.format("(0x%04X) old InfoZIP Unix/OS2/NT:", record.getSignature()), block);
+        super.print(out);
+
         printLine(out, "  Last Modified Date:", String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", record.getLastModificationTime()));
         printLine(out, "  Last Accessed Date:", String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", record.getLastAccessTime()));
 
@@ -40,13 +41,13 @@ final class InfoZipOldUnixExtraFieldRecordView extends ExtraFieldRecordView {
     }
 
     @Override
-    public int getSignature() {
+    protected int getSignature() {
         return record.getSignature();
     }
 
     @Override
-    public String getTitle() {
-        return "old InfoZIP Unix-OS2-NT";
+    protected String getTitle() {
+        return "old InfoZIP Unix/OS2/NT";
     }
 
     public static final class Builder {

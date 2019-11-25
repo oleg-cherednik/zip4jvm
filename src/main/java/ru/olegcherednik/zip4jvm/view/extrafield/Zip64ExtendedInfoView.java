@@ -26,7 +26,7 @@ final class Zip64ExtendedInfoView extends ExtraFieldRecordView {
 
     @Override
     public boolean print(PrintStream out) {
-        printValueLocation(out, String.format("(0x%04X) Zip64 Extended Information:", record.getSignature()), block);
+        super.print(out);
 
         if (record.getUncompressedSize() != ExtraField.NO_DATA)
             printLine(out, "  original compressed size:", String.format("%d bytes", record.getUncompressedSize()));
@@ -41,12 +41,12 @@ final class Zip64ExtendedInfoView extends ExtraFieldRecordView {
     }
 
     @Override
-    public int getSignature() {
+    protected int getSignature() {
         return record.getSignature();
     }
 
     @Override
-    public String getTitle() {
+    protected String getTitle() {
         return "Zip64 Extended Information";
     }
 

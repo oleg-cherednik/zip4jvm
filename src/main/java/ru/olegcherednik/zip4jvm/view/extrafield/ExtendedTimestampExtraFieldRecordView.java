@@ -25,7 +25,7 @@ final class ExtendedTimestampExtraFieldRecordView extends ExtraFieldRecordView {
 
     @Override
     public boolean print(PrintStream out) {
-        printValueLocation(out, String.format("(0x%04X) Universal time:", record.getSignature()), block);
+        super.print(out);
 
         if (record.getFlag().isLastModificationTime())
             printLine(out, "  Last Modified Date:", String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", record.getLastModificationTime()));
@@ -38,18 +38,13 @@ final class ExtendedTimestampExtraFieldRecordView extends ExtraFieldRecordView {
     }
 
     @Override
-    public int getSignature() {
+    protected int getSignature() {
         return record.getSignature();
     }
 
     @Override
-    public String getTitle() {
+    protected String getTitle() {
         return "Universal time";
-    }
-
-    @Override
-    public String getFileName() {
-        return String.format("(0x%04X)_universal_time", record.getSignature());
     }
 
     public static final class Builder {

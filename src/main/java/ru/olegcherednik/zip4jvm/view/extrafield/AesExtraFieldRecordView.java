@@ -29,7 +29,8 @@ final class AesExtraFieldRecordView extends ExtraFieldRecordView {
 
     @Override
     public boolean print(PrintStream out) {
-        printValueLocation(out, String.format("(0x%04X) AES Encryption Tag:", record.getSignature()), block);
+        super.print(out);
+
         printLine(out, "  Encryption Tag Version:", String.format("%s-%d", record.getVendor(), record.getVersionNumber()));
         printLine(out, "  Encryption Key Bits:", record.getStrength().getSize());
 
@@ -43,18 +44,13 @@ final class AesExtraFieldRecordView extends ExtraFieldRecordView {
     }
 
     @Override
-    public int getSignature() {
+    protected int getSignature() {
         return record.getSignature();
     }
 
     @Override
-    public String getTitle() {
+    protected String getTitle() {
         return "AES Encryption Tag";
-    }
-
-    @Override
-    public String getFileName() {
-        return String.format("(0x%04X)_AES_Encryption_Tag", record.getSignature());
     }
 
     public static final class Builder {

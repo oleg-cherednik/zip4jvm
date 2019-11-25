@@ -27,7 +27,7 @@ final class InfoZipNewUnixExtraFieldRecordView extends ExtraFieldRecordView {
 
     @Override
     public boolean print(PrintStream out) {
-        printValueLocation(out, String.format("(0x%04X) new InfoZIP Unix/OS2/NT:", record.getSignature()), block);
+        super.print(out);
 
         InfoZipNewUnixExtraFieldRecord.Payload payload = record.getPayload();
 
@@ -60,18 +60,13 @@ final class InfoZipNewUnixExtraFieldRecordView extends ExtraFieldRecordView {
     }
 
     @Override
-    public int getSignature() {
+    protected int getSignature() {
         return record.getSignature();
     }
 
     @Override
-    public String getTitle() {
-        return "new InfoZIP Unix-OS2-NT";
-    }
-
-    @Override
-    public String getFileName() {
-        return String.format("(0x%04X)_new_InfoZIP_Unix_OS2_NT", record.getSignature());
+    protected String getTitle() {
+        return "new InfoZIP Unix/OS2/NT";
     }
 
     public static final class Builder {
