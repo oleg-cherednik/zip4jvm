@@ -389,8 +389,7 @@ public final class DecomposeEngine {
     }
 
     private void writeExtraField(BlockModel blockModel, ExtraField extraField, ExtraFieldBlock extraFieldBlock, GeneralPurposeFlag
-            generalPurposeFlag,
-            Path parent) throws IOException {
+            generalPurposeFlag, Path parent) throws IOException {
         if (extraField == ExtraField.NULL)
             return;
 
@@ -398,11 +397,11 @@ public final class DecomposeEngine {
         Files.createDirectories(dir);
 
         ExtraFieldView extraFieldView = ExtraFieldView.builder()
-                                            .extraField(extraField)
-                                            .extraFieldBlock(extraFieldBlock)
-                                            .generalPurposeFlag(generalPurposeFlag)
-                                            .offs(offs)
-                                            .columnWidth(columnWidth).build();
+                                                      .extraField(extraField)
+                                                      .extraFieldBlock(extraFieldBlock)
+                                                      .generalPurposeFlag(generalPurposeFlag)
+                                                      .offs(offs)
+                                                      .columnWidth(columnWidth).build();
 
         for (int signature : extraField.getSignatures()) {
             ExtraField.Record record = extraField.getRecord(signature);

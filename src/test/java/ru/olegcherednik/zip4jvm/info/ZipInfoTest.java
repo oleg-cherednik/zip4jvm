@@ -105,13 +105,13 @@ public class ZipInfoTest {
     public void decompose() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-//        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/aes.zip"))
+        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/aes.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/aes1.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/ferdinand.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/pkware.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/pkware.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/macos_10.zip"))
-        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/ubuntu_18.zip"))
+//        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/ubuntu_18.zip"))
                .decompose(dir);
     }
 
