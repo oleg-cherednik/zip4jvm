@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.block.Block;
-import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 
 import java.io.PrintStream;
 import java.util.Objects;
@@ -13,7 +12,7 @@ import java.util.Objects;
  */
 final class UnknownExtraFieldRecordView extends ExtraFieldRecordView {
 
-    private final ExtraField.Record.Unknown record;
+    private final ExtraField.Record record;
 
     public static Builder builder() {
         return new Builder();
@@ -28,10 +27,10 @@ final class UnknownExtraFieldRecordView extends ExtraFieldRecordView {
     public boolean print(PrintStream out) {
         printValueLocation(out, String.format("(0x%04X) Unknown:", record.getSignature()), block);
 
-        ByteArrayHexView.builder()
-                        .buf(record.getData())
-                        .offs(offs)
-                        .columnWidth(columnWidth).build().print(out);
+//        ByteArrayHexView.builder()
+//                        .buf(record.getData())
+//                        .offs(offs)
+//                        .columnWidth(columnWidth).build().print(out);
 
         return true;
     }
@@ -48,7 +47,7 @@ final class UnknownExtraFieldRecordView extends ExtraFieldRecordView {
 
     public static final class Builder {
 
-        private ExtraField.Record.Unknown record;
+        private ExtraField.Record record;
         private Block block;
         private int offs;
         private int columnWidth;
@@ -59,7 +58,7 @@ final class UnknownExtraFieldRecordView extends ExtraFieldRecordView {
             return new UnknownExtraFieldRecordView(this);
         }
 
-        public Builder record(ExtraField.Record.Unknown record) {
+        public Builder record(ExtraField.Record record) {
             this.record = record;
             return this;
         }

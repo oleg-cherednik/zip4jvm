@@ -27,7 +27,6 @@ public class ExtraFieldRecordReader implements Reader<ExtraField.Record> {
         if (readers.containsKey(signature))
             return readers.get(signature).apply(size).read(in);
 
-
         byte[] data = in.readBytes(in.wordSignatureSize() + in.wordSize() + size);
         return ExtraField.Record.Unknown.builder()
                                         .signature(signature)

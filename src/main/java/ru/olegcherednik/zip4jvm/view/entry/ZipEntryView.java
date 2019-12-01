@@ -6,7 +6,7 @@ import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.block.Block;
-import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.View;
 import ru.olegcherednik.zip4jvm.view.crypto.EncryptionHeaderView;
@@ -23,8 +23,8 @@ public final class ZipEntryView extends View {
 
     private final long pos;
     private final LocalFileHeader localFileHeader;
-    private final Diagnostic.ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader;
-    private final Diagnostic.ZipEntryBlock.EncryptionHeader encryptionHeader;
+    private final ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader;
+    private final ZipEntryBlock.EncryptionHeader encryptionHeader;
     // TODO duplication of data descriptor
     private final DataDescriptor dataDescriptor;
     private final Block blockDataDescriptor;
@@ -84,8 +84,8 @@ public final class ZipEntryView extends View {
 
         private long pos;
         private LocalFileHeader localFileHeader;
-        private Diagnostic.ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader;
-        private Diagnostic.ZipEntryBlock.EncryptionHeader encryptionHeader;
+        private ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader;
+        private ZipEntryBlock.EncryptionHeader encryptionHeader;
         private DataDescriptor dataDescriptor;
         private Block blockDataDescriptor = Block.NULL;
         private Charset charset = Charsets.IBM437;
@@ -106,12 +106,12 @@ public final class ZipEntryView extends View {
             return this;
         }
 
-        public Builder diagLocalFileHeader(Diagnostic.ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader) {
+        public Builder diagLocalFileHeader(ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader) {
             this.diagLocalFileHeader = diagLocalFileHeader;
             return this;
         }
 
-        public Builder encryptionHeader(Diagnostic.ZipEntryBlock.EncryptionHeader encryptionHeader) {
+        public Builder encryptionHeader(ZipEntryBlock.EncryptionHeader encryptionHeader) {
             this.encryptionHeader = encryptionHeader;
             return this;
         }

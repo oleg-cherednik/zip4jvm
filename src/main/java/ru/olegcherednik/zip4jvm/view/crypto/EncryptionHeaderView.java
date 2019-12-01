@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.readers.block.aes.AesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.io.readers.block.pkware.PkwareEncryptionHeader;
-import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.View;
 
@@ -16,7 +16,7 @@ import java.io.PrintStream;
  */
 public final class EncryptionHeaderView extends View {
 
-    private final Diagnostic.ZipEntryBlock.EncryptionHeader encryptionHeader;
+    private final ZipEntryBlock.EncryptionHeader encryptionHeader;
     private final long pos;
 
     public static Builder builder() {
@@ -62,7 +62,7 @@ public final class EncryptionHeaderView extends View {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class Builder {
 
-        private Diagnostic.ZipEntryBlock.EncryptionHeader encryptionHeader;
+        private ZipEntryBlock.EncryptionHeader encryptionHeader;
         private long pos;
         private int offs;
         private int columnWidth;
@@ -71,7 +71,7 @@ public final class EncryptionHeaderView extends View {
             return encryptionHeader == null ? IView.NULL : new EncryptionHeaderView(this);
         }
 
-        public Builder encryptionHeader(Diagnostic.ZipEntryBlock.EncryptionHeader encryptionHeader) {
+        public Builder encryptionHeader(ZipEntryBlock.EncryptionHeader encryptionHeader) {
             this.encryptionHeader = encryptionHeader;
             return this;
         }

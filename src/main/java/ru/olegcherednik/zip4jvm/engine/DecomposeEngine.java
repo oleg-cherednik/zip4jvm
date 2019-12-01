@@ -25,6 +25,7 @@ import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.block.Zip64Block;
+import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.Zip64View;
@@ -163,8 +164,8 @@ public final class DecomposeEngine {
 
         for (String fileName : zipEntryModel.getLocalFileHeaders().keySet()) {
             ZipEntry zipEntry = blockModel.getZipModel().getZipEntryByFileName(fileName);
-            Diagnostic.ZipEntryBlock block = zipEntryModel.getZipEntryBlock();
-            Diagnostic.ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader = block.getLocalFileHeader(fileName);
+            ZipEntryBlock block = zipEntryModel.getZipEntryBlock();
+            ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader = block.getLocalFileHeader(fileName);
 
             String str = fileName;
 
@@ -388,8 +389,8 @@ public final class DecomposeEngine {
         System.out.println("complete: " + TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - time));
     }
 
-    private void writeExtraField(BlockModel blockModel, ExtraField extraField, ExtraFieldBlock extraFieldBlock, GeneralPurposeFlag
-            generalPurposeFlag, Path parent) throws IOException {
+    private void writeExtraField(BlockModel blockModel, ExtraField extraField, ExtraFieldBlock block, GeneralPurposeFlag generalPurposeFlag,
+            Path parent) throws IOException {
         if (extraField == ExtraField.NULL)
             return;
 
@@ -398,16 +399,22 @@ public final class DecomposeEngine {
 
         ExtraFieldView extraFieldView = ExtraFieldView.builder()
                                                       .extraField(extraField)
-                                                      .extraFieldBlock(extraFieldBlock)
+                                                      .block(block)
                                                       .generalPurposeFlag(generalPurposeFlag)
-                                                      .offs(offs)
                                                       .columnWidth(columnWidth).build();
 
         for (int signature : extraField.getSignatures()) {
             ExtraField.Record record = extraField.getRecord(signature);
             ExtraFieldRecordView recordView = extraFieldView.getView(record);
             String fileName = recordView.getFileName();
-            copyLarge(blockModel.getZipModel().getFile(), dir.resolve(fileName + ".data"), extraFieldBlock.getRecordBlock(signature));
+
+            // print .txt
+            try (PrintStream out = new PrintStream(new FileOutputStream(dir.resolve(fileName + ".txt").toFile()))) {
+                recordView.print(out);
+            }
+
+            // print .data
+            copyLarge(blockModel.getZipModel().getFile(), dir.resolve(fileName + ".data"), block.getRecordBlock(signature));
         }
     }
 

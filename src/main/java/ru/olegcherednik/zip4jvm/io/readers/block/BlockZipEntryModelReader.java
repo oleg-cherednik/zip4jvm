@@ -14,7 +14,7 @@ import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BlockZipEntryModel;
 import ru.olegcherednik.zip4jvm.model.block.ByteArrayBlock;
-import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
@@ -32,7 +32,7 @@ public class BlockZipEntryModelReader {
 
     private final ZipModel zipModel;
     private final Function<Charset, Charset> charsetCustomizer;
-    private final Diagnostic.ZipEntryBlock zipEntryBlock;
+    private final ZipEntryBlock zipEntryBlock;
 
     public BlockZipEntryModel read() throws IOException {
         Map<String, LocalFileHeader> localFileHeaders = new LinkedHashMap<>();
@@ -55,7 +55,7 @@ public class BlockZipEntryModelReader {
         zipEntryBlock.addLocalFileHeader();
         zipEntryBlock.getLocalFileHeader().setDisk(zipEntry.getDisk());
         long offs = zipEntry.getLocalFileHeaderOffs();
-        Diagnostic.ZipEntryBlock.LocalFileHeaderBlock blockLocalFileHeader = zipEntryBlock.getLocalFileHeader();
+        ZipEntryBlock.LocalFileHeaderBlock blockLocalFileHeader = zipEntryBlock.getLocalFileHeader();
         LocalFileHeader localFileHeader = new BlockLocalFileHeaderReader(offs, charsetCustomizer, blockLocalFileHeader).read(in);
         zipEntryBlock.saveLocalFileHeader(localFileHeader.getFileName());
         return localFileHeader;

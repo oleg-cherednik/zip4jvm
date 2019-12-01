@@ -15,7 +15,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class BlockZipEntryModel {
 
-    private final Diagnostic.ZipEntryBlock zipEntryBlock;
+    private final ZipEntryBlock zipEntryBlock;
     private final Map<String, LocalFileHeader> localFileHeaders;
     private final Map<String, DataDescriptor> dataDescriptors;
 

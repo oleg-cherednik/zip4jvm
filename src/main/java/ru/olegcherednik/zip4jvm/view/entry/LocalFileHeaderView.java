@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
-import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
 import ru.olegcherednik.zip4jvm.view.GeneralPurposeFlagView;
 import ru.olegcherednik.zip4jvm.view.IView;
@@ -27,7 +27,7 @@ final class LocalFileHeaderView extends View {
 
     private final LocalFileHeader localFileHeader;
     // TODO should be block
-    private final Diagnostic.ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader;
+    private final ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader;
     private final long pos;
     private final Charset charset;
 
@@ -114,7 +114,7 @@ final class LocalFileHeaderView extends View {
 
         ExtraFieldView.builder()
                       .extraField(localFileHeader.getExtraField())
-                      .extraFieldBlock(diagLocalFileHeader.getExtraFieldBlock())
+                      .block(diagLocalFileHeader.getExtraFieldBlock())
                       .generalPurposeFlag(localFileHeader.getGeneralPurposeFlag())
                       .offs(offs)
                       .columnWidth(columnWidth).build().print(out);
@@ -124,7 +124,7 @@ final class LocalFileHeaderView extends View {
     public static final class Builder {
 
         private LocalFileHeader localFileHeader;
-        private Diagnostic.ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader;
+        private ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader;
         private long pos;
         private Charset charset = Charsets.IBM437;
         private int offs;
@@ -139,7 +139,7 @@ final class LocalFileHeaderView extends View {
             return this;
         }
 
-        public Builder diagLocalFileHeader(Diagnostic.ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader) {
+        public Builder diagLocalFileHeader(ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader) {
             this.diagLocalFileHeader = diagLocalFileHeader;
             return this;
         }
