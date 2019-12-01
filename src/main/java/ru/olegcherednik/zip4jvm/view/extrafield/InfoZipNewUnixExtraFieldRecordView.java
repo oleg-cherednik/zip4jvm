@@ -1,7 +1,6 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
 import org.apache.commons.lang.StringUtils;
-import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.os.InfoZipNewUnixExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 
@@ -21,7 +20,7 @@ final class InfoZipNewUnixExtraFieldRecordView extends ExtraFieldRecordView {
     }
 
     private InfoZipNewUnixExtraFieldRecordView(Builder builder) {
-        super(builder.block, builder.offs, builder.columnWidth);
+        super(builder.block, builder.file, builder.offs, builder.columnWidth);
         record = builder.record;
     }
 
@@ -69,17 +68,18 @@ final class InfoZipNewUnixExtraFieldRecordView extends ExtraFieldRecordView {
         return "new InfoZIP Unix/OS2/NT";
     }
 
-    public static final class Builder {
+    public static final class Builder extends BaseBuilder<Builder> {
 
         private InfoZipNewUnixExtraFieldRecord record;
-        private Block block;
-        private int offs;
-        private int columnWidth;
 
         public InfoZipNewUnixExtraFieldRecordView build() {
-            Objects.requireNonNull(record, "'record' must not be null");
-            Objects.requireNonNull(block, "'block' must not be null");
+            check();
             return new InfoZipNewUnixExtraFieldRecordView(this);
+        }
+
+        @Override
+        protected void check() {
+            Objects.requireNonNull(record, "'record' must not be null");
         }
 
         public Builder record(InfoZipNewUnixExtraFieldRecord record) {
@@ -87,19 +87,5 @@ final class InfoZipNewUnixExtraFieldRecordView extends ExtraFieldRecordView {
             return this;
         }
 
-        public Builder block(Block block) {
-            this.block = block == Block.NULL ? null : block;
-            return this;
-        }
-
-        public Builder offs(int offs) {
-            this.offs = offs;
-            return this;
-        }
-
-        public Builder columnWidth(int columnWidth) {
-            this.columnWidth = columnWidth;
-            return this;
-        }
     }
 }

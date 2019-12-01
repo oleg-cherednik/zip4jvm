@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
-import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.os.InfoZipOldUnixExtraFieldRecord;
 
 import java.io.PrintStream;
@@ -21,7 +20,7 @@ final class InfoZipOldUnixExtraFieldRecordView extends ExtraFieldRecordView {
     }
 
     private InfoZipOldUnixExtraFieldRecordView(Builder builder) {
-        super(builder.block, builder.offs, builder.columnWidth);
+        super(builder.block, builder.file, builder.offs, builder.columnWidth);
         record = builder.record;
     }
 
@@ -50,16 +49,12 @@ final class InfoZipOldUnixExtraFieldRecordView extends ExtraFieldRecordView {
         return "old InfoZIP Unix/OS2/NT";
     }
 
-    public static final class Builder {
+    public static final class Builder extends BaseBuilder<Builder> {
 
         private InfoZipOldUnixExtraFieldRecord record;
-        private Block block;
-        private int offs;
-        private int columnWidth;
 
         public InfoZipOldUnixExtraFieldRecordView build() {
-            Objects.requireNonNull(record, "'record' must not be null");
-            Objects.requireNonNull(block, "'block' must not be null");
+            check();
             return new InfoZipOldUnixExtraFieldRecordView(this);
         }
 
@@ -68,19 +63,10 @@ final class InfoZipOldUnixExtraFieldRecordView extends ExtraFieldRecordView {
             return this;
         }
 
-        public Builder block(Block block) {
-            this.block = block == Block.NULL ? null : block;
-            return this;
+        @Override
+        protected void check() {
+            Objects.requireNonNull(record, "'record' must not be null");
         }
 
-        public Builder offs(int offs) {
-            this.offs = offs;
-            return this;
-        }
-
-        public Builder columnWidth(int columnWidth) {
-            this.columnWidth = columnWidth;
-            return this;
-        }
     }
 }

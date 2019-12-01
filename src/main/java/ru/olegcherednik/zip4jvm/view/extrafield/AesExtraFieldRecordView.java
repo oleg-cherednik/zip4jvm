@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 
 import ru.olegcherednik.zip4jvm.model.AesExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
-import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
 
 import java.io.PrintStream;
@@ -22,7 +21,7 @@ final class AesExtraFieldRecordView extends ExtraFieldRecordView {
     }
 
     private AesExtraFieldRecordView(Builder builder) {
-        super(builder.block, builder.offs, builder.columnWidth);
+        super(builder.block, builder.file, builder.offs, builder.columnWidth);
         record = builder.record;
         generalPurposeFlag = builder.generalPurposeFlag;
     }
@@ -53,18 +52,20 @@ final class AesExtraFieldRecordView extends ExtraFieldRecordView {
         return "AES Encryption Tag";
     }
 
-    public static final class Builder {
+    public static final class Builder extends BaseBuilder<Builder> {
 
         private AesExtraFieldRecord record;
         private GeneralPurposeFlag generalPurposeFlag;
-        private Block block;
-        private int offs;
-        private int columnWidth;
 
         public AesExtraFieldRecordView build() {
-            Objects.requireNonNull(record, "'record' must not be null");
-            Objects.requireNonNull(block, "'block' must not be null");
+            check();
             return new AesExtraFieldRecordView(this);
+        }
+
+        @Override
+        protected void check() {
+            super.check();
+            Objects.requireNonNull(record, "'record' must not be null");
         }
 
         public Builder record(AesExtraFieldRecord record) {
@@ -77,19 +78,5 @@ final class AesExtraFieldRecordView extends ExtraFieldRecordView {
             return this;
         }
 
-        public Builder block(Block block) {
-            this.block = block == Block.NULL ? null : block;
-            return this;
-        }
-
-        public Builder offs(int offs) {
-            this.offs = offs;
-            return this;
-        }
-
-        public Builder columnWidth(int columnWidth) {
-            this.columnWidth = columnWidth;
-            return this;
-        }
     }
 }

@@ -401,6 +401,7 @@ public final class DecomposeEngine {
                                                       .extraField(extraField)
                                                       .block(block)
                                                       .generalPurposeFlag(generalPurposeFlag)
+                                                      .file(blockModel.getZipModel().getFile())
                                                       .columnWidth(columnWidth).build();
 
         for (int signature : extraField.getSignatures()) {

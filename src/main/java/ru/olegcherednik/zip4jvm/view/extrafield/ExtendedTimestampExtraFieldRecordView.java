@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
-import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.os.ExtendedTimestampExtraFieldRecord;
 
 import java.io.PrintStream;
@@ -19,7 +18,7 @@ final class ExtendedTimestampExtraFieldRecordView extends ExtraFieldRecordView {
     }
 
     private ExtendedTimestampExtraFieldRecordView(Builder builder) {
-        super(builder.block, builder.offs, builder.columnWidth);
+        super(builder.block, builder.file, builder.offs, builder.columnWidth);
         record = builder.record;
     }
 
@@ -47,17 +46,19 @@ final class ExtendedTimestampExtraFieldRecordView extends ExtraFieldRecordView {
         return "Universal time";
     }
 
-    public static final class Builder {
+    public static final class Builder extends BaseBuilder<Builder> {
 
         private ExtendedTimestampExtraFieldRecord record;
-        private Block block;
-        private int offs;
-        private int columnWidth;
 
         public ExtendedTimestampExtraFieldRecordView build() {
-            Objects.requireNonNull(record, "'record' must not be null");
-            Objects.requireNonNull(block, "'block' must not be null");
+            check();
             return new ExtendedTimestampExtraFieldRecordView(this);
+        }
+
+        @Override
+        protected void check() {
+            super.check();
+            Objects.requireNonNull(record, "'record' must not be null");
         }
 
         public Builder record(ExtendedTimestampExtraFieldRecord record) {
@@ -65,19 +66,5 @@ final class ExtendedTimestampExtraFieldRecordView extends ExtraFieldRecordView {
             return this;
         }
 
-        public Builder block(Block block) {
-            this.block = block == Block.NULL ? null : block;
-            return this;
-        }
-
-        public Builder offs(int offs) {
-            this.offs = offs;
-            return this;
-        }
-
-        public Builder columnWidth(int columnWidth) {
-            this.columnWidth = columnWidth;
-            return this;
-        }
     }
 }

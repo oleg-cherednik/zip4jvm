@@ -2,6 +2,7 @@ package ru.olegcherednik.zip4jvm.model.block;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;
 
@@ -32,6 +33,10 @@ public class Block {
 
     public void calc(long offs) {
         size = offs - this.offs;
+    }
+
+    public byte[] getData() {
+        return ArrayUtils.EMPTY_BYTE_ARRAY;
     }
 
 }

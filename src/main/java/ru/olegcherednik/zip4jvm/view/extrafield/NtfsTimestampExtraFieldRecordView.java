@@ -1,12 +1,10 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
-import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.os.NtfsTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 
 import java.io.PrintStream;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Oleg Cherednik
@@ -21,7 +19,7 @@ final class NtfsTimestampExtraFieldRecordView extends ExtraFieldRecordView {
     }
 
     private NtfsTimestampExtraFieldRecordView(Builder builder) {
-        super(builder.block, builder.offs, builder.columnWidth);
+        super(builder.block, builder.file, builder.offs, builder.columnWidth);
         record = builder.record;
     }
 
@@ -67,17 +65,19 @@ final class NtfsTimestampExtraFieldRecordView extends ExtraFieldRecordView {
         return "NTFS Timestamps";
     }
 
-    public static final class Builder {
+    public static final class Builder extends BaseBuilder<Builder> {
 
         private NtfsTimestampExtraFieldRecord record;
-        private Block block;
-        private int offs;
-        private int columnWidth;
 
         public NtfsTimestampExtraFieldRecordView build() {
-            Objects.requireNonNull(record, "'record' must not be null");
-            Objects.requireNonNull(block, "'block' must not be null");
+            check();
             return new NtfsTimestampExtraFieldRecordView(this);
+        }
+
+        @Override
+        protected void check() {
+            super.check();
+            Objects.requireNonNull(record, "'record' must not be null");
         }
 
         public Builder record(NtfsTimestampExtraFieldRecord record) {
@@ -85,19 +85,5 @@ final class NtfsTimestampExtraFieldRecordView extends ExtraFieldRecordView {
             return this;
         }
 
-        public Builder block(Block block) {
-            this.block = Optional.ofNullable(block).orElse(Block.NULL);
-            return this;
-        }
-
-        public Builder offs(int offs) {
-            this.offs = offs;
-            return this;
-        }
-
-        public Builder columnWidth(int columnWidth) {
-            this.columnWidth = columnWidth;
-            return this;
-        }
     }
 }

@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
 import ru.olegcherednik.zip4jvm.model.ExtraField;
-import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 
 import java.io.PrintStream;
 import java.util.Objects;
@@ -19,7 +19,7 @@ final class UnknownExtraFieldRecordView extends ExtraFieldRecordView {
     }
 
     private UnknownExtraFieldRecordView(Builder builder) {
-        super(builder.block, builder.offs, builder.columnWidth);
+        super(builder.block, builder.file, builder.offs, builder.columnWidth);
         record = builder.record;
     }
 
@@ -27,10 +27,10 @@ final class UnknownExtraFieldRecordView extends ExtraFieldRecordView {
     public boolean print(PrintStream out) {
         printValueLocation(out, String.format("(0x%04X) Unknown:", record.getSignature()), block);
 
-//        ByteArrayHexView.builder()
-//                        .buf(record.getData())
-//                        .offs(offs)
-//                        .columnWidth(columnWidth).build().print(out);
+        ByteArrayHexView.builder()
+                        .buf(block.getData())
+                        .offs(offs)
+                        .columnWidth(columnWidth).build().print(out);
 
         return true;
     }
@@ -45,17 +45,19 @@ final class UnknownExtraFieldRecordView extends ExtraFieldRecordView {
         return "Unknown";
     }
 
-    public static final class Builder {
+    public static final class Builder extends BaseBuilder<Builder> {
 
         private ExtraField.Record record;
-        private Block block;
-        private int offs;
-        private int columnWidth;
 
         public UnknownExtraFieldRecordView build() {
-            Objects.requireNonNull(record, "'record' must not be null");
-            Objects.requireNonNull(block, "'block' must not be null");
+            check();
             return new UnknownExtraFieldRecordView(this);
+        }
+
+        @Override
+        protected void check() {
+            super.check();
+            Objects.requireNonNull(record, "'record' must not be null");
         }
 
         public Builder record(ExtraField.Record record) {
@@ -63,19 +65,5 @@ final class UnknownExtraFieldRecordView extends ExtraFieldRecordView {
             return this;
         }
 
-        public Builder block(Block block) {
-            this.block = block == Block.NULL ? null : block;
-            return this;
-        }
-
-        public Builder offs(int offs) {
-            this.offs = offs;
-            return this;
-        }
-
-        public Builder columnWidth(int columnWidth) {
-            this.columnWidth = columnWidth;
-            return this;
-        }
     }
 }
