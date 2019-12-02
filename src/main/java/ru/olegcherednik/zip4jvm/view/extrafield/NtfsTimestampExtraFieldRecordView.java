@@ -19,7 +19,7 @@ final class NtfsTimestampExtraFieldRecordView extends ExtraFieldRecordView {
     }
 
     private NtfsTimestampExtraFieldRecordView(Builder builder) {
-        super(builder.block, builder.file, builder.offs, builder.columnWidth);
+        super(builder);
         record = builder.record;
     }
 
@@ -50,7 +50,7 @@ final class NtfsTimestampExtraFieldRecordView extends ExtraFieldRecordView {
         printLine(out, String.format("  (0x%04X) Unknown Tag:", tag.getSignature()), String.format("%d bytes", tag.getSize()));
 
         ByteArrayHexView.builder()
-                        .buf(tag.getData())
+                        .data(tag.getData())
                         .offs(offs)
                         .columnWidth(columnWidth).build().print(out);
     }

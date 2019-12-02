@@ -43,7 +43,7 @@ final class DigitalSignatureView extends View {
 
     private boolean printData(PrintStream out) {
         return ByteArrayHexView.builder()
-                               .buf(digitalSignature.getSignatureData())
+                               .data(digitalSignature.getSignatureData())
                                .offs(offs)
                                .columnWidth(columnWidth).build().print(out);
     }

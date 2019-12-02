@@ -1,9 +1,11 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
+import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.model.AesExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.Zip64;
+import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.os.ExtendedTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.os.InfoZipNewUnixExtraFieldRecord;
@@ -12,8 +14,8 @@ import ru.olegcherednik.zip4jvm.model.os.NtfsTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
-import java.nio.file.Path;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -25,7 +27,7 @@ public final class ExtraFieldView extends View {
     private final ExtraField extraField;
     private final ExtraFieldBlock block;
     private final GeneralPurposeFlag generalPurposeFlag;
-    private final Path file;
+    private final Function<Block, byte[]> getDataFunc;
 
     public static Builder builder() {
         return new Builder();
@@ -36,7 +38,7 @@ public final class ExtraFieldView extends View {
         extraField = builder.extraField;
         block = builder.block;
         generalPurposeFlag = builder.generalPurposeFlag;
-        file = builder.file;
+        getDataFunc = builder.getDataFunc;
     }
 
     @Override
@@ -83,16 +85,15 @@ public final class ExtraFieldView extends View {
             return createView((ExtendedTimestampExtraFieldRecord)record);
         if (record instanceof Zip64.ExtendedInfo)
             return createView((Zip64.ExtendedInfo)record);
-        if (record instanceof AesExtraFieldRecord)
-            return createView((AesExtraFieldRecord)record);
-        return createView((ExtraField.Record.Unknown)record);
+//        if (record instanceof AesExtraFieldRecord)
+//            return createView((AesExtraFieldRecord)record);
+        return createView(record);
     };
 
     private NtfsTimestampExtraFieldRecordView createView(NtfsTimestampExtraFieldRecord record) {
         return NtfsTimestampExtraFieldRecordView.builder()
                                                 .record(record)
                                                 .block(block.getRecordBlock(record.getSignature()))
-                                                .file(file)
                                                 .offs(offs)
                                                 .columnWidth(columnWidth).build();
     }
@@ -101,7 +102,6 @@ public final class ExtraFieldView extends View {
         return InfoZipOldUnixExtraFieldRecordView.builder()
                                                  .record(record)
                                                  .block(block.getRecordBlock(record.getSignature()))
-                                                 .file(file)
                                                  .offs(offs)
                                                  .columnWidth(columnWidth).build();
     }
@@ -110,7 +110,6 @@ public final class ExtraFieldView extends View {
         return InfoZipNewUnixExtraFieldRecordView.builder()
                                                  .record(record)
                                                  .block(block.getRecordBlock(record.getSignature()))
-                                                 .file(file)
                                                  .offs(offs)
                                                  .columnWidth(columnWidth).build();
     }
@@ -119,7 +118,6 @@ public final class ExtraFieldView extends View {
         return ExtendedTimestampExtraFieldRecordView.builder()
                                                     .record(record)
                                                     .block(block.getRecordBlock(record.getSignature()))
-                                                    .file(file)
                                                     .offs(offs)
                                                     .columnWidth(columnWidth).build();
     }
@@ -128,7 +126,6 @@ public final class ExtraFieldView extends View {
         return Zip64ExtendedInfoView.builder()
                                     .record(record)
                                     .block(block.getRecordBlock(record.getSignature()))
-                                    .file(file)
                                     .offs(offs)
                                     .columnWidth(columnWidth).build();
     }
@@ -138,16 +135,16 @@ public final class ExtraFieldView extends View {
                                       .record(record)
                                       .generalPurposeFlag(generalPurposeFlag)
                                       .block(block.getRecordBlock(record.getSignature()))
-                                      .file(file)
                                       .offs(offs)
                                       .columnWidth(columnWidth).build();
     }
 
     private UnknownExtraFieldRecordView createView(ExtraField.Record record) {
+        Block recordBlock = block.getRecordBlock(record.getSignature());
         return UnknownExtraFieldRecordView.builder()
                                           .record(record)
-                                          .block(block.getRecordBlock(record.getSignature()))
-                                          .file(file)
+                                          .block(recordBlock)
+                                          .data(getDataFunc.apply(recordBlock))
                                           .offs(offs)
                                           .columnWidth(columnWidth).build();
     }
@@ -157,7 +154,7 @@ public final class ExtraFieldView extends View {
         private ExtraField extraField;
         private ExtraFieldBlock block;
         private GeneralPurposeFlag generalPurposeFlag;
-        private Path file;
+        private Function<Block, byte[]> getDataFunc = block -> ArrayUtils.EMPTY_BYTE_ARRAY;
         private int offs;
         private int columnWidth;
 
@@ -165,7 +162,7 @@ public final class ExtraFieldView extends View {
             Objects.requireNonNull(extraField, "'extraField' must not be null");
             Objects.requireNonNull(block, "'block' must not be null");
             Objects.requireNonNull(generalPurposeFlag, "'generalPurposeFlag' must not be null");
-//            Objects.requireNonNull(file, "'file' must not be null");
+            Objects.requireNonNull(getDataFunc, "'getDataFunc' must not be null");
             return new ExtraFieldView(this);
         }
 
@@ -184,8 +181,8 @@ public final class ExtraFieldView extends View {
             return this;
         }
 
-        public Builder file(Path file) {
-            this.file = file;
+        public Builder getDataFunc(Function<Block, byte[]> getDataFunc) {
+            this.getDataFunc = Optional.ofNullable(getDataFunc).orElseGet(() -> block -> ArrayUtils.EMPTY_BYTE_ARRAY);
             return this;
         }
 

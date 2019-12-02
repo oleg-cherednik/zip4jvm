@@ -38,7 +38,7 @@ final class PkwareEncryptionHeaderView extends View {
         printValueLocation(out, "data:", encryptionHeader.getData());
 
         ByteArrayHexView.builder()
-                        .buf(encryptionHeader.getData().getData())
+                        .data(encryptionHeader.getData().getData())
                         .offs(offs)
                         .columnWidth(columnWidth).build().print(out);
     }

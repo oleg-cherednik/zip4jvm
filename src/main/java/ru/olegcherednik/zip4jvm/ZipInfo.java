@@ -1,18 +1,22 @@
 package ru.olegcherednik.zip4jvm;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.engine.DecomposeEngine;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.io.readers.block.BlockModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.BlockZipEntryModelReader;
 import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.BlockZipEntryModel;
 import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.IView;
+import ru.olegcherednik.zip4jvm.view.Zip64View;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.CentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntryListView;
-import ru.olegcherednik.zip4jvm.view.Zip64View;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -56,7 +60,7 @@ public final class ZipInfo {
         boolean emptyLine = createEndCentralDirectoryView(blockModel, charset, offs, columnWidth).print(out);
         emptyLine = createZip64View(blockModel, offs, columnWidth).print(out, emptyLine);
         emptyLine = createCentralDirectoryView(blockModel, charset, offs, columnWidth).print(out, emptyLine);
-        createZipEntriesView(zipEntryModel, charset, offs, columnWidth).print(out, emptyLine);
+        createZipEntriesView(blockModel, zipEntryModel, charset, offs, columnWidth).print(out, emptyLine);
     }
 
     private static IView createEndCentralDirectoryView(BlockModel blockModel, Charset charset, int offs, int columnWidth) {
@@ -86,12 +90,28 @@ public final class ZipInfo {
                                    .columnWidth(columnWidth).build();
     }
 
-    private static IView createZipEntriesView(BlockZipEntryModel zipEntryModel, Charset charset, int offs, int columnWidth) {
+    private static IView createZipEntriesView(BlockModel blockModel, BlockZipEntryModel zipEntryModel, Charset charset, int offs, int columnWidth) {
         return ZipEntryListView.builder()
                                .blockZipEntryModel(zipEntryModel)
+                               .getDataFunc(getDataFunc(blockModel))
                                .charset(charset)
                                .offs(offs)
                                .columnWidth(columnWidth).build();
+    }
+
+    private static Function<Block, byte[]> getDataFunc(BlockModel blockModel) {
+        return block -> {
+            if (block.getSize() > Integer.MAX_VALUE)
+                return ArrayUtils.EMPTY_BYTE_ARRAY;
+
+            try (DataInput in = new SingleZipInputStream(blockModel.getZipModel().getFile())) {
+                in.skip(block.getOffs());
+                return in.readBytes((int)block.getSize());
+            } catch(Exception e) {
+                e.printStackTrace();
+                return ArrayUtils.EMPTY_BYTE_ARRAY;
+            }
+        };
     }
 
     public void decompose(Path destDir) throws IOException {

@@ -19,7 +19,7 @@ final class Zip64ExtendedInfoView extends ExtraFieldRecordView {
     }
 
     private Zip64ExtendedInfoView(Builder builder) {
-        super(builder.block, builder.file, builder.offs, builder.columnWidth);
+        super(builder);
         record = builder.record;
     }
 

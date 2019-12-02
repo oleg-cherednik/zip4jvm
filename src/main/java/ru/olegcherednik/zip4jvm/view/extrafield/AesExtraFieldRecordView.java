@@ -21,7 +21,7 @@ final class AesExtraFieldRecordView extends ExtraFieldRecordView {
     }
 
     private AesExtraFieldRecordView(Builder builder) {
-        super(builder.block, builder.file, builder.offs, builder.columnWidth);
+        super(builder);
         record = builder.record;
         generalPurposeFlag = builder.generalPurposeFlag;
     }

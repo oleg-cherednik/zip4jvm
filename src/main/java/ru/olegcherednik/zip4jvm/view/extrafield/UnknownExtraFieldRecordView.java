@@ -1,10 +1,12 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
+import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 
 import java.io.PrintStream;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author Oleg Cherednik
@@ -13,14 +15,16 @@ import java.util.Objects;
 final class UnknownExtraFieldRecordView extends ExtraFieldRecordView {
 
     private final ExtraField.Record record;
+    private final byte[] data;
 
     public static Builder builder() {
         return new Builder();
     }
 
     private UnknownExtraFieldRecordView(Builder builder) {
-        super(builder.block, builder.file, builder.offs, builder.columnWidth);
+        super(builder);
         record = builder.record;
+        data = builder.data;
     }
 
     @Override
@@ -28,7 +32,7 @@ final class UnknownExtraFieldRecordView extends ExtraFieldRecordView {
         printValueLocation(out, String.format("(0x%04X) Unknown:", record.getSignature()), block);
 
         ByteArrayHexView.builder()
-                        .buf(block.getData())
+                        .data(data)
                         .offs(offs)
                         .columnWidth(columnWidth).build().print(out);
 
@@ -48,6 +52,7 @@ final class UnknownExtraFieldRecordView extends ExtraFieldRecordView {
     public static final class Builder extends BaseBuilder<Builder> {
 
         private ExtraField.Record record;
+        private byte[] data = ArrayUtils.EMPTY_BYTE_ARRAY;
 
         public UnknownExtraFieldRecordView build() {
             check();
@@ -62,6 +67,12 @@ final class UnknownExtraFieldRecordView extends ExtraFieldRecordView {
 
         public Builder record(ExtraField.Record record) {
             this.record = record;
+            return this;
+        }
+
+        @SuppressWarnings("MethodCanBeVariableArityMethod")
+        public Builder data(byte[] data) {
+            this.data = Optional.ofNullable(data).orElse(ArrayUtils.EMPTY_BYTE_ARRAY);
             return this;
         }
 

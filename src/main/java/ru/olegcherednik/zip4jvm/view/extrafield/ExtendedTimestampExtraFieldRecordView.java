@@ -18,7 +18,7 @@ final class ExtendedTimestampExtraFieldRecordView extends ExtraFieldRecordView {
     }
 
     private ExtendedTimestampExtraFieldRecordView(Builder builder) {
-        super(builder.block, builder.file, builder.offs, builder.columnWidth);
+        super(builder);
         record = builder.record;
     }
 

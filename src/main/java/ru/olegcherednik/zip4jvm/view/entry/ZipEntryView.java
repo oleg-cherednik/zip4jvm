@@ -2,6 +2,7 @@ package ru.olegcherednik.zip4jvm.view.entry;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
@@ -14,6 +15,7 @@ import ru.olegcherednik.zip4jvm.view.crypto.EncryptionHeaderView;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -28,6 +30,7 @@ public final class ZipEntryView extends View {
     // TODO duplication of data descriptor
     private final DataDescriptor dataDescriptor;
     private final Block blockDataDescriptor;
+    private final Function<Block, byte[]> getDataFunc;
     private final Charset charset;
 
     public static Builder builder() {
@@ -42,6 +45,7 @@ public final class ZipEntryView extends View {
         encryptionHeader = builder.encryptionHeader;
         dataDescriptor = builder.dataDescriptor;
         blockDataDescriptor = builder.blockDataDescriptor;
+        getDataFunc = builder.getDataFunc;
         charset = builder.charset;
     }
 
@@ -57,6 +61,7 @@ public final class ZipEntryView extends View {
                                   .localFileHeader(localFileHeader)
                                   .diagLocalFileHeader(diagLocalFileHeader)
                                   .pos(pos)
+                                  .getDataFunc(getDataFunc)
                                   .charset(charset)
                                   .offs(offs)
                                   .columnWidth(columnWidth).build();
@@ -88,6 +93,7 @@ public final class ZipEntryView extends View {
         private ZipEntryBlock.EncryptionHeader encryptionHeader;
         private DataDescriptor dataDescriptor;
         private Block blockDataDescriptor = Block.NULL;
+        private Function<Block, byte[]> getDataFunc = block -> ArrayUtils.EMPTY_BYTE_ARRAY;
         private Charset charset = Charsets.IBM437;
         private int offs;
         private int columnWidth;
@@ -123,6 +129,11 @@ public final class ZipEntryView extends View {
 
         public Builder blockDataDescriptor(Block blockDataDescriptor) {
             this.blockDataDescriptor = Optional.ofNullable(blockDataDescriptor).orElse(Block.NULL);
+            return this;
+        }
+
+        public Builder getDataFunc(Function<Block, byte[]> getDataFunc) {
+            this.getDataFunc = Optional.ofNullable(getDataFunc).orElseGet(() -> block -> ArrayUtils.EMPTY_BYTE_ARRAY);
             return this;
         }
 

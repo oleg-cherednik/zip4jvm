@@ -12,7 +12,7 @@ import java.util.LinkedList;
  */
 public final class ByteArrayHexView extends View {
 
-    private final byte[] buf;
+    private final byte[] data;
 
     public static Builder builder() {
         return new Builder();
@@ -20,18 +20,18 @@ public final class ByteArrayHexView extends View {
 
     private ByteArrayHexView(Builder builder) {
         super(builder.offs, builder.columnWidth);
-        buf = builder.buf;
+        data = builder.data;
     }
 
     @Override
     public boolean print(PrintStream out) {
-        if (ArrayUtils.isEmpty(buf))
+        if (ArrayUtils.isEmpty(data))
             return false;
 
         Deque<Integer> hexs = new LinkedList<>();
 
-        for (int i = 0; i < buf.length; i++)
-            hexs.add((int)buf[i]);
+        for (int i = 0; i < data.length; i++)
+            hexs.add((int)data[i]);
 
         while (!hexs.isEmpty()) {
             out.print(prefix);
@@ -52,7 +52,7 @@ public final class ByteArrayHexView extends View {
 
     public static final class Builder {
 
-        private byte[] buf;
+        private byte[] data;
         private int offs;
         private int columnWidth;
 
@@ -61,8 +61,8 @@ public final class ByteArrayHexView extends View {
         }
 
         @SuppressWarnings("MethodCanBeVariableArityMethod")
-        public Builder buf(byte[] buf) {
-            this.buf = ArrayUtils.clone(buf);
+        public Builder data(byte[] data) {
+            this.data = ArrayUtils.isEmpty(data) ? ArrayUtils.EMPTY_BYTE_ARRAY : ArrayUtils.clone(data);
             return this;
         }
 

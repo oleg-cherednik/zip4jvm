@@ -3,8 +3,9 @@ package ru.olegcherednik.zip4jvm.engine;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import ru.olegcherednik.zip4jvm.io.in.ng.BaseZipInputStream;
-import ru.olegcherednik.zip4jvm.io.in.ng.SingleZipInputStream;
+import org.apache.commons.lang.ArrayUtils;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.io.readers.block.BlockModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.BlockZipEntryModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.aes.AesEncryptionHeaderBlock;
@@ -16,7 +17,6 @@ import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.Zip64;
-import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.BlockZipEntryModel;
@@ -48,6 +48,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -76,12 +77,12 @@ public final class DecomposeEngine {
         writeZipEntries(blockModel, zipEntryModel);
     }
 
-    private static BaseZipInputStream createDataInput(ZipModel zipModel, ZipEntry zipEntry) throws IOException {
-        return new SingleZipInputStream(zipModel.getFile());
-//        if (zipModel.isSplit())
-//            return new SplitZipInputStream(zipModel, zipEntry.getDisk());
+//    private static BaseZipInputStream createDataInput(ZipModel zipModel, ZipEntry zipEntry) throws IOException {
 //        return new SingleZipInputStream(zipModel.getFile());
-    }
+////        if (zipModel.isSplit())
+////            return new SplitZipInputStream(zipModel, zipEntry.getDisk());
+////        return new SingleZipInputStream(zipModel.getFile());
+//    }
 
     private void writeEndCentralDirectory(BlockModel blockModel) throws IOException {
         try (PrintStream out = new PrintStream(destDir.resolve("end_central_directory.txt").toFile())) {
@@ -143,6 +144,7 @@ public final class DecomposeEngine {
                 FileHeaderView.builder()
                               .fileHeader(fileHeader)
                               .diagFileHeader(block)
+                              .getDataFunc(getDataFunc(blockModel))
                               .pos(pos)
                               .charset(charset)
                               .offs(offs)
@@ -187,6 +189,7 @@ public final class DecomposeEngine {
                             .encryptionHeader(block.getEncryptionHeader(fileName))
                             .dataDescriptor(zipEntryModel.getDataDescriptors().get(fileName))
                             .blockDataDescriptor(block.getDataDescriptor(fileName))
+                            .getDataFunc(getDataFunc(blockModel))
                             .charset(charset)
                             .offs(4)
                             .columnWidth(52).build().print(out);
@@ -262,6 +265,7 @@ public final class DecomposeEngine {
         return CentralDirectoryView.builder()
                                    .centralDirectory(blockModel.getCentralDirectory())
                                    .diagCentralDirectory(blockModel.getDiagnostic().getCentralDirectoryBlock())
+                                   .getDataFunc(getDataFunc(blockModel))
                                    .charset(charset)
                                    .offs(offs)
                                    .columnWidth(columnWidth).build();
@@ -401,7 +405,7 @@ public final class DecomposeEngine {
                                                       .extraField(extraField)
                                                       .block(block)
                                                       .generalPurposeFlag(generalPurposeFlag)
-                                                      .file(blockModel.getZipModel().getFile())
+                                                      .getDataFunc(getDataFunc(blockModel))
                                                       .columnWidth(columnWidth).build();
 
         for (int signature : extraField.getSignatures()) {
@@ -417,6 +421,21 @@ public final class DecomposeEngine {
             // print .data
             copyLarge(blockModel.getZipModel().getFile(), dir.resolve(fileName + ".data"), block.getRecordBlock(signature));
         }
+    }
+
+    private static Function<Block, byte[]> getDataFunc(BlockModel blockModel) {
+        return block -> {
+            if (block.getSize() > Integer.MAX_VALUE)
+                return ArrayUtils.EMPTY_BYTE_ARRAY;
+
+            try (DataInput in = new SingleZipInputStream(blockModel.getZipModel().getFile())) {
+                in.skip(block.getOffs());
+                return in.readBytes((int)block.getSize());
+            } catch(Exception e) {
+                e.printStackTrace();
+                return ArrayUtils.EMPTY_BYTE_ARRAY;
+            }
+        };
     }
 
 }

@@ -2,8 +2,10 @@ package ru.olegcherednik.zip4jvm.view.centraldirectory;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.view.View;
 
@@ -11,6 +13,7 @@ import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -20,6 +23,7 @@ public final class CentralDirectoryView extends View {
 
     private final CentralDirectory centralDirectory;
     private final CentralDirectoryBlock diagCentralDirectory;
+    private final Function<Block, byte[]> getDataFunc;
     private final Charset charset;
 
     public static Builder builder() {
@@ -30,6 +34,7 @@ public final class CentralDirectoryView extends View {
         super(builder.offs, builder.columnWidth);
         centralDirectory = builder.centralDirectory;
         diagCentralDirectory = builder.diagCentralDirectory;
+        getDataFunc = builder.getDataFunc;
         charset = builder.charset;
     }
 
@@ -49,6 +54,7 @@ public final class CentralDirectoryView extends View {
         return FileHeaderListView.builder()
                                  .centralDirectory(centralDirectory)
                                  .diagCentralDirectory(diagCentralDirectory)
+                                 .getDataFunc(getDataFunc)
                                  .charset(charset)
                                  .offs(offs)
                                  .columnWidth(columnWidth).build();
@@ -67,6 +73,7 @@ public final class CentralDirectoryView extends View {
 
         private CentralDirectory centralDirectory;
         private CentralDirectoryBlock diagCentralDirectory;
+        private Function<Block, byte[]> getDataFunc = block -> ArrayUtils.EMPTY_BYTE_ARRAY;
         private Charset charset = Charsets.IBM437;
         private int offs;
         private int columnWidth;
@@ -84,6 +91,11 @@ public final class CentralDirectoryView extends View {
 
         public Builder diagCentralDirectory(CentralDirectoryBlock diagCentralDirectory) {
             this.diagCentralDirectory = diagCentralDirectory;
+            return this;
+        }
+
+        public Builder getDataFunc(Function<Block, byte[]> getDataFunc) {
+            this.getDataFunc = Optional.ofNullable(getDataFunc).orElseGet(() -> block -> ArrayUtils.EMPTY_BYTE_ARRAY);
             return this;
         }
 

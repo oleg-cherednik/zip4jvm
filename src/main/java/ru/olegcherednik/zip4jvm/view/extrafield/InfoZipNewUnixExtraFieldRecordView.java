@@ -20,7 +20,7 @@ final class InfoZipNewUnixExtraFieldRecordView extends ExtraFieldRecordView {
     }
 
     private InfoZipNewUnixExtraFieldRecordView(Builder builder) {
-        super(builder.block, builder.file, builder.offs, builder.columnWidth);
+        super(builder);
         record = builder.record;
     }
 
@@ -53,7 +53,7 @@ final class InfoZipNewUnixExtraFieldRecordView extends ExtraFieldRecordView {
         printLine(out, "  version:", String.format("%d (unknown)", payload.getVersion()));
 
         ByteArrayHexView.builder()
-                        .buf(payload.getData())
+                        .data(payload.getData())
                         .offs(offs)
                         .columnWidth(columnWidth).build().print(out);
     }

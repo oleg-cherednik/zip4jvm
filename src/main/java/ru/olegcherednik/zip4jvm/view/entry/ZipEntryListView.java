@@ -3,8 +3,10 @@ package ru.olegcherednik.zip4jvm.view.entry;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
+import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockZipEntryModel;
 import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.View;
@@ -12,6 +14,7 @@ import ru.olegcherednik.zip4jvm.view.View;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -20,6 +23,7 @@ import java.util.Optional;
 public final class ZipEntryListView extends View {
 
     private final BlockZipEntryModel blockZipEntryModel;
+    private final Function<Block, byte[]> getDataFunc;
     private final Charset charset;
 
     public static Builder builder() {
@@ -29,6 +33,7 @@ public final class ZipEntryListView extends View {
     private ZipEntryListView(Builder builder) {
         super(builder.offs, builder.columnWidth);
         blockZipEntryModel = builder.blockZipEntryModel;
+        getDataFunc = builder.getDataFunc;
         charset = builder.charset;
     }
 
@@ -53,6 +58,7 @@ public final class ZipEntryListView extends View {
                         .encryptionHeader(blockZipEntryModel.getZipEntryBlock().getEncryptionHeader(localFileHeader.getFileName()))
                         .dataDescriptor(blockZipEntryModel.getDataDescriptors().get(localFileHeader.getFileName()))
                         .blockDataDescriptor(blockZipEntryModel.getZipEntryBlock().getDataDescriptor(localFileHeader.getFileName()))
+                        .getDataFunc(getDataFunc)
                         .charset(charset)
                         .offs(offs)
                         .columnWidth(columnWidth).build().print(out);
@@ -65,6 +71,7 @@ public final class ZipEntryListView extends View {
     public static final class Builder {
 
         private BlockZipEntryModel blockZipEntryModel;
+        private Function<Block, byte[]> getDataFunc = block -> ArrayUtils.EMPTY_BYTE_ARRAY;
         private Charset charset = Charsets.IBM437;
         private int offs;
         private int columnWidth;
@@ -75,6 +82,11 @@ public final class ZipEntryListView extends View {
 
         public Builder blockZipEntryModel(BlockZipEntryModel blockZipEntryModel) {
             this.blockZipEntryModel = blockZipEntryModel;
+            return this;
+        }
+
+        public Builder getDataFunc(Function<Block, byte[]> getDataFunc) {
+            this.getDataFunc = Optional.ofNullable(getDataFunc).orElseGet(() -> block -> ArrayUtils.EMPTY_BYTE_ARRAY);
             return this;
         }
 

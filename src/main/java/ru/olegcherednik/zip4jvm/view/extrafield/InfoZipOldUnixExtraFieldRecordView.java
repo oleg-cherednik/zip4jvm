@@ -20,7 +20,7 @@ final class InfoZipOldUnixExtraFieldRecordView extends ExtraFieldRecordView {
     }
 
     private InfoZipOldUnixExtraFieldRecordView(Builder builder) {
-        super(builder.block, builder.file, builder.offs, builder.columnWidth);
+        super(builder);
         record = builder.record;
     }
 

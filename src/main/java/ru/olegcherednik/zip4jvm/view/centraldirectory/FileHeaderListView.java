@@ -2,14 +2,17 @@ package ru.olegcherednik.zip4jvm.view.centraldirectory;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -19,6 +22,7 @@ final class FileHeaderListView extends View {
 
     private final CentralDirectory centralDirectory;
     private final CentralDirectoryBlock diagCentralDirectory;
+    private final Function<Block, byte[]> getDataFunc;
     private final Charset charset;
 
     public static Builder builder() {
@@ -29,6 +33,7 @@ final class FileHeaderListView extends View {
         super(builder.offs, builder.columnWidth);
         centralDirectory = builder.centralDirectory;
         diagCentralDirectory = builder.diagCentralDirectory;
+        getDataFunc = builder.getDataFunc;
         charset = builder.charset;
     }
 
@@ -49,6 +54,7 @@ final class FileHeaderListView extends View {
                           .fileHeader(fileHeader)
                           .diagFileHeader(diagCentralDirectory.getFileHeaderBlock(fileHeader.getFileName()))
                           .pos(pos++)
+                          .getDataFunc(getDataFunc)
                           .charset(charset)
                           .offs(offs)
                           .columnWidth(columnWidth).build().print(out);
@@ -62,6 +68,7 @@ final class FileHeaderListView extends View {
 
         private CentralDirectory centralDirectory;
         private CentralDirectoryBlock diagCentralDirectory;
+        private Function<Block, byte[]> getDataFunc = block -> ArrayUtils.EMPTY_BYTE_ARRAY;
         private Charset charset = Charsets.IBM437;
         private int offs;
         private int columnWidth;
@@ -77,6 +84,11 @@ final class FileHeaderListView extends View {
 
         public Builder diagCentralDirectory(CentralDirectoryBlock diagCentralDirectory) {
             this.diagCentralDirectory = diagCentralDirectory;
+            return this;
+        }
+
+        public Builder getDataFunc(Function<Block, byte[]> getDataFunc) {
+            this.getDataFunc = Optional.ofNullable(getDataFunc).orElseGet(() -> block -> ArrayUtils.EMPTY_BYTE_ARRAY);
             return this;
         }
 

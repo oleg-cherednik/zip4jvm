@@ -40,7 +40,7 @@ final class BlockAesEncryptionHeaderView extends View {
         printValueLocation(out, "salt:", encryptionHeader.getSalt());
 
         ByteArrayHexView.builder()
-                        .buf(encryptionHeader.getSalt().getData())
+                        .data(encryptionHeader.getSalt().getData())
                         .offs(offs)
                         .columnWidth(columnWidth).build().print(out);
     }
@@ -49,7 +49,7 @@ final class BlockAesEncryptionHeaderView extends View {
         printValueLocation(out, "password checksum:", encryptionHeader.getPasswordChecksum());
 
         ByteArrayHexView.builder()
-                        .buf(encryptionHeader.getPasswordChecksum().getData())
+                        .data(encryptionHeader.getPasswordChecksum().getData())
                         .offs(offs)
                         .columnWidth(columnWidth).build().print(out);
     }
@@ -58,7 +58,7 @@ final class BlockAesEncryptionHeaderView extends View {
         printValueLocation(out, "mac:", encryptionHeader.getMac());
 
         ByteArrayHexView.builder()
-                        .buf(encryptionHeader.getMac().getData())
+                        .data(encryptionHeader.getMac().getData())
                         .offs(offs)
                         .columnWidth(columnWidth).build().print(out);
     }
