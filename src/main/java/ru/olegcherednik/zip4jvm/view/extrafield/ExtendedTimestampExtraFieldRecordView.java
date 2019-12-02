@@ -8,9 +8,7 @@ import java.io.PrintStream;
  * @author Oleg Cherednik
  * @since 26.10.2019
  */
-final class ExtendedTimestampExtraFieldRecordView extends ExtraFieldRecordView {
-
-    private final ExtendedTimestampExtraFieldRecord record;
+final class ExtendedTimestampExtraFieldRecordView extends ExtraFieldRecordView<ExtendedTimestampExtraFieldRecord> {
 
     public static Builder builder() {
         return new Builder();
@@ -18,7 +16,6 @@ final class ExtendedTimestampExtraFieldRecordView extends ExtraFieldRecordView {
 
     private ExtendedTimestampExtraFieldRecordView(Builder builder) {
         super(builder);
-        record = builder.record;
     }
 
     @Override
@@ -33,16 +30,6 @@ final class ExtendedTimestampExtraFieldRecordView extends ExtraFieldRecordView {
             printLine(out, "  Creation Date:", String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", record.getCreationTime()));
 
         return true;
-    }
-
-    @Override
-    protected int getSignature() {
-        return record.getSignature();
-    }
-
-    @Override
-    protected String getTitle() {
-        return record.getTitle();
     }
 
     public static final class Builder extends BaseBuilder<Builder, ExtendedTimestampExtraFieldRecord> {

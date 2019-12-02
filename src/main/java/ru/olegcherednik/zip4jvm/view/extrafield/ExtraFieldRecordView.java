@@ -11,18 +11,24 @@ import java.util.Objects;
  * @author Oleg Cherednik
  * @since 24.11.2019
  */
-public abstract class ExtraFieldRecordView extends View {
+public abstract class ExtraFieldRecordView<R extends ExtraField.Record> extends View {
 
+    protected final R record;
     protected final Block block;
 
-    protected ExtraFieldRecordView(BaseBuilder<?, ?> builder) {
+    protected ExtraFieldRecordView(BaseBuilder<?, R> builder) {
         super(builder.offs, builder.columnWidth);
+        record = builder.record;
         block = builder.block;
     }
 
-    protected abstract int getSignature();
+    protected int getSignature() {
+        return record.getSignature();
+    }
 
-    protected abstract String getTitle();
+    protected String getTitle() {
+        return record.getTitle();
+    }
 
     public String getFileName() {
         String title = getTitle();

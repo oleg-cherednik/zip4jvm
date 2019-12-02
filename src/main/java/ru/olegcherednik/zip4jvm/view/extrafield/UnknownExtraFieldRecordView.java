@@ -11,9 +11,8 @@ import java.util.Optional;
  * @author Oleg Cherednik
  * @since 26.10.2019
  */
-final class UnknownExtraFieldRecordView extends ExtraFieldRecordView {
+final class UnknownExtraFieldRecordView extends ExtraFieldRecordView<ExtraField.Record> {
 
-    private final ExtraField.Record record;
     private final byte[] data;
 
     public static Builder builder() {
@@ -22,7 +21,6 @@ final class UnknownExtraFieldRecordView extends ExtraFieldRecordView {
 
     private UnknownExtraFieldRecordView(Builder builder) {
         super(builder);
-        record = builder.record;
         data = builder.data;
     }
 
@@ -36,16 +34,6 @@ final class UnknownExtraFieldRecordView extends ExtraFieldRecordView {
                         .columnWidth(columnWidth).build().print(out);
 
         return true;
-    }
-
-    @Override
-    public int getSignature() {
-        return record.getSignature();
-    }
-
-    @Override
-    public String getTitle() {
-        return record.getTitle();
     }
 
     public static final class Builder extends BaseBuilder<Builder, ExtraField.Record> {

@@ -9,9 +9,7 @@ import java.io.PrintStream;
  * @author Oleg Cherednik
  * @since 26.10.2019
  */
-final class Zip64ExtendedInfoView extends ExtraFieldRecordView {
-
-    private final Zip64.ExtendedInfo record;
+final class Zip64ExtendedInfoView extends ExtraFieldRecordView<Zip64.ExtendedInfo> {
 
     public static Builder builder() {
         return new Builder();
@@ -19,7 +17,6 @@ final class Zip64ExtendedInfoView extends ExtraFieldRecordView {
 
     private Zip64ExtendedInfoView(Builder builder) {
         super(builder);
-        record = builder.record;
     }
 
     @Override
@@ -36,16 +33,6 @@ final class Zip64ExtendedInfoView extends ExtraFieldRecordView {
             printLine(out, String.format("  original part number of this part (%04X):", record.getDisk()), record.getDisk());
 
         return true;
-    }
-
-    @Override
-    protected int getSignature() {
-        return record.getSignature();
-    }
-
-    @Override
-    protected String getTitle() {
-        return record.getTitle();
     }
 
     public static final class Builder extends BaseBuilder<Builder, Zip64.ExtendedInfo> {

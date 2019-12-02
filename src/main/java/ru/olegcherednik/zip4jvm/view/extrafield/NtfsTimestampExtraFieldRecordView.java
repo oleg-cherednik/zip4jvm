@@ -9,9 +9,7 @@ import java.io.PrintStream;
  * @author Oleg Cherednik
  * @since 26.10.2019
  */
-final class NtfsTimestampExtraFieldRecordView extends ExtraFieldRecordView {
-
-    private final NtfsTimestampExtraFieldRecord record;
+final class NtfsTimestampExtraFieldRecordView extends ExtraFieldRecordView<NtfsTimestampExtraFieldRecord> {
 
     public static Builder builder() {
         return new Builder();
@@ -19,7 +17,6 @@ final class NtfsTimestampExtraFieldRecordView extends ExtraFieldRecordView {
 
     private NtfsTimestampExtraFieldRecordView(Builder builder) {
         super(builder);
-        record = builder.record;
     }
 
     @Override
@@ -52,16 +49,6 @@ final class NtfsTimestampExtraFieldRecordView extends ExtraFieldRecordView {
                         .data(tag.getData())
                         .offs(offs)
                         .columnWidth(columnWidth).build().print(out);
-    }
-
-    @Override
-    protected int getSignature() {
-        return record.getSignature();
-    }
-
-    @Override
-    protected String getTitle() {
-        return record.getTitle();
     }
 
     public static final class Builder extends BaseBuilder<Builder, NtfsTimestampExtraFieldRecord> {

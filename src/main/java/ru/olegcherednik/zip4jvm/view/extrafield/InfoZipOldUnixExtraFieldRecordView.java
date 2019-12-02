@@ -10,9 +10,7 @@ import static ru.olegcherednik.zip4jvm.model.ExtraField.NO_DATA;
  * @author Oleg Cherednik
  * @since 26.10.2019
  */
-final class InfoZipOldUnixExtraFieldRecordView extends ExtraFieldRecordView {
-
-    private final InfoZipOldUnixExtraFieldRecord record;
+final class InfoZipOldUnixExtraFieldRecordView extends ExtraFieldRecordView<InfoZipOldUnixExtraFieldRecord> {
 
     public static Builder builder() {
         return new Builder();
@@ -20,7 +18,6 @@ final class InfoZipOldUnixExtraFieldRecordView extends ExtraFieldRecordView {
 
     private InfoZipOldUnixExtraFieldRecordView(Builder builder) {
         super(builder);
-        record = builder.record;
     }
 
     @Override
@@ -36,16 +33,6 @@ final class InfoZipOldUnixExtraFieldRecordView extends ExtraFieldRecordView {
             printLine(out, "  Group Identifier (GID):", String.valueOf(record.getGid()));
 
         return true;
-    }
-
-    @Override
-    protected int getSignature() {
-        return record.getSignature();
-    }
-
-    @Override
-    protected String getTitle() {
-        return record.getTitle();
     }
 
     public static final class Builder extends BaseBuilder<Builder, InfoZipOldUnixExtraFieldRecord> {

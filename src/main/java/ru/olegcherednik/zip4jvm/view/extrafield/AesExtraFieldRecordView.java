@@ -10,9 +10,8 @@ import java.io.PrintStream;
  * @author Oleg Cherednik
  * @since 26.10.2019
  */
-final class AesExtraFieldRecordView extends ExtraFieldRecordView {
+final class AesExtraFieldRecordView extends ExtraFieldRecordView<AesExtraFieldRecord> {
 
-    private final AesExtraFieldRecord record;
     private final GeneralPurposeFlag generalPurposeFlag;
 
     public static Builder builder() {
@@ -21,7 +20,6 @@ final class AesExtraFieldRecordView extends ExtraFieldRecordView {
 
     private AesExtraFieldRecordView(Builder builder) {
         super(builder);
-        record = builder.record;
         generalPurposeFlag = builder.generalPurposeFlag;
     }
 
@@ -39,16 +37,6 @@ final class AesExtraFieldRecordView extends ExtraFieldRecordView {
                              .columnWidth(columnWidth).build().print(out);
 
         return true;
-    }
-
-    @Override
-    protected int getSignature() {
-        return record.getSignature();
-    }
-
-    @Override
-    protected String getTitle() {
-        return record.getTitle();
     }
 
     public static final class Builder extends BaseBuilder<Builder, AesExtraFieldRecord> {

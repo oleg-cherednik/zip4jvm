@@ -10,9 +10,7 @@ import java.io.PrintStream;
  * @author Oleg Cherednik
  * @since 26.10.2019
  */
-final class InfoZipNewUnixExtraFieldRecordView extends ExtraFieldRecordView {
-
-    private final InfoZipNewUnixExtraFieldRecord record;
+final class InfoZipNewUnixExtraFieldRecordView extends ExtraFieldRecordView<InfoZipNewUnixExtraFieldRecord> {
 
     public static Builder builder() {
         return new Builder();
@@ -20,7 +18,6 @@ final class InfoZipNewUnixExtraFieldRecordView extends ExtraFieldRecordView {
 
     private InfoZipNewUnixExtraFieldRecordView(Builder builder) {
         super(builder);
-        record = builder.record;
     }
 
     @Override
@@ -55,16 +52,6 @@ final class InfoZipNewUnixExtraFieldRecordView extends ExtraFieldRecordView {
                         .data(payload.getData())
                         .offs(offs)
                         .columnWidth(columnWidth).build().print(out);
-    }
-
-    @Override
-    protected int getSignature() {
-        return record.getSignature();
-    }
-
-    @Override
-    protected String getTitle() {
-        return record.getTitle();
     }
 
     public static final class Builder extends BaseBuilder<Builder, InfoZipNewUnixExtraFieldRecord> {
