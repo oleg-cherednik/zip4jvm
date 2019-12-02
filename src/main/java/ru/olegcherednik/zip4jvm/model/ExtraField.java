@@ -105,6 +105,8 @@ public final class ExtraField {
 
         boolean isNull();
 
+        String getTitle();
+
         @lombok.Builder
         @SuppressWarnings("InnerClassOfInterface")
         final class Unknown implements ExtraField.Record {
@@ -125,6 +127,11 @@ public final class ExtraField {
             @Override
             public boolean isNull() {
                 return false;
+            }
+
+            @Override
+            public String getTitle() {
+                return "Unknown";
             }
 
             @Override

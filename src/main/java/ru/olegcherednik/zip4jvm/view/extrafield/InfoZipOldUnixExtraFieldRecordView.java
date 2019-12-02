@@ -46,7 +46,7 @@ final class InfoZipOldUnixExtraFieldRecordView extends ExtraFieldRecordView {
 
     @Override
     protected String getTitle() {
-        return "old InfoZIP Unix/OS2/NT";
+        return record.getTitle();
     }
 
     public static final class Builder extends BaseBuilder<Builder> {

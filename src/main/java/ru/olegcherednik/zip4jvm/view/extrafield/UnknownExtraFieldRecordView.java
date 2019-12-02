@@ -29,7 +29,7 @@ final class UnknownExtraFieldRecordView extends ExtraFieldRecordView {
 
     @Override
     public boolean print(PrintStream out) {
-        printValueLocation(out, String.format("(0x%04X) Unknown:", record.getSignature()), block);
+        super.print(out);
 
         ByteArrayHexView.builder()
                         .data(data)
@@ -46,7 +46,7 @@ final class UnknownExtraFieldRecordView extends ExtraFieldRecordView {
 
     @Override
     public String getTitle() {
-        return "Unknown";
+        return record.getTitle();
     }
 
     public static final class Builder extends BaseBuilder<Builder> {

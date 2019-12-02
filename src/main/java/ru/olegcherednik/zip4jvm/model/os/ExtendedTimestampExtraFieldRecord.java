@@ -60,6 +60,11 @@ public final class ExtendedTimestampExtraFieldRecord implements ExtraField.Recor
     }
 
     @Override
+    public String getTitle() {
+        return "Universal time";
+    }
+
+    @Override
     public void write(DataOutput out) throws IOException {
         throw new NotImplementedException();
     }

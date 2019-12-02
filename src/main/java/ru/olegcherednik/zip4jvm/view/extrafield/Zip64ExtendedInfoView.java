@@ -46,7 +46,7 @@ final class Zip64ExtendedInfoView extends ExtraFieldRecordView {
 
     @Override
     protected String getTitle() {
-        return "Zip64 Extended Information";
+        return record.getTitle();
     }
 
     public static final class Builder extends BaseBuilder<Builder> {

@@ -43,7 +43,7 @@ final class ExtendedTimestampExtraFieldRecordView extends ExtraFieldRecordView {
 
     @Override
     protected String getTitle() {
-        return "Universal time";
+        return record.getTitle();
     }
 
     public static final class Builder extends BaseBuilder<Builder> {

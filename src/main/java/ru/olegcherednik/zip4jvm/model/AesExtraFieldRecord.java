@@ -64,6 +64,11 @@ public final class AesExtraFieldRecord implements ExtraField.Record {
     }
 
     @Override
+    public String getTitle() {
+        return "AES Encryption Tag";
+    }
+
+    @Override
     public String toString() {
         return isNull() ? "<null>" : "strength:" + strength.getSize() + ", compression:" + compressionMethod.name();
     }

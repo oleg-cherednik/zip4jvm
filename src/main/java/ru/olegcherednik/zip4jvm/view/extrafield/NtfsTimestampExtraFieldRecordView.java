@@ -62,7 +62,7 @@ final class NtfsTimestampExtraFieldRecordView extends ExtraFieldRecordView {
 
     @Override
     protected String getTitle() {
-        return "NTFS Timestamps";
+        return record.getTitle();
     }
 
     public static final class Builder extends BaseBuilder<Builder> {

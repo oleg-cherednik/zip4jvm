@@ -57,6 +57,11 @@ public final class InfoZipOldUnixExtraFieldRecord implements ExtraField.Record {
     }
 
     @Override
+    public String getTitle() {
+        return "old InfoZIP Unix/OS2/NT";
+    }
+
+    @Override
     public void write(DataOutput out) throws IOException {
         throw new NotImplementedException();
     }

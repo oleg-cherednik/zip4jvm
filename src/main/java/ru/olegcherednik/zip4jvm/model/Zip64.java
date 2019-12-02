@@ -149,6 +149,11 @@ public final class Zip64 {
         }
 
         @Override
+        public String getTitle() {
+            return "Zip64 Extended Information";
+        }
+
+        @Override
         public String toString() {
             return isNull() ? "<null>" : super.toString();
         }

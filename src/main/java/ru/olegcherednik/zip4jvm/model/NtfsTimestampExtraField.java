@@ -59,6 +59,11 @@ public final class NtfsTimestampExtraField implements ExtraField.Record {
     }
 
     @Override
+    public String getTitle() {
+        return "NTFS Timestamp";
+    }
+
+    @Override
     public void write(DataOutput out) throws IOException {
         throw new NotImplementedException();
     }

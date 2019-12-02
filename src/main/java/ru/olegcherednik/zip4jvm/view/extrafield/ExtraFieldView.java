@@ -85,8 +85,8 @@ public final class ExtraFieldView extends View {
             return createView((ExtendedTimestampExtraFieldRecord)record);
         if (record instanceof Zip64.ExtendedInfo)
             return createView((Zip64.ExtendedInfo)record);
-//        if (record instanceof AesExtraFieldRecord)
-//            return createView((AesExtraFieldRecord)record);
+        if (record instanceof AesExtraFieldRecord)
+            return createView((AesExtraFieldRecord)record);
         return createView(record);
     };
 

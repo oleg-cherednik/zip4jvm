@@ -49,7 +49,7 @@ final class AesExtraFieldRecordView extends ExtraFieldRecordView {
 
     @Override
     protected String getTitle() {
-        return "AES Encryption Tag";
+        return record.getTitle();
     }
 
     public static final class Builder extends BaseBuilder<Builder> {
