@@ -5,7 +5,6 @@ import ru.olegcherednik.zip4jvm.model.os.InfoZipNewUnixExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 
 import java.io.PrintStream;
-import java.util.Objects;
 
 /**
  * @author Oleg Cherednik
@@ -68,23 +67,11 @@ final class InfoZipNewUnixExtraFieldRecordView extends ExtraFieldRecordView {
         return record.getTitle();
     }
 
-    public static final class Builder extends BaseBuilder<Builder> {
-
-        private InfoZipNewUnixExtraFieldRecord record;
+    public static final class Builder extends BaseBuilder<Builder, InfoZipNewUnixExtraFieldRecord> {
 
         public InfoZipNewUnixExtraFieldRecordView build() {
             check();
             return new InfoZipNewUnixExtraFieldRecordView(this);
-        }
-
-        @Override
-        protected void check() {
-            Objects.requireNonNull(record, "'record' must not be null");
-        }
-
-        public Builder record(InfoZipNewUnixExtraFieldRecord record) {
-            this.record = record == InfoZipNewUnixExtraFieldRecord.NULL ? null : record;
-            return this;
         }
 
     }

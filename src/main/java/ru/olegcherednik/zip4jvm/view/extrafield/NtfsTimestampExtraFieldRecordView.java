@@ -4,7 +4,6 @@ import ru.olegcherednik.zip4jvm.model.os.NtfsTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 
 import java.io.PrintStream;
-import java.util.Objects;
 
 /**
  * @author Oleg Cherednik
@@ -65,24 +64,11 @@ final class NtfsTimestampExtraFieldRecordView extends ExtraFieldRecordView {
         return record.getTitle();
     }
 
-    public static final class Builder extends BaseBuilder<Builder> {
-
-        private NtfsTimestampExtraFieldRecord record;
+    public static final class Builder extends BaseBuilder<Builder, NtfsTimestampExtraFieldRecord> {
 
         public NtfsTimestampExtraFieldRecordView build() {
             check();
             return new NtfsTimestampExtraFieldRecordView(this);
-        }
-
-        @Override
-        protected void check() {
-            super.check();
-            Objects.requireNonNull(record, "'record' must not be null");
-        }
-
-        public Builder record(NtfsTimestampExtraFieldRecord record) {
-            this.record = record == NtfsTimestampExtraFieldRecord.NULL ? null : record;
-            return this;
         }
 
     }

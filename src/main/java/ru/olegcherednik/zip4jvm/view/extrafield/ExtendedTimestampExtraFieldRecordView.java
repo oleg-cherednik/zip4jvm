@@ -3,7 +3,6 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 import ru.olegcherednik.zip4jvm.model.os.ExtendedTimestampExtraFieldRecord;
 
 import java.io.PrintStream;
-import java.util.Objects;
 
 /**
  * @author Oleg Cherednik
@@ -46,24 +45,11 @@ final class ExtendedTimestampExtraFieldRecordView extends ExtraFieldRecordView {
         return record.getTitle();
     }
 
-    public static final class Builder extends BaseBuilder<Builder> {
-
-        private ExtendedTimestampExtraFieldRecord record;
+    public static final class Builder extends BaseBuilder<Builder, ExtendedTimestampExtraFieldRecord> {
 
         public ExtendedTimestampExtraFieldRecordView build() {
             check();
             return new ExtendedTimestampExtraFieldRecordView(this);
-        }
-
-        @Override
-        protected void check() {
-            super.check();
-            Objects.requireNonNull(record, "'record' must not be null");
-        }
-
-        public Builder record(ExtendedTimestampExtraFieldRecord record) {
-            this.record = record == ExtendedTimestampExtraFieldRecord.NULL ? null : record;
-            return this;
         }
 
     }

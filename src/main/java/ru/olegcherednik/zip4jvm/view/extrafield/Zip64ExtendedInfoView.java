@@ -4,7 +4,6 @@ import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 
 import java.io.PrintStream;
-import java.util.Objects;
 
 /**
  * @author Oleg Cherednik
@@ -49,24 +48,11 @@ final class Zip64ExtendedInfoView extends ExtraFieldRecordView {
         return record.getTitle();
     }
 
-    public static final class Builder extends BaseBuilder<Builder> {
-
-        private Zip64.ExtendedInfo record;
+    public static final class Builder extends BaseBuilder<Builder, Zip64.ExtendedInfo> {
 
         public Zip64ExtendedInfoView build() {
             check();
             return new Zip64ExtendedInfoView(this);
-        }
-
-        @Override
-        protected void check() {
-            super.check();
-            Objects.requireNonNull(record, "'record' must not be null");
-        }
-
-        public Builder record(Zip64.ExtendedInfo record) {
-            this.record = record == Zip64.ExtendedInfo.NULL ? null : record;
-            return this;
         }
 
     }

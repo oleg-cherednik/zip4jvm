@@ -5,7 +5,6 @@ import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
 
 import java.io.PrintStream;
-import java.util.Objects;
 
 /**
  * @author Oleg Cherednik
@@ -52,25 +51,13 @@ final class AesExtraFieldRecordView extends ExtraFieldRecordView {
         return record.getTitle();
     }
 
-    public static final class Builder extends BaseBuilder<Builder> {
+    public static final class Builder extends BaseBuilder<Builder, AesExtraFieldRecord> {
 
-        private AesExtraFieldRecord record;
         private GeneralPurposeFlag generalPurposeFlag;
 
         public AesExtraFieldRecordView build() {
             check();
             return new AesExtraFieldRecordView(this);
-        }
-
-        @Override
-        protected void check() {
-            super.check();
-            Objects.requireNonNull(record, "'record' must not be null");
-        }
-
-        public Builder record(AesExtraFieldRecord record) {
-            this.record = record == AesExtraFieldRecord.NULL ? null : record;
-            return this;
         }
 
         public Builder generalPurposeFlag(GeneralPurposeFlag generalPurposeFlag) {

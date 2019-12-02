@@ -5,7 +5,6 @@ import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 
 import java.io.PrintStream;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -49,25 +48,13 @@ final class UnknownExtraFieldRecordView extends ExtraFieldRecordView {
         return record.getTitle();
     }
 
-    public static final class Builder extends BaseBuilder<Builder> {
+    public static final class Builder extends BaseBuilder<Builder, ExtraField.Record> {
 
-        private ExtraField.Record record;
         private byte[] data = ArrayUtils.EMPTY_BYTE_ARRAY;
 
         public UnknownExtraFieldRecordView build() {
             check();
             return new UnknownExtraFieldRecordView(this);
-        }
-
-        @Override
-        protected void check() {
-            super.check();
-            Objects.requireNonNull(record, "'record' must not be null");
-        }
-
-        public Builder record(ExtraField.Record record) {
-            this.record = record;
-            return this;
         }
 
         @SuppressWarnings("MethodCanBeVariableArityMethod")
