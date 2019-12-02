@@ -1,5 +1,6 @@
 package ru.olegcherednik.zip4jvm.view;
 
+import lombok.Getter;
 import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 
@@ -11,6 +12,7 @@ import java.util.stream.IntStream;
  * @author Oleg Cherednik
  * @since 05.11.2019
  */
+@Getter
 public abstract class View implements IView {
 
     protected final int offs;
@@ -25,7 +27,7 @@ public abstract class View implements IView {
         prefix = StringUtils.repeat(" ", offs);
     }
 
-    protected final void printLine(PrintStream out, Object one, Object two) {
+    public final void printLine(PrintStream out, Object one, Object two) {
         if (offs > 0)
             one = prefix + one;
 
@@ -33,28 +35,28 @@ public abstract class View implements IView {
         out.println();
     }
 
-    protected void printLine(PrintStream out, String one) {
+    public void printLine(PrintStream out, String one) {
         if (offs > 0)
             one = prefix + one;
         out.println(one);
     }
 
-    protected void printTitle(PrintStream out, String str) {
+    public void printTitle(PrintStream out, String str) {
         out.println(str);
         IntStream.range(0, str.length()).forEach(i -> out.print('='));
         out.println();
     }
 
-    protected void printTitle(PrintStream out, int signature, String title) {
+    public void printTitle(PrintStream out, int signature, String title) {
         printTitle(out, String.format("(%s) %s", ViewUtils.signature(signature), title));
     }
 
-    protected void printTitle(PrintStream out, int signature, String title, Block block) {
+    public void printTitle(PrintStream out, int signature, String title, Block block) {
         printTitle(out, String.format("(%s) %s", ViewUtils.signature(signature), title));
         printLocationAndSize(out, block);
     }
 
-    protected void printSubTitle(PrintStream out, int signature, long pos, String title, Block block) {
+    public void printSubTitle(PrintStream out, int signature, long pos, String title, Block block) {
         String str = String.format("#%d (%s) %s", pos + 1, ViewUtils.signature(signature), title);
         out.println(str);
         IntStream.range(0, str.length()).forEach(i -> out.print('-'));
@@ -62,19 +64,19 @@ public abstract class View implements IView {
         printLocationAndSize(out, block);
     }
 
-    protected void printSubTitle(PrintStream out, long pos, String title) {
+    public void printSubTitle(PrintStream out, long pos, String title) {
         String str = String.format("#%d %s", pos + 1, title);
         out.println(str);
         IntStream.range(0, str.length()).forEach(i -> out.print('-'));
         out.println();
     }
 
-    protected void printLocationAndSize(PrintStream out, Block block) {
+    public void printLocationAndSize(PrintStream out, Block block) {
         printLine(out, "- location:", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
         printLine(out, "- size:", String.format("%s bytes", block.getSize()));
     }
 
-    protected final void printValueLocation(PrintStream out, String valueName, Block block) {
+    public final void printValueLocation(PrintStream out, String valueName, Block block) {
         printLine(out, valueName, String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
         printLine(out, "  - size:", String.format("%s bytes", block.getSize()));
     }

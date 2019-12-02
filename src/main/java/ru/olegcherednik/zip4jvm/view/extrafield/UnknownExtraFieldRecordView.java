@@ -4,7 +4,6 @@ import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 
-import java.io.PrintStream;
 import java.util.Optional;
 
 /**
@@ -13,27 +12,15 @@ import java.util.Optional;
  */
 final class UnknownExtraFieldRecordView extends ExtraFieldRecordView<ExtraField.Record> {
 
-    private final byte[] data;
-
     public static Builder builder() {
         return new Builder();
     }
 
     private UnknownExtraFieldRecordView(Builder builder) {
-        super(builder);
-        data = builder.data;
-    }
-
-    @Override
-    public boolean print(PrintStream out) {
-        super.print(out);
-
-        ByteArrayHexView.builder()
-                        .data(data)
-                        .offs(offs)
-                        .columnWidth(columnWidth).build().print(out);
-
-        return true;
+        super(builder, (record, view, out) -> ByteArrayHexView.builder()
+                                                              .data(builder.data)
+                                                              .offs(view.getOffs())
+                                                              .columnWidth(view.getColumnWidth()).build().print(out));
     }
 
     public static final class Builder extends BaseBuilder<Builder, ExtraField.Record, UnknownExtraFieldRecordView> {

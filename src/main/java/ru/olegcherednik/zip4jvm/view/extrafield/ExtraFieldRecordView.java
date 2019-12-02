@@ -2,6 +2,7 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.utils.function.PrintFoo;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
@@ -16,11 +17,13 @@ public abstract class ExtraFieldRecordView<R extends ExtraField.Record> extends 
 
     protected final R record;
     protected final Block block;
+    private final PrintFoo<R, View> consumer;
 
-    protected ExtraFieldRecordView(BaseBuilder<?, R, ?> builder) {
+    protected ExtraFieldRecordView(BaseBuilder<?, R, ?> builder, PrintFoo<R, View> consumer) {
         super(builder.offs, builder.columnWidth);
         record = builder.record;
         block = builder.block;
+        this.consumer = consumer;
     }
 
     protected int getSignature() {
@@ -41,6 +44,7 @@ public abstract class ExtraFieldRecordView<R extends ExtraField.Record> extends 
     @Override
     public boolean print(PrintStream out) {
         printValueLocation(out, String.format("(0x%04X) %s:", getSignature(), getTitle()), block);
+        consumer.print(record, this, out);
         return true;
     }
 

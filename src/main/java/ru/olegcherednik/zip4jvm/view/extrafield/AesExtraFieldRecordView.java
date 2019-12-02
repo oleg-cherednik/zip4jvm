@@ -4,39 +4,27 @@ import ru.olegcherednik.zip4jvm.model.AesExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
 
-import java.io.PrintStream;
-
 /**
  * @author Oleg Cherednik
  * @since 26.10.2019
  */
 final class AesExtraFieldRecordView extends ExtraFieldRecordView<AesExtraFieldRecord> {
 
-    private final GeneralPurposeFlag generalPurposeFlag;
-
     public static Builder builder() {
         return new Builder();
     }
 
     private AesExtraFieldRecordView(Builder builder) {
-        super(builder);
-        generalPurposeFlag = builder.generalPurposeFlag;
-    }
+        super(builder, (record, view, out) -> {
+            view.printLine(out, "  Encryption Tag Version:", String.format("%s-%d", record.getVendor(), record.getVersionNumber()));
+            view.printLine(out, "  Encryption Key Bits:", record.getStrength().getSize());
 
-    @Override
-    public boolean print(PrintStream out) {
-        super.print(out);
-
-        printLine(out, "  Encryption Tag Version:", String.format("%s-%d", record.getVendor(), record.getVersionNumber()));
-        printLine(out, "  Encryption Key Bits:", record.getStrength().getSize());
-
-        CompressionMethodView.builder()
-                             .compressionMethod(record.getCompressionMethod())
-                             .generalPurposeFlag(generalPurposeFlag)
-                             .offs(offs + 2)
-                             .columnWidth(columnWidth).build().print(out);
-
-        return true;
+            CompressionMethodView.builder()
+                                 .compressionMethod(record.getCompressionMethod())
+                                 .generalPurposeFlag(builder.generalPurposeFlag)
+                                 .offs(view.getOffs() + 2)
+                                 .columnWidth(view.getColumnWidth()).build().print(out);
+        });
     }
 
     public static final class Builder extends BaseBuilder<Builder, AesExtraFieldRecord, AesExtraFieldRecordView> {
