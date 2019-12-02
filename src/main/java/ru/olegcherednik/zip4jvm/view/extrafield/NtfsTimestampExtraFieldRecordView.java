@@ -51,11 +51,10 @@ final class NtfsTimestampExtraFieldRecordView extends ExtraFieldRecordView<NtfsT
                         .columnWidth(columnWidth).build().print(out);
     }
 
-    public static final class Builder extends BaseBuilder<Builder, NtfsTimestampExtraFieldRecord> {
+    public static final class Builder extends BaseBuilder<Builder, NtfsTimestampExtraFieldRecord, NtfsTimestampExtraFieldRecordView> {
 
-        public NtfsTimestampExtraFieldRecordView build() {
-            check();
-            return new NtfsTimestampExtraFieldRecordView(this);
+        private Builder() {
+            super(NtfsTimestampExtraFieldRecordView::new);
         }
 
     }

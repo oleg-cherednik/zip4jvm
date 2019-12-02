@@ -6,6 +6,7 @@ import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
 import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -16,7 +17,7 @@ public abstract class ExtraFieldRecordView<R extends ExtraField.Record> extends 
     protected final R record;
     protected final Block block;
 
-    protected ExtraFieldRecordView(BaseBuilder<?, R> builder) {
+    protected ExtraFieldRecordView(BaseBuilder<?, R, ?> builder) {
         super(builder.offs, builder.columnWidth);
         record = builder.record;
         block = builder.block;
@@ -43,12 +44,26 @@ public abstract class ExtraFieldRecordView<R extends ExtraField.Record> extends 
         return true;
     }
 
-    protected abstract static class BaseBuilder<T extends BaseBuilder<?, ?>, R extends ExtraField.Record> {
+    protected abstract static class BaseBuilder<T, R extends ExtraField.Record, V extends ExtraFieldRecordView<R>> {
 
+        protected final Function<T, V> sup;
         protected R record;
         protected Block block;
         protected int offs;
         protected int columnWidth;
+
+        protected BaseBuilder() {
+            sup = null;
+        }
+
+        protected BaseBuilder(Function<T, V> sup) {
+            this.sup = sup;
+        }
+
+        public V build() {
+            check();
+            return sup.apply((T)this);
+        }
 
         protected void check() {
 //            Objects.requireNonNull(record, "'record' must not be null");

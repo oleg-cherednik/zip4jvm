@@ -39,13 +39,12 @@ final class AesExtraFieldRecordView extends ExtraFieldRecordView<AesExtraFieldRe
         return true;
     }
 
-    public static final class Builder extends BaseBuilder<Builder, AesExtraFieldRecord> {
+    public static final class Builder extends BaseBuilder<Builder, AesExtraFieldRecord, AesExtraFieldRecordView> {
 
         private GeneralPurposeFlag generalPurposeFlag;
 
-        public AesExtraFieldRecordView build() {
-            check();
-            return new AesExtraFieldRecordView(this);
+        private Builder() {
+            super(AesExtraFieldRecordView::new);
         }
 
         public Builder generalPurposeFlag(GeneralPurposeFlag generalPurposeFlag) {

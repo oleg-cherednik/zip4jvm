@@ -35,11 +35,10 @@ final class InfoZipOldUnixExtraFieldRecordView extends ExtraFieldRecordView<Info
         return true;
     }
 
-    public static final class Builder extends BaseBuilder<Builder, InfoZipOldUnixExtraFieldRecord> {
+    public static final class Builder extends BaseBuilder<Builder, InfoZipOldUnixExtraFieldRecord, InfoZipOldUnixExtraFieldRecordView> {
 
-        public InfoZipOldUnixExtraFieldRecordView build() {
-            check();
-            return new InfoZipOldUnixExtraFieldRecordView(this);
+        private Builder() {
+            super(InfoZipOldUnixExtraFieldRecordView::new);
         }
 
     }

@@ -32,11 +32,10 @@ final class ExtendedTimestampExtraFieldRecordView extends ExtraFieldRecordView<E
         return true;
     }
 
-    public static final class Builder extends BaseBuilder<Builder, ExtendedTimestampExtraFieldRecord> {
+    public static final class Builder extends BaseBuilder<Builder, ExtendedTimestampExtraFieldRecord, ExtendedTimestampExtraFieldRecordView> {
 
-        public ExtendedTimestampExtraFieldRecordView build() {
-            check();
-            return new ExtendedTimestampExtraFieldRecordView(this);
+        private Builder() {
+            super(ExtendedTimestampExtraFieldRecordView::new);
         }
 
     }

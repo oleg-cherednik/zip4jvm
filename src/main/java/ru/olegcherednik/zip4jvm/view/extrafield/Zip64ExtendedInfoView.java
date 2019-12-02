@@ -35,12 +35,10 @@ final class Zip64ExtendedInfoView extends ExtraFieldRecordView<Zip64.ExtendedInf
         return true;
     }
 
-    public static final class Builder extends BaseBuilder<Builder, Zip64.ExtendedInfo> {
+    public static final class Builder extends BaseBuilder<Builder, Zip64.ExtendedInfo, Zip64ExtendedInfoView> {
 
-        public Zip64ExtendedInfoView build() {
-            check();
-            return new Zip64ExtendedInfoView(this);
+        private Builder() {
+            super(Zip64ExtendedInfoView::new);
         }
-
     }
 }

@@ -36,13 +36,12 @@ final class UnknownExtraFieldRecordView extends ExtraFieldRecordView<ExtraField.
         return true;
     }
 
-    public static final class Builder extends BaseBuilder<Builder, ExtraField.Record> {
+    public static final class Builder extends BaseBuilder<Builder, ExtraField.Record, UnknownExtraFieldRecordView> {
 
         private byte[] data = ArrayUtils.EMPTY_BYTE_ARRAY;
 
-        public UnknownExtraFieldRecordView build() {
-            check();
-            return new UnknownExtraFieldRecordView(this);
+        private Builder() {
+            super(UnknownExtraFieldRecordView::new);
         }
 
         @SuppressWarnings("MethodCanBeVariableArityMethod")

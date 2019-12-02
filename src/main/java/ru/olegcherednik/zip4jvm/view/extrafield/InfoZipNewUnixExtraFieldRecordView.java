@@ -54,11 +54,10 @@ final class InfoZipNewUnixExtraFieldRecordView extends ExtraFieldRecordView<Info
                         .columnWidth(columnWidth).build().print(out);
     }
 
-    public static final class Builder extends BaseBuilder<Builder, InfoZipNewUnixExtraFieldRecord> {
+    public static final class Builder extends BaseBuilder<Builder, InfoZipNewUnixExtraFieldRecord, InfoZipNewUnixExtraFieldRecordView> {
 
-        public InfoZipNewUnixExtraFieldRecordView build() {
-            check();
-            return new InfoZipNewUnixExtraFieldRecordView(this);
+        private Builder() {
+            super(InfoZipNewUnixExtraFieldRecordView::new);
         }
 
     }
