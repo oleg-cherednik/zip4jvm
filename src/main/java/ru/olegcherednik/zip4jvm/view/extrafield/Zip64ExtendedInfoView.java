@@ -9,11 +9,11 @@ import ru.olegcherednik.zip4jvm.model.Zip64;
  */
 final class Zip64ExtendedInfoView extends ExtraFieldRecordView<Zip64.ExtendedInfo> {
 
-    public static BaseBuilder<Zip64.ExtendedInfo, Zip64ExtendedInfoView> builder() {
-        return new BaseBuilder<>(Zip64ExtendedInfoView::new);
+    public static Builder<Zip64.ExtendedInfo, Zip64ExtendedInfoView> builder() {
+        return new Builder<>(Zip64ExtendedInfoView::new);
     }
 
-    private Zip64ExtendedInfoView(BaseBuilder<Zip64.ExtendedInfo, Zip64ExtendedInfoView> builder) {
+    private Zip64ExtendedInfoView(Builder<Zip64.ExtendedInfo, Zip64ExtendedInfoView> builder) {
         super(builder, (record, view, out) -> {
             if (record.getUncompressedSize() != ExtraField.NO_DATA)
                 view.printLine(out, "  original compressed size:", String.format("%d bytes", record.getUncompressedSize()));

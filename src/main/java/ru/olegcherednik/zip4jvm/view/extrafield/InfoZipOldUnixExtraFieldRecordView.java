@@ -10,11 +10,11 @@ import static ru.olegcherednik.zip4jvm.model.ExtraField.NO_DATA;
  */
 final class InfoZipOldUnixExtraFieldRecordView extends ExtraFieldRecordView<InfoZipOldUnixExtraFieldRecord> {
 
-    public static BaseBuilder<InfoZipOldUnixExtraFieldRecord, InfoZipOldUnixExtraFieldRecordView> builder() {
-        return new BaseBuilder<>(InfoZipOldUnixExtraFieldRecordView::new);
+    public static Builder<InfoZipOldUnixExtraFieldRecord, InfoZipOldUnixExtraFieldRecordView> builder() {
+        return new Builder<>(InfoZipOldUnixExtraFieldRecordView::new);
     }
 
-    private InfoZipOldUnixExtraFieldRecordView(BaseBuilder<InfoZipOldUnixExtraFieldRecord, InfoZipOldUnixExtraFieldRecordView> builder) {
+    private InfoZipOldUnixExtraFieldRecordView(Builder<InfoZipOldUnixExtraFieldRecord, InfoZipOldUnixExtraFieldRecordView> builder) {
         super(builder, (record, view, out) -> {
             view.printLine(out, "  Last Modified Date:", String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", record.getLastModificationTime()));
             view.printLine(out, "  Last Accessed Date:", String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", record.getLastAccessTime()));

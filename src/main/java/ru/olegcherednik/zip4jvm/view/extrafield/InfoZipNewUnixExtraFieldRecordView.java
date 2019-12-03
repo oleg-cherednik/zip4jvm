@@ -14,11 +14,11 @@ import java.io.PrintStream;
  */
 final class InfoZipNewUnixExtraFieldRecordView extends ExtraFieldRecordView<InfoZipNewUnixExtraFieldRecord> {
 
-    public static BaseBuilder<InfoZipNewUnixExtraFieldRecord, InfoZipNewUnixExtraFieldRecordView> builder() {
-        return new BaseBuilder<>(InfoZipNewUnixExtraFieldRecordView::new);
+    public static Builder<InfoZipNewUnixExtraFieldRecord, InfoZipNewUnixExtraFieldRecordView> builder() {
+        return new Builder<>(InfoZipNewUnixExtraFieldRecordView::new);
     }
 
-    private InfoZipNewUnixExtraFieldRecordView(BaseBuilder<InfoZipNewUnixExtraFieldRecord, InfoZipNewUnixExtraFieldRecordView> builder) {
+    private InfoZipNewUnixExtraFieldRecordView(Builder<InfoZipNewUnixExtraFieldRecord, InfoZipNewUnixExtraFieldRecordView> builder) {
         super(builder, new PrintFoo<InfoZipNewUnixExtraFieldRecord, View>() {
             @Override
             public void print(InfoZipNewUnixExtraFieldRecord record, View view, PrintStream out) {

@@ -8,11 +8,11 @@ import ru.olegcherednik.zip4jvm.model.os.ExtendedTimestampExtraFieldRecord;
  */
 final class ExtendedTimestampExtraFieldRecordView extends ExtraFieldRecordView<ExtendedTimestampExtraFieldRecord> {
 
-    public static BaseBuilder<ExtendedTimestampExtraFieldRecord, ExtendedTimestampExtraFieldRecordView> builder() {
-        return new BaseBuilder<>(ExtendedTimestampExtraFieldRecordView::new);
+    public static Builder<ExtendedTimestampExtraFieldRecord, ExtendedTimestampExtraFieldRecordView> builder() {
+        return new Builder<>(ExtendedTimestampExtraFieldRecordView::new);
     }
 
-    private ExtendedTimestampExtraFieldRecordView(BaseBuilder<ExtendedTimestampExtraFieldRecord, ExtendedTimestampExtraFieldRecordView> builder) {
+    private ExtendedTimestampExtraFieldRecordView(Builder<ExtendedTimestampExtraFieldRecord, ExtendedTimestampExtraFieldRecordView> builder) {
         super(builder, (record, view, out) -> {
             if (record.getFlag().isLastModificationTime())
                 view.printLine(out, "  Last Modified Date:", String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", record.getLastModificationTime()));

@@ -23,7 +23,7 @@ public abstract class ExtraFieldRecordView<R extends ExtraField.Record> extends 
     protected final Block block;
     private final PrintFoo<R, View> consumer;
 
-    protected ExtraFieldRecordView(BaseBuilder<R, ?> builder, PrintFoo<R, View> consumer) {
+    protected ExtraFieldRecordView(Builder<R, ?> builder, PrintFoo<R, View> consumer) {
         super(builder.offs, builder.columnWidth);
         record = builder.record;
         block = builder.block;
@@ -53,17 +53,17 @@ public abstract class ExtraFieldRecordView<R extends ExtraField.Record> extends 
     }
 
     @Getter
-    protected static class BaseBuilder<R extends ExtraField.Record, V extends ExtraFieldRecordView<R>> {
+    public static class Builder<R extends ExtraField.Record, V extends ExtraFieldRecordView<R>> {
 
-        protected final Function<BaseBuilder<R, V>, V> sup;
-        protected R record;
-        protected GeneralPurposeFlag generalPurposeFlag;
-        protected byte[] data = ArrayUtils.EMPTY_BYTE_ARRAY;
-        protected Block block;
-        protected int offs;
-        protected int columnWidth;
+        private final Function<Builder<R, V>, V> sup;
+        private R record;
+        private GeneralPurposeFlag generalPurposeFlag;
+        private byte[] data = ArrayUtils.EMPTY_BYTE_ARRAY;
+        private Block block;
+        private int offs;
+        private int columnWidth;
 
-        protected BaseBuilder(Function<BaseBuilder<R, V>, V> sup) {
+        protected Builder(Function<Builder<R, V>, V> sup) {
             this.sup = sup;
         }
 
@@ -73,37 +73,37 @@ public abstract class ExtraFieldRecordView<R extends ExtraField.Record> extends 
         }
 
         protected void check() {
-//            Objects.requireNonNull(record, "'record' must not be null");
+            Objects.requireNonNull(record, "'record' must not be null");
             Objects.requireNonNull(block, "'block' must not be null");
         }
 
-        public final BaseBuilder<R, V> record(R record) {
+        public final Builder<R, V> record(R record) {
             this.record = record == null || record.isNull() ? null : record;
             return this;
         }
 
-        public final BaseBuilder<R, V> generalPurposeFlag(GeneralPurposeFlag generalPurposeFlag) {
+        public final Builder<R, V> generalPurposeFlag(GeneralPurposeFlag generalPurposeFlag) {
             this.generalPurposeFlag = generalPurposeFlag;
             return this;
         }
 
         @SuppressWarnings("MethodCanBeVariableArityMethod")
-        public BaseBuilder<R, V> data(byte[] data) {
+        public Builder<R, V> data(byte[] data) {
             this.data = Optional.ofNullable(data).orElse(ArrayUtils.EMPTY_BYTE_ARRAY);
             return this;
         }
 
-        public final BaseBuilder<R, V> block(Block block) {
+        public final Builder<R, V> block(Block block) {
             this.block = block == Block.NULL ? null : block;
             return this;
         }
 
-        public final BaseBuilder<R, V> offs(int offs) {
+        public final Builder<R, V> offs(int offs) {
             this.offs = offs;
             return this;
         }
 
-        public final BaseBuilder<R, V> columnWidth(int columnWidth) {
+        public final Builder<R, V> columnWidth(int columnWidth) {
             this.columnWidth = columnWidth;
             return this;
         }
