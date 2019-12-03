@@ -69,12 +69,12 @@ public final class ExtraFieldView extends View {
             getView(record).print(out);
     }
 
-    public ExtraFieldRecordView getView(ExtraField.Record record) {
+    public ExtraFieldRecordView<?> getView(ExtraField.Record record) {
         // TODO check for record != null && !record.isNull()
         return createView.apply(record);
     }
 
-    private final Function<ExtraField.Record, ExtraFieldRecordView> createView = record -> {
+    private final Function<ExtraField.Record, ExtraFieldRecordView<?>> createView = record -> {
         if (record instanceof NtfsTimestampExtraFieldRecord)
             return createView((NtfsTimestampExtraFieldRecord)record);
         if (record instanceof InfoZipOldUnixExtraFieldRecord)

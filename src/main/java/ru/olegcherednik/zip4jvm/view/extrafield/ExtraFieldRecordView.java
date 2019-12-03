@@ -10,13 +10,13 @@ import java.io.PrintStream;
  * @author Oleg Cherednik
  * @since 24.11.2019
  */
-public abstract class ExtraFieldRecordView<R extends ExtraField.Record> extends View {
+public abstract class ExtraFieldRecordView<T extends ExtraField.Record> extends View {
 
-    private final R record;
+    private final T record;
     private final Block block;
-    private final PrintConsumer<R, View> printConsumer;
+    private final PrintConsumer<T, View> printConsumer;
 
-    protected ExtraFieldRecordView(Builder<R, ?> builder, PrintConsumer<R, View> printConsumer) {
+    protected ExtraFieldRecordView(Builder<T, ?> builder, PrintConsumer<T, View> printConsumer) {
         super(builder.getOffs(), builder.getColumnWidth());
         record = builder.getRecord();
         block = builder.getBlock();

@@ -410,16 +410,15 @@ public final class DecomposeEngine {
 
         for (int signature : extraField.getSignatures()) {
             ExtraField.Record record = extraField.getRecord(signature);
-            ExtraFieldRecordView recordView = extraFieldView.getView(record);
-            String fileName = recordView.getFileName();
+            ExtraFieldRecordView<?> recordView = extraFieldView.getView(record);
 
             // print .txt
-            try (PrintStream out = new PrintStream(new FileOutputStream(dir.resolve(fileName + ".txt").toFile()))) {
+            try (PrintStream out = new PrintStream(new FileOutputStream(dir.resolve(recordView.getFileName() + ".txt").toFile()))) {
                 recordView.print(out);
             }
 
             // print .data
-            copyLarge(blockModel.getZipModel().getFile(), dir.resolve(fileName + ".data"), block.getRecordBlock(signature));
+            copyLarge(blockModel.getZipModel().getFile(), dir.resolve(recordView.getFileName() + ".data"), block.getRecordBlock(signature));
         }
     }
 
