@@ -1,10 +1,7 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
-import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
-
-import java.util.Optional;
 
 /**
  * @author Oleg Cherednik
@@ -25,17 +22,11 @@ final class UnknownExtraFieldRecordView extends ExtraFieldRecordView<ExtraField.
 
     public static final class Builder extends BaseBuilder<Builder, ExtraField.Record, UnknownExtraFieldRecordView> {
 
-        private byte[] data = ArrayUtils.EMPTY_BYTE_ARRAY;
 
         private Builder() {
             super(UnknownExtraFieldRecordView::new);
         }
 
-        @SuppressWarnings("MethodCanBeVariableArityMethod")
-        public Builder data(byte[] data) {
-            this.data = Optional.ofNullable(data).orElse(ArrayUtils.EMPTY_BYTE_ARRAY);
-            return this;
-        }
 
     }
 }

@@ -1,12 +1,15 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
+import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
+import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.utils.function.PrintFoo;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -52,13 +55,11 @@ public abstract class ExtraFieldRecordView<R extends ExtraField.Record> extends 
 
         protected final Function<T, V> sup;
         protected R record;
+        protected GeneralPurposeFlag generalPurposeFlag;
+        protected byte[] data = ArrayUtils.EMPTY_BYTE_ARRAY;
         protected Block block;
         protected int offs;
         protected int columnWidth;
-
-        protected BaseBuilder() {
-            sup = null;
-        }
 
         protected BaseBuilder(Function<T, V> sup) {
             this.sup = sup;
@@ -76,6 +77,17 @@ public abstract class ExtraFieldRecordView<R extends ExtraField.Record> extends 
 
         public final T record(R record) {
             this.record = record == null || record.isNull() ? null : record;
+            return (T)this;
+        }
+
+        public final T generalPurposeFlag(GeneralPurposeFlag generalPurposeFlag) {
+            this.generalPurposeFlag = generalPurposeFlag;
+            return (T)this;
+        }
+
+        @SuppressWarnings("MethodCanBeVariableArityMethod")
+        public T data(byte[] data) {
+            this.data = Optional.ofNullable(data).orElse(ArrayUtils.EMPTY_BYTE_ARRAY);
             return (T)this;
         }
 

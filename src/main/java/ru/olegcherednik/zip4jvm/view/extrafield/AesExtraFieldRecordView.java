@@ -1,7 +1,6 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
 import ru.olegcherednik.zip4jvm.model.AesExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
 
 /**
@@ -29,15 +28,8 @@ final class AesExtraFieldRecordView extends ExtraFieldRecordView<AesExtraFieldRe
 
     public static final class Builder extends BaseBuilder<Builder, AesExtraFieldRecord, AesExtraFieldRecordView> {
 
-        private GeneralPurposeFlag generalPurposeFlag;
-
         private Builder() {
             super(AesExtraFieldRecordView::new);
-        }
-
-        public Builder generalPurposeFlag(GeneralPurposeFlag generalPurposeFlag) {
-            this.generalPurposeFlag = generalPurposeFlag;
-            return this;
         }
 
     }
