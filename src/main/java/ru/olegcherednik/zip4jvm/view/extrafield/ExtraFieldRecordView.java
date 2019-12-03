@@ -12,8 +12,8 @@ import java.io.PrintStream;
  */
 public abstract class ExtraFieldRecordView<R extends ExtraField.Record> extends View {
 
-    protected final R record;
-    protected final Block block;
+    private final R record;
+    private final Block block;
     private final PrintConsumer<R, View> printConsumer;
 
     protected ExtraFieldRecordView(Builder<R, ?> builder, PrintConsumer<R, View> printConsumer) {
@@ -40,8 +40,12 @@ public abstract class ExtraFieldRecordView<R extends ExtraField.Record> extends 
 
     @Override
     public boolean print(PrintStream out) {
+        if (record == null)
+            return false;
+
         printValueLocation(out, String.format("(0x%04X) %s:", getSignature(), getTitle()), block);
         printConsumer.print(record, this, out);
+
         return true;
     }
 

@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
  * @since 09.11.2019
  */
 @Test
+@SuppressWarnings("NewClassNamingConvention")
 public class InfoZipNewUnixExtraFieldRecordViewTest {
 
     public void shouldRetrieveVersionOneRecordWhenVersionOne() throws IOException {
@@ -34,7 +35,7 @@ public class InfoZipNewUnixExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(InfoZipNewUnixExtraFieldRecordView.builder()
                                                                                 .record(record)
                                                                                 .block(block)
-                                                                                .columnWidth(52).build());
+                                                                                .position(0, 52).build());
 
         assertThat(lines).hasSize(5);
         assertThat(lines[0]).isEqualTo("(0x7875) new InfoZIP Unix/OS2/NT:                   5296740 (0x0050D264) bytes");
@@ -51,7 +52,8 @@ public class InfoZipNewUnixExtraFieldRecordViewTest {
 
         InfoZipNewUnixExtraFieldRecord.Payload payload = InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload.builder()
                                                                                                              .version(2)
-                                                                                                             .data(new byte[] { 0x0, 0x1, 0x2, 0x3 }).build();
+                                                                                                             .data(new byte[] { 0x0, 0x1, 0x2, 0x3 })
+                                                                                                             .build();
 
         InfoZipNewUnixExtraFieldRecord record = InfoZipNewUnixExtraFieldRecord.builder()
                                                                               .dataSize(11)
@@ -60,7 +62,7 @@ public class InfoZipNewUnixExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(InfoZipNewUnixExtraFieldRecordView.builder()
                                                                                 .record(record)
                                                                                 .block(block)
-                                                                                .columnWidth(52).build());
+                                                                                .position(0, 52).build());
 
         assertThat(lines).hasSize(4);
         assertThat(lines[0]).isEqualTo("(0x7875) new InfoZIP Unix/OS2/NT:                   5296740 (0x0050D264) bytes");
@@ -73,7 +75,7 @@ public class InfoZipNewUnixExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(InfoZipNewUnixExtraFieldRecordView.builder()
                                                                                 .record(InfoZipNewUnixExtraFieldRecord.NULL)
                                                                                 .block(mock(Block.class))
-                                                                                .columnWidth(52).build());
+                                                                                .position(0, 52).build());
         assertThat(lines).hasSize(1);
         assertThat(lines[0]).isEmpty();
     }

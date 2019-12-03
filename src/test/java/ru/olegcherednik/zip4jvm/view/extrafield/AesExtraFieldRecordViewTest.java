@@ -37,7 +37,7 @@ public class AesExtraFieldRecordViewTest {
                                                                      .record(record)
                                                                      .generalPurposeFlag(new GeneralPurposeFlag(2057))
                                                                      .block(block)
-                                                                     .columnWidth(52).build());
+                                                                     .position(0, 52).build());
         assertThat(lines).hasSize(6);
         assertThat(lines[0]).isEqualTo("(0x9901) AES Encryption Tag:                        255603 (0x0003E673) bytes");
         assertThat(lines[1]).isEqualTo("  - size:                                           11 bytes");
@@ -52,7 +52,7 @@ public class AesExtraFieldRecordViewTest {
                                                                      .record(AesExtraFieldRecord.NULL)
                                                                      .generalPurposeFlag(mock(GeneralPurposeFlag.class))
                                                                      .block(mock(Block.class))
-                                                                     .columnWidth(52).build());
+                                                                     .position(0, 52).build());
         assertThat(lines).hasSize(1);
         assertThat(lines[0]).isEmpty();
     }

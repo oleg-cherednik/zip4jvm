@@ -34,7 +34,6 @@ final class Builder<R extends ExtraField.Record, V extends ExtraFieldRecordView<
     }
 
     public void check() {
-        Objects.requireNonNull(record, "'record' must not be null");
         Objects.requireNonNull(data, "'data' must not be null");
         Objects.requireNonNull(block, "'block' must not be null");
     }
@@ -60,13 +59,10 @@ final class Builder<R extends ExtraField.Record, V extends ExtraFieldRecordView<
         return this;
     }
 
-    public Builder<R, V> offs(int offs) {
+    public Builder<R, V> position(int offs, int columnWidth) {
         this.offs = offs;
-        return this;
-    }
-
-    public Builder<R, V> columnWidth(int columnWidth) {
         this.columnWidth = columnWidth;
         return this;
     }
+
 }

@@ -33,7 +33,7 @@ public class Zip64ExtendedInfoViewTest {
         String[] lines = Zip4jvmSuite.execute(Zip64ExtendedInfoView.builder()
                                                                    .record(record)
                                                                    .block(block)
-                                                                   .columnWidth(52).build());
+                                                                   .position(0, 52).build());
 
         assertThat(lines).hasSize(6);
         assertThat(lines[0]).isEqualTo("(0x0001) Zip64 Extended Information:                5300395 (0x0050E0AB) bytes");
@@ -48,7 +48,7 @@ public class Zip64ExtendedInfoViewTest {
         String[] lines = Zip4jvmSuite.execute(Zip64ExtendedInfoView.builder()
                                                                    .record(Zip64.ExtendedInfo.NULL)
                                                                    .block(mock(Block.class))
-                                                                   .columnWidth(52).build());
+                                                                   .position(0, 52).build());
         assertThat(lines).hasSize(1);
         assertThat(lines[0]).isEmpty();
     }

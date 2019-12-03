@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
  * @since 09.11.2019
  */
 @Test
+@SuppressWarnings("NewClassNamingConvention")
 public class InfoZipOldUnixExtraFieldRecordViewTest {
 
     public void shouldRetrieveAllDataWhenAllDataSet() throws IOException {
@@ -33,7 +34,7 @@ public class InfoZipOldUnixExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(InfoZipOldUnixExtraFieldRecordView.builder()
                                                                                 .record(record)
                                                                                 .block(block)
-                                                                                .columnWidth(52).build());
+                                                                                .position(0, 52).build());
 
         assertThat(lines).hasSize(6);
         assertThat(lines[0]).isEqualTo("(0x5855) old InfoZIP Unix/OS2/NT:                   5300395 (0x0050E0AB) bytes");
@@ -57,7 +58,7 @@ public class InfoZipOldUnixExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(InfoZipOldUnixExtraFieldRecordView.builder()
                                                                                 .record(record)
                                                                                 .block(block)
-                                                                                .columnWidth(52).build());
+                                                                                .position(0, 52).build());
 
         assertThat(lines).hasSize(4);
         assertThat(lines[0]).isEqualTo("(0x5855) old InfoZIP Unix/OS2/NT:                   5300395 (0x0050E0AB) bytes");
@@ -70,7 +71,7 @@ public class InfoZipOldUnixExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(InfoZipOldUnixExtraFieldRecordView.builder()
                                                                                 .record(InfoZipOldUnixExtraFieldRecord.NULL)
                                                                                 .block(mock(Block.class))
-                                                                                .columnWidth(52).build());
+                                                                                .position(0, 52).build());
         assertThat(lines).hasSize(1);
         assertThat(lines[0]).isEmpty();
     }

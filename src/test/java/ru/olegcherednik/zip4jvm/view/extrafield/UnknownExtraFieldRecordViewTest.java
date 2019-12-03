@@ -25,12 +25,13 @@ public class UnknownExtraFieldRecordViewTest {
 
         ExtraField.Record.Unknown record = ExtraField.Record.Unknown.builder()
                                                                     .signature(0x0666)
-                                                                    .data(new byte[] { 0x0, 0x1, 0x2, 0x3 }).build();
+                                                                    .build();
 
         String[] lines = Zip4jvmSuite.execute(UnknownExtraFieldRecordView.builder()
                                                                          .record(record)
                                                                          .block(block)
-                                                                         .columnWidth(52).build());
+                                                                         .data(new byte[] { 0x0, 0x1, 0x2, 0x3 })
+                                                                         .position(0, 52).build());
 
         assertThat(lines).hasSize(3);
         assertThat(lines[0]).isEqualTo("(0x0666) Unknown:                                   11208273272 (0x29C10AD78) bytes");

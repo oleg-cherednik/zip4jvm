@@ -29,7 +29,8 @@ public class ExtendedTimestampExtraFieldRecordViewTest {
 
         ExtendedTimestampExtraFieldRecord record = ExtendedTimestampExtraFieldRecord.builder()
                                                                                     .dataSize(13)
-                                                                                    .flag(new ExtendedTimestampExtraFieldRecord.Flag(BIT0 | BIT1 | BIT2))
+                                                                                    .flag(new ExtendedTimestampExtraFieldRecord.Flag(
+                                                                                            BIT0 | BIT1 | BIT2))
                                                                                     .lastModificationTime(1571903182000L)
                                                                                     .lastAccessTime(1571903185000L)
                                                                                     .creationTime(1571903182000L).build();
@@ -37,7 +38,7 @@ public class ExtendedTimestampExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(ExtendedTimestampExtraFieldRecordView.builder()
                                                                                    .record(record)
                                                                                    .block(block)
-                                                                                   .columnWidth(52).build());
+                                                                                   .position(0, 52).build());
 
         assertThat(lines).hasSize(5);
         assertThat(lines[0]).isEqualTo("(0x5455) Universal time:                            5296723 (0x0050D253) bytes");
@@ -62,7 +63,7 @@ public class ExtendedTimestampExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(ExtendedTimestampExtraFieldRecordView.builder()
                                                                                    .record(record)
                                                                                    .block(block)
-                                                                                   .columnWidth(52).build());
+                                                                                   .position(0, 52).build());
 
         assertThat(lines).hasSize(3);
         assertThat(lines[0]).isEqualTo("(0x5455) Universal time:                            5296723 (0x0050D253) bytes");
@@ -85,7 +86,7 @@ public class ExtendedTimestampExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(ExtendedTimestampExtraFieldRecordView.builder()
                                                                                    .record(record)
                                                                                    .block(block)
-                                                                                   .columnWidth(52).build());
+                                                                                   .position(0, 52).build());
 
         assertThat(lines).hasSize(3);
         assertThat(lines[0]).isEqualTo("(0x5455) Universal time:                            5296723 (0x0050D253) bytes");
@@ -108,7 +109,7 @@ public class ExtendedTimestampExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(ExtendedTimestampExtraFieldRecordView.builder()
                                                                                    .record(record)
                                                                                    .block(block)
-                                                                                   .columnWidth(52).build());
+                                                                                   .position(0, 52).build());
 
         assertThat(lines).hasSize(3);
         assertThat(lines[0]).isEqualTo("(0x5455) Universal time:                            5296723 (0x0050D253) bytes");
@@ -120,7 +121,7 @@ public class ExtendedTimestampExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(ExtendedTimestampExtraFieldRecordView.builder()
                                                                                    .record(ExtendedTimestampExtraFieldRecord.NULL)
                                                                                    .block(mock(Block.class))
-                                                                                   .columnWidth(52).build());
+                                                                                   .position(0, 52).build());
         assertThat(lines).hasSize(1);
         assertThat(lines[0]).isEmpty();
     }

@@ -12,11 +12,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+
 /**
  * @author Oleg Cherednik
  * @since 09.11.2019
  */
 @Test
+@SuppressWarnings("NewClassNamingConvention")
 public class NtfsTimestampExtraFieldRecordViewTest {
 
     public void shouldRetrieveAllDataWhenAllDataSet() throws IOException {
@@ -40,10 +42,10 @@ public class NtfsTimestampExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(NtfsTimestampExtraFieldRecordView.builder()
                                                                                .record(record)
                                                                                .block(block)
-                                                                               .columnWidth(52).build());
+                                                                               .position(0, 52).build());
 
         assertThat(lines).hasSize(9);
-        assertThat(lines[0]).isEqualTo("(0x000A) NTFS Timestamps:                           11208273272 (0x29C10AD78) bytes");
+        assertThat(lines[0]).isEqualTo("(0x000A) NTFS Timestamp:                            11208273272 (0x29C10AD78) bytes");
         assertThat(lines[1]).isEqualTo("  - size:                                           36 bytes");
         assertThat(lines[2]).isEqualTo("  - total tags:                                     2");
         assertThat(lines[3]).isEqualTo("  (0x0001) Tag1:                                    24 bytes");
@@ -58,8 +60,9 @@ public class NtfsTimestampExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(NtfsTimestampExtraFieldRecordView.builder()
                                                                                .record(NtfsTimestampExtraFieldRecord.NULL)
                                                                                .block(mock(Block.class))
-                                                                               .columnWidth(52).build());
+                                                                               .position(0, 52).build());
         assertThat(lines).hasSize(1);
         assertThat(lines[0]).isEmpty();
     }
 }
+
