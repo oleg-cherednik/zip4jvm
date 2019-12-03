@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang.ArrayUtils;
+import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
+import ru.olegcherednik.zip4jvm.crypto.strong.HashAlgorithm;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 
 import java.io.IOException;
@@ -84,7 +87,7 @@ public final class Zip64 {
         // size:8 - offs of CentralDirectory in startDiskNumber
         private long centralDirectoryOffs;
         // size:n-44 - extensible data sector
-        private byte[] extensibleDataSector;
+        private Zip64.ExtensibleDataSector extensibleDataSector = ExtensibleDataSector.NULL;
 
     }
 
@@ -318,6 +321,7 @@ public final class Zip64 {
                 return this;
             }
 
+            @SuppressWarnings("MethodCanBeVariableArityMethod")
             public Builder hashData(byte[] hashData) {
                 this.hashData = ArrayUtils.clone(hashData);
                 return this;

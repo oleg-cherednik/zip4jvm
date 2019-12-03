@@ -1,8 +1,11 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
+import ru.olegcherednik.zip4jvm.crypto.strong.HashAlgorithm;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -95,7 +98,7 @@ public class Zip64Reader implements Reader<Zip64> {
             dir.setTotalEntries(in.readQword());
             dir.setCentralDirectorySize(in.readQword());
             dir.setCentralDirectoryOffs(in.readQword());
-            dir.setExtensibleDataSector(in.readBytes((int)endCentralDirectorySize - Zip64.EndCentralDirectory.SIZE));
+            dir.setExtensibleDataSector(new ExtensibleDataSector()in.readBytes((int)endCentralDirectorySize - Zip64.EndCentralDirectory.SIZE));
 
             realBigZip64(dir.getCentralDirectoryOffs(), "centralDirectoryOffs");
             realBigZip64(dir.getTotalEntries(), "totalEntries");
