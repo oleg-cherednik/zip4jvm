@@ -149,4 +149,49 @@ public class Zip64Reader implements Reader<Zip64> {
 
     }
 
+    @RequiredArgsConstructor
+    static final class ExtensibleDataSector implements Reader<Zip64.ExtensibleDataSector> {
+
+        private final int size;
+
+        @Override
+        public Zip64.ExtensibleDataSector read(DataInput in) throws IOException {
+            if (size == 0)
+                return Zip64.ExtensibleDataSector.NULL;
+
+            long offs = in.getOffs();
+
+            Zip64.ExtensibleDataSector extensibleDataSector = readExtensibleDataSector(in);
+
+            if (in.getOffs() - offs != size)
+                throw new Zip4jvmException("Incorrect ExtensibleDataSector");
+
+            return extensibleDataSector;
+        }
+
+        private static Zip64.ExtensibleDataSector readExtensibleDataSector(DataInput in) throws IOException {
+            CompressionMethod compressionMethod = CompressionMethod.parseCode(in.readWord());
+            long compressedSize = in.readQword();
+            long uncompressedSize = in.readQword();
+            EncryptionAlgorithm encryptionAlgorithm = EncryptionAlgorithm.parseCode(in.readWord());
+            int bitLength = in.readWord();
+            int flags = in.readWord();
+            HashAlgorithm hashAlgorithm = HashAlgorithm.parseCode(in.readWord());
+            int hashLength = in.readWord();
+            byte[] hashData = in.readBytes(hashLength);
+
+            return Zip64.ExtensibleDataSector.builder()
+                                             .compressionMethod(compressionMethod)
+                                             .compressedSize(compressedSize)
+                                             .uncompressedSize(uncompressedSize)
+                                             .encryptionAlgorithm(encryptionAlgorithm)
+                                             .bitLength(bitLength)
+                                             .flags(flags)
+                                             .hashAlgorithm(hashAlgorithm)
+                                             .hashLength(hashLength)
+                                             .hashData(hashData).build();
+        }
+
+    }
+
 }
