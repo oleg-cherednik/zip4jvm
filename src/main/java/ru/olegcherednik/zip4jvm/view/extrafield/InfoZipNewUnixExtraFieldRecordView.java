@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 
 import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.model.os.InfoZipNewUnixExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.utils.function.PrintFoo;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.View;
 
@@ -19,7 +18,7 @@ final class InfoZipNewUnixExtraFieldRecordView extends ExtraFieldRecordView<Info
     }
 
     private InfoZipNewUnixExtraFieldRecordView(Builder<InfoZipNewUnixExtraFieldRecord, InfoZipNewUnixExtraFieldRecordView> builder) {
-        super(builder, new PrintFoo<InfoZipNewUnixExtraFieldRecord, View>() {
+        super(builder, new PrintConsumer<InfoZipNewUnixExtraFieldRecord, View>() {
             @Override
             public void print(InfoZipNewUnixExtraFieldRecord record, View view, PrintStream out) {
                 InfoZipNewUnixExtraFieldRecord.Payload payload = record.getPayload();

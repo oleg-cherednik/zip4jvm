@@ -1,7 +1,6 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
 import ru.olegcherednik.zip4jvm.model.os.NtfsTimestampExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.utils.function.PrintFoo;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.View;
 
@@ -18,7 +17,7 @@ final class NtfsTimestampExtraFieldRecordView extends ExtraFieldRecordView<NtfsT
     }
 
     private NtfsTimestampExtraFieldRecordView(Builder<NtfsTimestampExtraFieldRecord, NtfsTimestampExtraFieldRecordView> builder) {
-        super(builder, new PrintFoo<NtfsTimestampExtraFieldRecord, View>() {
+        super(builder, new PrintConsumer<NtfsTimestampExtraFieldRecord, View>() {
             @Override
             public void print(NtfsTimestampExtraFieldRecord record, View view, PrintStream out) {
                 view.printLine(out, "  - total tags:", String.valueOf(record.getTags().size()));
