@@ -9,24 +9,15 @@ import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
  */
 final class UnknownExtraFieldRecordView extends ExtraFieldRecordView<ExtraField.Record> {
 
-    public static Builder builder() {
-        return new Builder();
+    public static BaseBuilder<ExtraField.Record, UnknownExtraFieldRecordView> builder() {
+        return new BaseBuilder<>(UnknownExtraFieldRecordView::new);
     }
 
-    private UnknownExtraFieldRecordView(Builder builder) {
+    private UnknownExtraFieldRecordView(BaseBuilder<ExtraField.Record, UnknownExtraFieldRecordView> builder) {
         super(builder, (record, view, out) -> ByteArrayHexView.builder()
                                                               .data(builder.data)
                                                               .offs(view.getOffs())
                                                               .columnWidth(view.getColumnWidth()).build().print(out));
     }
-
-    public static final class Builder extends BaseBuilder<Builder, ExtraField.Record, UnknownExtraFieldRecordView> {
-
-
-        private Builder() {
-            super(UnknownExtraFieldRecordView::new);
-        }
-
-
-    }
 }
+

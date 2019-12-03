@@ -9,28 +9,21 @@ import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
  */
 final class AesExtraFieldRecordView extends ExtraFieldRecordView<AesExtraFieldRecord> {
 
-    public static Builder builder() {
-        return new Builder();
+    public static BaseBuilder<AesExtraFieldRecord, AesExtraFieldRecordView> builder() {
+        return new BaseBuilder<>(AesExtraFieldRecordView::new);
     }
 
-    private AesExtraFieldRecordView(Builder builder) {
+    private AesExtraFieldRecordView(BaseBuilder<AesExtraFieldRecord, AesExtraFieldRecordView> builder) {
         super(builder, (record, view, out) -> {
             view.printLine(out, "  Encryption Tag Version:", String.format("%s-%d", record.getVendor(), record.getVersionNumber()));
             view.printLine(out, "  Encryption Key Bits:", record.getStrength().getSize());
 
             CompressionMethodView.builder()
                                  .compressionMethod(record.getCompressionMethod())
-                                 .generalPurposeFlag(builder.generalPurposeFlag)
+                                 .generalPurposeFlag(builder.getGeneralPurposeFlag())
                                  .offs(view.getOffs() + 2)
                                  .columnWidth(view.getColumnWidth()).build().print(out);
         });
     }
 
-    public static final class Builder extends BaseBuilder<Builder, AesExtraFieldRecord, AesExtraFieldRecordView> {
-
-        private Builder() {
-            super(AesExtraFieldRecordView::new);
-        }
-
-    }
 }

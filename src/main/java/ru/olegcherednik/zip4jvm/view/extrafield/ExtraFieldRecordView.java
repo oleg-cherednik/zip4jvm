@@ -1,5 +1,6 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
+import lombok.Getter;
 import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
@@ -22,7 +23,7 @@ public abstract class ExtraFieldRecordView<R extends ExtraField.Record> extends 
     protected final Block block;
     private final PrintFoo<R, View> consumer;
 
-    protected ExtraFieldRecordView(BaseBuilder<?, R, ?> builder, PrintFoo<R, View> consumer) {
+    protected ExtraFieldRecordView(BaseBuilder<R, ?> builder, PrintFoo<R, View> consumer) {
         super(builder.offs, builder.columnWidth);
         record = builder.record;
         block = builder.block;
@@ -51,9 +52,10 @@ public abstract class ExtraFieldRecordView<R extends ExtraField.Record> extends 
         return true;
     }
 
-    protected abstract static class BaseBuilder<T, R extends ExtraField.Record, V extends ExtraFieldRecordView<R>> {
+    @Getter
+    protected static class BaseBuilder<R extends ExtraField.Record, V extends ExtraFieldRecordView<R>> {
 
-        protected final Function<T, V> sup;
+        protected final Function<BaseBuilder<R, V>, V> sup;
         protected R record;
         protected GeneralPurposeFlag generalPurposeFlag;
         protected byte[] data = ArrayUtils.EMPTY_BYTE_ARRAY;
@@ -61,13 +63,13 @@ public abstract class ExtraFieldRecordView<R extends ExtraField.Record> extends 
         protected int offs;
         protected int columnWidth;
 
-        protected BaseBuilder(Function<T, V> sup) {
+        protected BaseBuilder(Function<BaseBuilder<R, V>, V> sup) {
             this.sup = sup;
         }
 
         public V build() {
             check();
-            return sup.apply((T)this);
+            return sup.apply(this);
         }
 
         protected void check() {
@@ -75,35 +77,35 @@ public abstract class ExtraFieldRecordView<R extends ExtraField.Record> extends 
             Objects.requireNonNull(block, "'block' must not be null");
         }
 
-        public final T record(R record) {
+        public final BaseBuilder<R, V> record(R record) {
             this.record = record == null || record.isNull() ? null : record;
-            return (T)this;
+            return this;
         }
 
-        public final T generalPurposeFlag(GeneralPurposeFlag generalPurposeFlag) {
+        public final BaseBuilder<R, V> generalPurposeFlag(GeneralPurposeFlag generalPurposeFlag) {
             this.generalPurposeFlag = generalPurposeFlag;
-            return (T)this;
+            return this;
         }
 
         @SuppressWarnings("MethodCanBeVariableArityMethod")
-        public T data(byte[] data) {
+        public BaseBuilder<R, V> data(byte[] data) {
             this.data = Optional.ofNullable(data).orElse(ArrayUtils.EMPTY_BYTE_ARRAY);
-            return (T)this;
+            return this;
         }
 
-        public final T block(Block block) {
+        public final BaseBuilder<R, V> block(Block block) {
             this.block = block == Block.NULL ? null : block;
-            return (T)this;
+            return this;
         }
 
-        public final T offs(int offs) {
+        public final BaseBuilder<R, V> offs(int offs) {
             this.offs = offs;
-            return (T)this;
+            return this;
         }
 
-        public final T columnWidth(int columnWidth) {
+        public final BaseBuilder<R, V> columnWidth(int columnWidth) {
             this.columnWidth = columnWidth;
-            return (T)this;
+            return this;
         }
     }
 }

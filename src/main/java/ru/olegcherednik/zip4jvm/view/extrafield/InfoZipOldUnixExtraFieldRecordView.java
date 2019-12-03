@@ -10,11 +10,11 @@ import static ru.olegcherednik.zip4jvm.model.ExtraField.NO_DATA;
  */
 final class InfoZipOldUnixExtraFieldRecordView extends ExtraFieldRecordView<InfoZipOldUnixExtraFieldRecord> {
 
-    public static Builder builder() {
-        return new Builder();
+    public static BaseBuilder<InfoZipOldUnixExtraFieldRecord, InfoZipOldUnixExtraFieldRecordView> builder() {
+        return new BaseBuilder<>(InfoZipOldUnixExtraFieldRecordView::new);
     }
 
-    private InfoZipOldUnixExtraFieldRecordView(Builder builder) {
+    private InfoZipOldUnixExtraFieldRecordView(BaseBuilder<InfoZipOldUnixExtraFieldRecord, InfoZipOldUnixExtraFieldRecordView> builder) {
         super(builder, (record, view, out) -> {
             view.printLine(out, "  Last Modified Date:", String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", record.getLastModificationTime()));
             view.printLine(out, "  Last Accessed Date:", String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", record.getLastAccessTime()));
@@ -26,11 +26,4 @@ final class InfoZipOldUnixExtraFieldRecordView extends ExtraFieldRecordView<Info
         });
     }
 
-    public static final class Builder extends BaseBuilder<Builder, InfoZipOldUnixExtraFieldRecord, InfoZipOldUnixExtraFieldRecordView> {
-
-        private Builder() {
-            super(InfoZipOldUnixExtraFieldRecordView::new);
-        }
-
-    }
 }

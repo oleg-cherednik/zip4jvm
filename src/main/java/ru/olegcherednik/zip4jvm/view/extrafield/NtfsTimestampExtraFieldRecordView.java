@@ -13,11 +13,11 @@ import java.io.PrintStream;
  */
 final class NtfsTimestampExtraFieldRecordView extends ExtraFieldRecordView<NtfsTimestampExtraFieldRecord> {
 
-    public static Builder builder() {
-        return new Builder();
+    public static BaseBuilder<NtfsTimestampExtraFieldRecord, NtfsTimestampExtraFieldRecordView> builder() {
+        return new BaseBuilder<>(NtfsTimestampExtraFieldRecordView::new);
     }
 
-    private NtfsTimestampExtraFieldRecordView(Builder builder) {
+    private NtfsTimestampExtraFieldRecordView(BaseBuilder<NtfsTimestampExtraFieldRecord, NtfsTimestampExtraFieldRecordView> builder) {
         super(builder, new PrintFoo<NtfsTimestampExtraFieldRecord, View>() {
             @Override
             public void print(NtfsTimestampExtraFieldRecord record, View view, PrintStream out) {
@@ -49,11 +49,4 @@ final class NtfsTimestampExtraFieldRecordView extends ExtraFieldRecordView<NtfsT
         });
     }
 
-    public static final class Builder extends BaseBuilder<Builder, NtfsTimestampExtraFieldRecord, NtfsTimestampExtraFieldRecordView> {
-
-        private Builder() {
-            super(NtfsTimestampExtraFieldRecordView::new);
-        }
-
-    }
 }
