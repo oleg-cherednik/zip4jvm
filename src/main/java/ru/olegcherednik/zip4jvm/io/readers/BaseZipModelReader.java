@@ -34,7 +34,7 @@ import java.util.function.Function;
 public abstract class BaseZipModelReader {
 
     protected final Path zip;
-    protected final Function<Charset, Charset> charsetCustomizer;
+    protected final Function<Charset, Charset> customizeCharset;
 
     protected EndCentralDirectory endCentralDirectory;
     protected Zip64 zip64;

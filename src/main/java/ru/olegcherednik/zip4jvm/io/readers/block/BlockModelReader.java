@@ -1,5 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
+import lombok.Getter;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.BaseZipModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.CentralDirectoryReader;
@@ -20,17 +21,17 @@ import java.util.function.Function;
  */
 public final class BlockModelReader extends BaseZipModelReader {
 
-    private final Diagnostic diagnostic;
+    @Getter
+    private final Diagnostic diagnostic = new Diagnostic();
 
-    public BlockModelReader(Path zip, Function<Charset, Charset> charsetCustomizer, Diagnostic diagnostic) {
-        super(zip, charsetCustomizer);
-        this.diagnostic = diagnostic;
+    public BlockModelReader(Path zip, Function<Charset, Charset> customizeCharset) {
+        super(zip, customizeCharset);
     }
 
     public BlockModel read() throws IOException {
         readData();
         return BlockModel.builder()
-                         .zipModel(new ZipModelBuilder(zip, endCentralDirectory, zip64, centralDirectory, charsetCustomizer).build())
+                         .zipModel(new ZipModelBuilder(zip, endCentralDirectory, zip64, centralDirectory, customizeCharset).build())
                          .diagnostic(diagnostic)
                          .endCentralDirectory(endCentralDirectory)
                          .zip64(zip64)
@@ -39,7 +40,7 @@ public final class BlockModelReader extends BaseZipModelReader {
 
     @Override
     protected EndCentralDirectoryReader getEndCentralDirectoryReader() {
-        return new BlockEndCentralDirectoryReader(charsetCustomizer, diagnostic.getEndCentralDirectoryBlock());
+        return new BlockEndCentralDirectoryReader(customizeCharset, diagnostic.getEndCentralDirectoryBlock());
     }
 
     @Override
@@ -49,7 +50,7 @@ public final class BlockModelReader extends BaseZipModelReader {
 
     @Override
     protected CentralDirectoryReader getCentralDirectoryReader(long totalEntries) {
-        return new BlockCentralDirectoryReader(totalEntries, charsetCustomizer, diagnostic.getCentralDirectoryBlock());
+        return new BlockCentralDirectoryReader(totalEntries, customizeCharset, diagnostic.getCentralDirectoryBlock());
     }
 }
 

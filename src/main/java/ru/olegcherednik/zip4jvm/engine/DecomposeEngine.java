@@ -22,7 +22,6 @@ import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.BlockZipEntryModel;
 import ru.olegcherednik.zip4jvm.model.block.ByteArrayBlock;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
-import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.block.Zip64Block;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
@@ -64,10 +63,10 @@ public final class DecomposeEngine {
     private final int columnWidth;
 
     public void decompose() throws IOException {
-        Diagnostic diagnostic = new Diagnostic();
-        BlockModel blockModel = new BlockModelReader(zip, Charsets.STANDARD_ZIP_CHARSET, diagnostic).read();
-        BlockZipEntryModel zipEntryModel = new BlockZipEntryModelReader(blockModel.getZipModel(), Charsets.STANDARD_ZIP_CHARSET,
-                diagnostic.getZipEntryBlock()).read();
+        Function<Charset, Charset> customizeCharset = Charsets.STANDARD_ZIP_CHARSET;
+        BlockModel blockModel = new BlockModelReader(zip, customizeCharset).read();
+        BlockZipEntryModel zipEntryModel = new BlockZipEntryModelReader(blockModel.getZipModel(), customizeCharset,
+                blockModel.getDiagnostic().getZipEntryBlock()).read();
 
         Files.createDirectories(destDir);
 
@@ -76,13 +75,6 @@ public final class DecomposeEngine {
         writeCentralDirectory(blockModel);
         writeZipEntries(blockModel, zipEntryModel);
     }
-
-//    private static BaseZipInputStream createDataInput(ZipModel zipModel, ZipEntry zipEntry) throws IOException {
-//        return new SingleZipInputStream(zipModel.getFile());
-////        if (zipModel.isSplit())
-////            return new SplitZipInputStream(zipModel, zipEntry.getDisk());
-////        return new SingleZipInputStream(zipModel.getFile());
-//    }
 
     private void writeEndCentralDirectory(BlockModel blockModel) throws IOException {
         try (PrintStream out = new PrintStream(destDir.resolve("end_central_directory.txt").toFile())) {
@@ -284,8 +276,7 @@ public final class DecomposeEngine {
         return Zip64View.EndCentralDirectoryLocatorView.builder()
                                                        .locator(zip64.getEndCentralDirectoryLocator())
                                                        .block(block.getEndCentralDirectoryLocatorBlock())
-                                                       .offs(offs)
-                                                       .columnWidth(columnWidth).build();
+                                                       .position(offs, columnWidth).build();
     }
 
     private Zip64View.EndCentralDirectoryView createZip64EndCentralDirectoryView(Zip64 zip64, Zip64Block block) {

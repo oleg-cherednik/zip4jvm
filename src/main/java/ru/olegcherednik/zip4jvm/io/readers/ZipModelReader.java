@@ -22,12 +22,12 @@ public final class ZipModelReader extends BaseZipModelReader {
 
     public ZipModel read() throws IOException {
         readData();
-        return new ZipModelBuilder(zip, endCentralDirectory, zip64, centralDirectory, charsetCustomizer).build();
+        return new ZipModelBuilder(zip, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
     }
 
     @Override
     protected EndCentralDirectoryReader getEndCentralDirectoryReader() {
-        return new EndCentralDirectoryReader(charsetCustomizer);
+        return new EndCentralDirectoryReader(customizeCharset);
     }
 
     @Override
@@ -37,7 +37,7 @@ public final class ZipModelReader extends BaseZipModelReader {
 
     @Override
     protected CentralDirectoryReader getCentralDirectoryReader(long totalEntries) {
-        return new CentralDirectoryReader(totalEntries, charsetCustomizer);
+        return new CentralDirectoryReader(totalEntries, customizeCharset);
     }
 
 }

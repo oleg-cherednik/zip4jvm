@@ -19,8 +19,8 @@ public class BlockLocalFileHeaderReader extends LocalFileHeaderReader {
 
     private final ZipEntryBlock.LocalFileHeaderBlock localFileHeader;
 
-    public BlockLocalFileHeaderReader(long offs, Function<Charset, Charset> charsetCustomizer, ZipEntryBlock.LocalFileHeaderBlock localFileHeader) {
-        super(offs, charsetCustomizer);
+    public BlockLocalFileHeaderReader(long offs, Function<Charset, Charset> customizeCharset, ZipEntryBlock.LocalFileHeaderBlock localFileHeader) {
+        super(offs, customizeCharset);
         this.localFileHeader = localFileHeader;
     }
 

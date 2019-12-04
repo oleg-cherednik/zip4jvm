@@ -22,7 +22,7 @@ import java.util.function.Function;
 public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
 
     private final long offs;
-    private final Function<Charset, Charset> charsetCustomizer;
+    private final Function<Charset, Charset> customizeCharset;
 
     @Override
     public final LocalFileHeader read(DataInput in) throws IOException {
@@ -47,7 +47,7 @@ public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
         int extraFieldLength = in.readWord();
         Charset charset = localFileHeader.getGeneralPurposeFlag().getCharset();
 
-        localFileHeader.setFileName(in.readString(fileNameLength, charsetCustomizer.apply(charset)));
+        localFileHeader.setFileName(in.readString(fileNameLength, customizeCharset.apply(charset)));
         localFileHeader.setExtraField(readExtraFiled(extraFieldLength, localFileHeader, in));
 
         return localFileHeader;

@@ -30,6 +30,9 @@ public final class Zip64View extends View {
 
     @Override
     public boolean print(PrintStream out) {
+        if (zip64 == null)
+            return false;
+
         boolean emptyLine = createEndCentralDirectorLocatorView().print(out);
         return createEndCentralDirectoryView().print(out, emptyLine);
     }
@@ -38,8 +41,7 @@ public final class Zip64View extends View {
         return EndCentralDirectoryLocatorView.builder()
                                              .locator(zip64.getEndCentralDirectoryLocator())
                                              .block(block.getEndCentralDirectoryLocatorBlock())
-                                             .offs(offs)
-                                             .columnWidth(columnWidth).build();
+                                             .position(offs, columnWidth).build();
     }
 
     private EndCentralDirectoryView createEndCentralDirectoryView() {
@@ -59,7 +61,6 @@ public final class Zip64View extends View {
         private int columnWidth;
 
         public Zip64View build() {
-            Objects.requireNonNull(zip64, "'zip64' must not be null");
             Objects.requireNonNull(block, "'block' must not be null");
             return new Zip64View(this);
         }
@@ -133,12 +134,8 @@ public final class Zip64View extends View {
                 return this;
             }
 
-            public EndCentralDirectoryLocatorView.Builder offs(int offs) {
+            public EndCentralDirectoryLocatorView.Builder position(int offs, int columnWidth) {
                 this.offs = offs;
-                return this;
-            }
-
-            public EndCentralDirectoryLocatorView.Builder columnWidth(int columnWidth) {
                 this.columnWidth = columnWidth;
                 return this;
             }

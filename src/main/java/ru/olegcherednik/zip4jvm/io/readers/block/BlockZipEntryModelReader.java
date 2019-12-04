@@ -31,7 +31,7 @@ import java.util.function.Function;
 public class BlockZipEntryModelReader {
 
     private final ZipModel zipModel;
-    private final Function<Charset, Charset> charsetCustomizer;
+    private final Function<Charset, Charset> customizeCharset;
     private final ZipEntryBlock zipEntryBlock;
 
     public BlockZipEntryModel read() throws IOException {
@@ -56,7 +56,7 @@ public class BlockZipEntryModelReader {
         zipEntryBlock.getLocalFileHeader().setDisk(zipEntry.getDisk());
         long offs = zipEntry.getLocalFileHeaderOffs();
         ZipEntryBlock.LocalFileHeaderBlock blockLocalFileHeader = zipEntryBlock.getLocalFileHeader();
-        LocalFileHeader localFileHeader = new BlockLocalFileHeaderReader(offs, charsetCustomizer, blockLocalFileHeader).read(in);
+        LocalFileHeader localFileHeader = new BlockLocalFileHeaderReader(offs, customizeCharset, blockLocalFileHeader).read(in);
         zipEntryBlock.saveLocalFileHeader(localFileHeader.getFileName());
         return localFileHeader;
     }

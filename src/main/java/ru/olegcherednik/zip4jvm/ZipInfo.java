@@ -11,7 +11,6 @@ import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.BlockZipEntryModel;
-import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.Zip64View;
@@ -52,10 +51,9 @@ public final class ZipInfo {
         final int offs = prefix.length();
         final int columnWidth = 52;
 
-        Diagnostic diagnostic = new Diagnostic();
-        BlockModel blockModel = new BlockModelReader(zip, charsetCustomizer, diagnostic).read();
+        BlockModel blockModel = new BlockModelReader(zip, charsetCustomizer).read();
         BlockZipEntryModel zipEntryModel = new BlockZipEntryModelReader(blockModel.getZipModel(), charsetCustomizer,
-                diagnostic.getZipEntryBlock()).read();
+                blockModel.getDiagnostic().getZipEntryBlock()).read();
 
         boolean emptyLine = createEndCentralDirectoryView(blockModel, charset, offs, columnWidth).print(out);
         emptyLine = createZip64View(blockModel, offs, columnWidth).print(out, emptyLine);
