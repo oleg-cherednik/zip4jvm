@@ -44,8 +44,7 @@ final class DigitalSignatureView extends View {
     private boolean printData(PrintStream out) {
         return ByteArrayHexView.builder()
                                .data(digitalSignature.getSignatureData())
-                               .offs(offs)
-                               .columnWidth(columnWidth).build().print(out);
+                               .position(offs, columnWidth).build().print(out);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

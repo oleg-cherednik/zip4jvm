@@ -47,8 +47,7 @@ public final class ZipInfo {
         Function<Charset, Charset> charsetCustomizer = charset -> Charsets.UTF_8;//Charsets.SYSTEM_CHARSET;
 //        Function<Charset, Charset> charsetCustomizer = Charsets.SYSTEM_CHARSET;
         Charset charset = charsetCustomizer.apply(Charsets.IBM437);
-        final String prefix = "    ";
-        final int offs = prefix.length();
+        final int offs = 4;
         final int columnWidth = 52;
 
         BlockModel blockModel = new BlockModelReader(zip, charsetCustomizer).read();

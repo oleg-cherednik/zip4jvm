@@ -110,6 +110,9 @@ abstract class BaseDataInput implements DataInput {
 
     @Override
     public byte[] readBytes(int total) throws IOException {
+        if (total <= 0)
+            return ArrayUtils.EMPTY_BYTE_ARRAY;
+
         byte[] buf = new byte[total];
         int n = read(buf, 0, buf.length);
 

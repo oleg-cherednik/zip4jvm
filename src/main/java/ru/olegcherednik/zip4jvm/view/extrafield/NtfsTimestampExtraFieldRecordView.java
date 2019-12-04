@@ -42,8 +42,7 @@ final class NtfsTimestampExtraFieldRecordView extends ExtraFieldRecordView<NtfsT
 
                 ByteArrayHexView.builder()
                                 .data(tag.getData())
-                                .offs(view.getOffs())
-                                .columnWidth(view.getColumnWidth()).build().print(out);
+                                .position(view.getOffs(), view.getColumnWidth()).build().print(out);
             }
         });
     }

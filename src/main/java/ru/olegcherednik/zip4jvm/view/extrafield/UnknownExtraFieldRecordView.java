@@ -16,8 +16,7 @@ final class UnknownExtraFieldRecordView extends ExtraFieldRecordView<ExtraField.
     private UnknownExtraFieldRecordView(Builder<ExtraField.Record, UnknownExtraFieldRecordView> builder) {
         super(builder, (record, view, out) -> ByteArrayHexView.builder()
                                                               .data(builder.getData())
-                                                              .offs(view.getOffs())
-                                                              .columnWidth(view.getColumnWidth()).build().print(out));
+                                                              .position(view.getOffs(), view.getColumnWidth()).build().print(out));
     }
 }
 

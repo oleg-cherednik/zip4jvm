@@ -168,6 +168,7 @@ public final class Zip64View extends View {
             printLine(out, "total number of entries in central dir:", dir.getTotalEntries());
             printLine(out, "size of central dir:", String.format("%1$d (0x%1$08X) bytes", dir.getCentralDirectorySize()));
             printLine(out, "relative offset of central dir:", String.format("%1$d (0x%1$08X) bytes", dir.getCentralDirectoryOffs()));
+            printExtensibleDataSector(out);
             return true;
         }
 
@@ -177,6 +178,14 @@ public final class Zip64View extends View {
                        .versionToExtract(dir.getVersionToExtract())
                        .offs(offs)
                        .columnWidth(columnWidth).build().print(out);
+        }
+
+        private void printExtensibleDataSector(PrintStream out) {
+            printLine(out, "extensible data sector:", String.format("%d bytes", dir.getExtensibleDataSector().length));
+
+            ByteArrayHexView.builder()
+                            .data(dir.getExtensibleDataSector())
+                            .position(offs, columnWidth).build().print(out);
         }
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)

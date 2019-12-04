@@ -41,8 +41,7 @@ final class BlockAesEncryptionHeaderView extends View {
 
         ByteArrayHexView.builder()
                         .data(encryptionHeader.getSalt().getData())
-                        .offs(offs)
-                        .columnWidth(columnWidth).build().print(out);
+                        .position(offs, columnWidth).build().print(out);
     }
 
     private void printPasswordChecksum(PrintStream out) {
@@ -50,8 +49,7 @@ final class BlockAesEncryptionHeaderView extends View {
 
         ByteArrayHexView.builder()
                         .data(encryptionHeader.getPasswordChecksum().getData())
-                        .offs(offs)
-                        .columnWidth(columnWidth).build().print(out);
+                        .position(offs, columnWidth).build().print(out);
     }
 
     private void printMac(PrintStream out) {
@@ -59,8 +57,7 @@ final class BlockAesEncryptionHeaderView extends View {
 
         ByteArrayHexView.builder()
                         .data(encryptionHeader.getMac().getData())
-                        .offs(offs)
-                        .columnWidth(columnWidth).build().print(out);
+                        .position(offs, columnWidth).build().print(out);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

@@ -39,8 +39,7 @@ final class PkwareEncryptionHeaderView extends View {
 
         ByteArrayHexView.builder()
                         .data(encryptionHeader.getData().getData())
-                        .offs(offs)
-                        .columnWidth(columnWidth).build().print(out);
+                        .position(offs, columnWidth).build().print(out);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

@@ -45,8 +45,7 @@ final class InfoZipNewUnixExtraFieldRecordView extends ExtraFieldRecordView<Info
 
                 ByteArrayHexView.builder()
                                 .data(payload.getData())
-                                .offs(view.getOffs())
-                                .columnWidth(view.getColumnWidth()).build().print(out);
+                                .position(view.getOffs(), view.getColumnWidth()).build().print(out);
             }
         });
     }

@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.model.builders;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -28,8 +29,12 @@ public final class Zip64Builder {
     }
 
     private Zip64.EndCentralDirectory createEndCentralDirectory() {
+        byte[] extensibleDataSector = getExtensibleDataSector();
+        /* see 4.3.14.1 */
+        long size = Zip64.EndCentralDirectory.SIZE + extensibleDataSector.length;
+
         Zip64.EndCentralDirectory endCentralDirectory = new Zip64.EndCentralDirectory();
-        endCentralDirectory.setEndCentralDirectorySize(getEndCentralDirectorySize());
+        endCentralDirectory.setEndCentralDirectorySize(size);
         endCentralDirectory.setVersionMadeBy(new Version(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));
         endCentralDirectory.setVersionToExtract(new Version(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));
         endCentralDirectory.setTotalDisks(zipModel.getTotalDisks());
@@ -38,7 +43,7 @@ public final class Zip64Builder {
         endCentralDirectory.setTotalEntries(zipModel.getTotalEntries());
         endCentralDirectory.setCentralDirectorySize(zipModel.getCentralDirectorySize());
         endCentralDirectory.setCentralDirectoryOffs(zipModel.getCentralDirectoryOffs());
-        endCentralDirectory.setExtensibleDataSector(new byte[getExtensibleDataSectorSize()]);
+        endCentralDirectory.setExtensibleDataSector(extensibleDataSector);
         return endCentralDirectory;
     }
 
@@ -51,14 +56,9 @@ public final class Zip64Builder {
         return zipModel.getTotalEntries();
     }
 
-    /** see 4.3.14.1 */
-    private static long getEndCentralDirectorySize() {
-        return Zip64.EndCentralDirectory.SIZE + getExtensibleDataSectorSize();
-    }
-
     /** see 4.4.27 */
-    private static int getExtensibleDataSectorSize() {
-        return 0;
+    private static byte[] getExtensibleDataSector() {
+        return ArrayUtils.EMPTY_BYTE_ARRAY;
     }
 
 }
