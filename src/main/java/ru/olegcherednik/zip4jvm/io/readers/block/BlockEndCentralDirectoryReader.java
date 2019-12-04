@@ -24,8 +24,7 @@ public class BlockEndCentralDirectoryReader extends EndCentralDirectoryReader {
 
     @Override
     public EndCentralDirectory read(DataInput in) throws IOException {
-        EndCentralDirectory res = endCentralDirectory.calc(in, () -> super.read(in));
-        return res;
+        return endCentralDirectory.calc(in, () -> super.read(in));
     }
 
 }

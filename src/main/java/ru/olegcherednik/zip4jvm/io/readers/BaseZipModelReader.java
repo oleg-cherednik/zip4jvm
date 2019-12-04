@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.exception.SignatureWasNotFoundException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
@@ -33,6 +33,8 @@ import java.util.function.Function;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class BaseZipModelReader {
 
+    private static final String MARKER_END_CENTRAL_DIRECTORY = "end_central_directory";
+
     protected final Path zip;
     protected final Function<Charset, Charset> customizeCharset;
 
@@ -50,12 +52,11 @@ public abstract class BaseZipModelReader {
     }
 
     private EndCentralDirectory readEndCentralDirectory(DataInput in) throws IOException {
-        long offs = in.getOffs();
-
         try {
+            in.mark(MARKER_END_CENTRAL_DIRECTORY);
             return getEndCentralDirectoryReader().read(in);
         } finally {
-            in.seek(offs);
+            in.seek(MARKER_END_CENTRAL_DIRECTORY);
         }
     }
 
@@ -85,6 +86,6 @@ public abstract class BaseZipModelReader {
             }
         } while (commentLength >= 0 && available >= 0);
 
-        throw new Zip4jvmException("EndCentralDirectory was not found");
+        throw new SignatureWasNotFoundException(EndCentralDirectory.SIGNATURE, "EndCentralDirectory");
     }
 }
