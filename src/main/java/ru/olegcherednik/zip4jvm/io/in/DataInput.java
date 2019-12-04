@@ -24,6 +24,8 @@ public interface DataInput extends Closeable {
 
     int dwordSize();
 
+    int qwordSize();
+
     long getOffs();
 
     default int readWordSignature() throws IOException {

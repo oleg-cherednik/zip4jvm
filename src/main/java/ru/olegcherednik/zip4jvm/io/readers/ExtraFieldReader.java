@@ -54,9 +54,7 @@ public class ExtraFieldReader implements Reader<ExtraField> {
             boolean offs, boolean disk) {
         Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> map = new HashMap<>();
 
-        if (uncompressedSize || compressedSize || offs || disk)
-            map.put(Zip64.ExtendedInfo.SIGNATURE, size -> new Zip64Reader.ExtendedInfo(size, uncompressedSize, compressedSize, offs, disk));
-
+        map.put(Zip64.ExtendedInfo.SIGNATURE, size -> new Zip64Reader.ExtendedInfo(size, uncompressedSize, compressedSize, offs, disk));
         map.put(AesExtraFieldRecord.SIGNATURE, AesExtraDataRecordReader::new);
         map.put(NtfsTimestampExtraFieldRecord.SIGNATURE, NtfsTimestampExtraFieldReader::new);
         map.put(InfoZipOldUnixExtraFieldRecord.SIGNATURE, InfoZipOldUnitExtraFieldReader::new);

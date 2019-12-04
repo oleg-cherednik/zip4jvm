@@ -52,6 +52,11 @@ abstract class BaseDataInput implements DataInput {
     }
 
     @Override
+    public int qwordSize() {
+        return 8;
+    }
+
+    @Override
     public long getOffs() {
         return delegate.getOffs();
     }
@@ -73,7 +78,7 @@ abstract class BaseDataInput implements DataInput {
 
     @Override
     public long readQword() throws IOException {
-        return readAndConvert(OFFS_QWORD, 8);
+        return readAndConvert(OFFS_QWORD, qwordSize());
     }
 
     @Override

@@ -1,6 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
@@ -105,18 +105,29 @@ public class Zip64Reader implements Reader<Zip64> {
 
     }
 
-    @RequiredArgsConstructor
+    @AllArgsConstructor
     public static final class ExtendedInfo implements Reader<Zip64.ExtendedInfo> {
 
         private final int size;
-        private final boolean uncompressedSizeExists;
-        private final boolean compressedSizeExists;
-        private final boolean offsLocalHeaderRelativeExists;
-        private final boolean diskExists;
+        private boolean uncompressedSizeExists;
+        private boolean compressedSizeExists;
+        private boolean offsLocalHeaderRelativeExists;
+        private boolean diskExists;
+
+        private void updateFlags(DataInput in) {
+            if (uncompressedSizeExists || compressedSizeExists || offsLocalHeaderRelativeExists || diskExists)
+                return;
+
+            uncompressedSizeExists = size >= in.qwordSize();
+            compressedSizeExists = size >= in.qwordSize() * 2;
+            offsLocalHeaderRelativeExists = size >= in.qwordSize() * 3;
+            diskExists = size >= in.qwordSize() * 3 + in.dwordSize();
+        }
 
         @Override
         public Zip64.ExtendedInfo read(DataInput in) throws IOException {
             long offs = in.getOffs();
+            updateFlags(in);
 
             Zip64.ExtendedInfo extendedInfo = readExtendedInfo(in);
 
@@ -130,16 +141,12 @@ public class Zip64Reader implements Reader<Zip64> {
         }
 
         private Zip64.ExtendedInfo readExtendedInfo(DataInput in) throws IOException {
-            long uncompressedSize = uncompressedSizeExists ? in.readQword() : ExtraField.NO_DATA;
-            long compressedSize = compressedSizeExists ? in.readQword() : ExtraField.NO_DATA;
-            long offsLocalHeaderRelative = offsLocalHeaderRelativeExists ? in.readQword() : ExtraField.NO_DATA;
-            long disk = diskExists ? in.readDword() : ExtraField.NO_DATA;
-
             return Zip64.ExtendedInfo.builder()
-                                     .uncompressedSize(uncompressedSize)
-                                     .compressedSize(compressedSize)
-                                     .localFileHeaderOffs(offsLocalHeaderRelative)
-                                     .disk(disk).build();
+                                     .uncompressedSize(uncompressedSizeExists ? in.readQword() : ExtraField.NO_DATA)
+                                     .compressedSize(compressedSizeExists ? in.readQword() : ExtraField.NO_DATA)
+                                     .localFileHeaderOffs(offsLocalHeaderRelativeExists ? in.readQword() : ExtraField.NO_DATA)
+                                     .disk(diskExists ? in.readDword() : ExtraField.NO_DATA)
+                                     .build();
         }
 
         @Override
