@@ -26,7 +26,7 @@ import static ru.olegcherednik.zip4jvm.model.ExternalFileAttributes.PROP_OS_NAME
 public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader>> {
 
     private final long totalEntries;
-    private final Function<Charset, Charset> charsetCustomizer;
+    private final Function<Charset, Charset> customizeCharset;
 
     @Override
     public final List<CentralDirectory.FileHeader> read(DataInput in) throws IOException {
@@ -66,15 +66,15 @@ public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader
         int fileNameLength = in.readWord();
         int extraFieldLength = in.readWord();
         int fileCommentLength = in.readWord();
-        Charset charset = fileHeader.getGeneralPurposeFlag().getCharset();
+        Charset charset = customizeCharset.apply(fileHeader.getGeneralPurposeFlag().getCharset());
 
         fileHeader.setDisk(in.readWord());
         fileHeader.setInternalFileAttributes(getInternalFileAttribute(in.readBytes(InternalFileAttributes.SIZE)));
         fileHeader.setExternalFileAttributes(getExternalFileAttribute(in.readBytes(ExternalFileAttributes.SIZE)));
         fileHeader.setLocalFileHeaderOffs(in.readDword());
-        fileHeader.setFileName(in.readString(fileNameLength, charsetCustomizer.apply(charset)));
+        fileHeader.setFileName(in.readString(fileNameLength, charset));
         fileHeader.setExtraField(getExtraFiledReader(extraFieldLength, fileHeader).read(in));
-        fileHeader.setComment(in.readString(fileCommentLength, charsetCustomizer.apply(charset)));
+        fileHeader.setComment(in.readString(fileCommentLength, charset));
 
         return fileHeader;
     }

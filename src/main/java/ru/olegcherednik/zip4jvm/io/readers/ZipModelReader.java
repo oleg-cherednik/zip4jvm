@@ -1,7 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 
@@ -16,8 +14,8 @@ import java.util.function.Function;
  */
 public final class ZipModelReader extends BaseZipModelReader {
 
-    public ZipModelReader(Path zip, Function<Charset, Charset> charsetCustomizer) {
-        super(zip, charsetCustomizer);
+    public ZipModelReader(Path zip, Function<Charset, Charset> customizeCharset) {
+        super(zip, customizeCharset);
     }
 
     public ZipModel read() throws IOException {
@@ -31,8 +29,8 @@ public final class ZipModelReader extends BaseZipModelReader {
     }
 
     @Override
-    protected Zip64 readZip64(DataInput in) throws IOException {
-        return new Zip64Reader().read(in);
+    protected Zip64Reader getZip64Reader() {
+        return new Zip64Reader();
     }
 
     @Override

@@ -17,7 +17,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class EndCentralDirectoryReader implements Reader<EndCentralDirectory> {
 
-    private final Function<Charset, Charset> charsetCustomizer;
+    private final Function<Charset, Charset> customizeCharset;
 
     @Override
     public EndCentralDirectory read(DataInput in) throws IOException {
@@ -31,7 +31,7 @@ public class EndCentralDirectoryReader implements Reader<EndCentralDirectory> {
         endCentralDirectory.setCentralDirectorySize(in.readDword());
         endCentralDirectory.setCentralDirectoryOffs(in.readDword());
         int commentLength = in.readWord();
-        endCentralDirectory.setComment(in.readString(commentLength, charsetCustomizer.apply(Charsets.IBM437)));
+        endCentralDirectory.setComment(in.readString(commentLength, customizeCharset.apply(Charsets.IBM437)));
         return endCentralDirectory;
     }
 

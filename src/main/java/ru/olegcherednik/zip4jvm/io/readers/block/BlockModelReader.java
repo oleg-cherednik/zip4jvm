@@ -1,11 +1,10 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
-import lombok.Getter;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.BaseZipModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.CentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.EndCentralDirectoryReader;
-import ru.olegcherednik.zip4jvm.model.Zip64;
+import ru.olegcherednik.zip4jvm.io.readers.Zip64Reader;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
@@ -21,7 +20,6 @@ import java.util.function.Function;
  */
 public final class BlockModelReader extends BaseZipModelReader {
 
-    @Getter
     private final Diagnostic diagnostic = new Diagnostic();
 
     public BlockModelReader(Path zip, Function<Charset, Charset> customizeCharset) {
@@ -30,8 +28,11 @@ public final class BlockModelReader extends BaseZipModelReader {
 
     public BlockModel read() throws IOException {
         readData();
+
+        ZipModel zipModel = new ZipModelBuilder(zip, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
+
         return BlockModel.builder()
-                         .zipModel(new ZipModelBuilder(zip, endCentralDirectory, zip64, centralDirectory, customizeCharset).build())
+                         .zipModel(zipModel)
                          .diagnostic(diagnostic)
                          .endCentralDirectory(endCentralDirectory)
                          .zip64(zip64)
@@ -44,8 +45,8 @@ public final class BlockModelReader extends BaseZipModelReader {
     }
 
     @Override
-    protected Zip64 readZip64(DataInput in) throws IOException {
-        return new BlockZip64Reader(diagnostic.getZip64Block()).read(in);
+    protected Zip64Reader getZip64Reader() {
+        return new BlockZip64Reader(diagnostic.getZip64Block());
     }
 
     @Override

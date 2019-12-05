@@ -17,8 +17,8 @@ public class BlockEndCentralDirectoryReader extends EndCentralDirectoryReader {
 
     private final Block endCentralDirectory;
 
-    public BlockEndCentralDirectoryReader(Function<Charset, Charset> charsetCustomizer, Block endCentralDirectory) {
-        super(charsetCustomizer);
+    public BlockEndCentralDirectoryReader(Function<Charset, Charset> customizeCharset, Block endCentralDirectory) {
+        super(customizeCharset);
         this.endCentralDirectory = endCentralDirectory;
     }
 

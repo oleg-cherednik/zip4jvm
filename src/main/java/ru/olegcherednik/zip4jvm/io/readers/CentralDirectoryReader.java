@@ -17,7 +17,7 @@ import java.util.function.Function;
 public class CentralDirectoryReader implements Reader<CentralDirectory> {
 
     protected final long totalEntries;
-    protected final Function<Charset, Charset> charsetCustomizer;
+    protected final Function<Charset, Charset> customizeCharset;
 
     @Override
     public CentralDirectory read(DataInput in) throws IOException {
@@ -28,7 +28,7 @@ public class CentralDirectoryReader implements Reader<CentralDirectory> {
     }
 
     protected FileHeaderReader getFileHeaderReader() {
-        return new FileHeaderReader(totalEntries, charsetCustomizer);
+        return new FileHeaderReader(totalEntries, customizeCharset);
     }
 
     protected DigitalSignatureReader getDigitalSignatureReader() {
