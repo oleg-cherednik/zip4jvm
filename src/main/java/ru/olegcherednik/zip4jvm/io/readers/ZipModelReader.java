@@ -19,7 +19,7 @@ public final class ZipModelReader extends BaseZipModelReader {
     }
 
     public ZipModel read() throws IOException {
-        readData();
+        readCentralData();
         return new ZipModelBuilder(zip, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
     }
 

@@ -23,7 +23,8 @@ public final class BlockModel {
     private final Block endCentralDirectoryBlock;
     private final Zip64Block zip64Block;
     private final CentralDirectoryBlock centralDirectoryBlock;
-    private final ZipEntryBlock zipEntryBlock = new ZipEntryBlock();
+
+    private final BlockZipEntryModel zipEntryModel;
 
     public static Builder builder() {
         return new Builder();
@@ -39,6 +40,8 @@ public final class BlockModel {
         endCentralDirectoryBlock = builder.endCentralDirectoryBlock;
         zip64Block = builder.zip64Block;
         centralDirectoryBlock = builder.centralDirectoryBlock;
+
+        zipEntryModel = builder.zipEntryModel;
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -53,6 +56,8 @@ public final class BlockModel {
         private Block endCentralDirectoryBlock;
         private Zip64Block zip64Block;
         private CentralDirectoryBlock centralDirectoryBlock;
+
+        private BlockZipEntryModel zipEntryModel;
 
         public BlockModel build() {
             return new BlockModel(this);
@@ -78,6 +83,11 @@ public final class BlockModel {
         public Builder centralDirectory(CentralDirectory centralDirectory, CentralDirectoryBlock block) {
             this.centralDirectory = centralDirectory;
             centralDirectoryBlock = block;
+            return this;
+        }
+
+        public Builder zipEntryModel(BlockZipEntryModel zipEntryModel) {
+            this.zipEntryModel = zipEntryModel;
             return this;
         }
     }

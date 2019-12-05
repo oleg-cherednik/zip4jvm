@@ -7,6 +7,7 @@ import ru.olegcherednik.zip4jvm.io.readers.Zip64Reader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
+import ru.olegcherednik.zip4jvm.model.block.BlockZipEntryModel;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.Zip64Block;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
@@ -31,7 +32,7 @@ public final class BlockModelReader extends BaseZipModelReader {
     }
 
     public BlockModel read() throws IOException {
-        readData();
+        readCentralData();
 
         ZipModel zipModel = new ZipModelBuilder(zip, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
 
@@ -40,6 +41,20 @@ public final class BlockModelReader extends BaseZipModelReader {
                          .endCentralDirectory(endCentralDirectory, endCentralDirectoryBlock)
                          .zip64(zip64, zip64Block)
                          .centralDirectory(centralDirectory, centralDirectoryBlock).build();
+    }
+
+    public BlockModel readWithEntries() throws IOException {
+        readCentralData();
+
+        ZipModel zipModel = new ZipModelBuilder(zip, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
+        BlockZipEntryModel zipEntryModel = new BlockZipEntryModelReader(zipModel, customizeCharset).read();
+
+        return BlockModel.builder()
+                         .zipModel(zipModel)
+                         .endCentralDirectory(endCentralDirectory, endCentralDirectoryBlock)
+                         .zip64(zip64, zip64Block)
+                         .centralDirectory(centralDirectory, centralDirectoryBlock)
+                         .zipEntryModel(zipEntryModel).build();
     }
 
     @Override

@@ -7,7 +7,6 @@ import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.io.readers.block.BlockModelReader;
-import ru.olegcherednik.zip4jvm.io.readers.block.BlockZipEntryModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.aes.AesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.io.readers.block.pkware.PkwareEncryptionHeader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
@@ -64,16 +63,14 @@ public final class DecomposeEngine {
 
     public void decompose() throws IOException {
         Function<Charset, Charset> customizeCharset = Charsets.STANDARD_ZIP_CHARSET;
-        BlockModel blockModel = new BlockModelReader(zip, customizeCharset).read();
-        BlockZipEntryModel zipEntryModel =
-                new BlockZipEntryModelReader(blockModel.getZipModel(), customizeCharset, blockModel.getZipEntryBlock()).read();
+        BlockModel blockModel = new BlockModelReader(zip, customizeCharset).readWithEntries();
 
         Files.createDirectories(destDir);
 
         writeEndCentralDirectory(blockModel);
         writeZip64(blockModel);
         writeCentralDirectory(blockModel);
-        writeZipEntries(blockModel, zipEntryModel);
+        writeZipEntries(blockModel);
     }
 
     private void writeEndCentralDirectory(BlockModel blockModel) throws IOException {
@@ -149,7 +146,12 @@ public final class DecomposeEngine {
         }
     }
 
-    private void writeZipEntries(BlockModel blockModel, BlockZipEntryModel zipEntryModel) throws IOException {
+    private void writeZipEntries(BlockModel blockModel) throws IOException {
+        BlockZipEntryModel zipEntryModel = blockModel.getZipEntryModel();
+
+        if (blockModel.getZipEntryModel() == null)
+            return;
+
         Path dir = destDir.resolve("entries");
         Files.createDirectories(dir);
 

@@ -42,7 +42,7 @@ public abstract class BaseZipModelReader {
     protected Zip64 zip64;
     protected CentralDirectory centralDirectory;
 
-    protected final void readData() throws IOException {
+    protected final void readCentralData() throws IOException {
         try (DataInput in = new SingleZipInputStream(zip)) {
             findCentralDirectorySignature(in);
             endCentralDirectory = readEndCentralDirectory(in);

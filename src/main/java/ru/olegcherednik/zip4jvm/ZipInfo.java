@@ -6,11 +6,9 @@ import ru.olegcherednik.zip4jvm.engine.DecomposeEngine;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.io.readers.block.BlockModelReader;
-import ru.olegcherednik.zip4jvm.io.readers.block.BlockZipEntryModelReader;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
-import ru.olegcherednik.zip4jvm.model.block.BlockZipEntryModel;
 import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.Zip64View;
@@ -49,14 +47,12 @@ public final class ZipInfo {
         final int offs = 4;
         final int columnWidth = 52;
 
-        BlockModel blockModel = new BlockModelReader(zip, charsetCustomizer).read();
-        BlockZipEntryModel zipEntryModel =
-                new BlockZipEntryModelReader(blockModel.getZipModel(), charsetCustomizer, blockModel.getZipEntryBlock()).read();
+        BlockModel blockModel = new BlockModelReader(zip, charsetCustomizer).readWithEntries();
 
         boolean emptyLine = createEndCentralDirectoryView(blockModel, charset, offs, columnWidth).print(out);
         emptyLine = createZip64View(blockModel, offs, columnWidth).print(out, emptyLine);
         emptyLine = createCentralDirectoryView(blockModel, charset, offs, columnWidth).print(out, emptyLine);
-        createZipEntriesView(blockModel, zipEntryModel, charset, offs, columnWidth).print(out, emptyLine);
+        createZipEntriesView(blockModel, charset, offs, columnWidth).print(out, emptyLine);
     }
 
     private static IView createEndCentralDirectoryView(BlockModel blockModel, Charset charset, int offs, int columnWidth) {
@@ -86,9 +82,9 @@ public final class ZipInfo {
                                    .columnWidth(columnWidth).build();
     }
 
-    private static IView createZipEntriesView(BlockModel blockModel, BlockZipEntryModel zipEntryModel, Charset charset, int offs, int columnWidth) {
+    private static IView createZipEntriesView(BlockModel blockModel, Charset charset, int offs, int columnWidth) {
         return ZipEntryListView.builder()
-                               .blockZipEntryModel(zipEntryModel)
+                               .blockZipEntryModel(blockModel.getZipEntryModel())
                                .getDataFunc(getDataFunc(blockModel))
                                .charset(charset)
                                .offs(offs)

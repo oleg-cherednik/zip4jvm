@@ -32,7 +32,7 @@ public class BlockZipEntryModelReader {
 
     private final ZipModel zipModel;
     private final Function<Charset, Charset> customizeCharset;
-    private final ZipEntryBlock zipEntryBlock;
+    private final ZipEntryBlock zipEntryBlock = new ZipEntryBlock();
 
     public BlockZipEntryModel read() throws IOException {
         Map<String, LocalFileHeader> localFileHeaders = new LinkedHashMap<>();
