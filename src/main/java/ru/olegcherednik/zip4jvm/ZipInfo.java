@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.engine.DecomposeEngine;
+import ru.olegcherednik.zip4jvm.engine.decompose.DecomposeEngine;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 
 import java.io.IOException;

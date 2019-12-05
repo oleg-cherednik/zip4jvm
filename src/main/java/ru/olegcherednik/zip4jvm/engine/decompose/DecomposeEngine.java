@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.engine;
+package ru.olegcherednik.zip4jvm.engine.decompose;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
@@ -59,24 +59,26 @@ public final class DecomposeEngine {
     private final Path zip;
     private final ZipInfoSettings settings;
 
+    public void decompose(PrintStream out) throws IOException {
+        BlockModel blockModel = new BlockModelReader(zip, settings.getCustomizeCharset()).readWithEntries();
+
+        boolean emptyLine = new EndCentralDirectoryDecompose(blockModel, settings).createEndCentralDirectoryView().print(out);
+        emptyLine = createZip64View(blockModel).print(out, emptyLine);
+        emptyLine = createCentralDirectoryView(blockModel).print(out, emptyLine);
+        createZipEntriesView(blockModel).print(out, emptyLine);
+    }
+
     public void decompose(Path destDir) throws IOException {
         BlockModel blockModel = new BlockModelReader(zip, settings.getCustomizeCharset()).readWithEntries();
 
         Files.createDirectories(destDir);
 
+        new EndCentralDirectoryDecompose(blockModel, settings).writeEndCentralDirectory(destDir);
+
         writeEndCentralDirectory(destDir, blockModel);
         writeZip64(destDir, blockModel);
         writeCentralDirectory(destDir, blockModel);
         writeZipEntries(destDir, blockModel);
-    }
-
-    public void decompose(PrintStream out) throws IOException {
-        BlockModel blockModel = new BlockModelReader(zip, settings.getCustomizeCharset()).readWithEntries();
-
-        boolean emptyLine = createEndCentralDirectoryView(blockModel).print(out);
-        emptyLine = createZip64View(blockModel).print(out, emptyLine);
-        emptyLine = createCentralDirectoryView(blockModel).print(out, emptyLine);
-        createZipEntriesView(blockModel).print(out, emptyLine);
     }
 
     private EndCentralDirectoryView createEndCentralDirectoryView(BlockModel blockModel) {
