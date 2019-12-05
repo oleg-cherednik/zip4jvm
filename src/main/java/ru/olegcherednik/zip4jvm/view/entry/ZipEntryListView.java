@@ -2,13 +2,11 @@ package ru.olegcherednik.zip4jvm.view.entry;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockZipEntryModel;
-import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
@@ -76,8 +74,10 @@ public final class ZipEntryListView extends View {
         private int offs;
         private int columnWidth;
 
-        public IView build() {
-            return blockZipEntryModel == null || MapUtils.isEmpty(blockZipEntryModel.getLocalFileHeaders()) ? IView.NULL : new ZipEntryListView(this);
+        public ZipEntryListView build() {
+            // blockZipEntryModel == null
+            // MapUtils.isEmpty(blockZipEntryModel.getLocalFileHeaders()
+            return new ZipEntryListView(this);
         }
 
         public Builder blockZipEntryModel(BlockZipEntryModel blockZipEntryModel) {
