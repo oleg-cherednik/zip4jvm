@@ -2,12 +2,12 @@ package ru.olegcherednik.zip4jvm;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.engine.DecomposeEngine;
-import ru.olegcherednik.zip4jvm.model.Charsets;
-import ru.olegcherednik.zip4jvm.model.settings.DecomposeSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireExists;
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
@@ -21,6 +21,7 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireRegularFile;
 public final class ZipInfo {
 
     private final Path zip;
+    private ZipInfoSettings settings = ZipInfoSettings.DEFAULT;
 
     public static ZipInfo zip(Path zip) {
         requireNotNull(zip, "ZipInfo.zip");
@@ -29,19 +30,16 @@ public final class ZipInfo {
         return new ZipInfo(zip);
     }
 
+    public ZipInfo settings(ZipInfoSettings settings) {
+        this.settings = Optional.ofNullable(settings).orElse(ZipInfoSettings.DEFAULT);
+        return this;
+    }
+
     public void getShortInfo(PrintStream out) throws IOException {
-        DecomposeSettings settings = DecomposeSettings.builder()
-                                                      .customizeCharset(charset -> Charsets.UTF_8)
-                                                      .offs(4)
-                                                      .columnWidth(52).build();
-        new DecomposeEngine(zip, settings).getShortInfo(out);
+        new DecomposeEngine(zip, settings).decompose(out);
     }
 
     public void decompose(Path destDir) throws IOException {
-        DecomposeSettings settings = DecomposeSettings.builder()
-                                                      .customizeCharset(charset -> Charsets.UTF_8)
-                                                      .offs(4)
-                                                      .columnWidth(52).build();
         new DecomposeEngine(zip, settings).decompose(destDir);
     }
 

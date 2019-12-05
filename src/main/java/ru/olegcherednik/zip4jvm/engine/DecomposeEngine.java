@@ -24,7 +24,7 @@ import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.block.Zip64Block;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.model.settings.DecomposeSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.Zip64View;
@@ -57,7 +57,7 @@ import java.util.function.Function;
 public final class DecomposeEngine {
 
     private final Path zip;
-    private final DecomposeSettings settings;
+    private final ZipInfoSettings settings;
 
     public void decompose(Path destDir) throws IOException {
         BlockModel blockModel = new BlockModelReader(zip, settings.getCustomizeCharset()).readWithEntries();
@@ -70,13 +70,37 @@ public final class DecomposeEngine {
         writeZipEntries(destDir, blockModel);
     }
 
-    public void getShortInfo(PrintStream out) throws IOException {
+    public void decompose(PrintStream out) throws IOException {
         BlockModel blockModel = new BlockModelReader(zip, settings.getCustomizeCharset()).readWithEntries();
 
         boolean emptyLine = createEndCentralDirectoryView(blockModel).print(out);
         emptyLine = createZip64View(blockModel).print(out, emptyLine);
         emptyLine = createCentralDirectoryView(blockModel).print(out, emptyLine);
         createZipEntriesView(blockModel).print(out, emptyLine);
+    }
+
+    private EndCentralDirectoryView createEndCentralDirectoryView(BlockModel blockModel) {
+        return EndCentralDirectoryView.builder()
+                                      .endCentralDirectory(blockModel.getEndCentralDirectory())
+                                      .block(blockModel.getEndCentralDirectoryBlock())
+                                      .charset(settings.getCharset())
+                                      .position(settings.getOffs(), settings.getColumnWidth()).build();
+    }
+
+    private IView createZip64View(BlockModel blockModel) {
+        return Zip64View.builder()
+                        .zip64(blockModel.getZip64())
+                        .block(blockModel.getZip64Block())
+                        .position(settings.getOffs(), settings.getColumnWidth()).build();
+    }
+
+    private CentralDirectoryView createCentralDirectoryView(BlockModel blockModel) {
+        return CentralDirectoryView.builder()
+                                   .centralDirectory(blockModel.getCentralDirectory())
+                                   .diagCentralDirectory(blockModel.getCentralDirectoryBlock())
+                                   .getDataFunc(getDataFunc(blockModel))
+                                   .charset(settings.getCharset())
+                                   .position(settings.getOffs(), settings.getColumnWidth()).build();
     }
 
     private IView createZipEntriesView(BlockModel blockModel) {
@@ -268,36 +292,11 @@ public final class DecomposeEngine {
         }
     }
 
-    private CentralDirectoryView createCentralDirectoryView(BlockModel blockModel) {
-        return CentralDirectoryView.builder()
-                                   .centralDirectory(blockModel.getCentralDirectory())
-                                   .diagCentralDirectory(blockModel.getCentralDirectoryBlock())
-                                   .getDataFunc(getDataFunc(blockModel))
-                                   .charset(settings.getCharset())
-                                   .position(settings.getOffs(), settings.getColumnWidth()).build();
-    }
-
-    private EndCentralDirectoryView createEndCentralDirectoryView(BlockModel blockModel) {
-        return EndCentralDirectoryView.builder()
-                                      .endCentralDirectory(blockModel.getEndCentralDirectory())
-                                      .block(blockModel.getEndCentralDirectoryBlock())
-                                      .charset(settings.getCharset())
-                                      .position(settings.getOffs(), settings.getColumnWidth()).build();
-    }
-
     private Zip64View.EndCentralDirectoryLocatorView createZip64EndCentralDirectoryLocatorView(Zip64 zip64, Zip64Block block) {
         return Zip64View.EndCentralDirectoryLocatorView.builder()
                                                        .locator(zip64.getEndCentralDirectoryLocator())
                                                        .block(block.getEndCentralDirectoryLocatorBlock())
                                                        .position(settings.getOffs(), settings.getColumnWidth()).build();
-    }
-
-    @SuppressWarnings("NewMethodNamingConvention")
-    private IView createZip64View(BlockModel blockModel) {
-        return Zip64View.builder()
-                        .zip64(blockModel.getZip64())
-                        .block(blockModel.getZip64Block())
-                        .position(settings.getOffs(), settings.getColumnWidth()).build();
     }
 
     private Zip64View.EndCentralDirectoryView createZip64EndCentralDirectoryView(Zip64 zip64, Zip64Block block) {

@@ -12,7 +12,9 @@ import java.util.function.Function;
  * @since 05.12.2019
  */
 @Getter
-public final class DecomposeSettings {
+public final class ZipInfoSettings {
+
+    public static final ZipInfoSettings DEFAULT = builder().build();
 
     private final Function<Charset, Charset> customizeCharset;
     private final int offs;
@@ -22,7 +24,7 @@ public final class DecomposeSettings {
         return new Builder();
     }
 
-    private DecomposeSettings(Builder builder) {
+    private ZipInfoSettings(Builder builder) {
         customizeCharset = builder.customizeCharset;
         offs = builder.offs;
         columnWidth = builder.columnWidth;
@@ -34,12 +36,12 @@ public final class DecomposeSettings {
 
     public static final class Builder {
 
-        private Function<Charset, Charset> customizeCharset = Charsets.UNMODIFIED;
-        private int offs;
-        private int columnWidth;
+        private Function<Charset, Charset> customizeCharset = ch -> Charsets.UTF_8;
+        private int offs = 4;
+        private int columnWidth = 52;
 
-        public DecomposeSettings build() {
-            return new DecomposeSettings(this);
+        public ZipInfoSettings build() {
+            return new ZipInfoSettings(this);
         }
 
         public Builder customizeCharset(Function<Charset, Charset> customizeCharset) {
