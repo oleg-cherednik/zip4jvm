@@ -26,9 +26,11 @@ import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.settings.DecomposeSettings;
 import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
+import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.Zip64View;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.CentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.FileHeaderView;
+import ru.olegcherednik.zip4jvm.view.entry.ZipEntryListView;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntryView;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldRecordView;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
@@ -66,6 +68,23 @@ public final class DecomposeEngine {
         writeZip64(destDir, blockModel);
         writeCentralDirectory(destDir, blockModel);
         writeZipEntries(destDir, blockModel);
+    }
+
+    public void getShortInfo(PrintStream out) throws IOException {
+        BlockModel blockModel = new BlockModelReader(zip, settings.getCustomizeCharset()).readWithEntries();
+
+        boolean emptyLine = createEndCentralDirectoryView(blockModel).print(out);
+        emptyLine = createZip64View(blockModel).print(out, emptyLine);
+        emptyLine = createCentralDirectoryView(blockModel).print(out, emptyLine);
+        createZipEntriesView(blockModel).print(out, emptyLine);
+    }
+
+    private IView createZipEntriesView(BlockModel blockModel) {
+        return ZipEntryListView.builder()
+                               .blockZipEntryModel(blockModel.getZipEntryModel())
+                               .getDataFunc(getDataFunc(blockModel))
+                               .charset(settings.getCharset())
+                               .position(settings.getOffs(), settings.getColumnWidth()).build();
     }
 
     private void writeEndCentralDirectory(Path destDir, BlockModel blockModel) throws IOException {
@@ -271,6 +290,14 @@ public final class DecomposeEngine {
                                                        .locator(zip64.getEndCentralDirectoryLocator())
                                                        .block(block.getEndCentralDirectoryLocatorBlock())
                                                        .position(settings.getOffs(), settings.getColumnWidth()).build();
+    }
+
+    @SuppressWarnings("NewMethodNamingConvention")
+    private IView createZip64View(BlockModel blockModel) {
+        return Zip64View.builder()
+                        .zip64(blockModel.getZip64())
+                        .block(blockModel.getZip64Block())
+                        .position(settings.getOffs(), settings.getColumnWidth()).build();
     }
 
     private Zip64View.EndCentralDirectoryView createZip64EndCentralDirectoryView(Zip64 zip64, Zip64Block block) {
