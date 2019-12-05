@@ -158,8 +158,7 @@ public final class FileHeaderView extends View {
                       .block(diagFileHeader.getExtraFieldBlock())
                       .generalPurposeFlag(fileHeader.getGeneralPurposeFlag())
                       .getDataFunc(getDataFunc)
-                      .offs(offs)
-                      .columnWidth(columnWidth).build().print(out);
+                      .position(offs, columnWidth).build().print(out);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

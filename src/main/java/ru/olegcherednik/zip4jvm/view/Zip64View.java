@@ -48,8 +48,7 @@ public final class Zip64View extends View {
         return EndCentralDirectoryView.builder()
                                       .endCentralDirectory(zip64.getEndCentralDirectory())
                                       .block(block.getEndCentralDirectoryBlock())
-                                      .offs(offs)
-                                      .columnWidth(columnWidth).build();
+                                      .position(offs, columnWidth).build();
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -208,12 +207,8 @@ public final class Zip64View extends View {
                 return this;
             }
 
-            public EndCentralDirectoryView.Builder offs(int offs) {
+            public EndCentralDirectoryView.Builder position(int offs, int columnWidth) {
                 this.offs = offs;
-                return this;
-            }
-
-            public EndCentralDirectoryView.Builder columnWidth(int columnWidth) {
                 this.columnWidth = columnWidth;
                 return this;
             }

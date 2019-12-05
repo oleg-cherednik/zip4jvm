@@ -34,7 +34,7 @@ public final class ZipModelBuilder {
     private final Function<Charset, Charset> charsetCustomizer;
 
     public static ZipModel read(Path zip) throws IOException {
-        return read(zip, Charsets.STANDARD_ZIP_CHARSET);
+        return read(zip, Charsets.UNMODIFIED);
     }
 
     public static ZipModel read(Path zip, Function<Charset, Charset> charsetCustomizer) throws IOException {

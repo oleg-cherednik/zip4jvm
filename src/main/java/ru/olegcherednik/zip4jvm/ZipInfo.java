@@ -9,6 +9,7 @@ import ru.olegcherednik.zip4jvm.io.readers.block.BlockModelReader;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
+import ru.olegcherednik.zip4jvm.model.settings.DecomposeSettings;
 import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.Zip64View;
@@ -103,7 +104,11 @@ public final class ZipInfo {
     }
 
     public void decompose(Path destDir) throws IOException {
-        new DecomposeEngine(zip, destDir, Charsets.UTF_8, 4, 52).decompose();
+        DecomposeSettings settings = DecomposeSettings.builder()
+                                                      .customizeCharset(charset -> Charsets.UTF_8)
+                                                      .offs(4)
+                                                      .columnWidth(52).build();
+        new DecomposeEngine(zip, settings).decompose(destDir);
     }
 
 }

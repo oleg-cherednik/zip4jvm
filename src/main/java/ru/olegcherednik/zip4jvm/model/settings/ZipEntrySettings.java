@@ -14,6 +14,10 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import java.util.function.Function;
 
+/**
+ * @author Oleg Cherednik
+ * @since 05.09.2019
+ */
 @Getter
 public final class ZipEntrySettings {
 

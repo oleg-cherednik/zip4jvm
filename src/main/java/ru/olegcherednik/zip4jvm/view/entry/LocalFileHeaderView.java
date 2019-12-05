@@ -122,8 +122,7 @@ final class LocalFileHeaderView extends View {
                       .block(diagLocalFileHeader.getExtraFieldBlock())
                       .generalPurposeFlag(localFileHeader.getGeneralPurposeFlag())
                       .getDataFunc(getDataFunc)
-                      .offs(offs)
-                      .columnWidth(columnWidth).build().print(out);
+                      .position(offs, columnWidth).build().print(out);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

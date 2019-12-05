@@ -10,7 +10,6 @@ import ru.olegcherednik.zip4jvm.io.readers.block.BlockModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.aes.AesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.io.readers.block.pkware.PkwareEncryptionHeader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
@@ -25,6 +24,7 @@ import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.block.Zip64Block;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.model.settings.DecomposeSettings;
 import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.Zip64View;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.CentralDirectoryView;
@@ -38,7 +38,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.RandomAccessFile;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -56,24 +55,20 @@ import java.util.function.Function;
 public final class DecomposeEngine {
 
     private final Path zip;
-    private final Path destDir;
-    private final Charset charset;
-    private final int offs;
-    private final int columnWidth;
+    private final DecomposeSettings settings;
 
-    public void decompose() throws IOException {
-        Function<Charset, Charset> customizeCharset = Charsets.STANDARD_ZIP_CHARSET;
-        BlockModel blockModel = new BlockModelReader(zip, customizeCharset).readWithEntries();
+    public void decompose(Path destDir) throws IOException {
+        BlockModel blockModel = new BlockModelReader(zip, settings.getCustomizeCharset()).readWithEntries();
 
         Files.createDirectories(destDir);
 
-        writeEndCentralDirectory(blockModel);
-        writeZip64(blockModel);
-        writeCentralDirectory(blockModel);
-        writeZipEntries(blockModel);
+        writeEndCentralDirectory(destDir, blockModel);
+        writeZip64(destDir, blockModel);
+        writeCentralDirectory(destDir, blockModel);
+        writeZipEntries(destDir, blockModel);
     }
 
-    private void writeEndCentralDirectory(BlockModel blockModel) throws IOException {
+    private void writeEndCentralDirectory(Path destDir, BlockModel blockModel) throws IOException {
         try (PrintStream out = new PrintStream(destDir.resolve("end_central_directory.txt").toFile())) {
             createEndCentralDirectoryView(blockModel).print(out);
         }
@@ -81,7 +76,7 @@ public final class DecomposeEngine {
         copyLarge(blockModel.getZipModel().getFile(), destDir.resolve("end_central_directory.data"), blockModel.getEndCentralDirectoryBlock());
     }
 
-    private void writeZip64(BlockModel blockModel) throws IOException {
+    private void writeZip64(Path destDir, BlockModel blockModel) throws IOException {
         if (blockModel.getZip64() == Zip64.NULL)
             return;
 
@@ -105,7 +100,7 @@ public final class DecomposeEngine {
                 blockModel.getZip64Block().getEndCentralDirectoryBlock());
     }
 
-    private void writeCentralDirectory(BlockModel blockModel) throws IOException {
+    private void writeCentralDirectory(Path destDir, BlockModel blockModel) throws IOException {
         Path dir = destDir.resolve("central_directory");
         Files.createDirectories(dir);
 
@@ -134,9 +129,9 @@ public final class DecomposeEngine {
                               .diagFileHeader(block)
                               .getDataFunc(getDataFunc(blockModel))
                               .pos(pos)
-                              .charset(charset)
-                              .offs(offs)
-                              .columnWidth(columnWidth).build().print(out);
+                              .charset(settings.getCharset())
+                              .offs(settings.getOffs())
+                              .columnWidth(settings.getColumnWidth()).build().print(out);
             }
 
             copyLarge(blockModel.getZipModel().getFile(), subDir.resolve("file_header.data"), block);
@@ -146,7 +141,7 @@ public final class DecomposeEngine {
         }
     }
 
-    private void writeZipEntries(BlockModel blockModel) throws IOException {
+    private void writeZipEntries(Path destDir, BlockModel blockModel) throws IOException {
         BlockZipEntryModel zipEntryModel = blockModel.getZipEntryModel();
 
         if (blockModel.getZipEntryModel() == null)
@@ -183,9 +178,9 @@ public final class DecomposeEngine {
                             .dataDescriptor(zipEntryModel.getDataDescriptors().get(fileName))
                             .blockDataDescriptor(block.getDataDescriptor(fileName))
                             .getDataFunc(getDataFunc(blockModel))
-                            .charset(charset)
-                            .offs(4)
-                            .columnWidth(52).build().print(out);
+                            .charset(settings.getCharset())
+                            .offs(settings.getOffs())
+                            .columnWidth(settings.getColumnWidth()).build().print(out);
             }
 
             // print zip entry
@@ -259,33 +254,30 @@ public final class DecomposeEngine {
                                    .centralDirectory(blockModel.getCentralDirectory())
                                    .diagCentralDirectory(blockModel.getCentralDirectoryBlock())
                                    .getDataFunc(getDataFunc(blockModel))
-                                   .charset(charset)
-                                   .offs(offs)
-                                   .columnWidth(columnWidth).build();
+                                   .charset(settings.getCharset())
+                                   .position(settings.getOffs(), settings.getColumnWidth()).build();
     }
 
     private EndCentralDirectoryView createEndCentralDirectoryView(BlockModel blockModel) {
         return EndCentralDirectoryView.builder()
                                       .endCentralDirectory(blockModel.getEndCentralDirectory())
                                       .block(blockModel.getEndCentralDirectoryBlock())
-                                      .charset(charset)
-                                      .offs(offs)
-                                      .columnWidth(columnWidth).build();
+                                      .charset(settings.getCharset())
+                                      .position(settings.getOffs(), settings.getColumnWidth()).build();
     }
 
     private Zip64View.EndCentralDirectoryLocatorView createZip64EndCentralDirectoryLocatorView(Zip64 zip64, Zip64Block block) {
         return Zip64View.EndCentralDirectoryLocatorView.builder()
                                                        .locator(zip64.getEndCentralDirectoryLocator())
                                                        .block(block.getEndCentralDirectoryLocatorBlock())
-                                                       .position(offs, columnWidth).build();
+                                                       .position(settings.getOffs(), settings.getColumnWidth()).build();
     }
 
     private Zip64View.EndCentralDirectoryView createZip64EndCentralDirectoryView(Zip64 zip64, Zip64Block block) {
         return Zip64View.EndCentralDirectoryView.builder()
                                                 .endCentralDirectory(zip64.getEndCentralDirectory())
                                                 .block(block.getEndCentralDirectoryBlock())
-                                                .offs(offs)
-                                                .columnWidth(columnWidth).build();
+                                                .position(settings.getOffs(), settings.getColumnWidth()).build();
     }
 
     private static void copyLarge(Path in, Path out, Block block) throws IOException {
@@ -398,7 +390,7 @@ public final class DecomposeEngine {
                                                       .block(block)
                                                       .generalPurposeFlag(generalPurposeFlag)
                                                       .getDataFunc(getDataFunc(blockModel))
-                                                      .columnWidth(columnWidth).build();
+                                                      .position(0, settings.getColumnWidth()).build();
 
         for (int signature : extraField.getSignatures()) {
             ExtraField.Record record = extraField.getRecord(signature);

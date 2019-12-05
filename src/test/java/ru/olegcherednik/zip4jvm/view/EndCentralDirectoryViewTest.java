@@ -37,8 +37,7 @@ public class EndCentralDirectoryViewTest {
                                                                      .endCentralDirectory(endCentralDirectory)
                                                                      .block(block)
                                                                      .charset(Charsets.UTF_8)
-                                                                     .offs(2)
-                                                                     .columnWidth(52).build());
+                                                                     .position(2, 52).build());
         assertThat(lines).hasSize(13);
         assertThat(lines[0]).isEqualTo("(PK0506) End of Central directory record");
         assertThat(lines[1]).isEqualTo("========================================");
