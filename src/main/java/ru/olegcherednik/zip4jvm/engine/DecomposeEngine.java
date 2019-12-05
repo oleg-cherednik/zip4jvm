@@ -65,8 +65,8 @@ public final class DecomposeEngine {
     public void decompose() throws IOException {
         Function<Charset, Charset> customizeCharset = Charsets.STANDARD_ZIP_CHARSET;
         BlockModel blockModel = new BlockModelReader(zip, customizeCharset).read();
-        BlockZipEntryModel zipEntryModel = new BlockZipEntryModelReader(blockModel.getZipModel(), customizeCharset,
-                blockModel.getDiagnostic().getZipEntryBlock()).read();
+        BlockZipEntryModel zipEntryModel =
+                new BlockZipEntryModelReader(blockModel.getZipModel(), customizeCharset, blockModel.getZipEntryBlock()).read();
 
         Files.createDirectories(destDir);
 
@@ -81,8 +81,7 @@ public final class DecomposeEngine {
             createEndCentralDirectoryView(blockModel).print(out);
         }
 
-        copyLarge(blockModel.getZipModel().getFile(), destDir.resolve("end_central_directory.data"),
-                blockModel.getDiagnostic().getEndCentralDirectoryBlock());
+        copyLarge(blockModel.getZipModel().getFile(), destDir.resolve("end_central_directory.data"), blockModel.getEndCentralDirectoryBlock());
     }
 
     private void writeZip64(BlockModel blockModel) throws IOException {
@@ -94,19 +93,19 @@ public final class DecomposeEngine {
 
         // (PK0607) ZIP64 End of Central directory locator
         try (PrintStream out = new PrintStream(dir.resolve("zip64_end_central_directory_locator.txt").toFile())) {
-            createZip64EndCentralDirectoryLocatorView(blockModel.getZip64(), blockModel.getDiagnostic().getZip64Block()).print(out);
+            createZip64EndCentralDirectoryLocatorView(blockModel.getZip64(), blockModel.getZip64Block()).print(out);
         }
 
         copyLarge(blockModel.getZipModel().getFile(), dir.resolve("zip64_end_central_directory_locator.data"),
-                blockModel.getDiagnostic().getZip64Block().getEndCentralDirectoryLocatorBlock());
+                blockModel.getZip64Block().getEndCentralDirectoryLocatorBlock());
 
         // (PK0606) ZIP64 End of Central directory record
         try (PrintStream out = new PrintStream(dir.resolve("zip64_end_central_directory.txt").toFile())) {
-            createZip64EndCentralDirectoryView(blockModel.getZip64(), blockModel.getDiagnostic().getZip64Block()).print(out);
+            createZip64EndCentralDirectoryView(blockModel.getZip64(), blockModel.getZip64Block()).print(out);
         }
 
         copyLarge(blockModel.getZipModel().getFile(), dir.resolve("zip64_end_central_directory.data"),
-                blockModel.getDiagnostic().getZip64Block().getEndCentralDirectoryBlock());
+                blockModel.getZip64Block().getEndCentralDirectoryBlock());
     }
 
     private void writeCentralDirectory(BlockModel blockModel) throws IOException {
@@ -122,7 +121,7 @@ public final class DecomposeEngine {
         for (CentralDirectory.FileHeader fileHeader : blockModel.getCentralDirectory().getFileHeaders()) {
             String fileName = fileHeader.getFileName();
             ZipEntry zipEntry = blockModel.getZipModel().getZipEntryByFileName(fileName);
-            CentralDirectoryBlock.FileHeaderBlock block = blockModel.getDiagnostic().getCentralDirectoryBlock().getFileHeaderBlock(fileName);
+            CentralDirectoryBlock.FileHeaderBlock block = blockModel.getCentralDirectoryBlock().getFileHeaderBlock(fileName);
 
             if (zipEntry.isDirectory())
                 fileName = fileName.substring(0, fileName.length() - 1);
@@ -256,7 +255,7 @@ public final class DecomposeEngine {
     private CentralDirectoryView createCentralDirectoryView(BlockModel blockModel) {
         return CentralDirectoryView.builder()
                                    .centralDirectory(blockModel.getCentralDirectory())
-                                   .diagCentralDirectory(blockModel.getDiagnostic().getCentralDirectoryBlock())
+                                   .diagCentralDirectory(blockModel.getCentralDirectoryBlock())
                                    .getDataFunc(getDataFunc(blockModel))
                                    .charset(charset)
                                    .offs(offs)
@@ -266,7 +265,7 @@ public final class DecomposeEngine {
     private EndCentralDirectoryView createEndCentralDirectoryView(BlockModel blockModel) {
         return EndCentralDirectoryView.builder()
                                       .endCentralDirectory(blockModel.getEndCentralDirectory())
-                                      .block(blockModel.getDiagnostic().getEndCentralDirectoryBlock())
+                                      .block(blockModel.getEndCentralDirectoryBlock())
                                       .charset(charset)
                                       .offs(offs)
                                       .columnWidth(columnWidth).build();

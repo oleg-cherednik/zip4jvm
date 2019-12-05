@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.exception.SignatureWasNotFoundException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
@@ -44,7 +44,7 @@ public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader
         long offs = in.getOffs();
 
         if (in.readDwordSignature() != CentralDirectory.FileHeader.SIGNATURE)
-            throw new Zip4jvmException("Expected central directory entry not found offs=" + offs);
+            throw new SignatureWasNotFoundException(CentralDirectory.FileHeader.SIGNATURE, "CentralDirectory", offs);
 
         in.backward(in.dwordSignatureSize());
     }

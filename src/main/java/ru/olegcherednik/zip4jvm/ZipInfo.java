@@ -50,8 +50,8 @@ public final class ZipInfo {
         final int columnWidth = 52;
 
         BlockModel blockModel = new BlockModelReader(zip, charsetCustomizer).read();
-        BlockZipEntryModel zipEntryModel = new BlockZipEntryModelReader(blockModel.getZipModel(), charsetCustomizer,
-                blockModel.getDiagnostic().getZipEntryBlock()).read();
+        BlockZipEntryModel zipEntryModel =
+                new BlockZipEntryModelReader(blockModel.getZipModel(), charsetCustomizer, blockModel.getZipEntryBlock()).read();
 
         boolean emptyLine = createEndCentralDirectoryView(blockModel, charset, offs, columnWidth).print(out);
         emptyLine = createZip64View(blockModel, offs, columnWidth).print(out, emptyLine);
@@ -62,7 +62,7 @@ public final class ZipInfo {
     private static IView createEndCentralDirectoryView(BlockModel blockModel, Charset charset, int offs, int columnWidth) {
         return EndCentralDirectoryView.builder()
                                       .endCentralDirectory(blockModel.getEndCentralDirectory())
-                                      .block(blockModel.getDiagnostic().getEndCentralDirectoryBlock())
+                                      .block(blockModel.getEndCentralDirectoryBlock())
                                       .charset(charset)
                                       .offs(offs)
                                       .columnWidth(columnWidth).build();
@@ -72,7 +72,7 @@ public final class ZipInfo {
     private static IView createZip64View(BlockModel blockModel, int offs, int columnWidth) {
         return Zip64View.builder()
                         .zip64(blockModel.getZip64())
-                        .block(blockModel.getDiagnostic().getZip64Block())
+                        .block(blockModel.getZip64Block())
                         .offs(offs)
                         .columnWidth(columnWidth).build();
     }
@@ -80,7 +80,7 @@ public final class ZipInfo {
     private static IView createCentralDirectoryView(BlockModel blockModel, Charset charset, int offs, int columnWidth) {
         return CentralDirectoryView.builder()
                                    .centralDirectory(blockModel.getCentralDirectory())
-                                   .diagCentralDirectory(blockModel.getDiagnostic().getCentralDirectoryBlock())
+                                   .diagCentralDirectory(blockModel.getCentralDirectoryBlock())
                                    .charset(charset)
                                    .offs(offs)
                                    .columnWidth(columnWidth).build();

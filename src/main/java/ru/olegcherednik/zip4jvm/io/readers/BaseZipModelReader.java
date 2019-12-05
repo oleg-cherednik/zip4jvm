@@ -52,14 +52,11 @@ public abstract class BaseZipModelReader {
     }
 
     private EndCentralDirectory readEndCentralDirectory(DataInput in) throws IOException {
-        try {
-            return getEndCentralDirectoryReader().read(in);
-        } finally {
-            in.seek(MARKER_END_CENTRAL_DIRECTORY);
-        }
+        return getEndCentralDirectoryReader().read(in);
     }
 
     private Zip64 readZip64(DataInput in) throws IOException {
+        in.seek(MARKER_END_CENTRAL_DIRECTORY);
         return getZip64Reader().read(in);
     }
 
@@ -84,8 +81,8 @@ public abstract class BaseZipModelReader {
             commentLength--;
 
             if (in.readDwordSignature() == EndCentralDirectory.SIGNATURE) {
-                in.mark(MARKER_END_CENTRAL_DIRECTORY);
                 in.backward(in.dwordSignatureSize());
+                in.mark(MARKER_END_CENTRAL_DIRECTORY);
                 return;
             }
         } while (commentLength >= 0 && available >= 0);

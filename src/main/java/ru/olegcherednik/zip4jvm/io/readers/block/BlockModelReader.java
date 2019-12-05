@@ -5,8 +5,10 @@ import ru.olegcherednik.zip4jvm.io.readers.CentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.EndCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.Zip64Reader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
-import ru.olegcherednik.zip4jvm.model.block.Diagnostic;
+import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
+import ru.olegcherednik.zip4jvm.model.block.Zip64Block;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 
 import java.io.IOException;
@@ -20,7 +22,9 @@ import java.util.function.Function;
  */
 public final class BlockModelReader extends BaseZipModelReader {
 
-    private final Diagnostic diagnostic = new Diagnostic();
+    private final Block endCentralDirectoryBlock = new Block();
+    private final Zip64Block zip64Block = new Zip64Block();
+    private final CentralDirectoryBlock centralDirectoryBlock = new CentralDirectoryBlock();
 
     public BlockModelReader(Path zip, Function<Charset, Charset> customizeCharset) {
         super(zip, customizeCharset);
@@ -33,25 +37,24 @@ public final class BlockModelReader extends BaseZipModelReader {
 
         return BlockModel.builder()
                          .zipModel(zipModel)
-                         .diagnostic(diagnostic)
-                         .endCentralDirectory(endCentralDirectory)
-                         .zip64(zip64)
-                         .centralDirectory(centralDirectory).build();
+                         .endCentralDirectory(endCentralDirectory, endCentralDirectoryBlock)
+                         .zip64(zip64, zip64Block)
+                         .centralDirectory(centralDirectory, centralDirectoryBlock).build();
     }
 
     @Override
     protected EndCentralDirectoryReader getEndCentralDirectoryReader() {
-        return new BlockEndCentralDirectoryReader(customizeCharset, diagnostic.getEndCentralDirectoryBlock());
+        return new BlockEndCentralDirectoryReader(customizeCharset, endCentralDirectoryBlock);
     }
 
     @Override
     protected Zip64Reader getZip64Reader() {
-        return new BlockZip64Reader(diagnostic.getZip64Block());
+        return new BlockZip64Reader(zip64Block);
     }
 
     @Override
     protected CentralDirectoryReader getCentralDirectoryReader(long totalEntries) {
-        return new BlockCentralDirectoryReader(totalEntries, customizeCharset, diagnostic.getCentralDirectoryBlock());
+        return new BlockCentralDirectoryReader(totalEntries, customizeCharset, centralDirectoryBlock);
     }
 }
 
