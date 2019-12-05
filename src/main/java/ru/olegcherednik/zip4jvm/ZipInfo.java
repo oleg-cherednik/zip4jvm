@@ -60,8 +60,7 @@ public final class ZipInfo {
                                       .endCentralDirectory(blockModel.getEndCentralDirectory())
                                       .block(blockModel.getEndCentralDirectoryBlock())
                                       .charset(charset)
-                                      .offs(offs)
-                                      .columnWidth(columnWidth).build();
+                                      .position(offs, columnWidth).build();
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
@@ -69,8 +68,7 @@ public final class ZipInfo {
         return Zip64View.builder()
                         .zip64(blockModel.getZip64())
                         .block(blockModel.getZip64Block())
-                        .offs(offs)
-                        .columnWidth(columnWidth).build();
+                        .position(offs, columnWidth).build();
     }
 
     private static IView createCentralDirectoryView(BlockModel blockModel, Charset charset, int offs, int columnWidth) {
@@ -78,8 +76,7 @@ public final class ZipInfo {
                                    .centralDirectory(blockModel.getCentralDirectory())
                                    .diagCentralDirectory(blockModel.getCentralDirectoryBlock())
                                    .charset(charset)
-                                   .offs(offs)
-                                   .columnWidth(columnWidth).build();
+                                   .position(offs, columnWidth).build();
     }
 
     private static IView createZipEntriesView(BlockModel blockModel, Charset charset, int offs, int columnWidth) {
@@ -87,8 +84,7 @@ public final class ZipInfo {
                                .blockZipEntryModel(blockModel.getZipEntryModel())
                                .getDataFunc(getDataFunc(blockModel))
                                .charset(charset)
-                               .offs(offs)
-                               .columnWidth(columnWidth).build();
+                               .position(offs, columnWidth).build();
     }
 
     private static Function<Block, byte[]> getDataFunc(BlockModel blockModel) {
