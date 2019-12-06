@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -26,7 +26,7 @@ public final class DecomposeEngine {
         boolean emptyLine = false;
 
         for (BaseDecompose decompose : getDecomposes(createModel()))
-            emptyLine = decompose.createView().print(out, emptyLine);
+            emptyLine = decompose.print(out, emptyLine);
     }
 
     public void decompose(Path destDir) throws IOException {
@@ -42,15 +42,11 @@ public final class DecomposeEngine {
     }
 
     private List<BaseDecompose> getDecomposes(BlockModel blockModel) {
-        List<BaseDecompose> decomposes = new ArrayList<>();
-        decomposes.add(new EndCentralDirectoryDecompose(blockModel, settings));
-        decomposes.add(new Zip64Decompose(blockModel, settings));
-        decomposes.add(new CentralDirectoryDecompose(blockModel, settings));
-
-        if (blockModel.getZipEntryModel() != null)
-            decomposes.add(new ZipEntriesDecompose(blockModel, settings));
-
-        return decomposes;
+        return Arrays.asList(
+                new EndCentralDirectoryDecompose(blockModel, settings),
+                new Zip64Decompose(blockModel, settings),
+                new CentralDirectoryDecompose(blockModel, settings),
+                new ZipEntriesDecompose(blockModel, settings));
     }
 
 }

@@ -22,7 +22,7 @@ final class Zip64Decompose extends BaseDecompose {
     }
 
     @Override
-    public Zip64View createView() {
+    protected Zip64View createView() {
         return Zip64View.builder()
                         .zip64(blockModel.getZip64())
                         .block(blockModel.getZip64Block())

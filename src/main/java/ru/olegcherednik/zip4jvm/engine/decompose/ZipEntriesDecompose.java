@@ -11,6 +11,7 @@ import ru.olegcherednik.zip4jvm.model.block.ByteArrayBlock;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
+import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntryListView;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntryView;
 
@@ -31,9 +32,14 @@ final class ZipEntriesDecompose extends BaseDecompose {
     }
 
     @Override
-    public ZipEntryListView createView() {
+    protected IView createView() {
+        BlockZipEntryModel zipEntryModel = blockModel.getZipEntryModel();
+
+        if (zipEntryModel == null)
+            return IView.NULL;
+
         return ZipEntryListView.builder()
-                               .blockZipEntryModel(blockModel.getZipEntryModel())
+                               .blockZipEntryModel(zipEntryModel)
                                .getDataFunc(getDataFunc(blockModel))
                                .charset(settings.getCharset())
                                .position(settings.getOffs(), settings.getColumnWidth()).build();
@@ -43,7 +49,7 @@ final class ZipEntriesDecompose extends BaseDecompose {
     public void write(Path destDir) throws IOException {
         BlockZipEntryModel zipEntryModel = blockModel.getZipEntryModel();
 
-        if (blockModel.getZipEntryModel() == null)
+        if (zipEntryModel == null)
             return;
 
         Path dir = destDir.resolve("entries");

@@ -19,7 +19,7 @@ final class EndCentralDirectoryDecompose extends BaseDecompose {
     }
 
     @Override
-    public EndCentralDirectoryView createView() {
+    protected EndCentralDirectoryView createView() {
         return EndCentralDirectoryView.builder()
                                       .endCentralDirectory(blockModel.getEndCentralDirectory())
                                       .block(blockModel.getEndCentralDirectoryBlock())

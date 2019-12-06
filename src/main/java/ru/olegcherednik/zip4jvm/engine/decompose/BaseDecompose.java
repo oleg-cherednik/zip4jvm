@@ -34,9 +34,13 @@ abstract class BaseDecompose {
     protected final BlockModel blockModel;
     protected final ZipInfoSettings settings;
 
-    public abstract IView createView();
+    public final boolean print(PrintStream out, boolean emptyLine) {
+        return createView().print(out, emptyLine);
+    }
 
     public abstract void write(Path destDir) throws IOException;
+
+    protected abstract IView createView();
 
     protected static void copyLarge(Path in, Path out, Block block) throws IOException {
         copyLarge(in, out, block.getOffs(), block.getSize());

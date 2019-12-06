@@ -25,7 +25,7 @@ final class CentralDirectoryDecompose extends BaseDecompose {
     }
 
     @Override
-    public CentralDirectoryView createView() {
+    protected CentralDirectoryView createView() {
         return CentralDirectoryView.builder()
                                    .centralDirectory(blockModel.getCentralDirectory())
                                    .diagCentralDirectory(blockModel.getCentralDirectoryBlock())
