@@ -8,6 +8,7 @@ import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
@@ -17,6 +18,7 @@ import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldRecordView;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -38,6 +40,12 @@ abstract class BaseDecompose {
         return createView().print(out, emptyLine);
     }
 
+    protected final void print(Path file) throws FileNotFoundException {
+        try (PrintStream out = new PrintStream(file.toFile())) {
+            print(out, false);
+        }
+    }
+
     public abstract void write(Path destDir) throws IOException;
 
     protected abstract IView createView();
@@ -57,12 +65,12 @@ abstract class BaseDecompose {
         IOUtils.copyLarge(in, out, 0, size);
     }
 
-    protected static Function<Block, byte[]> getDataFunc(BlockModel blockModel) {
+    protected static Function<Block, byte[]> getDataFunc(ZipModel zipModel) {
         return block -> {
             if (block.getSize() > Integer.MAX_VALUE)
                 return ArrayUtils.EMPTY_BYTE_ARRAY;
 
-            try (DataInput in = new SingleZipInputStream(blockModel.getZipModel().getFile())) {
+            try (DataInput in = new SingleZipInputStream(zipModel.getFile())) {
                 in.skip(block.getOffs());
                 return in.readBytes((int)block.getSize());
             } catch(Exception e) {
@@ -84,7 +92,7 @@ abstract class BaseDecompose {
                                                       .extraField(extraField)
                                                       .block(block)
                                                       .generalPurposeFlag(generalPurposeFlag)
-                                                      .getDataFunc(getDataFunc(blockModel))
+                                                      .getDataFunc(getDataFunc(blockModel.getZipModel()))
                                                       .position(0, settings.getColumnWidth()).build();
 
         for (int signature : extraField.getSignatures()) {

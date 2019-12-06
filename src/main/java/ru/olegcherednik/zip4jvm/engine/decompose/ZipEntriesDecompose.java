@@ -40,7 +40,7 @@ final class ZipEntriesDecompose extends BaseDecompose {
 
         return ZipEntryListView.builder()
                                .blockZipEntryModel(zipEntryModel)
-                               .getDataFunc(getDataFunc(blockModel))
+                               .getDataFunc(getDataFunc(blockModel.getZipModel()))
                                .charset(settings.getCharset())
                                .position(settings.getOffs(), settings.getColumnWidth()).build();
     }
@@ -82,7 +82,7 @@ final class ZipEntriesDecompose extends BaseDecompose {
                             .encryptionHeader(block.getEncryptionHeader(fileName))
                             .dataDescriptor(zipEntryModel.getDataDescriptors().get(fileName))
                             .blockDataDescriptor(block.getDataDescriptor(fileName))
-                            .getDataFunc(getDataFunc(blockModel))
+                            .getDataFunc(getDataFunc(blockModel.getZipModel()))
                             .charset(settings.getCharset())
                             .offs(settings.getOffs())
                             .columnWidth(settings.getColumnWidth()).build().print(out);

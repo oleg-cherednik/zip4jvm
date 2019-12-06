@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.engine.decompose;
 
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -20,35 +21,44 @@ import java.nio.file.Path;
  */
 final class CentralDirectoryDecompose extends BaseDecompose {
 
+    private static final String FILE_NAME = "central_directory";
+
+    private final CentralDirectory centralDirectory;
+    private final CentralDirectoryBlock blockA;
+    private final ZipModel zipModel;
+
     public CentralDirectoryDecompose(BlockModel blockModel, ZipInfoSettings settings) {
         super(blockModel, settings);
+        centralDirectory = blockModel.getCentralDirectory();
+        blockA = blockModel.getCentralDirectoryBlock();
+        zipModel = blockModel.getZipModel();
     }
 
     @Override
     protected CentralDirectoryView createView() {
         return CentralDirectoryView.builder()
-                                   .centralDirectory(blockModel.getCentralDirectory())
-                                   .diagCentralDirectory(blockModel.getCentralDirectoryBlock())
-                                   .getDataFunc(getDataFunc(blockModel))
+                                   .centralDirectory(centralDirectory)
+                                   .diagCentralDirectory(blockA)
+                                   .getDataFunc(getDataFunc(zipModel))
                                    .charset(settings.getCharset())
                                    .position(settings.getOffs(), settings.getColumnWidth()).build();
     }
 
     @Override
     public void write(Path destDir) throws IOException {
-        Path dir = destDir.resolve("central_directory");
+        Path dir = destDir.resolve(FILE_NAME);
         Files.createDirectories(dir);
 
-        try (PrintStream out = new PrintStream(new FileOutputStream(dir.resolve("central_directory.txt").toFile(), true))) {
+        try (PrintStream out = new PrintStream(new FileOutputStream(dir.resolve(FILE_NAME + ".txt").toFile(), true))) {
             createView().printHeader(out);
         }
 
         int pos = 0;
 
-        for (CentralDirectory.FileHeader fileHeader : blockModel.getCentralDirectory().getFileHeaders()) {
+        for (CentralDirectory.FileHeader fileHeader : centralDirectory.getFileHeaders()) {
             String fileName = fileHeader.getFileName();
             ZipEntry zipEntry = blockModel.getZipModel().getZipEntryByFileName(fileName);
-            CentralDirectoryBlock.FileHeaderBlock block = blockModel.getCentralDirectoryBlock().getFileHeaderBlock(fileName);
+            CentralDirectoryBlock.FileHeaderBlock block = blockA.getFileHeaderBlock(fileName);
 
             if (zipEntry.isDirectory())
                 fileName = fileName.substring(0, fileName.length() - 1);
@@ -62,7 +72,7 @@ final class CentralDirectoryDecompose extends BaseDecompose {
                 FileHeaderView.builder()
                               .fileHeader(fileHeader)
                               .diagFileHeader(block)
-                              .getDataFunc(getDataFunc(blockModel))
+                              .getDataFunc(getDataFunc(zipModel))
                               .pos(pos)
                               .charset(settings.getCharset())
                               .offs(settings.getOffs())

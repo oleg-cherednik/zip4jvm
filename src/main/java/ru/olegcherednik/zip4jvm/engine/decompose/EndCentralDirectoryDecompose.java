@@ -1,11 +1,12 @@
 package ru.olegcherednik.zip4jvm.engine.decompose;
 
+import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
+import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.nio.file.Path;
 
 /**
@@ -14,26 +15,32 @@ import java.nio.file.Path;
  */
 final class EndCentralDirectoryDecompose extends BaseDecompose {
 
+    private static final String FILE_NAME = "end_central_directory";
+
+    private final EndCentralDirectory endCentralDirectory;
+    private final Block block;
+    private final Path file;
+
     public EndCentralDirectoryDecompose(BlockModel blockModel, ZipInfoSettings settings) {
         super(blockModel, settings);
+        endCentralDirectory = blockModel.getEndCentralDirectory();
+        block = blockModel.getEndCentralDirectoryBlock();
+        file = blockModel.getZipModel().getFile();
     }
 
     @Override
     protected EndCentralDirectoryView createView() {
         return EndCentralDirectoryView.builder()
-                                      .endCentralDirectory(blockModel.getEndCentralDirectory())
-                                      .block(blockModel.getEndCentralDirectoryBlock())
+                                      .endCentralDirectory(endCentralDirectory)
+                                      .block(block)
                                       .charset(settings.getCharset())
                                       .position(settings.getOffs(), settings.getColumnWidth()).build();
     }
 
     @Override
     public void write(Path destDir) throws IOException {
-        try (PrintStream out = new PrintStream(destDir.resolve("end_central_directory.txt").toFile())) {
-            createView().print(out);
-        }
-
-        copyLarge(blockModel.getZipModel().getFile(), destDir.resolve("end_central_directory.data"), blockModel.getEndCentralDirectoryBlock());
+        print(destDir.resolve(FILE_NAME + ".txt"));
+        copyLarge(file, destDir.resolve(FILE_NAME + ".data"), block);
     }
 
 }
