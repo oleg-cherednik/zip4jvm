@@ -21,6 +21,7 @@ final class Zip64Decompose extends BaseDecompose {
         super(blockModel, settings);
     }
 
+    @Override
     public Zip64View createView() {
         return Zip64View.builder()
                         .zip64(blockModel.getZip64())
@@ -28,6 +29,7 @@ final class Zip64Decompose extends BaseDecompose {
                         .position(settings.getOffs(), settings.getColumnWidth()).build();
     }
 
+    @Override
     public void write(Path destDir) throws IOException {
         if (blockModel.getZip64() == Zip64.NULL)
             return;

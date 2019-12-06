@@ -18,6 +18,7 @@ final class EndCentralDirectoryDecompose extends BaseDecompose {
         super(blockModel, settings);
     }
 
+    @Override
     public EndCentralDirectoryView createView() {
         return EndCentralDirectoryView.builder()
                                       .endCentralDirectory(blockModel.getEndCentralDirectory())
@@ -26,6 +27,7 @@ final class EndCentralDirectoryDecompose extends BaseDecompose {
                                       .position(settings.getOffs(), settings.getColumnWidth()).build();
     }
 
+    @Override
     public void write(Path destDir) throws IOException {
         try (PrintStream out = new PrintStream(destDir.resolve("end_central_directory.txt").toFile())) {
             createView().print(out);

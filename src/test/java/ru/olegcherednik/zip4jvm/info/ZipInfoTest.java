@@ -6,18 +6,12 @@ import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.TestData;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipInfo;
-import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
-import ru.olegcherednik.zip4jvm.model.Encryption;
-import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.function.Function;
 
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
 
@@ -79,12 +73,12 @@ public class ZipInfoTest {
         Path path = Paths.get("d:/zip4jvm/tmp/aes.zip");
 //        Files.deleteIfExists(path);
 
-        Function<String, ZipEntrySettings> entrySettingsProvider =
-                fileName -> ZipEntrySettings.builder()
-                                            .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                            .encryption(Encryption.AES_256, "1".toCharArray())
-                                            .build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(entrySettingsProvider).comment("password: 1").build();
+//        Function<String, ZipEntrySettings> entrySettingsProvider =
+//                fileName -> ZipEntrySettings.builder()
+//                                            .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
+//                                            .encryption(Encryption.AES_256, "1".toCharArray())
+//                                            .build();
+//        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(entrySettingsProvider).comment("password: 1").build();
 //        ZipIt.zip(path).settings(settings).add(contentDirSrc);
 //        ZipIt.zip(path).settings(settings).add(fileDucati);
 

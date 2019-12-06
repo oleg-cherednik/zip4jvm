@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Oleg Cherednik
@@ -21,23 +23,34 @@ public final class DecomposeEngine {
     private final ZipInfoSettings settings;
 
     public void decompose(PrintStream out) throws IOException {
-        BlockModel blockModel = new BlockModelReader(zip, settings.getCustomizeCharset()).readWithEntries();
+        boolean emptyLine = false;
 
-        boolean emptyLine = new EndCentralDirectoryDecompose(blockModel, settings).createView().print(out);
-        emptyLine = new Zip64Decompose(blockModel, settings).createView().print(out, emptyLine);
-        emptyLine = new CentralDirectoryDecompose(blockModel, settings).createView().print(out, emptyLine);
-        new ZipEntriesDecompose(blockModel, settings).createView().print(out, emptyLine);
+        for (BaseDecompose decompose : getDecomposes(createModel()))
+            emptyLine = decompose.createView().print(out, emptyLine);
     }
 
     public void decompose(Path destDir) throws IOException {
-        BlockModel blockModel = new BlockModelReader(zip, settings.getCustomizeCharset()).readWithEntries();
-
         Files.createDirectories(destDir);
 
-        new EndCentralDirectoryDecompose(blockModel, settings).write(destDir);
-        new Zip64Decompose(blockModel, settings).write(destDir);
-        new CentralDirectoryDecompose(blockModel, settings).write(destDir);
-        new ZipEntriesDecompose(blockModel, settings).write(destDir);
+        for (BaseDecompose decompose : getDecomposes(createModel()))
+            decompose.write(destDir);
+    }
+
+    private BlockModel createModel() throws IOException {
+        BlockModelReader reader = new BlockModelReader(zip, settings.getCustomizeCharset());
+        return settings.isReadEntries() ? reader.readWithEntries() : reader.read();
+    }
+
+    private List<BaseDecompose> getDecomposes(BlockModel blockModel) {
+        List<BaseDecompose> decomposes = new ArrayList<>();
+        decomposes.add(new EndCentralDirectoryDecompose(blockModel, settings));
+        decomposes.add(new Zip64Decompose(blockModel, settings));
+        decomposes.add(new CentralDirectoryDecompose(blockModel, settings));
+
+        if (blockModel.getZipEntryModel() != null)
+            decomposes.add(new ZipEntriesDecompose(blockModel, settings));
+
+        return decomposes;
     }
 
 }

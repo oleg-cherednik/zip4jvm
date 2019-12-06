@@ -30,6 +30,7 @@ final class ZipEntriesDecompose extends BaseDecompose {
         super(blockModel, settings);
     }
 
+    @Override
     public ZipEntryListView createView() {
         return ZipEntryListView.builder()
                                .blockZipEntryModel(blockModel.getZipEntryModel())
@@ -38,6 +39,7 @@ final class ZipEntriesDecompose extends BaseDecompose {
                                .position(settings.getOffs(), settings.getColumnWidth()).build();
     }
 
+    @Override
     public void write(Path destDir) throws IOException {
         BlockZipEntryModel zipEntryModel = blockModel.getZipEntryModel();
 

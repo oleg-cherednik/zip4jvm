@@ -24,6 +24,7 @@ final class CentralDirectoryDecompose extends BaseDecompose {
         super(blockModel, settings);
     }
 
+    @Override
     public CentralDirectoryView createView() {
         return CentralDirectoryView.builder()
                                    .centralDirectory(blockModel.getCentralDirectory())
@@ -33,6 +34,7 @@ final class CentralDirectoryDecompose extends BaseDecompose {
                                    .position(settings.getOffs(), settings.getColumnWidth()).build();
     }
 
+    @Override
     public void write(Path destDir) throws IOException {
         Path dir = destDir.resolve("central_directory");
         Files.createDirectories(dir);

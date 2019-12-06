@@ -16,6 +16,7 @@ public final class ZipInfoSettings {
 
     public static final ZipInfoSettings DEFAULT = builder().build();
 
+    private final boolean readEntries;
     private final Function<Charset, Charset> customizeCharset;
     private final int offs;
     private final int columnWidth;
@@ -25,6 +26,7 @@ public final class ZipInfoSettings {
     }
 
     private ZipInfoSettings(Builder builder) {
+        readEntries = builder.readEntries;
         customizeCharset = builder.customizeCharset;
         offs = builder.offs;
         columnWidth = builder.columnWidth;
@@ -36,12 +38,18 @@ public final class ZipInfoSettings {
 
     public static final class Builder {
 
+        private boolean readEntries;
         private Function<Charset, Charset> customizeCharset = ch -> Charsets.UTF_8;
         private int offs = 4;
         private int columnWidth = 52;
 
         public ZipInfoSettings build() {
             return new ZipInfoSettings(this);
+        }
+
+        public Builder readEntries(boolean readEntries) {
+            this.readEntries = readEntries;
+            return this;
         }
 
         public Builder customizeCharset(Function<Charset, Charset> customizeCharset) {

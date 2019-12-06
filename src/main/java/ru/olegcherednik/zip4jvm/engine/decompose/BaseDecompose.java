@@ -12,6 +12,7 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
+import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldRecordView;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
 
@@ -32,6 +33,10 @@ abstract class BaseDecompose {
 
     protected final BlockModel blockModel;
     protected final ZipInfoSettings settings;
+
+    public abstract IView createView();
+
+    public abstract void write(Path destDir) throws IOException;
 
     protected static void copyLarge(Path in, Path out, Block block) throws IOException {
         copyLarge(in, out, block.getOffs(), block.getSize());
