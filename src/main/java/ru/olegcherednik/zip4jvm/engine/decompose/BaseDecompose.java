@@ -6,22 +6,16 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
-import ru.olegcherednik.zip4jvm.model.ExtraField;
-import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
-import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.IView;
-import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldRecordView;
-import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -78,35 +72,6 @@ public abstract class BaseDecompose {
                 return ArrayUtils.EMPTY_BYTE_ARRAY;
             }
         };
-    }
-
-    protected void writeExtraField(ExtraField extraField, ExtraFieldBlock block, GeneralPurposeFlag generalPurposeFlag, Path parent)
-            throws IOException {
-        if (extraField == ExtraField.NULL)
-            return;
-
-        Path dir = parent.resolve("extra_fields");
-        Files.createDirectories(dir);
-
-        ExtraFieldView extraFieldView = ExtraFieldView.builder()
-                                                      .extraField(extraField)
-                                                      .block(block)
-                                                      .generalPurposeFlag(generalPurposeFlag)
-                                                      .getDataFunc(getDataFunc(zipModel))
-                                                      .position(0, settings.getColumnWidth()).build();
-
-        for (int signature : extraField.getSignatures()) {
-            ExtraField.Record record = extraField.getRecord(signature);
-            ExtraFieldRecordView<?> recordView = extraFieldView.getView(record);
-
-            // print .txt
-            try (PrintStream out = new PrintStream(new FileOutputStream(dir.resolve(recordView.getFileName() + ".txt").toFile()))) {
-                recordView.print(out);
-            }
-
-            // print .data
-            copyLarge(zipModel.getFile(), dir.resolve(recordView.getFileName() + ".data"), block.getRecordBlock(signature));
-        }
     }
 
 }

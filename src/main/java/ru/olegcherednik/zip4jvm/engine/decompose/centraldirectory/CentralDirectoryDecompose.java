@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.engine.decompose.centraldirectory;
 
 import ru.olegcherednik.zip4jvm.engine.decompose.BaseDecompose;
+import ru.olegcherednik.zip4jvm.engine.decompose.ExtraFieldDecompose;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
@@ -66,8 +67,8 @@ public final class CentralDirectoryDecompose extends BaseDecompose {
             Files.createDirectories(subDir);
 
             new FileHeaderDecompose(zipModel, settings, fileHeader, block, pos).write(subDir);
-
-            writeExtraField(fileHeader.getExtraField(), block.getExtraFieldBlock(), fileHeader.getGeneralPurposeFlag(), subDir);
+            new ExtraFieldDecompose(zipModel, settings, fileHeader.getExtraField(), block.getExtraFieldBlock(), fileHeader.getGeneralPurposeFlag())
+                    .write(subDir);
 
             pos++;
         }

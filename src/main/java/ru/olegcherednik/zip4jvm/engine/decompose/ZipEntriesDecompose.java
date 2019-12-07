@@ -98,8 +98,8 @@ final class ZipEntriesDecompose extends BaseDecompose {
             // print extra filed
 
             LocalFileHeader localFileHeader = zipEntryModel.getLocalFileHeaders().get(fileName);
-            writeExtraField(localFileHeader.getExtraField(), diagLocalFileHeader.getExtraFieldBlock(), localFileHeader.getGeneralPurposeFlag(),
-                    subDir);
+            new ExtraFieldDecompose(zipModel, settings, localFileHeader.getExtraField(), diagLocalFileHeader.getExtraFieldBlock(), localFileHeader.getGeneralPurposeFlag())
+                    .write(subDir);
 
             // print encryption header
 

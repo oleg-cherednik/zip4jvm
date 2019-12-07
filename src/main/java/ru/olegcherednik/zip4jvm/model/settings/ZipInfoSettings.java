@@ -38,7 +38,7 @@ public final class ZipInfoSettings {
 
     public static final class Builder {
 
-        private boolean readEntries;
+        private boolean readEntries = true;
         private Function<Charset, Charset> customizeCharset = ch -> Charsets.UTF_8;
         private int offs = 4;
         private int columnWidth = 52;
