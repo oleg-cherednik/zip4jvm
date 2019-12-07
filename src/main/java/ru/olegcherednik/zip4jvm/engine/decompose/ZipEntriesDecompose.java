@@ -27,8 +27,11 @@ import java.nio.file.Path;
  */
 final class ZipEntriesDecompose extends BaseDecompose {
 
+    private final BlockModel blockModel;
+
     public ZipEntriesDecompose(BlockModel blockModel, ZipInfoSettings settings) {
-        super(blockModel, settings);
+        super(blockModel.getZipModel(), settings);
+        this.blockModel = blockModel;
     }
 
     @Override
@@ -58,7 +61,7 @@ final class ZipEntriesDecompose extends BaseDecompose {
         int pos = 0;
 
         for (String fileName : zipEntryModel.getLocalFileHeaders().keySet()) {
-            ZipEntry zipEntry = blockModel.getZipModel().getZipEntryByFileName(fileName);
+            ZipEntry zipEntry = zipModel.getZipEntryByFileName(fileName);
             ZipEntryBlock block = zipEntryModel.getZipEntryBlock();
             ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader = block.getLocalFileHeader(fileName);
 
@@ -82,7 +85,7 @@ final class ZipEntriesDecompose extends BaseDecompose {
                             .encryptionHeader(block.getEncryptionHeader(fileName))
                             .dataDescriptor(zipEntryModel.getDataDescriptors().get(fileName))
                             .blockDataDescriptor(block.getDataDescriptor(fileName))
-                            .getDataFunc(getDataFunc(blockModel.getZipModel()))
+                            .getDataFunc(getDataFunc(zipModel))
                             .charset(settings.getCharset())
                             .offs(settings.getOffs())
                             .columnWidth(settings.getColumnWidth()).build().print(out);

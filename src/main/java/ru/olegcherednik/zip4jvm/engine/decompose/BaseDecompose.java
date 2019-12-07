@@ -10,7 +10,6 @@ import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
-import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.IView;
@@ -24,6 +23,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -31,18 +31,18 @@ import java.util.function.Function;
  * @since 06.12.2019
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-abstract class BaseDecompose {
+public abstract class BaseDecompose {
 
-    protected final BlockModel blockModel;
+    protected final ZipModel zipModel;
     protected final ZipInfoSettings settings;
 
     public final boolean print(PrintStream out, boolean emptyLine) {
         return createView().print(out, emptyLine);
     }
 
-    protected final void print(Path file) throws FileNotFoundException {
+    protected static void print(Path file, Consumer<PrintStream> consumer) throws FileNotFoundException {
         try (PrintStream out = new PrintStream(file.toFile())) {
-            print(out, false);
+            consumer.accept(out);
         }
     }
 
@@ -92,7 +92,7 @@ abstract class BaseDecompose {
                                                       .extraField(extraField)
                                                       .block(block)
                                                       .generalPurposeFlag(generalPurposeFlag)
-                                                      .getDataFunc(getDataFunc(blockModel.getZipModel()))
+                                                      .getDataFunc(getDataFunc(zipModel))
                                                       .position(0, settings.getColumnWidth()).build();
 
         for (int signature : extraField.getSignatures()) {
@@ -105,7 +105,7 @@ abstract class BaseDecompose {
             }
 
             // print .data
-            copyLarge(blockModel.getZipModel().getFile(), dir.resolve(recordView.getFileName() + ".data"), block.getRecordBlock(signature));
+            copyLarge(zipModel.getFile(), dir.resolve(recordView.getFileName() + ".data"), block.getRecordBlock(signature));
         }
     }
 

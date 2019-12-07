@@ -17,8 +17,11 @@ import java.nio.file.Path;
  */
 final class Zip64Decompose extends BaseDecompose {
 
+    private final BlockModel blockModel;
+
     public Zip64Decompose(BlockModel blockModel, ZipInfoSettings settings) {
-        super(blockModel, settings);
+        super(blockModel.getZipModel(), settings);
+        this.blockModel = blockModel;
     }
 
     @Override
@@ -42,7 +45,7 @@ final class Zip64Decompose extends BaseDecompose {
             createZip64EndCentralDirectoryLocatorView(blockModel.getZip64(), blockModel.getZip64Block()).print(out);
         }
 
-        copyLarge(blockModel.getZipModel().getFile(), dir.resolve("zip64_end_central_directory_locator.data"),
+        copyLarge(zipModel.getFile(), dir.resolve("zip64_end_central_directory_locator.data"),
                 blockModel.getZip64Block().getEndCentralDirectoryLocatorBlock());
 
         // (PK0606) ZIP64 End of Central directory record
@@ -50,7 +53,7 @@ final class Zip64Decompose extends BaseDecompose {
             createZip64EndCentralDirectoryView(blockModel.getZip64(), blockModel.getZip64Block()).print(out);
         }
 
-        copyLarge(blockModel.getZipModel().getFile(), dir.resolve("zip64_end_central_directory.data"),
+        copyLarge(zipModel.getFile(), dir.resolve("zip64_end_central_directory.data"),
                 blockModel.getZip64Block().getEndCentralDirectoryBlock());
     }
 

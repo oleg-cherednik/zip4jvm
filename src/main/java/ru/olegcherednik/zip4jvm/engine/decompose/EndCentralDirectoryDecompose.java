@@ -19,13 +19,11 @@ final class EndCentralDirectoryDecompose extends BaseDecompose {
 
     private final EndCentralDirectory endCentralDirectory;
     private final Block block;
-    private final Path file;
 
     public EndCentralDirectoryDecompose(BlockModel blockModel, ZipInfoSettings settings) {
-        super(blockModel, settings);
+        super(blockModel.getZipModel(), settings);
         endCentralDirectory = blockModel.getEndCentralDirectory();
         block = blockModel.getEndCentralDirectoryBlock();
-        file = blockModel.getZipModel().getFile();
     }
 
     @Override
@@ -39,8 +37,8 @@ final class EndCentralDirectoryDecompose extends BaseDecompose {
 
     @Override
     public void write(Path destDir) throws IOException {
-        print(destDir.resolve(FILE_NAME + ".txt"));
-        copyLarge(file, destDir.resolve(FILE_NAME + ".data"), block);
+        print(destDir.resolve(FILE_NAME + ".txt"), out -> createView().print(out));
+        copyLarge(zipModel.getFile(), destDir.resolve(FILE_NAME + ".data"), block);
     }
 
 }
