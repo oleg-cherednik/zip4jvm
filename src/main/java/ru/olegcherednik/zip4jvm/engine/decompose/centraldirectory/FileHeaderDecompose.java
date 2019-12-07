@@ -49,8 +49,7 @@ final class FileHeaderDecompose {
                              .getDataFunc(Utils.getDataFunc(zipModel))
                              .pos(pos)
                              .charset(settings.getCharset())
-                             .offs(settings.getOffs())
-                             .columnWidth(settings.getColumnWidth()).build();
+                             .position(settings.getOffs(), settings.getColumnWidth()).build();
     }
 
 }

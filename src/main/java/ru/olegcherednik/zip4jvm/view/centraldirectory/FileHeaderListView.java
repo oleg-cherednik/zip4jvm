@@ -56,8 +56,7 @@ final class FileHeaderListView extends View {
                           .pos(pos++)
                           .getDataFunc(getDataFunc)
                           .charset(charset)
-                          .offs(offs)
-                          .columnWidth(columnWidth).build().print(out);
+                          .position(offs, columnWidth).build().print(out);
         }
 
         return true;

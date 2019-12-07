@@ -34,6 +34,9 @@ public class ExtraFieldDecompose {
     }
 
     public void write(Path destDir) throws IOException {
+        if(extraField == ExtraField.NULL)
+            return;
+
         destDir = destDir.resolve("extra_fields");
         Files.createDirectories(destDir);
 

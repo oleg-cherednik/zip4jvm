@@ -32,11 +32,15 @@ public final class Utils {
     }
 
     public static void copyLarge(ZipModel zipModel, Path out, Block block) throws IOException {
+        copyLarge(zipModel, out, block.getOffs(), block.getSize());
+    }
+
+    public static void copyLarge(ZipModel zipModel, Path out, long offs, long size) throws IOException {
         Path file = zipModel.getFile();
 
         try (FileInputStream fis = new FileInputStream(file.toFile()); FileOutputStream fos = new FileOutputStream(out.toFile())) {
-            fis.skip(block.getOffs());
-            IOUtils.copyLarge(fis, fos, 0, block.getSize());
+            fis.skip(offs);
+            IOUtils.copyLarge(fis, fos, 0, size);
         }
     }
 
