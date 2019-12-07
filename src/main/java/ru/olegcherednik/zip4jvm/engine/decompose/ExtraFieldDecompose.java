@@ -50,8 +50,7 @@ public class ExtraFieldDecompose extends BaseDecompose {
         ExtraFieldView view = createView();
 
         for (int signature : extraField.getSignatures()) {
-            ExtraField.Record record = extraField.getRecord(signature);
-            ExtraFieldRecordView<?> recordView = view.getView(record);
+            ExtraFieldRecordView<?> recordView = view.getView(extraField.getRecord(signature));
 
             // print .txt
             try (PrintStream out = new PrintStream(new FileOutputStream(destDir.resolve(recordView.getFileName() + ".txt").toFile()))) {
