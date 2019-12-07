@@ -16,31 +16,23 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 07.12.2019
  */
-public class ExtraFieldDecompose extends BaseDecompose {
+public class ExtraFieldDecompose {
 
+    private final ZipModel zipModel;
+    private final ZipInfoSettings settings;
     private final ExtraField extraField;
     private final ExtraFieldBlock block;
     private final GeneralPurposeFlag generalPurposeFlag;
 
     public ExtraFieldDecompose(ZipModel zipModel, ZipInfoSettings settings, ExtraField extraField, ExtraFieldBlock block,
             GeneralPurposeFlag generalPurposeFlag) {
-        super(zipModel, settings);
+        this.zipModel = zipModel;
+        this.settings = settings;
         this.extraField = extraField;
         this.block = block;
         this.generalPurposeFlag = generalPurposeFlag;
     }
 
-    @Override
-    protected ExtraFieldView createView() {
-        return ExtraFieldView.builder()
-                             .extraField(extraField)
-                             .block(block)
-                             .generalPurposeFlag(generalPurposeFlag)
-                             .getDataFunc(getDataFunc(zipModel))
-                             .position(0, settings.getColumnWidth()).build();
-    }
-
-    @Override
     public void write(Path destDir) throws IOException {
         destDir = destDir.resolve("extra_fields");
         Files.createDirectories(destDir);
@@ -51,9 +43,18 @@ public class ExtraFieldDecompose extends BaseDecompose {
             ExtraFieldRecordView<?> recordView = view.getView(extraField.getRecord(signature));
             String fileName = recordView.getFileName();
 
-            print(destDir.resolve(fileName + ".txt"), recordView::print);
-            copyLarge(zipModel.getFile(), destDir.resolve(fileName + ".data"), block.getRecordBlock(signature));
+            Utils.print(destDir.resolve(fileName + ".txt"), recordView::print);
+            Utils.copyLarge(zipModel, destDir.resolve(fileName + ".data"), block.getRecordBlock(signature));
         }
+    }
+
+    private ExtraFieldView createView() {
+        return ExtraFieldView.builder()
+                             .extraField(extraField)
+                             .block(block)
+                             .generalPurposeFlag(generalPurposeFlag)
+                             .getDataFunc(Utils.getDataFunc(zipModel))
+                             .position(0, settings.getColumnWidth()).build();
     }
 
 }

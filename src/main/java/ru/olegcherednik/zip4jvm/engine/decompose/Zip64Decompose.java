@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.engine.decompose;
 
 import ru.olegcherednik.zip4jvm.model.Zip64;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.Zip64Block;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
@@ -15,59 +16,59 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 06.12.2019
  */
-final class Zip64Decompose extends BaseDecompose {
+final class Zip64Decompose {
 
-    private final BlockModel blockModel;
+    private final ZipModel zipModel;
+    private final Zip64 zip64;
+    private final Zip64Block block;
+    private final ZipInfoSettings settings;
 
     public Zip64Decompose(BlockModel blockModel, ZipInfoSettings settings) {
-        super(blockModel.getZipModel(), settings);
-        this.blockModel = blockModel;
+        zipModel = blockModel.getZipModel();
+        zip64 = blockModel.getZip64();
+        block = blockModel.getZip64Block();
+        this.settings = settings;
     }
 
-    @Override
-    protected Zip64View createView() {
+    public boolean print(PrintStream out, boolean emptyLine) {
+        Zip64View view = Zip64View.builder()
+                                  .zip64(zip64)
+                                  .block(block)
+                                  .position(settings.getOffs(), settings.getColumnWidth()).build();
+
+        return view.print(out, emptyLine);
+    }
+
+    public void write(Path destDir) throws IOException {
+        if (zip64 == Zip64.NULL)
+            return;
+
+        Path dir = Files.createDirectories(destDir.resolve("zip64"));
+        Zip64View view = createView();
+
+        endOfCentralDirectoryLocator(dir, view);
+        endOfCentralDirectory(dir, view);
+    }
+
+    private Zip64View createView() {
         return Zip64View.builder()
-                        .zip64(blockModel.getZip64())
-                        .block(blockModel.getZip64Block())
+                        .zip64(zip64)
+                        .block(block)
                         .position(settings.getOffs(), settings.getColumnWidth()).build();
     }
 
-    @Override
-    public void write(Path destDir) throws IOException {
-        if (blockModel.getZip64() == Zip64.NULL)
-            return;
+    private void endOfCentralDirectoryLocator(Path dir, Zip64View view) throws IOException {
+        String fileName = "zip64_end_central_directory_locator";
 
-        Path dir = destDir.resolve("zip64");
-        Files.createDirectories(dir);
-
-        // (PK0607) ZIP64 End of Central directory locator
-        try (PrintStream out = new PrintStream(dir.resolve("zip64_end_central_directory_locator.txt").toFile())) {
-            createZip64EndCentralDirectoryLocatorView(blockModel.getZip64(), blockModel.getZip64Block()).print(out);
-        }
-
-        copyLarge(zipModel.getFile(), dir.resolve("zip64_end_central_directory_locator.data"),
-                blockModel.getZip64Block().getEndCentralDirectoryLocatorBlock());
-
-        // (PK0606) ZIP64 End of Central directory record
-        try (PrintStream out = new PrintStream(dir.resolve("zip64_end_central_directory.txt").toFile())) {
-            createZip64EndCentralDirectoryView(blockModel.getZip64(), blockModel.getZip64Block()).print(out);
-        }
-
-        copyLarge(zipModel.getFile(), dir.resolve("zip64_end_central_directory.data"),
-                blockModel.getZip64Block().getEndCentralDirectoryBlock());
+        Utils.print(dir.resolve(fileName + ".txt"), out -> view.createEndCentralDirectorLocatorView().print(out));
+        Utils.copyLarge(zipModel, dir.resolve(fileName + ".data"), block.getEndCentralDirectoryLocatorBlock());
     }
 
-    private Zip64View.EndCentralDirectoryLocatorView createZip64EndCentralDirectoryLocatorView(Zip64 zip64, Zip64Block block) {
-        return Zip64View.EndCentralDirectoryLocatorView.builder()
-                                                       .locator(zip64.getEndCentralDirectoryLocator())
-                                                       .block(block.getEndCentralDirectoryLocatorBlock())
-                                                       .position(settings.getOffs(), settings.getColumnWidth()).build();
+    private void endOfCentralDirectory(Path dir, Zip64View view) throws IOException {
+        String fileName = "zip64_end_central_directory";
+
+        Utils.print(dir.resolve(fileName + ".txt"), out -> view.createEndCentralDirectoryView().print(out));
+        Utils.copyLarge(zipModel, dir.resolve(fileName + ".data"), block.getEndCentralDirectoryBlock());
     }
 
-    private Zip64View.EndCentralDirectoryView createZip64EndCentralDirectoryView(Zip64 zip64, Zip64Block block) {
-        return Zip64View.EndCentralDirectoryView.builder()
-                                                .endCentralDirectory(zip64.getEndCentralDirectory())
-                                                .block(block.getEndCentralDirectoryBlock())
-                                                .position(settings.getOffs(), settings.getColumnWidth()).build();
-    }
 }

@@ -37,14 +37,14 @@ public final class Zip64View extends View {
         return createEndCentralDirectoryView().print(out, emptyLine);
     }
 
-    private EndCentralDirectoryLocatorView createEndCentralDirectorLocatorView() {
+    public EndCentralDirectoryLocatorView createEndCentralDirectorLocatorView() {
         return EndCentralDirectoryLocatorView.builder()
                                              .locator(zip64.getEndCentralDirectoryLocator())
                                              .block(block.getEndCentralDirectoryLocatorBlock())
                                              .position(offs, columnWidth).build();
     }
 
-    private EndCentralDirectoryView createEndCentralDirectoryView() {
+    public EndCentralDirectoryView createEndCentralDirectoryView() {
         return EndCentralDirectoryView.builder()
                                       .endCentralDirectory(zip64.getEndCentralDirectory())
                                       .block(block.getEndCentralDirectoryBlock())

@@ -1,44 +1,51 @@
 package ru.olegcherednik.zip4jvm.engine.decompose;
 
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.Path;
 
 /**
  * @author Oleg Cherednik
  * @since 06.12.2019
  */
-final class EndCentralDirectoryDecompose extends BaseDecompose {
+final class EndCentralDirectoryDecompose {
 
     private static final String FILE_NAME = "end_central_directory";
 
+    private final ZipModel zipModel;
     private final EndCentralDirectory endCentralDirectory;
     private final Block block;
+    private final ZipInfoSettings settings;
 
     public EndCentralDirectoryDecompose(BlockModel blockModel, ZipInfoSettings settings) {
-        super(blockModel.getZipModel(), settings);
+        zipModel = blockModel.getZipModel();
         endCentralDirectory = blockModel.getEndCentralDirectory();
         block = blockModel.getEndCentralDirectoryBlock();
+        this.settings = settings;
     }
 
-    @Override
-    protected EndCentralDirectoryView createView() {
+    public boolean print(PrintStream out, boolean emptyLine) {
+        return createView().print(out, emptyLine);
+    }
+
+    public void write(Path destDir) throws IOException {
+        Utils.print(destDir.resolve(FILE_NAME + ".txt"), out -> createView().print(out));
+        Utils.copyLarge(zipModel, destDir.resolve(FILE_NAME + ".data"), block);
+    }
+
+    private EndCentralDirectoryView createView() {
         return EndCentralDirectoryView.builder()
                                       .endCentralDirectory(endCentralDirectory)
                                       .block(block)
                                       .charset(settings.getCharset())
                                       .position(settings.getOffs(), settings.getColumnWidth()).build();
-    }
-
-    @Override
-    public void write(Path destDir) throws IOException {
-        print(destDir.resolve(FILE_NAME + ".txt"), out -> createView().print(out));
-        copyLarge(zipModel.getFile(), destDir.resolve(FILE_NAME + ".data"), block);
     }
 
 }

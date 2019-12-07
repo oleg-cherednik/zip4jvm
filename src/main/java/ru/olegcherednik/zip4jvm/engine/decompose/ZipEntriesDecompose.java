@@ -11,7 +11,6 @@ import ru.olegcherednik.zip4jvm.model.block.ByteArrayBlock;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
-import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntryListView;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntryView;
 
@@ -25,30 +24,20 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 06.12.2019
  */
-final class ZipEntriesDecompose extends BaseDecompose {
+final class ZipEntriesDecompose {
 
     private final BlockModel blockModel;
+    private final ZipInfoSettings settings;
 
     public ZipEntriesDecompose(BlockModel blockModel, ZipInfoSettings settings) {
-        super(blockModel.getZipModel(), settings);
         this.blockModel = blockModel;
+        this.settings = settings;
     }
 
-    @Override
-    protected IView createView() {
-        BlockZipEntryModel zipEntryModel = blockModel.getZipEntryModel();
-
-        if (zipEntryModel == null)
-            return IView.NULL;
-
-        return ZipEntryListView.builder()
-                               .blockZipEntryModel(zipEntryModel)
-                               .getDataFunc(getDataFunc(blockModel.getZipModel()))
-                               .charset(settings.getCharset())
-                               .position(settings.getOffs(), settings.getColumnWidth()).build();
+    public boolean print(PrintStream out, boolean emptyLine) {
+        return createView().print(out, emptyLine);
     }
 
-    @Override
     public void write(Path destDir) throws IOException {
         BlockZipEntryModel zipEntryModel = blockModel.getZipEntryModel();
 
@@ -61,7 +50,7 @@ final class ZipEntriesDecompose extends BaseDecompose {
         int pos = 0;
 
         for (String fileName : zipEntryModel.getLocalFileHeaders().keySet()) {
-            ZipEntry zipEntry = zipModel.getZipEntryByFileName(fileName);
+            ZipEntry zipEntry = blockModel.getZipModel().getZipEntryByFileName(fileName);
             ZipEntryBlock block = zipEntryModel.getZipEntryBlock();
             ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader = block.getLocalFileHeader(fileName);
 
@@ -85,7 +74,7 @@ final class ZipEntriesDecompose extends BaseDecompose {
                             .encryptionHeader(block.getEncryptionHeader(fileName))
                             .dataDescriptor(zipEntryModel.getDataDescriptors().get(fileName))
                             .blockDataDescriptor(block.getDataDescriptor(fileName))
-                            .getDataFunc(getDataFunc(zipModel))
+                            .getDataFunc(Utils.getDataFunc(blockModel.getZipModel()))
                             .charset(settings.getCharset())
                             .offs(settings.getOffs())
                             .columnWidth(settings.getColumnWidth()).build().print(out);
@@ -98,8 +87,8 @@ final class ZipEntriesDecompose extends BaseDecompose {
             // print extra filed
 
             LocalFileHeader localFileHeader = zipEntryModel.getLocalFileHeaders().get(fileName);
-            new ExtraFieldDecompose(zipModel, settings, localFileHeader.getExtraField(), diagLocalFileHeader.getExtraFieldBlock(), localFileHeader.getGeneralPurposeFlag())
-                    .write(subDir);
+            new ExtraFieldDecompose(blockModel.getZipModel(), settings, localFileHeader.getExtraField(), diagLocalFileHeader.getExtraFieldBlock(),
+                    localFileHeader.getGeneralPurposeFlag()).write(subDir);
 
             // print encryption header
 
@@ -149,11 +138,19 @@ final class ZipEntriesDecompose extends BaseDecompose {
                     size -= encryptionHeader.getData().getSize();
                 }
 
-                copyLarge(blockModel.getZipModel().getFile(), subDir.resolve("payload.data"), offs, size);
+//                copyLarge(blockModel.getZipModel().getFile(), subDir.resolve("payload.data"), offs, size);
             }
 
             pos++;
         }
+    }
+
+    private ZipEntryListView createView() {
+        return ZipEntryListView.builder()
+                               .blockZipEntryModel(blockModel.getZipEntryModel())
+                               .getDataFunc(Utils.getDataFunc(blockModel.getZipModel()))
+                               .charset(settings.getCharset())
+                               .position(settings.getOffs(), settings.getColumnWidth()).build();
     }
 
 
