@@ -8,9 +8,7 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldRecordView;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -51,14 +49,10 @@ public class ExtraFieldDecompose extends BaseDecompose {
 
         for (int signature : extraField.getSignatures()) {
             ExtraFieldRecordView<?> recordView = view.getView(extraField.getRecord(signature));
+            String fileName = recordView.getFileName();
 
-            // print .txt
-            try (PrintStream out = new PrintStream(new FileOutputStream(destDir.resolve(recordView.getFileName() + ".txt").toFile()))) {
-                recordView.print(out);
-            }
-
-            // print .data
-            copyLarge(zipModel.getFile(), destDir.resolve(recordView.getFileName() + ".data"), block.getRecordBlock(signature));
+            print(destDir.resolve(fileName + ".txt"), recordView::print);
+            copyLarge(zipModel.getFile(), destDir.resolve(fileName + ".data"), block.getRecordBlock(signature));
         }
     }
 
