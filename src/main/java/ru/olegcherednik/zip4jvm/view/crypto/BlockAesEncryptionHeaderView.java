@@ -12,7 +12,7 @@ import java.io.PrintStream;
  * @author Oleg Cherednik
  * @since 09.11.2019
  */
-final class BlockAesEncryptionHeaderView extends View {
+public final class BlockAesEncryptionHeaderView extends View {
 
     private final AesEncryptionHeaderBlock encryptionHeader;
     private final long pos;

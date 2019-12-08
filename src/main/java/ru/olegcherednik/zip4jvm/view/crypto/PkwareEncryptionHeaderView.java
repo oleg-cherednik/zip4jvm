@@ -12,7 +12,7 @@ import java.io.PrintStream;
  * @author Oleg Cherednik
  * @since 09.11.2019
  */
-final class PkwareEncryptionHeaderView extends View {
+public final class PkwareEncryptionHeaderView extends View {
 
     private final PkwareEncryptionHeader encryptionHeader;
     private final long pos;

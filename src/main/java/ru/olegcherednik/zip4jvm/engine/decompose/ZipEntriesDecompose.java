@@ -4,14 +4,18 @@ import org.apache.commons.io.FileUtils;
 import ru.olegcherednik.zip4jvm.io.readers.block.aes.AesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.io.readers.block.pkware.PkwareEncryptionHeader;
 import ru.olegcherednik.zip4jvm.model.Encryption;
+import ru.olegcherednik.zip4jvm.model.ExtraField;
+import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.BlockZipEntryModel;
 import ru.olegcherednik.zip4jvm.model.block.ByteArrayBlock;
+import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
+import ru.olegcherednik.zip4jvm.view.crypto.EncryptionHeaderView;
 import ru.olegcherednik.zip4jvm.view.entry.LocalFileHeaderView;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntryListView;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntryView;
@@ -74,9 +78,9 @@ final class ZipEntriesDecompose {
                                                     .columnWidth(settings.getColumnWidth()).build();
 
 
-            writeLocalFileHeader(subDir, zipEntryView, diagLocalFileHeader);
-            printExtraField(localFileHeader, diagLocalFileHeader, subDir);
-            printEncryptionHeader(zipEntry, encryptionHeader, subDir);
+            writeLocalFileHeader(subDir, zipEntryView.createLocalFileHeaderView(), diagLocalFileHeader);
+            printExtraField(subDir, localFileHeader, diagLocalFileHeader.getExtraFieldBlock());
+            printEncryptionHeader(subDir, zipEntry, zipEntryView, encryptionHeader);
             printDataDescriptor(zipEntry, block, fileName, subDir);
 //            copyPayload(zipEntry, diagLocalFileHeader, encryptionHeader, subDir);
 
@@ -84,37 +88,45 @@ final class ZipEntriesDecompose {
         }
     }
 
-    private void writeLocalFileHeader(Path dir, ZipEntryView zipEntryView, ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader)
+    private void writeLocalFileHeader(Path dir, LocalFileHeaderView view, ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader)
             throws IOException {
         String fileName = "local_file_header";
-
-        LocalFileHeaderView view = zipEntryView.createLocalFileHeaderView();
 
         Utils.print(dir.resolve(fileName + ".txt"), view::print);
         Utils.copyLarge(zipModel, dir.resolve(fileName + ".data"), diagLocalFileHeader.getContent());
     }
 
-
-    private void printExtraField(LocalFileHeader localFileHeader, ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader, Path subDir)
-            throws IOException {
-        new ExtraFieldDecompose(blockModel.getZipModel(), settings, localFileHeader.getExtraField(), diagLocalFileHeader.getExtraFieldBlock(),
-                localFileHeader.getGeneralPurposeFlag()).write(subDir);
+    private void printExtraField(Path dir, LocalFileHeader localFileHeader, ExtraFieldBlock block) throws IOException {
+        ExtraField extraField = localFileHeader.getExtraField();
+        GeneralPurposeFlag generalPurposeFlag = localFileHeader.getGeneralPurposeFlag();
+        new ExtraFieldDecompose(blockModel.getZipModel(), settings, extraField, block, generalPurposeFlag).write(dir);
     }
 
-    private static void printEncryptionHeader(ZipEntry zipEntry, ZipEntryBlock.EncryptionHeader encryptionHeader, Path subDir) throws IOException {
+    private static void printEncryptionHeader(Path dir, ZipEntry zipEntry, ZipEntryView zipEntryView, ZipEntryBlock.EncryptionHeader encryptionHeader)
+            throws IOException {
         Encryption encryption = zipEntry.getEncryption();
+
+        if (encryption == Encryption.OFF)
+            return;
+
+        Path subDir = Files.createDirectories(dir.resolve("encryption"));
+
+        EncryptionHeaderView view = zipEntryView.createEncryptionHeaderView();
 
         // TODO probably same with block reader
         if (encryption == Encryption.AES_128 || encryption == Encryption.AES_192 || encryption == Encryption.AES_256) {
-            AesEncryptionHeaderBlock encryptionHeader1 = (AesEncryptionHeaderBlock)encryptionHeader;
+            AesEncryptionHeaderBlock block = (AesEncryptionHeaderBlock)encryptionHeader;
+            Utils.print(subDir.resolve("aes_encryption_header.txt"), out -> view.createView(block).print(out));
 
-            FileUtils.writeByteArrayToFile(subDir.resolve("aes_salt.data").toFile(), encryptionHeader1.getSalt().getData());
-            FileUtils.writeByteArrayToFile(subDir.resolve("aes_password_checksum.data").toFile(),
-                    encryptionHeader1.getPasswordChecksum().getData());
-            FileUtils.writeByteArrayToFile(subDir.resolve("aes_mac.data").toFile(), encryptionHeader1.getMac().getData());
+            FileUtils.writeByteArrayToFile(subDir.resolve("aes_salt.data").toFile(), block.getSalt().getData());
+            FileUtils.writeByteArrayToFile(subDir.resolve("aes_password_checksum.data").toFile(), block.getPasswordChecksum().getData());
+            FileUtils.writeByteArrayToFile(subDir.resolve("aes_mac.data").toFile(), block.getMac().getData());
         } else if (encryption == Encryption.PKWARE) {
-            PkwareEncryptionHeader encryptionHeader1 = (PkwareEncryptionHeader)encryptionHeader;
-            FileUtils.writeByteArrayToFile(subDir.resolve("pkware_header.data").toFile(), encryptionHeader1.getData().getData());
+            PkwareEncryptionHeader block = (PkwareEncryptionHeader)encryptionHeader;
+            Utils.print(dir.resolve("pkware_encryption_header.txt"), out -> view.createView(block).print(out));
+            FileUtils.writeByteArrayToFile(subDir.resolve("pkware_encryption_header.data").toFile(), block.getData().getData());
+        } else {
+            // TODO print unknown header
         }
     }
 

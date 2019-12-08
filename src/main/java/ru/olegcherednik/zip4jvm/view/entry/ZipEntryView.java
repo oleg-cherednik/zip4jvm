@@ -67,7 +67,7 @@ public final class ZipEntryView extends View {
                                   .columnWidth(columnWidth).build();
     }
 
-    private IView createEncryptionHeaderView() {
+    public EncryptionHeaderView createEncryptionHeaderView() {
         return EncryptionHeaderView.builder()
                                    .encryptionHeader(encryptionHeader)
                                    .pos(pos)

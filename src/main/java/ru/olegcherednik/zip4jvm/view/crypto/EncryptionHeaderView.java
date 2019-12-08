@@ -5,10 +5,10 @@ import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.readers.block.aes.AesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.io.readers.block.pkware.PkwareEncryptionHeader;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
-import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
+import java.util.Objects;
 
 /**
  * @author Oleg Cherednik
@@ -43,7 +43,7 @@ public final class EncryptionHeaderView extends View {
         return true;
     }
 
-    private BlockAesEncryptionHeaderView createView(AesEncryptionHeaderBlock encryptionHeader) {
+    public BlockAesEncryptionHeaderView createView(AesEncryptionHeaderBlock encryptionHeader) {
         return BlockAesEncryptionHeaderView.builder()
                                            .encryptionHeader(encryptionHeader)
                                            .pos(pos)
@@ -51,7 +51,7 @@ public final class EncryptionHeaderView extends View {
                                            .columnWidth(columnWidth).build();
     }
 
-    private PkwareEncryptionHeaderView createView(PkwareEncryptionHeader encryptionHeader) {
+    public PkwareEncryptionHeaderView createView(PkwareEncryptionHeader encryptionHeader) {
         return PkwareEncryptionHeaderView.builder()
                                          .encryptionHeader(encryptionHeader)
                                          .pos(pos)
@@ -67,8 +67,9 @@ public final class EncryptionHeaderView extends View {
         private int offs;
         private int columnWidth;
 
-        public IView build() {
-            return encryptionHeader == null ? IView.NULL : new EncryptionHeaderView(this);
+        public EncryptionHeaderView build() {
+            Objects.requireNonNull(encryptionHeader, "'encryptionHeader' must not be null");
+            return new EncryptionHeaderView(this);
         }
 
         public Builder encryptionHeader(ZipEntryBlock.EncryptionHeader encryptionHeader) {
