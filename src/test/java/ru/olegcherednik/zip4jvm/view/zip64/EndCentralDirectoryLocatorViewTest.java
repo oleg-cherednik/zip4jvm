@@ -29,10 +29,7 @@ public class EndCentralDirectoryLocatorViewTest {
         when(locator.getOffs()).thenReturn(11208273328L);
         when(locator.getTotalDisks()).thenReturn(5L);
 
-        String[] lines = Zip4jvmSuite.execute(Zip64View.EndCentralDirectoryLocatorView.builder()
-                                                                                      .locator(locator)
-                                                                                      .block(block)
-                                                                                      .position(2, 52).build());
+        String[] lines = Zip4jvmSuite.execute(new Zip64View.EndCentralDirectoryLocatorView(locator, block, 2, 52));
         assertThat(lines).hasSize(7);
         assertThat(lines[0]).isEqualTo("(PK0607) ZIP64 End of Central directory locator");
         assertThat(lines[1]).isEqualTo("===============================================");

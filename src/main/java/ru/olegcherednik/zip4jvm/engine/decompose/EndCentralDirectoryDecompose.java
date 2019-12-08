@@ -9,6 +9,7 @@ import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 
 /**
@@ -35,17 +36,16 @@ final class EndCentralDirectoryDecompose {
         return createView().print(out, emptyLine);
     }
 
-    public void write(Path dir) throws IOException {
+    public void decompose(Path dir) throws IOException {
         Utils.print(dir.resolve(FILE_NAME + ".txt"), out -> createView().print(out));
         Utils.copyLarge(zipModel, dir.resolve(FILE_NAME + ".data"), block);
     }
 
     private EndCentralDirectoryView createView() {
-        return EndCentralDirectoryView.builder()
-                                      .endCentralDirectory(endCentralDirectory)
-                                      .block(block)
-                                      .charset(settings.getCharset())
-                                      .position(settings.getOffs(), settings.getColumnWidth()).build();
+        Charset charset = settings.getCharset();
+        int offs = settings.getOffs();
+        int columnWidth = settings.getColumnWidth();
+        return new EndCentralDirectoryView(endCentralDirectory, block, charset, offs, columnWidth);
     }
 
 }

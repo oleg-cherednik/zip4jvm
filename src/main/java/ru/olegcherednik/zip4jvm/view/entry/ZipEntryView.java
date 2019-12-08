@@ -51,8 +51,13 @@ public final class ZipEntryView extends View {
     @Override
     public boolean print(PrintStream out) {
         boolean emptyLine = createLocalFileHeaderView().print(out);
-        emptyLine = createEncryptionHeaderView().print(out, emptyLine);
-        return createDataDescriptorView().print(out, emptyLine);
+
+        if (encryptionHeader != null)
+            emptyLine = createEncryptionHeaderView().print(out, emptyLine);
+        if (dataDescriptor != null)
+            emptyLine = createDataDescriptorView().print(out, emptyLine);
+
+        return emptyLine;
     }
 
     public LocalFileHeaderView createLocalFileHeaderView() {
@@ -67,11 +72,7 @@ public final class ZipEntryView extends View {
     }
 
     public EncryptionHeaderView createEncryptionHeaderView() {
-        return EncryptionHeaderView.builder()
-                                   .encryptionHeader(encryptionHeader)
-                                   .pos(pos)
-                                   .offs(offs)
-                                   .columnWidth(columnWidth).build();
+        return new EncryptionHeaderView(encryptionHeader, pos, offs, columnWidth);
     }
 
     public DataDescriptorView createDataDescriptorView() {

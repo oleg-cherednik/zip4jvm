@@ -33,11 +33,7 @@ public class EndCentralDirectoryViewTest {
         endCentralDirectory.setCentralDirectoryOffs(255533L);
         endCentralDirectory.setComment("password: 1");
 
-        String[] lines = Zip4jvmSuite.execute(EndCentralDirectoryView.builder()
-                                                                     .endCentralDirectory(endCentralDirectory)
-                                                                     .block(block)
-                                                                     .charset(Charsets.UTF_8)
-                                                                     .position(2, 52).build());
+        String[] lines = Zip4jvmSuite.execute(new EndCentralDirectoryView(endCentralDirectory, block, Charsets.UTF_8, 2, 52));
         assertThat(lines).hasSize(13);
         assertThat(lines[0]).isEqualTo("(PK0506) End of Central directory record");
         assertThat(lines[1]).isEqualTo("========================================");

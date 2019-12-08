@@ -20,7 +20,7 @@ public final class DecomposeEngine {
     private final Path zip;
     private final ZipInfoSettings settings;
 
-    public void decompose(PrintStream out) throws IOException {
+    public void printTextInfo(PrintStream out) throws IOException {
         BlockModel blockModel = createModel();
 
         boolean emptyLine = new EndCentralDirectoryDecompose(blockModel, settings).printTextInfo(out, false);
@@ -34,7 +34,7 @@ public final class DecomposeEngine {
 
         BlockModel blockModel = createModel();
 
-        new EndCentralDirectoryDecompose(blockModel, settings).write(dir);
+        new EndCentralDirectoryDecompose(blockModel, settings).decompose(dir);
         new Zip64Decompose(blockModel, settings).write(dir);
         new CentralDirectoryDecompose(blockModel, settings).write(dir);
         new ZipEntriesDecompose(blockModel, settings).write(dir);

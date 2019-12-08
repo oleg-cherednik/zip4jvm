@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
-import ru.olegcherednik.zip4jvm.model.block.Zip64Block;
 
 import java.io.PrintStream;
 import java.util.Objects;
@@ -13,85 +12,21 @@ import java.util.Objects;
  * @author Oleg Cherednik
  * @since 14.10.2019
  */
-public final class Zip64View extends View {
-
-    private final Zip64 zip64;
-    private final Zip64Block block;
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    private Zip64View(Builder builder) {
-        super(builder.offs, builder.columnWidth);
-        zip64 = builder.zip64;
-        block = builder.block;
-    }
-
-    @Override
-    public boolean print(PrintStream out) {
-        boolean emptyLine = createEndCentralDirectorLocatorView().print(out);
-        return createEndCentralDirectoryView().print(out, emptyLine);
-    }
-
-    public EndCentralDirectoryLocatorView createEndCentralDirectorLocatorView() {
-        return EndCentralDirectoryLocatorView.builder()
-                                             .locator(zip64.getEndCentralDirectoryLocator())
-                                             .block(block.getEndCentralDirectoryLocatorBlock())
-                                             .position(offs, columnWidth).build();
-    }
-
-    public EndCentralDirectoryView createEndCentralDirectoryView() {
-        return EndCentralDirectoryView.builder()
-                                      .endCentralDirectory(zip64.getEndCentralDirectory())
-                                      .block(block.getEndCentralDirectoryBlock())
-                                      .position(offs, columnWidth).build();
-    }
-
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static final class Builder {
-
-        private Zip64 zip64;
-        private Zip64Block block;
-        private int offs;
-        private int columnWidth;
-
-        public Zip64View build() {
-            Objects.requireNonNull(zip64, "'zip64' must not be null");
-            Objects.requireNonNull(block, "'block' must not be null");
-            return new Zip64View(this);
-        }
-
-        public Builder zip64(Zip64 zip64) {
-            this.zip64 = zip64 == Zip64.NULL ? null : zip64;
-            return this;
-        }
-
-        public Builder block(Zip64Block block) {
-            this.block = block;
-            return this;
-        }
-
-        public Builder position(int offs, int columnWidth) {
-            this.offs = offs;
-            this.columnWidth = columnWidth;
-            return this;
-        }
-    }
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class Zip64View {
 
     public static final class EndCentralDirectoryLocatorView extends View {
 
         private final Zip64.EndCentralDirectoryLocator locator;
         private final Block block;
 
-        public static EndCentralDirectoryLocatorView.Builder builder() {
-            return new EndCentralDirectoryLocatorView.Builder();
-        }
+        public EndCentralDirectoryLocatorView(Zip64.EndCentralDirectoryLocator locator, Block block, int offs, int columnWidth) {
+            super(offs, columnWidth);
+            this.locator = locator;
+            this.block = block;
 
-        private EndCentralDirectoryLocatorView(EndCentralDirectoryLocatorView.Builder builder) {
-            super(builder.offs, builder.columnWidth);
-            locator = builder.locator;
-            block = builder.block;
+            Objects.requireNonNull(locator, "'locator' must not be null");
+            Objects.requireNonNull(block, "'block' must not be null");
         }
 
         @Override
@@ -103,36 +38,6 @@ public final class Zip64View extends View {
             return true;
         }
 
-        @NoArgsConstructor(access = AccessLevel.PRIVATE)
-        public static final class Builder {
-
-            private Zip64.EndCentralDirectoryLocator locator;
-            private Block block;
-            private int offs;
-            private int columnWidth;
-
-            public EndCentralDirectoryLocatorView build() {
-                Objects.requireNonNull(locator, "'locator' must not be null");
-                Objects.requireNonNull(block, "'block' must not be null");
-                return new EndCentralDirectoryLocatorView(this);
-            }
-
-            public EndCentralDirectoryLocatorView.Builder locator(Zip64.EndCentralDirectoryLocator locator) {
-                this.locator = locator;
-                return this;
-            }
-
-            public EndCentralDirectoryLocatorView.Builder block(Block block) {
-                this.block = block == Block.NULL ? null : block;
-                return this;
-            }
-
-            public EndCentralDirectoryLocatorView.Builder position(int offs, int columnWidth) {
-                this.offs = offs;
-                this.columnWidth = columnWidth;
-                return this;
-            }
-        }
     }
 
     public static final class EndCentralDirectoryView extends View {
@@ -140,14 +45,13 @@ public final class Zip64View extends View {
         private final Zip64.EndCentralDirectory dir;
         private final Block block;
 
-        public static EndCentralDirectoryView.Builder builder() {
-            return new EndCentralDirectoryView.Builder();
-        }
+        public EndCentralDirectoryView(Zip64.EndCentralDirectory dir, Block block, int offs, int columnWidth) {
+            super(offs, columnWidth);
+            this.dir = dir;
+            this.block = block;
 
-        private EndCentralDirectoryView(EndCentralDirectoryView.Builder builder) {
-            super(builder.offs, builder.columnWidth);
-            dir = builder.endCentralDirectory;
-            block = builder.block;
+            Objects.requireNonNull(dir, "'endCentralDirectory' must not be null");
+            Objects.requireNonNull(block, "'block' must not be null");
         }
 
         @Override
@@ -179,37 +83,6 @@ public final class Zip64View extends View {
             ByteArrayHexView.builder()
                             .data(dir.getExtensibleDataSector())
                             .position(offs, columnWidth).build().print(out);
-        }
-
-        @NoArgsConstructor(access = AccessLevel.PRIVATE)
-        public static final class Builder {
-
-            private Zip64.EndCentralDirectory endCentralDirectory;
-            private Block block;
-            private int offs;
-            private int columnWidth;
-
-            public EndCentralDirectoryView build() {
-                Objects.requireNonNull(endCentralDirectory, "'endCentralDirectory' must not be null");
-                Objects.requireNonNull(block, "'block' must not be null");
-                return new EndCentralDirectoryView(this);
-            }
-
-            public EndCentralDirectoryView.Builder endCentralDirectory(Zip64.EndCentralDirectory endCentralDirectory) {
-                this.endCentralDirectory = endCentralDirectory;
-                return this;
-            }
-
-            public EndCentralDirectoryView.Builder block(Block block) {
-                this.block = block == Block.NULL ? null : block;
-                return this;
-            }
-
-            public EndCentralDirectoryView.Builder position(int offs, int columnWidth) {
-                this.offs = offs;
-                this.columnWidth = columnWidth;
-                return this;
-            }
         }
     }
 

@@ -1,8 +1,5 @@
 package ru.olegcherednik.zip4jvm.view;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
@@ -22,15 +19,14 @@ public final class EndCentralDirectoryView extends View {
     private final Block block;
     private final Charset charset;
 
-    public static Builder builder() {
-        return new Builder();
-    }
+    public EndCentralDirectoryView(EndCentralDirectory dir, Block block, Charset charset, int offs, int columnWidth) {
+        super(offs, columnWidth);
+        this.dir = dir;
+        this.block = block;
+        this.charset = charset;
 
-    private EndCentralDirectoryView(Builder builder) {
-        super(builder.offs, builder.columnWidth);
-        dir = builder.endCentralDirectory;
-        block = builder.block;
-        charset = builder.charset;
+        Objects.requireNonNull(dir, "'endCentralDirectory' must not be null");
+        Objects.requireNonNull(block, "'block' must not be null");
     }
 
     @Override
@@ -65,44 +61,6 @@ public final class EndCentralDirectoryView extends View {
                      .charset(charset)
                      .offs(offs)
                      .columnWidth(columnWidth).build().print(out);
-    }
-
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static final class Builder {
-
-        private EndCentralDirectory endCentralDirectory;
-        private Block block;
-        private Charset charset = Charsets.IBM437;
-        private int offs;
-        private int columnWidth;
-
-        public EndCentralDirectoryView build() {
-            Objects.requireNonNull(endCentralDirectory, "'endCentralDirectory' must not be null");
-            Objects.requireNonNull(block, "'block' must not be null");
-            return new EndCentralDirectoryView(this);
-        }
-
-        public Builder endCentralDirectory(EndCentralDirectory endCentralDirectory) {
-            this.endCentralDirectory = endCentralDirectory;
-            return this;
-        }
-
-        public Builder block(Block block) {
-            this.block = block == Block.NULL ? null : block;
-            return this;
-        }
-
-        public Builder charset(Charset charset) {
-            this.charset = Optional.ofNullable(charset).orElse(Charsets.IBM437);
-            return this;
-        }
-
-        public Builder position(int offs, int columnWidth) {
-            this.offs = offs;
-            this.columnWidth = columnWidth;
-            return this;
-        }
-
     }
 }
 

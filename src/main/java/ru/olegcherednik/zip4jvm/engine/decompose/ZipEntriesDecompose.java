@@ -109,12 +109,11 @@ final class ZipEntriesDecompose {
 
     private void printEncryptionHeader(Path dir, ZipEntry zipEntry, ZipEntryView zipEntryView, ZipEntryBlock.EncryptionHeader encryptionHeader)
             throws IOException {
-        Encryption encryption = zipEntry.getEncryption();
-
-        if (encryption == Encryption.OFF)
+        if (encryptionHeader == null)
             return;
 
         Path subDir = Files.createDirectories(dir.resolve("encryption"));
+        Encryption encryption = zipEntry.getEncryption();
         EncryptionHeaderView view = zipEntryView.createEncryptionHeaderView();
 
         // TODO probably same with block reader

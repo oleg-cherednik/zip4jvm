@@ -36,10 +36,7 @@ public class EndCentralDirectoryViewTest {
         endCentralDirectory.setCentralDirectorySize(115);
         endCentralDirectory.setCentralDirectoryOffs(11208273213L);
 
-        String[] lines = Zip4jvmSuite.execute(Zip64View.EndCentralDirectoryView.builder()
-                                                                               .endCentralDirectory(endCentralDirectory)
-                                                                               .block(block)
-                                                                               .position(2, 52).build());
+        String[] lines = Zip4jvmSuite.execute(new Zip64View.EndCentralDirectoryView(endCentralDirectory, block, 2, 52));
 
         assertThat(lines).hasSize(15);
         assertThat(lines[0]).isEqualTo("(PK0606) ZIP64 End of Central directory record");
