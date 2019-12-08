@@ -44,13 +44,13 @@ public final class ExtraFieldView extends View {
     @Override
     public boolean print(PrintStream out) {
         printLocation(out);
-        printSize(extraField.getTotalRecords(), out);
         printRecords(out);
         return true;
     }
 
-    private void printLocation(PrintStream out) {
-        printLine(out, "extra field location:", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
+    public void printLocation(PrintStream out) {
+        printLine(out, "extra field:", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
+        printSize(extraField.getTotalRecords(), out);
     }
 
     private void printSize(int total, PrintStream out) {
@@ -160,7 +160,7 @@ public final class ExtraFieldView extends View {
         }
 
         public Builder extraField(ExtraField extraField) {
-            this.extraField = extraField == ExtraField.NULL || extraField.getTotalRecords() == 0 ? null : extraField;
+            this.extraField = extraField == null || extraField == ExtraField.NULL || extraField.getTotalRecords() == 0 ? null : extraField;
             return this;
         }
 

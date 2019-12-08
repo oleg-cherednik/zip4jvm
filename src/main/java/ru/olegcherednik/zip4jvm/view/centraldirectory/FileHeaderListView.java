@@ -8,6 +8,7 @@ import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.view.View;
+import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
 
 import java.io.PrintStream;
 import java.nio.charset.Charset;
@@ -50,12 +51,19 @@ final class FileHeaderListView extends View {
             if (pos != 0)
                 out.println();
 
+            CentralDirectoryBlock.FileHeaderBlock fileHeaderBlock = diagCentralDirectory.getFileHeaderBlock(fileHeader.getFileName());
+
             FileHeaderView.builder()
                           .fileHeader(fileHeader)
-                          .diagFileHeader(diagCentralDirectory.getFileHeaderBlock(fileHeader.getFileName()))
+                          .block(fileHeaderBlock)
                           .pos(pos++)
-                          .getDataFunc(getDataFunc)
                           .charset(charset)
+                          .position(offs, columnWidth).build().print(out);
+            ExtraFieldView.builder()
+                          .extraField(fileHeader.getExtraField())
+                          .block(fileHeaderBlock.getExtraFieldBlock())
+                          .generalPurposeFlag(fileHeader.getGeneralPurposeFlag())
+                          .getDataFunc(getDataFunc)
                           .position(offs, columnWidth).build().print(out);
         }
 

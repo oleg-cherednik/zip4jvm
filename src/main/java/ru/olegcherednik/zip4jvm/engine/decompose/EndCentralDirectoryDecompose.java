@@ -20,15 +20,15 @@ final class EndCentralDirectoryDecompose {
     private static final String FILE_NAME = "end_central_directory";
 
     private final ZipModel zipModel;
+    private final ZipInfoSettings settings;
     private final EndCentralDirectory endCentralDirectory;
     private final Block block;
-    private final ZipInfoSettings settings;
 
     public EndCentralDirectoryDecompose(BlockModel blockModel, ZipInfoSettings settings) {
         zipModel = blockModel.getZipModel();
+        this.settings = settings;
         endCentralDirectory = blockModel.getEndCentralDirectory();
         block = blockModel.getEndCentralDirectoryBlock();
-        this.settings = settings;
     }
 
     public boolean print(PrintStream out, boolean emptyLine) {

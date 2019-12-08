@@ -19,15 +19,15 @@ import java.nio.file.Path;
 final class Zip64Decompose {
 
     private final ZipModel zipModel;
+    private final ZipInfoSettings settings;
     private final Zip64 zip64;
     private final Zip64Block block;
-    private final ZipInfoSettings settings;
 
     public Zip64Decompose(BlockModel blockModel, ZipInfoSettings settings) {
         zipModel = blockModel.getZipModel();
+        this.settings = settings;
         zip64 = blockModel.getZip64();
         block = blockModel.getZip64Block();
-        this.settings = settings;
     }
 
     public boolean print(PrintStream out, boolean emptyLine) {
@@ -41,8 +41,8 @@ final class Zip64Decompose {
         dir = Files.createDirectories(dir.resolve("zip64"));
         Zip64View view = createView();
 
-        endOfCentralDirectoryLocator(dir, view);
-        endOfCentralDirectory(dir, view);
+        writeEndOfCentralDirectoryLocator(dir, view.createEndCentralDirectorLocatorView());
+        writeEndOfCentralDirectory(dir, view.createEndCentralDirectoryView());
     }
 
     private Zip64View createView() {
@@ -52,17 +52,17 @@ final class Zip64Decompose {
                         .position(settings.getOffs(), settings.getColumnWidth()).build();
     }
 
-    private void endOfCentralDirectoryLocator(Path dir, Zip64View view) throws IOException {
+    private void writeEndOfCentralDirectoryLocator(Path dir, Zip64View.EndCentralDirectoryLocatorView view) throws IOException {
         String fileName = "zip64_end_central_directory_locator";
 
-        Utils.print(dir.resolve(fileName + ".txt"), out -> view.createEndCentralDirectorLocatorView().print(out));
+        Utils.print(dir.resolve(fileName + ".txt"), view::print);
         Utils.copyLarge(zipModel, dir.resolve(fileName + ".data"), block.getEndCentralDirectoryLocatorBlock());
     }
 
-    private void endOfCentralDirectory(Path dir, Zip64View view) throws IOException {
+    private void writeEndOfCentralDirectory(Path dir, Zip64View.EndCentralDirectoryView view) throws IOException {
         String fileName = "zip64_end_central_directory";
 
-        Utils.print(dir.resolve(fileName + ".txt"), out -> view.createEndCentralDirectoryView().print(out));
+        Utils.print(dir.resolve(fileName + ".txt"), view::print);
         Utils.copyLarge(zipModel, dir.resolve(fileName + ".data"), block.getEndCentralDirectoryBlock());
     }
 

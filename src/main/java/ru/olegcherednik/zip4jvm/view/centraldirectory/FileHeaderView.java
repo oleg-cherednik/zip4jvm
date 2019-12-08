@@ -31,7 +31,7 @@ import java.util.function.Function;
 public final class FileHeaderView extends View {
 
     private final CentralDirectory.FileHeader fileHeader;
-    private final CentralDirectoryBlock.FileHeaderBlock diagFileHeader;
+    private final CentralDirectoryBlock.FileHeaderBlock block;
     private final Function<Block, byte[]> getDataFunc;
     private final long pos;
     private final Charset charset;
@@ -43,7 +43,7 @@ public final class FileHeaderView extends View {
     private FileHeaderView(Builder builder) {
         super(builder.offs, builder.columnWidth);
         fileHeader = builder.fileHeader;
-        diagFileHeader = builder.diagFileHeader;
+        block = builder.block;
         getDataFunc = builder.getDataFunc;
         pos = builder.pos;
         charset = builder.charset;
@@ -51,7 +51,7 @@ public final class FileHeaderView extends View {
 
     @Override
     public boolean print(PrintStream out) {
-        printSubTitle(out, CentralDirectory.FileHeader.SIGNATURE, pos, '[' + charset.name() + "] " + fileHeader.getFileName(), diagFileHeader);
+        printSubTitle(out, CentralDirectory.FileHeader.SIGNATURE, pos, '[' + charset.name() + "] " + fileHeader.getFileName(), block);
         printLocation(out);
         printVersion(out);
         printGeneralPurposeFlag(out);
@@ -155,17 +155,17 @@ public final class FileHeaderView extends View {
 
         ExtraFieldView.builder()
                       .extraField(fileHeader.getExtraField())
-                      .block(diagFileHeader.getExtraFieldBlock())
+                      .block(block.getExtraFieldBlock())
                       .generalPurposeFlag(fileHeader.getGeneralPurposeFlag())
                       .getDataFunc(getDataFunc)
-                      .position(offs, columnWidth).build().print(out);
+                      .position(offs, columnWidth).build().printLocation(out);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class Builder {
 
         private CentralDirectory.FileHeader fileHeader;
-        private CentralDirectoryBlock.FileHeaderBlock diagFileHeader;
+        private CentralDirectoryBlock.FileHeaderBlock block;
         private Function<Block, byte[]> getDataFunc = block -> ArrayUtils.EMPTY_BYTE_ARRAY;
         private long pos;
         private Charset charset = Charsets.IBM437;
@@ -174,7 +174,7 @@ public final class FileHeaderView extends View {
 
         public FileHeaderView build() {
             Objects.requireNonNull(fileHeader, "'fileHeader' must not be null");
-            Objects.requireNonNull(diagFileHeader, "'diagFileHeader' must not be null");
+            Objects.requireNonNull(block, "'block' must not be null");
             Objects.requireNonNull(getDataFunc, "'getDataFunc' must not be null");
             return new FileHeaderView(this);
         }
@@ -184,8 +184,8 @@ public final class FileHeaderView extends View {
             return this;
         }
 
-        public Builder diagFileHeader(CentralDirectoryBlock.FileHeaderBlock diagFileHeader) {
-            this.diagFileHeader = diagFileHeader;
+        public Builder block(CentralDirectoryBlock.FileHeaderBlock block) {
+            this.block = block;
             return this;
         }
 

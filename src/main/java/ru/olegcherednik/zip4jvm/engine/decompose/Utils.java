@@ -8,12 +8,14 @@ import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -23,7 +25,7 @@ import java.util.function.Function;
  * @since 07.12.2019
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class Utils {
+final class Utils {
 
     public static void print(Path file, Consumer<PrintStream> consumer) throws FileNotFoundException {
         try (PrintStream out = new PrintStream(file.toFile())) {
@@ -57,6 +59,16 @@ public final class Utils {
                 return ArrayUtils.EMPTY_BYTE_ARRAY;
             }
         };
+    }
+
+    public static Path createSubDir(Path dir, ZipEntry zipEntry, int pos) throws IOException {
+        String fileName = zipEntry.getFileName();
+
+        if (zipEntry.isDirectory())
+            fileName = fileName.substring(0, fileName.length() - 1);
+
+        fileName = "#" + (pos + 1) + " - " + fileName.replaceAll("[\\/]", "_-_");
+        return Files.createDirectories(dir.resolve(fileName));
     }
 
 }

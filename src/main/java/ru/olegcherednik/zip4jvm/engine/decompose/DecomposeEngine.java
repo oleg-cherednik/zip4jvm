@@ -1,7 +1,6 @@
 package ru.olegcherednik.zip4jvm.engine.decompose;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.engine.decompose.centraldirectory.CentralDirectoryDecompose;
 import ru.olegcherednik.zip4jvm.io.readers.block.BlockModelReader;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
@@ -30,15 +29,15 @@ public final class DecomposeEngine {
         new ZipEntriesDecompose(blockModel, settings).print(out, emptyLine);
     }
 
-    public void decompose(Path destDir) throws IOException {
-        Files.createDirectories(destDir);
+    public void decompose(Path dir) throws IOException {
+        Files.createDirectories(dir);
 
         BlockModel blockModel = createModel();
 
-        new EndCentralDirectoryDecompose(blockModel, settings).write(destDir);
-        new Zip64Decompose(blockModel, settings).write(destDir);
-        new CentralDirectoryDecompose(blockModel, settings).write(destDir);
-        new ZipEntriesDecompose(blockModel, settings).write(destDir);
+        new EndCentralDirectoryDecompose(blockModel, settings).write(dir);
+        new Zip64Decompose(blockModel, settings).write(dir);
+        new CentralDirectoryDecompose(blockModel, settings).write(dir);
+        new ZipEntriesDecompose(blockModel, settings).write(dir);
     }
 
     private BlockModel createModel() throws IOException {

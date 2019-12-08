@@ -9,6 +9,7 @@ import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldRecordView;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -33,12 +34,16 @@ public class ExtraFieldDecompose {
         this.generalPurposeFlag = generalPurposeFlag;
     }
 
-    public void write(Path destDir) throws IOException {
-        if(extraField == ExtraField.NULL)
+    public boolean print(PrintStream out, boolean emptyLine) {
+        return extraField != ExtraField.NULL && createView().print(out, emptyLine);
+    }
+
+    public void write(Path dir) throws IOException {
+        if (extraField == ExtraField.NULL)
             return;
 
-        destDir = destDir.resolve("extra_fields");
-        Files.createDirectories(destDir);
+        dir = dir.resolve("extra_fields");
+        Files.createDirectories(dir);
 
         ExtraFieldView view = createView();
 
@@ -46,8 +51,8 @@ public class ExtraFieldDecompose {
             ExtraFieldRecordView<?> recordView = view.getView(extraField.getRecord(signature));
             String fileName = recordView.getFileName();
 
-            Utils.print(destDir.resolve(fileName + ".txt"), recordView::print);
-            Utils.copyLarge(zipModel, destDir.resolve(fileName + ".data"), block.getRecordBlock(signature));
+            Utils.print(dir.resolve(fileName + ".txt"), recordView::print);
+            Utils.copyLarge(zipModel, dir.resolve(fileName + ".data"), block.getRecordBlock(signature));
         }
     }
 
