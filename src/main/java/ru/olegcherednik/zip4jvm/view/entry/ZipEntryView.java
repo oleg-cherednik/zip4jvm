@@ -56,7 +56,7 @@ public final class ZipEntryView extends View {
         return createDataDescriptorView().print(out, emptyLine);
     }
 
-    private IView createLocalFileHeaderView() {
+    public LocalFileHeaderView createLocalFileHeaderView() {
         return LocalFileHeaderView.builder()
                                   .localFileHeader(localFileHeader)
                                   .diagLocalFileHeader(diagLocalFileHeader)

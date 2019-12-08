@@ -3,21 +3,19 @@ package ru.olegcherednik.zip4jvm.engine.decompose;
 import org.apache.commons.io.FileUtils;
 import ru.olegcherednik.zip4jvm.io.readers.block.aes.AesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.io.readers.block.pkware.PkwareEncryptionHeader;
-import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
-import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.BlockZipEntryModel;
 import ru.olegcherednik.zip4jvm.model.block.ByteArrayBlock;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
+import ru.olegcherednik.zip4jvm.view.entry.LocalFileHeaderView;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntryListView;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntryView;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
@@ -30,17 +28,17 @@ import java.nio.file.Path;
 final class ZipEntriesDecompose {
 
     private final BlockModel blockModel;
+    private final ZipModel zipModel;
     private final ZipInfoSettings settings;
 
     public ZipEntriesDecompose(BlockModel blockModel, ZipInfoSettings settings) {
         this.blockModel = blockModel;
+        this.zipModel = blockModel.getZipModel();
         this.settings = settings;
     }
 
-    public boolean print(PrintStream out, boolean emptyLine) {
-        if (blockModel.getZipEntryModel() == null)
-            return false;
-        return createView().print(out, emptyLine);
+    public boolean printTextInfo(PrintStream out, boolean emptyLine) {
+        return blockModel.getZipEntryModel() != null && createView().print(out, emptyLine);
     }
 
     public void write(Path destDir) throws IOException {
@@ -56,24 +54,27 @@ final class ZipEntriesDecompose {
 
         for (LocalFileHeader localFileHeader : zipEntryModel.getLocalFileHeaders().values()) {
             String fileName = localFileHeader.getFileName();
-            ZipEntry zipEntry = blockModel.getZipModel().getZipEntryByFileName(fileName);
+            ZipEntry zipEntry = zipModel.getZipEntryByFileName(fileName);
             ZipEntryBlock block = zipEntryModel.getZipEntryBlock();
             ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader = block.getLocalFileHeader(fileName);
             ZipEntryBlock.EncryptionHeader encryptionHeader = block.getEncryptionHeader(fileName);
 
-            String str = fileName;
+            Path subDir = Utils.createSubDir(dir, zipModel.getZipEntryByFileName(fileName), pos);
 
-            if (zipEntry.isDirectory())
-                str = str.substring(0, str.length() - 1);
+            ZipEntryView zipEntryView = ZipEntryView.builder()
+                                                    .pos(pos)
+                                                    .localFileHeader(localFileHeader)
+                                                    .diagLocalFileHeader(diagLocalFileHeader)
+                                                    .encryptionHeader(encryptionHeader)
+                                                    .dataDescriptor(zipEntryModel.getDataDescriptors().get(fileName))
+                                                    .blockDataDescriptor(block.getDataDescriptor(fileName))
+                                                    .getDataFunc(Utils.getDataFunc(blockModel.getZipModel()))
+                                                    .charset(settings.getCharset())
+                                                    .offs(settings.getOffs())
+                                                    .columnWidth(settings.getColumnWidth()).build();
 
-            str = "#" + (pos + 1) + " - " + str.replaceAll("[\\/]", "_-_");
 
-            Path subDir = dir.resolve(str);
-            Files.createDirectories(subDir);
-
-            printInfoFile(subDir, pos, localFileHeader, diagLocalFileHeader, encryptionHeader, zipEntryModel.getDataDescriptors().get(fileName),
-                    block.getDataDescriptor(fileName));
-            writeZipEntry(subDir, diagLocalFileHeader);
+            writeLocalFileHeader(subDir, zipEntryView, diagLocalFileHeader);
             printExtraField(localFileHeader, diagLocalFileHeader, subDir);
             printEncryptionHeader(zipEntry, encryptionHeader, subDir);
             printDataDescriptor(zipEntry, block, fileName, subDir);
@@ -83,26 +84,16 @@ final class ZipEntriesDecompose {
         }
     }
 
-    private void printInfoFile(Path subDir, int pos, LocalFileHeader localFileHeader, ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader,
-            ZipEntryBlock.EncryptionHeader encryptionHeader, DataDescriptor dataDescriptor, Block blockDataDescriptor) throws FileNotFoundException {
-        try (PrintStream out = new PrintStream(new FileOutputStream(subDir.resolve("info.txt").toFile()))) {
-            ZipEntryView.builder()
-                        .pos(pos)
-                        .localFileHeader(localFileHeader)
-                        .diagLocalFileHeader(diagLocalFileHeader)
-                        .encryptionHeader(encryptionHeader)
-                        .dataDescriptor(dataDescriptor)
-                        .blockDataDescriptor(blockDataDescriptor)
-                        .getDataFunc(Utils.getDataFunc(blockModel.getZipModel()))
-                        .charset(settings.getCharset())
-                        .offs(settings.getOffs())
-                        .columnWidth(settings.getColumnWidth()).build().print(out);
-        }
+    private void writeLocalFileHeader(Path dir, ZipEntryView zipEntryView, ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader)
+            throws IOException {
+        String fileName = "local_file_header";
+
+        LocalFileHeaderView view = zipEntryView.createLocalFileHeaderView();
+
+        Utils.print(dir.resolve(fileName + ".txt"), view::print);
+        Utils.copyLarge(zipModel, dir.resolve(fileName + ".data"), diagLocalFileHeader.getContent());
     }
 
-    private static void writeZipEntry(Path subDir, ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader) throws IOException {
-        FileUtils.writeByteArrayToFile(subDir.resolve("local_file_header.data").toFile(), diagLocalFileHeader.getContent().getData());
-    }
 
     private void printExtraField(LocalFileHeader localFileHeader, ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader, Path subDir)
             throws IOException {

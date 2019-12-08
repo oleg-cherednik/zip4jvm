@@ -36,19 +36,19 @@ final class CentralDirectoryDecompose {
         block = blockModel.getCentralDirectoryBlock();
     }
 
-    public boolean print(PrintStream out, boolean emptyLine) {
+    public boolean printTextInfo(PrintStream out, boolean emptyLine) {
         return createView().print(out, emptyLine);
     }
 
     public void write(Path destDir) throws IOException {
         Path dir = Files.createDirectories(destDir.resolve(FILE_NAME));
 
-        writeTextInfo(dir);
+        printTextInfo(dir);
         writeFileHeaders(dir);
         writeDigitalSignature(dir);
     }
 
-    private void writeTextInfo(Path dir) throws IOException {
+    private void printTextInfo(Path dir) throws IOException {
         Utils.print(dir.resolve(FILE_NAME + ".txt"), out -> createView().printHeader(out));
     }
 

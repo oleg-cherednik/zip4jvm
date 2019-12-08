@@ -109,8 +109,8 @@ public final class FileHeaderView extends View {
     }
 
     private void printSize(PrintStream out) {
-        printLine(out, "compressed size:", String.valueOf(fileHeader.getCompressedSize()));
-        printLine(out, "uncompressed size:", String.valueOf(fileHeader.getUncompressedSize()));
+        printLine(out, "compressed size:", String.format("%d bytes", fileHeader.getCompressedSize()));
+        printLine(out, "uncompressed size:", String.format("%d bytes", fileHeader.getUncompressedSize()));
     }
 
     private void printFileName(PrintStream out) {

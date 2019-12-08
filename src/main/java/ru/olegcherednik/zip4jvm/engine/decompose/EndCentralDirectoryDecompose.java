@@ -31,7 +31,7 @@ final class EndCentralDirectoryDecompose {
         block = blockModel.getEndCentralDirectoryBlock();
     }
 
-    public boolean print(PrintStream out, boolean emptyLine) {
+    public boolean printTextInfo(PrintStream out, boolean emptyLine) {
         return createView().print(out, emptyLine);
     }
 

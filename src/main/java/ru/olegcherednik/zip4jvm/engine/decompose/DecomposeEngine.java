@@ -23,10 +23,10 @@ public final class DecomposeEngine {
     public void decompose(PrintStream out) throws IOException {
         BlockModel blockModel = createModel();
 
-        boolean emptyLine = new EndCentralDirectoryDecompose(blockModel, settings).print(out, false);
-        emptyLine = new Zip64Decompose(blockModel, settings).print(out, emptyLine);
-        emptyLine = new CentralDirectoryDecompose(blockModel, settings).print(out, emptyLine);
-        new ZipEntriesDecompose(blockModel, settings).print(out, emptyLine);
+        boolean emptyLine = new EndCentralDirectoryDecompose(blockModel, settings).printTextInfo(out, false);
+        emptyLine = new Zip64Decompose(blockModel, settings).printTextInfo(out, emptyLine);
+        emptyLine = new CentralDirectoryDecompose(blockModel, settings).printTextInfo(out, emptyLine);
+        new ZipEntriesDecompose(blockModel, settings).printTextInfo(out, emptyLine);
     }
 
     public void decompose(Path dir) throws IOException {

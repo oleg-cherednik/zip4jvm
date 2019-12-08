@@ -10,7 +10,6 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
 import ru.olegcherednik.zip4jvm.view.GeneralPurposeFlagView;
-import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.LastModifiedTimeView;
 import ru.olegcherednik.zip4jvm.view.StringHexView;
 import ru.olegcherednik.zip4jvm.view.VersionView;
@@ -26,7 +25,7 @@ import java.util.function.Function;
  * @author Oleg Cherednik
  * @since 23.10.2019
  */
-final class LocalFileHeaderView extends View {
+public final class LocalFileHeaderView extends View {
 
     private final LocalFileHeader localFileHeader;
     // TODO should be block
@@ -99,8 +98,8 @@ final class LocalFileHeaderView extends View {
     }
 
     private void printSize(PrintStream out) {
-        printLine(out, "compressed size:", String.valueOf(localFileHeader.getCompressedSize()));
-        printLine(out, "uncompressed size:", String.valueOf(localFileHeader.getUncompressedSize()));
+        printLine(out, "compressed size:", String.format("%d bytes", localFileHeader.getCompressedSize()));
+        printLine(out, "uncompressed size:", String.format("%d bytes", localFileHeader.getUncompressedSize()));
     }
 
     private void printFileName(PrintStream out) {
@@ -122,7 +121,7 @@ final class LocalFileHeaderView extends View {
                       .block(diagLocalFileHeader.getExtraFieldBlock())
                       .generalPurposeFlag(localFileHeader.getGeneralPurposeFlag())
                       .getDataFunc(getDataFunc)
-                      .position(offs, columnWidth).build().print(out);
+                      .position(offs, columnWidth).build().printLocation(out);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -136,7 +135,7 @@ final class LocalFileHeaderView extends View {
         private int offs;
         private int columnWidth;
 
-        public IView build() {
+        public LocalFileHeaderView build() {
             return new LocalFileHeaderView(this);
         }
 

@@ -30,7 +30,7 @@ final class Zip64Decompose {
         block = blockModel.getZip64Block();
     }
 
-    public boolean print(PrintStream out, boolean emptyLine) {
+    public boolean printTextInfo(PrintStream out, boolean emptyLine) {
         return zip64 != Zip64.NULL && createView().print(out, emptyLine);
     }
 
