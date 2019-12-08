@@ -4,17 +4,16 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.block.Block;
-import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
-import java.util.Optional;
+import java.util.Objects;
 
 /**
  * @author Oleg Cherednik
  * @since 26.10.2019
  */
-final class DataDescriptorView extends View {
+public final class DataDescriptorView extends View {
 
     private final DataDescriptor dataDescriptor;
     private final Block block;
@@ -44,13 +43,15 @@ final class DataDescriptorView extends View {
     public static final class Builder {
 
         private DataDescriptor dataDescriptor;
-        private Block block = Block.NULL;
+        private Block block;
         private long pos;
         private int offs;
         private int columnWidth;
 
-        public IView build() {
-            return dataDescriptor == null || block == Block.NULL ? IView.NULL : new DataDescriptorView(this);
+        public DataDescriptorView build() {
+            Objects.requireNonNull(dataDescriptor, "'dataDescriptor' must not be null");
+            Objects.requireNonNull(block, "'block' must not be null");
+            return new DataDescriptorView(this);
         }
 
         public Builder dataDescriptor(DataDescriptor dataDescriptor) {
@@ -59,7 +60,7 @@ final class DataDescriptorView extends View {
         }
 
         public Builder block(Block block) {
-            this.block = Optional.ofNullable(block).orElse(Block.NULL);
+            this.block = block == Block.NULL ? null : block;
             return this;
         }
 
@@ -68,12 +69,8 @@ final class DataDescriptorView extends View {
             return this;
         }
 
-        public Builder offs(int offs) {
+        public Builder position(int offs, int columnWidth) {
             this.offs = offs;
-            return this;
-        }
-
-        public Builder columnWidth(int columnWidth) {
             this.columnWidth = columnWidth;
             return this;
         }

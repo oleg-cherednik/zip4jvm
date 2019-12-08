@@ -8,7 +8,6 @@ import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
-import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.View;
 import ru.olegcherednik.zip4jvm.view.crypto.EncryptionHeaderView;
 
@@ -75,13 +74,12 @@ public final class ZipEntryView extends View {
                                    .columnWidth(columnWidth).build();
     }
 
-    private IView createDataDescriptorView() {
+    public DataDescriptorView createDataDescriptorView() {
         return DataDescriptorView.builder()
                                  .dataDescriptor(dataDescriptor)
                                  .block(blockDataDescriptor)
                                  .pos(pos)
-                                 .offs(offs)
-                                 .columnWidth(columnWidth).build();
+                                 .position(offs, columnWidth).build();
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

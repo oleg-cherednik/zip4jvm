@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.engine.decompose;
 
-import org.apache.commons.io.FileUtils;
 import ru.olegcherednik.zip4jvm.io.readers.block.aes.AesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.io.readers.block.pkware.PkwareEncryptionHeader;
 import ru.olegcherednik.zip4jvm.model.Encryption;
@@ -37,11 +36,17 @@ final class ZipEntriesDecompose {
 
     public ZipEntriesDecompose(BlockModel blockModel, ZipInfoSettings settings) {
         this.blockModel = blockModel;
-        this.zipModel = blockModel.getZipModel();
+        zipModel = blockModel.getZipModel();
         this.settings = settings;
     }
 
     public boolean printTextInfo(PrintStream out, boolean emptyLine) {
+        if(blockModel.getZipEntryModel() == null)
+            return false;
+
+
+
+
         return blockModel.getZipEntryModel() != null && createView().print(out, emptyLine);
     }
 
@@ -81,8 +86,8 @@ final class ZipEntriesDecompose {
             writeLocalFileHeader(subDir, zipEntryView.createLocalFileHeaderView(), diagLocalFileHeader);
             printExtraField(subDir, localFileHeader, diagLocalFileHeader.getExtraFieldBlock());
             printEncryptionHeader(subDir, zipEntry, zipEntryView, encryptionHeader);
-            printDataDescriptor(zipEntry, block, fileName, subDir);
-//            copyPayload(zipEntry, diagLocalFileHeader, encryptionHeader, subDir);
+            printDataDescriptor(subDir, zipEntry, zipEntryView, block.getDataDescriptor(fileName));
+            copyPayload(zipEntry, diagLocalFileHeader, encryptionHeader, subDir);
 
             pos++;
         }
@@ -102,7 +107,7 @@ final class ZipEntriesDecompose {
         new ExtraFieldDecompose(blockModel.getZipModel(), settings, extraField, block, generalPurposeFlag).write(dir);
     }
 
-    private static void printEncryptionHeader(Path dir, ZipEntry zipEntry, ZipEntryView zipEntryView, ZipEntryBlock.EncryptionHeader encryptionHeader)
+    private void printEncryptionHeader(Path dir, ZipEntry zipEntry, ZipEntryView zipEntryView, ZipEntryBlock.EncryptionHeader encryptionHeader)
             throws IOException {
         Encryption encryption = zipEntry.getEncryption();
 
@@ -110,7 +115,6 @@ final class ZipEntriesDecompose {
             return;
 
         Path subDir = Files.createDirectories(dir.resolve("encryption"));
-
         EncryptionHeaderView view = zipEntryView.createEncryptionHeaderView();
 
         // TODO probably same with block reader
@@ -118,23 +122,26 @@ final class ZipEntriesDecompose {
             AesEncryptionHeaderBlock block = (AesEncryptionHeaderBlock)encryptionHeader;
             Utils.print(subDir.resolve("aes_encryption_header.txt"), out -> view.createView(block).print(out));
 
-            FileUtils.writeByteArrayToFile(subDir.resolve("aes_salt.data").toFile(), block.getSalt().getData());
-            FileUtils.writeByteArrayToFile(subDir.resolve("aes_password_checksum.data").toFile(), block.getPasswordChecksum().getData());
-            FileUtils.writeByteArrayToFile(subDir.resolve("aes_mac.data").toFile(), block.getMac().getData());
+            Utils.copyLarge(zipModel, subDir.resolve("aes_salt.data"), block.getSalt());
+            Utils.copyLarge(zipModel, subDir.resolve("aes_password_checksum.data"), block.getPasswordChecksum());
+            Utils.copyLarge(zipModel, subDir.resolve("aes_mac.data"), block.getMac());
         } else if (encryption == Encryption.PKWARE) {
             PkwareEncryptionHeader block = (PkwareEncryptionHeader)encryptionHeader;
             Utils.print(dir.resolve("pkware_encryption_header.txt"), out -> view.createView(block).print(out));
-            FileUtils.writeByteArrayToFile(subDir.resolve("pkware_encryption_header.data").toFile(), block.getData().getData());
+            Utils.copyLarge(zipModel, subDir.resolve("pkware_encryption_header.data"), block.getData());
         } else {
             // TODO print unknown header
         }
     }
 
-    private static void printDataDescriptor(ZipEntry zipEntry, ZipEntryBlock block, String fileName, Path subDir) throws IOException {
-        if (zipEntry.isDataDescriptorAvailable()) {
-            ByteArrayBlock dataDescriptor = block.getDataDescriptor(fileName);
-            FileUtils.writeByteArrayToFile(subDir.resolve("data_descriptor.data").toFile(), dataDescriptor.getData());
-        }
+    private void printDataDescriptor(Path dir, ZipEntry zipEntry, ZipEntryView zipEntryView, ByteArrayBlock block) throws IOException {
+        if (!zipEntry.isDataDescriptorAvailable())
+            return;
+
+        String fileName = "data_descriptor";
+
+        Utils.print(dir.resolve(fileName + ".txt"), out -> zipEntryView.createDataDescriptorView().print(out));
+        Utils.copyLarge(zipModel, dir.resolve(fileName + ".data"), block);
     }
 
     private void copyPayload(ZipEntry zipEntry, ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader,
@@ -165,7 +172,7 @@ final class ZipEntriesDecompose {
             size -= encryptionHeader1.getData().getSize();
         }
 
-        Utils.copyLarge(blockModel.getZipModel(), subDir.resolve("payload.data"), offs, size);
+//        Utils.copyLarge(blockModel.getZipModel(), subDir.resolve("payload.data"), offs, size);
     }
 
     private ZipEntryListView createView() {

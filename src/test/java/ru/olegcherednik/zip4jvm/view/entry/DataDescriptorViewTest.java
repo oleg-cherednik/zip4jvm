@@ -32,8 +32,7 @@ public class DataDescriptorViewTest {
                                                                 .dataDescriptor(dataDescriptor)
                                                                 .block(block)
                                                                 .pos(1)
-                                                                .offs(2)
-                                                                .columnWidth(52).build());
+                                                                .position(2, 52).build());
 
         assertThat(lines).hasSize(7);
         assertThat(lines[0]).isEqualTo("#2 (PK0708) Data descriptor");
