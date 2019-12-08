@@ -30,9 +30,6 @@ public final class Zip64View extends View {
 
     @Override
     public boolean print(PrintStream out) {
-        if (zip64 == null)
-            return false;
-
         boolean emptyLine = createEndCentralDirectorLocatorView().print(out);
         return createEndCentralDirectoryView().print(out, emptyLine);
     }
@@ -60,6 +57,7 @@ public final class Zip64View extends View {
         private int columnWidth;
 
         public Zip64View build() {
+            Objects.requireNonNull(zip64, "'zip64' must not be null");
             Objects.requireNonNull(block, "'block' must not be null");
             return new Zip64View(this);
         }

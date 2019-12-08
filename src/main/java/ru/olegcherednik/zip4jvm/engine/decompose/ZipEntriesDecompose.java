@@ -76,9 +76,8 @@ final class ZipEntriesDecompose {
             writeZipEntry(subDir, diagLocalFileHeader);
             printExtraField(localFileHeader, diagLocalFileHeader, subDir);
             printEncryptionHeader(zipEntry, encryptionHeader, subDir);
-            printEncryptionHeader(zipEntry, encryptionHeader, subDir);
             printDataDescriptor(zipEntry, block, fileName, subDir);
-            copyPayload(zipEntry, diagLocalFileHeader, encryptionHeader, subDir);
+//            copyPayload(zipEntry, diagLocalFileHeader, encryptionHeader, subDir);
 
             pos++;
         }

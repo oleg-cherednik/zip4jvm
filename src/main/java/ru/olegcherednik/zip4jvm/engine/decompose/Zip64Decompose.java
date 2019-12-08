@@ -31,19 +31,14 @@ final class Zip64Decompose {
     }
 
     public boolean print(PrintStream out, boolean emptyLine) {
-        Zip64View view = Zip64View.builder()
-                                  .zip64(zip64)
-                                  .block(block)
-                                  .position(settings.getOffs(), settings.getColumnWidth()).build();
-
-        return view.print(out, emptyLine);
+        return zip64 != Zip64.NULL && createView().print(out, emptyLine);
     }
 
-    public void write(Path destDir) throws IOException {
+    public void write(Path dir) throws IOException {
         if (zip64 == Zip64.NULL)
             return;
 
-        Path dir = Files.createDirectories(destDir.resolve("zip64"));
+        dir = Files.createDirectories(dir.resolve("zip64"));
         Zip64View view = createView();
 
         endOfCentralDirectoryLocator(dir, view);

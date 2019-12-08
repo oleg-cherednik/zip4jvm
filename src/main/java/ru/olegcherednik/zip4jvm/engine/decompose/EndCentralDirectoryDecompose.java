@@ -35,9 +35,9 @@ final class EndCentralDirectoryDecompose {
         return createView().print(out, emptyLine);
     }
 
-    public void write(Path destDir) throws IOException {
-        Utils.print(destDir.resolve(FILE_NAME + ".txt"), out -> createView().print(out));
-        Utils.copyLarge(zipModel, destDir.resolve(FILE_NAME + ".data"), block);
+    public void write(Path dir) throws IOException {
+        Utils.print(dir.resolve(FILE_NAME + ".txt"), out -> createView().print(out));
+        Utils.copyLarge(zipModel, dir.resolve(FILE_NAME + ".data"), block);
     }
 
     private EndCentralDirectoryView createView() {

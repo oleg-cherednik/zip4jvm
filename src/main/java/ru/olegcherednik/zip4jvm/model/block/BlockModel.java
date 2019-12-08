@@ -8,6 +8,8 @@ import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
+import java.util.Optional;
+
 /**
  * @author Oleg Cherednik
  * @since 12.10.2019
@@ -75,7 +77,7 @@ public final class BlockModel {
         }
 
         public Builder zip64(Zip64 zip64, Zip64Block block) {
-            this.zip64 = zip64;
+            this.zip64 = Optional.ofNullable(zip64).orElse(Zip64.NULL);
             zip64Block = block;
             return this;
         }
