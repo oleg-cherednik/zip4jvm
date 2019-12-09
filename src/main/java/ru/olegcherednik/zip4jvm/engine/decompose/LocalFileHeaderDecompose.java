@@ -56,7 +56,8 @@ final class LocalFileHeaderDecompose {
             DataDescriptor dataDescriptor = block.getDataDescriptors().get(fileName);
 
             emptyLine |= localFileHeaderView(localFileHeader, pos).print(out, pos != 0 || emptyLine);
-            emptyLine |= extraFieldDecompose(localFileHeader, localFileHeaderBlock.getExtraFieldBlock()).printTextInfo(out, false);
+            emptyLine |= extraFieldDecompose(localFileHeader, localFileHeaderBlock.getExtraFieldBlock(),
+                    settings.getOffs()).printTextInfo(out, false);
             emptyLine |= encryptionHeader(encryption, encryptionHeader, pos).printTextInfo(out, emptyLine);
             emptyLine |= dataDescriptor(dataDescriptor, zipEntryBlock.getDataDescriptor(fileName), pos, out, emptyLine);
 
@@ -85,7 +86,7 @@ final class LocalFileHeaderDecompose {
             Path subDir = Utils.createSubDir(dir, zipModel.getZipEntryByFileName(fileName), pos);
 
             localFileHeader(subDir, localFileHeader, pos);
-            extraFieldDecompose(localFileHeader, localFileHeaderBlock.getExtraFieldBlock()).decompose(subDir);
+            extraFieldDecompose(localFileHeader, localFileHeaderBlock.getExtraFieldBlock(), 0).decompose(subDir);
             encryptionHeader(encryption, encryptionHeader, pos).decompose(subDir);
             dataDescriptor(subDir, dataDescriptor, block.getDataDescriptor(fileName), pos);
             copyPayload(subDir, zipEntry, localFileHeaderBlock, encryptionHeader);
@@ -168,10 +169,10 @@ final class LocalFileHeaderDecompose {
         return new DataDescriptorView(dataDescriptor, block, pos, settings.getOffs(), settings.getColumnWidth());
     }
 
-    private ExtraFieldDecompose extraFieldDecompose(LocalFileHeader localFileHeader, ExtraFieldBlock block) {
+    private ExtraFieldDecompose extraFieldDecompose(LocalFileHeader localFileHeader, ExtraFieldBlock block, int offs) {
         ExtraField extraField = localFileHeader.getExtraField();
         GeneralPurposeFlag generalPurposeFlag = localFileHeader.getGeneralPurposeFlag();
-        return new ExtraFieldDecompose(zipModel, settings, extraField, block, generalPurposeFlag);
+        return new ExtraFieldDecompose(zipModel, extraField, block, generalPurposeFlag, offs, settings.getColumnWidth());
     }
 
 }

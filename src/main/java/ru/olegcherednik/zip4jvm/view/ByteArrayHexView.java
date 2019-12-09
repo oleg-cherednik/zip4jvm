@@ -14,13 +14,9 @@ public final class ByteArrayHexView extends View {
 
     private final byte[] data;
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    private ByteArrayHexView(Builder builder) {
-        super(builder.offs, builder.columnWidth);
-        data = builder.data;
+    public ByteArrayHexView(byte[] data, int offs, int columnWidth) {
+        super(offs, columnWidth);
+        this.data = ArrayUtils.isEmpty(data) ? ArrayUtils.EMPTY_BYTE_ARRAY : ArrayUtils.clone(data);
     }
 
     @Override
@@ -50,27 +46,4 @@ public final class ByteArrayHexView extends View {
         return true;
     }
 
-    public static final class Builder {
-
-        private byte[] data;
-        private int offs;
-        private int columnWidth;
-
-        public ByteArrayHexView build() {
-            return new ByteArrayHexView(this);
-        }
-
-        @SuppressWarnings("MethodCanBeVariableArityMethod")
-        public Builder data(byte[] data) {
-            this.data = ArrayUtils.isEmpty(data) ? ArrayUtils.EMPTY_BYTE_ARRAY : ArrayUtils.clone(data);
-            return this;
-        }
-
-        public Builder position(int offs, int columnWidth) {
-            this.offs = offs;
-            this.columnWidth = columnWidth;
-            return this;
-        }
-
-    }
 }

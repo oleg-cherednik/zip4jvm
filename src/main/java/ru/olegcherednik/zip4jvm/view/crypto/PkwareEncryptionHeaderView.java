@@ -30,16 +30,8 @@ public final class PkwareEncryptionHeaderView extends View {
     @Override
     public boolean print(PrintStream out) {
         printSubTitle(out, pos, "(PKWARE) encryption header");
-        printData(out);
-        return true;
-    }
-
-    private void printData(PrintStream out) {
         printValueLocation(out, "data:", encryptionHeader.getData());
-
-        ByteArrayHexView.builder()
-                        .data(encryptionHeader.getData().getData())
-                        .position(offs, columnWidth).build().print(out);
+        return new ByteArrayHexView(encryptionHeader.getData().getData(), offs, columnWidth).print(out);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

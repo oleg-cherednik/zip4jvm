@@ -4,7 +4,6 @@ import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
-import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldRecordView;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
 
@@ -20,18 +19,20 @@ import java.nio.file.Path;
 public class ExtraFieldDecompose {
 
     private final ZipModel zipModel;
-    private final ZipInfoSettings settings;
     private final ExtraField extraField;
     private final ExtraFieldBlock block;
     private final GeneralPurposeFlag generalPurposeFlag;
+    private final int offs;
+    private final int columnWidth;
 
-    public ExtraFieldDecompose(ZipModel zipModel, ZipInfoSettings settings, ExtraField extraField, ExtraFieldBlock block,
-            GeneralPurposeFlag generalPurposeFlag) {
+    public ExtraFieldDecompose(ZipModel zipModel, ExtraField extraField, ExtraFieldBlock block, GeneralPurposeFlag generalPurposeFlag, int offs,
+            int columnWidth) {
         this.zipModel = zipModel;
-        this.settings = settings;
         this.extraField = extraField;
         this.block = block;
         this.generalPurposeFlag = generalPurposeFlag;
+        this.offs = offs;
+        this.columnWidth = columnWidth;
     }
 
     public boolean printTextInfo(PrintStream out, boolean emptyLine) {
@@ -62,7 +63,7 @@ public class ExtraFieldDecompose {
                              .block(block)
                              .generalPurposeFlag(generalPurposeFlag)
                              .getDataFunc(Utils.getDataFunc(zipModel))
-                             .position(settings.getOffs(), settings.getColumnWidth()).build();
+                             .position(offs, columnWidth).build();
     }
 
 }

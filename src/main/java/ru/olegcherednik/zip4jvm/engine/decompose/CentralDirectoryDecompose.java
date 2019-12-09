@@ -5,6 +5,7 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
+import ru.olegcherednik.zip4jvm.view.IView;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.CentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.DigitalSignatureView;
 
@@ -56,8 +57,7 @@ final class CentralDirectoryDecompose {
         if (centralDirectory.getDigitalSignature() == null)
             return;
 
-        String fileName = "digital_signature";
-        Utils.print(dir.resolve(fileName + ".txt"), out -> digitalSignatureView().print(out));
+        Utils.print(dir.resolve("digital_signature.txt"), out -> digitalSignatureView().print(out));
         // TODO write digital signature data file
     }
 
@@ -69,8 +69,12 @@ final class CentralDirectoryDecompose {
         return new FileHeaderDecompose(zipModel, settings, centralDirectory, block);
     }
 
-    private DigitalSignatureView digitalSignatureView() {
+    private IView digitalSignatureView() {
         CentralDirectory.DigitalSignature digitalSignature = centralDirectory.getDigitalSignature();
+
+        if (digitalSignature == null)
+            return IView.NULL;
+
         int offs = settings.getOffs();
         int columnWidth = settings.getColumnWidth();
         return new DigitalSignatureView(digitalSignature, block.getDigitalSignatureBlock(), offs, columnWidth);

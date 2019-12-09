@@ -39,10 +39,7 @@ final class NtfsTimestampExtraFieldRecordView extends ExtraFieldRecordView<NtfsT
 
             private void print(NtfsTimestampExtraFieldRecord.UnknownTag tag, View view, PrintStream out) {
                 view.printLine(out, String.format("  (0x%04X) Unknown Tag:", tag.getSignature()), String.format("%d bytes", tag.getSize()));
-
-                ByteArrayHexView.builder()
-                                .data(tag.getData())
-                                .position(view.getOffs(), view.getColumnWidth()).build().print(out);
+                new ByteArrayHexView(tag.getData(), view.getOffs(), view.getColumnWidth()).print(out);
             }
         });
     }

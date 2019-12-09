@@ -14,4 +14,9 @@ final class EmptyView implements IView {
     public boolean print(PrintStream out) {
         return false;
     }
+
+    @Override
+    public boolean print(PrintStream out, boolean emptyLine) {
+        return false;
+    }
 }

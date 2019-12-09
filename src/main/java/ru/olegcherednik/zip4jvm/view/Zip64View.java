@@ -79,10 +79,7 @@ public final class Zip64View {
 
         private void printExtensibleDataSector(PrintStream out) {
             printLine(out, "extensible data sector:", String.format("%d bytes", dir.getExtensibleDataSector().length));
-
-            ByteArrayHexView.builder()
-                            .data(dir.getExtensibleDataSector())
-                            .position(offs, columnWidth).build().print(out);
+            new ByteArrayHexView(dir.getExtensibleDataSector(), offs, columnWidth).print(out);
         }
     }
 

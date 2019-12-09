@@ -38,26 +38,17 @@ public final class BlockAesEncryptionHeaderView extends View {
 
     private void printSalt(PrintStream out) {
         printValueLocation(out, "salt:", encryptionHeader.getSalt());
-
-        ByteArrayHexView.builder()
-                        .data(encryptionHeader.getSalt().getData())
-                        .position(offs, columnWidth).build().print(out);
+        new ByteArrayHexView(encryptionHeader.getSalt().getData(), offs, columnWidth).print(out);
     }
 
     private void printPasswordChecksum(PrintStream out) {
         printValueLocation(out, "password checksum:", encryptionHeader.getPasswordChecksum());
-
-        ByteArrayHexView.builder()
-                        .data(encryptionHeader.getPasswordChecksum().getData())
-                        .position(offs, columnWidth).build().print(out);
+        new ByteArrayHexView(encryptionHeader.getPasswordChecksum().getData(), offs, columnWidth).print(out);
     }
 
     private void printMac(PrintStream out) {
         printValueLocation(out, "mac:", encryptionHeader.getMac());
-
-        ByteArrayHexView.builder()
-                        .data(encryptionHeader.getMac().getData())
-                        .position(offs, columnWidth).build().print(out);
+        new ByteArrayHexView(encryptionHeader.getMac().getData(), offs, columnWidth).print(out);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
