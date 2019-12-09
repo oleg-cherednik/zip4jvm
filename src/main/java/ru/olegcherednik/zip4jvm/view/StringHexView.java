@@ -18,6 +18,12 @@ public final class StringHexView extends View {
     private final String str;
     private final Charset charset;
 
+    public StringHexView(String str, Charset charset, int offs, int columnWidth) {
+        super(offs, columnWidth);
+        this.str = str;
+        this.charset = charset;
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -30,7 +36,7 @@ public final class StringHexView extends View {
 
     @Override
     public boolean print(PrintStream out) {
-        if (str == null)
+        if (StringUtils.isEmpty(str))
             return false;
 
         printLine(out, "", charset.name());
@@ -61,14 +67,14 @@ public final class StringHexView extends View {
             for (int i = 0; i < 16; i++) {
                 if (hexs.isEmpty())
                     break;
-                if(i > 0)
+                if (i > 0)
                     out.print(' ');
                 out.format("%02X", hexs.remove().byteValue());
             }
 
             int end = total * 3 + offs;
 
-            for(int i = 0; i < columnWidth - end; i++)
+            for (int i = 0; i < columnWidth - end; i++)
                 out.print(' ');
 
             out.print(' ');

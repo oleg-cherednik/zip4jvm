@@ -104,12 +104,7 @@ public final class LocalFileHeaderView extends View {
 
     private void printFileName(PrintStream out) {
         printLine(out, "length of filename:", String.valueOf(localFileHeader.getFileName().length()));
-
-        StringHexView.builder()
-                     .str(localFileHeader.getFileName())
-                     .charset(charset)
-                     .offs(offs)
-                     .columnWidth(columnWidth).build().print(out);
+        new StringHexView(localFileHeader.getFileName(), charset, offs, columnWidth).print(out);
     }
 
     private void printExtraField(PrintStream out) {

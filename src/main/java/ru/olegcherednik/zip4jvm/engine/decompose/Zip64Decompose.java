@@ -49,17 +49,13 @@ final class Zip64Decompose {
     }
 
     private void endOfCentralDirectoryLocator(Path dir) throws IOException {
-        String fileName = "zip64_end_central_directory_locator";
-
-        Utils.print(dir.resolve(fileName + ".txt"), out -> endCentralDirectorLocatorView().print(out));
-        Utils.copyLarge(zipModel, dir.resolve(fileName + ".data"), block.getEndCentralDirectoryLocatorBlock());
+        Utils.print(dir.resolve("zip64_end_central_directory_locator.txt"), out -> endCentralDirectorLocatorView().print(out));
+        Utils.copyLarge(zipModel, dir.resolve("zip64_end_central_directory_locator.data"), block.getEndCentralDirectoryLocatorBlock());
     }
 
     private void endOfCentralDirectory(Path dir) throws IOException {
-        String fileName = "zip64_end_central_directory";
-
-        Utils.print(dir.resolve(fileName + ".txt"), out -> endCentralDirectoryView().print(out));
-        Utils.copyLarge(zipModel, dir.resolve(fileName + ".data"), block.getEndCentralDirectoryBlock());
+        Utils.print(dir.resolve("zip64_end_central_directory.txt"), out -> endCentralDirectoryView().print(out));
+        Utils.copyLarge(zipModel, dir.resolve("zip64_end_central_directory.data"), block.getEndCentralDirectoryBlock());
     }
 
     private Zip64View.EndCentralDirectoryLocatorView endCentralDirectorLocatorView() {

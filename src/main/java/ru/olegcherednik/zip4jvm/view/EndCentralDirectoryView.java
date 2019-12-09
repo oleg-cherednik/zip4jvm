@@ -52,15 +52,7 @@ public final class EndCentralDirectoryView extends View {
     private void printComment(PrintStream out) {
         String comment = Optional.ofNullable(dir.getComment()).orElse("");
         printLine(out, "zipfile comment length:", String.format("%d bytes", comment.getBytes(charset).length));
-
-        if (comment.isEmpty())
-            return;
-
-        StringHexView.builder()
-                     .str(comment)
-                     .charset(charset)
-                     .offs(offs)
-                     .columnWidth(columnWidth).build().print(out);
+        new StringHexView(comment, charset, offs, columnWidth).print(out);
     }
 }
 

@@ -110,24 +110,13 @@ public final class FileHeaderView extends View {
 
     private void printFileName(PrintStream out) {
         printLine(out, "length of filename:", String.valueOf(fileHeader.getFileName().length()));
-
-        StringHexView.builder()
-                     .str(fileHeader.getFileName())
-                     .charset(charset)
-                     .offs(offs)
-                     .columnWidth(columnWidth).build().print(out);
+        new StringHexView(fileHeader.getFileName(), charset, offs, columnWidth).print(out);
     }
 
     private void printComment(PrintStream out) {
         String comment = Optional.ofNullable(fileHeader.getComment()).orElse("");
-
         printLine(out, "length of file comment:", String.format("%d bytes", comment.getBytes(charset).length));
-
-        StringHexView.builder()
-                     .str(fileHeader.getComment())
-                     .charset(charset)
-                     .offs(offs)
-                     .columnWidth(columnWidth).build().print(out);
+        new StringHexView(fileHeader.getComment(), charset, offs, columnWidth).print(out);
     }
 
     private void printInternalFileAttributesView(PrintStream out) {
