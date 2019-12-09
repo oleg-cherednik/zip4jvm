@@ -29,8 +29,7 @@ public class DigitalSignatureViewTest {
         String[] lines = Zip4jvmSuite.execute(DigitalSignatureView.builder()
                                                                   .digitalSignature(digitalSignature)
                                                                   .block(block)
-                                                                  .offs(2)
-                                                                  .columnWidth(52).build());
+                                                                  .position(2, 52).build());
 
         assertThat(lines).hasSize(5);
         assertThat(lines[0]).isEqualTo("(PK0505) Digital signature");

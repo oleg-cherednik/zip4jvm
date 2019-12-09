@@ -43,7 +43,7 @@ public final class ExtraFieldView extends View {
 
     @Override
     public boolean print(PrintStream out) {
-        printLocation(out);
+//        printLocation(out);
         printRecords(out);
         return true;
     }

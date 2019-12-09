@@ -34,11 +34,11 @@ final class Zip64Decompose {
         if (zip64 == Zip64.NULL)
             return false;
 
-        emptyLine = createEndCentralDirectorLocatorView().print(out, emptyLine);
-        return createEndCentralDirectoryView().print(out, emptyLine);
+        emptyLine = endCentralDirectorLocatorView().print(out, emptyLine);
+        return endCentralDirectoryView().print(out, emptyLine);
     }
 
-    public void write(Path dir) throws IOException {
+    public void decompose(Path dir) throws IOException {
         if (zip64 == Zip64.NULL)
             return;
 
@@ -51,25 +51,25 @@ final class Zip64Decompose {
     private void writeEndOfCentralDirectoryLocator(Path dir) throws IOException {
         String fileName = "zip64_end_central_directory_locator";
 
-        Utils.print(dir.resolve(fileName + ".txt"), out -> createEndCentralDirectorLocatorView().print(out));
+        Utils.print(dir.resolve(fileName + ".txt"), out -> endCentralDirectorLocatorView().print(out));
         Utils.copyLarge(zipModel, dir.resolve(fileName + ".data"), block.getEndCentralDirectoryLocatorBlock());
     }
 
     private void writeEndOfCentralDirectory(Path dir) throws IOException {
         String fileName = "zip64_end_central_directory";
 
-        Utils.print(dir.resolve(fileName + ".txt"), out -> createEndCentralDirectoryView().print(out));
+        Utils.print(dir.resolve(fileName + ".txt"), out -> endCentralDirectoryView().print(out));
         Utils.copyLarge(zipModel, dir.resolve(fileName + ".data"), block.getEndCentralDirectoryBlock());
     }
 
-    private Zip64View.EndCentralDirectoryLocatorView createEndCentralDirectorLocatorView() {
+    private Zip64View.EndCentralDirectoryLocatorView endCentralDirectorLocatorView() {
         Zip64.EndCentralDirectoryLocator locator = zip64.getEndCentralDirectoryLocator();
         int offs = settings.getOffs();
         int columnWidth = settings.getColumnWidth();
         return new Zip64View.EndCentralDirectoryLocatorView(locator, block.getEndCentralDirectoryLocatorBlock(), offs, columnWidth);
     }
 
-    private Zip64View.EndCentralDirectoryView createEndCentralDirectoryView() {
+    private Zip64View.EndCentralDirectoryView endCentralDirectoryView() {
         Zip64.EndCentralDirectory dir = zip64.getEndCentralDirectory();
         int offs = settings.getOffs();
         int columnWidth = settings.getColumnWidth();

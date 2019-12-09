@@ -19,7 +19,7 @@ import java.util.function.Function;
  * @author Oleg Cherednik
  * @since 11.11.2019
  */
-final class FileHeaderListView extends View {
+public final class FileHeaderListView extends View {
 
     private final CentralDirectory centralDirectory;
     private final CentralDirectoryBlock diagCentralDirectory;
@@ -104,12 +104,8 @@ final class FileHeaderListView extends View {
             return this;
         }
 
-        public Builder offs(int offs) {
+        public Builder position(int offs, int columnWidth) {
             this.offs = offs;
-            return this;
-        }
-
-        public Builder columnWidth(int columnWidth) {
             this.columnWidth = columnWidth;
             return this;
         }

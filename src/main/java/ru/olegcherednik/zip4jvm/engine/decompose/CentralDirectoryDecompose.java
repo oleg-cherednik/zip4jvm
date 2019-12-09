@@ -1,16 +1,13 @@
 package ru.olegcherednik.zip4jvm.engine.decompose;
 
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.ExtraField;
-import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
-import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.CentralDirectoryView;
-import ru.olegcherednik.zip4jvm.view.centraldirectory.FileHeaderView;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
@@ -37,19 +34,24 @@ final class CentralDirectoryDecompose {
     }
 
     public boolean printTextInfo(PrintStream out, boolean emptyLine) {
-        return createView().print(out, emptyLine);
+        CentralDirectoryView view = createView();
+
+        view.printHeader(out, emptyLine);
+        emptyLine = new FileHeaderListDecompose(zipModel, settings, centralDirectory, block, view).printTextInfo(out, emptyLine);
+        return view.createDigitalSignatureView().print(out, emptyLine);
     }
 
     public void write(Path destDir) throws IOException {
         Path dir = Files.createDirectories(destDir.resolve(FILE_NAME));
+        CentralDirectoryView view = createView();
 
         printTextInfo(dir);
-        writeFileHeaders(dir);
-        writeDigitalSignature(dir);
+        new FileHeaderListDecompose(zipModel, settings, centralDirectory, block, view).write(dir);
+        writeDigitalSignature(dir, view);
     }
 
     private void printTextInfo(Path dir) throws IOException {
-        Utils.print(dir.resolve(FILE_NAME + ".txt"), out -> createView().printHeader(out));
+        Utils.print(dir.resolve(FILE_NAME + ".txt"), out -> createView().printHeader(out, false));
     }
 
     private CentralDirectoryView createView() {
@@ -61,44 +63,12 @@ final class CentralDirectoryDecompose {
                                    .position(settings.getOffs(), settings.getColumnWidth()).build();
     }
 
-    private void writeFileHeaders(Path dir) throws IOException {
-        int pos = 0;
+    private void writeDigitalSignature(Path dir, CentralDirectoryView view) throws FileNotFoundException {
+        if (centralDirectory.getDigitalSignature() == null)
+            return;
 
-        for (CentralDirectory.FileHeader fileHeader : centralDirectory.getFileHeaders()) {
-            String fileName = fileHeader.getFileName();
-            CentralDirectoryBlock.FileHeaderBlock fileHeaderBlock = block.getFileHeaderBlock(fileName);
-            Path subDir = Utils.createSubDir(dir, zipModel.getZipEntryByFileName(fileName), pos);
-
-            writeFileHeader(subDir, fileHeader, fileHeaderBlock, pos);
-            writeExtraField(subDir, fileHeader, fileHeaderBlock.getExtraFieldBlock());
-
-            pos++;
-        }
-    }
-
-    private void writeFileHeader(Path dir, CentralDirectory.FileHeader fileHeader, CentralDirectoryBlock.FileHeaderBlock block, int pos)
-            throws IOException {
-        String fileName = "file_header";
-        FileHeaderView view = FileHeaderView.builder()
-                                            .fileHeader(fileHeader)
-                                            .block(block)
-                                            .pos(pos)
-                                            .charset(settings.getCharset())
-                                            .position(settings.getOffs(), settings.getColumnWidth()).build();
-
-        Utils.print(dir.resolve(fileName + ".txt"), view::print);
-        Utils.copyLarge(zipModel, dir.resolve(fileName + ".data"), block);
-    }
-
-    private void writeExtraField(Path dir, CentralDirectory.FileHeader fileHeader, ExtraFieldBlock block) throws IOException {
-        ExtraField extraField = fileHeader.getExtraField();
-        GeneralPurposeFlag generalPurposeFlag = fileHeader.getGeneralPurposeFlag();
-        new ExtraFieldDecompose(zipModel, settings, extraField, block, generalPurposeFlag).write(dir);
-    }
-
-    private void writeDigitalSignature(Path dir) {
-        // TODO write DigitalSignature
-
+        String fileName = "digital_signature";
+        Utils.print(dir.resolve(fileName + ".txt"), out -> view.createDigitalSignatureView().print(out));
     }
 
 }

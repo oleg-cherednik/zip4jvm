@@ -84,9 +84,9 @@ public class ZipInfoTest {
 //        ZipInfo.zip(zipDeflateSolidPkware).getShortInfo();
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/foo/deflate/solid/off/src.zip"))
 //        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/pkware.zip"));
-        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/ferdinand.zip"));
+//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/ferdinand.zip"));
 //        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/foo/store/solid/pkware/src.zip"));
-//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/aes.zip"));
+        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/aes.zip"));
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/split/src.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/macos_10.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/ubuntu_18.zip"))

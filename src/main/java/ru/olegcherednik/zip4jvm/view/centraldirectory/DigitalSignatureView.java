@@ -15,7 +15,7 @@ import java.util.Optional;
  * @author Oleg Cherednik
  * @since 18.10.2019
  */
-final class DigitalSignatureView extends View {
+public final class DigitalSignatureView extends View {
 
     private final CentralDirectory.DigitalSignature digitalSignature;
     private final Block block;
@@ -69,12 +69,8 @@ final class DigitalSignatureView extends View {
             return this;
         }
 
-        public Builder offs(int offs) {
+        public Builder position(int offs, int columnWidth) {
             this.offs = offs;
-            return this;
-        }
-
-        public Builder columnWidth(int columnWidth) {
             this.columnWidth = columnWidth;
             return this;
         }

@@ -40,32 +40,33 @@ public final class CentralDirectoryView extends View {
 
     @Override
     public boolean print(PrintStream out) {
-        printHeader(out);
+        printHeader(out, false);
         boolean emptyLine = createFileHeaderListView().print(out);
         return createDigitalSignatureView().print(out, emptyLine);
     }
 
-    public void printHeader(PrintStream out) {
+    public void printHeader(PrintStream out, boolean emptyLine) {
+        if (emptyLine)
+            out.println();
+
         printTitle(out, CentralDirectory.FileHeader.SIGNATURE, "Central directory", diagCentralDirectory);
         printLine(out, "total entries:", String.valueOf(centralDirectory.getFileHeaders().size()));
     }
 
-    private FileHeaderListView createFileHeaderListView() {
+    public FileHeaderListView createFileHeaderListView() {
         return FileHeaderListView.builder()
                                  .centralDirectory(centralDirectory)
                                  .diagCentralDirectory(diagCentralDirectory)
                                  .getDataFunc(getDataFunc)
                                  .charset(charset)
-                                 .offs(offs)
-                                 .columnWidth(columnWidth).build();
+                                 .position(offs, columnWidth).build();
     }
 
-    private DigitalSignatureView createDigitalSignatureView() {
+    public DigitalSignatureView createDigitalSignatureView() {
         return DigitalSignatureView.builder()
                                    .digitalSignature(centralDirectory.getDigitalSignature())
                                    .block(diagCentralDirectory.getDigitalSignatureBlock())
-                                   .offs(offs)
-                                   .columnWidth(columnWidth).build();
+                                   .position(offs, columnWidth).build();
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
