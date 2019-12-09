@@ -18,7 +18,6 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.entry.DataDescriptorView;
 import ru.olegcherednik.zip4jvm.view.entry.LocalFileHeaderView;
-import ru.olegcherednik.zip4jvm.view.entry.ZipEntryView;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -81,58 +80,46 @@ final class LocalFileHeaderDecompose {
             ZipEntryBlock.EncryptionHeader encryptionHeader = block.getEncryptionHeader(fileName);
 
             Encryption encryption = zipModel.getZipEntryByFileName(fileName).getEncryption();
+            DataDescriptor dataDescriptor = zipEntryModel.getDataDescriptors().get(fileName);
 
             Path subDir = Utils.createSubDir(dir, zipModel.getZipEntryByFileName(fileName), pos);
 
-            ZipEntryView zipEntryView = ZipEntryView.builder()
-                                                    .pos(pos)
-                                                    .localFileHeader(localFileHeader)
-                                                    .diagLocalFileHeader(localFileHeaderBlock)
-                                                    .encryptionHeader(encryptionHeader)
-                                                    .dataDescriptor(zipEntryModel.getDataDescriptors().get(fileName))
-                                                    .blockDataDescriptor(block.getDataDescriptor(fileName))
-                                                    .getDataFunc(Utils.getDataFunc(blockModel.getZipModel()))
-                                                    .charset(settings.getCharset())
-                                                    .position(settings.getOffs(), settings.getColumnWidth()).build();
-
-
-            writeLocalFileHeader(subDir, localFileHeader, localFileHeaderBlock, pos);
-            printExtraField(subDir, localFileHeader, localFileHeaderBlock.getExtraFieldBlock());
+            localFileHeader(subDir, localFileHeader, localFileHeaderBlock, pos);
+            extraField(subDir, localFileHeader, localFileHeaderBlock.getExtraFieldBlock());
             encryptionHeader(encryptionHeader, encryption, pos).decompose(subDir);
-            printDataDescriptor(subDir, zipEntry, zipEntryView, block.getDataDescriptor(fileName));
+            printDataDescriptor(subDir, zipEntry, dataDescriptor, block.getDataDescriptor(fileName), pos);
             copyPayload(zipEntry, localFileHeaderBlock, encryptionHeader, subDir);
 
             pos++;
         }
     }
 
-    private void writeLocalFileHeader(Path dir, LocalFileHeader localFileHeader, ZipEntryBlock.LocalFileHeaderBlock block, long pos)
-            throws IOException {
+    private void localFileHeader(Path dir, LocalFileHeader localFileHeader, ZipEntryBlock.LocalFileHeaderBlock block, long pos) throws IOException {
         String fileName = "local_file_header";
 
         Utils.print(dir.resolve(fileName + ".txt"), out -> localFileHeaderView(localFileHeader, block, pos).print(out));
         Utils.copyLarge(zipModel, dir.resolve(fileName + ".data"), block.getContent());
     }
 
-    private void printExtraField(Path dir, LocalFileHeader localFileHeader, ExtraFieldBlock block) throws IOException {
+    private void extraField(Path dir, LocalFileHeader localFileHeader, ExtraFieldBlock block) throws IOException {
         ExtraField extraField = localFileHeader.getExtraField();
         GeneralPurposeFlag generalPurposeFlag = localFileHeader.getGeneralPurposeFlag();
         new ExtraFieldDecompose(blockModel.getZipModel(), settings, extraField, block, generalPurposeFlag).write(dir);
     }
 
-    private void printDataDescriptor(Path dir, ZipEntry zipEntry, ZipEntryView zipEntryView, ByteArrayBlock block) throws IOException {
+    private void printDataDescriptor(Path dir, ZipEntry zipEntry, DataDescriptor dataDescriptor, ByteArrayBlock block, long pos) throws IOException {
         if (!zipEntry.isDataDescriptorAvailable())
             return;
 
         String fileName = "data_descriptor";
 
-        Utils.print(dir.resolve(fileName + ".txt"), out -> zipEntryView.createDataDescriptorView().print(out));
+        Utils.print(dir.resolve(fileName + ".txt"), out -> dataDescriptorView(dataDescriptor, block, pos).print(out));
         Utils.copyLarge(zipModel, dir.resolve(fileName + ".data"), block);
     }
 
     private void copyPayload(ZipEntry zipEntry, ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader,
             ZipEntryBlock.EncryptionHeader encryptionHeader, Path subDir) throws IOException {
-        if (zipEntry.getCompressedSize() == 0)
+        if (zipEntry.getCompressedSize() == 0 || !settings.isCopyPayload())
             return;
 
         long size = zipEntry.getCompressedSize();
@@ -158,7 +145,7 @@ final class LocalFileHeaderDecompose {
             size -= encryptionHeader1.getData().getSize();
         }
 
-//        Utils.copyLarge(blockModel.getZipModel(), subDir.resolve("payload.data"), offs, size);
+        Utils.copyLarge(blockModel.getZipModel(), subDir.resolve("payload.data"), offs, size);
     }
 
     private EncryptionHeaderDecompose encryptionHeader(ZipEntryBlock.EncryptionHeader encryptionHeader, Encryption encryption, long pos) {
