@@ -7,6 +7,7 @@ import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
+import java.util.Objects;
 
 /**
  * @author Oleg Cherednik
@@ -16,6 +17,14 @@ public final class PkwareEncryptionHeaderView extends View {
 
     private final PkwareEncryptionHeader encryptionHeader;
     private final long pos;
+
+    public PkwareEncryptionHeaderView(PkwareEncryptionHeader encryptionHeader, long pos, int offs, int columnWidth) {
+        super(offs, columnWidth);
+        this.encryptionHeader = encryptionHeader;
+        this.pos = pos;
+
+        Objects.requireNonNull(encryptionHeader, "'encryptionHeader' must not be null");
+    }
 
     public static Builder builder() {
         return new Builder();

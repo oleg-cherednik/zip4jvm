@@ -40,11 +40,7 @@ public class BlockAesEncryptionHeaderViewTest {
         when(mac.getOffs()).thenReturn(255507L);
         when(mac.getData()).thenReturn(new byte[] { 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF });
 
-        String[] lines = Zip4jvmSuite.execute(BlockAesEncryptionHeaderView.builder()
-                                                                          .encryptionHeader(encryptionHeader)
-                                                                          .pos(1)
-                                                                          .offs(2)
-                                                                          .columnWidth(52).build());
+        String[] lines = Zip4jvmSuite.execute(new BlockAesEncryptionHeaderView(encryptionHeader, 1, 2, 52));
         assertThat(lines).hasSize(11);
         assertThat(lines[0]).isEqualTo("#2 (AES) encryption header");
         assertThat(lines[1]).isEqualTo("--------------------------");

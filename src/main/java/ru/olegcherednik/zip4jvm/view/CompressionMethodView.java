@@ -16,6 +16,12 @@ public final class CompressionMethodView extends View {
     private final CompressionMethod compressionMethod;
     private final GeneralPurposeFlag generalPurposeFlag;
 
+    public CompressionMethodView(CompressionMethod compressionMethod, GeneralPurposeFlag generalPurposeFlag, int offs, int columnWidth) {
+        super(offs, columnWidth);
+        this.compressionMethod = compressionMethod;
+        this.generalPurposeFlag = generalPurposeFlag;
+    }
+
     public static Builder builder() {
         return new Builder();
     }

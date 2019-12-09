@@ -1,12 +1,11 @@
 package ru.olegcherednik.zip4jvm.view;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 
 import java.io.PrintStream;
+import java.util.Objects;
 
 /**
  * @author Oleg Cherednik
@@ -17,14 +16,13 @@ public final class GeneralPurposeFlagView extends View {
     private final GeneralPurposeFlag generalPurposeFlag;
     private final CompressionMethod compressionMethod;
 
-    public static Builder builder() {
-        return new Builder();
-    }
+    public GeneralPurposeFlagView(GeneralPurposeFlag generalPurposeFlag, CompressionMethod compressionMethod, int offs, int columnWidth) {
+        super(offs, columnWidth);
+        this.generalPurposeFlag = generalPurposeFlag;
+        this.compressionMethod = compressionMethod;
 
-    private GeneralPurposeFlagView(Builder builder) {
-        super(builder.offs, builder.columnWidth);
-        generalPurposeFlag = builder.generalPurposeFlag;
-        compressionMethod = builder.compressionMethod;
+        Objects.requireNonNull(generalPurposeFlag, "'generalPurposeFlag' must not be null");
+        Objects.requireNonNull(compressionMethod, "'compressionMethod' must not be null");
     }
 
     @Override
@@ -43,39 +41,6 @@ public final class GeneralPurposeFlagView extends View {
         printLine(out, "  UTF-8 names          (bit 11):", generalPurposeFlag.isUtf8() ? "yes" : "no");
 
         return true;
-    }
-
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static final class Builder {
-
-        private GeneralPurposeFlag generalPurposeFlag;
-        private CompressionMethod compressionMethod;
-        private int offs;
-        private int columnWidth;
-
-        public GeneralPurposeFlagView build() {
-            return new GeneralPurposeFlagView(this);
-        }
-
-        public Builder generalPurposeFlag(GeneralPurposeFlag generalPurposeFlag) {
-            this.generalPurposeFlag = generalPurposeFlag;
-            return this;
-        }
-
-        public Builder compressionMethod(CompressionMethod compressionMethod) {
-            this.compressionMethod = compressionMethod;
-            return this;
-        }
-
-        public Builder offs(int offs) {
-            this.offs = offs;
-            return this;
-        }
-
-        public Builder columnWidth(int columnWidth) {
-            this.columnWidth = columnWidth;
-            return this;
-        }
     }
 
 }

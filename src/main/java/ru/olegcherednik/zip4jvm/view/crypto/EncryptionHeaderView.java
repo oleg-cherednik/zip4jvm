@@ -27,9 +27,6 @@ public final class EncryptionHeaderView extends View {
 
     @Override
     public boolean print(PrintStream out) {
-        if (encryptionHeader == null)
-            return false;
-
         if (encryptionHeader instanceof AesEncryptionHeaderBlock)
             createView((AesEncryptionHeaderBlock)encryptionHeader).print(out);
         else if (encryptionHeader instanceof PkwareEncryptionHeader)
@@ -40,18 +37,10 @@ public final class EncryptionHeaderView extends View {
     }
 
     public BlockAesEncryptionHeaderView createView(AesEncryptionHeaderBlock encryptionHeader) {
-        return BlockAesEncryptionHeaderView.builder()
-                                           .encryptionHeader(encryptionHeader)
-                                           .pos(pos)
-                                           .offs(offs)
-                                           .columnWidth(columnWidth).build();
+        return new BlockAesEncryptionHeaderView(encryptionHeader, pos, offs, columnWidth);
     }
 
     public PkwareEncryptionHeaderView createView(PkwareEncryptionHeader encryptionHeader) {
-        return PkwareEncryptionHeaderView.builder()
-                                         .encryptionHeader(encryptionHeader)
-                                         .pos(pos)
-                                         .offs(offs)
-                                         .columnWidth(columnWidth).build();
+        return new PkwareEncryptionHeaderView(encryptionHeader, pos, offs, columnWidth);
     }
 }

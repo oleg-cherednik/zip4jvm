@@ -47,7 +47,7 @@ final class FileHeaderDecompose {
         for (CentralDirectory.FileHeader fileHeader : centralDirectory.getFileHeaders()) {
             String fileName = fileHeader.getFileName();
             CentralDirectoryBlock.FileHeaderBlock fileHeaderBlock = block.getFileHeaderBlock(fileName);
-            Path subDir = Utils.createSubDir(dir, zipModel.getZipEntryByFileName(fileName), pos);
+            Path subDir = DecomposeUtils.createSubDir(dir, zipModel.getZipEntryByFileName(fileName), pos);
 
             fileHeader(subDir, fileHeader, fileHeaderBlock, pos);
             extraFieldDecompose(fileHeader, fileHeaderBlock.getExtraFieldBlock(), 0).decompose(subDir);
@@ -60,8 +60,8 @@ final class FileHeaderDecompose {
             throws IOException {
         String fileName = "file_header";
 
-        Utils.print(dir.resolve(fileName + ".txt"), out -> fileHeaderView(fileHeader, block, pos).print(out));
-        Utils.copyLarge(zipModel, dir.resolve(fileName + ".data"), block);
+        DecomposeUtils.print(dir.resolve(fileName + ".txt"), out -> fileHeaderView(fileHeader, block, pos).print(out));
+        DecomposeUtils.copyLarge(zipModel, dir.resolve(fileName + ".data"), block);
     }
 
     private FileHeaderView fileHeaderView(CentralDirectory.FileHeader fileHeader, CentralDirectoryBlock.FileHeaderBlock block, long pos) {

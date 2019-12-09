@@ -1,26 +1,23 @@
 package ru.olegcherednik.zip4jvm.view;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 
 import java.io.PrintStream;
+import java.util.Objects;
 
 /**
  * @author Oleg Cherednik
  * @since 15.10.2019
  */
-public class InternalFileAttributesView extends View {
+public final class InternalFileAttributesView extends View {
 
     private final InternalFileAttributes internalFileAttributes;
 
-    public static Builder builder() {
-        return new Builder();
-    }
+    public InternalFileAttributesView(InternalFileAttributes internalFileAttributes, int offs, int columnWidth) {
+        super(offs, columnWidth);
+        this.internalFileAttributes = internalFileAttributes;
 
-    private InternalFileAttributesView(Builder builder) {
-        super(builder.offs, builder.columnWidth);
-        internalFileAttributes = builder.internalFileAttributes;
+        Objects.requireNonNull(internalFileAttributes, "'internalFileAttributes' must not be null");
     }
 
     @Override
@@ -31,33 +28,6 @@ public class InternalFileAttributesView extends View {
         printLine(out, "  apparent file type: ", internalFileAttributes.getApparentFileType().getTitle());
 
         return true;
-    }
-
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static final class Builder {
-
-        private InternalFileAttributes internalFileAttributes;
-        private int offs;
-        private int columnWidth;
-
-        public InternalFileAttributesView build() {
-            return new InternalFileAttributesView(this);
-        }
-
-        public Builder internalFileAttributes(InternalFileAttributes internalFileAttributes) {
-            this.internalFileAttributes = internalFileAttributes;
-            return this;
-        }
-
-        public Builder offs(int offs) {
-            this.offs = offs;
-            return this;
-        }
-
-        public Builder columnWidth(int columnWidth) {
-            this.columnWidth = columnWidth;
-            return this;
-        }
     }
 
 }

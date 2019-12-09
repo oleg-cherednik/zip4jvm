@@ -52,8 +52,8 @@ public class ExtraFieldDecompose {
             ExtraFieldRecordView<?> recordView = view.getView(extraField.getRecord(signature));
             String fileName = recordView.getFileName();
 
-            Utils.print(dir.resolve(fileName + ".txt"), recordView::print);
-            Utils.copyLarge(zipModel, dir.resolve(fileName + ".data"), block.getRecordBlock(signature));
+            DecomposeUtils.print(dir.resolve(fileName + ".txt"), recordView::print);
+            DecomposeUtils.copyLarge(zipModel, dir.resolve(fileName + ".data"), block.getRecordBlock(signature));
         }
     }
 
@@ -62,7 +62,7 @@ public class ExtraFieldDecompose {
                              .extraField(extraField)
                              .block(block)
                              .generalPurposeFlag(generalPurposeFlag)
-                             .getDataFunc(Utils.getDataFunc(zipModel))
+                             .getDataFunc(DecomposeUtils.getDataFunc(zipModel))
                              .position(offs, columnWidth).build();
     }
 

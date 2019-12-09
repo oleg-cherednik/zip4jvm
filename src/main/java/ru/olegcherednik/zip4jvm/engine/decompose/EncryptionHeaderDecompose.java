@@ -29,7 +29,7 @@ final class EncryptionHeaderDecompose {
 
     public boolean printTextInfo(PrintStream out, boolean emptyLine) {
         if (encryptionHeader != null)
-            return new EncryptionHeaderView(encryptionHeader, pos, settings.getOffs(), settings.getColumnWidth()).print(out, emptyLine);
+            return encryptionHeaderView().print(out, emptyLine);
 
         return emptyLine;
     }
@@ -44,15 +44,15 @@ final class EncryptionHeaderDecompose {
         // TODO probably same with block reader
         if (encryption == Encryption.AES_128 || encryption == Encryption.AES_192 || encryption == Encryption.AES_256) {
             AesEncryptionHeaderBlock block = (AesEncryptionHeaderBlock)encryptionHeader;
-            Utils.print(subDir.resolve("aes_encryption_header.txt"), out -> encryptionHeaderView().print(out));
+            DecomposeUtils.print(subDir.resolve("aes_encryption_header.txt"), out -> encryptionHeaderView().print(out));
 
-            Utils.copyLarge(zipModel, subDir.resolve("aes_salt.data"), block.getSalt());
-            Utils.copyLarge(zipModel, subDir.resolve("aes_password_checksum.data"), block.getPasswordChecksum());
-            Utils.copyLarge(zipModel, subDir.resolve("aes_mac.data"), block.getMac());
+            DecomposeUtils.copyLarge(zipModel, subDir.resolve("aes_salt.data"), block.getSalt());
+            DecomposeUtils.copyLarge(zipModel, subDir.resolve("aes_password_checksum.data"), block.getPasswordChecksum());
+            DecomposeUtils.copyLarge(zipModel, subDir.resolve("aes_mac.data"), block.getMac());
         } else if (encryption == Encryption.PKWARE) {
             PkwareEncryptionHeader block = (PkwareEncryptionHeader)encryptionHeader;
-            Utils.print(dir.resolve("pkware_encryption_header.txt"), out -> encryptionHeaderView().print(out));
-            Utils.copyLarge(zipModel, subDir.resolve("pkware_encryption_header.data"), block.getData());
+            DecomposeUtils.print(dir.resolve("pkware_encryption_header.txt"), out -> encryptionHeaderView().print(out));
+            DecomposeUtils.copyLarge(zipModel, subDir.resolve("pkware_encryption_header.data"), block.getData());
         } else {
             // TODO print unknown header
         }

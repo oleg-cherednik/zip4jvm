@@ -27,11 +27,7 @@ public class PkwareEncryptionHeaderViewTest {
         when(data.getOffs()).thenReturn(60L);
         when(data.getData()).thenReturn(new byte[] { 0x0, 0x1, 0x2, 0x3 });
 
-        String[] lines = Zip4jvmSuite.execute(PkwareEncryptionHeaderView.builder()
-                                                                        .encryptionHeader(encryptionHeader)
-                                                                        .pos(1)
-                                                                        .offs(2)
-                                                                        .columnWidth(52).build());
+        String[] lines = Zip4jvmSuite.execute(new PkwareEncryptionHeaderView(encryptionHeader, 1, 2, 52));
         assertThat(lines).hasSize(5);
         assertThat(lines[0]).isEqualTo("#2 (PKWARE) encryption header");
         assertThat(lines[1]).isEqualTo("-----------------------------");

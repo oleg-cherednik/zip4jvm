@@ -16,9 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class InternalFileAttributesViewTest {
 
     public void shouldRetrieveWindowsAttributesWhenWin() throws IOException {
-        String[] lines = Zip4jvmSuite.execute(InternalFileAttributesView.builder()
-                                                                        .internalFileAttributes(InternalFileAttributes.build(new byte[] { 0x1, 0x2 }))
-                                                                        .columnWidth(52).build());
+        String[] lines = Zip4jvmSuite.execute(new InternalFileAttributesView(InternalFileAttributes.build(new byte[] { 0x1, 0x2 }), 0, 52));
 
         assertThat(lines).hasSize(2);
         assertThat(lines[0]).isEqualTo("internal file attributes:                           0x0201");

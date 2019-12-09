@@ -77,11 +77,7 @@ public final class FileHeaderView extends View {
     }
 
     private void printGeneralPurposeFlag(PrintStream out) {
-        GeneralPurposeFlagView.builder()
-                              .generalPurposeFlag(fileHeader.getGeneralPurposeFlag())
-                              .compressionMethod(fileHeader.getCompressionMethod())
-                              .offs(offs)
-                              .columnWidth(columnWidth).build().print(out);
+        new GeneralPurposeFlagView(fileHeader.getGeneralPurposeFlag(), fileHeader.getCompressionMethod(), offs, columnWidth).print(out);
     }
 
     private void printCompressionMethod(PrintStream out) {
@@ -120,17 +116,11 @@ public final class FileHeaderView extends View {
     }
 
     private void printInternalFileAttributesView(PrintStream out) {
-        InternalFileAttributesView.builder()
-                                  .internalFileAttributes(fileHeader.getInternalFileAttributes())
-                                  .offs(offs)
-                                  .columnWidth(columnWidth).build().print(out);
+        new InternalFileAttributesView(fileHeader.getInternalFileAttributes(), offs, columnWidth).print(out);
     }
 
     private void printExternalFileAttributes(PrintStream out) {
-        ExternalFileAttributesView.builder()
-                                  .externalFileAttributes(fileHeader.getExternalFileAttributes())
-                                  .offs(offs)
-                                  .columnWidth(columnWidth).build().print(out);
+        new ExternalFileAttributesView(fileHeader.getExternalFileAttributes(), offs, columnWidth).print(out);
     }
 
     private void printExtraField(PrintStream out) {

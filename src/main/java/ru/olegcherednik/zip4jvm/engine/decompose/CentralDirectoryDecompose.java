@@ -50,14 +50,14 @@ final class CentralDirectoryDecompose {
     }
 
     private void printTextInfo(Path dir) throws IOException {
-        Utils.print(dir.resolve(FILE_NAME + ".txt"), out -> centralDirectoryView().print(out));
+        DecomposeUtils.print(dir.resolve(FILE_NAME + ".txt"), out -> centralDirectoryView().print(out));
     }
 
     private void digitalSignature(Path dir) throws FileNotFoundException {
         if (centralDirectory.getDigitalSignature() == null)
             return;
 
-        Utils.print(dir.resolve("digital_signature.txt"), out -> digitalSignatureView().print(out));
+        DecomposeUtils.print(dir.resolve("digital_signature.txt"), out -> digitalSignatureView().print(out));
         // TODO write digital signature data file
     }
 

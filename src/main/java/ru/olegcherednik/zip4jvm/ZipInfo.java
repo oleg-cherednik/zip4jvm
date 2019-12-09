@@ -35,7 +35,7 @@ public final class ZipInfo {
         return this;
     }
 
-    public void getShortInfo(PrintStream out) throws IOException {
+    public void printShortInfo(PrintStream out) throws IOException {
         new DecomposeEngine(zip, settings).printTextInfo(out);
     }
 

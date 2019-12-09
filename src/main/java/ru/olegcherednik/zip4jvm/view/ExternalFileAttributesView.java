@@ -1,11 +1,9 @@
 package ru.olegcherednik.zip4jvm.view;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 
 import java.io.PrintStream;
-import java.util.Optional;
+import java.util.Objects;
 
 /**
  * @author Oleg Cherednik
@@ -15,13 +13,11 @@ public final class ExternalFileAttributesView extends View {
 
     private final ExternalFileAttributes externalFileAttributes;
 
-    public static Builder builder() {
-        return new Builder();
-    }
+    public ExternalFileAttributesView(ExternalFileAttributes externalFileAttributes, int offs, int columnWidth) {
+        super(offs, columnWidth);
+        this.externalFileAttributes = externalFileAttributes;
 
-    private ExternalFileAttributesView(Builder builder) {
-        super(builder.offs, builder.columnWidth);
-        externalFileAttributes = builder.externalFileAttributes;
+        Objects.requireNonNull(externalFileAttributes, "'externalFileAttributes' must not be null");
     }
 
     @Override
@@ -36,32 +32,5 @@ public final class ExternalFileAttributesView extends View {
         printLine(out, String.format("  non-MSDOS file attributes (0x%06X):", val >> 8), posix);
 
         return true;
-    }
-
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static final class Builder {
-
-        private ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.NULL;
-        private int offs;
-        private int columnWidth;
-
-        public ExternalFileAttributesView build() {
-            return new ExternalFileAttributesView(this);
-        }
-
-        public Builder externalFileAttributes(ExternalFileAttributes externalFileAttributes) {
-            this.externalFileAttributes = Optional.ofNullable(externalFileAttributes).orElse(ExternalFileAttributes.NULL);
-            return this;
-        }
-
-        public Builder offs(int offs) {
-            this.offs = offs;
-            return this;
-        }
-
-        public Builder columnWidth(int columnWidth) {
-            this.columnWidth = columnWidth;
-            return this;
-        }
     }
 }

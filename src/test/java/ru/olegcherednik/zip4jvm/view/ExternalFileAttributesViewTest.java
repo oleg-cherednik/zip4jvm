@@ -29,9 +29,7 @@ public class ExternalFileAttributesViewTest {
         ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.build(() -> WIN);
         externalFileAttributes.readFrom(new byte[] { (byte)(BIT0 | BIT2 | BIT4), 0x0, 0x0, 0x0 });
 
-        String[] lines = Zip4jvmSuite.execute(ExternalFileAttributesView.builder()
-                                                                        .externalFileAttributes(externalFileAttributes)
-                                                                        .columnWidth(52).build());
+        String[] lines = Zip4jvmSuite.execute(new ExternalFileAttributesView(externalFileAttributes, 0, 52));
 
         assertThat(lines).hasSize(3);
         assertThat(lines[0]).isEqualTo("external file attributes:                           0x00000015");
@@ -44,9 +42,7 @@ public class ExternalFileAttributesViewTest {
             ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.build(osNameProvider);
             externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, (byte)(BIT0 | BIT2 | BIT4 | BIT6), (byte)(BIT0 | BIT7) });
 
-            String[] lines = Zip4jvmSuite.execute(ExternalFileAttributesView.builder()
-                                                                            .externalFileAttributes(externalFileAttributes)
-                                                                            .columnWidth(52).build());
+            String[] lines = Zip4jvmSuite.execute(new ExternalFileAttributesView(externalFileAttributes, 0, 52));
 
             assertThat(lines).hasSize(3);
             assertThat(lines[0]).isEqualTo("external file attributes:                           0x81550000");

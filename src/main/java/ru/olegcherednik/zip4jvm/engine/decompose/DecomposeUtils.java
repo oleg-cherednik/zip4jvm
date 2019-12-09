@@ -25,7 +25,7 @@ import java.util.function.Function;
  * @since 07.12.2019
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-final class Utils {
+final class DecomposeUtils {
 
     public static void print(Path file, Consumer<PrintStream> consumer) throws FileNotFoundException {
         try (PrintStream out = new PrintStream(file.toFile())) {

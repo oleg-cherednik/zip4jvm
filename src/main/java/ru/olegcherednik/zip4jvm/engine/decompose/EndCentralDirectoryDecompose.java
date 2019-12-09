@@ -18,8 +18,6 @@ import java.nio.file.Path;
  */
 final class EndCentralDirectoryDecompose {
 
-    private static final String FILE_NAME = "end_central_directory";
-
     private final ZipModel zipModel;
     private final ZipInfoSettings settings;
     private final EndCentralDirectory endCentralDirectory;
@@ -37,8 +35,8 @@ final class EndCentralDirectoryDecompose {
     }
 
     public void decompose(Path dir) throws IOException {
-        Utils.print(dir.resolve(FILE_NAME + ".txt"), out -> createView().print(out));
-        Utils.copyLarge(zipModel, dir.resolve(FILE_NAME + ".data"), block);
+        DecomposeUtils.print(dir.resolve("end_central_directory.txt"), out -> createView().print(out));
+        DecomposeUtils.copyLarge(zipModel, dir.resolve("end_central_directory.data"), block);
     }
 
     private EndCentralDirectoryView createView() {

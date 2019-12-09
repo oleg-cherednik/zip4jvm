@@ -71,11 +71,7 @@ public final class LocalFileHeaderView extends View {
     }
 
     private void printGeneralPurposeFlag(PrintStream out) {
-        GeneralPurposeFlagView.builder()
-                              .generalPurposeFlag(localFileHeader.getGeneralPurposeFlag())
-                              .compressionMethod(localFileHeader.getCompressionMethod())
-                              .offs(offs)
-                              .columnWidth(columnWidth).build().print(out);
+        new GeneralPurposeFlagView(localFileHeader.getGeneralPurposeFlag(), localFileHeader.getCompressionMethod(), offs, columnWidth).print(out);
     }
 
     private void printCompressionMethod(PrintStream out) {
