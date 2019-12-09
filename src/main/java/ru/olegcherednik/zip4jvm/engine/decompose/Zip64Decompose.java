@@ -44,18 +44,18 @@ final class Zip64Decompose {
 
         dir = Files.createDirectories(dir.resolve("zip64"));
 
-        writeEndOfCentralDirectoryLocator(dir);
-        writeEndOfCentralDirectory(dir);
+        endOfCentralDirectoryLocator(dir);
+        endOfCentralDirectory(dir);
     }
 
-    private void writeEndOfCentralDirectoryLocator(Path dir) throws IOException {
+    private void endOfCentralDirectoryLocator(Path dir) throws IOException {
         String fileName = "zip64_end_central_directory_locator";
 
         Utils.print(dir.resolve(fileName + ".txt"), out -> endCentralDirectorLocatorView().print(out));
         Utils.copyLarge(zipModel, dir.resolve(fileName + ".data"), block.getEndCentralDirectoryLocatorBlock());
     }
 
-    private void writeEndOfCentralDirectory(Path dir) throws IOException {
+    private void endOfCentralDirectory(Path dir) throws IOException {
         String fileName = "zip64_end_central_directory";
 
         Utils.print(dir.resolve(fileName + ".txt"), out -> endCentralDirectoryView().print(out));

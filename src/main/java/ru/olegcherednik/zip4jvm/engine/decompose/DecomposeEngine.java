@@ -24,8 +24,8 @@ public final class DecomposeEngine {
         BlockModel blockModel = createModel();
 
         boolean emptyLine = new EndCentralDirectoryDecompose(blockModel, settings).printTextInfo(out, false);
-        emptyLine = new Zip64Decompose(blockModel, settings).printTextInfo(out, emptyLine);
-        emptyLine = new CentralDirectoryDecompose(blockModel, settings).printTextInfo(out, emptyLine);
+        emptyLine |= new Zip64Decompose(blockModel, settings).printTextInfo(out, emptyLine);
+        emptyLine |= new CentralDirectoryDecompose(blockModel, settings).printTextInfo(out, emptyLine);
         new ZipEntriesDecompose(blockModel, settings).printTextInfo(out, emptyLine);
     }
 
@@ -36,7 +36,7 @@ public final class DecomposeEngine {
 
         new EndCentralDirectoryDecompose(blockModel, settings).decompose(dir);
         new Zip64Decompose(blockModel, settings).decompose(dir);
-        new CentralDirectoryDecompose(blockModel, settings).write(dir);
+        new CentralDirectoryDecompose(blockModel, settings).decompose(dir);
         new ZipEntriesDecompose(blockModel, settings).write(dir);
     }
 

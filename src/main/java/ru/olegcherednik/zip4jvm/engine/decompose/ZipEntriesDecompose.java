@@ -47,7 +47,7 @@ final class ZipEntriesDecompose {
 
 
 
-        return blockModel.getZipEntryModel() != null && createView().print(out, emptyLine);
+        return blockModel.getZipEntryModel() != null && createView().print(out, false);
     }
 
     public void write(Path destDir) throws IOException {

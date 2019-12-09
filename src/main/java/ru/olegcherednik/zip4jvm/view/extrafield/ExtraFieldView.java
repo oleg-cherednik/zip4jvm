@@ -14,6 +14,7 @@ import ru.olegcherednik.zip4jvm.model.os.NtfsTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
@@ -43,9 +44,9 @@ public final class ExtraFieldView extends View {
 
     @Override
     public boolean print(PrintStream out) {
-//        printLocation(out);
-        printRecords(out);
-        return true;
+        Collection<ExtraField.Record> records = extraField.getRecords();
+        records.forEach(record -> printRecord(out, record));
+        return !records.isEmpty();
     }
 
     public void printLocation(PrintStream out) {
@@ -58,10 +59,6 @@ public final class ExtraFieldView extends View {
             printLine(out, "  - size:", String.format("%d bytes (1 record)", block.getSize()));
         else
             printLine(out, "  - size:", String.format("%d bytes (%d records)", block.getSize(), total));
-    }
-
-    private void printRecords(PrintStream out) {
-        extraField.getRecords().forEach(record -> printRecord(out, record));
     }
 
     public void printRecord(PrintStream out, ExtraField.Record record) {

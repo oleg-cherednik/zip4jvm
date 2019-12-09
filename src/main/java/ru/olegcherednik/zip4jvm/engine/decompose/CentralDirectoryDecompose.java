@@ -6,6 +6,7 @@ import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.CentralDirectoryView;
+import ru.olegcherednik.zip4jvm.view.centraldirectory.DigitalSignatureView;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -34,41 +35,45 @@ final class CentralDirectoryDecompose {
     }
 
     public boolean printTextInfo(PrintStream out, boolean emptyLine) {
-        CentralDirectoryView view = createView();
-
-        view.printHeader(out, emptyLine);
-        emptyLine = new FileHeaderListDecompose(zipModel, settings, centralDirectory, block, view).printTextInfo(out, emptyLine);
-        return view.createDigitalSignatureView().print(out, emptyLine);
+        emptyLine = centralDirectoryView().print(out, emptyLine);
+        emptyLine = fileHeaderDecompose().printTextInfo(out, emptyLine);
+        return digitalSignatureView().print(out, emptyLine);
     }
 
-    public void write(Path destDir) throws IOException {
-        Path dir = Files.createDirectories(destDir.resolve(FILE_NAME));
-        CentralDirectoryView view = createView();
+    public void decompose(Path dir) throws IOException {
+        dir = Files.createDirectories(dir.resolve(FILE_NAME));
 
         printTextInfo(dir);
-        new FileHeaderListDecompose(zipModel, settings, centralDirectory, block, view).write(dir);
-        writeDigitalSignature(dir, view);
+        fileHeaderDecompose().write(dir);
+        digitalSignature(dir);
     }
 
     private void printTextInfo(Path dir) throws IOException {
-        Utils.print(dir.resolve(FILE_NAME + ".txt"), out -> createView().printHeader(out, false));
+        Utils.print(dir.resolve(FILE_NAME + ".txt"), out -> centralDirectoryView().print(out));
     }
 
-    private CentralDirectoryView createView() {
-        return CentralDirectoryView.builder()
-                                   .centralDirectory(centralDirectory)
-                                   .diagCentralDirectory(block)
-                                   .getDataFunc(Utils.getDataFunc(zipModel))
-                                   .charset(settings.getCharset())
-                                   .position(settings.getOffs(), settings.getColumnWidth()).build();
+    private DigitalSignatureView digitalSignatureView() {
+        CentralDirectory.DigitalSignature digitalSignature = centralDirectory.getDigitalSignature();
+        int offs = settings.getOffs();
+        int columnWidth = settings.getColumnWidth();
+        return new DigitalSignatureView(digitalSignature, block.getDigitalSignatureBlock(), offs, columnWidth);
     }
 
-    private void writeDigitalSignature(Path dir, CentralDirectoryView view) throws FileNotFoundException {
+    private void digitalSignature(Path dir) throws FileNotFoundException {
         if (centralDirectory.getDigitalSignature() == null)
             return;
 
         String fileName = "digital_signature";
-        Utils.print(dir.resolve(fileName + ".txt"), out -> view.createDigitalSignatureView().print(out));
+        Utils.print(dir.resolve(fileName + ".txt"), out -> digitalSignatureView().print(out));
+        // TODO write digital signature data file
+    }
+
+    private CentralDirectoryView centralDirectoryView() {
+        return new CentralDirectoryView(centralDirectory, block, settings.getOffs(), settings.getColumnWidth());
+    }
+
+    private FileHeaderDecompose fileHeaderDecompose() {
+        return new FileHeaderDecompose(zipModel, settings, centralDirectory, block);
     }
 
 }

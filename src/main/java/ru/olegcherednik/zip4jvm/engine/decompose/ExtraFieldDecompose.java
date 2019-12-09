@@ -34,7 +34,7 @@ public class ExtraFieldDecompose {
         this.generalPurposeFlag = generalPurposeFlag;
     }
 
-    public boolean print(PrintStream out, boolean emptyLine) {
+    public boolean printTextInfo(PrintStream out, boolean emptyLine) {
         return extraField != ExtraField.NULL && createView().print(out, emptyLine);
     }
 
@@ -62,7 +62,7 @@ public class ExtraFieldDecompose {
                              .block(block)
                              .generalPurposeFlag(generalPurposeFlag)
                              .getDataFunc(Utils.getDataFunc(zipModel))
-                             .position(0, settings.getColumnWidth()).build();
+                             .position(settings.getOffs(), settings.getColumnWidth()).build();
     }
 
 }

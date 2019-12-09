@@ -26,10 +26,7 @@ public class DigitalSignatureViewTest {
         CentralDirectory.DigitalSignature digitalSignature = mock(CentralDirectory.DigitalSignature.class);
         when(digitalSignature.getSignatureData()).thenReturn(new byte[] { 0x0, 0x1, 0x2, 0x3 });
 
-        String[] lines = Zip4jvmSuite.execute(DigitalSignatureView.builder()
-                                                                  .digitalSignature(digitalSignature)
-                                                                  .block(block)
-                                                                  .position(2, 52).build());
+        String[] lines = Zip4jvmSuite.execute(new DigitalSignatureView(digitalSignature, block, 2, 52));
 
         assertThat(lines).hasSize(5);
         assertThat(lines[0]).isEqualTo("(PK0505) Digital signature");
