@@ -50,7 +50,7 @@ final class FileHeaderDecompose {
             Path subDir = Utils.createSubDir(dir, zipModel.getZipEntryByFileName(fileName), pos);
 
             fileHeader(subDir, fileHeader, fileHeaderBlock, pos);
-            extraFieldDecompose(fileHeader, fileHeaderBlock.getExtraFieldBlock()).write(subDir);
+            extraFieldDecompose(fileHeader, fileHeaderBlock.getExtraFieldBlock()).decompose(subDir);
 
             pos++;
         }

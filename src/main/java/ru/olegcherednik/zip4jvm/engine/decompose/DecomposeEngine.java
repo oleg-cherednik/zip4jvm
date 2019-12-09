@@ -37,7 +37,7 @@ public final class DecomposeEngine {
         new EndCentralDirectoryDecompose(blockModel, settings).decompose(dir);
         new Zip64Decompose(blockModel, settings).decompose(dir);
         new CentralDirectoryDecompose(blockModel, settings).decompose(dir);
-        new ZipEntriesDecompose(blockModel, settings).write(dir);
+        new ZipEntriesDecompose(blockModel, settings).decompose(dir);
     }
 
     private BlockModel createModel() throws IOException {

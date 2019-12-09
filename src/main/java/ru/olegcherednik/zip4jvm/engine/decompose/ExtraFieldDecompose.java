@@ -38,7 +38,7 @@ public class ExtraFieldDecompose {
         return extraField != ExtraField.NULL && createView().print(out, emptyLine);
     }
 
-    public void write(Path dir) throws IOException {
+    public void decompose(Path dir) throws IOException {
         if (extraField == ExtraField.NULL)
             return;
 

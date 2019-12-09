@@ -21,11 +21,11 @@ import java.nio.file.Path;
 @RequiredArgsConstructor
 final class EncryptionHeaderDecompose {
 
-    private final ZipEntryBlock.EncryptionHeader encryptionHeader;
-    private final long pos;
+    private final ZipModel zipModel;
     private final ZipInfoSettings settings;
     private final Encryption encryption;
-    private final ZipModel zipModel;
+    private final ZipEntryBlock.EncryptionHeader encryptionHeader;
+    private final long pos;
 
     public boolean printTextInfo(PrintStream out, boolean emptyLine) {
         if (encryptionHeader != null)

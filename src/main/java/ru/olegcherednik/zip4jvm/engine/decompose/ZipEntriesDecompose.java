@@ -31,12 +31,12 @@ final class ZipEntriesDecompose {
         return localFileHeaderDecompose().printTextInfo(out, emptyLine);
     }
 
-    public void write(Path dir) throws IOException {
+    public void decompose(Path dir) throws IOException {
         if (blockModel.getZipEntryModel() == null)
             return;
 
         dir = Files.createDirectories(dir.resolve("entries"));
-        localFileHeaderDecompose().write(dir);
+        localFileHeaderDecompose().decompose(dir);
     }
 
     private ZipEntriesView zipEntriesView() {
