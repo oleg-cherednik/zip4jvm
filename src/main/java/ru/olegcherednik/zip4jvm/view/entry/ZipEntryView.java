@@ -52,10 +52,10 @@ public final class ZipEntryView extends View {
     public boolean print(PrintStream out) {
         boolean emptyLine = createLocalFileHeaderView().print(out);
 
-        if (encryptionHeader != null)
-            emptyLine = createEncryptionHeaderView().print(out, emptyLine);
-        if (dataDescriptor != null)
-            emptyLine = createDataDescriptorView().print(out, emptyLine);
+//        if (encryptionHeader != null)
+//            emptyLine = createEncryptionHeaderView().print(out, emptyLine);
+//        if (dataDescriptor != null)
+//            emptyLine = createDataDescriptorView().print(out, emptyLine);
 
         return emptyLine;
     }
@@ -67,8 +67,7 @@ public final class ZipEntryView extends View {
                                   .pos(pos)
                                   .getDataFunc(getDataFunc)
                                   .charset(charset)
-                                  .offs(offs)
-                                  .columnWidth(columnWidth).build();
+                                  .position(offs, columnWidth).build();
     }
 
     public EncryptionHeaderView createEncryptionHeaderView() {
@@ -76,11 +75,7 @@ public final class ZipEntryView extends View {
     }
 
     public DataDescriptorView createDataDescriptorView() {
-        return DataDescriptorView.builder()
-                                 .dataDescriptor(dataDescriptor)
-                                 .block(blockDataDescriptor)
-                                 .pos(pos)
-                                 .position(offs, columnWidth).build();
+        return new DataDescriptorView(dataDescriptor, blockDataDescriptor, pos, offs, columnWidth);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -141,12 +136,8 @@ public final class ZipEntryView extends View {
             return this;
         }
 
-        public Builder offs(int offs) {
+        public Builder position(int offs, int columnWidth) {
             this.offs = offs;
-            return this;
-        }
-
-        public Builder columnWidth(int columnWidth) {
             this.columnWidth = columnWidth;
             return this;
         }

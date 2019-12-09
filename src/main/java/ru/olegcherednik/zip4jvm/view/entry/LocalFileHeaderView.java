@@ -164,12 +164,8 @@ public final class LocalFileHeaderView extends View {
             return this;
         }
 
-        public Builder offs(int offs) {
+        public Builder position(int offs, int columnWidth) {
             this.offs = offs;
-            return this;
-        }
-
-        public Builder columnWidth(int columnWidth) {
             this.columnWidth = columnWidth;
             return this;
         }

@@ -19,6 +19,16 @@ public final class DataDescriptorView extends View {
     private final Block block;
     private final long pos;
 
+    public DataDescriptorView(DataDescriptor dataDescriptor, Block block, long pos, int offs, int columnWidth) {
+        super(offs, columnWidth);
+        this.dataDescriptor = dataDescriptor;
+        this.block = block;
+        this.pos = pos;
+
+        Objects.requireNonNull(dataDescriptor, "'dataDescriptor' must not be null");
+        Objects.requireNonNull(block, "'block' must not be null");
+    }
+
     public static Builder builder() {
         return new Builder();
     }

@@ -151,7 +151,6 @@ public final class ExtraFieldView extends View {
         public ExtraFieldView build() {
             Objects.requireNonNull(extraField, "'extraField' must not be null");
             Objects.requireNonNull(block, "'block' must not be null");
-            Objects.requireNonNull(generalPurposeFlag, "'generalPurposeFlag' must not be null");
             Objects.requireNonNull(getDataFunc, "'getDataFunc' must not be null");
             return new ExtraFieldView(this);
         }

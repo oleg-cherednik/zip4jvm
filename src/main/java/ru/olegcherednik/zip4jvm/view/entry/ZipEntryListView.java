@@ -39,7 +39,7 @@ public final class ZipEntryListView extends View {
     public boolean print(PrintStream out) {
         printTitle(out, LocalFileHeader.SIGNATURE, "ZIP entries");
         printLine(out, "total entries:", String.valueOf(blockZipEntryModel.getLocalFileHeaders().size()));
-        printZipEntries(out);
+//        printZipEntries(out);
         return true;
     }
 
@@ -58,8 +58,7 @@ public final class ZipEntryListView extends View {
                         .blockDataDescriptor(blockZipEntryModel.getZipEntryBlock().getDataDescriptor(localFileHeader.getFileName()))
                         .getDataFunc(getDataFunc)
                         .charset(charset)
-                        .offs(offs)
-                        .columnWidth(columnWidth).build().print(out);
+                        .position(offs, columnWidth).build().print(out);
 
             pos++;
         }

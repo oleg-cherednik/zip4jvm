@@ -2,11 +2,9 @@ package ru.olegcherednik.zip4jvm.view.centraldirectory;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
-import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
 import ru.olegcherednik.zip4jvm.view.ExternalFileAttributesView;
@@ -22,7 +20,6 @@ import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -32,7 +29,6 @@ public final class FileHeaderView extends View {
 
     private final CentralDirectory.FileHeader fileHeader;
     private final CentralDirectoryBlock.FileHeaderBlock block;
-    private final Function<Block, byte[]> getDataFunc;
     private final long pos;
     private final Charset charset;
 
@@ -44,7 +40,6 @@ public final class FileHeaderView extends View {
         super(builder.offs, builder.columnWidth);
         fileHeader = builder.fileHeader;
         block = builder.block;
-        getDataFunc = builder.getDataFunc;
         pos = builder.pos;
         charset = builder.charset;
     }
@@ -157,7 +152,6 @@ public final class FileHeaderView extends View {
                       .extraField(fileHeader.getExtraField())
                       .block(block.getExtraFieldBlock())
                       .generalPurposeFlag(fileHeader.getGeneralPurposeFlag())
-                      .getDataFunc(getDataFunc)
                       .position(offs, columnWidth).build().printLocation(out);
     }
 
@@ -166,7 +160,6 @@ public final class FileHeaderView extends View {
 
         private CentralDirectory.FileHeader fileHeader;
         private CentralDirectoryBlock.FileHeaderBlock block;
-        private Function<Block, byte[]> getDataFunc = block -> ArrayUtils.EMPTY_BYTE_ARRAY;
         private long pos;
         private Charset charset = Charsets.IBM437;
         private int offs;
@@ -175,7 +168,6 @@ public final class FileHeaderView extends View {
         public FileHeaderView build() {
             Objects.requireNonNull(fileHeader, "'fileHeader' must not be null");
             Objects.requireNonNull(block, "'block' must not be null");
-            Objects.requireNonNull(getDataFunc, "'getDataFunc' must not be null");
             return new FileHeaderView(this);
         }
 
@@ -186,11 +178,6 @@ public final class FileHeaderView extends View {
 
         public Builder block(CentralDirectoryBlock.FileHeaderBlock block) {
             this.block = block;
-            return this;
-        }
-
-        public Builder getDataFunc(Function<Block, byte[]> getDataFunc) {
-            this.getDataFunc = Optional.ofNullable(getDataFunc).orElseGet(() -> block -> ArrayUtils.EMPTY_BYTE_ARRAY);
             return this;
         }
 

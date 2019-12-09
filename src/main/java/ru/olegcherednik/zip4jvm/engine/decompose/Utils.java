@@ -61,7 +61,7 @@ final class Utils {
         };
     }
 
-    public static Path createSubDir(Path dir, ZipEntry zipEntry, int pos) throws IOException {
+    public static Path createSubDir(Path dir, ZipEntry zipEntry, long pos) throws IOException {
         String fileName = zipEntry.getFileName();
 
         if (zipEntry.isDirectory())

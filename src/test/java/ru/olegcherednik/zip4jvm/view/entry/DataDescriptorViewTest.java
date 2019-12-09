@@ -28,11 +28,7 @@ public class DataDescriptorViewTest {
                                                       .compressedSize(255436L)
                                                       .uncompressedSize(293823L).build();
 
-        String[] lines = Zip4jvmSuite.execute(DataDescriptorView.builder()
-                                                                .dataDescriptor(dataDescriptor)
-                                                                .block(block)
-                                                                .pos(1)
-                                                                .position(2, 52).build());
+        String[] lines = Zip4jvmSuite.execute(new DataDescriptorView(dataDescriptor, block, 1, 2, 52));
 
         assertThat(lines).hasSize(7);
         assertThat(lines[0]).isEqualTo("#2 (PK0708) Data descriptor");

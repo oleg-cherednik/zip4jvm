@@ -35,8 +35,8 @@ final class CentralDirectoryDecompose {
     }
 
     public boolean printTextInfo(PrintStream out, boolean emptyLine) {
-        emptyLine = centralDirectoryView().print(out, emptyLine);
-        emptyLine = fileHeaderDecompose().printTextInfo(out, emptyLine);
+        emptyLine |= centralDirectoryView().print(out, emptyLine);
+        emptyLine |= fileHeaderDecompose().printTextInfo(out, emptyLine);
         return digitalSignatureView().print(out, emptyLine);
     }
 
@@ -44,19 +44,12 @@ final class CentralDirectoryDecompose {
         dir = Files.createDirectories(dir.resolve(FILE_NAME));
 
         printTextInfo(dir);
-        fileHeaderDecompose().write(dir);
+        fileHeaderDecompose().decompose(dir);
         digitalSignature(dir);
     }
 
     private void printTextInfo(Path dir) throws IOException {
         Utils.print(dir.resolve(FILE_NAME + ".txt"), out -> centralDirectoryView().print(out));
-    }
-
-    private DigitalSignatureView digitalSignatureView() {
-        CentralDirectory.DigitalSignature digitalSignature = centralDirectory.getDigitalSignature();
-        int offs = settings.getOffs();
-        int columnWidth = settings.getColumnWidth();
-        return new DigitalSignatureView(digitalSignature, block.getDigitalSignatureBlock(), offs, columnWidth);
     }
 
     private void digitalSignature(Path dir) throws FileNotFoundException {
@@ -74,6 +67,13 @@ final class CentralDirectoryDecompose {
 
     private FileHeaderDecompose fileHeaderDecompose() {
         return new FileHeaderDecompose(zipModel, settings, centralDirectory, block);
+    }
+
+    private DigitalSignatureView digitalSignatureView() {
+        CentralDirectory.DigitalSignature digitalSignature = centralDirectory.getDigitalSignature();
+        int offs = settings.getOffs();
+        int columnWidth = settings.getColumnWidth();
+        return new DigitalSignatureView(digitalSignature, block.getDigitalSignatureBlock(), offs, columnWidth);
     }
 
 }

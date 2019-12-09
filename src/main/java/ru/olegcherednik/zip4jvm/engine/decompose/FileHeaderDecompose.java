@@ -27,22 +27,22 @@ final class FileHeaderDecompose {
     private final CentralDirectoryBlock block;
 
     public boolean printTextInfo(PrintStream out, boolean emptyLine) {
-        int pos = 0;
+        long pos = 0;
 
         for (CentralDirectory.FileHeader fileHeader : centralDirectory.getFileHeaders()) {
             CentralDirectoryBlock.FileHeaderBlock fileHeaderBlock = block.getFileHeaderBlock(fileHeader.getFileName());
 
-            fileHeaderView(fileHeader, fileHeaderBlock, pos).print(out, pos != 0 || emptyLine);
-            extraFieldDecompose(fileHeader, fileHeaderBlock.getExtraFieldBlock()).printTextInfo(out, false);
+            emptyLine |= fileHeaderView(fileHeader, fileHeaderBlock, pos).print(out, pos != 0 || emptyLine);
+            emptyLine |= extraFieldDecompose(fileHeader, fileHeaderBlock.getExtraFieldBlock()).printTextInfo(out, false);
 
             pos++;
         }
 
-        return !centralDirectory.getFileHeaders().isEmpty();
+        return emptyLine;
     }
 
-    public void write(Path dir) throws IOException {
-        int pos = 0;
+    public void decompose(Path dir) throws IOException {
+        long pos = 0;
 
         for (CentralDirectory.FileHeader fileHeader : centralDirectory.getFileHeaders()) {
             String fileName = fileHeader.getFileName();
@@ -50,13 +50,13 @@ final class FileHeaderDecompose {
             Path subDir = Utils.createSubDir(dir, zipModel.getZipEntryByFileName(fileName), pos);
 
             fileHeader(subDir, fileHeader, fileHeaderBlock, pos);
-            extraFieldDecompose(fileHeader, fileHeaderBlock.getExtraFieldBlock()).write(dir);
+            extraFieldDecompose(fileHeader, fileHeaderBlock.getExtraFieldBlock()).write(subDir);
 
             pos++;
         }
     }
 
-    private void fileHeader(Path dir, CentralDirectory.FileHeader fileHeader, CentralDirectoryBlock.FileHeaderBlock block, int pos)
+    private void fileHeader(Path dir, CentralDirectory.FileHeader fileHeader, CentralDirectoryBlock.FileHeaderBlock block, long pos)
             throws IOException {
         String fileName = "file_header";
 
@@ -64,11 +64,11 @@ final class FileHeaderDecompose {
         Utils.copyLarge(zipModel, dir.resolve(fileName + ".data"), block);
     }
 
-    private FileHeaderView fileHeaderView(CentralDirectory.FileHeader fileHeader, CentralDirectoryBlock.FileHeaderBlock block, int pos) {
+    private FileHeaderView fileHeaderView(CentralDirectory.FileHeader fileHeader, CentralDirectoryBlock.FileHeaderBlock block, long pos) {
         return FileHeaderView.builder()
                              .fileHeader(fileHeader)
                              .block(block)
-                             .pos(pos++)
+                             .pos(pos)
                              .charset(settings.getCharset())
                              .position(settings.getOffs(), settings.getColumnWidth()).build();
     }

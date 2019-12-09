@@ -34,7 +34,7 @@ final class Zip64Decompose {
         if (zip64 == Zip64.NULL)
             return false;
 
-        emptyLine = endCentralDirectorLocatorView().print(out, emptyLine);
+        emptyLine |= endCentralDirectorLocatorView().print(out, emptyLine);
         return endCentralDirectoryView().print(out, emptyLine);
     }
 
