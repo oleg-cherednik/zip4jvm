@@ -1,9 +1,8 @@
 package ru.olegcherednik.zip4jvm.engine.decompose;
 
-import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
-import ru.olegcherednik.zip4jvm.view.entry.ZipEntryListView;
+import ru.olegcherednik.zip4jvm.view.entry.ZipEntriesView;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -17,12 +16,10 @@ import java.nio.file.Path;
 final class ZipEntriesDecompose {
 
     private final BlockModel blockModel;
-    private final ZipModel zipModel;
     private final ZipInfoSettings settings;
 
     public ZipEntriesDecompose(BlockModel blockModel, ZipInfoSettings settings) {
         this.blockModel = blockModel;
-        zipModel = blockModel.getZipModel();
         this.settings = settings;
     }
 
@@ -30,7 +27,7 @@ final class ZipEntriesDecompose {
         if (blockModel.getZipEntryModel() == null)
             return false;
 
-        emptyLine |= createView().print(out, emptyLine);
+        emptyLine |= zipEntriesView().print(out, emptyLine);
         return localFileHeaderDecompose().printTextInfo(out, emptyLine);
     }
 
@@ -42,12 +39,9 @@ final class ZipEntriesDecompose {
         localFileHeaderDecompose().write(dir);
     }
 
-    private ZipEntryListView createView() {
-        return ZipEntryListView.builder()
-                               .blockZipEntryModel(blockModel.getZipEntryModel())
-                               .getDataFunc(Utils.getDataFunc(blockModel.getZipModel()))
-                               .charset(settings.getCharset())
-                               .position(settings.getOffs(), settings.getColumnWidth()).build();
+    private ZipEntriesView zipEntriesView() {
+        long totalEntries = blockModel.getZipEntryModel().getLocalFileHeaders().size();
+        return new ZipEntriesView(totalEntries, settings.getOffs(), settings.getColumnWidth());
     }
 
     private LocalFileHeaderDecompose localFileHeaderDecompose() {
