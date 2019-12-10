@@ -4,10 +4,8 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.io.in.SplitZipInputStream;
-import ru.olegcherednik.zip4jvm.io.readers.block.aes.AesEncryptionHeaderBlock;
-import ru.olegcherednik.zip4jvm.io.readers.block.aes.BlockAesHeaderReader;
-import ru.olegcherednik.zip4jvm.io.readers.block.pkware.BlockPkwareHeaderReader;
-import ru.olegcherednik.zip4jvm.io.readers.block.pkware.PkwareEncryptionHeader;
+import ru.olegcherednik.zip4jvm.model.block.AesEncryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.model.block.PkwareEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
@@ -65,7 +63,7 @@ public class BlockZipEntryModelReader {
             AesEncryptionHeaderBlock encryptionHeader = new BlockAesHeaderReader(zipEntry.getStrength(), zipEntry.getCompressedSize()).read(in);
             zipEntryBlock.saveEncryptionHeader(zipEntry.getFileName(), encryptionHeader);
         } else if (zipEntry.getEncryption() == Encryption.PKWARE) {
-            PkwareEncryptionHeader encryptionHeader = new BlockPkwareHeaderReader().read(in);
+            PkwareEncryptionHeaderBlock encryptionHeader = new BlockPkwareHeaderReader().read(in);
             zipEntryBlock.saveEncryptionHeader(zipEntry.getFileName(), encryptionHeader);
             in.skip(zipEntry.getCompressedSize() - encryptionHeader.getData().getData().length);
         } else

@@ -1,8 +1,8 @@
 package ru.olegcherednik.zip4jvm.engine.decompose;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.readers.block.aes.AesEncryptionHeaderBlock;
-import ru.olegcherednik.zip4jvm.io.readers.block.pkware.PkwareEncryptionHeader;
+import ru.olegcherednik.zip4jvm.model.block.AesEncryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.model.block.PkwareEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
@@ -50,7 +50,7 @@ final class EncryptionHeaderDecompose {
             DecomposeUtils.copyLarge(zipModel, subDir.resolve("aes_password_checksum.data"), block.getPasswordChecksum());
             DecomposeUtils.copyLarge(zipModel, subDir.resolve("aes_mac.data"), block.getMac());
         } else if (encryption == Encryption.PKWARE) {
-            PkwareEncryptionHeader block = (PkwareEncryptionHeader)encryptionHeader;
+            PkwareEncryptionHeaderBlock block = (PkwareEncryptionHeaderBlock)encryptionHeader;
             DecomposeUtils.print(dir.resolve("pkware_encryption_header.txt"), out -> encryptionHeaderView().print(out));
             DecomposeUtils.copyLarge(zipModel, subDir.resolve("pkware_encryption_header.data"), block.getData());
         } else {

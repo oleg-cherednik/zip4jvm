@@ -1,6 +1,6 @@
 package ru.olegcherednik.zip4jvm.view.crypto;
 
-import ru.olegcherednik.zip4jvm.io.readers.block.aes.AesEncryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.model.block.AesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.View;
 

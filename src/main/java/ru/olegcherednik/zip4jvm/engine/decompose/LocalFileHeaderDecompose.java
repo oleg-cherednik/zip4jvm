@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.engine.decompose;
 
-import ru.olegcherednik.zip4jvm.io.readers.block.aes.AesEncryptionHeaderBlock;
-import ru.olegcherednik.zip4jvm.io.readers.block.pkware.PkwareEncryptionHeader;
+import ru.olegcherednik.zip4jvm.model.block.AesEncryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.model.block.PkwareEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
@@ -126,7 +126,7 @@ final class LocalFileHeaderDecompose {
             size -= encryptionHeader1.getPasswordChecksum().getSize();
             size -= encryptionHeader1.getMac().getSize();
         } else if (encryption == Encryption.PKWARE) {
-            PkwareEncryptionHeader encryptionHeader1 = (PkwareEncryptionHeader)encryptionHeader;
+            PkwareEncryptionHeaderBlock encryptionHeader1 = (PkwareEncryptionHeaderBlock)encryptionHeader;
             offs += encryptionHeader1.getData().getSize();
             size -= encryptionHeader1.getData().getSize();
         }

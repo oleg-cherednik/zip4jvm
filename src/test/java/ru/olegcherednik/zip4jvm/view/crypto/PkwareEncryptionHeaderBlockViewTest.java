@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.view.crypto;
 
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.io.readers.block.pkware.PkwareEncryptionHeader;
+import ru.olegcherednik.zip4jvm.model.block.PkwareEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.ByteArrayBlock;
 
 import java.io.IOException;
@@ -16,10 +16,10 @@ import static org.mockito.Mockito.when;
  * @since 09.11.2019
  */
 @Test
-public class PkwareEncryptionHeaderViewTest {
+public class PkwareEncryptionHeaderBlockViewTest {
 
     public void shouldRetrieveMultipleLinesWhenPkwareEncryptionHeader() throws IOException {
-        PkwareEncryptionHeader encryptionHeader = mock(PkwareEncryptionHeader.class);
+        PkwareEncryptionHeaderBlock encryptionHeader = mock(PkwareEncryptionHeaderBlock.class);
         ByteArrayBlock data = mock(ByteArrayBlock.class);
 
         when(encryptionHeader.getData()).thenReturn(data);

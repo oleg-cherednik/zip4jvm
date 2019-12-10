@@ -1,8 +1,6 @@
-package ru.olegcherednik.zip4jvm.io.readers.block.aes;
+package ru.olegcherednik.zip4jvm.model.block;
 
 import lombok.Getter;
-import ru.olegcherednik.zip4jvm.model.block.ByteArrayBlock;
-import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 
 /**
  * @author Oleg Cherednik

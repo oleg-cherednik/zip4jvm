@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.view.crypto;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.readers.block.pkware.PkwareEncryptionHeader;
+import ru.olegcherednik.zip4jvm.model.block.PkwareEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.View;
 
@@ -15,10 +15,10 @@ import java.util.Objects;
  */
 public final class PkwareEncryptionHeaderView extends View {
 
-    private final PkwareEncryptionHeader encryptionHeader;
+    private final PkwareEncryptionHeaderBlock encryptionHeader;
     private final long pos;
 
-    public PkwareEncryptionHeaderView(PkwareEncryptionHeader encryptionHeader, long pos, int offs, int columnWidth) {
+    public PkwareEncryptionHeaderView(PkwareEncryptionHeaderBlock encryptionHeader, long pos, int offs, int columnWidth) {
         super(offs, columnWidth);
         this.encryptionHeader = encryptionHeader;
         this.pos = pos;
@@ -46,7 +46,7 @@ public final class PkwareEncryptionHeaderView extends View {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class Builder {
 
-        private PkwareEncryptionHeader encryptionHeader;
+        private PkwareEncryptionHeaderBlock encryptionHeader;
         private long pos;
         private int offs;
         private int columnWidth;
@@ -55,7 +55,7 @@ public final class PkwareEncryptionHeaderView extends View {
             return new PkwareEncryptionHeaderView(this);
         }
 
-        public Builder encryptionHeader(PkwareEncryptionHeader encryptionHeader) {
+        public Builder encryptionHeader(PkwareEncryptionHeaderBlock encryptionHeader) {
             this.encryptionHeader = encryptionHeader;
             return this;
         }

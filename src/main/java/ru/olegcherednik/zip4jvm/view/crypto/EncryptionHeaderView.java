@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.view.crypto;
 
-import ru.olegcherednik.zip4jvm.io.readers.block.aes.AesEncryptionHeaderBlock;
-import ru.olegcherednik.zip4jvm.io.readers.block.pkware.PkwareEncryptionHeader;
+import ru.olegcherednik.zip4jvm.model.block.AesEncryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.model.block.PkwareEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.view.View;
 
@@ -29,8 +29,8 @@ public final class EncryptionHeaderView extends View {
     public boolean print(PrintStream out) {
         if (encryptionHeader instanceof AesEncryptionHeaderBlock)
             createView((AesEncryptionHeaderBlock)encryptionHeader).print(out);
-        else if (encryptionHeader instanceof PkwareEncryptionHeader)
-            createView((PkwareEncryptionHeader)encryptionHeader).print(out);
+        else if (encryptionHeader instanceof PkwareEncryptionHeaderBlock)
+            createView((PkwareEncryptionHeaderBlock)encryptionHeader).print(out);
         // TODO add for unknown encryption header
 
         return true;
@@ -40,7 +40,7 @@ public final class EncryptionHeaderView extends View {
         return new BlockAesEncryptionHeaderView(encryptionHeader, pos, offs, columnWidth);
     }
 
-    public PkwareEncryptionHeaderView createView(PkwareEncryptionHeader encryptionHeader) {
+    public PkwareEncryptionHeaderView createView(PkwareEncryptionHeaderBlock encryptionHeader) {
         return new PkwareEncryptionHeaderView(encryptionHeader, pos, offs, columnWidth);
     }
 }
