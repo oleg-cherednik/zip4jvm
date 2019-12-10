@@ -2,6 +2,7 @@ package ru.olegcherednik.zip4jvm.view.entry;
 
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.view.SizeView;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
@@ -31,8 +32,8 @@ public final class DataDescriptorView extends View {
     public boolean print(PrintStream out) {
         printSubTitle(out, DataDescriptor.SIGNATURE, pos, "Data descriptor", block);
         printLine(out, "32-bit CRC value:", String.format("0x%08X", dataDescriptor.getCrc32()));
-        printLine(out, "compressed size:", String.format("%d bytes", dataDescriptor.getCompressedSize()));
-        printLine(out, "uncompressed size:", String.format("%d bytes", dataDescriptor.getUncompressedSize()));
+        new SizeView("compressed size:", dataDescriptor.getCompressedSize(), offs, columnWidth).print(out);
+        new SizeView("uncompressed size:", dataDescriptor.getUncompressedSize(), offs, columnWidth).print(out);
         return true;
     }
 

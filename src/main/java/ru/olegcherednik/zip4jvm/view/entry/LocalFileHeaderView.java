@@ -11,6 +11,7 @@ import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
 import ru.olegcherednik.zip4jvm.view.GeneralPurposeFlagView;
 import ru.olegcherednik.zip4jvm.view.LastModifiedTimeView;
+import ru.olegcherednik.zip4jvm.view.SizeView;
 import ru.olegcherednik.zip4jvm.view.StringHexView;
 import ru.olegcherednik.zip4jvm.view.VersionView;
 import ru.olegcherednik.zip4jvm.view.View;
@@ -88,8 +89,8 @@ public final class LocalFileHeaderView extends View {
     }
 
     private void printSize(PrintStream out) {
-        printLine(out, "compressed size:", String.format("%d bytes", localFileHeader.getCompressedSize()));
-        printLine(out, "uncompressed size:", String.format("%d bytes", localFileHeader.getUncompressedSize()));
+        new SizeView("compressed size:", localFileHeader.getCompressedSize(), offs, columnWidth).print(out);
+        new SizeView("uncompressed size:", localFileHeader.getUncompressedSize(), offs, columnWidth).print(out);
     }
 
     private void printFileName(PrintStream out) {

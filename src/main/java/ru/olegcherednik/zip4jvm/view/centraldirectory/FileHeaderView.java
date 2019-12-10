@@ -11,6 +11,7 @@ import ru.olegcherednik.zip4jvm.view.ExternalFileAttributesView;
 import ru.olegcherednik.zip4jvm.view.GeneralPurposeFlagView;
 import ru.olegcherednik.zip4jvm.view.InternalFileAttributesView;
 import ru.olegcherednik.zip4jvm.view.LastModifiedTimeView;
+import ru.olegcherednik.zip4jvm.view.SizeView;
 import ru.olegcherednik.zip4jvm.view.StringHexView;
 import ru.olegcherednik.zip4jvm.view.VersionView;
 import ru.olegcherednik.zip4jvm.view.View;
@@ -93,8 +94,8 @@ public final class FileHeaderView extends View {
     }
 
     private void printSize(PrintStream out) {
-        printLine(out, "compressed size:", String.format("%d bytes", fileHeader.getCompressedSize()));
-        printLine(out, "uncompressed size:", String.format("%d bytes", fileHeader.getUncompressedSize()));
+        new SizeView("compressed size:", fileHeader.getCompressedSize(), offs, columnWidth).print(out);
+        new SizeView("uncompressed size:", fileHeader.getUncompressedSize(), offs, columnWidth).print(out);
     }
 
     private void printFileName(PrintStream out) {
