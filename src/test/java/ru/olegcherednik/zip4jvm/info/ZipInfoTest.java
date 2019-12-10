@@ -96,12 +96,12 @@ public class ZipInfoTest {
         return res;
     }
 
-    //    @Test(enabled = false)
+    @Test(enabled = false)
     public void foo() throws IOException {
         zipInfo().printShortInfo(System.out);
     }
 
-    //    @Test(enabled = false)
+    @Test(enabled = false)
     public void decompose() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         zipInfo().decompose(dir);
