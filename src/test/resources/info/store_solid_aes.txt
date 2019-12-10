@@ -37,8 +37,8 @@
     compression method (99):                        AES encryption
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
     32-bit CRC value:                               0x00000000
-    compressed size:                                293847
-    uncompressed size:                              293823
+    compressed size:                                293847 bytes
+    uncompressed size:                              293823 bytes
     length of filename:                             30
                                                     UTF-8
     62 69 6B 65 73 2F 64 75 63 61 74 69 2D 70 61 6E bikes/ducati-pan
@@ -49,7 +49,7 @@
     external file attributes:                       0x00000020
       MS-DOS file attributes (0x20):                arc
       non-MSDOS file attributes (0x000000):         ?---------
-    extra field location:                           5481155 (0x0053A2C3) bytes
+    extra field:                                    5481155 (0x0053A2C3) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5481155 (0x0053A2C3) bytes
       - size:                                       11 bytes
@@ -75,8 +75,8 @@
     compression method (99):                        AES encryption
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
     32-bit CRC value:                               0x00000000
-    compressed size:                                154615
-    uncompressed size:                              154591
+    compressed size:                                154615 bytes
+    uncompressed size:                              154591 bytes
     length of filename:                             24
                                                     UTF-8
     62 69 6B 65 73 2F 68 6F 6E 64 61 2D 63 62 72 36 bikes/honda-cbr6
@@ -87,7 +87,7 @@
     external file attributes:                       0x00000020
       MS-DOS file attributes (0x20):                arc
       non-MSDOS file attributes (0x000000):         ?---------
-    extra field location:                           5481236 (0x0053A314) bytes
+    extra field:                                    5481236 (0x0053A314) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5481236 (0x0053A314) bytes
       - size:                                       11 bytes
@@ -113,8 +113,8 @@
     compression method (99):                        AES encryption
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F44 0x6344):          2019-10-04 12:26:08
     32-bit CRC value:                               0x00000000
-    compressed size:                                167050
-    uncompressed size:                              167026
+    compressed size:                                167050 bytes
+    uncompressed size:                              167026 bytes
     length of filename:                             28
                                                     UTF-8
     62 69 6B 65 73 2F 6B 61 77 61 73 61 6B 69 2D 6E bikes/kawasaki-n
@@ -125,7 +125,7 @@
     external file attributes:                       0x00000020
       MS-DOS file attributes (0x20):                arc
       non-MSDOS file attributes (0x000000):         ?---------
-    extra field location:                           5481321 (0x0053A369) bytes
+    extra field:                                    5481321 (0x0053A369) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5481321 (0x0053A369) bytes
       - size:                                       11 bytes
@@ -151,8 +151,8 @@
     compression method (99):                        AES encryption
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
     32-bit CRC value:                               0x00000000
-    compressed size:                                287373
-    uncompressed size:                              287349
+    compressed size:                                287373 bytes
+    uncompressed size:                              287349 bytes
     length of filename:                             24
                                                     UTF-8
     62 69 6B 65 73 2F 73 75 7A 75 6B 69 2D 67 73 78 bikes/suzuki-gsx
@@ -163,7 +163,7 @@
     external file attributes:                       0x00000020
       MS-DOS file attributes (0x20):                arc
       non-MSDOS file attributes (0x000000):         ?---------
-    extra field location:                           5481402 (0x0053A3BA) bytes
+    extra field:                                    5481402 (0x0053A3BA) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5481402 (0x0053A3BA) bytes
       - size:                                       11 bytes
@@ -189,8 +189,8 @@
     compression method (99):                        AES encryption
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
-    compressed size:                                1395386
-    uncompressed size:                              1395362
+    compressed size:                                1395386 bytes
+    uncompressed size:                              1395362 bytes
     length of filename:                             28
                                                     UTF-8
     63 61 72 73 2F 62 65 6E 74 6C 65 79 2D 63 6F 6E cars/bentley-con
@@ -201,7 +201,7 @@
     external file attributes:                       0x00000020
       MS-DOS file attributes (0x20):                arc
       non-MSDOS file attributes (0x000000):         ?---------
-    extra field location:                           5481487 (0x0053A40F) bytes
+    extra field:                                    5481487 (0x0053A40F) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5481487 (0x0053A40F) bytes
       - size:                                       11 bytes
@@ -227,8 +227,8 @@
     compression method (99):                        AES encryption
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
-    compressed size:                                320918
-    uncompressed size:                              320894
+    compressed size:                                320918 bytes
+    uncompressed size:                              320894 bytes
     length of filename:                             27
                                                     UTF-8
     63 61 72 73 2F 66 65 72 72 61 72 69 2D 34 35 38 cars/ferrari-458
@@ -239,7 +239,7 @@
     external file attributes:                       0x00000020
       MS-DOS file attributes (0x20):                arc
       non-MSDOS file attributes (0x000000):         ?---------
-    extra field location:                           5481571 (0x0053A463) bytes
+    extra field:                                    5481571 (0x0053A463) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5481571 (0x0053A463) bytes
       - size:                                       11 bytes
@@ -265,8 +265,8 @@
     compression method (99):                        AES encryption
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
-    compressed size:                                729657
-    uncompressed size:                              729633
+    compressed size:                                729657 bytes
+    uncompressed size:                              729633 bytes
     length of filename:                             24
                                                     UTF-8
     63 61 72 73 2F 77 69 65 73 6D 61 6E 6E 2D 67 74 cars/wiesmann-gt
@@ -277,7 +277,7 @@
     external file attributes:                       0x00000020
       MS-DOS file attributes (0x20):                arc
       non-MSDOS file attributes (0x000000):         ?---------
-    extra field location:                           5481652 (0x0053A4B4) bytes
+    extra field:                                    5481652 (0x0053A4B4) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5481652 (0x0053A4B4) bytes
       - size:                                       11 bytes
@@ -303,8 +303,8 @@
     compression method (00):                        none (stored)
 <-- ignore_line -->    file last modified on (0x4F6D 0x9030):          2019-11-13 18:01:32
     32-bit CRC value:                               0x00000000
-    compressed size:                                0
-    uncompressed size:                              0
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
     length of filename:                             10
                                                     UTF-8
     65 6D 70 74 79 5F 64 69 72 2F                   empty_dir/
@@ -333,8 +333,8 @@
     compression method (99):                        AES encryption
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F2F 0x9DCE):          2019-09-15 19:46:28
     32-bit CRC value:                               0x00000000
-    compressed size:                                24
-    uncompressed size:                              0
+    compressed size:                                24 bytes
+    uncompressed size:                              0 bytes
     length of filename:                             14
                                                     UTF-8
     65 6D 70 74 79 5F 66 69 6C 65 2E 74 78 74       empty_file.txt
@@ -344,7 +344,7 @@
     external file attributes:                       0x00000020
       MS-DOS file attributes (0x20):                arc
       non-MSDOS file attributes (0x000000):         ?---------
-    extra field location:                           5481779 (0x0053A533) bytes
+    extra field:                                    5481779 (0x0053A533) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5481779 (0x0053A533) bytes
       - size:                                       11 bytes
@@ -370,8 +370,8 @@
     compression method (99):                        AES encryption
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
-    compressed size:                                624770
-    uncompressed size:                              624746
+    compressed size:                                624770 bytes
+    uncompressed size:                              624746 bytes
     length of filename:                             31
                                                     UTF-8
     6D 63 64 6F 6E 6E 65 6C 6C 2D 64 6F 75 67 6C 61 mcdonnell-dougla
@@ -382,7 +382,7 @@
     external file attributes:                       0x00000020
       MS-DOS file attributes (0x20):                arc
       non-MSDOS file attributes (0x000000):         ?---------
-    extra field location:                           5481867 (0x0053A58B) bytes
+    extra field:                                    5481867 (0x0053A58B) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5481867 (0x0053A58B) bytes
       - size:                                       11 bytes
@@ -408,8 +408,8 @@
     compression method (99):                        AES encryption
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F2F 0x9DCE):          2019-09-15 19:46:28
     32-bit CRC value:                               0x00000000
-    compressed size:                                65
-    uncompressed size:                              41
+    compressed size:                                65 bytes
+    uncompressed size:                              41 bytes
     length of filename:                             18
                                                     UTF-8
     4F 6C 65 67 20 43 68 65 72 65 64 6E 69 6B 2E 74 Oleg Cherednik.t
@@ -420,7 +420,7 @@
     external file attributes:                       0x00000020
       MS-DOS file attributes (0x20):                arc
       non-MSDOS file attributes (0x000000):         ?---------
-    extra field location:                           5481942 (0x0053A5D6) bytes
+    extra field:                                    5481942 (0x0053A5D6) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5481942 (0x0053A5D6) bytes
       - size:                                       11 bytes
@@ -446,8 +446,8 @@
     compression method (99):                        AES encryption
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
-    compressed size:                                1074860
-    uncompressed size:                              1074836
+    compressed size:                                1074860 bytes
+    uncompressed size:                              1074836 bytes
     length of filename:                             20
                                                     UTF-8
     73 61 69 6E 74 2D 70 65 74 65 72 73 62 75 72 67 saint-petersburg
@@ -458,7 +458,7 @@
     external file attributes:                       0x00000020
       MS-DOS file attributes (0x20):                arc
       non-MSDOS file attributes (0x000000):         ?---------
-    extra field location:                           5482019 (0x0053A623) bytes
+    extra field:                                    5482019 (0x0053A623) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5482019 (0x0053A623) bytes
       - size:                                       11 bytes
@@ -484,8 +484,8 @@
     compression method (99):                        AES encryption
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
-    compressed size:                                431502
-    uncompressed size:                              431478
+    compressed size:                                431502 bytes
+    uncompressed size:                              431478 bytes
     length of filename:                             20
                                                     UTF-8
     73 69 67 2D 73 61 75 65 72 2D 70 69 73 74 6F 6C sig-sauer-pistol
@@ -496,7 +496,7 @@
     external file attributes:                       0x00000020
       MS-DOS file attributes (0x20):                arc
       non-MSDOS file attributes (0x000000):         ?---------
-    extra field location:                           5482096 (0x0053A670) bytes
+    extra field:                                    5482096 (0x0053A670) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5482096 (0x0053A670) bytes
       - size:                                       11 bytes
@@ -522,13 +522,13 @@
     compression method (99):                        AES encryption
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
     32-bit CRC value:                               0x00000000
-    compressed size:                                0
-    uncompressed size:                              0
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
     length of filename:                             30
                                                     UTF-8
     62 69 6B 65 73 2F 64 75 63 61 74 69 2D 70 61 6E bikes/ducati-pan
     69 67 61 6C 65 2D 31 31 39 39 2E 6A 70 67       igale-1199.jpg
-    extra field location:                           60 (0x0000003C) bytes
+    extra field:                                    60 (0x0000003C) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    60 (0x0000003C) bytes
       - size:                                       11 bytes
@@ -570,13 +570,13 @@
     compression method (99):                        AES encryption
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
     32-bit CRC value:                               0x00000000
-    compressed size:                                0
-    uncompressed size:                              0
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
     length of filename:                             24
                                                     UTF-8
     62 69 6B 65 73 2F 68 6F 6E 64 61 2D 63 62 72 36 bikes/honda-cbr6
     30 30 72 72 2E 6A 70 67                         00rr.jpg
-    extra field location:                           293988 (0x00047C64) bytes
+    extra field:                                    293988 (0x00047C64) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    293988 (0x00047C64) bytes
       - size:                                       11 bytes
@@ -618,13 +618,13 @@
     compression method (99):                        AES encryption
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F44 0x6344):          2019-10-04 12:26:08
     32-bit CRC value:                               0x00000000
-    compressed size:                                0
-    uncompressed size:                              0
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
     length of filename:                             28
                                                     UTF-8
     62 69 6B 65 73 2F 6B 61 77 61 73 61 6B 69 2D 6E bikes/kawasaki-n
     69 6E 6A 61 2D 33 30 30 2E 6A 70 67             inja-300.jpg
-    extra field location:                           448688 (0x0006D8B0) bytes
+    extra field:                                    448688 (0x0006D8B0) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    448688 (0x0006D8B0) bytes
       - size:                                       11 bytes
@@ -666,13 +666,13 @@
     compression method (99):                        AES encryption
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
     32-bit CRC value:                               0x00000000
-    compressed size:                                0
-    uncompressed size:                              0
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
     length of filename:                             24
                                                     UTF-8
     62 69 6B 65 73 2F 73 75 7A 75 6B 69 2D 67 73 78 bikes/suzuki-gsx
     72 37 35 30 2E 6A 70 67                         r750.jpg
-    extra field location:                           615819 (0x0009658B) bytes
+    extra field:                                    615819 (0x0009658B) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    615819 (0x0009658B) bytes
       - size:                                       11 bytes
@@ -714,13 +714,13 @@
     compression method (99):                        AES encryption
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
-    compressed size:                                0
-    uncompressed size:                              0
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
     length of filename:                             28
                                                     UTF-8
     63 61 72 73 2F 62 65 6E 74 6C 65 79 2D 63 6F 6E cars/bentley-con
     74 69 6E 65 6E 74 61 6C 2E 6A 70 67             tinental.jpg
-    extra field location:                           903277 (0x000DC86D) bytes
+    extra field:                                    903277 (0x000DC86D) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    903277 (0x000DC86D) bytes
       - size:                                       11 bytes
@@ -762,13 +762,13 @@
     compression method (99):                        AES encryption
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
-    compressed size:                                0
-    uncompressed size:                              0
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
     length of filename:                             27
                                                     UTF-8
     63 61 72 73 2F 66 65 72 72 61 72 69 2D 34 35 38 cars/ferrari-458
     2D 69 74 61 6C 69 61 2E 6A 70 67                -italia.jpg
-    extra field location:                           2298747 (0x0023137B) bytes
+    extra field:                                    2298747 (0x0023137B) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    2298747 (0x0023137B) bytes
       - size:                                       11 bytes
@@ -810,13 +810,13 @@
     compression method (99):                        AES encryption
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
-    compressed size:                                0
-    uncompressed size:                              0
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
     length of filename:                             24
                                                     UTF-8
     63 61 72 73 2F 77 69 65 73 6D 61 6E 6E 2D 67 74 cars/wiesmann-gt
     2D 6D 66 35 2E 6A 70 67                         -mf5.jpg
-    extra field location:                           2619746 (0x0027F962) bytes
+    extra field:                                    2619746 (0x0027F962) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    2619746 (0x0027F962) bytes
       - size:                                       11 bytes
@@ -858,12 +858,11 @@
     compression method (00):                        none (stored)
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F6D 0x9030):          2019-11-13 18:01:32
     32-bit CRC value:                               0x00000000
-    compressed size:                                0
-    uncompressed size:                              0
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
     length of filename:                             10
                                                     UTF-8
     65 6D 70 74 79 5F 64 69 72 2F                   empty_dir/
-
 
 #9 (PK0304) [UTF-8] empty_file.txt
 ----------------------------------
@@ -879,12 +878,12 @@
     compression method (99):                        AES encryption
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F2F 0x9DCE):          2019-09-15 19:46:28
     32-bit CRC value:                               0x00000000
-    compressed size:                                0
-    uncompressed size:                              0
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
     length of filename:                             14
                                                     UTF-8
     65 6D 70 74 79 5F 66 69 6C 65 2E 74 78 74       empty_file.txt
-    extra field location:                           3349514 (0x00331C0A) bytes
+    extra field:                                    3349514 (0x00331C0A) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    3349514 (0x00331C0A) bytes
       - size:                                       11 bytes
@@ -926,13 +925,13 @@
     compression method (99):                        AES encryption
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
-    compressed size:                                0
-    uncompressed size:                              0
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
     length of filename:                             31
                                                     UTF-8
     6D 63 64 6F 6E 6E 65 6C 6C 2D 64 6F 75 67 6C 61 mcdonnell-dougla
     73 2D 66 31 35 2D 65 61 67 6C 65 2E 6A 70 67    s-f15-eagle.jpg
-    extra field location:                           3349626 (0x00331C7A) bytes
+    extra field:                                    3349626 (0x00331C7A) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    3349626 (0x00331C7A) bytes
       - size:                                       11 bytes
@@ -974,13 +973,13 @@
     compression method (99):                        AES encryption
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F2F 0x9DCE):          2019-09-15 19:46:28
     32-bit CRC value:                               0x00000000
-    compressed size:                                0
-    uncompressed size:                              0
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
     length of filename:                             18
                                                     UTF-8
     4F 6C 65 67 20 43 68 65 72 65 64 6E 69 6B 2E 74 Oleg Cherednik.t
     78 74                                           xt
-    extra field location:                           3974471 (0x003CA547) bytes
+    extra field:                                    3974471 (0x003CA547) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    3974471 (0x003CA547) bytes
       - size:                                       11 bytes
@@ -1022,13 +1021,13 @@
     compression method (99):                        AES encryption
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
-    compressed size:                                0
-    uncompressed size:                              0
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
     length of filename:                             20
                                                     UTF-8
     73 61 69 6E 74 2D 70 65 74 65 72 73 62 75 72 67 saint-petersburg
     2E 6A 70 67                                     .jpg
-    extra field location:                           3974613 (0x003CA5D5) bytes
+    extra field:                                    3974613 (0x003CA5D5) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    3974613 (0x003CA5D5) bytes
       - size:                                       11 bytes
@@ -1070,13 +1069,13 @@
     compression method (99):                        AES encryption
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
-    compressed size:                                0
-    uncompressed size:                              0
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
     length of filename:                             20
                                                     UTF-8
     73 69 67 2D 73 61 75 65 72 2D 70 69 73 74 6F 6C sig-sauer-pistol
     2E 6A 70 67                                     .jpg
-    extra field location:                           5049550 (0x004D0CCE) bytes
+    extra field:                                    5049550 (0x004D0CCE) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5049550 (0x004D0CCE) bytes
       - size:                                       11 bytes

@@ -1,7 +1,5 @@
 package ru.olegcherednik.zip4jvm.view;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.Version;
 
 import java.io.PrintStream;
@@ -16,14 +14,10 @@ public final class VersionView extends View {
     private final Version versionMadeBy;
     private final Version versionToExtract;
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    private VersionView(Builder builder) {
-        super(builder.offs, builder.columnWidth);
-        versionMadeBy = builder.versionMadeBy;
-        versionToExtract = builder.versionToExtract;
+    public VersionView(Version versionMadeBy, Version versionToExtract, int offs, int columnWidth) {
+        super(offs, columnWidth);
+        this.versionMadeBy = Optional.ofNullable(versionMadeBy).orElse(Version.NULL);
+        this.versionToExtract = Optional.ofNullable(versionToExtract).orElse(Version.NULL);
     }
 
     @Override
@@ -59,37 +53,4 @@ public final class VersionView extends View {
         return true;
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static final class Builder {
-
-        private Version versionMadeBy = Version.NULL;
-        private Version versionToExtract = Version.NULL;
-        private int offs;
-        private int columnWidth;
-
-        public VersionView build() {
-            return new VersionView(this);
-        }
-
-        public Builder versionMadeBy(Version versionMadeBy) {
-            this.versionMadeBy = Optional.ofNullable(versionMadeBy).orElse(Version.NULL);
-            return this;
-        }
-
-        public Builder versionToExtract(Version versionToExtract) {
-            this.versionToExtract = Optional.ofNullable(versionToExtract).orElse(Version.NULL);
-            return this;
-        }
-
-        public Builder offs(int offs) {
-            this.offs = offs;
-            return this;
-        }
-
-        public Builder columnWidth(int columnWidth) {
-            this.columnWidth = columnWidth;
-            return this;
-        }
-
-    }
 }

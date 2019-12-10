@@ -70,11 +70,7 @@ public final class Zip64View {
         }
 
         private void printVersion(PrintStream out) {
-            VersionView.builder()
-                       .versionMadeBy(dir.getVersionMadeBy())
-                       .versionToExtract(dir.getVersionToExtract())
-                       .offs(offs)
-                       .columnWidth(columnWidth).build().print(out);
+            new VersionView(dir.getVersionMadeBy(), dir.getVersionToExtract(), offs, columnWidth).print(out);
         }
 
         private void printExtensibleDataSector(PrintStream out) {

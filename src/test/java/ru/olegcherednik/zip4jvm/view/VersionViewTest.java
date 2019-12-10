@@ -16,10 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class VersionViewTest {
 
     public void shouldRetrieveVersionMadeByOnlyAndVersionToExtractWhenBothVersionsSet() throws IOException {
-        String[] lines = Zip4jvmSuite.execute(VersionView.builder()
-                                                         .versionMadeBy(Version.of(0x12))
-                                                         .versionToExtract(Version.of(0x134))
-                                                         .columnWidth(52).build());
+        String[] lines = Zip4jvmSuite.execute(new VersionView(Version.of(0x12), Version.of(0x134), 0, 52));
 
         assertThat(lines).hasSize(4);
         assertThat(lines[0]).isEqualTo("version made by operating system (00):              MS-DOS, OS/2, NT FAT");
@@ -29,9 +26,7 @@ public class VersionViewTest {
     }
 
     public void shouldRetrieveVersionMadeByOnlyWhenOnlyItSet() throws IOException {
-        String[] lines = Zip4jvmSuite.execute(VersionView.builder()
-                                                         .versionMadeBy(Version.of(0x12))
-                                                         .columnWidth(52).build());
+        String[] lines = Zip4jvmSuite.execute(new VersionView(Version.of(0x12), null, 0, 52));
 
         assertThat(lines).hasSize(2);
         assertThat(lines[0]).isEqualTo("version made by operating system (00):              MS-DOS, OS/2, NT FAT");
@@ -39,9 +34,7 @@ public class VersionViewTest {
     }
 
     public void shouldRetrieveVersionToExtractOnlyWhenOnlyItSet() throws IOException {
-        String[] lines = Zip4jvmSuite.execute(VersionView.builder()
-                                                         .versionToExtract(Version.of(0x134))
-                                                         .columnWidth(52).build());
+        String[] lines = Zip4jvmSuite.execute(new VersionView(null, Version.of(0x134), 0, 52));
 
         assertThat(lines).hasSize(2);
         assertThat(lines[0]).isEqualTo("operat. system version needed to extract (01):      Amiga");
@@ -49,7 +42,7 @@ public class VersionViewTest {
     }
 
     public void shouldRetrieveEmptyStringWhenVersionNull() throws IOException {
-        String[] lines = Zip4jvmSuite.execute(VersionView.builder().columnWidth(52).build());
+        String[] lines = Zip4jvmSuite.execute(new VersionView(null, null, 0, 52));
 
         assertThat(lines).hasSize(1);
         assertThat(lines[0]).isEmpty();

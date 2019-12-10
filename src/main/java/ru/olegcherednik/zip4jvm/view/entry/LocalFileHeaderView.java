@@ -64,10 +64,7 @@ public final class LocalFileHeaderView extends View {
     }
 
     private void printVersion(PrintStream out) {
-        VersionView.builder()
-                   .versionToExtract(localFileHeader.getVersionToExtract())
-                   .offs(offs)
-                   .columnWidth(columnWidth).build().print(out);
+        new VersionView(null, localFileHeader.getVersionToExtract(), offs, columnWidth).print(out);
     }
 
     private void printGeneralPurposeFlag(PrintStream out) {
@@ -83,10 +80,7 @@ public final class LocalFileHeaderView extends View {
     }
 
     private void printLastModifiedTime(PrintStream out) {
-        LastModifiedTimeView.builder()
-                            .lastModifiedTime(localFileHeader.getLastModifiedTime())
-                            .offs(offs)
-                            .columnWidth(columnWidth).build().print(out);
+        new LastModifiedTimeView(localFileHeader.getLastModifiedTime(), offs, columnWidth).print(out);
     }
 
     private void printCrc(PrintStream out) {

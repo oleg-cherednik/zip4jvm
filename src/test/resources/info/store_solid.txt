@@ -34,8 +34,8 @@
     compression method (00):                        none (stored)
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
     32-bit CRC value:                               0xEDF5F6AB
-    compressed size:                                293823
-    uncompressed size:                              293823
+    compressed size:                                293823 bytes
+    uncompressed size:                              293823 bytes
     length of filename:                             30
                                                     UTF-8
     62 69 6B 65 73 2F 64 75 63 61 74 69 2D 70 61 6E bikes/ducati-pan
@@ -65,8 +65,8 @@
     compression method (00):                        none (stored)
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
     32-bit CRC value:                               0x3424AFA6
-    compressed size:                                154591
-    uncompressed size:                              154591
+    compressed size:                                154591 bytes
+    uncompressed size:                              154591 bytes
     length of filename:                             24
                                                     UTF-8
     62 69 6B 65 73 2F 68 6F 6E 64 61 2D 63 62 72 36 bikes/honda-cbr6
@@ -96,8 +96,8 @@
     compression method (00):                        none (stored)
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F44 0x6344):          2019-10-04 12:26:08
     32-bit CRC value:                               0x5C89F301
-    compressed size:                                167026
-    uncompressed size:                              167026
+    compressed size:                                167026 bytes
+    uncompressed size:                              167026 bytes
     length of filename:                             28
                                                     UTF-8
     62 69 6B 65 73 2F 6B 61 77 61 73 61 6B 69 2D 6E bikes/kawasaki-n
@@ -127,8 +127,8 @@
     compression method (00):                        none (stored)
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
     32-bit CRC value:                               0xAC4B6C8C
-    compressed size:                                287349
-    uncompressed size:                              287349
+    compressed size:                                287349 bytes
+    uncompressed size:                              287349 bytes
     length of filename:                             24
                                                     UTF-8
     62 69 6B 65 73 2F 73 75 7A 75 6B 69 2D 67 73 78 bikes/suzuki-gsx
@@ -158,8 +158,8 @@
     compression method (00):                        none (stored)
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x71797968
-    compressed size:                                1395362
-    uncompressed size:                              1395362
+    compressed size:                                1395362 bytes
+    uncompressed size:                              1395362 bytes
     length of filename:                             28
                                                     UTF-8
     63 61 72 73 2F 62 65 6E 74 6C 65 79 2D 63 6F 6E cars/bentley-con
@@ -189,8 +189,8 @@
     compression method (00):                        none (stored)
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0xFEC7AE40
-    compressed size:                                320894
-    uncompressed size:                              320894
+    compressed size:                                320894 bytes
+    uncompressed size:                              320894 bytes
     length of filename:                             27
                                                     UTF-8
     63 61 72 73 2F 66 65 72 72 61 72 69 2D 34 35 38 cars/ferrari-458
@@ -220,8 +220,8 @@
     compression method (00):                        none (stored)
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0xDADB3142
-    compressed size:                                729633
-    uncompressed size:                              729633
+    compressed size:                                729633 bytes
+    uncompressed size:                              729633 bytes
     length of filename:                             24
                                                     UTF-8
     63 61 72 73 2F 77 69 65 73 6D 61 6E 6E 2D 67 74 cars/wiesmann-gt
@@ -251,8 +251,8 @@
     compression method (00):                        none (stored)
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F6E 0x1A26):          2019-11-14 03:17:12
     32-bit CRC value:                               0x00000000
-    compressed size:                                0
-    uncompressed size:                              0
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
     length of filename:                             10
                                                     UTF-8
     65 6D 70 74 79 5F 64 69 72 2F                   empty_dir/
@@ -281,8 +281,8 @@
     compression method (00):                        none (stored)
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F2F 0x9DCE):          2019-09-15 19:46:28
     32-bit CRC value:                               0x00000000
-    compressed size:                                0
-    uncompressed size:                              0
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
     length of filename:                             14
                                                     UTF-8
     65 6D 70 74 79 5F 66 69 6C 65 2E 74 78 74       empty_file.txt
@@ -311,8 +311,8 @@
     compression method (00):                        none (stored)
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x08C9E144
-    compressed size:                                624746
-    uncompressed size:                              624746
+    compressed size:                                624746 bytes
+    uncompressed size:                              624746 bytes
     length of filename:                             31
                                                     UTF-8
     6D 63 64 6F 6E 6E 65 6C 6C 2D 64 6F 75 67 6C 61 mcdonnell-dougla
@@ -342,8 +342,8 @@
     compression method (00):                        none (stored)
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F2F 0x9DCE):          2019-09-15 19:46:28
     32-bit CRC value:                               0xE4243527
-    compressed size:                                41
-    uncompressed size:                              41
+    compressed size:                                41 bytes
+    uncompressed size:                              41 bytes
     length of filename:                             18
                                                     UTF-8
     4F 6C 65 67 20 43 68 65 72 65 64 6E 69 6B 2E 74 Oleg Cherednik.t
@@ -373,8 +373,8 @@
     compression method (00):                        none (stored)
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x5F2EEF84
-    compressed size:                                1074836
-    uncompressed size:                              1074836
+    compressed size:                                1074836 bytes
+    uncompressed size:                              1074836 bytes
     length of filename:                             20
                                                     UTF-8
     73 61 69 6E 74 2D 70 65 74 65 72 73 62 75 72 67 saint-petersburg
@@ -404,8 +404,8 @@
     compression method (00):                        none (stored)
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x0142FEBB
-    compressed size:                                431478
-    uncompressed size:                              431478
+    compressed size:                                431478 bytes
+    uncompressed size:                              431478 bytes
     length of filename:                             20
                                                     UTF-8
     73 69 67 2D 73 61 75 65 72 2D 70 69 73 74 6F 6C sig-sauer-pistol
@@ -435,8 +435,8 @@
     compression method (00):                        none (stored)
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
     32-bit CRC value:                               0x00000000
-    compressed size:                                0
-    uncompressed size:                              0
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
     length of filename:                             30
                                                     UTF-8
     62 69 6B 65 73 2F 64 75 63 61 74 69 2D 70 61 6E bikes/ducati-pan
@@ -464,8 +464,8 @@
     compression method (00):                        none (stored)
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
     32-bit CRC value:                               0x00000000
-    compressed size:                                0
-    uncompressed size:                              0
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
     length of filename:                             24
                                                     UTF-8
     62 69 6B 65 73 2F 68 6F 6E 64 61 2D 63 62 72 36 bikes/honda-cbr6
@@ -493,8 +493,8 @@
     compression method (00):                        none (stored)
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F44 0x6344):          2019-10-04 12:26:08
     32-bit CRC value:                               0x00000000
-    compressed size:                                0
-    uncompressed size:                              0
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
     length of filename:                             28
                                                     UTF-8
     62 69 6B 65 73 2F 6B 61 77 61 73 61 6B 69 2D 6E bikes/kawasaki-n
@@ -522,8 +522,8 @@
     compression method (00):                        none (stored)
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
     32-bit CRC value:                               0x00000000
-    compressed size:                                0
-    uncompressed size:                              0
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
     length of filename:                             24
                                                     UTF-8
     62 69 6B 65 73 2F 73 75 7A 75 6B 69 2D 67 73 78 bikes/suzuki-gsx
@@ -551,8 +551,8 @@
     compression method (00):                        none (stored)
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
-    compressed size:                                0
-    uncompressed size:                              0
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
     length of filename:                             28
                                                     UTF-8
     63 61 72 73 2F 62 65 6E 74 6C 65 79 2D 63 6F 6E cars/bentley-con
@@ -580,8 +580,8 @@
     compression method (00):                        none (stored)
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
-    compressed size:                                0
-    uncompressed size:                              0
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
     length of filename:                             27
                                                     UTF-8
     63 61 72 73 2F 66 65 72 72 61 72 69 2D 34 35 38 cars/ferrari-458
@@ -609,8 +609,8 @@
     compression method (00):                        none (stored)
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
-    compressed size:                                0
-    uncompressed size:                              0
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
     length of filename:                             24
                                                     UTF-8
     63 61 72 73 2F 77 69 65 73 6D 61 6E 6E 2D 67 74 cars/wiesmann-gt
@@ -638,12 +638,11 @@
     compression method (00):                        none (stored)
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F6E 0x1A26):          2019-11-14 03:17:12
     32-bit CRC value:                               0x00000000
-    compressed size:                                0
-    uncompressed size:                              0
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
     length of filename:                             10
                                                     UTF-8
     65 6D 70 74 79 5F 64 69 72 2F                   empty_dir/
-
 
 #9 (PK0304) [UTF-8] empty_file.txt
 ----------------------------------
@@ -659,8 +658,8 @@
     compression method (00):                        none (stored)
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F2F 0x9DCE):          2019-09-15 19:46:28
     32-bit CRC value:                               0x00000000
-    compressed size:                                0
-    uncompressed size:                              0
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
     length of filename:                             14
                                                     UTF-8
     65 6D 70 74 79 5F 66 69 6C 65 2E 74 78 74       empty_file.txt
@@ -687,8 +686,8 @@
     compression method (00):                        none (stored)
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
-    compressed size:                                0
-    uncompressed size:                              0
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
     length of filename:                             31
                                                     UTF-8
     6D 63 64 6F 6E 6E 65 6C 6C 2D 64 6F 75 67 6C 61 mcdonnell-dougla
@@ -716,8 +715,8 @@
     compression method (00):                        none (stored)
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F2F 0x9DCE):          2019-09-15 19:46:28
     32-bit CRC value:                               0x00000000
-    compressed size:                                0
-    uncompressed size:                              0
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
     length of filename:                             18
                                                     UTF-8
     4F 6C 65 67 20 43 68 65 72 65 64 6E 69 6B 2E 74 Oleg Cherednik.t
@@ -745,8 +744,8 @@
     compression method (00):                        none (stored)
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
-    compressed size:                                0
-    uncompressed size:                              0
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
     length of filename:                             20
                                                     UTF-8
     73 61 69 6E 74 2D 70 65 74 65 72 73 62 75 72 67 saint-petersburg
@@ -774,8 +773,8 @@
     compression method (00):                        none (stored)
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
-    compressed size:                                0
-    uncompressed size:                              0
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
     length of filename:                             20
                                                     UTF-8
     73 69 67 2D 73 61 75 65 72 2D 70 69 73 74 6F 6C sig-sauer-pistol
