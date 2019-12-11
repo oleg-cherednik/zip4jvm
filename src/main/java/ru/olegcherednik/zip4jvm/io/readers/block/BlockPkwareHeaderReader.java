@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareHeader;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.model.block.PkwareEncryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;

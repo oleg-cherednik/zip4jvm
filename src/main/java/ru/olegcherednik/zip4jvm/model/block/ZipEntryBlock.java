@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.model.block;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -16,7 +17,7 @@ import java.util.Map;
 public class ZipEntryBlock {
 
     private final Map<String, LocalFileHeaderBlock> localFileHeaders = new LinkedHashMap<>();
-    private final Map<String, EncryptionHeader> encryptionHeaders = new LinkedHashMap<>();
+    private final Map<String, EncryptionHeaderBlock> encryptionHeaders = new LinkedHashMap<>();
     private final Map<String, ByteArrayBlock> dataDescriptors = new LinkedHashMap<>();
 
     @Setter(AccessLevel.NONE)
@@ -31,8 +32,8 @@ public class ZipEntryBlock {
         localFileHeader = null;
     }
 
-    public void saveEncryptionHeader(String fileName, EncryptionHeader encryptionHeader) {
-        encryptionHeaders.put(fileName, encryptionHeader);
+    public void saveEncryptionHeader(String fileName, EncryptionHeaderBlock encryptionHeaderBlock) {
+        encryptionHeaders.put(fileName, encryptionHeaderBlock);
     }
 
     public void saveDataDescriptor(String fileName, ByteArrayBlock block) {
@@ -43,7 +44,7 @@ public class ZipEntryBlock {
         return localFileHeaders.get(fileName);
     }
 
-    public EncryptionHeader getEncryptionHeader(String fileName) {
+    public EncryptionHeaderBlock getEncryptionHeader(String fileName) {
         return encryptionHeaders.get(fileName);
     }
 
@@ -61,7 +62,4 @@ public class ZipEntryBlock {
         private long disk;
     }
 
-    public interface EncryptionHeader {
-
-    }
 }

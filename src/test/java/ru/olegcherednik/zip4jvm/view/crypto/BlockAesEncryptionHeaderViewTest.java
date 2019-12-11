@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.view.crypto;
 
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.model.block.AesEncryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.ByteArrayBlock;
 
 import java.io.IOException;

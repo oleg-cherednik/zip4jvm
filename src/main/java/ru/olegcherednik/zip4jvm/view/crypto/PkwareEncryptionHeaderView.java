@@ -1,6 +1,6 @@
 package ru.olegcherednik.zip4jvm.view.crypto;
 
-import ru.olegcherednik.zip4jvm.model.block.PkwareEncryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.View;
 
