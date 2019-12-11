@@ -1,7 +1,5 @@
 package ru.olegcherednik.zip4jvm.view.crypto;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.block.PkwareEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.View;
@@ -26,53 +24,10 @@ public final class PkwareEncryptionHeaderView extends View {
         Objects.requireNonNull(encryptionHeader, "'encryptionHeader' must not be null");
     }
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    private PkwareEncryptionHeaderView(Builder builder) {
-        super(builder.offs, builder.columnWidth);
-        encryptionHeader = builder.encryptionHeader;
-        pos = builder.pos;
-    }
-
     @Override
     public boolean print(PrintStream out) {
         printSubTitle(out, pos, "(PKWARE) encryption header");
         printValueLocation(out, "data:", encryptionHeader.getData());
         return new ByteArrayHexView(encryptionHeader.getData().getData(), offs, columnWidth).print(out);
-    }
-
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static final class Builder {
-
-        private PkwareEncryptionHeaderBlock encryptionHeader;
-        private long pos;
-        private int offs;
-        private int columnWidth;
-
-        public PkwareEncryptionHeaderView build() {
-            return new PkwareEncryptionHeaderView(this);
-        }
-
-        public Builder encryptionHeader(PkwareEncryptionHeaderBlock encryptionHeader) {
-            this.encryptionHeader = encryptionHeader;
-            return this;
-        }
-
-        public Builder pos(long pos) {
-            this.pos = pos;
-            return this;
-        }
-
-        public Builder offs(int offs) {
-            this.offs = offs;
-            return this;
-        }
-
-        public Builder columnWidth(int columnWidth) {
-            this.columnWidth = columnWidth;
-            return this;
-        }
     }
 }
