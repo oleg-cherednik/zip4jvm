@@ -51,10 +51,10 @@ public final class BlockModelReader extends BaseZipModelReader {
 
         return BlockModel.builder()
                          .zipModel(zipModel)
+                         .zipEntryModel(zipEntryModel)
                          .endCentralDirectory(endCentralDirectory, endCentralDirectoryBlock)
                          .zip64(zip64, zip64Block)
-                         .centralDirectory(centralDirectory, centralDirectoryBlock)
-                         .zipEntryModel(zipEntryModel).build();
+                         .centralDirectory(centralDirectory, centralDirectoryBlock).build();
     }
 
     @Override

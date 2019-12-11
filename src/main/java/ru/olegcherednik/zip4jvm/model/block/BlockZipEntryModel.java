@@ -20,29 +20,29 @@ import java.util.Set;
 public final class BlockZipEntryModel {
 
     private final ZipEntryBlock zipEntryBlock;
-    private final Map<String, Data> content = new LinkedHashMap<>();
+    private final Map<String, Data> fileNameData = new LinkedHashMap<>();
 
     public Set<String> getFileNames() {
-        return content.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(content.keySet());
+        return fileNameData.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(fileNameData.keySet());
     }
 
     public void addLocalFileHeader(LocalFileHeader localFileHeader) {
         String fileName = localFileHeader.getFileName();
-        content.computeIfAbsent(fileName, Data::new);
-        content.get(fileName).setLocalFileHeader(localFileHeader);
+        fileNameData.computeIfAbsent(fileName, Data::new);
+        fileNameData.get(fileName).setLocalFileHeader(localFileHeader);
     }
 
     public void addDataDescriptor(String fileName, DataDescriptor dataDescriptor) {
-        content.computeIfAbsent(fileName, Data::new);
-        content.get(fileName).setDataDescriptor(dataDescriptor);
+        fileNameData.computeIfAbsent(fileName, Data::new);
+        fileNameData.get(fileName).setDataDescriptor(dataDescriptor);
     }
 
     public LocalFileHeader getLocalFileHeader(String fileName) {
-        return content.get(fileName).getLocalFileHeader();
+        return fileNameData.get(fileName).getLocalFileHeader();
     }
 
     public DataDescriptor getDataDescriptor(String fileName) {
-        return content.get(fileName).getDataDescriptor();
+        return fileNameData.get(fileName).getDataDescriptor();
     }
 
     @Getter
