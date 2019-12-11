@@ -47,14 +47,14 @@ final class LocalFileHeaderDecompose {
     public boolean printTextInfo(PrintStream out, boolean emptyLine) {
         long pos = 0;
 
-        for (LocalFileHeader localFileHeader : block.getLocalFileHeaders().values()) {
-            String fileName = localFileHeader.getFileName();
+        for (String fileName : block.getFileNames()) {
+            LocalFileHeader localFileHeader = block.getLocalFileHeader(fileName);
             ZipEntryBlock zipEntryBlock = block.getZipEntryBlock();
             ZipEntryBlock.LocalFileHeaderBlock localFileHeaderBlock = zipEntryBlock.getLocalFileHeader(fileName);
 
             EncryptionHeaderBlock encryptionHeaderBlock = zipEntryBlock.getEncryptionHeader(fileName);
             Encryption encryption = zipModel.getZipEntryByFileName(fileName).getEncryption();
-            DataDescriptor dataDescriptor = block.getDataDescriptors().get(fileName);
+            DataDescriptor dataDescriptor = block.getDataDescriptor(fileName);
 
             emptyLine |= localFileHeaderView(localFileHeader, pos).print(out, pos != 0 || emptyLine);
             emptyLine |= extraFieldDecompose(localFileHeader, localFileHeaderBlock.getExtraFieldBlock(),
@@ -73,8 +73,8 @@ final class LocalFileHeaderDecompose {
 
         long pos = 0;
 
-        for (LocalFileHeader localFileHeader : zipEntryModel.getLocalFileHeaders().values()) {
-            String fileName = localFileHeader.getFileName();
+        for (String fileName : zipEntryModel.getFileNames()) {
+            LocalFileHeader localFileHeader = zipEntryModel.getLocalFileHeader(fileName);
             ZipEntryBlock.LocalFileHeaderBlock localFileHeaderBlock = zipEntryModel.getZipEntryBlock().getLocalFileHeader(fileName);
 
             ZipEntry zipEntry = zipModel.getZipEntryByFileName(fileName);
@@ -82,7 +82,7 @@ final class LocalFileHeaderDecompose {
             EncryptionHeaderBlock encryptionHeaderBlock = block.getEncryptionHeader(fileName);
 
             Encryption encryption = zipModel.getZipEntryByFileName(fileName).getEncryption();
-            DataDescriptor dataDescriptor = zipEntryModel.getDataDescriptors().get(fileName);
+            DataDescriptor dataDescriptor = zipEntryModel.getDataDescriptor(fileName);
 
             Path subDir = DecomposeUtils.createSubDir(dir, zipModel.getZipEntryByFileName(fileName), pos);
 

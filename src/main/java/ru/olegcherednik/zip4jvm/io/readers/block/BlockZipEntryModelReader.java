@@ -4,8 +4,6 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.io.in.SplitZipInputStream;
-import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
-import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
@@ -13,6 +11,8 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BlockZipEntryModel;
 import ru.olegcherednik.zip4jvm.model.block.ByteArrayBlock;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
+import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
@@ -35,11 +35,11 @@ public class BlockZipEntryModelReader {
 
         for (ZipEntry zipEntry : zipModel.getZipEntries()) {
             try (DataInput in = createDataInput(zipModel, zipEntry)) {
-                model.getLocalFileHeaders().put(zipEntry.getFileName(), readLocalFileHeader(zipEntry, in));
+                model.addLocalFileHeader(readLocalFileHeader(zipEntry, in));
                 readEncryptionHeader(zipEntry, in);
 
                 if (zipEntry.isDataDescriptorAvailable())
-                    model.getDataDescriptors().put(zipEntry.getFileName(), readDataDescriptor(zipEntry, in));
+                    model.addDataDescriptor(zipEntry.getFileName(), readDataDescriptor(zipEntry, in));
             }
         }
 

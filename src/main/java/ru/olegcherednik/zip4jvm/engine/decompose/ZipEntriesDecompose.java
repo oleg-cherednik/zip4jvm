@@ -40,7 +40,7 @@ final class ZipEntriesDecompose {
     }
 
     private ZipEntriesView zipEntriesView() {
-        long totalEntries = blockModel.getZipEntryModel().getLocalFileHeaders().size();
+        long totalEntries = blockModel.getZipEntryModel().getFileNames().size();
         return new ZipEntriesView(totalEntries, settings.getOffs(), settings.getColumnWidth());
     }
 
