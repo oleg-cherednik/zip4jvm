@@ -36,10 +36,10 @@ public class BlockLocalFileHeaderReader extends LocalFileHeaderReader {
 
     @Override
     protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) throws IOException {
-        this.block.getContent().calc(in.getOffs());
-        this.block.getContent().setData(in.getLastBytes((int)this.block.getContent().getSize()));
+        block.getContent().calc(in.getOffs());
+        block.getContent().setData(in.getLastBytes((int)block.getContent().getSize()));
         in.cleanBuffer();
-        return new BlockExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader), this.block.getExtraFieldBlock()).read(in);
+        return new BlockExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader), block.getExtraFieldBlock()).read(in);
     }
 
 }

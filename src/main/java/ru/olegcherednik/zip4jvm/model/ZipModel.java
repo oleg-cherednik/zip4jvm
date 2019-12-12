@@ -6,16 +6,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
+import ru.olegcherednik.zip4jvm.io.in.SplitZipInputStream;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-
-import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireMaxSizeComment;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireMaxSizeComment;
 
@@ -99,6 +101,10 @@ public class ZipModel {
 
     public static Path getSplitFilePath(Path zip, long disk) {
         return zip.getParent().resolve(String.format("%s.z%02d", FilenameUtils.getBaseName(zip.toString()), disk));
+    }
+
+    public DataInput createDataInput(String fileName) throws IOException {
+        return isSplit() ? new SplitZipInputStream(this, getZipEntryByFileName(fileName).getDisk()) : new SingleZipInputStream(file);
     }
 
 }

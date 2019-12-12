@@ -26,15 +26,15 @@ public final class BlockZipEntryModel {
         return fileNameData.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(fileNameData.keySet());
     }
 
-    public void addLocalFileHeader(LocalFileHeader localFileHeader) {
+    public void addLocalFileHeader(LocalFileHeader localFileHeader, BlockZipEntryModel.LocalFileHeaderBlock block) {
         String fileName = localFileHeader.getFileName();
         fileNameData.computeIfAbsent(fileName, Data::new);
-        fileNameData.get(fileName).setLocalFileHeader(localFileHeader);
+        fileNameData.get(fileName).setLocalFileHeader(localFileHeader, block);
     }
 
-    public void addDataDescriptor(String fileName, DataDescriptor dataDescriptor) {
+    public void addDataDescriptor(String fileName, DataDescriptor dataDescriptor, ByteArrayBlock block) {
         fileNameData.computeIfAbsent(fileName, Data::new);
-        fileNameData.get(fileName).setDataDescriptor(dataDescriptor);
+        fileNameData.get(fileName).setDataDescriptor(dataDescriptor, block);
     }
 
     public LocalFileHeader getLocalFileHeader(String fileName) {
@@ -45,28 +45,17 @@ public final class BlockZipEntryModel {
         return fileNameData.get(fileName).getDataDescriptor();
     }
 
-
-    public void saveDataDescriptorBlock(String fileName, ByteArrayBlock block) {
-        fileNameData.computeIfAbsent(fileName, Data::new);
-        fileNameData.get(fileName).setDataDescriptorBlock(block);
-    }
-
     public ByteArrayBlock getDataDescriptorBlock(String fileName) {
         return fileNameData.get(fileName).getDataDescriptorBlock();
     }
 
-    public void saveEncryptionHeader(String fileName, EncryptionHeaderBlock encryptionHeaderBlock) {
+    public void saveEncryptionHeaderBlock(String fileName, EncryptionHeaderBlock block) {
         fileNameData.computeIfAbsent(fileName, Data::new);
-        fileNameData.get(fileName).setEncryptionHeaderBlock(encryptionHeaderBlock);
+        fileNameData.get(fileName).setEncryptionHeaderBlock(block);
     }
 
     public EncryptionHeaderBlock getEncryptionHeader(String fileName) {
         return fileNameData.get(fileName).getEncryptionHeaderBlock();
-    }
-
-    public void saveLocalFileHeader(String fileName, BlockZipEntryModel.LocalFileHeaderBlock localFileHeaderBlock) {
-        fileNameData.computeIfAbsent(fileName, Data::new);
-        fileNameData.get(fileName).setLocalFileHeaderBlock(localFileHeaderBlock);
     }
 
     public BlockZipEntryModel.LocalFileHeaderBlock getLocalFileHeaderBlock(String fileName) {
@@ -74,7 +63,6 @@ public final class BlockZipEntryModel {
     }
 
     @Getter
-    @Setter
     @RequiredArgsConstructor
     public static final class Data {
 
@@ -84,8 +72,19 @@ public final class BlockZipEntryModel {
         private DataDescriptor dataDescriptor;
 
         private BlockZipEntryModel.LocalFileHeaderBlock localFileHeaderBlock;
+        @Setter
         private EncryptionHeaderBlock encryptionHeaderBlock;
         private ByteArrayBlock dataDescriptorBlock;
+
+        public void setLocalFileHeader(LocalFileHeader localFileHeader, BlockZipEntryModel.LocalFileHeaderBlock block) {
+            this.localFileHeader = localFileHeader;
+            localFileHeaderBlock = block;
+        }
+
+        public void setDataDescriptor(DataDescriptor dataDescriptor, ByteArrayBlock block) {
+            this.dataDescriptor = dataDescriptor;
+            dataDescriptorBlock = block;
+        }
     }
 
     @Getter

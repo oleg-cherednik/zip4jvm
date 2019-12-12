@@ -2,8 +2,6 @@ package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
-import ru.olegcherednik.zip4jvm.io.in.SplitZipInputStream;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
@@ -31,23 +29,20 @@ public class BlockZipEntryModelReader {
 
     public BlockZipEntryModel read() throws IOException {
         for (ZipEntry zipEntry : zipModel.getZipEntries()) {
-            try (DataInput in = createDataInput(zipModel, zipEntry)) {
-                model.addLocalFileHeader(readLocalFileHeader(zipEntry, in));
+            try (DataInput in = zipModel.createDataInput(zipEntry.getFileName())) {
+                readLocalFileHeader(zipEntry, in);
                 readEncryptionHeader(zipEntry, in);
-
-                if (zipEntry.isDataDescriptorAvailable())
-                    model.addDataDescriptor(zipEntry.getFileName(), readDataDescriptor(zipEntry, in));
+                readDataDescriptor(zipEntry, in);
             }
         }
 
         return model;
     }
 
-    private LocalFileHeader readLocalFileHeader(ZipEntry zipEntry, DataInput in) throws IOException {
+    private void readLocalFileHeader(ZipEntry zipEntry, DataInput in) throws IOException {
         BlockLocalFileHeaderReader reader = new BlockLocalFileHeaderReader(zipEntry, customizeCharset);
         LocalFileHeader localFileHeader = reader.read(in);
-        model.saveLocalFileHeader(localFileHeader.getFileName(), reader.getBlock());
-        return localFileHeader;
+        model.addLocalFileHeader(localFileHeader, reader.getBlock());
     }
 
     private void readEncryptionHeader(ZipEntry zipEntry, DataInput in) throws IOException {
@@ -55,26 +50,21 @@ public class BlockZipEntryModelReader {
 
         if (encryption == Encryption.AES_256 || encryption == Encryption.AES_192 || encryption == Encryption.AES_128) {
             AesEncryptionHeaderBlock encryptionHeader = new BlockAesHeaderReader(zipEntry.getStrength(), zipEntry.getCompressedSize()).read(in);
-            model.saveEncryptionHeader(zipEntry.getFileName(), encryptionHeader);
+            model.saveEncryptionHeaderBlock(zipEntry.getFileName(), encryptionHeader);
         } else if (zipEntry.getEncryption() == Encryption.PKWARE) {
             PkwareEncryptionHeaderBlock encryptionHeader = new BlockPkwareHeaderReader().read(in);
-            model.saveEncryptionHeader(zipEntry.getFileName(), encryptionHeader);
+            model.saveEncryptionHeaderBlock(zipEntry.getFileName(), encryptionHeader);
             in.skip(zipEntry.getCompressedSize() - encryptionHeader.getData().getData().length);
         } else
             in.skip(zipEntry.getCompressedSize());
     }
 
-    private DataDescriptor readDataDescriptor(ZipEntry zipEntry, DataInput in) throws IOException {
+    private void readDataDescriptor(ZipEntry zipEntry, DataInput in) throws IOException {
+        if (!zipEntry.isDataDescriptorAvailable())
+            return;
+
         ByteArrayBlock block = new ByteArrayBlock();
         DataDescriptor dataDescriptor = new BlockDataDescriptorReader(zipEntry.isZip64(), block).read(in);
-        model.saveDataDescriptorBlock(zipEntry.getFileName(), block);
-        return dataDescriptor;
-    }
-
-    // TODO duplication with ZipInfo
-    private static DataInput createDataInput(ZipModel zipModel, ZipEntry zipEntry) throws IOException {
-        if (zipModel.isSplit())
-            return new SplitZipInputStream(zipModel, zipEntry.getDisk());
-        return new SingleZipInputStream(zipModel.getFile());
+        model.addDataDescriptor(zipEntry.getFileName(), dataDescriptor, block);
     }
 }
