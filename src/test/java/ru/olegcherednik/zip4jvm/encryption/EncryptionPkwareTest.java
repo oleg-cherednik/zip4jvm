@@ -9,6 +9,7 @@ import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.exception.EmptyPasswordException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
+import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
@@ -127,8 +128,7 @@ public class EncryptionPkwareTest {
 
         UnzipIt.zip(zip).destDir(destDir).password("Shu1an@2019GTS".toCharArray()).extract();
         assertThatDirectory(destDir).exists().hasDirectories(0).hasFiles(1);
-//        assertThatDirectory(destDir).file("hello.txt").exists().hasSize(11).hasContent("hello,itsme");
-        assertThatDirectory(destDir).file("hello.txt").exists().hasSize(11);
+        assertThatDirectory(destDir).file("hello.txt").exists().hasSize(11).usingCharset(Charsets.UTF_8).hasContent("hello,itsme");
     }
 
 }
