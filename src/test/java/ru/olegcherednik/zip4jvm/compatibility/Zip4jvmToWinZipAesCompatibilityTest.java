@@ -3,7 +3,6 @@ package ru.olegcherednik.zip4jvm.compatibility;
 import de.idyl.winzipaes.AesZipFileDecrypter;
 import de.idyl.winzipaes.impl.AESDecrypterJCA;
 import de.idyl.winzipaes.impl.ExtZipEntry;
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 
@@ -20,7 +19,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
  * @author Oleg Cherednik
  * @since 15.08.2019
  */
-@Test
+//@Test
 @SuppressWarnings({ "NewClassNamingConvention", "FieldNamingConvention" })
 public class Zip4jvmToWinZipAesCompatibilityTest {
 
