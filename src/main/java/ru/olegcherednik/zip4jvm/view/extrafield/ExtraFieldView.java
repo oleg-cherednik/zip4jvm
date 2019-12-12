@@ -90,35 +90,35 @@ public final class ExtraFieldView extends View {
     private NtfsTimestampExtraFieldRecordView createView(NtfsTimestampExtraFieldRecord record) {
         return NtfsTimestampExtraFieldRecordView.builder()
                                                 .record(record)
-                                                .block(block.getRecordBlock(record.getSignature()))
+                                                .block(block.getRecord(record.getSignature()))
                                                 .position(offs, columnWidth).build();
     }
 
     private InfoZipOldUnixExtraFieldRecordView createView(InfoZipOldUnixExtraFieldRecord record) {
         return InfoZipOldUnixExtraFieldRecordView.builder()
                                                  .record(record)
-                                                 .block(block.getRecordBlock(record.getSignature()))
+                                                 .block(block.getRecord(record.getSignature()))
                                                  .position(offs, columnWidth).build();
     }
 
     private InfoZipNewUnixExtraFieldRecordView createView(InfoZipNewUnixExtraFieldRecord record) {
         return InfoZipNewUnixExtraFieldRecordView.builder()
                                                  .record(record)
-                                                 .block(block.getRecordBlock(record.getSignature()))
+                                                 .block(block.getRecord(record.getSignature()))
                                                  .position(offs, columnWidth).build();
     }
 
     private ExtendedTimestampExtraFieldRecordView createView(ExtendedTimestampExtraFieldRecord record) {
         return ExtendedTimestampExtraFieldRecordView.builder()
                                                     .record(record)
-                                                    .block(block.getRecordBlock(record.getSignature()))
+                                                    .block(block.getRecord(record.getSignature()))
                                                     .position(offs, columnWidth).build();
     }
 
     private Zip64ExtendedInfoView createView(Zip64.ExtendedInfo record) {
         return Zip64ExtendedInfoView.builder()
                                     .record(record)
-                                    .block(block.getRecordBlock(record.getSignature()))
+                                    .block(block.getRecord(record.getSignature()))
                                     .position(offs, columnWidth).build();
     }
 
@@ -126,12 +126,12 @@ public final class ExtraFieldView extends View {
         return AesExtraFieldRecordView.builder()
                                       .record(record)
                                       .generalPurposeFlag(generalPurposeFlag)
-                                      .block(block.getRecordBlock(record.getSignature()))
+                                      .block(block.getRecord(record.getSignature()))
                                       .position(offs, columnWidth).build();
     }
 
     private UnknownExtraFieldRecordView createView(ExtraField.Record record) {
-        Block recordBlock = block.getRecordBlock(record.getSignature());
+        Block recordBlock = block.getRecord(record.getSignature());
         return UnknownExtraFieldRecordView.builder()
                                           .record(record)
                                           .block(recordBlock)

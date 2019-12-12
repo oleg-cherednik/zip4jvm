@@ -53,7 +53,7 @@ public class ExtraFieldDecompose {
             String fileName = recordView.getFileName();
 
             DecomposeUtils.print(dir.resolve(fileName + ".txt"), recordView::print);
-            DecomposeUtils.copyLarge(zipModel, dir.resolve(fileName + ".data"), block.getRecordBlock(signature));
+            DecomposeUtils.copyLarge(zipModel, dir.resolve(fileName + ".data"), block.getRecord(signature));
         }
     }
 

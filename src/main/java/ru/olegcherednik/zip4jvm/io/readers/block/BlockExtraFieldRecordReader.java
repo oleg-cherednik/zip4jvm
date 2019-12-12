@@ -29,7 +29,7 @@ public class BlockExtraFieldRecordReader extends ExtraFieldRecordReader {
     public ExtraField.Record read(DataInput in) throws IOException {
         Block block = new Block();
         ExtraField.Record record = block.calc(in, () -> super.read(in));
-        extraFieldBlock.addRecordBlock(record.getSignature(), block);
+        extraFieldBlock.addRecord(record.getSignature(), block);
         return record;
     }
 }

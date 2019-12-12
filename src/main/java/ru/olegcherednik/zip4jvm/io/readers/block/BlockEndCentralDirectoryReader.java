@@ -15,16 +15,16 @@ import java.util.function.Function;
  */
 public class BlockEndCentralDirectoryReader extends EndCentralDirectoryReader {
 
-    private final Block endCentralDirectory;
+    private final Block block;
 
-    public BlockEndCentralDirectoryReader(Function<Charset, Charset> customizeCharset, Block endCentralDirectory) {
+    public BlockEndCentralDirectoryReader(Function<Charset, Charset> customizeCharset, Block block) {
         super(customizeCharset);
-        this.endCentralDirectory = endCentralDirectory;
+        this.block = block;
     }
 
     @Override
     public EndCentralDirectory read(DataInput in) throws IOException {
-        return endCentralDirectory.calc(in, () -> super.read(in));
+        return block.calc(in, () -> super.read(in));
     }
 
 }

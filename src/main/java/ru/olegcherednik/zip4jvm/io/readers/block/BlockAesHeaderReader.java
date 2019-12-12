@@ -24,12 +24,12 @@ public class BlockAesHeaderReader implements Reader<AesEncryptionHeaderBlock> {
 
     @Override
     public AesEncryptionHeaderBlock read(DataInput in) throws IOException {
-        AesEncryptionHeaderBlock encryptionHeader = new AesEncryptionHeaderBlock();
-        encryptionHeader.getSalt().calc(in, () -> in.readBytes(strength.saltLength()));
-        encryptionHeader.getPasswordChecksum().calc(in, () -> in.readBytes(PASSWORD_CHECKSUM_SIZE));
+        AesEncryptionHeaderBlock block = new AesEncryptionHeaderBlock();
+        block.getSalt().calc(in, () -> in.readBytes(strength.saltLength()));
+        block.getPasswordChecksum().calc(in, () -> in.readBytes(PASSWORD_CHECKSUM_SIZE));
         in.skip(AesEngine.getDataCompressedSize(compressedSize, strength.saltLength()));
-        encryptionHeader.getMac().calc(in, () -> in.readBytes(MAC_SIZE));
-        return encryptionHeader;
+        block.getMac().calc(in, () -> in.readBytes(MAC_SIZE));
+        return block;
     }
 
 }

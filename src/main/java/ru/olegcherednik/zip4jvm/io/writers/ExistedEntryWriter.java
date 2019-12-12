@@ -67,7 +67,7 @@ public class ExistedEntryWriter implements Writer {
 
         public CopyEntryInputStream(ZipEntry zipEntry, ZipModel zipModel) throws IOException {
             this.zipEntry = zipEntry;
-            in = zipModel.isSplit() ? new SplitZipInputStream(zipModel, zipEntry.getDisk()) : new SingleZipInputStream(zipModel.getFile());
+            in = zipModel.isSplit() ? new SplitZipInputStream(zipModel, zipEntry.getDisk()) : new SingleZipInputStream(zipModel);
         }
 
         public void copyLocalFileHeader(DataOutput out) throws IOException {

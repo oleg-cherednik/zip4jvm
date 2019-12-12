@@ -51,7 +51,7 @@ final class DecomposeUtils {
             if (block.getSize() > Integer.MAX_VALUE)
                 return ArrayUtils.EMPTY_BYTE_ARRAY;
 
-            try (DataInput in = new SingleZipInputStream(zipModel.getFile())) {
+            try (DataInput in = new SingleZipInputStream(zipModel)) {
                 in.skip(block.getOffs());
                 return in.readBytes((int)block.getSize());
             } catch(Exception e) {

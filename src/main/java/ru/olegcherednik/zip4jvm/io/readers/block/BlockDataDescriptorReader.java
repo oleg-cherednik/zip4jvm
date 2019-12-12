@@ -1,5 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
+import lombok.Getter;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
@@ -15,11 +16,11 @@ import java.io.IOException;
 public class BlockDataDescriptorReader implements Reader<DataDescriptor> {
 
     private final DataDescriptorReader reader;
-    private final Block block;
+    @Getter
+    private final Block block = new Block();
 
-    public BlockDataDescriptorReader(boolean zip64, Block block) {
+    public BlockDataDescriptorReader(boolean zip64) {
         reader = DataDescriptorReader.get(zip64);
-        this.block = block;
     }
 
     @Override

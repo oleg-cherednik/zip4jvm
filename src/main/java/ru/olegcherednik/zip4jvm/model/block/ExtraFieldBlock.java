@@ -11,11 +11,11 @@ public class ExtraFieldBlock extends Block {
 
     private final Map<Integer, Block> records = new LinkedHashMap<>();
 
-    public void addRecordBlock(int signature, Block block) {
+    public void addRecord(int signature, Block block) {
         records.put(signature, block);
     }
 
-    public Block getRecordBlock(int signature) {
+    public Block getRecord(int signature) {
         return records.get(signature);
     }
 
