@@ -15,12 +15,16 @@ final class ExtendedTimestampExtraFieldRecordView extends ExtraFieldRecordView<E
     private ExtendedTimestampExtraFieldRecordView(Builder<ExtendedTimestampExtraFieldRecord, ExtendedTimestampExtraFieldRecordView> builder) {
         super(builder, (record, view, out) -> {
             if (record.getFlag().isLastModificationTime())
-                view.printLine(out, "  Last Modified Date:", String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", record.getLastModificationTime()));
+                view.printLine(out, "  Last Modified Date:", formatDateTime(record.getLastModificationTime()));
             if (record.getFlag().isLastAccessTime())
-                view.printLine(out, "  Last Accessed Date:", String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", record.getLastAccessTime()));
+                view.printLine(out, "  Last Accessed Date:", formatDateTime(record.getLastAccessTime()));
             if (record.getFlag().isCreationTime())
-                view.printLine(out, "  Creation Date:", String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", record.getCreationTime()));
+                view.printLine(out, "  Creation Date:", formatDateTime(record.getCreationTime()));
         });
+    }
+
+    private static String formatDateTime(long time) {
+        return String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", time);
     }
 
 }
