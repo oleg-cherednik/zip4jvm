@@ -111,8 +111,8 @@ final class LocalFileHeaderDecompose {
             size -= encryptionHeader1.getMac().getSize();
         } else if (encryption == Encryption.PKWARE) {
             PkwareEncryptionHeaderBlock encryptionHeader1 = (PkwareEncryptionHeaderBlock)encryptionHeaderBlock;
-            offs += encryptionHeader1.getData().getSize();
-            size -= encryptionHeader1.getData().getSize();
+            offs += encryptionHeader1.getHeader().getSize();
+            size -= encryptionHeader1.getHeader().getSize();
         }
 
         DecomposeUtils.copyLarge(blockModel.getZipModel(), dir.resolve("payload.data"), offs, size);

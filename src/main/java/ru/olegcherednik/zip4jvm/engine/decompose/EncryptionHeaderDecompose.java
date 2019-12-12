@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.engine.decompose;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -52,13 +54,14 @@ final class EncryptionHeaderDecompose {
         } else if (encryption == Encryption.PKWARE) {
             PkwareEncryptionHeaderBlock block = (PkwareEncryptionHeaderBlock)encryptionHeaderBlock;
             DecomposeUtils.print(dir.resolve("pkware_encryption_header.txt"), out -> encryptionHeaderView().print(out));
-            DecomposeUtils.copyLarge(zipModel, subDir.resolve("pkware_encryption_header.data"), block.getData());
+            DecomposeUtils.copyLarge(zipModel, subDir.resolve("pkware_encryption_header.data"), block.getHeader());
         } else {
             // TODO print unknown header
         }
     }
 
     private EncryptionHeaderView encryptionHeaderView() {
-        return new EncryptionHeaderView(encryptionHeaderBlock, pos, settings.getOffs(), settings.getColumnWidth());
+        Function<Block, byte[]> getDataFunc = DecomposeUtils.getDataFunc(zipModel);
+        return new EncryptionHeaderView(encryptionHeaderBlock, getDataFunc, pos, settings.getOffs(), settings.getColumnWidth());
     }
 }

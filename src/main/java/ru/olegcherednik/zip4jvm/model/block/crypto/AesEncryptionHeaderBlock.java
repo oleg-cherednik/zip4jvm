@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.model.block.crypto;
 
 import lombok.Getter;
-import ru.olegcherednik.zip4jvm.model.block.ByteArrayBlock;
+import ru.olegcherednik.zip4jvm.model.block.Block;
 
 /**
  * @author Oleg Cherednik
@@ -10,8 +10,8 @@ import ru.olegcherednik.zip4jvm.model.block.ByteArrayBlock;
 @Getter
 public class AesEncryptionHeaderBlock implements EncryptionHeaderBlock {
 
-    private final ByteArrayBlock salt = new ByteArrayBlock();
-    private final ByteArrayBlock passwordChecksum = new ByteArrayBlock();
-    private final ByteArrayBlock mac = new ByteArrayBlock();
+    private final Block salt = new Block();
+    private final Block passwordChecksum = new Block();
+    private final Block mac = new Block();
 
 }

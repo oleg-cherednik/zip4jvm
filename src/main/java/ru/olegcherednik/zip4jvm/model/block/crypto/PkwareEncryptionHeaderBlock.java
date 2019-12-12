@@ -10,6 +10,6 @@ import ru.olegcherednik.zip4jvm.model.block.ByteArrayBlock;
 @Getter
 public class PkwareEncryptionHeaderBlock implements EncryptionHeaderBlock {
 
-    private final ByteArrayBlock data = new ByteArrayBlock();
+    private final ByteArrayBlock header = new ByteArrayBlock();
 
 }

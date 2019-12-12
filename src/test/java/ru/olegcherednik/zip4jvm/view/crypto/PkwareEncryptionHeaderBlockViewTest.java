@@ -22,7 +22,7 @@ public class PkwareEncryptionHeaderBlockViewTest {
         PkwareEncryptionHeaderBlock encryptionHeader = mock(PkwareEncryptionHeaderBlock.class);
         ByteArrayBlock data = mock(ByteArrayBlock.class);
 
-        when(encryptionHeader.getData()).thenReturn(data);
+        when(encryptionHeader.getHeader()).thenReturn(data);
         when(data.getSize()).thenReturn(12L);
         when(data.getOffs()).thenReturn(60L);
         when(data.getData()).thenReturn(new byte[] { 0x0, 0x1, 0x2, 0x3 });

@@ -2,12 +2,14 @@ package ru.olegcherednik.zip4jvm.view.crypto;
 
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
-import ru.olegcherednik.zip4jvm.model.block.ByteArrayBlock;
 
 import java.io.IOException;
+import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -20,9 +22,10 @@ public class BlockAesEncryptionHeaderViewTest {
 
     public void shouldRetrieveMultipleLinesWhenAesEncryptionHeader() throws IOException {
         AesEncryptionHeaderBlock encryptionHeader = mock(AesEncryptionHeaderBlock.class);
-        ByteArrayBlock salt = mock(ByteArrayBlock.class);
-        ByteArrayBlock passwordChecksum = mock(ByteArrayBlock.class);
-        ByteArrayBlock mac = mock(ByteArrayBlock.class);
+        Function<Block, byte[]> getDataFunc = (Function<Block, byte[]>)mock(Function.class);
+        Block salt = mock(Block.class);
+        Block passwordChecksum = mock(Block.class);
+        Block mac = mock(Block.class);
 
         when(encryptionHeader.getSalt()).thenReturn(salt);
         when(encryptionHeader.getPasswordChecksum()).thenReturn(passwordChecksum);
@@ -30,17 +33,17 @@ public class BlockAesEncryptionHeaderViewTest {
 
         when(salt.getSize()).thenReturn(16L);
         when(salt.getOffs()).thenReturn(65L);
-        when(salt.getData()).thenReturn(new byte[] { 0x0, 0x1, 0x2, 0x3, 0x4 });
+        when(getDataFunc.apply(same(salt))).thenReturn(new byte[] { 0x0, 0x1, 0x2, 0x3, 0x4 });
 
         when(passwordChecksum.getSize()).thenReturn(2L);
         when(passwordChecksum.getOffs()).thenReturn(81L);
-        when(passwordChecksum.getData()).thenReturn(new byte[] { 0x5, 0x6 });
+        when(getDataFunc.apply(same(passwordChecksum))).thenReturn(new byte[] { 0x5, 0x6 });
 
         when(mac.getSize()).thenReturn(10L);
         when(mac.getOffs()).thenReturn(255507L);
-        when(mac.getData()).thenReturn(new byte[] { 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF });
+        when(getDataFunc.apply(same(mac))).thenReturn(new byte[] { 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF });
 
-        String[] lines = Zip4jvmSuite.execute(new BlockAesEncryptionHeaderView(encryptionHeader, 1, 2, 52));
+        String[] lines = Zip4jvmSuite.execute(new BlockAesEncryptionHeaderView(encryptionHeader, getDataFunc, 1, 2, 52));
         assertThat(lines).hasSize(11);
         assertThat(lines[0]).isEqualTo("#2 (AES) encryption header");
         assertThat(lines[1]).isEqualTo("--------------------------");
