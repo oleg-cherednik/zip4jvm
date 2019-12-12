@@ -6,15 +6,16 @@ import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import ru.olegcherednik.zip4jvm.model.block.BlockZipEntryModel;
 import ru.olegcherednik.zip4jvm.model.block.ByteArrayBlock;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
-import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -23,11 +24,11 @@ import java.util.function.Function;
  * @since 20.10.2019
  */
 @RequiredArgsConstructor
-public class BlockZipEntryModelReader {
+public class BlockZipEntryReader {
 
     private final ZipModel zipModel;
     private final Function<Charset, Charset> customizeCharset;
-    private final BlockZipEntryModel model = new BlockZipEntryModel();
+    private final Map<String, ZipEntryBlock.Data> fileNameZipEntryBlock = new LinkedHashMap<>();
 
     public Map<String, ZipEntryBlock.Data> read() throws IOException {
         for (ZipEntry zipEntry : zipModel.getZipEntries()) {
@@ -38,27 +39,34 @@ public class BlockZipEntryModelReader {
             }
         }
 
-        return model.getFileNameData();
+        return fileNameZipEntryBlock.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(fileNameZipEntryBlock);
     }
 
     private void readLocalFileHeader(ZipEntry zipEntry, DataInput in) throws IOException {
         BlockLocalFileHeaderReader reader = new BlockLocalFileHeaderReader(zipEntry, customizeCharset);
         LocalFileHeader localFileHeader = reader.read(in);
-        model.addLocalFileHeader(localFileHeader, reader.getBlock());
+
+        requireBlockExists(localFileHeader.getFileName());
+        fileNameZipEntryBlock.get(localFileHeader.getFileName()).setLocalFileHeader(localFileHeader, reader.getBlock());
     }
 
     private void readEncryptionHeader(ZipEntry zipEntry, DataInput in) throws IOException {
+        String fileName = zipEntry.getFileName();
         Encryption encryption = zipEntry.getEncryption();
+        EncryptionHeaderBlock block = null;
 
-        if (encryption == Encryption.AES_256 || encryption == Encryption.AES_192 || encryption == Encryption.AES_128) {
-            AesEncryptionHeaderBlock encryptionHeader = new BlockAesHeaderReader(zipEntry.getStrength(), zipEntry.getCompressedSize()).read(in);
-            model.saveEncryptionHeaderBlock(zipEntry.getFileName(), encryptionHeader);
-        } else if (zipEntry.getEncryption() == Encryption.PKWARE) {
-            PkwareEncryptionHeaderBlock encryptionHeader = new BlockPkwareHeaderReader().read(in);
-            model.saveEncryptionHeaderBlock(zipEntry.getFileName(), encryptionHeader);
-            in.skip(zipEntry.getCompressedSize() - encryptionHeader.getData().getData().length);
+        if (encryption == Encryption.AES_256 || encryption == Encryption.AES_192 || encryption == Encryption.AES_128)
+            block = new BlockAesHeaderReader(zipEntry.getStrength(), zipEntry.getCompressedSize()).read(in);
+        else if (zipEntry.getEncryption() == Encryption.PKWARE) {
+            block = new BlockPkwareHeaderReader().read(in);
+            in.skip(zipEntry.getCompressedSize() - ((PkwareEncryptionHeaderBlock)block).getData().getData().length);
         } else
             in.skip(zipEntry.getCompressedSize());
+
+        if (block != null) {
+            requireBlockExists(fileName);
+            fileNameZipEntryBlock.get(fileName).setEncryptionHeaderBlock(block);
+        }
     }
 
     private void readDataDescriptor(ZipEntry zipEntry, DataInput in) throws IOException {
@@ -67,6 +75,11 @@ public class BlockZipEntryModelReader {
 
         ByteArrayBlock block = new ByteArrayBlock();
         DataDescriptor dataDescriptor = new BlockDataDescriptorReader(zipEntry.isZip64(), block).read(in);
-        model.addDataDescriptor(zipEntry.getFileName(), dataDescriptor, block);
+        requireBlockExists(zipEntry.getFileName());
+        fileNameZipEntryBlock.get(zipEntry.getFileName()).setDataDescriptor(dataDescriptor, block);
+    }
+
+    private void requireBlockExists(String fileName) {
+        fileNameZipEntryBlock.computeIfAbsent(fileName, ZipEntryBlock.Data::new);
     }
 }
