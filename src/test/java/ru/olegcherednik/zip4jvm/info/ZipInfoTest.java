@@ -35,27 +35,27 @@ public class ZipInfoTest {
         Zip4jvmSuite.removeDir(rootDir);
     }
 
-    public void shouldRetrieveInfoWhenStoreSolid() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("actual.txt");
-        Files.createDirectories(file.getParent());
+//    public void shouldRetrieveInfoWhenStoreSolid() throws IOException {
+//        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("actual.txt");
+//        Files.createDirectories(file.getParent());
+//
+//        try (PrintStream out = new PrintStream(file.toFile())) {
+//            ZipInfo.zip(TestData.zipStoreSolid).printShortInfo(out);
+//        }
+//
+//        assertThatFile(file).matchesResourceLines("/info/store_solid.txt");
+//    }
 
-        try (PrintStream out = new PrintStream(file.toFile())) {
-            ZipInfo.zip(TestData.zipStoreSolid).printShortInfo(out);
-        }
-
-        assertThatFile(file).matchesResourceLines("/info/store_solid.txt");
-    }
-
-    public void shouldRetrieveInfoWhenStoreSolidPkware() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("actual.txt");
-        Files.createDirectories(file.getParent());
-
-        try (PrintStream out = new PrintStream(file.toFile())) {
-            ZipInfo.zip(TestData.zipStoreSolidPkware).printShortInfo(out);
-        }
-
-        assertThatFile(file).matchesResourceLines("/info/store_solid_pkware.txt");
-    }
+//    public void shouldRetrieveInfoWhenStoreSolidPkware() throws IOException {
+//        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("actual.txt");
+//        Files.createDirectories(file.getParent());
+//
+//        try (PrintStream out = new PrintStream(file.toFile())) {
+//            ZipInfo.zip(TestData.zipStoreSolidPkware).printShortInfo(out);
+//        }
+//
+//        assertThatFile(file).matchesResourceLines("/info/store_solid_pkware.txt");
+//    }
 
     public void shouldRetrieveInfoWhenStoreSolidAes() throws IOException {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("actual.txt");
