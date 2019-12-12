@@ -16,8 +16,11 @@ import static org.mockito.Mockito.when;
  * @since 09.11.2019
  */
 @Test
-@SuppressWarnings("NewClassNamingConvention")
+@SuppressWarnings({ "NewClassNamingConvention", "FieldNamingConvention" })
 public class InfoZipOldUnixExtraFieldRecordViewTest {
+
+    private static final long lastModifiedTime = 1571903182001L;
+    private static final long lastAccessTime = 1571703185000L;
 
     public void shouldRetrieveAllDataWhenAllDataSet() throws IOException {
         Block block = mock(Block.class);
@@ -26,8 +29,8 @@ public class InfoZipOldUnixExtraFieldRecordViewTest {
 
         InfoZipOldUnixExtraFieldRecord record = InfoZipOldUnixExtraFieldRecord.builder()
                                                                               .dataSize(8)
-                                                                              .lastAccessTime(1571903701000L)
-                                                                              .lastModificationTime(1571903182000L)
+                                                                              .lastAccessTime(lastAccessTime)
+                                                                              .lastModificationTime(lastModifiedTime)
                                                                               .uid(111)
                                                                               .gid(222).build();
 
@@ -39,8 +42,8 @@ public class InfoZipOldUnixExtraFieldRecordViewTest {
         assertThat(lines).hasSize(6);
         assertThat(lines[0]).isEqualTo("(0x5855) old InfoZIP Unix/OS2/NT:                   5300395 (0x0050E0AB) bytes");
         assertThat(lines[1]).isEqualTo("  - size:                                           12 bytes");
-        assertThat(lines[2]).isEqualTo("  Last Modified Date:                               2019-10-24 10:46:22");
-        assertThat(lines[3]).isEqualTo("  Last Accessed Date:                               2019-10-24 10:55:01");
+        assertThat(lines[2]).isEqualTo("  Last Modified Date:                               2019-10-24 07:46:22");
+        assertThat(lines[3]).isEqualTo("  Last Accessed Date:                               2019-10-22 00:13:05");
         assertThat(lines[4]).isEqualTo("  User identifier (UID):                            111");
         assertThat(lines[5]).isEqualTo("  Group Identifier (GID):                           222");
     }
@@ -52,8 +55,8 @@ public class InfoZipOldUnixExtraFieldRecordViewTest {
 
         InfoZipOldUnixExtraFieldRecord record = InfoZipOldUnixExtraFieldRecord.builder()
                                                                               .dataSize(8)
-                                                                              .lastAccessTime(1571903701000L)
-                                                                              .lastModificationTime(1571903182000L).build();
+                                                                              .lastAccessTime(lastAccessTime)
+                                                                              .lastModificationTime(lastModifiedTime).build();
 
         String[] lines = Zip4jvmSuite.execute(InfoZipOldUnixExtraFieldRecordView.builder()
                                                                                 .record(record)
@@ -63,8 +66,8 @@ public class InfoZipOldUnixExtraFieldRecordViewTest {
         assertThat(lines).hasSize(4);
         assertThat(lines[0]).isEqualTo("(0x5855) old InfoZIP Unix/OS2/NT:                   5300395 (0x0050E0AB) bytes");
         assertThat(lines[1]).isEqualTo("  - size:                                           12 bytes");
-        assertThat(lines[2]).isEqualTo("  Last Modified Date:                               2019-10-24 10:46:22");
-        assertThat(lines[3]).isEqualTo("  Last Accessed Date:                               2019-10-24 10:55:01");
+        assertThat(lines[2]).isEqualTo("  Last Modified Date:                               2019-10-24 07:46:22");
+        assertThat(lines[3]).isEqualTo("  Last Accessed Date:                               2019-10-22 00:13:05");
     }
 
     public void shouldRetrieveEmptyStringWhenRecordNull() throws IOException {

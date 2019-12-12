@@ -11,6 +11,9 @@ import ru.olegcherednik.zip4jvm.ZipFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 
 /**
  * @author Oleg Cherednik
@@ -18,6 +21,8 @@ import java.io.OutputStream;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ZipUtils {
+
+    private static final DateTimeFormatter DF = DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm:ss");
 
     public static boolean isDirectory(String fileName) {
         return fileName.endsWith("/") || fileName.endsWith("\\");
@@ -55,6 +60,10 @@ public final class ZipUtils {
         try (InputStream in = input; OutputStream out = output) {
             return IOUtils.copyLarge(in, out);
         }
+    }
+
+    public static String utcDateTime(long time) {
+        return DF.format(Instant.ofEpochMilli(time).atZone(ZoneOffset.UTC));
     }
 
 }

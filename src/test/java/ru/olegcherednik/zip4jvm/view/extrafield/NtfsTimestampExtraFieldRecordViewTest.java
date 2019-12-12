@@ -18,8 +18,12 @@ import static org.mockito.Mockito.when;
  * @since 09.11.2019
  */
 @Test
-@SuppressWarnings("NewClassNamingConvention")
+@SuppressWarnings({ "NewClassNamingConvention", "FieldNamingConvention" })
 public class NtfsTimestampExtraFieldRecordViewTest {
+
+    private static final long lastModifiedTime = 1571903182001L;
+    private static final long lastAccessTime = 1571703185000L;
+    private static final long creationTime = 1572903182000L;
 
     public void shouldRetrieveAllDataWhenAllDataSet() throws IOException {
         Block block = mock(Block.class);
@@ -27,9 +31,9 @@ public class NtfsTimestampExtraFieldRecordViewTest {
         when(block.getOffs()).thenReturn(11208273272L);
 
         NtfsTimestampExtraFieldRecord.Tag tagOne = NtfsTimestampExtraFieldRecord.OneTag.builder()
-                                                                                       .lastModificationTime(1522212737955L)
-                                                                                       .lastAccessTime(1571000455361L)
-                                                                                       .creationTime(1554845102859L).build();
+                                                                                       .lastModificationTime(lastModifiedTime)
+                                                                                       .lastAccessTime(lastAccessTime)
+                                                                                       .creationTime(creationTime).build();
 
         NtfsTimestampExtraFieldRecord.Tag tagUnknown = NtfsTimestampExtraFieldRecord.UnknownTag.builder()
                                                                                                .signature(0x0002)
@@ -49,9 +53,9 @@ public class NtfsTimestampExtraFieldRecordViewTest {
         assertThat(lines[1]).isEqualTo("  - size:                                           36 bytes");
         assertThat(lines[2]).isEqualTo("  - total tags:                                     2");
         assertThat(lines[3]).isEqualTo("  (0x0001) Tag1:                                    24 bytes");
-        assertThat(lines[4]).isEqualTo("    Creation Date:                                  2019-04-10 00:25:02");
-        assertThat(lines[5]).isEqualTo("    Last Modified Date:                             2018-03-28 07:52:17");
-        assertThat(lines[6]).isEqualTo("    Last Accessed Date:                             2019-10-14 00:00:55");
+        assertThat(lines[4]).isEqualTo("    Creation Date:                                  2019-11-04 21:33:02");
+        assertThat(lines[5]).isEqualTo("    Last Modified Date:                             2019-10-24 07:46:22");
+        assertThat(lines[6]).isEqualTo("    Last Accessed Date:                             2019-10-22 00:13:05");
         assertThat(lines[7]).isEqualTo("  (0x0002) Unknown Tag:                             4 bytes");
         assertThat(lines[8]).isEqualTo("00 01 02 03");
     }

@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
 import ru.olegcherednik.zip4jvm.model.os.NtfsTimestampExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.View;
 
@@ -33,9 +34,9 @@ final class NtfsTimestampExtraFieldRecordView extends ExtraFieldRecordView<NtfsT
 
             private void print(NtfsTimestampExtraFieldRecord.OneTag tag, View view, PrintStream out) {
                 view.printLine(out, String.format("  (0x%04X) Tag1:", tag.getSignature()), String.format("%d bytes", tag.getSize()));
-                view.printLine(out, "    Creation Date:", String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", tag.getCreationTime()));
-                view.printLine(out, "    Last Modified Date:", String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", tag.getLastModificationTime()));
-                view.printLine(out, "    Last Accessed Date:", String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", tag.getLastAccessTime()));
+                view.printLine(out, "    Creation Date:", ZipUtils.utcDateTime(tag.getCreationTime()));
+                view.printLine(out, "    Last Modified Date:", ZipUtils.utcDateTime(tag.getLastModificationTime()));
+                view.printLine(out, "    Last Accessed Date:", ZipUtils.utcDateTime(tag.getLastAccessTime()));
             }
 
             private void print(NtfsTimestampExtraFieldRecord.UnknownTag tag, View view, PrintStream out) {
