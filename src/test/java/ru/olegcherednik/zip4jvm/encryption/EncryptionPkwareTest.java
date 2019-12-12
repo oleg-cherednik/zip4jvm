@@ -131,7 +131,8 @@ public class EncryptionPkwareTest {
         assertThatDirectory(destDir).exists().hasDirectories(0).hasFiles(1);
         assertThatDirectory(destDir).file("hello.txt").exists().hasSize(11).hasContent("hello,itsme");
         System.out.println(FileUtils.readFileToString(destDir.resolve("hello.txt").toFile(), Charsets.UTF_8));
-        assertThatDirectory(destDir).file("hello.txt").hasContent("hello,itsme");
+        "hello,itsme".equals(FileUtils.readFileToString(destDir.resolve("hello.txt").toFile(), Charsets.UTF_8));
+//        assertThatDirectory(destDir).file("hello.txt").hasContent("hello,itsme");
     }
 
 }
