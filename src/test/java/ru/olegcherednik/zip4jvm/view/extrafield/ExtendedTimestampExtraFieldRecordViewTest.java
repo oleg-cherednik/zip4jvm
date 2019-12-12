@@ -6,6 +6,7 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.os.ExtendedTimestampExtraFieldRecord;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -110,6 +111,10 @@ public class ExtendedTimestampExtraFieldRecordViewTest {
                                                                                    .record(record)
                                                                                    .block(block)
                                                                                    .position(0, 52).build());
+
+        System.out.println("----");
+        Arrays.stream(lines).forEach(System.out::println);
+        System.out.println("----");
 
         assertThat(lines).hasSize(3);
         assertThat(lines[0]).isEqualTo("(0x5455) Universal time:                            5296723 (0x0050D253) bytes");
