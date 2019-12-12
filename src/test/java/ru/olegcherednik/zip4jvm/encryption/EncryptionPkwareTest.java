@@ -137,8 +137,10 @@ public class EncryptionPkwareTest {
 
             List<String> result = walk.filter(Files::isDirectory)
                                       .map(Path::toString).collect(Collectors.toList());
-
+            log.debug("---------");
+            log.debug(String.valueOf(result.size()));
             result.forEach(log::debug);
+            log.debug("---------");
 
         } catch(IOException e) {
             e.printStackTrace();
