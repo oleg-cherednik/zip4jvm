@@ -3,17 +3,13 @@ package ru.olegcherednik.zip4jvm.info;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.TestData;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipInfo;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
 
 /**
  * @author Oleg Cherednik
@@ -57,16 +53,16 @@ public class ZipInfoTest {
 //        assertThatFile(file).matchesResourceLines("/info/store_solid_pkware.txt");
 //    }
 
-    public void shouldRetrieveInfoWhenStoreSolidAes() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("actual.txt");
-        Files.createDirectories(file.getParent());
-
-        try (PrintStream out = new PrintStream(file.toFile())) {
-            ZipInfo.zip(TestData.zipStoreSolidAes).printShortInfo(out);
-        }
-
-        assertThatFile(file).matchesResourceLines("/info/store_solid_aes.txt");
-    }
+//    public void shouldRetrieveInfoWhenStoreSolidAes() throws IOException {
+//        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("actual.txt");
+//        Files.createDirectories(file.getParent());
+//
+//        try (PrintStream out = new PrintStream(file.toFile())) {
+//            ZipInfo.zip(TestData.zipStoreSolidAes).printShortInfo(out);
+//        }
+//
+//        assertThatFile(file).matchesResourceLines("/info/store_solid_aes.txt");
+//    }
 
     private static ZipInfo zipInfo() {
         Path path = Paths.get("d:/zip4jvm/tmp/aes.zip");
