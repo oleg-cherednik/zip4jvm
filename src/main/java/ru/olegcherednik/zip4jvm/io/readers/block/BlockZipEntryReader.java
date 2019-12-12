@@ -59,7 +59,7 @@ public class BlockZipEntryReader {
             block = new BlockAesHeaderReader(zipEntry.getStrength(), zipEntry.getCompressedSize()).read(in);
         else if (zipEntry.getEncryption() == Encryption.PKWARE) {
             block = new BlockPkwareHeaderReader().read(in);
-            in.skip(zipEntry.getCompressedSize() - ((PkwareEncryptionHeaderBlock)block).getHeader().getData().length);
+            in.skip(zipEntry.getCompressedSize() - ((PkwareEncryptionHeaderBlock)block).getHeader().getSize());
         } else
             in.skip(zipEntry.getCompressedSize());
 

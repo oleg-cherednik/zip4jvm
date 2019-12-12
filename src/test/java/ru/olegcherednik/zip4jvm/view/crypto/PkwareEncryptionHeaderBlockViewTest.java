@@ -2,12 +2,14 @@ package ru.olegcherednik.zip4jvm.view.crypto;
 
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
-import ru.olegcherednik.zip4jvm.model.block.ByteArrayBlock;
 
 import java.io.IOException;
+import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -16,18 +18,20 @@ import static org.mockito.Mockito.when;
  * @since 09.11.2019
  */
 @Test
+@SuppressWarnings("NewClassNamingConvention")
 public class PkwareEncryptionHeaderBlockViewTest {
 
     public void shouldRetrieveMultipleLinesWhenPkwareEncryptionHeader() throws IOException {
         PkwareEncryptionHeaderBlock encryptionHeader = mock(PkwareEncryptionHeaderBlock.class);
-        ByteArrayBlock data = mock(ByteArrayBlock.class);
+        Function<Block, byte[]> getDataFunc = (Function<Block, byte[]>)mock(Function.class);
+        Block data = mock(Block.class);
 
         when(encryptionHeader.getHeader()).thenReturn(data);
         when(data.getSize()).thenReturn(12L);
         when(data.getOffs()).thenReturn(60L);
-        when(data.getData()).thenReturn(new byte[] { 0x0, 0x1, 0x2, 0x3 });
+        when(getDataFunc.apply(same(data))).thenReturn(new byte[] { 0x0, 0x1, 0x2, 0x3 });
 
-        String[] lines = Zip4jvmSuite.execute(new PkwareEncryptionHeaderView(encryptionHeader, 1, 2, 52));
+        String[] lines = Zip4jvmSuite.execute(new PkwareEncryptionHeaderView(encryptionHeader, getDataFunc, 1, 2, 52));
         assertThat(lines).hasSize(5);
         assertThat(lines[0]).isEqualTo("#2 (PKWARE) encryption header");
         assertThat(lines[1]).isEqualTo("-----------------------------");

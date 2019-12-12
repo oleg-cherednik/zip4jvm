@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.model.block.crypto;
 
 import lombok.Getter;
-import ru.olegcherednik.zip4jvm.model.block.ByteArrayBlock;
+import ru.olegcherednik.zip4jvm.model.block.Block;
 
 /**
  * @author Oleg Cherednik
@@ -10,6 +10,6 @@ import ru.olegcherednik.zip4jvm.model.block.ByteArrayBlock;
 @Getter
 public class PkwareEncryptionHeaderBlock implements EncryptionHeaderBlock {
 
-    private final ByteArrayBlock header = new ByteArrayBlock();
+    private final Block header = new Block();
 
 }

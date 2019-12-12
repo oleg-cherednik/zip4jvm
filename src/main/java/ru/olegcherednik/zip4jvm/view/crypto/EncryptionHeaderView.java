@@ -40,11 +40,11 @@ public final class EncryptionHeaderView extends View {
         return true;
     }
 
-    public BlockAesEncryptionHeaderView createView(AesEncryptionHeaderBlock encryptionHeader) {
-        return new BlockAesEncryptionHeaderView(encryptionHeader, getDataFunc, pos, offs, columnWidth);
+    public BlockAesEncryptionHeaderView createView(AesEncryptionHeaderBlock block) {
+        return new BlockAesEncryptionHeaderView(block, getDataFunc, pos, offs, columnWidth);
     }
 
-    public PkwareEncryptionHeaderView createView(PkwareEncryptionHeaderBlock encryptionHeader) {
-        return new PkwareEncryptionHeaderView(encryptionHeader, pos, offs, columnWidth);
+    public PkwareEncryptionHeaderView createView(PkwareEncryptionHeaderBlock block) {
+        return new PkwareEncryptionHeaderView(block, getDataFunc, pos, offs, columnWidth);
     }
 }
