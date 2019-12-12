@@ -22,18 +22,18 @@ public class ZipEntryBlock {
 
     private LocalFileHeaderBlock localFileHeaderBlock;
     private EncryptionHeaderBlock encryptionHeaderBlock;
-    private ByteArrayBlock dataDescriptorBlock;
+    private Block dataDescriptorBlock;
 
     public void setLocalFileHeader(LocalFileHeader localFileHeader, LocalFileHeaderBlock block) {
         this.localFileHeader = localFileHeader;
         localFileHeaderBlock = block;
     }
 
-    public void setEncryptionHeaderBlock(EncryptionHeaderBlock encryptionHeaderBlock) {
-        this.encryptionHeaderBlock = encryptionHeaderBlock;
+    public void setEncryptionHeaderBlock(EncryptionHeaderBlock block) {
+        encryptionHeaderBlock = block;
     }
 
-    public void setDataDescriptor(DataDescriptor dataDescriptor, ByteArrayBlock block) {
+    public void setDataDescriptor(DataDescriptor dataDescriptor, Block block) {
         this.dataDescriptor = dataDescriptor;
         dataDescriptorBlock = block;
     }

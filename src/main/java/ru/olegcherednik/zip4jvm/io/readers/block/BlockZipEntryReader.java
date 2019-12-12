@@ -6,7 +6,7 @@ import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import ru.olegcherednik.zip4jvm.model.block.ByteArrayBlock;
+import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
@@ -73,7 +73,7 @@ public class BlockZipEntryReader {
         if (!zipEntry.isDataDescriptorAvailable())
             return;
 
-        ByteArrayBlock block = new ByteArrayBlock();
+        Block block = new Block();
         DataDescriptor dataDescriptor = new BlockDataDescriptorReader(zipEntry.isZip64(), block).read(in);
         requireBlockExists(zipEntry.getFileName());
         fileNameZipEntryBlock.get(zipEntry.getFileName()).setDataDescriptor(dataDescriptor, block);
