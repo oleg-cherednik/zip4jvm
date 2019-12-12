@@ -6,7 +6,7 @@ import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
-import ru.olegcherednik.zip4jvm.model.block.BlockZipEntryModel;
+import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
@@ -20,7 +20,7 @@ import java.util.function.Function;
 @Getter
 public class BlockLocalFileHeaderReader extends LocalFileHeaderReader {
 
-    private final BlockZipEntryModel.LocalFileHeaderBlock block = new BlockZipEntryModel.LocalFileHeaderBlock();
+    private final ZipEntryBlock.LocalFileHeaderBlock block = new ZipEntryBlock.LocalFileHeaderBlock();
 
     public BlockLocalFileHeaderReader(ZipEntry zipEntry, Function<Charset, Charset> customizeCharset) {
         super(zipEntry.getLocalFileHeaderOffs(), customizeCharset);

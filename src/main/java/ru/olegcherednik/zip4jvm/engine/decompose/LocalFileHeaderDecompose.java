@@ -10,6 +10,7 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.BlockZipEntryModel;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
+import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
@@ -48,7 +49,7 @@ final class LocalFileHeaderDecompose {
 
         for (String fileName : block.getFileNames()) {
             LocalFileHeader localFileHeader = block.getLocalFileHeader(fileName);
-            BlockZipEntryModel.LocalFileHeaderBlock localFileHeaderBlock = block.getLocalFileHeaderBlock(fileName);
+            ZipEntryBlock.LocalFileHeaderBlock localFileHeaderBlock = block.getLocalFileHeaderBlock(fileName);
 
             EncryptionHeaderBlock encryptionHeaderBlock = block.getEncryptionHeader(fileName);
             Encryption encryption = zipModel.getZipEntryByFileName(fileName).getEncryption();
@@ -73,7 +74,7 @@ final class LocalFileHeaderDecompose {
 
         for (String fileName : zipEntryModel.getFileNames()) {
             LocalFileHeader localFileHeader = zipEntryModel.getLocalFileHeader(fileName);
-            BlockZipEntryModel.LocalFileHeaderBlock localFileHeaderBlock = zipEntryModel.getLocalFileHeaderBlock(fileName);
+            ZipEntryBlock.LocalFileHeaderBlock localFileHeaderBlock = zipEntryModel.getLocalFileHeaderBlock(fileName);
 
             ZipEntry zipEntry = zipModel.getZipEntryByFileName(fileName);
             EncryptionHeaderBlock encryptionHeaderBlock = zipEntryModel.getEncryptionHeader(fileName);
@@ -95,13 +96,13 @@ final class LocalFileHeaderDecompose {
 
     private void localFileHeader(Path dir, LocalFileHeader localFileHeader, long pos) throws IOException {
         String fileName = localFileHeader.getFileName();
-        BlockZipEntryModel.LocalFileHeaderBlock block = blockModel.getZipEntryModel().getLocalFileHeaderBlock(fileName);
+        ZipEntryBlock.LocalFileHeaderBlock block = blockModel.getZipEntryModel().getLocalFileHeaderBlock(fileName);
 
         DecomposeUtils.print(dir.resolve("local_file_header.txt"), out -> localFileHeaderView(localFileHeader, pos).print(out));
         DecomposeUtils.copyLarge(zipModel, dir.resolve("local_file_header.data"), block.getContent());
     }
 
-    private void copyPayload(Path dir, ZipEntry zipEntry, BlockZipEntryModel.LocalFileHeaderBlock diagLocalFileHeader,
+    private void copyPayload(Path dir, ZipEntry zipEntry, ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader,
             EncryptionHeaderBlock encryptionHeaderBlock) throws IOException {
         if (zipEntry.getCompressedSize() == 0 || !settings.isCopyPayload())
             return;
