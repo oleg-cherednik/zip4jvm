@@ -53,6 +53,8 @@ public class ZipInfoTest {
 //        assertThatFile(file).matchesResourceLines("/info/store_solid_pkware.txt");
 //    }
 
+
+
 //    public void shouldRetrieveInfoWhenStoreSolidAes() throws IOException {
 //        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("actual.txt");
 //        Files.createDirectories(file.getParent());
