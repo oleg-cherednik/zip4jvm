@@ -123,7 +123,7 @@ public class EncryptionPkwareTest {
     }
 
     public void shouldUnzipWhenZip64ContainsOnlyOneCrcByteMatch() throws IOException {
-        Path destDir = rootDir.resolve("aa");//Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path destDir = Paths.get(System.getProperty("TRAVIS_TMPDIR"));//rootDir.resolve("aa");//Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         Path zip = Paths.get("src/test/resources/zip/zip64_crc1byte_check.zip").toAbsolutePath();
 
         UnzipIt.zip(zip).destDir(destDir).password("Shu1an@2019GTS".toCharArray()).extract();
