@@ -76,6 +76,11 @@ test {
     useTestNG()
 }
 
+buildScan {
+    termsOfServiceUrl = 'https://gradle.com/terms-of-service'
+    termsOfServiceAgree = 'yes'
+}
+
 //license {
 //    header = file('license_header.txt')
 //    include "**/*.java"
