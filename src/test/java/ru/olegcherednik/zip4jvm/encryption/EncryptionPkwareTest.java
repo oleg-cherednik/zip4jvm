@@ -10,11 +10,9 @@ import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.exception.EmptyPasswordException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
-import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
-import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
@@ -23,10 +21,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
@@ -39,7 +34,6 @@ import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.passwordStr;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
-import static ru.olegcherednik.zip4jvm.model.ExternalFileAttributes.PROP_OS_NAME;
 
 /**
  * @author Oleg Cherednik
@@ -130,26 +124,12 @@ public class EncryptionPkwareTest {
     }
 
     public void shouldUnzipWhenZip64ContainsOnlyOneCrcByteMatch() throws IOException {
-        Path destDir = Paths.get(System.getenv("TRAVIS_TMPDIR")).resolve("aa");//rootDir.resolve("aa");//Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         Path zip = Paths.get("src/test/resources/zip/zip64_crc1byte_check.zip").toAbsolutePath();
 
         UnzipIt.zip(zip).destDir(destDir).password("Shu1an@2019GTS".toCharArray()).extract();
-
-        try (Stream<Path> walk = Files.walk(destDir)) {
-
-            List<String> result = walk.map(Path::toString).collect(Collectors.toList());
-            log.debug("---------");
-            log.debug(String.valueOf(result.size()));
-            result.forEach(log::debug);
-            log.debug("---------");
-            log.debug(ExternalFileAttributes.build(PROP_OS_NAME).readFrom(destDir.resolve("hello.txt")).getDetails());
-            log.debug("---------");
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
-
         assertThatDirectory(destDir).exists().hasDirectories(0).hasFiles(1);
-        assertThatDirectory(destDir).file("hello.txt").exists().hasSize(11).usingCharset(Charsets.UTF_8).hasContent("hello,itsme");
+        assertThatDirectory(destDir).file("hello.txt").exists().hasSize(11).hasContent("hello,itsme");
     }
 
 }

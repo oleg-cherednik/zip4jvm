@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.assertj;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.assertj.core.api.AbstractPathAssert;
 
@@ -10,7 +9,6 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Consumer;
@@ -19,7 +17,6 @@ import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.assertj.core.util.Preconditions.checkNotNull;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatStringLine;
 
 /**
@@ -28,8 +25,6 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatStrin
  */
 @SuppressWarnings("CatchMayIgnoreException")
 public class FileAssert extends AbstractPathAssert<FileAssert> implements IFileAssert<FileAssert> {
-
-    private Charset charset = Charset.defaultCharset();
 
     public FileAssert(Path actual) {
         super(actual, FileAssert.class);
@@ -59,25 +54,6 @@ public class FileAssert extends AbstractPathAssert<FileAssert> implements IFileA
         }
 
         return myself;
-    }
-
-    @Override
-    public FileAssert hasContent(String expected) {
-        try {
-            assertThat(FileUtils.readFileToString(actual.toFile(), charset)).isEqualTo(expected);
-        } catch(Exception e) {
-            assertThatThrownBy(() -> {
-                throw e;
-            }).doesNotThrowAnyException();
-        }
-
-        return myself;
-    }
-
-    @Override
-    public FileAssert usingCharset(Charset charset) {
-        this.charset = checkNotNull(charset, "The charset should not be null");
-        return super.usingCharset(charset);
     }
 
     public FileAssert matches(Consumer<IFileAssert<?>> consumer) {
