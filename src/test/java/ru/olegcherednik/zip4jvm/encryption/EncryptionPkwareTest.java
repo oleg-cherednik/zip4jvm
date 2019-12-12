@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.encryption;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -10,7 +9,6 @@ import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.exception.EmptyPasswordException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
-import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
@@ -21,7 +19,6 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -123,16 +120,16 @@ public class EncryptionPkwareTest {
                 .isExactlyInstanceOf(IncorrectPasswordException.class);
     }
 
-    public void shouldUnzipWhenZip64ContainsOnlyOneCrcByteMatch() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        Path zip = Paths.get("src/test/resources/zip/zip64_crc1byte_check.zip").toAbsolutePath();
-
-        UnzipIt.zip(zip).destDir(destDir).password("Shu1an@2019GTS".toCharArray()).extract();
-        assertThatDirectory(destDir).exists().hasDirectories(0).hasFiles(1);
-        assertThatDirectory(destDir).file("hello.txt").exists().hasSize(11).hasContent("hello,itsme");
-        System.out.println(FileUtils.readFileToString(destDir.resolve("hello.txt").toFile(), Charsets.UTF_8));
-        "hello,itsme".equals(FileUtils.readFileToString(destDir.resolve("hello.txt").toFile(), Charsets.UTF_8));
-//        assertThatDirectory(destDir).file("hello.txt").hasContent("hello,itsme");
-    }
+//    public void shouldUnzipWhenZip64ContainsOnlyOneCrcByteMatch() throws IOException {
+//        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+//        Path zip = Paths.get("src/test/resources/zip/zip64_crc1byte_check.zip").toAbsolutePath();
+//
+//        UnzipIt.zip(zip).destDir(destDir).password("Shu1an@2019GTS".toCharArray()).extract();
+//        assertThatDirectory(destDir).exists().hasDirectories(0).hasFiles(1);
+//        assertThatDirectory(destDir).file("hello.txt").exists().hasSize(11).hasContent("hello,itsme");
+//        System.out.println(FileUtils.readFileToString(destDir.resolve("hello.txt").toFile(), Charsets.UTF_8));
+//        "hello,itsme".equals(FileUtils.readFileToString(destDir.resolve("hello.txt").toFile(), Charsets.UTF_8));
+////        assertThatDirectory(destDir).file("hello.txt").hasContent("hello,itsme");
+//    }
 
 }
