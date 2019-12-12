@@ -97,7 +97,8 @@ public final class TestData {
 
     private static Path createTempDirectory(String prefix) {
         try {
-            return Files.createTempDirectory(prefix);
+            String tmpDir = System.getProperty("TRAVIS_TMPDIR");
+            return tmpDir != null ? Paths.get("prefix") : Files.createTempDirectory(prefix);
         } catch(IOException e) {
             throw new Zip4jvmException(e);
         }
