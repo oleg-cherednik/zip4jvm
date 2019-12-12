@@ -7,7 +7,7 @@ import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.block.Block;
-import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
+import ru.olegcherednik.zip4jvm.model.block.BlockZipEntryModel;
 import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
 import ru.olegcherednik.zip4jvm.view.GeneralPurposeFlagView;
 import ru.olegcherednik.zip4jvm.view.LastModifiedTimeView;
@@ -30,7 +30,7 @@ public final class LocalFileHeaderView extends View {
 
     private final LocalFileHeader localFileHeader;
     // TODO should be block
-    private final ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader;
+    private final BlockZipEntryModel.LocalFileHeaderBlock diagLocalFileHeader;
     private final Function<Block, byte[]> getDataFunc;
     private final long pos;
     private final Charset charset;
@@ -114,7 +114,7 @@ public final class LocalFileHeaderView extends View {
     public static final class Builder {
 
         private LocalFileHeader localFileHeader;
-        private ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader;
+        private BlockZipEntryModel.LocalFileHeaderBlock diagLocalFileHeader;
         private Function<Block, byte[]> getDataFunc = block -> ArrayUtils.EMPTY_BYTE_ARRAY;
         private long pos;
         private Charset charset = Charsets.IBM437;
@@ -130,7 +130,7 @@ public final class LocalFileHeaderView extends View {
             return this;
         }
 
-        public Builder diagLocalFileHeader(ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader) {
+        public Builder diagLocalFileHeader(BlockZipEntryModel.LocalFileHeaderBlock diagLocalFileHeader) {
             this.diagLocalFileHeader = diagLocalFileHeader;
             return this;
         }

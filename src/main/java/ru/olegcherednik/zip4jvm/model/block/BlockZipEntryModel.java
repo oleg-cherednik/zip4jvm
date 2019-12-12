@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
+import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -19,7 +20,6 @@ import java.util.Set;
 @RequiredArgsConstructor
 public final class BlockZipEntryModel {
 
-    private final ZipEntryBlock zipEntryBlock;
     private final Map<String, Data> fileNameData = new LinkedHashMap<>();
 
     public Set<String> getFileNames() {
@@ -45,15 +45,57 @@ public final class BlockZipEntryModel {
         return fileNameData.get(fileName).getDataDescriptor();
     }
 
+
+    public void saveDataDescriptorBlock(String fileName, ByteArrayBlock block) {
+        fileNameData.computeIfAbsent(fileName, Data::new);
+        fileNameData.get(fileName).setDataDescriptorBlock(block);
+    }
+
+    public ByteArrayBlock getDataDescriptorBlock(String fileName) {
+        return fileNameData.get(fileName).getDataDescriptorBlock();
+    }
+
+    public void saveEncryptionHeader(String fileName, EncryptionHeaderBlock encryptionHeaderBlock) {
+        fileNameData.computeIfAbsent(fileName, Data::new);
+        fileNameData.get(fileName).setEncryptionHeaderBlock(encryptionHeaderBlock);
+    }
+
+    public EncryptionHeaderBlock getEncryptionHeader(String fileName) {
+        return fileNameData.get(fileName).getEncryptionHeaderBlock();
+    }
+
+    public void saveLocalFileHeader(String fileName, BlockZipEntryModel.LocalFileHeaderBlock localFileHeaderBlock) {
+        fileNameData.computeIfAbsent(fileName, Data::new);
+        fileNameData.get(fileName).setLocalFileHeaderBlock(localFileHeaderBlock);
+    }
+
+    public BlockZipEntryModel.LocalFileHeaderBlock getLocalFileHeaderBlock(String fileName) {
+        return fileNameData.get(fileName).getLocalFileHeaderBlock();
+    }
+
     @Getter
     @Setter
     @RequiredArgsConstructor
     public static final class Data {
 
         private final String fileName;
+
         private LocalFileHeader localFileHeader;
         private DataDescriptor dataDescriptor;
 
+        private BlockZipEntryModel.LocalFileHeaderBlock localFileHeaderBlock;
+        private EncryptionHeaderBlock encryptionHeaderBlock;
+        private ByteArrayBlock dataDescriptorBlock;
+    }
+
+    @Getter
+    @Setter
+    public static final class LocalFileHeaderBlock {
+
+        private final ByteArrayBlock content = new ByteArrayBlock();
+        private final ExtraFieldBlock extraFieldBlock = new ExtraFieldBlock();
+
+        private long disk;
     }
 
 }
