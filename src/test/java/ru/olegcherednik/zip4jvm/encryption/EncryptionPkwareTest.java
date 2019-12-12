@@ -142,7 +142,7 @@ public class EncryptionPkwareTest {
             log.debug(String.valueOf(result.size()));
             result.forEach(log::debug);
             log.debug("---------");
-            log.debug(ExternalFileAttributes.build(PROP_OS_NAME).readFrom(destDir.resolve("hello.txt")).toString());
+            log.debug(ExternalFileAttributes.build(PROP_OS_NAME).readFrom(destDir.resolve("hello.txt")).getDetails());
             log.debug("---------");
         } catch(IOException e) {
             e.printStackTrace();
