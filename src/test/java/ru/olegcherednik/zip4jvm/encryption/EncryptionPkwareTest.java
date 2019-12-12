@@ -1,5 +1,6 @@
 package ru.olegcherednik.zip4jvm.encryption;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.ArrayUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -21,7 +22,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
@@ -39,6 +43,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  * @author Oleg Cherednik
  * @since 28.07.2019
  */
+@Slf4j
 @Test
 @SuppressWarnings("FieldNamingConvention")
 public class EncryptionPkwareTest {
@@ -123,10 +128,22 @@ public class EncryptionPkwareTest {
     }
 
     public void shouldUnzipWhenZip64ContainsOnlyOneCrcByteMatch() throws IOException {
-        Path destDir = Paths.get(System.getenv("TRAVIS_TMPDIR"));//rootDir.resolve("aa");//Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path destDir = Paths.get(System.getenv("TRAVIS_TMPDIR")).resolve("aa");//rootDir.resolve("aa");//Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         Path zip = Paths.get("src/test/resources/zip/zip64_crc1byte_check.zip").toAbsolutePath();
 
         UnzipIt.zip(zip).destDir(destDir).password("Shu1an@2019GTS".toCharArray()).extract();
+
+        try (Stream<Path> walk = Files.walk(destDir)) {
+
+            List<String> result = walk.filter(Files::isDirectory)
+                                      .map(Path::toString).collect(Collectors.toList());
+
+            result.forEach(log::debug);
+
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+
         assertThatDirectory(destDir).exists().hasDirectories(0).hasFiles(1);
         assertThatDirectory(destDir).file("hello.txt").exists().hasSize(11).usingCharset(Charsets.UTF_8).hasContent("hello,itsme");
     }
