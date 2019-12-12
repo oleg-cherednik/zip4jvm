@@ -2,6 +2,10 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 
 import ru.olegcherednik.zip4jvm.model.os.ExtendedTimestampExtraFieldRecord;
 
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+
 /**
  * @author Oleg Cherednik
  * @since 26.10.2019
@@ -24,7 +28,7 @@ final class ExtendedTimestampExtraFieldRecordView extends ExtraFieldRecordView<E
     }
 
     private static String formatDateTime(long time) {
-        return String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", time);
+        return DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm:ss").format(Instant.ofEpochMilli(time).atZone(ZoneOffset.UTC));
     }
 
 }
