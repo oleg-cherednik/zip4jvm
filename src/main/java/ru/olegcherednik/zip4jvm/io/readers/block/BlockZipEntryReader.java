@@ -28,9 +28,9 @@ public class BlockZipEntryReader {
 
     private final ZipModel zipModel;
     private final Function<Charset, Charset> customizeCharset;
-    private final Map<String, ZipEntryBlock.Data> fileNameZipEntryBlock = new LinkedHashMap<>();
+    private final Map<String, ZipEntryBlock> fileNameZipEntryBlock = new LinkedHashMap<>();
 
-    public Map<String, ZipEntryBlock.Data> read() throws IOException {
+    public Map<String, ZipEntryBlock> read() throws IOException {
         for (ZipEntry zipEntry : zipModel.getZipEntries()) {
             try (DataInput in = zipModel.createDataInput(zipEntry.getFileName())) {
                 readLocalFileHeader(zipEntry, in);
@@ -80,6 +80,6 @@ public class BlockZipEntryReader {
     }
 
     private void requireBlockExists(String fileName) {
-        fileNameZipEntryBlock.computeIfAbsent(fileName, ZipEntryBlock.Data::new);
+        fileNameZipEntryBlock.computeIfAbsent(fileName, ZipEntryBlock::new);
     }
 }

@@ -29,7 +29,7 @@ public final class BlockModel {
     private final Zip64Block zip64Block;
     private final CentralDirectoryBlock centralDirectoryBlock;
 
-    private final Map<String, ZipEntryBlock.Data> fileNameZipEntryBlock;
+    private final Map<String, ZipEntryBlock> fileNameZipEntryBlock;
 
     public static Builder builder() {
         return new Builder();
@@ -49,7 +49,7 @@ public final class BlockModel {
         fileNameZipEntryBlock = builder.zipEntries;
     }
 
-    public ZipEntryBlock.Data getZipEntryBlock(String fileName) {
+    public ZipEntryBlock getZipEntryBlock(String fileName) {
         return fileNameZipEntryBlock.get(fileName);
     }
 
@@ -69,7 +69,7 @@ public final class BlockModel {
         private Block endCentralDirectoryBlock;
         private Zip64Block zip64Block;
         private CentralDirectoryBlock centralDirectoryBlock;
-        private Map<String, ZipEntryBlock.Data> zipEntries = Collections.emptyMap();
+        private Map<String, ZipEntryBlock> zipEntries = Collections.emptyMap();
 
         public BlockModel build() {
             return new BlockModel(this);
@@ -98,7 +98,7 @@ public final class BlockModel {
             return this;
         }
 
-        public Builder zipEntries(Map<String, ZipEntryBlock.Data> zipEntries) {
+        public Builder zipEntries(Map<String, ZipEntryBlock> zipEntries) {
             this.zipEntries = MapUtils.isEmpty(zipEntries) ? Collections.emptyMap() : Collections.unmodifiableMap(zipEntries);
             return this;
         }

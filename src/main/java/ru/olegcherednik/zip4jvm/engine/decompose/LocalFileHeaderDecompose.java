@@ -41,7 +41,7 @@ final class LocalFileHeaderDecompose {
     public boolean printTextInfo(PrintStream out, boolean emptyLine) {
         long pos = 0;
 
-        for (ZipEntryBlock.Data zipEntryBlock : blockModel.getFileNameZipEntryBlock().values()) {
+        for (ZipEntryBlock zipEntryBlock : blockModel.getFileNameZipEntryBlock().values()) {
             String fileName = zipEntryBlock.getFileName();
 
             Encryption encryption = zipModel.getZipEntryByFileName(fileName).getEncryption();
@@ -61,7 +61,7 @@ final class LocalFileHeaderDecompose {
     public void decompose(Path dir) throws IOException {
         long pos = 0;
 
-        for (ZipEntryBlock.Data zipEntryBlock : blockModel.getFileNameZipEntryBlock().values()) {
+        for (ZipEntryBlock zipEntryBlock : blockModel.getFileNameZipEntryBlock().values()) {
             String fileName = zipEntryBlock.getFileName();
             Encryption encryption = zipModel.getZipEntryByFileName(fileName).getEncryption();
 

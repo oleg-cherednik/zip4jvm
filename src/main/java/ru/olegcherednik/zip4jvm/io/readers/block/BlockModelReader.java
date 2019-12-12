@@ -48,7 +48,7 @@ public final class BlockModelReader extends BaseZipModelReader {
         readCentralData();
 
         ZipModel zipModel = new ZipModelBuilder(zip, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
-        Map<String, ZipEntryBlock.Data> zipEntries = new BlockZipEntryReader(zipModel, customizeCharset).read();
+        Map<String, ZipEntryBlock> zipEntries = new BlockZipEntryReader(zipModel, customizeCharset).read();
 
         return BlockModel.builder()
                          .zipModel(zipModel)

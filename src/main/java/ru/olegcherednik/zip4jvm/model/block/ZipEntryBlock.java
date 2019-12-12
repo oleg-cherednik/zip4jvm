@@ -11,31 +11,31 @@ import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
  * @author Oleg Cherednik
  * @since 12.12.2019
  */
+@Getter
+@RequiredArgsConstructor
 public class ZipEntryBlock {
 
-    @Getter
-    @RequiredArgsConstructor
-    public static final class Data {
+    private final String fileName;
 
-        private final String fileName;
+    private LocalFileHeader localFileHeader;
+    private DataDescriptor dataDescriptor;
 
-        private LocalFileHeader localFileHeader;
-        private DataDescriptor dataDescriptor;
+    private LocalFileHeaderBlock localFileHeaderBlock;
+    private EncryptionHeaderBlock encryptionHeaderBlock;
+    private ByteArrayBlock dataDescriptorBlock;
 
-        private LocalFileHeaderBlock localFileHeaderBlock;
-        @Setter
-        private EncryptionHeaderBlock encryptionHeaderBlock;
-        private ByteArrayBlock dataDescriptorBlock;
+    public void setLocalFileHeader(LocalFileHeader localFileHeader, LocalFileHeaderBlock block) {
+        this.localFileHeader = localFileHeader;
+        localFileHeaderBlock = block;
+    }
 
-        public void setLocalFileHeader(LocalFileHeader localFileHeader, LocalFileHeaderBlock block) {
-            this.localFileHeader = localFileHeader;
-            localFileHeaderBlock = block;
-        }
+    public void setEncryptionHeaderBlock(EncryptionHeaderBlock encryptionHeaderBlock) {
+        this.encryptionHeaderBlock = encryptionHeaderBlock;
+    }
 
-        public void setDataDescriptor(DataDescriptor dataDescriptor, ByteArrayBlock block) {
-            this.dataDescriptor = dataDescriptor;
-            dataDescriptorBlock = block;
-        }
+    public void setDataDescriptor(DataDescriptor dataDescriptor, ByteArrayBlock block) {
+        this.dataDescriptor = dataDescriptor;
+        dataDescriptorBlock = block;
     }
 
     @Getter
