@@ -42,7 +42,7 @@ public class ZipEntryBlock {
     @Setter
     public static final class LocalFileHeaderBlock {
 
-        private final ByteArrayBlock content = new ByteArrayBlock();
+        private final Block content = new Block();
         private final ExtraFieldBlock extraFieldBlock = new ExtraFieldBlock();
 
         private long disk;
