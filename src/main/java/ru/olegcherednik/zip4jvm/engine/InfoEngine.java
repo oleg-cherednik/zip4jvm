@@ -25,6 +25,7 @@ public final class InfoEngine {
     private final ZipInfoSettings settings;
 
     public void printTextInfo(PrintStream out) throws IOException {
+        // sdf
         BlockModel blockModel = createModel();
 
         boolean emptyLine = new EndCentralDirectoryDecompose(blockModel, settings).printTextInfo(out, false);
