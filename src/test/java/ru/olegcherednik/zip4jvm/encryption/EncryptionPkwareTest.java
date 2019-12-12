@@ -19,6 +19,7 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -120,15 +121,14 @@ public class EncryptionPkwareTest {
                 .isExactlyInstanceOf(IncorrectPasswordException.class);
     }
 
+    public void shouldUnzipWhenZip64ContainsOnlyOneCrcByteMatch() throws IOException {
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path zip = Paths.get("src/test/resources/zip/zip64_crc1byte_check.zip").toAbsolutePath();
 
-//    public void shouldUnzipWhenZip64ContainsOnlyOneCrcByteMatch() throws IOException {
-//        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-//        Path zip = Paths.get("src/test/resources/zip/zip64_crc1byte_check.zip").toAbsolutePath();
-//
-//        UnzipIt.zip(zip).destDir(destDir).password("Shu1an@2019GTS".toCharArray()).extract();
-//        assertThatDirectory(destDir).exists().hasDirectories(0).hasFiles(1);
+        UnzipIt.zip(zip).destDir(destDir).password("Shu1an@2019GTS".toCharArray()).extract();
+        assertThatDirectory(destDir).exists().hasDirectories(0).hasFiles(1);
 //        assertThatDirectory(destDir).file("hello.txt").exists().hasSize(11).hasContent("hello,itsme");
-//        assertThatDirectory(destDir).file("hello.txt").hasContent("hello,itsme");
-//    }
+        assertThatDirectory(destDir).file("hello.txt").hasContent("hello,itsme");
+    }
 
 }
