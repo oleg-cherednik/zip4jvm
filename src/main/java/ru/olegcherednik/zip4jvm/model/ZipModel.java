@@ -28,7 +28,7 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireMaxSizeComme
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class ZipModel {
+public final class ZipModel {
 
     public static final int NO_SPLIT = -1;
     public static final int MIN_SPLIT_SIZE = 64 * 1024; // 64Kb
@@ -104,7 +104,11 @@ public class ZipModel {
     }
 
     public DataInput createDataInput(String fileName) throws IOException {
-        return isSplit() ? new SplitZipInputStream(this, getZipEntryByFileName(fileName).getDisk()) : new SingleZipInputStream(file);
+        return isSplit() ? new SplitZipInputStream(this, getZipEntryByFileName(fileName).getDisk()) : new SingleZipInputStream(this);
+    }
+
+    public DataInput createDataInput() throws IOException {
+        return isSplit() ? new SplitZipInputStream(this, 1) : new SingleZipInputStream(this);
     }
 
 }

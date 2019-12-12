@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.engine.decompose.DecomposeEngine;
+import ru.olegcherednik.zip4jvm.engine.InfoEngine;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 
 import java.io.IOException;
@@ -36,11 +36,11 @@ public final class ZipInfo {
     }
 
     public void printShortInfo(PrintStream out) throws IOException {
-        new DecomposeEngine(zip, settings).printTextInfo(out);
+        new InfoEngine(zip, settings).printTextInfo(out);
     }
 
     public void decompose(Path destDir) throws IOException {
-        new DecomposeEngine(zip, settings).decompose(destDir);
+        new InfoEngine(zip, settings).decompose(destDir);
     }
 
 }

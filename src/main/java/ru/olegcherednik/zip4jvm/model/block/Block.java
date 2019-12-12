@@ -5,8 +5,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.ZipModelDataInput;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;
 
 import java.io.IOException;
@@ -32,7 +32,7 @@ public class Block {
 
     public <T> T calc(DataInput in, LocalSupplier<T> task) throws IOException {
         try {
-            zipModel = ZipUtils.getZipModel(in);
+            zipModel = in instanceof ZipModelDataInput ? ((ZipModelDataInput)in).getZipModel() : null;
             offs = in.getOffs();
             return task.get();
         } finally {

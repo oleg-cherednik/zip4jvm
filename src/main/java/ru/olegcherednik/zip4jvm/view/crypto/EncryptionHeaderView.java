@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.view.crypto;
 
-import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
@@ -8,7 +7,6 @@ import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
 import java.util.Objects;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -17,13 +15,11 @@ import java.util.function.Function;
 public final class EncryptionHeaderView extends View {
 
     private final EncryptionHeaderBlock block;
-    private final Function<Block, byte[]> getDataFunc;
     private final long pos;
 
-    public EncryptionHeaderView(EncryptionHeaderBlock block, Function<Block, byte[]> getDataFunc, long pos, int offs, int columnWidth) {
+    public EncryptionHeaderView(EncryptionHeaderBlock block, long pos, int offs, int columnWidth) {
         super(offs, columnWidth);
         this.block = block;
-        this.getDataFunc = getDataFunc;
         this.pos = pos;
 
         Objects.requireNonNull(block, "'block' must not be null");
@@ -41,10 +37,10 @@ public final class EncryptionHeaderView extends View {
     }
 
     public BlockAesEncryptionHeaderView createView(AesEncryptionHeaderBlock block) {
-        return new BlockAesEncryptionHeaderView(block, getDataFunc, pos, offs, columnWidth);
+        return new BlockAesEncryptionHeaderView(block, pos, offs, columnWidth);
     }
 
     public PkwareEncryptionHeaderView createView(PkwareEncryptionHeaderBlock block) {
-        return new PkwareEncryptionHeaderView(block, getDataFunc, pos, offs, columnWidth);
+        return new PkwareEncryptionHeaderView(block, pos, offs, columnWidth);
     }
 }

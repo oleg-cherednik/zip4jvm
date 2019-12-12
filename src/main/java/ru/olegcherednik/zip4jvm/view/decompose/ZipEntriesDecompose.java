@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.engine.decompose;
+package ru.olegcherednik.zip4jvm.view.decompose;
 
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
@@ -13,7 +13,7 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 06.12.2019
  */
-final class ZipEntriesDecompose {
+public final class ZipEntriesDecompose implements Decompose {
 
     private final BlockModel blockModel;
     private final ZipInfoSettings settings;
@@ -23,6 +23,7 @@ final class ZipEntriesDecompose {
         this.settings = settings;
     }
 
+    @Override
     public boolean printTextInfo(PrintStream out, boolean emptyLine) {
         if (blockModel.isEmpty())
             return false;
@@ -31,6 +32,7 @@ final class ZipEntriesDecompose {
         return localFileHeaderDecompose().printTextInfo(out, emptyLine);
     }
 
+    @Override
     public void decompose(Path dir) throws IOException {
         if (blockModel.isEmpty())
             return;

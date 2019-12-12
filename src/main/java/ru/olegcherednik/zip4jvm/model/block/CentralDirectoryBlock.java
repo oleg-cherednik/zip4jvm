@@ -15,13 +15,13 @@ public class CentralDirectoryBlock extends Block {
     private final Map<String, FileHeaderBlock> fileHeaders = new LinkedHashMap<>();
     @Getter
     @Setter
-    private Block digitalSignatureBlock = Block.NULL;
+    private Block digitalSignature = Block.NULL;
 
-    public void addFileHeaderBlock(String fileName, FileHeaderBlock block) {
+    public void addFileHeader(String fileName, FileHeaderBlock block) {
         fileHeaders.put(fileName, block);
     }
 
-    public FileHeaderBlock getFileHeaderBlock(String fileName) {
+    public FileHeaderBlock getFileHeader(String fileName) {
         return fileHeaders.get(fileName);
     }
 

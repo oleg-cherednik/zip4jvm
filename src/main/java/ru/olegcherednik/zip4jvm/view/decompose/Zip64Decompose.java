@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.engine.decompose;
+package ru.olegcherednik.zip4jvm.view.decompose;
 
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -16,7 +16,7 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 06.12.2019
  */
-final class Zip64Decompose {
+public final class Zip64Decompose implements Decompose {
 
     private final ZipModel zipModel;
     private final ZipInfoSettings settings;
@@ -30,6 +30,7 @@ final class Zip64Decompose {
         block = blockModel.getZip64Block();
     }
 
+    @Override
     public boolean printTextInfo(PrintStream out, boolean emptyLine) {
         if (zip64 == Zip64.NULL)
             return false;
@@ -38,6 +39,7 @@ final class Zip64Decompose {
         return endCentralDirectoryView().print(out, emptyLine);
     }
 
+    @Override
     public void decompose(Path dir) throws IOException {
         if (zip64 == Zip64.NULL)
             return;
@@ -49,13 +51,13 @@ final class Zip64Decompose {
     }
 
     private void endOfCentralDirectoryLocator(Path dir) throws IOException {
-        DecomposeUtils.print(dir.resolve("zip64_end_central_directory_locator.txt"), out -> endCentralDirectorLocatorView().print(out));
-        DecomposeUtils.copyLarge(zipModel, dir.resolve("zip64_end_central_directory_locator.data"), block.getEndCentralDirectoryLocatorBlock());
+        Utils.print(dir.resolve("zip64_end_central_directory_locator.txt"), out -> endCentralDirectorLocatorView().print(out));
+        Utils.copyLarge(zipModel, dir.resolve("zip64_end_central_directory_locator.data"), block.getEndCentralDirectoryLocatorBlock());
     }
 
     private void endOfCentralDirectory(Path dir) throws IOException {
-        DecomposeUtils.print(dir.resolve("zip64_end_central_directory.txt"), out -> endCentralDirectoryView().print(out));
-        DecomposeUtils.copyLarge(zipModel, dir.resolve("zip64_end_central_directory.data"), block.getEndCentralDirectoryBlock());
+        Utils.print(dir.resolve("zip64_end_central_directory.txt"), out -> endCentralDirectoryView().print(out));
+        Utils.copyLarge(zipModel, dir.resolve("zip64_end_central_directory.data"), block.getEndCentralDirectoryBlock());
     }
 
     private Zip64View.EndCentralDirectoryLocatorView endCentralDirectorLocatorView() {

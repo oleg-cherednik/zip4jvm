@@ -22,7 +22,7 @@ public class BlockDigitalSignatureReader extends DigitalSignatureReader {
     protected CentralDirectory.DigitalSignature readDigitalSignature(DataInput in) throws IOException {
         Block block = new Block();
         CentralDirectory.DigitalSignature digitalSignature = block.calc(in, () -> super.readDigitalSignature(in));
-        centralDirectoryBlock.setDigitalSignatureBlock(block);
+        centralDirectoryBlock.setDigitalSignature(block);
         return digitalSignature;
     }
 }

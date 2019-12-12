@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.engine.decompose;
+package ru.olegcherednik.zip4jvm.view.decompose;
 
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -16,7 +16,7 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 06.12.2019
  */
-final class EndCentralDirectoryDecompose {
+public final class EndCentralDirectoryDecompose implements Decompose {
 
     private final ZipModel zipModel;
     private final ZipInfoSettings settings;
@@ -30,13 +30,15 @@ final class EndCentralDirectoryDecompose {
         block = blockModel.getEndCentralDirectoryBlock();
     }
 
+    @Override
     public boolean printTextInfo(PrintStream out, boolean emptyLine) {
         return createView().print(out, emptyLine);
     }
 
+    @Override
     public void decompose(Path dir) throws IOException {
-        DecomposeUtils.print(dir.resolve("end_central_directory.txt"), out -> createView().print(out));
-        DecomposeUtils.copyLarge(zipModel, dir.resolve("end_central_directory.data"), block);
+        Utils.print(dir.resolve("end_central_directory.txt"), out -> createView().print(out));
+        Utils.copyLarge(zipModel, dir.resolve("end_central_directory.data"), block);
     }
 
     private EndCentralDirectoryView createView() {

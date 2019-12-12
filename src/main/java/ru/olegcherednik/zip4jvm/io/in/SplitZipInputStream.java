@@ -12,15 +12,13 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
-public class SplitZipInputStream extends BaseDataInput {
+public class SplitZipInputStream extends BaseZipModelDataInput {
 
-    protected final ZipModel zipModel;
     private long disk;
 
     public SplitZipInputStream(ZipModel zipModel, long disk) throws IOException {
-        this.zipModel = zipModel;
+        super(zipModel, zipModel.getPartFile(disk));
         this.disk = disk;
-        delegate = new LittleEndianReadFile(zipModel.getPartFile(disk));
         checkSignature();
     }
 

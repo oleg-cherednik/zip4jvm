@@ -1,9 +1,13 @@
-package ru.olegcherednik.zip4jvm.engine.decompose;
+package ru.olegcherednik.zip4jvm.engine;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.readers.block.BlockModelReader;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
+import ru.olegcherednik.zip4jvm.view.decompose.CentralDirectoryDecompose;
+import ru.olegcherednik.zip4jvm.view.decompose.EndCentralDirectoryDecompose;
+import ru.olegcherednik.zip4jvm.view.decompose.Zip64Decompose;
+import ru.olegcherednik.zip4jvm.view.decompose.ZipEntriesDecompose;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -15,7 +19,7 @@ import java.nio.file.Path;
  * @since 15.11.2019
  */
 @RequiredArgsConstructor
-public final class DecomposeEngine {
+public final class InfoEngine {
 
     private final Path zip;
     private final ZipInfoSettings settings;

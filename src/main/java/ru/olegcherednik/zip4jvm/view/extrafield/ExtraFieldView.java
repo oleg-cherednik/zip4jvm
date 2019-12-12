@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
-import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.model.AesExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
@@ -16,7 +15,6 @@ import ru.olegcherednik.zip4jvm.view.View;
 import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -28,7 +26,6 @@ public final class ExtraFieldView extends View {
     private final ExtraField extraField;
     private final ExtraFieldBlock block;
     private final GeneralPurposeFlag generalPurposeFlag;
-    private final Function<Block, byte[]> getDataFunc;
 
     public static Builder builder() {
         return new Builder();
@@ -39,7 +36,6 @@ public final class ExtraFieldView extends View {
         extraField = builder.extraField;
         block = builder.block;
         generalPurposeFlag = builder.generalPurposeFlag;
-        getDataFunc = builder.getDataFunc;
     }
 
     @Override
@@ -135,7 +131,7 @@ public final class ExtraFieldView extends View {
         return UnknownExtraFieldRecordView.builder()
                                           .record(record)
                                           .block(recordBlock)
-                                          .data(getDataFunc.apply(recordBlock))
+                                          .data(recordBlock.getData())
                                           .position(offs, columnWidth).build();
     }
 
@@ -144,14 +140,12 @@ public final class ExtraFieldView extends View {
         private ExtraField extraField;
         private ExtraFieldBlock block;
         private GeneralPurposeFlag generalPurposeFlag;
-        private Function<Block, byte[]> getDataFunc = block -> ArrayUtils.EMPTY_BYTE_ARRAY;
         private int offs;
         private int columnWidth;
 
         public ExtraFieldView build() {
             Objects.requireNonNull(extraField, "'extraField' must not be null");
             Objects.requireNonNull(block, "'block' must not be null");
-            Objects.requireNonNull(getDataFunc, "'getDataFunc' must not be null");
             return new ExtraFieldView(this);
         }
 
@@ -167,11 +161,6 @@ public final class ExtraFieldView extends View {
 
         public Builder generalPurposeFlag(GeneralPurposeFlag generalPurposeFlag) {
             this.generalPurposeFlag = generalPurposeFlag;
-            return this;
-        }
-
-        public Builder getDataFunc(Function<Block, byte[]> getDataFunc) {
-            this.getDataFunc = Optional.ofNullable(getDataFunc).orElseGet(() -> block -> ArrayUtils.EMPTY_BYTE_ARRAY);
             return this;
         }
 

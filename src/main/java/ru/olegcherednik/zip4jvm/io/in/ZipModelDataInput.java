@@ -1,0 +1,13 @@
+package ru.olegcherednik.zip4jvm.io.in;
+
+import ru.olegcherednik.zip4jvm.model.ZipModel;
+
+/**
+ * @author Oleg Cherednik
+ * @since 12.12.2019
+ */
+public interface ZipModelDataInput extends DataInput {
+
+    ZipModel getZipModel();
+
+}

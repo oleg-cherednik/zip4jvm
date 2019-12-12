@@ -133,7 +133,7 @@ public final class ZipEntryBuilder {
         private ZipEntryInputStreamSupplier createInputStreamSupplier() {
             if (zipModel.isSplit())
                 return zipEntry -> EntryInputStream.create(zipEntry, charsetCustomizer, new SplitZipInputStream(zipModel, zipEntry.getDisk()));
-            return zipEntry -> EntryInputStream.create(zipEntry, charsetCustomizer, new SingleZipInputStream(zipModel.getFile()));
+            return zipEntry -> EntryInputStream.create(zipEntry, charsetCustomizer, new SingleZipInputStream(zipModel));
         }
 
         private long getDisk() {

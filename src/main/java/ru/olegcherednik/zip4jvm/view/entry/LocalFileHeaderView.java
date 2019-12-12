@@ -2,11 +2,9 @@ package ru.olegcherednik.zip4jvm.view.entry;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
-import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
 import ru.olegcherednik.zip4jvm.view.GeneralPurposeFlagView;
@@ -20,7 +18,6 @@ import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -30,7 +27,6 @@ public final class LocalFileHeaderView extends View {
 
     private final LocalFileHeader localFileHeader;
     private final ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader;
-    private final Function<Block, byte[]> getDataFunc;
     private final long pos;
     private final Charset charset;
 
@@ -42,7 +38,6 @@ public final class LocalFileHeaderView extends View {
         super(builder.offs, builder.columnWidth);
         localFileHeader = builder.localFileHeader;
         diagLocalFileHeader = builder.diagLocalFileHeader;
-        getDataFunc = builder.getDataFunc;
         pos = builder.pos;
         charset = builder.charset;
     }
@@ -105,7 +100,6 @@ public final class LocalFileHeaderView extends View {
                       .extraField(localFileHeader.getExtraField())
                       .block(diagLocalFileHeader.getExtraFieldBlock())
                       .generalPurposeFlag(localFileHeader.getGeneralPurposeFlag())
-                      .getDataFunc(getDataFunc)
                       .position(offs, columnWidth).build().printLocation(out);
     }
 
@@ -114,7 +108,6 @@ public final class LocalFileHeaderView extends View {
 
         private LocalFileHeader localFileHeader;
         private ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader;
-        private Function<Block, byte[]> getDataFunc = block -> ArrayUtils.EMPTY_BYTE_ARRAY;
         private long pos;
         private Charset charset = Charsets.IBM437;
         private int offs;
@@ -131,11 +124,6 @@ public final class LocalFileHeaderView extends View {
 
         public Builder diagLocalFileHeader(ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader) {
             this.diagLocalFileHeader = diagLocalFileHeader;
-            return this;
-        }
-
-        public Builder getDataFunc(Function<Block, byte[]> getDataFunc) {
-            this.getDataFunc = Optional.ofNullable(getDataFunc).orElseGet(() -> block -> ArrayUtils.EMPTY_BYTE_ARRAY);
             return this;
         }
 

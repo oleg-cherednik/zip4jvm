@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.engine.decompose;
+package ru.olegcherednik.zip4jvm.view.decompose;
 
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
@@ -16,7 +16,7 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 07.12.2019
  */
-public class ExtraFieldDecompose {
+public final class ExtraFieldDecompose implements Decompose {
 
     private final ZipModel zipModel;
     private final ExtraField extraField;
@@ -35,10 +35,12 @@ public class ExtraFieldDecompose {
         this.columnWidth = columnWidth;
     }
 
+    @Override
     public boolean printTextInfo(PrintStream out, boolean emptyLine) {
         return extraField != ExtraField.NULL && createView().print(out, emptyLine);
     }
 
+    @Override
     public void decompose(Path dir) throws IOException {
         if (extraField == ExtraField.NULL)
             return;
@@ -52,8 +54,8 @@ public class ExtraFieldDecompose {
             ExtraFieldRecordView<?> recordView = view.getView(extraField.getRecord(signature));
             String fileName = recordView.getFileName();
 
-            DecomposeUtils.print(dir.resolve(fileName + ".txt"), recordView::print);
-            DecomposeUtils.copyLarge(zipModel, dir.resolve(fileName + ".data"), block.getRecord(signature));
+            Utils.print(dir.resolve(fileName + ".txt"), recordView::print);
+            Utils.copyLarge(zipModel, dir.resolve(fileName + ".data"), block.getRecord(signature));
         }
     }
 
@@ -62,7 +64,6 @@ public class ExtraFieldDecompose {
                              .extraField(extraField)
                              .block(block)
                              .generalPurposeFlag(generalPurposeFlag)
-                             .getDataFunc(DecomposeUtils.getDataFunc(zipModel))
                              .position(offs, columnWidth).build();
     }
 
