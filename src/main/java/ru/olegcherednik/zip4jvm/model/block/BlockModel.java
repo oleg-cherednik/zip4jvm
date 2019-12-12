@@ -3,11 +3,14 @@ package ru.olegcherednik.zip4jvm.model.block;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.apache.commons.collections4.MapUtils;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -26,7 +29,7 @@ public final class BlockModel {
     private final Zip64Block zip64Block;
     private final CentralDirectoryBlock centralDirectoryBlock;
 
-    private final BlockZipEntryModel zipEntryModel;
+    private final Map<String, ZipEntryBlock.Data> fileNameZipEntryBlock;
 
     public static Builder builder() {
         return new Builder();
@@ -43,7 +46,15 @@ public final class BlockModel {
         zip64Block = builder.zip64Block;
         centralDirectoryBlock = builder.centralDirectoryBlock;
 
-        zipEntryModel = builder.zipEntryModel;
+        fileNameZipEntryBlock = builder.zipEntries;
+    }
+
+    public ZipEntryBlock.Data getZipEntryBlock(String fileName) {
+        return fileNameZipEntryBlock.get(fileName);
+    }
+
+    public boolean isEmpty() {
+        return fileNameZipEntryBlock.isEmpty();
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -58,8 +69,7 @@ public final class BlockModel {
         private Block endCentralDirectoryBlock;
         private Zip64Block zip64Block;
         private CentralDirectoryBlock centralDirectoryBlock;
-
-        private BlockZipEntryModel zipEntryModel;
+        private Map<String, ZipEntryBlock.Data> zipEntries = Collections.emptyMap();
 
         public BlockModel build() {
             return new BlockModel(this);
@@ -88,8 +98,8 @@ public final class BlockModel {
             return this;
         }
 
-        public Builder zipEntryModel(BlockZipEntryModel zipEntryModel) {
-            this.zipEntryModel = zipEntryModel;
+        public Builder zipEntries(Map<String, ZipEntryBlock.Data> zipEntries) {
+            this.zipEntries = MapUtils.isEmpty(zipEntries) ? Collections.emptyMap() : Collections.unmodifiableMap(zipEntries);
             return this;
         }
     }

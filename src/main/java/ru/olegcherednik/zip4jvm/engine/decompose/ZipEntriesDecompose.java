@@ -24,7 +24,7 @@ final class ZipEntriesDecompose {
     }
 
     public boolean printTextInfo(PrintStream out, boolean emptyLine) {
-        if (blockModel.getZipEntryModel() == null)
+        if (blockModel.isEmpty())
             return false;
 
         emptyLine |= zipEntriesView().print(out, emptyLine);
@@ -32,7 +32,7 @@ final class ZipEntriesDecompose {
     }
 
     public void decompose(Path dir) throws IOException {
-        if (blockModel.getZipEntryModel() == null)
+        if (blockModel.isEmpty())
             return;
 
         dir = Files.createDirectories(dir.resolve("entries"));
@@ -40,7 +40,7 @@ final class ZipEntriesDecompose {
     }
 
     private ZipEntriesView zipEntriesView() {
-        long totalEntries = blockModel.getZipEntryModel().getFileNames().size();
+        long totalEntries = blockModel.getFileNameZipEntryBlock().size();
         return new ZipEntriesView(totalEntries, settings.getOffs(), settings.getColumnWidth());
     }
 

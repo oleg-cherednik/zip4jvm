@@ -8,12 +8,14 @@ import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BlockZipEntryModel;
 import ru.olegcherednik.zip4jvm.model.block.ByteArrayBlock;
+import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -27,7 +29,7 @@ public class BlockZipEntryModelReader {
     private final Function<Charset, Charset> customizeCharset;
     private final BlockZipEntryModel model = new BlockZipEntryModel();
 
-    public BlockZipEntryModel read() throws IOException {
+    public Map<String, ZipEntryBlock.Data> read() throws IOException {
         for (ZipEntry zipEntry : zipModel.getZipEntries()) {
             try (DataInput in = zipModel.createDataInput(zipEntry.getFileName())) {
                 readLocalFileHeader(zipEntry, in);
@@ -36,7 +38,7 @@ public class BlockZipEntryModelReader {
             }
         }
 
-        return model;
+        return model.getFileNameData();
     }
 
     private void readLocalFileHeader(ZipEntry zipEntry, DataInput in) throws IOException {

@@ -7,14 +7,15 @@ import ru.olegcherednik.zip4jvm.io.readers.Zip64Reader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
-import ru.olegcherednik.zip4jvm.model.block.BlockZipEntryModel;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.Zip64Block;
+import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -47,11 +48,11 @@ public final class BlockModelReader extends BaseZipModelReader {
         readCentralData();
 
         ZipModel zipModel = new ZipModelBuilder(zip, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
-        BlockZipEntryModel zipEntryModel = new BlockZipEntryModelReader(zipModel, customizeCharset).read();
+        Map<String, ZipEntryBlock.Data> zipEntries = new BlockZipEntryModelReader(zipModel, customizeCharset).read();
 
         return BlockModel.builder()
                          .zipModel(zipModel)
-                         .zipEntryModel(zipEntryModel)
+                         .zipEntries(zipEntries)
                          .endCentralDirectory(endCentralDirectory, endCentralDirectoryBlock)
                          .zip64(zip64, zip64Block)
                          .centralDirectory(centralDirectory, centralDirectoryBlock).build();
