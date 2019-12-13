@@ -38,6 +38,5 @@ public class AesEncoderTest {
     private static AesEncoder createAesEncoder(Cipher cipher, Mac mac, byte[] salt, byte[] passwordChecksum) {
         return ReflectionUtils.invokeConstructor(AesEncoder.class, new Class<?>[] { Cipher.class, Mac.class, byte[].class, byte[].class },
                 cipher, mac, salt, passwordChecksum);
-
     }
 }

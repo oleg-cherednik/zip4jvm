@@ -1,11 +1,13 @@
 package ru.olegcherednik.zip4jvm.engine;
 
+import org.testng.annotations.Test;
+
 /**
  * @author Oleg Cherednik
  * @since 07.09.2019
  */
-//@Test
-//@SuppressWarnings("FieldNamingConvention")
+@Test
+@SuppressWarnings("FieldNamingConvention")
 public class UnzipEngineTest {
 
 //    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(UnzipEngineTest.class);

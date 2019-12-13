@@ -49,7 +49,7 @@ public class ZipFolderSplitTest {
         // TODO ZipFile does not read split archive
 //        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
     }
-
+//    TODO commented tests
 //    @Test(dependsOnMethods = "shouldCreateNewZipWithFolder")
 //    public void shouldThrowExceptionWhenModifySplitZip() {
 //        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()

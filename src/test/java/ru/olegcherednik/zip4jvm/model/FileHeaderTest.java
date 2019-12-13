@@ -40,7 +40,7 @@ public class FileHeaderTest {
         ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.build(() -> WIN).readFrom(fileBentley);
         ExtraField extraField = ExtraField.builder().addRecord(Zip64.ExtendedInfo.builder().uncompressedSize(4).build()).build();
 
-// TODO temporary
+//    TODO commented tests
 //        assertThat(internalFileAttributes).isNotSameAs(InternalFileAttributes.NULL);
         assertThat(externalFileAttributes).isNotSameAs(ExternalFileAttributes.NULL);
         assertThat(extraField).isNotSameAs(ExtraField.NULL);

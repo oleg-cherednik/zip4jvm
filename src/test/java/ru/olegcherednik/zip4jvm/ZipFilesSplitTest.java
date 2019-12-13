@@ -47,7 +47,7 @@ public class ZipFilesSplitTest {
                                           .splitSize(1024 * 1024).build();
         List<Path> files = Arrays.asList(fileBentley, fileFerrari, fileWiesmann);
         ZipIt.zip(zip).settings(settings).add(files);
-
+//    TODO commented tests
 //        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
 //        assertThatZipFile(zipFile).exists().rootEntry().hasSubDirectories(1).hasFiles(0);
 //        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipCarsDirAssert);

@@ -266,6 +266,7 @@ public class ExternalFileAttributesTest {
         assertThat(externalFileAttributes.getData()[0] & 0xFF).isEqualTo(BIT5);
     }
 
+//    TODO commented tests
 //    public void shouldReadFromByteArrayWenPosix() {
 //        ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.build(() -> MAC);
 //

@@ -78,7 +78,6 @@ public class Zip4jvmToSevenZipCompatibilityTest {
 
             assertThatDirectory(dstDir).matches(rootAssert);
         }
-
     }
 
 }

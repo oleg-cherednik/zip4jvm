@@ -88,9 +88,6 @@ public class ZipMiscSnippet {
 
         ZipMisc zipFile = ZipMisc.zip(zip);
         zipFile.removeEntryByName(entryNames);
-
-        int a = 0;
-        a++;
     }
 
     public void removeEntryByNamePrefix() throws IOException {
@@ -99,13 +96,9 @@ public class ZipMiscSnippet {
 
         ZipMisc zipFile = ZipMisc.zip(zip);
         zipFile.removeEntryByNamePrefix(dirNameCars);
-
-        int a = 0;
-        a++;
     }
 
     public void checkWhetherZipArchiveSplitOrNot() throws IOException {
-        ZipMisc zipFile = ZipMisc.zip(zip);
         assertThat(ZipMisc.zip(zip).isSplit()).isFalse();
     }
 
