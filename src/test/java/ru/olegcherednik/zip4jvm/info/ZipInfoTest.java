@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.info;
 
-import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -20,7 +19,6 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
  * @author Oleg Cherednik
  * @since 11.10.2019
  */
-@Slf4j
 @Test
 @SuppressWarnings("FieldNamingConvention")
 public class ZipInfoTest {
@@ -48,27 +46,27 @@ public class ZipInfoTest {
         assertThatFile(file).matchesResourceLines("/info/store_solid.txt");
     }
 
-//    public void shouldRetrieveInfoWhenStoreSolidPkware() throws IOException {
-//        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("actual.txt");
-//        Files.createDirectories(file.getParent());
-//
-//        try (PrintStream out = new PrintStream(file.toFile())) {
-//            ZipInfo.zip(TestData.zipStoreSolidPkware).printShortInfo(out);
-//        }
-//
-//        assertThatFile(file).matchesResourceLines("/info/store_solid_pkware.txt");
-//    }
+    public void shouldRetrieveInfoWhenStoreSolidPkware() throws IOException {
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("actual.txt");
+        Files.createDirectories(file.getParent());
 
-//    public void shouldRetrieveInfoWhenStoreSolidAes() throws IOException {
-//        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("actual.txt");
-//        Files.createDirectories(file.getParent());
-//
-//        try (PrintStream out = new PrintStream(file.toFile())) {
-//            ZipInfo.zip(TestData.zipStoreSolidAes).printShortInfo(out);
-//        }
-//
-//        assertThatFile(file).matchesResourceLines("/info/store_solid_aes.txt");
-//    }
+        try (PrintStream out = new PrintStream(file.toFile())) {
+            ZipInfo.zip(TestData.zipStoreSolidPkware).printShortInfo(out);
+        }
+
+        assertThatFile(file).matchesResourceLines("/info/store_solid_pkware.txt");
+    }
+
+    public void shouldRetrieveInfoWhenStoreSolidAes() throws IOException {
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("actual.txt");
+        Files.createDirectories(file.getParent());
+
+        try (PrintStream out = new PrintStream(file.toFile())) {
+            ZipInfo.zip(TestData.zipStoreSolidAes).printShortInfo(out);
+        }
+
+        assertThatFile(file).matchesResourceLines("/info/store_solid_aes.txt");
+    }
 
     private static ZipInfo zipInfo() {
         Path path = Paths.get("d:/zip4jvm/tmp/aes.zip");
