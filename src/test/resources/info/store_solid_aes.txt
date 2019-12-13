@@ -35,7 +35,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
     32-bit CRC value:                               0x00000000
     compressed size:                                293847 bytes
     uncompressed size:                              293823 bytes
@@ -73,7 +73,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
     32-bit CRC value:                               0x00000000
     compressed size:                                154615 bytes
     uncompressed size:                              154591 bytes
@@ -111,7 +111,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F44 0x6344):          2019-10-04 12:26:08
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F44 0x6344):          2019-10-04 12:26:08
     32-bit CRC value:                               0x00000000
     compressed size:                                167050 bytes
     uncompressed size:                              167026 bytes
@@ -149,7 +149,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
     32-bit CRC value:                               0x00000000
     compressed size:                                287373 bytes
     uncompressed size:                              287349 bytes
@@ -187,7 +187,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
     compressed size:                                1395386 bytes
     uncompressed size:                              1395362 bytes
@@ -225,7 +225,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
     compressed size:                                320918 bytes
     uncompressed size:                              320894 bytes
@@ -263,7 +263,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
     compressed size:                                729657 bytes
     uncompressed size:                              729633 bytes
@@ -301,7 +301,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (00):                        none (stored)
-    file last modified on (0x4F8E 0x059D):          2019-12-14 00:44:58
+<-- ignore_line -->    file last modified on (0x4F6D 0x9030):          2019-11-13 18:01:32
     32-bit CRC value:                               0x00000000
     compressed size:                                0 bytes
     uncompressed size:                              0 bytes
@@ -331,7 +331,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F2F 0x9DCE):          2019-09-15 19:46:28
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F2F 0x9DCE):          2019-09-15 19:46:28
     32-bit CRC value:                               0x00000000
     compressed size:                                24 bytes
     uncompressed size:                              0 bytes
@@ -368,7 +368,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
     compressed size:                                624770 bytes
     uncompressed size:                              624746 bytes
@@ -406,7 +406,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F8E 0x0589):          2019-12-14 00:44:18
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F2F 0x9DCE):          2019-09-15 19:46:28
     32-bit CRC value:                               0x00000000
     compressed size:                                64 bytes
     uncompressed size:                              40 bytes
@@ -444,7 +444,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
     compressed size:                                1074860 bytes
     uncompressed size:                              1074836 bytes
@@ -482,7 +482,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
     compressed size:                                431502 bytes
     uncompressed size:                              431478 bytes
@@ -520,7 +520,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
     32-bit CRC value:                               0x00000000
     compressed size:                                0 bytes
     uncompressed size:                              0 bytes
@@ -540,13 +540,13 @@
 --------------------------
     salt:                                           71 (0x00000047) bytes
       - size:                                       12 bytes
-    5E C6 1F 7C 99 26 A5 89 F4 E8 72 80
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){11}[0-9A-F]{2}$) -->    AF 55 0E FF 97 9F 84 10 F6 27 F0 18
     password checksum:                              83 (0x00000053) bytes
       - size:                                       2 bytes
-    52 98
+<-- regexp(^ {4}(?:[0-9A-F]{2} )[0-9A-F]{2}$) -->    90 76
     mac:                                            293908 (0x00047C14) bytes
       - size:                                       10 bytes
-    53 E0 92 6F 9F ED DE C8 9F 56
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){9}[0-9A-F]{2}$) -->    58 B4 83 80 95 EB EC 47 D7 39
 
 #1 (PK0708) Data descriptor
 ---------------------------
@@ -568,7 +568,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
     32-bit CRC value:                               0x00000000
     compressed size:                                0 bytes
     uncompressed size:                              0 bytes
@@ -588,13 +588,13 @@
 --------------------------
     salt:                                           293999 (0x00047C6F) bytes
       - size:                                       12 bytes
-    45 E2 0A 36 90 21 1B 06 22 1E 6F 4A
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){11}[0-9A-F]{2}$) -->    DA 5A 5E EE 6A E1 EE 2A 1A 2A 71 52
     password checksum:                              294011 (0x00047C7B) bytes
       - size:                                       2 bytes
-    7F 65
+<-- regexp(^ {4}(?:[0-9A-F]{2} )[0-9A-F]{2}$) -->    83 F8
     mac:                                            448604 (0x0006D85C) bytes
       - size:                                       10 bytes
-    40 76 B2 90 48 EF A3 98 6A DC
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){9}[0-9A-F]{2}$) -->    F7 BD CB 9F FA 7A 2E 90 72 5F
 
 #2 (PK0708) Data descriptor
 ---------------------------
@@ -616,7 +616,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F44 0x6344):          2019-10-04 12:26:08
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F44 0x6344):          2019-10-04 12:26:08
     32-bit CRC value:                               0x00000000
     compressed size:                                0 bytes
     uncompressed size:                              0 bytes
@@ -636,13 +636,13 @@
 --------------------------
     salt:                                           448699 (0x0006D8BB) bytes
       - size:                                       12 bytes
-    9E 26 5F 00 4A 3B 74 9B 4F 29 91 FD
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){11}[0-9A-F]{2}$) -->    4B CE 33 E9 F4 BB A6 FD 07 0F 27 60
     password checksum:                              448711 (0x0006D8C7) bytes
       - size:                                       2 bytes
-    71 23
+<-- regexp(^ {4}(?:[0-9A-F]{2} )[0-9A-F]{2}$) -->    F0 29
     mac:                                            615739 (0x0009653B) bytes
       - size:                                       10 bytes
-    BE 18 82 ED DF 35 4F D4 B6 1A
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){9}[0-9A-F]{2}$) -->    6C 6C 09 CA 05 F6 5A 08 AB 8E
 
 #3 (PK0708) Data descriptor
 ---------------------------
@@ -664,7 +664,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
     32-bit CRC value:                               0x00000000
     compressed size:                                0 bytes
     uncompressed size:                              0 bytes
@@ -684,13 +684,13 @@
 --------------------------
     salt:                                           615830 (0x00096596) bytes
       - size:                                       12 bytes
-    9F 60 87 35 F6 5E 21 E2 16 8A 19 8E
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){11}[0-9A-F]{2}$) -->    65 DD A7 A2 D0 76 56 D5 6F 85 0E D2
     password checksum:                              615842 (0x000965A2) bytes
       - size:                                       2 bytes
-    87 CC
+<-- regexp(^ {4}(?:[0-9A-F]{2} )[0-9A-F]{2}$) -->    FA B1
     mac:                                            903193 (0x000DC819) bytes
       - size:                                       10 bytes
-    DD 98 FA 65 44 54 EC BA 1E D9
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){9}[0-9A-F]{2}$) -->    C6 8C 15 7B 7F BC C1 35 09 C1
 
 #4 (PK0708) Data descriptor
 ---------------------------
@@ -712,7 +712,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
     compressed size:                                0 bytes
     uncompressed size:                              0 bytes
@@ -732,13 +732,13 @@
 --------------------------
     salt:                                           903288 (0x000DC878) bytes
       - size:                                       12 bytes
-    EB BB 8C 44 CF 4E 47 BF D6 5B EE 5F
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){11}[0-9A-F]{2}$) -->    93 14 DA AD E7 F2 9F F7 95 D6 B0 35
     password checksum:                              903300 (0x000DC884) bytes
       - size:                                       2 bytes
-    25 85
+<-- regexp(^ {4}(?:[0-9A-F]{2} )[0-9A-F]{2}$) -->    54 B7
     mac:                                            2298664 (0x00231328) bytes
       - size:                                       10 bytes
-    BF 8D 5C E9 33 2A E6 16 53 CB
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){9}[0-9A-F]{2}$) -->    BA 36 8C E2 B8 A8 00 64 A4 A4
 
 #5 (PK0708) Data descriptor
 ---------------------------
@@ -760,7 +760,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
     compressed size:                                0 bytes
     uncompressed size:                              0 bytes
@@ -780,13 +780,13 @@
 --------------------------
     salt:                                           2298758 (0x00231386) bytes
       - size:                                       12 bytes
-    44 0D 0E 60 50 00 4B F4 23 FC E2 E1
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){11}[0-9A-F]{2}$) -->    0B 66 09 63 6D 3A E2 F9 DA 27 27 79
     password checksum:                              2298770 (0x00231392) bytes
       - size:                                       2 bytes
-    84 2E
+<-- regexp(^ {4}(?:[0-9A-F]{2} )[0-9A-F]{2}$) -->    BC 48
     mac:                                            2619666 (0x0027F912) bytes
       - size:                                       10 bytes
-    47 CF F5 81 C2 0F 7F B2 4D 7A
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){9}[0-9A-F]{2}$) -->    F2 77 77 A6 FD 2C 6C 1D 73 56
 
 #6 (PK0708) Data descriptor
 ---------------------------
@@ -808,7 +808,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
     compressed size:                                0 bytes
     uncompressed size:                              0 bytes
@@ -828,13 +828,13 @@
 --------------------------
     salt:                                           2619757 (0x0027F96D) bytes
       - size:                                       12 bytes
-    1D 47 E3 68 53 89 2B DB 82 23 53 56
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){11}[0-9A-F]{2}$) -->    3B 14 C1 21 97 8F 84 3E 11 96 7C 67
     password checksum:                              2619769 (0x0027F979) bytes
       - size:                                       2 bytes
-    BB 6C
+<-- regexp(^ {4}(?:[0-9A-F]{2} )[0-9A-F]{2}$) -->    92 64
     mac:                                            3349404 (0x00331B9C) bytes
       - size:                                       10 bytes
-    E9 99 31 71 D2 39 CB 7D 0A 17
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){9}[0-9A-F]{2}$) -->    B1 42 94 12 0E CC BA 4F 26 59
 
 #7 (PK0708) Data descriptor
 ---------------------------
@@ -856,7 +856,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (00):                        none (stored)
-    file last modified on (0x4F8E 0x059D):          2019-12-14 00:44:58
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F6D 0x9030):          2019-11-13 18:01:32
     32-bit CRC value:                               0x00000000
     compressed size:                                0 bytes
     uncompressed size:                              0 bytes
@@ -876,7 +876,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F2F 0x9DCE):          2019-09-15 19:46:28
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F2F 0x9DCE):          2019-09-15 19:46:28
     32-bit CRC value:                               0x00000000
     compressed size:                                0 bytes
     uncompressed size:                              0 bytes
@@ -895,13 +895,13 @@
 --------------------------
     salt:                                           3349525 (0x00331C15) bytes
       - size:                                       12 bytes
-    50 4F A3 78 4A 6C 08 F5 61 46 23 DB
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){11}[0-9A-F]{2}$) -->    D5 95 13 E2 23 47 B8 18 15 8C 30 0B
     password checksum:                              3349537 (0x00331C21) bytes
       - size:                                       2 bytes
-    5C 94
+<-- regexp(^ {4}(?:[0-9A-F]{2} )[0-9A-F]{2}$) -->    AD 20
     mac:                                            3349539 (0x00331C23) bytes
       - size:                                       10 bytes
-    73 7D 83 92 5D 37 87 ED 19 A6
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){9}[0-9A-F]{2}$) -->    15 9B 65 9E 8F 4E F2 8B B8 AB
 
 #9 (PK0708) Data descriptor
 ---------------------------
@@ -923,7 +923,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
     compressed size:                                0 bytes
     uncompressed size:                              0 bytes
@@ -943,13 +943,13 @@
 ---------------------------
     salt:                                           3349637 (0x00331C85) bytes
       - size:                                       12 bytes
-    E6 89 E8 13 C0 3C 37 91 C2 AA A9 69
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){11}[0-9A-F]{2}$) -->    42 F1 FC 54 8D A1 05 C5 58 7B 6E 27
     password checksum:                              3349649 (0x00331C91) bytes
       - size:                                       2 bytes
-    2F 9A
+<-- regexp(^ {4}(?:[0-9A-F]{2} )[0-9A-F]{2}$) -->    25 3B
     mac:                                            3974397 (0x003CA4FD) bytes
       - size:                                       10 bytes
-    54 38 83 38 87 62 04 AD DE 58
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){9}[0-9A-F]{2}$) -->    A9 17 37 46 EF A8 CE 07 C8 5C
 
 #10 (PK0708) Data descriptor
 ----------------------------
@@ -971,7 +971,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F8E 0x0589):          2019-12-14 00:44:18
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F2F 0x9DCE):          2019-09-15 19:46:28
     32-bit CRC value:                               0x00000000
     compressed size:                                0 bytes
     uncompressed size:                              0 bytes
@@ -991,13 +991,13 @@
 ---------------------------
     salt:                                           3974482 (0x003CA552) bytes
       - size:                                       12 bytes
-    F8 31 89 22 C9 0D 49 0B 8D CA FD 27
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){11}[0-9A-F]{2}$) -->    E7 F2 AE 9C 09 10 91 D5 69 1E EE 7F
     password checksum:                              3974494 (0x003CA55E) bytes
       - size:                                       2 bytes
-    25 6E
+<-- regexp(^ {4}(?:[0-9A-F]{2} )[0-9A-F]{2}$) -->    ED 15
     mac:                                            3974536 (0x003CA588) bytes
       - size:                                       10 bytes
-    81 E4 10 AF 80 63 4E AF 4F B4
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){9}[0-9A-F]{2}$) -->    5D 23 86 14 07 AF 91 3E 4E 6A
 
 #11 (PK0708) Data descriptor
 ----------------------------
@@ -1019,7 +1019,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
     compressed size:                                0 bytes
     uncompressed size:                              0 bytes
@@ -1039,13 +1039,13 @@
 ---------------------------
     salt:                                           3974623 (0x003CA5DF) bytes
       - size:                                       12 bytes
-    03 EF 8F 07 E6 8C BF 4E 92 5B F3 F8
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){11}[0-9A-F]{2}$) -->    F1 D1 32 AA BD 02 61 F4 6E 80 39 3E
     password checksum:                              3974635 (0x003CA5EB) bytes
       - size:                                       2 bytes
-    35 5C
+<-- regexp(^ {4}(?:[0-9A-F]{2} )[0-9A-F]{2}$) -->    45 4D
     mac:                                            5049473 (0x004D0C81) bytes
       - size:                                       10 bytes
-    22 01 9C 7A 03 D3 F1 80 0B 6E
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){9}[0-9A-F]{2}$) -->    59 93 F8 CA C0 43 38 5E 89 3E
 
 #12 (PK0708) Data descriptor
 ----------------------------
@@ -1067,7 +1067,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (99):                        AES encryption
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
     compressed size:                                0 bytes
     uncompressed size:                              0 bytes
@@ -1087,13 +1087,13 @@
 ---------------------------
     salt:                                           5049560 (0x004D0CD8) bytes
       - size:                                       12 bytes
-    D6 C2 01 E7 31 0F 7F 90 79 5C 46 11
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){11}[0-9A-F]{2}$) -->    BD 8F E5 62 EF AD D3 8D 88 2F EE 0A
     password checksum:                              5049572 (0x004D0CE4) bytes
       - size:                                       2 bytes
-    BE 04
+<-- regexp(^ {4}(?:[0-9A-F]{2} )[0-9A-F]{2}$) -->    80 B5
     mac:                                            5481052 (0x0053A25C) bytes
       - size:                                       10 bytes
-    13 D2 AC 94 D6 2A 2D FE 65 1E
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){9}[0-9A-F]{2}$) -->    A1 E0 C8 23 60 22 80 D6 DB 57
 
 #13 (PK0708) Data descriptor
 ----------------------------

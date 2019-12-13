@@ -32,7 +32,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (00):                        none (stored)
-    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
     32-bit CRC value:                               0xEDF5F6AB
     compressed size:                                293823 bytes
     uncompressed size:                              293823 bytes
@@ -63,7 +63,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (00):                        none (stored)
-    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
     32-bit CRC value:                               0x3424AFA6
     compressed size:                                154591 bytes
     uncompressed size:                              154591 bytes
@@ -94,7 +94,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (00):                        none (stored)
-    file last modified on (0x4F44 0x6344):          2019-10-04 12:26:08
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->     file last modified on (0x4F44 0x6344):          2019-10-04 12:26:08
     32-bit CRC value:                               0x5C89F301
     compressed size:                                167026 bytes
     uncompressed size:                              167026 bytes
@@ -125,7 +125,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (00):                        none (stored)
-    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
     32-bit CRC value:                               0xAC4B6C8C
     compressed size:                                287349 bytes
     uncompressed size:                              287349 bytes
@@ -156,7 +156,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (00):                        none (stored)
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x71797968
     compressed size:                                1395362 bytes
     uncompressed size:                              1395362 bytes
@@ -187,7 +187,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (00):                        none (stored)
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0xFEC7AE40
     compressed size:                                320894 bytes
     uncompressed size:                              320894 bytes
@@ -218,7 +218,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (00):                        none (stored)
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0xDADB3142
     compressed size:                                729633 bytes
     uncompressed size:                              729633 bytes
@@ -249,7 +249,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (00):                        none (stored)
-    file last modified on (0x4F8E 0x059D):          2019-12-14 00:44:58
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F8E 0x059D):          2019-12-14 00:44:58
     32-bit CRC value:                               0x00000000
     compressed size:                                0 bytes
     uncompressed size:                              0 bytes
@@ -279,7 +279,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (00):                        none (stored)
-    file last modified on (0x4F2F 0x9DCE):          2019-09-15 19:46:28
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->     file last modified on (0x4F2F 0x9DCE):          2019-09-15 19:46:28
     32-bit CRC value:                               0x00000000
     compressed size:                                0 bytes
     uncompressed size:                              0 bytes
@@ -309,7 +309,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (00):                        none (stored)
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x08C9E144
     compressed size:                                624746 bytes
     uncompressed size:                              624746 bytes
@@ -340,7 +340,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (00):                        none (stored)
-    file last modified on (0x4F8E 0x0589):          2019-12-14 00:44:18
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F8E 0x0589):          2019-12-14 00:44:18
     32-bit CRC value:                               0x14A28F67
     compressed size:                                40 bytes
     uncompressed size:                              40 bytes
@@ -371,7 +371,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (00):                        none (stored)
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->     file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x5F2EEF84
     compressed size:                                1074836 bytes
     uncompressed size:                              1074836 bytes
@@ -402,7 +402,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (00):                        none (stored)
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x0142FEBB
     compressed size:                                431478 bytes
     uncompressed size:                              431478 bytes
@@ -433,7 +433,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (00):                        none (stored)
-    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
     32-bit CRC value:                               0x00000000
     compressed size:                                0 bytes
     uncompressed size:                              0 bytes
@@ -462,7 +462,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (00):                        none (stored)
-    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
     32-bit CRC value:                               0x00000000
     compressed size:                                0 bytes
     uncompressed size:                              0 bytes
@@ -491,7 +491,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (00):                        none (stored)
-    file last modified on (0x4F44 0x6344):          2019-10-04 12:26:08
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F44 0x6344):          2019-10-04 12:26:08
     32-bit CRC value:                               0x00000000
     compressed size:                                0 bytes
     uncompressed size:                              0 bytes
@@ -520,7 +520,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (00):                        none (stored)
-    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
     32-bit CRC value:                               0x00000000
     compressed size:                                0 bytes
     uncompressed size:                              0 bytes
@@ -549,7 +549,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (00):                        none (stored)
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
     compressed size:                                0 bytes
     uncompressed size:                              0 bytes
@@ -578,7 +578,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (00):                        none (stored)
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
     compressed size:                                0 bytes
     uncompressed size:                              0 bytes
@@ -607,7 +607,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (00):                        none (stored)
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
     compressed size:                                0 bytes
     uncompressed size:                              0 bytes
@@ -636,7 +636,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (00):                        none (stored)
-    file last modified on (0x4F8E 0x059D):          2019-12-14 00:44:58
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F6E 0x1A26):          2019-11-14 03:17:12
     32-bit CRC value:                               0x00000000
     compressed size:                                0 bytes
     uncompressed size:                              0 bytes
@@ -656,7 +656,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (00):                        none (stored)
-    file last modified on (0x4F2F 0x9DCE):          2019-09-15 19:46:28
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F2F 0x9DCE):          2019-09-15 19:46:28
     32-bit CRC value:                               0x00000000
     compressed size:                                0 bytes
     uncompressed size:                              0 bytes
@@ -684,7 +684,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (00):                        none (stored)
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
     compressed size:                                0 bytes
     uncompressed size:                              0 bytes
@@ -713,7 +713,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (00):                        none (stored)
-    file last modified on (0x4F8E 0x0589):          2019-12-14 00:44:18
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F2F 0x9DCE):          2019-09-15 19:46:28
     32-bit CRC value:                               0x00000000
     compressed size:                                0 bytes
     uncompressed size:                              0 bytes
@@ -742,7 +742,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (00):                        none (stored)
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
     compressed size:                                0 bytes
     uncompressed size:                              0 bytes
@@ -771,7 +771,7 @@
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (00):                        none (stored)
-    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
     32-bit CRC value:                               0x00000000
     compressed size:                                0 bytes
     uncompressed size:                              0 bytes
