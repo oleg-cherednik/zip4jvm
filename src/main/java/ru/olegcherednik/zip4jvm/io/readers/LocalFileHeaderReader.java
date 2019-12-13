@@ -31,7 +31,7 @@ public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
     }
 
     protected LocalFileHeader readLocalFileHeader(DataInput in) throws IOException {
-        in.readDwordSignature();
+        in.skip(in.dwordSignatureSize());
 
         LocalFileHeader localFileHeader = new LocalFileHeader();
 
