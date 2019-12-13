@@ -9,7 +9,6 @@ import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipInfo;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -42,13 +41,9 @@ public class ZipInfoTest {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("actual.txt");
         Files.createDirectories(file.getParent());
 
-        try (PrintStream out = new PrintStream(new LogOutputStream())) {
+        try (PrintStream out = new PrintStream(file.toFile())) {
             ZipInfo.zip(TestData.zipStoreSolid).printShortInfo(out);
         }
-
-//        try (PrintStream out = new PrintStream(file.toFile())) {
-//            ZipInfo.zip(TestData.zipStoreSolid).printShortInfo(out);
-//        }
 
         assertThatFile(file).matchesResourceLines("/info/store_solid.txt");
     }
@@ -113,26 +108,4 @@ public class ZipInfoTest {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         zipInfo().decompose(dir);
     }
-
-    public class LogOutputStream extends OutputStream {
-
-        private String mem = "";
-
-        public void write(int b) {
-            byte[] bytes = new byte[1];
-            bytes[0] = (byte)(b & 0xff);
-            mem += new String(bytes);
-
-            if (mem.endsWith("\n")) {
-                mem = mem.substring(0, mem.length() - 1);
-                flush();
-            }
-        }
-
-        public void flush() {
-            log.debug(mem);
-            mem = "";
-        }
-    }
-
 }
