@@ -46,9 +46,9 @@
     length of file comment:                         0 bytes
     internal file attributes:                       0x0000
       apparent file type:                           binary
-    external file attributes:                       0x00000020
-      MS-DOS file attributes (0x20):                arc
-      non-MSDOS file attributes (0x000000):         ?---------
+<-- ignore_line -->    external file attributes:                       0x00000020
+<-- ignore_line -->      MS-DOS file attributes (0x20):                arc
+<-- ignore_line -->      non-MSDOS file attributes (0x000000):         ?---------
     extra field:                                    5481154 (0x0053A2C2) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5481154 (0x0053A2C2) bytes
@@ -84,9 +84,9 @@
     length of file comment:                         0 bytes
     internal file attributes:                       0x0000
       apparent file type:                           binary
-    external file attributes:                       0x00000020
-      MS-DOS file attributes (0x20):                arc
-      non-MSDOS file attributes (0x000000):         ?---------
+<-- ignore_line -->    external file attributes:                       0x00000020
+<-- ignore_line -->      MS-DOS file attributes (0x20):                arc
+<-- ignore_line -->      non-MSDOS file attributes (0x000000):         ?---------
     extra field:                                    5481235 (0x0053A313) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5481235 (0x0053A313) bytes
@@ -122,9 +122,9 @@
     length of file comment:                         0 bytes
     internal file attributes:                       0x0000
       apparent file type:                           binary
-    external file attributes:                       0x00000020
-      MS-DOS file attributes (0x20):                arc
-      non-MSDOS file attributes (0x000000):         ?---------
+<-- ignore_line -->    external file attributes:                       0x00000020
+<-- ignore_line -->      MS-DOS file attributes (0x20):                arc
+<-- ignore_line -->      non-MSDOS file attributes (0x000000):         ?---------
     extra field:                                    5481320 (0x0053A368) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5481320 (0x0053A368) bytes
@@ -160,9 +160,9 @@
     length of file comment:                         0 bytes
     internal file attributes:                       0x0000
       apparent file type:                           binary
-    external file attributes:                       0x00000020
-      MS-DOS file attributes (0x20):                arc
-      non-MSDOS file attributes (0x000000):         ?---------
+<-- ignore_line -->    external file attributes:                       0x00000020
+<-- ignore_line -->      MS-DOS file attributes (0x20):                arc
+<-- ignore_line -->      non-MSDOS file attributes (0x000000):         ?---------
     extra field:                                    5481401 (0x0053A3B9) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5481401 (0x0053A3B9) bytes
@@ -198,9 +198,9 @@
     length of file comment:                         0 bytes
     internal file attributes:                       0x0000
       apparent file type:                           binary
-    external file attributes:                       0x00000020
-      MS-DOS file attributes (0x20):                arc
-      non-MSDOS file attributes (0x000000):         ?---------
+<-- ignore_line -->    external file attributes:                       0x00000020
+<-- ignore_line -->      MS-DOS file attributes (0x20):                arc
+<-- ignore_line -->      non-MSDOS file attributes (0x000000):         ?---------
     extra field:                                    5481486 (0x0053A40E) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5481486 (0x0053A40E) bytes
@@ -236,9 +236,9 @@
     length of file comment:                         0 bytes
     internal file attributes:                       0x0000
       apparent file type:                           binary
-    external file attributes:                       0x00000020
-      MS-DOS file attributes (0x20):                arc
-      non-MSDOS file attributes (0x000000):         ?---------
+<-- ignore_line -->    external file attributes:                       0x00000020
+<-- ignore_line -->      MS-DOS file attributes (0x20):                arc
+<-- ignore_line -->      non-MSDOS file attributes (0x000000):         ?---------
     extra field:                                    5481570 (0x0053A462) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5481570 (0x0053A462) bytes
@@ -274,9 +274,9 @@
     length of file comment:                         0 bytes
     internal file attributes:                       0x0000
       apparent file type:                           binary
-    external file attributes:                       0x00000020
-      MS-DOS file attributes (0x20):                arc
-      non-MSDOS file attributes (0x000000):         ?---------
+<-- ignore_line -->    external file attributes:                       0x00000020
+<-- ignore_line -->      MS-DOS file attributes (0x20):                arc
+<-- ignore_line -->      non-MSDOS file attributes (0x000000):         ?---------
     extra field:                                    5481651 (0x0053A4B3) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5481651 (0x0053A4B3) bytes
@@ -311,7 +311,7 @@
     length of file comment:                         0 bytes
     internal file attributes:                       0x0000
       apparent file type:                           binary
-    external file attributes:                       0x00000010
+<-- ignore_line -->    external file attributes:                       0x00000010
       MS-DOS file attributes (0x10):                dir
       non-MSDOS file attributes (0x000000):         ?---------
 
@@ -341,9 +341,9 @@
     length of file comment:                         0 bytes
     internal file attributes:                       0x0000
       apparent file type:                           binary
-    external file attributes:                       0x00000020
-      MS-DOS file attributes (0x20):                arc
-      non-MSDOS file attributes (0x000000):         ?---------
+<-- ignore_line -->    external file attributes:                       0x00000020
+<-- ignore_line -->      MS-DOS file attributes (0x20):                arc
+<-- ignore_line -->      non-MSDOS file attributes (0x000000):         ?---------
     extra field:                                    5481778 (0x0053A532) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5481778 (0x0053A532) bytes
@@ -379,9 +379,9 @@
     length of file comment:                         0 bytes
     internal file attributes:                       0x0000
       apparent file type:                           binary
-    external file attributes:                       0x00000020
-      MS-DOS file attributes (0x20):                arc
-      non-MSDOS file attributes (0x000000):         ?---------
+<-- ignore_line -->    external file attributes:                       0x00000020
+<-- ignore_line -->      MS-DOS file attributes (0x20):                arc
+<-- ignore_line -->      non-MSDOS file attributes (0x000000):         ?---------
     extra field:                                    5481866 (0x0053A58A) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5481866 (0x0053A58A) bytes
@@ -417,9 +417,9 @@
     length of file comment:                         0 bytes
     internal file attributes:                       0x0000
       apparent file type:                           binary
-    external file attributes:                       0x00000020
-      MS-DOS file attributes (0x20):                arc
-      non-MSDOS file attributes (0x000000):         ?---------
+<-- ignore_line -->    external file attributes:                       0x00000020
+<-- ignore_line -->      MS-DOS file attributes (0x20):                arc
+<-- ignore_line -->      non-MSDOS file attributes (0x000000):         ?---------
     extra field:                                    5481941 (0x0053A5D5) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5481941 (0x0053A5D5) bytes
@@ -455,9 +455,9 @@
     length of file comment:                         0 bytes
     internal file attributes:                       0x0000
       apparent file type:                           binary
-    external file attributes:                       0x00000020
-      MS-DOS file attributes (0x20):                arc
-      non-MSDOS file attributes (0x000000):         ?---------
+<-- ignore_line -->    external file attributes:                       0x00000020
+<-- ignore_line -->      MS-DOS file attributes (0x20):                arc
+<-- ignore_line -->      non-MSDOS file attributes (0x000000):         ?---------
     extra field:                                    5482018 (0x0053A622) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5482018 (0x0053A622) bytes
@@ -493,9 +493,9 @@
     length of file comment:                         0 bytes
     internal file attributes:                       0x0000
       apparent file type:                           binary
-    external file attributes:                       0x00000020
-      MS-DOS file attributes (0x20):                arc
-      non-MSDOS file attributes (0x000000):         ?---------
+<-- ignore_line -->    external file attributes:                       0x00000020
+<-- ignore_line -->      MS-DOS file attributes (0x20):                arc
+<-- ignore_line -->      non-MSDOS file attributes (0x000000):         ?---------
     extra field:                                    5482095 (0x0053A66F) bytes
       - size:                                       11 bytes (1 record)
     (0x9901) AES Encryption Tag:                    5482095 (0x0053A66F) bytes
