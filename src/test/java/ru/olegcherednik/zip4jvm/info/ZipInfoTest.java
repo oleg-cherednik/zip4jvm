@@ -10,6 +10,7 @@ import ru.olegcherednik.zip4jvm.ZipInfo;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -42,6 +43,8 @@ public class ZipInfoTest {
         Files.createDirectories(file.getParent());
 
         log.debug(String.valueOf(Files.size(TestData.zipStoreSolid)));
+        log.debug(String.valueOf(TestData.zipStoreSolid.toFile().length()));
+        log.debug(String.valueOf(FileChannel.open(TestData.zipStoreSolid).size()));
 
         try (PrintStream out = new PrintStream(file.toFile())) {
             ZipInfo.zip(TestData.zipStoreSolid).printShortInfo(out);
