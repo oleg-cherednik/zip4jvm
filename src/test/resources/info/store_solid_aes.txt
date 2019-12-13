@@ -312,8 +312,8 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000010
-      MS-DOS file attributes (0x10):                dir
-      non-MSDOS file attributes (0x000000):         ?---------
+<-- ignore_line -->      MS-DOS file attributes (0x10):                dir
+<-- ignore_line -->      non-MSDOS file attributes (0x000000):         ?---------
 
 #9 (PK0102) [UTF-8] empty_file.txt
 ----------------------------------

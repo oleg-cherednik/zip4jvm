@@ -118,7 +118,7 @@ public class ZipMiscTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         Files.createDirectories(zip.getParent());
         Files.copy(zipStoreSolid, zip);
-        assertThatZipFile(zip).exists().root().matches(TestDataAssert.rootAssert);
+        assertThatZipFile(zip).exists().root().matches(rootAssert);
 
         List<String> entryNames = filesDirCars.stream()
                                               .map(file -> dirSrc.relativize(file).toString())
@@ -134,7 +134,7 @@ public class ZipMiscTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         Files.createDirectories(zip.getParent());
         Files.copy(zipStoreSolid, zip);
-        assertThatZipFile(zip).exists().root().matches(TestDataAssert.rootAssert);
+        assertThatZipFile(zip).exists().root().matches(rootAssert);
 
         ZipMisc zipFile = ZipMisc.zip(zip);
 
