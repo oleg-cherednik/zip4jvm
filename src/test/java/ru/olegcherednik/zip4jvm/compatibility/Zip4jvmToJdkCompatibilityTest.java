@@ -1,5 +1,6 @@
 package ru.olegcherednik.zip4jvm.compatibility;
 
+import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.TestDataAssert;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 
@@ -20,7 +21,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
  * @author Oleg Cherednik
  * @since 14.08.2019
  */
-//@Test
+@Test
 @SuppressWarnings({ "NewClassNamingConvention", "FieldNamingConvention", "LocalVariableNamingConvention" })
 public class Zip4jvmToJdkCompatibilityTest {
 
