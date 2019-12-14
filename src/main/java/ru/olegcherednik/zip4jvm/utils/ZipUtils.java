@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.utils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -51,7 +50,7 @@ public final class ZipUtils {
     }
 
     @SuppressWarnings("PMD.AvoidReassigningParameters")
-    public static String getFileNameNoDirectoryMarker(@NonNull String fileName) {
+    public static String getFileNameNoDirectoryMarker(String fileName) {
         fileName = normalizeFileName(fileName);
         return StringUtils.removeEnd(normalizeFileName(fileName), "/");
     }

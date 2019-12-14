@@ -25,6 +25,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotBlank;
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
 /**
  * @author Oleg Cherednik
@@ -66,7 +67,7 @@ public final class ZipEngine implements ZipFile.Writer {
     }
 
     @Override
-    public void removeEntryByNamePrefix(String entryNamePrefix)  {
+    public void removeEntryByNamePrefix(String entryNamePrefix) {
         requireNotBlank(entryNamePrefix, "ZipEngine.entryNamePrefix");
 
         String normalizedPrefixEntryName = ZipUtils.normalizeFileName(entryNamePrefix);
@@ -83,6 +84,8 @@ public final class ZipEngine implements ZipFile.Writer {
 
     @Override
     public void copy(Path zip) throws IOException {
+        requireNotNull(zip, "ZipEngine.zip");
+
         ZipModel srcZipModel = ZipModelBuilder.read(zip);
 
         for (String fileName : srcZipModel.getEntryNames()) {
