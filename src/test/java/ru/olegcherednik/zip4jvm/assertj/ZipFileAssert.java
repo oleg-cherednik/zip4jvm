@@ -51,8 +51,12 @@ public class ZipFileAssert extends AbstractAssert<ZipFileAssert, ZipFileDecorato
         return new ZipEntryFileAssert(entry, actual);
     }
 
-    public static ZipFileAssert assertThatZipFile(Path zipFile, char[] password) throws IOException {
-        return new ZipFileAssert(new ZipFileEncryptedDecoder(zipFile, password));
+    public static ZipFileAssert assertThatZipFile(Path zip) throws IOException {
+        return assertThatZipFile(zip, null);
+    }
+
+    public static ZipFileAssert assertThatZipFile(Path zip, char[] password) throws IOException {
+        return new ZipFileAssert(new ZipFileEncryptedDecoder(zip, password));
     }
 
     public ZipFileAssert exists() {

@@ -35,7 +35,7 @@ class ZipFileEncryptedDecoder extends ZipFileDecorator {
     @SuppressWarnings("MethodCanBeVariableArityMethod")
     public ZipFileEncryptedDecoder(Path zipFile, char[] password) {
         super(zipFile, entries(zipFile));
-        this.password = password != null ? new String(password) : null;
+        this.password = password == null ? null : new String(password);
     }
 
     @Override
