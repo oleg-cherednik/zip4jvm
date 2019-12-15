@@ -69,7 +69,7 @@ abstract class BaseDataOutput extends AbstractMarker implements DataOutput {
     }
 
     @Override
-    public final String toString() {
+    public String toString() {
         return delegate.toString();
     }
 

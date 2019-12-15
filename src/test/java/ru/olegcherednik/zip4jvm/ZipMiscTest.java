@@ -36,6 +36,7 @@ import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSplit;
 import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolid;
 import static ru.olegcherednik.zip4jvm.TestData.zipStoreSplit;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
@@ -102,7 +103,7 @@ public class ZipMiscTest {
 
     public void shouldRetrieveTrueWhenSplitZipWithOneDisk() throws IOException {
         ZipSettings settings = ZipSettings.builder()
-                                          .splitSize(1024 * 1024)
+                                          .splitSize(SIZE_1MB)
                                           .entrySettingsProvider(fileName ->
                                                   ZipEntrySettings.builder()
                                                                   .compression(Compression.STORE, CompressionLevel.NORMAL)

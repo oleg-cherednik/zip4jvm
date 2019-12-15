@@ -1,10 +1,13 @@
 package ru.olegcherednik.zip4jvm;
 
+import net.lingala.zip4j.ZipFile;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import ru.olegcherednik.zip4jvm.data.DefalteZipData;
 import ru.olegcherednik.zip4jvm.data.StoreZipData;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.view.IView;
 
@@ -14,7 +17,9 @@ import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirEmpty;
 import static ru.olegcherednik.zip4jvm.TestData.dirRoot;
@@ -36,6 +41,7 @@ public class Zip4jvmSuite {
     public static final boolean clear = false;
 
     public static final long SIZE_1MB = 1024 * 1024;
+    public static final long SIZE_2MB = 2 * SIZE_1MB;
 
     private static final long time = System.currentTimeMillis();
 
@@ -77,14 +83,22 @@ public class Zip4jvmSuite {
             FileUtils.deleteQuietly(path.toFile());
     }
 
-    public static Path copy(Path rootDir, Path srcFile) throws IOException {
-        Path zipFile = generateZipFileName(rootDir);
-        Files.copy(srcFile, zipFile);
-        return zipFile;
-    }
+    public static Path copy(Path destDir, Path zip) throws IOException {
+        if (new ZipFile(zip.toFile()).isSplitArchive()) {
+            final String fileName = FilenameUtils.getBaseName(zip.getFileName().toString());
 
-    public static Path generateZipFileName(Path rootDir) {
-        return rootDir.resolve("src_" + System.currentTimeMillis() + ".zip");
+            List<Path> parts = Files.walk(zip.getParent())
+                                    .filter(Files::isRegularFile)
+                                    .filter(path -> FilenameUtils.getBaseName(path.getFileName().toString()).equals(fileName))
+                                    .collect(Collectors.toList());
+
+            for (Path part : parts)
+                Files.copy(part, destDir.resolve(part.getFileName()));
+
+        } else
+            Files.copy(zip, destDir.resolve(zip.getFileName()));
+
+        return destDir.resolve(zip.getFileName());
     }
 
     public static Path generateSubDirName(Class<?> cls) {
@@ -107,7 +121,11 @@ public class Zip4jvmSuite {
             }
         }
 
-        return path;
+        try {
+            return Files.createDirectories(path);
+        } catch(IOException e) {
+            throw new Zip4jvmException(e);
+        }
     }
 
     public static Path temp() {
@@ -122,8 +140,8 @@ public class Zip4jvmSuite {
         return rootDir.resolve(TestDataAssert.getMethodName()).resolve(Paths.get(String.valueOf(time)));
     }
 
-    public static Path subDirNameAsMethodName(Path rootDir) {
-        return rootDir.resolve(TestDataAssert.getMethodName());
+    public static Path subDirNameAsMethodName(Path rootDir) throws IOException {
+        return Files.createDirectories(rootDir.resolve(TestDataAssert.getMethodName()));
     }
 
     public static Path subDirNameAsRelativePathToRoot(Path rootDir, Path zipFile) {

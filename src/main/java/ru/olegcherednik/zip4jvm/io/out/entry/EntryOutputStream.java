@@ -27,7 +27,7 @@ import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
  */
 public abstract class EntryOutputStream extends OutputStream {
 
-    private static final String COMPRESSED_DATA = "entryCompressedDataOffs";
+    private static final String COMPRESSED_DATA = EntryOutputStream.class.getSimpleName() + ".entryCompressedDataOffs";
 
     private final ZipEntry zipEntry;
     private final Checksum checksum = new CRC32();

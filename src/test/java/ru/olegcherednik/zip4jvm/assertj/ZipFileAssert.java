@@ -3,9 +3,7 @@ package ru.olegcherednik.zip4jvm.assertj;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.internal.Failures;
 
-import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.zip.ZipEntry;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,14 +47,6 @@ public class ZipFileAssert extends AbstractAssert<ZipFileAssert, ZipFileDecorato
         ZipEntry entry = actual.getEntry(name);
         assertThat(entry.isDirectory()).isFalse();
         return new ZipEntryFileAssert(entry, actual);
-    }
-
-    public static ZipFileAssert assertThatZipFile(Path zip) throws IOException {
-        return assertThatZipFile(zip, null);
-    }
-
-    public static ZipFileAssert assertThatZipFile(Path zip, char[] password) throws IOException {
-        return new ZipFileAssert(new ZipFileEncryptedDecoder(zip, password));
     }
 
     public ZipFileAssert exists() {

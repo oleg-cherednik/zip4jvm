@@ -56,6 +56,7 @@ public class FileAssert extends AbstractPathAssert<FileAssert> implements IFileA
         return myself;
     }
 
+    @Override
     public FileAssert matches(Consumer<IFileAssert<?>> consumer) {
         consumer.accept(this);
         return myself;

@@ -7,6 +7,7 @@ import ru.olegcherednik.zip4jvm.model.Charsets;
 import javax.imageio.ImageIO;
 import java.io.InputStream;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 
@@ -84,6 +85,12 @@ public class ZipEntryFileAssert extends AbstractZipEntryAssert<ZipEntryFileAsser
             assertThat(actual.getComment()).isNull();
         else
             assertThat(actual.getComment()).isEqualTo(comment);
+        return myself;
+    }
+
+    @Override
+    public ZipEntryFileAssert matches(Consumer<IFileAssert<?>> consumer) {
+        consumer.accept(this);
         return myself;
     }
 }

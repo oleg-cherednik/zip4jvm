@@ -17,6 +17,7 @@ import java.util.List;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileFerrari;
 import static ru.olegcherednik.zip4jvm.TestData.fileWiesmann;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
 
 /**
  * @author Oleg Cherednik
@@ -44,7 +45,7 @@ public class ZipFilesSplitTest {
                                           .entrySettingsProvider(fileName ->
                                                           ZipEntrySettings.builder()
                                                                           .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
-                                          .splitSize(1024 * 1024).build();
+                                          .splitSize(SIZE_1MB).build();
         List<Path> files = Arrays.asList(fileBentley, fileFerrari, fileWiesmann);
         ZipIt.zip(zip).settings(settings).add(files);
 //    TODO commented tests

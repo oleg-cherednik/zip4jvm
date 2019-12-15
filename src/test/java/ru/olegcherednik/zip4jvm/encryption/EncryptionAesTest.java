@@ -117,7 +117,7 @@ public class EncryptionAesTest {
         assertThatThrownBy(() -> ZipEntrySettings.builder()
                                                  .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                  .encryption(Encryption.AES_256, null).build())
-                .isExactlyInstanceOf(NullPointerException.class);
+                .isExactlyInstanceOf(EmptyPasswordException.class);
 
         assertThatThrownBy(() -> ZipEntrySettings.builder()
                                                  .compression(Compression.STORE, CompressionLevel.NORMAL)

@@ -55,6 +55,7 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
         return new ZipEntry(name);
     }
 
+    @Override
     public ZipEntryDirectoryAssert matches(Consumer<IDirectoryAssert<?>> consumer) {
         consumer.accept(this);
         return myself;
@@ -71,6 +72,7 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
                            .filter(entryName -> !isDirectory(entryName))
                            .count();
     }
+
 
     private static boolean isDirectory(String entryName) {
         return FilenameUtils.getExtension(entryName).isEmpty();

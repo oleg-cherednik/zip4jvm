@@ -91,7 +91,7 @@ public class EncryptionPkwareTest {
         assertThatThrownBy(() -> ZipEntrySettings.builder()
                                                  .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                  .encryption(Encryption.PKWARE, null).build())
-                .isExactlyInstanceOf(NullPointerException.class);
+                .isExactlyInstanceOf(EmptyPasswordException.class);
 
         assertThatThrownBy(() -> ZipEntrySettings.builder()
                                                  .compression(Compression.STORE, CompressionLevel.NORMAL)

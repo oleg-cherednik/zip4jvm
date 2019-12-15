@@ -88,4 +88,9 @@ public class SplitZipOutputStream extends BaseDataOutput {
         super.close();
     }
 
+    @Override
+    public final String toString() {
+        return super.toString() + "; disk: " + disk;
+    }
+
 }

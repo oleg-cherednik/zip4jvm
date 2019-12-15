@@ -42,6 +42,5 @@ public class SplitZipInputStream extends BaseZipInputStream {
     @Override
     public int read() throws IOException {
         throw new NotImplementedException();
-//        return 0;
     }
 }

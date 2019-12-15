@@ -65,6 +65,7 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
         }
     }
 
+    @Override
     public DirectoryAssert matches(Consumer<IDirectoryAssert<?>> consumer) {
         consumer.accept(this);
         return myself;

@@ -19,17 +19,15 @@ import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.function.Function;
 
 /**
+ * This writer copy existed {@link ZipEntry} block from one zip file to another as is. This block is not modified during the copy.
+ *
  * @author Oleg Cherednik
  * @since 12.09.2019
  */
 @RequiredArgsConstructor
 public class ExistedEntryWriter implements Writer {
-
-    private static final String LOCAL_FILE_HEADER_OFFS = "localFileHeaderOffs";
 
     private final ZipModel srcZipModel;
     private final String entryName;
@@ -39,20 +37,24 @@ public class ExistedEntryWriter implements Writer {
     @Override
     public void write(DataOutput out) throws IOException {
         ZipEntry entry = srcZipModel.getZipEntryByFileName(entryName);
+        // TODO it seems that this should not be done, because we just copy encrypted/not encrypted entry
         entry.setPassword(entry.isEncrypted() ? password : null);
+
+        long offs = out.getOffs();
+        long disk = out.getDisk();
 
         try (CopyEntryInputStream in = new CopyEntryInputStream(entry, srcZipModel)) {
             if (!destZipModel.hasEntry(entryName))
                 destZipModel.addEntry(entry);
 
-            out.mark(LOCAL_FILE_HEADER_OFFS);
-
             in.copyLocalFileHeader(out);
             in.copyEncryptionHeaderAndData(out);
             in.copyDataDescriptor(out);
-
-            entry.setLocalFileHeaderOffs(out.getMark(LOCAL_FILE_HEADER_OFFS));
+            // TODO probably should set compressed size here
         }
+
+        entry.setLocalFileHeaderOffs(offs);
+        entry.setDisk(disk);
     }
 
     @Override
@@ -71,8 +73,7 @@ public class ExistedEntryWriter implements Writer {
         }
 
         public void copyLocalFileHeader(DataOutput out) throws IOException {
-            Function<Charset, Charset> charsetCustomizer = Charsets.UNMODIFIED;
-            LocalFileHeader localFileHeader = new LocalFileHeaderReader(zipEntry.getLocalFileHeaderOffs(), charsetCustomizer).read(in);
+            LocalFileHeader localFileHeader = new LocalFileHeaderReader(zipEntry.getLocalFileHeaderOffs(), Charsets.UNMODIFIED).read(in);
             zipEntry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
             new LocalFileHeaderWriter(localFileHeader).write(out);
         }
