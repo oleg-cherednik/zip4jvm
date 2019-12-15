@@ -34,7 +34,9 @@ import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
 import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolidPkware;
 import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSplit;
 import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolid;
+import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolidPkware;
 import static ru.olegcherednik.zip4jvm.TestData.zipStoreSplit;
+import static ru.olegcherednik.zip4jvm.TestData.zipStoreSplitAes;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
@@ -168,5 +170,21 @@ public class ZipMiscTest {
 
         zipFile.removeEntryByName(dirNameCars);
         assertThat(zipFile.getEntries()).hasSize(1);
+    }
+
+    public void shouldIterateOverAllEntriesWhenStoreSolidPkware() throws IOException {
+        List<String> entryNames = ZipMisc.zip(zipStoreSolidPkware).getEntries()
+                                         .map(ZipFile.Entry::getFileName)
+                                         .collect(Collectors.toList());
+
+        assertThat(entryNames).hasSize(13);
+    }
+
+    public void shouldRetrieveStreamWithAllEntriesWhenStoreSplitAes() throws IOException {
+        List<String> entryNames = ZipMisc.zip(zipStoreSplitAes).getEntries()
+                                         .map(ZipFile.Entry::getFileName)
+                                         .collect(Collectors.toList());
+
+        assertThat(entryNames).hasSize(13);
     }
 }
