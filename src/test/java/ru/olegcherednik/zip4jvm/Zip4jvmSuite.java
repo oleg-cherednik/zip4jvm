@@ -7,7 +7,6 @@ import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import ru.olegcherednik.zip4jvm.data.DefalteZipData;
 import ru.olegcherednik.zip4jvm.data.StoreZipData;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.view.IView;
 
@@ -121,11 +120,7 @@ public class Zip4jvmSuite {
             }
         }
 
-        try {
-            return Files.createDirectories(path);
-        } catch(IOException e) {
-            throw new Zip4jvmException(e);
-        }
+        return path;
     }
 
     public static Path temp() {

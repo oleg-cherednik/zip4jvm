@@ -17,6 +17,7 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.function.Function;
@@ -64,6 +65,11 @@ public class ZipEngineSolidTest {
 
     private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ZipEngineSolidTest.class);
     private static final Path srcZip = rootDir.resolve("src/src.zip");
+
+    @BeforeClass
+    public static void createDir() throws IOException {
+        Files.createDirectories(rootDir);
+    }
 
     @BeforeClass
     private static void createSolidArchive() throws IOException {

@@ -17,6 +17,7 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.function.Function;
@@ -61,11 +62,16 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  * @since 12.09.2019
  */
 @Test
-@SuppressWarnings({ "FieldNamingConvention", "NewMethodNamingConvention" })
+@SuppressWarnings("FieldNamingConvention")
 public class ZipEngineSplitTest {
 
     private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ZipEngineSplitTest.class);
     private static final Path srcZip = rootDir.resolve("src/src.zip");
+
+    @BeforeClass
+    public static void createDir() throws IOException {
+        Files.createDirectories(rootDir);
+    }
 
     @BeforeClass
     private static void createSplitArchive() throws IOException {
