@@ -16,7 +16,6 @@ import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -145,8 +144,6 @@ public class FileHeaderViewTest {
                                                             .pos(0)
                                                             .charset(Charsets.UTF_8)
                                                             .position(4, 52).build());
-
-        Arrays.stream(lines).forEach(System.out::println);
 
         assertThat(lines).hasSize(32);
         assertThat(lines[0]).isEqualTo("#1 (PK0102) [UTF-8] ducati-panigale-1199.jpg");
