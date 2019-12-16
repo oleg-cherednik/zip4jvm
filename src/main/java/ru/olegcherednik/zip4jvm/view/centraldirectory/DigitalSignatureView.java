@@ -6,7 +6,8 @@ import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
-import java.util.Objects;
+
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
 /**
  * @author Oleg Cherednik
@@ -22,8 +23,8 @@ public final class DigitalSignatureView extends View {
         this.digitalSignature = digitalSignature;
         this.block = block;
 
-        Objects.requireNonNull(digitalSignature, "'digitalSignature' must not be null");
-        Objects.requireNonNull(block, "'block' must not be null");
+        requireNotNull(digitalSignature, "DigitalSignatureView.centralDirectory");
+        requireNotNull(block, "DigitalSignatureView.block");
     }
 
     @Override

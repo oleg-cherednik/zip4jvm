@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.view.crypto;
 
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
 
 import java.io.IOException;
@@ -20,15 +19,13 @@ import static org.mockito.Mockito.when;
 public class PkwareEncryptionHeaderBlockViewTest {
 
     public void shouldRetrieveMultipleLinesWhenPkwareEncryptionHeader() throws IOException {
-        PkwareEncryptionHeaderBlock encryptionHeader = mock(PkwareEncryptionHeaderBlock.class);
-        Block data = mock(Block.class);
+        PkwareEncryptionHeaderBlock block = mock(PkwareEncryptionHeaderBlock.class);
 
-        when(encryptionHeader.getHeader()).thenReturn(data);
-        when(data.getSize()).thenReturn(12L);
-        when(data.getOffs()).thenReturn(60L);
-        when(data.getData()).thenReturn(new byte[] { 0x0, 0x1, 0x2, 0x3 });
+        when(block.getSize()).thenReturn(12L);
+        when(block.getOffs()).thenReturn(60L);
+        when(block.getData()).thenReturn(new byte[] { 0x0, 0x1, 0x2, 0x3 });
 
-        String[] lines = Zip4jvmSuite.execute(new PkwareEncryptionHeaderView(encryptionHeader, 1, 2, 52));
+        String[] lines = Zip4jvmSuite.execute(new PkwareEncryptionHeaderView(block, 1, 2, 52));
         assertThat(lines).hasSize(5);
         assertThat(lines[0]).isEqualTo("#2 (PKWARE) encryption header");
         assertThat(lines[1]).isEqualTo("-----------------------------");

@@ -6,9 +6,9 @@ import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
-import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
@@ -58,7 +58,7 @@ public class BlockZipEntryReader {
             block = new BlockAesHeaderReader(zipEntry.getStrength(), zipEntry.getCompressedSize()).read(in);
         else if (zipEntry.getEncryption() == Encryption.PKWARE) {
             block = new BlockPkwareHeaderReader().read(in);
-            in.skip(zipEntry.getCompressedSize() - ((PkwareEncryptionHeaderBlock)block).getHeader().getSize());
+            in.skip(zipEntry.getCompressedSize() - ((Block)block).getSize());
         } else
             in.skip(zipEntry.getCompressedSize());
 

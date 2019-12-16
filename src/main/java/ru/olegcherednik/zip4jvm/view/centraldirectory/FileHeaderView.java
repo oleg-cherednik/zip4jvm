@@ -19,8 +19,9 @@ import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
 
 import java.io.PrintStream;
 import java.nio.charset.Charset;
-import java.util.Objects;
 import java.util.Optional;
+
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
 /**
  * @author Oleg Cherednik
@@ -63,7 +64,6 @@ public final class FileHeaderView extends View {
         return true;
     }
 
-    // TODO this is not location; method should be renamed
     private void printLocation(PrintStream out) {
         printLine(out, String.format("part number of this part (%04X):", fileHeader.getDisk()), String.valueOf(fileHeader.getDisk() + 1));
         printLine(out, "relative offset of local header:", String.format("%1$d (0x%1$08X) bytes", fileHeader.getLocalFileHeaderOffs()));
@@ -139,8 +139,8 @@ public final class FileHeaderView extends View {
         private int columnWidth;
 
         public FileHeaderView build() {
-            Objects.requireNonNull(fileHeader, "'fileHeader' must not be null");
-            Objects.requireNonNull(block, "'block' must not be null");
+            requireNotNull(fileHeader, "FileHeaderView.fileHeader");
+            requireNotNull(block, "FileHeaderView.block");
             return new FileHeaderView(this);
         }
 

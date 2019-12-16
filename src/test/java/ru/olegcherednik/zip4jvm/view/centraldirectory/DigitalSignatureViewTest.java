@@ -23,8 +23,8 @@ public class DigitalSignatureViewTest {
         when(block.getSize()).thenReturn(33L);
         when(block.getOffs()).thenReturn(255614L);
 
-        CentralDirectory.DigitalSignature digitalSignature = mock(CentralDirectory.DigitalSignature.class);
-        when(digitalSignature.getSignatureData()).thenReturn(new byte[] { 0x0, 0x1, 0x2, 0x3 });
+        CentralDirectory.DigitalSignature digitalSignature = new CentralDirectory.DigitalSignature();
+        digitalSignature.setSignatureData(new byte[] { 0x0, 0x1, 0x2, 0x3 });
 
         String[] lines = Zip4jvmSuite.execute(new DigitalSignatureView(digitalSignature, block, 2, 52));
 

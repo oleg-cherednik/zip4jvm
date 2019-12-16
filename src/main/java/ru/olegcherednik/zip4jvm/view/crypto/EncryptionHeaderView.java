@@ -6,7 +6,8 @@ import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
-import java.util.Objects;
+
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
 /**
  * @author Oleg Cherednik
@@ -22,7 +23,7 @@ public final class EncryptionHeaderView extends View {
         this.block = block;
         this.pos = pos;
 
-        Objects.requireNonNull(block, "'block' must not be null");
+        requireNotNull(block, "EncryptionHeaderView.centralDirectory");
     }
 
     @Override

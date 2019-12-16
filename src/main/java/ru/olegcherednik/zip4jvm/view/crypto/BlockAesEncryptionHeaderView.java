@@ -5,13 +5,14 @@ import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
-import java.util.Objects;
+
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
 /**
  * @author Oleg Cherednik
  * @since 09.11.2019
  */
-public final class BlockAesEncryptionHeaderView extends View {
+final class BlockAesEncryptionHeaderView extends View {
 
     private final AesEncryptionHeaderBlock block;
     private final long pos;
@@ -21,7 +22,7 @@ public final class BlockAesEncryptionHeaderView extends View {
         this.block = block;
         this.pos = pos;
 
-        Objects.requireNonNull(block, "'block' must not be null");
+        requireNotNull(block, "BlockAesEncryptionHeaderView.centralDirectory");
     }
 
     @Override

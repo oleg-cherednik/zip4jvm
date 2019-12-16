@@ -5,13 +5,14 @@ import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
-import java.util.Objects;
+
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
 /**
  * @author Oleg Cherednik
  * @since 09.11.2019
  */
-public final class PkwareEncryptionHeaderView extends View {
+final class PkwareEncryptionHeaderView extends View {
 
     private final PkwareEncryptionHeaderBlock block;
     private final long pos;
@@ -21,13 +22,13 @@ public final class PkwareEncryptionHeaderView extends View {
         this.block = block;
         this.pos = pos;
 
-        Objects.requireNonNull(block, "'block' must not be null");
+        requireNotNull(block, "PkwareEncryptionHeaderView.centralDirectory");
     }
 
     @Override
     public boolean print(PrintStream out) {
         printSubTitle(out, pos, "(PKWARE) encryption header");
-        printValueLocation(out, "data:", block.getHeader());
-        return new ByteArrayHexView(block.getHeader().getData(), offs, columnWidth).print(out);
+        printValueLocation(out, "data:", block);
+        return new ByteArrayHexView(block.getData(), offs, columnWidth).print(out);
     }
 }

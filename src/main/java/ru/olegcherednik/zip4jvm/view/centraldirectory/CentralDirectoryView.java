@@ -5,7 +5,8 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
-import java.util.Objects;
+
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
 /**
  * @author Oleg Cherednik
@@ -21,8 +22,8 @@ public final class CentralDirectoryView extends View {
         this.centralDirectory = centralDirectory;
         this.block = block;
 
-        Objects.requireNonNull(centralDirectory, "'centralDirectory' must not be null");
-        Objects.requireNonNull(block, "'block' must not be null");
+        requireNotNull(centralDirectory, "CentralDirectoryView.centralDirectory");
+        requireNotNull(block, "CentralDirectoryView.block");
     }
 
     @Override

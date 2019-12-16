@@ -8,8 +8,6 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
  * @since 24.10.2019
  */
 @Getter
-public class PkwareEncryptionHeaderBlock implements EncryptionHeaderBlock {
-
-    private final Block header = new Block();
+public class PkwareEncryptionHeaderBlock extends Block implements EncryptionHeaderBlock {
 
 }

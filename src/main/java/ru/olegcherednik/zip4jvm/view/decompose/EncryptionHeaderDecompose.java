@@ -54,7 +54,7 @@ public final class EncryptionHeaderDecompose implements Decompose {
         } else if (encryption == Encryption.PKWARE) {
             PkwareEncryptionHeaderBlock block = (PkwareEncryptionHeaderBlock)encryptionHeaderBlock;
             Utils.print(dir.resolve("pkware_encryption_header.txt"), out -> encryptionHeaderView().print(out));
-            Utils.copyLarge(zipModel, subDir.resolve("pkware_encryption_header.data"), block.getHeader());
+            Utils.copyLarge(zipModel, subDir.resolve("pkware_encryption_header.data"), block);
         } else {
             // TODO print unknown header
         }

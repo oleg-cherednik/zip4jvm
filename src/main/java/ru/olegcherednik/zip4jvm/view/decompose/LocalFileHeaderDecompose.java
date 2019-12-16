@@ -103,18 +103,18 @@ public final class LocalFileHeaderDecompose implements Decompose {
         Encryption encryption = zipEntry.getEncryption();
 
         if (encryption == Encryption.AES_128 || encryption == Encryption.AES_192 || encryption == Encryption.AES_256) {
-            AesEncryptionHeaderBlock encryptionHeader1 = (AesEncryptionHeaderBlock)encryptionHeaderBlock;
+            AesEncryptionHeaderBlock block = (AesEncryptionHeaderBlock)encryptionHeaderBlock;
 
-            offs += encryptionHeader1.getSalt().getSize();
-            offs += encryptionHeader1.getPasswordChecksum().getSize();
+            offs += block.getSalt().getSize();
+            offs += block.getPasswordChecksum().getSize();
 
-            size -= encryptionHeader1.getSalt().getSize();
-            size -= encryptionHeader1.getPasswordChecksum().getSize();
-            size -= encryptionHeader1.getMac().getSize();
+            size -= block.getSalt().getSize();
+            size -= block.getPasswordChecksum().getSize();
+            size -= block.getMac().getSize();
         } else if (encryption == Encryption.PKWARE) {
-            PkwareEncryptionHeaderBlock encryptionHeader1 = (PkwareEncryptionHeaderBlock)encryptionHeaderBlock;
-            offs += encryptionHeader1.getHeader().getSize();
-            size -= encryptionHeader1.getHeader().getSize();
+            PkwareEncryptionHeaderBlock block = (PkwareEncryptionHeaderBlock)encryptionHeaderBlock;
+            offs += block.getSize();
+            size -= block.getSize();
         }
 
         Utils.copyLarge(blockModel.getZipModel(), dir.resolve("payload.data"), offs, size);
