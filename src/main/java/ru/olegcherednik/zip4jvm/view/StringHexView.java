@@ -4,9 +4,6 @@ import org.apache.commons.lang.StringUtils;
 
 import java.io.PrintStream;
 import java.nio.charset.Charset;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.Optional;
 
 /**
  * @author Oleg Cherednik
@@ -19,65 +16,50 @@ public final class StringHexView extends View {
 
     public StringHexView(String str, Charset charset, int offs, int columnWidth) {
         super(offs, columnWidth);
-        this.str = str;
+        this.str = StringUtils.isEmpty(str) ? null : str;
         this.charset = charset;
     }
 
     @Override
     public boolean print(PrintStream out) {
-        if (StringUtils.isEmpty(str))
+        if (str == null)
             return false;
 
-        printLine(out, "", charset.name());
-
-        Deque<Integer> hexs = new LinkedList<>();
-        Deque<Character> chars = new LinkedList<>();
-        Deque<Integer> charsLength = new LinkedList<>();
-
-        for (int i = 0; i < str.length(); i++) {
-            char ch = str.charAt(i);
-            byte[] buf = String.valueOf(ch).getBytes(charset);
-
-            charsLength.add(buf.length);
-
-            for (int j = 0; j < buf.length; j++) {
-                hexs.add((int)buf[j]);
-
-                if (j == buf.length - 1)
-                    chars.add(Character.isISOControl(ch) ? '.' : ch);
-            }
-        }
-
-        while (!hexs.isEmpty()) {
-            out.print(prefix);
-
-            int total = hexs.size();
-
-            for (int i = 0; i < 16; i++) {
-                if (hexs.isEmpty())
-                    break;
-                if (i > 0)
-                    out.print(' ');
-                out.format("%02X", hexs.remove().byteValue());
-            }
-
-            int end = total * 3 + offs;
-
-            for (int i = 0; i < columnWidth - end; i++)
-                out.print(' ');
-
-            out.print(' ');
-
-            for (int i = 0; i < 16; i += Optional.ofNullable(charsLength.poll()).orElse(1)) {
-                if (chars.isEmpty())
-                    break;
-                out.print(chars.remove());
-            }
-
-            out.println();
-        }
-
+        printCharsetName(out);
+        printLines(out);
         return true;
+    }
+
+    private void printCharsetName(PrintStream out) {
+        printLine(out, "", charset.name());
+    }
+
+    private void printLines(PrintStream out) {
+        int i = 0;
+
+        while (i < str.length()) {
+            StringBuilder one = new StringBuilder();
+            StringBuilder two = new StringBuilder();
+
+            while (i < str.length() && one.length() + 3 < columnWidth - offs) {
+                char ch = str.charAt(i);
+                byte[] data = String.valueOf(ch).getBytes(charset);
+
+                if (one.length() + data.length * 3 > columnWidth - offs)
+                    break;
+
+                for (int j = 0; j < data.length; j++) {
+                    if (one.length() > 0)
+                        one.append(' ');
+                    one.append(String.format("%02X", data[j]));
+                }
+
+                two.append(Character.isISOControl(ch) ? '.' : ch);
+                i++;
+            }
+
+            printLine(out, one, two);
+        }
     }
 
 }

@@ -20,26 +20,17 @@ public final class ByteArrayHexView extends View {
     @Override
     public boolean print(PrintStream out) {
         int i = 0;
-        int j = 0;
 
         while (i < data.length) {
-            if (i > 0) {
-                out.println();
-                j = 0;
-            }
-
-            out.print(prefix);
-            j += prefix.length();
+            StringBuilder one = new StringBuilder();
 
             do {
-                if (j > prefix.length()) {
-                    out.print(' ');
-                    j++;
-                }
+                if (one.length() > 0)
+                    one.append(' ');
+                one.append(String.format("%02X", data[i++]));
+            } while (i < data.length && one.length() + 3 < columnWidth - offs);
 
-                out.format("%02X", data[i++]);
-                j += 2;
-            } while (i < data.length && j + 3 < columnWidth);
+            printLine(out, one);
         }
 
         return data.length > 0;

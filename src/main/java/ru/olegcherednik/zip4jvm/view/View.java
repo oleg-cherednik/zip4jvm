@@ -6,6 +6,7 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 
 import java.io.PrintStream;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 /**
@@ -28,6 +29,9 @@ public abstract class View implements IView {
     }
 
     public final void printLine(PrintStream out, Object one, Object two) {
+        one = Optional.ofNullable(one).orElse("");
+        two = Optional.ofNullable(two).orElse("");
+
         if (offs > 0)
             one = prefix + one;
 
@@ -35,9 +39,12 @@ public abstract class View implements IView {
         out.println();
     }
 
-    public void printLine(PrintStream out, String one) {
+    public void printLine(PrintStream out, Object one) {
+        one = Optional.ofNullable(one).orElse("");
+
         if (offs > 0)
             one = prefix + one;
+
         out.println(one);
     }
 
