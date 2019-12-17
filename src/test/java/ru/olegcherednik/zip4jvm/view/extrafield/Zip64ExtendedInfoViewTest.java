@@ -6,6 +6,7 @@ import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 
 import java.io.IOException;
+import java.io.PrintStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -44,12 +45,12 @@ public class Zip64ExtendedInfoViewTest {
         assertThat(lines[5]).isEqualTo("  original part number of this part (0002):         2");
     }
 
-    public void shouldRetrieveEmptyStringWhenRecordNull() throws IOException {
-        String[] lines = Zip4jvmSuite.execute(Zip64ExtendedInfoView.builder()
-                                                                   .record(Zip64.ExtendedInfo.NULL)
-                                                                   .block(mock(Block.class))
-                                                                   .position(0, 52).build());
-        assertThat(lines).hasSize(1);
-        assertThat(lines[0]).isEmpty();
+    public void shouldRetrieveFalseWhenRecordNull() throws IOException {
+        PrintStream out = mock(PrintStream.class);
+        Zip64ExtendedInfoView view = Zip64ExtendedInfoView.builder()
+                                                          .record(Zip64.ExtendedInfo.NULL)
+                                                          .block(mock(Block.class))
+                                                          .position(0, 52).build();
+        assertThat(view.print(out)).isFalse();
     }
 }

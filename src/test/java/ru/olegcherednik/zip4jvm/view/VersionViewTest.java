@@ -5,8 +5,10 @@ import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.Version;
 
 import java.io.IOException;
+import java.io.PrintStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Oleg Cherednik
@@ -42,9 +44,8 @@ public class VersionViewTest {
     }
 
     public void shouldRetrieveEmptyStringWhenVersionNull() throws IOException {
-        String[] lines = Zip4jvmSuite.execute(new VersionView(null, null, 0, 52));
-
-        assertThat(lines).hasSize(1);
-        assertThat(lines[0]).isEmpty();
+        PrintStream out = mock(PrintStream.class);
+        VersionView view = new VersionView(null, null, 0, 52);
+        assertThat(view.print(out)).isFalse();
     }
 }

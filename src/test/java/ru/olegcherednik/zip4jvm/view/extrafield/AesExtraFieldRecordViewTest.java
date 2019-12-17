@@ -9,6 +9,7 @@ import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 
 import java.io.IOException;
+import java.io.PrintStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -48,13 +49,13 @@ public class AesExtraFieldRecordViewTest {
     }
 
     public void shouldRetrieveEmptyStringWhenRecordNull() throws IOException {
-        String[] lines = Zip4jvmSuite.execute(AesExtraFieldRecordView.builder()
-                                                                     .record(AesExtraFieldRecord.NULL)
-                                                                     .generalPurposeFlag(mock(GeneralPurposeFlag.class))
-                                                                     .block(mock(Block.class))
-                                                                     .position(0, 52).build());
-        assertThat(lines).hasSize(1);
-        assertThat(lines[0]).isEmpty();
+        PrintStream out = mock(PrintStream.class);
+        AesExtraFieldRecordView view = AesExtraFieldRecordView.builder()
+                                                              .record(AesExtraFieldRecord.NULL)
+                                                              .generalPurposeFlag(mock(GeneralPurposeFlag.class))
+                                                              .block(mock(Block.class))
+                                                              .position(0, 52).build();
+        assertThat(view.print(out)).isFalse();
     }
 
 }

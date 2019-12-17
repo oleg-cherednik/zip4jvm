@@ -6,6 +6,7 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.os.NtfsTimestampExtraFieldRecord;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,12 +62,12 @@ public class NtfsTimestampExtraFieldRecordViewTest {
     }
 
     public void shouldRetrieveEmptyStringWhenRecordNull() throws IOException {
-        String[] lines = Zip4jvmSuite.execute(NtfsTimestampExtraFieldRecordView.builder()
-                                                                               .record(NtfsTimestampExtraFieldRecord.NULL)
-                                                                               .block(mock(Block.class))
-                                                                               .position(0, 52).build());
-        assertThat(lines).hasSize(1);
-        assertThat(lines[0]).isEmpty();
+        PrintStream out = mock(PrintStream.class);
+        NtfsTimestampExtraFieldRecordView view = NtfsTimestampExtraFieldRecordView.builder()
+                                                                                  .record(NtfsTimestampExtraFieldRecord.NULL)
+                                                                                  .block(mock(Block.class))
+                                                                                  .position(0, 52).build();
+        assertThat(view.print(out)).isFalse();
     }
 }
 

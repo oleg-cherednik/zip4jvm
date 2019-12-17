@@ -86,12 +86,14 @@ public class ZipInfoTest {
 //        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/pkware.zip"));
 //        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/ferdinand.zip"));
 //        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/foo/store/solid/pkware/src.zip"));
-        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/aes.zip"));
+//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/aes.zip"));
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/split/src.zip"))
 //        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/macos_10.zip"));
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/ubuntu_18.zip"))
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/securezip/aes128.zip"))
 //        ZipInfo.zip(TestData.zipStoreSolid)
+//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/files.zip"));
+        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/lapin/store_solid_off 2.zip"));
 
         return res;
     }
