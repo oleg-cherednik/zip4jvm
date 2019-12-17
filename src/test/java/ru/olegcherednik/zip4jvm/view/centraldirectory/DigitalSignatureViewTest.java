@@ -26,13 +26,13 @@ public class DigitalSignatureViewTest {
         CentralDirectory.DigitalSignature digitalSignature = new CentralDirectory.DigitalSignature();
         digitalSignature.setSignatureData(new byte[] { 0x0, 0x1, 0x2, 0x3 });
 
-        String[] lines = Zip4jvmSuite.execute(new DigitalSignatureView(digitalSignature, block, 2, 52));
+        String[] lines = Zip4jvmSuite.execute(new DigitalSignatureView(digitalSignature, block, 4, 52));
 
         assertThat(lines).hasSize(5);
         assertThat(lines[0]).isEqualTo("(PK0505) Digital signature");
         assertThat(lines[1]).isEqualTo("==========================");
-        assertThat(lines[2]).isEqualTo("  - location:                                       255614 (0x0003E67E) bytes");
-        assertThat(lines[3]).isEqualTo("  - size:                                           33 bytes");
-        assertThat(lines[4]).isEqualTo("  00 01 02 03");
+        assertThat(lines[2]).isEqualTo("    - location:                                     255614 (0x0003E67E) bytes");
+        assertThat(lines[3]).isEqualTo("    - size:                                         33 bytes");
+        assertThat(lines[4]).isEqualTo("    00 01 02 03");
     }
 }

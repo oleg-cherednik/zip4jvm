@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.dirEmpty;
 import static ru.olegcherednik.zip4jvm.TestData.dirRoot;
 import static ru.olegcherednik.zip4jvm.TestData.dirSrc;
@@ -154,7 +155,7 @@ public class Zip4jvmSuite {
 
     public static String[] execute(IView view) throws IOException {
         try (ByteArrayOutputStream os = new ByteArrayOutputStream(); PrintStream out = new PrintStream(os, true, Charsets.UTF_8.name())) {
-            view.print(out);
+            assertThat(view.print(out)).isTrue();
             return new String(os.toByteArray(), Charsets.UTF_8).split(System.lineSeparator());
         }
     }

@@ -3,8 +3,6 @@ package ru.olegcherednik.zip4jvm.view;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.io.PrintStream;
-import java.util.Deque;
-import java.util.LinkedList;
 
 /**
  * @author Oleg Cherednik
@@ -21,29 +19,30 @@ public final class ByteArrayHexView extends View {
 
     @Override
     public boolean print(PrintStream out) {
-        if (ArrayUtils.isEmpty(data))
-            return false;
+        int i = 0;
+        int j = 0;
 
-        Deque<Integer> hexs = new LinkedList<>();
-
-        for (int i = 0; i < data.length; i++)
-            hexs.add((int)data[i]);
-
-        while (!hexs.isEmpty()) {
-            out.print(prefix);
-
-            for (int i = 0; i < 16; i++) {
-                if (hexs.isEmpty())
-                    break;
-                if (i > 0)
-                    out.print(' ');
-                out.format("%02X", hexs.remove().byteValue());
+        while (i < data.length) {
+            if (i > 0) {
+                out.println();
+                j = 0;
             }
 
-            out.println();
+            out.print(prefix);
+            j += prefix.length();
+
+            do {
+                if (j > prefix.length()) {
+                    out.print(' ');
+                    j++;
+                }
+
+                out.format("%02X", data[i++]);
+                j += 2;
+            } while (i < data.length && j + 3 < columnWidth);
         }
 
-        return true;
+        return data.length > 0;
     }
 
 }
