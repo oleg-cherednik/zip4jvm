@@ -1,13 +1,14 @@
 package ru.olegcherednik.zip4jvm.view;
 
 import java.io.PrintStream;
-import java.util.Objects;
+
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotBlank;
 
 /**
  * @author Oleg Cherednik
  * @since 10.12.2019
  */
-public final class SizeView extends View {
+public final class SizeView extends BaseView {
 
     private final String name;
     private final long size;
@@ -17,7 +18,7 @@ public final class SizeView extends View {
         this.name = name;
         this.size = size;
 
-        Objects.requireNonNull(name, "'name' must not be null");
+        requireNotBlank(name, "SizeView.name");
     }
 
     @Override

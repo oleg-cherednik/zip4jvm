@@ -1,8 +1,8 @@
 package ru.olegcherednik.zip4jvm.view.crypto;
 
 import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.view.BaseView;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
-import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.PrintStream;
 
@@ -12,17 +12,15 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
  * @author Oleg Cherednik
  * @since 09.11.2019
  */
-final class BlockAesEncryptionHeaderView extends View {
+final class BlockAesEncryptionHeaderView extends BaseView {
 
     private final AesEncryptionHeaderBlock block;
     private final long pos;
 
     public BlockAesEncryptionHeaderView(AesEncryptionHeaderBlock block, long pos, int offs, int columnWidth) {
         super(offs, columnWidth);
-        this.block = block;
+        this.block = requireNotNull(block, "BlockAesEncryptionHeaderView.centralDirectory");
         this.pos = pos;
-
-        requireNotNull(block, "BlockAesEncryptionHeaderView.centralDirectory");
     }
 
     @Override

@@ -10,7 +10,7 @@ import java.io.PrintStream;
  * @since 11.11.2019
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-final class EmptyView implements IView {
+final class EmptyView implements View {
 
     public static final EmptyView INSTANCE = new EmptyView();
 

@@ -11,7 +11,7 @@ import java.util.Objects;
  * @author Oleg Cherednik
  * @since 15.10.2019
  */
-public final class GeneralPurposeFlagView extends View {
+public final class GeneralPurposeFlagView extends BaseView {
 
     private final GeneralPurposeFlag generalPurposeFlag;
     private final CompressionMethod compressionMethod;

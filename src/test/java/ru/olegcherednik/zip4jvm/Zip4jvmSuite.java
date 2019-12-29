@@ -8,7 +8,7 @@ import org.testng.annotations.BeforeSuite;
 import ru.olegcherednik.zip4jvm.data.DefalteZipData;
 import ru.olegcherednik.zip4jvm.data.StoreZipData;
 import ru.olegcherednik.zip4jvm.model.Charsets;
-import ru.olegcherednik.zip4jvm.view.IView;
+import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -153,7 +153,7 @@ public class Zip4jvmSuite {
         return rootDir.resolve(dirName);
     }
 
-    public static String[] execute(IView view) throws IOException {
+    public static String[] execute(View view) throws IOException {
         try (ByteArrayOutputStream os = new ByteArrayOutputStream(); PrintStream out = new PrintStream(os, true, Charsets.UTF_8.name())) {
             assertThat(view.print(out)).isTrue();
             return new String(os.toByteArray(), Charsets.UTF_8).split(System.lineSeparator());

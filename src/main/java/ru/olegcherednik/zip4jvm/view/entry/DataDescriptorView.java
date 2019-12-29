@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.view.entry;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.view.SizeView;
-import ru.olegcherednik.zip4jvm.view.View;
+import ru.olegcherednik.zip4jvm.view.BaseView;
 
 import java.io.PrintStream;
 import java.util.Objects;
@@ -12,7 +12,7 @@ import java.util.Objects;
  * @author Oleg Cherednik
  * @since 26.10.2019
  */
-public final class DataDescriptorView extends View {
+public final class DataDescriptorView extends BaseView {
 
     private final DataDescriptor dataDescriptor;
     private final Block block;

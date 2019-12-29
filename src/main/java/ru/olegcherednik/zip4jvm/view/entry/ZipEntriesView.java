@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.view.entry;
 
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
-import ru.olegcherednik.zip4jvm.view.View;
+import ru.olegcherednik.zip4jvm.view.BaseView;
 
 import java.io.PrintStream;
 
@@ -9,7 +9,7 @@ import java.io.PrintStream;
  * @author Oleg Cherednik
  * @since 20.10.2019
  */
-public final class ZipEntriesView extends View {
+public final class ZipEntriesView extends BaseView {
 
     private final long totalEntries;
 

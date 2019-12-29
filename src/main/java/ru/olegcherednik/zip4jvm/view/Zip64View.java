@@ -8,6 +8,8 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 import java.io.PrintStream;
 import java.util.Objects;
 
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
+
 /**
  * @author Oleg Cherednik
  * @since 14.10.2019
@@ -15,18 +17,15 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Zip64View {
 
-    public static final class EndCentralDirectoryLocatorView extends View {
+    public static final class EndCentralDirectoryLocatorView extends BaseView {
 
         private final Zip64.EndCentralDirectoryLocator locator;
         private final Block block;
 
         public EndCentralDirectoryLocatorView(Zip64.EndCentralDirectoryLocator locator, Block block, int offs, int columnWidth) {
             super(offs, columnWidth);
-            this.locator = locator;
-            this.block = block;
-
-            Objects.requireNonNull(locator, "'locator' must not be null");
-            Objects.requireNonNull(block, "'block' must not be null");
+            this.locator = requireNotNull(locator, "Zip64View.locator");
+            this.block = requireNotNull(block, "Zip64View.block");
         }
 
         @Override
@@ -40,7 +39,7 @@ public final class Zip64View {
 
     }
 
-    public static final class EndCentralDirectoryView extends View {
+    public static final class EndCentralDirectoryView extends BaseView {
 
         private final Zip64.EndCentralDirectory dir;
         private final Block block;

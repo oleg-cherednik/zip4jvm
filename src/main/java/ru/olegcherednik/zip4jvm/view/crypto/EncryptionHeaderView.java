@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.view.crypto;
 import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
-import ru.olegcherednik.zip4jvm.view.View;
+import ru.olegcherednik.zip4jvm.view.BaseView;
 
 import java.io.PrintStream;
 
@@ -13,17 +13,15 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
  * @author Oleg Cherednik
  * @since 24.10.2019
  */
-public final class EncryptionHeaderView extends View {
+public final class EncryptionHeaderView extends BaseView {
 
     private final EncryptionHeaderBlock block;
     private final long pos;
 
     public EncryptionHeaderView(EncryptionHeaderBlock block, long pos, int offs, int columnWidth) {
         super(offs, columnWidth);
-        this.block = block;
+        this.block = requireNotNull(block, "EncryptionHeaderView.centralDirectory");
         this.pos = pos;
-
-        requireNotNull(block, "EncryptionHeaderView.centralDirectory");
     }
 
     @Override

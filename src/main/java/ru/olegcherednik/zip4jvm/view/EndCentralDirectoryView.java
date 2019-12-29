@@ -6,14 +6,15 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 
 import java.io.PrintStream;
 import java.nio.charset.Charset;
-import java.util.Objects;
 import java.util.Optional;
+
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
 /**
  * @author Oleg Cherednik
  * @since 13.10.2019
  */
-public final class EndCentralDirectoryView extends View {
+public final class EndCentralDirectoryView extends BaseView {
 
     private final EndCentralDirectory dir;
     private final Block block;
@@ -21,12 +22,9 @@ public final class EndCentralDirectoryView extends View {
 
     public EndCentralDirectoryView(EndCentralDirectory dir, Block block, Charset charset, int offs, int columnWidth) {
         super(offs, columnWidth);
-        this.dir = dir;
-        this.block = block;
-        this.charset = charset;
-
-        Objects.requireNonNull(dir, "'endCentralDirectory' must not be null");
-        Objects.requireNonNull(block, "'block' must not be null");
+        this.dir = requireNotNull(dir, "EndCentralDirectoryView.dir");
+        this.block = requireNotNull(block, "EndCentralDirectoryView.block");
+        this.charset = requireNotNull(charset, "EndCentralDirectoryView.charset");
     }
 
     @Override
@@ -43,9 +41,10 @@ public final class EndCentralDirectoryView extends View {
     }
 
     private void printCentralDirectoryOffs(PrintStream out) {
-        printLine(out, "relative offset of central dir:", String.format("%1$d (0x%1$08X) bytes", dir.getCentralDirectoryOffs()));
+        long centralDirectoryOffs = Math.min(Zip64.LIMIT_DWORD, dir.getCentralDirectoryOffs());
+        printLine(out, "relative offset of central dir:", String.format("%1$d (0x%1$08X) bytes", centralDirectoryOffs));
 
-        if (dir.getCentralDirectoryOffs() == Zip64.LIMIT_DWORD)
+        if (centralDirectoryOffs == Zip64.LIMIT_DWORD)
             printLine(out, "  (see real value in ZIP64 record)");
     }
 

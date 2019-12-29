@@ -3,16 +3,18 @@ package ru.olegcherednik.zip4jvm.view.entry;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
+import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
+import ru.olegcherednik.zip4jvm.view.BaseView;
 import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
 import ru.olegcherednik.zip4jvm.view.GeneralPurposeFlagView;
 import ru.olegcherednik.zip4jvm.view.LastModifiedTimeView;
 import ru.olegcherednik.zip4jvm.view.SizeView;
 import ru.olegcherednik.zip4jvm.view.StringHexView;
 import ru.olegcherednik.zip4jvm.view.VersionView;
-import ru.olegcherednik.zip4jvm.view.View;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
 
 import java.io.PrintStream;
@@ -23,7 +25,7 @@ import java.util.Optional;
  * @author Oleg Cherednik
  * @since 23.10.2019
  */
-public final class LocalFileHeaderView extends View {
+public final class LocalFileHeaderView extends BaseView {
 
     private final LocalFileHeader localFileHeader;
     private final ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader;
@@ -67,11 +69,9 @@ public final class LocalFileHeaderView extends View {
     }
 
     private void printCompressionMethod(PrintStream out) {
-        CompressionMethodView.builder()
-                             .compressionMethod(localFileHeader.getCompressionMethod())
-                             .generalPurposeFlag(localFileHeader.getGeneralPurposeFlag())
-                             .offs(offs)
-                             .columnWidth(columnWidth).build().print(out);
+        CompressionMethod compressionMethod = localFileHeader.getCompressionMethod();
+        GeneralPurposeFlag generalPurposeFlag = localFileHeader.getGeneralPurposeFlag();
+        new CompressionMethodView(compressionMethod, generalPurposeFlag, offs, columnWidth).print(out);
     }
 
     private void printLastModifiedTime(PrintStream out) {

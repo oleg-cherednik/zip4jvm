@@ -9,7 +9,7 @@ import java.util.Optional;
  * @author Oleg Cherednik
  * @since 16.10.2019
  */
-public final class VersionView extends View {
+public final class VersionView extends BaseView {
 
     private final Version versionMadeBy;
     private final Version versionToExtract;

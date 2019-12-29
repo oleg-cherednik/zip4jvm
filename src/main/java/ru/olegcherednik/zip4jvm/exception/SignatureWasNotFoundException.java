@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.exception;
 
 import lombok.Getter;
-import ru.olegcherednik.zip4jvm.view.ViewUtils;
+import ru.olegcherednik.zip4jvm.view.BaseView;
 
 /**
  * @author Oleg Cherednik
@@ -17,14 +17,14 @@ public class SignatureWasNotFoundException extends Zip4jvmException {
     private final long offs;
 
     public SignatureWasNotFoundException(int signature, String name) {
-        super(String.format("Signature %s (%s) was not found", ViewUtils.signature(signature), name));
+        super(String.format("Signature %s (%s) was not found", BaseView.signature(signature), name));
         this.signature = signature;
         this.name = name;
         offs = -1;
     }
 
     public SignatureWasNotFoundException(int signature, String name, long offs) {
-        super(String.format("Signature %s (%s) was not found: (0x%08X)", ViewUtils.signature(signature), name, offs));
+        super(String.format("Signature %s (%s) was not found: (0x%08X)", BaseView.signature(signature), name, offs));
         this.signature = signature;
         this.name = name;
         this.offs = offs;

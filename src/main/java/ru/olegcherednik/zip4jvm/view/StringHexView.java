@@ -5,11 +5,13 @@ import org.apache.commons.lang.StringUtils;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
 
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
+
 /**
  * @author Oleg Cherednik
  * @since 13.10.2019
  */
-public final class StringHexView extends View {
+public final class StringHexView extends BaseView {
 
     private final String str;
     private final Charset charset;
@@ -17,7 +19,7 @@ public final class StringHexView extends View {
     public StringHexView(String str, Charset charset, int offs, int columnWidth) {
         super(offs, columnWidth);
         this.str = StringUtils.isEmpty(str) ? null : str;
-        this.charset = charset;
+        this.charset = requireNotNull(charset, "StringHexView.charset");
     }
 
     @Override
@@ -44,9 +46,6 @@ public final class StringHexView extends View {
             while (i < str.length() && one.length() + 3 < columnWidth - offs) {
                 char ch = str.charAt(i);
                 byte[] data = String.valueOf(ch).getBytes(charset);
-
-                if (one.length() + data.length * 3 > columnWidth - offs)
-                    break;
 
                 for (int j = 0; j < data.length; j++) {
                     if (one.length() > 0)

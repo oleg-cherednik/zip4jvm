@@ -4,8 +4,11 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
+import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
+import ru.olegcherednik.zip4jvm.view.BaseView;
 import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
 import ru.olegcherednik.zip4jvm.view.ExternalFileAttributesView;
 import ru.olegcherednik.zip4jvm.view.GeneralPurposeFlagView;
@@ -14,7 +17,6 @@ import ru.olegcherednik.zip4jvm.view.LastModifiedTimeView;
 import ru.olegcherednik.zip4jvm.view.SizeView;
 import ru.olegcherednik.zip4jvm.view.StringHexView;
 import ru.olegcherednik.zip4jvm.view.VersionView;
-import ru.olegcherednik.zip4jvm.view.View;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
 
 import java.io.PrintStream;
@@ -27,7 +29,7 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
  * @author Oleg Cherednik
  * @since 14.10.2019
  */
-public final class FileHeaderView extends View {
+public final class FileHeaderView extends BaseView {
 
     private final CentralDirectory.FileHeader fileHeader;
     private final CentralDirectoryBlock.FileHeaderBlock block;
@@ -78,11 +80,9 @@ public final class FileHeaderView extends View {
     }
 
     private void printCompressionMethod(PrintStream out) {
-        CompressionMethodView.builder()
-                             .compressionMethod(fileHeader.getCompressionMethod())
-                             .generalPurposeFlag(fileHeader.getGeneralPurposeFlag())
-                             .offs(offs)
-                             .columnWidth(columnWidth).build().print(out);
+        CompressionMethod compressionMethod = fileHeader.getCompressionMethod();
+        GeneralPurposeFlag generalPurposeFlag = fileHeader.getGeneralPurposeFlag();
+        new CompressionMethodView(compressionMethod, generalPurposeFlag, offs, columnWidth).print(out);
     }
 
     private void printLastModifiedTime(PrintStream out) {

@@ -11,6 +11,7 @@ import ru.olegcherednik.zip4jvm.exception.RealBigZip64NotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  * @author Oleg Cherednik
@@ -30,9 +31,8 @@ public final class ValidationUtils {
             throw new RealBigZip64NotSupportedException(value, type);
     }
 
-    public static <T> void requireNotNull(T obj, String name) {
-        if (obj == null)
-            throw new IllegalArgumentException("Parameter should not be null: " + name);
+    public static <T> T requireNotNull(T obj, String name) {
+        return Optional.ofNullable(obj).orElseThrow(() -> new IllegalArgumentException("Parameter should not be null: " + name));
     }
 
     public static void requireExists(Path path) {

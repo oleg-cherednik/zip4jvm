@@ -10,7 +10,7 @@ import ru.olegcherednik.zip4jvm.model.os.ExtendedTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.os.InfoZipNewUnixExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.os.InfoZipOldUnixExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.os.NtfsTimestampExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.view.View;
+import ru.olegcherednik.zip4jvm.view.BaseView;
 
 import java.io.PrintStream;
 import java.util.Collection;
@@ -21,7 +21,7 @@ import java.util.function.Function;
  * @author Oleg Cherednik
  * @since 16.10.2019
  */
-public final class ExtraFieldView extends View {
+public final class ExtraFieldView extends BaseView {
 
     private final ExtraField extraField;
     private final ExtraFieldBlock block;

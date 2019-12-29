@@ -8,7 +8,7 @@ import java.io.PrintStream;
  * @author Oleg Cherednik
  * @since 17.10.2019
  */
-public final class ByteArrayHexView extends View {
+public final class ByteArrayHexView extends BaseView {
 
     private final byte[] data;
 

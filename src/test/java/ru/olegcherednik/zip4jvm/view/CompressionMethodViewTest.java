@@ -21,10 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class CompressionMethodViewTest {
 
     public void shouldRetrieveCompressionMethodTitleWhenSingleLine() throws IOException {
-        String[] lines = Zip4jvmSuite.execute(CompressionMethodView.builder()
-                                                                   .compressionMethod(CompressionMethod.STORE)
-                                                                   .generalPurposeFlag(new GeneralPurposeFlag())
-                                                                   .columnWidth(52).build());
+        String[] lines = Zip4jvmSuite.execute(new CompressionMethodView(CompressionMethod.STORE, new GeneralPurposeFlag(), 0, 52));
         assertThat(lines).hasSize(1);
         assertThat(lines[0]).isEqualTo("compression method (00):                            none (stored)");
     }
@@ -34,10 +31,7 @@ public class CompressionMethodViewTest {
         generalPurposeFlag.setSlidingDictionarySize(SlidingDictionarySize.SD_4K);
         generalPurposeFlag.setShannonFanoTreesNumber(ShannonFanoTreesNumber.THREE);
 
-        String[] lines = Zip4jvmSuite.execute(CompressionMethodView.builder()
-                                                                   .compressionMethod(CompressionMethod.FILE_IMPLODED)
-                                                                   .generalPurposeFlag(generalPurposeFlag)
-                                                                   .columnWidth(52).build());
+        String[] lines = Zip4jvmSuite.execute(new CompressionMethodView(CompressionMethod.FILE_IMPLODED, generalPurposeFlag, 0, 52));
         assertThat(lines).hasSize(3);
         assertThat(lines[0]).isEqualTo("compression method (06):                            imploded");
         assertThat(lines[1]).isEqualTo("  size of sliding dictionary (implosion):           4K");
@@ -49,10 +43,7 @@ public class CompressionMethodViewTest {
             GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
             generalPurposeFlag.setEosMarker(eosMarker);
 
-            String[] lines = Zip4jvmSuite.execute(CompressionMethodView.builder()
-                                                                       .compressionMethod(CompressionMethod.LZMA)
-                                                                       .generalPurposeFlag(generalPurposeFlag)
-                                                                       .columnWidth(52).build());
+            String[] lines = Zip4jvmSuite.execute(new CompressionMethodView(CompressionMethod.LZMA, generalPurposeFlag, 0, 52));
             assertThat(lines).hasSize(2);
             assertThat(lines[0]).isEqualTo("compression method (14):                            lzma encoding");
             assertThat(lines[1]).isEqualTo("  end-of-stream (EOS) marker:                       " + (eosMarker ? "yes" : "no"));
@@ -64,10 +55,7 @@ public class CompressionMethodViewTest {
         generalPurposeFlag.setCompressionLevel(CompressionLevel.NORMAL);
 
         for (CompressionMethod compressionMethod : Arrays.asList(CompressionMethod.DEFLATE, CompressionMethod.FILE_ENHANCED_DEFLATED)) {
-            String[] lines = Zip4jvmSuite.execute(CompressionMethodView.builder()
-                                                                       .compressionMethod(compressionMethod)
-                                                                       .generalPurposeFlag(generalPurposeFlag)
-                                                                       .columnWidth(52).build());
+            String[] lines = Zip4jvmSuite.execute(new CompressionMethodView(compressionMethod, generalPurposeFlag, 0, 52));
             assertThat(lines).hasSize(2);
 
             if (compressionMethod == CompressionMethod.DEFLATE)

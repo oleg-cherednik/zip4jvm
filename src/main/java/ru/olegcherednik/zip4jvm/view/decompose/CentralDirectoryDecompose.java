@@ -5,7 +5,7 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
-import ru.olegcherednik.zip4jvm.view.IView;
+import ru.olegcherednik.zip4jvm.view.View;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.CentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.DigitalSignatureView;
 
@@ -71,11 +71,11 @@ public final class CentralDirectoryDecompose implements Decompose {
         return new FileHeaderDecompose(zipModel, settings, centralDirectory, block);
     }
 
-    private IView digitalSignatureView() {
+    private View digitalSignatureView() {
         CentralDirectory.DigitalSignature digitalSignature = centralDirectory.getDigitalSignature();
 
         if (digitalSignature == null)
-            return IView.NULL;
+            return View.NULL;
 
         int offs = settings.getOffs();
         int columnWidth = settings.getColumnWidth();

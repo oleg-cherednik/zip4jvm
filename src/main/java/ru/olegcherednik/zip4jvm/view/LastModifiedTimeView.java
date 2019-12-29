@@ -8,7 +8,7 @@ import java.io.PrintStream;
  * @author Oleg Cherednik
  * @since 15.10.2019
  */
-public final class LastModifiedTimeView extends View {
+public final class LastModifiedTimeView extends BaseView {
 
     private final int lastModifiedTime;
 

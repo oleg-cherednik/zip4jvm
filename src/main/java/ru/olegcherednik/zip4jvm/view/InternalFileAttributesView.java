@@ -9,7 +9,7 @@ import java.util.Objects;
  * @author Oleg Cherednik
  * @since 15.10.2019
  */
-public final class InternalFileAttributesView extends View {
+public final class InternalFileAttributesView extends BaseView {
 
     private final InternalFileAttributes internalFileAttributes;
 
