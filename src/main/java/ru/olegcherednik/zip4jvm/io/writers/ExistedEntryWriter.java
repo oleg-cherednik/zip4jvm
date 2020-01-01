@@ -4,8 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
-import ru.olegcherednik.zip4jvm.io.in.SplitZipInputStream;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
@@ -69,7 +67,7 @@ public class ExistedEntryWriter implements Writer {
 
         public CopyEntryInputStream(ZipEntry zipEntry, ZipModel zipModel) throws IOException {
             this.zipEntry = zipEntry;
-            in = zipModel.isSplit() ? new SplitZipInputStream(zipModel, zipEntry.getDisk()) : new SingleZipInputStream(zipModel);
+            in = zipModel.createDataInput(zipEntry.getFileName());
         }
 
         public void copyLocalFileHeader(DataOutput out) throws IOException {

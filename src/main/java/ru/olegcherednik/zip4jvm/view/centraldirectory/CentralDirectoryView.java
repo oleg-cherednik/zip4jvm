@@ -17,8 +17,8 @@ public final class CentralDirectoryView extends BaseView {
     private final CentralDirectory centralDirectory;
     private final Block block;
 
-    public CentralDirectoryView(CentralDirectory centralDirectory, Block block, int offs, int columnWidth) {
-        super(offs, columnWidth);
+    public CentralDirectoryView(CentralDirectory centralDirectory, Block block, int offs, int columnWidth, long totalDisks) {
+        super(offs, columnWidth, totalDisks);
         this.centralDirectory = requireNotNull(centralDirectory, "CentralDirectoryView.centralDirectory");
         this.block = requireNotNull(block, "CentralDirectoryView.block");
     }

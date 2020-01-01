@@ -1,5 +1,9 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
+import lombok.Getter;
+import lombok.Setter;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.io.readers.BaseZipModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.CentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.EndCentralDirectoryReader;
@@ -12,6 +16,7 @@ import ru.olegcherednik.zip4jvm.model.block.Zip64Block;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
@@ -59,6 +64,11 @@ public final class BlockModelReader extends BaseZipModelReader {
     }
 
     @Override
+    protected DataInput createDataInput(Path zip) throws FileNotFoundException {
+        return new CentralDataInputStream(zip);
+    }
+
+    @Override
     protected EndCentralDirectoryReader getEndCentralDirectoryReader() {
         return new BlockEndCentralDirectoryReader(customizeCharset, endCentralDirectoryBlock);
     }
@@ -71,6 +81,19 @@ public final class BlockModelReader extends BaseZipModelReader {
     @Override
     protected CentralDirectoryReader getCentralDirectoryReader(long totalEntries) {
         return new BlockCentralDirectoryReader(totalEntries, customizeCharset, centralDirectoryBlock);
+    }
+
+    @Getter
+    @Setter
+    public static final class CentralDataInputStream extends SingleZipInputStream {
+
+        private long disk;
+        private long totalDisks;
+
+        public CentralDataInputStream(Path zip) throws FileNotFoundException {
+            super(zip);
+        }
+
     }
 }
 

@@ -4,8 +4,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.ZipFile;
-import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
-import ru.olegcherednik.zip4jvm.io.in.SplitZipInputStream;
 import ru.olegcherednik.zip4jvm.io.in.entry.EntryInputStream;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Compression;
@@ -131,9 +129,7 @@ public final class ZipEntryBuilder {
         }
 
         private ZipEntryInputStreamSupplier createInputStreamSupplier() {
-            if (zipModel.isSplit())
-                return zipEntry -> EntryInputStream.create(zipEntry, charsetCustomizer, new SplitZipInputStream(zipModel, zipEntry.getDisk()));
-            return zipEntry -> EntryInputStream.create(zipEntry, charsetCustomizer, new SingleZipInputStream(zipModel));
+            return zipEntry -> EntryInputStream.create(zipEntry, charsetCustomizer, zipModel.createDataInput(zipEntry.getFileName()));
         }
 
         private long getDisk() {

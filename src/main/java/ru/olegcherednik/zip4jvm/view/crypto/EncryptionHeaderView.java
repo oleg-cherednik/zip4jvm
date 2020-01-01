@@ -40,6 +40,6 @@ public final class EncryptionHeaderView extends BaseView {
     }
 
     public PkwareEncryptionHeaderView createView(PkwareEncryptionHeaderBlock block) {
-        return new PkwareEncryptionHeaderView(block, pos, offs, columnWidth);
+        return new PkwareEncryptionHeaderView(block, pos, offs, columnWidth, totalDisks);
     }
 }

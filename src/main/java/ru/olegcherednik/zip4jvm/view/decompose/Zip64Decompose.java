@@ -64,14 +64,16 @@ public final class Zip64Decompose implements Decompose {
         Zip64.EndCentralDirectoryLocator locator = zip64.getEndCentralDirectoryLocator();
         int offs = settings.getOffs();
         int columnWidth = settings.getColumnWidth();
-        return new Zip64View.EndCentralDirectoryLocatorView(locator, block.getEndCentralDirectoryLocatorBlock(), offs, columnWidth);
+        long totalDisks = zipModel.getTotalDisks();
+        return new Zip64View.EndCentralDirectoryLocatorView(locator, block.getEndCentralDirectoryLocatorBlock(), offs, columnWidth, totalDisks);
     }
 
     private Zip64View.EndCentralDirectoryView endCentralDirectoryView() {
         Zip64.EndCentralDirectory dir = zip64.getEndCentralDirectory();
         int offs = settings.getOffs();
         int columnWidth = settings.getColumnWidth();
-        return new Zip64View.EndCentralDirectoryView(dir, block.getEndCentralDirectoryBlock(), offs, columnWidth);
+        long totalDisks = zipModel.getTotalDisks();
+        return new Zip64View.EndCentralDirectoryView(dir, block.getEndCentralDirectoryBlock(), offs, columnWidth, totalDisks);
     }
 
 }

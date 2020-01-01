@@ -41,7 +41,7 @@ public final class FileHeaderView extends BaseView {
     }
 
     private FileHeaderView(Builder builder) {
-        super(builder.offs, builder.columnWidth);
+        super(builder.offs, builder.columnWidth, builder.totalDisks);
         fileHeader = builder.fileHeader;
         block = builder.block;
         pos = builder.pos;
@@ -137,6 +137,7 @@ public final class FileHeaderView extends BaseView {
         private Charset charset = Charsets.IBM437;
         private int offs;
         private int columnWidth;
+        private long totalDisks;
 
         public FileHeaderView build() {
             requireNotNull(fileHeader, "FileHeaderView.fileHeader");
@@ -164,9 +165,10 @@ public final class FileHeaderView extends BaseView {
             return this;
         }
 
-        public Builder position(int offs, int columnWidth) {
+        public Builder position(int offs, int columnWidth, long totalDisks) {
             this.offs = offs;
             this.columnWidth = columnWidth;
+            this.totalDisks = totalDisks;
             return this;
         }
     }

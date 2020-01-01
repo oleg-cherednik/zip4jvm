@@ -26,7 +26,7 @@ public class DigitalSignatureViewTest {
         CentralDirectory.DigitalSignature digitalSignature = new CentralDirectory.DigitalSignature();
         digitalSignature.setSignatureData(new byte[] { 0x0, 0x1, 0x2, 0x3 });
 
-        String[] lines = Zip4jvmSuite.execute(new DigitalSignatureView(digitalSignature, block, 4, 52));
+        String[] lines = Zip4jvmSuite.execute(new DigitalSignatureView(digitalSignature, block, 4, 52, 0));
 
         assertThat(lines).hasSize(5);
         assertThat(lines[0]).isEqualTo("(PK0505) Digital signature");
@@ -34,5 +34,26 @@ public class DigitalSignatureViewTest {
         assertThat(lines[2]).isEqualTo("    - location:                                     255614 (0x0003E67E) bytes");
         assertThat(lines[3]).isEqualTo("    - size:                                         33 bytes");
         assertThat(lines[4]).isEqualTo("    00 01 02 03");
+    }
+
+    public void shouldRetrieveAllLinesWithDiskWhenSplitZip() throws IOException {
+        Block block = mock(Block.class);
+        when(block.getSize()).thenReturn(33L);
+        when(block.getOffs()).thenReturn(255614L);
+        when(block.getDisk()).thenReturn(5L);
+        when(block.getFileName()).thenReturn("src.zip");
+
+        CentralDirectory.DigitalSignature digitalSignature = new CentralDirectory.DigitalSignature();
+        digitalSignature.setSignatureData(new byte[] { 0x0, 0x1, 0x2, 0x3 });
+
+        String[] lines = Zip4jvmSuite.execute(new DigitalSignatureView(digitalSignature, block, 4, 52, 5));
+
+        assertThat(lines).hasSize(6);
+        assertThat(lines[0]).isEqualTo("(PK0505) Digital signature");
+        assertThat(lines[1]).isEqualTo("==========================");
+        assertThat(lines[2]).isEqualTo("    - disk (0005):                                  src.zip");
+        assertThat(lines[3]).isEqualTo("    - location:                                     255614 (0x0003E67E) bytes");
+        assertThat(lines[4]).isEqualTo("    - size:                                         33 bytes");
+        assertThat(lines[5]).isEqualTo("    00 01 02 03");
     }
 }

@@ -25,7 +25,7 @@ public class PkwareEncryptionHeaderBlockViewTest {
         when(block.getOffs()).thenReturn(60L);
         when(block.getData()).thenReturn(new byte[] { 0x0, 0x1, 0x2, 0x3 });
 
-        String[] lines = Zip4jvmSuite.execute(new PkwareEncryptionHeaderView(block, 1, 2, 52));
+        String[] lines = Zip4jvmSuite.execute(new PkwareEncryptionHeaderView(block, 1, 2, 52, 0));
         assertThat(lines).hasSize(5);
         assertThat(lines[0]).isEqualTo("#2 (PKWARE) encryption header");
         assertThat(lines[1]).isEqualTo("-----------------------------");

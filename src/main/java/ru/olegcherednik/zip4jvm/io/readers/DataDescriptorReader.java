@@ -33,10 +33,7 @@ public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
             long compressedSize = in.readDword();
             long uncompressedSize = in.readDword();
 
-            return DataDescriptor.builder()
-                                 .crc32(crc32)
-                                 .compressedSize(compressedSize)
-                                 .uncompressedSize(uncompressedSize).build();
+            return new DataDescriptor(crc32, compressedSize, uncompressedSize);
         }
     }
 
@@ -53,10 +50,7 @@ public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
             long compressedSize = in.readQword();
             long uncompressedSize = in.readQword();
 
-            return DataDescriptor.builder()
-                                 .crc32(crc32)
-                                 .compressedSize(compressedSize)
-                                 .uncompressedSize(uncompressedSize).build();
+            return new DataDescriptor(crc32, compressedSize, uncompressedSize);
         }
     }
 

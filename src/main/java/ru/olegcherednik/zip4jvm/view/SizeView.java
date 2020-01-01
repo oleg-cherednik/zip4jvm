@@ -15,10 +15,8 @@ public final class SizeView extends BaseView {
 
     public SizeView(String name, long size, int offs, int columnWidth) {
         super(offs, columnWidth);
-        this.name = name;
+        this.name = requireNotBlank(name, "SizeView.name");
         this.size = size;
-
-        requireNotBlank(name, "SizeView.name");
     }
 
     @Override

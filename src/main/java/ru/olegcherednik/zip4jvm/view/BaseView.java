@@ -9,6 +9,8 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZeroOrPositive;
+
 /**
  * @author Oleg Cherednik
  * @since 05.11.2019
@@ -18,12 +20,18 @@ public abstract class BaseView implements View {
 
     protected final int offs;
     protected final int columnWidth;
+    protected final long totalDisks;
     protected final String format;
     protected final String prefix;
 
     protected BaseView(int offs, int columnWidth) {
+        this(offs, columnWidth, -1);
+    }
+
+    protected BaseView(int offs, int columnWidth, long totalDisks) {
         this.offs = offs;
         this.columnWidth = columnWidth;
+        this.totalDisks = totalDisks;
         format = "%-" + columnWidth + "s%s";
         prefix = StringUtils.repeat(" ", offs);
     }
@@ -78,7 +86,12 @@ public abstract class BaseView implements View {
         out.println();
     }
 
-    public void printLocationAndSize(PrintStream out, Block block) {
+    private void printLocationAndSize(PrintStream out, Block block) {
+        requireZeroOrPositive(totalDisks, "BaseView.totalDisks");
+
+        if (totalDisks > 0)
+            printLine(out, String.format("- disk (%04X):", block.getDisk()), block.getFileName());
+
         printLine(out, "- location:", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
         printLine(out, "- size:", String.format("%s bytes", block.getSize()));
     }

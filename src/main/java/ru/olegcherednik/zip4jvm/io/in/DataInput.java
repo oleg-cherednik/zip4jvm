@@ -24,6 +24,18 @@ public interface DataInput extends Closeable {
 
     long getOffs();
 
+    default long getDisk() {
+        return 0;
+    }
+
+    default String getFileName() {
+        return null;
+    }
+
+    default long getTotalDisks() {
+        return 0;
+    }
+
     default int readWordSignature() throws IOException {
         return readWord();
     }

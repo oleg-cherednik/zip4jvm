@@ -17,8 +17,8 @@ final class PkwareEncryptionHeaderView extends BaseView {
     private final PkwareEncryptionHeaderBlock block;
     private final long pos;
 
-    public PkwareEncryptionHeaderView(PkwareEncryptionHeaderBlock block, long pos, int offs, int columnWidth) {
-        super(offs, columnWidth);
+    public PkwareEncryptionHeaderView(PkwareEncryptionHeaderBlock block, long pos, int offs, int columnWidth, long totalDisks) {
+        super(offs, columnWidth, totalDisks);
         this.block = requireNotNull(block, "PkwareEncryptionHeaderView.centralDirectory");
         this.pos = pos;
     }

@@ -20,7 +20,7 @@ import java.util.Optional;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ValidationUtils {
 
-    public static void requirePositive(long value, String type) {
+    public static void requireZeroOrPositive(long value, String type) {
         if (value < 0)
             throw new IllegalArgumentException("Parameter should be positive: " + type);
     }
@@ -55,9 +55,10 @@ public final class ValidationUtils {
             throw new IllegalArgumentException("Parameter should be not empty: " + name);
     }
 
-    public static void requireNotBlank(String str, String name) {
+    public static String requireNotBlank(String str, String name) {
         if (StringUtils.isBlank(str))
             throw new IllegalArgumentException("Parameter should be not blank: " + name);
+        return str;
     }
 
     public static <T> void requireNotEmpty(Collection<T> obj, String name) {

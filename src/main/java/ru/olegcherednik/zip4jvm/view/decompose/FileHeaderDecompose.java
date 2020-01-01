@@ -72,7 +72,7 @@ public final class FileHeaderDecompose implements Decompose {
                              .block(block)
                              .pos(pos)
                              .charset(settings.getCharset())
-                             .position(settings.getOffs(), settings.getColumnWidth()).build();
+                             .position(settings.getOffs(), settings.getColumnWidth(), zipModel.getTotalDisks()).build();
     }
 
     private ExtraFieldDecompose extraFieldDecompose(CentralDirectory.FileHeader fileHeader, ExtraFieldBlock block, int offs) {

@@ -29,7 +29,7 @@ public class EndCentralDirectoryLocatorViewTest {
         when(locator.getOffs()).thenReturn(11208273328L);
         when(locator.getTotalDisks()).thenReturn(5L);
 
-        String[] lines = Zip4jvmSuite.execute(new Zip64View.EndCentralDirectoryLocatorView(locator, block, 2, 52));
+        String[] lines = Zip4jvmSuite.execute(new Zip64View.EndCentralDirectoryLocatorView(locator, block, 2, 52, 0));
         assertThat(lines).hasSize(7);
         assertThat(lines[0]).isEqualTo("(PK0607) ZIP64 End of Central directory locator");
         assertThat(lines[1]).isEqualTo("===============================================");
@@ -38,5 +38,29 @@ public class EndCentralDirectoryLocatorViewTest {
         assertThat(lines[4]).isEqualTo("  part number of new-end-of-central-dir (0001):     2");
         assertThat(lines[5]).isEqualTo("  relative offset of new-end-of-central-dir:        11208273328 (0x29C10ADB0) bytes");
         assertThat(lines[6]).isEqualTo("  total number of parts in archive:                 5");
+    }
+
+    public void shouldRetrieveAllLineWithDiskWhenSplitZip() throws IOException {
+        Block block = mock(Block.class);
+        when(block.getSize()).thenReturn(20L);
+        when(block.getOffs()).thenReturn(11208273384L);
+        when(block.getDisk()).thenReturn(5L);
+        when(block.getFileName()).thenReturn("src.zip");
+
+        Zip64.EndCentralDirectoryLocator locator = mock(Zip64.EndCentralDirectoryLocator.class);
+        when(locator.getMainDisk()).thenReturn(1L);
+        when(locator.getOffs()).thenReturn(11208273328L);
+        when(locator.getTotalDisks()).thenReturn(5L);
+
+        String[] lines = Zip4jvmSuite.execute(new Zip64View.EndCentralDirectoryLocatorView(locator, block, 2, 52, 5));
+        assertThat(lines).hasSize(8);
+        assertThat(lines[0]).isEqualTo("(PK0607) ZIP64 End of Central directory locator");
+        assertThat(lines[1]).isEqualTo("===============================================");
+        assertThat(lines[2]).isEqualTo("  - disk (0005):                                    src.zip");
+        assertThat(lines[3]).isEqualTo("  - location:                                       11208273384 (0x29C10ADE8) bytes");
+        assertThat(lines[4]).isEqualTo("  - size:                                           20 bytes");
+        assertThat(lines[5]).isEqualTo("  part number of new-end-of-central-dir (0001):     2");
+        assertThat(lines[6]).isEqualTo("  relative offset of new-end-of-central-dir:        11208273328 (0x29C10ADB0) bytes");
+        assertThat(lines[7]).isEqualTo("  total number of parts in archive:                 5");
     }
 }

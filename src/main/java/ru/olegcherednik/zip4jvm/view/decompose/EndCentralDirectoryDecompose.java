@@ -45,7 +45,8 @@ public final class EndCentralDirectoryDecompose implements Decompose {
         Charset charset = settings.getCharset();
         int offs = settings.getOffs();
         int columnWidth = settings.getColumnWidth();
-        return new EndCentralDirectoryView(endCentralDirectory, block, charset, offs, columnWidth);
+        long totalDisks = zipModel.getTotalDisks();
+        return new EndCentralDirectoryView(endCentralDirectory, block, charset, offs, columnWidth, totalDisks);
     }
 
 }

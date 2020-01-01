@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.io.in.ng;
+package ru.olegcherednik.zip4jvm.io.in;
 
 import java.util.Arrays;
 

@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.ng.CycleBuffer;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -166,7 +165,7 @@ abstract class BaseDataInput implements DataInput {
     }
 
     @Override
-    public final String toString() {
+    public String toString() {
         return delegate.toString();
     }
 

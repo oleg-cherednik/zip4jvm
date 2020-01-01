@@ -35,6 +35,10 @@ public final class ZipInfo {
         return this;
     }
 
+    public void printShortInfo() throws IOException {
+        printShortInfo(System.out);
+    }
+
     public void printShortInfo(PrintStream out) throws IOException {
         new InfoEngine(zip, settings).printTextInfo(out);
     }

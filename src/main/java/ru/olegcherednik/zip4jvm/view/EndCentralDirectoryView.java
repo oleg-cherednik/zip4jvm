@@ -20,8 +20,8 @@ public final class EndCentralDirectoryView extends BaseView {
     private final Block block;
     private final Charset charset;
 
-    public EndCentralDirectoryView(EndCentralDirectory dir, Block block, Charset charset, int offs, int columnWidth) {
-        super(offs, columnWidth);
+    public EndCentralDirectoryView(EndCentralDirectory dir, Block block, Charset charset, int offs, int columnWidth, long totalDisks) {
+        super(offs, columnWidth, totalDisks);
         this.dir = requireNotNull(dir, "EndCentralDirectoryView.dir");
         this.block = requireNotNull(block, "EndCentralDirectoryView.block");
         this.charset = requireNotNull(charset, "EndCentralDirectoryView.charset");

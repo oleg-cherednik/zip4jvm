@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Oleg Cherednik
@@ -65,6 +67,13 @@ public class CompressionMethodViewTest {
 
             assertThat(lines[1]).isEqualTo("  compression sub-type (deflation):                 normal");
         }
+    }
+
+    public void shouldThrowIllegalArgumentExceptionWhenNameBlank() {
+        assertThatThrownBy(() -> new CompressionMethodView(null, mock(GeneralPurposeFlag.class), 0, 54))
+                .isExactlyInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new CompressionMethodView(CompressionMethod.DEFLATE, null, 0, 54))
+                .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
 }

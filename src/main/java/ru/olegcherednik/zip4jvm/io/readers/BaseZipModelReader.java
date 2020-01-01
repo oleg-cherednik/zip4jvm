@@ -4,13 +4,13 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.SignatureWasNotFoundException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
@@ -43,7 +43,7 @@ public abstract class BaseZipModelReader {
     protected CentralDirectory centralDirectory;
 
     protected final void readCentralData() throws IOException {
-        try (DataInput in = new SingleZipInputStream(zip)) {
+        try (DataInput in = createDataInput(zip)) {
             findCentralDirectorySignature(in);
             endCentralDirectory = readEndCentralDirectory(in);
             zip64 = readZip64(in);
@@ -65,6 +65,8 @@ public abstract class BaseZipModelReader {
         long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
         return getCentralDirectoryReader(totalEntries).read(in);
     }
+
+    protected abstract DataInput createDataInput(Path zip) throws FileNotFoundException;
 
     protected abstract EndCentralDirectoryReader getEndCentralDirectoryReader();
 
@@ -89,4 +91,5 @@ public abstract class BaseZipModelReader {
 
         throw new SignatureWasNotFoundException(EndCentralDirectory.SIGNATURE, "EndCentralDirectory");
     }
+
 }

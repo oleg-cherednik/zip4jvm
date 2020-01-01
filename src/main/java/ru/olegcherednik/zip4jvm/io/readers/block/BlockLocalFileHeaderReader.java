@@ -21,17 +21,17 @@ import java.util.function.Function;
 public class BlockLocalFileHeaderReader extends LocalFileHeaderReader {
 
     private final ZipEntryBlock.LocalFileHeaderBlock block = new ZipEntryBlock.LocalFileHeaderBlock();
+    private final long disk;
 
     public BlockLocalFileHeaderReader(ZipEntry zipEntry, Function<Charset, Charset> customizeCharset) {
         super(zipEntry.getLocalFileHeaderOffs(), customizeCharset);
-        block.setDisk(zipEntry.getDisk());
+        disk = zipEntry.getDisk();
     }
 
     @Override
     protected LocalFileHeader readLocalFileHeader(DataInput in) throws IOException {
         in.cleanBuffer();
-        block.getContent().setOffs(in.getOffs());
-        return super.readLocalFileHeader(in);
+        return block.getContent().calc(in, () -> super.readLocalFileHeader(in));
     }
 
     @Override

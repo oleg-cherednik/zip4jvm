@@ -6,7 +6,7 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
  * @author Oleg Cherednik
  * @since 12.12.2019
  */
-public interface ZipModelDataInput extends DataInput {
+public interface ZipDataInput extends DataInput {
 
     ZipModel getZipModel();
 

@@ -43,7 +43,8 @@ public final class ZipEntriesDecompose implements Decompose {
 
     private ZipEntriesView zipEntriesView() {
         long totalEntries = blockModel.getFileNameZipEntryBlock().size();
-        return new ZipEntriesView(totalEntries, settings.getOffs(), settings.getColumnWidth());
+        long totalDisks = blockModel.getZipModel().getTotalDisks();
+        return new ZipEntriesView(totalEntries, settings.getOffs(), settings.getColumnWidth(), totalDisks);
     }
 
     private LocalFileHeaderDecompose localFileHeaderDecompose() {

@@ -22,8 +22,8 @@ public final class Zip64View {
         private final Zip64.EndCentralDirectoryLocator locator;
         private final Block block;
 
-        public EndCentralDirectoryLocatorView(Zip64.EndCentralDirectoryLocator locator, Block block, int offs, int columnWidth) {
-            super(offs, columnWidth);
+        public EndCentralDirectoryLocatorView(Zip64.EndCentralDirectoryLocator locator, Block block, int offs, int columnWidth, long totalDisks) {
+            super(offs, columnWidth, totalDisks);
             this.locator = requireNotNull(locator, "Zip64View.locator");
             this.block = requireNotNull(block, "Zip64View.block");
         }
@@ -44,8 +44,8 @@ public final class Zip64View {
         private final Zip64.EndCentralDirectory dir;
         private final Block block;
 
-        public EndCentralDirectoryView(Zip64.EndCentralDirectory dir, Block block, int offs, int columnWidth) {
-            super(offs, columnWidth);
+        public EndCentralDirectoryView(Zip64.EndCentralDirectory dir, Block block, int offs, int columnWidth, long totalDisks) {
+            super(offs, columnWidth, totalDisks);
             this.dir = dir;
             this.block = block;
 

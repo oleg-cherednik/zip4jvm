@@ -10,7 +10,7 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
-public class SingleZipInputStream extends BaseZipModelDataInput {
+public class SingleZipInputStream extends BaseZipDataInput {
 
     public SingleZipInputStream(Path zip) throws FileNotFoundException {
         super(null, zip);

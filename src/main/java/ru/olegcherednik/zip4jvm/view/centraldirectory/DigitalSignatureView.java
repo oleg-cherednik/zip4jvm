@@ -18,8 +18,8 @@ public final class DigitalSignatureView extends BaseView {
     private final CentralDirectory.DigitalSignature digitalSignature;
     private final Block block;
 
-    public DigitalSignatureView(CentralDirectory.DigitalSignature digitalSignature, Block block, int offs, int columnWidth) {
-        super(offs, columnWidth);
+    public DigitalSignatureView(CentralDirectory.DigitalSignature digitalSignature, Block block, int offs, int columnWidth, long totalDisks) {
+        super(offs, columnWidth, totalDisks);
         this.digitalSignature = requireNotNull(digitalSignature, "DigitalSignatureView.centralDirectory");
         this.block = requireNotNull(block, "DigitalSignatureView.block");
     }

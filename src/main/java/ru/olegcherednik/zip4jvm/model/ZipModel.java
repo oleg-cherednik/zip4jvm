@@ -108,7 +108,7 @@ public final class ZipModel {
     }
 
     public DataInput createDataInput() throws IOException {
-        return isSplit() ? new SplitZipInputStream(this, 1) : new SingleZipInputStream(this);
+        return isSplit() ? new SplitZipInputStream(this, 0) : new SingleZipInputStream(this);
     }
 
 }

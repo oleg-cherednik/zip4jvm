@@ -24,7 +24,7 @@ public class SplitZipOutputStream extends BaseDataOutput {
 
     public SplitZipOutputStream(ZipModel zipModel) throws IOException {
         super(zipModel);
-        ValidationUtils.requirePositive(zipModel.getSplitSize(), "zipModel.splitSize");
+        ValidationUtils.requireZeroOrPositive(zipModel.getSplitSize(), "zipModel.splitSize");
         writeDwordSignature(SPLIT_SIGNATURE);
     }
 

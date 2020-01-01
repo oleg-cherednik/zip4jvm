@@ -147,11 +147,11 @@ public final class LocalFileHeaderDecompose implements Decompose {
                                   .diagLocalFileHeader(blockModel.getZipEntryBlock(localFileHeader.getFileName()).getLocalFileHeaderBlock())
                                   .pos(pos)
                                   .charset(settings.getCharset())
-                                  .position(settings.getOffs(), settings.getColumnWidth()).build();
+                                  .position(settings.getOffs(), settings.getColumnWidth(), zipModel.getTotalDisks()).build();
     }
 
     private DataDescriptorView dataDescriptorView(DataDescriptor dataDescriptor, Block block, long pos) {
-        return new DataDescriptorView(dataDescriptor, block, pos, settings.getOffs(), settings.getColumnWidth());
+        return new DataDescriptorView(dataDescriptor, block, pos, settings.getOffs(), settings.getColumnWidth(), zipModel.getTotalDisks());
     }
 
     private ExtraFieldDecompose extraFieldDecompose(LocalFileHeader localFileHeader, ExtraFieldBlock block, int offs) {

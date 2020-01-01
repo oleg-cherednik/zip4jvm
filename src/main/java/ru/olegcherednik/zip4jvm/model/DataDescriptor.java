@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.model;
 
-import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * see 4.3.9
@@ -10,7 +10,7 @@ import lombok.Getter;
  * @since 25.07.2019
  */
 @Getter
-@Builder
+@RequiredArgsConstructor
 public final class DataDescriptor {
 
     public static final int SIGNATURE = 0x08074B50;

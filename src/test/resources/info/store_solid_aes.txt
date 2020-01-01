@@ -511,7 +511,7 @@
 #1 (PK0304) [UTF-8] bikes/ducati-panigale-1199.jpg
 --------------------------------------------------
     - location:                                     0 (0x00000000) bytes
-    - size:                                         60 bytes
+    - size:                                         71 bytes
     operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
     unzip software version needed to extract (20):  2.0
     general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
@@ -559,7 +559,7 @@
 #2 (PK0304) [UTF-8] bikes/honda-cbr600rr.jpg
 --------------------------------------------
     - location:                                     293934 (0x00047C2E) bytes
-    - size:                                         54 bytes
+    - size:                                         65 bytes
     operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
     unzip software version needed to extract (20):  2.0
     general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
@@ -607,7 +607,7 @@
 #3 (PK0304) [UTF-8] bikes/kawasaki-ninja-300.jpg
 ------------------------------------------------
     - location:                                     448630 (0x0006D876) bytes
-    - size:                                         58 bytes
+    - size:                                         69 bytes
     operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
     unzip software version needed to extract (20):  2.0
     general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
@@ -655,7 +655,7 @@
 #4 (PK0304) [UTF-8] bikes/suzuki-gsxr750.jpg
 --------------------------------------------
     - location:                                     615765 (0x00096555) bytes
-    - size:                                         54 bytes
+    - size:                                         65 bytes
     operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
     unzip software version needed to extract (20):  2.0
     general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
@@ -703,7 +703,7 @@
 #5 (PK0304) [UTF-8] cars/bentley-continental.jpg
 ------------------------------------------------
     - location:                                     903219 (0x000DC833) bytes
-    - size:                                         58 bytes
+    - size:                                         69 bytes
     operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
     unzip software version needed to extract (20):  2.0
     general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
@@ -751,7 +751,7 @@
 #6 (PK0304) [UTF-8] cars/ferrari-458-italia.jpg
 -----------------------------------------------
     - location:                                     2298690 (0x00231342) bytes
-    - size:                                         57 bytes
+    - size:                                         68 bytes
     operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
     unzip software version needed to extract (20):  2.0
     general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
@@ -799,7 +799,7 @@
 #7 (PK0304) [UTF-8] cars/wiesmann-gt-mf5.jpg
 --------------------------------------------
     - location:                                     2619692 (0x0027F92C) bytes
-    - size:                                         54 bytes
+    - size:                                         65 bytes
     operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
     unzip software version needed to extract (20):  2.0
     general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
@@ -867,7 +867,7 @@
 #9 (PK0304) [UTF-8] empty_file.txt
 ----------------------------------
     - location:                                     3349470 (0x00331BDE) bytes
-    - size:                                         44 bytes
+    - size:                                         55 bytes
     operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
     unzip software version needed to extract (20):  2.0
     general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
@@ -914,7 +914,7 @@
 #10 (PK0304) [UTF-8] mcdonnell-douglas-f15-eagle.jpg
 ----------------------------------------------------
     - location:                                     3349565 (0x00331C3D) bytes
-    - size:                                         61 bytes
+    - size:                                         72 bytes
     operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
     unzip software version needed to extract (20):  2.0
     general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
@@ -962,7 +962,7 @@
 #11 (PK0304) [UTF-8] Oleg Cherednik.txt
 ---------------------------------------
     - location:                                     3974423 (0x003CA517) bytes
-    - size:                                         48 bytes
+    - size:                                         59 bytes
     operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
     unzip software version needed to extract (20):  2.0
     general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
@@ -1010,7 +1010,7 @@
 #12 (PK0304) [UTF-8] saint-petersburg.jpg
 -----------------------------------------
     - location:                                     3974562 (0x003CA5A2) bytes
-    - size:                                         50 bytes
+    - size:                                         61 bytes
     operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
     unzip software version needed to extract (20):  2.0
     general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
@@ -1058,7 +1058,7 @@
 #13 (PK0304) [UTF-8] sig-sauer-pistol.jpg
 -----------------------------------------
     - location:                                     5049499 (0x004D0C9B) bytes
-    - size:                                         50 bytes
+    - size:                                         61 bytes
     operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
     unzip software version needed to extract (20):  2.0
     general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001

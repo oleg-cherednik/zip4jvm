@@ -44,8 +44,6 @@ public class ZipEntryBlock {
 
         private final Block content = new Block();
         private final ExtraFieldBlock extraFieldBlock = new ExtraFieldBlock();
-
-        private long disk;
     }
 
 }

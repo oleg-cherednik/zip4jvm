@@ -13,8 +13,8 @@ public final class ZipEntriesView extends BaseView {
 
     private final long totalEntries;
 
-    public ZipEntriesView(long totalEntries, int offs, int columnWidth) {
-        super(offs, columnWidth);
+    public ZipEntriesView(long totalEntries, int offs, int columnWidth, long totalDisks) {
+        super(offs, columnWidth, totalDisks);
         this.totalEntries = totalEntries;
     }
 

@@ -12,7 +12,7 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
-public class SplitZipInputStream extends BaseZipModelDataInput {
+public class SplitZipInputStream extends BaseZipDataInput {
 
     private long disk;
 
@@ -67,6 +67,17 @@ public class SplitZipInputStream extends BaseZipModelDataInput {
         Path splitFile = zipModel.getPartFile(++disk);
         delegate.close();
         delegate = new LittleEndianReadFile(splitFile);
+        fileName = splitFile.getFileName().toString();
+    }
+
+    @Override
+    public final String toString() {
+        return "disk: " + disk + ", " + super.toString();
+    }
+
+    @Override
+    public long getDisk() {
+        return disk;
     }
 
 }

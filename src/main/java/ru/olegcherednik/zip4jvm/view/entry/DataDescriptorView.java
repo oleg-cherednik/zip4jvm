@@ -2,8 +2,8 @@ package ru.olegcherednik.zip4jvm.view.entry;
 
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.block.Block;
-import ru.olegcherednik.zip4jvm.view.SizeView;
 import ru.olegcherednik.zip4jvm.view.BaseView;
+import ru.olegcherednik.zip4jvm.view.SizeView;
 
 import java.io.PrintStream;
 import java.util.Objects;
@@ -18,8 +18,8 @@ public final class DataDescriptorView extends BaseView {
     private final Block block;
     private final long pos;
 
-    public DataDescriptorView(DataDescriptor dataDescriptor, Block block, long pos, int offs, int columnWidth) {
-        super(offs, columnWidth);
+    public DataDescriptorView(DataDescriptor dataDescriptor, Block block, long pos, int offs, int columnWidth, long totalDisks) {
+        super(offs, columnWidth, totalDisks);
         this.dataDescriptor = dataDescriptor;
         this.block = block;
         this.pos = pos;

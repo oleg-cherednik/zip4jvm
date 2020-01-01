@@ -29,7 +29,7 @@ public class EndCentralDirectoryViewTest {
 
         EndCentralDirectory endCentralDirectory = createEndCentralDirectory(255533L);
 
-        String[] lines = Zip4jvmSuite.execute(new EndCentralDirectoryView(endCentralDirectory, block, Charsets.UTF_8, 2, 52));
+        String[] lines = Zip4jvmSuite.execute(new EndCentralDirectoryView(endCentralDirectory, block, Charsets.UTF_8, 2, 52, 0));
         assertThat(lines).hasSize(13);
         assertThat(lines[0]).isEqualTo("(PK0506) End of Central directory record");
         assertThat(lines[1]).isEqualTo("========================================");
@@ -54,7 +54,7 @@ public class EndCentralDirectoryViewTest {
 
             EndCentralDirectory endCentralDirectory = createEndCentralDirectory(centralDirectoryOffs);
 
-            String[] lines = Zip4jvmSuite.execute(new EndCentralDirectoryView(endCentralDirectory, block, Charsets.UTF_8, 2, 52));
+            String[] lines = Zip4jvmSuite.execute(new EndCentralDirectoryView(endCentralDirectory, block, Charsets.UTF_8, 2, 52, 0));
             assertThat(lines).hasSize(14);
             assertThat(lines[0]).isEqualTo("(PK0506) End of Central directory record");
             assertThat(lines[1]).isEqualTo("========================================");
@@ -74,12 +74,39 @@ public class EndCentralDirectoryViewTest {
     }
 
     public void shouldThrowIllegalArgumentExceptionWhenSomeParametersNull() {
-        assertThatThrownBy(() -> new EndCentralDirectoryView(null, mock(Block.class), Charsets.UTF_8, 2, 52))
+        assertThatThrownBy(() -> new EndCentralDirectoryView(null, mock(Block.class), Charsets.UTF_8, 2, 52, 0))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> new EndCentralDirectoryView(mock(EndCentralDirectory.class), null, Charsets.UTF_8, 2, 52))
+        assertThatThrownBy(() -> new EndCentralDirectoryView(mock(EndCentralDirectory.class), null, Charsets.UTF_8, 2, 52, 0))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> new EndCentralDirectoryView(mock(EndCentralDirectory.class), mock(Block.class), null, 2, 52))
+        assertThatThrownBy(() -> new EndCentralDirectoryView(mock(EndCentralDirectory.class), mock(Block.class), null, 2, 52, 0))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
+    }
+
+    public void shouldRetrieveAllLinesWithDiskWhenSplitZip() throws IOException {
+        Block block = mock(Block.class);
+        when(block.getSize()).thenReturn(33L);
+        when(block.getOffs()).thenReturn(255614L);
+        when(block.getDisk()).thenReturn(5L);
+        when(block.getFileName()).thenReturn("src.zip");
+
+        EndCentralDirectory endCentralDirectory = createEndCentralDirectory(255533L);
+
+        String[] lines = Zip4jvmSuite.execute(new EndCentralDirectoryView(endCentralDirectory, block, Charsets.UTF_8, 2, 52, 5));
+        assertThat(lines).hasSize(14);
+        assertThat(lines[0]).isEqualTo("(PK0506) End of Central directory record");
+        assertThat(lines[1]).isEqualTo("========================================");
+        assertThat(lines[2]).isEqualTo("  - disk (0005):                                    src.zip");
+        assertThat(lines[3]).isEqualTo("  - location:                                       255614 (0x0003E67E) bytes");
+        assertThat(lines[4]).isEqualTo("  - size:                                           33 bytes");
+        assertThat(lines[5]).isEqualTo("  part number of this part (0001):                  2");
+        assertThat(lines[6]).isEqualTo("  part number of start of central dir (0002):       3");
+        assertThat(lines[7]).isEqualTo("  number of entries in central dir in this part:    13");
+        assertThat(lines[8]).isEqualTo("  total number of entries in central dir:           15");
+        assertThat(lines[9]).isEqualTo("  size of central dir:                              81 (0x00000051) bytes");
+        assertThat(lines[10]).isEqualTo("  relative offset of central dir:                   255533 (0x0003E62D) bytes");
+        assertThat(lines[11]).isEqualTo("  zipfile comment length:                           11 bytes");
+        assertThat(lines[12]).isEqualTo("                                                    UTF-8");
+        assertThat(lines[13]).isEqualTo("  70 61 73 73 77 6F 72 64 3A 20 31                  password: 1");
     }
 
     private static EndCentralDirectory createEndCentralDirectory(long centralDirectoryOffs) {

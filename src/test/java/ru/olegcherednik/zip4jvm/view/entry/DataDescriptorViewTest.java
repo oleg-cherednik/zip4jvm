@@ -23,12 +23,9 @@ public class DataDescriptorViewTest {
         when(block.getSize()).thenReturn(16L);
         when(block.getOffs()).thenReturn(255496L);
 
-        DataDescriptor dataDescriptor = DataDescriptor.builder()
-                                                      .crc32(3992319659L)
-                                                      .compressedSize(255436L)
-                                                      .uncompressedSize(293823L).build();
+        DataDescriptor dataDescriptor = new DataDescriptor(3992319659L, 255436L, 293823L);
 
-        String[] lines = Zip4jvmSuite.execute(new DataDescriptorView(dataDescriptor, block, 1, 2, 52));
+        String[] lines = Zip4jvmSuite.execute(new DataDescriptorView(dataDescriptor, block, 1, 2, 52, 0));
 
         assertThat(lines).hasSize(7);
         assertThat(lines[0]).isEqualTo("#2 (PK0708) Data descriptor");
@@ -38,5 +35,27 @@ public class DataDescriptorViewTest {
         assertThat(lines[4]).isEqualTo("  32-bit CRC value:                                 0xEDF5F6AB");
         assertThat(lines[5]).isEqualTo("  compressed size:                                  255436 bytes");
         assertThat(lines[6]).isEqualTo("  uncompressed size:                                293823 bytes");
+    }
+
+    public void shouldRetrieveAllLinesWithDiskWhenSplitZip() throws IOException {
+        Block block = mock(Block.class);
+        when(block.getSize()).thenReturn(16L);
+        when(block.getOffs()).thenReturn(255496L);
+        when(block.getDisk()).thenReturn(5L);
+        when(block.getFileName()).thenReturn("src.zip");
+
+        DataDescriptor dataDescriptor = new DataDescriptor(3992319659L, 255436L, 293823L);
+
+        String[] lines = Zip4jvmSuite.execute(new DataDescriptorView(dataDescriptor, block, 1, 2, 52, 5));
+
+        assertThat(lines).hasSize(8);
+        assertThat(lines[0]).isEqualTo("#2 (PK0708) Data descriptor");
+        assertThat(lines[1]).isEqualTo("---------------------------");
+        assertThat(lines[2]).isEqualTo("  - disk (0005):                                    src.zip");
+        assertThat(lines[3]).isEqualTo("  - location:                                       255496 (0x0003E608) bytes");
+        assertThat(lines[4]).isEqualTo("  - size:                                           16 bytes");
+        assertThat(lines[5]).isEqualTo("  32-bit CRC value:                                 0xEDF5F6AB");
+        assertThat(lines[6]).isEqualTo("  compressed size:                                  255436 bytes");
+        assertThat(lines[7]).isEqualTo("  uncompressed size:                                293823 bytes");
     }
 }

@@ -64,7 +64,7 @@ public final class CentralDirectoryDecompose implements Decompose {
     }
 
     private CentralDirectoryView centralDirectoryView() {
-        return new CentralDirectoryView(centralDirectory, block, settings.getOffs(), settings.getColumnWidth());
+        return new CentralDirectoryView(centralDirectory, block, settings.getOffs(), settings.getColumnWidth(), zipModel.getTotalDisks());
     }
 
     private FileHeaderDecompose fileHeaderDecompose() {
@@ -79,7 +79,8 @@ public final class CentralDirectoryDecompose implements Decompose {
 
         int offs = settings.getOffs();
         int columnWidth = settings.getColumnWidth();
-        return new DigitalSignatureView(digitalSignature, block.getDigitalSignature(), offs, columnWidth);
+        long totalDisks = zipModel.getTotalDisks();
+        return new DigitalSignatureView(digitalSignature, block.getDigitalSignature(), offs, columnWidth, totalDisks);
     }
 
 }

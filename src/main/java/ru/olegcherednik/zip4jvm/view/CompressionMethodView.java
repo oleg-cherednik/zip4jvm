@@ -34,8 +34,6 @@ public final class CompressionMethodView extends BaseView {
         else if (compressionMethod == CompressionMethod.DEFLATE || compressionMethod == CompressionMethod.FILE_ENHANCED_DEFLATED)
             printLine(out, "  compression sub-type (deflation):", generalPurposeFlag.getCompressionLevel().getTitle());
 
-        // TODO add for unknown compression method
-
         return true;
     }
 

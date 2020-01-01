@@ -37,7 +37,7 @@ public final class LocalFileHeaderView extends BaseView {
     }
 
     private LocalFileHeaderView(Builder builder) {
-        super(builder.offs, builder.columnWidth);
+        super(builder.offs, builder.columnWidth, builder.totalDisks);
         localFileHeader = builder.localFileHeader;
         diagLocalFileHeader = builder.diagLocalFileHeader;
         pos = builder.pos;
@@ -108,6 +108,7 @@ public final class LocalFileHeaderView extends BaseView {
 
         private LocalFileHeader localFileHeader;
         private ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader;
+        private long totalDisks;
         private long pos;
         private Charset charset = Charsets.IBM437;
         private int offs;
@@ -137,9 +138,10 @@ public final class LocalFileHeaderView extends BaseView {
             return this;
         }
 
-        public Builder position(int offs, int columnWidth) {
+        public Builder position(int offs, int columnWidth, long totalDisks) {
             this.offs = offs;
             this.columnWidth = columnWidth;
+            this.totalDisks = totalDisks;
             return this;
         }
     }
