@@ -125,7 +125,7 @@ public final class FileHeaderView extends BaseView {
                       .extraField(fileHeader.getExtraField())
                       .block(block.getExtraFieldBlock())
                       .generalPurposeFlag(fileHeader.getGeneralPurposeFlag())
-                      .position(offs, columnWidth).build().printLocation(out);
+                      .position(offs, columnWidth, totalDisks).build().printLocation(out);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

@@ -36,7 +36,7 @@ public class InfoZipNewUnixExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(InfoZipNewUnixExtraFieldRecordView.builder()
                                                                                 .record(record)
                                                                                 .block(block)
-                                                                                .position(0, 52).build());
+                                                                                .position(0, 52, 0).build());
 
         assertThat(lines).hasSize(5);
         assertThat(lines[0]).isEqualTo("(0x7875) new InfoZIP Unix/OS2/NT:                   5296740 (0x0050D264) bytes");
@@ -63,7 +63,7 @@ public class InfoZipNewUnixExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(InfoZipNewUnixExtraFieldRecordView.builder()
                                                                                 .record(record)
                                                                                 .block(block)
-                                                                                .position(0, 52).build());
+                                                                                .position(0, 52, 0).build());
 
         assertThat(lines).hasSize(4);
         assertThat(lines[0]).isEqualTo("(0x7875) new InfoZIP Unix/OS2/NT:                   5296740 (0x0050D264) bytes");
@@ -77,7 +77,36 @@ public class InfoZipNewUnixExtraFieldRecordViewTest {
         InfoZipNewUnixExtraFieldRecordView view = InfoZipNewUnixExtraFieldRecordView.builder()
                                                                                     .record(InfoZipNewUnixExtraFieldRecord.NULL)
                                                                                     .block(mock(Block.class))
-                                                                                    .position(0, 52).build();
+                                                                                    .position(0, 52, 0).build();
         assertThat(view.print(out)).isFalse();
+    }
+
+    public void shouldRetrieveVersionOneRecordWithDiskWhenSplit() throws IOException {
+        Block block = mock(Block.class);
+        when(block.getSize()).thenReturn(15L);
+        when(block.getOffs()).thenReturn(5296740L);
+        when(block.getDisk()).thenReturn(5L);
+        when(block.getFileName()).thenReturn("src.zip");
+
+        InfoZipNewUnixExtraFieldRecord.Payload payload = InfoZipNewUnixExtraFieldRecord.VersionOnePayload.builder()
+                                                                                                         .uid("aaa")
+                                                                                                         .gid("bbb").build();
+
+        InfoZipNewUnixExtraFieldRecord record = InfoZipNewUnixExtraFieldRecord.builder()
+                                                                              .dataSize(11)
+                                                                              .payload(payload).build();
+
+        String[] lines = Zip4jvmSuite.execute(InfoZipNewUnixExtraFieldRecordView.builder()
+                                                                                .record(record)
+                                                                                .block(block)
+                                                                                .position(0, 52, 5).build());
+
+        assertThat(lines).hasSize(6);
+        assertThat(lines[0]).isEqualTo("(0x7875) new InfoZIP Unix/OS2/NT:                   5296740 (0x0050D264) bytes");
+        assertThat(lines[1]).isEqualTo("  - disk (0005):                                    src.zip");
+        assertThat(lines[2]).isEqualTo("  - size:                                           15 bytes");
+        assertThat(lines[3]).isEqualTo("  version:                                          1");
+        assertThat(lines[4]).isEqualTo("  User identifier (UID):                            aaa");
+        assertThat(lines[5]).isEqualTo("  Group Identifier (GID):                           bbb");
     }
 }

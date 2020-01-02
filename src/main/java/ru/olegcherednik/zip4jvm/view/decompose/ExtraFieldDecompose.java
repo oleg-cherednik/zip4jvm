@@ -64,7 +64,7 @@ public final class ExtraFieldDecompose implements Decompose {
                              .extraField(extraField)
                              .block(block)
                              .generalPurposeFlag(generalPurposeFlag)
-                             .position(offs, columnWidth).build();
+                             .position(offs, columnWidth, zipModel.getTotalDisks()).build();
     }
 
 }

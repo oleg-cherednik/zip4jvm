@@ -32,7 +32,7 @@ public final class ExtraFieldView extends BaseView {
     }
 
     private ExtraFieldView(Builder builder) {
-        super(builder.offs, builder.columnWidth);
+        super(builder.offs, builder.columnWidth, builder.totalDisks);
         extraField = builder.extraField;
         block = builder.block;
         generalPurposeFlag = builder.generalPurposeFlag;
@@ -87,35 +87,35 @@ public final class ExtraFieldView extends BaseView {
         return NtfsTimestampExtraFieldRecordView.builder()
                                                 .record(record)
                                                 .block(block.getRecord(record.getSignature()))
-                                                .position(offs, columnWidth).build();
+                                                .position(offs, columnWidth, totalDisks).build();
     }
 
     private InfoZipOldUnixExtraFieldRecordView createView(InfoZipOldUnixExtraFieldRecord record) {
         return InfoZipOldUnixExtraFieldRecordView.builder()
                                                  .record(record)
                                                  .block(block.getRecord(record.getSignature()))
-                                                 .position(offs, columnWidth).build();
+                                                 .position(offs, columnWidth, totalDisks).build();
     }
 
     private InfoZipNewUnixExtraFieldRecordView createView(InfoZipNewUnixExtraFieldRecord record) {
         return InfoZipNewUnixExtraFieldRecordView.builder()
                                                  .record(record)
                                                  .block(block.getRecord(record.getSignature()))
-                                                 .position(offs, columnWidth).build();
+                                                 .position(offs, columnWidth, totalDisks).build();
     }
 
     private ExtendedTimestampExtraFieldRecordView createView(ExtendedTimestampExtraFieldRecord record) {
         return ExtendedTimestampExtraFieldRecordView.builder()
                                                     .record(record)
                                                     .block(block.getRecord(record.getSignature()))
-                                                    .position(offs, columnWidth).build();
+                                                    .position(offs, columnWidth, totalDisks).build();
     }
 
     private Zip64ExtendedInfoView createView(Zip64.ExtendedInfo record) {
         return Zip64ExtendedInfoView.builder()
                                     .record(record)
                                     .block(block.getRecord(record.getSignature()))
-                                    .position(offs, columnWidth).build();
+                                    .position(offs, columnWidth, totalDisks).build();
     }
 
     private AesExtraFieldRecordView createView(AesExtraFieldRecord record) {
@@ -123,16 +123,16 @@ public final class ExtraFieldView extends BaseView {
                                       .record(record)
                                       .generalPurposeFlag(generalPurposeFlag)
                                       .block(block.getRecord(record.getSignature()))
-                                      .position(offs, columnWidth).build();
+                                      .position(offs, columnWidth, totalDisks).build();
     }
 
     private UnknownExtraFieldRecordView createView(ExtraField.Record record) {
-        Block recordBlock = block.getRecord(record.getSignature());
+        Block block = this.block.getRecord(record.getSignature());
         return UnknownExtraFieldRecordView.builder()
                                           .record(record)
-                                          .block(recordBlock)
-                                          .data(recordBlock.getData())
-                                          .position(offs, columnWidth).build();
+                                          .block(block)
+                                          .data(block.getData())
+                                          .position(offs, columnWidth, totalDisks).build();
     }
 
     public static final class Builder {
@@ -142,6 +142,7 @@ public final class ExtraFieldView extends BaseView {
         private GeneralPurposeFlag generalPurposeFlag;
         private int offs;
         private int columnWidth;
+        private long totalDisks;
 
         public ExtraFieldView build() {
             Objects.requireNonNull(extraField, "'extraField' must not be null");
@@ -164,9 +165,10 @@ public final class ExtraFieldView extends BaseView {
             return this;
         }
 
-        public Builder position(int offs, int columnWidth) {
+        public Builder position(int offs, int columnWidth, long totalDisks) {
             this.offs = offs;
             this.columnWidth = columnWidth;
+            this.totalDisks = totalDisks;
             return this;
         }
     }

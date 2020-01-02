@@ -100,7 +100,7 @@ public final class LocalFileHeaderView extends BaseView {
                       .extraField(localFileHeader.getExtraField())
                       .block(diagLocalFileHeader.getExtraFieldBlock())
                       .generalPurposeFlag(localFileHeader.getGeneralPurposeFlag())
-                      .position(offs, columnWidth).build().printLocation(out);
+                      .position(offs, columnWidth, totalDisks).build().printLocation(out);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

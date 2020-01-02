@@ -38,7 +38,7 @@ public class InfoZipOldUnixExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(InfoZipOldUnixExtraFieldRecordView.builder()
                                                                                 .record(record)
                                                                                 .block(block)
-                                                                                .position(0, 52).build());
+                                                                                .position(0, 52, 0).build());
 
         assertThat(lines).hasSize(6);
         assertThat(lines[0]).isEqualTo("(0x5855) old InfoZIP Unix/OS2/NT:                   5300395 (0x0050E0AB) bytes");
@@ -62,7 +62,7 @@ public class InfoZipOldUnixExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(InfoZipOldUnixExtraFieldRecordView.builder()
                                                                                 .record(record)
                                                                                 .block(block)
-                                                                                .position(0, 52).build());
+                                                                                .position(0, 52, 0).build());
 
         assertThat(lines).hasSize(4);
         assertThat(lines[0]).isEqualTo("(0x5855) old InfoZIP Unix/OS2/NT:                   5300395 (0x0050E0AB) bytes");
@@ -76,7 +76,36 @@ public class InfoZipOldUnixExtraFieldRecordViewTest {
         InfoZipOldUnixExtraFieldRecordView view = InfoZipOldUnixExtraFieldRecordView.builder()
                                                                                     .record(InfoZipOldUnixExtraFieldRecord.NULL)
                                                                                     .block(mock(Block.class))
-                                                                                    .position(0, 52).build();
+                                                                                    .position(0, 52, 0).build();
         assertThat(view.print(out)).isFalse();
+    }
+
+    public void shouldRetrieveAllDataWithDiskWhenSplit() throws IOException {
+        Block block = mock(Block.class);
+        when(block.getSize()).thenReturn(12L);
+        when(block.getOffs()).thenReturn(5300395L);
+        when(block.getDisk()).thenReturn(5L);
+        when(block.getFileName()).thenReturn("src.zip");
+
+        InfoZipOldUnixExtraFieldRecord record = InfoZipOldUnixExtraFieldRecord.builder()
+                                                                              .dataSize(8)
+                                                                              .lastAccessTime(lastAccessTime)
+                                                                              .lastModificationTime(lastModifiedTime)
+                                                                              .uid(111)
+                                                                              .gid(222).build();
+
+        String[] lines = Zip4jvmSuite.execute(InfoZipOldUnixExtraFieldRecordView.builder()
+                                                                                .record(record)
+                                                                                .block(block)
+                                                                                .position(0, 52, 5).build());
+
+        assertThat(lines).hasSize(7);
+        assertThat(lines[0]).isEqualTo("(0x5855) old InfoZIP Unix/OS2/NT:                   5300395 (0x0050E0AB) bytes");
+        assertThat(lines[1]).isEqualTo("  - disk (0005):                                    src.zip");
+        assertThat(lines[2]).isEqualTo("  - size:                                           12 bytes");
+        assertThat(lines[3]).isEqualTo("  Last Modified Date:                               2019-10-24 07:46:22");
+        assertThat(lines[4]).isEqualTo("  Last Accessed Date:                               2019-10-22 00:13:05");
+        assertThat(lines[5]).isEqualTo("  User identifier (UID):                            111");
+        assertThat(lines[6]).isEqualTo("  Group Identifier (GID):                           222");
     }
 }

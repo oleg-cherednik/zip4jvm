@@ -116,12 +116,6 @@ public abstract class BaseView implements View {
         printLine(out, "- size:", String.format("%s bytes", block.getSize()));
     }
 
-    @Deprecated
-    public final void printValueLocation(PrintStream out, String valueName, Block block) {
-        printLine(out, valueName, String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
-        printLine(out, "  - size:", String.format("%s bytes", block.getSize()));
-    }
-
     public static String signature(int signature) {
         StringBuilder buf = new StringBuilder();
 

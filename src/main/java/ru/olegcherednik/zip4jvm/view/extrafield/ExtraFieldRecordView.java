@@ -17,7 +17,7 @@ public abstract class ExtraFieldRecordView<T extends ExtraField.Record> extends 
     private final PrintConsumer<T, BaseView> printConsumer;
 
     protected ExtraFieldRecordView(Builder<T, ?> builder, PrintConsumer<T, BaseView> printConsumer) {
-        super(builder.getOffs(), builder.getColumnWidth());
+        super(builder.getOffs(), builder.getColumnWidth(), builder.getTotalDisks());
         record = builder.getRecord();
         block = builder.getBlock();
         this.printConsumer = printConsumer;
@@ -43,7 +43,7 @@ public abstract class ExtraFieldRecordView<T extends ExtraField.Record> extends 
         if (record == null)
             return false;
 
-        printValueLocation(out, String.format("(0x%04X) %s:", getSignature(), getTitle()), block);
+        printValueWithLocation(out, String.format("(0x%04X) %s:", getSignature(), getTitle()), block);
         printConsumer.print(record, this, out);
 
         return true;

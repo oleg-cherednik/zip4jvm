@@ -68,6 +68,17 @@ public class ZipInfoTest {
         assertThatFile(file).matchesResourceLines("/info/store_solid_aes.txt");
     }
 
+//    public void shouldRetrieveInfoWhenStoreSplit() throws IOException {
+//        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("actual.txt");
+//        Files.createDirectories(file.getParent());
+//
+//        try (PrintStream out = new PrintStream(file.toFile())) {
+//            ZipInfo.zip(TestData.zipStoreSplit).printShortInfo(out);
+//        }
+//
+//        assertThatFile(file).matchesResourceLines("/info/store_split.txt");
+//    }
+
     private static ZipInfo zipInfo() {
         Path path = Paths.get("d:/zip4jvm/tmp/aes.zip");
 //        Files.deleteIfExists(path);
@@ -89,7 +100,7 @@ public class ZipInfoTest {
 //        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/aes.zip"));
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/split/src.zip"))
 //        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/macos_10.zip"));
-//        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/ubuntu_18.zip"))
+//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/ubuntu_18.zip"));
 //        ZipInfo.zip(Paths.get("d:/zip4jvm/securezip/aes128.zip"))
 //        ZipInfo.zip(TestData.zipStoreSolid)
 //        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/files.zip"));

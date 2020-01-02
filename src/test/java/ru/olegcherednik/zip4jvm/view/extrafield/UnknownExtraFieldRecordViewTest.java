@@ -23,19 +23,39 @@ public class UnknownExtraFieldRecordViewTest {
         when(block.getSize()).thenReturn(36L);
         when(block.getOffs()).thenReturn(11208273272L);
 
-        ExtraField.Record.Unknown record = ExtraField.Record.Unknown.builder()
-                                                                    .signature(0x0666)
-                                                                    .build();
+        ExtraField.Record.Unknown record = ExtraField.Record.Unknown.builder().signature(0x0666).build();
 
         String[] lines = Zip4jvmSuite.execute(UnknownExtraFieldRecordView.builder()
                                                                          .record(record)
                                                                          .block(block)
                                                                          .data(new byte[] { 0x0, 0x1, 0x2, 0x3 })
-                                                                         .position(0, 52).build());
+                                                                         .position(0, 52, 0).build());
 
         assertThat(lines).hasSize(3);
         assertThat(lines[0]).isEqualTo("(0x0666) Unknown:                                   11208273272 (0x29C10AD78) bytes");
         assertThat(lines[1]).isEqualTo("  - size:                                           36 bytes");
         assertThat(lines[2]).isEqualTo("00 01 02 03");
+    }
+
+    public void shouldRetrieveAllDataWithDiskWhenSplit() throws IOException {
+        Block block = mock(Block.class);
+        when(block.getSize()).thenReturn(36L);
+        when(block.getOffs()).thenReturn(11208273272L);
+        when(block.getDisk()).thenReturn(5L);
+        when(block.getFileName()).thenReturn("src.zip");
+
+        ExtraField.Record.Unknown record = ExtraField.Record.Unknown.builder().signature(0x0666).build();
+
+        String[] lines = Zip4jvmSuite.execute(UnknownExtraFieldRecordView.builder()
+                                                                         .record(record)
+                                                                         .block(block)
+                                                                         .data(new byte[] { 0x0, 0x1, 0x2, 0x3 })
+                                                                         .position(0, 52, 5).build());
+
+        assertThat(lines).hasSize(4);
+        assertThat(lines[0]).isEqualTo("(0x0666) Unknown:                                   11208273272 (0x29C10AD78) bytes");
+        assertThat(lines[1]).isEqualTo("  - disk (0005):                                    src.zip");
+        assertThat(lines[2]).isEqualTo("  - size:                                           36 bytes");
+        assertThat(lines[3]).isEqualTo("00 01 02 03");
     }
 }

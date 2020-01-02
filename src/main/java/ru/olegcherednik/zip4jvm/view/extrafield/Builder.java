@@ -23,6 +23,7 @@ final class Builder<R extends ExtraField.Record, V extends ExtraFieldRecordView<
     private Block block;
     private int offs;
     private int columnWidth;
+    private long totalDisks;
 
     Builder(Function<Builder<R, V>, V> sup) {
         this.sup = sup;
@@ -59,9 +60,10 @@ final class Builder<R extends ExtraField.Record, V extends ExtraFieldRecordView<
         return this;
     }
 
-    public Builder<R, V> position(int offs, int columnWidth) {
+    public Builder<R, V> position(int offs, int columnWidth, long totalDisks) {
         this.offs = offs;
         this.columnWidth = columnWidth;
+        this.totalDisks = totalDisks;
         return this;
     }
 
