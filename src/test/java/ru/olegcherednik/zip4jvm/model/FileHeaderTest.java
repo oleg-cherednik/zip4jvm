@@ -45,8 +45,8 @@ public class FileHeaderTest {
         assertThat(externalFileAttributes).isNotSameAs(ExternalFileAttributes.NULL);
         assertThat(extraField).isNotSameAs(ExtraField.NULL);
 
-        Version versionMadeBy = new Version(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20);
-        Version versionToExtract = new Version(Version.FileSystem.Z_SYSTEM, 15);
+        Version versionMadeBy = Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20);
+        Version versionToExtract = Version.of(Version.FileSystem.Z_SYSTEM, 15);
 
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 

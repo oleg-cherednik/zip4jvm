@@ -5,6 +5,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Optional;
+
 /**
  * see 4.4.2
  *
@@ -13,7 +15,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @EqualsAndHashCode(doNotUseGetters = true)
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Version {
 
     public static final Version NULL = new Version(FileSystem.UNKNOWN, 0);
@@ -23,6 +25,12 @@ public final class Version {
 
     public static Version of(int data) {
         return new Version(Version.FileSystem.parseCode(data >> 8), data & 0xFF);
+    }
+
+    public static Version of(FileSystem fileSystem, int zipSpecificationVersion) {
+        if (Optional.ofNullable(fileSystem).orElse(FileSystem.UNKNOWN) == FileSystem.UNKNOWN)
+            return NULL;
+        return new Version(fileSystem, zipSpecificationVersion);
     }
 
     public int getData() {

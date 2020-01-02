@@ -18,7 +18,7 @@ public class LocalFileHeaderBlockTest {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         ExtraField extraField = ExtraField.builder().addRecord(Zip64.ExtendedInfo.builder().uncompressedSize(4).build()).build();
 
-        Version versionToExtract = new Version(Version.FileSystem.Z_SYSTEM, 15);
+        Version versionToExtract = Version.of(Version.FileSystem.Z_SYSTEM, 15);
 
         assertThat(extraField).isNotSameAs(ExtraField.NULL);
 
