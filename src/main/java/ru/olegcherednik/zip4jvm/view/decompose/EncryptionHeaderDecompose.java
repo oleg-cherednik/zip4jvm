@@ -61,6 +61,9 @@ public final class EncryptionHeaderDecompose implements Decompose {
     }
 
     private EncryptionHeaderView encryptionHeaderView() {
-        return new EncryptionHeaderView(encryptionHeaderBlock, pos, settings.getOffs(), settings.getColumnWidth());
+        int offs = settings.getOffs();
+        int columnWidth = settings.getColumnWidth();
+        long totalDisks = zipModel.getTotalDisks();
+        return new EncryptionHeaderView(encryptionHeaderBlock, pos, offs, columnWidth, totalDisks);
     }
 }

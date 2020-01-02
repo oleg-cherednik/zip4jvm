@@ -103,7 +103,7 @@ public class ZipInfoTest {
         try {
             zipInfo().printShortInfo(System.out);
         } catch(Exception e) {
-
+            e.printStackTrace();
         }
     }
 
@@ -113,6 +113,7 @@ public class ZipInfoTest {
             Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
             zipInfo().decompose(dir);
         } catch(Exception e) {
+            e.printStackTrace();
         }
     }
 }

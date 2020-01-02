@@ -18,8 +18,8 @@ public final class EncryptionHeaderView extends BaseView {
     private final EncryptionHeaderBlock block;
     private final long pos;
 
-    public EncryptionHeaderView(EncryptionHeaderBlock block, long pos, int offs, int columnWidth) {
-        super(offs, columnWidth);
+    public EncryptionHeaderView(EncryptionHeaderBlock block, long pos, int offs, int columnWidth, long totalDisks) {
+        super(offs, columnWidth, totalDisks);
         this.block = requireNotNull(block, "EncryptionHeaderView.centralDirectory");
         this.pos = pos;
     }
@@ -35,8 +35,8 @@ public final class EncryptionHeaderView extends BaseView {
         return true;
     }
 
-    public BlockAesEncryptionHeaderView createView(AesEncryptionHeaderBlock block) {
-        return new BlockAesEncryptionHeaderView(block, pos, offs, columnWidth);
+    public AesEncryptionHeaderView createView(AesEncryptionHeaderBlock block) {
+        return new AesEncryptionHeaderView(block, pos, offs, columnWidth, totalDisks);
     }
 
     public PkwareEncryptionHeaderView createView(PkwareEncryptionHeaderBlock block) {

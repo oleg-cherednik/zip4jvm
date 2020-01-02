@@ -21,7 +21,7 @@ public class PkwareEncryptionHeaderBlockViewTest {
     public void shouldRetrieveMultipleLinesWhenPkwareEncryptionHeader() throws IOException {
         PkwareEncryptionHeaderBlock block = mock(PkwareEncryptionHeaderBlock.class);
 
-        when(block.getSize()).thenReturn(12L);
+        when(block.getSize()).thenReturn(4L);
         when(block.getOffs()).thenReturn(60L);
         when(block.getData()).thenReturn(new byte[] { 0x0, 0x1, 0x2, 0x3 });
 
@@ -29,8 +29,8 @@ public class PkwareEncryptionHeaderBlockViewTest {
         assertThat(lines).hasSize(5);
         assertThat(lines[0]).isEqualTo("#2 (PKWARE) encryption header");
         assertThat(lines[1]).isEqualTo("-----------------------------");
-        assertThat(lines[2]).isEqualTo("  data:                                             60 (0x0000003C) bytes");
-        assertThat(lines[3]).isEqualTo("    - size:                                         12 bytes");
+        assertThat(lines[2]).isEqualTo("  - location:                                       60 (0x0000003C) bytes");
+        assertThat(lines[3]).isEqualTo("  - size:                                           4 bytes");
         assertThat(lines[4]).isEqualTo("  00 01 02 03");
     }
 
