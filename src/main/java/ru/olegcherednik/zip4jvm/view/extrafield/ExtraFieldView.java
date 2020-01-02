@@ -46,7 +46,7 @@ public final class ExtraFieldView extends BaseView {
     }
 
     public void printLocation(PrintStream out) {
-        printLine(out, "extra field:", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
+        printValueWithLocation1(out, "extra field:", block);
         printSize(extraField.getTotalRecords(), out);
     }
 
