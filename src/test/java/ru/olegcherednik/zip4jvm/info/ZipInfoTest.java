@@ -68,16 +68,38 @@ public class ZipInfoTest {
         assertThatFile(file).matchesResourceLines("/info/store_solid_aes.txt");
     }
 
-//    public void shouldRetrieveInfoWhenStoreSplit() throws IOException {
-//        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("actual.txt");
-//        Files.createDirectories(file.getParent());
-//
-//        try (PrintStream out = new PrintStream(file.toFile())) {
-//            ZipInfo.zip(TestData.zipStoreSplit).printShortInfo(out);
-//        }
-//
-//        assertThatFile(file).matchesResourceLines("/info/store_split.txt");
-//    }
+    public void shouldRetrieveInfoWhenStoreSplit() throws IOException {
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("actual.txt");
+        Files.createDirectories(file.getParent());
+
+        try (PrintStream out = new PrintStream(file.toFile())) {
+            ZipInfo.zip(TestData.zipStoreSplit).printShortInfo(out);
+        }
+
+        assertThatFile(file).matchesResourceLines("/info/store_split.txt");
+    }
+
+    public void shouldRetrieveInfoWhenStoreSplitPkware() throws IOException {
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("actual.txt");
+        Files.createDirectories(file.getParent());
+
+        try (PrintStream out = new PrintStream(file.toFile())) {
+            ZipInfo.zip(TestData.zipStoreSplitPkware).printShortInfo(out);
+        }
+
+        assertThatFile(file).matchesResourceLines("/info/store_split_pkware.txt");
+    }
+
+    public void shouldRetrieveInfoWhenStoreSplitAes() throws IOException {
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("actual.txt");
+        Files.createDirectories(file.getParent());
+
+        try (PrintStream out = new PrintStream(file.toFile())) {
+            ZipInfo.zip(TestData.zipStoreSplitAes).printShortInfo(out);
+        }
+
+        assertThatFile(file).matchesResourceLines("/info/store_split_aes.txt");
+    }
 
     private static ZipInfo zipInfo() {
         Path path = Paths.get("d:/zip4jvm/tmp/aes.zip");
