@@ -70,8 +70,8 @@ public class FileHeaderViewTest {
         assertThat(lines[25]).isEqualTo("    internal file attributes:                       0x0000");
         assertThat(lines[26]).isEqualTo("      apparent file type:                           binary");
         assertThat(lines[27]).isEqualTo("    external file attributes:                       0x00000020");
-        assertThat(lines[28]).isEqualTo("      MS-DOS file attributes (0x20):                arc");
-        assertThat(lines[29]).isEqualTo("      non-MSDOS file attributes (0x000000):         ?---------");
+        assertThat(lines[28]).isEqualTo("      WINDOWS (0x20):                               arc");
+        assertThat(lines[29]).isEqualTo("      POSIX (0x000000):                             ?---------");
     }
 
     public void shouldRetrieveExtraFieldLocationAndSizeWhenFileHeaderWithExtraField() throws IOException {
@@ -127,8 +127,8 @@ public class FileHeaderViewTest {
         assertThat(lines[25]).isEqualTo("    internal file attributes:                       0x0000");
         assertThat(lines[26]).isEqualTo("      apparent file type:                           binary");
         assertThat(lines[27]).isEqualTo("    external file attributes:                       0x00000020");
-        assertThat(lines[28]).isEqualTo("      MS-DOS file attributes (0x20):                arc");
-        assertThat(lines[29]).isEqualTo("      non-MSDOS file attributes (0x000000):         ?---------");
+        assertThat(lines[28]).isEqualTo("      WINDOWS (0x20):                               arc");
+        assertThat(lines[29]).isEqualTo("      POSIX (0x000000):                             ?---------");
         assertThat(lines[30]).isEqualTo("    extra field:                                    255603 (0x0003E673) bytes");
         assertThat(lines[31]).isEqualTo("      - size:                                       11 bytes (1 record)");
     }
@@ -176,8 +176,8 @@ public class FileHeaderViewTest {
         assertThat(lines[27]).isEqualTo("    internal file attributes:                       0x0000");
         assertThat(lines[28]).isEqualTo("      apparent file type:                           binary");
         assertThat(lines[29]).isEqualTo("    external file attributes:                       0x00000020");
-        assertThat(lines[30]).isEqualTo("      MS-DOS file attributes (0x20):                arc");
-        assertThat(lines[31]).isEqualTo("      non-MSDOS file attributes (0x000000):         ?---------");
+        assertThat(lines[30]).isEqualTo("      WINDOWS (0x20):                               arc");
+        assertThat(lines[31]).isEqualTo("      POSIX (0x000000):                             ?---------");
     }
 
     private static CentralDirectory.FileHeader createFileHeader(boolean extraField, String comment) {

@@ -62,6 +62,23 @@ import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT7;
 @SuppressWarnings("FieldNamingConvention")
 public class ExternalFileAttributesTest {
 
+    private static final int WINDOWS_READ_ONLY = BIT0;
+    private static final int WINDOWS_HIDDEN = BIT1;
+    private static final int WINDOWS_SYSTEM = BIT2;
+    private static final int WINDOWS_ARCHIVE = BIT5;
+
+    private static final int POSIX_OTHERS_EXECUTE = BIT0;
+    private static final int POSIX_OTHERS_WRITE = BIT1;
+    private static final int POSIX_OTHERS_READ = BIT2;
+    private static final int POSIX_GROUP_EXECUTE = BIT3;
+    private static final int POSIX_GROUP_WRITE = BIT4;
+    private static final int POSIX_GROUP_READ = BIT5;
+    private static final int POSIX_OWNER_EXECUTE = BIT6;
+    private static final int POSIX_OWNER_WRITE = BIT7;
+    private static final int POSIX_OWNER_READ = BIT0;
+    private static final int POSIX_DIRECTORY = BIT6;
+    private static final int POSIX_REGULAR_FILE = BIT7;
+
     private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ExternalFileAttributesTest.class);
 
     @BeforeClass
@@ -99,22 +116,22 @@ public class ExternalFileAttributesTest {
 
         when(dos.isReadOnly()).thenReturn(true);
         externalFileAttributes.readFrom(path);
-        assertThat(externalFileAttributes.getData()[0] & 0xFF).isEqualTo(BIT0);
+        assertThat(externalFileAttributes.getData()[0] & 0xFF).isEqualTo(WINDOWS_READ_ONLY);
         reset(dos);
 
         when(dos.isHidden()).thenReturn(true);
         externalFileAttributes.readFrom(path);
-        assertThat(externalFileAttributes.getData()[0] & 0xFF).isEqualTo(BIT1);
+        assertThat(externalFileAttributes.getData()[0] & 0xFF).isEqualTo(WINDOWS_HIDDEN);
         reset(dos);
 
         when(dos.isSystem()).thenReturn(true);
         externalFileAttributes.readFrom(path);
-        assertThat(externalFileAttributes.getData()[0] & 0xFF).isEqualTo(BIT2);
+        assertThat(externalFileAttributes.getData()[0] & 0xFF).isEqualTo(WINDOWS_SYSTEM);
         reset(dos);
 
         when(dos.isArchive()).thenReturn(true);
         externalFileAttributes.readFrom(path);
-        assertThat(externalFileAttributes.getData()[0] & 0xFF).isEqualTo(BIT5);
+        assertThat(externalFileAttributes.getData()[0] & 0xFF).isEqualTo(WINDOWS_ARCHIVE);
         reset(dos);
     }
 
@@ -136,84 +153,61 @@ public class ExternalFileAttributesTest {
 
         when(attributes.permissions()).thenReturn(Collections.singleton(OTHERS_EXECUTE));
         externalFileAttributes.readFrom(path);
-        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(BIT0);
+        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(POSIX_OTHERS_EXECUTE);
         reset(attributes);
 
         when(attributes.permissions()).thenReturn(Collections.singleton(OTHERS_WRITE));
         externalFileAttributes.readFrom(path);
-        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(BIT1);
+        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(POSIX_OTHERS_WRITE);
         reset(attributes);
 
         when(attributes.permissions()).thenReturn(Collections.singleton(OTHERS_READ));
         externalFileAttributes.readFrom(path);
-        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(BIT2);
+        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(POSIX_OTHERS_READ);
         reset(attributes);
 
         when(attributes.permissions()).thenReturn(Collections.singleton(GROUP_EXECUTE));
         externalFileAttributes.readFrom(path);
-        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(BIT3);
+        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(POSIX_GROUP_EXECUTE);
         reset(attributes);
 
         when(attributes.permissions()).thenReturn(Collections.singleton(GROUP_WRITE));
         externalFileAttributes.readFrom(path);
-        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(BIT4);
+        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(POSIX_GROUP_WRITE);
         reset(attributes);
 
         when(attributes.permissions()).thenReturn(Collections.singleton(GROUP_READ));
         externalFileAttributes.readFrom(path);
-        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(BIT5);
+        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(POSIX_GROUP_READ);
         reset(attributes);
 
         when(attributes.permissions()).thenReturn(Collections.singleton(OWNER_EXECUTE));
         externalFileAttributes.readFrom(path);
-        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(BIT6);
+        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(POSIX_OWNER_EXECUTE);
         reset(attributes);
 
         when(attributes.permissions()).thenReturn(Collections.singleton(OWNER_WRITE));
         externalFileAttributes.readFrom(path);
-        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(BIT7);
+        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(POSIX_OWNER_WRITE);
         reset(attributes);
 
         when(attributes.permissions()).thenReturn(Collections.singleton(OWNER_READ));
         externalFileAttributes.readFrom(path);
-        assertThat(externalFileAttributes.getData()[3] & 0xFF).isEqualTo(BIT0);
+        assertThat(externalFileAttributes.getData()[3] & 0xFF).isEqualTo(POSIX_OWNER_READ);
         reset(attributes);
 
         when(basicFileAttributes.isDirectory()).thenReturn(true);
         externalFileAttributes.readFrom(path);
-        assertThat(externalFileAttributes.getData()[3] & 0xFF).isEqualTo(BIT6);
+        assertThat(externalFileAttributes.getData()[3] & 0xFF).isEqualTo(POSIX_DIRECTORY);
         reset(basicFileAttributes);
 
         when(basicFileAttributes.isRegularFile()).thenReturn(true);
         externalFileAttributes.readFrom(path);
-        assertThat(externalFileAttributes.getData()[3] & 0xFF).isEqualTo(BIT7);
+        assertThat(externalFileAttributes.getData()[3] & 0xFF).isEqualTo(POSIX_REGULAR_FILE);
         reset(basicFileAttributes);
     }
 
     public void shouldRetrievePosixInstanceWhenMacOrUnixSystem() throws IOException {
-        Path path = mock(Path.class);
-        FileSystem fileSystem = mock(FileSystem.class);
-        FileSystemProvider provider = mock(FileSystemProvider.class);
-        PosixFileAttributeView fileAttributeView = mock(PosixFileAttributeView.class);
-        BasicFileAttributes basicFileAttributes = mock(BasicFileAttributes.class);
-        PosixFileAttributes attributes = mock(PosixFileAttributes.class);
-
-        when(path.getFileSystem()).thenReturn(fileSystem);
-        when(fileSystem.provider()).thenReturn(provider);
-        when(provider.getFileAttributeView(same(path), same(PosixFileAttributeView.class), any())).thenReturn(fileAttributeView);
-        when(provider.readAttributes(same(path), same(BasicFileAttributes.class), any())).thenReturn(basicFileAttributes);
-        when(fileAttributeView.readAttributes()).thenReturn(attributes);
-        when(basicFileAttributes.isDirectory()).thenReturn(false);
-        when(basicFileAttributes.isRegularFile()).thenReturn(true);
-        when(attributes.permissions()).thenReturn(Collections.emptySet());
-
-        for (String osName : Arrays.asList(MAC, UNIX)) {
-            ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.build(() -> osName).readFrom(path);
-            assertThat(externalFileAttributes.toString()).isEqualTo("posix");
-        }
-    }
-
-    public void shouldRetrievePosixInstanceWhenMacOrUnixSystem1() throws IOException {
         Path path = mock(Path.class);
         FileSystem fileSystem = mock(FileSystem.class);
         FileSystemProvider provider = mock(FileSystemProvider.class);
@@ -254,55 +248,18 @@ public class ExternalFileAttributesTest {
         verify(path, never()).getFileSystem();
     }
 
-    public void shouldReadFromByteArrayWenWindows() {
+    public void shouldReadFromByteArrayWhenWindows() {
         ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.build(() -> WIN);
 
-        for (int b0 : Arrays.asList(BIT0, BIT1, BIT2, BIT5)) {
+        for (int b0 : Arrays.asList(WINDOWS_READ_ONLY, WINDOWS_HIDDEN, WINDOWS_SYSTEM, WINDOWS_ARCHIVE)) {
             externalFileAttributes.readFrom(new byte[] { (byte)b0, 0x0, 0x0, 0x0 });
             assertThat(externalFileAttributes.getData()[0] & 0xFF).isEqualTo(b0);
         }
 
-        externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, (byte)BitUtils.clearBits(0xFF, BIT1 | BIT4 | BIT7), 0x0 });
-        assertThat(externalFileAttributes.getData()[0] & 0xFF).isEqualTo(BIT5);
+        externalFileAttributes.readFrom(new byte[] { 0x0, 0x0,
+                (byte)BitUtils.clearBits(0xFF, POSIX_OTHERS_WRITE | POSIX_GROUP_WRITE | POSIX_OWNER_WRITE), 0x0 });
+        assertThat(externalFileAttributes.getData()[0] & 0xFF).isEqualTo(WINDOWS_ARCHIVE);
     }
-
-//    TODO commented tests
-//    public void shouldReadFromByteArrayWenPosix() {
-//        ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.build(() -> MAC);
-//
-//        for (int b2 : Arrays.asList(BIT0, BIT1, BIT2, BIT3, BIT4, BIT5, BIT6, BIT7)) {
-//            externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, (byte)b2, 0x0 });
-//            assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(b2);
-//            assertThat(externalFileAttributes.getData()[3] & 0xFF).isEqualTo(0x0);
-//        }
-//
-//        externalFileAttributes.readFrom(new byte[] { BIT0, 0x0, 0x0, 0x0 });
-//        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(BIT2 | BIT5);
-//        assertThat(externalFileAttributes.getData()[3] & 0xFF).isEqualTo(BIT0 | BIT7);
-//
-//        externalFileAttributes.readFrom(new byte[] { (byte)BitUtils.clearBits(0xFF, BIT0), 0x0, 0x0, 0x0 });
-//        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(BIT2 | BIT5 | BIT7);
-//        assertThat(externalFileAttributes.getData()[3] & 0xFF).isEqualTo(BIT0 | BIT7);
-//
-//        externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, 0x0, BIT6 });
-//        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(0x0);
-//        assertThat(externalFileAttributes.getData()[3] & 0xFF).isEqualTo(BIT6);
-//
-//        externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, 0x0, (byte)BIT7 });
-//        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(0x0);
-//        assertThat(externalFileAttributes.getData()[3] & 0xFF).isEqualTo(BIT7);
-//    }
-
-//    public void shouldRestoreDefaultWhenReadFromEmptyByteArray() {
-//        ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.build(() -> WIN);
-//        externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, 0x0, 0x0 });
-//        assertThat(externalFileAttributes.getData()[0] & 0xFF).isEqualTo(BIT5);
-//
-//        externalFileAttributes = ExternalFileAttributes.build(() -> MAC);
-//        externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, 0x0, 0x0 });
-//        assertThat(externalFileAttributes.getData()[2] & 0xFF).isEqualTo(BIT2 | BIT5 | BIT7);
-//        assertThat(externalFileAttributes.getData()[3] & 0xFF).isEqualTo(BIT0 | BIT7);
-//    }
 
     public void shouldApplyPathWhenWindows() throws IOException {
         Path path = mock(Path.class);
@@ -316,22 +273,22 @@ public class ExternalFileAttributesTest {
 
         ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.build(() -> WIN);
 
-        externalFileAttributes.readFrom(new byte[] { BIT0, 0x0, 0x0, 0x0 });
+        externalFileAttributes.readFrom(new byte[] { WINDOWS_READ_ONLY, 0x0, 0x0, 0x0 });
         externalFileAttributes.apply(path);
         verify(dos, times(1)).setReadOnly(eq(true));
         reset(dos);
 
-        externalFileAttributes.readFrom(new byte[] { BIT1, 0x0, 0x0, 0x0 });
+        externalFileAttributes.readFrom(new byte[] { WINDOWS_HIDDEN, 0x0, 0x0, 0x0 });
         externalFileAttributes.apply(path);
         verify(dos, times(1)).setHidden(eq(true));
         reset(dos);
 
-        externalFileAttributes.readFrom(new byte[] { BIT2, 0x0, 0x0, 0x0 });
+        externalFileAttributes.readFrom(new byte[] { WINDOWS_SYSTEM, 0x0, 0x0, 0x0 });
         externalFileAttributes.apply(path);
         verify(dos, times(1)).setSystem(eq(true));
         reset(dos);
 
-        externalFileAttributes.readFrom(new byte[] { BIT5, 0x0, 0x0, 0x0 });
+        externalFileAttributes.readFrom(new byte[] { WINDOWS_ARCHIVE, 0x0, 0x0, 0x0 });
         externalFileAttributes.apply(path);
         verify(dos, times(1)).setArchive(eq(true));
         reset(dos);
@@ -356,59 +313,108 @@ public class ExternalFileAttributesTest {
         Class<Set<PosixFilePermission>> listClass = (Class<Set<PosixFilePermission>>)(Class<?>)Set.class;
         ArgumentCaptor<Set<PosixFilePermission>> captor = ArgumentCaptor.forClass(listClass);
 
-        externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, BIT0, 0x0 });
+        externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, POSIX_OTHERS_EXECUTE, 0x0 });
         externalFileAttributes.apply(path);
         verify(fileAttributeView).setPermissions(captor.capture());
         assertThat(captor.getValue()).containsExactly(OTHERS_EXECUTE);
         reset(fileAttributeView);
 
-        externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, BIT1, 0x0 });
+        externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, POSIX_OTHERS_WRITE, 0x0 });
         externalFileAttributes.apply(path);
         verify(fileAttributeView).setPermissions(captor.capture());
         assertThat(captor.getValue()).containsExactly(OTHERS_WRITE);
         reset(fileAttributeView);
 
-        externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, BIT2, 0x0 });
+        externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, POSIX_OTHERS_READ, 0x0 });
         externalFileAttributes.apply(path);
         verify(fileAttributeView).setPermissions(captor.capture());
         assertThat(captor.getValue()).containsExactly(OTHERS_READ);
         reset(fileAttributeView);
 
-        externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, BIT3, 0x0 });
+        externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, POSIX_GROUP_EXECUTE, 0x0 });
         externalFileAttributes.apply(path);
         verify(fileAttributeView).setPermissions(captor.capture());
         assertThat(captor.getValue()).containsExactly(GROUP_EXECUTE);
         reset(fileAttributeView);
 
-        externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, BIT4, 0x0 });
+        externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, POSIX_GROUP_WRITE, 0x0 });
         externalFileAttributes.apply(path);
         verify(fileAttributeView).setPermissions(captor.capture());
         assertThat(captor.getValue()).containsExactly(GROUP_WRITE);
         reset(fileAttributeView);
 
-        externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, BIT5, 0x0 });
+        externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, POSIX_GROUP_READ, 0x0 });
         externalFileAttributes.apply(path);
         verify(fileAttributeView).setPermissions(captor.capture());
         assertThat(captor.getValue()).containsExactly(GROUP_READ);
         reset(fileAttributeView);
 
-        externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, BIT6, 0x0 });
+        externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, POSIX_OWNER_EXECUTE, 0x0 });
         externalFileAttributes.apply(path);
         verify(fileAttributeView).setPermissions(captor.capture());
         assertThat(captor.getValue()).containsExactly(OWNER_EXECUTE);
         reset(fileAttributeView);
 
-        externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, (byte)BIT7, 0x0 });
+        externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, (byte)POSIX_OWNER_WRITE, 0x0 });
         externalFileAttributes.apply(path);
         verify(fileAttributeView).setPermissions(captor.capture());
         assertThat(captor.getValue()).containsExactly(OWNER_WRITE);
         reset(fileAttributeView);
 
-        externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, 0x0, BIT0 });
+        externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, 0x0, POSIX_OWNER_READ });
         externalFileAttributes.apply(path);
         verify(fileAttributeView).setPermissions(captor.capture());
         assertThat(captor.getValue()).containsExactly(OWNER_READ);
         reset(fileAttributeView);
+    }
+
+    public void shouldUseDefaultPermissionsForPosixWhenFileWasCreatedUnderWindows() throws IOException {
+        ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.build(() -> MAC);
+        String details = externalFileAttributes.readFrom(new byte[] { WINDOWS_READ_ONLY | WINDOWS_ARCHIVE, 0x0, 0x0, 0x0 }).getDetails();
+        assertThat(details).isEqualTo("?---------");
+
+        Path path = mock(Path.class);
+        FileSystem fileSystem = mock(FileSystem.class);
+        FileSystemProvider provider = mock(FileSystemProvider.class);
+        PosixFileAttributeView fileAttributeView = mock(PosixFileAttributeView.class);
+        BasicFileAttributes basicFileAttributes = mock(BasicFileAttributes.class);
+        PosixFileAttributes attributes = mock(PosixFileAttributes.class);
+
+        when(path.getFileSystem()).thenReturn(fileSystem);
+        when(fileSystem.provider()).thenReturn(provider);
+        when(provider.getFileAttributeView(same(path), same(PosixFileAttributeView.class), any())).thenReturn(fileAttributeView);
+        when(provider.readAttributes(same(path), same(BasicFileAttributes.class), any())).thenReturn(basicFileAttributes);
+        when(fileAttributeView.readAttributes()).thenReturn(attributes);
+
+        Class<Set<PosixFilePermission>> listClass = (Class<Set<PosixFilePermission>>)(Class<?>)Set.class;
+        ArgumentCaptor<Set<PosixFilePermission>> captor = ArgumentCaptor.forClass(listClass);
+
+        externalFileAttributes.apply(path);
+
+        verify(fileAttributeView).setPermissions(captor.capture());
+        assertThat(captor.getValue()).containsExactly(OWNER_READ, GROUP_READ, OTHERS_READ);
+    }
+
+    public void shouldUseDefaultPermissionsForWindowsWhenFileWasCreatedUnderPosix() throws IOException {
+        ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.build(() -> WIN);
+        String details = externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, 0x0, POSIX_OWNER_READ }).getDetails();
+        assertThat(details).isEqualTo("none");
+
+        Path path = mock(Path.class);
+        FileSystem fileSystem = mock(FileSystem.class);
+        FileSystemProvider provider = mock(FileSystemProvider.class);
+        DosFileAttributeView dos = mock(DosFileAttributeView.class);
+
+        when(path.getFileSystem()).thenReturn(fileSystem);
+        when(fileSystem.provider()).thenReturn(provider);
+        when(provider.getFileAttributeView(same(path), same(DosFileAttributeView.class), any())).thenReturn(dos);
+
+        externalFileAttributes.apply(path);
+
+        verify(dos, times(1)).setReadOnly(eq(true));
+        verify(dos, times(1)).setHidden(eq(false));
+        verify(dos, times(1)).setSystem(eq(false));
+        verify(dos, times(1)).setArchive(eq(true));
     }
 
 }

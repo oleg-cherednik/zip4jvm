@@ -1,11 +1,8 @@
-package ru.olegcherednik.zip4jvm.info;
+package ru.olegcherednik.zip4jvm;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.TestData;
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.ZipInfo;
 
 import java.io.IOException;
 import java.io.PrintStream;

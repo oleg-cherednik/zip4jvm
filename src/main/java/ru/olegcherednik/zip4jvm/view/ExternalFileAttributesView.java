@@ -3,7 +3,8 @@ package ru.olegcherednik.zip4jvm.view;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 
 import java.io.PrintStream;
-import java.util.Objects;
+
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
 /**
  * @author Oleg Cherednik
@@ -17,7 +18,7 @@ public final class ExternalFileAttributesView extends BaseView {
         super(offs, columnWidth);
         this.externalFileAttributes = externalFileAttributes;
 
-        Objects.requireNonNull(externalFileAttributes, "'externalFileAttributes' must not be null");
+        requireNotNull(externalFileAttributes, "ExternalFileAttributesView.externalFileAttributes");
     }
 
     @Override
@@ -28,8 +29,8 @@ public final class ExternalFileAttributesView extends BaseView {
         String posix = ExternalFileAttributes.build(() -> ExternalFileAttributes.UNIX).readFrom(data).getDetails();
 
         printLine(out, "external file attributes:", String.format("0x%08X", val));
-        printLine(out, String.format("  MS-DOS file attributes (0x%02X):", val & 0xFF), win);
-        printLine(out, String.format("  non-MSDOS file attributes (0x%06X):", val >> 8), posix);
+        printLine(out, String.format("  WINDOWS (0x%02X):", val & 0xFF), win);
+        printLine(out, String.format("  POSIX (0x%06X):", val >> 8), posix);
 
         return true;
     }

@@ -46,8 +46,8 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      MS-DOS file attributes (0x20):                arc
-<-- ignore_line -->      non-MSDOS file attributes (0x000000):         ?---------
+<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      POSIX (0x000000):                             ?---------
 
 #2 (PK0102) [UTF-8] bikes/honda-cbr600rr.jpg
 --------------------------------------------
@@ -77,8 +77,8 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      MS-DOS file attributes (0x20):                arc
-<-- ignore_line -->      non-MSDOS file attributes (0x000000):         ?---------
+<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      POSIX (0x000000):                             ?---------
 
 #3 (PK0102) [UTF-8] bikes/kawasaki-ninja-300.jpg
 ------------------------------------------------
@@ -108,8 +108,8 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      MS-DOS file attributes (0x20):                arc
-<-- ignore_line -->      non-MSDOS file attributes (0x000000):         ?---------
+<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      POSIX (0x000000):                             ?---------
 
 #4 (PK0102) [UTF-8] bikes/suzuki-gsxr750.jpg
 --------------------------------------------
@@ -139,8 +139,8 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      MS-DOS file attributes (0x20):                arc
-<-- ignore_line -->      non-MSDOS file attributes (0x000000):         ?---------
+<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      POSIX (0x000000):                             ?---------
 
 #5 (PK0102) [UTF-8] cars/bentley-continental.jpg
 ------------------------------------------------
@@ -170,8 +170,8 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      MS-DOS file attributes (0x20):                arc
-<-- ignore_line -->      non-MSDOS file attributes (0x000000):         ?---------
+<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      POSIX (0x000000):                             ?---------
 
 #6 (PK0102) [UTF-8] cars/ferrari-458-italia.jpg
 -----------------------------------------------
@@ -201,8 +201,8 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      MS-DOS file attributes (0x20):                arc
-<-- ignore_line -->      non-MSDOS file attributes (0x000000):         ?---------
+<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      POSIX (0x000000):                             ?---------
 
 #7 (PK0102) [UTF-8] cars/wiesmann-gt-mf5.jpg
 --------------------------------------------
@@ -232,8 +232,8 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      MS-DOS file attributes (0x20):                arc
-<-- ignore_line -->      non-MSDOS file attributes (0x000000):         ?---------
+<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      POSIX (0x000000):                             ?---------
 
 #8 (PK0102) [UTF-8] empty_dir/
 ------------------------------
@@ -263,7 +263,7 @@
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000010
 <-- ignore_line -->      MS-DOS file attributes (0x10):                dir
-<-- ignore_line -->      non-MSDOS file attributes (0x000000):         ?---------
+<-- ignore_line -->      POSIX (0x000000):                             ?---------
 
 #9 (PK0102) [UTF-8] empty_file.txt
 ----------------------------------
@@ -292,8 +292,8 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      MS-DOS file attributes (0x20):                arc
-<-- ignore_line -->      non-MSDOS file attributes (0x000000):         ?---------
+<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      POSIX (0x000000):                             ?---------
 
 #10 (PK0102) [UTF-8] mcdonnell-douglas-f15-eagle.jpg
 ----------------------------------------------------
@@ -323,8 +323,8 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      MS-DOS file attributes (0x20):                arc
-<-- ignore_line -->      non-MSDOS file attributes (0x000000):         ?---------
+<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      POSIX (0x000000):                             ?---------
 
 #11 (PK0102) [UTF-8] Oleg Cherednik.txt
 ---------------------------------------
@@ -354,8 +354,8 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      MS-DOS file attributes (0x20):                arc
-<-- ignore_line -->      non-MSDOS file attributes (0x000000):         ?---------
+<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      POSIX (0x000000):                             ?---------
 
 #12 (PK0102) [UTF-8] saint-petersburg.jpg
 -----------------------------------------
@@ -385,8 +385,8 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      MS-DOS file attributes (0x20):                arc
-<-- ignore_line -->      non-MSDOS file attributes (0x000000):         ?---------
+<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      POSIX (0x000000):                             ?---------
 
 #13 (PK0102) [UTF-8] sig-sauer-pistol.jpg
 -----------------------------------------
@@ -416,8 +416,8 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      MS-DOS file attributes (0x20):                arc
-<-- ignore_line -->      non-MSDOS file attributes (0x000000):         ?---------
+<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      POSIX (0x000000):                             ?---------
 
 (PK0304) ZIP entries
 ====================
