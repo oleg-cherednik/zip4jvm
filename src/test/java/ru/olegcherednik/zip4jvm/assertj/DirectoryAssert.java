@@ -1,13 +1,17 @@
 package ru.olegcherednik.zip4jvm.assertj;
 
+import org.apache.commons.io.FilenameUtils;
 import org.assertj.core.api.AbstractFileAssert;
 import org.assertj.core.internal.Failures;
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Consumer;
+
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
 
 /**
  * @author Oleg Cherednik
@@ -79,6 +83,21 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
     private long getRegularFilesAmount() {
         try {
             return Files.list(actual.toPath()).filter(path -> Files.isRegularFile(path)).count();
+        } catch(IOException e) {
+            throw new Zip4jvmException(e);
+        }
+    }
+
+    public DirectoryAssert matchesResourceDirectory(String prefix) {
+        try {
+            for (String name : Zip4jvmSuite.getResourceFiles(prefix)) {
+                Path file = actual.toPath().resolve(name);
+                assertThatFile(file).exists();
+
+                if (!"data".equalsIgnoreCase(FilenameUtils.getExtension(file.getFileName().toString())))
+                    assertThatFile(file).matchesResourceLines(prefix + '/' + name);
+            }
+            return this;
         } catch(IOException e) {
             throw new Zip4jvmException(e);
         }

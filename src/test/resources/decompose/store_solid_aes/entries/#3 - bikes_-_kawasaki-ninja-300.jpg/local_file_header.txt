@@ -1,0 +1,22 @@
+#3 (PK0304) [UTF-8] bikes/kawasaki-ninja-300.jpg
+------------------------------------------------
+    - location:                                     448630 (0x0006D876) bytes
+    - size:                                         69 bytes
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (99):                        AES encryption
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F44 0x6344):          2019-10-04 12:26:08
+    32-bit CRC value:                               0x00000000
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
+    length of filename:                             28
+                                                    UTF-8
+    62 69 6B 65 73 2F 6B 61 77 61 73 61 6B 69 2D 6E bikes/kawasaki-n
+    69 6E 6A 61 2D 33 30 30 2E 6A 70 67             inja-300.jpg
+    extra field:                                    448688 (0x0006D8B0) bytes
+      - size:                                       11 bytes (1 record)

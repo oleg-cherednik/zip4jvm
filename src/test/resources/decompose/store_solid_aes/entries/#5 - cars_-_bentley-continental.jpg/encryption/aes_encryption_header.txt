@@ -1,0 +1,11 @@
+#5 (AES) encryption header
+--------------------------
+    salt:                                           903288 (0x000DC878) bytes
+      - size:                                       12 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){11}[0-9A-F]{2}$) -->    55 36 69 98 D1 7C 6E 5C A8 E4 9D 53
+    password checksum:                              903300 (0x000DC884) bytes
+      - size:                                       2 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} )[0-9A-F]{2}$) -->    D4 9F
+    mac:                                            2298664 (0x00231328) bytes
+      - size:                                       10 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){9}[0-9A-F]{2}$) -->    D5 3F 62 06 50 BA 71 95 69 52

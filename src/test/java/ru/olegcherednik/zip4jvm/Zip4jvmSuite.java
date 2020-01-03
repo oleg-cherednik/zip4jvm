@@ -8,15 +8,18 @@ import org.testng.annotations.BeforeSuite;
 import ru.olegcherednik.zip4jvm.data.DefalteZipData;
 import ru.olegcherednik.zip4jvm.data.StoreZipData;
 import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -158,6 +161,15 @@ public class Zip4jvmSuite {
             assertThat(view.print(out)).isTrue();
             return new String(os.toByteArray(), Charsets.UTF_8).split(System.lineSeparator());
         }
+    }
+
+    public static Set<String> getResourceFiles(String name) throws IOException {
+        Path parent = new File(Zip4jvmSuite.class.getResource(name).getPath()).toPath();
+
+        return Files.walk(parent)
+                    .filter(path -> Files.isRegularFile(path))
+                    .map(path -> ZipUtils.normalizeFileName(parent.relativize(path).toString()))
+                    .collect(Collectors.toSet());
     }
 
 }

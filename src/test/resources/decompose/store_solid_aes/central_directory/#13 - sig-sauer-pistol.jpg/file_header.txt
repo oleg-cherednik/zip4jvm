@@ -1,0 +1,32 @@
+#13 (PK0102) [UTF-8] sig-sauer-pistol.jpg
+-----------------------------------------
+    - location:                                     5482029 (0x0053A62D) bytes
+    - size:                                         77 bytes
+    part number of this part (0000):                1
+    relative offset of local header:                5049499 (0x004D0C9B) bytes
+    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+    version made by zip software (20):              2.0
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (99):                        AES encryption
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+    32-bit CRC value:                               0x00000000
+    compressed size:                                431502 bytes
+    uncompressed size:                              431478 bytes
+    length of filename:                             20
+                                                    UTF-8
+    73 69 67 2D 73 61 75 65 72 2D 70 69 73 74 6F 6C sig-sauer-pistol
+    2E 6A 70 67                                     .jpg
+    length of file comment:                         0 bytes
+    internal file attributes:                       0x0000
+      apparent file type:                           binary
+<-- ignore_line -->    external file attributes:                       0x00000020
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
+<-- ignore_line -->      POSIX (0x000000):                             ?---------
+    extra field:                                    5482095 (0x0053A66F) bytes
+      - size:                                       11 bytes (1 record)

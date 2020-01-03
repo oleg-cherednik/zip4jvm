@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
 
 /**
@@ -98,17 +99,26 @@ public class ZipInfoTest {
         assertThatFile(file).matchesResourceLines("/info/store_split_aes.txt");
     }
 
-//    public void shouldDecomposeWhenStoreSolid() throws IOException {
+    public void shouldDecomposeWhenStoreSolid() throws IOException {
+        Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Files.createDirectories(dir.getParent());
+        ZipInfo.zip(TestData.zipStoreSolid).decompose(dir);
+        assertThatDirectory(dir).matchesResourceDirectory("/decompose/store_solid");
+    }
+
+//    public void shouldDecomposeWhenStoreSolidPkware() throws IOException {
 //        Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 //        Files.createDirectories(dir.getParent());
-//        ZipInfo.zip(TestData.zipStoreSolid).decompose(dir);
-//
-//
-//
-//
-//
-////        assertThatFile(dir).matchesResourceLines("/info/store_solid.txt");
+//        ZipInfo.zip(TestData.zipStoreSolidPkware).decompose(dir);
+//        assertThatDirectory(dir).matchesResourceDirectory("/decompose/store_solid_pkware");
 //    }
+
+    public void shouldDecomposeWhenStoreSolidAes() throws IOException {
+        Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Files.createDirectories(dir.getParent());
+        ZipInfo.zip(TestData.zipStoreSolidAes).decompose(dir);
+        assertThatDirectory(dir).matchesResourceDirectory("/decompose/store_solid_aes");
+    }
 
     private static ZipInfo zipInfo() {
         Path path = Paths.get("d:/zip4jvm/tmp/aes.zip");

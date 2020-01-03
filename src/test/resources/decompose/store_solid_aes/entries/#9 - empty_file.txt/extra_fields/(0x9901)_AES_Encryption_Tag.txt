@@ -1,0 +1,5 @@
+(0x9901) AES Encryption Tag:                        3349514 (0x00331C0A) bytes
+  - size:                                           11 bytes
+  Encryption Tag Version:                           AE-2
+  Encryption Key Bits:                              192
+  compression method (00):                          none (stored)
