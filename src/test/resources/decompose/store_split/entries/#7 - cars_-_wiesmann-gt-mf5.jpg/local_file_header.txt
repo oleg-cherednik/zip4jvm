@@ -1,0 +1,21 @@
+#7 (PK0304) [UTF-8] cars/wiesmann-gt-mf5.jpg
+--------------------------------------------
+    - disk (0002):                                  src.z03
+    - location:                                     522334 (0x0007F85E) bytes
+    - size:                                         54 bytes
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0808) (bit 15..0):  0000.1000 0000.1000
+      file security status  (bit 0):                not encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (00):                        none (stored)
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+    32-bit CRC value:                               0x00000000
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
+    length of filename:                             24
+                                                    UTF-8
+    63 61 72 73 2F 77 69 65 73 6D 61 6E 6E 2D 67 74 cars/wiesmann-gt
+    2D 6D 66 35 2E 6A 70 67                         -mf5.jpg
