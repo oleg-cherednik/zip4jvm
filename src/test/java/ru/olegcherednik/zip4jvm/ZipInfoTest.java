@@ -98,6 +98,18 @@ public class ZipInfoTest {
         assertThatFile(file).matchesResourceLines("/info/store_split_aes.txt");
     }
 
+//    public void shouldDecomposeWhenStoreSolid() throws IOException {
+//        Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+//        Files.createDirectories(dir.getParent());
+//        ZipInfo.zip(TestData.zipStoreSolid).decompose(dir);
+//
+//
+//
+//
+//
+////        assertThatFile(dir).matchesResourceLines("/info/store_solid.txt");
+//    }
+
     private static ZipInfo zipInfo() {
         Path path = Paths.get("d:/zip4jvm/tmp/aes.zip");
 //        Files.deleteIfExists(path);

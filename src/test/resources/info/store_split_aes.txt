@@ -50,7 +50,7 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
 <-- ignore_line -->      POSIX (0x000000):                             ?---------
     extra field:                                    238230 (0x0003A296) bytes
       - disk (0005):                                src.zip
@@ -91,7 +91,7 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
 <-- ignore_line -->      POSIX (0x000000):                             ?---------
     extra field:                                    238311 (0x0003A2E7) bytes
       - disk (0005):                                src.zip
@@ -132,7 +132,7 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
 <-- ignore_line -->      POSIX (0x000000):                             ?---------
     extra field:                                    238396 (0x0003A33C) bytes
       - disk (0005):                                src.zip
@@ -173,7 +173,7 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
 <-- ignore_line -->      POSIX (0x000000):                             ?---------
     extra field:                                    238477 (0x0003A38D) bytes
       - disk (0005):                                src.zip
@@ -214,7 +214,7 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
 <-- ignore_line -->      POSIX (0x000000):                             ?---------
     extra field:                                    238562 (0x0003A3E2) bytes
       - disk (0005):                                src.zip
@@ -255,7 +255,7 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
 <-- ignore_line -->      POSIX (0x000000):                             ?---------
     extra field:                                    238646 (0x0003A436) bytes
       - disk (0005):                                src.zip
@@ -296,7 +296,7 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
 <-- ignore_line -->      POSIX (0x000000):                             ?---------
     extra field:                                    238727 (0x0003A487) bytes
       - disk (0005):                                src.zip
@@ -367,7 +367,7 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
 <-- ignore_line -->      POSIX (0x000000):                             ?---------
     extra field:                                    238854 (0x0003A506) bytes
       - disk (0005):                                src.zip
@@ -408,7 +408,7 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
 <-- ignore_line -->      POSIX (0x000000):                             ?---------
     extra field:                                    238942 (0x0003A55E) bytes
       - disk (0005):                                src.zip
@@ -449,7 +449,7 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
 <-- ignore_line -->      POSIX (0x000000):                             ?---------
     extra field:                                    239017 (0x0003A5A9) bytes
       - disk (0005):                                src.zip
@@ -490,7 +490,7 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
 <-- ignore_line -->      POSIX (0x000000):                             ?---------
     extra field:                                    239094 (0x0003A5F6) bytes
       - disk (0005):                                src.zip
@@ -531,7 +531,7 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
 <-- ignore_line -->      POSIX (0x000000):                             ?---------
     extra field:                                    239171 (0x0003A643) bytes
       - disk (0005):                                src.zip

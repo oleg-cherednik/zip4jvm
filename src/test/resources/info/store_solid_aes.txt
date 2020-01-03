@@ -237,7 +237,7 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
 <-- ignore_line -->      POSIX (0x000000):                             ?---------
     extra field:                                    5481570 (0x0053A462) bytes
       - size:                                       11 bytes (1 record)
@@ -275,7 +275,7 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
 <-- ignore_line -->      POSIX (0x000000):                             ?---------
     extra field:                                    5481651 (0x0053A4B3) bytes
       - size:                                       11 bytes (1 record)
@@ -342,7 +342,7 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
 <-- ignore_line -->      POSIX (0x000000):                             ?---------
     extra field:                                    5481778 (0x0053A532) bytes
       - size:                                       11 bytes (1 record)
@@ -380,7 +380,7 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
 <-- ignore_line -->      POSIX (0x000000):                             ?---------
     extra field:                                    5481866 (0x0053A58A) bytes
       - size:                                       11 bytes (1 record)
@@ -418,7 +418,7 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
 <-- ignore_line -->      POSIX (0x000000):                             ?---------
     extra field:                                    5481941 (0x0053A5D5) bytes
       - size:                                       11 bytes (1 record)
@@ -456,7 +456,7 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
 <-- ignore_line -->      POSIX (0x000000):                             ?---------
     extra field:                                    5482018 (0x0053A622) bytes
       - size:                                       11 bytes (1 record)
@@ -494,7 +494,7 @@
     internal file attributes:                       0x0000
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
-<-- ignore_line -->      WINDOWS (0x20):                               arc
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
 <-- ignore_line -->      POSIX (0x000000):                             ?---------
     extra field:                                    5482095 (0x0053A66F) bytes
       - size:                                       11 bytes (1 record)

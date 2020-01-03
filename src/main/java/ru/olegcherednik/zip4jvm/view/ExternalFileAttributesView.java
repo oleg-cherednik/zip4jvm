@@ -29,7 +29,7 @@ public final class ExternalFileAttributesView extends BaseView {
         String posix = ExternalFileAttributes.build(() -> ExternalFileAttributes.UNIX).readFrom(data).getDetails();
 
         printLine(out, "external file attributes:", String.format("0x%08X", val));
-        printLine(out, String.format("  WINDOWS (0x%02X):", val & 0xFF), win);
+        printLine(out, String.format("  WINDOWS   (0x%02X):", val & 0xFF), win);
         printLine(out, String.format("  POSIX (0x%06X):", val >> 8), posix);
 
         return true;
