@@ -106,12 +106,12 @@ public class ZipInfoTest {
         assertThatDirectory(dir).matchesResourceDirectory("/decompose/store_solid");
     }
 
-//    public void shouldDecomposeWhenStoreSolidPkware() throws IOException {
-//        Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-//        Files.createDirectories(dir.getParent());
-//        ZipInfo.zip(TestData.zipStoreSolidPkware).decompose(dir);
-//        assertThatDirectory(dir).matchesResourceDirectory("/decompose/store_solid_pkware");
-//    }
+    public void shouldDecomposeWhenStoreSolidPkware() throws IOException {
+        Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Files.createDirectories(dir.getParent());
+        ZipInfo.zip(TestData.zipStoreSolidPkware).decompose(dir);
+        assertThatDirectory(dir).matchesResourceDirectory("/decompose/store_solid_pkware");
+    }
 
     public void shouldDecomposeWhenStoreSolidAes() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);

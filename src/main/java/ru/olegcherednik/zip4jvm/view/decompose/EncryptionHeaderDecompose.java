@@ -42,7 +42,6 @@ public final class EncryptionHeaderDecompose implements Decompose {
 
         Path subDir = Files.createDirectories(dir.resolve("encryption"));
 
-
         // TODO probably same with block reader
         if (encryption == Encryption.AES_128 || encryption == Encryption.AES_192 || encryption == Encryption.AES_256) {
             AesEncryptionHeaderBlock block = (AesEncryptionHeaderBlock)encryptionHeaderBlock;
@@ -53,7 +52,7 @@ public final class EncryptionHeaderDecompose implements Decompose {
             Utils.copyLarge(zipModel, subDir.resolve("aes_mac.data"), block.getMac());
         } else if (encryption == Encryption.PKWARE) {
             PkwareEncryptionHeaderBlock block = (PkwareEncryptionHeaderBlock)encryptionHeaderBlock;
-            Utils.print(dir.resolve("pkware_encryption_header.txt"), out -> encryptionHeaderView().print(out));
+            Utils.print(subDir.resolve("pkware_encryption_header.txt"), out -> encryptionHeaderView().print(out));
             Utils.copyLarge(zipModel, subDir.resolve("pkware_encryption_header.data"), block);
         } else {
             // TODO print unknown header

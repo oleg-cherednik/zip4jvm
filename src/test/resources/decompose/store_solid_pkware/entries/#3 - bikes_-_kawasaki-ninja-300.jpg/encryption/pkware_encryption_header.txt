@@ -1,0 +1,5 @@
+#3 (PKWARE) encryption header
+-----------------------------
+    - location:                                     448642 (0x0006D882) bytes
+    - size:                                         12 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){11}[0-9A-F]{2}$) -->    8D B5 DA 6F 22 CE 21 99 DB EB 56 5A
