@@ -72,7 +72,7 @@ public class FileAssert extends AbstractPathAssert<FileAssert> implements IFileA
     private static final Pattern REGEX = Pattern.compile("<--\\sregexp\\((?<regex>.+)\\)\\s-->.+");
 
     public FileAssert matchesResourceLines(String path) {
-        try (BufferedReader actualReader = new BufferedReader(new FileReader(this.actual.toFile()));
+        try (BufferedReader actualReader = new BufferedReader(new FileReader(actual.toFile()));
              BufferedReader expectedReader = new BufferedReader(new InputStreamReader(FileAssert.class.getResourceAsStream(path)))) {
             int pos = 0;
 
