@@ -1,0 +1,14 @@
+#2 (AES) encryption header
+--------------------------
+    salt:                                           293999 (0x00047C6F) bytes
+      - disk (0000):                                src.z01
+      - size:                                       8 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){7}[0-9A-F]{2}$) -->    AB 87 29 61 F4 CA 5C 75
+    password checksum:                              294007 (0x00047C77) bytes
+      - disk (0000):                                src.z01
+      - size:                                       2 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} )[0-9A-F]{2}$) -->    CD CF
+    mac:                                            448600 (0x0006D858) bytes
+      - disk (0000):                                src.z01
+      - size:                                       10 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){9}[0-9A-F]{2}$) -->    32 9B 30 48 28 78 50 4B 07 08

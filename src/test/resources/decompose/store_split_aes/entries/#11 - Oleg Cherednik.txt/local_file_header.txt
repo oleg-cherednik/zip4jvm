@@ -1,0 +1,24 @@
+#11 (PK0304) [UTF-8] Oleg Cherednik.txt
+---------------------------------------
+    - disk (0003):                                  src.z04
+    - location:                                     828663 (0x000CA4F7) bytes
+    - size:                                         59 bytes
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (99):                        AES encryption
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F8E 0x0589):          2019-12-14 00:44:18
+    32-bit CRC value:                               0x00000000
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
+    length of filename:                             18
+                                                    UTF-8
+    4F 6C 65 67 20 43 68 65 72 65 64 6E 69 6B 2E 74 Oleg Cherednik.t
+    78 74                                           xt
+    extra field:                                    828711 (0x000CA527) bytes
+      - disk (0003):                                src.z04
+      - size:                                       11 bytes (1 record)

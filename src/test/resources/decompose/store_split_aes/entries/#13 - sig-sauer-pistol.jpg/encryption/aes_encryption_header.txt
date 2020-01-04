@@ -1,0 +1,14 @@
+#13 (AES) encryption header
+---------------------------
+    salt:                                           855216 (0x000D0CB0) bytes
+      - disk (0004):                                src.z05
+      - size:                                       8 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){7}[0-9A-F]{2}$) -->    4C D1 A4 2C DD 12 EA B3
+    password checksum:                              855224 (0x000D0CB8) bytes
+      - disk (0004):                                src.z05
+      - size:                                       2 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} )[0-9A-F]{2}$) -->    A3 02
+    mac:                                            238128 (0x0003A230) bytes
+      - disk (0005):                                src.zip
+      - size:                                       10 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){9}[0-9A-F]{2}$) -->    56 56 B9 D4 E7 DE 24 B1 03 87
