@@ -27,7 +27,7 @@ zip4jvm - a java library for working with zip files
 ## Gradle
 
 ~~~~
-compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:0.8'
+compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.0'
 ~~~~
 
 ## Maven
@@ -36,7 +36,7 @@ compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:0.8'
 <dependency>
     <groupId>ru.oleg-cherednik.zip4jvm</groupId>
     <artifactId>zip4jvm</artifactId>
-    <version>0.8</version>
+    <version>1.0</version>
 </dependency>
 ~~~~
 
@@ -46,6 +46,7 @@ To simplify usage of _zip4jvm_, there're following classes:
 * [ZipIt](#zipit) - add files to archive;
 * [UnzipIt](#unzipit) - extract files from archive;
 * [ZipMisc](#zipmisc) - other zip file activities.
+* [ZipInfo](#zipinfo) - zip file information and diagnostics.
  
 ### ZipIt
 
@@ -572,6 +573,280 @@ zipFile.merge(zip);
 >```
 >/- (after)
 > |-- filename.zip
+>```
+
+### ZipInfo
+
+#### Print content of zip file into console
+```
+Path zip = Paths.get("filename.zip");
+ZipInfo.zip(zip).printShortInfo();
+```
+>```
+>filename.zip
+>  |-- cars
+>  |    |-- bentley-continental.jpg 
+>  |-- saint-petersburg.jpg 
+>```
+>```    
+> --- console output ---
+>(PK0506) End of Central directory record
+>========================================
+>    - location:                                     2365537 (0x00241861) bytes
+>    - size:                                         22 bytes
+>    part number of this part (0000):                1
+>    part number of start of central dir (0000):     1
+>    number of entries in central dir in this part:  3
+>    total number of entries in central dir:         3
+>    size of central dir:                            299 (0x0000012B) bytes
+>    relative offset of central dir:                 2365238 (0x00241736) bytes
+>    zipfile comment length:                         0 bytes
+>
+>(PK0102) Central directory
+>==========================
+>    - location:                                     2365238 (0x00241736) bytes
+>    - size:                                         303 bytes
+>    total entries:                                  3
+>
+>#1 (PK0102) [UTF-8] cars/
+>-------------------------
+>    - location:                                     2365238 (0x00241736) bytes
+>    - size:                                         87 bytes
+>    part number of this part (0000):                1
+>    relative offset of local header:                0 (0x00000000) bytes
+>    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+>    version made by zip software (31):              3.1
+>    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+>    unzip software version needed to extract (10):  1.0
+>    general purpose bit flag (0x0000) (bit 15..0):  0000.0000 0000.0000
+>      file security status  (bit 0):                not encrypted
+>      data descriptor       (bit 3):                no
+>      strong encryption     (bit 6):                no
+>      UTF-8 names          (bit 11):                no
+>    compression method (00):                        none (stored)
+>    file last modified on (0x5024 0x7EC0):          2020-01-04 15:54:00
+>    32-bit CRC value:                               0x00000000
+>    compressed size:                                0 bytes
+>    uncompressed size:                              0 bytes
+>    length of filename:                             5
+>                                                    UTF-8
+>    63 61 72 73 2F                                  cars/
+>    length of file comment:                         0 bytes
+>    internal file attributes:                       0x0000
+>      apparent file type:                           binary
+>    external file attributes:                       0x00000010
+>      WINDOWS   (0x10):                             dir
+>      POSIX (0x000000):                             ?---------
+>    extra field:                                    2365289 (0x00241769) bytes
+>      - size:                                       36 bytes (1 record)
+>    (0x000A) NTFS Timestamp:                        2365289 (0x00241769) bytes
+>      - size:                                       36 bytes
+>      - total tags:                                 1
+>      (0x0001) Tag1:                                24 bytes
+>        Creation Date:                              2020-01-04 12:50:54
+>        Last Modified Date:                         2020-01-04 12:54:00
+>        Last Accessed Date:                         2020-01-04 12:54:00
+>
+>#2 (PK0102) [UTF-8] cars/bentley-continental.jpg
+>------------------------------------------------
+>    - location:                                     2365325 (0x0024178D) bytes
+>    - size:                                         110 bytes
+>    part number of this part (0000):                1
+>    relative offset of local header:                35 (0x00000023) bytes
+>    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+>    version made by zip software (31):              3.1
+>    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+>    unzip software version needed to extract (20):  2.0
+>    general purpose bit flag (0x0000) (bit 15..0):  0000.0000 0000.0000
+>      file security status  (bit 0):                not encrypted
+>      data descriptor       (bit 3):                no
+>      strong encryption     (bit 6):                no
+>      UTF-8 names          (bit 11):                no
+>    compression method (08):                        deflated
+>      compression sub-type (deflation):             normal
+>    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+>    32-bit CRC value:                               0x71797968
+>    compressed size:                                1380544 bytes
+>    uncompressed size:                              1395362 bytes
+>    length of filename:                             28
+>                                                    UTF-8
+>    63 61 72 73 2F 62 65 6E 74 6C 65 79 2D 63 6F 6E cars/bentley-con
+>    74 69 6E 65 6E 74 61 6C 2E 6A 70 67             tinental.jpg
+>    length of file comment:                         0 bytes
+>    internal file attributes:                       0x0000
+>      apparent file type:                           binary
+>    external file attributes:                       0x00000020
+>      WINDOWS   (0x20):                             arc
+>      POSIX (0x000000):                             ?---------
+>    extra field:                                    2365399 (0x002417D7) bytes
+>      - size:                                       36 bytes (1 record)
+>    (0x000A) NTFS Timestamp:                        2365399 (0x002417D7) bytes
+>      - size:                                       36 bytes
+>      - total tags:                                 1
+>      (0x0001) Tag1:                                24 bytes
+>        Creation Date:                              2020-01-04 12:50:54
+>        Last Modified Date:                         2019-09-04 04:43:27
+>        Last Accessed Date:                         2020-01-04 12:50:54
+>
+>#3 (PK0102) [UTF-8] saint-petersburg.jpg
+>----------------------------------------
+>    - location:                                     2365435 (0x002417FB) bytes
+>    - size:                                         102 bytes
+>    part number of this part (0000):                1
+>    relative offset of local header:                1380637 (0x0015111D) bytes
+>    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+>    version made by zip software (31):              3.1
+>    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+>    unzip software version needed to extract (20):  2.0
+>    general purpose bit flag (0x0000) (bit 15..0):  0000.0000 0000.0000
+>      file security status  (bit 0):                not encrypted
+>      data descriptor       (bit 3):                no
+>      strong encryption     (bit 6):                no
+>      UTF-8 names          (bit 11):                no
+>    compression method (08):                        deflated
+>      compression sub-type (deflation):             normal
+>    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+>    32-bit CRC value:                               0x5F2EEF84
+>    compressed size:                                984551 bytes
+>    uncompressed size:                              1074836 bytes
+>    length of filename:                             20
+>                                                    UTF-8
+>    73 61 69 6E 74 2D 70 65 74 65 72 73 62 75 72 67 saint-petersburg
+>    2E 6A 70 67                                     .jpg
+>    length of file comment:                         0 bytes
+>    internal file attributes:                       0x0000
+>      apparent file type:                           binary
+>    external file attributes:                       0x00000020
+>      WINDOWS   (0x20):                             arc
+>      POSIX (0x000000):                             ?---------
+>    extra field:                                    2365501 (0x0024183D) bytes
+>      - size:                                       36 bytes (1 record)
+>    (0x000A) NTFS Timestamp:                        2365501 (0x0024183D) bytes
+>      - size:                                       36 bytes
+>      - total tags:                                 1
+>      (0x0001) Tag1:                                24 bytes
+>        Creation Date:                              2020-01-04 12:50:54
+>        Last Modified Date:                         2019-09-04 04:43:27
+>        Last Accessed Date:                         2020-01-04 12:50:54
+>
+>(PK0304) ZIP entries
+>====================
+>    total entries:                                  3
+>
+>#1 (PK0304) [UTF-8] cars/
+>-------------------------
+>    - location:                                     0 (0x00000000) bytes
+>    - size:                                         35 bytes
+>    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+>    unzip software version needed to extract (10):  1.0
+>    general purpose bit flag (0x0000) (bit 15..0):  0000.0000 0000.0000
+>      file security status  (bit 0):                not encrypted
+>      data descriptor       (bit 3):                no
+>      strong encryption     (bit 6):                no
+>      UTF-8 names          (bit 11):                no
+>    compression method (00):                        none (stored)
+>    file last modified on (0x5024 0x7EC0):          2020-01-04 15:54:00
+>    32-bit CRC value:                               0x00000000
+>    compressed size:                                0 bytes
+>    uncompressed size:                              0 bytes
+>    length of filename:                             5
+>                                                    UTF-8
+>    63 61 72 73 2F                                  cars/
+>
+>#2 (PK0304) [UTF-8] cars/bentley-continental.jpg
+>------------------------------------------------
+>    - location:                                     35 (0x00000023) bytes
+>    - size:                                         58 bytes
+>    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+>    unzip software version needed to extract (20):  2.0
+>    general purpose bit flag (0x0000) (bit 15..0):  0000.0000 0000.0000
+>      file security status  (bit 0):                not encrypted
+>      data descriptor       (bit 3):                no
+>      strong encryption     (bit 6):                no
+>      UTF-8 names          (bit 11):                no
+>    compression method (08):                        deflated
+>      compression sub-type (deflation):             normal
+>    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+>    32-bit CRC value:                               0x71797968
+>    compressed size:                                1380544 bytes
+>    uncompressed size:                              1395362 bytes
+>    length of filename:                             28
+>                                                    UTF-8
+>    63 61 72 73 2F 62 65 6E 74 6C 65 79 2D 63 6F 6E cars/bentley-con
+>    74 69 6E 65 6E 74 61 6C 2E 6A 70 67             tinental.jpg
+>
+>#3 (PK0304) [UTF-8] saint-petersburg.jpg
+>----------------------------------------
+>    - location:                                     1380637 (0x0015111D) bytes
+>    - size:                                         50 bytes
+>    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+>    unzip software version needed to extract (20):  2.0
+>    general purpose bit flag (0x0000) (bit 15..0):  0000.0000 0000.0000
+>      file security status  (bit 0):                not encrypted
+>      data descriptor       (bit 3):                no
+>      strong encryption     (bit 6):                no
+>      UTF-8 names          (bit 11):                no
+>    compression method (08):                        deflated
+>      compression sub-type (deflation):             normal
+>    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+>    32-bit CRC value:                               0x5F2EEF84
+>    compressed size:                                984551 bytes
+>    uncompressed size:                              1074836 bytes
+>    length of filename:                             20
+>                                                    UTF-8
+>    73 61 69 6E 74 2D 70 65 74 65 72 73 62 75 72 67 saint-petersburg
+>    2E 6A 70 67                                     .jpg
+>```        
+
+**Note:** additional method `ZipInfo.printShortInfo(PrintStream)` could be use to print this info to required
+`PrintStream`
+
+#### Decompose zip file into `Path` destination
+```
+Path zip = Paths.get("filename.zip");
+Path destDir = Paths.get("/filename_decompose");
+ZipInfo.zip(zip).decompose(dir);
+```
+>```
+>filename.zip
+>  |-- cars
+>  |    |-- bentley-continental.jpg 
+>  |-- saint-petersburg.jpg 
+>```
+>```
+>/filename_content
+>  |-- central_directory
+>  |    |-- #1 - cars
+>  |    |    |-- extra_fields
+>  |    |    |    |-- (0x000A)_NTFS_Timestamp.txt 
+>  |    |    |    |-- (0x000A)_NTFS_Timestamp.data
+>  |    |    |-- file_header.txt
+>  |    |    |-- file_header.data
+>  |    |-- #2 - cars_-_bentley-continental.jpg
+>  |    |    |-- extra_fields
+>  |    |    |    |-- (0x000A)_NTFS_Timestamp.txt 
+>  |    |    |    |-- (0x000A)_NTFS_Timestamp.data
+>  |    |    |-- file_header.txt
+>  |    |    |-- file_header.data
+>  |    |-- #3 - saint-petersburg.jpg
+>  |    |    |-- extra_fields
+>  |    |    |    |-- (0x000A)_NTFS_Timestamp.txt 
+>  |    |    |    |-- (0x000A)_NTFS_Timestamp.data
+>  |    |    |-- file_header.txt
+>  |    |    |-- file_header.data
+>  |    |-- central_directory.txt
+>  |-- entries
+>  |    |-- #1 - cars
+>  |    |    |-- local_file_header.txt
+>  |    |    |-- local_file_header.data
+>  |    |-- #2 - cars_-_bentley-continental.jpg
+>  |    |    |-- local_file_header.txt
+>  |    |    |-- local_file_header.data
+>  |    |-- #3 - saint-petersburg.jpg
+>  |    |    |-- file_header.txt
+>  |    |    |-- file_header.data
+>  |-- end_central_directory.txt
+>  |-- end_central_directory.data
 >```
 
 ## Model

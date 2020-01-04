@@ -175,20 +175,11 @@ public class ZipInfoTest {
 
     @Test(enabled = false)
     public void foo() throws IOException {
-        try {
-            zipInfo().printShortInfo(System.out);
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
+        zipInfo().printShortInfo(System.out);
     }
 
     @Test(enabled = false)
     public void decompose() throws IOException {
-        try {
-            Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-            zipInfo().decompose(dir);
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
+        zipInfo().decompose(Zip4jvmSuite.subDirNameAsMethodName(rootDir));
     }
 }
