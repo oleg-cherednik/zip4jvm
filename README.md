@@ -805,7 +805,7 @@ ZipInfo.zip(zip).printShortInfo();
 ```
 Path zip = Paths.get("filename.zip");
 Path destDir = Paths.get("/filename_decompose");
-ZipInfo.zip(zip).decompose(dir);
+ZipInfo.zip(zip).decompose(destDir);
 ```
 >```
 >filename.zip
