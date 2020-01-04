@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public enum CompressionMethod  {
+public enum CompressionMethod {
     STORE(0, "none (stored)"),
     FILE_SHRUNK(1, "shrunk"),
     FILE_RED_COMP_FACTOR_1(2, "reduced (factor 1)"),
@@ -21,7 +21,7 @@ public enum CompressionMethod  {
     FILE_RED_COMP_FACTOR_4(5, "reduced (factor 4)"),
     FILE_IMPLODED(6, "imploded"),
     DEFLATE(8, "deflated"),
-    FILE_ENHANCED_DEFLATED(9, "deflated (enhanced)"),
+    ENHANCED_DEFLATE(9, "deflated (enhanced)"),
     BZIP2(12, "bzip2 algorithm"),
     LZMA(14, "lzma encoding"),
     JPEG(96, "jpeg compression"),

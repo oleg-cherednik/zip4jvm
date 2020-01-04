@@ -3,6 +3,8 @@ package ru.olegcherednik.zip4jvm.model;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
+import java.util.Arrays;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT0;
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT1;
@@ -115,6 +117,46 @@ public class GeneralPurposeFlagTest {
 
         generalPurposeFlag.setUtf8(true);
         assertThat(BitUtils.isBitSet(generalPurposeFlag.getAsInt(CompressionMethod.STORE), BIT11)).isTrue();
+    }
+
+    public void shouldRetrieveImplodedBitsWhenFileImploded() {
+        GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
+        assertThat(generalPurposeFlag.getAsInt(CompressionMethod.FILE_IMPLODED)).isEqualTo(0x0);
+
+        generalPurposeFlag.setSlidingDictionarySize(SlidingDictionarySize.SD_8K);
+        generalPurposeFlag.setShannonFanoTreesNumber(ShannonFanoTreesNumber.THREE);
+        assertThat(generalPurposeFlag.getAsInt(CompressionMethod.FILE_IMPLODED)).isEqualTo(BIT1 | BIT2);
+
+        generalPurposeFlag.setSlidingDictionarySize(SlidingDictionarySize.SD_8K);
+        generalPurposeFlag.setShannonFanoTreesNumber(ShannonFanoTreesNumber.TWO);
+        assertThat(generalPurposeFlag.getAsInt(CompressionMethod.FILE_IMPLODED)).isEqualTo(BIT1);
+
+        generalPurposeFlag.setSlidingDictionarySize(SlidingDictionarySize.SD_4K);
+        generalPurposeFlag.setShannonFanoTreesNumber(ShannonFanoTreesNumber.THREE);
+        assertThat(generalPurposeFlag.getAsInt(CompressionMethod.FILE_IMPLODED)).isEqualTo(BIT2);
+    }
+
+    public void shouldRetrieveLzmaBitsWhenLzma() {
+        GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
+        assertThat(generalPurposeFlag.getAsInt(CompressionMethod.LZMA)).isEqualTo(0x0);
+
+        generalPurposeFlag.setEosMarker(true);
+        assertThat(generalPurposeFlag.getAsInt(CompressionMethod.LZMA)).isEqualTo(BIT1);
+    }
+
+    public void shouldRetrieveDeflateBitsWhenDeflate() {
+        for (CompressionMethod compressionMethod : Arrays.asList(CompressionMethod.DEFLATE, CompressionMethod.ENHANCED_DEFLATE)) {
+            GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
+            assertThat(generalPurposeFlag.getAsInt(compressionMethod)).isEqualTo(0x0);
+
+            generalPurposeFlag.setCompressionLevel(CompressionLevel.MAXIMUM);
+            assertThat(generalPurposeFlag.getAsInt(compressionMethod)).isEqualTo(BIT1);
+
+            generalPurposeFlag.setCompressionLevel(CompressionLevel.FAST);
+            assertThat(generalPurposeFlag.getAsInt(compressionMethod)).isEqualTo(BIT2);
+            generalPurposeFlag.setCompressionLevel(CompressionLevel.SUPER_FAST);
+            assertThat(generalPurposeFlag.getAsInt(compressionMethod)).isEqualTo(BIT1 | BIT2);
+        }
     }
 
 }

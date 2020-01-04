@@ -89,14 +89,6 @@ public abstract class ExternalFileAttributes {
 
     public abstract String getDetails();
 
-    protected final boolean isEmpty() {
-        for (int i = 0; i < data.length; i++)
-            if (data[i] != 0)
-                return false;
-
-        return true;
-    }
-
     private static class Unknown extends ExternalFileAttributes {
 
         @Override

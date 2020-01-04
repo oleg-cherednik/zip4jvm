@@ -56,13 +56,13 @@ public class CompressionMethodViewTest {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         generalPurposeFlag.setCompressionLevel(CompressionLevel.NORMAL);
 
-        for (CompressionMethod compressionMethod : Arrays.asList(CompressionMethod.DEFLATE, CompressionMethod.FILE_ENHANCED_DEFLATED)) {
+        for (CompressionMethod compressionMethod : Arrays.asList(CompressionMethod.DEFLATE, CompressionMethod.ENHANCED_DEFLATE)) {
             String[] lines = Zip4jvmSuite.execute(new CompressionMethodView(compressionMethod, generalPurposeFlag, 0, 52));
             assertThat(lines).hasSize(2);
 
             if (compressionMethod == CompressionMethod.DEFLATE)
                 assertThat(lines[0]).isEqualTo("compression method (08):                            deflated");
-            else if (compressionMethod == CompressionMethod.FILE_ENHANCED_DEFLATED)
+            else if (compressionMethod == CompressionMethod.ENHANCED_DEFLATE)
                 assertThat(lines[0]).isEqualTo("compression method (09):                            deflated (enhanced)");
 
             assertThat(lines[1]).isEqualTo("  compression sub-type (deflation):                 normal");

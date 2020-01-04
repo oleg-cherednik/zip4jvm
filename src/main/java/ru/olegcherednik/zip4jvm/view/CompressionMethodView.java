@@ -31,7 +31,7 @@ public final class CompressionMethodView extends BaseView {
             printLine(out, "  number of Shannon-Fano trees (implosion):", generalPurposeFlag.getShannonFanoTreesNumber().getTitle());
         } else if (compressionMethod == CompressionMethod.LZMA)
             printLine(out, "  end-of-stream (EOS) marker:", generalPurposeFlag.isEosMarker() ? "yes" : "no");
-        else if (compressionMethod == CompressionMethod.DEFLATE || compressionMethod == CompressionMethod.FILE_ENHANCED_DEFLATED)
+        else if (compressionMethod == CompressionMethod.DEFLATE || compressionMethod == CompressionMethod.ENHANCED_DEFLATE)
             printLine(out, "  compression sub-type (deflation):", generalPurposeFlag.getCompressionLevel().getTitle());
 
         return true;

@@ -78,7 +78,7 @@ public class GeneralPurposeFlag {
     private int getCompressionMethodBits(CompressionMethod compressionMethod) {
         if (compressionMethod == CompressionMethod.FILE_IMPLODED)
             return getImplodedBits();
-        if (compressionMethod == CompressionMethod.DEFLATE || compressionMethod == CompressionMethod.FILE_ENHANCED_DEFLATED)
+        if (compressionMethod == CompressionMethod.DEFLATE || compressionMethod == CompressionMethod.ENHANCED_DEFLATE)
             return getDeflateBits();
         if (compressionMethod == CompressionMethod.LZMA)
             return getLzmaBits();

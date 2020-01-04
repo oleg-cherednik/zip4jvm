@@ -65,6 +65,8 @@ public class ExternalFileAttributesTest {
     private static final int WINDOWS_READ_ONLY = BIT0;
     private static final int WINDOWS_HIDDEN = BIT1;
     private static final int WINDOWS_SYSTEM = BIT2;
+    private static final int WINDOWS_LABORATORY = BIT3;
+    private static final int WINDOWS_DIRECTORY = BIT4;
     private static final int WINDOWS_ARCHIVE = BIT5;
 
     private static final int POSIX_OTHERS_EXECUTE = BIT0;
@@ -364,15 +366,11 @@ public class ExternalFileAttributesTest {
         externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, 0x0, POSIX_OWNER_READ });
         externalFileAttributes.apply(path);
         verify(fileAttributeView).setPermissions(captor.capture());
-        assertThat(captor.getValue()).containsExactly(OWNER_READ);
+        assertThat(captor.getValue()).containsExactlyInAnyOrder(OWNER_READ);
         reset(fileAttributeView);
     }
 
     public void shouldUseDefaultPermissionsForPosixWhenFileWasCreatedUnderWindows() throws IOException {
-        ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.build(() -> MAC);
-        String details = externalFileAttributes.readFrom(new byte[] { WINDOWS_READ_ONLY | WINDOWS_ARCHIVE, 0x0, 0x0, 0x0 }).getDetails();
-        assertThat(details).isEqualTo("?---------");
-
         Path path = mock(Path.class);
         FileSystem fileSystem = mock(FileSystem.class);
         FileSystemProvider provider = mock(FileSystemProvider.class);
@@ -386,19 +384,27 @@ public class ExternalFileAttributesTest {
         when(provider.readAttributes(same(path), same(BasicFileAttributes.class), any())).thenReturn(basicFileAttributes);
         when(fileAttributeView.readAttributes()).thenReturn(attributes);
 
+        ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.build(() -> MAC);
+
         Class<Set<PosixFilePermission>> listClass = (Class<Set<PosixFilePermission>>)(Class<?>)Set.class;
         ArgumentCaptor<Set<PosixFilePermission>> captor = ArgumentCaptor.forClass(listClass);
 
-        externalFileAttributes.apply(path);
+        assertThat(externalFileAttributes.readFrom(new byte[] { WINDOWS_READ_ONLY, 0x0, 0x0, 0x0 }).getDetails()).isEqualTo("?---------");
 
+        externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, 0x0, 0x0 }).apply(path);
         verify(fileAttributeView).setPermissions(captor.capture());
-        assertThat(captor.getValue()).containsExactly(OWNER_READ, GROUP_READ, OTHERS_READ);
+        assertThat(captor.getValue()).containsExactlyInAnyOrder(OWNER_READ, OWNER_WRITE, GROUP_READ, OTHERS_READ);
+        reset(fileAttributeView);
+
+        externalFileAttributes.readFrom(new byte[] { WINDOWS_READ_ONLY, 0x0, 0x0, 0x0 }).apply(path);
+        verify(fileAttributeView).setPermissions(captor.capture());
+        assertThat(captor.getValue()).containsExactlyInAnyOrder(OWNER_READ, GROUP_READ, OTHERS_READ);
+        reset(fileAttributeView);
     }
 
     public void shouldUseDefaultPermissionsForWindowsWhenFileWasCreatedUnderPosix() throws IOException {
         ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.build(() -> WIN);
-        String details = externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, 0x0, POSIX_OWNER_READ }).getDetails();
-        assertThat(details).isEqualTo("none");
+        assertThat(externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, 0x0, POSIX_OWNER_READ }).getDetails()).isEqualTo("none");
 
         Path path = mock(Path.class);
         FileSystem fileSystem = mock(FileSystem.class);
@@ -415,6 +421,65 @@ public class ExternalFileAttributesTest {
         verify(dos, times(1)).setHidden(eq(false));
         verify(dos, times(1)).setSystem(eq(false));
         verify(dos, times(1)).setArchive(eq(true));
+    }
+
+    public void shouldRetrieveDetailsNoneWhenUnknownFileSystem() {
+        assertThat(ExternalFileAttributes.NULL.getDetails()).isEqualTo("none");
+    }
+
+    public void shouldRetrieveDetailsWhenWindowsFileSystem() {
+        ExternalFileAttributes attributes = ExternalFileAttributes.build(() -> WIN);
+
+        assertThat(attributes.getDetails()).isEqualTo("none");
+        assertThat(attributes.readFrom(new byte[] { WINDOWS_READ_ONLY, 0x0, 0x0, 0x0 }).getDetails()).isEqualTo("read-only");
+        assertThat(attributes.readFrom(new byte[] { WINDOWS_HIDDEN, 0x0, 0x0, 0x0 }).getDetails()).isEqualTo("hid");
+        assertThat(attributes.readFrom(new byte[] { WINDOWS_SYSTEM, 0x0, 0x0, 0x0 }).getDetails()).isEqualTo("sys");
+        assertThat(attributes.readFrom(new byte[] { WINDOWS_LABORATORY, 0x0, 0x0, 0x0 }).getDetails()).isEqualTo("lab");
+        assertThat(attributes.readFrom(new byte[] { WINDOWS_DIRECTORY, 0x0, 0x0, 0x0 }).getDetails()).isEqualTo("dir");
+        assertThat(attributes.readFrom(new byte[] { WINDOWS_ARCHIVE, 0x0, 0x0, 0x0 }).getDetails()).isEqualTo("arc");
+        assertThat(attributes.readFrom(new byte[] { WINDOWS_READ_ONLY | WINDOWS_SYSTEM, 0x0, 0x0, 0x0 }).getDetails()).isEqualTo("rdo sys");
+    }
+
+    public void shouldRetrieveDetailsWhenPosixFileSystem() {
+        ExternalFileAttributes attributes = ExternalFileAttributes.build(() -> MAC);
+
+        assertThat(attributes.getDetails()).isEqualTo("?---------");
+        assertThat(attributes.readFrom(new byte[] { 0x0, 0x0, POSIX_OTHERS_EXECUTE, 0x0 }).getDetails()).isEqualTo("?--------x");
+        assertThat(attributes.readFrom(new byte[] { 0x0, 0x0, POSIX_OTHERS_EXECUTE | POSIX_OTHERS_WRITE, 0x0 }).getDetails()).isEqualTo("?-------wx");
+        assertThat(attributes.readFrom(new byte[] { 0x0, 0x0,
+                POSIX_OTHERS_EXECUTE | POSIX_OTHERS_WRITE | POSIX_OTHERS_READ, 0x0 }).getDetails()).isEqualTo("?------rwx");
+        assertThat(attributes.readFrom(new byte[] { 0x0, 0x0,
+                POSIX_OTHERS_EXECUTE | POSIX_OTHERS_WRITE | POSIX_OTHERS_READ
+                        | POSIX_GROUP_EXECUTE, 0x0 }).getDetails()).isEqualTo("?-----xrwx");
+        assertThat(attributes.readFrom(new byte[] { 0x0, 0x0,
+                POSIX_OTHERS_EXECUTE | POSIX_OTHERS_WRITE | POSIX_OTHERS_READ
+                        | POSIX_GROUP_EXECUTE | POSIX_GROUP_WRITE, 0x0 }).getDetails()).isEqualTo("?----wxrwx");
+        assertThat(attributes.readFrom(new byte[] { 0x0, 0x0,
+                POSIX_OTHERS_EXECUTE | POSIX_OTHERS_WRITE | POSIX_OTHERS_READ
+                        | POSIX_GROUP_EXECUTE | POSIX_GROUP_WRITE | POSIX_GROUP_READ, 0x0 }).getDetails()).isEqualTo("?---rwxrwx");
+        assertThat(attributes.readFrom(new byte[] { 0x0, 0x0,
+                POSIX_OTHERS_EXECUTE | POSIX_OTHERS_WRITE | POSIX_OTHERS_READ
+                        | POSIX_GROUP_EXECUTE | POSIX_GROUP_WRITE | POSIX_GROUP_READ
+                        | POSIX_OWNER_EXECUTE, 0x0 }).getDetails()).isEqualTo("?--xrwxrwx");
+        assertThat(attributes.readFrom(new byte[] { 0x0, 0x0,
+                (byte)(POSIX_OTHERS_EXECUTE | POSIX_OTHERS_WRITE | POSIX_OTHERS_READ
+                        | POSIX_GROUP_EXECUTE | POSIX_GROUP_WRITE | POSIX_GROUP_READ
+                        | POSIX_OWNER_EXECUTE | POSIX_OWNER_WRITE), 0x0 }).getDetails()).isEqualTo("?-wxrwxrwx");
+        assertThat(attributes.readFrom(new byte[] { 0x0, 0x0,
+                (byte)(POSIX_OTHERS_EXECUTE | POSIX_OTHERS_WRITE | POSIX_OTHERS_READ
+                        | POSIX_GROUP_EXECUTE | POSIX_GROUP_WRITE | POSIX_GROUP_READ
+                        | POSIX_OWNER_EXECUTE | POSIX_OWNER_WRITE),
+                POSIX_OWNER_READ }).getDetails()).isEqualTo("?rwxrwxrwx");
+        assertThat(attributes.readFrom(new byte[] { 0x0, 0x0,
+                (byte)(POSIX_OTHERS_EXECUTE | POSIX_OTHERS_WRITE | POSIX_OTHERS_READ
+                        | POSIX_GROUP_EXECUTE | POSIX_GROUP_WRITE | POSIX_GROUP_READ
+                        | POSIX_OWNER_EXECUTE | POSIX_OWNER_WRITE),
+                POSIX_OWNER_READ | POSIX_DIRECTORY }).getDetails()).isEqualTo("drwxrwxrwx");
+        assertThat(attributes.readFrom(new byte[] { 0x0, 0x0,
+                (byte)(POSIX_OTHERS_EXECUTE | POSIX_OTHERS_WRITE | POSIX_OTHERS_READ
+                        | POSIX_GROUP_EXECUTE | POSIX_GROUP_WRITE | POSIX_GROUP_READ
+                        | POSIX_OWNER_EXECUTE | POSIX_OWNER_WRITE),
+                (byte)(POSIX_OWNER_READ | POSIX_REGULAR_FILE) }).getDetails()).isEqualTo("-rwxrwxrwx");
     }
 
 }
