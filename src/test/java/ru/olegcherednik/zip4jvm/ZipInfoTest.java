@@ -127,6 +127,13 @@ public class ZipInfoTest {
         assertThatDirectory(dir).matchesResourceDirectory("/decompose/store_split");
     }
 
+    public void shouldDecomposeWhenStoreSplitPkware() throws IOException {
+        Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Files.createDirectories(dir.getParent());
+        ZipInfo.zip(TestData.zipStoreSplitPkware).decompose(dir);
+        assertThatDirectory(dir).matchesResourceDirectory("/decompose/store_split_pkware");
+    }
+
     private static ZipInfo zipInfo() {
         Path path = Paths.get("d:/zip4jvm/tmp/aes.zip");
 //        Files.deleteIfExists(path);

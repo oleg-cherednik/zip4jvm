@@ -1,0 +1,6 @@
+#3 (PKWARE) encryption header
+-----------------------------
+    - disk (0000):                                  src.z01
+    - location:                                     448646 (0x0006D886) bytes
+    - size:                                         12 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){11}[0-9A-F]{2}$) -->    98 8D 45 A5 DD 23 16 A6 AB 11 4A C3
