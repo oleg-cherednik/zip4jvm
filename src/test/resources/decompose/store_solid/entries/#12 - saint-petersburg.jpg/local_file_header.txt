@@ -1,0 +1,20 @@
+#12 (PK0304) [UTF-8] saint-petersburg.jpg
+-----------------------------------------
+    - location:                                     3974212 (0x003CA444) bytes
+    - size:                                         50 bytes
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0808) (bit 15..0):  0000.1000 0000.1000
+      file security status  (bit 0):                not encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (00):                        none (stored)
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+    32-bit CRC value:                               0x00000000
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
+    length of filename:                             20
+                                                    UTF-8
+    73 61 69 6E 74 2D 70 65 74 65 72 73 62 75 72 67 saint-petersburg
+    2E 6A 70 67                                     .jpg

@@ -1,5 +1,6 @@
 package ru.olegcherednik.zip4jvm.encryption;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.ArrayUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -38,6 +39,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  * @author Oleg Cherednik
  * @since 28.07.2019
  */
+@Slf4j
 @Test
 @SuppressWarnings("FieldNamingConvention")
 public class EncryptionPkwareTest {
@@ -89,7 +91,7 @@ public class EncryptionPkwareTest {
         assertThatThrownBy(() -> ZipEntrySettings.builder()
                                                  .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                  .encryption(Encryption.PKWARE, null).build())
-                .isExactlyInstanceOf(NullPointerException.class);
+                .isExactlyInstanceOf(EmptyPasswordException.class);
 
         assertThatThrownBy(() -> ZipEntrySettings.builder()
                                                  .compression(Compression.STORE, CompressionLevel.NORMAL)
@@ -122,7 +124,7 @@ public class EncryptionPkwareTest {
     }
 
     public void shouldUnzipWhenZip64ContainsOnlyOneCrcByteMatch() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTme(rootDir);
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         Path zip = Paths.get("src/test/resources/zip/zip64_crc1byte_check.zip").toAbsolutePath();
 
         UnzipIt.zip(zip).destDir(destDir).password("Shu1an@2019GTS".toCharArray()).extract();

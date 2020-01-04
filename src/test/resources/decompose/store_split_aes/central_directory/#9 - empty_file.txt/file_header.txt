@@ -1,0 +1,33 @@
+#9 (PK0102) [UTF-8] empty_file.txt
+----------------------------------
+    - disk (0005):                                  src.zip
+    - location:                                     238794 (0x0003A4CA) bytes
+    - size:                                         71 bytes
+    part number of this part (0003):                4
+    relative offset of local header:                203718 (0x00031BC6) bytes
+    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+    version made by zip software (20):              2.0
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (99):                        AES encryption
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F2F 0x9DCE):          2019-09-15 19:46:28
+    32-bit CRC value:                               0x00000000
+    compressed size:                                20 bytes
+    uncompressed size:                              0 bytes
+    length of filename:                             14
+                                                    UTF-8
+    65 6D 70 74 79 5F 66 69 6C 65 2E 74 78 74       empty_file.txt
+    length of file comment:                         0 bytes
+    internal file attributes:                       0x0000
+      apparent file type:                           binary
+<-- ignore_line -->    external file attributes:                       0x00000020
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
+<-- ignore_line -->      POSIX (0x000000):                             ?---------
+    extra field:                                    238854 (0x0003A506) bytes
+      - disk (0005):                                src.zip
+      - size:                                       11 bytes (1 record)

@@ -22,9 +22,9 @@ public class EndCentralDirectory {
     public static final int MIN_SIZE = 4 + 2 + 2 + 2 + 2 + 4 + 4 + 2;
 
     // size:4 - signature (0x06054b50)
-    // size:2 - number of the disk
+    // size:2 - number of the disk (=0 - single zip; >0 - split zip (e.g. 5 means 6 total parts))
     private int totalDisks;
-    // size:2 - number of the disk with the start of the central directory
+    // size:2 - number of the disk with the central directory (single zip - 0; split zip - e.g. 5 means 6th part)
     private int mainDisk;
     // size:2 - total number of entries in the central directory on this disk
     private int diskEntries;

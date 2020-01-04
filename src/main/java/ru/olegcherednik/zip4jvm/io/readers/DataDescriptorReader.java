@@ -20,39 +20,37 @@ public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
         return zip64 ? new Zip64() : new Standard();
     }
 
-    private static final class Standard extends DataDescriptorReader {
+    public static class Standard extends DataDescriptorReader {
 
         @Override
         public DataDescriptor read(DataInput in) throws IOException {
             long offs = in.getOffs();
 
-            if (in.readSignature() != DataDescriptor.SIGNATURE)
+            if (in.readDwordSignature() != DataDescriptor.SIGNATURE)
                 throw new Zip4jvmException("DataDescriptor signature expected at offs=" + offs);
 
-            DataDescriptor dataDescriptor = new DataDescriptor();
-            dataDescriptor.setCrc32(in.readDword());
-            dataDescriptor.setCompressedSize(in.readDword());
-            dataDescriptor.setUncompressedSize(in.readDword());
+            long crc32 = in.readDword();
+            long compressedSize = in.readDword();
+            long uncompressedSize = in.readDword();
 
-            return dataDescriptor;
+            return new DataDescriptor(crc32, compressedSize, uncompressedSize);
         }
     }
 
-    private static final class Zip64 extends DataDescriptorReader {
+    public static class Zip64 extends DataDescriptorReader {
 
         @Override
         public DataDescriptor read(DataInput in) throws IOException {
             long offs = in.getOffs();
 
-            if (in.readSignature() != DataDescriptor.SIGNATURE)
+            if (in.readDwordSignature() != DataDescriptor.SIGNATURE)
                 throw new Zip4jvmException("DataDescriptor signature expected at offs=" + offs);
 
-            DataDescriptor dataDescriptor = new DataDescriptor();
-            dataDescriptor.setCrc32(in.readDword());
-            dataDescriptor.setCompressedSize(in.readQword());
-            dataDescriptor.setUncompressedSize(in.readQword());
+            long crc32 = in.readDword();
+            long compressedSize = in.readQword();
+            long uncompressedSize = in.readQword();
 
-            return dataDescriptor;
+            return new DataDescriptor(crc32, compressedSize, uncompressedSize);
         }
     }
 

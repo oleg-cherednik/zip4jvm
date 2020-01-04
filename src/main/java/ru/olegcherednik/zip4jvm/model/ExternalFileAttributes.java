@@ -2,6 +2,7 @@ package ru.olegcherednik.zip4jvm.model;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import java.io.IOException;
@@ -11,7 +12,10 @@ import java.nio.file.attribute.DosFileAttributeView;
 import java.nio.file.attribute.DosFileAttributes;
 import java.nio.file.attribute.PosixFileAttributeView;
 import java.nio.file.attribute.PosixFilePermission;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -40,7 +44,7 @@ import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT7;
  */
 @SuppressWarnings("MethodCanBeVariableArityMethod")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public abstract class ExternalFileAttributes implements Supplier<byte[]> {
+public abstract class ExternalFileAttributes {
 
     public static final Supplier<String> PROP_OS_NAME = () -> System.getProperty("os.name");
 
@@ -51,6 +55,8 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]> {
     @SuppressWarnings("StaticInitializerReferencesSubClass")
     public static final ExternalFileAttributes NULL = new Unknown();
     public static final int SIZE = 4;
+
+    protected final byte[] data = new byte[SIZE];
 
     public static ExternalFileAttributes build(Supplier<String> osNameProvider) {
         String os = Optional.ofNullable(osNameProvider).orElse(() -> "<unknown>").get().toLowerCase();
@@ -63,11 +69,25 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]> {
         return NULL;
     }
 
-    public abstract ExternalFileAttributes readFrom(Path path) throws IOException;
+    public ExternalFileAttributes readFrom(Path path) throws IOException {
+        // clear, because use local file system
+        Arrays.fill(data, (byte)0x0);
+        return this;
+    }
 
-    public abstract ExternalFileAttributes readFrom(byte[] data);
+    public ExternalFileAttributes readFrom(byte[] data) {
+        // copy, because read from archive metadata
+        System.arraycopy(data, 0, this.data, 0, SIZE);
+        return this;
+    }
 
     public abstract void apply(Path path) throws IOException;
+
+    public byte[] getData() {
+        return ArrayUtils.clone(data);
+    }
+
+    public abstract String getDetails();
 
     private static class Unknown extends ExternalFileAttributes {
 
@@ -87,8 +107,8 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]> {
         }
 
         @Override
-        public byte[] get() {
-            return new byte[SIZE];
+        public String getDetails() {
+            return "none";
         }
 
         @Override
@@ -98,71 +118,97 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]> {
 
     }
 
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     private static class Windows extends ExternalFileAttributes {
 
         private boolean readOnly;
         private boolean hidden;
         private boolean system;
         private boolean archive;
+        private boolean laboratory;
+        private boolean directory;
 
-        public static boolean isValid(byte[] data) {
+        public static boolean isWindows(byte[] data) {
             return data[0] != 0;
-        }
-
-        private Windows() {
-            defaults();
-        }
-
-        private void defaults() {
-            readOnly = false;
-            hidden = false;
-            system = false;
-            archive = true;
         }
 
         @Override
         public Windows readFrom(Path path) throws IOException {
-            defaults();
+            super.readFrom(path);
+
             DosFileAttributes dos = Files.getFileAttributeView(path, DosFileAttributeView.class).readAttributes();
             readOnly = dos.isReadOnly();
             hidden = dos.isHidden();
             system = dos.isSystem();
             archive = dos.isArchive();
+            directory = dos.isDirectory();
             return this;
         }
 
         @Override
         public Windows readFrom(byte[] data) {
-            defaults();
+            super.readFrom(data);
 
-            if (isValid(data)) {
+            if (isWindows(data)) {
                 readOnly = isReadOnly(data);
                 hidden = BitUtils.isBitSet(data[0], BIT1);
                 system = BitUtils.isBitSet(data[0], BIT2);
+                laboratory = BitUtils.isBitSet(data[0], BIT3);
+                directory = BitUtils.isBitSet(data[0], BIT4);
                 archive = BitUtils.isBitSet(data[0], BIT5);
-            } else if (Posix.isValid(data))
-                readOnly = Posix.isReadOnly(data);
+            }
 
             return this;
         }
 
         @Override
+        @SuppressWarnings("SimplifiableConditionalExpression")
         public void apply(Path path) throws IOException {
+            boolean windows = isWindows(data);
+
             DosFileAttributeView dos = Files.getFileAttributeView(path, DosFileAttributeView.class);
-            dos.setReadOnly(readOnly);
-            dos.setHidden(hidden);
-            dos.setSystem(system);
-            dos.setArchive(archive);
+            dos.setReadOnly(windows ? readOnly : Posix.isReadOnly(data));
+            dos.setHidden(windows ? hidden : false);
+            dos.setSystem(windows ? system : false);
+            dos.setArchive(windows ? archive : true);
         }
 
         @Override
-        public byte[] get() {
-            byte[] data = new byte[SIZE];
-            data[0] = BitUtils.updateBits(data[0], BIT0, readOnly);
+        public byte[] getData() {
+            byte[] data = super.getData();
+
+            data[0] = BitUtils.updateBits((byte)0x0, BIT0, readOnly);
             data[0] = BitUtils.updateBits(data[0], BIT1, hidden);
             data[0] = BitUtils.updateBits(data[0], BIT2, system);
+            data[0] = BitUtils.updateBits(data[0], BIT3, laboratory);
+            data[0] = BitUtils.updateBits(data[0], BIT4, directory);
             data[0] = BitUtils.updateBits(data[0], BIT5, archive);
+
             return data;
+        }
+
+        @Override
+        public String getDetails() {
+            List<String> attributes = new ArrayList<>(4);
+
+            if (readOnly)
+                attributes.add("rdo");
+            if (hidden)
+                attributes.add("hid");
+            if (system)
+                attributes.add("sys");
+            if (laboratory)
+                attributes.add("lab");
+            if (directory)
+                attributes.add("dir");
+            if (archive)
+                attributes.add("arc");
+
+            if (attributes.isEmpty())
+                return "none";
+            if (attributes.size() == 1 && "rdo".equals(attributes.get(0)))
+                return "read-only";
+            return String.join(" ", attributes);
         }
 
         @Override
@@ -173,8 +219,10 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]> {
         private static boolean isReadOnly(byte[] data) {
             return BitUtils.isBitSet(data[0], BIT0);
         }
+
     }
 
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     private static class Posix extends ExternalFileAttributes {
 
         private boolean othersExecute;
@@ -189,33 +237,15 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]> {
         private boolean directory;
         private boolean regularFile;
 
-        public static boolean isValid(byte[] data) {
+        public static boolean isPosix(byte[] data) {
             return data[2] != 0 || data[3] != 0;
-        }
-
-        private Posix() {
-            defaults();
-        }
-
-        private void defaults() {
-            othersExecute = false;
-            othersWrite = false;
-            othersRead = true;
-            groupExecute = false;
-            groupWrite = false;
-            groupRead = true;
-            ownerExecute = false;
-            ownerWrite = true;
-            ownerRead = true;
-            directory = false;
-            regularFile = true;
         }
 
         @Override
         public Posix readFrom(Path path) throws IOException {
-            defaults();
-            Set<PosixFilePermission> permissions = Files.getFileAttributeView(path, PosixFileAttributeView.class).readAttributes().permissions();
+            super.readFrom(path);
 
+            Set<PosixFilePermission> permissions = Files.getFileAttributeView(path, PosixFileAttributeView.class).readAttributes().permissions();
             othersExecute = permissions.contains(OTHERS_EXECUTE);
             othersWrite = permissions.contains(OTHERS_WRITE);
             othersRead = permissions.contains(OTHERS_READ);
@@ -227,15 +257,14 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]> {
             ownerRead = permissions.contains(OWNER_READ);
             directory = Files.isDirectory(path);
             regularFile = Files.isRegularFile(path);
-
             return this;
         }
 
         @Override
         public Posix readFrom(byte[] data) {
-            defaults();
+            super.readFrom(data);
 
-            if (isValid(data)) {
+            if (isPosix(data)) {
                 othersExecute = BitUtils.isBitSet(data[2], BIT0);
                 othersWrite = BitUtils.isBitSet(data[2], BIT1);
                 othersRead = BitUtils.isBitSet(data[2], BIT2);
@@ -247,31 +276,35 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]> {
                 ownerRead = BitUtils.isBitSet(data[3], BIT0);
                 directory = BitUtils.isBitSet(data[3], BIT6);
                 regularFile = BitUtils.isBitSet(data[3], BIT7);
-            } else if (Windows.isValid(data))
-                ownerWrite = !Windows.isReadOnly(data);
+            }
 
             return this;
         }
 
         @Override
+        @SuppressWarnings("SimplifiableConditionalExpression")
         public void apply(Path path) throws IOException {
+            boolean posix = isPosix(data);
             Set<PosixFilePermission> permissions = EnumSet.noneOf(PosixFilePermission.class);
-            addIfSet(othersExecute, permissions, OTHERS_EXECUTE);
-            addIfSet(othersWrite, permissions, OTHERS_WRITE);
-            addIfSet(othersRead, permissions, OTHERS_READ);
-            addIfSet(groupExecute, permissions, GROUP_EXECUTE);
-            addIfSet(groupWrite, permissions, GROUP_WRITE);
-            addIfSet(groupRead, permissions, GROUP_READ);
-            addIfSet(ownerExecute, permissions, OWNER_EXECUTE);
-            addIfSet(ownerWrite, permissions, OWNER_WRITE);
-            addIfSet(ownerRead, permissions, OWNER_READ);
+
+            addIfSet(posix ? othersExecute : false, permissions, OTHERS_EXECUTE);
+            addIfSet(posix ? othersWrite : false, permissions, OTHERS_WRITE);
+            addIfSet(posix ? othersRead : true, permissions, OTHERS_READ);
+            addIfSet(posix ? groupExecute : false, permissions, GROUP_EXECUTE);
+            addIfSet(posix ? groupWrite : false, permissions, GROUP_WRITE);
+            addIfSet(posix ? groupRead : true, permissions, GROUP_READ);
+            addIfSet(posix ? ownerExecute : false, permissions, OWNER_EXECUTE);
+            addIfSet(posix ? ownerWrite : !Windows.isReadOnly(data), permissions, OWNER_WRITE);
+            addIfSet(posix ? ownerRead : true, permissions, OWNER_READ);
+
             Files.setPosixFilePermissions(path, permissions);
         }
 
         @Override
-        public byte[] get() {
-            byte[] data = new byte[SIZE];
-            data[2] = BitUtils.updateBits(data[2], BIT0, othersExecute);
+        public byte[] getData() {
+            byte[] data = super.getData();
+
+            data[2] = BitUtils.updateBits((byte)0x0, BIT0, othersExecute);
             data[2] = BitUtils.updateBits(data[2], BIT1, othersWrite);
             data[2] = BitUtils.updateBits(data[2], BIT2, othersRead);
             data[2] = BitUtils.updateBits(data[2], BIT3, groupExecute);
@@ -279,10 +312,37 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]> {
             data[2] = BitUtils.updateBits(data[2], BIT5, groupRead);
             data[2] = BitUtils.updateBits(data[2], BIT6, ownerExecute);
             data[2] = BitUtils.updateBits(data[2], BIT7, ownerWrite);
-            data[3] = BitUtils.updateBits(data[3], BIT0, ownerRead);
+            data[3] = BitUtils.updateBits((byte)0x0, BIT0, ownerRead);
             data[3] = BitUtils.updateBits(data[3], BIT6, directory);
             data[3] = BitUtils.updateBits(data[3], BIT7, regularFile);
+
             return data;
+        }
+
+        @Override
+        public String getDetails() {
+            StringBuilder buf = new StringBuilder();
+
+            if (directory)
+                buf.append('d');
+            else if (regularFile)
+                buf.append('-');
+            else
+                buf.append('?');
+
+            buf.append(ownerRead ? 'r' : '-');
+            buf.append(ownerWrite ? 'w' : '-');
+            buf.append(ownerExecute ? 'x' : '-');
+
+            buf.append(groupRead ? 'r' : '-');
+            buf.append(groupWrite ? 'w' : '-');
+            buf.append(groupExecute ? 'x' : '-');
+
+            buf.append(othersRead ? 'r' : '-');
+            buf.append(othersWrite ? 'w' : '-');
+            buf.append(othersExecute ? 'x' : '-');
+
+            return buf.toString();
         }
 
         @Override
@@ -298,6 +358,7 @@ public abstract class ExternalFileAttributes implements Supplier<byte[]> {
         private static boolean isReadOnly(byte[] data) {
             return BitUtils.isBitClear(data[2], BIT1 | BIT4 | BIT7);
         }
+
     }
 
 }

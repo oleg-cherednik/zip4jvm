@@ -27,13 +27,12 @@ public class CentralDirectory {
     public static class FileHeader {
 
         public static final int SIGNATURE = 0x02014B50;
-        public static final int VERSION = 20;
 
         // size:4 - signature (0x02014b50)
         // size:2 - version made by
-        private int versionMadeBy = VERSION;
+        private Version versionMadeBy = Version.NULL;
         // size:2 - version needed to extractEntries
-        private int versionToExtract = VERSION;
+        private Version versionToExtract = Version.NULL;
         // size:2 - general purpose bit flag
         private GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         // size:2 - compression method
@@ -54,7 +53,7 @@ public class CentralDirectory {
         // size:2 - disk number start
         private int disk;
         // size:2 - internal file attributes
-        private InternalFileAttributes internalFileAttributes = InternalFileAttributes.NULL;
+        private final InternalFileAttributes internalFileAttributes = new InternalFileAttributes();
         // size:4 - external file attributes
         private ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.NULL;
         // size:4 - relative offset of local header
@@ -82,6 +81,10 @@ public class CentralDirectory {
 
         public boolean isZip64() {
             return extraField.getExtendedInfo() != Zip64.ExtendedInfo.NULL;
+        }
+
+        public void setInternalFileAttributes(InternalFileAttributes internalFileAttributes) {
+            this.internalFileAttributes.readFrom(internalFileAttributes);
         }
 
         public void setExtraField(ExtraField extraField) {
@@ -113,6 +116,7 @@ public class CentralDirectory {
 
     }
 
+    /** see 4.3.13 */
     @Getter
     @Setter
     public static class DigitalSignature {

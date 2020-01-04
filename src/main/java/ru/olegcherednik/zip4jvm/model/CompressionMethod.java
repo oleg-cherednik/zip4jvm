@@ -5,31 +5,32 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
+ * see 4.4.5
+ *
  * @author Oleg Cherednik
  * @since 09.03.2019
  */
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum CompressionMethod {
-    STORE(0),
-    //    FILE_SHRUNK(1),
-//    FILE_RED_COMP_FACTOR_1(2),
-//    FILE_RED_COMP_FACTOR_2(3),
-//    FILE_RED_COMP_FACTOR_3(4),
-//    FILE_RED_COMP_FACTOR_4(5),
-//    FILE_IMPLODED(6),
-    DEFLATE(8),
-    //    FILE_ENHANCED_DEFLATED(9),
-//    PKWARE_DATA_COMP_LIB_IMPL(10),
-//    BZIP2(12),
-//    LZMA(14),
-//    IBM_TERSE(18),
-//    IBM_LZ77(19),
-//    WAVPACK(97),
-//    PPMD(98),
-    AES(99);
+    STORE(0, "none (stored)"),
+    FILE_SHRUNK(1, "shrunk"),
+    FILE_RED_COMP_FACTOR_1(2, "reduced (factor 1)"),
+    FILE_RED_COMP_FACTOR_2(3, "reduced (factor 2)"),
+    FILE_RED_COMP_FACTOR_3(4, "reduced (factor 3)"),
+    FILE_RED_COMP_FACTOR_4(5, "reduced (factor 4)"),
+    FILE_IMPLODED(6, "imploded"),
+    DEFLATE(8, "deflated"),
+    ENHANCED_DEFLATE(9, "deflated (enhanced)"),
+    BZIP2(12, "bzip2 algorithm"),
+    LZMA(14, "lzma encoding"),
+    JPEG(96, "jpeg compression"),
+    WAVPACK(97, "wavpack compression"),
+    PPMD(98, "ppmd encoding"),
+    AES(99, "AES encryption");
 
     private final int code;
+    private final String title;
 
     public static CompressionMethod parseCode(int code) {
         for (CompressionMethod method : values())

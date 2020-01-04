@@ -20,7 +20,7 @@ public class LocalFileHeader {
 
     // size:4 - signature (0x04034B50)
     // size:2 - version needed to extractEntries
-    private int versionToExtract;
+    private Version versionToExtract = Version.NULL;
     // size:2 - general purpose bit flag
     private GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
     // size:2 - compression method

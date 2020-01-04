@@ -10,9 +10,37 @@ import java.nio.charset.Charset;
  */
 public interface DataInput extends Closeable {
 
+    default int dwordSignatureSize() {
+        return dwordSize();
+    }
+
+    int byteSize();
+
+    int wordSize();
+
+    int dwordSize();
+
+    int qwordSize();
+
     long getOffs();
 
-    default int readSignature() throws IOException {
+    default long getDisk() {
+        return 0;
+    }
+
+    default String getFileName() {
+        return null;
+    }
+
+    default long getTotalDisks() {
+        return 0;
+    }
+
+    default int readWordSignature() throws IOException {
+        return readWord();
+    }
+
+    default int readDwordSignature() throws IOException {
         return (int)readDword();
     }
 
@@ -22,18 +50,34 @@ public interface DataInput extends Closeable {
 
     long readQword() throws IOException;
 
+    String readNumber(int bytes, int radix) throws IOException;
+
     String readString(int length, Charset charset) throws IOException;
 
     int readByte() throws IOException;
 
     byte[] readBytes(int total) throws IOException;
 
-    void skip(int bytes) throws IOException;
+    void skip(long bytes) throws IOException;
 
     long length() throws IOException;
 
     void seek(long pos) throws IOException;
 
+    default void backward(int bytes) throws IOException {
+        seek(getOffs() - bytes);
+    }
+
     int read(byte[] buf, int offs, int len) throws IOException;
+
+    void mark(String id);
+
+    long getMark(String id);
+
+    void seek(String id) throws IOException;
+
+    void cleanBuffer();
+
+    byte[] getLastBytes(int bytes);
 
 }

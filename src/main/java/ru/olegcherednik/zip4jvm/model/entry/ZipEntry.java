@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.model.entry;
 
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import ru.olegcherednik.zip4jvm.ZipFile;
@@ -91,7 +90,7 @@ public abstract class ZipEntry {
     }
 
     public InternalFileAttributes getInternalFileAttributes() throws IOException {
-        return InternalFileAttributes.NULL;
+        return new InternalFileAttributes();
     }
 
     public long getChecksum() {
@@ -106,7 +105,6 @@ public abstract class ZipEntry {
         return dataDescriptorAvailable.getAsBoolean();
     }
 
-    @NonNull
     public final ZipFile.Entry createImmutableEntry() {
         ZipFile.Entry.Builder builder = ZipFile.Entry.builder()
                                                      .inputStreamSupplier(this::getInputStream)

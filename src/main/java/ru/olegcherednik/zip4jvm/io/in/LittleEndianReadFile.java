@@ -20,9 +20,8 @@ public class LittleEndianReadFile implements DataInputFile {
     }
 
     @Override
-    public void skip(int bytes) throws IOException {
-        if (bytes > 0)
-            in.skipBytes(bytes);
+    public int skip(int bytes) throws IOException {
+        return in.skipBytes(bytes);
     }
 
     @Override
@@ -52,6 +51,7 @@ public class LittleEndianReadFile implements DataInputFile {
 
     @Override
     public int readSignature() throws IOException {
+        // TODO probably it's better to use convert
         int b0 = in.read();
         int b1 = in.read();
         int b2 = in.read();

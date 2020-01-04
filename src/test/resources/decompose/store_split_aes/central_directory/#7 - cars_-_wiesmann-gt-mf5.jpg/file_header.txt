@@ -1,0 +1,34 @@
+#7 (PK0102) [UTF-8] cars/wiesmann-gt-mf5.jpg
+--------------------------------------------
+    - disk (0005):                                  src.zip
+    - location:                                     238657 (0x0003A441) bytes
+    - size:                                         81 bytes
+    part number of this part (0002):                3
+    relative offset of local header:                522520 (0x0007F918) bytes
+    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+    version made by zip software (20):              2.0
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (99):                        AES encryption
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+    32-bit CRC value:                               0x00000000
+    compressed size:                                729653 bytes
+    uncompressed size:                              729633 bytes
+    length of filename:                             24
+                                                    UTF-8
+    63 61 72 73 2F 77 69 65 73 6D 61 6E 6E 2D 67 74 cars/wiesmann-gt
+    2D 6D 66 35 2E 6A 70 67                         -mf5.jpg
+    length of file comment:                         0 bytes
+    internal file attributes:                       0x0000
+      apparent file type:                           binary
+<-- ignore_line -->    external file attributes:                       0x00000020
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
+<-- ignore_line -->      POSIX (0x000000):                             ?---------
+    extra field:                                    238727 (0x0003A487) bytes
+      - disk (0005):                                src.zip
+      - size:                                       11 bytes (1 record)

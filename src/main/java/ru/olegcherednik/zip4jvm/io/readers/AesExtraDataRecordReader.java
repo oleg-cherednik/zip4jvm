@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.model.AesExtraDataRecord;
+import ru.olegcherednik.zip4jvm.model.AesExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
@@ -15,26 +15,28 @@ import java.io.IOException;
  * @since 14.04.2019
  */
 @RequiredArgsConstructor
-final class AesExtraDataRecordReader implements Reader<AesExtraDataRecord> {
+public final class AesExtraDataRecordReader implements Reader<AesExtraFieldRecord> {
 
-    private final int signature;
+    private final int size;
 
     @Override
-    public AesExtraDataRecord read(DataInput in) throws IOException {
-        if (signature != AesExtraDataRecord.SIGNATURE)
-            return AesExtraDataRecord.NULL;
-
-        int size = in.readWord();
+    public AesExtraFieldRecord read(DataInput in) throws IOException {
         int versionNumber = in.readWord();
         String vendor = in.readString(2, Charsets.UTF_8);
         AesStrength strength = AesStrength.parseValue(in.readByte());
         CompressionMethod compressionMethod = CompressionMethod.parseCode(in.readWord());
 
-        return AesExtraDataRecord.builder()
-                                 .size(size)
-                                 .versionNumber(versionNumber)
-                                 .vendor(vendor)
-                                 .strength(strength)
-                                 .compressionMethod(compressionMethod).build();
+        return AesExtraFieldRecord.builder()
+                                  .dataSize(size)
+                                  .versionNumber(versionNumber)
+                                  .vendor(vendor)
+                                  .strength(strength)
+                                  .compressionMethod(compressionMethod).build();
     }
+
+    @Override
+    public String toString() {
+        return String.format("AES (0x%04X)", AesExtraFieldRecord.SIGNATURE);
+    }
+
 }

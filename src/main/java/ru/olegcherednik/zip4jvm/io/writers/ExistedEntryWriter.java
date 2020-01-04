@@ -4,11 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
-import ru.olegcherednik.zip4jvm.io.in.SplitZipInputStream;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
+import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -18,17 +17,15 @@ import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.function.Function;
 
 /**
+ * This writer copy existed {@link ZipEntry} block from one zip file to another as is. This block is not modified during the copy.
+ *
  * @author Oleg Cherednik
  * @since 12.09.2019
  */
 @RequiredArgsConstructor
 public class ExistedEntryWriter implements Writer {
-
-    private static final String LOCAL_FILE_HEADER_OFFS = "localFileHeaderOffs";
 
     private final ZipModel srcZipModel;
     private final String entryName;
@@ -37,21 +34,25 @@ public class ExistedEntryWriter implements Writer {
 
     @Override
     public void write(DataOutput out) throws IOException {
-        ZipEntry entry = srcZipModel.getEntryByFileName(entryName);
+        ZipEntry entry = srcZipModel.getZipEntryByFileName(entryName);
+        // TODO it seems that this should not be done, because we just copy encrypted/not encrypted entry
         entry.setPassword(entry.isEncrypted() ? password : null);
+
+        long offs = out.getOffs();
+        long disk = out.getDisk();
 
         try (CopyEntryInputStream in = new CopyEntryInputStream(entry, srcZipModel)) {
             if (!destZipModel.hasEntry(entryName))
                 destZipModel.addEntry(entry);
 
-            out.mark(LOCAL_FILE_HEADER_OFFS);
-
             in.copyLocalFileHeader(out);
             in.copyEncryptionHeaderAndData(out);
             in.copyDataDescriptor(out);
-
-            entry.setLocalFileHeaderOffs(out.getMark(LOCAL_FILE_HEADER_OFFS));
+            // TODO probably should set compressed size here
         }
+
+        entry.setLocalFileHeaderOffs(offs);
+        entry.setDisk(disk);
     }
 
     @Override
@@ -66,12 +67,11 @@ public class ExistedEntryWriter implements Writer {
 
         public CopyEntryInputStream(ZipEntry zipEntry, ZipModel zipModel) throws IOException {
             this.zipEntry = zipEntry;
-            in = zipModel.isSplit() ? new SplitZipInputStream(zipModel, zipEntry.getDisk()) : new SingleZipInputStream(zipModel.getFile());
+            in = zipModel.createDataInput(zipEntry.getFileName());
         }
 
         public void copyLocalFileHeader(DataOutput out) throws IOException {
-            Function<Charset, Charset> charsetCustomizer = ZipModel.STANDARD_ZIP_CHARSET;
-            LocalFileHeader localFileHeader = new LocalFileHeaderReader(zipEntry.getLocalFileHeaderOffs(), charsetCustomizer).read(in);
+            LocalFileHeader localFileHeader = new LocalFileHeaderReader(zipEntry.getLocalFileHeaderOffs(), Charsets.UNMODIFIED).read(in);
             zipEntry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
             new LocalFileHeaderWriter(localFileHeader).write(out);
         }

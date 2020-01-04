@@ -51,7 +51,6 @@ public class Zip4jvmToJdkCompatibilityTest {
 
             assertThatDirectory(dstDir).matches(rootAssert);
         }
-
     }
 
 }

@@ -12,15 +12,13 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
-public class SplitZipInputStream extends BaseDataInput {
+public class SplitZipInputStream extends BaseZipDataInput {
 
-    protected final ZipModel zipModel;
     private long disk;
 
     public SplitZipInputStream(ZipModel zipModel, long disk) throws IOException {
-        this.zipModel = zipModel;
+        super(zipModel, zipModel.getPartFile(disk));
         this.disk = disk;
-        delegate = new LittleEndianReadFile(zipModel.getPartFile(disk));
         checkSignature();
     }
 
@@ -37,6 +35,7 @@ public class SplitZipInputStream extends BaseDataInput {
 
         while (res < len) {
             int total = delegate.read(buf, offs, size);
+            cycleBuffer.write(buf, offs, size);
 
             if (total > 0)
                 res += total;
@@ -51,10 +50,34 @@ public class SplitZipInputStream extends BaseDataInput {
         return res;
     }
 
+    @Override
+    public void skip(long bytes) throws IOException {
+        while (bytes > 0) {
+            int expected = (int)Math.min(bytes, Integer.MAX_VALUE);
+            int actual = delegate.skip(expected);
+
+            bytes -= actual;
+
+            if (actual < expected)
+                openNextDisk();
+        }
+    }
+
     private void openNextDisk() throws IOException {
         Path splitFile = zipModel.getPartFile(++disk);
         delegate.close();
         delegate = new LittleEndianReadFile(splitFile);
+        fileName = splitFile.getFileName().toString();
+    }
+
+    @Override
+    public final String toString() {
+        return "disk: " + disk + ", " + super.toString();
+    }
+
+    @Override
+    public long getDisk() {
+        return disk;
     }
 
 }

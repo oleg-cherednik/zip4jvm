@@ -1,0 +1,31 @@
+#10 (PK0102) [UTF-8] mcdonnell-douglas-f15-eagle.jpg
+----------------------------------------------------
+    - disk (0005):                                  src.zip
+    - location:                                     238549 (0x0003A3D5) bytes
+    - size:                                         77 bytes
+    part number of this part (0003):                4
+    relative offset of local header:                203657 (0x00031B89) bytes
+    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+    version made by zip software (20):              2.0
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (00):                        none (stored)
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+    32-bit CRC value:                               0x08C9E144
+    compressed size:                                624758 bytes
+    uncompressed size:                              624746 bytes
+    length of filename:                             31
+                                                    UTF-8
+    6D 63 64 6F 6E 6E 65 6C 6C 2D 64 6F 75 67 6C 61 mcdonnell-dougla
+    73 2D 66 31 35 2D 65 61 67 6C 65 2E 6A 70 67    s-f15-eagle.jpg
+    length of file comment:                         0 bytes
+    internal file attributes:                       0x0000
+      apparent file type:                           binary
+<-- ignore_line -->    external file attributes:                       0x00000020
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
+<-- ignore_line -->      POSIX (0x000000):                             ?---------

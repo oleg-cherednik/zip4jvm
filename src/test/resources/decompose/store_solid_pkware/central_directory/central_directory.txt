@@ -1,0 +1,5 @@
+(PK0102) Central directory
+==========================
+    - location:                                     5480802 (0x0053A162) bytes
+    - size:                                         900 bytes
+    total entries:                                  13

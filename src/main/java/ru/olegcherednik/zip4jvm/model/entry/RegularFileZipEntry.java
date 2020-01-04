@@ -21,7 +21,6 @@ final class RegularFileZipEntry extends ZipEntry {
     public RegularFileZipEntry(String fileName, int lastModifiedTime, ExternalFileAttributes externalFileAttributes, Compression compression,
             CompressionLevel compressionLevel, Encryption encryption, ZipEntryInputStreamSupplier inputStreamSup) {
         super(fileName, lastModifiedTime, externalFileAttributes, compression, compressionLevel, encryption, inputStreamSup);
-        setDataDescriptorAvailable(() -> true);
     }
 
     @Override

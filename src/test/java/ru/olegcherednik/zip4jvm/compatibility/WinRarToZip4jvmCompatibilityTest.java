@@ -16,7 +16,7 @@ import static ru.olegcherednik.zip4jvm.TestData.winRarStoreSolidPkwareZip;
 import static ru.olegcherednik.zip4jvm.TestData.winRarStoreSolidZip;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertionsForClassTypes.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
 /**
  * @author Oleg Cherednik
@@ -38,6 +38,5 @@ public class WinRarToZip4jvmCompatibilityTest {
             assertThatDirectory(destDir).matches(dirBikesAssert);
         }
     }
-
 
 }

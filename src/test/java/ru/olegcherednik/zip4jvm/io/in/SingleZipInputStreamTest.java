@@ -109,5 +109,4 @@ public class SingleZipInputStreamTest {
         assertThat(in.getOffs()).isEqualTo(IOUtils.EOF);
     }
 
-
 }

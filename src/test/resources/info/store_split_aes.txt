@@ -1,0 +1,1228 @@
+(PK0506) End of Central directory record
+========================================
+    - disk (0005):                                  src.zip
+    - location:                                     239182 (0x0003A64E) bytes
+    - size:                                         42 bytes
+    part number of this part (0005):                6
+    part number of start of central dir (0005):     6
+    number of entries in central dir in this part:  13
+    total number of entries in central dir:         13
+    size of central dir:                            1028 (0x00000404) bytes
+    relative offset of central dir:                 238154 (0x0003A24A) bytes
+    zipfile comment length:                         20 bytes
+                                                    UTF-8
+    70 61 73 73 77 6F 72 64 3A 20 3C 66 69 6C 65 4E password: <fileN
+    61 6D 65 3E                                     ame>
+
+(PK0102) Central directory
+==========================
+    - disk (0005):                                  src.zip
+    - location:                                     238154 (0x0003A24A) bytes
+    - size:                                         1032 bytes
+    total entries:                                  13
+
+#1 (PK0102) [UTF-8] bikes/ducati-panigale-1199.jpg
+--------------------------------------------------
+    - disk (0005):                                  src.zip
+    - location:                                     238154 (0x0003A24A) bytes
+    - size:                                         87 bytes
+    part number of this part (0000):                1
+    relative offset of local header:                4 (0x00000004) bytes
+    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+    version made by zip software (20):              2.0
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (99):                        AES encryption
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+    32-bit CRC value:                               0x00000000
+    compressed size:                                293843 bytes
+    uncompressed size:                              293823 bytes
+    length of filename:                             30
+                                                    UTF-8
+    62 69 6B 65 73 2F 64 75 63 61 74 69 2D 70 61 6E bikes/ducati-pan
+    69 67 61 6C 65 2D 31 31 39 39 2E 6A 70 67       igale-1199.jpg
+    length of file comment:                         0 bytes
+    internal file attributes:                       0x0000
+      apparent file type:                           binary
+<-- ignore_line -->    external file attributes:                       0x00000020
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
+<-- ignore_line -->      POSIX (0x000000):                             ?---------
+    extra field:                                    238230 (0x0003A296) bytes
+      - disk (0005):                                src.zip
+      - size:                                       11 bytes (1 record)
+    (0x9901) AES Encryption Tag:                    238230 (0x0003A296) bytes
+      - disk (0005):                                src.zip
+      - size:                                       11 bytes
+      Encryption Tag Version:                       AE-2
+      Encryption Key Bits:                          128
+      compression method (00):                      none (stored)
+
+#2 (PK0102) [UTF-8] bikes/honda-cbr600rr.jpg
+--------------------------------------------
+    - disk (0005):                                  src.zip
+    - location:                                     238241 (0x0003A2A1) bytes
+    - size:                                         81 bytes
+    part number of this part (0000):                1
+    relative offset of local header:                293934 (0x00047C2E) bytes
+    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+    version made by zip software (20):              2.0
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (99):                        AES encryption
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+    32-bit CRC value:                               0x00000000
+    compressed size:                                154611 bytes
+    uncompressed size:                              154591 bytes
+    length of filename:                             24
+                                                    UTF-8
+    62 69 6B 65 73 2F 68 6F 6E 64 61 2D 63 62 72 36 bikes/honda-cbr6
+    30 30 72 72 2E 6A 70 67                         00rr.jpg
+    length of file comment:                         0 bytes
+    internal file attributes:                       0x0000
+      apparent file type:                           binary
+<-- ignore_line -->    external file attributes:                       0x00000020
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
+<-- ignore_line -->      POSIX (0x000000):                             ?---------
+    extra field:                                    238311 (0x0003A2E7) bytes
+      - disk (0005):                                src.zip
+      - size:                                       11 bytes (1 record)
+    (0x9901) AES Encryption Tag:                    238311 (0x0003A2E7) bytes
+      - disk (0005):                                src.zip
+      - size:                                       11 bytes
+      Encryption Tag Version:                       AE-2
+      Encryption Key Bits:                          128
+      compression method (00):                      none (stored)
+
+#3 (PK0102) [UTF-8] bikes/kawasaki-ninja-300.jpg
+------------------------------------------------
+    - disk (0005):                                  src.zip
+    - location:                                     238322 (0x0003A2F2) bytes
+    - size:                                         85 bytes
+    part number of this part (0000):                1
+    relative offset of local header:                448626 (0x0006D872) bytes
+    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+    version made by zip software (20):              2.0
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (99):                        AES encryption
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+    32-bit CRC value:                               0x00000000
+    compressed size:                                167046 bytes
+    uncompressed size:                              167026 bytes
+    length of filename:                             28
+                                                    UTF-8
+    62 69 6B 65 73 2F 6B 61 77 61 73 61 6B 69 2D 6E bikes/kawasaki-n
+    69 6E 6A 61 2D 33 30 30 2E 6A 70 67             inja-300.jpg
+    length of file comment:                         0 bytes
+    internal file attributes:                       0x0000
+      apparent file type:                           binary
+<-- ignore_line -->    external file attributes:                       0x00000020
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
+<-- ignore_line -->      POSIX (0x000000):                             ?---------
+    extra field:                                    238396 (0x0003A33C) bytes
+      - disk (0005):                                src.zip
+      - size:                                       11 bytes (1 record)
+    (0x9901) AES Encryption Tag:                    238396 (0x0003A33C) bytes
+      - disk (0005):                                src.zip
+      - size:                                       11 bytes
+      Encryption Tag Version:                       AE-2
+      Encryption Key Bits:                          128
+      compression method (00):                      none (stored)
+
+#4 (PK0102) [UTF-8] bikes/suzuki-gsxr750.jpg
+--------------------------------------------
+    - disk (0005):                                  src.zip
+    - location:                                     238407 (0x0003A347) bytes
+    - size:                                         81 bytes
+    part number of this part (0000):                1
+    relative offset of local header:                615757 (0x0009654D) bytes
+    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+    version made by zip software (20):              2.0
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (99):                        AES encryption
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+    32-bit CRC value:                               0x00000000
+    compressed size:                                287369 bytes
+    uncompressed size:                              287349 bytes
+    length of filename:                             24
+                                                    UTF-8
+    62 69 6B 65 73 2F 73 75 7A 75 6B 69 2D 67 73 78 bikes/suzuki-gsx
+    72 37 35 30 2E 6A 70 67                         r750.jpg
+    length of file comment:                         0 bytes
+    internal file attributes:                       0x0000
+      apparent file type:                           binary
+<-- ignore_line -->    external file attributes:                       0x00000020
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
+<-- ignore_line -->      POSIX (0x000000):                             ?---------
+    extra field:                                    238477 (0x0003A38D) bytes
+      - disk (0005):                                src.zip
+      - size:                                       11 bytes (1 record)
+    (0x9901) AES Encryption Tag:                    238477 (0x0003A38D) bytes
+      - disk (0005):                                src.zip
+      - size:                                       11 bytes
+      Encryption Tag Version:                       AE-2
+      Encryption Key Bits:                          128
+      compression method (00):                      none (stored)
+
+#5 (PK0102) [UTF-8] cars/bentley-continental.jpg
+------------------------------------------------
+    - disk (0005):                                  src.zip
+    - location:                                     238488 (0x0003A398) bytes
+    - size:                                         85 bytes
+    part number of this part (0000):                1
+    relative offset of local header:                903207 (0x000DC827) bytes
+    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+    version made by zip software (20):              2.0
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (99):                        AES encryption
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+    32-bit CRC value:                               0x00000000
+    compressed size:                                1395382 bytes
+    uncompressed size:                              1395362 bytes
+    length of filename:                             28
+                                                    UTF-8
+    63 61 72 73 2F 62 65 6E 74 6C 65 79 2D 63 6F 6E cars/bentley-con
+    74 69 6E 65 6E 74 61 6C 2E 6A 70 67             tinental.jpg
+    length of file comment:                         0 bytes
+    internal file attributes:                       0x0000
+      apparent file type:                           binary
+<-- ignore_line -->    external file attributes:                       0x00000020
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
+<-- ignore_line -->      POSIX (0x000000):                             ?---------
+    extra field:                                    238562 (0x0003A3E2) bytes
+      - disk (0005):                                src.zip
+      - size:                                       11 bytes (1 record)
+    (0x9901) AES Encryption Tag:                    238562 (0x0003A3E2) bytes
+      - disk (0005):                                src.zip
+      - size:                                       11 bytes
+      Encryption Tag Version:                       AE-2
+      Encryption Key Bits:                          128
+      compression method (00):                      none (stored)
+
+#6 (PK0102) [UTF-8] cars/ferrari-458-italia.jpg
+-----------------------------------------------
+    - disk (0005):                                  src.zip
+    - location:                                     238573 (0x0003A3ED) bytes
+    - size:                                         84 bytes
+    part number of this part (0002):                3
+    relative offset of local header:                201522 (0x00031332) bytes
+    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+    version made by zip software (20):              2.0
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (99):                        AES encryption
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+    32-bit CRC value:                               0x00000000
+    compressed size:                                320914 bytes
+    uncompressed size:                              320894 bytes
+    length of filename:                             27
+                                                    UTF-8
+    63 61 72 73 2F 66 65 72 72 61 72 69 2D 34 35 38 cars/ferrari-458
+    2D 69 74 61 6C 69 61 2E 6A 70 67                -italia.jpg
+    length of file comment:                         0 bytes
+    internal file attributes:                       0x0000
+      apparent file type:                           binary
+<-- ignore_line -->    external file attributes:                       0x00000020
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
+<-- ignore_line -->      POSIX (0x000000):                             ?---------
+    extra field:                                    238646 (0x0003A436) bytes
+      - disk (0005):                                src.zip
+      - size:                                       11 bytes (1 record)
+    (0x9901) AES Encryption Tag:                    238646 (0x0003A436) bytes
+      - disk (0005):                                src.zip
+      - size:                                       11 bytes
+      Encryption Tag Version:                       AE-2
+      Encryption Key Bits:                          128
+      compression method (00):                      none (stored)
+
+#7 (PK0102) [UTF-8] cars/wiesmann-gt-mf5.jpg
+--------------------------------------------
+    - disk (0005):                                  src.zip
+    - location:                                     238657 (0x0003A441) bytes
+    - size:                                         81 bytes
+    part number of this part (0002):                3
+    relative offset of local header:                522520 (0x0007F918) bytes
+    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+    version made by zip software (20):              2.0
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (99):                        AES encryption
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+    32-bit CRC value:                               0x00000000
+    compressed size:                                729653 bytes
+    uncompressed size:                              729633 bytes
+    length of filename:                             24
+                                                    UTF-8
+    63 61 72 73 2F 77 69 65 73 6D 61 6E 6E 2D 67 74 cars/wiesmann-gt
+    2D 6D 66 35 2E 6A 70 67                         -mf5.jpg
+    length of file comment:                         0 bytes
+    internal file attributes:                       0x0000
+      apparent file type:                           binary
+<-- ignore_line -->    external file attributes:                       0x00000020
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
+<-- ignore_line -->      POSIX (0x000000):                             ?---------
+    extra field:                                    238727 (0x0003A487) bytes
+      - disk (0005):                                src.zip
+      - size:                                       11 bytes (1 record)
+    (0x9901) AES Encryption Tag:                    238727 (0x0003A487) bytes
+      - disk (0005):                                src.zip
+      - size:                                       11 bytes
+      Encryption Tag Version:                       AE-2
+      Encryption Key Bits:                          128
+      compression method (00):                      none (stored)
+
+#8 (PK0102) [UTF-8] empty_dir/
+------------------------------
+    - disk (0005):                                  src.zip
+    - location:                                     238738 (0x0003A492) bytes
+    - size:                                         56 bytes
+    part number of this part (0003):                4
+    relative offset of local header:                203678 (0x00031B9E) bytes
+    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+    version made by zip software (20):              2.0
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0800) (bit 15..0):  0000.1000 0000.0000
+      file security status  (bit 0):                not encrypted
+      data descriptor       (bit 3):                no
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (00):                        none (stored)
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+    32-bit CRC value:                               0x00000000
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
+    length of filename:                             10
+                                                    UTF-8
+    65 6D 70 74 79 5F 64 69 72 2F                   empty_dir/
+    length of file comment:                         0 bytes
+    internal file attributes:                       0x0000
+      apparent file type:                           binary
+<-- ignore_line -->    external file attributes:                       0x00000010
+<-- ignore_line -->      MS-DOS file attributes (0x10):                dir
+<-- ignore_line -->      POSIX (0x000000):                             ?---------
+
+#9 (PK0102) [UTF-8] empty_file.txt
+----------------------------------
+    - disk (0005):                                  src.zip
+    - location:                                     238794 (0x0003A4CA) bytes
+    - size:                                         71 bytes
+    part number of this part (0003):                4
+    relative offset of local header:                203718 (0x00031BC6) bytes
+    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+    version made by zip software (20):              2.0
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (99):                        AES encryption
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+    32-bit CRC value:                               0x00000000
+    compressed size:                                20 bytes
+    uncompressed size:                              0 bytes
+    length of filename:                             14
+                                                    UTF-8
+    65 6D 70 74 79 5F 66 69 6C 65 2E 74 78 74       empty_file.txt
+    length of file comment:                         0 bytes
+    internal file attributes:                       0x0000
+      apparent file type:                           binary
+<-- ignore_line -->    external file attributes:                       0x00000020
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
+<-- ignore_line -->      POSIX (0x000000):                             ?---------
+    extra field:                                    238854 (0x0003A506) bytes
+      - disk (0005):                                src.zip
+      - size:                                       11 bytes (1 record)
+    (0x9901) AES Encryption Tag:                    238854 (0x0003A506) bytes
+      - disk (0005):                                src.zip
+      - size:                                       11 bytes
+      Encryption Tag Version:                       AE-2
+      Encryption Key Bits:                          128
+      compression method (00):                      none (stored)
+
+#10 (PK0102) [UTF-8] mcdonnell-douglas-f15-eagle.jpg
+----------------------------------------------------
+    - disk (0005):                                  src.zip
+    - location:                                     238865 (0x0003A511) bytes
+    - size:                                         88 bytes
+    part number of this part (0003):                4
+    relative offset of local header:                203809 (0x00031C21) bytes
+    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+    version made by zip software (20):              2.0
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (99):                        AES encryption
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+    32-bit CRC value:                               0x00000000
+    compressed size:                                624766 bytes
+    uncompressed size:                              624746 bytes
+    length of filename:                             31
+                                                    UTF-8
+    6D 63 64 6F 6E 6E 65 6C 6C 2D 64 6F 75 67 6C 61 mcdonnell-dougla
+    73 2D 66 31 35 2D 65 61 67 6C 65 2E 6A 70 67    s-f15-eagle.jpg
+    length of file comment:                         0 bytes
+    internal file attributes:                       0x0000
+      apparent file type:                           binary
+<-- ignore_line -->    external file attributes:                       0x00000020
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
+<-- ignore_line -->      POSIX (0x000000):                             ?---------
+    extra field:                                    238942 (0x0003A55E) bytes
+      - disk (0005):                                src.zip
+      - size:                                       11 bytes (1 record)
+    (0x9901) AES Encryption Tag:                    238942 (0x0003A55E) bytes
+      - disk (0005):                                src.zip
+      - size:                                       11 bytes
+      Encryption Tag Version:                       AE-2
+      Encryption Key Bits:                          128
+      compression method (00):                      none (stored)
+
+#11 (PK0102) [UTF-8] Oleg Cherednik.txt
+---------------------------------------
+    - disk (0005):                                  src.zip
+    - location:                                     238953 (0x0003A569) bytes
+    - size:                                         75 bytes
+    part number of this part (0003):                4
+    relative offset of local header:                828663 (0x000CA4F7) bytes
+    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+    version made by zip software (20):              2.0
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (99):                        AES encryption
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+    32-bit CRC value:                               0x00000000
+    compressed size:                                60 bytes
+    uncompressed size:                              40 bytes
+    length of filename:                             18
+                                                    UTF-8
+    4F 6C 65 67 20 43 68 65 72 65 64 6E 69 6B 2E 74 Oleg Cherednik.t
+    78 74                                           xt
+    length of file comment:                         0 bytes
+    internal file attributes:                       0x0000
+      apparent file type:                           binary
+<-- ignore_line -->    external file attributes:                       0x00000020
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
+<-- ignore_line -->      POSIX (0x000000):                             ?---------
+    extra field:                                    239017 (0x0003A5A9) bytes
+      - disk (0005):                                src.zip
+      - size:                                       11 bytes (1 record)
+    (0x9901) AES Encryption Tag:                    239017 (0x0003A5A9) bytes
+      - disk (0005):                                src.zip
+      - size:                                       11 bytes
+      Encryption Tag Version:                       AE-2
+      Encryption Key Bits:                          128
+      compression method (00):                      none (stored)
+
+#12 (PK0102) [UTF-8] saint-petersburg.jpg
+-----------------------------------------
+    - disk (0005):                                  src.zip
+    - location:                                     239028 (0x0003A5B4) bytes
+    - size:                                         77 bytes
+    part number of this part (0003):                4
+    relative offset of local header:                828798 (0x000CA57E) bytes
+    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+    version made by zip software (20):              2.0
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (99):                        AES encryption
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+    32-bit CRC value:                               0x00000000
+    compressed size:                                1074856 bytes
+    uncompressed size:                              1074836 bytes
+    length of filename:                             20
+                                                    UTF-8
+    73 61 69 6E 74 2D 70 65 74 65 72 73 62 75 72 67 saint-petersburg
+    2E 6A 70 67                                     .jpg
+    length of file comment:                         0 bytes
+    internal file attributes:                       0x0000
+      apparent file type:                           binary
+<-- ignore_line -->    external file attributes:                       0x00000020
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
+<-- ignore_line -->      POSIX (0x000000):                             ?---------
+    extra field:                                    239094 (0x0003A5F6) bytes
+      - disk (0005):                                src.zip
+      - size:                                       11 bytes (1 record)
+    (0x9901) AES Encryption Tag:                    239094 (0x0003A5F6) bytes
+      - disk (0005):                                src.zip
+      - size:                                       11 bytes
+      Encryption Tag Version:                       AE-2
+      Encryption Key Bits:                          128
+      compression method (00):                      none (stored)
+
+#13 (PK0102) [UTF-8] sig-sauer-pistol.jpg
+-----------------------------------------
+    - disk (0005):                                  src.zip
+    - location:                                     239105 (0x0003A601) bytes
+    - size:                                         77 bytes
+    part number of this part (0004):                5
+    relative offset of local header:                855155 (0x000D0C73) bytes
+    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+    version made by zip software (20):              2.0
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (99):                        AES encryption
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+    32-bit CRC value:                               0x00000000
+    compressed size:                                431498 bytes
+    uncompressed size:                              431478 bytes
+    length of filename:                             20
+                                                    UTF-8
+    73 69 67 2D 73 61 75 65 72 2D 70 69 73 74 6F 6C sig-sauer-pistol
+    2E 6A 70 67                                     .jpg
+    length of file comment:                         0 bytes
+    internal file attributes:                       0x0000
+      apparent file type:                           binary
+<-- ignore_line -->    external file attributes:                       0x00000020
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
+<-- ignore_line -->      POSIX (0x000000):                             ?---------
+    extra field:                                    239171 (0x0003A643) bytes
+      - disk (0005):                                src.zip
+      - size:                                       11 bytes (1 record)
+    (0x9901) AES Encryption Tag:                    239171 (0x0003A643) bytes
+      - disk (0005):                                src.zip
+      - size:                                       11 bytes
+      Encryption Tag Version:                       AE-2
+      Encryption Key Bits:                          128
+      compression method (00):                      none (stored)
+
+(PK0304) ZIP entries
+====================
+    total entries:                                  13
+
+#1 (PK0304) [UTF-8] bikes/ducati-panigale-1199.jpg
+--------------------------------------------------
+    - disk (0000):                                  src.z01
+    - location:                                     4 (0x00000004) bytes
+    - size:                                         71 bytes
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (99):                        AES encryption
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+    32-bit CRC value:                               0x00000000
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
+    length of filename:                             30
+                                                    UTF-8
+    62 69 6B 65 73 2F 64 75 63 61 74 69 2D 70 61 6E bikes/ducati-pan
+    69 67 61 6C 65 2D 31 31 39 39 2E 6A 70 67       igale-1199.jpg
+    extra field:                                    64 (0x00000040) bytes
+      - disk (0000):                                src.z01
+      - size:                                       11 bytes (1 record)
+    (0x9901) AES Encryption Tag:                    64 (0x00000040) bytes
+      - disk (0000):                                src.z01
+      - size:                                       11 bytes
+      Encryption Tag Version:                       AE-2
+      Encryption Key Bits:                          128
+      compression method (00):                      none (stored)
+
+#1 (AES) encryption header
+--------------------------
+    salt:                                           75 (0x0000004B) bytes
+      - disk (0000):                                src.z01
+      - size:                                       8 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){7}[0-9A-F]{2}$) -->    6F 90 CA 5A 73 E9 91 6B
+    password checksum:                              83 (0x00000053) bytes
+      - disk (0000):                                src.z01
+      - size:                                       2 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} )[0-9A-F]{2}$) -->    90 76
+    mac:                                            293908 (0x00047C14) bytes
+      - disk (0000):                                src.z01
+      - size:                                       10 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){9}[0-9A-F]{2}$) -->    5F 96 E5 2E E9 CE 50 4B 07 08
+
+#1 (PK0708) Data descriptor
+---------------------------
+    - disk (0000):                                  src.z01
+    - location:                                     293918 (0x00047C1E) bytes
+    - size:                                         16 bytes
+    32-bit CRC value:                               0xEDF5F6AB
+    compressed size:                                293843 bytes
+    uncompressed size:                              293823 bytes
+
+#2 (PK0304) [UTF-8] bikes/honda-cbr600rr.jpg
+--------------------------------------------
+    - disk (0000):                                  src.z01
+    - location:                                     293934 (0x00047C2E) bytes
+    - size:                                         65 bytes
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (99):                        AES encryption
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+    32-bit CRC value:                               0x00000000
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
+    length of filename:                             24
+                                                    UTF-8
+    62 69 6B 65 73 2F 68 6F 6E 64 61 2D 63 62 72 36 bikes/honda-cbr6
+    30 30 72 72 2E 6A 70 67                         00rr.jpg
+    extra field:                                    293988 (0x00047C64) bytes
+      - disk (0000):                                src.z01
+      - size:                                       11 bytes (1 record)
+    (0x9901) AES Encryption Tag:                    293988 (0x00047C64) bytes
+      - disk (0000):                                src.z01
+      - size:                                       11 bytes
+      Encryption Tag Version:                       AE-2
+      Encryption Key Bits:                          128
+      compression method (00):                      none (stored)
+
+#2 (AES) encryption header
+--------------------------
+    salt:                                           293999 (0x00047C6F) bytes
+      - disk (0000):                                src.z01
+      - size:                                       8 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){7}[0-9A-F]{2}$) -->    6F 90 CA 5A 73 E9 91 6B
+    password checksum:                              294007 (0x00047C77) bytes
+      - disk (0000):                                src.z01
+      - size:                                       2 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} )[0-9A-F]{2}$) -->    90 76
+    mac:                                            448600 (0x0006D858) bytes
+      - disk (0000):                                src.z01
+      - size:                                       10 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){9}[0-9A-F]{2}$) -->    5F 96 E5 2E E9 CE 50 4B 07 08
+
+#2 (PK0708) Data descriptor
+---------------------------
+    - disk (0000):                                  src.z01
+    - location:                                     448610 (0x0006D862) bytes
+    - size:                                         16 bytes
+    32-bit CRC value:                               0x3424AFA6
+    compressed size:                                154611 bytes
+    uncompressed size:                              154591 bytes
+
+#3 (PK0304) [UTF-8] bikes/kawasaki-ninja-300.jpg
+------------------------------------------------
+    - disk (0000):                                  src.z01
+    - location:                                     448626 (0x0006D872) bytes
+    - size:                                         69 bytes
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (99):                        AES encryption
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+    32-bit CRC value:                               0x00000000
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
+    length of filename:                             28
+                                                    UTF-8
+    62 69 6B 65 73 2F 6B 61 77 61 73 61 6B 69 2D 6E bikes/kawasaki-n
+    69 6E 6A 61 2D 33 30 30 2E 6A 70 67             inja-300.jpg
+    extra field:                                    448684 (0x0006D8AC) bytes
+      - disk (0000):                                src.z01
+      - size:                                       11 bytes (1 record)
+    (0x9901) AES Encryption Tag:                    448684 (0x0006D8AC) bytes
+      - disk (0000):                                src.z01
+      - size:                                       11 bytes
+      Encryption Tag Version:                       AE-2
+      Encryption Key Bits:                          128
+      compression method (00):                      none (stored)
+
+#3 (AES) encryption header
+--------------------------
+    salt:                                           448695 (0x0006D8B7) bytes
+      - disk (0000):                                src.z01
+      - size:                                       8 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){7}[0-9A-F]{2}$) -->    6F 90 CA 5A 73 E9 91 6B    A7 5E 1F C5 9B 16 88 E6
+    password checksum:                              448703 (0x0006D8BF) bytes
+      - disk (0000):                                src.z01
+      - size:                                       2 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} )[0-9A-F]{2}$) -->    90 76
+    mac:                                            615731 (0x00096533) bytes
+      - disk (0000):                                src.z01
+      - size:                                       10 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){9}[0-9A-F]{2}$) -->    5F 96 E5 2E E9 CE 50 4B 07 08
+
+#3 (PK0708) Data descriptor
+---------------------------
+    - disk (0000):                                  src.z01
+    - location:                                     615741 (0x0009653D) bytes
+    - size:                                         16 bytes
+    32-bit CRC value:                               0x5C89F301
+    compressed size:                                167046 bytes
+    uncompressed size:                              167026 bytes
+
+#4 (PK0304) [UTF-8] bikes/suzuki-gsxr750.jpg
+--------------------------------------------
+    - disk (0000):                                  src.z01
+    - location:                                     615757 (0x0009654D) bytes
+    - size:                                         65 bytes
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (99):                        AES encryption
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+    32-bit CRC value:                               0x00000000
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
+    length of filename:                             24
+                                                    UTF-8
+    62 69 6B 65 73 2F 73 75 7A 75 6B 69 2D 67 73 78 bikes/suzuki-gsx
+    72 37 35 30 2E 6A 70 67                         r750.jpg
+    extra field:                                    615811 (0x00096583) bytes
+      - disk (0000):                                src.z01
+      - size:                                       11 bytes (1 record)
+    (0x9901) AES Encryption Tag:                    615811 (0x00096583) bytes
+      - disk (0000):                                src.z01
+      - size:                                       11 bytes
+      Encryption Tag Version:                       AE-2
+      Encryption Key Bits:                          128
+      compression method (00):                      none (stored)
+
+#4 (AES) encryption header
+--------------------------
+    salt:                                           615822 (0x0009658E) bytes
+      - disk (0000):                                src.z01
+      - size:                                       8 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){7}[0-9A-F]{2}$) -->    6F 90 CA 5A 73 E9 91 6B
+    password checksum:                              615830 (0x00096596) bytes
+      - disk (0000):                                src.z01
+      - size:                                       2 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} )[0-9A-F]{2}$) -->    90 76
+    mac:                                            903181 (0x000DC80D) bytes
+      - disk (0000):                                src.z01
+      - size:                                       10 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){9}[0-9A-F]{2}$) -->    5F 96 E5 2E E9 CE 50 4B 07 08
+
+#4 (PK0708) Data descriptor
+---------------------------
+    - disk (0000):                                  src.z01
+    - location:                                     903191 (0x000DC817) bytes
+    - size:                                         16 bytes
+    32-bit CRC value:                               0xAC4B6C8C
+    compressed size:                                287369 bytes
+    uncompressed size:                              287349 bytes
+
+#5 (PK0304) [UTF-8] cars/bentley-continental.jpg
+------------------------------------------------
+    - disk (0000):                                  src.z01
+    - location:                                     903207 (0x000DC827) bytes
+    - size:                                         69 bytes
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (99):                        AES encryption
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+    32-bit CRC value:                               0x00000000
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
+    length of filename:                             28
+                                                    UTF-8
+    63 61 72 73 2F 62 65 6E 74 6C 65 79 2D 63 6F 6E cars/bentley-con
+    74 69 6E 65 6E 74 61 6C 2E 6A 70 67             tinental.jpg
+    extra field:                                    903265 (0x000DC861) bytes
+      - disk (0000):                                src.z01
+      - size:                                       11 bytes (1 record)
+    (0x9901) AES Encryption Tag:                    903265 (0x000DC861) bytes
+      - disk (0000):                                src.z01
+      - size:                                       11 bytes
+      Encryption Tag Version:                       AE-2
+      Encryption Key Bits:                          128
+      compression method (00):                      none (stored)
+
+#5 (AES) encryption header
+--------------------------
+    salt:                                           903276 (0x000DC86C) bytes
+      - disk (0000):                                src.z01
+      - size:                                       8 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){7}[0-9A-F]{2}$) -->    6F 90 CA 5A 73 E9 91 6B
+    password checksum:                              903284 (0x000DC874) bytes
+      - disk (0000):                                src.z01
+      - size:                                       2 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} )[0-9A-F]{2}$) -->    90 76
+    mac:                                            201496 (0x00031318) bytes
+      - disk (0002):                                src.z03
+      - size:                                       10 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){9}[0-9A-F]{2}$) -->    5F 96 E5 2E E9 CE 50 4B 07 08
+
+#5 (PK0708) Data descriptor
+---------------------------
+    - disk (0002):                                  src.z03
+    - location:                                     201506 (0x00031322) bytes
+    - size:                                         16 bytes
+    32-bit CRC value:                               0x71797968
+    compressed size:                                1395382 bytes
+    uncompressed size:                              1395362 bytes
+
+#6 (PK0304) [UTF-8] cars/ferrari-458-italia.jpg
+-----------------------------------------------
+    - disk (0002):                                  src.z03
+    - location:                                     201522 (0x00031332) bytes
+    - size:                                         68 bytes
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (99):                        AES encryption
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+    32-bit CRC value:                               0x00000000
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
+    length of filename:                             27
+                                                    UTF-8
+    63 61 72 73 2F 66 65 72 72 61 72 69 2D 34 35 38 cars/ferrari-458
+    2D 69 74 61 6C 69 61 2E 6A 70 67                -italia.jpg
+    extra field:                                    201579 (0x0003136B) bytes
+      - disk (0002):                                src.z03
+      - size:                                       11 bytes (1 record)
+    (0x9901) AES Encryption Tag:                    201579 (0x0003136B) bytes
+      - disk (0002):                                src.z03
+      - size:                                       11 bytes
+      Encryption Tag Version:                       AE-2
+      Encryption Key Bits:                          128
+      compression method (00):                      none (stored)
+
+#6 (AES) encryption header
+--------------------------
+    salt:                                           201590 (0x00031376) bytes
+      - disk (0002):                                src.z03
+      - size:                                       8 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){7}[0-9A-F]{2}$) -->    6F 90 CA 5A 73 E9 91 6B
+    password checksum:                              201598 (0x0003137E) bytes
+      - disk (0002):                                src.z03
+      - size:                                       2 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} )[0-9A-F]{2}$) -->    90 76
+    mac:                                            522494 (0x0007F8FE) bytes
+      - disk (0002):                                src.z03
+      - size:                                       10 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){9}[0-9A-F]{2}$) -->    5F 96 E5 2E E9 CE 50 4B 07 08
+
+#6 (PK0708) Data descriptor
+---------------------------
+    - disk (0002):                                  src.z03
+    - location:                                     522504 (0x0007F908) bytes
+    - size:                                         16 bytes
+    32-bit CRC value:                               0xFEC7AE40
+    compressed size:                                320914 bytes
+    uncompressed size:                              320894 bytes
+
+#7 (PK0304) [UTF-8] cars/wiesmann-gt-mf5.jpg
+--------------------------------------------
+    - disk (0002):                                  src.z03
+    - location:                                     522520 (0x0007F918) bytes
+    - size:                                         65 bytes
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (99):                        AES encryption
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+    32-bit CRC value:                               0x00000000
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
+    length of filename:                             24
+                                                    UTF-8
+    63 61 72 73 2F 77 69 65 73 6D 61 6E 6E 2D 67 74 cars/wiesmann-gt
+    2D 6D 66 35 2E 6A 70 67                         -mf5.jpg
+    extra field:                                    522574 (0x0007F94E) bytes
+      - disk (0002):                                src.z03
+      - size:                                       11 bytes (1 record)
+    (0x9901) AES Encryption Tag:                    522574 (0x0007F94E) bytes
+      - disk (0002):                                src.z03
+      - size:                                       11 bytes
+      Encryption Tag Version:                       AE-2
+      Encryption Key Bits:                          128
+      compression method (00):                      none (stored)
+
+#7 (AES) encryption header
+--------------------------
+    salt:                                           522585 (0x0007F959) bytes
+      - disk (0002):                                src.z03
+      - size:                                       8 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){7}[0-9A-F]{2}$) -->    6F 90 CA 5A 73 E9 91 6B
+    password checksum:                              522593 (0x0007F961) bytes
+      - disk (0002):                                src.z03
+      - size:                                       2 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} )[0-9A-F]{2}$) -->    90 76
+    mac:                                            203652 (0x00031B84) bytes
+      - disk (0003):                                src.z04
+      - size:                                       10 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){9}[0-9A-F]{2}$) -->    5F 96 E5 2E E9 CE 50 4B 07 08
+
+#7 (PK0708) Data descriptor
+---------------------------
+    - disk (0003):                                  src.z04
+    - location:                                     203662 (0x00031B8E) bytes
+    - size:                                         16 bytes
+    32-bit CRC value:                               0xDADB3142
+    compressed size:                                729653 bytes
+    uncompressed size:                              729633 bytes
+
+#8 (PK0304) [UTF-8] empty_dir/
+------------------------------
+    - disk (0003):                                  src.z04
+    - location:                                     203678 (0x00031B9E) bytes
+    - size:                                         40 bytes
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0800) (bit 15..0):  0000.1000 0000.0000
+      file security status  (bit 0):                not encrypted
+      data descriptor       (bit 3):                no
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (00):                        none (stored)
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+    32-bit CRC value:                               0x00000000
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
+    length of filename:                             10
+                                                    UTF-8
+    65 6D 70 74 79 5F 64 69 72 2F                   empty_dir/
+
+#9 (PK0304) [UTF-8] empty_file.txt
+----------------------------------
+    - disk (0003):                                  src.z04
+    - location:                                     203718 (0x00031BC6) bytes
+    - size:                                         55 bytes
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (99):                        AES encryption
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+    32-bit CRC value:                               0x00000000
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
+    length of filename:                             14
+                                                    UTF-8
+    65 6D 70 74 79 5F 66 69 6C 65 2E 74 78 74       empty_file.txt
+    extra field:                                    203762 (0x00031BF2) bytes
+      - disk (0003):                                src.z04
+      - size:                                       11 bytes (1 record)
+    (0x9901) AES Encryption Tag:                    203762 (0x00031BF2) bytes
+      - disk (0003):                                src.z04
+      - size:                                       11 bytes
+      Encryption Tag Version:                       AE-2
+      Encryption Key Bits:                          128
+      compression method (00):                      none (stored)
+
+#9 (AES) encryption header
+--------------------------
+    salt:                                           203773 (0x00031BFD) bytes
+      - disk (0003):                                src.z04
+      - size:                                       8 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){7}[0-9A-F]{2}$) -->    6F 90 CA 5A 73 E9 91 6B
+    password checksum:                              203781 (0x00031C05) bytes
+      - disk (0003):                                src.z04
+      - size:                                       2 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} )[0-9A-F]{2}$) -->    90 76
+    mac:                                            203783 (0x00031C07) bytes
+      - disk (0003):                                src.z04
+      - size:                                       10 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){9}[0-9A-F]{2}$) -->    5F 96 E5 2E E9 CE 50 4B 07 08
+
+#9 (PK0708) Data descriptor
+---------------------------
+    - disk (0003):                                  src.z04
+    - location:                                     203793 (0x00031C11) bytes
+    - size:                                         16 bytes
+    32-bit CRC value:                               0x00000000
+    compressed size:                                20 bytes
+    uncompressed size:                              0 bytes
+
+#10 (PK0304) [UTF-8] mcdonnell-douglas-f15-eagle.jpg
+----------------------------------------------------
+    - disk (0003):                                  src.z04
+    - location:                                     203809 (0x00031C21) bytes
+    - size:                                         72 bytes
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (99):                        AES encryption
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+    32-bit CRC value:                               0x00000000
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
+    length of filename:                             31
+                                                    UTF-8
+    6D 63 64 6F 6E 6E 65 6C 6C 2D 64 6F 75 67 6C 61 mcdonnell-dougla
+    73 2D 66 31 35 2D 65 61 67 6C 65 2E 6A 70 67    s-f15-eagle.jpg
+    extra field:                                    203870 (0x00031C5E) bytes
+      - disk (0003):                                src.z04
+      - size:                                       11 bytes (1 record)
+    (0x9901) AES Encryption Tag:                    203870 (0x00031C5E) bytes
+      - disk (0003):                                src.z04
+      - size:                                       11 bytes
+      Encryption Tag Version:                       AE-2
+      Encryption Key Bits:                          128
+      compression method (00):                      none (stored)
+
+#10 (AES) encryption header
+---------------------------
+    salt:                                           203881 (0x00031C69) bytes
+      - disk (0003):                                src.z04
+      - size:                                       8 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){7}[0-9A-F]{2}$) -->    6F 90 CA 5A 73 E9 91 6B
+    password checksum:                              203889 (0x00031C71) bytes
+      - disk (0003):                                src.z04
+      - size:                                       2 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} )[0-9A-F]{2}$) -->    90 76
+    mac:                                            828637 (0x000CA4DD) bytes
+      - disk (0003):                                src.z04
+      - size:                                       10 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){9}[0-9A-F]{2}$) -->    5F 96 E5 2E E9 CE 50 4B 07 08
+
+#10 (PK0708) Data descriptor
+----------------------------
+    - disk (0003):                                  src.z04
+    - location:                                     828647 (0x000CA4E7) bytes
+    - size:                                         16 bytes
+    32-bit CRC value:                               0x08C9E144
+    compressed size:                                624766 bytes
+    uncompressed size:                              624746 bytes
+
+#11 (PK0304) [UTF-8] Oleg Cherednik.txt
+---------------------------------------
+    - disk (0003):                                  src.z04
+    - location:                                     828663 (0x000CA4F7) bytes
+    - size:                                         59 bytes
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (99):                        AES encryption
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+    32-bit CRC value:                               0x00000000
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
+    length of filename:                             18
+                                                    UTF-8
+    4F 6C 65 67 20 43 68 65 72 65 64 6E 69 6B 2E 74 Oleg Cherednik.t
+    78 74                                           xt
+    extra field:                                    828711 (0x000CA527) bytes
+      - disk (0003):                                src.z04
+      - size:                                       11 bytes (1 record)
+    (0x9901) AES Encryption Tag:                    828711 (0x000CA527) bytes
+      - disk (0003):                                src.z04
+      - size:                                       11 bytes
+      Encryption Tag Version:                       AE-2
+      Encryption Key Bits:                          128
+      compression method (00):                      none (stored)
+
+#11 (AES) encryption header
+---------------------------
+    salt:                                           828722 (0x000CA532) bytes
+      - disk (0003):                                src.z04
+      - size:                                       8 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){7}[0-9A-F]{2}$) -->    6F 90 CA 5A 73 E9 91 6B
+    password checksum:                              828730 (0x000CA53A) bytes
+      - disk (0003):                                src.z04
+      - size:                                       2 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} )[0-9A-F]{2}$) -->    90 76
+    mac:                                            828772 (0x000CA564) bytes
+      - disk (0003):                                src.z04
+      - size:                                       10 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){9}[0-9A-F]{2}$) -->    5F 96 E5 2E E9 CE 50 4B 07 08
+
+#11 (PK0708) Data descriptor
+----------------------------
+    - disk (0003):                                  src.z04
+    - location:                                     828782 (0x000CA56E) bytes
+    - size:                                         16 bytes
+    32-bit CRC value:                               0x14A28F67
+    compressed size:                                60 bytes
+    uncompressed size:                              40 bytes
+
+#12 (PK0304) [UTF-8] saint-petersburg.jpg
+-----------------------------------------
+    - disk (0003):                                  src.z04
+    - location:                                     828798 (0x000CA57E) bytes
+    - size:                                         61 bytes
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (99):                        AES encryption
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+    32-bit CRC value:                               0x00000000
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
+    length of filename:                             20
+                                                    UTF-8
+    73 61 69 6E 74 2D 70 65 74 65 72 73 62 75 72 67 saint-petersburg
+    2E 6A 70 67                                     .jpg
+    extra field:                                    828848 (0x000CA5B0) bytes
+      - disk (0003):                                src.z04
+      - size:                                       11 bytes (1 record)
+    (0x9901) AES Encryption Tag:                    828848 (0x000CA5B0) bytes
+      - disk (0003):                                src.z04
+      - size:                                       11 bytes
+      Encryption Tag Version:                       AE-2
+      Encryption Key Bits:                          128
+      compression method (00):                      none (stored)
+
+#12 (AES) encryption header
+---------------------------
+    salt:                                           828859 (0x000CA5BB) bytes
+      - disk (0003):                                src.z04
+      - size:                                       8 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){7}[0-9A-F]{2}$) -->    6F 90 CA 5A 73 E9 91 6B
+    password checksum:                              828867 (0x000CA5C3) bytes
+      - disk (0003):                                src.z04
+      - size:                                       2 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} )[0-9A-F]{2}$) -->    90 76
+    mac:                                            855129 (0x000D0C59) bytes
+      - disk (0004):                                src.z05
+      - size:                                       10 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){9}[0-9A-F]{2}$) -->    5F 96 E5 2E E9 CE 50 4B 07 08
+
+#12 (PK0708) Data descriptor
+----------------------------
+    - disk (0004):                                  src.z05
+    - location:                                     855139 (0x000D0C63) bytes
+    - size:                                         16 bytes
+    32-bit CRC value:                               0x5F2EEF84
+    compressed size:                                1074856 bytes
+    uncompressed size:                              1074836 bytes
+
+#13 (PK0304) [UTF-8] sig-sauer-pistol.jpg
+-----------------------------------------
+    - disk (0004):                                  src.z05
+    - location:                                     855155 (0x000D0C73) bytes
+    - size:                                         61 bytes
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (99):                        AES encryption
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+    32-bit CRC value:                               0x00000000
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
+    length of filename:                             20
+                                                    UTF-8
+    73 69 67 2D 73 61 75 65 72 2D 70 69 73 74 6F 6C sig-sauer-pistol
+    2E 6A 70 67                                     .jpg
+    extra field:                                    855205 (0x000D0CA5) bytes
+      - disk (0004):                                src.z05
+      - size:                                       11 bytes (1 record)
+    (0x9901) AES Encryption Tag:                    855205 (0x000D0CA5) bytes
+      - disk (0004):                                src.z05
+      - size:                                       11 bytes
+      Encryption Tag Version:                       AE-2
+      Encryption Key Bits:                          128
+      compression method (00):                      none (stored)
+
+#13 (AES) encryption header
+---------------------------
+    salt:                                           855216 (0x000D0CB0) bytes
+      - disk (0004):                                src.z05
+      - size:                                       8 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){7}[0-9A-F]{2}$) -->    6F 90 CA 5A 73 E9 91 6B
+    password checksum:                              855224 (0x000D0CB8) bytes
+      - disk (0004):                                src.z05
+      - size:                                       2 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} )[0-9A-F]{2}$) -->    90 76
+    mac:                                            238128 (0x0003A230) bytes
+      - disk (0005):                                src.zip
+      - size:                                       10 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){9}[0-9A-F]{2}$) -->    5F 96 E5 2E E9 CE 50 4B 07 08
+
+#13 (PK0708) Data descriptor
+----------------------------
+    - disk (0005):                                  src.zip
+    - location:                                     238138 (0x0003A23A) bytes
+    - size:                                         16 bytes
+    32-bit CRC value:                               0x0142FEBB
+    compressed size:                                431498 bytes
+    uncompressed size:                              431478 bytes

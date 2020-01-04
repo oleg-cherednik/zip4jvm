@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 
 import java.io.IOException;
@@ -66,9 +67,9 @@ public final class Zip64 {
         // size:8 - directory record (n)
         private long endCentralDirectorySize;
         // size:2 - version made by
-        private int versionMadeBy;
+        private Version versionMadeBy = Version.NULL;
         // size:2 - version needed to extractEntries
-        private int versionNeededToExtract;
+        private Version versionToExtract = Version.NULL;
         // size:4 - number of this disk
         private long totalDisks;
         // size:4 - number of the disk with the start of the central directory
@@ -82,7 +83,7 @@ public final class Zip64 {
         // size:8 - offs of CentralDirectory in startDiskNumber
         private long centralDirectoryOffs;
         // size:n-44 - extensible data sector
-        private byte[] extensibleDataSector;
+        private byte[] extensibleDataSector = ArrayUtils.EMPTY_BYTE_ARRAY;
 
     }
 
@@ -92,7 +93,7 @@ public final class Zip64 {
 
         public static final ExtendedInfo NULL = new ExtendedInfo(new Builder());
 
-        public static final int SIGNATURE = 0x1;
+        public static final int SIGNATURE = 0x0001;
         public static final int SIZE_FIELD = 2 + 2; // 4 bytes: signature + size
 
         public static Builder builder() {
@@ -145,6 +146,11 @@ public final class Zip64 {
         @Override
         public boolean isNull() {
             return this == NULL;
+        }
+
+        @Override
+        public String getTitle() {
+            return "Zip64 Extended Information";
         }
 
         @Override

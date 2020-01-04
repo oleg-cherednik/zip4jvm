@@ -1,0 +1,30 @@
+#6 (PK0102) [UTF-8] cars/ferrari-458-italia.jpg
+-----------------------------------------------
+    - location:                                     5481022 (0x0053A23E) bytes
+    - size:                                         73 bytes
+    part number of this part (0000):                1
+    relative offset of local header:                2298515 (0x00231293) bytes
+    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+    version made by zip software (20):              2.0
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0808) (bit 15..0):  0000.1000 0000.1000
+      file security status  (bit 0):                not encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (00):                        none (stored)
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
+    32-bit CRC value:                               0xFEC7AE40
+    compressed size:                                320894 bytes
+    uncompressed size:                              320894 bytes
+    length of filename:                             27
+                                                    UTF-8
+    63 61 72 73 2F 66 65 72 72 61 72 69 2D 34 35 38 cars/ferrari-458
+    2D 69 74 61 6C 69 61 2E 6A 70 67                -italia.jpg
+    length of file comment:                         0 bytes
+    internal file attributes:                       0x0000
+      apparent file type:                           binary
+<-- ignore_line -->    external file attributes:                       0x00000020
+<-- ignore_line -->      WINDOWS   (0x20):                             arc
+<-- ignore_line -->      POSIX (0x000000):                             ?---------

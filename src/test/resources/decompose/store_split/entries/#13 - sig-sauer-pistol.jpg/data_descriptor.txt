@@ -1,0 +1,8 @@
+#13 (PK0708) Data descriptor
+----------------------------
+    - disk (0005):                                  src.zip
+    - location:                                     237766 (0x0003A0C6) bytes
+    - size:                                         16 bytes
+    32-bit CRC value:                               0x0142FEBB
+    compressed size:                                431478 bytes
+    uncompressed size:                              431478 bytes

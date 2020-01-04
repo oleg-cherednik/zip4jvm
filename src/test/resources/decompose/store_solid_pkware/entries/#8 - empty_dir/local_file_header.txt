@@ -1,0 +1,19 @@
+#8 (PK0304) [UTF-8] empty_dir/
+------------------------------
+    - location:                                     3349269 (0x00331B15) bytes
+    - size:                                         40 bytes
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0800) (bit 15..0):  0000.1000 0000.0000
+      file security status  (bit 0):                not encrypted
+      data descriptor       (bit 3):                no
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (00):                        none (stored)
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x5023 0xAA34):          2020-01-03 21:17:40
+    32-bit CRC value:                               0x00000000
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
+    length of filename:                             10
+                                                    UTF-8
+    65 6D 70 74 79 5F 64 69 72 2F                   empty_dir/

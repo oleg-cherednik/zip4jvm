@@ -25,8 +25,8 @@ public final class AesDecoder implements Decoder {
 
     public static AesDecoder create(ZipEntry entry, DataInput in) {
         try {
-            AesStrength strength = AesEngine.getStrength(entry.getEncryption());
-            byte[] salt = getSalt(entry, in);
+            AesStrength strength = entry.getStrength();
+            byte[] salt = in.readBytes(strength.saltLength());
             byte[] key = AesEngine.createKey(entry.getPassword(), salt, strength);
 
             Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
@@ -59,8 +59,8 @@ public final class AesDecoder implements Decoder {
     }
 
     @Override
-    public long getCompressedSize(ZipEntry zipEntry) {
-        return zipEntry.getCompressedSize() - saltLength - PASSWORD_CHECKSUM_SIZE - MAC_SIZE;
+    public long getDataCompressedSize(long compressedSize) {
+        return AesEngine.getDataCompressedSize(compressedSize, saltLength);
     }
 
     @Override
@@ -74,11 +74,6 @@ public final class AesDecoder implements Decoder {
 
         if (!ArrayUtils.isEquals(expected, actual))
             throw new Zip4jvmException("Message Authentication Code (MAC) is incorrect");
-    }
-
-    private static byte[] getSalt(ZipEntry entry, DataInput in) throws IOException {
-        int saltLength = entry.getStrength().saltLength();
-        return in.readBytes(saltLength);
     }
 
     private static void checkPasswordChecksum(byte[] actual, ZipEntry entry, DataInput in) throws IOException {

@@ -6,8 +6,8 @@ import lombok.NoArgsConstructor;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireExists;
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
@@ -23,7 +23,7 @@ public final class PathUtils {
         requireNotNull(path, "PathUtils.path");
         requireExists(path);
 
-        Map<Path, String> pathFileName = new LinkedHashMap<>();
+        Map<Path, String> pathFileName = new TreeMap<>();
 
         if (Files.isRegularFile(path))
             pathFileName.put(path, ZipUtils.normalizeFileName(path.getFileName().toString()));

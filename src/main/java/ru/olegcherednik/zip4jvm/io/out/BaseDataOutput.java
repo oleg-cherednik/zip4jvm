@@ -1,28 +1,22 @@
 package ru.olegcherednik.zip4jvm.io.out;
 
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.io.AbstractMarker;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Oleg Cherednik
  * @since 03.08.2019
  */
-abstract class BaseDataOutput implements DataOutput {
+abstract class BaseDataOutput extends AbstractMarker implements DataOutput {
 
     private static final int OFFS_WORD = 1;
     private static final int OFFS_DWORD = 3;
     private static final int OFFS_QWORD = 7;
 
     private static final ThreadLocal<byte[]> THREAD_LOCAL_BUF = ThreadLocal.withInitial(() -> new byte[15]);
-
-    private final Map<String, Long> map = new HashMap<>();
-
-    private long tic;
 
     protected final ZipModel zipModel;
     private DataOutputFile delegate;
@@ -66,25 +60,7 @@ abstract class BaseDataOutput implements DataOutput {
     public void write(byte[] buf, int offs, int len) throws IOException {
         long offsFrom = getOffs();
         delegate.write(buf, offs, len);
-        tic += getOffs() - offsFrom;
-    }
-
-    @Override
-    public final void mark(String id) {
-        map.put(id, tic);
-    }
-
-    @Override
-    public long getMark(String id) {
-        if (map.containsKey(id))
-            return map.get(id);
-
-        throw new Zip4jvmException("Cannot find mark: " + id);
-    }
-
-    @Override
-    public final long getWrittenBytesAmount(String id) {
-        return tic - map.getOrDefault(id, 0L);
+        incTic(getOffs() - offsFrom);
     }
 
     @Override
@@ -93,7 +69,7 @@ abstract class BaseDataOutput implements DataOutput {
     }
 
     @Override
-    public final String toString() {
+    public String toString() {
         return delegate.toString();
     }
 

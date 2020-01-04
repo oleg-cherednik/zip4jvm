@@ -1,0 +1,7 @@
+#5 (PK0708) Data descriptor
+---------------------------
+    - location:                                     2298499 (0x00231283) bytes
+    - size:                                         16 bytes
+    32-bit CRC value:                               0x71797968
+    compressed size:                                1395362 bytes
+    uncompressed size:                              1395362 bytes

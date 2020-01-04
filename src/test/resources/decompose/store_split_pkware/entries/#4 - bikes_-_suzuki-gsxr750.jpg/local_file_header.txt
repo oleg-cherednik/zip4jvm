@@ -1,0 +1,21 @@
+#4 (PK0304) [UTF-8] bikes/suzuki-gsxr750.jpg
+--------------------------------------------
+    - disk (0000):                                  src.z01
+    - location:                                     615700 (0x00096514) bytes
+    - size:                                         54 bytes
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0809) (bit 15..0):  0000.1000 0000.1001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                yes
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (00):                        none (stored)
+<-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
+    32-bit CRC value:                               0x00000000
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
+    length of filename:                             24
+                                                    UTF-8
+    62 69 6B 65 73 2F 73 75 7A 75 6B 69 2D 67 73 78 bikes/suzuki-gsx
+    72 37 35 30 2E 6A 70 67                         r750.jpg

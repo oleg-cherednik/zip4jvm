@@ -40,9 +40,8 @@ public enum Encryption {
             throw new Zip4jvmException("Strong encryption is not supported");
         if (!generalPurposeFlag.isEncrypted())
             return OFF;
-        if (extraField.getAesExtraDataRecord() != AesExtraDataRecord.NULL)
+        if (extraField.getAesExtraDataRecord() != AesExtraFieldRecord.NULL)
             return AesEngine.getEncryption(extraField.getAesExtraDataRecord().getStrength());
-//        return generalPurposeFlag.isStrongEncryption() ? STRONG : PKWARE;
         return PKWARE;
     }
 

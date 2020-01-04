@@ -5,6 +5,7 @@ import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
+import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -26,8 +27,8 @@ final class FileHeaderBuilder {
     public CentralDirectory.FileHeader build() throws IOException {
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
-        fileHeader.setVersionMadeBy(CentralDirectory.FileHeader.VERSION);
-        fileHeader.setVersionToExtract(CentralDirectory.FileHeader.VERSION);
+        fileHeader.setVersionMadeBy(Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));
+        fileHeader.setVersionToExtract(Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));
         fileHeader.setGeneralPurposeFlag(createGeneralPurposeFlag());
         fileHeader.setCompressionMethod(zipEntry.getEncryption().getCompressionMethod().apply(zipEntry.getCompression()));
         fileHeader.setLastModifiedTime(zipEntry.getLastModifiedTime());

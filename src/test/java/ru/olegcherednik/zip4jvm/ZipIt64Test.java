@@ -156,8 +156,8 @@ public class ZipIt64Test {
         ZipIt.zip(zipHugeEntry).settings(settings).add(Arrays.asList(file, fileBentley));
 
         ZipModel zipModel = ZipModelBuilder.read(zipHugeEntry);
-        assertThat(zipModel.getEntryByFileName("file.txt").getUncompressedSize()).isEqualTo(ZipModel.MAX_ENTRY_SIZE + 1);
-        assertThat(zipModel.getEntryByFileName(fileNameBentley).getUncompressedSize()).isEqualTo(1_395_362);
+        assertThat(zipModel.getZipEntryByFileName("file.txt").getUncompressedSize()).isEqualTo(ZipModel.MAX_ENTRY_SIZE + 1);
+        assertThat(zipModel.getZipEntryByFileName(fileNameBentley).getUncompressedSize()).isEqualTo(1_395_362);
 
         // TODO asserts in zip should be using
     }

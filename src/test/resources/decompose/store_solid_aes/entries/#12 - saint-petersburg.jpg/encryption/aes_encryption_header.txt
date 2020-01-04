@@ -1,0 +1,11 @@
+#12 (AES) encryption header
+---------------------------
+    salt:                                           3974623 (0x003CA5DF) bytes
+      - size:                                       12 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){11}[0-9A-F]{2}$) -->    27 5E 05 C0 9D A1 03 28 EF D6 E1 77
+    password checksum:                              3974635 (0x003CA5EB) bytes
+      - size:                                       2 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} )[0-9A-F]{2}$) -->    E8 E1
+    mac:                                            5049473 (0x004D0C81) bytes
+      - size:                                       10 bytes
+<-- regexp(^ {4}(?:[0-9A-F]{2} ){9}[0-9A-F]{2}$) -->    19 41 1F D9 4A 42 44 29 67 54

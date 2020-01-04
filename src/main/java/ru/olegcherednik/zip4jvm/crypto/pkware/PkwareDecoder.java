@@ -7,6 +7,8 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
 
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotEmpty;
+
 /**
  * @author Oleg Cherednik
  * @since 22.03.2019
@@ -16,9 +18,11 @@ public final class PkwareDecoder implements Decoder {
 
     private final PkwareEngine engine;
 
-    public static PkwareDecoder create(ZipEntry zipEntry, DataInput in) throws IOException {
-        PkwareEngine engine = new PkwareEngine(zipEntry.getPassword());
-        PkwareHeader.read(engine, zipEntry, in);
+    public static PkwareDecoder create(ZipEntry entry, DataInput in) throws IOException {
+        requireNotEmpty(entry.getPassword(), entry.getFileName() + ".password");
+
+        PkwareEngine engine = new PkwareEngine(entry.getPassword());
+        PkwareHeader.read(engine, entry, in);
         return new PkwareDecoder(engine);
     }
 
@@ -28,8 +32,8 @@ public final class PkwareDecoder implements Decoder {
     }
 
     @Override
-    public long getCompressedSize(ZipEntry zipEntry) {
-        return zipEntry.getCompressedSize() - PkwareHeader.SIZE;
+    public long getDataCompressedSize(long compressedSize) {
+        return compressedSize - PkwareHeader.SIZE;
     }
 
 }

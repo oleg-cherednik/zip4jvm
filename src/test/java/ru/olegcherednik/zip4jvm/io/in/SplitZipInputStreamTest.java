@@ -68,7 +68,7 @@ public class SplitZipInputStreamTest {
 
             assertThat(in.readQword()).isEqualTo(0x0E0D0C0B0A090807L);
             assertThat(in.getOffs()).isEqualTo(4);
-            assertThat(in.toString()).isEqualTo("offs: 4 (0x4)");
+            assertThat(in.toString()).isEqualTo("disk: 1, offs: 4 (0x4)");
 
             in.skip(2);
             assertThat(in.getOffs()).isEqualTo(6);

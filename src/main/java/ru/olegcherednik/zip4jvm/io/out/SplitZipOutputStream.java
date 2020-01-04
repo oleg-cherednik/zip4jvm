@@ -24,7 +24,7 @@ public class SplitZipOutputStream extends BaseDataOutput {
 
     public SplitZipOutputStream(ZipModel zipModel) throws IOException {
         super(zipModel);
-        ValidationUtils.requirePositive(zipModel.getSplitSize(), "zipModel.splitSize");
+        ValidationUtils.requireZeroOrPositive(zipModel.getSplitSize(), "zipModel.splitSize");
         writeDwordSignature(SPLIT_SIGNATURE);
     }
 
@@ -86,6 +86,11 @@ public class SplitZipOutputStream extends BaseDataOutput {
     public void close() throws IOException {
         new ZipModelWriter(zipModel).write(this);
         super.close();
+    }
+
+    @Override
+    public final String toString() {
+        return super.toString() + "; disk: " + disk;
     }
 
 }

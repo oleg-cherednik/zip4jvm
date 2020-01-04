@@ -7,6 +7,8 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
 
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotEmpty;
+
 /**
  * @author Oleg Cherednik
  * @since 22.03.2019
@@ -18,6 +20,8 @@ public final class PkwareEncoder implements Encoder {
     private final PkwareHeader header;
 
     public static PkwareEncoder create(ZipEntry entry) {
+        requireNotEmpty(entry.getPassword(), entry.getFileName() + ".password");
+
         PkwareEngine engine = new PkwareEngine(entry.getPassword());
         PkwareHeader header = PkwareHeader.create(engine, entry.getLastModifiedTime());
         return new PkwareEncoder(engine, header);

@@ -1,0 +1,6 @@
+(0x9901) AES Encryption Tag:                        238646 (0x0003A436) bytes
+  - disk (0005):                                    src.zip
+  - size:                                           11 bytes
+  Encryption Tag Version:                           AE-2
+  Encryption Key Bits:                              128
+  compression method (00):                          none (stored)

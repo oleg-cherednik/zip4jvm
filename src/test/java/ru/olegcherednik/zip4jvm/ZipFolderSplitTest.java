@@ -15,7 +15,7 @@ import java.nio.file.Path;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertionsForClassTypes.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
 /**
  * @author Oleg Cherednik
@@ -49,7 +49,7 @@ public class ZipFolderSplitTest {
         // TODO ZipFile does not read split archive
 //        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
     }
-
+//    TODO commented tests
 //    @Test(dependsOnMethods = "shouldCreateNewZipWithFolder")
 //    public void shouldThrowExceptionWhenModifySplitZip() {
 //        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()

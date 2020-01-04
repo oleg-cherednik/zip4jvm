@@ -52,7 +52,7 @@ public class SplitZipOutputStreamTest {
 
             out.writeQword(0x0E0D0C0B0A090807L);
             assertThat(out.getOffs()).isEqualTo(8);
-            assertThat(out.toString()).isEqualTo("offs: 8 (0x8)");
+            assertThat(out.toString()).isEqualTo("offs: 8 (0x8); disk: 1");
 
             out.writeBytes("oleg".getBytes(Charsets.UTF_8));
             assertThat(out.getOffs()).isEqualTo(2);

@@ -21,4 +21,9 @@ public class CompressionMethodTest {
         assertThatThrownBy(() -> CompressionMethod.parseCode(-1)).isExactlyInstanceOf(EnumConstantNotPresentException.class);
     }
 
+    public void shouldRetrieveNotBlankTitleWhenGetTitle() {
+        for (CompressionMethod method : CompressionMethod.values())
+            assertThat(method.getTitle()).isNotBlank();
+    }
+
 }

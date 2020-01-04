@@ -1,44 +1,47 @@
 package ru.olegcherednik.zip4jvm.model;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
+import lombok.Getter;
 import org.apache.commons.lang.ArrayUtils;
+import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
-import java.nio.file.Path;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT0;
 
 /**
  * @author Oleg Cherednik
  * @since 16.08.2019
  */
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class InternalFileAttributes implements Supplier<byte[]>, Consumer<Path> {
+@SuppressWarnings("MethodCanBeVariableArityMethod")
+public final class InternalFileAttributes {
 
     public static final int SIZE = 2;
-    public static final InternalFileAttributes NULL = new InternalFileAttributes(new byte[SIZE]);
 
-    private final byte[] data;
+    @Getter
+    private ApparentFileType apparentFileType = ApparentFileType.BINARY;
 
-    @SuppressWarnings("MethodCanBeVariableArityMethod")
+    private final byte[] data = new byte[SIZE];
+
     public static InternalFileAttributes build(byte[] data) {
-        if (ArrayUtils.getLength(data) == SIZE && (data[0] != 0 || data[1] != 0))
-            return new InternalFileAttributes(data);
-        return NULL;
+        return new InternalFileAttributes().readFrom(data);
     }
 
-    @Override
-    public void accept(Path path) {
-        /* nothing to accept */
+    public InternalFileAttributes readFrom(InternalFileAttributes internalFileAttributes) {
+        return readFrom(internalFileAttributes.data);
     }
 
-    @Override
-    public byte[] get() {
+    private InternalFileAttributes readFrom(byte[] data) {
+        System.arraycopy(data, 0, this.data, 0, SIZE);
+        apparentFileType = BitUtils.isBitSet(data[0], BIT0) ? ApparentFileType.TEXT : ApparentFileType.BINARY;
+        return this;
+    }
+
+    public byte[] getData() {
+        byte[] data = ArrayUtils.clone(this.data);
+        data[0] = BitUtils.updateBits((byte)0x0, BIT0, apparentFileType == ApparentFileType.TEXT);
         return ArrayUtils.clone(data);
     }
 
     @Override
     public String toString() {
-        return this == NULL ? "<null>" : "internal";
+        return "internal";
     }
 }

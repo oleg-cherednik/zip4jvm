@@ -34,8 +34,11 @@ import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
 import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolidPkware;
 import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSplit;
 import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolid;
+import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolidPkware;
 import static ru.olegcherednik.zip4jvm.TestData.zipStoreSplit;
+import static ru.olegcherednik.zip4jvm.TestData.zipStoreSplitAes;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
@@ -102,7 +105,7 @@ public class ZipMiscTest {
 
     public void shouldRetrieveTrueWhenSplitZipWithOneDisk() throws IOException {
         ZipSettings settings = ZipSettings.builder()
-                                          .splitSize(1024 * 1024)
+                                          .splitSize(SIZE_1MB)
                                           .entrySettingsProvider(fileName ->
                                                   ZipEntrySettings.builder()
                                                                   .compression(Compression.STORE, CompressionLevel.NORMAL)
@@ -118,7 +121,7 @@ public class ZipMiscTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         Files.createDirectories(zip.getParent());
         Files.copy(zipStoreSolid, zip);
-        assertThatZipFile(zip).exists().root().matches(TestDataAssert.rootAssert);
+        assertThatZipFile(zip).exists().root().matches(rootAssert);
 
         List<String> entryNames = filesDirCars.stream()
                                               .map(file -> dirSrc.relativize(file).toString())
@@ -134,7 +137,7 @@ public class ZipMiscTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         Files.createDirectories(zip.getParent());
         Files.copy(zipStoreSolid, zip);
-        assertThatZipFile(zip).exists().root().matches(TestDataAssert.rootAssert);
+        assertThatZipFile(zip).exists().root().matches(rootAssert);
 
         ZipMisc zipFile = ZipMisc.zip(zip);
 
@@ -167,5 +170,21 @@ public class ZipMiscTest {
 
         zipFile.removeEntryByName(dirNameCars);
         assertThat(zipFile.getEntries()).hasSize(1);
+    }
+
+    public void shouldIterateOverAllEntriesWhenStoreSolidPkware() throws IOException {
+        List<String> entryNames = ZipMisc.zip(zipStoreSolidPkware).getEntries()
+                                         .map(ZipFile.Entry::getFileName)
+                                         .collect(Collectors.toList());
+
+        assertThat(entryNames).hasSize(13);
+    }
+
+    public void shouldRetrieveStreamWithAllEntriesWhenStoreSplitAes() throws IOException {
+        List<String> entryNames = ZipMisc.zip(zipStoreSplitAes).getEntries()
+                                         .map(ZipFile.Entry::getFileName)
+                                         .collect(Collectors.toList());
+
+        assertThat(entryNames).hasSize(13);
     }
 }

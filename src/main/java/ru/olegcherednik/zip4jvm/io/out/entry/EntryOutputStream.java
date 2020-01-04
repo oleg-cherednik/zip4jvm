@@ -27,7 +27,7 @@ import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
  */
 public abstract class EntryOutputStream extends OutputStream {
 
-    private static final String COMPRESSED_DATA = "entryCompressedDataOffs";
+    private static final String COMPRESSED_DATA = EntryOutputStream.class.getSimpleName() + ".entryCompressedDataOffs";
 
     private final ZipEntry zipEntry;
     private final Checksum checksum = new CRC32();
@@ -113,10 +113,11 @@ public abstract class EntryOutputStream extends OutputStream {
         if (!zipEntry.isDataDescriptorAvailable())
             return;
 
-        DataDescriptor dataDescriptor = new DataDescriptor();
-        dataDescriptor.setCrc32(checksum.getValue());
-        dataDescriptor.setCompressedSize(zipEntry.getCompressedSize());
-        dataDescriptor.setUncompressedSize(zipEntry.getUncompressedSize());
+        long crc32 = checksum.getValue();
+        long compressedSize = zipEntry.getCompressedSize();
+        long uncompressedSize = zipEntry.getUncompressedSize();
+
+        DataDescriptor dataDescriptor = new DataDescriptor(crc32, compressedSize, uncompressedSize);
         DataDescriptorWriter.get(zipEntry.isZip64(), dataDescriptor).write(out);
     }
 

@@ -3,7 +3,6 @@ package ru.olegcherednik.zip4jvm.model.settings;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.exception.EmptyPasswordException;
@@ -14,6 +13,10 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import java.util.function.Function;
 
+/**
+ * @author Oleg Cherednik
+ * @since 05.09.2019
+ */
 @Getter
 public final class ZipEntrySettings {
 
@@ -75,13 +78,13 @@ public final class ZipEntrySettings {
             return new ZipEntrySettings(this);
         }
 
-        public ZipEntrySettings.Builder compression(@NonNull Compression compression, @NonNull CompressionLevel compressionLevel) {
+        public ZipEntrySettings.Builder compression(Compression compression, CompressionLevel compressionLevel) {
             this.compression = compression;
             this.compressionLevel = compressionLevel;
             return this;
         }
 
-        public ZipEntrySettings.Builder encryption(@NonNull Encryption encryption, @NonNull char[] password) {
+        public ZipEntrySettings.Builder encryption(Encryption encryption, char[] password) {
             if (encryption != Encryption.OFF) {
                 this.encryption = encryption;
                 this.password = ArrayUtils.clone(password);
@@ -90,7 +93,7 @@ public final class ZipEntrySettings {
             return this;
         }
 
-        public ZipEntrySettings.Builder password(@NonNull char[] password) {
+        public ZipEntrySettings.Builder password(char[] password) {
             this.password = ArrayUtils.clone(password);
             return this;
         }
