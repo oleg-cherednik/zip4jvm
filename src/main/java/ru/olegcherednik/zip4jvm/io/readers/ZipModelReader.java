@@ -5,7 +5,6 @@ import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
@@ -27,7 +26,7 @@ public final class ZipModelReader extends BaseZipModelReader {
     }
 
     @Override
-    protected DataInput createDataInput(Path zip) throws FileNotFoundException {
+    protected DataInput createDataInput(Path zip) throws IOException {
         return new SingleZipInputStream(zip);
     }
 

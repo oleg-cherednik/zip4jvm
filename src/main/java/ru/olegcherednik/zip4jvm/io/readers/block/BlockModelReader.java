@@ -16,7 +16,6 @@ import ru.olegcherednik.zip4jvm.model.block.Zip64Block;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
@@ -64,7 +63,7 @@ public final class BlockModelReader extends BaseZipModelReader {
     }
 
     @Override
-    protected DataInput createDataInput(Path zip) throws FileNotFoundException {
+    protected DataInput createDataInput(Path zip) throws IOException {
         return new CentralDataInputStream(zip);
     }
 
@@ -90,7 +89,7 @@ public final class BlockModelReader extends BaseZipModelReader {
         private long disk;
         private long totalDisks;
 
-        public CentralDataInputStream(Path zip) throws FileNotFoundException {
+        public CentralDataInputStream(Path zip) throws IOException {
             super(zip);
         }
 

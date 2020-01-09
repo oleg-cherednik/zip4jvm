@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.io.in;
 
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -12,19 +11,17 @@ import java.nio.file.Path;
  */
 public class SingleZipInputStream extends BaseZipDataInput {
 
-    public SingleZipInputStream(Path zip) throws FileNotFoundException {
+    public SingleZipInputStream(Path zip) throws IOException {
         super(null, zip);
     }
 
-    public SingleZipInputStream(ZipModel zipModel) throws FileNotFoundException {
+    public SingleZipInputStream(ZipModel zipModel) throws IOException {
         super(zipModel, zipModel.getFile());
     }
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        int res = delegate.read(buf, offs, len);
-        cycleBuffer.write(buf, offs, len);
-        return res;
+        return delegate.read(buf, offs, len);
     }
 
     @Override

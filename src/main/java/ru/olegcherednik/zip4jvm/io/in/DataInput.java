@@ -76,8 +76,4 @@ public interface DataInput extends Closeable {
 
     void seek(String id) throws IOException;
 
-    void cleanBuffer();
-
-    byte[] getLastBytes(int bytes);
-
 }

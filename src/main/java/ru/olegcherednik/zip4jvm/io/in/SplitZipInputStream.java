@@ -6,7 +6,6 @@ import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import java.io.IOException;
-import java.nio.file.Path;
 
 /**
  * @author Oleg Cherednik
@@ -35,7 +34,6 @@ public class SplitZipInputStream extends BaseZipDataInput {
 
         while (res < len) {
             int total = delegate.read(buf, offs, size);
-            cycleBuffer.write(buf, offs, size);
 
             if (total > 0)
                 res += total;
@@ -64,10 +62,7 @@ public class SplitZipInputStream extends BaseZipDataInput {
     }
 
     private void openNextDisk() throws IOException {
-        Path splitFile = zipModel.getPartFile(++disk);
-        delegate.close();
-        delegate = new LittleEndianReadFile(splitFile);
-        fileName = splitFile.getFileName().toString();
+        createDelegate(zipModel.getPartFile(++disk));
     }
 
     @Override

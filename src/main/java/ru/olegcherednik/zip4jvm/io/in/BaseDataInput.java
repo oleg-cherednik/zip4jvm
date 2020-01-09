@@ -31,10 +31,6 @@ abstract class BaseDataInput implements DataInput {
 
     private final Map<String, Long> map = new HashMap<>();
 
-    protected DataInputFile delegate;
-
-    protected final CycleBuffer cycleBuffer = new CycleBuffer();
-
     @Override
     public int byteSize() {
         return 1;
@@ -53,11 +49,6 @@ abstract class BaseDataInput implements DataInput {
     @Override
     public int qwordSize() {
         return 8;
-    }
-
-    @Override
-    public long getOffs() {
-        return delegate.getOffs();
     }
 
     @Override
@@ -98,8 +89,10 @@ abstract class BaseDataInput implements DataInput {
     private long readAndConvert(int offs, int len) throws IOException {
         byte[] buf = THREAD_LOCAL_BUF.get();
         read(buf, offs, len);
-        return delegate.convert(buf, offs, len);
+        return convert(buf, offs, len);
     }
+
+    protected abstract long convert(byte[] buf, int offs, int len);
 
     @Override
     public String readString(int length, Charset charset) throws IOException {
@@ -123,21 +116,6 @@ abstract class BaseDataInput implements DataInput {
     }
 
     @Override
-    public long length() throws IOException {
-        return delegate.length();
-    }
-
-    @Override
-    public void seek(long pos) throws IOException {
-        delegate.seek(pos);
-    }
-
-    @Override
-    public void close() throws IOException {
-        delegate.close();
-    }
-
-    @Override
     public void mark(String id) {
         map.put(id, getOffs());
     }
@@ -152,21 +130,6 @@ abstract class BaseDataInput implements DataInput {
     @Override
     public void seek(String id) throws IOException {
         seek(getMark(id));
-    }
-
-    @Override
-    public void cleanBuffer() {
-        cycleBuffer.clear();
-    }
-
-    @Override
-    public byte[] getLastBytes(int bytes) {
-        return cycleBuffer.getLastBytes(bytes);
-    }
-
-    @Override
-    public String toString() {
-        return delegate.toString();
     }
 
 }
