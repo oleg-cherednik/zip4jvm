@@ -13,11 +13,15 @@ import java.nio.file.Path;
 public class SingleZipInputStream extends BaseZipDataInput {
 
     public SingleZipInputStream(Path zip) throws FileNotFoundException {
-        super(null, zip);
+        super(new SingleZip(zip));
+    }
+
+    public SingleZipInputStream(Zip zip) throws FileNotFoundException {
+        super(zip);
     }
 
     public SingleZipInputStream(ZipModel zipModel) throws FileNotFoundException {
-        super(zipModel, zipModel.getFile());
+        this(zipModel.getFile());
     }
 
     @Override
@@ -38,4 +42,8 @@ public class SingleZipInputStream extends BaseZipDataInput {
         }
     }
 
+    @Override
+    public ZipModel getZipModel() {
+        return null;
+    }
 }

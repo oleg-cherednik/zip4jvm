@@ -9,10 +9,6 @@ import java.io.PrintStream;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireExists;
-import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
-import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireRegularFile;
-
 /**
  * @author Oleg Cherednik
  * @since 11.10.2019
@@ -24,9 +20,9 @@ public final class ZipInfo {
     private ZipInfoSettings settings = ZipInfoSettings.DEFAULT;
 
     public static ZipInfo zip(Path zip) {
-        requireNotNull(zip, "ZipInfo.zip");
-        requireExists(zip);
-        requireRegularFile(zip, "ZipInfo.zip");
+//        requireNotNull(zip, "ZipInfo.zip");
+//        requireExists(zip);
+//        requireRegularFile(zip, "ZipInfo.zip");
         return new ZipInfo(zip);
     }
 

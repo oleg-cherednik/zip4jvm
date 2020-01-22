@@ -14,4 +14,14 @@ import java.nio.file.Path;
 public final class SingleZip implements Zip {
 
     private final Path path;
+
+    @Override
+    public Path getDiskPath() {
+        return path;
+    }
+
+    @Override
+    public long getTotalDisks() {
+        return 0;
+    }
 }

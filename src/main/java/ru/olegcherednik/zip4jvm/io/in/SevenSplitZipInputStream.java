@@ -10,15 +10,15 @@ import java.nio.file.Path;
 
 /**
  * @author Oleg Cherednik
- * @since 04.08.2019
+ * @since 22.01.2020
  */
-public class SplitZipInputStream extends BaseSplitZipInputStream {
+public class SevenSplitZipInputStream extends BaseSplitZipInputStream {
 
     @Getter
     private final ZipModel zipModel;
     private final Path file;
 
-    public SplitZipInputStream(ZipModel zipModel, long disk) throws IOException {
+    public SevenSplitZipInputStream(ZipModel zipModel, long disk) throws IOException {
         super(new SingleZip(zipModel.getPartFile(disk)));
         file = zipModel.getFile();
         this.zipModel = zipModel;

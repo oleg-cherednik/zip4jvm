@@ -34,6 +34,8 @@ public final class InfoEngine {
     }
 
     private static Zip zip(Path zip) {
+        zip = zip.getParent().resolve(zip.getFileName() + ".001");
+
         if ("001".equals(FilenameUtils.getExtension(zip.toString())))
             return MultipleZip.create(zip);
         return new SingleZip(zip);

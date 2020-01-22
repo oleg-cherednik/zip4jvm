@@ -10,4 +10,8 @@ public interface Zip {
 
     Path getPath();
 
+    Path getDiskPath();
+
+    long getTotalDisks();
+
 }

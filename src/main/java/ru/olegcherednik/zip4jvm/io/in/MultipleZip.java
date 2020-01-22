@@ -18,6 +18,17 @@ public final class MultipleZip implements Zip {
 
     private final Path path;
     private final int total;
+    private int disk;
+
+    @Override
+    public Path getDiskPath() {
+        return path.getParent().resolve(String.format("%s.%03d", path.getFileName().toString(), disk + 1));
+    }
+
+    @Override
+    public long getTotalDisks() {
+        return total;
+    }
 
     public static MultipleZip create(Path zip) {
         Path parent = zip.getParent();
@@ -33,4 +44,5 @@ public final class MultipleZip implements Zip {
 
         return new MultipleZip(parent.resolve(fileName), total);
     }
+
 }

@@ -1,11 +1,9 @@
 package ru.olegcherednik.zip4jvm.io.in;
 
 import lombok.Getter;
-import lombok.Setter;
-import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import java.io.FileNotFoundException;
-import java.nio.file.Path;
+import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
@@ -14,19 +12,20 @@ import java.nio.file.Path;
 @Getter
 public abstract class BaseZipDataInput extends BaseDataInput implements ZipDataInput {
 
-    protected final ZipModel zipModel;
-    @Setter
-    protected String fileName;
+    protected final Zip zip;
 
-    protected BaseZipDataInput(ZipModel zipModel, Path file) throws FileNotFoundException {
-        this.zipModel = zipModel;
-        delegate = new LittleEndianReadFile(file);
-        fileName = file.getFileName().toString();
+    protected BaseZipDataInput(Zip zip) throws FileNotFoundException {
+        this.zip = zip;
+        delegate = new LittleEndianReadFile(zip.getDiskPath());
     }
 
     @Override
     public long getTotalDisks() {
-        return zipModel.getTotalDisks();
+        return zip.getTotalDisks();
+    }
+
+    public long length() throws IOException {
+
     }
 
 }
