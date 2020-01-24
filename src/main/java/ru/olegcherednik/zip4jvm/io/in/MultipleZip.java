@@ -49,6 +49,11 @@ public final class MultipleZip extends Zip {
         return length;
     }
 
+    @Override
+    public DataInputFile openDataInputFile() throws IOException {
+        return new SevenLittleEndianReadFile(this);
+    }
+
     public static MultipleZip create(Path zip) {
         Path parent = zip.getParent();
         String fileName = zip.getFileName().toString();

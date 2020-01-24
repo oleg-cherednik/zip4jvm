@@ -20,7 +20,7 @@ public class SingleZipInputStream extends BaseZipDataInput {
     }
 
     public SingleZipInputStream(ZipModel zipModel) throws IOException {
-        this(zipModel.getFile());
+        this(zipModel.getZip());
     }
 
     @Override

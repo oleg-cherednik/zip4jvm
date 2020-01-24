@@ -31,4 +31,9 @@ public final class SingleZip extends Zip {
     public long length() throws IOException {
         return Files.size(path);
     }
+
+    @Override
+    public DataInputFile openDataInputFile() throws IOException {
+        return new LittleEndianReadFile(getDiskPath(0));
+    }
 }

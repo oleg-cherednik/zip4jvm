@@ -37,31 +37,9 @@ public class SevenLittleEndianReadFile extends BaseDataInputFile {
 
                 bytesSkipped += in.skipBytes(bytes - bytesSkipped);
                 break;
-            }
+            } else
+                bytesSkipped += diskInfo.getSize();
         }
-
-
-//        int bytesSkipped = in.skipBytes(bytes);
-//
-//        while (bytesSkipped < bytes) {
-//            DiskInfo nextDisk = zip.getDisk(disk + 1);
-//            boolean isLast = zip.getDisk(disk + 2) == null;
-//
-//            if (nextDisk == null)
-//                break;
-//
-//            disk++;
-//
-//
-//            if (bytes - bytesSkipped < nextDisk.getSize() || isLast) {
-//                disk = nextDisk.getDisk();
-//                openFile(nextDisk.getFile());
-//                bytesSkipped += in.skipBytes(bytes - bytesSkipped);
-//                break;
-//            }
-//            disk++;
-//            bytesSkipped += nextDisk.getSize();
-//        }
 
         return bytesSkipped;
     }
@@ -89,7 +67,23 @@ public class SevenLittleEndianReadFile extends BaseDataInputFile {
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        return in.read(buf, offs, len);
+        int res = 0;
+        int size = len;
+
+        while (res < len) {
+            int total = in.read(buf, offs, size);
+
+            if (total > 0)
+                res += total;
+
+            if (total == IOUtils.EOF || total < size) {
+                openFile(zip.getDisk(++disk).getFile());
+                offs += Math.max(0, total);
+                size -= Math.max(0, total);
+            }
+        }
+
+        return res;
     }
 
     @Override

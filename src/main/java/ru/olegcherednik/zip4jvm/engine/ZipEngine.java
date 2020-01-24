@@ -132,7 +132,7 @@ public final class ZipEngine implements ZipFile.Writer {
             Files.move(src, dest);
         }
 
-        Files.deleteIfExists(tempZipModel.getFile().getParent());
+        Files.deleteIfExists(tempZipModel.getZip().getPath().getParent());
     }
 
     private static ZipModel createTempZipModel(Path zip, ZipSettings settings, Map<String, Writer> fileNameWriter) throws IOException {

@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.LittleEndianReadFile;
+import ru.olegcherednik.zip4jvm.io.in.MultipleZip;
+import ru.olegcherednik.zip4jvm.io.in.SingleZip;
+import ru.olegcherednik.zip4jvm.io.in.Zip;
 import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
@@ -27,7 +30,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public final class ZipModelBuilder {
 
-    private final Path zip;
+    private final Zip zip;
     private final EndCentralDirectory endCentralDirectory;
     private final Zip64 zip64;
     private final CentralDirectory centralDirectory;
@@ -45,7 +48,7 @@ public final class ZipModelBuilder {
         if (Files.exists(zip))
             throw new Zip4jvmException("ZipFile '" + zip.toAbsolutePath() + "' exists");
 
-        ZipModel zipModel = new ZipModel(zip);
+        ZipModel zipModel = new ZipModel(new SingleZip(zip));
         zipModel.setSplitSize(settings.getSplitSize());
         zipModel.setComment(settings.getComment());
         zipModel.setZip64(settings.isZip64());
@@ -63,7 +66,7 @@ public final class ZipModelBuilder {
         zipModel.setCentralDirectorySize(getCentralDirectorySize());
         zipModel.setCentralDirectoryOffs(getCentralDirectoryOffs(endCentralDirectory, zip64));
         createAndAddEntries(zipModel);
-        updateSplit(zipModel);
+        updateSplit(zip, zipModel);
 
         return zipModel;
     }
@@ -105,6 +108,13 @@ public final class ZipModelBuilder {
     }
 
     private static void updateSplit(ZipModel zipModel) throws IOException {
+        if (isSplit(zipModel))
+            zipModel.setSplitSize(getSplitSize(zipModel));
+    }
+
+    private static void updateSplit(Zip zip, ZipModel zipModel) throws IOException {
+        if(zip instanceof MultipleZip)
+            return;
         if (isSplit(zipModel))
             zipModel.setSplitSize(getSplitSize(zipModel));
     }

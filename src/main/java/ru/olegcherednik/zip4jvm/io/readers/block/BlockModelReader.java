@@ -40,7 +40,7 @@ public final class BlockModelReader extends BaseZipModelReader {
     public BlockModel read() throws IOException {
         readCentralData();
 
-        ZipModel zipModel = new ZipModelBuilder(zip.getDiskPath(0), endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
+        ZipModel zipModel = new ZipModelBuilder(zip, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
 
         return BlockModel.builder()
                          .zipModel(zipModel)
@@ -52,7 +52,7 @@ public final class BlockModelReader extends BaseZipModelReader {
     public BlockModel readWithEntries() throws IOException {
         readCentralData();
 
-        ZipModel zipModel = new ZipModelBuilder(zip.getPath(), endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
+        ZipModel zipModel = new ZipModelBuilder(zip, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
         Map<String, ZipEntryBlock> zipEntries = new BlockZipEntryReader(zipModel, customizeCharset).read();
 
         return BlockModel.builder()

@@ -20,7 +20,7 @@ public class SevenSplitZipInputStream extends BaseSplitZipInputStream {
 
     public SevenSplitZipInputStream(ZipModel zipModel, long disk) throws IOException {
         super(new SingleZip(zipModel.getPartFile(disk)));
-        file = zipModel.getFile();
+        file = zipModel.getZip().getPath();
         this.zipModel = zipModel;
         this.disk = disk;
         checkSignature();

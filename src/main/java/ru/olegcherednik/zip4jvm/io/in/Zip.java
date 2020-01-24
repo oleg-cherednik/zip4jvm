@@ -17,4 +17,6 @@ public abstract class Zip {
 
     public abstract long length() throws IOException;
 
+    public abstract DataInputFile openDataInputFile() throws IOException;
+
 }
