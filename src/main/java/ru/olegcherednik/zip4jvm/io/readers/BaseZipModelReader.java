@@ -12,7 +12,6 @@ import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
@@ -68,9 +67,9 @@ public abstract class BaseZipModelReader {
         return getCentralDirectoryReader(totalEntries).read(in);
     }
 
-    protected abstract DataInput createDataInput() throws FileNotFoundException;
+    protected abstract DataInput createDataInput() throws IOException;
 
-    protected abstract DataInput createDataInput(Path zip) throws FileNotFoundException;
+    protected abstract DataInput createDataInput(Path zip) throws IOException;
 
     protected abstract EndCentralDirectoryReader getEndCentralDirectoryReader();
 

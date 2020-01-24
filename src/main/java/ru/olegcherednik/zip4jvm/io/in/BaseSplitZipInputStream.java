@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.io.in;
 
 import org.apache.commons.io.IOUtils;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -15,7 +14,7 @@ public abstract class BaseSplitZipInputStream extends BaseZipDataInput {
     protected String fileName;
     protected long disk;
 
-    protected BaseSplitZipInputStream(Zip zip) throws FileNotFoundException {
+    protected BaseSplitZipInputStream(Zip zip) throws IOException {
         super(zip);
         fileName = zip.getPath().getFileName().toString();
     }

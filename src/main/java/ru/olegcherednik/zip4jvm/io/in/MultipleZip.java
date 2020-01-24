@@ -5,8 +5,12 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author Oleg Cherednik
@@ -14,20 +18,35 @@ import java.nio.file.Path;
  */
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class MultipleZip implements Zip {
+public final class MultipleZip extends Zip {
 
     private final Path path;
-    private final int total;
-    private int disk;
+    private final List<DiskInfo> items;
+    private final long length;
+
+    private MultipleZip(Path path, List<DiskInfo> items) {
+        this.path = path;
+        this.items = Collections.unmodifiableList(items);
+        length = items.stream().mapToLong(DiskInfo::getSize).sum();
+    }
 
     @Override
-    public Path getDiskPath() {
-        return path.getParent().resolve(String.format("%s.%03d", path.getFileName().toString(), disk + 1));
+    public Path getDiskPath(int disk) {
+        return items.size() < disk ? null : items.get(disk).getFile();
+    }
+
+    public DiskInfo getDisk(int disk) {
+        return items.size() <= disk ? null : items.get(disk);
     }
 
     @Override
     public long getTotalDisks() {
-        return total;
+        return items.size();
+    }
+
+    @Override
+    public long length() {
+        return length;
     }
 
     public static MultipleZip create(Path zip) {
@@ -37,12 +56,29 @@ public final class MultipleZip implements Zip {
         if ("001".equals(FilenameUtils.getExtension(fileName)))
             fileName = fileName.substring(0, fileName.length() - 4);
 
-        int total = 0;
+        long offs = 0;
+        List<DiskInfo> items = new LinkedList<>();
 
-        while (Files.exists(parent.resolve(String.format("%s.%03d", fileName, total + 1))))
-            total++;
+        for (int i = 0; ; i++) {
+            Path file = parent.resolve(String.format("%s.%03d", fileName, i + 1));
 
-        return new MultipleZip(parent.resolve(fileName), total);
+            if (Files.exists(file)) {
+                long size = getSize(file);
+                items.add(DiskInfo.builder().disk(i).file(file).offs(offs).size(size).build());
+                offs += size;
+            } else
+                break;
+        }
+
+        return new MultipleZip(parent.resolve(fileName), items);
+    }
+
+    private static long getSize(Path file) {
+        try {
+            return Files.size(file);
+        } catch(IOException ignore) {
+            return 0;
+        }
     }
 
 }

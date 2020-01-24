@@ -1,8 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.in;
 
-import org.apache.commons.io.IOUtils;
-
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Path;
@@ -13,25 +10,10 @@ import java.nio.file.Path;
  */
 public abstract class BaseDataInputFile implements DataInputFile {
 
-    protected final RandomAccessFile in;
+    protected RandomAccessFile in;
 
-    protected BaseDataInputFile(Path file) throws FileNotFoundException {
-        in = new RandomAccessFile(file.toFile(), "r");
-    }
-
-    @Override
-    public int skip(int bytes) throws IOException {
-        return in.skipBytes(bytes);
-    }
-
-    @Override
-    public long length() throws IOException {
-        return in.length();
-    }
-
-    @Override
-    public void seek(long pos) throws IOException {
-        in.seek(pos);
+    protected BaseDataInputFile(Path file) throws IOException {
+        openFile(file);
     }
 
     @Override
@@ -45,36 +27,19 @@ public abstract class BaseDataInputFile implements DataInputFile {
     }
 
     @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
-        return in.read(buf, offs, len);
-    }
-
-    @Override
-    public int readSignature() throws IOException {
-        // TODO probably it's better to use convert
-        int b0 = in.read();
-        int b1 = in.read();
-        int b2 = in.read();
-        int b3 = in.read();
-        return b3 << 24 | b2 << 16 | b1 << 8 | b0;
-    }
-
-    @Override
-    public long getOffs() {
-        try {
-            return in.getFilePointer();
-        } catch(IOException e) {
-            return IOUtils.EOF;
-        }
-    }
-
-    @Override
-    public void close() throws IOException {
-        in.close();
+    public final void close() throws IOException {
+        if (in != null)
+            in.close();
     }
 
     @Override
     public String toString() {
-        return "offs: " + getOffs() + " (0x" + Long.toHexString(getOffs()) + ')';
+        return "offs: " + getBaseOffs() + " (0x" + Long.toHexString(getBaseOffs()) + ')';
     }
+
+    protected final void openFile(Path file) throws IOException {
+        close();
+        in = new RandomAccessFile(file.toFile(), "r");
+    }
+
 }

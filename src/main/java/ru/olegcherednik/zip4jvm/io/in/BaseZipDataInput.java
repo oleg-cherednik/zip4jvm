@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.io.in;
 
 import lombok.Getter;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -14,18 +13,15 @@ public abstract class BaseZipDataInput extends BaseDataInput implements ZipDataI
 
     protected final Zip zip;
 
-    protected BaseZipDataInput(Zip zip) throws FileNotFoundException {
+    protected BaseZipDataInput(Zip zip) throws IOException {
         this.zip = zip;
-        delegate = new LittleEndianReadFile(zip.getDiskPath());
+        delegate = zip instanceof MultipleZip ? new SevenLittleEndianReadFile((MultipleZip)zip)
+                                              : new LittleEndianReadFile(zip.getDiskPath(0));
     }
 
     @Override
     public long getTotalDisks() {
         return zip.getTotalDisks();
-    }
-
-    public long length() throws IOException {
-
     }
 
 }

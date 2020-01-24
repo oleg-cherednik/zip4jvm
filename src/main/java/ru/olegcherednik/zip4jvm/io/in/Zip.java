@@ -1,17 +1,20 @@
 package ru.olegcherednik.zip4jvm.io.in;
 
+import java.io.IOException;
 import java.nio.file.Path;
 
 /**
  * @author Oleg Cherednik
  * @since 20.01.2020
  */
-public interface Zip {
+public abstract class Zip {
 
-    Path getPath();
+    public abstract Path getPath();
 
-    Path getDiskPath();
+    public abstract Path getDiskPath(int disk);
 
-    long getTotalDisks();
+    public abstract long getTotalDisks();
+
+    public abstract long length() throws IOException;
 
 }

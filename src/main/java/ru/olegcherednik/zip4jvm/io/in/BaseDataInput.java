@@ -57,7 +57,7 @@ abstract class BaseDataInput implements DataInput {
 
     @Override
     public long getOffs() {
-        return delegate.getOffs();
+        return delegate.getBaseOffs();
     }
 
     @Override

@@ -9,7 +9,7 @@ import java.io.IOException;
  */
 public interface DataInputFile extends Closeable {
 
-    long getOffs();
+    long getBaseOffs();
 
     int skip(int bytes) throws IOException;
 
