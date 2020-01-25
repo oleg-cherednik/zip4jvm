@@ -4,11 +4,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.io.in.SplitZipInputStream;
+import ru.olegcherednik.zip4jvm.io.in.StandardZip;
 import ru.olegcherednik.zip4jvm.io.in.Zip;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -97,11 +97,7 @@ public final class ZipModel {
     }
 
     public Path getPartFile(long disk) {
-        return disk >= totalDisks ? zip.getPath() : getSplitFilePath(zip.getPath(), disk + 1);
-    }
-
-    public static Path getSplitFilePath(Path zip, long disk) {
-        return zip.getParent().resolve(String.format("%s.z%02d", FilenameUtils.getBaseName(zip.toString()), disk));
+        return disk >= totalDisks ? zip.getPath() : StandardZip.getDiskFile(zip.getPath(), disk + 1);
     }
 
     public DataInput createDataInput(String fileName) throws IOException {

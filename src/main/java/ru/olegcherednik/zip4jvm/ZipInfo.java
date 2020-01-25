@@ -2,12 +2,15 @@ package ru.olegcherednik.zip4jvm;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.engine.InfoEngine;
+import ru.olegcherednik.zip4jvm.io.in.Zip;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.util.Optional;
+
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
 /**
  * @author Oleg Cherednik
@@ -16,14 +19,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public final class ZipInfo {
 
-    private final Path zip;
+    private final Zip zip;
     private ZipInfoSettings settings = ZipInfoSettings.DEFAULT;
 
     public static ZipInfo zip(Path zip) {
-//        requireNotNull(zip, "ZipInfo.zip");
-//        requireExists(zip);
-//        requireRegularFile(zip, "ZipInfo.zip");
-        return new ZipInfo(zip);
+        requireNotNull(zip, "ZipInfo.zip");
+        return new ZipInfo(Zip.of(zip));
     }
 
     public ZipInfo settings(ZipInfoSettings settings) {

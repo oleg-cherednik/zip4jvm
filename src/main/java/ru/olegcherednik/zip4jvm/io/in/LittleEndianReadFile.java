@@ -9,7 +9,7 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 21.02.2019
  */
-public class LittleEndianReadFile extends BaseDataInputFile {
+public class LittleEndianReadFile extends LittleEndianDataInputFile {
 
     public LittleEndianReadFile(Path file) throws IOException {
         super(file);
@@ -18,11 +18,6 @@ public class LittleEndianReadFile extends BaseDataInputFile {
     @Override
     public int skip(int bytes) throws IOException {
         return in.skipBytes(bytes);
-    }
-
-    @Override
-    public long length() throws IOException {
-        return in.length();
     }
 
     @Override
@@ -36,17 +31,7 @@ public class LittleEndianReadFile extends BaseDataInputFile {
     }
 
     @Override
-    public int readSignature() throws IOException {
-        // TODO probably it's better to use convert
-        int b0 = in.read();
-        int b1 = in.read();
-        int b2 = in.read();
-        int b3 = in.read();
-        return b3 << 24 | b2 << 16 | b1 << 8 | b0;
-    }
-
-    @Override
-    public long getBaseOffs() {
+    public long getOffs() {
         try {
             return in.getFilePointer();
         } catch(IOException e) {

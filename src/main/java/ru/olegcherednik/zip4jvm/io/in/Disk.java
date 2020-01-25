@@ -11,11 +11,15 @@ import java.nio.file.Path;
  */
 @Getter
 @Builder
-public final class DiskInfo {
+public final class Disk {
 
-    private final int disk;
+    private final int num;
     private final Path file;
     private final long offs;
-    private final long size;
+    private final long length;
 
+    @Override
+    public String toString() {
+        return String.format("%s (offs: %s)", file.toString(), offs);
+    }
 }

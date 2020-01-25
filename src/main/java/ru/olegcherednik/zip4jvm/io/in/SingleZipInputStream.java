@@ -12,7 +12,7 @@ import java.nio.file.Path;
 public class SingleZipInputStream extends BaseZipDataInput {
 
     public SingleZipInputStream(Path zip) throws IOException {
-        super(new SingleZip(zip));
+        super(new StandardZip(zip));
     }
 
     public SingleZipInputStream(Zip zip) throws IOException {
@@ -25,9 +25,7 @@ public class SingleZipInputStream extends BaseZipDataInput {
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        int res = delegate.read(buf, offs, len);
-        cycleBuffer.write(buf, offs, len);
-        return res;
+        return delegate.read(buf, offs, len);
     }
 
     @Override

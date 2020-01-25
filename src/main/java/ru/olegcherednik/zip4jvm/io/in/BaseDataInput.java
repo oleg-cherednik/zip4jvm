@@ -33,8 +33,6 @@ abstract class BaseDataInput implements DataInput {
 
     protected DataInputFile delegate;
 
-    protected final CycleBuffer cycleBuffer = new CycleBuffer();
-
     @Override
     public int byteSize() {
         return 1;
@@ -57,7 +55,7 @@ abstract class BaseDataInput implements DataInput {
 
     @Override
     public long getOffs() {
-        return delegate.getBaseOffs();
+        return delegate.getOffs();
     }
 
     @Override
@@ -152,16 +150,6 @@ abstract class BaseDataInput implements DataInput {
     @Override
     public void seek(String id) throws IOException {
         seek(getMark(id));
-    }
-
-    @Override
-    public void cleanBuffer() {
-        cycleBuffer.clear();
-    }
-
-    @Override
-    public byte[] getLastBytes(int bytes) {
-        return cycleBuffer.getLastBytes(bytes);
     }
 
     @Override

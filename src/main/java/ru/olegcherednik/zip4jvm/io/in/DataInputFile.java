@@ -9,18 +9,16 @@ import java.io.IOException;
  */
 public interface DataInputFile extends Closeable {
 
-    long getBaseOffs();
+    long getOffs();
 
     int skip(int bytes) throws IOException;
 
-    long length() throws IOException;
+    long length();
 
     void seek(long pos) throws IOException;
 
     long convert(byte[] buf, int offs, int len);
 
     int read(byte[] buf, int offs, int len) throws IOException;
-
-    int readSignature() throws IOException;
 
 }

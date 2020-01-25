@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.assertj;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.assertj.core.api.Assertions;
-import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.io.in.StandardZip;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -38,7 +38,7 @@ public final class Zip4jvmAssertions extends Assertions {
     }
 
     private static boolean isSplit(Path zip) {
-        return Files.exists(ZipModel.getSplitFilePath(zip, 1));
+        return Files.exists(StandardZip.getDiskFile(zip, 1));
     }
 
 }

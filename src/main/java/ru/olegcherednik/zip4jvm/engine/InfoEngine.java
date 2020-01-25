@@ -1,9 +1,6 @@
 package ru.olegcherednik.zip4jvm.engine;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.FilenameUtils;
-import ru.olegcherednik.zip4jvm.io.in.MultipleZip;
-import ru.olegcherednik.zip4jvm.io.in.SingleZip;
 import ru.olegcherednik.zip4jvm.io.in.Zip;
 import ru.olegcherednik.zip4jvm.io.readers.block.BlockModelReader;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
@@ -29,16 +26,8 @@ public final class InfoEngine {
     private final ZipInfoSettings settings;
 
     public InfoEngine(Path zip, ZipInfoSettings settings) {
-        this.zip = zip(zip);
+        this.zip = Zip.of(zip);
         this.settings = settings;
-    }
-
-    private static Zip zip(Path zip) {
-        zip = zip.getParent().resolve(zip.getFileName() + ".001");
-
-        if ("001".equals(FilenameUtils.getExtension(zip.toString())))
-            return MultipleZip.create(zip);
-        return new SingleZip(zip);
     }
 
     public void printTextInfo(PrintStream out) throws IOException {

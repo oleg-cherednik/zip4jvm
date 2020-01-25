@@ -8,22 +8,28 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 22.01.2020
  */
-public abstract class BaseDataInputFile implements DataInputFile {
+public abstract class LittleEndianDataInputFile implements DataInputFile {
 
     protected RandomAccessFile in;
+    protected long length;
 
-    protected BaseDataInputFile(Path file) throws IOException {
+    protected LittleEndianDataInputFile(Path file) throws IOException {
         openFile(file);
     }
 
     @Override
-    public long convert(byte[] buf, int offs, int len) {
+    public final long convert(byte[] buf, int offs, int len) {
         long res = 0;
 
         for (int i = offs + len - 1; i >= offs; i--)
             res = res << 8 | buf[i] & 0xFF;
 
         return res;
+    }
+
+    @Override
+    public long length() {
+        return length;
     }
 
     @Override
@@ -34,12 +40,13 @@ public abstract class BaseDataInputFile implements DataInputFile {
 
     @Override
     public String toString() {
-        return "offs: " + getBaseOffs() + " (0x" + Long.toHexString(getBaseOffs()) + ')';
+        return "offs: " + getOffs() + " (0x" + Long.toHexString(getOffs()) + ')';
     }
 
     protected final void openFile(Path file) throws IOException {
         close();
         in = new RandomAccessFile(file.toFile(), "r");
+        length = in.length();
     }
 
 }
