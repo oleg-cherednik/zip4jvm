@@ -30,7 +30,7 @@ public abstract class SrcFile {
     @Builder
     public static final class Item {
 
-        private final int num;
+        private final int pos;
         private final Path file;
         private final long offs;
         private final long length;

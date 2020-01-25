@@ -54,7 +54,7 @@ final class SevenZipSplitSrcFile extends SrcFile {
                 break;
 
             long length = length(path);
-            items.add(Item.builder().num(i).file(path).offs(offs).length(length).build());
+            items.add(Item.builder().pos(i).file(path).offs(offs).length(length).build());
             offs += length;
         }
 
@@ -70,7 +70,7 @@ final class SevenZipSplitSrcFile extends SrcFile {
     }
 
     public boolean isLast(Item item) {
-        return item == null || items.size() < item.getNum();
+        return item == null || items.size() < item.getPos();
     }
 
     public Item getDisk(int disk) {

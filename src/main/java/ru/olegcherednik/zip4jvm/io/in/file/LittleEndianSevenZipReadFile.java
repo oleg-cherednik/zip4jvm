@@ -34,7 +34,7 @@ public class LittleEndianSevenZipReadFile extends LittleEndianDataInputFile {
             if (withinDisk || zip.isLast(item)) {
                 if (i != this.disk) {
                     openFile(item.getFile());
-                    this.disk = item.getNum();
+                    this.disk = item.getPos();
                 }
 
                 bytesSkipped += in.skipBytes(bytes - bytesSkipped);
@@ -53,11 +53,11 @@ public class LittleEndianSevenZipReadFile extends LittleEndianDataInputFile {
             if (item.getOffs() + item.getLength() < pos && !zip.isLast(item))
                 continue;
 
-            if (this.disk != item.getNum())
+            if (this.disk != item.getPos())
                 openFile(item.getFile());
 
             in.seek(pos - item.getOffs());
-            this.disk = item.getNum();
+            this.disk = item.getPos();
             offs = item.getOffs();
             break;
         }
