@@ -18,7 +18,7 @@ public class LittleEndianSevenZipReadFile extends LittleEndianDataInputFile {
     private long offs;
 
     protected LittleEndianSevenZipReadFile(SevenZipSplitSrcFile zip) throws IOException {
-        super(zip.getDiskFile(0));
+        super(zip.getItems().get(0).getFile());
         this.zip = zip;
         length = zip.getLength();
     }
@@ -28,20 +28,20 @@ public class LittleEndianSevenZipReadFile extends LittleEndianDataInputFile {
         int bytesSkipped = 0;
 
         for (int i = disk; bytesSkipped < bytes; ) {
-            Disk disk = requireNonNull(zip.getDisk(i));
-            boolean withinDisk = bytes - bytesSkipped < disk.getLength();
+            SrcFile.Item item = requireNonNull(zip.getDisk(i));
+            boolean withinDisk = bytes - bytesSkipped < item.getLength();
 
-            if (withinDisk || zip.isLast(disk)) {
+            if (withinDisk || zip.isLast(item)) {
                 if (i != this.disk) {
-                    openFile(disk.getFile());
-                    this.disk = disk.getNum();
+                    openFile(item.getFile());
+                    this.disk = item.getNum();
                 }
 
                 bytesSkipped += in.skipBytes(bytes - bytesSkipped);
                 break;
             }
 
-            bytesSkipped += disk.getLength();
+            bytesSkipped += item.getLength();
         }
 
         return bytesSkipped;
@@ -49,16 +49,16 @@ public class LittleEndianSevenZipReadFile extends LittleEndianDataInputFile {
 
     @Override
     public void seek(long pos) throws IOException {
-        for (Disk disk : zip.getItems()) {
-            if (disk.getOffs() + disk.getLength() < pos && !zip.isLast(disk))
+        for (SrcFile.Item item : zip.getItems()) {
+            if (item.getOffs() + item.getLength() < pos && !zip.isLast(item))
                 continue;
 
-            if (this.disk != disk.getNum())
-                openFile(disk.getFile());
+            if (this.disk != item.getNum())
+                openFile(item.getFile());
 
-            in.seek(pos - disk.getOffs());
-            this.disk = disk.getNum();
-            offs = disk.getOffs();
+            in.seek(pos - item.getOffs());
+            this.disk = item.getNum();
+            offs = item.getOffs();
             break;
         }
     }

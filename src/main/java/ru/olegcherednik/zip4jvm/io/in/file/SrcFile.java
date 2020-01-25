@@ -1,6 +1,8 @@
 package ru.olegcherednik.zip4jvm.io.in.file;
 
 import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.io.IOException;
@@ -20,12 +22,23 @@ public abstract class SrcFile {
 
     public abstract Path getPath();
 
-    public abstract Path getDiskFile(int disk);
-
-    public abstract long getTotalDisks();
-
     public abstract DataInputFile dataInputFile() throws IOException;
 
     public abstract boolean isSplit() throws IOException;
+
+    @Getter
+    @Builder
+    public static final class Item {
+
+        private final int num;
+        private final Path file;
+        private final long offs;
+        private final long length;
+
+        @Override
+        public String toString() {
+            return String.format("%s (offs: %s)", file, offs);
+        }
+    }
 
 }

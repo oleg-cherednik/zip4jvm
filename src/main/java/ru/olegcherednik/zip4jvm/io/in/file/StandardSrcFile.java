@@ -22,16 +22,6 @@ final class StandardSrcFile extends SrcFile {
     private final Path path;
 
     @Override
-    public Path getDiskFile(int disk) {
-        return path;
-    }
-
-    @Override
-    public long getTotalDisks() {
-        return 0;
-    }
-
-    @Override
     public DataInputFile dataInputFile() throws IOException {
         return new LittleEndianReadFile(path);
     }

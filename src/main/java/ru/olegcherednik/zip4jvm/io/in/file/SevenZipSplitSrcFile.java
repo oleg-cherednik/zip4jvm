@@ -31,7 +31,7 @@ import java.util.List;
 final class SevenZipSplitSrcFile extends SrcFile {
 
     private final Path path;
-    private final List<Disk> items;
+    private final List<Item> items;
     private final long length;
 
     static SevenZipSplitSrcFile create(Path file) {
@@ -45,7 +45,7 @@ final class SevenZipSplitSrcFile extends SrcFile {
             return null;
 
         long offs = 0;
-        List<Disk> items = new LinkedList<>();
+        List<Item> items = new LinkedList<>();
 
         for (int i = 0; ; i++) {
             Path path = parent.resolve(String.format("%s.%03d", fileName, i + 1));
@@ -54,7 +54,7 @@ final class SevenZipSplitSrcFile extends SrcFile {
                 break;
 
             long length = length(path);
-            items.add(Disk.builder().num(i).file(path).offs(offs).length(length).build());
+            items.add(Item.builder().num(i).file(path).offs(offs).length(length).build());
             offs += length;
         }
 
@@ -69,22 +69,12 @@ final class SevenZipSplitSrcFile extends SrcFile {
         }
     }
 
-    public boolean isLast(Disk disk) {
-        return disk == null || items.size() < disk.getNum();
+    public boolean isLast(Item item) {
+        return item == null || items.size() < item.getNum();
     }
 
-    @Override
-    public Path getDiskFile(int disk) {
-        return items.size() < disk ? null : items.get(disk).getFile();
-    }
-
-    public Disk getDisk(int disk) {
+    public Item getDisk(int disk) {
         return items.size() <= disk ? null : items.get(disk);
-    }
-
-    @Override
-    public long getTotalDisks() {
-        return items.size();
     }
 
     @Override
