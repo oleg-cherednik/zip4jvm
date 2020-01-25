@@ -1,7 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.out;
 
 import lombok.Getter;
-import ru.olegcherednik.zip4jvm.io.in.StandardZip;
 import ru.olegcherednik.zip4jvm.io.writers.ZipModelWriter;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -70,7 +69,7 @@ public class SplitZipOutputStream extends BaseDataOutput {
     }
 
     private void openNextDisk() throws IOException {
-        Path splitFile = StandardZip.getDiskFile(zipModel.getZip().getPath(), ++disk);
+        Path splitFile = ZipModel.getDiskFile(zipModel.getZip().getPath(), ++disk);
 
         super.close();
 

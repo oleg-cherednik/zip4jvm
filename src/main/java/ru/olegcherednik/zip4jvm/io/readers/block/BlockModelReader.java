@@ -19,7 +19,6 @@ import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.Path;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -69,11 +68,6 @@ public final class BlockModelReader extends BaseZipModelReader {
     }
 
     @Override
-    protected DataInput createDataInput(Path zip) throws IOException {
-        return new CentralDataInputStream(zip);
-    }
-
-    @Override
     protected EndCentralDirectoryReader getEndCentralDirectoryReader() {
         return new BlockEndCentralDirectoryReader(customizeCharset, endCentralDirectoryBlock);
     }
@@ -94,10 +88,6 @@ public final class BlockModelReader extends BaseZipModelReader {
 
         private long disk;
         private long totalDisks;
-
-        public CentralDataInputStream(Path zip) throws IOException {
-            super(zip);
-        }
 
         public CentralDataInputStream(Zip zip) throws IOException {
             super(zip);

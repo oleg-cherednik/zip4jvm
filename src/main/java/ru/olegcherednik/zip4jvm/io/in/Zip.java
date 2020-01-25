@@ -33,7 +33,7 @@ public abstract class Zip {
 
     public abstract long getTotalDisks();
 
-    public abstract DataInputFile openDataInputFile() throws IOException;
+    public abstract DataInputFile dataInputFile() throws IOException;
 
     public abstract boolean isSplit() throws IOException;
 

@@ -2,8 +2,8 @@ package ru.olegcherednik.zip4jvm.io.in;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.FilenameUtils;
 import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -14,7 +14,7 @@ import java.nio.file.Path;
  */
 @Getter
 @RequiredArgsConstructor
-public final class StandardZip extends Zip {
+final class StandardZip extends Zip {
 
     private final Path path;
 
@@ -29,13 +29,13 @@ public final class StandardZip extends Zip {
     }
 
     @Override
-    public DataInputFile openDataInputFile() throws IOException {
+    public DataInputFile dataInputFile() throws IOException {
         return new LittleEndianReadFile(path);
     }
 
     @Override
     public boolean isSplit() throws IOException {
-        try (DataInput in = new SingleZipInputStream(getDiskFile(path, 1))) {
+        try (DataInput in = new SingleZipInputStream(ZipModel.getDiskFile(path, 1))) {
             return in.readDwordSignature() == SplitZipOutputStream.SPLIT_SIGNATURE;
         }
     }
@@ -45,7 +45,4 @@ public final class StandardZip extends Zip {
         return path.toString();
     }
 
-    public static Path getDiskFile(Path file, long disk) {
-        return file.getParent().resolve(String.format("%s.z%02d", FilenameUtils.getBaseName(file.toString()), disk));
-    }
 }

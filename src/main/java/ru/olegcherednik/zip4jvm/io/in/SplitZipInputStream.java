@@ -7,7 +7,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 /**
- * TODO is should be merged with base
+ * TODO 7-Zip is should be merged with base
+ *
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
@@ -34,7 +35,7 @@ public class SplitZipInputStream extends BaseSplitZipInputStream {
     @Override
     protected Path getNextDiskPath() {
 //        return zipModel.getPartFile(++disk);
-        return StandardZip.getDiskFile(file, ++disk);
+        return ZipModel.getDiskFile(file, ++disk);
     }
 
 }

@@ -15,7 +15,7 @@ public abstract class BaseZipDataInput extends BaseDataInput implements ZipDataI
 
     protected BaseZipDataInput(Zip zip) throws IOException {
         this.zip = zip;
-        delegate = zip.openDataInputFile();
+        delegate = zip.dataInputFile();
     }
 
     @Override

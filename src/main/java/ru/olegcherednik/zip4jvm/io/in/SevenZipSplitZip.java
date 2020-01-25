@@ -28,7 +28,7 @@ import java.util.List;
  */
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class SevenZipSplitZip extends Zip {
+final class SevenZipSplitZip extends Zip {
 
     private final Path path;
     private final List<Disk> items;
@@ -86,7 +86,7 @@ public final class SevenZipSplitZip extends Zip {
     }
 
     @Override
-    public DataInputFile openDataInputFile() throws IOException {
+    public DataInputFile dataInputFile() throws IOException {
         return new LittleEndianSevenZipReadFile(this);
     }
 
