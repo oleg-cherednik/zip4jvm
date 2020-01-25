@@ -87,6 +87,7 @@ public final class BlockModelReader extends BaseZipModelReader {
     public static final class CentralDataInputStream extends SingleZipInputStream {
 
         private long disk;
+        // TODO it seems it not usable
         private long totalDisks;
 
         public CentralDataInputStream(Zip zip) throws IOException {

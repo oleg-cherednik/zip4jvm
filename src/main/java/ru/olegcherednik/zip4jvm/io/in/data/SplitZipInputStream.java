@@ -66,7 +66,6 @@ public class SplitZipInputStream extends BaseZipDataInput {
         Path splitFile = ZipModel.getDiskFile(zipModel.getZip().getPath(), ++disk);
         delegate.close();
         delegate = new LittleEndianReadFile(splitFile);
-        fileName = splitFile.getFileName().toString();
     }
 
     @Override

@@ -1,7 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import lombok.Getter;
-import lombok.Setter;
 import ru.olegcherednik.zip4jvm.io.in.file.Zip;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
@@ -15,8 +14,6 @@ import java.io.IOException;
 public abstract class BaseZipDataInput extends BaseDataInput implements ZipDataInput {
 
     protected final ZipModel zipModel;
-    @Setter
-    protected String fileName;
 
     protected BaseZipDataInput(ZipModel zipModel, Zip zip) throws IOException {
         this.zipModel = zipModel;
@@ -25,7 +22,7 @@ public abstract class BaseZipDataInput extends BaseDataInput implements ZipDataI
 
     @Override
     public long getTotalDisks() {
-        return zipModel.getZip().getTotalDisks();
+        return zipModel.getTotalDisks();
     }
 
 }
