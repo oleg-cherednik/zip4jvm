@@ -2,9 +2,9 @@ package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import lombok.Getter;
 import lombok.Setter;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
-import ru.olegcherednik.zip4jvm.io.in.Zip;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.SingleZipInputStream;
+import ru.olegcherednik.zip4jvm.io.in.file.Zip;
 import ru.olegcherednik.zip4jvm.io.readers.BaseZipModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.CentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.EndCentralDirectoryReader;

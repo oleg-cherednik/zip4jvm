@@ -1,7 +1,9 @@
-package ru.olegcherednik.zip4jvm.io.in;
+package ru.olegcherednik.zip4jvm.io.in.file;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
@@ -35,7 +37,7 @@ final class StandardZip extends Zip {
 
     @Override
     public boolean isSplit() throws IOException {
-        try (DataInput in = new SingleZipInputStream(ZipModel.getDiskFile(path, 1))) {
+        try (DataInput in = new SingleZipInputStream(Zip.of(ZipModel.getDiskFile(path, 1)))) {
             return in.readDwordSignature() == SplitZipOutputStream.SPLIT_SIGNATURE;
         }
     }

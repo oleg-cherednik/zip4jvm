@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.engine.InfoEngine;
-import ru.olegcherednik.zip4jvm.io.in.Zip;
+import ru.olegcherednik.zip4jvm.io.in.file.Zip;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 
 import java.io.IOException;

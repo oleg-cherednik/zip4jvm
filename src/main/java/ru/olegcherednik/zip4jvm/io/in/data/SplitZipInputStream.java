@@ -1,6 +1,7 @@
-package ru.olegcherednik.zip4jvm.io.in;
+package ru.olegcherednik.zip4jvm.io.in.data;
 
 import lombok.Getter;
+import ru.olegcherednik.zip4jvm.io.in.file.Zip;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import java.io.IOException;
@@ -19,7 +20,7 @@ public class SplitZipInputStream extends BaseSplitZipInputStream {
     private final Path file;
 
     public SplitZipInputStream(ZipModel zipModel, long disk) throws IOException {
-        super(new StandardZip(zipModel.getPartFile(disk)));
+        super(Zip.of(zipModel.getPartFile(disk)));
         file = zipModel.getZip().getPath();
         this.zipModel = zipModel;
         this.disk = disk;

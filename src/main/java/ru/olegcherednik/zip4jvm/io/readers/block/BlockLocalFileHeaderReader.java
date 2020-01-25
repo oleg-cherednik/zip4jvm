@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import lombok.Getter;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.ExtraField;

@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.io.in;
+package ru.olegcherednik.zip4jvm.io.in.file;
 
 import lombok.AccessLevel;
 import lombok.Getter;

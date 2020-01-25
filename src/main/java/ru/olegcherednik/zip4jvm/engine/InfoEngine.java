@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.engine;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.in.Zip;
+import ru.olegcherednik.zip4jvm.io.in.file.Zip;
 import ru.olegcherednik.zip4jvm.io.readers.block.BlockModelReader;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;

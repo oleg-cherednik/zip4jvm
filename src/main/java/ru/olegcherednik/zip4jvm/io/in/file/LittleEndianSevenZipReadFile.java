@@ -1,9 +1,10 @@
-package ru.olegcherednik.zip4jvm.io.in;
+package ru.olegcherednik.zip4jvm.io.in.file;
 
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
-import java.util.Objects;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * @author Oleg Cherednik
@@ -27,7 +28,7 @@ public class LittleEndianSevenZipReadFile extends LittleEndianDataInputFile {
         int bytesSkipped = 0;
 
         for (int i = disk; bytesSkipped < bytes; ) {
-            Disk disk = Objects.requireNonNull(zip.getDisk(i));
+            Disk disk = requireNonNull(zip.getDisk(i));
             boolean withinDisk = bytes - bytesSkipped < disk.getLength();
 
             if (withinDisk || zip.isLast(disk)) {
@@ -74,7 +75,7 @@ public class LittleEndianSevenZipReadFile extends LittleEndianDataInputFile {
                 res += total;
 
             if (total == IOUtils.EOF || total < size) {
-                openFile(zip.getDisk(++disk).getFile());
+                openFile(requireNonNull(zip.getDisk(++disk)).getFile());
                 offs += Math.max(0, total);
                 size -= Math.max(0, total);
             }

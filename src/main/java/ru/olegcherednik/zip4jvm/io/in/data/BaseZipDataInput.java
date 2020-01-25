@@ -1,6 +1,7 @@
-package ru.olegcherednik.zip4jvm.io.in;
+package ru.olegcherednik.zip4jvm.io.in.data;
 
 import lombok.Getter;
+import ru.olegcherednik.zip4jvm.io.in.file.Zip;
 
 import java.io.IOException;
 

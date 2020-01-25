@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.io.in;
+package ru.olegcherednik.zip4jvm.io.in.file;
 
 import org.apache.commons.io.IOUtils;
 

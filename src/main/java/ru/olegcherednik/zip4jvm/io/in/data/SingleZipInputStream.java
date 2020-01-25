@@ -1,19 +1,15 @@
-package ru.olegcherednik.zip4jvm.io.in;
+package ru.olegcherednik.zip4jvm.io.in.data;
 
+import ru.olegcherednik.zip4jvm.io.in.file.Zip;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import java.io.IOException;
-import java.nio.file.Path;
 
 /**
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
 public class SingleZipInputStream extends BaseZipDataInput {
-
-    public SingleZipInputStream(Path zip) throws IOException {
-        super(new StandardZip(zip));
-    }
 
     public SingleZipInputStream(Zip zip) throws IOException {
         super(zip);

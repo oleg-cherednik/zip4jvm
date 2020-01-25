@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.io.in;
+package ru.olegcherednik.zip4jvm.io.in.data;
 
 import java.io.Closeable;
 import java.io.IOException;

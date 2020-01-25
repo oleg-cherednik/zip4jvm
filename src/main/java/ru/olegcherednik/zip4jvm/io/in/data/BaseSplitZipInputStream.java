@@ -1,6 +1,8 @@
-package ru.olegcherednik.zip4jvm.io.in;
+package ru.olegcherednik.zip4jvm.io.in.data;
 
 import org.apache.commons.io.IOUtils;
+import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianReadFile;
+import ru.olegcherednik.zip4jvm.io.in.file.Zip;
 
 import java.io.IOException;
 import java.nio.file.Path;
