@@ -97,11 +97,11 @@ public final class ZipModel {
     }
 
     public Path getDiskFile(long disk) {
-        return disk >= totalDisks ? srcFile.getPath() : getDiskFile(srcFile.getPath(), disk);
+        return disk >= totalDisks ? srcFile.getPath() : getDiskFile(srcFile.getPath(), disk + 1);
     }
 
     public static Path getDiskFile(Path file, long disk) {
-        return file.getParent().resolve(String.format("%s.z%02d", FilenameUtils.getBaseName(file.toString()), disk + 1));
+        return file.getParent().resolve(String.format("%s.z%02d", FilenameUtils.getBaseName(file.toString()), disk));
     }
 
     public DataInput createDataInput(String fileName) throws IOException {
