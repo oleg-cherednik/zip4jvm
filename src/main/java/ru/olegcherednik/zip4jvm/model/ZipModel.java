@@ -105,7 +105,7 @@ public final class ZipModel {
     }
 
     public DataInput createDataInput(String fileName) throws IOException {
-        return isSplit() ? new SplitZipInputStream(this, getZipEntryByFileName(fileName).getDisk()) : new SingleZipInputStream(zip);
+        return isSplit() ? new SplitZipInputStream(this, getZipEntryByFileName(fileName).getDisk()) : new SingleZipInputStream(this);
     }
 
     public DataInput createDataInput() throws IOException {

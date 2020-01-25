@@ -12,11 +12,11 @@ import java.io.IOException;
 public class SingleZipInputStream extends BaseZipDataInput {
 
     public SingleZipInputStream(Zip zip) throws IOException {
-        super(zip);
+        super(null, zip);
     }
 
     public SingleZipInputStream(ZipModel zipModel) throws IOException {
-        this(zipModel.getZip());
+        super(zipModel, zipModel.getZip());
     }
 
     @Override
