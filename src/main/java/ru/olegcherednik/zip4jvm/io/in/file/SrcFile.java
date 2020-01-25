@@ -14,17 +14,17 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireRegularFile;
  * @since 20.01.2020
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class Zip {
+public abstract class SrcFile {
 
-    public static Zip of(Path file) {
-        Zip zip = SevenZipSplitZip.create(file);
+    public static SrcFile of(Path file) {
+        SrcFile srcFile = SevenZipSplitSrcFile.create(file);
 
-        if (zip != null)
-            return zip;
+        if (srcFile != null)
+            return srcFile;
 
         requireExists(file);
         requireRegularFile(file, "Zip.file");
-        return new StandardZip(file);
+        return new StandardSrcFile(file);
     }
 
     public abstract Path getPath();

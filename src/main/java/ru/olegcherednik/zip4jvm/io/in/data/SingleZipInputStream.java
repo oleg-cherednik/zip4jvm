@@ -1,6 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
-import ru.olegcherednik.zip4jvm.io.in.file.Zip;
+import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import java.io.IOException;
@@ -11,12 +11,12 @@ import java.io.IOException;
  */
 public class SingleZipInputStream extends BaseZipDataInput {
 
-    public SingleZipInputStream(Zip zip) throws IOException {
-        super(null, zip);
+    public SingleZipInputStream(SrcFile srcFile) throws IOException {
+        super(null, srcFile);
     }
 
     public SingleZipInputStream(ZipModel zipModel) throws IOException {
-        super(zipModel, zipModel.getZip());
+        super(zipModel, zipModel.getSrcFile());
     }
 
     @Override

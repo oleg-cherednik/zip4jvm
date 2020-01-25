@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.SingleZipInputStream;
-import ru.olegcherednik.zip4jvm.io.in.file.Zip;
+import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
 import ru.olegcherednik.zip4jvm.io.readers.BaseZipModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.CentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.EndCentralDirectoryReader;
@@ -32,14 +32,14 @@ public final class BlockModelReader extends BaseZipModelReader {
     private final Zip64Block zip64Block = new Zip64Block();
     private final CentralDirectoryBlock centralDirectoryBlock = new CentralDirectoryBlock();
 
-    public BlockModelReader(Zip zip, Function<Charset, Charset> customizeCharset) {
-        super(zip, customizeCharset);
+    public BlockModelReader(SrcFile srcFile, Function<Charset, Charset> customizeCharset) {
+        super(srcFile, customizeCharset);
     }
 
     public BlockModel read() throws IOException {
         readCentralData();
 
-        ZipModel zipModel = new ZipModelBuilder(zip, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
+        ZipModel zipModel = new ZipModelBuilder(srcFile, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
 
         return BlockModel.builder()
                          .zipModel(zipModel)
@@ -51,7 +51,7 @@ public final class BlockModelReader extends BaseZipModelReader {
     public BlockModel readWithEntries() throws IOException {
         readCentralData();
 
-        ZipModel zipModel = new ZipModelBuilder(zip, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
+        ZipModel zipModel = new ZipModelBuilder(srcFile, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
         Map<String, ZipEntryBlock> zipEntries = new BlockZipEntryReader(zipModel, customizeCharset).read();
 
         return BlockModel.builder()
@@ -64,7 +64,7 @@ public final class BlockModelReader extends BaseZipModelReader {
 
     @Override
     protected DataInput createDataInput() throws IOException {
-        return new CentralDataInputStream(zip);
+        return new CentralDataInputStream(srcFile);
     }
 
     @Override
@@ -90,8 +90,8 @@ public final class BlockModelReader extends BaseZipModelReader {
         // TODO it seems it not usable
         private long totalDisks;
 
-        public CentralDataInputStream(Zip zip) throws IOException {
-            super(zip);
+        public CentralDataInputStream(SrcFile srcFile) throws IOException {
+            super(srcFile);
         }
 
     }

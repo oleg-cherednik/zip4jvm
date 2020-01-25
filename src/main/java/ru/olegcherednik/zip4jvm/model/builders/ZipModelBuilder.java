@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.model.builders;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.file.Zip;
+import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
 import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
@@ -25,7 +25,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public final class ZipModelBuilder {
 
-    private final Zip zip;
+    private final SrcFile srcFile;
     private final EndCentralDirectory endCentralDirectory;
     private final Zip64 zip64;
     private final CentralDirectory centralDirectory;
@@ -43,7 +43,7 @@ public final class ZipModelBuilder {
         if (Files.exists(zip))
             throw new Zip4jvmException("ZipFile '" + zip.toAbsolutePath() + "' exists");
 
-        ZipModel zipModel = new ZipModel(Zip.of(zip));
+        ZipModel zipModel = new ZipModel(SrcFile.of(zip));
         zipModel.setSplitSize(settings.getSplitSize());
         zipModel.setComment(settings.getComment());
         zipModel.setZip64(settings.isZip64());
@@ -52,7 +52,7 @@ public final class ZipModelBuilder {
     }
 
     public ZipModel build() throws IOException {
-        ZipModel zipModel = new ZipModel(zip);
+        ZipModel zipModel = new ZipModel(srcFile);
 
         zipModel.setZip64(zip64 != Zip64.NULL);
         zipModel.setComment(endCentralDirectory.getComment());
@@ -103,7 +103,7 @@ public final class ZipModelBuilder {
     }
 
     private static void updateSplit(ZipModel zipModel) throws IOException {
-        if (zipModel.getZip().isSplit())
+        if (zipModel.getSrcFile().isSplit())
             zipModel.setSplitSize(getSplitSize(zipModel));
     }
 

@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.engine.InfoEngine;
-import ru.olegcherednik.zip4jvm.io.in.file.Zip;
+import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 
 import java.io.IOException;
@@ -19,12 +19,12 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 @RequiredArgsConstructor
 public final class ZipInfo {
 
-    private final Zip zip;
+    private final SrcFile srcFile;
     private ZipInfoSettings settings = ZipInfoSettings.DEFAULT;
 
     public static ZipInfo zip(Path zip) {
         requireNotNull(zip, "ZipInfo.zip");
-        return new ZipInfo(Zip.of(zip));
+        return new ZipInfo(SrcFile.of(zip));
     }
 
     public ZipInfo settings(ZipInfoSettings settings) {
@@ -37,11 +37,11 @@ public final class ZipInfo {
     }
 
     public void printShortInfo(PrintStream out) throws IOException {
-        new InfoEngine(zip, settings).printTextInfo(out);
+        new InfoEngine(srcFile, settings).printTextInfo(out);
     }
 
     public void decompose(Path destDir) throws IOException {
-        new InfoEngine(zip, settings).decompose(destDir);
+        new InfoEngine(srcFile, settings).decompose(destDir);
     }
 
 }

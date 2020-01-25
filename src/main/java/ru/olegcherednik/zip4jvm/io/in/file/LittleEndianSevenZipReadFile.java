@@ -12,12 +12,12 @@ import static java.util.Objects.requireNonNull;
  */
 public class LittleEndianSevenZipReadFile extends LittleEndianDataInputFile {
 
-    private final SevenZipSplitZip zip;
+    private final SevenZipSplitSrcFile zip;
     private int disk;
     /** offs from the beginning of the first file */
     private long offs;
 
-    protected LittleEndianSevenZipReadFile(SevenZipSplitZip zip) throws IOException {
+    protected LittleEndianSevenZipReadFile(SevenZipSplitSrcFile zip) throws IOException {
         super(zip.getDiskFile(0));
         this.zip = zip;
         length = zip.getLength();

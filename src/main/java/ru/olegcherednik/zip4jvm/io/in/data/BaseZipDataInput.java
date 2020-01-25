@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import lombok.Getter;
-import ru.olegcherednik.zip4jvm.io.in.file.Zip;
+import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import java.io.IOException;
@@ -15,9 +15,9 @@ public abstract class BaseZipDataInput extends BaseDataInput implements ZipDataI
 
     protected final ZipModel zipModel;
 
-    protected BaseZipDataInput(ZipModel zipModel, Zip zip) throws IOException {
+    protected BaseZipDataInput(ZipModel zipModel, SrcFile srcFile) throws IOException {
         this.zipModel = zipModel;
-        delegate = zip.dataInputFile();
+        delegate = srcFile.dataInputFile();
     }
 
     @Override

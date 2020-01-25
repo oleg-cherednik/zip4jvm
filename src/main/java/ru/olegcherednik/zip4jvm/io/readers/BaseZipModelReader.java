@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.SignatureWasNotFoundException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.file.Zip;
+import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -34,7 +34,7 @@ public abstract class BaseZipModelReader {
 
     private static final String MARKER_END_CENTRAL_DIRECTORY = "end_central_directory";
 
-    protected final Zip zip;
+    protected final SrcFile srcFile;
     protected final Function<Charset, Charset> customizeCharset;
 
     protected EndCentralDirectory endCentralDirectory;

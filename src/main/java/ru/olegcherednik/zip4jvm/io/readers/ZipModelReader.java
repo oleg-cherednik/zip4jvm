@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.SingleZipInputStream;
-import ru.olegcherednik.zip4jvm.io.in.file.Zip;
+import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 
@@ -18,17 +18,17 @@ import java.util.function.Function;
 public final class ZipModelReader extends BaseZipModelReader {
 
     public ZipModelReader(Path zip, Function<Charset, Charset> customizeCharset) {
-        super(Zip.of(zip), customizeCharset);
+        super(SrcFile.of(zip), customizeCharset);
     }
 
     public ZipModel read() throws IOException {
         readCentralData();
-        return new ZipModelBuilder(zip, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
+        return new ZipModelBuilder(srcFile, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
     }
 
     @Override
     protected DataInput createDataInput() throws IOException {
-        return new SingleZipInputStream(zip);
+        return new SingleZipInputStream(srcFile);
     }
 
     @Override

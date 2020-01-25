@@ -28,7 +28,7 @@ abstract class BaseDataInput implements DataInput {
     private static final int OFFS_DWORD = 3;
     private static final int OFFS_QWORD = 7;
 
-    private static final ThreadLocal<byte[]> THREAD_LOCAL_BUF = ThreadLocal.withInitial(() -> new byte[15]);
+    protected static final ThreadLocal<byte[]> THREAD_LOCAL_BUF = ThreadLocal.withInitial(() -> new byte[15]);
 
     private final Map<String, Long> map = new HashMap<>();
 

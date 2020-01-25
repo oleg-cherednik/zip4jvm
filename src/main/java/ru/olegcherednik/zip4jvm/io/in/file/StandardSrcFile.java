@@ -16,7 +16,7 @@ import java.nio.file.Path;
  */
 @Getter
 @RequiredArgsConstructor
-final class StandardZip extends Zip {
+final class StandardSrcFile extends SrcFile {
 
     private final Path path;
 
@@ -37,7 +37,7 @@ final class StandardZip extends Zip {
 
     @Override
     public boolean isSplit() throws IOException {
-        try (DataInput in = new SingleZipInputStream(Zip.of(ZipModel.getDiskFile(path, 1)))) {
+        try (DataInput in = new SingleZipInputStream(SrcFile.of(ZipModel.getDiskFile(path, 1)))) {
             return in.readDwordSignature() == SplitZipOutputStream.SPLIT_SIGNATURE;
         }
     }

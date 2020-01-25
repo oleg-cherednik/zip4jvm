@@ -9,7 +9,7 @@ import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.io.in.data.SplitZipInputStream;
-import ru.olegcherednik.zip4jvm.io.in.file.Zip;
+import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
@@ -41,7 +41,7 @@ public final class ZipModel {
     public static final int MAX_TOTAL_DISKS = Zip64.LIMIT_WORD;
     public static final int MAX_COMMENT_SIZE = Zip64.LIMIT_WORD;
 
-    private final Zip zip;
+    private final SrcFile srcFile;
     private long splitSize = NO_SPLIT;
 
     private String comment;
@@ -97,7 +97,7 @@ public final class ZipModel {
     }
 
     public Path getPartFile(long disk) {
-        return disk >= totalDisks ? zip.getPath() : getDiskFile(zip.getPath(), disk + 1);
+        return disk >= totalDisks ? srcFile.getPath() : getDiskFile(srcFile.getPath(), disk + 1);
     }
 
     public static Path getDiskFile(Path file, long disk) {

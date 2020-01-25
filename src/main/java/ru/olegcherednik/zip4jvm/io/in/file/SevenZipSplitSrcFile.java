@@ -28,13 +28,13 @@ import java.util.List;
  */
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-final class SevenZipSplitZip extends Zip {
+final class SevenZipSplitSrcFile extends SrcFile {
 
     private final Path path;
     private final List<Disk> items;
     private final long length;
 
-    static SevenZipSplitZip create(Path file) {
+    static SevenZipSplitSrcFile create(Path file) {
         String fileName = file.getFileName().toString();
         String ext = FilenameUtils.getExtension(fileName);
         Path parent = file.getParent();
@@ -56,7 +56,7 @@ final class SevenZipSplitZip extends Zip {
             offs += length;
         }
 
-        return new SevenZipSplitZip(parent.resolve(fileName), Collections.unmodifiableList(items), offs);
+        return new SevenZipSplitSrcFile(parent.resolve(fileName), Collections.unmodifiableList(items), offs);
     }
 
     private static long length(Path file) {
