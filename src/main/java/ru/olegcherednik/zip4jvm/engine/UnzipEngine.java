@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.engine;
 import org.apache.commons.io.FilenameUtils;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -30,9 +31,8 @@ public final class UnzipEngine implements ZipFile.Reader {
     private final ZipModel zipModel;
     private final UnzipSettings settings;
 
-    public UnzipEngine(Path zip, UnzipSettings settings) throws IOException {
-        checkZipFile(zip);
-        zipModel = ZipModelBuilder.read(zip, settings.getCharsetCustomizer());
+    public UnzipEngine(SrcFile srcFile, UnzipSettings settings) throws IOException {
+        zipModel = ZipModelBuilder.read(srcFile, settings.getCharsetCustomizer());
         this.settings = settings;
     }
 

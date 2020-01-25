@@ -21,6 +21,7 @@ import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.engine.ZipEngine;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
+import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
@@ -54,8 +55,8 @@ public final class ZipFile {
         return new ZipEngine(zip, settings);
     }
 
-    static Reader reader(Path zip, UnzipSettings settings) throws IOException {
-        return new UnzipEngine(zip, settings);
+    static Reader reader(SrcFile srcFile, UnzipSettings settings) throws IOException {
+        return new UnzipEngine(srcFile, settings);
     }
 
     @Getter

@@ -1,5 +1,6 @@
 package ru.olegcherednik.zip4jvm;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.engine.InfoEngine;
 import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
@@ -16,7 +17,7 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
  * @author Oleg Cherednik
  * @since 11.10.2019
  */
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class ZipInfo {
 
     private final SrcFile srcFile;

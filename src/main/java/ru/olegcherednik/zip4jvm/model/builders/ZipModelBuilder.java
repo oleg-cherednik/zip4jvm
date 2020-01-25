@@ -31,12 +31,12 @@ public final class ZipModelBuilder {
     private final CentralDirectory centralDirectory;
     private final Function<Charset, Charset> charsetCustomizer;
 
-    public static ZipModel read(Path zip) throws IOException {
-        return read(zip, Charsets.UNMODIFIED);
+    public static ZipModel read(SrcFile srcFile) throws IOException {
+        return read(srcFile, Charsets.UNMODIFIED);
     }
 
-    public static ZipModel read(Path zip, Function<Charset, Charset> charsetCustomizer) throws IOException {
-        return new ZipModelReader(zip, charsetCustomizer).read();
+    public static ZipModel read(SrcFile srcFile, Function<Charset, Charset> charsetCustomizer) throws IOException {
+        return new ZipModelReader(srcFile, charsetCustomizer).read();
     }
 
     public static ZipModel build(Path zip, ZipSettings settings) {
