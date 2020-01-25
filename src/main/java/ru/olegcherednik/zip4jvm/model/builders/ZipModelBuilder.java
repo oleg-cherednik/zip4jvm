@@ -2,12 +2,8 @@ package ru.olegcherednik.zip4jvm.model.builders;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.SevenZipSplitZip;
 import ru.olegcherednik.zip4jvm.io.in.StandardZip;
-import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.io.in.Zip;
-import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
@@ -66,7 +62,7 @@ public final class ZipModelBuilder {
         zipModel.setCentralDirectorySize(getCentralDirectorySize());
         zipModel.setCentralDirectoryOffs(getCentralDirectoryOffs(endCentralDirectory, zip64));
         createAndAddEntries(zipModel);
-        updateSplit(zip, zipModel);
+        updateSplit(zipModel);
 
         return zipModel;
     }
@@ -108,21 +104,8 @@ public final class ZipModelBuilder {
     }
 
     private static void updateSplit(ZipModel zipModel) throws IOException {
-        if (isSplit(zipModel))
+        if (zipModel.getZip().isSplit())
             zipModel.setSplitSize(getSplitSize(zipModel));
-    }
-
-    private static void updateSplit(Zip zip, ZipModel zipModel) throws IOException {
-        if (zip instanceof SevenZipSplitZip)
-            return;
-        if (isSplit(zipModel))
-            zipModel.setSplitSize(getSplitSize(zipModel));
-    }
-
-    private static boolean isSplit(ZipModel zipModel) throws IOException {
-        try (DataInput in = new SingleZipInputStream(zipModel.getZip())) {
-            return in.readDwordSignature() == SplitZipOutputStream.SPLIT_SIGNATURE;
-        }
     }
 
     private static long getSplitSize(ZipModel zipModel) throws IOException {

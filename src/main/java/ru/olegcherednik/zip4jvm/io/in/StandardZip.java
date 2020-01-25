@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.io.in;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
+import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -30,6 +31,13 @@ public final class StandardZip extends Zip {
     @Override
     public DataInputFile openDataInputFile() throws IOException {
         return new LittleEndianReadFile(path);
+    }
+
+    @Override
+    public boolean isSplit() throws IOException {
+        try (DataInput in = new SingleZipInputStream(getDiskFile(path, 1))) {
+            return in.readDwordSignature() == SplitZipOutputStream.SPLIT_SIGNATURE;
+        }
     }
 
     @Override

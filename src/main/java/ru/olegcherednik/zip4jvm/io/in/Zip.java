@@ -35,4 +35,6 @@ public abstract class Zip {
 
     public abstract DataInputFile openDataInputFile() throws IOException;
 
+    public abstract boolean isSplit() throws IOException;
+
 }

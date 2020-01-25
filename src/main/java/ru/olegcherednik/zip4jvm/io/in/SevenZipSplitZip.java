@@ -21,6 +21,7 @@ import java.util.List;
  * filename.zip.002
  * filename.zip.003
  * </pre>
+ * According to the zip specification, this is not a split archive.
  *
  * @author Oleg Cherednik
  * @since 20.01.2020
@@ -87,6 +88,11 @@ public final class SevenZipSplitZip extends Zip {
     @Override
     public DataInputFile openDataInputFile() throws IOException {
         return new LittleEndianSevenZipReadFile(this);
+    }
+
+    @Override
+    public boolean isSplit() {
+        return false;
     }
 
     @Override
