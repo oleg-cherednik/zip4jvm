@@ -9,6 +9,7 @@ import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  * @author Oleg Cherednik
@@ -74,7 +75,10 @@ public class SplitZipInputStream extends BaseZipDataInput {
 
     private void openNextDisk() throws IOException {
         delegate.close();
-        delegate = new LittleEndianReadFile(zipModel.getDiskFile(++disk));
+
+        Path splitFile = zipModel.getDiskFile(++disk);
+        delegate = new LittleEndianReadFile(splitFile);
+        fileName = splitFile.getFileName().toString();
     }
 
     @Override
