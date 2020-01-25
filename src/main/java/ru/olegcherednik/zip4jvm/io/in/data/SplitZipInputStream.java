@@ -1,5 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
+import lombok.Getter;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianReadFile;
@@ -8,7 +9,6 @@ import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import java.io.IOException;
-import java.nio.file.Path;
 
 /**
  * @author Oleg Cherednik
@@ -16,10 +16,11 @@ import java.nio.file.Path;
  */
 public class SplitZipInputStream extends BaseZipDataInput {
 
+    @Getter
     protected long disk;
 
     public SplitZipInputStream(ZipModel zipModel, long disk) throws IOException {
-        super(zipModel, SrcFile.of(zipModel.getPartFile(disk)));
+        super(zipModel, SrcFile.of(zipModel.getDiskFile(disk)));
         this.disk = disk;
         checkSignature();
     }
@@ -72,19 +73,13 @@ public class SplitZipInputStream extends BaseZipDataInput {
     }
 
     private void openNextDisk() throws IOException {
-        Path splitFile = ZipModel.getDiskFile(zipModel.getSrcFile().getPath(), ++disk);
         delegate.close();
-        delegate = new LittleEndianReadFile(splitFile);
+        delegate = new LittleEndianReadFile(zipModel.getDiskFile(++disk));
     }
 
     @Override
     public final String toString() {
         return "disk: " + disk + ", " + super.toString();
-    }
-
-    @Override
-    public long getDisk() {
-        return disk;
     }
 
 }

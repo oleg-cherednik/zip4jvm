@@ -35,8 +35,4 @@ public class SingleZipInputStream extends BaseZipDataInput {
         }
     }
 
-    @Override
-    public ZipModel getZipModel() {
-        return null;
-    }
 }

@@ -69,7 +69,7 @@ public class SplitZipOutputStream extends BaseDataOutput {
     }
 
     private void openNextDisk() throws IOException {
-        Path splitFile = ZipModel.getDiskFile(zipModel.getSrcFile().getPath(), ++disk);
+        Path splitFile = zipModel.getDiskFile(++disk);
 
         super.close();
 

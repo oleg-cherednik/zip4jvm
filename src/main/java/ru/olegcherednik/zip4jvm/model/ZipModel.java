@@ -96,12 +96,12 @@ public final class ZipModel {
         return isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(fileNameEntry.keySet());
     }
 
-    public Path getPartFile(long disk) {
-        return disk >= totalDisks ? srcFile.getPath() : getDiskFile(srcFile.getPath(), disk + 1);
+    public Path getDiskFile(long disk) {
+        return disk >= totalDisks ? srcFile.getPath() : getDiskFile(srcFile.getPath(), disk);
     }
 
     public static Path getDiskFile(Path file, long disk) {
-        return file.getParent().resolve(String.format("%s.z%02d", FilenameUtils.getBaseName(file.toString()), disk));
+        return file.getParent().resolve(String.format("%s.z%02d", FilenameUtils.getBaseName(file.toString()), disk + 1));
     }
 
     public DataInput createDataInput(String fileName) throws IOException {

@@ -63,4 +63,8 @@ public class Block {
         this.fileName = fileName;
     }
 
+    @Override
+    public String toString() {
+        return String.format("offs: %d, size: %s, disk: %d", offs, size, disk);
+    }
 }

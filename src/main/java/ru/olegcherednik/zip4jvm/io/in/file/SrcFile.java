@@ -6,9 +6,6 @@ import lombok.NoArgsConstructor;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireExists;
-import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireRegularFile;
-
 /**
  * @author Oleg Cherednik
  * @since 20.01.2020
@@ -18,13 +15,7 @@ public abstract class SrcFile {
 
     public static SrcFile of(Path file) {
         SrcFile srcFile = SevenZipSplitSrcFile.create(file);
-
-        if (srcFile != null)
-            return srcFile;
-
-        requireExists(file);
-        requireRegularFile(file, "Zip.file");
-        return new StandardSrcFile(file);
+        return srcFile == null ? new StandardSrcFile(file) : srcFile;
     }
 
     public abstract Path getPath();

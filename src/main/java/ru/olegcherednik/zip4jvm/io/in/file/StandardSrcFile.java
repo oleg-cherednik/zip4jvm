@@ -8,6 +8,7 @@ import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -37,7 +38,12 @@ final class StandardSrcFile extends SrcFile {
 
     @Override
     public boolean isSplit() throws IOException {
-        try (DataInput in = new SingleZipInputStream(SrcFile.of(ZipModel.getDiskFile(path, 1)))) {
+        Path file = ZipModel.getDiskFile(path, 1);
+
+        if (!Files.exists(file))
+            return false;
+
+        try (DataInput in = new SingleZipInputStream(SrcFile.of(file))) {
             return in.readDwordSignature() == SplitZipOutputStream.SPLIT_SIGNATURE;
         }
     }

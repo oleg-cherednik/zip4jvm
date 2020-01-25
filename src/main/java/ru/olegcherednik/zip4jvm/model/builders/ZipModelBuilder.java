@@ -111,7 +111,7 @@ public final class ZipModelBuilder {
         long size = 0;
 
         for (long i = 0; i <= zipModel.getTotalDisks(); i++)
-            size = Math.max(size, Files.size(zipModel.getPartFile(i)));
+            size = Math.max(size, Files.size(zipModel.getDiskFile(i)));
 
         return size;
     }

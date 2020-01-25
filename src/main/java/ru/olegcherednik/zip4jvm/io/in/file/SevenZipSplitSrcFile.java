@@ -39,7 +39,9 @@ final class SevenZipSplitSrcFile extends SrcFile {
         String ext = FilenameUtils.getExtension(fileName);
         Path parent = file.getParent();
 
-        if (!"zip".equalsIgnoreCase(ext) && !NumberUtils.isDigits(ext) && !Files.exists(parent.resolve(fileName + ".001")))
+        if (!"zip".equalsIgnoreCase(ext) && NumberUtils.isDigits(ext))
+            fileName = FilenameUtils.getBaseName(fileName);
+        if (!Files.exists(parent.resolve(fileName + ".001")))
             return null;
 
         long offs = 0;
