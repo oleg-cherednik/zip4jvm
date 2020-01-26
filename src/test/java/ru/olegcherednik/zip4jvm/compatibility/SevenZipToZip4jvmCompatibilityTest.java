@@ -9,7 +9,6 @@ import java.nio.file.Path;
 
 import static ru.olegcherednik.zip4jvm.TestData.sevenZipStoreSplitZip;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
-import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
 /**
@@ -24,7 +23,7 @@ public class SevenZipToZip4jvmCompatibilityTest {
 
     public void shouldUnzipWhenSevenZipSplit() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.zip(sevenZipStoreSplitZip).destDir(destDir).password(password).extract();
+        UnzipIt.zip(sevenZipStoreSplitZip).destDir(destDir).extract();
         assertThatDirectory(destDir).matches(rootAssert);
     }
 
