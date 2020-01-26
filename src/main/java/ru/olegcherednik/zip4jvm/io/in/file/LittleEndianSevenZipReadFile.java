@@ -25,11 +25,11 @@ public class LittleEndianSevenZipReadFile extends LittleEndianDataInputFile {
 
     @Override
     public long skip(long bytes) throws IOException {
-        int bytesSkipped = 0;
+        int skipped = 0;
 
-        for (int i = itemPos; bytesSkipped < bytes; ) {
+        for (int i = itemPos; skipped < bytes; ) {
             SrcFile.Item item = requireNonNull(zip.getDisk(i));
-            boolean withinDisk = bytes - bytesSkipped < item.getLength();
+            boolean withinDisk = bytes - skipped < item.getLength();
 
             if (withinDisk || zip.isLast(item)) {
                 if (i != itemPos) {
@@ -37,14 +37,14 @@ public class LittleEndianSevenZipReadFile extends LittleEndianDataInputFile {
                     itemPos = item.getPos();
                 }
 
-                bytesSkipped += in.skipBytes((int)(bytes - bytesSkipped));
+                skipped += super.skip(bytes - skipped);
                 break;
             }
 
-            bytesSkipped += item.getLength();
+            skipped += item.getLength();
         }
 
-        return bytesSkipped;
+        return skipped;
     }
 
     @Override
