@@ -29,7 +29,7 @@ public class SingleZipInputStream extends BaseZipDataInput {
         long actualSkipped = 0;
 
         while (bytes > 0) {
-            int actual = delegate.skip((int)Math.min(Integer.MAX_VALUE, bytes));
+            int actual = (int)delegate.skip((int)Math.min(Integer.MAX_VALUE, bytes));
 
             actualSkipped += actual;
             bytes -= actual;

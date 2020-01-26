@@ -66,7 +66,7 @@ public class SplitZipInputStream extends BaseZipDataInput {
 
         while (bytes > 0) {
             int expected = (int)Math.min(bytes, Integer.MAX_VALUE);
-            int actual = delegate.skip(expected);
+            int actual = (int)delegate.skip(expected);
 
             actualSkipped += actual;
             bytes -= actual;
