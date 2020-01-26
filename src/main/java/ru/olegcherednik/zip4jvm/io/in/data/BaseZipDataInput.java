@@ -24,9 +24,4 @@ public abstract class BaseZipDataInput extends BaseDataInput implements ZipDataI
         fileName = srcFile.getPath().getFileName().toString();
     }
 
-    @Override
-    public long getTotalDisks() {
-        return zipModel.getTotalDisks();
-    }
-
 }
