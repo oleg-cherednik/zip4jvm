@@ -21,8 +21,8 @@ zip4jvm - a java library for working with zip files
 * Streaming support for adding and extracting;
 * Read/Write password protected Zip files and streams;
 * [ZIP64](https://en.wikipedia.org/wiki/Zip_(file_format)#ZIP64) format support;
-* Multi-volume zip archive support (i.e. `filename.zip`, `filename.z01`, `filename.z02`);
-* 7-Zip multi-volume zip archive support  (i.e. `filename.zip.001`, `filename.zip.002`, `filename.zip.003`);
+* Multi-volume zip archive read/write support (i.e. `filename.zip`, `filename.z01`, `filename.z02`);
+* 7-Zip multi-volume zip archive read support  (i.e. `filename.zip.001`, `filename.zip.002`, `filename.zip.003`);
 * Unicode for comments and file names.
 
 ## Gradle
