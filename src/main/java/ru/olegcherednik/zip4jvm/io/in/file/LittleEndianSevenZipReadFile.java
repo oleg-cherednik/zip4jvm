@@ -13,7 +13,7 @@ import static java.util.Objects.requireNonNull;
 public class LittleEndianSevenZipReadFile extends LittleEndianDataInputFile {
 
     private final SevenZipSplitSrcFile zip;
-    private int disk;
+    private int itemPos;
     /** offs from the beginning of the first file */
     private long offs;
 
@@ -27,14 +27,14 @@ public class LittleEndianSevenZipReadFile extends LittleEndianDataInputFile {
     public int skip(int bytes) throws IOException {
         int bytesSkipped = 0;
 
-        for (int i = disk; bytesSkipped < bytes; ) {
+        for (int i = itemPos; bytesSkipped < bytes; ) {
             SrcFile.Item item = requireNonNull(zip.getDisk(i));
             boolean withinDisk = bytes - bytesSkipped < item.getLength();
 
             if (withinDisk || zip.isLast(item)) {
-                if (i != this.disk) {
+                if (i != this.itemPos) {
                     openFile(item.getFile());
-                    this.disk = item.getPos();
+                    this.itemPos = item.getPos();
                 }
 
                 bytesSkipped += in.skipBytes(bytes - bytesSkipped);
@@ -53,11 +53,11 @@ public class LittleEndianSevenZipReadFile extends LittleEndianDataInputFile {
             if (item.getOffs() + item.getLength() < pos && !zip.isLast(item))
                 continue;
 
-            if (this.disk != item.getPos())
+            if (itemPos != item.getPos())
                 openFile(item.getFile());
 
             in.seek(pos - item.getOffs());
-            this.disk = item.getPos();
+            itemPos = item.getPos();
             offs = item.getOffs();
             break;
         }
@@ -75,7 +75,7 @@ public class LittleEndianSevenZipReadFile extends LittleEndianDataInputFile {
                 res += total;
 
             if (total == IOUtils.EOF || total < size) {
-                openFile(requireNonNull(zip.getDisk(++disk)).getFile());
+                openFile(requireNonNull(zip.getDisk(++itemPos)).getFile());
                 offs += Math.max(0, total);
                 size -= Math.max(0, total);
             }

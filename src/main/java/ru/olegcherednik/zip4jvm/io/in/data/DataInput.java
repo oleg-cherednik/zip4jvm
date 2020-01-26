@@ -58,7 +58,7 @@ public interface DataInput extends Closeable {
 
     byte[] readBytes(int total) throws IOException;
 
-    void skip(long bytes) throws IOException;
+    long skip(long bytes) throws IOException;
 
     long length() throws IOException;
 

@@ -61,16 +61,21 @@ public class SplitZipInputStream extends BaseZipDataInput {
     }
 
     @Override
-    public void skip(long bytes) throws IOException {
+    public long skip(long bytes) throws IOException {
+        long actualSkipped = 0;
+
         while (bytes > 0) {
             int expected = (int)Math.min(bytes, Integer.MAX_VALUE);
             int actual = delegate.skip(expected);
 
+            actualSkipped += actual;
             bytes -= actual;
 
             if (actual < expected)
                 openNextDisk();
         }
+
+        return actualSkipped;
     }
 
     private void openNextDisk() throws IOException {
