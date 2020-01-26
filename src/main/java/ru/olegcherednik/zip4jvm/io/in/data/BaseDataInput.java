@@ -132,6 +132,11 @@ abstract class BaseDataInput implements DataInput {
     }
 
     @Override
+    public long skip(long bytes) throws IOException {
+        return delegate.skip(bytes);
+    }
+
+    @Override
     public void close() throws IOException {
         delegate.close();
     }

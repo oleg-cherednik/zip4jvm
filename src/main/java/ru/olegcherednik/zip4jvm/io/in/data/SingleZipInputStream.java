@@ -24,9 +24,4 @@ public class SingleZipInputStream extends BaseZipDataInput {
         return delegate.read(buf, offs, len);
     }
 
-    @Override
-    public long skip(long bytes) throws IOException {
-        return delegate.skip(bytes);
-    }
-
 }
