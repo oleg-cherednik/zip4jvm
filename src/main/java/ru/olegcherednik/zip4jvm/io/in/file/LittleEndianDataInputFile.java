@@ -50,6 +50,11 @@ public abstract class LittleEndianDataInputFile implements DataInputFile {
     }
 
     @Override
+    public void seek(long pos) throws IOException {
+        in.seek(pos);
+    }
+
+    @Override
     public final void close() throws IOException {
         if (in != null)
             in.close();

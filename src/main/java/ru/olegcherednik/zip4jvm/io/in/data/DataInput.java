@@ -1,5 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
+import ru.olegcherednik.zip4jvm.io.in.RandomAccess;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -8,7 +10,7 @@ import java.nio.charset.Charset;
  * @author Oleg Cherednik
  * @since 03.08.2019
  */
-public interface DataInput extends Closeable {
+public interface DataInput extends Closeable, RandomAccess {
 
     default int dwordSignatureSize() {
         return dwordSize();
@@ -58,11 +60,7 @@ public interface DataInput extends Closeable {
 
     byte[] readBytes(int total) throws IOException;
 
-    long skip(long bytes) throws IOException;
-
     long length() throws IOException;
-
-    void seek(long pos) throws IOException;
 
     default void backward(int bytes) throws IOException {
         seek(getOffs() - bytes);

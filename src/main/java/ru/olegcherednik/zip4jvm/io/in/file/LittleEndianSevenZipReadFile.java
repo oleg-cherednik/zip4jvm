@@ -56,7 +56,7 @@ public class LittleEndianSevenZipReadFile extends LittleEndianDataInputFile {
             if (itemPos != item.getPos())
                 openFile(item.getFile());
 
-            in.seek(pos - item.getOffs());
+            super.seek(pos - item.getOffs());
             itemPos = item.getPos();
             offs = item.getOffs();
             break;
