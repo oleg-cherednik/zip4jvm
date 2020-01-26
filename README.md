@@ -37,7 +37,7 @@ compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.0'
 <dependency>
     <groupId>ru.oleg-cherednik.zip4jvm</groupId>
     <artifactId>zip4jvm</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 </dependency>
 ~~~~
 
