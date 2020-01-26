@@ -14,7 +14,7 @@ public abstract class LittleEndianDataInputFile implements DataInputFile {
     protected long length;
 
     protected LittleEndianDataInputFile(Path file) throws IOException {
-        openFile(file);
+        openNextItem(file);
     }
 
     @Override
@@ -65,7 +65,7 @@ public abstract class LittleEndianDataInputFile implements DataInputFile {
         return "offs: " + getOffs() + " (0x" + Long.toHexString(getOffs()) + ')';
     }
 
-    protected final void openFile(Path file) throws IOException {
+    protected final void openNextItem(Path file) throws IOException {
         close();
         in = new RandomAccessFile(file.toFile(), "r");
         length = in.length();

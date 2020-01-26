@@ -33,7 +33,7 @@ public class LittleEndianSevenZipReadFile extends LittleEndianDataInputFile {
 
             if (withinDisk || zip.isLast(item)) {
                 if (i != itemPos) {
-                    openFile(item.getFile());
+                    openNextItem(item.getFile());
                     itemPos = item.getPos();
                 }
 
@@ -54,7 +54,7 @@ public class LittleEndianSevenZipReadFile extends LittleEndianDataInputFile {
                 continue;
 
             if (itemPos != item.getPos())
-                openFile(item.getFile());
+                openNextItem(item.getFile());
 
             super.seek(pos - item.getOffs());
             itemPos = item.getPos();
@@ -75,7 +75,7 @@ public class LittleEndianSevenZipReadFile extends LittleEndianDataInputFile {
                 res += total;
 
             if (total == IOUtils.EOF || total < size) {
-                openFile(requireNonNull(zip.getDisk(++itemPos)).getFile());
+                openNextItem(requireNonNull(zip.getDisk(++itemPos)).getFile());
                 offs += Math.max(0, total);
                 size -= Math.max(0, total);
             }
