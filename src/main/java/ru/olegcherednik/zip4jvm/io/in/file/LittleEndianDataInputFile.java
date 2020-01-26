@@ -33,6 +33,23 @@ public abstract class LittleEndianDataInputFile implements DataInputFile {
     }
 
     @Override
+    public long skip(long bytes) throws IOException {
+        long skipped = 0;
+
+        while (bytes > 0) {
+            int actual = in.skipBytes((int)Math.min(Integer.MAX_VALUE, bytes));
+
+            skipped += actual;
+            bytes -= actual;
+
+            if (actual == 0)
+                break;
+        }
+
+        return skipped;
+    }
+
+    @Override
     public final void close() throws IOException {
         if (in != null)
             in.close();

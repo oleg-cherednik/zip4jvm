@@ -16,11 +16,6 @@ public class LittleEndianReadFile extends LittleEndianDataInputFile {
     }
 
     @Override
-    public long skip(long bytes) throws IOException {
-        return in.skipBytes((int)bytes);
-    }
-
-    @Override
     public void seek(long pos) throws IOException {
         in.seek(pos);
     }

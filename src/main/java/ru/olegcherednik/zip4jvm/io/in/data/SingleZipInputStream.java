@@ -26,19 +26,7 @@ public class SingleZipInputStream extends BaseZipDataInput {
 
     @Override
     public long skip(long bytes) throws IOException {
-        long actualSkipped = 0;
-
-        while (bytes > 0) {
-            int actual = (int)delegate.skip((int)Math.min(Integer.MAX_VALUE, bytes));
-
-            actualSkipped += actual;
-            bytes -= actual;
-
-            if (actual == 0)
-                break;
-        }
-
-        return actualSkipped;
+        return delegate.skip(bytes);
     }
 
 }
