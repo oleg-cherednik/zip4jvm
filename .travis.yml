@@ -11,7 +11,7 @@ before_install:
   - export PATH=$GRADLE_HOME/bin:$PATH
   - gradle -v
 script:
-  - gradle clean build --scan -s
+  - gradle clean build --scan -s debug
   - gradle jacocoTestReport
 after_success:
   - bash <(curl -s https://codecov.io/bash)

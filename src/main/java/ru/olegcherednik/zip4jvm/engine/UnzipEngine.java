@@ -120,8 +120,8 @@ public final class UnzipEngine implements ZipFile.Reader {
             ZipUtils.copyLarge(zipEntry.getInputStream(), getOutputStream(file));
         }
 
-//        setFileAttributes(file, zipEntry);
-//        setFileLastModifiedTime(file, zipEntry);
+        setFileAttributes(file, zipEntry);
+        setFileLastModifiedTime(file, zipEntry);
     }
 
     private static void setFileLastModifiedTime(Path path, ZipEntry zipEntry) {
@@ -148,13 +148,6 @@ public final class UnzipEngine implements ZipFile.Reader {
         Files.deleteIfExists(file);
 
         return new FileOutputStream(file.toFile());
-    }
-
-    private static void checkZipFile(Path zip) throws IOException {
-        if (!Files.exists(zip))
-            throw new FileNotFoundException("ZipFile not exists: " + zip);
-        if (!Files.isRegularFile(zip))
-            throw new IOException("ZipFile is not a regular file: " + zip);
     }
 
 }
