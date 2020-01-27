@@ -77,7 +77,7 @@ public abstract class ExternalFileAttributes {
 
     public ExternalFileAttributes readFrom(byte[] data) {
         // copy, because read from archive metadata
-        Arrays.fill(data, (byte)0x0);
+        System.arraycopy(data, 0, this.data, 0, SIZE);
         return this;
     }
 
@@ -297,6 +297,8 @@ public abstract class ExternalFileAttributes {
             addIfSet(posix ? ownerWrite : !Windows.isReadOnly(data), permissions, OWNER_WRITE);
             addIfSet(posix ? ownerRead : true, permissions, OWNER_READ);
 
+            System.out.format("-- %s --", path.toAbsolutePath());
+            System.out.format("posix: %s\n", posix);
             System.out.format("othersExecute: %s\n", posix ? othersExecute : false);
             System.out.format("othersWrite: %s\n", posix ? othersWrite : false);
             System.out.format("othersRead: %s\n", posix ? othersRead : false);
@@ -306,6 +308,7 @@ public abstract class ExternalFileAttributes {
             System.out.format("ownerExecute: %s\n", posix ? ownerExecute : false);
             System.out.format("ownerWrite: %s\n", posix ? ownerWrite : false);
             System.out.format("ownerRead: %s\n", posix ? ownerRead : false);
+            System.out.println("--");
 
             Files.setPosixFilePermissions(path, permissions);
         }
