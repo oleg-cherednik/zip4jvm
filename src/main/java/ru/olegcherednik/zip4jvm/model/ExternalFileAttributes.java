@@ -297,7 +297,7 @@ public abstract class ExternalFileAttributes {
             addIfSet(posix ? ownerWrite : !Windows.isReadOnly(data), permissions, OWNER_WRITE);
             addIfSet(posix ? ownerRead : true, permissions, OWNER_READ);
 
-            System.out.format("-- %s --\n", path.toAbsolutePath());
+            System.out.format("-- POSIX: %s --\n", path.toAbsolutePath());
             System.out.format("posix: %s\n", posix);
             permissions.forEach(System.out::println);
             System.out.println("--");

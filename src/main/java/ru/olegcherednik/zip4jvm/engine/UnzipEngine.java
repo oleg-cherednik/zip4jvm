@@ -116,6 +116,7 @@ public final class UnzipEngine implements ZipFile.Reader {
         if (zipEntry.isDirectory())
             Files.createDirectories(file);
         else {
+            System.out.println("exists: " + file.toAbsolutePath() + " - " + Files.exists(file));
             zipEntry.setPassword(settings.getPasswordProvider().apply(ZipUtils.getFileNameNoDirectoryMarker(zipEntry.getFileName())));
             ZipUtils.copyLarge(zipEntry.getInputStream(), getOutputStream(file));
         }
