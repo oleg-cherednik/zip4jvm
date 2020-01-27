@@ -297,17 +297,9 @@ public abstract class ExternalFileAttributes {
             addIfSet(posix ? ownerWrite : !Windows.isReadOnly(data), permissions, OWNER_WRITE);
             addIfSet(posix ? ownerRead : true, permissions, OWNER_READ);
 
-            System.out.format("-- %s --", path.toAbsolutePath());
+            System.out.format("-- %s --\n", path.toAbsolutePath());
             System.out.format("posix: %s\n", posix);
-            System.out.format("othersExecute: %s\n", posix ? othersExecute : false);
-            System.out.format("othersWrite: %s\n", posix ? othersWrite : false);
-            System.out.format("othersRead: %s\n", posix ? othersRead : false);
-            System.out.format("groupExecute: %s\n", posix ? groupExecute : false);
-            System.out.format("groupWrite: %s\n", posix ? groupWrite : false);
-            System.out.format("groupRead: %s\n", posix ? groupRead : false);
-            System.out.format("ownerExecute: %s\n", posix ? ownerExecute : false);
-            System.out.format("ownerWrite: %s\n", posix ? ownerWrite : false);
-            System.out.format("ownerRead: %s\n", posix ? ownerRead : false);
+            permissions.forEach(System.out::println);
             System.out.println("--");
 
             Files.setPosixFilePermissions(path, permissions);
