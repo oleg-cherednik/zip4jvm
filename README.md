@@ -917,4 +917,4 @@ are not explicitly set, then `default` entry settings are used for all added ent
 * Home page: https://github.com/oleg-cherednik/zip4jvm
 * Maven:
   * **central:** https://mvnrepository.com/artifact/ru.oleg-cherednik.zip4jvm/zip4jvm
-  * **download:** http://repo1.maven.org/maven2/ru/oleg-cherednik/zip4jvm/zip4jvm/
+  * **download:** https://repo1.maven.org/maven2/ru/oleg-cherednik/zip4jvm/zip4jvm/
