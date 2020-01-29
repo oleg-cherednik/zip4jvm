@@ -118,17 +118,10 @@ public final class UnzipEngine implements ZipFile.Reader {
         else {
             System.out.println("exists: " + file.toAbsolutePath() + " - " + Files.exists(file));
             zipEntry.setPassword(settings.getPasswordProvider().apply(ZipUtils.getFileNameNoDirectoryMarker(zipEntry.getFileName())));
-
-            try {
-                file.toFile().createNewFile();
-                System.out.println("copyLarge");
-                ZipUtils.copyLarge(zipEntry.getInputStream(), getOutputStream(file));
-            } catch(Exception e) {
-                e.printStackTrace();
-            }
+            ZipUtils.copyLarge(zipEntry.getInputStream(), getOutputStream(file));
         }
 
-        setFileAttributes(file, zipEntry);
+//        setFileAttributes(file, zipEntry);
         setFileLastModifiedTime(file, zipEntry);
     }
 
