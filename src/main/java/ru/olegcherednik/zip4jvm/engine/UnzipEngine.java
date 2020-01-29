@@ -118,7 +118,10 @@ public final class UnzipEngine implements ZipFile.Reader {
         else {
             System.out.println("exists: " + file.toAbsolutePath() + " - " + Files.exists(file));
             zipEntry.setPassword(settings.getPasswordProvider().apply(ZipUtils.getFileNameNoDirectoryMarker(zipEntry.getFileName())));
+
             try {
+                file.toFile().createNewFile();
+                System.out.println("copyLarge");
                 ZipUtils.copyLarge(zipEntry.getInputStream(), getOutputStream(file));
             } catch(Exception e) {
                 e.printStackTrace();
@@ -145,13 +148,18 @@ public final class UnzipEngine implements ZipFile.Reader {
     }
 
     private static FileOutputStream getOutputStream(Path file) throws IOException {
+        System.out.println("1. getParent()");
         Path parent = file.getParent();
 
-        if (!Files.exists(file))
+        if (!Files.exists(parent)) {
+            System.out.println("2. create parent");
             Files.createDirectories(parent);
+        }
 
+        System.out.println("3. delete existed");
         Files.deleteIfExists(file);
 
+        System.out.println("4. create stream");
         return new FileOutputStream(file.toFile());
     }
 
