@@ -1,10 +1,11 @@
-package ru.olegcherednik.zip4jvm.io.in;
+package ru.olegcherednik.zip4jvm.io.in.data;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -27,13 +28,11 @@ abstract class BaseDataInput implements DataInput {
     private static final int OFFS_DWORD = 3;
     private static final int OFFS_QWORD = 7;
 
-    private static final ThreadLocal<byte[]> THREAD_LOCAL_BUF = ThreadLocal.withInitial(() -> new byte[15]);
+    protected static final ThreadLocal<byte[]> THREAD_LOCAL_BUF = ThreadLocal.withInitial(() -> new byte[15]);
 
     private final Map<String, Long> map = new HashMap<>();
 
     protected DataInputFile delegate;
-
-    protected final CycleBuffer cycleBuffer = new CycleBuffer();
 
     @Override
     public int byteSize() {
@@ -133,6 +132,11 @@ abstract class BaseDataInput implements DataInput {
     }
 
     @Override
+    public long skip(long bytes) throws IOException {
+        return delegate.skip(bytes);
+    }
+
+    @Override
     public void close() throws IOException {
         delegate.close();
     }
@@ -152,16 +156,6 @@ abstract class BaseDataInput implements DataInput {
     @Override
     public void seek(String id) throws IOException {
         seek(getMark(id));
-    }
-
-    @Override
-    public void cleanBuffer() {
-        cycleBuffer.clear();
-    }
-
-    @Override
-    public byte[] getLastBytes(int bytes) {
-        return cycleBuffer.getLastBytes(bytes);
     }
 
     @Override

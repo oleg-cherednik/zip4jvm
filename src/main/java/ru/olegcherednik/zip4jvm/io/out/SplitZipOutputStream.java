@@ -69,17 +69,17 @@ public class SplitZipOutputStream extends BaseDataOutput {
     }
 
     private void openNextDisk() throws IOException {
-        Path splitFile = ZipModel.getSplitFilePath(zipModel.getFile(), ++disk);
-
         super.close();
+
+        Path splitFile = ZipModel.getDiskFile(zipModel.getSrcFile().getPath(), ++disk);
 
         if (Files.exists(splitFile))
             throw new IOException("split file: " + splitFile.getFileName() + " already exists in the current directory, cannot rename this file");
 
-        if (!zipModel.getFile().toFile().renameTo(splitFile.toFile()))
+        if (!zipModel.getSrcFile().getPath().toFile().renameTo(splitFile.toFile()))
             throw new IOException("cannot rename newly created split file");
 
-        createFile(zipModel.getFile());
+        createFile(zipModel.getSrcFile().getPath());
     }
 
     @Override

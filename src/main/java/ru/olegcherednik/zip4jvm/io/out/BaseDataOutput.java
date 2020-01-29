@@ -23,7 +23,7 @@ abstract class BaseDataOutput extends AbstractMarker implements DataOutput {
 
     protected BaseDataOutput(ZipModel zipModel) throws IOException {
         this.zipModel = zipModel;
-        createFile(zipModel.getFile());
+        createFile(zipModel.getSrcFile().getPath());
     }
 
     protected void createFile(Path zip) throws IOException {

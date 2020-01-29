@@ -1,4 +1,6 @@
-package ru.olegcherednik.zip4jvm.io.in;
+package ru.olegcherednik.zip4jvm.io.in.data;
+
+import ru.olegcherednik.zip4jvm.io.in.RandomAccess;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -8,7 +10,7 @@ import java.nio.charset.Charset;
  * @author Oleg Cherednik
  * @since 03.08.2019
  */
-public interface DataInput extends Closeable {
+public interface DataInput extends Closeable, RandomAccess {
 
     default int dwordSignatureSize() {
         return dwordSize();
@@ -30,10 +32,6 @@ public interface DataInput extends Closeable {
 
     default String getFileName() {
         return null;
-    }
-
-    default long getTotalDisks() {
-        return 0;
     }
 
     default int readWordSignature() throws IOException {
@@ -58,11 +56,7 @@ public interface DataInput extends Closeable {
 
     byte[] readBytes(int total) throws IOException;
 
-    void skip(long bytes) throws IOException;
-
     long length() throws IOException;
-
-    void seek(long pos) throws IOException;
 
     default void backward(int bytes) throws IOException {
         seek(getOffs() - bytes);
@@ -75,9 +69,5 @@ public interface DataInput extends Closeable {
     long getMark(String id);
 
     void seek(String id) throws IOException;
-
-    void cleanBuffer();
-
-    byte[] getLastBytes(int bytes);
 
 }

@@ -3,17 +3,16 @@ package ru.olegcherednik.zip4jvm.io.readers;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.SignatureWasNotFoundException;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.Path;
 import java.util.function.Function;
 
 /**
@@ -35,7 +34,7 @@ public abstract class BaseZipModelReader {
 
     private static final String MARKER_END_CENTRAL_DIRECTORY = "end_central_directory";
 
-    protected final Path zip;
+    protected final SrcFile srcFile;
     protected final Function<Charset, Charset> customizeCharset;
 
     protected EndCentralDirectory endCentralDirectory;
@@ -43,7 +42,7 @@ public abstract class BaseZipModelReader {
     protected CentralDirectory centralDirectory;
 
     protected final void readCentralData() throws IOException {
-        try (DataInput in = createDataInput(zip)) {
+        try (DataInput in = createDataInput()) {
             findCentralDirectorySignature(in);
             endCentralDirectory = readEndCentralDirectory(in);
             zip64 = readZip64(in);
@@ -66,7 +65,7 @@ public abstract class BaseZipModelReader {
         return getCentralDirectoryReader(totalEntries).read(in);
     }
 
-    protected abstract DataInput createDataInput(Path zip) throws FileNotFoundException;
+    protected abstract DataInput createDataInput() throws IOException;
 
     protected abstract EndCentralDirectoryReader getEndCentralDirectoryReader();
 

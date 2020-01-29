@@ -1,7 +1,10 @@
-package ru.olegcherednik.zip4jvm.io.in;
+package ru.olegcherednik.zip4jvm.io.in.data;
 
+import lombok.Getter;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianReadFile;
+import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
 import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
@@ -10,21 +13,29 @@ import java.nio.file.Path;
 
 /**
  * @author Oleg Cherednik
- * @since 04.08.2019
+ * @since 22.01.2020
  */
 public class SplitZipInputStream extends BaseZipDataInput {
 
-    private long disk;
+    @Getter
+    protected long disk;
 
     public SplitZipInputStream(ZipModel zipModel, long disk) throws IOException {
-        super(zipModel, zipModel.getPartFile(disk));
+        super(zipModel, SrcFile.of(zipModel.getDiskFile(disk)));
         this.disk = disk;
         checkSignature();
     }
 
     private void checkSignature() throws IOException {
-        if (disk == 0 && delegate.readSignature() != SplitZipOutputStream.SPLIT_SIGNATURE)
-            throw new Zip4jvmException("Incorrect split file signature: " + zipModel.getFile().getFileName());
+        if (disk != 0)
+            return;
+
+        byte[] buf = THREAD_LOCAL_BUF.get();
+        read(buf, 0, 4);
+        int signature = (int)delegate.convert(buf, 0, 4);
+
+        if (signature != SplitZipOutputStream.SPLIT_SIGNATURE)
+            throw new Zip4jvmException("Incorrect split file signature: " + zipModel.getSrcFile().getPath());
     }
 
     @Override
@@ -35,7 +46,6 @@ public class SplitZipInputStream extends BaseZipDataInput {
 
         while (res < len) {
             int total = delegate.read(buf, offs, size);
-            cycleBuffer.write(buf, offs, size);
 
             if (total > 0)
                 res += total;
@@ -51,21 +61,26 @@ public class SplitZipInputStream extends BaseZipDataInput {
     }
 
     @Override
-    public void skip(long bytes) throws IOException {
-        while (bytes > 0) {
-            int expected = (int)Math.min(bytes, Integer.MAX_VALUE);
-            int actual = delegate.skip(expected);
+    public long skip(long bytes) throws IOException {
+        long skipped = 0;
 
+        while (bytes > 0) {
+            long actual = delegate.skip(bytes);
+
+            skipped += actual;
             bytes -= actual;
 
-            if (actual < expected)
+            if (actual < bytes)
                 openNextDisk();
         }
+
+        return skipped;
     }
 
     private void openNextDisk() throws IOException {
-        Path splitFile = zipModel.getPartFile(++disk);
         delegate.close();
+
+        Path splitFile = zipModel.getDiskFile(++disk);
         delegate = new LittleEndianReadFile(splitFile);
         fileName = splitFile.getFileName().toString();
     }
@@ -73,11 +88,6 @@ public class SplitZipInputStream extends BaseZipDataInput {
     @Override
     public final String toString() {
         return "disk: " + disk + ", " + super.toString();
-    }
-
-    @Override
-    public long getDisk() {
-        return disk;
     }
 
 }

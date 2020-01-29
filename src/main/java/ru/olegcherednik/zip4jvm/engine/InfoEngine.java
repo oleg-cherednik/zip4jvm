@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.engine;
 
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
 import ru.olegcherednik.zip4jvm.io.readers.block.BlockModelReader;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
@@ -21,8 +22,13 @@ import java.nio.file.Path;
 @RequiredArgsConstructor
 public final class InfoEngine {
 
-    private final Path zip;
+    private final SrcFile srcFile;
     private final ZipInfoSettings settings;
+
+    public InfoEngine(Path zip, ZipInfoSettings settings) {
+        this.srcFile = SrcFile.of(zip);
+        this.settings = settings;
+    }
 
     public void printTextInfo(PrintStream out) throws IOException {
         BlockModel blockModel = createModel();
@@ -45,7 +51,7 @@ public final class InfoEngine {
     }
 
     private BlockModel createModel() throws IOException {
-        BlockModelReader reader = new BlockModelReader(zip, settings.getCustomizeCharset());
+        BlockModelReader reader = new BlockModelReader(srcFile, settings.getCustomizeCharset());
         return settings.isReadEntries() ? reader.readWithEntries() : reader.read();
     }
 

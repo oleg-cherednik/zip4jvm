@@ -182,4 +182,5 @@ public class ZipInfoTest {
     public void decompose() throws IOException {
         zipInfo().decompose(Zip4jvmSuite.subDirNameAsMethodName(rootDir));
     }
+
 }
