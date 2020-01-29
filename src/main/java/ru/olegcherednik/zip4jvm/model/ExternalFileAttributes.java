@@ -284,10 +284,6 @@ public abstract class ExternalFileAttributes {
         @Override
         @SuppressWarnings("SimplifiableConditionalExpression")
         public void apply(Path path) throws IOException {
-            System.out.format("-- POSIX: %s --\n", path.toAbsolutePath());
-            System.out.println("-- current --");
-            Files.getFileAttributeView(path, PosixFileAttributeView.class).readAttributes().permissions().forEach(System.out::println);
-
             boolean posix = isPosix(data);
             Set<PosixFilePermission> permissions = EnumSet.noneOf(PosixFilePermission.class);
 
@@ -300,11 +296,6 @@ public abstract class ExternalFileAttributes {
             addIfSet(posix ? ownerExecute : false, permissions, OWNER_EXECUTE);
             addIfSet(posix ? ownerWrite : !Windows.isReadOnly(data), permissions, OWNER_WRITE);
             addIfSet(posix ? ownerRead : true, permissions, OWNER_READ);
-
-
-            System.out.println("-- new --");
-            permissions.forEach(System.out::println);
-            System.out.println("--");
 
             Files.setPosixFilePermissions(path, permissions);
         }

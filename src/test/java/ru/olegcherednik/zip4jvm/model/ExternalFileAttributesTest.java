@@ -296,7 +296,6 @@ public class ExternalFileAttributesTest {
         reset(dos);
     }
 
-    @Test(enabled = false) // TODO 7-zip
     public void shouldApplyPathWhenPosix() throws IOException {
         Path path = mock(Path.class);
         FileSystem fileSystem = mock(FileSystem.class);
@@ -371,7 +370,6 @@ public class ExternalFileAttributesTest {
         reset(fileAttributeView);
     }
 
-    @Test(enabled = false) // TODO 7-zip
     public void shouldUseDefaultPermissionsForPosixWhenFileWasCreatedUnderWindows() throws IOException {
         Path path = mock(Path.class);
         FileSystem fileSystem = mock(FileSystem.class);
