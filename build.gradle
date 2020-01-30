@@ -132,5 +132,5 @@ nexus {
 
 nexusStaging {
     packageGroup 'ru.oleg-cherednik'
-    stagingProfileId 'd3835bf60f05b9'
+    stagingProfileId 'D3835BF60F05B9'
 }
