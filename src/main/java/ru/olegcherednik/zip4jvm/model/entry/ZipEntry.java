@@ -84,6 +84,17 @@ public abstract class ZipEntry {
         return inputStreamSup.get(this);
     }
 
+    public CompressionMethod getCompressionMethodForBuilder() {
+        switch (encryption) {
+            case AES_128:
+            case AES_192:
+            case AES_256:
+                return CompressionMethod.AES;
+            default:
+                return compressionMethod;
+        }
+    }
+
     @Override
     public String toString() {
         return fileName;

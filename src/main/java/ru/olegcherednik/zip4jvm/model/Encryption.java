@@ -24,16 +24,15 @@ import java.util.function.Function;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum Encryption {
-    OFF(zipEntry -> Encoder.NULL, (zipEntry, in) -> Decoder.NULL, ZipEntry::getChecksum, compressionMethod -> compressionMethod),
-    PKWARE(PkwareEncoder::create, PkwareDecoder::create, ZipEntry::getChecksum, compressionMethod -> compressionMethod),
-    AES_128(AesEncoder::create, AesDecoder::create, entry -> 0L, compressionMethod -> CompressionMethod.AES),
-    AES_192(AES_128.createEncoder, AES_128.createDecoder, AES_128.checksum, AES_128.compressionMethod),
-    AES_256(AES_128.createEncoder, AES_128.createDecoder, AES_128.checksum, AES_128.compressionMethod);
+    OFF(zipEntry -> Encoder.NULL, (zipEntry, in) -> Decoder.NULL, ZipEntry::getChecksum),
+    PKWARE(PkwareEncoder::create, PkwareDecoder::create, ZipEntry::getChecksum),
+    AES_128(AesEncoder::create, AesDecoder::create, entry -> 0L),
+    AES_192(AES_128.createEncoder, AES_128.createDecoder, AES_128.checksum),
+    AES_256(AES_128.createEncoder, AES_128.createDecoder, AES_128.checksum);
 
     private final Function<ZipEntry, Encoder> createEncoder;
     private final CreateDecoder createDecoder;
     private final Function<ZipEntry, Long> checksum;
-    private final Function<CompressionMethod, CompressionMethod> compressionMethod;
 
     public static Encryption get(ExtraField extraField, GeneralPurposeFlag generalPurposeFlag) {
         if (generalPurposeFlag.isStrongEncryption())
