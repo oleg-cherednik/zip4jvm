@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -167,9 +168,11 @@ public class ZipInfoTest {
 //        ZipInfo.zip(TestData.zipStoreSolid)
 //        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/files.zip"));
 //        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/foo/store/split/pkware/src.zip"));
-        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/foo/store/split/aes/src.zip"));
+//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/foo/store/split/aes/src.zip"));
 //        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/lapin/store_solid_off 2.zip"));
 
+        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/lzma/lzma.zip"));
+        res = res.settings(ZipInfoSettings.builder().readEntries(false).build());
         return res;
     }
 

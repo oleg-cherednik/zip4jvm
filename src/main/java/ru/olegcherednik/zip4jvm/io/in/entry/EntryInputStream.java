@@ -6,7 +6,7 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
-import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -43,14 +43,14 @@ public abstract class EntryInputStream extends InputStream {
         zipEntry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
         // TODO check that localFileHeader matches fileHeader
         Decoder decoder = zipEntry.getEncryption().getCreateDecoder().apply(zipEntry, in);
-        Compression compression = zipEntry.getCompression();
+        CompressionMethod compressionMethod = zipEntry.getCompressionMethod();
 
-        if (compression == Compression.STORE)
+        if (compressionMethod == CompressionMethod.STORE)
             return new StoreEntryInputStream(zipEntry, in, decoder);
-        if (compression == Compression.DEFLATE)
+        if (compressionMethod == CompressionMethod.DEFLATE)
             return new InflateEntryInputStream(zipEntry, in, decoder);
 
-        throw new Zip4jvmException("Compression is not supported: " + compression);
+        throw new Zip4jvmException("Compression is not supported: " + compressionMethod);
     }
 
     protected EntryInputStream(ZipEntry zipEntry, DataInput in, Decoder decoder) {

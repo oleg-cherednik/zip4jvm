@@ -7,8 +7,8 @@ import lombok.Setter;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
+import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
@@ -40,7 +40,7 @@ public abstract class ZipEntry {
     private final int lastModifiedTime;
     private final ExternalFileAttributes externalFileAttributes;
 
-    protected final Compression compression;
+    protected final CompressionMethod compressionMethod;
     private final CompressionLevel compressionLevel;
     protected final Encryption encryption;
     @Getter(AccessLevel.NONE)

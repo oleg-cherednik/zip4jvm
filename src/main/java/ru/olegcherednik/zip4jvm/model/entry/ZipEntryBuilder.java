@@ -6,8 +6,8 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.io.in.entry.EntryInputStream;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
+import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -64,13 +64,13 @@ public final class ZipEntryBuilder {
             int lastModifiedTime = DosTimestampConverter.javaToDosTime(entry.getLastModifiedTime());
             ExternalFileAttributes externalFileAttributes = entry.getExternalFileAttributes();
 
-            Compression compression = entrySettings.getCompression();
+            CompressionMethod compressionMethod = entrySettings.getCompression().getMethod();
             CompressionLevel compressionLevel = entrySettings.getCompressionLevel();
             Encryption encryption = entrySettings.getEncryption();
             ZipEntryInputStreamSupplier inputStreamSup = zipEntry -> entry.getInputStream();
 
-            RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, compression, compressionLevel,
-                    encryption, inputStreamSup);
+            RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, compressionMethod,
+                    compressionLevel, encryption, inputStreamSup);
 
             zipEntry.setDataDescriptorAvailable(() -> true);
             zipEntry.setZip64(entrySettings.isZip64());
@@ -103,15 +103,15 @@ public final class ZipEntryBuilder {
         private ZipEntry createRegularFileEntry() {
             String fileName = ZipUtils.normalizeFileName(fileHeader.getFileName());
             int lastModifiedTime = fileHeader.getLastModifiedTime();
-            Compression compression = fileHeader.getCompression();
+            CompressionMethod compressionMethod = fileHeader.getCompression();
             CompressionLevel compressionLevel = fileHeader.getGeneralPurposeFlag().getCompressionLevel();
             Encryption encryption = fileHeader.getEncryption();
             ExternalFileAttributes externalFileAttributes = fileHeader.getExternalFileAttributes();
 
             ZipEntryInputStreamSupplier inputStreamSup = createInputStreamSupplier();
 
-            RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, compression, compressionLevel,
-                    encryption, inputStreamSup);
+            RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, compressionMethod,
+                    compressionLevel, encryption, inputStreamSup);
 
             zipEntry.setDataDescriptorAvailable(() -> fileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
             zipEntry.setZip64(fileHeader.isZip64());

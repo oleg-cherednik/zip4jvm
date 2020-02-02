@@ -5,7 +5,7 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.writers.DataDescriptorWriter;
 import ru.olegcherednik.zip4jvm.io.writers.LocalFileHeaderWriter;
-import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -50,15 +50,15 @@ public abstract class EntryOutputStream extends OutputStream {
     }
 
     private static EntryOutputStream createOutputStream(ZipEntry zipEntry, DataOutput out) throws IOException {
-        Compression compression = zipEntry.getCompression();
+        CompressionMethod compressionMethod = zipEntry.getCompressionMethod();
         zipEntry.setDisk(out.getDisk());
 
-        if (compression == Compression.STORE)
+        if (compressionMethod == CompressionMethod.STORE)
             return new StoreEntryOutputStream(zipEntry, out);
-        if (compression == Compression.DEFLATE)
+        if (compressionMethod == CompressionMethod.DEFLATE)
             return new DeflateEntryOutputStream(zipEntry, out);
 
-        throw new Zip4jvmException("Compression is not supported: " + compression);
+        throw new Zip4jvmException("Compression is not supported: " + compressionMethod);
     }
 
     protected EntryOutputStream(ZipEntry zipEntry, DataOutput out) {
