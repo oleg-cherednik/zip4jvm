@@ -20,6 +20,10 @@ final class LzmaEntryInputStream extends EntryInputStream {
     public LzmaEntryInputStream(ZipEntry zipEntry, DataInput in, Decoder decoder) throws IOException {
         super(zipEntry, in, decoder);
 
+        byte[] buf = new byte[1024];
+        in.read(buf, 0, buf.length);
+        decoder.decrypt(buf, 0, buf.length);
+
         in.mark("aa");
         int majorVersion = in.readByte();
         int minorVersion = in.readByte();
