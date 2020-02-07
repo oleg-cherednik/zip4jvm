@@ -85,14 +85,7 @@ public abstract class ZipEntry {
     }
 
     public CompressionMethod getCompressionMethodForBuilder() {
-        switch (encryption) {
-            case AES_128:
-            case AES_192:
-            case AES_256:
-                return CompressionMethod.AES;
-            default:
-                return compressionMethod;
-        }
+        return encryption.isAes() ? CompressionMethod.AES : compressionMethod;
     }
 
     @Override

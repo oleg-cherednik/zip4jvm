@@ -97,6 +97,8 @@ public final class TestData {
 
     // 7-Zip
     public static final Path sevenZipStoreSplitZip = Paths.get("src/test/resources/seven-zip/store_split_off/src.zip.001").toAbsolutePath();
+    public static final Path sevenZipLzmaSolidZip = Paths.get("src/test/resources/seven-zip/lzma_solid_off.zip").toAbsolutePath();
+    public static final Path sevenZipLzmaSolidAesZip = Paths.get("src/test/resources/seven-zip/lzma_solid_aes.zip").toAbsolutePath();
 
     private static Path createTempDirectory(String prefix) {
         try {

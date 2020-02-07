@@ -34,6 +34,10 @@ public enum Encryption {
     private final CreateDecoder createDecoder;
     private final Function<ZipEntry, Long> checksum;
 
+    public boolean isAes() {
+        return this == AES_128 || this == AES_192 || this == AES_256;
+    }
+
     public static Encryption get(ExtraField extraField, GeneralPurposeFlag generalPurposeFlag) {
         if (generalPurposeFlag.isStrongEncryption())
             throw new Zip4jvmException("Strong encryption is not supported");

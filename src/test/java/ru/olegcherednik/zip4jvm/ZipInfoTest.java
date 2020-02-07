@@ -171,19 +171,21 @@ public class ZipInfoTest {
 //        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/foo/store/split/aes/src.zip"));
 //        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/lapin/store_solid_off 2.zip"));
 
-        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/lzma/lzma.zip"));
-        res = res.settings(ZipInfoSettings.builder().readEntries(false).build());
+//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/lzma/lzma_16mb.zip"));
+//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/lzma/lzma_1mb_32.zip"));
+        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/lzma/zip_zip.zip"));
+//        res = res.settings(ZipInfoSettings.builder().readEntries(false).build());
         return res;
     }
 
-    @Test(enabled = false)
+    @Test//(enabled = false)
     public void foo() throws IOException {
         zipInfo().printShortInfo(System.out);
     }
 
-    @Test(enabled = false)
+    @Test//(enabled = false)
     public void decompose() throws IOException {
-        zipInfo().decompose(Zip4jvmSuite.subDirNameAsMethodName(rootDir));
+        zipInfo().settings(ZipInfoSettings.builder().copyPayload(true).build()).decompose(Zip4jvmSuite.subDirNameAsMethodName(rootDir));
     }
 
 }

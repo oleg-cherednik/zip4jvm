@@ -54,7 +54,7 @@ public class BlockZipEntryReader {
         Encryption encryption = zipEntry.getEncryption();
         EncryptionHeaderBlock block = null;
 
-        if (encryption == Encryption.AES_256 || encryption == Encryption.AES_192 || encryption == Encryption.AES_128)
+        if (encryption.isAes())
             block = new BlockAesHeaderReader(zipEntry.getStrength(), zipEntry.getCompressedSize()).read(in);
         else if (zipEntry.getEncryption() == Encryption.PKWARE) {
             block = new BlockPkwareHeaderReader().read(in);
