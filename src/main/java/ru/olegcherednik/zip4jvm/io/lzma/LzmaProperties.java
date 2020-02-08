@@ -15,8 +15,6 @@ import java.io.IOException;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class LzmaProperties {
 
-    public static final int SIZE = 5;
-
     private final int lc; // literal context bits
     private final int lp; // literal position bits
     private final int pb; // position bits

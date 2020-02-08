@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.io.in.entry;
 
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.lzma.DecoderNew;
+import ru.olegcherednik.zip4jvm.io.lzma.LzmaDecoder;
 import ru.olegcherednik.zip4jvm.io.lzma.LzmaProperties;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -14,20 +14,20 @@ import java.io.IOException;
  */
 final class LzmaEntryInputStream extends EntryInputStream {
 
-    private final DecoderNew dec;
+    private final LzmaDecoder dec;
 
     public LzmaEntryInputStream(ZipEntry zipEntry, DataInput in) throws IOException {
         super(zipEntry, in);
         dec = createDecoder();
     }
 
-    private DecoderNew createDecoder() throws IOException {
+    private LzmaDecoder createDecoder() throws IOException {
         in.mark("aa");
         int majorVersion = in.readByte();
         int minorVersion = in.readByte();
         int headerSize = in.readWord();
 
-        DecoderNew dec = new DecoderNew(in, LzmaProperties.read(in), Long.MAX_VALUE);
+        LzmaDecoder dec = new LzmaDecoder(in, LzmaProperties.read(in), Long.MAX_VALUE);
         readCompressedBytes += in.getOffs() - in.getMark("aa");
         return dec;
     }

@@ -5,7 +5,7 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import java.io.IOException;
 import java.util.Arrays;
 
-public class DecoderNew {
+public class RangeDecoder {
 
     static final int kTopMask = ~((1 << 24) - 1);
 
@@ -17,7 +17,7 @@ public class DecoderNew {
     private int code;
     private int range = -1;
 
-    public DecoderNew(DataInput in) throws IOException {
+    public RangeDecoder(DataInput in) throws IOException {
         this.in = in;
 
         for (int i = 0; i < 5; i++)
@@ -68,7 +68,13 @@ public class DecoderNew {
         return 1;
     }
 
-    public static void InitBitModels(short[] probs) {
-        Arrays.fill(probs, (short)(kBitModelTotal >>> 1));
+    public static void initBitModels(short... bits) {
+        Arrays.fill(bits, (short)(kBitModelTotal >>> 1));
+    }
+
+    public static short[] createBitModel(int size) {
+        short[] bits = new short[size];
+        Arrays.fill(bits, (short)(kBitModelTotal >>> 1));
+        return bits;
     }
 }
