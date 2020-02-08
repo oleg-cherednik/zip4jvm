@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.in.entry;
 
 import org.apache.commons.io.IOUtils;
-import ru.olegcherednik.zip4jvm.io.in.data.DecoderDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.EOFException;
@@ -18,7 +18,7 @@ final class InflateEntryInputStream extends EntryInputStream {
     private final byte[] buf = new byte[1024 * 4];
     private final Inflater inflater = new Inflater(true);
 
-    public InflateEntryInputStream(ZipEntry zipEntry, DecoderDataInput in) {
+    public InflateEntryInputStream(ZipEntry zipEntry, DataInput in) throws IOException {
         super(zipEntry, in);
     }
 
