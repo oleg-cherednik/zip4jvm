@@ -32,7 +32,7 @@ public class SplitZipInputStream extends BaseZipDataInput {
 
         byte[] buf = THREAD_LOCAL_BUF.get();
         read(buf, 0, 4);
-        int signature = (int)delegate.convert(buf, 0, 4);
+        int signature = (int)delegate.parseLong(buf, 0, 4);
 
         if (signature != SplitZipOutputStream.SPLIT_SIGNATURE)
             throw new Zip4jvmException("Incorrect split file signature: " + zipModel.getSrcFile().getPath());

@@ -64,6 +64,9 @@ public interface DataInput extends Closeable, RandomAccess {
 
     int read(byte[] buf, int offs, int len) throws IOException;
 
+    /** this is technical method; create {@literal long} from {@literal byte[]} */
+    long parseLong(byte[] buf, int offs, int len);
+
     void mark(String id);
 
     long getMark(String id);

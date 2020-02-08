@@ -4,6 +4,8 @@ import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DecoderDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DecoderDataInputDecorator;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
@@ -25,8 +27,7 @@ import java.util.zip.Checksum;
 public abstract class EntryInputStream extends InputStream {
 
     protected final ZipEntry zipEntry;
-    protected final DataInput in;
-    protected final Decoder decoder;
+    protected final DecoderDataInput in;
 
     protected final long compressedSize;
     protected final long uncompressedSize;
@@ -43,23 +44,23 @@ public abstract class EntryInputStream extends InputStream {
         zipEntry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
         // TODO check that localFileHeader matches fileHeader
         Decoder decoder = zipEntry.getEncryption().getCreateDecoder().apply(zipEntry, in);
+        DecoderDataInput decoderDataInput = new DecoderDataInputDecorator(in, decoder);
         CompressionMethod compressionMethod = zipEntry.getCompressionMethod();
 
         if (compressionMethod == CompressionMethod.STORE)
-            return new StoreEntryInputStream(zipEntry, in, decoder);
+            return new StoreEntryInputStream(zipEntry, decoderDataInput);
         if (compressionMethod == CompressionMethod.DEFLATE)
-            return new InflateEntryInputStream(zipEntry, in, decoder);
+            return new InflateEntryInputStream(zipEntry, decoderDataInput);
         if (compressionMethod == CompressionMethod.LZMA)
-            return new LzmaEntryInputStream(zipEntry, in, decoder);
+            return new LzmaEntryInputStream(zipEntry, decoderDataInput);
 
         throw new Zip4jvmException("Compression is not supported: " + compressionMethod);
     }
 
-    protected EntryInputStream(ZipEntry zipEntry, DataInput in, Decoder decoder) {
+    protected EntryInputStream(ZipEntry zipEntry, DecoderDataInput in) {
         this.zipEntry = zipEntry;
         this.in = in;
-        this.decoder = decoder;
-        compressedSize = Math.max(0, decoder.getDataCompressedSize(zipEntry.getCompressedSize()));
+        compressedSize = Math.max(0, in.getDataCompressedSize(zipEntry.getCompressedSize()));
         uncompressedSize = Math.max(0, zipEntry.getUncompressedSize());
     }
 
@@ -89,7 +90,7 @@ public abstract class EntryInputStream extends InputStream {
 
     @Override
     public void close() throws IOException {
-        decoder.close(in);
+        in.decodingAccomplished();
         readDataDescriptor();
         checkChecksum();
         checkUncompressedSize();

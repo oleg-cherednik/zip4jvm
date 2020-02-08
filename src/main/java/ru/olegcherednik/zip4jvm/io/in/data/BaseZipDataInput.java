@@ -2,6 +2,7 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 
 import lombok.Getter;
 import lombok.Setter;
+import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
@@ -15,6 +16,7 @@ import java.io.IOException;
 public abstract class BaseZipDataInput extends BaseDataInput implements ZipDataInput {
 
     protected final ZipModel zipModel;
+    protected DataInputFile delegate;
     @Setter
     protected String fileName;
 
@@ -22,6 +24,41 @@ public abstract class BaseZipDataInput extends BaseDataInput implements ZipDataI
         this.zipModel = zipModel;
         delegate = srcFile.dataInputFile();
         fileName = srcFile.getPath().getFileName().toString();
+    }
+
+    @Override
+    public long getOffs() {
+        return delegate.getOffs();
+    }
+
+    @Override
+    public long length() throws IOException {
+        return delegate.length();
+    }
+
+    @Override
+    public void seek(long pos) throws IOException {
+        delegate.seek(pos);
+    }
+
+    @Override
+    public long skip(long bytes) throws IOException {
+        return delegate.skip(bytes);
+    }
+
+    @Override
+    public void close() throws IOException {
+        delegate.close();
+    }
+
+    @Override
+    public long parseLong(byte[] buf, int offs, int len) {
+        return delegate.parseLong(buf, offs, len);
+    }
+
+    @Override
+    public String toString() {
+        return delegate.toString();
     }
 
 }

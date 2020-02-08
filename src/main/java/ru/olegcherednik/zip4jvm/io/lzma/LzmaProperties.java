@@ -42,9 +42,7 @@ public final class LzmaProperties {
         if (pb > Base.kNumPosStatesBitsMax)
             throw new IllegalArgumentException("Incorrect properties");
 
-        long a = in.readDword();
-
-        dictionarySize = (int)a;
+        dictionarySize = (int)in.readDword();
 
         if (dictionarySize < 0)
             throw new IllegalArgumentException("Incorrect stream properties");

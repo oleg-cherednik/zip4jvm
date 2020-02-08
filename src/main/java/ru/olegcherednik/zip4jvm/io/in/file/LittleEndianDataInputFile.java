@@ -18,7 +18,7 @@ public abstract class LittleEndianDataInputFile implements DataInputFile {
     }
 
     @Override
-    public final long convert(byte[] buf, int offs, int len) {
+    public final long parseLong(byte[] buf, int offs, int len) {
         long res = 0;
 
         for (int i = offs + len - 1; i >= offs; i--)

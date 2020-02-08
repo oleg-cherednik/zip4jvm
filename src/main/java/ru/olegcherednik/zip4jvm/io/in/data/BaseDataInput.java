@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -32,8 +31,6 @@ abstract class BaseDataInput implements DataInput {
 
     private final Map<String, Long> map = new HashMap<>();
 
-    protected DataInputFile delegate;
-
     @Override
     public int byteSize() {
         return 1;
@@ -55,28 +52,23 @@ abstract class BaseDataInput implements DataInput {
     }
 
     @Override
-    public long getOffs() {
-        return delegate.getOffs();
-    }
-
-    @Override
     public int readByte() throws IOException {
-        return (int)readAndConvert(OFFS_BYTE, byteSize());
+        return (int)readAndParseLong(OFFS_BYTE, byteSize());
     }
 
     @Override
     public int readWord() throws IOException {
-        return (int)readAndConvert(OFFS_WORD, wordSize());
+        return (int)readAndParseLong(OFFS_WORD, wordSize());
     }
 
     @Override
     public long readDword() throws IOException {
-        return readAndConvert(OFFS_DWORD, dwordSize());
+        return readAndParseLong(OFFS_DWORD, dwordSize());
     }
 
     @Override
     public long readQword() throws IOException {
-        return readAndConvert(OFFS_QWORD, qwordSize());
+        return readAndParseLong(OFFS_QWORD, qwordSize());
     }
 
     @Override
@@ -94,10 +86,10 @@ abstract class BaseDataInput implements DataInput {
         return new BigInteger(hexStr, radix).toString();
     }
 
-    private long readAndConvert(int offs, int len) throws IOException {
+    private long readAndParseLong(int offs, int len) throws IOException {
         byte[] buf = THREAD_LOCAL_BUF.get();
         read(buf, offs, len);
-        return delegate.convert(buf, offs, len);
+        return parseLong(buf, offs, len);
     }
 
     @Override
@@ -122,26 +114,6 @@ abstract class BaseDataInput implements DataInput {
     }
 
     @Override
-    public long length() throws IOException {
-        return delegate.length();
-    }
-
-    @Override
-    public void seek(long pos) throws IOException {
-        delegate.seek(pos);
-    }
-
-    @Override
-    public long skip(long bytes) throws IOException {
-        return delegate.skip(bytes);
-    }
-
-    @Override
-    public void close() throws IOException {
-        delegate.close();
-    }
-
-    @Override
     public void mark(String id) {
         map.put(id, getOffs());
     }
@@ -156,11 +128,6 @@ abstract class BaseDataInput implements DataInput {
     @Override
     public void seek(String id) throws IOException {
         seek(getMark(id));
-    }
-
-    @Override
-    public String toString() {
-        return delegate.toString();
     }
 
 }
