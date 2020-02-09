@@ -26,6 +26,8 @@ public class LzmaDecoder implements Closeable {
     private final RangeBitTreeDecoder[] posSlotDecoders = IntStream.range(0, Base.kNumLenToPosStates)
                                                                    .mapToObj(i -> new RangeBitTreeDecoder(Base.kNumPosSlotBits))
                                                                    .toArray(RangeBitTreeDecoder[]::new);
+    private final RangeBitTreeDecoder posAlignDecoder = new RangeBitTreeDecoder(Base.kNumAlignBits);
+
     private final LzmaLiteralDecoder literalDecoder;
     private final LzmaLengthDecoder lengthDecoder;
     private final LzmaLengthDecoder repLenDecoder;
@@ -33,18 +35,9 @@ public class LzmaDecoder implements Closeable {
     private final RangeDecoder rangeDecoder;
     private final OutWindow outWindow;
     private final long size;
+    private final int posStateMask;
+    private final int dictionarySize;
     private final int[] rep = new int[4];
-
-    RangeBitTreeDecoder m_PosAlignDecoder = new RangeBitTreeDecoder(Base.kNumAlignBits);
-
-
-
-
-
-    int m_DictionarySize = -1;
-    int m_DictionarySizeCheck = -1;
-
-    int m_PosStateMask;
 
     private int state = Base.StateInit();
 
@@ -59,19 +52,8 @@ public class LzmaDecoder implements Closeable {
         literalDecoder = new LzmaLiteralDecoder(properties.getLp(), properties.getLc());
         lengthDecoder = new LzmaLengthDecoder(properties.getPb());
         repLenDecoder = new LzmaLengthDecoder(properties.getPb());
-
-        setLcLpPb(properties.getLc(), properties.getLp(), properties.getPb());
-        setDictionarySize(properties.getDictionarySize());
-    }
-
-    private void setLcLpPb(int lc, int lp, int pb) {
-        int numPosStates = 1 << pb;
-        m_PosStateMask = numPosStates - 1;
-    }
-
-    private void setDictionarySize(int dictionarySize) {
-        m_DictionarySize = dictionarySize;
-        m_DictionarySizeCheck = Math.max(m_DictionarySize, 1);
+        posStateMask = (1 << properties.getPb()) - 1;
+        dictionarySize = properties.getDictionarySize();
     }
 
     public int decode(byte[] buf, int offs, int len) throws IOException {
@@ -99,7 +81,7 @@ public class LzmaDecoder implements Closeable {
         if (nowPos64 >= size || stop)
             return true;
 
-        int posState = (int)nowPos64 & m_PosStateMask;
+        int posState = (int)nowPos64 & posStateMask;
 
         if (rangeDecoder.decodeBit(matchDecoders, (state << Base.kNumPosStatesBitsMax) + posState) == 0) {
             LzmaLiteralDecoder.Decoder literalDecoder = this.literalDecoder.getDecoder((int)nowPos64, prv);
@@ -156,7 +138,7 @@ public class LzmaDecoder implements Closeable {
                                 rep[0] - posSlot - 1, rangeDecoder, numDirectBits);
                     else {
                         rep[0] += rangeDecoder.decodeDirectBits(numDirectBits - Base.kNumAlignBits) << Base.kNumAlignBits;
-                        rep[0] += m_PosAlignDecoder.reverseDecode(rangeDecoder);
+                        rep[0] += posAlignDecoder.reverseDecode(rangeDecoder);
                         if (rep[0] < 0) {
                             if (rep[0] == -1)
                                 return true;
@@ -167,7 +149,7 @@ public class LzmaDecoder implements Closeable {
                     rep[0] = posSlot;
             }
 
-            if (rep[0] >= nowPos64 || rep[0] >= m_DictionarySizeCheck)
+            if (rep[0] >= nowPos64 || rep[0] >= dictionarySize)
                 throw new IOException("Error in data stream");
 
             outWindow.writeBlock(rep[0], len);
