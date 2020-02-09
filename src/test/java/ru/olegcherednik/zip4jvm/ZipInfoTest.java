@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static ru.olegcherednik.zip4jvm.TestData.sevenZipLzmaSolidZip;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
 
@@ -173,13 +174,14 @@ public class ZipInfoTest {
 
 //        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/lzma/lzma_16mb.zip"));
 //        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/lzma/lzma_1mb_32.zip"));
-        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/lzma/zip_zip.zip"));
+//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/lzma/zip_zip.zip"));
 //        res = res.settings(ZipInfoSettings.builder().readEntries(false).build());
+        ZipInfo res = ZipInfo.zip(sevenZipLzmaSolidZip);
         return res;
     }
 
     @Test//(enabled = false)
-    public void foo() throws IOException {
+    public void printShortInfo() throws IOException {
         zipInfo().printShortInfo(System.out);
     }
 

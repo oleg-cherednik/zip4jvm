@@ -1,5 +1,3 @@
-// Base.java
-
 package ru.olegcherednik.zip4jvm.io.lzma;
 
 import lombok.AccessLevel;

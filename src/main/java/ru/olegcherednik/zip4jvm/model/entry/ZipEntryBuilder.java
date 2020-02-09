@@ -10,6 +10,7 @@ import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
+import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
@@ -103,8 +104,10 @@ public final class ZipEntryBuilder {
         private ZipEntry createRegularFileEntry() {
             String fileName = ZipUtils.normalizeFileName(fileHeader.getFileName());
             int lastModifiedTime = fileHeader.getLastModifiedTime();
+            GeneralPurposeFlag generalPurposeFlag = fileHeader.getGeneralPurposeFlag();
+
             CompressionMethod compressionMethod = fileHeader.getCompression();
-            CompressionLevel compressionLevel = fileHeader.getGeneralPurposeFlag().getCompressionLevel();
+            CompressionLevel compressionLevel = generalPurposeFlag.getCompressionLevel();
             Encryption encryption = fileHeader.getEncryption();
             ExternalFileAttributes externalFileAttributes = fileHeader.getExternalFileAttributes();
 
@@ -113,7 +116,8 @@ public final class ZipEntryBuilder {
             RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, compressionMethod,
                     compressionLevel, encryption, inputStreamSup);
 
-            zipEntry.setDataDescriptorAvailable(() -> fileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
+            zipEntry.setDataDescriptorAvailable(generalPurposeFlag::isDataDescriptorAvailable);
+            zipEntry.setLzmaEosMarker(generalPurposeFlag.isLzmaEosMarker());
             zipEntry.setZip64(fileHeader.isZip64());
             zipEntry.setComment(fileHeader.getComment());
             zipEntry.setUtf8(fileHeader.getGeneralPurposeFlag().isUtf8());

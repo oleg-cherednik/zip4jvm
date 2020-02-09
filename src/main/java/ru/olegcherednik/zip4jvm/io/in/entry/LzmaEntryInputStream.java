@@ -26,8 +26,9 @@ final class LzmaEntryInputStream extends EntryInputStream {
         int majorVersion = in.readByte();
         int minorVersion = in.readByte();
         int headerSize = in.readWord();
+        long size = zipEntry.isLzmaEosMarker() ? Long.MAX_VALUE : zipEntry.getUncompressedSize();
 
-        LzmaDecoder dec = new LzmaDecoder(in, LzmaProperties.read(in), Long.MAX_VALUE);
+        LzmaDecoder dec = new LzmaDecoder(in, LzmaProperties.read(in), size);
         readCompressedBytes += in.getOffs() - in.getMark("aa");
         return dec;
     }

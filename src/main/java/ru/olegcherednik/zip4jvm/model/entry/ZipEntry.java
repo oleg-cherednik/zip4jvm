@@ -60,6 +60,7 @@ public abstract class ZipEntry {
     private BooleanSupplier dataDescriptorAvailable = () -> false;
     private long uncompressedSize;
     private long compressedSize;
+    private boolean lzmaEosMarker = true;
 
     private String comment;
     private boolean utf8;
