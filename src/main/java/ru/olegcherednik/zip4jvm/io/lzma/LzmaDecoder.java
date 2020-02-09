@@ -5,7 +5,6 @@ import ru.olegcherednik.zip4jvm.io.lzma.range.RangeBitTreeDecoder;
 import ru.olegcherednik.zip4jvm.io.lzma.range.RangeDecoder;
 import ru.olegcherednik.zip4jvm.io.lzma.slidingwindow.OutWindow;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.util.stream.IntStream;
 
@@ -13,7 +12,7 @@ import java.util.stream.IntStream;
  * @author Oleg Cherednik
  * @since 08.02.2020
  */
-public class LzmaDecoder implements Closeable {
+public class LzmaDecoder {
 
     private final short[] matchDecoders = RangeDecoder.createBitModel(Base.kNumStates << Base.kNumPosStatesBitsMax);
     private final short[] repDecoders = RangeDecoder.createBitModel(Base.kNumStates);
@@ -158,10 +157,5 @@ public class LzmaDecoder implements Closeable {
         }
 
         return false;
-    }
-
-    @Override
-    public void close() throws IOException {
-//        flush();
     }
 }
