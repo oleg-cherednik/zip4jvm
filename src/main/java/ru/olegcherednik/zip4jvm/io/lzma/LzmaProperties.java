@@ -34,7 +34,7 @@ public final class LzmaProperties {
         if (dictionarySize < 0)
             throw new IllegalArgumentException("Incorrect stream properties");
 
-        return new LzmaProperties(lc, lp, pb, dictionarySize);
+        return new LzmaProperties(lc, lp, pb, Math.max(4096, dictionarySize));
     }
 
 }

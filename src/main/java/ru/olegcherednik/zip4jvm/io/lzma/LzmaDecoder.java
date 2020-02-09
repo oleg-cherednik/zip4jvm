@@ -3,10 +3,11 @@ package ru.olegcherednik.zip4jvm.io.lzma;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.lzma.range.RangeBitTreeDecoder;
 import ru.olegcherednik.zip4jvm.io.lzma.range.RangeDecoder;
-import ru.olegcherednik.zip4jvm.io.lzma.slidingwindow.OutWindowNew;
+import ru.olegcherednik.zip4jvm.io.lzma.slidingwindow.OutWindow;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.stream.IntStream;
 
 /**
  * @author Oleg Cherednik
@@ -22,7 +23,14 @@ public class LzmaDecoder implements Closeable {
     private final short[] rep0LongDecoders = RangeDecoder.createBitModel(Base.kNumStates << Base.kNumPosStatesBitsMax);
     private final short[] posDecoders = RangeDecoder.createBitModel(Base.kNumFullDistances - Base.kEndPosModelIndex);
 
-    RangeBitTreeDecoder[] m_PosSlotDecoder = new RangeBitTreeDecoder[Base.kNumLenToPosStates];
+    private final RangeBitTreeDecoder[] posSlotDecoders = IntStream.range(0, Base.kNumLenToPosStates)
+                                                                   .mapToObj(i -> new RangeBitTreeDecoder(Base.kNumPosSlotBits))
+                                                                   .toArray(RangeBitTreeDecoder[]::new);
+
+    private final RangeDecoder rangeDecoder;
+    private final OutWindow outWindow;
+    private final long size;
+
     RangeBitTreeDecoder m_PosAlignDecoder = new RangeBitTreeDecoder(Base.kNumAlignBits);
     LzmaLengthDecoder m_LenDecoder = new LzmaLengthDecoder();
     LzmaLengthDecoder m_RepLenDecoder = new LzmaLengthDecoder();
@@ -34,23 +42,15 @@ public class LzmaDecoder implements Closeable {
 
     int m_PosStateMask;
 
-
-    private final RangeDecoder rangeDecoder;
-    private final OutWindowNew m_OutWindow;
-
     private int state = Base.StateInit();
     private int rep0 = 0, rep1 = 0, rep2 = 0, rep3 = 0;
     private long nowPos64;
     private byte prv;
-    private long size;
 
     public LzmaDecoder(DataInput in, LzmaProperties properties, long size) throws IOException {
-        rangeDecoder = new RangeDecoder(in);
-        m_OutWindow = new OutWindowNew(Math.max(Math.max(properties.getDictionarySize(), 1), 1 << 12));
         this.size = size;
-
-        for (int i = 0; i < Base.kNumLenToPosStates; i++)
-            m_PosSlotDecoder[i] = new RangeBitTreeDecoder(Base.kNumPosSlotBits);
+        rangeDecoder = new RangeDecoder(in);
+        outWindow = new OutWindow(properties.getDictionarySize());
 
         setLcLpPb(properties.getLc(), properties.getLp(), properties.getPb());
         setDictionarySize(properties.getDictionarySize());
@@ -75,7 +75,7 @@ public class LzmaDecoder implements Closeable {
         int res = 0;
 
         while (res < len) {
-            int cur = m_OutWindow.flush(buf, offs, len - res);
+            int cur = outWindow.flush(buf, offs, len - res);
             res += cur;
             offs += cur;
 
@@ -84,7 +84,7 @@ public class LzmaDecoder implements Closeable {
 
             if (decodeStep()) {
                 stop = true;
-                res += m_OutWindow.flush(buf, offs, len - res);
+                res += outWindow.flush(buf, offs, len - res);
                 break;
             }
         }
@@ -101,9 +101,9 @@ public class LzmaDecoder implements Closeable {
         if (rangeDecoder.decodeBit(matchDecoders, (state << Base.kNumPosStatesBitsMax) + posState) == 0) {
             LzmaLiteralDecoder.Decoder2 literalDecoder = this.literalDecoder.GetDecoder((int)nowPos64, prv);
             prv = Base.StateIsCharState(state) ? literalDecoder.decodeNormal(rangeDecoder)
-                                               : literalDecoder.decodeWithMatchByte(rangeDecoder, m_OutWindow.get(rep0));
+                                               : literalDecoder.decodeWithMatchByte(rangeDecoder, outWindow.get(rep0));
 
-            m_OutWindow.writeByte(prv);
+            outWindow.writeByte(prv);
             state = Base.StateUpdateChar(state);
             nowPos64++;
         } else {
@@ -142,7 +142,7 @@ public class LzmaDecoder implements Closeable {
                 rep1 = rep0;
                 len = Base.kMatchMinLen + m_LenDecoder.decode(rangeDecoder, posState);
                 state = Base.StateUpdateMatch(state);
-                int posSlot = m_PosSlotDecoder[Base.GetLenToPosState(len)].decode(rangeDecoder);
+                int posSlot = posSlotDecoders[Base.GetLenToPosState(len)].decode(rangeDecoder);
 
                 if (posSlot >= Base.kStartPosModelIndex) {
                     int numDirectBits = (posSlot >> 1) - 1;
@@ -167,9 +167,9 @@ public class LzmaDecoder implements Closeable {
             if (rep0 >= nowPos64 || rep0 >= m_DictionarySizeCheck)
                 throw new IOException("Error in data stream");
 
-            m_OutWindow.writeBlock(rep0, len);
+            outWindow.writeBlock(rep0, len);
             nowPos64 += len;
-            prv = m_OutWindow.get(0);
+            prv = outWindow.get(0);
         }
 
         return false;

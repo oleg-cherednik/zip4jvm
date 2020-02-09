@@ -74,10 +74,6 @@ public class RangeDecoder {
         return 1;
     }
 
-    public static void initBitModels(short... bits) {
-        Arrays.fill(bits, (short)(BIT_MODEL_TOTAL >>> 1));
-    }
-
     public static short[] createBitModel(int size) {
         short[] bits = new short[size];
         Arrays.fill(bits, (short)(BIT_MODEL_TOTAL >>> 1));

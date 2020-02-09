@@ -2,14 +2,14 @@ package ru.olegcherednik.zip4jvm.io.lzma.slidingwindow;
 
 import java.io.IOException;
 
-public class OutWindowNew {
+public class OutWindow {
 
     private final byte[] buf;
 
     private int streamPos;
     private int offs;
 
-    public OutWindowNew(int windowSize) {
+    public OutWindow(int windowSize) {
         buf = new byte[windowSize];
     }
 
