@@ -26,10 +26,9 @@ public class LzmaDecoder implements Closeable {
 
     RangeBitTreeDecoder m_PosAlignDecoder = new RangeBitTreeDecoder(Base.kNumAlignBits);
 
-    LzmaLenDecoder m_LenDecoder = new LzmaLenDecoder();
-    LzmaLenDecoder m_RepLenDecoder = new LzmaLenDecoder();
-
-    LzmaLiteralDecoder m_LiteralDecoder = new LzmaLiteralDecoder();
+    LzmaLengthDecoder m_LenDecoder = new LzmaLengthDecoder();
+    LzmaLengthDecoder m_RepLenDecoder = new LzmaLengthDecoder();
+    private LzmaLiteralDecoder literalDecoder = new LzmaLiteralDecoder();
 
     int m_DictionarySize = -1;
     int m_DictionarySizeCheck = -1;
@@ -61,10 +60,10 @@ public class LzmaDecoder implements Closeable {
     }
 
     private void setLcLpPb(int lc, int lp, int pb) {
-        m_LiteralDecoder.Create(lp, lc);
+        literalDecoder.create(lp, lc);
         int numPosStates = 1 << pb;
-        m_LenDecoder.Create(numPosStates);
-        m_RepLenDecoder.Create(numPosStates);
+        m_LenDecoder.create(numPosStates);
+        m_RepLenDecoder.create(numPosStates);
         m_PosStateMask = numPosStates - 1;
     }
 
@@ -81,11 +80,6 @@ public class LzmaDecoder implements Closeable {
         RangeDecoder.initBitModels(m_IsRepG1Decoders);
         RangeDecoder.initBitModels(m_IsRepG2Decoders);
         RangeDecoder.initBitModels(m_PosDecoders);
-
-        m_LiteralDecoder.init();
-
-        m_LenDecoder.init();
-        m_RepLenDecoder.init();
     }
 
     private boolean stop;
@@ -118,9 +112,9 @@ public class LzmaDecoder implements Closeable {
         int posState = (int)nowPos64 & m_PosStateMask;
 
         if (rangeDecoder.decodeBit(m_IsMatchDecoders, (state << Base.kNumPosStatesBitsMax) + posState) == 0) {
-            LzmaLiteralDecoder.Decoder2 literalDecoder = m_LiteralDecoder.GetDecoder((int)nowPos64, prv);
-            prv = Base.StateIsCharState(state) ? literalDecoder.DecodeNormal(rangeDecoder)
-                                               : literalDecoder.DecodeWithMatchByte(rangeDecoder, m_OutWindow.get(rep0));
+            LzmaLiteralDecoder.Decoder2 literalDecoder = this.literalDecoder.GetDecoder((int)nowPos64, prv);
+            prv = Base.StateIsCharState(state) ? literalDecoder.decodeNormal(rangeDecoder)
+                                               : literalDecoder.decodeWithMatchByte(rangeDecoder, m_OutWindow.get(rep0));
 
             m_OutWindow.writeByte(prv);
             state = Base.StateUpdateChar(state);
@@ -152,27 +146,27 @@ public class LzmaDecoder implements Closeable {
                     rep0 = distance;
                 }
                 if (len == 0) {
-                    len = m_RepLenDecoder.Decode(rangeDecoder, posState) + Base.kMatchMinLen;
+                    len = m_RepLenDecoder.decode(rangeDecoder, posState) + Base.kMatchMinLen;
                     state = Base.StateUpdateRep(state);
                 }
             } else {
                 rep3 = rep2;
                 rep2 = rep1;
                 rep1 = rep0;
-                len = Base.kMatchMinLen + m_LenDecoder.Decode(rangeDecoder, posState);
+                len = Base.kMatchMinLen + m_LenDecoder.decode(rangeDecoder, posState);
                 state = Base.StateUpdateMatch(state);
-                int posSlot = m_PosSlotDecoder[Base.GetLenToPosState(len)].Decode(rangeDecoder);
+                int posSlot = m_PosSlotDecoder[Base.GetLenToPosState(len)].decode(rangeDecoder);
 
                 if (posSlot >= Base.kStartPosModelIndex) {
                     int numDirectBits = (posSlot >> 1) - 1;
                     rep0 = (2 | (posSlot & 1)) << numDirectBits;
 
                     if (posSlot < Base.kEndPosModelIndex)
-                        rep0 += RangeBitTreeDecoder.ReverseDecode(m_PosDecoders,
+                        rep0 += RangeBitTreeDecoder.reverseDecode(m_PosDecoders,
                                 rep0 - posSlot - 1, rangeDecoder, numDirectBits);
                     else {
                         rep0 += rangeDecoder.decodeDirectBits(numDirectBits - Base.kNumAlignBits) << Base.kNumAlignBits;
-                        rep0 += m_PosAlignDecoder.ReverseDecode(rangeDecoder);
+                        rep0 += m_PosAlignDecoder.reverseDecode(rangeDecoder);
                         if (rep0 < 0) {
                             if (rep0 == -1)
                                 return true;
