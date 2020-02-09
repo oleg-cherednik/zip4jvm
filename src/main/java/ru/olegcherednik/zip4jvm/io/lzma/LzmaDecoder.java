@@ -26,6 +26,7 @@ public class LzmaDecoder implements Closeable {
     private final RangeBitTreeDecoder[] posSlotDecoders = IntStream.range(0, Base.kNumLenToPosStates)
                                                                    .mapToObj(i -> new RangeBitTreeDecoder(Base.kNumPosSlotBits))
                                                                    .toArray(RangeBitTreeDecoder[]::new);
+    private final LzmaLiteralDecoder literalDecoder;
 
     private final RangeDecoder rangeDecoder;
     private final OutWindow outWindow;
@@ -35,7 +36,7 @@ public class LzmaDecoder implements Closeable {
     LzmaLengthDecoder m_LenDecoder = new LzmaLengthDecoder();
     LzmaLengthDecoder m_RepLenDecoder = new LzmaLengthDecoder();
 
-    private LzmaLiteralDecoder literalDecoder = new LzmaLiteralDecoder();
+
 
     int m_DictionarySize = -1;
     int m_DictionarySizeCheck = -1;
@@ -46,18 +47,19 @@ public class LzmaDecoder implements Closeable {
     private int rep0 = 0, rep1 = 0, rep2 = 0, rep3 = 0;
     private long nowPos64;
     private byte prv;
+    private boolean stop;
 
     public LzmaDecoder(DataInput in, LzmaProperties properties, long size) throws IOException {
         this.size = size;
         rangeDecoder = new RangeDecoder(in);
         outWindow = new OutWindow(properties.getDictionarySize());
+        literalDecoder = new LzmaLiteralDecoder(properties.getLp(), properties.getLc());
 
         setLcLpPb(properties.getLc(), properties.getLp(), properties.getPb());
         setDictionarySize(properties.getDictionarySize());
     }
 
     private void setLcLpPb(int lc, int lp, int pb) {
-        literalDecoder.create(lp, lc);
         int numPosStates = 1 << pb;
         m_LenDecoder.create(numPosStates);
         m_RepLenDecoder.create(numPosStates);
@@ -68,8 +70,6 @@ public class LzmaDecoder implements Closeable {
         m_DictionarySize = dictionarySize;
         m_DictionarySizeCheck = Math.max(m_DictionarySize, 1);
     }
-
-    private boolean stop;
 
     public int decode(byte[] buf, int offs, int len) throws IOException {
         int res = 0;
@@ -99,7 +99,7 @@ public class LzmaDecoder implements Closeable {
         int posState = (int)nowPos64 & m_PosStateMask;
 
         if (rangeDecoder.decodeBit(matchDecoders, (state << Base.kNumPosStatesBitsMax) + posState) == 0) {
-            LzmaLiteralDecoder.Decoder2 literalDecoder = this.literalDecoder.GetDecoder((int)nowPos64, prv);
+            LzmaLiteralDecoder.Decoder literalDecoder = this.literalDecoder.getDecoder((int)nowPos64, prv);
             prv = Base.StateIsCharState(state) ? literalDecoder.decodeNormal(rangeDecoder)
                                                : literalDecoder.decodeWithMatchByte(rangeDecoder, outWindow.get(rep0));
 

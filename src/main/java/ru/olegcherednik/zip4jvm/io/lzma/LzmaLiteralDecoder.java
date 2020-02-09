@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.io.lzma;
 import ru.olegcherednik.zip4jvm.io.lzma.range.RangeDecoder;
 
 import java.io.IOException;
+import java.util.stream.IntStream;
 
 /**
  * @author Oleg Cherednik
@@ -10,30 +11,23 @@ import java.io.IOException;
  */
 class LzmaLiteralDecoder {
 
-    private Decoder2[] m_Coders;
-    int m_NumPrevBits;
-    int m_NumPosBits;
-    int m_PosMask;
+    private final int posMask;
+    private final Decoder[] decoders;
+    private final int numPrevBits;
 
-    public void create(int lp, int lc) {
-        if (m_Coders != null && m_NumPrevBits == lc && m_NumPosBits == lp)
-            return;
-
-        m_NumPosBits = lp;
-        m_PosMask = (1 << lp) - 1;
-        m_NumPrevBits = lc;
-
-        m_Coders = new Decoder2[1 << (m_NumPrevBits + m_NumPosBits)];
-
-        for (int i = 0; i < m_Coders.length; i++)
-            m_Coders[i] = new Decoder2();
+    public LzmaLiteralDecoder(int lp, int lc) {
+        posMask = (1 << lp) - 1;
+        numPrevBits = lc;
+        decoders = IntStream.range(0, 1 << (lc + lp))
+                            .mapToObj(i -> new Decoder())
+                            .toArray(Decoder[]::new);
     }
 
-    Decoder2 GetDecoder(int pos, byte prevByte) {
-        return m_Coders[((pos & m_PosMask) << m_NumPrevBits) + ((prevByte & 0xFF) >>> (8 - m_NumPrevBits))];
+    Decoder getDecoder(int pos, byte prevByte) {
+        return decoders[((pos & posMask) << numPrevBits) + ((prevByte & 0xFF) >>> (8 - numPrevBits))];
     }
 
-    static class Decoder2 {
+    public static class Decoder {
 
         private final short[] decoders = RangeDecoder.createBitModel(0x300);
 
