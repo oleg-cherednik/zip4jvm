@@ -12,6 +12,7 @@ import java.util.stream.IntStream;
  * @author Oleg Cherednik
  * @since 08.02.2020
  */
+@SuppressWarnings("FieldNamingConvention")
 public class LzmaDecoder {
 
     private final short[] matchDecoders = RangeDecoder.createBitModel(Base.kNumStates << Base.kNumPosStatesBitsMax);
