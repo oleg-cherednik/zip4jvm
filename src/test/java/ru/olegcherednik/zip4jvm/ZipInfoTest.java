@@ -19,7 +19,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
  * @author Oleg Cherednik
  * @since 11.10.2019
  */
-@Test
+//@Test
 @SuppressWarnings("FieldNamingConvention")
 public class ZipInfoTest {
 

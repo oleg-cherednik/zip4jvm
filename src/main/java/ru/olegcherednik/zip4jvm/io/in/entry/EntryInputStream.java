@@ -48,7 +48,6 @@ public abstract class EntryInputStream extends EntryMetadataInputStream {
 
     protected EntryInputStream(ZipEntry zipEntry, DataInput in) throws IOException {
         super(zipEntry, in);
-
         this.in = new DecoderDataInputDecorator(in, zipEntry.getEncryption().createDecoder(zipEntry, in));
         compressedSize = Math.max(0, this.in.getDataCompressedSize(zipEntry.getCompressedSize()));
     }
