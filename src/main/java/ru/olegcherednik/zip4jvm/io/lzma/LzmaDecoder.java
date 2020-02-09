@@ -27,14 +27,16 @@ public class LzmaDecoder implements Closeable {
                                                                    .mapToObj(i -> new RangeBitTreeDecoder(Base.kNumPosSlotBits))
                                                                    .toArray(RangeBitTreeDecoder[]::new);
     private final LzmaLiteralDecoder literalDecoder;
+    private final LzmaLengthDecoder lengthDecoder;
+    private final LzmaLengthDecoder repLenDecoder;
 
     private final RangeDecoder rangeDecoder;
     private final OutWindow outWindow;
     private final long size;
 
     RangeBitTreeDecoder m_PosAlignDecoder = new RangeBitTreeDecoder(Base.kNumAlignBits);
-    LzmaLengthDecoder m_LenDecoder = new LzmaLengthDecoder();
-    LzmaLengthDecoder m_RepLenDecoder = new LzmaLengthDecoder();
+
+
 
 
 
@@ -54,6 +56,8 @@ public class LzmaDecoder implements Closeable {
         rangeDecoder = new RangeDecoder(in);
         outWindow = new OutWindow(properties.getDictionarySize());
         literalDecoder = new LzmaLiteralDecoder(properties.getLp(), properties.getLc());
+        lengthDecoder = new LzmaLengthDecoder(properties.getPb());
+        repLenDecoder = new LzmaLengthDecoder(properties.getPb());
 
         setLcLpPb(properties.getLc(), properties.getLp(), properties.getPb());
         setDictionarySize(properties.getDictionarySize());
@@ -61,8 +65,6 @@ public class LzmaDecoder implements Closeable {
 
     private void setLcLpPb(int lc, int lp, int pb) {
         int numPosStates = 1 << pb;
-        m_LenDecoder.create(numPosStates);
-        m_RepLenDecoder.create(numPosStates);
         m_PosStateMask = numPosStates - 1;
     }
 
@@ -133,14 +135,14 @@ public class LzmaDecoder implements Closeable {
                     rep0 = distance;
                 }
                 if (len == 0) {
-                    len = m_RepLenDecoder.decode(rangeDecoder, posState) + Base.kMatchMinLen;
+                    len = repLenDecoder.decode(rangeDecoder, posState) + Base.kMatchMinLen;
                     state = Base.StateUpdateRep(state);
                 }
             } else {
                 rep3 = rep2;
                 rep2 = rep1;
                 rep1 = rep0;
-                len = Base.kMatchMinLen + m_LenDecoder.decode(rangeDecoder, posState);
+                len = Base.kMatchMinLen + lengthDecoder.decode(rangeDecoder, posState);
                 state = Base.StateUpdateMatch(state);
                 int posSlot = posSlotDecoders[Base.GetLenToPosState(len)].decode(rangeDecoder);
 

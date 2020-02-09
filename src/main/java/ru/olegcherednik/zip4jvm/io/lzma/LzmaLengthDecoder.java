@@ -15,9 +15,12 @@ class LzmaLengthDecoder {
     private final RangeBitTreeDecoder[] lowCoder = new RangeBitTreeDecoder[Base.kNumPosStatesMax];
     private final RangeBitTreeDecoder[] midCoder = new RangeBitTreeDecoder[Base.kNumPosStatesMax];
     private final RangeBitTreeDecoder highCoder = new RangeBitTreeDecoder(Base.kNumHighLenBits);
+
     private int numPosStates;
 
-    public void create(int numPosStates) {
+    public LzmaLengthDecoder(int pb) {
+        int numPosStates = 1 << pb;
+
         for (; this.numPosStates < numPosStates; this.numPosStates++) {
             lowCoder[this.numPosStates] = new RangeBitTreeDecoder(Base.kNumLowLenBits);
             midCoder[this.numPosStates] = new RangeBitTreeDecoder(Base.kNumMidLenBits);

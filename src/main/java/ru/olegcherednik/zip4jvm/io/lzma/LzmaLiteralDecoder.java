@@ -23,7 +23,7 @@ class LzmaLiteralDecoder {
                             .toArray(Decoder[]::new);
     }
 
-    Decoder getDecoder(int pos, byte prevByte) {
+    public Decoder getDecoder(int pos, byte prevByte) {
         return decoders[((pos & posMask) << numPrevBits) + ((prevByte & 0xFF) >>> (8 - numPrevBits))];
     }
 
