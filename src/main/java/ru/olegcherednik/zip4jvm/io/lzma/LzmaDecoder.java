@@ -33,6 +33,7 @@ public class LzmaDecoder implements Closeable {
     private final RangeDecoder rangeDecoder;
     private final OutWindow outWindow;
     private final long size;
+    private final int[] rep = new int[4];
 
     RangeBitTreeDecoder m_PosAlignDecoder = new RangeBitTreeDecoder(Base.kNumAlignBits);
 
@@ -46,7 +47,7 @@ public class LzmaDecoder implements Closeable {
     int m_PosStateMask;
 
     private int state = Base.StateInit();
-    private int rep0 = 0, rep1 = 0, rep2 = 0, rep3 = 0;
+
     private long nowPos64;
     private byte prv;
     private boolean stop;
@@ -103,7 +104,7 @@ public class LzmaDecoder implements Closeable {
         if (rangeDecoder.decodeBit(matchDecoders, (state << Base.kNumPosStatesBitsMax) + posState) == 0) {
             LzmaLiteralDecoder.Decoder literalDecoder = this.literalDecoder.getDecoder((int)nowPos64, prv);
             prv = Base.StateIsCharState(state) ? literalDecoder.decodeNormal(rangeDecoder)
-                                               : literalDecoder.decodeWithMatchByte(rangeDecoder, outWindow.get(rep0));
+                                               : literalDecoder.decodeWithMatchByte(rangeDecoder, outWindow.get(rep[0]));
 
             outWindow.writeByte(prv);
             state = Base.StateUpdateChar(state);
@@ -121,55 +122,55 @@ public class LzmaDecoder implements Closeable {
                 } else {
                     int distance;
                     if (rangeDecoder.decodeBit(repG1Decoders, state) == 0)
-                        distance = rep1;
+                        distance = rep[1];
                     else {
                         if (rangeDecoder.decodeBit(repG2Decoders, state) == 0)
-                            distance = rep2;
+                            distance = rep[2];
                         else {
-                            distance = rep3;
-                            rep3 = rep2;
+                            distance = rep[3];
+                            rep[3] = rep[2];
                         }
-                        rep2 = rep1;
+                        rep[2] = rep[1];
                     }
-                    rep1 = rep0;
-                    rep0 = distance;
+                    rep[1] = rep[0];
+                    rep[0] = distance;
                 }
                 if (len == 0) {
                     len = repLenDecoder.decode(rangeDecoder, posState) + Base.kMatchMinLen;
                     state = Base.StateUpdateRep(state);
                 }
             } else {
-                rep3 = rep2;
-                rep2 = rep1;
-                rep1 = rep0;
+                rep[3] = rep[2];
+                rep[2] = rep[1];
+                rep[1] = rep[0];
                 len = Base.kMatchMinLen + lengthDecoder.decode(rangeDecoder, posState);
                 state = Base.StateUpdateMatch(state);
                 int posSlot = posSlotDecoders[Base.GetLenToPosState(len)].decode(rangeDecoder);
 
                 if (posSlot >= Base.kStartPosModelIndex) {
                     int numDirectBits = (posSlot >> 1) - 1;
-                    rep0 = (2 | (posSlot & 1)) << numDirectBits;
+                    rep[0] = (2 | (posSlot & 1)) << numDirectBits;
 
                     if (posSlot < Base.kEndPosModelIndex)
-                        rep0 += RangeBitTreeDecoder.reverseDecode(posDecoders,
-                                rep0 - posSlot - 1, rangeDecoder, numDirectBits);
+                        rep[0] += RangeBitTreeDecoder.reverseDecode(posDecoders,
+                                rep[0] - posSlot - 1, rangeDecoder, numDirectBits);
                     else {
-                        rep0 += rangeDecoder.decodeDirectBits(numDirectBits - Base.kNumAlignBits) << Base.kNumAlignBits;
-                        rep0 += m_PosAlignDecoder.reverseDecode(rangeDecoder);
-                        if (rep0 < 0) {
-                            if (rep0 == -1)
+                        rep[0] += rangeDecoder.decodeDirectBits(numDirectBits - Base.kNumAlignBits) << Base.kNumAlignBits;
+                        rep[0] += m_PosAlignDecoder.reverseDecode(rangeDecoder);
+                        if (rep[0] < 0) {
+                            if (rep[0] == -1)
                                 return true;
                             throw new IOException("Error in data stream");
                         }
                     }
                 } else
-                    rep0 = posSlot;
+                    rep[0] = posSlot;
             }
 
-            if (rep0 >= nowPos64 || rep0 >= m_DictionarySizeCheck)
+            if (rep[0] >= nowPos64 || rep[0] >= m_DictionarySizeCheck)
                 throw new IOException("Error in data stream");
 
-            outWindow.writeBlock(rep0, len);
+            outWindow.writeBlock(rep[0], len);
             nowPos64 += len;
             prv = outWindow.get(0);
         }

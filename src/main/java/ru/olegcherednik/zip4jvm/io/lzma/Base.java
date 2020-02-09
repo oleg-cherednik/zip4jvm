@@ -2,7 +2,11 @@
 
 package ru.olegcherednik.zip4jvm.io.lzma;
 
-public class Base {
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+class Base {
 
     public static final int kNumRepDistances = 4;
     public static final int kNumStates = 12;

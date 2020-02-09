@@ -4,6 +4,7 @@ import ru.olegcherednik.zip4jvm.io.lzma.range.RangeBitTreeDecoder;
 import ru.olegcherednik.zip4jvm.io.lzma.range.RangeDecoder;
 
 import java.io.IOException;
+import java.util.stream.IntStream;
 
 /**
  * @author Oleg Cherednik
@@ -16,15 +17,12 @@ class LzmaLengthDecoder {
     private final RangeBitTreeDecoder[] midCoder = new RangeBitTreeDecoder[Base.kNumPosStatesMax];
     private final RangeBitTreeDecoder highCoder = new RangeBitTreeDecoder(Base.kNumHighLenBits);
 
-    private int numPosStates;
-
     public LzmaLengthDecoder(int pb) {
-        int numPosStates = 1 << pb;
-
-        for (; this.numPosStates < numPosStates; this.numPosStates++) {
-            lowCoder[this.numPosStates] = new RangeBitTreeDecoder(Base.kNumLowLenBits);
-            midCoder[this.numPosStates] = new RangeBitTreeDecoder(Base.kNumMidLenBits);
-        }
+        IntStream.range(0, 1 << pb)
+                 .forEach(i -> {
+                     lowCoder[i] = new RangeBitTreeDecoder(Base.kNumLowLenBits);
+                     midCoder[i] = new RangeBitTreeDecoder(Base.kNumMidLenBits);
+                 });
     }
 
     public int decode(RangeDecoder rangeDecoder, int posState) throws IOException {
