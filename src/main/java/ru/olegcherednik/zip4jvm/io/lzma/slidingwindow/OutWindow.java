@@ -2,6 +2,10 @@ package ru.olegcherednik.zip4jvm.io.lzma.slidingwindow;
 
 import java.io.IOException;
 
+/**
+ * @author Oleg Cherednik
+ * @since 08.02.2020
+ */
 public class OutWindow {
 
     private final byte[] buf;

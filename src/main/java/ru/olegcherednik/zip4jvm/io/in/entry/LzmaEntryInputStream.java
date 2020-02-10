@@ -14,11 +14,11 @@ import java.io.IOException;
  */
 final class LzmaEntryInputStream extends EntryInputStream {
 
-    private final LzmaDecoder dec;
+    private final LzmaDecoder lzma;
 
     public LzmaEntryInputStream(ZipEntry zipEntry, DataInput in) throws IOException {
         super(zipEntry, in);
-        dec = createDecoder();
+        lzma = createDecoder();
     }
 
     private LzmaDecoder createDecoder() throws IOException {
@@ -35,7 +35,7 @@ final class LzmaEntryInputStream extends EntryInputStream {
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        len = dec.decode(buf, offs, len);
+        len = lzma.decode(buf, offs, len);
 
         if (len == 0 || len == IOUtils.EOF)
             return IOUtils.EOF;

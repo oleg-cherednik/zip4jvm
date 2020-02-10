@@ -55,6 +55,7 @@ final class FileHeaderBuilder {
         generalPurposeFlag.setEncrypted(zipEntry.getEncryption() != Encryption.OFF);
 //        generalPurposeFlag.setStrongEncryption(entry.getEncryption() == Encryption.STRONG);
         generalPurposeFlag.setStrongEncryption(false);
+        generalPurposeFlag.setLzmaEosMarker(zipEntry.isLzmaEosMarker());
 
         return generalPurposeFlag;
     }

@@ -14,6 +14,8 @@ public interface DataOutput extends Marker, Closeable {
 
     long getOffs();
 
+    void writeByte(int val) throws IOException;
+
     default void writeWordSignature(int sig) throws IOException {
         writeWord(sig);
     }

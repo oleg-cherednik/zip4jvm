@@ -100,9 +100,6 @@ public final class LocalFileHeaderDecompose implements Decompose {
         long size = zipEntry.getCompressedSize();
         long offs = content.getOffs() + content.getSize() + extraFieldBlock.getSize();
 
-        // TODO lzma (version + size)
-        offs += 4;
-
         Encryption encryption = zipEntry.getEncryption();
 
         if (encryption.isAes()) {

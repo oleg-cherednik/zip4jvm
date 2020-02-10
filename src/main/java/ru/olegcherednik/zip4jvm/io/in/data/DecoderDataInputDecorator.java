@@ -66,4 +66,9 @@ public final class DecoderDataInputDecorator extends BaseDataInput implements De
         delegate.seek(pos);
     }
 
+    @Override
+    public String toString() {
+        return delegate.toString();
+    }
+
 }

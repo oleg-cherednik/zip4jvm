@@ -11,7 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static ru.olegcherednik.zip4jvm.TestData.sevenZipLzmaSolidZip;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
 
@@ -174,9 +173,12 @@ public class ZipInfoTest {
 
 //        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/lzma/lzma_16mb.zip"));
 //        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/lzma/lzma_1mb_32.zip"));
-//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/lzma/zip_zip.zip"));
+//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/lzma/enc/lzma-ultra.zip"));
 //        res = res.settings(ZipInfoSettings.builder().readEntries(false).build());
-        ZipInfo res = ZipInfo.zip(sevenZipLzmaSolidZip);
+//        ZipInfo res = ZipInfo.zip(sevenZipLzmaSolidZip);
+//        ZipInfo res = ZipInfo.zip(Paths.get("D:\\zip4jvm\\tmp\\lzma/lzma.zip"));
+        ZipInfo res = ZipInfo.zip(Paths.get("D:\\zip4jvm\\foo\\compression\\1581359841667\\CompressionLzmaTest\\shouldCreateSingleZipWithFilesWhenLzmaCompression/src.zip"));
+
         return res;
     }
 

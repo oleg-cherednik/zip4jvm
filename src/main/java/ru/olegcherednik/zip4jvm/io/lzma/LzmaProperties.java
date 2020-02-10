@@ -1,9 +1,11 @@
 package ru.olegcherednik.zip4jvm.io.lzma;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 
 import java.io.IOException;
 
@@ -12,6 +14,7 @@ import java.io.IOException;
  * @since 05.02.2020
  */
 @Getter
+@Builder
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class LzmaProperties {
 
@@ -19,6 +22,12 @@ public final class LzmaProperties {
     private final int lp; // literal position bits
     private final int pb; // position bits
     private final int dictionarySize;
+
+    public int write(DataOutput out) throws IOException {
+        out.writeByte((byte)((pb * 5 + lp) * 9 + lc));
+        out.writeDword(dictionarySize);
+        return 5;
+    }
 
     public static LzmaProperties read(DataInput in) throws IOException {
         int v = in.readByte() & 0xFF;

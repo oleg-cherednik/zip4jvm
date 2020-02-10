@@ -12,6 +12,7 @@ import java.nio.file.Path;
  */
 abstract class BaseDataOutput extends AbstractMarker implements DataOutput {
 
+    private static final int OFFS_BYTE = 0;
     private static final int OFFS_WORD = 1;
     private static final int OFFS_DWORD = 3;
     private static final int OFFS_QWORD = 7;
@@ -33,6 +34,11 @@ abstract class BaseDataOutput extends AbstractMarker implements DataOutput {
     @Override
     public final long getOffs() {
         return delegate.getOffs();
+    }
+
+    @Override
+    public void writeByte(int val) throws IOException {
+        convertAndWrite(val, OFFS_BYTE, 1);
     }
 
     @Override
