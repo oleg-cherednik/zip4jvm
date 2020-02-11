@@ -177,7 +177,7 @@ public class ZipInfoTest {
 //        res = res.settings(ZipInfoSettings.builder().readEntries(false).build());
 //        ZipInfo res = ZipInfo.zip(sevenZipLzmaSolidZip);
 //        ZipInfo res = ZipInfo.zip(Paths.get("D:\\zip4jvm\\tmp\\lzma/lzma.zip"));
-        ZipInfo res = ZipInfo.zip(Paths.get("D:\\zip4jvm\\foo\\compression\\1581461362618\\CompressionLzmaTest\\shouldCreateSingleZipWithFilesWhenLzmaCompressionAndAesEncryption/src.zip"));
+        ZipInfo res = ZipInfo.zip(Paths.get("D:\\zip4jvm\\foo\\compression\\1581463249662\\CompressionLzmaTest\\shouldCreateSingleZipWithFilesWhenLzmaCompressionAndAesEncryption/src.zip"));
 
         return res;
     }

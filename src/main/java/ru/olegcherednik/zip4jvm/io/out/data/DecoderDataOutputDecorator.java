@@ -37,6 +37,7 @@ public final class DecoderDataOutputDecorator extends BaseDataOutput implements 
 
     @Override
     protected void writeInternal(byte[] buf, int offs, int len) throws IOException {
+        encoder.encrypt(buf, offs, len);
         delegate.write(buf, offs, len);
     }
 
