@@ -18,7 +18,7 @@ import java.util.zip.Checksum;
  * @author Oleg Cherednik
  * @since 08.02.2020
  */
-public abstract class EntryMetadataInputStream extends InputStream {
+abstract class EntryMetadataInputStream extends InputStream {
 
     private final DataInput in;
 

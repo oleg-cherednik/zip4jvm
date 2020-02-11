@@ -12,6 +12,7 @@ import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareDecoder;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareEncoder;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.model.entry.RegularFileZipEntry;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
@@ -39,8 +40,12 @@ public enum Encryption {
         return this == AES_128 || this == AES_192 || this == AES_256;
     }
 
-    public Decoder createDecoder(ZipEntry zipEntry, DataInput in) throws IOException {
+    public Decoder createDecoder(RegularFileZipEntry zipEntry, DataInput in) throws IOException {
         return createDecoder.apply(zipEntry, in);
+    }
+
+    public Encoder createEncoder(RegularFileZipEntry zipEntry) {
+        return createEncoder.apply(zipEntry);
     }
 
     public static Encryption get(ExtraField extraField, GeneralPurposeFlag generalPurposeFlag) {

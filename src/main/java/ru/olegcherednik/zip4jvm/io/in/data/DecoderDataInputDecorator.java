@@ -47,8 +47,8 @@ public final class DecoderDataInputDecorator extends BaseDataInput implements De
     }
 
     @Override
-    public long parseLong(byte[] buf, int offs, int len) {
-        return delegate.parseLong(buf, offs, len);
+    public long toLong(byte[] buf, int offs, int len) {
+        return delegate.toLong(buf, offs, len);
     }
 
     @Override

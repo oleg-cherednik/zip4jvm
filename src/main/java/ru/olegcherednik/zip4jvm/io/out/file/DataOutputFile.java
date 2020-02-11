@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.io.out;
+package ru.olegcherednik.zip4jvm.io.out.file;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -13,6 +13,6 @@ public interface DataOutputFile extends Closeable {
 
     long getOffs();
 
-    void convert(long val, byte[] buf, int offs, int len);
+    void fromLong(long val, byte[] buf, int offs, int len);
 
 }

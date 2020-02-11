@@ -5,8 +5,11 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import ru.olegcherednik.zip4jvm.ZipFile;
+import ru.olegcherednik.zip4jvm.crypto.Decoder;
+import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.Encryption;
@@ -122,6 +125,14 @@ public abstract class ZipEntry {
             builder.directoryName(fileName);
 
         return builder.build();
+    }
+
+    public Decoder createDecoder(DataInput in) throws IOException {
+        return Decoder.NULL;
+    }
+
+    public Encoder createEncoder() {
+        return Encoder.NULL;
     }
 
 }

@@ -12,7 +12,6 @@ import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.function.Function;
 
@@ -24,7 +23,7 @@ import java.util.function.Function;
  */
 public abstract class EntryInputStream extends EntryMetadataInputStream {
 
-    public static InputStream create(ZipEntry zipEntry, Function<Charset, Charset> charsetCustomizer, DataInput in) throws IOException {
+    public static EntryInputStream create(ZipEntry zipEntry, Function<Charset, Charset> charsetCustomizer, DataInput in) throws IOException {
         LocalFileHeader localFileHeader = new LocalFileHeaderReader(zipEntry.getLocalFileHeaderOffs(), charsetCustomizer).read(in);
         // TODO check why do I use Supplier here
         zipEntry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
@@ -42,18 +41,18 @@ public abstract class EntryInputStream extends EntryMetadataInputStream {
     }
 
     protected final DecoderDataInput in;
-    protected final long compressedSize;
+    private final long compressedSize;
 
     private final byte[] buf = new byte[1];
 
     protected EntryInputStream(ZipEntry zipEntry, DataInput in) throws IOException {
         super(zipEntry, in);
-        this.in = new DecoderDataInputDecorator(in, zipEntry.getEncryption().createDecoder(zipEntry, in));
-        compressedSize = Math.max(0, this.in.getDataCompressedSize(zipEntry.getCompressedSize()));
+        this.in = new DecoderDataInputDecorator(in, zipEntry.createDecoder(in));
+        compressedSize = this.in.getDataCompressedSize(zipEntry.getCompressedSize());
     }
 
     protected long getAvailableCompressedBytes() {
-        return Math.max(0, compressedSize - readCompressedBytes);
+        return compressedSize - readCompressedBytes;
     }
 
     @Override

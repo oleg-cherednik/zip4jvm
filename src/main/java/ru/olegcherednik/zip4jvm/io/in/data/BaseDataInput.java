@@ -53,22 +53,22 @@ abstract class BaseDataInput implements DataInput {
 
     @Override
     public int readByte() throws IOException {
-        return (int)readAndParseLong(OFFS_BYTE, byteSize());
+        return (int)readAndToLong(OFFS_BYTE, byteSize());
     }
 
     @Override
     public int readWord() throws IOException {
-        return (int)readAndParseLong(OFFS_WORD, wordSize());
+        return (int)readAndToLong(OFFS_WORD, wordSize());
     }
 
     @Override
     public long readDword() throws IOException {
-        return readAndParseLong(OFFS_DWORD, dwordSize());
+        return readAndToLong(OFFS_DWORD, dwordSize());
     }
 
     @Override
     public long readQword() throws IOException {
-        return readAndParseLong(OFFS_QWORD, qwordSize());
+        return readAndToLong(OFFS_QWORD, qwordSize());
     }
 
     @Override
@@ -86,10 +86,10 @@ abstract class BaseDataInput implements DataInput {
         return new BigInteger(hexStr, radix).toString();
     }
 
-    private long readAndParseLong(int offs, int len) throws IOException {
+    private long readAndToLong(int offs, int len) throws IOException {
         byte[] buf = THREAD_LOCAL_BUF.get();
         read(buf, offs, len);
-        return parseLong(buf, offs, len);
+        return toLong(buf, offs, len);
     }
 
     @Override

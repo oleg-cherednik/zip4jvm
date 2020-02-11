@@ -13,7 +13,7 @@ import java.io.IOException;
  * @since 12.12.2019
  */
 @Getter
-public abstract class BaseZipDataInput extends BaseDataInput implements ZipDataInput {
+abstract class BaseZipDataInput extends BaseDataInput implements ZipDataInput {
 
     protected final ZipModel zipModel;
     protected DataInputFile delegate;
@@ -52,8 +52,8 @@ public abstract class BaseZipDataInput extends BaseDataInput implements ZipDataI
     }
 
     @Override
-    public long parseLong(byte[] buf, int offs, int len) {
-        return delegate.parseLong(buf, offs, len);
+    public long toLong(byte[] buf, int offs, int len) {
+        return delegate.toLong(buf, offs, len);
     }
 
     @Override

@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.io.lzma.xz;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LZEncoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LZMAEncoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeEncoderToStream;
-import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 import java.io.IOException;
 

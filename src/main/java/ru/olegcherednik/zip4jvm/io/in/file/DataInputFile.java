@@ -17,6 +17,6 @@ public interface DataInputFile extends Closeable, RandomAccess {
 
     int read(byte[] buf, int offs, int len) throws IOException;
 
-    long parseLong(byte[] buf, int offs, int len);
+    long toLong(byte[] buf, int offs, int len);
 
 }

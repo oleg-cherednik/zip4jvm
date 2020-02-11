@@ -66,7 +66,7 @@ public interface DataInput extends Closeable, RandomAccess {
 
     /* this is technical method; create {@literal long} from {@literal byte[]} */
     @Deprecated
-    long parseLong(byte[] buf, int offs, int len);
+    long toLong(byte[] buf, int offs, int len);
 
     void mark(String id);
 
