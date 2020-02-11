@@ -59,6 +59,8 @@ dependencies {
     testImplementation 'net.lingala.zip4j:zip4j:2.2.1'
     testImplementation 'de.idyl:winzipaes:1.0.1'
     testImplementation 'org.mockito:mockito-core:3.0.0'
+    testImplementation 'org.apache.commons:commons-compress:1.20'
+    testImplementation 'org.tukaani:xz:1.8'
 
     testAnnotationProcessor("org.projectlombok:lombok:1.18.8")
 }

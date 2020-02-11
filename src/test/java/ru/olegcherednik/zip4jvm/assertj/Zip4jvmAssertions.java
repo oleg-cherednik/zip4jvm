@@ -18,7 +18,7 @@ import java.nio.file.Path;
 public final class Zip4jvmAssertions extends Assertions {
 
     public static ZipFileAssert assertThatZipFile(Path zip) throws IOException {
-        return new ZipFileAssert(isSplit(zip) ? new ZipFileSplitDecorator(zip) : new ZipFileNoSplitNoEncryptedDecorator(zip));
+        return new ZipFileAssert(isSplit(zip) ? new ZipFileSplitDecorator(zip) : new ZipFileSolidNoEncryptedDecorator(zip));
     }
 
     public static ZipFileAssert assertThatZipFile(Path zip, char[] password) throws IOException {

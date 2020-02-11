@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 
 import java.io.IOException;
@@ -182,12 +181,12 @@ public class ZipInfoTest {
         return res;
     }
 
-    @Test//(enabled = false)
+//    @Test//(enabled = false)
     public void printShortInfo() throws IOException {
         zipInfo().printShortInfo(System.out);
     }
 
-    @Test//(enabled = false)
+//    @Test//(enabled = false)
     public void decompose() throws IOException {
         zipInfo().settings(ZipInfoSettings.builder().copyPayload(true).build()).decompose(Zip4jvmSuite.subDirNameAsMethodName(rootDir));
     }

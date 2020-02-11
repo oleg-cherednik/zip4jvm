@@ -14,7 +14,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static ru.olegcherednik.zip4jvm.TestData.fileDucati;
+import static ru.olegcherednik.zip4jvm.TestData.filesDirBikes;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
  * @author Oleg Cherednik
@@ -44,9 +47,9 @@ public class CompressionLzmaTest {
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        ZipIt.zip(zip).settings(settings).add(fileDucati);
-//        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
-//        assertThatZipFile(zip).root().matches(dirBikesAssert);
+        ZipIt.zip(zip).settings(settings).add(filesDirBikes);
+        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
+        assertThatZipFile(zip).root().matches(dirBikesAssert);
     }
 
 }
