@@ -2,7 +2,10 @@ package ru.olegcherednik.zip4jvm.io.out.entry;
 
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.writers.DataDescriptorWriter;
+import ru.olegcherednik.zip4jvm.io.writers.LocalFileHeaderWriter;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
+import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
+import ru.olegcherednik.zip4jvm.model.builders.LocalFileHeaderBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
@@ -23,7 +26,7 @@ import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
  */
 abstract class EntryMetadataOutputStream extends OutputStream {
 
-    protected static final String COMPRESSED_DATA = EntryMetadataOutputStream.class.getSimpleName() + ".entryCompressedDataOffs";
+    private static final String COMPRESSED_DATA = EntryMetadataOutputStream.class.getSimpleName() + ".entryCompressedDataOffs";
 
     protected final ZipEntry zipEntry;
     private final Checksum checksum = new CRC32();
@@ -35,6 +38,12 @@ abstract class EntryMetadataOutputStream extends OutputStream {
     protected EntryMetadataOutputStream(ZipEntry zipEntry, DataOutput out) {
         this.zipEntry = zipEntry;
         this.out = out;
+    }
+
+    protected void writeLocalFileHeader() throws IOException {
+        LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(zipEntry).build();
+        new LocalFileHeaderWriter(localFileHeader).write(out);
+        out.mark(COMPRESSED_DATA);
     }
 
     @Override

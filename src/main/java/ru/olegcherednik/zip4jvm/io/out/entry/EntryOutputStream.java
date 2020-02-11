@@ -4,11 +4,8 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.DecoderDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.DecoderDataOutputDecorator;
-import ru.olegcherednik.zip4jvm.io.writers.LocalFileHeaderWriter;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import ru.olegcherednik.zip4jvm.model.builders.LocalFileHeaderBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
@@ -50,12 +47,6 @@ public abstract class EntryOutputStream extends EntryMetadataOutputStream {
     protected EntryOutputStream(ZipEntry zipEntry, DataOutput out) {
         super(zipEntry, out);
         this.out = new DecoderDataOutputDecorator(out, zipEntry.createEncoder());
-    }
-
-    private void writeLocalFileHeader() throws IOException {
-        LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(zipEntry).build();
-        new LocalFileHeaderWriter(localFileHeader).write(out);
-        out.mark(COMPRESSED_DATA);
     }
 
     private void writeEncryptionHeader() throws IOException {

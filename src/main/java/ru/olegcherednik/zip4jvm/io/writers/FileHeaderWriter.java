@@ -29,7 +29,7 @@ final class FileHeaderWriter implements Writer {
         Charset charset = fileHeader.getGeneralPurposeFlag().getCharset();
         byte[] fileName = fileHeader.getFileName(charset);
         byte[] fileComment = fileHeader.getComment(charset);
-        CompressionMethod compressionMethod = fileHeader.getCompressionMethod();
+        CompressionMethod compressionMethod = fileHeader.getCompression();
 
         out.writeDwordSignature(CentralDirectory.FileHeader.SIGNATURE);
         out.writeWord(fileHeader.getVersionMadeBy().getData());

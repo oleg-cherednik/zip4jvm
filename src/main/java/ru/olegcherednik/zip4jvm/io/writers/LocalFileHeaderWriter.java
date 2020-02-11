@@ -22,7 +22,7 @@ public final class LocalFileHeaderWriter implements Writer {
     public void write(DataOutput out) throws IOException {
         Charset charset = localFileHeader.getGeneralPurposeFlag().getCharset();
         byte[] fileName = localFileHeader.getFileName(charset);
-        CompressionMethod compressionMethod = localFileHeader.getCompressionMethod();
+        CompressionMethod compressionMethod = localFileHeader.getCompression();
 
         out.writeDwordSignature(LocalFileHeader.SIGNATURE);
         out.writeWord(localFileHeader.getVersionToExtract().getData());

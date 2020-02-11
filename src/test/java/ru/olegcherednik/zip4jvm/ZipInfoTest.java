@@ -2,6 +2,7 @@ package ru.olegcherednik.zip4jvm;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 
 import java.io.IOException;
@@ -176,7 +177,7 @@ public class ZipInfoTest {
 //        res = res.settings(ZipInfoSettings.builder().readEntries(false).build());
 //        ZipInfo res = ZipInfo.zip(sevenZipLzmaSolidZip);
 //        ZipInfo res = ZipInfo.zip(Paths.get("D:\\zip4jvm\\tmp\\lzma/lzma.zip"));
-        ZipInfo res = ZipInfo.zip(Paths.get("D:\\zip4jvm\\foo\\compression\\1581359841667\\CompressionLzmaTest\\shouldCreateSingleZipWithFilesWhenLzmaCompression/src.zip"));
+        ZipInfo res = ZipInfo.zip(Paths.get("D:\\zip4jvm\\foo\\compression\\1581461362618\\CompressionLzmaTest\\shouldCreateSingleZipWithFilesWhenLzmaCompressionAndAesEncryption/src.zip"));
 
         return res;
     }
@@ -186,7 +187,7 @@ public class ZipInfoTest {
         zipInfo().printShortInfo(System.out);
     }
 
-//    @Test//(enabled = false)
+    @Test//(enabled = false)
     public void decompose() throws IOException {
         zipInfo().settings(ZipInfoSettings.builder().copyPayload(true).build()).decompose(Zip4jvmSuite.subDirNameAsMethodName(rootDir));
     }

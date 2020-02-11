@@ -14,6 +14,7 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static ru.olegcherednik.zip4jvm.TestData.filesDirBikes;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
@@ -63,7 +64,8 @@ public class CompressionLzmaTest {
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        ZipIt.zip(zip).settings(settings).add(filesDirBikes);
+        ZipIt.zip(zip).settings(settings).add(Paths.get("D:\\zip4jvm\\tmp\\lzma/zip.txt"));
+//        ZipIt.zip(zip).settings(settings).add(filesDirBikes);
 //        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
 //        assertThatZipFile(zip).root().matches(dirBikesAssert);
     }
