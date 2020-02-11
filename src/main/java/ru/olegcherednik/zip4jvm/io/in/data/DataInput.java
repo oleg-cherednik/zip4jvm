@@ -64,7 +64,7 @@ public interface DataInput extends Closeable, RandomAccess {
 
     int read(byte[] buf, int offs, int len) throws IOException;
 
-    /** this is technical method; create {@literal long} from {@literal byte[]} */
+    /* this is technical method; create {@literal long} from {@literal byte[]} */
     @Deprecated
     long parseLong(byte[] buf, int offs, int len);
 

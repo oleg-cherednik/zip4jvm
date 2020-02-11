@@ -70,6 +70,7 @@ abstract class ZipFileDecorator {
 
                 ZipEntry entry = new ZipEntry(zipEntry.getName());
                 entry.setSize(zipEntry.getSize());
+                entry.setComment(zipEntry.getComment());
                 entry.setCompressedSize(zipEntry.getCompressedSize());
                 map.put(zipEntry.getName(), entry);
             }
