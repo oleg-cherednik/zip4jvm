@@ -5,7 +5,9 @@ import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.compress.archivers.zip.ZipMethod;
 import org.apache.commons.io.IOUtils;
 import org.tukaani.xz.LZMAInputStream;
+import ru.olegcherednik.zip4jvm.ZipInfo;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,34 +40,22 @@ class ZipFileSolidNoEncryptedDecorator extends ZipFileDecorator {
                     if (zipFile.canReadEntryData(zipEntry))
                         delegate = zipFile.getInputStream(zipEntry);
                     else if (zipEntry.getMethod() == ZipMethod.LZMA.getCode()) {
-                        try (InputStream in = zipFile.getRawInputStream(zipEntry)) {
-                            ByteBuffer buffer = ByteBuffer.wrap(IOUtils.readFully(in, 9)).order(ByteOrder.LITTLE_ENDIAN);
+                        InputStream in = zipFile.getRawInputStream(zipEntry);
+                        ByteBuffer buffer = ByteBuffer.wrap(IOUtils.readFully(in, 9)).order(ByteOrder.LITTLE_ENDIAN);
 
-                            // Lzma sdk version used to compress this data
-                            int majorVersion = buffer.get();
-                            int minorVersion = buffer.get();
+                        int majorVersion = buffer.get();
+                        int minorVersion = buffer.get();
+                        int size = buffer.getShort() & 0xFFFF;
 
-                            // Byte count of the following data represent as an unsigned short.
-                            // Should be = 5 (propByte + dictSize) in all versions
-                            int size = buffer.getShort() & 0xFFFF;
+                        if (size != 5)
+                            throw new UnsupportedOperationException("ZipEntry LZMA should have size 5 in header");
 
-                            if (size != 5)
-                                throw new UnsupportedOperationException("ZipEntry LZMA should have size 5 in header");
-
-                            byte propByte = buffer.get();
-
-                            // Dictionary size is an unsigned 32-bit little endian integer.
-                            int dictSize = buffer.getInt();
-//                            long uncompressedSize;
-//                            if ((ze.getRawFlag() & (1 << 1)) != 0) {
-//                                // If the entry uses EOS marker, use -1 to indicate
-//                                uncompressedSize = -1;
-//                            } else {
-//                                uncompressedSize = ze.getSize();
-//                            }
-
-                            delegate = new LZMAInputStream(in, -1, propByte, dictSize);
-                        }
+                        CentralDirectory.FileHeader fileHeader = ZipInfo.zip(zip).getFileHeader(zipEntry.getName());
+                        boolean lzmaEosMarker = fileHeader.getGeneralPurposeFlag().isLzmaEosMarker();
+                        long uncompSize = lzmaEosMarker ? -1 : fileHeader.getUncompressedSize();
+                        byte propByte = buffer.get();
+                        int dictSize = buffer.getInt();
+                        delegate = new LZMAInputStream(in, uncompSize, propByte, dictSize);
                     } else
                         throw new UnsupportedOperationException("ZipEntry data can't be read: " + zipEntry.getName());
                 }

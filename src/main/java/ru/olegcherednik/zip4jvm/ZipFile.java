@@ -18,12 +18,15 @@ package ru.olegcherednik.zip4jvm;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import ru.olegcherednik.zip4jvm.engine.InfoEngine;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.engine.ZipEngine;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
 import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
+import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.utils.EmptyInputStream;
 import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamSupplier;
@@ -35,6 +38,7 @@ import java.io.Closeable;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
@@ -57,6 +61,10 @@ public final class ZipFile {
 
     static Reader reader(SrcFile srcFile, UnzipSettings settings) throws IOException {
         return new UnzipEngine(srcFile, settings);
+    }
+
+    static Info info(SrcFile srcFile, ZipInfoSettings settings) throws IOException {
+        return new InfoEngine(srcFile, settings);
     }
 
     @Getter
@@ -177,6 +185,15 @@ public final class ZipFile {
         boolean isSplit();
 
         boolean isZip64();
+    }
+
+    public interface Info {
+
+        void printTextInfo(PrintStream out) throws IOException;
+
+        void decompose(Path dir) throws IOException;
+
+        CentralDirectory.FileHeader getFileHeader(String entryName) throws IOException;
     }
 
 }

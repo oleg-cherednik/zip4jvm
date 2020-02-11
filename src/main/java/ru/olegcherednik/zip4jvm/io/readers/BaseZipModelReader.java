@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.SignatureWasNotFoundException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
@@ -37,11 +38,14 @@ public abstract class BaseZipModelReader {
     protected final SrcFile srcFile;
     protected final Function<Charset, Charset> customizeCharset;
 
+    @Getter
     protected EndCentralDirectory endCentralDirectory;
+    @Getter
     protected Zip64 zip64;
+    @Getter
     protected CentralDirectory centralDirectory;
 
-    protected final void readCentralData() throws IOException {
+    public final void readCentralData() throws IOException {
         try (DataInput in = createDataInput()) {
             findCentralDirectorySignature(in);
             endCentralDirectory = readEndCentralDirectory(in);

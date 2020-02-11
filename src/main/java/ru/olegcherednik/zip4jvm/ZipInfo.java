@@ -2,8 +2,8 @@ package ru.olegcherednik.zip4jvm;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.engine.InfoEngine;
 import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
+import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 
 import java.io.IOException;
@@ -38,11 +38,15 @@ public final class ZipInfo {
     }
 
     public void printShortInfo(PrintStream out) throws IOException {
-        new InfoEngine(srcFile, settings).printTextInfo(out);
+        ZipFile.info(srcFile, settings).printTextInfo(out);
     }
 
     public void decompose(Path destDir) throws IOException {
-        new InfoEngine(srcFile, settings).decompose(destDir);
+        ZipFile.info(srcFile, settings).decompose(destDir);
+    }
+
+    public CentralDirectory.FileHeader getFileHeader(String entryName) throws IOException {
+        return ZipFile.info(srcFile, settings).getFileHeader(entryName);
     }
 
 }
