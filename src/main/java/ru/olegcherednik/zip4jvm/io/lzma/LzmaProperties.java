@@ -16,6 +16,8 @@ import java.io.IOException;
 @Getter
 @Builder
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@Deprecated
+// TODO it could be used in LZMA
 public final class LzmaProperties {
 
     private final int lc; // literal context bits
@@ -34,9 +36,6 @@ public final class LzmaProperties {
         int lc = v % 9;
         int lp = (v / 9) % 5;
         int pb = v / (9 * 5);
-
-        if (pb > Base.kNumPosStatesBitsMax)
-            throw new IllegalArgumentException("Incorrect properties");
 
         int dictionarySize = (int)in.readDword();
 
