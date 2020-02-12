@@ -21,7 +21,6 @@ final class LzmaEntryOutputStream extends EntryOutputStream {
     public LzmaEntryOutputStream(ZipEntry zipEntry, DataOutput out) throws IOException {
         super(zipEntry, out);
         lzma = createEncoder();
-
     }
 
     private LZMAOutputStream createEncoder() throws IOException {
