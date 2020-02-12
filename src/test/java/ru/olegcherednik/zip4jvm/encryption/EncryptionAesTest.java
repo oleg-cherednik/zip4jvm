@@ -19,6 +19,7 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -63,7 +64,8 @@ public class EncryptionAesTest {
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-        ZipIt.zip(zip).settings(settings).add(contentDirSrc);
+//        ZipIt.zip(zip).settings(settings).add(contentDirSrc);
+        ZipIt.zip(zip).settings(settings).add(Paths.get("D:\\zip4jvm\\tmp\\lzma/zip.txt"));
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
         assertThatZipFile(zip, password).exists().root().matches(rootAssert);
     }
