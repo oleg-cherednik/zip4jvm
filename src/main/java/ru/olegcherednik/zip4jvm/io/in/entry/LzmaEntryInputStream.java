@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.in.entry;
 
 import org.apache.commons.io.IOUtils;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.lzma.LzmaDecoder;
 import ru.olegcherednik.zip4jvm.io.lzma.LzmaProperties;
@@ -14,6 +15,8 @@ import java.io.IOException;
  */
 final class LzmaEntryInputStream extends EntryInputStream {
 
+    private static final String HEADER = LzmaEntryInputStream.class.getSimpleName() + ".header";
+
     private final LzmaDecoder lzma;
 
     public LzmaEntryInputStream(ZipEntry zipEntry, DataInput in) throws IOException {
@@ -22,14 +25,17 @@ final class LzmaEntryInputStream extends EntryInputStream {
     }
 
     private LzmaDecoder createDecoder() throws IOException {
-        in.mark("aa");
-        int majorVersion = in.readByte();
-        int minorVersion = in.readByte();
-        int headerSize = in.readWord();
-        long size = zipEntry.isLzmaEosMarker() ? Long.MAX_VALUE : zipEntry.getUncompressedSize();
+        in.mark(HEADER);
+        in.readByte();    // major version
+        in.readByte();    // minor version
+        int headerSize = in.readWord();    // header size
 
+        if (headerSize != 5)
+            throw new Zip4jvmException(String.format("LZMA header size expected 5 bytes: actual is %d bytes", headerSize));
+
+        long size = zipEntry.isLzmaEosMarker() ? Long.MAX_VALUE : zipEntry.getUncompressedSize();
         LzmaDecoder dec = new LzmaDecoder(in, LzmaProperties.read(in), size);
-        readCompressedBytes += in.getOffs() - in.getMark("aa");
+        readCompressedBytes += in.getOffs() - in.getMark(HEADER);
         return dec;
     }
 
