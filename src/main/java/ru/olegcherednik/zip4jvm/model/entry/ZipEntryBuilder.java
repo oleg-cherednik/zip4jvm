@@ -106,7 +106,7 @@ public final class ZipEntryBuilder {
             int lastModifiedTime = fileHeader.getLastModifiedTime();
             GeneralPurposeFlag generalPurposeFlag = fileHeader.getGeneralPurposeFlag();
 
-            CompressionMethod compressionMethod = fileHeader.getCompression();
+            CompressionMethod compressionMethod = fileHeader.getOriginalCompressionMethod();
             CompressionLevel compressionLevel = generalPurposeFlag.getCompressionLevel();
             Encryption encryption = fileHeader.getEncryption();
             ExternalFileAttributes externalFileAttributes = fileHeader.getExternalFileAttributes();

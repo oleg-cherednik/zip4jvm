@@ -45,7 +45,7 @@ public class LocalFileHeader {
         return fileName == null ? ArrayUtils.EMPTY_BYTE_ARRAY : fileName.getBytes(charset);
     }
 
-    public CompressionMethod getCompression() {
+    public CompressionMethod getOriginalCompressionMethod() {
         return compressionMethod == CompressionMethod.AES ? extraField.getAesExtraDataRecord().getCompressionMethod() : compressionMethod;
     }
 

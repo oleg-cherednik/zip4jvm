@@ -7,18 +7,15 @@ import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
-import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static ru.olegcherednik.zip4jvm.TestData.filesDirBikes;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
-import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
@@ -53,21 +50,6 @@ public class CompressionLzmaTest {
         ZipIt.zip(zip).settings(settings).add(filesDirBikes);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
         assertThatZipFile(zip).root().matches(dirBikesAssert);
-    }
-
-    public void shouldCreateSingleZipWithFilesWhenLzmaCompressionAndAesEncryption() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
-                                                         .compression(Compression.LZMA, CompressionLevel.NORMAL)
-                                                         .encryption(Encryption.AES_256, password)
-                                                         .lzmaEosMarker(true).build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
-
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-
-        ZipIt.zip(zip).settings(settings).add(Paths.get("D:\\zip4jvm\\tmp\\lzma/zip.txt"));
-//        ZipIt.zip(zip).settings(settings).add(filesDirBikes);
-//        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
-//        assertThatZipFile(zip).root().matches(dirBikesAssert);
     }
 
 }

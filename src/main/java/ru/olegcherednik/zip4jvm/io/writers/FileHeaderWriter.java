@@ -32,7 +32,7 @@ final class FileHeaderWriter implements Writer {
         out.writeDwordSignature(CentralDirectory.FileHeader.SIGNATURE);
         out.writeWord(fileHeader.getVersionMadeBy().getData());
         out.writeWord(fileHeader.getVersionToExtract().getData());
-        out.writeWord(fileHeader.getGeneralPurposeFlag().getAsInt(fileHeader.getCompression()));
+        out.writeWord(fileHeader.getGeneralPurposeFlag().getAsInt(fileHeader.getOriginalCompressionMethod()));
         out.writeWord(fileHeader.getCompressionMethod().getCode());
         out.writeDword(fileHeader.getLastModifiedTime());
         out.writeDword(fileHeader.getCrc32());

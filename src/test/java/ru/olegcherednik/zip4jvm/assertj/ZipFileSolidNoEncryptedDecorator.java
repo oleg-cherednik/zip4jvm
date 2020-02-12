@@ -70,7 +70,6 @@ class ZipFileSolidNoEncryptedDecorator extends ZipFileDecorator {
                     delegate.close();
                     zipFile.close();
                 }
-
             };
         } catch(Zip4jvmException e) {
             throw e;

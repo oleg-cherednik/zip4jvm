@@ -19,14 +19,15 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
+import static ru.olegcherednik.zip4jvm.TestData.filesDirBikes;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirCars;
 import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolidAes;
 import static ru.olegcherednik.zip4jvm.TestData.zipStoreSplitAes;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
@@ -64,8 +65,7 @@ public class EncryptionAesTest {
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
-//        ZipIt.zip(zip).settings(settings).add(contentDirSrc);
-        ZipIt.zip(zip).settings(settings).add(Paths.get("D:\\zip4jvm\\tmp\\lzma/zip.txt"));
+        ZipIt.zip(zip).settings(settings).add(contentDirSrc);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
         assertThatZipFile(zip, password).exists().root().matches(rootAssert);
     }
@@ -154,4 +154,21 @@ public class EncryptionAesTest {
         assertThatThrownBy(() -> UnzipIt.zip(zipStoreSplitAes).destDir(destDir).settings(settings).extract())
                 .isExactlyInstanceOf(IncorrectPasswordException.class);
     }
+
+    public void shouldCreateSingleZipWithFilesWhenLzmaCompressionAndAesEncryption() throws IOException {
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.LZMA, CompressionLevel.NORMAL)
+                                                         .encryption(Encryption.AES_256, password)
+                                                         .lzmaEosMarker(true).build();
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettingsProvider(fileName -> entrySettings)
+                                          .comment("password: " + passwordStr).build();
+
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+
+        ZipIt.zip(zip).settings(settings).add(filesDirBikes);
+        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
+        assertThatZipFile(zip, password).root().matches(dirBikesAssert);
+    }
+
 }

@@ -24,24 +24,7 @@ public final class AesEncoder implements Encoder {
     public static AesEncoder create(ZipEntry entry) {
         try {
             AesStrength strength = entry.getStrength();
-//            byte[] salt = strength.generateSalt();
-            byte[] salt = {
-                    (byte)0xCD,
-                    (byte)0x11,
-                    (byte)0x9D,
-                    (byte)0xF5,
-                    (byte)0x1E,
-                    (byte)0x3D,
-                    (byte)0xAA,
-                    (byte)0xED,
-                    (byte)0x77,
-                    (byte)0x4F,
-                    (byte)0xA8,
-                    (byte)0xBA,
-                    (byte)0xB3,
-                    (byte)0xE2,
-                    (byte)0xC6,
-                    (byte)0x30};
+            byte[] salt = strength.generateSalt();
             byte[] key = AesEngine.createKey(entry.getPassword(), salt, strength);
 
             Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
