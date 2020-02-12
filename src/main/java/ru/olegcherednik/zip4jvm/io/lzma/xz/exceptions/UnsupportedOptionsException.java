@@ -7,7 +7,9 @@
  * You can do whatever you want with this file.
  */
 
-package ru.olegcherednik.zip4jvm.io.lzma.xz;
+package ru.olegcherednik.zip4jvm.io.lzma.xz.exceptions;
+
+import ru.olegcherednik.zip4jvm.io.lzma.xz.XZIOException;
 
 /**
  * Thrown when compression options not supported by this implementation

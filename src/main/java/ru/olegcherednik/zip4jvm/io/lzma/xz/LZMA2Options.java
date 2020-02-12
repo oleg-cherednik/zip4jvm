@@ -9,6 +9,7 @@
 
 package ru.olegcherednik.zip4jvm.io.lzma.xz;
 
+import ru.olegcherednik.zip4jvm.io.lzma.xz.exceptions.UnsupportedOptionsException;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LZEncoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LZMAEncoder;
 

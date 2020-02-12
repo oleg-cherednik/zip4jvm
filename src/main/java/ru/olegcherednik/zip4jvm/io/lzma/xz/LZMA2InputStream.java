@@ -10,6 +10,7 @@
 
 package ru.olegcherednik.zip4jvm.io.lzma.xz;
 
+import ru.olegcherednik.zip4jvm.io.lzma.xz.exceptions.CorruptedInputException;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LZDecoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LZMADecoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeDecoderFromBuffer;
@@ -187,7 +188,7 @@ public class LZMA2InputStream extends InputStream {
      * @return      the next decompressed byte, or <code>-1</code>
      *              to indicate the end of the compressed stream
      *
-     * @throws      CorruptedInputException
+     * @throws CorruptedInputException
      *
      * @throws      XZIOException if the stream has been closed
      *

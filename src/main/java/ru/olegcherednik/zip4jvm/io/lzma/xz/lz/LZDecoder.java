@@ -11,7 +11,7 @@
 package ru.olegcherednik.zip4jvm.io.lzma.xz.lz;
 
 import ru.olegcherednik.zip4jvm.io.lzma.xz.ArrayCache;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.CorruptedInputException;
+import ru.olegcherednik.zip4jvm.io.lzma.xz.exceptions.CorruptedInputException;
 
 import java.io.DataInputStream;
 import java.io.IOException;
