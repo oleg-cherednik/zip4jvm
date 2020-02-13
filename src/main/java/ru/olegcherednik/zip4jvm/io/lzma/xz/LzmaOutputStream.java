@@ -51,7 +51,7 @@ public class LzmaOutputStream extends OutputStream {
      * @throws IOException may be thrown from <code>out</code>
      * @since 1.7
      */
-    public LzmaOutputStream(DataOutput out, LZMA2Options options, long uncompressedSize) throws IOException {
+    public LzmaOutputStream(DataOutput out, LzmaInputStream.LZMA2Options options, long uncompressedSize) throws IOException {
         this.out = out;
         this.uncompressedSize = uncompressedSize;
 

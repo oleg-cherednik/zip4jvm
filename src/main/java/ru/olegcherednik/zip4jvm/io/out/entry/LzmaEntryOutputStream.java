@@ -1,6 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.out.entry;
 
-import ru.olegcherednik.zip4jvm.io.lzma.xz.LZMA2Options;
+import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaInputStream;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -24,7 +24,7 @@ final class LzmaEntryOutputStream extends EntryOutputStream {
     private LzmaOutputStream createEncoder() throws IOException {
         long size = zipEntry.isLzmaEosMarker() ? -1 : zipEntry.getUncompressedSize();
         int compressionLevel = zipEntry.getCompressionLevel().getCode();
-        return new LzmaOutputStream(out, new LZMA2Options(compressionLevel), size);
+        return new LzmaOutputStream(out, new LzmaInputStream.LZMA2Options(compressionLevel), size);
     }
 
     @Override
