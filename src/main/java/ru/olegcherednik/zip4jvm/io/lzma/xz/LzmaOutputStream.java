@@ -1,6 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.lzma.xz;
 
-import ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LZMAEncoder;
+import ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LzmaEncoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeEncoder;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
@@ -18,7 +18,7 @@ public class LzmaOutputStream extends OutputStream {
 
     private final ArrayCache arrayCache = ArrayCache.getDefaultCache();
 
-    private LZMAEncoder lzma;
+    private LzmaEncoder lzma;
 
     private final int props;
     private final long uncompressedSize;
@@ -51,7 +51,7 @@ public class LzmaOutputStream extends OutputStream {
         this.uncompressedSize = uncompressedSize;
 
         dictSize = options.getDictionarySize();
-        lzma = LZMAEncoder.getInstance(new RangeEncoder(out),
+        lzma = LzmaEncoder.getInstance(new RangeEncoder(out),
                 options.getLc(), options.getLp(), options.getPb(),
                 options.getMode(),
                 dictSize, 0, options.getNiceLength(),

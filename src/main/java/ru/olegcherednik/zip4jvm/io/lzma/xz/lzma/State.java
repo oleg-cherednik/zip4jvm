@@ -28,13 +28,7 @@ final class State {
     private static final int NONLIT_MATCH = 10;
     private static final int NONLIT_REP = 11;
 
-    private int state;
-
-    State() {}
-
-    State(State other) {
-        state = other.state;
-    }
+    private int state = LIT_LIT;
 
     void reset() {
         state = LIT_LIT;

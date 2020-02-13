@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.io.lzma.xz;
 import lombok.Getter;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.exceptions.UnsupportedOptionsException;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LZEncoder;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LZMAEncoder;
+import ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LzmaEncoder;
 
 /**
  * LZMA2 compression options.
@@ -85,13 +85,13 @@ public class LZMA2Options {
      * Compression mode: fast.
      * This is usually combined with a hash chain match finder.
      */
-    public static final int MODE_FAST = LZMAEncoder.MODE_FAST;
+    public static final int MODE_FAST = LzmaEncoder.MODE_FAST;
 
     /**
      * Compression mode: normal.
      * This is usually combined with a binary tree match finder.
      */
-    public static final int MODE_NORMAL = LZMAEncoder.MODE_NORMAL;
+    public static final int MODE_NORMAL = LzmaEncoder.MODE_NORMAL;
 
     /**
      * Minimum value for <code>niceLen</code> is 8.

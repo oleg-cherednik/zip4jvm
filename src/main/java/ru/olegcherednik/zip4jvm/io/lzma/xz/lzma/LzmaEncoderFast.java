@@ -14,13 +14,13 @@ import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LZEncoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.Matches;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeEncoder;
 
-final class LZMAEncoderFast extends LZMAEncoder {
+final class LzmaEncoderFast extends LzmaEncoder {
     private static final int EXTRA_SIZE_BEFORE = 1;
     private static final int EXTRA_SIZE_AFTER = MATCH_LEN_MAX - 1;
 
     private Matches matches = null;
 
-    LZMAEncoderFast(RangeEncoder rc, int lc, int lp, int pb,
+    LzmaEncoderFast(RangeEncoder rc, int lc, int lp, int pb,
                            int dictSize, int extraSizeBefore,
                            int niceLen, int mf, int depthLimit) {
         super(rc, LZEncoder.getInstance(dictSize,

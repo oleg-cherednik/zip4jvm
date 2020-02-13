@@ -4,7 +4,7 @@ import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LZEncoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.Matches;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeEncoder;
 
-final class LZMAEncoderNormal extends LZMAEncoder {
+final class LzmaEncoderNormal extends LzmaEncoder {
 
     private static final int OPTS = 4096;
 
@@ -29,7 +29,7 @@ final class LZMAEncoderNormal extends LZMAEncoder {
                 + OPTS * 64 / 1024;
     }
 
-    LZMAEncoderNormal(RangeEncoder rc, int lc, int lp, int pb,
+    LzmaEncoderNormal(RangeEncoder rc, int lc, int lp, int pb,
             int dictSize, int extraSizeBefore,
             int niceLen, int mf, int depthLimit) {
         super(rc, LZEncoder.getInstance(dictSize,

@@ -1,13 +1,3 @@
-/*
- * LZMAEncoder
- *
- * Authors: Lasse Collin <lasse.collin@tukaani.org>
- *          Igor Pavlov <http://7-zip.org/>
- *
- * This file has been put into the public domain.
- * You can do whatever you want with this file.
- */
-
 package ru.olegcherednik.zip4jvm.io.lzma.xz.lzma;
 
 import ru.olegcherednik.zip4jvm.io.lzma.xz.ArrayCache;
@@ -17,7 +7,7 @@ import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeEncoder;
 
 import java.io.IOException;
 
-public abstract class LZMAEncoder extends LZMACoder {
+public abstract class LzmaEncoder extends LZMACoder {
 
     public static final int MODE_FAST = 1;
     public static final int MODE_NORMAL = 2;
@@ -69,18 +59,18 @@ public abstract class LZMAEncoder extends LZMACoder {
     int readAhead = -1;
     private int uncompressedSize = 0;
 
-    public static LZMAEncoder getInstance(
+    public static LzmaEncoder getInstance(
             RangeEncoder rc, int lc, int lp, int pb, int mode,
             int dictSize, int extraSizeBefore,
             int niceLen, int mf, int depthLimit) {
         switch (mode) {
             case MODE_FAST:
-                return new LZMAEncoderFast(rc, lc, lp, pb,
+                return new LzmaEncoderFast(rc, lc, lp, pb,
                         dictSize, extraSizeBefore,
                         niceLen, mf, depthLimit);
 
             case MODE_NORMAL:
-                return new LZMAEncoderNormal(rc, lc, lp, pb,
+                return new LzmaEncoderNormal(rc, lc, lp, pb,
                         dictSize, extraSizeBefore,
                         niceLen, mf, depthLimit);
         }
@@ -149,7 +139,7 @@ public abstract class LZMAEncoder extends LZMACoder {
      */
     abstract int getNextSymbol();
 
-    LZMAEncoder(RangeEncoder rc, LZEncoder lz,
+    LzmaEncoder(RangeEncoder rc, LZEncoder lz,
             int lc, int lp, int pb, int dictSize, int niceLen) {
         super(pb);
         this.rc = rc;
