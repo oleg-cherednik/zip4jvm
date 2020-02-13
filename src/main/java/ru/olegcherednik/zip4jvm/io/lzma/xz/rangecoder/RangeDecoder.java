@@ -1,22 +1,40 @@
-/*
- * RangeDecoder
- *
- * Authors: Lasse Collin <lasse.collin@tukaani.org>
- *          Igor Pavlov <http://7-zip.org/>
- *
- * This file has been put into the public domain.
- * You can do whatever you want with this file.
- */
-
 package ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder;
+
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.lzma.xz.exceptions.CorruptedInputException;
 
 import java.io.IOException;
 
-public abstract class RangeDecoder extends RangeCoder {
-    int range = 0;
-    int code = 0;
+public class RangeDecoder extends RangeCoder {
 
-    public abstract void normalize() throws IOException;
+    private final DataInput in;
+    private int range = -1;
+    private int code;
+
+    public RangeDecoder(DataInput in) throws IOException {
+        this.in = in;
+
+        if (in.readByte() != 0x00)
+            throw new CorruptedInputException();
+
+        code = readCode(in);
+    }
+
+    private static int readCode(DataInput in) throws IOException {
+        int code = 0;
+
+        for (int i = 0; i < 4; ++i)
+            code = code << 8 | in.readByte();
+
+        return code;
+    }
+
+    public void normalize() throws IOException {
+        if ((range & TOP_MASK) == 0) {
+            code = (code << SHIFT_BITS) | in.readByte();
+            range <<= SHIFT_BITS;
+        }
+    }
 
     public int decodeBit(short[] probs, int index) throws IOException {
         normalize();
@@ -82,5 +100,10 @@ public abstract class RangeDecoder extends RangeCoder {
         } while (--count != 0);
 
         return result;
+    }
+
+    @Override
+    public void close() throws IOException {
+        in.close();
     }
 }

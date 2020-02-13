@@ -5,7 +5,6 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaProperties;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LZDecoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeDecoder;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeDecoderFromStream;
 
 import java.io.IOException;
 
@@ -21,7 +20,7 @@ public final class LzmaDecoder extends LZMACoder {
     public LzmaDecoder(DataInput in, LzmaProperties properties) throws IOException {
         super(properties.getPb());
         lz = new LZDecoder(properties.getDictionarySize(), null);
-        rc = new RangeDecoderFromStream(in);
+        rc = new RangeDecoder(in);
         literalDecoder = new LiteralDecoder(properties);
         reset();
     }
