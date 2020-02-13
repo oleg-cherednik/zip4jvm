@@ -50,12 +50,12 @@ final class Hash234 extends CRC32Hash {
                / (1024 / 4) + 4;
     }
 
-    Hash234(int dictSize, ArrayCache arrayCache) {
-        hash2Table = arrayCache.getIntArray(HASH_2_SIZE, true);
-        hash3Table = arrayCache.getIntArray(HASH_3_SIZE, true);
+    Hash234(int dictSize) {
+        hash2Table = ArrayCache.getDefaultCache().getIntArray(HASH_2_SIZE, true);
+        hash3Table = ArrayCache.getDefaultCache().getIntArray(HASH_3_SIZE, true);
 
         hash4Size = getHash4Size(dictSize);
-        hash4Table = arrayCache.getIntArray(hash4Size, true);
+        hash4Table = ArrayCache.getDefaultCache().getIntArray(hash4Size, true);
         hash4Mask = hash4Size - 1;
     }
 

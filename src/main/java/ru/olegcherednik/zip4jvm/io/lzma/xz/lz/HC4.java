@@ -13,6 +13,7 @@ package ru.olegcherednik.zip4jvm.io.lzma.xz.lz;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.ArrayCache;
 
 final class HC4 extends LZEncoder {
+
     private final Hash234 hash;
     private final int[] chain;
     private final Matches matches;
@@ -34,16 +35,14 @@ final class HC4 extends LZEncoder {
      * See <code>LZEncoder.getInstance</code> for parameter descriptions.
      */
     HC4(int dictSize, int beforeSizeMin, int readAheadMax,
-            int niceLen, int matchLenMax, int depthLimit,
-            ArrayCache arrayCache) {
-        super(dictSize, beforeSizeMin, readAheadMax, niceLen, matchLenMax,
-              arrayCache);
+            int niceLen, int matchLenMax, int depthLimit) {
+        super(dictSize, beforeSizeMin, readAheadMax, niceLen, matchLenMax);
 
-        hash = new Hash234(dictSize, arrayCache);
+        hash = new Hash234(dictSize);
 
         // +1 because we need dictSize bytes of history + the current byte.
         cyclicSize = dictSize + 1;
-        chain = arrayCache.getIntArray(cyclicSize, false);
+        chain = ArrayCache.getDefaultCache().getIntArray(cyclicSize, false);
         lzPos = cyclicSize;
 
         // Substracting 1 because the shortest match that this match
@@ -67,7 +66,7 @@ final class HC4 extends LZEncoder {
      * Moves to the next byte, checks that there is enough available space,
      * and possibly normalizes the hash tables and the hash chain.
      *
-     * @return      number of bytes available, including the current byte
+     * @return number of bytes available, including the current byte
      */
     private int movePos() {
         int avail = movePos(4, 4);
@@ -137,7 +136,7 @@ final class HC4 extends LZEncoder {
         // If a match was found, see how long it is.
         if (matches.count > 0) {
             while (lenBest < matchLenLimit && buf[readPos + lenBest - delta2]
-                                              == buf[readPos + lenBest])
+                    == buf[readPos + lenBest])
                 ++lenBest;
 
             matches.len[matches.count - 1] = lenBest;
@@ -165,7 +164,7 @@ final class HC4 extends LZEncoder {
                 return matches;
 
             currentMatch = chain[cyclicPos - delta
-                                 + (delta > cyclicPos ? cyclicSize : 0)];
+                    + (delta > cyclicPos ? cyclicSize : 0)];
 
             // Test the first byte and the first new byte that would give us
             // a match that is at least one byte longer than lenBest. This

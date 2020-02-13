@@ -13,6 +13,7 @@ package ru.olegcherednik.zip4jvm.io.lzma.xz.lz;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.ArrayCache;
 
 final class BT4 extends LZEncoder {
+
     private final Hash234 hash;
     private final int[] tree;
     private final Matches matches;
@@ -26,17 +27,14 @@ final class BT4 extends LZEncoder {
         return Hash234.getMemoryUsage(dictSize) + dictSize / (1024 / 8) + 10;
     }
 
-    BT4(int dictSize, int beforeSizeMin, int readAheadMax,
-            int niceLen, int matchLenMax, int depthLimit,
-            ArrayCache arrayCache) {
-        super(dictSize, beforeSizeMin, readAheadMax, niceLen, matchLenMax,
-              arrayCache);
+    BT4(int dictSize, int beforeSizeMin, int readAheadMax, int niceLen, int matchLenMax, int depthLimit) {
+        super(dictSize, beforeSizeMin, readAheadMax, niceLen, matchLenMax);
 
         cyclicSize = dictSize + 1;
         lzPos = cyclicSize;
 
-        hash = new Hash234(dictSize, arrayCache);
-        tree = arrayCache.getIntArray(cyclicSize * 2, false);
+        hash = new Hash234(dictSize);
+        tree = ArrayCache.getDefaultCache().getIntArray(cyclicSize * 2, false);
 
         // Substracting 1 because the shortest match that this match
         // finder can find is 2 bytes, so there's no need to reserve
@@ -119,7 +117,7 @@ final class BT4 extends LZEncoder {
         // If a match was found, see how long it is.
         if (matches.count > 0) {
             while (lenBest < matchLenLimit && buf[readPos + lenBest - delta2]
-                                              == buf[readPos + lenBest])
+                    == buf[readPos + lenBest])
                 ++lenBest;
 
             matches.len[matches.count - 1] = lenBest;
@@ -157,7 +155,7 @@ final class BT4 extends LZEncoder {
             }
 
             int pair = (cyclicPos - delta
-                        + (delta > cyclicPos ? cyclicSize : 0)) << 1;
+                    + (delta > cyclicPos ? cyclicSize : 0)) << 1;
             int len = Math.min(len0, len1);
 
             if (buf[readPos + len - delta] == buf[readPos + len]) {
@@ -212,7 +210,7 @@ final class BT4 extends LZEncoder {
             }
 
             int pair = (cyclicPos - delta
-                        + (delta > cyclicPos ? cyclicSize : 0)) << 1;
+                    + (delta > cyclicPos ? cyclicSize : 0)) << 1;
             int len = Math.min(len0, len1);
 
             if (buf[readPos + len - delta] == buf[readPos + len]) {

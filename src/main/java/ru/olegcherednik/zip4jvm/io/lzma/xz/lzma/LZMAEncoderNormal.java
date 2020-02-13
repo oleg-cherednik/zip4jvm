@@ -1,11 +1,11 @@
 package ru.olegcherednik.zip4jvm.io.lzma.xz.lzma;
 
-import ru.olegcherednik.zip4jvm.io.lzma.xz.ArrayCache;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LZEncoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.Matches;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeEncoder;
 
 final class LZMAEncoderNormal extends LZMAEncoder {
+
     private static final int OPTS = 4096;
 
     private static final int EXTRA_SIZE_BEFORE = OPTS;
@@ -24,22 +24,21 @@ final class LZMAEncoderNormal extends LZMAEncoder {
 
     static int getMemoryUsage(int dictSize, int extraSizeBefore, int mf) {
         return LZEncoder.getMemoryUsage(dictSize,
-                   Math.max(extraSizeBefore, EXTRA_SIZE_BEFORE),
-                   EXTRA_SIZE_AFTER, MATCH_LEN_MAX, mf)
-               + OPTS * 64 / 1024;
+                Math.max(extraSizeBefore, EXTRA_SIZE_BEFORE),
+                EXTRA_SIZE_AFTER, MATCH_LEN_MAX, mf)
+                + OPTS * 64 / 1024;
     }
 
     LZMAEncoderNormal(RangeEncoder rc, int lc, int lp, int pb,
-                             int dictSize, int extraSizeBefore,
-                             int niceLen, int mf, int depthLimit,
-                             ArrayCache arrayCache) {
+            int dictSize, int extraSizeBefore,
+            int niceLen, int mf, int depthLimit) {
         super(rc, LZEncoder.getInstance(dictSize,
-                                        Math.max(extraSizeBefore,
-                                                 EXTRA_SIZE_BEFORE),
-                                        EXTRA_SIZE_AFTER,
-                                        niceLen, MATCH_LEN_MAX,
-                                        mf, depthLimit, arrayCache),
-              lc, lp, pb, dictSize, niceLen);
+                Math.max(extraSizeBefore,
+                        EXTRA_SIZE_BEFORE),
+                EXTRA_SIZE_AFTER,
+                niceLen, MATCH_LEN_MAX,
+                mf, depthLimit),
+                lc, lp, pb, dictSize, niceLen);
 
         for (int i = 0; i < OPTS; ++i)
             opts[i] = new Optimum();
@@ -169,7 +168,7 @@ final class LZMAEncoderNormal extends LZMAEncoder {
         {
             int prevByte = lz.getByte(1);
             int literalPrice = literalEncoder.getPrice(curByte, matchByte,
-                                                       prevByte, pos, state);
+                    prevByte, pos, state);
             opts[1].set1(literalPrice, 0, -1);
         }
 
@@ -180,7 +179,7 @@ final class LZMAEncoderNormal extends LZMAEncoder {
         // it is cheaper than encoding it as a literal.
         if (matchByte == curByte) {
             int shortRepPrice = getShortRepPrice(anyRepPrice,
-                                                 state, posState);
+                    state, posState);
             if (shortRepPrice < opts[1].price)
                 opts[1].set1(shortRepPrice, 0, 0);
         }
@@ -217,10 +216,10 @@ final class LZMAEncoderNormal extends LZMAEncoder {
                 continue;
 
             int longRepPrice = getLongRepPrice(anyRepPrice, rep,
-                                               state, posState);
+                    state, posState);
             do {
                 int price = longRepPrice + repLenEncoder.getPrice(repLen,
-                                                                  posState);
+                        posState);
                 if (price < opts[repLen].price)
                     opts[repLen].set1(price, 0, rep);
             } while (--repLen >= MATCH_LEN_MIN);
@@ -231,7 +230,7 @@ final class LZMAEncoderNormal extends LZMAEncoder {
             int len = Math.max(repLens[0] + 1, MATCH_LEN_MIN);
             if (len <= mainLen) {
                 int normalMatchPrice = getNormalMatchPrice(anyMatchPrice,
-                                                           state);
+                        state);
 
                 // Set i to the index of the shortest match that is
                 // at least len bytes long.
@@ -242,7 +241,7 @@ final class LZMAEncoderNormal extends LZMAEncoder {
                 while (true) {
                     int dist = matches.dist[i];
                     int price = getMatchAndLenPrice(normalMatchPrice,
-                                                    dist, len, posState);
+                            dist, len, posState);
                     if (price < opts[len].price)
                         opts[len].set1(price, 0, dist + REPS);
 
@@ -273,17 +272,17 @@ final class LZMAEncoderNormal extends LZMAEncoder {
 
             updateOptStateAndReps();
             anyMatchPrice = opts[optCur].price
-                            + getAnyMatchPrice(opts[optCur].state, posState);
+                    + getAnyMatchPrice(opts[optCur].state, posState);
             anyRepPrice = getAnyRepPrice(anyMatchPrice, opts[optCur].state);
 
             calc1BytePrices(pos, posState, avail, anyRepPrice);
 
             if (avail >= MATCH_LEN_MIN) {
                 int startLen = calcLongRepPrices(pos, posState,
-                                                 avail, anyRepPrice);
+                        avail, anyRepPrice);
                 if (matches.count > 0)
                     calcNormalMatchPrices(pos, posState, avail,
-                                          anyMatchPrice, startLen);
+                            anyMatchPrice, startLen);
             }
         }
 
@@ -325,7 +324,7 @@ final class LZMAEncoderNormal extends LZMAEncoder {
                 opts[optCur].state.updateLiteral();
 
             System.arraycopy(opts[optPrev].reps, 0,
-                             opts[optCur].reps, 0, REPS);
+                    opts[optCur].reps, 0, REPS);
         } else {
             int back;
             if (opts[optCur].prev1IsLiteral && opts[optCur].hasPrev2) {
@@ -352,7 +351,7 @@ final class LZMAEncoderNormal extends LZMAEncoder {
             } else {
                 opts[optCur].reps[0] = back - REPS;
                 System.arraycopy(opts[optPrev].reps, 0,
-                                 opts[optCur].reps, 1, REPS - 1);
+                        opts[optCur].reps, 1, REPS - 1);
             }
         }
     }
@@ -361,7 +360,7 @@ final class LZMAEncoderNormal extends LZMAEncoder {
      * Calculates prices of a literal, a short rep, and literal + rep0.
      */
     private void calc1BytePrices(int pos, int posState,
-                                 int avail, int anyRepPrice) {
+            int avail, int anyRepPrice) {
         // This will be set to true if using a literal or a short rep.
         boolean nextIsByte = false;
 
@@ -371,7 +370,7 @@ final class LZMAEncoderNormal extends LZMAEncoder {
         // Try a literal.
         int literalPrice = opts[optCur].price
                 + literalEncoder.getPrice(curByte, matchByte, lz.getByte(1),
-                                          pos, opts[optCur].state);
+                pos, opts[optCur].state);
         if (literalPrice < opts[optCur + 1].price) {
             opts[optCur + 1].set1(literalPrice, optCur, -1);
             nextIsByte = true;
@@ -379,10 +378,10 @@ final class LZMAEncoderNormal extends LZMAEncoder {
 
         // Try a short rep.
         if (matchByte == curByte && (opts[optCur + 1].optPrev == optCur
-                                      || opts[optCur + 1].backPrev != 0)) {
+                || opts[optCur + 1].backPrev != 0)) {
             int shortRepPrice = getShortRepPrice(anyRepPrice,
-                                                 opts[optCur].state,
-                                                 posState);
+                    opts[optCur].state,
+                    posState);
             if (shortRepPrice <= opts[optCur + 1].price) {
                 opts[optCur + 1].set1(shortRepPrice, optCur, 0);
                 nextIsByte = true;
@@ -400,8 +399,8 @@ final class LZMAEncoderNormal extends LZMAEncoder {
                 nextState.updateLiteral();
                 int nextPosState = (pos + 1) & posMask;
                 int price = literalPrice
-                            + getLongRepAndLenPrice(0, len,
-                                                    nextState, nextPosState);
+                        + getLongRepAndLenPrice(0, len,
+                        nextState, nextPosState);
 
                 int i = optCur + 1 + len;
                 while (optEnd < i)
@@ -417,7 +416,7 @@ final class LZMAEncoderNormal extends LZMAEncoder {
      * Calculates prices of long rep and long rep + literal + rep0.
      */
     private int calcLongRepPrices(int pos, int posState,
-                                  int avail, int anyRepPrice) {
+            int avail, int anyRepPrice) {
         int startLen = MATCH_LEN_MIN;
         int lenLimit = Math.min(avail, niceLen);
 
@@ -430,11 +429,11 @@ final class LZMAEncoderNormal extends LZMAEncoder {
                 opts[++optEnd].reset();
 
             int longRepPrice = getLongRepPrice(anyRepPrice, rep,
-                                               opts[optCur].state, posState);
+                    opts[optCur].state, posState);
 
             for (int i = len; i >= MATCH_LEN_MIN; --i) {
                 int price = longRepPrice
-                            + repLenEncoder.getPrice(i, posState);
+                        + repLenEncoder.getPrice(i, posState);
                 if (price < opts[optCur + i].price)
                     opts[optCur + i].set1(price, optCur, rep);
             }
@@ -444,12 +443,12 @@ final class LZMAEncoderNormal extends LZMAEncoder {
 
             int len2Limit = Math.min(niceLen, avail - len - 1);
             int len2 = lz.getMatchLen(len + 1, opts[optCur].reps[rep],
-                                      len2Limit);
+                    len2Limit);
 
             if (len2 >= MATCH_LEN_MIN) {
                 // Rep
                 int price = longRepPrice
-                            + repLenEncoder.getPrice(len, posState);
+                        + repLenEncoder.getPrice(len, posState);
                 nextState.set(opts[optCur].state);
                 nextState.updateLongRep();
 
@@ -458,13 +457,13 @@ final class LZMAEncoderNormal extends LZMAEncoder {
                 int matchByte = lz.getByte(0); // lz.getByte(len, len)
                 int prevByte = lz.getByte(len, 1);
                 price += literalEncoder.getPrice(curByte, matchByte, prevByte,
-                                                 pos + len, nextState);
+                        pos + len, nextState);
                 nextState.updateLiteral();
 
                 // Rep0
                 int nextPosState = (pos + len + 1) & posMask;
                 price += getLongRepAndLenPrice(0, len2,
-                                               nextState, nextPosState);
+                        nextState, nextPosState);
 
                 int i = optCur + len + 1 + len2;
                 while (optEnd < i)
@@ -482,7 +481,7 @@ final class LZMAEncoderNormal extends LZMAEncoder {
      * Calculates prices of a normal match and normal match + literal + rep0.
      */
     private void calcNormalMatchPrices(int pos, int posState, int avail,
-                                       int anyMatchPrice, int startLen) {
+            int anyMatchPrice, int startLen) {
         // If the longest match is so long that it would not fit into
         // the opts array, shorten the matches.
         if (matches.len[matches.count - 1] > avail) {
@@ -500,7 +499,7 @@ final class LZMAEncoderNormal extends LZMAEncoder {
             opts[++optEnd].reset();
 
         int normalMatchPrice = getNormalMatchPrice(anyMatchPrice,
-                                                   opts[optCur].state);
+                opts[optCur].state);
 
         int match = 0;
         while (startLen > matches.len[match])
@@ -512,10 +511,10 @@ final class LZMAEncoderNormal extends LZMAEncoder {
             // Calculate the price of a match of len bytes from the nearest
             // possible distance.
             int matchAndLenPrice = getMatchAndLenPrice(normalMatchPrice,
-                                                       dist, len, posState);
+                    dist, len, posState);
             if (matchAndLenPrice < opts[optCur + len].price)
                 opts[optCur + len].set1(matchAndLenPrice,
-                                        optCur, dist + REPS);
+                        optCur, dist + REPS);
 
             if (len != matches.len[match])
                 continue;
@@ -534,14 +533,14 @@ final class LZMAEncoderNormal extends LZMAEncoder {
                 int prevByte = lz.getByte(len, 1);
                 int price = matchAndLenPrice
                         + literalEncoder.getPrice(curByte, matchByte,
-                                                  prevByte, pos + len,
-                                                  nextState);
+                        prevByte, pos + len,
+                        nextState);
                 nextState.updateLiteral();
 
                 // Rep0
                 int nextPosState = (pos + len + 1) & posMask;
                 price += getLongRepAndLenPrice(0, len2,
-                                               nextState, nextPosState);
+                        nextState, nextPosState);
 
                 int i = optCur + len + 1 + len2;
                 while (optEnd < i)

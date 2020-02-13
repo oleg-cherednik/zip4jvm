@@ -55,8 +55,7 @@ public class LzmaOutputStream extends OutputStream {
                 options.getLc(), options.getLp(), options.getPb(),
                 options.getMode(),
                 dictSize, 0, options.getNiceLength(),
-                options.getMatchFinder(), options.getDepthLimit(),
-                arrayCache);
+                options.getMatchFinder(), options.getDepthLimit());
 
         props = (options.getPb() * 5 + options.getLp()) * 9 + options.getLc();
     }

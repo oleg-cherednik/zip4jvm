@@ -72,20 +72,17 @@ public abstract class LZMAEncoder extends LZMACoder {
     public static LZMAEncoder getInstance(
             RangeEncoder rc, int lc, int lp, int pb, int mode,
             int dictSize, int extraSizeBefore,
-            int niceLen, int mf, int depthLimit,
-            ArrayCache arrayCache) {
+            int niceLen, int mf, int depthLimit) {
         switch (mode) {
             case MODE_FAST:
                 return new LZMAEncoderFast(rc, lc, lp, pb,
                         dictSize, extraSizeBefore,
-                        niceLen, mf, depthLimit,
-                        arrayCache);
+                        niceLen, mf, depthLimit);
 
             case MODE_NORMAL:
                 return new LZMAEncoderNormal(rc, lc, lp, pb,
                         dictSize, extraSizeBefore,
-                        niceLen, mf, depthLimit,
-                        arrayCache);
+                        niceLen, mf, depthLimit);
         }
 
         throw new IllegalArgumentException();

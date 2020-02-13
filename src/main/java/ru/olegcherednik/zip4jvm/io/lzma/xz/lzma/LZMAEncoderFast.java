@@ -10,12 +10,9 @@
 
 package ru.olegcherednik.zip4jvm.io.lzma.xz.lzma;
 
-import ru.olegcherednik.zip4jvm.io.lzma.xz.ArrayCache;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LZEncoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.Matches;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeEncoder;
-
-import java.io.IOException;
 
 final class LZMAEncoderFast extends LZMAEncoder {
     private static final int EXTRA_SIZE_BEFORE = 1;
@@ -23,22 +20,15 @@ final class LZMAEncoderFast extends LZMAEncoder {
 
     private Matches matches = null;
 
-    static int getMemoryUsage(int dictSize, int extraSizeBefore, int mf) {
-        return LZEncoder.getMemoryUsage(
-                dictSize, Math.max(extraSizeBefore, EXTRA_SIZE_BEFORE),
-                EXTRA_SIZE_AFTER, MATCH_LEN_MAX, mf);
-    }
-
     LZMAEncoderFast(RangeEncoder rc, int lc, int lp, int pb,
                            int dictSize, int extraSizeBefore,
-                           int niceLen, int mf, int depthLimit,
-                           ArrayCache arrayCache) {
+                           int niceLen, int mf, int depthLimit) {
         super(rc, LZEncoder.getInstance(dictSize,
                                         Math.max(extraSizeBefore,
                                                  EXTRA_SIZE_BEFORE),
                                         EXTRA_SIZE_AFTER,
                                         niceLen, MATCH_LEN_MAX,
-                                        mf, depthLimit, arrayCache),
+                                        mf, depthLimit),
               lc, lp, pb, dictSize, niceLen);
     }
 
