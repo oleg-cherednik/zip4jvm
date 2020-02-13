@@ -94,8 +94,8 @@ public abstract class LzmaEncoder extends LzmaCoder {
         return (i << 1) + ((dist >>> (i - 1)) & 1);
     }
 
-    LzmaEncoder(DataOutput out, LzEncoder lz, LzmaInputStream.Properties properties) {
-        super(properties);
+    protected LzmaEncoder(DataOutput out, LzEncoder lz, LzmaInputStream.Properties properties) {
+        super(properties.getPb());
         rangeEncoder = new RangeEncoder(out);
         this.lz = lz;
         niceLen = properties.getNiceLength();
@@ -107,7 +107,14 @@ public abstract class LzmaEncoder extends LzmaCoder {
         distSlotPricesSize = getDistSlot(properties.getDictionarySize() - 1) + 1;
         distSlotPrices = new int[DIST_STATES][distSlotPricesSize];
 
-        reset();
+        literalEncoder.reset();
+        matchLenEncoder.reset();
+        repLenEncoder.reset();
+        distPriceCount = 0;
+        alignPriceCount = 0;
+
+        uncompressedSize += readAhead + 1;
+        readAhead = -1;
     }
 
     public LzEncoder getLZEncoder() {
@@ -132,18 +139,6 @@ public abstract class LzmaEncoder extends LzmaCoder {
      * of the match.
      */
     public abstract int getNextSymbol();
-
-    public void reset() {
-        super.reset();
-        literalEncoder.reset();
-        matchLenEncoder.reset();
-        repLenEncoder.reset();
-        distPriceCount = 0;
-        alignPriceCount = 0;
-
-        uncompressedSize += readAhead + 1;
-        readAhead = -1;
-    }
 
     public int getUncompressedSize() {
         return uncompressedSize;
@@ -171,28 +166,6 @@ public abstract class LzmaEncoder extends LzmaCoder {
         rangeEncoder.encodeBit(isMatch[state.get()], posState, 1);
         rangeEncoder.encodeBit(isRep, state.get(), 0);
         encodeMatch(-1, MATCH_LEN_MIN, posState);
-    }
-
-    /**
-     * Compresses for LZMA2.
-     *
-     * @return true if the LZMA2 chunk became full, false otherwise
-     */
-    public boolean encodeForLZMA2() {
-        // LZMA2 uses RangeEncoderToBuffer so IOExceptions aren't possible.
-        try {
-            if (!lz.isStarted() && !encodeInit())
-                return false;
-
-            while (uncompressedSize <= LZMA2_UNCOMPRESSED_LIMIT
-                    && rangeEncoder.getPendingSize() <= LZMA2_COMPRESSED_LIMIT)
-                if (!encodeSymbol())
-                    return false;
-        } catch(IOException e) {
-            throw new Error();
-        }
-
-        return true;
     }
 
     private boolean encodeInit() throws IOException {

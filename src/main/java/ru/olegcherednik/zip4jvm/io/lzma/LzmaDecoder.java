@@ -21,15 +21,11 @@ public final class LzmaDecoder extends LzmaCoder {
     }
 
     private LzmaDecoder(DataInput in, LzmaOutputStream.Properties properties) throws IOException {
-        super(properties);
+        super(properties.getPb());
         lz = new LzDecoder(properties.getDictionarySize());
         rc = new RangeDecoder(in);
         literalDecoder = new LiteralDecoder(properties);
-        reset();
-    }
 
-    public void reset() {
-        super.reset();
         literalDecoder.reset();
         matchLenDecoder.reset();
         repLenDecoder.reset();

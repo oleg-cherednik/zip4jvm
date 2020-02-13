@@ -5,6 +5,10 @@ import ru.olegcherednik.zip4jvm.io.lzma.exceptions.CorruptedInputException;
 
 import java.io.IOException;
 
+/**
+ * @author Oleg Cherednik
+ * @since 14.02.2020
+ */
 public class RangeDecoder extends RangeCoder {
 
     private final DataInput in;

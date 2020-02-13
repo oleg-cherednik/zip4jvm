@@ -4,22 +4,25 @@ import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 import java.io.IOException;
 
+/**
+ * @author Oleg Cherednik
+ * @since 14.02.2020
+ */
 public class RangeEncoder extends RangeCoder {
 
     private static final int MOVE_REDUCING_BITS = 4;
     private static final int BIT_PRICE_SHIFT_BITS = 4;
 
-    private static final int[] prices
-            = new int[BIT_MODEL_TOTAL >>> MOVE_REDUCING_BITS];
+    private static final int[] prices = new int[BIT_MODEL_TOTAL >>> MOVE_REDUCING_BITS];
 
     private long low;
-    private int range;
+    private int range = 0xFFFFFFFF;
 
     // NOTE: int is OK for LZMA2 because a compressed chunk
     // is not more than 64 KiB, but with LZMA1 there is no chunking
     // so in theory cacheSize can grow very big. To be very safe,
     // use long instead of int since this code is used for LZMA1 too.
-    long cacheSize;
+    long cacheSize = 1;
     private byte cache;
 
     static {
@@ -48,21 +51,6 @@ public class RangeEncoder extends RangeCoder {
 
     public RangeEncoder(DataOutput out) {
         this.out = out;
-        reset();
-    }
-
-    public void reset() {
-        low = 0;
-        range = 0xFFFFFFFF;
-        cache = 0x00;
-        cacheSize = 1;
-    }
-
-    public int getPendingSize() {
-        // This function is only needed by users of RangeEncoderToBuffer,
-        // but providing a must-be-never-called version here makes
-        // LZMAEncoder simpler.
-        throw new Error();
     }
 
     public int finish() throws IOException {
