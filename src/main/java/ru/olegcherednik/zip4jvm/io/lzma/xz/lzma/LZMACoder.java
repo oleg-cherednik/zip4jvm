@@ -25,11 +25,9 @@ public abstract class LZMACoder implements Closeable {
     static final int ALIGN_SIZE = 1 << ALIGN_BITS;
     static final int ALIGN_MASK = ALIGN_SIZE - 1;
 
-    static final int REPS = 4;
-
     final int posMask;
 
-    final int[] reps = new int[REPS];
+    final int[] reps = new int[4];
     final State state = new State();
 
     final short[][] isMatch = new short[State.STATES][POS_STATES_MAX];
@@ -61,12 +59,6 @@ public abstract class LZMACoder implements Closeable {
     }
 
     void reset() {
-        reps[0] = 0;
-        reps[1] = 0;
-        reps[2] = 0;
-        reps[3] = 0;
-        state.reset();
-
         for (int i = 0; i < isMatch.length; ++i)
             RangeCoder.initProbs(isMatch[i]);
 

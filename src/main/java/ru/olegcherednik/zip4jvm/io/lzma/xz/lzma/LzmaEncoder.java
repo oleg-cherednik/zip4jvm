@@ -248,7 +248,7 @@ public abstract class LzmaEncoder extends LZMACoder {
         } else {
             // Some type of match
             rc.encodeBit(isMatch[state.get()], posState, 1);
-            if (back < REPS) {
+            if (back < reps.length) {
                 // Repeated match i.e. the same distance
                 // has been used earlier.
                 assert lz.getMatchLen(-readAhead, reps[back], len) == len;
@@ -256,9 +256,9 @@ public abstract class LzmaEncoder extends LZMACoder {
                 encodeRepMatch(back, len, posState);
             } else {
                 // Normal match
-                assert lz.getMatchLen(-readAhead, back - REPS, len) == len;
+                assert lz.getMatchLen(-readAhead, back - reps.length, len) == len;
                 rc.encodeBit(isRep, state.get(), 0);
-                encodeMatch(back - REPS, len, posState);
+                encodeMatch(back - reps.length, len, posState);
             }
         }
 

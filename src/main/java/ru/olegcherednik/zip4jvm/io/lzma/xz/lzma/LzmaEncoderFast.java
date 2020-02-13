@@ -53,7 +53,7 @@ final class LzmaEncoderFast extends LzmaEncoder {
         // Look for a match from the previous four match distances.
         int bestRepLen = 0;
         int bestRepIndex = 0;
-        for (int rep = 0; rep < REPS; ++rep) {
+        for (int rep = 0; rep < reps.length; ++rep) {
             int len = lz.getMatchLen(reps[rep], avail);
             if (len < MATCH_LEN_MIN)
                 continue;
@@ -80,7 +80,7 @@ final class LzmaEncoderFast extends LzmaEncoder {
             mainDist = matches.dist[matches.count - 1];
 
             if (mainLen >= niceLen) {
-                back = mainDist + REPS;
+                back = mainDist + reps.length;
                 skip(mainLen - 1);
                 return mainLen;
             }
@@ -131,11 +131,11 @@ final class LzmaEncoderFast extends LzmaEncoder {
         }
 
         int limit = Math.max(mainLen - 1, MATCH_LEN_MIN);
-        for (int rep = 0; rep < REPS; ++rep)
+        for (int rep = 0; rep < reps.length; ++rep)
             if (lz.getMatchLen(reps[rep], limit) == limit)
                 return 1;
 
-        back = mainDist + REPS;
+        back = mainDist + reps.length;
         skip(mainLen - 2);
         return mainLen;
     }

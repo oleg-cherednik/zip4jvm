@@ -14,7 +14,7 @@ final class Optimum {
     private static final int INFINITY_PRICE = 1 << 30;
 
     final State state = new State();
-    final int[] reps = new int[LZMACoder.REPS];
+    final int[] reps = new int[4];
 
     /**
      * Cumulative price of arriving to this byte.

@@ -30,10 +30,6 @@ final class State {
 
     private int state = LIT_LIT;
 
-    void reset() {
-        state = LIT_LIT;
-    }
-
     int get() {
         return state;
     }

@@ -19,7 +19,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
 
     // These are fields solely to avoid allocating the objects again and
     // again on each function call.
-    private final int[] repLens = new int[REPS];
+    private final int[] repLens = new int[4];
     private final State nextState = new State();
 
     LzmaEncoderNormal(RangeEncoder rc, LzmaInputStream.Properties properties) {
@@ -104,7 +104,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
 
         // Get the lengths of repeated matches.
         int repBest = 0;
-        for (int rep = 0; rep < REPS; ++rep) {
+        for (int rep = 0; rep < reps.length; ++rep) {
             repLens[rep] = lz.getMatchLen(reps[rep], avail);
 
             if (repLens[rep] < MATCH_LEN_MIN) {
@@ -133,7 +133,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
 
             // Return if it is at least niceLen bytes long.
             if (mainLen >= niceLen) {
-                back = mainDist + REPS;
+                back = mainDist + reps.length;
                 skip(mainLen - 1);
                 return mainLen;
             }
@@ -192,14 +192,14 @@ final class LzmaEncoderNormal extends LzmaEncoder {
         // updateOptStateAndReps() will need these to get the new
         // state and reps for the next byte.
         opts[0].state.set(state);
-        System.arraycopy(reps, 0, opts[0].reps, 0, REPS);
+        System.arraycopy(reps, 0, opts[0].reps, 0, reps.length);
 
         // Initialize the prices for latter opts that will be used below.
         for (int i = optEnd; i >= MATCH_LEN_MIN; --i)
             opts[i].reset();
 
         // Calculate the prices of repeated matches of all lengths.
-        for (int rep = 0; rep < REPS; ++rep) {
+        for (int rep = 0; rep < reps.length; ++rep) {
             int repLen = repLens[rep];
             if (repLen < MATCH_LEN_MIN)
                 continue;
@@ -232,7 +232,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
                     int price = getMatchAndLenPrice(normalMatchPrice,
                             dist, len, posState);
                     if (price < opts[len].price)
-                        opts[len].set1(price, 0, dist + REPS);
+                        opts[len].set1(price, 0, dist + reps.length);
 
                     if (len == matches.len[i])
                         if (++i == matches.count)
@@ -290,7 +290,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
 
             if (opts[optCur].hasPrev2) {
                 opts[optCur].state.set(opts[opts[optCur].optPrev2].state);
-                if (opts[optCur].backPrev2 < REPS)
+                if (opts[optCur].backPrev2 < reps.length)
                     opts[optCur].state.updateLongRep();
                 else
                     opts[optCur].state.updateMatch();
@@ -313,7 +313,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
                 opts[optCur].state.updateLiteral();
 
             System.arraycopy(opts[optPrev].reps, 0,
-                    opts[optCur].reps, 0, REPS);
+                    opts[optCur].reps, 0, reps.length);
         } else {
             int back;
             if (opts[optCur].prev1IsLiteral && opts[optCur].hasPrev2) {
@@ -322,25 +322,25 @@ final class LzmaEncoderNormal extends LzmaEncoder {
                 opts[optCur].state.updateLongRep();
             } else {
                 back = opts[optCur].backPrev;
-                if (back < REPS)
+                if (back < reps.length)
                     opts[optCur].state.updateLongRep();
                 else
                     opts[optCur].state.updateMatch();
             }
 
-            if (back < REPS) {
+            if (back < reps.length) {
                 opts[optCur].reps[0] = opts[optPrev].reps[back];
 
                 int rep;
                 for (rep = 1; rep <= back; ++rep)
                     opts[optCur].reps[rep] = opts[optPrev].reps[rep - 1];
 
-                for (; rep < REPS; ++rep)
+                for (; rep < reps.length; ++rep)
                     opts[optCur].reps[rep] = opts[optPrev].reps[rep];
             } else {
-                opts[optCur].reps[0] = back - REPS;
+                opts[optCur].reps[0] = back - reps.length;
                 System.arraycopy(opts[optPrev].reps, 0,
-                        opts[optCur].reps, 1, REPS - 1);
+                        opts[optCur].reps, 1, reps.length - 1);
             }
         }
     }
@@ -409,7 +409,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
         int startLen = MATCH_LEN_MIN;
         int lenLimit = Math.min(avail, niceLen);
 
-        for (int rep = 0; rep < REPS; ++rep) {
+        for (int rep = 0; rep < reps.length; ++rep) {
             int len = lz.getMatchLen(opts[optCur].reps[rep], lenLimit);
             if (len < MATCH_LEN_MIN)
                 continue;
@@ -503,7 +503,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
                     dist, len, posState);
             if (matchAndLenPrice < opts[optCur + len].price)
                 opts[optCur + len].set1(matchAndLenPrice,
-                        optCur, dist + REPS);
+                        optCur, dist + reps.length);
 
             if (len != matches.len[match])
                 continue;
@@ -536,7 +536,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
                     opts[++optEnd].reset();
 
                 if (price < opts[i].price)
-                    opts[i].set3(price, optCur, dist + REPS, len, 0);
+                    opts[i].set3(price, optCur, dist + reps.length, len, 0);
             }
 
             if (++match == matches.count)
