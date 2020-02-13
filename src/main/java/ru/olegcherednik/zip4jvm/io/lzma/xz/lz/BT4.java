@@ -23,12 +23,9 @@ final class BT4 extends LZEncoder {
     private int cyclicPos = -1;
     private int lzPos;
 
-    static int getMemoryUsage(int dictSize) {
-        return Hash234.getMemoryUsage(dictSize) + dictSize / (1024 / 8) + 10;
-    }
 
-    BT4(int dictSize, int beforeSizeMin, int readAheadMax, int niceLen, int matchLenMax, int depthLimit) {
-        super(dictSize, beforeSizeMin, readAheadMax, niceLen, matchLenMax);
+    BT4(int dictSize, int readAheadMax, int niceLen, int matchLenMax, int depthLimit) {
+        super(dictSize,  readAheadMax, niceLen, matchLenMax);
 
         cyclicSize = dictSize + 1;
         lzPos = cyclicSize;

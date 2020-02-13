@@ -60,67 +60,38 @@ public abstract class LZEncoder {
      * Gets the size of the LZ window buffer that needs to be allocated.
      */
     private static int getBufSize(
-            int dictSize, int extraSizeBefore, int extraSizeAfter,
+            int dictSize, int extraSizeAfter,
             int matchLenMax) {
-        int keepSizeBefore = extraSizeBefore + dictSize;
+        int keepSizeBefore = dictSize;
         int keepSizeAfter = extraSizeAfter + matchLenMax;
         int reserveSize = Math.min(dictSize / 2 + (256 << 10), 512 << 20);
         return keepSizeBefore + keepSizeAfter + reserveSize;
     }
 
     /**
-     * Gets approximate memory usage of the LZEncoder base structure and
-     * the match finder as kibibytes.
-     */
-    public static int getMemoryUsage(
-            int dictSize, int extraSizeBefore, int extraSizeAfter,
-            int matchLenMax, int mf) {
-        // Buffer size + a little extra
-        int m = getBufSize(dictSize, extraSizeBefore, extraSizeAfter,
-                matchLenMax) / 1024 + 10;
-
-        switch (mf) {
-            case MF_HC4:
-                m += HC4.getMemoryUsage(dictSize);
-                break;
-
-            case MF_BT4:
-                m += BT4.getMemoryUsage(dictSize);
-                break;
-
-            default:
-                throw new IllegalArgumentException();
-        }
-
-        return m;
-    }
-
-    /**
      * Creates a new LZEncoder.
      * <p>
      *
-     * @param dictSize        dictionary size
-     * @param extraSizeBefore number of bytes to keep available in the
-     *                        history in addition to dictSize
-     * @param extraSizeAfter  number of bytes that must be available
-     *                        after current position + matchLenMax
-     * @param niceLen         if a match of at least <code>niceLen</code>
-     *                        bytes is found, be happy with it and don't
-     *                        stop looking for longer matches
-     * @param matchLenMax     don't test for matches longer than
-     *                        <code>matchLenMax</code> bytes
-     * @param mf              match finder ID
-     * @param depthLimit      match finder search depth limit
+     * @param dictSize       dictionary size
+     * @param extraSizeAfter number of bytes that must be available
+     *                       after current position + matchLenMax
+     * @param niceLen        if a match of at least <code>niceLen</code>
+     *                       bytes is found, be happy with it and don't
+     *                       stop looking for longer matches
+     * @param matchLenMax    don't test for matches longer than
+     *                       <code>matchLenMax</code> bytes
+     * @param mf             match finder ID
+     * @param depthLimit     match finder search depth limit
      */
     public static LZEncoder create(
-            int dictSize, int extraSizeBefore, int extraSizeAfter,
+            int dictSize, int extraSizeAfter,
             int niceLen, int matchLenMax, int mf, int depthLimit) {
         switch (mf) {
             case MF_HC4:
-                return new HC4(dictSize, extraSizeBefore, extraSizeAfter, niceLen, matchLenMax, depthLimit);
+                return new HC4(dictSize, extraSizeAfter, niceLen, matchLenMax, depthLimit);
 
             case MF_BT4:
-                return new BT4(dictSize, extraSizeBefore, extraSizeAfter, niceLen, matchLenMax, depthLimit);
+                return new BT4(dictSize, extraSizeAfter, niceLen, matchLenMax, depthLimit);
         }
 
         throw new IllegalArgumentException();
@@ -129,12 +100,12 @@ public abstract class LZEncoder {
     /**
      * Creates a new LZEncoder. See <code>getInstance</code>.
      */
-    LZEncoder(int dictSize, int extraSizeBefore, int extraSizeAfter, int niceLen, int matchLenMax) {
-        bufSize = getBufSize(dictSize, extraSizeBefore, extraSizeAfter,
+    LZEncoder(int dictSize, int extraSizeAfter, int niceLen, int matchLenMax) {
+        bufSize = getBufSize(dictSize, extraSizeAfter,
                 matchLenMax);
         buf = ArrayCache.getDefaultCache().getByteArray(bufSize, false);
 
-        keepSizeBefore = extraSizeBefore + dictSize;
+        keepSizeBefore = dictSize;
         keepSizeAfter = extraSizeAfter + matchLenMax;
 
         this.matchLenMax = matchLenMax;

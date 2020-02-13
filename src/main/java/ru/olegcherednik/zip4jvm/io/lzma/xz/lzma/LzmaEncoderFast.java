@@ -17,18 +17,16 @@ import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeEncoder;
 
 final class LzmaEncoderFast extends LzmaEncoder {
 
-    private static final int EXTRA_SIZE_BEFORE = 1;
     private static final int EXTRA_SIZE_AFTER = MATCH_LEN_MAX - 1;
 
     private Matches matches = null;
 
-    LzmaEncoderFast(RangeEncoder rc, LzmaInputStream.Properties properties, int extraSizeBefore, int niceLen, int mf, int depthLimit) {
-        super(rc, createEncoder(properties, extraSizeBefore, niceLen, mf, depthLimit), properties, niceLen);
+    LzmaEncoderFast(RangeEncoder rc, LzmaInputStream.Properties properties, int niceLen, int mf, int depthLimit) {
+        super(rc, createEncoder(properties, niceLen, mf, depthLimit), properties, niceLen);
     }
 
-    private static LZEncoder createEncoder(LzmaInputStream.Properties properties, int extraSizeBefore, int niceLen, int mf, int depthLimit) {
-        return LZEncoder.create(properties.getDictionarySize(), Math.max(extraSizeBefore, EXTRA_SIZE_BEFORE), EXTRA_SIZE_AFTER, niceLen,
-                MATCH_LEN_MAX, mf, depthLimit);
+    private static LZEncoder createEncoder(LzmaInputStream.Properties properties, int niceLen, int mf, int depthLimit) {
+        return LZEncoder.create(properties.getDictionarySize(), EXTRA_SIZE_AFTER, niceLen, MATCH_LEN_MAX, mf, depthLimit);
     }
 
     private boolean changePair(int smallDist, int bigDist) {

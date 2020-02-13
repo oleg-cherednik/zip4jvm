@@ -60,14 +60,14 @@ public abstract class LzmaEncoder extends LZMACoder {
     int readAhead = -1;
     private int uncompressedSize = 0;
 
-    public static LzmaEncoder create(RangeEncoder rc, LzmaInputStream.Properties properties, int mode, int extraSizeBefore, int niceLen, int mf,
+    public static LzmaEncoder create(RangeEncoder rc, LzmaInputStream.Properties properties, int niceLen, int mf,
             int depthLimit) {
 
-        switch (mode) {
+        switch (properties.getMode()) {
             case MODE_FAST:
-                return new LzmaEncoderFast(rc, properties, extraSizeBefore, niceLen, mf, depthLimit);
+                return new LzmaEncoderFast(rc, properties, niceLen, mf, depthLimit);
             case MODE_NORMAL:
-                return new LzmaEncoderNormal(rc, properties, extraSizeBefore, niceLen, mf, depthLimit);
+                return new LzmaEncoderNormal(rc, properties, niceLen, mf, depthLimit);
         }
 
         throw new IllegalArgumentException();

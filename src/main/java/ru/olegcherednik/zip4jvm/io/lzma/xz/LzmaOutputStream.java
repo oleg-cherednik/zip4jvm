@@ -56,8 +56,8 @@ public class LzmaOutputStream extends OutputStream {
         this.uncompressedSize = uncompressedSize;
 
         dictionarySize = properties.getDictionarySize();
-        lzma = LzmaEncoder.create(new RangeEncoder(out), properties, properties.getMode(), 0, properties.getNiceLength(),
-                properties.getMatchFinder(), properties.getDepthLimit());
+        lzma = LzmaEncoder.create(new RangeEncoder(out), properties, properties.getNiceLength(), properties.getMatchFinder(),
+                properties.getDepthLimit());
 
         props = (properties.getPb() * 5 + properties.getLp()) * 9 + properties.getLc();
     }

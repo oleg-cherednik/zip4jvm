@@ -9,7 +9,6 @@ final class LzmaEncoderNormal extends LzmaEncoder {
 
     private static final int OPTS = 4096;
 
-    private static final int EXTRA_SIZE_BEFORE = OPTS;
     private static final int EXTRA_SIZE_AFTER = OPTS;
 
     private final Optimum[] opts = new Optimum[OPTS];
@@ -23,15 +22,15 @@ final class LzmaEncoderNormal extends LzmaEncoder {
     private final int[] repLens = new int[REPS];
     private final State nextState = new State();
 
-    LzmaEncoderNormal(RangeEncoder rc, LzmaInputStream.Properties properties, int extraSizeBefore, int niceLen, int mf, int depthLimit) {
-        super(rc, createEncoder(properties, extraSizeBefore, niceLen, mf, depthLimit), properties, niceLen);
+    LzmaEncoderNormal(RangeEncoder rc, LzmaInputStream.Properties properties, int niceLen, int mf, int depthLimit) {
+        super(rc, createEncoder(properties, niceLen, mf, depthLimit), properties, niceLen);
 
         for (int i = 0; i < OPTS; ++i)
             opts[i] = new Optimum();
     }
 
-    private static LZEncoder createEncoder(LzmaInputStream.Properties properties, int extraSizeBefore, int niceLen, int mf, int depthLimit) {
-        return LZEncoder.create(properties.getDictionarySize(), Math.max(extraSizeBefore, EXTRA_SIZE_BEFORE), EXTRA_SIZE_AFTER, niceLen,
+    private static LZEncoder createEncoder(LzmaInputStream.Properties properties, int niceLen, int mf, int depthLimit) {
+        return LZEncoder.create(properties.getDictionarySize(), EXTRA_SIZE_AFTER, niceLen,
                 MATCH_LEN_MAX, mf, depthLimit);
     }
 

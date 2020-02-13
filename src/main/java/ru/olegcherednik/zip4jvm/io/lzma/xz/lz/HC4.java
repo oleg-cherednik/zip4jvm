@@ -34,9 +34,9 @@ final class HC4 extends LZEncoder {
      * Creates a new LZEncoder with the HC4 match finder.
      * See <code>LZEncoder.getInstance</code> for parameter descriptions.
      */
-    HC4(int dictSize, int beforeSizeMin, int readAheadMax,
+    HC4(int dictSize, int readAheadMax,
             int niceLen, int matchLenMax, int depthLimit) {
-        super(dictSize, beforeSizeMin, readAheadMax, niceLen, matchLenMax);
+        super(dictSize, readAheadMax, niceLen, matchLenMax);
 
         hash = new Hash234(dictSize);
 
