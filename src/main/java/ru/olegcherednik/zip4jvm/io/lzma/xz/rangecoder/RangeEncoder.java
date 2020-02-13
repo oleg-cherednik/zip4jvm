@@ -1,18 +1,11 @@
-/*
- * RangeEncoder
- *
- * Authors: Lasse Collin <lasse.collin@tukaani.org>
- *          Igor Pavlov <http://7-zip.org/>
- *
- * This file has been put into the public domain.
- * You can do whatever you want with this file.
- */
-
 package ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder;
+
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 import java.io.IOException;
 
-public abstract class RangeEncoder extends RangeCoder {
+public class RangeEncoder extends RangeCoder {
+
     private static final int MOVE_REDUCING_BITS = 4;
     private static final int BIT_PRICE_SHIFT_BITS = 4;
 
@@ -31,7 +24,7 @@ public abstract class RangeEncoder extends RangeCoder {
 
     static {
         for (int i = (1 << MOVE_REDUCING_BITS) / 2; i < BIT_MODEL_TOTAL;
-                i += (1 << MOVE_REDUCING_BITS)) {
+             i += (1 << MOVE_REDUCING_BITS)) {
             int w = i;
             int bitCount = 0;
 
@@ -47,8 +40,15 @@ public abstract class RangeEncoder extends RangeCoder {
 
             prices[i >> MOVE_REDUCING_BITS]
                     = (BIT_MODEL_TOTAL_BITS << BIT_PRICE_SHIFT_BITS)
-                      - 15 - bitCount;
+                    - 15 - bitCount;
         }
+    }
+
+    private final DataOutput out;
+
+    public RangeEncoder(DataOutput out) {
+        this.out = out;
+        reset();
     }
 
     public void reset() {
@@ -76,7 +76,9 @@ public abstract class RangeEncoder extends RangeCoder {
         return -1;
     }
 
-    abstract void writeByte(int b) throws IOException;
+    void writeByte(int b) throws IOException {
+        out.writeByte(b);
+    }
 
     private void shiftLow() throws IOException {
         int lowHi = (int)(low >>> 32);
@@ -122,7 +124,7 @@ public abstract class RangeEncoder extends RangeCoder {
         // NOTE: Unlike in encodeBit(), here bit must be 0 or 1.
         assert bit == 0 || bit == 1;
         return prices[(prob ^ ((-bit) & (BIT_MODEL_TOTAL - 1)))
-                      >>> MOVE_REDUCING_BITS];
+                >>> MOVE_REDUCING_BITS];
     }
 
     public void encodeBitTree(short[] probs, int symbol) throws IOException {
@@ -196,5 +198,10 @@ public abstract class RangeEncoder extends RangeCoder {
 
     public static int getDirectBitsPrice(int count) {
         return count << BIT_PRICE_SHIFT_BITS;
+    }
+
+    @Override
+    public void close() throws IOException {
+        out.close();
     }
 }

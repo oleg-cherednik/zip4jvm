@@ -69,28 +69,6 @@ public abstract class LZMAEncoder extends LZMACoder {
     int readAhead = -1;
     private int uncompressedSize = 0;
 
-    public static int getMemoryUsage(int mode, int dictSize,
-            int extraSizeBefore, int mf) {
-        int m = 80;
-
-        switch (mode) {
-            case MODE_FAST:
-                m += LZMAEncoderFast.getMemoryUsage(
-                        dictSize, extraSizeBefore, mf);
-                break;
-
-            case MODE_NORMAL:
-                m += LZMAEncoderNormal.getMemoryUsage(
-                        dictSize, extraSizeBefore, mf);
-                break;
-
-            default:
-                throw new IllegalArgumentException();
-        }
-
-        return m;
-    }
-
     public static LZMAEncoder getInstance(
             RangeEncoder rc, int lc, int lp, int pb, int mode,
             int dictSize, int extraSizeBefore,
@@ -534,6 +512,9 @@ public abstract class LZMAEncoder extends LZMACoder {
         repLenEncoder.updatePrices();
     }
 
+    public void finish() throws IOException {
+        rc.finish();
+    }
 
     class LiteralEncoder extends LiteralCoder {
 

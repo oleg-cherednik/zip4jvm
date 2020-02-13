@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.lzma.xz;
 
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LZMAEncoder;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeEncoderToStream;
+import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeEncoder;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 import java.io.IOException;
@@ -18,7 +18,6 @@ public class LzmaOutputStream extends OutputStream {
 
     private final ArrayCache arrayCache = ArrayCache.getDefaultCache();
 
-    private final RangeEncoderToStream rc;
     private LZMAEncoder lzma;
 
     private final int props;
@@ -49,11 +48,10 @@ public class LzmaOutputStream extends OutputStream {
      */
     public LzmaOutputStream(DataOutput out, LZMA2Options options, long uncompressedSize) throws IOException {
         this.out = out;
-        rc = new RangeEncoderToStream(out);
         this.uncompressedSize = uncompressedSize;
 
         dictSize = options.getDictionarySize();
-        lzma = LZMAEncoder.getInstance(rc,
+        lzma = LZMAEncoder.getInstance(new RangeEncoder(out),
                 options.getLc(), options.getLp(), options.getPb(),
                 options.getMode(),
                 dictSize, 0, options.getNiceLength(),
@@ -141,7 +139,7 @@ public class LzmaOutputStream extends OutputStream {
                 if (uncompressedSize == -1)
                     lzma.encodeLZMA1EndMarker();
 
-                rc.finish();
+                lzma.finish();
             } catch(IOException e) {
                 exception = e;
                 throw e;
