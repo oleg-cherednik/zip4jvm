@@ -22,8 +22,8 @@ final class LzmaEncoderNormal extends LzmaEncoder {
     private final int[] repLens = new int[4];
     private final State nextState = new State();
 
-    LzmaEncoderNormal(RangeEncoder rc, LzmaInputStream.Properties properties) {
-        super(rc, createEncoder(properties), properties);
+    public LzmaEncoderNormal(RangeEncoder raceEncoder, LzmaInputStream.Properties properties) {
+        super(raceEncoder, createEncoder(properties), properties);
 
         for (int i = 0; i < OPTS; ++i)
             opts[i] = new Optimum();
@@ -76,7 +76,8 @@ final class LzmaEncoderNormal extends LzmaEncoder {
         return optCur;
     }
 
-    int getNextSymbol() {
+    @Override
+    public int getNextSymbol() {
         // If there are pending symbols from an earlier call to this
         // function, return those symbols first.
         if (optCur < optEnd) {

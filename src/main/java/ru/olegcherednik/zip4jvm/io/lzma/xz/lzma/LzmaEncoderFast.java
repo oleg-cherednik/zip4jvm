@@ -1,13 +1,3 @@
-/*
- * LZMAEncoderFast
- *
- * Authors: Lasse Collin <lasse.collin@tukaani.org>
- *          Igor Pavlov <http://7-zip.org/>
- *
- * This file has been put into the public domain.
- * You can do whatever you want with this file.
- */
-
 package ru.olegcherednik.zip4jvm.io.lzma.xz.lzma;
 
 import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaInputStream;
@@ -17,23 +7,18 @@ import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeEncoder;
 
 final class LzmaEncoderFast extends LzmaEncoder {
 
-    private static final int EXTRA_SIZE_AFTER = MATCH_LEN_MAX - 1;
+    private Matches matches;
 
-    private Matches matches = null;
-
-    LzmaEncoderFast(RangeEncoder rc, LzmaInputStream.Properties properties) {
-        super(rc, createEncoder(properties), properties);
+    public LzmaEncoderFast(RangeEncoder raceEncoder, LzmaInputStream.Properties properties) {
+        super(raceEncoder, createEncoder(properties), properties);
     }
 
     private static LZEncoder createEncoder(LzmaInputStream.Properties properties) {
-        return LZEncoder.create(properties, EXTRA_SIZE_AFTER);
+        return LZEncoder.create(properties, MATCH_LEN_MAX - 1);
     }
 
-    private boolean changePair(int smallDist, int bigDist) {
-        return smallDist < (bigDist >>> 7);
-    }
-
-    int getNextSymbol() {
+    @Override
+    public int getNextSymbol() {
         // Get the matches for the next byte unless readAhead indicates
         // that we already got the new matches during the previous call
         // to this function.
@@ -138,6 +123,10 @@ final class LzmaEncoderFast extends LzmaEncoder {
         back = mainDist + reps.length;
         skip(mainLen - 2);
         return mainLen;
+    }
+
+    private static boolean changePair(int smallDist, int bigDist) {
+        return smallDist < (bigDist >>> 7);
     }
 
 }
