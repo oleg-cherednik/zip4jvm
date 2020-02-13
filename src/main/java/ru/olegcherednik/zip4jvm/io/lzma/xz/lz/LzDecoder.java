@@ -4,7 +4,7 @@ import ru.olegcherednik.zip4jvm.io.lzma.xz.exceptions.CorruptedInputException;
 
 import java.io.IOException;
 
-public final class LZDecoder {
+public final class LzDecoder {
 
     private final byte[] buf;
     private int start;
@@ -14,15 +14,12 @@ public final class LZDecoder {
     private int pendingLen;
     private int pendingDist;
 
-    public LZDecoder(int size) {
+    public LzDecoder(int size) {
         buf = new byte[size];
     }
 
     public void setLimit(int outMax) {
-        if (buf.length - pos <= outMax)
-            limit = buf.length;
-        else
-            limit = pos + outMax;
+        limit = buf.length - pos <= outMax ? buf.length : pos + outMax;
     }
 
     public boolean hasSpace() {
@@ -38,11 +35,12 @@ public final class LZDecoder {
     }
 
     public int getByte(int dist) {
-        int offset = pos - dist - 1;
-        if (dist >= pos)
-            offset += buf.length;
+        int offs = pos - dist - 1;
 
-        return buf[offset] & 0xFF;
+        if (dist >= pos)
+            offs += buf.length;
+
+        return buf[offs] & 0xFF;
     }
 
     public void putByte(byte b) {

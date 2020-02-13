@@ -1,22 +1,12 @@
-/*
- * Hash Chain match finder with 2-, 3-, and 4-byte hashing
- *
- * Authors: Lasse Collin <lasse.collin@tukaani.org>
- *          Igor Pavlov <http://7-zip.org/>
- *
- * This file has been put into the public domain.
- * You can do whatever you want with this file.
- */
-
 package ru.olegcherednik.zip4jvm.io.lzma.xz.lz;
 
 import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaInputStream;
 
 import static ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LZMACoder.MATCH_LEN_MAX;
 
-final class HashChain extends LZEncoder {
+final class HashChain extends LzEncoder {
 
-    private final Hash234 hash;
+    private final CRC32Hash hash;
     private final int[] chain;
     private final Matches matches;
     private final int depthLimit;
@@ -32,7 +22,7 @@ final class HashChain extends LZEncoder {
     public HashChain(LzmaInputStream.Properties properties, int readAheadMax) {
         super(properties, readAheadMax);
 
-        hash = new Hash234(properties.getDictionarySize());
+        hash = new CRC32Hash(properties.getDictionarySize());
 
         // +1 because we need dictSize bytes of history + the current byte.
         cyclicSize = properties.getDictionarySize() + 1;

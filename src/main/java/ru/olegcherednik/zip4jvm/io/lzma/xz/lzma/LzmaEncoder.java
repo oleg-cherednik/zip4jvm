@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.lzma.xz.lzma;
 
 import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaInputStream;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LZEncoder;
+import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LzEncoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.Matches;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeEncoder;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
@@ -38,7 +38,7 @@ public abstract class LzmaEncoder extends LZMACoder {
     private static final int ALIGN_PRICE_UPDATE_INTERVAL = ALIGN_SIZE;
 
     private final RangeEncoder rangeEncoder;
-    final LZEncoder lz;
+    final LzEncoder lz;
     final LiteralEncoder literalEncoder;
     final LengthEncoder matchLenEncoder;
     final LengthEncoder repLenEncoder;
@@ -95,7 +95,7 @@ public abstract class LzmaEncoder extends LZMACoder {
         return (i << 1) + ((dist >>> (i - 1)) & 1);
     }
 
-    LzmaEncoder(DataOutput out, LZEncoder lz, LzmaInputStream.Properties properties) {
+    LzmaEncoder(DataOutput out, LzEncoder lz, LzmaInputStream.Properties properties) {
         super(properties);
         rangeEncoder = new RangeEncoder(out);
         this.lz = lz;
@@ -111,7 +111,7 @@ public abstract class LzmaEncoder extends LZMACoder {
         reset();
     }
 
-    public LZEncoder getLZEncoder() {
+    public LzEncoder getLZEncoder() {
         return lz;
     }
 

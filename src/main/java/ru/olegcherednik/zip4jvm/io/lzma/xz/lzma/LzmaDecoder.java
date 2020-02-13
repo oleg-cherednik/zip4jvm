@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.io.lzma.xz.lzma;
 import lombok.Getter;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaOutputStream;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LZDecoder;
+import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LzDecoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeDecoder;
 
 import java.io.IOException;
@@ -11,7 +11,7 @@ import java.io.IOException;
 @Getter
 public final class LzmaDecoder extends LZMACoder {
 
-    private final LZDecoder lz;
+    private final LzDecoder lz;
     private final RangeDecoder rc;
     private final LiteralDecoder literalDecoder;
     private final LengthDecoder matchLenDecoder = new LengthDecoder();
@@ -23,7 +23,7 @@ public final class LzmaDecoder extends LZMACoder {
 
     private LzmaDecoder(DataInput in, LzmaOutputStream.Properties properties) throws IOException {
         super(properties);
-        lz = new LZDecoder(properties.getDictionarySize());
+        lz = new LzDecoder(properties.getDictionarySize());
         rc = new RangeDecoder(in);
         literalDecoder = new LiteralDecoder(properties);
         reset();

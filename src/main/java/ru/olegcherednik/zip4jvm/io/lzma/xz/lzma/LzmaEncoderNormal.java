@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.lzma.xz.lzma;
 
 import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaInputStream;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LZEncoder;
+import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LzEncoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.Matches;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
@@ -27,7 +27,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
             opts[i] = new Optimum();
     }
 
-    private static LZEncoder createEncoder(LzmaInputStream.Properties properties) {
+    private static LzEncoder createEncoder(LzmaInputStream.Properties properties) {
         return properties.getMatchFinder().createEncoder(properties, OPTS);
     }
 

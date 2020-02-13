@@ -1,22 +1,12 @@
-/*
- * Binary Tree match finder with 2-, 3-, and 4-byte hashing
- *
- * Authors: Lasse Collin <lasse.collin@tukaani.org>
- *          Igor Pavlov <http://7-zip.org/>
- *
- * This file has been put into the public domain.
- * You can do whatever you want with this file.
- */
-
 package ru.olegcherednik.zip4jvm.io.lzma.xz.lz;
 
 import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaInputStream;
 
 import static ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LZMACoder.MATCH_LEN_MAX;
 
-final class BinaryTree extends LZEncoder {
+final class BinaryTree extends LzEncoder {
 
-    private final Hash234 hash;
+    private final CRC32Hash hash;
     private final int[] tree;
     private final Matches matches;
     private final int depthLimit;
@@ -32,7 +22,7 @@ final class BinaryTree extends LZEncoder {
         cyclicSize = properties.getDictionarySize() + 1;
         lzPos = cyclicSize;
 
-        hash = new Hash234(properties.getDictionarySize());
+        hash = new CRC32Hash(properties.getDictionarySize());
         tree = new int[cyclicSize * 2];
 
         // Substracting 1 because the shortest match that this match

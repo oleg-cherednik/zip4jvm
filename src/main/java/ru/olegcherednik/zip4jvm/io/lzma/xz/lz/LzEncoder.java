@@ -7,7 +7,7 @@ import java.io.OutputStream;
 
 import static ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LZMACoder.MATCH_LEN_MAX;
 
-public abstract class LZEncoder {
+public abstract class LzEncoder {
 
     /**
      * Number of bytes to keep available before the current byte
@@ -56,7 +56,7 @@ public abstract class LZEncoder {
     /**
      * Creates a new LZEncoder. See <code>getInstance</code>.
      */
-    LZEncoder(LzmaInputStream.Properties properties, int extraSizeAfter) {
+    protected LzEncoder(LzmaInputStream.Properties properties, int extraSizeAfter) {
         int size = getBufSize(properties.getDictionarySize(), extraSizeAfter);
         buf = new byte[size];
 
