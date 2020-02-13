@@ -1,15 +1,14 @@
-package ru.olegcherednik.zip4jvm.io.lzma.xz.lzma;
+package ru.olegcherednik.zip4jvm.io.lzma;
 
 import lombok.Getter;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaOutputStream;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LzDecoder;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeDecoder;
+import ru.olegcherednik.zip4jvm.io.lzma.lz.LzDecoder;
+import ru.olegcherednik.zip4jvm.io.lzma.rangecoder.RangeDecoder;
 
 import java.io.IOException;
 
 @Getter
-public final class LzmaDecoder extends LZMACoder {
+public final class LzmaDecoder extends LzmaCoder {
 
     private final LzDecoder lz;
     private final RangeDecoder rc;

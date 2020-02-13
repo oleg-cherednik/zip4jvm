@@ -1,6 +1,6 @@
-package ru.olegcherednik.zip4jvm.io.lzma.xz.lz;
+package ru.olegcherednik.zip4jvm.io.lzma.lz;
 
-import ru.olegcherednik.zip4jvm.io.lzma.xz.exceptions.CorruptedInputException;
+import ru.olegcherednik.zip4jvm.io.lzma.exceptions.CorruptedInputException;
 
 import java.io.IOException;
 

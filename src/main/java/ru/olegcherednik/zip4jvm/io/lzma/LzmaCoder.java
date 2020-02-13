@@ -1,13 +1,11 @@
-package ru.olegcherednik.zip4jvm.io.lzma.xz.lzma;
+package ru.olegcherednik.zip4jvm.io.lzma;
 
-import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaInputStream;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaOutputStream;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeCoder;
+import ru.olegcherednik.zip4jvm.io.lzma.rangecoder.RangeCoder;
 
 import java.io.Closeable;
 import java.io.IOException;
 
-public abstract class LZMACoder implements Closeable {
+public abstract class LzmaCoder implements Closeable {
     static final int POS_STATES_MAX = 1 << 4;
 
     static final int MATCH_LEN_MIN = 2;
@@ -50,11 +48,11 @@ public abstract class LZMACoder implements Closeable {
                : DIST_STATES - 1;
     }
 
-    LZMACoder(LzmaOutputStream.Properties properties) {
+    LzmaCoder(LzmaOutputStream.Properties properties) {
         posMask = (1 << properties.getPb()) - 1;
     }
 
-    LZMACoder(LzmaInputStream.Properties properties) {
+    LzmaCoder(LzmaInputStream.Properties properties) {
         posMask = (1 << properties.getPb()) - 1;
     }
 

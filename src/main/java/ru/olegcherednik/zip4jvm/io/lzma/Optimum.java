@@ -8,7 +8,7 @@
  * You can do whatever you want with this file.
  */
 
-package ru.olegcherednik.zip4jvm.io.lzma.xz.lzma;
+package ru.olegcherednik.zip4jvm.io.lzma;
 
 final class Optimum {
     private static final int INFINITY_PRICE = 1 << 30;

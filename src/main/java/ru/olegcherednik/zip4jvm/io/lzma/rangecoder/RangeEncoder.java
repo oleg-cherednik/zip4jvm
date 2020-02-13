@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder;
+package ru.olegcherednik.zip4jvm.io.lzma.rangecoder;
 
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 

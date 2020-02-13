@@ -1,7 +1,7 @@
-package ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder;
+package ru.olegcherednik.zip4jvm.io.lzma.rangecoder;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.exceptions.CorruptedInputException;
+import ru.olegcherednik.zip4jvm.io.lzma.exceptions.CorruptedInputException;
 
 import java.io.IOException;
 

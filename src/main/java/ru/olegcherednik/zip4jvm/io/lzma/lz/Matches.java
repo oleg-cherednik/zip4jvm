@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.io.lzma.xz.lz;
+package ru.olegcherednik.zip4jvm.io.lzma.lz;
 
 public final class Matches {
 

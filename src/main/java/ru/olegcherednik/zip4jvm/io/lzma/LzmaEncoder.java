@@ -1,14 +1,13 @@
-package ru.olegcherednik.zip4jvm.io.lzma.xz.lzma;
+package ru.olegcherednik.zip4jvm.io.lzma;
 
-import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaInputStream;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LzEncoder;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.Matches;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeEncoder;
+import ru.olegcherednik.zip4jvm.io.lzma.lz.LzEncoder;
+import ru.olegcherednik.zip4jvm.io.lzma.lz.Matches;
+import ru.olegcherednik.zip4jvm.io.lzma.rangecoder.RangeEncoder;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 import java.io.IOException;
 
-public abstract class LzmaEncoder extends LZMACoder {
+public abstract class LzmaEncoder extends LzmaCoder {
 
     /**
      * LZMA2 chunk is considered full when its uncompressed size exceeds

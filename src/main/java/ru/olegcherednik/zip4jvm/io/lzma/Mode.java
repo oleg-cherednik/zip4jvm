@@ -1,6 +1,5 @@
-package ru.olegcherednik.zip4jvm.io.lzma.xz.lzma;
+package ru.olegcherednik.zip4jvm.io.lzma;
 
-import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaInputStream;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 /**

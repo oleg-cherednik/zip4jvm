@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.out.entry;
 
-import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaInputStream;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaOutputStream;
+import ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream;
+import ru.olegcherednik.zip4jvm.io.lzma.LzmaOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 

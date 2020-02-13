@@ -1,13 +1,11 @@
-package ru.olegcherednik.zip4jvm.io.lzma.xz;
+package ru.olegcherednik.zip4jvm.io.lzma;
 
 import lombok.Getter;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.exceptions.CorruptedInputException;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.exceptions.MemoryLimitException;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.exceptions.UnsupportedOptionsException;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.MatchFinder;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LzmaDecoder;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.Mode;
+import ru.olegcherednik.zip4jvm.io.lzma.exceptions.CorruptedInputException;
+import ru.olegcherednik.zip4jvm.io.lzma.exceptions.MemoryLimitException;
+import ru.olegcherednik.zip4jvm.io.lzma.exceptions.UnsupportedOptionsException;
+import ru.olegcherednik.zip4jvm.io.lzma.lz.MatchFinder;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 import java.io.IOException;

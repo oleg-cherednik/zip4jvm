@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.io.lzma.xz.lz;
+package ru.olegcherednik.zip4jvm.io.lzma.lz;
 
 /**
  * Provides a CRC32 table using the polynomial from IEEE 802.3

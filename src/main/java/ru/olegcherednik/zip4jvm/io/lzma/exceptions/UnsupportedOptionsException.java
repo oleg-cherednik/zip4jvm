@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.io.lzma.xz.exceptions;
+package ru.olegcherednik.zip4jvm.io.lzma.exceptions;
 
 import java.io.IOException;
 

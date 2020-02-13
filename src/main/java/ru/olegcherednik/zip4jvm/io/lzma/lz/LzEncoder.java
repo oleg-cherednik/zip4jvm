@@ -1,11 +1,11 @@
-package ru.olegcherednik.zip4jvm.io.lzma.xz.lz;
+package ru.olegcherednik.zip4jvm.io.lzma.lz;
 
-import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaInputStream;
+import ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
-import static ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LZMACoder.MATCH_LEN_MAX;
+import static ru.olegcherednik.zip4jvm.io.lzma.LzmaCoder.MATCH_LEN_MAX;
 
 public abstract class LzEncoder {
 

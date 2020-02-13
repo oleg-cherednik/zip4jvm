@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder;
+package ru.olegcherednik.zip4jvm.io.lzma.rangecoder;
 
 import java.io.Closeable;
 import java.util.Arrays;

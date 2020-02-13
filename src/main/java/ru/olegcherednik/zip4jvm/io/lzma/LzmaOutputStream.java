@@ -1,11 +1,10 @@
-package ru.olegcherednik.zip4jvm.io.lzma.xz;
+package ru.olegcherednik.zip4jvm.io.lzma;
 
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LzmaEncoder;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 import java.io.IOException;
