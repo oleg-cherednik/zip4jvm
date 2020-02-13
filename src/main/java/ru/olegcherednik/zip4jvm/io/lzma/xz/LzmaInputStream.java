@@ -8,6 +8,7 @@ import ru.olegcherednik.zip4jvm.io.lzma.xz.exceptions.UnsupportedOptionsExceptio
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LZEncoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LzmaDecoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LzmaEncoder;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -336,6 +337,12 @@ public class LzmaInputStream extends InputStream {
                 niceLength = (compressionLevel == 4) ? 16 : (compressionLevel == 5) ? 32 : 64;
                 depthLimit = 0;
             }
+        }
+
+        public int write(DataOutput out) throws IOException {
+            out.writeByte((byte)((pb * 5 + lp) * 9 + lc));
+            out.writeDword(dictionarySize);
+            return 5;
         }
 
     }

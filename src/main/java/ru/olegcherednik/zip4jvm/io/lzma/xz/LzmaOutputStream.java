@@ -25,15 +25,13 @@ public class LzmaOutputStream extends OutputStream {
 
     private LzmaEncoder lzma;
 
-    private final int props;
     private final long uncompressedSize;
     private long currentUncompressedSize = 0;
 
     private boolean finished;
-    private IOException exception;
 
     private final byte[] tempBuf = new byte[1];
-    private final int dictionarySize;
+    private final LzmaInputStream.Properties properties;
 
     /**
      * Creates a new compressor for the legacy .lzma file format.
@@ -53,17 +51,13 @@ public class LzmaOutputStream extends OutputStream {
      */
     public LzmaOutputStream(DataOutput out, LzmaInputStream.Properties properties, long uncompressedSize) throws IOException {
         this.out = out;
+        this.properties = properties;
         this.uncompressedSize = uncompressedSize;
-
-        dictionarySize = properties.getDictionarySize();
-        lzma = LzmaEncoder.create(new RangeEncoder(out), properties, properties.getMatchFinder(), properties.getDepthLimit());
-
-        props = (properties.getPb() * 5 + properties.getLp()) * 9 + properties.getLc();
+        lzma = LzmaEncoder.create(new RangeEncoder(out), properties);
     }
 
     public void writeHeader() throws IOException {
-        out.writeByte(props);
-        out.writeDword(dictionarySize);
+        properties.write(out);
     }
 
     /**
@@ -84,9 +78,6 @@ public class LzmaOutputStream extends OutputStream {
         if (off < 0 || len < 0 || off + len < 0 || off + len > buf.length)
             throw new IndexOutOfBoundsException();
 
-        if (exception != null)
-            throw exception;
-
         if (finished)
             throw new IOException("Stream finished or closed");
 
@@ -97,16 +88,11 @@ public class LzmaOutputStream extends OutputStream {
 
         currentUncompressedSize += len;
 
-        try {
-            while (len > 0) {
-                int used = lzma.getLZEncoder().fillWindow(buf, off, len);
-                off += used;
-                len -= used;
-                lzma.encodeForLZMA1();
-            }
-        } catch(IOException e) {
-            exception = e;
-            throw e;
+        while (len > 0) {
+            int used = lzma.getLZEncoder().fillWindow(buf, off, len);
+            off += used;
+            len -= used;
+            lzma.encodeForLZMA1();
         }
     }
 
@@ -115,29 +101,20 @@ public class LzmaOutputStream extends OutputStream {
      */
     public void finish() throws IOException {
         if (!finished) {
-            if (exception != null)
-                throw exception;
+            if (uncompressedSize != -1
+                    && uncompressedSize != currentUncompressedSize)
+                throw new IOException("Expected uncompressed size ("
+                        + uncompressedSize + ") doesn't equal "
+                        + "the number of bytes written to the stream ("
+                        + currentUncompressedSize + ")");
 
-            try {
-                if (uncompressedSize != -1
-                        && uncompressedSize != currentUncompressedSize)
-                    throw new IOException("Expected uncompressed size ("
-                            + uncompressedSize + ") doesn't equal "
-                            + "the number of bytes written to the stream ("
-                            + currentUncompressedSize + ")");
+            lzma.getLZEncoder().setFinishing();
+            lzma.encodeForLZMA1();
 
-                lzma.getLZEncoder().setFinishing();
-                lzma.encodeForLZMA1();
+            if (uncompressedSize == -1)
+                lzma.encodeLZMA1EndMarker();
 
-                if (uncompressedSize == -1)
-                    lzma.encodeLZMA1EndMarker();
-
-                lzma.finish();
-            } catch(IOException e) {
-                exception = e;
-                throw e;
-            }
-
+            lzma.finish();
             finished = true;
 
             lzma.putArraysToCache(arrayCache);
@@ -154,15 +131,7 @@ public class LzmaOutputStream extends OutputStream {
         } catch(IOException e) {
         }
 
-        try {
-            out.close();
-        } catch(IOException e) {
-            if (exception == null)
-                exception = e;
-        }
-
-        if (exception != null)
-            throw exception;
+        out.close();
     }
 
     @Getter

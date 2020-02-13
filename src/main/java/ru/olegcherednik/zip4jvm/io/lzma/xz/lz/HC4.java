@@ -28,7 +28,7 @@ final class HC4 extends LZEncoder {
      * Creates a new LZEncoder with the HC4 match finder.
      * See <code>LZEncoder.getInstance</code> for parameter descriptions.
      */
-    HC4(LzmaInputStream.Properties properties, int readAheadMax, int matchLenMax, int depthLimit) {
+    HC4(LzmaInputStream.Properties properties, int readAheadMax, int matchLenMax) {
         super(properties, readAheadMax, matchLenMax);
 
         hash = new Hash234(properties.getDictionarySize());
@@ -46,7 +46,7 @@ final class HC4 extends LZEncoder {
         // Use a default depth limit if no other value was specified.
         // The default is just something based on experimentation;
         // it's nothing magic.
-        this.depthLimit = (depthLimit > 0) ? depthLimit : 4 + properties.getNiceLength() / 4;
+        this.depthLimit = properties.getDepthLimit() > 0 ? properties.getDepthLimit() : 4 + properties.getNiceLength() / 4;
     }
 
     public void putArraysToCache(ArrayCache arrayCache) {

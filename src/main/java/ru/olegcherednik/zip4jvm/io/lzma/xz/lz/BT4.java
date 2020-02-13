@@ -25,7 +25,7 @@ final class BT4 extends LZEncoder {
     private int lzPos;
 
 
-    BT4(LzmaInputStream.Properties properties, int readAheadMax, int matchLenMax, int depthLimit) {
+    BT4(LzmaInputStream.Properties properties, int readAheadMax, int matchLenMax) {
         super(properties, readAheadMax, matchLenMax);
 
         cyclicSize = properties.getDictionarySize() + 1;
@@ -39,7 +39,7 @@ final class BT4 extends LZEncoder {
         // space for one-byte matches.
         matches = new Matches(niceLen - 1);
 
-        this.depthLimit = depthLimit > 0 ? depthLimit : 16 + niceLen / 2;
+        this.depthLimit = properties.getDepthLimit() > 0 ? properties.getDepthLimit() : 16 + niceLen / 2;
     }
 
     public void putArraysToCache(ArrayCache arrayCache) {

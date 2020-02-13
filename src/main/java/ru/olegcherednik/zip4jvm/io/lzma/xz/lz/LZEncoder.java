@@ -77,16 +77,14 @@ public abstract class LZEncoder {
      *                       after current position + matchLenMax
      * @param matchLenMax    don't test for matches longer than
      *                       <code>matchLenMax</code> bytes
-     * @param mf             match finder ID
-     * @param depthLimit     match finder search depth limit
      */
-    public static LZEncoder create(LzmaInputStream.Properties properties, int extraSizeAfter, int matchLenMax, int mf, int depthLimit) {
-        switch (mf) {
+    public static LZEncoder create(LzmaInputStream.Properties properties, int extraSizeAfter, int matchLenMax) {
+        switch (properties.getMatchFinder()) {
             case MF_HC4:
-                return new HC4(properties, extraSizeAfter, matchLenMax, depthLimit);
+                return new HC4(properties, extraSizeAfter, matchLenMax);
 
             case MF_BT4:
-                return new BT4(properties, extraSizeAfter, matchLenMax, depthLimit);
+                return new BT4(properties, extraSizeAfter, matchLenMax);
         }
 
         throw new IllegalArgumentException();
