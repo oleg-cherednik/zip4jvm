@@ -40,24 +40,13 @@ import java.io.InputStream;
  */
 public class LzmaInputStream extends InputStream {
 
-    /**
-     * Largest dictionary size supported by this implementation.
-     * <p>
-     * LZMA allows dictionaries up to one byte less than 4 GiB. This
-     * implementation supports only 16 bytes less than 2 GiB. This
-     * limitation is due to Java using signed 32-bit integers for array
-     * indexing. The limitation shouldn't matter much in practice since so
-     * huge dictionaries are not normally used.
-     */
-    public static final int DICT_SIZE_MAX = Integer.MAX_VALUE & ~15;
-
-    private DataInput in;
+    private final DataInput in;
     private final ArrayCache arrayCache = ArrayCache.getDefaultCache();
-    private LZDecoder lz;
-    private RangeDecoderFromStream rc;
-    private LZMADecoder lzma;
+    private final LZDecoder lz;
+    private final RangeDecoderFromStream rc;
+    private final LZMADecoder lzma;
 
-    private boolean endReached = false;
+    private boolean endReached;
 
     private final byte[] tempBuf = new byte[1];
 
@@ -70,99 +59,16 @@ public class LzmaInputStream extends InputStream {
     private IOException exception = null;
 
     /**
-     * Gets approximate decompressor memory requirements as kibibytes for
-     * the given dictionary size and LZMA properties byte (lc, lp, and pb).
-     *
-     * @param dictSize  LZMA dictionary size as bytes, should be
-     *                  in the range [<code>0</code>,
-     *                  <code>DICT_SIZE_MAX</code>]
-     * @param propsByte LZMA properties byte that encodes the values
-     *                  of lc, lp, and pb
-     * @return approximate memory requirements as kibibytes (KiB)
-     * @throws UnsupportedOptionsException if <code>dictSize</code> is outside
-     *                                     the range [<code>0</code>,
-     *                                     <code>DICT_SIZE_MAX</code>]
-     * @throws CorruptedInputException     if <code>propsByte</code> is invalid
-     */
-    public static int getMemoryUsage(int dictSize, int propsByte)
-            throws UnsupportedOptionsException, CorruptedInputException {
-        if (dictSize < 0 || dictSize > DICT_SIZE_MAX)
-            throw new UnsupportedOptionsException(
-                    "LZMA dictionary is too big for this implementation");
-
-        int props = propsByte & 0xFF;
-        if (props > (4 * 5 + 4) * 9 + 8)
-            throw new CorruptedInputException("Invalid LZMA properties byte");
-
-        props %= 9 * 5;
-        int lp = props / 9;
-        int lc = props - lp * 9;
-
-        return getMemoryUsage(dictSize, lc, lp);
-    }
-
-    /**
-     * Gets approximate decompressor memory requirements as kibibytes for
-     * the given dictionary size, lc, and lp. Note that pb isn't needed.
-     *
-     * @param dictSize LZMA dictionary size as bytes, must be
-     *                 in the range [<code>0</code>,
-     *                 <code>DICT_SIZE_MAX</code>]
-     * @param lc       number of literal context bits, must be
-     *                 in the range [0, 8]
-     * @param lp       number of literal position bits, must be
-     *                 in the range [0, 4]
-     * @return approximate memory requirements as kibibytes (KiB)
-     */
-    public static int getMemoryUsage(int dictSize, int lc, int lp) {
-        if (lc < 0 || lc > 8 || lp < 0 || lp > 4)
-            throw new IllegalArgumentException("Invalid lc or lp");
-
-        // Probability variables have the type "short". There are
-        // 0x300 (768) probability variables in each literal subcoder.
-        // The number of literal subcoders is 2^(lc + lp).
-        //
-        // Roughly 10 KiB for the base state + LZ decoder's dictionary buffer
-        // + sizeof(short) * number probability variables per literal subcoder
-        //   * number of literal subcoders
-        return 10 + getDictSize(dictSize) / 1024
-                + ((2 * 0x300) << (lc + lp)) / 1024;
-    }
-
-    private static int getDictSize(int dictSize) {
-        if (dictSize < 0 || dictSize > DICT_SIZE_MAX)
-            throw new IllegalArgumentException(
-                    "LZMA dictionary is too big for this implementation");
-
-        // For performance reasons, use a 4 KiB dictionary if something
-        // smaller was requested. It's a rare situation and the performance
-        // difference isn't huge, and it starts to matter mostly when the
-        // dictionary is just a few bytes. But we need to handle the special
-        // case of dictSize == 0 anyway, which is an allowed value but in
-        // practice means one-byte dictionary.
-        //
-        // Note that using a dictionary bigger than specified in the headers
-        // can hide errors if there is a reference to data beyond the original
-        // dictionary size but is still within 4 KiB.
-        if (dictSize < 4096)
-            dictSize = 4096;
-
-        // Round dictionary size upward to a multiple of 16. This way LZMA
-        // can use LZDecoder.getPos() for calculating LZMA's posMask.
-        return (dictSize + 15) & ~15;
-    }
-
-    /**
      * Creates a new .lzma file format decompressor with an optional
      * memory usage limit.
      * <p>
      * This is identical to <code>LZMAInputStream(InputStream, int)</code>
      * except that this also takes the <code>arrayCache</code> argument.
      *
-     * @param in          input stream from which .lzma data is read;
-     *                    it might be a good idea to wrap it in
-     *                    <code>BufferedInputStream</code>, see the
-     *                    note at the top of this page
+     * @param in         input stream from which .lzma data is read;
+     *                   it might be a good idea to wrap it in
+     *                   <code>BufferedInputStream</code>, see the
+     *                   note at the top of this page
      * @param uncompSize uncompressed size or <t>-1</t> if unknown
      * @throws CorruptedInputException     file is corrupt or perhaps not in
      *                                     the .lzma format at all
@@ -170,65 +76,14 @@ public class LzmaInputStream extends InputStream {
      *                                     big for this implementation
      * @throws MemoryLimitException        memory usage limit was exceeded
      * @throws IOException                 may be thrown by <code>in</code>
-     * @since 1.7
      */
     public LzmaInputStream(DataInput in, long uncompSize) throws IOException {
-        int propsByte = in.readByte();
-        int dictSize = (int)in.readDword();
-        initialize(in, uncompSize, propsByte, dictSize, null);
-    }
-
-    private void initialize(DataInput in, long uncompSize, int propsByte,
-            int dictSize, byte[] presetDict)
-            throws IOException {
-        // Validate the uncompressed size since the other "initialize" throws
-        // IllegalArgumentException if uncompSize < -1.
-        if (uncompSize < -1)
-            throw new UnsupportedOptionsException(
-                    "Uncompressed size is too big");
-
-        // Decode the properties byte. In contrast to LZMA2, there is no
-        // limit of lc + lp <= 4.
-        int props = propsByte & 0xFF;
-        if (props > (4 * 5 + 4) * 9 + 8)
-            throw new CorruptedInputException("Invalid LZMA properties byte");
-
-        int pb = props / (9 * 5);
-        props -= pb * 9 * 5;
-        int lp = props / 9;
-        int lc = props - lp * 9;
-
-        // Validate the dictionary size since the other "initialize" throws
-        // IllegalArgumentException if dictSize is not supported.
-        if (dictSize < 0 || dictSize > DICT_SIZE_MAX)
-            throw new UnsupportedOptionsException(
-                    "LZMA dictionary is too big for this implementation");
-
-        initialize(in, uncompSize, lc, lp, pb, dictSize, presetDict);
-    }
-
-    private void initialize(DataInput in, long uncompSize,
-            int lc, int lp, int pb,
-            int dictSize, byte[] presetDict)
-            throws IOException {
-        // getDictSize validates dictSize and gives a message in
-        // the exception too, so skip validating dictSize here.
-        if (uncompSize < -1 || lc < 0 || lc > 8 || lp < 0 || lp > 4
-                || pb < 0 || pb > 4)
-            throw new IllegalArgumentException();
-
         this.in = in;
+        LzmaProperties properties = LzmaProperties.read(in);
 
-        // If uncompressed size is known, use it to avoid wasting memory for
-        // a uselessly large dictionary buffer.
-        dictSize = getDictSize(dictSize);
-        if (uncompSize >= 0 && dictSize > uncompSize)
-            dictSize = getDictSize((int)uncompSize);
-
-        lz = new LZDecoder(getDictSize(dictSize), presetDict, arrayCache);
+        lz = new LZDecoder(properties.getDictionarySize(), null, arrayCache);
         rc = new RangeDecoderFromStream(in);
-        lzma = new LZMADecoder(lz, rc, lc, lp, pb);
-
+        lzma = new LZMADecoder(lz, rc, properties.getLc(), properties.getLp(), properties.getPb());
         remainingSize = uncompSize;
     }
 
@@ -352,10 +207,7 @@ public class LzmaInputStream extends InputStream {
     }
 
     private void putArraysToCache() {
-        if (lz != null) {
-            lz.putArraysToCache(arrayCache);
-            lz = null;
-        }
+        lz.putArraysToCache(arrayCache);
     }
 
     /**
@@ -364,15 +216,9 @@ public class LzmaInputStream extends InputStream {
      *
      * @throws IOException if thrown by <code>in.close()</code>
      */
+    @Override
     public void close() throws IOException {
-        if (in != null) {
-            putArraysToCache();
-
-            try {
-                in.close();
-            } finally {
-                in = null;
-            }
-        }
+        putArraysToCache();
+        in.close();
     }
 }
