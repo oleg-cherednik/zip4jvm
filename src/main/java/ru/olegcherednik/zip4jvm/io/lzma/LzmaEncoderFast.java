@@ -43,7 +43,7 @@ final class LzmaEncoderFast extends LzmaEncoder {
                 continue;
 
             // If it is long enough, return it.
-            if (len >= niceLen) {
+            if (len >= niceLength) {
                 back = rep;
                 skip(len - 1);
                 return len;
@@ -63,7 +63,7 @@ final class LzmaEncoderFast extends LzmaEncoder {
             mainLen = matches.len[matches.count - 1];
             mainDist = matches.dist[matches.count - 1];
 
-            if (mainLen >= niceLen) {
+            if (mainLen >= niceLength) {
                 back = mainDist + reps.length;
                 skip(mainLen - 1);
                 return mainLen;

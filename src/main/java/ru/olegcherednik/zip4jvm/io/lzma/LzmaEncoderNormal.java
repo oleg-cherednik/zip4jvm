@@ -109,7 +109,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
         }
 
         // Return if the best repeated match is at least niceLen bytes long.
-        if (repLens[repBest] >= niceLen) {
+        if (repLens[repBest] >= niceLength) {
             back = repBest;
             skip(repLens[repBest] - 1);
             return repLens[repBest];
@@ -124,7 +124,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
             mainDist = matches.dist[matches.count - 1];
 
             // Return if it is at least niceLen bytes long.
-            if (mainLen >= niceLen) {
+            if (mainLen >= niceLength) {
                 back = mainDist + reps.length;
                 skip(mainLen - 1);
                 return mainLen;
@@ -199,7 +199,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
             int longRepPrice = getLongRepPrice(anyRepPrice, rep,
                     state, posState);
             do {
-                int price = longRepPrice + repLenEncoder.getPrice(repLen,
+                int price = longRepPrice + repLengthEncoder.getPrice(repLen,
                         posState);
                 if (price < opts[repLen].price)
                     opts[repLen].set1(price, 0, rep);
@@ -244,7 +244,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
         while (++optCur < optEnd) {
             matches = getMatches();
             if (matches.count > 0
-                    && matches.len[matches.count - 1] >= niceLen)
+                    && matches.len[matches.count - 1] >= niceLength)
                 break;
 
             --avail;
@@ -372,7 +372,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
         // If neither a literal nor a short rep was the cheapest choice,
         // try literal + long rep0.
         if (!nextIsByte && matchByte != curByte && avail > MATCH_LEN_MIN) {
-            int lenLimit = Math.min(niceLen, avail - 1);
+            int lenLimit = Math.min(niceLength, avail - 1);
             int len = lz.getMatchLen(1, opts[optCur].reps[0], lenLimit);
 
             if (len >= MATCH_LEN_MIN) {
@@ -399,7 +399,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
     private int calcLongRepPrices(int pos, int posState,
             int avail, int anyRepPrice) {
         int startLen = MATCH_LEN_MIN;
-        int lenLimit = Math.min(avail, niceLen);
+        int lenLimit = Math.min(avail, niceLength);
 
         for (int rep = 0; rep < reps.length; ++rep) {
             int len = lz.getMatchLen(opts[optCur].reps[rep], lenLimit);
@@ -414,7 +414,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
 
             for (int i = len; i >= MATCH_LEN_MIN; --i) {
                 int price = longRepPrice
-                        + repLenEncoder.getPrice(i, posState);
+                        + repLengthEncoder.getPrice(i, posState);
                 if (price < opts[optCur + i].price)
                     opts[optCur + i].set1(price, optCur, rep);
             }
@@ -422,14 +422,14 @@ final class LzmaEncoderNormal extends LzmaEncoder {
             if (rep == 0)
                 startLen = len + 1;
 
-            int len2Limit = Math.min(niceLen, avail - len - 1);
+            int len2Limit = Math.min(niceLength, avail - len - 1);
             int len2 = lz.getMatchLen(len + 1, opts[optCur].reps[rep],
                     len2Limit);
 
             if (len2 >= MATCH_LEN_MIN) {
                 // Rep
                 int price = longRepPrice
-                        + repLenEncoder.getPrice(len, posState);
+                        + repLengthEncoder.getPrice(len, posState);
                 nextState.set(opts[optCur].state);
                 nextState.updateLongRep();
 
@@ -501,7 +501,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
                 continue;
 
             // Try match + literal + rep0. First get the length of the rep0.
-            int len2Limit = Math.min(niceLen, avail - len - 1);
+            int len2Limit = Math.min(niceLength, avail - len - 1);
             int len2 = lz.getMatchLen(len + 1, dist, len2Limit);
 
             if (len2 >= MATCH_LEN_MIN) {
