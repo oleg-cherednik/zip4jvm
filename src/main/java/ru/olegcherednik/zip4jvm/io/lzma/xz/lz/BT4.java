@@ -11,6 +11,7 @@
 package ru.olegcherednik.zip4jvm.io.lzma.xz.lz;
 
 import ru.olegcherednik.zip4jvm.io.lzma.xz.ArrayCache;
+import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaInputStream;
 
 final class BT4 extends LZEncoder {
 
@@ -24,13 +25,13 @@ final class BT4 extends LZEncoder {
     private int lzPos;
 
 
-    BT4(int dictSize, int readAheadMax, int niceLen, int matchLenMax, int depthLimit) {
-        super(dictSize,  readAheadMax, niceLen, matchLenMax);
+    BT4(LzmaInputStream.Properties properties, int readAheadMax, int matchLenMax, int depthLimit) {
+        super(properties, readAheadMax, matchLenMax);
 
-        cyclicSize = dictSize + 1;
+        cyclicSize = properties.getDictionarySize() + 1;
         lzPos = cyclicSize;
 
-        hash = new Hash234(dictSize);
+        hash = new Hash234(properties.getDictionarySize());
         tree = ArrayCache.getDefaultCache().getIntArray(cyclicSize * 2, false);
 
         // Substracting 1 because the shortest match that this match

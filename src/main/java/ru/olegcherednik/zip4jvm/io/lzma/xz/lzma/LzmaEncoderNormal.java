@@ -22,16 +22,15 @@ final class LzmaEncoderNormal extends LzmaEncoder {
     private final int[] repLens = new int[REPS];
     private final State nextState = new State();
 
-    LzmaEncoderNormal(RangeEncoder rc, LzmaInputStream.Properties properties, int niceLen, int mf, int depthLimit) {
-        super(rc, createEncoder(properties, niceLen, mf, depthLimit), properties, niceLen);
+    LzmaEncoderNormal(RangeEncoder rc, LzmaInputStream.Properties properties, int mf, int depthLimit) {
+        super(rc, createEncoder(properties, mf, depthLimit), properties);
 
         for (int i = 0; i < OPTS; ++i)
             opts[i] = new Optimum();
     }
 
-    private static LZEncoder createEncoder(LzmaInputStream.Properties properties, int niceLen, int mf, int depthLimit) {
-        return LZEncoder.create(properties.getDictionarySize(), EXTRA_SIZE_AFTER, niceLen,
-                MATCH_LEN_MAX, mf, depthLimit);
+    private static LZEncoder createEncoder(LzmaInputStream.Properties properties, int mf, int depthLimit) {
+        return LZEncoder.create(properties, EXTRA_SIZE_AFTER, MATCH_LEN_MAX, mf, depthLimit);
     }
 
     public void reset() {

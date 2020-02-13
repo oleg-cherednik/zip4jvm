@@ -11,6 +11,7 @@
 package ru.olegcherednik.zip4jvm.io.lzma.xz.lz;
 
 import ru.olegcherednik.zip4jvm.io.lzma.xz.ArrayCache;
+import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaInputStream;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -72,26 +73,20 @@ public abstract class LZEncoder {
      * Creates a new LZEncoder.
      * <p>
      *
-     * @param dictSize       dictionary size
      * @param extraSizeAfter number of bytes that must be available
      *                       after current position + matchLenMax
-     * @param niceLen        if a match of at least <code>niceLen</code>
-     *                       bytes is found, be happy with it and don't
-     *                       stop looking for longer matches
      * @param matchLenMax    don't test for matches longer than
      *                       <code>matchLenMax</code> bytes
      * @param mf             match finder ID
      * @param depthLimit     match finder search depth limit
      */
-    public static LZEncoder create(
-            int dictSize, int extraSizeAfter,
-            int niceLen, int matchLenMax, int mf, int depthLimit) {
+    public static LZEncoder create(LzmaInputStream.Properties properties, int extraSizeAfter, int matchLenMax, int mf, int depthLimit) {
         switch (mf) {
             case MF_HC4:
-                return new HC4(dictSize, extraSizeAfter, niceLen, matchLenMax, depthLimit);
+                return new HC4(properties, extraSizeAfter, matchLenMax, depthLimit);
 
             case MF_BT4:
-                return new BT4(dictSize, extraSizeAfter, niceLen, matchLenMax, depthLimit);
+                return new BT4(properties, extraSizeAfter, matchLenMax, depthLimit);
         }
 
         throw new IllegalArgumentException();
@@ -100,16 +95,15 @@ public abstract class LZEncoder {
     /**
      * Creates a new LZEncoder. See <code>getInstance</code>.
      */
-    LZEncoder(int dictSize, int extraSizeAfter, int niceLen, int matchLenMax) {
-        bufSize = getBufSize(dictSize, extraSizeAfter,
-                matchLenMax);
+    LZEncoder(LzmaInputStream.Properties properties, int extraSizeAfter, int matchLenMax) {
+        bufSize = getBufSize(properties.getDictionarySize(), extraSizeAfter, matchLenMax);
         buf = ArrayCache.getDefaultCache().getByteArray(bufSize, false);
 
-        keepSizeBefore = dictSize;
+        keepSizeBefore = properties.getDictionarySize();
         keepSizeAfter = extraSizeAfter + matchLenMax;
 
         this.matchLenMax = matchLenMax;
-        this.niceLen = niceLen;
+        niceLen = properties.getNiceLength();
     }
 
     public void putArraysToCache(ArrayCache arrayCache) {

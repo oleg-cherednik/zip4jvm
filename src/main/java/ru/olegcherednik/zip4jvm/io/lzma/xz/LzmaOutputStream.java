@@ -56,8 +56,7 @@ public class LzmaOutputStream extends OutputStream {
         this.uncompressedSize = uncompressedSize;
 
         dictionarySize = properties.getDictionarySize();
-        lzma = LzmaEncoder.create(new RangeEncoder(out), properties, properties.getNiceLength(), properties.getMatchFinder(),
-                properties.getDepthLimit());
+        lzma = LzmaEncoder.create(new RangeEncoder(out), properties, properties.getMatchFinder(), properties.getDepthLimit());
 
         props = (properties.getPb() * 5 + properties.getLp()) * 9 + properties.getLc();
     }
@@ -109,13 +108,6 @@ public class LzmaOutputStream extends OutputStream {
             exception = e;
             throw e;
         }
-    }
-
-    /**
-     * Flushing isn't supported and will throw XZIOException.
-     */
-    public void flush() throws IOException {
-        throw new IOException("LZMAOutputStream does not support flushing");
     }
 
     /**

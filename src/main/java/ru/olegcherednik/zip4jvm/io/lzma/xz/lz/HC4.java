@@ -11,6 +11,7 @@
 package ru.olegcherednik.zip4jvm.io.lzma.xz.lz;
 
 import ru.olegcherednik.zip4jvm.io.lzma.xz.ArrayCache;
+import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaInputStream;
 
 final class HC4 extends LZEncoder {
 
@@ -24,36 +25,28 @@ final class HC4 extends LZEncoder {
     private int lzPos;
 
     /**
-     * Gets approximate memory usage of the match finder as kibibytes.
-     */
-    static int getMemoryUsage(int dictSize) {
-        return Hash234.getMemoryUsage(dictSize) + dictSize / (1024 / 4) + 10;
-    }
-
-    /**
      * Creates a new LZEncoder with the HC4 match finder.
      * See <code>LZEncoder.getInstance</code> for parameter descriptions.
      */
-    HC4(int dictSize, int readAheadMax,
-            int niceLen, int matchLenMax, int depthLimit) {
-        super(dictSize, readAheadMax, niceLen, matchLenMax);
+    HC4(LzmaInputStream.Properties properties, int readAheadMax, int matchLenMax, int depthLimit) {
+        super(properties, readAheadMax, matchLenMax);
 
-        hash = new Hash234(dictSize);
+        hash = new Hash234(properties.getDictionarySize());
 
         // +1 because we need dictSize bytes of history + the current byte.
-        cyclicSize = dictSize + 1;
+        cyclicSize = properties.getDictionarySize() + 1;
         chain = ArrayCache.getDefaultCache().getIntArray(cyclicSize, false);
         lzPos = cyclicSize;
 
         // Substracting 1 because the shortest match that this match
         // finder can find is 2 bytes, so there's no need to reserve
         // space for one-byte matches.
-        matches = new Matches(niceLen - 1);
+        matches = new Matches(properties.getNiceLength() - 1);
 
         // Use a default depth limit if no other value was specified.
         // The default is just something based on experimentation;
         // it's nothing magic.
-        this.depthLimit = (depthLimit > 0) ? depthLimit : 4 + niceLen / 4;
+        this.depthLimit = (depthLimit > 0) ? depthLimit : 4 + properties.getNiceLength() / 4;
     }
 
     public void putArraysToCache(ArrayCache arrayCache) {

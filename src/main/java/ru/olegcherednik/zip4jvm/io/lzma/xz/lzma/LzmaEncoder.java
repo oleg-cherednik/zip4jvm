@@ -60,14 +60,13 @@ public abstract class LzmaEncoder extends LZMACoder {
     int readAhead = -1;
     private int uncompressedSize = 0;
 
-    public static LzmaEncoder create(RangeEncoder rc, LzmaInputStream.Properties properties, int niceLen, int mf,
-            int depthLimit) {
+    public static LzmaEncoder create(RangeEncoder rc, LzmaInputStream.Properties properties, int mf, int depthLimit) {
 
         switch (properties.getMode()) {
             case MODE_FAST:
-                return new LzmaEncoderFast(rc, properties, niceLen, mf, depthLimit);
+                return new LzmaEncoderFast(rc, properties, mf, depthLimit);
             case MODE_NORMAL:
-                return new LzmaEncoderNormal(rc, properties, niceLen, mf, depthLimit);
+                return new LzmaEncoderNormal(rc, properties, mf, depthLimit);
         }
 
         throw new IllegalArgumentException();
@@ -134,15 +133,15 @@ public abstract class LzmaEncoder extends LZMACoder {
      */
     abstract int getNextSymbol();
 
-    LzmaEncoder(RangeEncoder rc, LZEncoder lz, LzmaInputStream.Properties properties, int niceLen) {
+    LzmaEncoder(RangeEncoder rc, LZEncoder lz, LzmaInputStream.Properties properties) {
         super(properties);
         this.rc = rc;
         this.lz = lz;
-        this.niceLen = niceLen;
+        niceLen = properties.getNiceLength();
 
         literalEncoder = new LiteralEncoder(properties);
-        matchLenEncoder = new LengthEncoder(properties, niceLen);
-        repLenEncoder = new LengthEncoder(properties, niceLen);
+        matchLenEncoder = new LengthEncoder(properties);
+        repLenEncoder = new LengthEncoder(properties);
 
         distSlotPricesSize = getDistSlot(properties.getDictionarySize() - 1) + 1;
         distSlotPrices = new int[DIST_STATES][distSlotPricesSize];
@@ -635,14 +634,14 @@ public abstract class LzmaEncoder extends LZMACoder {
         private final int[] counters;
         private final int[][] prices;
 
-        LengthEncoder(LzmaInputStream.Properties properties, int niceLen) {
+        LengthEncoder(LzmaInputStream.Properties properties) {
             int posStates = 1 << properties.getPb();
             counters = new int[posStates];
 
             // Always allocate at least LOW_SYMBOLS + MID_SYMBOLS because
             // it makes updatePrices slightly simpler. The prices aren't
             // usually needed anyway if niceLen < 18.
-            int lenSymbols = Math.max(niceLen - MATCH_LEN_MIN + 1,
+            int lenSymbols = Math.max(properties.getNiceLength() - MATCH_LEN_MIN + 1,
                     LOW_SYMBOLS + MID_SYMBOLS);
             prices = new int[posStates][lenSymbols];
         }

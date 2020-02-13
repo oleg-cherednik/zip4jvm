@@ -21,12 +21,12 @@ final class LzmaEncoderFast extends LzmaEncoder {
 
     private Matches matches = null;
 
-    LzmaEncoderFast(RangeEncoder rc, LzmaInputStream.Properties properties, int niceLen, int mf, int depthLimit) {
-        super(rc, createEncoder(properties, niceLen, mf, depthLimit), properties, niceLen);
+    LzmaEncoderFast(RangeEncoder rc, LzmaInputStream.Properties properties, int mf, int depthLimit) {
+        super(rc, createEncoder(properties, mf, depthLimit), properties);
     }
 
-    private static LZEncoder createEncoder(LzmaInputStream.Properties properties, int niceLen, int mf, int depthLimit) {
-        return LZEncoder.create(properties.getDictionarySize(), EXTRA_SIZE_AFTER, niceLen, MATCH_LEN_MAX, mf, depthLimit);
+    private static LZEncoder createEncoder(LzmaInputStream.Properties properties, int mf, int depthLimit) {
+        return LZEncoder.create(properties, EXTRA_SIZE_AFTER, MATCH_LEN_MAX, mf, depthLimit);
     }
 
     private boolean changePair(int smallDist, int bigDist) {
