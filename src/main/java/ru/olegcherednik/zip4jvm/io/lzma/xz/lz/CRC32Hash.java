@@ -4,97 +4,87 @@ package ru.olegcherednik.zip4jvm.io.lzma.xz.lz;
 @SuppressWarnings("NewClassNamingConvention")
 final class CRC32Hash {
 
-    private static final int CRC32_POLY = 0xEDB88320;
+    private static final int[] CRC_TABLE = createTable();
 
-    static final int[] crcTable = new int[256];
+    private final int[] hash2Table = new int[1024];
+    private final int[] hash3Table = new int[65536];
+    private final int[] hash4Table;
 
-    static {
-        for (int i = 0; i < 256; ++i) {
+    private int hash2Value;
+    private int hash3Value;
+    private int hash4Value;
+
+    public CRC32Hash(int dictionarySize) {
+        hash4Table = new int[getHash4Size(dictionarySize)];
+    }
+
+    public void calcHashes(byte[] buf, int offs) {
+        int tmp = CRC_TABLE[buf[offs] & 0xFF] ^ (buf[offs + 1] & 0xFF);
+        hash2Value = tmp & hash2Table.length - 1;
+
+        tmp ^= (buf[offs + 2] & 0xFF) << 8;
+        hash3Value = tmp & (hash3Table.length - 1);
+
+        tmp ^= CRC_TABLE[buf[offs + 3] & 0xFF] << 5;
+        hash4Value = tmp & (hash4Table.length - 1);
+    }
+
+    public int getHash2Pos() {
+        return hash2Table[hash2Value];
+    }
+
+    public int getHash3Pos() {
+        return hash3Table[hash3Value];
+    }
+
+    public int getHash4Pos() {
+        return hash4Table[hash4Value];
+    }
+
+    public void updateTables(int pos) {
+        hash2Table[hash2Value] = pos;
+        hash3Table[hash3Value] = pos;
+        hash4Table[hash4Value] = pos;
+    }
+
+    public void normalize(int normalizationOffset) {
+        LzEncoder.normalize(hash2Table, hash2Table.length, normalizationOffset);
+        LzEncoder.normalize(hash3Table, hash3Table.length, normalizationOffset);
+        LzEncoder.normalize(hash4Table, hash4Table.length, normalizationOffset);
+    }
+
+    private static int[] createTable() {
+        int[] arr = new int[256];
+
+        for (int i = 0; i < arr.length; ++i) {
             int r = i;
 
             for (int j = 0; j < 8; ++j) {
                 if ((r & 1) != 0)
-                    r = (r >>> 1) ^ CRC32_POLY;
+                    r = (r >>> 1) ^ 0xEDB88320;
                 else
                     r >>>= 1;
             }
 
-            crcTable[i] = r;
+            arr[i] = r;
         }
+
+        return arr;
     }
 
-    private static final int HASH_2_SIZE = 1 << 10;
-    private static final int HASH_2_MASK = HASH_2_SIZE - 1;
-
-    private static final int HASH_3_SIZE = 1 << 16;
-    private static final int HASH_3_MASK = HASH_3_SIZE - 1;
-
-    private final int hash4Mask;
-
-    private final int[] hash2Table;
-    private final int[] hash3Table;
-    private final int[] hash4Table;
-    private final int hash4Size;
-
-    private int hash2Value = 0;
-    private int hash3Value = 0;
-    private int hash4Value = 0;
-
-    static int getHash4Size(int dictSize) {
-        int h = dictSize - 1;
+    @SuppressWarnings("NewMethodNamingConvention")
+    private static int getHash4Size(int dictionarySize) {
+        int h = dictionarySize - 1;
         h |= h >>> 1;
         h |= h >>> 2;
         h |= h >>> 4;
         h |= h >>> 8;
         h >>>= 1;
         h |= 0xFFFF;
+
         if (h > (1 << 24))
             h >>>= 1;
 
         return h + 1;
-    }
-
-    CRC32Hash(int dictSize) {
-        hash2Table = new int[HASH_2_SIZE];
-        hash3Table = new int[HASH_3_SIZE];
-
-        hash4Size = getHash4Size(dictSize);
-        hash4Table = new int[hash4Size];
-        hash4Mask = hash4Size - 1;
-    }
-
-    void calcHashes(byte[] buf, int off) {
-        int temp = crcTable[buf[off] & 0xFF] ^ (buf[off + 1] & 0xFF);
-        hash2Value = temp & HASH_2_MASK;
-
-        temp ^= (buf[off + 2] & 0xFF) << 8;
-        hash3Value = temp & HASH_3_MASK;
-
-        temp ^= crcTable[buf[off + 3] & 0xFF] << 5;
-        hash4Value = temp & hash4Mask;
-    }
-
-    int getHash2Pos() {
-        return hash2Table[hash2Value];
-    }
-
-    int getHash3Pos() {
-        return hash3Table[hash3Value];
-    }
-
-    int getHash4Pos() {
-        return hash4Table[hash4Value];
-    }
-
-    void updateTables(int pos) {
-        hash2Table[hash2Value] = pos;
-        hash3Table[hash3Value] = pos;
-        hash4Table[hash4Value] = pos;
-    }
-
-    void normalize(int normalizationOffset) {
-        LzEncoder.normalize(hash2Table, HASH_2_SIZE, normalizationOffset);
-        LzEncoder.normalize(hash3Table, HASH_3_SIZE, normalizationOffset);
-        LzEncoder.normalize(hash4Table, hash4Size, normalizationOffset);
     }
 }

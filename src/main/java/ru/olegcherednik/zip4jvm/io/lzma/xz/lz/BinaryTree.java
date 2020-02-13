@@ -30,7 +30,7 @@ final class BinaryTree extends LzEncoder {
         // space for one-byte matches.
         matches = new Matches(niceLen - 1);
 
-        this.depthLimit = properties.getDepthLimit() > 0 ? properties.getDepthLimit() : 16 + niceLen / 2;
+        depthLimit = properties.getDepthLimit() > 0 ? properties.getDepthLimit() : 16 + niceLen / 2;
     }
 
     private int movePos() {
@@ -51,6 +51,7 @@ final class BinaryTree extends LzEncoder {
         return avail;
     }
 
+    @Override
     public Matches getMatches() {
         matches.count = 0;
 
@@ -224,6 +225,7 @@ final class BinaryTree extends LzEncoder {
         }
     }
 
+    @Override
     public void skip(int len) {
         while (len-- > 0) {
             int niceLenLimit = niceLen;
