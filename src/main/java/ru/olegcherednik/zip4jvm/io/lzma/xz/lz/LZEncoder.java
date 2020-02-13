@@ -10,7 +10,6 @@
 
 package ru.olegcherednik.zip4jvm.io.lzma.xz.lz;
 
-import ru.olegcherednik.zip4jvm.io.lzma.xz.ArrayCache;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaInputStream;
 
 import java.io.IOException;
@@ -40,7 +39,6 @@ public abstract class LZEncoder {
     final int niceLen;
 
     final byte[] buf;
-    final int bufSize; // To avoid buf.length with an array-cached buf.
 
     int readPos = -1;
     private int readLimit = -1;
@@ -92,17 +90,13 @@ public abstract class LZEncoder {
      * Creates a new LZEncoder. See <code>getInstance</code>.
      */
     LZEncoder(LzmaInputStream.Properties properties, int extraSizeAfter) {
-        bufSize = getBufSize(properties.getDictionarySize(), extraSizeAfter);
-        buf = ArrayCache.getDefaultCache().getByteArray(bufSize, false);
+        int size = getBufSize(properties.getDictionarySize(), extraSizeAfter);
+        buf = new byte[size];
 
         keepSizeBefore = properties.getDictionarySize();
         keepSizeAfter = extraSizeAfter + MATCH_LEN_MAX;
 
         niceLen = properties.getNiceLength();
-    }
-
-    public void putArraysToCache(ArrayCache arrayCache) {
-        arrayCache.putArray(buf);
     }
 
     /**
@@ -129,13 +123,13 @@ public abstract class LZEncoder {
         assert !finishing;
 
         // Move the sliding window if needed.
-        if (readPos >= bufSize - keepSizeAfter)
+        if (readPos >= buf.length - keepSizeAfter)
             moveWindow();
 
         // Try to fill the dictionary buffer. If it becomes full,
         // some of the input bytes may be left unused.
-        if (len > bufSize - writePos)
-            len = bufSize - writePos;
+        if (len > buf.length - writePos)
+            len = buf.length - writePos;
 
         System.arraycopy(in, off, buf, writePos, len);
         writePos += len;

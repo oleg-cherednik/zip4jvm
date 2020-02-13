@@ -10,7 +10,6 @@
 
 package ru.olegcherednik.zip4jvm.io.lzma.xz.lz;
 
-import ru.olegcherednik.zip4jvm.io.lzma.xz.ArrayCache;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaInputStream;
 
 import static ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LZMACoder.MATCH_LEN_MAX;
@@ -37,7 +36,7 @@ final class HC4 extends LZEncoder {
 
         // +1 because we need dictSize bytes of history + the current byte.
         cyclicSize = properties.getDictionarySize() + 1;
-        chain = ArrayCache.getDefaultCache().getIntArray(cyclicSize, false);
+        chain = new int[cyclicSize];
         lzPos = cyclicSize;
 
         // Substracting 1 because the shortest match that this match
@@ -49,12 +48,6 @@ final class HC4 extends LZEncoder {
         // The default is just something based on experimentation;
         // it's nothing magic.
         this.depthLimit = properties.getDepthLimit() > 0 ? properties.getDepthLimit() : 4 + properties.getNiceLength() / 4;
-    }
-
-    public void putArraysToCache(ArrayCache arrayCache) {
-        arrayCache.putArray(chain);
-        hash.putArraysToCache(arrayCache);
-        super.putArraysToCache(arrayCache);
     }
 
     /**

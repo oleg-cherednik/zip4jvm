@@ -10,7 +10,6 @@
 
 package ru.olegcherednik.zip4jvm.io.lzma.xz.lz;
 
-import ru.olegcherednik.zip4jvm.io.lzma.xz.ArrayCache;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaInputStream;
 
 import static ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LZMACoder.MATCH_LEN_MAX;
@@ -34,7 +33,7 @@ final class BT4 extends LZEncoder {
         lzPos = cyclicSize;
 
         hash = new Hash234(properties.getDictionarySize());
-        tree = ArrayCache.getDefaultCache().getIntArray(cyclicSize * 2, false);
+        tree = new int[cyclicSize * 2];
 
         // Substracting 1 because the shortest match that this match
         // finder can find is 2 bytes, so there's no need to reserve
@@ -42,12 +41,6 @@ final class BT4 extends LZEncoder {
         matches = new Matches(niceLen - 1);
 
         this.depthLimit = properties.getDepthLimit() > 0 ? properties.getDepthLimit() : 16 + niceLen / 2;
-    }
-
-    public void putArraysToCache(ArrayCache arrayCache) {
-        arrayCache.putArray(tree);
-        hash.putArraysToCache(arrayCache);
-        super.putArraysToCache(arrayCache);
     }
 
     private int movePos() {

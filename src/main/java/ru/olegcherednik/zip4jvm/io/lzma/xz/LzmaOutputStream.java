@@ -113,8 +113,6 @@ public class LzmaOutputStream extends OutputStream {
 
             lzma.finish();
             finished = true;
-
-            lzma.putArraysToCache(ArrayCache.getDefaultCache());
         }
     }
 

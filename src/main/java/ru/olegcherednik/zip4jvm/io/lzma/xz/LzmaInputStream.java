@@ -162,16 +162,11 @@ public class LzmaInputStream extends InputStream {
                 if (!lzma.getRc().isFinished() || lzma.getLz().hasPending())
                     throw new CorruptedInputException();
 
-                putArraysToCache();
                 return size == 0 ? -1 : size;
             }
         }
 
         return size;
-    }
-
-    private void putArraysToCache() {
-        lzma.getLz().putArraysToCache();
     }
 
     /**

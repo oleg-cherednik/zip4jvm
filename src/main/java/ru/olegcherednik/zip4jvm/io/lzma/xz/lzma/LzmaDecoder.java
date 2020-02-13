@@ -131,7 +131,6 @@ public final class LzmaDecoder extends LZMACoder {
 
     @Override
     public void close() throws IOException {
-        lz.putArraysToCache();
         rc.close();
     }
 

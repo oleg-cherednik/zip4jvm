@@ -10,8 +10,6 @@
 
 package ru.olegcherednik.zip4jvm.io.lzma.xz.lz;
 
-import ru.olegcherednik.zip4jvm.io.lzma.xz.ArrayCache;
-
 final class Hash234 extends CRC32Hash {
     private static final int HASH_2_SIZE = 1 << 10;
     private static final int HASH_2_MASK = HASH_2_SIZE - 1;
@@ -51,18 +49,12 @@ final class Hash234 extends CRC32Hash {
     }
 
     Hash234(int dictSize) {
-        hash2Table = ArrayCache.getDefaultCache().getIntArray(HASH_2_SIZE, true);
-        hash3Table = ArrayCache.getDefaultCache().getIntArray(HASH_3_SIZE, true);
+        hash2Table = new int[HASH_2_SIZE];
+        hash3Table = new int[HASH_3_SIZE];
 
         hash4Size = getHash4Size(dictSize);
-        hash4Table = ArrayCache.getDefaultCache().getIntArray(hash4Size, true);
+        hash4Table = new int[hash4Size];
         hash4Mask = hash4Size - 1;
-    }
-
-    void putArraysToCache(ArrayCache arrayCache) {
-        arrayCache.putArray(hash4Table);
-        arrayCache.putArray(hash3Table);
-        arrayCache.putArray(hash2Table);
     }
 
     void calcHashes(byte[] buf, int off) {

@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.lzma.xz.lz;
 
-import ru.olegcherednik.zip4jvm.io.lzma.xz.ArrayCache;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.exceptions.CorruptedInputException;
 
 import java.io.IOException;
@@ -8,34 +7,20 @@ import java.io.IOException;
 public final class LZDecoder {
 
     private final byte[] buf;
-    private final int bufSize; // To avoid buf.length with an array-cached buf.
-    private int start = 0;
-    private int pos = 0;
-    private int full = 0;
-    private int limit = 0;
-    private int pendingLen = 0;
-    private int pendingDist = 0;
+    private int start;
+    private int pos;
+    private int full;
+    private int limit;
+    private int pendingLen;
+    private int pendingDist;
 
-    public LZDecoder(int dictSize) {
-        bufSize = dictSize;
-        buf = ArrayCache.getDefaultCache().getByteArray(bufSize, false);
-    }
-
-    public void putArraysToCache() {
-        ArrayCache.getDefaultCache().putArray(buf);
-    }
-
-    public void reset() {
-        start = 0;
-        pos = 0;
-        full = 0;
-        limit = 0;
-        buf[bufSize - 1] = 0x00;
+    public LZDecoder(int size) {
+        buf = new byte[size];
     }
 
     public void setLimit(int outMax) {
-        if (bufSize - pos <= outMax)
-            limit = bufSize;
+        if (buf.length - pos <= outMax)
+            limit = buf.length;
         else
             limit = pos + outMax;
     }
@@ -55,7 +40,7 @@ public final class LZDecoder {
     public int getByte(int dist) {
         int offset = pos - dist - 1;
         if (dist >= pos)
-            offset += bufSize;
+            offset += buf.length;
 
         return buf[offset] & 0xFF;
     }
@@ -77,11 +62,11 @@ public final class LZDecoder {
 
         int back = pos - dist - 1;
         if (dist >= pos)
-            back += bufSize;
+            back += buf.length;
 
         do {
             buf[pos++] = buf[back++];
-            if (back == bufSize)
+            if (back == buf.length)
                 back = 0;
         } while (--left > 0);
 
@@ -96,7 +81,7 @@ public final class LZDecoder {
 
     public int flush(byte[] out, int outOff) {
         int copySize = pos - start;
-        if (pos == bufSize)
+        if (pos == buf.length)
             pos = 0;
 
         System.arraycopy(buf, start, out, outOff, copySize);

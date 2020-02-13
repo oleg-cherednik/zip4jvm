@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.lzma.xz.lzma;
 
-import ru.olegcherednik.zip4jvm.io.lzma.xz.ArrayCache;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaInputStream;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LZEncoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.Matches;
@@ -70,10 +69,6 @@ public abstract class LzmaEncoder extends LZMACoder {
         }
 
         throw new IllegalArgumentException();
-    }
-
-    public void putArraysToCache(ArrayCache arrayCache) {
-        lz.putArraysToCache(arrayCache);
     }
 
     /**
@@ -167,10 +162,6 @@ public abstract class LzmaEncoder extends LZMACoder {
 
     public int getUncompressedSize() {
         return uncompressedSize;
-    }
-
-    public void resetUncompressedSize() {
-        uncompressedSize = 0;
     }
 
     /**
