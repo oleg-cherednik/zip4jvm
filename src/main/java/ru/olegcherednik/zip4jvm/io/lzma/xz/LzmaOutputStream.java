@@ -1,5 +1,10 @@
 package ru.olegcherednik.zip4jvm.io.lzma.xz;
 
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LzmaEncoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeEncoder;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
@@ -87,11 +92,11 @@ public class LzmaOutputStream extends OutputStream {
             throw exception;
 
         if (finished)
-            throw new XZIOException("Stream finished or closed");
+            throw new IOException("Stream finished or closed");
 
         if (uncompressedSize != -1
                 && uncompressedSize - currentUncompressedSize < len)
-            throw new XZIOException("Expected uncompressed input size ("
+            throw new IOException("Expected uncompressed input size ("
                     + uncompressedSize + " bytes) was exceeded");
 
         currentUncompressedSize += len;
@@ -113,7 +118,7 @@ public class LzmaOutputStream extends OutputStream {
      * Flushing isn't supported and will throw XZIOException.
      */
     public void flush() throws IOException {
-        throw new XZIOException("LZMAOutputStream does not support flushing");
+        throw new IOException("LZMAOutputStream does not support flushing");
     }
 
     /**
@@ -127,7 +132,7 @@ public class LzmaOutputStream extends OutputStream {
             try {
                 if (uncompressedSize != -1
                         && uncompressedSize != currentUncompressedSize)
-                    throw new XZIOException("Expected uncompressed size ("
+                    throw new IOException("Expected uncompressed size ("
                             + uncompressedSize + ") doesn't equal "
                             + "the number of bytes written to the stream ("
                             + currentUncompressedSize + ")");
@@ -171,5 +176,55 @@ public class LzmaOutputStream extends OutputStream {
             throw exception;
     }
 
+    @Getter
+    @Builder
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class Properties {
+
+        /**
+         * The largest dictionary size supported by this implementation.
+         * <p>
+         * LZMA allows dictionaries up to one byte less than 4 GiB. This implementation supports only 16 bytes less than 2 GiB. This limitation is due
+         * to Java using signed 32-bit integers for array indexing. The limitation shouldn't matter much in practice since so huge dictionaries are not
+         * normally used.
+         */
+        public static final int DICTIONARY_SIZE_MAX = Integer.MAX_VALUE & ~15;
+        public static final int DICTIONARY_SIZE_MIN = 4096;
+
+        private final int lc; // literal context bits
+        private final int lp; // literal position bits
+        private final int pb; // position bits
+        private final int dictionarySize;
+
+        public int write(DataOutput out) throws IOException {
+            out.writeByte((byte)((pb * 5 + lp) * 9 + lc));
+            out.writeDword(dictionarySize);
+            return 5;
+        }
+
+        public static Properties read(DataInput in) throws IOException {
+            int v = in.readByte() & 0xFF;
+            int lc = v % 9;
+            int lp = (v / 9) % 5;
+            int pb = v / (9 * 5);
+            int dictionarySize = (int)in.readDword();
+
+            checkDictionarySize(dictionarySize);
+
+            return new Properties(lc, lp, pb, dictionarySizeInRange(dictionarySize));
+        }
+
+        private static void checkDictionarySize(int dictionarySize) {
+            if (dictionarySize < 0)
+                throw new IllegalArgumentException("Incorrect LZMA dictionary size: " + dictionarySize);
+            if (dictionarySize > DICTIONARY_SIZE_MAX)
+                throw new IllegalArgumentException("Incorrect LZMA dictionary size is too big for this implementation: " + dictionarySize);
+        }
+
+        private static int dictionarySizeInRange(int dictionarySize) {
+            return Math.max(DICTIONARY_SIZE_MIN, Math.min(dictionarySize, DICTIONARY_SIZE_MAX));
+        }
+
+    }
 
 }

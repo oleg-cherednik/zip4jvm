@@ -57,7 +57,7 @@ public class LzmaInputStream extends InputStream {
      * @throws IOException                 may be thrown by <code>in</code>
      */
     public LzmaInputStream(DataInput in, long uncompSize) throws IOException {
-        LzmaProperties properties = LzmaProperties.read(in);
+        LzmaOutputStream.Properties properties = LzmaOutputStream.Properties.read(in);
         lzma = new LzmaDecoder(in, properties);
         remainingSize = uncompSize;
     }
@@ -72,7 +72,6 @@ public class LzmaInputStream extends InputStream {
      * @return the next decompressed byte, or <code>-1</code>
      * to indicate the end of the compressed stream
      * @throws CorruptedInputException
-     * @throws XZIOException           if the stream has been closed
      * @throws IOException             may be thrown by <code>in</code>
      */
     public int read() throws IOException {
@@ -93,7 +92,6 @@ public class LzmaInputStream extends InputStream {
      * @return number of bytes read, or <code>-1</code> to indicate
      * the end of the compressed stream
      * @throws CorruptedInputException
-     * @throws XZIOException           if the stream has been closed
      * @throws IOException             may be thrown by <code>in</code>
      */
     public int read(byte[] buf, int off, int len) throws IOException {

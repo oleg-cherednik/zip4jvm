@@ -1,22 +1,14 @@
-/*
- * CorruptedInputException
- *
- * Author: Lasse Collin <lasse.collin@tukaani.org>
- *
- * This file has been put into the public domain.
- * You can do whatever you want with this file.
- */
-
 package ru.olegcherednik.zip4jvm.io.lzma.xz.exceptions;
 
-import ru.olegcherednik.zip4jvm.io.lzma.xz.XZIOException;
+import java.io.IOException;
 
 /**
  * Thrown when the compressed input data is corrupt.
  * However, it is possible that some or all of the data
  * already read from the input stream was corrupt too.
  */
-public class CorruptedInputException extends XZIOException {
+public class CorruptedInputException extends IOException {
+
     private static final long serialVersionUID = 3L;
 
     /**
@@ -31,7 +23,7 @@ public class CorruptedInputException extends XZIOException {
      * Creates a new CorruptedInputException with
      * the specified error detail message.
      *
-     * @param       s           error detail message
+     * @param s error detail message
      */
     public CorruptedInputException(String s) {
         super(s);
