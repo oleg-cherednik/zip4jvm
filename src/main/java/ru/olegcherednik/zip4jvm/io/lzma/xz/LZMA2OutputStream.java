@@ -10,6 +10,8 @@
 
 package ru.olegcherednik.zip4jvm.io.lzma.xz;
 
+import lombok.Getter;
+import ru.olegcherednik.zip4jvm.io.lzma.xz.exceptions.UnsupportedOptionsException;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LZEncoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LZMAEncoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeEncoderToBuffer;
@@ -47,7 +49,7 @@ class LZMA2OutputStream extends FinishableOutputStream {
 
     static int getMemoryUsage(LZMA2Options options) {
         // 64 KiB buffer for the range encoder + a little extra + LZMAEncoder
-        int dictSize = options.getDictSize();
+        int dictSize = options.getDictionarySize();
         int extraSizeBefore = getExtraSizeBefore(dictSize);
         return 70 + LZMAEncoder.getMemoryUsage(options.getMode(),
                                                dictSize, extraSizeBefore,
@@ -64,23 +66,16 @@ class LZMA2OutputStream extends FinishableOutputStream {
         outData = new DataOutputStream(out);
         rc = new RangeEncoderToBuffer(COMPRESSED_SIZE_MAX, arrayCache);
 
-        int dictSize = options.getDictSize();
+        int dictSize = options.getDictionarySize();
         int extraSizeBefore = getExtraSizeBefore(dictSize);
         lzma = LZMAEncoder.getInstance(rc,
                 options.getLc(), options.getLp(), options.getPb(),
                 options.getMode(),
-                dictSize, extraSizeBefore, options.getNiceLen(),
+                dictSize, extraSizeBefore, options.getNiceLength(),
                 options.getMatchFinder(), options.getDepthLimit(),
                 this.arrayCache);
 
         lz = lzma.getLZEncoder();
-
-        byte[] presetDict = options.getPresetDict();
-        if (presetDict != null && presetDict.length > 0) {
-            lz.setPresetDict(dictSize, presetDict);
-            dictResetNeeded = false;
-        }
-
         props = (options.getPb() * 5 + options.getLp()) * 9 + options.getLc();
     }
 
@@ -268,4 +263,5 @@ class LZMA2OutputStream extends FinishableOutputStream {
         if (exception != null)
             throw exception;
     }
+
 }

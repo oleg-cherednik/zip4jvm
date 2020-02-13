@@ -159,7 +159,7 @@ public class ZipInfoTest {
         return res;
     }
 
-    @Test(enabled = false)
+    @Test//(enabled = false)
     public void printShortInfo() throws IOException {
         zipInfo().printShortInfo(System.out);
     }
