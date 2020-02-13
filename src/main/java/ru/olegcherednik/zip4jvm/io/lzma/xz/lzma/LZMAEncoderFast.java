@@ -15,6 +15,8 @@ import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LZEncoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.Matches;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeEncoder;
 
+import java.io.IOException;
+
 final class LZMAEncoderFast extends LZMAEncoder {
     private static final int EXTRA_SIZE_BEFORE = 1;
     private static final int EXTRA_SIZE_AFTER = MATCH_LEN_MAX - 1;
@@ -150,4 +152,5 @@ final class LZMAEncoderFast extends LZMAEncoder {
         skip(mainLen - 2);
         return mainLen;
     }
+
 }

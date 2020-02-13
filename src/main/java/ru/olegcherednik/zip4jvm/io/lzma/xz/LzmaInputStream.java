@@ -22,15 +22,11 @@ import java.io.InputStream;
  * cases where it is desired that this class won't read any bytes past
  * the end of the LZMA stream.
  * <p>
- * Even when using <code>BufferedInputStream</code>, the performance tends
- * to be worse (maybe 10-20&nbsp;% slower) than with {@link LZMA2InputStream}
- * or {@link XZInputStream} (when the .xz file contains LZMA2-compressed data).
  *
  * @since 1.4
  */
 public class LzmaInputStream extends InputStream {
 
-    private final DataInput in;
     private final LzmaDecoder lzma;
 
     private boolean endReached;
@@ -42,8 +38,6 @@ public class LzmaInputStream extends InputStream {
      * the end marker is used.
      */
     private long remainingSize;
-
-    private IOException exception = null;
 
     /**
      * Creates a new .lzma file format decompressor with an optional
@@ -65,7 +59,6 @@ public class LzmaInputStream extends InputStream {
      * @throws IOException                 may be thrown by <code>in</code>
      */
     public LzmaInputStream(DataInput in, long uncompSize) throws IOException {
-        this.in = in;
         LzmaProperties properties = LzmaProperties.read(in);
 
         LZDecoder lz = new LZDecoder(properties.getDictionarySize(), null);
@@ -115,82 +108,70 @@ public class LzmaInputStream extends InputStream {
         if (len == 0)
             return 0;
 
-        if (in == null)
-            throw new XZIOException("Stream closed");
-
-        if (exception != null)
-            throw exception;
-
         if (endReached)
             return -1;
 
-        try {
-            int size = 0;
+        int size = 0;
 
-            while (len > 0) {
-                // If uncompressed size is known and thus no end marker will
-                // be present, set the limit so that the uncompressed size
-                // won't be exceeded.
-                int copySizeMax = len;
-                if (remainingSize >= 0 && remainingSize < len)
-                    copySizeMax = (int)remainingSize;
+        while (len > 0) {
+            // If uncompressed size is known and thus no end marker will
+            // be present, set the limit so that the uncompressed size
+            // won't be exceeded.
+            int copySizeMax = len;
+            if (remainingSize >= 0 && remainingSize < len)
+                copySizeMax = (int)remainingSize;
 
-                lzma.getLz().setLimit(copySizeMax);
+            lzma.getLz().setLimit(copySizeMax);
 
-                // Decode into the dictionary buffer.
-                try {
-                    lzma.decode();
-                } catch(CorruptedInputException e) {
-                    // The end marker is encoded with a LZMA symbol that
-                    // indicates maximum match distance. This is larger
-                    // than any supported dictionary and thus causes
-                    // CorruptedInputException from LZDecoder.repeat.
-                    if (remainingSize != -1 || !lzma.endMarkerDetected())
-                        throw e;
+            // Decode into the dictionary buffer.
+            try {
+                lzma.decode();
+            } catch(CorruptedInputException e) {
+                // The end marker is encoded with a LZMA symbol that
+                // indicates maximum match distance. This is larger
+                // than any supported dictionary and thus causes
+                // CorruptedInputException from LZDecoder.repeat.
+                if (remainingSize != -1 || !lzma.endMarkerDetected())
+                    throw e;
 
-                    endReached = true;
+                endReached = true;
 
-                    // The exception makes lzma.decode() miss the last range
-                    // decoder normalization, so do it here. This might
-                    // cause an IOException if it needs to read a byte
-                    // from the input stream.
-                    lzma.getRc().normalize();
-                }
-
-                // Copy from the dictionary to buf.
-                int copiedSize = lzma.getLz().flush(buf, off);
-                off += copiedSize;
-                len -= copiedSize;
-                size += copiedSize;
-
-                if (remainingSize >= 0) {
-                    // Update the number of bytes left to be decompressed.
-                    remainingSize -= copiedSize;
-                    assert remainingSize >= 0;
-
-                    if (remainingSize == 0)
-                        endReached = true;
-                }
-
-                if (endReached) {
-                    // Checking these helps a lot when catching corrupt
-                    // or truncated .lzma files. LZMA Utils doesn't do
-                    // the first check and thus it accepts many invalid
-                    // files that this implementation and XZ Utils don't.
-                    if (!lzma.getRc().isFinished() || lzma.getLz().hasPending())
-                        throw new CorruptedInputException();
-
-                    putArraysToCache();
-                    return size == 0 ? -1 : size;
-                }
+                // The exception makes lzma.decode() miss the last range
+                // decoder normalization, so do it here. This might
+                // cause an IOException if it needs to read a byte
+                // from the input stream.
+                lzma.getRc().normalize();
             }
 
-            return size;
+            // Copy from the dictionary to buf.
+            int copiedSize = lzma.getLz().flush(buf, off);
+            off += copiedSize;
+            len -= copiedSize;
+            size += copiedSize;
 
-        } catch(IOException e) {
-            exception = e;
-            throw e;
+            if (remainingSize >= 0) {
+                // Update the number of bytes left to be decompressed.
+                remainingSize -= copiedSize;
+                assert remainingSize >= 0;
+
+                if (remainingSize == 0)
+                    endReached = true;
+            }
+
+            if (endReached) {
+                // Checking these helps a lot when catching corrupt
+                // or truncated .lzma files. LZMA Utils doesn't do
+                // the first check and thus it accepts many invalid
+                // files that this implementation and XZ Utils don't.
+                if (!lzma.getRc().isFinished() || lzma.getLz().hasPending())
+                    throw new CorruptedInputException();
+
+                putArraysToCache();
+                return size == 0 ? -1 : size;
+            }
         }
+
+        return size;
     }
 
     private void putArraysToCache() {
@@ -205,7 +186,6 @@ public class LzmaInputStream extends InputStream {
      */
     @Override
     public void close() throws IOException {
-        putArraysToCache();
-        in.close();
+        lzma.close();
     }
 }

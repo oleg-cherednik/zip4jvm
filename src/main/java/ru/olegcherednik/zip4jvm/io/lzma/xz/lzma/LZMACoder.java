@@ -2,7 +2,10 @@ package ru.olegcherednik.zip4jvm.io.lzma.xz.lzma;
 
 import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeCoder;
 
-abstract class LZMACoder {
+import java.io.Closeable;
+import java.io.IOException;
+
+abstract class LZMACoder implements Closeable {
     static final int POS_STATES_MAX = 1 << 4;
 
     static final int MATCH_LEN_MIN = 2;
@@ -126,5 +129,10 @@ abstract class LZMACoder {
 
             RangeCoder.initProbs(high);
         }
+    }
+
+    @Override
+    public void close() throws IOException {
+
     }
 }

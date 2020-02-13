@@ -36,4 +36,9 @@ public final class RangeDecoderFromStream extends RangeDecoder {
             range <<= SHIFT_BITS;
         }
     }
+
+    @Override
+    public void close() throws IOException {
+        in.close();
+    }
 }

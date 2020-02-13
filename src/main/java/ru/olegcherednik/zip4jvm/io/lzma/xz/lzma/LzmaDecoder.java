@@ -123,6 +123,11 @@ public final class LzmaDecoder extends LZMACoder {
         return repLenDecoder.decode(posState);
     }
 
+    @Override
+    public void close() throws IOException {
+        lz.putArraysToCache();
+        rc.close();
+    }
 
     private class LiteralDecoder extends LiteralCoder {
 
