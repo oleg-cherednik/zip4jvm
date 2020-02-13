@@ -5,7 +5,7 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.exceptions.CorruptedInputException;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.exceptions.MemoryLimitException;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.exceptions.UnsupportedOptionsException;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LZEncoder;
+import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.MatchFinder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LzmaDecoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LzmaEncoder;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
@@ -278,16 +278,6 @@ public class LzmaInputStream extends InputStream {
          */
         public static final int NICE_LEN_MAX = 273;
 
-        /**
-         * Match finder: Hash Chain 2-3-4
-         */
-        public static final int MF_HC4 = LZEncoder.MF_HC4;
-
-        /**
-         * Match finder: Binary tree 2-3-4
-         */
-        public static final int MF_BT4 = LZEncoder.MF_BT4;
-
         private static final int[] presetToDictSize = {
                 1 << 18, 1 << 20, 1 << 21, 1 << 22, 1 << 22,
                 1 << 23, 1 << 23, 1 << 24, 1 << 25, 1 << 26 };
@@ -300,7 +290,7 @@ public class LzmaInputStream extends InputStream {
         private int pb;
         private int mode;
         private int niceLength;
-        private int matchFinder;
+        private MatchFinder matchFinder;
         private int depthLimit;
 
         public Properties() throws UnsupportedOptionsException {
@@ -323,12 +313,12 @@ public class LzmaInputStream extends InputStream {
 
             if (compressionLevel <= 3) {
                 mode = MODE_FAST;
-                matchFinder = MF_HC4;
+                matchFinder = MatchFinder.HASH_CHAIN;
                 niceLength = compressionLevel <= 1 ? 128 : NICE_LEN_MAX;
                 depthLimit = presetToDepthLimit[compressionLevel];
             } else {
                 mode = MODE_NORMAL;
-                matchFinder = MF_BT4;
+                matchFinder = MatchFinder.BINARY_TREE;
                 niceLength = (compressionLevel == 4) ? 16 : (compressionLevel == 5) ? 32 : 64;
                 depthLimit = 0;
             }

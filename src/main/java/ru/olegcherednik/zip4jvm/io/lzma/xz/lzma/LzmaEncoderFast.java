@@ -14,7 +14,7 @@ final class LzmaEncoderFast extends LzmaEncoder {
     }
 
     private static LZEncoder createEncoder(LzmaInputStream.Properties properties) {
-        return LZEncoder.create(properties, MATCH_LEN_MAX - 1);
+        return properties.getMatchFinder().createEncoder(properties, MATCH_LEN_MAX - 1);
     }
 
     @Override

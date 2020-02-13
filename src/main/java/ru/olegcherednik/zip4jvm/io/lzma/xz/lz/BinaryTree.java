@@ -1,5 +1,5 @@
 /*
- * Hash Chain match finder with 2-, 3-, and 4-byte hashing
+ * Binary Tree match finder with 2-, 3-, and 4-byte hashing
  *
  * Authors: Lasse Collin <lasse.collin@tukaani.org>
  *          Igor Pavlov <http://7-zip.org/>
@@ -14,10 +14,10 @@ import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaInputStream;
 
 import static ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LZMACoder.MATCH_LEN_MAX;
 
-final class HC4 extends LZEncoder {
+final class BinaryTree extends LZEncoder {
 
     private final Hash234 hash;
-    private final int[] chain;
+    private final int[] tree;
     private final Matches matches;
     private final int depthLimit;
 
@@ -25,45 +25,32 @@ final class HC4 extends LZEncoder {
     private int cyclicPos = -1;
     private int lzPos;
 
-    /**
-     * Creates a new LZEncoder with the HC4 match finder.
-     * See <code>LZEncoder.getInstance</code> for parameter descriptions.
-     */
-    HC4(LzmaInputStream.Properties properties, int readAheadMax) {
+
+    BinaryTree(LzmaInputStream.Properties properties, int readAheadMax) {
         super(properties, readAheadMax);
 
-        hash = new Hash234(properties.getDictionarySize());
-
-        // +1 because we need dictSize bytes of history + the current byte.
         cyclicSize = properties.getDictionarySize() + 1;
-        chain = new int[cyclicSize];
         lzPos = cyclicSize;
+
+        hash = new Hash234(properties.getDictionarySize());
+        tree = new int[cyclicSize * 2];
 
         // Substracting 1 because the shortest match that this match
         // finder can find is 2 bytes, so there's no need to reserve
         // space for one-byte matches.
-        matches = new Matches(properties.getNiceLength() - 1);
+        matches = new Matches(niceLen - 1);
 
-        // Use a default depth limit if no other value was specified.
-        // The default is just something based on experimentation;
-        // it's nothing magic.
-        this.depthLimit = properties.getDepthLimit() > 0 ? properties.getDepthLimit() : 4 + properties.getNiceLength() / 4;
+        this.depthLimit = properties.getDepthLimit() > 0 ? properties.getDepthLimit() : 16 + niceLen / 2;
     }
 
-    /**
-     * Moves to the next byte, checks that there is enough available space,
-     * and possibly normalizes the hash tables and the hash chain.
-     *
-     * @return number of bytes available, including the current byte
-     */
     private int movePos() {
-        int avail = movePos(4, 4);
+        int avail = movePos(niceLen, 4);
 
         if (avail != 0) {
             if (++lzPos == Integer.MAX_VALUE) {
                 int normalizationOffset = Integer.MAX_VALUE - cyclicSize;
                 hash.normalize(normalizationOffset);
-                normalize(chain, cyclicSize, normalizationOffset);
+                normalize(tree, cyclicSize * 2, normalizationOffset);
                 lzPos -= normalizationOffset;
             }
 
@@ -76,6 +63,7 @@ final class HC4 extends LZEncoder {
 
     public Matches getMatches() {
         matches.count = 0;
+
         int matchLenLimit = MATCH_LEN_MAX;
         int niceLenLimit = niceLen;
         int avail = movePos();
@@ -94,8 +82,6 @@ final class HC4 extends LZEncoder {
         int delta3 = lzPos - hash.getHash3Pos();
         int currentMatch = hash.getHash4Pos();
         hash.updateTables(lzPos);
-
-        chain[cyclicPos] = currentMatch;
 
         int lenBest = 0;
 
@@ -131,16 +117,23 @@ final class HC4 extends LZEncoder {
 
             // Return if it is long enough (niceLen or reached the end of
             // the dictionary).
-            if (lenBest >= niceLenLimit)
+            if (lenBest >= niceLenLimit) {
+                skip(niceLenLimit, currentMatch);
                 return matches;
+            }
         }
 
         // Long enough match wasn't found so easily. Look for better matches
-        // from the hash chain.
+        // from the binary tree.
         if (lenBest < 3)
             lenBest = 3;
 
         int depth = depthLimit;
+
+        int ptr0 = (cyclicPos << 1) + 1;
+        int ptr1 = cyclicPos << 1;
+        int len0 = 0;
+        int len1 = 0;
 
         while (true) {
             int delta = lzPos - currentMatch;
@@ -148,50 +141,116 @@ final class HC4 extends LZEncoder {
             // Return if the search depth limit has been reached or
             // if the distance of the potential match exceeds the
             // dictionary size.
-            if (depth-- == 0 || delta >= cyclicSize)
+            if (depth-- == 0 || delta >= cyclicSize) {
+                tree[ptr0] = 0;
+                tree[ptr1] = 0;
                 return matches;
+            }
 
-            currentMatch = chain[cyclicPos - delta
-                    + (delta > cyclicPos ? cyclicSize : 0)];
+            int pair = (cyclicPos - delta
+                    + (delta > cyclicPos ? cyclicSize : 0)) << 1;
+            int len = Math.min(len0, len1);
 
-            // Test the first byte and the first new byte that would give us
-            // a match that is at least one byte longer than lenBest. This
-            // too short matches get quickly skipped.
-            if (buf[readPos + lenBest - delta] == buf[readPos + lenBest]
-                    && buf[readPos - delta] == buf[readPos]) {
-                // Calculate the length of the match.
-                int len = 0;
+            if (buf[readPos + len - delta] == buf[readPos + len]) {
                 while (++len < matchLenLimit)
                     if (buf[readPos + len - delta] != buf[readPos + len])
                         break;
 
-                // Use the match if and only if it is better than the longest
-                // match found so far.
                 if (len > lenBest) {
                     lenBest = len;
                     matches.len[matches.count] = len;
                     matches.dist[matches.count] = delta - 1;
                     ++matches.count;
 
-                    // Return if it is long enough (niceLen or reached the
-                    // end of the dictionary).
-                    if (len >= niceLenLimit)
+                    if (len >= niceLenLimit) {
+                        tree[ptr1] = tree[pair];
+                        tree[ptr0] = tree[pair + 1];
                         return matches;
+                    }
                 }
+            }
+
+            if ((buf[readPos + len - delta] & 0xFF)
+                    < (buf[readPos + len] & 0xFF)) {
+                tree[ptr1] = currentMatch;
+                ptr1 = pair + 1;
+                currentMatch = tree[ptr1];
+                len1 = len;
+            } else {
+                tree[ptr0] = currentMatch;
+                ptr0 = pair;
+                currentMatch = tree[ptr0];
+                len0 = len;
+            }
+        }
+    }
+
+    private void skip(int niceLenLimit, int currentMatch) {
+        int depth = depthLimit;
+
+        int ptr0 = (cyclicPos << 1) + 1;
+        int ptr1 = cyclicPos << 1;
+        int len0 = 0;
+        int len1 = 0;
+
+        while (true) {
+            int delta = lzPos - currentMatch;
+
+            if (depth-- == 0 || delta >= cyclicSize) {
+                tree[ptr0] = 0;
+                tree[ptr1] = 0;
+                return;
+            }
+
+            int pair = (cyclicPos - delta
+                    + (delta > cyclicPos ? cyclicSize : 0)) << 1;
+            int len = Math.min(len0, len1);
+
+            if (buf[readPos + len - delta] == buf[readPos + len]) {
+                // No need to look for longer matches than niceLenLimit
+                // because we only are updating the tree, not returning
+                // matches found to the caller.
+                do {
+                    if (++len == niceLenLimit) {
+                        tree[ptr1] = tree[pair];
+                        tree[ptr0] = tree[pair + 1];
+                        return;
+                    }
+                } while (buf[readPos + len - delta] == buf[readPos + len]);
+            }
+
+            if ((buf[readPos + len - delta] & 0xFF)
+                    < (buf[readPos + len] & 0xFF)) {
+                tree[ptr1] = currentMatch;
+                ptr1 = pair + 1;
+                currentMatch = tree[ptr1];
+                len1 = len;
+            } else {
+                tree[ptr0] = currentMatch;
+                ptr0 = pair;
+                currentMatch = tree[ptr0];
+                len0 = len;
             }
         }
     }
 
     public void skip(int len) {
-        assert len >= 0;
-
         while (len-- > 0) {
-            if (movePos() != 0) {
-                // Update the hash chain and hash tables.
-                hash.calcHashes(buf, readPos);
-                chain[cyclicPos] = hash.getHash4Pos();
-                hash.updateTables(lzPos);
+            int niceLenLimit = niceLen;
+            int avail = movePos();
+
+            if (avail < niceLenLimit) {
+                if (avail == 0)
+                    continue;
+
+                niceLenLimit = avail;
             }
+
+            hash.calcHashes(buf, readPos);
+            int currentMatch = hash.getHash4Pos();
+            hash.updateTables(lzPos);
+
+            skip(niceLenLimit, currentMatch);
         }
     }
 }

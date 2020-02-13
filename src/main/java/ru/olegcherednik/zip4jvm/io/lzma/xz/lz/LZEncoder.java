@@ -59,31 +59,11 @@ public abstract class LZEncoder {
     /**
      * Gets the size of the LZ window buffer that needs to be allocated.
      */
-    private static int getBufSize(
-            int dictSize, int extraSizeAfter) {
+    private static int getBufSize(int dictSize, int extraSizeAfter) {
         int keepSizeBefore = dictSize;
         int keepSizeAfter = extraSizeAfter + MATCH_LEN_MAX;
         int reserveSize = Math.min(dictSize / 2 + (256 << 10), 512 << 20);
         return keepSizeBefore + keepSizeAfter + reserveSize;
-    }
-
-    /**
-     * Creates a new LZEncoder.
-     * <p>
-     *
-     * @param extraSizeAfter number of bytes that must be available
-     *                       after current position + matchLenMax
-     */
-    public static LZEncoder create(LzmaInputStream.Properties properties, int extraSizeAfter) {
-        switch (properties.getMatchFinder()) {
-            case MF_HC4:
-                return new HC4(properties, extraSizeAfter);
-
-            case MF_BT4:
-                return new BT4(properties, extraSizeAfter);
-        }
-
-        throw new IllegalArgumentException();
     }
 
     /**

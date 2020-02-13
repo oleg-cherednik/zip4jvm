@@ -9,8 +9,6 @@ final class LzmaEncoderNormal extends LzmaEncoder {
 
     private static final int OPTS = 4096;
 
-    private static final int EXTRA_SIZE_AFTER = OPTS;
-
     private final Optimum[] opts = new Optimum[OPTS];
     private int optCur = 0;
     private int optEnd = 0;
@@ -30,7 +28,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
     }
 
     private static LZEncoder createEncoder(LzmaInputStream.Properties properties) {
-        return LZEncoder.create(properties, EXTRA_SIZE_AFTER);
+        return properties.getMatchFinder().createEncoder(properties, OPTS);
     }
 
     public void reset() {
