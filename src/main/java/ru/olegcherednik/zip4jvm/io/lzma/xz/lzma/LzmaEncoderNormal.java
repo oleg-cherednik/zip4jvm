@@ -30,7 +30,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
     }
 
     private static LZEncoder createEncoder(LzmaInputStream.Properties properties) {
-        return LZEncoder.create(properties, EXTRA_SIZE_AFTER, MATCH_LEN_MAX);
+        return LZEncoder.create(properties, EXTRA_SIZE_AFTER);
     }
 
     public void reset() {

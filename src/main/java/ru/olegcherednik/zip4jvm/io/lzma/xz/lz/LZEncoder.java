@@ -16,6 +16,8 @@ import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import static ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LZMACoder.MATCH_LEN_MAX;
+
 public abstract class LZEncoder {
 
     public static final int MF_HC4 = 0x04;
@@ -35,7 +37,6 @@ public abstract class LZEncoder {
      */
     private final int keepSizeAfter;
 
-    final int matchLenMax;
     final int niceLen;
 
     final byte[] buf;
@@ -61,10 +62,9 @@ public abstract class LZEncoder {
      * Gets the size of the LZ window buffer that needs to be allocated.
      */
     private static int getBufSize(
-            int dictSize, int extraSizeAfter,
-            int matchLenMax) {
+            int dictSize, int extraSizeAfter) {
         int keepSizeBefore = dictSize;
-        int keepSizeAfter = extraSizeAfter + matchLenMax;
+        int keepSizeAfter = extraSizeAfter + MATCH_LEN_MAX;
         int reserveSize = Math.min(dictSize / 2 + (256 << 10), 512 << 20);
         return keepSizeBefore + keepSizeAfter + reserveSize;
     }
@@ -75,16 +75,14 @@ public abstract class LZEncoder {
      *
      * @param extraSizeAfter number of bytes that must be available
      *                       after current position + matchLenMax
-     * @param matchLenMax    don't test for matches longer than
-     *                       <code>matchLenMax</code> bytes
      */
-    public static LZEncoder create(LzmaInputStream.Properties properties, int extraSizeAfter, int matchLenMax) {
+    public static LZEncoder create(LzmaInputStream.Properties properties, int extraSizeAfter) {
         switch (properties.getMatchFinder()) {
             case MF_HC4:
-                return new HC4(properties, extraSizeAfter, matchLenMax);
+                return new HC4(properties, extraSizeAfter);
 
             case MF_BT4:
-                return new BT4(properties, extraSizeAfter, matchLenMax);
+                return new BT4(properties, extraSizeAfter);
         }
 
         throw new IllegalArgumentException();
@@ -93,14 +91,13 @@ public abstract class LZEncoder {
     /**
      * Creates a new LZEncoder. See <code>getInstance</code>.
      */
-    LZEncoder(LzmaInputStream.Properties properties, int extraSizeAfter, int matchLenMax) {
-        bufSize = getBufSize(properties.getDictionarySize(), extraSizeAfter, matchLenMax);
+    LZEncoder(LzmaInputStream.Properties properties, int extraSizeAfter) {
+        bufSize = getBufSize(properties.getDictionarySize(), extraSizeAfter);
         buf = ArrayCache.getDefaultCache().getByteArray(bufSize, false);
 
         keepSizeBefore = properties.getDictionarySize();
-        keepSizeAfter = extraSizeAfter + matchLenMax;
+        keepSizeAfter = extraSizeAfter + MATCH_LEN_MAX;
 
-        this.matchLenMax = matchLenMax;
         niceLen = properties.getNiceLength();
     }
 
@@ -305,7 +302,7 @@ public abstract class LZEncoder {
      * @return true if matches are valid, false if match finder is broken
      */
     public boolean verifyMatches(Matches matches) {
-        int lenLimit = Math.min(getAvail(), matchLenMax);
+        int lenLimit = Math.min(getAvail(), MATCH_LEN_MAX);
 
         for (int i = 0; i < matches.count; ++i)
             if (getMatchLen(matches.dist[i], lenLimit) != matches.len[i])

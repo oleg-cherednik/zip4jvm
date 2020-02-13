@@ -20,13 +20,10 @@ import java.io.OutputStream;
 public class LzmaOutputStream extends OutputStream {
 
     private final DataOutput out;
-
-    private final ArrayCache arrayCache = ArrayCache.getDefaultCache();
-
-    private LzmaEncoder lzma;
+    private final LzmaEncoder lzma;
 
     private final long uncompressedSize;
-    private long currentUncompressedSize = 0;
+    private long currentUncompressedSize;
 
     private boolean finished;
 
@@ -117,8 +114,7 @@ public class LzmaOutputStream extends OutputStream {
             lzma.finish();
             finished = true;
 
-            lzma.putArraysToCache(arrayCache);
-            lzma = null;
+            lzma.putArraysToCache(ArrayCache.getDefaultCache());
         }
     }
 

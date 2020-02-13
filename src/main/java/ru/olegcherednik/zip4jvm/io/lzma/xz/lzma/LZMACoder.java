@@ -7,11 +7,11 @@ import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeCoder;
 import java.io.Closeable;
 import java.io.IOException;
 
-abstract class LZMACoder implements Closeable {
+public abstract class LZMACoder implements Closeable {
     static final int POS_STATES_MAX = 1 << 4;
 
     static final int MATCH_LEN_MIN = 2;
-    static final int MATCH_LEN_MAX = MATCH_LEN_MIN + LengthCoder.LOW_SYMBOLS
+    public static final int MATCH_LEN_MAX = MATCH_LEN_MIN + LengthCoder.LOW_SYMBOLS
                                      + LengthCoder.MID_SYMBOLS
                                      + LengthCoder.HIGH_SYMBOLS - 1;
 

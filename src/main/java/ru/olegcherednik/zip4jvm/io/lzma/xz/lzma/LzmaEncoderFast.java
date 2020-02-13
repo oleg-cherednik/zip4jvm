@@ -26,7 +26,7 @@ final class LzmaEncoderFast extends LzmaEncoder {
     }
 
     private static LZEncoder createEncoder(LzmaInputStream.Properties properties) {
-        return LZEncoder.create(properties, EXTRA_SIZE_AFTER, MATCH_LEN_MAX);
+        return LZEncoder.create(properties, EXTRA_SIZE_AFTER);
     }
 
     private boolean changePair(int smallDist, int bigDist) {

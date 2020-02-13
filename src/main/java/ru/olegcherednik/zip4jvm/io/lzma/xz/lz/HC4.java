@@ -13,6 +13,8 @@ package ru.olegcherednik.zip4jvm.io.lzma.xz.lz;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.ArrayCache;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaInputStream;
 
+import static ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LZMACoder.MATCH_LEN_MAX;
+
 final class HC4 extends LZEncoder {
 
     private final Hash234 hash;
@@ -28,8 +30,8 @@ final class HC4 extends LZEncoder {
      * Creates a new LZEncoder with the HC4 match finder.
      * See <code>LZEncoder.getInstance</code> for parameter descriptions.
      */
-    HC4(LzmaInputStream.Properties properties, int readAheadMax, int matchLenMax) {
-        super(properties, readAheadMax, matchLenMax);
+    HC4(LzmaInputStream.Properties properties, int readAheadMax) {
+        super(properties, readAheadMax);
 
         hash = new Hash234(properties.getDictionarySize());
 
@@ -81,7 +83,7 @@ final class HC4 extends LZEncoder {
 
     public Matches getMatches() {
         matches.count = 0;
-        int matchLenLimit = matchLenMax;
+        int matchLenLimit = MATCH_LEN_MAX;
         int niceLenLimit = niceLen;
         int avail = movePos();
 
