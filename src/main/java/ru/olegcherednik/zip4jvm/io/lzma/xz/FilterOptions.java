@@ -10,9 +10,6 @@
 
 package ru.olegcherednik.zip4jvm.io.lzma.xz;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 /**
  * Base class for filter-specific options classes.
  */
@@ -28,21 +25,6 @@ public abstract class FilterOptions implements Cloneable {
 
         for (int i = 0; i < options.length; ++i)
             m += options[i].getEncoderMemoryUsage();
-
-        return m;
-    }
-
-    /**
-     * Gets how much memory the decoder will need with
-     * the given filter chain. This function simply calls
-     * <code>getDecoderMemoryUsage()</code> for every filter
-     * in the array and returns the sum of the returned values.
-     */
-    public static int getDecoderMemoryUsage(FilterOptions[] options) {
-        int m = 0;
-
-        for (int i = 0; i < options.length; ++i)
-            m += options[i].getDecoderMemoryUsage();
 
         return m;
     }
@@ -75,30 +57,6 @@ public abstract class FilterOptions implements Cloneable {
      */
     public abstract FinishableOutputStream getOutputStream(
             FinishableOutputStream out, ArrayCache arrayCache);
-
-    /**
-     * Gets how much memory the decoder will need to decompress the data
-     * that was encoded with these options.
-     */
-    public abstract int getDecoderMemoryUsage();
-
-    /**
-     * Gets a raw (no XZ headers) decoder input stream using these options.
-     * <p>
-     * This is uses ArrayCache.getDefaultCache() as the ArrayCache.
-     */
-    public InputStream getInputStream(InputStream in) throws IOException {
-        return getInputStream(in, ArrayCache.getDefaultCache());
-    }
-
-    /**
-     * Gets a raw (no XZ headers) decoder input stream using these options
-     * and the given ArrayCache.
-     */
-    public abstract InputStream getInputStream(
-            InputStream in, ArrayCache arrayCache) throws IOException;
-
-    abstract FilterEncoder getFilterEncoder();
 
     FilterOptions() {}
 }

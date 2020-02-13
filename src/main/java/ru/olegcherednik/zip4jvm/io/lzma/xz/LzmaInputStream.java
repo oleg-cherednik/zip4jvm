@@ -4,9 +4,7 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.exceptions.CorruptedInputException;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.exceptions.MemoryLimitException;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.exceptions.UnsupportedOptionsException;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LZDecoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LzmaDecoder;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeDecoderFromStream;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -60,10 +58,7 @@ public class LzmaInputStream extends InputStream {
      */
     public LzmaInputStream(DataInput in, long uncompSize) throws IOException {
         LzmaProperties properties = LzmaProperties.read(in);
-
-        LZDecoder lz = new LZDecoder(properties.getDictionarySize(), null);
-        RangeDecoderFromStream rc = new RangeDecoderFromStream(in);
-        lzma = new LzmaDecoder(lz, rc, properties.getLc(), properties.getLp(), properties.getPb());
+        lzma = new LzmaDecoder(in, properties);
         remainingSize = uncompSize;
     }
 

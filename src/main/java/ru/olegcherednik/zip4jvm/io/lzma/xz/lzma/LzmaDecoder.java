@@ -1,8 +1,11 @@
 package ru.olegcherednik.zip4jvm.io.lzma.xz.lzma;
 
 import lombok.Getter;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaProperties;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LZDecoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeDecoder;
+import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeDecoderFromStream;
 
 import java.io.IOException;
 
@@ -15,11 +18,11 @@ public final class LzmaDecoder extends LZMACoder {
     private final LengthDecoder matchLenDecoder = new LengthDecoder();
     private final LengthDecoder repLenDecoder = new LengthDecoder();
 
-    public LzmaDecoder(LZDecoder lz, RangeDecoder rc, int lc, int lp, int pb) {
-        super(pb);
-        this.lz = lz;
-        this.rc = rc;
-        this.literalDecoder = new LiteralDecoder(lc, lp);
+    public LzmaDecoder(DataInput in, LzmaProperties properties) throws IOException {
+        super(properties.getPb());
+        lz = new LZDecoder(properties.getDictionarySize(), null);
+        rc = new RangeDecoderFromStream(in);
+        literalDecoder = new LiteralDecoder(properties);
         reset();
     }
 
@@ -133,10 +136,10 @@ public final class LzmaDecoder extends LZMACoder {
 
         private final LiteralSubdecoder[] subdecoders;
 
-        LiteralDecoder(int lc, int lp) {
-            super(lc, lp);
+        LiteralDecoder(LzmaProperties properties) {
+            super(properties.getLc(), properties.getLp());
 
-            subdecoders = new LiteralSubdecoder[1 << (lc + lp)];
+            subdecoders = new LiteralSubdecoder[1 << (properties.getLc() + properties.getLp())];
             for (int i = 0; i < subdecoders.length; ++i)
                 subdecoders[i] = new LiteralSubdecoder();
         }
