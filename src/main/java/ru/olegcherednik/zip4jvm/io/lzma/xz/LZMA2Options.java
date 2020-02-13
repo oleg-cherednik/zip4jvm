@@ -24,6 +24,7 @@ import java.io.InputStream;
  * <code>LZMA2Options(int)</code>.
  */
 public class LZMA2Options extends FilterOptions {
+
     /**
      * Minimum valid compression preset level is 0.
      */
@@ -148,7 +149,7 @@ public class LZMA2Options extends FilterOptions {
     public LZMA2Options() {
         try {
             setPreset(PRESET_DEFAULT);
-        } catch (UnsupportedOptionsException e) {
+        } catch(UnsupportedOptionsException e) {
             assert false;
             throw new RuntimeException();
         }
@@ -157,8 +158,7 @@ public class LZMA2Options extends FilterOptions {
     /**
      * Creates new LZMA2 options and sets them to the given preset.
      *
-     * @throws      UnsupportedOptionsException
-     *                          <code>preset</code> is not supported
+     * @throws UnsupportedOptionsException <code>preset</code> is not supported
      */
     public LZMA2Options(int preset) throws UnsupportedOptionsException {
         setPreset(preset);
@@ -167,11 +167,10 @@ public class LZMA2Options extends FilterOptions {
     /**
      * Creates new LZMA2 options and sets them to the given custom values.
      *
-     * @throws      UnsupportedOptionsException
-     *                          unsupported options were specified
+     * @throws UnsupportedOptionsException unsupported options were specified
      */
     public LZMA2Options(int dictSize, int lc, int lp, int pb, int mode,
-                        int niceLen, int mf, int depthLimit)
+            int niceLen, int mf, int depthLimit)
             throws UnsupportedOptionsException {
         setDictSize(dictSize);
         setLcLp(lc, lp);
@@ -195,8 +194,7 @@ public class LZMA2Options extends FilterOptions {
      * 16&nbsp;MiB, or 32&nbsp;MiB, it is waste of memory to use the
      * presets 7, 8, or 9, respectively.
      *
-     * @throws      UnsupportedOptionsException
-     *                          <code>preset</code> is not supported
+     * @throws UnsupportedOptionsException <code>preset</code> is not supported
      */
     public void setPreset(int preset) throws UnsupportedOptionsException {
         if (preset < 0 || preset > 9)
@@ -233,19 +231,18 @@ public class LZMA2Options extends FilterOptions {
      * but sizes of 2^n and 2^n&nbsp;+&nbsp;2^(n-1) bytes are somewhat
      * recommended.
      *
-     * @throws      UnsupportedOptionsException
-     *                          <code>dictSize</code> is not supported
+     * @throws UnsupportedOptionsException <code>dictSize</code> is not supported
      */
     public void setDictSize(int dictSize) throws UnsupportedOptionsException {
         if (dictSize < DICT_SIZE_MIN)
             throw new UnsupportedOptionsException(
                     "LZMA2 dictionary size must be at least 4 KiB: "
-                    + dictSize + " B");
+                            + dictSize + " B");
 
         if (dictSize > DICT_SIZE_MAX)
             throw new UnsupportedOptionsException(
                     "LZMA2 dictionary size must not exceed "
-                    + (DICT_SIZE_MAX >> 20) + " MiB: " + dictSize + " B");
+                            + (DICT_SIZE_MAX >> 20) + " MiB: " + dictSize + " B");
 
         this.dictSize = dictSize;
     }
@@ -289,16 +286,15 @@ public class LZMA2Options extends FilterOptions {
      * Trying to exceed it will throw an exception. This function lets
      * you change both at the same time.
      *
-     * @throws      UnsupportedOptionsException
-     *                          <code>lc</code> and <code>lp</code>
-     *                          are invalid
+     * @throws UnsupportedOptionsException <code>lc</code> and <code>lp</code>
+     *                                     are invalid
      */
     public void setLcLp(int lc, int lp) throws UnsupportedOptionsException {
         if (lc < 0 || lp < 0 || lc > LC_LP_MAX || lp > LC_LP_MAX
                 || lc + lp > LC_LP_MAX)
             throw new UnsupportedOptionsException(
                     "lc + lp must not exceed " + LC_LP_MAX + ": "
-                    + lc + " + " + lp);
+                            + lc + " + " + lp);
 
         this.lc = lc;
         this.lp = lp;
@@ -325,10 +321,9 @@ public class LZMA2Options extends FilterOptions {
      * makes compression worse. If it makes it worse, test for example
      * <code>setLc(2)</code> too.
      *
-     * @throws      UnsupportedOptionsException
-     *                          <code>lc</code> is invalid, or the sum
-     *                          of <code>lc</code> and <code>lp</code>
-     *                          exceed LC_LP_MAX
+     * @throws UnsupportedOptionsException <code>lc</code> is invalid, or the sum
+     *                                     of <code>lc</code> and <code>lp</code>
+     *                                     exceed LC_LP_MAX
      */
     public void setLc(int lc) throws UnsupportedOptionsException {
         setLcLp(lc, lp);
@@ -341,10 +336,9 @@ public class LZMA2Options extends FilterOptions {
      * assumed when encoding literals. See {@link #setPb(int) setPb} for
      * more information about alignment.
      *
-     * @throws      UnsupportedOptionsException
-     *                          <code>lp</code> is invalid, or the sum
-     *                          of <code>lc</code> and <code>lp</code>
-     *                          exceed LC_LP_MAX
+     * @throws UnsupportedOptionsException <code>lp</code> is invalid, or the sum
+     *                                     of <code>lc</code> and <code>lp</code>
+     *                                     exceed LC_LP_MAX
      */
     public void setLp(int lp) throws UnsupportedOptionsException {
         setLcLp(lc, lp);
@@ -385,8 +379,7 @@ public class LZMA2Options extends FilterOptions {
      * 16-byte alignment. It might be worth taking into account when designing
      * file formats that are likely to be often compressed with LZMA2.
      *
-     * @throws      UnsupportedOptionsException
-     *                          <code>pb</code> is invalid
+     * @throws UnsupportedOptionsException <code>pb</code> is invalid
      */
     public void setPb(int pb) throws UnsupportedOptionsException {
         if (pb < 0 || pb > PB_MAX)
@@ -418,8 +411,7 @@ public class LZMA2Options extends FilterOptions {
      * compress the data at all (and doesn't use a match finder) and will
      * simply wrap it in uncompressed LZMA2 chunks.
      *
-     * @throws      UnsupportedOptionsException
-     *                          <code>mode</code> is not supported
+     * @throws UnsupportedOptionsException <code>mode</code> is not supported
      */
     public void setMode(int mode) throws UnsupportedOptionsException {
         if (mode < MODE_UNCOMPRESSED || mode > MODE_NORMAL)
@@ -443,19 +435,18 @@ public class LZMA2Options extends FilterOptions {
      * to give better compression at the expense of speed. The default
      * depends on the preset.
      *
-     * @throws      UnsupportedOptionsException
-     *                          <code>niceLen</code> is invalid
+     * @throws UnsupportedOptionsException <code>niceLen</code> is invalid
      */
     public void setNiceLen(int niceLen) throws UnsupportedOptionsException {
         if (niceLen < NICE_LEN_MIN)
             throw new UnsupportedOptionsException(
                     "Minimum nice length of matches is "
-                    + NICE_LEN_MIN + " bytes: " + niceLen);
+                            + NICE_LEN_MIN + " bytes: " + niceLen);
 
         if (niceLen > NICE_LEN_MAX)
             throw new UnsupportedOptionsException(
                     "Maximum nice length of matches is " + NICE_LEN_MAX
-                    + ": " + niceLen);
+                            + ": " + niceLen);
 
         this.niceLen = niceLen;
     }
@@ -475,8 +466,7 @@ public class LZMA2Options extends FilterOptions {
      * than Binary Tree match finders. The default depends on the preset:
      * 0-3 use <code>MF_HC4</code> and 4-9 use <code>MF_BT4</code>.
      *
-     * @throws      UnsupportedOptionsException
-     *                          <code>mf</code> is not supported
+     * @throws UnsupportedOptionsException <code>mf</code> is not supported
      */
     public void setMatchFinder(int mf) throws UnsupportedOptionsException {
         if (mf != MF_HC4 && mf != MF_BT4)
@@ -506,8 +496,7 @@ public class LZMA2Options extends FilterOptions {
      * higher than 1000 unless you are prepared to interrupt the compression
      * in case it is taking far too long.
      *
-     * @throws      UnsupportedOptionsException
-     *                          <code>depthLimit</code> is invalid
+     * @throws UnsupportedOptionsException <code>depthLimit</code> is invalid
      */
     public void setDepthLimit(int depthLimit)
             throws UnsupportedOptionsException {
@@ -532,7 +521,7 @@ public class LZMA2Options extends FilterOptions {
     }
 
     public FinishableOutputStream getOutputStream(FinishableOutputStream out,
-                                                  ArrayCache arrayCache) {
+            ArrayCache arrayCache) {
         if (mode == MODE_UNCOMPRESSED)
             return new UncompressedLZMA2OutputStream(out, arrayCache);
 
@@ -565,9 +554,8 @@ public class LZMA2Options extends FilterOptions {
         return LZMA2InputStream.getMemoryUsage(d + 1);
     }
 
-    public InputStream getInputStream(InputStream in, ArrayCache arrayCache)
-            throws IOException {
-        return new LZMA2InputStream(in, dictSize, presetDict, arrayCache);
+    public InputStream getInputStream(InputStream in, ArrayCache arrayCache) throws IOException {
+        return new LZMA2InputStream(in, dictSize, presetDict);
     }
 
     FilterEncoder getFilterEncoder() {
@@ -577,7 +565,7 @@ public class LZMA2Options extends FilterOptions {
     public Object clone() {
         try {
             return super.clone();
-        } catch (CloneNotSupportedException e) {
+        } catch(CloneNotSupportedException e) {
             assert false;
             throw new RuntimeException();
         }

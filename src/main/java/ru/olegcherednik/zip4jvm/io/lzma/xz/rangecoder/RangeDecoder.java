@@ -41,6 +41,10 @@ public abstract class RangeDecoder extends RangeCoder {
         return bit;
     }
 
+    public boolean isFinished() {
+        return code == 0;
+    }
+
     public int decodeBitTree(short[] probs) throws IOException {
         int symbol = 1;
 

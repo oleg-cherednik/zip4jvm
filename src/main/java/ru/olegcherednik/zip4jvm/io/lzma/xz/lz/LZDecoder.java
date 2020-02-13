@@ -26,9 +26,9 @@ public final class LZDecoder {
     private int pendingLen = 0;
     private int pendingDist = 0;
 
-    public LZDecoder(int dictSize, byte[] presetDict, ArrayCache arrayCache) {
+    public LZDecoder(int dictSize, byte[] presetDict) {
         bufSize = dictSize;
-        buf = arrayCache.getByteArray(bufSize, false);
+        buf = ArrayCache.getDefaultCache().getByteArray(bufSize, false);
 
         if (presetDict != null) {
             pos = Math.min(presetDict.length, dictSize);
@@ -38,8 +38,8 @@ public final class LZDecoder {
         }
     }
 
-    public void putArraysToCache(ArrayCache arrayCache) {
-        arrayCache.putArray(buf);
+    public void putArraysToCache() {
+        ArrayCache.getDefaultCache().putArray(buf);
     }
 
     public void reset() {

@@ -12,7 +12,7 @@ package ru.olegcherednik.zip4jvm.io.lzma.xz;
 
 import ru.olegcherednik.zip4jvm.io.lzma.xz.exceptions.CorruptedInputException;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LZDecoder;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LZMADecoder;
+import ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LzmaDecoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeDecoderFromBuffer;
 
 import java.io.DataInputStream;
@@ -45,12 +45,11 @@ public class LZMA2InputStream extends InputStream {
 
     private static final int COMPRESSED_SIZE_MAX = 1 << 16;
 
-    private final ArrayCache arrayCache;
     private DataInputStream in;
 
     private LZDecoder lz;
     private RangeDecoderFromBuffer rc;
-    private LZMADecoder lzma;
+    private LzmaDecoder lzma;
 
     private int uncompressedSize = 0;
     private boolean isLZMAChunk = false;
@@ -120,28 +119,6 @@ public class LZMA2InputStream extends InputStream {
     }
 
     /**
-     * Creates a new LZMA2 decompressor using a preset dictionary.
-     * <p>
-     * This is like <code>LZMA2InputStream(InputStream, int)</code> except
-     * that the dictionary may be initialized using a preset dictionary.
-     * If a preset dictionary was used when compressing the data, the
-     * same preset dictionary must be provided when decompressing.
-     *
-     * @param       in          input stream from which LZMA2-compressed
-     *                          data is read
-     *
-     * @param       dictSize    LZMA2 dictionary size as bytes, must be
-     *                          in the range [<code>DICT_SIZE_MIN</code>,
-     *                          <code>DICT_SIZE_MAX</code>]
-     *
-     * @param       presetDict  preset dictionary or <code>null</code>
-     *                          to use no preset dictionary
-     */
-    public LZMA2InputStream(InputStream in, int dictSize, byte[] presetDict) {
-        this(in, dictSize, presetDict, ArrayCache.getDefaultCache());
-    }
-
-    /**
      * Creates a new LZMA2 decompressor using a preset dictionary
      * and array cache.
      * <p>
@@ -158,21 +135,17 @@ public class LZMA2InputStream extends InputStream {
      * @param       presetDict  preset dictionary or <code>null</code>
      *                          to use no preset dictionary
      *
-     * @param       arrayCache  cache to be used for allocating large arrays
-     *
      * @since 1.7
      */
-    LZMA2InputStream(InputStream in, int dictSize, byte[] presetDict,
-                     ArrayCache arrayCache) {
+    LZMA2InputStream(InputStream in, int dictSize, byte[] presetDict) {
         // Check for null because otherwise null isn't detect
         // in this constructor.
         if (in == null)
             throw new NullPointerException();
 
-        this.arrayCache = arrayCache;
         this.in = new DataInputStream(in);
-        this.rc = new RangeDecoderFromBuffer(COMPRESSED_SIZE_MAX, arrayCache);
-        this.lz = new LZDecoder(getDictSize(dictSize), presetDict, arrayCache);
+        this.rc = new RangeDecoderFromBuffer(COMPRESSED_SIZE_MAX, ArrayCache.getDefaultCache());
+        this.lz = new LZDecoder(getDictSize(dictSize), presetDict);
 
         if (presetDict != null && presetDict.length > 0)
             needDictReset = false;
@@ -191,9 +164,6 @@ public class LZMA2InputStream extends InputStream {
      * @throws CorruptedInputException
      *
      * @throws      XZIOException if the stream has been closed
-     *
-     * @throws      EOFException
-     *                          compressed input is truncated or corrupt
      *
      * @throws      IOException may be thrown by <code>in</code>
      */
@@ -219,9 +189,6 @@ public class LZMA2InputStream extends InputStream {
      * @throws      CorruptedInputException
      *
      * @throws      XZIOException if the stream has been closed
-     *
-     * @throws      EOFException
-     *                          compressed input is truncated or corrupt
      *
      * @throws      IOException may be thrown by <code>in</code>
      */
@@ -340,7 +307,7 @@ public class LZMA2InputStream extends InputStream {
         if (lc + lp > 4)
             throw new CorruptedInputException();
 
-        lzma = new LZMADecoder(lz, rc, lc, lp, pb);
+        lzma = new LzmaDecoder(lz, rc, lc, lp, pb);
     }
 
     /**
@@ -374,10 +341,10 @@ public class LZMA2InputStream extends InputStream {
 
     private void putArraysToCache() {
         if (lz != null) {
-            lz.putArraysToCache(arrayCache);
+            lz.putArraysToCache();
             lz = null;
 
-            rc.putArraysToCache(arrayCache);
+            rc.putArraysToCache(ArrayCache.getDefaultCache());
             rc = null;
         }
     }

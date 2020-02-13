@@ -1,28 +1,21 @@
-/*
- * LZMADecoder
- *
- * Authors: Lasse Collin <lasse.collin@tukaani.org>
- *          Igor Pavlov <http://7-zip.org/>
- *
- * This file has been put into the public domain.
- * You can do whatever you want with this file.
- */
-
 package ru.olegcherednik.zip4jvm.io.lzma.xz.lzma;
 
+import lombok.Getter;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LZDecoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeDecoder;
 
 import java.io.IOException;
 
-public final class LZMADecoder extends LZMACoder {
+@Getter
+public final class LzmaDecoder extends LZMACoder {
+
     private final LZDecoder lz;
     private final RangeDecoder rc;
     private final LiteralDecoder literalDecoder;
     private final LengthDecoder matchLenDecoder = new LengthDecoder();
     private final LengthDecoder repLenDecoder = new LengthDecoder();
 
-    public LZMADecoder(LZDecoder lz, RangeDecoder rc, int lc, int lp, int pb) {
+    public LzmaDecoder(LZDecoder lz, RangeDecoder rc, int lc, int lp, int pb) {
         super(pb);
         this.lz = lz;
         this.rc = rc;
@@ -91,7 +84,7 @@ public final class LZMADecoder extends LZMACoder {
                         distSpecial[distSlot - DIST_MODEL_START]);
             } else {
                 reps[0] |= rc.decodeDirectBits(limit - ALIGN_BITS)
-                           << ALIGN_BITS;
+                        << ALIGN_BITS;
                 reps[0] |= rc.decodeReverseBitTree(distAlign);
             }
         }
@@ -132,6 +125,7 @@ public final class LZMADecoder extends LZMACoder {
 
 
     private class LiteralDecoder extends LiteralCoder {
+
         private final LiteralSubdecoder[] subdecoders;
 
         LiteralDecoder(int lc, int lp) {
@@ -154,6 +148,7 @@ public final class LZMADecoder extends LZMACoder {
 
 
         private class LiteralSubdecoder extends LiteralSubcoder {
+
             void decode() throws IOException {
                 int symbol = 1;
 
@@ -185,16 +180,17 @@ public final class LZMADecoder extends LZMACoder {
 
 
     private class LengthDecoder extends LengthCoder {
+
         int decode(int posState) throws IOException {
             if (rc.decodeBit(choice, 0) == 0)
                 return rc.decodeBitTree(low[posState]) + MATCH_LEN_MIN;
 
             if (rc.decodeBit(choice, 1) == 0)
                 return rc.decodeBitTree(mid[posState])
-                       + MATCH_LEN_MIN + LOW_SYMBOLS;
+                        + MATCH_LEN_MIN + LOW_SYMBOLS;
 
             return rc.decodeBitTree(high)
-                   + MATCH_LEN_MIN + LOW_SYMBOLS + MID_SYMBOLS;
+                    + MATCH_LEN_MIN + LOW_SYMBOLS + MID_SYMBOLS;
         }
     }
 }

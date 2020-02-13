@@ -30,10 +30,6 @@ public final class RangeDecoderFromStream extends RangeDecoder {
         range = 0xFFFFFFFF;
     }
 
-    public boolean isFinished() {
-        return code == 0;
-    }
-
     public void normalize() throws IOException {
         if ((range & TOP_MASK) == 0) {
             code = (code << SHIFT_BITS) | in.readByte();

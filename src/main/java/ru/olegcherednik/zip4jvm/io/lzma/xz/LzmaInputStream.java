@@ -1,13 +1,3 @@
-/*
- * LZMAInputStream
- *
- * Authors: Lasse Collin <lasse.collin@tukaani.org>
- *          Igor Pavlov <http://7-zip.org/>
- *
- * This file has been put into the public domain.
- * You can do whatever you want with this file.
- */
-
 package ru.olegcherednik.zip4jvm.io.lzma.xz;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
@@ -15,7 +5,7 @@ import ru.olegcherednik.zip4jvm.io.lzma.xz.exceptions.CorruptedInputException;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.exceptions.MemoryLimitException;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.exceptions.UnsupportedOptionsException;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LZDecoder;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LZMADecoder;
+import ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LzmaDecoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeDecoderFromStream;
 
 import java.io.IOException;
@@ -41,10 +31,7 @@ import java.io.InputStream;
 public class LzmaInputStream extends InputStream {
 
     private final DataInput in;
-    private final ArrayCache arrayCache = ArrayCache.getDefaultCache();
-    private final LZDecoder lz;
-    private final RangeDecoderFromStream rc;
-    private final LZMADecoder lzma;
+    private final LzmaDecoder lzma;
 
     private boolean endReached;
 
@@ -81,9 +68,9 @@ public class LzmaInputStream extends InputStream {
         this.in = in;
         LzmaProperties properties = LzmaProperties.read(in);
 
-        lz = new LZDecoder(properties.getDictionarySize(), null, arrayCache);
-        rc = new RangeDecoderFromStream(in);
-        lzma = new LZMADecoder(lz, rc, properties.getLc(), properties.getLp(), properties.getPb());
+        LZDecoder lz = new LZDecoder(properties.getDictionarySize(), null);
+        RangeDecoderFromStream rc = new RangeDecoderFromStream(in);
+        lzma = new LzmaDecoder(lz, rc, properties.getLc(), properties.getLp(), properties.getPb());
         remainingSize = uncompSize;
     }
 
@@ -148,7 +135,7 @@ public class LzmaInputStream extends InputStream {
                 if (remainingSize >= 0 && remainingSize < len)
                     copySizeMax = (int)remainingSize;
 
-                lz.setLimit(copySizeMax);
+                lzma.getLz().setLimit(copySizeMax);
 
                 // Decode into the dictionary buffer.
                 try {
@@ -167,11 +154,11 @@ public class LzmaInputStream extends InputStream {
                     // decoder normalization, so do it here. This might
                     // cause an IOException if it needs to read a byte
                     // from the input stream.
-                    rc.normalize();
+                    lzma.getRc().normalize();
                 }
 
                 // Copy from the dictionary to buf.
-                int copiedSize = lz.flush(buf, off);
+                int copiedSize = lzma.getLz().flush(buf, off);
                 off += copiedSize;
                 len -= copiedSize;
                 size += copiedSize;
@@ -190,7 +177,7 @@ public class LzmaInputStream extends InputStream {
                     // or truncated .lzma files. LZMA Utils doesn't do
                     // the first check and thus it accepts many invalid
                     // files that this implementation and XZ Utils don't.
-                    if (!rc.isFinished() || lz.hasPending())
+                    if (!lzma.getRc().isFinished() || lzma.getLz().hasPending())
                         throw new CorruptedInputException();
 
                     putArraysToCache();
@@ -207,7 +194,7 @@ public class LzmaInputStream extends InputStream {
     }
 
     private void putArraysToCache() {
-        lz.putArraysToCache(arrayCache);
+        lzma.getLz().putArraysToCache();
     }
 
     /**
