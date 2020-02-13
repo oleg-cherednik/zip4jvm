@@ -17,8 +17,12 @@ public final class LzmaDecoder extends LZMACoder {
     private final LengthDecoder matchLenDecoder = new LengthDecoder();
     private final LengthDecoder repLenDecoder = new LengthDecoder();
 
-    public LzmaDecoder(DataInput in, LzmaOutputStream.Properties properties) throws IOException {
-        super(properties.getPb());
+    public static LzmaDecoder create(DataInput in) throws IOException {
+        return new LzmaDecoder(in, LzmaOutputStream.Properties.read(in));
+    }
+
+    private LzmaDecoder(DataInput in, LzmaOutputStream.Properties properties) throws IOException {
+        super(properties);
         lz = new LZDecoder(properties.getDictionarySize());
         rc = new RangeDecoder(in);
         literalDecoder = new LiteralDecoder(properties);
@@ -136,7 +140,7 @@ public final class LzmaDecoder extends LZMACoder {
         private final LiteralSubdecoder[] subdecoders;
 
         LiteralDecoder(LzmaOutputStream.Properties properties) {
-            super(properties.getLc(), properties.getLp());
+            super(properties);
 
             subdecoders = new LiteralSubdecoder[1 << (properties.getLc() + properties.getLp())];
             for (int i = 0; i < subdecoders.length; ++i)

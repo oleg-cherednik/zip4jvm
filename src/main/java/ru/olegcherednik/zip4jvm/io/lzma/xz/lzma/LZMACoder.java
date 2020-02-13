@@ -1,5 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.lzma.xz.lzma;
 
+import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaInputStream;
+import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaOutputStream;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeCoder;
 
 import java.io.Closeable;
@@ -50,8 +52,12 @@ abstract class LZMACoder implements Closeable {
                : DIST_STATES - 1;
     }
 
-    LZMACoder(int pb) {
-        posMask = (1 << pb) - 1;
+    LZMACoder(LzmaOutputStream.Properties properties) {
+        posMask = (1 << properties.getPb()) - 1;
+    }
+
+    LZMACoder(LzmaInputStream.Properties properties) {
+        posMask = (1 << properties.getPb()) - 1;
     }
 
     void reset() {
@@ -86,9 +92,14 @@ abstract class LZMACoder implements Closeable {
         private final int lc;
         private final int literalPosMask;
 
-        LiteralCoder(int lc, int lp) {
-            this.lc = lc;
-            this.literalPosMask = (1 << lp) - 1;
+        LiteralCoder(LzmaInputStream.Properties properties) {
+            lc = properties.getLc();
+            literalPosMask = (1 << properties.getLp()) - 1;
+        }
+
+        LiteralCoder(LzmaOutputStream.Properties properties) {
+            lc = properties.getLc();
+            literalPosMask = (1 << properties.getLp()) - 1;
         }
 
         final int getSubcoderIndex(int prevByte, int pos) {

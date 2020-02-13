@@ -60,8 +60,7 @@ public class LzmaInputStream extends InputStream {
      * @throws IOException                 may be thrown by <code>in</code>
      */
     public LzmaInputStream(DataInput in, long uncompSize) throws IOException {
-        LzmaOutputStream.Properties properties = LzmaOutputStream.Properties.read(in);
-        lzma = new LzmaDecoder(in, properties);
+        lzma = LzmaDecoder.create(in);
         remainingSize = uncompSize;
     }
 
@@ -193,7 +192,7 @@ public class LzmaInputStream extends InputStream {
      * <code>LZMA2Options(int)</code>.
      */
     @Getter
-    public static class LZMA2Options {
+    public static class Properties {
 
         /**
          * Minimum valid compression preset level is 0.
@@ -308,7 +307,7 @@ public class LzmaInputStream extends InputStream {
         private int matchFinder;
         private int depthLimit;
 
-        public LZMA2Options() throws UnsupportedOptionsException {
+        public Properties() throws UnsupportedOptionsException {
             this(PRESET_DEFAULT);
         }
 
@@ -317,7 +316,7 @@ public class LzmaInputStream extends InputStream {
          *
          * @throws UnsupportedOptionsException <code>preset</code> is not supported
          */
-        public LZMA2Options(int compressionLevel) throws UnsupportedOptionsException {
+        public Properties(int compressionLevel) throws UnsupportedOptionsException {
             if (compressionLevel < 0 || compressionLevel > 9)
                 throw new UnsupportedOptionsException("Unsupported preset: " + compressionLevel);
 

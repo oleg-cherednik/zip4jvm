@@ -24,7 +24,7 @@ final class LzmaEntryOutputStream extends EntryOutputStream {
     private LzmaOutputStream createEncoder() throws IOException {
         long size = zipEntry.isLzmaEosMarker() ? -1 : zipEntry.getUncompressedSize();
         int compressionLevel = zipEntry.getCompressionLevel().getCode();
-        return new LzmaOutputStream(out, new LzmaInputStream.LZMA2Options(compressionLevel), size);
+        return new LzmaOutputStream(out, new LzmaInputStream.Properties(compressionLevel), size);
     }
 
     @Override

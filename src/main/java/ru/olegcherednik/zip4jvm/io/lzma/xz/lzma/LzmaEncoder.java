@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.lzma.xz.lzma;
 
 import ru.olegcherednik.zip4jvm.io.lzma.xz.ArrayCache;
+import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaInputStream;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LZEncoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.Matches;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeEncoder;
@@ -59,20 +60,14 @@ public abstract class LzmaEncoder extends LZMACoder {
     int readAhead = -1;
     private int uncompressedSize = 0;
 
-    public static LzmaEncoder getInstance(
-            RangeEncoder rc, int lc, int lp, int pb, int mode,
-            int dictSize, int extraSizeBefore,
-            int niceLen, int mf, int depthLimit) {
+    public static LzmaEncoder create(RangeEncoder rc, LzmaInputStream.Properties properties, int mode, int extraSizeBefore, int niceLen, int mf,
+            int depthLimit) {
+
         switch (mode) {
             case MODE_FAST:
-                return new LzmaEncoderFast(rc, lc, lp, pb,
-                        dictSize, extraSizeBefore,
-                        niceLen, mf, depthLimit);
-
+                return new LzmaEncoderFast(rc, properties, extraSizeBefore, niceLen, mf, depthLimit);
             case MODE_NORMAL:
-                return new LzmaEncoderNormal(rc, lc, lp, pb,
-                        dictSize, extraSizeBefore,
-                        niceLen, mf, depthLimit);
+                return new LzmaEncoderNormal(rc, properties, extraSizeBefore, niceLen, mf, depthLimit);
         }
 
         throw new IllegalArgumentException();
@@ -139,18 +134,17 @@ public abstract class LzmaEncoder extends LZMACoder {
      */
     abstract int getNextSymbol();
 
-    LzmaEncoder(RangeEncoder rc, LZEncoder lz,
-            int lc, int lp, int pb, int dictSize, int niceLen) {
-        super(pb);
+    LzmaEncoder(RangeEncoder rc, LZEncoder lz, LzmaInputStream.Properties properties, int niceLen) {
+        super(properties);
         this.rc = rc;
         this.lz = lz;
         this.niceLen = niceLen;
 
-        literalEncoder = new LiteralEncoder(lc, lp);
-        matchLenEncoder = new LengthEncoder(pb, niceLen);
-        repLenEncoder = new LengthEncoder(pb, niceLen);
+        literalEncoder = new LiteralEncoder(properties);
+        matchLenEncoder = new LengthEncoder(properties, niceLen);
+        repLenEncoder = new LengthEncoder(properties, niceLen);
 
-        distSlotPricesSize = getDistSlot(dictSize - 1) + 1;
+        distSlotPricesSize = getDistSlot(properties.getDictionarySize() - 1) + 1;
         distSlotPrices = new int[DIST_STATES][distSlotPricesSize];
 
         reset();
@@ -507,10 +501,10 @@ public abstract class LzmaEncoder extends LZMACoder {
 
         private final LiteralSubencoder[] subencoders;
 
-        LiteralEncoder(int lc, int lp) {
-            super(lc, lp);
+        LiteralEncoder(LzmaInputStream.Properties properties) {
+            super(properties);
 
-            subencoders = new LiteralSubencoder[1 << (lc + lp)];
+            subencoders = new LiteralSubencoder[1 << (properties.getLc() + properties.getLp())];
             for (int i = 0; i < subencoders.length; ++i)
                 subencoders[i] = new LiteralSubencoder();
         }
@@ -641,8 +635,8 @@ public abstract class LzmaEncoder extends LZMACoder {
         private final int[] counters;
         private final int[][] prices;
 
-        LengthEncoder(int pb, int niceLen) {
-            int posStates = 1 << pb;
+        LengthEncoder(LzmaInputStream.Properties properties, int niceLen) {
+            int posStates = 1 << properties.getPb();
             counters = new int[posStates];
 
             // Always allocate at least LOW_SYMBOLS + MID_SYMBOLS because

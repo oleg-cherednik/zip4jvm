@@ -10,26 +10,25 @@
 
 package ru.olegcherednik.zip4jvm.io.lzma.xz.lzma;
 
+import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaInputStream;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LZEncoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.Matches;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeEncoder;
 
 final class LzmaEncoderFast extends LzmaEncoder {
+
     private static final int EXTRA_SIZE_BEFORE = 1;
     private static final int EXTRA_SIZE_AFTER = MATCH_LEN_MAX - 1;
 
     private Matches matches = null;
 
-    LzmaEncoderFast(RangeEncoder rc, int lc, int lp, int pb,
-                           int dictSize, int extraSizeBefore,
-                           int niceLen, int mf, int depthLimit) {
-        super(rc, LZEncoder.getInstance(dictSize,
-                                        Math.max(extraSizeBefore,
-                                                 EXTRA_SIZE_BEFORE),
-                                        EXTRA_SIZE_AFTER,
-                                        niceLen, MATCH_LEN_MAX,
-                                        mf, depthLimit),
-              lc, lp, pb, dictSize, niceLen);
+    LzmaEncoderFast(RangeEncoder rc, LzmaInputStream.Properties properties, int extraSizeBefore, int niceLen, int mf, int depthLimit) {
+        super(rc, createEncoder(properties, extraSizeBefore, niceLen, mf, depthLimit), properties, niceLen);
+    }
+
+    private static LZEncoder createEncoder(LzmaInputStream.Properties properties, int extraSizeBefore, int niceLen, int mf, int depthLimit) {
+        return LZEncoder.create(properties.getDictionarySize(), Math.max(extraSizeBefore, EXTRA_SIZE_BEFORE), EXTRA_SIZE_AFTER, niceLen,
+                MATCH_LEN_MAX, mf, depthLimit);
     }
 
     private boolean changePair(int smallDist, int bigDist) {
@@ -125,11 +124,11 @@ final class LzmaEncoderFast extends LzmaEncoder {
 
             if ((newLen >= mainLen && newDist < mainDist)
                     || (newLen == mainLen + 1
-                        && !changePair(mainDist, newDist))
+                    && !changePair(mainDist, newDist))
                     || newLen > mainLen + 1
                     || (newLen + 1 >= mainLen
-                        && mainLen >= MATCH_LEN_MIN + 1
-                        && changePair(newDist, mainDist)))
+                    && mainLen >= MATCH_LEN_MIN + 1
+                    && changePair(newDist, mainDist)))
                 return 1;
         }
 

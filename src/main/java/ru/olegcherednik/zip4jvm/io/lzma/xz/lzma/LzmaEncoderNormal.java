@@ -1,5 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.lzma.xz.lzma;
 
+import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaInputStream;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LZEncoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.Matches;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeEncoder;
@@ -22,26 +23,16 @@ final class LzmaEncoderNormal extends LzmaEncoder {
     private final int[] repLens = new int[REPS];
     private final State nextState = new State();
 
-    static int getMemoryUsage(int dictSize, int extraSizeBefore, int mf) {
-        return LZEncoder.getMemoryUsage(dictSize,
-                Math.max(extraSizeBefore, EXTRA_SIZE_BEFORE),
-                EXTRA_SIZE_AFTER, MATCH_LEN_MAX, mf)
-                + OPTS * 64 / 1024;
-    }
-
-    LzmaEncoderNormal(RangeEncoder rc, int lc, int lp, int pb,
-            int dictSize, int extraSizeBefore,
-            int niceLen, int mf, int depthLimit) {
-        super(rc, LZEncoder.getInstance(dictSize,
-                Math.max(extraSizeBefore,
-                        EXTRA_SIZE_BEFORE),
-                EXTRA_SIZE_AFTER,
-                niceLen, MATCH_LEN_MAX,
-                mf, depthLimit),
-                lc, lp, pb, dictSize, niceLen);
+    LzmaEncoderNormal(RangeEncoder rc, LzmaInputStream.Properties properties, int extraSizeBefore, int niceLen, int mf, int depthLimit) {
+        super(rc, createEncoder(properties, extraSizeBefore, niceLen, mf, depthLimit), properties, niceLen);
 
         for (int i = 0; i < OPTS; ++i)
             opts[i] = new Optimum();
+    }
+
+    private static LZEncoder createEncoder(LzmaInputStream.Properties properties, int extraSizeBefore, int niceLen, int mf, int depthLimit) {
+        return LZEncoder.create(properties.getDictionarySize(), Math.max(extraSizeBefore, EXTRA_SIZE_BEFORE), EXTRA_SIZE_AFTER, niceLen,
+                MATCH_LEN_MAX, mf, depthLimit);
     }
 
     public void reset() {

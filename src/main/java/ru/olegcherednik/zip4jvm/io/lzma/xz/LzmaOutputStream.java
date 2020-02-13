@@ -33,7 +33,7 @@ public class LzmaOutputStream extends OutputStream {
     private IOException exception;
 
     private final byte[] tempBuf = new byte[1];
-    private final int dictSize;
+    private final int dictionarySize;
 
     /**
      * Creates a new compressor for the legacy .lzma file format.
@@ -44,30 +44,27 @@ public class LzmaOutputStream extends OutputStream {
      *
      * @param out              output stream to which the compressed data
      *                         will be written
-     * @param options          LZMA compression options; the same class
+     * @param properties       LZMA compression options; the same class
      *                         is used here as is for LZMA2
      * @param uncompressedSize uncompressed size of the data to be compressed;
      *                         use <code>-1</code> when unknown
      * @throws IOException may be thrown from <code>out</code>
      * @since 1.7
      */
-    public LzmaOutputStream(DataOutput out, LzmaInputStream.LZMA2Options options, long uncompressedSize) throws IOException {
+    public LzmaOutputStream(DataOutput out, LzmaInputStream.Properties properties, long uncompressedSize) throws IOException {
         this.out = out;
         this.uncompressedSize = uncompressedSize;
 
-        dictSize = options.getDictionarySize();
-        lzma = LzmaEncoder.getInstance(new RangeEncoder(out),
-                options.getLc(), options.getLp(), options.getPb(),
-                options.getMode(),
-                dictSize, 0, options.getNiceLength(),
-                options.getMatchFinder(), options.getDepthLimit());
+        dictionarySize = properties.getDictionarySize();
+        lzma = LzmaEncoder.create(new RangeEncoder(out), properties, properties.getMode(), 0, properties.getNiceLength(),
+                properties.getMatchFinder(), properties.getDepthLimit());
 
-        props = (options.getPb() * 5 + options.getLp()) * 9 + options.getLc();
+        props = (properties.getPb() * 5 + properties.getLp()) * 9 + properties.getLc();
     }
 
     public void writeHeader() throws IOException {
         out.writeByte(props);
-        out.writeDword(dictSize);
+        out.writeDword(dictionarySize);
     }
 
     /**
@@ -184,8 +181,10 @@ public class LzmaOutputStream extends OutputStream {
         /**
          * The largest dictionary size supported by this implementation.
          * <p>
-         * LZMA allows dictionaries up to one byte less than 4 GiB. This implementation supports only 16 bytes less than 2 GiB. This limitation is due
-         * to Java using signed 32-bit integers for array indexing. The limitation shouldn't matter much in practice since so huge dictionaries are not
+         * LZMA allows dictionaries up to one byte less than 4 GiB. This implementation supports only 16 bytes less than 2 GiB. This limitation is
+         * due
+         * to Java using signed 32-bit integers for array indexing. The limitation shouldn't matter much in practice since so huge dictionaries are
+         * not
          * normally used.
          */
         public static final int DICTIONARY_SIZE_MAX = Integer.MAX_VALUE & ~15;

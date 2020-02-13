@@ -112,7 +112,7 @@ public abstract class LZEncoder {
      * @param mf              match finder ID
      * @param depthLimit      match finder search depth limit
      */
-    public static LZEncoder getInstance(
+    public static LZEncoder create(
             int dictSize, int extraSizeBefore, int extraSizeAfter,
             int niceLen, int matchLenMax, int mf, int depthLimit) {
         switch (mf) {
