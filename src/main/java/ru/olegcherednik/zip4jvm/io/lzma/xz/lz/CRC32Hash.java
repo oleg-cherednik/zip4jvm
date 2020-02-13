@@ -1,70 +1,61 @@
 package ru.olegcherednik.zip4jvm.io.lzma.xz.lz;
 
-/** Provides a CRC32 table using the polynomial from IEEE 802.3 */
+/**
+ * Provides a CRC32 table using the polynomial from IEEE 802.3
+ *
+ * @author Oleg Cherednik
+ * @since 14.02.2020
+ */
 @SuppressWarnings("NewClassNamingConvention")
 final class CRC32Hash {
 
     private static final int[] CRC_TABLE = createTable();
 
-    private final int[] hash2Table = new int[1024];
-    private final int[] hash3Table = new int[65536];
-    private final int[] hash4Table;
-
-    private int hash2Value;
-    private int hash3Value;
-    private int hash4Value;
+    private final HashData two = new HashData(1024);
+    private final HashData three = new HashData(65536);
+    private final HashData four;
 
     public CRC32Hash(int dictionarySize) {
-        hash4Table = new int[getHash4Size(dictionarySize)];
+        four = new HashData(getHash4Size(dictionarySize));
     }
 
     public void calcHashes(byte[] buf, int offs) {
         int tmp = CRC_TABLE[buf[offs] & 0xFF] ^ (buf[offs + 1] & 0xFF);
-        hash2Value = tmp & hash2Table.length - 1;
-
-        tmp ^= (buf[offs + 2] & 0xFF) << 8;
-        hash3Value = tmp & (hash3Table.length - 1);
-
-        tmp ^= CRC_TABLE[buf[offs + 3] & 0xFF] << 5;
-        hash4Value = tmp & (hash4Table.length - 1);
+        two.setValue(tmp);
+        three.setValue(tmp ^= (buf[offs + 2] & 0xFF) << 8);
+        four.setValue(tmp ^ CRC_TABLE[buf[offs + 3] & 0xFF] << 5);
     }
 
     public int getHash2Pos() {
-        return hash2Table[hash2Value];
+        return two.getPos();
     }
 
     public int getHash3Pos() {
-        return hash3Table[hash3Value];
+        return three.getPos();
     }
 
     public int getHash4Pos() {
-        return hash4Table[hash4Value];
+        return four.getPos();
     }
 
     public void updateTables(int pos) {
-        hash2Table[hash2Value] = pos;
-        hash3Table[hash3Value] = pos;
-        hash4Table[hash4Value] = pos;
+        two.update(pos);
+        three.update(pos);
+        four.update(pos);
     }
 
-    public void normalize(int normalizationOffset) {
-        LzEncoder.normalize(hash2Table, hash2Table.length, normalizationOffset);
-        LzEncoder.normalize(hash3Table, hash3Table.length, normalizationOffset);
-        LzEncoder.normalize(hash4Table, hash4Table.length, normalizationOffset);
+    public void normalize(int offs) {
+        two.normalize(offs);
+        three.normalize(offs);
+        four.normalize(offs);
     }
 
     private static int[] createTable() {
         int[] arr = new int[256];
 
-        for (int i = 0; i < arr.length; ++i) {
-            int r = i;
-
-            for (int j = 0; j < 8; ++j) {
-                if ((r & 1) != 0)
-                    r = (r >>> 1) ^ 0xEDB88320;
-                else
-                    r >>>= 1;
-            }
+        for (int i = 0, r = i; i < arr.length; i++, r = i) {
+            for (int j = 0; j < 8; j++)
+                r = (r & 1) != 0 ? (r >>> 1) ^ 0xEDB88320 : r >>> 1;
 
             arr[i] = r;
         }
@@ -86,5 +77,32 @@ final class CRC32Hash {
             h >>>= 1;
 
         return h + 1;
+    }
+
+    private static final class HashData {
+
+        private final int[] table;
+        private int value;
+
+        public HashData(int size) {
+            table = new int[size];
+        }
+
+        public void update(int value) {
+            table[this.value] = value;
+        }
+
+        public int getPos() {
+            return table[value];
+        }
+
+        public void setValue(int prv) {
+            value = prv & (table.length - 1);
+        }
+
+        public void normalize(int offs) {
+            LzEncoder.normalize(table, table.length, offs);
+        }
+
     }
 }

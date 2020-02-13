@@ -33,14 +33,9 @@ public abstract class LzEncoder {
     private int writePos = 0;
     private int pendingSize = 0;
 
-    static void normalize(int[] positions, int positionsCount,
-            int normalizationOffset) {
-        for (int i = 0; i < positionsCount; ++i) {
-            if (positions[i] <= normalizationOffset)
-                positions[i] = 0;
-            else
-                positions[i] -= normalizationOffset;
-        }
+    public static void normalize(int[] arr, int size, int offs) {
+        for (int i = 0; i < size; i++)
+            arr[i] = arr[i] <= offs ? 0 : arr[i] - offs;
     }
 
     /**
