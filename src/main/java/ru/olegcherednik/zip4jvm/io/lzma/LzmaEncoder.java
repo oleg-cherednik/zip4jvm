@@ -9,30 +9,6 @@ import java.io.IOException;
 
 public abstract class LzmaEncoder extends LzmaCoder {
 
-    /**
-     * LZMA2 chunk is considered full when its uncompressed size exceeds
-     * <code>LZMA2_UNCOMPRESSED_LIMIT</code>.
-     * <p>
-     * A compressed LZMA2 chunk can hold 2 MiB of uncompressed data.
-     * A single LZMA symbol may indicate up to MATCH_LEN_MAX bytes
-     * of data, so the LZMA2 chunk is considered full when there is
-     * less space than MATCH_LEN_MAX bytes.
-     */
-    private static final int LZMA2_UNCOMPRESSED_LIMIT
-            = (2 << 20) - MATCH_LEN_MAX;
-
-    /**
-     * LZMA2 chunk is considered full when its compressed size exceeds
-     * <code>LZMA2_COMPRESSED_LIMIT</code>.
-     * <p>
-     * The maximum compressed size of a LZMA2 chunk is 64 KiB.
-     * A single LZMA symbol might use 20 bytes of space even though
-     * it usually takes just one byte or so. Two more bytes are needed
-     * for LZMA2 uncompressed chunks (see LZMA2OutputStream.writeChunk).
-     * Leave a little safety margin and use 26 bytes.
-     */
-    private static final int LZMA2_COMPRESSED_LIMIT = (64 << 10) - 26;
-
     private static final int DIST_PRICE_UPDATE_INTERVAL = FULL_DISTANCES;
     private static final int ALIGN_PRICE_UPDATE_INTERVAL = ALIGN_SIZE;
 
@@ -107,9 +83,6 @@ public abstract class LzmaEncoder extends LzmaCoder {
         distSlotPricesSize = getDistSlot(properties.getDictionarySize() - 1) + 1;
         distSlotPrices = new int[DIST_STATES][distSlotPricesSize];
 
-        literalEncoder.reset();
-        matchLenEncoder.reset();
-        repLenEncoder.reset();
         distPriceCount = 0;
         alignPriceCount = 0;
 
@@ -457,11 +430,6 @@ public abstract class LzmaEncoder extends LzmaCoder {
                 subencoders[i] = new LiteralSubencoder();
         }
 
-        void reset() {
-            for (int i = 0; i < subencoders.length; ++i)
-                subencoders[i].reset();
-        }
-
         void encodeInit() throws IOException {
             // When encoding the first byte of the stream, there is
             // no previous byte in the dictionary so the encode function
@@ -593,13 +561,6 @@ public abstract class LzmaEncoder extends LzmaCoder {
             int lenSymbols = Math.max(properties.getNiceLength() - MATCH_LEN_MIN + 1,
                     LOW_SYMBOLS + MID_SYMBOLS);
             prices = new int[posStates][lenSymbols];
-        }
-
-        void reset() {
-            super.reset();
-
-            // Reset counters to zero to force price update before
-            // the prices are needed.
             for (int i = 0; i < counters.length; ++i)
                 counters[i] = 0;
         }

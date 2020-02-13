@@ -25,10 +25,6 @@ public final class LzmaDecoder extends LzmaCoder {
         lz = new LzDecoder(properties.getDictionarySize());
         rc = new RangeDecoder(in);
         literalDecoder = new LiteralDecoder(properties);
-
-        literalDecoder.reset();
-        matchLenDecoder.reset();
-        repLenDecoder.reset();
     }
 
     /**
@@ -137,13 +133,9 @@ public final class LzmaDecoder extends LzmaCoder {
             super(properties);
 
             subdecoders = new LiteralSubdecoder[1 << (properties.getLc() + properties.getLp())];
-            for (int i = 0; i < subdecoders.length; ++i)
-                subdecoders[i] = new LiteralSubdecoder();
-        }
 
-        void reset() {
-            for (int i = 0; i < subdecoders.length; ++i)
-                subdecoders[i].reset();
+            for (int i = 0; i < subdecoders.length; i++)
+                subdecoders[i] = new LiteralSubdecoder();
         }
 
         void decode() throws IOException {

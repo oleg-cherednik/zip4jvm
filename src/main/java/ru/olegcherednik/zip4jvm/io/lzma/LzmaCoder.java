@@ -104,7 +104,7 @@ public abstract class LzmaCoder implements Closeable {
 
             final short[] probs = new short[0x300];
 
-            void reset() {
+            protected LiteralSubcoder() {
                 initProbs(probs);
             }
         }
@@ -122,7 +122,7 @@ public abstract class LzmaCoder implements Closeable {
         final short[][] mid = new short[POS_STATES_MAX][MID_SYMBOLS];
         final short[] high = new short[HIGH_SYMBOLS];
 
-        void reset() {
+        protected LengthCoder() {
             initProbs(choice);
 
             for (int i = 0; i < low.length; ++i)
