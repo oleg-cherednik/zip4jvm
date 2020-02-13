@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LzmaEncoder;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeEncoder;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 import java.io.IOException;
@@ -50,7 +49,7 @@ public class LzmaOutputStream extends OutputStream {
         this.out = out;
         this.properties = properties;
         this.uncompressedSize = uncompressedSize;
-        lzma = LzmaEncoder.create(new RangeEncoder(out), properties);
+        lzma = properties.getMode().createEncoder(out, properties);
     }
 
     public void writeHeader() throws IOException {

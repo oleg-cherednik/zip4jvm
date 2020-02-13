@@ -4,24 +4,11 @@ import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaInputStream;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LZEncoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.Matches;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeEncoder;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 import java.io.IOException;
 
 public abstract class LzmaEncoder extends LZMACoder {
-
-    public static LzmaEncoder create(RangeEncoder raceEncoder, LzmaInputStream.Properties properties) {
-        switch (properties.getMode()) {
-            case MODE_FAST:
-                return new LzmaEncoderFast(raceEncoder, properties);
-            case MODE_NORMAL:
-                return new LzmaEncoderNormal(raceEncoder, properties);
-        }
-
-        throw new IllegalArgumentException();
-    }
-
-    public static final int MODE_FAST = 1;
-    public static final int MODE_NORMAL = 2;
 
     /**
      * LZMA2 chunk is considered full when its uncompressed size exceeds
@@ -50,7 +37,7 @@ public abstract class LzmaEncoder extends LZMACoder {
     private static final int DIST_PRICE_UPDATE_INTERVAL = FULL_DISTANCES;
     private static final int ALIGN_PRICE_UPDATE_INTERVAL = ALIGN_SIZE;
 
-    private final RangeEncoder raceEncoder;
+    private final RangeEncoder rangeEncoder;
     final LZEncoder lz;
     final LiteralEncoder literalEncoder;
     final LengthEncoder matchLenEncoder;
@@ -108,9 +95,9 @@ public abstract class LzmaEncoder extends LZMACoder {
         return (i << 1) + ((dist >>> (i - 1)) & 1);
     }
 
-    LzmaEncoder(RangeEncoder raceEncoder, LZEncoder lz, LzmaInputStream.Properties properties) {
+    LzmaEncoder(DataOutput out, LZEncoder lz, LzmaInputStream.Properties properties) {
         super(properties);
-        this.raceEncoder = raceEncoder;
+        rangeEncoder = new RangeEncoder(out);
         this.lz = lz;
         niceLen = properties.getNiceLength();
 
@@ -182,8 +169,8 @@ public abstract class LzmaEncoder extends LZMACoder {
         // Distance is a 32-bit unsigned integer in LZMA.
         // With Java's signed int, UINT32_MAX becomes -1.
         int posState = (lz.getPos() - readAhead) & posMask;
-        raceEncoder.encodeBit(isMatch[state.get()], posState, 1);
-        raceEncoder.encodeBit(isRep, state.get(), 0);
+        rangeEncoder.encodeBit(isMatch[state.get()], posState, 1);
+        rangeEncoder.encodeBit(isRep, state.get(), 0);
         encodeMatch(-1, MATCH_LEN_MIN, posState);
     }
 
@@ -199,7 +186,7 @@ public abstract class LzmaEncoder extends LZMACoder {
                 return false;
 
             while (uncompressedSize <= LZMA2_UNCOMPRESSED_LIMIT
-                    && raceEncoder.getPendingSize() <= LZMA2_COMPRESSED_LIMIT)
+                    && rangeEncoder.getPendingSize() <= LZMA2_COMPRESSED_LIMIT)
                 if (!encodeSymbol())
                     return false;
         } catch(IOException e) {
@@ -218,7 +205,7 @@ public abstract class LzmaEncoder extends LZMACoder {
         // a preset dictionary. This code isn't run if using
         // a preset dictionary.
         skip(1);
-        raceEncoder.encodeBit(isMatch[state.get()], 0, 0);
+        rangeEncoder.encodeBit(isMatch[state.get()], 0, 0);
         literalEncoder.encodeInit();
 
         --readAhead;
@@ -242,21 +229,21 @@ public abstract class LzmaEncoder extends LZMACoder {
         if (back == -1) {
             // Literal i.e. eight-bit byte
             assert len == 1;
-            raceEncoder.encodeBit(isMatch[state.get()], posState, 0);
+            rangeEncoder.encodeBit(isMatch[state.get()], posState, 0);
             literalEncoder.encode();
         } else {
             // Some type of match
-            raceEncoder.encodeBit(isMatch[state.get()], posState, 1);
+            rangeEncoder.encodeBit(isMatch[state.get()], posState, 1);
             if (back < reps.length) {
                 // Repeated match i.e. the same distance
                 // has been used earlier.
                 assert lz.getMatchLen(-readAhead, reps[back], len) == len;
-                raceEncoder.encodeBit(isRep, state.get(), 1);
+                rangeEncoder.encodeBit(isRep, state.get(), 1);
                 encodeRepMatch(back, len, posState);
             } else {
                 // Normal match
                 assert lz.getMatchLen(-readAhead, back - reps.length, len) == len;
-                raceEncoder.encodeBit(isRep, state.get(), 0);
+                rangeEncoder.encodeBit(isRep, state.get(), 0);
                 encodeMatch(back - reps.length, len, posState);
             }
         }
@@ -273,7 +260,7 @@ public abstract class LzmaEncoder extends LZMACoder {
         matchLenEncoder.encode(len, posState);
 
         int distSlot = getDistSlot(dist);
-        raceEncoder.encodeBitTree(distSlots[getDistState(len)], distSlot);
+        rangeEncoder.encodeBitTree(distSlots[getDistState(len)], distSlot);
 
         if (distSlot >= DIST_MODEL_START) {
             int footerBits = (distSlot >>> 1) - 1;
@@ -281,13 +268,13 @@ public abstract class LzmaEncoder extends LZMACoder {
             int distReduced = dist - base;
 
             if (distSlot < DIST_MODEL_END) {
-                raceEncoder.encodeReverseBitTree(
+                rangeEncoder.encodeReverseBitTree(
                         distSpecial[distSlot - DIST_MODEL_START],
                         distReduced);
             } else {
-                raceEncoder.encodeDirectBits(distReduced >>> ALIGN_BITS,
+                rangeEncoder.encodeDirectBits(distReduced >>> ALIGN_BITS,
                         footerBits - ALIGN_BITS);
-                raceEncoder.encodeReverseBitTree(distAlign, distReduced & ALIGN_MASK);
+                rangeEncoder.encodeReverseBitTree(distAlign, distReduced & ALIGN_MASK);
                 --alignPriceCount;
             }
         }
@@ -303,17 +290,17 @@ public abstract class LzmaEncoder extends LZMACoder {
     private void encodeRepMatch(int rep, int len, int posState)
             throws IOException {
         if (rep == 0) {
-            raceEncoder.encodeBit(isRep0, state.get(), 0);
-            raceEncoder.encodeBit(isRep0Long[state.get()], posState, len == 1 ? 0 : 1);
+            rangeEncoder.encodeBit(isRep0, state.get(), 0);
+            rangeEncoder.encodeBit(isRep0Long[state.get()], posState, len == 1 ? 0 : 1);
         } else {
             int dist = reps[rep];
-            raceEncoder.encodeBit(isRep0, state.get(), 1);
+            rangeEncoder.encodeBit(isRep0, state.get(), 1);
 
             if (rep == 1) {
-                raceEncoder.encodeBit(isRep1, state.get(), 0);
+                rangeEncoder.encodeBit(isRep1, state.get(), 0);
             } else {
-                raceEncoder.encodeBit(isRep1, state.get(), 1);
-                raceEncoder.encodeBit(isRep2, state.get(), rep - 2);
+                rangeEncoder.encodeBit(isRep1, state.get(), 1);
+                rangeEncoder.encodeBit(isRep2, state.get(), rep - 2);
 
                 if (rep == 3)
                     reps[3] = reps[2];
@@ -483,7 +470,7 @@ public abstract class LzmaEncoder extends LZMACoder {
     }
 
     public void finish() throws IOException {
-        raceEncoder.finish();
+        rangeEncoder.finish();
     }
 
     class LiteralEncoder extends LiteralCoder {
@@ -543,7 +530,7 @@ public abstract class LzmaEncoder extends LZMACoder {
                     do {
                         subencoderIndex = symbol >>> 8;
                         bit = (symbol >>> 7) & 1;
-                        raceEncoder.encodeBit(probs, subencoderIndex, bit);
+                        rangeEncoder.encodeBit(probs, subencoderIndex, bit);
                         symbol <<= 1;
                     } while (symbol < 0x10000);
 
@@ -559,7 +546,7 @@ public abstract class LzmaEncoder extends LZMACoder {
                         matchBit = matchByte & offset;
                         subencoderIndex = offset + matchBit + (symbol >>> 8);
                         bit = (symbol >>> 7) & 1;
-                        raceEncoder.encodeBit(probs, subencoderIndex, bit);
+                        rangeEncoder.encodeBit(probs, subencoderIndex, bit);
                         symbol <<= 1;
                         offset &= ~(matchByte ^ symbol);
                     } while (symbol < 0x10000);
@@ -649,18 +636,18 @@ public abstract class LzmaEncoder extends LZMACoder {
             len -= MATCH_LEN_MIN;
 
             if (len < LOW_SYMBOLS) {
-                raceEncoder.encodeBit(choice, 0, 0);
-                raceEncoder.encodeBitTree(low[posState], len);
+                rangeEncoder.encodeBit(choice, 0, 0);
+                rangeEncoder.encodeBitTree(low[posState], len);
             } else {
-                raceEncoder.encodeBit(choice, 0, 1);
+                rangeEncoder.encodeBit(choice, 0, 1);
                 len -= LOW_SYMBOLS;
 
                 if (len < MID_SYMBOLS) {
-                    raceEncoder.encodeBit(choice, 1, 0);
-                    raceEncoder.encodeBitTree(mid[posState], len);
+                    rangeEncoder.encodeBit(choice, 1, 0);
+                    rangeEncoder.encodeBitTree(mid[posState], len);
                 } else {
-                    raceEncoder.encodeBit(choice, 1, 1);
-                    raceEncoder.encodeBitTree(high, len - MID_SYMBOLS);
+                    rangeEncoder.encodeBit(choice, 1, 1);
+                    rangeEncoder.encodeBitTree(high, len - MID_SYMBOLS);
                 }
             }
 

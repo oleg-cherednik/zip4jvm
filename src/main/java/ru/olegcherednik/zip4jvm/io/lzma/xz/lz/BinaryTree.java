@@ -26,7 +26,7 @@ final class BinaryTree extends LZEncoder {
     private int lzPos;
 
 
-    BinaryTree(LzmaInputStream.Properties properties, int readAheadMax) {
+    public BinaryTree(LzmaInputStream.Properties properties, int readAheadMax) {
         super(properties, readAheadMax);
 
         cyclicSize = properties.getDictionarySize() + 1;

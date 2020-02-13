@@ -7,7 +7,7 @@ import ru.olegcherednik.zip4jvm.io.lzma.xz.exceptions.MemoryLimitException;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.exceptions.UnsupportedOptionsException;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.MatchFinder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LzmaDecoder;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LzmaEncoder;
+import ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.Mode;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 import java.io.IOException;
@@ -257,18 +257,6 @@ public class LzmaInputStream extends InputStream {
         public static final int MODE_UNCOMPRESSED = 0;
 
         /**
-         * Compression mode: fast.
-         * This is usually combined with a hash chain match finder.
-         */
-        public static final int MODE_FAST = LzmaEncoder.MODE_FAST;
-
-        /**
-         * Compression mode: normal.
-         * This is usually combined with a binary tree match finder.
-         */
-        public static final int MODE_NORMAL = LzmaEncoder.MODE_NORMAL;
-
-        /**
          * Minimum value for <code>niceLen</code> is 8.
          */
         public static final int NICE_LEN_MIN = 8;
@@ -288,7 +276,7 @@ public class LzmaInputStream extends InputStream {
         private int lc;
         private int lp;
         private int pb;
-        private int mode;
+        private Mode mode;
         private int niceLength;
         private MatchFinder matchFinder;
         private int depthLimit;
@@ -312,12 +300,12 @@ public class LzmaInputStream extends InputStream {
             dictionarySize = presetToDictSize[compressionLevel];
 
             if (compressionLevel <= 3) {
-                mode = MODE_FAST;
+                mode = Mode.FAST;
                 matchFinder = MatchFinder.HASH_CHAIN;
                 niceLength = compressionLevel <= 1 ? 128 : NICE_LEN_MAX;
                 depthLimit = presetToDepthLimit[compressionLevel];
             } else {
-                mode = MODE_NORMAL;
+                mode = Mode.NORMAL;
                 matchFinder = MatchFinder.BINARY_TREE;
                 niceLength = (compressionLevel == 4) ? 16 : (compressionLevel == 5) ? 32 : 64;
                 depthLimit = 0;

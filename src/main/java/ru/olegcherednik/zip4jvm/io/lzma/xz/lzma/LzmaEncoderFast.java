@@ -3,14 +3,14 @@ package ru.olegcherednik.zip4jvm.io.lzma.xz.lzma;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaInputStream;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LZEncoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.Matches;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeEncoder;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 final class LzmaEncoderFast extends LzmaEncoder {
 
     private Matches matches;
 
-    public LzmaEncoderFast(RangeEncoder raceEncoder, LzmaInputStream.Properties properties) {
-        super(raceEncoder, createEncoder(properties), properties);
+    public LzmaEncoderFast(DataOutput out, LzmaInputStream.Properties properties) {
+        super(out, createEncoder(properties), properties);
     }
 
     private static LZEncoder createEncoder(LzmaInputStream.Properties properties) {

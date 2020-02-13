@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.io.lzma.xz.lzma;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaInputStream;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.LZEncoder;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.lz.Matches;
-import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeEncoder;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 final class LzmaEncoderNormal extends LzmaEncoder {
 
@@ -20,8 +20,8 @@ final class LzmaEncoderNormal extends LzmaEncoder {
     private final int[] repLens = new int[4];
     private final State nextState = new State();
 
-    public LzmaEncoderNormal(RangeEncoder raceEncoder, LzmaInputStream.Properties properties) {
-        super(raceEncoder, createEncoder(properties), properties);
+    public LzmaEncoderNormal(DataOutput out, LzmaInputStream.Properties properties) {
+        super(out, createEncoder(properties), properties);
 
         for (int i = 0; i < OPTS; ++i)
             opts[i] = new Optimum();

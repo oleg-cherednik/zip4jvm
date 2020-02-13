@@ -29,7 +29,7 @@ final class HashChain extends LZEncoder {
      * Creates a new LZEncoder with the HC4 match finder.
      * See <code>LZEncoder.getInstance</code> for parameter descriptions.
      */
-    HashChain(LzmaInputStream.Properties properties, int readAheadMax) {
+    public HashChain(LzmaInputStream.Properties properties, int readAheadMax) {
         super(properties, readAheadMax);
 
         hash = new Hash234(properties.getDictionarySize());

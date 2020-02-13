@@ -1,13 +1,3 @@
-/*
- * LZEncoder
- *
- * Authors: Lasse Collin <lasse.collin@tukaani.org>
- *          Igor Pavlov <http://7-zip.org/>
- *
- * This file has been put into the public domain.
- * You can do whatever you want with this file.
- */
-
 package ru.olegcherednik.zip4jvm.io.lzma.xz.lz;
 
 import ru.olegcherednik.zip4jvm.io.lzma.xz.LzmaInputStream;
@@ -18,9 +8,6 @@ import java.io.OutputStream;
 import static ru.olegcherednik.zip4jvm.io.lzma.xz.lzma.LZMACoder.MATCH_LEN_MAX;
 
 public abstract class LZEncoder {
-
-    public static final int MF_HC4 = 0x04;
-    public static final int MF_BT4 = 0x14;
 
     /**
      * Number of bytes to keep available before the current byte
