@@ -1,22 +1,12 @@
-/*
- * LZDecoder
- *
- * Authors: Lasse Collin <lasse.collin@tukaani.org>
- *          Igor Pavlov <http://7-zip.org/>
- *
- * This file has been put into the public domain.
- * You can do whatever you want with this file.
- */
-
 package ru.olegcherednik.zip4jvm.io.lzma.xz.lz;
 
 import ru.olegcherednik.zip4jvm.io.lzma.xz.ArrayCache;
 import ru.olegcherednik.zip4jvm.io.lzma.xz.exceptions.CorruptedInputException;
 
-import java.io.DataInputStream;
 import java.io.IOException;
 
 public final class LZDecoder {
+
     private final byte[] buf;
     private final int bufSize; // To avoid buf.length with an array-cached buf.
     private int start = 0;
@@ -26,16 +16,9 @@ public final class LZDecoder {
     private int pendingLen = 0;
     private int pendingDist = 0;
 
-    public LZDecoder(int dictSize, byte[] presetDict) {
+    public LZDecoder(int dictSize) {
         bufSize = dictSize;
         buf = ArrayCache.getDefaultCache().getByteArray(bufSize, false);
-
-        if (presetDict != null) {
-            pos = Math.min(presetDict.length, dictSize);
-            full = pos;
-            start = pos;
-            System.arraycopy(presetDict, presetDict.length - pos, buf, 0, pos);
-        }
     }
 
     public void putArraysToCache() {
@@ -109,16 +92,6 @@ public final class LZDecoder {
     public void repeatPending() throws IOException {
         if (pendingLen > 0)
             repeat(pendingDist, pendingLen);
-    }
-
-    public void copyUncompressed(DataInputStream inData, int len)
-            throws IOException {
-        int copySize = Math.min(bufSize - pos, len);
-        inData.readFully(buf, pos, copySize);
-        pos += copySize;
-
-        if (full < pos)
-            full = pos;
     }
 
     public int flush(byte[] out, int outOff) {

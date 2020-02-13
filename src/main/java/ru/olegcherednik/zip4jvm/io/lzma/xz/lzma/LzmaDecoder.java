@@ -19,7 +19,7 @@ public final class LzmaDecoder extends LZMACoder {
 
     public LzmaDecoder(DataInput in, LzmaProperties properties) throws IOException {
         super(properties.getPb());
-        lz = new LZDecoder(properties.getDictionarySize(), null);
+        lz = new LZDecoder(properties.getDictionarySize());
         rc = new RangeDecoder(in);
         literalDecoder = new LiteralDecoder(properties);
         reset();
