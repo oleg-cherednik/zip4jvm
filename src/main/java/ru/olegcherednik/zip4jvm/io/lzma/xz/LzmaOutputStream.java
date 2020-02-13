@@ -5,13 +5,14 @@ import ru.olegcherednik.zip4jvm.io.lzma.xz.rangecoder.RangeEncoderToStream;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * Compresses into the legacy .lzma file format or into a raw LZMA stream.
  *
  * @since 1.6
  */
-public class LzmaOutputStream extends FinishableOutputStream {
+public class LzmaOutputStream extends OutputStream {
 
     private final DataOutput out;
 
