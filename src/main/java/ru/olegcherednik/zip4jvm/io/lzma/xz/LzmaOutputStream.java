@@ -13,7 +13,7 @@ import java.io.IOException;
  *
  * @since 1.6
  */
-public class LZMAOutputStream extends FinishableOutputStream {
+public class LzmaOutputStream extends FinishableOutputStream {
 
     private DataOutput out;
 
@@ -35,7 +35,7 @@ public class LZMAOutputStream extends FinishableOutputStream {
     private final boolean useHeader;
     private final int dictSize;
 
-    private LZMAOutputStream(DataOutput out, LZMA2Options options, boolean useHeader, boolean useEndMarker, long expectedUncompressedSize,
+    private LzmaOutputStream(DataOutput out, LZMA2Options options, boolean useHeader, boolean useEndMarker, long expectedUncompressedSize,
             ArrayCache arrayCache) throws IOException {
         this.useHeader = useHeader;
         // -1 indicates unknown and >= 0 are for known sizes.
@@ -117,7 +117,7 @@ public class LZMAOutputStream extends FinishableOutputStream {
      *                  use <code>-1</code> when unknown
      * @throws IOException may be thrown from <code>out</code>
      */
-    public LZMAOutputStream(DataOutput out, LZMA2Options options, long inputSize) throws IOException {
+    public LzmaOutputStream(DataOutput out, LZMA2Options options, long inputSize) throws IOException {
         this(out, options, inputSize, ArrayCache.getDefaultCache());
     }
 
@@ -138,7 +138,7 @@ public class LZMAOutputStream extends FinishableOutputStream {
      * @throws IOException may be thrown from <code>out</code>
      * @since 1.7
      */
-    public LZMAOutputStream(DataOutput out, LZMA2Options options, long inputSize, ArrayCache arrayCache) throws IOException {
+    public LzmaOutputStream(DataOutput out, LZMA2Options options, long inputSize, ArrayCache arrayCache) throws IOException {
         this(out, options, true, inputSize == -1, inputSize, arrayCache);
     }
 
@@ -157,7 +157,7 @@ public class LZMAOutputStream extends FinishableOutputStream {
      * @param useEndMarker if end of stream marker should be written
      * @throws IOException may be thrown from <code>out</code>
      */
-    public LZMAOutputStream(DataOutput out, LZMA2Options options, boolean useEndMarker) throws IOException {
+    public LzmaOutputStream(DataOutput out, LZMA2Options options, boolean useEndMarker) throws IOException {
         this(out, options, useEndMarker, ArrayCache.getDefaultCache());
     }
 
@@ -177,7 +177,7 @@ public class LZMAOutputStream extends FinishableOutputStream {
      * @throws IOException may be thrown from <code>out</code>
      * @since 1.7
      */
-    public LZMAOutputStream(DataOutput out, LZMA2Options options, boolean useEndMarker, ArrayCache arrayCache) throws IOException {
+    public LzmaOutputStream(DataOutput out, LZMA2Options options, boolean useEndMarker, ArrayCache arrayCache) throws IOException {
         this(out, options, false, useEndMarker, -1, arrayCache);
     }
 
