@@ -33,47 +33,29 @@ public abstract class LzmaCoder implements Closeable {
     final int[] reps = new int[4];
     final State state = new State();
 
-    final short[][] isMatch = new short[State.STATES][POS_STATES_MAX];
-    final short[] isRep = new short[State.STATES];
-    final short[] isRep0 = new short[State.STATES];
-    final short[] isRep1 = new short[State.STATES];
-    final short[] isRep2 = new short[State.STATES];
-    final short[][] isRep0Long = new short[State.STATES][POS_STATES_MAX];
-    final short[][] distSlots = new short[DIST_STATES][DIST_SLOTS];
+    protected final short[][] isMatch = createArray(State.STATES, POS_STATES_MAX);
+    protected final short[] isRep = createArray(State.STATES);
+    protected final short[] isRep0 = createArray(State.STATES);
+    protected final short[] isRep1 = createArray(State.STATES);
+    protected final short[] isRep2 = createArray(State.STATES);
+    protected final short[][] isRep0Long = createArray(State.STATES, POS_STATES_MAX);
+    protected final short[][] distSlots = createArray(DIST_STATES, DIST_SLOTS);
     final short[][] distSpecial = { new short[2], new short[2],
             new short[4], new short[4],
             new short[8], new short[8],
             new short[16], new short[16],
             new short[32], new short[32] };
-    final short[] distAlign = new short[ALIGN_SIZE];
-
-    static final int getDistState(int len) {
-        return len < DIST_STATES + MATCH_LEN_MIN
-               ? len - MATCH_LEN_MIN
-               : DIST_STATES - 1;
-    }
+    protected final short[] distAlign = createArray(ALIGN_SIZE);
 
     protected LzmaCoder(int pb) {
         posMask = (1 << pb) - 1;
 
-        for (int i = 0; i < isMatch.length; ++i)
-            initProbs(isMatch[i]);
-
-        initProbs(isRep);
-        initProbs(isRep0);
-        initProbs(isRep1);
-        initProbs(isRep2);
-
-        for (int i = 0; i < isRep0Long.length; ++i)
-            initProbs(isRep0Long[i]);
-
-        for (int i = 0; i < distSlots.length; ++i)
-            initProbs(distSlots[i]);
-
         for (int i = 0; i < distSpecial.length; ++i)
             initProbs(distSpecial[i]);
+    }
 
-        initProbs(distAlign);
+    protected static int getDistState(int len) {
+        return len < DIST_STATES + MATCH_LEN_MIN ? len - MATCH_LEN_MIN : DIST_STATES - 1;
     }
 
     private static void initProbs(short[] probs) {

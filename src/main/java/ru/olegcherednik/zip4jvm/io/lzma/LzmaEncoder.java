@@ -383,16 +383,14 @@ public abstract class LzmaEncoder extends LzmaCoder {
         alignPriceCount = ALIGN_SIZE;
 
         for (int i = 0; i < ALIGN_SIZE; ++i)
-            alignPrices[i] = RangeEncoder.getReverseBitTreePrice(distAlign,
-                    i);
+            alignPrices[i] = RangeEncoder.getReverseBitTreePrice(distAlign, i);
     }
 
     /**
-     * Updates the lookup tables used for calculating match distance
-     * and length prices. The updating is skipped for performance reasons
-     * if the tables haven't changed much since the previous update.
+     * Updates the lookup tables used for calculating match distance and length prices. The updating is skipped for performance reasons if the tables
+     * haven't changed much since the previous update.
      */
-    void updatePrices() {
+    public void updatePrices() {
         if (distPriceCount <= 0)
             updateDistPrices();
 
