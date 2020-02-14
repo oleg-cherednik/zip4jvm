@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.io.lzma;
 
 import ru.olegcherednik.zip4jvm.io.lzma.lz.LzEncoder;
 import ru.olegcherednik.zip4jvm.io.lzma.lz.Matches;
-import ru.olegcherednik.zip4jvm.io.lzma.rangecoder.RangeEncoder;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 import java.util.stream.IntStream;
@@ -401,7 +400,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
     }
 
     private int getShortRepPrice(int anyRepPrice, State state, int posState) {
-        return anyRepPrice + RangeEncoder.getBitPrice(isRep0[state.get()], 0) + RangeEncoder.getBitPrice(isRep0Long[state.get()][posState], 0);
+        return anyRepPrice + rangeEncoder.getBitPrice(isRep0[state.get()], 0) + rangeEncoder.getBitPrice(isRep0Long[state.get()][posState], 0);
     }
 
     private int getLongRepAndLenPrice(int rep, int len, State state, int posState) {
@@ -541,7 +540,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
     }
 
     private int getNormalMatchPrice(int anyMatchPrice, State state) {
-        return anyMatchPrice + RangeEncoder.getBitPrice(isRep[state.get()], 0);
+        return anyMatchPrice + rangeEncoder.getBitPrice(isRep[state.get()], 0);
     }
 
     private int getMatchAndLenPrice(int normalMatchPrice, int dist, int len, int posState) {

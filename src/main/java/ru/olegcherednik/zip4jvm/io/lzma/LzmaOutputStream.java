@@ -117,6 +117,7 @@ public class LzmaOutputStream extends OutputStream {
     /**
      * Finishes the stream and closes the underlying OutputStream.
      */
+    @Override
     public void close() throws IOException {
         try {
             finish();

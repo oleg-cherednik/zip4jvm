@@ -7,7 +7,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static ru.olegcherednik.zip4jvm.io.lzma.rangecoder.RangeCoder.PROB_INIT;
+import static ru.olegcherednik.zip4jvm.io.lzma.rangecoder.RangeEncoder.PROB_INIT;
 
 /**
  * @author Oleg Cherednik

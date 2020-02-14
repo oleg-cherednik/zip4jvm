@@ -1,24 +1,17 @@
-/*
- * Optimum
- *
- * Authors: Lasse Collin <lasse.collin@tukaani.org>
- *          Igor Pavlov <http://7-zip.org/>
- *
- * This file has been put into the public domain.
- * You can do whatever you want with this file.
- */
-
 package ru.olegcherednik.zip4jvm.io.lzma;
 
+/**
+ * @author Oleg Cherednik
+ * @since 14.02.2020
+ */
 final class Optimum {
+
     private static final int INFINITY_PRICE = 1 << 30;
 
     final State state = new State();
     final int[] reps = new int[4];
 
-    /**
-     * Cumulative price of arriving to this byte.
-     */
+    /** Cumulative price of arriving to this byte. */
     int price;
 
     int optPrev;
@@ -29,16 +22,10 @@ final class Optimum {
     int optPrev2;
     int backPrev2;
 
-    /**
-     * Resets the price.
-     */
     void reset() {
         price = INFINITY_PRICE;
     }
 
-    /**
-     * Sets to indicate one LZMA symbol (literal, rep, or match).
-     */
     void set1(int newPrice, int optCur, int back) {
         price = newPrice;
         optPrev = optCur;

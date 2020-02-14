@@ -1,7 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.lzma.rangecoder;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.lzma.exceptions.CorruptedInputException;
 
 import java.io.IOException;
 
@@ -9,6 +8,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 14.02.2020
  */
+@SuppressWarnings("MethodCanBeVariableArityMethod")
 public class RangeDecoder extends RangeCoder {
 
     private final DataInput in;
@@ -19,7 +19,7 @@ public class RangeDecoder extends RangeCoder {
         this.in = in;
 
         if (in.readByte() != 0x00)
-            throw new CorruptedInputException();
+            throw new IOException("Incorrect LZMA format");
 
         code = readCode(in);
     }
@@ -31,13 +31,6 @@ public class RangeDecoder extends RangeCoder {
             code = code << 8 | in.readByte();
 
         return code;
-    }
-
-    public void normalize() throws IOException {
-        if ((range & TOP_MASK) == 0) {
-            code = (code << SHIFT_BITS) | in.readByte();
-            range <<= SHIFT_BITS;
-        }
     }
 
     public int decodeBit(short[] probs, int index) throws IOException {
@@ -104,6 +97,13 @@ public class RangeDecoder extends RangeCoder {
         } while (--count != 0);
 
         return result;
+    }
+
+    public void normalize() throws IOException {
+        if ((range & TOP_MASK) == 0) {
+            code = (code << SHIFT_BITS) | in.readByte();
+            range <<= SHIFT_BITS;
+        }
     }
 
     @Override
