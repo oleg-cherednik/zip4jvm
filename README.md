@@ -15,14 +15,20 @@ zip4jvm - a java library for working with zip files
 
 * Add regular files or directories to new or existed zip archive;
 * Extract regular files or directories from zip archive;
-* [PKWare](https://en.wikipedia.org/wiki/PKWare) and [AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard) encryption algorithms support;
-* Store and [Deflate](https://en.wikipedia.org/wiki/DEFLATE) compression support;
+* Encryption algorithms support:
+  * [PKWare](https://en.wikipedia.org/wiki/PKWare)
+  * [AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
+* Compression support:
+  * Store
+  * [DEFLATE](https://en.wikipedia.org/wiki/DEFLATE)
+  * [LZMA](https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm)
 * Individual settings for each zip entry (i.e. some of files can be encrypted, and some - not);
 * Streaming support for adding and extracting;
 * Read/Write password protected Zip files and streams;
 * [ZIP64](https://en.wikipedia.org/wiki/Zip_(file_format)#ZIP64) format support;
-* Multi-volume zip archive read/write support (i.e. `filename.zip`, `filename.z01`, `filename.z02`);
-* 7-Zip multi-volume zip archive read support  (i.e. `filename.zip.001`, `filename.zip.002`, `filename.zip.003`);
+* Multi-volume zip archive support:
+  * standard, i.e. `filename.zip`, `filename.z01`, `filename.z02`
+  * [7-Zip](https://en.wikipedia.org/wiki/7-Zip#Features), i.e. `filename.zip.001`, `filename.zip.002`, `filename.zip.003` (read-only)
 * Unicode for comments and file names.
 
 ## Gradle
@@ -156,11 +162,13 @@ Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
 try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
     zipFile.add(ZipFile.Entry.builder()
                              .inputStreamSupplier(() -> new FileInputStream("/cars/bentley-continental.jpg"))
-                             .fileName("my_cars/bentley-continental.jpg").build());
+                             .fileName("my_cars/bentley-continental.jpg")
+                             .uncompressedSize(Files.size(Paths.get("/cars/bentley-continental.jpg"))).build());
 
     zipFile.add(ZipFile.Entry.builder()
                              .inputStreamSupplier(() -> new FileInputStream("/bikes/kawasaki-ninja-300.jpg"))
-                             .fileName("my_bikes/kawasaki.jpg").build());
+                             .fileName("my_bikes/kawasaki.jpg")
+                             .uncompressedSize(Files.size(Paths.get("/bikes/kawasaki-ninja-300.jpg"))).build());
 }
 ```
 >```

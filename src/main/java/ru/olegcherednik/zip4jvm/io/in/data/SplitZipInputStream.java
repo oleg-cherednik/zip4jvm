@@ -5,7 +5,7 @@ import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianReadFile;
 import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
-import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
+import ru.olegcherednik.zip4jvm.io.out.data.SplitZipOutputStream;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import java.io.IOException;
@@ -32,7 +32,7 @@ public class SplitZipInputStream extends BaseZipDataInput {
 
         byte[] buf = THREAD_LOCAL_BUF.get();
         read(buf, 0, 4);
-        int signature = (int)delegate.convert(buf, 0, 4);
+        int signature = (int)delegate.toLong(buf, 0, 4);
 
         if (signature != SplitZipOutputStream.SPLIT_SIGNATURE)
             throw new Zip4jvmException("Incorrect split file signature: " + zipModel.getSrcFile().getPath());

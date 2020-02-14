@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.io.out;
+package ru.olegcherednik.zip4jvm.io.out.data;
 
 import lombok.Getter;
 import ru.olegcherednik.zip4jvm.io.writers.ZipModelWriter;
@@ -15,7 +15,7 @@ import java.nio.file.Path;
  * @since 08.03.2019
  */
 @Getter
-public class SplitZipOutputStream extends BaseDataOutput {
+public class SplitZipOutputStream extends BaseZipDataOutput {
 
     /** see 8.5.5 */
     public static final int SPLIT_SIGNATURE = DataDescriptor.SIGNATURE;

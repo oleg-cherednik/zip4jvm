@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
-import ru.olegcherednik.zip4jvm.io.in.data.BaseZipDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.EndCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
@@ -30,7 +29,7 @@ public class BlockEndCentralDirectoryReader extends EndCentralDirectoryReader {
 
         if (in instanceof BlockModelReader.CentralDataInputStream) {
             ((BlockModelReader.CentralDataInputStream)in).setDisk(endCentralDirectory.getMainDisk());
-            ((BaseZipDataInput)in).setFileName(in.getFileName());
+            ((BlockModelReader.CentralDataInputStream)in).setFileName(in.getFileName());
         }
 
         block.setDisk(in.getDisk(), in.getFileName());

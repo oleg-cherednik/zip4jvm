@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.io.out;
+package ru.olegcherednik.zip4jvm.io.out.data;
 
 import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.io.Marker;
@@ -13,6 +13,8 @@ import java.io.IOException;
 public interface DataOutput extends Marker, Closeable {
 
     long getOffs();
+
+    void writeByte(int val) throws IOException;
 
     default void writeWordSignature(int sig) throws IOException {
         writeWord(sig);
@@ -38,5 +40,9 @@ public interface DataOutput extends Marker, Closeable {
     default long getDisk() {
         return 0;
     }
+
+    /* this is technical method; update {@literal byte[]} from given {@literal long}  */
+    @Deprecated
+    void fromLong(long val, byte[] buf, int offs, int len);
 
 }

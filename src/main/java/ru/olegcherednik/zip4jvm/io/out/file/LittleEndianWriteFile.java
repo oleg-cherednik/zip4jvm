@@ -1,4 +1,6 @@
-package ru.olegcherednik.zip4jvm.io.out;
+package ru.olegcherednik.zip4jvm.io.out.file;
+
+import ru.olegcherednik.zip4jvm.io.out.file.DataOutputFile;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -19,7 +21,7 @@ public class LittleEndianWriteFile implements DataOutputFile {
     }
 
     @Override
-    public void convert(long val, byte[] buf, int offs, int len) {
+    public void fromLong(long val, byte[] buf, int offs, int len) {
         for (int i = 0; i < len; i++) {
             buf[offs + i] = (byte)val;
             val >>= 8;

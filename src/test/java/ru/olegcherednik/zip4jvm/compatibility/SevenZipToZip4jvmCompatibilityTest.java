@@ -6,9 +6,14 @@ import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Arrays;
 
+import static ru.olegcherednik.zip4jvm.TestData.sevenZipLzmaSolidAesZip;
+import static ru.olegcherednik.zip4jvm.TestData.sevenZipLzmaSolidZip;
 import static ru.olegcherednik.zip4jvm.TestData.sevenZipStoreSplitZip;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
 /**
@@ -25,6 +30,16 @@ public class SevenZipToZip4jvmCompatibilityTest {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         UnzipIt.zip(sevenZipStoreSplitZip).destDir(destDir).extract();
         assertThatDirectory(destDir).matches(rootAssert);
+    }
+
+    public void checkCompatibilityWithLzmaSevenZip() throws IOException {
+        Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+
+        for (Path zip : Arrays.asList(sevenZipLzmaSolidZip, sevenZipLzmaSolidAesZip)) {
+            Path destDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(dir, zip);
+            UnzipIt.zip(zip).destDir(destDir).password(password).extract();
+            assertThatDirectory(destDir).matches(dirBikesAssert);
+        }
     }
 
 }

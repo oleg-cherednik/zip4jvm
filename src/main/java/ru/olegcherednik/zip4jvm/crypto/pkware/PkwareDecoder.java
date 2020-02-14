@@ -18,11 +18,11 @@ public final class PkwareDecoder implements Decoder {
 
     private final PkwareEngine engine;
 
-    public static PkwareDecoder create(ZipEntry entry, DataInput in) throws IOException {
-        requireNotEmpty(entry.getPassword(), entry.getFileName() + ".password");
+    public static PkwareDecoder create(ZipEntry zipEntry, DataInput in) throws IOException {
+        requireNotEmpty(zipEntry.getPassword(), zipEntry.getFileName() + ".password");
 
-        PkwareEngine engine = new PkwareEngine(entry.getPassword());
-        PkwareHeader.read(engine, entry, in);
+        PkwareEngine engine = new PkwareEngine(zipEntry.getPassword());
+        PkwareHeader.read(engine, zipEntry, in);
         return new PkwareDecoder(engine);
     }
 

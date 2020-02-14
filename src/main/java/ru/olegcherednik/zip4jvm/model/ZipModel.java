@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.io.in.data.SplitZipInputStream;
@@ -85,6 +86,9 @@ public final class ZipModel {
     }
 
     public ZipEntry getZipEntryByFileName(String fileName) {
+        if (!fileNameEntry.containsKey(fileName))
+            throw new EntryNotFoundException(fileName);
+
         return fileNameEntry.get(fileName);
     }
 
