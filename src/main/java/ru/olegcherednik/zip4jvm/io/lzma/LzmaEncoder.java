@@ -186,7 +186,7 @@ public abstract class LzmaEncoder extends LzmaCoder {
             else {
                 rangeEncoder.encodeDirectBits(distReduced >>> ALIGN_BITS, footerBits - ALIGN_BITS);
                 rangeEncoder.encodeReverseBitTree(distAlign, distReduced & ALIGN_MASK);
-                --alignPriceCount;
+                alignPriceCount--;
             }
         }
 
@@ -442,8 +442,10 @@ public abstract class LzmaEncoder extends LzmaCoder {
         public LengthEncoder(LzmaInputStream.Properties properties) {
             counters = new int[1 << properties.getPb()];
 
-            // Always allocate at least LOW_SYMBOLS + MID_SYMBOLS because it makes updatePrices slightly simpler. The prices aren't usually needed
-            // anyway if niceLen < 18.
+            /*
+             * Always allocate at least LOW_SYMBOLS + MID_SYMBOLS because it makes updatePrices slightly simpler. The prices aren't usually needed
+             * anyway if niceLength < 18.
+             */
             int lenSymbols = Math.max(properties.getNiceLength() - MATCH_LEN_MIN + 1, LOW_SYMBOLS + MID_SYMBOLS);
             prices = new int[counters.length][lenSymbols];
         }

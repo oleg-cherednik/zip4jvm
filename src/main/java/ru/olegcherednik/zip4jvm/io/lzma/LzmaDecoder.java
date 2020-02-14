@@ -49,9 +49,7 @@ public final class LzmaDecoder extends LzmaCoder {
             if (raceDecoder.decodeBit(isMatch[state.get()], posState) == 0) {
                 literalDecoder.decode();
             } else {
-                int len = raceDecoder.decodeBit(isRep, state.get()) == 0
-                          ? decodeMatch(posState)
-                          : decodeRepMatch(posState);
+                int len = raceDecoder.decodeBit(isRep, state.get()) == 0 ? decodeMatch(posState) : decodeRepMatch(posState);
 
                 // NOTE: With LZMA1 streams that have the end marker, this will throw CorruptedInputException. LZMAInputStream handles it specially.
                 lz.repeat(reps[0], len);
@@ -129,9 +127,7 @@ public final class LzmaDecoder extends LzmaCoder {
 
         public LiteralDecoder(LzmaOutputStream.Properties properties) {
             super(properties.getLc(), properties.getLp());
-            sub = IntStream.range(0, 1 << (properties.getLc() + properties.getLp()))
-                           .mapToObj(i -> new Sub())
-                           .toArray(Sub[]::new);
+            sub = IntStream.range(0, 1 << (properties.getLc() + properties.getLp())).mapToObj(i -> new Sub()).toArray(Sub[]::new);
         }
 
         public void decode() throws IOException {
