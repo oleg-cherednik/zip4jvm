@@ -2,6 +2,7 @@ package ru.olegcherednik.zip4jvm.io.lzma;
 
 import ru.olegcherednik.zip4jvm.io.lzma.lz.LzEncoder;
 import ru.olegcherednik.zip4jvm.io.lzma.lz.Matches;
+import ru.olegcherednik.zip4jvm.io.lzma.rangecoder.RangeEncoder;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 import java.util.stream.IntStream;
@@ -399,6 +400,17 @@ final class LzmaEncoderNormal extends LzmaEncoder {
         }
     }
 
+    private int getShortRepPrice(int anyRepPrice, State state, int posState) {
+        return anyRepPrice + RangeEncoder.getBitPrice(isRep0[state.get()], 0) + RangeEncoder.getBitPrice(isRep0Long[state.get()][posState], 0);
+    }
+
+    private int getLongRepAndLenPrice(int rep, int len, State state, int posState) {
+        int anyMatchPrice = getAnyMatchPrice(state, posState);
+        int anyRepPrice = getAnyRepPrice(anyMatchPrice, state);
+        int longRepPrice = getLongRepPrice(anyRepPrice, rep, state, posState);
+        return longRepPrice + repLengthEncoder.getPrice(len, posState);
+    }
+
     /**
      * Calculates prices of long rep and long rep + literal + rep0.
      */
@@ -540,5 +552,28 @@ final class LzmaEncoderNormal extends LzmaEncoder {
             if (++match == matches.count)
                 break;
         }
+    }
+
+    private int getNormalMatchPrice(int anyMatchPrice, State state) {
+        return anyMatchPrice + RangeEncoder.getBitPrice(isRep[state.get()], 0);
+    }
+
+    private int getMatchAndLenPrice(int normalMatchPrice,
+            int dist, int len, int posState) {
+        int price = normalMatchPrice
+                + matchLengthEncoder.getPrice(len, posState);
+        int distState = getDistState(len);
+
+        if (dist < FULL_DISTANCES) {
+            price += fullDistPrices[distState][dist];
+        } else {
+            // Note that distSlotPrices includes also
+            // the price of direct bits.
+            int distSlot = getDistSlot(dist);
+            price += distSlotPrices[distState][distSlot]
+                    + alignPrices[dist & ALIGN_MASK];
+        }
+
+        return price;
     }
 }

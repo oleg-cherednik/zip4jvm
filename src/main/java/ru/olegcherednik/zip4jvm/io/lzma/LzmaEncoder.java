@@ -14,15 +14,15 @@ import java.util.stream.IntStream;
  */
 public abstract class LzmaEncoder extends LzmaCoder {
 
-    private static final int FULL_DISTANCES = 1 << (DIST_MODEL_END / 2);
-    private static final int ALIGN_MASK = ALIGN_SIZE - 1;
+    protected static final int FULL_DISTANCES = 1 << (DIST_MODEL_END / 2);
+    protected static final int ALIGN_MASK = ALIGN_SIZE - 1;
 
     private final RangeEncoder rangeEncoder;
-    private final LengthEncoder matchLengthEncoder;
+    protected final LengthEncoder matchLengthEncoder;
     private final int distSlotPricesSize;
-    private final int[][] distSlotPrices;
-    private final int[][] fullDistPrices = new int[DIST_STATES][FULL_DISTANCES];
-    private final int[] alignPrices = new int[ALIGN_SIZE];
+    protected final int[][] distSlotPrices;
+    protected final int[][] fullDistPrices = new int[DIST_STATES][FULL_DISTANCES];
+    protected final int[] alignPrices = new int[ALIGN_SIZE];
 
     protected final LzEncoder lz;
     protected final LiteralEncoder literalEncoder;
@@ -47,9 +47,8 @@ public abstract class LzmaEncoder extends LzmaCoder {
     }
 
     /**
-     * Gets an integer [0, 63] matching the highest two bits of an integer.
-     * This is like bit scan reverse (BSR) on x86 except that this also
-     * cares about the second highest bit.
+     * Gets an integer [0, 63] matching the highest two bits of an integer. This is like bit scan reverse (BSR) on x86 except that this also  cares
+     * about the second highest bit.
      */
     public static int getDistSlot(int dist) {
         if (dist <= DIST_MODEL_START && dist >= 0)
@@ -91,19 +90,14 @@ public abstract class LzmaEncoder extends LzmaCoder {
     /**
      * Gets the next LZMA symbol.
      * <p>
-     * There are three types of symbols: literal (a single byte),
-     * repeated match, and normal match. The symbol is indicated
-     * by the return value and by the variable <code>back</code>.
+     * There are three types of symbols: literal (a single byte), repeated match, and normal match. The symbol is indicated by the return value and by
+     * the variable <code>back</code>.
      * <p>
-     * Literal: <code>back == -1</code> and return value is <code>1</code>.
-     * The literal itself needs to be read from <code>lz</code> separately.
+     * Literal: <code>back == -1</code> and return value is <code>1</code>. The literal itself needs to be read from <code>lz</code> separately.
      * <p>
-     * Repeated match: <code>back</code> is in the range [0, 3] and
-     * the return value is the length of the repeated match.
+     * Repeated match: <code>back</code> is in the range [0, 3] and the return value is the length of the repeated match.
      * <p>
-     * Normal match: <code>back - REPS<code> (<code>back - 4</code>)
-     * is the distance of the match and the return value is the length
-     * of the match.
+     * Normal match: <code>back - REPS<code> (<code>back - 4</code>) is the distance of the match and the return value is the length of the match.
      */
     public abstract int getNextSymbol();
 
@@ -111,22 +105,14 @@ public abstract class LzmaEncoder extends LzmaCoder {
         return uncompressedSize;
     }
 
-    /**
-     * Compress for LZMA1.
-     */
     public void encodeForLZMA1() throws IOException {
-        if (lz.isStarted() || encodeInit())
+        if (lz.isStarted() || encodeInit()) {
             while (encodeSymbol()) {
             }
+        }
     }
 
     public void encodeLZMA1EndMarker() throws IOException {
-        // End of stream marker is encoded as a match with the maximum
-        // possible distance. The length is ignored by the decoder,
-        // but the minimum length has been used by the LZMA SDK.
-        //
-        // Distance is a 32-bit unsigned integer in LZMA.
-        // With Java's signed int, UINT32_MAX becomes -1.
         int posState = (lz.getPos() - readAhead) & posMask;
         rangeEncoder.encodeBit(isMatch[state.get()], posState, 1);
         rangeEncoder.encodeBit(isRep, state.get(), 0);
@@ -134,22 +120,16 @@ public abstract class LzmaEncoder extends LzmaCoder {
     }
 
     private boolean encodeInit() throws IOException {
-        assert readAhead == -1;
         if (!lz.hasEnoughData(0))
             return false;
 
-        // The first symbol must be a literal unless using
-        // a preset dictionary. This code isn't run if using
-        // a preset dictionary.
+        // The first symbol must be a literal unless using a preset dictionary. This code isn't run if using a preset dictionary.
         skip(1);
         rangeEncoder.encodeBit(isMatch[state.get()], 0, 0);
         literalEncoder.encodeInit();
 
         --readAhead;
-        assert readAhead == -1;
-
         ++uncompressedSize;
-        assert uncompressedSize == 1;
 
         return true;
     }
@@ -159,27 +139,23 @@ public abstract class LzmaEncoder extends LzmaCoder {
             return false;
 
         int len = getNextSymbol();
-
-        assert readAhead >= 0;
         int posState = (lz.getPos() - readAhead) & posMask;
 
         if (back == -1) {
             // Literal i.e. eight-bit byte
-            assert len == 1;
             rangeEncoder.encodeBit(isMatch[state.get()], posState, 0);
             literalEncoder.encode();
         } else {
             // Some type of match
             rangeEncoder.encodeBit(isMatch[state.get()], posState, 1);
+
             if (back < reps.length) {
                 // Repeated match i.e. the same distance
                 // has been used earlier.
-                assert lz.getMatchLen(-readAhead, reps[back], len) == len;
                 rangeEncoder.encodeBit(isRep, state.get(), 1);
                 encodeRepMatch(back, len, posState);
             } else {
                 // Normal match
-                assert lz.getMatchLen(-readAhead, back - reps.length, len) == len;
                 rangeEncoder.encodeBit(isRep, state.get(), 0);
                 encodeMatch(back - reps.length, len, posState);
             }
@@ -191,8 +167,7 @@ public abstract class LzmaEncoder extends LzmaCoder {
         return true;
     }
 
-    private void encodeMatch(int dist, int len, int posState)
-            throws IOException {
+    private void encodeMatch(int dist, int len, int posState) throws IOException {
         state.updateMatch();
         matchLengthEncoder.encode(len, posState);
 
@@ -204,13 +179,10 @@ public abstract class LzmaEncoder extends LzmaCoder {
             int base = (2 | (distSlot & 1)) << footerBits;
             int distReduced = dist - base;
 
-            if (distSlot < DIST_MODEL_END) {
-                rangeEncoder.encodeReverseBitTree(
-                        distSpecial[distSlot - DIST_MODEL_START],
-                        distReduced);
-            } else {
-                rangeEncoder.encodeDirectBits(distReduced >>> ALIGN_BITS,
-                        footerBits - ALIGN_BITS);
+            if (distSlot < DIST_MODEL_END)
+                rangeEncoder.encodeReverseBitTree(distSpecial[distSlot - DIST_MODEL_START], distReduced);
+            else {
+                rangeEncoder.encodeDirectBits(distReduced >>> ALIGN_BITS, footerBits - ALIGN_BITS);
                 rangeEncoder.encodeReverseBitTree(distAlign, distReduced & ALIGN_MASK);
                 --alignPriceCount;
             }
@@ -224,8 +196,7 @@ public abstract class LzmaEncoder extends LzmaCoder {
         --distPriceCount;
     }
 
-    private void encodeRepMatch(int rep, int len, int posState)
-            throws IOException {
+    private void encodeRepMatch(int rep, int len, int posState) throws IOException {
         if (rep == 0) {
             rangeEncoder.encodeBit(isRep0, state.get(), 0);
             rangeEncoder.encodeBit(isRep0Long[state.get()], posState, len == 1 ? 0 : 1);
@@ -233,9 +204,9 @@ public abstract class LzmaEncoder extends LzmaCoder {
             int dist = reps[rep];
             rangeEncoder.encodeBit(isRep0, state.get(), 1);
 
-            if (rep == 1) {
+            if (rep == 1)
                 rangeEncoder.encodeBit(isRep1, state.get(), 0);
-            } else {
+            else {
                 rangeEncoder.encodeBit(isRep1, state.get(), 1);
                 rangeEncoder.encodeBit(isRep2, state.get(), rep - 2);
 
@@ -249,89 +220,44 @@ public abstract class LzmaEncoder extends LzmaCoder {
             reps[0] = dist;
         }
 
-        if (len == 1) {
+        if (len == 1)
             state.updateShortRep();
-        } else {
+        else {
             repLengthEncoder.encode(len, posState);
             state.updateLongRep();
         }
     }
 
-    Matches getMatches() {
+    protected Matches getMatches() {
         ++readAhead;
-        Matches matches = lz.getMatches();
-        assert lz.verifyMatches(matches);
-        return matches;
+        return lz.getMatches();
     }
 
-    void skip(int len) {
+    protected void skip(int len) {
         readAhead += len;
         lz.skip(len);
     }
 
-    int getAnyMatchPrice(State state, int posState) {
+    protected int getAnyMatchPrice(State state, int posState) {
         return RangeEncoder.getBitPrice(isMatch[state.get()][posState], 1);
     }
 
-    int getNormalMatchPrice(int anyMatchPrice, State state) {
-        return anyMatchPrice
-                + RangeEncoder.getBitPrice(isRep[state.get()], 0);
+    protected int getAnyRepPrice(int anyMatchPrice, State state) {
+        return anyMatchPrice + RangeEncoder.getBitPrice(isRep[state.get()], 1);
     }
 
-    int getAnyRepPrice(int anyMatchPrice, State state) {
-        return anyMatchPrice
-                + RangeEncoder.getBitPrice(isRep[state.get()], 1);
-    }
-
-    int getShortRepPrice(int anyRepPrice, State state, int posState) {
-        return anyRepPrice
-                + RangeEncoder.getBitPrice(isRep0[state.get()], 0)
-                + RangeEncoder.getBitPrice(isRep0Long[state.get()][posState],
-                0);
-    }
-
-    int getLongRepPrice(int anyRepPrice, int rep, State state, int posState) {
+    protected int getLongRepPrice(int anyRepPrice, int rep, State state, int posState) {
         int price = anyRepPrice;
 
-        if (rep == 0) {
-            price += RangeEncoder.getBitPrice(isRep0[state.get()], 0)
-                    + RangeEncoder.getBitPrice(
-                    isRep0Long[state.get()][posState], 1);
-        } else {
+        if (rep == 0)
+            price += RangeEncoder.getBitPrice(isRep0[state.get()], 0) + RangeEncoder.getBitPrice(isRep0Long[state.get()][posState], 1);
+        else {
             price += RangeEncoder.getBitPrice(isRep0[state.get()], 1);
 
             if (rep == 1)
                 price += RangeEncoder.getBitPrice(isRep1[state.get()], 0);
             else
-                price += RangeEncoder.getBitPrice(isRep1[state.get()], 1)
-                        + RangeEncoder.getBitPrice(isRep2[state.get()],
-                        rep - 2);
-        }
-
-        return price;
-    }
-
-    int getLongRepAndLenPrice(int rep, int len, State state, int posState) {
-        int anyMatchPrice = getAnyMatchPrice(state, posState);
-        int anyRepPrice = getAnyRepPrice(anyMatchPrice, state);
-        int longRepPrice = getLongRepPrice(anyRepPrice, rep, state, posState);
-        return longRepPrice + repLengthEncoder.getPrice(len, posState);
-    }
-
-    int getMatchAndLenPrice(int normalMatchPrice,
-            int dist, int len, int posState) {
-        int price = normalMatchPrice
-                + matchLengthEncoder.getPrice(len, posState);
-        int distState = getDistState(len);
-
-        if (dist < FULL_DISTANCES) {
-            price += fullDistPrices[distState][dist];
-        } else {
-            // Note that distSlotPrices includes also
-            // the price of direct bits.
-            int distSlot = getDistSlot(dist);
-            price += distSlotPrices[distState][distSlot]
-                    + alignPrices[dist & ALIGN_MASK];
+                price += RangeEncoder.getBitPrice(isRep1[state.get()], 1) + RangeEncoder.getBitPrice(isRep2[state.get()], rep - 2);
         }
 
         return price;
@@ -342,20 +268,12 @@ public abstract class LzmaEncoder extends LzmaCoder {
 
         for (int distState = 0; distState < DIST_STATES; ++distState) {
             for (int distSlot = 0; distSlot < distSlotPricesSize; ++distSlot)
-                distSlotPrices[distState][distSlot]
-                        = RangeEncoder.getBitTreePrice(
-                        distSlots[distState], distSlot);
+                distSlotPrices[distState][distSlot] = RangeEncoder.getBitTreePrice(distSlots[distState], distSlot);
 
-            for (int distSlot = DIST_MODEL_END; distSlot < distSlotPricesSize;
-                 ++distSlot) {
-                int count = (distSlot >>> 1) - 1 - ALIGN_BITS;
-                distSlotPrices[distState][distSlot]
-                        += RangeEncoder.getDirectBitsPrice(count);
-            }
+            for (int i = DIST_MODEL_END; i < distSlotPricesSize; i++)
+                distSlotPrices[distState][i] += RangeEncoder.getDirectBitsPrice((i >>> 1) - 1 - ALIGN_BITS);
 
-            for (int dist = 0; dist < DIST_MODEL_START; ++dist)
-                fullDistPrices[distState][dist]
-                        = distSlotPrices[distState][dist];
+            System.arraycopy(distSlotPrices[distState], 0, fullDistPrices[distState], 0, DIST_MODEL_START);
         }
 
         int dist = DIST_MODEL_START;
