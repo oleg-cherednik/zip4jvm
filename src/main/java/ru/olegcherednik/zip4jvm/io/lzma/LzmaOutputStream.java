@@ -11,39 +11,21 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Compresses into the legacy .lzma file format or into a raw LZMA stream.
- *
- * @since 1.6
+ * @author Oleg Cherednik
+ * @since 14.02.2020
  */
 public class LzmaOutputStream extends OutputStream {
 
+    private final byte[] oneByteBuf = new byte[1];
+
     private final DataOutput out;
     private final LzmaEncoder lzma;
-
     private final long uncompressedSize;
-    private long currentUncompressedSize;
-
-    private boolean finished;
-
-    private final byte[] tempBuf = new byte[1];
     private final LzmaInputStream.Properties properties;
 
-    /**
-     * Creates a new compressor for the legacy .lzma file format.
-     * <p>
-     * This is identical to
-     * <code>LZMAOutputStream(OutputStream, LZMA2Options, long)</code>
-     * except that this also takes the <code>arrayCache</code> argument.
-     *
-     * @param out              output stream to which the compressed data
-     *                         will be written
-     * @param properties       LZMA compression options; the same class
-     *                         is used here as is for LZMA2
-     * @param uncompressedSize uncompressed size of the data to be compressed;
-     *                         use <code>-1</code> when unknown
-     * @throws IOException may be thrown from <code>out</code>
-     * @since 1.7
-     */
+    private long currentUncompressedSize;
+    private boolean finished;
+
     public LzmaOutputStream(DataOutput out, LzmaInputStream.Properties properties, long uncompressedSize) throws IOException {
         this.out = out;
         this.properties = properties;
@@ -55,31 +37,16 @@ public class LzmaOutputStream extends OutputStream {
         properties.write(out);
     }
 
-    /**
-     * Gets the amount of uncompressed data written to the stream.
-     * This is useful when creating raw LZMA streams without
-     * the end of stream marker.
-     */
-    public long getUncompressedSize() {
-        return currentUncompressedSize;
-    }
-
+    @Override
     public void write(int b) throws IOException {
-        tempBuf[0] = (byte)b;
-        write(tempBuf, 0, 1);
+        oneByteBuf[0] = (byte)b;
+        write(oneByteBuf, 0, 1);
     }
 
+    @Override
     public void write(byte[] buf, int off, int len) throws IOException {
-        if (off < 0 || len < 0 || off + len < 0 || off + len > buf.length)
-            throw new IndexOutOfBoundsException();
-
-        if (finished)
-            throw new IOException("Stream finished or closed");
-
-        if (uncompressedSize != -1
-                && uncompressedSize - currentUncompressedSize < len)
-            throw new IOException("Expected uncompressed input size ("
-                    + uncompressedSize + " bytes) was exceeded");
+        if (uncompressedSize != -1 && uncompressedSize - currentUncompressedSize < len)
+            throw new IOException(String.format("Expected uncompressed input size (%s bytes) was exceeded", uncompressedSize));
 
         currentUncompressedSize += len;
 
@@ -91,39 +58,27 @@ public class LzmaOutputStream extends OutputStream {
         }
     }
 
-    /**
-     * Finishes the stream without closing the underlying OutputStream.
-     */
     public void finish() throws IOException {
-        if (!finished) {
-            if (uncompressedSize != -1
-                    && uncompressedSize != currentUncompressedSize)
-                throw new IOException("Expected uncompressed size ("
-                        + uncompressedSize + ") doesn't equal "
-                        + "the number of bytes written to the stream ("
-                        + currentUncompressedSize + ")");
+        if (finished)
+            return;
 
-            lzma.getLZEncoder().setFinishing();
-            lzma.encodeForLZMA1();
+        if (uncompressedSize != -1 && uncompressedSize != currentUncompressedSize)
+            throw new IOException(String.format("Expected uncompressed size (%s) doesn't equal the number of bytes written to the stream (%s)",
+                    uncompressedSize, currentUncompressedSize));
 
-            if (uncompressedSize == -1)
-                lzma.encodeLZMA1EndMarker();
+        lzma.getLZEncoder().setFinishing();
+        lzma.encodeForLZMA1();
 
-            lzma.finish();
-            finished = true;
-        }
+        if (uncompressedSize == -1)
+            lzma.encodeLZMA1EndMarker();
+
+        lzma.finish();
+        finished = true;
     }
 
-    /**
-     * Finishes the stream and closes the underlying OutputStream.
-     */
     @Override
     public void close() throws IOException {
-        try {
-            finish();
-        } catch(IOException e) {
-        }
-
+        finish();
         out.close();
     }
 
