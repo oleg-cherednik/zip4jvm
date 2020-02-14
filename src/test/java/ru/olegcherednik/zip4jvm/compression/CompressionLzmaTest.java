@@ -39,9 +39,22 @@ public class CompressionLzmaTest {
         Zip4jvmSuite.removeDir(rootDir);
     }
 
-    public void shouldCreateSingleZipWithFilesWhenLzmaCompression() throws IOException {
+    public void shouldCreateSingleZipWithFilesWhenLzmaCompressionNormalLevel() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
                                                          .compression(Compression.LZMA, CompressionLevel.NORMAL)
+                                                         .lzmaEosMarker(true).build();
+        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
+
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+
+        ZipIt.zip(zip).settings(settings).add(filesDirBikes);
+        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
+        assertThatZipFile(zip).root().matches(dirBikesAssert);
+    }
+
+    public void shouldCreateSingleZipWithFilesWhenLzmaCompressionSuperFastLevel() throws IOException {
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.LZMA, CompressionLevel.SUPER_FAST)
                                                          .lzmaEosMarker(true).build();
         ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
 

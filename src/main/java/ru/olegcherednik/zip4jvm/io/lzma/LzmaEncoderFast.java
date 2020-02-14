@@ -4,12 +4,18 @@ import ru.olegcherednik.zip4jvm.io.lzma.lz.LzEncoder;
 import ru.olegcherednik.zip4jvm.io.lzma.lz.Matches;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
+/**
+ * @author Oleg Cherednik
+ * @since 14.02.2020
+ */
 final class LzmaEncoderFast extends LzmaEncoder {
 
+    private final int niceLength;
     private Matches matches;
 
     public LzmaEncoderFast(DataOutput out, LzmaInputStream.Properties properties) {
         super(out, createEncoder(properties), properties);
+        niceLength = properties.getNiceLength();
     }
 
     private static LzEncoder createEncoder(LzmaInputStream.Properties properties) {

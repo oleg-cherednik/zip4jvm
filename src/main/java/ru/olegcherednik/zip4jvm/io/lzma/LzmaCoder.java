@@ -9,29 +9,27 @@ import java.util.Arrays;
 
 import static ru.olegcherednik.zip4jvm.io.lzma.rangecoder.RangeCoder.PROB_INIT;
 
+/**
+ * @author Oleg Cherednik
+ * @since 14.02.2020
+ */
 public abstract class LzmaCoder implements Closeable {
 
-    static final int POS_STATES_MAX = 1 << 4;
+    private static final int POS_STATES_MAX = 1 << 4;
 
-    static final int MATCH_LEN_MIN = 2;
-    public static final int MATCH_LEN_MAX = MATCH_LEN_MIN + LengthCoder.LOW_SYMBOLS
-            + LengthCoder.MID_SYMBOLS
-            + LengthCoder.HIGH_SYMBOLS - 1;
+    protected static final int DIST_STATES = 4;
+    protected static final int DIST_MODEL_START = 4;
+    protected static final int DIST_MODEL_END = 14;
 
-    static final int DIST_STATES = 4;
-    static final int DIST_SLOTS = 1 << 6;
-    static final int DIST_MODEL_START = 4;
-    static final int DIST_MODEL_END = 14;
-    static final int FULL_DISTANCES = 1 << (DIST_MODEL_END / 2);
+    protected static final int ALIGN_BITS = 4;
+    protected static final int ALIGN_SIZE = 1 << ALIGN_BITS;
 
-    static final int ALIGN_BITS = 4;
-    static final int ALIGN_SIZE = 1 << ALIGN_BITS;
-    static final int ALIGN_MASK = ALIGN_SIZE - 1;
+    protected static final int MATCH_LEN_MIN = 2;
+    public static final int MATCH_LEN_MAX = MATCH_LEN_MIN + LengthCoder.LOW_SYMBOLS + LengthCoder.MID_SYMBOLS + LengthCoder.HIGH_SYMBOLS - 1;
 
-    final int posMask;
-
-    final int[] reps = new int[4];
-    final State state = new State();
+    protected final int posMask;
+    protected final int[] reps = new int[4];
+    protected final State state = new State();
 
     protected final short[][] isMatch = createArray(State.STATES, POS_STATES_MAX);
     protected final short[] isRep = createArray(State.STATES);
@@ -39,13 +37,14 @@ public abstract class LzmaCoder implements Closeable {
     protected final short[] isRep1 = createArray(State.STATES);
     protected final short[] isRep2 = createArray(State.STATES);
     protected final short[][] isRep0Long = createArray(State.STATES, POS_STATES_MAX);
-    protected final short[][] distSlots = createArray(DIST_STATES, DIST_SLOTS);
+    protected final short[][] distSlots = createArray(DIST_STATES, 1 << 6);
+    protected final short[] distAlign = createArray(ALIGN_SIZE);
+
     final short[][] distSpecial = { new short[2], new short[2],
             new short[4], new short[4],
             new short[8], new short[8],
             new short[16], new short[16],
             new short[32], new short[32] };
-    protected final short[] distAlign = createArray(ALIGN_SIZE);
 
     protected LzmaCoder(int pb) {
         posMask = (1 << pb) - 1;

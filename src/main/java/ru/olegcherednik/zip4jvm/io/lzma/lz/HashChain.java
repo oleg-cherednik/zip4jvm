@@ -19,8 +19,8 @@ final class HashChain extends LzEncoder {
      * Creates a new LZEncoder with the HC4 match finder.
      * See <code>LZEncoder.getInstance</code> for parameter descriptions.
      */
-    public HashChain(LzmaInputStream.Properties properties, int readAheadMax) {
-        super(properties, readAheadMax);
+    public HashChain(LzmaInputStream.Properties properties, int extraSizeAfter) {
+        super(properties, extraSizeAfter);
 
         hash = new CRC32Hash(properties.getDictionarySize());
 

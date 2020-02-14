@@ -125,7 +125,7 @@ public class LzmaInputStream extends InputStream {
                 // indicates maximum match distance. This is larger
                 // than any supported dictionary and thus causes
                 // CorruptedInputException from LZDecoder.repeat.
-                if (remainingSize != -1 || !lzma.endMarkerDetected())
+                if (remainingSize != -1 || !lzma.isEndMarkerDetected())
                     throw e;
 
                 endReached = true;

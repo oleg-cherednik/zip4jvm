@@ -4,11 +4,19 @@ import ru.olegcherednik.zip4jvm.io.lzma.lz.LzEncoder;
 import ru.olegcherednik.zip4jvm.io.lzma.lz.Matches;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
+import java.util.stream.IntStream;
+
+/**
+ * @author Oleg Cherednik
+ * @since 14.02.2020
+ */
 final class LzmaEncoderNormal extends LzmaEncoder {
 
     private static final int OPTS = 4096;
 
-    private final Optimum[] opts = new Optimum[OPTS];
+    private final int niceLength;
+
+    private final Optimum[] opts = IntStream.range(0, OPTS).mapToObj(i -> new Optimum()).toArray(Optimum[]::new);
     private int optCur;
     private int optEnd;
 
@@ -21,9 +29,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
 
     public LzmaEncoderNormal(DataOutput out, LzmaInputStream.Properties properties) {
         super(out, createEncoder(properties), properties);
-
-        for (int i = 0; i < OPTS; ++i)
-            opts[i] = new Optimum();
+        niceLength = properties.getNiceLength();
     }
 
     private static LzEncoder createEncoder(LzmaInputStream.Properties properties) {

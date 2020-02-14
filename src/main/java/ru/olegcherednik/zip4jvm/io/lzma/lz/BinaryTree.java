@@ -16,8 +16,8 @@ final class BinaryTree extends LzEncoder {
     private int lzPos;
 
 
-    public BinaryTree(LzmaInputStream.Properties properties, int readAheadMax) {
-        super(properties, readAheadMax);
+    public BinaryTree(LzmaInputStream.Properties properties, int extraSizeAfter) {
+        super(properties, extraSizeAfter);
 
         cyclicSize = properties.getDictionarySize() + 1;
         lzPos = cyclicSize;

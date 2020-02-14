@@ -8,6 +8,10 @@ import ru.olegcherednik.zip4jvm.io.lzma.rangecoder.RangeDecoder;
 import java.io.IOException;
 import java.util.stream.IntStream;
 
+/**
+ * @author Oleg Cherednik
+ * @since 14.02.2020
+ */
 @Getter
 public final class LzmaDecoder extends LzmaCoder {
 
@@ -29,12 +33,10 @@ public final class LzmaDecoder extends LzmaCoder {
     }
 
     /**
-     * Returns true if LZMA end marker was detected. It is encoded as
-     * the maximum match distance which with signed ints becomes -1. This
-     * function is needed only for LZMA1. LZMA2 doesn't use the end marker
-     * in the LZMA layer.
+     * Returns true if LZMA end marker was detected. It is encoded as the maximum match distance which with signed ints becomes -1. This function is
+     * needed only for LZMA1. LZMA2 doesn't use the end marker in the LZMA layer.
      */
-    public boolean endMarkerDetected() {
+    public boolean isEndMarkerDetected() {
         return reps[0] == -1;
     }
 
@@ -51,9 +53,7 @@ public final class LzmaDecoder extends LzmaCoder {
                           ? decodeMatch(posState)
                           : decodeRepMatch(posState);
 
-                // NOTE: With LZMA1 streams that have the end marker,
-                // this will throw CorruptedInputException. LZMAInputStream
-                // handles it specially.
+                // NOTE: With LZMA1 streams that have the end marker, this will throw CorruptedInputException. LZMAInputStream handles it specially.
                 lz.repeat(reps[0], len);
             }
         }
@@ -71,18 +71,16 @@ public final class LzmaDecoder extends LzmaCoder {
         int len = matchLengthDecoder.decode(posState);
         int distSlot = raceDecoder.decodeBitTree(distSlots[getDistState(len)]);
 
-        if (distSlot < DIST_MODEL_START) {
+        if (distSlot < DIST_MODEL_START)
             reps[0] = distSlot;
-        } else {
+        else {
             int limit = (distSlot >> 1) - 1;
             reps[0] = (2 | (distSlot & 1)) << limit;
 
-            if (distSlot < DIST_MODEL_END) {
-                reps[0] |= raceDecoder.decodeReverseBitTree(
-                        distSpecial[distSlot - DIST_MODEL_START]);
-            } else {
-                reps[0] |= raceDecoder.decodeDirectBits(limit - ALIGN_BITS)
-                        << ALIGN_BITS;
+            if (distSlot < DIST_MODEL_END)
+                reps[0] |= raceDecoder.decodeReverseBitTree(distSpecial[distSlot - DIST_MODEL_START]);
+            else {
+                reps[0] |= raceDecoder.decodeDirectBits(limit - ALIGN_BITS) << ALIGN_BITS;
                 reps[0] |= raceDecoder.decodeReverseBitTree(distAlign);
             }
         }
@@ -99,12 +97,12 @@ public final class LzmaDecoder extends LzmaCoder {
         } else {
             int tmp;
 
-            if (raceDecoder.decodeBit(isRep1, state.get()) == 0) {
+            if (raceDecoder.decodeBit(isRep1, state.get()) == 0)
                 tmp = reps[1];
-            } else {
-                if (raceDecoder.decodeBit(isRep2, state.get()) == 0) {
+            else {
+                if (raceDecoder.decodeBit(isRep2, state.get()) == 0)
                     tmp = reps[2];
-                } else {
+                else {
                     tmp = reps[3];
                     reps[3] = reps[2];
                 }
@@ -117,7 +115,6 @@ public final class LzmaDecoder extends LzmaCoder {
         }
 
         state.updateLongRep();
-
         return repLengthDecoder.decode(posState);
     }
 

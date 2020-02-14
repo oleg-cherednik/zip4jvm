@@ -8,37 +8,40 @@ import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import java.io.IOException;
 import java.util.stream.IntStream;
 
+/**
+ * @author Oleg Cherednik
+ * @since 14.02.2020
+ */
 public abstract class LzmaEncoder extends LzmaCoder {
 
-    protected final LzEncoder lz;
+    private static final int FULL_DISTANCES = 1 << (DIST_MODEL_END / 2);
+    private static final int ALIGN_MASK = ALIGN_SIZE - 1;
+
     private final RangeEncoder rangeEncoder;
-    protected final LiteralEncoder literalEncoder;
-    private final LengthEncoder matchLenthEncoder;
-    protected final LengthEncoder repLengthEncoder;
-    final int niceLength;
-
-    private int distPriceCount;
-    private int alignPriceCount;
-
+    private final LengthEncoder matchLengthEncoder;
     private final int distSlotPricesSize;
     private final int[][] distSlotPrices;
     private final int[][] fullDistPrices = new int[DIST_STATES][FULL_DISTANCES];
     private final int[] alignPrices = new int[ALIGN_SIZE];
 
-    int back;
-    int readAhead = -1;
+    protected final LzEncoder lz;
+    protected final LiteralEncoder literalEncoder;
+    protected final LengthEncoder repLengthEncoder;
+
+    private int distPriceCount;
+    private int alignPriceCount;
     private int uncompressedSize;
+
+    protected int back;
+    protected int readAhead = -1;
 
     protected LzmaEncoder(DataOutput out, LzEncoder lz, LzmaInputStream.Properties properties) {
         super(properties.getPb());
         this.lz = lz;
         rangeEncoder = new RangeEncoder(out);
         literalEncoder = new LiteralEncoder(properties);
-        matchLenthEncoder = new LengthEncoder(properties);
+        matchLengthEncoder = new LengthEncoder(properties);
         repLengthEncoder = new LengthEncoder(properties);
-
-
-        niceLength = properties.getNiceLength();
         distSlotPricesSize = getDistSlot(properties.getDictionarySize() - 1) + 1;
         distSlotPrices = new int[DIST_STATES][distSlotPricesSize];
     }
@@ -191,7 +194,7 @@ public abstract class LzmaEncoder extends LzmaCoder {
     private void encodeMatch(int dist, int len, int posState)
             throws IOException {
         state.updateMatch();
-        matchLenthEncoder.encode(len, posState);
+        matchLengthEncoder.encode(len, posState);
 
         int distSlot = getDistSlot(dist);
         rangeEncoder.encodeBitTree(distSlots[getDistState(len)], distSlot);
@@ -318,7 +321,7 @@ public abstract class LzmaEncoder extends LzmaCoder {
     int getMatchAndLenPrice(int normalMatchPrice,
             int dist, int len, int posState) {
         int price = normalMatchPrice
-                + matchLenthEncoder.getPrice(len, posState);
+                + matchLengthEncoder.getPrice(len, posState);
         int distState = getDistState(len);
 
         if (dist < FULL_DISTANCES) {
@@ -397,7 +400,7 @@ public abstract class LzmaEncoder extends LzmaCoder {
         if (alignPriceCount <= 0)
             updateAlignPrices();
 
-        matchLenthEncoder.updatePrices();
+        matchLengthEncoder.updatePrices();
         repLengthEncoder.updatePrices();
     }
 
