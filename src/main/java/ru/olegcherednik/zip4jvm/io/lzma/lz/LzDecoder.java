@@ -1,6 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.lzma.lz;
 
-import ru.olegcherednik.zip4jvm.io.lzma.exceptions.CorruptedInputException;
+import ru.olegcherednik.zip4jvm.io.lzma.exceptions.LzmaCorruptedInputException;
 
 import java.io.IOException;
 
@@ -57,7 +57,7 @@ public final class LzDecoder {
 
     public void repeat(int dist, int len) throws IOException {
         if (dist < 0 || dist >= full)
-            throw new CorruptedInputException();
+            throw new LzmaCorruptedInputException();
 
         int left = Math.min(limit - pos, len);
         pendingLen = len - left;

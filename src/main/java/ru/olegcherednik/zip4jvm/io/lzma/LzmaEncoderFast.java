@@ -64,9 +64,9 @@ final class LzmaEncoderFast extends LzmaEncoder {
         int mainLen = 0;
         int mainDist = 0;
 
-        if (matches.count > 0) {
-            mainLen = matches.len[matches.count - 1];
-            mainDist = matches.dist[matches.count - 1];
+        if (matches.getCount() > 0) {
+            mainLen = matches.len[matches.getCount() - 1];
+            mainDist = matches.dist[matches.getCount() - 1];
 
             if (mainLen >= niceLength) {
                 back = mainDist + reps.length;
@@ -74,14 +74,13 @@ final class LzmaEncoderFast extends LzmaEncoder {
                 return mainLen;
             }
 
-            while (matches.count > 1
-                    && mainLen == matches.len[matches.count - 2] + 1) {
-                if (!changePair(matches.dist[matches.count - 2], mainDist))
+            while (matches.getCount() > 1 && mainLen == matches.len[matches.getCount() - 2] + 1) {
+                if (!changePair(matches.dist[matches.getCount() - 2], mainDist))
                     break;
 
-                matches.count--;
-                mainLen = matches.len[matches.count - 1];
-                mainDist = matches.dist[matches.count - 1];
+                matches.decCount();
+                mainLen = matches.len[matches.getCount() - 1];
+                mainDist = matches.dist[matches.getCount() - 1];
             }
 
             if (mainLen == MATCH_LEN_MIN && mainDist >= 0x80)
@@ -103,9 +102,9 @@ final class LzmaEncoderFast extends LzmaEncoder {
         // Get the next match. Test if it is better than the current match. If so, encode the current byte as a literal.
         matches = getMatches();
 
-        if (matches.count > 0) {
-            int newLen = matches.len[matches.count - 1];
-            int newDist = matches.dist[matches.count - 1];
+        if (matches.getCount() > 0) {
+            int newLen = matches.len[matches.getCount() - 1];
+            int newDist = matches.dist[matches.getCount() - 1];
 
             if ((newLen >= mainLen && newDist < mainDist) || (newLen == mainLen + 1 && !changePair(mainDist, newDist))
                     || newLen > mainLen + 1 || (newLen + 1 >= mainLen && mainLen >= MATCH_LEN_MIN + 1 && changePair(newDist, mainDist)))

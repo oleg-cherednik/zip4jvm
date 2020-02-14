@@ -2,8 +2,7 @@ package ru.olegcherednik.zip4jvm.io.lzma;
 
 import lombok.Getter;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.lzma.exceptions.CorruptedInputException;
-import ru.olegcherednik.zip4jvm.io.lzma.exceptions.MemoryLimitException;
+import ru.olegcherednik.zip4jvm.io.lzma.exceptions.LzmaCorruptedInputException;
 import ru.olegcherednik.zip4jvm.io.lzma.exceptions.UnsupportedOptionsException;
 import ru.olegcherednik.zip4jvm.io.lzma.lz.MatchFinder;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
@@ -50,17 +49,14 @@ public class LzmaInputStream extends InputStream {
      *                   it might be a good idea to wrap it in
      *                   <code>BufferedInputStream</code>, see the
      *                   note at the top of this page
-     * @param uncompSize uncompressed size or <t>-1</t> if unknown
-     * @throws CorruptedInputException     file is corrupt or perhaps not in
-     *                                     the .lzma format at all
+     * @param uncompressedSize uncompressed size or <t>-1</t> if unknown
      * @throws UnsupportedOptionsException dictionary size or uncompressed size is too
      *                                     big for this implementation
-     * @throws MemoryLimitException        memory usage limit was exceeded
      * @throws IOException                 may be thrown by <code>in</code>
      */
-    public LzmaInputStream(DataInput in, long uncompSize) throws IOException {
+    public LzmaInputStream(DataInput in, long uncompressedSize) throws IOException {
         lzma = LzmaDecoder.create(in);
-        remainingSize = uncompSize;
+        remainingSize = uncompressedSize;
     }
 
     /**
@@ -72,7 +68,6 @@ public class LzmaInputStream extends InputStream {
      *
      * @return the next decompressed byte, or <code>-1</code>
      * to indicate the end of the compressed stream
-     * @throws CorruptedInputException
      * @throws IOException             may be thrown by <code>in</code>
      */
     public int read() throws IOException {
@@ -92,9 +87,9 @@ public class LzmaInputStream extends InputStream {
      * @param len maximum number of uncompressed bytes to read
      * @return number of bytes read, or <code>-1</code> to indicate
      * the end of the compressed stream
-     * @throws CorruptedInputException
      * @throws IOException             may be thrown by <code>in</code>
      */
+    @Override
     public int read(byte[] buf, int off, int len) throws IOException {
         if (off < 0 || len < 0 || off + len < 0 || off + len > buf.length)
             throw new IndexOutOfBoundsException();
@@ -120,7 +115,7 @@ public class LzmaInputStream extends InputStream {
             // Decode into the dictionary buffer.
             try {
                 lzma.decode();
-            } catch(CorruptedInputException e) {
+            } catch(LzmaCorruptedInputException e) {
                 // The end marker is encoded with a LZMA symbol that
                 // indicates maximum match distance. This is larger
                 // than any supported dictionary and thus causes
@@ -158,7 +153,7 @@ public class LzmaInputStream extends InputStream {
                 // the first check and thus it accepts many invalid
                 // files that this implementation and XZ Utils don't.
                 if (!lzma.getRaceDecoder().isFinished() || lzma.getLz().hasPending())
-                    throw new CorruptedInputException();
+                    throw new LzmaCorruptedInputException();
 
                 return size == 0 ? -1 : size;
             }

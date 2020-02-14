@@ -121,9 +121,9 @@ final class LzmaEncoderNormal extends LzmaEncoder {
         // Initialize mainLen and mainDist to the longest match found by the match finder.
         int mainLen = 0;
         int mainDist = 0;
-        if (matches.count > 0) {
-            mainLen = matches.len[matches.count - 1];
-            mainDist = matches.dist[matches.count - 1];
+        if (matches.getCount() > 0) {
+            mainLen = matches.len[matches.getCount() - 1];
+            mainDist = matches.dist[matches.getCount() - 1];
 
             // Return if it is at least niceLen bytes long.
             if (mainLen >= niceLength) {
@@ -218,7 +218,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
                     opts[len].set1(price, 0, dist + reps.length);
 
                 if (len == matches.len[i])
-                    if (++i == matches.count)
+                    if (++i == matches.getCount())
                         break;
 
                 len++;
@@ -230,7 +230,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
         // Get matches for later bytes and optimize the use of LZMA symbols by calculating the prices and picking the cheapest symbol combinations.
         while (++optCur < optEnd) {
             matches = getMatches();
-            if (matches.count > 0 && matches.len[matches.count - 1] >= niceLength)
+            if (matches.getCount() > 0 && matches.len[matches.getCount() - 1] >= niceLength)
                 break;
 
             avail--;
@@ -245,7 +245,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
 
             if (avail >= MATCH_LEN_MIN) {
                 int startLen = calcLongRepPrices(pos, posState, avail, anyRepPrice);
-                if (matches.count > 0)
+                if (matches.getCount() > 0)
                     calcNormalMatchPrices(pos, posState, avail, anyMatchPrice, startLen);
             }
         }
@@ -430,19 +430,20 @@ final class LzmaEncoderNormal extends LzmaEncoder {
     /** Calculates prices of a normal match and normal match + literal + rep0. */
     private void calcNormalMatchPrices(int pos, int posState, int avail, int anyMatchPrice, int startLen) {
         // If the longest match is so long that it would not fit into the opts array, shorten the matches.
-        if (matches.len[matches.count - 1] > avail) {
-            matches.count = 0;
+        if (matches.len[matches.getCount() - 1] > avail) {
+            matches.setCount(0);
 
-            while (matches.len[matches.count] < avail)
-                matches.count++;
+            while (matches.len[matches.getCount()] < avail)
+                matches.incCount();
 
-            matches.len[matches.count++] = avail;
+            matches.len[matches.getCount()] = avail;
+            matches.incCount();
         }
 
-        if (matches.len[matches.count - 1] < startLen)
+        if (matches.len[matches.getCount() - 1] < startLen)
             return;
 
-        while (optEnd < optCur + matches.len[matches.count - 1])
+        while (optEnd < optCur + matches.len[matches.getCount() - 1])
             opts[++optEnd].reset();
 
         int normalMatchPrice = getNormalMatchPrice(anyMatchPrice, opts[optCur].state);
@@ -490,7 +491,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
                     opts[i].set3(price, optCur, dist + reps.length, len, 0);
             }
 
-            if (++match == matches.count)
+            if (++match == matches.getCount())
                 break;
         }
     }

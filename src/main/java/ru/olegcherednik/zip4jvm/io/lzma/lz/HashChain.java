@@ -50,7 +50,7 @@ final class HashChain extends LzEncoder {
 
     @Override
     public Matches getMatches() {
-        matches.count = 0;
+        matches.setCount(0);
         int matchLenLimit = MATCH_LEN_MAX;
         int niceLenLimit = niceLength;
         int avail = movePos();
@@ -83,7 +83,7 @@ final class HashChain extends LzEncoder {
             lenBest = 2;
             matches.len[0] = 2;
             matches.dist[0] = delta2 - 1;
-            matches.count = 1;
+            matches.setCount(1);
         }
 
         /*
@@ -92,16 +92,17 @@ final class HashChain extends LzEncoder {
          */
         if (delta2 != delta3 && delta3 < cyclicSize && buf[pos - delta3] == buf[pos]) {
             lenBest = 3;
-            matches.dist[matches.count++] = delta3 - 1;
+            matches.dist[matches.getCount()] = delta3 - 1;
+            matches.incCount();
             delta2 = delta3;
         }
 
         // If a match was found, see how long it is.
-        if (matches.count > 0) {
+        if (matches.getCount() > 0) {
             while (lenBest < matchLenLimit && buf[pos + lenBest - delta2] == buf[pos + lenBest])
                 ++lenBest;
 
-            matches.len[matches.count - 1] = lenBest;
+            matches.len[matches.getCount() - 1] = lenBest;
 
             // Return if it is long enough (niceLen or reached the end of the dictionary).
             if (lenBest >= niceLenLimit)
@@ -137,9 +138,9 @@ final class HashChain extends LzEncoder {
                 // Use the match if and only if it is better than the longest match found so far.
                 if (len > lenBest) {
                     lenBest = len;
-                    matches.len[matches.count] = len;
-                    matches.dist[matches.count] = delta - 1;
-                    ++matches.count;
+                    matches.len[matches.getCount()] = len;
+                    matches.dist[matches.getCount()] = delta - 1;
+                    matches.incCount();
 
                     // Return if it is long enough (niceLen or reached the end of the dictionary).
                     if (len >= niceLenLimit)

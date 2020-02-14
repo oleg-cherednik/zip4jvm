@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.lzma.rangecoder;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.lzma.exceptions.LzmaCorruptedInputException;
 
 import java.io.IOException;
 
@@ -19,7 +20,7 @@ public class RangeDecoder extends RangeCoder {
         this.in = in;
 
         if (in.readByte() != 0x00)
-            throw new IOException("Incorrect LZMA format");
+            throw new LzmaCorruptedInputException();
 
         code = readCode(in);
     }

@@ -32,8 +32,8 @@ final class LzmaEntryInputStream extends EntryInputStream {
         if (headerSize != 5)
             throw new Zip4jvmException(String.format("LZMA header size expected 5 bytes: actual is %d bytes", headerSize));
 
-        long size = zipEntry.isLzmaEosMarker() ? -1 : zipEntry.getUncompressedSize();
-        LzmaInputStream dec = new LzmaInputStream(in, size);
+        long uncompressedSize = zipEntry.isLzmaEosMarker() ? -1 : zipEntry.getUncompressedSize();
+        LzmaInputStream dec = new LzmaInputStream(in, uncompressedSize);
         readCompressedBytes += in.getOffs() - in.getMark(HEADER);
         return dec;
     }
