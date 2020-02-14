@@ -117,6 +117,7 @@ public abstract class ZipEntry {
         ZipFile.Entry.Builder builder = ZipFile.Entry.builder()
                                                      .inputStreamSupplier(this::getInputStream)
                                                      .lastModifiedTime(lastModifiedTime)
+                                                     .uncompressedSize(uncompressedSize)
                                                      .externalFileAttributes(externalFileAttributes);
 
         if (isRegularFile())

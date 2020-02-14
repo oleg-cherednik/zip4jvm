@@ -48,7 +48,7 @@ class ZipFileSolidNoEncryptedDecorator extends ZipFileDecorator {
                         int size = buffer.getShort() & 0xFFFF;
 
                         if (size != 5)
-                            throw new UnsupportedOperationException("ZipEntry LZMA should have size 5 in header");
+                            throw new UnsupportedOperationException("ZipEntry LZMA should have size 5 in header: " + zipEntry.getName());
 
                         CentralDirectory.FileHeader fileHeader = ZipInfo.zip(zip).getFileHeader(zipEntry.getName());
                         boolean lzmaEosMarker = fileHeader.getGeneralPurposeFlag().isLzmaEosMarker();

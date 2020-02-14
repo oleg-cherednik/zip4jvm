@@ -65,7 +65,8 @@ public final class ZipEntryBuilder {
             int lastModifiedTime = DosTimestampConverter.javaToDosTime(entry.getLastModifiedTime());
             ExternalFileAttributes externalFileAttributes = entry.getExternalFileAttributes();
 
-            CompressionMethod compressionMethod = entrySettings.getCompression().getMethod();
+            CompressionMethod compressionMethod = entry.getUncompressedSize() == 0 ? CompressionMethod.STORE
+                                                                                   : entrySettings.getCompression().getMethod();
             CompressionLevel compressionLevel = entrySettings.getCompressionLevel();
             Encryption encryption = entrySettings.getEncryption();
             ZipEntryInputStreamSupplier inputStreamSup = zipEntry -> entry.getInputStream();

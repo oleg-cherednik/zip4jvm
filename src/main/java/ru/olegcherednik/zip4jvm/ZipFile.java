@@ -75,6 +75,7 @@ public final class ZipFile {
         /** Normalized file name without directory marker {@literal /} */
         private final String fileName;
         private final long lastModifiedTime;
+        private final long uncompressedSize;
         private final ExternalFileAttributes externalFileAttributes;
         private final boolean regularFile;
 
@@ -85,6 +86,7 @@ public final class ZipFile {
 
             if (Files.isRegularFile(path)) {
                 builder.fileName(fileName);
+                builder.uncompressedSize(Files.size(path));
                 builder.inputStreamSupplier(() -> new FileInputStream(path.toFile()));
             } else
                 builder.directoryName(fileName);
@@ -100,6 +102,7 @@ public final class ZipFile {
             fileName = ZipUtils.normalizeFileName(builder.fileName);
             inputStreamSupplier = builder.regularFile ? builder.inputStreamSupplier : () -> EmptyInputStream.INSTANCE;
             lastModifiedTime = builder.lastModifiedTime;
+            uncompressedSize = builder.uncompressedSize;
             externalFileAttributes = builder.externalFileAttributes;
             regularFile = builder.regularFile;
         }
@@ -114,6 +117,7 @@ public final class ZipFile {
             private InputStreamSupplier inputStreamSupplier = EmptyInputStreamSupplier.INSTANCE;
             private String fileName;
             private long lastModifiedTime = System.currentTimeMillis();
+            private long uncompressedSize;
             private ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.NULL;
             private boolean regularFile = true;
 
@@ -140,6 +144,11 @@ public final class ZipFile {
 
             public Entry.Builder lastModifiedTime(long lastModifiedTime) {
                 this.lastModifiedTime = lastModifiedTime;
+                return this;
+            }
+
+            public Entry.Builder uncompressedSize(long uncompressedSize) {
+                this.uncompressedSize = uncompressedSize;
                 return this;
             }
 
