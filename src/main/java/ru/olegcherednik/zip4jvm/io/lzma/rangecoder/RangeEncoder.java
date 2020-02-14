@@ -34,11 +34,6 @@ public class RangeEncoder extends RangeCoder {
         this.out = out;
     }
 
-    public void finish() throws IOException {
-        for (int i = 0; i < 5; ++i)
-            shiftLow();
-    }
-
     private void shiftLow() throws IOException {
         int lowHi = (int)(low >>> 32);
 
@@ -152,7 +147,8 @@ public class RangeEncoder extends RangeCoder {
 
     @Override
     public void close() throws IOException {
-        out.close();
+        for (int i = 0; i < 5; ++i)
+            shiftLow();
     }
 
     public static int getDirectBitsPrice(int count) {

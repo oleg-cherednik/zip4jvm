@@ -44,7 +44,7 @@ final class LzmaEntryOutputStream extends EntryOutputStream {
 
     @Override
     public void close() throws IOException {
-        lzma.finish();
+        lzma.close();
         super.close();
     }
 

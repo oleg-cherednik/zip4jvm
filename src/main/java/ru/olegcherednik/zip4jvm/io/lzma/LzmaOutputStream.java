@@ -24,7 +24,6 @@ public class LzmaOutputStream extends OutputStream {
     private final LzmaInputStream.Properties properties;
 
     private long currentUncompressedSize;
-    private boolean finished;
 
     public LzmaOutputStream(DataOutput out, LzmaInputStream.Properties properties, long uncompressedSize) throws IOException {
         this.out = out;
@@ -58,10 +57,8 @@ public class LzmaOutputStream extends OutputStream {
         }
     }
 
-    public void finish() throws IOException {
-        if (finished)
-            return;
-
+    @Override
+    public void close() throws IOException {
         if (uncompressedSize != -1 && uncompressedSize != currentUncompressedSize)
             throw new IOException(String.format("Expected uncompressed size (%s) doesn't equal the number of bytes written to the stream (%s)",
                     uncompressedSize, currentUncompressedSize));
@@ -72,14 +69,7 @@ public class LzmaOutputStream extends OutputStream {
         if (uncompressedSize == -1)
             lzma.encodeLZMA1EndMarker();
 
-        lzma.finish();
-        finished = true;
-    }
-
-    @Override
-    public void close() throws IOException {
-        finish();
-        out.close();
+        lzma.close();
     }
 
     @Getter

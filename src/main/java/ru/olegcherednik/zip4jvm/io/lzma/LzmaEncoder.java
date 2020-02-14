@@ -320,8 +320,9 @@ public abstract class LzmaEncoder extends LzmaCoder {
         repLengthEncoder.updatePrices();
     }
 
-    public void finish() throws IOException {
-        rangeEncoder.finish();
+    @Override
+    public void close() throws IOException {
+        rangeEncoder.close();
     }
 
     protected class LiteralEncoder extends LiteralCoder {
