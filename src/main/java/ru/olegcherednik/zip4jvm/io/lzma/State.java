@@ -6,10 +6,9 @@ package ru.olegcherednik.zip4jvm.io.lzma;
  */
 final class State {
 
-    static final int STATES = 12;
+    public static final int STATES = 12;
 
     private static final int LIT_STATES = 7;
-
     private static final int LIT_LIT = 0;
     private static final int SHORTREP_LIT_LIT = 3;
     private static final int LIT_MATCH = 7;
@@ -20,15 +19,15 @@ final class State {
 
     private int state = LIT_LIT;
 
-    int get() {
+    public int get() {
         return state;
     }
 
-    void set(State other) {
-        state = other.state;
+    public void set(State state) {
+        this.state = state.state;
     }
 
-    void updateLiteral() {
+    public void updateLiteral() {
         if (state <= SHORTREP_LIT_LIT)
             state = LIT_LIT;
         else if (state <= LIT_SHORTREP)
@@ -37,19 +36,19 @@ final class State {
             state -= 6;
     }
 
-    void updateMatch() {
+    public void updateMatch() {
         state = state < LIT_STATES ? LIT_MATCH : NONLIT_MATCH;
     }
 
-    void updateLongRep() {
+    public void updateLongRep() {
         state = state < LIT_STATES ? LIT_LONGREP : NONLIT_REP;
     }
 
-    void updateShortRep() {
+    public void updateShortRep() {
         state = state < LIT_STATES ? LIT_SHORTREP : NONLIT_REP;
     }
 
-    boolean isLiteral() {
+    public boolean isLiteral() {
         return state < LIT_STATES;
     }
 }
