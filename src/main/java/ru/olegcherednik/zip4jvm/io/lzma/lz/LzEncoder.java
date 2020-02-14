@@ -21,7 +21,6 @@ public abstract class LzEncoder {
     private final int keepSizeAfter;
 
     protected final byte[] buf;
-    protected final int niceLength;
 
     /** The lowest four bits of the absolute offset of the current byte. Bits other than the lowest four are undefined. */
     @Getter
@@ -34,7 +33,6 @@ public abstract class LzEncoder {
 
     protected LzEncoder(LzmaInputStream.Properties properties, int extraSizeAfter) {
         buf = createBuffer(properties.getDictionarySize(), extraSizeAfter);
-        niceLength = properties.getNiceLength();
         keepSizeBefore = properties.getDictionarySize();
         keepSizeAfter = extraSizeAfter + MATCH_LEN_MAX;
     }

@@ -4,24 +4,30 @@ import ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream;
 
 import static ru.olegcherednik.zip4jvm.io.lzma.LzmaEncoder.MATCH_LEN_MAX;
 
+/**
+ * @author Oleg Cherednik
+ * @since 14.02.2020
+ */
 final class HashChain extends LzEncoder {
 
     private final CRC32Hash hash;
     private final int[] chain;
     private final Matches matches;
     private final int depthLimit;
-
+    private final int niceLength;
     private final int cyclicSize;
+
     private int cyclicPos = -1;
     private int lzPos;
 
     /**
-     * Creates a new LZEncoder with the HC4 match finder.
+     * Creates a new LZEncoder with the HC4 match finder.<br>
      * See <code>LZEncoder.getInstance</code> for parameter descriptions.
      */
     public HashChain(LzmaInputStream.Properties properties, int extraSizeAfter) {
         super(properties, extraSizeAfter);
 
+        niceLength = properties.getNiceLength();
         hash = new CRC32Hash(properties.getDictionarySize());
 
         // +1 because we need dictSize bytes of history + the current byte.
