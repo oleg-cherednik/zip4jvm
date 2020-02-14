@@ -127,24 +127,26 @@ public final class LzmaDecoder extends LzmaCoder {
 
     private class LiteralDecoder extends LiteralCoder {
 
-        private final LiteralSubdecoder[] subdecoders;
+        private final LiteralSubDecoder[] subdecoders;
 
-        LiteralDecoder(LzmaOutputStream.Properties properties) {
-            super(properties);
+        public LiteralDecoder(LzmaOutputStream.Properties properties) {
+            super(properties.getLc(), properties.getLp());
 
-            subdecoders = new LiteralSubdecoder[1 << (properties.getLc() + properties.getLp())];
+            subdecoders = new LiteralSubDecoder[1 << (properties.getLc() + properties.getLp())];
 
             for (int i = 0; i < subdecoders.length; i++)
-                subdecoders[i] = new LiteralSubdecoder();
+                subdecoders[i] = new LiteralSubDecoder();
         }
 
         void decode() throws IOException {
-            int i = getSubcoderIndex(lz.getByte(0), lz.getPos());
+            int i = getSubCoderIndex(lz.getByte(0), lz.getPos());
             subdecoders[i].decode();
         }
 
 
-        private class LiteralSubdecoder extends LiteralSubcoder {
+        private class LiteralSubDecoder {
+
+            private final short[] probs = createArray(0x300);
 
             void decode() throws IOException {
                 int symbol = 1;

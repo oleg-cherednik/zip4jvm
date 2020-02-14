@@ -408,14 +408,14 @@ public abstract class LzmaEncoder extends LzmaCoder {
 
     class LiteralEncoder extends LiteralCoder {
 
-        private final LiteralSubencoder[] subencoders;
+        private final LiteralSubEncoder[] subencoders;
 
         LiteralEncoder(LzmaInputStream.Properties properties) {
-            super(properties);
+            super(properties.getLc(), properties.getLp());
 
-            subencoders = new LiteralSubencoder[1 << (properties.getLc() + properties.getLp())];
+            subencoders = new LiteralSubEncoder[1 << (properties.getLc() + properties.getLp())];
             for (int i = 0; i < subencoders.length; ++i)
-                subencoders[i] = new LiteralSubencoder();
+                subencoders[i] = new LiteralSubEncoder();
         }
 
         void encodeInit() throws IOException {
@@ -428,7 +428,7 @@ public abstract class LzmaEncoder extends LzmaCoder {
 
         void encode() throws IOException {
             assert readAhead >= 0;
-            int i = getSubcoderIndex(lz.getByte(1 + readAhead),
+            int i = getSubCoderIndex(lz.getByte(1 + readAhead),
                     lz.getPos() - readAhead);
             subencoders[i].encode();
         }
@@ -438,7 +438,7 @@ public abstract class LzmaEncoder extends LzmaCoder {
             int price = RangeEncoder.getBitPrice(
                     isMatch[state.get()][pos & posMask], 0);
 
-            int i = getSubcoderIndex(prevByte, pos);
+            int i = getSubCoderIndex(prevByte, pos);
             price += state.isLiteral()
                      ? subencoders[i].getNormalPrice(curByte)
                      : subencoders[i].getMatchedPrice(curByte, matchByte);
@@ -446,9 +446,11 @@ public abstract class LzmaEncoder extends LzmaCoder {
             return price;
         }
 
-        private class LiteralSubencoder extends LiteralSubcoder {
+        private class LiteralSubEncoder {
 
-            void encode() throws IOException {
+            private final short[] probs = createArray(0x300);
+
+            public void encode() throws IOException {
                 int symbol = lz.getByte(readAhead) | 0x100;
 
                 if (state.isLiteral()) {

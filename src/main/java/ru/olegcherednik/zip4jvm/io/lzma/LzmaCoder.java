@@ -80,7 +80,7 @@ public abstract class LzmaCoder implements Closeable {
         Arrays.fill(probs, PROB_INIT);
     }
 
-    private static short[] createArray(int size) {
+    protected static short[] createArray(int size) {
         short[] arr = new short[size];
         initProbs(arr);
         return arr;
@@ -95,38 +95,22 @@ public abstract class LzmaCoder implements Closeable {
         return arr;
     }
 
-    abstract class LiteralCoder {
+    protected abstract static class LiteralCoder {
 
         private final int lc;
         private final int literalPosMask;
 
-        LiteralCoder(LzmaInputStream.Properties properties) {
-            lc = properties.getLc();
-            literalPosMask = (1 << properties.getLp()) - 1;
+        protected LiteralCoder(int lc, int lp) {
+            this.lc = lc;
+            literalPosMask = (1 << lp) - 1;
         }
 
-        LiteralCoder(LzmaOutputStream.Properties properties) {
-            lc = properties.getLc();
-            literalPosMask = (1 << properties.getLp()) - 1;
-        }
-
-        final int getSubcoderIndex(int prevByte, int pos) {
-            int low = prevByte >> (8 - lc);
+        protected final int getSubCoderIndex(int prvByte, int pos) {
+            int low = prvByte >> (8 - lc);
             int high = (pos & literalPosMask) << lc;
             return low + high;
         }
-
-
-        abstract class LiteralSubcoder {
-
-            final short[] probs = new short[0x300];
-
-            protected LiteralSubcoder() {
-                initProbs(probs);
-            }
-        }
     }
-
 
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     protected abstract static class LengthCoder {

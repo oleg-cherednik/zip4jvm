@@ -64,10 +64,6 @@ public class RangeEncoder extends RangeCoder {
         return -1;
     }
 
-    void writeByte(int b) throws IOException {
-        out.writeByte(b);
-    }
-
     private void shiftLow() throws IOException {
         int lowHi = (int)(low >>> 32);
 
@@ -75,19 +71,18 @@ public class RangeEncoder extends RangeCoder {
             int temp = cache;
 
             do {
-                writeByte(temp + lowHi);
+                out.writeByte(temp + lowHi);
                 temp = 0xFF;
             } while (--cacheSize != 0);
 
             cache = (byte)(low >>> 24);
         }
 
-        ++cacheSize;
+        cacheSize++;
         low = (low & 0x00FFFFFF) << 8;
     }
 
-    public void encodeBit(short[] probs, int index, int bit)
-            throws IOException {
+    public void encodeBit(short[] probs, int index, int bit) throws IOException {
         int prob = probs[index];
         int bound = (range >>> BIT_MODEL_TOTAL_BITS) * prob;
 
