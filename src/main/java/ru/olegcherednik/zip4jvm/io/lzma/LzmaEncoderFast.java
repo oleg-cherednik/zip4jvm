@@ -36,7 +36,7 @@ final class LzmaEncoderFast extends LzmaEncoder {
         // not more than the maximum match length. If there aren't
         // enough bytes remaining to encode a match at all, return
         // immediately to encode this byte as a literal.
-        int avail = Math.min(lz.getAvail(), MATCH_LEN_MAX);
+        int avail = Math.min(lz.available(), MATCH_LEN_MAX);
         if (avail < MATCH_LEN_MIN)
             return 1;
 
@@ -44,7 +44,7 @@ final class LzmaEncoderFast extends LzmaEncoder {
         int bestRepLen = 0;
         int bestRepIndex = 0;
         for (int rep = 0; rep < reps.length; ++rep) {
-            int len = lz.getMatchLength(reps[rep], avail);
+            int len = lz.getMatchLength(0, reps[rep], avail);
             if (len < MATCH_LEN_MIN)
                 continue;
 
@@ -122,7 +122,7 @@ final class LzmaEncoderFast extends LzmaEncoder {
 
         int limit = Math.max(mainLen - 1, MATCH_LEN_MIN);
         for (int rep = 0; rep < reps.length; ++rep)
-            if (lz.getMatchLength(reps[rep], limit) == limit)
+            if (lz.getMatchLength(0, reps[rep], limit) == limit)
                 return 1;
 
         back = mainDist + reps.length;

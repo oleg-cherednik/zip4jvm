@@ -339,7 +339,7 @@ public abstract class LzmaEncoder extends LzmaCoder {
         }
 
         public void encode() throws IOException {
-            sub[getSubCoderIndex(lz.getByte(1 + readAhead), lz.getPos() - readAhead)].encode();
+            sub[getSubCoderIndex(lz.getByte(0, 1 + readAhead), lz.getPos() - readAhead)].encode();
         }
 
         public int getPrice(int curByte, int matchByte, int prevByte, int pos, State state) {
@@ -356,7 +356,7 @@ public abstract class LzmaEncoder extends LzmaCoder {
             private final short[] probs = createArray(0x300);
 
             public void encode() throws IOException {
-                int symbol = lz.getByte(readAhead) | 0x100;
+                int symbol = lz.getByte(0, readAhead) | 0x100;
 
                 if (state.isLiteral()) {
                     int subencoderIndex;
@@ -370,7 +370,7 @@ public abstract class LzmaEncoder extends LzmaCoder {
                     } while (symbol < 0x10000);
 
                 } else {
-                    int matchByte = lz.getByte(reps[0] + 1 + readAhead);
+                    int matchByte = lz.getByte(0, reps[0] + 1 + readAhead);
                     int offset = 0x100;
                     int subencoderIndex;
                     int matchBit;

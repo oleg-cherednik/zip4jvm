@@ -96,14 +96,14 @@ final class LzmaEncoderNormal extends LzmaEncoder {
         // not more than the maximum match length. If there aren't
         // enough bytes remaining to encode a match at all, return
         // immediately to encode this byte as a literal.
-        int avail = Math.min(lz.getAvail(), MATCH_LEN_MAX);
+        int avail = Math.min(lz.available(), MATCH_LEN_MAX);
         if (avail < MATCH_LEN_MIN)
             return 1;
 
         // Get the lengths of repeated matches.
         int repBest = 0;
         for (int rep = 0; rep < reps.length; ++rep) {
-            repLens[rep] = lz.getMatchLength(reps[rep], avail);
+            repLens[rep] = lz.getMatchLength(0, reps[rep], avail);
 
             if (repLens[rep] < MATCH_LEN_MIN) {
                 repLens[rep] = 0;
@@ -137,8 +137,8 @@ final class LzmaEncoderNormal extends LzmaEncoder {
             }
         }
 
-        int curByte = lz.getByte(0);
-        int matchByte = lz.getByte(reps[0] + 1);
+        int curByte = lz.getByte(0, 0);
+        int matchByte = lz.getByte(0, reps[0] + 1);
 
         // If the match finder found no matches and this byte cannot be
         // encoded as a repeated match (short or long), we must be return
@@ -153,9 +153,8 @@ final class LzmaEncoderNormal extends LzmaEncoder {
 
         // Calculate the price of encoding the current byte as a literal.
         {
-            int prevByte = lz.getByte(1);
-            int literalPrice = literalEncoder.getPrice(curByte, matchByte,
-                    prevByte, pos, state);
+            int prevByte = lz.getByte(0, 1);
+            int literalPrice = literalEncoder.getPrice(curByte, matchByte, prevByte, pos, state);
             opts[1].set1(literalPrice, 0, -1);
         }
 
@@ -242,7 +241,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
         }
 
 
-        avail = Math.min(lz.getAvail(), OPTS - 1);
+        avail = Math.min(lz.available(), OPTS - 1);
 
         // Get matches for later bytes and optimize the use of LZMA symbols
         // by calculating the prices and picking the cheapest symbol
@@ -351,13 +350,12 @@ final class LzmaEncoderNormal extends LzmaEncoder {
         // This will be set to true if using a literal or a short rep.
         boolean nextIsByte = false;
 
-        int curByte = lz.getByte(0);
-        int matchByte = lz.getByte(opts[optCur].reps[0] + 1);
+        int curByte = lz.getByte(0, 0);
+        int matchByte = lz.getByte(0, opts[optCur].reps[0] + 1);
 
         // Try a literal.
-        int literalPrice = opts[optCur].price
-                + literalEncoder.getPrice(curByte, matchByte, lz.getByte(1),
-                pos, opts[optCur].state);
+        int literalPrice = opts[optCur].price + literalEncoder.getPrice(curByte, matchByte, lz.getByte(0, 1), pos, opts[optCur].state);
+
         if (literalPrice < opts[optCur + 1].price) {
             opts[optCur + 1].set1(literalPrice, optCur, -1);
             nextIsByte = true;
@@ -416,7 +414,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
         int lenLimit = Math.min(avail, niceLength);
 
         for (int rep = 0; rep < reps.length; ++rep) {
-            int len = lz.getMatchLength(opts[optCur].reps[rep], lenLimit);
+            int len = lz.getMatchLength(0, opts[optCur].reps[rep], lenLimit);
             if (len < MATCH_LEN_MIN)
                 continue;
 
@@ -446,7 +444,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
 
                 // Literal
                 int curByte = lz.getByte(len, 0);
-                int matchByte = lz.getByte(0); // lz.getByte(len, len)
+                int matchByte = lz.getByte(0, 0);
                 int prevByte = lz.getByte(len, 1);
                 price += literalEncoder.getPrice(curByte, matchByte, prevByte, pos + len, nextState);
                 nextState.updateLiteral();
@@ -517,7 +515,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
 
                 // Literal
                 int curByte = lz.getByte(len, 0);
-                int matchByte = lz.getByte(0); // lz.getByte(len, len)
+                int matchByte = lz.getByte(0, 0);
                 int prevByte = lz.getByte(len, 1);
                 int price = matchAndLenPrice + literalEncoder.getPrice(curByte, matchByte, prevByte, pos + len, nextState);
                 nextState.updateLiteral();

@@ -68,7 +68,7 @@ final class HashChain extends LzEncoder {
     public Matches getMatches() {
         matches.count = 0;
         int matchLenLimit = MATCH_LEN_MAX;
-        int niceLenLimit = niceLen;
+        int niceLenLimit = niceLength;
         int avail = movePos();
 
         if (avail < matchLenLimit) {
@@ -80,7 +80,7 @@ final class HashChain extends LzEncoder {
                 niceLenLimit = avail;
         }
 
-        hash.calcHashes(buf, readPos);
+        hash.calcHashes(buf, pos);
         int delta2 = lzPos - hash.getHash2Pos();
         int delta3 = lzPos - hash.getHash3Pos();
         int currentMatch = hash.getHash4Pos();
@@ -94,7 +94,7 @@ final class HashChain extends LzEncoder {
         // The hashing algorithm guarantees that if the first byte
         // matches, also the second byte does, so there's no need to
         // test the second byte.
-        if (delta2 < cyclicSize && buf[readPos - delta2] == buf[readPos]) {
+        if (delta2 < cyclicSize && buf[pos - delta2] == buf[pos]) {
             lenBest = 2;
             matches.len[0] = 2;
             matches.dist[0] = delta2 - 1;
@@ -106,7 +106,7 @@ final class HashChain extends LzEncoder {
         // Also here the hashing algorithm guarantees that if the first byte
         // matches, also the next two bytes do.
         if (delta2 != delta3 && delta3 < cyclicSize
-                && buf[readPos - delta3] == buf[readPos]) {
+                && buf[pos - delta3] == buf[pos]) {
             lenBest = 3;
             matches.dist[matches.count++] = delta3 - 1;
             delta2 = delta3;
@@ -114,8 +114,8 @@ final class HashChain extends LzEncoder {
 
         // If a match was found, see how long it is.
         if (matches.count > 0) {
-            while (lenBest < matchLenLimit && buf[readPos + lenBest - delta2]
-                    == buf[readPos + lenBest])
+            while (lenBest < matchLenLimit && buf[pos + lenBest - delta2]
+                    == buf[pos + lenBest])
                 ++lenBest;
 
             matches.len[matches.count - 1] = lenBest;
@@ -148,12 +148,12 @@ final class HashChain extends LzEncoder {
             // Test the first byte and the first new byte that would give us
             // a match that is at least one byte longer than lenBest. This
             // too short matches get quickly skipped.
-            if (buf[readPos + lenBest - delta] == buf[readPos + lenBest]
-                    && buf[readPos - delta] == buf[readPos]) {
+            if (buf[pos + lenBest - delta] == buf[pos + lenBest]
+                    && buf[pos - delta] == buf[pos]) {
                 // Calculate the length of the match.
                 int len = 0;
                 while (++len < matchLenLimit)
-                    if (buf[readPos + len - delta] != buf[readPos + len])
+                    if (buf[pos + len - delta] != buf[pos + len])
                         break;
 
                 // Use the match if and only if it is better than the longest
@@ -178,7 +178,7 @@ final class HashChain extends LzEncoder {
         while (len-- > 0) {
             if (movePos() != 0) {
                 // Update the hash chain and hash tables.
-                hash.calcHashes(buf, readPos);
+                hash.calcHashes(buf, pos);
                 chain[cyclicPos] = hash.getHash4Pos();
                 hash.updateTables(lzPos);
             }
