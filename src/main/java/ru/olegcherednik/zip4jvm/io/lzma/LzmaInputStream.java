@@ -134,7 +134,7 @@ public class LzmaInputStream extends InputStream {
                 // decoder normalization, so do it here. This might
                 // cause an IOException if it needs to read a byte
                 // from the input stream.
-                lzma.getRc().normalize();
+                lzma.getRaceDecoder().normalize();
             }
 
             // Copy from the dictionary to buf.
@@ -157,7 +157,7 @@ public class LzmaInputStream extends InputStream {
                 // or truncated .lzma files. LZMA Utils doesn't do
                 // the first check and thus it accepts many invalid
                 // files that this implementation and XZ Utils don't.
-                if (!lzma.getRc().isFinished() || lzma.getLz().hasPending())
+                if (!lzma.getRaceDecoder().isFinished() || lzma.getLz().hasPending())
                     throw new CorruptedInputException();
 
                 return size == 0 ? -1 : size;

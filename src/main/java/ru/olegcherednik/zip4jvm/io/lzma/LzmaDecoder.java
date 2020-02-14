@@ -11,10 +11,10 @@ import java.io.IOException;
 public final class LzmaDecoder extends LzmaCoder {
 
     private final LzDecoder lz;
-    private final RangeDecoder rc;
+    private final RangeDecoder raceDecoder;
     private final LiteralDecoder literalDecoder;
-    private final LengthDecoder matchLenDecoder = new LengthDecoder();
-    private final LengthDecoder repLenDecoder = new LengthDecoder();
+    private final LengthDecoder matchLengthDecoder = new LengthDecoder();
+    private final LengthDecoder repLengthDecoder = new LengthDecoder();
 
     public static LzmaDecoder create(DataInput in) throws IOException {
         return new LzmaDecoder(in, LzmaOutputStream.Properties.read(in));
@@ -23,7 +23,7 @@ public final class LzmaDecoder extends LzmaCoder {
     private LzmaDecoder(DataInput in, LzmaOutputStream.Properties properties) throws IOException {
         super(properties.getPb());
         lz = new LzDecoder(properties.getDictionarySize());
-        rc = new RangeDecoder(in);
+        raceDecoder = new RangeDecoder(in);
         literalDecoder = new LiteralDecoder(properties);
     }
 
@@ -43,10 +43,10 @@ public final class LzmaDecoder extends LzmaCoder {
         while (lz.hasSpace()) {
             int posState = lz.getPos() & posMask;
 
-            if (rc.decodeBit(isMatch[state.get()], posState) == 0) {
+            if (raceDecoder.decodeBit(isMatch[state.get()], posState) == 0) {
                 literalDecoder.decode();
             } else {
-                int len = rc.decodeBit(isRep, state.get()) == 0
+                int len = raceDecoder.decodeBit(isRep, state.get()) == 0
                           ? decodeMatch(posState)
                           : decodeRepMatch(posState);
 
@@ -57,7 +57,7 @@ public final class LzmaDecoder extends LzmaCoder {
             }
         }
 
-        rc.normalize();
+        raceDecoder.normalize();
     }
 
     private int decodeMatch(int posState) throws IOException {
@@ -67,8 +67,8 @@ public final class LzmaDecoder extends LzmaCoder {
         reps[2] = reps[1];
         reps[1] = reps[0];
 
-        int len = matchLenDecoder.decode(posState);
-        int distSlot = rc.decodeBitTree(distSlots[getDistState(len)]);
+        int len = matchLengthDecoder.decode(posState);
+        int distSlot = raceDecoder.decodeBitTree(distSlots[getDistState(len)]);
 
         if (distSlot < DIST_MODEL_START) {
             reps[0] = distSlot;
@@ -77,12 +77,12 @@ public final class LzmaDecoder extends LzmaCoder {
             reps[0] = (2 | (distSlot & 1)) << limit;
 
             if (distSlot < DIST_MODEL_END) {
-                reps[0] |= rc.decodeReverseBitTree(
+                reps[0] |= raceDecoder.decodeReverseBitTree(
                         distSpecial[distSlot - DIST_MODEL_START]);
             } else {
-                reps[0] |= rc.decodeDirectBits(limit - ALIGN_BITS)
+                reps[0] |= raceDecoder.decodeDirectBits(limit - ALIGN_BITS)
                         << ALIGN_BITS;
-                reps[0] |= rc.decodeReverseBitTree(distAlign);
+                reps[0] |= raceDecoder.decodeReverseBitTree(distAlign);
             }
         }
 
@@ -90,18 +90,18 @@ public final class LzmaDecoder extends LzmaCoder {
     }
 
     private int decodeRepMatch(int posState) throws IOException {
-        if (rc.decodeBit(isRep0, state.get()) == 0) {
-            if (rc.decodeBit(isRep0Long[state.get()], posState) == 0) {
+        if (raceDecoder.decodeBit(isRep0, state.get()) == 0) {
+            if (raceDecoder.decodeBit(isRep0Long[state.get()], posState) == 0) {
                 state.updateShortRep();
                 return 1;
             }
         } else {
             int tmp;
 
-            if (rc.decodeBit(isRep1, state.get()) == 0) {
+            if (raceDecoder.decodeBit(isRep1, state.get()) == 0) {
                 tmp = reps[1];
             } else {
-                if (rc.decodeBit(isRep2, state.get()) == 0) {
+                if (raceDecoder.decodeBit(isRep2, state.get()) == 0) {
                     tmp = reps[2];
                 } else {
                     tmp = reps[3];
@@ -117,12 +117,12 @@ public final class LzmaDecoder extends LzmaCoder {
 
         state.updateLongRep();
 
-        return repLenDecoder.decode(posState);
+        return repLengthDecoder.decode(posState);
     }
 
     @Override
     public void close() throws IOException {
-        rc.close();
+        raceDecoder.close();
     }
 
     private class LiteralDecoder extends LiteralCoder {
@@ -151,7 +151,7 @@ public final class LzmaDecoder extends LzmaCoder {
 
                 if (state.isLiteral()) {
                     do {
-                        symbol = (symbol << 1) | rc.decodeBit(probs, symbol);
+                        symbol = (symbol << 1) | raceDecoder.decodeBit(probs, symbol);
                     } while (symbol < 0x100);
 
                 } else {
@@ -163,9 +163,9 @@ public final class LzmaDecoder extends LzmaCoder {
                     do {
                         matchByte <<= 1;
                         matchBit = matchByte & offset;
-                        bit = rc.decodeBit(probs, offset + matchBit + symbol);
+                        bit = raceDecoder.decodeBit(probs, offset + matchBit + symbol);
                         symbol = (symbol << 1) | bit;
-                        offset &= (0 - bit) ^ ~matchBit;
+                        offset &= -bit ^ ~matchBit;
                     } while (symbol < 0x100);
                 }
 
@@ -175,19 +175,16 @@ public final class LzmaDecoder extends LzmaCoder {
         }
     }
 
-
     private class LengthDecoder extends LengthCoder {
 
-        int decode(int posState) throws IOException {
-            if (rc.decodeBit(choice, 0) == 0)
-                return rc.decodeBitTree(low[posState]) + MATCH_LEN_MIN;
+        public int decode(int posState) throws IOException {
+            if (raceDecoder.decodeBit(choice, 0) == 0)
+                return raceDecoder.decodeBitTree(low[posState]) + MATCH_LEN_MIN;
 
-            if (rc.decodeBit(choice, 1) == 0)
-                return rc.decodeBitTree(mid[posState])
-                        + MATCH_LEN_MIN + LOW_SYMBOLS;
+            if (raceDecoder.decodeBit(choice, 1) == 0)
+                return raceDecoder.decodeBitTree(mid[posState]) + MATCH_LEN_MIN + LOW_SYMBOLS;
 
-            return rc.decodeBitTree(high)
-                    + MATCH_LEN_MIN + LOW_SYMBOLS + MID_SYMBOLS;
+            return raceDecoder.decodeBitTree(high) + MATCH_LEN_MIN + LOW_SYMBOLS + MID_SYMBOLS;
         }
     }
 }

@@ -1,5 +1,8 @@
 package ru.olegcherednik.zip4jvm.io.lzma;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Arrays;
@@ -77,6 +80,20 @@ public abstract class LzmaCoder implements Closeable {
         Arrays.fill(probs, PROB_INIT);
     }
 
+    private static short[] createArray(int size) {
+        short[] arr = new short[size];
+        initProbs(arr);
+        return arr;
+    }
+
+    private static short[][] createArray(int rows, int cols) {
+        short[][] arr = new short[rows][cols];
+
+        for (short[] line : arr)
+            initProbs(line);
+
+        return arr;
+    }
 
     abstract class LiteralCoder {
 
@@ -111,28 +128,18 @@ public abstract class LzmaCoder implements Closeable {
     }
 
 
-    abstract class LengthCoder {
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    protected abstract static class LengthCoder {
 
-        static final int LOW_SYMBOLS = 1 << 3;
-        static final int MID_SYMBOLS = 1 << 3;
-        static final int HIGH_SYMBOLS = 1 << 8;
+        protected static final int LOW_SYMBOLS = 1 << 3;
+        protected static final int MID_SYMBOLS = 1 << 3;
+        protected static final int HIGH_SYMBOLS = 1 << 8;
 
-        final short[] choice = new short[2];
-        final short[][] low = new short[POS_STATES_MAX][LOW_SYMBOLS];
-        final short[][] mid = new short[POS_STATES_MAX][MID_SYMBOLS];
-        final short[] high = new short[HIGH_SYMBOLS];
+        protected final short[] choice = createArray(2);
+        protected final short[][] low = createArray(POS_STATES_MAX, LOW_SYMBOLS);
+        protected final short[][] mid = createArray(POS_STATES_MAX, MID_SYMBOLS);
+        protected final short[] high = createArray(HIGH_SYMBOLS);
 
-        protected LengthCoder() {
-            initProbs(choice);
-
-            for (int i = 0; i < low.length; ++i)
-                initProbs(low[i]);
-
-            for (int i = 0; i < low.length; ++i)
-                initProbs(mid[i]);
-
-            initProbs(high);
-        }
     }
 
     @Override
