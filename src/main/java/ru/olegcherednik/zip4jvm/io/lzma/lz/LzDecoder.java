@@ -4,9 +4,14 @@ import ru.olegcherednik.zip4jvm.io.lzma.exceptions.CorruptedInputException;
 
 import java.io.IOException;
 
+/**
+ * @author Oleg Cherednik
+ * @since 14.02.2020
+ */
 public final class LzDecoder {
 
     private final byte[] buf;
+
     private int start;
     private int pos;
     private int full;

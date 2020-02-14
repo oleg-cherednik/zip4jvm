@@ -43,8 +43,7 @@ public class RangeDecoder extends RangeCoder {
         // Compare code and bound as if they were unsigned 32-bit integers.
         if ((code ^ 0x80000000) < (bound ^ 0x80000000)) {
             range = bound;
-            probs[index] = (short)(
-                    prob + ((BIT_MODEL_TOTAL - prob) >>> MOVE_BITS));
+            probs[index] = (short)(prob + ((BIT_MODEL_TOTAL - prob) >>> MOVE_BITS));
             bit = 0;
         } else {
             range -= bound;

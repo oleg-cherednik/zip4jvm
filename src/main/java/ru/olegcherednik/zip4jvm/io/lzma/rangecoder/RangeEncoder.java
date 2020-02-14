@@ -23,8 +23,10 @@ public class RangeEncoder extends RangeCoder {
     private long low;
     private int range = 0xFFFFFFFF;
 
-    // NOTE: int is OK for LZMA2 because a compressed chunk is not more than 64 KiB, but with LZMA1 there is no chunking so in theory cacheSize can
-    // grow very big. To be very safe, use long instead of int since this code is used for LZMA1 too.
+    /*
+     * NOTE: int is OK for LZMA2 because a compressed chunk is not more than 64 KiB, but with LZMA1 there is no chunking so in theory cacheSize can
+     * grow very big. To be very safe, use long instead of int since this code is used for LZMA1 too.
+     */
     private long cacheSize = 1;
     private byte cache;
 
@@ -62,8 +64,7 @@ public class RangeEncoder extends RangeCoder {
         // NOTE: Any non-zero value for bit is taken as 1.
         if (bit == 0) {
             range = bound;
-            probs[index] = (short)(
-                    prob + ((BIT_MODEL_TOTAL - prob) >>> MOVE_BITS));
+            probs[index] = (short)(prob + ((BIT_MODEL_TOTAL - prob) >>> MOVE_BITS));
         } else {
             low += bound & 0xFFFFFFFFL;
             range -= bound;

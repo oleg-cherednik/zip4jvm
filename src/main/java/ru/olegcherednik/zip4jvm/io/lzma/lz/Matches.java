@@ -1,5 +1,9 @@
 package ru.olegcherednik.zip4jvm.io.lzma.lz;
 
+/**
+ * @author Oleg Cherednik
+ * @since 14.02.2020
+ */
 public final class Matches {
 
     public final int[] len;
