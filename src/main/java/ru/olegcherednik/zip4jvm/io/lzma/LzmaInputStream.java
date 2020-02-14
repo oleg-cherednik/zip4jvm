@@ -21,13 +21,9 @@ public class LzmaInputStream extends InputStream {
 
     private final byte[] tempBuf = new byte[1];
 
-    /** Number of uncompressed bytes left to be decompressed, or -1 if the end marker is used. */
+    /* Number of uncompressed bytes left to be decompressed, or -1 if the end marker is used. */
     private long remainingSize;
 
-    /**
-     * @param in               input stream
-     * @param uncompressedSize uncompressed size or <t>-1</t> if unknown
-     */
     public LzmaInputStream(DataInput in, long uncompressedSize) throws IOException {
         lzma = LzmaDecoder.create(in);
         remainingSize = uncompressedSize;

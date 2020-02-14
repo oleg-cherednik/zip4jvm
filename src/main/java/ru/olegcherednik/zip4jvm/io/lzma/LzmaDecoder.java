@@ -32,7 +32,7 @@ public final class LzmaDecoder extends LzmaCoder {
         literalDecoder = new LiteralDecoder(properties);
     }
 
-    /**
+    /*
      * Returns true if LZMA end marker was detected. It is encoded as the maximum match distance which with signed ints becomes -1. This function is
      * needed only for LZMA1. LZMA2 doesn't use the end marker in the LZMA layer.
      */

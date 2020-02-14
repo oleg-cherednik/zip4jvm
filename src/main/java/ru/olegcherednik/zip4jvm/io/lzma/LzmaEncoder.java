@@ -48,7 +48,7 @@ public abstract class LzmaEncoder extends LzmaCoder {
         distSlotPrices = new int[DIST_STATES][distSlotPricesSize];
     }
 
-    /**
+    /*
      * Gets an integer [0, 63] matching the highest two bits of an integer. This is like bit scan reverse (BSR) on x86 except that this also  cares
      * about the second highest bit.
      */
@@ -89,7 +89,7 @@ public abstract class LzmaEncoder extends LzmaCoder {
         return lz;
     }
 
-    /**
+    /*
      * Gets the next LZMA symbol.
      * <p>
      * There are three types of symbols: literal (a single byte), repeated match, and normal match. The symbol is indicated by the return value and by

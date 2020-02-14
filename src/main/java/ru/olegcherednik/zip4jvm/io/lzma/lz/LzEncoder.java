@@ -44,7 +44,7 @@ public abstract class LzEncoder {
         return new byte[size];
     }
 
-    /** Moves data from the end of the buffer to the beginning, discarding old data and making space for new input. */
+    /* Moves data from the end of the buffer to the beginning, discarding old data and making space for new input. */
     private void moveWindow() {
         /*
          * Align the move to a multiple of 16 bytes. LZMA2 needs this because it uses the lowest bits from readPos to get the alignment of the
@@ -59,7 +59,7 @@ public abstract class LzEncoder {
         writePos -= moveOffset;
     }
 
-    /** Copies new data into the LZEncoder's buffer. */
+    /* Copies new data into the LZEncoder's buffer. */
     public int fillWindow(byte[] in, int off, int len) {
         // Move the sliding window if needed.
         if (pos >= buf.length - keepSizeAfter)
@@ -81,7 +81,7 @@ public abstract class LzEncoder {
         return len;
     }
 
-    /** Process pending bytes remaining from preset dictionary initialization or encoder flush operation. */
+    /* Process pending bytes remaining from preset dictionary initialization or encoder flush operation. */
     private void processPendingBytes() {
         /*
          * After flushing or setting a preset dictionary there will be pending data that hasn't been ran through the match finder yet. Run it through
@@ -98,24 +98,24 @@ public abstract class LzEncoder {
         }
     }
 
-    /** Returns true if at least one byte has already been run through he match finder. */
+    /* Returns true if at least one byte has already been run through he match finder. */
     public boolean isStarted() {
         return pos != -1;
     }
 
-    /** Marks that there is no more input remaining. The read position can be advanced until the end of the data. */
+    /* Marks that there is no more input remaining. The read position can be advanced until the end of the data. */
     public void setFinishing() {
         readLimit = writePos - 1;
         finishing = true;
         processPendingBytes();
     }
 
-    /** Tests if there is enough input available to let the caller encode at least one more byte. */
+    /* Tests if there is enough input available to let the caller encode at least one more byte. */
     public boolean hasEnoughData(int alreadyReadLen) {
         return pos - alreadyReadLen < readLimit;
     }
 
-    /**
+    /*
      * Get the number of bytes available, including the current byte.
      * <p>
      * Note that the result is undefined if <code>getMatches</code> or
@@ -126,7 +126,7 @@ public abstract class LzEncoder {
         return writePos - pos;
     }
 
-    /**
+    /*
      * Gets the byte from the given forward minus backward offset. The forward offset is added to the current position. This lets one read bytes
      * ahead of the current byte.
      */
@@ -175,10 +175,10 @@ public abstract class LzEncoder {
         return avail;
     }
 
-    /** Runs match finder for the next byte and returns the matches found. */
+    /* Runs match finder for the next byte and returns the matches found. */
     public abstract Matches getMatches();
 
-    /** Skips the given number of bytes in the match finder. */
+    /* Skips the given number of bytes in the match finder. */
     public abstract void skip(int len);
 
     static void normalize(int[] arr, int size, int offs) {
