@@ -6,6 +6,7 @@ import ru.olegcherednik.zip4jvm.io.lzma.rangecoder.RangeEncoder;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 import java.io.IOException;
+import java.util.stream.IntStream;
 
 public abstract class LzmaEncoder extends LzmaCoder {
 
@@ -406,47 +407,36 @@ public abstract class LzmaEncoder extends LzmaCoder {
         rangeEncoder.finish();
     }
 
-    class LiteralEncoder extends LiteralCoder {
+    protected class LiteralEncoder extends LiteralCoder {
 
-        private final LiteralSubEncoder[] subencoders;
+        private final Sub[] sub;
 
-        LiteralEncoder(LzmaInputStream.Properties properties) {
+        public LiteralEncoder(LzmaInputStream.Properties properties) {
             super(properties.getLc(), properties.getLp());
-
-            subencoders = new LiteralSubEncoder[1 << (properties.getLc() + properties.getLp())];
-            for (int i = 0; i < subencoders.length; ++i)
-                subencoders[i] = new LiteralSubEncoder();
+            sub = IntStream.range(0, 1 << (properties.getLc() + properties.getLp()))
+                           .mapToObj(i -> new Sub())
+                           .toArray(Sub[]::new);
         }
 
-        void encodeInit() throws IOException {
-            // When encoding the first byte of the stream, there is
-            // no previous byte in the dictionary so the encode function
-            // wouldn't work.
-            assert readAhead >= 0;
-            subencoders[0].encode();
+        public void encodeInit() throws IOException {
+            // When encoding the first byte of the stream, there is no previous byte in the dictionary so the encode function wouldn't work.
+            sub[0].encode();
         }
 
-        void encode() throws IOException {
-            assert readAhead >= 0;
-            int i = getSubCoderIndex(lz.getByte(1 + readAhead),
-                    lz.getPos() - readAhead);
-            subencoders[i].encode();
+        public void encode() throws IOException {
+            sub[getSubCoderIndex(lz.getByte(1 + readAhead), lz.getPos() - readAhead)].encode();
         }
 
-        int getPrice(int curByte, int matchByte,
-                int prevByte, int pos, State state) {
-            int price = RangeEncoder.getBitPrice(
-                    isMatch[state.get()][pos & posMask], 0);
+        public int getPrice(int curByte, int matchByte, int prevByte, int pos, State state) {
+            int price = RangeEncoder.getBitPrice(isMatch[state.get()][pos & posMask], 0);
 
             int i = getSubCoderIndex(prevByte, pos);
-            price += state.isLiteral()
-                     ? subencoders[i].getNormalPrice(curByte)
-                     : subencoders[i].getMatchedPrice(curByte, matchByte);
+            price += state.isLiteral() ? sub[i].getNormalPrice(curByte) : sub[i].getMatchedPrice(curByte, matchByte);
 
             return price;
         }
 
-        private class LiteralSubEncoder {
+        private class Sub {
 
             private final short[] probs = createArray(0x300);
 
@@ -485,7 +475,7 @@ public abstract class LzmaEncoder extends LzmaCoder {
                 state.updateLiteral();
             }
 
-            int getNormalPrice(int symbol) {
+            public int getNormalPrice(int symbol) {
                 int price = 0;
                 int subencoderIndex;
                 int bit;
@@ -503,7 +493,7 @@ public abstract class LzmaEncoder extends LzmaCoder {
                 return price;
             }
 
-            int getMatchedPrice(int symbol, int matchByte) {
+            public int getMatchedPrice(int symbol, int matchByte) {
                 int price = 0;
                 int offset = 0x100;
                 int subencoderIndex;
@@ -528,34 +518,24 @@ public abstract class LzmaEncoder extends LzmaCoder {
         }
     }
 
+    protected class LengthEncoder extends LengthCoder {
 
-    class LengthEncoder extends LengthCoder {
-
-        /**
-         * The prices are updated after at least
-         * <code>PRICE_UPDATE_INTERVAL</code> many lengths
-         * have been encoded with the same posState.
-         */
-        private static final int PRICE_UPDATE_INTERVAL = 32; // FIXME?
+        /** The prices are updated after at least <code>PRICE_UPDATE_INTERVAL</code> many lengths have been encoded with the same posState. */
+        private static final int PRICE_UPDATE_INTERVAL = 32;
 
         private final int[] counters;
         private final int[][] prices;
 
-        LengthEncoder(LzmaInputStream.Properties properties) {
-            int posStates = 1 << properties.getPb();
-            counters = new int[posStates];
+        public LengthEncoder(LzmaInputStream.Properties properties) {
+            counters = new int[1 << properties.getPb()];
 
-            // Always allocate at least LOW_SYMBOLS + MID_SYMBOLS because
-            // it makes updatePrices slightly simpler. The prices aren't
-            // usually needed anyway if niceLen < 18.
-            int lenSymbols = Math.max(properties.getNiceLength() - MATCH_LEN_MIN + 1,
-                    LOW_SYMBOLS + MID_SYMBOLS);
-            prices = new int[posStates][lenSymbols];
-            for (int i = 0; i < counters.length; ++i)
-                counters[i] = 0;
+            // Always allocate at least LOW_SYMBOLS + MID_SYMBOLS because it makes updatePrices slightly simpler. The prices aren't usually needed
+            // anyway if niceLen < 18.
+            int lenSymbols = Math.max(properties.getNiceLength() - MATCH_LEN_MIN + 1, LOW_SYMBOLS + MID_SYMBOLS);
+            prices = new int[counters.length][lenSymbols];
         }
 
-        void encode(int len, int posState) throws IOException {
+        public void encode(int len, int posState) throws IOException {
             len -= MATCH_LEN_MIN;
 
             if (len < LOW_SYMBOLS) {
@@ -577,41 +557,37 @@ public abstract class LzmaEncoder extends LzmaCoder {
             --counters[posState];
         }
 
-        int getPrice(int len, int posState) {
+        public int getPrice(int len, int posState) {
             return prices[posState][len - MATCH_LEN_MIN];
         }
 
-        void updatePrices() {
+        public void updatePrices() {
             for (int posState = 0; posState < counters.length; ++posState) {
-                if (counters[posState] <= 0) {
-                    counters[posState] = PRICE_UPDATE_INTERVAL;
-                    updatePrices(posState);
-                }
+                if (counters[posState] > 0)
+                    continue;
+
+                counters[posState] = PRICE_UPDATE_INTERVAL;
+                updatePrices(posState);
             }
         }
 
         private void updatePrices(int posState) {
-            int choice0Price = RangeEncoder.getBitPrice(choice[0], 0);
+            int zero = RangeEncoder.getBitPrice(choice[0], 0);
 
             int i = 0;
-            for (; i < LOW_SYMBOLS; ++i)
-                prices[posState][i] = choice0Price
-                        + RangeEncoder.getBitTreePrice(low[posState], i);
+            for (; i < LOW_SYMBOLS; i++)
+                prices[posState][i] = zero + RangeEncoder.getBitTreePrice(low[posState], i);
 
-            choice0Price = RangeEncoder.getBitPrice(choice[0], 1);
-            int choice1Price = RangeEncoder.getBitPrice(choice[1], 0);
+            zero = RangeEncoder.getBitPrice(choice[0], 1);
+            int one = RangeEncoder.getBitPrice(choice[1], 0);
 
-            for (; i < LOW_SYMBOLS + MID_SYMBOLS; ++i)
-                prices[posState][i] = choice0Price + choice1Price
-                        + RangeEncoder.getBitTreePrice(mid[posState],
-                        i - LOW_SYMBOLS);
+            for (; i < LOW_SYMBOLS + MID_SYMBOLS; i++)
+                prices[posState][i] = zero + one + RangeEncoder.getBitTreePrice(mid[posState], i - LOW_SYMBOLS);
 
-            choice1Price = RangeEncoder.getBitPrice(choice[1], 1);
+            one = RangeEncoder.getBitPrice(choice[1], 1);
 
-            for (; i < prices[posState].length; ++i)
-                prices[posState][i] = choice0Price + choice1Price
-                        + RangeEncoder.getBitTreePrice(high, i - LOW_SYMBOLS
-                        - MID_SYMBOLS);
+            for (; i < prices[posState].length; i++)
+                prices[posState][i] = zero + one + RangeEncoder.getBitTreePrice(high, i - LOW_SYMBOLS - MID_SYMBOLS);
         }
     }
 }

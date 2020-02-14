@@ -6,6 +6,7 @@ import ru.olegcherednik.zip4jvm.io.lzma.lz.LzDecoder;
 import ru.olegcherednik.zip4jvm.io.lzma.rangecoder.RangeDecoder;
 
 import java.io.IOException;
+import java.util.stream.IntStream;
 
 @Getter
 public final class LzmaDecoder extends LzmaCoder {
@@ -127,28 +128,24 @@ public final class LzmaDecoder extends LzmaCoder {
 
     private class LiteralDecoder extends LiteralCoder {
 
-        private final LiteralSubDecoder[] subdecoders;
+        private final Sub[] sub;
 
         public LiteralDecoder(LzmaOutputStream.Properties properties) {
             super(properties.getLc(), properties.getLp());
-
-            subdecoders = new LiteralSubDecoder[1 << (properties.getLc() + properties.getLp())];
-
-            for (int i = 0; i < subdecoders.length; i++)
-                subdecoders[i] = new LiteralSubDecoder();
+            sub = IntStream.range(0, 1 << (properties.getLc() + properties.getLp()))
+                           .mapToObj(i -> new Sub())
+                           .toArray(Sub[]::new);
         }
 
-        void decode() throws IOException {
-            int i = getSubCoderIndex(lz.getByte(0), lz.getPos());
-            subdecoders[i].decode();
+        public void decode() throws IOException {
+            sub[getSubCoderIndex(lz.getByte(0), lz.getPos())].decode();
         }
 
-
-        private class LiteralSubDecoder {
+        private class Sub {
 
             private final short[] probs = createArray(0x300);
 
-            void decode() throws IOException {
+            public void decode() throws IOException {
                 int symbol = 1;
 
                 if (state.isLiteral()) {

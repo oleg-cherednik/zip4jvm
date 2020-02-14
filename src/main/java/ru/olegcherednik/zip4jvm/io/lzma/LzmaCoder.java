@@ -128,6 +128,5 @@ public abstract class LzmaCoder implements Closeable {
 
     @Override
     public void close() throws IOException {
-
     }
 }
