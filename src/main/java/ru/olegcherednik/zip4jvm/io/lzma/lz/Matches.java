@@ -7,11 +7,11 @@ import lombok.Setter;
  * @author Oleg Cherednik
  * @since 14.02.2020
  */
+@Getter
 public final class Matches {
 
-    public final int[] len;
-    public final int[] dist;
-    @Getter
+    private final int[] len;
+    private final int[] dist;
     @Setter
     private int count;
 

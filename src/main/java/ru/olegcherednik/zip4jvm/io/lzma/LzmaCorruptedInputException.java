@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.io.lzma.exceptions;
+package ru.olegcherednik.zip4jvm.io.lzma;
 
 import java.io.IOException;
 
@@ -17,7 +17,4 @@ public final class LzmaCorruptedInputException extends IOException {
         super("LZMA compressed data is corrupt");
     }
 
-    public LzmaCorruptedInputException(String message) {
-        super(message);
-    }
 }

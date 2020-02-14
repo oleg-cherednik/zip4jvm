@@ -122,8 +122,8 @@ final class LzmaEncoderNormal extends LzmaEncoder {
         int mainLen = 0;
         int mainDist = 0;
         if (matches.getCount() > 0) {
-            mainLen = matches.len[matches.getCount() - 1];
-            mainDist = matches.dist[matches.getCount() - 1];
+            mainLen = matches.getLen()[matches.getCount() - 1];
+            mainDist = matches.getDist()[matches.getCount() - 1];
 
             // Return if it is at least niceLen bytes long.
             if (mainLen >= niceLength) {
@@ -208,16 +208,16 @@ final class LzmaEncoderNormal extends LzmaEncoder {
 
             // Set i to the index of the shortest match that is at least len bytes long.
             int i = 0;
-            while (len > matches.len[i])
+            while (len > matches.getLen()[i])
                 i++;
 
             while (true) {
-                int dist = matches.dist[i];
+                int dist = matches.getDist()[i];
                 int price = getMatchAndLenPrice(normalMatchPrice, dist, len, posState);
                 if (price < opts[len].price)
                     opts[len].set1(price, 0, dist + reps.length);
 
-                if (len == matches.len[i])
+                if (len == matches.getLen()[i])
                     if (++i == matches.getCount())
                         break;
 
@@ -230,7 +230,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
         // Get matches for later bytes and optimize the use of LZMA symbols by calculating the prices and picking the cheapest symbol combinations.
         while (++optCur < optEnd) {
             matches = getMatches();
-            if (matches.getCount() > 0 && matches.len[matches.getCount() - 1] >= niceLength)
+            if (matches.getCount() > 0 && matches.getLen()[matches.getCount() - 1] >= niceLength)
                 break;
 
             avail--;
@@ -430,38 +430,38 @@ final class LzmaEncoderNormal extends LzmaEncoder {
     /** Calculates prices of a normal match and normal match + literal + rep0. */
     private void calcNormalMatchPrices(int pos, int posState, int avail, int anyMatchPrice, int startLen) {
         // If the longest match is so long that it would not fit into the opts array, shorten the matches.
-        if (matches.len[matches.getCount() - 1] > avail) {
+        if (matches.getLen()[matches.getCount() - 1] > avail) {
             matches.setCount(0);
 
-            while (matches.len[matches.getCount()] < avail)
+            while (matches.getLen()[matches.getCount()] < avail)
                 matches.incCount();
 
-            matches.len[matches.getCount()] = avail;
+            matches.getLen()[matches.getCount()] = avail;
             matches.incCount();
         }
 
-        if (matches.len[matches.getCount() - 1] < startLen)
+        if (matches.getLen()[matches.getCount() - 1] < startLen)
             return;
 
-        while (optEnd < optCur + matches.len[matches.getCount() - 1])
+        while (optEnd < optCur + matches.getLen()[matches.getCount() - 1])
             opts[++optEnd].reset();
 
         int normalMatchPrice = getNormalMatchPrice(anyMatchPrice, opts[optCur].state);
 
         int match = 0;
 
-        while (startLen > matches.len[match])
+        while (startLen > matches.getLen()[match])
             match++;
 
         for (int len = startLen; ; len++) {
-            int dist = matches.dist[match];
+            int dist = matches.getDist()[match];
 
             // Calculate the price of a match of len bytes from the nearest possible distance.
             int matchAndLenPrice = getMatchAndLenPrice(normalMatchPrice, dist, len, posState);
             if (matchAndLenPrice < opts[optCur + len].price)
                 opts[optCur + len].set1(matchAndLenPrice, optCur, dist + reps.length);
 
-            if (len != matches.len[match])
+            if (len != matches.getLen()[match])
                 continue;
 
             // Try match + literal + rep0. First get the length of the rep0.

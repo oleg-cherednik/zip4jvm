@@ -65,8 +65,8 @@ final class LzmaEncoderFast extends LzmaEncoder {
         int mainDist = 0;
 
         if (matches.getCount() > 0) {
-            mainLen = matches.len[matches.getCount() - 1];
-            mainDist = matches.dist[matches.getCount() - 1];
+            mainLen = matches.getLen()[matches.getCount() - 1];
+            mainDist = matches.getDist()[matches.getCount() - 1];
 
             if (mainLen >= niceLength) {
                 back = mainDist + reps.length;
@@ -74,13 +74,13 @@ final class LzmaEncoderFast extends LzmaEncoder {
                 return mainLen;
             }
 
-            while (matches.getCount() > 1 && mainLen == matches.len[matches.getCount() - 2] + 1) {
-                if (!changePair(matches.dist[matches.getCount() - 2], mainDist))
+            while (matches.getCount() > 1 && mainLen == matches.getLen()[matches.getCount() - 2] + 1) {
+                if (!changePair(matches.getDist()[matches.getCount() - 2], mainDist))
                     break;
 
                 matches.decCount();
-                mainLen = matches.len[matches.getCount() - 1];
-                mainDist = matches.dist[matches.getCount() - 1];
+                mainLen = matches.getLen()[matches.getCount() - 1];
+                mainDist = matches.getDist()[matches.getCount() - 1];
             }
 
             if (mainLen == MATCH_LEN_MIN && mainDist >= 0x80)
@@ -103,8 +103,8 @@ final class LzmaEncoderFast extends LzmaEncoder {
         matches = getMatches();
 
         if (matches.getCount() > 0) {
-            int newLen = matches.len[matches.getCount() - 1];
-            int newDist = matches.dist[matches.getCount() - 1];
+            int newLen = matches.getLen()[matches.getCount() - 1];
+            int newDist = matches.getDist()[matches.getCount() - 1];
 
             if ((newLen >= mainLen && newDist < mainDist) || (newLen == mainLen + 1 && !changePair(mainDist, newDist))
                     || newLen > mainLen + 1 || (newLen + 1 >= mainLen && mainLen >= MATCH_LEN_MIN + 1 && changePair(newDist, mainDist)))

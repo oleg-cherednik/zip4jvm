@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.io.lzma;
 
 import lombok.Getter;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.lzma.exceptions.LzmaCorruptedInputException;
 import ru.olegcherednik.zip4jvm.io.lzma.exceptions.UnsupportedOptionsException;
 import ru.olegcherednik.zip4jvm.io.lzma.lz.MatchFinder;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;

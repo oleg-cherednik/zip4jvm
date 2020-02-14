@@ -81,8 +81,8 @@ final class HashChain extends LzEncoder {
          */
         if (delta2 < cyclicSize && buf[pos - delta2] == buf[pos]) {
             lenBest = 2;
-            matches.len[0] = 2;
-            matches.dist[0] = delta2 - 1;
+            matches.getLen()[0] = 2;
+            matches.getDist()[0] = delta2 - 1;
             matches.setCount(1);
         }
 
@@ -92,7 +92,7 @@ final class HashChain extends LzEncoder {
          */
         if (delta2 != delta3 && delta3 < cyclicSize && buf[pos - delta3] == buf[pos]) {
             lenBest = 3;
-            matches.dist[matches.getCount()] = delta3 - 1;
+            matches.getDist()[matches.getCount()] = delta3 - 1;
             matches.incCount();
             delta2 = delta3;
         }
@@ -102,7 +102,7 @@ final class HashChain extends LzEncoder {
             while (lenBest < matchLenLimit && buf[pos + lenBest - delta2] == buf[pos + lenBest])
                 ++lenBest;
 
-            matches.len[matches.getCount() - 1] = lenBest;
+            matches.getLen()[matches.getCount() - 1] = lenBest;
 
             // Return if it is long enough (niceLen or reached the end of the dictionary).
             if (lenBest >= niceLenLimit)
@@ -138,8 +138,8 @@ final class HashChain extends LzEncoder {
                 // Use the match if and only if it is better than the longest match found so far.
                 if (len > lenBest) {
                     lenBest = len;
-                    matches.len[matches.getCount()] = len;
-                    matches.dist[matches.getCount()] = delta - 1;
+                    matches.getLen()[matches.getCount()] = len;
+                    matches.getDist()[matches.getCount()] = delta - 1;
                     matches.incCount();
 
                     // Return if it is long enough (niceLen or reached the end of the dictionary).
