@@ -14,6 +14,8 @@ import java.util.stream.IntStream;
  */
 public abstract class LzmaEncoder extends LzmaCoder {
 
+    public static final int MATCH_LEN_MAX = MATCH_LEN_MIN + LengthCoder.LOW_SYMBOLS + LengthCoder.MID_SYMBOLS + LengthCoder.HIGH_SYMBOLS - 1;
+
     protected static final int FULL_DISTANCES = 1 << (DIST_MODEL_END / 2);
     protected static final int ALIGN_MASK = ALIGN_SIZE - 1;
 
@@ -277,6 +279,7 @@ public abstract class LzmaEncoder extends LzmaCoder {
         }
 
         int dist = DIST_MODEL_START;
+
         for (int distSlot = DIST_MODEL_START; distSlot < DIST_MODEL_END;
              ++distSlot) {
             int footerBits = (distSlot >>> 1) - 1;
@@ -293,11 +296,9 @@ public abstract class LzmaEncoder extends LzmaCoder {
                     fullDistPrices[distState][dist]
                             = distSlotPrices[distState][distSlot] + price;
 
-                ++dist;
+                dist++;
             }
         }
-
-        assert dist == FULL_DISTANCES;
     }
 
     private void updateAlignPrices() {
@@ -473,7 +474,7 @@ public abstract class LzmaEncoder extends LzmaCoder {
                 }
             }
 
-            --counters[posState];
+            counters[posState]--;
         }
 
         public int getPrice(int len, int posState) {

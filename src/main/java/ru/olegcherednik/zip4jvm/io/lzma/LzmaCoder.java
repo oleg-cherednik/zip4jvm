@@ -13,7 +13,7 @@ import static ru.olegcherednik.zip4jvm.io.lzma.rangecoder.RangeCoder.PROB_INIT;
  * @author Oleg Cherednik
  * @since 14.02.2020
  */
-public abstract class LzmaCoder implements Closeable {
+abstract class LzmaCoder implements Closeable {
 
     private static final int POS_STATES_MAX = 1 << 4;
 
@@ -25,7 +25,6 @@ public abstract class LzmaCoder implements Closeable {
     protected static final int ALIGN_SIZE = 1 << ALIGN_BITS;
 
     protected static final int MATCH_LEN_MIN = 2;
-    public static final int MATCH_LEN_MAX = MATCH_LEN_MIN + LengthCoder.LOW_SYMBOLS + LengthCoder.MID_SYMBOLS + LengthCoder.HIGH_SYMBOLS - 1;
 
     protected final int posMask;
     protected final int[] reps = new int[4];

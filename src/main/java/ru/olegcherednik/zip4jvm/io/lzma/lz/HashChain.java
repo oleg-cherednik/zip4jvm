@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.io.lzma.lz;
 
 import ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream;
 
-import static ru.olegcherednik.zip4jvm.io.lzma.LzmaCoder.MATCH_LEN_MAX;
+import static ru.olegcherednik.zip4jvm.io.lzma.LzmaEncoder.MATCH_LEN_MAX;
 
 final class HashChain extends LzEncoder {
 

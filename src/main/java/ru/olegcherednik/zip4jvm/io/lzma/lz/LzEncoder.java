@@ -5,7 +5,7 @@ import ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import static ru.olegcherednik.zip4jvm.io.lzma.LzmaCoder.MATCH_LEN_MAX;
+import static ru.olegcherednik.zip4jvm.io.lzma.LzmaEncoder.MATCH_LEN_MAX;
 
 public abstract class LzEncoder {
 
@@ -42,10 +42,9 @@ public abstract class LzEncoder {
      * Gets the size of the LZ window buffer that needs to be allocated.
      */
     private static int getBufSize(int dictSize, int extraSizeAfter) {
-        int keepSizeBefore = dictSize;
         int keepSizeAfter = extraSizeAfter + MATCH_LEN_MAX;
         int reserveSize = Math.min(dictSize / 2 + (256 << 10), 512 << 20);
-        return keepSizeBefore + keepSizeAfter + reserveSize;
+        return dictSize + keepSizeAfter + reserveSize;
     }
 
     /**

@@ -411,11 +411,8 @@ final class LzmaEncoderNormal extends LzmaEncoder {
         return longRepPrice + repLengthEncoder.getPrice(len, posState);
     }
 
-    /**
-     * Calculates prices of long rep and long rep + literal + rep0.
-     */
-    private int calcLongRepPrices(int pos, int posState,
-            int avail, int anyRepPrice) {
+    /** Calculates prices of long rep and long rep + literal + rep0. */
+    private int calcLongRepPrices(int pos, int posState, int avail, int anyRepPrice) {
         int startLen = MATCH_LEN_MIN;
         int lenLimit = Math.min(avail, niceLength);
 
@@ -427,12 +424,11 @@ final class LzmaEncoderNormal extends LzmaEncoder {
             while (optEnd < optCur + len)
                 opts[++optEnd].reset();
 
-            int longRepPrice = getLongRepPrice(anyRepPrice, rep,
-                    opts[optCur].state, posState);
+            int longRepPrice = getLongRepPrice(anyRepPrice, rep, opts[optCur].state, posState);
 
             for (int i = len; i >= MATCH_LEN_MIN; --i) {
-                int price = longRepPrice
-                        + repLengthEncoder.getPrice(i, posState);
+                int price = longRepPrice + repLengthEncoder.getPrice(i, posState);
+
                 if (price < opts[optCur + i].price)
                     opts[optCur + i].set1(price, optCur, rep);
             }
@@ -441,13 +437,11 @@ final class LzmaEncoderNormal extends LzmaEncoder {
                 startLen = len + 1;
 
             int len2Limit = Math.min(niceLength, avail - len - 1);
-            int len2 = lz.getMatchLen(len + 1, opts[optCur].reps[rep],
-                    len2Limit);
+            int len2 = lz.getMatchLen(len + 1, opts[optCur].reps[rep], len2Limit);
 
             if (len2 >= MATCH_LEN_MIN) {
                 // Rep
-                int price = longRepPrice
-                        + repLengthEncoder.getPrice(len, posState);
+                int price = longRepPrice + repLengthEncoder.getPrice(len, posState);
                 nextState.set(opts[optCur].state);
                 nextState.updateLongRep();
 
@@ -455,16 +449,15 @@ final class LzmaEncoderNormal extends LzmaEncoder {
                 int curByte = lz.getByte(len, 0);
                 int matchByte = lz.getByte(0); // lz.getByte(len, len)
                 int prevByte = lz.getByte(len, 1);
-                price += literalEncoder.getPrice(curByte, matchByte, prevByte,
-                        pos + len, nextState);
+                price += literalEncoder.getPrice(curByte, matchByte, prevByte, pos + len, nextState);
                 nextState.updateLiteral();
 
                 // Rep0
                 int nextPosState = (pos + len + 1) & posMask;
-                price += getLongRepAndLenPrice(0, len2,
-                        nextState, nextPosState);
+                price += getLongRepAndLenPrice(0, len2, nextState, nextPosState);
 
                 int i = optCur + len + 1 + len2;
+
                 while (optEnd < i)
                     opts[++optEnd].reset();
 
@@ -476,15 +469,14 @@ final class LzmaEncoderNormal extends LzmaEncoder {
         return startLen;
     }
 
-    /**
-     * Calculates prices of a normal match and normal match + literal + rep0.
-     */
+    /** Calculates prices of a normal match and normal match + literal + rep0. */
     private void calcNormalMatchPrices(int pos, int posState, int avail,
             int anyMatchPrice, int startLen) {
         // If the longest match is so long that it would not fit into
         // the opts array, shorten the matches.
         if (matches.len[matches.count - 1] > avail) {
             matches.count = 0;
+
             while (matches.len[matches.count] < avail)
                 ++matches.count;
 
@@ -497,10 +489,10 @@ final class LzmaEncoderNormal extends LzmaEncoder {
         while (optEnd < optCur + matches.len[matches.count - 1])
             opts[++optEnd].reset();
 
-        int normalMatchPrice = getNormalMatchPrice(anyMatchPrice,
-                opts[optCur].state);
+        int normalMatchPrice = getNormalMatchPrice(anyMatchPrice, opts[optCur].state);
 
         int match = 0;
+
         while (startLen > matches.len[match])
             ++match;
 
@@ -509,11 +501,9 @@ final class LzmaEncoderNormal extends LzmaEncoder {
 
             // Calculate the price of a match of len bytes from the nearest
             // possible distance.
-            int matchAndLenPrice = getMatchAndLenPrice(normalMatchPrice,
-                    dist, len, posState);
+            int matchAndLenPrice = getMatchAndLenPrice(normalMatchPrice, dist, len, posState);
             if (matchAndLenPrice < opts[optCur + len].price)
-                opts[optCur + len].set1(matchAndLenPrice,
-                        optCur, dist + reps.length);
+                opts[optCur + len].set1(matchAndLenPrice, optCur, dist + reps.length);
 
             if (len != matches.len[match])
                 continue;
@@ -530,16 +520,12 @@ final class LzmaEncoderNormal extends LzmaEncoder {
                 int curByte = lz.getByte(len, 0);
                 int matchByte = lz.getByte(0); // lz.getByte(len, len)
                 int prevByte = lz.getByte(len, 1);
-                int price = matchAndLenPrice
-                        + literalEncoder.getPrice(curByte, matchByte,
-                        prevByte, pos + len,
-                        nextState);
+                int price = matchAndLenPrice + literalEncoder.getPrice(curByte, matchByte, prevByte, pos + len, nextState);
                 nextState.updateLiteral();
 
                 // Rep0
                 int nextPosState = (pos + len + 1) & posMask;
-                price += getLongRepAndLenPrice(0, len2,
-                        nextState, nextPosState);
+                price += getLongRepAndLenPrice(0, len2, nextState, nextPosState);
 
                 int i = optCur + len + 1 + len2;
                 while (optEnd < i)
@@ -558,20 +544,17 @@ final class LzmaEncoderNormal extends LzmaEncoder {
         return anyMatchPrice + RangeEncoder.getBitPrice(isRep[state.get()], 0);
     }
 
-    private int getMatchAndLenPrice(int normalMatchPrice,
-            int dist, int len, int posState) {
-        int price = normalMatchPrice
-                + matchLengthEncoder.getPrice(len, posState);
+    private int getMatchAndLenPrice(int normalMatchPrice, int dist, int len, int posState) {
+        int price = normalMatchPrice + matchLengthEncoder.getPrice(len, posState);
         int distState = getDistState(len);
 
-        if (dist < FULL_DISTANCES) {
+        if (dist < FULL_DISTANCES)
             price += fullDistPrices[distState][dist];
-        } else {
+        else {
             // Note that distSlotPrices includes also
             // the price of direct bits.
             int distSlot = getDistSlot(dist);
-            price += distSlotPrices[distState][distSlot]
-                    + alignPrices[dist & ALIGN_MASK];
+            price += distSlotPrices[distState][distSlot] + alignPrices[dist & ALIGN_MASK];
         }
 
         return price;
