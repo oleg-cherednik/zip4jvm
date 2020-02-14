@@ -103,7 +103,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
         // Get the lengths of repeated matches.
         int repBest = 0;
         for (int rep = 0; rep < reps.length; ++rep) {
-            repLens[rep] = lz.getMatchLen(reps[rep], avail);
+            repLens[rep] = lz.getMatchLength(reps[rep], avail);
 
             if (repLens[rep] < MATCH_LEN_MIN) {
                 repLens[rep] = 0;
@@ -379,7 +379,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
         // try literal + long rep0.
         if (!nextIsByte && matchByte != curByte && avail > MATCH_LEN_MIN) {
             int lenLimit = Math.min(niceLength, avail - 1);
-            int len = lz.getMatchLen(1, opts[optCur].reps[0], lenLimit);
+            int len = lz.getMatchLength(1, opts[optCur].reps[0], lenLimit);
 
             if (len >= MATCH_LEN_MIN) {
                 nextState.set(opts[optCur].state);
@@ -416,7 +416,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
         int lenLimit = Math.min(avail, niceLength);
 
         for (int rep = 0; rep < reps.length; ++rep) {
-            int len = lz.getMatchLen(opts[optCur].reps[rep], lenLimit);
+            int len = lz.getMatchLength(opts[optCur].reps[rep], lenLimit);
             if (len < MATCH_LEN_MIN)
                 continue;
 
@@ -436,7 +436,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
                 startLen = len + 1;
 
             int len2Limit = Math.min(niceLength, avail - len - 1);
-            int len2 = lz.getMatchLen(len + 1, opts[optCur].reps[rep], len2Limit);
+            int len2 = lz.getMatchLength(len + 1, opts[optCur].reps[rep], len2Limit);
 
             if (len2 >= MATCH_LEN_MIN) {
                 // Rep
@@ -509,7 +509,7 @@ final class LzmaEncoderNormal extends LzmaEncoder {
 
             // Try match + literal + rep0. First get the length of the rep0.
             int len2Limit = Math.min(niceLength, avail - len - 1);
-            int len2 = lz.getMatchLen(len + 1, dist, len2Limit);
+            int len2 = lz.getMatchLength(len + 1, dist, len2Limit);
 
             if (len2 >= MATCH_LEN_MIN) {
                 nextState.set(opts[optCur].state);

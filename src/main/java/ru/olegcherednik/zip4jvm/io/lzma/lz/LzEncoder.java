@@ -218,12 +218,12 @@ public abstract class LzEncoder {
      * @param lenLimit don't test for a match longer than this
      * @return length of the match; it is in the range [0, lenLimit]
      */
-    public int getMatchLen(int dist, int lenLimit) {
+    public int getMatchLength(int dist, int lenLimit) {
         int backPos = readPos - dist - 1;
         int len = 0;
 
         while (len < lenLimit && buf[readPos + len] == buf[backPos + len])
-            ++len;
+            len++;
 
         return len;
     }
@@ -236,40 +236,32 @@ public abstract class LzEncoder {
      * @param lenLimit don't test for a match longer than this
      * @return length of the match; it is in the range [0, lenLimit]
      */
-    public int getMatchLen(int forward, int dist, int lenLimit) {
+    public int getMatchLength(int forward, int dist, int lenLimit) {
         int curPos = readPos + forward;
         int backPos = curPos - dist - 1;
         int len = 0;
 
         while (len < lenLimit && buf[curPos + len] == buf[backPos + len])
-            ++len;
+            len++;
 
         return len;
     }
 
     /**
-     * Moves to the next byte, checks if there is enough input available,
-     * and returns the amount of input available.
+     * Moves to the next byte, checks if there is enough input available, and returns the amount of input available.
      *
-     * @param requiredForFlushing  minimum number of available bytes when
-     *                             flushing; encoding may be continued with
-     *                             new input after flushing
-     * @param requiredForFinishing minimum number of available bytes when
-     *                             finishing; encoding must not be continued
-     *                             after finishing or the match finder state
-     *                             may be corrupt
-     * @return the number of bytes available or zero if there
-     * is not enough input available
+     * @param requiredForFlushing  minimum number of available bytes when flushing; encoding may be continued with new input after flushing
+     * @param requiredForFinishing minimum number of available bytes when finishing; encoding must not be continued after finishing or the match
+     *                             finder state may be corrupt
+     * @return the number of bytes available or zero if there is not enough input available
      */
-    int movePos(int requiredForFlushing, int requiredForFinishing) {
-        assert requiredForFlushing >= requiredForFinishing;
-
-        ++readPos;
+    protected int movePos(int requiredForFlushing, int requiredForFinishing) {
+        readPos++;
         int avail = writePos - readPos;
 
         if (avail < requiredForFlushing) {
             if (avail < requiredForFinishing || !finishing) {
-                ++pendingSize;
+                pendingSize++;
                 avail = 0;
             }
         }

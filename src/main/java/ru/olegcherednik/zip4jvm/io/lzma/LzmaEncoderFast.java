@@ -44,7 +44,7 @@ final class LzmaEncoderFast extends LzmaEncoder {
         int bestRepLen = 0;
         int bestRepIndex = 0;
         for (int rep = 0; rep < reps.length; ++rep) {
-            int len = lz.getMatchLen(reps[rep], avail);
+            int len = lz.getMatchLength(reps[rep], avail);
             if (len < MATCH_LEN_MIN)
                 continue;
 
@@ -122,7 +122,7 @@ final class LzmaEncoderFast extends LzmaEncoder {
 
         int limit = Math.max(mainLen - 1, MATCH_LEN_MIN);
         for (int rep = 0; rep < reps.length; ++rep)
-            if (lz.getMatchLen(reps[rep], limit) == limit)
+            if (lz.getMatchLength(reps[rep], limit) == limit)
                 return 1;
 
         back = mainDist + reps.length;
