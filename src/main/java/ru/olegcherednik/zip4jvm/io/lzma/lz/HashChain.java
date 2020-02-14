@@ -64,6 +64,7 @@ final class HashChain extends LzEncoder {
         return avail;
     }
 
+    @Override
     public Matches getMatches() {
         matches.count = 0;
         int matchLenLimit = MATCH_LEN_MAX;
@@ -172,9 +173,8 @@ final class HashChain extends LzEncoder {
         }
     }
 
+    @Override
     public void skip(int len) {
-        assert len >= 0;
-
         while (len-- > 0) {
             if (movePos() != 0) {
                 // Update the hash chain and hash tables.

@@ -248,25 +248,6 @@ public abstract class LzEncoder {
     }
 
     /**
-     * Verifies that the matches returned by the match finder are valid.
-     * This is meant to be used in an assert statement. This is totally
-     * useless for actual encoding since match finder's results should
-     * naturally always be valid if it isn't broken.
-     *
-     * @param matches return value from <code>getMatches</code>
-     * @return true if matches are valid, false if match finder is broken
-     */
-    public boolean verifyMatches(Matches matches) {
-        int lenLimit = Math.min(getAvail(), MATCH_LEN_MAX);
-
-        for (int i = 0; i < matches.count; ++i)
-            if (getMatchLen(matches.dist[i], lenLimit) != matches.len[i])
-                return false;
-
-        return true;
-    }
-
-    /**
      * Moves to the next byte, checks if there is enough input available,
      * and returns the amount of input available.
      *
@@ -296,13 +277,9 @@ public abstract class LzEncoder {
         return avail;
     }
 
-    /**
-     * Runs match finder for the next byte and returns the matches found.
-     */
+    /** Runs match finder for the next byte and returns the matches found. */
     public abstract Matches getMatches();
 
-    /**
-     * Skips the given number of bytes in the match finder.
-     */
+    /** Skips the given number of bytes in the match finder. */
     public abstract void skip(int len);
 }

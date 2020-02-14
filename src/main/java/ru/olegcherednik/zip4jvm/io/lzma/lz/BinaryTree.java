@@ -64,6 +64,7 @@ final class BinaryTree extends LzEncoder {
                 return matches;
 
             matchLenLimit = avail;
+
             if (niceLenLimit > avail)
                 niceLenLimit = avail;
         }
@@ -72,14 +73,15 @@ final class BinaryTree extends LzEncoder {
         int delta2 = lzPos - hash.getHash2Pos();
         int delta3 = lzPos - hash.getHash3Pos();
         int currentMatch = hash.getHash4Pos();
+
         hash.updateTables(lzPos);
 
         int lenBest = 0;
 
-        // See if the hash from the first two bytes found a match.
-        // The hashing algorithm guarantees that if the first byte
-        // matches, also the second byte does, so there's no need to
-        // test the second byte.
+        /*
+         * See if the hash from the first two bytes found a match.
+         * The hashing algorithm guarantees that if the first byte matches, also the second byte does, so there's no need to test the second byte.
+         */
         if (delta2 < cyclicSize && buf[readPos - delta2] == buf[readPos]) {
             lenBest = 2;
             matches.len[0] = 2;
@@ -87,10 +89,10 @@ final class BinaryTree extends LzEncoder {
             matches.count = 1;
         }
 
-        // See if the hash from the first three bytes found a match that
-        // is different from the match possibly found by the two-byte hash.
-        // Also here the hashing algorithm guarantees that if the first byte
-        // matches, also the next two bytes do.
+        /*
+         * See if the hash from the first three bytes found a match that is different from the match possibly found by the two-byte hash.
+         * Also here the hashing algorithm guarantees that if the first byte matches, also the next two bytes do.
+         */
         if (delta2 != delta3 && delta3 < cyclicSize
                 && buf[readPos - delta3] == buf[readPos]) {
             lenBest = 3;
@@ -106,16 +108,14 @@ final class BinaryTree extends LzEncoder {
 
             matches.len[matches.count - 1] = lenBest;
 
-            // Return if it is long enough (niceLen or reached the end of
-            // the dictionary).
+            // Return if it is long enough (niceLen or reached the end of the dictionary).
             if (lenBest >= niceLenLimit) {
                 skip(niceLenLimit, currentMatch);
                 return matches;
             }
         }
 
-        // Long enough match wasn't found so easily. Look for better matches
-        // from the binary tree.
+        // Long enough match wasn't found so easily. Look for better matches from the binary tree.
         if (lenBest < 3)
             lenBest = 3;
 
@@ -129,9 +129,7 @@ final class BinaryTree extends LzEncoder {
         while (true) {
             int delta = lzPos - currentMatch;
 
-            // Return if the search depth limit has been reached or
-            // if the distance of the potential match exceeds the
-            // dictionary size.
+            // Return if the search depth limit has been reached or if the distance of the potential match exceeds the dictionary size.
             if (depth-- == 0 || delta >= cyclicSize) {
                 tree[ptr0] = 0;
                 tree[ptr1] = 0;
@@ -176,7 +174,28 @@ final class BinaryTree extends LzEncoder {
         }
     }
 
-    private void skip(int niceLenLimit, int currentMatch) {
+    @Override
+    public void skip(int len) {
+        while (len-- > 0) {
+            int niceLenLimit = niceLen;
+            int avail = movePos();
+
+            if (avail < niceLenLimit) {
+                if (avail == 0)
+                    continue;
+
+                niceLenLimit = avail;
+            }
+
+            hash.calcHashes(buf, readPos);
+            int currentMatch = hash.getHash4Pos();
+            hash.updateTables(lzPos);
+
+            skip(niceLenLimit, currentMatch);
+        }
+    }
+
+    private void skip(int niceLengthLimit, int currentMatch) {
         int depth = depthLimit;
 
         int ptr0 = (cyclicPos << 1) + 1;
@@ -198,11 +217,12 @@ final class BinaryTree extends LzEncoder {
             int len = Math.min(len0, len1);
 
             if (buf[readPos + len - delta] == buf[readPos + len]) {
-                // No need to look for longer matches than niceLenLimit
-                // because we only are updating the tree, not returning
-                // matches found to the caller.
+                /*
+                 * No need to look for longer matches than niceLenLimit because we only are updating the tree, not returning matches found to the
+                 * caller.
+                 */
                 do {
-                    if (++len == niceLenLimit) {
+                    if (++len == niceLengthLimit) {
                         tree[ptr1] = tree[pair];
                         tree[ptr0] = tree[pair + 1];
                         return;
@@ -222,27 +242,6 @@ final class BinaryTree extends LzEncoder {
                 currentMatch = tree[ptr0];
                 len0 = len;
             }
-        }
-    }
-
-    @Override
-    public void skip(int len) {
-        while (len-- > 0) {
-            int niceLenLimit = niceLen;
-            int avail = movePos();
-
-            if (avail < niceLenLimit) {
-                if (avail == 0)
-                    continue;
-
-                niceLenLimit = avail;
-            }
-
-            hash.calcHashes(buf, readPos);
-            int currentMatch = hash.getHash4Pos();
-            hash.updateTables(lzPos);
-
-            skip(niceLenLimit, currentMatch);
         }
     }
 }
