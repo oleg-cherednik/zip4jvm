@@ -897,6 +897,7 @@ are not explicitly set, then `default` entry settings are used for all added ent
  - _compression_ - compression algorithm
    - `store` - no compression
    - `deflate` - use [Deflate](https://en.wikipedia.org/wiki/DEFLATE) compression algorithm
+   - `LZMA` - use [LZMA](https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm) compression algorithm
  - _compressionLevel_ - compression level
    - `fastest` `fast` `normal` `maximum` `ultra`
  - _encryption_ - encryption algorithm
