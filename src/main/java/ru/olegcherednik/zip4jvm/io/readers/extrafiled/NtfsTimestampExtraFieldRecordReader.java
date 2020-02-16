@@ -16,7 +16,7 @@ import java.util.List;
  * @since 16.10.2019
  */
 @RequiredArgsConstructor
-public final class NtfsTimestampExtraFieldReader implements Reader<NtfsTimestampExtraFieldRecord> {
+public final class NtfsTimestampExtraFieldRecordReader implements Reader<NtfsTimestampExtraFieldRecord> {
 
     private final int size;
 

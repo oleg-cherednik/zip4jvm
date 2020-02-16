@@ -54,12 +54,12 @@ public class ExtraFieldReader implements Reader<ExtraField> {
         Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> map = new HashMap<>();
 
         map.put(Zip64.ExtendedInfo.SIGNATURE, size -> new Zip64Reader.ExtendedInfo(size, uncompressedSize, compressedSize, offs, disk));
-        map.put(AesExtraFieldRecord.SIGNATURE, AesExtraFieldReader::new);
-        map.put(NtfsTimestampExtraFieldRecord.SIGNATURE, NtfsTimestampExtraFieldReader::new);
-        map.put(InfoZipOldUnixExtraFieldRecord.SIGNATURE, InfoZipOldUnitExtraFieldReader::new);
-        map.put(InfoZipNewUnixExtraFieldRecord.SIGNATURE, InfoZipNewUnixExtraFieldReader::new);
-        map.put(ExtendedTimestampExtraFieldRecord.SIGNATURE, ExtendedTimestampExtraFieldReader::new);
-        map.put(AlgIdExtraFieldRecord.SIGNATURE, AlgIdExtraFieldReader::new);
+        map.put(AesExtraFieldRecord.SIGNATURE, AesExtraFieldRecordReader::new);
+        map.put(NtfsTimestampExtraFieldRecord.SIGNATURE, NtfsTimestampExtraFieldRecordReader::new);
+        map.put(InfoZipOldUnixExtraFieldRecord.SIGNATURE, InfoZipOldUnixExtraFieldRecordReader::new);
+        map.put(InfoZipNewUnixExtraFieldRecord.SIGNATURE, InfoZipNewUnixExtraFieldRecordReader::new);
+        map.put(ExtendedTimestampExtraFieldRecord.SIGNATURE, ExtendedTimestampExtraFieldRecordReader::new);
+        map.put(AlgIdExtraFieldRecord.SIGNATURE, AlgIdExtraFieldRecordReader::new);
 
         return map;
     }

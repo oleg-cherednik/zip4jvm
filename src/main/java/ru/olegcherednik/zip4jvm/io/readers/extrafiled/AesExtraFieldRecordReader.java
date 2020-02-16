@@ -15,7 +15,7 @@ import java.io.IOException;
  * @since 14.04.2019
  */
 @RequiredArgsConstructor
-public final class AesExtraFieldReader implements Reader<AesExtraFieldRecord> {
+public final class AesExtraFieldRecordReader implements Reader<AesExtraFieldRecord> {
 
     private final int size;
 

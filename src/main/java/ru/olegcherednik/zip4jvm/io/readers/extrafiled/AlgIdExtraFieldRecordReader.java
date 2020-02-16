@@ -14,7 +14,7 @@ import java.io.IOException;
  * @since 15.02.2020
  */
 @RequiredArgsConstructor
-public final class AlgIdExtraFieldReader implements Reader<AlgIdExtraFieldRecord> {
+public final class AlgIdExtraFieldRecordReader implements Reader<AlgIdExtraFieldRecord> {
 
     private final int size;
 
@@ -24,13 +24,14 @@ public final class AlgIdExtraFieldReader implements Reader<AlgIdExtraFieldRecord
         EncryptionAlgorithm encryptionAlgorithm = EncryptionAlgorithm.parseCode(in.readWord());
         int bitLength = in.readWord();
         Flags flags = Flags.parseCode(in.readWord());
-        in.skip(4); // unknown fields
+        byte[] unknown = in.readBytes(4);
 
         return AlgIdExtraFieldRecord.builder()
                                     .dataSize(size)
                                     .format(format)
                                     .encryptionAlgorithm(encryptionAlgorithm)
                                     .bitLength(bitLength)
+                                    .unknown(unknown)
                                     .flags(flags).build();
     }
 

@@ -29,13 +29,14 @@ public final class AlgIdExtraFieldRecord implements ExtraField.Record {
     // size:2 - size of total "extra" block
     private final int dataSize;
     // size:2 - format definition for this record (should be 2)
-    private int format;
+    private final int format;
     // size:2 - encryption algorithm identifier
-    private EncryptionAlgorithm encryptionAlgorithm;
+    private final EncryptionAlgorithm encryptionAlgorithm;
     // size:2 - bit length of encryption key
-    private int bitLength;
+    private final int bitLength;
     // size:2 - processing flags
-    private Flags flags;
+    private final Flags flags;
+    private final byte[] unknown;
 
     @Override
     public int getSignature() {

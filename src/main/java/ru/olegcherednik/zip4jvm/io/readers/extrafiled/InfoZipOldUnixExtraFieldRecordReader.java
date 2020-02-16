@@ -15,7 +15,7 @@ import static ru.olegcherednik.zip4jvm.model.ExtraField.NO_DATA;
  * @since 25.10.2019
  */
 @RequiredArgsConstructor
-public final class InfoZipOldUnitExtraFieldReader implements Reader<InfoZipOldUnixExtraFieldRecord> {
+public final class InfoZipOldUnixExtraFieldRecordReader implements Reader<InfoZipOldUnixExtraFieldRecord> {
 
     private final int size;
 

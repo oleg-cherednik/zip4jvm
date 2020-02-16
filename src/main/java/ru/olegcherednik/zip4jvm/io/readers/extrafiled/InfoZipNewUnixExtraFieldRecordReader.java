@@ -12,7 +12,7 @@ import java.io.IOException;
  * @since 25.10.2019
  */
 @RequiredArgsConstructor
-public final class InfoZipNewUnixExtraFieldReader implements Reader<InfoZipNewUnixExtraFieldRecord> {
+public final class InfoZipNewUnixExtraFieldRecordReader implements Reader<InfoZipNewUnixExtraFieldRecord> {
 
     private final int size;
 

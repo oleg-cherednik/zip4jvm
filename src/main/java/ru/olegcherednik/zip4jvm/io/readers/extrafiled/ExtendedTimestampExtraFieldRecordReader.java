@@ -13,7 +13,7 @@ import java.io.IOException;
  * @since 25.10.2019
  */
 @RequiredArgsConstructor
-public final class ExtendedTimestampExtraFieldReader implements Reader<ExtendedTimestampExtraFieldRecord> {
+public final class ExtendedTimestampExtraFieldRecordReader implements Reader<ExtendedTimestampExtraFieldRecord> {
 
     private final int size;
 
