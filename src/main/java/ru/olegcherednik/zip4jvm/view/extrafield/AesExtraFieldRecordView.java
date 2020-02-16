@@ -1,6 +1,6 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
-import ru.olegcherednik.zip4jvm.model.AesExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.AesExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.view.CompressionMethodView;

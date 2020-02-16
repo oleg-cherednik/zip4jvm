@@ -46,7 +46,7 @@ public class LocalFileHeader {
     }
 
     public CompressionMethod getOriginalCompressionMethod() {
-        return compressionMethod == CompressionMethod.AES ? extraField.getAesExtraDataRecord().getCompressionMethod() : compressionMethod;
+        return compressionMethod == CompressionMethod.AES ? extraField.getAesRecord().getCompressionMethod() : compressionMethod;
     }
 
     @Override

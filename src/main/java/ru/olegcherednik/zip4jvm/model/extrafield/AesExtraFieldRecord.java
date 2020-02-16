@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.model;
+package ru.olegcherednik.zip4jvm.model.extrafield;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -7,6 +7,9 @@ import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.ExtraField;
 
 import java.io.IOException;
 import java.nio.charset.Charset;

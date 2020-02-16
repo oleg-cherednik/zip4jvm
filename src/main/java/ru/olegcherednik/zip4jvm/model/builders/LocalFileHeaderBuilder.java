@@ -1,7 +1,6 @@
 package ru.olegcherednik.zip4jvm.model.builders;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
@@ -40,9 +39,8 @@ public final class LocalFileHeaderBuilder {
         generalPurposeFlag.setCompressionLevel(zipEntry.getCompressionLevel());
         generalPurposeFlag.setDataDescriptorAvailable(zipEntry.isDataDescriptorAvailable());
         generalPurposeFlag.setUtf8(zipEntry.isUtf8());
-        generalPurposeFlag.setEncrypted(zipEntry.getEncryption() != Encryption.OFF);
-//        generalPurposeFlag.setStrongEncryption(entry.getEncryption() == Encryption.STRONG);
-        generalPurposeFlag.setStrongEncryption(false);
+        generalPurposeFlag.setEncrypted(zipEntry.isEncrypted());
+        generalPurposeFlag.setStrongEncryption(zipEntry.isStrongEncryption());
         generalPurposeFlag.setLzmaEosMarker(zipEntry.isLzmaEosMarker());
 
         return generalPurposeFlag;
@@ -65,9 +63,7 @@ public final class LocalFileHeaderBuilder {
     }
 
     private long getCrc32() {
-        if (zipEntry.isDataDescriptorAvailable())
-            return LOOK_IN_DATA_DESCRIPTOR;
-        return zipEntry.getEncryption().getChecksum().apply(zipEntry);
+        return zipEntry.isDataDescriptorAvailable() ? LOOK_IN_DATA_DESCRIPTOR : zipEntry.getEncryptionMethod().getChecksum(zipEntry);
     }
 
     private long getSize(long size) {

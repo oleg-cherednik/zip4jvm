@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.view.decompose;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.model.Encryption;
+import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
@@ -23,7 +23,7 @@ public final class EncryptionHeaderDecompose implements Decompose {
 
     private final ZipModel zipModel;
     private final ZipInfoSettings settings;
-    private final Encryption encryption;
+    private final EncryptionMethod encryptionMethod;
     private final EncryptionHeaderBlock encryptionHeaderBlock;
     private final long pos;
 
@@ -43,14 +43,14 @@ public final class EncryptionHeaderDecompose implements Decompose {
         Path subDir = Files.createDirectories(dir.resolve("encryption"));
 
         // TODO probably same with block reader
-        if (encryption.isAes()) {
+        if (encryptionMethod.isAes()) {
             AesEncryptionHeaderBlock block = (AesEncryptionHeaderBlock)encryptionHeaderBlock;
             Utils.print(subDir.resolve("aes_encryption_header.txt"), out -> encryptionHeaderView().print(out));
 
             Utils.copyLarge(zipModel, subDir.resolve("aes_salt.data"), block.getSalt());
             Utils.copyLarge(zipModel, subDir.resolve("aes_password_checksum.data"), block.getPasswordChecksum());
             Utils.copyLarge(zipModel, subDir.resolve("aes_mac.data"), block.getMac());
-        } else if (encryption == Encryption.PKWARE) {
+        } else if (encryptionMethod == EncryptionMethod.PKWARE) {
             PkwareEncryptionHeaderBlock block = (PkwareEncryptionHeaderBlock)encryptionHeaderBlock;
             Utils.print(subDir.resolve("pkware_encryption_header.txt"), out -> encryptionHeaderView().print(out));
             Utils.copyLarge(zipModel, subDir.resolve("pkware_encryption_header.data"), block);

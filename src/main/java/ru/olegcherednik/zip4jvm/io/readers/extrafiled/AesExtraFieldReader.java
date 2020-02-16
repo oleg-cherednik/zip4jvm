@@ -1,9 +1,9 @@
-package ru.olegcherednik.zip4jvm.io.readers;
+package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.model.AesExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.AesExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
@@ -15,7 +15,7 @@ import java.io.IOException;
  * @since 14.04.2019
  */
 @RequiredArgsConstructor
-public final class AesExtraDataRecordReader implements Reader<AesExtraFieldRecord> {
+public final class AesExtraFieldReader implements Reader<AesExtraFieldRecord> {
 
     private final int size;
 

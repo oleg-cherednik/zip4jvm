@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.model.builders;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.Version;
@@ -32,7 +31,7 @@ final class FileHeaderBuilder {
         fileHeader.setGeneralPurposeFlag(createGeneralPurposeFlag());
         fileHeader.setCompressionMethod(zipEntry.getCompressionMethodForBuilder());
         fileHeader.setLastModifiedTime(zipEntry.getLastModifiedTime());
-        fileHeader.setCrc32(zipEntry.getEncryption().getChecksum().apply(zipEntry));
+        fileHeader.setCrc32(zipEntry.getEncryptionMethod().getChecksum(zipEntry));
         fileHeader.setCompressedSize(getSize(zipEntry.getCompressedSize()));
         fileHeader.setUncompressedSize(getSize(zipEntry.getUncompressedSize()));
         fileHeader.setCommentLength(0);
@@ -52,9 +51,8 @@ final class FileHeaderBuilder {
         generalPurposeFlag.setCompressionLevel(zipEntry.getCompressionLevel());
         generalPurposeFlag.setDataDescriptorAvailable(zipEntry.isDataDescriptorAvailable());
         generalPurposeFlag.setUtf8(zipEntry.isUtf8());
-        generalPurposeFlag.setEncrypted(zipEntry.getEncryption() != Encryption.OFF);
-//        generalPurposeFlag.setStrongEncryption(entry.getEncryption() == Encryption.STRONG);
-        generalPurposeFlag.setStrongEncryption(false);
+        generalPurposeFlag.setEncrypted(zipEntry.isEncrypted());
+        generalPurposeFlag.setStrongEncryption(zipEntry.isStrongEncryption());
         generalPurposeFlag.setLzmaEosMarker(zipEntry.isLzmaEosMarker());
 
         return generalPurposeFlag;

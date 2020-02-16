@@ -1,6 +1,6 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
-import ru.olegcherednik.zip4jvm.model.os.ExtendedTimestampExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.ExtendedTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 /**

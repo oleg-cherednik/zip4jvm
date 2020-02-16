@@ -12,7 +12,7 @@ import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.Encryption;
+import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
@@ -45,7 +45,7 @@ public abstract class ZipEntry {
 
     protected final CompressionMethod compressionMethod;
     private final CompressionLevel compressionLevel;
-    protected final Encryption encryption;
+    protected final EncryptionMethod encryptionMethod;
     @Getter(AccessLevel.NONE)
     private final ZipEntryInputStreamSupplier inputStreamSup;
 
@@ -77,11 +77,15 @@ public abstract class ZipEntry {
     }
 
     public final AesStrength getStrength() {
-        return AesEngine.getStrength(encryption);
+        return AesEngine.getStrength(encryptionMethod);
     }
 
     public final boolean isEncrypted() {
-        return encryption != Encryption.OFF;
+        return encryptionMethod != EncryptionMethod.OFF;
+    }
+
+    public final boolean isStrongEncryption() {
+        return false;
     }
 
     public InputStream getInputStream() throws IOException {
@@ -89,7 +93,7 @@ public abstract class ZipEntry {
     }
 
     public CompressionMethod getCompressionMethodForBuilder() {
-        return encryption.isAes() ? CompressionMethod.AES : compressionMethod;
+        return encryptionMethod.isAes() ? CompressionMethod.AES : compressionMethod;
     }
 
     @Override

@@ -1,6 +1,6 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
-import ru.olegcherednik.zip4jvm.model.os.InfoZipOldUnixExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.InfoZipOldUnixExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import static ru.olegcherednik.zip4jvm.model.ExtraField.NO_DATA;

@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.io.readers.block;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
-import ru.olegcherednik.zip4jvm.model.Encryption;
+import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
@@ -51,12 +51,12 @@ public class BlockZipEntryReader {
 
     private void readEncryptionHeader(ZipEntry zipEntry, DataInput in) throws IOException {
         String fileName = zipEntry.getFileName();
-        Encryption encryption = zipEntry.getEncryption();
+        EncryptionMethod encryptionMethod = zipEntry.getEncryptionMethod();
         EncryptionHeaderBlock block = null;
 
-        if (encryption.isAes())
+        if (encryptionMethod.isAes())
             block = new BlockAesHeaderReader(zipEntry.getStrength(), zipEntry.getCompressedSize()).read(in);
-        else if (zipEntry.getEncryption() == Encryption.PKWARE) {
+        else if (zipEntry.getEncryptionMethod() == EncryptionMethod.PKWARE) {
             block = new BlockPkwareHeaderReader().read(in);
             in.skip(zipEntry.getCompressedSize() - ((Block)block).getSize());
         } else
