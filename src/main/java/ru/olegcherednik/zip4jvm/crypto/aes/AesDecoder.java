@@ -20,12 +20,9 @@ import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.PASSWORD_CHECKSUM_SI
  */
 public final class AesDecoder implements Decoder {
 
-    private final int saltLength;
-    private final AesEngine engine;
-
     public static AesDecoder create(ZipEntry zipEntry, DataInput in) throws IOException {
         try {
-            AesStrength strength = zipEntry.getStrength();
+            AesStrength strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
             byte[] salt = in.readBytes(strength.saltLength());
             byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
 
@@ -42,6 +39,9 @@ public final class AesDecoder implements Decoder {
             throw new Zip4jvmException(e);
         }
     }
+
+    private final int saltLength;
+    private final AesEngine engine;
 
     private AesDecoder(Cipher cipher, Mac mac, int saltLength) {
         this.saltLength = saltLength;

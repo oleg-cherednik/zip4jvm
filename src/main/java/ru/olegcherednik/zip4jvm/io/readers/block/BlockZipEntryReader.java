@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
@@ -55,7 +56,7 @@ public class BlockZipEntryReader {
         EncryptionHeaderBlock block = null;
 
         if (encryptionMethod.isAes())
-            block = new BlockAesHeaderReader(zipEntry.getStrength(), zipEntry.getCompressedSize()).read(in);
+            block = new BlockAesHeaderReader(AesEngine.getStrength(zipEntry.getEncryptionMethod()), zipEntry.getCompressedSize()).read(in);
         else if (zipEntry.getEncryptionMethod() == EncryptionMethod.PKWARE) {
             block = new BlockPkwareHeaderReader().read(in);
             in.skip(zipEntry.getCompressedSize() - ((Block)block).getSize());

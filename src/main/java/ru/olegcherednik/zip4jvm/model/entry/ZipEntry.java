@@ -7,8 +7,6 @@ import lombok.Setter;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
@@ -74,10 +72,6 @@ public abstract class ZipEntry {
 
     public boolean isDirectory() {
         return false;
-    }
-
-    public final AesStrength getStrength() {
-        return AesEngine.getStrength(encryptionMethod);
     }
 
     public final boolean isEncrypted() {

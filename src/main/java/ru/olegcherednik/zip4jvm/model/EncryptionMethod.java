@@ -9,6 +9,7 @@ import ru.olegcherednik.zip4jvm.crypto.aes.AesEncoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareDecoder;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareEncoder;
+import ru.olegcherednik.zip4jvm.crypto.tripledes.TripleDesDecoder;
 import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.RegularFileZipEntry;
@@ -33,8 +34,8 @@ public enum EncryptionMethod {
     AES_256(AES_128.createEncoder, AES_128.createDecoder, AES_128.checksum),
     DES(null, null, ZipEntry::getChecksum),
     RC2_PRE_52(null, null, ZipEntry::getChecksum),
-    TRIPLE_DES_168(null, null, ZipEntry::getChecksum),
-    TRIPLE_DES_192(null, null, ZipEntry::getChecksum),
+    TRIPLE_DES_168(null, TripleDesDecoder::create, ZipEntry::getChecksum),
+    TRIPLE_DES_192(null, TRIPLE_DES_168.createDecoder, ZipEntry::getChecksum),
     RC2(null, null, ZipEntry::getChecksum),
     RC4(null, null, ZipEntry::getChecksum),
     BLOWFISH(null, null, ZipEntry::getChecksum),
