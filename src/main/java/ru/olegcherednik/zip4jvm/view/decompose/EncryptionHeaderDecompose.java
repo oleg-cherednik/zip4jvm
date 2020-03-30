@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.view.decompose;
 
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
@@ -24,6 +25,7 @@ public final class EncryptionHeaderDecompose implements Decompose {
     private final ZipModel zipModel;
     private final ZipInfoSettings settings;
     private final EncryptionMethod encryptionMethod;
+    private final DecryptionHeader decryptionHeader;
     private final EncryptionHeaderBlock encryptionHeaderBlock;
     private final long pos;
 
@@ -63,6 +65,6 @@ public final class EncryptionHeaderDecompose implements Decompose {
         int offs = settings.getOffs();
         int columnWidth = settings.getColumnWidth();
         long totalDisks = zipModel.getTotalDisks();
-        return new EncryptionHeaderView(encryptionHeaderBlock, pos, offs, columnWidth, totalDisks);
+        return new EncryptionHeaderView(decryptionHeader, encryptionHeaderBlock, pos, offs, columnWidth, totalDisks);
     }
 }

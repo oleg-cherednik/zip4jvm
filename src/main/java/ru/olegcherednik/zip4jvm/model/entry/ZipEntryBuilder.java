@@ -122,6 +122,7 @@ public final class ZipEntryBuilder {
             zipEntry.setZip64(fileHeader.isZip64());
             zipEntry.setComment(fileHeader.getComment());
             zipEntry.setUtf8(fileHeader.getGeneralPurposeFlag().isUtf8());
+            zipEntry.setStrongEncryption(generalPurposeFlag.isStrongEncryption());
 
             return zipEntry;
         }

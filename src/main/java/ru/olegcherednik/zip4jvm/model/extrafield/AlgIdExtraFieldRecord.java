@@ -20,7 +20,7 @@ import java.io.IOException;
 @Builder
 public final class AlgIdExtraFieldRecord implements ExtraField.Record {
 
-    public static final AlgIdExtraFieldRecord NULL = builder().build();
+    public static final AlgIdExtraFieldRecord NULL = builder().encryptionAlgorithm(EncryptionAlgorithm.UNKNOWN).build();
 
     public static final int SIGNATURE = 0x0017;
     public static final int SIZE_FIELD = 2 + 2; // 4 bytes: signature + size

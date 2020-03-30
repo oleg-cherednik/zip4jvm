@@ -41,7 +41,10 @@ public class Encryption3DesTest {
 
         UnzipSettings settings = UnzipSettings.builder().password(fileName -> password).build();
 
-        UnzipIt.zip(Paths.get("d:/zip4jvm/3des/3des.zip")).destDir(destDir).settings(settings).extract();
+//        UnzipIt.zip(Paths.get("d:/zip4jvm/3des/3des_lk.zip")).destDir(destDir).settings(settings).extract();
+//        UnzipIt.zip(Paths.get("d:/zip4jvm/securezip/aes/aes128.zip")).destDir(destDir).settings(settings).extract();
+//        UnzipIt.zip(Paths.get("d:/zip4jvm/securezip/aes/aes192.zip")).destDir(destDir).settings(settings).extract();
+        UnzipIt.zip(Paths.get("d:/zip4jvm/securezip/aes/aes256.zip")).destDir(destDir).settings(settings).extract();
         assertThatDirectory(destDir).matches(rootAssert);
     }
 

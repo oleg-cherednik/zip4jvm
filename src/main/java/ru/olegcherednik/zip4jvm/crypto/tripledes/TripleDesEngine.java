@@ -12,7 +12,7 @@ import javax.crypto.Cipher;
 @RequiredArgsConstructor
 public final class TripleDesEngine {
 
-    private final Cipher cipher;
+    public final Cipher cipher;
 
     public void cypherUpdate(byte[] buf, int offs, int len) {
         cipher.update(buf, offs, len);

@@ -1,5 +1,6 @@
 package ru.olegcherednik.zip4jvm.view.decompose;
 
+import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
@@ -50,7 +51,8 @@ public final class LocalFileHeaderDecompose implements Decompose {
             emptyLine |= localFileHeaderView(zipEntryBlock.getLocalFileHeader(), pos).print(out, pos != 0 || emptyLine);
             emptyLine |= extraFieldDecompose(zipEntryBlock.getLocalFileHeader(), zipEntryBlock.getLocalFileHeaderBlock().getExtraFieldBlock(),
                     settings.getOffs()).printTextInfo(out, false);
-            emptyLine |= encryptionHeader(encryptionMethod, zipEntryBlock.getEncryptionHeaderBlock(), pos).printTextInfo(out, emptyLine);
+            emptyLine |= encryptionHeader(encryptionMethod, zipEntryBlock.getDecryptionHeader(), zipEntryBlock.getEncryptionHeaderBlock(), pos)
+                    .printTextInfo(out, emptyLine);
             emptyLine |= dataDescriptor(zipEntryBlock.getDataDescriptor(), zipEntryBlock.getDataDescriptorBlock(), pos, out, emptyLine);
 
             pos++;
@@ -72,7 +74,7 @@ public final class LocalFileHeaderDecompose implements Decompose {
             localFileHeader(subDir, zipEntryBlock.getLocalFileHeader(), pos);
             extraFieldDecompose(zipEntryBlock.getLocalFileHeader(), zipEntryBlock.getLocalFileHeaderBlock().getExtraFieldBlock(), 0)
                     .decompose(subDir);
-            encryptionHeader(encryptionMethod, zipEntryBlock.getEncryptionHeaderBlock(), pos).decompose(subDir);
+            encryptionHeader(encryptionMethod, zipEntryBlock.getDecryptionHeader(), zipEntryBlock.getEncryptionHeaderBlock(), pos).decompose(subDir);
             dataDescriptor(subDir, zipEntryBlock.getDataDescriptor(), zipEntryBlock.getDataDescriptorBlock(), pos);
             copyPayload(subDir, zipModel.getZipEntryByFileName(fileName), zipEntryBlock.getLocalFileHeaderBlock(),
                     zipEntryBlock.getEncryptionHeaderBlock());
@@ -120,8 +122,9 @@ public final class LocalFileHeaderDecompose implements Decompose {
         Utils.copyLarge(blockModel.getZipModel(), dir.resolve("payload.data"), offs, size);
     }
 
-    private EncryptionHeaderDecompose encryptionHeader(EncryptionMethod encryptionMethod, EncryptionHeaderBlock encryptionHeaderBlock, long pos) {
-        return new EncryptionHeaderDecompose(zipModel, settings, encryptionMethod, encryptionHeaderBlock, pos);
+    private EncryptionHeaderDecompose encryptionHeader(EncryptionMethod encryptionMethod, DecryptionHeader decryptionHeader,
+            EncryptionHeaderBlock encryptionHeaderBlock, long pos) {
+        return new EncryptionHeaderDecompose(zipModel, settings, encryptionMethod, decryptionHeader, encryptionHeaderBlock, pos);
     }
 
     private boolean dataDescriptor(DataDescriptor dataDescriptor, Block block, long pos, PrintStream out, boolean emptyLine) {

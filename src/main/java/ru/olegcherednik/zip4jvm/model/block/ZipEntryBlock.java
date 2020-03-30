@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.model.block;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
@@ -19,8 +20,10 @@ public class ZipEntryBlock {
 
     private LocalFileHeader localFileHeader;
     private DataDescriptor dataDescriptor;
+    private DecryptionHeader decryptionHeader;
 
     private LocalFileHeaderBlock localFileHeaderBlock;
+    @Setter
     private EncryptionHeaderBlock encryptionHeaderBlock;
     private Block dataDescriptorBlock;
 
@@ -29,8 +32,9 @@ public class ZipEntryBlock {
         localFileHeaderBlock = block;
     }
 
-    public void setEncryptionHeaderBlock(EncryptionHeaderBlock block) {
-        encryptionHeaderBlock = block;
+    public void setDecryptionHeader(DecryptionHeader decryptionHeader, EncryptionHeaderBlock encryptionHeaderBlock) {
+        this.decryptionHeader = decryptionHeader;
+        this.encryptionHeaderBlock = encryptionHeaderBlock;
     }
 
     public void setDataDescriptor(DataDescriptor dataDescriptor, Block block) {

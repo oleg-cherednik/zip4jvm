@@ -22,7 +22,7 @@ public enum EncryptionAlgorithm {
     RC4(0x6801, EncryptionMethod.RC4, "RC4"),
     BLOWFISH(0x6720, EncryptionMethod.BLOWFISH, "Blowfish"),
     TWOFISH(0x6721, EncryptionMethod.TWOFISH, "Twofish"),
-    UNKNOWN(0xFFFF, EncryptionMethod.UNKNOWN, "unknown");
+    UNKNOWN(0xFFFF, EncryptionMethod.UNKNOWN, "<unknown>");
 
     private final int code;
     private final EncryptionMethod encryptionMethod;
@@ -32,6 +32,6 @@ public enum EncryptionAlgorithm {
         for (EncryptionAlgorithm encryptionAlgorithm : values())
             if (encryptionAlgorithm.code == code)
                 return encryptionAlgorithm;
-        throw new EnumConstantNotPresentException(EncryptionAlgorithm.class, "code: " + code);
+        return UNKNOWN;
     }
 }

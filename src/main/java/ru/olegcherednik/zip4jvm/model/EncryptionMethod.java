@@ -15,7 +15,6 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.RegularFileZipEntry;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.extrafield.AesExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.model.extrafield.AlgIdExtraFieldRecord;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -67,11 +66,8 @@ public enum EncryptionMethod {
             return OFF;
         if (extraField.getAesRecord() != AesExtraFieldRecord.NULL)
             return AesEngine.getEncryption(extraField.getAesRecord().getStrength());
-        if (generalPurposeFlag.isStrongEncryption()) {
-            if (extraField.getAlgIdRecord() == AlgIdExtraFieldRecord.NULL)
-                return UNKNOWN;
+        if (generalPurposeFlag.isStrongEncryption())
             return extraField.getAlgIdRecord().getEncryptionAlgorithm().getEncryptionMethod();
-        }
         return PKWARE;
     }
 

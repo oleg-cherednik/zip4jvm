@@ -65,6 +65,7 @@ public abstract class ZipEntry {
 
     private String comment;
     private boolean utf8;
+    private boolean strongEncryption;
 
     public boolean isRegularFile() {
         return false;
@@ -76,10 +77,6 @@ public abstract class ZipEntry {
 
     public final boolean isEncrypted() {
         return encryptionMethod != EncryptionMethod.OFF;
-    }
-
-    public final boolean isStrongEncryption() {
-        return false;
     }
 
     public InputStream getInputStream() throws IOException {

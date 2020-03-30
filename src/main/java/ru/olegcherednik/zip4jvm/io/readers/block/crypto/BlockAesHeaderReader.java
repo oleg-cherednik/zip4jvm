@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.io.readers.block;
+package ru.olegcherednik.zip4jvm.io.readers.block.crypto;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
