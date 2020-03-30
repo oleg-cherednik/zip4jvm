@@ -8,6 +8,7 @@ import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.block.crypto.DecryptionHeaderBlock;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author Oleg Cherednik
@@ -17,11 +18,16 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class BlockDecryptionHeaderReader extends DecryptionHeaderReader {
 
-    private final DecryptionHeaderBlock block = new DecryptionHeaderBlock();
+    private final DecryptionHeaderBlock decryptionHeaderBlock = new DecryptionHeaderBlock();
 
     @Override
     public DecryptionHeader read(DataInput in) throws IOException {
-        return block.calc(in, () -> super.read(in));
+        return decryptionHeaderBlock.calc(in, () -> super.read(in));
+    }
+
+    @Override
+    protected List<DecryptionHeader.Recipient> readRecipients(long total, int hashSize, DataInput in) throws IOException {
+        return decryptionHeaderBlock.getRecipientsBlock().calc(in, () -> super.readRecipients(total, hashSize, in));
     }
 
 }

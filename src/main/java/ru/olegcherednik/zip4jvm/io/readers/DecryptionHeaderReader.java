@@ -1,5 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
+import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
@@ -49,20 +50,32 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
         return decryptionHeader;
     }
 
-    private static List<DecryptionHeader.Recipient> readRecipients(long total, int hashSize, DataInput in) throws IOException {
-        List<DecryptionHeader.Recipient> recipients = new LinkedList<>();
+    protected List<DecryptionHeader.Recipient> readRecipients(long total, int hashSize, DataInput in) throws IOException {
+        return new Recipients(total, hashSize).read(in);
+    }
 
-        for (int i = 0; i < total; i++) {
-            DecryptionHeader.Recipient recipient = new DecryptionHeader.Recipient();
+    @RequiredArgsConstructor
+    private static final class Recipients implements Reader<List<DecryptionHeader.Recipient>> {
 
-            recipient.setSize(in.readWord());
-            recipient.setHash(in.readBytes(hashSize));
-            recipient.setSimpleKeyBlob(in.readBytes(recipient.getSize() - hashSize));
+        private final long total;
+        private final int hashSize;
 
-            recipients.add(recipient);
+        @Override
+        public List<DecryptionHeader.Recipient> read(DataInput in) throws IOException {
+            List<DecryptionHeader.Recipient> recipients = new LinkedList<>();
+
+            for (int i = 0; i < total; i++) {
+                DecryptionHeader.Recipient recipient = new DecryptionHeader.Recipient();
+
+                recipient.setSize(in.readWord());
+                recipient.setHash(in.readBytes(hashSize));
+                recipient.setSimpleKeyBlob(in.readBytes(recipient.getSize() - hashSize));
+
+                recipients.add(recipient);
+            }
+
+            return recipients;
         }
-
-        return recipients;
     }
 
 }

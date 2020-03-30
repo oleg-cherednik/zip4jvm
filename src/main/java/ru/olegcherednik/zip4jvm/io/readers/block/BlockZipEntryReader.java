@@ -62,7 +62,7 @@ public class BlockZipEntryReader {
             BlockDecryptionHeaderReader reader = new BlockDecryptionHeaderReader();
             DecryptionHeader decryptionHeader = reader.read(in);
             requireBlockExists(fileName);
-            fileNameZipEntryBlock.get(fileName).setDecryptionHeader(decryptionHeader, reader.getBlock());
+            fileNameZipEntryBlock.get(fileName).setDecryptionHeader(decryptionHeader, reader.getDecryptionHeaderBlock());
         } else if (encryptionMethod.isAes()) {
             EncryptionHeaderBlock block = new BlockAesHeaderReader(AesEngine.getStrength(encryptionMethod), zipEntry.getCompressedSize()).read(in);
             requireBlockExists(fileName);

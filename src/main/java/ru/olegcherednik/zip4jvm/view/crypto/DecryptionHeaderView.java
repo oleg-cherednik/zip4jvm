@@ -5,7 +5,6 @@ import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
 import ru.olegcherednik.zip4jvm.crypto.strong.HashAlgorithm;
-import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.crypto.DecryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.view.BaseView;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
@@ -113,15 +112,10 @@ public class DecryptionHeaderView extends BaseView {
     }
 
     private void printRecipients(PrintStream out) {
-        printValueWithLocation1(out, "recipients:", block);
-        printSize(out, decryptionHeader.getRecipients().size(), block);
-    }
+        RecipientsView.builder()
+                      .recipients(decryptionHeader.getRecipients())
+                      .block(block.getRecipientsBlock())
+                      .position(offs, columnWidth, totalDisks).build().print(out);
 
-    protected void printSize(PrintStream out, int total, Block block) {
-        if (total == 1)
-            printLine(out, "  - size:", String.format("%d bytes (1 recipient)", block.getSize()));
-        else
-            printLine(out, "  - size:", String.format("%d bytes (%d recipients)", block.getSize(), total));
     }
-
 }

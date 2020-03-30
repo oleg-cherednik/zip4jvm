@@ -5,9 +5,11 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 
 /**
  * @author Oleg Cherednik
- * @since 24.02.2020
+ * @since 30.03.2020
  */
 @Getter
 public class DecryptionHeaderBlock extends Block implements EncryptionHeaderBlock {
+
+    private final Block recipientsBlock = new Block();
 
 }
