@@ -26,9 +26,9 @@ public final class ExtendedTimestampExtraFieldRecordReader implements Reader<Ext
 
         if (flag.isLastModificationTime())
             lastModificationTime = UnixTimestampConverter.unixToJavaTime(in.readDword());
-        if (flag.isLastAccessTime())
+        if (flag.isLastAccessTime() && size > 5)
             lastAccessTime = UnixTimestampConverter.unixToJavaTime(in.readDword());
-        if (flag.isCreationTime())
+        if (flag.isCreationTime() && size > 5)
             creationTime = UnixTimestampConverter.unixToJavaTime(in.readDword());
 
         return ExtendedTimestampExtraFieldRecord.builder()

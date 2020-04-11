@@ -15,11 +15,11 @@ final class ExtendedTimestampExtraFieldRecordView extends ExtraFieldRecordView<E
 
     private ExtendedTimestampExtraFieldRecordView(Builder<ExtendedTimestampExtraFieldRecord, ExtendedTimestampExtraFieldRecordView> builder) {
         super(builder, (record, view, out) -> {
-            if (record.getFlag().isLastModificationTime())
+            if (record.getLastModificationTime() >= 0)
                 view.printLine(out, "  Last Modified Date:", ZipUtils.utcDateTime(record.getLastModificationTime()));
-            if (record.getFlag().isLastAccessTime())
+            if (record.getLastAccessTime() >= 0)
                 view.printLine(out, "  Last Accessed Date:", ZipUtils.utcDateTime(record.getLastAccessTime()));
-            if (record.getFlag().isCreationTime())
+            if (record.getCreationTime() >= 0)
                 view.printLine(out, "  Creation Date:", ZipUtils.utcDateTime(record.getCreationTime()));
         });
     }
