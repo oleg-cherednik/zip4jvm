@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.model.os;
+package ru.olegcherednik.zip4jvm.model.extrafield;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -35,13 +35,13 @@ public final class ExtendedTimestampExtraFieldRecord implements ExtraField.Recor
     // size:2 - attribute tag value #1 (0x5455)
     // size:2 - total data size for this block
     private final int dataSize;
-    // size:1 - bit flag
+    // size:1 - bit flag (refers to local header!)
     private final Flag flag;
-    // size:4 - file last modification time
+    // size:4 - file last modification time (must present in central header if present in local header)
     private final long lastModificationTime;
-    // size:4 - file last access time
+    // size:4 - file last access time (only in local header)
     private final long lastAccessTime;
-    // size:4 - file creation time
+    // size:4 - file creation time (only in local header)
     private final long creationTime;
 
     @Override

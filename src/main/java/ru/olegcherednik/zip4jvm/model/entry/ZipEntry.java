@@ -7,12 +7,10 @@ import lombok.Setter;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.Encryption;
+import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
@@ -45,7 +43,7 @@ public abstract class ZipEntry {
 
     protected final CompressionMethod compressionMethod;
     private final CompressionLevel compressionLevel;
-    protected final Encryption encryption;
+    protected final EncryptionMethod encryptionMethod;
     @Getter(AccessLevel.NONE)
     private final ZipEntryInputStreamSupplier inputStreamSup;
 
@@ -67,6 +65,7 @@ public abstract class ZipEntry {
 
     private String comment;
     private boolean utf8;
+    private boolean strongEncryption;
 
     public boolean isRegularFile() {
         return false;
@@ -76,12 +75,8 @@ public abstract class ZipEntry {
         return false;
     }
 
-    public final AesStrength getStrength() {
-        return AesEngine.getStrength(encryption);
-    }
-
     public final boolean isEncrypted() {
-        return encryption != Encryption.OFF;
+        return encryptionMethod != EncryptionMethod.OFF;
     }
 
     public InputStream getInputStream() throws IOException {
@@ -89,7 +84,7 @@ public abstract class ZipEntry {
     }
 
     public CompressionMethod getCompressionMethodForBuilder() {
-        return encryption.isAes() ? CompressionMethod.AES : compressionMethod;
+        return encryptionMethod.isAes() ? CompressionMethod.AES : compressionMethod;
     }
 
     @Override

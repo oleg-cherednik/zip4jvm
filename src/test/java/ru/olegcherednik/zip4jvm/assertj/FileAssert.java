@@ -94,7 +94,6 @@ public class FileAssert extends AbstractPathAssert<FileAssert> implements IFileA
 
                 if (matcher.matches()) {
                     String regex = matcher.group("regex");
-                    //noinspection ConstantConditions
                     if (Pattern.compile(regex).matcher(actual).matches())
                         continue;
 
@@ -102,7 +101,7 @@ public class FileAssert extends AbstractPathAssert<FileAssert> implements IFileA
                             String.format("(line %d)\r\nExpecting:\r\n<\"%s\">\r\nto be match the pattern:\r\n<\"%s\">\r\nbut was not.",
                                     pos, actual, regex));
                 } else
-                    assertThatStringLine(pos, actual).isEqualTo(expected);
+                    assertThatStringLine(this.actual, pos, actual).isEqualTo(expected);
             }
         } catch(Exception e) {
             assertThatThrownBy(() -> {

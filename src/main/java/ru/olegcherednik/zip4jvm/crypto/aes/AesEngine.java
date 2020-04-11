@@ -2,18 +2,21 @@ package ru.olegcherednik.zip4jvm.crypto.aes;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.model.Encryption;
+import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.ShortBufferException;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
 
 /**
  * @author Oleg Cherednik
@@ -65,8 +68,14 @@ public final class AesEngine {
     }
 
     public static byte[] createKey(char[] password, byte[] salt, AesStrength strength) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        final int keyLength = strength.getSize() * 2 + 16;
-        PBEKeySpec keySpec = new PBEKeySpec(password, salt, ITERATION_COUNT, keyLength);
+        int keyLength = strength.getSize() * 2 + 16;
+        KeySpec keySpec = new PBEKeySpec(password, salt, ITERATION_COUNT, keyLength);
+        return SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(keySpec).getEncoded();
+    }
+
+    public static byte[] createKey1(char[] password, byte[] salt, AesStrength strength) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        int keyLength = strength.getSize() * 2 + 16;
+        KeySpec keySpec = new PBEKeySpec(password, salt, ITERATION_COUNT, keyLength);
         return SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(keySpec).getEncoded();
     }
 
@@ -77,30 +86,37 @@ public final class AesEngine {
         return cipher;
     }
 
+    public static Cipher createCipher1(SecretKeySpec secretKeySpec, IvParameterSpec ivParameterSpec)
+            throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException {
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
+        return cipher;
+    }
+
     public static Mac createMac(SecretKeySpec secretKeySpec) throws NoSuchAlgorithmException, InvalidKeyException {
         Mac mac = Mac.getInstance("HmacSHA1");
         mac.init(secretKeySpec);
         return mac;
     }
 
-    public static AesStrength getStrength(Encryption encryption) {
-        if (encryption == Encryption.AES_128)
+    public static AesStrength getStrength(EncryptionMethod encryptionMethod) {
+        if (encryptionMethod == EncryptionMethod.AES_128)
             return AesStrength.S128;
-        if (encryption == Encryption.AES_192)
+        if (encryptionMethod == EncryptionMethod.AES_192)
             return AesStrength.S192;
-        if (encryption == Encryption.AES_256)
+        if (encryptionMethod == EncryptionMethod.AES_256)
             return AesStrength.S256;
         return AesStrength.NULL;
     }
 
-    public static Encryption getEncryption(AesStrength strength) {
+    public static EncryptionMethod getEncryption(AesStrength strength) {
         if (strength == AesStrength.S128)
-            return Encryption.AES_128;
+            return EncryptionMethod.AES_128;
         if (strength == AesStrength.S192)
-            return Encryption.AES_192;
+            return EncryptionMethod.AES_192;
         if (strength == AesStrength.S256)
-            return Encryption.AES_256;
-        return Encryption.OFF;
+            return EncryptionMethod.AES_256;
+        return EncryptionMethod.OFF;
     }
 
     public static long getDataCompressedSize(long compressedSize, int saltLength) {

@@ -33,8 +33,8 @@ public final class Zip4jvmAssertions extends Assertions {
         return new FileAssert(path);
     }
 
-    public static StringLineAssert assertThatStringLine(int pos, String str) {
-        return new StringLineAssert(pos, str);
+    public static StringLineAssert assertThatStringLine(Path path, int pos, String str) {
+        return new StringLineAssert(path, pos, str);
     }
 
     private static boolean isSplit(Path zip) {

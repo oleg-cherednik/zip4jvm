@@ -74,7 +74,7 @@ public class CentralDirectory {
         }
 
         public CompressionMethod getOriginalCompressionMethod() {
-            return compressionMethod == CompressionMethod.AES ? extraField.getAesExtraDataRecord().getCompressionMethod() : compressionMethod;
+            return compressionMethod == CompressionMethod.AES ? extraField.getAesRecord().getCompressionMethod() : compressionMethod;
         }
 
         public boolean isZip64() {
@@ -96,11 +96,11 @@ public class CentralDirectory {
         }
 
         public boolean isEncrypted() {
-            return getEncryption() != Encryption.OFF;
+            return generalPurposeFlag.isEncrypted();
         }
 
-        public Encryption getEncryption() {
-            return Encryption.get(extraField, generalPurposeFlag);
+        public EncryptionMethod getEncryptionMethod() {
+            return EncryptionMethod.get(extraField, generalPurposeFlag);
         }
 
         public boolean isWriteZip64OffsetLocalHeader() {

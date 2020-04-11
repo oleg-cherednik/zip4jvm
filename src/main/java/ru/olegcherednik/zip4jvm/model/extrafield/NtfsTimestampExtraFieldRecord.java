@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.model.os;
+package ru.olegcherednik.zip4jvm.model.extrafield;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -27,13 +27,8 @@ public final class NtfsTimestampExtraFieldRecord implements ExtraField.Record {
 
     // size:2 - tag for this "extra" block type (NTFS = 0x000A)
     // size:2 - size of total "extra" block
-    // size:4 - reserved for future use
-
-    // size:2 - attribute tag value #i
-    // size:2 - size of attribute #i (n)
-    // size:n - attribute tag #i data
-
     private final int dataSize;
+    // size:4 - reserved for future use
     private final List<Tag> tags;
 
     @Override

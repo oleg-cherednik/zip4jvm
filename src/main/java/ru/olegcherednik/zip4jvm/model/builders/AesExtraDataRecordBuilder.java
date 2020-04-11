@@ -1,9 +1,10 @@
 package ru.olegcherednik.zip4jvm.model.builders;
 
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.model.AesExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.model.extrafield.AesExtraFieldRecord;
 
 /**
  * @author Oleg Cherednik
@@ -12,10 +13,10 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 @RequiredArgsConstructor
 final class AesExtraDataRecordBuilder {
 
-    private final ZipEntry entry;
+    private final ZipEntry zipEntry;
 
     public AesExtraFieldRecord build() {
-        AesStrength strength = entry.getStrength();
+        AesStrength strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
 
         if (strength == AesStrength.NULL)
             return AesExtraFieldRecord.NULL;
@@ -25,7 +26,7 @@ final class AesExtraDataRecordBuilder {
                                   .vendor("AE")
                                   .versionNumber(2)
                                   .strength(strength)
-                                  .compressionMethod(entry.getCompressionMethod()).build();
+                                  .compressionMethod(zipEntry.getCompressionMethod()).build();
     }
 
 }

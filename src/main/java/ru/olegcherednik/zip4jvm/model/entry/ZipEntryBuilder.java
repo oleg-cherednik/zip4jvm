@@ -8,7 +8,7 @@ import ru.olegcherednik.zip4jvm.io.in.entry.EntryInputStream;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.Encryption;
+import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -68,11 +68,11 @@ public final class ZipEntryBuilder {
             CompressionMethod compressionMethod = entry.getUncompressedSize() == 0 ? CompressionMethod.STORE
                                                                                    : entrySettings.getCompression().getMethod();
             CompressionLevel compressionLevel = entrySettings.getCompressionLevel();
-            Encryption encryption = entrySettings.getEncryption();
+            EncryptionMethod encryptionMethod = entrySettings.getEncryption().getMethod();
             ZipEntryInputStreamSupplier inputStreamSup = zipEntry -> entry.getInputStream();
 
             RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, compressionMethod,
-                    compressionLevel, encryption, inputStreamSup);
+                    compressionLevel, encryptionMethod, inputStreamSup);
 
             zipEntry.setDataDescriptorAvailable(() -> true);
             zipEntry.setZip64(entrySettings.isZip64());
@@ -109,19 +109,20 @@ public final class ZipEntryBuilder {
 
             CompressionMethod compressionMethod = fileHeader.getOriginalCompressionMethod();
             CompressionLevel compressionLevel = generalPurposeFlag.getCompressionLevel();
-            Encryption encryption = fileHeader.getEncryption();
+            EncryptionMethod encryptionMethod = fileHeader.getEncryptionMethod();
             ExternalFileAttributes externalFileAttributes = fileHeader.getExternalFileAttributes();
 
             ZipEntryInputStreamSupplier inputStreamSup = createInputStreamSupplier();
 
             RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, compressionMethod,
-                    compressionLevel, encryption, inputStreamSup);
+                    compressionLevel, encryptionMethod, inputStreamSup);
 
             zipEntry.setDataDescriptorAvailable(generalPurposeFlag::isDataDescriptorAvailable);
             zipEntry.setLzmaEosMarker(generalPurposeFlag.isLzmaEosMarker());
             zipEntry.setZip64(fileHeader.isZip64());
             zipEntry.setComment(fileHeader.getComment());
             zipEntry.setUtf8(fileHeader.getGeneralPurposeFlag().isUtf8());
+            zipEntry.setStrongEncryption(generalPurposeFlag.isStrongEncryption());
 
             return zipEntry;
         }

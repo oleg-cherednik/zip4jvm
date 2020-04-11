@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.model.os;
+package ru.olegcherednik.zip4jvm.model.extrafield;
 
 import lombok.Builder;
 import lombok.Getter;

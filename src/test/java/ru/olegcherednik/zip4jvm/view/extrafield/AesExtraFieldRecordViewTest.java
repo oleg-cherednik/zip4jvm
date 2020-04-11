@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.model.AesExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.AesExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.block.Block;

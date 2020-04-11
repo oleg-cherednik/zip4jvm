@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldReader;
+import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldRecordReader;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;

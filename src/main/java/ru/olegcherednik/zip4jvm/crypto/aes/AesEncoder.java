@@ -17,15 +17,11 @@ import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.MAC_SIZE;
  */
 public final class AesEncoder implements Encoder {
 
-    private final byte[] salt;
-    private final byte[] passwordChecksum;
-    private final AesEngine engine;
-
-    public static AesEncoder create(ZipEntry entry) {
+    public static AesEncoder create(ZipEntry zipEntry) {
         try {
-            AesStrength strength = entry.getStrength();
+            AesStrength strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
             byte[] salt = strength.generateSalt();
-            byte[] key = AesEngine.createKey(entry.getPassword(), salt, strength);
+            byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
 
             Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
             Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
@@ -36,6 +32,10 @@ public final class AesEncoder implements Encoder {
             throw new Zip4jvmException(e);
         }
     }
+
+    private final byte[] salt;
+    private final byte[] passwordChecksum;
+    private final AesEngine engine;
 
     @SuppressWarnings({ "AssignmentOrReturnOfFieldWithMutableType", "MethodCanBeVariableArityMethod" })
     private AesEncoder(Cipher cipher, Mac mac, byte[] salt, byte[] passwordChecksum) {

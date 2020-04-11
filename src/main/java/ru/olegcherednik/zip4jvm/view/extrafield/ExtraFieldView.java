@@ -1,15 +1,16 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
-import ru.olegcherednik.zip4jvm.model.AesExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
-import ru.olegcherednik.zip4jvm.model.os.ExtendedTimestampExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.model.os.InfoZipNewUnixExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.model.os.InfoZipOldUnixExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.model.os.NtfsTimestampExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.AesExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.AlgIdExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.ExtendedTimestampExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.InfoZipNewUnixExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.InfoZipOldUnixExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.NtfsTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.view.BaseView;
 
 import java.io.PrintStream;
@@ -46,15 +47,7 @@ public final class ExtraFieldView extends BaseView {
     }
 
     public void printLocation(PrintStream out) {
-        printValueWithLocation1(out, "extra field:", block);
-        printSize(extraField.getTotalRecords(), out);
-    }
-
-    private void printSize(int total, PrintStream out) {
-        if (total == 1)
-            printLine(out, "  - size:", String.format("%d bytes (1 record)", block.getSize()));
-        else
-            printLine(out, "  - size:", String.format("%d bytes (%d records)", block.getSize(), total));
+        printValueWithLocation(out, "extra field:", block, extraField.getTotalRecords());
     }
 
     public void printRecord(PrintStream out, ExtraField.Record record) {
@@ -80,6 +73,8 @@ public final class ExtraFieldView extends BaseView {
             return createView((Zip64.ExtendedInfo)record);
         if (record instanceof AesExtraFieldRecord)
             return createView((AesExtraFieldRecord)record);
+        if (record instanceof AlgIdExtraFieldRecord)
+            return createView((AlgIdExtraFieldRecord)record);
         return createView(record);
     };
 
@@ -124,6 +119,14 @@ public final class ExtraFieldView extends BaseView {
                                       .generalPurposeFlag(generalPurposeFlag)
                                       .block(block.getRecord(record.getSignature()))
                                       .position(offs, columnWidth, totalDisks).build();
+    }
+
+    private AlgIdExtraFieldRecordView createView(AlgIdExtraFieldRecord record) {
+        return AlgIdExtraFieldRecordView.builder()
+                                        .record(record)
+                                        .generalPurposeFlag(generalPurposeFlag)
+                                        .block(block.getRecord(record.getSignature()))
+                                        .position(offs, columnWidth, totalDisks).build();
     }
 
     private UnknownExtraFieldRecordView createView(ExtraField.Record record) {

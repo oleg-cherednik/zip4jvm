@@ -1,20 +1,20 @@
-package ru.olegcherednik.zip4jvm.io.readers;
+package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.readers.os.ExtendedTimestampExtraFieldReader;
-import ru.olegcherednik.zip4jvm.io.readers.os.InfoZipNewUnixExtraFieldReader;
-import ru.olegcherednik.zip4jvm.io.readers.os.InfoZipOldUnitExtraFieldReader;
-import ru.olegcherednik.zip4jvm.io.readers.os.NtfsTimestampExtraFieldReader;
-import ru.olegcherednik.zip4jvm.model.AesExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldRecordReader;
+import ru.olegcherednik.zip4jvm.io.readers.Zip64Reader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.Zip64;
-import ru.olegcherednik.zip4jvm.model.os.ExtendedTimestampExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.model.os.InfoZipNewUnixExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.model.os.InfoZipOldUnixExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.model.os.NtfsTimestampExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.AesExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.AlgIdExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.ExecutableJarMarkerExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.ExtendedTimestampExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.InfoZipNewUnixExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.InfoZipOldUnixExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.NtfsTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
@@ -55,11 +55,14 @@ public class ExtraFieldReader implements Reader<ExtraField> {
         Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> map = new HashMap<>();
 
         map.put(Zip64.ExtendedInfo.SIGNATURE, size -> new Zip64Reader.ExtendedInfo(size, uncompressedSize, compressedSize, offs, disk));
-        map.put(AesExtraFieldRecord.SIGNATURE, AesExtraDataRecordReader::new);
-        map.put(NtfsTimestampExtraFieldRecord.SIGNATURE, NtfsTimestampExtraFieldReader::new);
-        map.put(InfoZipOldUnixExtraFieldRecord.SIGNATURE, InfoZipOldUnitExtraFieldReader::new);
-        map.put(InfoZipNewUnixExtraFieldRecord.SIGNATURE, InfoZipNewUnixExtraFieldReader::new);
-        map.put(ExtendedTimestampExtraFieldRecord.SIGNATURE, ExtendedTimestampExtraFieldReader::new);
+        map.put(AesExtraFieldRecord.SIGNATURE, AesExtraFieldRecordReader::new);
+        map.put(NtfsTimestampExtraFieldRecord.SIGNATURE, NtfsTimestampExtraFieldRecordReader::new);
+        map.put(InfoZipOldUnixExtraFieldRecord.SIGNATURE, InfoZipOldUnixExtraFieldRecordReader::new);
+        map.put(InfoZipNewUnixExtraFieldRecord.SIGNATURE, InfoZipNewUnixExtraFieldRecordReader::new);
+        map.put(ExtendedTimestampExtraFieldRecord.SIGNATURE, ExtendedTimestampExtraFieldRecordReader::new);
+        map.put(AlgIdExtraFieldRecord.SIGNATURE, AlgIdExtraFieldRecordReader::new);
+        map.put(ExecutableJarMarkerExtraFieldRecord.SIGNATURE, ExecutableJarMarkerExtraFieldRecordReader::new);
+
         return map;
     }
 
