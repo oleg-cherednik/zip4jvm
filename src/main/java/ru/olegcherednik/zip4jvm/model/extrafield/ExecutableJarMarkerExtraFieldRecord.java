@@ -9,8 +9,8 @@ import ru.olegcherednik.zip4jvm.model.ExtraField;
 import java.io.IOException;
 
 /**
- * Jar file could be treated as <b>executable</b> (but this is not mandatory marker) if this <tt>ExtraField</tt> is added as the very first extra
- * field of the archive.
+ * Jar file could be treated as <b>executable</b> (but this is not mandatory marker) if this ExtraField is added as the very first extra field of the
+ * archive.
  * <p>
  * <i>It's an "internal implementation detail" to support "executable" jar on Solaris platform</i>
  *
