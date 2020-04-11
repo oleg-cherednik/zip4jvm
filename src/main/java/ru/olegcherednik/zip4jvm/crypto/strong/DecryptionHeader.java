@@ -56,17 +56,4 @@ public class DecryptionHeader {
         hashAlgorithm = HashAlgorithm.parseCode(code);
     }
 
-    @Getter
-    @Setter
-    public static final class Recipient {
-
-        // size:2 = combined size of followed fields (w)
-        private int size;
-        // size:p - hash of Public Key
-        private byte[] hash;
-        // size:(w - p) - Simple Key Blob
-        private byte[] simpleKeyBlob;
-
-    }
-
 }

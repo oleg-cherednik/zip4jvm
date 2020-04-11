@@ -5,6 +5,7 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.view.BaseView;
 
 import java.io.PrintStream;
+import java.util.regex.Pattern;
 
 /**
  * @author Oleg Cherednik
@@ -31,10 +32,13 @@ public abstract class ExtraFieldRecordView<T extends ExtraField.Record> extends 
         return record.getTitle();
     }
 
+    private static final Pattern SPACE = Pattern.compile(" ");
+    private static final Pattern SLASH = Pattern.compile("[/\\\\]");
+
     public String getFileName() {
         String title = getTitle();
-        title = title.replaceAll(" ", "_");
-        title = title.replaceAll("[/\\\\]", "-");
+        title = SPACE.matcher(title).replaceAll("_");
+        title = SLASH.matcher(title).replaceAll("-");
         return String.format("(0x%04X)_%s", getSignature(), title);
     }
 

@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.io.readers.block.crypto;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
+import ru.olegcherednik.zip4jvm.crypto.strong.Recipient;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.block.crypto.DecryptionHeaderBlock;
@@ -26,7 +27,7 @@ public class BlockDecryptionHeaderReader extends DecryptionHeaderReader {
     }
 
     @Override
-    protected List<DecryptionHeader.Recipient> readRecipients(long total, int hashSize, DataInput in) throws IOException {
+    protected List<Recipient> readRecipients(int total, int hashSize, DataInput in) throws IOException {
         return decryptionHeaderBlock.getRecipientsBlock().calc(in, () -> super.readRecipients(total, hashSize, in));
     }
 

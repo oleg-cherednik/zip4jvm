@@ -47,15 +47,7 @@ public final class ExtraFieldView extends BaseView {
     }
 
     public void printLocation(PrintStream out) {
-        printValueWithLocation1(out, "extra field:", block);
-        printSize(extraField.getTotalRecords(), out);
-    }
-
-    private void printSize(int total, PrintStream out) {
-        if (total == 1)
-            printLine(out, "  - size:", String.format("%d bytes (1 record)", block.getSize()));
-        else
-            printLine(out, "  - size:", String.format("%d bytes (%d records)", block.getSize(), total));
+        printValueWithLocation2(out, "extra field:", block, extraField.getTotalRecords());
     }
 
     public void printRecord(PrintStream out, ExtraField.Record record) {
@@ -131,10 +123,10 @@ public final class ExtraFieldView extends BaseView {
 
     private AlgIdExtraFieldRecordView createView(AlgIdExtraFieldRecord record) {
         return AlgIdExtraFieldRecordView.builder()
-                                      .record(record)
-                                      .generalPurposeFlag(generalPurposeFlag)
-                                      .block(block.getRecord(record.getSignature()))
-                                      .position(offs, columnWidth, totalDisks).build();
+                                        .record(record)
+                                        .generalPurposeFlag(generalPurposeFlag)
+                                        .block(block.getRecord(record.getSignature()))
+                                        .position(offs, columnWidth, totalDisks).build();
     }
 
     private UnknownExtraFieldRecordView createView(ExtraField.Record record) {

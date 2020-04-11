@@ -5,13 +5,15 @@ import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
 import ru.olegcherednik.zip4jvm.crypto.strong.HashAlgorithm;
+import ru.olegcherednik.zip4jvm.crypto.strong.Recipient;
+import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.crypto.DecryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.view.BaseView;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.SizeView;
 
 import java.io.PrintStream;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Optional;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
@@ -33,12 +35,22 @@ public class DecryptionHeaderView extends BaseView {
         this.block = requireNotNull(block, "BlockDecryptionHeaderView.localFileHeader");
         this.pos = pos;
 
-        DecryptionHeader.Recipient recipient = new DecryptionHeader.Recipient();
-        recipient.setHash(new byte[] { 1, 2, 3 });
-        recipient.setSimpleKeyBlob(new byte[] { 4, 5, 6 });
-        recipient.setSize(6);
+        Recipient one = new Recipient();
+        one.setHash(new byte[] { 1, 2, 3 });
+        one.setSimpleKeyBlob(new byte[] { 4, 5, 6 });
+        one.setSize(6);
 
-        decryptionHeader.setRecipients(Collections.singletonList(recipient));
+        Recipient two = new Recipient();
+        two.setHash(new byte[] { 11, 22, 33 });
+        two.setSimpleKeyBlob(new byte[] { 44, 55, 66 });
+        two.setSize(66);
+
+        decryptionHeader.setRecipients(Arrays.asList(one, two));
+
+        block.getRecipientsBlock().setOffs(0x666);
+
+        block.getRecipientsBlock().addRecipient(0, Block.NULL);
+        block.getRecipientsBlock().addRecipient(1, Block.NULL);
     }
 
     @Override
@@ -51,17 +63,9 @@ public class DecryptionHeaderView extends BaseView {
         printFlags(out);
         printEncryptedRandomData(out);
         printHashAlgorithm(out);
-        printRecipients(out);
         printPasswordValidationData(out);
         printChecksum(out);
         printRecipients(out);
-                           /*
-    // size:2 - size of initialization vector (k)
-    // size:k - password validation data
-    private byte[] passwordValidationData;
-    // size:4 - checksum of password validation data
-    private long crc32;
-            */
         return true;
     }
 
@@ -112,10 +116,17 @@ public class DecryptionHeaderView extends BaseView {
     }
 
     private void printRecipients(PrintStream out) {
-        RecipientsView.builder()
-                      .recipients(decryptionHeader.getRecipients())
-                      .block(block.getRecipientsBlock())
-                      .position(offs, columnWidth, totalDisks).build().print(out);
+        printValueWithLocation2(out, "recipients:", block, decryptionHeader.getRecipients().size());
 
+        int i = 0;
+
+        for (Recipient recipient : decryptionHeader.getRecipients()) {
+            RecipientView.builder()
+                         .num(i)
+                         .recipient(recipient)
+                         .block(block.getRecipientsBlock().getRecipient(i))
+                         .position(offs + 2, columnWidth, totalDisks).build().print(out);
+            i++;
+        }
     }
 }

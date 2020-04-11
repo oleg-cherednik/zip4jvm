@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
+import ru.olegcherednik.zip4jvm.crypto.strong.Recipient;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
@@ -10,6 +11,8 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64;
 
 /**
  * @author Oleg Cherednik
@@ -36,7 +39,10 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
         boolean passwordKey = decryptionHeader.getFlags() == Flags.PASSWORD_KEY;
         int encryptedRandomDataSize = in.readWord();
         decryptionHeader.setEncryptedRandomData(in.readBytes(encryptedRandomDataSize));
-        long recipientCount = in.readDword();
+        int recipientCount = (int)in.readDword();
+
+        realBigZip64(recipientCount, "recipientCount");
+
         decryptionHeader.setHashAlgorithm(passwordKey ? 0 : in.readWord());
         int hashSize = passwordKey ? 0x0 : in.readWord();
         decryptionHeader.setRecipients(readRecipients(recipientCount, hashSize, in));
@@ -50,27 +56,25 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
         return decryptionHeader;
     }
 
-    protected List<DecryptionHeader.Recipient> readRecipients(long total, int hashSize, DataInput in) throws IOException {
+    protected List<Recipient> readRecipients(int total, int hashSize, DataInput in) throws IOException {
         return new Recipients(total, hashSize).read(in);
     }
 
     @RequiredArgsConstructor
-    private static final class Recipients implements Reader<List<DecryptionHeader.Recipient>> {
+    private static final class Recipients implements Reader<List<Recipient>> {
 
-        private final long total;
+        private final int total;
         private final int hashSize;
 
         @Override
-        public List<DecryptionHeader.Recipient> read(DataInput in) throws IOException {
-            List<DecryptionHeader.Recipient> recipients = new LinkedList<>();
+        public List<Recipient> read(DataInput in) throws IOException {
+            List<Recipient> recipients = new LinkedList<>();
 
             for (int i = 0; i < total; i++) {
-                DecryptionHeader.Recipient recipient = new DecryptionHeader.Recipient();
-
+                Recipient recipient = new Recipient();
                 recipient.setSize(in.readWord());
                 recipient.setHash(in.readBytes(hashSize));
                 recipient.setSimpleKeyBlob(in.readBytes(recipient.getSize() - hashSize));
-
                 recipients.add(recipient);
             }
 

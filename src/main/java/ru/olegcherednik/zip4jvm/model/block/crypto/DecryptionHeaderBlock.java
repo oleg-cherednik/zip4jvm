@@ -10,6 +10,6 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 @Getter
 public class DecryptionHeaderBlock extends Block implements EncryptionHeaderBlock {
 
-    private final Block recipientsBlock = new Block();
+    private final RecipientsBlock recipientsBlock = new RecipientsBlock();
 
 }
