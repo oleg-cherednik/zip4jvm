@@ -11,6 +11,8 @@ import java.io.IOException;
 /**
  * Jar file could be treated as <b>executable</b> (but this is not mandatory marker) if this <tt>ExtraField</tt> is added as the very first extra
  * field of the archive.
+ * <p>
+ * <i>It's an "internal implementation detail" to support "executable" jar on Solaris platform</i>
  *
  * @author Oleg Cherednik
  * @since 25.10.2019
@@ -52,7 +54,6 @@ public final class ExecutableJarMarkerExtraFieldRecord implements ExtraField.Rec
     public void write(DataOutput out) throws IOException {
         throw new NotImplementedException();
     }
-
 
 
 }
