@@ -34,7 +34,7 @@ zip4jvm - a java library for working with zip files
 ## Gradle
 
 ~~~~
-compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.2'
+compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.3'
 ~~~~
 
 ## Maven
@@ -43,7 +43,7 @@ compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.2'
 <dependency>
     <groupId>ru.oleg-cherednik.zip4jvm</groupId>
     <artifactId>zip4jvm</artifactId>
-    <version>1.2</version>
+    <version>1.3</version>
 </dependency>
 ~~~~
 
