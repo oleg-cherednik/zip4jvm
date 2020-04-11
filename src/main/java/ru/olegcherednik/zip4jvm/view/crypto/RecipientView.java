@@ -32,7 +32,7 @@ final class RecipientView extends BaseView {
 
     @Override
     public boolean print(PrintStream out) {
-        printValueWithLocation1(out, String.format("#%d - location:", num + 1), block);
+        printValueWithLocation(out, String.format("#%d - location:", num + 1), block);
         printLine(out, "  size:", recipient.getSize());
         printHash(out);
         printSimpleKeyBlob(out);

@@ -47,7 +47,7 @@ public final class ExtraFieldView extends BaseView {
     }
 
     public void printLocation(PrintStream out) {
-        printValueWithLocation2(out, "extra field:", block, extraField.getTotalRecords());
+        printValueWithLocation(out, "extra field:", block, extraField.getTotalRecords());
     }
 
     public void printRecord(PrintStream out, ExtraField.Record record) {

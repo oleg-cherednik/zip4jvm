@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.encryption;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
@@ -20,7 +19,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
  * @author Oleg Cherednik
  * @since 16.02.2020
  */
-@Test
+//@Test
 @SuppressWarnings("FieldNamingConvention")
 public class Encryption3DesTest {
 
