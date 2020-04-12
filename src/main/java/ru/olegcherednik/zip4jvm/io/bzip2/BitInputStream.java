@@ -22,7 +22,6 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteOrder;
 
 /**
@@ -109,19 +108,6 @@ class BitInputStream implements Closeable {
     }
 
     /**
-     * Returns an estimate of the number of bits that can be read from
-     * this input stream without blocking by the next invocation of a
-     * method for this input stream.
-     *
-     * @return estimate of the number of bits that can be read without blocking
-     * @throws IOException if the underlying stream throws one when calling available
-     * @since 1.16
-     */
-    public long bitsAvailable() throws IOException {
-        return bitsCachedSize + ((long)Byte.SIZE) * in.available();
-    }
-
-    /**
      * Drops bits until the next bits will be read from a byte boundary.
      *
      * @since 1.16
@@ -131,19 +117,6 @@ class BitInputStream implements Closeable {
         if (toSkip > 0) {
             readCachedBits(toSkip);
         }
-    }
-
-    /**
-     * Returns the number of bytes read from the underlying stream.
-     *
-     * <p>This includes the bytes read to fill the current cache and
-     * not read as bits so far.</p>
-     *
-     * @return the number of bytes read from the underlying stream
-     * @since 1.17
-     */
-    public long getBytesRead() {
-        return in.getBytesRead();
     }
 
     private long processBitsGreater57(final int count) throws IOException {
