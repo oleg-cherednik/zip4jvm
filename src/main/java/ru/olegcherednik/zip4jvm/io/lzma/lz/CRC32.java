@@ -7,7 +7,7 @@ package ru.olegcherednik.zip4jvm.io.lzma.lz;
  * @since 14.02.2020
  */
 @SuppressWarnings("NewClassNamingConvention")
-final class CRC32Hash {
+final class CRC32 {
 
     private static final int[] CRC_TABLE = createTable();
 
@@ -15,7 +15,7 @@ final class CRC32Hash {
     private final HashData three = new HashData(65536);
     private final HashData four;
 
-    public CRC32Hash(int dictionarySize) {
+    public CRC32(int dictionarySize) {
         four = new HashData(getHash4Size(dictionarySize));
     }
 

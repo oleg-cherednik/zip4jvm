@@ -11,10 +11,10 @@ import java.io.InputStream;
  */
 public class Bzip2InputStream extends InputStream {
 
-    private final BZip2CompressorInputStream bzip2;
+    private final Bzip2CompressorInputStream bzip2;
 
     public Bzip2InputStream(DataInput in) throws IOException {
-        bzip2 = new BZip2CompressorInputStream(in);
+        bzip2 = new Bzip2CompressorInputStream(in);
     }
 
     @Override

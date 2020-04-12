@@ -10,7 +10,7 @@ import static ru.olegcherednik.zip4jvm.io.lzma.LzmaEncoder.MATCH_LEN_MAX;
  */
 final class HashChain extends LzEncoder {
 
-    private final CRC32Hash hash;
+    private final CRC32 crc32;
     private final int[] chain;
     private final Matches matches;
     private final int depthLimit;
@@ -28,7 +28,7 @@ final class HashChain extends LzEncoder {
         super(properties, extraSizeAfter);
 
         niceLength = properties.getNiceLength();
-        hash = new CRC32Hash(properties.getDictionarySize());
+        crc32 = new CRC32(properties.getDictionarySize());
 
         // +1 because we need dictSize bytes of history + the current byte.
         cyclicSize = properties.getDictionarySize() + 1;
@@ -65,11 +65,11 @@ final class HashChain extends LzEncoder {
                 niceLenLimit = avail;
         }
 
-        hash.calcHashes(buf, pos);
-        int delta2 = lzPos - hash.getHash2Pos();
-        int delta3 = lzPos - hash.getHash3Pos();
-        int currentMatch = hash.getHash4Pos();
-        hash.updateTables(lzPos);
+        crc32.calcHashes(buf, pos);
+        int delta2 = lzPos - crc32.getHash2Pos();
+        int delta3 = lzPos - crc32.getHash3Pos();
+        int currentMatch = crc32.getHash4Pos();
+        crc32.updateTables(lzPos);
 
         chain[cyclicPos] = currentMatch;
 
@@ -155,9 +155,9 @@ final class HashChain extends LzEncoder {
         while (len-- > 0) {
             if (movePos() != 0) {
                 // Update the hash chain and hash tables.
-                hash.calcHashes(buf, pos);
-                chain[cyclicPos] = hash.getHash4Pos();
-                hash.updateTables(lzPos);
+                crc32.calcHashes(buf, pos);
+                chain[cyclicPos] = crc32.getHash4Pos();
+                crc32.updateTables(lzPos);
             }
         }
     }
@@ -174,7 +174,7 @@ final class HashChain extends LzEncoder {
         if (avail != 0) {
             if (++lzPos == Integer.MAX_VALUE) {
                 int normalizationOffset = Integer.MAX_VALUE - cyclicSize;
-                hash.normalize(normalizationOffset);
+                crc32.normalize(normalizationOffset);
                 normalize(chain, cyclicSize, normalizationOffset);
                 lzPos -= normalizationOffset;
             }

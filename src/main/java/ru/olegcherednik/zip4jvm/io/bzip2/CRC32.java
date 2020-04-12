@@ -4,9 +4,9 @@ package ru.olegcherednik.zip4jvm.io.bzip2;
  * @author Oleg Cherednik
  * @since 12.04.2020
  */
-final class CRC {
+final class CRC32 {
 
-    private static final int[] CRC32_TABLE = {
+    private static final int[] CRC_TABLE = {
             0x00000000, 0x04c11db7, 0x09823b6e, 0x0d4326d9,
             0x130476dc, 0x17c56b6b, 0x1a864db2, 0x1e475005,
             0x2608edb8, 0x22c9f00f, 0x2f8ad6d6, 0x2b4bcb61,
@@ -75,7 +75,7 @@ final class CRC {
 
     private int globalCrc;
 
-    public CRC() {
+    public CRC32() {
         initialiseCRC();
     }
 
@@ -92,14 +92,14 @@ final class CRC {
         if (temp < 0) {
             temp = 256 + temp;
         }
-        globalCrc = (globalCrc << 8) ^ CRC.CRC32_TABLE[temp];
+        globalCrc = (globalCrc << 8) ^ CRC32.CRC_TABLE[temp];
     }
 
     void updateCRC(final int inCh, int repeat) {
         int globalCrcShadow = this.globalCrc;
         while (repeat-- > 0) {
             final int temp = (globalCrcShadow >> 24) ^ inCh;
-            globalCrcShadow = (globalCrcShadow << 8) ^ CRC32_TABLE[(temp >= 0) ? temp : (temp + 256)];
+            globalCrcShadow = (globalCrcShadow << 8) ^ CRC_TABLE[(temp >= 0) ? temp : (temp + 256)];
         }
         this.globalCrc = globalCrcShadow;
     }

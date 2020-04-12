@@ -12,7 +12,7 @@ import java.util.Arrays;
  * @author Oleg Cherednik
  * @since 12.04.2020
  */
-class BZip2CompressorInputStream extends InputStream {
+class Bzip2CompressorInputStream extends InputStream {
 
     /**
      * Index of the last char in the block, so the block size == last + 1.
@@ -32,12 +32,11 @@ class BZip2CompressorInputStream extends InputStream {
 
     private boolean blockRandomised;
 
-    private final CRC crc = new CRC();
+    private final CRC32 crc32 = new CRC32();
 
     private int nInUse;
 
     private BitInputStream bin;
-    private final boolean decompressConcatenated;
 
     private static final int EOF = 0;
     private static final int START_BLOCK_STATE = 1;
@@ -68,7 +67,7 @@ class BZip2CompressorInputStream extends InputStream {
     /**
      * All memory intensive stuff. This field is initialized by initBlock().
      */
-    private BZip2CompressorInputStream.Data data;
+    private Bzip2CompressorInputStream.Data data;
 
     /**
      * Constructs a new BZip2CompressorInputStream which decompresses bytes
@@ -79,24 +78,8 @@ class BZip2CompressorInputStream extends InputStream {
      * @throws IOException          if the stream content is malformed or an I/O error occurs.
      * @throws NullPointerException if {@code in == null}
      */
-    public BZip2CompressorInputStream(DataInput in) throws IOException {
-        this(in, false);
-    }
-
-    /**
-     * Constructs a new BZip2CompressorInputStream which decompresses bytes
-     * read from the specified stream.
-     *
-     * @param in                     the InputStream from which this object should be created
-     * @param decompressConcatenated if true, decompress until the end of the input;
-     *                               if false, stop after the first .bz2 stream and
-     *                               leave the input position to point to the next
-     *                               byte after the .bz2 stream
-     * @throws IOException if {@code in == null}, the stream content is malformed, or an I/O error occurs.
-     */
-    public BZip2CompressorInputStream(DataInput in, final boolean decompressConcatenated) throws IOException {
+    public Bzip2CompressorInputStream(DataInput in) throws IOException {
         bin = new BitInputStream(in);
-        this.decompressConcatenated = decompressConcatenated;
 
         init(true);
         initBlock();
@@ -281,18 +264,18 @@ class BZip2CompressorInputStream extends InputStream {
          * it if the input file is empty.
          */
         if (this.data == null) {
-            this.data = new BZip2CompressorInputStream.Data(this.blockSize100k);
+            this.data = new Bzip2CompressorInputStream.Data(this.blockSize100k);
         }
 
         // currBlockNo++;
         getAndMoveToFrontDecode();
 
-        this.crc.initialiseCRC();
+        this.crc32.initialiseCRC();
         this.currentState = START_BLOCK_STATE;
     }
 
     private void endBlock() throws IOException {
-        this.computedBlockCRC = this.crc.getFinalCRC();
+        this.computedBlockCRC = this.crc32.getFinalCRC();
 
         // A bad CRC is considered a fatal error.
         if (this.storedBlockCRC != this.computedBlockCRC) {
@@ -319,9 +302,7 @@ class BZip2CompressorInputStream extends InputStream {
             throw new IOException("BZip2 CRC error");
         }
 
-        // Look for the next .bz2 stream if decompressing
-        // concatenated files.
-        return !decompressConcatenated || !init(false);
+        return true;
     }
 
     @Override
@@ -420,7 +401,7 @@ class BZip2CompressorInputStream extends InputStream {
 
     private void recvDecodingTables() throws IOException {
         final BitInputStream bin = this.bin;
-        final BZip2CompressorInputStream.Data dataShadow = this.data;
+        final Bzip2CompressorInputStream.Data dataShadow = this.data;
         final boolean[] inUse = dataShadow.inUse;
         final byte[] pos = dataShadow.recvDecodingTables_pos;
         final byte[] selector = dataShadow.selector;
@@ -514,7 +495,7 @@ class BZip2CompressorInputStream extends InputStream {
      */
     private void createHuffmanDecodingTables(final int alphaSize,
             final int nGroups) throws IOException {
-        final BZip2CompressorInputStream.Data dataShadow = this.data;
+        final Bzip2CompressorInputStream.Data dataShadow = this.data;
         final char[][] len = dataShadow.temp_charArray2d;
         final int[] minLens = dataShadow.minLens;
         final int[][] limit = dataShadow.limit;
@@ -545,7 +526,7 @@ class BZip2CompressorInputStream extends InputStream {
         this.origPtr = bsR(bin, 24);
         recvDecodingTables();
 
-        final BZip2CompressorInputStream.Data dataShadow = this.data;
+        final Bzip2CompressorInputStream.Data dataShadow = this.data;
         final byte[] ll8 = dataShadow.ll8;
         final int[] unzftab = dataShadow.unzftab;
         final byte[] selector = dataShadow.selector;
@@ -687,7 +668,7 @@ class BZip2CompressorInputStream extends InputStream {
     }
 
     private int getAndMoveToFrontDecode0() throws IOException {
-        final BZip2CompressorInputStream.Data dataShadow = this.data;
+        final Bzip2CompressorInputStream.Data dataShadow = this.data;
         final int zt = dataShadow.selector[0] & 0xff;
         checkBounds(zt, Constants.N_GROUPS, "zt");
         final int[] limit_zt = dataShadow.limit[zt];
@@ -761,7 +742,7 @@ class BZip2CompressorInputStream extends InputStream {
             this.su_ch2 = su_ch2Shadow ^= (this.su_rNToGo == 1) ? 1 : 0;
             this.su_i2++;
             this.currentState = RAND_PART_B_STATE;
-            this.crc.updateCRC(su_ch2Shadow);
+            this.crc32.updateCRC(su_ch2Shadow);
             return su_ch2Shadow;
         }
         endBlock();
@@ -778,7 +759,7 @@ class BZip2CompressorInputStream extends InputStream {
             this.su_tPos = this.data.tt[this.su_tPos];
             this.su_i2++;
             this.currentState = NO_RAND_PART_B_STATE;
-            this.crc.updateCRC(su_ch2Shadow);
+            this.crc32.updateCRC(su_ch2Shadow);
             return su_ch2Shadow;
         }
         this.currentState = NO_RAND_PART_A_STATE;
@@ -818,7 +799,7 @@ class BZip2CompressorInputStream extends InputStream {
 
     private int setupRandPartC() throws IOException {
         if (this.su_j2 < this.su_z) {
-            this.crc.updateCRC(this.su_ch2);
+            this.crc32.updateCRC(this.su_ch2);
             this.su_j2++;
             return this.su_ch2;
         }
@@ -846,7 +827,7 @@ class BZip2CompressorInputStream extends InputStream {
     private int setupNoRandPartC() throws IOException {
         if (this.su_j2 < this.su_z) {
             final int su_ch2Shadow = this.su_ch2;
-            this.crc.updateCRC(su_ch2Shadow);
+            this.crc32.updateCRC(su_ch2Shadow);
             this.su_j2++;
             this.currentState = NO_RAND_PART_C_STATE;
             return su_ch2Shadow;

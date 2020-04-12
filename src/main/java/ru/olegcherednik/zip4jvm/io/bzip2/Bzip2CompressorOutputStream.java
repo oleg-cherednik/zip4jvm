@@ -44,7 +44,7 @@ import java.io.OutputStream;
  * </pre>
  *
  * <p> To get the memory required for decompression by {@link
- * BZip2CompressorInputStream} use </p>
+ * Bzip2CompressorInputStream} use </p>
  *
  * <pre>
  * &lt;code&gt;65k + (5 * blocksize)&lt;/code&gt;.
@@ -121,7 +121,7 @@ import java.io.OutputStream;
  *
  * @NotThreadSafe
  */
-public class BZip2CompressorOutputStream extends OutputStream {
+class Bzip2CompressorOutputStream extends OutputStream {
 
     /**
      * The minimum supported blocksize {@code  == 1}.
@@ -300,7 +300,7 @@ public class BZip2CompressorOutputStream extends OutputStream {
 
     private int bsBuff;
     private int bsLive;
-    private final CRC crc = new CRC();
+    private final CRC32 crc32 = new CRC32();
 
     private int nInUse;
 
@@ -344,7 +344,7 @@ public class BZip2CompressorOutputStream extends OutputStream {
      * @throws IOException          if an I/O error occurs in the specified stream.
      * @throws NullPointerException if <code>out == null</code>.
      */
-    public BZip2CompressorOutputStream(final OutputStream out)
+    public Bzip2CompressorOutputStream(final OutputStream out)
             throws IOException {
         this(out, MAX_BLOCKSIZE);
     }
@@ -360,7 +360,7 @@ public class BZip2CompressorOutputStream extends OutputStream {
      * @see #MIN_BLOCKSIZE
      * @see #MAX_BLOCKSIZE
      */
-    public BZip2CompressorOutputStream(final OutputStream out, final int blockSize) throws IOException {
+    public Bzip2CompressorOutputStream(final OutputStream out, final int blockSize) throws IOException {
         if (blockSize < 1) {
             throw new IllegalArgumentException("blockSize(" + blockSize + ") < 1");
         }
@@ -408,7 +408,7 @@ public class BZip2CompressorOutputStream extends OutputStream {
             final byte ch = (byte)currentCharShadow;
 
             int runLengthShadow = this.runLength;
-            this.crc.updateCRC(currentCharShadow, runLengthShadow);
+            this.crc32.updateCRC(currentCharShadow, runLengthShadow);
 
             switch (runLengthShadow) {
                 case 1:
@@ -526,7 +526,7 @@ public class BZip2CompressorOutputStream extends OutputStream {
 
     private void initBlock() {
         // blockNo++;
-        this.crc.initialiseCRC();
+        this.crc32.initialiseCRC();
         this.last = -1;
         // ch = 0;
 
@@ -538,7 +538,7 @@ public class BZip2CompressorOutputStream extends OutputStream {
     }
 
     private void endBlock() throws IOException {
-        this.blockCRC = this.crc.getFinalCRC();
+        this.blockCRC = this.crc32.getFinalCRC();
         this.combinedCRC = (this.combinedCRC << 1) | (this.combinedCRC >>> 31);
         this.combinedCRC ^= this.blockCRC;
 

@@ -13,7 +13,7 @@ import java.io.OutputStream;
 public class Bzip2OutputStream extends OutputStream {
 
     private final DataOutput out;
-    private BZip2CompressorOutputStream bzip2;
+    private Bzip2CompressorOutputStream bzip2;
 
     public Bzip2OutputStream(DataOutput out, long uncompressedSize) throws IOException {
         this.out = out;
@@ -35,7 +35,7 @@ public class Bzip2OutputStream extends OutputStream {
         if (bzip2 != null)
             return;
 
-        bzip2 = new BZip2CompressorOutputStream(new OutputStream() {
+        bzip2 = new Bzip2CompressorOutputStream(new OutputStream() {
             @Override
             public void write(int b) throws IOException {
                 out.writeByte(b);
