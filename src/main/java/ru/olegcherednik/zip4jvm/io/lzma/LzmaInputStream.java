@@ -97,10 +97,6 @@ public class LzmaInputStream extends InputStream {
         return size;
     }
 
-    /**
-     * Closes the stream and calls <code>in.close()</code>.
-     * If the stream was already closed, this does nothing.
-     */
     @Override
     public void close() throws IOException {
         lzma.close();

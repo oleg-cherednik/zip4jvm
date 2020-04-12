@@ -7,6 +7,7 @@ import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SolidZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipLzmaSolidZip;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
@@ -21,9 +22,15 @@ public class SecureZipToZip4jvmCompatibilityTest {
 
     private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(SecureZipToZip4jvmCompatibilityTest.class);
 
-    public void shouldUnzipWhenSevenZipSplit() throws IOException {
+    public void shouldUnzipWhenLzmaSolid() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         UnzipIt.zip(secureZipLzmaSolidZip).destDir(destDir).extract();
+        assertThatDirectory(destDir).matches(dirBikesAssert);
+    }
+
+    public void shouldUnzipWhenBzip2Solid() throws IOException {
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        UnzipIt.zip(secureZipBzip2SolidZip).destDir(destDir).extract();
         assertThatDirectory(destDir).matches(dirBikesAssert);
     }
 

@@ -12,7 +12,8 @@ import lombok.RequiredArgsConstructor;
 public enum Compression {
     STORE(CompressionMethod.STORE),
     DEFLATE(CompressionMethod.DEFLATE),
-    LZMA(CompressionMethod.LZMA);;
+    LZMA(CompressionMethod.LZMA),
+    BZIP2(CompressionMethod.BZIP2);
 
     private final CompressionMethod method;
 

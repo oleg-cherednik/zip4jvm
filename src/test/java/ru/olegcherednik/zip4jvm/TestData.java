@@ -89,6 +89,7 @@ public final class TestData {
 
     // secure-zip
     public static final Path secureZipLzmaSolidZip = Paths.get("src/test/resources/secure-zip/lzma_solid_off.zip").toAbsolutePath();
+    public static final Path secureZipBzip2SolidZip = Paths.get("src/test/resources/secure-zip/bzip2_solid_off.zip").toAbsolutePath();
 
     // winrar
     public static final Path winRarStoreSolidZip = Paths.get("src/test/resources/winrar/store_solid_off.zip").toAbsolutePath();
