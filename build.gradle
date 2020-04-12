@@ -47,6 +47,7 @@ dependencies {
     implementation 'commons-io:commons-io:2.6'
     implementation 'commons-lang:commons-lang:2.6'
     implementation 'org.apache.commons:commons-collections4:4.3'
+    implementation 'org.apache.commons:commons-compress:1.20'
 
     annotationProcessor("org.projectlombok:lombok:1.18.12")
 
