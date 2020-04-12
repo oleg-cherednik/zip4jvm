@@ -24,10 +24,12 @@ import java.io.InputStream;
 
 /**
  * Input stream that tracks the number of bytes read.
- * @since 1.3
+ *
  * @NotThreadSafe
+ * @since 1.3
  */
-public class CountingInputStream extends FilterInputStream {
+class CountingInputStream extends FilterInputStream {
+
     private long bytesRead;
 
     public CountingInputStream(final InputStream in) {
@@ -74,6 +76,7 @@ public class CountingInputStream extends FilterInputStream {
 
     /**
      * Returns the current number of bytes read from this stream.
+     *
      * @return the number of read bytes
      */
     public long getBytesRead() {

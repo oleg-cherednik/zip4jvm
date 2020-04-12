@@ -11,8 +11,7 @@ import java.util.Arrays;
  * @author Oleg Cherednik
  * @since 12.04.2020
  */
-public class BZip2CompressorInputStream extends CompressorInputStream
-        implements BZip2Constants, InputStreamStatistics {
+class BZip2CompressorInputStream extends CompressorInputStream implements BZip2Constants {
 
     /**
      * Index of the last char in the block, so the block size == last + 1.
@@ -147,14 +146,6 @@ public class BZip2CompressorInputStream extends CompressorInputStream
         }
 
         return (destOffs == offs) ? -1 : (destOffs - offs);
-    }
-
-    /**
-     * @since 1.17
-     */
-    @Override
-    public long getCompressedCount() {
-        return bin.getBytesRead();
     }
 
     private void makeMaps() {

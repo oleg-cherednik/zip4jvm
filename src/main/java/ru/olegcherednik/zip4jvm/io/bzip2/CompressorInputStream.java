@@ -20,7 +20,8 @@ package ru.olegcherednik.zip4jvm.io.bzip2;
 
 import java.io.InputStream;
 
-public abstract class CompressorInputStream extends InputStream {
+abstract class CompressorInputStream extends InputStream {
+
     private long bytesRead = 0;
 
     /**
@@ -28,11 +29,10 @@ public abstract class CompressorInputStream extends InputStream {
      * Doesn't increment if the EOF has been hit (read == -1)
      *
      * @param read the number of bytes read
-     *
      * @since 1.1
      */
     protected void count(final int read) {
-        count((long) read);
+        count((long)read);
     }
 
     /**
@@ -59,38 +59,24 @@ public abstract class CompressorInputStream extends InputStream {
 
     /**
      * Returns the current number of bytes read from this stream.
+     *
      * @return the number of read bytes
      * @deprecated this method may yield wrong results for large
      * archives, use #getBytesRead instead
      */
     @Deprecated
     public int getCount() {
-        return (int) bytesRead;
+        return (int)bytesRead;
     }
 
     /**
      * Returns the current number of bytes read from this stream.
-     * @return the number of read bytes
      *
+     * @return the number of read bytes
      * @since 1.1
      */
     public long getBytesRead() {
         return bytesRead;
     }
 
-    /**
-     * Returns the amount of raw or compressed bytes read by the stream.
-     *
-     * <p>This implementation invokes {@link #getBytesRead}.</p>
-     *
-     * <p>Provides half of {@link
-     * org.apache.commons.compress.utils.InputStreamStatistics}
-     * without forcing subclasses to implement the other half.</p>
-     *
-     * @return the amount of decompressed bytes returned by the stream
-     * @since 1.17
-     */
-    public long getUncompressedCount() {
-        return getBytesRead();
-    }
 }
