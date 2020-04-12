@@ -16,11 +16,9 @@ import java.io.InputStream;
 public class LzmaInputStream extends InputStream {
 
     private final LzmaDecoder lzma;
+    private final byte[] buf = new byte[1];
 
     private boolean endReached;
-
-    private final byte[] tempBuf = new byte[1];
-
     /* Number of uncompressed bytes left to be decompressed, or -1 if the end marker is used. */
     private long remainingSize;
 
@@ -31,7 +29,7 @@ public class LzmaInputStream extends InputStream {
 
     @Override
     public int read() throws IOException {
-        return read(tempBuf, 0, 1) == -1 ? -1 : (tempBuf[0] & 0xFF);
+        return read(buf, 0, 1) == -1 ? -1 : (buf[0] & 0xFF);
     }
 
     @Override
