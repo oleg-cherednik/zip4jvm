@@ -121,7 +121,7 @@ import java.io.OutputStream;
  *
  * @NotThreadSafe
  */
-public class BZip2CompressorOutputStream extends CompressorOutputStream {
+public class BZip2CompressorOutputStream extends OutputStream {
 
     /**
      * The minimum supported blocksize {@code  == 1}.

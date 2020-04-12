@@ -36,26 +36,17 @@ class BitInputStream implements Closeable {
     private static final long[] MASKS = new long[MAXIMUM_CACHE_SIZE + 1];
 
     static {
-        for (int i = 1; i <= MAXIMUM_CACHE_SIZE; i++) {
+        for (int i = 1; i <= MAXIMUM_CACHE_SIZE; i++)
             MASKS[i] = (MASKS[i - 1] << 1) + 1;
-        }
     }
 
-    private final CountingInputStream in;
-    private final ByteOrder byteOrder;
+    private final DataInput in;
+    private final ByteOrder byteOrder = ByteOrder.BIG_ENDIAN;
     private long bitsCached = 0;
     private int bitsCachedSize = 0;
 
-    /**
-     * Constructor taking an InputStream and its bit arrangement.
-     *
-     * @param in        the InputStream
-     * @param byteOrder the bit arrangement across byte boundaries,
-     *                  either BIG_ENDIAN (aaaaabbb bb000000) or LITTLE_ENDIAN (bbbaaaaa 000000bb)
-     */
-    public BitInputStream(DataInput in, final ByteOrder byteOrder) {
-        this.in = new CountingInputStream(in);
-        this.byteOrder = byteOrder;
+    public BitInputStream(DataInput in) {
+        this.in = in;
     }
 
     @Override
@@ -127,7 +118,7 @@ class BitInputStream implements Closeable {
         // bitsCachedSize >= 57 and left-shifting it 8 bits would cause an overflow
         int bitsToAddCount = count - bitsCachedSize;
         overflowBits = Byte.SIZE - bitsToAddCount;
-        final long nextByte = in.read();
+        final long nextByte = in.readByte();
         if (nextByte < 0) {
             return nextByte;
         }
@@ -150,7 +141,7 @@ class BitInputStream implements Closeable {
     private long readCachedBits(int count) {
         final long bitsOut;
         if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
-            bitsOut = (bitsCached & MASKS[count]);
+            bitsOut = bitsCached & MASKS[count];
             bitsCached >>>= count;
         } else {
             bitsOut = (bitsCached >> (bitsCachedSize - count)) & MASKS[count];
@@ -168,12 +159,12 @@ class BitInputStream implements Closeable {
      */
     private boolean ensureCache(final int count) throws IOException {
         while (bitsCachedSize < count && bitsCachedSize < 57) {
-            final long nextByte = in.read();
+            final long nextByte = in.readByte();
             if (nextByte < 0) {
                 return true;
             }
             if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
-                bitsCached |= (nextByte << bitsCachedSize);
+                bitsCached |= nextByte << bitsCachedSize;
             } else {
                 bitsCached <<= Byte.SIZE;
                 bitsCached |= nextByte;

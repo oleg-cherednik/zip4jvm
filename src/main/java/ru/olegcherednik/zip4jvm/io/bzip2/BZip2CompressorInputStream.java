@@ -4,7 +4,6 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteOrder;
 import java.util.Arrays;
 
 /**
@@ -13,7 +12,7 @@ import java.util.Arrays;
  * @author Oleg Cherednik
  * @since 12.04.2020
  */
-class BZip2CompressorInputStream extends CompressorInputStream {
+class BZip2CompressorInputStream extends InputStream {
 
     /**
      * Index of the last char in the block, so the block size == last + 1.
@@ -96,7 +95,7 @@ class BZip2CompressorInputStream extends CompressorInputStream {
      * @throws IOException if {@code in == null}, the stream content is malformed, or an I/O error occurs.
      */
     public BZip2CompressorInputStream(DataInput in, final boolean decompressConcatenated) throws IOException {
-        this.bin = new BitInputStream(in, ByteOrder.BIG_ENDIAN);
+        bin = new BitInputStream(in);
         this.decompressConcatenated = decompressConcatenated;
 
         init(true);
@@ -107,7 +106,6 @@ class BZip2CompressorInputStream extends CompressorInputStream {
     public int read() throws IOException {
         if (this.bin != null) {
             final int r = read0();
-            count(r < 0 ? -1 : 1);
             return r;
         }
         throw new IOException("Stream closed");
@@ -143,7 +141,6 @@ class BZip2CompressorInputStream extends CompressorInputStream {
         int b;
         while (destOffs < hi && ((b = read0()) >= 0)) {
             dest[destOffs++] = (byte)b;
-            count(1);
         }
 
         return (destOffs == offs) ? -1 : (destOffs - offs);
