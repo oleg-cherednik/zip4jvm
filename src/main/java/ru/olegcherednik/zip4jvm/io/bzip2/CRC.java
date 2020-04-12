@@ -1,32 +1,12 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package ru.olegcherednik.zip4jvm.io.bzip2;
 
 /**
- * A simple class the hold and calculate the CRC for sanity checking of the data.
- *
  * @author Oleg Cherednik
  * @since 12.04.2020
  */
-class CRC {
+final class CRC {
 
-    private static final int crc32Table[] = {
+    private static final int[] CRC32_TABLE = {
             0x00000000, 0x04c11db7, 0x09823b6e, 0x0d4326d9,
             0x130476dc, 0x17c56b6b, 0x1a864db2, 0x1e475005,
             0x2608edb8, 0x22c9f00f, 0x2f8ad6d6, 0x2b4bcb61,
@@ -93,7 +73,9 @@ class CRC {
             0xbcb4666d, 0xb8757bda, 0xb5365d03, 0xb1f740b4
     };
 
-    CRC() {
+    private int globalCrc;
+
+    public CRC() {
         initialiseCRC();
     }
 
@@ -105,32 +87,20 @@ class CRC {
         return ~globalCrc;
     }
 
-    int getGlobalCRC() {
-        return globalCrc;
-    }
-
-    void setGlobalCRC(final int newCrc) {
-        globalCrc = newCrc;
-    }
-
     void updateCRC(final int inCh) {
         int temp = (globalCrc >> 24) ^ inCh;
         if (temp < 0) {
             temp = 256 + temp;
         }
-        globalCrc = (globalCrc << 8) ^ CRC.crc32Table[temp];
+        globalCrc = (globalCrc << 8) ^ CRC.CRC32_TABLE[temp];
     }
 
     void updateCRC(final int inCh, int repeat) {
         int globalCrcShadow = this.globalCrc;
         while (repeat-- > 0) {
             final int temp = (globalCrcShadow >> 24) ^ inCh;
-            globalCrcShadow = (globalCrcShadow << 8) ^ crc32Table[(temp >= 0)
-                                                                  ? temp
-                                                                  : (temp + 256)];
+            globalCrcShadow = (globalCrcShadow << 8) ^ CRC32_TABLE[(temp >= 0) ? temp : (temp + 256)];
         }
         this.globalCrc = globalCrcShadow;
     }
-
-    private int globalCrc;
 }
