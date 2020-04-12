@@ -18,8 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.io.bzip2;
 
-import org.apache.commons.compress.utils.CountingInputStream;
-
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
