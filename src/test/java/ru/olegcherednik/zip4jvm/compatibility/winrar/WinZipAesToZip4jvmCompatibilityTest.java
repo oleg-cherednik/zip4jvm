@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.compatibility;
+package ru.olegcherednik.zip4jvm.compatibility.winrar;
 
 import de.idyl.winzipaes.AesZipFileEncrypter;
 import de.idyl.winzipaes.impl.AESEncrypterJCA;

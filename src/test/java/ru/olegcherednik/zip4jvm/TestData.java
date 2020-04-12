@@ -87,6 +87,9 @@ public final class TestData {
     public static final Path zipDeflateSolidPkware = dirRoot.resolve("deflate/solid/pkware/src.zip");
     public static final Path zipDeflateSolidAes = dirRoot.resolve("deflate/solid/aes/src.zip");
 
+    // secure-zip
+    public static final Path secureZipLzmaSolidZip = Paths.get("src/test/resources/secure-zip/lzma_solid_off.zip").toAbsolutePath();
+
     // winrar
     public static final Path winRarStoreSolidZip = Paths.get("src/test/resources/winrar/store_solid_off.zip").toAbsolutePath();
     public static final Path winRarStoreSolidPkwareZip = Paths.get("src/test/resources/winrar/store_solid_pkware.zip").toAbsolutePath();

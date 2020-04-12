@@ -86,8 +86,9 @@ public class LzmaInputStream extends InputStream {
             }
 
             if (endReached) {
-                if (!lzma.getRaceDecoder().isFinished() || lzma.getLz().hasPending())
-                    throw new LzmaCorruptedInputException();
+// TODO it works with 7-ZIP but does not work with SecureZIP
+//                if (!lzma.getRaceDecoder().isFinished() || lzma.getLz().hasPending())
+//                    throw new LzmaCorruptedInputException();
 
                 return size == 0 ? -1 : size;
             }

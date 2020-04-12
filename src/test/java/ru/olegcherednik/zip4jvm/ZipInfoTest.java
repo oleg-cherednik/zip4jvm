@@ -151,7 +151,9 @@ public class ZipInfoTest {
 //        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/lzma/enc/lzma-ultra.zip"));
 //        res = res.settings(ZipInfoSettings.builder().readEntries(false).build());
 //        ZipInfo res = ZipInfo.zip(sevenZipLzmaSolidZip);
-        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/3des/3des_store_168.zip"));
+//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/3des/3des_store_168.zip"));
+//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/bzip2/bzip2.zip"));
+        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/bzip2/ppmd.zip"));
 //        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/securezip/aes/aes128.zip"));
 //        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/securezip/aes/aes192.zip"));
 //        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/securezip/aes/aes256.zip"));
@@ -162,7 +164,7 @@ public class ZipInfoTest {
         return res;
     }
 
-    @Test(enabled = false)
+    @Test//(enabled = false)
     public void printShortInfo() throws IOException {
         ZipInfoSettings settings = ZipInfoSettings.builder().copyPayload(true).build();
         zipInfo().settings(settings).printShortInfo(System.out);

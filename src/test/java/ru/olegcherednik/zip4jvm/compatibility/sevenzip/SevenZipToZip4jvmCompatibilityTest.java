@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.compatibility;
+package ru.olegcherednik.zip4jvm.compatibility.sevenzip;
 
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.UnzipIt;
