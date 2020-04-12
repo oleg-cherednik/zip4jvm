@@ -13,13 +13,8 @@ public class Bzip2InputStream extends InputStream {
 
     private final BZip2CompressorInputStream bzip2;
 
-    public Bzip2InputStream(DataInput in, long uncompressedSize) throws IOException {
-        bzip2 = new BZip2CompressorInputStream(new InputStream() {
-            @Override
-            public int read() throws IOException {
-                return in.readByte();
-            }
-        });
+    public Bzip2InputStream(DataInput in) throws IOException {
+        bzip2 = new BZip2CompressorInputStream(in);
     }
 
     @Override

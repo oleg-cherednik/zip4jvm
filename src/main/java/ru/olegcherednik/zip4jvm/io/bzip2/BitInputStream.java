@@ -18,6 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.io.bzip2;
 
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,7 +54,7 @@ class BitInputStream implements Closeable {
      * @param byteOrder the bit arrangement across byte boundaries,
      *                  either BIG_ENDIAN (aaaaabbb bb000000) or LITTLE_ENDIAN (bbbaaaaa 000000bb)
      */
-    public BitInputStream(final InputStream in, final ByteOrder byteOrder) {
+    public BitInputStream(DataInput in, final ByteOrder byteOrder) {
         this.in = new CountingInputStream(in);
         this.byteOrder = byteOrder;
     }

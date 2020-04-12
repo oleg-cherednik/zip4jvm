@@ -943,10 +943,10 @@ class BlockSort {
          * last+NUM_OVERSHOOT_BYTES inclusive. First, set up the overshoot area
          * for block.
          */
-        for (int i = 0; i < BZip2Constants.NUM_OVERSHOOT_BYTES; i++) {
+        for (int i = 0; i < Constants.NUM_OVERSHOOT_BYTES; i++) {
             block[lastShadow + i + 2] = block[(i % (lastShadow + 1)) + 1];
         }
-        for (int i = lastShadow + BZip2Constants.NUM_OVERSHOOT_BYTES + 1; --i >= 0; ) {
+        for (int i = lastShadow + Constants.NUM_OVERSHOOT_BYTES + 1; --i >= 0; ) {
             quadrant[i] = 0;
         }
         block[0] = block[lastShadow + 1];
@@ -1079,7 +1079,7 @@ class BlockSort {
                     final int a2update = fmap[bbStart + j];
                     final char qVal = (char)(j >> shifts);
                     quadrant[a2update] = qVal;
-                    if (a2update < BZip2Constants.NUM_OVERSHOOT_BYTES) {
+                    if (a2update < Constants.NUM_OVERSHOOT_BYTES) {
                         quadrant[a2update + lastShadow + 1] = qVal;
                     }
                 }

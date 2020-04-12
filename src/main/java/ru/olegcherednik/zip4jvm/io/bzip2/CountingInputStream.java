@@ -18,6 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.io.bzip2;
 
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,8 +34,13 @@ class CountingInputStream extends FilterInputStream {
 
     private long bytesRead;
 
-    public CountingInputStream(final InputStream in) {
-        super(in);
+    public CountingInputStream(DataInput in) {
+        super(new InputStream() {
+            @Override
+            public int read() throws IOException {
+                return in.readByte();
+            }
+        });
     }
 
     @Override

@@ -21,7 +21,7 @@ final class Bzip2EntryInputStream extends EntryInputStream {
     }
 
     private Bzip2InputStream createDecoder() throws IOException {
-        return new Bzip2InputStream(in, uncompressedSize);
+        return new Bzip2InputStream(in);
     }
 
     @Override

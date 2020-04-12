@@ -121,7 +121,7 @@ import java.io.OutputStream;
  *
  * @NotThreadSafe
  */
-public class BZip2CompressorOutputStream extends CompressorOutputStream implements BZip2Constants {
+public class BZip2CompressorOutputStream extends CompressorOutputStream {
 
     /**
      * The minimum supported blocksize {@code  == 1}.
@@ -372,7 +372,7 @@ public class BZip2CompressorOutputStream extends CompressorOutputStream implemen
         this.out = out;
 
         /* 20 is just a paranoia constant */
-        this.allowableBlockSize = (this.blockSize100k * BZip2Constants.BASEBLOCKSIZE) - 20;
+        this.allowableBlockSize = (this.blockSize100k * Constants.BASEBLOCKSIZE) - 20;
         init();
     }
 
@@ -707,7 +707,7 @@ public class BZip2CompressorOutputStream extends CompressorOutputStream implemen
         final byte[][] len = this.data.sendMTFValues_len;
         final int alphaSize = this.nInUse + 2;
 
-        for (int t = N_GROUPS; --t >= 0; ) {
+        for (int t = Constants.N_GROUPS; --t >= 0; ) {
             final byte[] len_t = len[t];
             for (int v = alphaSize; --v >= 0; ) {
                 len_t[v] = GREATER_ICOST;
@@ -799,7 +799,7 @@ public class BZip2CompressorOutputStream extends CompressorOutputStream implemen
 
         int nSelectors = 0;
 
-        for (int iter = 0; iter < N_ITERS; iter++) {
+        for (int iter = 0; iter < Constants.N_ITERS; iter++) {
             for (int t = nGroups; --t >= 0; ) {
                 fave[t] = 0;
                 final int[] rfreqt = rfreq[t];
@@ -818,9 +818,9 @@ public class BZip2CompressorOutputStream extends CompressorOutputStream implemen
                  * coding tables.
                  */
 
-                final int ge = Math.min(gs + G_SIZE - 1, nMTFShadow - 1);
+                final int ge = Math.min(gs + Constants.G_SIZE - 1, nMTFShadow - 1);
 
-                if (nGroups == N_GROUPS) {
+                if (nGroups == Constants.N_GROUPS) {
                     // unrolled version of the else-block
 
                     short cost0 = 0;
@@ -1111,7 +1111,7 @@ public class BZip2CompressorOutputStream extends CompressorOutputStream implemen
         int bsBuffShadow = this.bsBuff;
 
         for (int gs = 0; gs < nMTFShadow; ) {
-            final int ge = Math.min(gs + G_SIZE - 1, nMTFShadow - 1);
+            final int ge = Math.min(gs + Constants.G_SIZE - 1, nMTFShadow - 1);
             final int selector_selCtr = selector[selCtr] & 0xff;
             final int[] code_selCtr = code[selector_selCtr];
             final byte[] len_selCtr = len[selector_selCtr];
@@ -1214,13 +1214,13 @@ public class BZip2CompressorOutputStream extends CompressorOutputStream implemen
                     zPend--;
                     while (true) {
                         if ((zPend & 1) == 0) {
-                            sfmap[wr] = RUNA;
+                            sfmap[wr] = Constants.RUNA;
                             wr++;
-                            mtfFreq[RUNA]++;
+                            mtfFreq[Constants.RUNA]++;
                         } else {
-                            sfmap[wr] = RUNB;
+                            sfmap[wr] = Constants.RUNB;
                             wr++;
-                            mtfFreq[RUNB]++;
+                            mtfFreq[Constants.RUNB]++;
                         }
 
                         if (zPend >= 2) {
@@ -1241,13 +1241,13 @@ public class BZip2CompressorOutputStream extends CompressorOutputStream implemen
             zPend--;
             while (true) {
                 if ((zPend & 1) == 0) {
-                    sfmap[wr] = RUNA;
+                    sfmap[wr] = Constants.RUNA;
                     wr++;
-                    mtfFreq[RUNA]++;
+                    mtfFreq[Constants.RUNA]++;
                 } else {
-                    sfmap[wr] = RUNB;
+                    sfmap[wr] = Constants.RUNB;
                     wr++;
-                    mtfFreq[RUNB]++;
+                    mtfFreq[Constants.RUNB]++;
                 }
 
                 if (zPend >= 2) {
@@ -1269,25 +1269,25 @@ public class BZip2CompressorOutputStream extends CompressorOutputStream implemen
         /* maps unsigned byte => "does it occur in block" */
         final boolean[] inUse = new boolean[256]; // 256 byte
         final byte[] unseqToSeq = new byte[256]; // 256 byte
-        final int[] mtfFreq = new int[MAX_ALPHA_SIZE]; // 1032 byte
-        final byte[] selector = new byte[MAX_SELECTORS]; // 18002 byte
-        final byte[] selectorMtf = new byte[MAX_SELECTORS]; // 18002 byte
+        final int[] mtfFreq = new int[Constants.MAX_ALPHA_SIZE]; // 1032 byte
+        final byte[] selector = new byte[Constants.MAX_SELECTORS]; // 18002 byte
+        final byte[] selectorMtf = new byte[Constants.MAX_SELECTORS]; // 18002 byte
 
         final byte[] generateMTFValues_yy = new byte[256]; // 256 byte
-        final byte[][] sendMTFValues_len = new byte[N_GROUPS][MAX_ALPHA_SIZE]; // 1548
+        final byte[][] sendMTFValues_len = new byte[Constants.N_GROUPS][Constants.MAX_ALPHA_SIZE]; // 1548
         // byte
-        final int[][] sendMTFValues_rfreq = new int[N_GROUPS][MAX_ALPHA_SIZE]; // 6192
+        final int[][] sendMTFValues_rfreq = new int[Constants.N_GROUPS][Constants.MAX_ALPHA_SIZE]; // 6192
         // byte
-        final int[] sendMTFValues_fave = new int[N_GROUPS]; // 24 byte
-        final short[] sendMTFValues_cost = new short[N_GROUPS]; // 12 byte
-        final int[][] sendMTFValues_code = new int[N_GROUPS][MAX_ALPHA_SIZE]; // 6192
+        final int[] sendMTFValues_fave = new int[Constants.N_GROUPS]; // 24 byte
+        final short[] sendMTFValues_cost = new short[Constants.N_GROUPS]; // 12 byte
+        final int[][] sendMTFValues_code = new int[Constants.N_GROUPS][Constants.MAX_ALPHA_SIZE]; // 6192
         // byte
-        final byte[] sendMTFValues2_pos = new byte[N_GROUPS]; // 6 byte
+        final byte[] sendMTFValues2_pos = new byte[Constants.N_GROUPS]; // 6 byte
         final boolean[] sentMTFValues4_inUse16 = new boolean[16]; // 16 byte
 
-        final int[] heap = new int[MAX_ALPHA_SIZE + 2]; // 1040 byte
-        final int[] weight = new int[MAX_ALPHA_SIZE * 2]; // 2064 byte
-        final int[] parent = new int[MAX_ALPHA_SIZE * 2]; // 2064 byte
+        final int[] heap = new int[Constants.MAX_ALPHA_SIZE + 2]; // 1040 byte
+        final int[] weight = new int[Constants.MAX_ALPHA_SIZE * 2]; // 2064 byte
+        final int[] parent = new int[Constants.MAX_ALPHA_SIZE * 2]; // 2064 byte
 
         // ------------
         // 333408 byte
@@ -1313,8 +1313,8 @@ public class BZip2CompressorOutputStream extends CompressorOutputStream implemen
         int origPtr;
 
         Data(final int blockSize100k) {
-            final int n = blockSize100k * BZip2Constants.BASEBLOCKSIZE;
-            this.block = new byte[(n + 1 + NUM_OVERSHOOT_BYTES)];
+            final int n = blockSize100k * Constants.BASEBLOCKSIZE;
+            this.block = new byte[(n + 1 + Constants.NUM_OVERSHOOT_BYTES)];
             this.fmap = new int[n];
             this.sfmap = new char[2 * n];
         }
