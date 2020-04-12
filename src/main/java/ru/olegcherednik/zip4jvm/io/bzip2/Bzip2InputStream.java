@@ -1,5 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.bzip2;
 
+import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
 import java.io.IOException;
@@ -13,6 +14,8 @@ import java.util.Arrays;
  * @since 12.04.2020
  */
 public class Bzip2InputStream extends InputStream {
+
+    private final BitInputStream in;
 
     /**
      * Index of the last char in the block, so the block size == last + 1.
@@ -36,18 +39,7 @@ public class Bzip2InputStream extends InputStream {
 
     private int nInUse;
 
-    private final BitInputStream in;
-
-    private static final int EOF = 0;
-    private static final int START_BLOCK_STATE = 1;
-    private static final int RAND_PART_A_STATE = 2;
-    private static final int RAND_PART_B_STATE = 3;
-    private static final int RAND_PART_C_STATE = 4;
-    private static final int NO_RAND_PART_A_STATE = 5;
-    private static final int NO_RAND_PART_B_STATE = 6;
-    private static final int NO_RAND_PART_C_STATE = 7;
-
-    private int currentState = START_BLOCK_STATE;
+    private State currentState = State.START_BLOCK_STATE;
 
     private int storedBlockCRC, storedCombinedCRC;
     private int computedBlockCRC, computedCombinedCRC;
@@ -71,39 +63,25 @@ public class Bzip2InputStream extends InputStream {
 
     public Bzip2InputStream(DataInput in) throws IOException {
         this.in = new BitInputStream(in);
-
-        init(true);
+        init();
         initBlock();
     }
 
     @Override
     public int read() throws IOException {
-        return read0();
+        return currentState.read(this);
     }
 
     @Override
     public int read(final byte[] dest, final int offs, final int len) throws IOException {
-        if (offs < 0) {
-            throw new IndexOutOfBoundsException("offs(" + offs + ") < 0.");
-        }
-        if (len < 0) {
-            throw new IndexOutOfBoundsException("len(" + len + ") < 0.");
-        }
-        if (offs + len > dest.length) {
-            throw new IndexOutOfBoundsException("offs(" + offs + ") + len("
-                    + len + ") > dest.length(" + dest.length + ").");
-        }
-        if (this.in == null) {
-            throw new IOException("Stream closed");
-        }
-        if (len == 0) {
+        if (len == 0)
             return 0;
-        }
 
         final int hi = offs + len;
         int destOffs = offs;
         int b;
-        while (destOffs < hi && ((b = read0()) >= 0)) {
+
+        while (destOffs < hi && ((b = currentState.read(this)) >= 0)) {
             dest[destOffs++] = (byte)b;
         }
 
@@ -125,63 +103,21 @@ public class Bzip2InputStream extends InputStream {
         this.nInUse = nInUseShadow;
     }
 
-    private int read0() throws IOException {
-        switch (currentState) {
-            case EOF:
-                return -1;
-
-            case START_BLOCK_STATE:
-                return setupBlock();
-
-            case RAND_PART_A_STATE:
-                throw new IllegalStateException();
-
-            case RAND_PART_B_STATE:
-                return setupRandPartB();
-
-            case RAND_PART_C_STATE:
-                return setupRandPartC();
-
-            case NO_RAND_PART_A_STATE:
-                throw new IllegalStateException();
-
-            case NO_RAND_PART_B_STATE:
-                return setupNoRandPartB();
-
-            case NO_RAND_PART_C_STATE:
-                return setupNoRandPartC();
-
-            default:
-                throw new IllegalStateException();
-        }
-    }
-
     private int readNextByte(BitInputStream in) throws IOException {
         long b = in.readBits(8);
         return (int)b;
     }
 
-    private boolean init(final boolean isFirstStream) throws IOException {
-        if (null == in) {
+    private boolean init() throws IOException {
+        if (null == in)
             throw new IOException("No InputStream");
-        }
-
-        if (!isFirstStream) {
-            in.clearBitCache();
-        }
 
         final int magic0 = readNextByte(this.in);
-        if (magic0 == -1 && !isFirstStream) {
-            return false;
-        }
         final int magic1 = readNextByte(this.in);
         final int magic2 = readNextByte(this.in);
 
-        if (magic0 != 'B' || magic1 != 'Z' || magic2 != 'h') {
-            throw new IOException(isFirstStream
-                                  ? "Stream is not in the BZip2 format"
-                                  : "Garbage after a valid BZip2 stream");
-        }
+        if (magic0 != 'B' || magic1 != 'Z' || magic2 != 'h')
+            throw new IOException("Stream is not in the BZip2 format");
 
         final int blockSize = readNextByte(this.in);
         if ((blockSize < '1') || (blockSize > '9')) {
@@ -196,7 +132,6 @@ public class Bzip2InputStream extends InputStream {
     }
 
     private void initBlock() throws IOException {
-        BitInputStream bin = this.in;
         char magic0;
         char magic1;
         char magic2;
@@ -206,12 +141,12 @@ public class Bzip2InputStream extends InputStream {
 
         while (true) {
             // Get the block magic bytes.
-            magic0 = bsGetUByte(bin);
-            magic1 = bsGetUByte(bin);
-            magic2 = bsGetUByte(bin);
-            magic3 = bsGetUByte(bin);
-            magic4 = bsGetUByte(bin);
-            magic5 = bsGetUByte(bin);
+            magic0 = bsGetUByte(in);
+            magic1 = bsGetUByte(in);
+            magic2 = bsGetUByte(in);
+            magic3 = bsGetUByte(in);
+            magic4 = bsGetUByte(in);
+            magic5 = bsGetUByte(in);
 
             // If isn't end of stream magic, break out of the loop.
             if (magic0 != 0x17 || magic1 != 0x72 || magic2 != 0x45
@@ -234,11 +169,11 @@ public class Bzip2InputStream extends InputStream {
                 magic4 != 0x53 || // 'S'
                 magic5 != 0x59 // 'Y'
         ) {
-            this.currentState = EOF;
+            currentState = State.EOF;
             throw new IOException("Bad block header");
         }
-        this.storedBlockCRC = bsGetInt(bin);
-        this.blockRandomised = bsR(bin, 1) == 1;
+        this.storedBlockCRC = bsGetInt(in);
+        this.blockRandomised = bsR(in, 1) == 1;
 
         /**
          * Allocate data here instead in constructor, so we do not allocate
@@ -251,8 +186,8 @@ public class Bzip2InputStream extends InputStream {
         // currBlockNo++;
         getAndMoveToFrontDecode();
 
-        this.crc32.initialiseCRC();
-        this.currentState = START_BLOCK_STATE;
+        crc32.initialiseCRC();
+        currentState = State.START_BLOCK_STATE;
     }
 
     private void endBlock() throws IOException {
@@ -276,7 +211,7 @@ public class Bzip2InputStream extends InputStream {
 
     private boolean complete() throws IOException {
         this.storedCombinedCRC = bsGetInt(in);
-        this.currentState = EOF;
+        this.currentState = State.EOF;
         this.data = null;
 
         if (this.storedCombinedCRC != this.computedCombinedCRC) {
@@ -286,6 +221,7 @@ public class Bzip2InputStream extends InputStream {
         return true;
     }
 
+    @Override
     public void close() throws IOException {
         this.data = null;
     }
@@ -658,7 +594,7 @@ public class Bzip2InputStream extends InputStream {
     }
 
     private int setupBlock() throws IOException {
-        if (currentState == EOF || this.data == null) {
+        if (currentState == State.EOF || this.data == null) {
             return -1;
         }
 
@@ -713,7 +649,7 @@ public class Bzip2InputStream extends InputStream {
             }
             this.su_ch2 = su_ch2Shadow ^= (this.su_rNToGo == 1) ? 1 : 0;
             this.su_i2++;
-            this.currentState = RAND_PART_B_STATE;
+            this.currentState = State.RAND_PART_B_STATE;
             this.crc32.updateCRC(su_ch2Shadow);
             return su_ch2Shadow;
         }
@@ -730,11 +666,11 @@ public class Bzip2InputStream extends InputStream {
             checkBounds(this.su_tPos, this.data.tt.length, "su_tPos");
             this.su_tPos = this.data.tt[this.su_tPos];
             this.su_i2++;
-            this.currentState = NO_RAND_PART_B_STATE;
+            this.currentState = State.NO_RAND_PART_B_STATE;
             this.crc32.updateCRC(su_ch2Shadow);
             return su_ch2Shadow;
         }
-        this.currentState = NO_RAND_PART_A_STATE;
+        this.currentState = State.NO_RAND_PART_A_STATE;
         endBlock();
         initBlock();
         return setupBlock();
@@ -742,7 +678,7 @@ public class Bzip2InputStream extends InputStream {
 
     private int setupRandPartB() throws IOException {
         if (this.su_ch2 != this.su_chPrev) {
-            this.currentState = RAND_PART_A_STATE;
+            this.currentState = State.RAND_PART_A_STATE;
             this.su_count = 1;
             return setupRandPartA();
         } else if (++this.su_count >= 4) {
@@ -758,13 +694,13 @@ public class Bzip2InputStream extends InputStream {
                 this.su_rNToGo--;
             }
             this.su_j2 = 0;
-            this.currentState = RAND_PART_C_STATE;
+            this.currentState = State.RAND_PART_C_STATE;
             if (this.su_rNToGo == 1) {
                 this.su_z ^= 1;
             }
             return setupRandPartC();
         } else {
-            this.currentState = RAND_PART_A_STATE;
+            this.currentState = State.RAND_PART_A_STATE;
             return setupRandPartA();
         }
     }
@@ -775,7 +711,7 @@ public class Bzip2InputStream extends InputStream {
             this.su_j2++;
             return this.su_ch2;
         }
-        this.currentState = RAND_PART_A_STATE;
+        this.currentState = State.RAND_PART_A_STATE;
         this.su_i2++;
         this.su_count = 0;
         return setupRandPartA();
@@ -801,7 +737,7 @@ public class Bzip2InputStream extends InputStream {
             final int su_ch2Shadow = this.su_ch2;
             this.crc32.updateCRC(su_ch2Shadow);
             this.su_j2++;
-            this.currentState = NO_RAND_PART_C_STATE;
+            this.currentState = State.NO_RAND_PART_C_STATE;
             return su_ch2Shadow;
         }
         this.su_i2++;
@@ -882,5 +818,50 @@ public class Bzip2InputStream extends InputStream {
     public static boolean matches(final byte[] signature, final int length) {
         return length >= 3 && signature[0] == 'B' &&
                 signature[1] == 'Z' && signature[2] == 'h';
+    }
+
+    private enum State {
+        EOF {
+            @Override
+            public int read(Bzip2InputStream in) throws IOException {
+                return IOUtils.EOF;
+            }
+        },
+        START_BLOCK_STATE {
+            @Override
+            public int read(Bzip2InputStream in) throws IOException {
+                return in.setupBlock();
+            }
+        },
+        RAND_PART_A_STATE,
+        RAND_PART_B_STATE {
+            @Override
+            public int read(Bzip2InputStream in) throws IOException {
+                return in.setupRandPartB();
+            }
+        },
+        RAND_PART_C_STATE {
+            @Override
+            public int read(Bzip2InputStream in) throws IOException {
+                return in.setupRandPartC();
+            }
+        },
+        NO_RAND_PART_A_STATE,
+        NO_RAND_PART_B_STATE {
+            @Override
+            public int read(Bzip2InputStream in) throws IOException {
+                return in.setupNoRandPartB();
+            }
+        },
+        NO_RAND_PART_C_STATE {
+            @Override
+            public int read(Bzip2InputStream in) throws IOException {
+                return in.setupNoRandPartC();
+            }
+        };
+
+        public int read(Bzip2InputStream in) throws IOException {
+            throw new IllegalStateException();
+        }
     }
 }
