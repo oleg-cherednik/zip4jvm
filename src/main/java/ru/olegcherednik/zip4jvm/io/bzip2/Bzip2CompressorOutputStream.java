@@ -44,7 +44,7 @@ import java.io.OutputStream;
  * </pre>
  *
  * <p> To get the memory required for decompression by {@link
- * Bzip2CompressorInputStream} use </p>
+ * Bzip2InputStream} use </p>
  *
  * <pre>
  * &lt;code&gt;65k + (5 * blocksize)&lt;/code&gt;.

@@ -18,9 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.io.bzip2;
 
+import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.nio.ByteOrder;
 
@@ -30,7 +30,7 @@ import java.nio.ByteOrder;
  * @NotThreadSafe
  * @since 1.10
  */
-class BitInputStream implements Closeable {
+class BitInputStream {
 
     private static final int MAXIMUM_CACHE_SIZE = 63; // bits in long minus sign bit
     private static final long[] MASKS = new long[MAXIMUM_CACHE_SIZE + 1];
@@ -49,15 +49,6 @@ class BitInputStream implements Closeable {
         this.in = in;
     }
 
-    @Override
-    public void close() throws IOException {
-        in.close();
-    }
-
-    /**
-     * Clears the cache of bits that have been read from the
-     * underlying stream but not yet provided via {@link #readBits}.
-     */
     public void clearBitCache() {
         bitsCached = 0;
         bitsCachedSize = 0;
@@ -74,40 +65,16 @@ class BitInputStream implements Closeable {
      * @throws IOException on error
      */
     public long readBits(final int count) throws IOException {
-        if (count < 0 || count > MAXIMUM_CACHE_SIZE) {
+        if (count < 0 || count > MAXIMUM_CACHE_SIZE)
             throw new IllegalArgumentException("count must not be negative or greater than " + MAXIMUM_CACHE_SIZE);
-        }
-        if (ensureCache(count)) {
-            return -1;
-        }
+
+        if (ensureCache(count))
+            return IOUtils.EOF;
 
         if (bitsCachedSize < count) {
             return processBitsGreater57(count);
         }
         return readCachedBits(count);
-    }
-
-    /**
-     * Returns the number of bits that can be read from this input
-     * stream without reading from the underlying input stream at all.
-     *
-     * @return estimate of the number of bits that can be read without reading from the underlying stream
-     * @since 1.16
-     */
-    public int bitsCached() {
-        return bitsCachedSize;
-    }
-
-    /**
-     * Drops bits until the next bits will be read from a byte boundary.
-     *
-     * @since 1.16
-     */
-    public void alignWithByteBoundary() {
-        int toSkip = bitsCachedSize % Byte.SIZE;
-        if (toSkip > 0) {
-            readCachedBits(toSkip);
-        }
     }
 
     private long processBitsGreater57(final int count) throws IOException {
@@ -124,11 +91,11 @@ class BitInputStream implements Closeable {
         }
         if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
             long bitsToAdd = nextByte & MASKS[bitsToAddCount];
-            bitsCached |= (bitsToAdd << bitsCachedSize);
+            bitsCached |= bitsToAdd << bitsCachedSize;
             overflow = (nextByte >>> bitsToAddCount) & MASKS[overflowBits];
         } else {
             bitsCached <<= bitsToAddCount;
-            long bitsToAdd = (nextByte >>> (overflowBits)) & MASKS[bitsToAddCount];
+            long bitsToAdd = (nextByte >>> overflowBits) & MASKS[bitsToAddCount];
             bitsCached |= bitsToAdd;
             overflow = nextByte & MASKS[overflowBits];
         }

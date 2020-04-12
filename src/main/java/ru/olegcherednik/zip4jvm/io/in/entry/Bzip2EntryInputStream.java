@@ -13,11 +13,11 @@ import java.io.IOException;
  */
 final class Bzip2EntryInputStream extends EntryInputStream {
 
-    private final Bzip2InputStream lzma;
+    private final Bzip2InputStream bzip;
 
     public Bzip2EntryInputStream(ZipEntry zipEntry, DataInput in) throws IOException {
         super(zipEntry, in);
-        lzma = createDecoder();
+        bzip = createDecoder();
     }
 
     private Bzip2InputStream createDecoder() throws IOException {
@@ -26,7 +26,7 @@ final class Bzip2EntryInputStream extends EntryInputStream {
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        len = lzma.read(buf, offs, len);
+        len = bzip.read(buf, offs, len);
 
         if (len == 0 || len == IOUtils.EOF)
             return IOUtils.EOF;
