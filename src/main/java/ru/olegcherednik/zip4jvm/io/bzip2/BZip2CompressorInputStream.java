@@ -1,15 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.bzip2;
 
-/**
- * @author Oleg Cherednik
- * @since 12.04.2020
- */
-
-import org.apache.commons.compress.compressors.CompressorInputStream;
-import org.apache.commons.compress.utils.BitInputStream;
-import org.apache.commons.compress.utils.CloseShieldFilterInputStream;
-import org.apache.commons.compress.utils.InputStreamStatistics;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteOrder;

@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.bzip2;
 
-import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
 import java.io.IOException;
