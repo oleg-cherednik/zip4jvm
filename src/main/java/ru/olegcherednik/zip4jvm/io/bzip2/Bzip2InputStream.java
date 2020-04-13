@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.bzip2;
 
 import org.apache.commons.io.IOUtils;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
 import java.io.IOException;
@@ -8,14 +9,13 @@ import java.io.InputStream;
 import java.util.Arrays;
 
 /**
- * An input stream that decompresses from the BZip2 format to be read as any other stream.
- *
  * @author Oleg Cherednik
  * @since 12.04.2020
  */
 public class Bzip2InputStream extends InputStream {
 
     private final BitInputStream bin;
+    private final int blockSize100k;
 
     /**
      * Index of the last char in the block, so the block size == last + 1.
@@ -27,12 +27,8 @@ public class Bzip2InputStream extends InputStream {
      */
     private int origPtr;
 
-    /**
-     * always: in the range 0 .. 9. The current block size is 100000 * this
-     * number.
-     */
-    private final int blockSize100k;
 
+    private int blockCrc;
     private boolean blockRandomised;
 
     private final CRC32 crc32 = new CRC32();
@@ -41,7 +37,7 @@ public class Bzip2InputStream extends InputStream {
 
     private State currentState = State.START_BLOCK_STATE;
 
-    private int blockCrc, storedCombinedCRC;
+    private int storedCombinedCRC;
     private int computedBlockCRC, computedCombinedCRC;
 
     // Variables used by setup* methods exclusively
@@ -56,9 +52,6 @@ public class Bzip2InputStream extends InputStream {
     private int su_tPos;
     private char su_z;
 
-    /**
-     * All memory intensive stuff. This field is initialized by initBlock().
-     */
     private Bzip2InputStream.Data data;
 
     public Bzip2InputStream(DataInput in, int blockSize100k) throws IOException {
@@ -85,26 +78,18 @@ public class Bzip2InputStream extends InputStream {
             buf[destOffs++] = (byte)b;
         }
 
-        return (destOffs == offs) ? -1 : (destOffs - offs);
+        return destOffs == offs ? -1 : destOffs - offs;
     }
 
     private static final long MAGIC_COMPRESSED = 0x314159265359L;
     private static final long MAGIC_EOS = 0x177245385090L;
 
     private void initBlock() throws IOException {
-        long magic;
+        long magic = bin.readBits(Byte.SIZE * 6);
 
-        while (true) {
-            magic = bin.readBits(Byte.SIZE * 6);
-
-            if (magic != MAGIC_EOS)
-                break;
-
-            // End of stream was reached. Check the combined CRC and
-            // advance to the next .bz2 stream if decoding concatenated
-            // streams.
-            if (complete())
-                return;
+        if (magic == MAGIC_EOS) {
+            complete();
+            return;
         }
 
         if (magic != MAGIC_COMPRESSED) {
@@ -115,10 +100,6 @@ public class Bzip2InputStream extends InputStream {
         blockCrc = (int)bin.readBits(Byte.SIZE * 4);
         blockRandomised = bin.readBit();
 
-        /*
-         * Allocate data here instead in constructor, so we do not allocate
-         * it if the input file is empty.
-         */
         if (data == null)
             data = new Bzip2InputStream.Data(blockSize100k);
 
@@ -127,6 +108,17 @@ public class Bzip2InputStream extends InputStream {
 
         crc32.init();
         currentState = State.START_BLOCK_STATE;
+    }
+
+    private boolean complete() throws IOException {
+        storedCombinedCRC = (int)bin.readBits(Byte.SIZE * 4);
+        currentState = State.EOF;
+        data = null;
+
+        if (storedCombinedCRC != computedCombinedCRC)
+            throw new Zip4jvmException("BZIP2 CRC incorrect");
+
+        return true;
     }
 
     private void endBlock() throws IOException {
@@ -146,18 +138,6 @@ public class Bzip2InputStream extends InputStream {
         this.computedCombinedCRC = (this.computedCombinedCRC << 1)
                 | (this.computedCombinedCRC >>> 31);
         this.computedCombinedCRC ^= this.computedBlockCRC;
-    }
-
-    private boolean complete() throws IOException {
-        this.storedCombinedCRC = (int)bin.readBits(Byte.SIZE * 4);
-        this.currentState = State.EOF;
-        this.data = null;
-
-        if (this.storedCombinedCRC != this.computedCombinedCRC) {
-            throw new IOException("BZip2 CRC error");
-        }
-
-        return true;
     }
 
     @Override
@@ -220,8 +200,7 @@ public class Bzip2InputStream extends InputStream {
     }
 
     private void recvDecodingTables() throws IOException {
-        final BitInputStream bin = this.bin;
-        final Bzip2InputStream.Data dataShadow = this.data;
+        final Bzip2InputStream.Data dataShadow = data;
         final boolean[] inUse = dataShadow.inUse;
         final byte[] pos = dataShadow.recvDecodingTables_pos;
         final byte[] selector = dataShadow.selector;
@@ -338,7 +317,6 @@ public class Bzip2InputStream extends InputStream {
     }
 
     private void getAndMoveToFrontDecode() throws IOException {
-        final BitInputStream bin = this.bin;
         origPtr = (int)bin.readBits(Byte.SIZE * 3);
         recvDecodingTables();
 
@@ -502,9 +480,8 @@ public class Bzip2InputStream extends InputStream {
     }
 
     private int setupBlock() throws IOException {
-        if (currentState == State.EOF || this.data == null) {
-            return -1;
-        }
+        if (currentState == State.EOF || data == null)
+            return IOUtils.EOF;
 
         final int[] cftab = this.data.cftab;
         final int ttLen = this.last + 1;
@@ -538,6 +515,7 @@ public class Bzip2InputStream extends InputStream {
             this.su_rTPos = 0;
             return setupRandPartA();
         }
+
         return setupNoRandPartA();
     }
 
