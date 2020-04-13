@@ -72,25 +72,8 @@ class BitInputStream {
         return readCachedBits(count);
     }
 
-    public int readByte() throws IOException {
-        return (int)readBits(8);
-    }
-
-    public int bsR(int n) throws IOException {
-        long thech = readBits(n);
-
-        if (thech < IOUtils.EOF)
-            throw new IOException("Unexpected end of stream");
-
-        return (int)thech;
-    }
-
-    public int bsGetInt() throws IOException {
-        return bsR(32);
-    }
-
-    public boolean bsGetBit() throws IOException {
-        return bsR(1) != 0;
+    public boolean readBit() throws IOException {
+        return readBits(1) != 0;
     }
 
     private long processBitsGreater57(final int count) throws IOException {
@@ -157,4 +140,8 @@ class BitInputStream {
         return false;
     }
 
+    @Override
+    public String toString() {
+        return in.toString();
+    }
 }

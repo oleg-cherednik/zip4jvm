@@ -76,11 +76,11 @@ final class CRC32 {
     private int globalCrc;
 
     public CRC32() {
-        initialiseCRC();
+        init();
     }
 
-    void initialiseCRC() {
-        globalCrc = 0xffffffff;
+    public void init() {
+        globalCrc = 0xFFFFFFFF;
     }
 
     int getFinalCRC() {

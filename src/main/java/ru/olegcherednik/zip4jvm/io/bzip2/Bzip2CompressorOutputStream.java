@@ -526,7 +526,7 @@ class Bzip2CompressorOutputStream extends OutputStream {
 
     private void initBlock() {
         // blockNo++;
-        this.crc32.initialiseCRC();
+        this.crc32.init();
         this.last = -1;
         // ch = 0;
 
