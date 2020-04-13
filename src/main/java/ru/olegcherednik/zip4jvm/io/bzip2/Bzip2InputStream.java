@@ -145,14 +145,12 @@ public class Bzip2InputStream extends InputStream {
         this.data = null;
     }
 
-    private static void checkBounds(final int checkVal, final int limitExclusive, String name)
+    private static void checkBounds(int val, int limitExclusive, String name)
             throws IOException {
-        if (checkVal < 0) {
+        if (val < 0)
             throw new IOException("Corrupted input, " + name + " value negative");
-        }
-        if (checkVal >= limitExclusive) {
+        if (val >= limitExclusive)
             throw new IOException("Corrupted input, " + name + " value too big");
-        }
     }
 
     private void recvDecodingTables() throws IOException {
@@ -186,15 +184,15 @@ public class Bzip2InputStream extends InputStream {
             data.recvDecodingTables_pos[i] = (byte)i;
 
         for (int i = 0, max = Math.min(selectorsUsed, Constants.MAX_SELECTORS); i < max; i++) {
-            int v = data.selectorList[i] & 0xFF;
-            checkBounds(v, Constants.N_GROUPS, "selectorMtf");
+            int j = data.selectorList[i] & 0xFF;
+            checkBounds(j, Constants.N_GROUPS, "selectorMtf");
 
-            byte tmp = data.recvDecodingTables_pos[v];
+            byte tmp = data.recvDecodingTables_pos[j];
 
-            while (v > 0) {
-                // nearly all times v is zero, 4 in most other cases
-                data.recvDecodingTables_pos[v] = data.recvDecodingTables_pos[v - 1];
-                v--;
+            while (j > 0) {
+                // nearly all times j is zero, 4 in most other cases
+                data.recvDecodingTables_pos[j] = data.recvDecodingTables_pos[j - 1];
+                j--;
             }
 
             data.recvDecodingTables_pos[0] = tmp;
@@ -261,17 +259,7 @@ public class Bzip2InputStream extends InputStream {
         origPtr = (int)bin.readBits(Byte.SIZE * 3);
         recvDecodingTables();
 
-        final Bzip2InputStream.Data dataShadow = this.data;
-        final byte[] ll8 = dataShadow.ll8;
-        final int[] unzftab = dataShadow.unzftab;
-        final byte[] selector = dataShadow.selector;
-        final byte[] seqToUnseq = dataShadow.seqToUnseq;
-        final char[] yy = dataShadow.getAndMoveToFrontDecode_yy;
-        final int[] minLens = dataShadow.minLens;
-        final int[][] limit = dataShadow.limit;
-        final int[][] base = dataShadow.base;
-        final int[][] perm = dataShadow.perm;
-        final int limitLast = this.blockSize100k * 100000;
+        final int limitLast = blockSize100k * 100000;
 
         /*
          * Setting up the unzftab entries here is not strictly necessary, but it
@@ -279,21 +267,21 @@ public class Bzip2InputStream extends InputStream {
          * block's worth of cache misses.
          */
         for (int i = 256; --i >= 0; ) {
-            yy[i] = (char)i;
-            unzftab[i] = 0;
+            data.getAndMoveToFrontDecode_yy[i] = (char)i;
+            data.unzftab[i] = 0;
         }
 
         int groupNo = 0;
         int groupPos = Constants.G_SIZE - 1;
-        final int eob = this.nInUse + 1;
+        final int eob = nInUse + 1;
         int nextSym = getAndMoveToFrontDecode0();
         int lastShadow = -1;
-        int zt = selector[groupNo] & 0xff;
+        int zt = data.selector[groupNo] & 0xff;
         checkBounds(zt, Constants.N_GROUPS, "zt");
-        int[] base_zt = base[zt];
-        int[] limit_zt = limit[zt];
-        int[] perm_zt = perm[zt];
-        int minLens_zt = minLens[zt];
+        int[] base_zt = data.base[zt];
+        int[] limit_zt = data.limit[zt];
+        int[] perm_zt = data.perm[zt];
+        int minLens_zt = data.minLens[zt];
 
         while (nextSym != eob) {
             if ((nextSym == Constants.RUNA) || (nextSym == Constants.RUNB)) {
@@ -311,12 +299,12 @@ public class Bzip2InputStream extends InputStream {
                     if (groupPos == 0) {
                         groupPos = Constants.G_SIZE - 1;
                         checkBounds(++groupNo, Constants.MAX_SELECTORS, "groupNo");
-                        zt = selector[groupNo] & 0xff;
+                        zt = data.selector[groupNo] & 0xff;
                         checkBounds(zt, Constants.N_GROUPS, "zt");
-                        base_zt = base[zt];
-                        limit_zt = limit[zt];
-                        perm_zt = perm[zt];
-                        minLens_zt = minLens[zt];
+                        base_zt = data.base[zt];
+                        limit_zt = data.limit[zt];
+                        perm_zt = data.perm[zt];
+                        minLens_zt = data.minLens[zt];
                     } else {
                         groupPos--;
                     }
@@ -333,14 +321,14 @@ public class Bzip2InputStream extends InputStream {
                     nextSym = perm_zt[tmp];
                 }
 
-                final int yy0 = yy[0];
+                final int yy0 = data.getAndMoveToFrontDecode_yy[0];
                 checkBounds(yy0, 256, "yy");
-                final byte ch = seqToUnseq[yy0];
-                unzftab[ch & 0xff] += s + 1;
+                final byte ch = data.seqToUnseq[yy0];
+                data.unzftab[ch & 0xff] += s + 1;
 
                 final int from = ++lastShadow;
                 lastShadow += s;
-                Arrays.fill(ll8, from, lastShadow + 1, ch);
+                Arrays.fill(data.ll8, from, lastShadow + 1, ch);
 
                 if (lastShadow >= limitLast) {
                     throw new IOException("Block overrun while expanding RLE in MTF, "
@@ -353,10 +341,10 @@ public class Bzip2InputStream extends InputStream {
                 }
                 checkBounds(nextSym, 256 + 1, "nextSym");
 
-                final char tmp = yy[nextSym - 1];
+                final char tmp = data.getAndMoveToFrontDecode_yy[nextSym - 1];
                 checkBounds(tmp, 256, "yy");
-                unzftab[seqToUnseq[tmp] & 0xff]++;
-                ll8[lastShadow] = seqToUnseq[tmp];
+                data.unzftab[data.seqToUnseq[tmp] & 0xff]++;
+                data.ll8[lastShadow] = data.seqToUnseq[tmp];
 
                 /*
                  * This loop is hammered during decompression, hence avoid
@@ -364,24 +352,22 @@ public class Bzip2InputStream extends InputStream {
                  * small ranges to copy.
                  */
                 if (nextSym <= 16) {
-                    for (int j = nextSym - 1; j > 0; ) {
-                        yy[j] = yy[--j];
-                    }
-                } else {
-                    System.arraycopy(yy, 0, yy, 1, nextSym - 1);
-                }
+                    for (int j = nextSym - 1; j > 0; )
+                        data.getAndMoveToFrontDecode_yy[j] = data.getAndMoveToFrontDecode_yy[--j];
+                } else
+                    System.arraycopy(data.getAndMoveToFrontDecode_yy, 0, data.getAndMoveToFrontDecode_yy, 1, nextSym - 1);
 
-                yy[0] = tmp;
+                data.getAndMoveToFrontDecode_yy[0] = tmp;
 
                 if (groupPos == 0) {
                     groupPos = Constants.G_SIZE - 1;
                     checkBounds(++groupNo, Constants.MAX_SELECTORS, "groupNo");
-                    zt = selector[groupNo] & 0xff;
+                    zt = data.selector[groupNo] & 0xff;
                     checkBounds(zt, Constants.N_GROUPS, "zt");
-                    base_zt = base[zt];
-                    limit_zt = limit[zt];
-                    perm_zt = perm[zt];
-                    minLens_zt = minLens[zt];
+                    base_zt = data.base[zt];
+                    limit_zt = data.limit[zt];
+                    perm_zt = data.perm[zt];
+                    minLens_zt = data.minLens[zt];
                 } else {
                     groupPos--;
                 }
@@ -399,7 +385,7 @@ public class Bzip2InputStream extends InputStream {
             }
         }
 
-        this.last = lastShadow;
+        last = lastShadow;
     }
 
     private int getAndMoveToFrontDecode0() throws IOException {
@@ -446,14 +432,14 @@ public class Bzip2InputStream extends InputStream {
             throw new IOException("Stream corrupted");
         }
 
-        this.su_tPos = tt[this.origPtr];
-        this.su_count = 0;
-        this.su_i2 = 0;
-        this.su_ch2 = 256; /* not a char and not EOF */
+        su_tPos = tt[this.origPtr];
+        su_count = 0;
+        su_i2 = 0;
+        su_ch2 = 256; /* not a char and not EOF */
 
-        if (this.blockRandomised) {
-            this.su_rNToGo = 0;
-            this.su_rTPos = 0;
+        if (blockRandomised) {
+            su_rNToGo = 0;
+            su_rTPos = 0;
             return setupRandPartA();
         }
 
@@ -504,71 +490,74 @@ public class Bzip2InputStream extends InputStream {
     }
 
     private int setupRandPartB() throws IOException {
-        if (this.su_ch2 != this.su_chPrev) {
-            this.currentState = State.RAND_PART_A_STATE;
-            this.su_count = 1;
+        if (su_ch2 != su_chPrev) {
+            currentState = State.RAND_PART_A_STATE;
+            su_count = 1;
             return setupRandPartA();
-        } else if (++this.su_count >= 4) {
-            this.su_z = (char)(this.data.ll8[this.su_tPos] & 0xff);
-            checkBounds(this.su_tPos, this.data.tt.length, "su_tPos");
-            this.su_tPos = this.data.tt[this.su_tPos];
-            if (this.su_rNToGo == 0) {
-                this.su_rNToGo = RandomNumbers.get(this.su_rTPos) - 1;
-                if (++this.su_rTPos == 512) {
-                    this.su_rTPos = 0;
+        } else if (++su_count >= 4) {
+            su_z = (char)(data.ll8[su_tPos] & 0xff);
+            checkBounds(su_tPos, data.tt.length, "su_tPos");
+            su_tPos = data.tt[su_tPos];
+            if (su_rNToGo == 0) {
+                su_rNToGo = RandomNumbers.get(this.su_rTPos) - 1;
+                if (++su_rTPos == 512) {
+                    su_rTPos = 0;
                 }
             } else {
-                this.su_rNToGo--;
+                su_rNToGo--;
             }
-            this.su_j2 = 0;
-            this.currentState = State.RAND_PART_C_STATE;
-            if (this.su_rNToGo == 1) {
-                this.su_z ^= 1;
+            su_j2 = 0;
+            currentState = State.RAND_PART_C_STATE;
+            if (su_rNToGo == 1) {
+                su_z ^= 1;
             }
             return setupRandPartC();
         } else {
-            this.currentState = State.RAND_PART_A_STATE;
+            currentState = State.RAND_PART_A_STATE;
             return setupRandPartA();
         }
     }
 
     private int setupRandPartC() throws IOException {
-        if (this.su_j2 < this.su_z) {
-            this.crc32.updateCRC(this.su_ch2);
-            this.su_j2++;
-            return this.su_ch2;
+        if (su_j2 < su_z) {
+            crc32.updateCRC(su_ch2);
+            su_j2++;
+            return su_ch2;
         }
-        this.currentState = State.RAND_PART_A_STATE;
-        this.su_i2++;
-        this.su_count = 0;
+
+        currentState = State.RAND_PART_A_STATE;
+        su_i2++;
+        su_count = 0;
         return setupRandPartA();
     }
 
     private int setupNoRandPartB() throws IOException {
-        if (this.su_ch2 != this.su_chPrev) {
-            this.su_count = 1;
-            return setupNoRandPartA();
-        } else if (++this.su_count >= 4) {
-            checkBounds(this.su_tPos, this.data.ll8.length, "su_tPos");
-            this.su_z = (char)(this.data.ll8[this.su_tPos] & 0xff);
-            this.su_tPos = this.data.tt[this.su_tPos];
-            this.su_j2 = 0;
-            return setupNoRandPartC();
-        } else {
+        if (su_ch2 != su_chPrev) {
+            su_count = 1;
             return setupNoRandPartA();
         }
+
+        if (++su_count >= 4) {
+            checkBounds(su_tPos, data.ll8.length, "su_tPos");
+            su_z = (char)(data.ll8[su_tPos] & 0xff);
+            su_tPos = data.tt[su_tPos];
+            su_j2 = 0;
+            return setupNoRandPartC();
+        }
+
+        return setupNoRandPartA();
     }
 
     private int setupNoRandPartC() throws IOException {
-        if (this.su_j2 < this.su_z) {
-            final int su_ch2Shadow = this.su_ch2;
-            this.crc32.updateCRC(su_ch2Shadow);
-            this.su_j2++;
-            this.currentState = State.NO_RAND_PART_C_STATE;
-            return su_ch2Shadow;
+        if (su_j2 < su_z) {
+            crc32.updateCRC(su_ch2);
+            su_j2++;
+            currentState = State.NO_RAND_PART_C_STATE;
+            return su_ch2;
         }
-        this.su_i2++;
-        this.su_count = 0;
+
+        su_i2++;
+        su_count = 0;
         return setupNoRandPartA();
     }
 
