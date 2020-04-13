@@ -155,50 +155,6 @@ public class Bzip2InputStream extends InputStream {
         }
     }
 
-    /**
-     * Called by createHuffmanDecodingTables() exclusively.
-     */
-    private static void hbCreateDecodeTables(final int[] limit,
-            final int[] base, final int[] perm, final char[] length,
-            final int minLen, final int maxLen, final int alphaSize)
-            throws IOException {
-        for (int i = minLen, pp = 0; i <= maxLen; i++) {
-            for (int j = 0; j < alphaSize; j++) {
-                if (length[j] == i) {
-                    perm[pp++] = j;
-                }
-            }
-        }
-
-        for (int i = Constants.MAX_CODE_LEN; --i > 0; ) {
-            base[i] = 0;
-            limit[i] = 0;
-        }
-
-        for (int i = 0; i < alphaSize; i++) {
-            final int l = length[i];
-            checkBounds(l, Constants.MAX_ALPHA_SIZE, "length");
-            base[l + 1]++;
-        }
-
-        for (int i = 1, b = base[0]; i < Constants.MAX_CODE_LEN; i++) {
-            b += base[i];
-            base[i] = b;
-        }
-
-        for (int i = minLen, vec = 0, b = base[i]; i <= maxLen; i++) {
-            final int nb = base[i + 1];
-            vec += nb - b;
-            b = nb;
-            limit[i] = vec - 1;
-            vec <<= 1;
-        }
-
-        for (int i = minLen + 1; i <= maxLen; i++) {
-            base[i] = ((limit[i - 1] + 1) << 1) - base[i];
-        }
-    }
-
     private void recvDecodingTables() throws IOException {
         nInUse = data.readHuffmanUsedBitmaps(bin);
         int alphaSize = nInUse + 2;
@@ -259,9 +215,46 @@ public class Bzip2InputStream extends InputStream {
                 max = Math.max(max, data.temp_charArray2d[i][j]);
             }
 
-            hbCreateDecodeTables(data.limit[i], data.base[i], data.perm[i], data.temp_charArray2d[i], min, max, alphaSize);
+            hbCreateDecodeTables(i, min, max, alphaSize);
             data.minLens[i] = min;
         }
+    }
+
+    /**
+     * Called by createHuffmanDecodingTables() exclusively.
+     */
+    private void hbCreateDecodeTables(int group, int min, int max, int alphaSize) throws IOException {
+        for (int i = min, k = 0; i <= max; i++)
+            for (int j = 0; j < alphaSize; j++)
+                if (data.temp_charArray2d[group][j] == i)
+                    data.perm[group][k++] = j;
+
+        for (int i = Constants.MAX_CODE_LEN - 1; i > 0; i--) {
+            data.base[group][i] = 0;
+            data.limit[group][i] = 0;
+        }
+
+        for (int i = 0; i < alphaSize; i++) {
+            int l = data.temp_charArray2d[group][i];
+            checkBounds(l, Constants.MAX_ALPHA_SIZE, "length");
+            data.base[group][l + 1]++;
+        }
+
+        for (int i = 1, b = data.base[group][0]; i < Constants.MAX_CODE_LEN; i++) {
+            b += data.base[group][i];
+            data.base[group][i] = b;
+        }
+
+        for (int i = min, vec = 0, b = data.base[group][i]; i <= max; i++) {
+            int nb = data.base[group][i + 1];
+            vec += nb - b;
+            b = nb;
+            data.limit[group][i] = vec - 1;
+            vec <<= 1;
+        }
+
+        for (int i = min + 1; i <= max; i++)
+            data.base[group][i] = ((data.limit[group][i - 1] + 1) << 1) - data.base[group][i];
     }
 
     private void getAndMoveToFrontDecode() throws IOException {
