@@ -53,7 +53,7 @@ final class BitInputStream {
             return IOUtils.EOF;
         if (bitsCacheSize < totalBits)
             return processBitsGreater57(totalBits);
-        return readCachedBits(totalBits);
+        return readCacheBits(totalBits);
     }
 
     public boolean readBit() throws IOException {
@@ -78,11 +78,10 @@ final class BitInputStream {
         return res;
     }
 
-    private long readCachedBits(int totalBits) {
-        final long bitsOut;
-        bitsOut = (bitsCache >> (bitsCacheSize - totalBits)) & MASKS[totalBits];
+    private long readCacheBits(int totalBits) {
+        long res = (bitsCache >> (bitsCacheSize - totalBits)) & MASKS[totalBits];
         bitsCacheSize -= totalBits;
-        return bitsOut;
+        return res;
     }
 
     private boolean ensureCache(int totalBits) throws IOException {
