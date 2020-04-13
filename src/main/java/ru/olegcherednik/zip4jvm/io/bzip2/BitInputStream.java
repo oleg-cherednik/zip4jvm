@@ -85,6 +85,18 @@ class BitInputStream {
         return (int)thech;
     }
 
+    public int bsGetInt() throws IOException {
+        return bsR(32);
+    }
+
+    public char bsGetUByte() throws IOException {
+        return (char)bsR(8);
+    }
+
+    public boolean bsGetBit() throws IOException {
+        return bsR(1) != 0;
+    }
+
     private long processBitsGreater57(final int count) throws IOException {
         final long bitsOut;
         int overflowBits = 0;

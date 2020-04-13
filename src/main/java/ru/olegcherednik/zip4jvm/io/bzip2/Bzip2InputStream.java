@@ -113,16 +113,15 @@ public class Bzip2InputStream extends InputStream {
 
         while (true) {
             // Get the block magic bytes.
-            magic0 = bsGetUByte(bin);
-            magic1 = bsGetUByte(bin);
-            magic2 = bsGetUByte(bin);
-            magic3 = bsGetUByte(bin);
-            magic4 = bsGetUByte(bin);
-            magic5 = bsGetUByte(bin);
+            magic0 = bin.bsGetUByte();
+            magic1 = bin.bsGetUByte();
+            magic2 = bin.bsGetUByte();
+            magic3 = bin.bsGetUByte();
+            magic4 = bin.bsGetUByte();
+            magic5 = bin.bsGetUByte();
 
             // If isn't end of stream magic, break out of the loop.
-            if (magic0 != 0x17 || magic1 != 0x72 || magic2 != 0x45
-                    || magic3 != 0x38 || magic4 != 0x50 || magic5 != 0x90) {
+            if (magic0 != 0x17 || magic1 != 0x72 || magic2 != 0x45 || magic3 != 0x38 || magic4 != 0x50 || magic5 != 0x90) {
                 break;
             }
 
@@ -144,7 +143,7 @@ public class Bzip2InputStream extends InputStream {
             currentState = State.EOF;
             throw new IOException("Bad block header");
         }
-        this.storedBlockCRC = bsGetInt(bin);
+        this.storedBlockCRC = bin.bsGetInt();
         this.blockRandomised = bin.bsR(1) == 1;
 
         /**
@@ -182,7 +181,7 @@ public class Bzip2InputStream extends InputStream {
     }
 
     private boolean complete() throws IOException {
-        this.storedCombinedCRC = bsGetInt(bin);
+        this.storedCombinedCRC = bin.bsGetInt();
         this.currentState = State.EOF;
         this.data = null;
 
@@ -196,18 +195,6 @@ public class Bzip2InputStream extends InputStream {
     @Override
     public void close() throws IOException {
         this.data = null;
-    }
-
-    private static boolean bsGetBit(BitInputStream bin) throws IOException {
-        return bin.bsR(1) != 0;
-    }
-
-    private static char bsGetUByte(BitInputStream bin) throws IOException {
-        return (char)bin.bsR(8);
-    }
-
-    private static int bsGetInt(BitInputStream bin) throws IOException {
-        return bin.bsR(32);
     }
 
     private static void checkBounds(final int checkVal, final int limitExclusive, String name)
@@ -276,7 +263,7 @@ public class Bzip2InputStream extends InputStream {
 
         /* Receive the mapping table */
         for (int i = 0; i < 16; i++) {
-            if (bsGetBit(bin)) {
+            if (bin.bsGetBit()) {
                 inUse16 |= 1 << i;
             }
         }
@@ -286,7 +273,7 @@ public class Bzip2InputStream extends InputStream {
             if ((inUse16 & (1 << i)) != 0) {
                 final int i16 = i << 4;
                 for (int j = 0; j < 16; j++) {
-                    if (bsGetBit(bin)) {
+                    if (bin.bsGetBit()) {
                         inUse[i16 + j] = true;
                     }
                 }
@@ -310,7 +297,7 @@ public class Bzip2InputStream extends InputStream {
 
         for (int i = 0; i < selectors; i++) {
             int j = 0;
-            while (bsGetBit(bin)) {
+            while (bin.bsGetBit()) {
                 j++;
             }
             if (i < Constants.MAX_SELECTORS) {
@@ -344,8 +331,8 @@ public class Bzip2InputStream extends InputStream {
             int curr = bin.bsR(5);
             final char[] len_t = len[t];
             for (int i = 0; i < alphaSize; i++) {
-                while (bsGetBit(bin)) {
-                    curr += bsGetBit(bin) ? -1 : 1;
+                while (bin.bsGetBit()) {
+                    curr += bin.bsGetBit() ? -1 : 1;
                 }
                 len_t[i] = (char)curr;
             }
