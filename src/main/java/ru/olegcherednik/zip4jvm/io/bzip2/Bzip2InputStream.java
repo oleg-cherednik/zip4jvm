@@ -200,73 +200,59 @@ public class Bzip2InputStream extends InputStream {
     }
 
     private void recvDecodingTables() throws IOException {
-        data.readHuffmanUsedBitmaps(bin);
-        nInUse = data.makeMaps();
-        final int alphaSize = this.nInUse + 2;
-        /* Now the selectors */
-        final int nGroups = (int)bin.readBits(3);
-        final int selectors = (int)bin.readBits(15);
-        if (selectors < 0) {
+        nInUse = data.readHuffmanUsedBitmaps(bin);
+        int alphaSize = nInUse + 2;
+
+        /* Now the selectorsUsed */
+        int huffmanGroups = (int)bin.readBits(3);
+        int selectorsUsed = (int)bin.readBits(15);
+
+        if (selectorsUsed < 0)
             throw new IOException("Corrupted input, nSelectors value negative");
-        }
+
         checkBounds(alphaSize, Constants.MAX_ALPHA_SIZE + 1, "alphaSize");
-        checkBounds(nGroups, Constants.N_GROUPS + 1, "nGroups");
+        checkBounds(huffmanGroups, Constants.N_GROUPS + 1, "huffmanGroups");
 
         // Don't fail on nSelectors overflowing boundaries but discard the values in overflow
         // See https://gnu.wildebeest.org/blog/mjw/2019/08/02/bzip2-and-the-cve-that-wasnt/
         // and https://sourceware.org/ml/bzip2-devel/2019-q3/msg00007.html
 
-        for (int i = 0, j = 0; i < selectors; i++, j = 0) {
+        for (int i = 0, j = 0; i < selectorsUsed; i++, j = 0) {
             while (bin.readBit())
                 j++;
 
             if (i < Constants.MAX_SELECTORS)
-                data.selectorMtf[i] = (byte)j;
-        }
-        final int nSelectors = Math.min(selectors, Constants.MAX_SELECTORS);
-
-        /* Undo the MTF values for the selectors. */
-        for (int v = nGroups; --v >= 0; ) {
-            data.recvDecodingTables_pos[v] = (byte)v;
+                data.selectorList[i] = (byte)j;
         }
 
-        for (int i = 0; i < nSelectors; i++) {
-            int v = data.selectorMtf[i] & 0xff;
+        /* Undo the MTF values for the selectorsUsed. */
+        for (int i = huffmanGroups - 1; i >= 0; i--)
+            data.recvDecodingTables_pos[i] = (byte)i;
+
+        for (int i = 0, max = Math.min(selectorsUsed, Constants.MAX_SELECTORS); i < max; i++) {
+            int v = data.selectorList[i] & 0xFF;
             checkBounds(v, Constants.N_GROUPS, "selectorMtf");
-            final byte tmp = data.recvDecodingTables_pos[v];
+
+            byte tmp = data.recvDecodingTables_pos[v];
+
             while (v > 0) {
                 // nearly all times v is zero, 4 in most other cases
                 data.recvDecodingTables_pos[v] = data.recvDecodingTables_pos[v - 1];
                 v--;
             }
+
             data.recvDecodingTables_pos[0] = tmp;
             data.selector[i] = tmp;
         }
 
-        final char[][] len = data.temp_charArray2d;
-
-        /* Now the coding tables */
-        for (int t = 0; t < nGroups; t++) {
-            int curr = (int)bin.readBits(5);
-            final char[] len_t = len[t];
-
-            for (int i = 0; i < alphaSize; i++) {
-                while (bin.readBit())
-                    curr += bin.readBit() ? -1 : 1;
-
-                len_t[i] = (char)curr;
-            }
-        }
-
-        // finally create the Huffman tables
-        createHuffmanDecodingTables(alphaSize, nGroups);
+        data.codingTables(bin, huffmanGroups, alphaSize);
+        createHuffmanDecodingTables(alphaSize, huffmanGroups);
     }
 
     /**
      * Called by recvDecodingTables() exclusively.
      */
-    private void createHuffmanDecodingTables(final int alphaSize,
-            final int nGroups) throws IOException {
+    private void createHuffmanDecodingTables(final int alphaSize, final int nGroups) throws IOException {
         final Bzip2InputStream.Data dataShadow = this.data;
         final char[][] len = dataShadow.temp_charArray2d;
         final int[] minLens = dataShadow.minLens;
@@ -615,7 +601,7 @@ public class Bzip2InputStream extends InputStream {
 
         final byte[] seqToUnseq = new byte[256]; // 256 byte
         final byte[] selector = new byte[Constants.MAX_SELECTORS]; // 18002 byte
-        final byte[] selectorMtf = new byte[Constants.MAX_SELECTORS]; // 18002 byte
+        final byte[] selectorList = new byte[Constants.MAX_SELECTORS]; // 18002 byte
 
         /**
          * Freq table collected to save a pass over the data during
@@ -664,17 +650,7 @@ public class Bzip2InputStream extends InputStream {
             return ttShadow;
         }
 
-        public int makeMaps() {
-            int nInUseShadow = 0;
-
-            for (int i = 0; i < huffmanUsedBitmaps.length; i++)
-                if (huffmanUsedBitmaps[i])
-                    seqToUnseq[nInUseShadow++] = (byte)i;
-
-            return nInUseShadow;
-        }
-
-        public void readHuffmanUsedBitmaps(BitInputStream in) throws IOException {
+        public int readHuffmanUsedBitmaps(BitInputStream in) throws IOException {
             int huffmanUsedMap = (int)in.readBits(16);
 
             Arrays.fill(huffmanUsedBitmaps, false);
@@ -688,6 +664,31 @@ public class Bzip2InputStream extends InputStream {
                 for (int j = 0; j < 16; j++)
                     if (in.readBit())
                         huffmanUsedBitmaps[i16 + j] = true;
+            }
+
+            return makeMaps();
+        }
+
+        private int makeMaps() {
+            int res = 0;
+
+            for (int i = 0; i < huffmanUsedBitmaps.length; i++)
+                if (huffmanUsedBitmaps[i])
+                    seqToUnseq[res++] = (byte)i;
+
+            return res;
+        }
+
+        public void codingTables(BitInputStream bin, int huffmanGroups, int alphaSize) throws IOException {
+            for (int i = 0; i < huffmanGroups; i++) {
+                int curr = (int)bin.readBits(5);
+
+                for (int j = 0; j < alphaSize; j++) {
+                    while (bin.readBit())
+                        curr += bin.readBit() ? -1 : 1;
+
+                    temp_charArray2d[i][j] = (char)curr;
+                }
             }
         }
 
