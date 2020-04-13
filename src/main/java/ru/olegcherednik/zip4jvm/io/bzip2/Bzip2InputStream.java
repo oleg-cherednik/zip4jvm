@@ -61,9 +61,9 @@ public class Bzip2InputStream extends InputStream {
      */
     private Bzip2InputStream.Data data;
 
-    public Bzip2InputStream(DataInput in) throws IOException {
+    public Bzip2InputStream(DataInput in, int blocSize) throws IOException {
         this.in = new BitInputStream(in);
-        init();
+        blockSize100k = blocSize;
         initBlock();
     }
 
@@ -101,34 +101,6 @@ public class Bzip2InputStream extends InputStream {
         }
 
         this.nInUse = nInUseShadow;
-    }
-
-    private int readNextByte(BitInputStream in) throws IOException {
-        long b = in.readBits(8);
-        return (int)b;
-    }
-
-    private boolean init() throws IOException {
-        if (null == in)
-            throw new IOException("No InputStream");
-
-        final int magic0 = readNextByte(this.in);
-        final int magic1 = readNextByte(this.in);
-        final int magic2 = readNextByte(this.in);
-
-        if (magic0 != 'B' || magic1 != 'Z' || magic2 != 'h')
-            throw new IOException("Stream is not in the BZip2 format");
-
-        final int blockSize = readNextByte(this.in);
-        if ((blockSize < '1') || (blockSize > '9')) {
-            throw new IOException("BZip2 block size is invalid");
-        }
-
-        this.blockSize100k = blockSize - '0';
-
-        this.computedCombinedCRC = 0;
-
-        return true;
     }
 
     private void initBlock() throws IOException {

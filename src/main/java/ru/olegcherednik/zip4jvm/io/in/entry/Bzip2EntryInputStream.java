@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.in.entry;
 
 import org.apache.commons.io.IOUtils;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.bzip2.Bzip2InputStream;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -17,11 +18,24 @@ final class Bzip2EntryInputStream extends EntryInputStream {
 
     public Bzip2EntryInputStream(ZipEntry zipEntry, DataInput in) throws IOException {
         super(zipEntry, in);
-        bzip = createDecoder();
+        bzip = createInputStream();
     }
 
-    private Bzip2InputStream createDecoder() throws IOException {
-        return new Bzip2InputStream(in);
+    private Bzip2InputStream createInputStream() throws IOException {
+        int magicHi = in.readByte();
+        int magicLo = in.readByte();
+        int version = in.readByte();
+        int blockSize = in.readByte();
+
+        if (magicHi != 'B' || magicLo != 'Z')
+            throw new Zip4jvmException(String.format("BZIP2 magic number is not correct: actual is '%c%c' (expected is 'BZ')",
+                    magicHi, magicLo));
+        if (version != 'h')
+            throw new Zip4jvmException(String.format("BZIP2 version '%c' is not supported: only 'h' is supported", version));
+        if (blockSize < '1' || blockSize > '9')
+            throw new Zip4jvmException(String.format("BZIP2 block size is invalid: actual is '%c' (expected between '1' and '9')", blockSize));
+
+        return new Bzip2InputStream(in, blockSize);
     }
 
     @Override

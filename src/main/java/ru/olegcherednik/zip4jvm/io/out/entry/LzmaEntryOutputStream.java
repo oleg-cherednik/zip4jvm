@@ -18,10 +18,10 @@ final class LzmaEntryOutputStream extends EntryOutputStream {
 
     public LzmaEntryOutputStream(ZipEntry zipEntry, DataOutput out) throws IOException {
         super(zipEntry, out);
-        lzma = createEncoder();
+        lzma = createOutputStream();
     }
 
-    private LzmaOutputStream createEncoder() throws IOException {
+    private LzmaOutputStream createOutputStream() throws IOException {
         long size = zipEntry.isLzmaEosMarker() ? -1 : zipEntry.getUncompressedSize();
         int compressionLevel = zipEntry.getCompressionLevel().getCode();
         return new LzmaOutputStream(out, new LzmaInputStream.Properties(compressionLevel), size);

@@ -49,11 +49,6 @@ class BitInputStream {
         this.in = in;
     }
 
-    public void clearBitCache() {
-        bitsCached = 0;
-        bitsCachedSize = 0;
-    }
-
     /**
      * Returns at most 63 bits read from the underlying stream.
      *
@@ -75,6 +70,19 @@ class BitInputStream {
             return processBitsGreater57(count);
         }
         return readCachedBits(count);
+    }
+
+    public int readByte() throws IOException {
+        return (int)readBits(8);
+    }
+
+    public int bsR(int n) throws IOException {
+        long thech = readBits(n);
+
+        if (thech < IOUtils.EOF)
+            throw new IOException("Unexpected end of stream");
+
+        return (int)thech;
     }
 
     private long processBitsGreater57(final int count) throws IOException {
