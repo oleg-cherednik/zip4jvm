@@ -33,11 +33,15 @@ import java.nio.ByteOrder;
 class BitInputStream {
 
     private static final int MAXIMUM_CACHE_SIZE = 63; // bits in long minus sign bit
-    private static final long[] MASKS = new long[MAXIMUM_CACHE_SIZE + 1];
+    private static final long[] MASKS = createMasks();
 
-    static {
-        for (int i = 1; i <= MAXIMUM_CACHE_SIZE; i++)
-            MASKS[i] = (MASKS[i - 1] << 1) + 1;
+    private static long[] createMasks() {
+        long[] masks = new long[MAXIMUM_CACHE_SIZE + 1];
+
+        for (int i = 1; i < masks.length; i++)
+            masks[i] = (masks[i - 1] << 1) + 1;
+
+        return masks;
     }
 
     private final DataInput in;
@@ -49,16 +53,6 @@ class BitInputStream {
         this.in = in;
     }
 
-    /**
-     * Returns at most 63 bits read from the underlying stream.
-     *
-     * @param count the number of bits to read, must be a positive
-     *              number not bigger than 63.
-     * @return the bits concatenated as a long using the stream's byte order.
-     * -1 if the end of the underlying stream has been reached before reading
-     * the requested number of bits
-     * @throws IOException on error
-     */
     public long readBits(final int count) throws IOException {
         if (count < 0 || count > MAXIMUM_CACHE_SIZE)
             throw new IllegalArgumentException("count must not be negative or greater than " + MAXIMUM_CACHE_SIZE);
@@ -116,27 +110,22 @@ class BitInputStream {
         return bitsOut;
     }
 
-    /**
-     * Fills the cache up to 56 bits
-     *
-     * @param count
-     * @return return true, when EOF
-     * @throws IOException
-     */
-    private boolean ensureCache(final int count) throws IOException {
+    private boolean ensureCache(int count) throws IOException {
         while (bitsCachedSize < count && bitsCachedSize < 57) {
-            final long nextByte = in.readByte();
-            if (nextByte < 0) {
+            long nextByte = in.readByte();
+
+            if (nextByte < 0)
                 return true;
-            }
-            if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
+            if (byteOrder == ByteOrder.LITTLE_ENDIAN)
                 bitsCached |= nextByte << bitsCachedSize;
-            } else {
+            else {
                 bitsCached <<= Byte.SIZE;
                 bitsCached |= nextByte;
             }
+
             bitsCachedSize += Byte.SIZE;
         }
+
         return false;
     }
 
