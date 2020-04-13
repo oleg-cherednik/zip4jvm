@@ -25,17 +25,17 @@ final class Bzip2EntryInputStream extends EntryInputStream {
         int magicHi = in.readByte();
         int magicLo = in.readByte();
         int version = in.readByte();
-        int blockSize = in.readByte();
+        int blockSize100k = in.readByte();
 
         if (magicHi != 'B' || magicLo != 'Z')
             throw new Zip4jvmException(String.format("BZIP2 magic number is not correct: actual is '%c%c' (expected is 'BZ')",
                     magicHi, magicLo));
         if (version != 'h')
             throw new Zip4jvmException(String.format("BZIP2 version '%c' is not supported: only 'h' is supported", version));
-        if (blockSize < '1' || blockSize > '9')
-            throw new Zip4jvmException(String.format("BZIP2 block size is invalid: actual is '%c' (expected between '1' and '9')", blockSize));
+        if (blockSize100k < '1' || blockSize100k > '9')
+            throw new Zip4jvmException(String.format("BZIP2 block size is invalid: actual is '%c' (expected between '1' and '9')", blockSize100k));
 
-        return new Bzip2InputStream(in, blockSize);
+        return new Bzip2InputStream(in, blockSize100k);
     }
 
     @Override

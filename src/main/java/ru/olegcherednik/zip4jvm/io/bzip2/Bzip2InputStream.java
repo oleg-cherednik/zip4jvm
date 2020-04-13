@@ -31,7 +31,7 @@ public class Bzip2InputStream extends InputStream {
      * always: in the range 0 .. 9. The current block size is 100000 * this
      * number.
      */
-    private int blockSize100k;
+    private final int blockSize100k;
 
     private boolean blockRandomised;
 
@@ -61,9 +61,9 @@ public class Bzip2InputStream extends InputStream {
      */
     private Bzip2InputStream.Data data;
 
-    public Bzip2InputStream(DataInput in, int blocSize) throws IOException {
+    public Bzip2InputStream(DataInput in, int blockSize100k) throws IOException {
         bin = new BitInputStream(in);
-        blockSize100k = blocSize;
+        this.blockSize100k = blockSize100k;
         initBlock();
     }
 
@@ -73,7 +73,7 @@ public class Bzip2InputStream extends InputStream {
     }
 
     @Override
-    public int read(final byte[] dest, final int offs, final int len) throws IOException {
+    public int read(byte[] buf, int offs, int len) throws IOException {
         if (len == 0)
             return 0;
 
@@ -82,33 +82,31 @@ public class Bzip2InputStream extends InputStream {
         int b;
 
         while (destOffs < hi && ((b = currentState.read(this)) >= 0)) {
-            dest[destOffs++] = (byte)b;
+            buf[destOffs++] = (byte)b;
         }
 
         return (destOffs == offs) ? -1 : (destOffs - offs);
     }
 
     private void initBlock() throws IOException {
-        char magic0;
-        char magic1;
-        char magic2;
-        char magic3;
-        char magic4;
-        char magic5;
+        int magic0;
+        int magic1;
+        int magic2;
+        int magic3;
+        int magic4;
+        int magic5;
 
         while (true) {
-            // Get the block magic bytes.
-            magic0 = bin.bsGetUByte();
-            magic1 = bin.bsGetUByte();
-            magic2 = bin.bsGetUByte();
-            magic3 = bin.bsGetUByte();
-            magic4 = bin.bsGetUByte();
-            magic5 = bin.bsGetUByte();
+            magic0 = bin.readByte();
+            magic1 = bin.readByte();
+            magic2 = bin.readByte();
+            magic3 = bin.readByte();
+            magic4 = bin.readByte();
+            magic5 = bin.readByte();
 
             // If isn't end of stream magic, break out of the loop.
-            if (magic0 != 0x17 || magic1 != 0x72 || magic2 != 0x45 || magic3 != 0x38 || magic4 != 0x50 || magic5 != 0x90) {
+            if (magic0 != 0x17 || magic1 != 0x72 || magic2 != 0x45 || magic3 != 0x38 || magic4 != 0x50 || magic5 != 0x90)
                 break;
-            }
 
             // End of stream was reached. Check the combined CRC and
             // advance to the next .bz2 stream if decoding concatenated

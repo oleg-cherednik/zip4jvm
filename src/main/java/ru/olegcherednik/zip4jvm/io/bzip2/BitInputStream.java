@@ -89,10 +89,6 @@ class BitInputStream {
         return bsR(32);
     }
 
-    public char bsGetUByte() throws IOException {
-        return (char)bsR(8);
-    }
-
     public boolean bsGetBit() throws IOException {
         return bsR(1) != 0;
     }
