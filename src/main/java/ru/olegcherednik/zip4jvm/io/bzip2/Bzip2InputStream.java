@@ -15,7 +15,7 @@ import java.util.Arrays;
  */
 public class Bzip2InputStream extends InputStream {
 
-    private final BitInputStream in;
+    private final BitInputStream bin;
 
     /**
      * Index of the last char in the block, so the block size == last + 1.
@@ -62,7 +62,7 @@ public class Bzip2InputStream extends InputStream {
     private Bzip2InputStream.Data data;
 
     public Bzip2InputStream(DataInput in, int blocSize) throws IOException {
-        this.in = new BitInputStream(in);
+        bin = new BitInputStream(in);
         blockSize100k = blocSize;
         initBlock();
     }
@@ -113,12 +113,12 @@ public class Bzip2InputStream extends InputStream {
 
         while (true) {
             // Get the block magic bytes.
-            magic0 = bsGetUByte(in);
-            magic1 = bsGetUByte(in);
-            magic2 = bsGetUByte(in);
-            magic3 = bsGetUByte(in);
-            magic4 = bsGetUByte(in);
-            magic5 = bsGetUByte(in);
+            magic0 = bsGetUByte(bin);
+            magic1 = bsGetUByte(bin);
+            magic2 = bsGetUByte(bin);
+            magic3 = bsGetUByte(bin);
+            magic4 = bsGetUByte(bin);
+            magic5 = bsGetUByte(bin);
 
             // If isn't end of stream magic, break out of the loop.
             if (magic0 != 0x17 || magic1 != 0x72 || magic2 != 0x45
@@ -144,8 +144,8 @@ public class Bzip2InputStream extends InputStream {
             currentState = State.EOF;
             throw new IOException("Bad block header");
         }
-        this.storedBlockCRC = bsGetInt(in);
-        this.blockRandomised = bsR(in, 1) == 1;
+        this.storedBlockCRC = bsGetInt(bin);
+        this.blockRandomised = bin.bsR(1) == 1;
 
         /**
          * Allocate data here instead in constructor, so we do not allocate
@@ -182,7 +182,7 @@ public class Bzip2InputStream extends InputStream {
     }
 
     private boolean complete() throws IOException {
-        this.storedCombinedCRC = bsGetInt(in);
+        this.storedCombinedCRC = bsGetInt(bin);
         this.currentState = State.EOF;
         this.data = null;
 
@@ -198,31 +198,16 @@ public class Bzip2InputStream extends InputStream {
         this.data = null;
     }
 
-    /**
-     * read bits from the input stream
-     *
-     * @param n the number of bits to read, must not exceed 32?
-     * @return the requested bits combined into an int
-     * @throws IOException
-     */
-    private static int bsR(BitInputStream bin, final int n) throws IOException {
-        long thech = bin.readBits(n);
-        if (thech < 0) {
-            throw new IOException("Unexpected end of stream");
-        }
-        return (int)thech;
-    }
-
     private static boolean bsGetBit(BitInputStream bin) throws IOException {
-        return bsR(bin, 1) != 0;
+        return bin.bsR(1) != 0;
     }
 
     private static char bsGetUByte(BitInputStream bin) throws IOException {
-        return (char)bsR(bin, 8);
+        return (char)bin.bsR(8);
     }
 
     private static int bsGetInt(BitInputStream bin) throws IOException {
-        return bsR(bin, 32);
+        return bin.bsR(32);
     }
 
     private static void checkBounds(final int checkVal, final int limitExclusive, String name)
@@ -280,7 +265,7 @@ public class Bzip2InputStream extends InputStream {
     }
 
     private void recvDecodingTables() throws IOException {
-        final BitInputStream bin = this.in;
+        final BitInputStream bin = this.bin;
         final Bzip2InputStream.Data dataShadow = this.data;
         final boolean[] inUse = dataShadow.inUse;
         final byte[] pos = dataShadow.recvDecodingTables_pos;
@@ -311,8 +296,8 @@ public class Bzip2InputStream extends InputStream {
         makeMaps();
         final int alphaSize = this.nInUse + 2;
         /* Now the selectors */
-        final int nGroups = bsR(bin, 3);
-        final int selectors = bsR(bin, 15);
+        final int nGroups = bin.bsR(3);
+        final int selectors = bin.bsR(15);
         if (selectors < 0) {
             throw new IOException("Corrupted input, nSelectors value negative");
         }
@@ -356,7 +341,7 @@ public class Bzip2InputStream extends InputStream {
 
         /* Now the coding tables */
         for (int t = 0; t < nGroups; t++) {
-            int curr = bsR(bin, 5);
+            int curr = bin.bsR(5);
             final char[] len_t = len[t];
             for (int i = 0; i < alphaSize; i++) {
                 while (bsGetBit(bin)) {
@@ -402,8 +387,8 @@ public class Bzip2InputStream extends InputStream {
     }
 
     private void getAndMoveToFrontDecode() throws IOException {
-        final BitInputStream bin = this.in;
-        this.origPtr = bsR(bin, 24);
+        final BitInputStream bin = this.bin;
+        this.origPtr = bin.bsR(24);
         recvDecodingTables();
 
         final Bzip2InputStream.Data dataShadow = this.data;
@@ -468,10 +453,10 @@ public class Bzip2InputStream extends InputStream {
 
                     int zn = minLens_zt;
                     checkBounds(zn, Constants.MAX_ALPHA_SIZE, "zn");
-                    int zvec = bsR(bin, zn);
+                    int zvec = bin.bsR(zn);
                     while (zvec > limit_zt[zn]) {
                         checkBounds(++zn, Constants.MAX_ALPHA_SIZE, "zn");
-                        zvec = (zvec << 1) | bsR(bin, 1);
+                        zvec = (zvec << 1) | bin.bsR(1);
                     }
                     final int tmp = zvec - base_zt[zn];
                     checkBounds(tmp, Constants.MAX_ALPHA_SIZE, "zvec");
@@ -533,10 +518,10 @@ public class Bzip2InputStream extends InputStream {
 
                 int zn = minLens_zt;
                 checkBounds(zn, Constants.MAX_ALPHA_SIZE, "zn");
-                int zvec = bsR(bin, zn);
+                int zvec = bin.bsR(zn);
                 while (zvec > limit_zt[zn]) {
                     checkBounds(++zn, Constants.MAX_ALPHA_SIZE, "zn");
-                    zvec = (zvec << 1) | bsR(bin, 1);
+                    zvec = (zvec << 1) | bin.bsR(1);
                 }
                 final int idx = zvec - base_zt[zn];
                 checkBounds(idx, Constants.MAX_ALPHA_SIZE, "zvec");
@@ -554,10 +539,10 @@ public class Bzip2InputStream extends InputStream {
         final int[] limit_zt = dataShadow.limit[zt];
         int zn = dataShadow.minLens[zt];
         checkBounds(zn, Constants.MAX_ALPHA_SIZE, "zn");
-        int zvec = bsR(in, zn);
+        int zvec = bin.bsR(zn);
         while (zvec > limit_zt[zn]) {
             checkBounds(++zn, Constants.MAX_ALPHA_SIZE, "zn");
-            zvec = (zvec << 1) | bsR(in, 1);
+            zvec = (zvec << 1) | bin.bsR(1);
         }
         final int tmp = zvec - dataShadow.base[zt][zn];
         checkBounds(tmp, Constants.MAX_ALPHA_SIZE, "zvec");
