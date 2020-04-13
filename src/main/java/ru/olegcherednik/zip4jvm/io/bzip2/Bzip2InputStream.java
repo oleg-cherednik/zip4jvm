@@ -246,36 +246,21 @@ public class Bzip2InputStream extends InputStream {
         }
 
         data.codingTables(bin, huffmanGroups, alphaSize);
-        createHuffmanDecodingTables(alphaSize, huffmanGroups);
+        createHuffmanDecodingTables(huffmanGroups, alphaSize);
     }
 
     /**
      * Called by recvDecodingTables() exclusively.
      */
-    private void createHuffmanDecodingTables(final int alphaSize, final int nGroups) throws IOException {
-        final Bzip2InputStream.Data dataShadow = this.data;
-        final char[][] len = dataShadow.temp_charArray2d;
-        final int[] minLens = dataShadow.minLens;
-        final int[][] limit = dataShadow.limit;
-        final int[][] base = dataShadow.base;
-        final int[][] perm = dataShadow.perm;
-
-        for (int t = 0; t < nGroups; t++) {
-            int minLen = 32;
-            int maxLen = 0;
-            final char[] len_t = len[t];
-            for (int i = alphaSize; --i >= 0; ) {
-                final char lent = len_t[i];
-                if (lent > maxLen) {
-                    maxLen = lent;
-                }
-                if (lent < minLen) {
-                    minLen = lent;
-                }
+    private void createHuffmanDecodingTables(int huffmanGroups, int alphaSize) throws IOException {
+        for (int i = 0, min = 32, max = 0; i < huffmanGroups; i++) {
+            for (int j = alphaSize - 1; j >= 0; j--) {
+                min = Math.min(min, data.temp_charArray2d[i][j]);
+                max = Math.max(max, data.temp_charArray2d[i][j]);
             }
-            hbCreateDecodeTables(limit[t], base[t], perm[t], len[t], minLen,
-                    maxLen, alphaSize);
-            minLens[t] = minLen;
+
+            hbCreateDecodeTables(data.limit[i], data.base[i], data.perm[i], data.temp_charArray2d[i], min, max, alphaSize);
+            data.minLens[i] = min;
         }
     }
 
