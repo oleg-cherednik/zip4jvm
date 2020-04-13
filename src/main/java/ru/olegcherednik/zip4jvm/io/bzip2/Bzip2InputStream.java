@@ -95,7 +95,7 @@ public class Bzip2InputStream extends InputStream {
         long magic;
 
         while (true) {
-            magic = bin.readBits(48);
+            magic = bin.readBits(Byte.SIZE * 6);
 
             if (magic != MAGIC_EOS)
                 break;
@@ -112,7 +112,7 @@ public class Bzip2InputStream extends InputStream {
             throw new IOException("Bad block header");
         }
 
-        blockCrc = (int)bin.readBits(32);
+        blockCrc = (int)bin.readBits(Byte.SIZE * 4);
         blockRandomised = bin.readBit();
 
         /*
@@ -149,7 +149,7 @@ public class Bzip2InputStream extends InputStream {
     }
 
     private boolean complete() throws IOException {
-        this.storedCombinedCRC = (int)bin.readBits(32);
+        this.storedCombinedCRC = (int)bin.readBits(Byte.SIZE * 4);
         this.currentState = State.EOF;
         this.data = null;
 
@@ -339,7 +339,7 @@ public class Bzip2InputStream extends InputStream {
 
     private void getAndMoveToFrontDecode() throws IOException {
         final BitInputStream bin = this.bin;
-        this.origPtr = (int)bin.readBits(24);
+        origPtr = (int)bin.readBits(Byte.SIZE * 3);
         recvDecodingTables();
 
         final Bzip2InputStream.Data dataShadow = this.data;
