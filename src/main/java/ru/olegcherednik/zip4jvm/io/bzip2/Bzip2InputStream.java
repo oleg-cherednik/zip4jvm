@@ -88,21 +88,6 @@ public class Bzip2InputStream extends InputStream {
         return (destOffs == offs) ? -1 : (destOffs - offs);
     }
 
-    private void makeMaps() {
-        final boolean[] inUse = this.data.inUse;
-        final byte[] seqToUnseq = this.data.seqToUnseq;
-
-        int nInUseShadow = 0;
-
-        for (int i = 0; i < 256; i++) {
-            if (inUse[i]) {
-                seqToUnseq[nInUseShadow++] = (byte)i;
-            }
-        }
-
-        this.nInUse = nInUseShadow;
-    }
-
     private void initBlock() throws IOException {
         char magic0;
         char magic1;
@@ -280,7 +265,7 @@ public class Bzip2InputStream extends InputStream {
             }
         }
 
-        makeMaps();
+        nInUse = data.makeMaps();
         final int alphaSize = this.nInUse + 2;
         /* Now the selectors */
         final int nGroups = bin.bsR(3);
@@ -304,7 +289,7 @@ public class Bzip2InputStream extends InputStream {
                 selectorMtf[i] = (byte)j;
             }
         }
-        final int nSelectors = selectors > Constants.MAX_SELECTORS ? Constants.MAX_SELECTORS : selectors;
+        final int nSelectors = Math.min(selectors, Constants.MAX_SELECTORS);
 
         /* Undo the MTF values for the selectors. */
         for (int v = nGroups; --v >= 0; ) {
@@ -747,6 +732,16 @@ public class Bzip2InputStream extends InputStream {
             }
 
             return ttShadow;
+        }
+
+        public int makeMaps() {
+            int nInUseShadow = 0;
+
+            for (int i = 0; i < inUse.length; i++)
+                if (inUse[i])
+                    seqToUnseq[nInUseShadow++] = (byte)i;
+
+            return nInUseShadow;
         }
 
     }
