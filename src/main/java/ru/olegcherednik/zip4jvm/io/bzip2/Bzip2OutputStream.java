@@ -204,7 +204,6 @@ public class Bzip2OutputStream extends OutputStream {
     private Data data;
     private BlockSort blockSorter;
 
-    private final OutputStream os;
     private final DataOutput out;
     private volatile boolean closed;
 
@@ -216,12 +215,6 @@ public class Bzip2OutputStream extends OutputStream {
 
         blockSize100k = blockSize;
         this.out = out;
-        this.os = new OutputStream() {
-            @Override
-            public void write(int b) throws IOException {
-                out.writeByte(b);
-            }
-        };
 
         /* 20 is just a paranoia constant */
         this.allowableBlockSize = (this.blockSize100k * Constants.BASEBLOCKSIZE) - 20;
@@ -509,12 +502,11 @@ public class Bzip2OutputStream extends OutputStream {
     }
 
     private void bsW(final int n, final int v) throws IOException {
-        final OutputStream outShadow = this.os;
         int bsLiveShadow = this.bsLive;
         int bsBuffShadow = this.bsBuff;
 
         while (bsLiveShadow >= 8) {
-            outShadow.write(bsBuffShadow >> 24); // write 8-bit
+            out.writeByte(bsBuffShadow >> 24); // write 8-bit
             bsBuffShadow <<= 8;
             bsLiveShadow -= 8;
         }
@@ -800,7 +792,6 @@ public class Bzip2OutputStream extends OutputStream {
             bsW(1, inUse16[i] ? 1 : 0);
         }
 
-        final OutputStream outShadow = this.os;
         int bsLiveShadow = this.bsLive;
         int bsBuffShadow = this.bsBuff;
 
@@ -810,7 +801,7 @@ public class Bzip2OutputStream extends OutputStream {
                 for (int j = 0; j < 16; j++) {
                     // inlined: bsW(1, inUse[i16 + j] ? 1 : 0);
                     while (bsLiveShadow >= 8) {
-                        outShadow.write(bsBuffShadow >> 24); // write 8-bit
+                        out.writeByte(bsBuffShadow >> 24); // write 8-bit
                         bsBuffShadow <<= 8;
                         bsLiveShadow -= 8;
                     }
@@ -831,7 +822,6 @@ public class Bzip2OutputStream extends OutputStream {
         bsW(3, nGroups);
         bsW(15, nSelectors);
 
-        final OutputStream outShadow = this.os;
         final byte[] selectorMtf = this.data.selectorMtf;
 
         int bsLiveShadow = this.bsLive;
@@ -841,7 +831,7 @@ public class Bzip2OutputStream extends OutputStream {
             for (int j = 0, hj = selectorMtf[i] & 0xff; j < hj; j++) {
                 // inlined: bsW(1, 1);
                 while (bsLiveShadow >= 8) {
-                    outShadow.write(bsBuffShadow >> 24);
+                    out.writeByte(bsBuffShadow >> 24);
                     bsBuffShadow <<= 8;
                     bsLiveShadow -= 8;
                 }
@@ -851,7 +841,7 @@ public class Bzip2OutputStream extends OutputStream {
 
             // inlined: bsW(1, 0);
             while (bsLiveShadow >= 8) {
-                outShadow.write(bsBuffShadow >> 24);
+                out.writeByte(bsBuffShadow >> 24);
                 bsBuffShadow <<= 8;
                 bsLiveShadow -= 8;
             }
@@ -866,7 +856,6 @@ public class Bzip2OutputStream extends OutputStream {
     private void sendMTFValues6(final int nGroups, final int alphaSize)
             throws IOException {
         final byte[][] len = this.data.sendMTFValues_len;
-        final OutputStream outShadow = this.os;
 
         int bsLiveShadow = this.bsLive;
         int bsBuffShadow = this.bsBuff;
@@ -877,7 +866,7 @@ public class Bzip2OutputStream extends OutputStream {
 
             // inlined: bsW(5, curr);
             while (bsLiveShadow >= 8) {
-                outShadow.write(bsBuffShadow >> 24); // write 8-bit
+                out.writeByte(bsBuffShadow >> 24); // write 8-bit
                 bsBuffShadow <<= 8;
                 bsLiveShadow -= 8;
             }
@@ -889,7 +878,7 @@ public class Bzip2OutputStream extends OutputStream {
                 while (curr < lti) {
                     // inlined: bsW(2, 2);
                     while (bsLiveShadow >= 8) {
-                        outShadow.write(bsBuffShadow >> 24); // write 8-bit
+                        out.writeByte(bsBuffShadow >> 24); // write 8-bit
                         bsBuffShadow <<= 8;
                         bsLiveShadow -= 8;
                     }
@@ -902,7 +891,7 @@ public class Bzip2OutputStream extends OutputStream {
                 while (curr > lti) {
                     // inlined: bsW(2, 3);
                     while (bsLiveShadow >= 8) {
-                        outShadow.write(bsBuffShadow >> 24); // write 8-bit
+                        out.writeByte(bsBuffShadow >> 24); // write 8-bit
                         bsBuffShadow <<= 8;
                         bsLiveShadow -= 8;
                     }
@@ -914,7 +903,7 @@ public class Bzip2OutputStream extends OutputStream {
 
                 // inlined: bsW(1, 0);
                 while (bsLiveShadow >= 8) {
-                    outShadow.write(bsBuffShadow >> 24); // write 8-bit
+                    out.writeByte(bsBuffShadow >> 24); // write 8-bit
                     bsBuffShadow <<= 8;
                     bsLiveShadow -= 8;
                 }
@@ -931,7 +920,6 @@ public class Bzip2OutputStream extends OutputStream {
         final Data dataShadow = this.data;
         final byte[][] len = dataShadow.sendMTFValues_len;
         final int[][] code = dataShadow.sendMTFValues_code;
-        final OutputStream outShadow = this.os;
         final byte[] selector = dataShadow.selector;
         final char[] sfmap = dataShadow.sfmap;
         final int nMTFShadow = this.nMTF;
@@ -955,7 +943,7 @@ public class Bzip2OutputStream extends OutputStream {
                 // code_selCtr[sfmap_i]);
                 //
                 while (bsLiveShadow >= 8) {
-                    outShadow.write(bsBuffShadow >> 24);
+                    out.writeByte(bsBuffShadow >> 24);
                     bsBuffShadow <<= 8;
                     bsLiveShadow -= 8;
                 }
