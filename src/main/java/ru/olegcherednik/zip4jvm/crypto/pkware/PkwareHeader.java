@@ -50,6 +50,9 @@ public final class PkwareHeader {
         engine.decrypt(buf, 0, buf.length);
         int checksum = getChecksum(zipEntry);
 
+        int a = 0;
+        a++;
+
 // TODO this does not work with last SecureZIP pkware archive
 //        if (buf[buf.length - 1] != low(checksum) /*|| buf[buf.length - 2] != high(checksum)*/)
 //            throw new IncorrectPasswordException(zipEntry.getFileName());

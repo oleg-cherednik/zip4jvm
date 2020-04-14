@@ -9,9 +9,9 @@ import java.nio.file.Path;
 import java.util.Arrays;
 
 import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SolidPkwareZip;
-import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SolidZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SplitZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipLzmaSolidZip;
+import static ru.olegcherednik.zip4jvm.TestData.winRarDeflateSolidPkwareZip;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
@@ -36,7 +36,7 @@ public class SecureZipToZip4jvmCompatibilityTest {
     public void shouldUnzipWhenBzip2Solid() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        for (Path zip : Arrays.asList(secureZipBzip2SolidZip, secureZipBzip2SolidPkwareZip)) {
+        for (Path zip : Arrays.asList(/*secureZipBzip2SolidZip,*/winRarDeflateSolidPkwareZip,  secureZipBzip2SolidPkwareZip)) {
             Path destDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(dir, zip);
             UnzipIt.zip(zip).destDir(destDir).password(password).extract();
             assertThatDirectory(destDir).matches(dirBikesAssert);
