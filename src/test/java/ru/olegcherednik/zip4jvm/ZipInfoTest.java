@@ -172,7 +172,7 @@ public class ZipInfoTest {
         zipInfo().settings(settings).printShortInfo(System.out);
     }
 
-    @Test(enabled = false)
+    @Test//(enabled = false)
     public void decompose() throws IOException {
         ZipInfoSettings settings = ZipInfoSettings.builder().copyPayload(true).build();
         zipInfo().settings(settings).decompose(Zip4jvmSuite.subDirNameAsMethodName(rootDir));

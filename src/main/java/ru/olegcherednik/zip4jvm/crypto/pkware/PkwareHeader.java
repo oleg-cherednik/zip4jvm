@@ -2,6 +2,7 @@ package ru.olegcherednik.zip4jvm.crypto.pkware;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -48,18 +49,18 @@ public final class PkwareHeader {
     /** see 6.1.6 */
     private void requireMatchChecksum(PkwareEngine engine, ZipEntry zipEntry) {
         engine.decrypt(buf, 0, buf.length);
-        int checksum = getChecksum(zipEntry);
+        int lastModifiedTime = zipEntry.getLastModifiedTime();
+        long checksum = zipEntry.getChecksum();
 
-        int a = 0;
-        a++;
+        boolean match = false;
 
-// TODO this does not work with last SecureZIP pkware archive
-//        if (buf[buf.length - 1] != low(checksum) /*|| buf[buf.length - 2] != high(checksum)*/)
-//            throw new IncorrectPasswordException(zipEntry.getFileName());
-    }
+        if (buf[buf.length - 1] == low(lastModifiedTime))
+            match = true;
+        if (buf[buf.length - 1]  == (byte)(checksum >> 24))
+            match = true;
 
-    private static int getChecksum(ZipEntry zipEntry) {
-        return zipEntry.getLastModifiedTime();
+        if (!match)
+            throw new IncorrectPasswordException(zipEntry.getFileName());
     }
 
     private static byte low(int checksum) {

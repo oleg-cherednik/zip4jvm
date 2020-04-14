@@ -9,9 +9,9 @@ import java.nio.file.Path;
 
 import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SolidPkwareZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SolidZip;
-import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSplitZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipLzmaSolidZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSolidAesZip;
+import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSplitZip;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
