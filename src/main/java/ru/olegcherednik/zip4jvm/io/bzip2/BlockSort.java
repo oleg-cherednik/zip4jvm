@@ -22,7 +22,7 @@ import java.util.BitSet;
 
 /**
  * Encapsulates the Burrows-Wheeler sorting algorithm needed by {@link
- * Bzip2CompressorOutputStream}.
+ * Bzip2OutputStream}.
  *
  * <p>This class is based on a Java port of Julian Seward's
  * blocksort.c in his libbzip2</p>
@@ -146,11 +146,11 @@ class BlockSort {
      */
     private final char[] quadrant;
 
-    BlockSort(final Bzip2CompressorOutputStream.Data data) {
+    BlockSort(final Bzip2OutputStream.Data data) {
         this.quadrant = data.sfmap;
     }
 
-    void blockSort(final Bzip2CompressorOutputStream.Data data, final int last) {
+    void blockSort(final Bzip2OutputStream.Data data, final int last) {
         this.workLimit = WORK_FACTOR * last;
         this.workDone = 0;
         this.firstAttempt = true;
@@ -182,7 +182,7 @@ class BlockSort {
      * code, in particular deal with the fact that block starts at
      * offset 1 (in libbzip2 1.0.6 it starts at 0).
      */
-    final void fallbackSort(final Bzip2CompressorOutputStream.Data data,
+    final void fallbackSort(final Bzip2OutputStream.Data data,
             final int last) {
         data.block[0] = data.block[last + 1];
         fallbackSort(data.fmap, data.block, last + 1);
@@ -600,7 +600,7 @@ class BlockSort {
      * JIT compiler of the vm.
      * </p>
      */
-    private boolean mainSimpleSort(final Bzip2CompressorOutputStream.Data dataShadow,
+    private boolean mainSimpleSort(final Bzip2OutputStream.Data dataShadow,
             final int lo, final int hi, final int d,
             final int lastShadow) {
         final int bigN = hi - lo + 1;
@@ -813,7 +813,7 @@ class BlockSort {
     /**
      * Method "mainQSort3", file "blocksort.c", BZip2 1.0.2
      */
-    private void mainQSort3(final Bzip2CompressorOutputStream.Data dataShadow,
+    private void mainQSort3(final Bzip2OutputStream.Data dataShadow,
             final int loSt, final int hiSt, final int dSt,
             final int last) {
         final int[] stack_ll = this.stack_ll;
@@ -921,7 +921,7 @@ class BlockSort {
     private static final int SETMASK = (1 << 21);
     private static final int CLEARMASK = (~SETMASK);
 
-    final void mainSort(final Bzip2CompressorOutputStream.Data dataShadow,
+    final void mainSort(final Bzip2OutputStream.Data dataShadow,
             final int lastShadow) {
         final int[] runningOrder = this.mainSort_runningOrder;
         final int[] copy = this.mainSort_copy;
