@@ -18,6 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.io.bzip2;
 
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -337,52 +339,31 @@ class Bzip2CompressorOutputStream extends OutputStream {
                 .min((inputLength / 132000) + 1, 9) : MAX_BLOCKSIZE;
     }
 
-    /**
-     * Constructs a new {@code BZip2CompressorOutputStream} with a blocksize of 900k.
-     *
-     * @param out the destination stream.
-     * @throws IOException          if an I/O error occurs in the specified stream.
-     * @throws NullPointerException if <code>out == null</code>.
-     */
-    public Bzip2CompressorOutputStream(final OutputStream out)
-            throws IOException {
-        this(out, MAX_BLOCKSIZE);
-    }
-
-    /**
-     * Constructs a new {@code BZip2CompressorOutputStream} with specified blocksize.
-     *
-     * @param out       the destination stream.
-     * @param blockSize the blockSize as 100k units.
-     * @throws IOException              if an I/O error occurs in the specified stream.
-     * @throws IllegalArgumentException if <code>(blockSize &lt; 1) || (blockSize &gt; 9)</code>.
-     * @throws NullPointerException     if <code>out == null</code>.
-     * @see #MIN_BLOCKSIZE
-     * @see #MAX_BLOCKSIZE
-     */
-    public Bzip2CompressorOutputStream(final OutputStream out, final int blockSize) throws IOException {
-        if (blockSize < 1) {
+    public Bzip2CompressorOutputStream(DataOutput out, final int blockSize) throws IOException {
+        if (blockSize < 1)
             throw new IllegalArgumentException("blockSize(" + blockSize + ") < 1");
-        }
-        if (blockSize > 9) {
+        if (blockSize > 9)
             throw new IllegalArgumentException("blockSize(" + blockSize + ") > 9");
-        }
 
-        this.blockSize100k = blockSize;
-        this.out = out;
+        blockSize100k = blockSize;
+        this.out = new OutputStream() {
+            @Override
+            public void write(int b) throws IOException {
+                out.writeByte(b);
+            }
+        };
 
         /* 20 is just a paranoia constant */
         this.allowableBlockSize = (this.blockSize100k * Constants.BASEBLOCKSIZE) - 20;
-        init();
     }
 
     @Override
     public void write(final int b) throws IOException {
-        if (!closed) {
+        init();
+        if (!closed)
             write0(b);
-        } else {
+        else
             throw new IOException("Closed");
-        }
     }
 
     /**
@@ -502,6 +483,8 @@ class Bzip2CompressorOutputStream extends OutputStream {
         }
     }
 
+    private boolean init = true;
+
     /**
      * Writes magic bytes like BZ on the first position of the stream
      * and bytes indiciating the file-format, which is
@@ -510,6 +493,10 @@ class Bzip2CompressorOutputStream extends OutputStream {
      * @throws IOException if the magic bytes could not been written
      */
     private void init() throws IOException {
+        if (!init)
+            return;
+
+        init = false;
         bsPutUByte('B');
         bsPutUByte('Z');
 
@@ -606,26 +593,20 @@ class Bzip2CompressorOutputStream extends OutputStream {
     }
 
     @Override
-    public void write(final byte[] buf, int offs, final int len)
-            throws IOException {
-        if (offs < 0) {
+    public void write(final byte[] buf, int offs, final int len) throws IOException {
+        if (offs < 0)
             throw new IndexOutOfBoundsException("offs(" + offs + ") < 0.");
-        }
-        if (len < 0) {
+        if (len < 0)
             throw new IndexOutOfBoundsException("len(" + len + ") < 0.");
-        }
-        if (offs + len > buf.length) {
-            throw new IndexOutOfBoundsException("offs(" + offs + ") + len("
-                    + len + ") > buf.length("
-                    + buf.length + ").");
-        }
-        if (closed) {
+        if (offs + len > buf.length)
+            throw new IndexOutOfBoundsException("offs(" + offs + ") + len(" + len + ") > buf.length(" + buf.length + ").");
+        if (closed)
             throw new IOException("Stream closed");
-        }
 
-        for (final int hi = offs + len; offs < hi; ) {
+        init();
+
+        for (final int hi = offs + len; offs < hi; )
             write0(buf[offs++]);
-        }
     }
 
     /**

@@ -6,47 +6,33 @@ import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import static ru.olegcherednik.zip4jvm.io.bzip2.Bzip2CompressorOutputStream.MAX_BLOCKSIZE;
+
 /**
  * @author Oleg Cherednik
  * @since 12.04.2020
  */
 public class Bzip2OutputStream extends OutputStream {
 
-    private final DataOutput out;
-    private Bzip2CompressorOutputStream bzip2;
+    private final Bzip2CompressorOutputStream bzip;
 
     public Bzip2OutputStream(DataOutput out, long uncompressedSize) throws IOException {
-        this.out = out;
+        bzip = new Bzip2CompressorOutputStream(out, MAX_BLOCKSIZE);
     }
 
     @Override
     public void write(int b) throws IOException {
-        create();
-        bzip2.write(b);
+        bzip.write(b);
     }
 
     @Override
     public void write(byte[] buf, int off, int len) throws IOException {
-        create();
-        bzip2.write(buf, off, len);
-    }
-
-    private void create() throws IOException {
-        if (bzip2 != null)
-            return;
-
-        bzip2 = new Bzip2CompressorOutputStream(new OutputStream() {
-            @Override
-            public void write(int b) throws IOException {
-                out.writeByte(b);
-            }
-        });
+        bzip.write(buf, off, len);
     }
 
     @Override
     public void close() throws IOException {
-        if (bzip2 != null)
-            bzip2.close();
+        bzip.close();
     }
 
 }
