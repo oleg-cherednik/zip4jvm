@@ -6,10 +6,15 @@ import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Arrays;
 
+import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SolidAesZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SolidZip;
+import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SplitZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipLzmaSolidZip;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
 /**
@@ -29,9 +34,19 @@ public class SecureZipToZip4jvmCompatibilityTest {
     }
 
     public void shouldUnzipWhenBzip2Solid() throws IOException {
+        Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+
+        for (Path zip : Arrays.asList(secureZipBzip2SolidZip, secureZipBzip2SolidAesZip)) {
+            Path destDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(dir, zip);
+            UnzipIt.zip(zip).destDir(destDir).password(password).extract();
+            assertThatDirectory(destDir).matches(dirBikesAssert);
+        }
+    }
+
+    public void shouldUnzipWhenBzip2Split() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.zip(secureZipBzip2SolidZip).destDir(destDir).extract();
-        assertThatDirectory(destDir).matches(dirBikesAssert);
+        UnzipIt.zip(secureZipBzip2SplitZip).destDir(destDir).extract();
+        assertThatDirectory(destDir).matches(rootAssert);
     }
 
 }

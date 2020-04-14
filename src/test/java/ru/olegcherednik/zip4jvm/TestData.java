@@ -87,10 +87,6 @@ public final class TestData {
     public static final Path zipDeflateSolidPkware = dirRoot.resolve("deflate/solid/pkware/src.zip");
     public static final Path zipDeflateSolidAes = dirRoot.resolve("deflate/solid/aes/src.zip");
 
-    // secure-zip
-    public static final Path secureZipLzmaSolidZip = Paths.get("src/test/resources/secure-zip/lzma_solid_off.zip").toAbsolutePath();
-    public static final Path secureZipBzip2SolidZip = Paths.get("src/test/resources/secure-zip/bzip2_solid_off.zip").toAbsolutePath();
-
     // winrar
     public static final Path winRarStoreSolidZip = Paths.get("src/test/resources/winrar/store_solid_off.zip").toAbsolutePath();
     public static final Path winRarStoreSolidPkwareZip = Paths.get("src/test/resources/winrar/store_solid_pkware.zip").toAbsolutePath();
@@ -103,6 +99,12 @@ public final class TestData {
     public static final Path sevenZipStoreSplitZip = Paths.get("src/test/resources/seven-zip/store_split_off/src.zip.001").toAbsolutePath();
     public static final Path sevenZipLzmaSolidZip = Paths.get("src/test/resources/seven-zip/lzma_solid_off.zip").toAbsolutePath();
     public static final Path sevenZipLzmaSolidAesZip = Paths.get("src/test/resources/seven-zip/lzma_solid_aes.zip").toAbsolutePath();
+
+    // secure-zip
+    public static final Path secureZipLzmaSolidZip = Paths.get("src/test/resources/secure-zip/lzma_solid_off.zip").toAbsolutePath();
+    public static final Path secureZipBzip2SolidZip = Paths.get("src/test/resources/secure-zip/bzip2_solid_off.zip").toAbsolutePath();
+    public static final Path secureZipBzip2SolidAesZip = Paths.get("src/test/resources/secure-zip/bzip2_solid_aes.zip").toAbsolutePath();
+    public static final Path secureZipBzip2SplitZip = Paths.get("src/test/resources/secure-zip/bzip2_store_off_split/src.zip").toAbsolutePath();
 
     private static Path createTempDirectory(String prefix) {
         try {
