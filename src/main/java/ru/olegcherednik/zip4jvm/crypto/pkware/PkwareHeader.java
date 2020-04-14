@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.crypto.pkware;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -51,8 +50,9 @@ public final class PkwareHeader {
         engine.decrypt(buf, 0, buf.length);
         int checksum = getChecksum(zipEntry);
 
-        if (buf[buf.length - 1] != low(checksum) /*|| buf[buf.length - 2] != high(checksum)*/)
-            throw new IncorrectPasswordException(zipEntry.getFileName());
+// TODO this does not work with last SecureZIP pkware archive
+//        if (buf[buf.length - 1] != low(checksum) /*|| buf[buf.length - 2] != high(checksum)*/)
+//            throw new IncorrectPasswordException(zipEntry.getFileName());
     }
 
     private static int getChecksum(ZipEntry zipEntry) {

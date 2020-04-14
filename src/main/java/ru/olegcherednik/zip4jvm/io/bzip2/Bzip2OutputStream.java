@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.bzip2;
 
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -180,10 +181,6 @@ public class Bzip2OutputStream extends OutputStream {
      */
     private int last;
 
-    /**
-     * Always: in the range 0 .. 9. The current block size is 100000 * this
-     * number.
-     */
     private final int blockSize100k;
 
     private int bsBuff;
@@ -207,13 +204,8 @@ public class Bzip2OutputStream extends OutputStream {
     private final DataOutput out;
     private volatile boolean closed;
 
-    public Bzip2OutputStream(DataOutput out, int blockSize) throws IOException {
-        if (blockSize < 1)
-            throw new IllegalArgumentException("blockSize(" + blockSize + ") < 1");
-        if (blockSize > 9)
-            throw new IllegalArgumentException("blockSize(" + blockSize + ") > 9");
-
-        blockSize100k = blockSize;
+    public Bzip2OutputStream(DataOutput out, CompressionLevel compressionLevel) throws IOException {
+        blockSize100k = compressionLevel.getCode();
         this.out = out;
 
         /* 20 is just a paranoia constant */
