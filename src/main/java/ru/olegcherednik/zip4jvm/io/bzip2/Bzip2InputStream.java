@@ -14,7 +14,7 @@ import java.util.Arrays;
  */
 public class Bzip2InputStream extends InputStream {
 
-    private final BitInputStream bin;
+    private final BitInputStream in;
     private final int blockSize;
 
     /**
@@ -35,7 +35,7 @@ public class Bzip2InputStream extends InputStream {
 
     private int nInUse;
 
-    private State currentState = State.START_BLOCK_STATE;
+    private State currentState = State.START_BLOCK;
 
     private int storedCombinedCRC;
     private int computedBlockCRC, computedCombinedCRC;
@@ -68,7 +68,7 @@ public class Bzip2InputStream extends InputStream {
         if (blockSize < '1' || blockSize > '9')
             throw new Zip4jvmException(String.format("BZIP2 block size is invalid: actual is '%c' (expected between '1' and '9')", blockSize));
 
-        bin = new BitInputStream(in);
+        this.in = new BitInputStream(in);
         this.blockSize = blockSize * Constants.BASEBLOCKSIZE;
         initBlock();
     }
@@ -98,7 +98,7 @@ public class Bzip2InputStream extends InputStream {
     private static final long MAGIC_EOS = 0x177245385090L;
 
     private void initBlock() throws IOException {
-        long magic = bin.readBits(Byte.SIZE * 6);
+        long magic = in.readBits(Byte.SIZE * 6);
 
         if (magic == MAGIC_EOS) {
             complete();
@@ -110,8 +110,8 @@ public class Bzip2InputStream extends InputStream {
             throw new IOException("Bad block header");
         }
 
-        blockCrc = (int)bin.readBits(Byte.SIZE * 4);
-        blockRandomised = bin.readBit();
+        blockCrc = (int)in.readBits(Byte.SIZE * 4);
+        blockRandomised = in.readBit();
 
         if (data == null)
             data = new Bzip2InputStream.Data(blockSize);
@@ -120,11 +120,11 @@ public class Bzip2InputStream extends InputStream {
         getAndMoveToFrontDecode();
 
         crc32.init();
-        currentState = State.START_BLOCK_STATE;
+        currentState = State.START_BLOCK;
     }
 
     private boolean complete() throws IOException {
-        storedCombinedCRC = (int)bin.readBits(Byte.SIZE * 4);
+        storedCombinedCRC = (int)in.readBits(Byte.SIZE * 4);
         currentState = State.EOF;
         data = null;
 
@@ -160,12 +160,12 @@ public class Bzip2InputStream extends InputStream {
     }
 
     private void recvDecodingTables() throws IOException {
-        nInUse = data.readHuffmanUsedBitmaps(bin);
+        nInUse = data.readHuffmanUsedBitmaps(in);
         int alphaSize = nInUse + 2;
 
         /* Now the selectorsUsed */
-        int huffmanGroups = (int)bin.readBits(3);
-        int selectorsUsed = (int)bin.readBits(15);
+        int huffmanGroups = (int)in.readBits(3);
+        int selectorsUsed = (int)in.readBits(15);
 
         if (selectorsUsed < 0)
             throw new IOException("Corrupted input, nSelectors value negative");
@@ -178,7 +178,7 @@ public class Bzip2InputStream extends InputStream {
         // and https://sourceware.org/ml/bzip2-devel/2019-q3/msg00007.html
 
         for (int i = 0, j = 0; i < selectorsUsed; i++, j = 0) {
-            while (bin.readBit())
+            while (in.readBit())
                 j++;
 
             if (i < Constants.MAX_SELECTORS)
@@ -205,7 +205,7 @@ public class Bzip2InputStream extends InputStream {
             data.selector[i] = tmp;
         }
 
-        data.codingTables(bin, huffmanGroups, alphaSize);
+        data.codingTables(in, huffmanGroups, alphaSize);
         createHuffmanDecodingTables(huffmanGroups, alphaSize);
     }
 
@@ -262,7 +262,7 @@ public class Bzip2InputStream extends InputStream {
     }
 
     private void getAndMoveToFrontDecode() throws IOException {
-        origPtr = (int)bin.readBits(Byte.SIZE * 3);
+        origPtr = (int)in.readBits(Byte.SIZE * 3);
         recvDecodingTables();
 
         final int limitLast = blockSize;
@@ -317,10 +317,10 @@ public class Bzip2InputStream extends InputStream {
 
                     int zn = minLens_zt;
                     checkBounds(zn, Constants.MAX_ALPHA_SIZE, "zn");
-                    int zvec = (int)bin.readBits(zn);
+                    int zvec = (int)in.readBits(zn);
                     while (zvec > limit_zt[zn]) {
                         checkBounds(++zn, Constants.MAX_ALPHA_SIZE, "zn");
-                        zvec = (zvec << 1) | (int)bin.readBits(1);
+                        zvec = (zvec << 1) | (int)in.readBits(1);
                     }
                     final int tmp = zvec - base_zt[zn];
                     checkBounds(tmp, Constants.MAX_ALPHA_SIZE, "zvec");
@@ -380,10 +380,10 @@ public class Bzip2InputStream extends InputStream {
 
                 int zn = minLens_zt;
                 checkBounds(zn, Constants.MAX_ALPHA_SIZE, "zn");
-                int zvec = (int)bin.readBits(zn);
+                int zvec = (int)in.readBits(zn);
                 while (zvec > limit_zt[zn]) {
                     checkBounds(++zn, Constants.MAX_ALPHA_SIZE, "zn");
-                    zvec = (zvec << 1) | (int)bin.readBits(1);
+                    zvec = (zvec << 1) | (int)in.readBits(1);
                 }
                 final int idx = zvec - base_zt[zn];
                 checkBounds(idx, Constants.MAX_ALPHA_SIZE, "zvec");
@@ -400,10 +400,10 @@ public class Bzip2InputStream extends InputStream {
         final int[] limit_zt = data.limit[zt];
         int zn = data.minLens[zt];
         checkBounds(zn, Constants.MAX_ALPHA_SIZE, "zn");
-        int zvec = (int)bin.readBits(zn);
+        int zvec = (int)in.readBits(zn);
         while (zvec > limit_zt[zn]) {
             checkBounds(++zn, Constants.MAX_ALPHA_SIZE, "zn");
-            zvec = (zvec << 1) | (int)bin.readBits(1);
+            zvec = (zvec << 1) | (int)in.readBits(1);
         }
         final int tmp = zvec - data.base[zt][zn];
         checkBounds(tmp, Constants.MAX_ALPHA_SIZE, "zvec");
@@ -417,7 +417,6 @@ public class Bzip2InputStream extends InputStream {
 
         final int ttLen = last + 1;
         final int[] tt = data.initTT(ttLen);
-        final byte[] ll8 = data.ll8;
         data.cftab[0] = 0;
         System.arraycopy(data.unzftab, 0, data.cftab, 1, 256);
 
@@ -427,7 +426,7 @@ public class Bzip2InputStream extends InputStream {
         }
 
         for (int i = 0, lastShadow = last; i <= lastShadow; i++) {
-            final int tmp = data.cftab[ll8[i] & 0xff]++;
+            final int tmp = data.cftab[data.ll8[i] & 0xff]++;
             checkBounds(tmp, ttLen, "tt index");
             tt[tmp] = i;
         }
@@ -453,7 +452,7 @@ public class Bzip2InputStream extends InputStream {
     private int setupRandPartA() throws IOException {
         if (su_i2 <= last) {
             su_chPrev = su_ch2;
-            int su_ch2Shadow = data.ll8[this.su_tPos] & 0xff;
+            int su_ch2Shadow = data.ll8[su_tPos] & 0xff;
             checkBounds(su_tPos, data.tt.length, "su_tPos");
             su_tPos = data.tt[su_tPos];
             if (su_rNToGo == 0) {
@@ -466,7 +465,7 @@ public class Bzip2InputStream extends InputStream {
             }
             su_ch2 = su_ch2Shadow ^= (su_rNToGo == 1) ? 1 : 0;
             su_i2++;
-            currentState = State.RAND_PART_B_STATE;
+            currentState = State.RAND_PART_B;
             crc32.update(su_ch2Shadow);
             return su_ch2Shadow;
         }
@@ -483,11 +482,11 @@ public class Bzip2InputStream extends InputStream {
             checkBounds(su_tPos, data.tt.length, "su_tPos");
             su_tPos = data.tt[su_tPos];
             su_i2++;
-            currentState = State.NO_RAND_PART_B_STATE;
+            currentState = State.NO_RAND_PART_B;
             crc32.update(su_ch2Shadow);
             return su_ch2Shadow;
         }
-        currentState = State.NO_RAND_PART_A_STATE;
+        currentState = State.NO_RAND_PART_A;
         endBlock();
         initBlock();
         return setupBlock();
@@ -495,7 +494,7 @@ public class Bzip2InputStream extends InputStream {
 
     private int setupRandPartB() throws IOException {
         if (su_ch2 != su_chPrev) {
-            currentState = State.RAND_PART_A_STATE;
+            currentState = State.RAND_PART_A;
             su_count = 1;
             return setupRandPartA();
         } else if (++su_count >= 4) {
@@ -511,13 +510,13 @@ public class Bzip2InputStream extends InputStream {
                 su_rNToGo--;
             }
             su_j2 = 0;
-            currentState = State.RAND_PART_C_STATE;
+            currentState = State.RAND_PART_C;
             if (su_rNToGo == 1) {
                 su_z ^= 1;
             }
             return setupRandPartC();
         } else {
-            currentState = State.RAND_PART_A_STATE;
+            currentState = State.RAND_PART_A;
             return setupRandPartA();
         }
     }
@@ -529,7 +528,7 @@ public class Bzip2InputStream extends InputStream {
             return su_ch2;
         }
 
-        currentState = State.RAND_PART_A_STATE;
+        currentState = State.RAND_PART_A;
         su_i2++;
         su_count = 0;
         return setupRandPartA();
@@ -556,7 +555,7 @@ public class Bzip2InputStream extends InputStream {
         if (su_j2 < su_z) {
             crc32.update(su_ch2);
             su_j2++;
-            currentState = State.NO_RAND_PART_C_STATE;
+            currentState = State.NO_RAND_PART_C;
             return su_ch2;
         }
 
@@ -678,33 +677,33 @@ public class Bzip2InputStream extends InputStream {
                 return IOUtils.EOF;
             }
         },
-        START_BLOCK_STATE {
+        START_BLOCK {
             @Override
             public int read(Bzip2InputStream in) throws IOException {
                 return in.setupBlock();
             }
         },
-        RAND_PART_A_STATE,
-        RAND_PART_B_STATE {
+        RAND_PART_A,
+        RAND_PART_B {
             @Override
             public int read(Bzip2InputStream in) throws IOException {
                 return in.setupRandPartB();
             }
         },
-        RAND_PART_C_STATE {
+        RAND_PART_C {
             @Override
             public int read(Bzip2InputStream in) throws IOException {
                 return in.setupRandPartC();
             }
         },
-        NO_RAND_PART_A_STATE,
-        NO_RAND_PART_B_STATE {
+        NO_RAND_PART_A,
+        NO_RAND_PART_B {
             @Override
             public int read(Bzip2InputStream in) throws IOException {
                 return in.setupNoRandPartB();
             }
         },
-        NO_RAND_PART_C_STATE {
+        NO_RAND_PART_C {
             @Override
             public int read(Bzip2InputStream in) throws IOException {
                 return in.setupNoRandPartC();

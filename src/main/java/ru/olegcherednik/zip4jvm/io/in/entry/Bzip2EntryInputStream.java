@@ -17,7 +17,11 @@ final class Bzip2EntryInputStream extends EntryInputStream {
 
     public Bzip2EntryInputStream(ZipEntry zipEntry, DataInput in) throws IOException {
         super(zipEntry, in);
-        bzip = new Bzip2InputStream(in);
+        bzip = createInputStream();
+    }
+
+    private Bzip2InputStream createInputStream() throws IOException {
+        return new Bzip2InputStream(in);
     }
 
     @Override
