@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.out.data;
 
-import ru.olegcherednik.zip4jvm.io.out.file.LittleEndianWriteFile;
 import ru.olegcherednik.zip4jvm.io.out.file.DataOutputFile;
+import ru.olegcherednik.zip4jvm.io.out.file.LittleEndianWriteFile;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import java.io.IOException;
@@ -43,6 +43,11 @@ abstract class BaseZipDataOutput extends BaseDataOutput {
     @Override
     public void close() throws IOException {
         delegate.close();
+    }
+
+    @Override
+    public void flush() throws IOException {
+        delegate.flush();
     }
 
     @Override

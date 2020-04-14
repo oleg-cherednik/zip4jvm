@@ -201,38 +201,22 @@ public class Bzip2OutputStream extends OutputStream {
     private int combinedCRC;
     private final int allowableBlockSize;
 
-    /**
-     * All memory intensive stuff.
-     */
     private Data data;
     private BlockSort blockSorter;
 
-    private OutputStream out;
+    private final OutputStream os;
+    private final DataOutput out;
     private volatile boolean closed;
 
-    /**
-     * Chooses a blocksize based on the given length of the data to compress.
-     *
-     * @param inputLength The length of the data which will be compressed by
-     *                    {@code BZip2CompressorOutputStream}.
-     * @return The blocksize, between {@link #MIN_BLOCKSIZE} and
-     * {@link #MAX_BLOCKSIZE} both inclusive. For a negative
-     * {@code inputLength} this method returns {@code MAX_BLOCKSIZE}
-     * always.
-     */
-    public static int chooseBlockSize(final long inputLength) {
-        return (inputLength > 0) ? (int)Math
-                .min((inputLength / 132000) + 1, 9) : MAX_BLOCKSIZE;
-    }
-
-    public Bzip2OutputStream(DataOutput out, final int blockSize) throws IOException {
+    public Bzip2OutputStream(DataOutput out, int blockSize) throws IOException {
         if (blockSize < 1)
             throw new IllegalArgumentException("blockSize(" + blockSize + ") < 1");
         if (blockSize > 9)
             throw new IllegalArgumentException("blockSize(" + blockSize + ") > 9");
 
         blockSize100k = blockSize;
-        this.out = new OutputStream() {
+        this.out = out;
+        this.os = new OutputStream() {
             @Override
             public void write(int b) throws IOException {
                 out.writeByte(b);
@@ -342,7 +326,6 @@ public class Bzip2OutputStream extends OutputStream {
                 endBlock();
                 endCompression();
             } finally {
-                this.out = null;
                 this.blockSorter = null;
                 this.data = null;
             }
@@ -351,22 +334,12 @@ public class Bzip2OutputStream extends OutputStream {
 
     @Override
     public void close() throws IOException {
-        if (!closed) {
-            final OutputStream outShadow = this.out;
-            try {
-                finish();
-            } finally {
-//                outShadow.close();
-            }
-        }
+        finish();
     }
 
     @Override
     public void flush() throws IOException {
-        final OutputStream outShadow = this.out;
-        if (outShadow != null) {
-            outShadow.flush();
-        }
+        out.flush();
     }
 
     private boolean init = true;
@@ -529,14 +502,14 @@ public class Bzip2OutputStream extends OutputStream {
     private void bsFinishedWithStream() throws IOException {
         while (this.bsLive > 0) {
             final int ch = this.bsBuff >> 24;
-            this.out.write(ch); // write 8-bit
+            out.writeByte(ch); // write 8-bit
             this.bsBuff <<= 8;
             this.bsLive -= 8;
         }
     }
 
     private void bsW(final int n, final int v) throws IOException {
-        final OutputStream outShadow = this.out;
+        final OutputStream outShadow = this.os;
         int bsLiveShadow = this.bsLive;
         int bsBuffShadow = this.bsBuff;
 
@@ -827,7 +800,7 @@ public class Bzip2OutputStream extends OutputStream {
             bsW(1, inUse16[i] ? 1 : 0);
         }
 
-        final OutputStream outShadow = this.out;
+        final OutputStream outShadow = this.os;
         int bsLiveShadow = this.bsLive;
         int bsBuffShadow = this.bsBuff;
 
@@ -858,7 +831,7 @@ public class Bzip2OutputStream extends OutputStream {
         bsW(3, nGroups);
         bsW(15, nSelectors);
 
-        final OutputStream outShadow = this.out;
+        final OutputStream outShadow = this.os;
         final byte[] selectorMtf = this.data.selectorMtf;
 
         int bsLiveShadow = this.bsLive;
@@ -893,7 +866,7 @@ public class Bzip2OutputStream extends OutputStream {
     private void sendMTFValues6(final int nGroups, final int alphaSize)
             throws IOException {
         final byte[][] len = this.data.sendMTFValues_len;
-        final OutputStream outShadow = this.out;
+        final OutputStream outShadow = this.os;
 
         int bsLiveShadow = this.bsLive;
         int bsBuffShadow = this.bsBuff;
@@ -958,7 +931,7 @@ public class Bzip2OutputStream extends OutputStream {
         final Data dataShadow = this.data;
         final byte[][] len = dataShadow.sendMTFValues_len;
         final int[][] code = dataShadow.sendMTFValues_code;
-        final OutputStream outShadow = this.out;
+        final OutputStream outShadow = this.os;
         final byte[] selector = dataShadow.selector;
         final char[] sfmap = dataShadow.sfmap;
         final int nMTFShadow = this.nMTF;

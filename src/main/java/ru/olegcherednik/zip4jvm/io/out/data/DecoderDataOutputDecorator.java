@@ -47,6 +47,11 @@ public final class DecoderDataOutputDecorator extends BaseDataOutput implements 
     }
 
     @Override
+    public void flush() throws IOException {
+        delegate.flush();
+    }
+
+    @Override
     public String toString() {
         return delegate.toString();
     }

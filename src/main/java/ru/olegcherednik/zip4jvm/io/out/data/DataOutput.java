@@ -41,6 +41,8 @@ public interface DataOutput extends Marker, Closeable {
         return 0;
     }
 
+    void flush() throws IOException;
+
     /* this is technical method; update {@literal byte[]} from given {@literal long}  */
     @Deprecated
     void fromLong(long val, byte[] buf, int offs, int len);

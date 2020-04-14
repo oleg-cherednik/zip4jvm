@@ -140,11 +140,6 @@ public class Bzip2InputStream extends InputStream {
         this.computedCombinedCRC ^= this.computedBlockCRC;
     }
 
-    @Override
-    public void close() throws IOException {
-        this.data = null;
-    }
-
     private static void checkBounds(int val, int limitExclusive, String name)
             throws IOException {
         if (val < 0)
