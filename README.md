@@ -19,10 +19,10 @@ zip4jvm - a java library for working with zip files
   * [PKWare](https://en.wikipedia.org/wiki/PKWare)
   * [AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
 * Compression support:
-  * Store
+  * STORE
   * [DEFLATE](https://en.wikipedia.org/wiki/DEFLATE)
+  * [BZIP2](https://en.wikipedia.org/wiki/Bzip2)
   * [LZMA](https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm)
-  * [BZIP2](https://en.wikipedia.org/wiki/Bzip2)  
 * Individual settings for each zip entry (i.e. some of files can be encrypted, and some - not);
 * Streaming support for adding and extracting;
 * Read/Write password protected Zip files and streams;
