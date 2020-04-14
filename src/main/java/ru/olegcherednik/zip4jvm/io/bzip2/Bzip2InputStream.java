@@ -122,7 +122,7 @@ public class Bzip2InputStream extends InputStream {
     }
 
     private void endBlock() throws IOException {
-        this.computedBlockCRC = this.crc32.getFinalCRC();
+        this.computedBlockCRC = this.crc32.checksum();
 
         // A bad CRC is considered a fatal error.
         if (this.blockCrc != this.computedBlockCRC) {
@@ -458,7 +458,7 @@ public class Bzip2InputStream extends InputStream {
             this.su_ch2 = su_ch2Shadow ^= (this.su_rNToGo == 1) ? 1 : 0;
             this.su_i2++;
             this.currentState = State.RAND_PART_B_STATE;
-            this.crc32.updateCRC(su_ch2Shadow);
+            this.crc32.update(su_ch2Shadow);
             return su_ch2Shadow;
         }
         endBlock();
@@ -467,18 +467,18 @@ public class Bzip2InputStream extends InputStream {
     }
 
     private int setupNoRandPartA() throws IOException {
-        if (this.su_i2 <= this.last) {
-            this.su_chPrev = this.su_ch2;
-            final int su_ch2Shadow = this.data.ll8[this.su_tPos] & 0xff;
-            this.su_ch2 = su_ch2Shadow;
-            checkBounds(this.su_tPos, this.data.tt.length, "su_tPos");
-            this.su_tPos = this.data.tt[this.su_tPos];
-            this.su_i2++;
-            this.currentState = State.NO_RAND_PART_B_STATE;
-            this.crc32.updateCRC(su_ch2Shadow);
+        if (su_i2 <= last) {
+            su_chPrev = su_ch2;
+            final int su_ch2Shadow = data.ll8[su_tPos] & 0xff;
+            su_ch2 = su_ch2Shadow;
+            checkBounds(su_tPos, data.tt.length, "su_tPos");
+            su_tPos = data.tt[su_tPos];
+            su_i2++;
+            currentState = State.NO_RAND_PART_B_STATE;
+            crc32.update(su_ch2Shadow);
             return su_ch2Shadow;
         }
-        this.currentState = State.NO_RAND_PART_A_STATE;
+        currentState = State.NO_RAND_PART_A_STATE;
         endBlock();
         initBlock();
         return setupBlock();
@@ -515,7 +515,7 @@ public class Bzip2InputStream extends InputStream {
 
     private int setupRandPartC() throws IOException {
         if (su_j2 < su_z) {
-            crc32.updateCRC(su_ch2);
+            crc32.update(su_ch2);
             su_j2++;
             return su_ch2;
         }
@@ -545,7 +545,7 @@ public class Bzip2InputStream extends InputStream {
 
     private int setupNoRandPartC() throws IOException {
         if (su_j2 < su_z) {
-            crc32.updateCRC(su_ch2);
+            crc32.update(su_ch2);
             su_j2++;
             currentState = State.NO_RAND_PART_C_STATE;
             return su_ch2;

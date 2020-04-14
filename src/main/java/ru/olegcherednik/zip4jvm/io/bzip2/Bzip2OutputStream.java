@@ -12,16 +12,6 @@ import java.io.OutputStream;
  */
 public class Bzip2OutputStream extends OutputStream {
 
-    /**
-     * The minimum supported blocksize {@code  == 1}.
-     */
-    public static final int MIN_BLOCKSIZE = 1;
-
-    /**
-     * The maximum supported blocksize {@code  == 9}.
-     */
-    public static final int MAX_BLOCKSIZE = 9;
-
     private static final int GREATER_ICOST = 15;
     private static final int LESSER_ICOST = 0;
 
@@ -244,7 +234,7 @@ public class Bzip2OutputStream extends OutputStream {
             final byte ch = (byte)currentCharShadow;
 
             int runLengthShadow = this.runLength;
-            this.crc32.updateCRC(currentCharShadow, runLengthShadow);
+            this.crc32.update(currentCharShadow, runLengthShadow);
 
             switch (runLengthShadow) {
                 case 1:
@@ -369,7 +359,7 @@ public class Bzip2OutputStream extends OutputStream {
     }
 
     private void endBlock() throws IOException {
-        this.blockCRC = this.crc32.getFinalCRC();
+        this.blockCRC = this.crc32.checksum();
         this.combinedCRC = (this.combinedCRC << 1) | (this.combinedCRC >>> 31);
         this.combinedCRC ^= this.blockCRC;
 

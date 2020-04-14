@@ -4,6 +4,7 @@ package ru.olegcherednik.zip4jvm.io.bzip2;
  * @author Oleg Cherednik
  * @since 12.04.2020
  */
+@SuppressWarnings("NewClassNamingConvention")
 final class CRC32 {
 
     private static final int[] CRC_TABLE = {
@@ -73,34 +74,33 @@ final class CRC32 {
             0xbcb4666d, 0xb8757bda, 0xb5365d03, 0xb1f740b4
     };
 
-    private int globalCrc;
+    private int checksum;
 
     public CRC32() {
         init();
     }
 
     public void init() {
-        globalCrc = 0xFFFFFFFF;
+        checksum = 0xFFFFFFFF;
     }
 
-    int getFinalCRC() {
-        return ~globalCrc;
+    public int checksum() {
+        return ~checksum;
     }
 
-    void updateCRC(final int inCh) {
-        int temp = (globalCrc >> 24) ^ inCh;
-        if (temp < 0) {
+    public void update(int b) {
+        int temp = (checksum >> 24) ^ b;
+
+        if (temp < 0)
             temp = 256 + temp;
-        }
-        globalCrc = (globalCrc << 8) ^ CRC32.CRC_TABLE[temp];
+
+        checksum = (checksum << 8) ^ CRC_TABLE[temp];
     }
 
-    void updateCRC(final int inCh, int repeat) {
-        int globalCrcShadow = this.globalCrc;
+    public void update(int b, int repeat) {
         while (repeat-- > 0) {
-            final int temp = (globalCrcShadow >> 24) ^ inCh;
-            globalCrcShadow = (globalCrcShadow << 8) ^ CRC_TABLE[(temp >= 0) ? temp : (temp + 256)];
+            int temp = (checksum >> 24) ^ b;
+            checksum = (checksum << 8) ^ CRC_TABLE[temp >= 0 ? temp : temp + 256];
         }
-        this.globalCrc = globalCrcShadow;
     }
 }
