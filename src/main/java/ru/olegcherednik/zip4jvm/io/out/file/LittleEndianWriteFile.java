@@ -1,9 +1,9 @@
 package ru.olegcherednik.zip4jvm.io.out.file;
 
-import ru.olegcherednik.zip4jvm.io.out.file.DataOutputFile;
-
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -13,11 +13,12 @@ import java.nio.file.Path;
  */
 public class LittleEndianWriteFile implements DataOutputFile {
 
-    private final RandomAccessFile out;
+    private final OutputStream out;
+    private long offs;
 
     public LittleEndianWriteFile(Path file) throws IOException {
         Files.createDirectories(file.getParent());
-        out = new RandomAccessFile(file.toFile(), "rw");
+        out = new BufferedOutputStream(new FileOutputStream(file.toFile()));
     }
 
     @Override
@@ -31,15 +32,17 @@ public class LittleEndianWriteFile implements DataOutputFile {
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
         out.write(buf, offs, len);
+        this.offs += len;
     }
 
     @Override
     public long getOffs() {
-        try {
-            return out.getFilePointer();
-        } catch(IOException e) {
-            return -1;
-        }
+        return offs;
+    }
+
+    @Override
+    public void flush() throws IOException {
+        out.flush();
     }
 
     @Override

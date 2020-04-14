@@ -356,7 +356,7 @@ public class Bzip2OutputStream extends OutputStream {
             try {
                 finish();
             } finally {
-                outShadow.close();
+//                outShadow.close();
             }
         }
     }
@@ -467,15 +467,6 @@ public class Bzip2OutputStream extends OutputStream {
 
         bsPutInt(this.combinedCRC);
         bsFinishedWithStream();
-    }
-
-    /**
-     * Returns the blocksize parameter specified at construction time.
-     *
-     * @return the blocksize parameter specified at construction time
-     */
-    public final int getBlockSize() {
-        return this.blockSize100k;
     }
 
     @Override

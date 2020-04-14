@@ -6,8 +6,6 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
 
-import static ru.olegcherednik.zip4jvm.io.bzip2.Bzip2OutputStream.MAX_BLOCKSIZE;
-
 /**
  * @author Oleg Cherednik
  * @since 12.04.2020
@@ -23,7 +21,7 @@ final class Bzip2EntryOutputStream extends EntryOutputStream {
 
     private Bzip2OutputStream createEncoder() throws IOException {
         int compressionLevel = zipEntry.getCompressionLevel().getCode();
-        return new Bzip2OutputStream(out, MAX_BLOCKSIZE);
+        return new Bzip2OutputStream(out, compressionLevel);
     }
 
     @Override

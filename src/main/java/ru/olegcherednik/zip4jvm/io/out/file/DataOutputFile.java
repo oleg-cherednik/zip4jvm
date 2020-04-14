@@ -15,4 +15,6 @@ public interface DataOutputFile extends Closeable {
 
     void fromLong(long val, byte[] buf, int offs, int len);
 
+    void flush() throws IOException;
+
 }

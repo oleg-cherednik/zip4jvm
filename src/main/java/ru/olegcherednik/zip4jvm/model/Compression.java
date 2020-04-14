@@ -17,11 +17,11 @@ public enum Compression {
 
     private final CompressionMethod method;
 
-    public static Compression parseCompressionMethod(CompressionMethod method) {
+    public static Compression parseCompressionMethod(CompressionMethod compressionMethod) {
         for (Compression compression : values())
-            if (compression.method == method)
+            if (compression.method == compressionMethod)
                 return compression;
-        throw new EnumConstantNotPresentException(Compression.class, "method=" + method);
+        throw new EnumConstantNotPresentException(Compression.class, "compressionMethod=" + compressionMethod);
     }
 
 }
