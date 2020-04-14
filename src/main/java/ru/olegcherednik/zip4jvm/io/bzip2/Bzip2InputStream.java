@@ -15,7 +15,7 @@ import java.util.Arrays;
 public class Bzip2InputStream extends InputStream {
 
     private final BitInputStream bin;
-    private final int blockSize100k;
+    private final int blockSize;
 
     /**
      * Index of the last char in the block, so the block size == last + 1.
@@ -54,9 +54,22 @@ public class Bzip2InputStream extends InputStream {
 
     private Bzip2InputStream.Data data;
 
-    public Bzip2InputStream(DataInput in, int blockSize100k) throws IOException {
+    public Bzip2InputStream(DataInput in) throws IOException {
+        int magicHi = in.readByte();
+        int magicLo = in.readByte();
+        int version = in.readByte();
+        int blockSize = in.readByte();
+
+        if (magicHi != 'B' || magicLo != 'Z')
+            throw new Zip4jvmException(String.format("BZIP2 magic number is not correct: actual is '%c%c' (expected is 'BZ')",
+                    magicHi, magicLo));
+        if (version != 'h')
+            throw new Zip4jvmException(String.format("BZIP2 version '%c' is not supported: only 'h' is supported", version));
+        if (blockSize < '1' || blockSize > '9')
+            throw new Zip4jvmException(String.format("BZIP2 block size is invalid: actual is '%c' (expected between '1' and '9')", blockSize));
+
         bin = new BitInputStream(in);
-        this.blockSize100k = blockSize100k;
+        this.blockSize = blockSize * Constants.BASEBLOCKSIZE;
         initBlock();
     }
 
@@ -101,7 +114,7 @@ public class Bzip2InputStream extends InputStream {
         blockRandomised = bin.readBit();
 
         if (data == null)
-            data = new Bzip2InputStream.Data(blockSize100k);
+            data = new Bzip2InputStream.Data(blockSize);
 
         // currBlockNo++;
         getAndMoveToFrontDecode();
@@ -122,22 +135,20 @@ public class Bzip2InputStream extends InputStream {
     }
 
     private void endBlock() throws IOException {
-        this.computedBlockCRC = this.crc32.checksum();
+        computedBlockCRC = crc32.checksum();
 
         // A bad CRC is considered a fatal error.
-        if (this.blockCrc != this.computedBlockCRC) {
+        if (blockCrc != computedBlockCRC) {
             // make next blocks readable without error
             // (repair feature, not yet documented, not tested)
-            this.computedCombinedCRC = (this.storedCombinedCRC << 1)
-                    | (this.storedCombinedCRC >>> 31);
-            this.computedCombinedCRC ^= this.blockCrc;
+            computedCombinedCRC = (storedCombinedCRC << 1) | (storedCombinedCRC >>> 31);
+            computedCombinedCRC ^= blockCrc;
 
             throw new IOException("BZip2 CRC error");
         }
 
-        this.computedCombinedCRC = (this.computedCombinedCRC << 1)
-                | (this.computedCombinedCRC >>> 31);
-        this.computedCombinedCRC ^= this.computedBlockCRC;
+        computedCombinedCRC = (computedCombinedCRC << 1) | (computedCombinedCRC >>> 31);
+        computedCombinedCRC ^= computedBlockCRC;
     }
 
     private static void checkBounds(int val, int limitExclusive, String name)
@@ -254,7 +265,7 @@ public class Bzip2InputStream extends InputStream {
         origPtr = (int)bin.readBits(Byte.SIZE * 3);
         recvDecodingTables();
 
-        final int limitLast = blockSize100k * 100000;
+        final int limitLast = blockSize;
 
         /*
          * Setting up the unzftab entries here is not strictly necessary, but it
@@ -384,50 +395,48 @@ public class Bzip2InputStream extends InputStream {
     }
 
     private int getAndMoveToFrontDecode0() throws IOException {
-        final Bzip2InputStream.Data dataShadow = this.data;
-        final int zt = dataShadow.selector[0] & 0xff;
+        final int zt = data.selector[0] & 0xff;
         checkBounds(zt, Constants.N_GROUPS, "zt");
-        final int[] limit_zt = dataShadow.limit[zt];
-        int zn = dataShadow.minLens[zt];
+        final int[] limit_zt = data.limit[zt];
+        int zn = data.minLens[zt];
         checkBounds(zn, Constants.MAX_ALPHA_SIZE, "zn");
         int zvec = (int)bin.readBits(zn);
         while (zvec > limit_zt[zn]) {
             checkBounds(++zn, Constants.MAX_ALPHA_SIZE, "zn");
             zvec = (zvec << 1) | (int)bin.readBits(1);
         }
-        final int tmp = zvec - dataShadow.base[zt][zn];
+        final int tmp = zvec - data.base[zt][zn];
         checkBounds(tmp, Constants.MAX_ALPHA_SIZE, "zvec");
 
-        return dataShadow.perm[zt][tmp];
+        return data.perm[zt][tmp];
     }
 
     private int setupBlock() throws IOException {
         if (currentState == State.EOF || data == null)
             return IOUtils.EOF;
 
-        final int[] cftab = this.data.cftab;
-        final int ttLen = this.last + 1;
-        final int[] tt = this.data.initTT(ttLen);
-        final byte[] ll8 = this.data.ll8;
-        cftab[0] = 0;
-        System.arraycopy(this.data.unzftab, 0, cftab, 1, 256);
+        final int ttLen = last + 1;
+        final int[] tt = data.initTT(ttLen);
+        final byte[] ll8 = data.ll8;
+        data.cftab[0] = 0;
+        System.arraycopy(data.unzftab, 0, data.cftab, 1, 256);
 
-        for (int i = 1, c = cftab[0]; i <= 256; i++) {
-            c += cftab[i];
-            cftab[i] = c;
+        for (int i = 1, c = data.cftab[0]; i <= 256; i++) {
+            c += data.cftab[i];
+            data.cftab[i] = c;
         }
 
-        for (int i = 0, lastShadow = this.last; i <= lastShadow; i++) {
-            final int tmp = cftab[ll8[i] & 0xff]++;
+        for (int i = 0, lastShadow = last; i <= lastShadow; i++) {
+            final int tmp = data.cftab[ll8[i] & 0xff]++;
             checkBounds(tmp, ttLen, "tt index");
             tt[tmp] = i;
         }
 
-        if ((this.origPtr < 0) || (this.origPtr >= tt.length)) {
+        if ((origPtr < 0) || (origPtr >= tt.length)) {
             throw new IOException("Stream corrupted");
         }
 
-        su_tPos = tt[this.origPtr];
+        su_tPos = tt[origPtr];
         su_count = 0;
         su_i2 = 0;
         su_ch2 = 256; /* not a char and not EOF */
@@ -442,23 +451,23 @@ public class Bzip2InputStream extends InputStream {
     }
 
     private int setupRandPartA() throws IOException {
-        if (this.su_i2 <= this.last) {
-            this.su_chPrev = this.su_ch2;
-            int su_ch2Shadow = this.data.ll8[this.su_tPos] & 0xff;
-            checkBounds(this.su_tPos, this.data.tt.length, "su_tPos");
-            this.su_tPos = this.data.tt[this.su_tPos];
-            if (this.su_rNToGo == 0) {
-                this.su_rNToGo = RandomNumbers.get(this.su_rTPos) - 1;
-                if (++this.su_rTPos == 512) {
-                    this.su_rTPos = 0;
+        if (su_i2 <= last) {
+            su_chPrev = su_ch2;
+            int su_ch2Shadow = data.ll8[this.su_tPos] & 0xff;
+            checkBounds(su_tPos, data.tt.length, "su_tPos");
+            su_tPos = data.tt[su_tPos];
+            if (su_rNToGo == 0) {
+                su_rNToGo = RandomNumbers.get(su_rTPos) - 1;
+                if (++su_rTPos == 512) {
+                    su_rTPos = 0;
                 }
             } else {
-                this.su_rNToGo--;
+                su_rNToGo--;
             }
-            this.su_ch2 = su_ch2Shadow ^= (this.su_rNToGo == 1) ? 1 : 0;
-            this.su_i2++;
-            this.currentState = State.RAND_PART_B_STATE;
-            this.crc32.update(su_ch2Shadow);
+            su_ch2 = su_ch2Shadow ^= (su_rNToGo == 1) ? 1 : 0;
+            su_i2++;
+            currentState = State.RAND_PART_B_STATE;
+            crc32.update(su_ch2Shadow);
             return su_ch2Shadow;
         }
         endBlock();
@@ -494,7 +503,7 @@ public class Bzip2InputStream extends InputStream {
             checkBounds(su_tPos, data.tt.length, "su_tPos");
             su_tPos = data.tt[su_tPos];
             if (su_rNToGo == 0) {
-                su_rNToGo = RandomNumbers.get(this.su_rTPos) - 1;
+                su_rNToGo = RandomNumbers.get(su_rTPos) - 1;
                 if (++su_rTPos == 512) {
                     su_rTPos = 0;
                 }
@@ -587,8 +596,8 @@ public class Bzip2InputStream extends InputStream {
         int[] tt; // 3600000 byte
         private final byte[] ll8; // 900000 byte
 
-        public Data(int blockSize100k) {
-            ll8 = new byte[blockSize100k * Constants.BASEBLOCKSIZE];
+        public Data(int blockSize) {
+            ll8 = new byte[blockSize];
         }
 
         /**
@@ -599,17 +608,10 @@ public class Bzip2InputStream extends InputStream {
          * memory allocation when compressing small files.
          */
         int[] initTT(final int length) {
-            int[] ttShadow = this.tt;
+            if ((tt == null) || (tt.length < length))
+                tt = new int[length];
 
-            // tt.length should always be >= length, but theoretically
-            // it can happen, if the compressor mixed small and large
-            // blocks. Normally only the last block will be smaller
-            // than others.
-            if ((ttShadow == null) || (ttShadow.length < length)) {
-                this.tt = ttShadow = new int[length];
-            }
-
-            return ttShadow;
+            return tt;
         }
 
         public int readHuffmanUsedBitmaps(BitInputStream in) throws IOException {
