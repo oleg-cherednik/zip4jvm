@@ -334,14 +334,14 @@ public class Bzip2OutputStream extends OutputStream {
         bsPutUByte('B');
         bsPutUByte('Z');
 
-        this.data = new Data(this.blockSize100k);
-        this.blockSorter = new BlockSort(this.data);
+        data = new Data(blockSize100k);
+        blockSorter = new BlockSort(data);
 
         // huffmanised magic bytes
         bsPutUByte('h');
-        bsPutUByte('0' + this.blockSize100k);
+        bsPutUByte('0' + blockSize100k);
 
-        this.combinedCRC = 0;
+        combinedCRC = 0;
         initBlock();
     }
 
@@ -951,7 +951,7 @@ public class Bzip2OutputStream extends OutputStream {
     }
 
     private void blockSort() {
-        blockSorter.blockSort(data, last);
+        blockSorter.blockSort(last);
     }
 
     /*
