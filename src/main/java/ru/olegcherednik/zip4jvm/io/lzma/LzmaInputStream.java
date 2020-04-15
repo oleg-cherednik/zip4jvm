@@ -5,6 +5,7 @@ import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.lzma.lz.MatchFinder;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,11 +17,9 @@ import java.io.InputStream;
 public class LzmaInputStream extends InputStream {
 
     private final LzmaDecoder lzma;
+    private final byte[] buf = new byte[1];
 
     private boolean endReached;
-
-    private final byte[] tempBuf = new byte[1];
-
     /* Number of uncompressed bytes left to be decompressed, or -1 if the end marker is used. */
     private long remainingSize;
 
@@ -31,7 +30,7 @@ public class LzmaInputStream extends InputStream {
 
     @Override
     public int read() throws IOException {
-        return read(tempBuf, 0, 1) == -1 ? -1 : (tempBuf[0] & 0xFF);
+        return read(buf, 0, 1) == -1 ? -1 : (buf[0] & 0xFF);
     }
 
     @Override
@@ -86,8 +85,9 @@ public class LzmaInputStream extends InputStream {
             }
 
             if (endReached) {
-                if (!lzma.getRaceDecoder().isFinished() || lzma.getLz().hasPending())
-                    throw new LzmaCorruptedInputException();
+// TODO it works with 7-ZIP but does not work with SecureZIP
+//                if (!lzma.getRaceDecoder().isFinished() || lzma.getLz().hasPending())
+//                    throw new LzmaCorruptedInputException();
 
                 return size == 0 ? -1 : size;
             }
@@ -96,10 +96,6 @@ public class LzmaInputStream extends InputStream {
         return size;
     }
 
-    /**
-     * Closes the stream and calls <code>in.close()</code>.
-     * If the stream was already closed, this does nothing.
-     */
     @Override
     public void close() throws IOException {
         lzma.close();
@@ -108,7 +104,6 @@ public class LzmaInputStream extends InputStream {
     @Getter
     public static class Properties {
 
-        private static final int PRESET_DEFAULT = 6;
         private static final int LC_DEFAULT = 3;
         private static final int LP_DEFAULT = 0;
         private static final int PB_DEFAULT = 2;
@@ -129,28 +124,31 @@ public class LzmaInputStream extends InputStream {
         private final Mode mode;
         private final MatchFinder matchFinder;
 
-        public Properties() {
-            this(PRESET_DEFAULT);
-        }
-
-        public Properties(int compressionLevel) {
-            if (compressionLevel < 0 || compressionLevel > 9)
-                throw new IllegalArgumentException("LZMA compression level should be between 0 and 9: " + compressionLevel);
-
+        public Properties(CompressionLevel compressionLevel) {
             lc = LC_DEFAULT;
             lp = LP_DEFAULT;
             pb = PB_DEFAULT;
-            dictionarySize = PRESET_TO_DICTIONARY_SIZE[compressionLevel];
+            dictionarySize = PRESET_TO_DICTIONARY_SIZE[compressionLevel.getCode()];
 
-            if (compressionLevel <= 3) {
+            if (compressionLevel == CompressionLevel.SUPER_FAST) {
                 mode = Mode.FAST;
                 matchFinder = MatchFinder.HASH_CHAIN;
-                niceLength = compressionLevel <= 1 ? 128 : NICE_LENGTH_MAX;
-                depthLimit = PRESET_TO_DEPTH_LIMIT[compressionLevel];
+                niceLength = 128;
+                depthLimit = PRESET_TO_DEPTH_LIMIT[CompressionLevel.SUPER_FAST.getCode()];
+            } else if (compressionLevel == CompressionLevel.FAST) {
+                mode = Mode.FAST;
+                matchFinder = MatchFinder.HASH_CHAIN;
+                niceLength = NICE_LENGTH_MAX;
+                depthLimit = PRESET_TO_DEPTH_LIMIT[CompressionLevel.FAST.getCode()];
+            } else if (compressionLevel == CompressionLevel.NORMAL) {
+                mode = Mode.NORMAL;
+                matchFinder = MatchFinder.BINARY_TREE;
+                niceLength = 32;
+                depthLimit = 0;
             } else {
                 mode = Mode.NORMAL;
                 matchFinder = MatchFinder.BINARY_TREE;
-                niceLength = (compressionLevel == 4) ? 16 : (compressionLevel == 5) ? 32 : 64;
+                niceLength = 64;
                 depthLimit = 0;
             }
         }

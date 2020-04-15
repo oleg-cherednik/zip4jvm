@@ -19,8 +19,9 @@ zip4jvm - a java library for working with zip files
   * [PKWare](https://en.wikipedia.org/wiki/PKWare)
   * [AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
 * Compression support:
-  * Store
+  * STORE
   * [DEFLATE](https://en.wikipedia.org/wiki/DEFLATE)
+  * [BZIP2](https://en.wikipedia.org/wiki/Bzip2)
   * [LZMA](https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm)
 * Individual settings for each zip entry (i.e. some of files can be encrypted, and some - not);
 * Streaming support for adding and extracting;
@@ -34,7 +35,7 @@ zip4jvm - a java library for working with zip files
 ## Gradle
 
 ~~~~
-compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.3'
+compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.4'
 ~~~~
 
 ## Maven
@@ -43,7 +44,7 @@ compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.3'
 <dependency>
     <groupId>ru.oleg-cherednik.zip4jvm</groupId>
     <artifactId>zip4jvm</artifactId>
-    <version>1.3</version>
+    <version>1.4</version>
 </dependency>
 ~~~~
 

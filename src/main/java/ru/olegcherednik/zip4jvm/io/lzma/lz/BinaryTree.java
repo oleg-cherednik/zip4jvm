@@ -10,7 +10,7 @@ import static ru.olegcherednik.zip4jvm.io.lzma.LzmaEncoder.MATCH_LEN_MAX;
  */
 final class BinaryTree extends LzEncoder {
 
-    private final CRC32Hash hash;
+    private final CRC32 crc32;
     private final int[] tree;
     private final Matches matches;
     private final int depthLimit;
@@ -26,7 +26,7 @@ final class BinaryTree extends LzEncoder {
         cyclicSize = properties.getDictionarySize() + 1;
         lzPos = cyclicSize;
 
-        hash = new CRC32Hash(properties.getDictionarySize());
+        crc32 = new CRC32(properties.getDictionarySize());
         tree = new int[cyclicSize * 2];
 
         /*
@@ -55,12 +55,12 @@ final class BinaryTree extends LzEncoder {
                 niceLenLimit = avail;
         }
 
-        hash.calcHashes(buf, pos);
-        int deltaTwo = lzPos - hash.getHash2Pos();
-        int delta3 = lzPos - hash.getHash3Pos();
-        int currentMatch = hash.getHash4Pos();
+        crc32.calcHashes(buf, pos);
+        int deltaTwo = lzPos - crc32.getHash2Pos();
+        int delta3 = lzPos - crc32.getHash3Pos();
+        int currentMatch = crc32.getHash4Pos();
 
-        hash.updateTables(lzPos);
+        crc32.updateTables(lzPos);
 
         int lenBest = 0;
 
@@ -170,9 +170,9 @@ final class BinaryTree extends LzEncoder {
                 niceLenLimit = avail;
             }
 
-            hash.calcHashes(buf, pos);
-            int currentMatch = hash.getHash4Pos();
-            hash.updateTables(lzPos);
+            crc32.calcHashes(buf, pos);
+            int currentMatch = crc32.getHash4Pos();
+            crc32.updateTables(lzPos);
             skip(niceLenLimit, currentMatch);
         }
     }
@@ -231,7 +231,7 @@ final class BinaryTree extends LzEncoder {
         if (avail != 0) {
             if (++lzPos == Integer.MAX_VALUE) {
                 int normalizationOffset = Integer.MAX_VALUE - cyclicSize;
-                hash.normalize(normalizationOffset);
+                crc32.normalize(normalizationOffset);
                 normalize(tree, cyclicSize * 2, normalizationOffset);
                 lzPos -= normalizationOffset;
             }

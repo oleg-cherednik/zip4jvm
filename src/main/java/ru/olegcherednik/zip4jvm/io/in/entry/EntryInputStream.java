@@ -36,6 +36,8 @@ public abstract class EntryInputStream extends EntryMetadataInputStream {
             return new InflateEntryInputStream(zipEntry, in);
         if (compressionMethod == CompressionMethod.LZMA)
             return new LzmaEntryInputStream(zipEntry, in);
+        if (compressionMethod == CompressionMethod.BZIP2)
+            return new Bzip2EntryInputStream(zipEntry, in);
 
         throw new Zip4jvmException("Compression is not supported: " + compressionMethod);
     }
