@@ -49,7 +49,7 @@ class BlockSort {
 
         public int pop(int val) {
             if (top == -1)
-                throw new IndexOutOfBoundsException("Stack is full");
+                throw new IndexOutOfBoundsException("Stack is empty");
             return arr[top--];
         }
     }
@@ -402,16 +402,7 @@ class BlockSort {
         }
     }
 
-    /*---------------------------------------------*/
-
-    /*
-     * LBZ2: Knuth's increments seem to work better than Incerpi-Sedgewick here.
-     * Possibly because the number of elems to sort is usually small, typically
-     * &lt;= 20.
-     */
-    private static final int[] INCS = { 1, 4, 13, 40, 121, 364, 1093, 3280,
-            9841, 29524, 88573, 265720, 797161,
-            2391484 };
+    private static final int[] INCS = { 1, 4, 13, 40, 121, 364, 1093, 3280, 9841, 29524, 88573, 265720, 797161, 2391484 };
 
     /**
      * This is the most hammered method of this class.
@@ -423,25 +414,21 @@ class BlockSort {
      * JIT compiler of the vm.
      * </p>
      */
-    private boolean mainSimpleSort(final Bzip2OutputStream.Data dataShadow,
-            final int lo, final int hi, final int d,
-            final int lastShadow) {
+    private boolean mainSimpleSort(final int lo, final int hi, final int d, final int lastShadow) {
         final int bigN = hi - lo + 1;
-        if (bigN < 2) {
-            return this.firstAttempt && (this.workDone > this.workLimit);
-        }
+
+        if (bigN < 2)
+            return firstAttempt && (workDone > workLimit);
 
         int hp = 0;
         while (INCS[hp] < bigN) {
             hp++;
         }
 
-        final int[] fmap = dataShadow.fmap;
-        final byte[] block = dataShadow.block;
         final int lastPlus1 = lastShadow + 1;
-        final boolean firstAttemptShadow = this.firstAttempt;
-        final int workLimitShadow = this.workLimit;
-        int workDoneShadow = this.workDone;
+        final boolean firstAttemptShadow = firstAttempt;
+        final int workLimitShadow = workLimit;
+        int workDoneShadow = workDone;
 
         // Following block contains unrolled code which could be shortened by
         // coding it in additional loops.
@@ -454,7 +441,7 @@ class BlockSort {
             for (int i = lo + h; i <= hi; ) {
                 // copy
                 for (int k = 3; (i <= hi) && (--k >= 0); i++) {
-                    final int v = fmap[i];
+                    final int v = data.fmap[i];
                     final int vd = v + d;
                     int j = i;
 
@@ -474,7 +461,7 @@ class BlockSort {
                     HAMMER:
                     while (true) {
                         if (onceRunned) {
-                            fmap[j] = a;
+                            data.fmap[j] = a;
                             if ((j -= h) <= mj) { //NOSONAR
                                 break HAMMER;
                             }
@@ -482,31 +469,31 @@ class BlockSort {
                             onceRunned = true;
                         }
 
-                        a = fmap[j - h];
+                        a = data.fmap[j - h];
                         int i1 = a + d;
                         int i2 = vd;
 
                         // following could be done in a loop, but
                         // unrolled it for performance:
-                        if (block[i1 + 1] == block[i2 + 1]) {
-                            if (block[i1 + 2] == block[i2 + 2]) {
-                                if (block[i1 + 3] == block[i2 + 3]) {
-                                    if (block[i1 + 4] == block[i2 + 4]) {
-                                        if (block[i1 + 5] == block[i2 + 5]) {
-                                            if (block[(i1 += 6)] == block[(i2 += 6)]) { //NOSONAR
+                        if (data.block[i1 + 1] == data.block[i2 + 1]) {
+                            if (data.block[i1 + 2] == data.block[i2 + 2]) {
+                                if (data.block[i1 + 3] == data.block[i2 + 3]) {
+                                    if (data.block[i1 + 4] == data.block[i2 + 4]) {
+                                        if (data.block[i1 + 5] == data.block[i2 + 5]) {
+                                            if (data.block[i1 += 6] == data.block[i2 += 6]) { //NOSONAR
                                                 int x = lastShadow;
                                                 X:
                                                 while (x > 0) {
                                                     x -= 4;
 
-                                                    if (block[i1 + 1] == block[i2 + 1]) {
-                                                        if (data.sfmap[i1] == data.sfmap[i2]) {
-                                                            if (block[i1 + 2] == block[i2 + 2]) {
-                                                                if (data.sfmap[i1 + 1] == data.sfmap[i2 + 1]) {
-                                                                    if (block[i1 + 3] == block[i2 + 3]) {
-                                                                        if (data.sfmap[i1 + 2] == data.sfmap[i2 + 2]) {
-                                                                            if (block[i1 + 4] == block[i2 + 4]) {
-                                                                                if (data.sfmap[i1 + 3] == data.sfmap[i2 + 3]) {
+                                                    if (data.block[i1 + 1] == data.block[i2 + 1]) {
+                                                        if (this.data.sfmap[i1] == this.data.sfmap[i2]) {
+                                                            if (data.block[i1 + 2] == data.block[i2 + 2]) {
+                                                                if (this.data.sfmap[i1 + 1] == this.data.sfmap[i2 + 1]) {
+                                                                    if (data.block[i1 + 3] == data.block[i2 + 3]) {
+                                                                        if (this.data.sfmap[i1 + 2] == this.data.sfmap[i2 + 2]) {
+                                                                            if (data.block[i1 + 4] == data.block[i2 + 4]) {
+                                                                                if (this.data.sfmap[i1 + 3] == this.data.sfmap[i2 + 3]) {
                                                                                     if ((i1 += 4) >= lastPlus1) { //NOSONAR
                                                                                         i1 -= lastPlus1;
                                                                                     }
@@ -515,42 +502,42 @@ class BlockSort {
                                                                                     }
                                                                                     workDoneShadow++;
                                                                                     continue X;
-                                                                                } else if ((data.sfmap[i1 + 3] > data.sfmap[i2 + 3])) {
+                                                                                } else if (this.data.sfmap[i1 + 3] > this.data.sfmap[i2 + 3]) {
                                                                                     continue HAMMER;
                                                                                 } else {
                                                                                     break HAMMER;
                                                                                 }
-                                                                            } else if ((block[i1 + 4] & 0xff) > (block[i2 + 4] & 0xff)) {
+                                                                            } else if ((data.block[i1 + 4] & 0xff) > (data.block[i2 + 4] & 0xff)) {
                                                                                 continue HAMMER;
                                                                             } else {
                                                                                 break HAMMER;
                                                                             }
-                                                                        } else if ((data.sfmap[i1 + 2] > data.sfmap[i2 + 2])) {
+                                                                        } else if (this.data.sfmap[i1 + 2] > this.data.sfmap[i2 + 2]) {
                                                                             continue HAMMER;
                                                                         } else {
                                                                             break HAMMER;
                                                                         }
-                                                                    } else if ((block[i1 + 3] & 0xff) > (block[i2 + 3] & 0xff)) {
+                                                                    } else if ((data.block[i1 + 3] & 0xff) > (data.block[i2 + 3] & 0xff)) {
                                                                         continue HAMMER;
                                                                     } else {
                                                                         break HAMMER;
                                                                     }
-                                                                } else if ((data.sfmap[i1 + 1] > data.sfmap[i2 + 1])) {
+                                                                } else if (this.data.sfmap[i1 + 1] > this.data.sfmap[i2 + 1]) {
                                                                     continue HAMMER;
                                                                 } else {
                                                                     break HAMMER;
                                                                 }
-                                                            } else if ((block[i1 + 2] & 0xff) > (block[i2 + 2] & 0xff)) {
+                                                            } else if ((data.block[i1 + 2] & 0xff) > (data.block[i2 + 2] & 0xff)) {
                                                                 continue HAMMER;
                                                             } else {
                                                                 break HAMMER;
                                                             }
-                                                        } else if ((data.sfmap[i1] > data.sfmap[i2])) {
+                                                        } else if (this.data.sfmap[i1] > this.data.sfmap[i2]) {
                                                             continue HAMMER;
                                                         } else {
                                                             break HAMMER;
                                                         }
-                                                    } else if ((block[i1 + 1] & 0xff) > (block[i2 + 1] & 0xff)) {
+                                                    } else if ((data.block[i1 + 1] & 0xff) > (data.block[i2 + 1] & 0xff)) {
                                                         continue HAMMER;
                                                     } else {
                                                         break HAMMER;
@@ -559,31 +546,31 @@ class BlockSort {
                                                 }
                                                 break HAMMER;
                                             } // while x > 0
-                                            if ((block[i1] & 0xff) > (block[i2] & 0xff)) {
+                                            if ((data.block[i1] & 0xff) > (data.block[i2] & 0xff)) {
                                                 continue HAMMER;
                                             }
                                             break HAMMER;
-                                        } else if ((block[i1 + 5] & 0xff) > (block[i2 + 5] & 0xff)) {
+                                        } else if ((data.block[i1 + 5] & 0xff) > (data.block[i2 + 5] & 0xff)) {
                                             continue HAMMER;
                                         } else {
                                             break HAMMER;
                                         }
-                                    } else if ((block[i1 + 4] & 0xff) > (block[i2 + 4] & 0xff)) {
+                                    } else if ((data.block[i1 + 4] & 0xff) > (data.block[i2 + 4] & 0xff)) {
                                         continue HAMMER;
                                     } else {
                                         break HAMMER;
                                     }
-                                } else if ((block[i1 + 3] & 0xff) > (block[i2 + 3] & 0xff)) {
+                                } else if ((data.block[i1 + 3] & 0xff) > (data.block[i2 + 3] & 0xff)) {
                                     continue HAMMER;
                                 } else {
                                     break HAMMER;
                                 }
-                            } else if ((block[i1 + 2] & 0xff) > (block[i2 + 2] & 0xff)) {
+                            } else if ((data.block[i1 + 2] & 0xff) > (data.block[i2 + 2] & 0xff)) {
                                 continue HAMMER;
                             } else {
                                 break HAMMER;
                             }
-                        } else if ((block[i1 + 1] & 0xff) > (block[i2 + 1] & 0xff)) {
+                        } else if ((data.block[i1 + 1] & 0xff) > (data.block[i2 + 1] & 0xff)) {
                             continue HAMMER;
                         } else {
                             break HAMMER;
@@ -592,7 +579,7 @@ class BlockSort {
                     } // HAMMER
                     // end inline mainGTU
 
-                    fmap[j] = v;
+                    data.fmap[j] = v;
                 }
 
                 if (firstAttemptShadow && (i <= hi)
@@ -602,7 +589,7 @@ class BlockSort {
             }
         }
 
-        this.workDone = workDoneShadow;
+        workDone = workDoneShadow;
         return firstAttemptShadow && (workDoneShadow > workLimitShadow);
     }
 
@@ -624,8 +611,7 @@ class BlockSort {
     }
 
     private static byte med3(final byte a, final byte b, final byte c) {
-        return (a < b) ? (b < c ? b : a < c ? c : a) : (b > c ? b : a > c ? c
-                                                                          : a);
+        return (a < b) ? (b < c ? b : a < c ? c : a) : (b > c ? b : a > c ? c : a);
     }
 
     private static final int SMALL_THRESH = 20;
@@ -643,9 +629,8 @@ class BlockSort {
             final int d = stack_dd[sp];
 
             if ((hi - lo < SMALL_THRESH) || (d > DEPTH_THRESH)) {
-                if (mainSimpleSort(data, lo, hi, d, last)) {
+                if (mainSimpleSort(lo, hi, d, last))
                     return;
-                }
             } else {
                 final int d1 = d + 1;
                 final int med = med3(data.block[data.fmap[lo] + d1], data.block[data.fmap[hi] + d1],
