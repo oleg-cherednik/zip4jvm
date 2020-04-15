@@ -728,16 +728,13 @@ class BlockSort {
     private static final int SETMASK = 1 << 21;
     private static final int CLEARMASK = ~SETMASK;
 
-    final void mainSort(final Bzip2OutputStream.Data dataShadow,
-            final int lastShadow) {
-        final int[] runningOrder = this.mainSort_runningOrder;
-        final int[] copy = this.mainSort_copy;
-        final boolean[] bigDone = this.mainSort_bigDone;
+    final void mainSort(final Bzip2OutputStream.Data data, final int lastShadow) {
+        final int[] runningOrder = mainSort_runningOrder;
+        final int[] copy = mainSort_copy;
+        final boolean[] bigDone = mainSort_bigDone;
         final int[] ftab = this.ftab;
-        final byte[] block = dataShadow.block;
-        final int[] fmap = dataShadow.fmap;
-        final int workLimitShadow = this.workLimit;
-        final boolean firstAttemptShadow = this.firstAttempt;
+        final int workLimitShadow = workLimit;
+        final boolean firstAttemptShadow = firstAttempt;
 
         // LBZ2: Set up the 2-byte frequency table
         for (int i = 65537; --i >= 0; ) {
@@ -750,18 +747,18 @@ class BlockSort {
          * for block.
          */
         for (int i = 0; i < Constants.NUM_OVERSHOOT_BYTES; i++) {
-            block[lastShadow + i + 2] = block[(i % (lastShadow + 1)) + 1];
+            data.block[lastShadow + i + 2] = data.block[(i % (lastShadow + 1)) + 1];
         }
         for (int i = lastShadow + Constants.NUM_OVERSHOOT_BYTES + 1; --i >= 0; ) {
-            data.sfmap[i] = 0;
+            this.data.sfmap[i] = 0;
         }
-        block[0] = block[lastShadow + 1];
+        data.block[0] = data.block[lastShadow + 1];
 
         // LBZ2: Complete the initial radix sort:
 
-        int c1 = block[0] & 0xff;
+        int c1 = data.block[0] & 0xff;
         for (int i = 0; i <= lastShadow; i++) {
-            final int c2 = block[i + 1] & 0xff;
+            final int c2 = data.block[i + 1] & 0xff;
             ftab[(c1 << 8) + c2]++;
             c1 = c2;
         }
@@ -770,14 +767,14 @@ class BlockSort {
             ftab[i] += ftab[i - 1];
         }
 
-        c1 = block[1] & 0xff;
+        c1 = data.block[1] & 0xff;
         for (int i = 0; i < lastShadow; i++) {
-            final int c2 = block[i + 2] & 0xff;
-            fmap[--ftab[(c1 << 8) + c2]] = i;
+            final int c2 = data.block[i + 2] & 0xff;
+            data.fmap[--ftab[(c1 << 8) + c2]] = i;
             c1 = c2;
         }
 
-        fmap[--ftab[((block[lastShadow + 1] & 0xff) << 8) + (block[1] & 0xff)]] = lastShadow;
+        data.fmap[--ftab[((data.block[lastShadow + 1] & 0xff) << 8) + (data.block[1] & 0xff)]] = lastShadow;
 
         /*
          * LBZ2: Now ftab contains the first loc of every small bucket. Calculate the
@@ -849,10 +846,10 @@ class BlockSort {
             }
 
             for (int j = ftab[ss << 8] & CLEARMASK, hj = (ftab[(ss + 1) << 8] & CLEARMASK); j < hj; j++) {
-                final int fmap_j = fmap[j];
-                c1 = block[fmap_j] & 0xff;
+                final int fmap_j = data.fmap[j];
+                c1 = data.block[fmap_j] & 0xff;
                 if (!bigDone[c1]) {
-                    fmap[copy[c1]] = (fmap_j == 0) ? lastShadow : (fmap_j - 1);
+                    data.fmap[copy[c1]] = (fmap_j == 0) ? lastShadow : (fmap_j - 1);
                     copy[c1]++;
                 }
             }
@@ -881,11 +878,11 @@ class BlockSort {
                 }
 
                 for (int j = 0; j < bbSize; j++) {
-                    final int a2update = fmap[bbStart + j];
+                    final int a2update = data.fmap[bbStart + j];
                     final char qVal = (char)(j >> shifts);
-                    data.sfmap[a2update] = qVal;
+                    this.data.sfmap[a2update] = qVal;
                     if (a2update < Constants.NUM_OVERSHOOT_BYTES) {
-                        data.sfmap[a2update + lastShadow + 1] = qVal;
+                        this.data.sfmap[a2update + lastShadow + 1] = qVal;
                     }
                 }
             }
