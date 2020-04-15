@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.ed;
 
-import java.io.Closeable;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -10,11 +11,9 @@ import java.io.InputStream;
  * @NotThreadSafe
  * @since 1.16
  */
-public class Deflate64CompressorInputStream extends CompressorInputStream implements InputStreamStatistics {
+public class Deflate64CompressorInputStream extends InputStream {
 
-    private InputStream originalStream;
-    private HuffmanDecoder decoder;
-    private long compressedBytesRead;
+    private final HuffmanDecoder decoder;
     private final byte[] oneByte = new byte[1];
 
     /**
@@ -22,18 +21,10 @@ public class Deflate64CompressorInputStream extends CompressorInputStream implem
      *
      * @param in the stream to read from
      */
-    public Deflate64CompressorInputStream(InputStream in) {
-        this(new HuffmanDecoder(in));
-        originalStream = in;
+    public Deflate64CompressorInputStream(DataInput in) {
+        decoder = new HuffmanDecoder(in);
     }
 
-    Deflate64CompressorInputStream(HuffmanDecoder decoder) {
-        this.decoder = decoder;
-    }
-
-    /**
-     * @throws java.io.EOFException if the underlying stream is exhausted before the end of defalted data was reached.
-     */
     @Override
     public int read() throws IOException {
         while (true) {
@@ -51,62 +42,14 @@ public class Deflate64CompressorInputStream extends CompressorInputStream implem
         }
     }
 
-    /**
-     * @throws java.io.EOFException if the underlying stream is exhausted before the end of deflated data was reached.
-     */
     @Override
-    public int read(byte[] b, int off, int len) throws IOException {
-        if (len == 0) {
-            return 0;
-        }
-        int read = -1;
-        if (decoder != null) {
-            read = decoder.decode(b, off, len);
-            compressedBytesRead = decoder.getBytesRead();
-            count(read);
-            if (read == -1) {
-                closeDecoder();
-            }
-        }
-        return read;
-    }
-
-    @Override
-    public int available() throws IOException {
-        return decoder != null ? decoder.available() : 0;
+    public int read(byte[] buf, int offs, int len) throws IOException {
+        return decoder.decode(buf, offs, len);
     }
 
     @Override
     public void close() throws IOException {
-        try {
-            closeDecoder();
-        } finally {
-            if (originalStream != null) {
-                originalStream.close();
-                originalStream = null;
-            }
-        }
+        decoder.close();
     }
 
-    /**
-     * @since 1.17
-     */
-    @Override
-    public long getCompressedCount() {
-        return compressedBytesRead;
-    }
-
-    private void closeDecoder() {
-        closeQuietly(decoder);
-        decoder = null;
-    }
-
-    public static void closeQuietly(final Closeable c) {
-        if (c != null) {
-            try {
-                c.close();
-            } catch(final IOException ignored) { // NOPMD NOSONAR
-            }
-        }
-    }
 }

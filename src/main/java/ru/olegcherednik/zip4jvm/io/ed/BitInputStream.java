@@ -1,91 +1,42 @@
 package ru.olegcherednik.zip4jvm.io.ed;
 
-import java.io.Closeable;
+import lombok.Getter;
+import org.apache.commons.io.IOUtils;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteOrder;
 
-/**
- * Reads bits from an InputStream.
- *
- * @NotThreadSafe
- * @since 1.10
- */
-public class BitInputStream implements Closeable {
+class BitInputStream {
 
-    private static final int MAXIMUM_CACHE_SIZE = 63; // bits in long minus sign bit
-    private static final long[] MASKS = new long[MAXIMUM_CACHE_SIZE + 1];
+    private static final long[] MASKS = createMasks();
 
-    static {
-        for (int i = 1; i <= MAXIMUM_CACHE_SIZE; i++) {
-            MASKS[i] = (MASKS[i - 1] << 1) + 1;
-        }
+    private static long[] createMasks() {
+        long[] masks = new long[64];
+
+        for (int i = 1; i < masks.length; i++)
+            masks[i] = (masks[i - 1] << 1) + 1;
+
+        return masks;
     }
 
-    private final CountingInputStream in;
+    private final DataInput in;
     private final ByteOrder byteOrder;
-    private long bitsCached = 0;
-    private int bitsCachedSize = 0;
+    private long bitsCache;
+    @Getter
+    private int bitsCacheSize;
 
-    /**
-     * Constructor taking an InputStream and its bit arrangement.
-     *
-     * @param in        the InputStream
-     * @param byteOrder the bit arrangement across byte boundaries,
-     *                  either BIG_ENDIAN (aaaaabbb bb000000) or LITTLE_ENDIAN (bbbaaaaa 000000bb)
-     */
-    public BitInputStream(final InputStream in, final ByteOrder byteOrder) {
-        this.in = new CountingInputStream(in);
+    public BitInputStream(DataInput in, ByteOrder byteOrder) {
+        this.in = in;
         this.byteOrder = byteOrder;
     }
 
-    @Override
-    public void close() throws IOException {
-        in.close();
-    }
-
-    /**
-     * Clears the cache of bits that have been read from the
-     * underlying stream but not yet provided via {@link #readBits}.
-     */
-    public void clearBitCache() {
-        bitsCached = 0;
-        bitsCachedSize = 0;
-    }
-
-    /**
-     * Returns at most 63 bits read from the underlying stream.
-     *
-     * @param count the number of bits to read, must be a positive
-     *              number not bigger than 63.
-     * @return the bits concatenated as a long using the stream's byte order.
-     * -1 if the end of the underlying stream has been reached before reading
-     * the requested number of bits
-     * @throws IOException on error
-     */
-    public long readBits(final int count) throws IOException {
-        if (count < 0 || count > MAXIMUM_CACHE_SIZE) {
-            throw new IllegalArgumentException("count must not be negative or greater than " + MAXIMUM_CACHE_SIZE);
-        }
-        if (ensureCache(count)) {
-            return -1;
-        }
-
-        if (bitsCachedSize < count) {
-            return processBitsGreater57(count);
-        }
-        return readCachedBits(count);
-    }
-
-    /**
-     * Returns the number of bits that can be read from this input
-     * stream without reading from the underlying input stream at all.
-     *
-     * @return estimate of the number of bits that can be read without reading from the underlying stream
-     * @since 1.16
-     */
-    public int bitsCached() {
-        return bitsCachedSize;
+    public long readBits(int totalBits) throws IOException {
+        if (ensureCache(totalBits))
+            return IOUtils.EOF;
+        if (bitsCacheSize < totalBits)
+            return processBitsGreater57(totalBits);
+        return readCacheBits(totalBits);
     }
 
     /**
@@ -98,72 +49,51 @@ public class BitInputStream implements Closeable {
      * @since 1.16
      */
     public long bitsAvailable() throws IOException {
-        return bitsCachedSize + ((long)Byte.SIZE) * in.available();
+        return bitsCacheSize + ((long)Byte.SIZE) * 0;
     }
 
-    /**
-     * Drops bits until the next bits will be read from a byte boundary.
-     *
-     * @since 1.16
-     */
     public void alignWithByteBoundary() {
-        int toSkip = bitsCachedSize % Byte.SIZE;
-        if (toSkip > 0) {
-            readCachedBits(toSkip);
-        }
+        int skip = bitsCacheSize % Byte.SIZE;
+
+        if (skip > 0)
+            readCacheBits(skip);
     }
 
-    /**
-     * Returns the number of bytes read from the underlying stream.
-     *
-     * <p>This includes the bytes read to fill the current cache and
-     * not read as bits so far.</p>
-     *
-     * @return the number of bytes read from the underlying stream
-     * @since 1.17
-     */
-    public long getBytesRead() {
-        return in.getBytesRead();
-    }
+    private long processBitsGreater57(int totalBits) throws IOException {
+        int bitsToAddCount = totalBits - bitsCacheSize;
+        int overflowBits = Byte.SIZE - bitsToAddCount;
+        int nextByte = in.readByte();
+        long overflow;
 
-    private long processBitsGreater57(final int count) throws IOException {
-        final long bitsOut;
-        int overflowBits = 0;
-        long overflow = 0L;
-
-        // bitsCachedSize >= 57 and left-shifting it 8 bits would cause an overflow
-        int bitsToAddCount = count - bitsCachedSize;
-        overflowBits = Byte.SIZE - bitsToAddCount;
-        final long nextByte = in.read();
-        if (nextByte < 0) {
+        if (nextByte < 0)
             return nextByte;
-        }
+
         if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
-            long bitsToAdd = nextByte & MASKS[bitsToAddCount];
-            bitsCached |= (bitsToAdd << bitsCachedSize);
+            bitsCache |= (nextByte & MASKS[bitsToAddCount]) << bitsCacheSize;
             overflow = (nextByte >>> bitsToAddCount) & MASKS[overflowBits];
         } else {
-            bitsCached <<= bitsToAddCount;
-            long bitsToAdd = (nextByte >>> (overflowBits)) & MASKS[bitsToAddCount];
-            bitsCached |= bitsToAdd;
+            bitsCache <<= bitsToAddCount;
+            bitsCache |= (nextByte >>> overflowBits) & MASKS[bitsToAddCount];
             overflow = nextByte & MASKS[overflowBits];
         }
-        bitsOut = bitsCached & MASKS[count];
-        bitsCached = overflow;
-        bitsCachedSize = overflowBits;
-        return bitsOut;
+
+        long res = bitsCache & MASKS[totalBits];
+        bitsCache = overflow;
+        bitsCacheSize = overflowBits;
+        return res;
     }
 
-    private long readCachedBits(int count) {
-        final long bitsOut;
+    private long readCacheBits(int totalBits) {
+        long res;
+
         if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
-            bitsOut = (bitsCached & MASKS[count]);
-            bitsCached >>>= count;
-        } else {
-            bitsOut = (bitsCached >> (bitsCachedSize - count)) & MASKS[count];
-        }
-        bitsCachedSize -= count;
-        return bitsOut;
+            res = bitsCache & MASKS[totalBits];
+            bitsCache >>>= totalBits;
+        } else
+            res = (bitsCache >> (bitsCacheSize - totalBits)) & MASKS[totalBits];
+
+        bitsCacheSize -= totalBits;
+        return res;
     }
 
     /**
@@ -174,18 +104,18 @@ public class BitInputStream implements Closeable {
      * @throws IOException
      */
     private boolean ensureCache(final int count) throws IOException {
-        while (bitsCachedSize < count && bitsCachedSize < 57) {
-            final long nextByte = in.read();
+        while (bitsCacheSize < count && bitsCacheSize < 57) {
+            final long nextByte = in.readByte();
             if (nextByte < 0) {
                 return true;
             }
             if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
-                bitsCached |= (nextByte << bitsCachedSize);
+                bitsCache |= nextByte << bitsCacheSize;
             } else {
-                bitsCached <<= Byte.SIZE;
-                bitsCached |= nextByte;
+                bitsCache <<= Byte.SIZE;
+                bitsCache |= nextByte;
             }
-            bitsCachedSize += Byte.SIZE;
+            bitsCacheSize += Byte.SIZE;
         }
         return false;
     }

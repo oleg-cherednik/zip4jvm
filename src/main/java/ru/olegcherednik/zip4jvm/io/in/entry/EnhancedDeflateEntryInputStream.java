@@ -6,7 +6,6 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * @author Oleg Cherednik
@@ -22,12 +21,7 @@ final class EnhancedDeflateEntryInputStream extends EntryInputStream {
     }
 
     private Deflate64CompressorInputStream createInputStream() throws IOException {
-        return new Deflate64CompressorInputStream(new InputStream() {
-            @Override
-            public int read() throws IOException {
-                return in.readByte();
-            }
-        });
+        return new Deflate64CompressorInputStream(in);
     }
 
     @Override
