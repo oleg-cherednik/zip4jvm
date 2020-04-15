@@ -81,62 +81,44 @@ class BlockSort {
         }
     }
 
-    private void fallbackSimpleSort(final int[] fmap,
-            final int[] eclass,
-            final int lo,
-            final int hi) {
-        if (lo == hi) {
+    private static void fallbackSimpleSort(int[] fmap, int[] eclass, int lo, int hi) {
+        if (lo == hi)
             return;
-        }
 
         int j;
+
         if (hi - lo > 3) {
             for (int i = hi - 4; i >= lo; i--) {
-                final int tmp = fmap[i];
-                final int ec_tmp = eclass[tmp];
-                for (j = i + 4; j <= hi && ec_tmp > eclass[fmap[j]];
-                     j += 4) {
+                int tmp = fmap[i];
+                int ec_tmp = eclass[tmp];
+
+                for (j = i + 4; j <= hi && ec_tmp > eclass[fmap[j]]; j += 4)
                     fmap[j - 4] = fmap[j];
-                }
+
                 fmap[j - 4] = tmp;
             }
         }
 
         for (int i = hi - 1; i >= lo; i--) {
-            final int tmp = fmap[i];
-            final int ec_tmp = eclass[tmp];
-            for (j = i + 1; j <= hi && ec_tmp > eclass[fmap[j]]; j++) {
+            int tmp = fmap[i];
+            int ec_tmp = eclass[tmp];
+
+            for (j = i + 1; j <= hi && ec_tmp > eclass[fmap[j]]; j++)
                 fmap[j - 1] = fmap[j];
-            }
+
             fmap[j - 1] = tmp;
         }
     }
 
-    private static final int FALLBACK_QSORT_SMALL_THRESH = 10;
-
-    /**
-     * swaps two values in fmap
-     */
-    private void fswap(final int[] fmap, final int zz1, final int zz2) {
-        final int zztmp = fmap[zz1];
-        fmap[zz1] = fmap[zz2];
-        fmap[zz2] = zztmp;
+    private static void swap(int[] arr, int i, int j) {
+        int tmp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = tmp;
     }
 
-    /**
-     * swaps two intervals starting at yyp1 and yyp2 of length yyn inside fmap.
-     */
-    private void fvswap(final int[] fmap, int yyp1, int yyp2, int yyn) {
-        while (yyn > 0) {
-            fswap(fmap, yyp1, yyp2);
-            yyp1++;
-            yyp2++;
-            yyn--;
-        }
-    }
-
-    private int fmin(final int a, final int b) {
-        return a < b ? a : b;
+    private static void swap(int[] arr, int i, int j, int len) {
+        while (len-- > 0)
+            swap(arr, i++, j++);
     }
 
     private void fpush(final int sp, final int lz, final int hz) {
@@ -147,6 +129,8 @@ class BlockSort {
     private int[] fpop(final int sp) {
         return new int[] { stack_ll[sp], stack_hh[sp] };
     }
+
+    private static final int FALLBACK_QSORT_SMALL_THRESH = 10;
 
     /**
      * @param fmap   points to the index of the starting point of a
@@ -208,7 +192,7 @@ class BlockSort {
                     }
                     n = eclass[fmap[unLo]] - (int)med;
                     if (n == 0) {
-                        fswap(fmap, unLo, ltLo);
+                        swap(fmap, unLo, ltLo);
                         ltLo++;
                         unLo++;
                         continue;
@@ -224,7 +208,7 @@ class BlockSort {
                     }
                     n = eclass[fmap[unHi]] - (int)med;
                     if (n == 0) {
-                        fswap(fmap, unHi, gtHi);
+                        swap(fmap, unHi, gtHi);
                         gtHi--;
                         unHi--;
                         continue;
@@ -237,7 +221,7 @@ class BlockSort {
                 if (unLo > unHi) {
                     break;
                 }
-                fswap(fmap, unLo, unHi);
+                swap(fmap, unLo, unHi);
                 unLo++;
                 unHi--;
             }
@@ -246,10 +230,10 @@ class BlockSort {
                 continue;
             }
 
-            n = fmin(ltLo - lo, unLo - ltLo);
-            fvswap(fmap, lo, unLo - n, n);
-            int m = fmin(hi - gtHi, gtHi - unHi);
-            fvswap(fmap, unHi + 1, hi - m + 1, m);
+            n = Math.min(ltLo - lo, unLo - ltLo);
+            swap(fmap, lo, unLo - n, n);
+            int m = Math.min(hi - gtHi, gtHi - unHi);
+            swap(fmap, unHi + 1, hi - m + 1, m);
 
             n = lo + unLo - ltLo - 1;
             m = hi - (gtHi - unHi) + 1;
