@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.io.enhanceddeflate;
+package ru.olegcherednik.zip4jvm.io.ed;
 
 import java.io.Closeable;
 import java.io.EOFException;
@@ -7,10 +7,10 @@ import java.io.InputStream;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 
-import static ru.olegcherednik.zip4jvm.io.enhanceddeflate.HuffmanState.DYNAMIC_CODES;
-import static ru.olegcherednik.zip4jvm.io.enhanceddeflate.HuffmanState.FIXED_CODES;
-import static ru.olegcherednik.zip4jvm.io.enhanceddeflate.HuffmanState.INITIAL;
-import static ru.olegcherednik.zip4jvm.io.enhanceddeflate.HuffmanState.STORED;
+import static ru.olegcherednik.zip4jvm.io.ed.HuffmanState.DYNAMIC_CODES;
+import static ru.olegcherednik.zip4jvm.io.ed.HuffmanState.FIXED_CODES;
+import static ru.olegcherednik.zip4jvm.io.ed.HuffmanState.INITIAL;
+import static ru.olegcherednik.zip4jvm.io.ed.HuffmanState.STORED;
 
 class HuffmanDecoder implements Closeable {
 

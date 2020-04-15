@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.io.enhanceddeflate;
+package ru.olegcherednik.zip4jvm.io.ed;
 
 /**
  * @author Oleg Cherednik

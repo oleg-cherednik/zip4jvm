@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.io.enhanceddeflate;
+package ru.olegcherednik.zip4jvm.io.ed;
 
 /**
  * This interface provides statistics on the current decompression stream.
