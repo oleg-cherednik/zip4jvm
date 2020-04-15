@@ -36,10 +36,10 @@ public abstract class EntryOutputStream extends EntryMetadataOutputStream {
             return new StoreEntryOutputStream(zipEntry, out);
         if (compressionMethod == CompressionMethod.DEFLATE)
             return new DeflateEntryOutputStream(zipEntry, out);
-        if (compressionMethod == CompressionMethod.LZMA)
-            return new LzmaEntryOutputStream(zipEntry, out);
         if (compressionMethod == CompressionMethod.BZIP2)
             return new Bzip2EntryOutputStream(zipEntry, out);
+        if (compressionMethod == CompressionMethod.LZMA)
+            return new LzmaEntryOutputStream(zipEntry, out);
 
         throw new Zip4jvmException("Compression is not supported: " + compressionMethod);
     }

@@ -9,6 +9,7 @@ import java.nio.file.Path;
 
 import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SolidPkwareZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SolidZip;
+import static ru.olegcherednik.zip4jvm.TestData.secureZipEnhancedDeflateSolidZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipLzmaSolidZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSolidAesZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSplitZip;
@@ -35,7 +36,7 @@ public class SecureZipToZip4jvmCompatibilityTest {
 
     public void shouldUnzipWhenBzip2Solid() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.zip(secureZipBzip2SolidZip).destDir(destDir).password(password).extract();
+        UnzipIt.zip(secureZipBzip2SolidZip).destDir(destDir).extract();
         assertThatDirectory(destDir).matches(dirBikesAssert);
     }
 
@@ -55,6 +56,12 @@ public class SecureZipToZip4jvmCompatibilityTest {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         UnzipIt.zip(secureZipStoreSplitZip).destDir(destDir).extract();
         assertThatDirectory(destDir).matches(rootAssert);
+    }
+
+    public void shouldUnzipWhenEnhancedDeflateSolid() throws IOException {
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        UnzipIt.zip(secureZipEnhancedDeflateSolidZip).destDir(destDir).password(password).extract();
+        assertThatDirectory(destDir).matches(dirBikesAssert);
     }
 
 }
