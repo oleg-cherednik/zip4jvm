@@ -199,7 +199,7 @@ public class Bzip2OutputStream extends OutputStream {
         this.out = out;
 
         /* 20 is just a paranoia constant */
-        this.allowableBlockSize = (this.blockSize100k * Constants.BASEBLOCKSIZE) - 20;
+        allowableBlockSize = blockSize100k * Constants.BASEBLOCKSIZE - 20;
     }
 
     @Override
@@ -225,21 +225,21 @@ public class Bzip2OutputStream extends OutputStream {
      * written minus 1.</p>
      */
     private void writeRun() throws IOException {
-        final int lastShadow = this.last;
+        final int lastShadow = last;
 
-        if (lastShadow < this.allowableBlockSize) {
-            final int currentCharShadow = this.currentChar;
-            final Data dataShadow = this.data;
+        if (lastShadow < allowableBlockSize) {
+            final int currentCharShadow = currentChar;
+            final Data dataShadow = data;
             dataShadow.inUse[currentCharShadow] = true;
             final byte ch = (byte)currentCharShadow;
 
-            int runLengthShadow = this.runLength;
-            this.crc32.update(currentCharShadow, runLengthShadow);
+            int runLengthShadow = runLength;
+            crc32.update(currentCharShadow, runLengthShadow);
 
             switch (runLengthShadow) {
                 case 1:
                     dataShadow.block[lastShadow + 2] = ch;
-                    this.last = lastShadow + 1;
+                    last = lastShadow + 1;
                     break;
 
                 case 2:
@@ -253,7 +253,7 @@ public class Bzip2OutputStream extends OutputStream {
                     block[lastShadow + 2] = ch;
                     block[lastShadow + 3] = ch;
                     block[lastShadow + 4] = ch;
-                    this.last = lastShadow + 3;
+                    last = lastShadow + 3;
                 }
                 break;
 
@@ -266,7 +266,7 @@ public class Bzip2OutputStream extends OutputStream {
                     block[lastShadow + 4] = ch;
                     block[lastShadow + 5] = ch;
                     block[lastShadow + 6] = (byte)runLengthShadow;
-                    this.last = lastShadow + 5;
+                    last = lastShadow + 5;
                 }
                 break;
 
@@ -334,7 +334,7 @@ public class Bzip2OutputStream extends OutputStream {
         bsPutUByte('B');
         bsPutUByte('Z');
 
-        data = new Data(blockSize100k);
+        data = new Data(blockSize100k * Constants.BASEBLOCKSIZE);
         blockSorter = new BlockSort(data);
 
         // huffmanised magic bytes
@@ -347,8 +347,8 @@ public class Bzip2OutputStream extends OutputStream {
 
     private void initBlock() {
         // blockNo++;
-        this.crc32.init();
-        this.last = -1;
+        crc32.init();
+        last = -1;
         // ch = 0;
 
         final boolean[] inUse = this.data.inUse;
@@ -359,9 +359,9 @@ public class Bzip2OutputStream extends OutputStream {
     }
 
     private void endBlock() throws IOException {
-        this.blockCRC = this.crc32.checksum();
-        this.combinedCRC = (this.combinedCRC << 1) | (this.combinedCRC >>> 31);
-        this.combinedCRC ^= this.blockCRC;
+        blockCRC = crc32.checksum();
+        combinedCRC = (combinedCRC << 1) | (combinedCRC >>> 31);
+        combinedCRC ^= blockCRC;
 
         // empty block at end of file
         if (this.last == -1) {
@@ -1113,11 +1113,10 @@ public class Bzip2OutputStream extends OutputStream {
          */
         int origPtr;
 
-        Data(final int blockSize100k) {
-            final int n = blockSize100k * Constants.BASEBLOCKSIZE;
-            this.block = new byte[(n + 1 + Constants.NUM_OVERSHOOT_BYTES)];
-            this.fmap = new int[n];
-            this.sfmap = new char[2 * n];
+        public Data(int blockSize) {
+            block = new byte[(blockSize + 1 + Constants.NUM_OVERSHOOT_BYTES)];
+            fmap = new int[blockSize];
+            sfmap = new char[2 * blockSize];
         }
 
     }
