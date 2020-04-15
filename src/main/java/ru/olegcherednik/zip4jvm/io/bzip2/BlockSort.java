@@ -32,6 +32,28 @@ class BlockSort {
 
     private final Bzip2OutputStream.Data data;
 
+    private static final class Stack {
+
+        private final int[] arr;
+        private int top = -1;
+
+        public Stack(int size) {
+            arr = new int[size];
+        }
+
+        public void push(int val) {
+            if (top == arr.length - 1)
+                throw new IndexOutOfBoundsException("Stack is full");
+            arr[++top] = val;
+        }
+
+        public int pop(int val) {
+            if (top == -1)
+                throw new IndexOutOfBoundsException("Stack is full");
+            return arr[top--];
+        }
+    }
+
     public BlockSort(Bzip2OutputStream.Data data) {
         this.data = data;
     }
@@ -610,18 +632,7 @@ class BlockSort {
     private static final int DEPTH_THRESH = 10;
     private static final int WORK_FACTOR = 30;
 
-    /**
-     * Method "mainQSort3", file "blocksort.c", BZip2 1.0.2
-     */
-    private void mainQSort3(final Bzip2OutputStream.Data dataShadow,
-            final int loSt, final int hiSt, final int dSt,
-            final int last) {
-        final int[] stack_ll = this.stack_ll;
-        final int[] stack_hh = this.stack_hh;
-        final int[] stack_dd = this.stack_dd;
-        final int[] fmap = dataShadow.fmap;
-        final byte[] block = dataShadow.block;
-
+    private void mainQSort3(final int loSt, final int hiSt, final int dSt, final int last) {
         stack_ll[0] = loSt;
         stack_hh[0] = hiSt;
         stack_dd[0] = dSt;
@@ -632,13 +643,13 @@ class BlockSort {
             final int d = stack_dd[sp];
 
             if ((hi - lo < SMALL_THRESH) || (d > DEPTH_THRESH)) {
-                if (mainSimpleSort(dataShadow, lo, hi, d, last)) {
+                if (mainSimpleSort(data, lo, hi, d, last)) {
                     return;
                 }
             } else {
                 final int d1 = d + 1;
-                final int med = med3(block[fmap[lo] + d1],
-                        block[fmap[hi] + d1], block[fmap[(lo + hi) >>> 1] + d1]) & 0xff;
+                final int med = med3(data.block[data.fmap[lo] + d1], data.block[data.fmap[hi] + d1],
+                        data.block[data.fmap[(lo + hi) >>> 1] + d1]) & 0xff;
 
                 int unLo = lo;
                 int unHi = hi;
@@ -647,12 +658,11 @@ class BlockSort {
 
                 while (true) {
                     while (unLo <= unHi) {
-                        final int n = (block[fmap[unLo] + d1] & 0xff)
-                                - med;
+                        final int n = (data.block[data.fmap[unLo] + d1] & 0xff) - med;
                         if (n == 0) {
-                            final int temp = fmap[unLo];
-                            fmap[unLo++] = fmap[ltLo];
-                            fmap[ltLo++] = temp;
+                            final int temp = data.fmap[unLo];
+                            data.fmap[unLo++] = data.fmap[ltLo];
+                            data.fmap[ltLo++] = temp;
                         } else if (n < 0) {
                             unLo++;
                         } else {
@@ -661,12 +671,11 @@ class BlockSort {
                     }
 
                     while (unLo <= unHi) {
-                        final int n = (block[fmap[unHi] + d1] & 0xff)
-                                - med;
+                        final int n = (data.block[data.fmap[unHi] + d1] & 0xff) - med;
                         if (n == 0) {
-                            final int temp = fmap[unHi];
-                            fmap[unHi--] = fmap[gtHi];
-                            fmap[gtHi--] = temp;
+                            final int temp = data.fmap[unHi];
+                            data.fmap[unHi--] = data.fmap[gtHi];
+                            data.fmap[gtHi--] = temp;
                         } else if (n > 0) {
                             unHi--;
                         } else {
@@ -675,9 +684,9 @@ class BlockSort {
                     }
 
                     if (unLo <= unHi) {
-                        final int temp = fmap[unLo];
-                        fmap[unLo++] = fmap[unHi];
-                        fmap[unHi--] = temp;
+                        final int temp = data.fmap[unLo];
+                        data.fmap[unLo++] = data.fmap[unHi];
+                        data.fmap[unHi--] = temp;
                     } else {
                         break;
                     }
@@ -689,12 +698,10 @@ class BlockSort {
                     stack_dd[sp] = d1;
                     sp++;
                 } else {
-                    int n = ((ltLo - lo) < (unLo - ltLo)) ? (ltLo - lo)
-                                                          : (unLo - ltLo);
-                    vswap(fmap, lo, unLo - n, n);
-                    int m = ((hi - gtHi) < (gtHi - unHi)) ? (hi - gtHi)
-                                                          : (gtHi - unHi);
-                    vswap(fmap, unLo, hi - m + 1, m);
+                    int n = ((ltLo - lo) < (unLo - ltLo)) ? (ltLo - lo) : (unLo - ltLo);
+                    vswap(data.fmap, lo, unLo - n, n);
+                    int m = ((hi - gtHi) < (gtHi - unHi)) ? (hi - gtHi) : (gtHi - unHi);
+                    vswap(data.fmap, unLo, hi - m + 1, m);
 
                     n = lo + unLo - ltLo - 1;
                     m = hi - (gtHi - unHi) + 1;
@@ -718,8 +725,8 @@ class BlockSort {
         }
     }
 
-    private static final int SETMASK = (1 << 21);
-    private static final int CLEARMASK = (~SETMASK);
+    private static final int SETMASK = 1 << 21;
+    private static final int CLEARMASK = ~SETMASK;
 
     final void mainSort(final Bzip2OutputStream.Data dataShadow,
             final int lastShadow) {
@@ -824,9 +831,8 @@ class BlockSort {
                     final int lo = ftab_sb & CLEARMASK;
                     final int hi = (ftab[sb + 1] & CLEARMASK) - 1;
                     if (hi > lo) {
-                        mainQSort3(dataShadow, lo, hi, 2, lastShadow);
-                        if (firstAttemptShadow
-                                && (this.workDone > workLimitShadow)) {
+                        mainQSort3(lo, hi, 2, lastShadow);
+                        if (firstAttemptShadow && (workDone > workLimitShadow)) {
                             return;
                         }
                     }

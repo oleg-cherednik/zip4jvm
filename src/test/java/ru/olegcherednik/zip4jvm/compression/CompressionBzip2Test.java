@@ -32,7 +32,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  * @since 12.04.2020
  */
 @Test
-@SuppressWarnings({ "FieldNamingConvention", "NewClassNamingConvention" })
+@SuppressWarnings("FieldNamingConvention")
 public class CompressionBzip2Test {
 
     private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(CompressionBzip2Test.class);
