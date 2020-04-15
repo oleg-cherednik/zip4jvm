@@ -908,7 +908,7 @@ are not explicitly set, then `default` entry settings are used for all added ent
    - `off` - not encryption
    - `pkware` - [PKWare](https://en.wikipedia.org/wiki/PKWare) encryption algorithm
    - `aes_128` `aes_192` `aes_256` - [AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
-     encryption algorithm with given `128` `192` `255` key strength
+     encryption algorithm with given `128` `192` `255` bits key strength
  - _comment_ - comment for entry
    - _no comment_ - `null` or `empty string`
    - _max length_ - `65_535` symbols
