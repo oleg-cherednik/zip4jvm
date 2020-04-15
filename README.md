@@ -21,7 +21,7 @@ zip4jvm - a java library for working with zip files
 * Compression support:
   * STORE
   * [DEFLATE (default)](https://en.wikipedia.org/wiki/DEFLATE)
-  * [ENHANCED DEFLATE](https://en.wikipedia.org/wiki/DEFLATE#Deflate64/Enhanced_Deflate)
+  * [ENHANCED DEFLATE](http://deflate64.com)
   * [BZIP2](https://en.wikipedia.org/wiki/Bzip2)
   * [LZMA](https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm)
 * Individual settings for each zip entry (i.e. some of files can be encrypted, and some - not);
