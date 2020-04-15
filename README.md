@@ -898,7 +898,9 @@ are not explicitly set, then `default` entry settings are used for all added ent
 
  - _compression_ - compression algorithm
    - `store` - no compression
-   - `deflate` - use [Deflate](https://en.wikipedia.org/wiki/DEFLATE) compression algorithm
+   - `deflate` - use [DEFLATE](https://en.wikipedia.org/wiki/DEFLATE) compression algorithm
+   - `enhanced_deflate` - use [ENHANCED DEFLATE](http://deflate64.com) compression algorithm
+   - `bzip2` - use [BZIP2](https://en.wikipedia.org/wiki/Bzip2) compression algorithm   
    - `lzma` - use [LZMA](https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm) compression algorithm
  - _compressionLevel_ - compression level
    - `fastest` `fast` `normal` `maximum` `ultra`
@@ -912,8 +914,8 @@ are not explicitly set, then `default` entry settings are used for all added ent
    - _max length_ - `65_535` symbols
  - _zip64_ - use `true` or `false` zip64 format for global zip structure
    - **Note:** _zip64_ is switched on automatically if needed
- - _utf8_ - `true` use [UTF8](https://en.wikipedia.org/wiki/UTF-8) charset for file name and comment
-   instead of [IBM437](https://en.wikipedia.org/wiki/Code_page_437) when `false`
+ - _utf8_ - `true` use [UTF-8](https://en.wikipedia.org/wiki/UTF-8) charset for file name and comment
+   instead of [IBM-437](https://en.wikipedia.org/wiki/Code_page_437) when `false`
 
 #### Zip entry settings defaults
 
@@ -922,7 +924,7 @@ are not explicitly set, then `default` entry settings are used for all added ent
  - _encryption_ - `off`, i.e. no encryption
  - _comment_ - `null`, i.e. no comment
  - _zip64_ - `false`, i.e. standard format for entry structure
- - _utf8_ - `true`, i.e. entry's name and comment are stored using `UTF8` charset
+ - _utf8_ - `true`, i.e. entry's name and comment are stored using `UTF-8` charset
 
 ##### Links
 * Home page: https://github.com/oleg-cherednik/zip4jvm
