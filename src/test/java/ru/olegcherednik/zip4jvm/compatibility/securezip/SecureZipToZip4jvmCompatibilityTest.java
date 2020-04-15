@@ -40,13 +40,13 @@ public class SecureZipToZip4jvmCompatibilityTest {
         assertThatDirectory(destDir).matches(dirBikesAssert);
     }
 
-    public void shouldUnzipWhenPkwareEncryption() throws IOException {
+    public void shouldUnzipWhenBzip2AndPkwareEncryption() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         UnzipIt.zip(secureZipBzip2SolidPkwareZip).destDir(destDir).password(password).extract();
         assertThatDirectory(destDir).matches(dirBikesAssert);
     }
 
-    public void shouldUnzipWhenAesEncryption() throws IOException {
+    public void shouldUnzipWhenStoreAndAesEncryption() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         UnzipIt.zip(secureZipStoreSolidAesZip).destDir(destDir).password(password).extract();
         assertThatDirectory(destDir).matches(dirBikesAssert);
