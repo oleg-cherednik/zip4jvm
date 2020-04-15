@@ -903,7 +903,7 @@ are not explicitly set, then `default` entry settings are used for all added ent
    - `bzip2` - use [BZIP2](https://en.wikipedia.org/wiki/Bzip2) compression algorithm   
    - `lzma` - use [LZMA](https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm) compression algorithm
  - _compressionLevel_ - compression level
-   - `fastest` `fast` `normal` `maximum` `ultra`
+   - `super_fast` `fast` `normal` `maximum`
  - _encryption_ - encryption algorithm
    - `off` - not encryption
    - `pkware` - [PKWare](https://en.wikipedia.org/wiki/PKWare) encryption algorithm
