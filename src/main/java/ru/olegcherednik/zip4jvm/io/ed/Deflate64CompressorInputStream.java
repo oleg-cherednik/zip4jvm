@@ -5,12 +5,6 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import java.io.IOException;
 import java.io.InputStream;
 
-/**
- * Deflate64 decompressor.
- *
- * @NotThreadSafe
- * @since 1.16
- */
 public class Deflate64CompressorInputStream extends InputStream {
 
     private final HuffmanDecoder decoder;
