@@ -83,7 +83,7 @@ public class Bzip2InputStream extends InputStream {
         if (len == 0)
             return 0;
 
-        final int hi = offs + len;
+        int hi = offs + len;
         int destOffs = offs;
         int b;
 
@@ -91,7 +91,7 @@ public class Bzip2InputStream extends InputStream {
             buf[destOffs++] = (byte)b;
         }
 
-        return destOffs == offs ? -1 : destOffs - offs;
+        return destOffs == offs ? IOUtils.EOF : destOffs - offs;
     }
 
     private static final long MAGIC_COMPRESSED = 0x314159265359L;
