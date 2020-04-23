@@ -162,7 +162,7 @@ public class ZipInfoTest {
         return res;
     }
 
-    @Test(enabled = false)
+    @Test//(enabled = false)
     public void printShortInfo() throws IOException {
         ZipInfoSettings settings = ZipInfoSettings.builder().copyPayload(true).build();
         zipInfo().settings(settings).printShortInfo(System.out);
