@@ -1,6 +1,9 @@
 package tangible.cpp.seven_zip.archive.zip;
 
 import tangible.cpp.common.HRESULT;
+import tangible.cpp.seven_zip.ISequentialInStream;
+
+import static tangible.cpp.common.HRESULT.S_OK;
 
 // ZipIn.h:244
 public class CInArchive {
@@ -20,7 +23,12 @@ public class CInArchive {
 
     // ZipIn.h.cpp:1217
     public HRESULT ReadLocalItemAfterCdItem(CItemEx item, boolean[] isAvail, boolean[] headersError) {
-        return HRESULT.S_OK;
+        return S_OK;
+    }
+
+    // ZipIn.cpp:3195
+    public HRESULT GetItemStream(CItemEx item, boolean seekPackData, ISequentialInStream[] stream) {
+        return S_OK;
     }
 
 }

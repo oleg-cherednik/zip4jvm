@@ -222,7 +222,7 @@ public class CHandler extends CMyUnknownImp implements IInArchive, IOutArchive, 
 
             NOperationResult[] res = { NOperationResult.kOK };
             HRESULT hres = myDecoder.Decode(
-                    m_Archive, item, realOutStream, extractCallback,
+                    m_Archive, item, realOutStream[0], extractCallback,
                     progress,
                     res);
 
@@ -285,24 +285,10 @@ public class CHandler extends CMyUnknownImp implements IInArchive, IOutArchive, 
         return null;
     }
 
-    @Override
-    public HRESULT QueryInterface(GUID iid, Object outObject) {
-        return null;
-    }
-
-    @Override
-    public long AddRef() {
-        return ++__m_RefCount;
-    }
-
-    @Override
-    public long Release() {
-        return --__m_RefCount;
-    }
-
     // public
 
-    HRESULT QueryInterface(GUID iid, Object[] outObject) {
+    @Override
+    public HRESULT QueryInterface(GUID iid, Object[] outObject) {
 //         *outObject = NULL;
 //
 //        if (iid instanceof IUnknown . == IID_IUnknown)

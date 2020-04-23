@@ -1,40 +1,73 @@
 package tangible.cpp.seven_zip.archive.zip;
 
+import tangible.cpp.common.AString;
+import tangible.cpp.common.CMyComBSTR;
 import tangible.cpp.common.HRESULT;
+import tangible.cpp.seven_zip.ICompressCoder;
+import tangible.cpp.seven_zip.ICompressFilter;
 import tangible.cpp.seven_zip.ICompressProgressInfo;
+import tangible.cpp.seven_zip.ICryptoGetTextPassword;
+import tangible.cpp.seven_zip.ICryptoSetPassword;
+import tangible.cpp.seven_zip.ISequentialInStream;
 import tangible.cpp.seven_zip.archive.IArchiveExtractCallback;
 import tangible.cpp.seven_zip.archive.ISequentialOutStream;
+import tangible.cpp.seven_zip.archive.common.CLimitedSequentialInStream;
+import tangible.cpp.seven_zip.archive.common.COutStreamWithCRC;
+import tangible.cpp.seven_zip.common.CFilterCoder;
+import tangible.cpp.seven_zip.compress.NCompress;
+import tangible.cpp.seven_zip.crypto.NCrypto;
+
+import java.util.List;
+
+import static tangible.cpp.common.HRESULT.E_FAIL;
+import static tangible.cpp.common.HRESULT.S_OK;
+import static tangible.cpp.seven_zip.ICryptoGetTextPassword.IID_ICryptoGetTextPassword;
+import static tangible.cpp.seven_zip.ICryptoSetPassword.IID_ICryptoSetPassword;
+import static tangible.cpp.seven_zip.archive.zip.NArchive.NZip.kMethodId_BZip2;
+import static tangible.cpp.seven_zip.archive.zip.NArchive.NZip.kMethodId_ZipBase;
 
 public class CZipDecoder {
 
+    NCrypto.NZip.CDecoder _zipCryptoDecoderSpec;
+    NCrypto.NZipStrong.CDecoder _pkAesDecoderSpec;
+    NCrypto.NWzAes.CDecoder _wzAesDecoderSpec;
+
+    ICompressFilter _zipCryptoDecoder;
+    ICompressFilter _pkAesDecoder;
+    ICompressFilter _wzAesDecoder;
+
+    CFilterCoder filterStreamSpec;
+    ISequentialInStream filterStream;
+    ICryptoGetTextPassword[] getTextPassword = { null };
+    List<CMethodItem> methodItems;
+
     // ZipHandler.cpp:879
     public HRESULT Decode(CInArchive archive, CItemEx item,
-            ISequentialOutStream[] realOutStream,
+            ISequentialOutStream realOutStream,
             IArchiveExtractCallback extractCallback,
             ICompressProgressInfo compressProgress,
-            NOperationResult[] res) {
-        res[0] = NOperationResult.kHeadersError;
+            NExtract.NOperationResult[] res) {
+        res[0] = NExtract.NOperationResult.kHeadersError;
 
-        CFilterCoder::C_InStream_Releaser inStreamReleaser;
-        CFilterCoder::C_Filter_Releaser filterReleaser;
+        CFilterCoder.C_InStream_Releaser inStreamReleaser;
+        CFilterCoder.C_Filter_Releaser filterReleaser;
 
-        bool needCRC = true;
-        bool wzAesMode = false;
-        bool pkAesMode = false;
+        boolean needCRC = true;
+        boolean wzAesMode = false;
+        boolean pkAesMode = false;
 
-        unsigned id = item.Method;
+        NFileHeader.NCompressionMethod.EType id = item.Method;
 
         if (item.IsEncrypted()) {
             if (item.IsStrongEncrypted()) {
-                CStrongCryptoExtra f;
+                CStrongCryptoExtra f = new CStrongCryptoExtra();
                 if (!item.CentralExtra.GetStrongCrypto(f)) {
-                    res = NExtract::NOperationResult::kUnsupportedMethod;
+                    res[0] = NExtract.NOperationResult.kUnsupportedMethod;
                     return S_OK;
                 }
                 pkAesMode = true;
-            } else if (id == NFileHeader::NCompressionMethod::kWzAES)
-            {
-                CWzAesExtra aesField;
+            } else if (id == NFileHeader.NCompressionMethod.EType.kWzAES) {
+                CWzAesExtra aesField = new CWzAesExtra();
                 if (!item.GetMainExtra().GetWzAes(aesField))
                     return S_OK;
                 wzAesMode = true;
@@ -42,80 +75,91 @@ public class CZipDecoder {
             }
         }
 
-        COutStreamWithCRC * outStreamSpec = new COutStreamWithCRC;
-        CMyComPtr<ISequentialOutStream> outStream = outStreamSpec;
-        outStreamSpec -> SetStream(realOutStream);
-        outStreamSpec -> Init(needCRC);
+        COutStreamWithCRC outStreamSpec = new COutStreamWithCRC();
+        ISequentialOutStream outStream = outStreamSpec;
+        outStreamSpec.SetStream(realOutStream);
+        outStreamSpec.Init(needCRC);
 
-        CMyComPtr<ISequentialInStream> packStream;
+        ISequentialInStream[] packStream = { null };
 
-        CLimitedSequentialInStream * limitedStreamSpec = new CLimitedSequentialInStream;
-        CMyComPtr<ISequentialInStream> inStream (limitedStreamSpec);
+        CLimitedSequentialInStream limitedStreamSpec = new CLimitedSequentialInStream();
+        ISequentialInStream inStream = limitedStreamSpec;
 
         {
-            UInt64 packSize = item.PackSize;
+            long packSize = item.PackSize;
             if (wzAesMode) {
-                if (packSize < NCrypto::NWzAes::kMacSize)
-                return S_OK;
-                packSize -= NCrypto::NWzAes::kMacSize;
+                if (packSize < NCrypto.NWzAes.kMacSize)
+                    return S_OK;
+                packSize -= NCrypto.NWzAes.kMacSize;
             }
-            RINOK(archive.GetItemStream(item, true, packStream));
-            if (!packStream) {
-                res = NExtract::NOperationResult::kUnavailable;
+
+            HRESULT __result__ = archive.GetItemStream(item, true, packStream);
+            if (__result__ != S_OK)
+                return __result__;
+
+            if (packStream[0] != null) {
+                res[0] = NExtract.NOperationResult.kUnavailable;
                 return S_OK;
             }
-            limitedStreamSpec -> SetStream(packStream);
-            limitedStreamSpec -> Init(packSize);
+            limitedStreamSpec.SetStream(packStream[0]);
+            limitedStreamSpec.Init(packSize);
         }
 
 
-        res = NExtract::NOperationResult::kDataError;
+        res[0] = NExtract.NOperationResult.kDataError;
 
-        CMyComPtr<ICompressFilter> cryptoFilter;
+        ICompressFilter cryptoFilter;
 
         if (item.IsEncrypted()) {
             if (wzAesMode) {
-                CWzAesExtra aesField;
+                CWzAesExtra aesField = new CWzAesExtra();
                 if (!item.GetMainExtra().GetWzAes(aesField))
                     return S_OK;
                 id = aesField.Method;
-                if (!_wzAesDecoder) {
-                    _wzAesDecoderSpec = new NCrypto::NWzAes::CDecoder;
+                if (_wzAesDecoder == null) {
+                    _wzAesDecoderSpec = new NCrypto.NWzAes.CDecoder();
                     _wzAesDecoder = _wzAesDecoderSpec;
                 }
                 cryptoFilter = _wzAesDecoder;
-                if (!_wzAesDecoderSpec -> SetKeyMode(aesField.Strength)) {
-                    res = NExtract::NOperationResult::kUnsupportedMethod;
+                if (!_wzAesDecoderSpec.SetKeyMode(aesField.Strength)) {
+                    res[0] = NExtract.NOperationResult.kUnsupportedMethod;
                     return S_OK;
                 }
             } else if (pkAesMode) {
-                if (!_pkAesDecoder) {
-                    _pkAesDecoderSpec = new NCrypto::NZipStrong::CDecoder;
+                if (_pkAesDecoder == null) {
+                    _pkAesDecoderSpec = new NCrypto.NZipStrong.CDecoder(0);
                     _pkAesDecoder = _pkAesDecoderSpec;
                 }
                 cryptoFilter = _pkAesDecoder;
             } else {
-                if (!_zipCryptoDecoder) {
-                    _zipCryptoDecoderSpec = new NCrypto::NZip::CDecoder;
+                if (_zipCryptoDecoder == null) {
+                    _zipCryptoDecoderSpec = new NCrypto.NZip.CDecoder();
                     _zipCryptoDecoder = _zipCryptoDecoderSpec;
                 }
                 cryptoFilter = _zipCryptoDecoder;
             }
 
-            CMyComPtr<ICryptoSetPassword> cryptoSetPassword;
-            RINOK(cryptoFilter.QueryInterface(IID_ICryptoSetPassword, & cryptoSetPassword));
-            if (!cryptoSetPassword)
+            ICryptoSetPassword[] cryptoSetPassword = { null };
+            HRESULT __result__ = cryptoFilter.QueryInterface(IID_ICryptoSetPassword, cryptoSetPassword);
+            if (__result__ != S_OK)
+                return __result__;
+
+            if (cryptoSetPassword[0] == null)
                 return E_FAIL;
 
-            if (!getTextPassword)
-                extractCallback -> QueryInterface(IID_ICryptoGetTextPassword, ( void **)&getTextPassword);
+            if (getTextPassword[0] == null)
+                extractCallback.QueryInterface(IID_ICryptoGetTextPassword, getTextPassword);
 
-            if (getTextPassword) {
-                CMyComBSTR password;
-                RINOK(getTextPassword -> CryptoGetTextPassword( & password));
-                AString charPassword;
-                if (password) {
-                    UnicodeStringToMultiByte2(charPassword, (const wchar_t *)password, CP_ACP);
+            if (getTextPassword[0] != null) {
+                CMyComBSTR[] password = { null };
+
+                __result__ = getTextPassword[0].CryptoGetTextPassword(password);
+                if (__result__ != S_OK)
+                    return __result__;
+
+                AString[] charPassword = { null };
+                if (password[0] != null) {
+//                    UnicodeStringToMultiByte2(charPassword, (const wchar_t *)password, CP_ACP);
         /*
         if (wzAesMode || pkAesMode)
         {
@@ -131,86 +175,82 @@ public class CZipDecoder {
         }
         */
                 }
-                HRESULT result = cryptoSetPassword -> CryptoSetPassword(
-                        (const Byte *)(const char *)charPassword, charPassword.Len());
-                if (result != S_OK) {
-                    res = NExtract::NOperationResult::kWrongPassword;
+                __result__ = cryptoSetPassword[0].CryptoSetPassword(charPassword[0], charPassword[0].Len());
+                if (__result__ != S_OK) {
+                    res[0] = NExtract.NOperationResult.kWrongPassword;
                     return S_OK;
                 }
             } else {
-                res = NExtract::NOperationResult::kWrongPassword;
+                res[0] = NExtract.NOperationResult.kWrongPassword;
                 return S_OK;
                 // RINOK(cryptoSetPassword->CryptoSetPassword(NULL, 0));
             }
         }
 
-        unsigned m;
-        for (m = 0; m < methodItems.Size(); m++)
-            if (methodItems[m].ZipMethod == id)
+        int m = 0;
+
+        for (; m < methodItems.size(); m++)
+            if (methodItems.get(m).ZipMethod == id)
                 break;
 
-        if (m == methodItems.Size()) {
-            CMethodItem mi;
+        if (m == methodItems.size()) {
+            CMethodItem mi = new CMethodItem();
             mi.ZipMethod = id;
-            if (id == NFileHeader::NCompressionMethod::kStore)
-            mi.Coder = new NCompress::CCopyCoder;
-    else if (id == NFileHeader::NCompressionMethod::kShrink)
-            mi.Coder = new NCompress::NShrink::CDecoder;
-    else if (id == NFileHeader::NCompressionMethod::kImplode)
-            mi.Coder = new NCompress::NImplode::NDecoder::CCoder;
-    else if (id == NFileHeader::NCompressionMethod::kLZMA)
-            {
-                lzmaDecoderSpec = new CLzmaDecoder;
-                mi.Coder = lzmaDecoderSpec;
-            }
-    else if (id == NFileHeader::NCompressionMethod::kXz)
-            mi.Coder = new NCompress::NXz::CComDecoder;
-    else if (id == NFileHeader::NCompressionMethod::kPPMd)
-            mi.Coder = new NCompress::NPpmdZip::CDecoder(true);
-    else
-            {
-                CMethodId szMethodID;
-                if (id == NFileHeader::NCompressionMethod::kBZip2)
-                szMethodID = kMethodId_BZip2;
-      else
-                {
-                    if (id > 0xFF) {
-                        res = NExtract::NOperationResult::kUnsupportedMethod;
+            if (id == NFileHeader.NCompressionMethod.EType.kStore)
+                mi.Coder = new NCompress.CCopyCoder();
+            else if (id == NFileHeader.NCompressionMethod.EType.kShrink)
+                mi.Coder = new NCompress.NShrink.CDecoder();
+            else if (id == NFileHeader.NCompressionMethod.EType.kImplode)
+                mi.Coder = new NCompress.NImplode.NDecoder.CCoder();
+            else if (id == NFileHeader.NCompressionMethod.EType.kLZMA) {
+//                lzmaDecoderSpec = new CLzmaDecoder;
+//                mi.Coder = lzmaDecoderSpec;
+            } else if (id == NFileHeader.NCompressionMethod.EType.kXz)
+                mi.Coder = new NCompress.NXz.CComDecoder();
+            else if (id == NFileHeader.NCompressionMethod.EType.kPPMd)
+                mi.Coder = new NCompress.NPpmdZip.CDecoder(true);
+            else {
+                long szMethodID;
+                if (id == NFileHeader.NCompressionMethod.EType.kBZip2)
+                    szMethodID = kMethodId_BZip2;
+                else {
+                    if (id.ordinal() > 0xFF) {
+                        res[0] = NExtract.NOperationResult.kUnsupportedMethod;
                         return S_OK;
                     }
-                    szMethodID = kMethodId_ZipBase + (Byte)id;
+                    szMethodID = kMethodId_ZipBase + id.ordinal();
                 }
 
-                RINOK(CreateCoder_Id(EXTERNAL_CODECS_LOC_VARS szMethodID, false, mi.Coder));
-
-                if (!mi.Coder) {
-                    res = NExtract::NOperationResult::kUnsupportedMethod;
-                    return S_OK;
-                }
+//                HRESULT __result__ = CreateCoder_Id(EXTERNAL_CODECS_LOC_VARS szMethodID, false, mi.Coder);
+//                if (__result__ != S_OK) {
+//                    res[0] = NOperationResult.kUnsupportedMethod;
+//                    return S_OK;
+//                }
             }
-            m = methodItems.Add(mi);
+
+//            m = methodItems.add(mi);
         }
 
-        ICompressCoder * coder = methodItems[m].Coder;
+        ICompressCoder coder = methodItems.get(m).Coder;
 
 
-  #ifndef _7ZIP_ST
-        {
-            CMyComPtr<ICompressSetCoderMt> setCoderMt;
-            coder -> QueryInterface(IID_ICompressSetCoderMt, ( void **)&setCoderMt);
-            if (setCoderMt) {
-                RINOK(setCoderMt -> SetNumberOfThreads(numThreads));
-            }
-        }
-        // if (memUsage != 0)
-        {
-            CMyComPtr<ICompressSetMemLimit> setMemLimit;
-            coder -> QueryInterface(IID_ICompressSetMemLimit, ( void **)&setMemLimit);
-            if (setMemLimit) {
-                RINOK(setMemLimit -> SetMemLimit(memUsage));
-            }
-        }
-  #endif
+//  #ifndef _7ZIP_ST
+//        {
+//            CMyComPtr<ICompressSetCoderMt> setCoderMt;
+//            coder -> QueryInterface(IID_ICompressSetCoderMt, ( void **)&setCoderMt);
+//            if (setCoderMt) {
+//                RINOK(setCoderMt -> SetNumberOfThreads(numThreads));
+//            }
+//        }
+//        // if (memUsage != 0)
+//        {
+//            CMyComPtr<ICompressSetMemLimit> setMemLimit;
+//            coder -> QueryInterface(IID_ICompressSetMemLimit, ( void **)&setMemLimit);
+//            if (setMemLimit) {
+//                RINOK(setMemLimit -> SetMemLimit(memUsage));
+//            }
+//        }
+//  #endif
 
         {
             CMyComPtr<ICompressSetDecoderProperties2> setDecoderProperties;
@@ -222,49 +262,49 @@ public class CZipDecoder {
         }
 
 
-        CMyComPtr<ISequentialInStream> inStreamNew;
+        ISequentialInStream inStreamNew;
 
-        bool isFullStreamExpected = (!item.HasDescriptor() || item.PackSize != 0);
-        bool needReminderCheck = false;
+        boolean isFullStreamExpected = !item.HasDescriptor() || item.PackSize != 0;
+        boolean needReminderCheck = false;
 
-        bool dataAfterEnd = false;
-        bool truncatedError = false;
-        bool lzmaEosError = false;
+        boolean dataAfterEnd = false;
+        boolean truncatedError = false;
+        boolean lzmaEosError = false;
 
         {
             HRESULT result = S_OK;
             if (item.IsEncrypted()) {
-                if (!filterStream) {
+                if (filterStream == null) {
                     filterStreamSpec = new CFilterCoder(false);
                     filterStream = filterStreamSpec;
                 }
 
                 filterReleaser.FilterCoder = filterStreamSpec;
-                filterStreamSpec -> Filter = cryptoFilter;
+                filterStreamSpec.Filter = cryptoFilter;
 
                 if (wzAesMode) {
-                    result = _wzAesDecoderSpec -> ReadHeader(inStream);
+                    result = _wzAesDecoderSpec.ReadHeader(inStream);
                     if (result == S_OK) {
-                        if (!_wzAesDecoderSpec -> Init_and_CheckPassword()) {
-                            res = NExtract::NOperationResult::kWrongPassword;
+                        if (!_wzAesDecoderSpec.Init_and_CheckPassword()) {
+                            res[0] = NExtract.NOperationResult.kWrongPassword;
                             return S_OK;
                         }
                     }
                 } else if (pkAesMode) {
                     isFullStreamExpected = false;
-                    result = _pkAesDecoderSpec -> ReadHeader(inStream, item.Crc, item.Size);
+                    result = _pkAesDecoderSpec.ReadHeader(inStream, item.Crc, item.Size);
                     if (result == S_OK) {
-                        bool passwOK;
-                        result = _pkAesDecoderSpec -> Init_and_CheckPassword(passwOK);
-                        if (result == S_OK && !passwOK) {
-                            res = NExtract::NOperationResult::kWrongPassword;
+                        boolean[] passwOK = { true };
+                        result = _pkAesDecoderSpec.Init_and_CheckPassword(passwOK);
+                        if (result == S_OK && !passwOK[0]) {
+                            res[0] = NExtract.NOperationResult.kWrongPassword;
                             return S_OK;
                         }
                     }
                 } else {
-                    result = _zipCryptoDecoderSpec -> ReadHeader(inStream);
+                    result = _zipCryptoDecoderSpec.ReadHeader(inStream);
                     if (result == S_OK) {
-                        _zipCryptoDecoderSpec -> Init_BeforeDecode();
+                        _zipCryptoDecoderSpec.Init_BeforeDecode();
 
           /* Info-ZIP modification to ZipCrypto format:
                if bit 3 of the general purpose bit flag is set,
@@ -275,11 +315,11 @@ public class CZipDecoder {
                         // UInt32 v1 = GetUi16(_zipCryptoDecoderSpec->_header + NCrypto::NZip::kHeaderSize - 2);
                         // UInt32 v2 = (item.HasDescriptor() ? (item.Time & 0xFFFF) : (item.Crc >> 16));
 
-                        Byte v1 = _zipCryptoDecoderSpec -> _header[NCrypto::NZip::kHeaderSize - 1];
-                        Byte v2 = (Byte)(item.HasDescriptor() ? (item.Time >> 8) : (item.Crc >> 24));
+                        int v1 = _zipCryptoDecoderSpec._header[NCrypto.NZip.kHeaderSize - 1];
+                        int v2 = item.HasDescriptor() ? (item.Time >> 8) : (item.Crc >> 24));
 
                         if (v1 != v2) {
-                            res = NExtract::NOperationResult::kWrongPassword;
+                            res[0] = NExtract.NOperationResult.kWrongPassword;
                             return S_OK;
                         }
                     }

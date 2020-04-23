@@ -2,7 +2,7 @@ package tangible.cpp.common;
 
 public interface IUnknown {
 
-    HRESULT QueryInterface(GUID iid, Object outObject);
+    HRESULT QueryInterface(GUID iid, Object[] outObject);
 
     long AddRef();
 
