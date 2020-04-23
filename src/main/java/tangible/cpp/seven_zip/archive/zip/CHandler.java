@@ -111,7 +111,7 @@ public class CHandler extends CMyUnknownImp implements IInArchive, IOutArchive, 
 
         for (int i = 0; i < numItems; i++) {
             CItemEx item = m_Items[allFilesMode ? i : indices[i]];
-            totalUnPacked += item.Size;
+            totalUnPacked += item.Size[0];
             totalPacked += item.PackSize;
         }
 
@@ -120,16 +120,17 @@ public class CHandler extends CMyUnknownImp implements IInArchive, IOutArchive, 
             return __result__;
 
         long currentTotalUnPacked = 0, currentTotalPacked = 0;
-        long currentItemUnPacked, currentItemPacked;
+        long[] currentItemUnPacked = { 0 };
+        long currentItemPacked;
 
         CLocalProgress lps = new CLocalProgress();
         ICompressProgressInfo progress = lps;
         lps.Init(extractCallback, false);
 
         for (int i = 0; i < numItems; i++,
-                currentTotalUnPacked += currentItemUnPacked,
+                currentTotalUnPacked += currentItemUnPacked[0],
                 currentTotalPacked += currentItemPacked) {
-            currentItemUnPacked = 0;
+            currentItemUnPacked[0] = 0;
             currentItemPacked = 0;
 
             lps.InSize = currentTotalPacked;
@@ -164,7 +165,7 @@ public class CHandler extends CMyUnknownImp implements IInArchive, IOutArchive, 
 
                 realOutStream[0].Release();
 
-                __result__ = extractCallback.SetOperationResult(NOperationResult.kUnavailable);
+                __result__ = extractCallback.SetOperationResult(NExtract.NOperationResult.kUnavailable);
                 if (__result__ != S_OK)
                     return __result__;
 
@@ -184,7 +185,8 @@ public class CHandler extends CMyUnknownImp implements IInArchive, IOutArchive, 
 
                         realOutStream[0].Release();
 
-                        __result__ = extractCallback.SetOperationResult(isAvail[0] ? NOperationResult.kHeadersError : NOperationResult.kUnavailable);
+                        __result__ = extractCallback.SetOperationResult(
+                                isAvail[0] ? NExtract.NOperationResult.kHeadersError : NExtract.NOperationResult.kUnavailable);
                         if (__result__ != S_OK)
                             return __result__;
                     }
@@ -205,7 +207,7 @@ public class CHandler extends CMyUnknownImp implements IInArchive, IOutArchive, 
 
                     realOutStream[0].Release();
 
-                    __result__ = extractCallback.SetOperationResult(NOperationResult.kOK);
+                    __result__ = extractCallback.SetOperationResult(NExtract.NOperationResult.kOK);
                     if (__result__ != S_OK)
                         return __result__;
                 }
@@ -220,7 +222,7 @@ public class CHandler extends CMyUnknownImp implements IInArchive, IOutArchive, 
                 return __result__;
 
 
-            NOperationResult[] res = { NOperationResult.kOK };
+            NExtract.NOperationResult[] res = { NExtract.NOperationResult.kOK };
             HRESULT hres = myDecoder.Decode(
                     m_Archive, item, realOutStream[0], extractCallback,
                     progress,
@@ -232,8 +234,8 @@ public class CHandler extends CMyUnknownImp implements IInArchive, IOutArchive, 
 
             realOutStream[0].Release();
 
-            if (res[0] == NOperationResult.kOK && headersError[0])
-                res[0] = NOperationResult.kHeadersError;
+            if (res[0] == NExtract.NOperationResult.kOK && headersError[0])
+                res[0] = NExtract.NOperationResult.kHeadersError;
 
             __result__ = extractCallback.SetOperationResult(res[0]);
             if (__result__ != S_OK)

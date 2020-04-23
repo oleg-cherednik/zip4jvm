@@ -5,7 +5,10 @@ import tangible.cpp.common.CMyComBSTR;
 import tangible.cpp.common.HRESULT;
 import tangible.cpp.seven_zip.ICompressCoder;
 import tangible.cpp.seven_zip.ICompressFilter;
+import tangible.cpp.seven_zip.ICompressGetInStreamProcessedSize;
 import tangible.cpp.seven_zip.ICompressProgressInfo;
+import tangible.cpp.seven_zip.ICompressSetDecoderProperties2;
+import tangible.cpp.seven_zip.ICompressSetFinishMode;
 import tangible.cpp.seven_zip.ICryptoGetTextPassword;
 import tangible.cpp.seven_zip.ICryptoSetPassword;
 import tangible.cpp.seven_zip.ISequentialInStream;
@@ -20,7 +23,12 @@ import tangible.cpp.seven_zip.crypto.NCrypto;
 import java.util.List;
 
 import static tangible.cpp.common.HRESULT.E_FAIL;
+import static tangible.cpp.common.HRESULT.E_NOTIMP;
+import static tangible.cpp.common.HRESULT.S_FALSE;
 import static tangible.cpp.common.HRESULT.S_OK;
+import static tangible.cpp.seven_zip.ICompressGetInStreamProcessedSize.IID_ICompressGetInStreamProcessedSize;
+import static tangible.cpp.seven_zip.ICompressSetDecoderProperties2.IID_ICompressSetDecoderProperties2;
+import static tangible.cpp.seven_zip.ICompressSetFinishMode.IID_ICompressSetFinishMode;
 import static tangible.cpp.seven_zip.ICryptoGetTextPassword.IID_ICryptoGetTextPassword;
 import static tangible.cpp.seven_zip.ICryptoSetPassword.IID_ICryptoSetPassword;
 import static tangible.cpp.seven_zip.archive.zip.NArchive.NZip.kMethodId_BZip2;
@@ -41,6 +49,8 @@ public class CZipDecoder {
     ICryptoGetTextPassword[] getTextPassword = { null };
     List<CMethodItem> methodItems;
 
+    CLzmaDecoder lzmaDecoderSpec;
+
     // ZipHandler.cpp:879
     public HRESULT Decode(CInArchive archive, CItemEx item,
             ISequentialOutStream realOutStream,
@@ -49,8 +59,8 @@ public class CZipDecoder {
             NExtract.NOperationResult[] res) {
         res[0] = NExtract.NOperationResult.kHeadersError;
 
-        CFilterCoder.C_InStream_Releaser inStreamReleaser;
-        CFilterCoder.C_Filter_Releaser filterReleaser;
+        CFilterCoder.C_InStream_Releaser inStreamReleaser = null;
+        CFilterCoder.C_Filter_Releaser filterReleaser = null;
 
         boolean needCRC = true;
         boolean wzAesMode = false;
@@ -108,7 +118,7 @@ public class CZipDecoder {
 
         res[0] = NExtract.NOperationResult.kDataError;
 
-        ICompressFilter cryptoFilter;
+        ICompressFilter cryptoFilter = null;
 
         if (item.IsEncrypted()) {
             if (wzAesMode) {
@@ -253,16 +263,19 @@ public class CZipDecoder {
 //  #endif
 
         {
-            CMyComPtr<ICompressSetDecoderProperties2> setDecoderProperties;
-            coder -> QueryInterface(IID_ICompressSetDecoderProperties2, ( void **)&setDecoderProperties);
-            if (setDecoderProperties) {
-                Byte properties = (Byte)item.Flags;
-                RINOK(setDecoderProperties -> SetDecoderProperties2( & properties, 1));
+            ICompressSetDecoderProperties2[] setDecoderProperties = { null };
+            coder.QueryInterface(IID_ICompressSetDecoderProperties2, setDecoderProperties);
+            if (setDecoderProperties[0] != null) {
+                int properties = item.Flags;
+
+                HRESULT __result__ = setDecoderProperties[0].SetDecoderProperties2(properties, 1);
+                if (__result__ == S_OK)
+                    return __result__;
             }
         }
 
 
-        ISequentialInStream inStreamNew;
+        ISequentialInStream inStreamNew = null;
 
         boolean isFullStreamExpected = !item.HasDescriptor() || item.PackSize != 0;
         boolean needReminderCheck = false;
@@ -272,7 +285,7 @@ public class CZipDecoder {
         boolean lzmaEosError = false;
 
         {
-            HRESULT result = S_OK;
+            HRESULT __result__ = S_OK;
             if (item.IsEncrypted()) {
                 if (filterStream == null) {
                     filterStreamSpec = new CFilterCoder(false);
@@ -283,8 +296,8 @@ public class CZipDecoder {
                 filterStreamSpec.Filter = cryptoFilter;
 
                 if (wzAesMode) {
-                    result = _wzAesDecoderSpec.ReadHeader(inStream);
-                    if (result == S_OK) {
+                    __result__ = _wzAesDecoderSpec.ReadHeader(inStream);
+                    if (__result__ == S_OK) {
                         if (!_wzAesDecoderSpec.Init_and_CheckPassword()) {
                             res[0] = NExtract.NOperationResult.kWrongPassword;
                             return S_OK;
@@ -292,18 +305,18 @@ public class CZipDecoder {
                     }
                 } else if (pkAesMode) {
                     isFullStreamExpected = false;
-                    result = _pkAesDecoderSpec.ReadHeader(inStream, item.Crc, item.Size);
-                    if (result == S_OK) {
+                    __result__ = _pkAesDecoderSpec.ReadHeader(inStream, item.Crc, item.Size);
+                    if (__result__ == S_OK) {
                         boolean[] passwOK = { true };
-                        result = _pkAesDecoderSpec.Init_and_CheckPassword(passwOK);
-                        if (result == S_OK && !passwOK[0]) {
+                        __result__ = _pkAesDecoderSpec.Init_and_CheckPassword(passwOK);
+                        if (__result__ == S_OK && !passwOK[0]) {
                             res[0] = NExtract.NOperationResult.kWrongPassword;
                             return S_OK;
                         }
                     }
                 } else {
-                    result = _zipCryptoDecoderSpec.ReadHeader(inStream);
-                    if (result == S_OK) {
+                    __result__ = _zipCryptoDecoderSpec.ReadHeader(inStream);
+                    if (__result__ == S_OK) {
                         _zipCryptoDecoderSpec.Init_BeforeDecode();
 
           /* Info-ZIP modification to ZipCrypto format:
@@ -316,7 +329,7 @@ public class CZipDecoder {
                         // UInt32 v2 = (item.HasDescriptor() ? (item.Time & 0xFFFF) : (item.Crc >> 16));
 
                         int v1 = _zipCryptoDecoderSpec._header[NCrypto.NZip.kHeaderSize - 1];
-                        int v2 = item.HasDescriptor() ? (item.Time >> 8) : (item.Crc >> 24));
+                        int v2 = (int)(item.HasDescriptor() ? (item.Time >> 8) : (item.Crc >> 24));
 
                         if (v1 != v2) {
                             res[0] = NExtract.NOperationResult.kWrongPassword;
@@ -325,64 +338,74 @@ public class CZipDecoder {
                     }
                 }
 
-                if (result == S_OK) {
+                if (__result__ == S_OK) {
                     inStreamReleaser.FilterCoder = filterStreamSpec;
-                    RINOK(filterStreamSpec -> SetInStream(inStream));
+
+                    __result__ = filterStreamSpec.SetInStream(inStream);
+                    if (__result__ == S_OK)
+                        return __result__;
 
         /* IFilter::Init() does nothing in all zip crypto filters.
            So we can call any Initialize function in CFilterCoder. */
 
-                    RINOK(filterStreamSpec -> Init_NoSubFilterInit());
-                    // RINOK(filterStreamSpec->SetOutStreamSize(NULL));
+                    __result__ = filterStreamSpec.Init_NoSubFilterInit();
+                    if (__result__ == S_OK)
+                        return __result__;
 
                     inStreamNew = filterStream;
                 }
             } else
                 inStreamNew = inStream;
 
-            if (result == S_OK) {
-                CMyComPtr<ICompressSetFinishMode> setFinishMode;
-                coder -> QueryInterface(IID_ICompressSetFinishMode, ( void **)&setFinishMode);
-                if (setFinishMode) {
-                    RINOK(setFinishMode -> SetFinishMode(BoolToInt(true)));
+            if (__result__ == S_OK) {
+                ICompressSetFinishMode[] setFinishMode = { null };
+                coder.QueryInterface(IID_ICompressSetFinishMode, setFinishMode);
+                if (setFinishMode[0] != null) {
+                    __result__ = setFinishMode[0].SetFinishMode(1);
+                    if (__result__ == S_OK)
+                        return __result__;
                 }
 
-      const UInt64 coderPackSize = limitedStreamSpec -> GetRem();
+                long coderPackSize = limitedStreamSpec.GetRem();
 
-                bool useUnpackLimit = (id == 0
+                boolean useUnpackLimit = (id == NFileHeader.NCompressionMethod.EType.kStore
                         || !item.HasDescriptor()
-                        || item.Size >= ((UInt64)1 << 32)
+                        || item.Size[0] >= ((long)1 << 32)
                         || item.LocalExtra.IsZip64
                         || item.CentralExtra.IsZip64
                 );
 
-                result = coder -> Code(inStreamNew, outStream,
-                        isFullStreamExpected ? & coderPackSize :NULL,
+                __result__ = coder.Code(inStreamNew, outStream,
+                        isFullStreamExpected ? coderPackSize : null,
                         // NULL,
-                        useUnpackLimit ? &item.Size :NULL,
+                        useUnpackLimit ? item.Size : null,
                         compressProgress);
 
-                if (result == S_OK) {
-                    CMyComPtr<ICompressGetInStreamProcessedSize> getInStreamProcessedSize;
-                    coder -> QueryInterface(IID_ICompressGetInStreamProcessedSize, ( void **)&getInStreamProcessedSize);
-                    if (getInStreamProcessedSize && setFinishMode) {
-                        UInt64 processed;
-                        RINOK(getInStreamProcessedSize -> GetInStreamProcessedSize( & processed));
-                        if (processed != (UInt64)(Int64) - 1) {
+                if (__result__ == S_OK) {
+                    ICompressGetInStreamProcessedSize[] getInStreamProcessedSize = { null };
+                    coder.QueryInterface(IID_ICompressGetInStreamProcessedSize, getInStreamProcessedSize);
+                    if (getInStreamProcessedSize[0] != null && setFinishMode[0] != null) {
+                        long[] processed = { 0 };
+
+                        __result__ = getInStreamProcessedSize[0].GetInStreamProcessedSize(processed);
+                        if (__result__ == S_OK)
+                            return __result__;
+
+                        if (processed[0] != -1) {
                             if (pkAesMode) {
-              const UInt32 padSize = _pkAesDecoderSpec -> GetPadSize((UInt32)processed);
-                                if (processed + padSize > coderPackSize)
+                                long padSize = _pkAesDecoderSpec.GetPadSize(processed[0]);
+                                if (processed[0] + padSize > coderPackSize)
                                     truncatedError = true;
                                 else {
-                                    if (processed + padSize < coderPackSize)
+                                    if (processed[0] + padSize < coderPackSize)
                                         dataAfterEnd = true;
                                     // also here we can check PKCS7 padding data from reminder (it can be inside stream buffer in coder).
                                 }
                             } else {
-                                if (processed < coderPackSize) {
+                                if (processed[0] < coderPackSize) {
                                     if (isFullStreamExpected)
                                         dataAfterEnd = true;
-                                } else if (processed > coderPackSize)
+                                } else if (processed[0] > coderPackSize)
                                     truncatedError = true;
                                 needReminderCheck = isFullStreamExpected;
                             }
@@ -390,51 +413,51 @@ public class CZipDecoder {
                     }
                 }
 
-                if (result == S_OK && id == NFileHeader::NCompressionMethod::kLZMA)
-                if (!lzmaDecoderSpec -> DecoderSpec -> CheckFinishStatus(item.IsLzmaEOS()))
-                    lzmaEosError = true;
+                if (__result__ == S_OK && id == NFileHeader.NCompressionMethod.EType.kLZMA)
+                    if (!lzmaDecoderSpec.DecoderSpec.CheckFinishStatus(item.IsLzmaEOS()))
+                        lzmaEosError = true;
             }
 
-            if (result == S_FALSE)
+            if (__result__ == S_FALSE)
                 return S_OK;
 
-            if (result == E_NOTIMPL) {
-                res = NExtract::NOperationResult::kUnsupportedMethod;
+            if (__result__ == E_NOTIMP) {
+                res[0] = NExtract.NOperationResult.kUnsupportedMethod;
                 return S_OK;
             }
-
-            RINOK(result);
+            if (__result__ == S_OK)
+                return S_OK;
         }
 
-        bool crcOK = true;
-        bool authOk = true;
+        boolean crcOK = true;
+        boolean[] authOk = { true };
         if (needCRC)
-            crcOK = (outStreamSpec -> GetCRC() == item.Crc);
+            crcOK = outStreamSpec.GetCRC() == item.Crc;
 
         if (wzAesMode) {
-            bool thereAreData = false;
+            boolean[] thereAreData = { false };
             if (SkipStreamData(inStreamNew, thereAreData) != S_OK)
-                authOk = false;
+                authOk[0] = false;
 
-            if (needReminderCheck && thereAreData)
+            if (needReminderCheck && thereAreData[0])
                 dataAfterEnd = true;
 
-            limitedStreamSpec -> Init(NCrypto::NWzAes::kMacSize);
-            if (_wzAesDecoderSpec -> CheckMac(inStream, authOk) != S_OK)
-                authOk = false;
+            limitedStreamSpec.Init(NCrypto.NWzAes.kMacSize);
+            if (_wzAesDecoderSpec.CheckMac(inStream, authOk) != S_OK)
+                authOk[0] = false;
         }
 
-        res = NExtract::NOperationResult::kCRCError;
+        res[0] = NExtract.NOperationResult.kCRCError;
 
-        if (crcOK && authOk) {
-            res = NExtract::NOperationResult::kOK;
+        if (crcOK && authOk[0]) {
+            res[0] = NExtract.NOperationResult.kOK;
 
             if (dataAfterEnd)
-                res = NExtract::NOperationResult::kDataAfterEnd;
-    else if (truncatedError)
-                res = NExtract::NOperationResult::kUnexpectedEnd;
-    else if (lzmaEosError)
-                res = NExtract::NOperationResult::kHeadersError;
+                res[0] = NExtract.NOperationResult.kDataAfterEnd;
+            else if (truncatedError)
+                res[0] = NExtract.NOperationResult.kUnexpectedEnd;
+            else if (lzmaEosError)
+                res[0] = NExtract.NOperationResult.kHeadersError;
 
             // CheckDescriptor() supports only data descriptor with signature and
             // it doesn't support "old" pkzip's data descriptor without signature.
@@ -444,6 +467,21 @@ public class CZipDecoder {
       res = NExtract::NOperationResult::kHeadersError;
     */
         }
+
+        return S_OK;
+    }
+
+    public static HRESULT SkipStreamData(ISequentialInStream stream, boolean[] thereAreData) {
+//        thereAreData = false;
+//  const size_t kBufSize = 1 << 12;
+//        Byte buf[ kBufSize];
+//        for (; ; ) {
+//            size_t size = kBufSize;
+//            RINOK(ReadStream(stream, buf, & size));
+//            if (size == 0)
+//                return S_OK;
+//            thereAreData = true;
+//        }
 
         return S_OK;
     }

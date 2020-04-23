@@ -25,7 +25,7 @@ public class COutStreamWithCRC implements ISequentialOutStream {
     }
 
     @Override
-    public HRESULT QueryInterface(GUID iid, Object outObject) {
+    public HRESULT QueryInterface(GUID iid, Object[] outObject) {
         return null;
     }
 
@@ -37,5 +37,9 @@ public class COutStreamWithCRC implements ISequentialOutStream {
     @Override
     public long Release() {
         return 0;
+    }
+
+    public long GetCRC() {
+        return _crc;
     }
 }

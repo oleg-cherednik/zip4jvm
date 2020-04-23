@@ -42,8 +42,11 @@ public class CLimitedSequentialInStream extends CMyUnknownImp implements ISequen
     }
 
     @Override
-    public HRESULT QueryInterface(GUID iid, Object outObject) {
+    public HRESULT QueryInterface(GUID iid, Object[] outObject) {
         return null;
     }
 
+    public long GetRem() {
+        return _size - _pos;
+    }
 }

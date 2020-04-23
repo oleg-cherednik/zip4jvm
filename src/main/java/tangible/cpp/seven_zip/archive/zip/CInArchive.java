@@ -9,16 +9,18 @@ import static tangible.cpp.common.HRESULT.S_OK;
 public class CInArchive {
 
     public boolean IsLocalOffsetOK(CItemEx item) {
-        if (item.FromLocal)
-            return true;
-        return (Int64)GetOffset() + (Int64)item.LocalHeaderPos >= 0;
+//        if (item.FromLocal)
+//            return true;
+//        return (Int64)GetOffset() + (Int64)item.LocalHeaderPos >= 0;
+        return false;
     }
 
     public long GetOffset() {
-        if (IsMultiVol)
-            return 0;
-        else
-            return ArcInfo.Base;
+//        if (IsMultiVol)
+//            return 0;
+//        else
+//            return ArcInfo.Base;
+        return 0;
     }
 
     // ZipIn.h.cpp:1217

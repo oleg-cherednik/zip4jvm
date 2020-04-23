@@ -43,4 +43,9 @@ public class CLocalProgress extends CMyUnknownImp implements ICompressProgressIn
     public HRESULT SetRatioInfo(int[] inSize, int[] outSize) {
         return null;
     }
+
+    @Override
+    public HRESULT QueryInterface(GUID iid, Object[] outObject) {
+        return null;
+    }
 }

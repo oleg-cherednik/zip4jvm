@@ -34,7 +34,7 @@ public class NCrypto {
         }
 
         @Override
-        public HRESULT QueryInterface(GUID iid, Object outObject) {
+        public HRESULT QueryInterface(GUID iid, Object[] outObject) {
             return null;
         }
 
@@ -89,11 +89,6 @@ public class NCrypto {
             }
 
             @Override
-            public HRESULT QueryInterface(GUID iid, Object outObject) {
-                return null;
-            }
-
-            @Override
             public HRESULT ResetInitVector() {
                 return null;
             }
@@ -109,6 +104,15 @@ public class NCrypto {
                 return S_OK;
             }
 
+            @Override
+            public HRESULT QueryInterface(GUID iid, Object[] outObject) {
+                return null;
+            }
+
+            @Override
+            public HRESULT CryptoSetPassword(AString data, long size) {
+                return null;
+            }
         }
 
         public static class CDecoder extends CCipher {
@@ -125,6 +129,16 @@ public class NCrypto {
 
             public void Init_BeforeDecode() {
 
+            }
+
+            @Override
+            public HRESULT QueryInterface(GUID iid, Object[] outObject) {
+                return null;
+            }
+
+            @Override
+            public HRESULT CryptoSetPassword(AString data, long size) {
+                return null;
             }
         }
     }
@@ -189,6 +203,17 @@ public class NCrypto {
 //                return CompareArrays(_key.PwdVerifComputed, _pwdVerifFromArchive, kPwdVerifSize);
                 return false;
             }
+
+            // WzAes.cpp:150
+            public HRESULT CheckMac(ISequentialInStream inStream, boolean[] isOK) {
+//                isOK = false;
+//                Byte mac1[ kMacSize];
+//                RINOK(ReadStream_FAIL(inStream, mac1, kMacSize));
+//                Byte mac2[ kMacSize];
+//                _hmac.Final(mac2, kMacSize);
+//                isOK = CompareArrays(mac1, mac2, kMacSize);
+                return S_OK;
+            }
         }
     }
 
@@ -230,6 +255,11 @@ public class NCrypto {
             public HRESULT ResetInitVector() {
                 return null;
             }
+
+            @Override
+            public HRESULT QueryInterface(GUID iid, Object[] outObject) {
+                return null;
+            }
         }
 
         // ZipString.h:46
@@ -245,7 +275,7 @@ public class NCrypto {
 
 //            MY_UNKNOWN_IMP1(ICryptoSetPassword)
 
-            public HRESULT ReadHeader(ISequentialInStream inStream, long crc, long unpackSize) {
+            public HRESULT ReadHeader(ISequentialInStream inStream, long crc, long[] unpackSize) {
                 return S_OK;
             }
 

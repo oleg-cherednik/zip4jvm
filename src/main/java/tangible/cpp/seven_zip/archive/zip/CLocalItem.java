@@ -4,10 +4,12 @@ public class CLocalItem {
 
     public int Flags;
     public NFileHeader.NCompressionMethod.EType Method;
-    public long Size;
+    public long[] Size = new long[1];
     public long PackSize;
     public long Time;
     public long Crc;
+
+    public CExtraBlock LocalExtra;
 
     public boolean IsEncrypted() {
         return (Flags & NFileHeader.NFlags.kEncrypted) != 0;
@@ -19,6 +21,10 @@ public class CLocalItem {
 
     public boolean HasDescriptor() {
         return (Flags & NFileHeader.NFlags.kDescriptorUsedMask) != 0;
+    }
+
+    public boolean IsLzmaEOS() {
+        return (Flags & NFileHeader.NFlags.kLzmaEOS) != 0;
     }
 
 }

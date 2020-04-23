@@ -3,10 +3,13 @@ package tangible.cpp.seven_zip.common;
 import tangible.cpp.common.GUID;
 import tangible.cpp.common.HRESULT;
 import tangible.cpp.seven_zip.ICompressFilter;
+import tangible.cpp.seven_zip.ICompressSetInStream;
 import tangible.cpp.seven_zip.ISequentialInStream;
 
+import static tangible.cpp.common.HRESULT.S_OK;
+
 // FilterCoder.h:20
-public class CFilterCoder implements ISequentialInStream {
+public class CFilterCoder implements ISequentialInStream, ICompressSetInStream {
 
     public ICompressFilter Filter;
 
@@ -35,9 +38,19 @@ public class CFilterCoder implements ISequentialInStream {
         return 0;
     }
 
+    @Override
+    public HRESULT SetInStream(ISequentialInStream inStream) {
+        return null;
+    }
+
+    @Override
+    public HRESULT ReleaseInStream() {
+        return null;
+    }
 
     // FilterCoder.h:110
     public class C_InStream_Releaser {
+        public CFilterCoder FilterCoder;
 
     }
 
@@ -46,6 +59,11 @@ public class CFilterCoder implements ISequentialInStream {
 
         public CFilterCoder FilterCoder;
 
+    }
+
+    // FilterCoder.h:202
+    public HRESULT Init_NoSubFilterInit() {
+        return S_OK;
     }
 
 }

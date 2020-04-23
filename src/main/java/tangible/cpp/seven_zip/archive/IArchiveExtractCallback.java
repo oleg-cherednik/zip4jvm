@@ -4,7 +4,7 @@ import tangible.cpp.common.GUID;
 import tangible.cpp.common.HRESULT;
 import tangible.cpp.seven_zip.IProgress;
 import tangible.cpp.seven_zip.archive.zip.NAskMode;
-import tangible.cpp.seven_zip.archive.zip.NOperationResult;
+import tangible.cpp.seven_zip.archive.zip.NExtract;
 
 import static tangible.cpp.common.GUID.groupId;
 import static tangible.cpp.common.GUID.k_7zip_GUID_Data1;
@@ -26,7 +26,7 @@ public interface IArchiveExtractCallback extends IProgress {
 
     HRESULT PrepareOperation(NAskMode askExtractMode);
 
-    HRESULT SetOperationResult(NOperationResult resultEOperationResult);
+    HRESULT SetOperationResult(NExtract.NOperationResult resultEOperationResult);
 
     HRESULT SetTotal(long total);
 

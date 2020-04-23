@@ -158,4 +158,19 @@ public class NCompress {
             }
         }
     }
+
+    // LzmaDecoder.cpp:27
+    public static class NLzma {
+
+        public static class CDecoder {
+
+            // LzmaDecoer.h:103
+            public boolean CheckFinishStatus(boolean withEndMark) {
+//                return _lzmaStatus == (withEndMark ?
+//                                       LZMA_STATUS_FINISHED_WITH_MARK :
+//                                       LZMA_STATUS_MAYBE_FINISHED_WITHOUT_MARK);
+                return true;
+            }
+        }
+    }
 }
