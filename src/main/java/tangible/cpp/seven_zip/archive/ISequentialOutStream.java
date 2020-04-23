@@ -1,6 +1,9 @@
 package tangible.cpp.seven_zip.archive;
 
-// IStream.h
-public interface ISequentialOutStream {
+import tangible.cpp.common.IUnknown;
 
+// IStream.h:14
+public interface ISequentialOutStream extends IUnknown {
+
+    void Releas();
 }

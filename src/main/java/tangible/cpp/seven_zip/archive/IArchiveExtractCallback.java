@@ -1,12 +1,19 @@
 package tangible.cpp.seven_zip.archive;
 
 import tangible.cpp.common.HRESULT;
+import tangible.cpp.seven_zip.IProgress;
+import tangible.cpp.seven_zip.archive.zip.NAskMode;
+import tangible.cpp.seven_zip.archive.zip.NOperationResult;
 
-public interface IArchiveExtractCallback {
+public interface IArchiveExtractCallback extends IProgress {
 
-    HRESULT GetStream(long index, ISequentialOutStream outStream, int askExtractMode);
+    HRESULT GetStream(long index, ISequentialOutStream[] outStream, NAskMode askExtractMode);
 
-    HRESULT PrepareOperation(int askExtractMode);
+    HRESULT PrepareOperation(NAskMode askExtractMode);
 
-    HRESULT SetOperationResult(int resultEOperationResult);
+    HRESULT SetOperationResult(NOperationResult resultEOperationResult);
+
+    HRESULT SetTotal(long total);
+
+    HRESULT SetCompleted(long[] completeValue);
 }

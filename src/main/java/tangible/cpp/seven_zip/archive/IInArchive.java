@@ -28,7 +28,7 @@ public interface IInArchive extends IArchive {
 
     HRESULT GetProperty(long index, long propID, PROPVARIANT value);
 
-    HRESULT Extract(long[] indices, long numItems, int testMode, IArchiveExtractCallback extractCallback);
+    HRESULT Extract(int[] indices, long numItems, boolean testMode, IArchiveExtractCallback extractCallback);
 
     HRESULT GetArchiveProperty(long propID, PROPVARIANT value);
 
