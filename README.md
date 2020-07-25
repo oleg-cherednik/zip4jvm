@@ -35,19 +35,19 @@ zip4jvm - a java library for working with zip files
 
 ## Gradle
 
-~~~~
+```
 compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.5'
-~~~~
+```
 
 ## Maven
 
-~~~~
+```xml
 <dependency>
     <groupId>ru.oleg-cherednik.zip4jvm</groupId>
     <artifactId>zip4jvm</artifactId>
     <version>1.5</version>
 </dependency>
-~~~~
+```
 
 ## Usage
 
@@ -63,7 +63,7 @@ To simplify usage of _zip4jvm_, there're following classes:
 
 ##### Create (or open existed) zip archive and add regular file */cars/bentley-continental.jpg*
 
-```
+```java
 Path zip = Paths.get("filename.zip");
 Path file = Path.get("/cars/bentley-continental.jpg")
 ZipIt.zip(zip).add(file);
@@ -89,7 +89,7 @@ ZipIt.zip(zip).add(file);
 
 ##### Create (or open existed) zip archive and add directory */cars*
 
-```
+```java
 Path zip = Paths.get("filename.zip");
 Path dir = Path.get("/cars")
 ZipIt.zip(zip).add(dir);
@@ -118,7 +118,7 @@ ZipIt.zip(zip).add(dir);
 
 ##### Create (or open existed) zip archive and add some regular files and/or directories
 
-```
+```java
 Path zip = Paths.get("filename.zip");
 Collection<Path> paths = Arrays.asList(
         Paths.get("/bikes/ducati-panigale-1199.jpg"),
@@ -158,7 +158,7 @@ ZipIt.zip(zip).add(paths);
 
 ##### Create (or open existed) zip archive and add input streams content as regular files
 
-```
+```java
 Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
 
 try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
@@ -201,7 +201,7 @@ try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
 
 ##### Extract all entries into given directory
 
-```
+```java
 Path zip = Paths.get("filename.zip");
 Path destDir = Paths.get("/filename_content");
 UnzipIt.zip(zip).destDir(destDir).extract();
@@ -235,7 +235,7 @@ UnzipIt.zip(zip).destDir(destDir).extract();
 
 ##### Extract regular file's entry into given directory
 
-```
+```java
 Path zip = Paths.get("filename.zip");
 Path destDir = Paths.get("/filename_content");
 UnzipIt.zip(zip).destDir(destDir).extract("/cars/bentley-continental.jpg");
@@ -259,7 +259,7 @@ UnzipIt.zip(zip).destDir(destDir).extract("/cars/bentley-continental.jpg");
 **Note:** regular file's entry is added to the root of the destination directory.
 
 ##### Extract directory entries into given directory
-```
+```java
 Path zip = Paths.get("filename.zip");
 Path destDir = Paths.get("/filename_content");
 UnzipIt.zip(zip).destDir(destDir).extract("cars");
@@ -288,7 +288,7 @@ the destination directory keeping the initial structure.
 
 ##### Extract some entries into given directory
 
-```
+```java
 Path zip = Paths.get("filename.zip");
 Path destDir = Paths.get("/filename_content");
 Collection<Path> fileNames = Arrays.asList("cars", "bikes/ducati-panigale-1199.jpg", "saint-petersburg.jpg");
@@ -322,7 +322,7 @@ destination directory
 
 ##### Get input stream for regular file's entry
 
-```
+```java
 Path zip = Paths.get("filename.zip");
 Path destFile = Paths.get("/filename_content/bentley.jpg");
 try (InputStream in = UnzipIt.zip(zip).stream("/cars/bentley-continental.jpg");
@@ -355,7 +355,7 @@ password provider with _fileName_ of the entry as a key.
 
 #### Unzip with single password for entries
 
-```
+```java
 char[] password = "1".toCharArray();
 Path destDir = Paths.get("/filename_content");
 List<String> fileNames = Arrays.asList("cars", "bikes/ducati-panigale-1199.jpg", "saint-petersburg.jpg");
@@ -386,7 +386,7 @@ Or separate password for each entry. The key is the _fileName_ of the entry:
 
 #### Unzip with separate password for each entry
 
-```
+```java
 Path zip = Paths.get("filename.zip");
 Path destFile = Paths.get("filename_content/bentley.jpg");
 
@@ -429,7 +429,7 @@ UnzipIt.zip(zip).destDir(destDir).settings(settings).extract(fileNames);
 
 #### Modify zip archive comment
 
-```
+```java
 Path zip = Paths.get("filename.zip");
 ZipMisc zipFile = ZipMisc.zip(zip);
 
@@ -440,20 +440,20 @@ zipFile.setComment(null);       // remove comment
 
 #### Get all entries
 
-```
+```java
 Path zip = Paths.get("filename.zip");
 ZipMisc zipFile = ZipMisc.zip(zip);
 List<ZipFile.Entry> entires = zipFile.getEntries().collect(Collectors.toList());
 
 /*
-[entryNames]
-cars/bentley-continental.jpg
-cars/ferrari-458-italia.jpg
-cars/wiesmann-gt-mf5.jpg
-bikes/ducati-panigale-1199.jpg
-bikes/kawasaki-ninja-300.jpg
-saint-petersburg.jpg
-*/
+ * [entryNames]
+ * cars/bentley-continental.jpg
+ * cars/ferrari-458-italia.jpg
+ * cars/wiesmann-gt-mf5.jpg
+ * bikes/ducati-panigale-1199.jpg
+ * bikes/kawasaki-ninja-300.jpg
+ * saint-petersburg.jpg
+ */
 ```
 >```
 >filename.zip
@@ -471,7 +471,7 @@ saint-petersburg.jpg
 
 #### Remove entry by name
 
-```
+```java
 Path zip = Paths.get("filename.zip");
 ZipMisc zipFile = ZipMisc.zip(zip);
 zipFile.removeEntryByName("cars/bentley-continental.jpg");
@@ -502,7 +502,7 @@ zipFile.removeEntryByName("cars/bentley-continental.jpg");
 
 #### Remove some entries by name
 
-```
+```java
 Path zip = Paths.get("filename.zip");
 ZipMisc zipFile = ZipMisc.zip(zip);
 Collection<String> entryNames = Arrays.asList("cars/ferrari-458-italia.jpg", "bikes/ducati-panigale-1199.jpg");
@@ -531,7 +531,7 @@ zipFile.removeEntryByName(entryNames);
 
 #### Remove entry by name prefix
 
-```
+```java
 Path zip = Paths.get("filename.zip");
 ZipMisc zipFile = ZipMisc.zip(zip);
 zipFile.removeEntryByNamePrefix("cars")
@@ -559,7 +559,7 @@ zipFile.removeEntryByNamePrefix("cars")
 
 #### Check whether zip archive split or not
 
-```
+```java
 Path zip = Paths.get("filename.zip");
 ZipMisc zipFile = ZipMisc.zip(zip);
 boolean split = zipFile.isSplit();
@@ -567,7 +567,7 @@ boolean split = zipFile.isSplit();
 
 #### Merge split archive into solid one
 
-```
+```java
 Path zipSrc = Paths.get("split.zip");
 Path zip = Paths.get("filename.zip");
 ZipMisc zipFile = ZipMisc.zip(zipSrc);
@@ -589,7 +589,7 @@ zipFile.merge(zip);
 ### ZipInfo
 
 #### Print content of zip file into console
-```
+```java
 Path zip = Paths.get("filename.zip");
 ZipInfo.zip(zip).printShortInfo();
 ```
@@ -813,7 +813,7 @@ ZipInfo.zip(zip).printShortInfo();
 `PrintStream`
 
 #### Decompose zip file into `Path` destination
-```
+```java
 Path zip = Paths.get("filename.zip");
 Path destDir = Paths.get("/filename_decompose");
 ZipInfo.zip(zip).decompose(destDir);
