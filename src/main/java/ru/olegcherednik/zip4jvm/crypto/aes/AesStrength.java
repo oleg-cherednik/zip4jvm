@@ -31,7 +31,8 @@ public enum AesStrength {
         return size / 8;
     }
 
-    private int keyLength() {
+    // TODO should be private
+    public int keyLength() {
         return size / 8;
     }
 

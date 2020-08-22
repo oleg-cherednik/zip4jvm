@@ -1,13 +1,18 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
 import ru.olegcherednik.zip4jvm.crypto.strong.Recipient;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import tangible.cpp.seven_zip.crypto.NCrypto;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -21,7 +26,7 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64;
 
 /**
  * ZipHandler.cpp:1150
- * ZipString.cpp:100
+ * ZipStrong.cpp:100
  *
  * @author Oleg Cherednik
  * @since 11.10.2019
@@ -38,14 +43,16 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
         decryptionHeader.setIv(in.readBytes(ivSize));
 
         long size = in.readDword();
+        int _remSize = (int)size;
         in.mark(MARKER);
 
-        decryptionHeader.setVersion(in.readWord());
-        decryptionHeader.setEncryptionAlgorithm(in.readWord());
-        decryptionHeader.setBitLength(in.readWord());
-        decryptionHeader.setFlags(Flags.parseCode(in.readWord()));
+        decryptionHeader.setVersion(in.readWord()); // +0
+        decryptionHeader.setEncryptionAlgorithm(in.readWord()); // +2
+        decryptionHeader.setBitLength(in.readWord()); // +4
+        decryptionHeader.setFlags(Flags.parseCode(in.readWord())); // +6
         boolean passwordKey = decryptionHeader.getFlags() == Flags.PASSWORD_KEY;
-        int encryptedRandomDataSize = in.readWord();
+        int encryptedRandomDataSize = in.readWord(); // +8
+        int rdSize = encryptedRandomDataSize;
         decryptionHeader.setEncryptedRandomData(in.readBytes(encryptedRandomDataSize));
         int recipientCount = (int)in.readDword();
 
@@ -58,7 +65,76 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
         decryptionHeader.setPasswordValidationData(in.readBytes(passwordValidationDataSize - 4));
         decryptionHeader.setCrc32(in.readDword());
 
+        in.seek(MARKER);
+        byte[] _bufAligned = new byte[_remSize];
+        in.read(_bufAligned, 0, _bufAligned.length);
+
+        byte[] p = new byte[rdSize];
+        System.arraycopy(_bufAligned, 10, p, 0, rdSize);
+
         try {
+
+            final int kPadSize = 16;
+
+            if (rdSize < kPadSize)
+                return null;
+            if ((rdSize & (kPadSize - 1)) != 0)
+                return null;
+
+            int validSize = passwordValidationDataSize;
+
+            if ((validSize & 0xF) != 0/* || validOffset + validSize != _remSize*/)
+                return null;
+
+            NCrypto.NZipStrong.CDecoder coder = new NCrypto.NZipStrong.CDecoder(AesStrength.S128.keyLength());
+            coder.CryptoSetPassword("1".getBytes(), "1".getBytes().length);
+            coder._key.KeySize = AesStrength.S128.keyLength();    // 16 + (algId - kAES128) * 2
+
+//            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+//            SecretKeySpec secretKeySpec = new SecretKeySpec(coder._key.MasterKey, "AES");
+//            AlgorithmParameterSpec paramSpec = new IvParameterSpec(decryptionHeader.getIv());
+//            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, paramSpec);
+//
+//            cipher.update(_bufAligned1, 0, rdSize);
+//            byte[] fi = cipher.doFinal();
+
+//            rdSize -= kPadSize;
+
+//            for (int i = 0; i < kPadSize; i++)
+//                if (p[rdSize + i] != kPadSize)
+//                    return null; // passwOK = false;
+
+//            IvParameterSpec ivParameterSpec = new IvParameterSpec(decryptionHeader.getIv());
+//            byte[] randomData = decryptionHeader.getEncryptedRandomData();//in.readBytes(strength.saltLength());
+//            byte[] salt = Arrays.copyOfRange(randomData, 0, strength.saltLength());
+//
+//            byte[] key = AesEngine.createKey1("1".toCharArray(), salt, strength);
+//
+//
+//            Cipher cipher = AesEngine.createCipher1(strength.createSecretKeyForCipher(key), ivParameterSpec);
+//            Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
+//            byte[] passwordChecksum = strength.createPasswordChecksum(key);
+
+            IvParameterSpec iv = new IvParameterSpec(decryptionHeader.getIv());
+            SecretKeySpec skeySpec = new SecretKeySpec(coder._key.MasterKey, "AES");
+
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+            cipher.init(Cipher.DECRYPT_MODE, skeySpec, iv);
+            byte[] original = cipher.doFinal(p);
+
+            int a = 0;
+            a++;
+
+            coder.SetKey(coder._key.MasterKey, coder._key.KeySize);
+            coder.SetInitVector(decryptionHeader.getIv(), 16);
+            coder.Init();
+            coder.Filter(p, rdSize);
+            rdSize -= kPadSize;
+
+            for (int i = 0; i < kPadSize; i++)
+                if (p[rdSize + i] != kPadSize)
+                    return null; // passwOK = false;
+
 
             byte[] masterKey = setPassword("1");
 
@@ -104,9 +180,9 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
 
         int i = 0;
 
-        for(int j = 0; j < one.length; j++)
+        for (int j = 0; j < one.length; j++)
             key[i++] = one[j];
-        for(int j = 0; j < two.length; j++)
+        for (int j = 0; j < two.length; j++)
             key[i++] = two[j];
 
         return key;

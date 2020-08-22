@@ -1,6 +1,5 @@
 package tangible.cpp.seven_zip;
 
-import tangible.cpp.common.AString;
 import tangible.cpp.common.GUID;
 import tangible.cpp.common.HRESULT;
 
@@ -23,6 +22,6 @@ public interface ICryptoSetPassword {
 
     HRESULT ResetInitVector();
 
-    HRESULT CryptoSetPassword(AString data, long size);
+    HRESULT CryptoSetPassword(byte[] data, int size);
 
 }

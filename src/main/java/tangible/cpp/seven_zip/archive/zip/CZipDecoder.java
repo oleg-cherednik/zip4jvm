@@ -1,6 +1,5 @@
 package tangible.cpp.seven_zip.archive.zip;
 
-import tangible.cpp.common.AString;
 import tangible.cpp.common.CMyComBSTR;
 import tangible.cpp.common.HRESULT;
 import tangible.cpp.seven_zip.ICompressCoder;
@@ -167,7 +166,7 @@ public class CZipDecoder {
                 if (__result__ != S_OK)
                     return __result__;
 
-                AString[] charPassword = { null };
+                byte[][] charPassword = { null };
                 if (password[0] != null) {
 //                    UnicodeStringToMultiByte2(charPassword, (const wchar_t *)password, CP_ACP);
         /*
@@ -185,7 +184,7 @@ public class CZipDecoder {
         }
         */
                 }
-                __result__ = cryptoSetPassword[0].CryptoSetPassword(charPassword[0], charPassword[0].Len());
+                __result__ = cryptoSetPassword[0].CryptoSetPassword(charPassword[0], 0);
                 if (__result__ != S_OK) {
                     res[0] = NExtract.NOperationResult.kWrongPassword;
                     return S_OK;
