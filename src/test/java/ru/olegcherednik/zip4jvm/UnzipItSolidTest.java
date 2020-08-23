@@ -48,7 +48,7 @@ public class UnzipItSolidTest {
     }
 
     public void shouldUnzipRequiredFiles() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTme(rootDir);
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
         List<String> fileNames = Arrays.asList(fileNameSaintPetersburg, dirNameCars + '/' + fileNameBentley);
         UnzipIt.zip(zipDeflateSolid).destDir(destDir).extract(fileNames);
 
@@ -58,7 +58,7 @@ public class UnzipItSolidTest {
     }
 
     public void shouldUnzipOneFile() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTme(rootDir);
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
         UnzipIt.zip(zipDeflateSolid).destDir(destDir).extract(dirNameCars + '/' + fileNameFerrari);
 
         assertThatDirectory(destDir).exists().hasDirectories(0).hasFiles(1);
@@ -66,7 +66,7 @@ public class UnzipItSolidTest {
     }
 
     public void shouldUnzipFolder() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTme(rootDir);
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
         UnzipIt.zip(zipDeflateSolid).destDir(destDir).extract(dirNameBikes);
 
         assertThatDirectory(destDir).exists().hasDirectories(1).hasFiles(0);
@@ -74,7 +74,7 @@ public class UnzipItSolidTest {
     }
 
     public void shouldExtractZipArchiveWhenEntryNameWithCustomCharset() throws IOException, URISyntaxException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTme(rootDir);
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
         Path zip = Paths.get(UnzipItSolidTest.class.getResource("/zip/cjk_filename.zip").toURI()).toAbsolutePath();
 
         UnzipSettings settings = UnzipSettings.builder().charset(Charset.forName("GBK")).build();
@@ -85,7 +85,7 @@ public class UnzipItSolidTest {
     }
 
     public void shouldExtractZipArchiveWhenZipWasCreatedUnderMac() throws IOException, URISyntaxException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTme(rootDir);
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
         Path zip = Paths.get(UnzipItSolidTest.class.getResource("/zip/macos_10.zip").toURI()).toAbsolutePath();
 
         UnzipIt.zip(zip).destDir(destDir).extract();

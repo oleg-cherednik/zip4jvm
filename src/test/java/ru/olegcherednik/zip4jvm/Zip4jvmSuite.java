@@ -18,6 +18,7 @@ import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -47,6 +48,7 @@ public class Zip4jvmSuite {
     public static final long SIZE_2MB = 2 * SIZE_1MB;
 
     private static final long time = System.currentTimeMillis();
+    private static final String timeStr = new SimpleDateFormat("yyyyMMdd_HHmmss").format(time);
 
     @BeforeSuite
     public void beforeSuite() throws IOException {
@@ -114,11 +116,11 @@ public class Zip4jvmSuite {
         Path path = dirRoot;
 
         if (parts.length == 1)
-            path = path.resolve(parts[0]).resolve(String.valueOf(time));
+            path = path.resolve(parts[0]).resolve(timeStr);
         else {
             for (int i = 0; i < parts.length; i++) {
                 if (i == 1)
-                    path = path.resolve(String.valueOf(time));
+                    path = path.resolve(timeStr);
 
                 path = path.resolve(parts[i]);
             }
@@ -135,8 +137,8 @@ public class Zip4jvmSuite {
         return temp().resolve(UUID.randomUUID().toString() + '.' + ext);
     }
 
-    public static Path subDirNameAsMethodNameWithTme(Path rootDir) {
-        return rootDir.resolve(TestDataAssert.getMethodName()).resolve(Paths.get(String.valueOf(time)));
+    public static Path subDirNameAsMethodNameWithTime(Path rootDir) {
+        return rootDir.resolve(TestDataAssert.getMethodName()).resolve(Paths.get(timeStr));
     }
 
     public static Path subDirNameAsMethodName(Path rootDir) throws IOException {
