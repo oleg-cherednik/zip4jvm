@@ -14,6 +14,11 @@ public interface IDirectoryAssert<S extends IDirectoryAssert<S>> {
 
     S hasFiles(int expected);
 
+    default S isEmpty() {
+        hasDirectories(0);
+        return hasFiles(0);
+    }
+
     S directory(String name);
 
     IFileAssert<?> file(String name);
