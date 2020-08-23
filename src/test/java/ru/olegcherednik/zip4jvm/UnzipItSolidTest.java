@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 
@@ -21,7 +20,6 @@ import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameFerrari;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameSaintPetersburg;
 import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
-import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSplit;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileFerrariAssert;
@@ -35,9 +33,9 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
  */
 @Test
 @SuppressWarnings("FieldNamingConvention")
-public class UnzipItTest {
+public class UnzipItSolidTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirName(UnzipItTest.class);
+    private static final Path rootDir = Zip4jvmSuite.generateSubDirName(UnzipItSolidTest.class);
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -53,18 +51,6 @@ public class UnzipItTest {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTme(rootDir);
         List<String> fileNames = Arrays.asList(fileNameSaintPetersburg, dirNameCars + '/' + fileNameBentley);
         UnzipIt.zip(zipDeflateSolid).destDir(destDir).extract(fileNames);
-
-        assertThatDirectory(destDir).exists().hasDirectories(0).hasFiles(2);
-        assertThatFile(destDir.resolve(fileNameSaintPetersburg)).matches(fileSaintPetersburgAssert);
-        assertThatFile(destDir.resolve(fileNameBentley)).matches(fileBentleyAssert);
-    }
-
-    @Test
-    @Ignore
-    public void shouldUnzipRequiredFilesWhenSplit() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTme(rootDir);
-        List<String> fileNames = Arrays.asList("saint-fileNameSaintPetersburg.jpg", dirNameCars + '/' + fileNameBentley);
-        UnzipIt.zip(zipDeflateSplit).destDir(destDir).extract(fileNames);
 
         assertThatDirectory(destDir).exists().hasDirectories(0).hasFiles(2);
         assertThatFile(destDir.resolve(fileNameSaintPetersburg)).matches(fileSaintPetersburgAssert);
@@ -89,19 +75,18 @@ public class UnzipItTest {
 
     public void shouldExtractZipArchiveWhenEntryNameWithCustomCharset() throws IOException, URISyntaxException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTme(rootDir);
-        Path zip = Paths.get(UnzipItTest.class.getResource("/zip/cjk_filename.zip").toURI()).toAbsolutePath();
+        Path zip = Paths.get(UnzipItSolidTest.class.getResource("/zip/cjk_filename.zip").toURI()).toAbsolutePath();
 
         UnzipSettings settings = UnzipSettings.builder().charset(Charset.forName("GBK")).build();
 
         UnzipIt.zip(zip).destDir(destDir).settings(settings).extract();
 
         assertThatDirectory(destDir).hasDirectories(0).hasFiles(2);
-        assertThatDirectory(destDir).file("fff - 副本.txt").exists();
     }
 
     public void shouldExtractZipArchiveWhenZipWasCreatedUnderMac() throws IOException, URISyntaxException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTme(rootDir);
-        Path zip = Paths.get(UnzipItTest.class.getResource("/zip/macos_10.zip").toURI()).toAbsolutePath();
+        Path zip = Paths.get(UnzipItSolidTest.class.getResource("/zip/macos_10.zip").toURI()).toAbsolutePath();
 
         UnzipIt.zip(zip).destDir(destDir).extract();
 
