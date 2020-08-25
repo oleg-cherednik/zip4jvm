@@ -17,6 +17,7 @@ public abstract class SrcFile {
 
     public static SrcFile of(Path file) {
         SrcFile srcFile = SevenZipSplitSrcFile.create(file);
+        srcFile = srcFile == null ? StandardSplitSrcFile.create(file) : srcFile;
         return srcFile == null ? new StandardSrcFile(file) : srcFile;
     }
 

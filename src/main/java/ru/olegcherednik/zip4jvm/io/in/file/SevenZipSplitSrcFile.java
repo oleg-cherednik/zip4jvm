@@ -30,11 +30,10 @@ import java.util.List;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 final class SevenZipSplitSrcFile extends SrcFile {
 
-    private final Path path;
-    private final List<Item> items;
-    private final long length;
-
     static SevenZipSplitSrcFile create(Path file) {
+        if(!Files.isReadable(file))
+            return null;
+
         String fileName = file.getFileName().toString();
         String ext = FilenameUtils.getExtension(fileName);
         Path parent = file.getParent();
@@ -68,6 +67,10 @@ final class SevenZipSplitSrcFile extends SrcFile {
             return 0;
         }
     }
+
+    private final Path path;
+    private final List<Item> items;
+    private final long length;
 
     public boolean isLast(Item item) {
         return item == null || items.size() < item.getPos();

@@ -17,7 +17,7 @@ import java.nio.file.Path;
  */
 @Getter
 @RequiredArgsConstructor
-final class StandardSrcFile extends SrcFile {
+class StandardSrcFile extends SrcFile {
 
     private final Path path;
 
