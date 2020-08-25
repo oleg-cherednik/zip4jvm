@@ -22,7 +22,7 @@ public abstract class SrcFile {
             return SevenZipSplitSrcFile.create(file);
         if (StandardSplitSrcFile.isCandidate(file))
             return StandardSplitSrcFile.create(file);
-        return StandardSrcFile.create(file);
+        return StandardSolidSrcFile.create(file);
     }
 
     protected final Path path;
@@ -43,7 +43,9 @@ public abstract class SrcFile {
 
     public abstract DataInputFile dataInputFile() throws IOException;
 
-    public abstract boolean isSplit() throws IOException;
+    public boolean isSplit() {
+        return items.size() > 1;
+    }
 
     @Override
     public String toString() {

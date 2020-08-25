@@ -47,7 +47,7 @@ final class SevenZipSplitSrcFile extends SrcFile {
             return null;
 
         long offs = 0;
-        List<Item> items = new LinkedList<>();
+        List<Item> items = getItems(file);
 
         for (int i = 0; ; i++) {
             Path path = parent.resolve(String.format("%s.%03d", fileName, i + 1));
@@ -61,6 +61,24 @@ final class SevenZipSplitSrcFile extends SrcFile {
         }
 
         return new SevenZipSplitSrcFile(parent.resolve(fileName), Collections.unmodifiableList(items), offs);
+    }
+
+    private static List<Item> getItems(Path file) {
+        long offs = 0;
+        List<Item> items = new LinkedList<>();
+
+        Path parent = file.getParent();
+
+        for (int i = 0; ; i++) {
+            Path path = parent.resolve(String.format("%s.%03d", fileName, i + 1));
+
+            if (!Files.exists(path))
+                break;
+
+            long length = PathUtils.length(path);
+            items.add(Item.builder().pos(i).file(path).offs(offs).length(length).build());
+            offs += length;
+        }
     }
 
     private final long length;
