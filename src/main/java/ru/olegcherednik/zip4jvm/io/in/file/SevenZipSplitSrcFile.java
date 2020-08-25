@@ -79,7 +79,7 @@ final class SevenZipSplitSrcFile extends SrcFile {
 
     @Override
     public boolean isSplit() {
-        // TODO on this result we check split signature (this is valid only for standard split zip)
+        // TODO on this result we check split signature (this is valid only for standard split zip) - see ZipModel.createDataInput() 
         return false;
     }
 
