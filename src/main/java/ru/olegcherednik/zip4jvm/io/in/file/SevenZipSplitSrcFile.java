@@ -35,33 +35,9 @@ final class SevenZipSplitSrcFile extends SrcFile {
     }
 
     static SevenZipSplitSrcFile create(Path file) {
-        if(!Files.isReadable(file))
-            return null;
-
-        String fileName = file.getFileName().toString();
-        String ext = FilenameUtils.getExtension(fileName);
-        Path parent = file.getParent();
-
-        if (!"zip".equalsIgnoreCase(ext) && NumberUtils.isDigits(ext))
-            fileName = FilenameUtils.getBaseName(fileName);
-        if (!Files.exists(parent.resolve(fileName + ".001")))
-            return null;
-
-        long offs = 0;
-        List<Item> items = createItems(file, );
-
-        for (int i = 0; ; i++) {
-            Path path = parent.resolve(String.format("%s.%03d", fileName, i + 1));
-
-            if (!Files.exists(path))
-                break;
-
-            long length = PathUtils.length(path);
-            items.add(Item.builder().pos(i).file(path).offs(offs).length(length).build());
-            offs += length;
-        }
-
-        return new SevenZipSplitSrcFile(parent.resolve(fileName), Collections.unmodifiableList(items), offs);
+        String baseName = FilenameUtils.getBaseName(file.getFileName().toString());
+        List<Item> items = createItems(file.getParent(), baseName);
+        return new SevenZipSplitSrcFile(file, items);
     }
 
     private static List<Item> createItems(Path dir, String baseName) {
@@ -90,9 +66,9 @@ final class SevenZipSplitSrcFile extends SrcFile {
 
     private final long length;
 
-    public SevenZipSplitSrcFile(Path path, List<Item> items, long length) {
+    private SevenZipSplitSrcFile(Path path, List<Item> items) {
         super(path, items);
-        this.length = length;
+        length = items.get(items.size() - 1).getLength();
     }
 
     public boolean isLast(Item item) {
@@ -102,11 +78,6 @@ final class SevenZipSplitSrcFile extends SrcFile {
     @Override
     public DataInputFile dataInputFile() throws IOException {
         return new LittleEndianSevenZipReadFile(this);
-    }
-
-    @Override
-    public boolean isSplit() {
-        return false;
     }
 
 }
