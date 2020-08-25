@@ -3,12 +3,12 @@ package ru.olegcherednik.zip4jvm;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import ru.olegcherednik.zip4jvm.exception.SplitPartNotFoundException;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -76,7 +76,7 @@ public class UnzipItSplitTest {
         Path unzipDir = destDir.resolve("unzip");
         Files.createDirectory(unzipDir);
 
-        assertThatThrownBy(() -> UnzipIt.zip(zip).destDir(unzipDir).extract()).isExactlyInstanceOf(FileNotFoundException.class);
+        assertThatThrownBy(() -> UnzipIt.zip(zip).destDir(unzipDir).extract()).isExactlyInstanceOf(SplitPartNotFoundException.class);
         assertThatDirectory(unzipDir).isEmpty();
     }
 

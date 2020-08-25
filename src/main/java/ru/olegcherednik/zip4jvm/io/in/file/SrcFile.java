@@ -44,7 +44,7 @@ public abstract class SrcFile {
             return null;
         if (disk == 0)
             return items.get(items.size() - 1);
-        return disk < items.size() ? items.get(disk) : null;
+        return disk <= items.size() ? items.get(disk - 1) : null;
     }
 
     public abstract DataInputFile dataInputFile() throws IOException;

@@ -35,15 +35,16 @@ final class SevenZipSplitSrcFile extends SrcFile {
     }
 
     static SevenZipSplitSrcFile create(Path file) {
-        String baseName = FilenameUtils.getBaseName(file.getFileName().toString());
-        List<Item> items = createItems(file.getParent(), baseName);
+        List<Item> items = createItems(file);
         return new SevenZipSplitSrcFile(file, items);
     }
 
-    private static List<Item> createItems(Path dir, String baseName) {
+    private static List<Item> createItems(Path file) {
         int i = 1;
         long offs = 0;
         List<Item> items = new LinkedList<>();
+        Path dir = file.getParent();
+        String baseName = FilenameUtils.getBaseName(file.getFileName().toString());
 
         for (Path path : getParts(dir, baseName + "\\.\\d+")) {
             String actualFileName = path.getFileName().toString();
@@ -54,6 +55,7 @@ final class SevenZipSplitSrcFile extends SrcFile {
 
             long length = PathUtils.length(path);
             items.add(Item.builder()
+                          .pos(i)
                           .file(path)
                           .offs(offs)
                           .length(length).build());
@@ -68,11 +70,17 @@ final class SevenZipSplitSrcFile extends SrcFile {
 
     private SevenZipSplitSrcFile(Path path, List<Item> items) {
         super(path, items);
-        length = items.get(items.size() - 1).getLength();
+        length = items.stream().mapToLong(Item::getLength).sum();
     }
 
     public boolean isLast(Item item) {
         return item == null || items.size() < item.getPos();
+    }
+
+    @Override
+    public boolean isSplit() {
+        // TODO on this result we check split signature (this is valid only for standard split zip)
+        return false;
     }
 
     @Override

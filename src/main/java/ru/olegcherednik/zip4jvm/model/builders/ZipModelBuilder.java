@@ -12,7 +12,6 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -111,14 +110,8 @@ public final class ZipModelBuilder {
     private static long getSplitSize(ZipModel zipModel) throws IOException {
         long size = 0;
 
-        for (long i = 0; i <= zipModel.getTotalDisks(); i++) {
-            Path file = zipModel.getDiskFile(i);
-
-            if (Files.isReadable(file))
-                size = Math.max(size, Files.size(zipModel.getDiskFile(i)));
-            else
-                throw new FileNotFoundException(file.toString());
-        }
+        for (long i = 0; i <= zipModel.getTotalDisks(); i++)
+            size = Math.max(size, Files.size(zipModel.getDiskFile(i)));
 
         return size;
     }

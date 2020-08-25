@@ -27,15 +27,16 @@ class StandardSplitSrcFile extends SrcFile {
     }
 
     public static StandardSplitSrcFile create(Path file) {
-        String baseName = FilenameUtils.getBaseName(file.getFileName().toString());
-        List<Item> items = createItems(file.getParent(), baseName);
+        List<Item> items = createItems(file);
         return new StandardSplitSrcFile(file, items);
     }
 
-    private static List<Item> createItems(Path dir, String baseName) {
+    private static List<Item> createItems(Path file) {
         int i = 1;
         long offs = 0;
         List<Item> items = new LinkedList<>();
+        Path dir = file.getParent();
+        String baseName = FilenameUtils.getBaseName(file.getFileName().toString());
 
         for (Path path : getParts(dir, baseName + "\\.z\\d+")) {
             String actualFileName = path.getFileName().toString();
@@ -46,12 +47,22 @@ class StandardSplitSrcFile extends SrcFile {
 
             long length = PathUtils.length(path);
             items.add(Item.builder()
+                          .pos(i)
                           .file(path)
                           .offs(offs)
                           .length(length).build());
             offs += length;
             i++;
         }
+
+        if (i == getTotalDisks(file))
+            throw new SplitPartNotFoundException(dir.resolve(String.format("%s.%02d", baseName, i)));
+
+        items.add(Item.builder()
+                      .pos(i)
+                      .file(file)
+                      .offs(offs)
+                      .length(PathUtils.length(file)).build());
 
         return items.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(items);
     }
