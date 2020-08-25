@@ -16,7 +16,11 @@ import java.util.Collections;
  */
 class StandardSrcFile extends SrcFile {
 
-    public StandardSrcFile(Path path) {
+    public static StandardSrcFile create(Path file) {
+        return new StandardSrcFile(file);
+    }
+
+    protected StandardSrcFile(Path path) {
         super(path, Collections.singletonList(Item.create(path)));
     }
 

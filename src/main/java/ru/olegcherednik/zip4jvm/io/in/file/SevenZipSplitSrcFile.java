@@ -29,8 +29,7 @@ import java.util.List;
 final class SevenZipSplitSrcFile extends SrcFile {
 
     public static boolean isCandidate(Path file) {
-        String fileName = file.getFileName().toString();
-        String ext = FilenameUtils.getExtension(fileName);
+        String ext = FilenameUtils.getExtension(file.toString());
         return Files.isReadable(file) && NumberUtils.isDigits(ext);
     }
 

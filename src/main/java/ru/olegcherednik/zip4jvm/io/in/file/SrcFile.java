@@ -18,9 +18,11 @@ import java.util.List;
 public abstract class SrcFile {
 
     public static SrcFile of(Path file) {
-        SrcFile srcFile = SevenZipSplitSrcFile.create(file);
-        srcFile = srcFile == null ? StandardSplitSrcFile.create(file) : srcFile;
-        return srcFile == null ? new StandardSrcFile(file) : srcFile;
+        if (SevenZipSplitSrcFile.isCandidate(file))
+            return SevenZipSplitSrcFile.create(file);
+        if (StandardSplitSrcFile.isCandidate(file))
+            return StandardSplitSrcFile.create(file);
+        return StandardSrcFile.create(file);
     }
 
     protected final Path path;

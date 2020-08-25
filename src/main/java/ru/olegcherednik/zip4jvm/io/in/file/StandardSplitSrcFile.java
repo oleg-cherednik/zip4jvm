@@ -1,16 +1,13 @@
 package ru.olegcherednik.zip4jvm.io.in.file;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.math.NumberUtils;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.SingleZipInputStream;
-import ru.olegcherednik.zip4jvm.io.out.data.SplitZipOutputStream;
-import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.io.readers.BaseZipModelReader;
+import ru.olegcherednik.zip4jvm.io.readers.EndCentralDirectoryReader;
+import ru.olegcherednik.zip4jvm.model.Charsets;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 
 /**
  * @author Oleg Cherednik
@@ -19,38 +16,23 @@ import java.util.Collections;
 class StandardSplitSrcFile extends StandardSrcFile {
 
     public static boolean isCandidate(Path file) {
-        if(!Files.isReadable(file))
-            return false;
-
-        Path file = ZipModel.getDiskFile(path, 1);
-
-        try (DataInput in = new SingleZipInputStream(new StandardSplitSrcFile(file))) {
-
-            return in.readDwordSignature() == SplitZipOutputStream.SPLIT_SIGNATURE;
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
-
-
-        String fileName = file.getFileName().toString();
-        String ext = FilenameUtils.getExtension(fileName);
-        return Files.isReadable(file) && NumberUtils.isDigits(ext);
+        return Files.isReadable(file) && getTotalDisks(file) > 0;
     }
 
-    static StandardSplitSrcFile create(Path file) {
-        if (!Files.isReadable(file))
-            return null;
+    public static StandardSplitSrcFile create(Path file) {
+        return new StandardSplitSrcFile(file);
+    }
 
-        try (DataInput in = new SingleZipInputStream(new StandardSrcFile(ZipModel.getDiskFile(file, 1)))) {
-            if (in.readDwordSignature() != SplitZipOutputStream.SPLIT_SIGNATURE)
-                return null;
-            return new StandardSplitSrcFile(file);
-        } catch(IOException e) {
-            return null;
+    private static int getTotalDisks(Path file) {
+        try (DataInput in = new SingleZipInputStream(StandardSrcFile.create(file))) {
+            BaseZipModelReader.findCentralDirectorySignature(in);
+            return new EndCentralDirectoryReader(Charsets.UNMODIFIED).read(in).getTotalDisks();
+        } catch(Exception e) {
+            return 0;
         }
     }
 
-    public StandardSplitSrcFile(Path path) {
+    private StandardSplitSrcFile(Path path) {
         super(path);
     }
 }
