@@ -1,10 +1,9 @@
 package ru.olegcherednik.zip4jvm.io.in.file;
 
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,7 +26,6 @@ import java.util.List;
  * @since 20.01.2020
  */
 @Getter
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 final class SevenZipSplitSrcFile extends SrcFile {
 
     static SevenZipSplitSrcFile create(Path file) {
@@ -52,7 +50,7 @@ final class SevenZipSplitSrcFile extends SrcFile {
             if (!Files.exists(path))
                 break;
 
-            long length = length(path);
+            long length = PathUtils.length(path);
             items.add(Item.builder().pos(i).file(path).offs(offs).length(length).build());
             offs += length;
         }
@@ -60,24 +58,15 @@ final class SevenZipSplitSrcFile extends SrcFile {
         return new SevenZipSplitSrcFile(parent.resolve(fileName), Collections.unmodifiableList(items), offs);
     }
 
-    private static long length(Path file) {
-        try {
-            return Files.size(file);
-        } catch(IOException ignore) {
-            return 0;
-        }
-    }
-
-    private final Path path;
-    private final List<Item> items;
     private final long length;
+
+    public SevenZipSplitSrcFile(Path path, List<Item> items, long length) {
+        super(path, items);
+        this.length = length;
+    }
 
     public boolean isLast(Item item) {
         return item == null || items.size() < item.getPos();
-    }
-
-    public Item getDisk(int disk) {
-        return items.size() <= disk ? null : items.get(disk);
     }
 
     @Override
@@ -90,8 +79,4 @@ final class SevenZipSplitSrcFile extends SrcFile {
         return false;
     }
 
-    @Override
-    public String toString() {
-        return String.format("%s (%d)", path.toString(), items.size());
-    }
 }

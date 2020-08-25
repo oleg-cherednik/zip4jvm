@@ -19,6 +19,14 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PathUtils {
 
+    public static long length(Path path) {
+        try {
+            return Files.size(path);
+        } catch(IOException ignore) {
+            return 0;
+        }
+    }
+
     public static Map<Path, String> getRelativeContent(Path path) throws IOException {
         requireNotNull(path, "PathUtils.path");
         requireExists(path);
