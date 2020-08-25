@@ -10,14 +10,14 @@ import static java.util.Objects.requireNonNull;
  * @author Oleg Cherednik
  * @since 22.01.2020
  */
-public class LittleEndianSevenZipReadFile extends LittleEndianDataInputFile {
+public class SevenZipLittleEndianReadFile extends LittleEndianDataInputFile {
 
     private final SevenZipSplitSrcFile zip;
     private int itemPos;
     /** offs from the beginning of the first file */
     private long offs;
 
-    protected LittleEndianSevenZipReadFile(SevenZipSplitSrcFile zip) throws IOException {
+    protected SevenZipLittleEndianReadFile(SevenZipSplitSrcFile zip) throws IOException {
         super(zip.getItems().get(0).getFile());
         this.zip = zip;
         length = zip.getLength();

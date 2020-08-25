@@ -73,19 +73,15 @@ final class SevenZipSplitSrcFile extends SrcFile {
         length = items.stream().mapToLong(Item::getLength).sum();
     }
 
-    public boolean isLast(Item item) {
-        return item == null || items.size() < item.getPos();
-    }
-
     @Override
     public boolean isSplit() {
-        // TODO on this result we check split signature (this is valid only for standard split zip) - see ZipModel.createDataInput() 
+        // TODO on this result we check split signature (this is valid only for standard split zip) - see ZipModel.createDataInput()
         return false;
     }
 
     @Override
     public DataInputFile dataInputFile() throws IOException {
-        return new LittleEndianSevenZipReadFile(this);
+        return new SevenZipLittleEndianReadFile(this);
     }
 
 }

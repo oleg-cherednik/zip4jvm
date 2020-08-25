@@ -53,6 +53,10 @@ public abstract class SrcFile {
         return items.size() > 1;
     }
 
+    public boolean isLast(Item item) {
+        return item == null || items.size() < item.getPos();
+    }
+
     protected static Set<Path> getParts(Path dir, String pattern) {
         FileFilter fileFilter = new RegexFileFilter(pattern);
         File[] files = dir.toFile().listFiles(fileFilter);
