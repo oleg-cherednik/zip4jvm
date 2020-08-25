@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.io.in.file;
 import lombok.Getter;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import ru.olegcherednik.zip4jvm.exception.SplitPartNotFoundException;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import java.io.IOException;
@@ -47,7 +48,7 @@ final class SevenZipSplitSrcFile extends SrcFile {
             return null;
 
         long offs = 0;
-        List<Item> items = getItems(file);
+        List<Item> items = createItems(file, );
 
         for (int i = 0; ; i++) {
             Path path = parent.resolve(String.format("%s.%03d", fileName, i + 1));

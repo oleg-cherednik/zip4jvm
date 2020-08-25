@@ -3,12 +3,18 @@ package ru.olegcherednik.zip4jvm.io.in.file;
 import lombok.Builder;
 import lombok.Getter;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.filefilter.RegexFileFilter;
+import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
+import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * @author Oleg Cherednik
@@ -45,6 +51,21 @@ public abstract class SrcFile {
 
     public boolean isSplit() {
         return items.size() > 1;
+    }
+
+    protected static Set<Path> getParts(Path dir, String pattern) {
+        FileFilter fileFilter = new RegexFileFilter(pattern);
+        File[] files = dir.toFile().listFiles(fileFilter);
+
+        if (ArrayUtils.isEmpty(files))
+            return Collections.emptySet();
+
+        Set<Path> parts = new TreeSet<>();
+
+        for (File file : files)
+            parts.add(file.toPath());
+
+        return parts;
     }
 
     @Override
