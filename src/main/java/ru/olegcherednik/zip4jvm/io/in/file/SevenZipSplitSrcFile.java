@@ -63,22 +63,28 @@ final class SevenZipSplitSrcFile extends SrcFile {
         return new SevenZipSplitSrcFile(parent.resolve(fileName), Collections.unmodifiableList(items), offs);
     }
 
-    private static List<Item> getItems(Path file) {
+    private static List<Item> createItems(Path dir, String baseName) {
+        int i = 1;
         long offs = 0;
         List<Item> items = new LinkedList<>();
 
-        Path parent = file.getParent();
+        for (Path path : getParts(dir, baseName + "\\.\\d+")) {
+            String actualFileName = path.getFileName().toString();
+            String expectedFileName = String.format("%s.%03d", baseName, i);
 
-        for (int i = 0; ; i++) {
-            Path path = parent.resolve(String.format("%s.%03d", fileName, i + 1));
-
-            if (!Files.exists(path))
-                break;
+            if (!actualFileName.equals(expectedFileName) || !Files.isReadable(path))
+                throw new SplitPartNotFoundException(dir.resolve(expectedFileName));
 
             long length = PathUtils.length(path);
-            items.add(Item.builder().pos(i).file(path).offs(offs).length(length).build());
+            items.add(Item.builder()
+                          .file(path)
+                          .offs(offs)
+                          .length(length).build());
             offs += length;
+            i++;
         }
+
+        return items.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(items);
     }
 
     private final long length;
