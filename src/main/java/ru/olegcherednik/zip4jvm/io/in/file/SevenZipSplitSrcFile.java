@@ -78,7 +78,7 @@ final class SevenZipSplitSrcFile extends SrcFile {
 
     @Override
     public DataInputFile dataInputFile() throws IOException {
-        return new SevenZipLittleEndianReadFile(this);
+        return new StandardSplitLittleEndianReadFile(this);
     }
 
 }
