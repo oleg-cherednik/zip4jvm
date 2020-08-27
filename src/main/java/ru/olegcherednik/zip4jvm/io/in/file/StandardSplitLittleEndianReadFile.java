@@ -8,16 +8,16 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * @author Oleg Cherednik
- * @since 22.01.2020
+ * @since 27.08.2020
  */
-public class SevenZipLittleEndianReadFile extends LittleEndianDataInputFile {
+public class StandardSplitLittleEndianReadFile extends LittleEndianDataInputFile {
 
     private final SrcFile srcFile;
     private int itemPos;
     /** offs from the beginning of the first file */
     private long offs;
 
-    protected SevenZipLittleEndianReadFile(SrcFile srcFile) throws IOException {
+    public StandardSplitLittleEndianReadFile(SrcFile srcFile) throws IOException {
         super(srcFile.getItems().get(0).getFile());
         this.srcFile = srcFile;
         length = srcFile.getLength();
@@ -25,23 +25,26 @@ public class SevenZipLittleEndianReadFile extends LittleEndianDataInputFile {
 
     @Override
     public long skip(long bytes) throws IOException {
-        int skipped = 0;
+        long skipped = 0;
 
-        for (int i = itemPos; skipped < bytes; ) {
-            SrcFile.Item item = requireNonNull(srcFile.getDisk(i));
-            boolean withinDisk = bytes - skipped < item.getLength();
+        while (bytes > 0) {
+            long actual = super.skip(bytes);
 
-            if (withinDisk || srcFile.isLast(item)) {
-                if (i != itemPos) {
-                    openNextItem(item.getFile());
-                    itemPos = item.getPos();
-                }
+            skipped += actual;
+            bytes -= actual;
 
-                skipped += super.skip(bytes - skipped);
+            if (bytes == 0)
                 break;
-            }
 
-            skipped += item.getLength();
+            SrcFile.Item item = srcFile.getDisk(itemPos);
+
+            if (srcFile.isLast(item))
+                break;
+
+            item = requireNonNull(srcFile.getDisk(itemPos + 1));
+            openNextItem(item.getFile());
+            offs = item.getOffs();
+            itemPos = item.getPos();
         }
 
         return skipped;
@@ -50,15 +53,16 @@ public class SevenZipLittleEndianReadFile extends LittleEndianDataInputFile {
     @Override
     public void seek(long pos) throws IOException {
         for (SrcFile.Item item : srcFile.getItems()) {
-            if (item.getOffs() + item.getLength() < pos && !srcFile.isLast(item))
+            if (item.getOffs() + item.getLength() <= pos && !srcFile.isLast(item))
                 continue;
 
-            if (itemPos != item.getPos())
+            if (itemPos != item.getPos()) {
                 openNextItem(item.getFile());
+                offs = item.getOffs();
+            }
 
             super.seek(pos - item.getOffs());
             itemPos = item.getPos();
-            offs = item.getOffs();
             break;
         }
     }
@@ -71,11 +75,14 @@ public class SevenZipLittleEndianReadFile extends LittleEndianDataInputFile {
         while (res < len) {
             int total = in.read(buf, offs, size);
 
-            if (total > 0)
+            if (total > 0) {
                 res += total;
+            }
 
             if (total == IOUtils.EOF || total < size) {
-                openNextItem(requireNonNull(srcFile.getDisk(++itemPos)).getFile());
+                SrcFile.Item item = requireNonNull(srcFile.getDisk(++itemPos));
+                openNextItem(item.getFile());
+                this.offs = item.getOffs();
                 offs += Math.max(0, total);
                 size -= Math.max(0, total);
             }
@@ -91,7 +98,7 @@ public class SevenZipLittleEndianReadFile extends LittleEndianDataInputFile {
 
     @Override
     public int getDisk() {
-        return itemPos;
+        return srcFile.getItems().size() == 1 ? 0 : itemPos - 1;
     }
 
     @Override
@@ -102,5 +109,4 @@ public class SevenZipLittleEndianReadFile extends LittleEndianDataInputFile {
             return IOUtils.EOF;
         }
     }
-
 }

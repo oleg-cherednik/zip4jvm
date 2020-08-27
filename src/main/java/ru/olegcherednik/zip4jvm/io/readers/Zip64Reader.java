@@ -22,7 +22,9 @@ public class Zip64Reader implements Reader<Zip64> {
     public final Zip64 read(DataInput in) throws IOException {
         if (findCentralDirectoryLocatorSignature(in)) {
             Zip64.EndCentralDirectoryLocator locator = readEndCentralDirectoryLocator(in);
-            findCentralDirectorySignature(locator.getOffs(), in);
+            int disk = (int)locator.getMainDisk();
+            long offs = in.getSrcFile().getItems().get(disk).getOffs();
+            findCentralDirectorySignature(offs + locator.getOffs(), in);
             Zip64.EndCentralDirectory dir = readEndCentralDirectory(in);
             return Zip64.of(locator, dir);
         }

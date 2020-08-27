@@ -33,10 +33,12 @@ public abstract class SrcFile {
 
     protected final Path path;
     protected final List<Item> items;
+    protected final long length;
 
     protected SrcFile(Path path, List<Item> items) {
         this.path = path;
         this.items = CollectionUtils.isEmpty(items) ? Collections.emptyList() : Collections.unmodifiableList(items);
+        length = items.stream().mapToLong(Item::getLength).sum();
     }
 
     public Item getDisk(int disk) {
@@ -54,7 +56,7 @@ public abstract class SrcFile {
     }
 
     public boolean isLast(Item item) {
-        return item == null || items.size() < item.getPos();
+        return item == null || items.get(items.size() - 1) == item;
     }
 
     protected static Set<Path> getParts(Path dir, String pattern) {

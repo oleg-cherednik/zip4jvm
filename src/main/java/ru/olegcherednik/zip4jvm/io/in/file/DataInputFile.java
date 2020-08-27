@@ -19,4 +19,12 @@ public interface DataInputFile extends Closeable, RandomAccess {
 
     long toLong(byte[] buf, int offs, int len);
 
+    // TODO temporary
+    @Deprecated
+    SrcFile getSrcFile();
+
+    // TODO temporary
+    @Deprecated
+    int getDisk();
+
 }

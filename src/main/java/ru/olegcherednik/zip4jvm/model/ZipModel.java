@@ -9,7 +9,6 @@ import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.SingleZipInputStream;
-import ru.olegcherednik.zip4jvm.io.in.data.SplitZipInputStream;
 import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -109,11 +108,18 @@ public final class ZipModel {
     }
 
     public DataInput createDataInput(String fileName) throws IOException {
-        return isSplit() ? new SplitZipInputStream(this, getZipEntryByFileName(fileName).getDisk()) : new SingleZipInputStream(this);
+        int disk = (int)getZipEntryByFileName(fileName).getDisk();
+        SrcFile.Item item = srcFile.getItems().get(disk);
+        DataInput res = new SingleZipInputStream(this);
+        res.seek(item.getOffs());
+        return res;
     }
 
     public DataInput createDataInput() throws IOException {
-        return isSplit() ? new SplitZipInputStream(this, 0) : new SingleZipInputStream(this);
+        SrcFile.Item item = srcFile.getDisk(0);
+        DataInput res = new SingleZipInputStream(this);
+        res.seek(item.getOffs());
+        return res;
     }
 
 }

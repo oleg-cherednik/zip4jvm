@@ -1,7 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
-import lombok.Getter;
-import lombok.Setter;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
@@ -82,14 +80,15 @@ public final class BlockModelReader extends BaseZipModelReader {
         return new BlockCentralDirectoryReader(totalEntries, customizeCharset, centralDirectoryBlock);
     }
 
-    @Getter
-    @Setter
     public static final class CentralDataInputStream extends SingleZipInputStream {
-
-        private long disk;
 
         public CentralDataInputStream(SrcFile srcFile) throws IOException {
             super(srcFile);
+        }
+
+        @Override
+        public long getDisk() {
+            return delegate.getDisk();
         }
 
     }

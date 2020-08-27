@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.io.in.RandomAccess;
+import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -26,9 +27,7 @@ public interface DataInput extends Closeable, RandomAccess {
 
     long getOffs();
 
-    default long getDisk() {
-        return 0;
-    }
+    long getDisk();
 
     default String getFileName() {
         return null;
@@ -73,5 +72,10 @@ public interface DataInput extends Closeable, RandomAccess {
     long getMark(String id);
 
     void seek(String id) throws IOException;
+
+    // TODO temporary
+    @Deprecated
+    SrcFile getSrcFile();
+
 
 }

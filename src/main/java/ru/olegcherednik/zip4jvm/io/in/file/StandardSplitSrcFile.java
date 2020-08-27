@@ -82,7 +82,7 @@ class StandardSplitSrcFile extends SrcFile {
 
     @Override
     public DataInputFile dataInputFile() throws IOException {
-        return new LittleEndianReadFile(path);
+        return new StandardSplitLittleEndianReadFile(this);
     }
 
 }

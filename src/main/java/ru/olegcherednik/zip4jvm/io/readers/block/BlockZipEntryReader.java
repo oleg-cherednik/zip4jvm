@@ -47,7 +47,7 @@ public class BlockZipEntryReader {
     }
 
     private void readLocalFileHeader(ZipEntry zipEntry, DataInput in) throws IOException {
-        BlockLocalFileHeaderReader reader = new BlockLocalFileHeaderReader(zipEntry, customizeCharset);
+        BlockLocalFileHeaderReader reader = new BlockLocalFileHeaderReader(zipEntry, in, customizeCharset);
         LocalFileHeader localFileHeader = reader.read(in);
 
         requireBlockExists(localFileHeader.getFileName());

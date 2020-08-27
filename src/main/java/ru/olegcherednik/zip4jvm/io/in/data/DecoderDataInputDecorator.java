@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
+import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
 
 import java.io.IOException;
 
@@ -29,6 +30,12 @@ public final class DecoderDataInputDecorator extends BaseDataInput implements De
     @Override
     public long getOffs() {
         return delegate.getOffs();
+    }
+
+    // TODO temporary
+    @Override
+    public long getDisk() {
+        return 0;
     }
 
     @Override
@@ -64,6 +71,10 @@ public final class DecoderDataInputDecorator extends BaseDataInput implements De
     @Override
     public void seek(long pos) throws IOException {
         delegate.seek(pos);
+    }
+    @Override
+    public SrcFile getSrcFile() {
+        return delegate.getSrcFile();
     }
 
     @Override

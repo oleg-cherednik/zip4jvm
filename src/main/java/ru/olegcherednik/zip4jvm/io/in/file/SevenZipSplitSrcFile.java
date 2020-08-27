@@ -66,11 +66,8 @@ final class SevenZipSplitSrcFile extends SrcFile {
         return items.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(items);
     }
 
-    private final long length;
-
     private SevenZipSplitSrcFile(Path path, List<Item> items) {
         super(path, items);
-        length = items.stream().mapToLong(Item::getLength).sum();
     }
 
     @Override

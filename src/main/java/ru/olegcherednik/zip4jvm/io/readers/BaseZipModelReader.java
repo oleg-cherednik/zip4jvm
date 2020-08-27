@@ -64,7 +64,11 @@ public abstract class BaseZipModelReader {
     }
 
     private CentralDirectory readCentralDirectory(DataInput in) throws IOException {
-        in.seek(ZipModelBuilder.getCentralDirectoryOffs(endCentralDirectory, zip64));
+        // TODO same with ZipMode.createDataInput()
+        int mainDisk = ZipModelBuilder.getMainDisk(endCentralDirectory, zip64);
+        SrcFile.Item item = srcFile.getItems().get(mainDisk);
+        long offs = item.getOffs() + ZipModelBuilder.getCentralDirectoryOffs(endCentralDirectory, zip64);
+        in.seek(offs);
         long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
         return getCentralDirectoryReader(totalEntries).read(in);
     }

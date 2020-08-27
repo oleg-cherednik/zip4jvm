@@ -23,9 +23,17 @@ public class BlockLocalFileHeaderReader extends LocalFileHeaderReader {
     private final ZipEntryBlock.LocalFileHeaderBlock block = new ZipEntryBlock.LocalFileHeaderBlock();
     private final long disk;
 
-    public BlockLocalFileHeaderReader(ZipEntry zipEntry, Function<Charset, Charset> customizeCharset) {
-        super(zipEntry.getLocalFileHeaderOffs(), customizeCharset);
+    // TODO DataInput in - temporary
+    public BlockLocalFileHeaderReader(ZipEntry zipEntry, DataInput in, Function<Charset, Charset> customizeCharset) {
+        super(getOffs(zipEntry, in), customizeCharset);
         disk = zipEntry.getDisk();
+    }
+
+    private static long getOffs(ZipEntry zipEntry, DataInput in) {
+        int disk = (int)zipEntry.getDisk();
+        long offs = in.getSrcFile().getItems().get(disk).getOffs();
+        offs += zipEntry.getLocalFileHeaderOffs();
+        return offs;
     }
 
     @Override
@@ -35,6 +43,7 @@ public class BlockLocalFileHeaderReader extends LocalFileHeaderReader {
 
     @Override
     protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) throws IOException {
+        block.getContent().setSrcFile(in.getSrcFile());
         block.getContent().calc(in.getOffs());
         return new BlockExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader), block.getExtraFieldBlock()).read(in);
     }

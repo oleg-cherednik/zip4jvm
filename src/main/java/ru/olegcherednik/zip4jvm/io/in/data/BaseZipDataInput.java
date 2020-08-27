@@ -32,6 +32,11 @@ abstract class BaseZipDataInput extends BaseDataInput implements ZipDataInput {
     }
 
     @Override
+    public long getDisk() {
+        return delegate.getDisk();
+    }
+
+    @Override
     public long length() throws IOException {
         return delegate.length();
     }
@@ -54,6 +59,11 @@ abstract class BaseZipDataInput extends BaseDataInput implements ZipDataInput {
     @Override
     public long toLong(byte[] buf, int offs, int len) {
         return delegate.toLong(buf, offs, len);
+    }
+
+    @Override
+    public SrcFile getSrcFile() {
+        return delegate.getSrcFile();
     }
 
     @Override

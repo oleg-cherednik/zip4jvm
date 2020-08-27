@@ -11,13 +11,26 @@ import java.nio.file.Path;
  */
 public class LittleEndianReadFile extends LittleEndianDataInputFile {
 
+    private final Path file;
+
     public LittleEndianReadFile(Path file) throws IOException {
         super(file);
+        this.file = file;
     }
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
         return in.read(buf, offs, len);
+    }
+
+    @Override
+    public SrcFile getSrcFile() {
+        return SrcFile.of(file);
+    }
+
+    @Override
+    public int getDisk() {
+        return 0;
     }
 
     @Override

@@ -90,6 +90,12 @@ public final class ZipModelBuilder {
         return zip64.getEndCentralDirectory().getCentralDirectorySize();
     }
 
+    public static int getMainDisk(EndCentralDirectory endCentralDirectory, Zip64 zip64) {
+        if (zip64 == Zip64.NULL)
+            return endCentralDirectory.getMainDisk();
+        return (int)zip64.getEndCentralDirectory().getMainDisk();
+    }
+
     public static long getCentralDirectoryOffs(EndCentralDirectory endCentralDirectory, Zip64 zip64) {
         if (zip64 == Zip64.NULL)
             return endCentralDirectory.getCentralDirectoryOffs();
