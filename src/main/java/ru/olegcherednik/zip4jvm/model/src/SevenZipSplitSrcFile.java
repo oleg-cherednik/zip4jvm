@@ -1,9 +1,11 @@
-package ru.olegcherednik.zip4jvm.io.in.file;
+package ru.olegcherednik.zip4jvm.model.src;
 
 import lombok.Getter;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import ru.olegcherednik.zip4jvm.exception.SplitPartNotFoundException;
+import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.file.SrcFileLittleEndianReadFile;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import java.io.IOException;
@@ -78,7 +80,7 @@ final class SevenZipSplitSrcFile extends SrcFile {
 
     @Override
     public DataInputFile dataInputFile() throws IOException {
-        return new StandardSplitLittleEndianReadFile(this);
+        return new SrcFileLittleEndianReadFile(this);
     }
 
 }

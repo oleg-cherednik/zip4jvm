@@ -6,7 +6,7 @@ import lombok.Setter;
 import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.ZipDataInput;
-import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
+import ru.olegcherednik.zip4jvm.model.src.SrcFile;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;
 

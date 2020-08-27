@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
+import ru.olegcherednik.zip4jvm.model.src.SrcFile;
 
 import java.io.IOException;
 

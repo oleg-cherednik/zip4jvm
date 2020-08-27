@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.in.file;
 
 import org.apache.commons.io.IOUtils;
+import ru.olegcherednik.zip4jvm.model.src.SrcFile;
 
 import java.io.IOException;
 
@@ -10,14 +11,14 @@ import static java.util.Objects.requireNonNull;
  * @author Oleg Cherednik
  * @since 27.08.2020
  */
-public class StandardSplitLittleEndianReadFile extends LittleEndianDataInputFile {
+public class SrcFileLittleEndianReadFile extends LittleEndianDataInputFile {
 
     private final SrcFile srcFile;
     private int itemPos;
     /** offs from the beginning of the first file */
     private long offs;
 
-    public StandardSplitLittleEndianReadFile(SrcFile srcFile) throws IOException {
+    public SrcFileLittleEndianReadFile(SrcFile srcFile) throws IOException {
         super(srcFile.getItems().get(0).getFile());
         this.srcFile = srcFile;
         length = srcFile.getLength();

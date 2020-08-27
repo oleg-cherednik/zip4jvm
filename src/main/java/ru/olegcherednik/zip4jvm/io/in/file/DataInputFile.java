@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.in.file;
 
 import ru.olegcherednik.zip4jvm.io.in.RandomAccess;
+import ru.olegcherednik.zip4jvm.model.src.SrcFile;
 
 import java.io.Closeable;
 import java.io.IOException;

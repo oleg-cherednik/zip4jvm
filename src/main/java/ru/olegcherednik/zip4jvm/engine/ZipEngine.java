@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.engine;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.EntryDuplicationException;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
-import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
+import ru.olegcherednik.zip4jvm.model.src.SrcFile;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.SingleZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.data.SplitZipOutputStream;

@@ -1,9 +1,11 @@
-package ru.olegcherednik.zip4jvm.io.in.file;
+package ru.olegcherednik.zip4jvm.model.src;
 
 import org.apache.commons.io.FilenameUtils;
 import ru.olegcherednik.zip4jvm.exception.SplitPartNotFoundException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.SingleZipInputStream;
+import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.file.SrcFileLittleEndianReadFile;
 import ru.olegcherednik.zip4jvm.io.readers.BaseZipModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.EndCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.model.Charsets;
@@ -82,7 +84,7 @@ class StandardSplitSrcFile extends SrcFile {
 
     @Override
     public DataInputFile dataInputFile() throws IOException {
-        return new StandardSplitLittleEndianReadFile(this);
+        return new SrcFileLittleEndianReadFile(this);
     }
 
 }

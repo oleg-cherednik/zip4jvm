@@ -1,6 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
-import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
+import ru.olegcherednik.zip4jvm.model.src.SrcFile;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import java.io.IOException;

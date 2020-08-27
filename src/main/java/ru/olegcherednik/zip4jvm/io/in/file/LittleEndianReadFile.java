@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.in.file;
 
 import org.apache.commons.io.IOUtils;
+import ru.olegcherednik.zip4jvm.model.src.SrcFile;
 
 import java.io.IOException;
 import java.nio.file.Path;

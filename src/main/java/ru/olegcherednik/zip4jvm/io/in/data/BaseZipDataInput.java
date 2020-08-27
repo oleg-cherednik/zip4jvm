@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 import lombok.Getter;
 import lombok.Setter;
 import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
-import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
+import ru.olegcherednik.zip4jvm.model.src.SrcFile;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import java.io.IOException;
