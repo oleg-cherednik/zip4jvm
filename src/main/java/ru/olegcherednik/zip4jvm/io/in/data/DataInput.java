@@ -25,7 +25,11 @@ public interface DataInput extends Closeable, RandomAccess {
 
     int qwordSize();
 
+    /** Retrieves offs starting from the beginning of the first disk */
     long getOffs();
+
+    /** Retrieves offs starting from the beginning of the current disk */
+    long getDiskRelativeOffs();
 
     long getDisk();
 

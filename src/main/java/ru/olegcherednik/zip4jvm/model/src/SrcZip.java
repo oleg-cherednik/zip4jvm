@@ -1,5 +1,6 @@
 package ru.olegcherednik.zip4jvm.model.src;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import org.apache.commons.io.filefilter.RegexFileFilter;
@@ -36,6 +37,7 @@ public abstract class SrcZip {
     }
 
     protected final Path path;
+    @Getter(AccessLevel.NONE)
     protected final List<Disk> disks;
     protected final long length;
 
@@ -47,6 +49,18 @@ public abstract class SrcZip {
 
     public Disk getDisk(int disk) {
         return disks.get(disk);
+    }
+
+    // TODO simplify for loop
+    public Disk getDiskByOffs(long offs) {
+        for (SrcZip.Disk disk : disks) {
+            if (disk.getOffs() + disk.getLength() <= offs && !isLast(disk))
+                continue;
+
+            return disk;
+        }
+
+        return disks.get(disks.size() - 1);
     }
 
     public boolean isSplit() {

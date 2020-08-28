@@ -32,6 +32,11 @@ public final class DecoderDataInputDecorator extends BaseDataInput implements De
         return delegate.getOffs();
     }
 
+    @Override
+    public long getDiskRelativeOffs() {
+        return delegate.getDiskRelativeOffs();
+    }
+
     // TODO temporary
     @Override
     public long getDisk() {
@@ -72,6 +77,7 @@ public final class DecoderDataInputDecorator extends BaseDataInput implements De
     public void seek(long pos) throws IOException {
         delegate.seek(pos);
     }
+
     @Override
     public SrcZip getSrcFile() {
         return delegate.getSrcFile();
