@@ -12,6 +12,7 @@ import java.io.IOException;
  */
 public interface DataInputFile extends Closeable, RandomAccess {
 
+    /** Absolute offs starting from the beginning of the first disk */
     long getAbsOffs();
 
     long length();
