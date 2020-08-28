@@ -22,18 +22,15 @@ public class Zip64Reader implements Reader<Zip64> {
     public final Zip64 read(DataInput in) throws IOException {
         if (findCentralDirectoryLocatorSignature(in)) {
             Zip64.EndCentralDirectoryLocator locator = readEndCentralDirectoryLocator(in);
-            int disk = (int)locator.getMainDisk();
-            long offs = in.getSrcFile().getDisk(disk).getOffs();
-            findCentralDirectorySignature(offs + locator.getOffs(), in);
-            Zip64.EndCentralDirectory dir = readEndCentralDirectory(in);
-            return Zip64.of(locator, dir);
+            findCentralDirectorySignature(locator, in);
+            return Zip64.of(locator, readEndCentralDirectory(in));
         }
 
         return Zip64.NULL;
     }
 
     private static boolean findCentralDirectoryLocatorSignature(DataInput in) throws IOException {
-        long offs = in.getOffs() - Zip64.EndCentralDirectoryLocator.SIZE;
+        long offs = in.getAbsoluteOffs() - Zip64.EndCentralDirectoryLocator.SIZE;
 
         if (offs < 0)
             return false;
@@ -47,8 +44,12 @@ public class Zip64Reader implements Reader<Zip64> {
         return true;
     }
 
-    private static void findCentralDirectorySignature(long offs, DataInput in) throws IOException {
-        in.seek(offs);
+    private static void findCentralDirectorySignature(Zip64.EndCentralDirectoryLocator locator, DataInput in) throws IOException {
+        int mainDisk = (int)locator.getMainDisk();
+        long relOffs = locator.getOffs();
+        long absOffs = in.convertToAbsoluteOffs(mainDisk, relOffs);
+
+        in.seek(absOffs);
 
         if (in.readDwordSignature() != Zip64.EndCentralDirectory.SIGNATURE)
             throw new Zip4jvmException("invalid zip64 end of central directory");
@@ -128,12 +129,12 @@ public class Zip64Reader implements Reader<Zip64> {
 
         @Override
         public Zip64.ExtendedInfo read(DataInput in) throws IOException {
-            long offs = in.getOffs();
+            long offs = in.getAbsoluteOffs();
             updateFlags(in);
 
             Zip64.ExtendedInfo extendedInfo = readExtendedInfo(in);
 
-            if (in.getOffs() - offs != size) {
+            if (in.getAbsoluteOffs() - offs != size) {
                 // section exists, but not need to read it; all data is in FileHeader
                 extendedInfo = Zip64.ExtendedInfo.NULL;
                 in.seek(offs + size);

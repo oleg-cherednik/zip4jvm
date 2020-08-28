@@ -73,9 +73,9 @@ public class ExtraFieldReader implements Reader<ExtraField> {
 
     protected ExtraField readExtraField(DataInput in) throws IOException {
         ExtraField.Builder builder = ExtraField.builder();
-        long offsMax = in.getOffs() + size;
+        long offsMax = in.getAbsoluteOffs() + size;
 
-        while (in.getOffs() < offsMax)
+        while (in.getAbsoluteOffs() < offsMax)
             builder.addRecord(getExtraFieldRecordReader().read(in));
 
         return builder.build();

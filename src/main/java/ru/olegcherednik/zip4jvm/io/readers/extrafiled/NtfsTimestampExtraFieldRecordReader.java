@@ -22,7 +22,7 @@ public final class NtfsTimestampExtraFieldRecordReader implements Reader<NtfsTim
 
     @Override
     public NtfsTimestampExtraFieldRecord read(DataInput in) throws IOException {
-        long offs = in.getOffs();
+        long offs = in.getAbsoluteOffs();
 
         in.skip(4);
 
@@ -36,7 +36,7 @@ public final class NtfsTimestampExtraFieldRecordReader implements Reader<NtfsTim
     private List<NtfsTimestampExtraFieldRecord.Tag> readTags(long offs, DataInput in) throws IOException {
         List<NtfsTimestampExtraFieldRecord.Tag> tags = new ArrayList<>();
 
-        while (in.getOffs() < offs + size) {
+        while (in.getAbsoluteOffs() < offs + size) {
             int tag = in.readWord();
             tags.add(tag == NtfsTimestampExtraFieldRecord.OneTag.SIGNATURE ? readOneTag(in) : readUnknownTag(tag, in));
         }

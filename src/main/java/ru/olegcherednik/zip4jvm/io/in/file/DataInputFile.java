@@ -13,7 +13,9 @@ import java.io.IOException;
 public interface DataInputFile extends Closeable, RandomAccess {
 
     /** Retrieves offs starting from the beginning of the first disk */
-    long getOffs();
+    long getAbsoluteOffs();
+
+    long toAbsoluteOffs(int disk, long relativeOffs);
 
     /** Retrieves offs starting from the beginning of the current disk */
     long getDiskRelativeOffs();

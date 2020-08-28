@@ -37,13 +37,13 @@ public class Block {
         try {
             zipModel = in instanceof ZipDataInput ? ((ZipDataInput)in).getZipModel() : null;
             srcZip = in.getSrcFile();
-            base = in.getDisk().getOffs();
-            offs = in.getOffs() - base;
+            base = in.getDisk().getAbsOffs();
+            offs = in.getAbsoluteOffs() - base;
             disk = Math.max(0, in.getDisk().getPos() - 1);
             fileName = srcZip.getDisk((int)disk).getFile().getFileName().toString();
             return task.get();
         } finally {
-            calc(in.getOffs() - base);
+            calc(in.getAbsoluteOffs() - base);
         }
     }
 

@@ -26,7 +26,9 @@ public interface DataInput extends Closeable, RandomAccess {
     int qwordSize();
 
     /** Retrieves offs starting from the beginning of the first disk */
-    long getOffs();
+    long getAbsoluteOffs();
+
+    long convertToAbsoluteOffs(int disk, long relOffs);
 
     /** Retrieves offs starting from the beginning of the current disk */
     long getDiskRelativeOffs();
@@ -62,7 +64,7 @@ public interface DataInput extends Closeable, RandomAccess {
     long length() throws IOException;
 
     default void backward(int bytes) throws IOException {
-        seek(getOffs() - bytes);
+        seek(getAbsoluteOffs() - bytes);
     }
 
     int read(byte[] buf, int offs, int len) throws IOException;

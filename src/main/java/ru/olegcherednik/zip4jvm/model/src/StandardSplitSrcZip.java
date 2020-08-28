@@ -30,7 +30,7 @@ final class StandardSplitSrcZip extends SrcZip {
 
     private static List<Disk> createDisks(Path zip) {
         int i = 1;
-        long offs = 0;
+        long absOffs = 0;
         List<Disk> disks = new LinkedList<>();
         Path dir = zip.getParent();
         String baseName = FilenameUtils.getBaseName(zip.getFileName().toString());
@@ -46,9 +46,9 @@ final class StandardSplitSrcZip extends SrcZip {
             disks.add(Disk.builder()
                           .pos(i)
                           .file(diskPath)
-                          .offs(offs)
+                          .absOffs(absOffs)
                           .length(length).build());
-            offs += length;
+            absOffs += length;
             i++;
         }
 
@@ -58,7 +58,7 @@ final class StandardSplitSrcZip extends SrcZip {
         disks.add(Disk.builder()
                       .pos(i)
                       .file(zip)
-                      .offs(offs)
+                      .absOffs(absOffs)
                       .length(PathUtils.length(zip)).build());
 
         return disks;

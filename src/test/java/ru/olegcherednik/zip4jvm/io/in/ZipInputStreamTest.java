@@ -49,31 +49,31 @@ public class ZipInputStreamTest {
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x12, 0x13, 0x14 }, true);
 
         try (ZipInputStream in = new ZipInputStream(SrcZip.of(file))) {
-            assertThat(in.getOffs()).isEqualTo(0);
+            assertThat(in.getAbsoluteOffs()).isEqualTo(0);
 
             assertThat(in.readWord()).isEqualTo(0x201);
-            assertThat(in.getOffs()).isEqualTo(2);
+            assertThat(in.getAbsoluteOffs()).isEqualTo(2);
 
             assertThat(in.readDword()).isEqualTo(0x06050403);
-            assertThat(in.getOffs()).isEqualTo(6);
+            assertThat(in.getAbsoluteOffs()).isEqualTo(6);
 
             assertThat(in.readQword()).isEqualTo(0x0E0D0C0B0A090807L);
-            assertThat(in.getOffs()).isEqualTo(14);
+            assertThat(in.getAbsoluteOffs()).isEqualTo(14);
             assertThat(in.toString()).isEqualTo("offs: 14 (0xe)");
 
             in.skip(2);
-            assertThat(in.getOffs()).isEqualTo(16);
+            assertThat(in.getAbsoluteOffs()).isEqualTo(16);
 
             assertThat(in.readString(4, Charsets.UTF_8)).isEqualTo("oleg");
-            assertThat(in.getOffs()).isEqualTo(20);
+            assertThat(in.getAbsoluteOffs()).isEqualTo(20);
 
             assertThat(in.readByte()).isEqualTo(0x11);
-            assertThat(in.getOffs()).isEqualTo(21);
+            assertThat(in.getAbsoluteOffs()).isEqualTo(21);
 
             assertThat(in.readBytes(3)).isEqualTo(new byte[] { 0x12, 0x13, 0x14 });
-            assertThat(in.getOffs()).isEqualTo(24);
+            assertThat(in.getAbsoluteOffs()).isEqualTo(24);
 
-            assertThat(in.getOffs()).isEqualTo(in.length());
+            assertThat(in.getAbsoluteOffs()).isEqualTo(in.length());
         }
     }
 
@@ -82,11 +82,11 @@ public class ZipInputStreamTest {
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x1, 0x2 }, true);
 
         try (ZipInputStream in = new ZipInputStream(SrcZip.of(file))) {
-            assertThat(in.getOffs()).isEqualTo(0);
+            assertThat(in.getAbsoluteOffs()).isEqualTo(0);
 
             assertThatCode(() -> in.skip(-1)).doesNotThrowAnyException();
             assertThatCode(() -> in.skip(0)).doesNotThrowAnyException();
-            assertThat(in.getOffs()).isEqualTo(0);
+            assertThat(in.getAbsoluteOffs()).isEqualTo(0);
         }
     }
 
@@ -99,7 +99,7 @@ public class ZipInputStreamTest {
 
         try (ZipInputStream in = new ZipInputStream(SrcZip.of(file))) {
             assertThat(in.readBytes(3)).isEqualTo(new byte[] { 0x1, 0x2 });
-            assertThat(in.getOffs()).isEqualTo(2);
+            assertThat(in.getAbsoluteOffs()).isEqualTo(2);
         }
     }
 
@@ -108,11 +108,11 @@ public class ZipInputStreamTest {
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x1, 0x2 }, true);
 
         ZipInputStream in = new ZipInputStream(SrcZip.of(file));
-        assertThat(in.getOffs()).isEqualTo(0);
+        assertThat(in.getAbsoluteOffs()).isEqualTo(0);
 
         in.close();
-        assertThatCode(in::getOffs).doesNotThrowAnyException();
-        assertThat(in.getOffs()).isEqualTo(IOUtils.EOF);
+        assertThatCode(in::getAbsoluteOffs).doesNotThrowAnyException();
+        assertThat(in.getAbsoluteOffs()).isEqualTo(IOUtils.EOF);
     }
 
 }

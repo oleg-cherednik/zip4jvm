@@ -36,7 +36,7 @@ final class SevenZipSplitSrcZip extends SrcZip {
 
     private static List<Disk> createDisks(Path zip) {
         int i = 1;
-        long offs = 0;
+        long absOffs = 0;
         List<Disk> disks = new LinkedList<>();
         Path dir = zip.getParent();
         String baseName = FilenameUtils.getBaseName(zip.getFileName().toString());
@@ -52,9 +52,9 @@ final class SevenZipSplitSrcZip extends SrcZip {
             disks.add(Disk.builder()
                           .pos(i)
                           .file(diskPath)
-                          .offs(offs)
+                          .absOffs(absOffs)
                           .length(length).build());
-            offs += length;
+            absOffs += length;
             i++;
         }
 

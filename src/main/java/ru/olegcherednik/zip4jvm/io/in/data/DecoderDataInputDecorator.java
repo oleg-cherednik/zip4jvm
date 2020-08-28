@@ -28,8 +28,13 @@ public final class DecoderDataInputDecorator extends BaseDataInput implements De
     }
 
     @Override
-    public long getOffs() {
-        return delegate.getOffs();
+    public long getAbsoluteOffs() {
+        return delegate.getAbsoluteOffs();
+    }
+
+    @Override
+    public long convertToAbsoluteOffs(int disk, long relOffs) {
+        return delegate.convertToAbsoluteOffs(disk, relOffs);
     }
 
     @Override
@@ -44,7 +49,7 @@ public final class DecoderDataInputDecorator extends BaseDataInput implements De
 
     @Override
     public long length() throws IOException {
-        return delegate.getOffs();
+        return delegate.getAbsoluteOffs();
     }
 
     @Override

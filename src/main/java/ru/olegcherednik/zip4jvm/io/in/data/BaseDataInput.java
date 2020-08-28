@@ -115,7 +115,7 @@ abstract class BaseDataInput implements DataInput {
 
     @Override
     public void mark(String id) {
-        map.put(id, getOffs());
+        map.put(id, getAbsoluteOffs());
     }
 
     @Override
