@@ -88,11 +88,6 @@ public class LittleEndianDataInputFile implements DataInputFile {
     }
 
     @Override
-    public int getDiskNum() {
-        return Math.max(0, disk.getPos() - 1);
-    }
-
-    @Override
     public SrcZip.Disk getDisk() {
         return disk;
     }

@@ -39,7 +39,7 @@ public class Block {
             srcZip = in.getSrcFile();
             base = in.getDisk().getOffs();
             offs = in.getOffs() - base;
-            disk = in.getDiskNum();
+            disk = Math.max(0, in.getDisk().getPos() - 1);
             fileName = srcZip.getDisk((int)disk).getFile().getFileName().toString();
             return task.get();
         } finally {

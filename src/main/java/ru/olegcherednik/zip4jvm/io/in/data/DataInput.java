@@ -31,10 +31,6 @@ public interface DataInput extends Closeable, RandomAccess {
     /** Retrieves offs starting from the beginning of the current disk */
     long getDiskRelativeOffs();
 
-    // TODO temporary
-    @Deprecated
-    long getDiskNum();
-
     SrcZip.Disk getDisk();
 
     default String getFileName() {
