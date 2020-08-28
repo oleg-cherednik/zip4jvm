@@ -46,7 +46,7 @@ final class StandardSplitSrcZip extends SrcZip {
             disks.add(Disk.builder()
                           .pos(i)
                           .file(diskPath)
-                          .absOffs(absOffs)
+                          .offs(absOffs)
                           .length(length).build());
             absOffs += length;
             i++;
@@ -58,7 +58,7 @@ final class StandardSplitSrcZip extends SrcZip {
         disks.add(Disk.builder()
                       .pos(i)
                       .file(zip)
-                      .absOffs(absOffs)
+                      .offs(absOffs)
                       .length(PathUtils.length(zip)).build());
 
         return disks;

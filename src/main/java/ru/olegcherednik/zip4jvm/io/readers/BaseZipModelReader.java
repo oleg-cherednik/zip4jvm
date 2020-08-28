@@ -67,7 +67,7 @@ public abstract class BaseZipModelReader {
         // TODO same with ZipMode.createDataInput()
         int mainDisk = ZipModelBuilder.getMainDisk(endCentralDirectory, zip64);
         SrcZip.Disk disk = srcZip.getDisks().get(mainDisk);
-        long offs = disk.getAbsOffs() + ZipModelBuilder.getCentralDirectoryOffs(endCentralDirectory, zip64);
+        long offs = disk.getOffs() + ZipModelBuilder.getCentralDirectoryOffs(endCentralDirectory, zip64);
         in.seek(offs);
         long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
         return getCentralDirectoryReader(totalEntries).read(in);

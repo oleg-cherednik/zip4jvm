@@ -81,12 +81,12 @@ public abstract class SrcZip {
         private final int pos;
         private final Path file;
         /** Absolute offs of this disk starting from the beginning of the first disk */
-        private final long absOffs;
+        private final long offs;
         private final long length;
 
         @Override
         public String toString() {
-            return String.format("%s (offs: %s)", file, absOffs);
+            return String.format("%s (offs: %s)", file, offs);
         }
     }
 

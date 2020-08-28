@@ -111,14 +111,14 @@ public final class ZipModel {
         int disk = (int)getZipEntryByFileName(fileName).getDisk();
         SrcZip.Disk item = srcZip.getDisks().get(disk);
         DataInput res = new ZipInputStream(this);
-        res.seek(item.getAbsOffs());
+        res.seek(item.getOffs());
         return res;
     }
 
     public DataInput createDataInput() throws IOException {
         SrcZip.Disk disk = srcZip.getDisk(0);
         DataInput res = new ZipInputStream(this);
-        res.seek(disk.getAbsOffs());
+        res.seek(disk.getOffs());
         return res;
     }
 

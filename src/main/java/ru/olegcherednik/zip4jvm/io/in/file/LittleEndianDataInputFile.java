@@ -5,7 +5,6 @@ import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.file.Path;
 
 import static java.util.Objects.requireNonNull;
 
@@ -17,16 +16,11 @@ public class LittleEndianDataInputFile implements DataInputFile {
 
     private final SrcZip srcZip;
     private SrcZip.Disk disk;
-
-    private int itemPos;
-    private long absOffs;
-
     private RandomAccessFile in;
 
     public LittleEndianDataInputFile(SrcZip srcZip) throws IOException {
         this.srcZip = srcZip;
-        disk = srcZip.getDisks().get(0);
-        openNextDisk(disk.getFile());
+        openDisk(srcZip.getDisks().get(0));
     }
 
     @Override
@@ -54,19 +48,8 @@ public class LittleEndianDataInputFile implements DataInputFile {
             skipped += actual;
             bytes -= actual;
 
-            if (bytes == 0)
+            if (bytes == 0 || !openNextDisk())
                 break;
-
-            SrcZip.Disk disk = srcZip.getDisk(itemPos);
-
-            if (srcZip.isLast(disk))
-                break;
-
-            disk = requireNonNull(srcZip.getDisk(itemPos + 1));
-            openNextDisk(disk.getFile());
-            this.disk = disk;
-            absOffs = disk.getAbsOffs();
-            itemPos = disk.getPos();
         }
 
         return skipped;
@@ -75,16 +58,11 @@ public class LittleEndianDataInputFile implements DataInputFile {
     @Override
     public void seek(long pos) throws IOException {
         for (SrcZip.Disk disk : srcZip.getDisks()) {
-            if (disk.getAbsOffs() + disk.getLength() <= pos && !srcZip.isLast(disk))
+            if (disk.getOffs() + disk.getLength() <= pos && !srcZip.isLast(disk))
                 continue;
 
-            if (itemPos != disk.getPos()) {
-                openNextDisk(disk.getFile());
-                absOffs = disk.getAbsOffs();
-            }
-
-            in.seek(pos - disk.getAbsOffs());
-            itemPos = disk.getPos();
+            openDisk(disk);
+            in.seek(pos - disk.getOffs());
             break;
         }
     }
@@ -95,19 +73,15 @@ public class LittleEndianDataInputFile implements DataInputFile {
         int size = len;
 
         while (res < len) {
-            int total = in.read(buf, offs, size);
+            int totalRead = in.read(buf, offs, size);
 
-            if (total > 0) {
-                res += total;
-            }
+            if (totalRead > 0)
+                res += totalRead;
 
-            if (total == IOUtils.EOF || total < size) {
-                SrcZip.Disk disk = requireNonNull(srcZip.getDisk(++itemPos));
-                openNextDisk(disk.getFile());
-                this.disk = disk;
-                absOffs = disk.getAbsOffs();
-                offs += Math.max(0, total);
-                size -= Math.max(0, total);
+            if (totalRead == IOUtils.EOF || totalRead < size) {
+                openNextDisk();
+                offs += Math.max(0, totalRead);
+                size -= Math.max(0, totalRead);
             }
         }
 
@@ -121,24 +95,33 @@ public class LittleEndianDataInputFile implements DataInputFile {
 
     @Override
     public int getDisk() {
-        return srcZip.getDisks().size() == 1 ? 0 : itemPos - 1;
+        return srcZip.getDisks().size() == 1 ? 0 : disk.getPos() - 1;
     }
 
     @Override
     public long getAbsOffs() {
         try {
-            return absOffs + in.getFilePointer();
+            return disk.getOffs() + in.getFilePointer();
         } catch(IOException e) {
             return IOUtils.EOF;
         }
     }
 
-    private void openNextDisk(Path file) throws IOException {
+    private boolean openNextDisk() throws IOException {
         if (srcZip.isLast(disk))
+            return false;
+
+        openDisk(requireNonNull(srcZip.getDisk(disk.getPos() + 1)));
+        return true;
+    }
+
+    private void openDisk(SrcZip.Disk disk) throws IOException {
+        if (this.disk == disk)
             return;
 
         close();
-        in = new RandomAccessFile(file.toFile(), "r");
+        in = new RandomAccessFile(disk.getFile().toFile(), "r");
+        this.disk = disk;
     }
 
     @Override

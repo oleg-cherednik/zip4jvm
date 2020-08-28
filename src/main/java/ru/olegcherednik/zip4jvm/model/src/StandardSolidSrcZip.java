@@ -24,7 +24,7 @@ final class StandardSolidSrcZip extends SrcZip {
         Disk disk = Disk.builder()
                         .pos(0)
                         .file(zip)
-                        .absOffs(0)
+                        .offs(0)
                         .length(PathUtils.length(zip)).build();
         return Collections.singletonList(disk);
     }
