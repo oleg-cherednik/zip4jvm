@@ -29,10 +29,8 @@ public class BlockEndCentralDirectoryReader extends EndCentralDirectoryReader {
         block.setOffs(in.getOffs() - in.getSrcFile().getDisks().get((int)in.getDisk()).getOffs());
         EndCentralDirectory endCentralDirectory = super.read(in);
 
-        if (in instanceof ZipInputStream) {
-//            ((ZipInputStream)in).setDisk(endCentralDirectory.getMainDisk());
+        if (in instanceof ZipInputStream)
             ((ZipInputStream)in).setFileName(in.getFileName());
-        }
 
         block.setDisk(in.getDisk(), in.getFileName());
         block.setSrcZip(in.getSrcFile());
