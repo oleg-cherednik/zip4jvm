@@ -116,7 +116,7 @@ public final class ZipModel {
     }
 
     public DataInput createDataInput() throws IOException {
-        SrcZip.Disk disk = srcZip.getDisk(0);
+        SrcZip.Disk disk = srcZip.getMainDisk();
         DataInput res = new ZipInputStream(this);
         res.seek(disk.getOffs());
         return res;

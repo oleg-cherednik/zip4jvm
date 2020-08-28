@@ -111,7 +111,8 @@ public class LittleEndianDataInputFile implements DataInputFile {
         if (srcZip.isLast(disk))
             return false;
 
-        openDisk(requireNonNull(srcZip.getDisk(disk.getPos() + 1)));
+        // TODO disk.getPos() is 1 ahead (no need to +1)
+        openDisk(requireNonNull(srcZip.getDisk(disk.getPos())));
         return true;
     }
 

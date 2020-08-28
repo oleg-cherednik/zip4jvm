@@ -16,6 +16,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotEmpty;
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
 /**
  * Represents either single solid zip file or split zip with multiple disks.
@@ -44,12 +45,12 @@ public abstract class SrcZip {
         length = disks.stream().mapToLong(Disk::getLength).sum();
     }
 
+    public Disk getMainDisk() {
+        return disks.get(0);
+    }
+
     public Disk getDisk(int disk) {
-        if (disks.isEmpty())
-            return null;
-        if (disk == 0)
-            return disks.get(disks.size() - 1);
-        return disk <= disks.size() ? disks.get(disk - 1) : null;
+        return disks.get(disk);
     }
 
     public boolean isSplit() {
@@ -57,7 +58,7 @@ public abstract class SrcZip {
     }
 
     public boolean isLast(Disk disk) {
-        return disk == null || disks.get(disks.size() - 1) == disk;
+        return requireNotNull(disk, "SrzZip.disk") == disks.get(disks.size() - 1);
     }
 
     protected static Set<Path> getDiskPaths(Path dir, String pattern) {
