@@ -15,7 +15,7 @@ public interface DataInputFile extends Closeable, RandomAccess {
     /** Retrieves offs starting from the beginning of the first disk */
     long getAbsoluteOffs();
 
-    long toAbsoluteOffs(int disk, long relativeOffs);
+    long toAbsOffs(int disk, long relativeOffs);
 
     /** Retrieves offs starting from the beginning of the current disk */
     long getDiskRelativeOffs();
@@ -25,6 +25,8 @@ public interface DataInputFile extends Closeable, RandomAccess {
     int read(byte[] buf, int offs, int len) throws IOException;
 
     long toLong(byte[] buf, int offs, int len);
+
+    void seek(int disk, long relativeOffs) throws IOException;
 
     // TODO temporary
     @Deprecated

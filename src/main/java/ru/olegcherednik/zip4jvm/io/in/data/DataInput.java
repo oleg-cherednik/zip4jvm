@@ -77,6 +77,8 @@ public interface DataInput extends Closeable, RandomAccess {
 
     long getMark(String id);
 
+    void seek(int disk, long relativeOffs) throws IOException;
+
     void seek(String id) throws IOException;
 
     // TODO temporary

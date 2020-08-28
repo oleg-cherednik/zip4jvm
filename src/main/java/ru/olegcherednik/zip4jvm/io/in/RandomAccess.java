@@ -10,6 +10,6 @@ public interface RandomAccess {
 
     long skip(long bytes) throws IOException;
 
-    void seek(long offs) throws IOException;
+    void seek(long absoluteOffs) throws IOException;
 
 }

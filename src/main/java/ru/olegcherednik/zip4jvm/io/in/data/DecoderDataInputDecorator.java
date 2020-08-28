@@ -78,8 +78,13 @@ public final class DecoderDataInputDecorator extends BaseDataInput implements De
     }
 
     @Override
-    public void seek(long pos) throws IOException {
-        delegate.seek(pos);
+    public void seek(long absoluteOffs) throws IOException {
+        delegate.seek(absoluteOffs);
+    }
+
+    @Override
+    public void seek(int disk, long relativeOffs) throws IOException {
+        delegate.seek(disk, relativeOffs);
     }
 
     @Override

@@ -111,7 +111,7 @@ public final class ZipModel {
         int disk = (int)getZipEntryByFileName(fileName).getDisk();
         SrcZip.Disk item = srcZip.getDisk(disk);
         DataInput res = new ZipInputStream(this);
-        res.seek(item.getAbsOffs());
+        res.seek(item.getAbsoluteOffs());
         return res;
     }
 

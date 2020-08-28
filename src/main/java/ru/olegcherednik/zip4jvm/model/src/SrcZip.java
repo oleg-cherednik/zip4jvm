@@ -54,7 +54,7 @@ public abstract class SrcZip {
     // TODO simplify for loop
     public Disk getDiskByAbsOffs(long absOffs) {
         for (SrcZip.Disk disk : disks) {
-            if (disk.getAbsOffs() + disk.getLength() <= absOffs && !isLast(disk))
+            if (disk.getAbsoluteOffs() + disk.getLength() <= absOffs && !isLast(disk))
                 continue;
 
             return disk;
@@ -92,12 +92,12 @@ public abstract class SrcZip {
         private final int pos;
         private final Path file;
         /** Absolute offs of this disk starting from the beginning of the first disk */
-        private final long absOffs;
+        private final long absoluteOffs;
         private final long length;
 
         @Override
         public String toString() {
-            return String.format("%s (offs: %s)", file, absOffs);
+            return String.format("%s (offs: %s)", file, absoluteOffs);
         }
     }
 

@@ -56,10 +56,16 @@ public class LittleEndianDataInputFile implements DataInputFile {
     }
 
     @Override
-    public void seek(long absOffs) throws IOException {
-        openDisk(srcZip.getDiskByAbsOffs(absOffs));
-        long relOffs = absOffs - disk.getAbsOffs();
-        in.seek(relOffs);
+    public void seek(long absoluteOffs) throws IOException {
+        openDisk(srcZip.getDiskByAbsOffs(absoluteOffs));
+        long relativeOffs = absoluteOffs - disk.getAbsoluteOffs();
+        in.seek(relativeOffs);
+    }
+
+    @Override
+    public void seek(int disk, long relativeOffs) throws IOException {
+        openDisk(srcZip.getDisk(disk));
+        in.seek(relativeOffs);
     }
 
     @Override
@@ -95,12 +101,12 @@ public class LittleEndianDataInputFile implements DataInputFile {
 
     @Override
     public long getAbsoluteOffs() {
-        return disk.getAbsOffs() + getDiskRelativeOffs();
+        return disk.getAbsoluteOffs() + getDiskRelativeOffs();
     }
 
     @Override
-    public long toAbsoluteOffs(int disk, long relativeOffs) {
-        return srcZip.getDisk(disk).getAbsOffs() + relativeOffs;
+    public long toAbsOffs(int disk, long relativeOffs) {
+        return srcZip.getDisk(disk).getAbsoluteOffs() + relativeOffs;
     }
 
     @Override
