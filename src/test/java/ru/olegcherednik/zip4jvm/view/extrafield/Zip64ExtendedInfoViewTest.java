@@ -27,7 +27,7 @@ public class Zip64ExtendedInfoViewTest {
 
         Zip64.ExtendedInfo record = Zip64.ExtendedInfo.builder()
                                                       .disk(2)
-                                                      .localFileHeaderOffs(145)
+                                                      .localFileHeaderRelativeOffs(145)
                                                       .compressedSize(11208273150L)
                                                       .uncompressedSize(11322883953L).build();
 
@@ -63,7 +63,7 @@ public class Zip64ExtendedInfoViewTest {
 
         Zip64.ExtendedInfo record = Zip64.ExtendedInfo.builder()
                                                       .disk(2)
-                                                      .localFileHeaderOffs(145)
+                                                      .localFileHeaderRelativeOffs(145)
                                                       .compressedSize(11208273150L)
                                                       .uncompressedSize(11322883953L).build();
 

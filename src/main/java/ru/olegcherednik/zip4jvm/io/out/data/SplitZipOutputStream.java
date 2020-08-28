@@ -20,7 +20,7 @@ public class SplitZipOutputStream extends BaseZipDataOutput {
     /** see 8.5.5 */
     public static final int SPLIT_SIGNATURE = DataDescriptor.SIGNATURE;
 
-    private long disk;
+    private int disk;
 
     public SplitZipOutputStream(ZipModel zipModel) throws IOException {
         super(zipModel);

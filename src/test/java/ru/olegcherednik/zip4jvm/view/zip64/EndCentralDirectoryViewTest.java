@@ -89,7 +89,7 @@ public class EndCentralDirectoryViewTest {
         endCentralDirectory.setDiskEntries(13);
         endCentralDirectory.setTotalEntries(15);
         endCentralDirectory.setCentralDirectorySize(115);
-        endCentralDirectory.setCentralDirectoryOffs(11208273213L);
+        endCentralDirectory.setCentralDirectoryRelativeOffs(11208273213L);
         return endCentralDirectory;
     }
 }

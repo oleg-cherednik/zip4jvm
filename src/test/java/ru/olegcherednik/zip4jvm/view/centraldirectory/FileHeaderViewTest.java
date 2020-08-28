@@ -197,7 +197,7 @@ public class FileHeaderViewTest {
         fileHeader.setCommentLength(comment == null ? 0 : comment.length());
         fileHeader.setDisk(1);
         fileHeader.setExternalFileAttributes(externalFileAttributes);
-        fileHeader.setLocalFileHeaderOffs(293899);
+        fileHeader.setLocalFileHeaderRelativeOffs(293899);
         fileHeader.setFileName("ducati-panigale-1199.jpg");
 
         if (extraField) {

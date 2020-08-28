@@ -41,7 +41,7 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
         decryptionHeader.setEncryptedRandomData(in.readBytes(encryptedRandomDataSize));
         int recipientCount = (int)in.readDword();
 
-        realBigZip64(recipientCount, "recipientCount");
+        realBigZip64(recipientCount, "zip64.decryptionHeader.recipientCount");
 
         decryptionHeader.setHashAlgorithm(passwordKey ? 0 : in.readWord());
         int hashSize = passwordKey ? 0x0 : in.readWord();

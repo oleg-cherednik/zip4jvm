@@ -98,7 +98,7 @@ public final class ZipEntryBuilder {
             zipEntry.setUncompressedSize(getUncompressedSize());
             zipEntry.setCompressedSize(getCompressedSize());
             zipEntry.setDisk(getDisk());
-            zipEntry.setLocalFileHeaderOffs(getLocalFileHeaderOffs());
+            zipEntry.setLocalFileHeaderRelativeOffs(getLocalFileHeaderOffs());
             return zipEntry;
         }
 
@@ -138,9 +138,9 @@ public final class ZipEntryBuilder {
             return zipEntry -> EntryInputStream.create(zipEntry, charsetCustomizer, zipModel.createDataInput(zipEntry.getFileName()));
         }
 
-        private long getDisk() {
+        private int getDisk() {
             if (fileHeader.getDisk() == MAX_TOTAL_DISKS)
-                return fileHeader.getExtraField().getExtendedInfo().getDisk();
+                return (int)fileHeader.getExtraField().getExtendedInfo().getDisk();
             return fileHeader.getDisk();
         }
 
@@ -157,9 +157,9 @@ public final class ZipEntryBuilder {
         }
 
         private long getLocalFileHeaderOffs() {
-            if (fileHeader.getLocalFileHeaderOffs() == MAX_LOCAL_FILE_HEADER_OFFS)
-                return fileHeader.getExtraField().getExtendedInfo().getLocalFileHeaderOffs();
-            return fileHeader.getLocalFileHeaderOffs();
+            if (fileHeader.getLocalFileHeaderRelativeOffs() == MAX_LOCAL_FILE_HEADER_OFFS)
+                return fileHeader.getExtraField().getExtendedInfo().getLocalFileHeaderRelativeOffs();
+            return fileHeader.getLocalFileHeaderRelativeOffs();
         }
 
     }

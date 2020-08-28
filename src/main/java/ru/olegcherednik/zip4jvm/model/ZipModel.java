@@ -47,7 +47,7 @@ public final class ZipModel {
     private String comment;
     private long totalDisks;
     private long mainDisk;
-    private long centralDirectoryOffs;
+    private long centralDirectoryRelativeOffs;
     private long centralDirectorySize;
 
     /**
@@ -108,10 +108,8 @@ public final class ZipModel {
     }
 
     public DataInput createDataInput(String fileName) throws IOException {
-        int disk = (int)getZipEntryByFileName(fileName).getDisk();
-        SrcZip.Disk item = srcZip.getDisk(disk);
-        DataInput res = new ZipInputStream(this);
-        res.seek(item.getAbsoluteOffs());
+        DataInput res = createDataInput();
+        res.seek(srcZip.getDisk(getZipEntryByFileName(fileName).getDisk()).getAbsoluteOffs());
         return res;
     }
 

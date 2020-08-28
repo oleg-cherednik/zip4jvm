@@ -116,7 +116,7 @@ public class EndCentralDirectoryViewTest {
         endCentralDirectory.setDiskEntries(13);
         endCentralDirectory.setTotalEntries(15);
         endCentralDirectory.setCentralDirectorySize(81);
-        endCentralDirectory.setCentralDirectoryOffs(centralDirectoryOffs);
+        endCentralDirectory.setCentralDirectoryRelativeOffs(centralDirectoryOffs);
         endCentralDirectory.setComment("password: 1");
         return endCentralDirectory;
     }

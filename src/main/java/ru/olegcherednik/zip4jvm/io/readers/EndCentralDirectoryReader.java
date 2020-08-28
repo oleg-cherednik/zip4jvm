@@ -29,7 +29,7 @@ public class EndCentralDirectoryReader implements Reader<EndCentralDirectory> {
         endCentralDirectory.setDiskEntries(in.readWord());
         endCentralDirectory.setTotalEntries(in.readWord());
         endCentralDirectory.setCentralDirectorySize(in.readDword());
-        endCentralDirectory.setCentralDirectoryOffs(in.readDword());
+        endCentralDirectory.setCentralDirectoryRelativeOffs(in.readDword());
         int commentLength = in.readWord();
         endCentralDirectory.setComment(in.readString(commentLength, customizeCharset.apply(Charsets.IBM437)));
         return endCentralDirectory;

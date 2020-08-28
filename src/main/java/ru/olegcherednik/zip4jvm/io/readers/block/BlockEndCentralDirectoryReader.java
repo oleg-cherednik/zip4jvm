@@ -28,6 +28,8 @@ public class BlockEndCentralDirectoryReader extends EndCentralDirectoryReader {
         // TODO temporary
         block.setAbsoluteOffs(in.getAbsoluteOffs());
         block.setRelativeOffs(in.getDiskRelativeOffs());
+        // TODO end temporary
+
         EndCentralDirectory endCentralDirectory = super.read(in);
 
         if (in instanceof ZipInputStream)

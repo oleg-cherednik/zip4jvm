@@ -26,7 +26,7 @@ public class EndCentralDirectoryLocatorViewTest {
 
         Zip64.EndCentralDirectoryLocator locator = mock(Zip64.EndCentralDirectoryLocator.class);
         when(locator.getMainDisk()).thenReturn(1L);
-        when(locator.getOffs()).thenReturn(11208273328L);
+        when(locator.getEndCentralDirectoryRelativeOffs()).thenReturn(11208273328L);
         when(locator.getTotalDisks()).thenReturn(5L);
 
         String[] lines = Zip4jvmSuite.execute(new Zip64View.EndCentralDirectoryLocatorView(locator, block, 2, 52, 0));
@@ -49,7 +49,7 @@ public class EndCentralDirectoryLocatorViewTest {
 
         Zip64.EndCentralDirectoryLocator locator = mock(Zip64.EndCentralDirectoryLocator.class);
         when(locator.getMainDisk()).thenReturn(1L);
-        when(locator.getOffs()).thenReturn(11208273328L);
+        when(locator.getEndCentralDirectoryRelativeOffs()).thenReturn(11208273328L);
         when(locator.getTotalDisks()).thenReturn(5L);
 
         String[] lines = Zip4jvmSuite.execute(new Zip64View.EndCentralDirectoryLocatorView(locator, block, 2, 52, 5));

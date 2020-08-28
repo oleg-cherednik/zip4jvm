@@ -21,7 +21,7 @@ public abstract class EntryOutputStream extends EntryMetadataOutputStream {
 
         // TODO move it to the separate method
         zipModel.addEntry(zipEntry);
-        zipEntry.setLocalFileHeaderOffs(out.getOffs());
+        zipEntry.setLocalFileHeaderRelativeOffs(out.getOffs());
 
         os.writeLocalFileHeader();
         os.writeEncryptionHeader();

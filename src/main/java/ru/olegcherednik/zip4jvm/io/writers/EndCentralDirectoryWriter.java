@@ -27,7 +27,7 @@ final class EndCentralDirectoryWriter implements Writer {
         out.writeWord(endCentralDirectory.getDiskEntries());
         out.writeWord(endCentralDirectory.getTotalEntries());
         out.writeDword(endCentralDirectory.getCentralDirectorySize());
-        out.writeDword(endCentralDirectory.getCentralDirectoryOffs());
+        out.writeDword(endCentralDirectory.getCentralDirectoryRelativeOffs());
         out.writeWord(comment.length);
         out.writeBytes(comment);
     }

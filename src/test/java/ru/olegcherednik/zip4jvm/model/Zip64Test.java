@@ -73,7 +73,7 @@ public class Zip64Test {
         verify(out, never()).writeDword(any(long.class));
         reset(out);
 
-        Zip64.ExtendedInfo.builder().localFileHeaderOffs(3).build().write(out);
+        Zip64.ExtendedInfo.builder().localFileHeaderRelativeOffs(3).build().write(out);
         verify(out, times(1)).writeQword(eq(3L));
         verify(out, never()).writeDword(any(long.class));
         reset(out);

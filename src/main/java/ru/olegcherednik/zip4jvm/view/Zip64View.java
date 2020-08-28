@@ -32,7 +32,7 @@ public final class Zip64View {
         public boolean print(PrintStream out) {
             printTitle(out, Zip64.EndCentralDirectoryLocator.SIGNATURE, "ZIP64 End of Central directory locator", block);
             printLine(out, String.format("part number of new-end-of-central-dir (%04X):", locator.getMainDisk()), locator.getMainDisk() + 1);
-            printLine(out, "relative offset of new-end-of-central-dir:", String.format("%1$d (0x%1$08X) bytes", locator.getOffs()));
+            printLine(out, "relative offset of new-end-of-central-dir:", String.format("%1$d (0x%1$08X) bytes", locator.getEndCentralDirectoryRelativeOffs()));
             printLine(out, "total number of parts in archive:", locator.getTotalDisks());
             return true;
         }
@@ -63,7 +63,7 @@ public final class Zip64View {
             printLine(out, "number of entries in central dir in this part:", dir.getDiskEntries());
             printLine(out, "total number of entries in central dir:", dir.getTotalEntries());
             printLine(out, "size of central dir:", String.format("%1$d (0x%1$08X) bytes", dir.getCentralDirectorySize()));
-            printLine(out, "relative offset of central dir:", String.format("%1$d (0x%1$08X) bytes", dir.getCentralDirectoryOffs()));
+            printLine(out, "relative offset of central dir:", String.format("%1$d (0x%1$08X) bytes", dir.getCentralDirectoryRelativeOffs()));
             printExtensibleDataSector(out);
             return true;
         }

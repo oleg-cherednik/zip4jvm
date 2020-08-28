@@ -47,9 +47,7 @@ public class BlockZipEntryReader {
     }
 
     private void readLocalFileHeader(ZipEntry zipEntry, DataInput in) throws IOException {
-        int disk = (int)zipEntry.getDisk();
-        long relativeOffs = zipEntry.getLocalFileHeaderOffs();
-        long absoluteOffs = in.convertToAbsoluteOffs(disk, relativeOffs);
+        long absoluteOffs = in.convertToAbsoluteOffs(zipEntry.getDisk(), zipEntry.getLocalFileHeaderRelativeOffs());
 
         BlockLocalFileHeaderReader reader = new BlockLocalFileHeaderReader(absoluteOffs, customizeCharset);
         LocalFileHeader localFileHeader = reader.read(in);

@@ -39,7 +39,7 @@ public class ExistedEntryWriter implements Writer {
         entry.setPassword(entry.isEncrypted() ? password : null);
 
         long offs = out.getOffs();
-        long disk = out.getDisk();
+        int disk = out.getDisk();
 
         try (CopyEntryInputStream in = new CopyEntryInputStream(entry, srcZipModel)) {
             if (!destZipModel.hasEntry(entryName))
@@ -51,7 +51,7 @@ public class ExistedEntryWriter implements Writer {
             // TODO probably should set compressed size here
         }
 
-        entry.setLocalFileHeaderOffs(offs);
+        entry.setLocalFileHeaderRelativeOffs(offs);
         entry.setDisk(disk);
     }
 
@@ -71,9 +71,7 @@ public class ExistedEntryWriter implements Writer {
         }
 
         public void copyLocalFileHeader(DataOutput out) throws IOException {
-            int disk = (int)zipEntry.getDisk();
-            long relativeOffs = zipEntry.getLocalFileHeaderOffs();
-            long absoluteOffs = in.convertToAbsoluteOffs(disk, relativeOffs);
+            long absoluteOffs = in.convertToAbsoluteOffs(zipEntry.getDisk(), zipEntry.getLocalFileHeaderRelativeOffs());
             LocalFileHeader localFileHeader = new LocalFileHeaderReader(absoluteOffs, Charsets.UNMODIFIED).read(in);
             zipEntry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
             new LocalFileHeaderWriter(localFileHeader).write(out);

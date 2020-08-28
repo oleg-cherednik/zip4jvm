@@ -41,7 +41,7 @@ public final class EndCentralDirectoryView extends BaseView {
     }
 
     private void printCentralDirectoryOffs(PrintStream out) {
-        long centralDirectoryOffs = Math.min(Zip64.LIMIT_DWORD, dir.getCentralDirectoryOffs());
+        long centralDirectoryOffs = Math.min(Zip64.LIMIT_DWORD, dir.getCentralDirectoryRelativeOffs());
         printLine(out, "relative offset of central dir:", String.format("%1$d (0x%1$08X) bytes", centralDirectoryOffs));
 
         if (centralDirectoryOffs == Zip64.LIMIT_DWORD)
