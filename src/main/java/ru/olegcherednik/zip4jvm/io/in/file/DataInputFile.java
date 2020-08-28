@@ -30,6 +30,9 @@ public interface DataInputFile extends Closeable, RandomAccess {
 
     // TODO temporary
     @Deprecated
-    int getDisk();
+    int getDiskNum();
+
+    @Deprecated
+    SrcZip.Disk getDisk();
 
 }

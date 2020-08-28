@@ -39,8 +39,13 @@ public final class DecoderDataInputDecorator extends BaseDataInput implements De
 
     // TODO temporary
     @Override
-    public long getDisk() {
+    public long getDiskNum() {
         return 0;
+    }
+
+    @Override
+    public SrcZip.Disk getDisk() {
+        return delegate.getDisk();
     }
 
     @Override
