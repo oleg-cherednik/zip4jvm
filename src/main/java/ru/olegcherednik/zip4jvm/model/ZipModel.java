@@ -8,9 +8,9 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.SingleZipInputStream;
-import ru.olegcherednik.zip4jvm.model.src.SrcFile;
+import ru.olegcherednik.zip4jvm.io.in.data.ZipInputStream;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.model.src.SrcFile;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -110,14 +110,14 @@ public final class ZipModel {
     public DataInput createDataInput(String fileName) throws IOException {
         int disk = (int)getZipEntryByFileName(fileName).getDisk();
         SrcFile.Item item = srcFile.getItems().get(disk);
-        DataInput res = new SingleZipInputStream(this);
+        DataInput res = new ZipInputStream(this);
         res.seek(item.getOffs());
         return res;
     }
 
     public DataInput createDataInput() throws IOException {
         SrcFile.Item item = srcFile.getDisk(0);
-        DataInput res = new SingleZipInputStream(this);
+        DataInput res = new ZipInputStream(this);
         res.seek(item.getOffs());
         return res;
     }

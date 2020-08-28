@@ -1,14 +1,10 @@
 package ru.olegcherednik.zip4jvm.model.src;
 
-import lombok.Getter;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import ru.olegcherednik.zip4jvm.exception.SplitPartNotFoundException;
-import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
-import ru.olegcherednik.zip4jvm.io.in.file.SrcFileLittleEndianReadFile;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -28,7 +24,6 @@ import java.util.List;
  * @author Oleg Cherednik
  * @since 20.01.2020
  */
-@Getter
 final class SevenZipSplitSrcFile extends SrcFile {
 
     public static boolean isCandidate(Path file) {
@@ -70,17 +65,6 @@ final class SevenZipSplitSrcFile extends SrcFile {
 
     private SevenZipSplitSrcFile(Path path, List<Item> items) {
         super(path, items);
-    }
-
-    @Override
-    public boolean isSplit() {
-        // TODO on this result we check split signature (this is valid only for standard split zip) - see ZipModel.createDataInput()
-        return false;
-    }
-
-    @Override
-    public DataInputFile dataInputFile() throws IOException {
-        return new SrcFileLittleEndianReadFile(this);
     }
 
 }

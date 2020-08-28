@@ -3,8 +3,8 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 import lombok.Getter;
 import lombok.Setter;
 import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
-import ru.olegcherednik.zip4jvm.model.src.SrcFile;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.src.SrcFile;
 
 import java.io.IOException;
 
@@ -13,14 +13,22 @@ import java.io.IOException;
  * @since 12.12.2019
  */
 @Getter
-abstract class BaseZipDataInput extends BaseDataInput implements ZipDataInput {
+public class ZipInputStream extends BaseDataInput implements ZipDataInput {
 
-    protected final ZipModel zipModel;
-    protected DataInputFile delegate;
+    private final ZipModel zipModel;
+    private final DataInputFile delegate;
     @Setter
-    protected String fileName;
+    private String fileName;
 
-    protected BaseZipDataInput(ZipModel zipModel, SrcFile srcFile) throws IOException {
+    public ZipInputStream(SrcFile srcFile) throws IOException {
+        this(null, srcFile);
+    }
+
+    public ZipInputStream(ZipModel zipModel) throws IOException {
+        this(zipModel, zipModel.getSrcFile());
+    }
+
+    private ZipInputStream(ZipModel zipModel, SrcFile srcFile) throws IOException {
         this.zipModel = zipModel;
         delegate = srcFile.dataInputFile();
         fileName = srcFile.getPath().getFileName().toString();
@@ -39,6 +47,11 @@ abstract class BaseZipDataInput extends BaseDataInput implements ZipDataInput {
     @Override
     public long length() throws IOException {
         return delegate.length();
+    }
+
+    @Override
+    public int read(byte[] buf, int offs, int len) throws IOException {
+        return delegate.read(buf, offs, len);
     }
 
     @Override

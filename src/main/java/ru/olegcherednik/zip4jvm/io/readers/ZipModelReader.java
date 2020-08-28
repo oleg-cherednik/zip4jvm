@@ -1,10 +1,10 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.SingleZipInputStream;
-import ru.olegcherednik.zip4jvm.model.src.SrcFile;
+import ru.olegcherednik.zip4jvm.io.in.data.ZipInputStream;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
+import ru.olegcherednik.zip4jvm.model.src.SrcFile;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -27,7 +27,7 @@ public final class ZipModelReader extends BaseZipModelReader {
 
     @Override
     protected DataInput createDataInput() throws IOException {
-        return new SingleZipInputStream(srcFile);
+        return new ZipInputStream(srcFile);
     }
 
     @Override

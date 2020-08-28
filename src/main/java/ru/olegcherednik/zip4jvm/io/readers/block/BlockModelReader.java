@@ -1,8 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.SingleZipInputStream;
-import ru.olegcherednik.zip4jvm.model.src.SrcFile;
+import ru.olegcherednik.zip4jvm.io.in.data.ZipInputStream;
 import ru.olegcherednik.zip4jvm.io.readers.BaseZipModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.CentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.EndCentralDirectoryReader;
@@ -14,6 +13,7 @@ import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.Zip64Block;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
+import ru.olegcherednik.zip4jvm.model.src.SrcFile;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -62,7 +62,7 @@ public final class BlockModelReader extends BaseZipModelReader {
 
     @Override
     protected DataInput createDataInput() throws IOException {
-        return new CentralDataInputStream(srcFile);
+        return new ZipInputStream(srcFile);
     }
 
     @Override
@@ -80,17 +80,5 @@ public final class BlockModelReader extends BaseZipModelReader {
         return new BlockCentralDirectoryReader(totalEntries, customizeCharset, centralDirectoryBlock);
     }
 
-    public static final class CentralDataInputStream extends SingleZipInputStream {
-
-        public CentralDataInputStream(SrcFile srcFile) throws IOException {
-            super(srcFile);
-        }
-
-        @Override
-        public long getDisk() {
-            return delegate.getDisk();
-        }
-
-    }
 }
 

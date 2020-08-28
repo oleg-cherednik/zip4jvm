@@ -3,15 +3,12 @@ package ru.olegcherednik.zip4jvm.model.src;
 import org.apache.commons.io.FilenameUtils;
 import ru.olegcherednik.zip4jvm.exception.SplitPartNotFoundException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.SingleZipInputStream;
-import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
-import ru.olegcherednik.zip4jvm.io.in.file.SrcFileLittleEndianReadFile;
+import ru.olegcherednik.zip4jvm.io.in.data.ZipInputStream;
 import ru.olegcherednik.zip4jvm.io.readers.BaseZipModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.EndCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -22,7 +19,7 @@ import java.util.List;
  * @author Oleg Cherednik
  * @since 25.08.2020
  */
-class StandardSplitSrcFile extends SrcFile {
+final class StandardSplitSrcFile extends SrcFile {
 
     public static boolean isCandidate(Path file) {
         return Files.isReadable(file) && getTotalDisks(file) > 0;
@@ -70,7 +67,7 @@ class StandardSplitSrcFile extends SrcFile {
     }
 
     private static int getTotalDisks(Path file) {
-        try (DataInput in = new SingleZipInputStream(StandardSolidSrcFile.create(file))) {
+        try (DataInput in = new ZipInputStream(StandardSolidSrcFile.create(file))) {
             BaseZipModelReader.findCentralDirectorySignature(in);
             return new EndCentralDirectoryReader(Charsets.UNMODIFIED).read(in).getTotalDisks();
         } catch(Exception e) {
@@ -80,11 +77,6 @@ class StandardSplitSrcFile extends SrcFile {
 
     private StandardSplitSrcFile(Path path, List<Item> items) {
         super(path, items);
-    }
-
-    @Override
-    public DataInputFile dataInputFile() throws IOException {
-        return new SrcFileLittleEndianReadFile(this);
     }
 
 }

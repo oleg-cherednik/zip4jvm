@@ -6,6 +6,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.file.SrcFileLittleEndianReadFile;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import java.io.File;
@@ -18,6 +19,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
+ * Represents either single solid zip file or split zip with multiple disks.
+ *
  * @author Oleg Cherednik
  * @since 20.01.2020
  */
@@ -50,7 +53,9 @@ public abstract class SrcFile {
         return disk <= items.size() ? items.get(disk - 1) : null;
     }
 
-    public abstract DataInputFile dataInputFile() throws IOException;
+    public DataInputFile dataInputFile() throws IOException {
+        return new SrcFileLittleEndianReadFile(this);
+    }
 
     public boolean isSplit() {
         return items.size() > 1;
