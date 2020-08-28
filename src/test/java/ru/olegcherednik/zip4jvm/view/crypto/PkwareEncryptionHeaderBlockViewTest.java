@@ -22,7 +22,7 @@ public class PkwareEncryptionHeaderBlockViewTest {
         PkwareEncryptionHeaderBlock block = mock(PkwareEncryptionHeaderBlock.class);
 
         when(block.getSize()).thenReturn(4L);
-        when(block.getOffs()).thenReturn(60L);
+        when(block.getRelativeOffs()).thenReturn(60L);
         when(block.getData()).thenReturn(new byte[] { 0x0, 0x1, 0x2, 0x3 });
 
         String[] lines = Zip4jvmSuite.execute(new PkwareEncryptionHeaderView(block, 1, 2, 52, 0));

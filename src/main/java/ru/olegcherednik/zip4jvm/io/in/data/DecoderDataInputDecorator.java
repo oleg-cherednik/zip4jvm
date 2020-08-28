@@ -33,8 +33,8 @@ public final class DecoderDataInputDecorator extends BaseDataInput implements De
     }
 
     @Override
-    public long convertToAbsoluteOffs(int disk, long relOffs) {
-        return delegate.convertToAbsoluteOffs(disk, relOffs);
+    public long convertToAbsoluteOffs(int disk, long relativeOffs) {
+        return delegate.convertToAbsoluteOffs(disk, relativeOffs);
     }
 
     @Override
@@ -85,11 +85,6 @@ public final class DecoderDataInputDecorator extends BaseDataInput implements De
     @Override
     public void seek(int disk, long relativeOffs) throws IOException {
         delegate.seek(disk, relativeOffs);
-    }
-
-    @Override
-    public SrcZip getSrcFile() {
-        return delegate.getSrcFile();
     }
 
     @Override

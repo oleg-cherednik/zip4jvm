@@ -25,10 +25,10 @@ public class BlockAesHeaderReader implements Reader<AesEncryptionHeaderBlock> {
     @Override
     public AesEncryptionHeaderBlock read(DataInput in) throws IOException {
         AesEncryptionHeaderBlock block = new AesEncryptionHeaderBlock();
-        block.getSalt().calc(in, () -> in.readBytes(strength.saltLength()));
-        block.getPasswordChecksum().calc(in, () -> in.readBytes(PASSWORD_CHECKSUM_SIZE));
+        block.getSalt().calcSize(in, () -> in.readBytes(strength.saltLength()));
+        block.getPasswordChecksum().calcSize(in, () -> in.readBytes(PASSWORD_CHECKSUM_SIZE));
         in.skip(AesEngine.getDataCompressedSize(compressedSize, strength.saltLength()));
-        block.getMac().calc(in, () -> in.readBytes(MAC_SIZE));
+        block.getMac().calcSize(in, () -> in.readBytes(MAC_SIZE));
         return block;
     }
 

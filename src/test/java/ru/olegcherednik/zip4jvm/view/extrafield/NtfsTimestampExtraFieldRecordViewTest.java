@@ -29,7 +29,7 @@ public class NtfsTimestampExtraFieldRecordViewTest {
     public void shouldRetrieveAllDataWhenAllDataSet() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(36L);
-        when(block.getOffs()).thenReturn(11208273272L);
+        when(block.getRelativeOffs()).thenReturn(11208273272L);
 
         NtfsTimestampExtraFieldRecord.Tag tagOne = NtfsTimestampExtraFieldRecord.OneTag.builder()
                                                                                        .lastModificationTime(lastModifiedTime)
@@ -73,7 +73,7 @@ public class NtfsTimestampExtraFieldRecordViewTest {
     public void shouldRetrieveAllDataWithDiskWhenSplit() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(36L);
-        when(block.getOffs()).thenReturn(11208273272L);
+        when(block.getRelativeOffs()).thenReturn(11208273272L);
         when(block.getDisk()).thenReturn(5L);
         when(block.getFileName()).thenReturn("src.zip");
 

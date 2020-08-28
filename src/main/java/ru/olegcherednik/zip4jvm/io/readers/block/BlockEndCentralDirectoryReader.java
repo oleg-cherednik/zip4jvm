@@ -27,14 +27,14 @@ public class BlockEndCentralDirectoryReader extends EndCentralDirectoryReader {
     public EndCentralDirectory read(DataInput in) throws IOException {
         // TODO temporary
         block.setAbsoluteOffs(in.getAbsoluteOffs());
-        block.setOffs(in.getDiskRelativeOffs());
+        block.setRelativeOffs(in.getDiskRelativeOffs());
         EndCentralDirectory endCentralDirectory = super.read(in);
 
         if (in instanceof ZipInputStream)
             ((ZipInputStream)in).setFileName(in.getFileName());
 
         block.setDisk(Math.max(0, in.getDisk().getPos() - 1), in.getFileName());
-        block.calc(in.getAbsoluteOffs());
+        block.calcSize(in);
 
         return endCentralDirectory;
     }

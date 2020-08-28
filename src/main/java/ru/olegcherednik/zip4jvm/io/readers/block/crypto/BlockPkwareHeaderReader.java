@@ -16,7 +16,7 @@ public class BlockPkwareHeaderReader implements Reader<PkwareEncryptionHeaderBlo
     @Override
     public PkwareEncryptionHeaderBlock read(DataInput in) throws IOException {
         PkwareEncryptionHeaderBlock encryptionHeader = new PkwareEncryptionHeaderBlock();
-        encryptionHeader.calc(in, () -> in.readBytes(PkwareHeader.SIZE));
+        encryptionHeader.calcSize(in, () -> in.readBytes(PkwareHeader.SIZE));
         return encryptionHeader;
     }
 }

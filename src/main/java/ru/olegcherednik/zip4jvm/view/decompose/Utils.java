@@ -30,7 +30,7 @@ final class Utils {
     }
 
     public static void copyLarge(ZipModel zipModel, Path out, Block block) throws IOException {
-        copyLarge(zipModel, out, block.getOffs(), block.getSize());
+        copyLarge(zipModel, out, block.getRelativeOffs(), block.getSize());
     }
 
     public static void copyLarge(ZipModel zipModel, Path out, long offs, long size) throws IOException {

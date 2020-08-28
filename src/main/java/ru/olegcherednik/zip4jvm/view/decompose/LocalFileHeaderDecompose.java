@@ -100,7 +100,7 @@ public final class LocalFileHeaderDecompose implements Decompose {
         ExtraFieldBlock extraFieldBlock = diagLocalFileHeader.getExtraFieldBlock();
 
         long size = zipEntry.getCompressedSize();
-        long offs = content.getOffs() + content.getSize() + extraFieldBlock.getSize();
+        long offs = content.getRelativeOffs() + content.getSize() + extraFieldBlock.getSize();
 
         EncryptionMethod encryptionMethod = zipEntry.getEncryptionMethod();
 

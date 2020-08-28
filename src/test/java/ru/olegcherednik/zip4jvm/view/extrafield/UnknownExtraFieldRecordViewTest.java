@@ -21,7 +21,7 @@ public class UnknownExtraFieldRecordViewTest {
     public void shouldRetrieveAllDataWhenAllDataSet() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(36L);
-        when(block.getOffs()).thenReturn(11208273272L);
+        when(block.getRelativeOffs()).thenReturn(11208273272L);
 
         ExtraField.Record.Unknown record = ExtraField.Record.Unknown.builder().signature(0x0666).build();
 
@@ -40,7 +40,7 @@ public class UnknownExtraFieldRecordViewTest {
     public void shouldRetrieveAllDataWithDiskWhenSplit() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(36L);
-        when(block.getOffs()).thenReturn(11208273272L);
+        when(block.getRelativeOffs()).thenReturn(11208273272L);
         when(block.getDisk()).thenReturn(5L);
         when(block.getFileName()).thenReturn("src.zip");
 

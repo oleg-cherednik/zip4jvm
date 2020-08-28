@@ -88,7 +88,7 @@ public abstract class BaseView implements View {
     }
 
     public void printValueWithLocation(PrintStream out, String valueName, Block block) {
-        printLine(out, valueName, String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
+        printLine(out, valueName, String.format("%1$d (0x%1$08X) bytes", block.getRelativeOffs()));
 
         requireZeroOrPositive(totalDisks, "BaseView.totalDisks");
 
@@ -99,7 +99,7 @@ public abstract class BaseView implements View {
     }
 
     public void printValueWithLocation(PrintStream out, String valueName, Block block, int total) {
-        printLine(out, valueName, String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
+        printLine(out, valueName, String.format("%1$d (0x%1$08X) bytes", block.getRelativeOffs()));
 
         requireZeroOrPositive(totalDisks, "BaseView.totalDisks");
 
@@ -123,7 +123,7 @@ public abstract class BaseView implements View {
         if (totalDisks > 0)
             printLine(out, String.format("- disk (%04X):", block.getDisk()), block.getFileName());
 
-        printLine(out, "- location:", String.format("%1$d (0x%1$08X) bytes", block.getOffs()));
+        printLine(out, "- location:", String.format("%1$d (0x%1$08X) bytes", block.getRelativeOffs()));
         printLine(out, "- size:", String.format("%s bytes", block.getSize()));
     }
 

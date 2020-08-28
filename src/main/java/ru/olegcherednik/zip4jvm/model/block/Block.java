@@ -23,7 +23,7 @@ public class Block {
 
     private long size;
     @Setter
-    private long offs;
+    private long relativeOffs;
     @Setter
     private long absoluteOffs;
     private long disk;
@@ -31,21 +31,21 @@ public class Block {
     @Setter
     private ZipModel zipModel;
 
-    public <T> T calc(DataInput in, LocalSupplier<T> task) throws IOException {
+    public <T> T calcSize(DataInput in, LocalSupplier<T> task) throws IOException {
         try {
             zipModel = in instanceof ZipDataInput ? ((ZipDataInput)in).getZipModel() : null;
             absoluteOffs = in.getAbsoluteOffs();
-            offs = in.getDiskRelativeOffs();
+            relativeOffs = in.getDiskRelativeOffs();
             disk = Math.max(0, in.getDisk().getPos() - 1);
             fileName = in.getFileName();
             return task.get();
         } finally {
-            calc(in.getAbsoluteOffs());
+            calcSize(in);
         }
     }
 
-    public void calc(long absoluteOffs) {
-        size = absoluteOffs - this.absoluteOffs;
+    public void calcSize(DataInput in) {
+        size = in.getAbsoluteOffs() - absoluteOffs;
     }
 
     public byte[] getData() {
@@ -53,7 +53,7 @@ public class Block {
             return ArrayUtils.EMPTY_BYTE_ARRAY;
 
         try (DataInput in = zipModel.createDataInput()) {
-            in.skip(offs);
+            in.skip(relativeOffs);
             return in.readBytes((int)size);
         } catch(Exception e) {
             e.printStackTrace();
@@ -68,6 +68,6 @@ public class Block {
 
     @Override
     public String toString() {
-        return String.format("offs: %d, size: %s, disk: %d", offs, size, disk);
+        return String.format("offs: %d, size: %s, disk: %d", relativeOffs, size, disk);
     }
 }

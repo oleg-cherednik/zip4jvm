@@ -19,12 +19,12 @@ public final class BlockZip64Reader extends Zip64Reader {
 
     @Override
     protected Zip64.EndCentralDirectoryLocator readEndCentralDirectoryLocator(DataInput in) throws IOException {
-        return zip64Block.getEndCentralDirectoryLocatorBlock().calc(in, () -> super.readEndCentralDirectoryLocator(in));
+        return zip64Block.getEndCentralDirectoryLocatorBlock().calcSize(in, () -> super.readEndCentralDirectoryLocator(in));
     }
 
     @Override
     protected Zip64.EndCentralDirectory readEndCentralDirectory(DataInput in) throws IOException {
-        return zip64Block.getEndCentralDirectoryBlock().calc(in, () -> super.readEndCentralDirectory(in));
+        return zip64Block.getEndCentralDirectoryBlock().calcSize(in, () -> super.readEndCentralDirectory(in));
     }
 
 }

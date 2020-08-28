@@ -26,7 +26,7 @@ public class BlockCentralDirectoryReader extends CentralDirectoryReader {
 
     @Override
     public CentralDirectory read(DataInput in) throws IOException {
-        return block.calc(in, () -> super.read(in));
+        return block.calcSize(in, () -> super.read(in));
     }
 
     @Override

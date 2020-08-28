@@ -28,7 +28,7 @@ public interface DataInput extends Closeable, RandomAccess {
     /** Retrieves offs starting from the beginning of the first disk */
     long getAbsoluteOffs();
 
-    long convertToAbsoluteOffs(int disk, long relOffs);
+    long convertToAbsoluteOffs(int disk, long relativeOffs);
 
     /** Retrieves offs starting from the beginning of the current disk */
     long getDiskRelativeOffs();
@@ -80,9 +80,5 @@ public interface DataInput extends Closeable, RandomAccess {
     void seek(int disk, long relativeOffs) throws IOException;
 
     void seek(String id) throws IOException;
-
-    // TODO temporary
-    @Deprecated
-    SrcZip getSrcFile();
 
 }

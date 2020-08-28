@@ -90,11 +90,6 @@ public class LittleEndianDataInputFile implements DataInputFile {
     }
 
     @Override
-    public SrcZip getSrcZip() {
-        return srcZip;
-    }
-
-    @Override
     public SrcZip.Disk getDisk() {
         return disk;
     }
@@ -105,7 +100,7 @@ public class LittleEndianDataInputFile implements DataInputFile {
     }
 
     @Override
-    public long toAbsOffs(int disk, long relativeOffs) {
+    public long convertToAbsoluteOffs(int disk, long relativeOffs) {
         return srcZip.getDisk(disk).getAbsoluteOffs() + relativeOffs;
     }
 
