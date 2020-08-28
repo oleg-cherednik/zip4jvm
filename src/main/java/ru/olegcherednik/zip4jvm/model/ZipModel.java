@@ -109,7 +109,7 @@ public final class ZipModel {
 
     public DataInput createDataInput(String fileName) throws IOException {
         int disk = (int)getZipEntryByFileName(fileName).getDisk();
-        SrcZip.Disk item = srcZip.getDisks().get(disk);
+        SrcZip.Disk item = srcZip.getDisk(disk);
         DataInput res = new ZipInputStream(this);
         res.seek(item.getOffs());
         return res;

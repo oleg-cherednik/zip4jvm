@@ -20,7 +20,7 @@ public class LittleEndianDataInputFile implements DataInputFile {
 
     public LittleEndianDataInputFile(SrcZip srcZip) throws IOException {
         this.srcZip = srcZip;
-        openDisk(srcZip.getDisks().get(0));
+        openDisk(srcZip.getDisk(0));
     }
 
     @Override
@@ -99,7 +99,7 @@ public class LittleEndianDataInputFile implements DataInputFile {
     }
 
     @Override
-    public long getAbsOffs() {
+    public long getOffs() {
         try {
             return disk.getOffs() + in.getFilePointer();
         } catch(IOException e) {
@@ -133,6 +133,6 @@ public class LittleEndianDataInputFile implements DataInputFile {
 
     @Override
     public String toString() {
-        return "offs: " + getAbsOffs() + " (0x" + Long.toHexString(getAbsOffs()) + ')';
+        return "offs: " + getOffs() + " (0x" + Long.toHexString(getOffs()) + ')';
     }
 }

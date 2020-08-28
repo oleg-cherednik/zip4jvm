@@ -37,7 +37,7 @@ public class ZipInputStream extends BaseDataInput implements ZipDataInput {
 
     @Override
     public long getOffs() {
-        return delegate.getAbsOffs();
+        return delegate.getOffs();
     }
 
     @Override

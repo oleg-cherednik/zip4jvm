@@ -31,7 +31,7 @@ public class BlockLocalFileHeaderReader extends LocalFileHeaderReader {
 
     private static long getOffs(ZipEntry zipEntry, DataInput in) {
         int disk = (int)zipEntry.getDisk();
-        long offs = in.getSrcFile().getDisks().get(disk).getOffs();
+        long offs = in.getSrcFile().getDisk(disk).getOffs();
         offs += zipEntry.getLocalFileHeaderOffs();
         return offs;
     }
