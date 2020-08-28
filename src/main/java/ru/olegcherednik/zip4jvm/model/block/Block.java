@@ -36,7 +36,7 @@ public class Block {
             zipModel = in instanceof ZipDataInput ? ((ZipDataInput)in).getZipModel() : null;
             absoluteOffs = in.getAbsoluteOffs();
             relativeOffs = in.getDiskRelativeOffs();
-            disk = Math.max(0, in.getDisk().getPos() - 1);
+            disk = in.getDisk().getPos();
             fileName = in.getFileName();
             return task.get();
         } finally {

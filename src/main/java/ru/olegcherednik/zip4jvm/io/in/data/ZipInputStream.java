@@ -92,7 +92,7 @@ public class ZipInputStream extends BaseDataInput implements ZipDataInput {
 
     @Override
     public String getFileName() {
-        return delegate.getDisk().getFile().getFileName().toString();
+        return getDisk().getFile().getFileName().toString();
     }
 
     @Override

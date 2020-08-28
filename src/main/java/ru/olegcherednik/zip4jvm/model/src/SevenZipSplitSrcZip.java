@@ -35,7 +35,7 @@ final class SevenZipSplitSrcZip extends SrcZip {
     }
 
     private static List<Disk> createDisks(Path zip) {
-        int i = 1;
+        int i = 0;
         long absoluteOffs = 0;
         List<Disk> disks = new LinkedList<>();
         Path dir = zip.getParent();
@@ -43,7 +43,7 @@ final class SevenZipSplitSrcZip extends SrcZip {
 
         for (Path diskPath : getDiskPaths(dir, baseName + "\\.\\d+")) {
             String actualFileName = diskPath.getFileName().toString();
-            String expectedFileName = String.format("%s.%03d", baseName, i);
+            String expectedFileName = String.format("%s.%03d", baseName, i + 1);
 
             if (!actualFileName.equals(expectedFileName) || !Files.isReadable(diskPath))
                 throw new SplitPartNotFoundException(dir.resolve(expectedFileName));

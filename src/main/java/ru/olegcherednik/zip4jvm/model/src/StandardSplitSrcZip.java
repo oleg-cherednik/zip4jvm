@@ -29,7 +29,7 @@ final class StandardSplitSrcZip extends SrcZip {
     }
 
     private static List<Disk> createDisks(Path zip) {
-        int i = 1;
+        int i = 0;
         long absoluteOffs = 0;
         List<Disk> disks = new LinkedList<>();
         Path dir = zip.getParent();
@@ -37,7 +37,7 @@ final class StandardSplitSrcZip extends SrcZip {
 
         for (Path diskPath : getDiskPaths(dir, baseName + "\\.z\\d+")) {
             String actualFileName = diskPath.getFileName().toString();
-            String expectedFileName = String.format("%s.z%02d", baseName, i);
+            String expectedFileName = String.format("%s.z%02d", baseName, i + 1);
 
             if (!actualFileName.equals(expectedFileName) || !Files.isReadable(diskPath))
                 throw new SplitPartNotFoundException(dir.resolve(expectedFileName));
@@ -52,8 +52,8 @@ final class StandardSplitSrcZip extends SrcZip {
             i++;
         }
 
-        if (i == getTotalDisks(zip))
-            throw new SplitPartNotFoundException(dir.resolve(String.format("%s.%02d", baseName, i)));
+        if (i + 1 == getTotalDisks(zip))
+            throw new SplitPartNotFoundException(dir.resolve(String.format("%s.%02d", baseName, i + 1)));
 
         disks.add(Disk.builder()
                       .pos(i)
