@@ -77,9 +77,4 @@ final class StandardSplitSrcZip extends SrcZip {
         super(zip, disks);
     }
 
-    @Override
-    public Disk getMainDisk() {
-        return disks.get(disks.size() - 1);
-    }
-
 }

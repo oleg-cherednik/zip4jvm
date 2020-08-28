@@ -56,7 +56,6 @@ public class Block {
             return ArrayUtils.EMPTY_BYTE_ARRAY;
 
         try (DataInput in = zipModel.createDataInput()) {
-            in.seek(0);
             in.skip(offs);
             return in.readBytes((int)size);
         } catch(Exception e) {

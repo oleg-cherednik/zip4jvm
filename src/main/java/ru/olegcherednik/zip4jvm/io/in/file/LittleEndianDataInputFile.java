@@ -95,7 +95,7 @@ public class LittleEndianDataInputFile implements DataInputFile {
 
     @Override
     public int getDisk() {
-        return srcZip.getDisks().size() == 1 ? 0 : disk.getPos() - 1;
+        return Math.max(0, disk.getPos() - 1);
     }
 
     @Override

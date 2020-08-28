@@ -45,10 +45,6 @@ public abstract class SrcZip {
         length = disks.stream().mapToLong(Disk::getLength).sum();
     }
 
-    public Disk getMainDisk() {
-        return disks.get(0);
-    }
-
     public Disk getDisk(int disk) {
         return disks.get(disk);
     }
