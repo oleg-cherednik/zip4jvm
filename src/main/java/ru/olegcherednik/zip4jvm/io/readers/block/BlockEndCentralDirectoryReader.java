@@ -26,15 +26,15 @@ public class BlockEndCentralDirectoryReader extends EndCentralDirectoryReader {
     @Override
     public EndCentralDirectory read(DataInput in) throws IOException {
         // TODO temporary
-        block.setOffs(in.getAbsoluteOffs() - in.getSrcFile().getDisk(Math.max(0, in.getDisk().getPos() - 1)).getAbsoluteOffs());
+        block.setAbsoluteOffs(in.getAbsoluteOffs());
+        block.setOffs(in.getDiskRelativeOffs());
         EndCentralDirectory endCentralDirectory = super.read(in);
 
         if (in instanceof ZipInputStream)
             ((ZipInputStream)in).setFileName(in.getFileName());
 
         block.setDisk(Math.max(0, in.getDisk().getPos() - 1), in.getFileName());
-        block.setSrcZip(in.getSrcFile());
-        block.calc(in.getAbsoluteOffs() - in.getSrcFile().getDisk(Math.max(0, in.getDisk().getPos() - 1)).getAbsoluteOffs());
+        block.calc(in.getAbsoluteOffs());
 
         return endCentralDirectory;
     }

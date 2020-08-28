@@ -25,9 +25,9 @@ public abstract class EntryInputStream extends EntryMetadataInputStream {
 
     public static EntryInputStream create(ZipEntry zipEntry, Function<Charset, Charset> charsetCustomizer, DataInput in) throws IOException {
         int disk = (int)zipEntry.getDisk();
-        long offs = in.getSrcFile().getDisk(disk).getAbsoluteOffs();
-        offs += zipEntry.getLocalFileHeaderOffs();
-        LocalFileHeader localFileHeader = new LocalFileHeaderReader(offs, charsetCustomizer).read(in);
+        long relativeOffs = zipEntry.getLocalFileHeaderOffs();
+        long absoluteOffs = in.convertToAbsoluteOffs(disk, relativeOffs);
+        LocalFileHeader localFileHeader = new LocalFileHeaderReader(absoluteOffs, charsetCustomizer).read(in);
         // TODO check why do I use Supplier here
         zipEntry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
         // TODO check that localFileHeader matches fileHeader

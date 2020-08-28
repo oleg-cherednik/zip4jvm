@@ -22,7 +22,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
 
-    private final long offs;
+    private final long absoluteOffs;
     private final Function<Charset, Charset> customizeCharset;
 
     @Override
@@ -59,7 +59,7 @@ public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
     }
 
     private void findSignature(DataInput in) throws IOException {
-        in.seek(offs);
+        in.seek(absoluteOffs);
 
         if (in.readDwordSignature() != LocalFileHeader.SIGNATURE)
             throw new Zip4jvmException("invalid local file header signature");

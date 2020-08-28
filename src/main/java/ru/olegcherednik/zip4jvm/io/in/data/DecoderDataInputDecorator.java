@@ -93,6 +93,11 @@ public final class DecoderDataInputDecorator extends BaseDataInput implements De
     }
 
     @Override
+    public String getFileName() {
+        return delegate.getFileName();
+    }
+
+    @Override
     public String toString() {
         return delegate.toString();
     }

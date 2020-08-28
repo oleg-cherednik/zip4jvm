@@ -2,8 +2,8 @@ package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import lombok.Getter;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
+import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
@@ -25,15 +25,14 @@ public class BlockLocalFileHeaderReader extends LocalFileHeaderReader {
 
     // TODO DataInput in - temporary
     public BlockLocalFileHeaderReader(ZipEntry zipEntry, DataInput in, Function<Charset, Charset> customizeCharset) {
-        super(getOffs(zipEntry, in), customizeCharset);
+        super(getAbsoluteOffs(zipEntry, in), customizeCharset);
         disk = zipEntry.getDisk();
     }
 
-    private static long getOffs(ZipEntry zipEntry, DataInput in) {
+    private static long getAbsoluteOffs(ZipEntry zipEntry, DataInput in) {
         int disk = (int)zipEntry.getDisk();
-        long offs = in.getSrcFile().getDisk(disk).getAbsoluteOffs();
-        offs += zipEntry.getLocalFileHeaderOffs();
-        return offs;
+        long relativeOffs = zipEntry.getLocalFileHeaderOffs();
+        return in.convertToAbsoluteOffs(disk, relativeOffs);
     }
 
     @Override
@@ -43,7 +42,6 @@ public class BlockLocalFileHeaderReader extends LocalFileHeaderReader {
 
     @Override
     protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) throws IOException {
-        block.getContent().setSrcZip(in.getSrcFile());
         block.getContent().calc(in.getAbsoluteOffs());
         return new BlockExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader), block.getExtraFieldBlock()).read(in);
     }

@@ -85,5 +85,4 @@ public interface DataInput extends Closeable, RandomAccess {
     @Deprecated
     SrcZip getSrcFile();
 
-
 }

@@ -6,7 +6,6 @@ import lombok.Setter;
 import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.ZipDataInput;
-import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;
 
@@ -25,30 +24,28 @@ public class Block {
     private long size;
     @Setter
     private long offs;
+    @Setter
+    private long absoluteOffs;
     private long disk;
     private String fileName;
     @Setter
     private ZipModel zipModel;
-    @Setter
-    private SrcZip srcZip;
 
     public <T> T calc(DataInput in, LocalSupplier<T> task) throws IOException {
-        long base = 0;
         try {
             zipModel = in instanceof ZipDataInput ? ((ZipDataInput)in).getZipModel() : null;
-            srcZip = in.getSrcFile();
-            base = in.getDisk().getAbsoluteOffs();
-            offs = in.getAbsoluteOffs() - base;
+            absoluteOffs = in.getAbsoluteOffs();
+            offs = in.getDiskRelativeOffs();
             disk = Math.max(0, in.getDisk().getPos() - 1);
-            fileName = srcZip.getDisk((int)disk).getFile().getFileName().toString();
+            fileName = in.getFileName();
             return task.get();
         } finally {
-            calc(in.getAbsoluteOffs() - base);
+            calc(in.getAbsoluteOffs());
         }
     }
 
-    public void calc(long offs) {
-        size = offs - this.offs;
+    public void calc(long absoluteOffs) {
+        size = absoluteOffs - this.absoluteOffs;
     }
 
     public byte[] getData() {
