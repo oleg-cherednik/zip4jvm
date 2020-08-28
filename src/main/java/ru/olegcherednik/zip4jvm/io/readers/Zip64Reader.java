@@ -23,7 +23,7 @@ public class Zip64Reader implements Reader<Zip64> {
         if (findCentralDirectoryLocatorSignature(in)) {
             Zip64.EndCentralDirectoryLocator locator = readEndCentralDirectoryLocator(in);
             int disk = (int)locator.getMainDisk();
-            long offs = in.getSrcFile().getItems().get(disk).getOffs();
+            long offs = in.getSrcFile().getDisks().get(disk).getAbsOffs();
             findCentralDirectorySignature(offs + locator.getOffs(), in);
             Zip64.EndCentralDirectory dir = readEndCentralDirectory(in);
             return Zip64.of(locator, dir);

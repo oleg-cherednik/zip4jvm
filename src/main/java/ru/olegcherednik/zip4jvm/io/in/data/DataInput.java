@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.io.in.RandomAccess;
-import ru.olegcherednik.zip4jvm.model.src.SrcFile;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -75,7 +75,7 @@ public interface DataInput extends Closeable, RandomAccess {
 
     // TODO temporary
     @Deprecated
-    SrcFile getSrcFile();
+    SrcZip getSrcFile();
 
 
 }

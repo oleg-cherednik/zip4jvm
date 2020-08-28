@@ -3,8 +3,9 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 import lombok.Getter;
 import lombok.Setter;
 import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.file.SrcZipLittleEndianReadFile;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import ru.olegcherednik.zip4jvm.model.src.SrcFile;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
 
@@ -20,23 +21,23 @@ public class ZipInputStream extends BaseDataInput implements ZipDataInput {
     @Setter
     private String fileName;
 
-    public ZipInputStream(SrcFile srcFile) throws IOException {
-        this(null, srcFile);
+    public ZipInputStream(SrcZip srcZip) throws IOException {
+        this(null, srcZip);
     }
 
     public ZipInputStream(ZipModel zipModel) throws IOException {
-        this(zipModel, zipModel.getSrcFile());
+        this(zipModel, zipModel.getSrcZip());
     }
 
-    private ZipInputStream(ZipModel zipModel, SrcFile srcFile) throws IOException {
+    private ZipInputStream(ZipModel zipModel, SrcZip srcZip) throws IOException {
         this.zipModel = zipModel;
-        delegate = srcFile.dataInputFile();
-        fileName = srcFile.getPath().getFileName().toString();
+        delegate = new SrcZipLittleEndianReadFile(srcZip);
+        fileName = srcZip.getPath().getFileName().toString();
     }
 
     @Override
     public long getOffs() {
-        return delegate.getOffs();
+        return delegate.getAbsOffs();
     }
 
     @Override
@@ -75,8 +76,8 @@ public class ZipInputStream extends BaseDataInput implements ZipDataInput {
     }
 
     @Override
-    public SrcFile getSrcFile() {
-        return delegate.getSrcFile();
+    public SrcZip getSrcFile() {
+        return delegate.getSrcZip();
     }
 
     @Override

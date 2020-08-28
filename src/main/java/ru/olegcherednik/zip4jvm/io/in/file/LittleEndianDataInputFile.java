@@ -62,7 +62,7 @@ public abstract class LittleEndianDataInputFile implements DataInputFile {
 
     @Override
     public String toString() {
-        return "offs: " + getOffs() + " (0x" + Long.toHexString(getOffs()) + ')';
+        return "offs: " + getAbsOffs() + " (0x" + Long.toHexString(getAbsOffs()) + ')';
     }
 
     protected final void openNextItem(Path file) throws IOException {

@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.in.file;
 
 import ru.olegcherednik.zip4jvm.io.in.RandomAccess;
-import ru.olegcherednik.zip4jvm.model.src.SrcFile;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.io.IOException;
  */
 public interface DataInputFile extends Closeable, RandomAccess {
 
-    long getOffs();
+    long getAbsOffs();
 
     long length();
 
@@ -22,7 +22,7 @@ public interface DataInputFile extends Closeable, RandomAccess {
 
     // TODO temporary
     @Deprecated
-    SrcFile getSrcFile();
+    SrcZip getSrcZip();
 
     // TODO temporary
     @Deprecated

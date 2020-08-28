@@ -10,7 +10,7 @@ import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.ZipInputStream;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.model.src.SrcFile;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -41,7 +41,7 @@ public final class ZipModel {
     public static final int MAX_TOTAL_DISKS = Zip64.LIMIT_WORD;
     public static final int MAX_COMMENT_SIZE = Zip64.LIMIT_WORD;
 
-    private final SrcFile srcFile;
+    private final SrcZip srcZip;
     private long splitSize = NO_SPLIT;
 
     private String comment;
@@ -100,7 +100,7 @@ public final class ZipModel {
     }
 
     public Path getDiskFile(long disk) {
-        return disk >= totalDisks ? srcFile.getPath() : getDiskFile(srcFile.getPath(), disk + 1);
+        return disk >= totalDisks ? srcZip.getPath() : getDiskFile(srcZip.getPath(), disk + 1);
     }
 
     public static Path getDiskFile(Path file, long disk) {
@@ -109,16 +109,16 @@ public final class ZipModel {
 
     public DataInput createDataInput(String fileName) throws IOException {
         int disk = (int)getZipEntryByFileName(fileName).getDisk();
-        SrcFile.Item item = srcFile.getItems().get(disk);
+        SrcZip.Disk item = srcZip.getDisks().get(disk);
         DataInput res = new ZipInputStream(this);
-        res.seek(item.getOffs());
+        res.seek(item.getAbsOffs());
         return res;
     }
 
     public DataInput createDataInput() throws IOException {
-        SrcFile.Item item = srcFile.getDisk(0);
+        SrcZip.Disk disk = srcZip.getDisk(0);
         DataInput res = new ZipInputStream(this);
-        res.seek(item.getOffs());
+        res.seek(disk.getAbsOffs());
         return res;
     }
 

@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.model.src.SrcFile;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
 
@@ -73,7 +73,7 @@ public final class DecoderDataInputDecorator extends BaseDataInput implements De
         delegate.seek(pos);
     }
     @Override
-    public SrcFile getSrcFile() {
+    public SrcZip getSrcFile() {
         return delegate.getSrcFile();
     }
 

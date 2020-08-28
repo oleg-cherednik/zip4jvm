@@ -6,7 +6,7 @@ import lombok.Setter;
 import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.ZipDataInput;
-import ru.olegcherednik.zip4jvm.model.src.SrcFile;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;
 
@@ -30,17 +30,17 @@ public class Block {
     @Setter
     private ZipModel zipModel;
     @Setter
-    private SrcFile srcFile;
+    private SrcZip srcZip;
 
     public <T> T calc(DataInput in, LocalSupplier<T> task) throws IOException {
         long base = 0;
         try {
             zipModel = in instanceof ZipDataInput ? ((ZipDataInput)in).getZipModel() : null;
-            srcFile = in.getSrcFile();
-            base = in.getSrcFile().getItems().get((int)in.getDisk()).getOffs();
+            srcZip = in.getSrcFile();
+            base = in.getSrcFile().getDisks().get((int)in.getDisk()).getAbsOffs();
             offs = in.getOffs() - base;
             disk = in.getDisk();
-            fileName = srcFile.getItems().get((int)disk).getFile().getFileName().toString();//in.getFileName();
+            fileName = srcZip.getDisks().get((int)disk).getFile().getFileName().toString();//in.getFileName();
             return task.get();
         } finally {
             calc(in.getOffs() - base);

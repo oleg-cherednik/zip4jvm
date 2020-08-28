@@ -18,7 +18,7 @@ abstract class BaseZipDataOutput extends BaseDataOutput {
 
     protected BaseZipDataOutput(ZipModel zipModel) throws IOException {
         this.zipModel = zipModel;
-        createFile(zipModel.getSrcFile().getPath());
+        createFile(zipModel.getSrcZip().getPath());
     }
 
     protected void createFile(Path zip) throws IOException {

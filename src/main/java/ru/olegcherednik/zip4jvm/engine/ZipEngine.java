@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.engine;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.EntryDuplicationException;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
-import ru.olegcherednik.zip4jvm.model.src.SrcFile;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.SingleZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.data.SplitZipOutputStream;
@@ -87,7 +87,7 @@ public final class ZipEngine implements ZipFile.Writer {
     public void copy(Path zip) throws IOException {
         requireNotNull(zip, "ZipEngine.zip");
 
-        ZipModel srcZipModel = ZipModelBuilder.read(SrcFile.of(zip));
+        ZipModel srcZipModel = ZipModelBuilder.read(SrcZip.of(zip));
 
         for (String fileName : srcZipModel.getEntryNames()) {
             if (fileNameWriter.containsKey(fileName))
@@ -119,7 +119,7 @@ public final class ZipEngine implements ZipFile.Writer {
 
     private void removeOriginalZipFiles() throws IOException {
         if (Files.exists(zip)) {
-            ZipModel zipModel = ZipModelBuilder.read(SrcFile.of(zip));
+            ZipModel zipModel = ZipModelBuilder.read(SrcZip.of(zip));
 
             for (long i = 0; i <= zipModel.getTotalDisks(); i++)
                 Files.deleteIfExists(zipModel.getDiskFile(i));
@@ -133,7 +133,7 @@ public final class ZipEngine implements ZipFile.Writer {
             Files.move(src, dest);
         }
 
-        Files.deleteIfExists(tempZipModel.getSrcFile().getPath().getParent());
+        Files.deleteIfExists(tempZipModel.getSrcZip().getPath().getParent());
     }
 
     private static ZipModel createTempZipModel(Path zip, ZipSettings settings, Map<String, Writer> fileNameWriter) throws IOException {
@@ -141,7 +141,7 @@ public final class ZipEngine implements ZipFile.Writer {
         ZipModel tempZipModel = ZipModelBuilder.build(tempZip, settings);
 
         if (Files.exists(zip)) {
-            ZipModel zipModel = ZipModelBuilder.read(SrcFile.of(zip));
+            ZipModel zipModel = ZipModelBuilder.read(SrcZip.of(zip));
 
             if (zipModel.isSplit())
                 tempZipModel.setSplitSize(zipModel.getSplitSize());

@@ -13,7 +13,7 @@ import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.Zip64Block;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
-import ru.olegcherednik.zip4jvm.model.src.SrcFile;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -30,14 +30,14 @@ public final class BlockModelReader extends BaseZipModelReader {
     private final Zip64Block zip64Block = new Zip64Block();
     private final CentralDirectoryBlock centralDirectoryBlock = new CentralDirectoryBlock();
 
-    public BlockModelReader(SrcFile srcFile, Function<Charset, Charset> customizeCharset) {
-        super(srcFile, customizeCharset);
+    public BlockModelReader(SrcZip srcZip, Function<Charset, Charset> customizeCharset) {
+        super(srcZip, customizeCharset);
     }
 
     public BlockModel read() throws IOException {
         readCentralData();
 
-        ZipModel zipModel = new ZipModelBuilder(srcFile, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
+        ZipModel zipModel = new ZipModelBuilder(srcZip, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
 
         return BlockModel.builder()
                          .zipModel(zipModel)
@@ -49,7 +49,7 @@ public final class BlockModelReader extends BaseZipModelReader {
     public BlockModel readWithEntries() throws IOException {
         readCentralData();
 
-        ZipModel zipModel = new ZipModelBuilder(srcFile, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
+        ZipModel zipModel = new ZipModelBuilder(srcZip, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
         Map<String, ZipEntryBlock> zipEntries = new BlockZipEntryReader(zipModel, customizeCharset).read();
 
         return BlockModel.builder()
@@ -62,7 +62,7 @@ public final class BlockModelReader extends BaseZipModelReader {
 
     @Override
     protected DataInput createDataInput() throws IOException {
-        return new ZipInputStream(srcFile);
+        return new ZipInputStream(srcZip);
     }
 
     @Override

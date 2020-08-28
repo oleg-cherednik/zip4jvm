@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.engine;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
-import ru.olegcherednik.zip4jvm.model.src.SrcFile;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.BlockModelReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
@@ -26,7 +26,7 @@ import java.nio.file.Path;
 @RequiredArgsConstructor
 public final class InfoEngine implements ZipFile.Info {
 
-    private final SrcFile srcFile;
+    private final SrcZip srcZip;
     private final ZipInfoSettings settings;
 
     @Override
@@ -53,7 +53,7 @@ public final class InfoEngine implements ZipFile.Info {
 
     @Override
     public CentralDirectory.FileHeader getFileHeader(String entryName) throws IOException {
-        ZipModelReader zipModelReader = new ZipModelReader(srcFile, settings.getCustomizeCharset());
+        ZipModelReader zipModelReader = new ZipModelReader(srcZip, settings.getCustomizeCharset());
         zipModelReader.readCentralData();
         return zipModelReader.getCentralDirectory().getFileHeaders().stream()
                              .filter(fh -> fh.getFileName().equalsIgnoreCase(entryName))
@@ -61,7 +61,7 @@ public final class InfoEngine implements ZipFile.Info {
     }
 
     private BlockModel createModel() throws IOException {
-        BlockModelReader reader = new BlockModelReader(srcFile, settings.getCustomizeCharset());
+        BlockModelReader reader = new BlockModelReader(srcZip, settings.getCustomizeCharset());
         return settings.isReadEntries() ? reader.readWithEntries() : reader.read();
     }
 

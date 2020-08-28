@@ -31,7 +31,7 @@ public class BlockLocalFileHeaderReader extends LocalFileHeaderReader {
 
     private static long getOffs(ZipEntry zipEntry, DataInput in) {
         int disk = (int)zipEntry.getDisk();
-        long offs = in.getSrcFile().getItems().get(disk).getOffs();
+        long offs = in.getSrcFile().getDisks().get(disk).getAbsOffs();
         offs += zipEntry.getLocalFileHeaderOffs();
         return offs;
     }
@@ -43,7 +43,7 @@ public class BlockLocalFileHeaderReader extends LocalFileHeaderReader {
 
     @Override
     protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) throws IOException {
-        block.getContent().setSrcFile(in.getSrcFile());
+        block.getContent().setSrcZip(in.getSrcFile());
         block.getContent().calc(in.getOffs());
         return new BlockExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader), block.getExtraFieldBlock()).read(in);
     }

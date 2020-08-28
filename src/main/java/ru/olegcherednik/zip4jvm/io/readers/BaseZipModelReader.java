@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.SignatureWasNotFoundException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.model.src.SrcFile;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -35,7 +35,7 @@ public abstract class BaseZipModelReader {
 
     private static final String MARKER_END_CENTRAL_DIRECTORY = "end_central_directory";
 
-    protected final SrcFile srcFile;
+    protected final SrcZip srcZip;
     protected final Function<Charset, Charset> customizeCharset;
 
     @Getter
@@ -66,8 +66,8 @@ public abstract class BaseZipModelReader {
     private CentralDirectory readCentralDirectory(DataInput in) throws IOException {
         // TODO same with ZipMode.createDataInput()
         int mainDisk = ZipModelBuilder.getMainDisk(endCentralDirectory, zip64);
-        SrcFile.Item item = srcFile.getItems().get(mainDisk);
-        long offs = item.getOffs() + ZipModelBuilder.getCentralDirectoryOffs(endCentralDirectory, zip64);
+        SrcZip.Disk disk = srcZip.getDisks().get(mainDisk);
+        long offs = disk.getAbsOffs() + ZipModelBuilder.getCentralDirectoryOffs(endCentralDirectory, zip64);
         in.seek(offs);
         long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
         return getCentralDirectoryReader(totalEntries).read(in);

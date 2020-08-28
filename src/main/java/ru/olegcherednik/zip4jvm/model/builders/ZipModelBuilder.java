@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.model.builders;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.model.src.SrcFile;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
@@ -25,25 +25,25 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public final class ZipModelBuilder {
 
-    private final SrcFile srcFile;
+    private final SrcZip srcZip;
     private final EndCentralDirectory endCentralDirectory;
     private final Zip64 zip64;
     private final CentralDirectory centralDirectory;
     private final Function<Charset, Charset> charsetCustomizer;
 
-    public static ZipModel read(SrcFile srcFile) throws IOException {
-        return read(srcFile, Charsets.UNMODIFIED);
+    public static ZipModel read(SrcZip srcZip) throws IOException {
+        return read(srcZip, Charsets.UNMODIFIED);
     }
 
-    public static ZipModel read(SrcFile srcFile, Function<Charset, Charset> charsetCustomizer) throws IOException {
-        return new ZipModelReader(srcFile, charsetCustomizer).read();
+    public static ZipModel read(SrcZip srcZip, Function<Charset, Charset> charsetCustomizer) throws IOException {
+        return new ZipModelReader(srcZip, charsetCustomizer).read();
     }
 
     public static ZipModel build(Path zip, ZipSettings settings) {
         if (Files.exists(zip))
             throw new Zip4jvmException("ZipFile '" + zip.toAbsolutePath() + "' exists");
 
-        ZipModel zipModel = new ZipModel(SrcFile.of(zip));
+        ZipModel zipModel = new ZipModel(SrcZip.of(zip));
         zipModel.setSplitSize(settings.getSplitSize());
         zipModel.setComment(settings.getComment());
         zipModel.setZip64(settings.isZip64());
@@ -52,7 +52,7 @@ public final class ZipModelBuilder {
     }
 
     public ZipModel build() throws IOException {
-        ZipModel zipModel = new ZipModel(srcFile);
+        ZipModel zipModel = new ZipModel(srcZip);
 
         zipModel.setZip64(zip64 != Zip64.NULL);
         zipModel.setComment(endCentralDirectory.getComment());
@@ -109,7 +109,7 @@ public final class ZipModelBuilder {
     }
 
     private static void updateSplit(ZipModel zipModel) throws IOException {
-        if (zipModel.getSrcFile().isSplit())
+        if (zipModel.getSrcZip().isSplit())
             zipModel.setSplitSize(getSplitSize(zipModel));
     }
 

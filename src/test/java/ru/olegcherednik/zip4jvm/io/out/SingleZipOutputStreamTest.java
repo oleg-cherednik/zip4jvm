@@ -6,7 +6,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.model.src.SrcFile;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.io.out.data.SingleZipOutputStream;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -41,7 +41,7 @@ public class SingleZipOutputStreamTest {
 
     public void shouldWriteStreamWhenUsingDataOutput() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.data");
-        ZipModel zipModel = new ZipModel(SrcFile.of(zip));
+        ZipModel zipModel = new ZipModel(SrcZip.of(zip));
 
         try (SingleZipOutputStream out = new SingleZipOutputStream(zipModel)) {
             assertThat(out.getOffs()).isEqualTo(0);
@@ -78,7 +78,7 @@ public class SingleZipOutputStreamTest {
 
     public void shouldThrowExceptionWhenGetUnknownMark() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.data");
-        ZipModel zipModel = new ZipModel(SrcFile.of(zip));
+        ZipModel zipModel = new ZipModel(SrcZip.of(zip));
 
         assertThatThrownBy(() -> {
             try (SingleZipOutputStream out = new SingleZipOutputStream(zipModel)) {

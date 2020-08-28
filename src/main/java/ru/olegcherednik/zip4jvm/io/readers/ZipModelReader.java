@@ -4,7 +4,7 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.ZipInputStream;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
-import ru.olegcherednik.zip4jvm.model.src.SrcFile;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -16,18 +16,18 @@ import java.util.function.Function;
  */
 public final class ZipModelReader extends BaseZipModelReader {
 
-    public ZipModelReader(SrcFile srcFile, Function<Charset, Charset> customizeCharset) {
-        super(srcFile, customizeCharset);
+    public ZipModelReader(SrcZip srcZip, Function<Charset, Charset> customizeCharset) {
+        super(srcZip, customizeCharset);
     }
 
     public ZipModel read() throws IOException {
         readCentralData();
-        return new ZipModelBuilder(srcFile, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
+        return new ZipModelBuilder(srcZip, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
     }
 
     @Override
     protected DataInput createDataInput() throws IOException {
-        return new ZipInputStream(srcFile);
+        return new ZipInputStream(srcZip);
     }
 
     @Override

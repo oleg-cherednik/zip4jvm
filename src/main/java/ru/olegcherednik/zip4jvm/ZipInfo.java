@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.model.src.SrcFile;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 
@@ -20,12 +20,12 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class ZipInfo {
 
-    private final SrcFile srcFile;
+    private final SrcZip srcZip;
     private ZipInfoSettings settings = ZipInfoSettings.DEFAULT;
 
     public static ZipInfo zip(Path zip) {
         requireNotNull(zip, "ZipInfo.zip");
-        return new ZipInfo(SrcFile.of(zip));
+        return new ZipInfo(SrcZip.of(zip));
     }
 
     public ZipInfo settings(ZipInfoSettings settings) {
@@ -38,15 +38,15 @@ public final class ZipInfo {
     }
 
     public void printShortInfo(PrintStream out) throws IOException {
-        ZipFile.info(srcFile, settings).printTextInfo(out);
+        ZipFile.info(srcZip, settings).printTextInfo(out);
     }
 
     public void decompose(Path destDir) throws IOException {
-        ZipFile.info(srcFile, settings).decompose(destDir);
+        ZipFile.info(srcZip, settings).decompose(destDir);
     }
 
     public CentralDirectory.FileHeader getFileHeader(String entryName) throws IOException {
-        return ZipFile.info(srcFile, settings).getFileHeader(entryName);
+        return ZipFile.info(srcZip, settings).getFileHeader(entryName);
     }
 
 }

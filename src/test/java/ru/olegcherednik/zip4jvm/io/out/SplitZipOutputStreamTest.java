@@ -5,7 +5,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.model.src.SrcFile;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.io.out.data.SplitZipOutputStream;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -40,7 +40,7 @@ public class SplitZipOutputStreamTest {
 
     public void shouldWriteStreamWhenUsingDataOutput() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.data");
-        ZipModel zipModel = new ZipModel(SrcFile.of(zip));
+        ZipModel zipModel = new ZipModel(SrcZip.of(zip));
         zipModel.setSplitSize(10);
 
         try (SplitZipOutputStream out = new SplitZipOutputStream(zipModel)) {
@@ -85,7 +85,7 @@ public class SplitZipOutputStreamTest {
 
     public void shouldMoveToNextDiskWhenNotEnoughSpaceToWriteSignature() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.data");
-        ZipModel zipModel = new ZipModel(SrcFile.of(zip));
+        ZipModel zipModel = new ZipModel(SrcZip.of(zip));
         zipModel.setSplitSize(10);
 
         try (SplitZipOutputStream out = new SplitZipOutputStream(zipModel)) {
@@ -111,7 +111,7 @@ public class SplitZipOutputStreamTest {
 
     public void shouldThrowExceptionWhenSplitFileExists() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.data");
-        ZipModel zipModel = new ZipModel(SrcFile.of(zip));
+        ZipModel zipModel = new ZipModel(SrcZip.of(zip));
         zipModel.setSplitSize(10);
 
         zipModel.setTotalDisks(5);
