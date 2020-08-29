@@ -67,8 +67,7 @@ public abstract class BaseZipModelReader {
         int mainDiskNo = ZipModelBuilder.getMainDiskNo(endCentralDirectory, zip64);
         long relativeOffs = ZipModelBuilder.getCentralDirectoryRelativeOffs(endCentralDirectory, zip64);
         long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
-        in.seek(in.convertToAbsoluteOffs(mainDiskNo, relativeOffs));
-
+        in.seek(mainDiskNo, relativeOffs);
         return getCentralDirectoryReader(totalEntries).read(in);
     }
 

@@ -77,7 +77,6 @@ public interface DataInput extends Closeable, RandomAccess {
 
     long getMark(String id);
 
-    // FIXME doesn't work when relativeOffs over another disk - BaseZipModelReader.readCentralDirectory
     void seek(int diskNo, long relativeOffs) throws IOException;
 
     void seek(String id) throws IOException;

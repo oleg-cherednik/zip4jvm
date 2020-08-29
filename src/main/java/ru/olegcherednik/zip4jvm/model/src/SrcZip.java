@@ -33,7 +33,7 @@ public abstract class SrcZip {
             return SevenZipSplitSrcZip.create(zip);
         if (StandardSplitSrcZip.isCandidate(zip))
             return StandardSplitSrcZip.create(zip);
-        return StandardSolidSrcZip.create(zip);
+        return SolidSrcZip.create(zip);
     }
 
     protected final Path path;

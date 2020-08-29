@@ -10,13 +10,13 @@ import java.util.List;
  * @author Oleg Cherednik
  * @since 20.01.2020
  */
-final class StandardSolidSrcZip extends SrcZip {
+final class SolidSrcZip extends SrcZip {
 
-    public static StandardSolidSrcZip create(Path zip) {
-        return new StandardSolidSrcZip(zip);
+    public static SolidSrcZip create(Path zip) {
+        return new SolidSrcZip(zip);
     }
 
-    private StandardSolidSrcZip(Path zip) {
+    private SolidSrcZip(Path zip) {
         super(zip, createDisks(zip));
     }
 

@@ -65,7 +65,7 @@ final class StandardSplitSrcZip extends SrcZip {
     }
 
     private static int getTotalDisks(Path zip) {
-        try (DataInput in = new ZipInputStream(StandardSolidSrcZip.create(zip))) {
+        try (DataInput in = new ZipInputStream(SolidSrcZip.create(zip))) {
             BaseZipModelReader.findCentralDirectorySignature(in);
             return new EndCentralDirectoryReader(Charsets.UNMODIFIED).read(in).getTotalDisks();
         } catch(Exception e) {

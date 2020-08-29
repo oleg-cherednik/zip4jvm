@@ -64,8 +64,7 @@ public class LittleEndianDataInputFile implements DataInputFile {
 
     @Override
     public void seek(int diskNo, long relativeOffs) throws IOException {
-        openDisk(srcZip.getDiskByNo(diskNo));
-        in.seek(relativeOffs);
+        seek(srcZip.getDiskByNo(diskNo).getAbsoluteOffs() + relativeOffs);
     }
 
     @Override
