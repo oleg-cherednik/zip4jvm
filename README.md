@@ -45,7 +45,7 @@ compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.5'
 <dependency>
     <groupId>ru.oleg-cherednik.zip4jvm</groupId>
     <artifactId>zip4jvm</artifactId>
-    <version>1.5</version>
+    <version>1.6</version>
 </dependency>
 ```
 
@@ -900,7 +900,7 @@ are not explicitly set, then `default` entry settings are used for all added ent
    - `store` - no compression
    - `deflate` - use [DEFLATE](https://en.wikipedia.org/wiki/DEFLATE) compression algorithm
    - `enhanced_deflate` - use [ENHANCED DEFLATE](http://deflate64.com) compression algorithm
-   - `bzip2` - use [BZIP2](https://en.wikipedia.org/wiki/Bzip2) compression algorithm   
+   - `bzip2` - use [BZIP2](https://en.wikipedia.org/wiki/Bzip2) compression algorithm
    - `lzma` - use [LZMA](https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm) compression algorithm
  - _compressionLevel_ - compression level
    - `super_fast` `fast` `normal` `maximum`
