@@ -25,7 +25,7 @@ final class SolidSrcZip extends SrcZip {
                         .no(0)
                         .file(zip)
                         .absoluteOffs(0)
-                        .length(PathUtils.length(zip)).build();
+                        .size(PathUtils.size(zip)).build();
         return Collections.singletonList(disk);
     }
 

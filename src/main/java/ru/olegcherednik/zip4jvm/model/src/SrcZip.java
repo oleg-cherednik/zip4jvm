@@ -53,11 +53,11 @@ public abstract class SrcZip {
     }
 
     private static long calcSize(List<Disk> disks) {
-        return disks.stream().mapToLong(Disk::getLength).sum();
+        return disks.stream().mapToLong(Disk::getSize).sum();
     }
 
     private static long calcSplitSize(List<Disk> disks) {
-        return disks.size() == 1 ? ZipModel.NO_SPLIT : disks.stream().mapToLong(Disk::getLength).max().orElse(ZipModel.NO_SPLIT);
+        return disks.size() == 1 ? ZipModel.NO_SPLIT : disks.stream().mapToLong(Disk::getSize).max().orElse(ZipModel.NO_SPLIT);
     }
 
     public Disk getDiskByNo(int diskNo) {
@@ -66,14 +66,14 @@ public abstract class SrcZip {
 
     public Disk getDiskByAbsoluteOffs(long absoluteOffs) {
         for (SrcZip.Disk disk : disks)
-            if (absoluteOffs - disk.getAbsoluteOffs() <= disk.getLength())
+            if (absoluteOffs - disk.getAbsoluteOffs() <= disk.getSize())
                 return disk;
 
         return disks.get(disks.size() - 1);
     }
 
     public boolean isLast(Disk disk) {
-        return requireNotNull(disk, "SrzZip.disk") == disks.get(disks.size() - 1);
+        return requireNotNull(disk, "SrcZip.disk") == disks.get(disks.size() - 1);
     }
 
     protected static Set<Path> getDiskPaths(Path dir, String pattern) {
@@ -98,7 +98,7 @@ public abstract class SrcZip {
         private final Path file;
         /** Absolute offs of this disk starting from the beginning of the first disk */
         private final long absoluteOffs;
-        private final long length;
+        private final long size;
 
         @Override
         public String toString() {

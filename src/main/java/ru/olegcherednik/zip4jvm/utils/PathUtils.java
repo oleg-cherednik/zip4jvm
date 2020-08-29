@@ -19,7 +19,7 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PathUtils {
 
-    public static long length(Path path) {
+    public static long size(Path path) {
         try {
             return Files.size(path);
         } catch(IOException ignore) {
