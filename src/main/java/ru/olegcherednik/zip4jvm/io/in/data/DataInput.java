@@ -1,7 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.io.in.RandomAccess;
-import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -33,7 +32,7 @@ public interface DataInput extends Closeable, RandomAccess {
     /** Retrieves offs starting from the beginning of the current disk */
     long getDiskRelativeOffs();
 
-    SrcZip.Disk getDisk();
+    int getDiskNo();
 
     default String getFileName() {
         return null;

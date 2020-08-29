@@ -43,8 +43,8 @@ public final class DecoderDataInputDecorator extends BaseDataInput implements De
     }
 
     @Override
-    public SrcZip.Disk getDisk() {
-        return delegate.getDisk();
+    public int getDiskNo() {
+        return delegate.getDiskNo();
     }
 
     @Override
