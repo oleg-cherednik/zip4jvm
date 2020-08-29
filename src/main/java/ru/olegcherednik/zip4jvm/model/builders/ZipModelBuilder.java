@@ -57,7 +57,7 @@ public final class ZipModelBuilder {
         zipModel.setZip64(zip64 != Zip64.NULL);
         zipModel.setComment(endCentralDirectory.getComment());
         zipModel.setTotalDisks(getTotalDisks());
-        zipModel.setMainDisk(getMainDisks());
+        zipModel.setMainDisk(getMainDiskNo());
         zipModel.setCentralDirectorySize(getCentralDirectorySize());
         zipModel.setCentralDirectoryRelativeOffs(getCentralDirectoryRelativeOffs(endCentralDirectory, zip64));
         createAndAddEntries(zipModel);
@@ -78,10 +78,10 @@ public final class ZipModelBuilder {
         return (int)zip64.getEndCentralDirectory().getTotalDisks();
     }
 
-    private long getMainDisks() {
+    private long getMainDiskNo() {
         if (zip64 == Zip64.NULL)
             return endCentralDirectory.getMainDiskNo();
-        return zip64.getEndCentralDirectoryLocator().getMainDisk();
+        return zip64.getEndCentralDirectoryLocator().getMainDiskNo();
     }
 
     public long getCentralDirectorySize() {

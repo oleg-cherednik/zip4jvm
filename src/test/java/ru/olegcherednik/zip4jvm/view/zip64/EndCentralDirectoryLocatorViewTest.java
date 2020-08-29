@@ -25,7 +25,7 @@ public class EndCentralDirectoryLocatorViewTest {
         when(block.getRelativeOffs()).thenReturn(11208273384L);
 
         Zip64.EndCentralDirectoryLocator locator = mock(Zip64.EndCentralDirectoryLocator.class);
-        when(locator.getMainDisk()).thenReturn(1L);
+        when(locator.getMainDiskNo()).thenReturn(1L);
         when(locator.getEndCentralDirectoryRelativeOffs()).thenReturn(11208273328L);
         when(locator.getTotalDisks()).thenReturn(5L);
 
@@ -48,7 +48,7 @@ public class EndCentralDirectoryLocatorViewTest {
         when(block.getFileName()).thenReturn("src.zip");
 
         Zip64.EndCentralDirectoryLocator locator = mock(Zip64.EndCentralDirectoryLocator.class);
-        when(locator.getMainDisk()).thenReturn(1L);
+        when(locator.getMainDiskNo()).thenReturn(1L);
         when(locator.getEndCentralDirectoryRelativeOffs()).thenReturn(11208273328L);
         when(locator.getTotalDisks()).thenReturn(5L);
 

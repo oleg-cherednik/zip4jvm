@@ -52,13 +52,10 @@ public abstract class SrcZip {
     }
 
     // TODO simplify for loop
-    public Disk getDiskByAbsOffs(long absOffs) {
-        for (SrcZip.Disk disk : disks) {
-            if (disk.getAbsoluteOffs() + disk.getLength() <= absOffs && !isLast(disk))
-                continue;
-
-            return disk;
-        }
+    public Disk getDiskByAbsoluteOffs(long absoluteOffs) {
+        for (SrcZip.Disk disk : disks)
+            if (!(disk.getAbsoluteOffs() + disk.getLength() <= absoluteOffs && !isLast(disk)))
+                return disk;
 
         return disks.get(disks.size() - 1);
     }

@@ -48,13 +48,14 @@ final class SevenZipSplitSrcZip extends SrcZip {
             if (!actualFileName.equals(expectedFileName) || !Files.isReadable(diskPath))
                 throw new SplitPartNotFoundException(dir.resolve(expectedFileName));
 
-            long length = PathUtils.length(diskPath);
-            disks.add(Disk.builder()
-                          .no(i)
-                          .file(diskPath)
-                          .absoluteOffs(absoluteOffs)
-                          .length(length).build());
-            absoluteOffs += length;
+            Disk disk = Disk.builder()
+                            .no(i)
+                            .file(diskPath)
+                            .absoluteOffs(absoluteOffs)
+                            .length(PathUtils.length(diskPath)).build();
+
+            disks.add(disk);
+            absoluteOffs += disk.getLength();
             i++;
         }
 

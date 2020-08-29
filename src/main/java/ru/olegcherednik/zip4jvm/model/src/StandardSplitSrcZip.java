@@ -2,13 +2,11 @@ package ru.olegcherednik.zip4jvm.model.src;
 
 import org.apache.commons.io.FilenameUtils;
 import ru.olegcherednik.zip4jvm.exception.SplitPartNotFoundException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.ZipInputStream;
-import ru.olegcherednik.zip4jvm.io.readers.BaseZipModelReader;
-import ru.olegcherednik.zip4jvm.io.readers.EndCentralDirectoryReader;
-import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedList;
@@ -34,41 +32,35 @@ final class StandardSplitSrcZip extends SrcZip {
         List<Disk> disks = new LinkedList<>();
         Path dir = zip.getParent();
         String baseName = FilenameUtils.getBaseName(zip.getFileName().toString());
+        int totalDisk = getTotalDisks(zip);
 
-        for (Path diskPath : getDiskPaths(dir, baseName + "\\.z\\d+")) {
+        for (Path diskPath : getDiskPaths(dir, baseName + "\\.(?:z\\d+|zip)")) {
             String actualFileName = diskPath.getFileName().toString();
-            String expectedFileName = String.format("%s.z%02d", baseName, i + 1);
+            String expectedFileName = i == totalDisk ? baseName + ".zip" : String.format("%s.z%02d", baseName, i + 1);
 
             if (!actualFileName.equals(expectedFileName) || !Files.isReadable(diskPath))
                 throw new SplitPartNotFoundException(dir.resolve(expectedFileName));
 
-            long length = PathUtils.length(diskPath);
-            disks.add(Disk.builder()
-                          .no(i)
-                          .file(diskPath)
-                          .absoluteOffs(absoluteOffs)
-                          .length(length).build());
-            absoluteOffs += length;
+            Disk disk = Disk.builder()
+                            .no(i)
+                            .file(diskPath)
+                            .absoluteOffs(absoluteOffs)
+                            .length(PathUtils.length(diskPath)).build();
+
+            disks.add(disk);
+            absoluteOffs += disk.getLength();
             i++;
         }
-
-        if (i + 1 == getTotalDisks(zip))
-            throw new SplitPartNotFoundException(dir.resolve(String.format("%s.%02d", baseName, i + 1)));
-
-        disks.add(Disk.builder()
-                      .no(i)
-                      .file(zip)
-                      .absoluteOffs(absoluteOffs)
-                      .length(PathUtils.length(zip)).build());
 
         return disks;
     }
 
     private static int getTotalDisks(Path zip) {
-        try (DataInput in = new ZipInputStream(SolidSrcZip.create(zip))) {
-            BaseZipModelReader.findCentralDirectorySignature(in);
-            return new EndCentralDirectoryReader(Charsets.UNMODIFIED).read(in).getTotalDisks();
-        } catch(Exception e) {
+        try {
+            // TODO ready only required parts
+            ZipModel model = new ZipModelReader(SolidSrcZip.create(zip)).read();
+            return model.getTotalDisks();
+        } catch(IOException e) {
             return 0;
         }
     }

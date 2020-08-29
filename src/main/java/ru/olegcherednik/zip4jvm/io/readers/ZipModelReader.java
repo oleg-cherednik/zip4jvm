@@ -2,6 +2,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.ZipInputStream;
+import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
@@ -15,6 +16,10 @@ import java.util.function.Function;
  * @since 06.03.2019
  */
 public final class ZipModelReader extends BaseZipModelReader {
+
+    public ZipModelReader(SrcZip srcZip) {
+        this(srcZip, Charsets.UNMODIFIED);
+    }
 
     public ZipModelReader(SrcZip srcZip, Function<Charset, Charset> customizeCharset) {
         super(srcZip, customizeCharset);

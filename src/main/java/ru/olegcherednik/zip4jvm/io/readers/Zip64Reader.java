@@ -45,7 +45,7 @@ public class Zip64Reader implements Reader<Zip64> {
     }
 
     private static void findCentralDirectorySignature(Zip64.EndCentralDirectoryLocator locator, DataInput in) throws IOException {
-        in.seek((int)locator.getMainDisk(), locator.getEndCentralDirectoryRelativeOffs());
+        in.seek((int)locator.getMainDiskNo(), locator.getEndCentralDirectoryRelativeOffs());
 
         if (in.readDwordSignature() != Zip64.EndCentralDirectory.SIGNATURE)
             throw new Zip4jvmException("invalid zip64 end of central directory");
@@ -67,12 +67,12 @@ public class Zip64Reader implements Reader<Zip64> {
             in.skip(in.dwordSignatureSize());
 
             Zip64.EndCentralDirectoryLocator locator = new Zip64.EndCentralDirectoryLocator();
-            locator.setMainDisk(in.readDword());
+            locator.setMainDiskNo(in.readDword());
             locator.setEndCentralDirectoryRelativeOffs(in.readQword());
             locator.setTotalDisks(in.readDword());
 
-            realBigZip64(locator.getMainDisk(), "zip64.locator.mainDisk");
-            realBigZip64(locator.getMainDisk(), "zip64.locator.totalDisks");
+            realBigZip64(locator.getMainDiskNo(), "zip64.locator.mainDisk");
+            realBigZip64(locator.getMainDiskNo(), "zip64.locator.totalDisks");
             realBigZip64(locator.getEndCentralDirectoryRelativeOffs(), "zip64.locator.centralDirectoryOffs");
 
             return locator;

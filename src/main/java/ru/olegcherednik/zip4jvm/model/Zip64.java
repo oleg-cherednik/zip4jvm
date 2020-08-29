@@ -46,7 +46,7 @@ public final class Zip64 {
 
         // size:4 - signature (0x06054b50)
         // size:4 - number of the disk with the start of the zip64 end of central directory
-        private long mainDisk;
+        private long mainDiskNo;
         // size:8 - relative offset of the Zip64.EndCentralDirectory
         private long endCentralDirectoryRelativeOffs;
         // size:4 - total number of disks

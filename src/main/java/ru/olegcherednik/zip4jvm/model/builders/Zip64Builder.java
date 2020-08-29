@@ -23,7 +23,7 @@ public final class Zip64Builder {
     private Zip64.EndCentralDirectoryLocator createLocator() {
         Zip64.EndCentralDirectoryLocator locator = new Zip64.EndCentralDirectoryLocator();
         locator.setEndCentralDirectoryRelativeOffs(zipModel.getCentralDirectoryRelativeOffs() + zipModel.getCentralDirectorySize());
-        locator.setMainDisk(disk);
+        locator.setMainDiskNo(disk);
         locator.setTotalDisks(disk);
         return locator;
     }
