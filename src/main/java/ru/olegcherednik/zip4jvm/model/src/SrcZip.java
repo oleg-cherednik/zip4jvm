@@ -18,7 +18,6 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotEmpty;
-import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
 /**
  * Represents either single solid zip file or split zip with multiple disks. This class used to check that required disks are available, otherwise
@@ -72,10 +71,6 @@ public abstract class SrcZip {
         return disks.get(disks.size() - 1);
     }
 
-    public boolean isLast(Disk disk) {
-        return requireNotNull(disk, "SrcZip.disk") == disks.get(disks.size() - 1);
-    }
-
     protected static Set<Path> getDiskPaths(Path dir, String pattern) {
         FileFilter fileFilter = new RegexFileFilter(pattern);
         File[] files = dir.toFile().listFiles(fileFilter);
@@ -99,6 +94,7 @@ public abstract class SrcZip {
         /** Absolute offs of this disk starting from the beginning of the first disk */
         private final long absoluteOffs;
         private final long size;
+        private final boolean last;
 
         @Override
         public String toString() {

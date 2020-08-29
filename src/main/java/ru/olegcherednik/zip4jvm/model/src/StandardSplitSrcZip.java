@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Oleg Cherednik
@@ -31,8 +32,9 @@ final class StandardSplitSrcZip extends SrcZip {
         Path dir = zip.getParent();
         String baseName = FilenameUtils.getBaseName(zip.getFileName().toString());
         int totalDisk = ZipModelReader.getTotalDisks(SolidSrcZip.create(zip));
+        Set<Path> diskPaths = getDiskPaths(dir, baseName + "\\.(?:z\\d+|zip)");
 
-        for (Path diskPath : getDiskPaths(dir, baseName + "\\.(?:z\\d+|zip)")) {
+        for (Path diskPath : diskPaths) {
             String actualFileName = diskPath.getFileName().toString();
             String expectedFileName = i == totalDisk ? baseName + ".zip" : String.format("%s.z%02d", baseName, i + 1);
 
@@ -43,7 +45,8 @@ final class StandardSplitSrcZip extends SrcZip {
                             .no(i)
                             .file(diskPath)
                             .absoluteOffs(absoluteOffs)
-                            .size(PathUtils.size(diskPath)).build();
+                            .size(PathUtils.size(diskPath))
+                            .last(i + 1 == diskPaths.size()).build();
 
             disks.add(disk);
             absoluteOffs += disk.getSize();

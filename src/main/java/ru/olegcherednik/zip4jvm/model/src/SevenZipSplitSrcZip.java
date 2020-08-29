@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 7-Zip has not standard split algorithm. It creates the whole zip file first and then split it with required part size. It has following naming
@@ -40,8 +41,9 @@ final class SevenZipSplitSrcZip extends SrcZip {
         List<Disk> disks = new LinkedList<>();
         Path dir = zip.getParent();
         String baseName = FilenameUtils.getBaseName(zip.getFileName().toString());
+        Set<Path> diskPaths = getDiskPaths(dir, baseName + "\\.\\d+");
 
-        for (Path diskPath : getDiskPaths(dir, baseName + "\\.\\d+")) {
+        for (Path diskPath : diskPaths) {
             String actualFileName = diskPath.getFileName().toString();
             String expectedFileName = String.format("%s.%03d", baseName, i + 1);
 
@@ -52,7 +54,8 @@ final class SevenZipSplitSrcZip extends SrcZip {
                             .no(i)
                             .file(diskPath)
                             .absoluteOffs(absoluteOffs)
-                            .size(PathUtils.size(diskPath)).build();
+                            .size(PathUtils.size(diskPath))
+                            .last(i + 1 == diskPaths.size()).build();
 
             disks.add(disk);
             absoluteOffs += disk.getSize();

@@ -118,7 +118,7 @@ public class LittleEndianDataInputFile implements DataInputFile {
     }
 
     private boolean openNextDisk() throws IOException {
-        if (srcZip.isLast(disk))
+        if (disk.isLast())
             return false;
 
         openDisk(requireNonNull(srcZip.getDiskByNo(disk.getNo() + 1)));
