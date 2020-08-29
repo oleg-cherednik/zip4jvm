@@ -26,7 +26,7 @@ public class Zip64ExtendedInfoViewTest {
         when(block.getRelativeOffs()).thenReturn(5300395L);
 
         Zip64.ExtendedInfo record = Zip64.ExtendedInfo.builder()
-                                                      .disk(2)
+                                                      .diskNo(2)
                                                       .localFileHeaderRelativeOffs(145)
                                                       .compressedSize(11208273150L)
                                                       .uncompressedSize(11322883953L).build();
@@ -58,11 +58,11 @@ public class Zip64ExtendedInfoViewTest {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(12L);
         when(block.getRelativeOffs()).thenReturn(5300395L);
-        when(block.getDisk()).thenReturn(5L);
+        when(block.getDiskNo()).thenReturn(5);
         when(block.getFileName()).thenReturn("src.zip");
 
         Zip64.ExtendedInfo record = Zip64.ExtendedInfo.builder()
-                                                      .disk(2)
+                                                      .diskNo(2)
                                                       .localFileHeaderRelativeOffs(145)
                                                       .compressedSize(11208273150L)
                                                       .uncompressedSize(11322883953L).build();

@@ -72,6 +72,7 @@ public class Zip64Reader implements Reader<Zip64> {
             locator.setTotalDisks(in.readDword());
 
             realBigZip64(locator.getMainDisk(), "zip64.locator.mainDisk");
+            realBigZip64(locator.getMainDisk(), "zip64.locator.totalDisks");
             realBigZip64(locator.getEndCentralDirectoryRelativeOffs(), "zip64.locator.centralDirectoryOffs");
 
             return locator;
@@ -90,7 +91,7 @@ public class Zip64Reader implements Reader<Zip64> {
             dir.setVersionMadeBy(Version.of(in.readWord()));
             dir.setVersionToExtract(Version.of(in.readWord()));
             dir.setTotalDisks(in.readDword());
-            dir.setMainDisk(in.readDword());
+            dir.setMainDiskNo(in.readDword());
             dir.setDiskEntries(in.readQword());
             dir.setTotalEntries(in.readQword());
             dir.setCentralDirectorySize(in.readQword());
@@ -137,8 +138,8 @@ public class Zip64Reader implements Reader<Zip64> {
                 in.seek(offs + size);
             }
 
-            if (extendedInfo.getDisk() != ExtraField.NO_DATA)
-                realBigZip64(extendedInfo.getDisk(), "zip64.extendedInfo.disk");
+            if (extendedInfo.getDiskNo() != ExtraField.NO_DATA)
+                realBigZip64(extendedInfo.getDiskNo(), "zip64.extendedInfo.disk");
 
             return extendedInfo;
         }
@@ -148,7 +149,7 @@ public class Zip64Reader implements Reader<Zip64> {
                                      .uncompressedSize(uncompressedSizeExists ? in.readQword() : ExtraField.NO_DATA)
                                      .compressedSize(compressedSizeExists ? in.readQword() : ExtraField.NO_DATA)
                                      .localFileHeaderRelativeOffs(offsLocalHeaderRelativeExists ? in.readQword() : ExtraField.NO_DATA)
-                                     .disk(diskExists ? in.readDword() : ExtraField.NO_DATA)
+                                     .diskNo(diskExists ? in.readDword() : ExtraField.NO_DATA)
                                      .build();
         }
 

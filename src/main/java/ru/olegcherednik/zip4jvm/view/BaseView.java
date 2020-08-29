@@ -93,7 +93,7 @@ public abstract class BaseView implements View {
         requireZeroOrPositive(totalDisks, "BaseView.totalDisks");
 
         if (totalDisks > 0)
-            printLine(out, String.format("  - disk (%04X):", block.getDisk()), block.getFileName());
+            printLine(out, String.format("  - disk (%04X):", block.getDiskNo()), block.getFileName());
 
         printLine(out, "  - size:", String.format("%s bytes", block.getSize()));
     }
@@ -104,7 +104,7 @@ public abstract class BaseView implements View {
         requireZeroOrPositive(totalDisks, "BaseView.totalDisks");
 
         if (totalDisks > 0)
-            printLine(out, String.format("  - disk (%04X):", block.getDisk()), block.getFileName());
+            printLine(out, String.format("  - disk (%04X):", block.getDiskNo()), block.getFileName());
 
         printLine(out, "  - size:", String.format("%d bytes (%d record%s)", block.getSize(), total, total == 1 ? "" : "s"));
     }
@@ -121,7 +121,7 @@ public abstract class BaseView implements View {
         requireZeroOrPositive(totalDisks, "BaseView.totalDisks");
 
         if (totalDisks > 0)
-            printLine(out, String.format("- disk (%04X):", block.getDisk()), block.getFileName());
+            printLine(out, String.format("- disk (%04X):", block.getDiskNo()), block.getFileName());
 
         printLine(out, "- location:", String.format("%1$d (0x%1$08X) bytes", block.getRelativeOffs()));
         printLine(out, "- size:", String.format("%s bytes", block.getSize()));

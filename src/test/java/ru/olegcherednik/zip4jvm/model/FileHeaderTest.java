@@ -62,7 +62,7 @@ public class FileHeaderTest {
         fileHeader.setCompressedSize(5);
         fileHeader.setUncompressedSize(6);
         fileHeader.setCommentLength(7);
-        fileHeader.setDisk(8);
+        fileHeader.setDiskNo(8);
         fileHeader.setInternalFileAttributes(internalFileAttributes);
         fileHeader.setExternalFileAttributes(externalFileAttributes);
         fileHeader.setLocalFileHeaderRelativeOffs(9);
@@ -78,7 +78,7 @@ public class FileHeaderTest {
         assertThat(fileHeader.getCompressedSize()).isEqualTo(5);
         assertThat(fileHeader.getUncompressedSize()).isEqualTo(6);
         assertThat(fileHeader.getCommentLength()).isEqualTo(7);
-        assertThat(fileHeader.getDisk()).isEqualTo(8);
+        assertThat(fileHeader.getDiskNo()).isEqualTo(8);
         assertThat(fileHeader.getInternalFileAttributes().getData()).isEqualTo(internalFileAttributes.getData());
         assertThat(fileHeader.getExternalFileAttributes()).isSameAs(externalFileAttributes);
         assertThat(fileHeader.getLocalFileHeaderRelativeOffs()).isEqualTo(9);
@@ -118,7 +118,7 @@ public class FileHeaderTest {
         assertThat(fileHeader.isZip64()).isFalse();
 
         Zip64.ExtendedInfo extendedInfo = Zip64.ExtendedInfo.builder().uncompressedSize(1).compressedSize(2).localFileHeaderRelativeOffs(3)
-                                                            .disk(4).build();
+                                                            .diskNo(4).build();
 
         fileHeader.setExtraField(ExtraField.builder().addRecord(extendedInfo).build());
         assertThat(fileHeader.isZip64()).isTrue();

@@ -40,7 +40,7 @@ public class ExtraFieldReader implements Reader<ExtraField> {
         boolean uncompressedSize = fileHeader.getUncompressedSize() == MAX_ENTRY_SIZE;
         boolean compressedSize = fileHeader.getCompressedSize() == MAX_ENTRY_SIZE;
         boolean offs = fileHeader.getLocalFileHeaderRelativeOffs() == MAX_LOCAL_FILE_HEADER_OFFS;
-        boolean disk = fileHeader.getDisk() == MAX_TOTAL_DISKS;
+        boolean disk = fileHeader.getDiskNo() == MAX_TOTAL_DISKS;
         return getReaders(uncompressedSize, compressedSize, offs, disk);
     }
 

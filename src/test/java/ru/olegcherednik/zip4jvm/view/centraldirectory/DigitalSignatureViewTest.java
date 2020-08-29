@@ -40,7 +40,7 @@ public class DigitalSignatureViewTest {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(33L);
         when(block.getRelativeOffs()).thenReturn(255614L);
-        when(block.getDisk()).thenReturn(5L);
+        when(block.getDiskNo()).thenReturn(5);
         when(block.getFileName()).thenReturn("src.zip");
 
         CentralDirectory.DigitalSignature digitalSignature = new CentralDirectory.DigitalSignature();

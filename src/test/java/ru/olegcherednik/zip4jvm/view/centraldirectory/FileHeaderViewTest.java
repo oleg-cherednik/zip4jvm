@@ -195,7 +195,7 @@ public class FileHeaderViewTest {
         fileHeader.setCompressedSize(255452);
         fileHeader.setUncompressedSize(293823);
         fileHeader.setCommentLength(comment == null ? 0 : comment.length());
-        fileHeader.setDisk(1);
+        fileHeader.setDiskNo(1);
         fileHeader.setExternalFileAttributes(externalFileAttributes);
         fileHeader.setLocalFileHeaderRelativeOffs(293899);
         fileHeader.setFileName("ducati-panigale-1199.jpg");

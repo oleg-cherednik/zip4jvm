@@ -33,12 +33,12 @@ public class FileHeaderBuilderTest {
 
         assertThat(fileHeader.getCompressedSize()).isEqualTo(LOOK_IN_EXTRA_FIELD);
         assertThat(fileHeader.getUncompressedSize()).isEqualTo(LOOK_IN_EXTRA_FIELD);
-        assertThat(fileHeader.getDisk()).isEqualTo(ZipModel.MAX_TOTAL_DISKS);
+        assertThat(fileHeader.getDiskNo()).isEqualTo(ZipModel.MAX_TOTAL_DISKS);
 
         Zip64.ExtendedInfo extendedInfo = fileHeader.getExtraField().getExtendedInfo();
         assertThat(extendedInfo).isNotSameAs(Zip64.ExtendedInfo.NULL);
         assertThat(extendedInfo.getUncompressedSize()).isEqualTo(0);
         assertThat(extendedInfo.getCompressedSize()).isEqualTo(0);
-        assertThat(extendedInfo.getDisk()).isEqualTo(0);
+        assertThat(extendedInfo.getDiskNo()).isEqualTo(0);
     }
 }

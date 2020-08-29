@@ -26,7 +26,7 @@ public class Block {
     private long relativeOffs;
     @Setter
     private long absoluteOffs;
-    private long disk;
+    private int diskNo;
     private String fileName;
     @Setter
     private ZipModel zipModel;
@@ -36,7 +36,7 @@ public class Block {
             zipModel = in instanceof ZipDataInput ? ((ZipDataInput)in).getZipModel() : null;
             absoluteOffs = in.getAbsoluteOffs();
             relativeOffs = in.getDiskRelativeOffs();
-            disk = in.getDisk().getPos();
+            diskNo = in.getDisk().getNo();
             fileName = in.getFileName();
             return task.get();
         } finally {
@@ -61,13 +61,13 @@ public class Block {
         }
     }
 
-    public void setDisk(long disk, String fileName) {
-        this.disk = disk;
+    public void setDiskNo(int diskNo, String fileName) {
+        this.diskNo = diskNo;
         this.fileName = fileName;
     }
 
     @Override
     public String toString() {
-        return String.format("offs: %d, size: %s, disk: %d", relativeOffs, size, disk);
+        return String.format("offs: %d, size: %s, disk: %d", relativeOffs, size, diskNo);
     }
 }

@@ -28,7 +28,7 @@ public interface DataInput extends Closeable, RandomAccess {
     /** Retrieves offs starting from the beginning of the first disk */
     long getAbsoluteOffs();
 
-    long convertToAbsoluteOffs(int disk, long relativeOffs);
+    long convertToAbsoluteOffs(int diskNo, long relativeOffs);
 
     /** Retrieves offs starting from the beginning of the current disk */
     long getDiskRelativeOffs();
@@ -77,7 +77,8 @@ public interface DataInput extends Closeable, RandomAccess {
 
     long getMark(String id);
 
-    void seek(int disk, long relativeOffs) throws IOException;
+    // FIXME doesn't work when relativeOffs over another disk - BaseZipModelReader.readCentralDirectory
+    void seek(int diskNo, long relativeOffs) throws IOException;
 
     void seek(String id) throws IOException;
 

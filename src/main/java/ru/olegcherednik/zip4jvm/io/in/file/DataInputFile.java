@@ -15,7 +15,7 @@ public interface DataInputFile extends Closeable, RandomAccess {
     /** Retrieves offs starting from the beginning of the first disk */
     long getAbsoluteOffs();
 
-    long convertToAbsoluteOffs(int disk, long relativeOffs);
+    long convertToAbsoluteOffs(int diskNo, long relativeOffs);
 
     /** Retrieves offs starting from the beginning of the current disk */
     long getDiskRelativeOffs();
@@ -26,7 +26,7 @@ public interface DataInputFile extends Closeable, RandomAccess {
 
     long toLong(byte[] buf, int offs, int len);
 
-    void seek(int disk, long relativeOffs) throws IOException;
+    void seek(int diskNo, long relativeOffs) throws IOException;
 
     @Deprecated
     SrcZip.Disk getDisk();

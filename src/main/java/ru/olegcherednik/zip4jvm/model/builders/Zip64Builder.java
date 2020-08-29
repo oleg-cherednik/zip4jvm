@@ -38,7 +38,7 @@ public final class Zip64Builder {
         endCentralDirectory.setVersionMadeBy(Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));
         endCentralDirectory.setVersionToExtract(Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));
         endCentralDirectory.setTotalDisks(zipModel.getTotalDisks());
-        endCentralDirectory.setMainDisk(zipModel.getMainDisk());
+        endCentralDirectory.setMainDiskNo(zipModel.getMainDisk());
         endCentralDirectory.setDiskEntries(countNumberOfFileHeaderEntriesOnDisk());
         endCentralDirectory.setTotalEntries(zipModel.getTotalEntries());
         endCentralDirectory.setCentralDirectorySize(zipModel.getCentralDirectorySize());
@@ -50,7 +50,7 @@ public final class Zip64Builder {
     private int countNumberOfFileHeaderEntriesOnDisk() {
         if (zipModel.isSplit())
             return (int)zipModel.getZipEntries().stream()
-                                .filter(zipEntry -> zipEntry.getDisk() == zipModel.getTotalDisks())
+                                .filter(zipEntry -> zipEntry.getDiskNo() == zipModel.getTotalDisks())
                                 .count();
 
         return zipModel.getTotalEntries();

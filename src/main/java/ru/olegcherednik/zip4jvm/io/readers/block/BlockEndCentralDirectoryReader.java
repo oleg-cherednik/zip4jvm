@@ -35,7 +35,7 @@ public class BlockEndCentralDirectoryReader extends EndCentralDirectoryReader {
         if (in instanceof ZipInputStream)
             ((ZipInputStream)in).setFileName(in.getFileName());
 
-        block.setDisk(in.getDisk().getPos(), in.getFileName());
+        block.setDiskNo(in.getDisk().getNo(), in.getFileName());
         block.calcSize(in);
 
         return endCentralDirectory;

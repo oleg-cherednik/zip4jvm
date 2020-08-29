@@ -20,7 +20,7 @@ public class SplitZipOutputStream extends BaseZipDataOutput {
     /** see 8.5.5 */
     public static final int SPLIT_SIGNATURE = DataDescriptor.SIGNATURE;
 
-    private int disk;
+    private int diskNo;
 
     public SplitZipOutputStream(ZipModel zipModel) throws IOException {
         super(zipModel);
@@ -71,7 +71,7 @@ public class SplitZipOutputStream extends BaseZipDataOutput {
     private void openNextDisk() throws IOException {
         super.close();
 
-        Path splitFile = ZipModel.getDiskFile(zipModel.getSrcZip().getPath(), ++disk);
+        Path splitFile = ZipModel.getDiskFile(zipModel.getSrcZip().getPath(), ++diskNo);
 
         if (Files.exists(splitFile))
             throw new IOException("split file: " + splitFile.getFileName() + " already exists in the current directory, cannot rename this file");
@@ -90,7 +90,7 @@ public class SplitZipOutputStream extends BaseZipDataOutput {
 
     @Override
     public final String toString() {
-        return super.toString() + "; disk: " + disk;
+        return super.toString() + "; disk: " + diskNo;
     }
 
 }

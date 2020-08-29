@@ -45,7 +45,7 @@ public final class ZipModel {
     private long splitSize = NO_SPLIT;
 
     private String comment;
-    private long totalDisks;
+    private int totalDisks;
     private long mainDisk;
     private long centralDirectoryRelativeOffs;
     private long centralDirectorySize;
@@ -99,17 +99,17 @@ public final class ZipModel {
         return isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(fileNameEntry.keySet());
     }
 
-    public Path getDiskFile(long disk) {
-        return disk >= totalDisks ? srcZip.getPath() : getDiskFile(srcZip.getPath(), disk + 1);
+    public Path getDiskFile(int diskNo) {
+        return diskNo >= totalDisks ? srcZip.getPath() : getDiskFile(srcZip.getPath(), diskNo + 1);
     }
 
-    public static Path getDiskFile(Path file, long disk) {
-        return file.getParent().resolve(String.format("%s.z%02d", FilenameUtils.getBaseName(file.toString()), disk));
+    public static Path getDiskFile(Path file, int diskNo) {
+        return file.getParent().resolve(String.format("%s.z%02d", FilenameUtils.getBaseName(file.toString()), diskNo));
     }
 
     public DataInput createDataInput(String fileName) throws IOException {
         DataInput res = createDataInput();
-        res.seek(srcZip.getDisk(getZipEntryByFileName(fileName).getDisk()).getAbsoluteOffs());
+        res.seek(srcZip.getDiskByNo(getZipEntryByFileName(fileName).getDiskNo()).getAbsoluteOffs());
         return res;
     }
 

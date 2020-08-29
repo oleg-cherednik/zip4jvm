@@ -67,7 +67,7 @@ public final class FileHeaderView extends BaseView {
     }
 
     private void printLocation(PrintStream out) {
-        printLine(out, String.format("part number of this part (%04X):", fileHeader.getDisk()), String.valueOf(fileHeader.getDisk() + 1));
+        printLine(out, String.format("part number of this part (%04X):", fileHeader.getDiskNo()), String.valueOf(fileHeader.getDiskNo() + 1));
         printLine(out, "relative offset of local header:", String.format("%1$d (0x%1$08X) bytes", fileHeader.getLocalFileHeaderRelativeOffs()));
     }
 

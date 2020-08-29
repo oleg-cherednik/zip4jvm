@@ -44,7 +44,7 @@ final class StandardSplitSrcZip extends SrcZip {
 
             long length = PathUtils.length(diskPath);
             disks.add(Disk.builder()
-                          .pos(i)
+                          .no(i)
                           .file(diskPath)
                           .absoluteOffs(absoluteOffs)
                           .length(length).build());
@@ -56,7 +56,7 @@ final class StandardSplitSrcZip extends SrcZip {
             throw new SplitPartNotFoundException(dir.resolve(String.format("%s.%02d", baseName, i + 1)));
 
         disks.add(Disk.builder()
-                      .pos(i)
+                      .no(i)
                       .file(zip)
                       .absoluteOffs(absoluteOffs)
                       .length(PathUtils.length(zip)).build());

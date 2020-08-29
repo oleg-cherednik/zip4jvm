@@ -74,7 +74,7 @@ public class NtfsTimestampExtraFieldRecordViewTest {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(36L);
         when(block.getRelativeOffs()).thenReturn(11208273272L);
-        when(block.getDisk()).thenReturn(5L);
+        when(block.getDiskNo()).thenReturn(5);
         when(block.getFileName()).thenReturn("src.zip");
 
         NtfsTimestampExtraFieldRecord.Tag tagOne = NtfsTimestampExtraFieldRecord.OneTag.builder()

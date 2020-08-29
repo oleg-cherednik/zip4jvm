@@ -47,8 +47,8 @@ public abstract class SrcZip {
         length = disks.stream().mapToLong(Disk::getLength).sum();
     }
 
-    public Disk getDisk(int disk) {
-        return disks.get(disk);
+    public Disk getDiskByNo(int diskNo) {
+        return disks.get(diskNo);
     }
 
     // TODO simplify for loop
@@ -89,7 +89,7 @@ public abstract class SrcZip {
     @Builder
     public static final class Disk {
 
-        private final int pos;
+        private final int no;
         private final Path file;
         /** Absolute offs of this disk starting from the beginning of the first disk */
         private final long absoluteOffs;

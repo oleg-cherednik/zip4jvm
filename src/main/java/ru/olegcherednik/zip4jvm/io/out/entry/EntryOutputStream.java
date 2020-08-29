@@ -30,7 +30,7 @@ public abstract class EntryOutputStream extends EntryMetadataOutputStream {
 
     private static EntryOutputStream createOutputStream(ZipEntry zipEntry, DataOutput out) throws IOException {
         CompressionMethod compressionMethod = zipEntry.getCompressionMethod();
-        zipEntry.setDisk(out.getDisk());
+        zipEntry.setDiskNo(out.getDiskNo());
 
         if (compressionMethod == CompressionMethod.STORE)
             return new StoreEntryOutputStream(zipEntry, out);

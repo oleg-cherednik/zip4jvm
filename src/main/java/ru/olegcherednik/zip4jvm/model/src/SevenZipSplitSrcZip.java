@@ -50,7 +50,7 @@ final class SevenZipSplitSrcZip extends SrcZip {
 
             long length = PathUtils.length(diskPath);
             disks.add(Disk.builder()
-                          .pos(i)
+                          .no(i)
                           .file(diskPath)
                           .absoluteOffs(absoluteOffs)
                           .length(length).build());

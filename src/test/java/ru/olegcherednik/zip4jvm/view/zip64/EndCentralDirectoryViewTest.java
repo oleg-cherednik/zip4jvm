@@ -52,7 +52,7 @@ public class EndCentralDirectoryViewTest {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(56L);
         when(block.getRelativeOffs()).thenReturn(11208273328L);
-        when(block.getDisk()).thenReturn(5L);
+        when(block.getDiskNo()).thenReturn(5);
         when(block.getFileName()).thenReturn("src.zip");
 
         Zip64.EndCentralDirectory endCentralDirectory = createEndCentralDirectory();
@@ -85,7 +85,7 @@ public class EndCentralDirectoryViewTest {
         endCentralDirectory.setVersionMadeBy(Version.of(0x12));
         endCentralDirectory.setVersionToExtract(Version.of(0x134));
         endCentralDirectory.setTotalDisks(1);
-        endCentralDirectory.setMainDisk(2);
+        endCentralDirectory.setMainDiskNo(2);
         endCentralDirectory.setDiskEntries(13);
         endCentralDirectory.setTotalEntries(15);
         endCentralDirectory.setCentralDirectorySize(115);

@@ -59,7 +59,7 @@ public final class Zip64View {
             printLine(out, "number of bytes in rest of record:", String.format("%d bytes", dir.getEndCentralDirectorySize()));
             printVersion(out);
             printLine(out, String.format("part number of this part (%04d):", dir.getTotalDisks()), dir.getTotalDisks() + 1);
-            printLine(out, String.format("part number of start of central dir (%04d):", dir.getMainDisk()), dir.getMainDisk() + 1);
+            printLine(out, String.format("part number of start of central dir (%04d):", dir.getMainDiskNo()), dir.getMainDiskNo() + 1);
             printLine(out, "number of entries in central dir in this part:", dir.getDiskEntries());
             printLine(out, "total number of entries in central dir:", dir.getTotalEntries());
             printLine(out, "size of central dir:", String.format("%1$d (0x%1$08X) bytes", dir.getCentralDirectorySize()));

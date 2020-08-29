@@ -51,7 +51,7 @@ public class CentralDirectory {
         // size:2 - comment length (k)
         private int commentLength;
         // size:2 - disk number start
-        private int disk;
+        private int diskNo;
         // size:2 - internal file attributes
         private final InternalFileAttributes internalFileAttributes = new InternalFileAttributes();
         // size:4 - external file attributes

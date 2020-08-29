@@ -22,7 +22,7 @@ final class StandardSolidSrcZip extends SrcZip {
 
     private static List<Disk> createDisks(Path zip) {
         Disk disk = Disk.builder()
-                        .pos(0)
+                        .no(0)
                         .file(zip)
                         .absoluteOffs(0)
                         .length(PathUtils.length(zip)).build();

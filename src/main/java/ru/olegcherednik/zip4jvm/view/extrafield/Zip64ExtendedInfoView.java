@@ -22,8 +22,8 @@ final class Zip64ExtendedInfoView extends ExtraFieldRecordView<Zip64.ExtendedInf
             if (record.getLocalFileHeaderRelativeOffs() != ExtraField.NO_DATA)
                 view.printLine(out, "  original relative offset of local header:",
                         String.format("%1$d (0x%1$08X) bytes", record.getLocalFileHeaderRelativeOffs()));
-            if (record.getDisk() != ExtraField.NO_DATA)
-                view.printLine(out, String.format("  original part number of this part (%04X):", record.getDisk()), record.getDisk());
+            if (record.getDiskNo() != ExtraField.NO_DATA)
+                view.printLine(out, String.format("  original part number of this part (%04X):", record.getDiskNo()), record.getDiskNo());
         });
     }
 }

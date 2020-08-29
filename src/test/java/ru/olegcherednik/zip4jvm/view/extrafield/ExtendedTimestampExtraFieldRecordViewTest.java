@@ -135,7 +135,7 @@ public class ExtendedTimestampExtraFieldRecordViewTest {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(17L);
         when(block.getRelativeOffs()).thenReturn(5296723L);
-        when(block.getDisk()).thenReturn(5L);
+        when(block.getDiskNo()).thenReturn(5);
         when(block.getFileName()).thenReturn("src.zip");
 
         ExtendedTimestampExtraFieldRecord record =

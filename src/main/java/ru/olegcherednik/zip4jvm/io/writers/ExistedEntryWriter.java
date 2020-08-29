@@ -39,7 +39,7 @@ public class ExistedEntryWriter implements Writer {
         entry.setPassword(entry.isEncrypted() ? password : null);
 
         long offs = out.getOffs();
-        int disk = out.getDisk();
+        int diskNo = out.getDiskNo();
 
         try (CopyEntryInputStream in = new CopyEntryInputStream(entry, srcZipModel)) {
             if (!destZipModel.hasEntry(entryName))
@@ -52,7 +52,7 @@ public class ExistedEntryWriter implements Writer {
         }
 
         entry.setLocalFileHeaderRelativeOffs(offs);
-        entry.setDisk(disk);
+        entry.setDiskNo(diskNo);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class ExistedEntryWriter implements Writer {
         }
 
         public void copyLocalFileHeader(DataOutput out) throws IOException {
-            long absoluteOffs = in.convertToAbsoluteOffs(zipEntry.getDisk(), zipEntry.getLocalFileHeaderRelativeOffs());
+            long absoluteOffs = in.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs());
             LocalFileHeader localFileHeader = new LocalFileHeaderReader(absoluteOffs, Charsets.UNMODIFIED).read(in);
             zipEntry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
             new LocalFileHeaderWriter(localFileHeader).write(out);

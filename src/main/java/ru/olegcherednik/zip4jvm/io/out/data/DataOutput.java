@@ -37,7 +37,7 @@ public interface DataOutput extends Marker, Closeable {
 
     void write(byte[] buf, int offs, int len) throws IOException;
 
-    default int getDisk() {
+    default int getDiskNo() {
         return 0;
     }
 

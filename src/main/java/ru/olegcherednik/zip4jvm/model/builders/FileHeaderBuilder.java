@@ -35,7 +35,7 @@ final class FileHeaderBuilder {
         fileHeader.setCompressedSize(getSize(zipEntry.getCompressedSize()));
         fileHeader.setUncompressedSize(getSize(zipEntry.getUncompressedSize()));
         fileHeader.setCommentLength(0);
-        fileHeader.setDisk(getDisk());
+        fileHeader.setDiskNo(getDisk());
         fileHeader.setInternalFileAttributes(zipEntry.getInternalFileAttributes());
         fileHeader.setExternalFileAttributes(zipEntry.getExternalFileAttributes());
         fileHeader.setLocalFileHeaderRelativeOffs(getLocalFileHeaderRelativeOffs());
@@ -69,7 +69,7 @@ final class FileHeaderBuilder {
             return Zip64.ExtendedInfo.builder()
                                      .compressedSize(zipEntry.getCompressedSize())
                                      .uncompressedSize(zipEntry.getUncompressedSize())
-                                     .disk(zipEntry.getDisk())
+                                     .diskNo(zipEntry.getDiskNo())
                                      .localFileHeaderRelativeOffs(zipEntry.getLocalFileHeaderRelativeOffs()).build();
         return Zip64.ExtendedInfo.NULL;
     }
@@ -79,7 +79,7 @@ final class FileHeaderBuilder {
     }
 
     private int getDisk() {
-        return zipEntry.isZip64() ? MAX_TOTAL_DISKS : zipEntry.getDisk();
+        return zipEntry.isZip64() ? MAX_TOTAL_DISKS : zipEntry.getDiskNo();
     }
 
     private long getLocalFileHeaderRelativeOffs() {

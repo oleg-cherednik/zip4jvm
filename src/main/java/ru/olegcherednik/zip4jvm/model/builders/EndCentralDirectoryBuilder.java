@@ -17,7 +17,7 @@ public final class EndCentralDirectoryBuilder {
     public EndCentralDirectory build() {
         EndCentralDirectory endCentralDirectory = new EndCentralDirectory();
         endCentralDirectory.setTotalDisks(getTotalDisks());
-        endCentralDirectory.setMainDisk(getTotalDisks());
+        endCentralDirectory.setMainDiskNo(getTotalDisks());
         endCentralDirectory.setDiskEntries(getDiskEntries());
         endCentralDirectory.setTotalEntries(getTotalEntries());
         endCentralDirectory.setCentralDirectorySize(getCentralDirectorySize());

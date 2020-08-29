@@ -84,7 +84,7 @@ public class InfoZipOldUnixExtraFieldRecordViewTest {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(12L);
         when(block.getRelativeOffs()).thenReturn(5300395L);
-        when(block.getDisk()).thenReturn(5L);
+        when(block.getDiskNo()).thenReturn(5);
         when(block.getFileName()).thenReturn("src.zip");
 
         InfoZipOldUnixExtraFieldRecord record = InfoZipOldUnixExtraFieldRecord.builder()

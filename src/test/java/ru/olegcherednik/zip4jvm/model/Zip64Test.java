@@ -45,7 +45,7 @@ public class Zip64Test {
 
     public void shouldRetrieveCorrectStringWhenToString() {
         assertThat(Zip64.ExtendedInfo.NULL.toString()).isEqualTo("<null>");
-        assertThat(Zip64.ExtendedInfo.builder().disk(1).build().toString()).isNotEqualTo("<null>");
+        assertThat(Zip64.ExtendedInfo.builder().diskNo(1).build().toString()).isNotEqualTo("<null>");
     }
 
     public void shouldRetrieveNullObjectWhenAllDataInExtendedInfoNoExist() {
@@ -78,7 +78,7 @@ public class Zip64Test {
         verify(out, never()).writeDword(any(long.class));
         reset(out);
 
-        Zip64.ExtendedInfo.builder().disk(4).build().write(out);
+        Zip64.ExtendedInfo.builder().diskNo(4).build().write(out);
         verify(out, never()).writeQword(any(long.class));
         verify(out, times(1)).writeDword(eq(4L));
         reset(out);

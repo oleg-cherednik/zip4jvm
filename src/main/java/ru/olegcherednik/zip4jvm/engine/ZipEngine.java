@@ -121,14 +121,14 @@ public final class ZipEngine implements ZipFile.Writer {
         if (Files.exists(zip)) {
             ZipModel zipModel = ZipModelBuilder.read(SrcZip.of(zip));
 
-            for (long i = 0; i <= zipModel.getTotalDisks(); i++)
-                Files.deleteIfExists(zipModel.getDiskFile(i));
+            for (int diskNo = 0; diskNo <= zipModel.getTotalDisks(); diskNo++)
+                Files.deleteIfExists(zipModel.getDiskFile(diskNo));
         }
     }
 
     private void moveTempZipFiles() throws IOException {
-        for (long i = 0; i <= tempZipModel.getTotalDisks(); i++) {
-            Path src = tempZipModel.getDiskFile(i);
+        for (int diskNo = 0; diskNo <= tempZipModel.getTotalDisks(); diskNo++) {
+            Path src = tempZipModel.getDiskFile(diskNo);
             Path dest = zip.getParent().resolve(src.getFileName());
             Files.move(src, dest);
         }

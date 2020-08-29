@@ -25,7 +25,7 @@ public class EndCentralDirectory {
     // size:2 - number of the disk (=0 - single zip; >0 - split zip (e.g. 5 means 6 total parts))
     private int totalDisks;
     // size:2 - number of the disk with the central directory (single zip - 0; split zip - e.g. 5 means 6th part)
-    private int mainDisk;
+    private int mainDiskNo;
     // size:2 - total number of entries in the central directory on this disk
     private int diskEntries;
     // size:2 - total number of entries in the central directory

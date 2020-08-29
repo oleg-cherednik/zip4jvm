@@ -97,7 +97,7 @@ public final class ZipEntryBuilder {
             zipEntry.setChecksum(fileHeader.getCrc32());
             zipEntry.setUncompressedSize(getUncompressedSize());
             zipEntry.setCompressedSize(getCompressedSize());
-            zipEntry.setDisk(getDisk());
+            zipEntry.setDiskNo(getDisk());
             zipEntry.setLocalFileHeaderRelativeOffs(getLocalFileHeaderOffs());
             return zipEntry;
         }
@@ -139,9 +139,9 @@ public final class ZipEntryBuilder {
         }
 
         private int getDisk() {
-            if (fileHeader.getDisk() == MAX_TOTAL_DISKS)
-                return (int)fileHeader.getExtraField().getExtendedInfo().getDisk();
-            return fileHeader.getDisk();
+            if (fileHeader.getDiskNo() == MAX_TOTAL_DISKS)
+                return (int)fileHeader.getExtraField().getExtendedInfo().getDiskNo();
+            return fileHeader.getDiskNo();
         }
 
         private long getCompressedSize() {

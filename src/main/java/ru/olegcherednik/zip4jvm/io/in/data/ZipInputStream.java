@@ -41,8 +41,8 @@ public class ZipInputStream extends BaseDataInput implements ZipDataInput {
     }
 
     @Override
-    public long convertToAbsoluteOffs(int disk, long relativeOffs) {
-        return delegate.convertToAbsoluteOffs(disk, relativeOffs);
+    public long convertToAbsoluteOffs(int diskNo, long relativeOffs) {
+        return delegate.convertToAbsoluteOffs(diskNo, relativeOffs);
     }
 
     @Override
@@ -71,8 +71,8 @@ public class ZipInputStream extends BaseDataInput implements ZipDataInput {
     }
 
     @Override
-    public void seek(int disk, long relativeOffs) throws IOException {
-        delegate.seek(disk, relativeOffs);
+    public void seek(int diskNo, long relativeOffs) throws IOException {
+        delegate.seek(diskNo, relativeOffs);
     }
 
     @Override

@@ -69,7 +69,7 @@ public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader
         int fileCommentLength = in.readWord();
         Charset charset = customizeCharset.apply(fileHeader.getGeneralPurposeFlag().getCharset());
 
-        fileHeader.setDisk(in.readWord());
+        fileHeader.setDiskNo(in.readWord());
         fileHeader.setInternalFileAttributes(getInternalFileAttribute(in.readBytes(InternalFileAttributes.SIZE)));
         fileHeader.setExternalFileAttributes(getExternalFileAttribute(in.readBytes(ExternalFileAttributes.SIZE)));
         fileHeader.setLocalFileHeaderRelativeOffs(in.readDword());
