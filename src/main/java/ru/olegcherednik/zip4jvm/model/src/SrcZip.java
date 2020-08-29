@@ -96,6 +96,10 @@ public abstract class SrcZip {
         private final long size;
         private final boolean last;
 
+        public String getFileName() {
+            return file.getFileName().toString();
+        }
+
         @Override
         public String toString() {
             return String.format("%s (offs: %s)", file, absoluteOffs);

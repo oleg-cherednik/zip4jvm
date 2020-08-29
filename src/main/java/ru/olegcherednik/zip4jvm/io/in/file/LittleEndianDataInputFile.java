@@ -1,5 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.in.file;
 
+import lombok.Getter;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
@@ -14,7 +15,9 @@ import static java.util.Objects.requireNonNull;
  */
 public class LittleEndianDataInputFile implements DataInputFile {
 
+    @Getter
     private final SrcZip srcZip;
+    @Getter
     private SrcZip.Disk disk;
     private RandomAccessFile in;
 
@@ -86,16 +89,6 @@ public class LittleEndianDataInputFile implements DataInputFile {
         }
 
         return res;
-    }
-
-    @Override
-    public String getFileName() {
-        return disk.getFile().getFileName().toString();
-    }
-
-    @Override
-    public int getDiskNo() {
-        return disk.getNo();
     }
 
     @Override

@@ -47,8 +47,13 @@ public class ZipInputStream extends BaseDataInput implements ZipDataInput {
     }
 
     @Override
-    public int getDiskNo() {
-        return delegate.getDiskNo();
+    public SrcZip getSrcZip() {
+        return delegate.getSrcZip();
+    }
+
+    @Override
+    public SrcZip.Disk getDisk() {
+        return delegate.getDisk();
     }
 
     @Override
@@ -84,11 +89,6 @@ public class ZipInputStream extends BaseDataInput implements ZipDataInput {
     @Override
     public long toLong(byte[] buf, int offs, int len) {
         return delegate.toLong(buf, offs, len);
-    }
-
-    @Override
-    public String getFileName() {
-        return delegate.getFileName();
     }
 
     @Override

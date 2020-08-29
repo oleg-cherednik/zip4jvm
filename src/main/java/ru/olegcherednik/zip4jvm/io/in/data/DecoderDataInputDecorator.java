@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
 
@@ -42,8 +43,13 @@ public final class DecoderDataInputDecorator extends BaseDataInput implements De
     }
 
     @Override
-    public int getDiskNo() {
-        return delegate.getDiskNo();
+    public SrcZip getSrcZip() {
+        return delegate.getSrcZip();
+    }
+
+    @Override
+    public SrcZip.Disk getDisk() {
+        return delegate.getDisk();
     }
 
     @Override
@@ -84,11 +90,6 @@ public final class DecoderDataInputDecorator extends BaseDataInput implements De
     @Override
     public void seek(int diskNo, long relativeOffs) throws IOException {
         delegate.seek(diskNo, relativeOffs);
-    }
-
-    @Override
-    public String getFileName() {
-        return delegate.getFileName();
     }
 
     @Override
