@@ -4,6 +4,7 @@ import lombok.Getter;
 import ru.olegcherednik.zip4jvm.io.writers.ZipModelWriter;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import java.io.IOException;
@@ -71,7 +72,7 @@ public class SplitZipOutputStream extends BaseZipDataOutput {
     private void openNextDisk() throws IOException {
         super.close();
 
-        Path splitFile = ZipModel.getDiskFile(zipModel.getSrcZip().getPath(), ++diskNo);
+        Path splitFile = SrcZip.getDiskFile(zipModel.getSrcZip().getPath(), ++diskNo);
 
         if (Files.exists(splitFile))
             throw new IOException("split file: " + splitFile.getFileName() + " already exists in the current directory, cannot rename this file");

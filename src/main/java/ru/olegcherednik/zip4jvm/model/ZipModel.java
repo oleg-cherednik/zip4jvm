@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -97,11 +96,7 @@ public final class ZipModel {
 
     // TODO it seems that it should be moved to SrcZip
     public Path getDiskFile(int diskNo) {
-        return diskNo >= totalDisks ? srcZip.getPath() : getDiskFile(srcZip.getPath(), diskNo + 1);
-    }
-
-    public static Path getDiskFile(Path file, int diskNo) {
-        return file.getParent().resolve(String.format("%s.z%02d", FilenameUtils.getBaseName(file.toString()), diskNo));
+        return diskNo >= totalDisks ? srcZip.getPath() : SrcZip.getDiskFile(srcZip.getPath(), diskNo + 1);
     }
 
 }
