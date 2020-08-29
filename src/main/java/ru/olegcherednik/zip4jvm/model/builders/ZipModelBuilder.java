@@ -53,41 +53,38 @@ public final class ZipModelBuilder {
 
     public ZipModel build() throws IOException {
         ZipModel zipModel = new ZipModel(srcZip);
-
         zipModel.setZip64(zip64 != Zip64.NULL);
         zipModel.setComment(endCentralDirectory.getComment());
         zipModel.setTotalDisks(getTotalDisks());
-        zipModel.setMainDisk(getMainDiskNo());
+        zipModel.setMainDiskNo(getMainDiskNo());
         zipModel.setCentralDirectorySize(getCentralDirectorySize());
         zipModel.setCentralDirectoryRelativeOffs(getCentralDirectoryRelativeOffs(endCentralDirectory, zip64));
+        zipModel.setSplitSize(srcZip.getSplitSize());
+
         createAndAddEntries(zipModel);
-        updateSplit(zipModel);
 
         return zipModel;
     }
 
     private void createAndAddEntries(ZipModel zipModel) {
-        centralDirectory.getFileHeaders().stream()
-                        .map(fileHeader -> ZipEntryBuilder.build(fileHeader, zipModel, charsetCustomizer))
-                        .forEach(zipModel::addEntry);
+        if (centralDirectory != null)
+            centralDirectory.getFileHeaders().stream()
+                            .map(fileHeader -> ZipEntryBuilder.build(fileHeader, zipModel, charsetCustomizer))
+                            .forEach(zipModel::addEntry);
     }
 
     private int getTotalDisks() {
         if (zip64 == Zip64.NULL)
             return endCentralDirectory.getTotalDisks();
-        return (int)zip64.getEndCentralDirectory().getTotalDisks();
+        return (int)zip64.getEndCentralDirectoryLocator().getTotalDisks();
     }
 
     private long getMainDiskNo() {
-        if (zip64 == Zip64.NULL)
-            return endCentralDirectory.getMainDiskNo();
-        return zip64.getEndCentralDirectoryLocator().getMainDiskNo();
+        return getMainDiskNo(endCentralDirectory, zip64);
     }
 
     public long getCentralDirectorySize() {
-        if (zip64 == Zip64.NULL)
-            return endCentralDirectory.getCentralDirectorySize();
-        return zip64.getEndCentralDirectory().getCentralDirectorySize();
+        return getCentralDirectoryRelativeOffs(endCentralDirectory, zip64);
     }
 
     public static int getMainDiskNo(EndCentralDirectory endCentralDirectory, Zip64 zip64) {
@@ -106,20 +103,6 @@ public final class ZipModelBuilder {
         if (zip64 == Zip64.NULL)
             return endCentralDirectory.getTotalEntries();
         return zip64.getEndCentralDirectory().getTotalEntries();
-    }
-
-    private static void updateSplit(ZipModel zipModel) throws IOException {
-        if (zipModel.getSrcZip().isSplit())
-            zipModel.setSplitSize(getSplitSize(zipModel));
-    }
-
-    private static long getSplitSize(ZipModel zipModel) throws IOException {
-        long size = 0;
-
-        for (int diskNo = 0; diskNo <= zipModel.getTotalDisks(); diskNo++)
-            size = Math.max(size, Files.size(zipModel.getDiskFile(diskNo)));
-
-        return size;
     }
 
 }

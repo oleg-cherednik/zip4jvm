@@ -24,7 +24,7 @@ public final class ZipModelWriter implements Writer {
     public void write(DataOutput out) throws IOException {
         zipModel.setTotalDisks(out.getDiskNo());
         zipModel.setCentralDirectoryRelativeOffs(out.getOffs());
-        zipModel.setMainDisk(out.getDiskNo());
+        zipModel.setMainDiskNo(out.getDiskNo());
 
         updateZip64(out.getOffs());
         writeCentralDirectoryHeaders(out);

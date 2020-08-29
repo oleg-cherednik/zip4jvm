@@ -24,8 +24,8 @@ public class LittleEndianDataInputFile implements DataInputFile {
     }
 
     @Override
-    public long length() {
-        return srcZip.getLength();
+    public long size() {
+        return srcZip.getSize();
     }
 
     @Override
@@ -137,6 +137,6 @@ public class LittleEndianDataInputFile implements DataInputFile {
 
     @Override
     public String toString() {
-        return "offs: " + getAbsoluteOffs() + " (0x" + Long.toHexString(getAbsoluteOffs()) + ')';
+        return in == null ? "<empty>" : "offs: " + getAbsoluteOffs() + " (0x" + Long.toHexString(getAbsoluteOffs()) + ')';
     }
 }

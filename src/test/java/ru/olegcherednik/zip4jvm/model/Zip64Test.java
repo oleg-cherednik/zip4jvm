@@ -22,13 +22,13 @@ import static org.mockito.Mockito.verify;
 @SuppressWarnings("NewClassNamingConvention")
 public class Zip64Test {
 
-    public void shouldRetrieveNullObjectWhenOneOfArgumentsIsNull() {
+    public void shouldRetrieveNullObjectWhenAllArgumentsAreNull() {
         Zip64.EndCentralDirectoryLocator endCentralDirectoryLocator = new Zip64.EndCentralDirectoryLocator();
         Zip64.EndCentralDirectory endCentralDirectory = new Zip64.EndCentralDirectory();
 
         assertThat(Zip64.of(null, null)).isSameAs(Zip64.NULL);
-        assertThat(Zip64.of(endCentralDirectoryLocator, null)).isSameAs(Zip64.NULL);
-        assertThat(Zip64.of(null, endCentralDirectory)).isSameAs(Zip64.NULL);
+        assertThat(Zip64.of(endCentralDirectoryLocator, null)).isNotSameAs(Zip64.NULL);
+        assertThat(Zip64.of(null, endCentralDirectory)).isNotSameAs(Zip64.NULL);
         assertThat(Zip64.of(endCentralDirectoryLocator, endCentralDirectory)).isNotSameAs(Zip64.NULL);
     }
 

@@ -46,7 +46,7 @@ public final class ZipModel {
 
     private String comment;
     private int totalDisks;
-    private long mainDisk;
+    private long mainDiskNo;
     private long centralDirectoryRelativeOffs;
     private long centralDirectorySize;
 
@@ -65,7 +65,7 @@ public final class ZipModel {
     }
 
     public boolean isSplit() {
-        return splitSize > 0 || totalDisks > 0;
+        return splitSize != NO_SPLIT || totalDisks > 0;
     }
 
     public boolean isEmpty() {

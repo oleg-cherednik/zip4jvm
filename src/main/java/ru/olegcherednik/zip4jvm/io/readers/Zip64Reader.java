@@ -22,20 +22,22 @@ public class Zip64Reader implements Reader<Zip64> {
     public final Zip64 read(DataInput in) throws IOException {
         if (findCentralDirectoryLocatorSignature(in)) {
             Zip64.EndCentralDirectoryLocator locator = readEndCentralDirectoryLocator(in);
-            findCentralDirectorySignature(locator, in);
+            findEndCentralDirectorySignature(locator, in);
             return Zip64.of(locator, readEndCentralDirectory(in));
         }
 
         return Zip64.NULL;
     }
 
-    private static boolean findCentralDirectoryLocatorSignature(DataInput in) throws IOException {
-        long offs = in.getAbsoluteOffs() - Zip64.EndCentralDirectoryLocator.SIZE;
+    protected final Zip64 findAndReadEndCentralDirectoryLocator(DataInput in) throws IOException {
+        return findCentralDirectoryLocatorSignature(in) ? Zip64.of(readEndCentralDirectoryLocator(in), null) : Zip64.NULL;
+    }
 
-        if (offs < 0)
+    private static boolean findCentralDirectoryLocatorSignature(DataInput in) throws IOException {
+        if (in.getAbsoluteOffs() < Zip64.EndCentralDirectoryLocator.SIZE)
             return false;
 
-        in.seek(offs);
+        in.backward(Zip64.EndCentralDirectoryLocator.SIZE);
 
         if (in.readDwordSignature() != Zip64.EndCentralDirectoryLocator.SIGNATURE)
             return false;
@@ -44,7 +46,7 @@ public class Zip64Reader implements Reader<Zip64> {
         return true;
     }
 
-    private static void findCentralDirectorySignature(Zip64.EndCentralDirectoryLocator locator, DataInput in) throws IOException {
+    private static void findEndCentralDirectorySignature(Zip64.EndCentralDirectoryLocator locator, DataInput in) throws IOException {
         in.seek((int)locator.getMainDiskNo(), locator.getEndCentralDirectoryRelativeOffs());
 
         if (in.readDwordSignature() != Zip64.EndCentralDirectory.SIGNATURE)
@@ -90,7 +92,7 @@ public class Zip64Reader implements Reader<Zip64> {
             dir.setEndCentralDirectorySize(endCentralDirectorySize);
             dir.setVersionMadeBy(Version.of(in.readWord()));
             dir.setVersionToExtract(Version.of(in.readWord()));
-            dir.setTotalDisks(in.readDword());
+            dir.setDiskNo(in.readDword());
             dir.setMainDiskNo(in.readDword());
             dir.setDiskEntries(in.readQword());
             dir.setTotalEntries(in.readQword());

@@ -36,7 +36,7 @@ final class Zip64Writer implements Writer {
             out.writeQword(endCentralDirectory.getEndCentralDirectorySize());
             out.writeWord(endCentralDirectory.getVersionMadeBy().getData());
             out.writeWord(endCentralDirectory.getVersionToExtract().getData());
-            out.writeDword(endCentralDirectory.getTotalDisks());
+            out.writeDword(endCentralDirectory.getDiskNo());
             out.writeDword(endCentralDirectory.getMainDiskNo());
             out.writeQword(endCentralDirectory.getDiskEntries());
             out.writeQword(endCentralDirectory.getTotalEntries());

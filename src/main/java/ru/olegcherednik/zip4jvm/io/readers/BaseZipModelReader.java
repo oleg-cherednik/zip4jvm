@@ -46,29 +46,40 @@ public abstract class BaseZipModelReader {
     protected CentralDirectory centralDirectory;
 
     public final void readCentralData() throws IOException {
+        readCentralData(true);
+    }
+
+    protected final void readCentralData(boolean readCentralDirectory) throws IOException {
         try (DataInput in = createDataInput()) {
-            findCentralDirectorySignature(in);
-            endCentralDirectory = readEndCentralDirectory(in);
-            zip64 = readZip64(in);
-            centralDirectory = readCentralDirectory(in);
+            readEndCentralDirectory(in);
+            readZip64(in);
+
+            if (readCentralDirectory)
+                readCentralDirectory(in);
         }
     }
 
-    private EndCentralDirectory readEndCentralDirectory(DataInput in) throws IOException {
-        return getEndCentralDirectoryReader().read(in);
+    protected final void readEndCentralDirectory(DataInput in) throws IOException {
+        findCentralDirectorySignature(in);
+        endCentralDirectory = getEndCentralDirectoryReader().read(in);
     }
 
-    private Zip64 readZip64(DataInput in) throws IOException {
+    protected void readZip64(DataInput in) throws IOException {
         in.seek(MARKER_END_CENTRAL_DIRECTORY);
-        return getZip64Reader().read(in);
+        zip64 = getZip64Reader().read(in);
     }
 
-    private CentralDirectory readCentralDirectory(DataInput in) throws IOException {
+    protected final void readZip64EndCentralDirectoryLocator(DataInput in) throws IOException {
+        in.seek(MARKER_END_CENTRAL_DIRECTORY);
+        zip64 = getZip64Reader().findAndReadEndCentralDirectoryLocator(in);
+    }
+
+    private void readCentralDirectory(DataInput in) throws IOException {
         int mainDiskNo = ZipModelBuilder.getMainDiskNo(endCentralDirectory, zip64);
         long relativeOffs = ZipModelBuilder.getCentralDirectoryRelativeOffs(endCentralDirectory, zip64);
         long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
         in.seek(mainDiskNo, relativeOffs);
-        return getCentralDirectoryReader(totalEntries).read(in);
+        centralDirectory = getCentralDirectoryReader(totalEntries).read(in);
     }
 
     protected abstract DataInput createDataInput() throws IOException;

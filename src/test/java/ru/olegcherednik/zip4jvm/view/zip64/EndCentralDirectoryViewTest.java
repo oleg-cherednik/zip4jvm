@@ -84,7 +84,7 @@ public class EndCentralDirectoryViewTest {
         endCentralDirectory.setEndCentralDirectorySize(345);
         endCentralDirectory.setVersionMadeBy(Version.of(0x12));
         endCentralDirectory.setVersionToExtract(Version.of(0x134));
-        endCentralDirectory.setTotalDisks(1);
+        endCentralDirectory.setDiskNo(1);
         endCentralDirectory.setMainDiskNo(2);
         endCentralDirectory.setDiskEntries(13);
         endCentralDirectory.setTotalEntries(15);

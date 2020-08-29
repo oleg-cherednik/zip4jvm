@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.apache.commons.lang.ArrayUtils;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -20,7 +21,9 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotEmpty;
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
 /**
- * Represents either single solid zip file or split zip with multiple disks.
+ * Represents either single solid zip file or split zip with multiple disks. This class used to check that required disks are available, otherwise
+ * given {@code zip} file it treats as {@link SolidSrcZip} and this file could be not a zip file at all (to check this {@link ZipModel} should be
+ * built).
  *
  * @author Oleg Cherednik
  * @since 20.01.2020
@@ -39,12 +42,22 @@ public abstract class SrcZip {
     protected final Path path;
     @Getter(AccessLevel.NONE)
     protected final List<Disk> disks;
-    protected final long length;
+    protected final long size;
+    protected final long splitSize;
 
     protected SrcZip(Path path, List<Disk> disks) {
         this.path = path;
         this.disks = Collections.unmodifiableList(requireNotEmpty(disks, "SrcZip.disks"));
-        length = disks.stream().mapToLong(Disk::getLength).sum();
+        size = calcSize(disks);
+        splitSize = calcSplitSize(disks);
+    }
+
+    private static long calcSize(List<Disk> disks) {
+        return disks.stream().mapToLong(Disk::getLength).sum();
+    }
+
+    private static long calcSplitSize(List<Disk> disks) {
+        return disks.size() == 1 ? ZipModel.NO_SPLIT : disks.stream().mapToLong(Disk::getLength).max().orElse(ZipModel.NO_SPLIT);
     }
 
     public Disk getDiskByNo(int diskNo) {
@@ -58,10 +71,6 @@ public abstract class SrcZip {
                 return disk;
 
         return disks.get(disks.size() - 1);
-    }
-
-    public boolean isSplit() {
-        return disks.size() > 1;
     }
 
     public boolean isLast(Disk disk) {

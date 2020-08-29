@@ -120,9 +120,9 @@ abstract class BaseDataInput implements DataInput {
 
     @Override
     public long getMark(String id) {
-        if (!map.containsKey(id))
-            throw new Zip4jvmException("Cannot find mark: " + id);
-        return map.get(id);
+        if (map.containsKey(id))
+            return map.get(id);
+        throw new Zip4jvmException("Cannot find mark: " + id);
     }
 
     @Override

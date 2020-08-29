@@ -20,7 +20,7 @@ public interface DataInputFile extends Closeable, RandomAccess {
     /** Retrieves offs starting from the beginning of the current disk */
     long getDiskRelativeOffs();
 
-    long length();
+    long size();
 
     int read(byte[] buf, int offs, int len) throws IOException;
 

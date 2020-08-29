@@ -26,7 +26,7 @@ public final class Zip64 {
     private final EndCentralDirectory endCentralDirectory;
 
     public static Zip64 of(EndCentralDirectoryLocator endCentralDirectoryLocator, EndCentralDirectory endCentralDirectory) {
-        return endCentralDirectoryLocator == null || endCentralDirectory == null ? NULL : new Zip64(endCentralDirectoryLocator, endCentralDirectory);
+        return endCentralDirectoryLocator == null && endCentralDirectory == null ? NULL : new Zip64(endCentralDirectoryLocator, endCentralDirectory);
     }
 
     @Override
@@ -71,7 +71,7 @@ public final class Zip64 {
         // size:2 - version needed to extractEntries
         private Version versionToExtract = Version.NULL;
         // size:4 - number of this disk
-        private long totalDisks;
+        private long diskNo;
         // size:4 - number of the disk with the start of the central directory
         private long mainDiskNo;
         // size:8 - total number of entries in the central directory on this disk

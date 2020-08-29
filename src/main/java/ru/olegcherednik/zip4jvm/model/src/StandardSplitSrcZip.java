@@ -3,10 +3,8 @@ package ru.olegcherednik.zip4jvm.model.src;
 import org.apache.commons.io.FilenameUtils;
 import ru.olegcherednik.zip4jvm.exception.SplitPartNotFoundException;
 import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
-import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedList;
@@ -19,7 +17,7 @@ import java.util.List;
 final class StandardSplitSrcZip extends SrcZip {
 
     public static boolean isCandidate(Path zip) {
-        return Files.isReadable(zip) && getTotalDisks(zip) > 0;
+        return Files.isReadable(zip) && ZipModelReader.getTotalDisks(SolidSrcZip.create(zip)) > 0;
     }
 
     public static StandardSplitSrcZip create(Path zip) {
@@ -32,7 +30,7 @@ final class StandardSplitSrcZip extends SrcZip {
         List<Disk> disks = new LinkedList<>();
         Path dir = zip.getParent();
         String baseName = FilenameUtils.getBaseName(zip.getFileName().toString());
-        int totalDisk = getTotalDisks(zip);
+        int totalDisk = ZipModelReader.getTotalDisks(SolidSrcZip.create(zip));
 
         for (Path diskPath : getDiskPaths(dir, baseName + "\\.(?:z\\d+|zip)")) {
             String actualFileName = diskPath.getFileName().toString();
@@ -53,16 +51,6 @@ final class StandardSplitSrcZip extends SrcZip {
         }
 
         return disks;
-    }
-
-    private static int getTotalDisks(Path zip) {
-        try {
-            // TODO ready only required parts
-            ZipModel model = new ZipModelReader(SolidSrcZip.create(zip)).read();
-            return model.getTotalDisks();
-        } catch(IOException e) {
-            return 0;
-        }
     }
 
     private StandardSplitSrcZip(Path zip, List<Disk> disks) {
