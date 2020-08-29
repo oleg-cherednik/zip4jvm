@@ -3,9 +3,7 @@ package ru.olegcherednik.zip4jvm.model.block;
 import lombok.Getter;
 import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.ZipDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.ZipInputStream;
-import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;
 
@@ -26,11 +24,9 @@ public class Block {
     private int diskNo;
     private String fileName;
     private SrcZip srcZip;
-    private ZipModel zipModel;
 
     public <T> T calcSize(DataInput in, LocalSupplier<T> task) throws IOException {
         try {
-            zipModel = in instanceof ZipDataInput ? ((ZipDataInput)in).getZipModel() : null;
             absoluteOffs = in.getAbsoluteOffs();
             relativeOffs = in.getDiskRelativeOffs();
             diskNo = in.getDisk().getNo();
@@ -47,7 +43,7 @@ public class Block {
     }
 
     public byte[] getData() {
-        if (srcZip == null || size > Integer.MAX_VALUE)
+        if (size > Integer.MAX_VALUE)
             return ArrayUtils.EMPTY_BYTE_ARRAY;
 
         try (DataInput in = new ZipInputStream(srcZip)) {
@@ -57,11 +53,6 @@ public class Block {
             e.printStackTrace();
             return ArrayUtils.EMPTY_BYTE_ARRAY;
         }
-    }
-
-    public void setDiskNo(int diskNo, String fileName) {
-        this.diskNo = diskNo;
-        this.fileName = fileName;
     }
 
     @Override

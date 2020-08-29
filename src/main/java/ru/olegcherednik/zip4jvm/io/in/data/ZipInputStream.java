@@ -3,7 +3,6 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 import lombok.Getter;
 import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianDataInputFile;
-import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
@@ -13,21 +12,11 @@ import java.io.IOException;
  * @since 12.12.2019
  */
 @Getter
-public class ZipInputStream extends BaseDataInput implements ZipDataInput {
+public class ZipInputStream extends BaseDataInput {
 
-    private final ZipModel zipModel;
     private final DataInputFile delegate;
 
     public ZipInputStream(SrcZip srcZip) throws IOException {
-        this(null, srcZip);
-    }
-
-    public ZipInputStream(ZipModel zipModel) throws IOException {
-        this(zipModel, zipModel.getSrcZip());
-    }
-
-    private ZipInputStream(ZipModel zipModel, SrcZip srcZip) throws IOException {
-        this.zipModel = zipModel;
         delegate = new LittleEndianDataInputFile(srcZip);
     }
 
