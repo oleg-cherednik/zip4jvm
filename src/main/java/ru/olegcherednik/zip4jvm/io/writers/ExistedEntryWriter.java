@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.ZipInputStream;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
@@ -15,7 +16,6 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
-import java.io.Closeable;
 import java.io.IOException;
 
 /**
@@ -41,13 +41,15 @@ public class ExistedEntryWriter implements Writer {
         long offs = out.getOffs();
         int diskNo = out.getDiskNo();
 
-        try (CopyEntryInputStream in = new CopyEntryInputStream(entry, srcZipModel)) {
+        try (DataInput in = new ZipInputStream(srcZipModel.getSrcZip())) {
+            CopyEntryInputStream is = new CopyEntryInputStream(entry, in);
+
             if (!destZipModel.hasEntry(entryName))
                 destZipModel.addEntry(entry);
 
-            in.copyLocalFileHeader(out);
-            in.copyEncryptionHeaderAndData(out);
-            in.copyDataDescriptor(out);
+            is.copyLocalFileHeader(out);
+            is.copyEncryptionHeaderAndData(out);
+            is.copyDataDescriptor(out);
             // TODO probably should set compressed size here
         }
 
@@ -60,15 +62,11 @@ public class ExistedEntryWriter implements Writer {
         return "->" + entryName;
     }
 
-    private static final class CopyEntryInputStream implements Closeable {
+    @RequiredArgsConstructor
+    private static final class CopyEntryInputStream {
 
         private final ZipEntry zipEntry;
         private final DataInput in;
-
-        public CopyEntryInputStream(ZipEntry zipEntry, ZipModel zipModel) throws IOException {
-            this.zipEntry = zipEntry;
-            in = zipModel.createDataInput(zipEntry.getFileName());
-        }
 
         public void copyLocalFileHeader(DataOutput out) throws IOException {
             long absoluteOffs = in.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs());
@@ -97,11 +95,6 @@ public class ExistedEntryWriter implements Writer {
                 DataDescriptor dataDescriptor = DataDescriptorReader.get(zipEntry.isZip64()).read(in);
                 DataDescriptorWriter.get(zipEntry.isZip64(), dataDescriptor).write(out);
             }
-        }
-
-        @Override
-        public void close() throws IOException {
-            in.close();
         }
 
         @Override

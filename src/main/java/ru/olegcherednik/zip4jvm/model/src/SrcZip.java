@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.model.src;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -80,9 +81,17 @@ public abstract class SrcZip {
                                                                           .collect(Collectors.toCollection(TreeSet::new));
     }
 
+    public Path getDiskFile(int diskNo) {
+        return getDiskFile(path, diskNo);
+    }
+
     @Override
     public String toString() {
         return String.format("%s (%d)", path.toString(), disks.size());
+    }
+
+    public static Path getDiskFile(Path path, int diskNo) {
+        return path.getParent().resolve(String.format("%s.z%02d", FilenameUtils.getBaseName(path.toString()), diskNo + 1));
     }
 
     @Getter

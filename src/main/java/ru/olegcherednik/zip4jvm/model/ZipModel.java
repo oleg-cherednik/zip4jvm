@@ -7,12 +7,9 @@ import lombok.Setter;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.ZipInputStream;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
@@ -85,10 +82,9 @@ public final class ZipModel {
     }
 
     public ZipEntry getZipEntryByFileName(String fileName) {
-        if (!fileNameEntry.containsKey(fileName))
-            throw new EntryNotFoundException(fileName);
-
-        return fileNameEntry.get(fileName);
+        if (fileNameEntry.containsKey(fileName))
+            return fileNameEntry.get(fileName);
+        throw new EntryNotFoundException(fileName);
     }
 
     public boolean hasEntry(String fileName) {
@@ -99,20 +95,13 @@ public final class ZipModel {
         return isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(fileNameEntry.keySet());
     }
 
+    // TODO it seems that it should be moved to SrcZip
     public Path getDiskFile(int diskNo) {
         return diskNo >= totalDisks ? srcZip.getPath() : getDiskFile(srcZip.getPath(), diskNo + 1);
     }
 
     public static Path getDiskFile(Path file, int diskNo) {
         return file.getParent().resolve(String.format("%s.z%02d", FilenameUtils.getBaseName(file.toString()), diskNo));
-    }
-
-    public DataInput createDataInput(String fileName) throws IOException {
-        int diskNo = getZipEntryByFileName(fileName).getDiskNo();
-        long absoluteOffs = srcZip.getDiskByNo(diskNo).getAbsoluteOffs();
-        DataInput in = new ZipInputStream(srcZip);
-        in.seek(absoluteOffs);
-        return in;
     }
 
 }
