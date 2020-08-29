@@ -34,9 +34,7 @@ public interface DataInput extends Closeable, RandomAccess {
 
     int getDiskNo();
 
-    default String getFileName() {
-        return null;
-    }
+    String getFileName();
 
     default int readWordSignature() throws IOException {
         return readWord();
@@ -60,7 +58,7 @@ public interface DataInput extends Closeable, RandomAccess {
 
     byte[] readBytes(int total) throws IOException;
 
-    long length() throws IOException;
+    long size() throws IOException;
 
     default void backward(int bytes) throws IOException {
         seek(getAbsoluteOffs() - bytes);

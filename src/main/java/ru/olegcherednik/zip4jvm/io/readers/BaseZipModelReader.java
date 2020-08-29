@@ -92,7 +92,7 @@ public abstract class BaseZipModelReader {
 
     public static void findCentralDirectorySignature(DataInput in) throws IOException {
         int commentLength = ZipModel.MAX_COMMENT_SIZE;
-        long available = in.length() - EndCentralDirectory.MIN_SIZE;
+        long available = in.size() - EndCentralDirectory.MIN_SIZE;
 
         do {
             in.seek(available--);

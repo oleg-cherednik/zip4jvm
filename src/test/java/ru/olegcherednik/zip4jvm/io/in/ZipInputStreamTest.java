@@ -73,7 +73,7 @@ public class ZipInputStreamTest {
             assertThat(in.readBytes(3)).isEqualTo(new byte[] { 0x12, 0x13, 0x14 });
             assertThat(in.getAbsoluteOffs()).isEqualTo(24);
 
-            assertThat(in.getAbsoluteOffs()).isEqualTo(in.length());
+            assertThat(in.getAbsoluteOffs()).isEqualTo(in.size());
         }
     }
 
