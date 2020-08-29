@@ -108,9 +108,11 @@ public final class ZipModel {
     }
 
     public DataInput createDataInput(String fileName) throws IOException {
-        DataInput res = createDataInput();
-        res.seek(srcZip.getDiskByNo(getZipEntryByFileName(fileName).getDiskNo()).getAbsoluteOffs());
-        return res;
+        int diskNo = getZipEntryByFileName(fileName).getDiskNo();
+        long absoluteOffs = srcZip.getDiskByNo(diskNo).getAbsoluteOffs();
+        DataInput in = createDataInput();
+        in.seek(absoluteOffs);
+        return in;
     }
 
     public DataInput createDataInput() throws IOException {

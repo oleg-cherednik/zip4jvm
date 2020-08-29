@@ -1,8 +1,6 @@
 package ru.olegcherednik.zip4jvm.model.block;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.ZipDataInput;
@@ -16,19 +14,15 @@ import java.io.IOException;
  * @since 19.10.2019
  */
 @Getter
-@NoArgsConstructor
 public class Block {
 
     public static final Block NULL = new Block();
 
     private long size;
-    @Setter
     private long relativeOffs;
-    @Setter
     private long absoluteOffs;
     private int diskNo;
     private String fileName;
-    @Setter
     private ZipModel zipModel;
 
     public <T> T calcSize(DataInput in, LocalSupplier<T> task) throws IOException {
@@ -53,7 +47,7 @@ public class Block {
             return ArrayUtils.EMPTY_BYTE_ARRAY;
 
         try (DataInput in = zipModel.createDataInput()) {
-            in.skip(relativeOffs);
+            in.seek(diskNo, relativeOffs);
             return in.readBytes((int)size);
         } catch(Exception e) {
             e.printStackTrace();
