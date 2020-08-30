@@ -3,7 +3,6 @@ package ru.olegcherednik.zip4jvm.engine;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.EntryDuplicationException;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
-import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.SingleZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.data.SplitZipOutputStream;
@@ -13,6 +12,7 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
@@ -118,12 +118,13 @@ public final class ZipEngine implements ZipFile.Writer {
     }
 
     private void removeOriginalZipFiles() throws IOException {
-        if (Files.exists(zip)) {
-            ZipModel zipModel = ZipModelBuilder.read(SrcZip.of(zip));
+        if (!Files.exists(zip))
+            return;
 
-            for (int diskNo = 0; diskNo <= zipModel.getTotalDisks(); diskNo++)
-                Files.deleteIfExists(zipModel.getDiskFile(diskNo));
-        }
+        SrcZip srcZip = SrcZip.of(zip);
+
+        for (int diskNo = 0; diskNo < srcZip.getTotalDisks(); diskNo++)
+            Files.deleteIfExists(srcZip.getDiskByNo(diskNo).getFile());
     }
 
     private void moveTempZipFiles() throws IOException {

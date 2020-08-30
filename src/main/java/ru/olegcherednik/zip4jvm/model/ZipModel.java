@@ -96,7 +96,7 @@ public final class ZipModel {
 
     // TODO it seems that it should be moved to SrcZip
     public Path getDiskFile(int diskNo) {
-        return diskNo >= totalDisks ? srcZip.getPath() : SrcZip.getDiskFile(srcZip.getPath(), diskNo + 1);
+        return diskNo >= totalDisks ? srcZip.getPath() : srcZip.getDiskFile(diskNo + 1);
     }
 
 }

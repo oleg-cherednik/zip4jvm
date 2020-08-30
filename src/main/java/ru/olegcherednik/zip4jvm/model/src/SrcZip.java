@@ -60,6 +60,10 @@ public abstract class SrcZip {
         return disks.size() == 1 ? ZipModel.NO_SPLIT : disks.stream().mapToLong(Disk::getSize).max().orElse(ZipModel.NO_SPLIT);
     }
 
+    public int getTotalDisks() {
+        return disks.size();
+    }
+
     public Disk getDiskByNo(int diskNo) {
         return disks.get(diskNo);
     }
@@ -69,6 +73,10 @@ public abstract class SrcZip {
             if (absoluteOffs - disk.getAbsoluteOffs() <= disk.getSize())
                 return disk;
 
+        return getLastDisk();
+    }
+
+    private Disk getLastDisk() {
         return disks.get(disks.size() - 1);
     }
 
