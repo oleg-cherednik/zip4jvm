@@ -36,7 +36,7 @@ zip4jvm - a java library for working with zip files
 ## Gradle
 
 ```
-compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.5'
+compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.6'
 ```
 
 ## Maven
