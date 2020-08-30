@@ -89,8 +89,8 @@ public abstract class SrcZip {
                                                                           .collect(Collectors.toCollection(TreeSet::new));
     }
 
-    public Path getDiskFile(int diskNo) {
-        return getDiskFile(path, diskNo);
+    public Path getDiskPath(int diskNo) {
+        return getDiskPath(path, diskNo);
     }
 
     @Override
@@ -98,7 +98,7 @@ public abstract class SrcZip {
         return String.format("%s (%d)", path.toString(), disks.size());
     }
 
-    public static Path getDiskFile(Path path, int diskNo) {
+    public static Path getDiskPath(Path path, int diskNo) {
         Path dir = path.getParent();
         String baseName = FilenameUtils.getBaseName(path.toString());
         return dir.resolve(String.format("%s.z%02d", baseName, diskNo));

@@ -21,6 +21,11 @@ import java.util.Optional;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ValidationUtils {
 
+    public static void requireLessOrEqual(long value, long max, String type) {
+        if (value > max)
+            throw new IllegalArgumentException(String.format("Parameter should be less or equal to %d: %s", max, type));
+    }
+
     public static void requireZeroOrPositive(long value, String type) {
         if (value < 0)
             throw new IllegalArgumentException("Parameter should be positive: " + type);

@@ -74,7 +74,7 @@ public class SplitZipOutputStream extends BaseZipDataOutput {
 
         SrcZip srcZip = zipModel.getSrcZip();
         Path path = srcZip.getPath();
-        Path diskPath = srcZip.getDiskFile(++diskNo);
+        Path diskPath = srcZip.getDiskPath(++diskNo);
 
         // TODO #34 - Validate all new create split disks are not exist
         if (Files.exists(diskPath))

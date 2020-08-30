@@ -41,6 +41,7 @@ public final class ZipModel {
     private long splitSize = NO_SPLIT;
 
     private String comment;
+    // 0 - solid zip; e.g. 5 - split zip with 5 disks + zip file (6 files in total)
     private int totalDisks;
     private long mainDiskNo;
     private long centralDirectoryRelativeOffs;
@@ -96,7 +97,7 @@ public final class ZipModel {
 
     // TODO it seems that it should be moved to SrcZip
     public Path getDiskFile(int diskNo) {
-        return diskNo >= totalDisks ? srcZip.getPath() : srcZip.getDiskFile(diskNo + 1);
+        return diskNo >= totalDisks ? srcZip.getPath() : srcZip.getDiskPath(diskNo + 1);
     }
 
 }

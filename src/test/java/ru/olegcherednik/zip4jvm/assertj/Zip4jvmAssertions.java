@@ -38,7 +38,7 @@ public final class Zip4jvmAssertions extends Assertions {
     }
 
     private static boolean isSplit(Path zip) {
-        return Files.exists(SrcZip.getDiskFile(zip, 1));
+        return Files.exists(SrcZip.getDiskPath(zip, 1));
     }
 
 }
