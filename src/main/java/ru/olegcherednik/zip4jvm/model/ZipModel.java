@@ -95,8 +95,7 @@ public final class ZipModel {
         return isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(fileNameEntry.keySet());
     }
 
-    // TODO it seems that it should be moved to SrcZip
-    public Path getDiskFile(int diskNo) {
+    public Path getDiskPath(int diskNo) {
         return diskNo >= totalDisks ? srcZip.getPath() : srcZip.getDiskPath(diskNo + 1);
     }
 
