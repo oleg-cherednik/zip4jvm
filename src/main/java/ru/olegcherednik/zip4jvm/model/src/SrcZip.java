@@ -99,7 +99,9 @@ public abstract class SrcZip {
     }
 
     public static Path getDiskFile(Path path, int diskNo) {
-        return path.getParent().resolve(String.format("%s.z%02d", FilenameUtils.getBaseName(path.toString()), diskNo));
+        Path dir = path.getParent();
+        String baseName = FilenameUtils.getBaseName(path.toString());
+        return dir.resolve(String.format("%s.z%02d", baseName, diskNo));
     }
 
     @Getter

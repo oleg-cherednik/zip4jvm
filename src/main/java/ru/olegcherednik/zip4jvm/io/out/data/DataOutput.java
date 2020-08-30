@@ -12,7 +12,7 @@ import java.io.IOException;
  */
 public interface DataOutput extends Marker, Closeable {
 
-    long getOffs();
+    long getRelativeOffs();
 
     void writeByte(int val) throws IOException;
 

@@ -31,8 +31,8 @@ abstract class BaseZipDataOutput extends BaseDataOutput {
     }
 
     @Override
-    public final long getOffs() {
-        return delegate.getOffs();
+    public final long getRelativeOffs() {
+        return delegate.getRelativeOffs();
     }
 
     @Override

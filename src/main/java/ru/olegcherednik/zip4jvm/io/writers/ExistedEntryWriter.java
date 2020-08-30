@@ -38,7 +38,7 @@ public class ExistedEntryWriter implements Writer {
         // TODO it seems that this should not be done, because we just copy encrypted/not encrypted entry
         entry.setPassword(entry.isEncrypted() ? password : null);
 
-        long offs = out.getOffs();
+        long offs = out.getRelativeOffs();
         int diskNo = out.getDiskNo();
 
         try (DataInput in = new ZipInputStream(srcZipModel.getSrcZip())) {

@@ -42,7 +42,7 @@ public class SplitZipOutputStream extends BaseZipDataOutput {
     }
 
     private void doNotSplitSignature(int len) throws IOException {
-        long available = zipModel.getSplitSize() - getOffs();
+        long available = zipModel.getSplitSize() - getRelativeOffs();
 
         if (available <= len)
             openNextDisk();
@@ -54,12 +54,12 @@ public class SplitZipOutputStream extends BaseZipDataOutput {
         final int offsInit = offs;
 
         while (len > 0) {
-            long available = zipModel.getSplitSize() - getOffs();
+            long available = zipModel.getSplitSize() - getRelativeOffs();
 
             if (available <= 0 || len > available && offsInit != offs)
                 openNextDisk();
 
-            available = zipModel.getSplitSize() - getOffs();
+            available = zipModel.getSplitSize() - getRelativeOffs();
 
             int writeBytes = Math.min(len, (int)available);
             super.write(buf, offs, writeBytes);
@@ -72,15 +72,18 @@ public class SplitZipOutputStream extends BaseZipDataOutput {
     private void openNextDisk() throws IOException {
         super.close();
 
-        Path splitFile = SrcZip.getDiskFile(zipModel.getSrcZip().getPath(), ++diskNo);
+        SrcZip srcZip = zipModel.getSrcZip();
+        Path path = srcZip.getPath();
+        Path diskPath = srcZip.getDiskFile(++diskNo);
 
-        if (Files.exists(splitFile))
-            throw new IOException("split file: " + splitFile.getFileName() + " already exists in the current directory, cannot rename this file");
+        // TODO #34 - Validate all new create split disks are not exist
+        if (Files.exists(diskPath))
+            throw new IOException("split file: " + diskPath.getFileName() + " already exists in the current directory, cannot rename this file");
 
-        if (!zipModel.getSrcZip().getPath().toFile().renameTo(splitFile.toFile()))
+        if (!path.toFile().renameTo(diskPath.toFile()))
             throw new IOException("cannot rename newly created split file");
 
-        createFile(zipModel.getSrcZip().getPath());
+        createFile(path);
     }
 
     @Override

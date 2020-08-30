@@ -31,8 +31,8 @@ public final class DecoderDataOutputDecorator extends BaseDataOutput implements 
     }
 
     @Override
-    public long getOffs() {
-        return delegate.getOffs();
+    public long getRelativeOffs() {
+        return delegate.getRelativeOffs();
     }
 
     @Override
