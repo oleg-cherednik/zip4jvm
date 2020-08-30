@@ -123,7 +123,7 @@ public class LittleEndianDataInputFile implements DataInputFile {
             return;
 
         close();
-        in = new RandomAccessFile(disk.getFile().toFile(), "r");
+        in = new RandomAccessFile(disk.getPath().toFile(), "r");
         this.disk = disk;
     }
 

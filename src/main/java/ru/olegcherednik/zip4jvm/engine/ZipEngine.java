@@ -124,7 +124,7 @@ public final class ZipEngine implements ZipFile.Writer {
         SrcZip srcZip = SrcZip.of(zip);
 
         for (int diskNo = 0; diskNo < srcZip.getTotalDisks(); diskNo++)
-            Files.deleteIfExists(srcZip.getDiskByNo(diskNo).getFile());
+            Files.deleteIfExists(srcZip.getDiskByNo(diskNo).getPath());
     }
 
     private void moveTempZipFiles() throws IOException {
