@@ -48,7 +48,7 @@ dependencies {
     implementation 'commons-lang:commons-lang:2.6'
     implementation 'org.apache.commons:commons-collections4:4.3'
 
-    annotationProcessor("org.projectlombok:lombok:1.18.12")
+    annotationProcessor('org.projectlombok:lombok:1.18.12')
 
     testImplementation 'org.testng:testng:7.3.0'
     testImplementation 'org.assertj:assertj-core:3.11.1'
@@ -60,7 +60,7 @@ dependencies {
     testImplementation 'org.apache.commons:commons-compress:1.20'
     testImplementation 'org.tukaani:xz:1.8'
 
-    testAnnotationProcessor("org.projectlombok:lombok:1.18.12")
+    testAnnotationProcessor('org.projectlombok:lombok:1.18.12')
 }
 
 jacocoTestReport {
@@ -120,8 +120,8 @@ modifyPom {
 
 extraArchive {
     sources true
-    tests true
-    javadoc true
+    tests false
+    javadoc false
 }
 
 nexus {
