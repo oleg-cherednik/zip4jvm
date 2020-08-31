@@ -120,8 +120,8 @@ modifyPom {
 
 extraArchive {
     sources true
-    tests false
-    javadoc false
+    tests true
+    javadoc true
 }
 
 nexus {
