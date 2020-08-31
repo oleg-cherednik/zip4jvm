@@ -7,7 +7,7 @@ import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
-import ru.olegcherednik.zip4jvm.io.out.data.SingleZipOutputStream;
+import ru.olegcherednik.zip4jvm.io.out.data.SolidZipOutputStream;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
@@ -25,9 +25,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 @Test
 @SuppressWarnings("FieldNamingConvention")
-public class SingleZipOutputStreamTest {
+public class SolidZipOutputStreamTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(SingleZipOutputStreamTest.class);
+    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(SolidZipOutputStreamTest.class);
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -43,7 +43,7 @@ public class SingleZipOutputStreamTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.data");
         ZipModel zipModel = new ZipModel(SrcZip.of(zip));
 
-        try (SingleZipOutputStream out = new SingleZipOutputStream(zipModel)) {
+        try (SolidZipOutputStream out = new SolidZipOutputStream(zipModel)) {
             assertThat(out.getRelativeOffs()).isEqualTo(0);
 
             out.writeWord(0x0201);
@@ -81,7 +81,7 @@ public class SingleZipOutputStreamTest {
         ZipModel zipModel = new ZipModel(SrcZip.of(zip));
 
         assertThatThrownBy(() -> {
-            try (SingleZipOutputStream out = new SingleZipOutputStream(zipModel)) {
+            try (SolidZipOutputStream out = new SolidZipOutputStream(zipModel)) {
                 out.writeWord(0x0201);
                 out.writeDword(0x06050403);
 
