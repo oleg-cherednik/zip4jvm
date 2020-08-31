@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.ZipInputStream;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
@@ -15,7 +16,6 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
-import java.io.Closeable;
 import java.io.IOException;
 
 /**
@@ -38,21 +38,23 @@ public class ExistedEntryWriter implements Writer {
         // TODO it seems that this should not be done, because we just copy encrypted/not encrypted entry
         entry.setPassword(entry.isEncrypted() ? password : null);
 
-        long offs = out.getOffs();
-        long disk = out.getDisk();
+        long offs = out.getRelativeOffs();
+        int diskNo = out.getDiskNo();
 
-        try (CopyEntryInputStream in = new CopyEntryInputStream(entry, srcZipModel)) {
+        try (DataInput in = new ZipInputStream(srcZipModel.getSrcZip())) {
+            CopyEntryInputStream is = new CopyEntryInputStream(entry, in);
+
             if (!destZipModel.hasEntry(entryName))
                 destZipModel.addEntry(entry);
 
-            in.copyLocalFileHeader(out);
-            in.copyEncryptionHeaderAndData(out);
-            in.copyDataDescriptor(out);
+            is.copyLocalFileHeader(out);
+            is.copyEncryptionHeaderAndData(out);
+            is.copyDataDescriptor(out);
             // TODO probably should set compressed size here
         }
 
-        entry.setLocalFileHeaderOffs(offs);
-        entry.setDisk(disk);
+        entry.setLocalFileHeaderRelativeOffs(offs);
+        entry.setDiskNo(diskNo);
     }
 
     @Override
@@ -60,18 +62,15 @@ public class ExistedEntryWriter implements Writer {
         return "->" + entryName;
     }
 
-    private static final class CopyEntryInputStream implements Closeable {
+    @RequiredArgsConstructor
+    private static final class CopyEntryInputStream {
 
         private final ZipEntry zipEntry;
         private final DataInput in;
 
-        public CopyEntryInputStream(ZipEntry zipEntry, ZipModel zipModel) throws IOException {
-            this.zipEntry = zipEntry;
-            in = zipModel.createDataInput(zipEntry.getFileName());
-        }
-
         public void copyLocalFileHeader(DataOutput out) throws IOException {
-            LocalFileHeader localFileHeader = new LocalFileHeaderReader(zipEntry.getLocalFileHeaderOffs(), Charsets.UNMODIFIED).read(in);
+            long absoluteOffs = in.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs());
+            LocalFileHeader localFileHeader = new LocalFileHeaderReader(absoluteOffs, Charsets.UNMODIFIED).read(in);
             zipEntry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
             new LocalFileHeaderWriter(localFileHeader).write(out);
         }
@@ -99,13 +98,8 @@ public class ExistedEntryWriter implements Writer {
         }
 
         @Override
-        public void close() throws IOException {
-            in.close();
-        }
-
-        @Override
         public String toString() {
-            return ZipUtils.toString(in.getOffs());
+            return ZipUtils.toString(in.getAbsoluteOffs());
         }
 
     }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.ZipInputStream;
 import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockAesHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockDecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockPkwareHeaderReader;
@@ -35,8 +36,8 @@ public class BlockZipEntryReader {
     private final Map<String, ZipEntryBlock> fileNameZipEntryBlock = new LinkedHashMap<>();
 
     public Map<String, ZipEntryBlock> read() throws IOException {
-        for (ZipEntry zipEntry : zipModel.getZipEntries()) {
-            try (DataInput in = zipModel.createDataInput(zipEntry.getFileName())) {
+        try (DataInput in = new ZipInputStream(zipModel.getSrcZip())) {
+            for (ZipEntry zipEntry : zipModel.getZipEntries()) {
                 readLocalFileHeader(zipEntry, in);
                 readEncryptionHeader(zipEntry, in);
                 readDataDescriptor(zipEntry, in);
@@ -47,7 +48,9 @@ public class BlockZipEntryReader {
     }
 
     private void readLocalFileHeader(ZipEntry zipEntry, DataInput in) throws IOException {
-        BlockLocalFileHeaderReader reader = new BlockLocalFileHeaderReader(zipEntry, customizeCharset);
+        long absoluteOffs = in.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs());
+
+        BlockLocalFileHeaderReader reader = new BlockLocalFileHeaderReader(absoluteOffs, customizeCharset);
         LocalFileHeader localFileHeader = reader.read(in);
 
         requireBlockExists(localFileHeader.getFileName());

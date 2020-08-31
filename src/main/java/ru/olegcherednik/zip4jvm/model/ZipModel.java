@@ -4,16 +4,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.SingleZipInputStream;
-import ru.olegcherednik.zip4jvm.io.in.data.SplitZipInputStream;
-import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
@@ -42,13 +37,14 @@ public final class ZipModel {
     public static final int MAX_TOTAL_DISKS = Zip64.LIMIT_WORD;
     public static final int MAX_COMMENT_SIZE = Zip64.LIMIT_WORD;
 
-    private final SrcFile srcFile;
+    private final SrcZip srcZip;
     private long splitSize = NO_SPLIT;
 
     private String comment;
-    private long totalDisks;
-    private long mainDisk;
-    private long centralDirectoryOffs;
+    // 0 - solid zip; e.g. 5 - split zip with 5 disks + zip file (6 files in total)
+    private int totalDisks;
+    private long mainDiskNo;
+    private long centralDirectoryRelativeOffs;
     private long centralDirectorySize;
 
     /**
@@ -66,7 +62,7 @@ public final class ZipModel {
     }
 
     public boolean isSplit() {
-        return splitSize > 0 || totalDisks > 0;
+        return splitSize != NO_SPLIT || totalDisks > 0;
     }
 
     public boolean isEmpty() {
@@ -86,10 +82,9 @@ public final class ZipModel {
     }
 
     public ZipEntry getZipEntryByFileName(String fileName) {
-        if (!fileNameEntry.containsKey(fileName))
-            throw new EntryNotFoundException(fileName);
-
-        return fileNameEntry.get(fileName);
+        if (fileNameEntry.containsKey(fileName))
+            return fileNameEntry.get(fileName);
+        throw new EntryNotFoundException(fileName);
     }
 
     public boolean hasEntry(String fileName) {
@@ -100,20 +95,8 @@ public final class ZipModel {
         return isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(fileNameEntry.keySet());
     }
 
-    public Path getDiskFile(long disk) {
-        return disk >= totalDisks ? srcFile.getPath() : getDiskFile(srcFile.getPath(), disk + 1);
-    }
-
-    public static Path getDiskFile(Path file, long disk) {
-        return file.getParent().resolve(String.format("%s.z%02d", FilenameUtils.getBaseName(file.toString()), disk));
-    }
-
-    public DataInput createDataInput(String fileName) throws IOException {
-        return isSplit() ? new SplitZipInputStream(this, getZipEntryByFileName(fileName).getDisk()) : new SingleZipInputStream(this);
-    }
-
-    public DataInput createDataInput() throws IOException {
-        return isSplit() ? new SplitZipInputStream(this, 0) : new SingleZipInputStream(this);
+    public Path getDiskPath(int diskNo) {
+        return diskNo >= totalDisks ? srcZip.getPath() : srcZip.getDiskPath(diskNo + 1);
     }
 
 }

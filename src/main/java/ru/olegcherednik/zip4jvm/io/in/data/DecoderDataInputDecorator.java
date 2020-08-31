@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
 
@@ -27,13 +28,33 @@ public final class DecoderDataInputDecorator extends BaseDataInput implements De
     }
 
     @Override
-    public long getOffs() {
-        return delegate.getOffs();
+    public long getAbsoluteOffs() {
+        return delegate.getAbsoluteOffs();
     }
 
     @Override
-    public long length() throws IOException {
-        return delegate.getOffs();
+    public long convertToAbsoluteOffs(int diskNo, long relativeOffs) {
+        return delegate.convertToAbsoluteOffs(diskNo, relativeOffs);
+    }
+
+    @Override
+    public long getDiskRelativeOffs() {
+        return delegate.getDiskRelativeOffs();
+    }
+
+    @Override
+    public SrcZip getSrcZip() {
+        return delegate.getSrcZip();
+    }
+
+    @Override
+    public SrcZip.Disk getDisk() {
+        return delegate.getDisk();
+    }
+
+    @Override
+    public long size() throws IOException {
+        return delegate.getAbsoluteOffs();
     }
 
     @Override
@@ -62,8 +83,13 @@ public final class DecoderDataInputDecorator extends BaseDataInput implements De
     }
 
     @Override
-    public void seek(long pos) throws IOException {
-        delegate.seek(pos);
+    public void seek(long absoluteOffs) throws IOException {
+        delegate.seek(absoluteOffs);
+    }
+
+    @Override
+    public void seek(int diskNo, long relativeOffs) throws IOException {
+        delegate.seek(diskNo, relativeOffs);
     }
 
     @Override

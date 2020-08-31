@@ -27,7 +27,7 @@ public class BlockFileHeaderReader extends FileHeaderReader {
     @Override
     protected CentralDirectory.FileHeader readFileHeader(DataInput in) throws IOException {
         block = new CentralDirectoryBlock.FileHeaderBlock();
-        CentralDirectory.FileHeader fileHeader = block.calc(in, () -> super.readFileHeader(in));
+        CentralDirectory.FileHeader fileHeader = block.calcSize(in, () -> super.readFileHeader(in));
         centralDirectoryBlock.addFileHeader(fileHeader.getFileName(), block);
         return fileHeader;
     }

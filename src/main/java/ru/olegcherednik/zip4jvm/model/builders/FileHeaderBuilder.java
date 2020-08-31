@@ -35,10 +35,10 @@ final class FileHeaderBuilder {
         fileHeader.setCompressedSize(getSize(zipEntry.getCompressedSize()));
         fileHeader.setUncompressedSize(getSize(zipEntry.getUncompressedSize()));
         fileHeader.setCommentLength(0);
-        fileHeader.setDisk(getDisk());
+        fileHeader.setDiskNo(getDisk());
         fileHeader.setInternalFileAttributes(zipEntry.getInternalFileAttributes());
         fileHeader.setExternalFileAttributes(zipEntry.getExternalFileAttributes());
-        fileHeader.setLocalFileHeaderOffs(getOffsLocalFileHeader());
+        fileHeader.setLocalFileHeaderRelativeOffs(getLocalFileHeaderRelativeOffs());
         fileHeader.setFileName(zipEntry.getFileName());
         fileHeader.setExtraField(createExtraField());
         fileHeader.setComment(zipEntry.getComment());
@@ -69,8 +69,8 @@ final class FileHeaderBuilder {
             return Zip64.ExtendedInfo.builder()
                                      .compressedSize(zipEntry.getCompressedSize())
                                      .uncompressedSize(zipEntry.getUncompressedSize())
-                                     .disk(zipEntry.getDisk())
-                                     .localFileHeaderOffs(zipEntry.getLocalFileHeaderOffs()).build();
+                                     .diskNo(zipEntry.getDiskNo())
+                                     .localFileHeaderRelativeOffs(zipEntry.getLocalFileHeaderRelativeOffs()).build();
         return Zip64.ExtendedInfo.NULL;
     }
 
@@ -79,11 +79,11 @@ final class FileHeaderBuilder {
     }
 
     private int getDisk() {
-        return zipEntry.isZip64() ? MAX_TOTAL_DISKS : (int)zipEntry.getDisk();
+        return zipEntry.isZip64() ? MAX_TOTAL_DISKS : zipEntry.getDiskNo();
     }
 
-    private long getOffsLocalFileHeader() {
-        return zipEntry.isZip64() ? MAX_LOCAL_FILE_HEADER_OFFS : zipEntry.getLocalFileHeaderOffs();
+    private long getLocalFileHeaderRelativeOffs() {
+        return zipEntry.isZip64() ? MAX_LOCAL_FILE_HEADER_OFFS : zipEntry.getLocalFileHeaderRelativeOffs();
     }
 
 }

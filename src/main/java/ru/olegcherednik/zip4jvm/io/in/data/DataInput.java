@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.io.in.RandomAccess;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -24,15 +25,17 @@ public interface DataInput extends Closeable, RandomAccess {
 
     int qwordSize();
 
-    long getOffs();
+    /** Retrieves offs starting from the beginning of the first disk */
+    long getAbsoluteOffs();
 
-    default long getDisk() {
-        return 0;
-    }
+    long convertToAbsoluteOffs(int diskNo, long relativeOffs);
 
-    default String getFileName() {
-        return null;
-    }
+    /** Retrieves offs starting from the beginning of the current disk */
+    long getDiskRelativeOffs();
+
+    SrcZip getSrcZip();
+
+    SrcZip.Disk getDisk();
 
     default int readWordSignature() throws IOException {
         return readWord();
@@ -56,10 +59,10 @@ public interface DataInput extends Closeable, RandomAccess {
 
     byte[] readBytes(int total) throws IOException;
 
-    long length() throws IOException;
+    long size() throws IOException;
 
     default void backward(int bytes) throws IOException {
-        seek(getOffs() - bytes);
+        seek(getAbsoluteOffs() - bytes);
     }
 
     int read(byte[] buf, int offs, int len) throws IOException;
@@ -71,6 +74,8 @@ public interface DataInput extends Closeable, RandomAccess {
     void mark(String id);
 
     long getMark(String id);
+
+    void seek(int diskNo, long relativeOffs) throws IOException;
 
     void seek(String id) throws IOException;
 

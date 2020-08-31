@@ -23,12 +23,12 @@ public class BlockDecryptionHeaderReader extends DecryptionHeaderReader {
 
     @Override
     public DecryptionHeader read(DataInput in) throws IOException {
-        return decryptionHeaderBlock.calc(in, () -> super.read(in));
+        return decryptionHeaderBlock.calcSize(in, () -> super.read(in));
     }
 
     @Override
     protected List<Recipient> readRecipients(int total, int hashSize, DataInput in) throws IOException {
-        return decryptionHeaderBlock.getRecipientsBlock().calc(in, () -> super.readRecipients(total, hashSize, in));
+        return decryptionHeaderBlock.getRecipientsBlock().calcSize(in, () -> super.readRecipients(total, hashSize, in));
     }
 
 }

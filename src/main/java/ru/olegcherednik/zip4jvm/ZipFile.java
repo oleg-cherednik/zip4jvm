@@ -22,7 +22,7 @@ import ru.olegcherednik.zip4jvm.engine.InfoEngine;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.engine.ZipEngine;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
-import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
@@ -59,12 +59,12 @@ public final class ZipFile {
         return new ZipEngine(zip, settings);
     }
 
-    static Reader reader(SrcFile srcFile, UnzipSettings settings) throws IOException {
-        return new UnzipEngine(srcFile, settings);
+    static Reader reader(SrcZip srcZip, UnzipSettings settings) throws IOException {
+        return new UnzipEngine(srcZip, settings);
     }
 
-    static Info info(SrcFile srcFile, ZipInfoSettings settings) throws IOException {
-        return new InfoEngine(srcFile, settings);
+    static Info info(SrcZip srcZip, ZipInfoSettings settings) throws IOException {
+        return new InfoEngine(srcZip, settings);
     }
 
     @Getter

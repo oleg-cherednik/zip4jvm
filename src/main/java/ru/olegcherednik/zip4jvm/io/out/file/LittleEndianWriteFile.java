@@ -14,7 +14,7 @@ import java.nio.file.Path;
 public class LittleEndianWriteFile implements DataOutputFile {
 
     private final OutputStream out;
-    private long offs;
+    private long relativeOffs;
 
     public LittleEndianWriteFile(Path file) throws IOException {
         Files.createDirectories(file.getParent());
@@ -32,12 +32,12 @@ public class LittleEndianWriteFile implements DataOutputFile {
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
         out.write(buf, offs, len);
-        this.offs += len;
+        relativeOffs += len;
     }
 
     @Override
-    public long getOffs() {
-        return offs;
+    public long getRelativeOffs() {
+        return relativeOffs;
     }
 
     @Override
@@ -52,7 +52,7 @@ public class LittleEndianWriteFile implements DataOutputFile {
 
     @Override
     public String toString() {
-        return "offs: " + getOffs() + " (0x" + Long.toHexString(getOffs()) + ')';
+        return "offs: " + getRelativeOffs() + " (0x" + Long.toHexString(getRelativeOffs()) + ')';
     }
 
 }

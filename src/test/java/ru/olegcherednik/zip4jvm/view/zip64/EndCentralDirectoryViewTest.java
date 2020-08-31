@@ -23,7 +23,7 @@ public class EndCentralDirectoryViewTest {
     public void shouldRetrieveAllLinesWhenZip64EndCentralDirectoryExists() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(56L);
-        when(block.getOffs()).thenReturn(11208273328L);
+        when(block.getRelativeOffs()).thenReturn(11208273328L);
 
         Zip64.EndCentralDirectory endCentralDirectory = createEndCentralDirectory();
 
@@ -51,8 +51,8 @@ public class EndCentralDirectoryViewTest {
     public void shouldRetrieveAllLinesWithDiskWhenSplitZip() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(56L);
-        when(block.getOffs()).thenReturn(11208273328L);
-        when(block.getDisk()).thenReturn(5L);
+        when(block.getRelativeOffs()).thenReturn(11208273328L);
+        when(block.getDiskNo()).thenReturn(5);
         when(block.getFileName()).thenReturn("src.zip");
 
         Zip64.EndCentralDirectory endCentralDirectory = createEndCentralDirectory();
@@ -84,12 +84,12 @@ public class EndCentralDirectoryViewTest {
         endCentralDirectory.setEndCentralDirectorySize(345);
         endCentralDirectory.setVersionMadeBy(Version.of(0x12));
         endCentralDirectory.setVersionToExtract(Version.of(0x134));
-        endCentralDirectory.setTotalDisks(1);
-        endCentralDirectory.setMainDisk(2);
+        endCentralDirectory.setDiskNo(1);
+        endCentralDirectory.setMainDiskNo(2);
         endCentralDirectory.setDiskEntries(13);
         endCentralDirectory.setTotalEntries(15);
         endCentralDirectory.setCentralDirectorySize(115);
-        endCentralDirectory.setCentralDirectoryOffs(11208273213L);
+        endCentralDirectory.setCentralDirectoryRelativeOffs(11208273213L);
         return endCentralDirectory;
     }
 }

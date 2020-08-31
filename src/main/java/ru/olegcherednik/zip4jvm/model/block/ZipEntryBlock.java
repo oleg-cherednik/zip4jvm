@@ -42,6 +42,11 @@ public class ZipEntryBlock {
         dataDescriptorBlock = block;
     }
 
+    @Override
+    public String toString() {
+        return fileName;
+    }
+
     @Getter
     @Setter
     public static final class LocalFileHeaderBlock {

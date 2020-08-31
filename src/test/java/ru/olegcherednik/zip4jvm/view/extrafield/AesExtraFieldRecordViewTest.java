@@ -25,7 +25,7 @@ public class AesExtraFieldRecordViewTest {
     public void shouldRetrieveMultipleLinesWhenViewAesRecord() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(11L);
-        when(block.getOffs()).thenReturn(255603L);
+        when(block.getRelativeOffs()).thenReturn(255603L);
 
         AesExtraFieldRecord record = AesExtraFieldRecord.builder()
                                                         .dataSize(7)
@@ -61,8 +61,8 @@ public class AesExtraFieldRecordViewTest {
     public void shouldRetrieveMultipleLinesWithDiskWhenSplit() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(11L);
-        when(block.getOffs()).thenReturn(255603L);
-        when(block.getDisk()).thenReturn(5L);
+        when(block.getRelativeOffs()).thenReturn(255603L);
+        when(block.getDiskNo()).thenReturn(5);
         when(block.getFileName()).thenReturn("src.zip");
 
         AesExtraFieldRecord record = AesExtraFieldRecord.builder()

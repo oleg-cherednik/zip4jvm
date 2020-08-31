@@ -12,7 +12,7 @@ import java.io.IOException;
  */
 public interface DataOutput extends Marker, Closeable {
 
-    long getOffs();
+    long getRelativeOffs();
 
     void writeByte(int val) throws IOException;
 
@@ -37,7 +37,7 @@ public interface DataOutput extends Marker, Closeable {
 
     void write(byte[] buf, int offs, int len) throws IOException;
 
-    default long getDisk() {
+    default int getDiskNo() {
         return 0;
     }
 

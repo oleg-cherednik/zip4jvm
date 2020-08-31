@@ -18,7 +18,7 @@ abstract class BaseZipDataOutput extends BaseDataOutput {
 
     protected BaseZipDataOutput(ZipModel zipModel) throws IOException {
         this.zipModel = zipModel;
-        createFile(zipModel.getSrcFile().getPath());
+        createFile(zipModel.getSrcZip().getPath());
     }
 
     protected void createFile(Path zip) throws IOException {
@@ -31,8 +31,8 @@ abstract class BaseZipDataOutput extends BaseDataOutput {
     }
 
     @Override
-    public final long getOffs() {
-        return delegate.getOffs();
+    public final long getRelativeOffs() {
+        return delegate.getRelativeOffs();
     }
 
     @Override

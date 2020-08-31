@@ -41,7 +41,7 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
         decryptionHeader.setEncryptedRandomData(in.readBytes(encryptedRandomDataSize));
         int recipientCount = (int)in.readDword();
 
-        realBigZip64(recipientCount, "recipientCount");
+        realBigZip64(recipientCount, "zip64.decryptionHeader.recipientCount");
 
         decryptionHeader.setHashAlgorithm(passwordKey ? 0 : in.readWord());
         int hashSize = passwordKey ? 0x0 : in.readWord();
@@ -50,7 +50,7 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
         decryptionHeader.setPasswordValidationData(in.readBytes(passwordValidationDataSize - 4));
         decryptionHeader.setCrc32(in.readDword());
 
-        if (in.getOffs() - in.getMark(MARKER) != size)
+        if (in.getAbsoluteOffs() - in.getMark(MARKER) != size)
             throw new Zip4jvmException("DecryptionHeader size is incorrect");
 
         return decryptionHeader;

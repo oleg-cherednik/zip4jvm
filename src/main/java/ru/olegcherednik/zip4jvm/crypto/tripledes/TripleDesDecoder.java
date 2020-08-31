@@ -59,7 +59,7 @@ public final class TripleDesDecoder implements Decoder {
             //            byte[] password = DigestUtils.sha1("".getBytes(StandardCharsets.UTF_8));
             byte[] password = psw.getBytes(StandardCharsets.UTF_8);
 
-            return new TripleDesDecoder(cipher, in.getOffs() - in.getMark("bb"));
+            return new TripleDesDecoder(cipher, in.getAbsoluteOffs() - in.getMark("bb"));
         } catch(Exception e) {
             throw new IOException(e);
         }

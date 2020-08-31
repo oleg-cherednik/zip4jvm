@@ -51,13 +51,13 @@ public class CentralDirectory {
         // size:2 - comment length (k)
         private int commentLength;
         // size:2 - disk number start
-        private int disk;
+        private int diskNo;
         // size:2 - internal file attributes
         private final InternalFileAttributes internalFileAttributes = new InternalFileAttributes();
         // size:4 - external file attributes
         private ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.NULL;
         // size:4 - relative offset of local header
-        private long localFileHeaderOffs;
+        private long localFileHeaderRelativeOffs;
         // size:n - file name
         private String fileName;
         // size:m - extra field
@@ -104,7 +104,7 @@ public class CentralDirectory {
         }
 
         public boolean isWriteZip64OffsetLocalHeader() {
-            return localFileHeaderOffs > Zip64.LIMIT_DWORD;
+            return localFileHeaderRelativeOffs > Zip64.LIMIT_DWORD;
         }
 
         @Override

@@ -39,8 +39,8 @@ public class ExtraFieldReader implements Reader<ExtraField> {
     public static Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> getReaders(CentralDirectory.FileHeader fileHeader) {
         boolean uncompressedSize = fileHeader.getUncompressedSize() == MAX_ENTRY_SIZE;
         boolean compressedSize = fileHeader.getCompressedSize() == MAX_ENTRY_SIZE;
-        boolean offs = fileHeader.getLocalFileHeaderOffs() == MAX_LOCAL_FILE_HEADER_OFFS;
-        boolean disk = fileHeader.getDisk() == MAX_TOTAL_DISKS;
+        boolean offs = fileHeader.getLocalFileHeaderRelativeOffs() == MAX_LOCAL_FILE_HEADER_OFFS;
+        boolean disk = fileHeader.getDiskNo() == MAX_TOTAL_DISKS;
         return getReaders(uncompressedSize, compressedSize, offs, disk);
     }
 
@@ -73,9 +73,9 @@ public class ExtraFieldReader implements Reader<ExtraField> {
 
     protected ExtraField readExtraField(DataInput in) throws IOException {
         ExtraField.Builder builder = ExtraField.builder();
-        long offsMax = in.getOffs() + size;
+        long offsMax = in.getAbsoluteOffs() + size;
 
-        while (in.getOffs() < offsMax)
+        while (in.getAbsoluteOffs() < offsMax)
             builder.addRecord(getExtraFieldRecordReader().read(in));
 
         return builder.build();

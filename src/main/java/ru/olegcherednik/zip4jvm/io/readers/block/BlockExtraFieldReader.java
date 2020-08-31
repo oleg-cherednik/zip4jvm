@@ -27,7 +27,7 @@ public class BlockExtraFieldReader extends ExtraFieldReader {
 
     @Override
     protected ExtraField readExtraField(DataInput in) throws IOException {
-        return extraFieldBlock.calc(in, () -> super.readExtraField(in));
+        return extraFieldBlock.calcSize(in, () -> super.readExtraField(in));
     }
 
     @Override

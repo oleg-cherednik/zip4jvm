@@ -9,9 +9,9 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 08.03.2019
  */
-public class SingleZipOutputStream extends BaseZipDataOutput {
+public class SolidZipOutputStream extends BaseZipDataOutput {
 
-    public SingleZipOutputStream(ZipModel zipModel) throws IOException {
+    public SolidZipOutputStream(ZipModel zipModel) throws IOException {
         super(zipModel);
     }
 

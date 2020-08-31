@@ -36,12 +36,12 @@ final class Zip64Writer implements Writer {
             out.writeQword(endCentralDirectory.getEndCentralDirectorySize());
             out.writeWord(endCentralDirectory.getVersionMadeBy().getData());
             out.writeWord(endCentralDirectory.getVersionToExtract().getData());
-            out.writeDword(endCentralDirectory.getTotalDisks());
-            out.writeDword(endCentralDirectory.getMainDisk());
+            out.writeDword(endCentralDirectory.getDiskNo());
+            out.writeDword(endCentralDirectory.getMainDiskNo());
             out.writeQword(endCentralDirectory.getDiskEntries());
             out.writeQword(endCentralDirectory.getTotalEntries());
             out.writeQword(endCentralDirectory.getCentralDirectorySize());
-            out.writeQword(endCentralDirectory.getCentralDirectoryOffs());
+            out.writeQword(endCentralDirectory.getCentralDirectoryRelativeOffs());
             out.writeBytes(endCentralDirectory.getExtensibleDataSector());
         }
     }
@@ -56,8 +56,8 @@ final class Zip64Writer implements Writer {
                 return;
 
             out.writeDwordSignature(Zip64.EndCentralDirectoryLocator.SIGNATURE);
-            out.writeDword(locator.getMainDisk());
-            out.writeQword(locator.getOffs());
+            out.writeDword(locator.getMainDiskNo());
+            out.writeQword(locator.getEndCentralDirectoryRelativeOffs());
             out.writeDword(locator.getTotalDisks());
         }
     }
@@ -78,10 +78,10 @@ final class Zip64Writer implements Writer {
                 out.writeQword(info.getUncompressedSize());
             if (info.getCompressedSize() != ExtraField.NO_DATA)
                 out.writeQword(info.getCompressedSize());
-            if (info.getLocalFileHeaderOffs() != ExtraField.NO_DATA)
-                out.writeQword(info.getLocalFileHeaderOffs());
-            if (info.getDisk() != ExtraField.NO_DATA)
-                out.writeDword(info.getDisk());
+            if (info.getLocalFileHeaderRelativeOffs() != ExtraField.NO_DATA)
+                out.writeQword(info.getLocalFileHeaderRelativeOffs());
+            if (info.getDiskNo() != ExtraField.NO_DATA)
+                out.writeDword(info.getDiskNo());
         }
 
     }

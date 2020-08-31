@@ -1,10 +1,12 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.SingleZipInputStream;
-import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
+import ru.olegcherednik.zip4jvm.io.in.data.ZipInputStream;
+import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -16,18 +18,37 @@ import java.util.function.Function;
  */
 public final class ZipModelReader extends BaseZipModelReader {
 
-    public ZipModelReader(SrcFile srcFile, Function<Charset, Charset> customizeCharset) {
-        super(srcFile, customizeCharset);
+    public ZipModelReader(SrcZip srcZip) {
+        this(srcZip, Charsets.UNMODIFIED);
+    }
+
+    public ZipModelReader(SrcZip srcZip, Function<Charset, Charset> customizeCharset) {
+        super(srcZip, customizeCharset);
     }
 
     public ZipModel read() throws IOException {
         readCentralData();
-        return new ZipModelBuilder(srcFile, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
+        return new ZipModelBuilder(srcZip, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
+    }
+
+    public static int getTotalDisks(SrcZip srcZip) {
+        ZipModelReader reader = new ZipModelReader(srcZip);
+
+        try (DataInput in = reader.createDataInput()) {
+            reader.readEndCentralDirectory(in);
+            reader.readZip64EndCentralDirectoryLocator(in);
+
+            if (reader.zip64 == Zip64.NULL)
+                return reader.endCentralDirectory.getTotalDisks();
+            return (int)reader.zip64.getEndCentralDirectoryLocator().getTotalDisks();
+        } catch(Exception e) {
+            return 0;
+        }
     }
 
     @Override
     protected DataInput createDataInput() throws IOException {
-        return new SingleZipInputStream(srcFile);
+        return new ZipInputStream(srcZip);
     }
 
     @Override

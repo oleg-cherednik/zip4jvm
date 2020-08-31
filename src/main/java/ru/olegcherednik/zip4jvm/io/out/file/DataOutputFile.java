@@ -11,7 +11,7 @@ public interface DataOutputFile extends Closeable {
 
     void write(byte[] buf, int offs, int len) throws IOException;
 
-    long getOffs();
+    long getRelativeOffs();
 
     void fromLong(long val, byte[] buf, int offs, int len);
 

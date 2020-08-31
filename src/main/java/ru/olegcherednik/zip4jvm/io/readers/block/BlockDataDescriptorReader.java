@@ -25,7 +25,7 @@ public class BlockDataDescriptorReader implements Reader<DataDescriptor> {
 
     @Override
     public DataDescriptor read(DataInput in) throws IOException {
-        return block.calc(in, () -> reader.read(in));
+        return block.calcSize(in, () -> reader.read(in));
     }
 
 }

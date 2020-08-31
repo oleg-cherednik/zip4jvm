@@ -22,8 +22,8 @@ public final class Zip64Builder {
 
     private Zip64.EndCentralDirectoryLocator createLocator() {
         Zip64.EndCentralDirectoryLocator locator = new Zip64.EndCentralDirectoryLocator();
-        locator.setOffs(zipModel.getCentralDirectoryOffs() + zipModel.getCentralDirectorySize());
-        locator.setMainDisk(disk);
+        locator.setEndCentralDirectoryRelativeOffs(zipModel.getCentralDirectoryRelativeOffs() + zipModel.getCentralDirectorySize());
+        locator.setMainDiskNo(disk);
         locator.setTotalDisks(disk);
         return locator;
     }
@@ -37,12 +37,12 @@ public final class Zip64Builder {
         endCentralDirectory.setEndCentralDirectorySize(size);
         endCentralDirectory.setVersionMadeBy(Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));
         endCentralDirectory.setVersionToExtract(Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));
-        endCentralDirectory.setTotalDisks(zipModel.getTotalDisks());
-        endCentralDirectory.setMainDisk(zipModel.getMainDisk());
+        endCentralDirectory.setDiskNo(zipModel.getTotalDisks());
+        endCentralDirectory.setMainDiskNo(zipModel.getMainDiskNo());
         endCentralDirectory.setDiskEntries(countNumberOfFileHeaderEntriesOnDisk());
         endCentralDirectory.setTotalEntries(zipModel.getTotalEntries());
         endCentralDirectory.setCentralDirectorySize(zipModel.getCentralDirectorySize());
-        endCentralDirectory.setCentralDirectoryOffs(zipModel.getCentralDirectoryOffs());
+        endCentralDirectory.setCentralDirectoryRelativeOffs(zipModel.getCentralDirectoryRelativeOffs());
         endCentralDirectory.setExtensibleDataSector(extensibleDataSector);
         return endCentralDirectory;
     }
@@ -50,7 +50,7 @@ public final class Zip64Builder {
     private int countNumberOfFileHeaderEntriesOnDisk() {
         if (zipModel.isSplit())
             return (int)zipModel.getZipEntries().stream()
-                                .filter(zipEntry -> zipEntry.getDisk() == zipModel.getTotalDisks())
+                                .filter(zipEntry -> zipEntry.getDiskNo() == zipModel.getTotalDisks())
                                 .count();
 
         return zipModel.getTotalEntries();

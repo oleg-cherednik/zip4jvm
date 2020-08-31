@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.ZipFile;
+import ru.olegcherednik.zip4jvm.io.in.data.ZipInputStream;
 import ru.olegcherednik.zip4jvm.io.in.entry.EntryInputStream;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
@@ -11,8 +12,8 @@ import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
-import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
 import ru.olegcherednik.zip4jvm.utils.time.DosTimestampConverter;
@@ -35,8 +36,8 @@ public final class ZipEntryBuilder {
         return new EntryBased(entry, entrySettings).build();
     }
 
-    public static ZipEntry build(CentralDirectory.FileHeader fileHeader, ZipModel zipModel, Function<Charset, Charset> charsetCustomizer) {
-        return new FileHeaderBased(fileHeader, zipModel, charsetCustomizer).build();
+    public static ZipEntry build(CentralDirectory.FileHeader fileHeader, SrcZip srcZip, Function<Charset, Charset> charsetCustomizer) {
+        return new FileHeaderBased(fileHeader, srcZip, charsetCustomizer).build();
     }
 
     @RequiredArgsConstructor
@@ -88,7 +89,7 @@ public final class ZipEntryBuilder {
     private static final class FileHeaderBased {
 
         private final CentralDirectory.FileHeader fileHeader;
-        private final ZipModel zipModel;
+        private final SrcZip srcZip;
         private final Function<Charset, Charset> charsetCustomizer;
 
         public ZipEntry build() {
@@ -97,8 +98,8 @@ public final class ZipEntryBuilder {
             zipEntry.setChecksum(fileHeader.getCrc32());
             zipEntry.setUncompressedSize(getUncompressedSize());
             zipEntry.setCompressedSize(getCompressedSize());
-            zipEntry.setDisk(getDisk());
-            zipEntry.setLocalFileHeaderOffs(getLocalFileHeaderOffs());
+            zipEntry.setDiskNo(getDisk());
+            zipEntry.setLocalFileHeaderRelativeOffs(getLocalFileHeaderOffs());
             return zipEntry;
         }
 
@@ -135,13 +136,13 @@ public final class ZipEntryBuilder {
         }
 
         private ZipEntryInputStreamSupplier createInputStreamSupplier() {
-            return zipEntry -> EntryInputStream.create(zipEntry, charsetCustomizer, zipModel.createDataInput(zipEntry.getFileName()));
+            return zipEntry -> EntryInputStream.create(zipEntry, charsetCustomizer, new ZipInputStream(srcZip));
         }
 
-        private long getDisk() {
-            if (fileHeader.getDisk() == MAX_TOTAL_DISKS)
-                return fileHeader.getExtraField().getExtendedInfo().getDisk();
-            return fileHeader.getDisk();
+        private int getDisk() {
+            if (fileHeader.getDiskNo() == MAX_TOTAL_DISKS)
+                return (int)fileHeader.getExtraField().getExtendedInfo().getDiskNo();
+            return fileHeader.getDiskNo();
         }
 
         private long getCompressedSize() {
@@ -157,9 +158,9 @@ public final class ZipEntryBuilder {
         }
 
         private long getLocalFileHeaderOffs() {
-            if (fileHeader.getLocalFileHeaderOffs() == MAX_LOCAL_FILE_HEADER_OFFS)
-                return fileHeader.getExtraField().getExtendedInfo().getLocalFileHeaderOffs();
-            return fileHeader.getLocalFileHeaderOffs();
+            if (fileHeader.getLocalFileHeaderRelativeOffs() == MAX_LOCAL_FILE_HEADER_OFFS)
+                return fileHeader.getExtraField().getExtendedInfo().getLocalFileHeaderRelativeOffs();
+            return fileHeader.getLocalFileHeaderRelativeOffs();
         }
 
     }

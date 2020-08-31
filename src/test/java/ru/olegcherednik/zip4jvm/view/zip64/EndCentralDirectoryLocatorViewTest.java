@@ -22,11 +22,11 @@ public class EndCentralDirectoryLocatorViewTest {
     public void shouldRetrieveAllLinesWhenLocatorExists() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(20L);
-        when(block.getOffs()).thenReturn(11208273384L);
+        when(block.getRelativeOffs()).thenReturn(11208273384L);
 
         Zip64.EndCentralDirectoryLocator locator = mock(Zip64.EndCentralDirectoryLocator.class);
-        when(locator.getMainDisk()).thenReturn(1L);
-        when(locator.getOffs()).thenReturn(11208273328L);
+        when(locator.getMainDiskNo()).thenReturn(1L);
+        when(locator.getEndCentralDirectoryRelativeOffs()).thenReturn(11208273328L);
         when(locator.getTotalDisks()).thenReturn(5L);
 
         String[] lines = Zip4jvmSuite.execute(new Zip64View.EndCentralDirectoryLocatorView(locator, block, 2, 52, 0));
@@ -43,13 +43,13 @@ public class EndCentralDirectoryLocatorViewTest {
     public void shouldRetrieveAllLineWithDiskWhenSplitZip() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(20L);
-        when(block.getOffs()).thenReturn(11208273384L);
-        when(block.getDisk()).thenReturn(5L);
+        when(block.getRelativeOffs()).thenReturn(11208273384L);
+        when(block.getDiskNo()).thenReturn(5);
         when(block.getFileName()).thenReturn("src.zip");
 
         Zip64.EndCentralDirectoryLocator locator = mock(Zip64.EndCentralDirectoryLocator.class);
-        when(locator.getMainDisk()).thenReturn(1L);
-        when(locator.getOffs()).thenReturn(11208273328L);
+        when(locator.getMainDiskNo()).thenReturn(1L);
+        when(locator.getEndCentralDirectoryRelativeOffs()).thenReturn(11208273328L);
         when(locator.getTotalDisks()).thenReturn(5L);
 
         String[] lines = Zip4jvmSuite.execute(new Zip64View.EndCentralDirectoryLocatorView(locator, block, 2, 52, 5));

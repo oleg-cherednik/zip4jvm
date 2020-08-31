@@ -4,6 +4,7 @@ import lombok.Getter;
 import ru.olegcherednik.zip4jvm.io.writers.ZipModelWriter;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import java.io.IOException;
@@ -20,7 +21,7 @@ public class SplitZipOutputStream extends BaseZipDataOutput {
     /** see 8.5.5 */
     public static final int SPLIT_SIGNATURE = DataDescriptor.SIGNATURE;
 
-    private long disk;
+    private int diskNo;
 
     public SplitZipOutputStream(ZipModel zipModel) throws IOException {
         super(zipModel);
@@ -41,7 +42,7 @@ public class SplitZipOutputStream extends BaseZipDataOutput {
     }
 
     private void doNotSplitSignature(int len) throws IOException {
-        long available = zipModel.getSplitSize() - getOffs();
+        long available = zipModel.getSplitSize() - getRelativeOffs();
 
         if (available <= len)
             openNextDisk();
@@ -53,12 +54,12 @@ public class SplitZipOutputStream extends BaseZipDataOutput {
         final int offsInit = offs;
 
         while (len > 0) {
-            long available = zipModel.getSplitSize() - getOffs();
+            long available = zipModel.getSplitSize() - getRelativeOffs();
 
             if (available <= 0 || len > available && offsInit != offs)
                 openNextDisk();
 
-            available = zipModel.getSplitSize() - getOffs();
+            available = zipModel.getSplitSize() - getRelativeOffs();
 
             int writeBytes = Math.min(len, (int)available);
             super.write(buf, offs, writeBytes);
@@ -71,15 +72,18 @@ public class SplitZipOutputStream extends BaseZipDataOutput {
     private void openNextDisk() throws IOException {
         super.close();
 
-        Path splitFile = ZipModel.getDiskFile(zipModel.getSrcFile().getPath(), ++disk);
+        SrcZip srcZip = zipModel.getSrcZip();
+        Path path = srcZip.getPath();
+        Path diskPath = srcZip.getDiskPath(++diskNo);
 
-        if (Files.exists(splitFile))
-            throw new IOException("split file: " + splitFile.getFileName() + " already exists in the current directory, cannot rename this file");
+        // TODO #34 - Validate all new create split disks are not exist
+        if (Files.exists(diskPath))
+            throw new IOException("split file: " + diskPath.getFileName() + " already exists in the current directory, cannot rename this file");
 
-        if (!zipModel.getSrcFile().getPath().toFile().renameTo(splitFile.toFile()))
+        if (!path.toFile().renameTo(diskPath.toFile()))
             throw new IOException("cannot rename newly created split file");
 
-        createFile(zipModel.getSrcFile().getPath());
+        createFile(path);
     }
 
     @Override
@@ -90,7 +94,7 @@ public class SplitZipOutputStream extends BaseZipDataOutput {
 
     @Override
     public final String toString() {
-        return super.toString() + "; disk: " + disk;
+        return super.toString() + "; disk: " + diskNo;
     }
 
 }

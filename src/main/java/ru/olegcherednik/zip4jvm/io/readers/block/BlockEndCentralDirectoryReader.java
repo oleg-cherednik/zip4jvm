@@ -24,18 +24,7 @@ public class BlockEndCentralDirectoryReader extends EndCentralDirectoryReader {
 
     @Override
     public EndCentralDirectory read(DataInput in) throws IOException {
-        block.setOffs(in.getOffs());
-        EndCentralDirectory endCentralDirectory = super.read(in);
-
-        if (in instanceof BlockModelReader.CentralDataInputStream) {
-            ((BlockModelReader.CentralDataInputStream)in).setDisk(endCentralDirectory.getMainDisk());
-            ((BlockModelReader.CentralDataInputStream)in).setFileName(in.getFileName());
-        }
-
-        block.setDisk(in.getDisk(), in.getFileName());
-        block.calc(in.getOffs());
-
-        return endCentralDirectory;
+        return block.calcSize(in, () -> super.read(in));
     }
 
 }

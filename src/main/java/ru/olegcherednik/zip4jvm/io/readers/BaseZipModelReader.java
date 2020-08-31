@@ -5,12 +5,12 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.SignatureWasNotFoundException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -35,7 +35,7 @@ public abstract class BaseZipModelReader {
 
     private static final String MARKER_END_CENTRAL_DIRECTORY = "end_central_directory";
 
-    protected final SrcFile srcFile;
+    protected final SrcZip srcZip;
     protected final Function<Charset, Charset> customizeCharset;
 
     @Getter
@@ -46,27 +46,40 @@ public abstract class BaseZipModelReader {
     protected CentralDirectory centralDirectory;
 
     public final void readCentralData() throws IOException {
+        readCentralData(true);
+    }
+
+    protected final void readCentralData(boolean readCentralDirectory) throws IOException {
         try (DataInput in = createDataInput()) {
-            findCentralDirectorySignature(in);
-            endCentralDirectory = readEndCentralDirectory(in);
-            zip64 = readZip64(in);
-            centralDirectory = readCentralDirectory(in);
+            readEndCentralDirectory(in);
+            readZip64(in);
+
+            if (readCentralDirectory)
+                readCentralDirectory(in);
         }
     }
 
-    private EndCentralDirectory readEndCentralDirectory(DataInput in) throws IOException {
-        return getEndCentralDirectoryReader().read(in);
+    protected final void readEndCentralDirectory(DataInput in) throws IOException {
+        findCentralDirectorySignature(in);
+        endCentralDirectory = getEndCentralDirectoryReader().read(in);
     }
 
-    private Zip64 readZip64(DataInput in) throws IOException {
+    protected void readZip64(DataInput in) throws IOException {
         in.seek(MARKER_END_CENTRAL_DIRECTORY);
-        return getZip64Reader().read(in);
+        zip64 = getZip64Reader().read(in);
     }
 
-    private CentralDirectory readCentralDirectory(DataInput in) throws IOException {
-        in.seek(ZipModelBuilder.getCentralDirectoryOffs(endCentralDirectory, zip64));
+    protected final void readZip64EndCentralDirectoryLocator(DataInput in) throws IOException {
+        in.seek(MARKER_END_CENTRAL_DIRECTORY);
+        zip64 = getZip64Reader().findAndReadEndCentralDirectoryLocator(in);
+    }
+
+    private void readCentralDirectory(DataInput in) throws IOException {
+        int mainDiskNo = ZipModelBuilder.getMainDiskNo(endCentralDirectory, zip64);
+        long relativeOffs = ZipModelBuilder.getCentralDirectoryRelativeOffs(endCentralDirectory, zip64);
         long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
-        return getCentralDirectoryReader(totalEntries).read(in);
+        in.seek(mainDiskNo, relativeOffs);
+        centralDirectory = getCentralDirectoryReader(totalEntries).read(in);
     }
 
     protected abstract DataInput createDataInput() throws IOException;
@@ -77,9 +90,9 @@ public abstract class BaseZipModelReader {
 
     protected abstract CentralDirectoryReader getCentralDirectoryReader(long totalEntries);
 
-    private static void findCentralDirectorySignature(DataInput in) throws IOException {
+    public static void findCentralDirectorySignature(DataInput in) throws IOException {
         int commentLength = ZipModel.MAX_COMMENT_SIZE;
-        long available = in.length() - EndCentralDirectory.MIN_SIZE;
+        long available = in.size() - EndCentralDirectory.MIN_SIZE;
 
         do {
             in.seek(available--);

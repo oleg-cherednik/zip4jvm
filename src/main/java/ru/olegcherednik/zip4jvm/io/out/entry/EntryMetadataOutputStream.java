@@ -71,9 +71,9 @@ abstract class EntryMetadataOutputStream extends OutputStream {
             zipEntry.setZip64(true);
         if (zipEntry.getUncompressedSize() > MAX_ENTRY_SIZE)
             zipEntry.setZip64(true);
-        if (zipEntry.getDisk() > MAX_TOTAL_DISKS)
+        if (zipEntry.getDiskNo() > MAX_TOTAL_DISKS)
             zipEntry.setZip64(true);
-        if (zipEntry.getLocalFileHeaderOffs() > MAX_LOCAL_FILE_HEADER_OFFS)
+        if (zipEntry.getLocalFileHeaderRelativeOffs() > MAX_LOCAL_FILE_HEADER_OFFS)
             zipEntry.setZip64(true);
     }
 

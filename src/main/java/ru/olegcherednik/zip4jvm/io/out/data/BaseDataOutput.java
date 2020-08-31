@@ -45,9 +45,9 @@ public abstract class BaseDataOutput extends AbstractMarker implements DataOutpu
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
-        long offsFrom = getOffs();
+        long offsFrom = getRelativeOffs();
         writeInternal(buf, offs, len);
-        incTic(getOffs() - offsFrom);
+        incTic(getRelativeOffs() - offsFrom);
     }
 
     protected abstract void writeInternal(byte[] buf, int offs, int len) throws IOException;

@@ -26,7 +26,7 @@ public final class Zip64 {
     private final EndCentralDirectory endCentralDirectory;
 
     public static Zip64 of(EndCentralDirectoryLocator endCentralDirectoryLocator, EndCentralDirectory endCentralDirectory) {
-        return endCentralDirectoryLocator == null || endCentralDirectory == null ? NULL : new Zip64(endCentralDirectoryLocator, endCentralDirectory);
+        return endCentralDirectoryLocator == null && endCentralDirectory == null ? NULL : new Zip64(endCentralDirectoryLocator, endCentralDirectory);
     }
 
     @Override
@@ -46,9 +46,9 @@ public final class Zip64 {
 
         // size:4 - signature (0x06054b50)
         // size:4 - number of the disk with the start of the zip64 end of central directory
-        private long mainDisk;
+        private long mainDiskNo;
         // size:8 - relative offset of the Zip64.EndCentralDirectory
-        private long offs;
+        private long endCentralDirectoryRelativeOffs;
         // size:4 - total number of disks
         private long totalDisks;
 
@@ -71,9 +71,9 @@ public final class Zip64 {
         // size:2 - version needed to extractEntries
         private Version versionToExtract = Version.NULL;
         // size:4 - number of this disk
-        private long totalDisks;
+        private long diskNo;
         // size:4 - number of the disk with the start of the central directory
-        private long mainDisk;
+        private long mainDiskNo;
         // size:8 - total number of entries in the central directory on this disk
         private long diskEntries;
         // size:8 - total number of entries in the central directory
@@ -81,7 +81,7 @@ public final class Zip64 {
         // size:8 - size of the central directory
         private long centralDirectorySize;
         // size:8 - offs of CentralDirectory in startDiskNumber
-        private long centralDirectoryOffs;
+        private long centralDirectoryRelativeOffs;
         // size:n-44 - extensible data sector
         private byte[] extensibleDataSector = ArrayUtils.EMPTY_BYTE_ARRAY;
 
@@ -107,15 +107,15 @@ public final class Zip64 {
         // size:8 - size of compressed data
         private final long compressedSize;
         // size:8 - offset of local header record
-        private final long localFileHeaderOffs;
+        private final long localFileHeaderRelativeOffs;
         // size:4 - number of the disk on which  this file starts
-        private final long disk;
+        private final long diskNo;
 
         private ExtendedInfo(Builder builder) {
             uncompressedSize = builder.uncompressedSize;
             compressedSize = builder.compressedSize;
-            localFileHeaderOffs = builder.localFileHeaderOffs;
-            disk = builder.disk;
+            localFileHeaderRelativeOffs = builder.localFileHeaderRelativeOffs;
+            diskNo = builder.diskNo;
         }
 
         public int getDataSize() {
@@ -125,9 +125,9 @@ public final class Zip64 {
                 size += 8;
             if (compressedSize != ExtraField.NO_DATA)
                 size += 8;
-            if (localFileHeaderOffs != ExtraField.NO_DATA)
+            if (localFileHeaderRelativeOffs != ExtraField.NO_DATA)
                 size += 8;
-            if (disk != ExtraField.NO_DATA)
+            if (diskNo != ExtraField.NO_DATA)
                 size += 4;
 
             return size;
@@ -170,10 +170,10 @@ public final class Zip64 {
                 out.writeQword(getUncompressedSize());
             if (getCompressedSize() != ExtraField.NO_DATA)
                 out.writeQword(getCompressedSize());
-            if (getLocalFileHeaderOffs() != ExtraField.NO_DATA)
-                out.writeQword(getLocalFileHeaderOffs());
-            if (getDisk() != ExtraField.NO_DATA)
-                out.writeDword(getDisk());
+            if (getLocalFileHeaderRelativeOffs() != ExtraField.NO_DATA)
+                out.writeQword(getLocalFileHeaderRelativeOffs());
+            if (getDiskNo() != ExtraField.NO_DATA)
+                out.writeDword(getDiskNo());
         }
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -181,12 +181,12 @@ public final class Zip64 {
 
             private long uncompressedSize = ExtraField.NO_DATA;
             private long compressedSize = ExtraField.NO_DATA;
-            private long localFileHeaderOffs = ExtraField.NO_DATA;
-            private long disk = ExtraField.NO_DATA;
+            private long localFileHeaderRelativeOffs = ExtraField.NO_DATA;
+            private long diskNo = ExtraField.NO_DATA;
 
             public ExtendedInfo build() {
                 if (uncompressedSize == ExtraField.NO_DATA && compressedSize == ExtraField.NO_DATA
-                        && localFileHeaderOffs == ExtraField.NO_DATA && disk == ExtraField.NO_DATA)
+                        && localFileHeaderRelativeOffs == ExtraField.NO_DATA && diskNo == ExtraField.NO_DATA)
                     return NULL;
                 return new ExtendedInfo(this);
             }
@@ -201,13 +201,13 @@ public final class Zip64 {
                 return this;
             }
 
-            public Builder localFileHeaderOffs(long localFileHeaderOffs) {
-                this.localFileHeaderOffs = localFileHeaderOffs;
+            public Builder localFileHeaderRelativeOffs(long localFileHeaderRelativeOffs) {
+                this.localFileHeaderRelativeOffs = localFileHeaderRelativeOffs;
                 return this;
             }
 
-            public Builder disk(long disk) {
-                this.disk = disk;
+            public Builder diskNo(long diskNo) {
+                this.diskNo = diskNo;
                 return this;
             }
         }

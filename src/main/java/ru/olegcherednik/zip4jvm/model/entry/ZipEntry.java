@@ -35,7 +35,7 @@ import java.util.function.BooleanSupplier;
 public abstract class ZipEntry {
 
     public static final Comparator<ZipEntry> SORT_BY_DISC_LOCAL_FILE_HEADER_OFFS =
-            Comparator.comparingLong(ZipEntry::getDisk).thenComparing(ZipEntry::getLocalFileHeaderOffs);
+            Comparator.comparingLong(ZipEntry::getDiskNo).thenComparing(ZipEntry::getLocalFileHeaderRelativeOffs);
 
     private final String fileName;
     private final int lastModifiedTime;
@@ -55,8 +55,8 @@ public abstract class ZipEntry {
     private boolean zip64;
 
     private char[] password;
-    private long disk;
-    private long localFileHeaderOffs;
+    private int diskNo;
+    private long localFileHeaderRelativeOffs;
     @Getter(AccessLevel.NONE)
     private BooleanSupplier dataDescriptorAvailable = () -> false;
     private long uncompressedSize;

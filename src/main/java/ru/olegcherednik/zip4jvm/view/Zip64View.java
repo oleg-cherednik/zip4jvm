@@ -31,8 +31,8 @@ public final class Zip64View {
         @Override
         public boolean print(PrintStream out) {
             printTitle(out, Zip64.EndCentralDirectoryLocator.SIGNATURE, "ZIP64 End of Central directory locator", block);
-            printLine(out, String.format("part number of new-end-of-central-dir (%04X):", locator.getMainDisk()), locator.getMainDisk() + 1);
-            printLine(out, "relative offset of new-end-of-central-dir:", String.format("%1$d (0x%1$08X) bytes", locator.getOffs()));
+            printLine(out, String.format("part number of new-end-of-central-dir (%04X):", locator.getMainDiskNo()), locator.getMainDiskNo() + 1);
+            printLine(out, "relative offset of new-end-of-central-dir:", String.format("%1$d (0x%1$08X) bytes", locator.getEndCentralDirectoryRelativeOffs()));
             printLine(out, "total number of parts in archive:", locator.getTotalDisks());
             return true;
         }
@@ -58,12 +58,12 @@ public final class Zip64View {
             printTitle(out, Zip64.EndCentralDirectory.SIGNATURE, "ZIP64 End of Central directory record", block);
             printLine(out, "number of bytes in rest of record:", String.format("%d bytes", dir.getEndCentralDirectorySize()));
             printVersion(out);
-            printLine(out, String.format("part number of this part (%04d):", dir.getTotalDisks()), dir.getTotalDisks() + 1);
-            printLine(out, String.format("part number of start of central dir (%04d):", dir.getMainDisk()), dir.getMainDisk() + 1);
+            printLine(out, String.format("part number of this part (%04d):", dir.getDiskNo()), dir.getDiskNo() + 1);
+            printLine(out, String.format("part number of start of central dir (%04d):", dir.getMainDiskNo()), dir.getMainDiskNo() + 1);
             printLine(out, "number of entries in central dir in this part:", dir.getDiskEntries());
             printLine(out, "total number of entries in central dir:", dir.getTotalEntries());
             printLine(out, "size of central dir:", String.format("%1$d (0x%1$08X) bytes", dir.getCentralDirectorySize()));
-            printLine(out, "relative offset of central dir:", String.format("%1$d (0x%1$08X) bytes", dir.getCentralDirectoryOffs()));
+            printLine(out, "relative offset of central dir:", String.format("%1$d (0x%1$08X) bytes", dir.getCentralDirectoryRelativeOffs()));
             printExtensibleDataSector(out);
             return true;
         }
