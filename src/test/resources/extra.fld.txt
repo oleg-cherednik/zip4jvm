@@ -18,7 +18,7 @@ All integer fields in the descriptions below are in little-endian (Intel)
 format unless otherwise specified.  Note that "Short" means two bytes,
 "Long" means four bytes, and "Long-Long" means eight bytes, regardless
 of their native sizes.  Unless specifically noted, all integer fields should
-be interpreted as unsigned (non-negative) numbers.
+be interpreted as unsigned (non-negative) numbers..
 
 Christian Spieler, 20010517
 
