@@ -8,7 +8,7 @@ import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
-import java.util.Random;
+import java.security.SecureRandom;
 
 /**
  * @author Oleg Cherednik
@@ -28,7 +28,7 @@ public final class PkwareHeader {
     private static byte[] createBuf(PkwareEngine engine, int checksum) {
         byte[] buf = new byte[SIZE];
 
-        new Random().nextBytes(buf);
+        new SecureRandom().nextBytes(buf);
         buf[buf.length - 1] = low(checksum);
         buf[buf.length - 2] = high(checksum);
         engine.encrypt(buf, 0, buf.length);
