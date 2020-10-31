@@ -165,13 +165,13 @@ class HuffmanDecoder implements Closeable {
 
     private abstract static class DecoderState {
 
-        abstract HuffmanState state();
+        public abstract HuffmanState state();
 
-        abstract int read(byte[] b, int off, int len) throws IOException;
+        public abstract int read(byte[] b, int off, int len) throws IOException;
 
-        abstract boolean hasData();
+        public abstract boolean hasData();
 
-        abstract int available() throws IOException;
+        public abstract int available() throws IOException;
     }
 
     private class UncompressedState extends DecoderState {
@@ -184,12 +184,12 @@ class HuffmanDecoder implements Closeable {
         }
 
         @Override
-        HuffmanState state() {
+        public HuffmanState state() {
             return read < blockLength ? STORED : INITIAL;
         }
 
         @Override
-        int read(byte[] b, int off, int len) throws IOException {
+        public int read(byte[] b, int off, int len) throws IOException {
             if (len == 0) {
                 return 0;
             }
@@ -216,25 +216,25 @@ class HuffmanDecoder implements Closeable {
         }
 
         @Override
-        boolean hasData() {
+        public boolean hasData() {
             return read < blockLength;
         }
 
         @Override
-        int available() throws IOException {
+        public int available() throws IOException {
             return (int)Math.min(blockLength - read, reader.bitsAvailable() / Byte.SIZE);
         }
     }
 
-    private class InitialState extends DecoderState {
+    private static class InitialState extends DecoderState {
 
         @Override
-        HuffmanState state() {
+        public HuffmanState state() {
             return INITIAL;
         }
 
         @Override
-        int read(byte[] b, int off, int len) throws IOException {
+        public int read(byte[] b, int off, int len) throws IOException {
             if (len == 0) {
                 return 0;
             }
@@ -242,12 +242,12 @@ class HuffmanDecoder implements Closeable {
         }
 
         @Override
-        boolean hasData() {
+        public boolean hasData() {
             return false;
         }
 
         @Override
-        int available() {
+        public int available() {
             return 0;
         }
     }
@@ -270,12 +270,12 @@ class HuffmanDecoder implements Closeable {
         }
 
         @Override
-        HuffmanState state() {
+        public HuffmanState state() {
             return endOfBlock ? INITIAL : state;
         }
 
         @Override
-        int read(byte[] b, int off, int len) throws IOException {
+        public int read(byte[] b, int off, int len) throws IOException {
             if (len == 0) {
                 return 0;
             }
@@ -334,12 +334,12 @@ class HuffmanDecoder implements Closeable {
         }
 
         @Override
-        boolean hasData() {
+        public boolean hasData() {
             return !endOfBlock;
         }
 
         @Override
-        int available() {
+        public int available() {
             return runBufferLength - runBufferPos;
         }
     }
@@ -396,28 +396,28 @@ class HuffmanDecoder implements Closeable {
     private static class BinaryTreeNode {
 
         private final int bits;
-        int literal = -1;
-        BinaryTreeNode leftNode;
-        BinaryTreeNode rightNode;
+        private int literal = -1;
+        private BinaryTreeNode leftNode;
+        private BinaryTreeNode rightNode;
 
         private BinaryTreeNode(int bits) {
             this.bits = bits;
         }
 
-        void leaf(int symbol) {
+        public void leaf(int symbol) {
             literal = symbol;
             leftNode = null;
             rightNode = null;
         }
 
-        BinaryTreeNode left() {
+        public BinaryTreeNode left() {
             if (leftNode == null && literal == -1) {
                 leftNode = new BinaryTreeNode(bits + 1);
             }
             return leftNode;
         }
 
-        BinaryTreeNode right() {
+        public BinaryTreeNode right() {
             if (rightNode == null && literal == -1) {
                 rightNode = new BinaryTreeNode(bits + 1);
             }
@@ -482,19 +482,19 @@ class HuffmanDecoder implements Closeable {
             mask = memory.length - 1;
         }
 
-        byte add(byte b) {
+        public byte add(byte b) {
             memory[wHead] = b;
             wHead = incCounter(wHead);
             return b;
         }
 
-        void add(byte[] b, int off, int len) {
+        public void add(byte[] b, int off, int len) {
             for (int i = off; i < off + len; i++) {
                 add(b[i]);
             }
         }
 
-        void recordToBuffer(int distance, int length, byte[] buff) {
+        public void recordToBuffer(int distance, int length, byte[] buff) {
             if (distance > memory.length) {
                 throw new IllegalStateException("Illegal distance parameter: " + distance);
             }

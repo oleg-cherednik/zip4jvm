@@ -64,6 +64,7 @@ public final class ZipEngine implements ZipFile.Writer {
             return;
         if (fileNameWriter.remove(entryName + '/') != null)
             return;
+
         throw new EntryNotFoundException(entryName);
     }
 
