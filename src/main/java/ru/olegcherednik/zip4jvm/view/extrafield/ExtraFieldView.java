@@ -28,6 +28,24 @@ public final class ExtraFieldView extends BaseView {
     private final ExtraFieldBlock block;
     private final GeneralPurposeFlag generalPurposeFlag;
 
+    private final Function<ExtraField.Record, ExtraFieldRecordView<?>> createView = record -> {
+        if (record instanceof NtfsTimestampExtraFieldRecord)
+            return createView((NtfsTimestampExtraFieldRecord)record);
+        if (record instanceof InfoZipOldUnixExtraFieldRecord)
+            return createView((InfoZipOldUnixExtraFieldRecord)record);
+        if (record instanceof InfoZipNewUnixExtraFieldRecord)
+            return createView((InfoZipNewUnixExtraFieldRecord)record);
+        if (record instanceof ExtendedTimestampExtraFieldRecord)
+            return createView((ExtendedTimestampExtraFieldRecord)record);
+        if (record instanceof Zip64.ExtendedInfo)
+            return createView((Zip64.ExtendedInfo)record);
+        if (record instanceof AesExtraFieldRecord)
+            return createView((AesExtraFieldRecord)record);
+        if (record instanceof AlgIdExtraFieldRecord)
+            return createView((AlgIdExtraFieldRecord)record);
+        return createView(record);
+    };
+
     public static Builder builder() {
         return new Builder();
     }
@@ -59,24 +77,6 @@ public final class ExtraFieldView extends BaseView {
         // TODO check for record != null && !record.isNull()
         return createView.apply(record);
     }
-
-    private final Function<ExtraField.Record, ExtraFieldRecordView<?>> createView = record -> {
-        if (record instanceof NtfsTimestampExtraFieldRecord)
-            return createView((NtfsTimestampExtraFieldRecord)record);
-        if (record instanceof InfoZipOldUnixExtraFieldRecord)
-            return createView((InfoZipOldUnixExtraFieldRecord)record);
-        if (record instanceof InfoZipNewUnixExtraFieldRecord)
-            return createView((InfoZipNewUnixExtraFieldRecord)record);
-        if (record instanceof ExtendedTimestampExtraFieldRecord)
-            return createView((ExtendedTimestampExtraFieldRecord)record);
-        if (record instanceof Zip64.ExtendedInfo)
-            return createView((Zip64.ExtendedInfo)record);
-        if (record instanceof AesExtraFieldRecord)
-            return createView((AesExtraFieldRecord)record);
-        if (record instanceof AlgIdExtraFieldRecord)
-            return createView((AlgIdExtraFieldRecord)record);
-        return createView(record);
-    };
 
     private NtfsTimestampExtraFieldRecordView createView(NtfsTimestampExtraFieldRecord record) {
         return NtfsTimestampExtraFieldRecordView.builder()

@@ -96,10 +96,6 @@ public final class Zip64 {
         public static final int SIGNATURE = 0x0001;
         public static final int SIZE_FIELD = 2 + 2; // 4 bytes: signature + size
 
-        public static Builder builder() {
-            return new Builder();
-        }
-
         // size:2 - tag for this "extra" block type (ZIP64 = 0x001)
         // size:2 - size of this "extra" block
         // size:8 - original uncompressed file size
@@ -110,6 +106,10 @@ public final class Zip64 {
         private final long localFileHeaderRelativeOffs;
         // size:4 - number of the disk on which  this file starts
         private final long diskNo;
+
+        public static Builder builder() {
+            return new Builder();
+        }
 
         private ExtendedInfo(Builder builder) {
             uncompressedSize = builder.uncompressedSize;

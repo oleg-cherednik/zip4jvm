@@ -16,6 +16,8 @@ import java.io.IOException;
  */
 public abstract class EntryOutputStream extends EntryMetadataOutputStream {
 
+    protected final DecoderDataOutput out;
+
     public static EntryOutputStream create(ZipEntry zipEntry, ZipModel zipModel, DataOutput out) throws IOException {
         EntryOutputStream os = createOutputStream(zipEntry, out);
 
@@ -43,8 +45,6 @@ public abstract class EntryOutputStream extends EntryMetadataOutputStream {
 
         throw new Zip4jvmException("Compression is not supported: " + compressionMethod);
     }
-
-    protected final DecoderDataOutput out;
 
     protected EntryOutputStream(ZipEntry zipEntry, DataOutput out) {
         super(zipEntry, out);

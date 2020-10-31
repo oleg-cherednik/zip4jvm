@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.ExtendedTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
-import ru.olegcherednik.zip4jvm.utils.time.UnixTimestampConverter;
+import ru.olegcherednik.zip4jvm.utils.time.UnixTimestampConverterUtils;
 
 import java.io.IOException;
 
@@ -25,11 +25,11 @@ public final class ExtendedTimestampExtraFieldRecordReader implements Reader<Ext
         long creationTime = -1;
 
         if (flag.isLastModificationTime())
-            lastModificationTime = UnixTimestampConverter.unixToJavaTime(in.readDword());
+            lastModificationTime = UnixTimestampConverterUtils.unixToJavaTime(in.readDword());
         if (flag.isLastAccessTime() && size > 5)
-            lastAccessTime = UnixTimestampConverter.unixToJavaTime(in.readDword());
+            lastAccessTime = UnixTimestampConverterUtils.unixToJavaTime(in.readDword());
         if (flag.isCreationTime() && size > 5)
-            creationTime = UnixTimestampConverter.unixToJavaTime(in.readDword());
+            creationTime = UnixTimestampConverterUtils.unixToJavaTime(in.readDword());
 
         return ExtendedTimestampExtraFieldRecord.builder()
                                                 .dataSize(size)

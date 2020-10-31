@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
  * @since 25.10.2019
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class UnixTimestampConverter {
+public final class UnixTimestampConverterUtils {
 
     public static long unixToJavaTime(long utime) {
         return utime * 1000;

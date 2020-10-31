@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.InfoZipOldUnixExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
-import ru.olegcherednik.zip4jvm.utils.time.UnixTimestampConverter;
+import ru.olegcherednik.zip4jvm.utils.time.UnixTimestampConverterUtils;
 
 import java.io.IOException;
 
@@ -21,8 +21,8 @@ public final class InfoZipOldUnixExtraFieldRecordReader implements Reader<InfoZi
 
     @Override
     public InfoZipOldUnixExtraFieldRecord read(DataInput in) throws IOException {
-        long lastAccessTime = UnixTimestampConverter.unixToJavaTime(in.readDword());
-        long lastModificationTime = UnixTimestampConverter.unixToJavaTime(in.readDword());
+        long lastAccessTime = UnixTimestampConverterUtils.unixToJavaTime(in.readDword());
+        long lastModificationTime = UnixTimestampConverterUtils.unixToJavaTime(in.readDword());
         int uid = size >= 10 ? in.readWord() : NO_DATA;
         int gid = size >= 12 ? in.readWord() : NO_DATA;
 

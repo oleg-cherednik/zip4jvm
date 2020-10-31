@@ -10,7 +10,7 @@ import java.util.Date;
  * @since 17.10.2019
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class DosTimestampConverter {
+public final class DosTimestampConverterUtils {
 
     private static final int DOSTIME_BEFORE_1980 = (1 << 21) | (1 << 16);
 

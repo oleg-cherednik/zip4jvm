@@ -23,6 +23,11 @@ import java.util.function.Function;
  */
 public abstract class EntryInputStream extends EntryMetadataInputStream {
 
+    protected final DecoderDataInput in;
+    private final long compressedSize;
+
+    private final byte[] buf = new byte[1];
+
     public static EntryInputStream create(ZipEntry zipEntry, Function<Charset, Charset> charsetCustomizer, DataInput in) throws IOException {
         long absoluteOffs = in.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs());
         LocalFileHeader localFileHeader = new LocalFileHeaderReader(absoluteOffs, charsetCustomizer).read(in);
@@ -44,11 +49,6 @@ public abstract class EntryInputStream extends EntryMetadataInputStream {
 
         throw new Zip4jvmException("Compression is not supported: " + compressionMethod);
     }
-
-    protected final DecoderDataInput in;
-    private final long compressedSize;
-
-    private final byte[] buf = new byte[1];
 
     protected EntryInputStream(ZipEntry zipEntry, DataInput in) throws IOException {
         super(zipEntry, in);

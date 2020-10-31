@@ -15,6 +15,35 @@ public class Bzip2OutputStream extends OutputStream {
     private static final int GREATER_ICOST = 15;
     private static final int LESSER_ICOST = 0;
 
+    /**
+     * Index of the last char in the block, so the block size == last + 1.
+     */
+    private int last;
+
+    private final int blockSize100k;
+
+    private int bsBuff;
+    private int bsLive;
+    private final CRC32 crc32 = new CRC32();
+
+    private int nInUse;
+
+    private int nMTF;
+
+    private int currentChar = -1;
+    private int runLength = 0;
+
+    private int blockCRC;
+    private int combinedCRC;
+    private final int allowableBlockSize;
+
+    private Data data;
+    private BlockSort blockSorter;
+
+    private final DataOutput out;
+    private volatile boolean closed;
+
+
     private static void hbMakeCodeLengths(final byte[] len, final int[] freq,
             final Data dat, final int alphaSize,
             final int maxLen) {
@@ -165,34 +194,6 @@ public class Bzip2OutputStream extends OutputStream {
             }
         }
     }
-
-    /**
-     * Index of the last char in the block, so the block size == last + 1.
-     */
-    private int last;
-
-    private final int blockSize100k;
-
-    private int bsBuff;
-    private int bsLive;
-    private final CRC32 crc32 = new CRC32();
-
-    private int nInUse;
-
-    private int nMTF;
-
-    private int currentChar = -1;
-    private int runLength = 0;
-
-    private int blockCRC;
-    private int combinedCRC;
-    private final int allowableBlockSize;
-
-    private Data data;
-    private BlockSort blockSorter;
-
-    private final DataOutput out;
-    private volatile boolean closed;
 
     public Bzip2OutputStream(DataOutput out, CompressionLevel compressionLevel) throws IOException {
         blockSize100k = compressionLevel.getCode();

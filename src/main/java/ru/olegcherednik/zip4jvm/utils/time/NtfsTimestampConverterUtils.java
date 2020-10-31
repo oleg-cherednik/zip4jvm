@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
  * @since 17.10.2019
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class NtfsTimestampConverter {
+public final class NtfsTimestampConverterUtils {
 
     public static long ntfsToJavaTime(long ntime) {
         return (ntime / 10000L) - +11644473600000L;

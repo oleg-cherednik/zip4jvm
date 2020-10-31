@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.NtfsTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
-import ru.olegcherednik.zip4jvm.utils.time.NtfsTimestampConverter;
+import ru.olegcherednik.zip4jvm.utils.time.NtfsTimestampConverterUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -48,9 +48,9 @@ public final class NtfsTimestampExtraFieldRecordReader implements Reader<NtfsTim
         int size = in.readWord();
         // TODO size should be equal to 8 * 3
 
-        long lastModificationTime = NtfsTimestampConverter.ntfsToJavaTime(in.readQword());
-        long lastAccessTime = NtfsTimestampConverter.ntfsToJavaTime(in.readQword());
-        long creationTime = NtfsTimestampConverter.ntfsToJavaTime(in.readQword());
+        long lastModificationTime = NtfsTimestampConverterUtils.ntfsToJavaTime(in.readQword());
+        long lastAccessTime = NtfsTimestampConverterUtils.ntfsToJavaTime(in.readQword());
+        long creationTime = NtfsTimestampConverterUtils.ntfsToJavaTime(in.readQword());
 
         return NtfsTimestampExtraFieldRecord.OneTag.builder()
                                                    .lastModificationTime(lastModificationTime)

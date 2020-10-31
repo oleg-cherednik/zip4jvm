@@ -11,6 +11,12 @@ class BitInputStream {
 
     private static final long[] MASKS = createMasks();
 
+    private final DataInput in;
+    private final ByteOrder byteOrder;
+    private long bitsCache;
+    @Getter
+    private int bitsCacheSize;
+
     private static long[] createMasks() {
         long[] masks = new long[64];
 
@@ -19,12 +25,6 @@ class BitInputStream {
 
         return masks;
     }
-
-    private final DataInput in;
-    private final ByteOrder byteOrder;
-    private long bitsCache;
-    @Getter
-    private int bitsCacheSize;
 
     public BitInputStream(DataInput in, ByteOrder byteOrder) {
         this.in = in;

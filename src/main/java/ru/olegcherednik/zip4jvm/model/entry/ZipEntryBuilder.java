@@ -16,7 +16,7 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
-import ru.olegcherednik.zip4jvm.utils.time.DosTimestampConverter;
+import ru.olegcherednik.zip4jvm.utils.time.DosTimestampConverterUtils;
 
 import java.nio.charset.Charset;
 import java.util.function.Function;
@@ -56,14 +56,14 @@ public final class ZipEntryBuilder {
 
         private ZipEntry createDirectoryEntry() {
             String fileName = ZipUtils.getFileName(entry);
-            int lastModifiedTime = DosTimestampConverter.javaToDosTime(entry.getLastModifiedTime());
+            int lastModifiedTime = DosTimestampConverterUtils.javaToDosTime(entry.getLastModifiedTime());
             ExternalFileAttributes externalFileAttributes = entry.getExternalFileAttributes();
             return new DirectoryZipEntry(fileName, lastModifiedTime, externalFileAttributes);
         }
 
         private ZipEntry createRegularFileEntry() {
             String fileName = ZipUtils.getFileName(entry);
-            int lastModifiedTime = DosTimestampConverter.javaToDosTime(entry.getLastModifiedTime());
+            int lastModifiedTime = DosTimestampConverterUtils.javaToDosTime(entry.getLastModifiedTime());
             ExternalFileAttributes externalFileAttributes = entry.getExternalFileAttributes();
 
             CompressionMethod compressionMethod = entry.getUncompressedSize() == 0 ? CompressionMethod.STORE
