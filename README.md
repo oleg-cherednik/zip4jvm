@@ -7,7 +7,7 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/7b6b963fef254ff4b00b8be0304e829b)](https://www.codacy.com/app/oleg-cherednik/zip4jvm?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=oleg-cherednik/zip4jvm&amp;utm_campaign=Badge_Grade)
 [![coverity](https://scan.coverity.com/projects/4735/badge.svg)](https://scan.coverity.com/projects/oleg-cherednik-zip4jvm)
 
-<p align="center"><img src="img/zip4jvm_qr.png"></p>
+<p align="center"><img src="img/zip4jvm_qr.png" alt="QR code" width="200" height="200"></p>
 
 zip4jvm - a java library for working with zip files
 =====================
