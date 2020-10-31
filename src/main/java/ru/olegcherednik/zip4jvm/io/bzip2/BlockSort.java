@@ -37,6 +37,8 @@ class BlockSort {
 
     private final Bzip2OutputStream.Data data;
 
+    private int[] eclass;
+
     @RequiredArgsConstructor
     private static final class Data {
 
@@ -226,8 +228,6 @@ class BlockSort {
             }
         }
     }
-
-    private int[] eclass;
 
     private int[] getEclass() {
         if (eclass == null) {
@@ -657,7 +657,7 @@ class BlockSort {
         }
     }
 
-    private final void mainSort(final Bzip2OutputStream.Data data, final int lastShadow) {
+    final void mainSort(final Bzip2OutputStream.Data data, final int lastShadow) {
         final int[] runningOrder = mainSortRunningOrder;
         final int[] copy = mainSortCopy;
         final boolean[] bigDone = mainSortBigDone;

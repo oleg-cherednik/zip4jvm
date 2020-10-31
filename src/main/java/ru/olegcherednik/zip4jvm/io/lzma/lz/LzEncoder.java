@@ -181,7 +181,7 @@ public abstract class LzEncoder {
     /* Skips the given number of bytes in the match finder. */
     public abstract void skip(int len);
 
-    static void normalize(int[] arr, int size, int offs) {
+    public static void normalize(int[] arr, int size, int offs) {
         for (int i = 0; i < size; i++)
             arr[i] = arr[i] <= offs ? 0 : arr[i] - offs;
     }

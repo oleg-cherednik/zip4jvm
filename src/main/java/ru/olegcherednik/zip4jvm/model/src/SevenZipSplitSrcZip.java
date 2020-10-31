@@ -31,7 +31,7 @@ final class SevenZipSplitSrcZip extends SrcZip {
         return Files.isReadable(zip) && NumberUtils.isDigits(ext);
     }
 
-    static SevenZipSplitSrcZip create(Path zip) {
+    public static SevenZipSplitSrcZip create(Path zip) {
         return new SevenZipSplitSrcZip(zip, createDisks(zip));
     }
 

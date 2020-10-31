@@ -27,6 +27,8 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatStrin
 @SuppressWarnings("CatchMayIgnoreException")
 public class FileAssert extends AbstractPathAssert<FileAssert> implements IFileAssert<FileAssert> {
 
+    private static final Pattern REGEX = Pattern.compile("<--\\sregexp\\((?<regex>.+)\\)\\s-->.+");
+
     public FileAssert(Path actual) {
         super(actual, FileAssert.class);
     }
@@ -69,8 +71,6 @@ public class FileAssert extends AbstractPathAssert<FileAssert> implements IFileA
         isRegularFile();
         return myself;
     }
-
-    private static final Pattern REGEX = Pattern.compile("<--\\sregexp\\((?<regex>.+)\\)\\s-->.+");
 
     public FileAssert matchesResourceLines(String path) {
         try (BufferedReader actualReader = new BufferedReader(new FileReader(actual.toFile()));

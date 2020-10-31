@@ -40,7 +40,8 @@ abstract class LzmaCoder implements Closeable {
     protected final short[][] distSlots = createArray(DIST_STATES, 1 << 6);
     protected final short[] distAlign = createArray(ALIGN_SIZE);
 
-    final short[][] distSpecial = { new short[2], new short[2],
+    // TODO used only within current package (removed default visibility because of vulnerability check)
+    public final short[][] distSpecial = { new short[2], new short[2],
             new short[4], new short[4],
             new short[8], new short[8],
             new short[16], new short[16],
