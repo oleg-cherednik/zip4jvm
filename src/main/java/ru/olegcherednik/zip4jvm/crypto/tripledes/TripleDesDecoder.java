@@ -47,7 +47,7 @@ public final class TripleDesDecoder implements Decoder {
 
             Checksum checksum = new CRC32();
             checksum.update(pvd, 0, 4);
-            long crc32 = checksum.getValue();
+//            long crc32 = checksum.getValue();
 
 
             KeySpec keySpec = new PBEKeySpec(psw.toCharArray(), salt, 100, bitLength);
@@ -77,6 +77,7 @@ public final class TripleDesDecoder implements Decoder {
         try {
             byte[] plain = engine.cipher.doFinal(buf, offs, len);
             String str = new String(plain, StandardCharsets.UTF_8);
+            System.out.println(str);
             int a = 0;
             a++;
         } catch(Exception e) {

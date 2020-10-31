@@ -22,8 +22,6 @@ final class LzmaEncoderNormal extends LzmaEncoder {
 
     private Matches matches;
 
-    // These are fields solely to avoid allocating the objects again and again on each function call.
-    private final int[] repLens = new int[4];
     private final State nextState = new State();
 
     public LzmaEncoderNormal(DataOutput out, LzmaInputStream.Properties properties) {
@@ -99,6 +97,8 @@ final class LzmaEncoderNormal extends LzmaEncoder {
 
         // Get the lengths of repeated matches.
         int repBest = 0;
+        // These are fields solely to avoid allocating the objects again and again on each function call.
+        int[] repLens = new int[4];
         for (int rep = 0; rep < reps.length; ++rep) {
             repLens[rep] = lz.getMatchLength(0, reps[rep], avail);
 
