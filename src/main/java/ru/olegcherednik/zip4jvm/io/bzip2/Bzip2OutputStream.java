@@ -43,6 +43,7 @@ public class Bzip2OutputStream extends OutputStream {
     private final DataOutput out;
     private volatile boolean closed;
 
+    private boolean init = true;
 
     private static void hbMakeCodeLengths(final byte[] len, final int[] freq,
             final Data dat, final int alphaSize,
@@ -317,8 +318,6 @@ public class Bzip2OutputStream extends OutputStream {
     public void flush() throws IOException {
         out.flush();
     }
-
-    private boolean init = true;
 
     /**
      * Writes magic bytes like BZ on the first position of the stream
@@ -1069,27 +1068,27 @@ public class Bzip2OutputStream extends OutputStream {
 
         // with blockSize 900k
         /* maps unsigned byte => "does it occur in block" */
-        final boolean[] inUse = new boolean[256]; // 256 byte
-        final byte[] unseqToSeq = new byte[256]; // 256 byte
-        final int[] mtfFreq = new int[Constants.MAX_ALPHA_SIZE]; // 1032 byte
-        final byte[] selector = new byte[Constants.MAX_SELECTORS]; // 18002 byte
-        final byte[] selectorMtf = new byte[Constants.MAX_SELECTORS]; // 18002 byte
+        private final boolean[] inUse = new boolean[256]; // 256 byte
+        private final byte[] unseqToSeq = new byte[256]; // 256 byte
+        private final int[] mtfFreq = new int[Constants.MAX_ALPHA_SIZE]; // 1032 byte
+        private final byte[] selector = new byte[Constants.MAX_SELECTORS]; // 18002 byte
+        private final byte[] selectorMtf = new byte[Constants.MAX_SELECTORS]; // 18002 byte
 
-        final byte[] generateMTFValues_yy = new byte[256]; // 256 byte
-        final byte[][] sendMTFValues_len = new byte[Constants.N_GROUPS][Constants.MAX_ALPHA_SIZE]; // 1548
+        private final byte[] generateMTFValues_yy = new byte[256]; // 256 byte
+        private final byte[][] sendMTFValues_len = new byte[Constants.N_GROUPS][Constants.MAX_ALPHA_SIZE]; // 1548
         // byte
-        final int[][] sendMTFValues_rfreq = new int[Constants.N_GROUPS][Constants.MAX_ALPHA_SIZE]; // 6192
+        private final int[][] sendMTFValues_rfreq = new int[Constants.N_GROUPS][Constants.MAX_ALPHA_SIZE]; // 6192
         // byte
-        final int[] sendMTFValues_fave = new int[Constants.N_GROUPS]; // 24 byte
-        final short[] sendMTFValues_cost = new short[Constants.N_GROUPS]; // 12 byte
-        final int[][] sendMTFValues_code = new int[Constants.N_GROUPS][Constants.MAX_ALPHA_SIZE]; // 6192
+        private final int[] sendMTFValues_fave = new int[Constants.N_GROUPS]; // 24 byte
+        private final short[] sendMTFValues_cost = new short[Constants.N_GROUPS]; // 12 byte
+        private final int[][] sendMTFValues_code = new int[Constants.N_GROUPS][Constants.MAX_ALPHA_SIZE]; // 6192
         // byte
-        final byte[] sendMTFValues2_pos = new byte[Constants.N_GROUPS]; // 6 byte
-        final boolean[] sentMTFValues4_inUse16 = new boolean[16]; // 16 byte
+        private final byte[] sendMTFValues2_pos = new byte[Constants.N_GROUPS]; // 6 byte
+        private final boolean[] sentMTFValues4_inUse16 = new boolean[16]; // 16 byte
 
-        final int[] heap = new int[Constants.MAX_ALPHA_SIZE + 2]; // 1040 byte
-        final int[] weight = new int[Constants.MAX_ALPHA_SIZE * 2]; // 2064 byte
-        final int[] parent = new int[Constants.MAX_ALPHA_SIZE * 2]; // 2064 byte
+        private final int[] heap = new int[Constants.MAX_ALPHA_SIZE + 2]; // 1040 byte
+        private final int[] weight = new int[Constants.MAX_ALPHA_SIZE * 2]; // 2064 byte
+        private final int[] parent = new int[Constants.MAX_ALPHA_SIZE * 2]; // 2064 byte
 
         // ------------
         // 333408 byte
@@ -1097,11 +1096,11 @@ public class Bzip2OutputStream extends OutputStream {
         /* holds the RLEd block of original data starting at index 1.
          * After sorting the last byte added to the buffer is at index
          * 0. */
-        final byte[] block; // 900021 byte
+        private final byte[] block; // 900021 byte
         /* maps index in Burrows-Wheeler transformed block => index of
          * byte in original block */
-        final int[] fmap; // 3600000 byte
-        final char[] sfmap; // 3600000 byte
+        private final int[] fmap; // 3600000 byte
+        private final char[] sfmap; // 3600000 byte
         // ------------
         // 8433529 byte
         // ============
@@ -1112,7 +1111,7 @@ public class Bzip2OutputStream extends OutputStream {
          * <p>This is the index in fmap that points to the last byte
          * of the original data.</p>
          */
-        int origPtr;
+        private int origPtr;
 
         public Data(int blockSize) {
             block = new byte[(blockSize + 1 + Constants.NUM_OVERSHOOT_BYTES)];
