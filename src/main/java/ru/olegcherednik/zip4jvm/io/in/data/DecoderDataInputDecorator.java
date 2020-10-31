@@ -79,7 +79,12 @@ public final class DecoderDataInputDecorator extends BaseDataInput implements De
 
     @Override
     public long skip(long bytes) throws IOException {
-        return delegate.skip(bytes);
+        int total = 0;
+
+        for (long i = 0; i < bytes; i++)
+            total += readByte();
+
+        return total;
     }
 
     @Override

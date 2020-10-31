@@ -8,6 +8,7 @@ import java.io.IOException;
  */
 public interface RandomAccess {
 
+    // TODO looks like when delegate is encryption (e.g. AES), then it's mandatory not skip, but read bytes to keep counters up to date
     long skip(long bytes) throws IOException;
 
     void seek(long absoluteOffs) throws IOException;
