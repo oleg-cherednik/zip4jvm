@@ -25,8 +25,10 @@ final class LzmaEntryInputStream extends EntryInputStream {
 
     private LzmaInputStream createInputStream() throws IOException {
         in.mark(HEADER);
-        in.skip(1); // major version
-        in.skip(1); // minor version
+        in.readByte();
+        in.readByte();
+//        in.skip(1); // major version
+//        in.skip(1); // minor version
         int headerSize = in.readWord();
 
         if (headerSize != 5)
