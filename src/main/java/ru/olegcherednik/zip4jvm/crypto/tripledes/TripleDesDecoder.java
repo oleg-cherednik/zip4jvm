@@ -25,6 +25,9 @@ import java.util.zip.Checksum;
  */
 public final class TripleDesDecoder implements Decoder {
 
+    private final TripleDesEngine engine;
+    private final long decryptionHeaderSize;
+
     public static TripleDesDecoder create(ZipEntry zipEntry, DataInput in) throws IOException {
         try {
             in.mark("bb");
@@ -54,7 +57,6 @@ public final class TripleDesDecoder implements Decoder {
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
 
 
-
             IvParameterSpec ivParameterSpec = new IvParameterSpec(ivOne);
             //            byte[] password = DigestUtils.sha1("".getBytes(StandardCharsets.UTF_8));
             byte[] password = psw.getBytes(StandardCharsets.UTF_8);
@@ -64,9 +66,6 @@ public final class TripleDesDecoder implements Decoder {
             throw new IOException(e);
         }
     }
-
-    private final TripleDesEngine engine;
-    private final long decryptionHeaderSize;
 
     private TripleDesDecoder(Cipher cipher, long decryptionHeaderSize) {
         engine = new TripleDesEngine(cipher);

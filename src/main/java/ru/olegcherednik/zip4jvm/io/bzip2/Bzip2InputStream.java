@@ -14,6 +14,9 @@ import java.util.Arrays;
  */
 public class Bzip2InputStream extends InputStream {
 
+    private static final long MAGIC_COMPRESSED = 0x314159265359L;
+    private static final long MAGIC_EOS = 0x177245385090L;
+
     private final BitInputStream in;
     private final int blockSize;
 
@@ -93,9 +96,6 @@ public class Bzip2InputStream extends InputStream {
 
         return destOffs == offs ? IOUtils.EOF : destOffs - offs;
     }
-
-    private static final long MAGIC_COMPRESSED = 0x314159265359L;
-    private static final long MAGIC_EOS = 0x177245385090L;
 
     private void initBlock() throws IOException {
         long magic = in.readBits(Byte.SIZE * 6);
@@ -567,32 +567,32 @@ public class Bzip2InputStream extends InputStream {
     private static final class Data {
 
         // (with blockSize 900k)
-        final boolean[] huffmanUsedBitmaps = new boolean[256]; // 256 byte
+        private final boolean[] huffmanUsedBitmaps = new boolean[256]; // 256 byte
 
-        final byte[] seqToUnseq = new byte[256]; // 256 byte
-        final byte[] selector = new byte[Constants.MAX_SELECTORS]; // 18002 byte
-        final byte[] selectorList = new byte[Constants.MAX_SELECTORS]; // 18002 byte
+        private final byte[] seqToUnseq = new byte[256]; // 256 byte
+        private final byte[] selector = new byte[Constants.MAX_SELECTORS]; // 18002 byte
+        private final byte[] selectorList = new byte[Constants.MAX_SELECTORS]; // 18002 byte
 
         /**
          * Freq table collected to save a pass over the data during
          * decompression.
          */
-        final int[] unzftab = new int[256]; // 1024 byte
+        private final int[] unzftab = new int[256]; // 1024 byte
 
-        final int[][] limit = new int[Constants.N_GROUPS][Constants.MAX_ALPHA_SIZE]; // 6192 byte
-        final int[][] base = new int[Constants.N_GROUPS][Constants.MAX_ALPHA_SIZE]; // 6192 byte
-        final int[][] perm = new int[Constants.N_GROUPS][Constants.MAX_ALPHA_SIZE]; // 6192 byte
-        final int[] minLens = new int[Constants.N_GROUPS]; // 24 byte
+        private final int[][] limit = new int[Constants.N_GROUPS][Constants.MAX_ALPHA_SIZE]; // 6192 byte
+        private final int[][] base = new int[Constants.N_GROUPS][Constants.MAX_ALPHA_SIZE]; // 6192 byte
+        private final int[][] perm = new int[Constants.N_GROUPS][Constants.MAX_ALPHA_SIZE]; // 6192 byte
+        private final int[] minLens = new int[Constants.N_GROUPS]; // 24 byte
 
-        final int[] cftab = new int[257]; // 1028 byte
-        final char[] getAndMoveToFrontDecode_yy = new char[256]; // 512 byte
-        final char[][] temp_charArray2d = new char[Constants.N_GROUPS][Constants.MAX_ALPHA_SIZE]; // 3096
+        private final int[] cftab = new int[257]; // 1028 byte
+        private final char[] getAndMoveToFrontDecode_yy = new char[256]; // 512 byte
+        private final char[][] temp_charArray2d = new char[Constants.N_GROUPS][Constants.MAX_ALPHA_SIZE]; // 3096
         // byte
-        final byte[] recvDecodingTables_pos = new byte[Constants.N_GROUPS]; // 6 byte
+        private final byte[] recvDecodingTables_pos = new byte[Constants.N_GROUPS]; // 6 byte
         // ---------------
         // 60798 byte
 
-        int[] tt; // 3600000 byte
+        private int[] tt; // 3600000 byte
         private final byte[] ll8; // 900000 byte
 
         public Data(int blockSize) {
@@ -606,7 +606,7 @@ public class Bzip2InputStream extends InputStream {
          * I don't initialize it at construction time to avoid unneccessary
          * memory allocation when compressing small files.
          */
-        int[] initTT(final int length) {
+        private int[] initTT(final int length) {
             if ((tt == null) || (tt.length < length))
                 tt = new int[length];
 

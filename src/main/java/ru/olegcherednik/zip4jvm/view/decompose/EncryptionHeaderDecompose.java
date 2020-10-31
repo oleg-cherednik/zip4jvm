@@ -58,6 +58,7 @@ public final class EncryptionHeaderDecompose implements Decompose {
             Utils.copyLarge(zipModel, subDir.resolve("pkware_encryption_header.data"), block);
         } else {
             // TODO print unknown header
+            System.out.println("TODO print unknown header");
         }
     }
 

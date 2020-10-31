@@ -31,6 +31,12 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotEmpty;
 @Getter
 public abstract class SrcZip {
 
+    protected final Path path;
+    @Getter(AccessLevel.NONE)
+    protected final List<Disk> disks;
+    protected final long size;
+    protected final long splitSize;
+
     public static SrcZip of(Path zip) {
         if (SevenZipSplitSrcZip.isCandidate(zip))
             return SevenZipSplitSrcZip.create(zip);
@@ -38,12 +44,6 @@ public abstract class SrcZip {
             return StandardSplitSrcZip.create(zip);
         return SolidSrcZip.create(zip);
     }
-
-    protected final Path path;
-    @Getter(AccessLevel.NONE)
-    protected final List<Disk> disks;
-    protected final long size;
-    protected final long splitSize;
 
     protected SrcZip(Path path, List<Disk> disks) {
         this.path = path;

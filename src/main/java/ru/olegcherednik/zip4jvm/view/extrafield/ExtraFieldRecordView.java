@@ -13,6 +13,9 @@ import java.util.regex.Pattern;
  */
 public abstract class ExtraFieldRecordView<T extends ExtraField.Record> extends BaseView {
 
+    private static final Pattern SPACE = Pattern.compile(" ");
+    private static final Pattern SLASH = Pattern.compile("[/\\\\]");
+
     private final T record;
     private final Block block;
     private final PrintConsumer<T, BaseView> printConsumer;
@@ -31,9 +34,6 @@ public abstract class ExtraFieldRecordView<T extends ExtraField.Record> extends 
     protected String getTitle() {
         return record.getTitle();
     }
-
-    private static final Pattern SPACE = Pattern.compile(" ");
-    private static final Pattern SLASH = Pattern.compile("[/\\\\]");
 
     public String getFileName() {
         String title = getTitle();

@@ -12,6 +12,15 @@ import java.util.LinkedList;
  */
 class BlockSort {
 
+    private static final int FALLBACK_QSORT_SMALL_THRESH = 10;
+
+    private static final int SMALL_THRESH = 20;
+    private static final int DEPTH_THRESH = 10;
+    private static final int WORK_FACTOR = 30;
+
+    private static final int SETMASK = 1 << 21;
+    private static final int CLEARMASK = ~SETMASK;
+
     /*
      * Used when sorting. If too many long comparisons happen, we stop sorting,
      * and use fallbackSort instead.
@@ -20,9 +29,9 @@ class BlockSort {
     private int workLimit;
     private boolean firstAttempt;
 
-    private final int[] mainSort_runningOrder = new int[256]; // 1024 byte
-    private final int[] mainSort_copy = new int[256]; // 1024 byte
-    private final boolean[] mainSort_bigDone = new boolean[256]; // 256 byte
+    private final int[] mainSortRunningOrder = new int[256]; // 1024 byte
+    private final int[] mainSortCopy = new int[256]; // 1024 byte
+    private final boolean[] mainSortBigDone = new boolean[256]; // 256 byte
 
     private final int[] ftab = new int[65537]; // 262148 byte
 
@@ -108,8 +117,6 @@ class BlockSort {
         while (len-- > 0)
             swap(arr, i++, j++);
     }
-
-    private static final int FALLBACK_QSORT_SMALL_THRESH = 10;
 
     /**
      * @param eclass points from the index of a character inside the
@@ -575,10 +582,6 @@ class BlockSort {
         return (a < b) ? (b < c ? b : a < c ? c : a) : (b > c ? b : a > c ? c : a);
     }
 
-    private static final int SMALL_THRESH = 20;
-    private static final int DEPTH_THRESH = 10;
-    private static final int WORK_FACTOR = 30;
-
     private void mainQSort3(final int loSt, final int hiSt, final int dSt, final int last) {
         Deque<Data> stack = new LinkedList<>();
         stack.push(new Data(loSt, hiSt, dSt));
@@ -654,13 +657,10 @@ class BlockSort {
         }
     }
 
-    private static final int SETMASK = 1 << 21;
-    private static final int CLEARMASK = ~SETMASK;
-
-    final void mainSort(final Bzip2OutputStream.Data data, final int lastShadow) {
-        final int[] runningOrder = mainSort_runningOrder;
-        final int[] copy = mainSort_copy;
-        final boolean[] bigDone = mainSort_bigDone;
+    private final void mainSort(final Bzip2OutputStream.Data data, final int lastShadow) {
+        final int[] runningOrder = mainSortRunningOrder;
+        final int[] copy = mainSortCopy;
+        final boolean[] bigDone = mainSortBigDone;
         final int[] ftab = this.ftab;
         final int workLimitShadow = workLimit;
         final boolean firstAttemptShadow = firstAttempt;
