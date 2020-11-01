@@ -93,7 +93,6 @@ modifyPom {
         description 'Zip files support for JDK application'
         url 'https://github.com/oleg-cherednik/zip4jvm'
         inceptionYear '2019'
-        logo 'https://raw.githubusercontent.com/oleg-cherednik/zip4jvm/master/img/zip4jvm.png'
 
         scm {
             url 'https://github.com/oleg-cherednik/zip4jvm'
