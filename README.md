@@ -8,7 +8,7 @@
 [![coverity](https://scan.coverity.com/projects/4735/badge.svg)](https://scan.coverity.com/projects/oleg-cherednik-zip4jvm)
 
 <p align="center">
-    <a href="https://github.com/oleg-cherednik/zip4jvm/blob/master/img/zip4jvm_qr.png">
+    <a href="https://github.com/oleg-cherednik/zip4jvm/blob/master/img/zip4jvm_qr.png?raw=true">
         <img alt="QR-code" src="img/zip4jvm_qr_small.png" />
     </a>
 </p>
