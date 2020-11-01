@@ -115,8 +115,6 @@ modifyPom {
                 email 'oleg.cherednik@gmail.com'
             }
         }
-
-        logo 'img/zip4jvm.png'
     }
 }
 
