@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.crypto.aes;
 import org.apache.commons.lang.ArrayUtils;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.ReflectionUtils;
 
@@ -72,14 +72,17 @@ public class AesDecoderTest {
         @Override
         protected void engineInit(Key key, AlgorithmParameterSpec algorithmParameterSpec)
                 throws InvalidKeyException, InvalidAlgorithmParameterException {
+            // no implementation
         }
 
         @Override
         protected void engineUpdate(byte b) {
+            // no implementation
         }
 
         @Override
         protected void engineUpdate(byte[] bytes, int i, int i1) {
+            // no implementation
         }
 
         @Override
@@ -89,6 +92,7 @@ public class AesDecoderTest {
 
         @Override
         protected void engineReset() {
+            // no implementation
         }
     }
 

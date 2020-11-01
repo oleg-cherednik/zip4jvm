@@ -11,6 +11,7 @@ import ru.olegcherednik.zip4jvm.exception.RealBigZip64NotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -19,6 +20,11 @@ import java.util.Optional;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ValidationUtils {
+
+    public static void requireLessOrEqual(long value, long max, String type) {
+        if (value > max)
+            throw new IllegalArgumentException(String.format("Parameter should be less or equal to %d: %s", max, type));
+    }
 
     public static void requireZeroOrPositive(long value, String type) {
         if (value < 0)
@@ -61,9 +67,16 @@ public final class ValidationUtils {
         return str;
     }
 
-    public static <T> void requireNotEmpty(Collection<T> obj, String name) {
+    public static <T> List<T> requireNotEmpty(List<T> obj, String name) {
         if (CollectionUtils.isEmpty(obj))
-            throw new IllegalArgumentException("Collection should be empty: " + name);
+            throw new IllegalArgumentException("Collection should be not empty: " + name);
+        return obj;
+    }
+
+    public static <T> Collection<T> requireNotEmpty(Collection<T> obj, String name) {
+        if (CollectionUtils.isEmpty(obj))
+            throw new IllegalArgumentException("Collection should be not empty: " + name);
+        return obj;
     }
 
     public static void requireMaxSizeComment(String str, int maxLength) {

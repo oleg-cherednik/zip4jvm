@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.writers;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -22,11 +22,11 @@ public final class ZipModelWriter implements Writer {
 
     @Override
     public void write(DataOutput out) throws IOException {
-        zipModel.setTotalDisks(out.getDisk());
-        zipModel.setCentralDirectoryOffs(out.getOffs());
-        zipModel.setMainDisk(out.getDisk());
+        zipModel.setTotalDisks(out.getDiskNo());
+        zipModel.setCentralDirectoryRelativeOffs(out.getRelativeOffs());
+        zipModel.setMainDiskNo(out.getDiskNo());
 
-        updateZip64(out.getOffs());
+        updateZip64(out.getRelativeOffs());
         writeCentralDirectoryHeaders(out);
         // TODO see 4.4.1.5 - these sections must be on the same disk (probably add function to block the split)
         writeZip64(out);
@@ -50,7 +50,7 @@ public final class ZipModelWriter implements Writer {
     }
 
     private void writeZip64(DataOutput out) throws IOException {
-        Zip64 zip64 = new Zip64Builder(zipModel, out.getDisk()).build();
+        Zip64 zip64 = new Zip64Builder(zipModel, out.getDiskNo()).build();
         new Zip64Writer(zip64).write(out);
     }
 

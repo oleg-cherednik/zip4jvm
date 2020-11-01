@@ -1,9 +1,14 @@
 package ru.olegcherednik.zip4jvm.engine;
 
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.ZipFile;
+import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
+import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.BlockModelReader;
+import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.view.decompose.CentralDirectoryDecompose;
 import ru.olegcherednik.zip4jvm.view.decompose.EndCentralDirectoryDecompose;
 import ru.olegcherednik.zip4jvm.view.decompose.Zip64Decompose;
@@ -19,11 +24,12 @@ import java.nio.file.Path;
  * @since 15.11.2019
  */
 @RequiredArgsConstructor
-public final class InfoEngine {
+public final class InfoEngine implements ZipFile.Info {
 
-    private final Path zip;
+    private final SrcZip srcZip;
     private final ZipInfoSettings settings;
 
+    @Override
     public void printTextInfo(PrintStream out) throws IOException {
         BlockModel blockModel = createModel();
 
@@ -33,6 +39,7 @@ public final class InfoEngine {
         new ZipEntriesDecompose(blockModel, settings).printTextInfo(out, emptyLine);
     }
 
+    @Override
     public void decompose(Path dir) throws IOException {
         Files.createDirectories(dir);
 
@@ -44,8 +51,17 @@ public final class InfoEngine {
         new ZipEntriesDecompose(blockModel, settings).decompose(dir);
     }
 
+    @Override
+    public CentralDirectory.FileHeader getFileHeader(String entryName) throws IOException {
+        ZipModelReader reader = new ZipModelReader(srcZip, settings.getCustomizeCharset());
+        reader.readCentralData();
+        return reader.getCentralDirectory().getFileHeaders().stream()
+                     .filter(fh -> fh.getFileName().equalsIgnoreCase(entryName))
+                     .findFirst().orElseThrow(() -> new EntryNotFoundException(entryName));
+    }
+
     private BlockModel createModel() throws IOException {
-        BlockModelReader reader = new BlockModelReader(zip, settings.getCustomizeCharset());
+        BlockModelReader reader = new BlockModelReader(srcZip, settings.getCustomizeCharset());
         return settings.isReadEntries() ? reader.readWithEntries() : reader.read();
     }
 

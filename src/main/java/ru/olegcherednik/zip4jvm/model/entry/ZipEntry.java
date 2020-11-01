@@ -5,11 +5,12 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import ru.olegcherednik.zip4jvm.ZipFile;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.crypto.Decoder;
+import ru.olegcherednik.zip4jvm.crypto.Encoder;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
-import ru.olegcherednik.zip4jvm.model.Encryption;
+import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
@@ -34,15 +35,15 @@ import java.util.function.BooleanSupplier;
 public abstract class ZipEntry {
 
     public static final Comparator<ZipEntry> SORT_BY_DISC_LOCAL_FILE_HEADER_OFFS =
-            Comparator.comparingLong(ZipEntry::getDisk).thenComparing(ZipEntry::getLocalFileHeaderOffs);
+            Comparator.comparingLong(ZipEntry::getDiskNo).thenComparing(ZipEntry::getLocalFileHeaderRelativeOffs);
 
     private final String fileName;
     private final int lastModifiedTime;
     private final ExternalFileAttributes externalFileAttributes;
 
-    protected final Compression compression;
+    protected final CompressionMethod compressionMethod;
     private final CompressionLevel compressionLevel;
-    protected final Encryption encryption;
+    protected final EncryptionMethod encryptionMethod;
     @Getter(AccessLevel.NONE)
     private final ZipEntryInputStreamSupplier inputStreamSup;
 
@@ -54,15 +55,17 @@ public abstract class ZipEntry {
     private boolean zip64;
 
     private char[] password;
-    private long disk;
-    private long localFileHeaderOffs;
+    private int diskNo;
+    private long localFileHeaderRelativeOffs;
     @Getter(AccessLevel.NONE)
     private BooleanSupplier dataDescriptorAvailable = () -> false;
     private long uncompressedSize;
     private long compressedSize;
+    private boolean lzmaEosMarker = true;
 
     private String comment;
     private boolean utf8;
+    private boolean strongEncryption;
 
     public boolean isRegularFile() {
         return false;
@@ -72,16 +75,16 @@ public abstract class ZipEntry {
         return false;
     }
 
-    public final AesStrength getStrength() {
-        return AesEngine.getStrength(encryption);
-    }
-
     public final boolean isEncrypted() {
-        return encryption != Encryption.OFF;
+        return encryptionMethod != EncryptionMethod.OFF;
     }
 
     public InputStream getInputStream() throws IOException {
         return inputStreamSup.get(this);
+    }
+
+    public CompressionMethod getCompressionMethodForBuilder() {
+        return encryptionMethod.isAes() ? CompressionMethod.AES : compressionMethod;
     }
 
     @Override
@@ -109,6 +112,7 @@ public abstract class ZipEntry {
         ZipFile.Entry.Builder builder = ZipFile.Entry.builder()
                                                      .inputStreamSupplier(this::getInputStream)
                                                      .lastModifiedTime(lastModifiedTime)
+                                                     .uncompressedSize(uncompressedSize)
                                                      .externalFileAttributes(externalFileAttributes);
 
         if (isRegularFile())
@@ -117,6 +121,14 @@ public abstract class ZipEntry {
             builder.directoryName(fileName);
 
         return builder.build();
+    }
+
+    public Decoder createDecoder(DataInput in) throws IOException {
+        return Decoder.NULL;
+    }
+
+    public Encoder createEncoder() {
+        return Encoder.NULL;
     }
 
 }

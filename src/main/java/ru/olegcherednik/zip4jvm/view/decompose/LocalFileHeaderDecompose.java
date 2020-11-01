@@ -1,7 +1,8 @@
 package ru.olegcherednik.zip4jvm.view.decompose;
 
+import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
-import ru.olegcherednik.zip4jvm.model.Encryption;
+import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
@@ -45,12 +46,13 @@ public final class LocalFileHeaderDecompose implements Decompose {
         for (ZipEntryBlock zipEntryBlock : blockModel.getFileNameZipEntryBlock().values()) {
             String fileName = zipEntryBlock.getFileName();
 
-            Encryption encryption = zipModel.getZipEntryByFileName(fileName).getEncryption();
+            EncryptionMethod encryptionMethod = zipModel.getZipEntryByFileName(fileName).getEncryptionMethod();
 
             emptyLine |= localFileHeaderView(zipEntryBlock.getLocalFileHeader(), pos).print(out, pos != 0 || emptyLine);
             emptyLine |= extraFieldDecompose(zipEntryBlock.getLocalFileHeader(), zipEntryBlock.getLocalFileHeaderBlock().getExtraFieldBlock(),
                     settings.getOffs()).printTextInfo(out, false);
-            emptyLine |= encryptionHeader(encryption, zipEntryBlock.getEncryptionHeaderBlock(), pos).printTextInfo(out, emptyLine);
+            emptyLine |= encryptionHeader(encryptionMethod, zipEntryBlock.getDecryptionHeader(), zipEntryBlock.getEncryptionHeaderBlock(), pos)
+                    .printTextInfo(out, emptyLine);
             emptyLine |= dataDescriptor(zipEntryBlock.getDataDescriptor(), zipEntryBlock.getDataDescriptorBlock(), pos, out, emptyLine);
 
             pos++;
@@ -65,14 +67,14 @@ public final class LocalFileHeaderDecompose implements Decompose {
 
         for (ZipEntryBlock zipEntryBlock : blockModel.getFileNameZipEntryBlock().values()) {
             String fileName = zipEntryBlock.getFileName();
-            Encryption encryption = zipModel.getZipEntryByFileName(fileName).getEncryption();
+            EncryptionMethod encryptionMethod = zipModel.getZipEntryByFileName(fileName).getEncryptionMethod();
 
             Path subDir = Utils.createSubDir(dir, zipModel.getZipEntryByFileName(fileName), pos);
 
             localFileHeader(subDir, zipEntryBlock.getLocalFileHeader(), pos);
             extraFieldDecompose(zipEntryBlock.getLocalFileHeader(), zipEntryBlock.getLocalFileHeaderBlock().getExtraFieldBlock(), 0)
                     .decompose(subDir);
-            encryptionHeader(encryption, zipEntryBlock.getEncryptionHeaderBlock(), pos).decompose(subDir);
+            encryptionHeader(encryptionMethod, zipEntryBlock.getDecryptionHeader(), zipEntryBlock.getEncryptionHeaderBlock(), pos).decompose(subDir);
             dataDescriptor(subDir, zipEntryBlock.getDataDescriptor(), zipEntryBlock.getDataDescriptorBlock(), pos);
             copyPayload(subDir, zipModel.getZipEntryByFileName(fileName), zipEntryBlock.getLocalFileHeaderBlock(),
                     zipEntryBlock.getEncryptionHeaderBlock());
@@ -94,15 +96,15 @@ public final class LocalFileHeaderDecompose implements Decompose {
         if (zipEntry.getCompressedSize() == 0 || !settings.isCopyPayload())
             return;
 
+        Block content = diagLocalFileHeader.getContent();
+        ExtraFieldBlock extraFieldBlock = diagLocalFileHeader.getExtraFieldBlock();
+
         long size = zipEntry.getCompressedSize();
-        long offs = diagLocalFileHeader.getContent().getOffs() + diagLocalFileHeader.getContent().getSize();
+        long offs = content.getRelativeOffs() + content.getSize() + extraFieldBlock.getSize();
 
-        if (diagLocalFileHeader.getExtraFieldBlock() != null)
-            offs += diagLocalFileHeader.getExtraFieldBlock().getSize();
+        EncryptionMethod encryptionMethod = zipEntry.getEncryptionMethod();
 
-        Encryption encryption = zipEntry.getEncryption();
-
-        if (encryption == Encryption.AES_128 || encryption == Encryption.AES_192 || encryption == Encryption.AES_256) {
+        if (encryptionMethod.isAes()) {
             AesEncryptionHeaderBlock block = (AesEncryptionHeaderBlock)encryptionHeaderBlock;
 
             offs += block.getSalt().getSize();
@@ -111,7 +113,7 @@ public final class LocalFileHeaderDecompose implements Decompose {
             size -= block.getSalt().getSize();
             size -= block.getPasswordChecksum().getSize();
             size -= block.getMac().getSize();
-        } else if (encryption == Encryption.PKWARE) {
+        } else if (encryptionMethod == EncryptionMethod.PKWARE) {
             PkwareEncryptionHeaderBlock block = (PkwareEncryptionHeaderBlock)encryptionHeaderBlock;
             offs += block.getSize();
             size -= block.getSize();
@@ -120,8 +122,9 @@ public final class LocalFileHeaderDecompose implements Decompose {
         Utils.copyLarge(blockModel.getZipModel(), dir.resolve("payload.data"), offs, size);
     }
 
-    private EncryptionHeaderDecompose encryptionHeader(Encryption encryption, EncryptionHeaderBlock encryptionHeaderBlock, long pos) {
-        return new EncryptionHeaderDecompose(zipModel, settings, encryption, encryptionHeaderBlock, pos);
+    private EncryptionHeaderDecompose encryptionHeader(EncryptionMethod encryptionMethod, DecryptionHeader decryptionHeader,
+            EncryptionHeaderBlock encryptionHeaderBlock, long pos) {
+        return new EncryptionHeaderDecompose(zipModel, settings, encryptionMethod, decryptionHeader, encryptionHeaderBlock, pos);
     }
 
     private boolean dataDescriptor(DataDescriptor dataDescriptor, Block block, long pos, PrintStream out, boolean emptyLine) {

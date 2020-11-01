@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import lombok.Getter;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.block.Block;
@@ -25,7 +25,7 @@ public class BlockDataDescriptorReader implements Reader<DataDescriptor> {
 
     @Override
     public DataDescriptor read(DataInput in) throws IOException {
-        return block.calc(in, () -> reader.read(in));
+        return block.calcSize(in, () -> reader.read(in));
     }
 
 }

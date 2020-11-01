@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.model.AesExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.AesExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.block.Block;
@@ -25,7 +25,7 @@ public class AesExtraFieldRecordViewTest {
     public void shouldRetrieveMultipleLinesWhenViewAesRecord() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(11L);
-        when(block.getOffs()).thenReturn(255603L);
+        when(block.getRelativeOffs()).thenReturn(255603L);
 
         AesExtraFieldRecord record = AesExtraFieldRecord.builder()
                                                         .dataSize(7)
@@ -61,8 +61,8 @@ public class AesExtraFieldRecordViewTest {
     public void shouldRetrieveMultipleLinesWithDiskWhenSplit() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(11L);
-        when(block.getOffs()).thenReturn(255603L);
-        when(block.getDisk()).thenReturn(5L);
+        when(block.getRelativeOffs()).thenReturn(255603L);
+        when(block.getDiskNo()).thenReturn(5);
         when(block.getFileName()).thenReturn("src.zip");
 
         AesExtraFieldRecord record = AesExtraFieldRecord.builder()

@@ -28,7 +28,7 @@ import java.util.Optional;
 public final class LocalFileHeaderView extends BaseView {
 
     private final LocalFileHeader localFileHeader;
-    private final ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader;
+    private final ZipEntryBlock.LocalFileHeaderBlock localFileHeaderBlock;
     private final long pos;
     private final Charset charset;
 
@@ -39,7 +39,7 @@ public final class LocalFileHeaderView extends BaseView {
     private LocalFileHeaderView(Builder builder) {
         super(builder.offs, builder.columnWidth, builder.totalDisks);
         localFileHeader = builder.localFileHeader;
-        diagLocalFileHeader = builder.diagLocalFileHeader;
+        localFileHeaderBlock = builder.diagLocalFileHeader;
         pos = builder.pos;
         charset = builder.charset;
     }
@@ -47,7 +47,7 @@ public final class LocalFileHeaderView extends BaseView {
     @Override
     public boolean print(PrintStream out) {
         printSubTitle(out, LocalFileHeader.SIGNATURE, pos, '[' + charset.name() + "] " + localFileHeader.getFileName(),
-                diagLocalFileHeader.getContent());
+                localFileHeaderBlock.getContent());
         printVersion(out);
         printGeneralPurposeFlag(out);
         printCompressionMethod(out);
@@ -98,7 +98,7 @@ public final class LocalFileHeaderView extends BaseView {
 
         ExtraFieldView.builder()
                       .extraField(localFileHeader.getExtraField())
-                      .block(diagLocalFileHeader.getExtraFieldBlock())
+                      .block(localFileHeaderBlock.getExtraFieldBlock())
                       .generalPurposeFlag(localFileHeader.getGeneralPurposeFlag())
                       .position(offs, columnWidth, totalDisks).build().printLocation(out);
     }

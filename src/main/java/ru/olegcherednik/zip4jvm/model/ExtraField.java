@@ -4,7 +4,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang.ArrayUtils;
-import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.model.extrafield.AesExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.AlgIdExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import java.io.IOException;
@@ -43,9 +45,14 @@ public final class ExtraField {
         return record instanceof Zip64.ExtendedInfo ? (Zip64.ExtendedInfo)record : Zip64.ExtendedInfo.NULL;
     }
 
-    public AesExtraFieldRecord getAesExtraDataRecord() {
+    public AesExtraFieldRecord getAesRecord() {
         ExtraField.Record record = map.get(AesExtraFieldRecord.SIGNATURE);
         return record instanceof AesExtraFieldRecord ? (AesExtraFieldRecord)record : AesExtraFieldRecord.NULL;
+    }
+
+    public AlgIdExtraFieldRecord getAlgIdRecord() {
+        ExtraField.Record record = map.get(AlgIdExtraFieldRecord.SIGNATURE);
+        return record instanceof AlgIdExtraFieldRecord ? (AlgIdExtraFieldRecord)record : AlgIdExtraFieldRecord.NULL;
     }
 
     public Set<Integer> getSignatures() {
@@ -76,26 +83,6 @@ public final class ExtraField {
     public String toString() {
         return this == NULL ? "<null>" : ("total: " + getTotalRecords());
     }
-
-
-    /*
-		case 0x0017:
-		{
-			// Strong encryption field.
-			if (archive_le16dec(p + offset) == 2) {
-        unsigned algId =
-                archive_le16dec(p + offset + 2);
-        unsigned bitLen =
-                archive_le16dec(p + offset + 4);
-        int	 flags =
-                archive_le16dec(p + offset + 6);
-        fprintf(stderr, "algId=0x%04x, bitLen=%u, "
-                "flgas=%d\n", algId, bitLen,flags);
-    }
-			break;
-}
-
-     */
 
     public interface Record extends Writer {
 

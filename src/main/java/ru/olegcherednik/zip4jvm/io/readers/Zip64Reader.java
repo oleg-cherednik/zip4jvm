@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.AllArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -22,21 +22,22 @@ public class Zip64Reader implements Reader<Zip64> {
     public final Zip64 read(DataInput in) throws IOException {
         if (findCentralDirectoryLocatorSignature(in)) {
             Zip64.EndCentralDirectoryLocator locator = readEndCentralDirectoryLocator(in);
-            findCentralDirectorySignature(locator.getOffs(), in);
-            Zip64.EndCentralDirectory dir = readEndCentralDirectory(in);
-            return Zip64.of(locator, dir);
+            findEndCentralDirectorySignature(locator, in);
+            return Zip64.of(locator, readEndCentralDirectory(in));
         }
 
         return Zip64.NULL;
     }
 
-    private static boolean findCentralDirectoryLocatorSignature(DataInput in) throws IOException {
-        long offs = in.getOffs() - Zip64.EndCentralDirectoryLocator.SIZE;
+    protected final Zip64 findAndReadEndCentralDirectoryLocator(DataInput in) throws IOException {
+        return findCentralDirectoryLocatorSignature(in) ? Zip64.of(readEndCentralDirectoryLocator(in), null) : Zip64.NULL;
+    }
 
-        if (offs < 0)
+    private static boolean findCentralDirectoryLocatorSignature(DataInput in) throws IOException {
+        if (in.getAbsoluteOffs() < Zip64.EndCentralDirectoryLocator.SIZE)
             return false;
 
-        in.seek(offs);
+        in.backward(Zip64.EndCentralDirectoryLocator.SIZE);
 
         if (in.readDwordSignature() != Zip64.EndCentralDirectoryLocator.SIGNATURE)
             return false;
@@ -45,8 +46,8 @@ public class Zip64Reader implements Reader<Zip64> {
         return true;
     }
 
-    private static void findCentralDirectorySignature(long offs, DataInput in) throws IOException {
-        in.seek(offs);
+    private static void findEndCentralDirectorySignature(Zip64.EndCentralDirectoryLocator locator, DataInput in) throws IOException {
+        in.seek((int)locator.getMainDiskNo(), locator.getEndCentralDirectoryRelativeOffs());
 
         if (in.readDwordSignature() != Zip64.EndCentralDirectory.SIGNATURE)
             throw new Zip4jvmException("invalid zip64 end of central directory");
@@ -68,11 +69,13 @@ public class Zip64Reader implements Reader<Zip64> {
             in.skip(in.dwordSignatureSize());
 
             Zip64.EndCentralDirectoryLocator locator = new Zip64.EndCentralDirectoryLocator();
-            locator.setMainDisk(in.readDword());
-            locator.setOffs(in.readQword());
+            locator.setMainDiskNo(in.readDword());
+            locator.setEndCentralDirectoryRelativeOffs(in.readQword());
             locator.setTotalDisks(in.readDword());
 
-            realBigZip64(locator.getOffs(), "zip64.centralDirectoryOffs");
+            realBigZip64(locator.getMainDiskNo(), "zip64.locator.mainDisk");
+            realBigZip64(locator.getMainDiskNo(), "zip64.locator.totalDisks");
+            realBigZip64(locator.getEndCentralDirectoryRelativeOffs(), "zip64.locator.centralDirectoryOffs");
 
             return locator;
         }
@@ -89,16 +92,16 @@ public class Zip64Reader implements Reader<Zip64> {
             dir.setEndCentralDirectorySize(endCentralDirectorySize);
             dir.setVersionMadeBy(Version.of(in.readWord()));
             dir.setVersionToExtract(Version.of(in.readWord()));
-            dir.setTotalDisks(in.readDword());
-            dir.setMainDisk(in.readDword());
+            dir.setDiskNo(in.readDword());
+            dir.setMainDiskNo(in.readDword());
             dir.setDiskEntries(in.readQword());
             dir.setTotalEntries(in.readQword());
             dir.setCentralDirectorySize(in.readQword());
-            dir.setCentralDirectoryOffs(in.readQword());
+            dir.setCentralDirectoryRelativeOffs(in.readQword());
             dir.setExtensibleDataSector(in.readBytes((int)endCentralDirectorySize - Zip64.EndCentralDirectory.SIZE));
 
-            realBigZip64(dir.getCentralDirectoryOffs(), "centralDirectoryOffs");
-            realBigZip64(dir.getTotalEntries(), "totalEntries");
+            realBigZip64(dir.getCentralDirectoryRelativeOffs(), "zip64.endCentralDirectory.centralDirectoryOffs");
+            realBigZip64(dir.getTotalEntries(), "zip64.endCentralDirectory.totalEntries");
 
             return dir;
         }
@@ -126,16 +129,19 @@ public class Zip64Reader implements Reader<Zip64> {
 
         @Override
         public Zip64.ExtendedInfo read(DataInput in) throws IOException {
-            long offs = in.getOffs();
+            long offs = in.getAbsoluteOffs();
             updateFlags(in);
 
             Zip64.ExtendedInfo extendedInfo = readExtendedInfo(in);
 
-            if (in.getOffs() - offs != size) {
+            if (in.getAbsoluteOffs() - offs != size) {
                 // section exists, but not need to read it; all data is in FileHeader
                 extendedInfo = Zip64.ExtendedInfo.NULL;
                 in.seek(offs + size);
             }
+
+            if (extendedInfo.getDiskNo() != ExtraField.NO_DATA)
+                realBigZip64(extendedInfo.getDiskNo(), "zip64.extendedInfo.disk");
 
             return extendedInfo;
         }
@@ -144,8 +150,8 @@ public class Zip64Reader implements Reader<Zip64> {
             return Zip64.ExtendedInfo.builder()
                                      .uncompressedSize(uncompressedSizeExists ? in.readQword() : ExtraField.NO_DATA)
                                      .compressedSize(compressedSizeExists ? in.readQword() : ExtraField.NO_DATA)
-                                     .localFileHeaderOffs(offsLocalHeaderRelativeExists ? in.readQword() : ExtraField.NO_DATA)
-                                     .disk(diskExists ? in.readDword() : ExtraField.NO_DATA)
+                                     .localFileHeaderRelativeOffs(offsLocalHeaderRelativeExists ? in.readQword() : ExtraField.NO_DATA)
+                                     .diskNo(diskExists ? in.readDword() : ExtraField.NO_DATA)
                                      .build();
         }
 

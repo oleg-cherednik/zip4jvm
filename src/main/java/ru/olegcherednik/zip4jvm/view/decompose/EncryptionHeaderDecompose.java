@@ -1,7 +1,8 @@
 package ru.olegcherednik.zip4jvm.view.decompose;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.model.Encryption;
+import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
+import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
@@ -23,7 +24,8 @@ public final class EncryptionHeaderDecompose implements Decompose {
 
     private final ZipModel zipModel;
     private final ZipInfoSettings settings;
-    private final Encryption encryption;
+    private final EncryptionMethod encryptionMethod;
+    private final DecryptionHeader decryptionHeader;
     private final EncryptionHeaderBlock encryptionHeaderBlock;
     private final long pos;
 
@@ -43,19 +45,20 @@ public final class EncryptionHeaderDecompose implements Decompose {
         Path subDir = Files.createDirectories(dir.resolve("encryption"));
 
         // TODO probably same with block reader
-        if (encryption == Encryption.AES_128 || encryption == Encryption.AES_192 || encryption == Encryption.AES_256) {
+        if (encryptionMethod.isAes()) {
             AesEncryptionHeaderBlock block = (AesEncryptionHeaderBlock)encryptionHeaderBlock;
             Utils.print(subDir.resolve("aes_encryption_header.txt"), out -> encryptionHeaderView().print(out));
 
             Utils.copyLarge(zipModel, subDir.resolve("aes_salt.data"), block.getSalt());
             Utils.copyLarge(zipModel, subDir.resolve("aes_password_checksum.data"), block.getPasswordChecksum());
             Utils.copyLarge(zipModel, subDir.resolve("aes_mac.data"), block.getMac());
-        } else if (encryption == Encryption.PKWARE) {
+        } else if (encryptionMethod == EncryptionMethod.PKWARE) {
             PkwareEncryptionHeaderBlock block = (PkwareEncryptionHeaderBlock)encryptionHeaderBlock;
             Utils.print(subDir.resolve("pkware_encryption_header.txt"), out -> encryptionHeaderView().print(out));
             Utils.copyLarge(zipModel, subDir.resolve("pkware_encryption_header.data"), block);
         } else {
             // TODO print unknown header
+            System.out.println("TODO print unknown header");
         }
     }
 
@@ -63,6 +66,6 @@ public final class EncryptionHeaderDecompose implements Decompose {
         int offs = settings.getOffs();
         int columnWidth = settings.getColumnWidth();
         long totalDisks = zipModel.getTotalDisks();
-        return new EncryptionHeaderView(encryptionHeaderBlock, pos, offs, columnWidth, totalDisks);
+        return new EncryptionHeaderView(decryptionHeader, encryptionHeaderBlock, pos, offs, columnWidth, totalDisks);
     }
 }

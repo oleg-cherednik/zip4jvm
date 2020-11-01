@@ -1,13 +1,15 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.ZipInputStream;
+import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.Path;
 import java.util.function.Function;
 
 /**
@@ -16,18 +18,37 @@ import java.util.function.Function;
  */
 public final class ZipModelReader extends BaseZipModelReader {
 
-    public ZipModelReader(Path zip, Function<Charset, Charset> customizeCharset) {
-        super(zip, customizeCharset);
+    public ZipModelReader(SrcZip srcZip) {
+        this(srcZip, Charsets.UNMODIFIED);
+    }
+
+    public ZipModelReader(SrcZip srcZip, Function<Charset, Charset> customizeCharset) {
+        super(srcZip, customizeCharset);
     }
 
     public ZipModel read() throws IOException {
         readCentralData();
-        return new ZipModelBuilder(zip, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
+        return new ZipModelBuilder(srcZip, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
+    }
+
+    public static int getTotalDisks(SrcZip srcZip) {
+        ZipModelReader reader = new ZipModelReader(srcZip);
+
+        try (DataInput in = reader.createDataInput()) {
+            reader.readEndCentralDirectory(in);
+            reader.readZip64EndCentralDirectoryLocator(in);
+
+            if (reader.zip64 == Zip64.NULL)
+                return reader.endCentralDirectory.getTotalDisks();
+            return (int)reader.zip64.getEndCentralDirectoryLocator().getTotalDisks();
+        } catch(Exception e) {
+            return 0;
+        }
     }
 
     @Override
-    protected DataInput createDataInput(Path zip) throws IOException {
-        return new SingleZipInputStream(zip);
+    protected DataInput createDataInput() throws IOException {
+        return new ZipInputStream(srcZip);
     }
 
     @Override

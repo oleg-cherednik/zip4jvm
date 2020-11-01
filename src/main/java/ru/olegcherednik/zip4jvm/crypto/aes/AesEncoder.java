@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.crypto.aes;
 
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import javax.crypto.Cipher;
@@ -21,11 +21,11 @@ public final class AesEncoder implements Encoder {
     private final byte[] passwordChecksum;
     private final AesEngine engine;
 
-    public static AesEncoder create(ZipEntry entry) {
+    public static AesEncoder create(ZipEntry zipEntry) {
         try {
-            AesStrength strength = entry.getStrength();
+            AesStrength strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
             byte[] salt = strength.generateSalt();
-            byte[] key = AesEngine.createKey(entry.getPassword(), salt, strength);
+            byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
 
             Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
             Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));

@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.model.builders;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.Version;
@@ -30,16 +29,16 @@ final class FileHeaderBuilder {
         fileHeader.setVersionMadeBy(Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));
         fileHeader.setVersionToExtract(Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));
         fileHeader.setGeneralPurposeFlag(createGeneralPurposeFlag());
-        fileHeader.setCompressionMethod(zipEntry.getEncryption().getCompressionMethod().apply(zipEntry.getCompression()));
+        fileHeader.setCompressionMethod(zipEntry.getCompressionMethodForBuilder());
         fileHeader.setLastModifiedTime(zipEntry.getLastModifiedTime());
-        fileHeader.setCrc32(zipEntry.getEncryption().getChecksum().apply(zipEntry));
+        fileHeader.setCrc32(zipEntry.getEncryptionMethod().getChecksum(zipEntry));
         fileHeader.setCompressedSize(getSize(zipEntry.getCompressedSize()));
         fileHeader.setUncompressedSize(getSize(zipEntry.getUncompressedSize()));
         fileHeader.setCommentLength(0);
-        fileHeader.setDisk(getDisk());
+        fileHeader.setDiskNo(getDisk());
         fileHeader.setInternalFileAttributes(zipEntry.getInternalFileAttributes());
         fileHeader.setExternalFileAttributes(zipEntry.getExternalFileAttributes());
-        fileHeader.setLocalFileHeaderOffs(getOffsLocalFileHeader());
+        fileHeader.setLocalFileHeaderRelativeOffs(getLocalFileHeaderRelativeOffs());
         fileHeader.setFileName(zipEntry.getFileName());
         fileHeader.setExtraField(createExtraField());
         fileHeader.setComment(zipEntry.getComment());
@@ -52,9 +51,9 @@ final class FileHeaderBuilder {
         generalPurposeFlag.setCompressionLevel(zipEntry.getCompressionLevel());
         generalPurposeFlag.setDataDescriptorAvailable(zipEntry.isDataDescriptorAvailable());
         generalPurposeFlag.setUtf8(zipEntry.isUtf8());
-        generalPurposeFlag.setEncrypted(zipEntry.getEncryption() != Encryption.OFF);
-//        generalPurposeFlag.setStrongEncryption(entry.getEncryption() == Encryption.STRONG);
-        generalPurposeFlag.setStrongEncryption(false);
+        generalPurposeFlag.setEncrypted(zipEntry.isEncrypted());
+        generalPurposeFlag.setStrongEncryption(zipEntry.isStrongEncryption());
+        generalPurposeFlag.setLzmaEosMarker(zipEntry.isLzmaEosMarker());
 
         return generalPurposeFlag;
     }
@@ -70,8 +69,8 @@ final class FileHeaderBuilder {
             return Zip64.ExtendedInfo.builder()
                                      .compressedSize(zipEntry.getCompressedSize())
                                      .uncompressedSize(zipEntry.getUncompressedSize())
-                                     .disk(zipEntry.getDisk())
-                                     .localFileHeaderOffs(zipEntry.getLocalFileHeaderOffs()).build();
+                                     .diskNo(zipEntry.getDiskNo())
+                                     .localFileHeaderRelativeOffs(zipEntry.getLocalFileHeaderRelativeOffs()).build();
         return Zip64.ExtendedInfo.NULL;
     }
 
@@ -80,11 +79,11 @@ final class FileHeaderBuilder {
     }
 
     private int getDisk() {
-        return zipEntry.isZip64() ? MAX_TOTAL_DISKS : (int)zipEntry.getDisk();
+        return zipEntry.isZip64() ? MAX_TOTAL_DISKS : zipEntry.getDiskNo();
     }
 
-    private long getOffsLocalFileHeader() {
-        return zipEntry.isZip64() ? MAX_LOCAL_FILE_HEADER_OFFS : zipEntry.getLocalFileHeaderOffs();
+    private long getLocalFileHeaderRelativeOffs() {
+        return zipEntry.isZip64() ? MAX_LOCAL_FILE_HEADER_OFFS : zipEntry.getLocalFileHeaderRelativeOffs();
     }
 
 }

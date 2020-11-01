@@ -1,6 +1,8 @@
 package ru.olegcherednik.zip4jvm.view.crypto;
 
+import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.model.block.crypto.DecryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.view.BaseView;
@@ -15,11 +17,14 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
  */
 public final class EncryptionHeaderView extends BaseView {
 
+    private final DecryptionHeader decryptionHeader;
     private final EncryptionHeaderBlock block;
     private final long pos;
 
-    public EncryptionHeaderView(EncryptionHeaderBlock block, long pos, int offs, int columnWidth, long totalDisks) {
+    public EncryptionHeaderView(DecryptionHeader decryptionHeader, EncryptionHeaderBlock block, long pos, int offs, int columnWidth,
+            long totalDisks) {
         super(offs, columnWidth, totalDisks);
+        this.decryptionHeader = decryptionHeader;
         this.block = requireNotNull(block, "EncryptionHeaderView.centralDirectory");
         this.pos = pos;
     }
@@ -27,19 +32,13 @@ public final class EncryptionHeaderView extends BaseView {
     @Override
     public boolean print(PrintStream out) {
         if (block instanceof AesEncryptionHeaderBlock)
-            createView((AesEncryptionHeaderBlock)block).print(out);
+            new AesEncryptionHeaderView((AesEncryptionHeaderBlock)block, pos, offs, columnWidth, totalDisks).print(out);
         else if (block instanceof PkwareEncryptionHeaderBlock)
-            createView((PkwareEncryptionHeaderBlock)block).print(out);
-        // TODO add for unknown encryption header
+            new PkwareEncryptionHeaderView((PkwareEncryptionHeaderBlock)block, pos, offs, columnWidth, totalDisks).print(out);
+        else if (block instanceof DecryptionHeaderBlock)
+            new DecryptionHeaderView(decryptionHeader, (DecryptionHeaderBlock)block, pos, offs, columnWidth, totalDisks).print(out);
 
         return true;
     }
 
-    public AesEncryptionHeaderView createView(AesEncryptionHeaderBlock block) {
-        return new AesEncryptionHeaderView(block, pos, offs, columnWidth, totalDisks);
-    }
-
-    public PkwareEncryptionHeaderView createView(PkwareEncryptionHeaderBlock block) {
-        return new PkwareEncryptionHeaderView(block, pos, offs, columnWidth, totalDisks);
-    }
 }

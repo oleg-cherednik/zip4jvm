@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.block.Block;
-import ru.olegcherednik.zip4jvm.model.os.InfoZipNewUnixExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.InfoZipNewUnixExtraFieldRecord;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -23,7 +23,7 @@ public class InfoZipNewUnixExtraFieldRecordViewTest {
     public void shouldRetrieveVersionOneRecordWhenVersionOne() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(15L);
-        when(block.getOffs()).thenReturn(5296740L);
+        when(block.getRelativeOffs()).thenReturn(5296740L);
 
         InfoZipNewUnixExtraFieldRecord.Payload payload = InfoZipNewUnixExtraFieldRecord.VersionOnePayload.builder()
                                                                                                          .uid("aaa")
@@ -49,7 +49,7 @@ public class InfoZipNewUnixExtraFieldRecordViewTest {
     public void shouldRetrieveUnknownVersionRecordWhenVersionNotOne() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(15L);
-        when(block.getOffs()).thenReturn(5296740L);
+        when(block.getRelativeOffs()).thenReturn(5296740L);
 
         InfoZipNewUnixExtraFieldRecord.Payload payload = InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload.builder()
                                                                                                              .version(2)
@@ -84,8 +84,8 @@ public class InfoZipNewUnixExtraFieldRecordViewTest {
     public void shouldRetrieveVersionOneRecordWithDiskWhenSplit() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(15L);
-        when(block.getOffs()).thenReturn(5296740L);
-        when(block.getDisk()).thenReturn(5L);
+        when(block.getRelativeOffs()).thenReturn(5296740L);
+        when(block.getDiskNo()).thenReturn(5);
         when(block.getFileName()).thenReturn("src.zip");
 
         InfoZipNewUnixExtraFieldRecord.Payload payload = InfoZipNewUnixExtraFieldRecord.VersionOnePayload.builder()

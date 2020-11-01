@@ -2,7 +2,8 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
@@ -21,7 +22,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
 
-    private final long offs;
+    private final long absoluteOffs;
     private final Function<Charset, Charset> customizeCharset;
 
     @Override
@@ -58,7 +59,7 @@ public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
     }
 
     private void findSignature(DataInput in) throws IOException {
-        in.seek(offs);
+        in.seek(absoluteOffs);
 
         if (in.readDwordSignature() != LocalFileHeader.SIGNATURE)
             throw new Zip4jvmException("invalid local file header signature");

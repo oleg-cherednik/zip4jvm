@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.writers;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
@@ -23,11 +23,11 @@ final class EndCentralDirectoryWriter implements Writer {
 
         out.writeDwordSignature(EndCentralDirectory.SIGNATURE);
         out.writeWord(endCentralDirectory.getTotalDisks());
-        out.writeWord(endCentralDirectory.getMainDisk());
+        out.writeWord(endCentralDirectory.getMainDiskNo());
         out.writeWord(endCentralDirectory.getDiskEntries());
         out.writeWord(endCentralDirectory.getTotalEntries());
         out.writeDword(endCentralDirectory.getCentralDirectorySize());
-        out.writeDword(endCentralDirectory.getCentralDirectoryOffs());
+        out.writeDword(endCentralDirectory.getCentralDirectoryRelativeOffs());
         out.writeWord(comment.length);
         out.writeBytes(comment);
     }

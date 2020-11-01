@@ -3,12 +3,12 @@ package ru.olegcherednik.zip4jvm.crypto.pkware;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
-import java.util.Random;
+import java.security.SecureRandom;
 
 /**
  * @author Oleg Cherednik
@@ -28,7 +28,7 @@ public final class PkwareHeader {
     private static byte[] createBuf(PkwareEngine engine, int checksum) {
         byte[] buf = new byte[SIZE];
 
-        new Random().nextBytes(buf);
+        new SecureRandom().nextBytes(buf);
         buf[buf.length - 1] = low(checksum);
         buf[buf.length - 2] = high(checksum);
         engine.encrypt(buf, 0, buf.length);
@@ -49,14 +49,18 @@ public final class PkwareHeader {
     /** see 6.1.6 */
     private void requireMatchChecksum(PkwareEngine engine, ZipEntry zipEntry) {
         engine.decrypt(buf, 0, buf.length);
-        int checksum = getChecksum(zipEntry);
+        int lastModifiedTime = zipEntry.getLastModifiedTime();
+        long checksum = zipEntry.getChecksum();
 
-        if (buf[buf.length - 1] != low(checksum) /*|| buf[buf.length - 2] != high(checksum)*/)
+        boolean match = false;
+
+        if (buf[buf.length - 1] == low(lastModifiedTime))
+            match = true;
+        if (buf[buf.length - 1]  == (byte)(checksum >> 24))
+            match = true;
+
+        if (!match)
             throw new IncorrectPasswordException(zipEntry.getFileName());
-    }
-
-    private static int getChecksum(ZipEntry zipEntry) {
-        return zipEntry.getLastModifiedTime();
     }
 
     private static byte low(int checksum) {

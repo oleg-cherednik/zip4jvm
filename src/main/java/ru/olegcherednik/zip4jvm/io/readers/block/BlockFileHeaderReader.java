@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldReader;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
@@ -27,7 +27,7 @@ public class BlockFileHeaderReader extends FileHeaderReader {
     @Override
     protected CentralDirectory.FileHeader readFileHeader(DataInput in) throws IOException {
         block = new CentralDirectoryBlock.FileHeaderBlock();
-        CentralDirectory.FileHeader fileHeader = block.calc(in, () -> super.readFileHeader(in));
+        CentralDirectory.FileHeader fileHeader = block.calcSize(in, () -> super.readFileHeader(in));
         centralDirectoryBlock.addFileHeader(fileHeader.getFileName(), block);
         return fileHeader;
     }

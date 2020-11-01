@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,6 +26,8 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatStrin
  */
 @SuppressWarnings("CatchMayIgnoreException")
 public class FileAssert extends AbstractPathAssert<FileAssert> implements IFileAssert<FileAssert> {
+
+    private static final Pattern REGEX = Pattern.compile("<--\\sregexp\\((?<regex>.+)\\)\\s-->.+");
 
     public FileAssert(Path actual) {
         super(actual, FileAssert.class);
@@ -69,8 +72,6 @@ public class FileAssert extends AbstractPathAssert<FileAssert> implements IFileA
         return myself;
     }
 
-    private static final Pattern REGEX = Pattern.compile("<--\\sregexp\\((?<regex>.+)\\)\\s-->.+");
-
     public FileAssert matchesResourceLines(String path) {
         try (BufferedReader actualReader = new BufferedReader(new FileReader(actual.toFile()));
              BufferedReader expectedReader = new BufferedReader(new InputStreamReader(FileAssert.class.getResourceAsStream(path)))) {
@@ -85,13 +86,14 @@ public class FileAssert extends AbstractPathAssert<FileAssert> implements IFileA
                     break;
                 if (StringUtils.equals(actual, expected) || expected.startsWith("<-- ignore_line -->"))
                     continue;
-                // <-- regexp(^\s{4}(?:[0-9A-F]{2}\s){11}[0-9A-F]{2}$) -->
+
+                actual = Optional.ofNullable(actual).orElse("");
+                expected = Optional.ofNullable(expected).orElse("");
 
                 Matcher matcher = REGEX.matcher(expected);
 
                 if (matcher.matches()) {
                     String regex = matcher.group("regex");
-                    //noinspection ConstantConditions
                     if (Pattern.compile(regex).matcher(actual).matches())
                         continue;
 
@@ -99,7 +101,7 @@ public class FileAssert extends AbstractPathAssert<FileAssert> implements IFileA
                             String.format("(line %d)\r\nExpecting:\r\n<\"%s\">\r\nto be match the pattern:\r\n<\"%s\">\r\nbut was not.",
                                     pos, actual, regex));
                 } else
-                    assertThatStringLine(pos, actual).isEqualTo(expected);
+                    assertThatStringLine(this.actual, pos, actual).isEqualTo(expected);
             }
         } catch(Exception e) {
             assertThatThrownBy(() -> {

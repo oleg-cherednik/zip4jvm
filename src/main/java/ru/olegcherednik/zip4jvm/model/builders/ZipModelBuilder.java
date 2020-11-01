@@ -2,9 +2,7 @@ package ru.olegcherednik.zip4jvm.model.builders;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.DataInputFile;
-import ru.olegcherednik.zip4jvm.io.in.LittleEndianReadFile;
-import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
@@ -27,25 +25,25 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public final class ZipModelBuilder {
 
-    private final Path zip;
+    private final SrcZip srcZip;
     private final EndCentralDirectory endCentralDirectory;
     private final Zip64 zip64;
     private final CentralDirectory centralDirectory;
     private final Function<Charset, Charset> charsetCustomizer;
 
-    public static ZipModel read(Path zip) throws IOException {
-        return read(zip, Charsets.UNMODIFIED);
+    public static ZipModel read(SrcZip srcZip) throws IOException {
+        return read(srcZip, Charsets.UNMODIFIED);
     }
 
-    public static ZipModel read(Path zip, Function<Charset, Charset> charsetCustomizer) throws IOException {
-        return new ZipModelReader(zip, charsetCustomizer).read();
+    public static ZipModel read(SrcZip srcZip, Function<Charset, Charset> charsetCustomizer) throws IOException {
+        return new ZipModelReader(srcZip, charsetCustomizer).read();
     }
 
     public static ZipModel build(Path zip, ZipSettings settings) {
         if (Files.exists(zip))
             throw new Zip4jvmException("ZipFile '" + zip.toAbsolutePath() + "' exists");
 
-        ZipModel zipModel = new ZipModel(zip);
+        ZipModel zipModel = new ZipModel(SrcZip.of(zip));
         zipModel.setSplitSize(settings.getSplitSize());
         zipModel.setComment(settings.getComment());
         zipModel.setZip64(settings.isZip64());
@@ -54,74 +52,57 @@ public final class ZipModelBuilder {
     }
 
     public ZipModel build() throws IOException {
-        ZipModel zipModel = new ZipModel(zip);
-
+        ZipModel zipModel = new ZipModel(srcZip);
         zipModel.setZip64(zip64 != Zip64.NULL);
         zipModel.setComment(endCentralDirectory.getComment());
         zipModel.setTotalDisks(getTotalDisks());
-        zipModel.setMainDisk(getMainDisks());
+        zipModel.setMainDiskNo(getMainDiskNo());
         zipModel.setCentralDirectorySize(getCentralDirectorySize());
-        zipModel.setCentralDirectoryOffs(getCentralDirectoryOffs(endCentralDirectory, zip64));
+        zipModel.setCentralDirectoryRelativeOffs(getCentralDirectoryRelativeOffs(endCentralDirectory, zip64));
+        zipModel.setSplitSize(srcZip.getSplitSize());
+
         createAndAddEntries(zipModel);
-        updateSplit(zipModel);
 
         return zipModel;
     }
 
     private void createAndAddEntries(ZipModel zipModel) {
-        centralDirectory.getFileHeaders().stream()
-                        .map(fileHeader -> ZipEntryBuilder.build(fileHeader, zipModel, charsetCustomizer))
-                        .forEach(zipModel::addEntry);
+        if (centralDirectory != null)
+            centralDirectory.getFileHeaders().stream()
+                            .map(fileHeader -> ZipEntryBuilder.build(fileHeader, zipModel.getSrcZip(), charsetCustomizer))
+                            .forEach(zipModel::addEntry);
     }
 
-    private long getTotalDisks() {
+    private int getTotalDisks() {
         if (zip64 == Zip64.NULL)
             return endCentralDirectory.getTotalDisks();
-        return zip64.getEndCentralDirectory().getTotalDisks();
+        return (int)zip64.getEndCentralDirectoryLocator().getTotalDisks();
     }
 
-    private long getMainDisks() {
-        if (zip64 == Zip64.NULL)
-            return endCentralDirectory.getMainDisk();
-        return zip64.getEndCentralDirectoryLocator().getMainDisk();
+    private long getMainDiskNo() {
+        return getMainDiskNo(endCentralDirectory, zip64);
     }
 
     public long getCentralDirectorySize() {
-        if (zip64 == Zip64.NULL)
-            return endCentralDirectory.getCentralDirectorySize();
-        return zip64.getEndCentralDirectory().getCentralDirectorySize();
+        return getCentralDirectoryRelativeOffs(endCentralDirectory, zip64);
     }
 
-    public static long getCentralDirectoryOffs(EndCentralDirectory endCentralDirectory, Zip64 zip64) {
+    public static int getMainDiskNo(EndCentralDirectory endCentralDirectory, Zip64 zip64) {
         if (zip64 == Zip64.NULL)
-            return endCentralDirectory.getCentralDirectoryOffs();
-        return zip64.getEndCentralDirectory().getCentralDirectoryOffs();
+            return endCentralDirectory.getMainDiskNo();
+        return (int)zip64.getEndCentralDirectory().getMainDiskNo();
+    }
+
+    public static long getCentralDirectoryRelativeOffs(EndCentralDirectory endCentralDirectory, Zip64 zip64) {
+        if (zip64 == Zip64.NULL)
+            return endCentralDirectory.getCentralDirectoryRelativeOffs();
+        return zip64.getEndCentralDirectory().getCentralDirectoryRelativeOffs();
     }
 
     public static long getTotalEntries(EndCentralDirectory endCentralDirectory, Zip64 zip64) {
         if (zip64 == Zip64.NULL)
             return endCentralDirectory.getTotalEntries();
         return zip64.getEndCentralDirectory().getTotalEntries();
-    }
-
-    private static void updateSplit(ZipModel zipModel) throws IOException {
-        if (isSplit(zipModel))
-            zipModel.setSplitSize(getSplitSize(zipModel));
-    }
-
-    private static boolean isSplit(ZipModel zipModel) throws IOException {
-        try (DataInputFile in = new LittleEndianReadFile(zipModel.getPartFile(0))) {
-            return in.readSignature() == SplitZipOutputStream.SPLIT_SIGNATURE;
-        }
-    }
-
-    private static long getSplitSize(ZipModel zipModel) throws IOException {
-        long size = 0;
-
-        for (long i = 0; i <= zipModel.getTotalDisks(); i++)
-            size = Math.max(size, Files.size(zipModel.getPartFile(i)));
-
-        return size;
     }
 
 }

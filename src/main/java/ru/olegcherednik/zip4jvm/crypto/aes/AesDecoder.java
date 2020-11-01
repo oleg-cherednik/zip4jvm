@@ -4,7 +4,7 @@ import org.apache.commons.lang.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import javax.crypto.Cipher;
@@ -23,25 +23,55 @@ public final class AesDecoder implements Decoder {
     private final int saltLength;
     private final AesEngine engine;
 
-    public static AesDecoder create(ZipEntry entry, DataInput in) {
+    public static AesDecoder create(ZipEntry zipEntry, DataInput in) throws IOException {
         try {
-            AesStrength strength = entry.getStrength();
+            AesStrength strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
             byte[] salt = in.readBytes(strength.saltLength());
-            byte[] key = AesEngine.createKey(entry.getPassword(), salt, strength);
+            byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
 
             Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
             Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
             byte[] passwordChecksum = strength.createPasswordChecksum(key);
 
-            checkPasswordChecksum(passwordChecksum, entry, in);
+            checkPasswordChecksum(passwordChecksum, zipEntry, in);
 
             return new AesDecoder(cipher, mac, salt.length);
-        } catch(Zip4jvmException e) {
+        } catch(Zip4jvmException | IOException e) {
             throw e;
         } catch(Exception e) {
             throw new Zip4jvmException(e);
         }
     }
+
+    /*
+    public static AesDecoder create(ZipEntry zipEntry, DataInput in) throws IOException {
+        try {
+            DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
+            AesStrength strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
+//            byte[] salt = in.readBytes(strength.saltLength());
+//            byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
+
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(decryptionHeader.getIv());
+            byte[] randomData = decryptionHeader.getEncryptedRandomData();//in.readBytes(strength.saltLength());
+            byte[] salt = Arrays.copyOfRange(randomData, 0, strength.saltLength());
+
+            byte[] key = AesEngine.createKey1(zipEntry.getPassword(), salt, strength);
+
+
+            Cipher cipher = AesEngine.createCipher1(strength.createSecretKeyForCipher(key), ivParameterSpec);
+            Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
+            byte[] passwordChecksum = strength.createPasswordChecksum(key);
+
+//            checkPasswordChecksum(passwordChecksum, zipEntry, in);
+
+            return new AesDecoder(cipher, mac, salt.length);
+        } catch(Zip4jvmException | IOException e) {
+            throw e;
+        } catch(Exception e) {
+            throw new Zip4jvmException(e);
+        }
+    }
+     */
 
     private AesDecoder(Cipher cipher, Mac mac, int saltLength) {
         this.saltLength = saltLength;

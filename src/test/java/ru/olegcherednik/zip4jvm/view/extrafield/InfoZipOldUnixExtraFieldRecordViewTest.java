@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.block.Block;
-import ru.olegcherednik.zip4jvm.model.os.InfoZipOldUnixExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.InfoZipOldUnixExtraFieldRecord;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -26,7 +26,7 @@ public class InfoZipOldUnixExtraFieldRecordViewTest {
     public void shouldRetrieveAllDataWhenAllDataSet() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(12L);
-        when(block.getOffs()).thenReturn(5300395L);
+        when(block.getRelativeOffs()).thenReturn(5300395L);
 
         InfoZipOldUnixExtraFieldRecord record = InfoZipOldUnixExtraFieldRecord.builder()
                                                                               .dataSize(8)
@@ -52,7 +52,7 @@ public class InfoZipOldUnixExtraFieldRecordViewTest {
     public void shouldRetrieveTimesOnlyWhenNoUserId() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(12L);
-        when(block.getOffs()).thenReturn(5300395L);
+        when(block.getRelativeOffs()).thenReturn(5300395L);
 
         InfoZipOldUnixExtraFieldRecord record = InfoZipOldUnixExtraFieldRecord.builder()
                                                                               .dataSize(8)
@@ -83,8 +83,8 @@ public class InfoZipOldUnixExtraFieldRecordViewTest {
     public void shouldRetrieveAllDataWithDiskWhenSplit() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(12L);
-        when(block.getOffs()).thenReturn(5300395L);
-        when(block.getDisk()).thenReturn(5L);
+        when(block.getRelativeOffs()).thenReturn(5300395L);
+        when(block.getDiskNo()).thenReturn(5);
         when(block.getFileName()).thenReturn("src.zip");
 
         InfoZipOldUnixExtraFieldRecord record = InfoZipOldUnixExtraFieldRecord.builder()

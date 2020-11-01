@@ -11,15 +11,18 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum Compression {
     STORE(CompressionMethod.STORE),
-    DEFLATE(CompressionMethod.DEFLATE);
+    DEFLATE(CompressionMethod.DEFLATE),
+    ENHANCED_DEFLATE(CompressionMethod.ENHANCED_DEFLATE),
+    BZIP2(CompressionMethod.BZIP2),
+    LZMA(CompressionMethod.LZMA);
 
     private final CompressionMethod method;
 
-    public static Compression parseCompressionMethod(CompressionMethod method) {
+    public static Compression parseCompressionMethod(CompressionMethod compressionMethod) {
         for (Compression compression : values())
-            if (compression.method == method)
+            if (compression.method == compressionMethod)
                 return compression;
-        throw new EnumConstantNotPresentException(Compression.class, "method=" + method);
+        throw new EnumConstantNotPresentException(Compression.class, "compressionMethod=" + compressionMethod);
     }
 
 }

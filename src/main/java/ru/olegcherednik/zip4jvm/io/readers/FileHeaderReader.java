@@ -2,7 +2,8 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.SignatureWasNotFoundException;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
@@ -41,7 +42,7 @@ public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader
     }
 
     private static void checkSignature(DataInput in) throws IOException {
-        long offs = in.getOffs();
+        long offs = in.getAbsoluteOffs();
 
         if (in.readDwordSignature() != CentralDirectory.FileHeader.SIGNATURE)
             throw new SignatureWasNotFoundException(CentralDirectory.FileHeader.SIGNATURE, "CentralDirectory", offs);
@@ -68,10 +69,10 @@ public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader
         int fileCommentLength = in.readWord();
         Charset charset = customizeCharset.apply(fileHeader.getGeneralPurposeFlag().getCharset());
 
-        fileHeader.setDisk(in.readWord());
+        fileHeader.setDiskNo(in.readWord());
         fileHeader.setInternalFileAttributes(getInternalFileAttribute(in.readBytes(InternalFileAttributes.SIZE)));
         fileHeader.setExternalFileAttributes(getExternalFileAttribute(in.readBytes(ExternalFileAttributes.SIZE)));
-        fileHeader.setLocalFileHeaderOffs(in.readDword());
+        fileHeader.setLocalFileHeaderRelativeOffs(in.readDword());
         fileHeader.setFileName(in.readString(fileNameLength, charset));
         fileHeader.setExtraField(getExtraFiledReader(extraFieldLength, fileHeader).read(in));
         fileHeader.setComment(in.readString(fileCommentLength, charset));

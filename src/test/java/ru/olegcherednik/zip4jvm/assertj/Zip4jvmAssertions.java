@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.assertj;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.assertj.core.api.Assertions;
-import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,7 +18,7 @@ import java.nio.file.Path;
 public final class Zip4jvmAssertions extends Assertions {
 
     public static ZipFileAssert assertThatZipFile(Path zip) throws IOException {
-        return new ZipFileAssert(isSplit(zip) ? new ZipFileSplitDecorator(zip) : new ZipFileNoSplitNoEncryptedDecorator(zip));
+        return new ZipFileAssert(isSplit(zip) ? new ZipFileSplitDecorator(zip) : new ZipFileSolidNoEncryptedDecorator(zip));
     }
 
     public static ZipFileAssert assertThatZipFile(Path zip, char[] password) throws IOException {
@@ -33,12 +33,12 @@ public final class Zip4jvmAssertions extends Assertions {
         return new FileAssert(path);
     }
 
-    public static StringLineAssert assertThatStringLine(int pos, String str) {
-        return new StringLineAssert(pos, str);
+    public static StringLineAssert assertThatStringLine(Path path, int pos, String str) {
+        return new StringLineAssert(path, pos, str);
     }
 
     private static boolean isSplit(Path zip) {
-        return Files.exists(ZipModel.getSplitFilePath(zip, 1));
+        return Files.exists(SrcZip.getDiskPath(zip, 1));
     }
 
 }
