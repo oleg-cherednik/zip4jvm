@@ -56,6 +56,7 @@ public final class TripleDesDecoder implements Decoder {
             Cipher cipher = Cipher.getInstance("DESede/CBC/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
 
+
             IvParameterSpec ivParameterSpec = new IvParameterSpec(ivOne);
             //            byte[] password = DigestUtils.sha1("".getBytes(StandardCharsets.UTF_8));
             byte[] password = psw.getBytes(StandardCharsets.UTF_8);
