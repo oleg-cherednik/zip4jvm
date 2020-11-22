@@ -4,7 +4,7 @@
 <br>
 [![TravisCI-master](https://img.shields.io/travis/oleg-cherednik/zip4jvm/master.svg?label=build%3Amaster)](https://travis-ci.org/oleg-cherednik/zip4jvm)
 [![TravisCI-dev](https://img.shields.io/travis/oleg-cherednik/zip4jvm/dev.svg?label=build%3Adev)](https://travis-ci.org/oleg-cherednik/zip4jvm)
-[![CircleCI](https://img.shields.io/circleci/build/github/oleg-cherednik/zip4jvm/dev?style=plastic)](https://circleci.com/gh/oleg-cherednik/zip4jvm) 
+[![CircleCI](https://img.shields.io/circleci/build/github/oleg-cherednik/zip4jvm/dev?)](https://circleci.com/gh/oleg-cherednik/zip4jvm) 
 &nbsp;&nbsp;&nbsp;&nbsp;
 [![codecov](https://codecov.io/gh/oleg-cherednik/zip4jvm/branch/master/graph/badge.svg)](https://codecov.io/gh/oleg-cherednik/zip4jvm)
 [![Known Vulnerabilities](https://snyk.io//test/github/oleg-cherednik/zip4jvm/badge.svg?targetFile=build.gradle)](https://snyk.io//test/github/oleg-cherednik/zip4jvm?targetFile=build.gradle)
