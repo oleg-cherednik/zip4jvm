@@ -1,10 +1,10 @@
 [![javadoc](https://javadoc.io/badge2/ru.oleg-cherednik.zip4jvm/zip4jvm/javadoc.svg)](https://javadoc.io/doc/ru.oleg-cherednik.zip4jvm/zip4jvm)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/ru.oleg-cherednik.zip4jvm/zip4jvm/badge.svg)](https://maven-badges.herokuapp.com/maven-central/ru.oleg-cherednik.zip4jvm/zip4jvm)
 [![TravisCI](https://travis-ci.org/oleg-cherednik/zip4jvm.svg?branch=master)](https://travis-ci.org/oleg-cherednik/zip4jvm)
-[![CircleCI](https://img.shields.io/circleci/build/github/oleg-cherednik/zip4jvm/maser?style=plastic)](https://circleci.com/gh/oleg-cherednik/zip4jvm)
+[![CircleCI](https://img.shields.io/circleci/build/github/oleg-cherednik/zip4jvm/dev?style=plastic)](https://circleci.com/gh/oleg-cherednik/zip4jvm)
 
 [![CircleCI](https://circleci.com/gh/circleci/circleci-docs.svg?style=shield)](https://circleci.com/gh/oleg-cherednik/zip4jvm)
-[![CircleCI](https://circleci.com/gh/oleg-cherednik/zip4jvm.svg?style=shield)](https://circleci.com/gh/oleg-cherednik/zip4jvm)
+[![CircleCI](https://circleci.com/gh/oleg-cherednik/zip4jvm.svg?style=shield&branch=master)](https://circleci.com/gh/oleg-cherednik/zip4jvm)
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
 [![codecov](https://codecov.io/gh/oleg-cherednik/zip4jvm/branch/master/graph/badge.svg)](https://codecov.io/gh/oleg-cherednik/zip4jvm)
