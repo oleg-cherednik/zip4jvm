@@ -4,8 +4,8 @@
 <br>
 [![TravisCI-master](https://travis-ci.org/oleg-cherednik/zip4jvm.svg?branch=master&label=bu)](https://travis-ci.org/oleg-cherednik/zip4jvm)
 [![TravisCI-dev](https://travis-ci.org/oleg-cherednik/zip4jvm.svg?branch=dev)](https://travis-ci.org/oleg-cherednik/zip4jvm)
-[![Travis (.org)](https://img.shields.io/travis/oleg-cherednik/zip4jvm?label=build%3Amaster&logo=dd&style=plastic)](https://travis-ci.org/oleg-cherednik/zip4jvm)
-[![Travis (.org)](https://img.shields.io/travis/oleg-cherednik/zip4jvm?label=build%3Adev&logo=dd&style=plastic)](https://travis-ci.org/oleg-cherednik/zip4jvm)
+[![Travis (.org)](https://img.shields.io/travis/oleg-cherednik/zip4jvm/master.svg?label=build%3Amaster&logo=dd&style=plastic)](https://travis-ci.org/oleg-cherednik/zip4jvm)
+[![Travis (.org)](https://img.shields.io/travis/oleg-cherednik/zip4jvm/dev.svg?label=build%3Adev&logo=dd&style=plastic)](https://travis-ci.org/oleg-cherednik/zip4jvm)
 [![CircleCI](https://img.shields.io/circleci/build/github/oleg-cherednik/zip4jvm/dev?style=plastic)](https://circleci.com/gh/oleg-cherednik/zip4jvm) 
 &nbsp;&nbsp;&nbsp;&nbsp;
 [![codecov](https://codecov.io/gh/oleg-cherednik/zip4jvm/branch/master/graph/badge.svg)](https://codecov.io/gh/oleg-cherednik/zip4jvm)
