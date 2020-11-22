@@ -12,7 +12,8 @@ before_install:
   - gradle -v
 script:
 #  - gradle clean build --scan -s --debug
-  - gradle clean build --scan -s
+#  - gradle clean build --scan -s
+  - gradle clean build --stacktrace
   - gradle jacocoTestReport
 after_success:
   - bash <(curl -s https://codecov.io/bash)
