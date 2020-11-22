@@ -4,7 +4,7 @@
 [![CircleCI](https://img.shields.io/circleci/build/github/oleg-cherednik/zip4jvm/dev?style=plastic)](https://circleci.com/gh/oleg-cherednik/zip4jvm)
 
 [![CircleCI](https://circleci.com/gh/circleci/circleci-docs.svg?style=svg)](https://circleci.com/gh/oleg-cherednik/zip4jvm)
-[![CircleCI](https://circleci.com/gh/oleg-cherednik/zip4jvm.svg?style=svg&branch=dev)](https://circleci.com/gh/oleg-cherednik/zip4jvm)
+[![CircleCI](https://circleci.com/gh/oleg-cherednik/zip4jvm.svg?style=plastic&branch=dev)](https://circleci.com/gh/oleg-cherednik/zip4jvm)
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
 [![codecov](https://codecov.io/gh/oleg-cherednik/zip4jvm/branch/master/graph/badge.svg)](https://codecov.io/gh/oleg-cherednik/zip4jvm)
