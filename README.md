@@ -3,6 +3,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt) 
 <br>
 [![TravisCI](https://travis-ci.org/oleg-cherednik/zip4jvm.svg?branch=master)](https://travis-ci.org/oleg-cherednik/zip4jvm)
+[![TravisCI](https://travis-ci.org/oleg-cherednik/zip4jvm.svg?branch=dev)](https://travis-ci.org/oleg-cherednik/zip4jvm)
 [![CircleCI](https://img.shields.io/circleci/build/github/oleg-cherednik/zip4jvm/dev?style=plastic)](https://circleci.com/gh/oleg-cherednik/zip4jvm) 
 &nbsp;&nbsp;&nbsp;&nbsp;
 [![codecov](https://codecov.io/gh/oleg-cherednik/zip4jvm/branch/master/graph/badge.svg)](https://codecov.io/gh/oleg-cherednik/zip4jvm)
