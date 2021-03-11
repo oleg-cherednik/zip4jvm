@@ -8,7 +8,6 @@ import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -96,21 +95,6 @@ public class UnzipItSolidTest {
 //    TODO commented tests
 //        assertThatDirectory(destDir).hasDirectories(0).hasFiles(2);
 //        assertThatDirectory(destDir).file("fff - 副本.txt").exists();
-    }
-
-    public void shouldExtractZipArchiveWhenUtf8Charset() throws IOException, URISyntaxException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
-        Path zip = Paths.get(UnzipItSolidTest.class.getResource("/zip/test2.zip").toURI()).toAbsolutePath();
-
-        UnzipSettings settings = UnzipSettings.builder().charset(StandardCharsets.UTF_8).build();
-
-        UnzipIt.zip(zip).destDir(destDir).settings(settings).extract();
-
-        assertThatDirectory(destDir).hasDirectories(1).hasFiles(0);
-        assertThatDirectory(destDir).directory("test").hasDirectories(3).hasFiles(0);
-        assertThatDirectory(destDir).directory("test/测试文件夹1").exists();
-        assertThatDirectory(destDir).directory("test/测试文件夹2").exists();
-        assertThatDirectory(destDir).directory("test/测试文件夹3").exists();
     }
 
 }
