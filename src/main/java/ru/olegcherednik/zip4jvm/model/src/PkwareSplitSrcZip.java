@@ -15,14 +15,14 @@ import java.util.Set;
  * @author Oleg Cherednik
  * @since 25.08.2020
  */
-final class StandardSplitSrcZip extends SrcZip {
+final class PkwareSplitSrcZip extends SrcZip {
 
     public static boolean isCandidate(Path zip) {
         return Files.isReadable(zip) && ZipModelReader.getTotalDisks(SolidSrcZip.create(zip)) > 0;
     }
 
-    public static StandardSplitSrcZip create(Path zip) {
-        return new StandardSplitSrcZip(zip, createDisks(zip));
+    public static PkwareSplitSrcZip create(Path zip) {
+        return new PkwareSplitSrcZip(zip, createDisks(zip));
     }
 
     private static List<Disk> createDisks(Path zip) {
@@ -56,7 +56,7 @@ final class StandardSplitSrcZip extends SrcZip {
         return disks;
     }
 
-    private StandardSplitSrcZip(Path zip, List<Disk> disks) {
+    private PkwareSplitSrcZip(Path zip, List<Disk> disks) {
         super(zip, disks);
     }
 
