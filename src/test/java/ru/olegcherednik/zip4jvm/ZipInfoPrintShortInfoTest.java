@@ -11,7 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
 
 /**
@@ -20,9 +19,9 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
  */
 @Test
 @SuppressWarnings("FieldNamingConvention")
-public class ZipInfoTest {
+public class ZipInfoPrintShortInfoTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ZipInfoTest.class);
+    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ZipInfoPrintShortInfoTest.class);
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -100,48 +99,6 @@ public class ZipInfoTest {
         assertThatFile(file).matchesResourceLines("/info/store_split_aes.txt");
     }
 
-    public void shouldDecomposeWhenStoreSolid() throws IOException {
-        Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        Files.createDirectories(dir.getParent());
-        ZipInfo.zip(TestData.zipStoreSolid).decompose(dir);
-        assertThatDirectory(dir).matchesResourceDirectory("/decompose/store_solid");
-    }
-
-    public void shouldDecomposeWhenStoreSolidPkware() throws IOException {
-        Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        Files.createDirectories(dir.getParent());
-        ZipInfo.zip(TestData.zipStoreSolidPkware).decompose(dir);
-        assertThatDirectory(dir).matchesResourceDirectory("/decompose/store_solid_pkware");
-    }
-
-    public void shouldDecomposeWhenStoreSolidAes() throws IOException {
-        Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        Files.createDirectories(dir.getParent());
-        ZipInfo.zip(TestData.zipStoreSolidAes).decompose(dir);
-        assertThatDirectory(dir).matchesResourceDirectory("/decompose/store_solid_aes");
-    }
-
-    public void shouldDecomposeWhenStoreSplit() throws IOException {
-        Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        Files.createDirectories(dir.getParent());
-        ZipInfo.zip(TestData.zipStoreSplit).decompose(dir);
-        assertThatDirectory(dir).matchesResourceDirectory("/decompose/store_split");
-    }
-
-    public void shouldDecomposeWhenStoreSplitPkware() throws IOException {
-        Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        Files.createDirectories(dir.getParent());
-        ZipInfo.zip(TestData.zipStoreSplitPkware).decompose(dir);
-        assertThatDirectory(dir).matchesResourceDirectory("/decompose/store_split_pkware");
-    }
-
-    public void shouldDecomposeWhenStoreSplitAes() throws IOException {
-        Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        Files.createDirectories(dir.getParent());
-        ZipInfo.zip(TestData.zipStoreSplitAes).decompose(dir);
-        assertThatDirectory(dir).matchesResourceDirectory("/decompose/store_split_aes");
-    }
-
     private static ZipInfo zipInfo() {
         Path path = Paths.get("d:/zip4jvm/tmp/aes.zip");
 //        Files.deleteIfExists(path);
@@ -170,12 +127,6 @@ public class ZipInfoTest {
     public void printShortInfo() throws IOException {
         ZipInfoSettings settings = ZipInfoSettings.builder().copyPayload(true).build();
         zipInfo().settings(settings).printShortInfo(System.out);
-    }
-
-    @Test(enabled = false)
-    public void decompose() throws IOException {
-        ZipInfoSettings settings = ZipInfoSettings.builder().copyPayload(true).build();
-        zipInfo().settings(settings).decompose(Zip4jvmSuite.subDirNameAsMethodName(rootDir));
     }
 
 }
