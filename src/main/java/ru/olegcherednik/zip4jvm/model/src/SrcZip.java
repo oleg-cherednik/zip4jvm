@@ -40,8 +40,8 @@ public abstract class SrcZip {
     public static SrcZip of(Path zip) {
         if (SevenZipSplitSrcZip.isCandidate(zip))
             return SevenZipSplitSrcZip.create(zip);
-        if (StandardSplitSrcZip.isCandidate(zip))
-            return StandardSplitSrcZip.create(zip);
+        if (PkwareSplitSrcZip.isCandidate(zip))
+            return PkwareSplitSrcZip.create(zip);
         return SolidSrcZip.create(zip);
     }
 
