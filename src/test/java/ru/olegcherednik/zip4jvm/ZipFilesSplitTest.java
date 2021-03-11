@@ -60,6 +60,7 @@ public class ZipFilesSplitTest {
 //        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipCarsDirAssert);
     }
 
+    @SuppressWarnings("LocalVariableNamingConvention")
     public void shouldSetTotalDiskWhenSplitZip64() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipSettings settings = ZipSettings.builder()
@@ -76,11 +77,36 @@ public class ZipFilesSplitTest {
         reader.readCentralData();
 
         EndCentralDirectory endCentralDirectory = reader.getEndCentralDirectory();
-        Zip64.EndCentralDirectoryLocator zip64Locator = reader.getZip64().getEndCentralDirectoryLocator();
+        Zip64.EndCentralDirectoryLocator zip64EndCentralDirectoryLocator = reader.getZip64().getEndCentralDirectoryLocator();
 
+        assertThat(endCentralDirectory.getMainDiskNo()).isEqualTo(ZipModel.MAX_TOTAL_DISKS);
         assertThat(endCentralDirectory.getTotalDisks()).isEqualTo(ZipModel.MAX_TOTAL_DISKS);
-        assertThat(zip64Locator.getMainDiskNo()).isEqualTo(2);
-        assertThat(zip64Locator.getTotalDisks()).isEqualTo(3);
+        assertThat(zip64EndCentralDirectoryLocator.getMainDiskNo()).isEqualTo(2);
+        assertThat(zip64EndCentralDirectoryLocator.getTotalDisks()).isEqualTo(3);
+
+        assertThat(ZipModelReader.getTotalDisks(srcZip)).isEqualTo(3);
+    }
+
+    public void shouldSetTotalDiskWhenSplit() throws IOException {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettingsProvider(fileName ->
+                                                  ZipEntrySettings.builder()
+                                                                  .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
+                                          .splitSize(SIZE_1MB).build();
+        List<Path> files = Arrays.asList(fileBentley, fileFerrari, fileWiesmann);
+        ZipIt.zip(zip).settings(settings).add(files);
+
+        SrcZip srcZip = SrcZip.of(zip);
+        ZipModelReader reader = new ZipModelReader(srcZip);
+        reader.readCentralData();
+
+        EndCentralDirectory endCentralDirectory = reader.getEndCentralDirectory();
+
+        assertThat(endCentralDirectory.getMainDiskNo()).isEqualTo(2);
+        assertThat(endCentralDirectory.getTotalDisks()).isEqualTo(2);
+        assertThat(reader.getZip64()).isSameAs(Zip64.NULL);
+
         assertThat(ZipModelReader.getTotalDisks(srcZip)).isEqualTo(3);
     }
 
