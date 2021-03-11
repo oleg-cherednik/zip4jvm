@@ -26,7 +26,7 @@ final class PkwareSplitSrcZip extends SrcZip {
     }
 
     private static List<Disk> createDisks(Path zip) {
-        int i = 0;
+        int diskNo = 0;
         long absoluteOffs = 0;
         List<Disk> disks = new LinkedList<>();
         Path dir = zip.getParent();
@@ -35,22 +35,23 @@ final class PkwareSplitSrcZip extends SrcZip {
         Set<Path> diskPaths = getDiskPaths(dir, baseName + "\\.(?:z\\d+|zip)");
 
         for (Path diskPath : diskPaths) {
+            boolean last = diskNo + 1 == totalDisk;
             String actualFileName = diskPath.getFileName().toString();
-            String expectedFileName = i == totalDisk ? baseName + ".zip" : String.format("%s.z%02d", baseName, i + 1);
+            String expectedFileName = last ? baseName + ".zip" : String.format("%s.z%02d", baseName, diskNo + 1);
 
             if (!actualFileName.equals(expectedFileName) || !Files.isReadable(diskPath))
                 throw new SplitPartNotFoundException(dir.resolve(expectedFileName));
 
             Disk disk = Disk.builder()
-                            .no(i)
+                            .no(diskNo)
                             .path(diskPath)
                             .absoluteOffs(absoluteOffs)
                             .size(PathUtils.size(diskPath))
-                            .last(i + 1 == diskPaths.size()).build();
+                            .last(last).build();
 
             disks.add(disk);
             absoluteOffs += disk.getSize();
-            i++;
+            diskNo++;
         }
 
         return disks;

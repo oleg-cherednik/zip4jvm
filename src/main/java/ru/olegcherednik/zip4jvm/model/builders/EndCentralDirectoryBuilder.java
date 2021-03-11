@@ -27,7 +27,7 @@ public final class EndCentralDirectoryBuilder {
     }
 
     private int getTotalDisks() {
-        return zipModel.isZip64() ? ZipModel.MAX_TOTAL_DISKS : (int)zipModel.getTotalDisks();
+        return zipModel.isZip64() ? ZipModel.MAX_TOTAL_DISKS : zipModel.getTotalDisks();
     }
 
     private int getDiskEntries() {
