@@ -1,6 +1,6 @@
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
@@ -10,6 +10,7 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import java.io.IOException;
+import java.util.Objects;
 
 import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.MAC_SIZE;
 import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.PASSWORD_CHECKSUM_SIZE;
@@ -109,7 +110,7 @@ public final class AesDecoder implements Decoder {
     private static void checkPasswordChecksum(byte[] actual, ZipEntry entry, DataInput in) throws IOException {
         byte[] expected = in.readBytes(PASSWORD_CHECKSUM_SIZE);
 
-        if (!ArrayUtils.isEquals(expected, actual))
+        if (!Objects.deepEquals(expected, actual))
             throw new IncorrectPasswordException(entry.getFileName());
     }
 

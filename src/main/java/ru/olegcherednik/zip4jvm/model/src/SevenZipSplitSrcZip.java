@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.model.src;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import ru.olegcherednik.zip4jvm.exception.SplitPartNotFoundException;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 

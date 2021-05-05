@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.model;
 
 import lombok.Getter;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT0;
@@ -37,11 +37,12 @@ public final class InternalFileAttributes {
     public byte[] getData() {
         byte[] data = ArrayUtils.clone(this.data);
         data[0] = BitUtils.updateBits((byte)0x0, BIT0, apparentFileType == ApparentFileType.TEXT);
-        return ArrayUtils.clone(data);
+        return data;
     }
 
     @Override
     public String toString() {
         return "internal";
     }
+
 }

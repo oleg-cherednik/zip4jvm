@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.model;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.extrafield.AesExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.AlgIdExtraFieldRecord;
@@ -127,6 +127,7 @@ public final class ExtraField {
                 out.writeWord(data.length);
                 out.write(data, 0, data.length);
             }
+
         }
 
     }

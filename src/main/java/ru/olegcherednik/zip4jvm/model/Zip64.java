@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 import java.io.IOException;
@@ -210,6 +210,7 @@ public final class Zip64 {
                 this.diskNo = diskNo;
                 return this;
             }
+
         }
 
     }

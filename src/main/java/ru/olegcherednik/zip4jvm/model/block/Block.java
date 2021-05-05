@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.model.block;
 
 import lombok.Getter;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.ZipInputStream;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
