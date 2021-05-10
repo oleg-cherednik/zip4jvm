@@ -99,7 +99,7 @@ ZipIt.zip(zip).add(file);
 
 ```java
 Path zip = Paths.get("filename.zip");
-Path dir = Path.get("/cars")
+Path dir = Path.get("/cars");
 ZipIt.zip(zip).add(dir);
 ```
 >```
