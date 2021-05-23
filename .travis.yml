@@ -1,11 +1,14 @@
-language: java
-install: true
+jobs:
+  include:
+    - language: java
+      install: true
 
-dist: trusty
-jdk: openjdk8
+      dist: trusty
+      jdk: openjdk8
 
-script:
-  - ./gradlew build --stacktrace
-  - ./gradlew jacocoTestReport
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
+      script:
+        - ./gradlew build --stacktrace
+        - ./gradlew jacocoTestReport
+
+      after_success:
+        - bash <(curl -s https://codecov.io/bash)
