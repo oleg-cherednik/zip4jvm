@@ -14,9 +14,6 @@ before_script:
 jobs:
   include:
     - language: java
-      android:
-        components:
-          - android-28
       install: true
       dist: trusty
       jdk: openjdk8
@@ -28,6 +25,9 @@ jobs:
         - bash <(curl -s https://codecov.io/bash)
 
     - language: android
+      android:
+        components:
+          - android-28
       install: true
       dist: trusty
       jdk: openjdk8
