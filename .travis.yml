@@ -18,10 +18,11 @@ before_cache:
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 
 cache:
+  bundler: true
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
-    - $HOME/.android/build-cache
+#    - $HOME/.android/build-cache
 
 before_script:
   - chmod +x gradlew
