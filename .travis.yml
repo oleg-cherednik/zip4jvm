@@ -2,13 +2,20 @@ jobs:
   include:
     - language: java
       install: true
-
       dist: trusty
       jdk: openjdk8
-
       script:
         - ./gradlew build --stacktrace
         - ./gradlew jacocoTestReport
+      after_success:
+        - bash <(curl -s https://codecov.io/bash)
 
+    - language: android
+      install: true
+      dist: trusty
+      jdk: openjdk8
+      script:
+        - ./gradlew build --stacktrace
+        - ./gradlew jacocoTestReport
       after_success:
         - bash <(curl -s https://codecov.io/bash)
