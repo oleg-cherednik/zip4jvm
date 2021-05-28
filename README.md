@@ -8,6 +8,12 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/7b6b963fef254ff4b00b8be0304e829b)](https://www.codacy.com/app/oleg-cherednik/zip4jvm?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=oleg-cherednik/zip4jvm&amp;utm_campaign=Badge_Grade)
 [![coverity](https://scan.coverity.com/projects/4735/badge.svg)](https://scan.coverity.com/projects/oleg-cherednik-zip4jvm)
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=oleg-cherednik_zip4jvm&metric=alert_status)](https://sonarcloud.io/dashboard?id=oleg-cherednik_zip4jvm)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=oleg-cherednik_zip4jvm&metric=security_rating)](https://sonarcloud.io/dashboard?id=oleg-cherednik_zip4jvm)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=oleg-cherednik_zip4jvm&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=oleg-cherednik_zip4jvm)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=oleg-cherednik_zip4jvm&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=oleg-cherednik_zip4jvm)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=oleg-cherednik_zip4jvm&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=oleg-cherednik_zip4jvm)
+                             
 <p align="center">
     <a href="https://github.com/oleg-cherednik/zip4jvm/blob/master/img/zip4jvm_qr.png?raw=true">
         <img alt="QR-code" src="img/zip4jvm_qr_small.png" />
