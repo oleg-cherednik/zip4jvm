@@ -22,8 +22,14 @@ jobs:
     - language: java
       script:
         - ./gradlew clean build test jacocoTestReport
+        - sonar-scanner
       after_success:
         - bash <(curl -s https://codecov.io/bash)
+      addons:
+        sonarcloud:
+          organization: oleg-cherednik
+          token:
+            secure: "83da2cd10b1ed3149b37ce695af1955ced6b4e18"
     - language: android
       android:
         components:
