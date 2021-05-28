@@ -54,7 +54,7 @@ public class ModifyCommentTest {
     @Test(dependsOnMethods = "shouldCreateNewZipWithComment")
     public void shouldAddCommentToExistedNoSplitZip() throws IOException {
         ZipMisc.zip(zip).setComment("this is new comment - новый комментарий");
-        assertThatZipFile(zip).exists().hasComment("this is new comment - новый комментарий");
+        assertThatZipFile(zip).exists().hasComment("this is new comment - новый комментарий1");
     }
 
     @Test(dependsOnMethods = "shouldAddCommentToExistedNoSplitZip")
