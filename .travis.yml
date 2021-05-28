@@ -49,13 +49,8 @@ jobs:
         components:
           - tools # to get the new `repository-11.xml`
           - tools # see https://github.com/travis-ci/travis-ci/issues/6040#issuecomment-219367943)
-          - platform-tools
-          - extra-google-google_play_services
-          - extra-google-m2repository
-          - extra-android-m2repository
-          - addon-google_apis-google-19
-          - build-tools-25.0.0
-          - android-25
+          - build-tools-23.0.0
+          - android-23
       install: true
       dist: trusty
       jdk: openjdk8
