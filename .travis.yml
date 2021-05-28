@@ -1,31 +1,57 @@
-language: java
-install: true
-dist: trusty
+#language: java
+#install: true
+#dist: trusty
+#
+#jdk:
+#  - openjdk8
+#  - openjdk11
+#
+#os: linux
+#
+#before_cache:
+#  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+#  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+#
+#cache:
+#  bundler: true
+#  directories:
+#    - $HOME/.gradle/caches/
+#    - $HOME/.gradle/wrapper/
+##    - $HOME/.android/build-cache
+#
+#before_script:
+#  - chmod +x gradlew
+#
+#script:
+#  - ./gradlew clean build --stacktrace
+#  - ./gradlew test
+#  - ./gradlew jacocoTestReport
+#
+#after_success:
+#  - bash <(curl -s https://codecov.io/bash)
 
-jdk:
-  - openjdk8
-  - openjdk11
 
-os: linux
+jobs:
+  include:
+    - language: java
+      install: true
+      dist: trusty
+      jdk: openjdk8
+      script:
+        - ./gradlew clean build --stacktrace
+        - ./gradlew test
+        - ./gradlew jacocoTestReport
+      after_success:
+        - bash <(curl -s https://codecov.io/bash)
 
-before_cache:
-  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-
-cache:
-  bundler: true
-  directories:
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
-#    - $HOME/.android/build-cache
-
-before_script:
-  - chmod +x gradlew
-
-script:
-  - ./gradlew clean build --stacktrace
-  - ./gradlew test
-  - ./gradlew jacocoTestReport
-
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
+    - language: android
+      android:
+        components:
+          - android-23
+      install: true
+      dist: trusty
+      jdk: openjdk8
+      script:
+        - ./gradlew clean build --stacktrace
+        - ./gradlew test
+        - ./gradlew jacocoTestReport
