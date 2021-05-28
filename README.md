@@ -13,6 +13,7 @@
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=oleg-cherednik_zip4jvm&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=oleg-cherednik_zip4jvm)
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=oleg-cherednik_zip4jvm&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=oleg-cherednik_zip4jvm)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=oleg-cherednik_zip4jvm&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=oleg-cherednik_zip4jvm)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=oleg-cherednik_zip4jvm&metric=code_smells)](https://sonarcloud.io/dashboard?id=oleg-cherednik_zip4jvm)
                              
 <p align="center">
     <a href="https://github.com/oleg-cherednik/zip4jvm/blob/master/img/zip4jvm_qr.png?raw=true">
