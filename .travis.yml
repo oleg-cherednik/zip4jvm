@@ -21,9 +21,7 @@ jobs:
   include:
     - language: java
       script:
-        - ./gradlew clean build --stacktrace
-        - ./gradlew test
-        - ./gradlew jacocoTestReport
+        - ./gradlew clean build test jacocoTestReport
       after_success:
         - bash <(curl -s https://codecov.io/bash)
     - language: android
