@@ -50,7 +50,7 @@ jobs:
 #          - tools # to get the new `repository-11.xml`
 #          - tools # see https://github.com/travis-ci/travis-ci/issues/6040#issuecomment-219367943)
 #          - build-tools-23.0.0
-          - android-21
+          - android-18
 #      install: true
       dist: trusty
       jdk: openjdk8
