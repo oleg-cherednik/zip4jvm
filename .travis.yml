@@ -4,7 +4,7 @@ dist: trusty
 
 jdk:
   - openjdk8
-  - openjdk11
+#  - openjdk11
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -30,15 +30,15 @@ jobs:
           organization: oleg-cherednik
           token:
             secure: "83da2cd10b1ed3149b37ce695af1955ced6b4e18"
-    - language: android
-      android:
-        components:
-          - android-30
-      script:
-        - ./gradlew clean build test
-    - language: android
-      android:
-        components:
-          - android-18
-      script:
-        - ./gradlew clean build test
+#    - language: android
+#      android:
+#        components:
+#          - android-30
+#      script:
+#        - ./gradlew clean build test
+#    - language: android
+#      android:
+#        components:
+#          - android-18
+#      script:
+#        - ./gradlew clean build test
