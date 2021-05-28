@@ -22,7 +22,6 @@ jobs:
     - language: java
       script:
         - ./gradlew clean build test jacocoTestReport
-        - sonar-scanner -X -Dsonar.projectVersion=1.0.0
       after_success:
         - bash <(curl -s https://codecov.io/bash)
       addons:
