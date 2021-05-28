@@ -28,8 +28,7 @@ jobs:
       addons:
         sonarcloud:
           organization: oleg-cherednik
-          token:
-            secure: 83da2cd10b1ed3149b37ce695af1955ced6b4e18
+          token: 83da2cd10b1ed3149b37ce695af1955ced6b4e18
 #    - language: android
 #      android:
 #        components:
