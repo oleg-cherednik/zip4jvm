@@ -1,24 +1,24 @@
-#language: java
+language: java
 #install: true
-#dist: trusty
-#
-#jdk:
-#  - openjdk8
+dist: trusty
+
+jdk:
+  - openjdk8
 #  - openjdk11
-#
+
 #os: linux
 #
-#before_cache:
-#  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-#  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-#
-#cache:
-#  bundler: true
-#  directories:
-#    - $HOME/.gradle/caches/
-#    - $HOME/.gradle/wrapper/
-##    - $HOME/.android/build-cache
-#
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+  bundler: true
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+    - $HOME/.android/build-cache
+
 #before_script:
 #  - chmod +x gradlew
 #
@@ -43,18 +43,15 @@ jobs:
 #        - ./gradlew jacocoTestReport
 #      after_success:
 #        - bash <(curl -s https://codecov.io/bash)
-
     - language: android
       android:
         components:
-#          - tools # to get the new `repository-11.xml`
-#          - tools # see https://github.com/travis-ci/travis-ci/issues/6040#issuecomment-219367943)
-#          - build-tools-23.0.0
-          - android-18
-#      install: true
-      dist: trusty
-      jdk: openjdk8
+          - android-30
       script:
-        - ./gradlew clean build --stacktrace
-        - ./gradlew test
-        - ./gradlew jacocoTestReport
+        - ./gradlew clean build test
+    - language: android
+      android:
+        components:
+          - android-18
+      script:
+        - ./gradlew clean build test
