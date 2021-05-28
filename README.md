@@ -2,7 +2,6 @@
 [![javadoc](https://javadoc.io/badge2/ru.oleg-cherednik.zip4jvm/zip4jvm/javadoc.svg)](https://javadoc.io/doc/ru.oleg-cherednik.zip4jvm/zip4jvm)
 [![java1.8](https://badgen.net/badge/java/1.8/blue)](https://badgen.net/)
 [![travis-ci](https://travis-ci.com/oleg-cherednik/zip4jvm.svg?branch=dev)](https://travis-ci.com/oleg-cherednik/zip4jvm)
-[![circle-ci](https://circleci.com/gh/oleg-cherednik/zip4jvm/tree/dev.svg?style=shield)](https://app.circleci.com/pipelines/github/oleg-cherednik/zip4jvm)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
 [![codecov](https://codecov.io/gh/oleg-cherednik/zip4jvm/branch/master/graph/badge.svg)](https://codecov.io/gh/oleg-cherednik/zip4jvm)
 [![Known Vulnerabilities](https://snyk.io//test/github/oleg-cherednik/zip4jvm/badge.svg?targetFile=build.gradle)](https://snyk.io//test/github/oleg-cherednik/zip4jvm?targetFile=build.gradle)
