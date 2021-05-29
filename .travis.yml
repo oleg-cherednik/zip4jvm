@@ -22,7 +22,7 @@ jobs:
     - language: java
       script:
         - ./gradlew clean build test jacocoTestReport
-        - sonar-scanner
+#        - sonar-scanner
       after_success:
         - bash <(curl -s https://codecov.io/bash)
       addons:
