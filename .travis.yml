@@ -34,12 +34,12 @@ jobs:
     - language: android
       android:
         components:
-          - android-30
+          - android-18
       script:
         - ./gradlew clean build test
     - language: android
       android:
         components:
-          - android-18
+          - android-30
       script:
         - ./gradlew clean build test
