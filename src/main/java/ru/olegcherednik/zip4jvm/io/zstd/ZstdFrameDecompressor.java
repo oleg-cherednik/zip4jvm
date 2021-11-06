@@ -143,7 +143,7 @@ class ZstdFrameDecompressor
         long input = inputAddress;
         long output = outputAddress;
 
-        while (input < inputLimit) {
+//        while (input < inputLimit) {
             reset();
             long outputStart = output;
             input += verifyMagic(inputBase, inputAddress, inputLimit);
@@ -200,7 +200,7 @@ class ZstdFrameDecompressor
 
                 input += SIZE_OF_INT;
             }
-        }
+//        }
 
         return (int) (output - outputAddress);
     }
