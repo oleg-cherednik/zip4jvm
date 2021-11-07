@@ -27,7 +27,6 @@ public class FseTableReader
     {
         // read table headers
         long input = inputAddress;
-        verify(inputLimit - inputAddress >= 4, input, "Not enough input bytes");
 
         int threshold;
         int symbolNumber = 0;

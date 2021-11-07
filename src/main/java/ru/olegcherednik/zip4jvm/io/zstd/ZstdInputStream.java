@@ -36,9 +36,8 @@ public class ZstdInputStream extends InputStream {
     public int read(byte[] buf, int offs, int len) throws IOException {
         if (outputBase == null) {
             in.mark("start");
-            byte[] inputBase = in.readBytes(500_000);
             outputBase = new byte[500_000];
-            written = decompressor.decompress(inputBase, outputBase);
+            written = decompressor.decompress(in.readBytes(500_000), outputBase);
             this.offs = 0;
             in.seek("start");
             in.skip(written);

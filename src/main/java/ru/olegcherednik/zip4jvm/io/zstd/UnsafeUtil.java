@@ -52,8 +52,8 @@ public final class UnsafeUtil {
         }
     }
 
-    public static int getInt(Object inputBase, long inputAddress) {
-        return UNSAFE.getInt(inputBase, inputAddress);
+    public static int getInt(Object inputBase, long offs) {
+        return UNSAFE.getInt(inputBase, offs);
     }
 
     public static long getLong(Object inputBase, long inputAddress) {
