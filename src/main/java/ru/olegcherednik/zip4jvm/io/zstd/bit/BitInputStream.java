@@ -35,7 +35,7 @@ public class BitInputStream {
         return startAddress == currentAddress && bitsConsumed == Long.SIZE;
     }
 
-    static long readTail(byte[] inputBase, long inputAddress, int inputSize) {
+    static long readTail(byte[] inputBase, int inputAddress, int inputSize) {
         long bits = UnsafeUtil.getByte(inputBase, inputAddress) & 0xFF;
 
         switch (inputSize) {
@@ -75,13 +75,13 @@ public class BitInputStream {
     public static class Initializer {
 
         private final byte[] inputBase;
-        private final long startAddress;
-        private final long endAddress;
+        private final int startAddress;
+        private final int endAddress;
         private long bits;
-        private long currentAddress;
+        private int currentAddress;
         private int bitsConsumed;
 
-        public Initializer(byte[] inputBase, long startAddress, long endAddress) {
+        public Initializer(byte[] inputBase, int startAddress, int endAddress) {
             this.inputBase = inputBase;
             this.startAddress = startAddress;
             this.endAddress = endAddress;
@@ -91,7 +91,7 @@ public class BitInputStream {
             return bits;
         }
 
-        public long getCurrentAddress() {
+        public int getCurrentAddress() {
             return currentAddress;
         }
 
@@ -124,13 +124,13 @@ public class BitInputStream {
     public static final class Loader {
 
         private final byte[] inputBase;
-        private final long startAddress;
+        private final int startAddress;
         private long bits;
-        private long currentAddress;
+        private int currentAddress;
         private int bitsConsumed;
         private boolean overflow;
 
-        public Loader(byte[] inputBase, long startAddress, long currentAddress, long bits, int bitsConsumed) {
+        public Loader(byte[] inputBase, int startAddress, int currentAddress, long bits, int bitsConsumed) {
             this.inputBase = inputBase;
             this.startAddress = startAddress;
             this.bits = bits;
@@ -142,7 +142,7 @@ public class BitInputStream {
             return bits;
         }
 
-        public long getCurrentAddress() {
+        public int getCurrentAddress() {
             return currentAddress;
         }
 

@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.zstd;
 
 import org.apache.commons.io.IOUtils;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
 import java.io.IOException;
@@ -14,6 +15,9 @@ import java.io.InputStream;
  */
 public class ZstdInputStream extends InputStream {
 
+    private static final int SIGNATURE = 0xFD2FB528;
+    private static final int SIGNATURE_V07 = 0xFD2FB527;
+
     private final DataInput in;
     private final ZstdFrameDecompressor decompressor;
 
@@ -21,6 +25,16 @@ public class ZstdInputStream extends InputStream {
 //        verifyMagic(in);
         this.in = in;
         decompressor = new ZstdFrameDecompressor();
+    }
+
+    private static void verifyMagic(DataInput in) throws IOException {
+        int signature = in.readDwordSignature();
+
+        if (signature == SIGNATURE)
+            return;
+        if (signature == SIGNATURE_V07)
+            throw new Zip4jvmException("Data encoded in unsupported ZSTD v0.7 format");
+        throw new Zip4jvmException("Invalid ZSTD signature: " + signature);
     }
 
     @Override

@@ -23,10 +23,10 @@ public class FseTableReader
     private final short[] nextSymbol = new short[MAX_SYMBOL + 1];
     private final short[] normalizedCounters = new short[MAX_SYMBOL + 1];
 
-    public int readFseTable(FiniteStateEntropy.Table table, byte[] inputBase, long inputAddress, long inputLimit, int maxSymbol, int maxTableLog)
+    public int readFseTable(FiniteStateEntropy.Table table, byte[] inputBase, int inputAddress, int inputLimit, int maxSymbol, int maxTableLog)
     {
         // read table headers
-        long input = inputAddress;
+        int input = inputAddress;
 
         int threshold;
         int symbolNumber = 0;

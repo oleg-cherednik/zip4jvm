@@ -118,7 +118,7 @@ class ZstdFrameCompressor {
     }
 
     // visible for testing
-    static int writeChecksum(byte[] outputBase, long outputAddress, long outputLimit, byte[] inputBase, long inputAddress, long inputLimit) {
+    static int writeChecksum(byte[] outputBase, long outputAddress, long outputLimit, byte[] inputBase, int inputAddress, long inputLimit) {
         checkArgument(outputLimit - outputAddress >= SIZE_OF_INT, "Output buffer too small");
 
         int inputSize = (int)(inputLimit - inputAddress);
@@ -139,7 +139,7 @@ class ZstdFrameCompressor {
         Buffer output = outputBuffer;
 
         byte[] inputBase = (byte[])input.array();
-        long inputAddress = input.arrayOffset() + input.position();
+        int inputAddress = input.arrayOffset() + input.position();
         long inputLimit = input.arrayOffset() + input.limit();
 
         byte[] outputBase = (byte[])output.array();
@@ -158,7 +158,7 @@ class ZstdFrameCompressor {
     }
 
 
-    public static int compress(byte[] inputBase, long inputAddress, long inputLimit, byte[] outputBase, long outputAddress, long outputLimit,
+    public static int compress(byte[] inputBase, int inputAddress, long inputLimit, byte[] outputBase, long outputAddress, long outputLimit,
             int compressionLevel) {
         int inputSize = (int)(inputLimit - inputAddress);
 
@@ -174,7 +174,7 @@ class ZstdFrameCompressor {
         return (int)(output - outputAddress);
     }
 
-    private static int compressFrame(byte[] inputBase, long inputAddress, long inputLimit, byte[] outputBase, long outputAddress, long outputLimit,
+    private static int compressFrame(byte[] inputBase, int inputAddress, long inputLimit, byte[] outputBase, long outputAddress, long outputLimit,
             CompressionParameters parameters) {
         int windowSize = 1 << parameters.getWindowLog(); // TODO: store window size in parameters directly?
         int blockSize = Math.min(MAX_BLOCK_SIZE, windowSize);
@@ -183,7 +183,7 @@ class ZstdFrameCompressor {
         int remaining = (int)(inputLimit - inputAddress);
 
         long output = outputAddress;
-        long input = inputAddress;
+        int input = inputAddress;
 
         CompressionContext context = new CompressionContext(parameters, inputAddress, remaining);
 
@@ -222,7 +222,7 @@ class ZstdFrameCompressor {
         return (int)(output - outputAddress);
     }
 
-    private static int compressBlock(byte[] inputBase, long inputAddress, int inputSize, byte[] outputBase, long outputAddress, int outputSize,
+    private static int compressBlock(byte[] inputBase, int inputAddress, int inputSize, byte[] outputBase, long outputAddress, int outputSize,
             CompressionContext context, CompressionParameters parameters) {
         if (inputSize < MIN_BLOCK_SIZE + SIZE_OF_BLOCK_HEADER + 1) {
             //  don't even attempt compression below a certain input size
@@ -302,7 +302,7 @@ class ZstdFrameCompressor {
         int maxSymbol = Histogram.findMaxSymbol(counts, MAX_SYMBOL);
         int largestCount = Histogram.findLargestCount(counts, maxSymbol);
 
-        long literalsAddress = 0;
+        int literalsAddress = 0;
         if (largestCount == literalsSize) {
             // all bytes in input are equal
             return rleLiterals(outputBase, outputAddress, literals, literalsSize);

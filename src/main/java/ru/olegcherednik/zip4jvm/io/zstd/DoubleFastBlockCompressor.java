@@ -22,7 +22,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
     private static final int SEARCH_STRENGTH = 8;
     private static final int REP_MOVE = Constants.REPEATED_OFFSET_COUNT - 1;
 
-    public int compressBlock(byte[] inputBase, final long inputAddress, int inputSize, SequenceStore output, BlockCompressionState state,
+    public int compressBlock(byte[] inputBase, final int inputAddress, int inputSize, SequenceStore output, BlockCompressionState state,
             RepeatedOffsets offsets, CompressionParameters parameters) {
         int matchSearchLength = Math.max(parameters.getSearchLength(), 4);
 
@@ -30,7 +30,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         // baseAddress is kept constant.
         // We don't want to generate sequences that point before the current window limit, so we "filter" out all results from looking up in the hash tables
         // beyond that point.
-        final long baseAddress = state.getBaseAddress();
+        final int baseAddress = state.getBaseAddress();
         final long windowBaseAddress = baseAddress + state.getWindowBaseOffset();
 
         int[] longHashTable = state.hashTable;
@@ -42,8 +42,8 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         final long inputEnd = inputAddress + inputSize;
         final long inputLimit = inputEnd - SIZE_OF_LONG; // We read a long at a time for computing the hashes
 
-        long input = inputAddress;
-        long anchor = inputAddress;
+        int input = inputAddress;
+        int anchor = inputAddress;
 
         int offset1 = offsets.getOffset0();
         int offset2 = offsets.getOffset1();
@@ -67,10 +67,10 @@ class DoubleFastBlockCompressor implements BlockCompressor {
 
         while (input < inputLimit) {   // < instead of <=, because repcode check at (input+1)
             int shortHash = hash(inputBase, input, shortHashBits, matchSearchLength);
-            long shortMatchAddress = baseAddress + shortHashTable[shortHash];
+            int shortMatchAddress = baseAddress + shortHashTable[shortHash];
 
             int longHash = hash8(UnsafeUtil.getLong(inputBase, input), longHashBits);
-            long longMatchAddress = baseAddress + longHashTable[longHash];
+            int longMatchAddress = baseAddress + longHashTable[longHash];
 
             // update hash tables
             int current = (int)(input - baseAddress);
@@ -101,7 +101,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                     if (shortMatchAddress > windowBaseAddress && UnsafeUtil.getInt(inputBase, shortMatchAddress) == UnsafeUtil.getInt(inputBase,
                             input)) {
                         int nextOffsetHash = hash8(UnsafeUtil.getLong(inputBase, input + 1), longHashBits);
-                        long nextOffsetMatchAddress = baseAddress + longHashTable[nextOffsetHash];
+                        int nextOffsetMatchAddress = baseAddress + longHashTable[nextOffsetHash];
                         longHashTable[nextOffsetHash] = current + 1;
 
                         // check prefix long +1 match
@@ -136,7 +136,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                 offset2 = offset1;
                 offset1 = offset;
 
-                output.storeSequence(inputBase, anchor, (int)(input - anchor), offset + REP_MOVE, matchLength - MIN_MATCH);
+                output.storeSequence(inputBase, anchor, input - anchor, offset + REP_MOVE, matchLength - MIN_MATCH);
             }
 
             input += matchLength;
@@ -147,8 +147,8 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                 longHashTable[hash8(UnsafeUtil.getLong(inputBase, baseAddress + current + 2), longHashBits)] = current + 2;
                 shortHashTable[hash(inputBase, baseAddress + current + 2, shortHashBits, matchSearchLength)] = current + 2;
 
-                longHashTable[hash8(UnsafeUtil.getLong(inputBase, input - 2), longHashBits)] = (int)(input - 2 - baseAddress);
-                shortHashTable[hash(inputBase, input - 2, shortHashBits, matchSearchLength)] = (int)(input - 2 - baseAddress);
+                longHashTable[hash8(UnsafeUtil.getLong(inputBase, input - 2), longHashBits)] = input - 2 - baseAddress;
+                shortHashTable[hash(inputBase, input - 2, shortHashBits, matchSearchLength)] = input - 2 - baseAddress;
 
                 while (input <= inputLimit && offset2 > 0 && UnsafeUtil.getInt(inputBase, input) == UnsafeUtil.getInt(inputBase, input - offset2)) {
                     int repetitionLength = count(inputBase, input + SIZE_OF_INT, inputEnd, input + SIZE_OF_INT - offset2) + SIZE_OF_INT;
@@ -158,8 +158,8 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                     offset2 = offset1;
                     offset1 = temp;
 
-                    shortHashTable[hash(inputBase, input, shortHashBits, matchSearchLength)] = (int)(input - baseAddress);
-                    longHashTable[hash8(UnsafeUtil.getLong(inputBase, input), longHashBits)] = (int)(input - baseAddress);
+                    shortHashTable[hash(inputBase, input, shortHashBits, matchSearchLength)] = input - baseAddress;
+                    longHashTable[hash8(UnsafeUtil.getLong(inputBase, input), longHashBits)] = input - baseAddress;
 
                     output.storeSequence(inputBase, anchor, 0, 0, repetitionLength - MIN_MATCH);
 
@@ -182,9 +182,9 @@ class DoubleFastBlockCompressor implements BlockCompressor {
     /**
      * matchAddress must be < inputAddress
      */
-    public static int count(byte[] inputBase, final long inputAddress, final long inputLimit, final long matchAddress) {
-        long input = inputAddress;
-        long match = matchAddress;
+    public static int count(byte[] inputBase, final int inputAddress, final long inputLimit, final int matchAddress) {
+        int input = inputAddress;
+        int match = matchAddress;
 
         int remaining = (int)(inputLimit - inputAddress);
 
@@ -210,7 +210,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         return count;
     }
 
-    private static int hash(byte[] inputBase, long inputAddress, int bits, int matchSearchLength) {
+    private static int hash(byte[] inputBase, int inputAddress, int bits, int matchSearchLength) {
         switch (matchSearchLength) {
             case 8:
                 return hash8(UnsafeUtil.getLong(inputBase, inputAddress), bits);

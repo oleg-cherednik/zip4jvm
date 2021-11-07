@@ -22,7 +22,7 @@ public class Histogram {
 
     // TODO: count parallel heuristic for large inputs
     public static void count(byte[] inputBase, int inputSize, int[] counts) {
-        long input = 0;
+        int input = 0;
 
         Arrays.fill(counts, 0);
 

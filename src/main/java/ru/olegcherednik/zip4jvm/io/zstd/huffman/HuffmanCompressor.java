@@ -24,9 +24,9 @@ public class HuffmanCompressor {
     private HuffmanCompressor() {
     }
 
-    public static int compress4streams(byte[] outputBase, long outputAddress, int outputSize, byte[] inputBase, long inputAddress, int inputSize,
+    public static int compress4streams(byte[] outputBase, long outputAddress, int outputSize, byte[] inputBase, int inputAddress, int inputSize,
             HuffmanCompressionTable table) {
-        long input = inputAddress;
+        int input = inputAddress;
         long inputLimit = inputAddress + inputSize;
         long output = outputAddress;
         long outputLimit = outputAddress + outputSize;
@@ -83,14 +83,14 @@ public class HuffmanCompressor {
         return (int)(output - outputAddress);
     }
 
-    public static int compressSingleStream(byte[] outputBase, long outputAddress, int outputSize, byte[] inputBase, long inputAddress, int inputSize,
+    public static int compressSingleStream(byte[] outputBase, long outputAddress, int outputSize, byte[] inputBase, int inputAddress, int inputSize,
             HuffmanCompressionTable table) {
         if (outputSize < SIZE_OF_LONG) {
             return 0;
         }
 
         BitOutputStream bitstream = new BitOutputStream(outputBase, outputAddress, outputSize);
-        long input = inputAddress;
+        int input = inputAddress;
 
         int n = inputSize & ~3; // join to mod 4
 

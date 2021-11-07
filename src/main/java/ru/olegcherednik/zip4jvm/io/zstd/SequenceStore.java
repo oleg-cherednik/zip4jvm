@@ -76,9 +76,9 @@ class SequenceStore
         literalsLength += inputSize;
     }
 
-    public void storeSequence(Object literalBase, long literalAddress, int literalLength, int offsetCode, int matchLengthBase)
+    public void storeSequence(Object literalBase, int literalAddress, int literalLength, int offsetCode, int matchLengthBase)
     {
-        long input = literalAddress;
+        int input = literalAddress;
         long output = literalsLength;
         int copied = 0;
         do {

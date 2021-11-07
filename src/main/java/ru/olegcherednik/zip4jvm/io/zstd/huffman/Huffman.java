@@ -54,10 +54,10 @@ public class Huffman
         return tableLog != -1;
     }
 
-    public int readTable(final byte[] inputBase, final long inputAddress, final int size)
+    public int readTable(final byte[] inputBase, final int inputAddress, final int size)
     {
         Arrays.fill(ranks, 0);
-        long input = inputAddress;
+        int input = inputAddress;
 
         // read table header
         verify(size > 0, input, "Not enough input bytes");
@@ -80,7 +80,7 @@ public class Huffman
         else {
             verify(inputSize + 1 <= size, input, "Not enough input bytes");
 
-            long inputLimit = input + inputSize;
+            int inputLimit = input + inputSize;
             input += reader.readFseTable(fseTable, inputBase, input, inputLimit, FiniteStateEntropy.MAX_SYMBOL, MAX_FSE_TABLE_LOG);
             outputSize = FiniteStateEntropy.decompress(fseTable, inputBase, input, inputLimit, weights);
         }
@@ -132,14 +132,14 @@ public class Huffman
         return inputSize + 1;
     }
 
-    public void decodeSingleStream(final byte[] inputBase, final long inputAddress, final long inputLimit, final byte[] outputBase, final long outputAddress, final long outputLimit)
+    public void decodeSingleStream(final byte[] inputBase, final int inputAddress, final int inputLimit, final byte[] outputBase, final long outputAddress, final long outputLimit)
     {
         BitInputStream.Initializer initializer = new BitInputStream.Initializer(inputBase, inputAddress, inputLimit);
         initializer.initialize();
 
         long bits = initializer.getBits();
         int bitsConsumed = initializer.getBitsConsumed();
-        long currentAddress = initializer.getCurrentAddress();
+        int currentAddress = initializer.getCurrentAddress();
 
         int tableLog = this.tableLog;
         byte[] numbersOfBits = this.numbersOfBits;
@@ -168,37 +168,37 @@ public class Huffman
         decodeTail(inputBase, inputAddress, currentAddress, bitsConsumed, bits, outputBase, output, outputLimit);
     }
 
-    public void decode4Streams(final byte[] inputBase, final long inputAddress, final long inputLimit, final byte[] outputBase, final long outputAddress, final long outputLimit)
+    public void decode4Streams(final byte[] inputBase, final int inputAddress, final int inputLimit, final byte[] outputBase, final long outputAddress, final long outputLimit)
     {
         verify(inputLimit - inputAddress >= 10, inputAddress, "Input is corrupted"); // jump table + 1 byte per stream
 
-        long start1 = inputAddress + 3 * SIZE_OF_SHORT; // for the shorts we read below
-        long start2 = start1 + (UnsafeUtil.getShort(inputBase, inputAddress) & 0xFFFF);
-        long start3 = start2 + (UnsafeUtil.getShort(inputBase, inputAddress + 2) & 0xFFFF);
-        long start4 = start3 + (UnsafeUtil.getShort(inputBase, inputAddress + 4) & 0xFFFF);
+        int start1 = inputAddress + 3 * SIZE_OF_SHORT; // for the shorts we read below
+        int start2 = start1 + (UnsafeUtil.getShort(inputBase, inputAddress) & 0xFFFF);
+        int start3 = start2 + (UnsafeUtil.getShort(inputBase, inputAddress + 2) & 0xFFFF);
+        int start4 = start3 + (UnsafeUtil.getShort(inputBase, inputAddress + 4) & 0xFFFF);
 
         BitInputStream.Initializer initializer = new BitInputStream.Initializer(inputBase, start1, start2);
         initializer.initialize();
         int stream1bitsConsumed = initializer.getBitsConsumed();
-        long stream1currentAddress = initializer.getCurrentAddress();
+        int stream1currentAddress = initializer.getCurrentAddress();
         long stream1bits = initializer.getBits();
 
         initializer = new BitInputStream.Initializer(inputBase, start2, start3);
         initializer.initialize();
         int stream2bitsConsumed = initializer.getBitsConsumed();
-        long stream2currentAddress = initializer.getCurrentAddress();
+        int stream2currentAddress = initializer.getCurrentAddress();
         long stream2bits = initializer.getBits();
 
         initializer = new BitInputStream.Initializer(inputBase, start3, start4);
         initializer.initialize();
         int stream3bitsConsumed = initializer.getBitsConsumed();
-        long stream3currentAddress = initializer.getCurrentAddress();
+        int stream3currentAddress = initializer.getCurrentAddress();
         long stream3bits = initializer.getBits();
 
         initializer = new BitInputStream.Initializer(inputBase, start4, inputLimit);
         initializer.initialize();
         int stream4bitsConsumed = initializer.getBitsConsumed();
-        long stream4currentAddress = initializer.getCurrentAddress();
+        int stream4currentAddress = initializer.getCurrentAddress();
         long stream4bits = initializer.getBits();
 
         int segmentSize = (int) ((outputLimit - outputAddress + 3) / 4);
@@ -291,7 +291,7 @@ public class Huffman
         decodeTail(inputBase, start4, stream4currentAddress, stream4bitsConsumed, stream4bits, outputBase, output4, outputLimit);
     }
 
-    private void decodeTail(final byte[] inputBase, final long startAddress, long currentAddress, int bitsConsumed, long bits, final byte[] outputBase, long outputAddress, final long outputLimit)
+    private void decodeTail(final byte[] inputBase, final int startAddress, int currentAddress, int bitsConsumed, long bits, final byte[] outputBase, long outputAddress, final long outputLimit)
     {
         int tableLog = this.tableLog;
         byte[] numbersOfBits = this.numbersOfBits;

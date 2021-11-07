@@ -36,20 +36,20 @@ public class FiniteStateEntropy
     {
     }
 
-    public static int decompress(FiniteStateEntropy.Table table, final byte[] inputBase, final long inputAddress, final long inputLimit, byte[] outputBuffer)
+    public static int decompress(FiniteStateEntropy.Table table, final byte[] inputBase, final int inputAddress, final int inputLimit, byte[] outputBuffer)
     {
         final byte[] outputBase = outputBuffer;
         final long outputAddress = 0;
         final long outputLimit = outputAddress + outputBuffer.length;
 
-        long input = inputAddress;
+        int input = inputAddress;
         long output = outputAddress;
 
         // initialize bit stream
         BitInputStream.Initializer initializer = new BitInputStream.Initializer(inputBase, input, inputLimit);
         initializer.initialize();
         int bitsConsumed = initializer.getBitsConsumed();
-        long currentAddress = initializer.getCurrentAddress();
+        int currentAddress = initializer.getCurrentAddress();
         long bits = initializer.getBits();
 
         // initialize first FSE stream
@@ -155,10 +155,10 @@ public class FiniteStateEntropy
     {
         checkArgument(outputSize >= SIZE_OF_LONG, "Output buffer too small");
 
-        final long start = 0;
-        final long inputLimit = start + inputSize;
+        final int start = 0;
+        final int inputLimit = start + inputSize;
 
-        long input = inputLimit;
+        int input = inputLimit;
 
         if (inputSize <= 2) {
             return 0;

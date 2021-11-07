@@ -27,7 +27,7 @@ class CompressionContext
 
     public final HuffmanCompressionContext huffmanContext = new HuffmanCompressionContext();
 
-    public CompressionContext(CompressionParameters parameters, long baseAddress, int inputSize)
+    public CompressionContext(CompressionParameters parameters, int baseAddress, int inputSize)
     {
         int windowSize = Math.max(1, Math.min(1 << parameters.getWindowLog(), inputSize));
         int blockSize = Math.min(MAX_BLOCK_SIZE, windowSize);
