@@ -34,7 +34,6 @@ import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_INT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.TREELESS_LITERALS_BLOCK;
 import static ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil.ARRAY_BYTE_BASE_OFFSET;
-import static ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil.getAddress;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.checkArgument;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.put24BitLittleEndian;
 import static ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman.MAX_SYMBOL;
@@ -140,37 +139,13 @@ class ZstdFrameCompressor {
         Buffer input = inputBuffer;
         Buffer output = outputBuffer;
 
-        byte[] inputBase;
-        long inputAddress;
-        long inputLimit;
-        if (input.isDirect()) {
-            inputBase = null;
-            long address = getAddress(input);
-            inputAddress = address + input.position();
-            inputLimit = address + input.limit();
-        } else if (input.hasArray()) {
-            inputBase = (byte[])input.array();
-            inputAddress = ARRAY_BYTE_BASE_OFFSET + input.arrayOffset() + input.position();
-            inputLimit = ARRAY_BYTE_BASE_OFFSET + input.arrayOffset() + input.limit();
-        } else {
-            throw new IllegalArgumentException("Unsupported input ByteBuffer implementation " + input.getClass().getName());
-        }
+        byte[] inputBase = (byte[])input.array();
+        long inputAddress = ARRAY_BYTE_BASE_OFFSET + input.arrayOffset() + input.position();
+        long inputLimit = ARRAY_BYTE_BASE_OFFSET + input.arrayOffset() + input.limit();
 
-        byte[] outputBase;
-        long outputAddress;
-        long outputLimit;
-        if (output.isDirect()) {
-            outputBase = null;
-            long address = getAddress(output);
-            outputAddress = address + output.position();
-            outputLimit = address + output.limit();
-        } else if (output.hasArray()) {
-            outputBase = (byte[])output.array();
-            outputAddress = ARRAY_BYTE_BASE_OFFSET + output.arrayOffset() + output.position();
-            outputLimit = ARRAY_BYTE_BASE_OFFSET + output.arrayOffset() + output.limit();
-        } else {
-            throw new IllegalArgumentException("Unsupported output ByteBuffer implementation " + output.getClass().getName());
-        }
+        byte[] outputBase = (byte[])output.array();
+        long outputAddress = ARRAY_BYTE_BASE_OFFSET + output.arrayOffset() + output.position();
+        long outputLimit = ARRAY_BYTE_BASE_OFFSET + output.arrayOffset() + output.limit();
 
         int written = compress(
                 inputBase,

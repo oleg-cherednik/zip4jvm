@@ -61,7 +61,6 @@ public final class UnsafeUtil {
         res = res << 8 | c & 0xFF;
         res = res << 8 | b & 0xFF;
         return res << 8 | a & 0xFF;
-//        return UNSAFE.getInt(inputBase, inputAddress);
     }
 
     public static long getLong(byte[] inputBase, long inputAddress) {
@@ -81,12 +80,10 @@ public final class UnsafeUtil {
         res = res << 8 | c & 0xFF;
         res = res << 8 | b & 0xFF;
         return res << 8 | a & 0xFF;
-//        return UNSAFE.getLong(inputBase, inputAddress);
     }
 
     public static byte getByte(byte[] inputBase, long inputAddress) {
         return inputBase[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET];
-//        return UNSAFE.getByte(inputBase, inputAddress);
     }
 
     public static short getShort(byte[] inputBase, long inputAddress) {
@@ -94,15 +91,6 @@ public final class UnsafeUtil {
         byte b = inputBase[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET + 1];
         long res = b & 0xFF;
         return (short)(res << 8 | a & 0xFF);
-//        return UNSAFE.getShort(inputBase, inputAddress);
-    }
-
-    public static long getAddress(Buffer buffer) {
-        if (!buffer.isDirect()) {
-            throw new IllegalArgumentException("buffer is not direct");
-        }
-
-        return UNSAFE.getLong(buffer, ADDRESS_OFFSET);
     }
 
     public static void putLong(byte[] outputBase, long outputAddress, long value) {
@@ -121,21 +109,16 @@ public final class UnsafeUtil {
         outputBase[(int)outputAddress - ARRAY_BYTE_BASE_OFFSET + 6] = (byte)(value & 0xFF);
         value >>= 8;
         outputBase[(int)outputAddress - ARRAY_BYTE_BASE_OFFSET + 7] = (byte)(value & 0xFF);
-        value >>= 8;
-//        UNSAFE.putLong(outputBase, outputAddress, value);
     }
 
     public static void putByte(byte[] outputBase, long outputAddress, byte value) {
         outputBase[(int)outputAddress - ARRAY_BYTE_BASE_OFFSET] = value;
-//        UNSAFE.putByte(outputBase, outputAddress, value);
     }
 
     public static void putShort(byte[] outputBase, long outputAddress, short value) {
         outputBase[(int)outputAddress - ARRAY_BYTE_BASE_OFFSET] = (byte)(value & 0xFF);
         value >>= 8;
         outputBase[(int)outputAddress - ARRAY_BYTE_BASE_OFFSET + 1] = (byte)(value & 0xFF);
-        value >>= 8;
-//        UNSAFE.putShort(outputBase, outputAddress, value);
     }
 
     public static void putInt(byte[] outputBase, long outputAddress, int value) {
@@ -146,8 +129,6 @@ public final class UnsafeUtil {
         outputBase[(int)outputAddress - ARRAY_BYTE_BASE_OFFSET + 2] = (byte)(value & 0xFF);
         value >>= 8;
         outputBase[(int)outputAddress - ARRAY_BYTE_BASE_OFFSET + 3] = (byte)(value & 0xFF);
-        value >>= 8;
-//        UNSAFE.putInt(outputBase, outputAddress, value);
     }
 
     public static void copyMemory(Object inputBase, long inputAddress, Object literalsBuffer, long offs, long inputSize) {
