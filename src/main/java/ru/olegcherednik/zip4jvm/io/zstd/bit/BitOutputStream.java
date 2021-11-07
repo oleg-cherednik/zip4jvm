@@ -28,7 +28,7 @@ public class BitOutputStream {
             0xFFFFFF, 0x1FFFFFF, 0x3FFFFFF, 0x7FFFFFF, 0xFFFFFFF, 0x1FFFFFFF,
             0x3FFFFFFF, 0x7FFFFFFF }; // up to 31 bits
 
-    private final Object outputBase;
+    private final byte[] outputBase;
     private final long outputAddress;
     private final long outputLimit;
 
@@ -36,7 +36,7 @@ public class BitOutputStream {
     private int bitCount;
     private long currentAddress;
 
-    public BitOutputStream(Object outputBase, long outputAddress, int outputSize) {
+    public BitOutputStream(byte[] outputBase, long outputAddress, int outputSize) {
         checkArgument(outputSize >= SIZE_OF_LONG, "Output buffer too small");
 
         this.outputBase = outputBase;

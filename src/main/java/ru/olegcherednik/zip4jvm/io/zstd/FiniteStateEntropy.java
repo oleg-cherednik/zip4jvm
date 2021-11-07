@@ -39,7 +39,7 @@ public class FiniteStateEntropy
 
     public static int decompress(FiniteStateEntropy.Table table, final byte[] inputBase, final long inputAddress, final long inputLimit, byte[] outputBuffer)
     {
-        final Object outputBase = outputBuffer;
+        final byte[] outputBase = outputBuffer;
         final long outputAddress = ARRAY_BYTE_BASE_OFFSET;
         final long outputLimit = outputAddress + outputBuffer.length;
 
@@ -152,12 +152,12 @@ public class FiniteStateEntropy
         return (int) (output - outputAddress);
     }
 
-    public static int compress(Object outputBase, long outputAddress, int outputSize, byte[] input, int inputSize, FseCompressionTable table)
+    public static int compress(byte[] outputBase, long outputAddress, int outputSize, byte[] input, int inputSize, FseCompressionTable table)
     {
         return compress(outputBase, outputAddress, outputSize, input, ARRAY_BYTE_BASE_OFFSET, inputSize, table);
     }
 
-    public static int compress(Object outputBase, long outputAddress, int outputSize, byte[] inputBase, long inputAddress, int inputSize, FseCompressionTable table)
+    public static int compress(byte[] outputBase, long outputAddress, int outputSize, byte[] inputBase, long inputAddress, int inputSize, FseCompressionTable table)
     {
         checkArgument(outputSize >= SIZE_OF_LONG, "Output buffer too small");
 
@@ -406,7 +406,7 @@ public class FiniteStateEntropy
         return 0;
     }
 
-    public static int writeNormalizedCounts(Object outputBase, long outputAddress, int outputSize, short[] normalizedCounts, int maxSymbol, int tableLog)
+    public static int writeNormalizedCounts(byte[] outputBase, long outputAddress, int outputSize, short[] normalizedCounts, int maxSymbol, int tableLog)
     {
         checkArgument(tableLog <= MAX_TABLE_LOG, "FSE table too large");
         checkArgument(tableLog >= MIN_TABLE_LOG, "FSE table too small");

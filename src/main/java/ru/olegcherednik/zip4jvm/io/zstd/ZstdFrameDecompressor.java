@@ -130,12 +130,12 @@ class ZstdFrameDecompressor {
     private FiniteStateEntropy.Table currentOffsetCodesTable;
     private FiniteStateEntropy.Table currentMatchLengthTable;
 
-    private static int decodeRawBlock(Object inputBase, long inputAddress, int blockSize, Object outputBase, long outputAddress) {
+    private static int decodeRawBlock(Object inputBase, long inputAddress, int blockSize, byte[] outputBase, long outputAddress) {
         UnsafeUtil.copyMemory(inputBase, inputAddress, outputBase, outputAddress, blockSize);
         return blockSize;
     }
 
-    private static int decodeRleBlock(int size, byte[] inputBase, long inputAddress, Object outputBase, long outputAddress) {
+    private static int decodeRleBlock(int size, byte[] inputBase, long inputAddress, byte[] outputBase, long outputAddress) {
         long output = outputAddress;
         long value = UnsafeUtil.getByte(inputBase, inputAddress) & 0xFFL;
 
@@ -251,7 +251,7 @@ class ZstdFrameDecompressor {
 
     private int decompress(
             final byte[] inputBase, final int inputAddress,
-            final Object outputBase, final long outputAddress, final long outputLimit) {
+            final byte[] outputBase, final long outputAddress, final long outputLimit) {
         if (outputAddress == outputLimit) {
             return 0;
         }
@@ -324,7 +324,7 @@ class ZstdFrameDecompressor {
         currentMatchLengthTable = null;
     }
 
-    private int decodeCompressedBlock(byte[] inputBase, final long inputAddress, int blockSize, Object outputBase, long outputAddress,
+    private int decodeCompressedBlock(byte[] inputBase, final long inputAddress, int blockSize, byte[] outputBase, long outputAddress,
             long outputLimit, int windowSize, long outputAbsoluteBaseAddress) {
         long inputLimit = inputAddress + blockSize;
         long input = inputAddress;
@@ -362,7 +362,7 @@ class ZstdFrameDecompressor {
 
     private int decompressSequences(
             final byte[] inputBase, final long inputAddress, final long inputLimit,
-            final Object outputBase, final long outputAddress, final long outputLimit,
+            final byte[] outputBase, final long outputAddress, final long outputLimit,
             final Object literalsBase, final long literalsAddress, final long literalsLimit,
             long outputAbsoluteBaseAddress) {
         final long fastOutputLimit = outputLimit - SIZE_OF_LONG;
@@ -562,7 +562,7 @@ class ZstdFrameDecompressor {
         return output;
     }
 
-    private void copyMatch(Object outputBase, long fastOutputLimit, long output, int offset, long matchOutputLimit, long matchAddress,
+    private void copyMatch(byte[] outputBase, long fastOutputLimit, long output, int offset, long matchOutputLimit, long matchAddress,
             int matchLength, long fastMatchOutputLimit) {
         matchAddress = copyMatchHead(outputBase, output, offset, matchAddress);
         output += SIZE_OF_LONG;
@@ -571,7 +571,7 @@ class ZstdFrameDecompressor {
         copyMatchTail(outputBase, fastOutputLimit, output, matchOutputLimit, matchAddress, matchLength, fastMatchOutputLimit);
     }
 
-    private void copyMatchTail(Object outputBase, long fastOutputLimit, long output, long matchOutputLimit, long matchAddress, int matchLength,
+    private void copyMatchTail(byte[] outputBase, long fastOutputLimit, long output, long matchOutputLimit, long matchAddress, int matchLength,
             long fastMatchOutputLimit) {
         // fastMatchOutputLimit is just fastOutputLimit - SIZE_OF_LONG. It needs to be passed in so that it can be computed once for the
         // whole invocation to decompressSequences. Otherwise, we'd just compute it here.
@@ -580,7 +580,7 @@ class ZstdFrameDecompressor {
         if (matchOutputLimit < fastMatchOutputLimit) {
             int copied = 0;
             do {
-                UnsafeUtil.putLong(outputBase, output, UnsafeUtil.getLong((byte[])outputBase, matchAddress));
+                UnsafeUtil.putLong(outputBase, output, UnsafeUtil.getLong(outputBase, matchAddress));
                 output += SIZE_OF_LONG;
                 matchAddress += SIZE_OF_LONG;
                 copied += SIZE_OF_LONG;
@@ -599,29 +599,29 @@ class ZstdFrameDecompressor {
         }
     }
 
-    private long copyMatchHead(Object outputBase, long output, int offset, long matchAddress) {
+    private long copyMatchHead(byte[] outputBase, long output, int offset, long matchAddress) {
         // copy match
         if (offset < 8) {
             // 8 bytes apart so that we can copy long-at-a-time below
             int increment32 = DEC_32_TABLE[offset];
             int decrement64 = DEC_64_TABLE[offset];
 
-            UnsafeUtil.putByte(outputBase, output, UnsafeUtil.getByte((byte[])outputBase, matchAddress));
-            UnsafeUtil.putByte(outputBase, output + 1, UnsafeUtil.getByte((byte[])outputBase, matchAddress + 1));
-            UnsafeUtil.putByte(outputBase, output + 2, UnsafeUtil.getByte((byte[])outputBase, matchAddress + 2));
-            UnsafeUtil.putByte(outputBase, output + 3, UnsafeUtil.getByte((byte[])outputBase, matchAddress + 3));
+            UnsafeUtil.putByte(outputBase, output, UnsafeUtil.getByte(outputBase, matchAddress));
+            UnsafeUtil.putByte(outputBase, output + 1, UnsafeUtil.getByte(outputBase, matchAddress + 1));
+            UnsafeUtil.putByte(outputBase, output + 2, UnsafeUtil.getByte(outputBase, matchAddress + 2));
+            UnsafeUtil.putByte(outputBase, output + 3, UnsafeUtil.getByte(outputBase, matchAddress + 3));
             matchAddress += increment32;
 
-            UnsafeUtil.putInt(outputBase, output + 4, UnsafeUtil.getInt((byte[])outputBase, matchAddress));
+            UnsafeUtil.putInt(outputBase, output + 4, UnsafeUtil.getInt(outputBase, matchAddress));
             matchAddress -= decrement64;
         } else {
-            UnsafeUtil.putLong(outputBase, output, UnsafeUtil.getLong((byte[])outputBase, matchAddress));
+            UnsafeUtil.putLong(outputBase, output, UnsafeUtil.getLong(outputBase, matchAddress));
             matchAddress += SIZE_OF_LONG;
         }
         return matchAddress;
     }
 
-    private long copyLiterals(Object outputBase, Object literalsBase, long output, long literalsInput, long literalOutputLimit) {
+    private long copyLiterals(byte[] outputBase, Object literalsBase, long output, long literalsInput, long literalOutputLimit) {
         long literalInput = literalsInput;
         do {
             UnsafeUtil.putLong(outputBase, output, UnsafeUtil.getLong((byte[])literalsBase, literalInput));
@@ -708,7 +708,7 @@ class ZstdFrameDecompressor {
         return input;
     }
 
-    private void executeLastSequence(Object outputBase, long output, long literalOutputLimit, long matchOutputLimit, long fastOutputLimit,
+    private void executeLastSequence(byte[] outputBase, long output, long literalOutputLimit, long matchOutputLimit, long fastOutputLimit,
             long literalInput, long matchAddress) {
         // copy literals
         if (output < fastOutputLimit) {

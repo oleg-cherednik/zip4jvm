@@ -206,7 +206,7 @@ public final class HuffmanCompressionTable
         output.addBitsFast(values[symbol], numberOfBits[symbol]);
     }
 
-    public int write(Object outputBase, long outputAddress, int outputSize, HuffmanTableWriterWorkspace workspace)
+    public int write(byte[] outputBase, long outputAddress, int outputSize, HuffmanTableWriterWorkspace workspace)
     {
         byte[] weights = workspace.weights;
 
@@ -399,7 +399,7 @@ public final class HuffmanCompressionTable
     /**
      * All elements within weightTable must be <= Huffman.MAX_TABLE_LOG
      */
-    private static int compressWeights(Object outputBase, long outputAddress, int outputSize, byte[] weights, int weightsLength, HuffmanTableWriterWorkspace workspace)
+    private static int compressWeights(byte[] outputBase, long outputAddress, int outputSize, byte[] weights, int weightsLength, HuffmanTableWriterWorkspace workspace)
     {
         if (weightsLength <= 1) {
             return 0; // Not compressible

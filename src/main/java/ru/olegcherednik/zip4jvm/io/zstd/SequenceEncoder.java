@@ -66,7 +66,7 @@ class SequenceEncoder {
     private SequenceEncoder() {
     }
 
-    public static int compressSequences(Object outputBase, final long outputAddress, int outputSize, SequenceStore sequences,
+    public static int compressSequences(byte[] outputBase, final long outputAddress, int outputSize, SequenceStore sequences,
             CompressionParameters.Strategy strategy, SequenceEncodingContext workspace) {
         long output = outputAddress;
         long outputLimit = outputAddress + outputSize;
@@ -220,7 +220,7 @@ class SequenceEncoder {
         return (int)(output - outputAddress);
     }
 
-    private static int buildCompressionTable(FseCompressionTable table, Object outputBase, long output, long outputLimit, int sequenceCount,
+    private static int buildCompressionTable(FseCompressionTable table, byte[] outputBase, long output, long outputLimit, int sequenceCount,
             int maxTableLog, byte[] codes, int[] counts, int maxSymbol, short[] normalizedCounts) {
         int tableLog = optimalTableLog(maxTableLog, sequenceCount, maxSymbol);
 
@@ -239,7 +239,7 @@ class SequenceEncoder {
     }
 
     private static int encodeSequences(
-            Object outputBase,
+            byte[] outputBase,
             long output,
             long outputLimit,
             FseCompressionTable matchLengthTable,
