@@ -52,12 +52,11 @@ public final class UnsafeUtil {
         }
     }
 
-    public static int getInt(Object inputBase, long inputAddress) {
-        byte[] in = (byte[])inputBase;
-        byte a = in[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET];
-        byte b = in[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET + 1];
-        byte c = in[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET + 2];
-        byte d = in[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET + 3];
+    public static int getInt(byte[] inputBase, long inputAddress) {
+        byte a = inputBase[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET];
+        byte b = inputBase[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET + 1];
+        byte c = inputBase[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET + 2];
+        byte d = inputBase[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET + 3];
         int res = d & 0xFF;
         res = res << 8 | c & 0xFF;
         res = res << 8 | b & 0xFF;
@@ -65,16 +64,15 @@ public final class UnsafeUtil {
 //        return UNSAFE.getInt(inputBase, inputAddress);
     }
 
-    public static long getLong(Object inputBase, long inputAddress) {
-        byte[] in = (byte[])inputBase;
-        byte a = in[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET];
-        byte b = in[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET + 1];
-        byte c = in[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET + 2];
-        byte d = in[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET + 3];
-        byte e = in[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET + 4];
-        byte f = in[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET + 5];
-        byte g = in[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET + 6];
-        byte h = in[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET + 7];
+    public static long getLong(byte[] inputBase, long inputAddress) {
+        byte a = inputBase[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET];
+        byte b = inputBase[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET + 1];
+        byte c = inputBase[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET + 2];
+        byte d = inputBase[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET + 3];
+        byte e = inputBase[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET + 4];
+        byte f = inputBase[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET + 5];
+        byte g = inputBase[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET + 6];
+        byte h = inputBase[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET + 7];
         long res = h & 0xFF;
         res = res << 8 | g & 0xFF;
         res = res << 8 | f & 0xFF;
@@ -86,16 +84,14 @@ public final class UnsafeUtil {
 //        return UNSAFE.getLong(inputBase, inputAddress);
     }
 
-    public static byte getByte(Object inputBase, long inputAddress) {
-        byte[] in = (byte[])inputBase;
-        return in[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET];
+    public static byte getByte(byte[] inputBase, long inputAddress) {
+        return inputBase[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET];
 //        return UNSAFE.getByte(inputBase, inputAddress);
     }
 
-    public static short getShort(Object inputBase, long inputAddress) {
-        byte[] in = (byte[])inputBase;
-        byte a = in[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET];
-        byte b = in[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET + 1];
+    public static short getShort(byte[] inputBase, long inputAddress) {
+        byte a = inputBase[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET];
+        byte b = inputBase[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET + 1];
         long res = b & 0xFF;
         return (short)(res << 8 | a & 0xFF);
 //        return UNSAFE.getShort(inputBase, inputAddress);

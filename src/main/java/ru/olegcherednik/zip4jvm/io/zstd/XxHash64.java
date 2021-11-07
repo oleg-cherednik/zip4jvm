@@ -26,10 +26,10 @@ final class XxHash64 {
 
     private XxHash64() {}
 
-    public static long hash(long seed, Object base, long address, int length) {
+    public static long hash(long seed, byte[] inputBase, long address, int length) {
         long hash;
         if (length >= 32) {
-            hash = updateBody(seed, base, address, length);
+            hash = updateBody(seed, inputBase, address, length);
         } else {
             hash = seed + PRIME64_5;
         }
@@ -40,22 +40,22 @@ final class XxHash64 {
         // this is the point up to which updateBody() processed
         int index = length & 0xFFFFFFE0;
 
-        return updateTail(hash, base, address, index, length);
+        return updateTail(hash, inputBase, address, index, length);
     }
 
-    private static long updateTail(long hash, Object base, long address, int index, int length) {
+    private static long updateTail(long hash, byte[] inputBase, long address, int index, int length) {
         while (index <= length - 8) {
-            hash = updateTail(hash, UnsafeUtil.getLong(base, address + index));
+            hash = updateTail(hash, UnsafeUtil.getLong(inputBase, address + index));
             index += 8;
         }
 
         if (index <= length - 4) {
-            hash = updateTail(hash, UnsafeUtil.getInt(base, address + index));
+            hash = updateTail(hash, UnsafeUtil.getInt(inputBase, address + index));
             index += 4;
         }
 
         while (index < length) {
-            hash = updateTail(hash, UnsafeUtil.getByte(base, address + index));
+            hash = updateTail(hash, UnsafeUtil.getByte(inputBase, address + index));
             index++;
         }
 
@@ -64,7 +64,7 @@ final class XxHash64 {
         return hash;
     }
 
-    private static long updateBody(long seed, Object base, long address, int length) {
+    private static long updateBody(long seed, byte[] inputBase, long address, int length) {
         long v1 = seed + PRIME64_1 + PRIME64_2;
         long v2 = seed + PRIME64_2;
         long v3 = seed;
@@ -72,10 +72,10 @@ final class XxHash64 {
 
         int remaining = length;
         while (remaining >= 32) {
-            v1 = mix(v1, UnsafeUtil.getLong(base, address));
-            v2 = mix(v2, UnsafeUtil.getLong(base, address + 8));
-            v3 = mix(v3, UnsafeUtil.getLong(base, address + 16));
-            v4 = mix(v4, UnsafeUtil.getLong(base, address + 24));
+            v1 = mix(v1, UnsafeUtil.getLong(inputBase, address));
+            v2 = mix(v2, UnsafeUtil.getLong(inputBase, address + 8));
+            v3 = mix(v3, UnsafeUtil.getLong(inputBase, address + 16));
+            v4 = mix(v4, UnsafeUtil.getLong(inputBase, address + 24));
 
             address += 32;
             remaining -= 32;

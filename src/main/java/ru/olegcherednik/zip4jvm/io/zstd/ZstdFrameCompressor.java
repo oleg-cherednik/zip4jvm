@@ -120,7 +120,7 @@ class ZstdFrameCompressor {
     }
 
     // visible for testing
-    static int writeChecksum(Object outputBase, long outputAddress, long outputLimit, Object inputBase, long inputAddress, long inputLimit) {
+    static int writeChecksum(Object outputBase, long outputAddress, long outputLimit, byte[] inputBase, long inputAddress, long inputLimit) {
         checkArgument(outputLimit - outputAddress >= SIZE_OF_INT, "Output buffer too small");
 
         int inputSize = (int)(inputLimit - inputAddress);
@@ -140,7 +140,7 @@ class ZstdFrameCompressor {
         Buffer input = inputBuffer;
         Buffer output = outputBuffer;
 
-        Object inputBase;
+        byte[] inputBase;
         long inputAddress;
         long inputLimit;
         if (input.isDirect()) {
@@ -149,7 +149,7 @@ class ZstdFrameCompressor {
             inputAddress = address + input.position();
             inputLimit = address + input.limit();
         } else if (input.hasArray()) {
-            inputBase = input.array();
+            inputBase = (byte[])input.array();
             inputAddress = ARRAY_BYTE_BASE_OFFSET + input.arrayOffset() + input.position();
             inputLimit = ARRAY_BYTE_BASE_OFFSET + input.arrayOffset() + input.limit();
         } else {
@@ -184,7 +184,7 @@ class ZstdFrameCompressor {
     }
 
 
-    public static int compress(Object inputBase, long inputAddress, long inputLimit, Object outputBase, long outputAddress, long outputLimit,
+    public static int compress(byte[] inputBase, long inputAddress, long inputLimit, Object outputBase, long outputAddress, long outputLimit,
             int compressionLevel) {
         int inputSize = (int)(inputLimit - inputAddress);
 
@@ -200,7 +200,7 @@ class ZstdFrameCompressor {
         return (int)(output - outputAddress);
     }
 
-    private static int compressFrame(Object inputBase, long inputAddress, long inputLimit, Object outputBase, long outputAddress, long outputLimit,
+    private static int compressFrame(byte[] inputBase, long inputAddress, long inputLimit, Object outputBase, long outputAddress, long outputLimit,
             CompressionParameters parameters) {
         int windowSize = 1 << parameters.getWindowLog(); // TODO: store window size in parameters directly?
         int blockSize = Math.min(MAX_BLOCK_SIZE, windowSize);
@@ -248,7 +248,7 @@ class ZstdFrameCompressor {
         return (int)(output - outputAddress);
     }
 
-    private static int compressBlock(Object inputBase, long inputAddress, int inputSize, Object outputBase, long outputAddress, int outputSize,
+    private static int compressBlock(byte[] inputBase, long inputAddress, int inputSize, Object outputBase, long outputAddress, int outputSize,
             CompressionContext context, CompressionParameters parameters) {
         if (inputSize < MIN_BLOCK_SIZE + SIZE_OF_BLOCK_HEADER + 1) {
             //  don't even attempt compression below a certain input size
@@ -316,7 +316,7 @@ class ZstdFrameCompressor {
         // TODO: move this to Strategy
         boolean bypassCompression = (parameters.getStrategy() == CompressionParameters.Strategy.FAST) && (parameters.getTargetLength() > 0);
         if (bypassCompression || literalsSize <= MINIMUM_LITERALS_SIZE) {
-            return rawLiterals(outputBase, outputAddress, outputSize, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
+            return rawLiterals(outputBase, outputAddress, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
         }
 
         int headerSize = 3 + (literalsSize >= 1024 ? 1 : 0) + (literalsSize >= 16384 ? 1 : 0);
@@ -331,10 +331,10 @@ class ZstdFrameCompressor {
         long literalsAddress = ARRAY_BYTE_BASE_OFFSET;
         if (largestCount == literalsSize) {
             // all bytes in input are equal
-            return rleLiterals(outputBase, outputAddress, outputSize, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
+            return rleLiterals(outputBase, outputAddress, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
         } else if (largestCount <= (literalsSize >>> 7) + 4) {
             // heuristic: probably not compressible enough
-            return rawLiterals(outputBase, outputAddress, outputSize, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
+            return rawLiterals(outputBase, outputAddress, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
         }
 
         HuffmanCompressionTable previousTable = context.getPreviousTable();
@@ -394,7 +394,7 @@ class ZstdFrameCompressor {
             // discard any temporary table we might have borrowed above
             context.discardTemporaryTable();
 
-            return rawLiterals(outputBase, outputAddress, outputSize, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
+            return rawLiterals(outputBase, outputAddress, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
         }
 
         int encodingType = reuseTable ? TREELESS_LITERALS_BLOCK : COMPRESSED_LITERALS_BLOCK;
@@ -424,7 +424,7 @@ class ZstdFrameCompressor {
         return headerSize + totalSize;
     }
 
-    private static int rleLiterals(Object outputBase, long outputAddress, int outputSize, Object inputBase, long inputAddress, int inputSize) {
+    private static int rleLiterals(Object outputBase, long outputAddress, byte[] inputBase, long inputAddress, int inputSize) {
         int headerSize = 1 + (inputSize > 31 ? 1 : 0) + (inputSize > 4095 ? 1 : 0);
 
         switch (headerSize) {
@@ -452,7 +452,7 @@ class ZstdFrameCompressor {
         return (inputSize >>> minLog) + 2;
     }
 
-    private static int rawLiterals(Object outputBase, long outputAddress, int outputSize, Object inputBase, long inputAddress, int inputSize) {
+    private static int rawLiterals(Object outputBase, long outputAddress, Object inputBase, long inputAddress, int inputSize) {
         int headerSize = 1;
         if (inputSize >= 32) {
             headerSize++;
@@ -460,8 +460,6 @@ class ZstdFrameCompressor {
         if (inputSize >= 4096) {
             headerSize++;
         }
-
-        checkArgument(inputSize + headerSize <= outputSize, "Output buffer too small");
 
         switch (headerSize) {
             case 1:
@@ -478,8 +476,6 @@ class ZstdFrameCompressor {
         }
 
         // TODO: ensure this test is correct
-        checkArgument(inputSize + 1 <= outputSize, "Output buffer too small");
-
         UnsafeUtil.copyMemory(inputBase, inputAddress, outputBase, outputAddress + headerSize, inputSize);
 
         return headerSize + inputSize;

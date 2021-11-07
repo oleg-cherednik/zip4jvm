@@ -35,7 +35,7 @@ public class BitInputStream {
         return startAddress == currentAddress && bitsConsumed == Long.SIZE;
     }
 
-    static long readTail(Object inputBase, long inputAddress, int inputSize) {
+    static long readTail(byte[] inputBase, long inputAddress, int inputSize) {
         long bits = UnsafeUtil.getByte(inputBase, inputAddress) & 0xFF;
 
         switch (inputSize) {
@@ -74,14 +74,14 @@ public class BitInputStream {
 
     public static class Initializer {
 
-        private final Object inputBase;
+        private final byte[] inputBase;
         private final long startAddress;
         private final long endAddress;
         private long bits;
         private long currentAddress;
         private int bitsConsumed;
 
-        public Initializer(Object inputBase, long startAddress, long endAddress) {
+        public Initializer(byte[] inputBase, long startAddress, long endAddress) {
             this.inputBase = inputBase;
             this.startAddress = startAddress;
             this.endAddress = endAddress;
@@ -123,14 +123,14 @@ public class BitInputStream {
 
     public static final class Loader {
 
-        private final Object inputBase;
+        private final byte[] inputBase;
         private final long startAddress;
         private long bits;
         private long currentAddress;
         private int bitsConsumed;
         private boolean overflow;
 
-        public Loader(Object inputBase, long startAddress, long currentAddress, long bits, int bitsConsumed) {
+        public Loader(byte[] inputBase, long startAddress, long currentAddress, long bits, int bitsConsumed) {
             this.inputBase = inputBase;
             this.startAddress = startAddress;
             this.bits = bits;

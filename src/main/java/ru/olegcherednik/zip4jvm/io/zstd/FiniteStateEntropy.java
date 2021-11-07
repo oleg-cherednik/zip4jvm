@@ -37,7 +37,7 @@ public class FiniteStateEntropy
     {
     }
 
-    public static int decompress(FiniteStateEntropy.Table table, final Object inputBase, final long inputAddress, final long inputLimit, byte[] outputBuffer)
+    public static int decompress(FiniteStateEntropy.Table table, final byte[] inputBase, final long inputAddress, final long inputLimit, byte[] outputBuffer)
     {
         final Object outputBase = outputBuffer;
         final long outputAddress = ARRAY_BYTE_BASE_OFFSET;
@@ -157,7 +157,7 @@ public class FiniteStateEntropy
         return compress(outputBase, outputAddress, outputSize, input, ARRAY_BYTE_BASE_OFFSET, inputSize, table);
     }
 
-    public static int compress(Object outputBase, long outputAddress, int outputSize, Object inputBase, long inputAddress, int inputSize, FseCompressionTable table)
+    public static int compress(Object outputBase, long outputAddress, int outputSize, byte[] inputBase, long inputAddress, int inputSize, FseCompressionTable table)
     {
         checkArgument(outputSize >= SIZE_OF_LONG, "Output buffer too small");
 

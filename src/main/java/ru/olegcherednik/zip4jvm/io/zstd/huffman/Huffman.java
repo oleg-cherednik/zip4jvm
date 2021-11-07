@@ -54,7 +54,7 @@ public class Huffman
         return tableLog != -1;
     }
 
-    public int readTable(final Object inputBase, final long inputAddress, final int size)
+    public int readTable(final byte[] inputBase, final long inputAddress, final int size)
     {
         Arrays.fill(ranks, 0);
         long input = inputAddress;
@@ -132,7 +132,7 @@ public class Huffman
         return inputSize + 1;
     }
 
-    public void decodeSingleStream(final Object inputBase, final long inputAddress, final long inputLimit, final Object outputBase, final long outputAddress, final long outputLimit)
+    public void decodeSingleStream(final byte[] inputBase, final long inputAddress, final long inputLimit, final Object outputBase, final long outputAddress, final long outputLimit)
     {
         BitInputStream.Initializer initializer = new BitInputStream.Initializer(inputBase, inputAddress, inputLimit);
         initializer.initialize();
@@ -168,7 +168,7 @@ public class Huffman
         decodeTail(inputBase, inputAddress, currentAddress, bitsConsumed, bits, outputBase, output, outputLimit);
     }
 
-    public void decode4Streams(final Object inputBase, final long inputAddress, final long inputLimit, final Object outputBase, final long outputAddress, final long outputLimit)
+    public void decode4Streams(final byte[] inputBase, final long inputAddress, final long inputLimit, final Object outputBase, final long outputAddress, final long outputLimit)
     {
         verify(inputLimit - inputAddress >= 10, inputAddress, "Input is corrupted"); // jump table + 1 byte per stream
 
@@ -291,7 +291,7 @@ public class Huffman
         decodeTail(inputBase, start4, stream4currentAddress, stream4bitsConsumed, stream4bits, outputBase, output4, outputLimit);
     }
 
-    private void decodeTail(final Object inputBase, final long startAddress, long currentAddress, int bitsConsumed, long bits, final Object outputBase, long outputAddress, final long outputLimit)
+    private void decodeTail(final byte[] inputBase, final long startAddress, long currentAddress, int bitsConsumed, long bits, final Object outputBase, long outputAddress, final long outputLimit)
     {
         int tableLog = this.tableLog;
         byte[] numbersOfBits = this.numbersOfBits;
