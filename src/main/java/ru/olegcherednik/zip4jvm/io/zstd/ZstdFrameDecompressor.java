@@ -48,7 +48,6 @@ import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_INT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_LONG;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.TREELESS_LITERALS_BLOCK;
-import static ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil.UNSAFE;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.fail;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.mask;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.verify;
@@ -226,7 +225,7 @@ class ZstdFrameDecompressor {
     private static int decodeRawBlock(Object inputBase, long inputAddress, int blockSize, Object outputBase, long outputAddress, long outputLimit) {
         verify(outputAddress + blockSize <= outputLimit, inputAddress, "Output buffer too small");
 
-        UNSAFE.copyMemory(inputBase, inputAddress, outputBase, outputAddress, blockSize);
+        UnsafeUtil.copyMemory(inputBase, inputAddress, outputBase, outputAddress, blockSize);
         return blockSize;
     }
 
@@ -504,7 +503,7 @@ class ZstdFrameDecompressor {
 
     private long copyLastLiteral(Object outputBase, Object literalsBase, long literalsLimit, long output, long literalsInput) {
         long lastLiteralsSize = literalsLimit - literalsInput;
-        UNSAFE.copyMemory(literalsBase, literalsInput, outputBase, output, lastLiteralsSize);
+        UnsafeUtil.copyMemory(literalsBase, literalsInput, outputBase, output, lastLiteralsSize);
         output += lastLiteralsSize;
         return output;
     }
@@ -830,7 +829,7 @@ class ZstdFrameDecompressor {
             literalsAddress = ARRAY_BYTE_BASE_OFFSET;
             literalsLimit = ARRAY_BYTE_BASE_OFFSET + literalSize;
 
-            UNSAFE.copyMemory(inputBase, input, literals, literalsAddress, literalSize);
+            UnsafeUtil.copyMemory(inputBase, input, literals, literalsAddress, literalSize);
             Arrays.fill(literals, literalSize, literalSize + SIZE_OF_LONG, (byte)0);
         } else {
             literalsBase = inputBase;

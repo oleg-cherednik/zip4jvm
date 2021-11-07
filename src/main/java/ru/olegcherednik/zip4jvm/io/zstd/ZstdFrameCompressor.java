@@ -30,7 +30,6 @@ import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_BLOCK_HEADER;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_INT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.TREELESS_LITERALS_BLOCK;
-import static ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil.UNSAFE;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.checkArgument;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.put24BitLittleEndian;
 import static ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman.MAX_SYMBOL;
@@ -181,7 +180,7 @@ class ZstdFrameCompressor
 
                 int blockHeader = lastBlockFlag | (RAW_BLOCK << 1) | (blockSize << 3);
                 put24BitLittleEndian(outputBase, output, blockHeader);
-                UNSAFE.copyMemory(inputBase, input, outputBase, output + SIZE_OF_BLOCK_HEADER, blockSize);
+                UnsafeUtil.copyMemory(inputBase, input, outputBase, output + SIZE_OF_BLOCK_HEADER, blockSize);
                 compressedSize = SIZE_OF_BLOCK_HEADER + blockSize;
             }
             else {
@@ -435,7 +434,7 @@ class ZstdFrameCompressor
         // TODO: ensure this test is correct
         checkArgument(inputSize + 1 <= outputSize, "Output buffer too small");
 
-        UNSAFE.copyMemory(inputBase, inputAddress, outputBase, outputAddress + headerSize, inputSize);
+        UnsafeUtil.copyMemory(inputBase, inputAddress, outputBase, outputAddress + headerSize, inputSize);
 
         return headerSize + inputSize;
     }

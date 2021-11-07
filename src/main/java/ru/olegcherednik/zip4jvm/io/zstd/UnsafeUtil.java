@@ -20,11 +20,10 @@ import java.nio.Buffer;
 import java.nio.ByteOrder;
 
 import static java.lang.String.format;
-import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
 
 public final class UnsafeUtil {
 
-    public static final Unsafe UNSAFE;
+    private static final Unsafe UNSAFE;
     private static final long ADDRESS_OFFSET;
 
     private UnsafeUtil() {}
@@ -91,8 +90,8 @@ public final class UnsafeUtil {
         UNSAFE.putInt(outputBase, output, value);
     }
 
-    public static void copyMemory(Object inputBase, long inputAddress, Object literalsBuffer, long literalsLength, long inputSize) {
-        UNSAFE.copyMemory(inputBase, inputAddress, literalsBuffer, ARRAY_BYTE_BASE_OFFSET + literalsLength, inputSize);
+    public static void copyMemory(Object inputBase, long inputAddress, Object literalsBuffer, long offs, long inputSize) {
+        UNSAFE.copyMemory(inputBase, inputAddress, literalsBuffer, offs, inputSize);
     }
 
 }
