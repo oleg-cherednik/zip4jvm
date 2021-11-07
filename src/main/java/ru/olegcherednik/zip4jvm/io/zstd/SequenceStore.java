@@ -14,7 +14,7 @@
 package ru.olegcherednik.zip4jvm.io.zstd;
 
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_LONG;
-import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
+import static ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil.ARRAY_BYTE_BASE_OFFSET;
 
 class SequenceStore
 {

@@ -16,6 +16,7 @@ package ru.olegcherednik.zip4jvm.io.zstd;
 import ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream;
 import ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.COMPRESSED_BLOCK;
@@ -48,11 +49,11 @@ import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_INT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_LONG;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.TREELESS_LITERALS_BLOCK;
+import static ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil.ARRAY_BYTE_BASE_OFFSET;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.fail;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.mask;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.verify;
 import static ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream.peekBits;
-import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
 
 class ZstdFrameDecompressor {
 
@@ -135,6 +136,19 @@ class ZstdFrameDecompressor {
 
     private final Huffman huffman = new Huffman();
     private final FseTableReader fse = new FseTableReader();
+
+    public void decompress(ByteBuffer input, ByteBuffer output) throws MalformedInputException {
+        byte[] inputBase = input.array();
+        long inputAddress = ARRAY_BYTE_BASE_OFFSET + input.arrayOffset() + input.position();
+        long inputLimit = ARRAY_BYTE_BASE_OFFSET + input.arrayOffset() + input.limit();
+
+        byte[] outputBase = output.array();
+        long outputAddress = ARRAY_BYTE_BASE_OFFSET + output.arrayOffset() + output.position();
+        long outputLimit = ARRAY_BYTE_BASE_OFFSET + output.arrayOffset() + output.limit();
+
+        int written = decompress(inputBase, inputAddress, inputLimit, outputBase, outputAddress, outputLimit);
+        output.position(output.position() + written);
+    }
 
     public int decompress(
             final byte[] inputBase,

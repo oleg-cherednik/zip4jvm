@@ -23,6 +23,8 @@ import static java.lang.String.format;
 
 public final class UnsafeUtil {
 
+    public static final int ARRAY_BYTE_BASE_OFFSET = Unsafe.ARRAY_BYTE_BASE_OFFSET;
+
     private static final Unsafe UNSAFE;
     private static final long ADDRESS_OFFSET;
 

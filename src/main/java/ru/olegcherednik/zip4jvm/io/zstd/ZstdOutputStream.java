@@ -14,11 +14,13 @@ import java.nio.ByteBuffer;
 public class ZstdOutputStream extends OutputStream {
 
     private final DataOutput out;
-    private final ZstdCompressor compressor;
+    private final CompressionLevel compressionLevel;
+    private final ZstdFrameCompressor compressor;
 
     public ZstdOutputStream(DataOutput out, CompressionLevel compressionLevel) {
         this.out = out;
-        compressor = new ZstdCompressor(compressionLevel(compressionLevel));
+        this.compressionLevel = compressionLevel;
+        compressor = new ZstdFrameCompressor();
     }
 
     private static int compressionLevel(CompressionLevel compressionLevel) {
@@ -63,7 +65,7 @@ public class ZstdOutputStream extends OutputStream {
         inputBuffer = ByteBuffer.wrap(buf);
 
         ByteBuffer outputBuffer = ByteBuffer.allocate(500_000);
-        compressor.compress(inputBuffer, outputBuffer);
+        compressor.compress(inputBuffer, outputBuffer, compressionLevel(compressionLevel));
 
         len = outputBuffer.position();
         buf = new byte[len];

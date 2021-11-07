@@ -19,10 +19,10 @@ import ru.olegcherednik.zip4jvm.io.zstd.bit.BitOutputStream;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_INT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_LONG;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;
+import static ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil.ARRAY_BYTE_BASE_OFFSET;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.checkArgument;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.verify;
 import static ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream.peekBits;
-import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
 
 public class FiniteStateEntropy
 {

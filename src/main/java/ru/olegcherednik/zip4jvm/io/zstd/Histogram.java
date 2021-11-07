@@ -15,7 +15,7 @@ package ru.olegcherednik.zip4jvm.io.zstd;
 
 import java.util.Arrays;
 
-import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
+import static ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil.ARRAY_BYTE_BASE_OFFSET;
 
 public class Histogram {
 

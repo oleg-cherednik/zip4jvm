@@ -16,12 +16,12 @@ import java.nio.ByteBuffer;
 public class ZstdInputStream extends InputStream {
 
     private final DataInput in;
-    private final ZstdDecompressor decompressor;
+    private final ZstdFrameDecompressor decompressor;
 
     public ZstdInputStream(DataInput in) throws IOException {
 //        verifyMagic(in);
         this.in = in;
-        decompressor = new ZstdDecompressor();
+        decompressor = new ZstdFrameDecompressor();
     }
 
     @Override
