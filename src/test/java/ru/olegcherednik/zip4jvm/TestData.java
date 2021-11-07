@@ -100,6 +100,7 @@ public final class TestData {
     public static final Path sevenZipStoreSolidPkwareZip = Paths.get("src/test/resources/seven-zip/lzma_solid_aes.zip").toAbsolutePath();
     public static final Path sevenZipLzmaSolidZip = Paths.get("src/test/resources/seven-zip/lzma_solid_off.zip").toAbsolutePath();
     public static final Path sevenZipLzmaSolidAesZip = Paths.get("src/test/resources/seven-zip/lzma_solid_aes.zip").toAbsolutePath();
+    public static final Path sevenZipZstdSolidZip = Paths.get("src/test/resources/seven-zip/zstd_solid_off.zip").toAbsolutePath();
 
     // secure-zip
     public static final Path secureZipStoreSolidAesZip = Paths.get("src/test/resources/secure-zip/store_solid_aes.zip").toAbsolutePath();
