@@ -11,20 +11,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ru.olegcherednik.zip4jvm.io.zstd;
+package ru.olegcherednik.zip4jvm.io.zstd.huffman;
+
+import ru.olegcherednik.zip4jvm.io.zstd.FiniteStateEntropy;
+import ru.olegcherednik.zip4jvm.io.zstd.FseCompressionTable;
+import ru.olegcherednik.zip4jvm.io.zstd.Histogram;
+import ru.olegcherednik.zip4jvm.io.zstd.NodeTable;
+import ru.olegcherednik.zip4jvm.io.zstd.Util;
+import ru.olegcherednik.zip4jvm.io.zstd.bit.BitOutputStream;
 
 import java.util.Arrays;
 
-import static ru.olegcherednik.zip4jvm.io.zstd.Huffman.MAX_FSE_TABLE_LOG;
-import static ru.olegcherednik.zip4jvm.io.zstd.Huffman.MAX_SYMBOL;
-import static ru.olegcherednik.zip4jvm.io.zstd.Huffman.MAX_SYMBOL_COUNT;
-import static ru.olegcherednik.zip4jvm.io.zstd.Huffman.MAX_TABLE_LOG;
-import static ru.olegcherednik.zip4jvm.io.zstd.Huffman.MIN_TABLE_LOG;
+import static ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman.MAX_FSE_TABLE_LOG;
+import static ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman.MAX_SYMBOL;
+import static ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman.MAX_SYMBOL_COUNT;
+import static ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman.MAX_TABLE_LOG;
+import static ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman.MIN_TABLE_LOG;
 import static ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil.UNSAFE;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.checkArgument;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.minTableLog;
 
-final class HuffmanCompressionTable
+public final class HuffmanCompressionTable
 {
     private final short[] values;
     private final byte[] numberOfBits;

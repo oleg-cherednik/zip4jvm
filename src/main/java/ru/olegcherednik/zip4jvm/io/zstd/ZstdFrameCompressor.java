@@ -13,6 +13,10 @@
  */
 package ru.olegcherednik.zip4jvm.io.zstd;
 
+import ru.olegcherednik.zip4jvm.io.zstd.huffman.HuffmanCompressionContext;
+import ru.olegcherednik.zip4jvm.io.zstd.huffman.HuffmanCompressionTable;
+import ru.olegcherednik.zip4jvm.io.zstd.huffman.HuffmanCompressor;
+
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.COMPRESSED_BLOCK;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.COMPRESSED_LITERALS_BLOCK;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.MAGIC_NUMBER;
@@ -26,8 +30,8 @@ import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_BLOCK_HEADER;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_INT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.TREELESS_LITERALS_BLOCK;
-import static ru.olegcherednik.zip4jvm.io.zstd.Huffman.MAX_SYMBOL;
-import static ru.olegcherednik.zip4jvm.io.zstd.Huffman.MAX_SYMBOL_COUNT;
+import static ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman.MAX_SYMBOL;
+import static ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman.MAX_SYMBOL_COUNT;
 import static ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil.UNSAFE;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.checkArgument;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.put24BitLittleEndian;

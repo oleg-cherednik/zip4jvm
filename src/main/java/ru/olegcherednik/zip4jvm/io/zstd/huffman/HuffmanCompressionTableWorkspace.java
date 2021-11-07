@@ -11,7 +11,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ru.olegcherednik.zip4jvm.io.zstd;
+package ru.olegcherednik.zip4jvm.io.zstd.huffman;
+
+import ru.olegcherednik.zip4jvm.io.zstd.NodeTable;
 
 import java.util.Arrays;
 

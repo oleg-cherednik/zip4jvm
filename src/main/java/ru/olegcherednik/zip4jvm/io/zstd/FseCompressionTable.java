@@ -13,9 +13,11 @@
  */
 package ru.olegcherednik.zip4jvm.io.zstd;
 
+import ru.olegcherednik.zip4jvm.io.zstd.bit.BitOutputStream;
+
 import static ru.olegcherednik.zip4jvm.io.zstd.FiniteStateEntropy.MAX_SYMBOL;
 
-class FseCompressionTable
+public class FseCompressionTable
 {
     private final short[] nextState;
     private final int[] deltaNumberOfBits;

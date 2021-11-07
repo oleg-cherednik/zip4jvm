@@ -19,7 +19,7 @@ import static ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil.UNSAFE;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.highestBit;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.verify;
 
-class FseTableReader
+public class FseTableReader
 {
     private final short[] nextSymbol = new short[MAX_SYMBOL + 1];
     private final short[] normalizedCounters = new short[MAX_SYMBOL + 1];

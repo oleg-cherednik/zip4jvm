@@ -11,21 +11,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ru.olegcherednik.zip4jvm.io.zstd;
+package ru.olegcherednik.zip4jvm.io.zstd.bit;
 
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_LONG;
 import static ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil.UNSAFE;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.checkArgument;
 
-class BitOutputStream
-{
+public class BitOutputStream {
+
     private static final long[] BIT_MASK = {
             0x0, 0x1, 0x3, 0x7, 0xF, 0x1F,
             0x3F, 0x7F, 0xFF, 0x1FF, 0x3FF, 0x7FF,
             0xFFF, 0x1FFF, 0x3FFF, 0x7FFF, 0xFFFF, 0x1FFFF,
             0x3FFFF, 0x7FFFF, 0xFFFFF, 0x1FFFFF, 0x3FFFFF, 0x7FFFFF,
             0xFFFFFF, 0x1FFFFFF, 0x3FFFFFF, 0x7FFFFFF, 0xFFFFFFF, 0x1FFFFFFF,
-            0x3FFFFFFF, 0x7FFFFFFF}; // up to 31 bits
+            0x3FFFFFFF, 0x7FFFFFFF }; // up to 31 bits
 
     private final Object outputBase;
     private final long outputAddress;
@@ -35,8 +35,7 @@ class BitOutputStream
     private int bitCount;
     private long currentAddress;
 
-    public BitOutputStream(Object outputBase, long outputAddress, int outputSize)
-    {
+    public BitOutputStream(Object outputBase, long outputAddress, int outputSize) {
         checkArgument(outputSize >= SIZE_OF_LONG, "Output buffer too small");
 
         this.outputBase = outputBase;
@@ -46,8 +45,7 @@ class BitOutputStream
         currentAddress = this.outputAddress;
     }
 
-    public void addBits(int value, int bits)
-    {
+    public void addBits(int value, int bits) {
         container |= (value & BIT_MASK[bits]) << bitCount;
         bitCount += bits;
     }
@@ -55,14 +53,12 @@ class BitOutputStream
     /**
      * Note: leading bits of value must be 0
      */
-    public void addBitsFast(int value, int bits)
-    {
-        container |= ((long) value) << bitCount;
+    public void addBitsFast(int value, int bits) {
+        container |= ((long)value) << bitCount;
         bitCount += bits;
     }
 
-    public void flush()
-    {
+    public void flush() {
         int bytes = bitCount >>> 3;
 
         UNSAFE.putLong(outputBase, currentAddress, container);
@@ -76,8 +72,7 @@ class BitOutputStream
         container >>>= bytes * 8;
     }
 
-    public int close()
-    {
+    public int close() {
         addBitsFast(1, 1); // end mark
         flush();
 
@@ -85,6 +80,7 @@ class BitOutputStream
             return 0;
         }
 
-        return (int) ((currentAddress - outputAddress) + (bitCount > 0 ? 1 : 0));
+        return (int)((currentAddress - outputAddress) + (bitCount > 0 ? 1 : 0));
     }
+
 }

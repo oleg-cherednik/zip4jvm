@@ -13,6 +13,8 @@
  */
 package ru.olegcherednik.zip4jvm.io.zstd;
 
+import ru.olegcherednik.zip4jvm.io.zstd.bit.BitOutputStream;
+
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.DEFAULT_MAX_OFFSET_CODE_SYMBOL;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.LITERALS_LENGTH_BITS;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.LITERAL_LENGTH_TABLE_LOG;

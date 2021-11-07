@@ -13,7 +13,10 @@
  */
 package ru.olegcherednik.zip4jvm.io.zstd;
 
-import static ru.olegcherednik.zip4jvm.io.zstd.BitInputStream.peekBits;
+import ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream;
+import ru.olegcherednik.zip4jvm.io.zstd.bit.BitOutputStream;
+
+import static ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream.peekBits;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_INT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_LONG;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;
@@ -22,7 +25,7 @@ import static ru.olegcherednik.zip4jvm.io.zstd.Util.checkArgument;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.verify;
 import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
 
-class FiniteStateEntropy
+public class FiniteStateEntropy
 {
     public static final int MAX_SYMBOL = 255;
     public static final int MAX_TABLE_LOG = 12;

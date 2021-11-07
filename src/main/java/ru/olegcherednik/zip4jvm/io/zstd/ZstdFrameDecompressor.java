@@ -13,9 +13,12 @@
  */
 package ru.olegcherednik.zip4jvm.io.zstd;
 
+import ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream;
+import ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman;
+
 import java.util.Arrays;
 
-import static ru.olegcherednik.zip4jvm.io.zstd.BitInputStream.peekBits;
+import static ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream.peekBits;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.COMPRESSED_BLOCK;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.COMPRESSED_LITERALS_BLOCK;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.DEFAULT_MAX_OFFSET_CODE_SYMBOL;

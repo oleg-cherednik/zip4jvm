@@ -15,12 +15,12 @@ package ru.olegcherednik.zip4jvm.io.zstd;
 
 import java.util.Arrays;
 
-class NodeTable
+public class NodeTable
 {
-    int[] count;
-    short[] parents;
-    int[] symbols;
-    byte[] numberOfBits;
+    public int[] count;
+    public short[] parents;
+    public int[] symbols;
+    public byte[] numberOfBits;
 
     public NodeTable(int size)
     {

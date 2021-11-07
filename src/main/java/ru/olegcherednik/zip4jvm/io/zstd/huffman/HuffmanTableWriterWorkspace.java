@@ -11,11 +11,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ru.olegcherednik.zip4jvm.io.zstd;
+package ru.olegcherednik.zip4jvm.io.zstd.huffman;
 
-import static ru.olegcherednik.zip4jvm.io.zstd.Huffman.MAX_FSE_TABLE_LOG;
-import static ru.olegcherednik.zip4jvm.io.zstd.Huffman.MAX_SYMBOL;
-import static ru.olegcherednik.zip4jvm.io.zstd.Huffman.MAX_TABLE_LOG;
+import ru.olegcherednik.zip4jvm.io.zstd.FseCompressionTable;
+
+import static ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman.MAX_FSE_TABLE_LOG;
+import static ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman.MAX_SYMBOL;
+import static ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman.MAX_TABLE_LOG;
 
 class HuffmanTableWriterWorkspace
 {

@@ -11,19 +11,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ru.olegcherednik.zip4jvm.io.zstd;
+package ru.olegcherednik.zip4jvm.io.zstd.huffman;
+
+import ru.olegcherednik.zip4jvm.io.zstd.FiniteStateEntropy;
+import ru.olegcherednik.zip4jvm.io.zstd.FseTableReader;
+import ru.olegcherednik.zip4jvm.io.zstd.Util;
+import ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream;
 
 import java.util.Arrays;
 
-import static ru.olegcherednik.zip4jvm.io.zstd.BitInputStream.isEndOfStream;
-import static ru.olegcherednik.zip4jvm.io.zstd.BitInputStream.peekBitsFast;
+import static ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream.isEndOfStream;
+import static ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream.peekBitsFast;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_INT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;
 import static ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil.UNSAFE;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.isPowerOf2;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.verify;
 
-class Huffman
+public class Huffman
 {
     public static final int MAX_SYMBOL = 255;
     public static final int MAX_SYMBOL_COUNT = MAX_SYMBOL + 1;

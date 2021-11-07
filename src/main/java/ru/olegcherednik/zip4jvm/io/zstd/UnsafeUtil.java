@@ -21,7 +21,7 @@ import java.nio.ByteOrder;
 
 import static java.lang.String.format;
 
-final class UnsafeUtil {
+public final class UnsafeUtil {
 
     public static final Unsafe UNSAFE;
     private static final long ADDRESS_OFFSET;
