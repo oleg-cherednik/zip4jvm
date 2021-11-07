@@ -11,8 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ru.olegcherednik.zip4jvm.io.zstd;
+package ru.olegcherednik.zip4jvm.io.zstd.frame;
 
+import ru.olegcherednik.zip4jvm.io.zstd.CompressionContext;
+import ru.olegcherednik.zip4jvm.io.zstd.CompressionParameters;
+import ru.olegcherednik.zip4jvm.io.zstd.Histogram;
+import ru.olegcherednik.zip4jvm.io.zstd.SequenceEncoder;
+import ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil;
+import ru.olegcherednik.zip4jvm.io.zstd.XxHash64;
 import ru.olegcherednik.zip4jvm.io.zstd.huffman.HuffmanCompressionContext;
 import ru.olegcherednik.zip4jvm.io.zstd.huffman.HuffmanCompressionTable;
 import ru.olegcherednik.zip4jvm.io.zstd.huffman.HuffmanCompressor;
@@ -38,9 +44,7 @@ import static ru.olegcherednik.zip4jvm.io.zstd.Util.put24BitLittleEndian;
 import static ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman.MAX_SYMBOL;
 import static ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman.MAX_SYMBOL_COUNT;
 
-class ZstdFrameCompressor {
-
-    static final int MAX_FRAME_HEADER_SIZE = 14;
+public class ZstdFrameCompressor {
 
     private static final int CHECKSUM_FLAG = 0b100;
     private static final int SINGLE_SEGMENT_FLAG = 0b100000;
@@ -51,19 +55,14 @@ class ZstdFrameCompressor {
     private static final int MAX_HUFFMAN_TABLE_LOG = 11;
 
     // visible for testing
-    static int writeMagic(final byte[] outputBase, final long outputAddress, final long outputLimit) {
-        checkArgument(outputLimit - outputAddress >= SIZE_OF_INT, "Output buffer too small");
-
+    static int writeMagic(final byte[] outputBase, final int outputAddress) {
         UnsafeUtil.putInt(outputBase, outputAddress, MAGIC_NUMBER);
         return SIZE_OF_INT;
     }
 
     // visible for testing
-    static int writeFrameHeader(final byte[] outputBase, final long outputAddress, final long outputLimit, int inputSize, int windowSize) {
-        checkArgument(outputLimit - outputAddress >= MAX_FRAME_HEADER_SIZE, "Output buffer too small");
-
-        long output = outputAddress;
-
+    static int writeFrameHeader(final byte[] outputBase, final int outputAddress, int inputSize, int windowSize) {
+        int output = outputAddress;
         int contentSizeDescriptor = (inputSize >= 256 ? 1 : 0) + (inputSize >= 65536 + 256 ? 1 : 0);
         int frameHeaderDescriptor = (contentSizeDescriptor << 6) | CHECKSUM_FLAG; // dictionary ID missing
 
@@ -118,7 +117,7 @@ class ZstdFrameCompressor {
     }
 
     // visible for testing
-    static int writeChecksum(byte[] outputBase, long outputAddress, long outputLimit, byte[] inputBase, int inputAddress, long inputLimit) {
+    static int writeChecksum(byte[] outputBase, int outputAddress, long outputLimit, byte[] inputBase, int inputAddress, long inputLimit) {
         checkArgument(outputLimit - outputAddress >= SIZE_OF_INT, "Output buffer too small");
 
         int inputSize = (int)(inputLimit - inputAddress);
@@ -166,8 +165,8 @@ class ZstdFrameCompressor {
 
         int output = outputAddress;
 
-        output += writeMagic(outputBase, output, outputLimit);
-        output += writeFrameHeader(outputBase, output, outputLimit, inputSize, 1 << parameters.getWindowLog());
+        output += writeMagic(outputBase, output);
+        output += writeFrameHeader(outputBase, output, inputSize, 1 << parameters.getWindowLog());
         output += compressFrame(inputBase, inputAddress, inputLimit, outputBase, output, outputLimit, parameters);
         output += writeChecksum(outputBase, output, outputLimit, inputBase, inputAddress, inputLimit);
 
@@ -188,8 +187,6 @@ class ZstdFrameCompressor {
         CompressionContext context = new CompressionContext(parameters, inputAddress, remaining);
 
         do {
-            checkArgument(outputSize >= SIZE_OF_BLOCK_HEADER + MIN_BLOCK_SIZE, "Output buffer too small");
-
             int lastBlockFlag = blockSize >= remaining ? 1 : 0;
             blockSize = Math.min(blockSize, remaining);
 
@@ -237,7 +234,7 @@ class ZstdFrameCompressor {
                                          .compressBlock(inputBase, inputAddress, inputSize, context.sequenceStore, context.blockCompressionState,
                                                  context.offsets, parameters);
 
-        long lastLiteralsAddress = inputAddress + inputSize - lastLiteralsSize;
+        int lastLiteralsAddress = inputAddress + inputSize - lastLiteralsSize;
 
         // append [lastLiteralsAddress .. lastLiteralsSize] to sequenceStore literals buffer
         context.sequenceStore.appendLiterals(inputBase, lastLiteralsAddress, lastLiteralsSize);
@@ -264,7 +261,7 @@ class ZstdFrameCompressor {
         int compressedSize = compressedLiteralsSize + compressedSequencesSize;
         if (compressedSize == 0) {
             // not compressible
-            return compressedSize;
+            return 0;
         }
 
         // Check compressibility
@@ -398,7 +395,7 @@ class ZstdFrameCompressor {
         return headerSize + totalSize;
     }
 
-    private static int rleLiterals(byte[] outputBase, long outputAddress, byte[] inputBase, int inputSize) {
+    private static int rleLiterals(byte[] outputBase, int outputAddress, byte[] inputBase, int inputSize) {
         int headerSize = 1 + (inputSize > 31 ? 1 : 0) + (inputSize > 4095 ? 1 : 0);
 
         switch (headerSize) {
@@ -426,7 +423,7 @@ class ZstdFrameCompressor {
         return (inputSize >>> minLog) + 2;
     }
 
-    private static int rawLiterals(byte[] outputBase, long outputAddress, Object inputBase, int inputSize) {
+    private static int rawLiterals(byte[] outputBase, int outputAddress, byte[] inputBase, int inputSize) {
         int headerSize = 1;
         if (inputSize >= 32) {
             headerSize++;

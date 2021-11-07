@@ -34,7 +34,7 @@ public class BitOutputStream {
 
     private long container;
     private int bitCount;
-    private long currentAddress;
+    private int currentAddress;
 
     public BitOutputStream(byte[] outputBase, int outputAddress, int outputSize) {
         checkArgument(outputSize >= SIZE_OF_LONG, "Output buffer too small");

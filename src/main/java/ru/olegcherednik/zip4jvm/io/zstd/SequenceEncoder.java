@@ -32,7 +32,7 @@ import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;
 import static ru.olegcherednik.zip4jvm.io.zstd.FiniteStateEntropy.optimalTableLog;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.checkArgument;
 
-class SequenceEncoder {
+public class SequenceEncoder {
 
     private static final int DEFAULT_LITERAL_LENGTH_NORMALIZED_COUNTS_LOG = 6;
     private static final short[] DEFAULT_LITERAL_LENGTH_NORMALIZED_COUNTS = { 4, 3, 2, 2, 2, 2, 2, 2,
@@ -89,11 +89,11 @@ class SequenceEncoder {
         }
 
         if (sequenceCount == 0) {
-            return (int)(output - outputAddress);
+            return output - outputAddress;
         }
 
         // flags for FSE encoding type
-        long headerAddress = output++;
+        int headerAddress = output++;
 
         int maxSymbol;
         int largestCount;
@@ -217,10 +217,10 @@ class SequenceEncoder {
 
         output += encodeSequences(outputBase, output, outputLimit, matchLengthTable, offsetCodeTable, literalLengthTable, sequences);
 
-        return (int)(output - outputAddress);
+        return output - outputAddress;
     }
 
-    private static int buildCompressionTable(FseCompressionTable table, byte[] outputBase, long output, long outputLimit, int sequenceCount,
+    private static int buildCompressionTable(FseCompressionTable table, byte[] outputBase, int output, long outputLimit, int sequenceCount,
             int maxTableLog, byte[] codes, int[] counts, int maxSymbol, short[] normalizedCounts) {
         int tableLog = optimalTableLog(maxTableLog, sequenceCount, maxSymbol);
 

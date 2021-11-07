@@ -57,7 +57,7 @@ public final class Util {
         return cycleLog;
     }
 
-    public static void put24BitLittleEndian(byte[] outputBase, long outputAddress, int value) {
+    public static void put24BitLittleEndian(byte[] outputBase, int outputAddress, int value) {
         UnsafeUtil.putShort(outputBase, outputAddress, (short)value);
         UnsafeUtil.putByte(outputBase, outputAddress + SIZE_OF_SHORT, (byte)(value >>> Short.SIZE));
     }

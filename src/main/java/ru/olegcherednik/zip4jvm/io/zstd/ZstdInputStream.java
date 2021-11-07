@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.io.zstd;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.zstd.frame.ZstdFrameDecompressor;
 
 import java.io.IOException;
 import java.io.InputStream;

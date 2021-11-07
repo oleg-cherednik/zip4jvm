@@ -15,7 +15,7 @@ package ru.olegcherednik.zip4jvm.io.zstd;
 
 import java.util.Arrays;
 
-class BlockCompressionState
+public class BlockCompressionState
 {
     public final int[] hashTable;
     public final int[] chainTable;

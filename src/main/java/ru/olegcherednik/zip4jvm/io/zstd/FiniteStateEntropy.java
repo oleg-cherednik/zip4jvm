@@ -13,6 +13,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.zstd;
 
+import lombok.Getter;
 import ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream;
 import ru.olegcherednik.zip4jvm.io.zstd.bit.BitOutputStream;
 
@@ -38,11 +39,11 @@ public class FiniteStateEntropy {
     public static int decompress(FiniteStateEntropy.Table table, final byte[] inputBase, final int inputAddress, final int inputLimit,
             byte[] outputBuffer) {
         final byte[] outputBase = outputBuffer;
-        final long outputAddress = 0;
+        final int outputAddress = 0;
         final long outputLimit = outputAddress + outputBuffer.length;
 
         int input = inputAddress;
-        long output = outputAddress;
+        int output = outputAddress;
 
         // initialize bit stream
         BitInputStream.Initializer initializer = new BitInputStream.Initializer(inputBase, input, inputLimit);
@@ -387,12 +388,12 @@ public class FiniteStateEntropy {
         return 0;
     }
 
-    public static int writeNormalizedCounts(byte[] outputBase, long outputAddress, int outputSize, short[] normalizedCounts, int maxSymbol,
+    public static int writeNormalizedCounts(byte[] outputBase, int outputAddress, int outputSize, short[] normalizedCounts, int maxSymbol,
             int tableLog) {
         checkArgument(tableLog <= MAX_TABLE_LOG, "FSE table too large");
         checkArgument(tableLog >= MIN_TABLE_LOG, "FSE table too small");
 
-        long output = outputAddress;
+        int output = outputAddress;
         long outputLimit = outputAddress + outputSize;
 
         int tableSize = 1 << tableLog;
@@ -400,7 +401,7 @@ public class FiniteStateEntropy {
         int bitCount = 0;
 
         // encode table size
-        int bitStream = (tableLog - MIN_TABLE_LOG);
+        int bitStream = tableLog - MIN_TABLE_LOG;
         bitCount += 4;
 
         int remaining = tableSize + 1; // +1 for extra accuracy
@@ -505,10 +506,10 @@ public class FiniteStateEntropy {
 
     public static final class Table {
 
-        int log2Size;
-        final int[] newState;
-        final byte[] symbol;
-        final byte[] numberOfBits;
+        public  int log2Size;
+        public final int[] newState;
+        public final byte[] symbol;
+        public final byte[] numberOfBits;
 
         public Table(int log2Capacity) {
             int capacity = 1 << log2Capacity;

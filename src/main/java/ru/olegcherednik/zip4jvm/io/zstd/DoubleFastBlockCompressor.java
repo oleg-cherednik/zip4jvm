@@ -73,7 +73,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
             int longMatchAddress = baseAddress + longHashTable[longHash];
 
             // update hash tables
-            int current = (int)(input - baseAddress);
+            int current = input - baseAddress;
             longHashTable[longHash] = current;
             shortHashTable[shortHash] = current;
 
@@ -84,12 +84,12 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                 // found a repeated sequence of at least 4 bytes, separated by offset1
                 matchLength = count(inputBase, input + 1 + SIZE_OF_INT, inputEnd, input + 1 + SIZE_OF_INT - offset1) + SIZE_OF_INT;
                 input++;
-                output.storeSequence(inputBase, anchor, (int)(input - anchor), 0, matchLength - MIN_MATCH);
+                output.storeSequence(inputBase, anchor, input - anchor, 0, matchLength - MIN_MATCH);
             } else {
                 // check prefix long match
                 if (longMatchAddress > windowBaseAddress && UnsafeUtil.getLong(inputBase, longMatchAddress) == UnsafeUtil.getLong(inputBase, input)) {
                     matchLength = count(inputBase, input + SIZE_OF_LONG, inputEnd, longMatchAddress + SIZE_OF_LONG) + SIZE_OF_LONG;
-                    offset = (int)(input - longMatchAddress);
+                    offset = input - longMatchAddress;
                     while (input > anchor && longMatchAddress > windowBaseAddress && UnsafeUtil.getByte(inputBase, input - 1) == UnsafeUtil.getByte(
                             inputBase, longMatchAddress - 1)) {
                         input--;

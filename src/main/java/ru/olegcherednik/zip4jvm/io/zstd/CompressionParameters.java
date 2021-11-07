@@ -18,7 +18,7 @@ import static ru.olegcherednik.zip4jvm.io.zstd.Constants.MIN_WINDOW_LOG;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.cycleLog;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.highestBit;
 
-class CompressionParameters
+public class CompressionParameters
 {
     private static final int MIN_HASH_LOG = 6;
 

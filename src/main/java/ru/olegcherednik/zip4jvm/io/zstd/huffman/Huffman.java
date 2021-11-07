@@ -132,7 +132,7 @@ public class Huffman
         return inputSize + 1;
     }
 
-    public void decodeSingleStream(final byte[] inputBase, final int inputAddress, final int inputLimit, final byte[] outputBase, final long outputAddress, final long outputLimit)
+    public void decodeSingleStream(final byte[] inputBase, final int inputAddress, final int inputLimit, final byte[] outputBase, final int outputAddress, final long outputLimit)
     {
         BitInputStream.Initializer initializer = new BitInputStream.Initializer(inputBase, inputAddress, inputLimit);
         initializer.initialize();
@@ -146,7 +146,7 @@ public class Huffman
         byte[] symbols = this.symbols;
 
         // 4 symbols at a time
-        long output = outputAddress;
+        int output = outputAddress;
         long fastOutputLimit = outputLimit - 4;
         while (output < fastOutputLimit) {
             BitInputStream.Loader loader = new BitInputStream.Loader(inputBase, inputAddress, currentAddress, bits, bitsConsumed);
@@ -168,7 +168,7 @@ public class Huffman
         decodeTail(inputBase, inputAddress, currentAddress, bitsConsumed, bits, outputBase, output, outputLimit);
     }
 
-    public void decode4Streams(final byte[] inputBase, final int inputAddress, final int inputLimit, final byte[] outputBase, final long outputAddress, final long outputLimit)
+    public void decode4Streams(final byte[] inputBase, final int inputAddress, final int inputLimit, final byte[] outputBase, final int outputAddress, final long outputLimit)
     {
         verify(inputLimit - inputAddress >= 10, inputAddress, "Input is corrupted"); // jump table + 1 byte per stream
 
@@ -203,14 +203,14 @@ public class Huffman
 
         int segmentSize = (int) ((outputLimit - outputAddress + 3) / 4);
 
-        long outputStart2 = outputAddress + segmentSize;
-        long outputStart3 = outputStart2 + segmentSize;
-        long outputStart4 = outputStart3 + segmentSize;
+        int outputStart2 = outputAddress + segmentSize;
+        int outputStart3 = outputStart2 + segmentSize;
+        int outputStart4 = outputStart3 + segmentSize;
 
-        long output1 = outputAddress;
-        long output2 = outputStart2;
-        long output3 = outputStart3;
-        long output4 = outputStart4;
+        int output1 = outputAddress;
+        int output2 = outputStart2;
+        int output3 = outputStart3;
+        int output4 = outputStart4;
 
         long fastOutputLimit = outputLimit - 7;
         int tableLog = this.tableLog;
@@ -291,7 +291,7 @@ public class Huffman
         decodeTail(inputBase, start4, stream4currentAddress, stream4bitsConsumed, stream4bits, outputBase, output4, outputLimit);
     }
 
-    private void decodeTail(final byte[] inputBase, final int startAddress, int currentAddress, int bitsConsumed, long bits, final byte[] outputBase, long outputAddress, final long outputLimit)
+    private void decodeTail(final byte[] inputBase, final int startAddress, int currentAddress, int bitsConsumed, long bits, final byte[] outputBase, int outputAddress, final long outputLimit)
     {
         int tableLog = this.tableLog;
         byte[] numbersOfBits = this.numbersOfBits;
@@ -319,7 +319,7 @@ public class Huffman
         verify(isEndOfStream(startAddress, currentAddress, bitsConsumed), startAddress, "Bit stream is not fully consumed");
     }
 
-    private static int decodeSymbol(byte[] outputBase, long outputAddress, long bitContainer, int bitsConsumed, int tableLog, byte[] numbersOfBits, byte[] symbols)
+    private static int decodeSymbol(byte[] outputBase, int outputAddress, long bitContainer, int bitsConsumed, int tableLog, byte[] numbersOfBits, byte[] symbols)
     {
         int value = (int) peekBitsFast(bitsConsumed, bitContainer, tableLog);
         UnsafeUtil.putByte(outputBase, outputAddress, symbols[value]);

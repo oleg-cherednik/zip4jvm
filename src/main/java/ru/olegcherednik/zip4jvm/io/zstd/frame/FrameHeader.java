@@ -11,21 +11,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ru.olegcherednik.zip4jvm.io.zstd;
+package ru.olegcherednik.zip4jvm.io.zstd.frame;
 
 import java.util.Objects;
 import java.util.StringJoiner;
 
-class FrameHeader
-{
+public class FrameHeader {
+
     final int headerSize;
     final int windowSize;
     final long contentSize;
     final long dictionaryId;
     final boolean hasChecksum;
 
-    public FrameHeader(int headerSize, int windowSize, long contentSize, long dictionaryId, boolean hasChecksum)
-    {
+    public FrameHeader(int headerSize, int windowSize, long contentSize, long dictionaryId, boolean hasChecksum) {
         this.headerSize = headerSize;
         this.windowSize = windowSize;
         this.contentSize = contentSize;
@@ -34,15 +33,14 @@ class FrameHeader
     }
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        FrameHeader that = (FrameHeader) o;
+        FrameHeader that = (FrameHeader)o;
         return headerSize == that.headerSize &&
                 windowSize == that.windowSize &&
                 contentSize == that.contentSize &&
@@ -51,14 +49,12 @@ class FrameHeader
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return Objects.hash(headerSize, windowSize, contentSize, dictionaryId, hasChecksum);
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return new StringJoiner(", ", FrameHeader.class.getSimpleName() + "[", "]")
                 .add("headerSize=" + headerSize)
                 .add("windowSize=" + windowSize)
@@ -67,4 +63,5 @@ class FrameHeader
                 .add("hasChecksum=" + hasChecksum)
                 .toString();
     }
+
 }

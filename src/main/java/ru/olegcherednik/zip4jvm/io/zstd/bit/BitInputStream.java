@@ -60,7 +60,7 @@ public class BitInputStream {
      * @return numberOfBits in the low order bits of a long
      */
     public static long peekBits(int bitsConsumed, long bitContainer, int numberOfBits) {
-        return (((bitContainer << bitsConsumed) >>> 1) >>> (63 - numberOfBits));
+        return (bitContainer << bitsConsumed) >>> 1 >>> (63 - numberOfBits);
     }
 
     /**
@@ -69,7 +69,7 @@ public class BitInputStream {
      * @return numberOfBits in the low order bits of a long
      */
     public static long peekBitsFast(int bitsConsumed, long bitContainer, int numberOfBits) {
-        return ((bitContainer << bitsConsumed) >>> (64 - numberOfBits));
+        return (bitContainer << bitsConsumed) >>> (64 - numberOfBits);
     }
 
     public static class Initializer {
@@ -100,14 +100,12 @@ public class BitInputStream {
         }
 
         public void initialize() {
-            verify(endAddress - startAddress >= 1, startAddress, "Bitstream is empty");
-
             int lastByte = UnsafeUtil.getByte(inputBase, endAddress - 1) & 0xFF;
             verify(lastByte != 0, endAddress, "Bitstream end mark not present");
 
             bitsConsumed = SIZE_OF_LONG - highestBit(lastByte);
 
-            int inputSize = (int)(endAddress - startAddress);
+            int inputSize = endAddress - startAddress;
             if (inputSize >= SIZE_OF_LONG) {  /* normal case */
                 currentAddress = endAddress - SIZE_OF_LONG;
                 bits = UnsafeUtil.getLong(inputBase, currentAddress);

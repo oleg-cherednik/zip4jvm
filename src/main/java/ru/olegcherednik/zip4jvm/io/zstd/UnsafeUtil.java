@@ -56,48 +56,46 @@ public final class UnsafeUtil {
         return (short)(res << 8 | a & 0xFF);
     }
 
-    public static void putLong(byte[] outputBase, long outputAddress, long value) {
-        outputBase[(int)outputAddress] = (byte)(value & 0xFF);
+    public static void putLong(byte[] outputBase, int outputAddress, long value) {
+        outputBase[outputAddress] = (byte)(value & 0xFF);
         value >>= 8;
-        outputBase[(int)outputAddress + 1] = (byte)(value & 0xFF);
+        outputBase[outputAddress + 1] = (byte)(value & 0xFF);
         value >>= 8;
-        outputBase[(int)outputAddress + 2] = (byte)(value & 0xFF);
+        outputBase[outputAddress + 2] = (byte)(value & 0xFF);
         value >>= 8;
-        outputBase[(int)outputAddress + 3] = (byte)(value & 0xFF);
+        outputBase[outputAddress + 3] = (byte)(value & 0xFF);
         value >>= 8;
-        outputBase[(int)outputAddress + 4] = (byte)(value & 0xFF);
+        outputBase[outputAddress + 4] = (byte)(value & 0xFF);
         value >>= 8;
-        outputBase[(int)outputAddress + 5] = (byte)(value & 0xFF);
+        outputBase[outputAddress + 5] = (byte)(value & 0xFF);
         value >>= 8;
-        outputBase[(int)outputAddress + 6] = (byte)(value & 0xFF);
+        outputBase[outputAddress + 6] = (byte)(value & 0xFF);
         value >>= 8;
-        outputBase[(int)outputAddress + 7] = (byte)(value & 0xFF);
+        outputBase[outputAddress + 7] = (byte)(value & 0xFF);
     }
 
-    public static void putByte(byte[] outputBase, long outputAddress, byte value) {
-        outputBase[(int)outputAddress] = value;
+    public static void putByte(byte[] outputBase, int outputAddress, byte value) {
+        outputBase[outputAddress] = value;
     }
 
-    public static void putShort(byte[] outputBase, long outputAddress, short value) {
-        outputBase[(int)outputAddress] = (byte)(value & 0xFF);
+    public static void putShort(byte[] outputBase, int outputAddress, short value) {
+        outputBase[outputAddress] = (byte)(value & 0xFF);
         value >>= 8;
-        outputBase[(int)outputAddress + 1] = (byte)(value & 0xFF);
+        outputBase[outputAddress + 1] = (byte)(value & 0xFF);
     }
 
-    public static void putInt(byte[] outputBase, long outputAddress, int value) {
-        outputBase[(int)outputAddress] = (byte)(value & 0xFF);
+    public static void putInt(byte[] outputBase, int outputAddress, int value) {
+        outputBase[outputAddress] = (byte)(value & 0xFF);
         value >>= 8;
-        outputBase[(int)outputAddress + 1] = (byte)(value & 0xFF);
+        outputBase[outputAddress + 1] = (byte)(value & 0xFF);
         value >>= 8;
-        outputBase[(int)outputAddress + 2] = (byte)(value & 0xFF);
+        outputBase[outputAddress + 2] = (byte)(value & 0xFF);
         value >>= 8;
-        outputBase[(int)outputAddress + 3] = (byte)(value & 0xFF);
+        outputBase[outputAddress + 3] = (byte)(value & 0xFF);
     }
 
-    public static void copyMemory(Object inputBase, long inputAddress, Object outputBase, long offs, long inputSize) {
-        byte[] in = (byte[])inputBase;
-        byte[] out = (byte[])outputBase;
-        System.arraycopy(in, (int)inputAddress, out, (int)offs, (int)inputSize);
+    public static void copyMemory(byte[] inputBase, int inputAddress, byte[] outputBase, int offs, int inputSize) {
+        System.arraycopy(inputBase, inputAddress, outputBase, offs, inputSize);
     }
 
 }
