@@ -137,17 +137,12 @@ class ZstdFrameDecompressor {
     private final Huffman huffman = new Huffman();
     private final FseTableReader fse = new FseTableReader();
 
-    public void decompress(ByteBuffer input, ByteBuffer output) throws MalformedInputException {
-        byte[] inputBase = input.array();
-        long inputAddress = ARRAY_BYTE_BASE_OFFSET + input.arrayOffset() + input.position();
-        long inputLimit = ARRAY_BYTE_BASE_OFFSET + input.arrayOffset() + input.limit();
+    public int decompress(byte[] inputBase, byte[] outputBase) throws MalformedInputException {
+        long outputAddress = ARRAY_BYTE_BASE_OFFSET;
+        long outputLimit = ARRAY_BYTE_BASE_OFFSET + outputBase.length;
 
-        byte[] outputBase = output.array();
-        long outputAddress = ARRAY_BYTE_BASE_OFFSET + output.arrayOffset() + output.position();
-        long outputLimit = ARRAY_BYTE_BASE_OFFSET + output.arrayOffset() + output.limit();
-
-        int written = decompress(inputBase, inputAddress, inputLimit, outputBase, outputAddress, outputLimit);
-        output.position(output.position() + written);
+        return decompress(inputBase, ARRAY_BYTE_BASE_OFFSET, ARRAY_BYTE_BASE_OFFSET + inputBase.length,
+                outputBase, outputAddress, outputLimit);
     }
 
     public int decompress(
