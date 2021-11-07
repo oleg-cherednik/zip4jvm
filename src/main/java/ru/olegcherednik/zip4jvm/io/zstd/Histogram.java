@@ -32,7 +32,7 @@ public class Histogram
         Arrays.fill(counts, 0);
 
         for (int i = 0; i < inputSize; i++) {
-            int symbol = UNSAFE.getByte(inputBase, input) & 0xFF;
+            int symbol = UnsafeUtil.getByte(inputBase, input) & 0xFF;
             input++;
             counts[symbol]++;
         }

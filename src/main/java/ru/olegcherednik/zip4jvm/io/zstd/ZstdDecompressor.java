@@ -13,18 +13,18 @@
  */
 package ru.olegcherednik.zip4jvm.io.zstd;
 
-import java.nio.Buffer;
+import java.nio.ByteBuffer;
 
 import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
 
 public class ZstdDecompressor {
 
-    public void decompress(Buffer input, Buffer output) throws MalformedInputException {
-        Object inputBase = input.array();
+    public void decompress(ByteBuffer input, ByteBuffer output) throws MalformedInputException {
+        byte[] inputBase = input.array();
         long inputAddress = ARRAY_BYTE_BASE_OFFSET + input.arrayOffset() + input.position();
         long inputLimit = ARRAY_BYTE_BASE_OFFSET + input.arrayOffset() + input.limit();
 
-        Object outputBase = output.array();
+        byte[] outputBase = output.array();
         long outputAddress = ARRAY_BYTE_BASE_OFFSET + output.arrayOffset() + output.position();
         long outputLimit = ARRAY_BYTE_BASE_OFFSET + output.arrayOffset() + output.limit();
 

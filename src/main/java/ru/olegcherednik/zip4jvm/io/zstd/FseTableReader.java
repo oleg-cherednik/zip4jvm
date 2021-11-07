@@ -15,7 +15,6 @@ package ru.olegcherednik.zip4jvm.io.zstd;
 
 import static ru.olegcherednik.zip4jvm.io.zstd.FiniteStateEntropy.MAX_SYMBOL;
 import static ru.olegcherednik.zip4jvm.io.zstd.FiniteStateEntropy.MIN_TABLE_LOG;
-import static ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil.UNSAFE;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.highestBit;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.verify;
 
@@ -34,7 +33,7 @@ public class FseTableReader
         int symbolNumber = 0;
         boolean previousIsZero = false;
 
-        int bitStream = UNSAFE.getInt(inputBase, input);
+        int bitStream = UnsafeUtil.getInt(inputBase, input);
 
         int tableLog = (bitStream & 0xF) + MIN_TABLE_LOG;
 
@@ -54,7 +53,7 @@ public class FseTableReader
                     n0 += 24;
                     if (input < inputLimit - 5) {
                         input += 2;
-                        bitStream = (UNSAFE.getInt(inputBase, input) >>> bitCount);
+                        bitStream = (UnsafeUtil.getInt(inputBase, input) >>> bitCount);
                     }
                     else {
                         // end of bit stream
@@ -78,7 +77,7 @@ public class FseTableReader
                 if ((input <= inputLimit - 7) || (input + (bitCount >>> 3) <= inputLimit - 4)) {
                     input += bitCount >>> 3;
                     bitCount &= 7;
-                    bitStream = UNSAFE.getInt(inputBase, input) >>> bitCount;
+                    bitStream = UnsafeUtil.getInt(inputBase, input) >>> bitCount;
                 }
                 else {
                     bitStream >>>= 2;
@@ -117,7 +116,7 @@ public class FseTableReader
                 bitCount -= (int) (8 * (inputLimit - 4 - input));
                 input = inputLimit - 4;
             }
-            bitStream = UNSAFE.getInt(inputBase, input) >>> (bitCount & 31);
+            bitStream = UnsafeUtil.getInt(inputBase, input) >>> (bitCount & 31);
         }
 
         verify(remaining == 1 && bitCount <= 32, input, "Input is corrupted");

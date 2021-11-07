@@ -50,12 +50,28 @@ public final class UnsafeUtil {
         }
     }
 
+    public static int getInt(Object inputBase, long inputAddress) {
+        return UNSAFE.getInt(inputBase, inputAddress);
+    }
+
+    public static long getLong(Object inputBase, long inputAddress) {
+        return UNSAFE.getLong(inputBase, inputAddress);
+    }
+
+    public static byte getByte(Object inputBase, long inputAddress) {
+        return UNSAFE.getByte(inputBase, inputAddress);
+    }
+
     public static long getAddress(Buffer buffer) {
         if (!buffer.isDirect()) {
             throw new IllegalArgumentException("buffer is not direct");
         }
 
         return UNSAFE.getLong(buffer, ADDRESS_OFFSET);
+    }
+
+    public static void putLong(Object outputBase, long currentAddress, long container) {
+        UNSAFE.putLong(outputBase, currentAddress, container);
     }
 
 }

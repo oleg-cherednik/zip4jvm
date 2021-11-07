@@ -49,17 +49,17 @@ final class XxHash64
     private static long updateTail(long hash, Object base, long address, int index, int length)
     {
         while (index <= length - 8) {
-            hash = updateTail(hash, UNSAFE.getLong(base, address + index));
+            hash = updateTail(hash, UnsafeUtil.getLong(base, address + index));
             index += 8;
         }
 
         if (index <= length - 4) {
-            hash = updateTail(hash, UNSAFE.getInt(base, address + index));
+            hash = updateTail(hash, UnsafeUtil.getInt(base, address + index));
             index += 4;
         }
 
         while (index < length) {
-            hash = updateTail(hash, UNSAFE.getByte(base, address + index));
+            hash = updateTail(hash, UnsafeUtil.getByte(base, address + index));
             index++;
         }
 
@@ -77,10 +77,10 @@ final class XxHash64
 
         int remaining = length;
         while (remaining >= 32) {
-            v1 = mix(v1, UNSAFE.getLong(base, address));
-            v2 = mix(v2, UNSAFE.getLong(base, address + 8));
-            v3 = mix(v3, UNSAFE.getLong(base, address + 16));
-            v4 = mix(v4, UNSAFE.getLong(base, address + 24));
+            v1 = mix(v1, UnsafeUtil.getLong(base, address));
+            v2 = mix(v2, UnsafeUtil.getLong(base, address + 8));
+            v3 = mix(v3, UnsafeUtil.getLong(base, address + 16));
+            v4 = mix(v4, UnsafeUtil.getLong(base, address + 24));
 
             address += 32;
             remaining -= 32;

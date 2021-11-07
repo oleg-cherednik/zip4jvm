@@ -15,18 +15,19 @@ package ru.olegcherednik.zip4jvm.io.zstd.huffman;
 
 import ru.olegcherednik.zip4jvm.io.zstd.FiniteStateEntropy;
 import ru.olegcherednik.zip4jvm.io.zstd.FseTableReader;
+import ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil;
 import ru.olegcherednik.zip4jvm.io.zstd.Util;
 import ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream;
 
 import java.util.Arrays;
 
-import static ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream.isEndOfStream;
-import static ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream.peekBitsFast;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_INT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;
 import static ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil.UNSAFE;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.isPowerOf2;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.verify;
+import static ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream.isEndOfStream;
+import static ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream.peekBitsFast;
 
 public class Huffman
 {
@@ -61,7 +62,7 @@ public class Huffman
 
         // read table header
         verify(size > 0, input, "Not enough input bytes");
-        int inputSize = UNSAFE.getByte(inputBase, input++) & 0xFF;
+        int inputSize = UnsafeUtil.getByte(inputBase, input++) & 0xFF;
 
         int outputSize;
         if (inputSize >= 128) {
@@ -72,7 +73,7 @@ public class Huffman
             verify(outputSize <= MAX_SYMBOL + 1, input, "Input is corrupted");
 
             for (int i = 0; i < outputSize; i += 2) {
-                int value = UNSAFE.getByte(inputBase, input + i / 2) & 0xFF;
+                int value = UnsafeUtil.getByte(inputBase, input + i / 2) & 0xFF;
                 weights[i] = (byte) (value >>> 4);
                 weights[i + 1] = (byte) (value & 0b1111);
             }

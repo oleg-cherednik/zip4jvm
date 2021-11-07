@@ -13,8 +13,9 @@
  */
 package ru.olegcherednik.zip4jvm.io.zstd.bit;
 
+import ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil;
+
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_LONG;
-import static ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil.UNSAFE;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.highestBit;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.verify;
 
@@ -35,21 +36,21 @@ public class BitInputStream {
     }
 
     static long readTail(Object inputBase, long inputAddress, int inputSize) {
-        long bits = UNSAFE.getByte(inputBase, inputAddress) & 0xFF;
+        long bits = UnsafeUtil.getByte(inputBase, inputAddress) & 0xFF;
 
         switch (inputSize) {
             case 7:
-                bits |= (UNSAFE.getByte(inputBase, inputAddress + 6) & 0xFFL) << 48;
+                bits |= (UnsafeUtil.getByte(inputBase, inputAddress + 6) & 0xFFL) << 48;
             case 6:
-                bits |= (UNSAFE.getByte(inputBase, inputAddress + 5) & 0xFFL) << 40;
+                bits |= (UnsafeUtil.getByte(inputBase, inputAddress + 5) & 0xFFL) << 40;
             case 5:
-                bits |= (UNSAFE.getByte(inputBase, inputAddress + 4) & 0xFFL) << 32;
+                bits |= (UnsafeUtil.getByte(inputBase, inputAddress + 4) & 0xFFL) << 32;
             case 4:
-                bits |= (UNSAFE.getByte(inputBase, inputAddress + 3) & 0xFFL) << 24;
+                bits |= (UnsafeUtil.getByte(inputBase, inputAddress + 3) & 0xFFL) << 24;
             case 3:
-                bits |= (UNSAFE.getByte(inputBase, inputAddress + 2) & 0xFFL) << 16;
+                bits |= (UnsafeUtil.getByte(inputBase, inputAddress + 2) & 0xFFL) << 16;
             case 2:
-                bits |= (UNSAFE.getByte(inputBase, inputAddress + 1) & 0xFFL) << 8;
+                bits |= (UnsafeUtil.getByte(inputBase, inputAddress + 1) & 0xFFL) << 8;
         }
 
         return bits;
@@ -101,7 +102,7 @@ public class BitInputStream {
         public void initialize() {
             verify(endAddress - startAddress >= 1, startAddress, "Bitstream is empty");
 
-            int lastByte = UNSAFE.getByte(inputBase, endAddress - 1) & 0xFF;
+            int lastByte = UnsafeUtil.getByte(inputBase, endAddress - 1) & 0xFF;
             verify(lastByte != 0, endAddress, "Bitstream end mark not present");
 
             bitsConsumed = SIZE_OF_LONG - highestBit(lastByte);
@@ -109,7 +110,7 @@ public class BitInputStream {
             int inputSize = (int)(endAddress - startAddress);
             if (inputSize >= SIZE_OF_LONG) {  /* normal case */
                 currentAddress = endAddress - SIZE_OF_LONG;
-                bits = UNSAFE.getLong(inputBase, currentAddress);
+                bits = UnsafeUtil.getLong(inputBase, currentAddress);
             } else {
                 currentAddress = startAddress;
                 bits = readTail(inputBase, startAddress, inputSize);
@@ -165,19 +166,19 @@ public class BitInputStream {
             if (currentAddress >= startAddress + SIZE_OF_LONG) {
                 if (bytes > 0) {
                     currentAddress -= bytes;
-                    bits = UNSAFE.getLong(inputBase, currentAddress);
+                    bits = UnsafeUtil.getLong(inputBase, currentAddress);
                 }
                 bitsConsumed &= 0b111;
             } else if (currentAddress - bytes < startAddress) {
                 bytes = (int)(currentAddress - startAddress);
                 currentAddress = startAddress;
                 bitsConsumed -= bytes * SIZE_OF_LONG;
-                bits = UNSAFE.getLong(inputBase, startAddress);
+                bits = UnsafeUtil.getLong(inputBase, startAddress);
                 return true;
             } else {
                 currentAddress -= bytes;
                 bitsConsumed -= bytes * SIZE_OF_LONG;
-                bits = UNSAFE.getLong(inputBase, currentAddress);
+                bits = UnsafeUtil.getLong(inputBase, currentAddress);
             }
 
             return false;

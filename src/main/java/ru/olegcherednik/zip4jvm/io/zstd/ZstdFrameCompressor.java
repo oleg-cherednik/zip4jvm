@@ -394,7 +394,7 @@ class ZstdFrameCompressor
                 throw new IllegalStateException();
         }
 
-        UNSAFE.putByte(outputBase, outputAddress + headerSize, UNSAFE.getByte(inputBase, inputAddress));
+        UNSAFE.putByte(outputBase, outputAddress + headerSize, UnsafeUtil.getByte(inputBase, inputAddress));
 
         return headerSize + 1;
     }

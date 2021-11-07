@@ -13,8 +13,9 @@
  */
 package ru.olegcherednik.zip4jvm.io.zstd.bit;
 
+import ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil;
+
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_LONG;
-import static ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil.UNSAFE;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.checkArgument;
 
 public class BitOutputStream {
@@ -61,7 +62,7 @@ public class BitOutputStream {
     public void flush() {
         int bytes = bitCount >>> 3;
 
-        UNSAFE.putLong(outputBase, currentAddress, container);
+        UnsafeUtil.putLong(outputBase, currentAddress, container);
         currentAddress += bytes;
 
         if (currentAddress > outputLimit) {

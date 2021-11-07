@@ -84,7 +84,7 @@ class SequenceStore
         long output = ARRAY_BYTE_BASE_OFFSET + literalsLength;
         int copied = 0;
         do {
-            UNSAFE.putLong(literalsBuffer, output, UNSAFE.getLong(literalBase, input));
+            UnsafeUtil.putLong(literalsBuffer, output, UnsafeUtil.getLong(literalBase, input));
             input += SIZE_OF_LONG;
             output += SIZE_OF_LONG;
             copied += SIZE_OF_LONG;
