@@ -36,15 +36,18 @@ public class ZstdInputStream extends InputStream {
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
         if (output == null) {
-            ByteBuffer input = ByteBuffer.wrap(in.readBytes(len + 500_000));
-            output = ByteBuffer.allocate(len + 500_000);
+            in.mark("start");
+            ByteBuffer input = ByteBuffer.wrap(in.readBytes(500_000));
+            output = ByteBuffer.allocate(500_000);
             decompressor.decompress(input, output);
             this.offs = 0;
+            in.seek("start");
+            in.skip(output.position());
         }
 
         int minLen = Math.min(len, output.position() - this.offs);
 
-        if(minLen == 0) {
+        if (minLen == 0) {
             output = null;
             return IOUtils.EOF;
         }
@@ -60,3 +63,5 @@ public class ZstdInputStream extends InputStream {
     }
 
 }
+
+

@@ -82,7 +82,9 @@ public class LittleEndianDataInputFile implements DataInputFile {
                 res += totalRead;
 
             if (totalRead == IOUtils.EOF || totalRead < size) {
-                openNextDisk();
+                if (!openNextDisk())
+                    break;
+
                 offs += Math.max(0, totalRead);
                 size -= Math.max(0, totalRead);
             }
@@ -105,7 +107,7 @@ public class LittleEndianDataInputFile implements DataInputFile {
     public long getDiskRelativeOffs() {
         try {
             return in.getFilePointer();
-        } catch(IOException e) {
+        } catch (IOException e) {
             return IOUtils.EOF;
         }
     }
@@ -137,4 +139,5 @@ public class LittleEndianDataInputFile implements DataInputFile {
     public String toString() {
         return in == null ? "<empty>" : "offs: " + getAbsoluteOffs() + " (0x" + Long.toHexString(getAbsoluteOffs()) + ')';
     }
+
 }
