@@ -39,7 +39,7 @@ public class CompressionZstdTest {
         Zip4jvmSuite.removeDir(rootDir);
     }
 
-    public void shouldCreateSingleZipWithFilesWhenLzmaCompressionNormalLevelEosMarker() throws IOException {
+    public void shouldCreateSingleZipWithFilesWhenZstdCompressionNormalLevelEosMarker() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
                                                          .compression(Compression.ZSTD, CompressionLevel.NORMAL)
                                                          .lzmaEosMarker(true).build();

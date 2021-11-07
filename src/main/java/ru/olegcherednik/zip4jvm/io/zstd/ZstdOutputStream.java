@@ -44,6 +44,7 @@ public class ZstdOutputStream extends OutputStream {
 
     private ByteBuffer inputBuffer;
 
+    @Override
     public void write(final byte[] buf, int offs, final int len) throws IOException {
         if (inputBuffer == null)
             inputBuffer = ByteBuffer.allocate(500_000);
@@ -56,12 +57,17 @@ public class ZstdOutputStream extends OutputStream {
         if (inputBuffer == null)
             return;
 
+        int len = inputBuffer.position();
+        byte[] buf = new byte[len];
+        System.arraycopy(inputBuffer.array(), 0, buf, 0, buf.length);
+        inputBuffer = ByteBuffer.wrap(buf);
+
         ByteBuffer outputBuffer = ByteBuffer.allocate(500_000);
         compressor.compress(inputBuffer, outputBuffer);
 
-        int len = outputBuffer.position();
-        byte[] buf = new byte[len];
-        outputBuffer.get(buf, 0, buf.length);
+        len = outputBuffer.position();
+        buf = new byte[len];
+        System.arraycopy(outputBuffer.array(), 0, buf, 0, buf.length);
 
         out.write(buf, 0, buf.length);
         inputBuffer = null;
