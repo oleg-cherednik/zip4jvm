@@ -14,7 +14,8 @@ public enum Compression {
     DEFLATE(CompressionMethod.DEFLATE),
     ENHANCED_DEFLATE(CompressionMethod.ENHANCED_DEFLATE),
     BZIP2(CompressionMethod.BZIP2),
-    LZMA(CompressionMethod.LZMA);
+    LZMA(CompressionMethod.LZMA),
+    ZSTD(CompressionMethod.ZSTD);
 
     private final CompressionMethod method;
 

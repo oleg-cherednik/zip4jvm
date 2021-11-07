@@ -18,7 +18,6 @@ public class ZstdInputStream extends InputStream {
     private final DataInput in;
     private final ZstdDecompressor decompressor;
 
-
     public ZstdInputStream(DataInput in) throws IOException {
 //        verifyMagic(in);
         this.in = in;

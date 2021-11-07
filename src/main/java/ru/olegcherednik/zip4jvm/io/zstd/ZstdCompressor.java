@@ -20,12 +20,16 @@ import static ru.olegcherednik.zip4jvm.io.zstd.Constants.MAX_BLOCK_SIZE;
 import static ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil.getAddress;
 import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
 
-public class ZstdCompressor
-        implements Compressor
-{
+public class ZstdCompressor implements Compressor {
+
+    private final int compressionLevel;
+
+    public ZstdCompressor(int compressionLevel) {
+        this.compressionLevel = compressionLevel;
+    }
+
     @Override
-    public int maxCompressedLength(int uncompressedSize)
-    {
+    public int maxCompressedLength(int uncompressedSize) {
         int result = uncompressedSize + (uncompressedSize >>> 8);
 
         if (uncompressedSize < MAX_BLOCK_SIZE) {
@@ -36,17 +40,16 @@ public class ZstdCompressor
     }
 
     @Override
-    public int compress(byte[] input, int inputOffset, int inputLength, byte[] output, int outputOffset, int maxOutputLength)
-    {
+    public int compress(byte[] input, int inputOffset, int inputLength, byte[] output, int outputOffset, int maxOutputLength) {
         long inputAddress = ARRAY_BYTE_BASE_OFFSET + inputOffset;
         long outputAddress = ARRAY_BYTE_BASE_OFFSET + outputOffset;
 
-        return ZstdFrameCompressor.compress(input, inputAddress, inputAddress + inputLength, output, outputAddress, outputAddress + maxOutputLength, CompressionParameters.DEFAULT_COMPRESSION_LEVEL);
+        return ZstdFrameCompressor.compress(input, inputAddress, inputAddress + inputLength, output, outputAddress, outputAddress + maxOutputLength,
+                CompressionParameters.DEFAULT_COMPRESSION_LEVEL);
     }
 
     @Override
-    public void compress(ByteBuffer inputBuffer, ByteBuffer outputBuffer)
-    {
+    public void compress(ByteBuffer inputBuffer, ByteBuffer outputBuffer) {
         // Java 9+ added an overload of various methods in ByteBuffer. When compiling with Java 11+ and targeting Java 8 bytecode
         // the resulting signatures are invalid for JDK 8, so accesses below result in NoSuchMethodError. Accessing the
         // methods through the interface class works around the problem
@@ -62,13 +65,11 @@ public class ZstdCompressor
             long address = getAddress(input);
             inputAddress = address + input.position();
             inputLimit = address + input.limit();
-        }
-        else if (input.hasArray()) {
+        } else if (input.hasArray()) {
             inputBase = input.array();
             inputAddress = ARRAY_BYTE_BASE_OFFSET + input.arrayOffset() + input.position();
             inputLimit = ARRAY_BYTE_BASE_OFFSET + input.arrayOffset() + input.limit();
-        }
-        else {
+        } else {
             throw new IllegalArgumentException("Unsupported input ByteBuffer implementation " + input.getClass().getName());
         }
 
@@ -80,13 +81,11 @@ public class ZstdCompressor
             long address = getAddress(output);
             outputAddress = address + output.position();
             outputLimit = address + output.limit();
-        }
-        else if (output.hasArray()) {
+        } else if (output.hasArray()) {
             outputBase = output.array();
             outputAddress = ARRAY_BYTE_BASE_OFFSET + output.arrayOffset() + output.position();
             outputLimit = ARRAY_BYTE_BASE_OFFSET + output.arrayOffset() + output.limit();
-        }
-        else {
+        } else {
             throw new IllegalArgumentException("Unsupported output ByteBuffer implementation " + output.getClass().getName());
         }
 
@@ -103,9 +102,10 @@ public class ZstdCompressor
                         outputBase,
                         outputAddress,
                         outputLimit,
-                        CompressionParameters.DEFAULT_COMPRESSION_LEVEL);
+                        compressionLevel);
                 output.position(output.position() + written);
             }
         }
     }
+
 }
