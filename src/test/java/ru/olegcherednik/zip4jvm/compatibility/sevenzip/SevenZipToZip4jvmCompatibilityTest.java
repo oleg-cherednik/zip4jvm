@@ -57,4 +57,10 @@ public class SevenZipToZip4jvmCompatibilityTest {
         assertThatDirectory(destDir).matches(dirBikesAssert);
     }
 
+//    public void shouldUnzipWhenZstdAndAesEncryption() throws IOException {
+//        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+//        UnzipIt.zip(sevenZipZstdSolidAesZip).destDir(destDir).password(password).extract();
+//        assertThatDirectory(destDir).matches(dirBikesAssert);
+//    }
+
 }
