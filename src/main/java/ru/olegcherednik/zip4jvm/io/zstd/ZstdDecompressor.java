@@ -19,27 +19,9 @@ import java.nio.ByteBuffer;
 import static ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil.getAddress;
 import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
 
-public class ZstdDecompressor
-        implements Decompressor
-{
-    private final ZstdFrameDecompressor decompressor = new ZstdFrameDecompressor();
+public class ZstdDecompressor {
 
-    @Override
-    public int decompress(byte[] input, int inputOffset, int inputLength, byte[] output, int outputOffset, int maxOutputLength)
-            throws MalformedInputException
-    {
-        long inputAddress = ARRAY_BYTE_BASE_OFFSET + (long)inputOffset;
-        long inputLimit = inputAddress + inputLength;
-        long outputAddress = ARRAY_BYTE_BASE_OFFSET + (long)outputOffset;
-        long outputLimit = outputAddress + maxOutputLength;
-
-        return decompressor.decompress(input, inputAddress, inputLimit, output, outputAddress, outputLimit);
-    }
-
-    @Override
-    public void decompress(ByteBuffer inputBuffer, ByteBuffer outputBuffer)
-            throws MalformedInputException
-    {
+    public void decompress(ByteBuffer inputBuffer, ByteBuffer outputBuffer) throws MalformedInputException {
         // Java 9+ added an overload of various methods in ByteBuffer. When compiling with Java 11+ and targeting Java 8 bytecode
         // the resulting signatures are invalid for JDK 8, so accesses below result in NoSuchMethodError. Accessing the
         // methods through the interface class works around the problem
@@ -55,13 +37,11 @@ public class ZstdDecompressor
             long address = getAddress(input);
             inputAddress = address + input.position();
             inputLimit = address + input.limit();
-        }
-        else if (input.hasArray()) {
+        } else if (input.hasArray()) {
             inputBase = input.array();
             inputAddress = ARRAY_BYTE_BASE_OFFSET + input.arrayOffset() + input.position();
             inputLimit = ARRAY_BYTE_BASE_OFFSET + input.arrayOffset() + input.limit();
-        }
-        else {
+        } else {
             throw new IllegalArgumentException("Unsupported input ByteBuffer implementation " + input.getClass().getName());
         }
 
@@ -73,13 +53,11 @@ public class ZstdDecompressor
             long address = getAddress(output);
             outputAddress = address + output.position();
             outputLimit = address + output.limit();
-        }
-        else if (output.hasArray()) {
+        } else if (output.hasArray()) {
             outputBase = output.array();
             outputAddress = ARRAY_BYTE_BASE_OFFSET + output.arrayOffset() + output.position();
             outputLimit = ARRAY_BYTE_BASE_OFFSET + output.arrayOffset() + output.limit();
-        }
-        else {
+        } else {
             throw new IllegalArgumentException("Unsupported output ByteBuffer implementation " + output.getClass().getName());
         }
 
@@ -95,9 +73,4 @@ public class ZstdDecompressor
         }
     }
 
-    public static long getDecompressedSize(byte[] input, int offset, int length)
-    {
-        int baseAddress = ARRAY_BYTE_BASE_OFFSET + offset;
-        return ZstdFrameDecompressor.getDecompressedSize(input, baseAddress, baseAddress + length);
-    }
 }
