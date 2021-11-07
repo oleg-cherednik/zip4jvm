@@ -13,11 +13,9 @@
  */
 package ru.olegcherednik.zip4jvm.io.zstd;
 
-import sun.misc.Unsafe;
-
 public final class UnsafeUtil {
 
-    public static final int ARRAY_BYTE_BASE_OFFSET = Unsafe.ARRAY_BYTE_BASE_OFFSET;
+    public static final int ARRAY_BYTE_BASE_OFFSET = 0;
 
     private UnsafeUtil() {}
 

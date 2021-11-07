@@ -19,7 +19,6 @@ import ru.olegcherednik.zip4jvm.io.zstd.bit.BitOutputStream;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_INT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_LONG;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;
-import static ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil.ARRAY_BYTE_BASE_OFFSET;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.checkArgument;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.verify;
 import static ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream.peekBits;
@@ -40,7 +39,7 @@ public class FiniteStateEntropy
     public static int decompress(FiniteStateEntropy.Table table, final byte[] inputBase, final long inputAddress, final long inputLimit, byte[] outputBuffer)
     {
         final byte[] outputBase = outputBuffer;
-        final long outputAddress = ARRAY_BYTE_BASE_OFFSET;
+        final long outputAddress = 0;
         final long outputLimit = outputAddress + outputBuffer.length;
 
         long input = inputAddress;
@@ -152,16 +151,11 @@ public class FiniteStateEntropy
         return (int) (output - outputAddress);
     }
 
-    public static int compress(byte[] outputBase, long outputAddress, int outputSize, byte[] input, int inputSize, FseCompressionTable table)
-    {
-        return compress(outputBase, outputAddress, outputSize, input, ARRAY_BYTE_BASE_OFFSET, inputSize, table);
-    }
-
-    public static int compress(byte[] outputBase, long outputAddress, int outputSize, byte[] inputBase, long inputAddress, int inputSize, FseCompressionTable table)
+    public static int compress(byte[] outputBase, long outputAddress, int outputSize, byte[] inputBase, int inputSize, FseCompressionTable table)
     {
         checkArgument(outputSize >= SIZE_OF_LONG, "Output buffer too small");
 
-        final long start = inputAddress;
+        final long start = 0;
         final long inputLimit = start + inputSize;
 
         long input = inputLimit;

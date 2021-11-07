@@ -14,7 +14,6 @@
 package ru.olegcherednik.zip4jvm.io.zstd;
 
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_LONG;
-import static ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil.ARRAY_BYTE_BASE_OFFSET;
 
 class SequenceStore
 {
@@ -73,14 +72,14 @@ class SequenceStore
 
     public void appendLiterals(Object inputBase, long inputAddress, int inputSize)
     {
-        UnsafeUtil.copyMemory(inputBase, inputAddress, literalsBuffer, ARRAY_BYTE_BASE_OFFSET + literalsLength, inputSize);
+        UnsafeUtil.copyMemory(inputBase, inputAddress, literalsBuffer, literalsLength, inputSize);
         literalsLength += inputSize;
     }
 
     public void storeSequence(Object literalBase, long literalAddress, int literalLength, int offsetCode, int matchLengthBase)
     {
         long input = literalAddress;
-        long output = ARRAY_BYTE_BASE_OFFSET + literalsLength;
+        long output = literalsLength;
         int copied = 0;
         do {
             UnsafeUtil.putLong(literalsBuffer, output, UnsafeUtil.getLong((byte[])literalBase, input));

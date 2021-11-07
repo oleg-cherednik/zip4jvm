@@ -15,16 +15,14 @@ package ru.olegcherednik.zip4jvm.io.zstd;
 
 import java.util.Arrays;
 
-import static ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil.ARRAY_BYTE_BASE_OFFSET;
-
 public class Histogram {
 
     private Histogram() {
     }
 
     // TODO: count parallel heuristic for large inputs
-    private static void count(byte[] inputBase, long inputAddress, int inputSize, int[] counts) {
-        long input = inputAddress;
+    public static void count(byte[] inputBase, int inputSize, int[] counts) {
+        long input = 0;
 
         Arrays.fill(counts, 0);
 
@@ -51,10 +49,6 @@ public class Histogram {
             maxSymbol--;
         }
         return maxSymbol;
-    }
-
-    public static void count(byte[] input, int length, int[] counts) {
-        count(input, ARRAY_BYTE_BASE_OFFSET, length, counts);
     }
 
 }
