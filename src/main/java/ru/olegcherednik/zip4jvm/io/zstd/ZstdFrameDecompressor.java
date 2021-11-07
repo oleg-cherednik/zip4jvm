@@ -166,18 +166,13 @@ class ZstdFrameDecompressor {
         return size;
     }
 
-    static FrameHeader readFrameHeader(final byte[] inputBase, final int offs) {
+    static FrameHeader readFrameHeader(final Object inputBase, final int offs) {
         int input = offs;
 
         int frameHeaderDescriptor = UnsafeUtil.getByte(inputBase, input++) & 0xFF;
         boolean singleSegment = (frameHeaderDescriptor & 0b100000) != 0;
         int dictionaryDescriptor = frameHeaderDescriptor & 0b11;
         int contentSizeDescriptor = frameHeaderDescriptor >>> 6;
-
-        int headerSize = 1 +
-                (singleSegment ? 0 : 1) +
-                (dictionaryDescriptor == 0 ? 0 : (1 << (dictionaryDescriptor - 1))) +
-                (contentSizeDescriptor == 0 ? singleSegment ? 1 : 0 : (1 << contentSizeDescriptor));
 
         // decode window size
         int windowSize = -1;
@@ -234,21 +229,16 @@ class ZstdFrameDecompressor {
 
         boolean hasChecksum = (frameHeaderDescriptor & 0b100) != 0;
 
-        return new FrameHeader(
-                input - offs,
-                windowSize,
-                contentSize,
-                dictionaryId,
-                hasChecksum);
+        return new FrameHeader(input - offs, windowSize, contentSize, dictionaryId, hasChecksum);
     }
 
-    static int verifyMagic(byte[] inputBase, int offs) {
-        int magic = UnsafeUtil.getInt(inputBase, offs);
+    static int verifyMagic(Object inputBase, int inputAddress) {
+        int magic = UnsafeUtil.getInt(inputBase, inputAddress);
         if (magic != MAGIC_NUMBER) {
             if (magic == V07_MAGIC_NUMBER) {
-                throw new MalformedInputException(offs, "Data encoded in unsupported ZSTD v0.7 format");
+                throw new MalformedInputException(inputAddress, "Data encoded in unsupported ZSTD v0.7 format");
             }
-            throw new MalformedInputException(offs, "Invalid magic prefix: " + Integer.toHexString(magic));
+            throw new MalformedInputException(inputAddress, "Invalid magic prefix: " + Integer.toHexString(magic));
         }
 
         return SIZE_OF_INT;
@@ -260,18 +250,18 @@ class ZstdFrameDecompressor {
     }
 
     private int decompress(
-            final byte[] inputBase, final int offs,
-            final byte[] outputBase, final long outputAddress, final long outputLimit) {
+            final Object inputBase, final int inputAddress,
+            final Object outputBase, final long outputAddress, final long outputLimit) {
         if (outputAddress == outputLimit) {
             return 0;
         }
 
-        int input = offs;
+        int input = inputAddress;
         long output = outputAddress;
 
         reset();
         long outputStart = output;
-        input += verifyMagic(inputBase, offs);
+        input += verifyMagic(inputBase, inputAddress);
 
         FrameHeader frameHeader = readFrameHeader(inputBase, input);
         input += frameHeader.headerSize;

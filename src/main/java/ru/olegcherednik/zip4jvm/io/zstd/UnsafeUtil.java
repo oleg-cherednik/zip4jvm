@@ -52,8 +52,17 @@ public final class UnsafeUtil {
         }
     }
 
-    public static int getInt(Object inputBase, long offs) {
-        return UNSAFE.getInt(inputBase, offs);
+    public static int getInt(Object inputBase, long inputAddress) {
+        byte[] in = (byte[])inputBase;
+        byte a = in[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET];
+        byte b = in[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET + 1];
+        byte c = in[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET + 2];
+        byte d = in[(int)inputAddress - ARRAY_BYTE_BASE_OFFSET + 3];
+        int res = d & 0xFF;
+        res = res << 8 | c & 0xFF;
+        res = res << 8 | b & 0xFF;
+        return res << 8 | a & 0xFF;
+//        return UNSAFE.getInt(inputBase, inputAddress);
     }
 
     public static long getLong(Object inputBase, long inputAddress) {
