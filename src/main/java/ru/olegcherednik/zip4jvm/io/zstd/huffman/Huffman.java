@@ -23,7 +23,6 @@ import java.util.Arrays;
 
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_INT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;
-import static ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil.UNSAFE;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.isPowerOf2;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.verify;
 import static ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream.isEndOfStream;
@@ -174,9 +173,9 @@ public class Huffman
         verify(inputLimit - inputAddress >= 10, inputAddress, "Input is corrupted"); // jump table + 1 byte per stream
 
         long start1 = inputAddress + 3 * SIZE_OF_SHORT; // for the shorts we read below
-        long start2 = start1 + (UNSAFE.getShort(inputBase, inputAddress) & 0xFFFF);
-        long start3 = start2 + (UNSAFE.getShort(inputBase, inputAddress + 2) & 0xFFFF);
-        long start4 = start3 + (UNSAFE.getShort(inputBase, inputAddress + 4) & 0xFFFF);
+        long start2 = start1 + (UnsafeUtil.getShort(inputBase, inputAddress) & 0xFFFF);
+        long start3 = start2 + (UnsafeUtil.getShort(inputBase, inputAddress + 2) & 0xFFFF);
+        long start4 = start3 + (UnsafeUtil.getShort(inputBase, inputAddress + 4) & 0xFFFF);
 
         BitInputStream.Initializer initializer = new BitInputStream.Initializer(inputBase, start1, start2);
         initializer.initialize();

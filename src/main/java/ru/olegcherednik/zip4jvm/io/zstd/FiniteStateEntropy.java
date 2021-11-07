@@ -16,13 +16,12 @@ package ru.olegcherednik.zip4jvm.io.zstd;
 import ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream;
 import ru.olegcherednik.zip4jvm.io.zstd.bit.BitOutputStream;
 
-import static ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream.peekBits;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_INT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_LONG;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;
-import static ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil.UNSAFE;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.checkArgument;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.verify;
+import static ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream.peekBits;
 import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
 
 public class FiniteStateEntropy
@@ -450,7 +449,7 @@ public class FiniteStateEntropy
                     bitStream |= (0b11_11_11_11_11_11_11_11 << bitCount);
                     checkArgument(output + SIZE_OF_SHORT <= outputLimit, "Output buffer too small");
 
-                    UNSAFE.putShort(outputBase, output, (short) bitStream);
+                    UnsafeUtil.putShort(outputBase, output, (short) bitStream);
                     output += SIZE_OF_SHORT;
 
                     // flush now, so no need to increase bitCount by 16
@@ -472,7 +471,7 @@ public class FiniteStateEntropy
                 if (bitCount > 16) {
                     checkArgument(output + SIZE_OF_SHORT <= outputLimit, "Output buffer too small");
 
-                    UNSAFE.putShort(outputBase, output, (short) bitStream);
+                    UnsafeUtil.putShort(outputBase, output, (short) bitStream);
                     output += SIZE_OF_SHORT;
 
                     bitStream >>>= Short.SIZE;
@@ -505,7 +504,7 @@ public class FiniteStateEntropy
             if (bitCount > 16) {
                 checkArgument(output + SIZE_OF_SHORT <= outputLimit, "Output buffer too small");
 
-                UNSAFE.putShort(outputBase, output, (short) bitStream);
+                UnsafeUtil.putShort(outputBase, output, (short) bitStream);
                 output += SIZE_OF_SHORT;
 
                 bitStream >>>= Short.SIZE;
@@ -515,7 +514,7 @@ public class FiniteStateEntropy
 
         // flush remaining bitstream
         checkArgument(output + SIZE_OF_SHORT <= outputLimit, "Output buffer too small");
-        UNSAFE.putShort(outputBase, output, (short) bitStream);
+        UnsafeUtil.putShort(outputBase, output, (short) bitStream);
         output += (bitCount + 7) / 8;
 
         checkArgument(symbol <= maxSymbol + 1, "Error"); // TODO

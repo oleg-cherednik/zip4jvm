@@ -15,18 +15,15 @@ package ru.olegcherednik.zip4jvm.io.zstd;
 
 import java.util.Arrays;
 
-import static ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil.UNSAFE;
 import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
 
-public class Histogram
-{
-    private Histogram()
-    {
+public class Histogram {
+
+    private Histogram() {
     }
 
     // TODO: count parallel heuristic for large inputs
-    private static void count(Object inputBase, long inputAddress, int inputSize, int[] counts)
-    {
+    private static void count(Object inputBase, long inputAddress, int inputSize, int[] counts) {
         long input = inputAddress;
 
         Arrays.fill(counts, 0);
@@ -38,8 +35,7 @@ public class Histogram
         }
     }
 
-    public static int findLargestCount(int[] counts, int maxSymbol)
-    {
+    public static int findLargestCount(int[] counts, int maxSymbol) {
         int max = 0;
         for (int i = 0; i <= maxSymbol; i++) {
             if (counts[i] > max) {
@@ -50,16 +46,15 @@ public class Histogram
         return max;
     }
 
-    public static int findMaxSymbol(int[] counts, int maxSymbol)
-    {
+    public static int findMaxSymbol(int[] counts, int maxSymbol) {
         while (counts[maxSymbol] == 0) {
             maxSymbol--;
         }
         return maxSymbol;
     }
 
-    public static void count(byte[] input, int length, int[] counts)
-    {
+    public static void count(byte[] input, int length, int[] counts) {
         count(input, ARRAY_BYTE_BASE_OFFSET, length, counts);
     }
+
 }

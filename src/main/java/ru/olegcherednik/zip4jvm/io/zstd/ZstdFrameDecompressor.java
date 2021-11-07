@@ -323,7 +323,7 @@ class ZstdFrameDecompressor {
         if (sequenceCount != 0) {
             if (sequenceCount == 255) {
                 verify(input + SIZE_OF_SHORT <= inputLimit, input, "Not enough input bytes");
-                sequenceCount = (UNSAFE.getShort(inputBase, input) & 0xFFFF) + LONG_NUMBER_OF_SEQUENCES;
+                sequenceCount = (UnsafeUtil.getShort(inputBase, input) & 0xFFFF) + LONG_NUMBER_OF_SEQUENCES;
                 input += SIZE_OF_SHORT;
             } else if (sequenceCount > 127) {
                 verify(input < inputLimit, input, "Not enough input bytes");
@@ -559,7 +559,7 @@ class ZstdFrameDecompressor {
             UnsafeUtil.putByte(outputBase, output + 3, UnsafeUtil.getByte(outputBase, matchAddress + 3));
             matchAddress += increment32;
 
-            UNSAFE.putInt(outputBase, output + 4, UnsafeUtil.getInt(outputBase, matchAddress));
+            UnsafeUtil.putInt(outputBase, output + 4, UnsafeUtil.getInt(outputBase, matchAddress));
             matchAddress -= decrement64;
         } else {
             UnsafeUtil.putLong(outputBase, output, UnsafeUtil.getLong(outputBase, matchAddress));
@@ -769,7 +769,7 @@ class ZstdFrameDecompressor {
                 input++;
                 break;
             case 1:
-                outputSize = (UNSAFE.getShort(inputBase, input) & 0xFFFF) >>> 4;
+                outputSize = (UnsafeUtil.getShort(inputBase, input) & 0xFFFF) >>> 4;
                 input += 2;
                 break;
             case 3:
@@ -806,13 +806,13 @@ class ZstdFrameDecompressor {
                 input++;
                 break;
             case 1:
-                literalSize = (UNSAFE.getShort(inputBase, input) & 0xFFFF) >>> 4;
+                literalSize = (UnsafeUtil.getShort(inputBase, input) & 0xFFFF) >>> 4;
                 input += 2;
                 break;
             case 3:
                 // read 3 little-endian bytes
                 int header = ((UnsafeUtil.getByte(inputBase, input) & 0xFF) |
-                        ((UNSAFE.getShort(inputBase, input + 1) & 0xFFFF) << 8));
+                        ((UnsafeUtil.getShort(inputBase, input + 1) & 0xFFFF) << 8));
 
                 literalSize = header >>> 4;
                 input += 3;
@@ -877,7 +877,7 @@ class ZstdFrameDecompressor {
                 input += SIZE_OF_BYTE;
                 break;
             case 2:
-                dictionaryId = UNSAFE.getShort(inputBase, input) & 0xFFFF;
+                dictionaryId = UnsafeUtil.getShort(inputBase, input) & 0xFFFF;
                 input += SIZE_OF_SHORT;
                 break;
             case 3:
@@ -897,7 +897,7 @@ class ZstdFrameDecompressor {
                 }
                 break;
             case 1:
-                contentSize = UNSAFE.getShort(inputBase, input) & 0xFFFF;
+                contentSize = UnsafeUtil.getShort(inputBase, input) & 0xFFFF;
                 contentSize += 256;
                 input += SIZE_OF_SHORT;
                 break;

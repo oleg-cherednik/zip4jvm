@@ -20,6 +20,7 @@ import java.nio.Buffer;
 import java.nio.ByteOrder;
 
 import static java.lang.String.format;
+import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
 
 public final class UnsafeUtil {
 
@@ -62,6 +63,10 @@ public final class UnsafeUtil {
         return UNSAFE.getByte(inputBase, inputAddress);
     }
 
+    public static short getShort(Object inputBase, long inputAddress) {
+        return UNSAFE.getShort(inputBase, inputAddress);
+    }
+
     public static long getAddress(Buffer buffer) {
         if (!buffer.isDirect()) {
             throw new IllegalArgumentException("buffer is not direct");
@@ -76,6 +81,18 @@ public final class UnsafeUtil {
 
     public static void putByte(Object outputBase, long output, byte value) {
         UNSAFE.putByte(outputBase, output, value);
+    }
+
+    public static void putShort(Object outputBase, long output, short value) {
+        UNSAFE.putShort(outputBase, output, value);
+    }
+
+    public static void putInt(Object outputBase, long output, int value) {
+        UNSAFE.putInt(outputBase, output, value);
+    }
+
+    public static void copyMemory(Object inputBase, long inputAddress, Object literalsBuffer, long literalsLength, long inputSize) {
+        UNSAFE.copyMemory(inputBase, inputAddress, literalsBuffer, ARRAY_BYTE_BASE_OFFSET + literalsLength, inputSize);
     }
 
 }

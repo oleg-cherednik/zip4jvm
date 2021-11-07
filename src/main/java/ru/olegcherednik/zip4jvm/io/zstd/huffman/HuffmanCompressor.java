@@ -18,16 +18,14 @@ import ru.olegcherednik.zip4jvm.io.zstd.bit.BitOutputStream;
 
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_LONG;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;
-import static ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil.UNSAFE;
 
-public class HuffmanCompressor
-{
-    private HuffmanCompressor()
-    {
+public class HuffmanCompressor {
+
+    private HuffmanCompressor() {
     }
 
-    public static int compress4streams(Object outputBase, long outputAddress, int outputSize, Object inputBase, long inputAddress, int inputSize, HuffmanCompressionTable table)
-    {
+    public static int compress4streams(Object outputBase, long outputAddress, int outputSize, Object inputBase, long inputAddress, int inputSize,
+            HuffmanCompressionTable table) {
         long input = inputAddress;
         long inputLimit = inputAddress + inputSize;
         long output = outputAddress;
@@ -35,7 +33,8 @@ public class HuffmanCompressor
 
         int segmentSize = (inputSize + 3) / 4;
 
-        if (outputSize < 6 /* jump table */ + 1 /* first stream */ + 1 /* second stream */ + 1 /* third stream */ + 8 /* 8 bytes minimum needed by the bitstream encoder */) {
+        if (outputSize < 6 /* jump table */ + 1 /* first stream */ + 1 /* second stream */ + 1 /* third stream */ +
+                8 /* 8 bytes minimum needed by the bitstream encoder */) {
             return 0; // minimum space to compress successfully
         }
 
@@ -48,44 +47,44 @@ public class HuffmanCompressor
         int compressedSize;
 
         // first segment
-        compressedSize = compressSingleStream(outputBase, output, (int) (outputLimit - output), inputBase, input, segmentSize, table);
+        compressedSize = compressSingleStream(outputBase, output, (int)(outputLimit - output), inputBase, input, segmentSize, table);
         if (compressedSize == 0) {
             return 0;
         }
-        UNSAFE.putShort(outputBase, outputAddress, (short) compressedSize);
+        UnsafeUtil.putShort(outputBase, outputAddress, (short)compressedSize);
         output += compressedSize;
         input += segmentSize;
 
         // second segment
-        compressedSize = compressSingleStream(outputBase, output, (int) (outputLimit - output), inputBase, input, segmentSize, table);
+        compressedSize = compressSingleStream(outputBase, output, (int)(outputLimit - output), inputBase, input, segmentSize, table);
         if (compressedSize == 0) {
             return 0;
         }
-        UNSAFE.putShort(outputBase, outputAddress + SIZE_OF_SHORT, (short) compressedSize);
+        UnsafeUtil.putShort(outputBase, outputAddress + SIZE_OF_SHORT, (short)compressedSize);
         output += compressedSize;
         input += segmentSize;
 
         // third segment
-        compressedSize = compressSingleStream(outputBase, output, (int) (outputLimit - output), inputBase, input, segmentSize, table);
+        compressedSize = compressSingleStream(outputBase, output, (int)(outputLimit - output), inputBase, input, segmentSize, table);
         if (compressedSize == 0) {
             return 0;
         }
-        UNSAFE.putShort(outputBase, outputAddress + SIZE_OF_SHORT + SIZE_OF_SHORT, (short) compressedSize);
+        UnsafeUtil.putShort(outputBase, outputAddress + SIZE_OF_SHORT + SIZE_OF_SHORT, (short)compressedSize);
         output += compressedSize;
         input += segmentSize;
 
         // fourth segment
-        compressedSize = compressSingleStream(outputBase, output, (int) (outputLimit - output), inputBase, input, (int) (inputLimit - input), table);
+        compressedSize = compressSingleStream(outputBase, output, (int)(outputLimit - output), inputBase, input, (int)(inputLimit - input), table);
         if (compressedSize == 0) {
             return 0;
         }
         output += compressedSize;
 
-        return (int) (output - outputAddress);
+        return (int)(output - outputAddress);
     }
 
-    public static int compressSingleStream(Object outputBase, long outputAddress, int outputSize, Object inputBase, long inputAddress, int inputSize, HuffmanCompressionTable table)
-    {
+    public static int compressSingleStream(Object outputBase, long outputAddress, int outputSize, Object inputBase, long inputAddress, int inputSize,
+            HuffmanCompressionTable table) {
         if (outputSize < SIZE_OF_LONG) {
             return 0;
         }
@@ -136,4 +135,5 @@ public class HuffmanCompressor
 
         return bitstream.close();
     }
+
 }

@@ -30,11 +30,11 @@ import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_BLOCK_HEADER;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_INT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.TREELESS_LITERALS_BLOCK;
-import static ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman.MAX_SYMBOL;
-import static ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman.MAX_SYMBOL_COUNT;
 import static ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil.UNSAFE;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.checkArgument;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.put24BitLittleEndian;
+import static ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman.MAX_SYMBOL;
+import static ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman.MAX_SYMBOL_COUNT;
 import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
 
 class ZstdFrameCompressor
@@ -58,7 +58,7 @@ class ZstdFrameCompressor
     {
         checkArgument(outputLimit - outputAddress >= SIZE_OF_INT, "Output buffer too small");
 
-        UNSAFE.putInt(outputBase, outputAddress, MAGIC_NUMBER);
+        UnsafeUtil.putInt(outputBase, outputAddress, MAGIC_NUMBER);
         return SIZE_OF_INT;
     }
 
@@ -108,11 +108,11 @@ class ZstdFrameCompressor
                 }
                 break;
             case 1:
-                UNSAFE.putShort(outputBase, output, (short) (inputSize - 256));
+                UnsafeUtil.putShort(outputBase, output, (short) (inputSize - 256));
                 output += SIZE_OF_SHORT;
                 break;
             case 2:
-                UNSAFE.putInt(outputBase, output, inputSize);
+                UnsafeUtil.putInt(outputBase, output, inputSize);
                 output += SIZE_OF_INT;
                 break;
             default:
@@ -131,7 +131,7 @@ class ZstdFrameCompressor
 
         long hash = XxHash64.hash(0, inputBase, inputAddress, inputSize);
 
-        UNSAFE.putInt(outputBase, outputAddress, (int) hash);
+        UnsafeUtil.putInt(outputBase, outputAddress, (int) hash);
 
         return SIZE_OF_INT;
     }
@@ -360,12 +360,12 @@ class ZstdFrameCompressor
             }
             case 4: { // 2 - 2 - 14 - 14
                 int header = encodingType | (2 << 2) | (literalsSize << 4) | (totalSize << 18);
-                UNSAFE.putInt(outputBase, outputAddress, header);
+                UnsafeUtil.putInt(outputBase, outputAddress, header);
                 break;
             }
             case 5: { // 2 - 2 - 18 - 18
                 int header = encodingType | (3 << 2) | (literalsSize << 4) | (totalSize << 22);
-                UNSAFE.putInt(outputBase, outputAddress, header);
+                UnsafeUtil.putInt(outputBase, outputAddress, header);
                 UnsafeUtil.putByte(outputBase, outputAddress + SIZE_OF_INT, (byte) (totalSize >>> 10));
                 break;
             }
@@ -385,10 +385,10 @@ class ZstdFrameCompressor
                 UnsafeUtil.putByte(outputBase, outputAddress, (byte) (RLE_LITERALS_BLOCK | (inputSize << 3)));
                 break;
             case 2: // 2 - 2 - 12
-                UNSAFE.putShort(outputBase, outputAddress, (short) (RLE_LITERALS_BLOCK | (1 << 2) | (inputSize << 4)));
+                UnsafeUtil.putShort(outputBase, outputAddress, (short) (RLE_LITERALS_BLOCK | (1 << 2) | (inputSize << 4)));
                 break;
             case 3: // 2 - 2 - 20
-                UNSAFE.putInt(outputBase, outputAddress, RLE_LITERALS_BLOCK | 3 << 2 | inputSize << 4);
+                UnsafeUtil.putInt(outputBase, outputAddress, RLE_LITERALS_BLOCK | 3 << 2 | inputSize << 4);
                 break;
             default:   // impossible. headerSize is {1,2,3}
                 throw new IllegalStateException();
@@ -423,7 +423,7 @@ class ZstdFrameCompressor
                 UnsafeUtil.putByte(outputBase, outputAddress, (byte) (RAW_LITERALS_BLOCK | (inputSize << 3)));
                 break;
             case 2:
-                UNSAFE.putShort(outputBase, outputAddress, (short) (RAW_LITERALS_BLOCK | (1 << 2) | (inputSize << 4)));
+                UnsafeUtil.putShort(outputBase, outputAddress, (short) (RAW_LITERALS_BLOCK | (1 << 2) | (inputSize << 4)));
                 break;
             case 3:
                 put24BitLittleEndian(outputBase, outputAddress, RAW_LITERALS_BLOCK | (3 << 2) | (inputSize << 4));

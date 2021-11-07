@@ -14,7 +14,6 @@
 package ru.olegcherednik.zip4jvm.io.zstd;
 
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;
-import static ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil.UNSAFE;
 
 public final class Util {
 
@@ -59,7 +58,7 @@ public final class Util {
     }
 
     public static void put24BitLittleEndian(Object outputBase, long outputAddress, int value) {
-        UNSAFE.putShort(outputBase, outputAddress, (short)value);
+        UnsafeUtil.putShort(outputBase, outputAddress, (short)value);
         UnsafeUtil.putByte(outputBase, outputAddress + SIZE_OF_SHORT, (byte)(value >>> Short.SIZE));
     }
 
