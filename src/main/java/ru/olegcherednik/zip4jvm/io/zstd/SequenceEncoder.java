@@ -66,9 +66,9 @@ class SequenceEncoder {
     private SequenceEncoder() {
     }
 
-    public static int compressSequences(byte[] outputBase, final long outputAddress, int outputSize, SequenceStore sequences,
+    public static int compressSequences(byte[] outputBase, final int outputAddress, int outputSize, SequenceStore sequences,
             CompressionParameters.Strategy strategy, SequenceEncodingContext workspace) {
-        long output = outputAddress;
+        int output = outputAddress;
         long outputLimit = outputAddress + outputSize;
 
         checkArgument(outputLimit - output > 3 /* max sequence count Size */ + 1 /* encoding type flags */, "Output buffer too small");
@@ -240,7 +240,7 @@ class SequenceEncoder {
 
     private static int encodeSequences(
             byte[] outputBase,
-            long output,
+            int output,
             long outputLimit,
             FseCompressionTable matchLengthTable,
             FseCompressionTable offsetsTable,
