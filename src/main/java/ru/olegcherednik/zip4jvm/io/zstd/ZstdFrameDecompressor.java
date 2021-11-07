@@ -256,7 +256,7 @@ class ZstdFrameDecompressor {
         }
 
         for (int i = 0; i < remaining; i++) {
-            UNSAFE.putByte(outputBase, output, (byte)value);
+            UnsafeUtil.putByte(outputBase, output, (byte)value);
             output++;
         }
 
@@ -541,7 +541,7 @@ class ZstdFrameDecompressor {
             }
 
             while (output < matchOutputLimit) {
-                UNSAFE.putByte(outputBase, output++, UnsafeUtil.getByte(outputBase, matchAddress++));
+                UnsafeUtil.putByte(outputBase, output++, UnsafeUtil.getByte(outputBase, matchAddress++));
             }
         }
     }
@@ -553,10 +553,10 @@ class ZstdFrameDecompressor {
             int increment32 = DEC_32_TABLE[offset];
             int decrement64 = DEC_64_TABLE[offset];
 
-            UNSAFE.putByte(outputBase, output, UnsafeUtil.getByte(outputBase, matchAddress));
-            UNSAFE.putByte(outputBase, output + 1, UnsafeUtil.getByte(outputBase, matchAddress + 1));
-            UNSAFE.putByte(outputBase, output + 2, UnsafeUtil.getByte(outputBase, matchAddress + 2));
-            UNSAFE.putByte(outputBase, output + 3, UnsafeUtil.getByte(outputBase, matchAddress + 3));
+            UnsafeUtil.putByte(outputBase, output, UnsafeUtil.getByte(outputBase, matchAddress));
+            UnsafeUtil.putByte(outputBase, output + 1, UnsafeUtil.getByte(outputBase, matchAddress + 1));
+            UnsafeUtil.putByte(outputBase, output + 2, UnsafeUtil.getByte(outputBase, matchAddress + 2));
+            UnsafeUtil.putByte(outputBase, output + 3, UnsafeUtil.getByte(outputBase, matchAddress + 3));
             matchAddress += increment32;
 
             UNSAFE.putInt(outputBase, output + 4, UnsafeUtil.getInt(outputBase, matchAddress));
@@ -678,14 +678,14 @@ class ZstdFrameDecompressor {
         }
 
         while (output < literalOutputLimit) {
-            UNSAFE.putByte(outputBase, output, UnsafeUtil.getByte(literalsBase, literalInput));
+            UnsafeUtil.putByte(outputBase, output, UnsafeUtil.getByte(literalsBase, literalInput));
             output++;
             literalInput++;
         }
 
         // copy match
         while (output < matchOutputLimit) {
-            UNSAFE.putByte(outputBase, output, UnsafeUtil.getByte(outputBase, matchAddress));
+            UnsafeUtil.putByte(outputBase, output, UnsafeUtil.getByte(outputBase, matchAddress));
             output++;
             matchAddress++;
         }

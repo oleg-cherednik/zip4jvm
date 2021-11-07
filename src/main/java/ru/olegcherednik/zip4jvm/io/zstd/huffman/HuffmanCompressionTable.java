@@ -17,19 +17,19 @@ import ru.olegcherednik.zip4jvm.io.zstd.FiniteStateEntropy;
 import ru.olegcherednik.zip4jvm.io.zstd.FseCompressionTable;
 import ru.olegcherednik.zip4jvm.io.zstd.Histogram;
 import ru.olegcherednik.zip4jvm.io.zstd.NodeTable;
+import ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil;
 import ru.olegcherednik.zip4jvm.io.zstd.Util;
 import ru.olegcherednik.zip4jvm.io.zstd.bit.BitOutputStream;
 
 import java.util.Arrays;
 
+import static ru.olegcherednik.zip4jvm.io.zstd.Util.checkArgument;
+import static ru.olegcherednik.zip4jvm.io.zstd.Util.minTableLog;
 import static ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman.MAX_FSE_TABLE_LOG;
 import static ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman.MAX_SYMBOL;
 import static ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman.MAX_SYMBOL_COUNT;
 import static ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman.MAX_TABLE_LOG;
 import static ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman.MIN_TABLE_LOG;
-import static ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil.UNSAFE;
-import static ru.olegcherednik.zip4jvm.io.zstd.Util.checkArgument;
-import static ru.olegcherednik.zip4jvm.io.zstd.Util.minTableLog;
 
 public final class HuffmanCompressionTable
 {
@@ -242,7 +242,7 @@ public final class HuffmanCompressionTable
             //   - the compressed size is better than what we'd get with the raw encoding below
             //   - the compressed size is <= 127 bytes, which is the most that the encoding can hold for FSE-compressed weights (see RFC 8478 section 4.2.1.1). This is implied
             //     by the maxSymbol / 2 check, since maxSymbol must be <= 255
-            UNSAFE.putByte(outputBase, output, (byte) size);
+            UnsafeUtil.putByte(outputBase, output, (byte) size);
             return size + 1; // header + size
         }
         else {
@@ -256,12 +256,12 @@ public final class HuffmanCompressionTable
 
             // encode number of symbols
             // header = #entries + 127 per RFC
-            UNSAFE.putByte(outputBase, output, (byte) (127 + entryCount));
+            UnsafeUtil.putByte(outputBase, output, (byte) (127 + entryCount));
             output++;
 
             weights[maxSymbol] = 0; // last weight is implicit, so set to 0 so that it doesn't get encoded below
             for (int i = 0; i < entryCount; i += 2) {
-                UNSAFE.putByte(outputBase, output, (byte) ((weights[i] << 4) + weights[i + 1]));
+                UnsafeUtil.putByte(outputBase, output, (byte) ((weights[i] << 4) + weights[i + 1]));
                 output++;
             }
 

@@ -74,4 +74,8 @@ public final class UnsafeUtil {
         UNSAFE.putLong(outputBase, currentAddress, container);
     }
 
+    public static void putByte(Object outputBase, long output, byte value) {
+        UNSAFE.putByte(outputBase, output, value);
+    }
+
 }
