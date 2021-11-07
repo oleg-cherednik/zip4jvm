@@ -13,55 +13,93 @@
  */
 package ru.olegcherednik.zip4jvm.io.zstd.frame;
 
-import java.util.Objects;
-import java.util.StringJoiner;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil;
 
+import static ru.olegcherednik.zip4jvm.io.zstd.Constants.MIN_WINDOW_LOG;
+import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_BYTE;
+import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_INT;
+import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_LONG;
+import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;
+
+@Getter
+@RequiredArgsConstructor
 public class FrameHeader {
 
-    final int headerSize;
-    final int windowSize;
-    final long contentSize;
-    final long dictionaryId;
-    final boolean hasChecksum;
+    private final int headerSize;
+    private final int windowSize;
+    private final long contentSize;
+    private final long dictionaryId;
+    private final boolean hasChecksum;
 
-    public FrameHeader(int headerSize, int windowSize, long contentSize, long dictionaryId, boolean hasChecksum) {
-        this.headerSize = headerSize;
-        this.windowSize = windowSize;
-        this.contentSize = contentSize;
-        this.dictionaryId = dictionaryId;
-        this.hasChecksum = hasChecksum;
-    }
+    public static FrameHeader read(byte[] inputBase, int offs) {
+        final int pos = offs;
+        int frameHeaderDescriptor = UnsafeUtil.getByte(inputBase, offs++) & 0xFF;
+        boolean singleSegment = (frameHeaderDescriptor & 0b100000) != 0;
+        int dictionaryDescriptor = frameHeaderDescriptor & 0b11;
+        int contentSizeDescriptor = frameHeaderDescriptor >>> 6;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
+        // decode window size
+        int windowSize = -1;
+        if (!singleSegment) {
+            int windowDescriptor = UnsafeUtil.getByte(inputBase, offs++) & 0xFF;
+            int exponent = windowDescriptor >>> 3;
+            int mantissa = windowDescriptor & 0b111;
+
+            int base = 1 << (MIN_WINDOW_LOG + exponent);
+            windowSize = base + (base / 8) * mantissa;
         }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
+
+        // decode dictionary id
+        long dictionaryId = -1;
+        switch (dictionaryDescriptor) {
+            case 0:
+                break;
+            case 1:
+                dictionaryId = UnsafeUtil.getByte(inputBase, offs) & 0xFF;
+                offs += SIZE_OF_BYTE;
+                break;
+            case 2:
+                dictionaryId = UnsafeUtil.getShort(inputBase, offs) & 0xFFFF;
+                offs += SIZE_OF_SHORT;
+                break;
+            case 3:
+                dictionaryId = UnsafeUtil.getInt(inputBase, offs) & 0xFFFF_FFFFL;
+                offs += SIZE_OF_INT;
+                break;
+            default:
+                throw new Zip4jvmException("Custom dictionaries not supported");
         }
-        FrameHeader that = (FrameHeader)o;
-        return headerSize == that.headerSize &&
-                windowSize == that.windowSize &&
-                contentSize == that.contentSize &&
-                dictionaryId == that.dictionaryId &&
-                hasChecksum == that.hasChecksum;
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(headerSize, windowSize, contentSize, dictionaryId, hasChecksum);
-    }
+        // decode content size
+        long contentSize = -1;
+        switch (contentSizeDescriptor) {
+            case 0:
+                if (singleSegment) {
+                    contentSize = UnsafeUtil.getByte(inputBase, offs) & 0xFF;
+                    offs += SIZE_OF_BYTE;
+                }
+                break;
+            case 1:
+                contentSize = UnsafeUtil.getShort(inputBase, offs) & 0xFFFF;
+                contentSize += 256;
+                offs += SIZE_OF_SHORT;
+                break;
+            case 2:
+                contentSize = UnsafeUtil.getInt(inputBase, offs) & 0xFFFF_FFFFL;
+                offs += SIZE_OF_INT;
+                break;
+            case 3:
+                contentSize = UnsafeUtil.getLong(inputBase, offs);
+                offs += SIZE_OF_LONG;
+                break;
+        }
 
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", FrameHeader.class.getSimpleName() + "[", "]")
-                .add("headerSize=" + headerSize)
-                .add("windowSize=" + windowSize)
-                .add("contentSize=" + contentSize)
-                .add("dictionaryId=" + dictionaryId)
-                .add("hasChecksum=" + hasChecksum)
-                .toString();
+        boolean hasChecksum = (frameHeaderDescriptor & 0b100) != 0;
+
+        return new FrameHeader(offs - pos, windowSize, contentSize, dictionaryId, hasChecksum);
     }
 
 }

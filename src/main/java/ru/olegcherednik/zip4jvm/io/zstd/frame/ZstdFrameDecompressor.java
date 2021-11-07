@@ -36,7 +36,6 @@ import static ru.olegcherednik.zip4jvm.io.zstd.Constants.MAX_BLOCK_SIZE;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.MAX_LITERALS_LENGTH_SYMBOL;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.MAX_MATCH_LENGTH_SYMBOL;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.MIN_BLOCK_SIZE;
-import static ru.olegcherednik.zip4jvm.io.zstd.Constants.MIN_WINDOW_LOG;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.OFFSET_TABLE_LOG;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.RAW_BLOCK;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.RAW_LITERALS_BLOCK;
@@ -47,7 +46,6 @@ import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SEQUENCE_ENCODING_COMPR
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SEQUENCE_ENCODING_REPEAT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SEQUENCE_ENCODING_RLE;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_BLOCK_HEADER;
-import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_BYTE;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_INT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_LONG;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;
@@ -170,72 +168,6 @@ public class ZstdFrameDecompressor {
         return size;
     }
 
-    static FrameHeader readFrameHeader(final byte[] inputBase, final int offs) {
-        int input = offs;
-
-        int frameHeaderDescriptor = UnsafeUtil.getByte(inputBase, input++) & 0xFF;
-        boolean singleSegment = (frameHeaderDescriptor & 0b100000) != 0;
-        int dictionaryDescriptor = frameHeaderDescriptor & 0b11;
-        int contentSizeDescriptor = frameHeaderDescriptor >>> 6;
-
-        // decode window size
-        int windowSize = -1;
-        if (!singleSegment) {
-            int windowDescriptor = UnsafeUtil.getByte(inputBase, input++) & 0xFF;
-            int exponent = windowDescriptor >>> 3;
-            int mantissa = windowDescriptor & 0b111;
-
-            int base = 1 << (MIN_WINDOW_LOG + exponent);
-            windowSize = base + (base / 8) * mantissa;
-        }
-
-        // decode dictionary id
-        long dictionaryId = -1;
-        switch (dictionaryDescriptor) {
-            case 1:
-                dictionaryId = UnsafeUtil.getByte(inputBase, input) & 0xFF;
-                input += SIZE_OF_BYTE;
-                break;
-            case 2:
-                dictionaryId = UnsafeUtil.getShort(inputBase, input) & 0xFFFF;
-                input += SIZE_OF_SHORT;
-                break;
-            case 3:
-                dictionaryId = UnsafeUtil.getInt(inputBase, input) & 0xFFFF_FFFFL;
-                input += SIZE_OF_INT;
-                break;
-        }
-        verify(dictionaryId == -1, input, "Custom dictionaries not supported");
-
-        // decode content size
-        long contentSize = -1;
-        switch (contentSizeDescriptor) {
-            case 0:
-                if (singleSegment) {
-                    contentSize = UnsafeUtil.getByte(inputBase, input) & 0xFF;
-                    input += SIZE_OF_BYTE;
-                }
-                break;
-            case 1:
-                contentSize = UnsafeUtil.getShort(inputBase, input) & 0xFFFF;
-                contentSize += 256;
-                input += SIZE_OF_SHORT;
-                break;
-            case 2:
-                contentSize = UnsafeUtil.getInt(inputBase, input) & 0xFFFF_FFFFL;
-                input += SIZE_OF_INT;
-                break;
-            case 3:
-                contentSize = UnsafeUtil.getLong(inputBase, input);
-                input += SIZE_OF_LONG;
-                break;
-        }
-
-        boolean hasChecksum = (frameHeaderDescriptor & 0b100) != 0;
-
-        return new FrameHeader(input - offs, windowSize, contentSize, dictionaryId, hasChecksum);
-    }
-
     static int verifyMagic(byte[] inputBase) {
         int inputAddress = 0;
         int magic = UnsafeUtil.getInt(inputBase, inputAddress);
@@ -257,16 +189,15 @@ public class ZstdFrameDecompressor {
         int outputStart = output;
         input += verifyMagic(inputBase);
 
-        FrameHeader frameHeader = readFrameHeader(inputBase, input);
-        input += frameHeader.headerSize;
+        FrameHeader frameHeader = FrameHeader.read(inputBase, input);
+        input += frameHeader.getHeaderSize();
 
-        boolean lastBlock;
-        do {
+        while (true) {
             // read block header
             int header = UnsafeUtil.getInt(inputBase, input) & 0xFF_FFFF;
             input += SIZE_OF_BLOCK_HEADER;
 
-            lastBlock = (header & 1) != 0;
+            boolean lastBlock = (header & 1) != 0;
             int blockType = (header >>> 1) & 0b11;
             int blockSize = (header >>> 3) & 0x1F_FFFF; // 21 bits
 
@@ -281,7 +212,7 @@ public class ZstdFrameDecompressor {
                     input += 1;
                     break;
                 case COMPRESSED_BLOCK:
-                    decodedSize = decodeCompressedBlock(inputBase, input, blockSize, outputBase, output, frameHeader.windowSize);
+                    decodedSize = decodeCompressedBlock(inputBase, input, blockSize, outputBase, output, frameHeader.getWindowSize());
                     input += blockSize;
                     break;
                 default:
@@ -289,10 +220,12 @@ public class ZstdFrameDecompressor {
             }
 
             output += decodedSize;
-        }
-        while (!lastBlock);
 
-        if (frameHeader.hasChecksum) {
+            if (lastBlock)
+                break;
+        }
+
+        if (frameHeader.isHasChecksum()) {
             int decodedFrameSize = output - outputStart;
 
             long hash = XxHash64.hash(0, outputBase, outputStart, decodedFrameSize);
