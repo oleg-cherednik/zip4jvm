@@ -52,7 +52,7 @@ public class FooTest {
     }
 
     private static final Consumer<IDirectoryAssert<?>> foo = dir -> {
-        dir.exists().hasDirectories(0).hasFiles(2);
+//        dir.exists().hasDirectories(0).hasFiles(2);
         TestDataAssert.fileDucatiAssert.accept(dir.file(fileNameDucati));
     };
 
