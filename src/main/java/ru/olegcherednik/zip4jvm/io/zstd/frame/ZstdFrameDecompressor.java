@@ -25,7 +25,6 @@ import ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman;
 
 import java.util.Arrays;
 
-import static ru.olegcherednik.zip4jvm.io.zstd.Constants.COMPRESSED_BLOCK;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.COMPRESSED_LITERALS_BLOCK;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.DEFAULT_MAX_OFFSET_CODE_SYMBOL;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.LITERALS_LENGTH_BITS;
@@ -38,9 +37,7 @@ import static ru.olegcherednik.zip4jvm.io.zstd.Constants.MAX_BLOCK_SIZE;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.MAX_LITERALS_LENGTH_SYMBOL;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.MAX_MATCH_LENGTH_SYMBOL;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.OFFSET_TABLE_LOG;
-import static ru.olegcherednik.zip4jvm.io.zstd.Constants.RAW_BLOCK;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.RAW_LITERALS_BLOCK;
-import static ru.olegcherednik.zip4jvm.io.zstd.Constants.RLE_BLOCK;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.RLE_LITERALS_BLOCK;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SEQUENCE_ENCODING_BASIC;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SEQUENCE_ENCODING_COMPRESSED;
@@ -193,38 +190,29 @@ public class ZstdFrameDecompressor {
         while (true) {
             // read block header
             inputBase.seek(input);
-            int header = inputBase.get3Bytes();
+            BlockHeader blockHeader = BlockHeader.read(inputBase);
             input += SIZE_OF_BLOCK_HEADER;
-
-            boolean lastBlock = (header & 1) != 0;
-            int blockType = (header >>> 1) & 0b11;
-            int blockSize = (header >>> 3) & 0x1F_FFFF; // 21 bits
 
             int decodedSize;
 
-            switch (blockType) {
-                case RAW_BLOCK:
-                    decodedSize = decodeRawBlock(inputBase.getBuf(), input, blockSize, outputBase, output);
-                    inputBase.skip(blockSize);
-                    input += blockSize;
-                    break;
-                case RLE_BLOCK:
-                    decodedSize = decodeRleBlock(blockSize, inputBase.getBuf(), input, outputBase, output);
-                    inputBase.skip(1);
-                    input += 1;
-                    break;
-                case COMPRESSED_BLOCK:
-                    decodedSize = decodeCompressedBlock(inputBase.getBuf(), input, blockSize, outputBase, output);
-                    inputBase.skip(blockSize);
-                    input += blockSize;
-                    break;
-                default:
-                    throw fail(input, "Invalid block type");
-            }
+            if (blockHeader.getType() == BlockHeader.Type.RAW) {
+                decodedSize = decodeRawBlock(inputBase.getBuf(), input, blockHeader.getSize(), outputBase, output);
+                inputBase.skip(blockHeader.getSize());
+                input += blockHeader.getSize();
+            } else if (blockHeader.getType() == BlockHeader.Type.RLE) {
+                decodedSize = decodeRleBlock(blockHeader.getSize(), inputBase.getBuf(), input, outputBase, output);
+                inputBase.skip(1);
+                input += 1;
+            } else if (blockHeader.getType() == BlockHeader.Type.COMPRESSED) {
+                decodedSize = decodeCompressedBlock(inputBase.getBuf(), input, blockHeader.getSize(), outputBase, output);
+                inputBase.skip(blockHeader.getSize());
+                input += blockHeader.getSize();
+            } else
+                throw fail(input, "Invalid block type");
 
             output += decodedSize;
 
-            if (lastBlock)
+            if (blockHeader.isLast())
                 break;
         }
 
