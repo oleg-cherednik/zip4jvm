@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.zstd;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_BYTE;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_INT;
@@ -14,6 +15,7 @@ import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;
 public final class Buffer {
 
     private final byte[] buf;
+    @Setter
     private int offs;
 
     public Buffer(int size) {
@@ -40,6 +42,11 @@ public final class Buffer {
         UnsafeUtil.putShort(buf, offs, value);
         offs += SIZE_OF_SHORT;
         return SIZE_OF_SHORT;
+    }
+
+    @Override
+    public String toString() {
+        return "offs: " + offs;
     }
 
 }

@@ -123,24 +123,24 @@ public class ZstdFrameCompressor {
 
         output += writeMagic(outputBase);
         output += writeFrameHeader(outputBase, inputSize, 1 << parameters.getWindowLog());
-        output += compressFrame(inputBase, 0, inputBase.length, outputBase.getBuf(), output, outputBase.getBuf().length, parameters);
+        output += compressFrame(inputBase, outputBase, parameters);
         output += writeChecksum(outputBase.getBuf(), output, inputBase, 0, inputBase.length);
 
         return output;
     }
 
-    private static int compressFrame(byte[] inputBase, int inputAddress, int inputLimit, byte[] outputBase, int outputAddress, int outputLimit,
-            CompressionParameters parameters) {
+    private static int compressFrame(byte[] inputBase, Buffer outputBase, CompressionParameters parameters) {
+        int outputAddress = outputBase.getOffs();
         int windowSize = 1 << parameters.getWindowLog(); // TODO: store window size in parameters directly?
         int blockSize = Math.min(MAX_BLOCK_SIZE, windowSize);
 
-        int outputSize = outputLimit - outputAddress;
-        int remaining = inputLimit - inputAddress;
+        int outputSize = outputBase.getBuf().length - outputAddress;
+        int remaining = inputBase.length - 0;
 
         int output = outputAddress;
-        int input = inputAddress;
+        int input = 0;
 
-        CompressionContext context = new CompressionContext(parameters, inputAddress, remaining);
+        CompressionContext context = new CompressionContext(parameters, 0, remaining);
 
         do {
             int lastBlockFlag = blockSize >= remaining ? 1 : 0;
@@ -148,7 +148,7 @@ public class ZstdFrameCompressor {
 
             int compressedSize = 0;
             if (remaining > 0) {
-                compressedSize = compressBlock(inputBase, input, blockSize, outputBase, output + SIZE_OF_BLOCK_HEADER,
+                compressedSize = compressBlock(inputBase, input, blockSize, outputBase.getBuf(), output + SIZE_OF_BLOCK_HEADER,
                         outputSize - SIZE_OF_BLOCK_HEADER, context, parameters);
             }
 
@@ -156,12 +156,12 @@ public class ZstdFrameCompressor {
                 checkArgument(blockSize + SIZE_OF_BLOCK_HEADER <= outputSize, "Output size too small");
 
                 int blockHeader = lastBlockFlag | (RAW_BLOCK << 1) | (blockSize << 3);
-                put24BitLittleEndian(outputBase, output, blockHeader);
-                UnsafeUtil.copyMemory(inputBase, input, outputBase, output + SIZE_OF_BLOCK_HEADER, blockSize);
+                put24BitLittleEndian(outputBase.getBuf(), output, blockHeader);
+                UnsafeUtil.copyMemory(inputBase, input, outputBase.getBuf(), output + SIZE_OF_BLOCK_HEADER, blockSize);
                 compressedSize = SIZE_OF_BLOCK_HEADER + blockSize;
             } else {
                 int blockHeader = lastBlockFlag | (COMPRESSED_BLOCK << 1) | (compressedSize << 3);
-                put24BitLittleEndian(outputBase, output, blockHeader);
+                put24BitLittleEndian(outputBase.getBuf(), output, blockHeader);
                 compressedSize += SIZE_OF_BLOCK_HEADER;
             }
 
