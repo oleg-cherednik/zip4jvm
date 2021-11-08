@@ -45,20 +45,7 @@ public class CompressionZstdTest {
         Zip4jvmSuite.removeDir(rootDir);
     }
 
-    public void shouldCreateSingleZipWithFilesWhenZstdCompressionNormalLevelEosMarker() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
-                                                         .compression(Compression.ZSTD, CompressionLevel.NORMAL)
-                                                         .build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
-
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-
-        ZipIt.zip(zip).settings(settings).add(filesDirBikes);
-        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
-        assertThatZipFile(zip).root().matches(dirBikesAssert);
-    }
-
-    public void shouldCreateSingleZipWithFilesWhenZstdCompressionNormalLevelEosNoMarker() throws IOException {
+    public void shouldCreateSingleZipWithFilesWhenZstdCompressionNormalLevel() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
                                                          .compression(Compression.ZSTD, CompressionLevel.NORMAL)
                                                          .build();
@@ -72,19 +59,6 @@ public class CompressionZstdTest {
     }
 
     public void shouldCreateSingleZipWithFilesWhenZstdCompressionSuperFastLevelEosMarker() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
-                                                         .compression(Compression.ZSTD, CompressionLevel.SUPER_FAST)
-                                                         .build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
-
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-
-        ZipIt.zip(zip).settings(settings).add(filesDirBikes);
-        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
-        assertThatZipFile(zip).root().matches(dirBikesAssert);
-    }
-
-    public void shouldCreateSingleZipWithFilesWhenZstdCompressionSuperFastLevelNoEosMarker() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
                                                          .compression(Compression.ZSTD, CompressionLevel.SUPER_FAST)
                                                          .build();

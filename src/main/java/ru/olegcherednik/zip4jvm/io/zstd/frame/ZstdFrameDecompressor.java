@@ -35,7 +35,6 @@ import static ru.olegcherednik.zip4jvm.io.zstd.Constants.MATCH_LENGTH_TABLE_LOG;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.MAX_BLOCK_SIZE;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.MAX_LITERALS_LENGTH_SYMBOL;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.MAX_MATCH_LENGTH_SYMBOL;
-import static ru.olegcherednik.zip4jvm.io.zstd.Constants.MIN_BLOCK_SIZE;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.OFFSET_TABLE_LOG;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.RAW_BLOCK;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.RAW_LITERALS_BLOCK;
@@ -61,8 +60,6 @@ public class ZstdFrameDecompressor {
     private static final int[] DEC_64_TABLE = { 0, 0, 0, -1, 0, 1, 2, 3 };
 
     private static final int V07_MAGIC_NUMBER = 0xFD2FB527;
-
-    private static final int MAX_WINDOW_SIZE = 1 << 23;
 
     private static final int[] LITERALS_LENGTH_BASE = {
             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
@@ -181,7 +178,7 @@ public class ZstdFrameDecompressor {
         return SIZE_OF_INT;
     }
 
-    public int decompress(final byte[] inputBase, final byte[] outputBase) {
+    public int decompress(byte[] inputBase, byte[] outputBase) {
         int input = 0;
         int output = 0;
 
@@ -202,6 +199,7 @@ public class ZstdFrameDecompressor {
             int blockSize = (header >>> 3) & 0x1F_FFFF; // 21 bits
 
             int decodedSize;
+
             switch (blockType) {
                 case RAW_BLOCK:
                     decodedSize = decodeRawBlock(inputBase, input, blockSize, outputBase, output);
@@ -255,9 +253,6 @@ public class ZstdFrameDecompressor {
         long inputLimit = inputAddress + blockSize;
         int input = inputAddress;
 
-        verify(blockSize <= MAX_BLOCK_SIZE, input, "Expected match length table to be present");
-        verify(blockSize >= MIN_BLOCK_SIZE, input, "Compressed block size too small");
-
         // decode literals
         int literalsBlockType = UnsafeUtil.getByte(inputBase, input) & 0b11;
 
@@ -276,8 +271,6 @@ public class ZstdFrameDecompressor {
             default:
                 throw fail(input, "Invalid literals block encoding type");
         }
-
-        verify(windowSize <= MAX_WINDOW_SIZE, input, "Window size too large (not yet supported)");
 
         return decompressSequences(
                 inputBase, input, inputAddress + blockSize,
@@ -474,7 +467,7 @@ public class ZstdFrameDecompressor {
         return output - outputAddress;
     }
 
-    private int copyLastLiteral(byte[] outputBase, byte[] literalsBase, int literalsLimit, int output, int literalsInput) {
+    private static int copyLastLiteral(byte[] outputBase, byte[] literalsBase, int literalsLimit, int output, int literalsInput) {
         int lastLiteralsSize = literalsLimit - literalsInput;
         UnsafeUtil.copyMemory(literalsBase, literalsInput, outputBase, output, lastLiteralsSize);
         output += lastLiteralsSize;
@@ -518,7 +511,7 @@ public class ZstdFrameDecompressor {
         }
     }
 
-    private int copyMatchHead(byte[] outputBase, int output, int offset, int matchAddress) {
+    private static int copyMatchHead(byte[] outputBase, int output, int offset, int matchAddress) {
         // copy match
         if (offset < 8) {
             // 8 bytes apart so that we can copy long-at-a-time below
@@ -540,7 +533,7 @@ public class ZstdFrameDecompressor {
         return matchAddress;
     }
 
-    private int copyLiterals(byte[] outputBase, byte[] literalsBase, int output, int literalsInput, int literalOutputLimit) {
+    private static int copyLiterals(byte[] outputBase, byte[] literalsBase, int output, int literalsInput, int literalOutputLimit) {
         int literalInput = literalsInput;
         do {
             UnsafeUtil.putLong(outputBase, output, UnsafeUtil.getLong(literalsBase, literalInput));
@@ -659,7 +652,6 @@ public class ZstdFrameDecompressor {
 
     private int decodeCompressedLiterals(byte[] inputBase, final int inputAddress, int blockSize, int literalsBlockType) {
         int input = inputAddress;
-        verify(blockSize >= 5, input, "Not enough input bytes");
 
         // compressed
         int compressedSize;
@@ -804,7 +796,7 @@ public class ZstdFrameDecompressor {
         }
         input += literalSize;
 
-        return (int)(input - inputAddress);
+        return input - inputAddress;
     }
 
 }
