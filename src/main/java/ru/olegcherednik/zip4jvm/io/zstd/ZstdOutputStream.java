@@ -6,7 +6,6 @@ import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
 
 /**
  * @author Oleg Cherednik
@@ -45,14 +44,18 @@ public class ZstdOutputStream extends OutputStream {
         a++;
     }
 
-    private ByteBuffer inputBuffer;
+    private byte[] inputBuffer;
+    private int offs;
 
     @Override
     public void write(final byte[] buf, int offs, final int len) throws IOException {
-        if (inputBuffer == null)
-            inputBuffer = ByteBuffer.allocate(500_000);
+        if (inputBuffer == null) {
+            inputBuffer = new byte[500_000];
+            offs = 0;
+        }
 
-        inputBuffer.put(buf, offs, len);
+        System.arraycopy(buf, offs, inputBuffer, this.offs, len);
+        this.offs += len;
     }
 
     @Override
@@ -60,19 +63,13 @@ public class ZstdOutputStream extends OutputStream {
         if (inputBuffer == null)
             return;
 
-        int len = inputBuffer.position();
-        byte[] buf = new byte[len];
-        System.arraycopy(inputBuffer.array(), 0, buf, 0, buf.length);
-        inputBuffer = ByteBuffer.wrap(buf);
+        byte[] inputBase = new byte[offs];
+        System.arraycopy(inputBuffer, 0, inputBase, 0, inputBase.length);
 
-        ByteBuffer outputBuffer = ByteBuffer.allocate(500_000);
-        compressor.compress(inputBuffer, outputBuffer, compressionLevel(compressionLevel));
+        byte[] outputBase = new byte[500_000];
+        int written = compressor.compress(inputBase, outputBase, compressionLevel(compressionLevel));
 
-        len = outputBuffer.position();
-        buf = new byte[len];
-        System.arraycopy(outputBuffer.array(), 0, buf, 0, buf.length);
-
-        out.write(buf, 0, buf.length);
+        out.write(outputBase, 0, written);
         inputBuffer = null;
     }
 

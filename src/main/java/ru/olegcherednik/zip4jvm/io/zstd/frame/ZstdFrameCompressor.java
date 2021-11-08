@@ -23,9 +23,6 @@ import ru.olegcherednik.zip4jvm.io.zstd.huffman.HuffmanCompressionContext;
 import ru.olegcherednik.zip4jvm.io.zstd.huffman.HuffmanCompressionTable;
 import ru.olegcherednik.zip4jvm.io.zstd.huffman.HuffmanCompressor;
 
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
-
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.COMPRESSED_BLOCK;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.COMPRESSED_LITERALS_BLOCK;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.MAGIC_NUMBER;
@@ -113,53 +110,31 @@ public class ZstdFrameCompressor {
                 throw new AssertionError();
         }
 
-        return (int)(output - outputAddress);
+        return output - outputAddress;
     }
 
     // visible for testing
-    static int writeChecksum(byte[] outputBase, int outputAddress, long outputLimit, byte[] inputBase, int inputAddress, long inputLimit) {
-        checkArgument(outputLimit - outputAddress >= SIZE_OF_INT, "Output buffer too small");
-
-        int inputSize = (int)(inputLimit - inputAddress);
-
+    static int writeChecksum(byte[] outputBase, int outputAddress, byte[] inputBase, int inputAddress, int inputLimit) {
+        int inputSize = inputLimit - inputAddress;
         long hash = XxHash64.hash(0, inputBase, inputAddress, inputSize);
-
         UnsafeUtil.putInt(outputBase, outputAddress, (int)hash);
-
         return SIZE_OF_INT;
     }
 
-    public void compress(ByteBuffer inputBuffer, ByteBuffer outputBuffer, int compressionLevel) {
-        // Java 9+ added an overload of various methods in ByteBuffer. When compiling with Java 11+ and targeting Java 8 bytecode
-        // the resulting signatures are invalid for JDK 8, so accesses below result in NoSuchMethodError. Accessing the
-        // methods through the interface class works around the problem
-        // Sidenote: we can't target "javac --release 8" because Unsafe is not available in the signature data for that profile
-        Buffer input = inputBuffer;
-        Buffer output = outputBuffer;
-
-        byte[] inputBase = (byte[])input.array();
-        int inputAddress = input.arrayOffset() + input.position();
-        long inputLimit = input.arrayOffset() + input.limit();
-
-        byte[] outputBase = (byte[])output.array();
-        int outputAddress = output.arrayOffset() + output.position();
-        long outputLimit = output.arrayOffset() + output.limit();
-
-        int written = compress(
+    public int compress(byte[] inputBase, byte[] outputBase, int compressionLevel) {
+        return compress(
                 inputBase,
-                inputAddress,
-                inputLimit,
+                0,
+                inputBase.length,
                 outputBase,
-                outputAddress,
-                outputLimit,
+                0,
+                outputBase.length,
                 compressionLevel);
-        output.position(output.position() + written);
     }
 
-
-    public static int compress(byte[] inputBase, int inputAddress, long inputLimit, byte[] outputBase, int outputAddress, long outputLimit,
+    public static int compress(byte[] inputBase, int inputAddress, int inputLimit, byte[] outputBase, int outputAddress, int outputLimit,
             int compressionLevel) {
-        int inputSize = (int)(inputLimit - inputAddress);
+        int inputSize = inputLimit - inputAddress;
 
         CompressionParameters parameters = CompressionParameters.compute(compressionLevel, inputSize);
 
@@ -168,18 +143,18 @@ public class ZstdFrameCompressor {
         output += writeMagic(outputBase, output);
         output += writeFrameHeader(outputBase, output, inputSize, 1 << parameters.getWindowLog());
         output += compressFrame(inputBase, inputAddress, inputLimit, outputBase, output, outputLimit, parameters);
-        output += writeChecksum(outputBase, output, outputLimit, inputBase, inputAddress, inputLimit);
+        output += writeChecksum(outputBase, output, inputBase, inputAddress, inputLimit);
 
         return output - outputAddress;
     }
 
-    private static int compressFrame(byte[] inputBase, int inputAddress, long inputLimit, byte[] outputBase, int outputAddress, long outputLimit,
+    private static int compressFrame(byte[] inputBase, int inputAddress, int inputLimit, byte[] outputBase, int outputAddress, int outputLimit,
             CompressionParameters parameters) {
         int windowSize = 1 << parameters.getWindowLog(); // TODO: store window size in parameters directly?
         int blockSize = Math.min(MAX_BLOCK_SIZE, windowSize);
 
-        int outputSize = (int)(outputLimit - outputAddress);
-        int remaining = (int)(inputLimit - inputAddress);
+        int outputSize = outputLimit - outputAddress;
+        int remaining = inputLimit - inputAddress;
 
         int output = outputAddress;
         int input = inputAddress;
