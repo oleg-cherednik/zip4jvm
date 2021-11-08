@@ -33,7 +33,7 @@ public class FooTest {
     private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(FooTest.class);
 
     public void shouldUnzipWhenZstdSolid() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path destDir = rootDir;
         UnzipIt.zip(zip).destDir(destDir).extract();
         assertThatDirectory(destDir).matches(foo);
     }
@@ -44,7 +44,7 @@ public class FooTest {
                                                          .build();
         ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        Path zip = rootDir.resolve("src.zip");
 
         ZipIt.zip(zip).settings(settings).add(fileDucati);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
@@ -52,7 +52,7 @@ public class FooTest {
     }
 
     private static final Consumer<IDirectoryAssert<?>> foo = dir -> {
-        dir.exists().hasDirectories(0).hasFiles(1);
+        dir.exists().hasDirectories(0).hasFiles(2);
         TestDataAssert.fileDucatiAssert.accept(dir.file(fileNameDucati));
     };
 
