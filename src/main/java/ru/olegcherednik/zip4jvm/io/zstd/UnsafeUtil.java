@@ -49,7 +49,7 @@ public final class UnsafeUtil {
         return inputBase[offs];
     }
 
-    public static short getShort(byte[] inputBase, int offs) {
+    public static int getShort(byte[] inputBase, int offs) {
         byte a = inputBase[offs];
         byte b = inputBase[offs + 1];
         long res = b & 0xFF;

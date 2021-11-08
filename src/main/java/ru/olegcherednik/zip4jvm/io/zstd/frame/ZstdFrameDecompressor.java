@@ -168,7 +168,7 @@ public class ZstdFrameDecompressor {
     }
 
     private static int verifyMagic(Buffer inputBase) {
-        int magic = inputBase.getInt();
+        int magic = (int)inputBase.getInt();
         if (magic != MAGIC_NUMBER) {
             if (magic == V07_MAGIC_NUMBER) {
                 throw new Zip4jvmException("Data encoded in unsupported ZSTD v0.7 format");
@@ -180,20 +180,20 @@ public class ZstdFrameDecompressor {
     }
 
     public int decompress(Buffer inputBase, byte[] outputBase) {
-        int input = 0;
         int output = 0;
 
         reset();
         int outputStart = output;
 
-        input += verifyMagic(inputBase);
+        verifyMagic(inputBase);
 
-        FrameHeader frameHeader = FrameHeader.read(inputBase.getBuf(), input);
-        input += frameHeader.getHeaderSize();
+        FrameHeader frameHeader = FrameHeader.read(inputBase);
+        int input = inputBase.getOffs();
 
         while (true) {
             // read block header
-            int header = UnsafeUtil.getInt(inputBase.getBuf(), input) & 0xFF_FFFF;
+            inputBase.seek(input);
+            int header = inputBase.get3Bytes();
             input += SIZE_OF_BLOCK_HEADER;
 
             boolean lastBlock = (header & 1) != 0;
@@ -205,14 +205,17 @@ public class ZstdFrameDecompressor {
             switch (blockType) {
                 case RAW_BLOCK:
                     decodedSize = decodeRawBlock(inputBase.getBuf(), input, blockSize, outputBase, output);
+                    inputBase.skip(blockSize);
                     input += blockSize;
                     break;
                 case RLE_BLOCK:
                     decodedSize = decodeRleBlock(blockSize, inputBase.getBuf(), input, outputBase, output);
+                    inputBase.skip(1);
                     input += 1;
                     break;
                 case COMPRESSED_BLOCK:
                     decodedSize = decodeCompressedBlock(inputBase.getBuf(), input, blockSize, outputBase, output);
+                    inputBase.skip(blockSize);
                     input += blockSize;
                     break;
                 default:

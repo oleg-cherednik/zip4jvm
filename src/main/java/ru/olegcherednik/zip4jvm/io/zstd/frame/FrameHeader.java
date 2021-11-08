@@ -16,13 +16,9 @@ package ru.olegcherednik.zip4jvm.io.zstd.frame;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil;
+import ru.olegcherednik.zip4jvm.io.zstd.Buffer;
 
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.MIN_WINDOW_LOG;
-import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_BYTE;
-import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_INT;
-import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_LONG;
-import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;
 
 @Getter
 @RequiredArgsConstructor
@@ -34,9 +30,10 @@ public class FrameHeader {
     private final long dictionaryId;
     private final boolean hasChecksum;
 
-    public static FrameHeader read(byte[] inputBase, int offs) {
-        final int pos = offs;
-        int frameHeaderDescriptor = UnsafeUtil.getByte(inputBase, offs++) & 0xFF;
+    public static FrameHeader read(Buffer inputBase) {
+        final int pos = inputBase.getOffs();
+        int frameHeaderDescriptor = inputBase.getByte();
+
         boolean singleSegment = (frameHeaderDescriptor & 0b100000) != 0;
         int dictionaryDescriptor = frameHeaderDescriptor & 0b11;
         int contentSizeDescriptor = frameHeaderDescriptor >>> 6;
@@ -44,7 +41,7 @@ public class FrameHeader {
         // decode window size
         int windowSize = -1;
         if (!singleSegment) {
-            int windowDescriptor = UnsafeUtil.getByte(inputBase, offs++) & 0xFF;
+            int windowDescriptor = inputBase.getByte();
             int exponent = windowDescriptor >>> 3;
             int mantissa = windowDescriptor & 0b111;
 
@@ -58,16 +55,13 @@ public class FrameHeader {
             case 0:
                 break;
             case 1:
-                dictionaryId = UnsafeUtil.getByte(inputBase, offs) & 0xFF;
-                offs += SIZE_OF_BYTE;
+                dictionaryId = inputBase.getByte();
                 break;
             case 2:
-                dictionaryId = UnsafeUtil.getShort(inputBase, offs) & 0xFFFF;
-                offs += SIZE_OF_SHORT;
+                dictionaryId = inputBase.getShort();
                 break;
             case 3:
-                dictionaryId = UnsafeUtil.getInt(inputBase, offs) & 0xFFFF_FFFFL;
-                offs += SIZE_OF_INT;
+                dictionaryId = inputBase.getInt();
                 break;
             default:
                 throw new Zip4jvmException("Custom dictionaries not supported");
@@ -78,28 +72,22 @@ public class FrameHeader {
         switch (contentSizeDescriptor) {
             case 0:
                 if (singleSegment) {
-                    contentSize = UnsafeUtil.getByte(inputBase, offs) & 0xFF;
-                    offs += SIZE_OF_BYTE;
+                    contentSize = inputBase.getByte();
                 }
                 break;
             case 1:
-                contentSize = UnsafeUtil.getShort(inputBase, offs) & 0xFFFF;
-                contentSize += 256;
-                offs += SIZE_OF_SHORT;
+                contentSize = inputBase.getShort() + 256L;
                 break;
             case 2:
-                contentSize = UnsafeUtil.getInt(inputBase, offs) & 0xFFFF_FFFFL;
-                offs += SIZE_OF_INT;
+                contentSize = inputBase.getInt();
                 break;
             case 3:
-                contentSize = UnsafeUtil.getLong(inputBase, offs);
-                offs += SIZE_OF_LONG;
+                contentSize = inputBase.getLong();
                 break;
         }
 
         boolean hasChecksum = (frameHeaderDescriptor & 0b100) != 0;
-
-        return new FrameHeader(offs - pos, windowSize, contentSize, dictionaryId, hasChecksum);
+        return new FrameHeader(inputBase.getOffs() - pos, windowSize, contentSize, dictionaryId, hasChecksum);
     }
 
 }
