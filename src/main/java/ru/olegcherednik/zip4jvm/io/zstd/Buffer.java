@@ -22,8 +22,18 @@ public final class Buffer {
         buf = new byte[size];
     }
 
+    public Buffer(byte[] buf) {
+        this.buf = buf;
+    }
+
     public void incOffs(int size) {
         offs += size;
+    }
+
+    public int getInt() {
+        int value = UnsafeUtil.getInt(buf, offs);
+        offs += SIZE_OF_INT;
+        return value;
     }
 
     public int putInt(int value) {

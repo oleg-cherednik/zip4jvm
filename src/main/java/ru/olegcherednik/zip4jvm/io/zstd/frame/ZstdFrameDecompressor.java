@@ -13,6 +13,8 @@
  */
 package ru.olegcherednik.zip4jvm.io.zstd.frame;
 
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.io.zstd.Buffer;
 import ru.olegcherednik.zip4jvm.io.zstd.FiniteStateEntropy;
 import ru.olegcherednik.zip4jvm.io.zstd.FseTableReader;
 import ru.olegcherednik.zip4jvm.io.zstd.MalformedInputException;
@@ -165,33 +167,33 @@ public class ZstdFrameDecompressor {
         return size;
     }
 
-    static int verifyMagic(byte[] inputBase) {
-        int inputAddress = 0;
-        int magic = UnsafeUtil.getInt(inputBase, inputAddress);
+    private static int verifyMagic(Buffer inputBase) {
+        int magic = inputBase.getInt();
         if (magic != MAGIC_NUMBER) {
             if (magic == V07_MAGIC_NUMBER) {
-                throw new MalformedInputException(inputAddress, "Data encoded in unsupported ZSTD v0.7 format");
+                throw new Zip4jvmException("Data encoded in unsupported ZSTD v0.7 format");
             }
-            throw new MalformedInputException(inputAddress, "Invalid magic prefix: " + Integer.toHexString(magic));
+            throw new Zip4jvmException("Invalid magic prefix");
         }
 
         return SIZE_OF_INT;
     }
 
-    public int decompress(byte[] inputBase, byte[] outputBase) {
+    public int decompress(Buffer inputBase, byte[] outputBase) {
         int input = 0;
         int output = 0;
 
         reset();
         int outputStart = output;
+
         input += verifyMagic(inputBase);
 
-        FrameHeader frameHeader = FrameHeader.read(inputBase, input);
+        FrameHeader frameHeader = FrameHeader.read(inputBase.getBuf(), input);
         input += frameHeader.getHeaderSize();
 
         while (true) {
             // read block header
-            int header = UnsafeUtil.getInt(inputBase, input) & 0xFF_FFFF;
+            int header = UnsafeUtil.getInt(inputBase.getBuf(), input) & 0xFF_FFFF;
             input += SIZE_OF_BLOCK_HEADER;
 
             boolean lastBlock = (header & 1) != 0;
@@ -202,15 +204,15 @@ public class ZstdFrameDecompressor {
 
             switch (blockType) {
                 case RAW_BLOCK:
-                    decodedSize = decodeRawBlock(inputBase, input, blockSize, outputBase, output);
+                    decodedSize = decodeRawBlock(inputBase.getBuf(), input, blockSize, outputBase, output);
                     input += blockSize;
                     break;
                 case RLE_BLOCK:
-                    decodedSize = decodeRleBlock(blockSize, inputBase, input, outputBase, output);
+                    decodedSize = decodeRleBlock(blockSize, inputBase.getBuf(), input, outputBase, output);
                     input += 1;
                     break;
                 case COMPRESSED_BLOCK:
-                    decodedSize = decodeCompressedBlock(inputBase, input, blockSize, outputBase, output, frameHeader.getWindowSize());
+                    decodedSize = decodeCompressedBlock(inputBase.getBuf(), input, blockSize, outputBase, output);
                     input += blockSize;
                     break;
                 default:
@@ -228,7 +230,7 @@ public class ZstdFrameDecompressor {
 
             long hash = XxHash64.hash(0, outputBase, outputStart, decodedFrameSize);
 
-            int checksum = UnsafeUtil.getInt(inputBase, input);
+            int checksum = UnsafeUtil.getInt(inputBase.getBuf(), input);
             if (checksum != (int)hash) {
                 throw new MalformedInputException(input,
                         String.format("Bad checksum. Expected: %s, actual: %s", Integer.toHexString(checksum), Integer.toHexString((int)hash)));
@@ -248,8 +250,7 @@ public class ZstdFrameDecompressor {
         currentMatchLengthTable = null;
     }
 
-    private int decodeCompressedBlock(byte[] inputBase, final int inputAddress, int blockSize, byte[] outputBase, int outputAddress,
-            int windowSize) {
+    private int decodeCompressedBlock(byte[] inputBase, final int inputAddress, int blockSize, byte[] outputBase, int outputAddress) {
         long inputLimit = inputAddress + blockSize;
         int input = inputAddress;
 
