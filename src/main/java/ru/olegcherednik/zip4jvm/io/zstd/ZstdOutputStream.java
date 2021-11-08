@@ -66,10 +66,10 @@ public class ZstdOutputStream extends OutputStream {
         byte[] inputBase = new byte[offs];
         System.arraycopy(inputBuffer, 0, inputBase, 0, inputBase.length);
 
-        byte[] outputBase = new byte[500_000];
+        Buffer outputBase = new Buffer(500_000);
         int written = compressor.compress(inputBase, outputBase, compressionLevel(compressionLevel));
 
-        out.write(outputBase, 0, written);
+        out.write(outputBase.getBuf(), 0, written);
         inputBuffer = null;
     }
 

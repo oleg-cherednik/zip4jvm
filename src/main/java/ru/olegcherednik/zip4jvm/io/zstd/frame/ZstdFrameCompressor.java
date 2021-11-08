@@ -13,6 +13,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.zstd.frame;
 
+import ru.olegcherednik.zip4jvm.io.zstd.Buffer;
 import ru.olegcherednik.zip4jvm.io.zstd.CompressionContext;
 import ru.olegcherednik.zip4jvm.io.zstd.CompressionParameters;
 import ru.olegcherednik.zip4jvm.io.zstd.Histogram;
@@ -34,7 +35,6 @@ import static ru.olegcherednik.zip4jvm.io.zstd.Constants.RAW_LITERALS_BLOCK;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.RLE_LITERALS_BLOCK;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_BLOCK_HEADER;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_INT;
-import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.TREELESS_LITERALS_BLOCK;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.checkArgument;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.put24BitLittleEndian;
@@ -52,14 +52,13 @@ public class ZstdFrameCompressor {
     private static final int MAX_HUFFMAN_TABLE_LOG = 11;
 
     // visible for testing
-    static int writeMagic(final byte[] outputBase, final int outputAddress) {
-        UnsafeUtil.putInt(outputBase, outputAddress, MAGIC_NUMBER);
-        return SIZE_OF_INT;
+    static int writeMagic(Buffer outputBase) {
+        return outputBase.putInt(MAGIC_NUMBER);
     }
 
     // visible for testing
-    static int writeFrameHeader(final byte[] outputBase, final int outputAddress, int inputSize, int windowSize) {
-        int output = outputAddress;
+    static int writeFrameHeader(Buffer outputBase, int inputSize, int windowSize) {
+        final int outputAddress = outputBase.getOffs();
         int contentSizeDescriptor = (inputSize >= 256 ? 1 : 0) + (inputSize >= 65536 + 256 ? 1 : 0);
         int frameHeaderDescriptor = (contentSizeDescriptor << 6) | CHECKSUM_FLAG; // dictionary ID missing
 
@@ -68,8 +67,7 @@ public class ZstdFrameCompressor {
             frameHeaderDescriptor |= SINGLE_SEGMENT_FLAG;
         }
 
-        UnsafeUtil.putByte(outputBase, output, (byte)frameHeaderDescriptor);
-        output++;
+        outputBase.putByte((byte)frameHeaderDescriptor);
 
         if (!singleSegment) {
             int base = Integer.highestOneBit(windowSize);
@@ -87,30 +85,25 @@ public class ZstdFrameCompressor {
             // mantissa is guaranteed to be between 0-7
             int mantissa = remainder / (base / 8);
             int encoded = ((exponent - MIN_WINDOW_LOG) << 3) | mantissa;
-
-            UnsafeUtil.putByte(outputBase, output, (byte)encoded);
-            output++;
+            outputBase.putByte((byte)encoded);
         }
 
         switch (contentSizeDescriptor) {
             case 0:
-                if (singleSegment) {
-                    UnsafeUtil.putByte(outputBase, output++, (byte)inputSize);
-                }
+                if (singleSegment)
+                    outputBase.putByte((byte)inputSize);
                 break;
             case 1:
-                UnsafeUtil.putShort(outputBase, output, (short)(inputSize - 256));
-                output += SIZE_OF_SHORT;
+                outputBase.putShort((short)(inputSize - 256));
                 break;
             case 2:
-                UnsafeUtil.putInt(outputBase, output, inputSize);
-                output += SIZE_OF_INT;
+                outputBase.putInt(inputSize);
                 break;
             default:
                 throw new AssertionError();
         }
 
-        return output - outputAddress;
+        return outputBase.getOffs() - outputAddress;
     }
 
     // visible for testing
@@ -121,19 +114,19 @@ public class ZstdFrameCompressor {
         return SIZE_OF_INT;
     }
 
-    public static int compress(byte[] inputBase, byte[] outputBase, int compressionLevel) {
-        int inputSize = inputBase.length - 0;
+    public static int compress(byte[] inputBase, Buffer outputBase, int compressionLevel) {
+        int inputSize = inputBase.length;
 
         CompressionParameters parameters = CompressionParameters.compute(compressionLevel, inputSize);
 
         int output = 0;
 
-        output += writeMagic(outputBase, output);
-        output += writeFrameHeader(outputBase, output, inputSize, 1 << parameters.getWindowLog());
-        output += compressFrame(inputBase, 0, inputBase.length, outputBase, output, outputBase.length, parameters);
-        output += writeChecksum(outputBase, output, inputBase, 0, inputBase.length);
+        output += writeMagic(outputBase);
+        output += writeFrameHeader(outputBase, inputSize, 1 << parameters.getWindowLog());
+        output += compressFrame(inputBase, 0, inputBase.length, outputBase.getBuf(), output, outputBase.getBuf().length, parameters);
+        output += writeChecksum(outputBase.getBuf(), output, inputBase, 0, inputBase.length);
 
-        return output - 0;
+        return output;
     }
 
     private static int compressFrame(byte[] inputBase, int inputAddress, int inputLimit, byte[] outputBase, int outputAddress, int outputLimit,
