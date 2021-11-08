@@ -204,9 +204,9 @@ public class ZstdFrameDecompressor {
                 inputBase.skip(1);
                 input += 1;
             } else if (blockHeader.getType() == BlockHeader.Type.COMPRESSED) {
-                decodedSize = decodeCompressedBlock(inputBase.getBuf(), input, blockHeader.getSize(), outputBase, output);
-                inputBase.skip(blockHeader.getSize());
+                decodedSize = decodeCompressedBlock(inputBase, blockHeader.getSize(), outputBase, output);
                 input += blockHeader.getSize();
+                inputBase.skip(input);
             } else
                 throw fail(input, "Invalid block type");
 
@@ -241,31 +241,33 @@ public class ZstdFrameDecompressor {
         currentMatchLengthTable = null;
     }
 
-    private int decodeCompressedBlock(byte[] inputBase, final int inputAddress, int blockSize, byte[] outputBase, int outputAddress) {
-        long inputLimit = inputAddress + blockSize;
+    private int decodeCompressedBlock(Buffer inputBase, int blockSize, byte[] outputBase, int outputAddress) {
+        int inputAddress = inputBase.getOffs();
+        int inputLimit = inputAddress + blockSize;
         int input = inputAddress;
 
         // decode literals
-        int literalsBlockType = UnsafeUtil.getByte(inputBase, input) & 0b11;
+        int literalsBlockType = inputBase.getByte() & 0b11;
+        inputBase.skip(-1);
 
         switch (literalsBlockType) {
             case RAW_LITERALS_BLOCK:
-                input += decodeRawLiterals(inputBase, input, inputLimit);
+                input += decodeRawLiterals(inputBase.getBuf(), input, inputLimit);
                 break;
             case RLE_LITERALS_BLOCK:
-                input += decodeRleLiterals(inputBase, input, blockSize);
+                input += decodeRleLiterals(inputBase.getBuf(), input, blockSize);
                 break;
             case TREELESS_LITERALS_BLOCK:
                 verify(huffman.isLoaded(), input, "Dictionary is corrupted");
             case COMPRESSED_LITERALS_BLOCK:
-                input += decodeCompressedLiterals(inputBase, input, blockSize, literalsBlockType);
+                input += decodeCompressedLiterals(inputBase.getBuf(), input, blockSize, literalsBlockType);
                 break;
             default:
                 throw fail(input, "Invalid literals block encoding type");
         }
 
         return decompressSequences(
-                inputBase, input, inputAddress + blockSize,
+                inputBase.getBuf(), input, inputAddress + blockSize,
                 outputBase, outputAddress, literalsBase, literalsAddress, literalsLimit);
     }
 
@@ -745,10 +747,10 @@ public class ZstdFrameDecompressor {
 
     private int decodeRawLiterals(byte[] inputBase, final int inputAddress, long inputLimit) {
         int input = inputAddress;
-        int type = (UnsafeUtil.getByte(inputBase, input) >> 2) & 0b11;
+        int sizeFormat = (UnsafeUtil.getByte(inputBase, input) >> 2) & 0b11;
 
         int literalSize;
-        switch (type) {
+        switch (sizeFormat) {
             case 0:
             case 2:
                 literalSize = (UnsafeUtil.getByte(inputBase, input) & 0xFF) >>> 3;
@@ -769,8 +771,6 @@ public class ZstdFrameDecompressor {
             default:
                 throw fail(input, "Invalid raw literals header encoding type");
         }
-
-        verify(input + literalSize <= inputLimit, input, "Not enough input bytes");
 
         // Set literals pointer to [input, literalSize], but only if we can copy 8 bytes at a time during sequence decoding
         // Otherwise, copy literals into buffer that's big enough to guarantee that
