@@ -206,7 +206,7 @@ public class ZstdFrameDecompressor {
                 decodedSize = decodeCompressedBlock(inputBase, blockHeader.getSize(), outputBase, output);
                 input += blockHeader.getSize();
             } else
-                throw fail(input, "Invalid block type");
+                throw new Zip4jvmException("Invalid block type");
 
             output += decodedSize;
 
