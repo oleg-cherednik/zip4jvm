@@ -205,7 +205,6 @@ public class ZstdFrameDecompressor {
             } else if (blockHeader.getType() == BlockHeader.Type.COMPRESSED) {
                 decodedSize = decodeCompressedBlock(inputBase, blockHeader.getSize(), outputBase, output);
                 input += blockHeader.getSize();
-                inputBase.skip(input);
             } else
                 throw fail(input, "Invalid block type");
 
@@ -264,9 +263,11 @@ public class ZstdFrameDecompressor {
                 throw fail(input, "Invalid literals block encoding type");
         }
 
-        return decompressSequences(
+        int written = decompressSequences(
                 inputBase.getBuf(), input, inputAddress + blockSize,
                 outputBase, outputAddress, literalsBase, literalsAddress, literalsLimit);
+        inputBase.skip(blockSize);
+        return written;
     }
 
     private int decompressSequences(
