@@ -17,7 +17,6 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.zstd.Buffer;
 import ru.olegcherednik.zip4jvm.io.zstd.FiniteStateEntropy;
 import ru.olegcherednik.zip4jvm.io.zstd.FseTableReader;
-import ru.olegcherednik.zip4jvm.io.zstd.MalformedInputException;
 import ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil;
 import ru.olegcherednik.zip4jvm.io.zstd.XxHash64;
 import ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream;
@@ -44,6 +43,7 @@ import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SEQUENCE_ENCODING_COMPR
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SEQUENCE_ENCODING_REPEAT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SEQUENCE_ENCODING_RLE;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_BLOCK_HEADER;
+import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_BYTE;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_INT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_LONG;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;
@@ -134,11 +134,11 @@ public class ZstdFrameDecompressor {
         return blockSize;
     }
 
-    private static int decodeRleBlock(int size, byte[] inputBase, int inputAddress, byte[] outputBase, int outputAddress) {
+    private static int decodeRleBlock(Buffer inputBase, int blockSize, byte[] outputBase, int outputAddress) {
         int output = outputAddress;
-        long value = UnsafeUtil.getByte(inputBase, inputAddress) & 0xFFL;
+        long value = inputBase.getByte();
 
-        int remaining = size;
+        int remaining = blockSize;
         if (remaining >= SIZE_OF_LONG) {
             long packed = value
                     | (value << 8)
@@ -162,7 +162,7 @@ public class ZstdFrameDecompressor {
             output++;
         }
 
-        return size;
+        return blockSize;
     }
 
     private static int verifyMagic(Buffer inputBase) {
@@ -200,9 +200,8 @@ public class ZstdFrameDecompressor {
                 decodedSize = decodeRawBlock(inputBase, blockHeader.getSize(), outputBase, output);
                 input += blockHeader.getSize();
             } else if (blockHeader.getType() == BlockHeader.Type.RLE) {
-                decodedSize = decodeRleBlock(blockHeader.getSize(), inputBase.getBuf(), input, outputBase, output);
-                inputBase.skip(1);
-                input += 1;
+                decodedSize = decodeRleBlock(inputBase, blockHeader.getSize(), outputBase, output);
+                input += SIZE_OF_BYTE;
             } else if (blockHeader.getType() == BlockHeader.Type.COMPRESSED) {
                 decodedSize = decodeCompressedBlock(inputBase, blockHeader.getSize(), outputBase, output);
                 input += blockHeader.getSize();
@@ -218,14 +217,13 @@ public class ZstdFrameDecompressor {
 
         if (frameHeader.isHasChecksum()) {
             int decodedFrameSize = output - outputStart;
-
             long hash = XxHash64.hash(0, outputBase, outputStart, decodedFrameSize);
+            long checksum = inputBase.getInt();
 
-            int checksum = UnsafeUtil.getInt(inputBase.getBuf(), input);
-            if (checksum != (int)hash) {
-                throw new MalformedInputException(input,
-                        String.format("Bad checksum. Expected: %s, actual: %s", Integer.toHexString(checksum), Integer.toHexString((int)hash)));
-            }
+            if (checksum != hash)
+                throw new Zip4jvmException(
+                        String.format("Bad checksum. Expected: %s, actual: %s",
+                                Integer.toHexString((int)checksum), Integer.toHexString((int)hash)));
         }
 
         return output;
