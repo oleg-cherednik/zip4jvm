@@ -128,8 +128,9 @@ public class ZstdFrameDecompressor {
     private FiniteStateEntropy.Table currentOffsetCodesTable;
     private FiniteStateEntropy.Table currentMatchLengthTable;
 
-    private static int decodeRawBlock(byte[] inputBase, int inputAddress, int blockSize, byte[] outputBase, int outputAddress) {
-        UnsafeUtil.copyMemory(inputBase, inputAddress, outputBase, outputAddress, blockSize);
+    private static int decodeRawBlock(Buffer inputBase, int blockSize, byte[] outputBase, int outputAddress) {
+        UnsafeUtil.copyMemory(inputBase.getBuf(), inputBase.getOffs(), outputBase, outputAddress, blockSize);
+        inputBase.skip(blockSize);
         return blockSize;
     }
 
@@ -196,8 +197,7 @@ public class ZstdFrameDecompressor {
             int decodedSize;
 
             if (blockHeader.getType() == BlockHeader.Type.RAW) {
-                decodedSize = decodeRawBlock(inputBase.getBuf(), input, blockHeader.getSize(), outputBase, output);
-                inputBase.skip(blockHeader.getSize());
+                decodedSize = decodeRawBlock(inputBase, blockHeader.getSize(), outputBase, output);
                 input += blockHeader.getSize();
             } else if (blockHeader.getType() == BlockHeader.Type.RLE) {
                 decodedSize = decodeRleBlock(blockHeader.getSize(), inputBase.getBuf(), input, outputBase, output);
