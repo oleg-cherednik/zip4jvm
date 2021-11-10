@@ -24,7 +24,6 @@ import ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman;
 
 import java.util.Arrays;
 
-import static ru.olegcherednik.zip4jvm.io.zstd.Constants.COMPRESSED_LITERALS_BLOCK;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.DEFAULT_MAX_OFFSET_CODE_SYMBOL;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.LITERALS_LENGTH_BITS;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.LITERAL_LENGTH_TABLE_LOG;
@@ -36,18 +35,13 @@ import static ru.olegcherednik.zip4jvm.io.zstd.Constants.MAX_BLOCK_SIZE;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.MAX_LITERALS_LENGTH_SYMBOL;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.MAX_MATCH_LENGTH_SYMBOL;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.OFFSET_TABLE_LOG;
-import static ru.olegcherednik.zip4jvm.io.zstd.Constants.RAW_LITERALS_BLOCK;
-import static ru.olegcherednik.zip4jvm.io.zstd.Constants.RLE_LITERALS_BLOCK;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SEQUENCE_ENCODING_BASIC;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SEQUENCE_ENCODING_COMPRESSED;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SEQUENCE_ENCODING_REPEAT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SEQUENCE_ENCODING_RLE;
-import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_BLOCK_HEADER;
-import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_BYTE;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_INT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_LONG;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;
-import static ru.olegcherednik.zip4jvm.io.zstd.Constants.TREELESS_LITERALS_BLOCK;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.fail;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.mask;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.verify;
@@ -186,26 +180,20 @@ public class ZstdFrameDecompressor {
         verifyMagic(inputBase);
 
         FrameHeader frameHeader = FrameHeader.read(inputBase);
-        int input = inputBase.getOffs();
 
         while (true) {
             // read block header
-            inputBase.seek(input);
             BlockHeader blockHeader = BlockHeader.read(inputBase);
-            input += SIZE_OF_BLOCK_HEADER;
 
             int decodedSize;
 
-            if (blockHeader.getType() == BlockHeader.Type.RAW) {
+            if (blockHeader.getType() == BlockHeader.Type.RAW)
                 decodedSize = decodeRawBlock(inputBase, blockHeader.getSize(), outputBase, output);
-                input += blockHeader.getSize();
-            } else if (blockHeader.getType() == BlockHeader.Type.RLE) {
+            else if (blockHeader.getType() == BlockHeader.Type.RLE)
                 decodedSize = decodeRleBlock(inputBase, blockHeader.getSize(), outputBase, output);
-                input += SIZE_OF_BYTE;
-            } else if (blockHeader.getType() == BlockHeader.Type.COMPRESSED) {
+            else if (blockHeader.getType() == BlockHeader.Type.COMPRESSED)
                 decodedSize = decodeCompressedBlock(inputBase, blockHeader.getSize(), outputBase, output);
-                input += blockHeader.getSize();
-            } else
+            else
                 throw new Zip4jvmException("Invalid block type");
 
             output += decodedSize;
@@ -238,30 +226,27 @@ public class ZstdFrameDecompressor {
         currentMatchLengthTable = null;
     }
 
+
     private int decodeCompressedBlock(Buffer inputBase, int blockSize, byte[] outputBase, int outputAddress) {
         int inputAddress = inputBase.getOffs();
         int inputLimit = inputAddress + blockSize;
         int input = inputAddress;
 
         // decode literals
-        int literalsBlockType = inputBase.getByte() & 0b11;
+        LiteralsBlockType literalsBlockType = LiteralsBlockType.parseId(inputBase.getByte() & 0b11);
         inputBase.skip(-1);
 
-        switch (literalsBlockType) {
-            case RAW_LITERALS_BLOCK:
-                input += decodeRawLiterals(inputBase.getBuf(), input, inputLimit);
-                break;
-            case RLE_LITERALS_BLOCK:
-                input += decodeRleLiterals(inputBase.getBuf(), input, blockSize);
-                break;
-            case TREELESS_LITERALS_BLOCK:
-                verify(huffman.isLoaded(), input, "Dictionary is corrupted");
-            case COMPRESSED_LITERALS_BLOCK:
-                input += decodeCompressedLiterals(inputBase.getBuf(), input, blockSize, literalsBlockType);
-                break;
-            default:
-                throw fail(input, "Invalid literals block encoding type");
-        }
+        if (literalsBlockType == LiteralsBlockType.RAW)
+            input += decodeRawLiterals(inputBase.getBuf(), input, inputLimit);
+        else if (literalsBlockType == LiteralsBlockType.RLE)
+            input += decodeRleLiterals(inputBase.getBuf(), input, blockSize);
+        else if (literalsBlockType == LiteralsBlockType.COMPRESSED)
+            input += decodeCompressedLiterals(inputBase.getBuf(), input, blockSize, LiteralsBlockType.COMPRESSED);
+        else if (literalsBlockType == LiteralsBlockType.TREELESS) {
+            verify(huffman.isLoaded(), input, "Dictionary is corrupted");
+            input += decodeCompressedLiterals(inputBase.getBuf(), input, blockSize, LiteralsBlockType.TREELESS);
+        } else
+            throw new Zip4jvmException("Invalid Literals_Block type");
 
         int written = decompressSequences(
                 inputBase.getBuf(), input, inputAddress + blockSize,
@@ -637,13 +622,13 @@ public class ZstdFrameDecompressor {
 
         // copy match
         while (output < matchOutputLimit) {
-            UnsafeUtil.putByte(outputBase, output, UnsafeUtil.getByte((byte[])outputBase, matchAddress));
+            UnsafeUtil.putByte(outputBase, output, UnsafeUtil.getByte(outputBase, matchAddress));
             output++;
             matchAddress++;
         }
     }
 
-    private int decodeCompressedLiterals(byte[] inputBase, final int inputAddress, int blockSize, int literalsBlockType) {
+    private int decodeCompressedLiterals(byte[] inputBase, final int inputAddress, int blockSize, LiteralsBlockType literalsBlockType) {
         int input = inputAddress;
 
         // compressed
@@ -690,9 +675,9 @@ public class ZstdFrameDecompressor {
         input += headerSize;
 
         int inputLimit = input + compressedSize;
-        if (literalsBlockType != TREELESS_LITERALS_BLOCK) {
+
+        if (literalsBlockType != LiteralsBlockType.TREELESS)
             input += huffman.readTable(inputBase, input, compressedSize);
-        }
 
         literalsBase = literals;
         literalsAddress = 0;
