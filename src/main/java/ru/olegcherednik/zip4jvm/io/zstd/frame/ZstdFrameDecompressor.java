@@ -239,10 +239,10 @@ public class ZstdFrameDecompressor {
         else if (literalsBlockType == LiteralsBlockType.RLE)
             input += decodeRleLiterals(inputBase);
         else if (literalsBlockType == LiteralsBlockType.COMPRESSED)
-            input += decodeCompressedLiterals(inputBase.getBuf(), input, blockSize, LiteralsBlockType.COMPRESSED);
+            input += decodeCompressedLiterals(inputBase, blockSize, LiteralsBlockType.COMPRESSED);
         else if (literalsBlockType == LiteralsBlockType.TREELESS) {
             verify(huffman.isLoaded(), input, "Dictionary is corrupted");
-            input += decodeCompressedLiterals(inputBase.getBuf(), input, blockSize, LiteralsBlockType.TREELESS);
+            input += decodeCompressedLiterals(inputBase, blockSize, LiteralsBlockType.TREELESS);
         } else
             throw new Zip4jvmException("Invalid Literals_Block type");
 
@@ -626,7 +626,8 @@ public class ZstdFrameDecompressor {
         }
     }
 
-    private int decodeCompressedLiterals(byte[] inputBase, final int inputAddress, int blockSize, LiteralsBlockType literalsBlockType) {
+    private int decodeCompressedLiterals(Buffer inputBase, int blockSize, LiteralsBlockType literalsBlockType) {
+        final int inputAddress = inputBase.getOffs();
         int input = inputAddress;
 
         // compressed
@@ -634,12 +635,12 @@ public class ZstdFrameDecompressor {
         int uncompressedSize;
         boolean singleStream = false;
         int headerSize;
-        int type = (UnsafeUtil.getByte(inputBase, input) >> 2) & 0b11;
+        int type = (UnsafeUtil.getByte(inputBase.getBuf(), input) >> 2) & 0b11;
         switch (type) {
             case 0:
                 singleStream = true;
             case 1: {
-                int header = UnsafeUtil.getInt(inputBase, input);
+                int header = UnsafeUtil.getInt(inputBase.getBuf(), input);
 
                 headerSize = 3;
                 uncompressedSize = (header >>> 4) & mask(10);
@@ -647,7 +648,7 @@ public class ZstdFrameDecompressor {
                 break;
             }
             case 2: {
-                int header = UnsafeUtil.getInt(inputBase, input);
+                int header = UnsafeUtil.getInt(inputBase.getBuf(), input);
 
                 headerSize = 4;
                 uncompressedSize = (header >>> 4) & mask(14);
@@ -656,8 +657,8 @@ public class ZstdFrameDecompressor {
             }
             case 3:
                 // read 5 little-endian bytes
-                long header = UnsafeUtil.getByte(inputBase, input) & 0xFF |
-                        (UnsafeUtil.getInt(inputBase, input + 1) & 0xFFFF_FFFFL) << 8;
+                long header = UnsafeUtil.getByte(inputBase.getBuf(), input) & 0xFF |
+                        (UnsafeUtil.getInt(inputBase.getBuf(), input + 1) & 0xFFFF_FFFFL) << 8;
 
                 headerSize = 5;
                 uncompressedSize = (int)((header >>> 4) & mask(18));
@@ -675,16 +676,16 @@ public class ZstdFrameDecompressor {
         int inputLimit = input + compressedSize;
 
         if (literalsBlockType != LiteralsBlockType.TREELESS)
-            input += huffman.readTable(inputBase, input, compressedSize);
+            input += huffman.readTable(inputBase.getBuf(), input, compressedSize);
 
         literalsBase = literals;
         literalsAddress = 0;
         literalsLimit = uncompressedSize;
 
         if (singleStream) {
-            huffman.decodeSingleStream(inputBase, input, inputLimit, literals, literalsAddress, literalsLimit);
+            huffman.decodeSingleStream(inputBase.getBuf(), input, inputLimit, literals, literalsAddress, literalsLimit);
         } else {
-            huffman.decode4Streams(inputBase, input, inputLimit, literals, literalsAddress, literalsLimit);
+            huffman.decode4Streams(inputBase.getBuf(), input, inputLimit, literals, literalsAddress, literalsLimit);
         }
 
         return headerSize + compressedSize;
