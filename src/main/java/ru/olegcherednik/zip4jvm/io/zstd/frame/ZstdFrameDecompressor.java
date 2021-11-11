@@ -232,14 +232,12 @@ public class ZstdFrameDecompressor {
         int inputLimit = inputAddress + blockSize;
         int input = inputAddress;
 
-        // decode literals
-        LiteralsBlockType literalsBlockType = LiteralsBlockType.parseId(inputBase.getByte() & 0b11);
-        inputBase.skip(-1);
+        LiteralsBlockType literalsBlockType = LiteralsBlockType.parseId(inputBase.getByteNoMove() & 0b11);
 
         if (literalsBlockType == LiteralsBlockType.RAW)
-            input += decodeRawLiterals(inputBase.getBuf(), input, inputLimit);
+            input += decodeRawLiterals(inputBase, inputLimit);
         else if (literalsBlockType == LiteralsBlockType.RLE)
-            input += decodeRleLiterals(inputBase.getBuf(), input, blockSize);
+            input += decodeRleLiterals(inputBase);
         else if (literalsBlockType == LiteralsBlockType.COMPRESSED)
             input += decodeCompressedLiterals(inputBase.getBuf(), input, blockSize, LiteralsBlockType.COMPRESSED);
         else if (literalsBlockType == LiteralsBlockType.TREELESS) {
@@ -692,69 +690,32 @@ public class ZstdFrameDecompressor {
         return headerSize + compressedSize;
     }
 
-    private int decodeRleLiterals(byte[] inputBase, final int inputAddress, int blockSize) {
-        int input = inputAddress;
-        int outputSize;
+    private int decodeRleLiterals(Buffer inputBase) {
+        final int pos = inputBase.getOffs();
+        int outputSize = getLiteralSize(inputBase);
 
-        int type = (UnsafeUtil.getByte(inputBase, input) >> 2) & 0b11;
-        switch (type) {
-            case 0:
-            case 2:
-                outputSize = (UnsafeUtil.getByte(inputBase, input) & 0xFF) >>> 3;
-                input++;
-                break;
-            case 1:
-                outputSize = (UnsafeUtil.getShort(inputBase, input) & 0xFFFF) >>> 4;
-                input += 2;
-                break;
-            case 3:
-                // we need at least 4 bytes (3 for the header, 1 for the payload)
-                verify(blockSize >= SIZE_OF_INT, input, "Not enough input bytes");
-                outputSize = (UnsafeUtil.getInt(inputBase, input) & 0xFF_FFFF) >>> 4;
-                input += 3;
-                break;
-            default:
-                throw fail(input, "Invalid RLE literals header encoding type");
-        }
+        if (outputSize > MAX_BLOCK_SIZE)
+            throw new Zip4jvmException("Output exceeds maximum block size");
 
-        verify(outputSize <= MAX_BLOCK_SIZE, input, "Output exceeds maximum block size");
-
-        byte value = UnsafeUtil.getByte(inputBase, input++);
-        Arrays.fill(literals, 0, outputSize + SIZE_OF_LONG, value);
+        int value = inputBase.getByte();
+        Arrays.fill(literals, 0, outputSize + SIZE_OF_LONG, (byte)value);
 
         literalsBase = literals;
         literalsAddress = 0;
         literalsLimit = outputSize;
 
-        return input - inputAddress;
+        int written = inputBase.getOffs() - pos;
+        inputBase.seek(pos);
+        return written;
     }
 
-    private int decodeRawLiterals(byte[] inputBase, final int inputAddress, long inputLimit) {
-        int input = inputAddress;
-        int sizeFormat = (UnsafeUtil.getByte(inputBase, input) >> 2) & 0b11;
+    private int decodeRawLiterals(Buffer inputBase, long inputLimit) {
+        final int pos = inputBase.getOffs();
+        int literalSize = getLiteralSize(inputBase);
+        int input = inputBase.getOffs();
+        // TODO temporary
+        inputBase.seek(pos);
 
-        int literalSize;
-        switch (sizeFormat) {
-            case 0:
-            case 2:
-                literalSize = (UnsafeUtil.getByte(inputBase, input) & 0xFF) >>> 3;
-                input++;
-                break;
-            case 1:
-                literalSize = (UnsafeUtil.getShort(inputBase, input) & 0xFFFF) >>> 4;
-                input += 2;
-                break;
-            case 3:
-                // read 3 little-endian bytes
-                int header = (UnsafeUtil.getByte(inputBase, input) & 0xFF) |
-                        ((UnsafeUtil.getShort(inputBase, input + 1) & 0xFFFF) << 8);
-
-                literalSize = header >>> 4;
-                input += 3;
-                break;
-            default:
-                throw fail(input, "Invalid raw literals header encoding type");
-        }
 
         // Set literals pointer to [input, literalSize], but only if we can copy 8 bytes at a time during sequence decoding
         // Otherwise, copy literals into buffer that's big enough to guarantee that
@@ -763,16 +724,25 @@ public class ZstdFrameDecompressor {
             literalsAddress = 0;
             literalsLimit = literalSize;
 
-            UnsafeUtil.copyMemory(inputBase, input, literals, literalsAddress, literalSize);
+            UnsafeUtil.copyMemory(inputBase.getBuf(), input, literals, literalsAddress, literalSize);
             Arrays.fill(literals, literalSize, literalSize + SIZE_OF_LONG, (byte)0);
         } else {
-            literalsBase = inputBase;
+            literalsBase = inputBase.getBuf();
             literalsAddress = input;
             literalsLimit = literalsAddress + literalSize;
         }
-        input += literalSize;
 
-        return input - inputAddress;
+        return input + literalSize - pos;
+    }
+
+    private static int getLiteralSize(Buffer inputBase) {
+        int sizeFormat = (inputBase.getByteNoMove() >> 2) & 0b11;
+
+        if (sizeFormat == 0b00 || sizeFormat == 0b10)
+            return inputBase.getByte() >>> 3;
+        if (sizeFormat == 0b01)
+            return inputBase.getShort() >>> 4;
+        return inputBase.get3Bytes() >>> 4; // sizeFormat == 0b11
     }
 
 }

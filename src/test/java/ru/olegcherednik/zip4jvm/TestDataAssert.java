@@ -54,7 +54,7 @@ public final class TestDataAssert {
     public static final Consumer<IFileAssert<?>> fileSaintPetersburgAssert = file -> file.exists().isImage().hasSize(1_074_836);
     public static final Consumer<IFileAssert<?>> fileSigSauerAssert = file -> file.exists().isImage().hasSize(431_478);
     public static final Consumer<IFileAssert<?>> fileEmptyAssert = file -> file.exists().hasSize(0);
-    public static final Consumer<IFileAssert<?>> zipFileOlegCherednikAssert = file -> file.exists().hasSize(1_395_362);
+    public static final Consumer<IFileAssert<?>> fileOlegCherednikAssert = file -> file.exists().hasSize(40);
 
     public static final Consumer<IDirectoryAssert<?>> dirBikesAssert = dir -> {
         dir.exists().hasDirectories(0).hasFiles(4);

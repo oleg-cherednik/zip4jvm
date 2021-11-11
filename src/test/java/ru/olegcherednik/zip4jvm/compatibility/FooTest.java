@@ -18,6 +18,8 @@ import java.util.function.Consumer;
 
 import static ru.olegcherednik.zip4jvm.TestData.fileDucati;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameDucati;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameOlegCherednik;
+import static ru.olegcherednik.zip4jvm.TestData.fileOlegCherednik;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
@@ -28,11 +30,17 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
 @Test
 public class FooTest {
 
-    public static final Path zip = Paths.get("src/test/resources/seven-zip/ducati-panigale-1199.zip").toAbsolutePath();
-
     private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(FooTest.class);
 
-    public void shouldUnzipWhenZstdSolid() throws IOException {
+    public void shouldUnzipWhenZstdSolid1() throws IOException {
+        Path zip = Paths.get("src/test/resources/seven-zip/ducati-panigale-1199.zip").toAbsolutePath();
+        Path destDir = rootDir;
+        UnzipIt.zip(zip).destDir(destDir).extract();
+        assertThatDirectory(destDir).matches(foo);
+    }
+
+    public void shouldUnzipWhenZstdSolid2() throws IOException {
+        Path zip = Paths.get("src/test/resources/seven-zip/oleg-cherednik.zip").toAbsolutePath();
         Path destDir = rootDir;
         UnzipIt.zip(zip).destDir(destDir).extract();
         assertThatDirectory(destDir).matches(foo);
@@ -44,11 +52,30 @@ public class FooTest {
                                                          .build();
         ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
 
-        Path zip = rootDir.resolve("src.zip");
+        Path zip = rootDir.resolve("src1.zip");
 
         ZipIt.zip(zip).settings(settings).add(fileDucati);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
-        assertThatZipFile(zip).root().matches(foo);
+        assertThatZipFile(zip).root().matches(dir -> {
+            dir.exists().hasDirectories(0).hasFiles(1);
+            TestDataAssert.fileDucatiAssert.accept(dir.file(fileNameDucati));
+        });
+    }
+
+    public void shouldCreateSingleZipWithFilesWhenZstdCompressionTextFile() throws IOException {
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.ZSTD, CompressionLevel.NORMAL)
+                                                         .build();
+        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
+
+        Path zip = rootDir.resolve("src2.zip");
+
+        ZipIt.zip(zip).settings(settings).add(fileOlegCherednik);
+//        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
+        assertThatZipFile(zip).root().matches(dir -> {
+            dir.exists().hasDirectories(0).hasFiles(1);
+            TestDataAssert.fileOlegCherednikAssert.accept(dir.file(fileNameOlegCherednik));
+        });
     }
 
     private static final Consumer<IDirectoryAssert<?>> foo = dir -> {

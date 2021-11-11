@@ -1,7 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.zstd;
 
 import lombok.Getter;
-import lombok.Setter;
 
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_BYTE;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_INT;
@@ -16,7 +15,6 @@ import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;
 public final class Buffer {
 
     private final byte[] buf;
-    @Setter
     private int offs;
 
     public Buffer(int size) {
@@ -35,16 +33,17 @@ public final class Buffer {
         this.offs = offs;
     }
 
+    public int get3Bytes() {
+        int one = getByte();
+        int two = getByte();
+        int three = getByte();
+        return three << 16 | two << 8 | one;
+    }
+
     public long getInt() {
         long value = UnsafeUtil.getInt(buf, offs) & 0xFFFF_FFFFL;
         offs += SIZE_OF_INT;
         return value;
-    }
-
-    public int get3Bytes() {
-        int a = getShort();
-        int b = getByte();
-        return b << 16 | a;
     }
 
     public long getLong() {
@@ -56,6 +55,12 @@ public final class Buffer {
     public int getByte() {
         int value = UnsafeUtil.getByte(buf, offs) & 0xFF;
         offs += SIZE_OF_BYTE;
+        return value;
+    }
+
+    public int getByteNoMove() {
+        int value = getByte();
+        offs -= SIZE_OF_BYTE;
         return value;
     }
 

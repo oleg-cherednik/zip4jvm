@@ -56,19 +56,12 @@ public class BlockHeader {
     }
 
     public static BlockHeader read(Buffer inputBase) {
-        int data = readData(inputBase);
+        int data = inputBase.get3Bytes();
         boolean last = (data & 1) != 0;
         Type type = Type.parseId((data >>> 1) & 0b11);
         int size = (data >>> 3) & 0x1F_FFFF; // 21 bits
 
         return new BlockHeader(last, type, size);
-    }
-
-    private static int readData(Buffer inputBase) {
-        int one = inputBase.getByte();
-        int two = inputBase.getByte();
-        int three = inputBase.getByte();
-        return three << 16 | two << 8 | one;
     }
 
 }
