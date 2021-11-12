@@ -13,7 +13,6 @@
  */
 package ru.olegcherednik.zip4jvm.io.zstd;
 
-import lombok.Getter;
 import ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream;
 import ru.olegcherednik.zip4jvm.io.zstd.bit.BitOutputStream;
 
@@ -148,7 +147,7 @@ public class FiniteStateEntropy {
             }
         }
 
-        return (int)(output - outputAddress);
+        return output - outputAddress;
     }
 
     public static int compress(byte[] outputBase, int outputAddress, int outputSize, byte[] inputBase, int inputSize, FseCompressionTable table) {

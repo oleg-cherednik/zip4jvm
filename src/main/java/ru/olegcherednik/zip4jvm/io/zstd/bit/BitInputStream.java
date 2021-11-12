@@ -13,6 +13,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.zstd.bit;
 
+import ru.olegcherednik.zip4jvm.io.zstd.Buffer;
 import ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil;
 
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_LONG;
@@ -80,6 +81,10 @@ public class BitInputStream {
         private long bits;
         private int currentAddress;
         private int bitsConsumed;
+
+        public Initializer(Buffer inputBase, int startAddress, int endAddress) {
+            this(inputBase.getBuf(), startAddress, endAddress);
+        }
 
         public Initializer(byte[] inputBase, int startAddress, int endAddress) {
             this.inputBase = inputBase;

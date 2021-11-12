@@ -278,7 +278,7 @@ public class ZstdFrameDecompressor {
             input = computeMatchLengthTable(matchLengthType, inputBase.getBuf(), input, inputLimit);
 
             // decompress sequences
-            BitInputStream.Initializer initializer = new BitInputStream.Initializer(inputBase.getBuf(), input, inputLimit);
+            BitInputStream.Initializer initializer = new BitInputStream.Initializer(inputBase, input, inputLimit);
             initializer.initialize();
             int bitsConsumed = initializer.getBitsConsumed();
             long bits = initializer.getBits();
@@ -621,10 +621,8 @@ public class ZstdFrameDecompressor {
     private void decodeCompressedLiterals(Buffer inputBase, int blockSize, LiteralBlockHeader literalBlockHeader) {
         final int pos = inputBase.getOffs();
 
-        // compressed
         int compressedSize;
         int uncompressedSize;
-
         int sizeFormat = literalBlockHeader.getSizeFormat();
 
         if (sizeFormat == LiteralBlockHeader.SIZE_FORMAT_1STREAM_10BITS
@@ -661,8 +659,6 @@ public class ZstdFrameDecompressor {
             huffman.decodeSingleStream(inputBase, inputLimit, literals, literalsAddress, literalsLimit);
         else
             huffman.decode4Streams(inputBase, inputLimit, literals, literalsAddress, literalsLimit);
-
-        inputBase.seek(inputLimit);
     }
 
     private void decodeRleLiterals(Buffer inputBase, LiteralBlockHeader literalBlockHeader) {
