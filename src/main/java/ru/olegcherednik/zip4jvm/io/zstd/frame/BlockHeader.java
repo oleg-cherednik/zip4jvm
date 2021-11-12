@@ -24,7 +24,6 @@ public class BlockHeader {
     // when type == RLE - the number of times the single byte must be repeated.
     // limited: min of Window_Size and 128Kb
     private final int size;
-    // Block_Content (n bytes)
 
     @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
     public enum Type {
