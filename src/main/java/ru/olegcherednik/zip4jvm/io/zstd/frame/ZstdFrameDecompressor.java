@@ -687,19 +687,17 @@ public class ZstdFrameDecompressor {
 
     private void decodeRleLiterals(Buffer inputBase) {
         final int pos = inputBase.getOffs();
-        int outputSize = getLiteralSize(inputBase);
+        int literalSize = getLiteralSize(inputBase);
 
-        if (outputSize > MAX_BLOCK_SIZE)
+        if (literalSize > MAX_BLOCK_SIZE)
             throw new Zip4jvmException("Output exceeds maximum block size");
 
-        int value = inputBase.getByte();
-        Arrays.fill(literals, 0, outputSize + SIZE_OF_LONG, (byte)value);
+        Arrays.fill(literals, 0, literalSize + SIZE_OF_LONG, (byte)inputBase.getByte());
+        inputBase.seek(inputBase.getOffs() - pos);
 
         literalsBase = literals;
         literalsAddress = 0;
-        literalsLimit = outputSize;
-
-        inputBase.seek(inputBase.getOffs() - pos);
+        literalsLimit = literalSize;
     }
 
     private void decodeRawLiterals(Buffer inputBase, long blockSize) {
