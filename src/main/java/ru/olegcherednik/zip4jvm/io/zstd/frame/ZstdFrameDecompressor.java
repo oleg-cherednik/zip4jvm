@@ -228,65 +228,63 @@ public class ZstdFrameDecompressor {
 
 
     private int decodeCompressedBlock(Buffer inputBase, int blockSize, byte[] outputBase, int outputAddress) {
-        int inputAddress = inputBase.getOffs();
-        int inputLimit = inputAddress + blockSize;
-        int input = inputAddress;
-
+        final int pos = inputBase.getOffs();
         LiteralsBlockType literalsBlockType = LiteralsBlockType.parseId(inputBase.getByteNoMove() & 0b11);
 
         if (literalsBlockType == LiteralsBlockType.RAW)
-            input += decodeRawLiterals(inputBase, inputLimit);
+            decodeRawLiterals(inputBase, blockSize);
         else if (literalsBlockType == LiteralsBlockType.RLE)
-            input += decodeRleLiterals(inputBase);
+            decodeRleLiterals(inputBase);
         else if (literalsBlockType == LiteralsBlockType.COMPRESSED)
-            input += decodeCompressedLiterals(inputBase, blockSize, LiteralsBlockType.COMPRESSED);
+            decodeCompressedLiterals(inputBase, blockSize, LiteralsBlockType.COMPRESSED);
         else if (literalsBlockType == LiteralsBlockType.TREELESS) {
-            verify(huffman.isLoaded(), input, "Dictionary is corrupted");
-            input += decodeCompressedLiterals(inputBase, blockSize, LiteralsBlockType.TREELESS);
+            if (!huffman.isLoaded())
+                throw new Zip4jvmException("Dictionary is corrupted");
+            decodeCompressedLiterals(inputBase, blockSize, LiteralsBlockType.TREELESS);
         } else
             throw new Zip4jvmException("Invalid Literals_Block type");
 
-        int written = decompressSequences(
-                inputBase.getBuf(), input, inputAddress + blockSize,
+        int written = decompressSequences(inputBase, pos + blockSize,
                 outputBase, outputAddress, literalsBase, literalsAddress, literalsLimit);
-        inputBase.skip(blockSize);
+        inputBase.seek(pos + blockSize);
         return written;
     }
 
     private int decompressSequences(
-            final byte[] inputBase, final int inputAddress, final int inputLimit,
+            Buffer inputBase, final int inputLimit,
             final byte[] outputBase, final int outputAddress,
             final byte[] literalsBase, final int literalsAddress, final int literalsLimit) {
         final int fastOutputLimit = outputBase.length - SIZE_OF_LONG;
         final long fastMatchOutputLimit = fastOutputLimit - SIZE_OF_LONG;
 
+        final int inputAddress = inputBase.getOffs();
         int input = inputAddress;
         int output = outputAddress;
 
         int literalsInput = literalsAddress;
 
         // decode header
-        int sequenceCount = UnsafeUtil.getByte(inputBase, input++) & 0xFF;
+        int sequenceCount = UnsafeUtil.getByte(inputBase.getBuf(), input++) & 0xFF;
         if (sequenceCount != 0) {
             if (sequenceCount == 255) {
-                sequenceCount = (UnsafeUtil.getShort(inputBase, input) & 0xFFFF) + LONG_NUMBER_OF_SEQUENCES;
+                sequenceCount = (UnsafeUtil.getShort(inputBase.getBuf(), input) & 0xFFFF) + LONG_NUMBER_OF_SEQUENCES;
                 input += SIZE_OF_SHORT;
             } else if (sequenceCount > 127) {
-                sequenceCount = ((sequenceCount - 128) << 8) + (UnsafeUtil.getByte(inputBase, input++) & 0xFF);
+                sequenceCount = ((sequenceCount - 128) << 8) + (UnsafeUtil.getByte(inputBase.getBuf(), input++) & 0xFF);
             }
 
-            byte type = UnsafeUtil.getByte(inputBase, input++);
+            byte type = UnsafeUtil.getByte(inputBase.getBuf(), input++);
 
             int literalsLengthType = (type & 0xFF) >>> 6;
             int offsetCodesType = (type >>> 4) & 0b11;
             int matchLengthType = (type >>> 2) & 0b11;
 
-            input = computeLiteralsTable(literalsLengthType, inputBase, input, inputLimit);
-            input = computeOffsetsTable(offsetCodesType, inputBase, input, inputLimit);
-            input = computeMatchLengthTable(matchLengthType, inputBase, input, inputLimit);
+            input = computeLiteralsTable(literalsLengthType, inputBase.getBuf(), input, inputLimit);
+            input = computeOffsetsTable(offsetCodesType, inputBase.getBuf(), input, inputLimit);
+            input = computeMatchLengthTable(matchLengthType, inputBase.getBuf(), input, inputLimit);
 
             // decompress sequences
-            BitInputStream.Initializer initializer = new BitInputStream.Initializer(inputBase, input, inputLimit);
+            BitInputStream.Initializer initializer = new BitInputStream.Initializer(inputBase.getBuf(), input, inputLimit);
             initializer.initialize();
             int bitsConsumed = initializer.getBitsConsumed();
             long bits = initializer.getBits();
@@ -322,7 +320,7 @@ public class ZstdFrameDecompressor {
             while (sequenceCount > 0) {
                 sequenceCount--;
 
-                BitInputStream.Loader loader = new BitInputStream.Loader(inputBase, input, currentAddress, bits, bitsConsumed);
+                BitInputStream.Loader loader = new BitInputStream.Loader(inputBase.getBuf(), input, currentAddress, bits, bitsConsumed);
                 loader.load();
                 bitsConsumed = loader.getBitsConsumed();
                 bits = loader.getBits();
@@ -394,7 +392,7 @@ public class ZstdFrameDecompressor {
 
                 int totalBits = literalsLengthBits + matchLengthBits + offsetBits;
                 if (totalBits > 64 - 7 - (LITERAL_LENGTH_TABLE_LOG + MATCH_LENGTH_TABLE_LOG + OFFSET_TABLE_LOG)) {
-                    BitInputStream.Loader loader1 = new BitInputStream.Loader(inputBase, input, currentAddress, bits, bitsConsumed);
+                    BitInputStream.Loader loader1 = new BitInputStream.Loader(inputBase.getBuf(), input, currentAddress, bits, bitsConsumed);
                     loader1.load();
 
                     bitsConsumed = loader1.getBitsConsumed();
@@ -626,7 +624,7 @@ public class ZstdFrameDecompressor {
         }
     }
 
-    private int decodeCompressedLiterals(Buffer inputBase, int blockSize, LiteralsBlockType literalsBlockType) {
+    private void decodeCompressedLiterals(Buffer inputBase, int blockSize, LiteralsBlockType literalsBlockType) {
         final int inputAddress = inputBase.getOffs();
         int input = inputAddress;
 
@@ -688,10 +686,10 @@ public class ZstdFrameDecompressor {
             huffman.decode4Streams(inputBase.getBuf(), input, inputLimit, literals, literalsAddress, literalsLimit);
         }
 
-        return headerSize + compressedSize;
+        inputBase.skip(headerSize + compressedSize);
     }
 
-    private int decodeRleLiterals(Buffer inputBase) {
+    private void decodeRleLiterals(Buffer inputBase) {
         final int pos = inputBase.getOffs();
         int outputSize = getLiteralSize(inputBase);
 
@@ -705,13 +703,12 @@ public class ZstdFrameDecompressor {
         literalsAddress = 0;
         literalsLimit = outputSize;
 
-        int written = inputBase.getOffs() - pos;
-        inputBase.seek(pos);
-        return written;
+        inputBase.seek(inputBase.getOffs() - pos);
     }
 
-    private int decodeRawLiterals(Buffer inputBase, long inputLimit) {
+    private void decodeRawLiterals(Buffer inputBase, long blockSize) {
         final int pos = inputBase.getOffs();
+        long inputLimit = pos + blockSize;
         int literalSize = getLiteralSize(inputBase);
         int input = inputBase.getOffs();
         // TODO temporary
@@ -733,7 +730,7 @@ public class ZstdFrameDecompressor {
             literalsLimit = literalsAddress + literalSize;
         }
 
-        return input + literalSize - pos;
+        inputBase.skip(input + literalSize - pos);
     }
 
     private static int getLiteralSize(Buffer inputBase) {
