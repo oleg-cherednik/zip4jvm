@@ -14,11 +14,17 @@ import ru.olegcherednik.zip4jvm.io.zstd.Buffer;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class LiteralBlockHeader {
 
+    public static final int SIZE_FORMAT_1STREAM_10BITS = 0b00;
+    public static final int SIZE_FORMAT_4STREAMS_10BITS = 0b01;
+    public static final int SIZE_FORMAT_4STREAMS_14BITS = 0b10;
+    public static final int SIZE_FORMAT_4STREAMS_18BITS = 0b11;
+
     // bit:0-1
     private final Type type;
-    // bit:3-4
+    // bit:2-3
     private final int sizeFormat;
-    // bit:5-20 - regeneratedSize
+    // bit:4-23
+    private final int sizePart1;
     // CompressedSize (18 bits) - optional
 
     @Getter
@@ -50,10 +56,12 @@ public class LiteralBlockHeader {
     }
 
     public static LiteralBlockHeader read(Buffer inputBase) {
-        Type type = Type.parseId(inputBase.getByteNoMove() & 0b11);
-        int sizeFormat = (inputBase.getByteNoMove() >> 2) & 0b11;
-
-        return new LiteralBlockHeader(type, sizeFormat);
+        int one = inputBase.getByteNoMove();
+        int two = inputBase.get3Bytes();
+        Type type = Type.parseId(one & 0b11);
+        int sizeFormat = (one >> 2) & 0b11;
+        int sizePart1 = two >> 4;
+        return new LiteralBlockHeader(type, sizeFormat, sizePart1);
     }
 
 }

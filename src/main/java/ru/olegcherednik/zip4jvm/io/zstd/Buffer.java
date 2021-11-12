@@ -40,6 +40,15 @@ public final class Buffer {
         return three << 16 | two << 8 | one;
     }
 
+    public long get5Bytes() {
+        int one = getByte();
+        int two = getByte();
+        int three = getByte();
+        int four = getByte();
+        long five = getByte();
+        return five << 32 | four << 24 | three << 16 | two << 8 | one;
+    }
+
     public long getInt() {
         long value = UnsafeUtil.getInt(buf, offs) & 0xFFFF_FFFFL;
         offs += SIZE_OF_INT;

@@ -43,7 +43,6 @@ import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_INT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_LONG;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.fail;
-import static ru.olegcherednik.zip4jvm.io.zstd.Util.mask;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.verify;
 import static ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream.peekBits;
 
@@ -235,11 +234,11 @@ public class ZstdFrameDecompressor {
         else if (literalBlockHeader.getType() == LiteralBlockHeader.Type.RLE)
             decodeRleLiterals(inputBase, literalBlockHeader);
         else if (literalBlockHeader.getType() == LiteralBlockHeader.Type.COMPRESSED)
-            decodeCompressedLiterals(inputBase, blockSize, LiteralBlockHeader.Type.COMPRESSED);
+            decodeCompressedLiterals(inputBase, blockSize, literalBlockHeader);
         else if (literalBlockHeader.getType() == LiteralBlockHeader.Type.TREELESS) {
             if (!huffman.isLoaded())
                 throw new Zip4jvmException("Dictionary is corrupted");
-            decodeCompressedLiterals(inputBase, blockSize, LiteralBlockHeader.Type.TREELESS);
+            decodeCompressedLiterals(inputBase, blockSize, literalBlockHeader);
         } else
             throw new Zip4jvmException("Invalid Literals_Block type");
 
@@ -619,73 +618,57 @@ public class ZstdFrameDecompressor {
         }
     }
 
-    private void decodeCompressedLiterals(Buffer inputBase, int blockSize, LiteralBlockHeader.Type literalsBlockType) {
-        final int inputAddress = inputBase.getOffs();
-        int input = inputAddress;
+    private void decodeCompressedLiterals(Buffer inputBase, int blockSize, LiteralBlockHeader literalBlockHeader) {
+        final int pos = inputBase.getOffs();
 
         // compressed
         int compressedSize;
         int uncompressedSize;
-        boolean singleStream = false;
-        int headerSize;
 
-        int sizeFormat = getSizeFormat(inputBase);
+        int sizeFormat = literalBlockHeader.getSizeFormat();
 
-        switch (sizeFormat) {
-            case 0b00:
-                singleStream = true;
-            case 0b01: {
-                int header = UnsafeUtil.getInt(inputBase.getBuf(), input);
-                headerSize = 3;
-                uncompressedSize = (header >>> 4) & mask(10);
-                compressedSize = (header >>> 14) & mask(10);
-                break;
-            }
-            case 2: {
-                int header = UnsafeUtil.getInt(inputBase.getBuf(), input);
+        if (sizeFormat == LiteralBlockHeader.SIZE_FORMAT_1STREAM_10BITS
+                || sizeFormat == LiteralBlockHeader.SIZE_FORMAT_4STREAMS_10BITS) {
+            long data = literalBlockHeader.getSizePart1();
+            uncompressedSize = (int)(data & 0x3FF);
+            compressedSize = (int)(data >>> 10 & 0x3FF);
+        } else if (sizeFormat == LiteralBlockHeader.SIZE_FORMAT_4STREAMS_14BITS) {
+            long sizePart2 = inputBase.getByte();
+            long data = sizePart2 << 20 | literalBlockHeader.getSizePart1();
+            uncompressedSize = (int)(data & 0x3FFF);
+            compressedSize = (int)(data >>> 14 & 0x3FFF);
+        } else if (sizeFormat == LiteralBlockHeader.SIZE_FORMAT_4STREAMS_18BITS) {
+            long sizePart2 = inputBase.getShort();
+            long data = sizePart2 << 20 | literalBlockHeader.getSizePart1();
+            uncompressedSize = (int)(data & 0x3FFFF);
+            compressedSize = (int)(data >>> 18 & 0x3FFFF);
+        } else
+            throw new Zip4jvmException("Invalid literals header size type");
 
-                headerSize = 4;
-                uncompressedSize = (header >>> 4) & mask(14);
-                compressedSize = (header >>> 18) & mask(14);
-                break;
-            }
-            case 3:
-                // read 5 little-endian bytes
-                long header = UnsafeUtil.getByte(inputBase.getBuf(), input) & 0xFF |
-                        (UnsafeUtil.getInt(inputBase.getBuf(), input + 1) & 0xFFFF_FFFFL) << 8;
+        verify(uncompressedSize <= MAX_BLOCK_SIZE, pos, "Block exceeds maximum size");
+        verify(inputBase.getOffs() - pos + compressedSize <= blockSize, pos, "Input is corrupted");
 
-                headerSize = 5;
-                uncompressedSize = (int)((header >>> 4) & mask(18));
-                compressedSize = (int)((header >>> 22) & mask(18));
-                break;
-            default:
-                throw fail(input, "Invalid literals header size type");
-        }
+        int inputLimit = inputBase.getOffs() + compressedSize;
+        int input = inputBase.getOffs();
 
-        verify(uncompressedSize <= MAX_BLOCK_SIZE, input, "Block exceeds maximum size");
-        verify(headerSize + compressedSize <= blockSize, input, "Input is corrupted");
-
-        input += headerSize;
-
-        int inputLimit = input + compressedSize;
-
-        if (literalsBlockType != LiteralBlockHeader.Type.TREELESS)
+        if (literalBlockHeader.getType() == LiteralBlockHeader.Type.COMPRESSED)
             input += huffman.readTable(inputBase.getBuf(), input, compressedSize);
 
         literalsBase = literals;
         literalsAddress = 0;
         literalsLimit = uncompressedSize;
 
-        if (singleStream) {
+        if (sizeFormat == LiteralBlockHeader.SIZE_FORMAT_1STREAM_10BITS) {
             huffman.decodeSingleStream(inputBase.getBuf(), input, inputLimit, literals, literalsAddress, literalsLimit);
         } else {
             huffman.decode4Streams(inputBase.getBuf(), input, inputLimit, literals, literalsAddress, literalsLimit);
         }
 
-        inputBase.skip(headerSize + compressedSize);
+        inputBase.skip(compressedSize);
     }
 
     private void decodeRleLiterals(Buffer inputBase, LiteralBlockHeader literalBlockHeader) {
+        inputBase.skip(-3);
         final int pos = inputBase.getOffs();
         int literalSize = getLiteralSize(inputBase, literalBlockHeader.getSizeFormat());
 
@@ -701,6 +684,7 @@ public class ZstdFrameDecompressor {
     }
 
     private void decodeRawLiterals(Buffer inputBase, long blockSize, LiteralBlockHeader literalBlockHeader) {
+        inputBase.skip(-3);
         final int pos = inputBase.getOffs();
         long inputLimit = pos + blockSize;
         int literalSize = getLiteralSize(inputBase, literalBlockHeader.getSizeFormat());
@@ -732,10 +716,6 @@ public class ZstdFrameDecompressor {
         if (sizeFormat == 0b01)
             return inputBase.getShort() >>> 4;
         return inputBase.get3Bytes() >>> 4; // sizeFormat == 0b11
-    }
-
-    private static int getSizeFormat(Buffer inputBase) {
-        return (inputBase.getByteNoMove() >> 2) & 0b11;
     }
 
 }
