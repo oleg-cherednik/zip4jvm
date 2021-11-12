@@ -244,16 +244,12 @@ public class ZstdFrameDecompressor {
         } else
             throw new Zip4jvmException("Invalid Literals_Block type");
 
-        int written = decompressSequences(inputBase, pos + blockSize,
-                outputBase, outputAddress, literalsBase, literalsAddress, literalsLimit);
+        int written = decompressSequences(inputBase, pos + blockSize, outputBase, outputAddress);
         inputBase.seek(pos + blockSize);
         return written;
     }
 
-    private int decompressSequences(
-            Buffer inputBase, final int inputLimit,
-            final byte[] outputBase, final int outputAddress,
-            final byte[] literalsBase, final int literalsAddress, final int literalsLimit) {
+    private int decompressSequences(Buffer inputBase, final int inputLimit, final byte[] outputBase, final int outputAddress) {
         final int fastOutputLimit = outputBase.length - SIZE_OF_LONG;
         final long fastMatchOutputLimit = fastOutputLimit - SIZE_OF_LONG;
 
@@ -427,7 +423,7 @@ public class ZstdFrameDecompressor {
                 } else {
                     // copy literals. literalOutputLimit <= fastOutputLimit, so we can copy
                     // long at a time with over-copy
-                    output = copyLiterals(outputBase, literalsBase, output, literalsInput, literalOutputLimit);
+                    output = copyLiterals(outputBase, output, literalsInput, literalOutputLimit);
                     copyMatch(outputBase, fastOutputLimit, output, offset, matchOutputLimit, matchAddress, matchLength, fastMatchOutputLimit);
                 }
                 output = matchOutputLimit;
@@ -436,12 +432,12 @@ public class ZstdFrameDecompressor {
         }
 
         // last literal segment
-        output = copyLastLiteral(outputBase, literalsBase, literalsLimit, output, literalsInput);
+        output = copyLastLiteral(outputBase, output, literalsInput);
 
         return output - outputAddress;
     }
 
-    private static int copyLastLiteral(byte[] outputBase, byte[] literalsBase, int literalsLimit, int output, int literalsInput) {
+    private int copyLastLiteral(byte[] outputBase, int output, int literalsInput) {
         int lastLiteralsSize = literalsLimit - literalsInput;
         UnsafeUtil.copyMemory(literalsBase, literalsInput, outputBase, output, lastLiteralsSize);
         output += lastLiteralsSize;
@@ -507,7 +503,7 @@ public class ZstdFrameDecompressor {
         return matchAddress;
     }
 
-    private static int copyLiterals(byte[] outputBase, byte[] literalsBase, int output, int literalsInput, int literalOutputLimit) {
+    private int copyLiterals(byte[] outputBase, int output, int literalsInput, int literalOutputLimit) {
         int literalInput = literalsInput;
         do {
             UnsafeUtil.putLong(outputBase, output, UnsafeUtil.getLong(literalsBase, literalInput));
@@ -713,7 +709,6 @@ public class ZstdFrameDecompressor {
         int input = inputBase.getOffs();
         // TODO temporary
         inputBase.seek(pos);
-
 
         // Set literals pointer to [input, literalSize], but only if we can copy 8 bytes at a time during sequence decoding
         // Otherwise, copy literals into buffer that's big enough to guarantee that
