@@ -648,7 +648,7 @@ public class ZstdFrameDecompressor {
         verify(uncompressedSize <= MAX_BLOCK_SIZE, pos, "Block exceeds maximum size");
         verify(inputBase.getOffs() - pos + compressedSize <= blockSize, pos, "Input is corrupted");
 
-        int inputLimit = inputBase.getOffs() + compressedSize;
+        final int inputLimit = inputBase.getOffs() + compressedSize;
         int input = inputBase.getOffs();
 
         if (literalBlockHeader.getType() == LiteralBlockHeader.Type.COMPRESSED)
@@ -664,7 +664,7 @@ public class ZstdFrameDecompressor {
             huffman.decode4Streams(inputBase.getBuf(), input, inputLimit, literals, literalsAddress, literalsLimit);
         }
 
-        inputBase.skip(compressedSize);
+        inputBase.seek(inputLimit);
     }
 
     private void decodeRleLiterals(Buffer inputBase, LiteralBlockHeader literalBlockHeader) {
