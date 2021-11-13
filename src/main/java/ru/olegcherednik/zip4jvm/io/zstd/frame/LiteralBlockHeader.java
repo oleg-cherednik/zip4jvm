@@ -31,20 +31,46 @@ public class LiteralBlockHeader {
     @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
     public enum Type {
         // Literals are stored uncompressed
-        RAW(0),
+        RAW(0) {
+            @Override
+            public void decode(Buffer inputBase, int blockSize, LiteralBlockHeader literalBlockHeader, ZstdFrameDecompressor decompressor) {
+                decompressor.decodeRawLiterals(inputBase, blockSize, literalBlockHeader);
+            }
+        },
         // Literals consist of a single byte value repeated Regenerated_Size times
-        RLE(1),
+        RLE(1) {
+            @Override
+            public void decode(Buffer inputBase, int blockSize, LiteralBlockHeader literalBlockHeader, ZstdFrameDecompressor decompressor) {
+                decompressor.decodeRleLiterals(inputBase, literalBlockHeader);
+            }
+        },
         // This is a standard Huffman-compressed block, starting with a Huffman
         // tree description
-        COMPRESSED(2),
+        COMPRESSED(2) {
+            @Override
+            public void decode(Buffer inputBase, int blockSize, LiteralBlockHeader literalBlockHeader, ZstdFrameDecompressor decompressor) {
+                decompressor.decodeCompressedLiterals(inputBase, blockSize, literalBlockHeader);
+            }
+        },
         // This is a Huffman-compressed block, using Huffman tree from previous
         // Huffman-compressed literals block. Huffman_Tree_Description will be
         // skipped. Note: If this mode is triggered without any previous
         // Huffman-table in the frame (or dictionary), this should be treated as
         // data corruption
-        TREELESS(3);
+        TREELESS(3) {
+            @Override
+            public void decode(Buffer inputBase, int blockSize, LiteralBlockHeader literalBlockHeader, ZstdFrameDecompressor decompressor) {
+                if (!decompressor.huffman.isLoaded())
+                    throw new Zip4jvmException("Dictionary is corrupted");
+                decompressor.decodeCompressedLiterals(inputBase, blockSize, literalBlockHeader);
+            }
+        };
 
         private final int id;
+
+        public void decode(Buffer inputBase, int blockSize, LiteralBlockHeader literalBlockHeader, ZstdFrameDecompressor decompressors) {
+            throw new Zip4jvmException("Invalid Literals_Block type");
+        }
 
         public static Type parseId(int id) {
             for (Type type : values())

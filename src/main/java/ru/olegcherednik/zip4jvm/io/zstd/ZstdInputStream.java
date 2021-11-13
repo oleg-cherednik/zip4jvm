@@ -20,7 +20,6 @@ public class ZstdInputStream extends InputStream {
     private static final int SIGNATURE_V07 = 0xFD2FB527;
 
     private final DataInput in;
-    private final ZstdFrameDecompressor decompressor = new ZstdFrameDecompressor();
 
     public ZstdInputStream(DataInput in) throws IOException {
 //        verifyMagic(in);
@@ -52,7 +51,7 @@ public class ZstdInputStream extends InputStream {
             in.mark("start");
             outputBase = new byte[500_000];
             Buffer inputBase = new Buffer(in.readBytes(500_000));
-            written = decompressor.decompress(inputBase, outputBase);
+            written = new ZstdFrameDecompressor().decompress(inputBase, outputBase);
             this.offs = 0;
             in.seek("start");
             in.skip(written);

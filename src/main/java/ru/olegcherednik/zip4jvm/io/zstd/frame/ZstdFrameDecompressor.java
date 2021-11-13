@@ -111,7 +111,7 @@ public class ZstdFrameDecompressor {
     private final FiniteStateEntropy.Table literalsLengthTable = new FiniteStateEntropy.Table(LITERAL_LENGTH_TABLE_LOG);
     private final FiniteStateEntropy.Table offsetCodesTable = new FiniteStateEntropy.Table(OFFSET_TABLE_LOG);
     private final FiniteStateEntropy.Table matchLengthTable = new FiniteStateEntropy.Table(MATCH_LENGTH_TABLE_LOG);
-    private final Huffman huffman = new Huffman();
+    final Huffman huffman = new Huffman();
     private final FseTableReader fse = new FseTableReader();
     // current buffer containing literals
     private byte[] literalsBase;
@@ -164,8 +164,6 @@ public class ZstdFrameDecompressor {
 
     public int decompress(Buffer inputBase, byte[] outputBase) {
         int output = 0;
-
-        reset();
         int outputStart = output;
 
         verifyMagic(inputBase);
@@ -174,7 +172,7 @@ public class ZstdFrameDecompressor {
 
         while (true) {
             BlockHeader blockHeader = BlockHeader.read(inputBase);
-            output += blockHeader.getType().decodeBlock(blockHeader.getSize(), inputBase, outputBase, output, this);
+            output += blockHeader.getType().decode(blockHeader.getSize(), inputBase, outputBase, output, this);
 
             if (blockHeader.isLast())
                 break;
@@ -193,33 +191,10 @@ public class ZstdFrameDecompressor {
         return output;
     }
 
-    private void reset() {
-        previousOffsets[0] = 1;
-        previousOffsets[1] = 4;
-        previousOffsets[2] = 8;
-
-        currentLiteralsLengthTable = null;
-        currentOffsetCodesTable = null;
-        currentMatchLengthTable = null;
-    }
-
     int decodeCompressedBlock(Buffer inputBase, int blockSize, byte[] outputBase, int outputAddress) {
         final int pos = inputBase.getOffs();
         LiteralBlockHeader literalBlockHeader = LiteralBlockHeader.read(inputBase);
-
-        if (literalBlockHeader.getType() == LiteralBlockHeader.Type.RAW)
-            decodeRawLiterals(inputBase, blockSize, literalBlockHeader);
-        else if (literalBlockHeader.getType() == LiteralBlockHeader.Type.RLE)
-            decodeRleLiterals(inputBase, literalBlockHeader);
-        else if (literalBlockHeader.getType() == LiteralBlockHeader.Type.COMPRESSED)
-            decodeCompressedLiterals(inputBase, blockSize, literalBlockHeader);
-        else if (literalBlockHeader.getType() == LiteralBlockHeader.Type.TREELESS) {
-            if (!huffman.isLoaded())
-                throw new Zip4jvmException("Dictionary is corrupted");
-            decodeCompressedLiterals(inputBase, blockSize, literalBlockHeader);
-        } else
-            throw new Zip4jvmException("Invalid Literals_Block type");
-
+        literalBlockHeader.getType().decode(inputBase, blockSize, literalBlockHeader, this);
         int written = decompressSequences(inputBase, pos + blockSize, outputBase, outputAddress);
         inputBase.seek(pos + blockSize);
         return written;
@@ -574,7 +549,7 @@ public class ZstdFrameDecompressor {
         }
     }
 
-    private void decodeCompressedLiterals(Buffer inputBase, int blockSize, LiteralBlockHeader literalBlockHeader) {
+    void decodeCompressedLiterals(Buffer inputBase, int blockSize, LiteralBlockHeader literalBlockHeader) {
         final int pos = inputBase.getOffs();
 
         int compressedSize;
@@ -617,7 +592,7 @@ public class ZstdFrameDecompressor {
             huffman.decode4Streams(inputBase, inputLimit, literals, literalsAddress, literalsLimit);
     }
 
-    private void decodeRleLiterals(Buffer inputBase, LiteralBlockHeader literalBlockHeader) {
+    void decodeRleLiterals(Buffer inputBase, LiteralBlockHeader literalBlockHeader) {
         inputBase.skip(-3);
         final int pos = inputBase.getOffs();
         int literalSize = getLiteralSize(inputBase, literalBlockHeader.getSizeFormat());
@@ -633,7 +608,7 @@ public class ZstdFrameDecompressor {
         literalsLimit = literalSize;
     }
 
-    private void decodeRawLiterals(Buffer inputBase, long blockSize, LiteralBlockHeader literalBlockHeader) {
+    void decodeRawLiterals(Buffer inputBase, long blockSize, LiteralBlockHeader literalBlockHeader) {
         inputBase.skip(-3);
         final int pos = inputBase.getOffs();
         long inputLimit = pos + blockSize;

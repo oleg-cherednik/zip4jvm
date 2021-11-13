@@ -34,8 +34,8 @@ public class BlockHeader {
         // Block_Content contains 'size' bytes
         RAW(0) {
             @Override
-            public int decodeBlock(int size, Buffer inputBase, byte[] outputBase, int output, ZstdFrameDecompressor decompressor) {
-                return inputBase.copyMemory(outputBase, output, size);
+            public int decode(int blockSize, Buffer inputBase, byte[] outputBase, int output, ZstdFrameDecompressor decompressor) {
+                return inputBase.copyMemory(outputBase, output, blockSize);
             }
         },
         // this is a single byte, repeated 'size' times
@@ -43,15 +43,15 @@ public class BlockHeader {
         // this byte must be repeated 'size' times
         RLE(1) {
             @Override
-            public int decodeBlock(int size, Buffer inputBase, byte[] outputBase, int output, ZstdFrameDecompressor decompressor) {
+            public int decode(int blockSize, Buffer inputBase, byte[] outputBase, int output, ZstdFrameDecompressor decompressor) {
                 byte value = (byte)inputBase.getByte();
 
-                for (int i = 0; i < size; i++) {
+                for (int i = 0; i < blockSize; i++) {
                     UnsafeUtil.putByte(outputBase, output, value);
                     output += SIZE_OF_BYTE;
                 }
 
-                return size;
+                return blockSize;
             }
         },
         // this is a Zstandard compressed block. `size` is the length of
@@ -59,8 +59,8 @@ public class BlockHeader {
         // known, but its maximum possible value is guaranteed
         COMPRESSED(2) {
             @Override
-            public int decodeBlock(int size, Buffer inputBase, byte[] outputBase, int output, ZstdFrameDecompressor decompressor) {
-                return decompressor.decodeCompressedBlock(inputBase, size, outputBase, output);
+            public int decode(int blockSize, Buffer inputBase, byte[] outputBase, int output, ZstdFrameDecompressor decompressor) {
+                return decompressor.decodeCompressedBlock(inputBase, blockSize, outputBase, output);
             }
         },
         // this is not a block. This value cannot be used with current version
@@ -70,7 +70,7 @@ public class BlockHeader {
 
         private final int id;
 
-        public int decodeBlock(int size, Buffer inputBase, byte[] outputBase, int output, ZstdFrameDecompressor decompressor) {
+        public int decode(int blockSize, Buffer inputBase, byte[] outputBase, int output, ZstdFrameDecompressor decompressor) {
             throw new Zip4jvmException("Invalid block type");
         }
 
