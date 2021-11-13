@@ -40,10 +40,12 @@ public class FooTest {
     }
 
     public void shouldUnzipWhenZstdSolid2() throws IOException {
-        Path zip = Paths.get("src/test/resources/seven-zip/oleg-cherednik.zip").toAbsolutePath();
+        Path zip = Paths.get("src/test/resources/seven-zip/APPNOTE-6.3.21.zip").toAbsolutePath();
         Path destDir = rootDir;
         UnzipIt.zip(zip).destDir(destDir).extract();
-        assertThatDirectory(destDir).matches(foo);
+        assertThatDirectory(destDir).matches(dir -> {
+            dir.file("APPNOTE-6.3.2.TXT").hasSize(145310);
+        });
     }
 
     public void shouldCreateSingleZipWithFilesWhenZstdCompressionNormalLevel() throws IOException {
