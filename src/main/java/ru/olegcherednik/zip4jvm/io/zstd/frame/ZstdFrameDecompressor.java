@@ -121,13 +121,13 @@ public class ZstdFrameDecompressor {
     private FiniteStateEntropy.Table currentOffsetCodesTable;
     private FiniteStateEntropy.Table currentMatchLengthTable;
 
-    private static int decodeRawBlock(Buffer inputBase, int blockSize, byte[] outputBase, int outputAddress) {
+    static int decodeRawBlock(Buffer inputBase, int blockSize, byte[] outputBase, int outputAddress) {
         UnsafeUtil.copyMemory(inputBase.getBuf(), inputBase.getOffs(), outputBase, outputAddress, blockSize);
         inputBase.skip(blockSize);
         return blockSize;
     }
 
-    private static int decodeRleBlock(Buffer inputBase, int blockSize, byte[] outputBase, int outputAddress) {
+    static int decodeRleBlock(Buffer inputBase, int blockSize, byte[] outputBase, int outputAddress) {
         int output = outputAddress;
         long value = inputBase.getByte();
 
@@ -180,9 +180,8 @@ public class ZstdFrameDecompressor {
         FrameHeader frameHeader = FrameHeader.read(inputBase);
 
         while (true) {
-            // read block header
             BlockHeader blockHeader = BlockHeader.read(inputBase);
-            output += decodeBlock(blockHeader, inputBase, outputBase, output);
+            output += blockHeader.getType().decodeBlock(blockHeader.getSize(), inputBase, outputBase, output, this);
 
             if (blockHeader.isLast())
                 break;
@@ -202,16 +201,6 @@ public class ZstdFrameDecompressor {
         return output;
     }
 
-    private int decodeBlock(BlockHeader blockHeader, Buffer inputBase, byte[] outputBase, int output) {
-        if (blockHeader.getType() == BlockHeader.Type.RAW)
-            return decodeRawBlock(inputBase, blockHeader.getSize(), outputBase, output);
-        if (blockHeader.getType() == BlockHeader.Type.RLE)
-            return decodeRleBlock(inputBase, blockHeader.getSize(), outputBase, output);
-        if (blockHeader.getType() == BlockHeader.Type.COMPRESSED)
-            return decodeCompressedBlock(inputBase, blockHeader.getSize(), outputBase, output);
-        throw new Zip4jvmException("Invalid block type");
-    }
-
     private void reset() {
         previousOffsets[0] = 1;
         previousOffsets[1] = 4;
@@ -222,7 +211,7 @@ public class ZstdFrameDecompressor {
         currentMatchLengthTable = null;
     }
 
-    private int decodeCompressedBlock(Buffer inputBase, int blockSize, byte[] outputBase, int outputAddress) {
+    int decodeCompressedBlock(Buffer inputBase, int blockSize, byte[] outputBase, int outputAddress) {
         final int pos = inputBase.getOffs();
         LiteralBlockHeader literalBlockHeader = LiteralBlockHeader.read(inputBase);
 

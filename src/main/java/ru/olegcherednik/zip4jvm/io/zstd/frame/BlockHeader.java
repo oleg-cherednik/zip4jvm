@@ -29,21 +29,40 @@ public class BlockHeader {
     public enum Type {
         // this is an uncompressed block
         // Block_Content contains 'size' bytes
-        RAW(0),
+        RAW(0) {
+            @Override
+            public int decodeBlock(int size, Buffer inputBase, byte[] outputBase, int output, ZstdFrameDecompressor decompressor) {
+                return ZstdFrameDecompressor.decodeRawBlock(inputBase, size, outputBase, output);
+            }
+        },
         // this is a single byte, repeated 'size' times
         // Block_Content consists of a single byte. On the decompression side,
         // this byte must be repeated 'size' times
-        RLE(1),
+        RLE(1) {
+            @Override
+            public int decodeBlock(int size, Buffer inputBase, byte[] outputBase, int output, ZstdFrameDecompressor decompressor) {
+                return ZstdFrameDecompressor.decodeRleBlock(inputBase, size, outputBase, output);
+            }
+        },
         // this is a Zstandard compressed block. `size` is the length of
         // Block_Content, the compressed data. The decompressed size is not
         // known, but its maximum possible value is guaranteed
-        COMPRESSED(2),
+        COMPRESSED(2) {
+            @Override
+            public int decodeBlock(int size, Buffer inputBase, byte[] outputBase, int output, ZstdFrameDecompressor decompressor) {
+                return decompressor.decodeCompressedBlock(inputBase, size, outputBase, output);
+            }
+        },
         // this is not a block. This value cannot be used with current version
         // of this specification. If such a value is present, it is considered
         // corrupted data
         RESERVED(3);
 
         private final int id;
+
+        public int decodeBlock(int size, Buffer inputBase, byte[] outputBase, int output, ZstdFrameDecompressor decompressor) {
+            throw new Zip4jvmException("Invalid block type");
+        }
 
         public static Type parseId(int id) {
             for (Type type : values())
