@@ -13,6 +13,10 @@
  */
 package ru.olegcherednik.zip4jvm.io.zstd;
 
+import ru.olegcherednik.zip4jvm.io.zstd.frame.BlockCompressionState;
+import ru.olegcherednik.zip4jvm.io.zstd.frame.RepeatedOffsets;
+import ru.olegcherednik.zip4jvm.io.zstd.frame.SequenceStore;
+
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_INT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_LONG;
 

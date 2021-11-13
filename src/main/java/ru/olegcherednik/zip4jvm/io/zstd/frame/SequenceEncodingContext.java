@@ -11,7 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ru.olegcherednik.zip4jvm.io.zstd;
+package ru.olegcherednik.zip4jvm.io.zstd.frame;
+
+import ru.olegcherednik.zip4jvm.io.zstd.Constants;
+import ru.olegcherednik.zip4jvm.io.zstd.fse.FseCompressionTable;
 
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.MAX_LITERALS_LENGTH_SYMBOL;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.MAX_MATCH_LENGTH_SYMBOL;

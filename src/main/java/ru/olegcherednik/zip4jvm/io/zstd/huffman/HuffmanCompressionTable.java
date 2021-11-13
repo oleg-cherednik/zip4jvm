@@ -13,13 +13,12 @@
  */
 package ru.olegcherednik.zip4jvm.io.zstd.huffman;
 
-import ru.olegcherednik.zip4jvm.io.zstd.FiniteStateEntropy;
-import ru.olegcherednik.zip4jvm.io.zstd.FseCompressionTable;
+import ru.olegcherednik.zip4jvm.io.zstd.fse.FiniteStateEntropy;
+import ru.olegcherednik.zip4jvm.io.zstd.fse.FseCompressionTable;
 import ru.olegcherednik.zip4jvm.io.zstd.Histogram;
-import ru.olegcherednik.zip4jvm.io.zstd.NodeTable;
 import ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil;
 import ru.olegcherednik.zip4jvm.io.zstd.Util;
-import ru.olegcherednik.zip4jvm.io.zstd.bit.BitOutputStream;
+import ru.olegcherednik.zip4jvm.io.zstd.fse.bit.BitOutputStream;
 
 import java.util.Arrays;
 

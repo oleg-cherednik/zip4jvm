@@ -13,8 +13,6 @@
  */
 package ru.olegcherednik.zip4jvm.io.zstd.huffman;
 
-import ru.olegcherednik.zip4jvm.io.zstd.NodeTable;
-
 import java.util.Arrays;
 
 class HuffmanCompressionTableWorkspace

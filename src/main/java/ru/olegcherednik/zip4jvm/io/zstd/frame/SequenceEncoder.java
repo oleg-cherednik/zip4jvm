@@ -11,9 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ru.olegcherednik.zip4jvm.io.zstd;
+package ru.olegcherednik.zip4jvm.io.zstd.frame;
 
-import ru.olegcherednik.zip4jvm.io.zstd.bit.BitOutputStream;
+import ru.olegcherednik.zip4jvm.io.zstd.CompressionParameters;
+import ru.olegcherednik.zip4jvm.io.zstd.Histogram;
+import ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil;
+import ru.olegcherednik.zip4jvm.io.zstd.fse.FiniteStateEntropy;
+import ru.olegcherednik.zip4jvm.io.zstd.fse.FseCompressionTable;
+import ru.olegcherednik.zip4jvm.io.zstd.fse.bit.BitOutputStream;
 
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.DEFAULT_MAX_OFFSET_CODE_SYMBOL;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.LITERALS_LENGTH_BITS;
@@ -29,8 +34,8 @@ import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SEQUENCE_ENCODING_BASIC
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SEQUENCE_ENCODING_COMPRESSED;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SEQUENCE_ENCODING_RLE;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;
-import static ru.olegcherednik.zip4jvm.io.zstd.FiniteStateEntropy.optimalTableLog;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.checkArgument;
+import static ru.olegcherednik.zip4jvm.io.zstd.fse.FiniteStateEntropy.optimalTableLog;
 
 public class SequenceEncoder {
 

@@ -15,11 +15,11 @@ package ru.olegcherednik.zip4jvm.io.zstd.frame;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.zstd.Buffer;
-import ru.olegcherednik.zip4jvm.io.zstd.FiniteStateEntropy;
-import ru.olegcherednik.zip4jvm.io.zstd.FseTableReader;
+import ru.olegcherednik.zip4jvm.io.zstd.fse.FiniteStateEntropy;
+import ru.olegcherednik.zip4jvm.io.zstd.fse.FseTableReader;
 import ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil;
 import ru.olegcherednik.zip4jvm.io.zstd.XxHash64;
-import ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream;
+import ru.olegcherednik.zip4jvm.io.zstd.fse.bit.BitInputStream;
 import ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman;
 
 import java.util.Arrays;
@@ -44,7 +44,7 @@ import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_LONG;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.fail;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.verify;
-import static ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream.peekBits;
+import static ru.olegcherednik.zip4jvm.io.zstd.fse.bit.BitInputStream.peekBits;
 
 public class ZstdFrameDecompressor {
 

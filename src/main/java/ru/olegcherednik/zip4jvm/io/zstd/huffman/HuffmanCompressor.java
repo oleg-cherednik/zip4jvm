@@ -14,7 +14,7 @@
 package ru.olegcherednik.zip4jvm.io.zstd.huffman;
 
 import ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil;
-import ru.olegcherednik.zip4jvm.io.zstd.bit.BitOutputStream;
+import ru.olegcherednik.zip4jvm.io.zstd.fse.bit.BitOutputStream;
 
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_LONG;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;

@@ -11,17 +11,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ru.olegcherednik.zip4jvm.io.zstd;
+package ru.olegcherednik.zip4jvm.io.zstd.fse;
 
-import ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream;
-import ru.olegcherednik.zip4jvm.io.zstd.bit.BitOutputStream;
+import ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil;
+import ru.olegcherednik.zip4jvm.io.zstd.Util;
+import ru.olegcherednik.zip4jvm.io.zstd.fse.bit.BitInputStream;
+import ru.olegcherednik.zip4jvm.io.zstd.fse.bit.BitOutputStream;
 
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_INT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_LONG;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.checkArgument;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.verify;
-import static ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream.peekBits;
+import static ru.olegcherednik.zip4jvm.io.zstd.fse.bit.BitInputStream.peekBits;
 
 public class FiniteStateEntropy {
 
@@ -29,7 +31,7 @@ public class FiniteStateEntropy {
     public static final int MAX_TABLE_LOG = 12;
     public static final int MIN_TABLE_LOG = 5;
 
-    private static final int[] REST_TO_BEAT = new int[] { 0, 473195, 504333, 520860, 550000, 700000, 750000, 830000 };
+    private static final int[] REST_TO_BEAT = { 0, 473195, 504333, 520860, 550000, 700000, 750000, 830000 };
     private static final short UNASSIGNED = -2;
 
     private FiniteStateEntropy() {

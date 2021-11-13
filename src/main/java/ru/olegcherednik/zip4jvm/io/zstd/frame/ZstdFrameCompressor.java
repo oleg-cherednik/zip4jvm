@@ -14,10 +14,8 @@
 package ru.olegcherednik.zip4jvm.io.zstd.frame;
 
 import ru.olegcherednik.zip4jvm.io.zstd.Buffer;
-import ru.olegcherednik.zip4jvm.io.zstd.CompressionContext;
 import ru.olegcherednik.zip4jvm.io.zstd.CompressionParameters;
 import ru.olegcherednik.zip4jvm.io.zstd.Histogram;
-import ru.olegcherednik.zip4jvm.io.zstd.SequenceEncoder;
 import ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil;
 import ru.olegcherednik.zip4jvm.io.zstd.XxHash64;
 import ru.olegcherednik.zip4jvm.io.zstd.huffman.HuffmanCompressionContext;

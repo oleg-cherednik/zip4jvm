@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ru.olegcherednik.zip4jvm.io.zstd.bit;
+package ru.olegcherednik.zip4jvm.io.zstd.fse.bit;
 
 import ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil;
 

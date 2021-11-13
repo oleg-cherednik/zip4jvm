@@ -11,11 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ru.olegcherednik.zip4jvm.io.zstd;
+package ru.olegcherednik.zip4jvm.io.zstd.fse;
 
-import ru.olegcherednik.zip4jvm.io.zstd.bit.BitOutputStream;
+import ru.olegcherednik.zip4jvm.io.zstd.Util;
+import ru.olegcherednik.zip4jvm.io.zstd.fse.bit.BitOutputStream;
 
-import static ru.olegcherednik.zip4jvm.io.zstd.FiniteStateEntropy.MAX_SYMBOL;
+import static ru.olegcherednik.zip4jvm.io.zstd.fse.FiniteStateEntropy.MAX_SYMBOL;
 
 public class FseCompressionTable
 {

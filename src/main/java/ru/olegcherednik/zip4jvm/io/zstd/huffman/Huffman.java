@@ -14,11 +14,11 @@
 package ru.olegcherednik.zip4jvm.io.zstd.huffman;
 
 import ru.olegcherednik.zip4jvm.io.zstd.Buffer;
-import ru.olegcherednik.zip4jvm.io.zstd.FiniteStateEntropy;
-import ru.olegcherednik.zip4jvm.io.zstd.FseTableReader;
+import ru.olegcherednik.zip4jvm.io.zstd.fse.FiniteStateEntropy;
+import ru.olegcherednik.zip4jvm.io.zstd.fse.FseTableReader;
 import ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil;
 import ru.olegcherednik.zip4jvm.io.zstd.Util;
-import ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream;
+import ru.olegcherednik.zip4jvm.io.zstd.fse.bit.BitInputStream;
 
 import java.util.Arrays;
 
@@ -27,8 +27,8 @@ import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_INT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.isPowerOf2;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.verify;
-import static ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream.isEndOfStream;
-import static ru.olegcherednik.zip4jvm.io.zstd.bit.BitInputStream.peekBitsFast;
+import static ru.olegcherednik.zip4jvm.io.zstd.fse.bit.BitInputStream.isEndOfStream;
+import static ru.olegcherednik.zip4jvm.io.zstd.fse.bit.BitInputStream.peekBitsFast;
 
 public class Huffman {
 

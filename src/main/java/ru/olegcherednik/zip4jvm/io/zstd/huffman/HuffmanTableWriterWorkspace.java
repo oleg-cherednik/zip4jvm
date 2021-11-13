@@ -13,7 +13,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.zstd.huffman;
 
-import ru.olegcherednik.zip4jvm.io.zstd.FseCompressionTable;
+import ru.olegcherednik.zip4jvm.io.zstd.fse.FseCompressionTable;
 
 import static ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman.MAX_FSE_TABLE_LOG;
 import static ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman.MAX_SYMBOL;

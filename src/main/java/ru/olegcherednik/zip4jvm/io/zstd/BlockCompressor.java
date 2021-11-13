@@ -13,6 +13,10 @@
  */
 package ru.olegcherednik.zip4jvm.io.zstd;
 
+import ru.olegcherednik.zip4jvm.io.zstd.frame.BlockCompressionState;
+import ru.olegcherednik.zip4jvm.io.zstd.frame.RepeatedOffsets;
+import ru.olegcherednik.zip4jvm.io.zstd.frame.SequenceStore;
+
 public interface BlockCompressor
 {
     BlockCompressor UNSUPPORTED = (inputBase, inputAddress, inputSize, sequenceStore, blockCompressionState, offsets, parameters) -> { throw new UnsupportedOperationException(); };
