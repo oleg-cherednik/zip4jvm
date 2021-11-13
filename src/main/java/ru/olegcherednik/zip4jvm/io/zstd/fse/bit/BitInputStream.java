@@ -13,9 +13,13 @@
  */
 package ru.olegcherednik.zip4jvm.io.zstd.fse.bit;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.zstd.Buffer;
 import ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil;
 
+import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_BYTE;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_LONG;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.highestBit;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.verify;
@@ -31,6 +35,40 @@ public class BitInputStream {
 
     public static boolean isEndOfStream(long startAddress, long currentAddress, int bitsConsumed) {
         return startAddress == currentAddress && bitsConsumed == Long.SIZE;
+    }
+
+    static long readTail(Buffer inputBase, int size) {
+        int inputAddress = inputBase.getOffs();
+        long bits = inputBase.getByte();
+
+        switch (size) {
+            case 7:
+                inputBase.seek(inputAddress);
+                inputBase.skip(6);
+                bits |= (inputBase.getByte() & 0xFFL) << 48;
+            case 6:
+                inputBase.seek(inputAddress);
+                inputBase.skip(5);
+                bits |= (inputBase.getByte() & 0xFFL) << 40;
+            case 5:
+                inputBase.seek(inputAddress);
+                inputBase.skip(4);
+                bits |= (inputBase.getByte() & 0xFFL) << 32;
+            case 4:
+                inputBase.seek(inputAddress);
+                inputBase.skip(3);
+                bits |= (inputBase.getByte() & 0xFFL) << 24;
+            case 3:
+                inputBase.seek(inputAddress);
+                inputBase.skip(2);
+                bits |= (inputBase.getByte() & 0xFFL) << 16;
+            case 2:
+                inputBase.seek(inputAddress);
+                inputBase.skip(1);
+                bits |= (inputBase.getByte() & 0xFFL) << 8;
+        }
+
+        return bits;
     }
 
     static long readTail(byte[] inputBase, int inputAddress, int inputSize) {
@@ -120,7 +158,46 @@ public class BitInputStream {
 
     }
 
+    @Getter
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class InitializerBuffer {
 
+        private final long bits;
+        private final int currentAddress;
+        private final int bitsConsumed;
+
+        public static InitializerBuffer read(Buffer inputBase, int size) {
+            int startAddress = inputBase.getOffs();
+            int endAddress = startAddress + size;
+
+            inputBase.skip(size);
+            inputBase.skip(-SIZE_OF_BYTE);
+            int lastByte = inputBase.getByte();
+
+            verify(lastByte != 0, endAddress, "Bitstream end mark not present");
+
+            int bitsConsumed;
+            int currentAddress;
+            long bits;
+
+            if (size >= SIZE_OF_LONG) {
+                inputBase.skip(-SIZE_OF_LONG);
+                currentAddress = inputBase.getOffs();
+                bits = inputBase.getLong();
+                bitsConsumed = SIZE_OF_LONG - highestBit(lastByte);
+            } else {
+                inputBase.skip(-size);
+                currentAddress = inputBase.getOffs();
+                bits = readTail(inputBase, size);
+                bitsConsumed = SIZE_OF_LONG - highestBit(lastByte) + (SIZE_OF_LONG - size) * 8;
+            }
+
+            inputBase.seek(endAddress);
+
+            return new InitializerBuffer(bits, currentAddress, bitsConsumed);
+        }
+
+    }
 
     public static final class Loader {
 

@@ -179,34 +179,25 @@ public class Huffman {
         BitStreamData streamThree = new BitStreamData(streamTwo.getEndOffs(), jumpTable.getStreamThreeSize());
         BitStreamData streamFour = new BitStreamData(streamThree.getEndOffs(), inputLimit - streamThree.getEndOffs());
 
-        int start1 = inputBase.getOffs();
-        int start2 = start1 + jumpTable.getStreamOneSize();
-        int start3 = start2 + jumpTable.getStreamTwoSize();
-        int start4 = start3 + jumpTable.getStreamThreeSize();
+        BitInputStream.InitializerBuffer initializerBuffer = BitInputStream.InitializerBuffer.read(inputBase, streamOne.getSize());
+        streamOne.setBitsConsumed(initializerBuffer.getBitsConsumed());
+        streamOne.setCurrentAddress(initializerBuffer.getCurrentAddress());
+        streamOne.setBits(initializerBuffer.getBits());
 
-        BitInputStream.Initializer initializer = new BitInputStream.Initializer(inputBase, start1, start2);
-        initializer.initialize();
-        int stream1bitsConsumed = initializer.getBitsConsumed();
-        int stream1currentAddress = initializer.getCurrentAddress();
-        long stream1bits = initializer.getBits();
+        initializerBuffer = BitInputStream.InitializerBuffer.read(inputBase, streamTwo.getSize());
+        streamTwo.setBitsConsumed(initializerBuffer.getBitsConsumed());
+        streamTwo.setCurrentAddress(initializerBuffer.getCurrentAddress());
+        streamTwo.setBits(initializerBuffer.getBits());
 
-        initializer = new BitInputStream.Initializer(inputBase, start2, start3);
-        initializer.initialize();
-        int stream2bitsConsumed = initializer.getBitsConsumed();
-        int stream2currentAddress = initializer.getCurrentAddress();
-        long stream2bits = initializer.getBits();
+        initializerBuffer = BitInputStream.InitializerBuffer.read(inputBase, streamThree.getSize());
+        streamThree.setBitsConsumed(initializerBuffer.getBitsConsumed());
+        streamThree.setCurrentAddress(initializerBuffer.getCurrentAddress());
+        streamThree.setBits(initializerBuffer.getBits());
 
-        initializer = new BitInputStream.Initializer(inputBase, start3, start4);
-        initializer.initialize();
-        int stream3bitsConsumed = initializer.getBitsConsumed();
-        int stream3currentAddress = initializer.getCurrentAddress();
-        long stream3bits = initializer.getBits();
-
-        initializer = new BitInputStream.Initializer(inputBase, start4, inputLimit);
-        initializer.initialize();
-        int stream4bitsConsumed = initializer.getBitsConsumed();
-        int stream4currentAddress = initializer.getCurrentAddress();
-        long stream4bits = initializer.getBits();
+        initializerBuffer = BitInputStream.InitializerBuffer.read(inputBase, streamFour.getSize());
+        streamFour.setBitsConsumed(initializerBuffer.getBitsConsumed());
+        streamFour.setCurrentAddress(initializerBuffer.getCurrentAddress());
+        streamFour.setBits(initializerBuffer.getBits());
 
         int segmentSize = (int)((outputLimit - outputAddress + 3) / 4);
 
@@ -225,66 +216,68 @@ public class Huffman {
         byte[] symbols = this.symbols;
 
         while (output4 < fastOutputLimit) {
-            stream1bitsConsumed = decodeSymbol(outputBase, output1, stream1bits, stream1bitsConsumed, tableLog, numbersOfBits, symbols);
-            stream2bitsConsumed = decodeSymbol(outputBase, output2, stream2bits, stream2bitsConsumed, tableLog, numbersOfBits, symbols);
-            stream3bitsConsumed = decodeSymbol(outputBase, output3, stream3bits, stream3bitsConsumed, tableLog, numbersOfBits, symbols);
-            stream4bitsConsumed = decodeSymbol(outputBase, output4, stream4bits, stream4bitsConsumed, tableLog, numbersOfBits, symbols);
+            streamOne.setBitsConsumed(decodeSymbol(outputBase, output1, streamOne.getBits(), streamOne.getBitsConsumed(), tableLog, numbersOfBits, symbols));
+            streamTwo.setBitsConsumed(decodeSymbol(outputBase, output2, streamTwo.getBits(), streamTwo.getBitsConsumed(), tableLog, numbersOfBits, symbols));
+            streamThree.setBitsConsumed(decodeSymbol(outputBase, output3, streamThree.getBits(), streamThree.getBitsConsumed(), tableLog, numbersOfBits, symbols));
+            streamFour.setBitsConsumed(decodeSymbol(outputBase, output4, streamFour.getBits(), streamFour.getBitsConsumed(), tableLog, numbersOfBits, symbols));
 
-            stream1bitsConsumed = decodeSymbol(outputBase, output1 + 1, stream1bits, stream1bitsConsumed, tableLog, numbersOfBits, symbols);
-            stream2bitsConsumed = decodeSymbol(outputBase, output2 + 1, stream2bits, stream2bitsConsumed, tableLog, numbersOfBits, symbols);
-            stream3bitsConsumed = decodeSymbol(outputBase, output3 + 1, stream3bits, stream3bitsConsumed, tableLog, numbersOfBits, symbols);
-            stream4bitsConsumed = decodeSymbol(outputBase, output4 + 1, stream4bits, stream4bitsConsumed, tableLog, numbersOfBits, symbols);
+            streamOne.setBitsConsumed(decodeSymbol(outputBase, output1 + 1, streamOne.getBits(), streamOne.getBitsConsumed(), tableLog, numbersOfBits, symbols));
+            streamTwo.setBitsConsumed(decodeSymbol(outputBase, output2 + 1, streamTwo.getBits(), streamTwo.getBitsConsumed(), tableLog, numbersOfBits, symbols));
+            streamThree.setBitsConsumed(decodeSymbol(outputBase, output3 + 1, streamThree.getBits(), streamThree.getBitsConsumed(), tableLog, numbersOfBits, symbols));
+            streamFour.setBitsConsumed(decodeSymbol(outputBase, output4 + 1, streamFour.getBits(), streamFour.getBitsConsumed(), tableLog, numbersOfBits, symbols));
 
-            stream1bitsConsumed = decodeSymbol(outputBase, output1 + 2, stream1bits, stream1bitsConsumed, tableLog, numbersOfBits, symbols);
-            stream2bitsConsumed = decodeSymbol(outputBase, output2 + 2, stream2bits, stream2bitsConsumed, tableLog, numbersOfBits, symbols);
-            stream3bitsConsumed = decodeSymbol(outputBase, output3 + 2, stream3bits, stream3bitsConsumed, tableLog, numbersOfBits, symbols);
-            stream4bitsConsumed = decodeSymbol(outputBase, output4 + 2, stream4bits, stream4bitsConsumed, tableLog, numbersOfBits, symbols);
+            streamOne.setBitsConsumed(decodeSymbol(outputBase, output1 + 2, streamOne.getBits(), streamOne.getBitsConsumed(), tableLog, numbersOfBits, symbols));
+            streamTwo.setBitsConsumed(decodeSymbol(outputBase, output2 + 2, streamTwo.getBits(), streamTwo.getBitsConsumed(), tableLog, numbersOfBits, symbols));
+            streamThree.setBitsConsumed(decodeSymbol(outputBase, output3 + 2, streamThree.getBits(), streamThree.getBitsConsumed(), tableLog, numbersOfBits, symbols));
+            streamFour.setBitsConsumed(decodeSymbol(outputBase, output4 + 2, streamFour.getBits(), streamFour.getBitsConsumed(), tableLog, numbersOfBits, symbols));
 
-            stream1bitsConsumed = decodeSymbol(outputBase, output1 + 3, stream1bits, stream1bitsConsumed, tableLog, numbersOfBits, symbols);
-            stream2bitsConsumed = decodeSymbol(outputBase, output2 + 3, stream2bits, stream2bitsConsumed, tableLog, numbersOfBits, symbols);
-            stream3bitsConsumed = decodeSymbol(outputBase, output3 + 3, stream3bits, stream3bitsConsumed, tableLog, numbersOfBits, symbols);
-            stream4bitsConsumed = decodeSymbol(outputBase, output4 + 3, stream4bits, stream4bitsConsumed, tableLog, numbersOfBits, symbols);
+            streamOne.setBitsConsumed(decodeSymbol(outputBase, output1 + 3, streamOne.getBits(), streamOne.getBitsConsumed(), tableLog, numbersOfBits, symbols));
+            streamTwo.setBitsConsumed(decodeSymbol(outputBase, output2 + 3, streamTwo.getBits(), streamTwo.getBitsConsumed(), tableLog, numbersOfBits, symbols));
+            streamThree.setBitsConsumed(decodeSymbol(outputBase, output3 + 3, streamThree.getBits(), streamThree.getBitsConsumed(), tableLog, numbersOfBits, symbols));
+            streamFour.setBitsConsumed(decodeSymbol(outputBase, output4 + 3, streamFour.getBits(), streamFour.getBitsConsumed(), tableLog, numbersOfBits, symbols));
 
             output1 += SIZE_OF_INT;
             output2 += SIZE_OF_INT;
             output3 += SIZE_OF_INT;
             output4 += SIZE_OF_INT;
 
-            BitInputStream.Loader loader = new BitInputStream.Loader(inputBase.getBuf(), start1, stream1currentAddress, stream1bits,
-                    stream1bitsConsumed);
+            BitInputStream.Loader loader = new BitInputStream.Loader(inputBase.getBuf(), streamOne.getOffs(), streamOne.getCurrentAddress(), streamOne.getBits(),
+                    streamOne.getBitsConsumed());
             boolean done = loader.load();
-            stream1bitsConsumed = loader.getBitsConsumed();
-            stream1bits = loader.getBits();
-            stream1currentAddress = loader.getCurrentAddress();
+            streamOne.setBitsConsumed(loader.getBitsConsumed());
+            streamOne.setBits(loader.getBits());
+            streamOne.setCurrentAddress(loader.getCurrentAddress());
 
             if (done) {
                 break;
             }
 
-            loader = new BitInputStream.Loader(inputBase.getBuf(), start2, stream2currentAddress, stream2bits, stream2bitsConsumed);
+            loader = new BitInputStream.Loader(inputBase.getBuf(), streamTwo.getOffs(), streamTwo.getCurrentAddress(), streamTwo.getBits(),
+                    streamTwo.getBitsConsumed());
             done = loader.load();
-            stream2bitsConsumed = loader.getBitsConsumed();
-            stream2bits = loader.getBits();
-            stream2currentAddress = loader.getCurrentAddress();
+            streamTwo.setBitsConsumed(loader.getBitsConsumed());
+            streamTwo.setBits(loader.getBits());
+            streamTwo.setCurrentAddress(loader.getCurrentAddress());
 
             if (done) {
                 break;
             }
 
-            loader = new BitInputStream.Loader(inputBase.getBuf(), start3, stream3currentAddress, stream3bits, stream3bitsConsumed);
+            loader = new BitInputStream.Loader(inputBase.getBuf(), streamThree.getOffs(), streamThree.getCurrentAddress(), streamThree.getBits(),
+                    streamThree.getBitsConsumed());
             done = loader.load();
-            stream3bitsConsumed = loader.getBitsConsumed();
-            stream3bits = loader.getBits();
-            stream3currentAddress = loader.getCurrentAddress();
+            streamThree.setBitsConsumed(loader.getBitsConsumed());
+            streamThree.setBits(loader.getBits());
+            streamThree.setCurrentAddress(loader.getCurrentAddress());
             if (done) {
                 break;
             }
 
-            loader = new BitInputStream.Loader(inputBase.getBuf(), start4, stream4currentAddress, stream4bits, stream4bitsConsumed);
+            loader = new BitInputStream.Loader(inputBase.getBuf(), streamFour.getOffs(), streamFour.getCurrentAddress(), streamFour.getBits(), streamFour.getBitsConsumed());
             done = loader.load();
-            stream4bitsConsumed = loader.getBitsConsumed();
-            stream4bits = loader.getBits();
-            stream4currentAddress = loader.getCurrentAddress();
+            streamFour.setBitsConsumed(loader.getBitsConsumed());
+            streamFour.setBits(loader.getBits());
+            streamFour.setCurrentAddress(loader.getCurrentAddress());
             if (done) {
                 break;
             }
@@ -293,10 +286,10 @@ public class Huffman {
         verify(output1 <= outputStart2 && output2 <= outputStart3 && output3 <= outputStart4, inputAddress, "Input is corrupted");
 
         /// finish streams one by one
-        decodeTail(inputBase.getBuf(), start1, stream1currentAddress, stream1bitsConsumed, stream1bits, outputBase, output1, outputStart2);
-        decodeTail(inputBase.getBuf(), start2, stream2currentAddress, stream2bitsConsumed, stream2bits, outputBase, output2, outputStart3);
-        decodeTail(inputBase.getBuf(), start3, stream3currentAddress, stream3bitsConsumed, stream3bits, outputBase, output3, outputStart4);
-        decodeTail(inputBase.getBuf(), start4, stream4currentAddress, stream4bitsConsumed, stream4bits, outputBase, output4, outputLimit);
+        decodeTail(inputBase.getBuf(), streamOne.getOffs(), streamOne.getCurrentAddress(), streamOne.getBitsConsumed(), streamOne.getBits(), outputBase, output1, outputStart2);
+        decodeTail(inputBase.getBuf(), streamTwo.getOffs(), streamTwo.getCurrentAddress(), streamTwo.getBitsConsumed(), streamTwo.getBits(), outputBase, output2, outputStart3);
+        decodeTail(inputBase.getBuf(), streamThree.getOffs(), streamThree.getCurrentAddress(), streamThree.getBitsConsumed(), streamThree.getBits(), outputBase, output3, outputStart4);
+        decodeTail(inputBase.getBuf(), streamFour.getOffs(), streamFour.getCurrentAddress(), streamFour.getBitsConsumed(), streamFour.getBits(), outputBase, output4, outputLimit);
         inputBase.seek(inputLimit);
     }
 
