@@ -81,7 +81,7 @@ public class BitOutputStream {
             return 0;
         }
 
-        return (int)((currentAddress - outputAddress) + (bitCount > 0 ? 1 : 0));
+        return (currentAddress - outputAddress) + (bitCount > 0 ? 1 : 0);
     }
 
 }

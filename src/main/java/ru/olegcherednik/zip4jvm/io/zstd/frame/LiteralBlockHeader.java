@@ -14,15 +14,10 @@ import ru.olegcherednik.zip4jvm.io.zstd.Buffer;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class LiteralBlockHeader {
 
-    public static final int SIZE_FORMAT_1STREAM_10BITS = 0b00;
-    public static final int SIZE_FORMAT_4STREAMS_10BITS = 0b01;
-    public static final int SIZE_FORMAT_4STREAMS_14BITS = 0b10;
-    public static final int SIZE_FORMAT_4STREAMS_18BITS = 0b11;
-
     // bit:0-1
     private final Type type;
     // bit:2-3
-    private final int sizeFormat;
+    private final SizeFormat sizeFormat;
     // bit:4-23
     private final int sizePart1;
     // CompressedSize (18 bits) - optional
@@ -81,11 +76,30 @@ public class LiteralBlockHeader {
         }
     }
 
+    @Getter
+    @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+    public enum SizeFormat {
+        ONE_STREAM_10BITS(0b00),
+        FOUR_STREAMS_10BITS(0b01),
+        FOUR_STREAMS_14BITS(0b10),
+        FOUR_STREAMS_18BITS(0b11);
+
+        private final int id;
+
+        public static SizeFormat parseId(int id) {
+            for (SizeFormat sizeFormat : values())
+                if (sizeFormat.id == id)
+                    return sizeFormat;
+
+            throw new Zip4jvmException("Unknown LiteralsBlock type: " + id);
+        }
+    }
+
     public static LiteralBlockHeader read(Buffer inputBase) {
         int one = inputBase.getByteNoMove();
         int two = inputBase.get3Bytes();
         Type type = Type.parseId(one & 0b11);
-        int sizeFormat = (one >> 2) & 0b11;
+        SizeFormat sizeFormat = SizeFormat.parseId((one >> 2) & 0b11);
         int sizePart1 = two >> 4;
         return new LiteralBlockHeader(type, sizeFormat, sizePart1);
     }

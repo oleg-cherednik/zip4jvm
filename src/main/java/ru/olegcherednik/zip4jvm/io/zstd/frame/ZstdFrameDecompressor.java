@@ -15,10 +15,10 @@ package ru.olegcherednik.zip4jvm.io.zstd.frame;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.zstd.Buffer;
-import ru.olegcherednik.zip4jvm.io.zstd.fse.FiniteStateEntropy;
-import ru.olegcherednik.zip4jvm.io.zstd.fse.FseTableReader;
 import ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil;
 import ru.olegcherednik.zip4jvm.io.zstd.XxHash64;
+import ru.olegcherednik.zip4jvm.io.zstd.fse.FiniteStateEntropy;
+import ru.olegcherednik.zip4jvm.io.zstd.fse.FseTableReader;
 import ru.olegcherednik.zip4jvm.io.zstd.fse.bit.BitInputStream;
 import ru.olegcherednik.zip4jvm.io.zstd.huffman.Huffman;
 
@@ -154,12 +154,13 @@ public class ZstdFrameDecompressor {
         return matchAddress;
     }
 
-    private static int getLiteralSize(Buffer inputBase, int sizeFormat) {
-        if (sizeFormat == 0b00 || sizeFormat == 0b10)
+    private static int getLiteralSize(Buffer inputBase, LiteralBlockHeader.SizeFormat sizeFormat) {
+        if (sizeFormat == LiteralBlockHeader.SizeFormat.ONE_STREAM_10BITS
+                || sizeFormat == LiteralBlockHeader.SizeFormat.FOUR_STREAMS_10BITS)
             return inputBase.getByte() >>> 3;
-        if (sizeFormat == 0b01)
+        if (sizeFormat == LiteralBlockHeader.SizeFormat.FOUR_STREAMS_14BITS)
             return inputBase.getShort() >>> 4;
-        return inputBase.get3Bytes() >>> 4; // sizeFormat == 0b11
+        return inputBase.get3Bytes() >>> 4; // sizeFormat == LiteralBlockHeader.SizeFormat.FOUR_STREAMS_18BITS
     }
 
     public int decompress(Buffer inputBase, byte[] outputBase) {
@@ -554,19 +555,19 @@ public class ZstdFrameDecompressor {
 
         int compressedSize;
         int uncompressedSize;
-        int sizeFormat = literalBlockHeader.getSizeFormat();
+        LiteralBlockHeader.SizeFormat sizeFormat = literalBlockHeader.getSizeFormat();
 
-        if (sizeFormat == LiteralBlockHeader.SIZE_FORMAT_1STREAM_10BITS
-                || sizeFormat == LiteralBlockHeader.SIZE_FORMAT_4STREAMS_10BITS) {
+        if (sizeFormat == LiteralBlockHeader.SizeFormat.ONE_STREAM_10BITS
+                || sizeFormat == LiteralBlockHeader.SizeFormat.FOUR_STREAMS_10BITS) {
             long data = literalBlockHeader.getSizePart1();
             uncompressedSize = (int)(data & 0x3FF);
             compressedSize = (int)(data >>> 10 & 0x3FF);
-        } else if (sizeFormat == LiteralBlockHeader.SIZE_FORMAT_4STREAMS_14BITS) {
+        } else if (sizeFormat == LiteralBlockHeader.SizeFormat.FOUR_STREAMS_14BITS) {
             long sizePart2 = inputBase.getByte();
             long data = sizePart2 << 20 | literalBlockHeader.getSizePart1();
             uncompressedSize = (int)(data & 0x3FFF);
             compressedSize = (int)(data >>> 14 & 0x3FFF);
-        } else if (sizeFormat == LiteralBlockHeader.SIZE_FORMAT_4STREAMS_18BITS) {
+        } else if (sizeFormat == LiteralBlockHeader.SizeFormat.FOUR_STREAMS_18BITS) {
             long sizePart2 = inputBase.getShort();
             long data = sizePart2 << 20 | literalBlockHeader.getSizePart1();
             uncompressedSize = (int)(data & 0x3FFFF);
@@ -586,7 +587,7 @@ public class ZstdFrameDecompressor {
         literalsAddress = 0;
         literalsLimit = uncompressedSize;
 
-        if (sizeFormat == LiteralBlockHeader.SIZE_FORMAT_1STREAM_10BITS)
+        if (sizeFormat == LiteralBlockHeader.SizeFormat.ONE_STREAM_10BITS)
             huffman.decodeSingleStream(inputBase, inputLimit, literals, literalsAddress, literalsLimit);
         else
             huffman.decode4Streams(inputBase, inputLimit, literals, literalsAddress, literalsLimit);

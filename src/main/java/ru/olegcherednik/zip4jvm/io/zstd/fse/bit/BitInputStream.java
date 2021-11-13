@@ -29,9 +29,6 @@ import static ru.olegcherednik.zip4jvm.io.zstd.Util.verify;
  */
 public class BitInputStream {
 
-    private BitInputStream() {
-    }
-
     public static boolean isEndOfStream(long startAddress, long currentAddress, int bitsConsumed) {
         return startAddress == currentAddress && bitsConsumed == Long.SIZE;
     }
@@ -117,7 +114,6 @@ public class BitInputStream {
             } else {
                 currentAddress = startAddress;
                 bits = readTail(inputBase, startAddress, inputSize);
-
                 bitsConsumed += (SIZE_OF_LONG - inputSize) * 8;
             }
         }

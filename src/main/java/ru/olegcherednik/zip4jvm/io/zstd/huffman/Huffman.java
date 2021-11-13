@@ -55,7 +55,7 @@ public class Huffman {
         return tableLog != -1;
     }
 
-    public void readTable(Buffer inputBase, final int size) {
+    public void readTable(Buffer inputBase, int size) {
         final int pos = inputBase.getOffs();
         Arrays.fill(ranks, 0);
         int input = pos;
