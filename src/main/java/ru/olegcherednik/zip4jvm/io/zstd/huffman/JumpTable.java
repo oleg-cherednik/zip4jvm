@@ -15,17 +15,17 @@ import ru.olegcherednik.zip4jvm.io.zstd.Buffer;
 public class JumpTable {
 
     // 2 bytes
-    private final int compressedSizeStream1;
+    private final int streamOneSize;
     // 2 bytes
-    private final int compressedSizeStream2;
+    private final int streamTwoSize;
     // 2 bytes
-    private final int compressedSizeStream3;
+    private final int streamThreeSize;
 
     public static JumpTable read(Buffer inputBase) {
-        int compressedSizeStream1 = inputBase.getShort();
-        int compressedSizeStream2 = inputBase.getShort();
-        int compressedSizeStream3 = inputBase.getShort();
-        return new JumpTable(compressedSizeStream1, compressedSizeStream2, compressedSizeStream3);
+        int streamOneSize = inputBase.getShort();
+        int streamTwoSize = inputBase.getShort();
+        int streamThreeSize = inputBase.getShort();
+        return new JumpTable(streamOneSize, streamTwoSize, streamThreeSize);
     }
 
 }

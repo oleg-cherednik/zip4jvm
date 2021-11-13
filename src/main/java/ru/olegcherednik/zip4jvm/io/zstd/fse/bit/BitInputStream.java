@@ -120,6 +120,8 @@ public class BitInputStream {
 
     }
 
+
+
     public static final class Loader {
 
         private final byte[] inputBase;

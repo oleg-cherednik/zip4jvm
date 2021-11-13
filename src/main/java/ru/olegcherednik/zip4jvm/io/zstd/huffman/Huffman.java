@@ -174,10 +174,15 @@ public class Huffman {
         verify(inputLimit - inputAddress >= 10, inputAddress, "Input is corrupted"); // jump table + 1 byte per stream
 
         JumpTable jumpTable = JumpTable.read(inputBase);
+        BitStreamData streamOne = new BitStreamData(inputBase.getOffs(), jumpTable.getStreamOneSize());
+        BitStreamData streamTwo = new BitStreamData(streamOne.getEndOffs(), jumpTable.getStreamTwoSize());
+        BitStreamData streamThree = new BitStreamData(streamTwo.getEndOffs(), jumpTable.getStreamThreeSize());
+        BitStreamData streamFour = new BitStreamData(streamThree.getEndOffs(), inputLimit - streamThree.getEndOffs());
+
         int start1 = inputBase.getOffs();
-        int start2 = start1 + jumpTable.getCompressedSizeStream1();
-        int start3 = start2 + jumpTable.getCompressedSizeStream2();
-        int start4 = start3 + jumpTable.getCompressedSizeStream3();
+        int start2 = start1 + jumpTable.getStreamOneSize();
+        int start3 = start2 + jumpTable.getStreamTwoSize();
+        int start4 = start3 + jumpTable.getStreamThreeSize();
 
         BitInputStream.Initializer initializer = new BitInputStream.Initializer(inputBase, start1, start2);
         initializer.initialize();
