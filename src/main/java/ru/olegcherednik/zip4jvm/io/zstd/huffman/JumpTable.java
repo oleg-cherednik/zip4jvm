@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.zstd.Buffer;
 
 /**
+ * see 3.1.1.3.1.6
+ *
  * @author Oleg Cherednik
  * @since 13.11.2021
  */
