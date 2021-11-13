@@ -154,11 +154,11 @@ public class ZstdFrameDecompressor {
         return matchAddress;
     }
 
-    private static int getLiteralSize(Buffer inputBase, LiteralBlockHeader.SizeFormat sizeFormat) {
-        if (sizeFormat == LiteralBlockHeader.SizeFormat.ONE_STREAM_10BITS
-                || sizeFormat == LiteralBlockHeader.SizeFormat.FOUR_STREAMS_10BITS)
+    private static int getLiteralSize(Buffer inputBase, LiteralSectionHeader.SizeFormat sizeFormat) {
+        if (sizeFormat == LiteralSectionHeader.SizeFormat.ONE_STREAM_10BITS
+                || sizeFormat == LiteralSectionHeader.SizeFormat.FOUR_STREAMS_10BITS)
             return inputBase.getByte() >>> 3;
-        if (sizeFormat == LiteralBlockHeader.SizeFormat.FOUR_STREAMS_14BITS)
+        if (sizeFormat == LiteralSectionHeader.SizeFormat.FOUR_STREAMS_14BITS)
             return inputBase.getShort() >>> 4;
         return inputBase.get3Bytes() >>> 4; // sizeFormat == LiteralBlockHeader.SizeFormat.FOUR_STREAMS_18BITS
     }
@@ -194,8 +194,8 @@ public class ZstdFrameDecompressor {
 
     int decodeCompressedBlock(Buffer inputBase, int blockSize, byte[] outputBase, int outputAddress) {
         final int pos = inputBase.getOffs();
-        LiteralBlockHeader literalBlockHeader = LiteralBlockHeader.read(inputBase);
-        literalBlockHeader.getType().decode(inputBase, blockSize, literalBlockHeader, this);
+        LiteralSectionHeader literalSectionHeader = LiteralSectionHeader.read(inputBase);
+        literalSectionHeader.getType().decode(inputBase, blockSize, literalSectionHeader, this);
         int written = decompressSequences(inputBase, pos + blockSize, outputBase, outputAddress);
         inputBase.seek(pos + blockSize);
         return written;
@@ -550,26 +550,26 @@ public class ZstdFrameDecompressor {
         }
     }
 
-    void decodeCompressedLiterals(Buffer inputBase, int blockSize, LiteralBlockHeader literalBlockHeader) {
+    void decodeCompressedLiterals(Buffer inputBase, int blockSize, LiteralSectionHeader literalSectionHeader) {
         final int pos = inputBase.getOffs();
 
         int compressedSize;
         int uncompressedSize;
-        LiteralBlockHeader.SizeFormat sizeFormat = literalBlockHeader.getSizeFormat();
+        LiteralSectionHeader.SizeFormat sizeFormat = literalSectionHeader.getSizeFormat();
 
-        if (sizeFormat == LiteralBlockHeader.SizeFormat.ONE_STREAM_10BITS
-                || sizeFormat == LiteralBlockHeader.SizeFormat.FOUR_STREAMS_10BITS) {
-            long data = literalBlockHeader.getSizePart1();
+        if (sizeFormat == LiteralSectionHeader.SizeFormat.ONE_STREAM_10BITS
+                || sizeFormat == LiteralSectionHeader.SizeFormat.FOUR_STREAMS_10BITS) {
+            long data = literalSectionHeader.getSizePart1();
             uncompressedSize = (int)(data & 0x3FF);
             compressedSize = (int)(data >>> 10 & 0x3FF);
-        } else if (sizeFormat == LiteralBlockHeader.SizeFormat.FOUR_STREAMS_14BITS) {
+        } else if (sizeFormat == LiteralSectionHeader.SizeFormat.FOUR_STREAMS_14BITS) {
             long sizePart2 = inputBase.getByte();
-            long data = sizePart2 << 20 | literalBlockHeader.getSizePart1();
+            long data = sizePart2 << 20 | literalSectionHeader.getSizePart1();
             uncompressedSize = (int)(data & 0x3FFF);
             compressedSize = (int)(data >>> 14 & 0x3FFF);
-        } else if (sizeFormat == LiteralBlockHeader.SizeFormat.FOUR_STREAMS_18BITS) {
+        } else if (sizeFormat == LiteralSectionHeader.SizeFormat.FOUR_STREAMS_18BITS) {
             long sizePart2 = inputBase.getShort();
-            long data = sizePart2 << 20 | literalBlockHeader.getSizePart1();
+            long data = sizePart2 << 20 | literalSectionHeader.getSizePart1();
             uncompressedSize = (int)(data & 0x3FFFF);
             compressedSize = (int)(data >>> 18 & 0x3FFFF);
         } else
@@ -580,23 +580,23 @@ public class ZstdFrameDecompressor {
 
         final int inputLimit = inputBase.getOffs() + compressedSize;
 
-        if (literalBlockHeader.getType() == LiteralBlockHeader.Type.COMPRESSED)
+        if (literalSectionHeader.getType() == LiteralSectionHeader.Type.COMPRESSED)
             huffman.readTable(inputBase, compressedSize);
 
         literalsBase = literals;
         literalsAddress = 0;
         literalsLimit = uncompressedSize;
 
-        if (sizeFormat == LiteralBlockHeader.SizeFormat.ONE_STREAM_10BITS)
+        if (sizeFormat == LiteralSectionHeader.SizeFormat.ONE_STREAM_10BITS)
             huffman.decodeSingleStream(inputBase, inputLimit, literals, literalsAddress, literalsLimit);
         else
             huffman.decode4Streams(inputBase, inputLimit, literals, literalsAddress, literalsLimit);
     }
 
-    void decodeRleLiterals(Buffer inputBase, LiteralBlockHeader literalBlockHeader) {
+    void decodeRleLiterals(Buffer inputBase, LiteralSectionHeader literalSectionHeader) {
         inputBase.skip(-3);
         final int pos = inputBase.getOffs();
-        int literalSize = getLiteralSize(inputBase, literalBlockHeader.getSizeFormat());
+        int literalSize = getLiteralSize(inputBase, literalSectionHeader.getSizeFormat());
 
         if (literalSize > MAX_BLOCK_SIZE)
             throw new Zip4jvmException("Output exceeds maximum block size");
@@ -609,11 +609,11 @@ public class ZstdFrameDecompressor {
         literalsLimit = literalSize;
     }
 
-    void decodeRawLiterals(Buffer inputBase, long blockSize, LiteralBlockHeader literalBlockHeader) {
+    void decodeRawLiterals(Buffer inputBase, long blockSize, LiteralSectionHeader literalSectionHeader) {
         inputBase.skip(-3);
         final int pos = inputBase.getOffs();
         long inputLimit = pos + blockSize;
-        int literalSize = getLiteralSize(inputBase, literalBlockHeader.getSizeFormat());
+        int literalSize = getLiteralSize(inputBase, literalSectionHeader.getSizeFormat());
         int input = inputBase.getOffs();
         // TODO temporary
         inputBase.seek(pos);

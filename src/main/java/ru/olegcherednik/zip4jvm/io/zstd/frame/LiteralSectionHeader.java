@@ -12,7 +12,7 @@ import ru.olegcherednik.zip4jvm.io.zstd.Buffer;
  */
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class LiteralBlockHeader {
+public class LiteralSectionHeader {
 
     // bit:0-1
     private final Type type;
@@ -28,23 +28,23 @@ public class LiteralBlockHeader {
         // Literals are stored uncompressed
         RAW(0) {
             @Override
-            public void decode(Buffer inputBase, int blockSize, LiteralBlockHeader literalBlockHeader, ZstdFrameDecompressor decompressor) {
-                decompressor.decodeRawLiterals(inputBase, blockSize, literalBlockHeader);
+            public void decode(Buffer inputBase, int blockSize, LiteralSectionHeader literalSectionHeader, ZstdFrameDecompressor decompressor) {
+                decompressor.decodeRawLiterals(inputBase, blockSize, literalSectionHeader);
             }
         },
         // Literals consist of a single byte value repeated Regenerated_Size times
         RLE(1) {
             @Override
-            public void decode(Buffer inputBase, int blockSize, LiteralBlockHeader literalBlockHeader, ZstdFrameDecompressor decompressor) {
-                decompressor.decodeRleLiterals(inputBase, literalBlockHeader);
+            public void decode(Buffer inputBase, int blockSize, LiteralSectionHeader literalSectionHeader, ZstdFrameDecompressor decompressor) {
+                decompressor.decodeRleLiterals(inputBase, literalSectionHeader);
             }
         },
         // This is a standard Huffman-compressed block, starting with a Huffman
         // tree description
         COMPRESSED(2) {
             @Override
-            public void decode(Buffer inputBase, int blockSize, LiteralBlockHeader literalBlockHeader, ZstdFrameDecompressor decompressor) {
-                decompressor.decodeCompressedLiterals(inputBase, blockSize, literalBlockHeader);
+            public void decode(Buffer inputBase, int blockSize, LiteralSectionHeader literalSectionHeader, ZstdFrameDecompressor decompressor) {
+                decompressor.decodeCompressedLiterals(inputBase, blockSize, literalSectionHeader);
             }
         },
         // This is a Huffman-compressed block, using Huffman tree from previous
@@ -54,16 +54,16 @@ public class LiteralBlockHeader {
         // data corruption
         TREELESS(3) {
             @Override
-            public void decode(Buffer inputBase, int blockSize, LiteralBlockHeader literalBlockHeader, ZstdFrameDecompressor decompressor) {
+            public void decode(Buffer inputBase, int blockSize, LiteralSectionHeader literalSectionHeader, ZstdFrameDecompressor decompressor) {
                 if (!decompressor.huffman.isLoaded())
                     throw new Zip4jvmException("Dictionary is corrupted");
-                decompressor.decodeCompressedLiterals(inputBase, blockSize, literalBlockHeader);
+                decompressor.decodeCompressedLiterals(inputBase, blockSize, literalSectionHeader);
             }
         };
 
         private final int id;
 
-        public void decode(Buffer inputBase, int blockSize, LiteralBlockHeader literalBlockHeader, ZstdFrameDecompressor decompressors) {
+        public void decode(Buffer inputBase, int blockSize, LiteralSectionHeader literalSectionHeader, ZstdFrameDecompressor decompressors) {
             throw new Zip4jvmException("Invalid Literals_Block type");
         }
 
@@ -95,13 +95,13 @@ public class LiteralBlockHeader {
         }
     }
 
-    public static LiteralBlockHeader read(Buffer inputBase) {
+    public static LiteralSectionHeader read(Buffer inputBase) {
         int one = inputBase.getByteNoMove();
         int two = inputBase.get3Bytes();
         Type type = Type.parseId(one & 0b11);
         SizeFormat sizeFormat = SizeFormat.parseId((one >> 2) & 0b11);
         int sizePart1 = two >> 4;
-        return new LiteralBlockHeader(type, sizeFormat, sizePart1);
+        return new LiteralSectionHeader(type, sizeFormat, sizePart1);
     }
 
 }

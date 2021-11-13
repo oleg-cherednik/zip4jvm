@@ -14,17 +14,16 @@
 package ru.olegcherednik.zip4jvm.io.zstd.huffman;
 
 import ru.olegcherednik.zip4jvm.io.zstd.Buffer;
-import ru.olegcherednik.zip4jvm.io.zstd.fse.FiniteStateEntropy;
-import ru.olegcherednik.zip4jvm.io.zstd.fse.FseTableReader;
 import ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil;
 import ru.olegcherednik.zip4jvm.io.zstd.Util;
+import ru.olegcherednik.zip4jvm.io.zstd.fse.FiniteStateEntropy;
+import ru.olegcherednik.zip4jvm.io.zstd.fse.FseTableReader;
 import ru.olegcherednik.zip4jvm.io.zstd.fse.bit.BitInputStream;
 
 import java.util.Arrays;
 
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_BYTE;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_INT;
-import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_SHORT;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.isPowerOf2;
 import static ru.olegcherednik.zip4jvm.io.zstd.Util.verify;
 import static ru.olegcherednik.zip4jvm.io.zstd.fse.bit.BitInputStream.isEndOfStream;
@@ -174,10 +173,11 @@ public class Huffman {
         final int inputAddress = inputBase.getOffs();
         verify(inputLimit - inputAddress >= 10, inputAddress, "Input is corrupted"); // jump table + 1 byte per stream
 
-        int start1 = inputAddress + 3 * SIZE_OF_SHORT; // for the shorts we read below
-        int start2 = start1 + inputBase.getShort();
-        int start3 = start2 + inputBase.getShort();
-        int start4 = start3 + inputBase.getShort();
+        JumpTable jumpTable = JumpTable.read(inputBase);
+        int start1 = inputBase.getOffs();
+        int start2 = start1 + jumpTable.getCompressedSizeStream1();
+        int start3 = start2 + jumpTable.getCompressedSizeStream2();
+        int start4 = start3 + jumpTable.getCompressedSizeStream3();
 
         BitInputStream.Initializer initializer = new BitInputStream.Initializer(inputBase, start1, start2);
         initializer.initialize();

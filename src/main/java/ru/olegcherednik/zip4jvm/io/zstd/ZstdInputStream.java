@@ -10,6 +10,8 @@ import java.io.InputStream;
 
 /**
  * https://github.com/facebook/zstd/blob/dev/doc/zstd_compression_format.md#frame_header
+ * https://datatracker.ietf.org/doc/html/rfc8478#page-14
+ * https://facebook.github.io/zstd/zstd_manual.html
  *
  * @author Oleg Cherednik
  * @since 06.11.2021
