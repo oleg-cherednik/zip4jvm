@@ -161,9 +161,8 @@ public class ZstdFrameDecompressor {
     private static int verifyMagic(Buffer inputBase) {
         int magic = (int)inputBase.getInt();
         if (magic != MAGIC_NUMBER) {
-            if (magic == V07_MAGIC_NUMBER) {
+            if (magic == V07_MAGIC_NUMBER)
                 throw new Zip4jvmException("Data encoded in unsupported ZSTD v0.7 format");
-            }
             throw new Zip4jvmException("Invalid magic prefix");
         }
 
@@ -183,19 +182,7 @@ public class ZstdFrameDecompressor {
         while (true) {
             // read block header
             BlockHeader blockHeader = BlockHeader.read(inputBase);
-
-            int decodedSize;
-
-            if (blockHeader.getType() == BlockHeader.Type.RAW)
-                decodedSize = decodeRawBlock(inputBase, blockHeader.getSize(), outputBase, output);
-            else if (blockHeader.getType() == BlockHeader.Type.RLE)
-                decodedSize = decodeRleBlock(inputBase, blockHeader.getSize(), outputBase, output);
-            else if (blockHeader.getType() == BlockHeader.Type.COMPRESSED)
-                decodedSize = decodeCompressedBlock(inputBase, blockHeader.getSize(), outputBase, output);
-            else
-                throw new Zip4jvmException("Invalid block type");
-
-            output += decodedSize;
+            output += decodeBlock(blockHeader, inputBase, outputBase, output);
 
             if (blockHeader.isLast())
                 break;
@@ -213,6 +200,16 @@ public class ZstdFrameDecompressor {
         }
 
         return output;
+    }
+
+    private int decodeBlock(BlockHeader blockHeader, Buffer inputBase, byte[] outputBase, int output) {
+        if (blockHeader.getType() == BlockHeader.Type.RAW)
+            return decodeRawBlock(inputBase, blockHeader.getSize(), outputBase, output);
+        if (blockHeader.getType() == BlockHeader.Type.RLE)
+            return decodeRleBlock(inputBase, blockHeader.getSize(), outputBase, output);
+        if (blockHeader.getType() == BlockHeader.Type.COMPRESSED)
+            return decodeCompressedBlock(inputBase, blockHeader.getSize(), outputBase, output);
+        throw new Zip4jvmException("Invalid block type");
     }
 
     private void reset() {
