@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.zstd.Buffer;
+import ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil;
+
+import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_BYTE;
 
 /**
  * @author Oleg Cherednik
@@ -32,7 +35,7 @@ public class BlockHeader {
         RAW(0) {
             @Override
             public int decodeBlock(int size, Buffer inputBase, byte[] outputBase, int output, ZstdFrameDecompressor decompressor) {
-                return ZstdFrameDecompressor.decodeRawBlock(inputBase, size, outputBase, output);
+                return inputBase.copyMemory(outputBase, output, size);
             }
         },
         // this is a single byte, repeated 'size' times
@@ -41,7 +44,14 @@ public class BlockHeader {
         RLE(1) {
             @Override
             public int decodeBlock(int size, Buffer inputBase, byte[] outputBase, int output, ZstdFrameDecompressor decompressor) {
-                return ZstdFrameDecompressor.decodeRleBlock(inputBase, size, outputBase, output);
+                byte value = (byte)inputBase.getByte();
+
+                for (int i = 0; i < size; i++) {
+                    UnsafeUtil.putByte(outputBase, output, value);
+                    output += SIZE_OF_BYTE;
+                }
+
+                return size;
             }
         },
         // this is a Zstandard compressed block. `size` is the length of

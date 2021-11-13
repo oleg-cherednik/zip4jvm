@@ -121,43 +121,6 @@ public class ZstdFrameDecompressor {
     private FiniteStateEntropy.Table currentOffsetCodesTable;
     private FiniteStateEntropy.Table currentMatchLengthTable;
 
-    static int decodeRawBlock(Buffer inputBase, int blockSize, byte[] outputBase, int outputAddress) {
-        UnsafeUtil.copyMemory(inputBase.getBuf(), inputBase.getOffs(), outputBase, outputAddress, blockSize);
-        inputBase.skip(blockSize);
-        return blockSize;
-    }
-
-    static int decodeRleBlock(Buffer inputBase, int blockSize, byte[] outputBase, int outputAddress) {
-        int output = outputAddress;
-        long value = inputBase.getByte();
-
-        int remaining = blockSize;
-        if (remaining >= SIZE_OF_LONG) {
-            long packed = value
-                    | (value << 8)
-                    | (value << 16)
-                    | (value << 24)
-                    | (value << 32)
-                    | (value << 40)
-                    | (value << 48)
-                    | (value << 56);
-
-            do {
-                UnsafeUtil.putLong(outputBase, output, packed);
-                output += SIZE_OF_LONG;
-                remaining -= SIZE_OF_LONG;
-            }
-            while (remaining >= SIZE_OF_LONG);
-        }
-
-        for (int i = 0; i < remaining; i++) {
-            UnsafeUtil.putByte(outputBase, output, (byte)value);
-            output++;
-        }
-
-        return blockSize;
-    }
-
     private static int verifyMagic(Buffer inputBase) {
         int magic = (int)inputBase.getInt();
         if (magic != MAGIC_NUMBER) {
@@ -167,6 +130,36 @@ public class ZstdFrameDecompressor {
         }
 
         return SIZE_OF_INT;
+    }
+
+    private static int copyMatchHead(byte[] outputBase, int output, int offset, int matchAddress) {
+        // copy match
+        if (offset < 8) {
+            // 8 bytes apart so that we can copy long-at-a-time below
+            int increment32 = DEC_32_TABLE[offset];
+            int decrement64 = DEC_64_TABLE[offset];
+
+            UnsafeUtil.putByte(outputBase, output, UnsafeUtil.getByte(outputBase, matchAddress));
+            UnsafeUtil.putByte(outputBase, output + 1, UnsafeUtil.getByte(outputBase, matchAddress + 1));
+            UnsafeUtil.putByte(outputBase, output + 2, UnsafeUtil.getByte(outputBase, matchAddress + 2));
+            UnsafeUtil.putByte(outputBase, output + 3, UnsafeUtil.getByte(outputBase, matchAddress + 3));
+            matchAddress += increment32;
+
+            UnsafeUtil.putInt(outputBase, output + 4, UnsafeUtil.getInt(outputBase, matchAddress));
+            matchAddress -= decrement64;
+        } else {
+            UnsafeUtil.putLong(outputBase, output, UnsafeUtil.getLong(outputBase, matchAddress));
+            matchAddress += SIZE_OF_LONG;
+        }
+        return matchAddress;
+    }
+
+    private static int getLiteralSize(Buffer inputBase, int sizeFormat) {
+        if (sizeFormat == 0b00 || sizeFormat == 0b10)
+            return inputBase.getByte() >>> 3;
+        if (sizeFormat == 0b01)
+            return inputBase.getShort() >>> 4;
+        return inputBase.get3Bytes() >>> 4; // sizeFormat == 0b11
     }
 
     public int decompress(Buffer inputBase, byte[] outputBase) {
@@ -193,9 +186,8 @@ public class ZstdFrameDecompressor {
             long checksum = inputBase.getInt();
 
             if (checksum != hash)
-                throw new Zip4jvmException(
-                        String.format("Bad checksum. Expected: %s, actual: %s",
-                                Integer.toHexString((int)checksum), Integer.toHexString((int)hash)));
+                throw new Zip4jvmException(String.format("Bad checksum. Expected: %s, actual: %s",
+                        Integer.toHexString((int)checksum), Integer.toHexString((int)hash)));
         }
 
         return output;
@@ -465,28 +457,6 @@ public class ZstdFrameDecompressor {
         }
     }
 
-    private static int copyMatchHead(byte[] outputBase, int output, int offset, int matchAddress) {
-        // copy match
-        if (offset < 8) {
-            // 8 bytes apart so that we can copy long-at-a-time below
-            int increment32 = DEC_32_TABLE[offset];
-            int decrement64 = DEC_64_TABLE[offset];
-
-            UnsafeUtil.putByte(outputBase, output, UnsafeUtil.getByte(outputBase, matchAddress));
-            UnsafeUtil.putByte(outputBase, output + 1, UnsafeUtil.getByte(outputBase, matchAddress + 1));
-            UnsafeUtil.putByte(outputBase, output + 2, UnsafeUtil.getByte(outputBase, matchAddress + 2));
-            UnsafeUtil.putByte(outputBase, output + 3, UnsafeUtil.getByte(outputBase, matchAddress + 3));
-            matchAddress += increment32;
-
-            UnsafeUtil.putInt(outputBase, output + 4, UnsafeUtil.getInt(outputBase, matchAddress));
-            matchAddress -= decrement64;
-        } else {
-            UnsafeUtil.putLong(outputBase, output, UnsafeUtil.getLong(outputBase, matchAddress));
-            matchAddress += SIZE_OF_LONG;
-        }
-        return matchAddress;
-    }
-
     private int copyLiterals(byte[] outputBase, int output, int literalsInput, int literalOutputLimit) {
         int literalInput = literalsInput;
         do {
@@ -688,14 +658,6 @@ public class ZstdFrameDecompressor {
         }
 
         inputBase.skip(input + literalSize - pos);
-    }
-
-    private static int getLiteralSize(Buffer inputBase, int sizeFormat) {
-        if (sizeFormat == 0b00 || sizeFormat == 0b10)
-            return inputBase.getByte() >>> 3;
-        if (sizeFormat == 0b01)
-            return inputBase.getShort() >>> 4;
-        return inputBase.get3Bytes() >>> 4; // sizeFormat == 0b11
     }
 
 }
