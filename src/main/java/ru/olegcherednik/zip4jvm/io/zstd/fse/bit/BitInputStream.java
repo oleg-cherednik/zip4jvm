@@ -18,6 +18,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.zstd.Buffer;
 import ru.olegcherednik.zip4jvm.io.zstd.UnsafeUtil;
+import ru.olegcherednik.zip4jvm.io.zstd.huffman.BitStreamData;
 
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_BYTE;
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.SIZE_OF_LONG;
@@ -176,7 +177,7 @@ public class BitInputStream {
 
             verify(lastByte != 0, endAddress, "Bitstream end mark not present");
 
-            int bitsConsumed;
+            int bitsConsumed = SIZE_OF_LONG - highestBit(lastByte);
             int currentAddress;
             long bits;
 
@@ -184,12 +185,11 @@ public class BitInputStream {
                 inputBase.skip(-SIZE_OF_LONG);
                 currentAddress = inputBase.getOffs();
                 bits = inputBase.getLong();
-                bitsConsumed = SIZE_OF_LONG - highestBit(lastByte);
             } else {
                 inputBase.skip(-size);
                 currentAddress = inputBase.getOffs();
                 bits = readTail(inputBase, size);
-                bitsConsumed = SIZE_OF_LONG - highestBit(lastByte) + (SIZE_OF_LONG - size) * 8;
+                bitsConsumed += (SIZE_OF_LONG - size) * 8;
             }
 
             inputBase.seek(endAddress);
@@ -207,6 +207,10 @@ public class BitInputStream {
         private int currentAddress;
         private int bitsConsumed;
         private boolean overflow;
+
+        public Loader(byte[] inputBase, BitStreamData stream) {
+            this(inputBase, stream.getOffs(), stream.getCurrentAddress(), stream.getBits(), stream.getBitsConsumed());
+        }
 
         public Loader(byte[] inputBase, int startAddress, int currentAddress, long bits, int bitsConsumed) {
             this.inputBase = inputBase;
@@ -236,7 +240,9 @@ public class BitInputStream {
             if (bitsConsumed > 64) {
                 overflow = true;
                 return true;
-            } else if (currentAddress == startAddress) {
+            }
+
+            if (currentAddress == startAddress) {
                 return true;
             }
 
@@ -248,7 +254,7 @@ public class BitInputStream {
                 }
                 bitsConsumed &= 0b111;
             } else if (currentAddress - bytes < startAddress) {
-                bytes = (int)(currentAddress - startAddress);
+                bytes = currentAddress - startAddress;
                 currentAddress = startAddress;
                 bitsConsumed -= bytes * SIZE_OF_LONG;
                 bits = UnsafeUtil.getLong(inputBase, startAddress);
@@ -257,6 +263,48 @@ public class BitInputStream {
                 currentAddress -= bytes;
                 bitsConsumed -= bytes * SIZE_OF_LONG;
                 bits = UnsafeUtil.getLong(inputBase, currentAddress);
+            }
+
+            return false;
+        }
+
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static final class LoaderBuffer {
+
+        private final byte[] inputBase;
+        private final BitStreamData stream;
+        private boolean overflow;
+
+        public boolean load() {
+            if (stream.getCurrentAddress() > 64) {
+                overflow = true;
+                return true;
+            }
+
+            if (stream.getCurrentAddress() == stream.getOffs()) {
+                return true;
+            }
+
+            int bytes = stream.getBitsConsumed() >>> 3; // divide by 8
+            if (stream.getCurrentAddress() >= stream.getOffs() + SIZE_OF_LONG) {
+                if (bytes > 0) {
+                    stream.setCurrentAddress(stream.getCurrentAddress() - bytes);
+                    stream.setBits(UnsafeUtil.getLong(inputBase, stream.getCurrentAddress()));
+                }
+                stream.setBitsConsumed(stream.getBitsConsumed() & 0b111);
+            } else if (stream.getCurrentAddress() - bytes < stream.getOffs()) {
+                bytes = stream.getCurrentAddress() - stream.getOffs();
+                stream.setCurrentAddress(stream.getOffs());
+                stream.setBitsConsumed(stream.getBitsConsumed() - bytes * SIZE_OF_LONG);
+                stream.setBits(UnsafeUtil.getLong(inputBase, stream.getOffs()));
+                return true;
+            } else {
+                stream.setCurrentAddress(stream.getCurrentAddress() - bytes);
+                stream.setBitsConsumed(stream.getBitsConsumed() - bytes * SIZE_OF_LONG);
+                stream.setBits(UnsafeUtil.getLong(inputBase, stream.getCurrentAddress()));
             }
 
             return false;

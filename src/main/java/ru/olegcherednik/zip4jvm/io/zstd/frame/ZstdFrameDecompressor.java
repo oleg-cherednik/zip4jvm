@@ -553,27 +553,27 @@ public class ZstdFrameDecompressor {
         final int pos = inputBase.getOffs();
 
         int compressedSize;
-        int uncompressedSize;
+        int regeneratedSize;
         LiteralsSizeFormat sizeFormat = literalsSectionHeader.getLiteralsSizeFormat();
 
         if (sizeFormat == LiteralsSizeFormat.ONE_STREAM_10BITS || sizeFormat == LiteralsSizeFormat.FOUR_STREAMS_10BITS) {
             long data = literalsSectionHeader.getSizePart1();
-            uncompressedSize = (int)(data & 0x3FF);
+            regeneratedSize = (int)(data & 0x3FF);
             compressedSize = (int)(data >>> 10 & 0x3FF);
         } else if (sizeFormat == LiteralsSizeFormat.FOUR_STREAMS_14BITS) {
             long sizePart2 = inputBase.getByte();
             long data = sizePart2 << 20 | literalsSectionHeader.getSizePart1();
-            uncompressedSize = (int)(data & 0x3FFF);
+            regeneratedSize = (int)(data & 0x3FFF);
             compressedSize = (int)(data >>> 14 & 0x3FFF);
         } else if (sizeFormat == LiteralsSizeFormat.FOUR_STREAMS_18BITS) {
             long sizePart2 = inputBase.getShort();
             long data = sizePart2 << 20 | literalsSectionHeader.getSizePart1();
-            uncompressedSize = (int)(data & 0x3FFFF);
+            regeneratedSize = (int)(data & 0x3FFFF);
             compressedSize = (int)(data >>> 18 & 0x3FFFF);
         } else
             throw new Zip4jvmException("Invalid literals header size type");
 
-        verify(uncompressedSize <= MAX_BLOCK_SIZE, pos, "Block exceeds maximum size");
+        verify(regeneratedSize <= MAX_BLOCK_SIZE, pos, "Block exceeds maximum size");
         verify(inputBase.getOffs() - pos + compressedSize <= blockSize, pos, "Input is corrupted");
 
         final int inputLimit = inputBase.getOffs() + compressedSize;
@@ -583,7 +583,7 @@ public class ZstdFrameDecompressor {
 
         literalsBase = literals;
         literalsAddress = 0;
-        literalsLimit = uncompressedSize;
+        literalsLimit = regeneratedSize;
 
         if (sizeFormat == LiteralsSizeFormat.ONE_STREAM_10BITS)
             huffman.decodeSingleStream(inputBase, inputLimit, literals, literalsAddress, literalsLimit);
