@@ -199,9 +199,11 @@ public class Huffman {
         streams.get(2).setOutputAddress(outputStart3);
         streams.get(3).setOutputAddress(outputStart4);
 
-        int output1 = outputAddress;
-        int output2 = outputStart2;
-        int output3 = outputStart3;
+        streams.get(0).setOutput(outputAddress);
+        streams.get(1).setOutput(outputStart2);
+        streams.get(2).setOutput(outputStart3);
+        streams.get(3).setOutput(outputStart4);
+
         int output4 = outputStart4;
 
         long fastOutputLimit = outputLimit - 7;
@@ -211,29 +213,29 @@ public class Huffman {
 
         out:
         while (output4 < fastOutputLimit) {
-            streams.get(0).setBitsConsumed(decodeSymbol(outputBase, output1, streams.get(0), tableLog, numbersOfBits, symbols));
-            streams.get(1).setBitsConsumed(decodeSymbol(outputBase, output2, streams.get(1), tableLog, numbersOfBits, symbols));
-            streams.get(2).setBitsConsumed(decodeSymbol(outputBase, output3, streams.get(2), tableLog, numbersOfBits, symbols));
-            streams.get(3).setBitsConsumed(decodeSymbol(outputBase, output4, streams.get(3), tableLog, numbersOfBits, symbols));
+            decodeSymbol(outputBase, streams.get(0).getOutput(), streams.get(0), tableLog, numbersOfBits, symbols);
+            decodeSymbol(outputBase, streams.get(1).getOutput(), streams.get(1), tableLog, numbersOfBits, symbols);
+            decodeSymbol(outputBase, streams.get(2).getOutput(), streams.get(2), tableLog, numbersOfBits, symbols);
+            decodeSymbol(outputBase, output4, streams.get(3), tableLog, numbersOfBits, symbols);
 
-            streams.get(0).setBitsConsumed(decodeSymbol(outputBase, output1 + 1, streams.get(0), tableLog, numbersOfBits, symbols));
-            streams.get(1).setBitsConsumed(decodeSymbol(outputBase, output2 + 1, streams.get(1), tableLog, numbersOfBits, symbols));
-            streams.get(2).setBitsConsumed(decodeSymbol(outputBase, output3 + 1, streams.get(2), tableLog, numbersOfBits, symbols));
-            streams.get(3).setBitsConsumed(decodeSymbol(outputBase, output4 + 1, streams.get(3), tableLog, numbersOfBits, symbols));
+            decodeSymbol(outputBase, streams.get(0).getOutput() + 1, streams.get(0), tableLog, numbersOfBits, symbols);
+            decodeSymbol(outputBase, streams.get(1).getOutput() + 1, streams.get(1), tableLog, numbersOfBits, symbols);
+            decodeSymbol(outputBase, streams.get(2).getOutput() + 1, streams.get(2), tableLog, numbersOfBits, symbols);
+            decodeSymbol(outputBase, output4 + 1, streams.get(3), tableLog, numbersOfBits, symbols);
 
-            streams.get(0).setBitsConsumed(decodeSymbol(outputBase, output1 + 2, streams.get(0), tableLog, numbersOfBits, symbols));
-            streams.get(1).setBitsConsumed(decodeSymbol(outputBase, output2 + 2, streams.get(1), tableLog, numbersOfBits, symbols));
-            streams.get(2).setBitsConsumed(decodeSymbol(outputBase, output3 + 2, streams.get(2), tableLog, numbersOfBits, symbols));
-            streams.get(3).setBitsConsumed(decodeSymbol(outputBase, output4 + 2, streams.get(3), tableLog, numbersOfBits, symbols));
+            decodeSymbol(outputBase, streams.get(0).getOutput() + 2, streams.get(0), tableLog, numbersOfBits, symbols);
+            decodeSymbol(outputBase, streams.get(1).getOutput() + 2, streams.get(1), tableLog, numbersOfBits, symbols);
+            decodeSymbol(outputBase, streams.get(2).getOutput() + 2, streams.get(2), tableLog, numbersOfBits, symbols);
+            decodeSymbol(outputBase, output4 + 2, streams.get(3), tableLog, numbersOfBits, symbols);
 
-            streams.get(0).setBitsConsumed(decodeSymbol(outputBase, output1 + 3, streams.get(0), tableLog, numbersOfBits, symbols));
-            streams.get(1).setBitsConsumed(decodeSymbol(outputBase, output2 + 3, streams.get(1), tableLog, numbersOfBits, symbols));
-            streams.get(2).setBitsConsumed(decodeSymbol(outputBase, output3 + 3, streams.get(2), tableLog, numbersOfBits, symbols));
-            streams.get(3).setBitsConsumed(decodeSymbol(outputBase, output4 + 3, streams.get(3), tableLog, numbersOfBits, symbols));
+            decodeSymbol(outputBase, streams.get(0).getOutput() + 3, streams.get(0), tableLog, numbersOfBits, symbols);
+            decodeSymbol(outputBase, streams.get(1).getOutput() + 3, streams.get(1), tableLog, numbersOfBits, symbols);
+            decodeSymbol(outputBase, streams.get(2).getOutput() + 3, streams.get(2), tableLog, numbersOfBits, symbols);
+            decodeSymbol(outputBase, output4 + 3, streams.get(3), tableLog, numbersOfBits, symbols);
 
-            output1 += SIZE_OF_INT;
-            output2 += SIZE_OF_INT;
-            output3 += SIZE_OF_INT;
+            streams.get(0).setOutput(streams.get(0).getOutput() + SIZE_OF_INT);
+            streams.get(1).setOutput(streams.get(1).getOutput() + SIZE_OF_INT);
+            streams.get(2).setOutput(streams.get(2).getOutput() + SIZE_OF_INT);
             output4 += SIZE_OF_INT;
 
             for (BitStreamData stream : streams)
@@ -241,11 +243,12 @@ public class Huffman {
                     break out;
         }
 
-        verify(output1 <= outputStart2 && output2 <= outputStart3 && output3 <= outputStart4, inputAddress, "Input is corrupted");
+        verify(streams.get(0).getOutput() <= outputStart2 && streams.get(1).getOutput() <= outputStart3
+                && streams.get(2).getOutput() <= outputStart4, inputAddress, "Input is corrupted");
 
-        decodeTail(inputBase.getBuf(), streams.get(0), outputBase, output1, outputStart2);
-        decodeTail(inputBase.getBuf(), streams.get(1), outputBase, output2, outputStart3);
-        decodeTail(inputBase.getBuf(), streams.get(2), outputBase, output3, outputStart4);
+        decodeTail(inputBase.getBuf(), streams.get(0), outputBase, streams.get(0).getOutput(), outputStart2);
+        decodeTail(inputBase.getBuf(), streams.get(1), outputBase, streams.get(1).getOutput(), outputStart3);
+        decodeTail(inputBase.getBuf(), streams.get(2), outputBase, streams.get(2).getOutput(), outputStart4);
         decodeTail(inputBase.getBuf(), streams.get(3), outputBase, output4, outputLimit);
         inputBase.seek(inputLimit);
     }
@@ -309,12 +312,11 @@ public class Huffman {
         verify(isEndOfStream(startAddress, currentAddress, bitsConsumed), startAddress, "Bit stream is not fully consumed");
     }
 
-    private static int decodeSymbol(byte[] outputBase, int outputAddress, BitStreamData stream, int tableLog, byte[] numbersOfBits, byte[] symbols) {
+    private static void decodeSymbol(byte[] outputBase, int outputAddress, BitStreamData stream, int tableLog, byte[] numbersOfBits, byte[] symbols) {
         long bitContainer = stream.getBits();
-        int bitsConsumed = stream.getBitsConsumed();
-        int value = (int)peekBitsFast(bitsConsumed, bitContainer, tableLog);
+        int value = (int)peekBitsFast(stream.getBitsConsumed(), bitContainer, tableLog);
         UnsafeUtil.putByte(outputBase, outputAddress, symbols[value]);
-        return bitsConsumed + numbersOfBits[value];
+        stream.setBitsConsumed(stream.getBitsConsumed() + numbersOfBits[value]);
     }
 
     private static int decodeSymbol(byte[] outputBase, int outputAddress, long bitContainer, int bitsConsumed, int tableLog, byte[] numbersOfBits,

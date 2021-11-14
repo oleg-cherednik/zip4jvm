@@ -19,6 +19,7 @@ public class BitStreamData {
     private int currentAddress;
     private int bitsConsumed;
     private int outputAddress;
+    private int output;
 
     public int getEndOffs() {
         return offs + size;
