@@ -20,7 +20,6 @@ import ru.olegcherednik.zip4jvm.io.zstd.fse.FiniteStateEntropy;
 import ru.olegcherednik.zip4jvm.io.zstd.fse.FseTableReader;
 import ru.olegcherednik.zip4jvm.io.zstd.fse.bit.BitInputStream;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -175,18 +174,14 @@ public class Huffman {
         verify(inputLimit - inputAddress >= 10, inputAddress, "Input is corrupted"); // jump table + 1 byte per stream
 
         JumpTable jumpTable = JumpTable.read(inputBase);
-        List<BitStreamData> streams = new ArrayList<>();
-        streams.add(new BitStreamData(inputBase.getOffs(), jumpTable.getStreamOneSize()));
-        streams.add(new BitStreamData(streams.get(0).getEndOffs(), jumpTable.getStreamTwoSize()));
-        streams.add(new BitStreamData(streams.get(1).getEndOffs(), jumpTable.getStreamThreeSize()));
-        streams.add(new BitStreamData(streams.get(2).getEndOffs(), inputLimit - streams.get(2).getEndOffs()));
+        List<BitStreamData> streams = jumpTable.createStreams(inputBase, inputLimit);
 
-        for (BitStreamData stream : streams) {
+        streams.forEach(stream -> {
             BitInputStream.InitializerBuffer initializerBuffer = BitInputStream.InitializerBuffer.read(inputBase, stream.getSize());
             stream.setBitsConsumed(initializerBuffer.getBitsConsumed());
             stream.setCurrentAddress(initializerBuffer.getCurrentAddress());
             stream.setBits(initializerBuffer.getBits());
-        }
+        });
 
         int segmentSize = (int)((outputLimit - outputAddress + 3) / 4);
 
