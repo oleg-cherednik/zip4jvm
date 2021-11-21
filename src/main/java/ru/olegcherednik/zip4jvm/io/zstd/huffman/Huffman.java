@@ -134,8 +134,8 @@ public class Huffman {
 
     public void decodeSingleStream(Buffer inputBase, final int inputLimit, final byte[] outputBase,
             final int outputAddress, final long outputLimit) {
-        final int inputAddress = inputBase.getOffs();
-        BitInputStream.Initializer initializer = new BitInputStream.Initializer(inputBase, inputAddress, inputLimit);
+        final int pos = inputBase.getOffs();
+        BitInputStream.Initializer initializer = new BitInputStream.Initializer(inputBase, pos, inputLimit);
         initializer.initialize();
 
         long bits = initializer.getBits();
@@ -150,7 +150,7 @@ public class Huffman {
         int output = outputAddress;
         long fastOutputLimit = outputLimit - 4;
         while (output < fastOutputLimit) {
-            BitInputStream.Loader loader = new BitInputStream.Loader(inputBase.getBuf(), inputAddress, currentAddress, bits, bitsConsumed);
+            BitInputStream.Loader loader = new BitInputStream.Loader(inputBase.getBuf(), pos, currentAddress, bits, bitsConsumed);
             boolean done = loader.load();
             bits = loader.getBits();
             bitsConsumed = loader.getBitsConsumed();
@@ -166,7 +166,7 @@ public class Huffman {
             output += SIZE_OF_INT;
         }
 
-        decodeTail(inputBase.getBuf(), inputAddress, currentAddress, bitsConsumed, bits, outputBase, output, outputLimit);
+        decodeTail(inputBase.getBuf(), pos, currentAddress, bitsConsumed, bits, outputBase, output, outputLimit);
         inputBase.seek(inputLimit);
     }
 

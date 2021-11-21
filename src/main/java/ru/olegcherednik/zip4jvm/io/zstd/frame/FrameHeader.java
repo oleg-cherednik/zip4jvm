@@ -13,13 +13,30 @@
  */
 package ru.olegcherednik.zip4jvm.io.zstd.frame;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.zstd.Buffer;
+import ru.olegcherednik.zip4jvm.utils.BitUtils;
+
+import java.util.function.BiFunction;
 
 import static ru.olegcherednik.zip4jvm.io.zstd.Constants.MIN_WINDOW_LOG;
+import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT0;
+import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT1;
+import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT2;
+import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT5;
+import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT6;
+import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT7;
 
+/**
+ * see 3.1.1.1
+ *
+ * @author Oleg Cherednik
+ * @since 21.11.2021
+ */
 @Getter
 @RequiredArgsConstructor
 public class FrameHeader {
@@ -32,15 +49,11 @@ public class FrameHeader {
 
     public static FrameHeader read(Buffer inputBase) {
         final int pos = inputBase.getOffs();
-        int frameHeaderDescriptor = inputBase.getByte();
-
-        boolean singleSegment = (frameHeaderDescriptor & 0b100000) != 0;
-        int dictionaryDescriptor = frameHeaderDescriptor & 0b11;
-        int contentSizeDescriptor = frameHeaderDescriptor >>> 6;
+        FrameHeader.Descriptor descriptor = FrameHeader.Descriptor.read(inputBase);
 
         // decode window size
         int windowSize = -1;
-        if (!singleSegment) {
+        if (!descriptor.isSingleSegment()) {
             int windowDescriptor = inputBase.getByte();
             int exponent = windowDescriptor >>> 3;
             int mantissa = windowDescriptor & 0b111;
@@ -51,7 +64,7 @@ public class FrameHeader {
 
         // decode dictionary id
         long dictionaryId = -1;
-        switch (dictionaryDescriptor) {
+        switch (descriptor.getDictionaryId()) {
             case 0:
                 break;
             case 1:
@@ -68,26 +81,65 @@ public class FrameHeader {
         }
 
         // decode content size
-        long contentSize = -1;
-        switch (contentSizeDescriptor) {
-            case 0:
-                if (singleSegment) {
-                    contentSize = inputBase.getByte();
-                }
-                break;
-            case 1:
-                contentSize = inputBase.getShort() + 256L;
-                break;
-            case 2:
-                contentSize = inputBase.getInt();
-                break;
-            case 3:
-                contentSize = inputBase.getLong();
-                break;
+        long contentSize = descriptor.readContentSize(inputBase);
+        boolean hasChecksum = descriptor.isContentChecksum();
+        return new FrameHeader(inputBase.getOffs() - pos, windowSize, contentSize, dictionaryId, hasChecksum);
+    }
+
+    /** @see 3.1.1.1.1 */
+    @Getter
+    @Setter
+    public static final class Descriptor {
+
+        // total size:1
+
+        // bitNum:0-1 - Dictionary ID Flag
+        private int dictionaryId;
+        // bitNum:2 - Content Checksum Flag
+        private boolean contentChecksum;
+        // bitNum:3 - reserved
+        // bitNum:4 - unused
+        // bitNum:5 - Single Segment Flag
+        private boolean singleSegment;
+        // bitNum:6-7 - Frame Content Size Flag
+        private FrameContentSize frameContentSize;
+
+        public long readContentSize(Buffer inputBase) {
+            return frameContentSize.readContentSize(inputBase, singleSegment);
         }
 
-        boolean hasChecksum = (frameHeaderDescriptor & 0b100) != 0;
-        return new FrameHeader(inputBase.getOffs() - pos, windowSize, contentSize, dictionaryId, hasChecksum);
+        public static Descriptor read(Buffer inputBase) {
+            int data = inputBase.getByte();
+            Descriptor descriptor = new Descriptor();
+            descriptor.setDictionaryId(data & (BIT0 | BIT1));
+            descriptor.setSingleSegment(BitUtils.isBitSet(data, BIT2));
+            descriptor.setContentChecksum(BitUtils.isBitSet(data, BIT5));
+            descriptor.setFrameContentSize(FrameContentSize.parseValue((data & (BIT6 | BIT7)) >> 6));
+            return descriptor;
+        }
+
+    }
+
+    @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+    public enum FrameContentSize {
+        BYTE(0, (inputBase, singleSegment) -> singleSegment == Boolean.TRUE ? inputBase.getByte() : -1L),
+        WORD(1, (inputBase, singleSegment) -> inputBase.getShort() + 256L),
+        DWORD(2, (inputBase, singleSegment) -> inputBase.getInt()),
+        QWORD(3, (inputBase, singleSegment) -> inputBase.getLong());
+
+        private final int value;
+        private final BiFunction<Buffer, Boolean, Long> readContentSize;
+
+        public final long readContentSize(Buffer inputBase, boolean singleSegment) {
+            return readContentSize.apply(inputBase, singleSegment);
+        }
+
+        public static FrameContentSize parseValue(int value) {
+            for (FrameContentSize frameContentSize : values())
+                if (frameContentSize.value == value)
+                    return frameContentSize;
+            throw new EnumConstantNotPresentException(FrameContentSize.class, String.valueOf(value));
+        }
     }
 
 }
