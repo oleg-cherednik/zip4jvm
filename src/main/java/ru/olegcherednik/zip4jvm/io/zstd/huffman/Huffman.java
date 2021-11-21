@@ -135,12 +135,11 @@ public class Huffman {
     public void decodeSingleStream(Buffer inputBase, final int inputLimit, final byte[] outputBase,
             final int outputAddress, final long outputLimit) {
         final int pos = inputBase.getOffs();
-        BitInputStream.Initializer initializer = new BitInputStream.Initializer(inputBase, pos, inputLimit);
-        initializer.initialize();
-
-        long bits = initializer.getBits();
-        int bitsConsumed = initializer.getBitsConsumed();
-        int currentAddress = initializer.getCurrentAddress();
+        final int compressedSize = inputLimit - inputBase.getOffs();
+        BitInputStream.InitializerBuffer initializerBuffer = BitInputStream.InitializerBuffer.read(inputBase, compressedSize);
+        long bits = initializerBuffer.getBits();
+        int bitsConsumed = initializerBuffer.getBitsConsumed();
+        int currentAddress = initializerBuffer.getCurrentAddress();
 
         int tableLog = this.tableLog;
         byte[] numbersOfBits = this.numbersOfBits;
