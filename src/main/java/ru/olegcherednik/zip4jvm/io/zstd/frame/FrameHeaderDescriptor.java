@@ -42,14 +42,15 @@ public class FrameHeaderDescriptor {
     // bitNum:6-7 - Frame Content Size Flag
     private FrameContentSize frameContentSize;
 
-    public int readWindowSize(Buffer inputBase) {
+    /** see 3.1.1.1.2 */
+    public long readWindowSize(Buffer inputBase) {
         if (singleSegment)
-            return -1;
+            return -1L;
 
-        int windowDescriptor = inputBase.getByte();
-        int exponent = windowDescriptor >> 3;
-        int mantissa = windowDescriptor & 0b111;
-        int base = 1 << (MIN_WINDOW_LOG + exponent);
+        long windowDescriptor = inputBase.getByte();
+        long exponent = windowDescriptor >> 3;
+        long mantissa = windowDescriptor & (BIT0 | BIT1 | BIT2);
+        long base = 1 << (MIN_WINDOW_LOG + exponent);
         return base + (base / 8) * mantissa;
     }
 

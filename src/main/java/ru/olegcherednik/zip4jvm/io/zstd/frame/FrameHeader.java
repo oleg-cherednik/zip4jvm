@@ -28,7 +28,7 @@ import ru.olegcherednik.zip4jvm.io.zstd.Buffer;
 public class FrameHeader {
 
     private final int headerSize;
-    private final int windowSize;
+    private final long windowSize;
     private final long contentSize;
     private final long dictionaryId;
     private final boolean hasChecksum;
@@ -36,10 +36,14 @@ public class FrameHeader {
     public static FrameHeader read(Buffer inputBase) {
         final int pos = inputBase.getOffs();
         FrameHeaderDescriptor descriptor = FrameHeaderDescriptor.read(inputBase);
-        int windowSize = descriptor.readWindowSize(inputBase);
+        long windowSize = descriptor.readWindowSize(inputBase);
         long dictionaryId = descriptor.readDictionaryId(inputBase);
         long contentSize = descriptor.readContentSize(inputBase);
         boolean hasChecksum = descriptor.isContentChecksum();
+
+        if (descriptor.isSingleSegment())
+            windowSize = contentSize;
+
         return new FrameHeader(inputBase.getOffs() - pos, windowSize, contentSize, dictionaryId, hasChecksum);
     }
 
