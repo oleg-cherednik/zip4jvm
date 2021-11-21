@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.io.zstd.Buffer;
 
 /**
  * @author Oleg Cherednik
@@ -26,4 +27,13 @@ public enum LiteralsSizeFormat {
 
         throw new Zip4jvmException("Unknown LiteralsBlock type: " + value);
     }
+
+    public void decodeStream(Buffer inputBase, int inputLimit, ZstdFrameDecompressor decompressor) {
+        if (this == ONE_STREAM_10BITS)
+            decompressor.decodeSingleStream(inputBase, inputLimit);
+        else
+            decompressor.decode4Streams(inputBase, inputLimit);
+    }
+
+
 }

@@ -584,11 +584,7 @@ public class ZstdFrameDecompressor {
         literalsBase = literals;
         literalsAddress = 0;
         literalsLimit = regeneratedSize;
-
-        if (sizeFormat == LiteralsSizeFormat.ONE_STREAM_10BITS)
-            huffman.decodeSingleStream(inputBase, inputLimit, literals, literalsAddress, literalsLimit);
-        else
-            huffman.decode4Streams(inputBase, inputLimit, literals, literalsAddress, literalsLimit);
+        sizeFormat.decodeStream(inputBase, inputLimit, this);
     }
 
     void decodeRleLiterals(Buffer inputBase, LiteralsSectionHeader literalsSectionHeader) {
@@ -632,6 +628,14 @@ public class ZstdFrameDecompressor {
         }
 
         inputBase.skip(input + literalSize - pos);
+    }
+
+    void decodeSingleStream(Buffer inputBase, int inputLimit) {
+        huffman.decodeSingleStream(inputBase, inputLimit, literals, literalsAddress, literalsLimit);
+    }
+
+    void decode4Streams(Buffer inputBase, int inputLimit) {
+        huffman.decode4Streams(inputBase, inputLimit, literals, literalsAddress, literalsLimit);
     }
 
 }
