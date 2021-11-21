@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.zstd.Buffer;
 
 /**
- * see 3.1.1.3.1
+ * see 3.1.1.3.1.1
  *
  * @author Oleg Cherednik
  * @since 12.11.2021
@@ -26,10 +26,14 @@ public class LiteralsSectionHeader {
     public static LiteralsSectionHeader read(Buffer inputBase) {
         int one = inputBase.getByteNoMove();
         int two = inputBase.get3Bytes();
-        LiteralsBlockType literalsBlockType = LiteralsBlockType.parseId(one & 0b11);
-        LiteralsSizeFormat literalsSizeFormat = LiteralsSizeFormat.parseId((one >> 2) & 0b11);
+        LiteralsBlockType literalsBlockType = LiteralsBlockType.parseValue(one & 0b11);
+        LiteralsSizeFormat literalsSizeFormat = LiteralsSizeFormat.parseValue((one >> 2) & 0b11);
         int sizePart1 = two >> 4;
         return new LiteralsSectionHeader(literalsBlockType, literalsSizeFormat, sizePart1);
+    }
+
+    public void decodeLiteralsBlock(Buffer inputBase, int blockSize, ZstdFrameDecompressor decompressors) {
+        literalsBlockType.decode(inputBase, blockSize, this, decompressors);
     }
 
 }

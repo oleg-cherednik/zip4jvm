@@ -17,13 +17,13 @@ public enum LiteralsSizeFormat {
     FOUR_STREAMS_14BITS(0b10),
     FOUR_STREAMS_18BITS(0b11);
 
-    private final int id;
+    private final int value;
 
-    public static LiteralsSizeFormat parseId(int id) {
+    public static LiteralsSizeFormat parseValue(int value) {
         for (LiteralsSizeFormat literalsSizeFormat : values())
-            if (literalsSizeFormat.id == id)
+            if (literalsSizeFormat.value == value)
                 return literalsSizeFormat;
 
-        throw new Zip4jvmException("Unknown LiteralsBlock type: " + id);
+        throw new Zip4jvmException("Unknown LiteralsBlock type: " + value);
     }
 }

@@ -15,7 +15,7 @@ import ru.olegcherednik.zip4jvm.io.zstd.Buffer;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class BlockHeader {
 
-    // size:3
+    // size:1
     // bit:0
     private final boolean lastBlock;
     // bit:1-2
@@ -31,8 +31,11 @@ public class BlockHeader {
         boolean last = (data & 1) != 0;
         BlockType blockType = BlockType.parseId((data >>> 1) & 0b11);
         int size = (data >>> 3) & 0x1F_FFFF; // 21 bits
-
         return new BlockHeader(last, blockType, size);
+    }
+
+    public int decodeBlock(Buffer inputBase, byte[] outputBase, int output, ZstdFrameDecompressor decompressor) {
+        return blockType.decode(blockSize, inputBase, outputBase, output, decompressor);
     }
 
 }

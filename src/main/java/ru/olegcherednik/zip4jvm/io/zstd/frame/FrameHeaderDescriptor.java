@@ -31,15 +31,15 @@ public class FrameHeaderDescriptor {
 
     // total size:1
 
-    // bitNum:0-1 - Dictionary ID Flag
+    // bit:0-1 - Dictionary ID Flag
     private DictionaryIdSize dictionaryIdSize;
-    // bitNum:2 - Content Checksum Flag
+    // bit:2 - Content Checksum Flag
     private boolean contentChecksum;
-    // bitNum:3 - reserved
-    // bitNum:4 - unused
-    // bitNum:5 - Single Segment Flag
+    // bit:3 - reserved
+    // bit:4 - unused
+    // bit:5 - Single Segment Flag
     private boolean singleSegment;
-    // bitNum:6-7 - Frame Content Size Flag
+    // bit:6-7 - Frame Content Size Flag
     private FrameContentSize frameContentSize;
 
     /** see 3.1.1.1.2 */

@@ -51,17 +51,17 @@ public enum LiteralsBlockType {
         }
     };
 
-    private final int id;
+    private final int value;
 
     public void decode(Buffer inputBase, int blockSize, LiteralsSectionHeader literalsSectionHeader, ZstdFrameDecompressor decompressors) {
         throw new Zip4jvmException("Invalid Literals_Block type");
     }
 
-    public static LiteralsBlockType parseId(int id) {
+    public static LiteralsBlockType parseValue(int value) {
         for (LiteralsBlockType literalsBlockType : values())
-            if (literalsBlockType.id == id)
+            if (literalsBlockType.value == value)
                 return literalsBlockType;
 
-        throw new Zip4jvmException("Unknown LiteralsBlock type: " + id);
+        throw new Zip4jvmException("Unknown LiteralsBlock type: " + value);
     }
 }

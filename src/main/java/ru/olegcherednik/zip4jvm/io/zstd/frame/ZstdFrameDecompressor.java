@@ -172,7 +172,7 @@ public class ZstdFrameDecompressor {
 
         while (true) {
             BlockHeader blockHeader = BlockHeader.read(inputBase);
-            output += blockHeader.getBlockType().decode(blockHeader.getBlockSize(), inputBase, outputBase, output, this);
+            output += blockHeader.decodeBlock(inputBase, outputBase, output, this);
 
             if (blockHeader.isLastBlock())
                 break;
@@ -194,7 +194,7 @@ public class ZstdFrameDecompressor {
     int decodeCompressedBlock(Buffer inputBase, int blockSize, byte[] outputBase, int outputAddress) {
         final int pos = inputBase.getOffs();
         LiteralsSectionHeader literalsSectionHeader = LiteralsSectionHeader.read(inputBase);
-        literalsSectionHeader.getLiteralsBlockType().decode(inputBase, blockSize, literalsSectionHeader, this);
+        literalsSectionHeader.decodeLiteralsBlock(inputBase, blockSize, this);
         int written = decompressSequences(inputBase, pos + blockSize, outputBase, outputAddress);
         inputBase.seek(pos + blockSize);
         return written;
